@@ -3,7 +3,7 @@
 import asyncio
 
 import pytest
-from conftest import LOCAL_VERSION, FakeHttp
+from conftest import LOCAL_VERSION, FakeHttp, corrupt_manifest
 from mcp import Client
 
 from forever.mcp_server import build_server
@@ -62,6 +62,24 @@ def test_unknown_spell_is_structured_error(make_deps):
     assert "frostbolt" in data["error"]["suggestions"]
     assert validate_provenance(data["provenance"]) == []
     assert r.content and "frostbolt" in r.content[0].text
+
+
+def test_lookup_with_corrupt_manifest_is_integrity_error(make_deps, data_copy):
+    corrupt_manifest(data_copy)
+    args = {"kind": "spell", "name": "frostbolt", "rank": 2}
+    r = call(make_deps(data_dir=data_copy), lambda c: c.call_tool("forever_lookup", args))
+    assert r.is_error
+    assert r.structured_content["error"]["code"] == "data_integrity"
+    assert validate_provenance(r.structured_content["provenance"]) == []
+
+
+def test_status_with_corrupt_manifest(make_deps, data_copy):
+    corrupt_manifest(data_copy)
+    r = call(make_deps(data_dir=data_copy), lambda c: c.call_tool("forever_status", {"offline": True}))
+    assert not r.is_error
+    integrity = r.structured_content["integrity"]
+    assert integrity["ok"] is False and integrity["manifest_error"]
+    assert validate_provenance(r.structured_content["provenance"]) == []
 
 
 def test_unsupported_kind(make_deps):

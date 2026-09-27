@@ -2,7 +2,8 @@
 
 import json
 
-from conftest import LOCAL_VERSION, FakeHttp, tamper
+import pytest
+from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, FakeHttp, corrupt_manifest, tamper
 
 from forever.cli import main
 
@@ -126,6 +127,41 @@ def test_manifest_update(capsys, make_deps, data_copy):
     code, out, _ = run(capsys, ["manifest", "--update"], make_deps(data_dir=data_copy))
     assert code == 0
     assert "manifest.json" in out
+    assert run(capsys, ["manifest", "--check"], make_deps(data_dir=data_copy))[0] == 0
+
+
+@pytest.mark.parametrize("kind", MANIFEST_CORRUPTIONS)
+@pytest.mark.parametrize("argv", [["lookup", "spell", "frostbolt"], ["manifest", "--check"]])
+def test_corrupt_manifest_is_integrity_error_without_traceback(capsys, make_deps, data_copy, argv, kind):
+    corrupt_manifest(data_copy, kind)
+    code, out, err = run(capsys, argv, make_deps(data_dir=data_copy))
+    assert code == 3
+    assert "(data_integrity)" in err
+    assert "Traceback" not in out + err
+    assert err.rstrip("\n").splitlines()[-1].startswith("Provenance")
+
+
+@pytest.mark.parametrize("kind", MANIFEST_CORRUPTIONS)
+def test_status_reports_corrupt_manifest(capsys, make_deps, data_copy, kind):
+    corrupt_manifest(data_copy, kind)
+    code, out, _ = run(capsys, ["status", "--json"], make_deps(data_dir=data_copy))
+    assert code == 3
+    integrity = json.loads(out)["integrity"]
+    assert integrity["ok"] is False
+    assert integrity["manifest_found"] is True
+    assert integrity["manifest_error"]
+
+
+def test_status_text_reports_corrupt_manifest(capsys, make_deps, data_copy):
+    corrupt_manifest(data_copy)
+    code, out, _ = run(capsys, ["status"], make_deps(data_dir=data_copy))
+    assert code == 3
+    assert "manifeste illisible" in out
+
+
+def test_manifest_update_repairs_corrupt_manifest(capsys, make_deps, data_copy):
+    corrupt_manifest(data_copy)
+    assert run(capsys, ["manifest", "--update"], make_deps(data_dir=data_copy))[0] == 0
     assert run(capsys, ["manifest", "--check"], make_deps(data_dir=data_copy))[0] == 0
 
 

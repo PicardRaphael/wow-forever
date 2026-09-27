@@ -6,7 +6,7 @@ En --json, l'objet renvoyé contient un bloc `provenance` valide."""
 import json
 
 import pytest
-from conftest import LOCAL_VERSION, FakeHttp, tamper
+from conftest import LOCAL_VERSION, FakeHttp, corrupt_manifest, tamper
 
 from forever.cli import main
 from forever.provenance import validate_provenance
@@ -29,6 +29,9 @@ CASES = {
     "manifest-check-integrity": (["manifest", "--check"], 3, "tamper"),
     "manifest-check-no-manifest": (["manifest", "--check"], 3, "no-manifest"),
     "manifest-update": (["manifest", "--update"], 0, None),
+    "status-corrupt-manifest": (["status"], 3, "corrupt-manifest"),
+    "lookup-corrupt-manifest": (["lookup", "spell", "frostbolt"], 3, "corrupt-manifest"),
+    "manifest-check-corrupt-manifest": (["manifest", "--check"], 3, "corrupt-manifest"),
 }
 
 
@@ -37,6 +40,8 @@ def prepare(data_copy, alteration):
         tamper(data_copy / LOCAL_VERSION / "spells.json")
     elif alteration == "no-manifest":
         (data_copy / "manifest.json").unlink(missing_ok=True)
+    elif alteration == "corrupt-manifest":
+        corrupt_manifest(data_copy)
 
 
 @pytest.mark.parametrize("case", CASES)

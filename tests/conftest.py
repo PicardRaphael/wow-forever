@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import json
 import shutil
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -90,3 +92,33 @@ def tamper(path: Path) -> None:
     i = next(i for i, b in enumerate(raw) if chr(b).isdigit())
     raw[i] = ord("7") if raw[i] != ord("7") else ord("8")
     path.write_bytes(bytes(raw))
+
+
+def _mutated(mutate: Callable[[dict[str, Any]], object]) -> Callable[[bytes], bytes]:
+    def apply(raw: bytes) -> bytes:
+        manifest = json.loads(raw)
+        mutate(manifest)
+        return json.dumps(manifest).encode("utf-8")
+
+    return apply
+
+
+# Manifestes présents mais corrompus : illisibles, mal formés ou incohérents.
+MANIFEST_CORRUPTIONS: dict[str, Callable[[bytes], bytes]] = {
+    "tronque": lambda raw: raw[: len(raw) // 2],
+    "vide": lambda raw: b"",
+    "non-utf8": lambda raw: b"\xff\xfe" + raw,
+    "pas-un-objet": lambda raw: b"[]\n",
+    "versions-liste": _mutated(lambda m: m.update(versions=[])),
+    "entree-texte": _mutated(lambda m: m["versions"].update({LOCAL_VERSION: "x"})),
+    "files-liste": _mutated(lambda m: m["versions"][LOCAL_VERSION].update(files=["spells.json"])),
+    "version-invalide": _mutated(lambda m: m["versions"].update(latest=m["versions"][LOCAL_VERSION])),
+    "empreinte-non-texte": _mutated(lambda m: m["versions"][LOCAL_VERSION]["files"].update({"spells.json": 42})),
+    "data-sha-incoherent": _mutated(lambda m: m["versions"][LOCAL_VERSION].update(data_sha="0" * 12)),
+    "game-version-absente": _mutated(lambda m: m.update(game_version="1.60.1.99999")),
+}
+
+
+def corrupt_manifest(data_dir: Path, kind: str = "tronque") -> None:
+    path = data_dir / "manifest.json"
+    path.write_bytes(MANIFEST_CORRUPTIONS[kind](path.read_bytes()))

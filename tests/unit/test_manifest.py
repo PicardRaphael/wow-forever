@@ -4,7 +4,8 @@ import json
 import re
 import shutil
 
-from conftest import DATA_DIR, LOCAL_VERSION, tamper
+import pytest
+from conftest import DATA_DIR, LOCAL_VERSION, MANIFEST_CORRUPTIONS, corrupt_manifest, tamper
 
 from forever.manifest import compute_manifest, data_sha, verify, write_manifest
 
@@ -43,6 +44,19 @@ def test_missing_manifest_is_reported(data_copy):
     report = verify(data_copy)
     assert not report.manifest_found
     assert not report.ok
+
+
+@pytest.mark.parametrize("kind", MANIFEST_CORRUPTIONS)
+def test_corrupt_manifest_is_reported_not_missing(data_copy, kind):
+    corrupt_manifest(data_copy, kind)
+    report = verify(data_copy)
+    assert report.manifest_found
+    assert report.manifest_error
+    assert not report.ok
+
+
+def test_valid_manifest_has_no_error():
+    assert verify(DATA_DIR).manifest_error is None
 
 
 def test_write_manifest_is_idempotent(data_copy):

@@ -1,7 +1,7 @@
 """Consultation des sorts (critère 1). Valeurs attendues : seed/forever-mage/data/1.60.1.70009/spells.json."""
 
 import pytest
-from conftest import LOCAL_VERSION, tamper
+from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, corrupt_manifest, tamper
 
 from forever.errors import DataIntegrityError, ForeverError
 from forever.lookup import lookup_spell
@@ -141,6 +141,16 @@ def test_missing_manifest_refuses_to_answer(make_deps, data_copy):
         lookup_spell(make_deps(data_dir=data_copy), "frostbolt", 2)
     assert e.value.code == "manifest_missing"
     assert e.value.exit_code == 3
+
+
+@pytest.mark.parametrize("kind", MANIFEST_CORRUPTIONS)
+def test_corrupt_manifest_refuses_to_answer(make_deps, data_copy, kind):
+    corrupt_manifest(data_copy, kind)
+    with pytest.raises(DataIntegrityError) as e:
+        lookup_spell(make_deps(data_dir=data_copy), "frostbolt", 2)
+    assert e.value.code == "data_integrity"
+    assert e.value.exit_code == 3
+    assert "manifest --update" in e.value.action
 
 
 def test_stale_cache_adds_assumption(make_deps, tmp_path):
