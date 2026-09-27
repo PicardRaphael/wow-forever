@@ -77,3 +77,10 @@ def master_of_elements_refund(gd: GameData, pts: Points, rank: Rank, estimated_m
 
     Registre : B17"""
     return talent_value(gd, pts, "masterOfElements") / PERCENT * (rank.mana or estimated_mana)
+
+
+def arcane_blast_cost(gd: GameData, rank: Rank, pts: Points, ch: Character, stacks: int) -> float:
+    """Coût d'un Arcane Blast lancé avec `stacks` cumuls actifs.
+
+    Registre : B11"""
+    raise NotImplementedError

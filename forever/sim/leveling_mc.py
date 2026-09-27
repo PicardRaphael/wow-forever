@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import random
 import statistics
-from typing import Any, TypedDict, cast
+from typing import Any, NamedTuple, TypedDict, cast
 
 from forever.engine.armor import ARMOR_CHOICES, worn_armor
 from forever.engine.cast import expected_cast
@@ -57,8 +57,20 @@ from forever.engine.movement import (
 from forever.engine.spells import SPELL_LEVELS, best_rank
 from forever.engine.talents import talent_value
 
-ROTATIONS = {"frost": "frostbolt", "fire": "fireball"}  # sort principal de chaque rotation
-OPTIONS = ("level_diff", "nova", "nova_break", "run_between_s", "mob_source", "spell_level", "rules", "armor")
+ROTATIONS = {"frost": "frostbolt", "fire": "fireball", "arcane": "arcane_blast"}  # sort principal de chaque rotation
+AB_DUMPS = ("frostbolt", "fireball", "arcane_missiles")  # sorts de décharge de la rotation arcane
+OPTIONS = (
+    "level_diff",
+    "nova",
+    "nova_break",
+    "run_between_s",
+    "mob_source",
+    "spell_level",
+    "rules",
+    "armor",
+    "ab_stacks",
+    "ab_dump",
+)
 # Règles du simulateur : `forever` (corrections de T04c) ou `seed` (comportement du seed à l'identique, parité).
 RULES = ("forever", "seed")
 # Paramètres de méthode (pas des chiffres de jeu) : pas de temps, garde contre une boucle sans fin, marges de temps.
@@ -68,6 +80,16 @@ EPSILON_S = 1e-9
 LOOKAHEAD_S = 0.01
 SECONDS_PER_HOUR = 3600.0
 PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
+
+
+class CastLog(NamedTuple):
+    """Lancer relevé par `kill_mc(log=…)` : instant de fin d'incantation, sort, cumuls d'Arcane Blast actifs au
+    lancer, mana payée (0 sous Clearcasting)."""
+
+    t: float
+    key: str
+    stacks: int
+    cost: float
 
 
 class KillResult(TypedDict):
@@ -97,6 +119,8 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
         "spell_level": "character",
         "rules": "forever",
         "armor": "auto",
+        "ab_stacks": None,
+        "ab_dump": None,
         **options,
     }
     if o["mob_source"] not in MOB_SOURCES:
@@ -109,6 +133,8 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
         raise ValueError(f"armor inconnue « {o['armor']} » ({', '.join(ARMOR_CHOICES)} attendue)")
     if o["rules"] == "seed" and o["armor"] != "auto":
         raise ValueError(f"armor « {o['armor']} » sans effet avec rules seed (le seed porte Frost Armor)")
+    if rotation == "arcane":
+        raise NotImplementedError
     return o
 
 
@@ -119,6 +145,7 @@ def kill_mc(
     ch: Character,
     rotation: str = "frost",
     rng: random.Random | None = None,
+    log: list[CastLog] | None = None,
     **options: Any,
 ) -> KillResult:
     """Un combat simulé pas à pas contre un monstre normal de niveau `level + level_diff`, puis le repos.

@@ -93,17 +93,21 @@ def build_server(deps: Deps) -> MCPServer:
         nova: bool = False,
         rules: str = "forever",
         armor: str = "auto",
+        ab_stacks: int | None = None,
+        ab_dump: str | None = None,
     ) -> LevelingReport:
         """Leveling du Mage : temps par monstre (combat, repos, total), mana, dégâts subis et XP par heure, par Monte
         Carlo (moyenne de `n` combats, graine fixe) et par le modèle analytique, avec les PV du monstre (valeur,
         source, certitude) et la provenance.
 
-        `rotation` : frost ou fire. `talents` : clé de talent -> rang (ex. {"improvedFrostbolt": 3}), build vérifié.
+        `rotation` : frost, fire ou arcane. `talents` : clé de talent -> rang (ex. {"improvedFrostbolt": 3}), build vérifié.
         `mob_source` : measured (PV mesurés, puis Questie corrigé) ou seed (modèle du seed).
         `spell_level` : character (dégâts au niveau du personnage) ou rank (dégâts du rang, parité avec le seed).
         `rules` : forever (corrections de Forever, défaut) ou seed (comportement du seed, parité).
         `armor` : auto (armure selon le niveau d'apprentissage lu dans le client), frost ou mage (paramètre de build ;
-        Mage Armor sous son niveau d'apprentissage est refusée)."""
+        Mage Armor sous son niveau d'apprentissage est refusée).
+        Rotation arcane (niveau 20 et talent arcaneBlast) : `ab_stacks` cumuls d'Arcane Blast (0 au maximum du
+        talent ; défaut : maximum) puis `ab_dump` (frostbolt par défaut, fireball, arcane_missiles)."""
         try:
             return simulate_leveling(
                 deps,
@@ -119,6 +123,8 @@ def build_server(deps: Deps) -> MCPServer:
                 nova=nova,
                 rules=rules,
                 armor=armor,
+                ab_stacks=ab_stacks,
+                ab_dump=ab_dump,
             )
         except ForeverError as err:
             return cast(LevelingReport, _error_result(deps, err))

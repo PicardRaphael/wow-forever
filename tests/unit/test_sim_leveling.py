@@ -42,7 +42,7 @@ def test_run_between_is_added_to_every_kill(game_data):
 
 def test_invalid_options_are_refused(game_data):
     with pytest.raises(ValueError, match="rotation"):
-        mc(game_data, 12, {}, rotation="arcane", n=10)
+        mc(game_data, 12, {}, rotation="shadow", n=10)
     with pytest.raises(ValueError, match="n"):
         mc(game_data, 12, {}, n=0)
     with pytest.raises(ValueError, match="mob_source"):
@@ -94,6 +94,6 @@ def test_calibration_values_of_the_seed(game_data):
 
 def test_analytic_refuses_invalid_options(game_data):
     with pytest.raises(ValueError, match="rotation"):
-        kill_analytic(game_data, 12, {}, rotation="arcane")
+        kill_analytic(game_data, 12, {}, rotation="shadow")
     with pytest.raises(ValueError, match="option"):
         kill_analytic(game_data, 12, {}, flee=True)

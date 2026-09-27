@@ -147,6 +147,8 @@ def simulate_leveling(
     over: CharacterOverrides | None = None,
     rules: str = "forever",
     armor: str = "auto",
+    ab_stacks: int | None = None,
+    ab_dump: str | None = None,
 ) -> LevelingReport:
     """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance."""
     data = load_version(deps)
@@ -165,6 +167,10 @@ def simulate_leveling(
         "rules": rules,
         "armor": armor,
     }
+    if ab_stacks is not None:
+        raw["ab_stacks"] = ab_stacks
+    if ab_dump is not None:
+        raw["ab_dump"] = ab_dump
     if level_diff is not None:
         raw["level_diff"] = level_diff
     try:

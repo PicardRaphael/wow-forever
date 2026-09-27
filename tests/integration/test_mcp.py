@@ -151,3 +151,13 @@ def test_sim_leveling_armor_and_rules(make_deps):
     r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
     assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
     assert validate_provenance(r.structured_content["provenance"]) == []
+
+
+def test_sim_leveling_arcane_rotation(make_deps):
+    """T04c : rotation arcane, `ab_stacks` et `ab_dump` paramètres de build ; cumuls hors plage refusés."""
+    talents = {"arcaneFocus": 5, "arcaneSubtlety": 2, "magicAbsorption": 2, "arcaneResilience": 1, "arcaneBlast": 1}
+    args = {"level": 24, "n": 10, "rotation": "arcane", "talents": talents, "ab_stacks": 2, "ab_dump": "fireball"}
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
+    assert not r.is_error and r.structured_content["options"]["ab_stacks"] == 2
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", {**args, "ab_stacks": 9}))
+    assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"

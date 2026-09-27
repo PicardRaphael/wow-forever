@@ -14,14 +14,14 @@ Les règles viennent de `forever/engine/` ; ce module assemble l'espérance. Reg
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
 from forever.engine.armor import worn_armor
 from forever.engine.cast import expected_cast
 from forever.engine.casting import melee_cast_time, pushback_rate, spell_cooldown
 from forever.engine.character import character
 from forever.engine.mana import downtime, in_combat_regen_fraction
-from forever.engine.model import CharacterOverrides, GameData, Points
+from forever.engine.model import Character, CharacterOverrides, GameData, Points
 from forever.engine.monsters import mob_expected_hit, mob_hp, mob_land_chance, mob_swing_damage, mob_xp
 from forever.engine.movement import (
     attacker_swing_s,
@@ -35,6 +35,33 @@ from forever.engine.movement import (
 from forever.engine.spells import best_rank
 from forever.engine.talents import talent_value
 from forever.sim.leveling_mc import PERCENT, ROTATIONS, SECONDS_PER_HOUR, KillResult, options_with_defaults
+
+
+class ArcaneCycle(TypedDict):
+    """Cycle stationnaire de la rotation arcane : k Arcane Blast à coûts croissants puis une décharge."""
+
+    ab_casts: int
+    time_s: float
+    dmg: float
+    mana: float
+    ab_mana: float
+
+
+def arcane_cycle(
+    gd: GameData,
+    level: int,
+    pts: Points,
+    ch: Character,
+    level_diff: int = 0,
+    *,
+    ab_stacks: int | None = None,
+    ab_dump: str = "frostbolt",
+    spell_level: str = "character",
+) -> ArcaneCycle:
+    """Espérance d'un cycle de la rotation arcane (hors recul d'incantation).
+
+    Registre : B11, B15, I1"""
+    raise NotImplementedError
 
 
 def kill_analytic(

@@ -214,7 +214,15 @@ def build_parser() -> argparse.ArgumentParser:
 
 def _leveling_arguments(p: argparse.ArgumentParser, *, n_default: int) -> None:
     p.add_argument("--race", default="Orc", help="race du personnage (défaut : Orc)")
-    p.add_argument("--rotation", default="frost", choices=["frost", "fire"], help="rotation (défaut : frost)")
+    p.add_argument("--rotation", default="frost", choices=["frost", "fire", "arcane"], help="rotation (défaut : frost)")
+    p.add_argument(
+        "--ab-stacks", type=int, help="rotation arcane : cumuls d'Arcane Blast avant la décharge (défaut : maximum)"
+    )
+    p.add_argument(
+        "--ab-dump",
+        choices=["frostbolt", "fireball", "arcane_missiles"],
+        help="rotation arcane : sort de décharge (défaut : frostbolt)",
+    )
     p.add_argument("--talents", default="", help="talents clé=rang,clé=rang (ex. improvedFrostbolt=3)")
     p.add_argument("--n", type=int, default=n_default, help=f"combats simulés par niveau (défaut : {n_default})")
     p.add_argument("--seed", type=int, default=12345, help="graine du Monte Carlo (défaut : 12345)")
@@ -759,6 +767,8 @@ def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
         nova=args.nova,
         rules=args.rules,
         armor=args.armor,
+        ab_stacks=args.ab_stacks,
+        ab_dump=args.ab_dump,
     )
     hp = rep["mob_hp"]
     gap = f"{rep['analytic_gap'] * 100:+.1f}".replace(".", ",")
@@ -805,6 +815,10 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
         "rules": args.rules,
         "armor": args.armor,
     }
+    if args.ab_stacks is not None:
+        options["ab_stacks"] = args.ab_stacks
+    if args.ab_dump is not None:
+        options["ab_dump"] = args.ab_dump
     if args.level_diff is not None:
         options["level_diff"] = args.level_diff
     try:
