@@ -25,7 +25,11 @@ sys.path.insert(0, str(ROOT))
 
 from forever.config import default_wow_dir
 
-NPCS = (3099, 5951, 3111, 1531, 5945)  # mesurés dans le journal (3) ; leurres : 1531 rare (rang 4), 5945 élite (rang 1)
+# Mesurés dans la première fixture (3099, 5951) ; leurres : 3111 jamais observé, 1531 rare (rang 4), 5945 élite
+# (rang 1) ; puis les 19 PNJ mesurés dans la seconde fixture (T04b, correction Questie -> Forever).
+NPCS = (3099, 5951, 3111, 1531, 5945)
+NPCS_T04B = (3242, 3244, 3245, 3246, 3254, 3265, 3266, 3267, 3268, 3269, 3272, 3379, 3380, 3415, 3425, 3986, 6466)
+NPCS_T04B += (12319, 12320)
 QUESTS = (787, 788, 789)
 NPC_DB = Path("Database/Classic/classicNpcDB.lua")
 XP_DB = Path("Database/QuestXP/DB/xpDB-classic.lua")
@@ -96,7 +100,7 @@ def main(argv: list[str] | None = None) -> int:
 
     npc = (args.addon / NPC_DB).read_text(encoding="utf-8")
     keys = npc[: npc.index("QuestieDB.npcData")]
-    body = "\n".join(entries(npc, NPCS))
+    body = "\n".join(entries(npc, NPCS + NPCS_T04B))
     (out / NPC_DB).write_bytes(f"{keys}QuestieDB.npcData = [[return {{\n{body}\n}}]]\n".encode())
 
     xp = (args.addon / XP_DB).read_text(encoding="utf-8")

@@ -189,11 +189,25 @@ class RankScaling:
 
 @dataclass(frozen=True)
 class MonsterHp:
-    """PV max d'un monstre à un niveau, avec sa certitude (`certain` mesuré, `suppose` communautaire)."""
+    """PV max d'un monstre à un niveau, avec sa certitude (`certain` mesuré, `probable`, `suppose` communautaire ou
+    extrapolé) ; valeur fractionnaire possible pour le modèle interpolé du seed."""
 
-    value: int
+    value: float
     certainty: str
     source: str
+
+
+@dataclass(frozen=True)
+class QuestieCorrection:
+    """Correction PV Questie -> Forever (`monsters.json.questie_correction`) : rapport médian mesuré / Questie par
+    niveau mesuré, droite des moindres carrés (rapport = max(1, pente × niveau + ordonnée)), plage des niveaux
+    mesurés. `slope` et `intercept` absents : moins de deux niveaux au rapport supérieur à 1."""
+
+    levels: Mapping[int, float]
+    slope: float | None
+    intercept: float | None
+    level_min: int
+    level_max: int
 
 
 @dataclass(frozen=True)
@@ -202,6 +216,21 @@ class MonsterTable:
 
     hp_by_level: Mapping[int, MonsterHp]
     npcs: Mapping[int, Mapping[int, MonsterHp]]
+    correction: QuestieCorrection | None = None
+
+
+@dataclass(frozen=True)
+class MobModel:
+    """Modèle de monstre du seed (`leveling.json.mob_model`) : PV d'ancrage par niveau (interpolés), coups, course."""
+
+    hp_anchors: Mapping[int, float]
+    swing_s: float
+    crit: float
+    crit_mult: float
+    avoid_vs_mage: float
+    run_speed: float
+    melee_range: float
+    certainty: str
 
 
 @dataclass(frozen=True)

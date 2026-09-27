@@ -53,7 +53,7 @@ def check(name, *, strict=True, engine_dirs=()):
 def test_repository_registry_is_valid_strict():
     report = validate(REGISTRY_PATH, REPO_ROOT, strict=True)
     assert report.errors == []
-    assert report.total == 102  # T04 : G7 (points de base par niveau)
+    assert report.total == 103  # T04b : H11 (PV des monstres par niveau)
 
 
 def test_tested_entries_reference_existing_test_functions():
@@ -124,7 +124,7 @@ def test_find_entry_unknown_suggests():
 
 def test_repository_coverage():
     """Seul test qui fige la couverture du registre après T02."""
-    assert coverage(REGISTRY_PATH) == "22/102"  # T04 : G7 ajoutée (teste)
+    assert coverage(REGISTRY_PATH) == "23/103"  # T04b : H11 ajoutée (teste)
 
 
 def test_load_reads_optional_fields():
@@ -136,8 +136,8 @@ def test_load_reads_optional_fields():
 def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("Registre : 102 mécaniques")
-    assert "teste 22" in out
+    assert out.startswith("Registre : 103 mécaniques")
+    assert "teste 23" in out
 
 
 def test_main_reports_errors(capsys):

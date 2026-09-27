@@ -15,7 +15,7 @@ from __future__ import annotations
 import json
 import statistics
 from collections import defaultdict
-from collections.abc import Iterable, Sequence
+from collections.abc import Collection, Iterable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -32,6 +32,11 @@ def _median(values: Sequence[int]) -> int:
     return int(statistics.median_low(values))
 
 
+def fit_questie_correction(npcs: Mapping[str, Any], *, exclude: Collection[int] = ()) -> dict[str, Any] | None:
+    """Correction PV Questie -> Forever tirée des PNJ normaux mesurés (section `npcs` de `monsters.json`)."""
+    raise NotImplementedError
+
+
 def build_monsters(
     observations: Iterable[MonsterObservation],
     questie: QuestieDB | None,
@@ -39,6 +44,7 @@ def build_monsters(
     *,
     conflicts: Iterable[Conflict] = (),
     logs: Iterable[str] = (),
+    fit_exclude: Collection[int] = (),
 ) -> dict[str, Any]:
     """Contenu de `monsters.json` pour la version `version`."""
     by_key: dict[tuple[int, int], list[MonsterObservation]] = defaultdict(list)

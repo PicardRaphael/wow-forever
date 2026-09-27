@@ -15,7 +15,7 @@ def test_info_from_camelot_toc():
     db = read_questie(QUESTIE)
     info = db.info
     assert (info.version, info.title, info.interface) == ("11.38.0", "Forever-v27", 16001)
-    assert info.npc_count == 5 and info.quest_count is None
+    assert info.npc_count == 24 and info.quest_count is None  # T04b : + 19 PNJ de la seconde fixture
 
 
 def test_npcs():
@@ -30,7 +30,7 @@ def test_npcs():
         1,
     )
     assert db.npc(1) is None
-    assert sorted(db.npcs()) == [1531, 3099, 3111, 5945, 5951]
+    assert {1531, 3099, 3111, 5945, 5951, 3986, 12320} <= set(db.npcs()) and len(db.npcs()) == 24
 
 
 def test_hp_at_level_interpolates_between_min_and_max():

@@ -29,7 +29,7 @@ def test_questie_info(capsys, make_deps):
     http = FakeHttp.failing()
     code, out, _ = run(capsys, ["questie", "info", "--dir", str(QUESTIE), "--json"], make_deps(http=http))
     payload = json.loads(out)
-    assert code == 0 and payload["version"] == "11.38.0" and payload["npc_count"] == 5
+    assert code == 0 and payload["version"] == "11.38.0" and payload["npc_count"] == 24
     assert payload["provenance"]["certainty"] == "suppose"
     code, out, _ = run(capsys, ["questie", "info", "--dir", str(QUESTIE)], make_deps(http=http))
     assert code == 0 and "11.38.0" in out and "communautaire" in out
@@ -46,6 +46,7 @@ def test_monsters_build(capsys, make_deps, data_copy, tmp_path):
     deps = make_deps(http=http, data_dir=data_copy)
     before = tree_sha(data_copy)
     argv = ["monsters", "build", "--logs", str(COMBATLOG), "--questie", str(QUESTIE), "--out", str(tmp_path / "m")]
+    argv += ["--fit-exclude", "3986"]  # T04b : Sarilus Foulborne hors de l'ajustement de la correction Questie
     code, out, _ = run(capsys, [*argv, "--json"], deps)
     payload = json.loads(out)
     assert code == 0 and payload["npcs"] == 21  # T04b : 19 PNJ de la seconde fixture
@@ -53,6 +54,7 @@ def test_monsters_build(capsys, make_deps, data_copy, tmp_path):
     assert table["npcs"]["3099"]["levels"]["6"]["certainty"] == "certain"
     assert table["npcs"]["3099"]["levels"]["7"]["max_hp"] == table["npcs"]["3099"]["levels"]["7"]["questie_hp"]
     assert table["npcs"]["5951"]["levels"]["1"]["max_hp"] == 8
+    assert table["schema_version"] == 2 and table["questie_correction"]["excluded"][0]["npc_id"] == 3986
     code, out, _ = run(capsys, [*argv, "--json"], deps)
     assert code == 2 and json.loads(out)["error"]["code"] == "candidate_exists"
     code, out, _ = run(capsys, [*argv, "--force"], deps)
