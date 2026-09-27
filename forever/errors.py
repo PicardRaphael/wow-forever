@@ -157,3 +157,25 @@ class UnknownVersionError(ForeverError):
             "donner une version du dépôt ou le chemin d'une version candidate",
             suggestions=available,
         )
+
+
+class CsvMissingError(ForeverError):
+    exit_code = EXIT_NOT_FOUND
+
+    def __init__(self, version: str, missing: list[str]) -> None:
+        super().__init__(
+            "csv_missing",
+            f"Tables du client absentes pour {version} : {', '.join(missing)}.",
+            f"lancer `uv run forever fetch --version {version}` (ou donner --csv-dir)",
+        )
+
+
+class CandidateExistsError(ForeverError):
+    exit_code = EXIT_USAGE
+
+    def __init__(self, path: str) -> None:
+        super().__init__(
+            "candidate_exists",
+            f"Une version candidate existe déjà : {path}.",
+            "ajouter --force pour la remplacer, ou choisir un autre dossier avec --out",
+        )

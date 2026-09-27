@@ -1,4 +1,5 @@
-"""Interface en ligne de commande : `forever status | lookup | explain-mechanic | manifest | builds | fetch | mcp`.
+"""Interface en ligne de commande : `forever status | lookup | explain-mechanic | manifest | builds | fetch | decode | diff | verify
+| report | mcp`.
 
 Sortie texte en français par défaut (dernière ligne : provenance), `--json` pour une sortie structurée.
 Codes de sortie : 0 succès, 2 usage, 3 intégrité des données, 4 introuvable, 5 réseau."""
@@ -11,6 +12,7 @@ import json
 import sys
 from collections.abc import Mapping
 from dataclasses import replace
+from pathlib import Path
 from typing import Any, NoReturn
 
 from forever.config import Deps, default_deps
@@ -26,7 +28,11 @@ from forever.explain import MechanicExplanation, explain_mechanic
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.builds import list_builds
+from forever.pipeline.decode import Candidate, decode_version
+from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
+from forever.pipeline.report import render_report
+from forever.pipeline.verify import VerifyReport, verify_version
 from forever.provenance import Provenance, error_payload, format_provenance_line, local_provenance
 from forever.status import StatusReport, status_report
 from forever.store import current_identity, ensure_integrity, read_sources
@@ -82,6 +88,28 @@ def build_parser() -> argparse.ArgumentParser:
     fetch.add_argument("--refresh", action="store_true", help="retélécharger même si le cache est conforme")
     fetch.add_argument("--offline", action="store_true", help="refuser tout appel réseau")
     fetch.add_argument("--json", action="store_true", help="sortie JSON")
+
+    decode = sub.add_parser("decode", help="décoder les tables du client en version candidate (hors ligne)")
+    decode.add_argument("--version", required=True, help="version complète, ex. 1.60.1.70009")
+    decode.add_argument("--csv-dir", help="dossier des CSV (défaut : cache de forever fetch)")
+    decode.add_argument("--out", help="dossier de la candidate (défaut : <cache>/candidates/<version>)")
+    decode.add_argument("--force", action="store_true", help="remplacer une candidate existante")
+    decode.add_argument("--json", action="store_true", help="sortie JSON")
+
+    diff = sub.add_parser("diff", help="comparer deux versions de données (dépôt ou candidate)")
+    diff.add_argument("a", help="version du dépôt ou chemin d'une candidate")
+    diff.add_argument("b", help="version du dépôt ou chemin d'une candidate")
+    diff.add_argument("--json", action="store_true", help="sortie JSON")
+
+    verify = sub.add_parser("verify", help="vérifier une version de données (dépôt ou candidate)")
+    verify.add_argument("source", nargs="?", help="version du dépôt ou chemin d'une candidate (défaut : locale)")
+    verify.add_argument("--json", action="store_true", help="sortie JSON")
+
+    report = sub.add_parser("report", help="rapport Markdown d'un changement de données")
+    report.add_argument("a", help="version du dépôt ou chemin d'une candidate")
+    report.add_argument("b", help="version du dépôt ou chemin d'une candidate")
+    report.add_argument("--out", help="écrire le rapport dans ce fichier")
+    report.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     return parser
@@ -328,6 +356,91 @@ def _cmd_fetch(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def render_decode(c: Candidate) -> list[str]:
+    lines = [
+        f"Version candidate {c.version} : {c.root}",
+        f"{c.talents} talents · {c.spells} sorts · {c.spell_ranks} rangs de sort",
+    ]
+    lines += [f"  observation : {o}" for o in c.observations]
+    return lines
+
+
+def _change_line(c: Change) -> str:
+    what = {"talent": "talent", "spell": "sort", "file": "fichier"}[c["kind"]]
+    if c["change"] == "added":
+        return f"+ {what} ajouté : {c['key']}" + (f" ({c['field']})" if c["field"] else "")
+    if c["change"] == "removed":
+        return f"- {what} retiré : {c['key']}" + (f" ({c['field']})" if c["field"] else "")
+    old, new = json.dumps(c["old"], ensure_ascii=False), json.dumps(c["new"], ensure_ascii=False)
+    return f"~ {c['key']} : {c['field']} {old} -> {new}"
+
+
+def render_diff(d: VersionDiff) -> list[str]:
+    lines = [f"Comparaison {d['a']} -> {d['b']}"]
+    lines += [_change_line(c) for c in d["changes"]]
+    counts = ", ".join(f"{n} {k}" for k, n in d["counts"].items())
+    lines.append(f"{len(d['changes'])} changement(s) ({counts})" if d["changes"] else "Aucun changement")
+    return lines
+
+
+def render_verify(r: VerifyReport) -> list[str]:
+    lines = [f"Vérification de {r['source']} ({r['version']}) : {'ok' if r['ok'] else 'ÉCHEC'}"]
+    lines += [f"  erreur : {e}" for e in r["errors"]]
+    lines += [f"  avertissement : {w}" for w in r["warnings"]]
+    if r["inherited"]:
+        lines.append(f"Fichiers hérités : {', '.join(r['inherited'])}")
+    return lines
+
+
+def _cmd_decode(deps: Deps, args: argparse.Namespace) -> int:
+    c = decode_version(
+        deps,
+        args.version,
+        csv_dir=Path(args.csv_dir) if args.csv_dir else None,
+        out=Path(args.out) if args.out else None,
+        force=args.force,
+    )
+    provenance = local_provenance(deps, assumptions=[f"version candidate {c.version} non installée : {c.root}"])
+    payload = {
+        "version": c.version,
+        "root": str(c.root),
+        "talents": c.talents,
+        "spells": c.spells,
+        "spell_ranks": c.spell_ranks,
+        "observations": c.observations,
+        "provenance": provenance,
+    }
+    _emit(payload, render_decode(c), provenance, args.json)
+    return EXIT_OK
+
+
+def _cmd_diff(deps: Deps, args: argparse.Namespace) -> int:
+    d = diff_versions(deps, args.a, args.b)
+    _emit(d, render_diff(d), d["provenance"], args.json)
+    return EXIT_OK
+
+
+def _cmd_verify(deps: Deps, args: argparse.Namespace) -> int:
+    r = verify_version(deps, args.source)
+    _emit(r, render_verify(r), r["provenance"], args.json)
+    return EXIT_OK if r["ok"] else EXIT_INTEGRITY
+
+
+def _cmd_report(deps: Deps, args: argparse.Namespace) -> int:
+    d = diff_versions(deps, args.a, args.b)
+    r = verify_version(deps, args.b)
+    text = render_report(d, r)
+    if args.out:
+        Path(args.out).write_bytes(text.encode("utf-8"))
+    lines = [f"Rapport écrit : {args.out}"] if args.out else [text.rstrip("\n")]
+    payload = {"a": d["a"], "b": d["b"], "report": text, "out": args.out, "provenance": d["provenance"]}
+    if args.json or args.out:
+        _emit(payload, lines, d["provenance"], args.json)
+    else:
+        print(text.rstrip("\n"))  # la dernière ligne du rapport est déjà la provenance
+    return EXIT_OK
+
+
 def _use_utf8_output() -> None:
     """Sortie redirigée (tube, fichier) : UTF-8 quel que soit l'encodage local, pour les accents et le JSON."""
     for stream in (sys.stdout, sys.stderr):
@@ -362,6 +475,10 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "manifest": _cmd_manifest,
         "builds": _cmd_builds,
         "fetch": _cmd_fetch,
+        "decode": _cmd_decode,
+        "diff": _cmd_diff,
+        "verify": _cmd_verify,
+        "report": _cmd_report,
     }
     try:
         return handlers[args.command](deps, args)
