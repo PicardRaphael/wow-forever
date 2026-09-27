@@ -11,6 +11,7 @@ import json
 import pytest
 from conftest import (
     COMBATLOG,
+    FIXTURES,
     LOCAL_VERSION,
     REAL_LOG,
     SYNTHETIC_LOGS,
@@ -22,6 +23,8 @@ from conftest import (
 
 from forever.cli import main
 from forever.provenance import validate_provenance
+
+QUESTIE = FIXTURES / "questie" / "11.38.0"
 
 LABELS = ["version ", "données ", "générée ", "fraîcheur ", "certitude ", "registre ", "hypothèses : "]
 
@@ -75,7 +78,21 @@ CASES = {
     "logs-measure-unsupported": (["logs", "measure", str(SYNTHETIC_LOGS / "version21.txt")], 3, None),
     "logs-measure-truncated": (["logs", "measure", str(SYNTHETIC_LOGS / "truncated.txt")], 3, None),
     "usage-logs-no-subcommand": (["logs"], 2, None),
+    "questie-info": (["questie", "info", "--dir", str(QUESTIE)], 0, None),
+    "questie-info-missing": (["questie", "info", "--dir", str(COMBATLOG / "absent")], 4, None),
+    "monsters-build": (
+        ["monsters", "build", "--logs", str(COMBATLOG), "--questie", str(QUESTIE), "--out", "{tmp}/m", "--force"],
+        0,
+        None,
+    ),
+    "monsters-build-into-data": (["monsters", "build", "--logs", str(COMBATLOG), "--out", "{data}/x"], 2, None),
+    "usage-monsters-no-logs": (["monsters", "build"], 2, None),
 }
+
+
+def expand(argv, data_copy):
+    """Chemins de sortie propres au test : {tmp} (dossier temporaire) et {data} (copie des données)."""
+    return [a.replace("{tmp}", str(data_copy.parent)).replace("{data}", str(data_copy)) for a in argv]
 
 
 def prepare(data_copy, alteration):
@@ -91,6 +108,7 @@ def prepare(data_copy, alteration):
 def test_text_output_ends_with_provenance(case, capsys, make_deps, data_copy):
     argv, expected_code, alteration = CASES[case]
     prepare(data_copy, alteration)
+    argv = expand(argv, data_copy)
     code = main(argv, make_deps(data_dir=data_copy, http=FakeHttp.fixture("builds_fresh.json")))
     out, err = capsys.readouterr()
     assert code == expected_code
@@ -105,6 +123,7 @@ def test_text_output_ends_with_provenance(case, capsys, make_deps, data_copy):
 def test_json_output_has_valid_provenance(case, capsys, make_deps, data_copy):
     argv, expected_code, alteration = CASES[case]
     prepare(data_copy, alteration)
+    argv = expand(argv, data_copy)
     code = main([*argv, "--json"], make_deps(data_dir=data_copy, http=FakeHttp.fixture("builds_fresh.json")))
     out, _ = capsys.readouterr()
     assert code == expected_code

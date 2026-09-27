@@ -13,3 +13,4 @@ Cas limites écrits pour les tests (pas des journaux réels) :
 - `unknown_event.txt` : événement inconnu `FOREVER_NEW_EVENT` (gardé brut, compté).
 - `hp_conflict.txt` : deux sangliers 3099 de niveau 6 avec des PV max différents (120 et 125) → conflit ; nom de joueur non ASCII (`Jén-Royaume`).
 - `multi_power.txt` : bloc avancé à plusieurs ressources (`3|4,46|2,100|5,35|2` : énergie et points de combo), ligne relevée dans `WoWCombatLog-092726_150346.txt` (joueur anonymisé) → ressource principale retenue.
+- `summoned.txt` : totem de feu (2523) invoqué par un joueur (propriétaire non nul dans le bloc avancé) → exclu des PV de monstres.
