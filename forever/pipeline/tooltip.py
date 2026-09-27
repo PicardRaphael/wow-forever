@@ -32,7 +32,7 @@ _DECIMALS = re.compile(r"\.(\d)")
 
 def half_up(x: float, decimals: int = 0) -> float:
     """Arrondi au demi supérieur (0,5 -> 1), à `decimals` décimales."""
-    scale = 10**decimals
+    scale = 10.0**decimals
     return math.floor(round(x * scale, 9) + 0.5) / scale
 
 
