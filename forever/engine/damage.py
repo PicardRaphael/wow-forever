@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import NamedTuple
+
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, Character, GameData, Points, Rank
 from forever.engine.spells import coefficient
 from forever.engine.talents import talent_value
@@ -71,3 +73,24 @@ def ignite_damage(gd: GameData, pts: Points, crit_damage: float) -> float:
 
     Registre : A18"""
     return crit_damage * talent_value(gd, pts, "ignite") / PERCENT
+
+
+class IgniteState(NamedTuple):
+    """Ignite en cours sur la cible : dégâts restant à infliger et instants des tics restants."""
+
+    remaining: float
+    ticks: tuple[float, ...]
+
+
+def roll_ignite(gd: GameData, state: IgniteState | None, now: float, amount: float) -> IgniteState:
+    """Nouvel Ignite posé à `now` par un critique de feu de part `amount` (règle roulante).
+
+    Registre : A18"""
+    raise NotImplementedError
+
+
+def ignite_ticks_due(state: IgniteState | None, until: float) -> tuple[float, IgniteState | None]:
+    """(dégâts des tics dus jusqu'à `until` inclus, Ignite restant ou None).
+
+    Registre : A18"""
+    raise NotImplementedError
