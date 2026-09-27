@@ -20,5 +20,17 @@
 - Base d'objets de référence : `alcaras/forever-ref` (calcul des stats par formules du client).
 - Recoupements lisibles : ForeverChanges, WoW Forever Talents, Wowhead Forever.
 
-## Journaux de combat
-- Format `WoWCombatLog.txt` version 22 (journalisation avancée) : parseur maison. Warcraft Logs n'a pas de support Forever documenté à ce jour.
+## Client installé (sources locales, sans réseau ; T04a)
+Dossier du client : `FOREVER_WOW_DIR` (défaut `C:\Program Files (x86)\World of Warcraft\_classic_beta_`), lu en lecture seule.
+- **Journaux de combat** `Logs/WoWCombatLog-*.txt` : format 22, bloc avancé à 19 champs (dont PV max, coût du sort, position, niveau) ; lecteur `forever/pipeline/combatlog.py`, mesures `forever/pipeline/measure.py` (`forever logs scan`, `forever logs measure`). L'en-tête ne donne que `1.60.1` (pas le build) : la provenance retient la version locale de même préfixe, avec une hypothèse. Source de premier rang pour les PV des monstres (`certain`). Warcraft Logs n'a pas de support Forever documenté.
+- **Hotfix.log** : index des hotfixes appliqués au démarrage (push, table, RecID, validité), **sans valeur** ; utilisable en T08 comme index de changements. Les valeurs sont dans `Cache/ADB/<locale>/DBCache.bin` (en-tête `XFTH`, build en octets 4-7) : décodage en T08 (WoWDBDefs).
+- **QuestCache.log** : journal de requêtes du cache de quêtes, **aucune donnée** ; le contenu est dans `Cache/WDB/<locale>/questcache.wdb` (`WQST`) et `creaturecache.wdb` (`WMOB`, sans PV) : format binaire non documenté, hors T04.
+- **SavedVariables** `WTF/Account/<COMPTE>/SavedVariables/` : `ForeverLogger.lua` (`ForeverLoggerDB`, niveau et talents du personnage, `forever/pipeline/addon_sv.py`) ; lus sans exécuter de Lua (`forever/pipeline/lua_table.py`).
+
+## Addons installés (sources communautaires)
+- **Questie** (`Interface/AddOns/Questie`, version lue dans `Questie_Camelot.toc`, ici 11.38.0 Forever-v27) : base **Classic Era sans correction Forever** (PNJ : PV min/max, niveaux, rang ; XP de quête). Lecture locale seulement (`forever/pipeline/questie.py`), jamais copiée : le dépôt ne garde que l'agrégat par niveau et les PNJ observés dans un journal avec la valeur Questie en regard (`monsters.json`). Certitude `suppose`, étiquette « communautaire », version de l'addon dans la provenance. **Licence amont à vérifier** avant tout élargissement. Relire quand la version change (veille, T08). Écart mesuré le 2026-09-27 : Questie sous-estime les PV de Forever à partir du niveau 10 environ (22 écarts sur 17 PNJ mesurés).
+- ForeverDungeonJournal (niveaux de boss, recoupement de H1), GearQuestForever (fiches d'objets, T10) : notés, non ingérés. EllesmereUI : non utilisé.
+- **RestedXP (RXPGuides) : exclu en entier** (guides payants).
+
+## API Blizzard
+Clés dans `.env` (ignoré par git, jamais lu par les tests). Couverture de Forever à vérifier au lancement ; le client futur vivra dans `forever/pipeline/bnet.py` (via `Deps.http_get`) et sera ajouté à la liste réseau de CLAUDE.md et de `tests/unit/test_network_boundary.py` ce jour-là. Aucun code en T04.

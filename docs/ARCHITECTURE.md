@@ -17,12 +17,14 @@ forever-core/
 │   ├── sim/                   # leveling_mc.py, leveling_analytic.py, raid_analytic.py, raid_mc.py
 │   ├── optim/                 # talents.py, gear.py, consumables.py, respec.py
 │   ├── charts/                # graphiques déterministes (PNG/SVG)
-│   ├── pipeline/              # builds, fetch, tables, tooltip, decode, sources, diff, verify, report
+│   ├── pipeline/              # builds, fetch, tables, tooltip, decode, sources, diff, verify, report ;
+│   │                          # combatlog, measure, lua_table, questie, monsters, addon_sv (sources locales)
 │   ├── memory/                # fiches joueur (lecture/écriture dans le vault), import de l'addon
 │   ├── provenance.py          # bloc provenance commun
 │   ├── cli.py                 # commandes forever …
 │   └── mcp_server.py          # outils MCP
 ├── plugin/                    # plugin Claude Code (skills, agents, hooks, commands, .mcp.json)
+├── addon/                     # addons du jeu (ForeverLogger ; ForeverAssist prévu), règles : docs/ADDON.md
 ├── tests/{unit,golden,parity,fixtures}/
 └── .github/workflows/{ci.yml,build-watch.yml}
 ```
@@ -64,6 +66,13 @@ forever-core/
 - `forever decode --version X [--csv-dir D] [--out D] [--force]` écrit une **version candidate** hors de `forever/data/` (défaut `<cache>/candidates/<version>/`) : `manifest.json` + `<version>/` avec `talents.json` et `spells.json` décodés, les fichiers non dérivables du client hérités de la version locale la plus récente (`inherited_from` dans le fichier et dans son entrée de `sources.json`) et un `sources.json` généré. Talents : `ranks` (forme de la référence, positions lues par le moteur) et `tooltip_values` (toutes les variables de l'infobulle). T03 n'installe jamais une candidate (T08).
 - `forever diff A B`, `forever verify [SOURCE]`, `forever report A B [--out F]` acceptent un identifiant de version du dépôt ou le chemin d'une candidate (`unknown_version`, code 4) et exigent l'intégrité des deux côtés. `verify` : schéma du moteur, `len(ranks) == max`, prérequis, positions uniques, longueur et niveaux des rangs de sort, `sources.json` complet ; code 3 en cas d'écart. `report` : Markdown déterministe « data: A → B », futur corps de PR de T08.
 - `confirmed_changes.json` (dossier de version) : écarts entre le décodage du client et la référence de la version, tranchés par l'utilisateur, avec leur nature (`client`, `format`, `convention`). Les tests vérifient la liste dans les deux sens ; l'installation de ces valeurs revient à T08.
+
+## Sources locales du client (T04a)
+- `forever logs scan [--dir D]` et `forever logs measure FICHIER|DOSSIER [--max-gap S] [--addon-sv F]` : lecture des journaux (`combatlog.py` : format 22 et bloc avancé décrits dans le code comme un format de fichier ; événement inconnu gardé brut ; `unsupported_log` code 3 ; ligne mal formée `data_schema` avec fichier et ligne), puis mesures pures (`measure.py`) : PV max par PNJ et niveau (créatures invoquées exclues, conflits listés), coûts, intervalles entre instantanés enchaînés (fenêtre `--max-gap`, paramètre de l'outil), durées d'incantation, critiques, touchés et ratés par école et écart de niveau (niveau du lanceur par `ForeverLoggerDB`).
+- `forever questie info [--dir D]` et `forever monsters build --logs D [--questie D] [--out D] [--force]` : table des monstres écrite hors de `forever/data/` (`candidate_exists` code 2), puis installée à la main avec `forever manifest --update`.
+- `lua_table.py` : analyseur pur des tables Lua littérales (Questie, SavedVariables) ; aucun Lua exécuté, aucune dépendance.
+- Données : `monsters.json` (PNJ mesurés `certain`, agrégat `hp_by_level` : journal d'abord, sinon médiane Questie `suppose`) et `spell_scaling.json` (produit par `forever decode` : points de base, points par niveau, variance et ticks de chaque effet de dégâts ; `MaxLevel` 0 résolu au décodage). `GameData.monsters` et `GameData.scaling` ; moteur : `rank_values_at_level` (registre G7).
+- Registre : champ optionnel `preuves` (journal sous `tests/fixtures/combatlog/`, date, mesure, `n`, test) ; `valide-journal` exige une preuve valide avec `n` ≥ `tolerance.n_min`.
 
 ## Moteur de mécaniques et registre
 - `forever/gamedata.py` lit une version après contrôle d'intégrité (`store.load_version`) et construit un `GameData` gelé (sorts, talents dans l'ordre du fichier, règles de combat, raciaux, constantes). Seul module qui touche au JSON brut du moteur ; tout écart de schéma lève `data_schema` (code 3). En T02, `GameData` ne couvre que le Mage (un espace par classe en T12).
