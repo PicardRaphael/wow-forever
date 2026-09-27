@@ -9,7 +9,7 @@ Exclusions : `--help` (aide d'argparse, code 0, ce n'est pas un résultat d'outi
 import json
 
 import pytest
-from conftest import LOCAL_VERSION, FakeHttp, corrupt_manifest, tamper
+from conftest import LOCAL_VERSION, WAGO_70009, FakeHttp, corrupt_manifest, tamper
 
 from forever.cli import main
 from forever.provenance import validate_provenance
@@ -44,6 +44,16 @@ CASES = {
     "fetch-failed": (["fetch", "--version", LOCAL_VERSION, "--tables", "SpellName"], 5, None),
     "fetch-invalid-version": (["fetch", "--version", "1.60.x", "--tables", "SpellName"], 2, None),
     "usage-fetch-no-version": (["fetch"], 2, None),
+    "decode": (["decode", "--version", LOCAL_VERSION, "--csv-dir", str(WAGO_70009)], 0, None),
+    "decode-missing-csv": (["decode", "--version", LOCAL_VERSION], 4, None),
+    "diff-same": (["diff", LOCAL_VERSION, LOCAL_VERSION], 0, None),
+    "diff-unknown": (["diff", LOCAL_VERSION, "1.60.1.99999"], 4, None),
+    "diff-integrity": (["diff", LOCAL_VERSION, LOCAL_VERSION], 3, "tamper"),
+    "verify": (["verify"], 0, None),
+    "verify-integrity": (["verify"], 3, "tamper"),
+    "report": (["report", LOCAL_VERSION, LOCAL_VERSION], 0, None),
+    "report-unknown": (["report", LOCAL_VERSION, "1.60.1.99999"], 4, None),
+    "usage-diff-missing-args": (["diff"], 2, None),
     "usage-no-command": ([], 2, None),
     "usage-unknown-command": (["inconnu"], 2, None),
     "usage-lookup-missing-args": (["lookup"], 2, None),

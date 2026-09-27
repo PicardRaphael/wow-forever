@@ -150,3 +150,82 @@ MANIFEST_CORRUPTIONS: dict[str, Callable[[bytes], bytes]] = {
 def corrupt_manifest(data_dir: Path, kind: str = "tronque") -> None:
     path = data_dir / "manifest.json"
     path.write_bytes(MANIFEST_CORRUPTIONS[kind](path.read_bytes()))
+
+
+# --- Pipeline de données (T03) -------------------------------------------------------------------
+
+WAGO_70009 = FIXTURES / "wago" / LOCAL_VERSION  # extraits des tables du client (voir son README.md)
+
+
+def read_json(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def isolated_deps(tmp: Path, data_dir: Path = DATA_DIR) -> Deps:
+    """Deps isolées pour les fixtures de session : cache dans `tmp`, réseau en échec, horloge fixe."""
+    return Deps(
+        data_dir=data_dir,
+        registry_path=REGISTRY_PATH,
+        cache_dir=tmp / "cache",
+        http_get=FakeHttp.failing(),
+        now=lambda: NOW,
+    )
+
+
+@pytest.fixture(scope="session")
+def decode_rules() -> Any:
+    return read_json(DATA_DIR / LOCAL_VERSION / "decode_rules.json")
+
+
+@pytest.fixture(scope="session")
+def client_tables(decode_rules: Any) -> Any:
+    """Tables typées des fixtures wago 1.60.1.70009."""
+    from forever.pipeline.decode import load_tables
+
+    return load_tables(WAGO_70009, decode_rules)
+
+
+@pytest.fixture(scope="session")
+def candidate(tmp_path_factory: pytest.TempPathFactory) -> Any:
+    """Version candidate décodée des fixtures (dossier temporaire partagé par la session)."""
+    from forever.pipeline.decode import decode_version
+
+    tmp = tmp_path_factory.mktemp("candidate")
+    return decode_version(isolated_deps(tmp), LOCAL_VERSION, csv_dir=WAGO_70009, out=tmp / "candidate")
+
+
+def change_key(c: Mapping[str, Any]) -> tuple[str, str, str, str, str, str]:
+    """Identité d'un changement de `forever diff`, comparable entre le diff et confirmed_changes.json."""
+    return (
+        c["kind"],
+        c["key"],
+        c["change"],
+        str(c["field"]),
+        json.dumps(c["old"], sort_keys=True),
+        json.dumps(c["new"], sort_keys=True),
+    )
+
+
+def format_changes(changes: list[Mapping[str, Any]]) -> str:
+    """Table lisible (une ligne par écart) pour les messages d'échec."""
+    return "\n".join(
+        f"  {c['kind']:<6} {c['key']:<22} {c['change']:<8} {c['field']!s:<18} "
+        f"référence={json.dumps(c['old'], ensure_ascii=False)} client={json.dumps(c['new'], ensure_ascii=False)}"
+        for c in changes
+    )
+
+
+def client_vs_reference(candidate: Any, kind: str) -> tuple[list[Any], list[Any], list[Any]]:
+    """(écarts, observations, changements confirmés) entre la référence du dépôt et la candidate, pour `kind`.
+
+    Observation : valeur relevée dans le client là où la référence a null (décision 2 du plan T03)."""
+    from forever.pipeline.diff import diff_versions
+
+    deps = isolated_deps(candidate.root.parent)
+    changes = [c for c in diff_versions(deps, LOCAL_VERSION, str(candidate.root))["changes"] if c["kind"] == kind]
+    observations = [c for c in changes if c["change"] == "modified" and c["old"] is None]
+    gaps = [c for c in changes if c not in observations]
+    confirmed = [
+        c for c in read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"] if c["kind"] == kind
+    ]
+    return gaps, observations, confirmed
