@@ -193,6 +193,7 @@ def test_intact_data_provenance_has_no_fingerprint_gap(capsys, make_deps, data_c
     real, declared = fingerprints(data_copy)
     assert real == declared
     code, out, _ = run(capsys, ["status", "--json"], make_deps(data_dir=data_copy))
+    assert code == 0
     provenance = json.loads(out)["provenance"]
     assert provenance["data_sha"] == real
     assert not any(real in a for a in provenance["assumptions"])

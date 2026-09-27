@@ -30,7 +30,8 @@ class StatusReport(TypedDict):
 
 def status_report(deps: Deps, *, allow_network: bool = True) -> StatusReport:
     report = verify(deps.data_dir)
-    local_version, sha = current_identity(deps.data_dir)
+    identity = current_identity(deps.data_dir)
+    local_version = identity.game_version
     fresh = freshness_for_version(deps, local_version, allow_network=allow_network)
     assumptions = list(fresh["assumptions"])
     if not report.manifest_found:
@@ -39,10 +40,11 @@ def status_report(deps: Deps, *, allow_network: bool = True) -> StatusReport:
         assumptions.append(f"manifeste illisible ({report.manifest_error}) : les consultations sont refusées")
     elif not report.ok:
         assumptions.append(f"empreintes invalides ({describe_integrity(report)}) : les consultations sont refusées")
+    assumptions += identity.notes()
     provenance = make_provenance(
         deps,
         game_version=local_version,
-        data_sha=sha,
+        data_sha=identity.data_sha,
         freshness=fresh["freshness"],
         certainty="certain",
         assumptions=assumptions,

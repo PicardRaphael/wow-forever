@@ -41,22 +41,38 @@ def read_sources(data_dir: Path, version: str) -> dict[str, Any] | None:
     return data if isinstance(data, dict) else None
 
 
-def current_identity(data_dir: Path) -> tuple[str, str]:
-    """(version, empreinte courte) sans contrôle : d'après le manifeste s'il est valide, sinon d'après les fichiers."""
+@dataclass(frozen=True)
+class DataIdentity:
+    """Version courante, empreinte réelle de ses fichiers sur disque et empreinte annoncée par le manifeste."""
+
+    game_version: str
+    data_sha: str
+    manifest_sha: str | None  # None : manifeste absent ou illisible, ou version absente du manifeste
+
+    def notes(self) -> list[str]:
+        """Hypothèse signalant l'écart entre les fichiers et le manifeste (liste vide si aucun écart connu)."""
+        if self.manifest_sha is None or self.manifest_sha == self.data_sha:
+            return []
+        return [f"empreinte des fichiers sur disque {self.data_sha} ≠ manifeste {self.manifest_sha}"]
+
+
+def current_identity(data_dir: Path) -> DataIdentity:
+    """Version (celle du manifeste s'il est valide, sinon le dossier le plus récent) et empreinte réelle de ses
+    fichiers, sans contrôle d'intégrité complet."""
     try:
         manifest = load_manifest(data_dir)
     except ManifestError:
         manifest = None
-    if manifest is not None:
-        version = manifest.get("game_version")
-        if isinstance(version, str):
-            entry = manifest["versions"].get(version)
-            if isinstance(entry, dict) and isinstance(entry.get("data_sha"), str):
-                return version, str(entry["data_sha"])
-    versions = version_dirs(data_dir)
-    if not versions:
-        return "0.0.0.0", "0" * 12
-    return versions[-1], data_sha(version_files(data_dir / versions[-1]))
+    version = manifest.get("game_version") if manifest is not None else None
+    if not isinstance(version, str):
+        versions = version_dirs(data_dir)
+        if not versions:
+            return DataIdentity("0.0.0.0", "0" * 12, None)
+        version = versions[-1]
+    vdir = data_dir / version
+    actual = data_sha(version_files(vdir) if vdir.is_dir() else {})
+    entry = manifest["versions"].get(version) if manifest is not None else None
+    return DataIdentity(version, actual, entry["data_sha"] if entry is not None else None)
 
 
 def describe_integrity(report: IntegrityReport) -> str:
@@ -90,5 +106,6 @@ def ensure_integrity(data_dir: Path) -> IntegrityReport:
 def load_version(deps: Deps) -> VersionData:
     """Version la plus récente ; lève DataIntegrityError ou ManifestMissingError si les empreintes sont invalides."""
     ensure_integrity(deps.data_dir)
-    game_version, sha = current_identity(deps.data_dir)
-    return VersionData(game_version, sha, deps.data_dir / game_version, read_sources(deps.data_dir, game_version) or {})
+    identity = current_identity(deps.data_dir)
+    version = identity.game_version
+    return VersionData(version, identity.data_sha, deps.data_dir / version, read_sources(deps.data_dir, version) or {})

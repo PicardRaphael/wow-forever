@@ -109,16 +109,17 @@ def min_certainty(values: Iterable[Certainty]) -> Certainty:
 
 
 def local_provenance(deps: Deps, *, certainty: Certainty = "certain", assumptions: Iterable[str] = ()) -> Provenance:
-    """Provenance des données présentes sur disque, sans contrôle d'intégrité ni réseau (fraîcheur du cache)."""
-    game_version, sha = current_identity(deps.data_dir)
-    fresh = freshness_for_version(deps, game_version, allow_network=False)
+    """Provenance des données présentes sur disque (empreinte réelle, écart au manifeste signalé), sans contrôle
+    d'intégrité complet ni réseau (fraîcheur du cache)."""
+    identity = current_identity(deps.data_dir)
+    fresh = freshness_for_version(deps, identity.game_version, allow_network=False)
     return make_provenance(
         deps,
-        game_version=game_version,
-        data_sha=sha,
+        game_version=identity.game_version,
+        data_sha=identity.data_sha,
         freshness=fresh["freshness"],
         certainty=certainty,
-        assumptions=[*fresh["assumptions"], *assumptions],
+        assumptions=[*fresh["assumptions"], *identity.notes(), *assumptions],
     )
 
 
