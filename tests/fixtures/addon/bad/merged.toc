@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: ForeverLogger
+## Notes: Active le journal de combat avancé à chaque connexion
+ForeverLogger.lua## Interface: XXXXX
+## Title: ForeverLogger
+## Notes: Active le journal de combat avancé à chaque connexion
+ForeverLogger.lua

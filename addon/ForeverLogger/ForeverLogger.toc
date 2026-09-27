@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: ForeverLogger
+## Notes: Active le journal de combat avancé à chaque connexion et note le contexte du personnage pour forever
+## Version: 0.2.0
+## Author: forever-core
+## SavedVariables: ForeverLoggerDB
+ForeverLogger.lua
