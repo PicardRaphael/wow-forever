@@ -124,7 +124,7 @@ def test_find_entry_unknown_suggests():
 
 def test_repository_coverage():
     """Seul test qui fige la couverture du registre après T02."""
-    assert coverage(REGISTRY_PATH) == "23/103"  # T04b : H11 ajoutée (teste)
+    assert coverage(REGISTRY_PATH) == "31/103"  # T04b : H11 ajoutée ; B6, B7, B13, C1, C5, I1, I6, J2 testées
 
 
 def test_load_reads_optional_fields():
@@ -137,7 +137,7 @@ def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
     assert out.startswith("Registre : 103 mécaniques")
-    assert "teste 22" in out and "valide-journal 1" in out  # B1 validée par les journaux (T04b)
+    assert "teste 30" in out and "valide-journal 1" in out  # B1 validée par les journaux (T04b)
 
 
 def test_main_reports_errors(capsys):
@@ -180,3 +180,16 @@ def test_cumulative_and_multi_log_proofs_are_accepted():
     for name in ("valid_cumulative.yaml", "valid_gap.yaml"):
         report = check(name)
         assert report.errors == [] and report.counts["valide-journal"] == 1, name
+
+
+def test_leveling_mechanics_are_tested_after_t04b():
+    """T04b : mécaniques portées du simulateur de leveling du seed, testées ; H2 reste absente (armure et
+    résistances de la cible non modélisées par le seed)."""
+    entries = {m.id: m for m in load(REGISTRY_PATH)}
+    for mid in ("B6", "B7", "B13", "C1", "C5", "I1", "I6", "J2"):
+        assert entries[mid].status == "teste", mid
+        assert any("::" in t for t in entries[mid].tests), mid
+    assert entries["H2"].status == "absent"
+    impl = implementations([ENGINE_DIR], REPO_ROOT)
+    for mid in ("B6", "B7", "B13", "C1", "C5"):
+        assert impl.get(mid), mid
