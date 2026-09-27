@@ -10,11 +10,16 @@ def format_utc(dt: datetime) -> str:
 
 
 def parse_utc(text: str) -> datetime:
-    """Accepte `AAAA-MM-JJ HH:MM:SS` ou ISO 8601 (Z ou décalage) ; une date sans fuseau est lue en UTC."""
+    """Accepte `AAAA-MM-JJ HH:MM:SS` ou ISO 8601 (Z ou décalage) ; une date sans fuseau est lue en UTC.
+
+    Lève ValueError si le texte est invalide ou si la date sort des limites une fois ramenée en UTC."""
     dt = datetime.fromisoformat(text.strip())
     if dt.tzinfo is None:
         return dt.replace(tzinfo=UTC)
-    return dt.astimezone(UTC)
+    try:
+        return dt.astimezone(UTC)
+    except OverflowError as exc:
+        raise ValueError(f"date hors limites en UTC : {text!r}") from exc
 
 
 def format_age(hours: float) -> str:

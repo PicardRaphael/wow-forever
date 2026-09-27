@@ -56,7 +56,13 @@ def _read_cache(cache_dir: Path, product: str) -> Observation | None:
         if data.get("schema_version") != CACHE_SCHEMA_VERSION or data.get("product") != product:
             return None
         latest = data.get("latest")
-        build = Build(latest["version"], parse_utc(latest["created_at"])) if latest else None
+        build = None
+        if latest is not None:
+            version = latest["version"]
+            if not isinstance(version, str):
+                raise TypeError("version absente ou invalide")
+            version_key(version)  # ValueError si la version est mal formée
+            build = Build(version, parse_utc(latest["created_at"]))
         return Observation(parse_utc(data["fetched_at"]), build)
     except (OSError, ValueError, KeyError, TypeError, AttributeError):
         return None  # cache absent ou illisible : comme s'il n'existait pas
@@ -115,6 +121,11 @@ def check_freshness(
 ) -> FreshnessResult:
     now = deps.now()
     cached = _read_cache(deps.cache_dir, product)
+    ignored: list[str] = []
+    if cached is not None and cached.fetched_at > now:
+        # horloge qui a reculé ou cache fabriqué : l'observation n'a pas de sens, le cache est traité comme absent
+        ignored.append(f"cache de fraîcheur daté dans le futur ({format_utc(cached.fetched_at)}) : ignoré")
+        cached = None
 
     if allow_network and not deps.offline:
         if cached and now - cached.fetched_at < CACHE_TTL:
@@ -124,7 +135,7 @@ def check_freshness(
             payload = fetch_builds(deps.http_get)
         except BuildsUnavailable as exc:
             if cached is None:
-                return _result("unknown", None, now, "none", [f"fraîcheur inconnue : {exc.message}"])
+                return _result("unknown", None, now, "none", [*ignored, f"fraîcheur inconnue : {exc.message}"])
             last = classify(local_version, cached.latest, now, SILENT_AFTER)
             age = format_age((now - cached.fetched_at).total_seconds() / 3600)
             note = f"réseau indisponible : dernier état connu {last}, vérifié il y a {age}"
@@ -132,10 +143,11 @@ def check_freshness(
         obs = Observation(now, latest_build(parse_builds(payload, product, prefix)))
         freshness = classify(local_version, obs.latest, now, SILENT_AFTER)
         _write_cache(deps.cache_dir, product, local_version, obs, freshness)
-        return _result(freshness, obs, now, "network", _status_assumptions(freshness, obs, prefix))
+        return _result(freshness, obs, now, "network", [*ignored, *_status_assumptions(freshness, obs, prefix)])
 
     if cached is None:
-        return _result("unknown", None, now, "none", ["fraîcheur jamais vérifiée (lancer `forever status`)"])
+        never = "fraîcheur non vérifiée" if ignored else "fraîcheur jamais vérifiée"
+        return _result("unknown", None, now, "none", [*ignored, f"{never} (lancer `forever status`)"])
     freshness = classify(local_version, cached.latest, now, SILENT_AFTER)
     assumptions = _status_assumptions(freshness, cached, prefix)
     age_h = (now - cached.fetched_at).total_seconds() / 3600
