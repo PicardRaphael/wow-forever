@@ -24,7 +24,8 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - `seed/forever-mage/` et `seed/grimoire-engine/` : code de référence validé, à porter, en lecture seule.
 
 ## Façon de travailler
-- Une tranche de `docs/ROADMAP.md` à la fois, dans l'ordre, via `/tranche Txx` : plan dans `tasks/Txx-plan.md`, puis exécution dans une nouvelle session.
+- Une tranche de `docs/ROADMAP.md` à la fois, dans l'ordre, via `/tranche Txx` : plan écrit directement dans `tasks/Txx-plan.md` (sans mode plan ni code), committé sur `main`, arrêt pour validation ; puis exécution dans une nouvelle session.
+- Exécution dans le dépôt principal (pas de worktree) sur une branche `txx`. Fin de tranche : pousser la branche, attendre la CI verte sous Ubuntu et Windows, fusionner soi-même en fast-forward dans `main`, pousser `main`, supprimer la branche locale et distante.
 - Tests d'abord : écrire les tests, constater l'échec, committer, puis implémenter jusqu'au vert sans modifier ces tests.
 - Petits commits, message `Txx: <ce qui change>`.
 - Continuer sans demander tant qu'une étape n'a pas besoin de moi. S'arrêter et demander avant : toucher `tests/golden/`, ajouter une dépendance, un accès réseau, supprimer des données, trancher une règle de jeu.

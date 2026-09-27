@@ -8,11 +8,15 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
 | T01 | Squelette de bout en bout : `forever status` + consultation d'un sort, CLI + MCP + provenance + CI | — |
 | T02 | Port du cœur de mécaniques du skill Mage + registre + tests de référence | T01 |
 | T03 | Pipeline de données : builds, fetch, decode, diff, verify, report (tests hors ligne) | T01 |
-| T04 | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T02 |
-| T05 | Optimiseur de talents et conseiller de respec | T04 |
-| T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04 |
-| T07 | Mémoire joueur : fiches du vault, import de l'addon | T06 |
+| T04a | Sources locales du client : journaux de combat, Questie, table des monstres, points de base par niveau, preuves du registre, addon ForeverLogger | T02, T03 |
+| T04b | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T04a |
+| T05 | Optimiseur de talents et conseiller de respec | T04b |
+| FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
+| T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
+| P06 | Évaluation d'un pont de conversation existant (wow-claude / wow-ai) pointé sur ce dépôt | T06 |
+| T07 | Mémoire joueur : fiches du vault, import de l'addon (+ ForeverAssist V2 proposée) | T06 |
 | T08 | Veille : workflow planifié, PR de données, note d'impact par personnage | T03, T07 |
+| FA3 | ForeverAssist V3 : compagnon de bureau, analyse des journaux après le combat | T08 |
 | T09 | Raid : moteur analytique porté, Monte Carlo, parité avec wowsims Forever | T02 |
 | T10 | Équipement : base d'objets par formules du client, optimiseur | T09 |
 | T11 | Consommables et préparation de raid | T10 |
@@ -45,20 +49,43 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
     - `diff` signale un rang de talent modifié et un sort ajouté (tests).
     - `decode`, `verify` et `report` sur les fixtures : code 0, provenance sur chaque sortie, `forever/data/` inchangé.
 
-## T04 — Leveling
-- **Fait** : porter `sim_leveling.py` (Monte Carlo à impacts différés, jeu expert) et le modèle analytique ; outil MCP `forever_sim_leveling` ; `forever chart leveling` ; porter les tests du seed `analytique_proche_du_monte_carlo`, `calibrage_cible_blizzard` et `monte_carlo_reproductible` ; remonter dans le registre les entrées rétrogradées en T02 (B6, B7, B13, C1, C5, H2, I1, I6, J2) et compléter A18 (cumul d'Ignite), B11 (escalade d'Arcane Blast), C2 (talents de portée).
+## T04a — Sources locales du client et mesures sur journaux
+- **Fait** : lecture des journaux de combat (`WoWCombatLog-*.txt`, format 22 avancé) et mesures (PV des monstres, coûts, intervalles, incantations, critiques, touchés et ratés par écart de niveau) ; lecteur local de la base Questie (sans réseau, jamais copiée) ; table des monstres `monsters.json` (journal `certain`, Questie `suppose`) ; points de base des sorts par niveau (`spell_scaling.json`, `rank_values_at_level`) ; champ `preuves` du registre et contrôle de `valide-journal` ; addon ForeverLogger réparé (SavedVariable `ForeverLoggerDB`), script d'installation, test statique des règles de l'addon ; `docs/ADDON.md`. Plan : `tasks/T04-plan.md`.
+- **Hors périmètre** : simulateurs (T04b) ; `DBCache.bin` et hotfixes (T08) ; caches WDB ; client de l'API Blizzard ; ForeverAssist (planifié seulement).
 - **Critères de fin** :
-    - Au niveau 12 avec 3 Improved Frostbolt, le Monte Carlo (graine fixe) reproduit le seed à ±1 %.
+    - `forever logs measure` sur la fixture anonymisée renvoie PV, coûts, intervalles et critiques, avec provenance, code 0, sans réseau.
+    - `forever monsters build` sur les fixtures produit une table où les PNJ mesurés sont `certain` et égaux à Questie ; `monsters.json` et `spell_scaling.json` installés dans 1.60.1.70009 avec manifeste à jour.
+    - `rank_values_at_level` reproduit `spells.json` au niveau min(MaxLevel, 60).
+    - Le registre refuse un `valide-journal` sans preuve ; B1 porte la preuve du journal.
+    - `uv run scripts/install_addon.py --dry-run` affiche la copie prévue ; `test_addon_rules.py` vert.
+
+## T04b — Leveling
+- **Fait** : porter `sim_leveling.py` (Monte Carlo à impacts différés, jeu expert) et le modèle analytique ; PV des monstres par `mob_source` (`measured` par défaut depuis `monsters.json`, `seed` pour la parité) ; dégâts au niveau du personnage par `spell_level` (`character` par défaut, `rank` pour la parité) ; outil MCP `forever_sim_leveling` ; `forever chart leveling` ; porter les tests du seed `analytique_proche_du_monte_carlo`, `calibrage_cible_blizzard` et `monte_carlo_reproductible` ; remonter dans le registre les entrées rétrogradées en T02 (B6, B7, B13, C1, C5, H2, I1, I6, J2) et compléter A18 (cumul d'Ignite, durée d'infobulle dans `tooltip_values`), B11 (escalade d'Arcane Blast), C2 (talents de portée) ; ingestion des quêtes propres à Forever (`QuestieForeverDB`) avec le modèle d'XP.
+- **Critères de fin** :
+    - Au niveau 12 avec 3 Improved Frostbolt, le Monte Carlo (graine fixe, `mob_source="seed"`, `spell_level="rank"`) reproduit le seed à ±1 %.
     - L'analytique reste à moins de 15 % du Monte Carlo aux niveaux 12, 16 et 24.
     - Le graphique est un fichier PNG déterministe (empreinte stable à graine fixe).
-- **À prévoir (décision T03)** : stocker les points de base des sorts et leur progression par niveau (`EffectBasePointsF`, `EffectRealPointsPerLevel`, `BaseLevel`, `MaxLevel`, variance) pour calculer les dégâts au niveau du personnage, au lieu des rangs évalués au niveau min(MaxLevel, 60) ; les durées d'infobulle des talents sont dans `tooltip_values` (ex. Ignite).
 
 ## T05 — Talents et respec
 - **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre.
 - **Critères de fin** : `forever optimize talents --from 10 --to 30` produit un ordre légal à chaque niveau ; le barème de respec est paramétrable ; tests de légalité et de non-régression.
 
+## FA1 — ForeverAssist V1 (affichage de données précalculées)
+Addon d'affichage seul (règles et canaux : `docs/ADDON.md`). Aucun calcul de combat dans l'addon : `forever` précalcule, l'addon affiche.
+- **Fait** : `forever export-addon` génère `addon/ForeverAssist/Data/Generated.lua` (schéma versionné, build, date de génération, écriture atomique) à partir des calculs de forever pour un personnage : **talent suivant proposé à chaque gain de niveau** (ordre de talents de l'optimiseur T05) et **comparaison de l'équipement dans l'infobulle des objets** (valeur des statistiques au niveau du personnage, calculée par le moteur ; l'addon affiche l'écart avec l'objet porté) ; table des monstres de la zone (PV mesurés, source). Affichage hors combat (`PLAYER_LEVEL_UP`, `TooltipDataProcessor`, `pcall`, `issecretvalue`), panneau `/fa`, avertissement si la build du client diffère de celle des données.
+- **Hors périmètre** : conseil en combat, conversation, écriture de SavedVariables (V2), analyse des journaux (V3).
+- **Critères de fin** :
+    - Le fichier généré est déterministe et validé par un schéma (pytest) ; `Generated.sample.lua` versionné, `Generated.lua` ignoré par git.
+    - Au gain de niveau, l'addon affiche le talent prévu pour ce niveau par les données ; l'infobulle d'un objet affiche l'écart avec l'objet porté (test hors jeu sur bouchons de l'API).
+    - `test_addon_rules.py` étendu à ForeverAssist ; procédure de test en jeu dans `docs/ADDON.md`.
+
 ## T06 — Plugin Claude Code
 - **Critères de fin** : installation locale du plugin ; SessionStart injecte une seule ligne de fraîcheur ; la statusline affiche version et statut ; jeu d'évaluation d'aiguillage de 30 requêtes (60 % doivent déclencher un skill, 40 % non) avec au moins 90 % de bonnes décisions.
+
+## P06 — Évaluation d'un pont de conversation (après T06)
+- **Fait** : évaluer un pont existant (wow-claude / wow-ai, voir `docs/research/addon-forever.md`, section 3.5) dont la session Claude Code est pointée sur ce dépôt, pour disposer en jeu des outils et des données de forever-core par le serveur MCP du plugin (T06). Grille : conformité (zone grise : lecture d'écran, aucune action de jeu), sécurité (liste d'autorisations stricte, jamais de mode sans permission, commandes réseau exclues), fragilité face aux builds, installation sous Windows.
+- **Hors périmètre** : écrire ou vendoriser un pont dans ce dépôt ; toute entrée simulée.
+- **Critères de fin** : décision écrite dans `docs/DECISIONS.md` (adopter, reporter ou écarter) avec la grille remplie ; si adopté, procédure d'installation et liste d'autorisations dans `docs/ADDON.md`.
 
 ## T07 — Mémoire joueur
 - **Critères de fin** : import d'un export d'addon d'exemple ; fiche écrite dans le vault avec la version du jeu ; une fiche plus ancienne que la version courante est signalée.
@@ -67,6 +94,10 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
 - **Fait (repris de T03)** : installation d'une version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report`) ; application de `overrides.json` et de `confirmed_changes.json` ; substitution des coûts en mana relevés dans le client à l'estimation de `mechanics.json` (`mana.talent_rank_cost`) ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
 - **Durcissement du pipeline (relecture T03)** : `$d` entre dans les expressions `${…}` dans son unité d'affichage (minutes dès 60 s), aucune infobulle de talent ne l'exerce aujourd'hui ; un sort cité deux fois par une infobulle d'aura 226 compterait deux fois ses dégâts ; `SpellLevel` n'est pas lu (écart de niveau calculé depuis `BaseLevel`) ; `--locale` ignoré sans `--tables` ; un CSV réduit à son en-tête est accepté ; `verify` suppose `level` en tête de `rank_format`.
 - **Critères de fin** : `build-watch.yml` simulé en test (nouvelle version fictive → PR et note) ; alerte `silent` après 14 jours sans version.
+
+## ForeverAssist V2 et V3
+- **V2 (proposée avec T07, qui lit déjà les SavedVariables)** : l'addon écrit hors combat le contexte du personnage (niveau, talents `C_Traits`, équipement, zone, quêtes) dans `ForeverAssistCharDB` ; `forever ingest-sv` le lit après un `/reload`, recalcule et régénère `Generated.lua`. Hors périmètre : tout canal temps réel. Critères de fin : lecture d'une SavedVariable d'exemple, régénération déterministe, fiche du vault mise à jour.
+- **V3 (proposée après T08)** : compagnon de bureau qui analyse `WoWCombatLog-*.txt` après le combat (`forever logs measure`), résume le dernier combat, l'expose au MCP et prépare le fichier de V1. Hors périmètre : toute consigne en direct. Critères de fin : découpe des combats testée sur fixtures, résumé avec provenance.
 
 ## T09 à T13
 Détaillées au moment de les planifier, avec la même structure (fait, hors périmètre, critères de fin testables).
