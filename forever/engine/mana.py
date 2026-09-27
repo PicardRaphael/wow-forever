@@ -87,3 +87,10 @@ def arcane_blast_cost(gd: GameData, rank: Rank, pts: Points, ch: Character, stac
     Registre : B11"""
     per_stack = talent_value(gd, pts, "arcaneBlast", COST_PER_STACK) / PERCENT
     return mana_cost(gd, "arcane_blast", rank, pts, ch) * (1 + stacks * per_stack)
+
+
+def clearcast_cost_factor(gd: GameData, pts: Points, hit: float) -> float:
+    """Part du coût payée en espérance sous Clearcasting.
+
+    Registre : B12"""
+    raise NotImplementedError

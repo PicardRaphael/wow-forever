@@ -53,3 +53,12 @@ def arcane_blast_bonus(gd: GameData, pts: Points, stacks: int, *, for_spell: str
     if for_spell == SPELL or stacks <= 0:
         return {}
     return {"dmg": stacks * talent_value(gd, pts, TALENT, DMG_PER_STACK) / PERCENT}
+
+
+def arcane_blast_after_spell(
+    gd: GameData, pts: Points, aura: ArcaneBlastAura | None, now: float, key: str
+) -> ArcaneBlastAura | None:
+    """Aura après un sort de dégâts `key` lancé à `now`.
+
+    Registre : B15"""
+    raise NotImplementedError
