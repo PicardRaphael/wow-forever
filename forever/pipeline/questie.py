@@ -222,6 +222,10 @@ class QuestieDB:
             out.setdefault(int(m[1]), m[2])
         return out
 
+    def battlegrounds(self) -> frozenset[int]:
+        """Zones des champs de bataille (catégorie « Battlegrounds » de `lookupZones.lua`)."""
+        raise NotImplementedError
+
     def zone_names(self) -> dict[int, str]:
         """Noms anglais des zones (`lookupZones.lua`, table `zoneLookup`)."""
         return self._zone_names

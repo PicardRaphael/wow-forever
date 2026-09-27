@@ -37,7 +37,8 @@ NPCS_T04B = (3242, 3244, 3245, 3246, 3254, 3265, 3266, 3267, 3268, 3269, 3272, 3
 NPCS_T04B += (12319, 12320)
 QUESTS = (787, 788, 789)
 ZONES = (14, 17, 718)
-DUNGEONS = (718, 1581, 2437)  # Wailing Caverns ; leurres : The Deadmines, Ragefire Chasm (aucune quête extraite)
+DUNGEONS = (718, 1581, 2437, 3277)  # Wailing Caverns ; leurres : The Deadmines, Ragefire Chasm, Warsong Gulch
+BATTLEGROUNDS_LABEL = "Battlegrounds"  # catégorie de Questie (continentLookup) des champs de bataille
 QUEST_DB = Path("Database/Classic/classicQuestDB.lua")
 DUNGEON_DB = Path("Database/Zones/data/dungeons.lua")
 ZONE_NAMES = Path("Localization/lookups/lookupZones.lua")
@@ -113,7 +114,18 @@ def extract_zones(addon: Path, out: Path, zones: tuple[int, ...]) -> None:
             found.setdefault(m[1], m[2])
     body = "\n".join(f'        [{k}]="{v}",' for k, v in sorted(found.items(), key=lambda kv: int(kv[0])))
     (out / ZONE_NAMES).parent.mkdir(parents=True, exist_ok=True)
-    (out / ZONE_NAMES).write_bytes(f"l10n.zoneLookup = {{\n    [1]={{\n{body}\n    }},\n}}\n".encode())
+    continents = names[names.index("l10n.continentLookup = {") : names.index("l10n.zoneLookup = {")]
+    category = next(m[1] for m in re.finditer(r'\[(\d+)\] = "([^"]*)"', continents) if m[2] == BATTLEGROUNDS_LABEL)
+    categories = names[names.index("l10n.zoneCategoryLookup = {") :]
+    block = categories[categories.index(f"    [{category}] = {{") :]
+    block = block[: block.index("    },") + len("    },")]
+    (out / ZONE_NAMES).write_bytes(
+        (
+            f'l10n.continentLookup = {{\n    [{category}] = "{BATTLEGROUNDS_LABEL}",\n}}\n\n'
+            f"l10n.zoneLookup = {{\n    [1]={{\n{body}\n    }},\n}}\n\n"
+            f"l10n.zoneCategoryLookup = {{\n{block}\n}}\n"
+        ).encode("utf-8")
+    )
     print(f"quêtes : {len(lines)} ; donjons : {len(kept)} ; noms de zones : {len(found)}")
 
 
