@@ -1,4 +1,5 @@
-"""Seul point d'accès réseau de T01 : versions publiées du client (wago.tools)."""
+"""Versions publiées du client (wago.tools) : seul appelant réseau de T01, via le client HTTP injecté
+(`Deps.http_get`, en production `forever.pipeline.http_client.urllib_get`)."""
 
 from __future__ import annotations
 

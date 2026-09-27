@@ -17,7 +17,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - Chaque résultat d'outil (CLI, MCP) porte un bloc `provenance` : version du jeu, empreinte des données, date, certitude (`certain`, `probable`, `suppose`).
 - Toute mécanique ajoutée ou modifiée met à jour son entrée dans `docs/MECHANICS_REGISTRY.yaml` (statut, source, tests).
 - Règle de jeu incertaine : ne pas deviner. Marquer `suppose` avec une note et ajouter la question dans `docs/OPEN_QUESTIONS.md`. Un comportement que Blizzard a reconnu comme bug (message officiel ou correctif annoncé) n'est jamais modélisé.
-- Pas de réseau dans les tests (`tests/fixtures/` seulement). Seules `forever status`, `forever builds` et `forever fetch` touchent Internet (via `forever/pipeline/`).
+- Pas de réseau dans les tests (`tests/fixtures/` seulement). Seuls `forever status`, l'outil MCP `forever_status`, `forever builds` et `forever fetch` touchent Internet (via `forever/pipeline/`).
 
 ## Zones protégées
 - `tests/golden/` : ne jamais régénérer pour faire passer un test. Si un changement voulu les modifie, s'arrêter, expliquer pourquoi et demander l'accord ; la justification va dans le message de commit. Un hook bloque l'écriture.

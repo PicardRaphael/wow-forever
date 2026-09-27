@@ -1,18 +1,18 @@
 """Configuration de l'outil et dépendances injectées (données, cache, réseau, horloge).
 
-Les constantes de ce module décrivent l'outil (cache, délais), jamais le jeu."""
+Les constantes de ce module décrivent l'outil (cache, délais), jamais le jeu. Le client HTTP de production vit dans
+`forever/pipeline/` (règle réseau) ; ce module ne fait que l'injecter."""
 
 from __future__ import annotations
 
-import http.client
 import os
-import urllib.request
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from forever import __version__
+from forever.pipeline.http_client import urllib_get
 
 HttpGet = Callable[[str, Mapping[str, str], float], bytes]
 """(url, en-têtes, délai en secondes) -> corps de la réponse ; lève OSError en cas d'échec."""
@@ -38,17 +38,6 @@ class Deps:
     http_get: HttpGet
     now: Callable[[], datetime]
     offline: bool = False
-
-
-def urllib_get(url: str, headers: Mapping[str, str], timeout: float) -> bytes:
-    """Client HTTP de production (bibliothèque standard)."""
-    request = urllib.request.Request(url, headers=dict(headers))
-    try:
-        with urllib.request.urlopen(request, timeout=timeout) as response:
-            body: bytes = response.read()
-            return body
-    except http.client.HTTPException as exc:  # réponse tronquée ou mal formée : même traitement qu'une panne
-        raise OSError(str(exc)) from exc
 
 
 def utc_now() -> datetime:
