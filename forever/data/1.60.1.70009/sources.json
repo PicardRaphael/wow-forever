@@ -17,10 +17,11 @@
       "field_certainty": {
         "projectile_speed": "suppose"
       },
-      "notes": [
-        "mana null : coût non publié pour le rang issu d'un talent (à relever en jeu)",
-        "vitesses de projectile estimées (EST), à calibrer"
-      ]
+      "field_notes": {
+        "mana": "mana null : coût non publié pour le rang issu d'un talent (à relever en jeu)",
+        "projectile_speed": "vitesse de projectile estimée (EST), à calibrer"
+      },
+      "notes": []
     },
     "talents.json": {
       "source": "gunba/wow-forever-sim mage.json (MIT) + corrections https://foreverchanges.pro/talents/mage",
