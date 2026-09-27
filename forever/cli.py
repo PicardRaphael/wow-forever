@@ -10,10 +10,10 @@ import io
 import json
 import sys
 from collections.abc import Mapping
-from typing import Any
+from typing import Any, NoReturn
 
 from forever.config import Deps, default_deps
-from forever.errors import EXIT_INTEGRITY, EXIT_OK, ForeverError, UnsupportedKindError
+from forever.errors import EXIT_INTEGRITY, EXIT_OK, ForeverError, UnsupportedKindError, UsageError
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, write_manifest
 from forever.provenance import Provenance, error_payload, format_provenance_line, local_provenance
@@ -24,11 +24,10 @@ SCHOOLS_FR = {"frost": "givre", "fire": "feu", "arcane": "arcane", "frostfire": 
 
 
 class _Parser(argparse.ArgumentParser):
-    """Messages d'usage d'argparse en français pour les cas courants."""
+    """Une erreur d'usage devient une UsageError : `main` l'affiche avec la provenance, en texte ou en JSON."""
 
-    def error(self, message: str) -> Any:
-        self.print_usage(sys.stderr)
-        self.exit(2, f"{self.prog} : erreur d'usage : {message}\n")
+    def error(self, message: str) -> NoReturn:
+        raise UsageError(self.prog, message, self.format_usage())
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -191,9 +190,17 @@ def _use_utf8_output() -> None:
 
 
 def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
+    argv = sys.argv[1:] if argv is None else argv
     try:
         args = build_parser().parse_args(argv)
-    except SystemExit as exc:
+    except UsageError as err:
+        # la ligne n'a pas été analysée : --json est cherché tel quel ; en texte, la ligne d'usage précède l'erreur
+        as_json = "--json" in argv
+        _use_utf8_output()
+        if not as_json:
+            sys.stderr.write(err.usage)
+        return _emit_error(deps or default_deps(), err, as_json)
+    except SystemExit as exc:  # --help : aide d'argparse, sans provenance
         return exc.code if isinstance(exc.code, int) else 2
     deps = deps or default_deps()
     if args.command == "mcp":

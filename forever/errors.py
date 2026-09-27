@@ -43,6 +43,16 @@ class InvalidArgumentError(ForeverError):
         super().__init__("invalid_argument", message, action)
 
 
+class UsageError(ForeverError):
+    """Ligne de commande refusée par argparse ; `usage` garde la ligne d'usage de la (sous-)commande."""
+
+    exit_code = EXIT_USAGE
+
+    def __init__(self, prog: str, message: str, usage: str = "") -> None:
+        super().__init__("usage", f"Usage incorrect de `{prog}` : {message}.", f"voir `{prog} --help`")
+        self.usage = usage
+
+
 class DataIntegrityError(ForeverError):
     exit_code = EXIT_INTEGRITY
 
