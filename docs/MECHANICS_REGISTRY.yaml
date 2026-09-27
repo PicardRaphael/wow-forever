@@ -1,7 +1,9 @@
 # Registre des mécaniques — source de vérité de la couverture.
 # statut : absent | modelise | teste | valide-journal | valide-jeu
 # certitude : certain | probable | suppose ; forever : oui | modifie | inconnu
-# Les entrées 'teste' héritées du skill Mage pointent vers seed/forever-mage/tests/run_all.py : à remplacer par les tests portés en T02.
+# tests : références `tests/…/fichier.py::test_nom` (fonction existante) ; `teste` ou mieux en exige au moins une.
+# formule (optionnelle) : symbolique, seuls 0 et 1 y sont admis ; les valeurs vivent dans forever/data/<version>/.
+# note (optionnelle) : périmètre couvert, reprise prévue.
 version: 1
 game_version: 1.60.1.70009
 mechanics:
@@ -29,27 +31,50 @@ mechanics:
     forever: oui
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/leveling.json (combat_rules)"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_hit_by_level_diff
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
+    formule: "toucher = 1 − max(raté_min, raté_table[écart de niveau] − talents de toucher d'école − toucher_équipement)"
   - id: A4
     categorie: attaque
     description: "Toucher unifié Forever (sources, plafond, poisons et pièges)"
     forever: modifie
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
+    formule: "raté réduit additivement par Elemental Precision (givre, feu), Arcane Focus (arcane) et le toucher d'équipement ; plancher raté_min"
+    note: "poisons et pièges hors Mage, non modélisés"
   - id: A5
     categorie: attaque
     description: "Critique unifié ; critique des sorts par Intellect et niveau"
     forever: modifie
     statut: teste
     certitude: probable
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/mechanics.json"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_character.py::test_character_orc_60
+      - tests/unit/test_engine_character.py::test_int_per_crit
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
+    formule: "crit = crit_base + Int / int_par_crit(niveau) + crit_équipement (+ épée, racial) + talents (Arcane Instability, Critical Mass, Arcane Impact, Incineration, Shatter si gelé) + crit_par_cumul × cumuls de Winter's Chill + buffs, bornée à [0, 1]"
   - id: A6
     categorie: attaque
     description: "Érafles (taux et pénalité selon la compétence d'arme)"
@@ -155,18 +180,31 @@ mechanics:
     forever: modifie
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/leveling.json (combat_rules)"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_fireball_values
     tolerance: null
+    formule: "DoT = total × mult_dégâts × (1 + crit × (mult_crit − 1)) si les DoT critiquent"
   - id: A18
     categorie: attaque
     description: "Ignite : cumul, rafraîchissement"
     forever: oui
     statut: teste
     certitude: probable
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
+    formule: "Ignite = crit × base × mult_dégâts × mult_crit × part_Ignite (espérance par lancer)"
+    note: "espérance seule ; cumul et rafraîchissement en T04"
   - id: A19
     categorie: attaque
     description: "Procs exclus des critiques périodiques (Hot Streak)"
@@ -176,24 +214,68 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+  - id: A20
+    categorie: attaque
+    description: "Multiplicateurs de dégâts des sorts (talents d'école, bonus globaux)"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
+    tolerance: null
+    formule: "mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts)"
+  - id: A21
+    categorie: attaque
+    description: "Multiplicateur de critique des sorts et talents qui l'augmentent"
+    forever: modifie
+    statut: teste
+    certitude: certain
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/leveling.json (combat_rules)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_frostbolt_values
+    tolerance: null
+    formule: "mult_crit = 1 + (mult_crit_sorts − 1) × (1 + Ice Shards (givre) ou Arcane Mind (arcane))"
+    note: "Givre-feu : branche givre (voir OPEN_QUESTIONS)"
   - id: B1
     categorie: temps
     description: "Temps de recharge global (1,5 s)"
     forever: oui
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/leveling.json (combat_rules)"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_improved_frostbolt_gcd_floor
     tolerance: null
+    formule: "incantation effective = max(recharge_globale, incantation)"
   - id: B2
     categorie: temps
     description: "Hâte et arrondis (10 points de notation par 1 %)"
     forever: modifie
     statut: teste
     certitude: probable
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
+    formule: "incantation = (incantation_rang − réductions) / (1 + hâte + buff de hâte), plancher recharge_globale ; canalisé : sans hâte"
+    note: "hâte en fraction ; conversion de la notation en pourcentage hors périmètre T02"
   - id: B3
     categorie: temps
     description: "File d'attente des sorts"
@@ -225,20 +307,22 @@ mechanics:
     categorie: temps
     description: "Recul d'incantation et canalisations"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: suppose
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: B7
     categorie: ressources
     description: "Règle des 5 s, ticks de 2 s, régénération pendant l'incantation"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: certain
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: B8
     categorie: ressources
     description: "MP5"
@@ -254,9 +338,17 @@ mechanics:
     forever: oui
     statut: teste
     certitude: probable
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/mechanics.json"
+    tests:
+      - tests/unit/test_engine_character.py::test_character_orc_60
+      - tests/unit/test_engine_character.py::test_character_gnome_mana
+      - tests/unit/test_engine_character.py::test_overrides_replace_estimates
+      - tests/parity/test_fm_parity.py::test_character_parity
     tolerance: null
+    formule: "mana = mana_base(niveau) + min(Int, premiers_points) + mana_par_point × max(0, Int − premiers_points), × (1 + bonus racial)"
   - id: B10
     categorie: ressources
     description: "Évocation, gemmes, potions (recharges partagées)"
@@ -272,27 +364,43 @@ mechanics:
     forever: modifie
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/spells.json"
+      - "forever/data/1.60.1.70009/mechanics.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_arcane_blast_mana_pct
+      - tests/unit/test_engine_values.py::test_talent_rank_mana_estimate
     tolerance: null
+    formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié"
+    note: "escalade d'Arcane Blast en T04 ; coût des rangs de talent estimé (voir OPEN_QUESTIONS)"
   - id: B12
     categorie: ressources
     description: "Clearcasting"
     forever: oui
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
+    formule: "mana × (1 − toucher × chance de Clearcasting)"
   - id: B13
     categorie: temps
     description: "Recharges des sorts et réductions par talents"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: certain
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: B14
     categorie: temps
     description: "Procs : PPM, chance fixe, recharges internes"
@@ -311,24 +419,60 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+  - id: B16
+    categorie: temps
+    description: "Temps d'incantation réduits par talents"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_improved_frostbolt_gcd_floor
+    tolerance: null
+    formule: "incantation − réduction du talent (Improved Frostbolt ; Improved Fireball pour Fireball et Frostfire Bolt)"
+  - id: B17
+    categorie: ressources
+    description: "Réductions et remboursements de coût (Frost Channeling, Master of Elements)"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
+    tolerance: null
+    formule: "coût × (1 − Frost Channeling) (givre) ; − toucher × crit × Master of Elements × coût de base (feu, givre)"
   - id: C1
     categorie: physique
     description: "Temps de vol des projectiles"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: suppose
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: C2
     categorie: physique
     description: "Portées et talents de portée"
     forever: oui
-    statut: modelise
+    statut: teste
     certitude: certain
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/spells.json"
+      - "forever/data/1.60.1.70009/mechanics.json"
+    tests: ["tests/unit/test_engine_values.py::test_range_values"]
     tolerance: null
+    formule: "portée = portée du sort, sinon portée par défaut des données"
+    note: "portée de base ; talents de portée en T04"
   - id: C3
     categorie: physique
     description: "Marge de mêlée et hitbox"
@@ -351,11 +495,12 @@ mechanics:
     categorie: physique
     description: "Vitesse des monstres, ralentis, gel (Nova, Frostbite)"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: probable
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: C6
     categorie: physique
     description: "Temps en mouvement, sorts utilisables en mouvement"
@@ -416,9 +561,16 @@ mechanics:
     forever: modifie
     statut: teste
     certitude: probable
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/mechanics.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
+    formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance)"
+    note: "débuff personnel du Mage seulement ; chance d'application et durée en T04"
   - id: D5
     categorie: environnement
     description: "Buffs de campement et de Legacy"
@@ -630,38 +782,75 @@ mechanics:
     categorie: personnage
     description: "Raciaux (Skyborne et nouvelles combinaisons)"
     forever: modifie
-    statut: modelise
+    statut: teste
     certitude: certain
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/racials.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_character.py::test_human_spirit_bonus
+      - tests/unit/test_engine_character.py::test_human_sword_crit
+      - tests/unit/test_engine_character.py::test_character_gnome_mana
     tolerance: null
+    formule: "esprit × (1 + bonus racial) ; mana × (1 + bonus racial) ; crit + bonus d'épée (racial)"
+    note: "passifs Humain et Gnome seulement ; raciaux actifs et Skyborne non modélisés"
   - id: G2
     categorie: personnage
     description: "Stats de base par race, classe et niveau"
     forever: oui
-    statut: modelise
+    statut: teste
     certitude: suppose
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/mechanics.json"
+      - "forever/data/1.60.1.70009/leveling.json (player_model)"
+    tests:
+      - tests/unit/test_engine_character.py::test_character_orc_60
+      - tests/unit/test_engine_character.py::test_spell_power_starts_at_level_10
+      - tests/parity/test_fm_parity.py::test_character_parity
     tolerance: null
+    formule: "stat = base + par_niveau × (niveau − 1) + bonus_tardif × max(0, niveau − niveau_tardif) ; la fiche du personnage remplace l'estimation"
+    note: "Mage seulement ; modèle estimé (EST), la fiche du personnage fait foi"
   - id: G3
     categorie: personnage
     description: "Talents : rangs, prérequis, paliers, 4e talent doré"
     forever: modifie
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/talents.json"
+      - "forever/data/1.60.1.70009/mechanics.json"
+    tests:
+      - tests/unit/test_engine_talents.py::test_prerequisites
+      - tests/unit/test_engine_talents.py::test_build_legality
+      - tests/unit/test_engine_talents.py::test_points_available
+      - tests/unit/test_engine_talents.py::test_legal_additions_tier_one
+      - tests/parity/test_fm_parity.py::test_build_parity
     tolerance: null
+    formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis au maximum"
+    note: "4e talent doré non modélisé"
   - id: G4
     categorie: personnage
     description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"
     forever: modifie
     statut: teste
     certitude: probable
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/spells.json"
+      - "forever/data/1.60.1.70009/mechanics.json"
+    tests:
+      - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_coefficient_values
+      - tests/unit/test_gamedata.py::test_spell_ranks
+      - tests/unit/test_gamedata.py::test_coefficient_reads_data
+      - tests/parity/test_fm_parity.py::test_rank_and_coefficient_parity
     tolerance: null
+    formule: "coefficient = min(max, max(min, incantation)) / diviseur (× facteur si ralenti) ; canalisé : min(durée, plafond) / diviseur ; coefficient fixe pour les sorts listés ; × max(0, 1 − pénalité × (seuil − niveau du sort)) sous le seuil"
   - id: G5
     categorie: personnage
     description: "Legacy (arbre de compte)"
@@ -686,18 +875,23 @@ mechanics:
     forever: oui
     statut: teste
     certitude: certain
-    sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    sources:
+      - "seed/forever-mage/references/mechanics.md"
+      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "forever/data/1.60.1.70009/leveling.json (combat_rules)"
+    tests: ["tests/unit/test_engine_values.py::test_hit_by_level_diff"]
     tolerance: null
+    formule: "écart de niveau avec la cible → ligne de la table de raté des sorts (au-delà de la table : dernière ligne)"
   - id: H2
     categorie: rencontre
     description: "Armure et résistances de la cible"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: suppose
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: H3
     categorie: rencontre
     description: "Nombre de cibles et adds"
@@ -774,11 +968,12 @@ mechanics:
     categorie: optimisation
     description: "Rotations (listes de priorités) par spé et situation"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: probable
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"
@@ -810,20 +1005,22 @@ mechanics:
     categorie: optimisation
     description: "Optimiseur de talents et de respec"
     forever: oui
-    statut: modelise
+    statut: absent
     certitude: probable
     sources: []
     tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T05"
   - id: I6
     categorie: optimisation
     description: "Leveling : temps par monstre, XP, repos"
     forever: oui
-    statut: teste
+    statut: absent
     certitude: suppose
     sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"
@@ -839,11 +1036,12 @@ mechanics:
     categorie: meta
     description: "Graine et reproductibilité"
     forever: oui
-    statut: teste
+    statut: absent
     certitude: certain
     sources: []
-    tests: ["seed/forever-mage/tests/run_all.py"]
+    tests: []
     tolerance: null
+    note: "code du seed non encore porté dans forever/ : reprise en T04"
   - id: J3
     categorie: meta
     description: "Erreur statistique cible"
