@@ -1,0 +1,13 @@
+# Registre de test : entrée modelise sans test.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: modelise
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null

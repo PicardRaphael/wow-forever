@@ -78,6 +78,21 @@ def make_deps(tmp_path: Path) -> MakeDeps:
     return factory
 
 
+@pytest.fixture(scope="session")
+def game_data() -> Any:
+    """Données typées du moteur pour la version du dépôt (après contrôle d'intégrité)."""
+    from forever.gamedata import load_game_data
+
+    deps = Deps(
+        data_dir=DATA_DIR,
+        registry_path=REGISTRY_PATH,
+        cache_dir=REPO_ROOT / ".cache-tests-inutilise",
+        http_get=FakeHttp.failing(),
+        now=lambda: NOW,
+    )
+    return load_game_data(deps)
+
+
 @pytest.fixture
 def data_copy(tmp_path: Path) -> Path:
     """Copie modifiable de forever/data (manifeste compris)."""

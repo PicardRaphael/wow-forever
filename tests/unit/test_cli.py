@@ -5,10 +5,11 @@ Valeurs de sort attendues (frostbolt) : seed/forever-mage/data/1.60.1.70009/spel
 import json
 
 import pytest
-from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, FakeHttp, corrupt_manifest, tamper
+from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, REGISTRY_PATH, FakeHttp, corrupt_manifest, tamper
 
 from forever.cli import main
 from forever.manifest import compute_manifest
+from forever.registry import coverage
 
 
 def run(capsys, argv, deps):
@@ -105,7 +106,7 @@ def test_status_text(capsys, make_deps):
     assert LOCAL_VERSION in out
     assert "fresh" in out
     assert "intégrité ok" in out
-    assert "registre 16/97" in out
+    assert f"registre {coverage(REGISTRY_PATH)}" in out
     assert out.rstrip("\n").splitlines()[-1].startswith("Provenance")
 
 
@@ -116,7 +117,7 @@ def test_status_json(capsys, make_deps):
     assert data["local_version"] == LOCAL_VERSION
     assert data["freshness"]["freshness"] == "stale"
     assert data["integrity"]["ok"] is True
-    assert data["registry_coverage"] == "16/97"
+    assert data["registry_coverage"] == coverage(REGISTRY_PATH)
 
 
 def test_status_offline_makes_no_call(capsys, make_deps):

@@ -84,7 +84,7 @@ def test_manifest_content():
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert len(v["files"]) == 9 and "sources.json" in v["files"]
+    assert len(v["files"]) == 10 and "mechanics.json" in v["files"]
 
 
 def test_data_sha_is_short_and_changes_with_content(data_copy):

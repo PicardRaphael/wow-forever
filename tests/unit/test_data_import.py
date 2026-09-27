@@ -1,4 +1,5 @@
-"""Les données 1.60.1.70009 sont des copies octet pour octet du seed forever-mage."""
+"""Les données 1.60.1.70009 sont des copies octet pour octet du seed forever-mage (sauf sources.json et
+mechanics.json, rédigés dans forever-core)."""
 
 import hashlib
 
@@ -30,4 +31,4 @@ def test_overrides_copied_into_version_dir():
 
 def test_version_dir_contains_exactly_expected_files():
     names = {p.name for p in (DATA_DIR / LOCAL_VERSION).iterdir()}
-    assert names == set(SEED_FILES) | {"overrides.json", "sources.json"}
+    assert names == set(SEED_FILES) | {"overrides.json", "sources.json", "mechanics.json"}

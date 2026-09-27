@@ -1,0 +1,14 @@
+# Registre de test : formule chiffrée.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["tests/unit/test_registry.py::test_repository_registry_is_valid_strict"]
+    tolerance: null
+    formule: "coefficient = incantation / 3.5, bornée à 1,5"

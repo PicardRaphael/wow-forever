@@ -1,0 +1,13 @@
+# Registre de test : entrée teste de catégorie A sans implémentation.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: A99
+    categorie: attaque
+    description: "Entrée de test"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["tests/unit/test_registry.py::test_repository_registry_is_valid_strict"]
+    tolerance: null

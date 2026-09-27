@@ -1,0 +1,13 @@
+# Registre de test : référence dans seed/.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null

@@ -1,0 +1,13 @@
+# Registre de test : entrée teste citant un fichier sans fonction.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["tests/unit/test_registry.py"]
+    tolerance: null

@@ -35,11 +35,16 @@ CASES = {
     "status-corrupt-manifest": (["status"], 3, "corrupt-manifest"),
     "lookup-corrupt-manifest": (["lookup", "spell", "frostbolt"], 3, "corrupt-manifest"),
     "manifest-check-corrupt-manifest": (["manifest", "--check"], 3, "corrupt-manifest"),
+    "explain": (["explain-mechanic", "A5"], 0, None),
+    "explain-absent": (["explain-mechanic", "A1"], 0, None),
+    "explain-unknown": (["explain-mechanic", "Z9"], 4, None),
+    "explain-integrity": (["explain-mechanic", "A5"], 3, "tamper"),
     "usage-no-command": ([], 2, None),
     "usage-unknown-command": (["inconnu"], 2, None),
     "usage-lookup-missing-args": (["lookup"], 2, None),
     "usage-lookup-bad-rank": (["lookup", "spell", "frostbolt", "--rank", "deux"], 2, None),
     "usage-manifest-no-mode": (["manifest"], 2, None),
+    "usage-explain-missing-id": (["explain-mechanic"], 2, None),
 }
 
 
