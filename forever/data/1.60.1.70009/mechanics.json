@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "game_version": "1.60.1.70009",
+  "source": "Portage de seed/forever-mage/scripts/fm.py (T02) ; règles détaillées dans seed/forever-mage/references/mechanics.md",
+  "values": {
+    "coefficient.cast_divisor": {
+      "value": 3.5,
+      "certainty": "suppose",
+      "registry": "G4",
+      "source": "règle Classic supposée inchangée (PC) : coefficient direct = incantation / 3,5 (fm.py, references/mechanics.md)"
+    },
+    "coefficient.cast_bounds_s": {
+      "value": [1.5, 3.5],
+      "certainty": "suppose",
+      "registry": "G4",
+      "source": "règle Classic (PC) : incantation bornée à 1,5..3,5 s dans le coefficient direct (fm.py)"
+    },
+    "coefficient.slow_factor": {
+      "value": 0.95,
+      "certainty": "suppose",
+      "registry": "G4",
+      "source": "règle Classic (PC) : ×0,95 pour un sort qui ralentit (fm.py)"
+    },
+    "coefficient.channel_cap_s": {
+      "value": 5.0,
+      "certainty": "suppose",
+      "registry": "G4",
+      "source": "règle Classic (PC) : canalisé = durée (plafonnée à 5 s) / 3,5 (fm.py)"
+    },
+    "coefficient.low_level": {
+      "value": {"threshold": 20, "penalty_per_level": 0.0375},
+      "certainty": "suppose",
+      "registry": "G4",
+      "source": "règle Classic (PC) : ×(1 - 0,0375 × (20 - niveau du sort)) pour un sort de niveau < 20 (fm.py)"
+    },
+    "coefficient.fixed": {
+      "value": {
+        "fire_blast": {"cast_s": 1.5},
+        "scorch": {"cast_s": 1.5},
+        "ice_lance": {"value": 0.1429},
+        "arcane_explosion": {"value": 0.143},
+        "frost_nova": {"value": 0.043},
+        "cone_of_cold": {"value": 0.143, "slowed": true},
+        "blast_wave": {"value": 0.143},
+        "blizzard": {"value": 0.333},
+        "flamestrike": {"value": 0.157}
+      },
+      "certainty": "suppose",
+      "registry": "G4",
+      "source": "valeurs Classic des sorts de zone et instantanés (PC) ; Ice Lance estimée (EST) ; COEF_FIXED de fm.py"
+    },
+    "talents.first_level": {
+      "value": 10,
+      "certainty": "certain",
+      "registry": "G3",
+      "source": "premier point de talent au niveau 10 : points = niveau - 9 (fm.py points_available)"
+    },
+    "talents.points_per_tier": {
+      "value": 5,
+      "certainty": "certain",
+      "registry": "G3",
+      "source": "5 points dans l'arbre par palier précédent (fm.py check_build)"
+    },
+    "character.crit_base": {
+      "value": 0.002,
+      "certainty": "suppose",
+      "registry": "A5",
+      "source": "critique de base du Mage 0,2 % (Warcraft Tavern / PC ; references/mechanics.md)"
+    },
+    "character.int_per_crit": {
+      "value": {"level_min": 1, "at_min": 6.0, "level_max": 60, "at_max": 59.5},
+      "certainty": "suppose",
+      "registry": "A5",
+      "source": "Int pour 1 % de critique : 59,5 au niveau 60 (Mage Classic) ; interpolation linéaire depuis 6 au niveau 1 (EST, fm.py)"
+    },
+    "character.intellect": {
+      "value": {"base": 21, "per_level": 1.76, "late_bonus_per_level": 0.8, "late_from_level": 5},
+      "certainty": "suppose",
+      "registry": "G2",
+      "source": "modèle d'Intelligence estimé (EST) de fm.py character"
+    },
+    "character.spirit": {
+      "value": {"base": 22, "per_level": 1.66, "late_bonus_per_level": 0.5, "late_from_level": 5},
+      "certainty": "suppose",
+      "registry": "G2",
+      "source": "modèle d'Esprit estimé (EST) de fm.py character"
+    },
+    "character.spell_power": {
+      "value": {"per_level": 0.4, "from_level": 10},
+      "certainty": "suppose",
+      "registry": "G2",
+      "source": "puissance des sorts d'équipement estimée : 0,4 × niveau à partir du niveau 10 (EST, fm.py)"
+    },
+    "character.base_mana": {
+      "value": {"base": 100, "per_level": 18.9},
+      "certainty": "suppose",
+      "registry": "B9",
+      "source": "mana de base 100 + 18,9 × (niveau - 1) (PC, leveling.json player_model)"
+    },
+    "character.mana_from_intellect": {
+      "value": {"first_points": 20, "per_point_after": 15},
+      "certainty": "suppose",
+      "registry": "B9",
+      "source": "mana = base + min(Int, 20) + 15 × max(0, Int - 20) (PC, leveling.json player_model)"
+    },
+    "character.hp": {
+      "value": {"base": 40, "per_level": 12, "per_level_squared": 0.25},
+      "certainty": "suppose",
+      "registry": "G2",
+      "source": "points de vie estimés (EST) de fm.py character"
+    },
+    "character.armor": {
+      "value": {"agility_base": 20, "agility_per_level": 0.5, "armor_per_agility": 2, "per_level": 4},
+      "certainty": "suppose",
+      "registry": "G2",
+      "source": "armure = 2 × Agilité + 4 × niveau (tissu), Agilité estimée (EST, fm.py)"
+    },
+    "character.spirit_regen": {
+      "value": {"base": 13, "spirit_divisor": 4, "tick_s": 2},
+      "certainty": "suppose",
+      "registry": "G2",
+      "source": "régénération d'Esprit (13 + Esprit / 4) par tick de 2 s hors règle des 5 s (PC, fm.py)"
+    },
+    "crit.winters_chill_per_stack": {
+      "value": 0.02,
+      "certainty": "certain",
+      "registry": "D4",
+      "source": "Winter's Chill +2 % de critique par cumul, Frostbolt et Ice Lance seulement dans Forever (FC, references/mechanics.md)"
+    },
+    "mana.talent_rank_cost": {
+      "value": {"ratio_of_next_rank": 0.75, "default": 50.0},
+      "certainty": "suppose",
+      "registry": "B11",
+      "source": "estimation du seed (EST) pour un rang de talent sans coût publié ; voir docs/OPEN_QUESTIONS.md"
+    },
+    "spell.default_range_yd": {
+      "value": 30,
+      "certainty": "suppose",
+      "registry": "C2",
+      "source": "portée par défaut d'un sort sans portée publiée (zone autour du lanceur), repli de fm.py"
+    }
+  }
+}

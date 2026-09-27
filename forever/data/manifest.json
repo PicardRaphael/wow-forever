@@ -4,16 +4,17 @@
   "versions": {
     "1.60.1.70009": {
       "collected_at": "2026-09-26",
-      "data_sha": "5f403531a434",
-      "data_sha256": "5f403531a434d8f05dbdb123f2f07a9872446dce38f74956548fdf5d1333b15f",
+      "data_sha": "199357d52a88",
+      "data_sha256": "199357d52a88e47989d54fc6104be224033bcdcd2eeafc67c16ac90a009b24fc",
       "files": {
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
         "leveling.json": "0244ad81f75114722917c96912ad393f11a21742260f69809aaff2a5e9f7380f",
+        "mechanics.json": "66214f2483b130c745198825f785363d2f9262c7904a1fd6bfe0a213b15b8255",
         "meta.json": "3ac4666f8dd47349d3b1e0f4f7e2936b17a2848071a5bc1dc7aa7e8634303095",
         "overrides.json": "e251b04e9fe407a72380f99f4eaea5d141d4361f6167650e8ca09c26451ec9b9",
         "racials.json": "e4cba8c29d0800913a8bc48c6e3db569f64d71d65ea06abbbefffe2f173f7bdf",
         "respec.json": "d0728942f79f45fa2eeafe52ddc75b74608cde77f5a2dcc8d65e1d80e2ed1358",
-        "sources.json": "cf312d48e51481a6b0cfc524efe35fa1a2605ebc10e6ba15529b36c82efbe2de",
+        "sources.json": "7e74007184d39add5e6769c6ef57201a961fd8ae0b8642e678b943208e28957a",
         "spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
         "talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb"
       },

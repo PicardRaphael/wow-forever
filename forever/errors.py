@@ -72,6 +72,31 @@ class ManifestMissingError(ForeverError):
         super().__init__("manifest_missing", message, "lancer `uv run forever manifest --update`")
 
 
+class DataSchemaError(ForeverError):
+    """Fichier de données ou registre dont la structure ne correspond pas au schéma attendu."""
+
+    exit_code = EXIT_INTEGRITY
+
+    def __init__(self, message: str, action: str | None = None) -> None:
+        super().__init__(
+            "data_schema",
+            message,
+            action or "corriger le fichier signalé, puis lancer `uv run forever manifest --update` s'il est versionné",
+        )
+
+
+class UnknownMechanicError(ForeverError):
+    exit_code = EXIT_NOT_FOUND
+
+    def __init__(self, mechanic_id: str, suggestions: list[str]) -> None:
+        hint = (
+            "reprendre un identifiant suggéré"
+            if suggestions
+            else "consulter docs/MECHANICS_REGISTRY.yaml (identifiants de la forme A5)"
+        )
+        super().__init__("unknown_mechanic", f"Mécanique inconnue : « {mechanic_id} ».", hint, suggestions=suggestions)
+
+
 class UnknownSpellError(ForeverError):
     exit_code = EXIT_NOT_FOUND
 

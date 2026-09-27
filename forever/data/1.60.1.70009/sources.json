@@ -40,8 +40,29 @@
     "leveling.json": {
       "source": "Tables d'XP Classic et modèles de monstres et de joueur (voir les champs du fichier)",
       "certainty": "suppose",
+      "field_certainty": {
+        "combat_rules.gcd": "suppose",
+        "combat_rules.spell_miss_by_level_diff": "suppose",
+        "combat_rules.min_miss": "suppose",
+        "combat_rules.crit_mult_spell": "certain",
+        "combat_rules.dot_can_crit": "certain"
+      },
+      "field_notes": {
+        "combat_rules.gcd": "temps de recharge global, règle Classic (PC) : seed/forever-mage/references/mechanics.md",
+        "combat_rules.spell_miss_by_level_diff": "raté des sorts selon l'écart de niveau, règle Classic (PC) : references/mechanics.md",
+        "combat_rules.min_miss": "plancher de raté des sorts, règle Classic (PC) : references/mechanics.md",
+        "combat_rules.crit_mult_spell": "multiplicateur de critique des sorts (FC) : references/mechanics.md",
+        "combat_rules.dot_can_crit": "les effets sur la durée critiquent dans Forever (FS/FC) : references/mechanics.md"
+      },
       "notes": [
         "certitude mixte (FC, PC, EST) : la plus basse est retenue ; modèles à calibrer"
+      ]
+    },
+    "mechanics.json": {
+      "source": "Constantes de seed/forever-mage/scripts/fm.py absentes des tables (portage T02) ; statuts FC/FS/PC/EST de fm.py et de references/mechanics.md",
+      "certainty": "suppose",
+      "notes": [
+        "certitude par entrée dans le champ certainty ; identifiant du registre des mécaniques dans le champ registry"
       ]
     },
     "respec.json": {

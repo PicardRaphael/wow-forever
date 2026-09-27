@@ -1,0 +1,235 @@
+"""Types du moteur : données de la version (gelées) et résultats des calculs.
+
+Les valeurs de jeu vivent dans `forever/data/` ; ces types ne font que les porter. `GameData` est construit hors du
+moteur par `forever/gamedata.py`, après contrôle d'intégrité, puis passé en premier paramètre à chaque fonction."""
+
+from __future__ import annotations
+
+from collections.abc import Mapping
+from dataclasses import dataclass
+from typing import NamedTuple, TypedDict
+
+Points = Mapping[str, int]
+"""Clé de talent -> rang pris."""
+
+# Écoles touchées par les talents de givre et de feu (Givre-feu compte dans les deux : voir OPEN_QUESTIONS).
+SCHOOL_FROST = frozenset({"frost", "frostfire"})
+SCHOOL_FIRE = frozenset({"fire", "frostfire"})
+
+
+class Rank(NamedTuple):
+    """Rang d'un sort, dans l'ordre de `spells.json.rank_format` ; `position` commence à 1, comme `lookup`."""
+
+    position: int
+    level: int
+    damage_min: float
+    damage_max: float
+    dot_total: float
+    dot_duration_s: float
+    cast_time_s: float
+    mana: float | None
+    cooldown_s: float
+
+
+@dataclass(frozen=True)
+class Spell:
+    key: str
+    school: str
+    ranks: tuple[Rank, ...]
+    range_yd: float | None
+    talent: str | None
+    channel: bool
+    slow: float | None
+    mana_pct_base: float | None
+    frozen_mult: float | None
+    projectile_speed: float | None
+
+
+@dataclass(frozen=True)
+class Talent:
+    key: str
+    name: str
+    tree: str
+    tier: int
+    col: int
+    max_rank: int
+    ranks: tuple[tuple[float, ...], ...]
+    prereq: tuple[int, int] | None  # (palier, colonne) dans le même arbre
+
+
+@dataclass(frozen=True)
+class CombatRules:
+    """Champs structurés de `leveling.json.combat_rules`."""
+
+    gcd_s: float
+    spell_miss_by_level_diff: Mapping[str, float]  # clé "-" : cible plus basse
+    min_miss: float
+    crit_mult_spell: float
+    dot_can_crit: bool
+
+
+@dataclass(frozen=True)
+class FixedCoefficient:
+    """Coefficient fixe d'un sort : `value` direct, ou `cast_s` (durée équivalente divisée par le diviseur)."""
+
+    value: float | None
+    cast_s: float | None
+    slowed: bool
+
+
+@dataclass(frozen=True)
+class CoefficientRules:
+    cast_divisor: float
+    cast_min_s: float
+    cast_max_s: float
+    slow_factor: float
+    channel_cap_s: float
+    low_level_threshold: int
+    low_level_penalty_per_level: float
+    fixed: Mapping[str, FixedCoefficient]
+
+
+@dataclass(frozen=True)
+class StatGrowth:
+    """stat = base + per_level × (niveau - 1) + late_bonus_per_level × max(0, niveau - late_from_level)."""
+
+    base: float
+    per_level: float
+    late_bonus_per_level: float
+    late_from_level: int
+
+
+@dataclass(frozen=True)
+class IntPerCrit:
+    level_min: int
+    at_min: float
+    level_max: int
+    at_max: float
+
+
+@dataclass(frozen=True)
+class CharacterModel:
+    crit_base: float
+    int_per_crit: IntPerCrit
+    intellect: StatGrowth
+    spirit: StatGrowth
+    spell_power_per_level: float
+    spell_power_from_level: int
+    base_mana: float
+    base_mana_per_level: float
+    mana_first_points: float
+    mana_per_point_after: float
+    hp_base: float
+    hp_per_level: float
+    hp_per_level_squared: float
+    agility_base: float
+    agility_per_level: float
+    armor_per_agility: float
+    armor_per_level: float
+    regen_base: float
+    regen_spirit_divisor: float
+    regen_tick_s: float
+
+
+@dataclass(frozen=True)
+class TalentRules:
+    first_level: int
+    points_per_tier: int
+
+
+@dataclass(frozen=True)
+class Constants:
+    """Constantes de `mechanics.json` (valeurs absentes des tables du client)."""
+
+    coefficients: CoefficientRules
+    character: CharacterModel
+    talents: TalentRules
+    crit_per_winters_chill_stack: float
+    talent_rank_mana_ratio: float
+    talent_rank_mana_default: float
+    default_range_yd: float
+
+
+@dataclass(frozen=True)
+class Racials:
+    """Raciaux utilisés par le modèle de personnage (`racials.json`), par race."""
+
+    sword_crit: Mapping[str, float]
+    spirit_pct: Mapping[str, float]
+    mana_pct: Mapping[str, float]
+
+
+@dataclass(frozen=True)
+class GameData:
+    """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
+
+    game_version: str
+    spells: Mapping[str, Spell]
+    talents: Mapping[str, Talent]  # ordre de talents.json (arbres puis talents)
+    talent_at: Mapping[tuple[str, int, int], str]  # (arbre, palier, colonne) -> clé
+    trees: tuple[str, ...]
+    rules: CombatRules
+    constants: Constants
+    racials: Racials
+
+
+class CharacterOverrides(TypedDict, total=False):
+    """Valeurs relevées sur la fiche du personnage : elles remplacent toute estimation."""
+
+    intellect: float
+    spirit: float
+    sp: float
+    base_mana: float
+    mana: float
+    spell_crit: float  # critique des sorts affiché (fraction)
+    crit_gear: float
+    sword: bool
+    hit_gear: float
+    haste: float
+    hp: float
+    armor: float
+
+
+@dataclass(frozen=True)
+class Character:
+    level: int
+    race: str
+    intellect: float
+    spirit: float
+    sp: float
+    base_mana: float
+    mana: float
+    crit: float
+    hit_gear: float
+    haste: float
+    hp: float
+    armor: float
+    spirit_regen: float  # mana par seconde, hors règle des 5 s
+    overrides: CharacterOverrides
+
+
+class Buffs(TypedDict, total=False):
+    crit: float
+    dmg: float
+    haste: float
+    cost: float
+    sp_pct: float
+    sp_flat: float
+
+
+class CastEstimate(TypedDict):
+    key: str
+    rank: Rank
+    school: str
+    hit: float
+    crit: float
+    crit_mult: float
+    dmg_mult: float
+    dmg: float
+    direct_per_hit: float
+    dot: float
+    ignite: float
+    mana: float
+    cast_s: float
+    range_yd: float
+    cooldown_s: float
