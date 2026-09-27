@@ -6,6 +6,7 @@ Les constantes de ce module décrivent l'outil (cache, délais), jamais le jeu. 
 from __future__ import annotations
 
 import os
+import sys
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -44,6 +45,16 @@ class Deps:
     now: Callable[[], datetime]
     offline: bool = False
     wow_dir: Path | None = None  # dossier du client (journaux, addons, SavedVariables), lu sans réseau
+    confirm: Callable[[str], bool] | None = None  # demande d'accord avant une écriture (None : refus)
+
+
+def terminal_confirm(prompt: str) -> bool:
+    """Accord demandé sur le terminal (question sur la sortie d'erreur, « o » ou « oui ») ; refus si l'entrée
+    standard n'est pas un terminal."""
+    if not sys.stdin.isatty():
+        return False
+    print(prompt, end="", file=sys.stderr, flush=True)
+    return input().strip().lower() in ("o", "oui")
 
 
 def utc_now() -> datetime:
@@ -73,4 +84,5 @@ def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
         now=utc_now,
         offline=environ.get("FOREVER_OFFLINE", "") not in ("", "0"),
         wow_dir=default_wow_dir(environ),
+        confirm=terminal_confirm,
     )

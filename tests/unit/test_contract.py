@@ -85,6 +85,9 @@ CASES = {
         0,
         None,
     ),
+    # T04c : rafraîchissement des mesures (simulation : aucune écriture)
+    "measures-refresh": (["measures", "refresh", "--logs", str(COMBATLOG), "--dry-run"], 0, None),
+    "measures-refresh-missing-logs": (["measures", "refresh", "--logs", "{tmp}/absent", "--dry-run"], 2, None),
     "monsters-build-into-data": (["monsters", "build", "--logs", str(COMBATLOG), "--out", "{data}/x"], 2, None),
     "usage-monsters-no-logs": (["monsters", "build"], 2, None),
     # T04b : simulateur et graphique de leveling

@@ -351,3 +351,19 @@ def measure_log(
         ),
         "assumptions": [*notes, *tally.assumptions],
     }
+
+
+class IgniteObservation(TypedDict):
+    """Critiques de feu du lanceur sur une cible et tics d'Ignite qui suivent (instants en s depuis le premier
+    critique de l'épisode, dégâts)."""
+
+    target: str
+    crits: list[tuple[float, float]]
+    ticks: list[tuple[float, float]]
+
+
+def ignite_ticks(
+    events: Iterable[Event], caster: str, *, ignite_spell: int, window_s: float
+) -> list[IgniteObservation]:
+    """Épisodes d'Ignite du lanceur : un épisode s'arrête après `window_s` sans critique ni tic sur la cible."""
+    raise NotImplementedError

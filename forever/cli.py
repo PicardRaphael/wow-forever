@@ -177,6 +177,34 @@ def build_parser() -> argparse.ArgumentParser:
     info.add_argument("--dir", help="dossier de l'addon (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)")
     info.add_argument("--json", action="store_true", help="sortie JSON")
 
+    measures = sub.add_parser("measures", help="mesures tirées des journaux et SavedVariables")
+    measures_sub = measures.add_subparsers(dest="measures_command", required=True, parser_class=_Parser)
+    refresh = measures_sub.add_parser(
+        "refresh", help="relancer toutes les mesures, afficher ce qui change, écrire après accord"
+    )
+    refresh.add_argument("--logs", help="dossier des journaux (défaut : <FOREVER_WOW_DIR>/Logs)")
+    refresh.add_argument(
+        "--sv", help="dossier SavedVariables (défaut : <FOREVER_WOW_DIR>/WTF/Account/*/SavedVariables)"
+    )
+    refresh.add_argument(
+        "--questie", help="dossier de l'addon Questie (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)"
+    )
+    refresh.add_argument(
+        "--utc-offset", type=float, help="décalage horaire des journaux, en heures (niveaux du carnet)"
+    )
+    refresh.add_argument(
+        "--fit-exclude",
+        type=int,
+        action="append",
+        default=None,
+        metavar="NPC",
+        help="PNJ écarté de l'ajustement de la correction Questie (défaut : ceux de monsters.json installé)",
+    )
+    mode = refresh.add_mutually_exclusive_group()
+    mode.add_argument("--yes", action="store_true", help="écrire sans demander")
+    mode.add_argument("--dry-run", action="store_true", help="afficher sans jamais écrire")
+    refresh.add_argument("--json", action="store_true", help="sortie JSON")
+
     monsters = sub.add_parser("monsters", help="table des monstres (PV mesurés, Questie en regard)")
     monsters_sub = monsters.add_subparsers(dest="monsters_command", required=True, parser_class=_Parser)
     build = monsters_sub.add_parser("build", help="construire monsters.json hors des données")
@@ -870,6 +898,10 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
+    raise NotImplementedError
+
+
 def _cmd_monsters_build(deps: Deps, args: argparse.Namespace) -> int:
     path = Path(args.logs)
     if not path.exists():
@@ -974,6 +1006,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
         "monsters": _cmd_monsters_build,
+        "measures": _cmd_measures_refresh,
         "sim": _cmd_sim,
         "chart": _cmd_chart,
     }

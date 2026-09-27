@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import NamedTuple
 
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, Character, GameData, Points, Rank
@@ -112,3 +113,20 @@ def ignite_ticks_due(state: IgniteState | None, until: float) -> tuple[float, Ig
         return state.remaining, None
     dealt = per_tick * len(due)
     return dealt, IgniteState(state.remaining - dealt, left)
+
+
+def roll_ignite_keep_timer(gd: GameData, state: IgniteState | None, now: float, amount: float) -> IgniteState:
+    """Variante de comparaison (T04c, décision 2, non retenue) : le reste s'ajoute aux tics restants, dont les
+    instants ne bougent pas ; un Ignite sans tic restant repart du critique.
+
+    Registre : A18"""
+    raise NotImplementedError
+
+
+def predict_ignite_ticks(
+    gd: GameData, crits: Sequence[tuple[float, float]], part: float, *, keep_timer: bool = False
+) -> list[tuple[float, float]]:
+    """Tics (instant, dégâts) prédits pour des critiques (instant, dégâts) et une part d'Ignite `part`.
+
+    Registre : A18"""
+    raise NotImplementedError

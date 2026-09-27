@@ -43,3 +43,9 @@ def test_production_client_comes_from_pipeline():
     from forever.pipeline.http_client import urllib_get
 
     assert default_deps({}).http_get is urllib_get
+
+
+def test_measures_refresh_reads_the_disk_only():
+    """T04c : `forever measures refresh` lit les journaux et SavedVariables sur disque, sans aucun module réseau."""
+    assert network_uses(PACKAGE / "pipeline" / "refresh.py") == set()
+    assert network_uses(PACKAGE / "pipeline" / "measure.py") == set()

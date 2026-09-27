@@ -11,6 +11,7 @@ Cas limites écrits pour les tests (pas des journaux réels) :
 - `empty.txt` : fichier vide (comme le second journal du 2026-09-27) → `unsupported_log`.
 - `truncated.txt` : ligne 3 tronquée dans le bloc avancé → `data_schema` avec le numéro de ligne.
 - `unknown_event.txt` : événement inconnu `FOREVER_NEW_EVENT` (gardé brut, compté).
+- `ignite_pairs.txt` (T04c) : Ignite roulant écrit d'après les formes réelles du format 22 (lignes `SPELL_DAMAGE` et `SPELL_PERIODIC_DAMAGE` des fixtures) ; montants choisis, pas des chiffres de jeu. Critique isolé de Fireball (133) de 200 sur le PNJ 3099 à 10:00:01, tics d'Ignite (412538) de 40 à +2 s et +4 s ; deux critiques de 200 et 150 à 1 s d'écart sur le PNJ 3100 à 10:01:00, tics de 70 à +3 s et +5 s (règle roulante de la décision 2, part 40 %).
 - `hp_conflict.txt` : deux sangliers 3099 de niveau 6 avec des PV max différents (120 et 125) → conflit ; nom de joueur non ASCII (`Élève-Royaume`).
 - `multi_power.txt` : bloc avancé à plusieurs ressources (`3|4,46|2,100|5,35|2` : énergie et points de combo), ligne relevée dans `WoWCombatLog-092726_150346.txt` (joueur anonymisé) → ressource principale retenue.
 - `summoned.txt` : totem de feu (2523) invoqué par un joueur (propriétaire non nul dans le bloc avancé) → exclu des PV de monstres.
