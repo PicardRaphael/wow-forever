@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "version": "1.60.1.70009",
+  "reference": "talents.json et spells.json de cette version",
+  "notes": [
+    "Écarts entre le décodage du client 1.60.1.70009 et les fichiers de référence de cette version, tranchés comme de vrais changements du client (pas des bogues du décodeur).",
+    "Chaque entrée reprend un changement de `forever diff 1.60.1.70009 <candidate>` : kind, key, change, field, old (référence), new (client), avec la certitude de la référence et la décision.",
+    "Les fichiers de référence ne sont pas modifiés : l'installation de ces valeurs revient à T08."
+  ],
+  "changes": []
+}

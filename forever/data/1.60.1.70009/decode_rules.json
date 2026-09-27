@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "class": "Mage",
+  "tables": [
+    "SkillLineXTraitTree",
+    "TraitNode",
+    "TraitNodeXTraitNodeEntry",
+    "TraitNodeEntry",
+    "TraitDefinition",
+    "TraitDefinitionEffectPoints",
+    "TraitEdge",
+    "CurvePoint",
+    "SkillLineAbility",
+    "Spell",
+    "SpellName",
+    "SpellEffect",
+    "SpellLevels",
+    "SpellMisc",
+    "SpellCastTimes",
+    "SpellDuration",
+    "SpellPower",
+    "SpellCooldowns",
+    "SpellAuraOptions"
+  ],
+  "localized_tables": {
+    "frFR": ["SpellName"]
+  },
+  "skill_lines": {
+    "Arcane": 237,
+    "Fire": 8,
+    "Frost": 6
+  },
+  "talent_geometry": {
+    "tabs": {
+      "Arcane": 1020,
+      "Fire": 5020,
+      "Frost": 9080
+    },
+    "row_base": 2130,
+    "row_step": 600,
+    "col_step": 600,
+    "extra_zero_divisor": 10
+  },
+  "shared_spell": "latest_node",
+  "curve_operations": {
+    "0": "set"
+  },
+  "levels": {
+    "level_cap": 60,
+    "talent_tooltip": "base",
+    "spell_rank": "max_capped"
+  },
+  "tooltip": {
+    "duration_units": [
+      {"ms": 60000, "unit": "min"},
+      {"ms": 1000, "unit": "sec"}
+    ]
+  },
+  "effects": {
+    "school_damage": 2,
+    "apply_aura": 6,
+    "aura_periodic_damage": 3,
+    "aura_periodic_trigger_spell": 23,
+    "aura_periodic_dummy": 226
+  },
+  "spell_ranks": {
+    "acquire_methods": [0, 2],
+    "rank_subtext": "^Rank (\\d+)$",
+    "channel_attributes_1_mask": 68,
+    "mana_power_type": 0
+  },
+  "spells": {
+    "frostbolt": "Frostbolt",
+    "fireball": "Fireball",
+    "fire_blast": "Fire Blast",
+    "scorch": "Scorch",
+    "pyroblast": "Pyroblast",
+    "frostfire_bolt": "Frostfire Bolt",
+    "ice_lance": "Ice Lance",
+    "arcane_blast": "Arcane Blast",
+    "arcane_missiles": "Arcane Missiles",
+    "frost_nova": "Frost Nova",
+    "cone_of_cold": "Cone of Cold",
+    "arcane_explosion": "Arcane Explosion",
+    "blizzard": "Blizzard",
+    "flamestrike": "Flamestrike",
+    "blast_wave": "Blast Wave"
+  },
+  "rank_format": ["level", "min", "max", "dot_total", "dot_duration", "cast_s", "mana", "cooldown_s"],
+  "notes": [
+    "Règles de lecture des tables du client (wago.tools) pour le Mage ; héritées par les versions suivantes tant qu'elles restent valides.",
+    "tables : téléchargées en enUS ; localized_tables : tables de noms téléchargées en plus dans la locale indiquée.",
+    "skill_lines : lignes de compétence du Mage ; l'arbre de talents est celui que SkillLineXTraitTree associe à ces lignes.",
+    "talent_geometry : colonne = (PosX - onglet) / col_step + 1, palier = (PosY - row_base) / row_step + 1 ; une position qui ne tombe pas sur la grille est divisée par extra_zero_divisor (zéro en trop).",
+    "shared_spell latest_node : si deux nœuds de l'arbre portent le même sort, le nœud d'identifiant le plus grand est retenu.",
+    "curve_operations : TraitDefinitionEffectPoints.OperationType pris en charge ; 0 remplace les points de l'effet par la valeur de la courbe au rang.",
+    "levels : infobulles de talent évaluées au niveau de base du sort (valeurs affichées dans l'arbre) ; rangs de sort évalués au niveau min(MaxLevel, level_cap), MaxLevel 0 valant level_cap.",
+    "tooltip.duration_units : unité d'affichage d'une durée, la plus grande dont la durée atteint le seuil.",
+    "effects : identifiants d'effet et d'aura du client (SpellEffect.Effect, SpellEffect.EffectAura).",
+    "spell_ranks : rangs lus dans SkillLineAbility (lignes du Mage, méthodes d'acquisition retenues), numérotés par Spell.NameSubtext ; canalisé si Attributes_1 & channel_attributes_1_mask."
+  ]
+}

@@ -92,6 +92,21 @@
       "notes": [
         "corrections de rangs lues sur le build 1.60.1.70009 (FC)"
       ]
+    },
+    "decode_rules.json": {
+      "source": "Inventaire des tables du client 1.60.1.70009 (https://wago.tools/db2/<Table>/csv?build=1.60.1.70009, collecte du 2026-09-27) et docs/DATA_SOURCES.md ; voir tasks/T03-inventaire.md",
+      "certainty": "certain",
+      "notes": [
+        "règles de lecture des tables (géométrie, lignes de compétence, identifiants d'effet) ; ne décrit pas une règle de combat",
+        "levels : convention d'évaluation des infobulles (niveau de base pour les talents, min(MaxLevel, 60) pour les rangs de sort), à ratifier (docs/OPEN_QUESTIONS.md)"
+      ]
+    },
+    "confirmed_changes.json": {
+      "source": "Écarts entre le décodage du client 1.60.1.70009 et talents.json / spells.json, tranchés par l'utilisateur (T03)",
+      "certainty": "certain",
+      "notes": [
+        "liste vide tant qu'aucun écart n'est tranché ; appliquée aux données par l'installation (T08)"
+      ]
     }
   }
 }
