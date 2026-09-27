@@ -27,7 +27,12 @@ def call(deps, coro_fn):
 
 def test_list_tools(make_deps):
     tools = call(make_deps(), lambda c: c.list_tools()).tools
-    assert {t.name for t in tools} == {"forever_status", "forever_lookup", "forever_explain_mechanic"}
+    assert {t.name for t in tools} == {
+        "forever_status",
+        "forever_lookup",
+        "forever_explain_mechanic",
+        "forever_sim_leveling",
+    }
     for t in tools:
         assert t.output_schema is not None
         assert t.description
@@ -117,4 +122,21 @@ def test_explain_unknown_mechanic_is_structured_error(make_deps):
     r = call(make_deps(), lambda c: c.call_tool("forever_explain_mechanic", {"mechanic_id": "Z9"}))
     assert r.is_error
     assert r.structured_content["error"]["code"] == "unknown_mechanic"
+    assert validate_provenance(r.structured_content["provenance"]) == []
+
+
+def test_sim_leveling(make_deps):
+    args = {"level": 12, "talents": {"improvedFrostbolt": 3}, "n": 50}
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
+    assert not r.is_error
+    data = r.structured_content
+    assert data["mob_hp"]["value"] == 272 and data["mob_hp"]["certainty"] == "certain"
+    assert data["monte_carlo"]["total"] > data["monte_carlo"]["combat"] > 0 and data["analytic"]["total"] > 0
+    assert validate_provenance(data["provenance"]) == [] and data["provenance"]["certainty"] == "suppose"
+
+
+def test_sim_leveling_illegal_build_is_structured_error(make_deps):
+    args = {"level": 12, "talents": {"improvedFrostbolt": 5}}
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
+    assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
     assert validate_provenance(r.structured_content["provenance"]) == []

@@ -87,6 +87,17 @@ CASES = {
     ),
     "monsters-build-into-data": (["monsters", "build", "--logs", str(COMBATLOG), "--out", "{data}/x"], 2, None),
     "usage-monsters-no-logs": (["monsters", "build"], 2, None),
+    # T04b : simulateur et graphique de leveling
+    "sim-leveling": (["sim", "leveling", "--level", "12", "--n", "20"], 0, None),
+    "sim-leveling-illegal": (["sim", "leveling", "--level", "12", "--talents", "improvedFrostbolt=5"], 2, None),
+    "sim-leveling-integrity": (["sim", "leveling", "--level", "12", "--n", "5"], 3, "tamper"),
+    "chart-leveling": (
+        ["chart", "leveling", "--out", "{tmp}/c.png", "--from", "12", "--to", "13", "--n", "5"],
+        0,
+        None,
+    ),
+    "usage-sim-no-level": (["sim", "leveling"], 2, None),
+    "usage-chart-no-out": (["chart", "leveling"], 2, None),
 }
 
 
