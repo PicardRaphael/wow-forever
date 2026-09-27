@@ -81,6 +81,7 @@ def test_constants(game_data):
     assert c.crit_per_winters_chill_stack == 0.02
     assert (c.talent_rank_mana_ratio, c.talent_rank_mana_default) == (0.75, 50.0)
     assert c.default_range_yd == 30
+    assert c.miss_per_level_below == 0.01  # T04b, décision 4 : cible plus basse (règle Classic, suppose)
 
 
 def test_missing_constant_is_schema_error(make_deps, data_copy):

@@ -30,8 +30,9 @@ def test_logs_scan(capsys, make_deps, data_copy):
     code, out, _ = run(capsys, ["logs", "scan", "--dir", str(COMBATLOG), "--json"], deps)
     payload = json.loads(out)
     assert code == 0
-    (log,) = payload["logs"]
+    log, second = payload["logs"]  # T04b : seconde fixture compressée (.txt.gz) listée aussi
     assert log["name"] == REAL_LOG.name and log["lines"] == 194 and log["mine"] == ["Moi-Royaume"]
+    assert second["name"] == "WoWCombatLog-092726_150346.anon.txt.gz" and second["lines"] == 3330
     code, out, _ = run(capsys, ["logs", "scan", "--dir", str(COMBATLOG)], deps)
     assert code == 0 and REAL_LOG.name in out and out.rstrip().splitlines()[-1].startswith("Provenance")
     assert http.calls == [] and tree_sha(data_copy) == before

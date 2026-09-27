@@ -48,7 +48,7 @@ def test_monsters_build(capsys, make_deps, data_copy, tmp_path):
     argv = ["monsters", "build", "--logs", str(COMBATLOG), "--questie", str(QUESTIE), "--out", str(tmp_path / "m")]
     code, out, _ = run(capsys, [*argv, "--json"], deps)
     payload = json.loads(out)
-    assert code == 0 and payload["npcs"] == 2
+    assert code == 0 and payload["npcs"] == 21  # T04b : 19 PNJ de la seconde fixture
     table = read_json(tmp_path / "m" / "monsters.json")
     assert table["npcs"]["3099"]["levels"]["6"]["certainty"] == "certain"
     assert table["npcs"]["3099"]["levels"]["7"]["max_hp"] == table["npcs"]["3099"]["levels"]["7"]["questie_hp"]

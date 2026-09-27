@@ -59,7 +59,11 @@ def test_talent_rank_mana_estimate(game_data, ch):
 
 def test_hit_by_level_diff(game_data, ch):
     assert hit_chance(game_data, "frost", 0, {}, ch) == approx(0.96)
-    assert hit_chance(game_data, "frost", -2, {}, ch) == approx(0.96)
+    # T04b, décision 4 : cible plus basse, 4 % (écart 0) + écart × 1 %, plancher 1 % (règle Classic, suppose)
+    assert hit_chance(game_data, "frost", -1, {}, ch) == approx(0.97)
+    assert hit_chance(game_data, "frost", -2, {}, ch) == approx(0.98)
+    assert hit_chance(game_data, "frost", -3, {}, ch) == approx(0.99)
+    assert hit_chance(game_data, "frost", -8, {}, ch) == approx(0.99)
     assert hit_chance(game_data, "frost", 3, {}, ch) == approx(0.83)
     assert hit_chance(game_data, "frost", 7, {}, ch) == approx(0.61)  # au-delà de la table : dernière ligne
 

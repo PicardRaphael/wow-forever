@@ -1,10 +1,13 @@
 """Mesures tirées d'un journal : PV des monstres, coûts, intervalles entre instantanés, incantations, critiques,
 touchés et ratés. Valeurs relevées sur la fixture anonymisée du 2026-09-27 (voir tests/fixtures/combatlog/)."""
 
+from datetime import datetime
+
 import pytest
 from conftest import MINE_GUID, REAL_LOG, SYNTHETIC_LOGS
 
 from forever.pipeline.combatlog import read_log
+from forever.pipeline.levels import CasterLevels, LevelTimeline
 from forever.pipeline.measure import (
     cast_times,
     crit_ratios,
@@ -88,3 +91,44 @@ def test_hit_tally_grouped_by_school_and_level_gap():
         ("arcane", -13): (1, 0),
         ("arcane", -8): (2, 0),
     }
+
+
+def test_gcd_intervals_only_between_gcd_spells():
+    """Un sort hors de `gcd_spells` (ici Fire Blast 2137) rompt l'enchaînement : ses deux intervalles disparaissent."""
+    intervals = gcd_intervals(events(), MINE_GUID, max_gap_s=MAX_GAP_S, gcd_spells=frozenset({1449}))
+    assert intervals == pytest.approx([1.516, 1.590], abs=1e-3)
+
+
+def test_hit_tally_counts_known_spells_only():
+    tally = hit_tally(events(), MINE_GUID, 14, known_spells=frozenset({837}))
+    assert {k: (v["hits"], v["misses"]) for k, v in tally.counts.items()} == {("frost", -8): (3, 0)}
+
+
+def test_hit_tally_follows_a_level_change():
+    """Niveau 15 à partir de 14:55:00 : Fire Blast et Arcane Explosion de la fin du journal changent d'écart."""
+    levels = CasterLevels(
+        (
+            LevelTimeline(
+                (
+                    (datetime.fromisoformat("2026-09-27T14:50:00"), 14),
+                    (datetime.fromisoformat("2026-09-27T14:55:00"), 15),
+                ),
+                "t",
+            ),
+        )
+    )
+    tally = hit_tally(events(), MINE_GUID, levels)
+    assert {k: v["hits"] for k, v in tally.counts.items()} == {
+        ("frost", -8): 3,
+        ("fire", -7): 2,
+        ("arcane", -13): 1,
+        ("fire", -9): 1,
+        ("arcane", -9): 2,
+    }
+
+
+def test_hit_tally_notes_casts_before_any_known_level():
+    levels = CasterLevels((LevelTimeline(((datetime.fromisoformat("2026-09-27T14:55:00"), 15),), "t"),))
+    tally = hit_tally(events(), MINE_GUID, levels)
+    assert sum(v["hits"] for v in tally.counts.values()) == 3
+    assert any("6 sort(s)" in a and "niveau du lanceur inconnu" in a for a in tally.assumptions)

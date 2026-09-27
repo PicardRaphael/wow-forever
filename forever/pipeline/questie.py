@@ -157,3 +157,9 @@ def read_questie(addon_dir: Path) -> QuestieDB:
     quest_count = len(_ENTRY.findall(quest_file.read_text(encoding="utf-8"))) if quest_file.is_file() else None
     info = QuestieInfo(version[1], version[2].strip(), int(interface[1]), npc_count, quest_count)
     return QuestieDB(addon_dir, info)
+
+
+def read_journey(sv: Path, guid: str) -> list[tuple[int, int]]:
+    """(heure Unix, niveau atteint) des événements `Level` du carnet de Questie pour le personnage `guid`, triés ;
+    tous les blocs `char` du GUID sont réunis (Questie peut en écrire plusieurs, dont un « Unknown »)."""
+    raise NotImplementedError

@@ -50,12 +50,19 @@ def test_scaling_entry_of_frostbolt_rank3(client_tables, decode_rules):
     assert component["base_points"] == 46
     assert component["points_per_level"] == pytest.approx(0.9)
     assert component["variance"] == pytest.approx(0.111111, abs=1e-6)
+    assert entry["start_recovery_ms"] == 1500  # SpellCooldowns.StartRecoveryTime (recharge globale déclenchée)
 
 
 def test_max_level_zero_is_resolved_to_the_cap_at_decode(client_tables, decode_rules):
     doc = decode_scaling(client_tables, decode_rules, LOCAL_VERSION)
     levels = [e["max_level"] for ranks in doc["spells"].values() for e in ranks]
     assert all(0 < m <= decode_rules["levels"]["level_cap"] for m in levels)
+
+
+def test_start_recovery_of_every_rank(game_data):
+    """Chaque rang décodé porte `start_recovery_ms` ; les sorts suivis déclenchent tous la recharge globale."""
+    values = {r.start_recovery_ms for ranks in game_data.scaling.values() for r in ranks}
+    assert values == {1500}
 
 
 def test_decode_reproduces_installed_spell_scaling(candidate):

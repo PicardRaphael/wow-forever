@@ -1,0 +1,24 @@
+# Registre de test : preuves d'une même mesure cumulées (30 + 25 >= 50), décision 2 du plan T04b.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: valide-journal
+    certitude: probable
+    sources: ["tests/fixtures/combatlog/README.md"]
+    tests: ["tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants"]
+    tolerance: {n_min: 50}
+    preuves:
+      - journal: tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt
+        date: "2026-09-27"
+        mesure: "intervalles entre instantanés enchaînés"
+        n: 30
+        test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants
+      - journal: tests/fixtures/combatlog/WoWCombatLog-092726_150346.anon.txt.gz
+        date: "2026-09-27"
+        mesure: "intervalles entre instantanés enchaînés"
+        n: 25
+        test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants

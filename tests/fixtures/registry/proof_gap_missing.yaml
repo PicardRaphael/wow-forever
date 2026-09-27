@@ -1,0 +1,19 @@
+# Registre de test : tolérance d'écart sans écarts déclarés dans la preuve.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: valide-journal
+    certitude: probable
+    sources: ["tests/fixtures/combatlog/README.md"]
+    tests: ["tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants"]
+    tolerance: {n_min: 50, ecart_s: 0.05}
+    preuves:
+      - journal: [tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt, tests/fixtures/combatlog/WoWCombatLog-092726_150346.anon.txt.gz]
+        date: "2026-09-27"
+        mesure: "intervalles entre instantanés enchaînés"
+        n: 50
+        test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants

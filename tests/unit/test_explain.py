@@ -45,6 +45,8 @@ def test_explain_combat_rule_parameters(make_deps):
     params = {p["key"]: p for p in explain_mechanic(make_deps(), "A3")["parameters"]}
     assert params["combat_rules.spell_miss_by_level_diff"]["certainty"] == "suppose"
     assert params["combat_rules.min_miss"]["value"] == 0.01
+    assert params["hit.miss_per_level_below"]["value"] == 0.01  # T04b, décision 4
+    assert params["hit.miss_per_level_below"]["certainty"] == "suppose"
     assert explain_mechanic(make_deps(), "A21")["parameters"][0]["key"] == "combat_rules.crit_mult_spell"
     assert [p["key"] for p in explain_mechanic(make_deps(), "H1")["parameters"]] == [
         "combat_rules.spell_miss_by_level_diff"

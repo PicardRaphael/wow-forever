@@ -12,7 +12,9 @@ from collections.abc import Iterable
 from itertools import pairwise
 from typing import NamedTuple, TypedDict
 
+from forever.engine.model import GameData
 from forever.pipeline.combatlog import NO_GUID, Event, LogHeader, is_known
+from forever.pipeline.levels import CasterLevels
 
 # Masque d'école du journal (format) -> nom d'école des données.
 SCHOOLS = {1: "physical", 2: "holy", 4: "fire", 8: "nature", 16: "frost", 32: "shadow", 64: "arcane"}
@@ -153,7 +155,9 @@ def _casts(events: Iterable[Event], caster: str) -> list[_Cast]:
     return out
 
 
-def gcd_intervals(events: Iterable[Event], caster: str, *, max_gap_s: float) -> list[float]:
+def gcd_intervals(
+    events: Iterable[Event], caster: str, *, max_gap_s: float, gcd_spells: frozenset[int] | None = None
+) -> list[float]:
     """Intervalles (s) entre deux sorts instantanés réussis consécutifs du lanceur, dans l'ordre chronologique ; un
     intervalle plus long que `max_gap_s` (paramètre de mesure) n'est pas un enchaînement et n'est pas retenu.
 
@@ -189,7 +193,13 @@ def crit_ratios(events: Iterable[Event], caster: str) -> list[tuple[int, float]]
     return out
 
 
-def hit_tally(events: Iterable[Event], caster: str, caster_level: int | None) -> HitTally:
+def hit_tally(
+    events: Iterable[Event],
+    caster: str,
+    caster_level: CasterLevels | int | None,
+    *,
+    known_spells: frozenset[int] | None = None,
+) -> HitTally:
     """Touchés et ratés des sorts directs du lanceur sur des créatures, par (école, niveau de la cible - niveau du
     lanceur). Sans niveau du lanceur (ForeverLoggerDB), rien n'est compté.
 
@@ -225,6 +235,16 @@ def hit_tally(events: Iterable[Event], caster: str, caster_level: int | None) ->
     return HitTally(counts, notes)
 
 
+class LogSpellSets(NamedTuple):
+    gcd: frozenset[int]  # rangs dont `start_recovery_ms` > 0 (déclenchent la recharge globale)
+    known: frozenset[int]  # rangs et sorts déclenchés suivis par les données (`spell_scaling.json`)
+
+
+def log_spell_sets(gd: GameData) -> LogSpellSets:
+    """Sorts du lanceur retenus par les mesures, tirés des données de la version (aucun identifiant en dur)."""
+    raise NotImplementedError
+
+
 class GcdIntervals(TypedDict):
     values: list[float]
     n: int
@@ -251,7 +271,13 @@ class LogMeasures(TypedDict):
 
 
 def measure_log(
-    header: LogHeader, events: list[Event], *, name: str, max_gap_s: float, caster_level: int | None = None
+    header: LogHeader,
+    events: list[Event],
+    *,
+    name: str,
+    max_gap_s: float,
+    caster_level: CasterLevels | int | None = None,
+    spells: LogSpellSets | None = None,
 ) -> LogMeasures:
     """Toutes les mesures d'un journal, pour le joueur « à moi » (sérialisables en JSON)."""
     caster = find_mine(events)

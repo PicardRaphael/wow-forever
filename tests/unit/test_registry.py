@@ -5,6 +5,7 @@ Registres invalides : tests/fixtures/registry/ (un défaut par fichier) ; faux m
 import ast
 
 import pytest
+import yaml
 from conftest import FIXTURES, REGISTRY_PATH, REPO_ROOT
 
 from forever.errors import UnknownMechanicError
@@ -35,6 +36,13 @@ DEFECTS = {
     "proof_missing_test.yaml": "fonction de test introuvable",
     "proof_below_n_min.yaml": "n = 3 < n_min = 50",
     "proof_missing_field.yaml": "champ 'n' manquant",
+    # T04b : preuves cumulées par mesure, preuve de plusieurs journaux, écarts à la recharge globale (décision 2)
+    "proof_cumulative_below.yaml": "n = 45 < n_min = 50",
+    "proof_other_measures_not_summed.yaml": "n = 30 < n_min = 50",
+    "proof_median_gap.yaml": "écart médian 0.08 s > tolerance.ecart_s = 0.05 s",
+    "proof_min_gap.yaml": "écart minimal 0.086 s > tolerance.ecart_s = 0.05 s",
+    "proof_gap_missing.yaml": "champ 'ecart_median_s' manquant",
+    "proof_journal_list_missing.yaml": "journal introuvable 'tests/fixtures/combatlog/absent.txt'",
 }
 
 
@@ -143,9 +151,35 @@ def test_valid_journal_proof_is_accepted():
 
 
 def test_b1_carries_the_log_proof_and_stays_tested():
-    """B1 : intervalles du journal du 2026-09-27 (n = 3), sous le seuil : reste `teste`, preuve jointe."""
+    """B1 (décision 2 du plan T04b) : preuve des deux journaux du 2026-09-27, n = 50 = n_min, médiane à 0,011 s de
+    la recharge globale, mais trois intervalles sous 1,5 - 0,05 s (minimum 1,414 s) : reste `teste`."""
     b1 = find_entry(load(REGISTRY_PATH), "B1")
     assert b1.status == "teste"
+    assert b1.tolerance == {"n_min": 50, "ecart_s": 0.05}
     (proof,) = b1.proofs
-    assert proof["journal"] == "tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt"
-    assert proof["n"] == 3 and proof["test"].startswith("tests/unit/test_measure.py::")
+    assert proof["journal"] == [
+        "tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt",
+        "tests/fixtures/combatlog/WoWCombatLog-092726_150346.anon.txt.gz",
+    ]
+    assert (
+        proof["n"] == 50
+        and proof["test"] == "tests/unit/test_measure_second_log.py::test_b1_proof_matches_the_registry"
+    )
+
+
+def test_b1_as_valide_journal_is_refused_on_the_minimum_interval(tmp_path):
+    raw = yaml.safe_load(REGISTRY_PATH.read_text(encoding="utf-8"))
+    (b1,) = [m for m in raw["mechanics"] if m["id"] == "B1"]
+    b1["statut"] = "valide-journal"
+    path = tmp_path / "registry.yaml"
+    path.write_text(yaml.safe_dump({**raw, "mechanics": [b1]}, allow_unicode=True), encoding="utf-8")
+    report = validate(path, REPO_ROOT, strict=True, engine_dirs=())
+    assert [e for e in report.errors if "écart" in e] == [
+        "B1 : preuve 1 : écart minimal 0.086 s > tolerance.ecart_s = 0.05 s"
+    ]
+
+
+def test_cumulative_and_multi_log_proofs_are_accepted():
+    for name in ("valid_cumulative.yaml", "valid_gap.yaml"):
+        report = check(name)
+        assert report.errors == [] and report.counts["valide-journal"] == 1, name
