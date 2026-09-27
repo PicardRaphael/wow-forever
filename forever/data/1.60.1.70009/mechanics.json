@@ -139,6 +139,72 @@
       "registry": "A3",
       "source": "règle Classic (PC) supposée dans Forever : cible plus basse, raté = raté à écart 0 - 1 % par niveau d'écart, plancher min_miss (décision 4 du plan T04b) ; journal du 2026-09-27 : 0 raté sur 281 sorts directs, cibles 2 à 8 niveaux plus bas (très improbable avec 4 % : 0,96^281 ≈ 1e-5)"
     },
+    "leveling.mob_hit_damage": {
+      "value": {"per_level": 0.8, "per_level_squared": 0.02},
+      "certainty": "suppose",
+      "registry": "I6",
+      "source": "sim_leveling.py du seed (EST) : dégâts bruts d'un coup de monstre normal = 0,8 × niveau + 0,02 × niveau², avant armure (leveling.json mob_model.hit_damage)"
+    },
+    "leveling.armor_reduction": {
+      "value": {"base": 400, "per_attacker_level": 85},
+      "certainty": "suppose",
+      "registry": "I6",
+      "source": "règle Classic (PC) reprise par sim_leveling.py du seed : réduction = armure / (armure + 400 + 85 × niveau de l'attaquant), attaquant < 60 (leveling.json combat_rules.armor_dr)"
+    },
+    "leveling.mob_xp": {
+      "value": {"base": 45, "per_level": 5},
+      "certainty": "suppose",
+      "registry": "I6",
+      "source": "règle Classic (PC) reprise par sim_leveling.py du seed : XP d'un monstre normal de même niveau = 45 + 5 × niveau (leveling.json mob_xp.formula) ; XP de Forever à modéliser en T04c"
+    },
+    "leveling.frostbite_freeze_s": {
+      "value": 5.0,
+      "certainty": "suppose",
+      "registry": "C5",
+      "source": "sim_leveling.py du seed (EST) : gel de Frostbite de 5 s"
+    },
+    "leveling.dot_tick_s": {
+      "value": 2.0,
+      "certainty": "suppose",
+      "registry": "A17",
+      "source": "sim_leveling.py du seed (EST) : un tic de DoT toutes les 2 s, au moins un tic"
+    },
+    "leveling.ignite": {
+      "value": {"ticks": 2, "tick_s": 2.0},
+      "certainty": "suppose",
+      "registry": "A18",
+      "source": "sim_leveling.py du seed (EST) : Ignite en 2 tics de 2 s par critique, sans cumul ni rafraîchissement (T04c)"
+    },
+    "leveling.frost_nova_retreat_yd": {
+      "value": 10.0,
+      "certainty": "suppose",
+      "registry": "I1",
+      "source": "sim_leveling.py du seed (EST) : le Mage recule à 10 m du monstre gelé par Frost Nova"
+    },
+    "leveling.rest_hp_regen_fraction": {
+      "value": 0.02,
+      "certainty": "suppose",
+      "registry": "I6",
+      "source": "sim_leveling.py du seed (EST) : régénération de vie au repos de 2 % des PV par seconde, en plus de la nourriture"
+    },
+    "leveling.projectile_speed": {
+      "value": {"default": 28, "instant": 1e9},
+      "certainty": "suppose",
+      "registry": "C1",
+      "source": "sim_leveling.py du seed (EST) : vitesse d'un sort sans projectile_speed publié, 28 m/s dans l'analytique, « infinie » (1e9 m/s) dans le Monte Carlo"
+    },
+    "leveling.analytic": {
+      "value": {"min_cast_fraction": 0.2, "freeze_cap": 0.95, "winters_chill_casts": 3},
+      "certainty": "suppose",
+      "registry": "I6",
+      "source": "sim_leveling.py du seed (EST), modèle analytique : incantation en mêlée au plus allongée de 1 / 0,2 par le recul, part de temps gelé plafonnée à 95 %, empilements moyens de Winter's Chill sur 3 lancers"
+    },
+    "leveling.defaults": {
+      "value": {"level_diff": 0, "nova_break": 1.0, "run_between_s": 6.0},
+      "certainty": "suppose",
+      "registry": "I6",
+      "source": "sim_leveling.py du seed (DEFAULTS) : monstre de même niveau, Frost Nova rompu par tout dégât, 6 s de course entre deux monstres"
+    },
     "spell.default_range_yd": {
       "value": 30,
       "certainty": "suppose",

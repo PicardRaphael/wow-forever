@@ -16,6 +16,7 @@ from forever.engine.model import (
     FixedCoefficient,
     GameData,
     IntPerCrit,
+    LevelingConstants,
     MobModel,
     MonsterHp,
     MonsterTable,
@@ -23,11 +24,13 @@ from forever.engine.model import (
     Racials,
     Rank,
     RankScaling,
+    Restore,
     ScalingComponent,
     Spell,
     StatGrowth,
     Talent,
     TalentRules,
+    Utility,
 )
 from forever.errors import DataSchemaError
 from forever.store import VersionData, load_version
@@ -140,6 +143,9 @@ def _spells(raw: Any) -> dict[str, Spell]:
         channel = s.get("channel", False)
         if not isinstance(channel, bool):
             raise r.fail(f"{where}.channel", "booléen")
+        slow_dur = None
+        if "slow_dur" in s:
+            slow_dur = tuple(r.num({"v": v}, "v", f"{where}.slow_dur") for v in r.list_(s, "slow_dur", where))
         spells[key] = Spell(
             key=key,
             school=r.str_(s, "school", f"{where}.school"),
@@ -151,6 +157,7 @@ def _spells(raw: Any) -> dict[str, Spell]:
             mana_pct_base=r.opt_num(s, "mana_pct_base", f"{where}.mana_pct_base"),
             frozen_mult=r.opt_num(s, "frozen_mult", f"{where}.frozen_mult"),
             projectile_speed=r.opt_num(s, "projectile_speed", f"{where}.projectile_speed"),
+            slow_dur=slow_dur,
         )
     return spells
 
@@ -212,6 +219,7 @@ def _rules(raw: Any) -> CombatRules:
         min_miss=r.num(cr, "min_miss", "combat_rules.min_miss"),
         crit_mult_spell=r.num(cr, "crit_mult_spell", "combat_rules.crit_mult_spell"),
         dot_can_crit=r.bool_(cr, "dot_can_crit", "combat_rules.dot_can_crit"),
+        pushback_s=r.num(cr, "pushback_s", "combat_rules.pushback_s"),
     )
 
 
@@ -303,6 +311,78 @@ def _correction(r: _Reader, raw: Any) -> QuestieCorrection | None:
         intercept=r.num(fit, "intercept", "questie_correction.fit.intercept") if fit else None,
         level_min=span[0],
         level_max=span[1],
+    )
+
+
+def _utility(raw: Any) -> Utility:
+    """`spells.json.utility` : Frost Armor (ralenti des coups), Mage Armor (premier rang, régénération en
+    incantation), nourriture et boisson conjurées (quantité et durée par rang)."""
+    r = _Reader(SPELLS_FILE)
+    u = r.obj(raw, "utility", "utility")
+    frost = r.obj(u, "frost_armor", "utility.frost_armor")
+    mage = r.obj(u, "mage_armor", "utility.mage_armor")
+    ranks = r.list_(mage, "ranks", "utility.mage_armor.ranks")
+    if not ranks or not isinstance(ranks[0], list) or not ranks[0]:
+        raise r.fail("utility.mage_armor.ranks", "liste de rangs [niveau, …]")
+
+    def restore(key: str) -> Restore:
+        entry = r.obj(u, key, f"utility.{key}")
+        levels = r.list_(entry, "spell_levels", f"utility.{key}.spell_levels")
+        values = r.list_(entry, "restore", f"utility.{key}.restore")
+        if len(levels) != len(values) or not all(isinstance(v, list) and len(v) == 2 for v in values):
+            raise r.fail(f"utility.{key}", "spell_levels et restore [quantité, durée] de même longueur")
+        return Restore(
+            spell_levels=tuple(r.int_({"v": v}, "v", f"utility.{key}.spell_levels") for v in levels),
+            restore=tuple(
+                (r.num({"v": a}, "v", f"utility.{key}.restore"), r.num({"v": d}, "v", f"utility.{key}.restore"))
+                for a, d in values
+            ),
+        )
+
+    return Utility(
+        frost_armor_duration_s=r.num(frost, "dur", "utility.frost_armor.dur"),
+        frost_armor_swing_slow=r.num(frost, "attacker_swing_slow", "utility.frost_armor.attacker_swing_slow"),
+        mage_armor_level=r.int_({"v": ranks[0][0]}, "v", "utility.mage_armor.ranks[1]"),
+        mage_armor_regen=r.num(mage, "regen_while_casting", "utility.mage_armor.regen_while_casting"),
+        water=restore("conjure_water"),
+        food=restore("conjure_food"),
+    )
+
+
+def _leveling(values: Mapping[str, Any]) -> LevelingConstants:
+    """Clés `leveling.*` de `mechanics.json`."""
+    r = _Reader(MECHANICS_FILE)
+
+    def obj(key: str) -> Mapping[str, Any]:
+        return r.obj(r.obj(values, key, key), "value", key)
+
+    def num(key: str) -> float:
+        return r.num(r.obj(values, key, key), "value", key)
+
+    hit, armor, xp = obj("leveling.mob_hit_damage"), obj("leveling.armor_reduction"), obj("leveling.mob_xp")
+    ignite, speed = obj("leveling.ignite"), obj("leveling.projectile_speed")
+    analytic, defaults = obj("leveling.analytic"), obj("leveling.defaults")
+    return LevelingConstants(
+        mob_hit_per_level=r.num(hit, "per_level", "leveling.mob_hit_damage"),
+        mob_hit_per_level_squared=r.num(hit, "per_level_squared", "leveling.mob_hit_damage"),
+        armor_base=r.num(armor, "base", "leveling.armor_reduction"),
+        armor_per_attacker_level=r.num(armor, "per_attacker_level", "leveling.armor_reduction"),
+        xp_base=r.num(xp, "base", "leveling.mob_xp"),
+        xp_per_level=r.num(xp, "per_level", "leveling.mob_xp"),
+        frostbite_freeze_s=num("leveling.frostbite_freeze_s"),
+        dot_tick_s=num("leveling.dot_tick_s"),
+        ignite_ticks=r.int_(ignite, "ticks", "leveling.ignite"),
+        ignite_tick_s=r.num(ignite, "tick_s", "leveling.ignite"),
+        frost_nova_retreat_yd=num("leveling.frost_nova_retreat_yd"),
+        rest_hp_regen_fraction=num("leveling.rest_hp_regen_fraction"),
+        projectile_speed_default=r.num(speed, "default", "leveling.projectile_speed"),
+        projectile_speed_instant=r.num(speed, "instant", "leveling.projectile_speed"),
+        analytic_min_cast_fraction=r.num(analytic, "min_cast_fraction", "leveling.analytic"),
+        analytic_freeze_cap=r.num(analytic, "freeze_cap", "leveling.analytic"),
+        analytic_winters_chill_casts=r.num(analytic, "winters_chill_casts", "leveling.analytic"),
+        default_level_diff=r.int_(defaults, "level_diff", "leveling.defaults"),
+        default_nova_break=r.num(defaults, "nova_break", "leveling.defaults"),
+        default_run_between_s=r.num(defaults, "run_between_s", "leveling.defaults"),
     )
 
 
@@ -501,6 +581,8 @@ def build_game_data(version: VersionData) -> GameData:
         monsters=_monsters(raw[MONSTERS_FILE]),
         scaling=_scaling(raw[SCALING_FILE], spells),
         mob_model=_mob_model(raw[LEVELING_FILE]),
+        leveling=_leveling(_Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")),
+        utility=_utility(raw[SPELLS_FILE]),
     )
 
 

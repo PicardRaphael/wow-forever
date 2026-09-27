@@ -8,7 +8,7 @@ from forever.engine.damage import dmg_mult, spell_power
 from forever.engine.hit import hit_chance
 from forever.engine.mana import mana_cost
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, CastEstimate, Character, GameData, Points
-from forever.engine.spells import best_rank, coefficient
+from forever.engine.spells import best_rank, coefficient, rank_damage
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
@@ -34,10 +34,16 @@ def expected_cast(
     Portée : celle du sort, sinon la portée par défaut des données (sort de zone autour du lanceur).
     Cible gelée : multiplicateur de dégâts du sort s'il en publie un (Ice Lance), `frozen_mult=False` pour l'ignorer.
 
-    Registre : A17, A18, A20, B12, B17, C2"""
+    `spell_level` : dégâts du rang (`rank`, défaut, parité avec le seed) ou au niveau du personnage (`character`) ;
+    le rang rendu porte les dégâts retenus.
+
+    Registre : A17, A18, A20, B12, B17, C2, G7"""
     r = best_rank(gd, key, level, pts)
     if not r:
         return None
+    if spell_level != "rank":
+        low, high, dot_total = rank_damage(gd, key, r, level, spell_level)
+        r = r._replace(damage_min=low, damage_max=high, dot_total=dot_total)
     s = gd.spells[key]
     school = s.school
     hit = hit_chance(gd, school, level_diff, pts, ch)

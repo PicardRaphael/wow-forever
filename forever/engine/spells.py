@@ -48,9 +48,19 @@ def rank_values_at_level(gd: GameData, key: str, rank: int, level: int) -> RankV
     return RankValues(_normalize(low), _normalize(high), _normalize(dot))
 
 
+SPELL_LEVELS = ("rank", "character")
+
+
 def rank_damage(gd: GameData, key: str, rank: Rank, level: int, spell_level: str = "rank") -> RankValues:
-    """Registre : G7"""
-    raise NotImplementedError
+    """Dégâts d'un rang : ceux de `spells.json` (`rank`, plafond de niveau du rang) ou au niveau du personnage
+    (`character`, `rank_values_at_level`).
+
+    Registre : G7"""
+    if spell_level == "rank":
+        return RankValues(rank.damage_min, rank.damage_max, rank.dot_total)
+    if spell_level == "character":
+        return rank_values_at_level(gd, key, rank.position, level)
+    raise ValueError(f"spell_level inconnu « {spell_level} » ({' ou '.join(SPELL_LEVELS)} attendu)")
 
 
 def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:

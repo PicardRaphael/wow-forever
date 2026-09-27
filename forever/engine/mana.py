@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from forever.engine.model import SCHOOL_FROST, Buffs, Character, GameData, Points, Rank
+from forever.engine.model import SCHOOL_FROST, Buffs, Character, GameData, Points, Rank, Restore
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents de coût sont exprimés en %
@@ -31,15 +31,33 @@ def mana_cost(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
 
 
 def in_combat_regen_fraction(gd: GameData, pts: Points, level: int) -> float:
-    """Registre : B7"""
-    raise NotImplementedError
+    """Part de la régénération d'Esprit gardée en combat (règle d'incantation) : Arcane Meditation, ou Mage Armor
+    dès le niveau de son premier rang (`spells.json.utility`), bornée à 1.
+
+    Registre : B7"""
+    f = talent_value(gd, pts, "arcaneMeditation") / PERCENT
+    if level >= gd.utility.mage_armor_level:
+        f = max(f, gd.utility.mage_armor_regen)
+    return min(1.0, f)
+
+
+def _restore_rate(r: Restore, level: int) -> float:
+    idx = max([i for i, lv in enumerate(r.spell_levels) if lv <= level] or [0])
+    amount, duration = r.restore[idx]
+    return amount / duration
 
 
 def consumables(gd: GameData, level: int) -> tuple[float, float]:
-    """Registre : I6"""
-    raise NotImplementedError
+    """(mana, vie) rendues par seconde par la boisson et la nourriture conjurées du plus haut rang appris.
+
+    Registre : I6"""
+    return _restore_rate(gd.utility.water, level), _restore_rate(gd.utility.food, level)
 
 
 def downtime(gd: GameData, ch: Character, level: int, mana_used: float, taken: float) -> float:
-    """Registre : I6"""
-    raise NotImplementedError
+    """Repos après un combat : le plus long de la boisson (mana, avec l'Esprit) et du repas (vie, avec la
+    régénération de repos `leveling.rest_hp_regen_fraction`).
+
+    Registre : I6"""
+    water, food = consumables(gd, level)
+    return max(mana_used / (water + ch.spirit_regen), taken / (food + gd.leveling.rest_hp_regen_fraction * ch.hp))

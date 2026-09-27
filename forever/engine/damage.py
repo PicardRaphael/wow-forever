@@ -31,10 +31,16 @@ def spell_power(ch: Character, buffs: Buffs | None = None) -> float:
 
 
 def dot_tick_times(gd: GameData, duration_s: float) -> list[float]:
-    """Registre : A17"""
-    raise NotImplementedError
+    """Instants des tics d'un DoT après l'impact : un tic par `leveling.dot_tick_s`, au moins un (seed).
+
+    Registre : A17"""
+    tick = gd.leveling.dot_tick_s
+    return [tick * i for i in range(1, max(1, int(duration_s / tick)) + 1)]
 
 
 def ignite_tick_times(gd: GameData) -> list[float]:
-    """Registre : A18"""
-    raise NotImplementedError
+    """Instants des tics d'Ignite après le critique (`leveling.ignite`, sans cumul ni rafraîchissement).
+
+    Registre : A18"""
+    lv = gd.leveling
+    return [lv.ignite_tick_s * i for i in range(1, lv.ignite_ticks + 1)]

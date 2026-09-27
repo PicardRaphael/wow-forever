@@ -43,6 +43,7 @@ class Spell:
     mana_pct_base: float | None
     frozen_mult: float | None
     projectile_speed: float | None
+    slow_dur: tuple[float, ...] | None = None  # durée du ralenti par rang (spells.json)
 
 
 @dataclass(frozen=True)
@@ -66,6 +67,7 @@ class CombatRules:
     min_miss: float
     crit_mult_spell: float
     dot_can_crit: bool
+    pushback_s: float = 0.0  # recul d'incantation par coup reçu
 
 
 @dataclass(frozen=True)
@@ -234,6 +236,52 @@ class MobModel:
 
 
 @dataclass(frozen=True)
+class LevelingConstants:
+    """Constantes du leveling (`mechanics.json`, clés `leveling.*`), chiffres du seed sim_leveling.py."""
+
+    mob_hit_per_level: float
+    mob_hit_per_level_squared: float
+    armor_base: float
+    armor_per_attacker_level: float
+    xp_base: float
+    xp_per_level: float
+    frostbite_freeze_s: float
+    dot_tick_s: float
+    ignite_ticks: int
+    ignite_tick_s: float
+    frost_nova_retreat_yd: float
+    rest_hp_regen_fraction: float
+    projectile_speed_default: float
+    projectile_speed_instant: float
+    analytic_min_cast_fraction: float
+    analytic_freeze_cap: float
+    analytic_winters_chill_casts: float
+    default_level_diff: int
+    default_nova_break: float
+    default_run_between_s: float
+
+
+@dataclass(frozen=True)
+class Restore:
+    """Nourriture ou boisson conjurée : niveaux des rangs et (quantité, durée en s) par rang."""
+
+    spell_levels: tuple[int, ...]
+    restore: tuple[tuple[float, float], ...]
+
+
+@dataclass(frozen=True)
+class Utility:
+    """Sorts utilitaires du leveling (`spells.json.utility`)."""
+
+    frost_armor_duration_s: float
+    frost_armor_swing_slow: float
+    mage_armor_level: int
+    mage_armor_regen: float
+    water: Restore
+    food: Restore
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
 
@@ -248,6 +296,8 @@ class GameData:
     monsters: MonsterTable
     scaling: Mapping[str, tuple[RankScaling, ...]]  # clé de sort -> rangs (spell_scaling.json)
     mob_model: MobModel
+    leveling: LevelingConstants
+    utility: Utility
 
 
 class CharacterOverrides(TypedDict, total=False):

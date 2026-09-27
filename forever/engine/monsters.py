@@ -84,15 +84,23 @@ def mob_hp(gd: GameData, level: int, mob_source: MobSource = "measured") -> Mons
 
 
 def mob_hit_damage(gd: GameData, level: int) -> float:
-    """Registre : I6"""
-    raise NotImplementedError
+    """Dégâts bruts d'un coup de monstre normal, avant armure (`leveling.mob_hit_damage`).
+
+    Registre : I6"""
+    lv = gd.leveling
+    return lv.mob_hit_per_level * level + lv.mob_hit_per_level_squared * level * level
 
 
 def armor_reduction(gd: GameData, armor: float, attacker_level: int) -> float:
-    """Registre : I6"""
-    raise NotImplementedError
+    """Réduction des dégâts physiques par l'armure du Mage (`leveling.armor_reduction`, attaquant < 60).
+
+    Registre : I6"""
+    lv = gd.leveling
+    return armor / (armor + lv.armor_base + lv.armor_per_attacker_level * attacker_level)
 
 
 def mob_xp(gd: GameData, level: int) -> float:
-    """Registre : I6"""
-    raise NotImplementedError
+    """XP d'un monstre normal de même niveau (`leveling.mob_xp`, règle Classic ; XP de Forever en T04c).
+
+    Registre : I6"""
+    return gd.leveling.xp_base + gd.leveling.xp_per_level * level
