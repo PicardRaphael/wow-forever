@@ -4,14 +4,14 @@
   "versions": {
     "1.60.1.70009": {
       "collected_at": "2026-09-26",
-      "data_sha": "16996509e2ee",
-      "data_sha256": "16996509e2ee2b875935118a388a4a3afeadd3b1691edb1c7e4c8d1f75414412",
+      "data_sha": "c52d28ba718c",
+      "data_sha256": "c52d28ba718c5591c10b2e3a06166e0b2191617f33f71ecaec5752ef62dc4de0",
       "files": {
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
         "confirmed_changes.json": "627f306bd2a7bf086f0ff2bbfe2045f47e423e081339865b5845d11ac1d7f7d1",
         "decode_rules.json": "8a9801122493cf6c01df6b6774fefd18e1196a1aa1f6bec807581dd9d4d84b46",
         "leveling.json": "0244ad81f75114722917c96912ad393f11a21742260f69809aaff2a5e9f7380f",
-        "mechanics.json": "6bbf6e4b50a49ca4ec8bb72d39cc58fa7865a5444acd4f85f683bcc85ddea850",
+        "mechanics.json": "b91591195b1e5657e76ac0e5a32957fb58151fb7752d358f76a8e77c71b264d7",
         "meta.json": "3ac4666f8dd47349d3b1e0f4f7e2936b17a2848071a5bc1dc7aa7e8634303095",
         "monsters.json": "4e46cbfb7ef3f2c5f01c8f55d59570f9f7974eb5cc2baaa16e3ead031c0d0f9f",
         "overrides.json": "e251b04e9fe407a72380f99f4eaea5d141d4361f6167650e8ca09c26451ec9b9",

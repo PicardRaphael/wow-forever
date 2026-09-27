@@ -170,10 +170,16 @@
       "source": "sim_leveling.py du seed (EST) : un tic de DoT toutes les 2 s, au moins un tic"
     },
     "leveling.ignite": {
-      "value": {"ticks": 2, "tick_s": 2.0},
+      "value": {"duration_s": 4.0, "tick_s": 2.0, "cumulative": 1},
+      "certainty": "certain",
+      "registry": "A18",
+      "source": "Client 1.60.1.70009 (tables wago, extraits tests/fixtures/wago/1.60.1.70009) : aura 412538 « Ignite », SpellMisc.DurationIndex 35 -> SpellDuration 4000 ms, SpellEffect aura 226 période 2000 ms, SpellAuraOptions.CumulativeAura 1 (T04c) ; rules seed : durée / période = 2 tics de 2 s par critique, comme sim_leveling.py du seed"
+    },
+    "leveling.ignite_rule": {
+      "value": "rolling",
       "certainty": "suppose",
       "registry": "A18",
-      "source": "sim_leveling.py du seed (EST) : Ignite en 2 tics de 2 s par critique, sans cumul ni rafraîchissement (T04c)"
+      "source": "T04c, décision 2 : Ignite roulant (aura non cumulable) ; à chaque critique de feu, montant = part du talent × critique + reste non infligé, l'aura repart pour sa durée et le compteur de tics repart du critique ; reste perdu à la mort du monstre. Règle côté serveur, à vérifier par les journaux (docs/OPEN_QUESTIONS.md)"
     },
     "leveling.frost_nova_retreat_yd": {
       "value": 10.0,

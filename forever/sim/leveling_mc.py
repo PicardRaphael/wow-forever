@@ -7,7 +7,8 @@ armure, mana et repos. Les tirages `rng.random()` suivent l'ordre du seed : à g
 
 Option `rules` (T04c) : `seed` reproduit le seed à l'identique (parité) ; `forever` (défaut) applique les corrections
 de T04c : armure portée selon le niveau d'apprentissage du client (`armor`), régénération cumulée d'Arcane
-Meditation et de Mage Armor. Aucune correction ne consomme de tirage.
+Meditation et de Mage Armor, Ignite roulant (posé à l'impact du critique, reste perdu à la mort du monstre). Aucune
+correction ne consomme de tirage.
 
 Aucune formule de combat ici : chaque règle vient de `forever/engine/` ; ce module n'orchestre que le temps, les
 événements et les tirages. Registre : I1 (rotation frost/fire), I6 (leveling), J2 (graine)."""
@@ -22,7 +23,16 @@ from forever.engine.armor import ARMOR_CHOICES, worn_armor
 from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time, pushback_resist_chance, pushback_s, spell_cooldown
 from forever.engine.character import character
-from forever.engine.damage import dot_tick_damage, dot_tick_times, ignite_damage, ignite_tick_times, roll_base_damage
+from forever.engine.damage import (
+    IgniteState,
+    dot_tick_damage,
+    dot_tick_times,
+    ignite_damage,
+    ignite_tick_times,
+    ignite_ticks_due,
+    roll_base_damage,
+    roll_ignite,
+)
 from forever.engine.mana import downtime, in_combat_regen_fraction, mana_cost, master_of_elements_refund
 from forever.engine.model import (
     SCHOOL_FIRE,
@@ -160,6 +170,8 @@ def kill_mc(
         "dist": spell_range(gd, main, pts),
     }
     dots: list[tuple[float, float]] = []  # (instant, dégâts)
+    ignites: list[tuple[float, float]] = []  # forever : (instant de l'impact, part d'Ignite posée)
+    ig_state: list[IgniteState | None] = [None]  # forever : Ignite roulant en cours sur le monstre
     impacts: list[tuple[float, str, float, bool]] = []  # (instant, sort, dégâts, touché)
 
     def fire_spell(key: str, frozen: bool) -> CastEstimate:
@@ -190,9 +202,12 @@ def kill_mc(
                     dots.append((s["t"] + travel + at, tick * (e["crit_mult"] if tick_crit else 1.0)))
             if crit and e["school"] in SCHOOL_FIRE and ignite:
                 ig = ignite_damage(gd, pts, dmg)
-                ig_ticks = ignite_tick_times(gd)
-                for at in ig_ticks:
-                    dots.append((s["t"] + travel + at, ig / len(ig_ticks)))
+                if forever:
+                    ignites.append((s["t"] + travel, ig))
+                else:
+                    ig_ticks = ignite_tick_times(gd)
+                    for at in ig_ticks:
+                        dots.append((s["t"] + travel + at, ig / len(ig_ticks)))
         impacts.append((s["t"] + travel, key, dmg, landed))
         return e
 
@@ -220,9 +235,14 @@ def kill_mc(
             for im in sorted([x for x in impacts if x[0] <= nt]):
                 impacts.remove(im)
                 on_impact(im[1], im[2], im[3], im[0])
+            for ig in sorted(x for x in ignites if x[0] <= nt):
+                ignites.remove(ig)
+                ig_state[0] = roll_ignite(gd, ig_state[0], ig[0], ig[1])
             for d in [x for x in dots if x[0] <= nt]:
                 dots.remove(d)
                 hp[0] -= d[1]
+            ig_dealt, ig_state[0] = ignite_ticks_due(ig_state[0], nt)
+            hp[0] -= ig_dealt
             frozen = s["t"] < s["frozen"] or s["nova"]
             if s["aggro"] and not frozen:
                 if s["dist"] > mm.melee_range:

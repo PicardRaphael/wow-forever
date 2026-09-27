@@ -247,8 +247,10 @@ class LevelingConstants:
     xp_per_level: float
     frostbite_freeze_s: float
     dot_tick_s: float
-    ignite_ticks: int
+    ignite_duration_s: float  # aura d'Ignite du client
     ignite_tick_s: float
+    ignite_cumulative: int
+    ignite_rule: str  # rolling : règle roulante (T04c, décision 2)
     frost_nova_retreat_yd: float
     rest_hp_regen_fraction: float
     projectile_speed_default: float
@@ -259,6 +261,11 @@ class LevelingConstants:
     default_level_diff: int
     default_nova_break: float
     default_run_between_s: float
+
+    @property
+    def ignite_ticks(self) -> int:
+        """Tics d'un Ignite posé par un critique : durée / période de l'aura, arrondie (comme le seed)."""
+        return round(self.ignite_duration_s / self.ignite_tick_s)
 
 
 @dataclass(frozen=True)

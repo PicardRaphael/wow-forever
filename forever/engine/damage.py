@@ -42,9 +42,10 @@ def dot_tick_times(gd: GameData, duration_s: float) -> list[float]:
 
 
 def ignite_tick_times(gd: GameData) -> list[float]:
-    """Instants des tics d'Ignite après le critique (`leveling.ignite`, sans cumul ni rafraîchissement).
+    """Instants des tics d'Ignite après le critique, sans cumul ni rafraîchissement (`rules="seed"` : durée / période
+    de `leveling.ignite`, 2 tics de 2 s comme le seed).
 
-    Registre : A18"""
+        Registre : A18"""
     lv = gd.leveling
     return [lv.ignite_tick_s * i for i in range(1, lv.ignite_ticks + 1)]
 
@@ -83,14 +84,31 @@ class IgniteState(NamedTuple):
 
 
 def roll_ignite(gd: GameData, state: IgniteState | None, now: float, amount: float) -> IgniteState:
-    """Nouvel Ignite posé à `now` par un critique de feu de part `amount` (règle roulante).
+    """Nouvel Ignite posé à `now` par un critique de feu de part `amount` (règle roulante, `leveling.ignite_rule`,
+    suppose) : le reste non infligé de l'Ignite en cours s'ajoute, l'aura (non cumulable, client) repart pour sa
+    durée et le compteur de tics repart du critique (un tic par période de l'aura).
 
     Registre : A18"""
-    raise NotImplementedError
+    lv = gd.leveling
+    if lv.ignite_rule != "rolling":
+        raise ValueError(f"règle d'Ignite inconnue « {lv.ignite_rule} » (rolling attendue)")
+    remaining = amount + (state.remaining if state else 0.0)
+    return IgniteState(remaining, tuple(now + lv.ignite_tick_s * i for i in range(1, lv.ignite_ticks + 1)))
 
 
 def ignite_ticks_due(state: IgniteState | None, until: float) -> tuple[float, IgniteState | None]:
-    """(dégâts des tics dus jusqu'à `until` inclus, Ignite restant ou None).
+    """(dégâts des tics dus jusqu'à `until` inclus, Ignite restant ou None) : le reste se répartit à parts égales
+    sur les tics restants.
 
     Registre : A18"""
-    raise NotImplementedError
+    if state is None:
+        return 0.0, None
+    due = [t for t in state.ticks if t <= until]
+    if not due:
+        return 0.0, state
+    per_tick = state.remaining / len(state.ticks)
+    left = state.ticks[len(due) :]
+    if not left:
+        return state.remaining, None
+    dealt = per_tick * len(due)
+    return dealt, IgniteState(state.remaining - dealt, left)
