@@ -28,12 +28,20 @@ from forever.errors import (
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, version_dirs, write_manifest
+from forever.pipeline.addon_sv import read_logger_db
 from forever.pipeline.builds import list_builds
 from forever.pipeline.combatlog import LOG_GLOB, LogHeader, LogSummary, read_log, scan_logs
 from forever.pipeline.decode import Candidate, decode_version
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
-from forever.pipeline.measure import Conflict, LogMeasures, MonsterObservation, measure_log, monster_hp
+from forever.pipeline.measure import (
+    Conflict,
+    LogMeasures,
+    MonsterObservation,
+    find_mine,
+    measure_log,
+    monster_hp,
+)
 from forever.pipeline.monsters import build_monsters, write_monsters
 from forever.pipeline.questie import read_questie
 from forever.pipeline.report import render_report
@@ -132,6 +140,9 @@ def build_parser() -> argparse.ArgumentParser:
     measure.add_argument("path", help="journal WoWCombatLog-*.txt ou dossier")
     measure.add_argument(
         "--max-gap", type=float, default=CHAIN_MAX_GAP_S, help="écart maximal (s) entre deux instantanés enchaînés"
+    )
+    measure.add_argument(
+        "--addon-sv", help="SavedVariables de ForeverLogger (niveau du lanceur pour les touchés et ratés)"
     )
     measure.add_argument("--json", action="store_true", help="sortie JSON")
 
@@ -560,6 +571,11 @@ def render_measures(m: LogMeasures) -> list[str]:
         f"  Touchés/ratés {h['school']} écart {h['level_diff']:+d} : {h['hits']} / {h['misses']}"
         for h in m["hit_tally"]
     ]
+    if m["caster_level"] is not None:
+        field = ", ".join(str(v) for v in m["player_level_field"]) or "absent"
+        lines.append(
+            f"  Niveau du lanceur (ForeverLoggerDB) : {m['caster_level']} ; dernier champ du bloc avancé : {field}"
+        )
     if m["unknown_events"]:
         lines.append(f"  Événements inconnus gardés bruts : {', '.join(m['unknown_events'])}")
     return lines
@@ -573,6 +589,7 @@ def _cmd_logs_measure(deps: Deps, args: argparse.Namespace) -> int:
     notes: list[str] = [f"fenêtre d'enchaînement des instantanés : {_num(args.max_gap)} s (paramètre de mesure)"]
     results: list[LogMeasures] = []
     headers: list[LogHeader] = []
+    db = read_logger_db(Path(args.addon_sv)) if args.addon_sv else None
     for file in files:
         try:
             header, events = read_log(file)
@@ -583,7 +600,15 @@ def _cmd_logs_measure(deps: Deps, args: argparse.Namespace) -> int:
             notes.append(f"{file.name} ignoré : {err.message}")
             continue
         headers.append(header)
-        results.append(measure_log(header, evs, name=file.name, max_gap_s=args.max_gap))
+        level = None
+        caster = find_mine(evs)
+        if db is not None and caster and evs:
+            level = db.level_at(caster, evs[0].time)
+            notes.append(
+                f"{file.name} : niveau du lanceur {level if level is not None else 'inconnu'} au début du journal "
+                "(ForeverLoggerDB, dernier instantané antérieur)"
+            )
+        results.append(measure_log(header, evs, name=file.name, max_gap_s=args.max_gap, caster_level=level))
     for m in results:
         notes += [f"{m['name']} : {a}" for a in m["assumptions"]]
     stats = any(m["gcd_intervals"]["values"] or m["cast_times"] or m["crits"] for m in results)

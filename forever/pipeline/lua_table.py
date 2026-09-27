@@ -140,3 +140,19 @@ def parse_lua_value(text: str) -> object:
     if parser.pos != len(text):
         raise parser.fail("texte en trop après la valeur")
     return value
+
+
+def parse_lua_assignments(text: str) -> dict[str, object]:
+    """Affectations globales `Nom = valeur` successives (format d'un fichier de SavedVariables)."""
+    parser = _Parser(text)
+    out: dict[str, object] = {}
+    while True:
+        parser.skip()
+        if parser.pos >= len(text):
+            return out
+        name = _NAME.match(text, parser.pos)
+        if name is None or name[0] in _KEYWORDS:
+            raise parser.fail("nom de variable attendu")
+        parser.pos = name.end()
+        parser.expect("=")
+        out[name[0]] = parser.value()

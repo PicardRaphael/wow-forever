@@ -1,4 +1,4 @@
-"""Contrôle : pas de chiffres de jeu dans le plugin (skills, agents, commandes, prompts produit).
+"""Contrôle : pas de chiffres de jeu dans le plugin (skills, agents, commandes, prompts produit) ni dans l'addon.
 Signale les nombres suivis d'une unité de jeu (dégâts, mana, %, s, secondes, points, PV, DPS)."""
 
 import pathlib
@@ -6,7 +6,7 @@ import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-ZONES = [ROOT / "plugin"]
+ZONES = [ROOT / "plugin", ROOT / "addon"]
 MOTIF = re.compile(
     r"\b\d+(?:[.,]\d+)?\s?(?:%|s\b|sec|secondes|mana|dégâts|degats|damage|points|pv|hp|dps)\b", re.IGNORECASE
 )
@@ -19,7 +19,7 @@ def main() -> int:
         if not zone.exists():
             continue
         for f in zone.rglob("*"):
-            if f.suffix not in {".md", ".json", ".yaml", ".yml", ".txt"}:
+            if f.suffix not in {".md", ".json", ".yaml", ".yml", ".txt", ".lua", ".toc"}:
                 continue
             text = f.read_text(encoding="utf-8", errors="ignore")
             if AUTORISE.search(text):

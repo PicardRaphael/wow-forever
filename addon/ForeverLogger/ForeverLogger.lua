@@ -55,7 +55,7 @@ end
 -- Rangs de talents achetés (arbre de traits du moteur Mainline) : { [nodeID] = rang }.
 local function readTalents()
   local configID = safe(C_ClassTalents and C_ClassTalents.GetActiveConfigID)
-  if not configID then
+  if not configID or type(C_Traits) ~= "table" then
     return nil
   end
   local config = safe(C_Traits.GetConfigInfo, configID)

@@ -2,7 +2,7 @@
 
 import pytest
 
-from forever.pipeline.lua_table import parse_lua_value
+from forever.pipeline.lua_table import parse_lua_assignments, parse_lua_value
 
 
 def test_strings_single_and_double_quotes_with_escapes():
@@ -54,3 +54,10 @@ def test_error_is_located():
         parse_lua_value("'abc")
     with pytest.raises(ValueError, match="après la valeur"):
         parse_lua_value("1 2")
+
+
+def test_saved_variables_file_assignments():
+    text = 'ForeverLoggerDB = {\n\t["schema"] = 1,\n}\nAutre = "x" -- fin\n'
+    assert parse_lua_assignments(text) == {"ForeverLoggerDB": {"schema": 1}, "Autre": "x"}
+    with pytest.raises(ValueError, match="nom de variable"):
+        parse_lua_assignments("= 1")

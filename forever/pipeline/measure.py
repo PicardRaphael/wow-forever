@@ -239,6 +239,8 @@ class LogMeasures(TypedDict):
     cast_times: dict[str, list[float]]
     crits: list[dict[str, int | float]]
     hit_tally: list[dict[str, object]]
+    caster_level: int | None
+    player_level_field: list[int]
     assumptions: list[str]
 
 
@@ -275,5 +277,9 @@ def measure_log(
         "hit_tally": [
             {"school": school, "level_diff": diff, **count} for (school, diff), count in sorted(tally.counts.items())
         ],
+        "caster_level": caster_level,
+        "player_level_field": sorted(
+            {e.advanced.level for e in events if e.advanced is not None and caster and e.advanced.guid == caster}
+        ),
         "assumptions": [*notes, *tally.assumptions],
     }
