@@ -88,7 +88,7 @@ forever-core/
 | Outil | Rôle |
 | --- | --- |
 | `forever_status` | Fraîcheur et couverture du registre |
-| `forever_lookup` | Sort, talent, objet, consommable, raciaux (paginé, `detail=false` par défaut) |
+| `forever_lookup` | Sort, talent, objet, consommable, raciaux (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
 | `forever_explain_mechanic` | Entrée du registre, formule, certitude, paramètres de la version, implémentation, sources |
 | `forever_sim_leveling` | Temps par monstre, XP/h : Monte Carlo et analytique, PV du monstre (valeur, source, certitude) ; graphique par `forever chart leveling` (T04b) |
 | `forever_sim_raid` | DPS, intervalle de confiance, contributions |
@@ -103,6 +103,24 @@ forever-core/
 - Sous-agents produit : `data-updater`, `sim-runner`, `web-researcher`, `evaluator` (sorties courtes et structurées).
 - Hooks produit : SessionStart (`forever status --json`).
 - Commandes : `/forever`, `/forever-update`, `/forever-sim`, `/forever-raid-prep`, `/forever-respec`.
+
+## Outils et skills prévus (provisoires)
+Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la forme définitive (nom, paramètres, schéma de sortie) se fixe au plan de chaque tranche (décision 63).
+- **Principe** : les consultations passent par `forever_lookup` avec un paramètre de domaine, plutôt que par un outil par domaine ; des outils séparés seulement pour les calculs (simulations, optimiseurs, prix). La liste d'outils reste courte et à fort levier ; chaque domaine renvoie des résultats compacts, paginés, avec provenance et certitude par champ.
+- Un calcul peut aussi rejoindre un outil de calcul existant (par exemple `forever_optimize_talents` avec l'objectif `pvp`) plutôt que créer un outil.
+
+| Domaine | Consultation (`forever_lookup`, domaine) | Calcul (outil séparé) | Skill | Tranche |
+| --- | --- | --- | --- | --- |
+| Leveling : zone ou donjon à mon niveau | `zones` (données de Questie lues localement) | — | `forever-leveling` | T04c |
+| PvP | `pvp` : savoir des 9 classes, fiches par affrontement, champs de bataille, équipement PvP, monde ouvert, rendements décroissants mesurés | Profil PvP du Mage : `forever_optimize_talents`, objectif `pvp` | `forever-pvp` | PV1, PV2 (fiches en jeu : FA1p) |
+| Donjons | `dungeons` : niveaux, boss, butin | — | `forever-dungeons` | DJ1 |
+| Legacy | `legacy` : catalogue, puis état importé | Conseil des bonus par personnage (appelle le simulateur de leveling) | `forever-legacy` | LG1, LG2 |
+| Métiers | `professions` : recettes, sources, points Legacy | Plan de montée de compétence (coût en or avec EC1) | `forever-professions` | MT1 |
+| Réputations | `reputations` : factions, paliers, gains, récompenses | Plan de montée (temps estimé) | `forever-reputations` | RP1 |
+| Économie | — | `forever_prices` (seul outil qui ajoute un accès réseau, après accord) | rattaché à `forever-professions` ou skill propre | EC1 |
+
+- Skills : chacun sous 200 lignes, sans chiffre de jeu, ajouté par sa tranche de domaine (T06 ne livre que le routeur, le leveling et le Mage) ; le routeur `forever-router` reçoit la carte des domaines à chaque ajout.
+- Commandes CLI : `forever pvp …`, `forever dungeon …`, `forever legacy …`, `forever profession …`, `forever rep …`, `forever prices …` (détail dans chaque section de `docs/ROADMAP.md`), toutes branchées sur les mêmes services que le MCP.
 
 ## Mémoire joueur
 Fichiers du vault, suivis dans Git : `joueur/personnages/<nom>.json` (avec la version du jeu), `objectifs.md`, `decisions.md` (datées), `legacy.json`, `historique/`.

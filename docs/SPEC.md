@@ -19,8 +19,8 @@ Priorités : PvP en champs de bataille, donjons et leveling d'abord ; raid ensui
 | P0 | Fraîcheur | `forever status` : version locale, dernière version publiée, statut `fresh`, `stale`, `unknown` ou `silent` | T01 |
 | P0 | Consultation | Sorts, talents, objets, consommables, raciaux, avec provenance | T01 à T03 |
 | P0 | Mécaniques | Registre d'environ 120 mécaniques, couvert par des tests | T02 |
-| P0 | Leveling | Temps par monstre, XP par heure, quêtes et XP de Forever, ordre de talents optimal, conseil de respec | T04b, T04c, T05 |
-| P0 | PvP | Savoir des 9 classes (sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants), fiches par affrontement ; champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux | PV1, PV2 |
+| P0 | Leveling | Temps par monstre, XP par heure, quêtes et XP de Forever, zone ou donjon adapté au niveau (données de Questie), ordre de talents optimal, conseil de respec ; talent suivant et comparaison d'équipement en jeu | T04b, T04c, T05, FA1 |
+| P0 | PvP | Savoir des 9 classes (sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants), fiches par affrontement ; champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux ; fiche fixe de la classe adverse en jeu | PV1, PV2, FA1p |
 | P0 | Donjons | Niveaux, boss, butin | DJ1 |
 | P1 | Legacy | Défis, points, arbres de bonus, conseil des bonus par personnage, suivi de la progression | LG1, LG2 |
 | P1 | Raid | DPS analytique et Monte Carlo par build, comparaison au simulateur wowsims Forever | T09 |
@@ -42,7 +42,7 @@ Chaque valeur garde sa source et sa certitude. « — » : la source n'apporte r
 | --- | --- | --- | --- | --- | --- | --- |
 | Mécaniques, sorts, talents (Mage) | Tables Spell* et Trait* (`certain`) | Changements de classe | Recoupement (wowsims, ForeverChanges), `suppose` | Mesures et preuves du registre | Niveau et talents (ForeverLogger) | T02 à T04b |
 | Leveling et quêtes | Sorts, points par niveau | Changements d'XP, quêtes de Forever | Questie (PV, quêtes), `suppose` | PV des monstres (`certain`) | Niveau du lanceur, carnet de Questie | T04a à T05 |
-| PvP : savoir des classes | Sorts, talents, raciaux, bijoux des 9 classes | Règles PvP de Forever | Guides PvP, faits sourcés, `suppose` | — (mesures en PV2) | Fiches fixes seulement (FA1) | PV1 |
+| PvP : savoir des classes | Sorts, talents, raciaux, bijoux des 9 classes | Règles PvP de Forever | Guides PvP, faits sourcés, `suppose` | — (mesures en PV2) | Fiches fixes seulement (extension FA1p) | PV1, FA1p |
 | PvP : champs de bataille, monde ouvert, rendements décroissants | Cartes, objets PvP, monnaies | Dates, liste, récompenses, règles du monde ouvert | Vendeurs, coûts, stratégie | Mes parties : contrôles et durées, recharges observées après coup | Résultat de partie et honneur hors combat | PV2 |
 | Donjons | Instances, niveaux, objets | Donjons nouveaux ou modifiés | Butin et taux (Wowhead), ForeverDungeonJournal en recoupement | Niveau et PV des boss (H1), durées | Butin observé hors combat | DJ1 |
 | Legacy | Arbres et défis | Système Legacy, état au lancement | Icy Veins, Wowhead (noms divergents à recouper) | Validation d'un bonus mesurable | Progression du compte | LG1, LG2 |
@@ -55,6 +55,7 @@ Chaque valeur garde sa source et sa certitude. « — » : la source n'apporte r
 - Automatiser le jeu ou capturer le trafic réseau.
 - Recopier le contenu protégé des guides (seulement des faits sourcés).
 - Prédire un duel PvP : le PvP reste un profil comparatif, marqué `suppose`.
+- Routes de leveling détaillées : le joueur suit RestedXP en jeu (exclu comme source de données) ; l'agent répond seulement « quelle zone ou quel donjon à mon niveau ».
 - Suivre en direct les temps de recharge adverses dans un addon : impossible sur Forever (abonnement au journal de combat refusé aux addons, valeurs de combat secrètes, `docs/research/addon-forever.md`). En jeu, seules des fiches fixes s'affichent ; l'analyse des combats se fait après coup sur les journaux.
 - Acheter ou vendre à l'hôtel des ventes à la place du joueur.
 
