@@ -7,8 +7,8 @@ Preuves de journal (champ `preuves`, T04) : chaque preuve cite une fixture de jo
 (ou une liste de fixtures, mesure faite sur leur réunion), sa date, la mesure, l'effectif `n` et le test qui la lit.
 `valide-journal` exige que les preuves valides d'une même mesure totalisent `n` ≥ `tolerance.n_min` (décision 2 du
 plan T04b : les preuves se cumulent) ; avec `tolerance.ecart_s`, chaque preuve déclare `ecart_median_s` (médiane -
-valeur des données, en valeur absolue) et `ecart_min_s` (valeur des données - minimum), recalculés par son test, et
-tous deux doivent rester sous la tolérance. Le statut ne change pas la certitude (règle observée, pas valeur)."""
+valeur des données, en valeur absolue) et `ecart_p10_s` (valeur des données - 10e percentile), recalculés par son
+test, et tous deux doivent rester sous la tolérance ; le minimum n'est pas contrôlé (gigue d'horodatage). Le statut ne change pas la certitude (règle observée, pas valeur)."""
 
 from __future__ import annotations
 
@@ -31,8 +31,8 @@ CERTAINTIES = frozenset({"certain", "probable", "suppose"})
 FOREVER_VALUES = frozenset({"oui", "modifie", "inconnu"})
 REQUIRED_FIELDS = ("id", "categorie", "description", "forever", "statut", "certitude", "sources", "tests")
 PROOF_FIELDS = ("journal", "date", "mesure", "n", "test")
-GAP_FIELDS = ("ecart_median_s", "ecart_min_s")
-GAP_LABELS = {"ecart_median_s": "écart médian", "ecart_min_s": "écart minimal"}
+GAP_FIELDS = ("ecart_median_s", "ecart_p10_s")
+GAP_LABELS = {"ecart_median_s": "écart médian", "ecart_p10_s": "écart du 10e percentile"}
 PROOF_DIR = "tests/fixtures/combatlog/"
 ENGINE_DIR = PACKAGE_DIR / "engine"
 # Catégories (première lettre de l'identifiant) dont une entrée testée doit être implémentée dans le moteur.

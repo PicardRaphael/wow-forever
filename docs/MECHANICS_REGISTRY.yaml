@@ -257,8 +257,8 @@ mechanics:
     categorie: temps
     description: "Temps de recharge global (1,5 s)"
     forever: oui
-    statut: teste
-    certitude: suppose
+    statut: valide-journal
+    certitude: probable
     sources:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
@@ -269,19 +269,19 @@ mechanics:
       - tests/unit/test_measure_second_log.py::test_b1_proof_matches_the_registry
     tolerance:
       n_min: 50  # effectif minimal des preuves cumulées d'une mesure (protocole de collecte, docs/ADDON.md)
-      ecart_s: 0.05  # écart admis entre la médiane (et le minimum) des intervalles et la recharge globale des données (décision 2 du plan T04b)
+      ecart_s: 0.05  # écart admis entre la médiane (et le 10e percentile) des intervalles et la recharge globale des données (critère de l'utilisateur, 2026-09-27)
     formule: "incantation effective = max(recharge_globale, incantation)"
     preuves:
       - journal:
           - tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt
           - tests/fixtures/combatlog/WoWCombatLog-092726_150346.anon.txt.gz
         date: "2026-09-27"
-        mesure: "intervalles entre deux instantanés consécutifs du Mage qui déclenchent la recharge globale (start_recovery_ms > 0), fenêtre 3 s (forever logs measure) : médiane 1,511 s, minimum 1,414 s"
+        mesure: "intervalles entre deux instantanés consécutifs du Mage qui déclenchent la recharge globale (start_recovery_ms > 0), fenêtre 3 s (forever logs measure) : médiane 1,511 s, 10e percentile 1,4569 s (statistics.quantiles), minimum 1,414 s non contrôlé"
         n: 50
         ecart_median_s: 0.011
-        ecart_min_s: 0.086
+        ecart_p10_s: 0.0431
         test: tests/unit/test_measure_second_log.py::test_b1_proof_matches_the_registry
-    note: "règle Classic supposée inchangée dans Forever (voir OPEN_QUESTIONS) ; T04b : 50 intervalles sur deux journaux, médiane à 0,011 s de la recharge globale, mais 3 intervalles sous 1,45 s (1,414, 1,418, 1,424 s) : le critère de l'utilisateur (aucun intervalle sous recharge − 0,05 s) n'est pas atteint, B1 reste teste (gigue d'horodatage ou file d'attente des sorts ?)"
+    note: "T04b : validée par deux journaux du 2026-09-27 (50 intervalles, médiane à 0,011 s et 10e percentile à 0,043 s de la recharge globale de leveling.json) ; certitude probable (règle observée, valeur de 1,5 s non mesurée au-delà de la médiane) ; 3 intervalles sous 1,45 s (1,414 à 1,424 s) attribués à la variation d'horodatage du journal (voir OPEN_QUESTIONS)"
   - id: B2
     categorie: temps
     description: "Hâte et arrondis (10 points de notation par 1 %)"

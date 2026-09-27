@@ -283,7 +283,7 @@ def render_explanation(res: MechanicExplanation) -> list[str]:
         journals = proof["journal"] if isinstance(proof["journal"], list) else [proof["journal"]]
         gaps = [
             f"{label} {_num(proof[key])} s"
-            for key, label in (("ecart_median_s", "écart médian"), ("ecart_min_s", "écart minimal"))
+            for key, label in (("ecart_median_s", "écart médian"), ("ecart_p10_s", "écart du 10e percentile"))
             if key in proof
         ]
         lines.append(

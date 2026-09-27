@@ -7,7 +7,7 @@ import pytest
 from conftest import REGISTRY_PATH
 
 from forever.engine import MECHANICS, character, coefficient, expected_cast
-from forever.registry import load
+from forever.registry import COVERED_STATUSES, load
 
 L = 60
 THIS_FILE = "tests/unit/test_engine_mechanics.py"
@@ -84,5 +84,5 @@ def test_inventory_ids_are_tested_in_registry():
     for label, mechanic_id in MECHANICS.items():
         assert mechanic_id in entries, (label, mechanic_id)
         entry = entries[mechanic_id]
-        assert entry.status == "teste", (label, mechanic_id, entry.status)
+        assert entry.status in COVERED_STATUSES, (label, mechanic_id, entry.status)  # B1 : valide-journal (T04b)
         assert any(t.startswith(f"{THIS_FILE}::") for t in entry.tests), (label, mechanic_id)
