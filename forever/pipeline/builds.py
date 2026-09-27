@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
-from forever.config import HttpGet
+from forever.config import HTTP_TIMEOUT, USER_AGENT, HttpGet
 from forever.errors import ForeverError
+from forever.timefmt import parse_utc
 
 BUILDS_URL = "https://wago.tools/api/builds"
 
@@ -24,16 +26,47 @@ class BuildsUnavailable(ForeverError):
 
 
 def version_key(version: str) -> tuple[int, ...]:
-    raise NotImplementedError
+    return tuple(int(part) for part in version.split("."))
 
 
 def fetch_builds(http_get: HttpGet) -> object:
-    raise NotImplementedError
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/json"}
+    try:
+        body = http_get(BUILDS_URL, headers, HTTP_TIMEOUT)
+    except OSError as exc:
+        raise BuildsUnavailable(f"wago.tools injoignable : {exc}") from exc
+    try:
+        payload: object = json.loads(body)
+    except (ValueError, UnicodeDecodeError) as exc:
+        raise BuildsUnavailable("réponse de wago.tools illisible (JSON invalide)") from exc
+    return payload
 
 
 def parse_builds(payload: object, product: str, prefix: str) -> list[Build]:
-    raise NotImplementedError
+    """Versions du produit ayant le préfixe, dans l'ordre d'arrivée.
+
+    Accepte un dict par produit (`{"wow_classic_beta": [...]}`) ou une liste d'entrées portant `product`.
+    Les entrées mal formées sont ignorées."""
+    if isinstance(payload, dict):
+        items = payload.get(product, [])
+    elif isinstance(payload, list):
+        items = [x for x in payload if isinstance(x, dict) and x.get("product", product) == product]
+    else:
+        return []
+    builds: list[Build] = []
+    for item in items if isinstance(items, list) else []:
+        if not isinstance(item, dict):
+            continue
+        version, created = item.get("version"), item.get("created_at")
+        if not (isinstance(version, str) and version.startswith(prefix) and isinstance(created, str)):
+            continue
+        try:
+            version_key(version)
+            builds.append(Build(version, parse_utc(created)))
+        except ValueError:
+            continue
+    return builds
 
 
 def latest_build(builds: Sequence[Build]) -> Build | None:
-    raise NotImplementedError
+    return max(builds, key=lambda b: b.created_at, default=None)
