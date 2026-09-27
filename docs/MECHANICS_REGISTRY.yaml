@@ -875,6 +875,22 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+  - id: G7
+    categorie: personnage
+    description: "Points de base des sorts au niveau du personnage (progression par niveau jusqu'au niveau maximal du rang, variance)"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources:
+      - "Tables du client SpellEffect (EffectBasePointsF, EffectRealPointsPerLevel, Variance) et SpellLevels (BaseLevel, SpellLevel, MaxLevel), 1.60.1.70009"
+      - "forever/data/1.60.1.70009/spell_scaling.json"
+    tests:
+      - tests/unit/test_spell_scaling.py::test_frostbolt_rank3_by_level
+      - tests/unit/test_spell_scaling.py::test_arcane_explosion_rank1_at_19
+      - tests/unit/test_spell_scaling.py::test_reproduces_decoded_ranks_at_capped_max_level
+    tolerance: null
+    formule: "points(L) = points_de_base + points_par_niveau × (min(max(L, niveau_de_base), niveau_max) - niveau_de_base) ; min, max = arrondi_demi_supérieur(points × (1 ∓ demi_variance))"
+    note: "T04a : le simulateur de leveling (T04b) choisit par spell_level entre ce calcul (character) et les rangs de spells.json (rank, parité du seed)."
   - id: H1
     categorie: rencontre
     description: "Niveau de la cible (+3 pour un boss)"

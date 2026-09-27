@@ -160,6 +160,32 @@ class Racials:
 
 
 @dataclass(frozen=True)
+class ScalingComponent:
+    """Effet de dégâts d'un rang (`spell_scaling.json`) : `kind` direct, dot (× ticks, sur la durée) ou channel
+    (× ticks, dans le coup)."""
+
+    spell_id: int
+    index: int
+    kind: str
+    ticks: float
+    base_level: int
+    max_level: int
+    base_points: float
+    points_per_level: float
+    variance: float
+
+
+@dataclass(frozen=True)
+class RankScaling:
+    rank: int
+    spell_id: int
+    base_level: int
+    spell_level: int
+    max_level: int
+    components: tuple[ScalingComponent, ...]
+
+
+@dataclass(frozen=True)
 class MonsterHp:
     """PV max d'un monstre à un niveau, avec sa certitude (`certain` mesuré, `suppose` communautaire)."""
 
@@ -189,6 +215,7 @@ class GameData:
     constants: Constants
     racials: Racials
     monsters: MonsterTable
+    scaling: Mapping[str, tuple[RankScaling, ...]]  # clé de sort -> rangs (spell_scaling.json)
 
 
 class CharacterOverrides(TypedDict, total=False):

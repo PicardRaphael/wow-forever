@@ -24,7 +24,7 @@ from forever.pipeline.tooltip import half_up, normalize, tooltip_values
 from forever.timefmt import format_utc
 
 RULES_NAME = "decode_rules.json"
-DECODED_FILES = ("talents.json", "spells.json")
+DECODED_FILES = ("talents.json", "spells.json", "spell_scaling.json")
 INHERITED_FILES = (
     "racials.json",
     "leveling.json",
@@ -459,8 +459,93 @@ def decode_spells(
     return doc
 
 
+def _component(client: _Client, spell: int, index: int, kind: str, ticks: float, variance: bool) -> dict[str, Any]:
+    e = client.effect(spell, index)
+    base, top = client.level_for(spell, "max_capped")
+    return {
+        "spell_id": spell,
+        "index": index,
+        "kind": kind,
+        "ticks": normalize(ticks),
+        "base_level": base,
+        "max_level": top,
+        "base_points": float(e["EffectBasePointsF"]),
+        "points_per_level": float(e["EffectRealPointsPerLevel"]),
+        "variance": float(e["Variance"]) if variance else 0.0,
+    }
+
+
+def _components(client: _Client, spell: int, rules: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Effets de dégâts d'un rang, dans l'ordre de `_rank_row` : directs (`direct`), puis périodiques (`dot`, ou
+    `channel` pour un sort canalisé), éventuellement portés par un sort déclenché ou cité par l'infobulle."""
+    fx = rules["effects"]
+    misc = client.misc[spell]
+    channel = bool(int(misc["Attributes_1"]) & int(rules["spell_ranks"]["channel_attributes_1_mask"]))
+    effects = [client.effects[spell][i] for i in sorted(client.effects.get(spell, {}))]
+    out = [
+        _component(client, spell, int(e["EffectIndex"]), "direct", 1, True)
+        for e in effects
+        if int(e["Effect"]) == fx["school_damage"]
+    ]
+    description = str(client.spell.get(spell, {}).get("Description_lang", ""))
+    duration = client.duration_ms(spell)
+    kind = "channel" if channel else "dot"
+    for e in effects:
+        if int(e["Effect"]) != fx["apply_aura"] or not int(e["EffectAuraPeriod"]) or duration is None:
+            continue
+        ticks = duration / int(e["EffectAuraPeriod"])
+        aura = int(e["EffectAura"])
+        if aura == fx["aura_periodic_damage"]:
+            out.append(_component(client, spell, int(e["EffectIndex"]), kind, ticks, False))
+            continue
+        if aura == fx["aura_periodic_trigger_spell"]:
+            linked = [int(e["EffectTriggerSpell"])]
+        elif aura == fx["aura_periodic_dummy"]:
+            linked = [int(s) for s in _CITED_SPELL.findall(description)]
+        else:
+            continue
+        for other in linked:
+            for te in client.effects.get(other, {}).values():
+                if int(te["Effect"]) == fx["school_damage"]:
+                    out.append(_component(client, other, int(te["EffectIndex"]), kind, ticks, True))
+    return out
+
+
 def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
-    raise NotImplementedError
+    """Contenu de `spell_scaling.json` : pour chaque rang des sorts suivis, niveaux (`MaxLevel` 0 résolu au plafond
+    de `decode_rules.json`) et effets de dégâts (points de base, points par niveau, variance, nombre de ticks), pour
+    calculer les dégâts au niveau du personnage (moteur : `rank_values_at_level`)."""
+    client = _Client(tables, rules)
+    spells = decode_spells(tables, rules, {"rank_format": rules["rank_format"], "spells": {}}, version)["spells"]
+    out: dict[str, list[dict[str, Any]]] = {}
+    for key, spell in spells.items():
+        ranks = []
+        for position, spell_id in enumerate(spell["spell_ids"], start=1):
+            level = client.levels[spell_id]
+            base, top = client.level_for(spell_id, "max_capped")
+            ranks.append(
+                {
+                    "rank": position,
+                    "spell_id": spell_id,
+                    "base_level": base,
+                    "spell_level": int(level["SpellLevel"]),
+                    "max_level": top,
+                    "components": _components(client, spell_id, rules),
+                }
+            )
+        out[key] = ranks
+    return {
+        "schema_version": 1,
+        "build": version,
+        "source": f"Client {version} : tables SpellEffect, SpellLevels, SpellMisc (wago.tools) décodées par forever decode",
+        "level_cap": int(rules["levels"]["level_cap"]),
+        "spells": out,
+        "notes": [
+            "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
+            "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
+            "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
+        ],
+    }
 
 
 # --- Version candidate ---------------------------------------------------------------------------
@@ -541,6 +626,7 @@ def decode_version(
     tables = load_tables(csv_dir, rules)
     talents = decode_talents(tables, rules, version)
     spells = decode_spells(tables, rules, _read_json(base / "spells.json"), version)
+    scaling = decode_scaling(tables, rules, version)
     inherited = {}
     for name in INHERITED_FILES:
         doc = _read_json(base / name)
@@ -570,6 +656,11 @@ def decode_version(
                     f"rangs décodés du client ; autres champs hérités de {base_version}",
                 ],
             },
+            "spell_scaling.json": {
+                "source": f"Client {version} : points de base par niveau, {decoded_note}",
+                "certainty": "certain",
+                "notes": ["MaxLevel 0 résolu au plafond de niveau (decode_rules.json)"],
+            },
             **{
                 name: {
                     **files.get(name, {"source": "inconnue", "certainty": "suppose"}),
@@ -586,6 +677,7 @@ def decode_version(
     vdir.mkdir(parents=True)
     _write_json(vdir / "talents.json", talents)
     _write_json(vdir / "spells.json", spells)
+    _write_json(vdir / "spell_scaling.json", scaling)
     for name, doc in inherited.items():
         _write_json(vdir / name, doc)
     _write_json(vdir / SOURCES_NAME, sources)

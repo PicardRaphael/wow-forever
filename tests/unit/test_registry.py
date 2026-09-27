@@ -108,7 +108,7 @@ def test_find_entry_unknown_suggests():
 
 def test_repository_coverage():
     """Seul test qui fige la couverture du registre après T02."""
-    assert coverage(REGISTRY_PATH) == "21/101"
+    assert coverage(REGISTRY_PATH) == "22/102"  # T04 : G7 ajoutée (teste)
 
 
 def test_load_reads_optional_fields():
@@ -120,8 +120,8 @@ def test_load_reads_optional_fields():
 def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("Registre : 101 mécaniques")
-    assert "teste 21" in out
+    assert out.startswith("Registre : 102 mécaniques")
+    assert "teste 22" in out
 
 
 def test_main_reports_errors(capsys):

@@ -20,6 +20,8 @@ from forever.engine.model import (
     MonsterTable,
     Racials,
     Rank,
+    RankScaling,
+    ScalingComponent,
     Spell,
     StatGrowth,
     Talent,
@@ -34,6 +36,8 @@ TALENTS_FILE = "talents.json"
 LEVELING_FILE = "leveling.json"
 RACIALS_FILE = "racials.json"
 MONSTERS_FILE = "monsters.json"
+SCALING_FILE = "spell_scaling.json"
+SCALING_KINDS = ("direct", "dot", "channel")
 
 # Colonnes attendues de `spells.json.rank_format`, dans l'ordre des champs de `Rank`.
 RANK_COLUMNS = ("level", "min", "max", "dot_total", "dot_duration", "cast_s", "mana", "cooldown_s")
@@ -272,6 +276,54 @@ def _monsters(raw: Any) -> MonsterTable:
     return MonsterTable(hp_by_level=by_level, npcs=npcs)
 
 
+def _scaling(raw: Any, spells: Mapping[str, Spell]) -> dict[str, tuple[RankScaling, ...]]:
+    r = _Reader(SCALING_FILE)
+    if not isinstance(raw, dict):
+        raise r.fail("racine", "objet")
+    out: dict[str, tuple[RankScaling, ...]] = {}
+    for key, ranks in r.obj(raw, "spells", "spells").items():
+        where = f"spells.{key}"
+        if not isinstance(ranks, list):
+            raise r.fail(where, "liste de rangs")
+        if key in spells and len(ranks) != len(spells[key].ranks):
+            raise r.fail(where, f"{len(spells[key].ranks)} rangs comme spells.json")
+        parsed = []
+        for i, entry in enumerate(ranks, start=1):
+            w = f"{where}[{i}]"
+            if not isinstance(entry, dict):
+                raise r.fail(w, "objet")
+            components = []
+            for j, c in enumerate(r.list_(entry, "components", f"{w}.components"), start=1):
+                cw = f"{w}.components[{j}]"
+                if not isinstance(c, dict) or c.get("kind") not in SCALING_KINDS:
+                    raise r.fail(f"{cw}.kind", " ou ".join(SCALING_KINDS))
+                components.append(
+                    ScalingComponent(
+                        spell_id=r.int_(c, "spell_id", cw),
+                        index=r.int_(c, "index", cw),
+                        kind=str(c["kind"]),
+                        ticks=r.num(c, "ticks", cw),
+                        base_level=r.int_(c, "base_level", cw),
+                        max_level=r.int_(c, "max_level", cw),
+                        base_points=r.num(c, "base_points", cw),
+                        points_per_level=r.num(c, "points_per_level", cw),
+                        variance=r.num(c, "variance", cw),
+                    )
+                )
+            parsed.append(
+                RankScaling(
+                    rank=r.int_(entry, "rank", w),
+                    spell_id=r.int_(entry, "spell_id", w),
+                    base_level=r.int_(entry, "base_level", w),
+                    spell_level=r.int_(entry, "spell_level", w),
+                    max_level=r.int_(entry, "max_level", w),
+                    components=tuple(components),
+                )
+            )
+        out[key] = tuple(parsed)
+    return out
+
+
 def _constants(raw: Any) -> Constants:
     r = _Reader(MECHANICS_FILE)
     if not isinstance(raw, dict):
@@ -376,15 +428,16 @@ def _constants(raw: Any) -> Constants:
 def build_game_data(version: VersionData) -> GameData:
     """Données typées d'une version déjà vérifiée ; lève DataSchemaError si une clé manque ou a un mauvais type."""
     try:
-        names = (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE)
+        names = (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE, SCALING_FILE)
         raw = {name: version.read_json(name) for name in names}
         raw_mechanics = version.read_json(MECHANICS_FILE)
     except (OSError, ValueError) as exc:
         raise DataSchemaError(f"Données de la version {version.game_version} illisibles ({exc}).") from exc
     talents, trees = _talents(raw[TALENTS_FILE])
+    spells = _spells(raw[SPELLS_FILE])
     return GameData(
         game_version=version.game_version,
-        spells=_spells(raw[SPELLS_FILE]),
+        spells=spells,
         talents=talents,
         talent_at={(t.tree, t.tier, t.col): t.key for t in talents.values()},
         trees=trees,
@@ -392,6 +445,7 @@ def build_game_data(version: VersionData) -> GameData:
         constants=_constants(raw_mechanics),
         racials=_racials(raw[RACIALS_FILE]),
         monsters=_monsters(raw[MONSTERS_FILE]),
+        scaling=_scaling(raw[SCALING_FILE], spells),
     )
 
 

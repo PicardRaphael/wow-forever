@@ -23,7 +23,7 @@ from forever.engine.model import (
     Points,
     Rank,
 )
-from forever.engine.spells import best_rank, coefficient
+from forever.engine.spells import RankValues, best_rank, coefficient, rank_values_at_level
 from forever.engine.talents import check_build, legal_additions, points_available, talent_value, tree_split
 
 MECHANICS: dict[str, str] = {
@@ -70,6 +70,7 @@ __all__ = [
     "GameData",
     "Points",
     "Rank",
+    "RankValues",
     "best_rank",
     "cast_time",
     "character",
@@ -84,6 +85,7 @@ __all__ = [
     "legal_additions",
     "mana_cost",
     "points_available",
+    "rank_values_at_level",
     "spell_power",
     "talent_value",
     "tree_split",

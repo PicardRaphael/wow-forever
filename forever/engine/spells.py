@@ -1,7 +1,8 @@
-"""Sorts : rang appris et coefficient de puissance des sorts."""
+"""Sorts : rang appris, coefficient de puissance des sorts, dégâts d'un rang au niveau du personnage."""
 
 from __future__ import annotations
 
+import math
 from typing import NamedTuple
 
 from forever.engine.model import GameData, Points, Rank
@@ -13,8 +14,35 @@ class RankValues(NamedTuple):
     dot_total: float
 
 
+def _half_up(x: float) -> float:
+    """Arrondi au demi supérieur, comme le décodeur (0,5 -> 1)."""
+    return math.floor(round(x, 9) + 0.5)
+
+
+def _normalize(x: float) -> float:
+    rounded = round(x, 9)
+    return int(rounded) if rounded.is_integer() else rounded
+
+
 def rank_values_at_level(gd: GameData, key: str, rank: int, level: int) -> RankValues:
-    raise NotImplementedError
+    """Dégâts d'un rang (position à partir de 1) pour un personnage de niveau `level` : chaque effet est évalué à
+    son niveau borné par son niveau de base et son niveau maximal (`spell_scaling.json`), puis arrondi au demi
+    supérieur ; au plafond de niveau, reproduit les rangs de `spells.json` décodés du client.
+
+    Registre : G7"""
+    scaling = gd.scaling[key][rank - 1]
+    low = high = dot = 0.0
+    for c in scaling.components:
+        at = max(c.base_level, min(level, c.max_level))
+        points = c.base_points + c.points_per_level * (at - c.base_level)
+        a, b = _half_up(points * (1 - c.variance / 2)), _half_up(points * (1 + c.variance / 2))
+        if c.kind == "direct":
+            low, high = low + a, high + b
+        elif c.kind == "channel":
+            low, high = low + a * c.ticks, high + b * c.ticks
+        else:
+            dot += a * c.ticks
+    return RankValues(_normalize(low), _normalize(high), _normalize(dot))
 
 
 def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:

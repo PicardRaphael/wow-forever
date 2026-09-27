@@ -4,8 +4,8 @@
   "versions": {
     "1.60.1.70009": {
       "collected_at": "2026-09-26",
-      "data_sha": "d29aff3416f2",
-      "data_sha256": "d29aff3416f22b25a703af025270314b695be89e53fb74242f223b65caf076d7",
+      "data_sha": "d934383e2ecd",
+      "data_sha256": "d934383e2ecd13679d15582cfdeecce781045fb6a3019ebe02752adba9a0f565",
       "files": {
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
         "confirmed_changes.json": "627f306bd2a7bf086f0ff2bbfe2045f47e423e081339865b5845d11ac1d7f7d1",
@@ -17,7 +17,8 @@
         "overrides.json": "e251b04e9fe407a72380f99f4eaea5d141d4361f6167650e8ca09c26451ec9b9",
         "racials.json": "e4cba8c29d0800913a8bc48c6e3db569f64d71d65ea06abbbefffe2f173f7bdf",
         "respec.json": "d0728942f79f45fa2eeafe52ddc75b74608cde77f5a2dcc8d65e1d80e2ed1358",
-        "sources.json": "70fda55299017b40b7cb31e3b6815c7a45f7156d6f5ec4a37550a7c3d81fdd0b",
+        "sources.json": "72dbf53f3176aced9ad1494283e9b1e8893d6ae789347ae8a6bc090200911bb6",
+        "spell_scaling.json": "5316c16446dd3f1d8ff1dcf6a2876b09eb73dca70173ce2c4c8b369a7ed2706c",
         "spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
         "talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb"
       },

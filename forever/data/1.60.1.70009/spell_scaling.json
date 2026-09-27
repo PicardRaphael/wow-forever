@@ -1,0 +1,2342 @@
+{
+ "schema_version": 1,
+ "build": "1.60.1.70009",
+ "source": "Client 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools) décodées par forever decode",
+ "level_cap": 60,
+ "spells": {
+  "frostbolt": [
+   {
+    "rank": 1,
+    "spell_id": 116,
+    "base_level": 4,
+    "spell_level": 4,
+    "max_level": 8,
+    "components": [
+     {
+      "spell_id": 116,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 4,
+      "max_level": 8,
+      "base_points": 19.0,
+      "points_per_level": 0.5,
+      "variance": 0.10526315868
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 205,
+    "base_level": 8,
+    "spell_level": 8,
+    "max_level": 12,
+    "components": [
+     {
+      "spell_id": 205,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 8,
+      "max_level": 12,
+      "base_points": 33.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.12121211737
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 837,
+    "base_level": 14,
+    "spell_level": 14,
+    "max_level": 18,
+    "components": [
+     {
+      "spell_id": 837,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 14,
+      "max_level": 18,
+      "base_points": 46.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.11111111194
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 7322,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 24,
+    "components": [
+     {
+      "spell_id": 7322,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 24,
+      "base_points": 60.0,
+      "points_per_level": 1.10000002384,
+      "variance": 0.10256409645
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8406,
+    "base_level": 26,
+    "spell_level": 26,
+    "max_level": 30,
+    "components": [
+     {
+      "spell_id": 8406,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 26,
+      "max_level": 30,
+      "base_points": 95.0,
+      "points_per_level": 1.5,
+      "variance": 0.09090909362
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 8407,
+    "base_level": 32,
+    "spell_level": 32,
+    "max_level": 36,
+    "components": [
+     {
+      "spell_id": 8407,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 32,
+      "max_level": 36,
+      "base_points": 134.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.08791209012
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 8408,
+    "base_level": 38,
+    "spell_level": 38,
+    "max_level": 42,
+    "components": [
+     {
+      "spell_id": 8408,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 38,
+      "max_level": 42,
+      "base_points": 181.0,
+      "points_per_level": 2.0,
+      "variance": 0.08438818902
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 10179,
+    "base_level": 44,
+    "spell_level": 44,
+    "max_level": 48,
+    "components": [
+     {
+      "spell_id": 10179,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 44,
+      "max_level": 48,
+      "base_points": 244.0,
+      "points_per_level": 2.29999995232,
+      "variance": 0.07894736528
+     }
+    ]
+   },
+   {
+    "rank": 9,
+    "spell_id": 10180,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 54,
+    "components": [
+     {
+      "spell_id": 10180,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 54,
+      "base_points": 308.0,
+      "points_per_level": 2.59999990463,
+      "variance": 0.08152174205
+     }
+    ]
+   },
+   {
+    "rank": 10,
+    "spell_id": 10181,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 10181,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 386.0,
+      "points_per_level": 2.90000009537,
+      "variance": 0.07623318583
+     }
+    ]
+   },
+   {
+    "rank": 11,
+    "spell_id": 25304,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 25304,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 475.0,
+      "points_per_level": 3.20000004768,
+      "variance": 0.07476635277
+     }
+    ]
+   }
+  ],
+  "fireball": [
+   {
+    "rank": 1,
+    "spell_id": 133,
+    "base_level": 1,
+    "spell_level": 1,
+    "max_level": 5,
+    "components": [
+     {
+      "spell_id": 133,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 1,
+      "max_level": 5,
+      "base_points": 18.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.44444444776
+     },
+     {
+      "spell_id": 133,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 2,
+      "base_level": 1,
+      "max_level": 5,
+      "base_points": 1.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 143,
+    "base_level": 6,
+    "spell_level": 6,
+    "max_level": 10,
+    "components": [
+     {
+      "spell_id": 143,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 6,
+      "max_level": 10,
+      "base_points": 37.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.36842104793
+     },
+     {
+      "spell_id": 143,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 6,
+      "max_level": 10,
+      "base_points": 1.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 145,
+    "base_level": 12,
+    "spell_level": 12,
+    "max_level": 16,
+    "components": [
+     {
+      "spell_id": 145,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 12,
+      "max_level": 16,
+      "base_points": 53.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.31746032834
+     },
+     {
+      "spell_id": 145,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 12,
+      "max_level": 16,
+      "base_points": 2.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 3140,
+    "base_level": 18,
+    "spell_level": 18,
+    "max_level": 22,
+    "components": [
+     {
+      "spell_id": 3140,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 18,
+      "max_level": 22,
+      "base_points": 74.0,
+      "points_per_level": 1.10000002384,
+      "variance": 0.31999999285
+     },
+     {
+      "spell_id": 3140,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 18,
+      "max_level": 22,
+      "base_points": 3.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8400,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 28,
+    "components": [
+     {
+      "spell_id": 8400,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 24,
+      "max_level": 28,
+      "base_points": 108.0,
+      "points_per_level": 1.5,
+      "variance": 0.29447853565
+     },
+     {
+      "spell_id": 8400,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 24,
+      "max_level": 28,
+      "base_points": 4.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 8401,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 34,
+    "components": [
+     {
+      "spell_id": 8401,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 34,
+      "base_points": 153.0,
+      "points_per_level": 1.79999995232,
+      "variance": 0.28448274732
+     },
+     {
+      "spell_id": 8401,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 30,
+      "max_level": 34,
+      "base_points": 6.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 8402,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 40,
+    "components": [
+     {
+      "spell_id": 8402,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 36,
+      "max_level": 40,
+      "base_points": 187.0,
+      "points_per_level": 2.29999995232,
+      "variance": 0.27118644118
+     },
+     {
+      "spell_id": 8402,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 36,
+      "max_level": 40,
+      "base_points": 6.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 10148,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 46,
+    "components": [
+     {
+      "spell_id": 10148,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 46,
+      "base_points": 235.0,
+      "points_per_level": 2.20000004768,
+      "variance": 0.26229506731
+     },
+     {
+      "spell_id": 10148,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 42,
+      "max_level": 46,
+      "base_points": 8.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 9,
+    "spell_id": 10149,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 52,
+    "components": [
+     {
+      "spell_id": 10149,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 52,
+      "base_points": 300.0,
+      "points_per_level": 2.40000009537,
+      "variance": 0.25389754772
+     },
+     {
+      "spell_id": 10149,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 48,
+      "max_level": 52,
+      "base_points": 10.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 10,
+    "spell_id": 10150,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 58,
+    "components": [
+     {
+      "spell_id": 10150,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 58,
+      "base_points": 374.0,
+      "points_per_level": 2.70000004768,
+      "variance": 0.24723246694
+     },
+     {
+      "spell_id": 10150,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 54,
+      "max_level": 58,
+      "base_points": 12.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 11,
+    "spell_id": 10151,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 10151,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 451.0,
+      "points_per_level": 3.0,
+      "variance": 0.24137930572
+     },
+     {
+      "spell_id": 10151,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 14.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 12,
+    "spell_id": 25306,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 25306,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 483.0,
+      "points_per_level": 3.0,
+      "variance": 0.24188791215
+     },
+     {
+      "spell_id": 25306,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 15.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   }
+  ],
+  "fire_blast": [
+   {
+    "rank": 1,
+    "spell_id": 2136,
+    "base_level": 6,
+    "spell_level": 6,
+    "max_level": 11,
+    "components": [
+     {
+      "spell_id": 2136,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 6,
+      "max_level": 11,
+      "base_points": 28.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.28571429849
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 2137,
+    "base_level": 14,
+    "spell_level": 14,
+    "max_level": 19,
+    "components": [
+     {
+      "spell_id": 2137,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 14,
+      "max_level": 19,
+      "base_points": 58.0,
+      "points_per_level": 1.0,
+      "variance": 0.21875
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 2138,
+    "base_level": 22,
+    "spell_level": 22,
+    "max_level": 27,
+    "components": [
+     {
+      "spell_id": 2138,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 22,
+      "max_level": 27,
+      "base_points": 100.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.2086956501
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8412,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 35,
+    "components": [
+     {
+      "spell_id": 8412,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 35,
+      "base_points": 163.0,
+      "points_per_level": 1.79999995232,
+      "variance": 0.18378378451
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8413,
+    "base_level": 38,
+    "spell_level": 38,
+    "max_level": 43,
+    "components": [
+     {
+      "spell_id": 8413,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 38,
+      "max_level": 43,
+      "base_points": 236.0,
+      "points_per_level": 2.20000004768,
+      "variance": 0.18045112491
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10197,
+    "base_level": 46,
+    "spell_level": 46,
+    "max_level": 51,
+    "components": [
+     {
+      "spell_id": 10197,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 46,
+      "max_level": 51,
+      "base_points": 331.0,
+      "points_per_level": 2.59999990463,
+      "variance": 0.17079889774
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 10199,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 59,
+    "components": [
+     {
+      "spell_id": 10199,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 59,
+      "base_points": 438.0,
+      "points_per_level": 3.0,
+      "variance": 0.16595745087
+     }
+    ]
+   }
+  ],
+  "scorch": [
+   {
+    "rank": 1,
+    "spell_id": 2948,
+    "base_level": 22,
+    "spell_level": 22,
+    "max_level": 26,
+    "components": [
+     {
+      "spell_id": 2948,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 22,
+      "max_level": 26,
+      "base_points": 39.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.20338982344
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 8444,
+    "base_level": 28,
+    "spell_level": 28,
+    "max_level": 32,
+    "components": [
+     {
+      "spell_id": 8444,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 28,
+      "max_level": 32,
+      "base_points": 55.0,
+      "points_per_level": 1.0,
+      "variance": 0.1882352978
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8445,
+    "base_level": 34,
+    "spell_level": 34,
+    "max_level": 38,
+    "components": [
+     {
+      "spell_id": 8445,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 34,
+      "max_level": 38,
+      "base_points": 69.0,
+      "points_per_level": 1.0,
+      "variance": 0.18181818724
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8446,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 44,
+    "components": [
+     {
+      "spell_id": 8446,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 44,
+      "base_points": 93.0,
+      "points_per_level": 1.20000004768,
+      "variance": 0.1780821979
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10205,
+    "base_level": 46,
+    "spell_level": 46,
+    "max_level": 50,
+    "components": [
+     {
+      "spell_id": 10205,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 46,
+      "max_level": 50,
+      "base_points": 116.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.16949152946
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10206,
+    "base_level": 52,
+    "spell_level": 52,
+    "max_level": 56,
+    "components": [
+     {
+      "spell_id": 10206,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 52,
+      "max_level": 56,
+      "base_points": 150.0,
+      "points_per_level": 1.5,
+      "variance": 0.1780821979
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 10207,
+    "base_level": 58,
+    "spell_level": 58,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 10207,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 58,
+      "max_level": 60,
+      "base_points": 178.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.16535432637
+     }
+    ]
+   }
+  ],
+  "pyroblast": [
+   {
+    "rank": 1,
+    "spell_id": 11366,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 24,
+    "components": [
+     {
+      "spell_id": 11366,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 24,
+      "base_points": 110.0,
+      "points_per_level": 1.5,
+      "variance": 0.2804878056
+     },
+     {
+      "spell_id": 11366,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 20,
+      "max_level": 24,
+      "base_points": 11.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 12505,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 30,
+    "components": [
+     {
+      "spell_id": 12505,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 24,
+      "max_level": 30,
+      "base_points": 134.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.26923078299
+     },
+     {
+      "spell_id": 12505,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 24,
+      "max_level": 30,
+      "base_points": 14.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 12522,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 36,
+    "components": [
+     {
+      "spell_id": 12522,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 36,
+      "base_points": 191.0,
+      "points_per_level": 2.09999990463,
+      "variance": 0.24742268026
+     },
+     {
+      "spell_id": 12522,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 30,
+      "max_level": 36,
+      "base_points": 19.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 12523,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 42,
+    "components": [
+     {
+      "spell_id": 12523,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 36,
+      "max_level": 42,
+      "base_points": 245.0,
+      "points_per_level": 2.40000009537,
+      "variance": 0.24064171314
+     },
+     {
+      "spell_id": 12523,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 36,
+      "max_level": 42,
+      "base_points": 25.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 12524,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 48,
+    "components": [
+     {
+      "spell_id": 12524,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 48,
+      "base_points": 311.0,
+      "points_per_level": 2.70000004768,
+      "variance": 0.23427331448
+     },
+     {
+      "spell_id": 12524,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 42,
+      "max_level": 48,
+      "base_points": 31.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 12525,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 54,
+    "components": [
+     {
+      "spell_id": 12525,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 54,
+      "base_points": 394.0,
+      "points_per_level": 3.0,
+      "variance": 0.22574955225
+     },
+     {
+      "spell_id": 12525,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 48,
+      "max_level": 54,
+      "base_points": 38.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 12526,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 12526,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 60,
+      "base_points": 481.0,
+      "points_per_level": 3.40000009537,
+      "variance": 0.22222222388
+     },
+     {
+      "spell_id": 12526,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 54,
+      "max_level": 60,
+      "base_points": 46.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 18809,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 18809,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 583.0,
+      "points_per_level": 4.59999990463,
+      "variance": 0.21668742597
+     },
+     {
+      "spell_id": 18809,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 53.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   }
+  ],
+  "frostfire_bolt": [
+   {
+    "rank": 1,
+    "spell_id": 401502,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 48,
+    "components": [
+     {
+      "spell_id": 401502,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 48,
+      "base_points": 100.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.15340909362
+     },
+     {
+      "spell_id": 401502,
+      "index": 2,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 40,
+      "max_level": 48,
+      "base_points": 9.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 1237312,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 58,
+    "components": [
+     {
+      "spell_id": 1237312,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 58,
+      "base_points": 182.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.15340909362
+     },
+     {
+      "spell_id": 1237312,
+      "index": 2,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 50,
+      "max_level": 58,
+      "base_points": 13.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 1237313,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 1237313,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 292.0,
+      "points_per_level": 2.09999990463,
+      "variance": 0.15340909362
+     },
+     {
+      "spell_id": 1237313,
+      "index": 2,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 19.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   }
+  ],
+  "ice_lance": [
+   {
+    "rank": 1,
+    "spell_id": 1312002,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 26,
+    "components": [
+     {
+      "spell_id": 1312002,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 26,
+      "base_points": 28.0,
+      "points_per_level": 0.34999999404,
+      "variance": 0.16666667163
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 400640,
+    "base_level": 28,
+    "spell_level": 28,
+    "max_level": 32,
+    "components": [
+     {
+      "spell_id": 400640,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 28,
+      "max_level": 32,
+      "base_points": 36.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.16666667163
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 1240044,
+    "base_level": 34,
+    "spell_level": 34,
+    "max_level": 40,
+    "components": [
+     {
+      "spell_id": 1240044,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 34,
+      "max_level": 40,
+      "base_points": 45.0,
+      "points_per_level": 0.5,
+      "variance": 0.16666667163
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 1240045,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 48,
+    "components": [
+     {
+      "spell_id": 1240045,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 48,
+      "base_points": 79.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.16666667163
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 1240046,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 56,
+    "components": [
+     {
+      "spell_id": 1240046,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 56,
+      "base_points": 98.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.16666667163
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 1240047,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 1240047,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 145.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.16666667163
+     }
+    ]
+   }
+  ],
+  "arcane_blast": [
+   {
+    "rank": 1,
+    "spell_id": 400574,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 28,
+    "components": [
+     {
+      "spell_id": 400574,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 28,
+      "base_points": 54.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.15102040768
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 1239696,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 38,
+    "components": [
+     {
+      "spell_id": 1239696,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 38,
+      "base_points": 130.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.15102040768
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 1239697,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 48,
+    "components": [
+     {
+      "spell_id": 1239697,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 48,
+      "base_points": 169.0,
+      "points_per_level": 1.60000002384,
+      "variance": 0.15102040768
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 1239699,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 58,
+    "components": [
+     {
+      "spell_id": 1239699,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 58,
+      "base_points": 274.0,
+      "points_per_level": 2.09999990463,
+      "variance": 0.15102040768
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 1239700,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 1239700,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 394.0,
+      "points_per_level": 2.59999990463,
+      "variance": 0.15102040768
+     }
+    ]
+   }
+  ],
+  "arcane_missiles": [
+   {
+    "rank": 1,
+    "spell_id": 5143,
+    "base_level": 8,
+    "spell_level": 8,
+    "max_level": 12,
+    "components": [
+     {
+      "spell_id": 7268,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 3,
+      "base_level": 8,
+      "max_level": 12,
+      "base_points": 24.0,
+      "points_per_level": 0.30000001192,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 5144,
+    "base_level": 16,
+    "spell_level": 16,
+    "max_level": 20,
+    "components": [
+     {
+      "spell_id": 7269,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 4,
+      "base_level": 16,
+      "max_level": 20,
+      "base_points": 31.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 5145,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 28,
+    "components": [
+     {
+      "spell_id": 7270,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 24,
+      "max_level": 28,
+      "base_points": 44.0,
+      "points_per_level": 0.5,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8416,
+    "base_level": 32,
+    "spell_level": 32,
+    "max_level": 36,
+    "components": [
+     {
+      "spell_id": 8419,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 32,
+      "max_level": 36,
+      "base_points": 66.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8417,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 44,
+    "components": [
+     {
+      "spell_id": 8418,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 40,
+      "max_level": 44,
+      "base_points": 95.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10211,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 52,
+    "components": [
+     {
+      "spell_id": 10273,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 48,
+      "max_level": 52,
+      "base_points": 130.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 10212,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 10274,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 171.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 25345,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 25346,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 209.0,
+      "points_per_level": 1.0,
+      "variance": 0.0
+     }
+    ]
+   }
+  ],
+  "frost_nova": [
+   {
+    "rank": 1,
+    "spell_id": 122,
+    "base_level": 10,
+    "spell_level": 10,
+    "max_level": 15,
+    "components": [
+     {
+      "spell_id": 122,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 10,
+      "max_level": 15,
+      "base_points": 20.0,
+      "points_per_level": 0.5,
+      "variance": 0.10000000149
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 865,
+    "base_level": 26,
+    "spell_level": 26,
+    "max_level": 31,
+    "components": [
+     {
+      "spell_id": 865,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 26,
+      "max_level": 31,
+      "base_points": 34.0,
+      "points_per_level": 0.5,
+      "variance": 0.11428570747
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 6131,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 45,
+    "components": [
+     {
+      "spell_id": 6131,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 45,
+      "base_points": 53.0,
+      "points_per_level": 0.5,
+      "variance": 0.10909090936
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 10230,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 59,
+    "components": [
+     {
+      "spell_id": 10230,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 59,
+      "base_points": 73.0,
+      "points_per_level": 0.5,
+      "variance": 0.10666666925
+     }
+    ]
+   }
+  ],
+  "cone_of_cold": [
+   {
+    "rank": 1,
+    "spell_id": 120,
+    "base_level": 26,
+    "spell_level": 26,
+    "max_level": 31,
+    "components": [
+     {
+      "spell_id": 120,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 26,
+      "max_level": 31,
+      "base_points": 97.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.09708737582
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 8492,
+    "base_level": 34,
+    "spell_level": 34,
+    "max_level": 39,
+    "components": [
+     {
+      "spell_id": 8492,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 34,
+      "max_level": 39,
+      "base_points": 144.0,
+      "points_per_level": 1.0,
+      "variance": 0.09150326997
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 10159,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 47,
+    "components": [
+     {
+      "spell_id": 10159,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 47,
+      "base_points": 204.0,
+      "points_per_level": 1.20000004768,
+      "variance": 0.09389671683
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 10160,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 55,
+    "components": [
+     {
+      "spell_id": 10160,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 55,
+      "base_points": 267.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.09386281669
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10161,
+    "base_level": 58,
+    "spell_level": 58,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 10161,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 58,
+      "max_level": 60,
+      "base_points": 340.0,
+      "points_per_level": 1.5,
+      "variance": 0.08571428806
+     }
+    ]
+   }
+  ],
+  "arcane_explosion": [
+   {
+    "rank": 1,
+    "spell_id": 1449,
+    "base_level": 14,
+    "spell_level": 14,
+    "max_level": 19,
+    "components": [
+     {
+      "spell_id": 1449,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 14,
+      "max_level": 19,
+      "base_points": 32.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.11764705926
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 8437,
+    "base_level": 22,
+    "spell_level": 22,
+    "max_level": 27,
+    "components": [
+     {
+      "spell_id": 8437,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 22,
+      "max_level": 27,
+      "base_points": 55.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.10000000149
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8438,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 35,
+    "components": [
+     {
+      "spell_id": 8438,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 35,
+      "base_points": 94.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.07920791954
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8439,
+    "base_level": 38,
+    "spell_level": 38,
+    "max_level": 43,
+    "components": [
+     {
+      "spell_id": 8439,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 38,
+      "max_level": 43,
+      "base_points": 135.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.08275862038
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10201,
+    "base_level": 46,
+    "spell_level": 46,
+    "max_level": 51,
+    "components": [
+     {
+      "spell_id": 10201,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 46,
+      "max_level": 51,
+      "base_points": 183.0,
+      "points_per_level": 1.10000002384,
+      "variance": 0.08247422427
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10202,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 59,
+    "components": [
+     {
+      "spell_id": 10202,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 59,
+      "base_points": 242.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.07905138284
+     }
+    ]
+   }
+  ],
+  "blizzard": [
+   {
+    "rank": 1,
+    "spell_id": 10,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 25,
+    "components": [
+     {
+      "spell_id": 1279976,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 20,
+      "max_level": 25,
+      "base_points": 24.0,
+      "points_per_level": 0.10000000149,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 6141,
+    "base_level": 28,
+    "spell_level": 28,
+    "max_level": 33,
+    "components": [
+     {
+      "spell_id": 1279977,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 28,
+      "max_level": 33,
+      "base_points": 42.0,
+      "points_per_level": 0.20000000298,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8427,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 41,
+    "components": [
+     {
+      "spell_id": 1279978,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 36,
+      "max_level": 41,
+      "base_points": 62.0,
+      "points_per_level": 0.20000000298,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 10185,
+    "base_level": 44,
+    "spell_level": 44,
+    "max_level": 49,
+    "components": [
+     {
+      "spell_id": 1279979,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 44,
+      "max_level": 49,
+      "base_points": 87.0,
+      "points_per_level": 0.30000001192,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10186,
+    "base_level": 52,
+    "spell_level": 52,
+    "max_level": 57,
+    "components": [
+     {
+      "spell_id": 1279980,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 52,
+      "max_level": 57,
+      "base_points": 114.0,
+      "points_per_level": 0.30000001192,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10187,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 1279949,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 146.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.0
+     }
+    ]
+   }
+  ],
+  "flamestrike": [
+   {
+    "rank": 1,
+    "spell_id": 2120,
+    "base_level": 16,
+    "spell_level": 16,
+    "max_level": 21,
+    "components": [
+     {
+      "spell_id": 2120,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 16,
+      "max_level": 21,
+      "base_points": 60.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.26666668057
+     },
+     {
+      "spell_id": 1279983,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 16,
+      "max_level": 21,
+      "base_points": 11.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 2121,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 29,
+    "components": [
+     {
+      "spell_id": 2121,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 24,
+      "max_level": 29,
+      "base_points": 109.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.23853211105
+     },
+     {
+      "spell_id": 1279985,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 24,
+      "max_level": 29,
+      "base_points": 21.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8422,
+    "base_level": 32,
+    "spell_level": 32,
+    "max_level": 37,
+    "components": [
+     {
+      "spell_id": 8422,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 32,
+      "max_level": 37,
+      "base_points": 173.0,
+      "points_per_level": 1.0,
+      "variance": 0.21965317428
+     },
+     {
+      "spell_id": 1279987,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 32,
+      "max_level": 37,
+      "base_points": 33.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8423,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 45,
+    "components": [
+     {
+      "spell_id": 8423,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 45,
+      "base_points": 246.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.21138212085
+     },
+     {
+      "spell_id": 1279988,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 40,
+      "max_level": 45,
+      "base_points": 47.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10215,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 53,
+    "components": [
+     {
+      "spell_id": 10215,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 53,
+      "base_points": 325.0,
+      "points_per_level": 1.5,
+      "variance": 0.2092307657
+     },
+     {
+      "spell_id": 1279989,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 48,
+      "max_level": 53,
+      "base_points": 64.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10216,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 10216,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 417.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.2014388442
+     },
+     {
+      "spell_id": 1279990,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 83.0,
+      "points_per_level": 0.0,
+      "variance": 0.0
+     }
+    ]
+   }
+  ],
+  "blast_wave": [
+   {
+    "rank": 1,
+    "spell_id": 11113,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 36,
+    "components": [
+     {
+      "spell_id": 11113,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 36,
+      "base_points": 163.0,
+      "points_per_level": 1.0,
+      "variance": 0.1882352978
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 13018,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 42,
+    "components": [
+     {
+      "spell_id": 13018,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 36,
+      "max_level": 42,
+      "base_points": 212.0,
+      "points_per_level": 1.20000004768,
+      "variance": 0.18099547923
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 13019,
+    "base_level": 44,
+    "spell_level": 44,
+    "max_level": 50,
+    "components": [
+     {
+      "spell_id": 13019,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 44,
+      "max_level": 50,
+      "base_points": 293.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.17161716521
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 13020,
+    "base_level": 52,
+    "spell_level": 52,
+    "max_level": 58,
+    "components": [
+     {
+      "spell_id": 13020,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 52,
+      "max_level": 58,
+      "base_points": 389.0,
+      "points_per_level": 1.60000002384,
+      "variance": 0.17042607069
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 13021,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "components": [
+     {
+      "spell_id": 13021,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 493.0,
+      "points_per_level": 1.89999997616,
+      "variance": 0.16302186251
+     }
+    ]
+   }
+  ]
+ },
+ "notes": [
+  "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
+  "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
+  "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond"
+ ]
+}

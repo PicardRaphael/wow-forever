@@ -119,6 +119,14 @@
         "certitude par entrée dans le champ certainty (journal certain, Questie suppose) : la plus basse est retenue pour le fichier",
         "collecté le 2026-09-27 ; les données communautaires ne remplacent jamais une mesure"
       ]
+    },
+    "spell_scaling.json": {
+      "source": "Client Forever 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools, extraits tests/fixtures/wago/1.60.1.70009) décodées par forever decode le 2026-09-27",
+      "certainty": "certain",
+      "notes": [
+        "points de base, points par niveau et variance par effet de dégâts ; MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
+        "spells.json inchangé (décision 39) : rangs évalués au niveau min(MaxLevel, 60)"
+      ]
     }
   }
 }
