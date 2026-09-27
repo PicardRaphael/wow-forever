@@ -60,7 +60,7 @@ def test_mage_armor_removes_the_attacker_slow_in_the_analytic_model(game_data):
     mage = kill_analytic(game_data, 40, {}, armor="mage")
     frost = kill_analytic(game_data, 40, {}, armor="frost")
     assert mage != frost  # le paramètre est lu
-    assert mage["combat"] == frost["combat"]
+    assert mage["combat"] > frost["combat"]  # coups plus fréquents : plus de recul d'incantation
     assert mage["taken"] > frost["taken"]
     auto = kill_analytic(game_data, 40, {})
     assert auto == mage  # auto : Mage Armor dès son niveau d'apprentissage
