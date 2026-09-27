@@ -1,9 +1,12 @@
 """Fraîcheur : les quatre statuts sans réseau (critère 2), priorités, cache 6 h."""
 
+import json
 from datetime import UTC, datetime, timedelta
 
+import pytest
 from conftest import LOCAL_VERSION, NOW, PREFIX, PRODUCT, FakeHttp
 
+from forever.cli import main
 from forever.freshness import check_freshness, classify, freshness_for_version
 from forever.pipeline.builds import Build
 
@@ -141,6 +144,83 @@ def test_corrupt_cache_is_ignored(make_deps, tmp_path):
     (cache / "status.json").write_text("{pas du json", encoding="utf-8")
     r = check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), cache_dir=cache))
     assert r["freshness"] == "fresh"
+
+
+# --- Cache daté dans le futur : traité comme absent ------------------------------------------------
+
+
+def future_cache(make_deps, cache):
+    """Cache écrit par une horloge en avance d'un jour sur NOW."""
+    check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), now=NOW + timedelta(days=1), cache_dir=cache))
+
+
+def write_cache(cache, fetched_at, version=LOCAL_VERSION):
+    cache.mkdir(parents=True, exist_ok=True)
+    latest = {"version": version, "created_at": "2026-09-24T22:02:03Z"}
+    data = {"schema_version": 1, "product": PRODUCT, "fetched_at": fetched_at, "latest": latest}
+    (cache / "status.json").write_text(json.dumps(data), encoding="utf-8")
+
+
+def test_future_cache_is_ignored_without_network(make_deps, tmp_path):
+    cache = tmp_path / "shared-cache"
+    future_cache(make_deps, cache)
+    r = check(make_deps(cache_dir=cache), allow_network=False)
+    assert r["freshness"] == "unknown"
+    assert r["source"] == "none"
+    assert r["checked_at"] is None and r["age_hours"] is None and r["latest_version"] is None
+    assert any("futur" in a for a in r["assumptions"])
+
+
+def test_future_cache_is_ignored_when_network_fails(make_deps, tmp_path):
+    cache = tmp_path / "shared-cache"
+    future_cache(make_deps, cache)
+    r = check(make_deps(http=FakeHttp.failing(), cache_dir=cache))
+    assert r["freshness"] == "unknown"
+    assert r["source"] == "none"
+    assert any("futur" in a for a in r["assumptions"])
+
+
+def test_future_cache_does_not_skip_network_check(make_deps, tmp_path):
+    cache = tmp_path / "shared-cache"
+    future_cache(make_deps, cache)
+    http = FakeHttp.fixture("builds_stale.json")
+    r = check(make_deps(http=http, cache_dir=cache))
+    assert len(http.calls) == 1
+    assert r["freshness"] == "stale"
+    assert r["source"] == "network"
+    # le cache fautif est remplacé par l'observation du moment
+    assert check(make_deps(cache_dir=cache), allow_network=False)["checked_at"] == "2026-09-27T12:00:00Z"
+
+
+@pytest.mark.parametrize(
+    "fetched_at", ["9999-12-31T23:59:59Z", "9999-12-31T23:59:59-05:00", "0001-01-01T00:00:00+05:00"]
+)
+@pytest.mark.parametrize("network", [False, True], ids=["sans-reseau", "reseau-en-panne"])
+def test_extreme_cache_dates_do_not_crash(make_deps, tmp_path, fetched_at, network):
+    cache = tmp_path / "shared-cache"
+    write_cache(cache, fetched_at)
+    r = check(make_deps(http=FakeHttp.failing(), cache_dir=cache), allow_network=network)
+    assert r["freshness"] == "unknown"
+    assert r["source"] == "none"
+
+
+@pytest.mark.parametrize("version", ["latest", 70009, None])
+def test_cache_with_invalid_version_is_ignored(make_deps, tmp_path, version):
+    cache = tmp_path / "shared-cache"
+    write_cache(cache, "2026-09-27T10:00:00Z", version=version)
+    r = check(make_deps(cache_dir=cache), allow_network=False)
+    assert r["freshness"] == "unknown"
+    assert r["source"] == "none"
+
+
+def test_status_offline_with_future_cache(capsys, make_deps, tmp_path):
+    cache = tmp_path / "shared-cache"
+    future_cache(make_deps, cache)
+    assert main(["status", "--offline", "--json"], make_deps(cache_dir=cache)) == 0
+    data = json.loads(capsys.readouterr().out)
+    assert data["freshness"]["freshness"] == "unknown"
+    assert data["provenance"]["freshness"] == "unknown"
+    assert any("futur" in a for a in data["provenance"]["assumptions"])
 
 
 def test_freshness_for_version_reads_product_from_sources(make_deps):

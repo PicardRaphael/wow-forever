@@ -15,6 +15,7 @@ from forever.pipeline.builds import (
     parse_builds,
     version_key,
 )
+from forever.timefmt import parse_utc
 
 
 def load(name):
@@ -50,6 +51,16 @@ def test_both_date_formats_are_accepted():
     assert builds["1.60.1.70009"] == datetime(2026, 9, 24, 15, 32, 10, tzinfo=UTC)  # +02:00 ramené en UTC
     assert builds["1.60.1.69900"] == datetime(2026, 9, 1, 8, 0, tzinfo=UTC)  # sans fuseau : UTC
     assert all(dt.tzinfo is not None for dt in builds.values())
+
+
+def test_out_of_range_date_is_ignored():
+    payload = {PRODUCT: [{"version": "1.60.1.70009", "created_at": "9999-12-31T23:59:59-05:00"}]}
+    assert parse_builds(payload, PRODUCT, PREFIX) == []
+
+
+def test_parse_utc_out_of_range_is_value_error():
+    with pytest.raises(ValueError):
+        parse_utc("0001-01-01T00:00:00+05:00")
 
 
 def test_version_key_compares_numerically():
