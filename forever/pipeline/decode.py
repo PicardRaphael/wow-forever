@@ -17,7 +17,7 @@ from typing import Any, NamedTuple
 
 from forever.config import Deps
 from forever.errors import CandidateExistsError, CsvMissingError, DataSchemaError, InvalidArgumentError
-from forever.manifest import SOURCES_NAME, version_dirs, write_manifest
+from forever.manifest import SOURCES_NAME, VERSION_DIR_RE, version_dirs, write_manifest
 from forever.pipeline.fetch import DEFAULT_LOCALE, wago_dir
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
@@ -496,6 +496,18 @@ def _observations(talents: Mapping[str, Any], spells: Mapping[str, Any], base: P
     return notes
 
 
+def _is_candidate(path: Path, version: str) -> bool:
+    """Dossier produit par `decode` pour cette version : manifeste, un seul dossier de version, `candidate` dans
+    son `sources.json`. Seul un tel dossier peut être remplacé avec `force`."""
+    if not (path / "manifest.json").is_file() or version_dirs(path) != [version]:
+        return False
+    try:
+        sources = json.loads((path / version / SOURCES_NAME).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return False
+    return isinstance(sources, dict) and sources.get("candidate") is True
+
+
 def decode_version(
     deps: Deps, version: str, *, csv_dir: Path | None = None, out: Path | None = None, force: bool = False
 ) -> Candidate:
@@ -503,6 +515,10 @@ def decode_version(
 
     `csv_dir` : dossier des CSV (défaut : cache de `forever fetch`). Règles et fichiers hérités : version locale la
     plus récente. Refuse d'écraser une candidate existante sans `force`. Aucun accès réseau."""
+    if not VERSION_DIR_RE.fullmatch(version):
+        raise InvalidArgumentError(
+            f"Version mal formée : « {version} ».", "donner une version complète, par exemple 1.60.1.70009"
+        )
     base_version, rules = load_rules(deps.data_dir)
     base = deps.data_dir / base_version
     csv_dir = csv_dir or wago_dir(deps.cache_dir, version)
@@ -515,7 +531,7 @@ def decode_version(
     missing = [rel for _, rel in table_files(rules) if not (csv_dir / rel).is_file()]
     if missing:
         raise CsvMissingError(version, missing)
-    if out.exists() and any(out.iterdir()) and (not force or not (out / "manifest.json").is_file()):
+    if out.exists() and any(out.iterdir()) and (not force or not _is_candidate(out, version)):
         raise CandidateExistsError(str(out))
     tables = load_tables(csv_dir, rules)
     talents = decode_talents(tables, rules, version)

@@ -105,7 +105,7 @@
       "source": "Écarts entre le décodage du client 1.60.1.70009 et talents.json / spells.json, tranchés par l'utilisateur (T03)",
       "certainty": "certain",
       "notes": [
-        "liste vide tant qu'aucun écart n'est tranché ; appliquée aux données par l'installation (T08)"
+        "15 écarts tranchés le 2026-09-27 (tasks/T03-ecarts.md), avec leur nature (client, format, convention) ; appliqués aux données par l'installation (T08)"
       ]
     }
   }

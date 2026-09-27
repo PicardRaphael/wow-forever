@@ -2,7 +2,7 @@
 
 Champs comparés : talents `name`, `tree`, `tier`, `col`, `max`, `prereq`, puis chaque rang (`ranks[i]`, à partir
 de 1) ; sorts, chaque champ de `rank_format` de chaque rang (`ranks[i].mana`), un rang en plus ou en moins
-(`ranks[i]`). Ne sont pas comparés : descriptions, identifiants de sorts, noms français, certitudes, notes."""
+(`ranks[i]`) ; `tooltip_values[i]` quand les deux versions l'ont. Ne sont pas comparés : descriptions, identifiants de sorts, noms français, certitudes, notes."""
 
 from __future__ import annotations
 
@@ -64,11 +64,13 @@ def _talents(doc: Any) -> dict[str, Any]:
     return {t["key"]: t for tree in doc.get("trees", []) for t in tree.get("talents", [])}
 
 
-def _rows(kind: Kind, key: str, old: Sequence[Any], new: Sequence[Any], fields: Sequence[str] | None) -> list[Change]:
+def _rows(
+    kind: Kind, key: str, old: Sequence[Any], new: Sequence[Any], fields: Sequence[str] | None, name: str = "ranks"
+) -> list[Change]:
     """Rangs comparés un à un ; `fields` : noms des colonnes d'un rang de sort (None : rang comparé en bloc)."""
     out: list[Change] = []
     for i in range(max(len(old), len(new))):
-        where = f"ranks[{i + 1}]"
+        where = f"{name}[{i + 1}]"
         if i >= len(new):
             out.append(_change(kind, key, "removed", where, old[i], None))
         elif i >= len(old):
@@ -107,6 +109,8 @@ def compare_data(a: VersionData, b: VersionData) -> list[Change]:
                 if old.get(f) != new.get(f)
             ]
             changes += _rows("talent", key, old.get("ranks", []), new.get("ranks", []), None)
+            if "tooltip_values" in old and "tooltip_values" in new:  # champ du décodage (T03), absent de la référence
+                changes += _rows("talent", key, old["tooltip_values"], new["tooltip_values"], None, "tooltip_values")
 
     sa, sb = _read(a, "spells.json") or {}, _read(b, "spells.json") or {}
     fields = sb.get("rank_format") or sa.get("rank_format") or []

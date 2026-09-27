@@ -1,4 +1,7 @@
-"""Évaluation des variables d'infobulle, avec un résolveur simulé (valeurs inventées, sans lien avec le jeu)."""
+"""Évaluation des variables d'infobulle, avec un résolveur simulé.
+
+Les gabarits imitent ceux du client (identifiants de sorts cités repris des fixtures wago 1.60.1.70009) ; les valeurs
+renvoyées par le résolveur sont choisies pour le test : seule la mécanique de lecture est vérifiée."""
 
 import pytest
 

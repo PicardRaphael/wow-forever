@@ -65,6 +65,7 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
 
 ## T08 — Veille
 - **Fait (repris de T03)** : installation d'une version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report`) ; application de `overrides.json` et de `confirmed_changes.json` ; substitution des coûts en mana relevés dans le client à l'estimation de `mechanics.json` (`mana.talent_rank_cost`) ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
+- **Durcissement du pipeline (relecture T03)** : `$d` entre dans les expressions `${…}` dans son unité d'affichage (minutes dès 60 s), aucune infobulle de talent ne l'exerce aujourd'hui ; un sort cité deux fois par une infobulle d'aura 226 compterait deux fois ses dégâts ; `SpellLevel` n'est pas lu (écart de niveau calculé depuis `BaseLevel`) ; `--locale` ignoré sans `--tables` ; un CSV réduit à son en-tête est accepté ; `verify` suppose `level` en tête de `rank_format`.
 - **Critères de fin** : `build-watch.yml` simulé en test (nouvelle version fictive → PR et note) ; alerte `silent` après 14 jours sans version.
 
 ## T09 à T13

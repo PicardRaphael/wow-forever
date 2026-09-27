@@ -32,6 +32,7 @@ from forever.pipeline.decode import Candidate, decode_version
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
 from forever.pipeline.report import render_report
+from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
 from forever.provenance import Provenance, error_payload, format_provenance_line, local_provenance
 from forever.status import StatusReport, status_report
@@ -400,7 +401,8 @@ def _cmd_decode(deps: Deps, args: argparse.Namespace) -> int:
         out=Path(args.out) if args.out else None,
         force=args.force,
     )
-    provenance = local_provenance(deps, assumptions=[f"version candidate {c.version} non installée : {c.root}"])
+    src, v = load_source(deps, str(c.root))
+    provenance = source_provenance(deps, src, v)
     payload = {
         "version": c.version,
         "root": str(c.root),
@@ -433,12 +435,12 @@ def _cmd_report(deps: Deps, args: argparse.Namespace) -> int:
     if args.out:
         Path(args.out).write_bytes(text.encode("utf-8"))
     lines = [f"Rapport écrit : {args.out}"] if args.out else [text.rstrip("\n")]
-    payload = {"a": d["a"], "b": d["b"], "report": text, "out": args.out, "provenance": d["provenance"]}
+    payload = {"a": d["a"], "b": d["b"], "report": text, "out": args.out, "verify": r, "provenance": d["provenance"]}
     if args.json or args.out:
         _emit(payload, lines, d["provenance"], args.json)
     else:
         print(text.rstrip("\n"))  # la dernière ligne du rapport est déjà la provenance
-    return EXIT_OK
+    return EXIT_OK if r["ok"] else EXIT_INTEGRITY
 
 
 def _use_utf8_output() -> None:
