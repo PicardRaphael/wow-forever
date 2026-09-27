@@ -40,6 +40,7 @@ _DUNGEON = re.compile(
 )
 NPC_LEVEL_QUANTILES = (0.1, 0.9)  # plage des niveaux des PNJ d'une zone : 10e et 90e percentiles (méthode)
 NORMAL_RANK = 0
+PLAYER_LEVEL = -1  # format de Questie : `questLevel` -1 = quête au niveau du joueur
 BATTLEGROUNDS = "Battlegrounds"  # catégorie de Questie (continentLookup) des champs de bataille
 
 
@@ -431,7 +432,9 @@ class ZoneAdvice(TypedDict):
 
 
 def quest_available(quest: QuestieQuest, level: int, faction: str | None, player_class: str) -> bool:
-    """Quête prenable : race de la faction (toutes si `faction` est None), classe, niveau requis atteint."""
+    """Quête prenable : race de la faction (toutes si `faction` est None), classe, niveau requis atteint.
+
+    Registre : I7"""
     return _eligible(quest, faction, player_class) and quest.required_level <= level
 
 
@@ -479,8 +482,9 @@ def zones_for_level(
         available = [q for q in quests if quest_available(q, level, faction, player_class)]
         colors = {c: 0 for c in ("gray", "green", "yellow", "orange", "red")}
         for q in available:
-            colors[quest_color(gd, level, q.quest_level)] += 1
-        levels = [q.quest_level for q in quests]
+            quest_level = level if q.quest_level == PLAYER_LEVEL else q.quest_level  # quête au niveau du joueur
+            colors[quest_color(gd, level, quest_level)] += 1
+        levels = [q.quest_level for q in quests if q.quest_level != PLAYER_LEVEL] or [level]
         npcs = npc_levels.get(area)
         is_dungeon = area in dungeons
         entry: ZoneEntry = {

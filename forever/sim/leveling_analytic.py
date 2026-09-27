@@ -21,7 +21,7 @@ from forever.engine.buffs import arcane_blast_bonus
 from forever.engine.cast import expected_cast
 from forever.engine.casting import melee_cast_time, pushback_rate, spell_cooldown
 from forever.engine.character import character
-from forever.engine.mana import arcane_blast_cost, downtime, in_combat_regen_fraction
+from forever.engine.mana import arcane_blast_cost, clearcast_cost_factor, downtime, in_combat_regen_fraction
 from forever.engine.model import Character, CharacterOverrides, GameData, Points
 from forever.engine.monsters import mob_expected_hit, mob_hp, mob_land_chance, mob_swing_damage, mob_xp
 from forever.engine.movement import (
@@ -77,7 +77,7 @@ def arcane_cycle(
     buffs = arcane_blast_bonus(gd, pts, n, for_spell=dump)
     de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=buffs, spell_level=spell_level)
     assert ab is not None and de is not None  # vérifiés par arcane_plan
-    free = 1 - ab["hit"] * talent_value(gd, pts, "arcaneConcentration") / PERCENT
+    free = clearcast_cost_factor(gd, pts, ab["hit"])
     ab_mana = sum(arcane_blast_cost(gd, ab["rank"], pts, ch, i) for i in range(n)) * free
     return {
         "ab_casts": n,

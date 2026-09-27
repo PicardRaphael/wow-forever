@@ -203,7 +203,7 @@ mechanics:
     description: "Ignite : cumul, rafraîchissement"
     forever: oui
     statut: teste
-    certitude: probable
+    certitude: suppose
     sources:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
@@ -412,7 +412,7 @@ mechanics:
     description: "Coûts en % du mana de base, escalade d'Arcane Blast"
     forever: modifie
     statut: teste
-    certitude: certain
+    certitude: probable
     sources:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
@@ -485,7 +485,7 @@ mechanics:
       - tests/unit/test_engine_arcane_blast.py::test_clearcasting_makes_the_cast_free_and_keeps_the_stack
     tolerance: null
     formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée ; expire sans nouvel Arcane Blast ; tout autre sort de dégâts profite de +x % par cumul et la consomme"
-    note: "T04c : forever/engine/buffs.py (seule aura modélisée) ; Missile Barrage et autres buffs : absents"
+    note: "T04c : forever/engine/buffs.py (seule aura modélisée), valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11) ; Missile Barrage et autres buffs : absents"
   - id: B16
     categorie: temps
     description: "Temps d'incantation réduits par talents"
@@ -583,8 +583,8 @@ mechanics:
       - tests/unit/test_engine_leveling.py::test_slow_freeze_and_range
       - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
     tolerance: null
-    formule: "vitesse du monstre = vitesse de course × (1 − ralenti) ; ralenti de Frostbolt = ralenti du sort + Permafrost, durée = durée du rang × (1 + Permafrost) ; gel de Frostbite (chance du talent) et de Frost Nova ; coups ralentis par Frost Armor"
-    note: "T04b : porté du seed (forever/engine/movement.py) ; vitesse de course, portée de mêlée et cadence des coups du modèle de monstre du seed (EST) ; Frost Nova rompue par les dégâts avec la chance nova_break"
+    formule: "vitesse du monstre = vitesse de course × (1 − ralenti) ; ralenti de Frostbolt = ralenti du sort + Permafrost, durée = durée du rang × (1 + Permafrost) ; gel de Frostbite (chance du talent) et de Frost Nova ; coups ralentis par Frost Armor ou Ice Armor portée (rules forever ; toujours en rules seed)"
+    note: "T04b : porté du seed (forever/engine/movement.py) ; vitesse de course, portée de mêlée et cadence des coups du modèle de monstre du seed (EST) ; Frost Nova rompue par les dégâts avec la chance nova_break ; T04c : plus de ralenti des coups sous Mage Armor (worn_armor, I6) ; Ice Armor reprend la durée et le ralenti de Frost Armor (spells.json.utility.frost_armor) alors que son sort de ralenti est 7321 (6136 pour Frost Armor) : suppose, voir OPEN_QUESTIONS"
   - id: C6
     categorie: physique
     description: "Temps en mouvement, sorts utilisables en mouvement"
@@ -1105,7 +1105,7 @@ mechanics:
       - tests/unit/test_engine_arcane_blast.py::test_invalid_arcane_rotations_are_refused
     tolerance: null
     formule: "rotation arcane (T04c) : Arcane Blast jusqu'à ab_stacks cumuls, puis la décharge ab_dump ; rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
-    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo −7,9 % à L24 et −1,5 % à L30"
+    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test)"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"
@@ -1155,6 +1155,7 @@ mechanics:
       - "forever/data/1.60.1.70009/mechanics.json (clés leveling.*)"
       - "forever/data/1.60.1.70009/spells.json (utility.conjure_water, conjure_food)"
       - "forever/data/1.60.1.70009/leveling.json (mob_model)"
+      - "forever/data/1.60.1.70009/spell_scaling.json (utility : armures du client, niveaux d'apprentissage)"
     tests:
       - tests/unit/test_engine_leveling.py::test_monster_formulas_match_the_seed
       - tests/unit/test_engine_leveling.py::test_downtime_is_the_longer_of_drinking_and_eating
@@ -1178,7 +1179,8 @@ mechanics:
     certitude: suppose
     sources:
       - "forever/data/1.60.1.70009/mechanics.json (leveling.quest_band)"
-      - "Questie 11.38.0 local : Database/Classic/classicQuestDB.lua, Database/Zones/data/dungeons.lua, Localization/lookups/lookupZones.lua, Modules/Libs/QuestieLib.lua (seuils de couleur)"
+      - "Questie 11.38.0 local : Database/Classic/classicQuestDB.lua, Database/Zones/data/dungeons.lua, Localization/lookups/lookupZones.lua, Modules/Libs/QuestieLib.lua (seuils de couleur : QuestieLib:GetDifficultyColorPercent)"
+      - "niveau gris : formule communautaire de Classic (MaNGOS, Formulas.h, MaNGOS::XP::GetGrayLevel ; citée de mémoire, non relue dans le dépôt : suppose)"
       - "tests/fixtures/questie/README.md"
     tests:
       - tests/unit/test_questie_zones.py::test_quest_band_comes_from_the_data

@@ -59,7 +59,15 @@ from forever.pipeline.measure import (
 )
 from forever.pipeline.monsters import MONSTERS_FILE, build_monsters, write_monsters
 from forever.pipeline.questie import read_questie
-from forever.pipeline.refresh import RefreshSources, apply_refresh, collect_sources, compare, read_snapshot, remeasure
+from forever.pipeline.refresh import (
+    RefreshSources,
+    apply_refresh,
+    collect_sources,
+    compare,
+    read_snapshot,
+    remeasure,
+    snapshot_exists,
+)
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
@@ -906,6 +914,7 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
     notes = [f"niveau {o['level']} omis : {o['reason']}" for o in res["omitted"]]
     notes += [
         f"mob_source {args.mob_source}, spell_level {args.spell_level}, n = {args.n} par niveau, graine {args.seed}",
+        f"rules {args.rules}, armor {args.armor}",
         "constantes leveling.* du seed sim_leveling.py (EST, suppose) ; XP de monstre : règle Classic (T04c)",
     ]
     provenance = local_provenance(deps, certainty=min_certainty([*certainties, "suppose"]), assumptions=notes)
@@ -957,6 +966,7 @@ def _refresh_lines(sources: RefreshSources, diff: Mapping[str, Any], status: str
             f"PNJ : {len(npcs['added'])} ajoutés, {len(npcs['changed'])} changés, {len(npcs['kept'])} conservés "
             "(journal disparu)"
         ),
+        f"PNJ retirés : {', '.join(npcs['removed']) or 'aucun'}",
         f"PV par niveau : {len(diff['hp_by_level'])} niveau(x) changé(s)",
     ]
     for level, change in sorted(diff["hp_by_level"].items(), key=lambda kv: int(kv[0])):
@@ -1018,14 +1028,17 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     new = remeasure(
         gd, sources, questie, version=data.game_version, installed=installed, fit_exclude=fit_exclude, utc_offset=offset
     )
-    diff = compare(installed, registry.load(deps.registry_path), read_snapshot(deps.cache_dir), new)
+    previous = read_snapshot(deps.cache_dir)
+    if previous is None and snapshot_exists(deps.cache_dir):
+        new["notes"].append("instantané illisible (<cache>/measures/last.json) : traité comme un premier instantané")
+    diff = compare(installed, registry.load(deps.registry_path), previous, new)
     written: list[Path] = []
     if not diff["changed"]:
         status = "rien à écrire"
     elif args.dry_run:
         status = "simulation"
     elif args.yes or (deps.confirm is not None and deps.confirm("Écrire ces changements ? [o/N] ")):
-        written = apply_refresh(new, deps.data_dir, deps.cache_dir)
+        written = apply_refresh(new, deps.data_dir, deps.cache_dir, date=format_utc(deps.now())[:10])
         status = "écrit"
     else:
         status = "refusé"

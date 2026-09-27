@@ -123,8 +123,12 @@ def assumptions(options: Mapping[str, Any], hp: MonsterHp, talents: Mapping[str,
         + ("dégâts des rangs au niveau du personnage" if options["spell_level"] == "character" else "dégâts des rangs"),
         f"rules {options['rules']} : "
         + ("corrections de Forever (T04c)" if options["rules"] == "forever" else "comportement du seed à l'identique"),
-        f"armor {options['armor']} : armure portée selon le niveau d'apprentissage lu dans le client"
-        + (" (auto)" if options["armor"] == "auto" else " (forcée)"),
+        (
+            "armure du seed : Frost Armor à tout niveau, Mage Armor pour la régénération dès son premier rang (seed)"
+            if options["rules"] == "seed"
+            else f"armor {options['armor']} : armure portée selon le niveau d'apprentissage lu dans le client"
+            + (" (auto)" if options["armor"] == "auto" else " (forcée)")
+        ),
         f"talents : {spec}",
         f"Monte Carlo : n = {n}, graine {seed} ; analytique : espérance fermée (seed)",
         "constantes leveling.* du seed sim_leveling.py (EST, suppose) ; XP de monstre : règle Classic (T04c)",

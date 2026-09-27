@@ -15,7 +15,7 @@ from mcp.types import CallToolResult, TextContent
 
 from forever import __version__
 from forever.config import Deps
-from forever.errors import ForeverError, UnsupportedKindError
+from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.leveling import LevelingReport, simulate_leveling
 from forever.lookup import lookup_spell, lookup_zones
@@ -75,6 +75,8 @@ def build_server(deps: Deps) -> MCPServer:
                 return dict(lookup_zones(deps, level, faction=faction, questie_dir=path))
             if kind != "spell":
                 raise UnsupportedKindError(f"type « {kind} »", ["spell", "zones"])
+            if not name:
+                raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")
             return dict(lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset))
         except ForeverError as err:
             # Le SDK transmet tel quel un CallToolResult renvoyé par l'outil (vérifié avec mcp 2.2).

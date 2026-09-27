@@ -84,7 +84,9 @@ def test_rest_and_regen_match_the_seed(game_data, seed_sim):
 
 def test_mage_armor_regen_from_its_first_rank(game_data):
     assert in_combat_regen_fraction(game_data, {}, 33) == 0.0
-    assert in_combat_regen_fraction(game_data, {}, 34) == 0.5  # utility.mage_armor : rang 1 au niveau 34, 50 %
+    assert (
+        in_combat_regen_fraction(game_data, {}, 34) == 0.5
+    )  # Mage Armor du client : rang 1 au niveau 34, aura 134 à 50 %
 
 
 def test_forever_regen_adds_arcane_meditation_and_worn_mage_armor(game_data):

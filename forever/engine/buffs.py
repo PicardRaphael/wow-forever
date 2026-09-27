@@ -58,7 +58,7 @@ def arcane_blast_bonus(gd: GameData, pts: Points, stacks: int, *, for_spell: str
 def arcane_blast_after_spell(
     gd: GameData, pts: Points, aura: ArcaneBlastAura | None, now: float, key: str
 ) -> ArcaneBlastAura | None:
-    """Aura après un sort de dégâts `key` lancé à `now`.
+    """Aura après un sort de dégâts `key` lancé à `now` : Arcane Blast cumule, tout autre sort de dégâts la consomme.
 
     Registre : B15"""
-    raise NotImplementedError
+    return arcane_blast_after_cast(gd, pts, aura, now) if key == SPELL else None

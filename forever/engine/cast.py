@@ -6,7 +6,7 @@ from forever.engine.casting import cast_time
 from forever.engine.crit import crit_chance, crit_mult
 from forever.engine.damage import dmg_mult, spell_power
 from forever.engine.hit import hit_chance
-from forever.engine.mana import mana_cost
+from forever.engine.mana import clearcast_cost_factor, mana_cost
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, CastEstimate, Character, GameData, Points
 from forever.engine.spells import best_rank, coefficient, rank_damage
 from forever.engine.talents import talent_value
@@ -64,7 +64,7 @@ def expected_cast(
     base_mana_cost = r.mana if r.mana else mana
     if school in SCHOOL_FIRE or school in SCHOOL_FROST:
         mana -= hit * crit * talent_value(gd, pts, "masterOfElements") / PERCENT * base_mana_cost
-    mana *= 1 - hit * talent_value(gd, pts, "arcaneConcentration") / PERCENT
+    mana *= clearcast_cost_factor(gd, pts, hit)
     return {
         "key": key,
         "rank": r,

@@ -11,7 +11,7 @@ Meditation et de Mage Armor, Ignite roulant (posé à l'impact du critique, rest
 correction ne consomme de tirage.
 
 Aucune formule de combat ici : chaque règle vient de `forever/engine/` ; ce module n'orchestre que le temps, les
-événements et les tirages. Registre : I1 (rotation frost/fire), I6 (leveling), J2 (graine)."""
+événements et les tirages. Registre : I1 (rotations frost, fire, arcane), I6 (leveling), J2 (graine)."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from forever.engine.armor import ARMOR_CHOICES, worn_armor
 from forever.engine.buffs import (
     ArcaneBlastAura,
     arcane_blast_active,
-    arcane_blast_after_cast,
+    arcane_blast_after_spell,
     arcane_blast_bonus,
     arcane_blast_max_stacks,
 )
@@ -161,7 +161,9 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
 
 def arcane_plan(gd: GameData, level: int, pts: Points, ab_stacks: int | None, ab_dump: str | None) -> tuple[int, str]:
     """(cumuls d'Arcane Blast avant la décharge, sort de décharge) de la rotation arcane ; ValueError si Arcane Blast
-    ou la décharge n'est pas appris, ou si `ab_stacks` sort de 0 au maximum du talent (défaut : maximum)."""
+    ou la décharge n'est pas appris, ou si `ab_stacks` sort de 0 au maximum du talent (défaut : maximum).
+
+    Registre : I1"""
     first = gd.spells["arcane_blast"].ranks[0].level  # rang 1 du talent : niveau du sort (spells.json)
     if best_rank(gd, "arcane_blast", level, pts) is None or level < first:
         raise ValueError(
@@ -272,7 +274,7 @@ def kill_mc(
         if log is not None:
             log.append(CastLog(s["t"], key, stacks, paid))
         if arcane:  # Arcane Blast cumule ; tout autre sort de dégâts consomme l'aura
-            aura[0] = arcane_blast_after_cast(gd, pts, aura[0], s["t"]) if key == "arcane_blast" else None
+            aura[0] = arcane_blast_after_spell(gd, pts, aura[0], s["t"], key)
         landed = rng.random() < e["hit"]
         dmg = 0.0
         travel = travel_time(gd, key, s["dist"] if key != "frost_nova" else 0.0)
@@ -329,6 +331,8 @@ def kill_mc(
                 on_impact(im[1], im[2], im[3], im[0])
             for ig in sorted(x for x in ignites if x[0] <= nt):
                 ignites.remove(ig)
+                due, ig_state[0] = ignite_ticks_due(ig_state[0], ig[0])  # un tic à l'instant du critique passe avant
+                hp[0] -= due
                 ig_state[0] = roll_ignite(gd, ig_state[0], ig[0], ig[1])
             for d in [x for x in dots if x[0] <= nt]:
                 dots.remove(d)
@@ -407,8 +411,8 @@ def kill_mc(
         end = s["t"] + cast_time(gd, key, r_key, pts, ch)
         while True:
             p = advance(end, True, fire_school=(key == "fireball"))
-            if hp[0] <= 0 or p <= 0:
-                break
+            if hp[0] <= 0 or p <= 0 or (arcane and gd.spells[key].channel):
+                break  # canalisation (décharge Arcane Missiles) : jamais prolongée par le recul (T04c)
             end = s["t"] + p
         if hp[0] <= 0:
             break

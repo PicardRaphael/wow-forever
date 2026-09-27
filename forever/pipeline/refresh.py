@@ -22,7 +22,7 @@ from forever.config import CHAIN_MAX_GAP_S
 from forever.engine.damage import predict_ignite_ticks
 from forever.engine.model import GameData
 from forever.errors import ForeverError, InvalidArgumentError
-from forever.manifest import write_manifest
+from forever.manifest import SOURCES_NAME, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.combatlog import log_files, read_log
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
@@ -52,6 +52,7 @@ MEASURE_KEYS = ("sources", "b1", "a3", "costs", "cast_times", "crits", "ignite")
 OTHER_MEASURES = ("costs", "cast_times", "crits")
 B1_ID = "B1"
 DECILES = 10  # statistics.quantiles : 10e percentile = premier décile (méthode de la preuve B1)
+SOURCE_FIELD = re.compile(r'"source":\s*("(?:[^"\\]|\\.)*")')
 SOURCE_RE = re.compile(r"^journal (?P<logs>.+) \(bloc avancé, (?P<guids>\d+) individu")
 NO_IGNITE = "aucune mesure : pas de critique de feu suivi de tics d'Ignite dans les journaux"
 IGNITE_NOTE = "écarts entre tics relevés et prédits (règle des données : rolling ; variante : keep_timer)"
@@ -72,8 +73,13 @@ def collect_sources(logs_dir: Path, sv_dir: Path | None = None) -> RefreshSource
         raise InvalidArgumentError(
             f"Dossier des journaux introuvable : {logs_dir}.", "donner --logs ou définir FOREVER_WOW_DIR"
         )
+    logs = tuple(log_files(logs_dir))
+    if not logs:
+        raise InvalidArgumentError(
+            f"Aucun journal WoWCombatLog-*.txt dans {logs_dir}.", "vérifier --logs (dossier Logs du client)"
+        )
     found = tuple(sv_dir / name for name in SV_NAMES if (sv_dir / name).is_file()) if sv_dir else ()
-    return RefreshSources(tuple(log_files(logs_dir)), found)
+    return RefreshSources(logs, found)
 
 
 def _sha(path: Path) -> str:
@@ -226,13 +232,14 @@ def remeasure(
             events, mine, ignite_spell=gd.leveling.ignite_aura_id, window_s=gd.leveling.ignite_duration_s
         )
     measured = {(o["npc_id"], o["level"]) for o in observations}
-    kept_obs, kept, gone_used = _kept_observations(installed or {}, set(names), measured)
+    kept_obs, kept, _ = _kept_observations(installed or {}, set(names), measured)
+    gone = sorted(set((installed or {}).get("logs", [])) - set(names))
     table = build_monsters(
         [*observations, *kept_obs],
         questie,
         version,
         conflicts=conflicts,
-        logs=[*names, *gone_used],
+        logs=[*names, *gone],  # un journal disparu reste listé (jamais de suppression)
         fit_exclude=fit_exclude,
     )
     snapshot = {
@@ -244,7 +251,7 @@ def remeasure(
         },
         "monsters": table,
         "kept_npcs": kept,
-        "gone_logs": sorted(set((installed or {}).get("logs", [])) - set(names)),
+        "gone_logs": gone,
         "b1": _b1(gd, intervals),
         "a3": [{"school": s, "level_diff": d, **c} for (s, d), c in sorted(tally.items())],
         "costs": {str(k): sorted(v) for k, v in sorted(costs.items())},
@@ -350,6 +357,7 @@ def compare(
             "added": sorted((n for n in npcs if n not in old_npcs), key=int),
             "changed": sorted((n for n, e in npcs.items() if n in old_npcs and _hp(e) != _hp(old_npcs[n])), key=int),
             "kept": new.get("kept_npcs", []),
+            "removed": sorted((n for n in old_npcs if n not in npcs), key=int),
         },
         "hp_by_level": changed_levels,
         "questie_correction": {
@@ -367,6 +375,10 @@ def compare(
     }
 
 
+def snapshot_exists(cache_dir: Path) -> bool:
+    return (cache_dir / SNAPSHOT_DIR / SNAPSHOT_NAME).is_file()
+
+
 def read_snapshot(cache_dir: Path) -> MeasureSnapshot | None:
     """Dernier instantané (None s'il n'existe pas ou est illisible)."""
     try:
@@ -376,14 +388,39 @@ def read_snapshot(cache_dir: Path) -> MeasureSnapshot | None:
     return doc if isinstance(doc, dict) else None
 
 
-def apply_refresh(new: MeasureSnapshot, data_dir: Path, cache_dir: Path) -> list[Path]:
-    """Écrit `monsters.json` de la version installée, le manifeste et l'instantané (sans la table des monstres) ;
-    rend les chemins écrits. Octets LF (chemins -text : empreintes du manifeste)."""
-    monsters = data_dir / new["game_version"] / MONSTERS_FILE
+def monsters_source(table: Mapping[str, Any], date: str) -> str:
+    """Texte `source` de `monsters.json` dans `sources.json` après un rafraîchissement écrit."""
+    excluded = [str(e["npc_id"]) for e in (table.get("questie_correction") or {}).get("excluded", [])]
+    questie = table.get("questie_source") or "sans Questie"
+    return (
+        f"Journaux de combat du client ({', '.join(table.get('logs', []))}, PV max du bloc avancé) ; valeurs en "
+        f"regard et agrégat des niveaux non observés : {questie} ; table écrite par forever measures refresh le {date}"
+        + (f" (--fit-exclude {', '.join(excluded)})" if excluded else "")
+    )
+
+
+def _update_sources(path: Path, source: str) -> None:
+    """Remplace le texte `source` de l'entrée `monsters.json` de `sources.json`, sans réécrire le reste du fichier."""
+    text = path.read_bytes().decode("utf-8")
+    entry = text.index(f'"{MONSTERS_FILE}": {{')
+    match = SOURCE_FIELD.search(text, entry)
+    if match is None:
+        raise ValueError(f"{path} : entrée {MONSTERS_FILE} sans champ source")
+    new = json.dumps(source, ensure_ascii=False)
+    path.write_bytes((text[: match.start(1)] + new + text[match.end(1) :]).encode("utf-8"))
+
+
+def apply_refresh(new: MeasureSnapshot, data_dir: Path, cache_dir: Path, *, date: str) -> list[Path]:
+    """Écrit `monsters.json` de la version installée, sa source dans `sources.json`, le manifeste et l'instantané
+    (sans la table des monstres) ; rend les chemins écrits. Octets LF (chemins -text : empreintes du manifeste)."""
+    version_dir = data_dir / new["game_version"]
+    monsters = version_dir / MONSTERS_FILE
     monsters.write_bytes((json.dumps(new["monsters"], ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
+    sources = version_dir / SOURCES_NAME
+    _update_sources(sources, monsters_source(new["monsters"], date))
     manifest = write_manifest(data_dir)
     snapshot = cache_dir / SNAPSHOT_DIR / SNAPSHOT_NAME
     snapshot.parent.mkdir(parents=True, exist_ok=True)
     rest = {k: v for k, v in new.items() if k != "monsters"}
     snapshot.write_bytes((json.dumps(rest, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
-    return [monsters, manifest, snapshot]
+    return [monsters, sources, manifest, snapshot]

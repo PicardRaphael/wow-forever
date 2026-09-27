@@ -90,7 +90,8 @@ def arcane_blast_cost(gd: GameData, rank: Rank, pts: Points, ch: Character, stac
 
 
 def clearcast_cost_factor(gd: GameData, pts: Points, hit: float) -> float:
-    """Part du coût payée en espérance sous Clearcasting.
+    """Part du coût payée en espérance sous Clearcasting : 1 − toucher × chance d'Arcane Concentration (le lancer qui
+    touche peut rendre le suivant gratuit).
 
     Registre : B12"""
-    raise NotImplementedError
+    return 1 - hit * talent_value(gd, pts, "arcaneConcentration") / PERCENT

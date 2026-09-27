@@ -100,7 +100,7 @@ def armor_reduction(gd: GameData, armor: float, attacker_level: int) -> float:
 
 
 def mob_xp(gd: GameData, level: int) -> float:
-    """XP d'un monstre normal de même niveau (`leveling.mob_xp`, règle Classic ; XP de Forever en T04c).
+    """XP d'un monstre normal de même niveau (`leveling.mob_xp`, règle Classic ; XP de Forever en T04d).
 
     Registre : I6"""
     return gd.leveling.xp_base + gd.leveling.xp_per_level * level

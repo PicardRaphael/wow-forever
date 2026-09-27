@@ -43,10 +43,10 @@ def dot_tick_times(gd: GameData, duration_s: float) -> list[float]:
 
 
 def ignite_tick_times(gd: GameData) -> list[float]:
-    """Instants des tics d'Ignite après le critique, sans cumul ni rafraîchissement (`rules="seed"` : durée / période
-    de `leveling.ignite`, 2 tics de 2 s comme le seed).
+    """Instants des tics d'Ignite après le critique, sans cumul ni rafraîchissement (`rules="seed"` : un tic par
+    période de `leveling.ignite` pendant sa durée, comme le seed).
 
-        Registre : A18"""
+    Registre : A18"""
     lv = gd.leveling
     return [lv.ignite_tick_s * i for i in range(1, lv.ignite_ticks + 1)]
 
