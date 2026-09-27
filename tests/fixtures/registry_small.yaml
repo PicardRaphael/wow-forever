@@ -1,0 +1,26 @@
+version: 1
+mechanics:
+  - id: X1
+    categorie: test
+    description: "Entrée testée"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: []
+  - id: X2
+    categorie: test
+    description: "Entrée modélisée"
+    forever: oui
+    statut: modelise
+    certitude: probable
+    sources: []
+    tests: []
+  - id: X3
+    categorie: test
+    description: "Entrée absente"
+    forever: inconnu
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
