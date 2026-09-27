@@ -1,3 +1,5 @@
+# Texte normalisé en LF dans l'index, quel que soit l'OS (T04c).
+* text=auto eol=lf
 # Octets stables sur tous les OS : les empreintes du manifeste ne dépendent pas des fins de ligne.
 forever/data/** -text
 seed/forever-mage/data/** -text
