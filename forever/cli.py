@@ -1,4 +1,4 @@
-"""Interface en ligne de commande : `forever status | lookup | manifest | mcp`.
+"""Interface en ligne de commande : `forever status | lookup | explain-mechanic | manifest | mcp`.
 
 Sortie texte en français par défaut (dernière ligne : provenance), `--json` pour une sortie structurée.
 Codes de sortie : 0 succès, 2 usage, 3 intégrité des données, 4 introuvable."""
@@ -14,6 +14,7 @@ from typing import Any, NoReturn
 
 from forever.config import Deps, default_deps
 from forever.errors import EXIT_INTEGRITY, EXIT_OK, ForeverError, UnsupportedKindError, UsageError
+from forever.explain import MechanicExplanation, explain_mechanic
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, write_manifest
 from forever.provenance import Provenance, error_payload, format_provenance_line, local_provenance
@@ -21,6 +22,7 @@ from forever.status import StatusReport, status_report
 from forever.store import ensure_integrity
 
 SCHOOLS_FR = {"frost": "givre", "fire": "feu", "arcane": "arcane", "frostfire": "givrefeu"}
+FOREVER_FR = {"oui": "identique", "modifie": "modifié", "inconnu": "inconnu"}
 
 
 class _Parser(argparse.ArgumentParser):
@@ -52,6 +54,10 @@ def build_parser() -> argparse.ArgumentParser:
     mode.add_argument("--update", action="store_true", help="recalculer et écrire forever/data/manifest.json")
     mode.add_argument("--check", action="store_true", help="vérifier les empreintes")
     manifest.add_argument("--json", action="store_true", help="sortie JSON")
+
+    explain = sub.add_parser("explain-mechanic", help="expliquer une mécanique du registre")
+    explain.add_argument("mechanic_id", help="identifiant du registre (ex. A5, casse ignorée)")
+    explain.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     return parser
@@ -127,6 +133,31 @@ def render_status(rep: StatusReport) -> list[str]:
     return lines
 
 
+def render_explanation(res: MechanicExplanation) -> list[str]:
+    lines = [
+        f"{res['id']} — {res['description']}",
+        f"Statut {res['status']} · certitude {res['certainty']} · Forever : {FOREVER_FR.get(res['forever'], res['forever'])}",
+        f"Formule : {res['formula']}" if res["formula"] else "Formule : aucune (mécanique non modélisée)",
+    ]
+    if res["note"]:
+        lines.append(f"Note : {res['note']}")
+    if res["parameters"]:
+        lines.append(f"Paramètres (version {res['provenance']['game_version']}) :")
+        lines += [
+            f"  {p['key']} = {json.dumps(p['value'], ensure_ascii=False)} ({p['certainty']}) — {p['source']}"
+            for p in res["parameters"]
+        ]
+    else:
+        lines.append("Paramètres : aucun")
+    for label, values in (
+        ("Implémentation", res["implementations"]),
+        ("Sources", res["sources"]),
+        ("Tests", res["tests"]),
+    ):
+        lines.append(f"{label} : {', '.join(values) if values else 'aucun'}")
+    return lines
+
+
 def _emit(payload: Mapping[str, Any], lines: list[str], provenance: Provenance, as_json: bool) -> None:
     if as_json:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -161,6 +192,12 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         raise UnsupportedKindError(f"type « {args.kind} »", ["spell"])
     res = lookup_spell(deps, args.name, args.rank, detail=args.detail, limit=args.limit, offset=args.offset)
     _emit(res, render_lookup(res), res["provenance"], args.json)
+    return EXIT_OK
+
+
+def _cmd_explain(deps: Deps, args: argparse.Namespace) -> int:
+    res = explain_mechanic(deps, args.mechanic_id)
+    _emit(res, render_explanation(res), res["provenance"], args.json)
     return EXIT_OK
 
 
@@ -209,7 +246,12 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         build_server(deps).run()
         return EXIT_OK
     _use_utf8_output()
-    handlers = {"status": _cmd_status, "lookup": _cmd_lookup, "manifest": _cmd_manifest}
+    handlers = {
+        "status": _cmd_status,
+        "lookup": _cmd_lookup,
+        "explain-mechanic": _cmd_explain,
+        "manifest": _cmd_manifest,
+    }
     try:
         return handlers[args.command](deps, args)
     except ForeverError as err:
