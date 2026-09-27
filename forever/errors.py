@@ -8,6 +8,7 @@ EXIT_OK = 0
 EXIT_USAGE = 2
 EXIT_INTEGRITY = 3
 EXIT_NOT_FOUND = 4
+EXIT_NETWORK = 5
 
 
 class ErrorInfo(TypedDict):
@@ -124,5 +125,35 @@ class UnsupportedKindError(ForeverError):
             "unsupported_kind",
             f"Consultation non prise en charge : {what}.",
             "consulter un sort de dégâts parmi les suggestions",
+            suggestions=available,
+        )
+
+
+class OfflineError(ForeverError):
+    exit_code = EXIT_NETWORK
+
+    def __init__(self, what: str = "cette commande") -> None:
+        super().__init__(
+            "offline",
+            f"Mode hors ligne : {what} a besoin du réseau.",
+            "retirer --offline ou FOREVER_OFFLINE, ou travailler sur le cache local",
+        )
+
+
+class FetchFailedError(ForeverError):
+    exit_code = EXIT_NETWORK
+
+    def __init__(self, message: str) -> None:
+        super().__init__("fetch_failed", message, "réessayer plus tard ou vérifier la table sur https://wago.tools/db2")
+
+
+class UnknownVersionError(ForeverError):
+    exit_code = EXIT_NOT_FOUND
+
+    def __init__(self, version: str, available: list[str]) -> None:
+        super().__init__(
+            "unknown_version",
+            f"Version de données inconnue : « {version} ».",
+            "donner une version du dépôt ou le chemin d'une version candidate",
             suggestions=available,
         )

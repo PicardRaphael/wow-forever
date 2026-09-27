@@ -25,6 +25,7 @@ REGISTRY_PATH = REPO_ROOT / "docs" / "MECHANICS_REGISTRY.yaml"
 CACHE_TTL = timedelta(hours=6)
 SILENT_AFTER = timedelta(days=14)
 HTTP_TIMEOUT = 2.0
+FETCH_TIMEOUT = 30.0  # téléchargement d'une table CSV (plusieurs Mo)
 USER_AGENT = f"forever-core/{__version__}"
 
 

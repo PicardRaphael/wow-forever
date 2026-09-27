@@ -5,11 +5,11 @@ import json
 
 import pytest
 from conftest import FIXTURES, LOCAL_VERSION, FakeHttp
-from forever.pipeline.fetch import fetch_tables, index_path, table_path, table_url
 
 from forever.cli import main
 from forever.config import FETCH_TIMEOUT
 from forever.errors import EXIT_NETWORK, FetchFailedError, InvalidArgumentError, OfflineError
+from forever.pipeline.fetch import fetch_tables, index_path, table_path, table_url
 
 FETCH = FIXTURES / "wago" / "fetch"
 SPELLNAME = (FETCH / "SpellName_min.csv").read_bytes()

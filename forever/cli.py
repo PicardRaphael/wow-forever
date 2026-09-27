@@ -1,7 +1,7 @@
-"""Interface en ligne de commande : `forever status | lookup | explain-mechanic | manifest | mcp`.
+"""Interface en ligne de commande : `forever status | lookup | explain-mechanic | manifest | builds | fetch | mcp`.
 
 Sortie texte en français par défaut (dernière ligne : provenance), `--json` pour une sortie structurée.
-Codes de sortie : 0 succès, 2 usage, 3 intégrité des données, 4 introuvable."""
+Codes de sortie : 0 succès, 2 usage, 3 intégrité des données, 4 introuvable, 5 réseau."""
 
 from __future__ import annotations
 
@@ -10,16 +10,27 @@ import io
 import json
 import sys
 from collections.abc import Mapping
+from dataclasses import replace
 from typing import Any, NoReturn
 
 from forever.config import Deps, default_deps
-from forever.errors import EXIT_INTEGRITY, EXIT_OK, ForeverError, UnsupportedKindError, UsageError
+from forever.errors import (
+    EXIT_INTEGRITY,
+    EXIT_OK,
+    ForeverError,
+    InvalidArgumentError,
+    UnsupportedKindError,
+    UsageError,
+)
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
-from forever.manifest import load_manifest, write_manifest
+from forever.manifest import load_manifest, version_dirs, write_manifest
+from forever.pipeline.builds import list_builds
+from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
 from forever.provenance import Provenance, error_payload, format_provenance_line, local_provenance
 from forever.status import StatusReport, status_report
-from forever.store import ensure_integrity
+from forever.store import current_identity, ensure_integrity, read_sources
+from forever.timefmt import format_utc
 
 SCHOOLS_FR = {"frost": "givre", "fire": "feu", "arcane": "arcane", "frostfire": "givrefeu"}
 FOREVER_FR = {"oui": "identique", "modifie": "modifié", "inconnu": "inconnu"}
@@ -58,6 +69,19 @@ def build_parser() -> argparse.ArgumentParser:
     explain = sub.add_parser("explain-mechanic", help="expliquer une mécanique du registre")
     explain.add_argument("mechanic_id", help="identifiant du registre (ex. A5, casse ignorée)")
     explain.add_argument("--json", action="store_true", help="sortie JSON")
+
+    builds = sub.add_parser("builds", help="versions publiées du client (réseau)")
+    builds.add_argument("--limit", type=int, default=10, help="nombre de versions affichées")
+    builds.add_argument("--offline", action="store_true", help="refuser tout appel réseau")
+    builds.add_argument("--json", action="store_true", help="sortie JSON")
+
+    fetch = sub.add_parser("fetch", help="télécharger les tables du client d'une version (réseau)")
+    fetch.add_argument("--version", required=True, help="version complète, ex. 1.60.1.70009")
+    fetch.add_argument("--tables", help="tables séparées par des virgules (défaut : decode_rules.json)")
+    fetch.add_argument("--locale", help="locales séparées par des virgules (défaut : enUS)")
+    fetch.add_argument("--refresh", action="store_true", help="retélécharger même si le cache est conforme")
+    fetch.add_argument("--offline", action="store_true", help="refuser tout appel réseau")
+    fetch.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     return parser
@@ -219,6 +243,91 @@ def _cmd_manifest(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _split(value: str) -> list[str]:
+    return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def _local_product(deps: Deps) -> tuple[str, str, str]:
+    """(version locale, produit, préfixe) lus dans sources.json de la version la plus récente."""
+    version = current_identity(deps.data_dir).game_version
+    sources = read_sources(deps.data_dir, version) or {}
+    product, prefix = sources.get("product"), sources.get("version_prefix")
+    if not (isinstance(product, str) and isinstance(prefix, str)):
+        raise InvalidArgumentError(
+            f"Produit inconnu : sources.json absent ou incomplet pour {version}.",
+            "vérifier forever/data/<version>/sources.json (champs product et version_prefix)",
+        )
+    return version, product, prefix
+
+
+def _cmd_builds(deps: Deps, args: argparse.Namespace) -> int:
+    if args.limit < 1:
+        raise InvalidArgumentError(f"--limit doit être positif (reçu {args.limit}).", "donner --limit 1 ou plus")
+    local, product, prefix = _local_product(deps)
+    deps = replace(deps, offline=deps.offline or args.offline)
+    builds = list_builds(deps, product, prefix)
+    shown = builds[: args.limit]
+    provenance = local_provenance(deps)
+    payload = {
+        "product": product,
+        "prefix": prefix,
+        "local_version": local,
+        "latest": builds[0].version if builds else None,
+        "total": len(builds),
+        "builds": [
+            {"version": b.version, "created_at": format_utc(b.created_at), "local": b.version == local} for b in shown
+        ],
+        "provenance": provenance,
+    }
+    lines = [f"Versions publiées ({product}, {prefix}x) : {len(builds)}, de la plus récente à la plus ancienne"]
+    for i, b in enumerate(shown):
+        marks = [m for m, on in (("dernière", i == 0), ("locale", b.version == local)) if on]
+        lines.append(f"  {b.version} · {format_utc(b.created_at)}" + (f" · {', '.join(marks)}" if marks else ""))
+    if not any(b.version == local for b in builds):
+        lines.append(f"Version locale {local} absente de la liste publiée")
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _fetch_defaults(deps: Deps) -> tuple[list[str], dict[str, list[str]]]:
+    """Tables et tables localisées de decode_rules.json (version locale la plus récente qui en a un)."""
+    for version in reversed(version_dirs(deps.data_dir)):
+        path = deps.data_dir / version / "decode_rules.json"
+        if path.is_file():
+            rules = json.loads(path.read_text(encoding="utf-8"))
+            localized = rules.get("localized_tables", {})
+            return list(rules["tables"]), {k: list(v) for k, v in localized.items()}
+    raise InvalidArgumentError(
+        "Aucune liste de tables : --tables est obligatoire tant qu'aucune version locale n'a de decode_rules.json.",
+        "donner --tables T1,T2,…",
+    )
+
+
+def _cmd_fetch(deps: Deps, args: argparse.Namespace) -> int:
+    deps = replace(deps, offline=deps.offline or args.offline)
+    results: list[TableFetch] = []
+    if args.tables:
+        locales = _split(args.locale) if args.locale else [DEFAULT_LOCALE]
+        results = fetch_tables(deps, args.version, _split(args.tables), locales=locales, refresh=args.refresh)
+    else:
+        tables, localized = _fetch_defaults(deps)
+        results = fetch_tables(deps, args.version, tables, refresh=args.refresh)
+        for locale, names in localized.items():
+            results += fetch_tables(deps, args.version, names, locales=[locale], refresh=args.refresh)
+    provenance = local_provenance(deps)
+    downloaded = sum(1 for r in results if not r["from_cache"])
+    lines = [
+        f"Tables de {args.version} : {len(results)} ({downloaded} téléchargée(s), {len(results) - downloaded} en cache)"
+    ]
+    lines += [
+        f"  {r['locale']}/{r['table']} · {r['bytes']} octets · {'cache' if r['from_cache'] else 'téléchargée'}"
+        for r in results
+    ]
+    payload = {"version": args.version, "tables": results, "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _use_utf8_output() -> None:
     """Sortie redirigée (tube, fichier) : UTF-8 quel que soit l'encodage local, pour les accents et le JSON."""
     for stream in (sys.stdout, sys.stderr):
@@ -251,6 +360,8 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "lookup": _cmd_lookup,
         "explain-mechanic": _cmd_explain,
         "manifest": _cmd_manifest,
+        "builds": _cmd_builds,
+        "fetch": _cmd_fetch,
     }
     try:
         return handlers[args.command](deps, args)

@@ -8,8 +8,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime
 
-from forever.config import HTTP_TIMEOUT, USER_AGENT, HttpGet
-from forever.errors import ForeverError
+from forever.config import HTTP_TIMEOUT, USER_AGENT, Deps, HttpGet
+from forever.errors import EXIT_NETWORK, ForeverError, OfflineError
 from forever.timefmt import parse_utc
 
 BUILDS_URL = "https://wago.tools/api/builds"
@@ -22,6 +22,10 @@ class Build:
 
 
 class BuildsUnavailable(ForeverError):
+    """`status` l'absorbe (fraîcheur inconnue) ; la commande `builds` échoue avec le code réseau."""
+
+    exit_code = EXIT_NETWORK
+
     def __init__(self, message: str) -> None:
         super().__init__("builds_unavailable", message, "réessayer plus tard ou vérifier sur https://wago.tools/builds")
 
@@ -71,3 +75,11 @@ def parse_builds(payload: object, product: str, prefix: str) -> list[Build]:
 
 def latest_build(builds: Sequence[Build]) -> Build | None:
     return max(builds, key=lambda b: b.created_at, default=None)
+
+
+def list_builds(deps: Deps, product: str, prefix: str) -> list[Build]:
+    """Versions publiées du produit, de la plus récente à la plus ancienne (réseau)."""
+    if deps.offline:
+        raise OfflineError("la liste des versions publiées")
+    builds = parse_builds(fetch_builds(deps.http_get), product, prefix)
+    return sorted(builds, key=lambda b: b.created_at, reverse=True)
