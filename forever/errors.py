@@ -65,7 +65,7 @@ class UnknownSpellError(ForeverError):
     exit_code = EXIT_NOT_FOUND
 
     def __init__(self, name: str, suggestions: list[str]) -> None:
-        hint = f"essayer : {', '.join(suggestions)}" if suggestions else "vérifier l'orthographe (nom anglais du sort)"
+        hint = "reprendre un nom suggéré" if suggestions else "vérifier l'orthographe (nom anglais du sort)"
         super().__init__("unknown_spell", f"Sort inconnu : « {name} ».", hint, suggestions=suggestions)
 
 

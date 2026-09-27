@@ -9,7 +9,15 @@ from typing import Any
 
 from forever.config import Deps
 from forever.errors import DataIntegrityError, ManifestMissingError
-from forever.manifest import SOURCES_NAME, data_sha, load_manifest, verify, version_dirs, version_files
+from forever.manifest import (
+    SOURCES_NAME,
+    IntegrityReport,
+    data_sha,
+    load_manifest,
+    verify,
+    version_dirs,
+    version_files,
+)
 
 
 @dataclass(frozen=True)
@@ -47,21 +55,31 @@ def current_identity(data_dir: Path) -> tuple[str, str]:
     return versions[-1], data_sha(version_files(data_dir / versions[-1]))
 
 
+def describe_integrity(report: IntegrityReport) -> str:
+    """Résumé en français des écarts d'empreintes (chaîne vide si aucun)."""
+    return " ; ".join(
+        f"{label} : {', '.join(paths)}"
+        for label, paths in (
+            ("modifiés", report.mismatched),
+            ("manquants", report.missing),
+            ("inattendus", report.unexpected),
+        )
+        if paths
+    )
+
+
+def ensure_integrity(data_dir: Path) -> IntegrityReport:
+    """Lève ManifestMissingError ou DataIntegrityError si les données ne correspondent pas au manifeste."""
+    report = verify(data_dir)
+    if not report.manifest_found:
+        raise ManifestMissingError(f"Manifeste des données absent ou illisible dans {data_dir}.")
+    if not report.ok:
+        raise DataIntegrityError(f"Empreintes des données invalides, réponse refusée ({describe_integrity(report)}).")
+    return report
+
+
 def load_version(deps: Deps) -> VersionData:
     """Version la plus récente ; lève DataIntegrityError ou ManifestMissingError si les empreintes sont invalides."""
-    report = verify(deps.data_dir)
-    if not report.manifest_found:
-        raise ManifestMissingError(f"Manifeste des données absent ou illisible dans {deps.data_dir}.")
-    if not report.ok:
-        parts = [
-            f"{label} : {', '.join(paths)}"
-            for label, paths in (
-                ("modifiés", report.mismatched),
-                ("manquants", report.missing),
-                ("inattendus", report.unexpected),
-            )
-            if paths
-        ]
-        raise DataIntegrityError("Empreintes des données invalides, réponse refusée (" + " ; ".join(parts) + ").")
+    ensure_integrity(deps.data_dir)
     game_version, sha = current_identity(deps.data_dir)
     return VersionData(game_version, sha, deps.data_dir / game_version, read_sources(deps.data_dir, game_version) or {})

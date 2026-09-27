@@ -108,16 +108,20 @@ def min_certainty(values: Iterable[Certainty]) -> Certainty:
     return min(values, key=_CERTAINTY_ORDER.index, default="certain")
 
 
-def error_payload(deps: Deps, err: ForeverError) -> ErrorPayload:
-    """Erreur + provenance calculée sans contrôle d'intégrité ni réseau."""
+def local_provenance(deps: Deps, *, certainty: Certainty = "certain", assumptions: Iterable[str] = ()) -> Provenance:
+    """Provenance des données présentes sur disque, sans contrôle d'intégrité ni réseau (fraîcheur du cache)."""
     game_version, sha = current_identity(deps.data_dir)
     fresh = freshness_for_version(deps, game_version, allow_network=False)
-    provenance = make_provenance(
+    return make_provenance(
         deps,
         game_version=game_version,
         data_sha=sha,
         freshness=fresh["freshness"],
-        certainty="certain",
-        assumptions=fresh["assumptions"],
+        certainty=certainty,
+        assumptions=[*fresh["assumptions"], *assumptions],
     )
-    return {"error": err.to_info(), "provenance": provenance}
+
+
+def error_payload(deps: Deps, err: ForeverError) -> ErrorPayload:
+    """Erreur + provenance calculée sans contrôle d'intégrité ni réseau."""
+    return {"error": err.to_info(), "provenance": local_provenance(deps)}
