@@ -404,7 +404,7 @@ wheels = [
 [[package]]
 name = "forever-core"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
     { name = "mcp" },
@@ -423,7 +423,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "matplotlib", specifier = ">=3.9" },
-    { name = "mcp", specifier = ">=1.0" },
+    { name = "mcp", specifier = ">=2,<3" },
     { name = "pyyaml", specifier = ">=6" },
 ]
 

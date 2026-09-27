@@ -1,0 +1,4 @@
+# Octets stables sur tous les OS : les empreintes du manifeste ne dépendent pas des fins de ligne.
+forever/data/** -text
+seed/forever-mage/data/** -text
+tests/fixtures/** -text
