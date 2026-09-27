@@ -215,6 +215,12 @@ def format_changes(changes: list[Mapping[str, Any]]) -> str:
     )
 
 
+COMBATLOG = FIXTURES / "combatlog"  # journaux de combat (voir son README.md)
+REAL_LOG = COMBATLOG / "WoWCombatLog-092726_145346.anon.txt"
+SYNTHETIC_LOGS = COMBATLOG / "synthetic"
+MINE_GUID = "Player-0000-00000000"  # joueur « à moi » de la fixture anonymisée (Mage)
+
+
 def client_vs_reference(candidate: Any, kind: str) -> tuple[list[Any], list[Any], list[Any]]:
     """(écarts, observations, changements confirmés) entre la référence du dépôt et la candidate, pour `kind`.
 

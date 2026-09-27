@@ -9,7 +9,16 @@ Exclusions : `--help` (aide d'argparse, code 0, ce n'est pas un résultat d'outi
 import json
 
 import pytest
-from conftest import LOCAL_VERSION, WAGO_70009, FakeHttp, corrupt_manifest, tamper
+from conftest import (
+    COMBATLOG,
+    LOCAL_VERSION,
+    REAL_LOG,
+    SYNTHETIC_LOGS,
+    WAGO_70009,
+    FakeHttp,
+    corrupt_manifest,
+    tamper,
+)
 
 from forever.cli import main
 from forever.provenance import validate_provenance
@@ -60,6 +69,12 @@ CASES = {
     "usage-lookup-bad-rank": (["lookup", "spell", "frostbolt", "--rank", "deux"], 2, None),
     "usage-manifest-no-mode": (["manifest"], 2, None),
     "usage-explain-missing-id": (["explain-mechanic"], 2, None),
+    "logs-scan": (["logs", "scan", "--dir", str(COMBATLOG)], 0, None),
+    "logs-scan-missing": (["logs", "scan", "--dir", str(COMBATLOG / "absent")], 4, None),
+    "logs-measure": (["logs", "measure", str(REAL_LOG)], 0, None),
+    "logs-measure-unsupported": (["logs", "measure", str(SYNTHETIC_LOGS / "version21.txt")], 3, None),
+    "logs-measure-truncated": (["logs", "measure", str(SYNTHETIC_LOGS / "truncated.txt")], 3, None),
+    "usage-logs-no-subcommand": (["logs"], 2, None),
 }
 
 

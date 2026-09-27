@@ -179,3 +179,24 @@ class CandidateExistsError(ForeverError):
             f"Une version candidate existe déjà : {path}.",
             "ajouter --force pour la remplacer, ou choisir un autre dossier avec --out",
         )
+
+
+class UnsupportedLogError(ForeverError):
+    """Journal de combat vide, d'une autre version de format ou sans le bloc avancé."""
+
+    exit_code = EXIT_INTEGRITY
+
+    def __init__(self, path: str, reason: str) -> None:
+        super().__init__(
+            "unsupported_log",
+            f"Journal de combat non pris en charge : {path} ({reason}).",
+            "activer le journal avancé (ForeverLogger) et fournir un journal au format 22 (COMBAT_LOG_VERSION 22, "
+            "ADVANCED_LOG_ENABLED 1)",
+        )
+
+
+class PathNotFoundError(ForeverError):
+    exit_code = EXIT_NOT_FOUND
+
+    def __init__(self, what: str, path: str, action: str) -> None:
+        super().__init__("path_not_found", f"{what} introuvable : {path}.", action)
