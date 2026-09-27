@@ -30,7 +30,8 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
     - Test de contrat : chaque sortie CLI et MCP contient un bloc `provenance` complet (schéma validé).
 
 ## T02 — Cœur de mécaniques et registre
-- **Fait** : porter `seed/forever-mage/scripts/fm.py` dans `forever/engine/` (modules : hit, crit, damage, casting, mana) ; créer `forever/registry.py` qui lit `docs/MECHANICS_REGISTRY.yaml` ; `uv run tasks.py verify` échoue si une entrée `modelise` ou mieux n'a pas de test ; porter les 10 tests existants ; passer `STRICT_REGISTRY = True` dans `tasks.py`.
+- **Fait** : porter `seed/forever-mage/scripts/fm.py` dans `forever/engine/` (modules : talents, character, spells, hit, crit, damage, casting, mana, cast), en fonctions pures qui reçoivent `GameData` ; constantes absentes des tables dans `forever/data/<version>/mechanics.json` ; créer `forever/registry.py` qui lit et valide `docs/MECHANICS_REGISTRY.yaml` ; `uv run tasks.py verify` échoue si une entrée `modelise` ou mieux n'a pas de test ; porter les 5 tests du seed qui visent `fm.py` (`donnees_completes`, `valeurs_client_70009`, `prerequis`, `legalite`, `couverture_mecaniques` et ses 30 contrôles) plus un test de parité avec `fm.py` ; passer `STRICT_REGISTRY = True` dans `tasks.py` ; `forever explain-mechanic` et l'outil MCP `forever_explain_mechanic`.
+- **Reporté** : les 5 autres tests du seed dépendent des simulateurs (T04 : `analytique_proche_du_monte_carlo`, `calibrage_cible_blizzard`, `monte_carlo_reproductible`) ou de l'optimiseur, du PvP et de la respec (T05 : `optimiseur_legal`, `pvp_et_respec`).
 - **Critères de fin** :
     - Les 30 contrôles de mécaniques de `seed/forever-mage/tests/run_all.py` passent à l'identique.
     - Chaque entrée du registre marquée `teste` pointe vers au moins un test qui existe.
@@ -44,13 +45,14 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
     - `diff` signale un rang de talent modifié et un sort ajouté (tests).
 
 ## T04 — Leveling
-- **Fait** : porter `sim_leveling.py` (Monte Carlo à impacts différés, jeu expert) et le modèle analytique ; outil MCP `forever_sim_leveling` ; `forever chart leveling`.
+- **Fait** : porter `sim_leveling.py` (Monte Carlo à impacts différés, jeu expert) et le modèle analytique ; outil MCP `forever_sim_leveling` ; `forever chart leveling` ; porter les tests du seed `analytique_proche_du_monte_carlo`, `calibrage_cible_blizzard` et `monte_carlo_reproductible` ; remonter dans le registre les entrées rétrogradées en T02 (B6, B7, B13, C1, C5, H2, I1, I6, J2) et compléter A18 (cumul d'Ignite), B11 (escalade d'Arcane Blast), C2 (talents de portée).
 - **Critères de fin** :
     - Au niveau 12 avec 3 Improved Frostbolt, le Monte Carlo (graine fixe) reproduit le seed à ±1 %.
     - L'analytique reste à moins de 15 % du Monte Carlo aux niveaux 12, 16 et 24.
     - Le graphique est un fichier PNG déterministe (empreinte stable à graine fixe).
 
 ## T05 — Talents et respec
+- **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre.
 - **Critères de fin** : `forever optimize talents --from 10 --to 30` produit un ordre légal à chaque niveau ; le barème de respec est paramétrable ; tests de légalité et de non-régression.
 
 ## T06 — Plugin Claude Code
