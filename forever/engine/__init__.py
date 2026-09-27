@@ -26,7 +26,38 @@ from forever.engine.model import (
 from forever.engine.spells import best_rank, coefficient
 from forever.engine.talents import check_build, legal_additions, points_available, talent_value, tree_split
 
-MECHANICS: dict[str, str] = {}
+MECHANICS: dict[str, str] = {
+    "toucher/écart de niveau": "A3",
+    "plafond de toucher": "A3",
+    "Elemental Precision": "A4",
+    "Arcane Focus": "A4",
+    "critique Int/niveau": "A5",
+    "critique d'équipement": "A5",
+    "critique épée Humain": "G1",
+    "Arcane Instability": "A5",
+    "Critical Mass": "A5",
+    "Arcane Impact": "A5",
+    "Incineration": "A5",
+    "Shatter (gelé)": "A5",
+    "Winter's Chill": "D4",
+    "multiplicateur de critique": "A21",
+    "Ice Shards": "A21",
+    "Arcane Mind": "A21",
+    "DoT qui critiquent": "A17",
+    "Ignite": "A18",
+    "Piercing Ice": "A20",
+    "Fire Power": "A20",
+    "coefficients": "G4",
+    "pénalité < 20": "G4",
+    "Improved Frostbolt": "B16",
+    "Improved Fireball": "B16",
+    "hâte": "B2",
+    "temps de recharge global": "B1",
+    "Frost Channeling": "B17",
+    "Master of Elements": "B17",
+    "Arcane Concentration": "B12",
+    "sorts en % du mana de base": "B11",
+}
 
 __all__ = [
     "MECHANICS",
