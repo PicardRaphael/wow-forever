@@ -58,3 +58,9 @@ Résolutions possibles : garder `levels.spell_rank: max_capped` et confirmer S1�
 ## Observations (pas des écarts)
 - Mana relevé là où la référence a null : pyroblast r1 125, ice_lance r1 45, blast_wave r1 215 (Arcane Blast : coût en pourcentage, pas de mana fixe).
 - `spellIds` : un seul sort par nœud dans le client ; 7 talents portent un autre sort que le premier identifiant wowsims (identifiants TBC/Wrath) : arcaneGeometry 11247 / 11100, arcaneBlast 400574 / 30451, missileBarrage 400588 / 44404, flameThrowing 11100 / 11078, hotStreak 400624 / 44445, iceLance 1312002 / 30455, fingersOfFrost 400647 / 44543.
+
+## Décisions de l'utilisateur (2026-09-27)
+- Groupe 1 : C pour Improved Blizzard, Hot Streak, Improved Scorch. Impact : C après vérification (rang 1 identique, aucune autre courbe décalée, chance lue dans les points de l'effet, `ProcChance` à 100 ; 3 / 7 / 10 = arrondi de 10 × rang / 3).
+- Groupe 2 : option B avec `tooltip_values` (toutes les variables de l'infobulle conservées) ; Presence of Mind confirmé, nature `format`.
+- Groupe 3 : C, nature `convention` ; niveau 30 de Blast Wave r1 : C (nature `client` retenue).
+- Résultat : 15 entrées dans `forever/data/1.60.1.70009/confirmed_changes.json` (6 talents, 9 sorts).

@@ -2,10 +2,10 @@
 
 ## Client Forever (vérité)
 - Versions : `https://wago.tools/api/builds` (produit `wow_classic_beta`, versions `1.60.x` ; liste non triée : trier par `created_at`). Produit de lancement : inconnu, prévoir l'alerte `silent`.
-- Tables : `https://wago.tools/db2/<Table>/csv?build=<version>`.
-    - Talents : TraitTree, TraitNode, TraitNodeEntry, TraitNodeXTraitNodeEntry, TraitDefinition, TraitDefinitionEffectPoints, TraitEdge, CurvePoint. Ignorer Talent et TalentTab (reliquats Classic).
+- Tables : `https://wago.tools/db2/<Table>/csv?build=<version>` (enUS) ; autre locale : `&locale=frFR` (vérifié le 2026-09-27 sur `SpellName`). Liste des tables, colonnes utilisées et règles de lecture : `forever/data/<version>/decode_rules.json`, `forever/pipeline/tables.py`, inventaire `tasks/T03-inventaire.md`. `TraitTreeLoadout*` : HTTP 400 sur 1.60.1.70009 (inutile).
+    - Talents : SkillLineXTraitTree (ligne de compétence → arbre), TraitNode, TraitNodeEntry, TraitNodeXTraitNodeEntry, TraitDefinition, TraitDefinitionEffectPoints (points par rang via CurvePoint), TraitEdge (prérequis), CurvePoint. Ignorer Talent et TalentTab (reliquats Classic). Valeurs d'un rang : variables de l'infobulle du sort du nœud (`Spell.Description_lang`).
     - Géométrie des arbres : onglets à PosX 1020 / 5020 / 9080, rangées à PosY 2130 + 600 par rangée, colonnes espacées de 600 ; quelques positions ont un zéro en trop ; si deux nœuds partagent un sort, le plus récent est le bon.
-    - Sorts : Spell, SpellName, SpellEffect (points de base, RealPointsPerLevel, variance), SpellLevels, SpellCastTimes, SpellPower.
+    - Sorts : SkillLineAbility (rangs par ligne de compétence), Spell (rang dans NameSubtext, infobulle), SpellName, SpellEffect (points de base, RealPointsPerLevel, variance, période, sort déclenché), SpellLevels, SpellMisc (attributs, index d'incantation et de durée), SpellCastTimes, SpellDuration, SpellPower, SpellCooldowns, SpellAuraOptions (cumuls, charges).
     - Objets : Item*, formules RandPropPoints, ItemDamage*, ItemArmor*.
 - Hotfixes : `DBCache.bin` du client, à faire correspondre à la version, la région et la langue.
 - Absent du client : PV des monstres, quêtes, positions des PNJ, taux de butin, stocks, listes d'entraîneurs.

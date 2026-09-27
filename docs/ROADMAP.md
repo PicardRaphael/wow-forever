@@ -40,9 +40,10 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
 ## T03 — Pipeline de données
 - **Fait** : `forever builds` (API wago.tools, produit `wow_classic_beta`, tri par date) ; `forever fetch --version X --tables …` (cache, empreintes) ; `forever decode` (talents depuis les tables Trait*, sorts depuis Spell*, noms français et anglais) ; `forever diff A B` ; `forever verify` ; `forever report` (Markdown).
 - **Critères de fin** :
-    - Tests hors ligne sur des extraits CSV dans `tests/fixtures/`.
-    - `decode` reproduit les 54 talents Mage de `seed/forever-mage/data/…/talents.json` (rangs identiques) à partir des fixtures.
+    - Tests hors ligne sur des extraits CSV dans `tests/fixtures/wago/1.60.1.70009/`.
+    - `decode` reproduit les 54 talents Mage de `talents.json` (clé, nom, arbre, palier, colonne, max, prérequis, ordre, rangs) à partir des fixtures, aux changements confirmés près (`confirmed_changes.json`, vérifié dans les deux sens) ; idem pour les 99 rangs des 15 sorts de `spells.json`.
     - `diff` signale un rang de talent modifié et un sort ajouté (tests).
+    - `decode`, `verify` et `report` sur les fixtures : code 0, provenance sur chaque sortie, `forever/data/` inchangé.
 
 ## T04 — Leveling
 - **Fait** : porter `sim_leveling.py` (Monte Carlo à impacts différés, jeu expert) et le modèle analytique ; outil MCP `forever_sim_leveling` ; `forever chart leveling` ; porter les tests du seed `analytique_proche_du_monte_carlo`, `calibrage_cible_blizzard` et `monte_carlo_reproductible` ; remonter dans le registre les entrées rétrogradées en T02 (B6, B7, B13, C1, C5, H2, I1, I6, J2) et compléter A18 (cumul d'Ignite), B11 (escalade d'Arcane Blast), C2 (talents de portée).
@@ -50,6 +51,7 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
     - Au niveau 12 avec 3 Improved Frostbolt, le Monte Carlo (graine fixe) reproduit le seed à ±1 %.
     - L'analytique reste à moins de 15 % du Monte Carlo aux niveaux 12, 16 et 24.
     - Le graphique est un fichier PNG déterministe (empreinte stable à graine fixe).
+- **À prévoir (décision T03)** : stocker les points de base des sorts et leur progression par niveau (`EffectBasePointsF`, `EffectRealPointsPerLevel`, `BaseLevel`, `MaxLevel`, variance) pour calculer les dégâts au niveau du personnage, au lieu des rangs évalués au niveau min(MaxLevel, 60) ; les durées d'infobulle des talents sont dans `tooltip_values` (ex. Ignite).
 
 ## T05 — Talents et respec
 - **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre.
@@ -62,6 +64,7 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
 - **Critères de fin** : import d'un export d'addon d'exemple ; fiche écrite dans le vault avec la version du jeu ; une fiche plus ancienne que la version courante est signalée.
 
 ## T08 — Veille
+- **Fait (repris de T03)** : installation d'une version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report`) ; application de `overrides.json` et de `confirmed_changes.json` ; substitution des coûts en mana relevés dans le client à l'estimation de `mechanics.json` (`mana.talent_rank_cost`) ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
 - **Critères de fin** : `build-watch.yml` simulé en test (nouvelle version fictive → PR et note) ; alerte `silent` après 14 jours sans version.
 
 ## T09 à T13
