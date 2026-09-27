@@ -17,10 +17,11 @@ from __future__ import annotations
 from typing import Any, TypedDict
 
 from forever.engine.armor import worn_armor
+from forever.engine.buffs import arcane_blast_bonus
 from forever.engine.cast import expected_cast
 from forever.engine.casting import melee_cast_time, pushback_rate, spell_cooldown
 from forever.engine.character import character
-from forever.engine.mana import downtime, in_combat_regen_fraction
+from forever.engine.mana import arcane_blast_cost, downtime, in_combat_regen_fraction
 from forever.engine.model import Character, CharacterOverrides, GameData, Points
 from forever.engine.monsters import mob_expected_hit, mob_hp, mob_land_chance, mob_swing_damage, mob_xp
 from forever.engine.movement import (
@@ -34,7 +35,14 @@ from forever.engine.movement import (
 )
 from forever.engine.spells import best_rank
 from forever.engine.talents import talent_value
-from forever.sim.leveling_mc import PERCENT, ROTATIONS, SECONDS_PER_HOUR, KillResult, options_with_defaults
+from forever.sim.leveling_mc import (
+    PERCENT,
+    ROTATIONS,
+    SECONDS_PER_HOUR,
+    KillResult,
+    arcane_plan,
+    options_with_defaults,
+)
 
 
 class ArcaneCycle(TypedDict):
@@ -58,10 +66,26 @@ def arcane_cycle(
     ab_dump: str = "frostbolt",
     spell_level: str = "character",
 ) -> ArcaneCycle:
-    """Espérance d'un cycle de la rotation arcane (hors recul d'incantation).
+    """Espérance d'un cycle stationnaire de la rotation arcane (hors recul d'incantation) : `ab_stacks` Arcane Blast
+    (défaut : maximum du talent), chacun au coût de son cumul (`arcane_blast_cost`), libérés par Clearcasting avec la
+    même espérance que `expected_cast`, puis une décharge `ab_dump` qui profite du bonus des cumuls et consomme
+    l'aura. ValueError si la rotation est impossible (`arcane_plan`).
 
     Registre : B11, B15, I1"""
-    raise NotImplementedError
+    n, dump = arcane_plan(gd, level, pts, ab_stacks, ab_dump)
+    ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, spell_level=spell_level)
+    buffs = arcane_blast_bonus(gd, pts, n, for_spell=dump)
+    de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=buffs, spell_level=spell_level)
+    assert ab is not None and de is not None  # vérifiés par arcane_plan
+    free = 1 - ab["hit"] * talent_value(gd, pts, "arcaneConcentration") / PERCENT
+    ab_mana = sum(arcane_blast_cost(gd, ab["rank"], pts, ch, i) for i in range(n)) * free
+    return {
+        "ab_casts": n,
+        "time_s": n * ab["cast_s"] + de["cast_s"],
+        "dmg": n * ab["dmg"] + de["dmg"],
+        "mana": ab_mana + de["mana"],
+        "ab_mana": ab_mana,
+    }
 
 
 def kill_analytic(
@@ -93,6 +117,12 @@ def kill_analytic(
     if e is None:
         raise ValueError(f"{main} n'est pas appris au niveau {level}")
     c, d_cast, m_cast = e["cast_s"], e["dmg"], e["mana"]
+    if rotation == "arcane":  # cycle stationnaire : moyenne par lancer
+        cyc = arcane_cycle(
+            gd, level, pts, ch, level_diff, ab_stacks=o["ab_stacks"], ab_dump=o["ab_dump"], spell_level=spell_level
+        )
+        casts = cyc["ab_casts"] + 1
+        c, d_cast, m_cast = cyc["time_s"] / casts, cyc["dmg"] / casts, cyc["mana"] / casts
     frng = spell_range(gd, main, pts)
     flight = travel_time(gd, main, frng, analytic=True)
     slow = frostbolt_slow(gd, pts) if frostbolt else 0.0

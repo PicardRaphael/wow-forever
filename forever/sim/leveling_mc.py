@@ -20,6 +20,13 @@ import statistics
 from typing import Any, NamedTuple, TypedDict, cast
 
 from forever.engine.armor import ARMOR_CHOICES, worn_armor
+from forever.engine.buffs import (
+    ArcaneBlastAura,
+    arcane_blast_active,
+    arcane_blast_after_cast,
+    arcane_blast_bonus,
+    arcane_blast_max_stacks,
+)
 from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time, pushback_resist_chance, pushback_s, spell_cooldown
 from forever.engine.character import character
@@ -33,7 +40,13 @@ from forever.engine.damage import (
     roll_base_damage,
     roll_ignite,
 )
-from forever.engine.mana import downtime, in_combat_regen_fraction, mana_cost, master_of_elements_refund
+from forever.engine.mana import (
+    arcane_blast_cost,
+    downtime,
+    in_combat_regen_fraction,
+    mana_cost,
+    master_of_elements_refund,
+)
 from forever.engine.model import (
     SCHOOL_FIRE,
     SCHOOL_FROST,
@@ -42,6 +55,7 @@ from forever.engine.model import (
     CharacterOverrides,
     GameData,
     Points,
+    Rank,
 )
 from forever.engine.monsters import MOB_SOURCES, mob_hit_taken, mob_hp, mob_swing_damage, mob_xp
 from forever.engine.movement import (
@@ -133,9 +147,34 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
         raise ValueError(f"armor inconnue « {o['armor']} » ({', '.join(ARMOR_CHOICES)} attendue)")
     if o["rules"] == "seed" and o["armor"] != "auto":
         raise ValueError(f"armor « {o['armor']} » sans effet avec rules seed (le seed porte Frost Armor)")
-    if rotation == "arcane":
-        raise NotImplementedError
+    if rotation == "arcane" and o["rules"] == "seed":
+        raise ValueError("rotation arcane absente du seed : rules forever attendu (rules seed refusé)")
+    for key in ("ab_stacks", "ab_dump"):
+        if o[key] is not None and rotation != "arcane":
+            raise ValueError(f"{key} sans effet hors de la rotation arcane (rotation {rotation})")
+    if o["ab_dump"] is not None and o["ab_dump"] not in AB_DUMPS:
+        raise ValueError(f"ab_dump inconnu « {o['ab_dump']} » ({', '.join(AB_DUMPS)} attendu)")
+    if o["ab_stacks"] is not None and (isinstance(o["ab_stacks"], bool) or not isinstance(o["ab_stacks"], int)):
+        raise ValueError(f"ab_stacks « {o['ab_stacks']} » : nombre entier de cumuls attendu")
     return o
+
+
+def arcane_plan(gd: GameData, level: int, pts: Points, ab_stacks: int | None, ab_dump: str | None) -> tuple[int, str]:
+    """(cumuls d'Arcane Blast avant la décharge, sort de décharge) de la rotation arcane ; ValueError si Arcane Blast
+    ou la décharge n'est pas appris, ou si `ab_stacks` sort de 0 au maximum du talent (défaut : maximum)."""
+    first = gd.spells["arcane_blast"].ranks[0].level  # rang 1 du talent : niveau du sort (spells.json)
+    if best_rank(gd, "arcane_blast", level, pts) is None or level < first:
+        raise ValueError(
+            f"arcane_blast n'est pas appris au niveau {level} (talent arcaneBlast requis, rang 1 au niveau {first})"
+        )
+    top = arcane_blast_max_stacks(gd, pts)
+    stacks = top if ab_stacks is None else ab_stacks
+    if not 0 <= stacks <= top:
+        raise ValueError(f"ab_stacks {stacks} hors de 0-{top} (cumuls maximum du talent arcaneBlast)")
+    dump = ab_dump or AB_DUMPS[0]
+    if best_rank(gd, dump, level, pts) is None:
+        raise ValueError(f"ab_dump {dump} n'est pas appris au niveau {level}")
+    return stacks, dump
 
 
 def kill_mc(
@@ -163,6 +202,11 @@ def kill_mc(
     r_main = best_rank(gd, main, level, pts)
     if r_main is None:
         raise ValueError(f"{main} n'est pas appris au niveau {level}")
+    r_frostbolt = best_rank(gd, "frostbolt", level, pts)
+    arcane = rotation == "arcane"
+    ab_n, dump = arcane_plan(gd, level, pts, o["ab_stacks"], o["ab_dump"]) if arcane else (0, main)
+    r_dump = best_rank(gd, dump, level, pts)
+    aura: list[ArcaneBlastAura | None] = [None]  # rotation arcane : aura d'Arcane Blast
     has_il = best_rank(gd, "ice_lance", level, pts) is not None
     has_fbl = best_rank(gd, "fire_blast", level, pts) is not None
     nova_r = best_rank(gd, "frost_nova", level, pts)
@@ -202,13 +246,33 @@ def kill_mc(
     impacts: list[tuple[float, str, float, bool]] = []  # (instant, sort, dégâts, touché)
 
     def fire_spell(key: str, frozen: bool) -> CastEstimate:
+        stacks = arcane_blast_active(aura[0], s["t"]) if arcane else 0
+        buffs = arcane_blast_bonus(gd, pts, stacks, for_spell=key) if arcane else None
         e = expected_cast(
-            gd, key, level, pts, ch, level_diff, frozen=frozen, wc_stacks=s["wc"], spell_level=o["spell_level"]
+            gd,
+            key,
+            level,
+            pts,
+            ch,
+            level_diff,
+            frozen=frozen,
+            wc_stacks=s["wc"],
+            buffs=buffs,
+            spell_level=o["spell_level"],
         )
         assert e is not None  # seuls les sorts appris sont lancés
+        paid = 0.0
         if not s["cc"]:
-            s["mana"] += mana_cost(gd, key, e["rank"], pts, ch)
+            if key == "arcane_blast":
+                paid = arcane_blast_cost(gd, e["rank"], pts, ch, stacks)
+            else:
+                paid = mana_cost(gd, key, e["rank"], pts, ch)
+            s["mana"] += paid
         s["cc"] = False
+        if log is not None:
+            log.append(CastLog(s["t"], key, stacks, paid))
+        if arcane:  # Arcane Blast cumule ; tout autre sort de dégâts consomme l'aura
+            aura[0] = arcane_blast_after_cast(gd, pts, aura[0], s["t"]) if key == "arcane_blast" else None
         landed = rng.random() < e["hit"]
         dmg = 0.0
         travel = travel_time(gd, key, s["dist"] if key != "frost_nova" else 0.0)
@@ -246,7 +310,8 @@ def kill_mc(
         if s["nova"] and key != "frost_nova" and dmg > 0 and rng.random() < o["nova_break"]:
             s["nova"] = False
         if key == "frostbolt":
-            s["chill"] = now + chill_duration(gd, r_main, pts)
+            assert r_frostbolt is not None  # un Frostbolt a été lancé, il est appris
+            s["chill"] = now + chill_duration(gd, r_frostbolt, pts)
             if fbite and rng.random() < fbite:
                 s["frozen"] = now + frostbite_freeze_s(gd)
             if fof_p and rng.random() < fof_p:
@@ -332,18 +397,22 @@ def kill_mc(
         if impacts and sum(x[2] for x in impacts) >= hp[0]:
             advance(min(x[0] for x in impacts) + LOOKAHEAD_S, False)
             continue
+        key, r_key = main, cast("Rank | None", r_main)
+        if arcane and arcane_blast_active(aura[0], s["t"]) >= ab_n:
+            key, r_key = dump, r_dump
+        assert r_key is not None  # sort principal et décharge vérifiés appris
         treat_frozen = frozen_now or s["fof"] > 0
         if s["fof"] > 0 and not frozen_now:
             s["fof"] -= 1
-        end = s["t"] + cast_time(gd, main, r_main, pts, ch)
+        end = s["t"] + cast_time(gd, key, r_key, pts, ch)
         while True:
-            p = advance(end, True, fire_school=(main == "fireball"))
+            p = advance(end, True, fire_school=(key == "fireball"))
             if hp[0] <= 0 or p <= 0:
                 break
             end = s["t"] + p
         if hp[0] <= 0:
             break
-        fire_spell(main, treat_frozen)
+        fire_spell(key, treat_frozen)
     # laisser arriver les projectiles en vol
     if hp[0] > 0 and impacts:
         advance(max(x[0] for x in impacts) + LOOKAHEAD_S, False)

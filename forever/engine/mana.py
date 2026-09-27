@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from forever.engine.armor import worn_armor
+from forever.engine.buffs import COST_PER_STACK
 from forever.engine.model import SCHOOL_FROST, Buffs, Character, GameData, Points, Rank, Restore
 from forever.engine.talents import talent_value
 
@@ -80,7 +81,9 @@ def master_of_elements_refund(gd: GameData, pts: Points, rank: Rank, estimated_m
 
 
 def arcane_blast_cost(gd: GameData, rank: Rank, pts: Points, ch: Character, stacks: int) -> float:
-    """Coût d'un Arcane Blast lancé avec `stacks` cumuls actifs.
+    """Coût d'un Arcane Blast lancé avec `stacks` cumuls actifs : coût de base × (1 + cumuls × hausse par cumul du
+    talent) ; les hausses de l'aura s'ajoutent (probable, T04c).
 
     Registre : B11"""
-    raise NotImplementedError
+    per_stack = talent_value(gd, pts, "arcaneBlast", COST_PER_STACK) / PERCENT
+    return mana_cost(gd, "arcane_blast", rank, pts, ch) * (1 + stacks * per_stack)
