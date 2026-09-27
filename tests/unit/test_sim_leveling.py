@@ -29,7 +29,8 @@ def test_default_mode_uses_measured_hp_and_character_level(game_data):
     default = mc(game_data, 12, {"improvedFrostbolt": 3}, n=300)
     seed = mc(game_data, 12, {"improvedFrostbolt": 3}, n=300, **SEED_MODE)
     assert default["combat"] > seed["combat"]
-    assert default["xp_h"] == pytest.approx(3600 * (45 + 5 * 12) / default["total"], rel=1e-12)  # leveling.mob_xp
+    one = mc(game_data, 12, {"improvedFrostbolt": 3}, n=1)
+    assert one["xp_h"] == pytest.approx(3600 * (45 + 5 * 12) / one["total"], rel=1e-12)  # leveling.mob_xp
 
 
 def test_run_between_is_added_to_every_kill(game_data):
