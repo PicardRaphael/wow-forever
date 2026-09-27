@@ -30,7 +30,10 @@ def rank_values_at_level(gd: GameData, key: str, rank: int, level: int) -> RankV
     supérieur ; au plafond de niveau, reproduit les rangs de `spells.json` décodés du client.
 
     Registre : G7"""
-    scaling = gd.scaling[key][rank - 1]
+    ranks = gd.scaling[key]
+    if not 1 <= rank <= len(ranks):
+        raise ValueError(f"rang {rank} hors de 1-{len(ranks)} pour {key}")
+    scaling = ranks[rank - 1]
     low = high = dot = 0.0
     for c in scaling.components:
         at = max(c.base_level, min(level, c.max_level))

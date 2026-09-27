@@ -10,7 +10,7 @@ def test_strings_single_and_double_quotes_with_escapes():
     assert parse_lua_value('"AH"') == "AH"
     assert parse_lua_value(r"'L\'ours \"brun\"\n\\'") == 'L\'ours "brun"\n\\'
     assert parse_lua_value(r'"\65\066"') == "AB"
-    assert parse_lua_value('"Jén"') == "Jén"
+    assert parse_lua_value('"Élève"') == "Élève"
 
 
 def test_numbers():
@@ -34,7 +34,7 @@ def test_positional_table_is_a_list_with_nil_holes():
 
 def test_keyed_tables():
     assert parse_lua_value("{[14]={{52.03,49.96},{54.2,30.65}}}") == {14: [[52.03, 49.96], [54.2, 30.65]]}
-    assert parse_lua_value('{name = "Jen", ["level"] = 14; [2] = true}') == {"name": "Jen", "level": 14, 2: True}
+    assert parse_lua_value('{name = "Moi", ["level"] = 14; [2] = true}') == {"name": "Moi", "level": 14, 2: True}
     assert parse_lua_value("{'a', x = 1}") == {1: "a", "x": 1}
 
 

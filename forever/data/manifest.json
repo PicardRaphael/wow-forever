@@ -4,8 +4,8 @@
   "versions": {
     "1.60.1.70009": {
       "collected_at": "2026-09-26",
-      "data_sha": "d934383e2ecd",
-      "data_sha256": "d934383e2ecd13679d15582cfdeecce781045fb6a3019ebe02752adba9a0f565",
+      "data_sha": "d02140362b80",
+      "data_sha256": "d02140362b806675a0e8de6038855fee4232151b85956d86d09c7d23aa79ba47",
       "files": {
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
         "confirmed_changes.json": "627f306bd2a7bf086f0ff2bbfe2045f47e423e081339865b5845d11ac1d7f7d1",
@@ -13,7 +13,7 @@
         "leveling.json": "0244ad81f75114722917c96912ad393f11a21742260f69809aaff2a5e9f7380f",
         "mechanics.json": "dec304b080d3e01d20baf6b76c89b33a97258b739b41ab67554ab654510c424c",
         "meta.json": "3ac4666f8dd47349d3b1e0f4f7e2936b17a2848071a5bc1dc7aa7e8634303095",
-        "monsters.json": "ffa77175bbbfe3fcd36a492ebc2518e8956dfe038efc5955afb687a838e980a2",
+        "monsters.json": "810ab12cb0a7d2eb78158b1bd47101420a46196c564a2cc78071ec2fb811a3b9",
         "overrides.json": "e251b04e9fe407a72380f99f4eaea5d141d4361f6167650e8ca09c26451ec9b9",
         "racials.json": "e4cba8c29d0800913a8bc48c6e3db569f64d71d65ea06abbbefffe2f173f7bdf",
         "respec.json": "d0728942f79f45fa2eeafe52ddc75b74608cde77f5a2dcc8d65e1d80e2ed1358",

@@ -53,6 +53,7 @@ from forever.provenance import (
     error_payload,
     format_provenance_line,
     local_provenance,
+    min_certainty,
 )
 from forever.status import StatusReport, status_report
 from forever.store import current_identity, ensure_integrity, read_sources
@@ -666,7 +667,7 @@ def _cmd_monsters_build(deps: Deps, args: argparse.Namespace) -> int:
     table = build_monsters(observations, questie, version, conflicts=conflicts, logs=names)
     written = write_monsters(table, out, deps.data_dir, force=args.force)
     levels = table["hp_by_level"].values()
-    certainty: Certainty = "suppose" if any(v["certainty"] == "suppose" for v in levels) else "certain"
+    certainty = min_certainty(v["certainty"] for v in levels)
     if questie is not None:
         notes += [f"valeurs en regard et agrégat : {questie.source}", QUESTIE_NOTE]
     provenance = _log_provenance(deps, headers, certainty, notes)

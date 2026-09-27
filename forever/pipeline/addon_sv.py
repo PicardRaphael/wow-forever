@@ -125,7 +125,7 @@ def read_logger_db(path: Path) -> LoggerDB:
                     level=_opt_int(s.get("level")),
                     talents={int(k): int(v) for k, v in talents.items() if isinstance(k, int) and isinstance(v, int)}
                     if isinstance(talents, dict)
-                    else None,
+                    else ({} if talents == [] else None),  # table vide : lue comme liste
                     spell_bonus=_numbers(s.get("spell_bonus")),
                     spell_crit=_numbers(s.get("spell_crit")),
                 )

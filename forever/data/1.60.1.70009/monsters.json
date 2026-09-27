@@ -28,6 +28,19 @@
     }
    }
   },
+  "3242": {
+   "name": "Zhevra Runner",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 300
+    }
+   }
+  },
   "3244": {
    "name": "Greater Plainstrider",
    "zone_id": 17,
@@ -36,13 +49,13 @@
     "11": {
      "max_hp": 239,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 14 individu(s))",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 15 individu(s))",
      "questie_hp": 222
     },
     "12": {
      "max_hp": 272,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 15 individu(s))",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 17 individu(s))",
      "questie_hp": 247
     }
    }
@@ -68,13 +81,13 @@
     "12": {
      "max_hp": 272,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 5 individu(s))",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 247
     },
     "13": {
      "max_hp": 307,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 5 individu(s))",
      "questie_hp": 273
     }
    }
@@ -119,7 +132,7 @@
     "13": {
      "max_hp": 307,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 273
     }
    }
@@ -167,11 +180,36 @@
    "zone_id": 17,
    "rank": 0,
    "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 219
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 241
+    }
+   }
+  },
+  "3272": {
+   "name": "Kolkar Wrangler",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 248
+    },
     "13": {
      "max_hp": 307,
      "certainty": "certain",
      "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
-     "questie_hp": 241
+     "questie_hp": 273
     }
    }
   },
@@ -226,6 +264,25 @@
     }
    }
   },
+  "3425": {
+   "name": "Savannah Prowler",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 300
+    },
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328
+    }
+   }
+  },
   "3986": {
    "name": "Sarilus Foulborne",
    "zone_id": 17,
@@ -249,6 +306,19 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 8
+    }
+   }
+  },
+  "6466": {
+   "name": "Gamon",
+   "zone_id": 1637,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 247
     }
    }
   },
@@ -282,8 +352,8 @@
  "hp_by_level": {
   "1": {
    "value": 8,
-   "certainty": "certain",
-   "source": "journaux : valeur commune des PNJ normaux observés",
+   "certainty": "probable",
+   "source": "journaux : médiane de [8] des PNJ normaux observés",
    "n_npcs": 1
   },
   "2": {
@@ -312,14 +382,14 @@
   },
   "6": {
    "value": 120,
-   "certainty": "certain",
-   "source": "journaux : valeur commune des PNJ normaux observés",
+   "certainty": "probable",
+   "source": "journaux : médiane de [120] des PNJ normaux observés",
    "n_npcs": 1
   },
   "7": {
    "value": 137,
-   "certainty": "certain",
-   "source": "journaux : valeur commune des PNJ normaux observés",
+   "certainty": "probable",
+   "source": "journaux : médiane de [137] des PNJ normaux observés",
    "n_npcs": 1
   },
   "8": {
@@ -350,25 +420,25 @@
    "value": 272,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 4
+   "n_npcs": 7
   },
   "13": {
    "value": 307,
    "certainty": "probable",
-   "source": "journaux : médiane de [246, 307, 307, 307, 307] des PNJ normaux observés",
-   "n_npcs": 5
+   "source": "journaux : médiane de [246, 307, 307, 307, 307, 307] des PNJ normaux observés",
+   "n_npcs": 6
   },
   "14": {
    "value": 345,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 1
+   "n_npcs": 3
   },
   "15": {
-   "value": 328,
-   "certainty": "suppose",
-   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
-   "n_npcs": 197
+   "value": 385,
+   "certainty": "probable",
+   "source": "journaux : médiane de [385] des PNJ normaux observés",
+   "n_npcs": 1
   },
   "16": {
    "value": 356,
@@ -378,8 +448,8 @@
   },
   "17": {
    "value": 473,
-   "certainty": "certain",
-   "source": "journaux : valeur commune des PNJ normaux observés",
+   "certainty": "probable",
+   "source": "journaux : médiane de [473] des PNJ normaux observés",
    "n_npcs": 1
   },
   "18": {
@@ -426,8 +496,8 @@
   },
   "25": {
    "value": 927,
-   "certainty": "certain",
-   "source": "journaux : valeur commune des PNJ normaux observés",
+   "certainty": "probable",
+   "source": "journaux : médiane de [927] des PNJ normaux observés",
    "n_npcs": 1
   },
   "26": {
@@ -662,6 +732,12 @@
  "conflicts": [],
  "questie_gaps": [
   {
+   "npc_id": 3242,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
    "npc_id": 3244,
    "level": 11,
    "measured": 239,
@@ -741,9 +817,27 @@
   },
   {
    "npc_id": 3269,
+   "level": 12,
+   "measured": 272,
+   "questie": 219
+  },
+  {
+   "npc_id": 3269,
    "level": 13,
    "measured": 307,
    "questie": 241
+  },
+  {
+   "npc_id": 3272,
+   "level": 12,
+   "measured": 272,
+   "questie": 248
+  },
+  {
+   "npc_id": 3272,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
   },
   {
    "npc_id": 3379,
@@ -776,10 +870,28 @@
    "questie": 222
   },
   {
+   "npc_id": 3425,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 3425,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
    "npc_id": 3986,
    "level": 25,
    "measured": 927,
    "questie": 573
+  },
+  {
+   "npc_id": 6466,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
   },
   {
    "npc_id": 12319,

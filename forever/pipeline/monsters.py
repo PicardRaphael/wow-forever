@@ -5,8 +5,8 @@ Règles (décisions 2 et 3 du plan T04) :
   jamais moyenné. Seuls les PNJ observés sont écrits, avec la valeur Questie en regard (`questie_hp`) : la base
   Questie n'est jamais copiée.
 - `hp_by_level` : par niveau, médiane des PV observés des PNJ normaux (rang Questie 0, ou rang inconnu), `certain` si
-  tous concordent, `probable` sinon ; à défaut d'observation, médiane Questie des PNJ normaux (`suppose`,
-  communautaire). Élites et rares à part (jamais dans l'agrégat).
+  plusieurs PNJ concordent, `probable` sinon (un PNJ seul, peut-être renforcé, n'établit pas la valeur du niveau) ;
+  à défaut d'observation, médiane Questie des PNJ normaux (`suppose`, communautaire). Élites et rares à part.
 - Écart entre une mesure et Questie : listé dans `questie_gaps`, la mesure prime.
 Aucun chiffre de jeu : tout vient des journaux et de Questie."""
 
@@ -81,7 +81,7 @@ def build_monsters(
 
     hp_by_level: dict[int, dict[str, Any]] = {}
     for level, values in normal_by_level.items():
-        agree = len(set(values)) == 1
+        agree = len(set(values)) == 1 and len(values) > 1
         hp_by_level[level] = {
             "value": _median(values),
             "certainty": "certain" if agree else "probable",

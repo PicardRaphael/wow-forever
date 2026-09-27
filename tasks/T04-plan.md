@@ -245,7 +245,7 @@ def rank_values_at_level(gd: GameData, spell: str, rank: int, level: int) -> Ran
 ## Écarts à l'exécution (2026-09-27)
 - Incantations START → SUCCESS : la fixture en contient **trois** pour Frostbolt (1,916, 2,074, 1,982 s), le plan en citait deux ; les tests suivent la fixture. Intervalles entre instantanés : ordre chronologique [1,516, 1,503, 1,590], fenêtre d'enchaînement passée en paramètre (`--max-gap`, 3 s par défaut dans `forever/config.py`).
 - Cas réels du second journal (devenu non vide pendant la session, 10 713 lignes) : ressources multiples `3|4` dans le bloc avancé, `SPELL_ABSORBED` à disposition variable, totems et gardiens invoqués (exclus des PV) ; fixtures synthétiques et tests ajoutés.
-- `monsters.json` construit sur les deux journaux réels du 2026-09-27 et Questie 11.38.0 : 17 PNJ mesurés, 0 conflit, 22 écarts avec Questie.
+- `monsters.json` construit sur les deux journaux réels du 2026-09-27 et Questie 11.38.0 : 21 PNJ mesurés, 0 conflit, 29 écarts avec Questie (reconstruit après relecture : un niveau tiré d'un seul PNJ est `probable`).
 - Nouvelle entrée de registre **G7** (points de base par niveau) ; B1 porte la preuve du journal (n = 3, `tolerance.n_min` 50) et reste `teste`.
 - `forever explain-mechanic` affiche les preuves de journal ; `forever logs measure` rapporte `player_level_field` (dernier champ du bloc avancé du joueur) à côté du niveau de `ForeverLoggerDB`.
 - ForeverAssist V1 dépend aussi de T05 (ordre de talents), en plus de T04b.

@@ -5,6 +5,7 @@
 - Le joueur « à moi » (drapeau d'affiliation 0x1 sur une unité) devient `Moi-Royaume`, GUID `Player-0000-00000000`.
 - Les autres joueurs deviennent `Joueur1-Royaume`, `Joueur2-Royaume`… et `Player-0000-00000001`… dans l'ordre de
   première apparition ; chaque GUID est remplacé sur toute la ligne (il réapparaît dans le bloc avancé).
+- Les familiers (GUID `Pet-…`, nom choisi par le joueur) deviennent `Familier1`, `Familier2`… ; GUID gardé.
 - Créatures, objets, sorts et chiffres intacts ; nombre de lignes et d'événements conservés (contrôlé).
 Sortie `<nom>.anon.txt` en UTF-8, fins de ligne LF. Ne pas éditer à la main : relancer le script."""
 
@@ -33,14 +34,18 @@ def players(lines: list[str]) -> tuple[dict[str, str], dict[str, str]]:
     """(GUID -> GUID anonyme, nom -> nom anonyme) des joueurs, dans l'ordre de première apparition."""
     guids: dict[str, str] = {}
     names: dict[str, str] = {}
-    n = 0
+    n = pets = 0
     for line in lines[1:]:
         _, row = fields(line)
         for i in (1, 5):  # unités source et destination : GUID, nom, drapeaux, drapeaux de raid
-            if len(row) < i + 3 or not row[i].startswith("Player-"):
+            if len(row) < i + 3 or not row[i].startswith(("Player-", "Pet-")):
                 continue
             guid, name, flags = row[i], row[i + 1], int(row[i + 2], 16)
-            if guid in guids:
+            if guid.startswith("Pet-") and name not in names:
+                pets += 1
+                names[name] = f"Familier{pets}"
+                continue
+            if not guid.startswith("Player-") or guid in guids:
                 continue
             if flags & MINE_FLAG:
                 guids[guid], names[name] = MINE_GUID, MINE_NAME

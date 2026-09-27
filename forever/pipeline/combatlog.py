@@ -373,8 +373,9 @@ def scan_logs(directory: Path) -> list[LogSummary]:
     son erreur."""
     out = []
     for path in sorted(directory.glob(LOG_GLOB)):
-        n_lines = len(_lines(path))
+        n_lines = 0
         try:
+            n_lines = len(_lines(path))
             header, events = read_log(path)
             start = end = None
             count = 0

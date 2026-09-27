@@ -35,7 +35,7 @@ def test_measured_npcs_are_certain_and_match_questie():
     assert table["questie_gaps"] == [] and table["conflicts"] == []
     assert table["questie_version"] == "11.38.0" and table["game_version"] == LOCAL_VERSION
     level6 = table["hp_by_level"]["6"]
-    assert (level6["value"], level6["certainty"], level6["n_npcs"]) == (120, "certain", 1)
+    assert (level6["value"], level6["certainty"], level6["n_npcs"]) == (120, "probable", 1)  # un seul PNJ observé
 
 
 def test_questie_only_levels_stay_suppose_and_skip_elites():
@@ -44,7 +44,7 @@ def test_questie_only_levels_stay_suppose_and_skip_elites():
     assert (level6["value"], level6["certainty"], level6["n_npcs"]) == (120, "suppose", 2)  # 3099 et 3111
     assert "communautaire" in level6["source"]
     assert "5" not in table["hp_by_level"]  # 5945 élite (rang 1) écarté
-    assert table["hp_by_level"]["1"]["certainty"] == "certain"
+    assert table["hp_by_level"]["1"]["certainty"] == "probable"  # un seul PNJ observé
 
 
 def test_gap_between_log_and_questie_is_listed():
@@ -74,5 +74,8 @@ def test_summoned_creatures_are_not_monsters():
 
 def test_installed_table_is_read_by_game_data(game_data):
     monsters = game_data.monsters
-    assert monsters.hp_by_level[6].value == 120 and monsters.hp_by_level[6].certainty == "certain"
+    assert (
+        monsters.hp_by_level[11].value == 239 and monsters.hp_by_level[11].certainty == "certain"
+    )  # 7 PNJ concordants
+    assert monsters.hp_by_level[25].certainty == "probable"  # un seul PNJ nommé
     assert monsters.npcs[3099][7].value == 137 and monsters.npcs[3099][7].certainty == "certain"

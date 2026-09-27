@@ -18,6 +18,9 @@ from forever.pipeline.combatlog import NO_GUID, Event, LogHeader, is_known
 SCHOOLS = {1: "physical", 2: "holy", 4: "fire", 8: "nature", 16: "frost", 32: "shadow", 64: "arcane"}
 DIRECT_DAMAGE = frozenset({"SPELL_DAMAGE", "RANGE_DAMAGE"})
 DIRECT_MISSED = frozenset({"SPELL_MISSED", "RANGE_MISSED"})
+# Types de raté du journal qui relèvent de la table de toucher des sorts (les autres : ABSORB, IMMUNE, EVADE…,
+# restent comptés à part dans `by_type`).
+HIT_TABLE_MISSES = frozenset({"MISS", "RESIST"})
 
 
 class MonsterObservation(TypedDict):
@@ -193,12 +196,14 @@ def hit_tally(events: Iterable[Event], caster: str, caster_level: int | None) ->
     Sert de preuve de journal à l'entrée A3 du registre."""
     if caster_level is None:
         return HitTally({}, ["niveau du lanceur inconnu (ForeverLoggerDB absent) : touchés et ratés non comptés"])
+    evs = list(events)
     levels: dict[str, int] = {}
+    for e in evs:  # d'abord les niveaux : un raté n'a pas de bloc avancé, la cible peut n'être décrite qu'après
+        if e.advanced is not None:
+            levels.setdefault(e.advanced.guid, e.advanced.level)
     counts: dict[tuple[str, int], HitCount] = {}
     unknown = 0
-    for e in events:
-        if e.advanced is not None:
-            levels[e.advanced.guid] = e.advanced.level
+    for e in evs:
         if e.source is None or e.source.guid != caster or e.dest is None or e.dest.kind != "Creature":
             continue
         if e.spell is None or e.name not in DIRECT_DAMAGE | DIRECT_MISSED:
@@ -212,9 +217,10 @@ def hit_tally(events: Iterable[Event], caster: str, caster_level: int | None) ->
         if e.name in DIRECT_DAMAGE:
             count["hits"] += 1
         else:
-            count["misses"] += 1
             miss_type = str(e.suffix.get("miss_type"))
             count["by_type"][miss_type] = count["by_type"].get(miss_type, 0) + 1
+            if miss_type in HIT_TABLE_MISSES:
+                count["misses"] += 1
     notes = [f"{unknown} sort(s) sur une cible de niveau inconnu non compté(s)"] if unknown else []
     return HitTally(counts, notes)
 

@@ -121,5 +121,5 @@ def test_scan_logs_lists_every_log(tmp_path):
 def test_scan_logs_reads_utf8_names_and_ignores_other_files(tmp_path):
     assert scan_logs(SYNTHETIC_LOGS) == []  # seuls les fichiers WoWCombatLog-*.txt sont listés
     (tmp_path / "WoWCombatLog-1.txt").write_bytes((SYNTHETIC_LOGS / "hp_conflict.txt").read_bytes())
-    assert scan_logs(tmp_path)[0].mine == ["Jén-Royaume"]
+    assert scan_logs(tmp_path)[0].mine == ["Élève-Royaume"]
     assert scan_logs(COMBATLOG)[0].mine == ["Moi-Royaume"]
