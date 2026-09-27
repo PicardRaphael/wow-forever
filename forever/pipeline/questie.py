@@ -13,6 +13,7 @@ from functools import cached_property
 from pathlib import Path
 from typing import Literal, NamedTuple, TypedDict
 
+from forever.engine.leveling import USEFUL_COLORS, level_band, quest_color
 from forever.engine.model import GameData
 from forever.errors import DataSchemaError, PathNotFoundError
 from forever.pipeline.lua_table import parse_lua_value
@@ -33,6 +34,12 @@ CLASS_MASKS = {name: 1 << (class_id - 1) for name, class_id in CLASS_IDS.items()
 # Champs lus dans `npcKeys` (noms du fichier de Questie).
 NPC_FIELDS = ("name", "minLevelHealth", "maxLevelHealth", "minLevel", "maxLevel", "rank", "zoneID")
 _ENTRY = re.compile(r"^\[\d+\] = \{", re.MULTILINE)
+# Ligne de `dungeons.lua` : [zone] = {"nom", {alternatifs} ou nil, zone parente, …}
+_DUNGEON = re.compile(
+    r'^\s*\[(?P<id>\d+)\] = \{"(?P<name>[^"]+)",(?P<alt>nil|\{[\d, ]*\}),(?P<parent>\d+),', re.MULTILINE
+)
+NPC_LEVEL_QUANTILES = (0.1, 0.9)  # plage des niveaux des PNJ d'une zone : 10e et 90e percentiles (méthode)
+NORMAL_RANK = 0
 
 
 class QuestieInfo(NamedTuple):
@@ -154,21 +161,85 @@ class QuestieDB:
                         out[quest] = (level, xp)
         return out
 
+    @cached_property
+    def _quests(self) -> dict[int, QuestieQuest]:
+        text = self._read(QUEST_DB)
+        keys = _keys(text, "questData", QUEST_FIELDS, "questKeys")
+        start, end = text.find("[[return"), text.rfind("]]")
+        if start < 0 or end < start:
+            raise DataSchemaError(f"Questie : {QUEST_DB} sans chaîne « [[return {{…}}]] ».")
+        try:
+            raw = parse_lua_value(text[start + len("[[return") : end])
+        except ValueError as exc:
+            raise DataSchemaError(f"Questie : {QUEST_DB} : {exc}.") from exc
+        if not isinstance(raw, dict):
+            raise DataSchemaError(f"Questie : {QUEST_DB} : table de quêtes attendue.")
+        out: dict[int, QuestieQuest] = {}
+        for quest_id, row in raw.items():
+            if not isinstance(quest_id, int) or not isinstance(row, list | dict):
+                continue
+            fields = row if isinstance(row, dict) else dict(enumerate(row, start=1))
+            name, required, level, races, classes, zone = (fields.get(keys[f]) for f in QUEST_FIELDS)
+            if not isinstance(name, str) or not all(isinstance(v, int) for v in (required, level, zone)):
+                continue  # quête incomplète (niveau ou zone absents) : ignorée
+            out[quest_id] = QuestieQuest(
+                quest_id,
+                name,
+                required,  # type: ignore[arg-type]
+                level,  # type: ignore[arg-type]
+                races if isinstance(races, int) else 0,
+                classes if isinstance(classes, int) else 0,
+                zone,  # type: ignore[arg-type]
+            )
+        return out
+
     def quests(self) -> dict[int, QuestieQuest]:
         """Quêtes de `classicQuestDB.lua` (champs `QUEST_FIELDS`), lues à la première demande."""
-        raise NotImplementedError
+        return self._quests
+
+    @cached_property
+    def _dungeons(self) -> dict[int, QuestieDungeon]:
+        out: dict[int, QuestieDungeon] = {}
+        for m in _DUNGEON.finditer(self._read(DUNGEON_DB)):
+            alternatives = tuple(int(x) for x in re.findall(r"\d+", m["alt"])) if m["alt"] != "nil" else ()
+            out[int(m["id"])] = QuestieDungeon(int(m["id"]), m["name"], alternatives, int(m["parent"]))
+        return out
 
     def dungeons(self) -> dict[int, QuestieDungeon]:
         """Donjons de `dungeons.lua` : zone, nom, identifiants de zone alternatifs, zone parente."""
-        raise NotImplementedError
+        return self._dungeons
+
+    @cached_property
+    def _zone_names(self) -> dict[int, str]:
+        text = self._read(ZONE_NAMES)
+        start = text.find("l10n.zoneLookup = {")
+        if start < 0:
+            raise DataSchemaError(f"Questie : {ZONE_NAMES} sans « l10n.zoneLookup ».")
+        end = text.find("l10n.zoneCategoryLookup", start)
+        section = text[start : end if end > 0 else len(text)]
+        out: dict[int, str] = {}
+        for m in re.finditer(r'\[(-?\d+)\]\s*=\s*"([^"]*)"', section):
+            out.setdefault(int(m[1]), m[2])
+        return out
 
     def zone_names(self) -> dict[int, str]:
         """Noms anglais des zones (`lookupZones.lua`, table `zoneLookup`)."""
-        raise NotImplementedError
+        return self._zone_names
 
     def quest_xp(self, quest_id: int) -> tuple[int, int] | None:
         """(niveau de la quête, XP) selon la base Classic de Questie."""
         return self._xp.get(quest_id)
+
+
+def _keys(text: str, data: str, fields: tuple[str, ...], name: str) -> dict[str, int]:
+    """Positions des champs `fields` dans l'en-tête `name` (avant la table `data`)."""
+    keys: dict[str, int] = {}
+    for m in re.finditer(r"^\s*\['(\w+)'\]\s*=\s*(\d+)", text[: text.find(data)], re.MULTILINE):
+        keys.setdefault(m[1], int(m[2]))  # sous-champs commentés (--) ignorés : ancrés en début de ligne
+    missing = [f for f in fields if f not in keys]
+    if missing:
+        raise DataSchemaError(f"Questie : {name} sans {', '.join(missing)}.")
+    return keys
 
 
 def _npc_keys(text: str) -> dict[str, int]:
@@ -338,11 +409,84 @@ class ZoneAdvice(TypedDict):
 
 def quest_available(quest: QuestieQuest, level: int, faction: str | None, player_class: str) -> bool:
     """Quête prenable : race de la faction (toutes si `faction` est None), classe, niveau requis atteint."""
-    raise NotImplementedError
+    return _eligible(quest, faction, player_class) and quest.required_level <= level
+
+
+def _eligible(quest: QuestieQuest, faction: str | None, player_class: str) -> bool:
+    """Quête ouverte à la faction et à la classe, quel que soit le niveau."""
+    if faction is not None and quest.required_races and not quest.required_races & FACTION_MASKS[faction]:
+        return False
+    return not quest.required_classes or bool(quest.required_classes & CLASS_MASKS[player_class])
+
+
+def _nearest_rank(values: list[int], q: float) -> int:
+    ordered = sorted(values)
+    return ordered[round((len(ordered) - 1) * q)]
 
 
 def zones_for_level(
     db: QuestieDB, gd: GameData, level: int, *, faction: str | None = None, player_class: str = "mage"
 ) -> ZoneAdvice:
-    """Zones et donjons classés par nombre de quêtes utiles au niveau `level`."""
-    raise NotImplementedError
+    """Zones et donjons classés par nombre de quêtes utiles (vertes, jaunes, orange) au niveau `level`, avec les
+    plages de niveau des quêtes (faction et classe) et des PNJ normaux de la zone. Certitude `suppose` : base Classic
+    Era de Questie sans correction Forever, couleurs de la règle de Classic (`leveling.quest_band`).
+
+    Registre : I7"""
+    if faction is not None and faction not in FACTION_MASKS:
+        raise ValueError(f"faction inconnue « {faction} » ({' ou '.join(FACTION_MASKS)} attendue)")
+    if player_class not in CLASS_MASKS:
+        raise ValueError(f"classe inconnue « {player_class} » ({', '.join(CLASS_MASKS)} attendue)")
+    dungeons = db.dungeons()
+    dungeon_of = {area: area for area in dungeons}
+    for area, d in dungeons.items():
+        dungeon_of.update({alt: area for alt in d.alternative_ids})
+    names = db.zone_names()
+    grouped: dict[int, list[QuestieQuest]] = {}
+    for q in db.quests().values():
+        if q.zone_or_sort <= 0 or not _eligible(q, faction, player_class):
+            continue
+        grouped.setdefault(dungeon_of.get(q.zone_or_sort, q.zone_or_sort), []).append(q)
+    npc_levels: dict[int, list[int]] = {}
+    for npc in db.npcs().values():
+        if npc.rank == NORMAL_RANK:
+            npc_levels.setdefault(npc.zone_id, []).extend((npc.min_level, npc.max_level))
+    zones: list[ZoneEntry] = []
+    instances: list[ZoneEntry] = []
+    for area, quests in grouped.items():
+        available = [q for q in quests if quest_available(q, level, faction, player_class)]
+        colors = {c: 0 for c in ("gray", "green", "yellow", "orange", "red")}
+        for q in available:
+            colors[quest_color(gd, level, q.quest_level)] += 1
+        levels = [q.quest_level for q in quests]
+        npcs = npc_levels.get(area)
+        is_dungeon = area in dungeons
+        entry: ZoneEntry = {
+            "area_id": area,
+            "name": dungeons[area].name if is_dungeon else names.get(area, f"zone {area}"),
+            "kind": "dungeon" if is_dungeon else "zone",
+            "useful_quests": sum(colors[c] for c in USEFUL_COLORS),
+            "by_color": colors,
+            "quests": sorted(q.id for q in available),
+            "quest_levels": [min(levels), max(levels)],
+            "npc_levels": [_nearest_rank(npcs, p) for p in NPC_LEVEL_QUANTILES] if npcs else None,
+        }
+        (instances if is_dungeon else zones).append(entry)
+
+    def rank(e: ZoneEntry) -> tuple[int, str]:
+        return -e["useful_quests"], e["name"]
+
+    return {
+        "level": level,
+        "faction": faction,
+        "band": list(level_band(gd, level)),
+        "zones": sorted((z for z in zones if z["quests"]), key=rank),
+        "dungeons": sorted((d for d in instances if d["useful_quests"]), key=rank),
+        "certainty": db.certainty,
+        "source": db.source,
+        "notes": [
+            "noms de zones en anglais (Questie ne fournit pas de table française)",
+            "quêtes et PNJ de la base Classic Era de Questie, sans correction Forever",
+            "couleurs de quête : règle de Classic (leveling.quest_band, suppose) ; utiles = vertes, jaunes, orange",
+            f"quêtes disponibles : faction {faction or 'toutes'}, classe {player_class}, niveau requis atteint",
+        ],
+    }

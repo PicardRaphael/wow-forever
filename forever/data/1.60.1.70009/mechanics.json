@@ -181,6 +181,17 @@
       "registry": "A18",
       "source": "T04c, décision 2 : Ignite roulant (aura non cumulable) ; à chaque critique de feu, montant = part du talent × critique + reste non infligé, l'aura repart pour sa durée et le compteur de tics repart du critique ; reste perdu à la mort du monstre. Règle côté serveur, à vérifier par les journaux (docs/OPEN_QUESTIONS.md)"
     },
+    "leveling.quest_band": {
+      "value": {
+        "red_min_diff": 5,
+        "orange_min_diff": 3,
+        "yellow_min_diff": -2,
+        "gray_rows": [[5, null, 0], [39, 5, 10], [59, 1, 5], [60, 9, 0]]
+      },
+      "certainty": "suppose",
+      "registry": "I7",
+      "source": "Couleurs de quête (T04c) : rouge dès +5, orange dès +3, jaune dès -2 niveaux, relevés dans Questie 11.38.0 (Modules/Libs/QuestieLib.lua, GetDifficultyColorPercent, copie de la règle de l'interface Classic) ; plus bas, verte jusqu'au niveau gris exclu, grise au-delà. Plage verte : GetQuestGreenRange est une API du client, absente sur disque ; remplacée par le niveau gris de Classic (formule communautaire des émulateurs, non vérifiée pour Forever) : gray_rows [niveau max, retrait, diviseur] -> niveau gris = niveau - retrait - niveau // diviseur (0 si retrait null, sans division si diviseur 0), soit 0 jusqu'au niveau 5, niveau - 5 - niveau/10 jusqu'à 39, niveau - 1 - niveau/5 jusqu'à 59, niveau - 9 au niveau 60 ; quête grise si son niveau est au plus le niveau gris"
+    },
     "leveling.frost_nova_retreat_yd": {
       "value": 10.0,
       "certainty": "suppose",

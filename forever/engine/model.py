@@ -236,6 +236,17 @@ class MobModel:
 
 
 @dataclass(frozen=True)
+class QuestBand:
+    """Couleurs de quête selon l'écart de niveau (`leveling.quest_band`) : seuils rouge, orange, jaune (niveau de
+    quête - niveau du personnage) et lignes du niveau gris (niveau max, retrait ou None, diviseur ou 0)."""
+
+    red_min_diff: int
+    orange_min_diff: int
+    yellow_min_diff: int
+    gray_rows: tuple[tuple[int, int | None, int], ...]
+
+
+@dataclass(frozen=True)
 class LevelingConstants:
     """Constantes du leveling (`mechanics.json`, clés `leveling.*`), chiffres du seed sim_leveling.py."""
 
@@ -262,6 +273,7 @@ class LevelingConstants:
     default_level_diff: int
     default_nova_break: float
     default_run_between_s: float
+    quest_band: QuestBand
 
     @property
     def ignite_ticks(self) -> int:

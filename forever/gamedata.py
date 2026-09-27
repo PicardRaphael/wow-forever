@@ -21,6 +21,7 @@ from forever.engine.model import (
     MobModel,
     MonsterHp,
     MonsterTable,
+    QuestBand,
     QuestieCorrection,
     Racials,
     Rank,
@@ -372,6 +373,7 @@ def _leveling(values: Mapping[str, Any]) -> LevelingConstants:
         xp_per_level=r.num(xp, "per_level", "leveling.mob_xp"),
         frostbite_freeze_s=num("leveling.frostbite_freeze_s"),
         dot_tick_s=num("leveling.dot_tick_s"),
+        quest_band=_quest_band(r, obj("leveling.quest_band")),
         ignite_aura_id=r.int_(ignite, "aura_spell_id", "leveling.ignite"),
         ignite_duration_s=r.num(ignite, "duration_s", "leveling.ignite"),
         ignite_tick_s=r.num(ignite, "tick_s", "leveling.ignite"),
@@ -461,6 +463,23 @@ def _scaling(raw: Any, spells: Mapping[str, Spell]) -> dict[str, tuple[RankScali
             )
         out[key] = tuple(parsed)
     return out
+
+
+def _quest_band(r: _Reader, band: Mapping[str, Any]) -> QuestBand:
+    where = "leveling.quest_band"
+    rows = r.list_(band, "gray_rows", f"{where}.gray_rows")
+    parsed = []
+    for row in rows:
+        ok = isinstance(row, list) and len(row) == 3 and isinstance(row[0], int) and isinstance(row[2], int)
+        if not ok or not (row[1] is None or isinstance(row[1], int)):
+            raise r.fail(f"{where}.gray_rows", "lignes [niveau max, retrait ou null, diviseur]")
+        parsed.append((row[0], row[1], row[2]))
+    return QuestBand(
+        red_min_diff=r.int_(band, "red_min_diff", where),
+        orange_min_diff=r.int_(band, "orange_min_diff", where),
+        yellow_min_diff=r.int_(band, "yellow_min_diff", where),
+        gray_rows=tuple(parsed),
+    )
 
 
 def _armors(raw: Any) -> dict[str, tuple[ArmorRank, ...]]:

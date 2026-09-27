@@ -10,7 +10,7 @@ from typing import Any, Literal, TypedDict, cast
 from forever.config import Deps
 from forever.errors import InvalidArgumentError, UnknownRankError, UnknownSpellError, UnsupportedKindError
 from forever.freshness import freshness_for_version
-from forever.pipeline.questie import ZoneAdvice
+from forever.pipeline.questie import TOC_NAME, ZoneAdvice, read_questie, zones_for_level
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.store import load_version
 
@@ -147,6 +147,39 @@ class ZoneLookup(ZoneAdvice):
     provenance: Provenance
 
 
-def lookup_zones(deps: Deps, level: int, *, faction: str | None = None, questie_dir: Path | None = None) -> ZoneLookup:
-    """Zones et donjons adaptés au niveau (base Questie lue sur disque), avec la provenance."""
-    raise NotImplementedError
+def lookup_zones(
+    deps: Deps, level: int | None, *, faction: str | None = None, questie_dir: Path | None = None
+) -> ZoneLookup:
+    """Zones et donjons adaptés au niveau (base Questie lue sur disque, jamais par le réseau), avec la provenance ;
+    InvalidArgumentError (code 2) si le niveau manque ou sort des bornes, si la faction est inconnue ou si l'addon
+    Questie est introuvable.
+
+    Registre : I7"""
+    from forever.gamedata import build_game_data
+    from forever.leveling import check_level, level_cap
+
+    if level is None:
+        raise InvalidArgumentError("Niveau manquant.", "donner --level (niveau du personnage)")
+    data = load_version(deps)
+    check_level(level, level_cap(data))
+    if questie_dir is None and deps.wow_dir is not None:
+        questie_dir = deps.wow_dir / "Interface" / "AddOns" / "Questie"
+    if questie_dir is None or not (questie_dir / TOC_NAME).is_file():
+        raise InvalidArgumentError(
+            f"Addon Questie introuvable : {questie_dir or 'aucun dossier'}.",
+            "donner --questie <Interface/AddOns/Questie> ou définir FOREVER_WOW_DIR",
+        )
+    try:
+        advice = zones_for_level(read_questie(questie_dir), build_game_data(data), level, faction=faction)
+    except ValueError as exc:
+        raise InvalidArgumentError(f"{exc}.", "choisir --faction horde ou alliance") from exc
+    fresh = freshness_for_version(deps, data.game_version, allow_network=False)
+    provenance = make_provenance(
+        deps,
+        game_version=data.game_version,
+        data_sha=data.data_sha,
+        freshness=fresh["freshness"],
+        certainty="suppose",
+        assumptions=[*fresh["assumptions"], f"source : {advice['source']}", *advice["notes"]],
+    )
+    return {**advice, "provenance": provenance}

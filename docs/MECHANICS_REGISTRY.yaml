@@ -214,9 +214,15 @@ mechanics:
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
       - tests/unit/test_engine_leveling.py::test_dot_and_ignite_ticks
       - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
+      - tests/unit/test_engine_ignite.py::test_ignite_constants_come_from_the_client
+      - tests/unit/test_engine_ignite.py::test_second_crit_rolls_the_remainder_and_restarts_the_ticks
+      - tests/unit/test_engine_ignite.py::test_rolled_ignite_deals_exactly_what_was_posted
+      - tests/unit/test_engine_ignite.py::test_forever_monte_carlo_differs_from_the_seed_only_through_ignite
+      - tests/unit/test_measures_refresh.py::test_ignite_prediction_of_both_variants
+      - tests/unit/test_measures_refresh.py::test_refresh_compares_ignite_ticks_with_the_data_rule
     tolerance: null
-    formule: "Ignite = crit × base × mult_dégâts × mult_crit × part_Ignite (espérance par lancer)"
-    note: "espérance par lancer dans expected_cast ; T04b : le Monte Carlo du seed pose Ignite en leveling.ignite.ticks tics de leveling.ignite.tick_s par critique de feu, sans cumul ni rafraîchissement (forever/engine/damage.py : ignite_damage, ignite_tick_times) ; cumul et rafraîchissement : T04c"
+    formule: "Ignite = crit × base × mult_dégâts × mult_crit × part_Ignite (espérance par lancer) ; Monte Carlo (rules forever) : à chaque critique de feu, reste = part × critique + reste non infligé, tics repartis sur durée / période à partir du critique"
+    note: "espérance par lancer dans expected_cast (analytique inchangée : perte à la mort non modélisée) ; T04c : aura 412538 lue dans le client (4 s, période 2 s, CumulativeAura 1 : pas de cumul par empilement, certain) ; règle roulante leveling.ignite_rule (décision 2, suppose : le compteur de tics repart du critique, reste perdu à la mort), forever/engine/damage.py : roll_ignite, ignite_ticks_due ; variante « compteur conservé » (roll_ignite_keep_timer) pour la comparaison seulement ; rules seed : 2 tics de 2 s par critique sans cumul (parité) ; vérification par les journaux (forever measures refresh, protocole de collecte A18) : voir OPEN_QUESTIONS"
   - id: A19
     categorie: attaque
     description: "Procs exclus des critiques périodiques (Hot Streak)"
@@ -356,12 +362,16 @@ mechanics:
       - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
       - "forever/data/1.60.1.70009/spells.json (utility.mage_armor)"
       - "forever/data/1.60.1.70009/talents.json"
+      - "forever/data/1.60.1.70009/spell_scaling.json (utility : armures du client, aura 134 de Mage Armor)"
     tests:
       - tests/unit/test_engine_leveling.py::test_rest_and_regen_match_the_seed
       - tests/unit/test_engine_leveling.py::test_mage_armor_regen_from_its_first_rank
+      - tests/unit/test_engine_leveling.py::test_forever_regen_adds_arcane_meditation_and_worn_mage_armor
+      - tests/unit/test_sim_rules.py::test_arcane_meditation_adds_to_mage_armor
+      - tests/unit/test_sim_rules.py::test_monte_carlo_uses_the_cumulated_regen
     tolerance: null
-    formule: "part gardée en combat = min(1, max(Arcane Meditation, régénération de Mage Armor dès son premier rang)) ; mana régénérée en combat = part × régénération d'Esprit × durée du combat"
-    note: "T04b : porté du seed (forever/engine/mana.py : in_combat_regen_fraction) ; agrégat part × régénération d'Esprit × durée du combat : ni règle des 5 s (combat_rules.five_second_rule non lu), ni tic de 2 s simulé ; maximum d'Arcane Meditation et de Mage Armor repris du seed (cumul Classic probable) et Mage Armor supposée portée dès son premier rang alors que le Monte Carlo applique aussi Frost Armor : voir OPEN_QUESTIONS"
+    formule: "rules forever : part gardée en combat = min(1, Arcane Meditation + part de l'armure portée) ; rules seed : min(1, max(Arcane Meditation, Mage Armor dès son premier rang)) ; mana régénérée en combat = part × régénération d'Esprit × durée du combat"
+    note: "T04b : porté du seed (forever/engine/mana.py : in_combat_regen_fraction) ; agrégat part × régénération d'Esprit × durée du combat : ni règle des 5 s (combat_rules.five_second_rule non lu), ni tic de 2 s simulé ; T04c (décision 3) : cumul de la règle Classic (deux auras 134 s'additionnent, suppose) et armure portée selon le niveau d'apprentissage lu dans le client (worn_armor, I6) : plus de Mage Armor et de Frost Armor à la fois ; maximum du seed gardé en rules seed : voir OPEN_QUESTIONS"
   - id: B8
     categorie: ressources
     description: "MP5"
@@ -412,9 +422,12 @@ mechanics:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_arcane_blast_mana_pct
       - tests/unit/test_engine_values.py::test_talent_rank_mana_estimate
+      - tests/unit/test_engine_arcane_blast.py::test_cost_grows_with_the_stacks
+      - tests/unit/test_engine_arcane_blast.py::test_analytic_cycle_pays_the_growing_cost
+      - tests/unit/test_engine_arcane_blast.py::test_monte_carlo_pays_each_cast_at_its_stack_cost
     tolerance: null
-    formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié"
-    note: "escalade d'Arcane Blast en T04b ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2)"
+    formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié ; Arcane Blast à n cumuls : coût × (1 + n × hausse par cumul du talent arcaneBlast)"
+    note: "T04c : escalade d'Arcane Blast (mana.arcane_blast_cost ; hausses de l'aura additionnées : probable, voir OPEN_QUESTIONS), payée lancer par lancer (Monte Carlo) et sur le cycle (analytique) ; Clearcasting rend le lancer gratuit sans retirer de cumul (suppose) ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2)"
   - id: B12
     categorie: ressources
     description: "Clearcasting"
@@ -443,9 +456,10 @@ mechanics:
     tests:
       - tests/unit/test_engine_leveling.py::test_spell_cooldowns
       - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
+      - tests/unit/test_sim_rules.py::test_analytic_fire_blast_cooldown_includes_wake_of_fire
     tolerance: null
     formule: "recharge = recharge du rang − Improved Frost Nova (Frost Nova) ou − Wake of Fire (Fire Blast)"
-    note: "T04b : porté du seed (forever/engine/casting.py : spell_cooldown), appliqué par le Monte Carlo ; l'analytique du seed, dans tous les modes, compte Fire Blast à la recharge du rang (expected_cast.cooldown_s), sans Wake of Fire : écart connu, voir OPEN_QUESTIONS"
+    note: "T04b : porté du seed (forever/engine/casting.py : spell_cooldown), appliqué par le Monte Carlo ; T04c : l'analytique prend aussi la recharge réduite par Wake of Fire en rules forever ; rules seed garde la recharge du rang (parité) ; Frost Nova reste hors de l'analytique"
   - id: B14
     categorie: temps
     description: "Procs : PPM, chance fixe, recharges internes"
@@ -459,11 +473,19 @@ mechanics:
     categorie: temps
     description: "Durée, charges, rafraîchissement et cumul des buffs"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: probable
-    sources: []
-    tests: []
+    sources:
+      - "forever/data/1.60.1.70009/talents.json (arcaneBlast : bonus et coût par cumul, cumuls, durée)"
+      - "tests/fixtures/wago/1.60.1.70009 (aura 400573 : CumulativeAura 4, durée 8000 ms)"
+    tests:
+      - tests/unit/test_engine_arcane_blast.py::test_max_stacks_come_from_the_talent
+      - tests/unit/test_engine_arcane_blast.py::test_stacks_are_capped_and_expire
+      - tests/unit/test_engine_arcane_blast.py::test_bonus_applies_to_other_spells_only
+      - tests/unit/test_engine_arcane_blast.py::test_clearcasting_makes_the_cast_free_and_keeps_the_stack
     tolerance: null
+    formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée ; expire sans nouvel Arcane Blast ; tout autre sort de dégâts profite de +x % par cumul et la consomme"
+    note: "T04c : forever/engine/buffs.py (seule aura modélisée) ; Missile Barrage et autres buffs : absents"
   - id: B16
     categorie: temps
     description: "Temps d'incantation réduits par talents"
@@ -1078,9 +1100,12 @@ mechanics:
     tests:
       - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
       - tests/parity/test_sim_leveling_parity.py::test_every_analytic_branch_matches_the_seed
+      - tests/unit/test_engine_arcane_blast.py::test_zero_stacks_is_the_dump_rotation
+      - tests/unit/test_engine_arcane_blast.py::test_analytic_close_to_monte_carlo
+      - tests/unit/test_engine_arcane_blast.py::test_invalid_arcane_rotations_are_refused
     tolerance: null
-    formule: "rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
-    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes"
+    formule: "rotation arcane (T04c) : Arcane Blast jusqu'à ab_stacks cumuls, puis la décharge ab_dump ; rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
+    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo −7,9 % à L24 et −1,5 % à L30"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"
@@ -1137,9 +1162,33 @@ mechanics:
       - tests/unit/test_sim_leveling.py::test_calibration_blizzard_target
       - tests/parity/test_sim_leveling_parity.py::test_mc_default_n_matches_the_seed
       - tests/parity/test_sim_leveling_parity.py::test_analytic_matches_the_seed
+      - tests/unit/test_engine_armor.py::test_armor_ranks_are_decoded_from_the_client
+      - tests/unit/test_engine_armor.py::test_auto_armor_follows_the_learned_levels
+      - tests/unit/test_engine_armor.py::test_mage_armor_below_its_learned_level_is_refused
+      - tests/unit/test_sim_rules.py::test_mage_armor_removes_the_attacker_slow_in_the_analytic_model
+      - tests/unit/test_sim_rules.py::test_mage_armor_changes_the_monte_carlo
     tolerance: null
     formule: "temps par monstre = combat + repos + course entre monstres ; repos = max(mana dépensée / (boisson + Esprit), dégâts subis / (nourriture + régénération de repos × PV)) ; XP par heure = XP du monstre × secondes par heure / temps par monstre"
-    note: "T04b : Monte Carlo (forever/sim/leveling_mc.py) et analytique (forever/sim/leveling_analytic.py) portés du seed, parité à 1e-12 en mode seed ; mode par défaut : PV mesurés puis Questie corrigé (H11) et dégâts au niveau du personnage (G7) ; attaques des monstres sur le Mage du modèle du seed (mob_model : esquive, critique, cadence ; forever/engine/monsters.py : mob_land_chance, mob_hit_taken, mob_expected_hit, mob_swing_damage), aucune entrée dédiée (A1 et A11 absentes) ; l'armure du Mage réduit les coups reçus (leveling.armor_reduction), celle de la cible reste absente (H2) ; XP : règle Classic (T04c)"
+    note: "T04b : Monte Carlo (forever/sim/leveling_mc.py) et analytique (forever/sim/leveling_analytic.py) portés du seed, parité à 1e-12 en mode seed ; mode par défaut : PV mesurés puis Questie corrigé (H11) et dégâts au niveau du personnage (G7) ; attaques des monstres sur le Mage du modèle du seed (mob_model : esquive, critique, cadence ; forever/engine/monsters.py : mob_land_chance, mob_hit_taken, mob_expected_hit, mob_swing_damage), aucune entrée dédiée (A1 et A11 absentes) ; l'armure du Mage réduit les coups reçus (leveling.armor_reduction), celle de la cible reste absente (H2) ; XP : règle Classic ; T04c : option rules (forever par défaut, seed pour la parité) ; armure portée (worn_armor, forever/engine/armor.py) selon le niveau d'apprentissage lu dans le client (spell_scaling.json.utility) : Frost puis Ice Armor, Mage Armor dès 34 ; armor paramètre de build (auto, frost, mage ; Mage Armor sous son niveau refusée) ; ralenti des coups seulement sous Frost ou Ice Armor ; bonus d'armure de Frost et Ice Armor non ajouté à l'armure du personnage (voir OPEN_QUESTIONS)"
+  - id: I7
+    categorie: optimisation
+    description: "Zone ou donjon à mon niveau (quêtes utiles, plages de niveau des quêtes et des PNJ)"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70009/mechanics.json (leveling.quest_band)"
+      - "Questie 11.38.0 local : Database/Classic/classicQuestDB.lua, Database/Zones/data/dungeons.lua, Localization/lookups/lookupZones.lua, Modules/Libs/QuestieLib.lua (seuils de couleur)"
+      - "tests/fixtures/questie/README.md"
+    tests:
+      - tests/unit/test_questie_zones.py::test_quest_band_comes_from_the_data
+      - tests/unit/test_questie_zones.py::test_gray_level_follows_the_rows_of_the_data
+      - tests/unit/test_questie_zones.py::test_zones_for_level_12_horde
+      - tests/unit/test_questie_zones.py::test_other_faction_quests_are_excluded
+      - tests/unit/test_zones_cli.py::test_lookup_zones_level_12
+    tolerance: null
+    formule: "couleur = rouge si niveau de quête − niveau ≥ seuil rouge, orange ≥ seuil orange, jaune ≥ seuil jaune, sinon verte au-dessus du niveau gris, grise ; zone classée par quêtes utiles (vertes, jaunes, orange) prenables (faction, classe, niveau requis)"
+    note: "T04c : forever/engine/leveling.py (gray_level, quest_color, level_band), forever/pipeline/questie.py (zones_for_level) ; base Classic Era de Questie sans correction Forever, noms de zones en anglais ; plage verte (GetQuestGreenRange, API du client) remplacée par le niveau gris communautaire de Classic : voir OPEN_QUESTIONS"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

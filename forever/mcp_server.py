@@ -7,6 +7,7 @@ provenance) : une exception brute ne montrerait au modèle qu'un message génér
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any, cast
 
 from mcp.server.mcpserver import MCPServer
@@ -17,7 +18,7 @@ from forever.config import Deps
 from forever.errors import ForeverError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.leveling import LevelingReport, simulate_leveling
-from forever.lookup import lookup_spell
+from forever.lookup import lookup_spell, lookup_zones
 from forever.provenance import error_payload
 from forever.status import StatusReport, status_report
 
@@ -64,10 +65,14 @@ def build_server(deps: Deps) -> MCPServer:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
         `rank` : position du rang à partir de 1 (tous les rangs, paginés, s'il est omis).
-        `detail=True` : champs complémentaires (ralentissement, vitesse de projectile…)."""
+        `detail=True` : champs complémentaires (ralentissement, vitesse de projectile…).
+        T04c : `kind="zones"` avec `level` (niveau du personnage), `faction` (horde ou alliance, défaut : toutes) et
+        `questie` (dossier de l'addon, défaut : dans FOREVER_WOW_DIR) : zones et donjons classés par quêtes utiles
+        (base Questie Classic Era lue sur disque, noms anglais, certitude suppose)."""
         try:
             if kind == "zones":
-                raise NotImplementedError
+                path = Path(questie) if questie else None
+                return dict(lookup_zones(deps, level, faction=faction, questie_dir=path))
             if kind != "spell":
                 raise UnsupportedKindError(f"type « {kind} »", ["spell", "zones"])
             return dict(lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset))

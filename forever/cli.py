@@ -39,7 +39,7 @@ from forever.leveling import (
     parse_talents,
     simulate_leveling,
 )
-from forever.lookup import SpellLookup, SpellRank, lookup_spell
+from forever.lookup import SpellLookup, SpellRank, lookup_spell, lookup_zones
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
@@ -314,6 +314,32 @@ def _rank_parts(r: SpellRank) -> list[str]:
     return parts
 
 
+def _zone_line(z: Mapping[str, Any]) -> str:
+    c = z["by_color"]
+    quests = z["quest_levels"]
+    npcs = z["npc_levels"]
+    return (
+        f"  {z['name']} : {z['useful_quests']} quête(s) utile(s) (vertes {c['green']}, jaunes {c['yellow']}, "
+        f"orange {c['orange']}, grises {c['gray']}, rouges {c['red']}) · quêtes de niveau {quests[0]} à {quests[1]}"
+        + (f" · PNJ {npcs[0]} à {npcs[1]}" if npcs else "")
+    )
+
+
+def render_zones(res: Mapping[str, Any]) -> list[str]:
+    low, high = res["band"]
+    lines = [
+        (
+            f"Niveau {res['level']} · faction {res['faction'] or 'toutes'} · quêtes utiles de niveau {low} à {high} "
+            f"({res['certainty']}, {res['source']})"
+        ),
+        "Zones :",
+    ]
+    lines += [_zone_line(z) for z in res["zones"]] or ["  aucune"]
+    lines.append("Donjons :")
+    lines += [_zone_line(d) for d in res["dungeons"]] or ["  aucun"]
+    return lines
+
+
 def render_lookup(res: SpellLookup) -> list[str]:
     title = f"{res['id'].replace('_', ' ').title()} ({SCHOOLS_FR.get(res['school'], res['school'])})"
     reach = [f"portée {_num(res['range_yd'])} m"] if res["range_yd"] is not None else []
@@ -426,7 +452,11 @@ def _cmd_status(deps: Deps, args: argparse.Namespace) -> int:
 
 def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
     if args.kind == "zones":
-        raise NotImplementedError
+        zones = lookup_zones(
+            deps, args.level, faction=args.faction, questie_dir=Path(args.questie) if args.questie else None
+        )
+        _emit(zones, render_zones(zones), zones["provenance"], args.json)
+        return EXIT_OK
     if args.kind != "spell":
         raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "zones"])
     if not args.name:
