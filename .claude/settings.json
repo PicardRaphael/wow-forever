@@ -1,0 +1,79 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run tasks.py:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff:*)",
+      "Bash(uv run mypy:*)",
+      "Bash(uv sync:*)",
+      "Bash(uv run forever status:*)",
+      "Bash(uv run forever lookup:*)",
+      "Bash(uv run forever explain-mechanic:*)",
+      "Bash(uv run forever diff:*)",
+      "Bash(uv run forever verify:*)",
+      "Bash(uv run python scripts/:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git switch:*)",
+      "Bash(git worktree:*)"
+    ],
+    "ask": [
+      "Bash(uv run forever fetch:*)",
+      "Bash(uv run forever builds:*)",
+      "Bash(uv add:*)",
+      "Bash(git push:*)",
+      "Bash(curl:*)",
+      "Bash(rm:*)"
+    ],
+    "deny": [
+      "Edit(seed/**)",
+      "Write(seed/**)",
+      "Read(./.env)",
+      "Read(./.env.*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --no-project python \"$CLAUDE_PROJECT_DIR/.claude/hooks/protect_golden.py\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --no-project python \"$CLAUDE_PROJECT_DIR/.claude/hooks/format_python.py\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --no-project python \"$CLAUDE_PROJECT_DIR/.claude/hooks/test_on_stop.py\"",
+            "timeout": 300
+          }
+        ]
+      }
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "uv run --no-project python \"$CLAUDE_PROJECT_DIR/.claude/hooks/statusline.py\""
+  }
+}

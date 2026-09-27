@@ -1,0 +1,880 @@
+# Registre des mécaniques — source de vérité de la couverture.
+# statut : absent | modelise | teste | valide-journal | valide-jeu
+# certitude : certain | probable | suppose ; forever : oui | modifie | inconnu
+# Les entrées 'teste' héritées du skill Mage pointent vers seed/forever-mage/tests/run_all.py : à remplacer par les tests portés en T02.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: A1
+    categorie: attaque
+    description: "Table d'attaque des coups blancs (ordre, tirage unique)"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A2
+    categorie: attaque
+    description: "Deux jets pour les sorts (raté puis résistance)"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A3
+    categorie: attaque
+    description: "Raté des sorts selon l'écart de niveau, plancher 1 %"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: A4
+    categorie: attaque
+    description: "Toucher unifié Forever (sources, plafond, poisons et pièges)"
+    forever: modifie
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: A5
+    categorie: attaque
+    description: "Critique unifié ; critique des sorts par Intellect et niveau"
+    forever: modifie
+    statut: teste
+    certitude: probable
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: A6
+    categorie: attaque
+    description: "Érafles (taux et pénalité selon la compétence d'arme)"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A7
+    categorie: attaque
+    description: "Compétence d'arme réduite dans Forever"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A8
+    categorie: attaque
+    description: "Stat « réduit esquive et parade »"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A9
+    categorie: attaque
+    description: "Esquive, parade, blocage selon la position"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A10
+    categorie: attaque
+    description: "Pénalité de raté en double arme"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A11
+    categorie: attaque
+    description: "Écrasements (monstres)"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A12
+    categorie: attaque
+    description: "Résistances partielles (paliers, moyenne, plafond 75 %)"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A13
+    categorie: attaque
+    description: "Sorts binaires et non binaires"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A14
+    categorie: attaque
+    description: "Résistance liée au niveau (non réductible)"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A15
+    categorie: attaque
+    description: "Pénétration des sorts"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A16
+    categorie: attaque
+    description: "Écoles et immunités (école double Givre-feu comprise)"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: A17
+    categorie: attaque
+    description: "Les effets sur la durée critiquent (Forever)"
+    forever: modifie
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: A18
+    categorie: attaque
+    description: "Ignite : cumul, rafraîchissement"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: A19
+    categorie: attaque
+    description: "Procs exclus des critiques périodiques (Hot Streak)"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B1
+    categorie: temps
+    description: "Temps de recharge global (1,5 s)"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: B2
+    categorie: temps
+    description: "Hâte et arrondis (10 points de notation par 1 %)"
+    forever: modifie
+    statut: teste
+    certitude: probable
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: B3
+    categorie: temps
+    description: "File d'attente des sorts"
+    forever: inconnu
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B4
+    categorie: temps
+    description: "Latence et temps de réaction"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B5
+    categorie: temps
+    description: "Regroupement des actions serveur (valeur Forever à mesurer)"
+    forever: inconnu
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B6
+    categorie: temps
+    description: "Recul d'incantation et canalisations"
+    forever: oui
+    statut: modelise
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B7
+    categorie: ressources
+    description: "Règle des 5 s, ticks de 2 s, régénération pendant l'incantation"
+    forever: oui
+    statut: modelise
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B8
+    categorie: ressources
+    description: "MP5"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B9
+    categorie: ressources
+    description: "Mana de base, Intellect vers mana et critique"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: B10
+    categorie: ressources
+    description: "Évocation, gemmes, potions (recharges partagées)"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B11
+    categorie: ressources
+    description: "Coûts en % du mana de base, escalade d'Arcane Blast"
+    forever: modifie
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: B12
+    categorie: ressources
+    description: "Clearcasting"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: B13
+    categorie: temps
+    description: "Recharges des sorts et réductions par talents"
+    forever: oui
+    statut: modelise
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B14
+    categorie: temps
+    description: "Procs : PPM, chance fixe, recharges internes"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: B15
+    categorie: temps
+    description: "Durée, charges, rafraîchissement et cumul des buffs"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C1
+    categorie: physique
+    description: "Temps de vol des projectiles"
+    forever: oui
+    statut: modelise
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C2
+    categorie: physique
+    description: "Portées et talents de portée"
+    forever: oui
+    statut: modelise
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C3
+    categorie: physique
+    description: "Marge de mêlée et hitbox"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C4
+    categorie: physique
+    description: "Vitesse de déplacement du joueur"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C5
+    categorie: physique
+    description: "Vitesse des monstres, ralentis, gel (Nova, Frostbite)"
+    forever: oui
+    statut: modelise
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C6
+    categorie: physique
+    description: "Temps en mouvement, sorts utilisables en mouvement"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C7
+    categorie: physique
+    description: "Rayon des zones et plafonds de cibles"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: C8
+    categorie: physique
+    description: "Ligne de vue et temps morts aux changements de phase"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: D1
+    categorie: environnement
+    description: "Buffs de raid et de groupe (dont ceux devenus passifs)"
+    forever: modifie
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: D2
+    categorie: environnement
+    description: "Non-cumuls métier, campement, classe"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: D3
+    categorie: environnement
+    description: "Buffs mondiaux (si présents)"
+    forever: inconnu
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: D4
+    categorie: environnement
+    description: "Débuffs de cible (Winter's Chill personnel)"
+    forever: modifie
+    statut: teste
+    certitude: probable
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: D5
+    categorie: environnement
+    description: "Buffs de campement et de Legacy"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: D6
+    categorie: environnement
+    description: "Effets de biome et de type de créature"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: D7
+    categorie: environnement
+    description: "Bonus d'XP (Well Fed, repos)"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E1
+    categorie: consommables
+    description: "Flacons : un seul actif, conservé à la mort, conditions de zone"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E2
+    categorie: consommables
+    description: "Élixirs et catégories de cumul"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E3
+    categorie: consommables
+    description: "Nourriture (Well Fed, Gourmand +33 %)"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E4
+    categorie: consommables
+    description: "Potions (recharge partagée, soins via First Aid)"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E5
+    categorie: consommables
+    description: "Huiles de sorcier et de mana"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E6
+    categorie: consommables
+    description: "Pierres à aiguiser et poids"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E7
+    categorie: consommables
+    description: "Parchemins"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E8
+    categorie: consommables
+    description: "Objets d'ingénierie (bombes, sapeurs)"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E9
+    categorie: consommables
+    description: "Runes (recharges partagées)"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E10
+    categorie: consommables
+    description: "Bonus des alchimistes (durée et puissance)"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E11
+    categorie: consommables
+    description: "Protections contre les écoles"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: E12
+    categorie: consommables
+    description: "Coût en or et disponibilité"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F1
+    categorie: equipement
+    description: "Stats des objets par version (formules du client)"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F2
+    categorie: equipement
+    description: "Enchantements"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F3
+    categorie: equipement
+    description: "Bonus de set"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F4
+    categorie: equipement
+    description: "Effets déclenchés et effets d'utilisation"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F5
+    categorie: equipement
+    description: "Bijoux uniques"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F6
+    categorie: equipement
+    description: "Armes de lanceur de sorts"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F7
+    categorie: equipement
+    description: "Bonus de soins : un tiers en dégâts"
+    forever: modifie
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: F8
+    categorie: equipement
+    description: "Liste des effets non modélisés"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: G1
+    categorie: personnage
+    description: "Raciaux (Skyborne et nouvelles combinaisons)"
+    forever: modifie
+    statut: modelise
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: G2
+    categorie: personnage
+    description: "Stats de base par race, classe et niveau"
+    forever: oui
+    statut: modelise
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: G3
+    categorie: personnage
+    description: "Talents : rangs, prérequis, paliers, 4e talent doré"
+    forever: modifie
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: G4
+    categorie: personnage
+    description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"
+    forever: modifie
+    statut: teste
+    certitude: probable
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: G5
+    categorie: personnage
+    description: "Legacy (arbre de compte)"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: G6
+    categorie: personnage
+    description: "Bonus propres aux métiers du joueur"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H1
+    categorie: rencontre
+    description: "Niveau de la cible (+3 pour un boss)"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: H2
+    categorie: rencontre
+    description: "Armure et résistances de la cible"
+    forever: oui
+    statut: modelise
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H3
+    categorie: rencontre
+    description: "Nombre de cibles et adds"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H4
+    categorie: rencontre
+    description: "Phase d'exécution"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H5
+    categorie: rencontre
+    description: "Durée et variance"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H6
+    categorie: rencontre
+    description: "Mouvement programmé"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H7
+    categorie: rencontre
+    description: "Interruptions et incantations du boss"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H8
+    categorie: rencontre
+    description: "Taille de raid (10, 20, 40)"
+    forever: modifie
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H9
+    categorie: rencontre
+    description: "Menace et plafond de menace"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: H10
+    categorie: rencontre
+    description: "Mort et ressources"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: I1
+    categorie: optimisation
+    description: "Rotations (listes de priorités) par spé et situation"
+    forever: oui
+    statut: modelise
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: I2
+    categorie: optimisation
+    description: "Optimisation des rotations"
+    forever: oui
+    statut: absent
+    certitude: suppose
+    sources: []
+    tests: []
+    tolerance: null
+  - id: I3
+    categorie: optimisation
+    description: "Poids de stats avec erreur standard"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: I4
+    categorie: optimisation
+    description: "Simulation de l'ensemble réel"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: I5
+    categorie: optimisation
+    description: "Optimiseur de talents et de respec"
+    forever: oui
+    statut: modelise
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: I6
+    categorie: optimisation
+    description: "Leveling : temps par monstre, XP, repos"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: J1
+    categorie: meta
+    description: "Version du client et hotfixes"
+    forever: oui
+    statut: modelise
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: J2
+    categorie: meta
+    description: "Graine et reproductibilité"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources: []
+    tests: ["seed/forever-mage/tests/run_all.py"]
+    tolerance: null
+  - id: J3
+    categorie: meta
+    description: "Erreur statistique cible"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null
+  - id: J4
+    categorie: meta
+    description: "Parité avec wowsims Forever"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: J5
+    categorie: meta
+    description: "Validation par journaux de combat (taille d'échantillon)"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources: []
+    tests: []
+    tolerance: null
+  - id: J6
+    categorie: meta
+    description: "Hypothèses datées avec date de péremption"
+    forever: oui
+    statut: absent
+    certitude: certain
+    sources: []
+    tests: []
+    tolerance: null

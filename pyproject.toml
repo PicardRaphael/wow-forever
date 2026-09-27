@@ -1,0 +1,25 @@
+[project]
+name = "forever-core"
+version = "0.1.0"
+description = "Système expert WoW Forever : données versionnées, mécaniques, simulateurs, CLI et serveur MCP"
+requires-python = ">=3.12"
+dependencies = ["pyyaml>=6", "matplotlib>=3.9", "mcp>=1.0"]
+
+[project.scripts]
+forever = "forever.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-socket>=0.7", "ruff>=0.6", "mypy>=1.11", "types-PyYAML"]
+
+[tool.pytest.ini_options]
+addopts = "--disable-socket"
+markers = ["slow: tests longs (Monte Carlo complet, parité)"]
+
+[tool.ruff]
+line-length = 120
+extend-exclude = ["seed"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+exclude = ["seed/"]

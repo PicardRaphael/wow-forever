@@ -1,0 +1,152 @@
+{
+ "build": "1.60.1.70009",
+ "source": "foreverchanges.pro/fr/racials (client 1.60.1.70009) + Icy Veins / AOEAH pour les recharges",
+ "mage_races": {
+  "Horde": [
+   "Orc",
+   "Undead",
+   "Troll"
+  ],
+  "Alliance": [
+   "Human",
+   "Gnome",
+   "Skyborne (Ordre suprême)"
+  ]
+ },
+ "races": {
+  "Orc": {
+   "blood_fury": {
+    "ap_sp_pct": 0.1,
+    "duration": 15,
+    "cooldown": 120,
+    "certainty": "FC (valeur) / PC (recharge)"
+   },
+   "shatter_curse": {
+    "dispels": [
+     "curse",
+     "bane"
+    ],
+    "immunity": true,
+    "magic_dmg_taken": -0.15,
+    "duration": 8,
+    "certainty": "FC"
+   },
+   "hardiness": {
+    "stun_duration": -0.2,
+    "certainty": "FC"
+   },
+   "axe_spec": {
+    "crit": 0.01,
+    "note": "inutile au Mage (pas de hache)"
+   }
+  },
+  "Undead": {
+   "will_of_the_forsaken": {
+    "breaks": [
+     "charm",
+     "fear",
+     "sleep"
+    ],
+    "post_immunity": false,
+    "cooldown": 120,
+    "certainty": "FC (effet) / PC (recharge)"
+   },
+   "cannibalize": {
+    "hp_pct_per_2s": 0.07,
+    "mana_pct_per_2s": 0.07,
+    "duration": 10,
+    "certainty": "FC"
+   },
+   "touch_of_the_grave": {
+    "proc_mage": 0.1,
+    "drain_max_hp_pct": 0.05,
+    "certainty": "FC"
+   },
+   "underwater_breathing": true
+  },
+  "Troll": {
+   "berserking": {
+    "haste": 0.1,
+    "duration": 10,
+    "cooldown": 180,
+    "certainty": "FC (+10 % fixe) / PC (durée, recharge)"
+   },
+   "rapid_regeneration": {
+    "hp_pct": 0.5,
+    "duration": 6,
+    "broken_by": [
+     "move",
+     "act",
+     "damage"
+    ],
+    "certainty": "FC"
+   },
+   "regeneration": {
+    "hp_regen_pct": 0.1,
+    "in_combat_pct": 0.1
+   },
+   "beast_slaying": 0.05
+  },
+  "Human": {
+   "will_to_survive": {
+    "breaks": [
+     "stun"
+    ],
+    "cooldown": 180,
+    "shared_cd_with_pvp_trinket": null,
+    "certainty": "FC (effet) / inconnu (recharge partagée)"
+   },
+   "perception": {
+    "stealth_detect": 20
+   },
+   "sword_spec": {
+    "crit": 0.02,
+    "requires": "épée"
+   },
+   "human_spirit": {
+    "spirit_pct": 0.05
+   }
+  },
+  "Gnome": {
+   "eureka": {
+    "spells": 3,
+    "cost": -0.1,
+    "damage": 0.1,
+    "cooldown": 120,
+    "certainty": "FC (valeurs) / PC (recharge)"
+   },
+   "expansive_mind": {
+    "mana_pct": 0.05
+   },
+   "escape_artist": {
+    "removes": [
+     "root",
+     "snare"
+    ],
+    "immunity_s": 3,
+    "cooldown": 120,
+    "certainty": "FC"
+   },
+   "engineering_spec": {
+    "failure": -0.2
+   }
+  },
+  "Skyborne (Ordre suprême)": {
+   "wind_blessed": {
+    "haste": 0.01
+   },
+   "read_ley_line": {
+    "regen_mult": 2.0,
+    "duration": 15,
+    "near_ley_line_duration": 900
+   },
+   "walk_on_air": {
+    "glide_s": 10
+   },
+   "elemental_knowledge": {
+    "vs_elementals": 0.05
+   },
+   "note": "race payante (pack)"
+  }
+ }
+}

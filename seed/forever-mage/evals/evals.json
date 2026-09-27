@@ -1,0 +1,5 @@
+{"skill_name": "forever-mage", "evals": [
+ {"id": 1, "prompt": "je suis mage niveau 16 orc, frostbolt ou fireball à spam ? j'ai 5 points en improved frostbolt et 1 en elemental precision", "expected_output": "Lance sim_leveling au MC pour les deux rotations avec ces talents, compare le temps total par monstre (pas seulement le DPS), donne le build de données, les hypothèses et une décision tranchée.", "files": []},
+ {"id": 2, "prompt": "donne moi l'ordre des talents mage givre du 10 au 30 pour leveler le plus vite possible", "expected_output": "Vérifie le build, lance optimize.py leveling 10-30, valide au MC (n>=2000) contre l'alternative Mobalytics, présente l'ordre niveau par niveau, signale les égalités dans le bruit.", "files": []},
+ {"id": 3, "prompt": "au 60 je fais raid et BG, je reste givre ou je respec feu pour le raid ?", "expected_output": "Compare les builds raid (optimize raid frost/fire) et le profil PvP, applique le barème de respec, tranche avec les statuts (FS analytique, EST PvP) et recommande une validation wowsims pour le raid.", "files": []}
+]}
