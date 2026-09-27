@@ -40,7 +40,7 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "SpellName": _cols("ID:int Name_lang:str"),
     "SpellEffect": _cols(
         "ID:int SpellID:int DifficultyID:int EffectIndex:int Effect:int EffectAura:int EffectAuraPeriod:int "
-        "EffectBasePointsF:float EffectRealPointsPerLevel:float Variance:float EffectTriggerSpell:int"
+        "EffectBasePointsF:float EffectRealPointsPerLevel:float Variance:float EffectTriggerSpell:int EffectMiscValue_0:int"
     ),
     "SpellLevels": _cols("ID:int SpellID:int DifficultyID:int BaseLevel:int MaxLevel:int SpellLevel:int"),
     "SpellMisc": _cols("ID:int SpellID:int DifficultyID:int Attributes_1:int CastingTimeIndex:int DurationIndex:int"),

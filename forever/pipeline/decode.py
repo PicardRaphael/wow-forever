@@ -416,18 +416,15 @@ def _rank_row(client: _Client, spell: int, rules: Mapping[str, Any]) -> list[Any
     return [row[f] for f in rules["rank_format"]]
 
 
-def decode_spells(
-    tables: Tables, rules: Mapping[str, Any], inherited: Mapping[str, Any], version: str
-) -> dict[str, Any]:
-    """Contenu de `spells.json` : rangs décodés (`rank_format`), noms anglais et français, identifiants des rangs ;
-    les autres champs (portée, ralentissement, sorts utilitaires…) sont repris de `inherited`."""
-    if list(inherited.get("rank_format", [])) != list(rules["rank_format"]):
-        raise DataSchemaError(f"rank_format de {RULES_NAME} différent de celui de spells.json hérité.")
-    client = _Client(tables, rules)
+def _rank_ids(
+    tables: Tables, rules: Mapping[str, Any], client: _Client, names: Mapping[str, str]
+) -> dict[str, list[int]]:
+    """Clé -> identifiants des rangs 1, 2, … des sorts `names` (clé -> nom anglais) : lignes du Mage de
+    SkillLineAbility aux méthodes d'acquisition retenues, rang lu dans Spell.NameSubtext (`spell_ranks`)."""
     lines = set(rules["skill_lines"].values())
     methods = set(rules["spell_ranks"]["acquire_methods"])
     rank_re = re.compile(rules["spell_ranks"]["rank_subtext"])
-    wanted = {name: key for key, name in rules["spells"].items()}
+    wanted = {name: key for key, name in names.items()}
     found: dict[str, dict[int, int]] = defaultdict(dict)
     for r in tables["SkillLineAbility"]:
         spell = int(r["Spell"])
@@ -436,20 +433,35 @@ def decode_spells(
             continue
         match = rank_re.match(str(client.spell.get(spell, {}).get("NameSubtext_lang", "")))
         if not match:
-            raise DataSchemaError(f"Sort {spell} ({rules['spells'][key]}) : rang illisible dans NameSubtext.")
+            raise DataSchemaError(f"Sort {spell} ({names[key]}) : rang illisible dans NameSubtext.")
         rank = int(match[1])
         if found[key].get(rank, spell) != spell:
             raise DataSchemaError(f"{key} : deux sorts pour le rang {rank} ({found[key][rank]}, {spell}).")
         found[key][rank] = spell
+    out = {}
+    for key, name in names.items():
+        ranks = found.get(key, {})
+        if not ranks or sorted(ranks) != list(range(1, len(ranks) + 1)):
+            raise DataSchemaError(f"{key} ({name}) : rangs incomplets dans le client ({sorted(ranks)}).")
+        out[key] = [ranks[r] for r in sorted(ranks)]
+    return out
+
+
+def decode_spells(
+    tables: Tables, rules: Mapping[str, Any], inherited: Mapping[str, Any], version: str
+) -> dict[str, Any]:
+    """Contenu de `spells.json` : rangs décodés (`rank_format`), noms anglais et français, identifiants des rangs ;
+    les autres champs (portée, ralentissement, sorts utilitaires…) sont repris de `inherited`."""
+    if list(inherited.get("rank_format", [])) != list(rules["rank_format"]):
+        raise DataSchemaError(f"rank_format de {RULES_NAME} différent de celui de spells.json hérité.")
+    client = _Client(tables, rules)
+    found = _rank_ids(tables, rules, client, rules["spells"])
     doc = copy.deepcopy(dict(inherited))
     doc["build"] = version
     doc["inherited_from"] = inherited.get("build")
     doc["source"] = f"Client {version} : tables Spell* et SkillLineAbility (wago.tools) décodées par forever decode"
     for key, name in rules["spells"].items():
-        ranks = found.get(key, {})
-        if not ranks or sorted(ranks) != list(range(1, len(ranks) + 1)):
-            raise DataSchemaError(f"{key} ({name}) : rangs incomplets dans le client ({sorted(ranks)}).")
-        ids = [ranks[r] for r in sorted(ranks)]
+        ids = found[key]
         entry = dict(doc["spells"].get(key, {}))
         entry["ranks"] = [_rank_row(client, i, rules) for i in ids]
         entry["name"] = name
@@ -536,20 +548,59 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
                 }
             )
         out[key] = ranks
-    return {
+    notes = [
+        "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
+        "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
+        "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
+        "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)",
+    ]
+    doc: dict[str, Any] = {
         "schema_version": 1,
         "build": version,
-        "source": f"Client {version} : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns (wago.tools) décodées "
-        "par forever decode",
+        "source": f"Client {version} : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns, SkillLineAbility "
+        "(wago.tools) décodées par forever decode",
         "level_cap": int(rules["levels"]["level_cap"]),
         "spells": out,
-        "notes": [
-            "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
-            "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
-            "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
-            "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)",
-        ],
+        "notes": notes,
     }
+    if "utility_spells" in rules:
+        doc["utility"] = _utility(tables, rules, client)
+        notes.append(
+            "utility : armures du Mage, niveau d'apprentissage (SpellLevels.BaseLevel) et effets retenus par "
+            "decode_rules.json.utility_spells"
+        )
+    return doc
+
+
+def _utility(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, list[dict[str, Any]]]:
+    """Armures (`utility_spells`) : par rang, identifiant, niveau d'apprentissage et effets retenus (aura, valeur
+    diverse éventuelle -> champ de SpellEffect)."""
+    spec = rules["utility_spells"]
+    wanted = spec["effects"]
+    out: dict[str, list[dict[str, Any]]] = {}
+    for key, ids in _rank_ids(tables, rules, client, spec["spells"]).items():
+        ranks = []
+        for position, spell_id in enumerate(ids, start=1):
+            effects: dict[str, int | float] = {}
+            for e in client.effects.get(spell_id, {}).values():
+                if int(e["Effect"]) != rules["effects"]["apply_aura"]:
+                    continue
+                for name, want in wanted.items():
+                    if int(e["EffectAura"]) != want["aura"]:
+                        continue
+                    if "misc_value" in want and int(e["EffectMiscValue_0"]) != want["misc_value"]:
+                        continue
+                    effects[name] = normalize(float(e[want["field"]]))
+            ranks.append(
+                {
+                    "rank": position,
+                    "spell_id": spell_id,
+                    "learned_level": int(client.levels[spell_id]["BaseLevel"]),
+                    "effects": effects,
+                }
+            )
+        out[key] = ranks
+    return out
 
 
 # --- Version candidate ---------------------------------------------------------------------------
@@ -663,7 +714,10 @@ def decode_version(
             "spell_scaling.json": {
                 "source": f"Client {version} : points de base par niveau, {decoded_note}",
                 "certainty": "certain",
-                "notes": ["MaxLevel 0 résolu au plafond de niveau (decode_rules.json)"],
+                "notes": [
+                    "MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
+                    "utility : armures du Mage, niveau d'apprentissage et effets (decode_rules.json.utility_spells)",
+                ],
             },
             **{
                 name: {

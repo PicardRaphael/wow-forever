@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "build": "1.60.1.70009",
- "source": "Client 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns (wago.tools) décodées par forever decode",
+ "source": "Client 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns, SkillLineAbility (wago.tools) décodées par forever decode",
  "level_cap": 60,
  "spells": {
   "frostbolt": [
@@ -2437,6 +2437,109 @@
   "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
   "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
   "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
-  "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)"
- ]
+  "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)",
+  "utility : armures du Mage, niveau d'apprentissage (SpellLevels.BaseLevel) et effets retenus par decode_rules.json.utility_spells"
+ ],
+ "utility": {
+  "frost_armor": [
+   {
+    "rank": 1,
+    "spell_id": 168,
+    "learned_level": 1,
+    "effects": {
+     "armor": 30,
+     "chill_on_hit_spell": 6136
+    }
+   },
+   {
+    "rank": 2,
+    "spell_id": 7300,
+    "learned_level": 10,
+    "effects": {
+     "armor": 110,
+     "chill_on_hit_spell": 6136
+    }
+   },
+   {
+    "rank": 3,
+    "spell_id": 7301,
+    "learned_level": 20,
+    "effects": {
+     "armor": 200,
+     "chill_on_hit_spell": 6136
+    }
+   }
+  ],
+  "ice_armor": [
+   {
+    "rank": 1,
+    "spell_id": 7302,
+    "learned_level": 30,
+    "effects": {
+     "armor": 290,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 6
+    }
+   },
+   {
+    "rank": 2,
+    "spell_id": 7320,
+    "learned_level": 40,
+    "effects": {
+     "armor": 380,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 9
+    }
+   },
+   {
+    "rank": 3,
+    "spell_id": 10219,
+    "learned_level": 50,
+    "effects": {
+     "armor": 470,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 12
+    }
+   },
+   {
+    "rank": 4,
+    "spell_id": 10220,
+    "learned_level": 60,
+    "effects": {
+     "armor": 560,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 15
+    }
+   }
+  ],
+  "mage_armor": [
+   {
+    "rank": 1,
+    "spell_id": 6117,
+    "learned_level": 34,
+    "effects": {
+     "magic_resistance": 5,
+     "regen_while_casting_pct": 50
+    }
+   },
+   {
+    "rank": 2,
+    "spell_id": 22782,
+    "learned_level": 46,
+    "effects": {
+     "magic_resistance": 10,
+     "regen_while_casting_pct": 50
+    }
+   },
+   {
+    "rank": 3,
+    "spell_id": 22783,
+    "learned_level": 58,
+    "effects": {
+     "magic_resistance": 15,
+     "regen_while_casting_pct": 50
+    }
+   }
+  ]
+ }
 }

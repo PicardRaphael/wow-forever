@@ -9,6 +9,7 @@ from typing import Any
 
 from forever.config import Deps
 from forever.engine.model import (
+    ArmorRank,
     CharacterModel,
     CoefficientRules,
     CombatRules,
@@ -457,6 +458,35 @@ def _scaling(raw: Any, spells: Mapping[str, Spell]) -> dict[str, tuple[RankScali
     return out
 
 
+def _armors(raw: Any) -> dict[str, tuple[ArmorRank, ...]]:
+    """`spell_scaling.json.utility` : rangs des armures du Mage (niveau d'apprentissage et effets du client)."""
+    r = _Reader(SCALING_FILE)
+    out: dict[str, tuple[ArmorRank, ...]] = {}
+    for kind, ranks in r.obj(raw, "utility", "utility").items():
+        where = f"utility.{kind}"
+        if not isinstance(ranks, list) or not ranks:
+            raise r.fail(where, "liste de rangs")
+        parsed = []
+        for i, entry in enumerate(ranks, start=1):
+            w = f"{where}[{i}]"
+            if not isinstance(entry, dict):
+                raise r.fail(w, "objet")
+            effects = r.obj(entry, "effects", f"{w}.effects")
+            parsed.append(
+                ArmorRank(
+                    kind=kind,
+                    rank=r.int_(entry, "rank", w),
+                    spell_id=r.int_(entry, "spell_id", w),
+                    learned_level=r.int_(entry, "learned_level", w),
+                    effects={k: r.num(effects, k, f"{w}.effects") for k in effects},
+                )
+            )
+        if [a.rank for a in parsed] != list(range(1, len(parsed) + 1)):
+            raise r.fail(where, "rangs 1, 2, … dans l'ordre")
+        out[kind] = tuple(parsed)
+    return out
+
+
 def _constants(raw: Any) -> Constants:
     r = _Reader(MECHANICS_FILE)
     if not isinstance(raw, dict):
@@ -583,7 +613,7 @@ def build_game_data(version: VersionData) -> GameData:
         mob_model=_mob_model(raw[LEVELING_FILE]),
         leveling=_leveling(_Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")),
         utility=_utility(raw[SPELLS_FILE]),
-        armors={},
+        armors=_armors(raw[SCALING_FILE]),
     )
 
 

@@ -5,8 +5,10 @@ Portage de seed/forever-mage/scripts/sim_leveling.py (`kill_analytic`) : approch
 sa course, ralentie par Frostbolt), puis cycle en mêlée (sort principal allongé par le recul d'incantation, Ice Lance
 pendant le gel de Frostbite et sur Fingers of Frost, Fire Blast à chaque recharge), dégâts subis hors gel, repos.
 Deux termes morts du seed sont omis sans changer un seul résultat : `cyc_time` multiplie un plafond par 0, et `k`
-(part de temps sur Fire Blast) n'est jamais lu. Comme le seed, le cycle compte la recharge de Fire Blast du rang,
-sans Wake of Fire.
+(part de temps sur Fire Blast) n'est jamais lu. Avec `rules="seed"`, comme le seed, le cycle compte la recharge de
+Fire Blast du rang, sans Wake of Fire ; avec `rules="forever"` (défaut, T04c), la recharge réduite par Wake of Fire
+(B13), l'armure portée selon le niveau (ralenti des coups sous Frost ou Ice Armor seulement) et la régénération
+cumulée d'Arcane Meditation et de Mage Armor. Frost Nova n'est pas modélisée par l'analytique.
 
 Les règles viennent de `forever/engine/` ; ce module assemble l'espérance. Registre : I1, I6."""
 
@@ -14,8 +16,9 @@ from __future__ import annotations
 
 from typing import Any
 
+from forever.engine.armor import worn_armor
 from forever.engine.cast import expected_cast
-from forever.engine.casting import melee_cast_time, pushback_rate
+from forever.engine.casting import melee_cast_time, pushback_rate, spell_cooldown
 from forever.engine.character import character
 from forever.engine.mana import downtime, in_combat_regen_fraction
 from forever.engine.model import CharacterOverrides, GameData, Points
@@ -68,7 +71,9 @@ def kill_analytic(
     slow = frostbolt_slow(gd, pts) if frostbolt else 0.0
     run = mob_speed(gd, slow * e["hit"])
     t0 = c + flight + (frng - mm.melee_range) / run
-    swing = attacker_swing_s(gd, frost_armor=True)
+    forever = o["rules"] == "forever"
+    slows = worn_armor(gd, level, o["armor"]).slows_attackers if forever else True
+    swing = attacker_swing_s(gd, frost_armor=slows)
     p_land = mob_land_chance(gd)
     push_per_s = pushback_rate(gd, pts, swing_s=swing, fire_school=main == "fireball")
     c_melee = melee_cast_time(gd, c, push_per_s)
@@ -90,9 +95,10 @@ def kill_analytic(
     if main == "fireball":
         fbl = expected_cast(gd, "fire_blast", level, pts, ch, level_diff, spell_level=spell_level)
         if fbl:
-            cyc_dmg += fbl["dmg"] * c_melee / fbl["cooldown_s"]
-            cyc_mana += fbl["mana"] * c_melee / fbl["cooldown_s"]
-            cyc_time += gcd * c_melee / fbl["cooldown_s"]
+            fbl_cd = spell_cooldown(gd, "fire_blast", fbl["rank"], pts) if forever else fbl["cooldown_s"]
+            cyc_dmg += fbl["dmg"] * c_melee / fbl_cd
+            cyc_mana += fbl["mana"] * c_melee / fbl_cd
+            cyc_time += gcd * c_melee / fbl_cd
     n_pre = t0 / c
     if hp <= n_pre * d_cast:
         combat = hp / d_cast * c + flight
@@ -105,7 +111,8 @@ def kill_analytic(
     frozen_frac = min(lv.analytic_freeze_cap, frz_per_cast / cyc_time) if t_melee else 0.0
     hit_raw = mob_swing_damage(gd, mlevel, ch.armor)
     taken = t_melee * (1 - frozen_frac) / swing * p_land * mob_expected_hit(gd, hit_raw)
-    mana = max(0.0, mana - in_combat_regen_fraction(gd, pts, level) * ch.spirit_regen * combat)
+    regen = in_combat_regen_fraction(gd, pts, level, armor=o["armor"], rules=o["rules"])
+    mana = max(0.0, mana - regen * ch.spirit_regen * combat)
     down = downtime(gd, ch, level, mana, taken)
     total = combat + down + o["run_between_s"]
     return {

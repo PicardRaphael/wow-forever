@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from forever.engine.armor import worn_armor
 from forever.engine.model import SCHOOL_FROST, Buffs, Character, GameData, Points, Rank, Restore
 from forever.engine.talents import talent_value
 
@@ -33,14 +34,19 @@ def mana_cost(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
 def in_combat_regen_fraction(
     gd: GameData, pts: Points, level: int, *, armor: str = "auto", rules: str = "forever"
 ) -> float:
-    """Part de la régénération d'Esprit gardée en combat (règle d'incantation) : Arcane Meditation, ou Mage Armor
-    dès le niveau de son premier rang (`spells.json.utility`), bornée à 1.
+    """Part de la régénération d'Esprit gardée en combat (règle d'incantation), bornée à 1.
+
+    `rules="forever"` : Arcane Meditation + part de l'armure portée (`worn_armor`, Mage Armor : aura 134 du client),
+    cumul de la règle Classic (deux auras du même type s'additionnent ; suppose, T04c). `rules="seed"` : maximum
+    d'Arcane Meditation et de Mage Armor dès le niveau de son premier rang (`spells.json.utility`), comme le seed.
 
     Registre : B7"""
     f = talent_value(gd, pts, "arcaneMeditation") / PERCENT
-    if level >= gd.utility.mage_armor_level:
-        f = max(f, gd.utility.mage_armor_regen)
-    return min(1.0, f)
+    if rules == "seed":
+        if level >= gd.utility.mage_armor_level:
+            f = max(f, gd.utility.mage_armor_regen)
+        return min(1.0, f)
+    return min(1.0, f + worn_armor(gd, level, armor).regen_while_casting)
 
 
 def _restore_rate(r: Restore, level: int) -> float:

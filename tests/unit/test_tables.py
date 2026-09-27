@@ -15,7 +15,7 @@ def write_csv(tmp_path, name, text):
 
 def test_fixture_rows_are_typed():
     rows = read_table(WAGO_70009 / "enUS" / "SpellName.csv", "SpellName")
-    assert len(rows) == 203  # fixture extraite (README.md) : 203 sorts
+    assert len(rows) == 217  # fixture extraite (README.md) : 217 sorts (armures ajoutées en T04c)
     first = rows[0]
     assert set(first) == {"ID", "Name_lang"}  # colonnes déclarées seulement
     assert isinstance(first["ID"], int) and isinstance(first["Name_lang"], str)

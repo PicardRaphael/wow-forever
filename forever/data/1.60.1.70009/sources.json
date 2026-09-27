@@ -126,7 +126,8 @@
       "certainty": "certain",
       "notes": [
         "points de base, points par niveau et variance par effet de dégâts ; MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
-        "spells.json inchangé (décision 39) : rangs évalués au niveau min(MaxLevel, 60)"
+        "spells.json inchangé (décision 39) : rangs évalués au niveau min(MaxLevel, 60)",
+        "utility (T04c, 2026-09-27) : armures du Mage (Frost Armor, Ice Armor, Mage Armor), niveau d'apprentissage SpellLevels.BaseLevel et effets retenus par decode_rules.json.utility_spells (SkillLineAbility, SpellEffect)"
       ]
     }
   }

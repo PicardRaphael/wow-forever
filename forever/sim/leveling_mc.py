@@ -5,6 +5,10 @@ volent pendant que le Mage enchaîne l'incantation suivante (impact différé : 
 Winter's Chill), avec course et ralentis du monstre, recul d'incantation, DoT et Ignite, coups critiques du monstre,
 armure, mana et repos. Les tirages `rng.random()` suivent l'ordre du seed : à graine égale, résultat égal.
 
+Option `rules` (T04c) : `seed` reproduit le seed à l'identique (parité) ; `forever` (défaut) applique les corrections
+de T04c : armure portée selon le niveau d'apprentissage du client (`armor`), régénération cumulée d'Arcane
+Meditation et de Mage Armor. Aucune correction ne consomme de tirage.
+
 Aucune formule de combat ici : chaque règle vient de `forever/engine/` ; ce module n'orchestre que le temps, les
 événements et les tirages. Registre : I1 (rotation frost/fire), I6 (leveling), J2 (graine)."""
 
@@ -14,7 +18,7 @@ import random
 import statistics
 from typing import Any, TypedDict, cast
 
-from forever.engine.armor import ARMOR_CHOICES
+from forever.engine.armor import ARMOR_CHOICES, worn_armor
 from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time, pushback_resist_chance, pushback_s, spell_cooldown
 from forever.engine.character import character
@@ -134,7 +138,10 @@ def kill_mc(
     burning = pushback_resist_chance(gd, pts, fire_school=True)
     clearcast = talent_value(gd, pts, "arcaneConcentration") / PERCENT
     ignite = talent_value(gd, pts, "ignite")
-    regen_c = in_combat_regen_fraction(gd, pts, level) * ch.spirit_regen
+    forever = o["rules"] == "forever"
+    # armure portée (forever) : ralenti des coups du monstre seulement sous Frost ou Ice Armor ; seed : toujours
+    slows = worn_armor(gd, level, o["armor"]).slows_attackers if forever else True
+    regen_c = in_combat_regen_fraction(gd, pts, level, armor=o["armor"], rules=o["rules"]) * ch.spirit_regen
     s: dict[str, Any] = {
         "t": 0.0,
         "mana": 0.0,
@@ -226,7 +233,8 @@ def kill_mc(
                 elif s["swing"] is not None and nt >= s["swing"]:
                     if rng.random() > mm.avoid_vs_mage:
                         s["taken"] += mob_hit_taken(gd, hit_raw, crit=rng.random() < mm.crit)
-                        s["farmor"] = nt + gd.utility.frost_armor_duration_s
+                        if slows:
+                            s["farmor"] = nt + gd.utility.frost_armor_duration_s
                         if casting and not (fire_school and rng.random() < burning):
                             push += pushback_s(gd)
                     s["swing"] = nt + attacker_swing_s(gd, frost_armor=nt < s["farmor"])
