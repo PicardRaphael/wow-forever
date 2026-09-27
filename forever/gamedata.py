@@ -38,6 +38,7 @@ RANK_COLUMNS = ("level", "min", "max", "dot_total", "dot_duration", "cast_s", "m
 # Règles de `leveling.json.combat_rules` qui paramètrent une mécanique du registre (utilisées par `explain`).
 COMBAT_RULE_MECHANICS: dict[str, tuple[str, ...]] = {
     "A3": ("spell_miss_by_level_diff", "min_miss"),
+    "H1": ("spell_miss_by_level_diff",),
     "B1": ("gcd",),
     "A21": ("crit_mult_spell",),
     "A17": ("dot_can_crit",),
@@ -172,6 +173,8 @@ def _talents(raw: Any) -> tuple[dict[str, Talent], tuple[str, ...]]:
                 if not isinstance(prereq_raw, dict):
                     raise r.fail(f"{where}.prereq", "objet")
                 prereq = (r.int_(prereq_raw, "tier", f"{where}.prereq"), r.int_(prereq_raw, "col", f"{where}.prereq"))
+            if key in talents:
+                raise r.fail(where, "clé de talent unique")
             talents[key] = Talent(
                 key=key,
                 name=r.str_(t, "name", f"{where}.name"),
@@ -191,6 +194,9 @@ def _rules(raw: Any) -> CombatRules:
         raise r.fail("racine", "objet")
     cr = r.obj(raw, "combat_rules", "combat_rules")
     miss = r.obj(cr, "spell_miss_by_level_diff", "combat_rules.spell_miss_by_level_diff")
+    levels = [k for k in miss if k != "-"]
+    if "-" not in miss or not levels or not all(k.lstrip("-").isdigit() for k in levels):
+        raise r.fail("combat_rules.spell_miss_by_level_diff", "table avec la clé « - » et des écarts entiers")
     return CombatRules(
         gcd_s=r.num(cr, "gcd", "combat_rules.gcd"),
         spell_miss_by_level_diff={k: r.num(miss, k, f"combat_rules.spell_miss_by_level_diff.{k}") for k in miss},
@@ -252,7 +258,9 @@ def _constants(raw: Any) -> Constants:
         if not isinstance(slowed, bool):
             raise r.fail(f"{where}.slowed", "booléen")
         fixed[spell] = FixedCoefficient(
-            value=r.opt_num(spec, "value", where), cast_s=r.opt_num(spec, "cast_s", where), slowed=slowed
+            value=r.num(spec, "value", where) if "value" in spec else None,
+            cast_s=r.num(spec, "cast_s", where) if "cast_s" in spec else None,
+            slowed=slowed,
         )
     coefficients = CoefficientRules(
         cast_divisor=num("coefficient.cast_divisor"),

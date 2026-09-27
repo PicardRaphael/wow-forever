@@ -65,9 +65,12 @@ def _parameters(version: VersionData, mechanic_id: str) -> list[MechanicParamete
         for key, entry in values.items()
         if isinstance(entry, dict) and entry.get("registry") == mechanic_id
     ]
-    meta: dict[str, Any] = version.sources.get("files", {}).get(LEVELING_FILE, {})
-    field_certainty: dict[str, str] = meta.get("field_certainty", {})
-    field_notes: dict[str, str] = meta.get("field_notes", {})
+    files = version.sources.get("files", {})
+    meta: Any = files.get(LEVELING_FILE, {}) if isinstance(files, dict) else None
+    field_certainty: Any = meta.get("field_certainty", {}) if isinstance(meta, dict) else None
+    field_notes: Any = meta.get("field_notes", {}) if isinstance(meta, dict) else None
+    if not isinstance(meta, dict) or not isinstance(field_certainty, dict) or not isinstance(field_notes, dict):
+        raise DataSchemaError(f"sources.json : bloc « {LEVELING_FILE} » absent ou mal formé.")
     for rule in COMBAT_RULE_MECHANICS.get(mechanic_id, ()):
         name = f"combat_rules.{rule}"
         params.append(
@@ -83,6 +86,7 @@ def _parameters(version: VersionData, mechanic_id: str) -> list[MechanicParamete
 
 def explain_mechanic(deps: Deps, mechanic_id: str) -> MechanicExplanation:
     """Explication d'une mécanique du registre ; lève UnknownMechanicError, DataSchemaError ou DataIntegrityError."""
+    version = load_version(deps)  # intégrité d'abord, comme les autres consultations
     try:
         mechanics = load(deps.registry_path)
     except RegistryError as exc:
@@ -90,7 +94,6 @@ def explain_mechanic(deps: Deps, mechanic_id: str) -> MechanicExplanation:
             f"Registre des mécaniques inutilisable ({exc}).", "restaurer docs/MECHANICS_REGISTRY.yaml depuis git"
         ) from exc
     entry = find_entry(mechanics, mechanic_id)
-    version = load_version(deps)
     params = _parameters(version, entry.id)
     certainty = _certainty(entry.certainty)
     fresh = freshness_for_version(deps, version.game_version, allow_network=False)

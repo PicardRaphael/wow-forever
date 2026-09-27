@@ -145,10 +145,10 @@ def _check_tests(mid: str, tests: list[Any], repo_root: Path, cache: dict[Path, 
     for ref in tests:
         ref = str(ref)
         file_part, _, name = ref.partition("::")
-        if not file_part.startswith("tests/"):
+        file = repo_root / file_part
+        if not file_part.startswith("tests/") or not file.resolve().is_relative_to((repo_root / "tests").resolve()):
             errors.append(f"{mid} : référence hors de tests/ refusée '{ref}'")
             continue
-        file = repo_root / file_part
         if not file.is_file():
             errors.append(f"{mid} : test introuvable '{ref}'")
             continue

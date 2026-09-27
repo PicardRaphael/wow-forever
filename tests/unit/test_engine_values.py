@@ -89,3 +89,13 @@ def test_talent_spell_requires_talent(game_data, ch):
     assert expected_cast(game_data, "ice_lance", 60, {}, ch) is None
     r = best_rank(game_data, "ice_lance", 20, {"iceLance": 1})
     assert r is not None and r.position == 1
+
+
+def test_ice_lance_frozen_multiplier(game_data, ch):
+    """Ice Lance contre cible gelée : dégâts de base × frozen_mult du sort (4.0 dans spells.json), ignoré si demandé."""
+    pts = {"iceLance": 1}
+    free = expected_cast(game_data, "ice_lance", 60, pts, ch)
+    frozen = expected_cast(game_data, "ice_lance", 60, pts, ch, frozen=True)
+    ignored = expected_cast(game_data, "ice_lance", 60, pts, ch, frozen=True, frozen_mult=False)
+    assert frozen["direct_per_hit"] == approx(4.0 * free["direct_per_hit"])
+    assert ignored["direct_per_hit"] == approx(free["direct_per_hit"])

@@ -3,16 +3,15 @@
 Registres invalides : tests/fixtures/registry/ (un défaut par fichier) ; faux moteur : tests/fixtures/engine_cites/."""
 
 import ast
-import re
 
 import pytest
 from conftest import FIXTURES, REGISTRY_PATH, REPO_ROOT
 
 from forever.errors import UnknownMechanicError
-from forever.registry import ENGINE_DIR, coverage, find_entry, implementations, load, main, validate
+from forever.registry import ENGINE_DIR, NUMBER_RE, coverage, find_entry, implementations, load, main, validate
 
 REGISTRIES = FIXTURES / "registry"
-NUMBER = re.compile(r"(?<![\w.])\d+(?:[.,]\d+)?(?![\w])")
+NUMBER = NUMBER_RE
 
 DEFECTS = {
     "missing_field.yaml": "champ 'certitude' manquant",
@@ -23,6 +22,8 @@ DEFECTS = {
     "missing_file.yaml": "test introuvable",
     "missing_function.yaml": "fonction de test introuvable",
     "seed_path.yaml": "hors de tests/",
+    "traversal_path.yaml": "hors de tests/",
+    "decimal_comma_formula.yaml": "formule chiffrée (1,5)",
     "modelise_without_test.yaml": "'modelise' sans test",
     "numeric_formula.yaml": "formule chiffrée",
     "no_implementation.yaml": "aucune implémentation",

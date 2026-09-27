@@ -204,7 +204,7 @@ class Character:
     haste: float
     hp: float
     armor: float
-    spirit_regen: float  # mana par seconde, hors règle des 5 s
+    spirit_regen: float  # mana par seconde, hors règle d'incantation (combat_rules.five_second_rule)
     overrides: CharacterOverrides
 
 

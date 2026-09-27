@@ -123,7 +123,7 @@
     },
     "crit.winters_chill_per_stack": {
       "value": 0.02,
-      "certainty": "certain",
+      "certainty": "probable",
       "registry": "D4",
       "source": "Winter's Chill +2 % de critique par cumul, Frostbolt et Ice Lance seulement dans Forever (FC, references/mechanics.md)"
     },

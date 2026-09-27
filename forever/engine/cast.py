@@ -31,8 +31,9 @@ def expected_cast(
     (Frost Channeling, Master of Elements, Clearcasting), temps d'incantation, portée. None si le sort n'est pas appris.
 
     Portée : celle du sort, sinon la portée par défaut des données (sort de zone autour du lanceur).
+    Cible gelée : multiplicateur de dégâts du sort s'il en publie un (Ice Lance), `frozen_mult=False` pour l'ignorer.
 
-    Registre : A17, A18, B12, B17, C2"""
+    Registre : A17, A18, A20, B12, B17, C2"""
     r = best_rank(gd, key, level, pts)
     if not r:
         return None

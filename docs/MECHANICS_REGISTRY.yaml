@@ -226,9 +226,10 @@ mechanics:
       - "forever/data/1.60.1.70009/talents.json"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
+      - tests/unit/test_engine_values.py::test_ice_lance_frozen_multiplier
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
-    formule: "mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts)"
+    formule: "mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts) ; Ice Lance contre cible gelée : × mult_gelé du sort"
   - id: A21
     categorie: attaque
     description: "Multiplicateur de critique des sorts et talents qui l'augmentent"
@@ -322,7 +323,7 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    note: "régénération d'Esprit hors règle d'incantation portée dans le modèle de personnage (G2) ; règle d'incantation, ticks et régénération pendant l'incantation : reprise en T04"
   - id: B8
     categorie: ressources
     description: "MP5"
@@ -831,7 +832,7 @@ mechanics:
       - tests/parity/test_fm_parity.py::test_build_parity
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis au maximum"
-    note: "4e talent doré non modélisé"
+    note: "4e talent doré non modélisé ; bonus Legacy « Talented » accepté en paramètre (G5 absent, non actif en bêta)"
   - id: G4
     categorie: personnage
     description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"

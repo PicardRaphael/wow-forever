@@ -46,6 +46,9 @@ def test_explain_combat_rule_parameters(make_deps):
     assert params["combat_rules.spell_miss_by_level_diff"]["certainty"] == "suppose"
     assert params["combat_rules.min_miss"]["value"] == 0.01
     assert explain_mechanic(make_deps(), "A21")["parameters"][0]["key"] == "combat_rules.crit_mult_spell"
+    assert [p["key"] for p in explain_mechanic(make_deps(), "H1")["parameters"]] == [
+        "combat_rules.spell_miss_by_level_diff"
+    ]
 
 
 def test_explain_unknown(make_deps):
@@ -73,6 +76,8 @@ def test_explain_tampered_data(make_deps, data_copy):
     tamper(data_copy / LOCAL_VERSION / "mechanics.json")
     with pytest.raises(DataIntegrityError):
         explain_mechanic(make_deps(data_dir=data_copy), "A5")
+    with pytest.raises(DataIntegrityError):  # intégrité vérifiée avant l'identifiant, comme lookup
+        explain_mechanic(make_deps(data_dir=data_copy), "Z9")
 
 
 def test_cli_text(capsys, make_deps):
