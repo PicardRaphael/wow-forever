@@ -104,3 +104,10 @@ def mob_xp(gd: GameData, level: int) -> float:
 
     Registre : I6"""
     return gd.leveling.xp_base + gd.leveling.xp_per_level * level
+
+
+def mob_swing_damage(gd: GameData, level: int, armor: float) -> float:
+    """Dégâts d'un coup de monstre du niveau donné après l'armure du Mage.
+
+    Registre : I6"""
+    return mob_hit_damage(gd, level) * (1 - armor_reduction(gd, armor, level))

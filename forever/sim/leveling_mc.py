@@ -1,11 +1,56 @@
-"""Simulation Monte Carlo du leveling (portée de seed/forever-mage/scripts/sim_leveling.py)."""
+"""Simulation Monte Carlo du leveling : temps par monstre (combat, repos), mana, dégâts subis, XP par heure.
+
+Portage de seed/forever-mage/scripts/sim_leveling.py (`kill_mc`, `mc`) : simulation pas à pas où les projectiles
+volent pendant que le Mage enchaîne l'incantation suivante (impact différé : dégâts, ralenti, gel, Fingers of Frost,
+Winter's Chill), avec course et ralentis du monstre, recul d'incantation, DoT et Ignite, coups critiques du monstre,
+armure, mana et repos. Les tirages `rng.random()` suivent l'ordre du seed : à graine égale, résultat égal.
+
+Aucune formule de combat ici : chaque règle vient de `forever/engine/` ; ce module n'orchestre que le temps, les
+événements et les tirages. Registre : I1 (rotation frost/fire), I6 (leveling), J2 (graine)."""
 
 from __future__ import annotations
 
 import random
-from typing import Any, TypedDict
+import statistics
+from typing import Any, TypedDict, cast
 
-from forever.engine.model import Character, CharacterOverrides, GameData, Points
+from forever.engine.cast import expected_cast
+from forever.engine.casting import cast_time, pushback_resist_chance, pushback_s, spell_cooldown
+from forever.engine.character import character
+from forever.engine.damage import dot_tick_times, ignite_tick_times, roll_base_damage
+from forever.engine.mana import downtime, in_combat_regen_fraction, mana_cost
+from forever.engine.model import (
+    SCHOOL_FIRE,
+    SCHOOL_FROST,
+    CastEstimate,
+    Character,
+    CharacterOverrides,
+    GameData,
+    Points,
+)
+from forever.engine.monsters import MOB_SOURCES, mob_hp, mob_swing_damage, mob_xp
+from forever.engine.movement import (
+    attacker_swing_s,
+    chill_duration,
+    frostbite_chance,
+    frostbite_freeze_s,
+    frostbolt_slow,
+    mob_speed,
+    spell_range,
+    travel_time,
+)
+from forever.engine.spells import SPELL_LEVELS, best_rank
+from forever.engine.talents import talent_value
+
+ROTATIONS = {"frost": "frostbolt", "fire": "fireball"}  # sort principal de chaque rotation
+OPTIONS = ("level_diff", "nova", "nova_break", "run_between_s", "mob_source", "spell_level")
+# Paramètres de méthode (pas des chiffres de jeu) : pas de temps, garde contre une boucle sans fin, marges de temps.
+STEP_S = 0.05
+GUARD_CASTS = 500
+EPSILON_S = 1e-9
+LOOKAHEAD_S = 0.01
+SECONDS_PER_HOUR = 3600.0
+PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
 
 
 class KillResult(TypedDict):
@@ -17,6 +62,31 @@ class KillResult(TypedDict):
     xp_h: float
 
 
+def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) -> dict[str, Any]:
+    """Options du simulateur complétées par les défauts des données (`leveling.defaults`) ; ValueError si une option,
+    une rotation, une source de PV ou un niveau de sort est inconnu."""
+    unknown = sorted(set(options) - set(OPTIONS))
+    if unknown:
+        raise ValueError(f"option inconnue : {', '.join(unknown)} ({', '.join(OPTIONS)} attendues)")
+    if rotation not in ROTATIONS:
+        raise ValueError(f"rotation inconnue « {rotation} » ({' ou '.join(ROTATIONS)} attendue)")
+    lv = gd.leveling
+    o = {
+        "level_diff": lv.default_level_diff,
+        "nova": False,
+        "nova_break": lv.default_nova_break,
+        "run_between_s": lv.default_run_between_s,
+        "mob_source": "measured",
+        "spell_level": "character",
+        **options,
+    }
+    if o["mob_source"] not in MOB_SOURCES:
+        raise ValueError(f"mob_source inconnu « {o['mob_source']} » ({' ou '.join(MOB_SOURCES)} attendu)")
+    if o["spell_level"] not in SPELL_LEVELS:
+        raise ValueError(f"spell_level inconnu « {o['spell_level']} » ({' ou '.join(SPELL_LEVELS)} attendu)")
+    return o
+
+
 def kill_mc(
     gd: GameData,
     level: int,
@@ -26,7 +96,201 @@ def kill_mc(
     rng: random.Random | None = None,
     **options: Any,
 ) -> KillResult:
-    raise NotImplementedError
+    """Un combat simulé pas à pas contre un monstre normal de niveau `level + level_diff`, puis le repos."""
+    o = options_with_defaults(gd, rotation, options)
+    rng = rng or random.Random()
+    mm = gd.mob_model
+    gcd = gd.rules.gcd_s
+    level_diff = o["level_diff"]
+    mlevel = level + level_diff
+    hp = [mob_hp(gd, mlevel, o["mob_source"]).value]
+    hit_raw = mob_swing_damage(gd, mlevel, ch.armor)
+    main = ROTATIONS[rotation]
+    r_main = best_rank(gd, main, level, pts)
+    if r_main is None:
+        raise ValueError(f"{main} n'est pas appris au niveau {level}")
+    has_il = best_rank(gd, "ice_lance", level, pts) is not None
+    has_fbl = best_rank(gd, "fire_blast", level, pts) is not None
+    nova_r = best_rank(gd, "frost_nova", level, pts)
+    slow = frostbolt_slow(gd, pts)
+    fbite = frostbite_chance(gd, pts)
+    fof_p = talent_value(gd, pts, "fingersOfFrost", 0) / PERCENT
+    fof_n = int(talent_value(gd, pts, "fingersOfFrost", 1, 1))
+    wc_p = talent_value(gd, pts, "wintersChill", 0) / PERCENT
+    wc_max = int(talent_value(gd, pts, "wintersChill", 1, 0))
+    burning = pushback_resist_chance(gd, pts, fire_school=True)
+    mastery = talent_value(gd, pts, "masterOfElements") / PERCENT
+    clearcast = talent_value(gd, pts, "arcaneConcentration") / PERCENT
+    ignite = talent_value(gd, pts, "ignite")
+    regen_c = in_combat_regen_fraction(gd, pts, level) * ch.spirit_regen
+    s: dict[str, Any] = {
+        "t": 0.0,
+        "mana": 0.0,
+        "taken": 0.0,
+        "aggro": False,
+        "chill": -1.0,
+        "frozen": -1.0,
+        "nova": False,
+        "swing": None,
+        "farmor": -1.0,
+        "nova_ready": 0.0,
+        "fbl_ready": 0.0,
+        "fof": 0,
+        "wc": 0,
+        "cc": False,
+        "dist": spell_range(gd, main, pts),
+    }
+    dots: list[tuple[float, float]] = []  # (instant, dégâts)
+    impacts: list[tuple[float, str, float, bool]] = []  # (instant, sort, dégâts, touché)
+
+    def fire_spell(key: str, frozen: bool) -> CastEstimate:
+        e = expected_cast(
+            gd, key, level, pts, ch, level_diff, frozen=frozen, wc_stacks=s["wc"], spell_level=o["spell_level"]
+        )
+        assert e is not None  # seuls les sorts appris sont lancés
+        if not s["cc"]:
+            s["mana"] += mana_cost(gd, key, e["rank"], pts, ch)
+        s["cc"] = False
+        landed = rng.random() < e["hit"]
+        dmg = 0.0
+        travel = travel_time(gd, key, s["dist"] if key != "frost_nova" else 0.0)
+        if landed:
+            r = e["rank"]
+            base = roll_base_damage(gd, key, r, ch, rng.random(), frozen=frozen and key == "ice_lance")
+            crit = rng.random() < e["crit"]
+            dmg = base * e["dmg_mult"] * (e["crit_mult"] if crit else 1.0)
+            if crit and e["school"] in (SCHOOL_FIRE | SCHOOL_FROST):
+                s["mana"] -= mastery * (r.mana or e["mana"])
+            if rng.random() < clearcast:
+                s["cc"] = True
+            if r.dot_total:
+                ticks = dot_tick_times(gd, r.dot_duration_s)
+                tick = r.dot_total * e["dmg_mult"] / len(ticks)
+                for at in ticks:
+                    dots.append((s["t"] + travel + at, tick * (e["crit_mult"] if rng.random() < e["crit"] else 1.0)))
+            if crit and e["school"] in SCHOOL_FIRE and ignite:
+                ig = dmg * ignite / PERCENT
+                ig_ticks = ignite_tick_times(gd)
+                for at in ig_ticks:
+                    dots.append((s["t"] + travel + at, ig / len(ig_ticks)))
+        impacts.append((s["t"] + travel, key, dmg, landed))
+        return e
+
+    def on_impact(key: str, dmg: float, landed: bool, now: float) -> None:
+        s["aggro"] = True
+        if not landed:
+            return
+        hp[0] -= dmg
+        if s["nova"] and key != "frost_nova" and dmg > 0 and rng.random() < o["nova_break"]:
+            s["nova"] = False
+        if key == "frostbolt":
+            s["chill"] = now + chill_duration(gd, r_main, pts)
+            if fbite and rng.random() < fbite:
+                s["frozen"] = now + frostbite_freeze_s(gd)
+            if fof_p and rng.random() < fof_p:
+                s["fof"] = fof_n
+        if key in ("frostbolt", "ice_lance", "frost_nova") and wc_max and rng.random() < wc_p:
+            s["wc"] = min(wc_max, s["wc"] + 1)
+
+    def advance(t1: float, casting: bool, fire_school: bool = False) -> float:
+        push = 0.0
+        while s["t"] < t1 - EPSILON_S:
+            dt = min(STEP_S, t1 - s["t"])
+            nt = s["t"] + dt
+            for im in sorted([x for x in impacts if x[0] <= nt]):
+                impacts.remove(im)
+                on_impact(im[1], im[2], im[3], im[0])
+            for d in [x for x in dots if x[0] <= nt]:
+                dots.remove(d)
+                hp[0] -= d[1]
+            frozen = s["t"] < s["frozen"] or s["nova"]
+            if s["aggro"] and not frozen:
+                if s["dist"] > mm.melee_range:
+                    sp = mob_speed(gd, slow if s["t"] < s["chill"] else 0.0)
+                    s["dist"] = max(mm.melee_range, s["dist"] - sp * dt)
+                    if s["dist"] <= mm.melee_range and s["swing"] is None:
+                        s["swing"] = nt
+                elif s["swing"] is not None and nt >= s["swing"]:
+                    if rng.random() > mm.avoid_vs_mage:
+                        s["taken"] += hit_raw * (mm.crit_mult if rng.random() < mm.crit else 1.0)
+                        s["farmor"] = nt + gd.utility.frost_armor_duration_s
+                        if casting and not (fire_school and rng.random() < burning):
+                            push += pushback_s(gd)
+                    s["swing"] = nt + attacker_swing_s(gd, frost_armor=nt < s["farmor"])
+            elif frozen and s["swing"] is not None:
+                s["swing"] = max(s["swing"], nt)
+            s["t"] = nt
+            if hp[0] <= 0:
+                break
+        return push
+
+    guard = 0
+    while hp[0] > 0 and guard < GUARD_CASTS:
+        guard += 1
+        frozen_now = s["t"] < s["frozen"] or s["nova"]
+        if (
+            o["nova"]
+            and nova_r
+            and s["aggro"]
+            and s["dist"] <= mm.melee_range
+            and s["t"] >= s["nova_ready"]
+            and not frozen_now
+        ):
+            fire_spell("frost_nova", False)
+            s["nova"] = True
+            s["nova_ready"] = s["t"] + spell_cooldown(gd, "frost_nova", nova_r, pts)
+            advance(s["t"] + gcd, False)
+            s["dist"] = gd.leveling.frost_nova_retreat_yd
+            s["swing"] = None
+            continue
+        if rotation == "frost" and has_il and (frozen_now or s["fof"] > 0):
+            if s["fof"] > 0 and not frozen_now:
+                s["fof"] -= 1
+            fire_spell("ice_lance", True)
+            advance(s["t"] + gcd, False)
+            continue
+        if (
+            rotation == "fire"
+            and has_fbl
+            and s["t"] >= s["fbl_ready"]
+            and s["aggro"]
+            and s["dist"] <= spell_range(gd, "fire_blast", pts)
+        ):
+            e = fire_spell("fire_blast", False)
+            s["fbl_ready"] = s["t"] + spell_cooldown(gd, "fire_blast", e["rank"], pts)
+            advance(s["t"] + gcd, False)
+            continue
+        # jeu expert : ne pas lancer un sort si les projectiles déjà en vol suffisent à tuer
+        if impacts and sum(x[2] for x in impacts) >= hp[0]:
+            advance(min(x[0] for x in impacts) + LOOKAHEAD_S, False)
+            continue
+        treat_frozen = frozen_now or s["fof"] > 0
+        if s["fof"] > 0 and not frozen_now:
+            s["fof"] -= 1
+        end = s["t"] + cast_time(gd, main, r_main, pts, ch)
+        while True:
+            p = advance(end, True, fire_school=(main == "fireball"))
+            if hp[0] <= 0 or p <= 0:
+                break
+            end = s["t"] + p
+        if hp[0] <= 0:
+            break
+        fire_spell(main, treat_frozen)
+    # laisser arriver les projectiles en vol
+    if hp[0] > 0 and impacts:
+        advance(max(x[0] for x in impacts) + LOOKAHEAD_S, False)
+    combat = s["t"]
+    mana_used = max(0.0, s["mana"] - regen_c * combat)
+    down = downtime(gd, ch, level, mana_used, s["taken"])
+    total = combat + down + o["run_between_s"]
+    return {
+        "combat": combat,
+        "mana": mana_used,
+        "taken": s["taken"],
+        "downtime": down,
+        "total": total,
+        "xp_h": mob_xp(gd, level) * SECONDS_PER_HOUR / total,
+    }
 
 
 def mc(
@@ -40,4 +304,23 @@ def mc(
     over: CharacterOverrides | None = None,
     **options: Any,
 ) -> KillResult:
-    raise NotImplementedError
+    """Moyenne de `n` combats simulés avec un générateur à graine fixe (reproductible)."""
+    if n < 1:
+        raise ValueError(f"n = {n} : au moins un combat (n ≥ 1)")
+    options_with_defaults(gd, rotation, options)
+    ch = character(gd, level, race, over)
+    rng = random.Random(seed)
+    rs = [kill_mc(gd, level, pts, ch, rotation, rng, **options) for _ in range(n)]
+    rows = [cast("dict[str, float]", r) for r in rs]
+
+    def avg(key: str) -> float:
+        return statistics.mean(r[key] for r in rows)
+
+    return {
+        "combat": avg("combat"),
+        "mana": avg("mana"),
+        "taken": avg("taken"),
+        "downtime": avg("downtime"),
+        "total": avg("total"),
+        "xp_h": avg("xp_h"),
+    }

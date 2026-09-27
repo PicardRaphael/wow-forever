@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, Character, GameData, Points
+from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, Character, GameData, Points, Rank
+from forever.engine.spells import coefficient
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents de dégâts sont exprimés en %
@@ -44,3 +45,15 @@ def ignite_tick_times(gd: GameData) -> list[float]:
     Registre : A18"""
     lv = gd.leveling
     return [lv.ignite_tick_s * i for i in range(1, lv.ignite_ticks + 1)]
+
+
+def roll_base_damage(gd: GameData, key: str, rank: Rank, ch: Character, u: float, *, frozen: bool = False) -> float:
+    """Dégâts de base d'un coup tiré : min + (max - min) × `u` (tirage uniforme dans [0, 1[ fourni par l'appelant)
+    + coefficient × puissance des sorts ; multiplicateur sur cible gelée du sort s'il en publie un (Ice Lance).
+
+    Registre : G4"""
+    base = rank.damage_min + (rank.damage_max - rank.damage_min) * u + coefficient(gd, key, rank) * spell_power(ch)
+    frozen_mult = gd.spells[key].frozen_mult
+    if frozen and frozen_mult is not None:
+        base *= frozen_mult
+    return base
