@@ -2,7 +2,16 @@
 
 from __future__ import annotations
 
-from forever.engine.model import Buffs, CastEstimate, Character, GameData, Points
+from forever.engine.casting import cast_time
+from forever.engine.crit import crit_chance, crit_mult
+from forever.engine.damage import dmg_mult, spell_power
+from forever.engine.hit import hit_chance
+from forever.engine.mana import mana_cost
+from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, CastEstimate, Character, GameData, Points
+from forever.engine.spells import best_rank, coefficient
+from forever.engine.talents import talent_value
+
+PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
 
 
 def expected_cast(
@@ -21,5 +30,47 @@ def expected_cast(
     """Espérance d'un sort : dégâts (toucher, critique, multiplicateurs, DoT qui critiquent, Ignite), mana
     (Frost Channeling, Master of Elements, Clearcasting), temps d'incantation, portée. None si le sort n'est pas appris.
 
+    Portée : celle du sort, sinon la portée par défaut des données (sort de zone autour du lanceur).
+
     Registre : A17, A18, B12, B17, C2"""
-    raise NotImplementedError
+    r = best_rank(gd, key, level, pts)
+    if not r:
+        return None
+    s = gd.spells[key]
+    school = s.school
+    hit = hit_chance(gd, school, level_diff, pts, ch)
+    crit = crit_chance(gd, key, school, pts, ch, frozen=frozen, wc_stacks=wc_stacks, buffs=buffs)
+    cm = crit_mult(gd, school, pts)
+    dm = dmg_mult(gd, school, pts, buffs)
+    sp = spell_power(ch, buffs)
+    base = (r.damage_min + r.damage_max) / 2.0 + coefficient(gd, key, r) * sp
+    if frozen and frozen_mult and s.frozen_mult is not None:
+        base *= s.frozen_mult
+    direct = base * dm * (1 + crit * (cm - 1))
+    dot = r.dot_total * dm * (1 + (crit * (cm - 1) if gd.rules.dot_can_crit else 0.0))
+    ignite = 0.0
+    if school in SCHOOL_FIRE:
+        ignite = crit * base * dm * cm * talent_value(gd, pts, "ignite") / PERCENT
+    dmg = hit * (direct + dot + ignite)
+    mana = mana_cost(gd, key, r, pts, ch, buffs)
+    base_mana_cost = r.mana if r.mana else mana
+    if school in SCHOOL_FIRE or school in SCHOOL_FROST:
+        mana -= hit * crit * talent_value(gd, pts, "masterOfElements") / PERCENT * base_mana_cost
+    mana *= 1 - hit * talent_value(gd, pts, "arcaneConcentration") / PERCENT
+    return {
+        "key": key,
+        "rank": r,
+        "school": school,
+        "hit": hit,
+        "crit": crit,
+        "crit_mult": cm,
+        "dmg_mult": dm,
+        "dmg": dmg,
+        "direct_per_hit": direct,
+        "dot": dot,
+        "ignite": ignite,
+        "mana": mana,
+        "cast_s": cast_time(gd, key, r, pts, ch, buffs),
+        "range_yd": s.range_yd if s.range_yd is not None else gd.constants.default_range_yd,
+        "cooldown_s": r.cooldown_s,
+    }
