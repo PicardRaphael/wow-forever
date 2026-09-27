@@ -111,3 +111,18 @@ def mob_swing_damage(gd: GameData, level: int, armor: float) -> float:
 
     Registre : I6"""
     return mob_hit_damage(gd, level) * (1 - armor_reduction(gd, armor, level))
+
+
+def mob_land_chance(gd: GameData) -> float:
+    """Registre : I6"""
+    raise NotImplementedError
+
+
+def mob_hit_taken(gd: GameData, hit: float, *, crit: bool) -> float:
+    """Registre : I6"""
+    raise NotImplementedError
+
+
+def mob_expected_hit(gd: GameData, hit: float) -> float:
+    """Registre : I6"""
+    raise NotImplementedError

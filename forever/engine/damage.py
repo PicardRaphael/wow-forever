@@ -57,3 +57,13 @@ def roll_base_damage(gd: GameData, key: str, rank: Rank, ch: Character, u: float
     if frozen and frozen_mult is not None:
         base *= frozen_mult
     return base
+
+
+def dot_tick_damage(gd: GameData, dot_total: float, dmg_mult: float, ticks: int) -> float:
+    """Registre : A17"""
+    raise NotImplementedError
+
+
+def ignite_damage(gd: GameData, pts: Points, crit_damage: float) -> float:
+    """Registre : A18"""
+    raise NotImplementedError

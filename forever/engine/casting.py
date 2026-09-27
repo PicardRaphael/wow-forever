@@ -57,3 +57,13 @@ def spell_cooldown(gd: GameData, key: str, rank: Rank, pts: Points) -> float:
     if key == "fire_blast":
         return rank.cooldown_s - talent_value(gd, pts, "wakeOfFire", 0)
     return rank.cooldown_s
+
+
+def pushback_rate(gd: GameData, pts: Points, *, swing_s: float, fire_school: bool) -> float:
+    """Registre : B6"""
+    raise NotImplementedError
+
+
+def melee_cast_time(gd: GameData, cast_s: float, push_per_s: float) -> float:
+    """Registre : B6"""
+    raise NotImplementedError

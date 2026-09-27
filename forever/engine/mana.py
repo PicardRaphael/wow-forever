@@ -61,3 +61,8 @@ def downtime(gd: GameData, ch: Character, level: int, mana_used: float, taken: f
     Registre : I6"""
     water, food = consumables(gd, level)
     return max(mana_used / (water + ch.spirit_regen), taken / (food + gd.leveling.rest_hp_regen_fraction * ch.hp))
+
+
+def master_of_elements_refund(gd: GameData, pts: Points, rank: Rank, estimated_mana: float) -> float:
+    """Registre : B17"""
+    raise NotImplementedError
