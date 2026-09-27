@@ -120,13 +120,32 @@ def roll_ignite_keep_timer(gd: GameData, state: IgniteState | None, now: float, 
     instants ne bougent pas ; un Ignite sans tic restant repart du critique.
 
     Registre : A18"""
-    raise NotImplementedError
+    if state is None or not state.ticks:
+        return roll_ignite(gd, None, now, amount)
+    return IgniteState(state.remaining + amount, state.ticks)
 
 
 def predict_ignite_ticks(
     gd: GameData, crits: Sequence[tuple[float, float]], part: float, *, keep_timer: bool = False
 ) -> list[tuple[float, float]]:
-    """Tics (instant, dégâts) prédits pour des critiques (instant, dégâts) et une part d'Ignite `part`.
+    """Tics (instant, dégâts) prédits pour des critiques (instant, dégâts) et une part d'Ignite `part`, selon la
+    règle des données (`roll_ignite`) ou la variante qui garde le compteur de tics (`keep_timer`). Un tic qui tombe
+    à l'instant d'un critique passe avant lui.
 
     Registre : A18"""
-    raise NotImplementedError
+    roll = roll_ignite_keep_timer if keep_timer else roll_ignite
+    state: IgniteState | None = None
+    out: list[tuple[float, float]] = []
+
+    def flush(until: float) -> None:
+        nonlocal state
+        while state is not None and state.ticks and state.ticks[0] <= until:
+            at = state.ticks[0]
+            dealt, state = ignite_ticks_due(state, at)
+            out.append((at, dealt))
+
+    for at, damage in sorted(crits):
+        flush(at)
+        state = roll(gd, state, at, part * damage)
+    flush(float("inf"))
+    return out

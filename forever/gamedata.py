@@ -372,6 +372,7 @@ def _leveling(values: Mapping[str, Any]) -> LevelingConstants:
         xp_per_level=r.num(xp, "per_level", "leveling.mob_xp"),
         frostbite_freeze_s=num("leveling.frostbite_freeze_s"),
         dot_tick_s=num("leveling.dot_tick_s"),
+        ignite_aura_id=r.int_(ignite, "aura_spell_id", "leveling.ignite"),
         ignite_duration_s=r.num(ignite, "duration_s", "leveling.ignite"),
         ignite_tick_s=r.num(ignite, "tick_s", "leveling.ignite"),
         ignite_cumulative=r.int_(ignite, "cumulative", "leveling.ignite"),

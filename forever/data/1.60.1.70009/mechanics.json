@@ -170,7 +170,7 @@
       "source": "sim_leveling.py du seed (EST) : un tic de DoT toutes les 2 s, au moins un tic"
     },
     "leveling.ignite": {
-      "value": {"duration_s": 4.0, "tick_s": 2.0, "cumulative": 1},
+      "value": {"aura_spell_id": 412538, "duration_s": 4.0, "tick_s": 2.0, "cumulative": 1},
       "certainty": "certain",
       "registry": "A18",
       "source": "Client 1.60.1.70009 (tables wago, extraits tests/fixtures/wago/1.60.1.70009) : aura 412538 « Ignite », SpellMisc.DurationIndex 35 -> SpellDuration 4000 ms, SpellEffect aura 226 période 2000 ms, SpellAuraOptions.CumulativeAura 1 (T04c) ; rules seed : durée / période = 2 tics de 2 s par critique, comme sim_leveling.py du seed"

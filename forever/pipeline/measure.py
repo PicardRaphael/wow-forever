@@ -18,6 +18,7 @@ from forever.pipeline.levels import CasterLevels
 
 # Masque d'école du journal (format) -> nom d'école des données.
 SCHOOLS = {1: "physical", 2: "holy", 4: "fire", 8: "nature", 16: "frost", 32: "shadow", 64: "arcane"}
+FIRE_MASK = next(mask for mask, name in SCHOOLS.items() if name == "fire")  # école feu (format du journal)
 DIRECT_DAMAGE = frozenset({"SPELL_DAMAGE", "RANGE_DAMAGE"})
 DIRECT_MISSED = frozenset({"SPELL_MISSED", "RANGE_MISSED"})
 # Types de raté du journal qui relèvent de la table de toucher des sorts (les autres : ABSORB, IMMUNE, EVADE…,
@@ -365,5 +366,39 @@ class IgniteObservation(TypedDict):
 def ignite_ticks(
     events: Iterable[Event], caster: str, *, ignite_spell: int, window_s: float
 ) -> list[IgniteObservation]:
-    """Épisodes d'Ignite du lanceur : un épisode s'arrête après `window_s` sans critique ni tic sur la cible."""
-    raise NotImplementedError
+    """Épisodes d'Ignite du lanceur : critiques de feu (`SPELL_DAMAGE` critique d'école feu, hors Ignite) et tics de
+    l'aura `ignite_spell` (`SPELL_PERIODIC_DAMAGE`) sur chaque cible ; un épisode commence à un critique et s'arrête
+    après `window_s` sans critique ni tic. Épisodes rangés par premier critique ; un épisode sans tic (lanceur
+    sans le talent) est écarté."""
+    by_target: dict[str, list[tuple[float, str, float]]] = defaultdict(list)
+    start = None
+    for e in events:
+        if e.source is None or e.source.guid != caster or e.dest is None or e.spell is None:
+            continue
+        spell_id, _, school = e.spell
+        if e.name == "SPELL_DAMAGE" and e.suffix.get("critical") and school & FIRE_MASK and spell_id != ignite_spell:
+            kind = "crit"
+        elif e.name == "SPELL_PERIODIC_DAMAGE" and spell_id == ignite_spell:
+            kind = "tick"
+        else:
+            continue
+        start = start or e.time
+        amount = e.suffix.get("amount")
+        value = float(amount) if isinstance(amount, int | float) else 0.0
+        by_target[e.dest.guid].append(((e.time - start).total_seconds(), kind, value))
+    episodes: list[tuple[float, IgniteObservation]] = []
+    for target, rows in by_target.items():
+        current: IgniteObservation | None = None
+        origin = last = 0.0
+        for at, kind, amount in sorted(rows):
+            if current is not None and at - last > window_s:
+                current = None
+            last = at
+            if current is None:
+                if kind != "crit":
+                    continue  # tics sans critique relevé (début du journal) : ignorés
+                origin = at
+                current = {"target": target, "crits": [], "ticks": []}
+                episodes.append((origin, current))
+            current["crits" if kind == "crit" else "ticks"].append((round(at - origin, 6), amount))
+    return [e for _, e in sorted(episodes, key=lambda x: x[0]) if e["ticks"]]  # sans tic : pas d'Ignite

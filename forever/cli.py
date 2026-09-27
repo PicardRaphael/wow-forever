@@ -16,6 +16,7 @@ from datetime import timedelta
 from pathlib import Path
 from typing import Any, NoReturn, cast
 
+from forever import registry
 from forever.chart import leveling_chart
 from forever.config import CHAIN_MAX_GAP_S, Deps, default_deps
 from forever.errors import (
@@ -56,8 +57,9 @@ from forever.pipeline.measure import (
     measure_log,
     monster_hp,
 )
-from forever.pipeline.monsters import build_monsters, write_monsters
+from forever.pipeline.monsters import MONSTERS_FILE, build_monsters, write_monsters
 from forever.pipeline.questie import read_questie
+from forever.pipeline.refresh import RefreshSources, apply_refresh, collect_sources, compare, read_snapshot, remeasure
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
@@ -898,8 +900,114 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _default_sv(deps: Deps) -> Path | None:
+    """Premier dossier `WTF/Account/*/SavedVariables` du client, s'il existe."""
+    if deps.wow_dir is None:
+        return None
+    found = sorted((deps.wow_dir / "WTF" / "Account").glob("*/SavedVariables"))
+    return found[0] if found else None
+
+
+def _refresh_lines(sources: RefreshSources, diff: Mapping[str, Any], status: str) -> list[str]:
+    logs, npcs, b1 = diff["logs"], diff["npcs"], diff["b1"]
+    lines = [
+        (
+            f"Journaux : {len(sources.logs)} trouvés · nouveaux {', '.join(logs['new']) or 'aucun'} · modifiés "
+            f"{', '.join(logs['modified']) or 'aucun'} · disparus {', '.join(logs['gone']) or 'aucun'}"
+        ),
+        f"SavedVariables : {', '.join(p.name for p in sources.saved_variables) or 'aucune'}",
+        (
+            f"PNJ : {len(npcs['added'])} ajoutés, {len(npcs['changed'])} changés, {len(npcs['kept'])} conservés "
+            "(journal disparu)"
+        ),
+        f"PV par niveau : {len(diff['hp_by_level'])} niveau(x) changé(s)",
+    ]
+    for level, change in sorted(diff["hp_by_level"].items(), key=lambda kv: int(kv[0])):
+        lines.append(f"  niveau {level} : {change['before']} -> {change['after']}")
+    corr = diff["questie_correction"]
+    if corr["before"] != corr["after"]:
+        lines.append(f"Correction Questie : {corr['before']} -> {corr['after']}")
+    measured, proof = b1["measured"], b1["registry"]
+    if measured.get("n", 0) >= 2:
+        lines.append(
+            f"B1 : n = {measured['n']}, médiane {_num(round(measured['median_s'], 4))} s, 10e percentile "
+            f"{_num(round(measured['p10_s'], 4))} s ; registre n = {proof['n'] if proof else '?'} : "
+            + ("identique" if b1["same"] else "écart, bloc proposé ci-dessous (à reporter à la main)")
+        )
+        if not b1["same"]:
+            lines += ["  " + line for line in b1["proposed"].splitlines()]
+    else:
+        lines.append("B1 : pas assez d'intervalles")
+    a3 = diff["a3"]["measured"]
+    lines.append(
+        f"A3 : {sum(r['hits'] for r in a3)} touchés, {sum(r['misses'] for r in a3)} ratés sur {len(a3)} écart(s) "
+        f"({diff['a3']['note']})"
+    )
+    changed = diff["measures"]["changed"]
+    if diff["measures"]["first_snapshot"]:
+        lines.append("Coûts, incantations, critiques : premier instantané")
+    else:
+        lines.append(
+            "Coûts, incantations, critiques : "
+            + (" ; ".join(f"{k} {', '.join(v)}" for k, v in changed.items() if v) or "inchangés")
+        )
+    ignite = diff["ignite"]
+    lines.append(f"Ignite (règle {ignite['rule']}) : {ignite['note']}")
+    for e in ignite["episodes"]:
+        lines.append(
+            f"  {len(e['crits'])} critique(s), {len(e['ticks'])} tic(s), part {_num(round(e['part'], 3))} : écart "
+            f"règle {_num(round(e['rolling']['max_time_gap_s'], 3))} s, variante "
+            f"{_num(round(e['keep_timer']['max_time_gap_s'], 3))} s"
+        )
+    lines.append(f"Résultat : {status}")
+    return lines
+
+
 def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
-    raise NotImplementedError
+    logs_dir = _wow_path(deps, args.logs, "Logs")
+    sv_dir = Path(args.sv) if args.sv else _default_sv(deps)
+    questie_dir = Path(args.questie) if args.questie else None
+    if questie_dir is None and deps.wow_dir is not None:
+        default = deps.wow_dir / "Interface" / "AddOns" / "Questie"
+        questie_dir = default if default.is_dir() else None
+    sources = collect_sources(logs_dir, sv_dir)
+    data = load_version(deps)
+    gd = build_game_data(data)
+    installed = data.read_json(MONSTERS_FILE)
+    questie = read_questie(questie_dir) if questie_dir else None
+    excluded = (installed.get("questie_correction") or {}).get("excluded", [])
+    fit_exclude = args.fit_exclude if args.fit_exclude is not None else [int(e["npc_id"]) for e in excluded]
+    offset = timedelta(hours=args.utc_offset) if args.utc_offset is not None else None
+    new = remeasure(
+        gd, sources, questie, version=data.game_version, installed=installed, fit_exclude=fit_exclude, utc_offset=offset
+    )
+    diff = compare(installed, registry.load(deps.registry_path), read_snapshot(deps.cache_dir), new)
+    written: list[Path] = []
+    if not diff["changed"]:
+        status = "rien à écrire"
+    elif args.dry_run:
+        status = "simulation"
+    elif args.yes or (deps.confirm is not None and deps.confirm("Écrire ces changements ? [o/N] ")):
+        written = apply_refresh(new, deps.data_dir, deps.cache_dir)
+        status = "écrit"
+    else:
+        status = "refusé"
+    notes = [*new["notes"], "PV des monstres : bloc avancé des journaux (mesure) ; preuves du registre jamais écrites"]
+    if questie is not None:
+        notes.append(QUESTIE_NOTE)
+    provenance = local_provenance(deps, certainty="suppose" if questie is not None else "probable", assumptions=notes)
+    payload = {
+        "status": status,
+        "sources": {
+            "logs": [p.name for p in sources.logs],
+            "saved_variables": [p.name for p in sources.saved_variables],
+        },
+        "diff": diff,
+        "written": [str(p) for p in written],
+        "provenance": provenance,
+    }
+    _emit(payload, _refresh_lines(sources, diff, status), provenance, args.json)
+    return EXIT_OK
 
 
 def _cmd_monsters_build(deps: Deps, args: argparse.Namespace) -> int:

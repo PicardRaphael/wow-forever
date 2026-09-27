@@ -247,6 +247,7 @@ class LevelingConstants:
     xp_per_level: float
     frostbite_freeze_s: float
     dot_tick_s: float
+    ignite_aura_id: int  # identifiant de l'aura d'Ignite (tics dans les journaux)
     ignite_duration_s: float  # aura d'Ignite du client
     ignite_tick_s: float
     ignite_cumulative: int
