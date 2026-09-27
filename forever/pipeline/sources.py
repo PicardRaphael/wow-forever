@@ -5,11 +5,18 @@ Une version candidate est un dossier de données complet (`manifest.json` + un s
 
 from __future__ import annotations
 
+import json
+from collections.abc import Iterable
 from pathlib import Path
-from typing import NamedTuple
+from typing import NamedTuple, cast
 
 from forever.config import Deps
-from forever.store import VersionData
+from forever.errors import UnknownVersionError
+from forever.manifest import MANIFEST_NAME, VERSION_DIR_RE, data_sha, version_dirs, version_files
+from forever.provenance import Certainty, Provenance, local_provenance, make_provenance, min_certainty
+from forever.store import VersionData, ensure_integrity, read_sources
+
+CERTAINTIES = ("certain", "probable", "suppose")
 
 
 class DataSource(NamedTuple):
@@ -22,9 +29,63 @@ class DataSource(NamedTuple):
 def resolve_source(deps: Deps, ref: str) -> DataSource:
     """Version du dépôt si `ref` est un identifiant présent dans `deps.data_dir`, sinon dossier candidat ;
     lève UnknownVersionError (code 4) si ni l'un ni l'autre."""
-    raise NotImplementedError
+    if VERSION_DIR_RE.fullmatch(ref) and (deps.data_dir / ref).is_dir():
+        return DataSource(ref, deps.data_dir, ref, False)
+    path = Path(ref)
+    if not VERSION_DIR_RE.fullmatch(ref) and path.is_dir() and (path / MANIFEST_NAME).is_file():
+        versions = version_dirs(path)
+        if len(versions) == 1:
+            return DataSource(ref, path, versions[0], True)
+    raise UnknownVersionError(ref, version_dirs(deps.data_dir))
 
 
 def load_source(deps: Deps, ref: str) -> tuple[DataSource, VersionData]:
     """Source résolue et chargée après contrôle d'intégrité de son manifeste (DataIntegrityError sinon)."""
-    raise NotImplementedError
+    src = resolve_source(deps, ref)
+    ensure_integrity(src.root)
+    vdir = src.root / src.version
+    return src, VersionData(src.version, data_sha(version_files(vdir)), vdir, read_sources(src.root, src.version) or {})
+
+
+def inherited_files(v: VersionData) -> list[str]:
+    """Fichiers JSON de la version qui portent `inherited_from`."""
+    names = []
+    for path in sorted(v.path.glob("*.json")):
+        try:
+            doc = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if isinstance(doc, dict) and "inherited_from" in doc:
+            names.append(path.name)
+    return names
+
+
+def source_certainty(v: VersionData) -> Certainty:
+    """Certitude la plus basse annoncée par `sources.json` (suppose si aucune n'est lisible)."""
+    files = v.sources.get("files", {})
+    values = [f.get("certainty") for f in files.values() if isinstance(f, dict)] if isinstance(files, dict) else []
+    valid = [cast(Certainty, c) for c in values if c in CERTAINTIES]
+    return min_certainty(valid) if valid else "suppose"
+
+
+def source_notes(src: DataSource, v: VersionData) -> list[str]:
+    notes = []
+    if src.candidate:
+        notes.append(f"{src.version} : version candidate non installée ({src.root})")
+    inherited = inherited_files(v)
+    if inherited:
+        notes.append(f"{src.version} : fichiers hérités d'une version antérieure ({', '.join(inherited)})")
+    return notes
+
+
+def source_provenance(deps: Deps, src: DataSource, v: VersionData, extra: Iterable[str] = ()) -> Provenance:
+    """Provenance d'un résultat qui porte sur la version `v` (fraîcheur : celle des données locales)."""
+    local = local_provenance(deps)
+    return make_provenance(
+        deps,
+        game_version=v.game_version,
+        data_sha=v.data_sha,
+        freshness=local["freshness"],
+        certainty=source_certainty(v),
+        assumptions=[*local["assumptions"], *source_notes(src, v), *extra],
+    )
