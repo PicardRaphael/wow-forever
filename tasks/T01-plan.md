@@ -1,6 +1,6 @@
 # T01 — Squelette de bout en bout : plan
 
-> Plan issu de la session de cadrage du 2026-09-27. Exécution dans une nouvelle session : `/tranche T01`.
+> Après approbation, ce contenu est copié tel quel dans `tasks/T01-plan.md` (worktree, commit `T01: plan`, push d'une branche). L'exécution se fait ensuite dans une nouvelle session via `/tranche T01`.
 
 ## Contexte
 Le dépôt ne contient encore que le kit : docs, hooks, `tasks.py`, CI et `seed/`, mais pas de paquet `forever/`. T01 livre un premier chemin vertical : données versionnées et vérifiées, `forever status`, `forever lookup spell`, serveur MCP à deux outils, bloc provenance dans chaque sortie, CI verte sous Linux et Windows. Le moteur de mécaniques et les simulateurs restent pour T02 et T04.
