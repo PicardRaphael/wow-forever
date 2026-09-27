@@ -137,7 +137,7 @@ def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
     assert out.startswith("Registre : 104 mécaniques")
-    assert "teste 30" in out and "valide-journal 1" in out  # B1 validée par les journaux (T04b)
+    assert "teste 32" in out and "valide-journal 1" in out  # B1 validée par les journaux (T04b) ; T04c : I7, B15
 
 
 def test_main_reports_errors(capsys):
