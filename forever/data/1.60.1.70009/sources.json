@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "game_version": "1.60.1.70009",
+  "product": "wow_classic_beta",
+  "version_prefix": "1.60.",
+  "collected_at": "2026-09-26",
+  "certainty_mapping": {
+    "FC": "certain",
+    "FS": "probable",
+    "PC": "suppose",
+    "EST": "suppose"
+  },
+  "files": {
+    "spells.json": {
+      "source": "Client Forever 1.60.1.70009 via https://wowforevertalents.com/abilities/mage/ (lu le 26/09/2026)",
+      "certainty": "certain",
+      "field_certainty": {
+        "projectile_speed": "suppose"
+      },
+      "notes": [
+        "mana null : coût non publié pour le rang issu d'un talent (à relever en jeu)",
+        "vitesses de projectile estimées (EST), à calibrer"
+      ]
+    },
+    "talents.json": {
+      "source": "gunba/wow-forever-sim mage.json (MIT) + corrections https://foreverchanges.pro/talents/mage",
+      "certainty": "probable",
+      "notes": [
+        "certitude par talent dans le champ certainty : la plupart des rangs sont lus sur le build 1.60.1.69893, pas sur 1.60.1.70009"
+      ]
+    },
+    "racials.json": {
+      "source": "https://foreverchanges.pro/fr/racials (client 1.60.1.70009) + Icy Veins / AOEAH pour les recharges",
+      "certainty": "suppose",
+      "notes": [
+        "certitude mixte (FC et PC) : la plus basse est retenue ; détail par entrée dans le fichier"
+      ]
+    },
+    "leveling.json": {
+      "source": "Tables d'XP Classic et modèles de monstres et de joueur (voir les champs du fichier)",
+      "certainty": "suppose",
+      "notes": [
+        "certitude mixte (FC, PC, EST) : la plus basse est retenue ; modèles à calibrer"
+      ]
+    },
+    "respec.json": {
+      "source": "Observations de la bêta et barème Classic (voir le champ sources du fichier)",
+      "certainty": "suppose",
+      "notes": [
+        "règle Classic supposée inchangée (PC)"
+      ]
+    },
+    "meta.json": {
+      "source": "Métadonnées de collecte du seed forever-mage",
+      "certainty": "certain",
+      "notes": [
+        "ne décrit pas le jeu : liste des sources et légende des certitudes"
+      ]
+    },
+    "_source_gunba_mage_tree.json": {
+      "source": "https://raw.githubusercontent.com/gunba/wow-forever-sim/master/ui/core/talents/trees/mage.json (MIT)",
+      "certainty": "probable",
+      "notes": [
+        "copie brute de l'arbre open source ayant servi à construire talents.json"
+      ]
+    },
+    "overrides.json": {
+      "source": "Corrections manuelles relevées sur https://foreverchanges.pro/talents/mage",
+      "certainty": "certain",
+      "notes": [
+        "corrections de rangs lues sur le build 1.60.1.70009 (FC)"
+      ]
+    }
+  }
+}
