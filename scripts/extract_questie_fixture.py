@@ -124,7 +124,7 @@ def extract_zones(addon: Path, out: Path, zones: tuple[int, ...]) -> None:
             f'l10n.continentLookup = {{\n    [{category}] = "{BATTLEGROUNDS_LABEL}",\n}}\n\n'
             f"l10n.zoneLookup = {{\n    [1]={{\n{body}\n    }},\n}}\n\n"
             f"l10n.zoneCategoryLookup = {{\n{block}\n}}\n"
-        ).encode("utf-8")
+        ).encode()
     )
     print(f"quêtes : {len(lines)} ; donjons : {len(kept)} ; noms de zones : {len(found)}")
 
