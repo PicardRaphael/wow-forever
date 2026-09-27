@@ -11,6 +11,12 @@ import sys
 
 import pytest
 from conftest import LOCAL_VERSION, REPO_ROOT
+
+from forever.engine import best_rank, character, expected_cast, rank_values_at_level
+from forever.engine.casting import pushback_chance, pushback_s, spell_cooldown
+from forever.engine.damage import dot_tick_times, ignite_tick_times
+from forever.engine.mana import consumables, downtime, in_combat_regen_fraction
+from forever.engine.monsters import armor_reduction, mob_hit_damage, mob_hp, mob_xp
 from forever.engine.movement import (
     attacker_swing_s,
     chill_duration,
@@ -21,12 +27,6 @@ from forever.engine.movement import (
     spell_range,
     travel_time,
 )
-
-from forever.engine import best_rank, character, expected_cast, rank_values_at_level
-from forever.engine.casting import pushback_chance, pushback_s, spell_cooldown
-from forever.engine.damage import dot_tick_times, ignite_tick_times
-from forever.engine.mana import consumables, downtime, in_combat_regen_fraction
-from forever.engine.monsters import armor_reduction, mob_hit_damage, mob_hp, mob_xp
 from forever.engine.spells import RankValues, rank_damage
 
 SEED_SCRIPTS = REPO_ROOT / "seed" / "forever-mage" / "scripts"

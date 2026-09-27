@@ -1,4 +1,4 @@
-# Registre de test : intervalle minimal sous la recharge globale moins la tolérance.
+# Registre de test : 10e percentile des intervalles sous la recharge globale moins la tolérance.
 version: 1
 game_version: 1.60.1.70009
 mechanics:
@@ -18,4 +18,4 @@ mechanics:
         n: 50
         test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants
         ecart_median_s: 0.011
-        ecart_min_s: 0.086
+        ecart_p10_s: 0.06

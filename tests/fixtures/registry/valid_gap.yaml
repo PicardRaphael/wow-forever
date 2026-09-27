@@ -18,4 +18,4 @@ mechanics:
         n: 50
         test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants
         ecart_median_s: 0.011
-        ecart_min_s: 0.03
+        ecart_p10_s: 0.03

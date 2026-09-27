@@ -40,7 +40,7 @@ DEFECTS = {
     "proof_cumulative_below.yaml": "n = 45 < n_min = 50",
     "proof_other_measures_not_summed.yaml": "n = 30 < n_min = 50",
     "proof_median_gap.yaml": "écart médian 0.08 s > tolerance.ecart_s = 0.05 s",
-    "proof_min_gap.yaml": "écart minimal 0.086 s > tolerance.ecart_s = 0.05 s",
+    "proof_p10_gap.yaml": "écart du 10e percentile 0.06 s > tolerance.ecart_s = 0.05 s",
     "proof_gap_missing.yaml": "champ 'ecart_median_s' manquant",
     "proof_journal_list_missing.yaml": "journal introuvable 'tests/fixtures/combatlog/absent.txt'",
 }
@@ -137,7 +137,7 @@ def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
     assert out.startswith("Registre : 103 mécaniques")
-    assert "teste 23" in out
+    assert "teste 22" in out and "valide-journal 1" in out  # B1 validée par les journaux (T04b)
 
 
 def test_main_reports_errors(capsys):
@@ -150,33 +150,30 @@ def test_valid_journal_proof_is_accepted():
     assert report.errors == [] and report.counts["valide-journal"] == 1
 
 
-def test_b1_carries_the_log_proof_and_stays_tested():
-    """B1 (décision 2 du plan T04b) : preuve des deux journaux du 2026-09-27, n = 50 = n_min, médiane à 0,011 s de
-    la recharge globale, mais trois intervalles sous 1,5 - 0,05 s (minimum 1,414 s) : reste `teste`."""
+def test_b1_is_validated_by_the_two_logs():
+    """B1 (critère de l'utilisateur, 2026-09-27) : preuve des deux journaux, n = 50 = n_min, médiane à 0,011 s de la
+    recharge globale, 10e percentile 1,4569 s (écart 0,0431 s ≤ 0,05 s) : `valide-journal`, certitude `probable`."""
     b1 = find_entry(load(REGISTRY_PATH), "B1")
-    assert b1.status == "teste"
+    assert (b1.status, b1.certainty) == ("valide-journal", "probable")
     assert b1.tolerance == {"n_min": 50, "ecart_s": 0.05}
     (proof,) = b1.proofs
     assert proof["journal"] == [
         "tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt",
         "tests/fixtures/combatlog/WoWCombatLog-092726_150346.anon.txt.gz",
     ]
-    assert (
-        proof["n"] == 50
-        and proof["test"] == "tests/unit/test_measure_second_log.py::test_b1_proof_matches_the_registry"
-    )
+    assert (proof["n"], proof["ecart_median_s"], proof["ecart_p10_s"]) == (50, 0.011, 0.0431)
+    assert proof["test"] == "tests/unit/test_measure_second_log.py::test_b1_proof_matches_the_registry"
 
 
-def test_b1_as_valide_journal_is_refused_on_the_minimum_interval(tmp_path):
+def test_the_minimum_interval_no_longer_counts(tmp_path):
+    """Seuls la médiane et le 10e percentile sont contrôlés : un `ecart_min_s` éventuel est ignoré."""
     raw = yaml.safe_load(REGISTRY_PATH.read_text(encoding="utf-8"))
     (b1,) = [m for m in raw["mechanics"] if m["id"] == "B1"]
-    b1["statut"] = "valide-journal"
+    b1["preuves"][0]["ecart_min_s"] = 0.086
     path = tmp_path / "registry.yaml"
     path.write_text(yaml.safe_dump({**raw, "mechanics": [b1]}, allow_unicode=True), encoding="utf-8")
     report = validate(path, REPO_ROOT, strict=True, engine_dirs=())
-    assert [e for e in report.errors if "écart" in e] == [
-        "B1 : preuve 1 : écart minimal 0.086 s > tolerance.ecart_s = 0.05 s"
-    ]
+    assert [e for e in report.errors if "écart" in e] == []
 
 
 def test_cumulative_and_multi_log_proofs_are_accepted():

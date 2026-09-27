@@ -128,7 +128,8 @@ def test_b1_proof_matches_the_registry(game_data, second):
     assert proof["n"] == len(intervals) == 50
     gcd_s = game_data.rules.gcd_s
     assert proof["ecart_median_s"] == pytest.approx(abs(statistics.median(intervals) - gcd_s), abs=5e-4)
-    assert proof["ecart_min_s"] == pytest.approx(gcd_s - min(intervals), abs=5e-4)
+    # 10e percentile (statistics.quantiles, méthode par défaut) : 1,4569 s ; minimum 1,414 s non contrôlé
+    assert proof["ecart_p10_s"] == pytest.approx(gcd_s - statistics.quantiles(intervals, n=10)[0], abs=5e-5)
 
 
 def test_logs_measure_on_the_gz_fixture_with_the_journey(capsys, make_deps):
