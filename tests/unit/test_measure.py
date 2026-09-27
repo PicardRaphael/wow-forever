@@ -3,6 +3,7 @@ touchés et ratés. Valeurs relevées sur la fixture anonymisée du 2026-09-27 (
 
 import pytest
 from conftest import MINE_GUID, REAL_LOG, SYNTHETIC_LOGS
+
 from forever.pipeline.combatlog import read_log
 from forever.pipeline.measure import (
     cast_times,

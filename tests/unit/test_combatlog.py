@@ -3,13 +3,12 @@
 Valeurs tirées de la fixture anonymisée du journal réel du 2026-09-27 (tests/fixtures/combatlog/README.md)."""
 
 from collections import Counter
-from datetime import datetime
 
 import pytest
 from conftest import COMBATLOG, MINE_GUID, REAL_LOG, SYNTHETIC_LOGS
-from forever.pipeline.combatlog import read_log, scan_logs
 
 from forever.errors import DataSchemaError, UnsupportedLogError
+from forever.pipeline.combatlog import read_log, scan_logs
 
 
 def events(path=REAL_LOG):
@@ -41,7 +40,7 @@ def test_event_counts_match_real_log():
 def test_timestamp_parsed():
     first = events()[0]
     assert first.name == "ZONE_CHANGE"
-    assert first.time == datetime(2026, 9, 27, 14, 53, 46, 81200)
+    assert first.time.isoformat() == "2026-09-27T14:53:46.081200"  # heure locale du client, sans fuseau
 
 
 def test_advanced_block_has_19_fields_and_describes_destination_on_spell_damage():
@@ -114,7 +113,7 @@ def test_scan_logs_lists_every_log(tmp_path):
     assert [s.name for s in summaries] == ["WoWCombatLog-092726_145346.txt", "WoWCombatLog-092726_150346.txt"]
     real, empty = summaries
     assert real.lines == 194 and real.events == 193 and real.header.build == "1.60.1"
-    assert real.start == datetime(2026, 9, 27, 14, 53, 46, 81200) and real.end.minute == 55
+    assert real.start.isoformat() == "2026-09-27T14:53:46.081200" and real.end.minute == 55
     assert real.mine == ["Moi-Royaume"] and real.error is None
     assert empty.lines == 0 and empty.header is None and empty.error
 
