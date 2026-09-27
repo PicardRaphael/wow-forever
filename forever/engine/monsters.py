@@ -81,3 +81,18 @@ def mob_hp(gd: GameData, level: int, mob_source: MobSource = "measured") -> Mons
     if hp is None:
         raise ValueError(f"PV des monstres inconnus au niveau {level} (monsters.json)")
     return hp
+
+
+def mob_hit_damage(gd: GameData, level: int) -> float:
+    """Registre : I6"""
+    raise NotImplementedError
+
+
+def armor_reduction(gd: GameData, armor: float, attacker_level: int) -> float:
+    """Registre : I6"""
+    raise NotImplementedError
+
+
+def mob_xp(gd: GameData, level: int) -> float:
+    """Registre : I6"""
+    raise NotImplementedError

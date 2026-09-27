@@ -28,3 +28,13 @@ def spell_power(ch: Character, buffs: Buffs | None = None) -> float:
     Registre : G4"""
     buffs = buffs or {}
     return ch.sp * (1 + buffs.get("sp_pct", 0.0)) + buffs.get("sp_flat", 0.0)
+
+
+def dot_tick_times(gd: GameData, duration_s: float) -> list[float]:
+    """Registre : A17"""
+    raise NotImplementedError
+
+
+def ignite_tick_times(gd: GameData) -> list[float]:
+    """Registre : A18"""
+    raise NotImplementedError

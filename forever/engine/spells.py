@@ -48,6 +48,11 @@ def rank_values_at_level(gd: GameData, key: str, rank: int, level: int) -> RankV
     return RankValues(_normalize(low), _normalize(high), _normalize(dot))
 
 
+def rank_damage(gd: GameData, key: str, rank: Rank, level: int, spell_level: str = "rank") -> RankValues:
+    """Registre : G7"""
+    raise NotImplementedError
+
+
 def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:
     """Plus haut rang appris au niveau donné. Un sort de talent exige le talent ; son rang 1 vient du talent.
 

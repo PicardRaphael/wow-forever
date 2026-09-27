@@ -24,3 +24,18 @@ def cast_time(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
         return max(gcd, cast)
     cast /= 1 + ch.haste + buffs.get("haste", 0.0)
     return max(gcd, cast)
+
+
+def pushback_s(gd: GameData) -> float:
+    """Registre : B6"""
+    raise NotImplementedError
+
+
+def pushback_chance(gd: GameData, pts: Points, *, fire_school: bool) -> float:
+    """Registre : B6"""
+    raise NotImplementedError
+
+
+def spell_cooldown(gd: GameData, key: str, rank: Rank, pts: Points) -> float:
+    """Registre : B13"""
+    raise NotImplementedError

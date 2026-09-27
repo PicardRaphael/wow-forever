@@ -26,6 +26,7 @@ def expected_cast(
     wc_stacks: int = 0,
     buffs: Buffs | None = None,
     frozen_mult: bool = True,
+    spell_level: str = "rank",
 ) -> CastEstimate | None:
     """Espérance d'un sort : dégâts (toucher, critique, multiplicateurs, DoT qui critiquent, Ignite), mana
     (Frost Channeling, Master of Elements, Clearcasting), temps d'incantation, portée. None si le sort n'est pas appris.

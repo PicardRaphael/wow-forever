@@ -28,3 +28,18 @@ def mana_cost(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
         m *= 1 - talent_value(gd, pts, "frostChanneling") / PERCENT
     m *= 1 + buffs.get("cost", 0.0)
     return m
+
+
+def in_combat_regen_fraction(gd: GameData, pts: Points, level: int) -> float:
+    """Registre : B7"""
+    raise NotImplementedError
+
+
+def consumables(gd: GameData, level: int) -> tuple[float, float]:
+    """Registre : I6"""
+    raise NotImplementedError
+
+
+def downtime(gd: GameData, ch: Character, level: int, mana_used: float, taken: float) -> float:
+    """Registre : I6"""
+    raise NotImplementedError
