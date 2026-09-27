@@ -1,4 +1,6 @@
-"""Serveur MCP en mémoire (critère 4) : outils listés, résultats structurés, provenance, erreurs."""
+"""Serveur MCP en mémoire (critère 4) : outils listés, résultats structurés, provenance, erreurs.
+
+Valeurs de sort attendues (frostbolt, rang 2) : seed/forever-mage/data/1.60.1.70009/spells.json."""
 
 import asyncio
 

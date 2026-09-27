@@ -1,4 +1,6 @@
-"""CLI : rendu texte français, --json, codes de sortie (0 succès, 2 usage, 3 intégrité, 4 introuvable)."""
+"""CLI : rendu texte français, --json, codes de sortie (0 succès, 2 usage, 3 intégrité, 4 introuvable).
+
+Valeurs de sort attendues (frostbolt) : seed/forever-mage/data/1.60.1.70009/spells.json ; couverture du registre : docs/MECHANICS_REGISTRY.yaml."""
 
 import json
 

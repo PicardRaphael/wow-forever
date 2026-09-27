@@ -1,4 +1,6 @@
-"""Vrai point d'entrée stdio (`python -m forever mcp`) : le serveur démarre, liste ses outils et répond."""
+"""Vrai point d'entrée stdio (`python -m forever mcp`) : le serveur démarre, liste ses outils et répond.
+
+Valeur de sort attendue (frostbolt, rang 2) : seed/forever-mage/data/1.60.1.70009/spells.json."""
 
 import asyncio
 import os
