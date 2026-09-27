@@ -21,7 +21,11 @@
       "Bash(git commit:*)",
       "Bash(git switch:*)",
       "Bash(git worktree:*)",
-      "Bash(uv run forever manifest --check:*)"
+      "Bash(uv run forever manifest --check:*)",
+      "Bash(uv run forever logs:*)",
+      "Bash(uv run forever questie:*)",
+      "Bash(uv run forever monsters:*)",
+      "Bash(uv run forever manifest --update:*)"
     ],
     "ask": [
       "Bash(uv run forever fetch:*)",
