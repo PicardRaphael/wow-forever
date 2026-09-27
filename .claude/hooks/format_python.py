@@ -1,5 +1,6 @@
 """PostToolUse (Edit|Write|MultiEdit) : formate et corrige automatiquement les fichiers Python modifiés avec ruff.
 Ne bloque jamais : le lint restant est vérifié par uv run tasks.py verify."""
+
 import json
 import os
 import shutil

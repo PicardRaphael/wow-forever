@@ -1,12 +1,15 @@
 """Contrôle : pas de chiffres de jeu dans le plugin (skills, agents, commandes, prompts produit).
 Signale les nombres suivis d'une unité de jeu (dégâts, mana, %, s, secondes, points, PV, DPS)."""
+
 import pathlib
 import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ZONES = [ROOT / "plugin"]
-MOTIF = re.compile(r"\b\d+(?:[.,]\d+)?\s?(?:%|s\b|sec|secondes|mana|dégâts|degats|damage|points|pv|hp|dps)\b", re.IGNORECASE)
+MOTIF = re.compile(
+    r"\b\d+(?:[.,]\d+)?\s?(?:%|s\b|sec|secondes|mana|dégâts|degats|damage|points|pv|hp|dps)\b", re.IGNORECASE
+)
 AUTORISE = re.compile(r"<!--\s*chiffres-autorisés\s*-->")
 
 

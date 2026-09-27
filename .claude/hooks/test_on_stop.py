@@ -1,6 +1,7 @@
 """Stop : si du code a changé, lance les tests rapides avant que Claude ne s'arrête.
 - Les tests listés dans tasks/.rouge (phase rouge d'une tranche) sont ignorés.
 - Anti-boucle : ne relance pas si l'arrêt a déjà été bloqué une fois (stop_hook_active)."""
+
 import importlib.util
 import json
 import pathlib
@@ -15,7 +16,9 @@ except (json.JSONDecodeError, ValueError):
 if data.get("stop_hook_active"):
     sys.exit(0)
 cwd = data.get("cwd") or "."
-changed = subprocess.run(["git", "status", "--porcelain", "--untracked-files=all"], capture_output=True, text=True, cwd=cwd, check=False).stdout
+changed = subprocess.run(
+    ["git", "status", "--porcelain", "--untracked-files=all"], capture_output=True, text=True, cwd=cwd, check=False
+).stdout
 if not any(p.endswith((".py", ".yaml", ".json")) for p in (line[3:] for line in changed.splitlines())):
     sys.exit(0)
 if not pathlib.Path(cwd, "tests/unit").is_dir():
@@ -35,6 +38,9 @@ if rouge.exists():
 r = subprocess.run(cmd, capture_output=True, text=True, cwd=cwd, check=False)
 if r.returncode not in (0, 5):
     tail = "\n".join((r.stdout + r.stderr).strip().splitlines()[-25:])
-    print(f"Les tests rapides échouent (hors tests attendus rouges). Corrige avant de t'arrêter :\n{tail}", file=sys.stderr)
+    print(
+        f"Les tests rapides échouent (hors tests attendus rouges). Corrige avant de t'arrêter :\n{tail}",
+        file=sys.stderr,
+    )
     sys.exit(2)
 sys.exit(0)

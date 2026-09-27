@@ -1,15 +1,16 @@
 """Commandes du projet, identiques sous Windows, macOS et Linux : `uv run tasks.py <commande>`.
 
-  test        tous les tests
-  test-fast   tests unitaires rapides
-  lint        ruff check
-  fmt         ruff format
-  typecheck   mypy strict sur forever/
-  registry    contrôle du registre des mécaniques
-  numbers     contrôle des chiffres de jeu dans le plugin
-  verify      lint + typecheck + test + registry + numbers (définition de « fini »)
-  status      fraîcheur des données (après T01)
+test        tous les tests
+test-fast   tests unitaires rapides
+lint        ruff check
+fmt         ruff format
+typecheck   mypy strict sur forever/
+registry    contrôle du registre des mécaniques
+numbers     contrôle des chiffres de jeu dans le plugin
+verify      lint + typecheck + test + registry + numbers (définition de « fini »)
+status      fraîcheur des données (après T01)
 """
+
 import pathlib
 import subprocess
 import sys
@@ -61,8 +62,16 @@ def numbers() -> bool:
 
 
 def verify() -> bool:
-    results = {name: step() for name, step in
-               [("lint", lint), ("typecheck", typecheck), ("test", test), ("registry", registry), ("numbers", numbers)]}
+    results = {
+        name: step()
+        for name, step in [
+            ("lint", lint),
+            ("typecheck", typecheck),
+            ("test", test),
+            ("registry", registry),
+            ("numbers", numbers),
+        ]
+    }
     print("\nVérification : " + " | ".join(f"{k} {'OK' if v else 'ÉCHEC'}" for k, v in results.items()))
     return all(results.values())
 
@@ -71,8 +80,17 @@ def status() -> bool:
     return run(PY + ["-m", "forever.cli", "status"])
 
 
-COMMANDS = {"test": test, "test-fast": test_fast, "lint": lint, "fmt": fmt, "typecheck": typecheck,
-            "registry": registry, "numbers": numbers, "verify": verify, "status": status}
+COMMANDS = {
+    "test": test,
+    "test-fast": test_fast,
+    "lint": lint,
+    "fmt": fmt,
+    "typecheck": typecheck,
+    "registry": registry,
+    "numbers": numbers,
+    "verify": verify,
+    "status": status,
+}
 
 if __name__ == "__main__":
     if len(sys.argv) != 2 or sys.argv[1] not in COMMANDS:

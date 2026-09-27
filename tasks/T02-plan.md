@@ -73,57 +73,135 @@ Tests T01 modifiés : test_cli.py, test_provenance.py (16/97 → coverage(REGIST
 
 ### Types du moteur (`forever/engine/model.py`)
 ```python
-Points = Mapping[str, int]                      # clé de talent -> rang
-SCHOOL_FROST = frozenset({"frost", "frostfire"}); SCHOOL_FIRE = frozenset({"fire", "frostfire"})
+Points = Mapping[str, int]  # clé de talent -> rang
+SCHOOL_FROST = frozenset({"frost", "frostfire"})
+SCHOOL_FIRE = frozenset({"fire", "frostfire"})
+
 
 class Rank(NamedTuple):
-    position: int            # base 1, comme `lookup`
-    level: int; damage_min: float; damage_max: float; dot_total: float; dot_duration_s: float
-    cast_time_s: float; mana: float | None; cooldown_s: float
+    position: int  # base 1, comme `lookup`
+    level: int
+    damage_min: float
+    damage_max: float
+    dot_total: float
+    dot_duration_s: float
+    cast_time_s: float
+    mana: float | None
+    cooldown_s: float
+
 
 @dataclass(frozen=True)
 class Spell:
-    key: str; school: str; ranks: tuple[Rank, ...]; range_yd: float | None; talent: str | None
-    channel: bool; slow: float | None; mana_pct_base: float | None; frozen_mult: float | None
+    key: str
+    school: str
+    ranks: tuple[Rank, ...]
+    range_yd: float | None
+    talent: str | None
+    channel: bool
+    slow: float | None
+    mana_pct_base: float | None
+    frozen_mult: float | None
     projectile_speed: float | None
+
 
 @dataclass(frozen=True)
 class Talent:
-    key: str; name: str; tree: str; tier: int; col: int; max_rank: int
-    ranks: tuple[tuple[float, ...], ...]; prereq: tuple[int, int] | None     # (palier, colonne)
+    key: str
+    name: str
+    tree: str
+    tier: int
+    col: int
+    max_rank: int
+    ranks: tuple[tuple[float, ...], ...]
+    prereq: tuple[int, int] | None  # (palier, colonne)
+
 
 @dataclass(frozen=True)
-class CombatRules:        # leveling.json.combat_rules (champs structurés seulement)
-    gcd_s: float; spell_miss_by_level_diff: Mapping[str, float]; min_miss: float
-    crit_mult_spell: float; dot_can_crit: bool
+class CombatRules:  # leveling.json.combat_rules (champs structurés seulement)
+    gcd_s: float
+    spell_miss_by_level_diff: Mapping[str, float]
+    min_miss: float
+    crit_mult_spell: float
+    dot_can_crit: bool
+
 
 @dataclass(frozen=True)
-class Racials:            # racials.json
-    sword_crit: Mapping[str, float]; spirit_pct: Mapping[str, float]; mana_pct: Mapping[str, float]  # par race
+class Racials:  # racials.json
+    sword_crit: Mapping[str, float]
+    spirit_pct: Mapping[str, float]
+    mana_pct: Mapping[str, float]  # par race
+
 
 @dataclass(frozen=True)
 class GameData:
-    game_version: str; spells: Mapping[str, Spell]; talents: Mapping[str, Talent]
-    talent_at: Mapping[tuple[str, int, int], str]; trees: tuple[str, ...]
-    rules: CombatRules; constants: Constants; racials: Racials
+    game_version: str
+    spells: Mapping[str, Spell]
+    talents: Mapping[str, Talent]
+    talent_at: Mapping[tuple[str, int, int], str]
+    trees: tuple[str, ...]
+    rules: CombatRules
+    constants: Constants
+    racials: Racials
+
 
 class CharacterOverrides(TypedDict, total=False):
-    intellect: float; spirit: float; sp: float; base_mana: float; mana: float; spell_crit: float
-    crit_gear: float; sword: bool; hit_gear: float; haste: float; hp: float; armor: float
+    intellect: float
+    spirit: float
+    sp: float
+    base_mana: float
+    mana: float
+    spell_crit: float
+    crit_gear: float
+    sword: bool
+    hit_gear: float
+    haste: float
+    hp: float
+    armor: float
+
 
 @dataclass(frozen=True)
 class Character:
-    level: int; race: str; intellect: float; spirit: float; sp: float; base_mana: float; mana: float
-    crit: float; hit_gear: float; haste: float; hp: float; armor: float; spirit_regen: float   # mana/s
+    level: int
+    race: str
+    intellect: float
+    spirit: float
+    sp: float
+    base_mana: float
+    mana: float
+    crit: float
+    hit_gear: float
+    haste: float
+    hp: float
+    armor: float
+    spirit_regen: float  # mana/s
     overrides: CharacterOverrides
 
+
 class Buffs(TypedDict, total=False):
-    crit: float; dmg: float; haste: float; cost: float; sp_pct: float; sp_flat: float
+    crit: float
+    dmg: float
+    haste: float
+    cost: float
+    sp_pct: float
+    sp_flat: float
+
 
 class CastEstimate(TypedDict):
-    key: str; rank: Rank; school: str; hit: float; crit: float; crit_mult: float; dmg_mult: float
-    dmg: float; direct_per_hit: float; dot: float; ignite: float; mana: float; cast_s: float
-    range_yd: float; cooldown_s: float
+    key: str
+    rank: Rank
+    school: str
+    hit: float
+    crit: float
+    crit_mult: float
+    dmg_mult: float
+    dmg: float
+    direct_per_hit: float
+    dot: float
+    ignite: float
+    mana: float
+    cast_s: float
+    range_yd: float
+    cooldown_s: float
 ```
 `Constants` regroupe des sous-types gelés lus dans `mechanics.json` : `CoefficientRules`, `CharacterModel`, `TalentRules`, `crit_per_winters_chill_stack`, `talent_rank_mana_ratio`, `talent_rank_mana_default`, `default_range_yd`.
 
