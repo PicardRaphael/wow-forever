@@ -14,7 +14,8 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 | T03 | Pipeline de données : builds, fetch, decode, diff, verify, report (tests hors ligne) | T01 |
 | T04a | Sources locales du client : journaux de combat, Questie, table des monstres, points de base par niveau, preuves du registre, addon ForeverLogger | T02, T03 |
 | T04b | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T04a |
-| T04c | Quêtes propres à Forever et modèle d'XP, cumul d'Ignite, escalade d'Arcane Blast | T04b |
+| T04c | Simulateur fiable pour comparer les builds : Ignite, Arcane Blast, recharges, régénération et armure, `forever measures refresh`, zone ou donjon à mon niveau | T04b |
+| T04d | Quêtes propres à Forever et modèle d'XP de Forever | T04c |
 | T05 | Optimiseur de talents et conseiller de respec | T04b, T04c |
 | T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
@@ -80,12 +81,16 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
     - L'analytique reste à moins de 15 % du Monte Carlo aux niveaux 12, 16 et 24, dans les deux modes.
     - Le graphique est un fichier PNG déterministe à graine fixe (deux générations identiques octet pour octet).
 
-## T04c — Quêtes Forever, XP, Ignite, Arcane Blast
-- **À faire** : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; cumul et rafraîchissement d'Ignite (A18) ; escalade d'Arcane Blast (B11) ; durée d'infobulle dans `tooltip_values`. Routes de leveling : pas de tranche dédiée (le joueur suit RestedXP en jeu ; RestedXP reste exclu comme source de données, `docs/DATA_SOURCES.md`). Le plan de T04c prévoit seulement la réponse « quelle zone ou quel donjon à mon niveau », à partir des données de Questie lues localement (niveaux des quêtes et des PNJ par zone et par donjon ; `suppose`, communautaire) ; DJ1 affinera la partie donjons. Les quêtes de donjon restent ici ; DJ1 s'y réfère.
-- **Critères de fin** : à fixer au plan de T04c.
+## T04c — Simulateur fiable, mesures, zones (fait)
+- **Fait** : fins de ligne normalisées par Git ; option `rules` des simulateurs (`seed` : parité à 1e-12) ; Ignite roulant (A18) ; escalade d'Arcane Blast et rotation arcane (B11, B15, I1) ; recharge de Fire Blast dans l'analytique (B13) ; armure portée selon le niveau lu dans le client et régénération cumulée (B7, I6) ; `forever measures refresh` ; `forever lookup zones` (I7). Plan : `tasks/T04c-plan.md`.
+- **Paramètres de build prêts pour T05** : `armor` (`auto`, `frost`, `mage`) et `ab_stacks` (0 au maximum du talent), avec `ab_dump`.
+
+## T04d — Quêtes Forever et XP
+- **À faire** (reporté de T04c) : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; cumul et rafraîchissement d'Ignite (A18) ; escalade d'Arcane Blast (B11) ; durée d'infobulle dans `tooltip_values`. Routes de leveling : pas de tranche dédiée (le joueur suit RestedXP en jeu ; RestedXP reste exclu comme source de données, `docs/DATA_SOURCES.md`). Le plan de T04c prévoit seulement la réponse « quelle zone ou quel donjon à mon niveau », à partir des données de Questie lues localement (niveaux des quêtes et des PNJ par zone et par donjon ; `suppose`, communautaire) ; DJ1 affinera la partie donjons. Les quêtes de donjon restent ici ; DJ1 s'y réfère.
+- **Critères de fin** : à fixer au plan de T04d.
 
 ## T05 — Talents et respec
-- **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre.
+- **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre ; comparer les builds avec les simulateurs de T04c, `armor` et `ab_stacks` compris parmi les paramètres de build à optimiser.
 - **Critères de fin** : `forever optimize talents --from 10 --to 30` produit un ordre légal à chaque niveau ; le barème de respec est paramétrable ; tests de légalité et de non-régression.
 
 ## T06 — Plugin Claude Code

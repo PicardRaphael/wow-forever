@@ -18,7 +18,7 @@ forever-core/
 │   ├── optim/                 # talents.py, gear.py, consumables.py, respec.py
 │   ├── charts/                # graphiques déterministes (PNG/SVG)
 │   ├── pipeline/              # builds, fetch, tables, tooltip, decode, sources, diff, verify, report ;
-│   │                          # combatlog, measure, lua_table, questie, monsters, addon_sv (sources locales)
+│   │                          # combatlog, measure, lua_table, questie, monsters, addon_sv, refresh (sources locales)
 │   ├── memory/                # fiches joueur (lecture/écriture dans le vault), import de l'addon
 │   ├── provenance.py          # bloc provenance commun
 │   ├── cli.py                 # commandes forever …
@@ -128,3 +128,9 @@ La mémoire de Claude ne garde que des pointeurs et des décisions, jamais de ch
 
 ## Veille
 `build-watch.yml` (cron 6 h) : `forever builds` ; si nouvelle version, `fetch`, `decode`, `diff`, `verify`, puis PR « data: A → B » avec le résumé du diff et une note pour le vault. Alerte si `silent`.
+
+## T04c
+- Moteur : `forever/engine/armor.py` (armure portée selon le niveau d'apprentissage lu dans le client, `worn_armor`), `buffs.py` (aura d'Arcane Blast), `leveling.py` (couleurs de quête, bande de niveaux), `damage.py` (Ignite roulant : `roll_ignite`, `ignite_ticks_due`, `predict_ignite_ticks`), `mana.py` (`arcane_blast_cost`, régénération selon `rules`).
+- Simulateurs : options `rules` (`forever` ou `seed`), `armor`, `ab_stacks`, `ab_dump` ; rotation `arcane` ; journal des lancers `kill_mc(log=…)` pour les tests.
+- Données : `spell_scaling.json.utility` (armures, produit par `decode` avec `decode_rules.json.utility_spells`), `mechanics.json` : `leveling.ignite` (client), `leveling.ignite_rule`, `leveling.quest_band`.
+- `forever measures refresh` (`forever/pipeline/refresh.py`) : collecte sur disque, mesures, comparaison, écriture après accord (`Deps.confirm`) ; `forever lookup zones` et `forever_lookup(kind="zones")` (`forever/lookup.py`, `forever/pipeline/questie.py`).

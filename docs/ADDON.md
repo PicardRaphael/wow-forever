@@ -58,7 +58,11 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 - **B1** (recharge globale) : sur un mannequin ou des monstres faciles, 50 sorts instantanés enchaînés sans pause → intervalles minimaux ; `tolerance.n_min` de B1 dans le registre.
 - **A3** (raté des sorts selon l'écart de niveau) : leveling ordinaire au Frostbolt, ForeverLogger installé (niveau du lanceur) ; il faut plusieurs centaines de lancers par écart de niveau pour distinguer des taux voisins ; noter les talents de toucher (instantané de l'addon).
 - **H1** (niveau d'un boss) : un boss de donjon → niveau lu dans le bloc avancé du journal.
-- **Monstres** : tout journal de leveling enrichit la table (`uv run forever monsters build --logs <dossier> --questie <addon Questie>`).
+- **Monstres** : tout journal de leveling enrichit la table (`uv run forever monsters build --logs <dossier> --questie <addon Questie>`) ; `uv run forever measures refresh` relance toutes les mesures et n'écrit qu'après accord.
+- **A18** (Ignite) : leveling ou mannequin au Fireball avec Ignite pris, ForeverLogger installé (rangs de talents) ; relever des paires de critiques de feu à moins de 4 s l'une de l'autre et des critiques isolés ; pour chacun, montants et instants des tics de 412538 jusqu'à la fin de l'aura ; `forever measures refresh` relève les épisodes et les compare à la règle des données et à la variante (écart affiché, jamais écrit au registre).
+- **B7** : régénération de mana en incantation avec Arcane Meditation et Mage Armor à la fois (cumul Classic supposé) ; bonus d'armure de Frost et Ice Armor non modélisé.
+- **B11** : coût d'Arcane Blast à chaque cumul (1 + 1,75 n supposé additif) et effet de Clearcasting sur le cumul.
+- **I7** : couleur des quêtes au niveau du personnage (vertes les plus basses), à comparer à `leveling.quest_band`.
 
 ## 8. Checklist à chaque build
 Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
