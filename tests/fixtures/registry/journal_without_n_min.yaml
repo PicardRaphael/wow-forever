@@ -1,0 +1,19 @@
+# Registre de test : valide-journal sans tolerance.n_min.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: valide-journal
+    certitude: probable
+    sources: ["tests/fixtures/combatlog/README.md"]
+    tests: ["tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants"]
+    tolerance: null
+    preuves:
+      - journal: tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt
+        date: "2026-09-27"
+        mesure: "intervalles entre instantanés enchaînés"
+        n: 3
+        test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants

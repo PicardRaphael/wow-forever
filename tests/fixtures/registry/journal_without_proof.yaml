@@ -1,0 +1,13 @@
+# Registre de test : valide-journal sans preuve.
+version: 1
+game_version: 1.60.1.70009
+mechanics:
+  - id: J9
+    categorie: meta
+    description: "Entrée de test"
+    forever: oui
+    statut: valide-journal
+    certitude: probable
+    sources: ["tests/fixtures/combatlog/README.md"]
+    tests: ["tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants"]
+    tolerance: {n_min: 3}

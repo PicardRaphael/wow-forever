@@ -27,6 +27,14 @@ DEFECTS = {
     "modelise_without_test.yaml": "'modelise' sans test",
     "numeric_formula.yaml": "formule chiffrée",
     "no_implementation.yaml": "aucune implémentation",
+    # T04 : preuves de journal (champ `preuves`, contrôle de `valide-journal`)
+    "journal_without_proof.yaml": "'valide-journal' sans preuve",
+    "journal_without_n_min.yaml": "tolerance.n_min",
+    "proof_missing_log.yaml": "journal introuvable",
+    "proof_log_outside_fixtures.yaml": "hors de tests/fixtures/combatlog/",
+    "proof_missing_test.yaml": "fonction de test introuvable",
+    "proof_below_n_min.yaml": "n = 3 < n_min = 50",
+    "proof_missing_field.yaml": "champ 'n' manquant",
 }
 
 
@@ -127,3 +135,17 @@ def test_main_strict_on_repository(capsys):
 def test_main_reports_errors(capsys):
     assert main(["--strict"], path=REGISTRIES / "duplicate.yaml", repo_root=REPO_ROOT) == 1
     assert "ERREUR" in capsys.readouterr().out
+
+
+def test_valid_journal_proof_is_accepted():
+    report = check("valid_journal.yaml")
+    assert report.errors == [] and report.counts["valide-journal"] == 1
+
+
+def test_b1_carries_the_log_proof_and_stays_tested():
+    """B1 : intervalles du journal du 2026-09-27 (n = 3), sous le seuil : reste `teste`, preuve jointe."""
+    b1 = find_entry(load(REGISTRY_PATH), "B1")
+    assert b1.status == "teste"
+    (proof,) = b1.proofs
+    assert proof["journal"] == "tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt"
+    assert proof["n"] == 3 and proof["test"].startswith("tests/unit/test_measure.py::")
