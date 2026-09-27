@@ -173,6 +173,14 @@ def build_parser() -> argparse.ArgumentParser:
     build.add_argument("--questie", help="dossier de l'addon Questie (valeurs en regard, agrégat communautaire)")
     build.add_argument("--out", help="dossier de sortie (défaut : <cache>/monsters)")
     build.add_argument("--force", action="store_true", help="remplacer un monsters.json existant")
+    build.add_argument(
+        "--fit-exclude",
+        type=int,
+        action="append",
+        default=[],
+        metavar="NPC",
+        help="PNJ écarté de l'ajustement de la correction Questie (répétable ; listé dans la table)",
+    )
     build.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
@@ -710,7 +718,9 @@ def _cmd_monsters_build(deps: Deps, args: argparse.Namespace) -> int:
         observations += found
         conflicts += clash
     version = current_identity(deps.data_dir).game_version
-    table = build_monsters(observations, questie, version, conflicts=conflicts, logs=names)
+    table = build_monsters(
+        observations, questie, version, conflicts=conflicts, logs=names, fit_exclude=args.fit_exclude
+    )
     written = write_monsters(table, out, deps.data_dir, force=args.force)
     levels = table["hp_by_level"].values()
     certainty = min_certainty(v["certainty"] for v in levels)

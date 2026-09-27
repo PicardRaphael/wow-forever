@@ -1002,6 +1002,26 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+  - id: H11
+    categorie: rencontre
+    description: "PV des monstres normaux par niveau (mesure des journaux, puis Questie corrigé vers Forever)"
+    forever: modifie
+    statut: teste
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70009/monsters.json (journaux du 2026-09-27, Questie 11.38.0 local, forever monsters build --fit-exclude 3986)"
+      - "tests/fixtures/combatlog/README.md"
+      - "tests/fixtures/questie/README.md"
+    tests:
+      - tests/unit/test_monsters_correction.py::test_ratio_per_measured_level
+      - tests/unit/test_monsters_correction.py::test_least_squares_line_on_ratios_above_one
+      - tests/unit/test_monsters_correction.py::test_correction_ratio_certainty_inside_and_beyond_the_range
+      - tests/unit/test_monsters_correction.py::test_measured_levels_are_never_modified
+      - tests/unit/test_engine_monsters.py::test_mob_hp_measured_first
+      - tests/unit/test_engine_monsters.py::test_mob_hp_seed_model
+    tolerance: null
+    formule: "PV(niveau) = mesure si le niveau est mesuré ; sinon médiane Questie × max(1, pente × niveau + ordonnée) (médiane mesurée / Questie au niveau si elle existe) ; probable dans la plage mesurée, suppose au-delà"
+    note: "T04b (décision 5) : Questie charge sur Forever la base Classic Era ; rapport mesuré / Questie de 1 jusqu'au niveau 7 puis +0,0248 par niveau (genou 7,95), 7 niveaux d'une seule zone (les Tarides) ; extrapolé jusqu'à × 2,29 au niveau 60 (suppose). Sarilus Foulborne (PNJ de quête, rapport 1,62) exclu de l'ajustement. Forever semble donner une valeur commune par niveau aux PNJ normaux (lanceurs de sorts compris) ; Sunscale Lashtail à part. Modèle du seed (hp_anchors) gardé pour la parité (mob_source seed)"
   - id: I1
     categorie: optimisation
     description: "Rotations (listes de priorités) par spé et situation"

@@ -247,6 +247,7 @@ class GameData:
     racials: Racials
     monsters: MonsterTable
     scaling: Mapping[str, tuple[RankScaling, ...]]  # clé de sort -> rangs (spell_scaling.json)
+    mob_model: MobModel
 
 
 class CharacterOverrides(TypedDict, total=False):

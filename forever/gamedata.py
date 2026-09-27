@@ -16,8 +16,10 @@ from forever.engine.model import (
     FixedCoefficient,
     GameData,
     IntPerCrit,
+    MobModel,
     MonsterHp,
     MonsterTable,
+    QuestieCorrection,
     Racials,
     Rank,
     RankScaling,
@@ -273,7 +275,57 @@ def _monsters(raw: Any) -> MonsterTable:
             _level_key(r, k, f"{where}.levels"): _monster_hp(r, v, f"{where}.levels.{k}", "max_hp")
             for k, v in r.obj(npc, "levels", f"{where}.levels").items()
         }
-    return MonsterTable(hp_by_level=by_level, npcs=npcs)
+    raw_corr = raw.get("questie_correction", "absent")
+    if raw_corr == "absent":
+        raise r.fail("questie_correction", "objet ou null (schéma 2)")
+    return MonsterTable(hp_by_level=by_level, npcs=npcs, correction=_correction(r, raw_corr))
+
+
+def _correction(r: _Reader, raw: Any) -> QuestieCorrection | None:
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise r.fail("questie_correction", "objet ou null")
+    levels: dict[int, float] = {}
+    for k, v in r.obj(raw, "levels", "questie_correction.levels").items():
+        if not isinstance(v, dict):
+            raise r.fail(f"questie_correction.levels.{k}", "objet")
+        levels[_level_key(r, k, "questie_correction.levels")] = r.num(v, "ratio", f"questie_correction.levels.{k}")
+    span = r.list_(raw, "range", "questie_correction.range")
+    if len(span) != 2 or not all(isinstance(x, int) and not isinstance(x, bool) for x in span):
+        raise r.fail("questie_correction.range", "[niveau min, niveau max]")
+    fit = raw.get("fit")
+    if fit is not None and not isinstance(fit, dict):
+        raise r.fail("questie_correction.fit", "objet ou null")
+    return QuestieCorrection(
+        levels=levels,
+        slope=r.num(fit, "slope", "questie_correction.fit.slope") if fit else None,
+        intercept=r.num(fit, "intercept", "questie_correction.fit.intercept") if fit else None,
+        level_min=span[0],
+        level_max=span[1],
+    )
+
+
+def _mob_model(raw: Any) -> MobModel:
+    """`leveling.json.mob_model` (copie du seed) ; certitude « EST » du seed : `suppose`."""
+    r = _Reader(LEVELING_FILE)
+    mm = r.obj(raw, "mob_model", "mob_model")
+    anchors = {
+        _level_key(r, k, "mob_model.hp_anchors"): r.num(mm["hp_anchors"], k, f"mob_model.hp_anchors.{k}")
+        for k in r.obj(mm, "hp_anchors", "mob_model.hp_anchors")
+    }
+    if not anchors:
+        raise r.fail("mob_model.hp_anchors", "au moins une ancre")
+    return MobModel(
+        hp_anchors=anchors,
+        swing_s=r.num(mm, "swing_s", "mob_model.swing_s"),
+        crit=r.num(mm, "crit", "mob_model.crit"),
+        crit_mult=r.num(mm, "crit_mult", "mob_model.crit_mult"),
+        avoid_vs_mage=r.num(mm, "avoid_vs_mage", "mob_model.avoid_vs_mage"),
+        run_speed=r.num(mm, "run_speed", "mob_model.run_speed"),
+        melee_range=r.num(mm, "melee_range", "mob_model.melee_range"),
+        certainty="suppose",
+    )
 
 
 def _scaling(raw: Any, spells: Mapping[str, Spell]) -> dict[str, tuple[RankScaling, ...]]:
@@ -448,6 +500,7 @@ def build_game_data(version: VersionData) -> GameData:
         racials=_racials(raw[RACIALS_FILE]),
         monsters=_monsters(raw[MONSTERS_FILE]),
         scaling=_scaling(raw[SCALING_FILE], spells),
+        mob_model=_mob_model(raw[LEVELING_FILE]),
     )
 
 
