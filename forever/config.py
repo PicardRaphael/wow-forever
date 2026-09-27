@@ -27,6 +27,10 @@ SILENT_AFTER = timedelta(days=14)
 HTTP_TIMEOUT = 2.0
 FETCH_TIMEOUT = 30.0  # téléchargement d'une table CSV (plusieurs Mo)
 USER_AGENT = f"forever-core/{__version__}"
+DEFAULT_WOW_DIR = Path(r"C:\Program Files (x86)\World of Warcraft\_classic_beta_")
+# Mesure des journaux : au-delà de cet écart, deux sorts instantanés ne sont pas « enchaînés » (paramètre de
+# l'outil, modifiable par --max-gap ; ce n'est pas une règle du jeu).
+CHAIN_MAX_GAP_S = 3.0
 
 
 @dataclass(frozen=True)
@@ -39,6 +43,7 @@ class Deps:
     http_get: HttpGet
     now: Callable[[], datetime]
     offline: bool = False
+    wow_dir: Path | None = None  # dossier du client (journaux, addons, SavedVariables), lu sans réseau
 
 
 def utc_now() -> datetime:
@@ -52,6 +57,12 @@ def default_cache_dir(environ: Mapping[str, str] = os.environ) -> Path:
     return Path(configured) if configured else Path.home() / ".cache" / "forever"
 
 
+def default_wow_dir(environ: Mapping[str, str] = os.environ) -> Path:
+    """FOREVER_WOW_DIR, sinon le dossier de la bêta Forever sous Windows."""
+    configured = environ.get("FOREVER_WOW_DIR")
+    return Path(configured) if configured else DEFAULT_WOW_DIR
+
+
 def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
     """Dépendances de production ; FOREVER_OFFLINE=1 interdit tout appel réseau."""
     return Deps(
@@ -61,4 +72,5 @@ def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
         http_get=urllib_get,
         now=utc_now,
         offline=environ.get("FOREVER_OFFLINE", "") not in ("", "0"),
+        wow_dir=default_wow_dir(environ),
     )

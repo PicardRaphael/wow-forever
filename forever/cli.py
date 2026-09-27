@@ -1,5 +1,5 @@
 """Interface en ligne de commande : `forever status | lookup | explain-mechanic | manifest | builds | fetch | decode | diff | verify
-| report | mcp`.
+| report | logs | mcp`.
 
 Sortie texte en français par défaut (dernière ligne : provenance), `--json` pour une sortie structurée.
 Codes de sortie : 0 succès, 2 usage, 3 intégrité des données, 4 introuvable, 5 réseau."""
@@ -15,12 +15,13 @@ from dataclasses import replace
 from pathlib import Path
 from typing import Any, NoReturn
 
-from forever.config import Deps, default_deps
+from forever.config import CHAIN_MAX_GAP_S, Deps, default_deps
 from forever.errors import (
     EXIT_INTEGRITY,
     EXIT_OK,
     ForeverError,
     InvalidArgumentError,
+    PathNotFoundError,
     UnsupportedKindError,
     UsageError,
 )
@@ -28,13 +29,21 @@ from forever.explain import MechanicExplanation, explain_mechanic
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.builds import list_builds
+from forever.pipeline.combatlog import LOG_GLOB, LogHeader, LogSummary, read_log, scan_logs
 from forever.pipeline.decode import Candidate, decode_version
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
+from forever.pipeline.measure import LogMeasures, measure_log
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
-from forever.provenance import Provenance, error_payload, format_provenance_line, local_provenance
+from forever.provenance import (
+    Certainty,
+    Provenance,
+    error_payload,
+    format_provenance_line,
+    local_provenance,
+)
 from forever.status import StatusReport, status_report
 from forever.store import current_identity, ensure_integrity, read_sources
 from forever.timefmt import format_utc
@@ -111,6 +120,18 @@ def build_parser() -> argparse.ArgumentParser:
     report.add_argument("b", help="version du dépôt ou chemin d'une candidate")
     report.add_argument("--out", help="écrire le rapport dans ce fichier")
     report.add_argument("--json", action="store_true", help="sortie JSON")
+
+    logs = sub.add_parser("logs", help="journaux de combat du client (lecture locale, sans réseau)")
+    logs_sub = logs.add_subparsers(dest="logs_command", required=True, parser_class=_Parser)
+    scan = logs_sub.add_parser("scan", help="lister les journaux WoWCombatLog-*.txt d'un dossier")
+    scan.add_argument("--dir", help="dossier des journaux (défaut : <FOREVER_WOW_DIR>/Logs)")
+    scan.add_argument("--json", action="store_true", help="sortie JSON")
+    measure = logs_sub.add_parser("measure", help="mesurer un journal ou tous ceux d'un dossier")
+    measure.add_argument("path", help="journal WoWCombatLog-*.txt ou dossier")
+    measure.add_argument(
+        "--max-gap", type=float, default=CHAIN_MAX_GAP_S, help="écart maximal (s) entre deux instantanés enchaînés"
+    )
+    measure.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     return parser
@@ -443,6 +464,124 @@ def _cmd_report(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK if r["ok"] else EXIT_INTEGRITY
 
 
+def _wow_path(deps: Deps, given: str | None, *parts: str) -> Path:
+    """Chemin donné, sinon `<wow_dir>/<parts>` (FOREVER_WOW_DIR)."""
+    if given:
+        return Path(given)
+    if deps.wow_dir is None:
+        raise InvalidArgumentError(
+            "Dossier du client inconnu.", "donner le chemin explicitement ou définir FOREVER_WOW_DIR"
+        )
+    return deps.wow_dir.joinpath(*parts)
+
+
+def _log_provenance(deps: Deps, headers: list[LogHeader], certainty: Certainty, notes: list[str]) -> Provenance:
+    """Provenance des mesures : version locale dont le préfixe correspond au build du journal (le journal ne donne
+    que `1.60.1`, sans numéro de build : hypothèse affichée)."""
+    version = current_identity(deps.data_dir).game_version
+    assumptions = list(notes)
+    for build in sorted({h.build for h in headers}):
+        if version.startswith(build + "."):
+            assumptions.append(f"build du journal non précisé ({build}) : version locale {version} retenue")
+        else:
+            assumptions.append(f"build du journal {build} sans version locale correspondante (locale : {version})")
+    return local_provenance(deps, certainty=certainty, assumptions=assumptions)
+
+
+def _summary_json(s: LogSummary) -> dict[str, Any]:
+    return {
+        "name": s.name,
+        "lines": s.lines,
+        "events": s.events,
+        "build": s.header.build if s.header else None,
+        "start": s.start.isoformat() if s.start else None,
+        "end": s.end.isoformat() if s.end else None,
+        "mine": s.mine,
+        "error": s.error,
+    }
+
+
+def _cmd_logs_scan(deps: Deps, args: argparse.Namespace) -> int:
+    directory = _wow_path(deps, args.dir, "Logs")
+    if not directory.is_dir():
+        raise PathNotFoundError("Dossier des journaux", str(directory), "donner --dir ou définir FOREVER_WOW_DIR")
+    summaries = scan_logs(directory)
+    provenance = _log_provenance(deps, [s.header for s in summaries if s.header], "certain", [])
+    lines = [f"Journaux de combat dans {directory} : {len(summaries)}"]
+    for s in summaries:
+        if s.error:
+            lines.append(f"  {s.name} · {s.lines} ligne(s) · illisible : {s.error}")
+        else:
+            span = f"{s.start:%Y-%m-%d %H:%M:%S} → {s.end:%H:%M:%S}" if s.start and s.end else "aucun événement"
+            who = ", ".join(s.mine) or "aucun joueur « à moi »"
+            lines.append(f"  {s.name} · {s.lines} lignes · {span} · {who}")
+    payload = {"dir": str(directory), "logs": [_summary_json(s) for s in summaries], "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def render_measures(m: LogMeasures) -> list[str]:
+    caster = m["caster"]["name"] if m["caster"] else "aucun joueur « à moi »"
+    lines = [f"Journal {m['name']} · build {m['header']['build']} · {m['events']} événements · lanceur {caster}"]
+    lines += [
+        f"  PV : {o['name']} ({o['npc_id']}) niveau {o['level']} = {o['max_hp']} ({o['guids']} individu(s))"
+        for o in m["monsters"]
+    ]
+    lines += [f"  CONFLIT de PV : PNJ {c['npc_id']} niveau {c['level']} : {c['values']}" for c in m["conflicts"]]
+    if m["costs"]:
+        lines.append("  Coûts relevés : " + " · ".join(f"sort {k} = {v}" for k, v in m["costs"].items()))
+    gcd = m["gcd_intervals"]
+    if gcd["values"]:
+        values = ", ".join(_num(round(v, 3)) for v in gcd["values"])
+        lines.append(f"  Intervalles entre instantanés enchaînés : {values} s (n = {gcd['n']})")
+    for spell, times in m["cast_times"].items():
+        lines.append(f"  Incantations du sort {spell} : " + ", ".join(_num(round(x, 3)) for x in times) + " s")
+    lines += [f"  Critique du sort {c['spell_id']} : × {_num(round(c['ratio'], 4))}" for c in m["crits"]]
+    lines += [
+        f"  Touchés/ratés {h['school']} écart {h['level_diff']:+d} : {h['hits']} / {h['misses']}"
+        for h in m["hit_tally"]
+    ]
+    if m["unknown_events"]:
+        lines.append(f"  Événements inconnus gardés bruts : {', '.join(m['unknown_events'])}")
+    return lines
+
+
+def _cmd_logs_measure(deps: Deps, args: argparse.Namespace) -> int:
+    path = Path(args.path)
+    if not path.exists():
+        raise PathNotFoundError("Journal", str(path), "donner un fichier WoWCombatLog-*.txt ou son dossier")
+    files = sorted(path.glob(LOG_GLOB)) if path.is_dir() else [path]
+    notes: list[str] = [f"fenêtre d'enchaînement des instantanés : {_num(args.max_gap)} s (paramètre de mesure)"]
+    results: list[LogMeasures] = []
+    headers: list[LogHeader] = []
+    for file in files:
+        try:
+            header, events = read_log(file)
+            evs = list(events)
+        except ForeverError as err:
+            if not path.is_dir():
+                raise
+            notes.append(f"{file.name} ignoré : {err.message}")
+            continue
+        headers.append(header)
+        results.append(measure_log(header, evs, name=file.name, max_gap_s=args.max_gap))
+    for m in results:
+        notes += [f"{m['name']} : {a}" for a in m["assumptions"]]
+    stats = any(m["gcd_intervals"]["values"] or m["cast_times"] or m["crits"] for m in results)
+    certainty: Certainty = "probable" if stats else "certain"
+    if stats:
+        notes.append("intervalles, incantations et critiques : statistiques sur un petit échantillon (probable)")
+    provenance = _log_provenance(deps, headers, certainty, notes)
+    lines = [line for m in results for line in render_measures(m)] or ["Aucun journal mesurable"]
+    _emit({"logs": results, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _cmd_logs(deps: Deps, args: argparse.Namespace) -> int:
+    handlers = {"scan": _cmd_logs_scan, "measure": _cmd_logs_measure}
+    return handlers[args.logs_command](deps, args)
+
+
 def _use_utf8_output() -> None:
     """Sortie redirigée (tube, fichier) : UTF-8 quel que soit l'encodage local, pour les accents et le JSON."""
     for stream in (sys.stdout, sys.stderr):
@@ -481,6 +620,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "diff": _cmd_diff,
         "verify": _cmd_verify,
         "report": _cmd_report,
+        "logs": _cmd_logs,
     }
     try:
         return handlers[args.command](deps, args)
