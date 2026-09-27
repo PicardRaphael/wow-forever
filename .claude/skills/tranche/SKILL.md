@@ -28,3 +28,6 @@ disable-model-invocation: true
 ## Pièges
 <!-- Ajouter ici chaque erreur récurrente observée pendant les tranches. -->
 - Ne pas démarrer la tranche suivante dans la même session : ouvrir une nouvelle session.
+- Le mode auto refuse d'écrire dans `.github/workflows/` et `.claude/settings.json` : préparer un patch (`git diff` du changement voulu, enregistré hors du dépôt) et donner à l'utilisateur la commande pour l'appliquer (`git apply <fichier>.patch`).
+- Le plan (`tasks/$ARGUMENTS-plan.md`) s'écrit et se committe sur `main`, avant de créer la branche ou le worktree de la tranche.
+- Fin de tranche dans un worktree : depuis le dépôt principal, fusion fast-forward dans `main` (`git merge --ff-only <branche>`), `git push`, puis suppression du worktree (`git worktree remove <chemin>`) et des branches locale et distante (`git branch -d <branche>`, `git push origin --delete <branche>`).
