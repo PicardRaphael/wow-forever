@@ -60,10 +60,14 @@ def roll_base_damage(gd: GameData, key: str, rank: Rank, ch: Character, u: float
 
 
 def dot_tick_damage(gd: GameData, dot_total: float, dmg_mult: float, ticks: int) -> float:
-    """Registre : A17"""
-    raise NotImplementedError
+    """Dégâts d'un tic de DoT, hors critique : total du rang × multiplicateur de dégâts, réparti sur les tics.
+
+    Registre : A17"""
+    return dot_total * dmg_mult / ticks
 
 
 def ignite_damage(gd: GameData, pts: Points, crit_damage: float) -> float:
-    """Registre : A18"""
-    raise NotImplementedError
+    """Dégâts totaux d'Ignite posés par un coup critique de feu (part du talent).
+
+    Registre : A18"""
+    return crit_damage * talent_value(gd, pts, "ignite") / PERCENT

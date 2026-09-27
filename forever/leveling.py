@@ -23,6 +23,7 @@ from forever.store import VersionData, load_version
 
 MECHANICS_FILE = "mechanics.json"
 SCALING_FILE = "spell_scaling.json"
+RACIALS_FILE = "racials.json"
 LEVELING_PREFIX = "leveling."
 MAX_N = 100_000  # borne de méthode (temps de calcul), pas un chiffre de jeu
 CERTAINTIES: tuple[Certainty, ...] = ("certain", "probable", "suppose")
@@ -68,6 +69,11 @@ def parse_talents(text: str | None) -> dict[str, int]:
 
 def check_talents(gd: GameData, pts: Mapping[str, int], level: int) -> None:
     """Clés connues et build légal au niveau donné (InvalidArgumentError, message en français)."""
+    negative = [k for k, v in pts.items() if v < 0]
+    if negative:
+        raise InvalidArgumentError(
+            f"Rang de talent négatif : {', '.join(negative)}.", "donner des rangs positifs ou nuls"
+        )
     unknown = [k for k in pts if k not in gd.talents]
     if unknown:
         close = difflib.get_close_matches(unknown[0], list(gd.talents), n=3, cutoff=0.6)
@@ -84,9 +90,15 @@ def level_cap(data: VersionData) -> int:
     return int(data.read_json(SCALING_FILE)["level_cap"])
 
 
-def check_level(level: int, cap: int) -> None:
+def check_level(level: int, cap: int, what: str = "Niveau") -> None:
     if not 1 <= level <= cap:
-        raise InvalidArgumentError(f"Niveau {level} hors de 1-{cap}.", f"donner un niveau de 1 à {cap}")
+        raise InvalidArgumentError(f"{what} {level} hors de 1-{cap}.", f"donner un niveau de 1 à {cap}")
+
+
+def check_race(data: VersionData, race: str) -> None:
+    races = sorted(data.read_json(RACIALS_FILE)["races"])
+    if race not in races:
+        raise InvalidArgumentError(f"Race inconnue « {race} ».", f"choisir parmi {', '.join(races)} (racials.json)")
 
 
 def constants_certainty(data: VersionData) -> Certainty:
@@ -133,7 +145,9 @@ def simulate_leveling(
     """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance."""
     data = load_version(deps)
     gd = build_game_data(data)
-    check_level(level, level_cap(data))
+    cap = level_cap(data)
+    check_level(level, cap)
+    check_race(data, race)
     if not 1 <= n <= MAX_N:
         raise InvalidArgumentError(f"n = {n} hors de 1-{MAX_N}.", f"donner un nombre de combats de 1 à {MAX_N}")
     pts = dict(talents or {})
@@ -145,6 +159,7 @@ def simulate_leveling(
         options = options_with_defaults(gd, rotation, raw)
     except ValueError as exc:
         raise InvalidArgumentError(f"{exc}.", "voir `forever sim leveling --help`") from exc
+    check_level(level + options["level_diff"], cap, "Niveau du monstre")
     hp = target_hp(gd, level + options["level_diff"], options["mob_source"])
     try:
         m = mc(gd, level, pts, race, rotation, n, seed, over, **raw)

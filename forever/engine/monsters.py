@@ -114,15 +114,22 @@ def mob_swing_damage(gd: GameData, level: int, armor: float) -> float:
 
 
 def mob_land_chance(gd: GameData) -> float:
-    """Registre : I6"""
-    raise NotImplementedError
+    """Chance qu'un coup de monstre touche le Mage (`mob_model.avoid_vs_mage` du seed).
+
+    Registre : I6"""
+    return 1 - gd.mob_model.avoid_vs_mage
 
 
 def mob_hit_taken(gd: GameData, hit: float, *, crit: bool) -> float:
-    """Registre : I6"""
-    raise NotImplementedError
+    """Dégâts d'un coup de monstre qui touche, critique compris (`mob_model.crit_mult`).
+
+    Registre : I6"""
+    return hit * (gd.mob_model.crit_mult if crit else 1.0)
 
 
 def mob_expected_hit(gd: GameData, hit: float) -> float:
-    """Registre : I6"""
-    raise NotImplementedError
+    """Espérance des dégâts d'un coup de monstre qui touche (modèle analytique).
+
+    Registre : I6"""
+    mm = gd.mob_model
+    return hit * (1 + mm.crit * (mm.crit_mult - 1))

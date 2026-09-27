@@ -17,8 +17,8 @@ from typing import Any, TypedDict, cast
 from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time, pushback_resist_chance, pushback_s, spell_cooldown
 from forever.engine.character import character
-from forever.engine.damage import dot_tick_times, ignite_tick_times, roll_base_damage
-from forever.engine.mana import downtime, in_combat_regen_fraction, mana_cost
+from forever.engine.damage import dot_tick_damage, dot_tick_times, ignite_damage, ignite_tick_times, roll_base_damage
+from forever.engine.mana import downtime, in_combat_regen_fraction, mana_cost, master_of_elements_refund
 from forever.engine.model import (
     SCHOOL_FIRE,
     SCHOOL_FROST,
@@ -28,7 +28,7 @@ from forever.engine.model import (
     GameData,
     Points,
 )
-from forever.engine.monsters import MOB_SOURCES, mob_hp, mob_swing_damage, mob_xp
+from forever.engine.monsters import MOB_SOURCES, mob_hit_taken, mob_hp, mob_swing_damage, mob_xp
 from forever.engine.movement import (
     attacker_swing_s,
     chill_duration,
@@ -96,7 +96,9 @@ def kill_mc(
     rng: random.Random | None = None,
     **options: Any,
 ) -> KillResult:
-    """Un combat simulé pas à pas contre un monstre normal de niveau `level + level_diff`, puis le repos."""
+    """Un combat simulé pas à pas contre un monstre normal de niveau `level + level_diff`, puis le repos.
+
+    Registre : I1, I6, J2"""
     o = options_with_defaults(gd, rotation, options)
     rng = rng or random.Random()
     mm = gd.mob_model
@@ -119,7 +121,6 @@ def kill_mc(
     wc_p = talent_value(gd, pts, "wintersChill", 0) / PERCENT
     wc_max = int(talent_value(gd, pts, "wintersChill", 1, 0))
     burning = pushback_resist_chance(gd, pts, fire_school=True)
-    mastery = talent_value(gd, pts, "masterOfElements") / PERCENT
     clearcast = talent_value(gd, pts, "arcaneConcentration") / PERCENT
     ignite = talent_value(gd, pts, "ignite")
     regen_c = in_combat_regen_fraction(gd, pts, level) * ch.spirit_regen
@@ -160,16 +161,17 @@ def kill_mc(
             crit = rng.random() < e["crit"]
             dmg = base * e["dmg_mult"] * (e["crit_mult"] if crit else 1.0)
             if crit and e["school"] in (SCHOOL_FIRE | SCHOOL_FROST):
-                s["mana"] -= mastery * (r.mana or e["mana"])
+                s["mana"] -= master_of_elements_refund(gd, pts, r, e["mana"])
             if rng.random() < clearcast:
                 s["cc"] = True
             if r.dot_total:
                 ticks = dot_tick_times(gd, r.dot_duration_s)
-                tick = r.dot_total * e["dmg_mult"] / len(ticks)
+                tick = dot_tick_damage(gd, r.dot_total, e["dmg_mult"], len(ticks))
                 for at in ticks:
-                    dots.append((s["t"] + travel + at, tick * (e["crit_mult"] if rng.random() < e["crit"] else 1.0)))
+                    tick_crit = gd.rules.dot_can_crit and rng.random() < e["crit"]
+                    dots.append((s["t"] + travel + at, tick * (e["crit_mult"] if tick_crit else 1.0)))
             if crit and e["school"] in SCHOOL_FIRE and ignite:
-                ig = dmg * ignite / PERCENT
+                ig = ignite_damage(gd, pts, dmg)
                 ig_ticks = ignite_tick_times(gd)
                 for at in ig_ticks:
                     dots.append((s["t"] + travel + at, ig / len(ig_ticks)))
@@ -212,7 +214,7 @@ def kill_mc(
                         s["swing"] = nt
                 elif s["swing"] is not None and nt >= s["swing"]:
                     if rng.random() > mm.avoid_vs_mage:
-                        s["taken"] += hit_raw * (mm.crit_mult if rng.random() < mm.crit else 1.0)
+                        s["taken"] += mob_hit_taken(gd, hit_raw, crit=rng.random() < mm.crit)
                         s["farmor"] = nt + gd.utility.frost_armor_duration_s
                         if casting and not (fire_school and rng.random() < burning):
                             push += pushback_s(gd)
@@ -304,7 +306,9 @@ def mc(
     over: CharacterOverrides | None = None,
     **options: Any,
 ) -> KillResult:
-    """Moyenne de `n` combats simulés avec un générateur à graine fixe (reproductible)."""
+    """Moyenne de `n` combats simulés avec un générateur à graine fixe (reproductible).
+
+    Registre : I6, J2"""
     if n < 1:
         raise ValueError(f"n = {n} : au moins un combat (n ≥ 1)")
     options_with_defaults(gd, rotation, options)

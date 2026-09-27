@@ -60,10 +60,17 @@ def spell_cooldown(gd: GameData, key: str, rank: Rank, pts: Points) -> float:
 
 
 def pushback_rate(gd: GameData, pts: Points, *, swing_s: float, fire_school: bool) -> float:
-    """Registre : B6"""
-    raise NotImplementedError
+    """Recul moyen par seconde d'incantation en mêlée (modèle analytique) : coups qui touchent par seconde × recul
+    par coup × chance de recul (Burning Soul).
+
+    Registre : B6"""
+    land = 1 - gd.mob_model.avoid_vs_mage
+    return land / swing_s * pushback_s(gd) * (1 - pushback_resist_chance(gd, pts, fire_school=fire_school))
 
 
 def melee_cast_time(gd: GameData, cast_s: float, push_per_s: float) -> float:
-    """Registre : B6"""
-    raise NotImplementedError
+    """Incantation en mêlée allongée par le recul (modèle analytique), au plus `1 / leveling.analytic.min_cast_fraction`
+    fois l'incantation.
+
+    Registre : B6"""
+    return cast_s / max(gd.leveling.analytic_min_cast_fraction, 1 - push_per_s)

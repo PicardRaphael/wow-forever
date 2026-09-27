@@ -321,7 +321,7 @@ def measure_log(
         moments = sorted({t for tl in levels.timelines for t, _ in tl.points if events[0].time < t <= events[-1].time})
         for t in moments:
             now = levels.level_at(t)
-            if now is not None and now != previous:
+            if now is not None and (previous is None or now[0] != previous[0]):
                 changes.append({"time": t.isoformat(), "level": now[0], "source": now[1]})
             previous = now
     return {

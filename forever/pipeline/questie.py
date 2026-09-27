@@ -165,6 +165,7 @@ def read_questie(addon_dir: Path) -> QuestieDB:
 JOURNEY_VARIABLE = "QuestieConfig"
 _VARIABLE = re.compile(rf"^{JOURNEY_VARIABLE}\s*=\s*\{{", re.MULTILINE)
 _KEY = re.compile(r'\[("(?:[^"\\]|\\.)*"|-?\d+)\]\s*=\s*')
+_BARE_KEY = re.compile(r"[A-Za-z_]\w*\s*=\s*")  # clé nue (`foo = …`), valeur ignorée
 
 
 def _string_end(text: str, i: int) -> int:
@@ -221,6 +222,8 @@ def _items(text: str, start: int, end: int) -> dict[str, tuple[int, int]]:
         if m:
             key = m[1][1:-1] if m[1].startswith('"') else None
             i = m.end()
+        elif bare := _BARE_KEY.match(text, i):
+            i = bare.end()
         if text[i] == "{":
             j = _table_end(text, i)
         elif text[i] == '"':
@@ -231,7 +234,7 @@ def _items(text: str, start: int, end: int) -> dict[str, tuple[int, int]]:
                 j += 1
         if key is not None:
             out[key] = (i, j)
-        i = j
+        i = max(j, i + 1)  # toujours avancer : un jeton inattendu ne bloque jamais la lecture
     return out
 
 

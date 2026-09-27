@@ -66,7 +66,8 @@ def fit_questie_correction(npcs: Mapping[str, Any], *, exclude: Collection[int] 
         mean_y = sum(y for _, y in points) / len(points)
         slope = sum((x - mean_x) * (y - mean_y) for x, y in points) / sum((x - mean_x) ** 2 for x, _ in points)
         intercept = mean_y - slope * mean_x
-        fit = {"slope": slope, "intercept": intercept, "knee_level": (1 - intercept) / slope, "points": len(points)}
+        knee = (1 - intercept) / slope if slope else None  # pente nulle : la droite ne coupe jamais 1
+        fit = {"slope": slope, "intercept": intercept, "knee_level": knee, "points": len(points)}
     return {
         "method": "médiane par niveau des rapports PV mesuré / PV Questie (PNJ normaux) ; droite des moindres carrés "
         "sur les médianes > 1 ; rapport hors mesure = max(1, droite)",

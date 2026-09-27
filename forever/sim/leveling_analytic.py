@@ -15,11 +15,11 @@ from __future__ import annotations
 from typing import Any
 
 from forever.engine.cast import expected_cast
-from forever.engine.casting import pushback_resist_chance, pushback_s
+from forever.engine.casting import melee_cast_time, pushback_rate
 from forever.engine.character import character
 from forever.engine.mana import downtime, in_combat_regen_fraction
 from forever.engine.model import CharacterOverrides, GameData, Points
-from forever.engine.monsters import mob_hp, mob_swing_damage, mob_xp
+from forever.engine.monsters import mob_expected_hit, mob_hp, mob_land_chance, mob_swing_damage, mob_xp
 from forever.engine.movement import (
     attacker_swing_s,
     frostbite_chance,
@@ -43,7 +43,9 @@ def kill_analytic(
     over: CharacterOverrides | None = None,
     **options: Any,
 ) -> KillResult:
-    """Espérance d'un combat contre un monstre normal de niveau `level + level_diff`, puis du repos."""
+    """Espérance d'un combat contre un monstre normal de niveau `level + level_diff`, puis du repos.
+
+    Registre : I1, I6"""
     o = options_with_defaults(gd, rotation, options)
     lv, mm, gcd = gd.leveling, gd.mob_model, gd.rules.gcd_s
     level_diff = o["level_diff"]
@@ -67,10 +69,9 @@ def kill_analytic(
     run = mob_speed(gd, slow * e["hit"])
     t0 = c + flight + (frng - mm.melee_range) / run
     swing = attacker_swing_s(gd, frost_armor=True)
-    p_land = 1 - mm.avoid_vs_mage
-    burning = pushback_resist_chance(gd, pts, fire_school=main == "fireball")
-    push_per_s = p_land / swing * pushback_s(gd) * (1 - burning)
-    c_melee = c / max(lv.analytic_min_cast_fraction, 1 - push_per_s)
+    p_land = mob_land_chance(gd)
+    push_per_s = pushback_rate(gd, pts, swing_s=swing, fire_school=main == "fireball")
+    c_melee = melee_cast_time(gd, c, push_per_s)
     # gel : Frostbite et Fingers of Frost -> Ice Lance
     fbite = frostbite_chance(gd, pts) if frostbolt else 0.0
     frz_per_cast = fbite * e["hit"] * frostbite_freeze_s(gd)
@@ -103,7 +104,7 @@ def kill_analytic(
         mana = n_pre * m_cast + t_melee / cyc_time * cyc_mana
     frozen_frac = min(lv.analytic_freeze_cap, frz_per_cast / cyc_time) if t_melee else 0.0
     hit_raw = mob_swing_damage(gd, mlevel, ch.armor)
-    taken = t_melee * (1 - frozen_frac) / swing * p_land * hit_raw * (1 + mm.crit * (mm.crit_mult - 1))
+    taken = t_melee * (1 - frozen_frac) / swing * p_land * mob_expected_hit(gd, hit_raw)
     mana = max(0.0, mana - in_combat_regen_fraction(gd, pts, level) * ch.spirit_regen * combat)
     down = downtime(gd, ch, level, mana, taken)
     total = combat + down + o["run_between_s"]

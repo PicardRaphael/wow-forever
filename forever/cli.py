@@ -29,7 +29,15 @@ from forever.errors import (
 )
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.gamedata import build_game_data, load_game_data
-from forever.leveling import MAX_N, check_level, check_talents, level_cap, parse_talents, simulate_leveling
+from forever.leveling import (
+    MAX_N,
+    check_level,
+    check_race,
+    check_talents,
+    level_cap,
+    parse_talents,
+    simulate_leveling,
+)
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
@@ -770,6 +778,10 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
         )
     if not 1 <= args.n <= MAX_N:
         raise InvalidArgumentError(f"n = {args.n} hors de 1-{MAX_N}.", f"donner un nombre de combats de 1 à {MAX_N}")
+    check_race(data, args.race)
+    diff = args.level_diff if args.level_diff is not None else gd.leveling.default_level_diff
+    check_level(args.level_from + diff, cap, "Niveau du monstre")
+    check_level(args.level_to + diff, cap, "Niveau du monstre")
     pts = parse_talents(args.talents)
     check_talents(gd, pts, args.level_to)
     options: dict[str, Any] = {"mob_source": args.mob_source, "spell_level": args.spell_level, "nova": args.nova}

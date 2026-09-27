@@ -64,5 +64,8 @@ def downtime(gd: GameData, ch: Character, level: int, mana_used: float, taken: f
 
 
 def master_of_elements_refund(gd: GameData, pts: Points, rank: Rank, estimated_mana: float) -> float:
-    """Registre : B17"""
-    raise NotImplementedError
+    """Mana rendue par Master of Elements sur un critique de feu ou de givre : part du coût du rang (coût estimé du
+    lancer si le rang n'en publie pas).
+
+    Registre : B17"""
+    return talent_value(gd, pts, "masterOfElements") / PERCENT * (rank.mana or estimated_mana)

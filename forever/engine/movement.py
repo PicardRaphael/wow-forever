@@ -39,7 +39,7 @@ def chill_duration(gd: GameData, rank: Rank, pts: Points) -> float:
 
 
 def mob_speed(gd: GameData, slow: float) -> float:
-    """Vitesse de course du monstre (m/s) sous un ralenti `slow` (0 : sans ralenti).
+    """Vitesse de course du monstre (yards par seconde, comme les portées) sous un ralenti `slow` (0 : sans ralenti).
 
     Registre : C5"""
     return gd.mob_model.run_speed * (1 - slow)
