@@ -828,10 +828,12 @@ mechanics:
     categorie: meta
     description: "Version du client et hotfixes"
     forever: oui
-    statut: modelise
+    statut: modelise  # T01 : version du client, empreintes et fraîcheur testées ; hotfixes absents (T03)
     certitude: certain
-    sources: []
-    tests: []
+    sources: ["https://wago.tools/api/builds"]
+    tests:
+      - tests/unit/test_manifest.py
+      - tests/unit/test_freshness.py
     tolerance: null
   - id: J2
     categorie: meta
