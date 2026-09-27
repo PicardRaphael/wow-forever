@@ -26,7 +26,12 @@ def test_stdio_server(tmp_path):
             return tools, result
 
     tools, result = asyncio.run(go())
-    assert {t.name for t in tools.tools} == {"forever_status", "forever_lookup", "forever_explain_mechanic"}
+    assert {t.name for t in tools.tools} == {
+        "forever_status",
+        "forever_lookup",
+        "forever_explain_mechanic",
+        "forever_sim_leveling",
+    }
     assert not result.is_error
     assert result.structured_content["ranks"][0]["damage_min"] == 34
     assert validate_provenance(result.structured_content["provenance"]) == []

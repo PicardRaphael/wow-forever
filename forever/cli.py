@@ -14,8 +14,9 @@ from collections.abc import Mapping
 from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path
-from typing import Any, NoReturn
+from typing import Any, NoReturn, cast
 
+from forever.chart import leveling_chart
 from forever.config import CHAIN_MAX_GAP_S, Deps, default_deps
 from forever.errors import (
     EXIT_INTEGRITY,
@@ -27,7 +28,8 @@ from forever.errors import (
     UsageError,
 )
 from forever.explain import MechanicExplanation, explain_mechanic
-from forever.gamedata import load_game_data
+from forever.gamedata import build_game_data, load_game_data
+from forever.leveling import MAX_N, check_level, check_talents, level_cap, parse_talents, simulate_leveling
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
@@ -59,8 +61,9 @@ from forever.provenance import (
     local_provenance,
     min_certainty,
 )
+from forever.sim.leveling_mc import KillResult
 from forever.status import StatusReport, status_report
-from forever.store import current_identity, ensure_integrity, read_sources
+from forever.store import current_identity, ensure_integrity, load_version, read_sources
 from forever.timefmt import format_utc
 
 SCHOOLS_FR = {"frost": "givre", "fire": "feu", "arcane": "arcane", "frostfire": "givrefeu"}
@@ -183,8 +186,45 @@ def build_parser() -> argparse.ArgumentParser:
     )
     build.add_argument("--json", action="store_true", help="sortie JSON")
 
+    sim = sub.add_parser("sim", help="simulateurs (leveling)")
+    sim_sub = sim.add_subparsers(dest="sim_command", required=True, parser_class=_Parser)
+    sim_leveling = sim_sub.add_parser("leveling", help="temps par monstre et XP par heure (Monte Carlo et analytique)")
+    sim_leveling.add_argument("--level", type=int, required=True, help="niveau du personnage")
+    _leveling_arguments(sim_leveling, n_default=1500)
+
+    chart = sub.add_parser("chart", help="graphiques (leveling)")
+    chart_sub = chart.add_subparsers(dest="chart_command", required=True, parser_class=_Parser)
+    chart_leveling = chart_sub.add_parser("leveling", help="graphique PNG du leveling, niveau par niveau")
+    chart_leveling.add_argument("--out", required=True, help="fichier PNG à écrire (hors de forever/data/)")
+    chart_leveling.add_argument("--from", dest="level_from", type=int, default=10, help="premier niveau")
+    chart_leveling.add_argument("--to", dest="level_to", type=int, default=30, help="dernier niveau")
+    _leveling_arguments(chart_leveling, n_default=300)
+
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     return parser
+
+
+def _leveling_arguments(p: argparse.ArgumentParser, *, n_default: int) -> None:
+    p.add_argument("--race", default="Orc", help="race du personnage (défaut : Orc)")
+    p.add_argument("--rotation", default="frost", choices=["frost", "fire"], help="rotation (défaut : frost)")
+    p.add_argument("--talents", default="", help="talents clé=rang,clé=rang (ex. improvedFrostbolt=3)")
+    p.add_argument("--n", type=int, default=n_default, help=f"combats simulés par niveau (défaut : {n_default})")
+    p.add_argument("--seed", type=int, default=12345, help="graine du Monte Carlo (défaut : 12345)")
+    p.add_argument(
+        "--mob-source",
+        default="measured",
+        choices=["measured", "seed"],
+        help="PV du monstre : mesurés puis Questie corrigé (défaut) ou modèle du seed",
+    )
+    p.add_argument(
+        "--spell-level",
+        default="character",
+        choices=["character", "rank"],
+        help="dégâts des rangs au niveau du personnage (défaut) ou du rang (seed)",
+    )
+    p.add_argument("--level-diff", type=int, help="niveau du monstre - niveau du personnage (défaut des données)")
+    p.add_argument("--nova", action="store_true", help="Frost Nova au contact")
+    p.add_argument("--json", action="store_true", help="sortie JSON")
 
 
 # --- Rendu texte ---------------------------------------------------------------------------------
@@ -676,6 +716,97 @@ def _cmd_logs_measure(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _fmt_kill(label: str, k: KillResult) -> str:
+    return (
+        f"  {label} : total {_num(round(k['total'], 2))} s · combat {_num(round(k['combat'], 2))} s · "
+        f"repos {_num(round(k['downtime'], 2))} s · mana {_num(round(k['mana'], 1))} · "
+        f"dégâts subis {_num(round(k['taken'], 1))} · XP/h {_num(round(k['xp_h']))}"
+    )
+
+
+def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
+    rep = simulate_leveling(
+        deps,
+        args.level,
+        race=args.race,
+        rotation=args.rotation,
+        talents=parse_talents(args.talents),
+        n=args.n,
+        seed=args.seed,
+        mob_source=args.mob_source,
+        spell_level=args.spell_level,
+        level_diff=args.level_diff,
+        nova=args.nova,
+    )
+    hp = rep["mob_hp"]
+    gap = f"{rep['analytic_gap'] * 100:+.1f}".replace(".", ",")
+    lines = [
+        (
+            f"Leveling niveau {rep['level']} · {rep['race']} · {rep['rotation']} · monstre niveau {hp['level']} "
+            f"({_num(hp['value'])} PV, {hp['certainty']})"
+        ),
+        _fmt_kill(f"Monte Carlo (n = {rep['n']}, graine {rep['seed']})", rep["monte_carlo"]),
+        _fmt_kill("Analytique", rep["analytic"]),
+        f"  Écart analytique / Monte Carlo : {gap} %",
+    ]
+    _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
+
+
+def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
+    out = Path(args.out)
+    if out.resolve().is_relative_to(deps.data_dir.resolve()):
+        raise InvalidArgumentError(
+            f"Le graphique ne s'écrit jamais dans {deps.data_dir}.", "choisir un fichier --out hors des données"
+        )
+    data = load_version(deps)
+    gd = build_game_data(data)
+    cap = level_cap(data)
+    check_level(args.level_from, cap)
+    check_level(args.level_to, cap)
+    if args.level_from > args.level_to:
+        raise InvalidArgumentError(
+            f"Plage de niveaux vide ({args.level_from} > {args.level_to}).", "donner --from ≤ --to"
+        )
+    if not 1 <= args.n <= MAX_N:
+        raise InvalidArgumentError(f"n = {args.n} hors de 1-{MAX_N}.", f"donner un nombre de combats de 1 à {MAX_N}")
+    pts = parse_talents(args.talents)
+    check_talents(gd, pts, args.level_to)
+    options: dict[str, Any] = {"mob_source": args.mob_source, "spell_level": args.spell_level, "nova": args.nova}
+    if args.level_diff is not None:
+        options["level_diff"] = args.level_diff
+    try:
+        res = leveling_chart(
+            gd,
+            range(args.level_from, args.level_to + 1),
+            pts,
+            race=args.race,
+            rotation=args.rotation,
+            n=args.n,
+            seed=args.seed,
+            options=options,
+            out=out,
+        )
+    except ValueError as exc:
+        raise InvalidArgumentError(f"{exc}.", "voir `forever chart leveling --help`") from exc
+    certainties = [cast(Certainty, p["mob_hp_certainty"]) for p in res["levels"]]
+    notes = [f"niveau {o['level']} omis : {o['reason']}" for o in res["omitted"]]
+    notes += [
+        f"mob_source {args.mob_source}, spell_level {args.spell_level}, n = {args.n} par niveau, graine {args.seed}",
+        "constantes leveling.* du seed sim_leveling.py (EST, suppose) ; XP de monstre : règle Classic (T04c)",
+    ]
+    provenance = local_provenance(deps, certainty=min_certainty([*certainties, "suppose"]), assumptions=notes)
+    payload = {**res, "provenance": provenance}
+    lines = [f"Graphique écrit : {res['path']} ({len(res['levels'])} niveaux, {len(res['omitted'])} omis)"]
+    lines += [
+        f"  niveau {p['level']} : Monte Carlo {_num(round(p['mc_total'], 1))} s, analytique "
+        f"{_num(round(p['analytic_total'], 1))} s, XP/h {_num(round(p['xp_h']))} (PV {p['mob_hp_certainty']})"
+        for p in res["levels"]
+    ]
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 QUESTIE_NOTE = "licence amont de Questie à vérifier (docs/OPEN_QUESTIONS.md) : base lue localement, jamais copiée"
 
 
@@ -797,6 +928,8 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
         "monsters": _cmd_monsters_build,
+        "sim": _cmd_sim,
+        "chart": _cmd_chart,
     }
     try:
         return handlers[args.command](deps, args)

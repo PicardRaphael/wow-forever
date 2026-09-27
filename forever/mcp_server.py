@@ -1,4 +1,5 @@
-"""Serveur MCP : outils `forever_status`, `forever_lookup` et `forever_explain_mechanic` (même cœur que la CLI).
+"""Serveur MCP : outils `forever_status`, `forever_lookup`, `forever_explain_mechanic` et `forever_sim_leveling` (même
+cœur que la CLI).
 
 Une erreur métier est renvoyée comme résultat d'outil (`is_error`, `structured_content` avec l'erreur et la
 provenance) : une exception brute ne montrerait au modèle qu'un message générique."""
@@ -15,6 +16,7 @@ from forever import __version__
 from forever.config import Deps
 from forever.errors import ForeverError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
+from forever.leveling import LevelingReport, simulate_leveling
 from forever.lookup import SpellLookup, lookup_spell
 from forever.provenance import error_payload
 from forever.status import StatusReport, status_report
@@ -76,5 +78,42 @@ def build_server(deps: Deps) -> MCPServer:
             return explain_mechanic(deps, mechanic_id)
         except ForeverError as err:
             return cast(MechanicExplanation, _error_result(deps, err))
+
+    @server.tool()
+    def forever_sim_leveling(
+        level: int,
+        race: str = "Orc",
+        rotation: str = "frost",
+        talents: dict[str, int] | None = None,
+        n: int = 1500,
+        seed: int = 12345,
+        mob_source: str = "measured",
+        spell_level: str = "character",
+        level_diff: int | None = None,
+        nova: bool = False,
+    ) -> LevelingReport:
+        """Leveling du Mage : temps par monstre (combat, repos, total), mana, dégâts subis et XP par heure, par Monte
+        Carlo (moyenne de `n` combats, graine fixe) et par le modèle analytique, avec les PV du monstre (valeur,
+        source, certitude) et la provenance.
+
+        `rotation` : frost ou fire. `talents` : clé de talent -> rang (ex. {"improvedFrostbolt": 3}), build vérifié.
+        `mob_source` : measured (PV mesurés, puis Questie corrigé) ou seed (modèle du seed).
+        `spell_level` : character (dégâts au niveau du personnage) ou rank (dégâts du rang, parité avec le seed)."""
+        try:
+            return simulate_leveling(
+                deps,
+                level,
+                race=race,
+                rotation=rotation,
+                talents=talents,
+                n=n,
+                seed=seed,
+                mob_source=mob_source,
+                spell_level=spell_level,
+                level_diff=level_diff,
+                nova=nova,
+            )
+        except ForeverError as err:
+            return cast(LevelingReport, _error_result(deps, err))
 
     return server
