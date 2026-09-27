@@ -193,8 +193,10 @@ mechanics:
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_fireball_values
+      - tests/unit/test_engine_leveling.py::test_dot_and_ignite_ticks
     tolerance: null
     formule: "DoT = total × mult_dégâts × (1 + crit × (mult_crit − 1)) si les DoT critiquent"
+    note: "T04b : dans le Monte Carlo, un DoT tique toutes les leveling.dot_tick_s (au moins un tic), chaque tic peut critiquer (forever/engine/damage.py : dot_tick_times)"
   - id: A18
     categorie: attaque
     description: "Ignite : cumul, rafraîchissement"
@@ -208,9 +210,11 @@ mechanics:
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
+      - tests/unit/test_engine_leveling.py::test_dot_and_ignite_ticks
+      - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
     tolerance: null
     formule: "Ignite = crit × base × mult_dégâts × mult_crit × part_Ignite (espérance par lancer)"
-    note: "espérance seule ; cumul et rafraîchissement en T04"
+    note: "espérance par lancer dans expected_cast ; T04b : le Monte Carlo du seed pose Ignite en leveling.ignite.ticks tics de leveling.ignite.tick_s par critique de feu, sans cumul ni rafraîchissement (forever/engine/damage.py : ignite_tick_times) ; cumul et rafraîchissement : T04c"
   - id: A19
     categorie: attaque
     description: "Procs exclus des critiques périodiques (Hot Streak)"
@@ -328,22 +332,32 @@ mechanics:
     categorie: temps
     description: "Recul d'incantation et canalisations"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: suppose
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+      - "forever/data/1.60.1.70009/leveling.json (combat_rules.pushback_s)"
+    tests:
+      - tests/unit/test_engine_leveling.py::test_pushback
+      - tests/parity/test_sim_leveling_parity.py::test_mc_matches_the_seed
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    formule: "recul par coup reçu pendant une incantation = pushback_s si le coup n'est pas résisté (Burning Soul, sorts de feu) ; aucune limite de reculs (pushback_limit null)"
+    note: "T04b : porté du seed (forever/engine/casting.py : pushback_s, pushback_resist_chance, pushback_chance) ; canalisations non modélisées ; analytique : incantation en mêlée allongée par le recul, plancher leveling.analytic.min_cast_fraction"
   - id: B7
     categorie: ressources
     description: "Règle des 5 s, ticks de 2 s, régénération pendant l'incantation"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: certain
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+      - "forever/data/1.60.1.70009/spells.json (utility.mage_armor)"
+    tests:
+      - tests/unit/test_engine_leveling.py::test_rest_and_regen_match_the_seed
+      - tests/unit/test_engine_leveling.py::test_mage_armor_regen_from_its_first_rank
     tolerance: null
-    note: "régénération d'Esprit hors règle d'incantation portée dans le modèle de personnage (G2) ; règle d'incantation, ticks et régénération pendant l'incantation : reprise en T04"
+    formule: "part gardée en combat = min(1, max(Arcane Meditation, régénération de Mage Armor dès son premier rang)) ; mana régénérée en combat = part × régénération d'Esprit × durée du combat"
+    note: "T04b : porté du seed (forever/engine/mana.py : in_combat_regen_fraction) ; ticks de 2 s et règle des 5 s agrégés sur le combat (pas de tic simulé)"
   - id: B8
     categorie: ressources
     description: "MP5"
@@ -416,12 +430,18 @@ mechanics:
     categorie: temps
     description: "Recharges des sorts et réductions par talents"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: certain
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+      - "forever/data/1.60.1.70009/spells.json (cooldown_s des rangs)"
+      - "forever/data/1.60.1.70009/talents.json"
+    tests:
+      - tests/unit/test_engine_leveling.py::test_spell_cooldowns
+      - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    formule: "recharge = recharge du rang − Improved Frost Nova (Frost Nova) ou − Wake of Fire (Fire Blast)"
+    note: "T04b : porté du seed (forever/engine/casting.py : spell_cooldown) ; l'analytique du seed compte Fire Blast sans Wake of Fire (gardé pour la parité)"
   - id: B14
     categorie: temps
     description: "Procs : PPM, chance fixe, recharges internes"
@@ -474,12 +494,18 @@ mechanics:
     categorie: physique
     description: "Temps de vol des projectiles"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: suppose
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+      - "forever/data/1.60.1.70009/spells.json (projectile_speed)"
+      - "forever/data/1.60.1.70009/mechanics.json (clés leveling.*)"
+    tests:
+      - tests/unit/test_engine_leveling.py::test_travel_time
+      - tests/parity/test_sim_leveling_parity.py::test_mc_matches_the_seed
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    formule: "temps de vol = distance / vitesse du projectile ; sans vitesse publiée : vitesse par défaut (analytique) ou instantanée (Monte Carlo)"
+    note: "T04b : porté du seed (forever/engine/movement.py : travel_time) ; Monte Carlo à impacts différés : le projectile vole pendant l'incantation suivante"
   - id: C2
     categorie: physique
     description: "Portées et talents de portée"
@@ -490,10 +516,12 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/spells.json"
       - "forever/data/1.60.1.70009/mechanics.json"
-    tests: ["tests/unit/test_engine_values.py::test_range_values"]
+    tests:
+      - tests/unit/test_engine_values.py::test_range_values
+      - tests/unit/test_engine_leveling.py::test_slow_freeze_and_range
     tolerance: null
-    formule: "portée = portée du sort, sinon portée par défaut des données"
-    note: "portée de base ; talents de portée en T04"
+    formule: "portée = portée du sort, sinon portée par défaut des données ; Frostbolt × (1 + Arctic Reach)"
+    note: "T04b : Arctic Reach (forever/engine/movement.py : spell_range) appliqué à Frostbolt seulement, comme le seed"
   - id: C3
     categorie: physique
     description: "Marge de mêlée et hitbox"
@@ -516,12 +544,19 @@ mechanics:
     categorie: physique
     description: "Vitesse des monstres, ralentis, gel (Nova, Frostbite)"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: probable
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+      - "forever/data/1.60.1.70009/leveling.json (mob_model)"
+      - "forever/data/1.60.1.70009/spells.json (slow, slow_dur, utility.frost_armor)"
+      - "forever/data/1.60.1.70009/mechanics.json (clés leveling.*)"
+    tests:
+      - tests/unit/test_engine_leveling.py::test_slow_freeze_and_range
+      - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    formule: "vitesse du monstre = vitesse de course × (1 − ralenti) ; ralenti de Frostbolt = ralenti du sort + Permafrost, durée = durée du rang × (1 + Permafrost) ; gel de Frostbite (chance du talent) et de Frost Nova ; coups ralentis par Frost Armor"
+    note: "T04b : porté du seed (forever/engine/movement.py) ; vitesse de course, portée de mêlée et cadence des coups du modèle de monstre du seed (EST) ; Frost Nova rompue par les dégâts avec la chance nova_break"
   - id: C6
     categorie: physique
     description: "Temps en mouvement, sorts utilisables en mouvement"
@@ -903,9 +938,11 @@ mechanics:
       - tests/unit/test_spell_scaling.py::test_frostbolt_rank3_by_level
       - tests/unit/test_spell_scaling.py::test_arcane_explosion_rank1_at_19
       - tests/unit/test_spell_scaling.py::test_reproduces_decoded_ranks_at_capped_max_level
+      - tests/unit/test_engine_leveling.py::test_rank_damage_at_the_character_level
+      - tests/unit/test_engine_leveling.py::test_expected_cast_at_the_character_level
     tolerance: null
     formule: "points(L) = points_de_base + points_par_niveau × (min(max(L, niveau_de_base), niveau_max) - niveau_de_base) ; min, max = arrondi_demi_supérieur(points × (1 ∓ demi_variance))"
-    note: "T04a : le simulateur de leveling (T04b) choisit par spell_level entre ce calcul (character) et les rangs de spells.json (rank, parité du seed)."
+    note: "T04b : rank_damage et expected_cast(spell_level=character) ; le simulateur de leveling l'utilise par défaut, spell_level=rank garde la parité avec le seed"
   - id: H1
     categorie: rencontre
     description: "Niveau de la cible (+3 pour un boss)"
@@ -929,7 +966,7 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    note: "T04b : le seed n'applique l'armure qu'aux coups des monstres sur le Mage (rattachée à I6) ; la cible n'a ni armure ni résistance dans le simulateur (level_resist de leveling.json non appliqué) : reste absente"
   - id: H3
     categorie: rencontre
     description: "Nombre de cibles et adds"
@@ -1026,12 +1063,16 @@ mechanics:
     categorie: optimisation
     description: "Rotations (listes de priorités) par spé et situation"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: probable
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+    tests:
+      - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
+      - tests/parity/test_sim_leveling_parity.py::test_every_analytic_branch_matches_the_seed
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    formule: "rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
+    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"
@@ -1073,12 +1114,23 @@ mechanics:
     categorie: optimisation
     description: "Leveling : temps par monstre, XP, repos"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: suppose
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+      - "forever/data/1.60.1.70009/monsters.json"
+      - "forever/data/1.60.1.70009/mechanics.json (clés leveling.*)"
+      - "forever/data/1.60.1.70009/spells.json (utility.conjure_water, conjure_food)"
+    tests:
+      - tests/unit/test_engine_leveling.py::test_monster_formulas_match_the_seed
+      - tests/unit/test_engine_leveling.py::test_downtime_is_the_longer_of_drinking_and_eating
+      - tests/unit/test_sim_leveling.py::test_analytic_close_to_monte_carlo
+      - tests/unit/test_sim_leveling.py::test_calibration_blizzard_target
+      - tests/parity/test_sim_leveling_parity.py::test_mc_default_n_matches_the_seed
+      - tests/parity/test_sim_leveling_parity.py::test_analytic_matches_the_seed
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    formule: "temps par monstre = combat + repos + course entre monstres ; repos = max(mana dépensée / (boisson + Esprit), dégâts subis / (nourriture + régénération de repos × PV)) ; XP par heure = XP du monstre × secondes par heure / temps par monstre"
+    note: "T04b : Monte Carlo (forever/sim/leveling_mc.py) et analytique (forever/sim/leveling_analytic.py) portés du seed, parité à 1e-12 en mode seed ; mode par défaut : PV mesurés puis Questie corrigé (H11) et dégâts au niveau du personnage (G7) ; l'armure du Mage réduit les coups reçus (leveling.armor_reduction), celle de la cible reste absente (H2) ; XP : règle Classic (T04c)"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"
@@ -1094,12 +1146,17 @@ mechanics:
     categorie: meta
     description: "Graine et reproductibilité"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: certain
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
+    tests:
+      - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_seed_mode
+      - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_default_mode
+      - tests/unit/test_chart.py::test_two_generations_are_identical
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T04"
+    formule: "même graine, mêmes paramètres, mêmes données : même résultat (générateur injecté, ordre des tirages fixe)"
+    note: "T04b : graine par défaut du seed ; le graphique de leveling est identique octet pour octet à graine fixe"
   - id: J3
     categorie: meta
     description: "Erreur statistique cible"

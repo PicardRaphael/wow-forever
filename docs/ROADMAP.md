@@ -10,7 +10,8 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
 | T03 | Pipeline de données : builds, fetch, decode, diff, verify, report (tests hors ligne) | T01 |
 | T04a | Sources locales du client : journaux de combat, Questie, table des monstres, points de base par niveau, preuves du registre, addon ForeverLogger | T02, T03 |
 | T04b | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T04a |
-| T05 | Optimiseur de talents et conseiller de respec | T04b |
+| T04c | Quêtes propres à Forever et modèle d'XP, cumul d'Ignite, escalade d'Arcane Blast | T04b |
+| T05 | Optimiseur de talents et conseiller de respec | T04b, T04c |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
 | T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
 | P06 | Évaluation d'un pont de conversation existant (wow-claude / wow-ai) pointé sur ce dépôt | T06 |
@@ -60,11 +61,15 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
     - `uv run scripts/install_addon.py --dry-run` affiche la copie prévue ; `test_addon_rules.py` vert.
 
 ## T04b — Leveling
-- **Fait** : porter `sim_leveling.py` (Monte Carlo à impacts différés, jeu expert) et le modèle analytique ; PV des monstres par `mob_source` (`measured` par défaut depuis `monsters.json`, `seed` pour la parité) ; dégâts au niveau du personnage par `spell_level` (`character` par défaut, `rank` pour la parité) ; outil MCP `forever_sim_leveling` ; `forever chart leveling` ; porter les tests du seed `analytique_proche_du_monte_carlo`, `calibrage_cible_blizzard` et `monte_carlo_reproductible` ; remonter dans le registre les entrées rétrogradées en T02 (B6, B7, B13, C1, C5, H2, I1, I6, J2) et compléter A18 (cumul d'Ignite, durée d'infobulle dans `tooltip_values`), B11 (escalade d'Arcane Blast), C2 (talents de portée) ; ingestion des quêtes propres à Forever (`QuestieForeverDB`) avec le modèle d'XP.
-- **Critères de fin** :
-    - Au niveau 12 avec 3 Improved Frostbolt, le Monte Carlo (graine fixe, `mob_source="seed"`, `spell_level="rank"`) reproduit le seed à ±1 %.
-    - L'analytique reste à moins de 15 % du Monte Carlo aux niveaux 12, 16 et 24.
-    - Le graphique est un fichier PNG déterministe (empreinte stable à graine fixe).
+- **Fait** : seconde fixture de journal (journal entier filtré aux événements utiles, anonymisé, compressé ; lecteur `.gz`) ; niveau du lanceur par ForeverLogger, puis carnet de Questie, puis `--caster-level` ; B1 validée par deux journaux (50 intervalles, 10e percentile et médiane à 0,05 s de la recharge globale) ; A3 : règle Classic des cibles plus basses (`suppose`) ; correction PV Questie → Forever (H11, `monsters.json` schéma 2) ; `sim_leveling.py` porté (Monte Carlo à impacts différés et analytique, parité à 1e-12 avec le seed en mode `mob_source="seed"`, `spell_level="rank"`) ; chiffres du seed dans `mechanics.json` (clés `leveling.*`), `leveling.json` et `spells.json` restant des copies du seed ; `forever sim leveling`, `forever chart leveling`, outil MCP `forever_sim_leveling` ; tests du seed `analytique_proche_du_monte_carlo`, `calibrage_cible_blizzard` et `monte_carlo_reproductible` portés dans les deux modes ; registre : B6, B7, B13, C1, C5, I1, I6, J2 testées, C2 (Arctic Reach), A17 et A18 (tics du Monte Carlo) complétées, H2 reste absente (le seed n'arme pas la cible). Plan : `tasks/T04b-plan.md`.
+- **Critères de fin** (atteints) :
+    - Au niveau 12 avec 3 Improved Frostbolt, le Monte Carlo (graine fixe, `mob_source="seed"`, `spell_level="rank"`) reproduit le seed à 1e-12 (donc à ±1 %).
+    - L'analytique reste à moins de 15 % du Monte Carlo aux niveaux 12, 16 et 24, dans les deux modes.
+    - Le graphique est un fichier PNG déterministe à graine fixe (deux générations identiques octet pour octet).
+
+## T04c — Quêtes Forever, XP, Ignite, Arcane Blast
+- **À faire** : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; cumul et rafraîchissement d'Ignite (A18) ; escalade d'Arcane Blast (B11) ; durée d'infobulle dans `tooltip_values`.
+- **Critères de fin** : à fixer au plan de T04c.
 
 ## T05 — Talents et respec
 - **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre.
