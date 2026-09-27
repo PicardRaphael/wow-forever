@@ -14,6 +14,7 @@ from forever.sim.leveling_mc import mc
 IGNITE_AURA = 412538  # identifiant de l'aura d'Ignite (Spell.csv, infobulle du talent 11119 : $412538d)
 FIRE_IGNITE = {"improvedFireball": 5, "ignite": 5}
 FIRE_PLAIN = {"improvedFireball": 5}
+HIGH_CRIT = {"spell_crit": 0.5}  # critique relevé sur la fiche (valeur de test) : chevauchements fréquents
 
 
 def _client_ignite(tables):
@@ -71,9 +72,10 @@ def test_remainder_at_death_is_never_negative(game_data):
 
 def test_forever_monte_carlo_differs_from_the_seed_only_through_ignite(game_data):
     """Sans le talent, aucune différence entre `forever` et `seed` au niveau 16 (feu) ; avec, l'Ignite roulant
-    change le résultat (effet mesuré par différence, graine fixe)."""
-    plain = mc(game_data, 16, FIRE_PLAIN, "Orc", "fire", 150, seed=11)
-    assert plain == mc(game_data, 16, FIRE_PLAIN, "Orc", "fire", 150, seed=11, rules="seed")
-    rolling = mc(game_data, 16, FIRE_IGNITE, "Orc", "fire", 150, seed=11)
-    assert rolling != mc(game_data, 16, FIRE_IGNITE, "Orc", "fire", 150, seed=11, rules="seed")
-    assert rolling == mc(game_data, 16, FIRE_IGNITE, "Orc", "fire", 150, seed=11)  # reproductible
+    change le résultat (effet mesuré par différence, graine fixe). Critique relevé à 50 % : au critique de base, deux
+    critiques à moins de 4 s sont trop rares pour que l'écart soit visible à n = 150."""
+    plain = mc(game_data, 16, FIRE_PLAIN, "Orc", "fire", 150, seed=11, over=HIGH_CRIT)
+    assert plain == mc(game_data, 16, FIRE_PLAIN, "Orc", "fire", 150, seed=11, over=HIGH_CRIT, rules="seed")
+    rolling = mc(game_data, 16, FIRE_IGNITE, "Orc", "fire", 150, seed=11, over=HIGH_CRIT)
+    assert rolling != mc(game_data, 16, FIRE_IGNITE, "Orc", "fire", 150, seed=11, over=HIGH_CRIT, rules="seed")
+    assert rolling == mc(game_data, 16, FIRE_IGNITE, "Orc", "fire", 150, seed=11, over=HIGH_CRIT)  # reproductible
