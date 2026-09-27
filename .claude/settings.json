@@ -18,7 +18,8 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git switch:*)",
-      "Bash(git worktree:*)"
+      "Bash(git worktree:*)",
+      "Bash(uv run forever manifest --check:*)"
     ],
     "ask": [
       "Bash(uv run forever fetch:*)",
@@ -71,9 +72,5 @@
         ]
       }
     ]
-  },
-  "statusLine": {
-    "type": "command",
-    "command": "uv run --no-project python \"$CLAUDE_PROJECT_DIR/.claude/hooks/statusline.py\""
   }
 }
