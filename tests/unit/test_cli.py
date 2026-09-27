@@ -6,6 +6,7 @@ import pytest
 from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, FakeHttp, corrupt_manifest, tamper
 
 from forever.cli import main
+from forever.manifest import compute_manifest
 
 
 def run(capsys, argv, deps):
@@ -163,6 +164,38 @@ def test_manifest_update_repairs_corrupt_manifest(capsys, make_deps, data_copy):
     corrupt_manifest(data_copy)
     assert run(capsys, ["manifest", "--update"], make_deps(data_dir=data_copy))[0] == 0
     assert run(capsys, ["manifest", "--check"], make_deps(data_dir=data_copy))[0] == 0
+
+
+def fingerprints(data_dir):
+    """(empreinte réelle des fichiers sur disque, empreinte annoncée par le manifeste)."""
+    real = compute_manifest(data_dir)["versions"][LOCAL_VERSION]["data_sha"]
+    declared = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))["versions"][LOCAL_VERSION]
+    return real, declared["data_sha"]
+
+
+@pytest.mark.parametrize(
+    "argv", [["lookup", "spell", "frostbolt"], ["manifest", "--check"], ["status"]], ids=["lookup", "check", "status"]
+)
+def test_tampered_data_provenance_shows_disk_fingerprint(capsys, make_deps, data_copy, argv):
+    tamper(data_copy / LOCAL_VERSION / "spells.json")
+    real, declared = fingerprints(data_copy)
+    assert real != declared
+    code, out, _ = run(capsys, [*argv, "--json"], make_deps(data_dir=data_copy))
+    assert code == 3
+    provenance = json.loads(out)["provenance"]
+    assert provenance["data_sha"] == real
+    assert any(real in a and declared in a for a in provenance["assumptions"])
+    code, out, err = run(capsys, argv, make_deps(data_dir=data_copy))
+    assert f"données {real}" in (out or err).rstrip("\n").splitlines()[-1]
+
+
+def test_intact_data_provenance_has_no_fingerprint_gap(capsys, make_deps, data_copy):
+    real, declared = fingerprints(data_copy)
+    assert real == declared
+    code, out, _ = run(capsys, ["status", "--json"], make_deps(data_dir=data_copy))
+    provenance = json.loads(out)["provenance"]
+    assert provenance["data_sha"] == real
+    assert not any(real in a for a in provenance["assumptions"])
 
 
 def test_manifest_requires_a_mode(capsys, make_deps):

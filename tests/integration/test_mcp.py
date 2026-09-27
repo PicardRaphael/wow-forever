@@ -3,9 +3,10 @@
 import asyncio
 
 import pytest
-from conftest import LOCAL_VERSION, FakeHttp, corrupt_manifest
+from conftest import LOCAL_VERSION, FakeHttp, corrupt_manifest, tamper
 from mcp import Client
 
+from forever.manifest import compute_manifest
 from forever.mcp_server import build_server
 from forever.provenance import validate_provenance
 
@@ -80,6 +81,16 @@ def test_status_with_corrupt_manifest(make_deps, data_copy):
     integrity = r.structured_content["integrity"]
     assert integrity["ok"] is False and integrity["manifest_error"]
     assert validate_provenance(r.structured_content["provenance"]) == []
+
+
+def test_lookup_with_tampered_data_shows_disk_fingerprint(make_deps, data_copy):
+    tamper(data_copy / LOCAL_VERSION / "spells.json")
+    real = compute_manifest(data_copy)["versions"][LOCAL_VERSION]["data_sha"]
+    args = {"kind": "spell", "name": "frostbolt", "rank": 2}
+    r = call(make_deps(data_dir=data_copy), lambda c: c.call_tool("forever_lookup", args))
+    assert r.is_error
+    assert r.structured_content["error"]["code"] == "data_integrity"
+    assert r.structured_content["provenance"]["data_sha"] == real
 
 
 def test_unsupported_kind(make_deps):
