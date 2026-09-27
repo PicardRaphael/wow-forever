@@ -2,7 +2,6 @@
 
 import dataclasses
 import json
-import random
 
 import pytest
 from conftest import MINE_GUID
@@ -15,7 +14,8 @@ from forever.engine.mana import master_of_elements_refund
 from forever.engine.monsters import mob_expected_hit, mob_hit_taken, mob_land_chance, mob_swing_damage
 from forever.pipeline.monsters import fit_questie_correction
 from forever.pipeline.questie import read_journey
-from forever.sim.leveling_mc import kill_mc
+from forever.sim.leveling_analytic import kill_analytic
+from forever.sim.leveling_mc import mc
 
 SEED_MODE = {"mob_source": "seed", "spell_level": "rank"}
 
@@ -58,14 +58,16 @@ def test_flat_ratios_give_no_knee():
 
 
 def test_dot_ticks_do_not_crit_when_the_rule_says_so(game_data):
-    """Fireball rang 1 (DoT) : sans critique des DoT, les tics valent tous le même montant, et le tirage ne change pas
-    le résultat quand la règle permet le critique (parité)."""
+    """Fireball rang 2 (DoT) au niveau 6, sans critique des DoT (`combat_rules.dot_can_crit` à faux) : le Monte Carlo
+    (200 combats, graine 2) change ; l'effet (environ 0,3 % des dégâts) est plus petit que le bruit du Monte Carlo,
+    son sens se vérifie donc sur l'analytique, déterministe : sans critique des DoT, le combat dure plus longtemps."""
     rules = dataclasses.replace(game_data.rules, dot_can_crit=False)
     gd = dataclasses.replace(game_data, rules=rules)
-    ch = character(gd, 6)
-    a = kill_mc(gd, 6, {}, ch, "fire", random.Random(2), **SEED_MODE)
-    b = kill_mc(game_data, 6, {}, character(game_data, 6), "fire", random.Random(2), **SEED_MODE)
-    assert a != b  # les tics critiques du DoT de Fireball disparaissent
+    a = mc(gd, 6, {}, "Orc", "fire", 200, seed=2, **SEED_MODE)
+    b = mc(game_data, 6, {}, "Orc", "fire", 200, seed=2, **SEED_MODE)
+    assert a != b
+    slower = kill_analytic(gd, 6, {}, "Orc", "fire", **SEED_MODE)["combat"]
+    assert slower > kill_analytic(game_data, 6, {}, "Orc", "fire", **SEED_MODE)["combat"]
 
 
 def test_engine_helpers(game_data):
