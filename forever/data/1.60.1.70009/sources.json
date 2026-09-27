@@ -107,6 +107,18 @@
       "notes": [
         "15 écarts tranchés le 2026-09-27 (tasks/T03-ecarts.md), avec leur nature (client, format, convention) ; appliqués aux données par l'installation (T08)"
       ]
+    },
+    "monsters.json": {
+      "source": "Journaux de combat du client 1.60.1 (WoWCombatLog-092726_145346.txt et WoWCombatLog-092726_150346.txt du 2026-09-27, PV max du bloc avancé) par forever monsters build ; valeurs en regard et agrégat des niveaux non observés : Questie 11.38.0 Forever-v27 (communautaire, Classic Era, aucune correction Forever)",
+      "certainty": "suppose",
+      "field_certainty": {
+        "npcs": "certain",
+        "hp_by_level": "suppose"
+      },
+      "notes": [
+        "certitude par entrée dans le champ certainty (journal certain, Questie suppose) : la plus basse est retenue pour le fichier",
+        "collecté le 2026-09-27 ; les données communautaires ne remplacent jamais une mesure"
+      ]
     }
   }
 }

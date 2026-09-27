@@ -1,5 +1,5 @@
 """Interface en ligne de commande : `forever status | lookup | explain-mechanic | manifest | builds | fetch | decode | diff | verify
-| report | logs | mcp`.
+| report | logs | questie | monsters | mcp`.
 
 Sortie texte en français par défaut (dernière ligne : provenance), `--json` pour une sortie structurée.
 Codes de sortie : 0 succès, 2 usage, 3 intégrité des données, 4 introuvable, 5 réseau."""
@@ -33,7 +33,9 @@ from forever.pipeline.combatlog import LOG_GLOB, LogHeader, LogSummary, read_log
 from forever.pipeline.decode import Candidate, decode_version
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
-from forever.pipeline.measure import LogMeasures, measure_log
+from forever.pipeline.measure import Conflict, LogMeasures, MonsterObservation, measure_log, monster_hp
+from forever.pipeline.monsters import build_monsters, write_monsters
+from forever.pipeline.questie import read_questie
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
@@ -132,6 +134,21 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-gap", type=float, default=CHAIN_MAX_GAP_S, help="écart maximal (s) entre deux instantanés enchaînés"
     )
     measure.add_argument("--json", action="store_true", help="sortie JSON")
+
+    questie = sub.add_parser("questie", help="base locale de l'addon Questie (communautaire, sans réseau)")
+    questie_sub = questie.add_subparsers(dest="questie_command", required=True, parser_class=_Parser)
+    info = questie_sub.add_parser("info", help="version et contenu de l'addon Questie installé")
+    info.add_argument("--dir", help="dossier de l'addon (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)")
+    info.add_argument("--json", action="store_true", help="sortie JSON")
+
+    monsters = sub.add_parser("monsters", help="table des monstres (PV mesurés, Questie en regard)")
+    monsters_sub = monsters.add_subparsers(dest="monsters_command", required=True, parser_class=_Parser)
+    build = monsters_sub.add_parser("build", help="construire monsters.json hors des données")
+    build.add_argument("--logs", required=True, help="journal WoWCombatLog-*.txt ou dossier de journaux")
+    build.add_argument("--questie", help="dossier de l'addon Questie (valeurs en regard, agrégat communautaire)")
+    build.add_argument("--out", help="dossier de sortie (défaut : <cache>/monsters)")
+    build.add_argument("--force", action="store_true", help="remplacer un monsters.json existant")
+    build.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     return parser
@@ -577,6 +594,79 @@ def _cmd_logs_measure(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+QUESTIE_NOTE = "licence amont de Questie à vérifier (docs/OPEN_QUESTIONS.md) : base lue localement, jamais copiée"
+
+
+def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
+    db = read_questie(_wow_path(deps, args.dir, "Interface", "AddOns", "Questie"))
+    info = db.info
+    provenance = local_provenance(deps, certainty=db.certainty, assumptions=[f"données {db.source}", QUESTIE_NOTE])
+    lines = [
+        f"Questie {info.version} {info.title} · interface {info.interface} · {info.npc_count} PNJ · "
+        + (f"{info.quest_count} quêtes" if info.quest_count is not None else "quêtes non comptées"),
+        f"Source : {db.source} ; certitude {db.certainty}",
+    ]
+    payload = {**info._asdict(), "source": db.source, "certainty": db.certainty, "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _cmd_monsters_build(deps: Deps, args: argparse.Namespace) -> int:
+    path = Path(args.logs)
+    if not path.exists():
+        raise PathNotFoundError("Journaux", str(path), "donner --logs : un fichier WoWCombatLog-*.txt ou son dossier")
+    out = Path(args.out) if args.out else deps.cache_dir / "monsters"
+    questie = read_questie(Path(args.questie)) if args.questie else None
+    observations: list[MonsterObservation] = []
+    conflicts: list[Conflict] = []
+    headers: list[LogHeader] = []
+    notes: list[str] = []
+    names: list[str] = []
+    for file in sorted(path.glob(LOG_GLOB)) if path.is_dir() else [path]:
+        try:
+            header, events = read_log(file)
+            found, clash = monster_hp(list(events), log=file.name)
+        except ForeverError as err:
+            if not path.is_dir():
+                raise
+            notes.append(f"{file.name} ignoré : {err.message}")
+            continue
+        headers.append(header)
+        names.append(file.name)
+        observations += found
+        conflicts += clash
+    version = current_identity(deps.data_dir).game_version
+    table = build_monsters(observations, questie, version, conflicts=conflicts, logs=names)
+    written = write_monsters(table, out, deps.data_dir, force=args.force)
+    levels = table["hp_by_level"].values()
+    certainty: Certainty = "suppose" if any(v["certainty"] == "suppose" for v in levels) else "certain"
+    if questie is not None:
+        notes += [f"valeurs en regard et agrégat : {questie.source}", QUESTIE_NOTE]
+    provenance = _log_provenance(deps, headers, certainty, notes)
+    payload = {
+        "path": str(written),
+        "logs": names,
+        "npcs": len(table["npcs"]),
+        "levels": len(table["hp_by_level"]),
+        "conflicts": table["conflicts"],
+        "questie_gaps": table["questie_gaps"],
+        "provenance": provenance,
+    }
+    lines = [
+        f"Table des monstres écrite : {written}",
+        (
+            f"{len(table['npcs'])} PNJ mesurés · {len(table['hp_by_level'])} niveaux dans l'agrégat · "
+            f"{len(table['conflicts'])} conflit(s) · {len(table['questie_gaps'])} écart(s) avec Questie"
+        ),
+    ]
+    lines += [
+        f"  écart : PNJ {g['npc_id']} niveau {g['level']} mesuré {g['measured']}, Questie {g['questie']}"
+        for g in table["questie_gaps"]
+    ]
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_logs(deps: Deps, args: argparse.Namespace) -> int:
     handlers = {"scan": _cmd_logs_scan, "measure": _cmd_logs_measure}
     return handlers[args.logs_command](deps, args)
@@ -621,6 +711,8 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "verify": _cmd_verify,
         "report": _cmd_report,
         "logs": _cmd_logs,
+        "questie": _cmd_questie_info,
+        "monsters": _cmd_monsters_build,
     }
     try:
         return handlers[args.command](deps, args)

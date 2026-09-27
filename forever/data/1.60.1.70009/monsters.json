@@ -1,0 +1,802 @@
+{
+ "schema_version": 1,
+ "game_version": "1.60.1.70009",
+ "source": "PV max lus dans le bloc avancé des journaux de combat du client ; Questie en regard",
+ "logs": [
+  "WoWCombatLog-092726_145346.txt",
+  "WoWCombatLog-092726_150346.txt"
+ ],
+ "questie_version": "11.38.0",
+ "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+ "npcs": {
+  "3099": {
+   "name": "Dire Mottled Boar",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 120
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 137
+    }
+   }
+  },
+  "3244": {
+   "name": "Greater Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 222
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 15 individu(s))",
+     "questie_hp": 247
+    }
+   }
+  },
+  "3245": {
+   "name": "Ornery Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386
+    }
+   }
+  },
+  "3246": {
+   "name": "Fleeting Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 247
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 273
+    }
+   }
+  },
+  "3254": {
+   "name": "Sunscale Lashtail",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 246,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 218
+    }
+   }
+  },
+  "3265": {
+   "name": "Razormane Hunter",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 222
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 247
+    }
+   }
+  },
+  "3266": {
+   "name": "Razormane Defender",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 273
+    }
+   }
+  },
+  "3267": {
+   "name": "Razormane Water Seeker",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 22 individu(s))",
+     "questie_hp": 198
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 222
+    }
+   }
+  },
+  "3268": {
+   "name": "Razormane Thornweaver",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 186
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 18 individu(s))",
+     "questie_hp": 208
+    }
+   }
+  },
+  "3269": {
+   "name": "Razormane Geomancer",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 241
+    }
+   }
+  },
+  "3379": {
+   "name": "Burning Blade Bruiser",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 198
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 222
+    }
+   }
+  },
+  "3380": {
+   "name": "Burning Blade Acolyte",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 199
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 219
+    }
+   }
+  },
+  "3415": {
+   "name": "Savannah Huntress",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 222
+    }
+   }
+  },
+  "3986": {
+   "name": "Sarilus Foulborne",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "25": {
+     "max_hp": 927,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 573
+    }
+   }
+  },
+  "5951": {
+   "name": "Hare",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 8,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 8
+    }
+   }
+  },
+  "12319": {
+   "name": "Burning Blade Toxicologist",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 263
+    }
+   }
+  },
+  "12320": {
+   "name": "Burning Blade Crusher",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 273
+    }
+   }
+  }
+ },
+ "hp_by_level": {
+  "1": {
+   "value": 8,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "2": {
+   "value": 55,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 101
+  },
+  "3": {
+   "value": 71,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 69
+  },
+  "4": {
+   "value": 86,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 46
+  },
+  "5": {
+   "value": 102,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 188
+  },
+  "6": {
+   "value": 120,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "7": {
+   "value": 137,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "8": {
+   "value": 156,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 140
+  },
+  "9": {
+   "value": 176,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 128
+  },
+  "10": {
+   "value": 208,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 3
+  },
+  "11": {
+   "value": 239,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 7
+  },
+  "12": {
+   "value": 272,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 4
+  },
+  "13": {
+   "value": 307,
+   "certainty": "probable",
+   "source": "journaux : médiane de [246, 307, 307, 307, 307] des PNJ normaux observés",
+   "n_npcs": 5
+  },
+  "14": {
+   "value": 345,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "15": {
+   "value": 328,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 197
+  },
+  "16": {
+   "value": 356,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 122
+  },
+  "17": {
+   "value": 473,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "18": {
+   "value": 417,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 138
+  },
+  "19": {
+   "value": 449,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 127
+  },
+  "20": {
+   "value": 484,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 270
+  },
+  "21": {
+   "value": 531,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 104
+  },
+  "22": {
+   "value": 573,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 115
+  },
+  "23": {
+   "value": 617,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 115
+  },
+  "24": {
+   "value": 664,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 163
+  },
+  "25": {
+   "value": 927,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "26": {
+   "value": 787,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 125
+  },
+  "27": {
+   "value": 840,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 99
+  },
+  "28": {
+   "value": 896,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 114
+  },
+  "29": {
+   "value": 950,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 104
+  },
+  "30": {
+   "value": 1002,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 627
+  },
+  "31": {
+   "value": 1106,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 102
+  },
+  "32": {
+   "value": 1162,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 124
+  },
+  "33": {
+   "value": 1221,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 102
+  },
+  "34": {
+   "value": 1279,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 100
+  },
+  "35": {
+   "value": 1342,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 315
+  },
+  "36": {
+   "value": 1469,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 124
+  },
+  "37": {
+   "value": 1536,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 140
+  },
+  "38": {
+   "value": 1604,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 125
+  },
+  "39": {
+   "value": 1678,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 96
+  },
+  "40": {
+   "value": 1752,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 326
+  },
+  "41": {
+   "value": 1902,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 111
+  },
+  "42": {
+   "value": 1981,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 135
+  },
+  "43": {
+   "value": 2059,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 136
+  },
+  "44": {
+   "value": 2138,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 132
+  },
+  "45": {
+   "value": 2217,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 258
+  },
+  "46": {
+   "value": 2398,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 121
+  },
+  "47": {
+   "value": 2488,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 101
+  },
+  "48": {
+   "value": 2577,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 109
+  },
+  "49": {
+   "value": 2672,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 95
+  },
+  "50": {
+   "value": 2768,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 327
+  },
+  "51": {
+   "value": 2979,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 122
+  },
+  "52": {
+   "value": 3082,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 154
+  },
+  "53": {
+   "value": 3188,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 158
+  },
+  "54": {
+   "value": 3292,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 176
+  },
+  "55": {
+   "value": 3398,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 353
+  },
+  "56": {
+   "value": 2968,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 169
+  },
+  "57": {
+   "value": 3758,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 183
+  },
+  "58": {
+   "value": 3732,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 151
+  },
+  "59": {
+   "value": 3849,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 123
+  },
+  "60": {
+   "value": 3296,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 475
+  },
+  "61": {
+   "value": 3395,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 33
+  },
+  "62": {
+   "value": 4370,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 73
+  },
+  "63": {
+   "value": 5746,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 27
+  }
+ },
+ "conflicts": [],
+ "questie_gaps": [
+  {
+   "npc_id": 3244,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3244,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3245,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 3246,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3246,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3254,
+   "level": 13,
+   "measured": 246,
+   "questie": 218
+  },
+  {
+   "npc_id": 3265,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3265,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3266,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3267,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3267,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3268,
+   "level": 10,
+   "measured": 208,
+   "questie": 186
+  },
+  {
+   "npc_id": 3268,
+   "level": 11,
+   "measured": 239,
+   "questie": 208
+  },
+  {
+   "npc_id": 3269,
+   "level": 13,
+   "measured": 307,
+   "questie": 241
+  },
+  {
+   "npc_id": 3379,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3379,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3380,
+   "level": 11,
+   "measured": 239,
+   "questie": 199
+  },
+  {
+   "npc_id": 3380,
+   "level": 12,
+   "measured": 272,
+   "questie": 219
+  },
+  {
+   "npc_id": 3415,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3986,
+   "level": 25,
+   "measured": 927,
+   "questie": 573
+  },
+  {
+   "npc_id": 12319,
+   "level": 14,
+   "measured": 345,
+   "questie": 263
+  },
+  {
+   "npc_id": 12320,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  }
+ ],
+ "notes": [
+  "npcs : PNJ observés seulement (jamais la base Questie) ; questie_hp : valeur de Questie au même niveau",
+  "hp_by_level : médiane des PNJ normaux (rang Questie 0 ou inconnu) ; journal d'abord, sinon Questie",
+  "créatures invoquées (propriétaire non nul dans le bloc avancé) exclues"
+ ]
+}

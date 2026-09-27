@@ -52,8 +52,6 @@ SUFFIXES: dict[str, tuple[bool, tuple[str, ...]]] = {
     "_DAMAGE_LANDED": (True, DAMAGE),
     "_MISSED": (False, ("miss_type",)),
     "_HEAL": (True, ("amount", "base_amount", "overhealing", "absorbed", "critical")),
-    "_HEAL_ABSORBED": (False, ()),
-    "_ABSORBED": (False, ()),
     "_ENERGIZE": (True, ("amount", "over_energize", "power_type", "max_power")),
     "_DRAIN": (True, ("amount", "power_type", "extra_amount")),
     "_LEECH": (True, ("amount", "power_type", "extra_amount")),
@@ -80,7 +78,10 @@ SUFFIXES: dict[str, tuple[bool, tuple[str, ...]]] = {
     "_RESURRECT": (False, ()),
 }
 # Événements à deux unités sans préfixe ni suffixe (champs restants gardés dans `raw`).
-UNIT_EVENTS = frozenset({"UNIT_DIED", "UNIT_DESTROYED", "UNIT_DISSIPATES", "PARTY_KILL", "SPELL_ABSORBED"})
+# SPELL_ABSORBED et SPELL_HEAL_ABSORBED : disposition variable (sort de l'attaquant présent ou non), reste brut.
+UNIT_EVENTS = frozenset(
+    {"UNIT_DIED", "UNIT_DESTROYED", "UNIT_DISSIPATES", "PARTY_KILL", "SPELL_ABSORBED", "SPELL_HEAL_ABSORBED"}
+)
 # Événements sans unité (contexte : zone, carte, rencontre, personnage).
 CONTEXT_EVENTS = frozenset(
     {

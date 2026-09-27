@@ -32,6 +32,7 @@ INHERITED_FILES = (
     "respec.json",
     "overrides.json",
     "meta.json",
+    "monsters.json",
     RULES_NAME,
 )
 

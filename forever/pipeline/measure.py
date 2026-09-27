@@ -12,7 +12,7 @@ from collections.abc import Iterable
 from itertools import pairwise
 from typing import NamedTuple, TypedDict
 
-from forever.pipeline.combatlog import Event, LogHeader, is_known
+from forever.pipeline.combatlog import NO_GUID, Event, LogHeader, is_known
 
 # Masque d'école du journal (format) -> nom d'école des données.
 SCHOOLS = {1: "physical", 2: "holy", 4: "fire", 8: "nature", 16: "frost", 32: "shadow", 64: "arcane"}
@@ -82,8 +82,8 @@ def monster_hp(events: Iterable[Event], *, log: str = "") -> tuple[list[MonsterO
         if adv is None:
             continue
         unit = next((u for u in (e.source, e.dest) if u is not None and u.guid == adv.guid), None)
-        if unit is None or unit.kind != "Creature" or unit.npc_id is None:
-            continue
+        if unit is None or unit.kind != "Creature" or unit.npc_id is None or adv.owner != NO_GUID:
+            continue  # créature invoquée (totem, gardien…) : propriétaire non nul
         key = (unit.npc_id, adv.level)
         values[key].add(adv.max_hp)
         guids[key].add(adv.guid)

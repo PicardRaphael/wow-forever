@@ -160,6 +160,23 @@ class Racials:
 
 
 @dataclass(frozen=True)
+class MonsterHp:
+    """PV max d'un monstre à un niveau, avec sa certitude (`certain` mesuré, `suppose` communautaire)."""
+
+    value: int
+    certainty: str
+    source: str
+
+
+@dataclass(frozen=True)
+class MonsterTable:
+    """Table des monstres (`monsters.json`) : agrégat par niveau et PNJ mesurés (npc_id -> niveau -> PV)."""
+
+    hp_by_level: Mapping[int, MonsterHp]
+    npcs: Mapping[int, Mapping[int, MonsterHp]]
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
 
@@ -171,6 +188,7 @@ class GameData:
     rules: CombatRules
     constants: Constants
     racials: Racials
+    monsters: MonsterTable
 
 
 class CharacterOverrides(TypedDict, total=False):

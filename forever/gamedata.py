@@ -16,6 +16,8 @@ from forever.engine.model import (
     FixedCoefficient,
     GameData,
     IntPerCrit,
+    MonsterHp,
+    MonsterTable,
     Racials,
     Rank,
     Spell,
@@ -31,6 +33,7 @@ SPELLS_FILE = "spells.json"
 TALENTS_FILE = "talents.json"
 LEVELING_FILE = "leveling.json"
 RACIALS_FILE = "racials.json"
+MONSTERS_FILE = "monsters.json"
 
 # Colonnes attendues de `spells.json.rank_format`, dans l'ordre des champs de `Rank`.
 RANK_COLUMNS = ("level", "min", "max", "dot_total", "dot_duration", "cast_s", "mana", "cooldown_s")
@@ -230,6 +233,45 @@ def _racials(raw: Any) -> Racials:
     return Racials(sword_crit=sword, spirit_pct=spirit, mana_pct=mana)
 
 
+def _monster_hp(r: _Reader, raw: Any, where: str, value_key: str) -> MonsterHp:
+    if not isinstance(raw, dict):
+        raise r.fail(where, "objet")
+    certainty = r.str_(raw, "certainty", f"{where}.certainty")
+    if certainty not in ("certain", "probable", "suppose"):
+        raise r.fail(f"{where}.certainty", "certain, probable ou suppose")
+    return MonsterHp(
+        value=r.int_(raw, value_key, f"{where}.{value_key}"),
+        certainty=certainty,
+        source=r.str_(raw, "source", f"{where}.source"),
+    )
+
+
+def _level_key(r: _Reader, key: str, where: str) -> int:
+    if not key.isdigit():
+        raise r.fail(where, "clé de niveau entière")
+    return int(key)
+
+
+def _monsters(raw: Any) -> MonsterTable:
+    r = _Reader(MONSTERS_FILE)
+    if not isinstance(raw, dict):
+        raise r.fail("racine", "objet")
+    by_level = {
+        _level_key(r, k, "hp_by_level"): _monster_hp(r, v, f"hp_by_level.{k}", "value")
+        for k, v in r.obj(raw, "hp_by_level", "hp_by_level").items()
+    }
+    npcs: dict[int, dict[int, MonsterHp]] = {}
+    for npc_id, npc in r.obj(raw, "npcs", "npcs").items():
+        where = f"npcs.{npc_id}"
+        if not isinstance(npc, dict):
+            raise r.fail(where, "objet")
+        npcs[_level_key(r, npc_id, "npcs")] = {
+            _level_key(r, k, f"{where}.levels"): _monster_hp(r, v, f"{where}.levels.{k}", "max_hp")
+            for k, v in r.obj(npc, "levels", f"{where}.levels").items()
+        }
+    return MonsterTable(hp_by_level=by_level, npcs=npcs)
+
+
 def _constants(raw: Any) -> Constants:
     r = _Reader(MECHANICS_FILE)
     if not isinstance(raw, dict):
@@ -334,7 +376,8 @@ def _constants(raw: Any) -> Constants:
 def build_game_data(version: VersionData) -> GameData:
     """Données typées d'une version déjà vérifiée ; lève DataSchemaError si une clé manque ou a un mauvais type."""
     try:
-        raw = {name: version.read_json(name) for name in (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE)}
+        names = (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE)
+        raw = {name: version.read_json(name) for name in names}
         raw_mechanics = version.read_json(MECHANICS_FILE)
     except (OSError, ValueError) as exc:
         raise DataSchemaError(f"Données de la version {version.game_version} illisibles ({exc}).") from exc
@@ -348,6 +391,7 @@ def build_game_data(version: VersionData) -> GameData:
         rules=_rules(raw[LEVELING_FILE]),
         constants=_constants(raw_mechanics),
         racials=_racials(raw[RACIALS_FILE]),
+        monsters=_monsters(raw[MONSTERS_FILE]),
     )
 
 
