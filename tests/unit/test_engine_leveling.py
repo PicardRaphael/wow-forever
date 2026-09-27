@@ -148,17 +148,17 @@ def test_rank_damage_at_the_character_level(game_data):
 
 
 def test_expected_cast_at_the_character_level(game_data):
-    """Frostbolt rang 2 (appris au niveau 8, plafond MaxLevel 13) au niveau 12 : dégâts du rang au niveau 12."""
-    ch = character(game_data, 12)
-    rank = expected_cast(game_data, "frostbolt", 12, {}, ch)
-    level = expected_cast(game_data, "frostbolt", 12, {}, ch, spell_level="character")
+    """Frostbolt rang 2 (appris au niveau 8, plafond MaxLevel 12) au niveau 10 : dégâts du rang au niveau 10."""
+    ch = character(game_data, 10)
+    rank = expected_cast(game_data, "frostbolt", 10, {}, ch)
+    level = expected_cast(game_data, "frostbolt", 10, {}, ch, spell_level="character")
     assert rank is not None and level is not None and rank["rank"].position == level["rank"].position == 2
-    low, high, _ = rank_values_at_level(game_data, "frostbolt", 2, 12)
+    low, high, _ = rank_values_at_level(game_data, "frostbolt", 2, 10)
     assert (low, high) != (34, 38)
     per_point = rank["dmg_mult"] * (1 + rank["crit"] * (rank["crit_mult"] - 1))
     assert close(level["direct_per_hit"] - rank["direct_per_hit"], ((low + high) / 2 - (34 + 38) / 2) * per_point)
     top = game_data.scaling["frostbolt"][1].max_level
-    assert top == 13 and best_rank(game_data, "frostbolt", top, {}).position == 2
+    assert top == 12 and best_rank(game_data, "frostbolt", top, {}).position == 2
     ch_top = character(game_data, top)
     assert expected_cast(game_data, "frostbolt", top, {}, ch_top, spell_level="character") == expected_cast(
         game_data, "frostbolt", top, {}, ch_top
