@@ -2,7 +2,19 @@
 
 from __future__ import annotations
 
+from typing import NamedTuple
+
 from forever.engine.model import GameData, Points, Rank
+
+
+class RankValues(NamedTuple):
+    damage_min: float
+    damage_max: float
+    dot_total: float
+
+
+def rank_values_at_level(gd: GameData, key: str, rank: int, level: int) -> RankValues:
+    raise NotImplementedError
 
 
 def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:

@@ -459,6 +459,10 @@ def decode_spells(
     return doc
 
 
+def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
+    raise NotImplementedError
+
+
 # --- Version candidate ---------------------------------------------------------------------------
 
 

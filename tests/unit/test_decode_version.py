@@ -26,7 +26,7 @@ def test_candidate_is_a_complete_data_dir(candidate):
     assert candidate.version == LOCAL_VERSION
     assert verify(candidate.root).ok
     names = {p.name for p in (candidate.root / LOCAL_VERSION).iterdir()}
-    assert names == EXPECTED_FILES and len(names) == 11  # T04 : monsters.json hérité
+    assert names == EXPECTED_FILES and len(names) == 12  # T04 : monsters.json hérité, spell_scaling.json décodé
     assert "_source_gunba_mage_tree.json" not in names and "confirmed_changes.json" not in names
 
 

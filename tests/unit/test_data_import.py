@@ -38,4 +38,5 @@ def test_version_dir_contains_exactly_expected_files():
         "decode_rules.json",  # T03 : règles de lecture des tables du client
         "confirmed_changes.json",  # T03 : écarts client ↔ référence tranchés
         "monsters.json",  # T04 : PV des monstres (journaux, Questie en regard)
+        "spell_scaling.json",  # T04 : points de base des sorts par niveau (decode)
     }

@@ -37,7 +37,7 @@ def check(name, *, strict=True, engine_dirs=()):
 def test_repository_registry_is_valid_strict():
     report = validate(REGISTRY_PATH, REPO_ROOT, strict=True)
     assert report.errors == []
-    assert report.total == 101
+    assert report.total == 102  # T04 : G7 (points de base par niveau)
 
 
 def test_tested_entries_reference_existing_test_functions():
