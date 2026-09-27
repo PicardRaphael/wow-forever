@@ -27,18 +27,31 @@ NOW = datetime(2026, 9, 27, 12, 0, tzinfo=UTC)
 
 
 class FakeHttp:
-    """Client HTTP simulé : renvoie `body` ou lève `exc`, et garde la trace des appels."""
+    """Client HTTP simulé : renvoie `body` ou lève `exc`, et garde la trace des appels.
 
-    def __init__(self, body: bytes | None = None, exc: Exception | None = None) -> None:
+    `routes` (URL -> corps ou exception) prend le pas sur `body` pour les URL qu'il contient."""
+
+    def __init__(
+        self,
+        body: bytes | None = None,
+        exc: Exception | None = None,
+        routes: Mapping[str, bytes | Exception] | None = None,
+    ) -> None:
         self.body = body
         self.exc = exc
+        self.routes = dict(routes or {})
         self.calls: list[tuple[str, dict[str, str], float]] = []
 
     def __call__(self, url: str, headers: Mapping[str, str], timeout: float) -> bytes:
         self.calls.append((url, dict(headers), timeout))
+        if url in self.routes:
+            answer = self.routes[url]
+            if isinstance(answer, Exception):
+                raise answer
+            return answer
         if self.exc is not None:
             raise self.exc
-        assert self.body is not None
+        assert self.body is not None, f"URL non simulée : {url}"
         return self.body
 
     @classmethod

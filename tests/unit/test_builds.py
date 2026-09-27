@@ -87,3 +87,75 @@ def test_network_error_becomes_builds_unavailable():
 def test_invalid_json_becomes_builds_unavailable():
     with pytest.raises(BuildsUnavailable):
         fetch_builds(FakeHttp(body=b"<html>maintenance</html>"))
+
+
+# --- list_builds et commande builds (T03) -------------------------------------------------------
+
+
+def test_list_builds_sorted_by_created_at_desc(make_deps):
+    from forever.pipeline.builds import list_builds
+
+    builds = list_builds(make_deps(http=FakeHttp.fixture("builds_mixed_dates.json")), PRODUCT, PREFIX)
+    assert [b.version for b in builds] == ["1.60.1.70009", "1.60.1.69977", "1.60.1.69900"]
+
+
+def test_list_builds_filters_product_and_prefix(make_deps):
+    from forever.pipeline.builds import list_builds
+
+    assert list_builds(make_deps(http=FakeHttp.fixture("builds_other_product.json")), PRODUCT, PREFIX) == []
+
+
+def test_list_builds_offline_makes_no_call(make_deps):
+    from forever.errors import OfflineError
+    from forever.pipeline.builds import list_builds
+
+    http = FakeHttp.fixture("builds_fresh.json")
+    with pytest.raises(OfflineError):
+        list_builds(make_deps(http=http, offline=True), PRODUCT, PREFIX)
+    assert http.calls == []
+
+
+def test_builds_unavailable_exits_with_network_code():
+    from forever.errors import EXIT_NETWORK
+
+    assert BuildsUnavailable("x").exit_code == EXIT_NETWORK == 5
+
+
+def test_cli_builds_marks_local_version(capsys, make_deps):
+    from forever.cli import main
+
+    code = main(["builds"], make_deps(http=FakeHttp.fixture("builds_mixed_dates.json")))
+    out = capsys.readouterr().out
+    assert code == 0
+    local_line = next(line for line in out.splitlines() if "1.60.1.70009" in line)
+    assert "locale" in local_line
+    assert out.rstrip().splitlines()[-1].startswith("Provenance")
+
+
+def test_cli_builds_json(capsys, make_deps):
+    from forever.cli import main
+
+    code = main(["builds", "--json", "--limit", "2"], make_deps(http=FakeHttp.fixture("builds_mixed_dates.json")))
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 0
+    assert payload["local_version"] == "1.60.1.70009" and payload["latest"] == "1.60.1.70009"
+    assert [b["version"] for b in payload["builds"]] == ["1.60.1.70009", "1.60.1.69977"]
+    assert payload["builds"][0]["local"] is True and payload["total"] == 3
+    assert "provenance" in payload
+
+
+def test_cli_builds_network_failure_is_code_5(capsys, make_deps):
+    from forever.cli import main
+
+    code = main(["builds", "--json"], make_deps(http=FakeHttp.failing()))
+    assert code == 5
+    assert json.loads(capsys.readouterr().out)["error"]["code"] == "builds_unavailable"
+
+
+def test_cli_builds_offline(capsys, make_deps):
+    from forever.cli import main
+
+    http = FakeHttp.fixture("builds_fresh.json")
+    code = main(["builds", "--offline", "--json"], make_deps(http=http))
+    assert code == 5 and http.calls == []
+    assert json.loads(capsys.readouterr().out)["error"]["code"] == "offline"
