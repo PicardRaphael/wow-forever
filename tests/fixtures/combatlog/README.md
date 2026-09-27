@@ -16,3 +16,9 @@ Cas limites écrits pour les tests (pas des journaux réels) :
 - `summoned.txt` : totem de feu (2523) invoqué par un joueur (propriétaire non nul dans le bloc avancé) → exclu des PV de monstres.
 - `absorbed.txt` : `SPELL_ABSORBED` sans puis avec le sort de l'attaquant (disposition variable, relevée dans le second journal) → deux unités lues, reste brut.
 - `missed_first.txt` : un Frostbolt résisté puis un immunisé **avant** le premier bloc avancé de la cible, puis un touché → le raté compte à l'écart de niveau de la cible ; IMMUNE hors de la table de toucher.
+
+## `WoWCombatLog-092726_150346.anon.txt.gz`
+- Origine : `…\_classic_beta_\Logs\WoWCombatLog-092726_150346.txt`, journal réel du client 1.60.1 (build 70009), 2026-09-27 15:03:46 → 16:48:23, les Tarides (`uiMapID` 1413), 25 902 lignes (6,4 Mo), même en-tête que la première fixture.
+- Extraction (décision 1 du plan T04b) : `uv run python scripts/extract_combatlog_fixture.py <journal> --useful --gzip`. Filtre des événements utiles **avant** l'anonymisation : tout événement dont la source ou la destination est le Mage « à moi » (incantations, ratés, baguette, effets), tout événement de dégâts dont le bloc avancé décrit une créature (PV des monstres, quelle que soit la cible), les morts de créatures (`UNIT_DIED`, `PARTY_KILL`) et les changements de carte ; 3 330 lignes (3 329 événements). Anonymisation identique à la première fixture ; gzip déterministe (`mtime` 0, sans nom de fichier). Ne pas éditer à la main.
+- Contrôle au moment de l'extraction : mêmes mesures que le journal complet (47 intervalles entre sorts sous recharge globale, 98 sans filtre, 29 relevés de PV sur 19 PNJ, 0 conflit, coûts identiques, 334 touchés dont 53 de baguette).
+- Le lecteur (`forever/pipeline/combatlog.py`) lit les `.txt.gz` comme les `.txt` ; `forever logs scan` et `forever logs measure <dossier>` les listent.

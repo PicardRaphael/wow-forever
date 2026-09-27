@@ -148,6 +148,7 @@ class Constants:
     talent_rank_mana_ratio: float
     talent_rank_mana_default: float
     default_range_yd: float
+    miss_per_level_below: float  # raté retiré par niveau d'écart sous la cible (écart négatif)
 
 
 @dataclass(frozen=True)
@@ -182,6 +183,7 @@ class RankScaling:
     base_level: int
     spell_level: int
     max_level: int
+    start_recovery_ms: int  # recharge globale déclenchée (SpellCooldowns.StartRecoveryTime)
     components: tuple[ScalingComponent, ...]
 
 

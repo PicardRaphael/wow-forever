@@ -3,9 +3,12 @@
 Une référence de test prend la forme `tests/…/fichier.py::test_nom` ; la fonction doit exister (analyse `ast`, sans
 import). Les fonctions du moteur citent leurs identifiants dans leur docstring : « Registre : A3, A4 ».
 
-Preuves de journal (champ `preuves`, T04) : chaque preuve cite une fixture de journal sous `tests/fixtures/combatlog/`,
-sa date, la mesure, l'effectif `n` et le test qui la lit. `valide-journal` exige au moins une preuve valide avec
-`n` ≥ `tolerance.n_min` ; le statut ne change pas la certitude (règle observée, pas valeur)."""
+Preuves de journal (champ `preuves`, T04) : chaque preuve cite une fixture de journal sous `tests/fixtures/combatlog/`
+(ou une liste de fixtures, mesure faite sur leur réunion), sa date, la mesure, l'effectif `n` et le test qui la lit.
+`valide-journal` exige que les preuves valides d'une même mesure totalisent `n` ≥ `tolerance.n_min` (décision 2 du
+plan T04b : les preuves se cumulent) ; avec `tolerance.ecart_s`, chaque preuve déclare `ecart_median_s` (médiane -
+valeur des données, en valeur absolue) et `ecart_min_s` (valeur des données - minimum), recalculés par son test, et
+tous deux doivent rester sous la tolérance. Le statut ne change pas la certitude (règle observée, pas valeur)."""
 
 from __future__ import annotations
 
@@ -28,6 +31,8 @@ CERTAINTIES = frozenset({"certain", "probable", "suppose"})
 FOREVER_VALUES = frozenset({"oui", "modifie", "inconnu"})
 REQUIRED_FIELDS = ("id", "categorie", "description", "forever", "statut", "certitude", "sources", "tests")
 PROOF_FIELDS = ("journal", "date", "mesure", "n", "test")
+GAP_FIELDS = ("ecart_median_s", "ecart_min_s")
+GAP_LABELS = {"ecart_median_s": "écart médian", "ecart_min_s": "écart minimal"}
 PROOF_DIR = "tests/fixtures/combatlog/"
 ENGINE_DIR = PACKAGE_DIR / "engine"
 # Catégories (première lettre de l'identifiant) dont une entrée testée doit être implémentée dans le moteur.
@@ -176,6 +181,19 @@ def _n_min(tolerance: object) -> int | None:
     return value if isinstance(value, int) and not isinstance(value, bool) else None
 
 
+def _number(value: object) -> float | None:
+    return float(value) if isinstance(value, int | float) and not isinstance(value, bool) else None
+
+
+def _check_journal(where: str, journal: str, repo_root: Path) -> list[str]:
+    path = repo_root / journal
+    if not journal.startswith(PROOF_DIR) or not path.resolve().is_relative_to((repo_root / PROOF_DIR).resolve()):
+        return [f"{where} : journal hors de {PROOF_DIR} refusé '{journal}'"]
+    if not path.is_file():
+        return [f"{where} : journal introuvable '{journal}'"]
+    return []
+
+
 def _check_proofs(
     mid: str, status: object, m: dict[str, Any], repo_root: Path, cache: dict[Path, set[str]]
 ) -> list[str]:
@@ -186,7 +204,9 @@ def _check_proofs(
     if not isinstance(raw, list):
         return [f"{mid} : 'preuves' doit être une liste"]
     errors: list[str] = []
-    valid_n: list[int] = []
+    valid_n: dict[str, int] = {}
+    gap_errors: list[str] = []
+    ecart_s = _number(m.get("tolerance", {}).get("ecart_s")) if isinstance(m.get("tolerance"), dict) else None
     for i, proof in enumerate(raw, start=1):
         where = f"{mid} : preuve {i}"
         if not isinstance(proof, dict):
@@ -197,12 +217,11 @@ def _check_proofs(
         if missing:
             continue
         own: list[str] = []
-        journal = str(proof["journal"])
-        path = repo_root / journal
-        if not journal.startswith(PROOF_DIR) or not path.resolve().is_relative_to((repo_root / PROOF_DIR).resolve()):
-            own.append(f"{where} : journal hors de {PROOF_DIR} refusé '{journal}'")
-        elif not path.is_file():
-            own.append(f"{where} : journal introuvable '{journal}'")
+        journals = proof["journal"] if isinstance(proof["journal"], list) else [proof["journal"]]
+        if not journals:
+            own.append(f"{where} : liste de journaux vide")
+        for journal in journals:
+            own += _check_journal(where, str(journal), repo_root)
         n = proof["n"]
         if isinstance(n, bool) or not isinstance(n, int) or n < 1:
             own.append(f"{where} : 'n' doit être un entier positif")
@@ -210,17 +229,30 @@ def _check_proofs(
         if "::" not in str(proof["test"]):
             own.append(f"{where} : test sans référence ::nom de fonction")
         errors += own
-        if not own:
-            valid_n.append(n)
+        if own:
+            continue
+        mesure = str(proof["mesure"])
+        valid_n[mesure] = valid_n.get(mesure, 0) + n
+        if ecart_s is None:
+            continue
+        for gap in GAP_FIELDS:
+            value = _number(proof.get(gap))
+            if gap not in proof:
+                gap_errors.append(f"{where} : champ '{gap}' manquant (tolerance.ecart_s)")
+            elif value is None:
+                gap_errors.append(f"{where} : '{gap}' doit être un nombre")
+            elif value > ecart_s:
+                gap_errors.append(f"{where} : {GAP_LABELS[gap]} {value:g} s > tolerance.ecart_s = {ecart_s:g} s")
     if status == "valide-journal":
         n_min = _n_min(m.get("tolerance"))
         if n_min is None:
             errors.append(f"{mid} : 'valide-journal' exige tolerance.n_min (effectif minimal d'une preuve)")
         elif not raw:
             errors.append(f"{mid} : 'valide-journal' sans preuve de journal")
-        elif not any(n >= n_min for n in valid_n):
-            best = max(valid_n, default=0)
+        elif not any(n >= n_min for n in valid_n.values()):
+            best = max(valid_n.values(), default=0)
             errors.append(f"{mid} : 'valide-journal' sans preuve suffisante (n = {best} < n_min = {n_min})")
+        errors += gap_errors
     return errors
 
 

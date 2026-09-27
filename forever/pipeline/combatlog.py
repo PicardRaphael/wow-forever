@@ -11,6 +11,8 @@ destination pour `SPELL_DAMAGE`…) : on se fie à son GUID, premier champ du bl
 from __future__ import annotations
 
 import csv
+import gzip
+import zlib
 from collections.abc import Iterator, Mapping
 from datetime import datetime
 from pathlib import Path
@@ -19,7 +21,7 @@ from typing import NamedTuple
 from forever.errors import DataSchemaError, UnsupportedLogError
 
 SUPPORTED_VERSION = 22
-LOG_GLOB = "WoWCombatLog-*.txt"
+LOG_GLOBS = ("WoWCombatLog-*.txt", "WoWCombatLog-*.txt.gz")  # journal du client, ou fixture compressée
 NO_GUID = "0000000000000000"
 AFFILIATION_MINE = 0x1  # COMBATLOG_OBJECT_AFFILIATION_MINE
 TIME_FORMAT = "%m/%d/%Y %H:%M:%S.%f"
@@ -337,11 +339,21 @@ def _header(path: Path, first: str) -> LogHeader:
     return header
 
 
+def log_files(directory: Path) -> list[Path]:
+    """Journaux d'un dossier (`WoWCombatLog-*.txt` et leur forme compressée `.txt.gz`), triés par nom."""
+    return sorted({p for pattern in LOG_GLOBS for p in directory.glob(pattern)}, key=lambda p: p.name)
+
+
 def _lines(path: Path) -> list[str]:
     try:
-        return path.read_bytes().decode("utf-8").splitlines()
+        data = path.read_bytes()
+        if path.suffix == ".gz":
+            data = gzip.decompress(data)
+        return data.decode("utf-8").splitlines()
     except UnicodeDecodeError as exc:
         raise DataSchemaError(f"{path} : encodage invalide (UTF-8 attendu).") from exc
+    except (gzip.BadGzipFile, EOFError, zlib.error) as exc:
+        raise DataSchemaError(f"{path} : compression gzip invalide ({exc}).") from exc
 
 
 def read_log(path: Path) -> tuple[LogHeader, Iterator[Event]]:
@@ -372,7 +384,7 @@ def scan_logs(directory: Path) -> list[LogSummary]:
     """Résumé de chaque `WoWCombatLog-*.txt` du dossier (triés par nom) ; un journal illisible est listé avec
     son erreur."""
     out = []
-    for path in sorted(directory.glob(LOG_GLOB)):
+    for path in log_files(directory):
         n_lines = 0
         try:
             n_lines = len(_lines(path))

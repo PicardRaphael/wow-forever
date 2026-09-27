@@ -47,7 +47,9 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "SpellCastTimes": _cols("ID:int Base:int"),
     "SpellDuration": _cols("ID:int Duration:int"),
     "SpellPower": _cols("ID:int SpellID:int ManaCost:int PowerCostPct:float PowerType:int"),
-    "SpellCooldowns": _cols("ID:int SpellID:int DifficultyID:int RecoveryTime:int CategoryRecoveryTime:int"),
+    "SpellCooldowns": _cols(
+        "ID:int SpellID:int DifficultyID:int RecoveryTime:int CategoryRecoveryTime:int StartRecoveryTime:int"
+    ),
     "SpellAuraOptions": _cols("ID:int SpellID:int DifficultyID:int CumulativeAura:int ProcCharges:int"),
 }
 

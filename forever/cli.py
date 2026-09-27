@@ -12,6 +12,7 @@ import json
 import sys
 from collections.abc import Mapping
 from dataclasses import replace
+from datetime import timedelta
 from pathlib import Path
 from typing import Any, NoReturn
 
@@ -26,19 +27,22 @@ from forever.errors import (
     UsageError,
 )
 from forever.explain import MechanicExplanation, explain_mechanic
+from forever.gamedata import load_game_data
 from forever.lookup import SpellLookup, SpellRank, lookup_spell
 from forever.manifest import load_manifest, version_dirs, write_manifest
-from forever.pipeline.addon_sv import read_logger_db
+from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
-from forever.pipeline.combatlog import LOG_GLOB, LogHeader, LogSummary, read_log, scan_logs
+from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
 from forever.pipeline.decode import Candidate, decode_version
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
+from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
 from forever.pipeline.measure import (
     Conflict,
     LogMeasures,
     MonsterObservation,
     find_mine,
+    log_spell_sets,
     measure_log,
     monster_hp,
 )
@@ -143,8 +147,17 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-gap", type=float, default=CHAIN_MAX_GAP_S, help="écart maximal (s) entre deux instantanés enchaînés"
     )
     measure.add_argument(
-        "--addon-sv", help="SavedVariables de ForeverLogger (niveau du lanceur pour les touchés et ratés)"
+        "--addon-sv", help="SavedVariables de ForeverLogger (niveau du lanceur pour les touchés et ratés, priorité 1)"
     )
+    measure.add_argument(
+        "--questie-sv", help="SavedVariables de Questie : carnet des gains de niveau (repli, lecture locale seulement)"
+    )
+    measure.add_argument(
+        "--utc-offset",
+        type=float,
+        help="décalage heure locale - UTC (h) pour le carnet de Questie (défaut : instantané ForeverLogger, sinon système)",
+    )
+    measure.add_argument("--caster-level", type=int, help="niveau du lanceur en dernier recours")
     measure.add_argument("--json", action="store_true", help="sortie JSON")
 
     questie = sub.add_parser("questie", help="base locale de l'addon Questie (communautaire, sans réseau)")
@@ -259,7 +272,17 @@ def render_explanation(res: MechanicExplanation) -> list[str]:
     ):
         lines.append(f"{label} : {', '.join(values) if values else 'aucun'}")
     for proof in res["proofs"]:
-        lines.append(f"Preuve de journal : {proof['journal']} ({proof['date']}, n = {proof['n']}) : {proof['mesure']}")
+        journals = proof["journal"] if isinstance(proof["journal"], list) else [proof["journal"]]
+        gaps = [
+            f"{label} {_num(proof[key])} s"
+            for key, label in (("ecart_median_s", "écart médian"), ("ecart_min_s", "écart minimal"))
+            if key in proof
+        ]
+        lines.append(
+            f"Preuve de journal : {', '.join(journals)} ({proof['date']}, n = {proof['n']}"
+            + "".join(f", {g}" for g in gaps)
+            + f") : {proof['mesure']}"
+        )
     return lines
 
 
@@ -574,23 +597,51 @@ def render_measures(m: LogMeasures) -> list[str]:
     ]
     if m["caster_level"] is not None:
         field = ", ".join(str(v) for v in m["player_level_field"]) or "absent"
-        lines.append(
-            f"  Niveau du lanceur (ForeverLoggerDB) : {m['caster_level']} ; dernier champ du bloc avancé : {field}"
-        )
+        lines.append(f"  Niveau du lanceur au début : {m['caster_level']} ; dernier champ du bloc avancé : {field}")
+    lines += [
+        f"  Niveau du lanceur {c['level']} à {str(c['time']).replace('T', ' ')} ({c['source']})"
+        for c in m["caster_level_changes"]
+    ]
     if m["unknown_events"]:
         lines.append(f"  Événements inconnus gardés bruts : {', '.join(m['unknown_events'])}")
     return lines
+
+
+def _caster_levels(
+    args: argparse.Namespace, db: LoggerDB | None, caster: str, notes: list[str], name: str
+) -> CasterLevels | None:
+    """Niveau du lanceur par priorité (décision 3 du plan T04b) : ForeverLoggerDB, carnet de Questie, --caster-level."""
+    timelines = []
+    if db is not None:
+        timelines.append(from_logger_db(db, caster))
+    if args.questie_sv:
+        offset = logger_utc_offset(db, caster) if db is not None else None
+        if args.utc_offset is not None:
+            offset = timedelta(hours=args.utc_offset)
+        if offset is None:
+            notes.append(f"{name} : carnet de Questie ramené à l'heure locale par le fuseau du système")
+        timelines.append(from_questie_journey(Path(args.questie_sv), caster, utc_offset=offset))
+    if not timelines and args.caster_level is None:
+        return None
+    sources = [t.source for t in timelines] + (["--caster-level"] if args.caster_level is not None else [])
+    notes.append(f"{name} : niveau du lanceur par priorité {' > '.join(sources)}")
+    return CasterLevels(tuple(timelines), args.caster_level)
 
 
 def _cmd_logs_measure(deps: Deps, args: argparse.Namespace) -> int:
     path = Path(args.path)
     if not path.exists():
         raise PathNotFoundError("Journal", str(path), "donner un fichier WoWCombatLog-*.txt ou son dossier")
-    files = sorted(path.glob(LOG_GLOB)) if path.is_dir() else [path]
+    files = log_files(path) if path.is_dir() else [path]
     notes: list[str] = [f"fenêtre d'enchaînement des instantanés : {_num(args.max_gap)} s (paramètre de mesure)"]
     results: list[LogMeasures] = []
     headers: list[LogHeader] = []
     db = read_logger_db(Path(args.addon_sv)) if args.addon_sv else None
+    spells = log_spell_sets(load_game_data(deps))
+    notes.append(
+        "intervalles : sorts qui déclenchent la recharge globale (start_recovery_ms > 0) ; touchés et ratés : sorts "
+        "de spell_scaling.json seulement (ni baguette, ni effets déclenchés)"
+    )
     for file in files:
         try:
             header, events = read_log(file)
@@ -601,15 +652,10 @@ def _cmd_logs_measure(deps: Deps, args: argparse.Namespace) -> int:
             notes.append(f"{file.name} ignoré : {err.message}")
             continue
         headers.append(header)
-        level = None
-        caster = find_mine(evs)
-        if db is not None and caster and evs:
-            level = db.level_at(caster, evs[0].time)
-            notes.append(
-                f"{file.name} : niveau du lanceur {level if level is not None else 'inconnu'} au début du journal "
-                "(ForeverLoggerDB, dernier instantané antérieur)"
-            )
-        results.append(measure_log(header, evs, name=file.name, max_gap_s=args.max_gap, caster_level=level))
+        levels = _caster_levels(args, db, find_mine(evs) or "", notes, file.name)
+        results.append(
+            measure_log(header, evs, name=file.name, max_gap_s=args.max_gap, caster_level=levels, spells=spells)
+        )
     for m in results:
         notes += [f"{m['name']} : {a}" for a in m["assumptions"]]
     stats = any(m["gcd_intervals"]["values"] or m["cast_times"] or m["crits"] for m in results)
@@ -650,7 +696,7 @@ def _cmd_monsters_build(deps: Deps, args: argparse.Namespace) -> int:
     headers: list[LogHeader] = []
     notes: list[str] = []
     names: list[str] = []
-    for file in sorted(path.glob(LOG_GLOB)) if path.is_dir() else [path]:
+    for file in log_files(path) if path.is_dir() else [path]:
         try:
             header, events = read_log(file)
             found, clash = monster_hp(list(events), log=file.name)

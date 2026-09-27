@@ -133,6 +133,12 @@
       "registry": "B11",
       "source": "estimation du seed (EST) pour un rang de talent sans coût publié ; voir docs/OPEN_QUESTIONS.md"
     },
+    "hit.miss_per_level_below": {
+      "value": 0.01,
+      "certainty": "suppose",
+      "registry": "A3",
+      "source": "règle Classic (PC) supposée dans Forever : cible plus basse, raté = raté à écart 0 - 1 % par niveau d'écart, plancher min_miss (décision 4 du plan T04b) ; journal du 2026-09-27 : 0 raté sur 281 sorts directs, cibles 2 à 8 niveaux plus bas (très improbable avec 4 % : 0,96^281 ≈ 1e-5)"
+    },
     "spell.default_range_yd": {
       "value": 30,
       "certainty": "suppose",

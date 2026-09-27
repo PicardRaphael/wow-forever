@@ -159,7 +159,114 @@ def read_questie(addon_dir: Path) -> QuestieDB:
     return QuestieDB(addon_dir, info)
 
 
+# SavedVariable de Questie (`WTF/Account/<COMPTE>/SavedVariables/Questie.lua`) : données personnelles de
+# l'utilisateur, lues localement (décision 3 du plan T04b). Le fichier contient des chaînes compressées (octets
+# quelconques) : il est lu octet pour octet (latin-1) et parcouru table par table, sans analyser le reste.
+JOURNEY_VARIABLE = "QuestieConfig"
+_VARIABLE = re.compile(rf"^{JOURNEY_VARIABLE}\s*=\s*\{{", re.MULTILINE)
+_KEY = re.compile(r'\[("(?:[^"\\]|\\.)*"|-?\d+)\]\s*=\s*')
+
+
+def _string_end(text: str, i: int) -> int:
+    """Indice qui suit la chaîne ouverte en `i` (guillemet), échappements compris."""
+    i += 1
+    while i < len(text):
+        c = text[i]
+        if c == "\\":
+            i += 2
+            continue
+        if c == '"':
+            return i + 1
+        i += 1
+    raise ValueError("chaîne non terminée")
+
+
+def _table_end(text: str, i: int) -> int:
+    """Indice qui suit la table ouverte en `i` (accolade), chaînes et commentaires sautés."""
+    depth = 0
+    while i < len(text):
+        c = text[i]
+        if c == '"':
+            i = _string_end(text, i)
+            continue
+        if text.startswith("--", i):
+            i = text.find("\n", i)
+            i = len(text) if i < 0 else i
+            continue
+        if c == "{":
+            depth += 1
+        elif c == "}":
+            depth -= 1
+            if depth == 0:
+                return i + 1
+        i += 1
+    raise ValueError("table non terminée")
+
+
+def _items(text: str, start: int, end: int) -> dict[str, tuple[int, int]]:
+    """Clés en chaîne du premier niveau de la table `text[start:end]` (accolades comprises) -> étendue de la valeur."""
+    out: dict[str, tuple[int, int]] = {}
+    i = start + 1
+    while i < end - 1:
+        c = text[i]
+        if c.isspace() or c == ",":
+            i += 1
+            continue
+        if text.startswith("--", i):
+            i = text.find("\n", i)
+            i = end if i < 0 else i
+            continue
+        key = None
+        m = _KEY.match(text, i)
+        if m:
+            key = m[1][1:-1] if m[1].startswith('"') else None
+            i = m.end()
+        if text[i] == "{":
+            j = _table_end(text, i)
+        elif text[i] == '"':
+            j = _string_end(text, i)
+        else:
+            j = i
+            while j < end - 1 and text[j] not in ",\n}":
+                j += 1
+        if key is not None:
+            out[key] = (i, j)
+        i = j
+    return out
+
+
 def read_journey(sv: Path, guid: str) -> list[tuple[int, int]]:
     """(heure Unix, niveau atteint) des événements `Level` du carnet de Questie pour le personnage `guid`, triés ;
-    tous les blocs `char` du GUID sont réunis (Questie peut en écrire plusieurs, dont un « Unknown »)."""
-    raise NotImplementedError
+    tous les blocs `char` du GUID sont réunis (Questie peut en écrire plusieurs, dont un « Unknown »).
+    PathNotFoundError si le fichier manque ; DataSchemaError s'il ne contient pas `QuestieConfig`."""
+    if not sv.is_file():
+        raise PathNotFoundError(
+            "SavedVariables de Questie",
+            str(sv),
+            "donner WTF/Account/<COMPTE>/SavedVariables/Questie.lua (écrit au /reload ou à la déconnexion)",
+        )
+    text = sv.read_bytes().decode("latin-1")
+    found = _VARIABLE.search(text)
+    if found is None:
+        raise DataSchemaError(f"{sv.name} : variable {JOURNEY_VARIABLE} absente.")
+    out: list[tuple[int, int]] = []
+    try:
+        root = found.end() - 1
+        chars = _items(text, root, _table_end(text, root)).get("char")
+        for start, end in _items(text, *chars).values() if chars and text[chars[0]] == "{" else []:
+            if text[start] != "{":
+                continue
+            fields = _items(text, start, end)
+            g, journey = fields.get("guid"), fields.get("journey")
+            if g is None or journey is None or text[g[0] + 1 : g[1] - 1] != guid:
+                continue
+            events = parse_lua_value(text[journey[0] : journey[1]])
+            for e in events if isinstance(events, list) else []:
+                if not isinstance(e, dict) or e.get("Event") != "Level":
+                    continue
+                ts, level = e.get("Timestamp"), e.get("NewLevel")
+                if isinstance(ts, int) and isinstance(level, int):
+                    out.append((ts, level))
+    except ValueError as exc:
+        raise DataSchemaError(f"{sv.name} : {exc}.") from exc
+    return sorted(out)

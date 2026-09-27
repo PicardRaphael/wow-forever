@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "build": "1.60.1.70009",
- "source": "Client 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools) décodées par forever decode",
+ "source": "Client 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns (wago.tools) décodées par forever decode",
  "level_cap": 60,
  "spells": {
   "frostbolt": [
@@ -11,6 +11,7 @@
     "base_level": 4,
     "spell_level": 4,
     "max_level": 8,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 116,
@@ -31,6 +32,7 @@
     "base_level": 8,
     "spell_level": 8,
     "max_level": 12,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 205,
@@ -51,6 +53,7 @@
     "base_level": 14,
     "spell_level": 14,
     "max_level": 18,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 837,
@@ -71,6 +74,7 @@
     "base_level": 20,
     "spell_level": 20,
     "max_level": 24,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 7322,
@@ -91,6 +95,7 @@
     "base_level": 26,
     "spell_level": 26,
     "max_level": 30,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8406,
@@ -111,6 +116,7 @@
     "base_level": 32,
     "spell_level": 32,
     "max_level": 36,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8407,
@@ -131,6 +137,7 @@
     "base_level": 38,
     "spell_level": 38,
     "max_level": 42,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8408,
@@ -151,6 +158,7 @@
     "base_level": 44,
     "spell_level": 44,
     "max_level": 48,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10179,
@@ -171,6 +179,7 @@
     "base_level": 50,
     "spell_level": 50,
     "max_level": 54,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10180,
@@ -191,6 +200,7 @@
     "base_level": 56,
     "spell_level": 56,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10181,
@@ -211,6 +221,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 25304,
@@ -233,6 +244,7 @@
     "base_level": 1,
     "spell_level": 1,
     "max_level": 5,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 133,
@@ -264,6 +276,7 @@
     "base_level": 6,
     "spell_level": 6,
     "max_level": 10,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 143,
@@ -295,6 +308,7 @@
     "base_level": 12,
     "spell_level": 12,
     "max_level": 16,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 145,
@@ -326,6 +340,7 @@
     "base_level": 18,
     "spell_level": 18,
     "max_level": 22,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 3140,
@@ -357,6 +372,7 @@
     "base_level": 24,
     "spell_level": 24,
     "max_level": 28,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8400,
@@ -388,6 +404,7 @@
     "base_level": 30,
     "spell_level": 30,
     "max_level": 34,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8401,
@@ -419,6 +436,7 @@
     "base_level": 36,
     "spell_level": 36,
     "max_level": 40,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8402,
@@ -450,6 +468,7 @@
     "base_level": 42,
     "spell_level": 42,
     "max_level": 46,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10148,
@@ -481,6 +500,7 @@
     "base_level": 48,
     "spell_level": 48,
     "max_level": 52,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10149,
@@ -512,6 +532,7 @@
     "base_level": 54,
     "spell_level": 54,
     "max_level": 58,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10150,
@@ -543,6 +564,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10151,
@@ -574,6 +596,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 25306,
@@ -607,6 +630,7 @@
     "base_level": 6,
     "spell_level": 6,
     "max_level": 11,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 2136,
@@ -627,6 +651,7 @@
     "base_level": 14,
     "spell_level": 14,
     "max_level": 19,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 2137,
@@ -647,6 +672,7 @@
     "base_level": 22,
     "spell_level": 22,
     "max_level": 27,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 2138,
@@ -667,6 +693,7 @@
     "base_level": 30,
     "spell_level": 30,
     "max_level": 35,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8412,
@@ -687,6 +714,7 @@
     "base_level": 38,
     "spell_level": 38,
     "max_level": 43,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8413,
@@ -707,6 +735,7 @@
     "base_level": 46,
     "spell_level": 46,
     "max_level": 51,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10197,
@@ -727,6 +756,7 @@
     "base_level": 54,
     "spell_level": 54,
     "max_level": 59,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10199,
@@ -749,6 +779,7 @@
     "base_level": 22,
     "spell_level": 22,
     "max_level": 26,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 2948,
@@ -769,6 +800,7 @@
     "base_level": 28,
     "spell_level": 28,
     "max_level": 32,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8444,
@@ -789,6 +821,7 @@
     "base_level": 34,
     "spell_level": 34,
     "max_level": 38,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8445,
@@ -809,6 +842,7 @@
     "base_level": 40,
     "spell_level": 40,
     "max_level": 44,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8446,
@@ -829,6 +863,7 @@
     "base_level": 46,
     "spell_level": 46,
     "max_level": 50,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10205,
@@ -849,6 +884,7 @@
     "base_level": 52,
     "spell_level": 52,
     "max_level": 56,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10206,
@@ -869,6 +905,7 @@
     "base_level": 58,
     "spell_level": 58,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10207,
@@ -891,6 +928,7 @@
     "base_level": 20,
     "spell_level": 20,
     "max_level": 24,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 11366,
@@ -922,6 +960,7 @@
     "base_level": 24,
     "spell_level": 24,
     "max_level": 30,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 12505,
@@ -953,6 +992,7 @@
     "base_level": 30,
     "spell_level": 30,
     "max_level": 36,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 12522,
@@ -984,6 +1024,7 @@
     "base_level": 36,
     "spell_level": 36,
     "max_level": 42,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 12523,
@@ -1015,6 +1056,7 @@
     "base_level": 42,
     "spell_level": 42,
     "max_level": 48,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 12524,
@@ -1046,6 +1088,7 @@
     "base_level": 48,
     "spell_level": 48,
     "max_level": 54,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 12525,
@@ -1077,6 +1120,7 @@
     "base_level": 54,
     "spell_level": 54,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 12526,
@@ -1108,6 +1152,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 18809,
@@ -1141,6 +1186,7 @@
     "base_level": 40,
     "spell_level": 40,
     "max_level": 48,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 401502,
@@ -1172,6 +1218,7 @@
     "base_level": 50,
     "spell_level": 50,
     "max_level": 58,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1237312,
@@ -1203,6 +1250,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1237313,
@@ -1236,6 +1284,7 @@
     "base_level": 20,
     "spell_level": 20,
     "max_level": 26,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1312002,
@@ -1256,6 +1305,7 @@
     "base_level": 28,
     "spell_level": 28,
     "max_level": 32,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 400640,
@@ -1276,6 +1326,7 @@
     "base_level": 34,
     "spell_level": 34,
     "max_level": 40,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1240044,
@@ -1296,6 +1347,7 @@
     "base_level": 42,
     "spell_level": 42,
     "max_level": 48,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1240045,
@@ -1316,6 +1368,7 @@
     "base_level": 48,
     "spell_level": 48,
     "max_level": 56,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1240046,
@@ -1336,6 +1389,7 @@
     "base_level": 56,
     "spell_level": 56,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1240047,
@@ -1358,6 +1412,7 @@
     "base_level": 20,
     "spell_level": 20,
     "max_level": 28,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 400574,
@@ -1378,6 +1433,7 @@
     "base_level": 30,
     "spell_level": 30,
     "max_level": 38,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1239696,
@@ -1398,6 +1454,7 @@
     "base_level": 40,
     "spell_level": 40,
     "max_level": 48,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1239697,
@@ -1418,6 +1475,7 @@
     "base_level": 50,
     "spell_level": 50,
     "max_level": 58,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1239699,
@@ -1438,6 +1496,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1239700,
@@ -1460,6 +1519,7 @@
     "base_level": 8,
     "spell_level": 8,
     "max_level": 12,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 7268,
@@ -1480,6 +1540,7 @@
     "base_level": 16,
     "spell_level": 16,
     "max_level": 20,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 7269,
@@ -1500,6 +1561,7 @@
     "base_level": 24,
     "spell_level": 24,
     "max_level": 28,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 7270,
@@ -1520,6 +1582,7 @@
     "base_level": 32,
     "spell_level": 32,
     "max_level": 36,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8419,
@@ -1540,6 +1603,7 @@
     "base_level": 40,
     "spell_level": 40,
     "max_level": 44,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8418,
@@ -1560,6 +1624,7 @@
     "base_level": 48,
     "spell_level": 48,
     "max_level": 52,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10273,
@@ -1580,6 +1645,7 @@
     "base_level": 56,
     "spell_level": 56,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10274,
@@ -1600,6 +1666,7 @@
     "base_level": 56,
     "spell_level": 56,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 25346,
@@ -1622,6 +1689,7 @@
     "base_level": 10,
     "spell_level": 10,
     "max_level": 15,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 122,
@@ -1642,6 +1710,7 @@
     "base_level": 26,
     "spell_level": 26,
     "max_level": 31,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 865,
@@ -1662,6 +1731,7 @@
     "base_level": 40,
     "spell_level": 40,
     "max_level": 45,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 6131,
@@ -1682,6 +1752,7 @@
     "base_level": 54,
     "spell_level": 54,
     "max_level": 59,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10230,
@@ -1704,6 +1775,7 @@
     "base_level": 26,
     "spell_level": 26,
     "max_level": 31,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 120,
@@ -1724,6 +1796,7 @@
     "base_level": 34,
     "spell_level": 34,
     "max_level": 39,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8492,
@@ -1744,6 +1817,7 @@
     "base_level": 42,
     "spell_level": 42,
     "max_level": 47,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10159,
@@ -1764,6 +1838,7 @@
     "base_level": 50,
     "spell_level": 50,
     "max_level": 55,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10160,
@@ -1784,6 +1859,7 @@
     "base_level": 58,
     "spell_level": 58,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10161,
@@ -1806,6 +1882,7 @@
     "base_level": 14,
     "spell_level": 14,
     "max_level": 19,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1449,
@@ -1826,6 +1903,7 @@
     "base_level": 22,
     "spell_level": 22,
     "max_level": 27,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8437,
@@ -1846,6 +1924,7 @@
     "base_level": 30,
     "spell_level": 30,
     "max_level": 35,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8438,
@@ -1866,6 +1945,7 @@
     "base_level": 38,
     "spell_level": 38,
     "max_level": 43,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8439,
@@ -1886,6 +1966,7 @@
     "base_level": 46,
     "spell_level": 46,
     "max_level": 51,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10201,
@@ -1906,6 +1987,7 @@
     "base_level": 54,
     "spell_level": 54,
     "max_level": 59,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10202,
@@ -1928,6 +2010,7 @@
     "base_level": 20,
     "spell_level": 20,
     "max_level": 25,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1279976,
@@ -1948,6 +2031,7 @@
     "base_level": 28,
     "spell_level": 28,
     "max_level": 33,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1279977,
@@ -1968,6 +2052,7 @@
     "base_level": 36,
     "spell_level": 36,
     "max_level": 41,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1279978,
@@ -1988,6 +2073,7 @@
     "base_level": 44,
     "spell_level": 44,
     "max_level": 49,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1279979,
@@ -2008,6 +2094,7 @@
     "base_level": 52,
     "spell_level": 52,
     "max_level": 57,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1279980,
@@ -2028,6 +2115,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 1279949,
@@ -2050,6 +2138,7 @@
     "base_level": 16,
     "spell_level": 16,
     "max_level": 21,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 2120,
@@ -2081,6 +2170,7 @@
     "base_level": 24,
     "spell_level": 24,
     "max_level": 29,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 2121,
@@ -2112,6 +2202,7 @@
     "base_level": 32,
     "spell_level": 32,
     "max_level": 37,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8422,
@@ -2143,6 +2234,7 @@
     "base_level": 40,
     "spell_level": 40,
     "max_level": 45,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 8423,
@@ -2174,6 +2266,7 @@
     "base_level": 48,
     "spell_level": 48,
     "max_level": 53,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10215,
@@ -2205,6 +2298,7 @@
     "base_level": 56,
     "spell_level": 56,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 10216,
@@ -2238,6 +2332,7 @@
     "base_level": 30,
     "spell_level": 30,
     "max_level": 36,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 11113,
@@ -2258,6 +2353,7 @@
     "base_level": 36,
     "spell_level": 36,
     "max_level": 42,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 13018,
@@ -2278,6 +2374,7 @@
     "base_level": 44,
     "spell_level": 44,
     "max_level": 50,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 13019,
@@ -2298,6 +2395,7 @@
     "base_level": 52,
     "spell_level": 52,
     "max_level": 58,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 13020,
@@ -2318,6 +2416,7 @@
     "base_level": 60,
     "spell_level": 60,
     "max_level": 60,
+    "start_recovery_ms": 1500,
     "components": [
      {
       "spell_id": 13021,
@@ -2337,6 +2436,7 @@
  "notes": [
   "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
   "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
-  "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond"
+  "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
+  "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)"
  ]
 }

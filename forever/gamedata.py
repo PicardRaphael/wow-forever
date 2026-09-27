@@ -202,8 +202,8 @@ def _rules(raw: Any) -> CombatRules:
     cr = r.obj(raw, "combat_rules", "combat_rules")
     miss = r.obj(cr, "spell_miss_by_level_diff", "combat_rules.spell_miss_by_level_diff")
     levels = [k for k in miss if k != "-"]
-    if "-" not in miss or not levels or not all(k.lstrip("-").isdigit() for k in levels):
-        raise r.fail("combat_rules.spell_miss_by_level_diff", "table avec la clé « - » et des écarts entiers")
+    if "-" not in miss or "0" not in miss or not all(k.lstrip("-").isdigit() for k in levels):
+        raise r.fail("combat_rules.spell_miss_by_level_diff", "table avec les clés « - », « 0 » et des écarts entiers")
     return CombatRules(
         gcd_s=r.num(cr, "gcd", "combat_rules.gcd"),
         spell_miss_by_level_diff={k: r.num(miss, k, f"combat_rules.spell_miss_by_level_diff.{k}") for k in miss},
@@ -317,6 +317,7 @@ def _scaling(raw: Any, spells: Mapping[str, Spell]) -> dict[str, tuple[RankScali
                     base_level=r.int_(entry, "base_level", w),
                     spell_level=r.int_(entry, "spell_level", w),
                     max_level=r.int_(entry, "max_level", w),
+                    start_recovery_ms=r.int_(entry, "start_recovery_ms", w),
                     components=tuple(components),
                 )
             )
@@ -422,6 +423,7 @@ def _constants(raw: Any) -> Constants:
         talent_rank_mana_ratio=r.num(talent_mana, "ratio_of_next_rank", "mana.talent_rank_cost"),
         talent_rank_mana_default=r.num(talent_mana, "default", "mana.talent_rank_cost"),
         default_range_yd=num("spell.default_range_yd"),
+        miss_per_level_below=num("hit.miss_per_level_below"),
     )
 
 

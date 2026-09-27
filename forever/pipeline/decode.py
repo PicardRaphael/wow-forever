@@ -513,7 +513,8 @@ def _components(client: _Client, spell: int, rules: Mapping[str, Any]) -> list[d
 
 def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `spell_scaling.json` : pour chaque rang des sorts suivis, niveaux (`MaxLevel` 0 résolu au plafond
-    de `decode_rules.json`) et effets de dégâts (points de base, points par niveau, variance, nombre de ticks), pour
+    de `decode_rules.json`), recharge globale déclenchée (`SpellCooldowns.StartRecoveryTime`, 0 sans ligne) et effets
+    de dégâts (points de base, points par niveau, variance, nombre de ticks), pour
     calculer les dégâts au niveau du personnage (moteur : `rank_values_at_level`)."""
     client = _Client(tables, rules)
     spells = decode_spells(tables, rules, {"rank_format": rules["rank_format"], "spells": {}}, version)["spells"]
@@ -530,6 +531,7 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
                     "base_level": base,
                     "spell_level": int(level["SpellLevel"]),
                     "max_level": top,
+                    "start_recovery_ms": int(cd["StartRecoveryTime"]) if (cd := client.cooldowns.get(spell_id)) else 0,
                     "components": _components(client, spell_id, rules),
                 }
             )
@@ -537,13 +539,15 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
     return {
         "schema_version": 1,
         "build": version,
-        "source": f"Client {version} : tables SpellEffect, SpellLevels, SpellMisc (wago.tools) décodées par forever decode",
+        "source": f"Client {version} : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns (wago.tools) décodées "
+        "par forever decode",
         "level_cap": int(rules["levels"]["level_cap"]),
         "spells": out,
         "notes": [
             "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
             "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
             "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
+            "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)",
         ],
     }
 

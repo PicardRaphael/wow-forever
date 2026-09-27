@@ -160,11 +160,15 @@ def gcd_intervals(
 ) -> list[float]:
     """Intervalles (s) entre deux sorts instantanés réussis consécutifs du lanceur, dans l'ordre chronologique ; un
     intervalle plus long que `max_gap_s` (paramètre de mesure) n'est pas un enchaînement et n'est pas retenu.
+    Avec `gcd_spells`, les deux sorts doivent en faire partie (sorts qui déclenchent la recharge globale) : un sort
+    hors de l'ensemble (baguette, sort hors recharge globale) rompt l'enchaînement.
 
     Sert de preuve de journal à l'entrée B1 du registre."""
     casts = _casts(events, caster)
     out = []
     for prev, cur in pairwise(casts):
+        if gcd_spells is not None and (prev.spell not in gcd_spells or cur.spell not in gcd_spells):
+            continue
         if prev.started is None and cur.started is None:
             gap = (cur.event.time - prev.event.time).total_seconds()
             if gap <= max_gap_s:
@@ -201,28 +205,39 @@ def hit_tally(
     known_spells: frozenset[int] | None = None,
 ) -> HitTally:
     """Touchés et ratés des sorts directs du lanceur sur des créatures, par (école, niveau de la cible - niveau du
-    lanceur). Sans niveau du lanceur (ForeverLoggerDB), rien n'est compté.
+    lanceur à l'instant du sort). Niveau : chronologie (`CasterLevels`) ou niveau fixe ; sans niveau, rien n'est
+    compté. Avec `known_spells`, seuls ces sorts comptent (ni baguette, ni effets déclenchés comme Chilled).
 
     Sert de preuve de journal à l'entrée A3 du registre."""
     if caster_level is None:
         return HitTally({}, ["niveau du lanceur inconnu (ForeverLoggerDB absent) : touchés et ratés non comptés"])
+    levels = CasterLevels(fixed=caster_level) if isinstance(caster_level, int) else caster_level
     evs = list(events)
-    levels: dict[str, int] = {}
+    targets: dict[str, int] = {}
     for e in evs:  # d'abord les niveaux : un raté n'a pas de bloc avancé, la cible peut n'être décrite qu'après
         if e.advanced is not None:
-            levels.setdefault(e.advanced.guid, e.advanced.level)
+            targets.setdefault(e.advanced.guid, e.advanced.level)
     counts: dict[tuple[str, int], HitCount] = {}
-    unknown = 0
+    unknown = no_level = excluded = 0
+    sources: dict[str, int] = {}
     for e in evs:
         if e.source is None or e.source.guid != caster or e.dest is None or e.dest.kind != "Creature":
             continue
         if e.spell is None or e.name not in DIRECT_DAMAGE | DIRECT_MISSED:
             continue
-        target = levels.get(e.dest.guid)
+        if known_spells is not None and e.spell[0] not in known_spells:
+            excluded += 1
+            continue
+        target = targets.get(e.dest.guid)
         if target is None:
             unknown += 1
             continue
-        key = (school_name(e.spell[2]), target - caster_level)
+        own = levels.level_at(e.time)
+        if own is None:
+            no_level += 1
+            continue
+        sources[own[1]] = sources.get(own[1], 0) + 1
+        key = (school_name(e.spell[2]), target - own[0])
         count = counts.setdefault(key, {"hits": 0, "misses": 0, "by_type": {}})
         if e.name in DIRECT_DAMAGE:
             count["hits"] += 1
@@ -232,6 +247,12 @@ def hit_tally(
             if miss_type in HIT_TABLE_MISSES:
                 count["misses"] += 1
     notes = [f"{unknown} sort(s) sur une cible de niveau inconnu non compté(s)"] if unknown else []
+    if no_level:
+        notes.append(f"{no_level} sort(s) avant tout niveau connu : niveau du lanceur inconnu, non compté(s)")
+    if excluded:
+        notes.append(f"{excluded} sort(s) absent(s) des données (baguette, effets déclenchés) exclu(s)")
+    if sources and isinstance(caster_level, CasterLevels):
+        notes.append("niveau du lanceur : " + ", ".join(f"{src} ({n} sort(s))" for src, n in sorted(sources.items())))
     return HitTally(counts, notes)
 
 
@@ -242,7 +263,9 @@ class LogSpellSets(NamedTuple):
 
 def log_spell_sets(gd: GameData) -> LogSpellSets:
     """Sorts du lanceur retenus par les mesures, tirés des données de la version (aucun identifiant en dur)."""
-    raise NotImplementedError
+    ranks = [r for ranks in gd.scaling.values() for r in ranks]
+    known = {r.spell_id for r in ranks} | {c.spell_id for r in ranks for c in r.components}
+    return LogSpellSets(frozenset(r.spell_id for r in ranks if r.start_recovery_ms > 0), frozenset(known))
 
 
 class GcdIntervals(TypedDict):
@@ -266,6 +289,7 @@ class LogMeasures(TypedDict):
     crits: list[dict[str, int | float]]
     hit_tally: list[dict[str, object]]
     caster_level: int | None
+    caster_level_changes: list[dict[str, object]]
     player_level_field: list[int]
     assumptions: list[str]
 
@@ -286,9 +310,20 @@ def measure_log(
     if caster is None:
         notes.append("aucun joueur « à moi » dans le journal : mesures du lanceur vides")
     guid = caster or ""
-    intervals = gcd_intervals(events, guid, max_gap_s=max_gap_s)
-    tally = hit_tally(events, guid, caster_level)
+    intervals = gcd_intervals(events, guid, max_gap_s=max_gap_s, gcd_spells=spells.gcd if spells else None)
+    tally = hit_tally(events, guid, caster_level, known_spells=spells.known if spells else None)
     monsters, conflicts = monster_hp(events, log=name)
+    levels = CasterLevels(fixed=caster_level) if isinstance(caster_level, int) else caster_level
+    start = levels.level_at(events[0].time) if levels and events else None
+    changes: list[dict[str, object]] = []
+    if levels and events:
+        previous = start
+        moments = sorted({t for tl in levels.timelines for t, _ in tl.points if events[0].time < t <= events[-1].time})
+        for t in moments:
+            now = levels.level_at(t)
+            if now is not None and now != previous:
+                changes.append({"time": t.isoformat(), "level": now[0], "source": now[1]})
+            previous = now
     return {
         "name": name,
         "header": header._asdict(),
@@ -309,7 +344,8 @@ def measure_log(
         "hit_tally": [
             {"school": school, "level_diff": diff, **count} for (school, diff), count in sorted(tally.counts.items())
         ],
-        "caster_level": caster_level,
+        "caster_level": start[0] if start else None,
+        "caster_level_changes": changes,
         "player_level_field": sorted(
             {e.advanced.level for e in events if e.advanced is not None and caster and e.advanced.guid == caster}
         ),

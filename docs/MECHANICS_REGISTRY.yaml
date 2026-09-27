@@ -38,13 +38,15 @@ mechanics:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/leveling.json (combat_rules)"
+      - "forever/data/1.60.1.70009/mechanics.json (hit.miss_per_level_below, T04b)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_hit_by_level_diff
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
+      - tests/unit/test_measure_second_log.py::test_hit_tally_with_the_questie_journey
     tolerance: null
-    formule: "toucher = 1 − max(raté_min, raté_table[écart de niveau] − talents de toucher d'école − toucher_équipement)"
-    note: "règle Classic supposée inchangée dans Forever, non observée (voir OPEN_QUESTIONS) ; T04a : touchés et ratés comptés par hit_tally (forever/pipeline/measure.py) dès que ForeverLoggerDB donne le niveau du lanceur ; aucun raté dans le journal du 2026-09-27"
+    formule: "raté = raté_table[écart] si écart ≥ 0 (dernière ligne au-delà) ; raté_table[0] + écart × raté_par_niveau_sous si écart < 0 ; toucher = 1 − max(raté_min, raté − talents de toucher d'école − toucher_équipement)"
+    note: "règle Classic supposée inchangée dans Forever (voir OPEN_QUESTIONS) ; T04b (décision 4) : cible plus basse selon la règle Classic (raté à écart 0 moins 1 % par niveau, plancher 1 %), la ligne « - » de leveling.json n'est plus lue ; journal du 2026-09-27 (seconde fixture, niveau du lanceur par le carnet de Questie) : 0 raté de table sur 281 sorts directs, cibles 2 à 8 niveaux plus bas — très improbable avec 4 % (0,96^281 ≈ 1e-5), plausible au plancher ; talents de toucher du Mage inconnus ; écarts 0 à +3 encore à mesurer (aucune cible de niveau égal ou supérieur)"
   - id: A4
     categorie: attaque
     description: "Toucher unifié Forever (sources, plafond, poisons et pièges)"
@@ -264,16 +266,22 @@ mechanics:
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_improved_frostbolt_gcd_floor
+      - tests/unit/test_measure_second_log.py::test_b1_proof_matches_the_registry
     tolerance:
-      n_min: 50  # effectif minimal d'une preuve de journal (protocole de collecte, docs/ADDON.md)
+      n_min: 50  # effectif minimal des preuves cumulées d'une mesure (protocole de collecte, docs/ADDON.md)
+      ecart_s: 0.05  # écart admis entre la médiane (et le minimum) des intervalles et la recharge globale des données (décision 2 du plan T04b)
     formule: "incantation effective = max(recharge_globale, incantation)"
     preuves:
-      - journal: tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt
+      - journal:
+          - tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt
+          - tests/fixtures/combatlog/WoWCombatLog-092726_150346.anon.txt.gz
         date: "2026-09-27"
-        mesure: "intervalles entre sorts instantanés enchaînés du Mage (forever logs measure) : minimum compatible avec la recharge globale de leveling.json ; un « Not yet recovered » juste après un lancer"
-        n: 3
-        test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants
-    note: "règle Classic supposée inchangée dans Forever, non observée (voir OPEN_QUESTIONS)"
+        mesure: "intervalles entre deux instantanés consécutifs du Mage qui déclenchent la recharge globale (start_recovery_ms > 0), fenêtre 3 s (forever logs measure) : médiane 1,511 s, minimum 1,414 s"
+        n: 50
+        ecart_median_s: 0.011
+        ecart_min_s: 0.086
+        test: tests/unit/test_measure_second_log.py::test_b1_proof_matches_the_registry
+    note: "règle Classic supposée inchangée dans Forever (voir OPEN_QUESTIONS) ; T04b : 50 intervalles sur deux journaux, médiane à 0,011 s de la recharge globale, mais 3 intervalles sous 1,45 s (1,414, 1,418, 1,424 s) : le critère de l'utilisateur (aucun intervalle sous recharge − 0,05 s) n'est pas atteint, B1 reste teste (gigue d'horodatage ou file d'attente des sorts ?)"
   - id: B2
     categorie: temps
     description: "Hâte et arrondis (10 points de notation par 1 %)"

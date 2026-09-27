@@ -121,7 +121,7 @@
       ]
     },
     "spell_scaling.json": {
-      "source": "Client Forever 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools, extraits tests/fixtures/wago/1.60.1.70009) décodées par forever decode le 2026-09-27",
+      "source": "Client Forever 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools, extraits tests/fixtures/wago/1.60.1.70009) décodées par forever decode le 2026-09-27 ; SpellCooldowns (start_recovery_ms) ajoutée le 2026-09-27 (T04b)",
       "certainty": "certain",
       "notes": [
         "points de base, points par niveau et variance par effet de dégâts ; MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
