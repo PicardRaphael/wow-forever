@@ -56,6 +56,25 @@ def test_usage_error_exit_2(capsys, make_deps):
     assert run(capsys, ["inconnu"], make_deps())[0] == 2
 
 
+def test_usage_error_text_keeps_usage_line(capsys, make_deps):
+    code, out, err = run(capsys, ["lookup"], make_deps())
+    assert code == 2
+    assert out == ""
+    assert err.startswith("usage: forever lookup")
+    assert "Erreur (usage)" in err
+    assert "forever lookup --help" in err
+    assert err.rstrip("\n").splitlines()[-1].startswith("Provenance")
+
+
+def test_usage_error_json(capsys, make_deps):
+    code, out, _ = run(capsys, ["lookup", "--json"], make_deps())
+    assert code == 2
+    data = json.loads(out)
+    assert data["error"]["code"] == "usage"
+    assert "kind" in data["error"]["message"]
+    assert data["provenance"]["game_version"] == LOCAL_VERSION
+
+
 def test_unknown_spell_exit_4(capsys, make_deps):
     code, _, err = run(capsys, ["lookup", "spell", "frostbollt"], make_deps())
     assert code == 4

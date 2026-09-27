@@ -1,7 +1,10 @@
 """Contrat des sorties (critère 5) : chaque commande, succès et erreurs, porte une provenance complète.
 
 En texte, la dernière ligne (stdout pour un résultat ou un rapport, stderr pour une erreur) contient les 7 champs.
-En --json, l'objet renvoyé contient un bloc `provenance` valide."""
+En --json, l'objet renvoyé contient un bloc `provenance` valide.
+Les erreurs d'usage d'argparse (code 2) sont couvertes comme les autres erreurs.
+Exclusions : `--help` (aide d'argparse, code 0, ce n'est pas un résultat d'outil) et `forever mcp`
+(serveur stdio, couvert par tests/integration/)."""
 
 import json
 
@@ -32,6 +35,11 @@ CASES = {
     "status-corrupt-manifest": (["status"], 3, "corrupt-manifest"),
     "lookup-corrupt-manifest": (["lookup", "spell", "frostbolt"], 3, "corrupt-manifest"),
     "manifest-check-corrupt-manifest": (["manifest", "--check"], 3, "corrupt-manifest"),
+    "usage-no-command": ([], 2, None),
+    "usage-unknown-command": (["inconnu"], 2, None),
+    "usage-lookup-missing-args": (["lookup"], 2, None),
+    "usage-lookup-bad-rank": (["lookup", "spell", "frostbolt", "--rank", "deux"], 2, None),
+    "usage-manifest-no-mode": (["manifest"], 2, None),
 }
 
 
@@ -69,3 +77,9 @@ def test_json_output_has_valid_provenance(case, capsys, make_deps, data_copy):
     assert validate_provenance(data["provenance"]) == []
     if code != 0 and not case.startswith("status"):  # status en échec reste un rapport complet
         assert {"code", "message", "action"} <= set(data["error"])
+
+
+def test_help_is_excluded(capsys, make_deps):
+    """Exclusion documentée : l'aide d'argparse sort avec le code 0, sans ligne provenance."""
+    assert main(["--help"], make_deps()) == 0
+    assert "Provenance" not in capsys.readouterr().out
