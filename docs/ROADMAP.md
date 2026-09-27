@@ -3,6 +3,10 @@
 Chaque tranche traverse toutes les couches (données → moteur → outil → test) et se termine par un résultat utilisable.
 Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `uv run tasks.py verify` est vert.
 
+L'ordre de la table est l'ordre d'exécution. Il suit les priorités du joueur (PvP en champs de bataille, donjons et leveling d'abord, raid ensuite) et les dépendances (mémoire joueur T07 pour tout suivi de progression, API Blizzard après le lancement). Une tranche gardée par un événement extérieur (condition écrite dans sa colonne « Dépend de ») est sautée tant que la condition n'est pas remplie, puis reprise à la première fin de tranche qui suit : elle ne bloque pas les suivantes.
+
+Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : PV (PvP), DJ (donjons), LG (Legacy), MT (métiers), RP (réputations), EC (économie). Les sources de chaque domaine sont résumées dans `docs/SPEC.md` (section « Domaines et sources ») et détaillées dans chaque section ci-dessous.
+
 | Tranche | But | Dépend de |
 | --- | --- | --- |
 | T01 | Squelette de bout en bout : `forever status` + consultation d'un sort, CLI + MCP + provenance + CI | — |
@@ -12,11 +16,19 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
 | T04b | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T04a |
 | T04c | Quêtes propres à Forever et modèle d'XP, cumul d'Ignite, escalade d'Arcane Blast | T04b |
 | T05 | Optimiseur de talents et conseiller de respec | T04b, T04c |
-| FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
+| PV1 | PvP, savoir des 9 classes sans moteur de classe : sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants (règles Classic), fiches par affrontement | T03, T05 |
+| PV2 | PvP, champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux de champs de bataille | PV1, T04a |
+| DJ1 | Donjons : niveaux, boss, butin | T03, T04a |
+| LG1 | Legacy : défis, points, arbres de bonus, conseil des bonus par personnage (Mage, Paladin, Démoniste) | T03, T04b |
+| FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, fiches PvP fixes, données précalculées par forever | T04b, T05, PV1 |
 | T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
 | P06 | Évaluation d'un pont de conversation existant (wow-claude / wow-ai) pointé sur ce dépôt | T06 |
 | T07 | Mémoire joueur : fiches du vault, import de l'addon (+ ForeverAssist V2 proposée) | T06 |
+| LG2 | Suivi de ma progression Legacy (et, par le même import, honneur et rang PvP) | LG1, T07 |
+| MT1 | Métiers : recettes, montée de compétence, points Legacy des métiers | T03, LG1, T07 |
+| RP1 | Réputations : factions, paliers, gains, récompenses, suivi | T03, T07 |
 | T08 | Veille : workflow planifié, PR de données, note d'impact par personnage | T03, T07 |
+| EC1 | Économie : prix de l'hôtel des ventes par l'API Blizzard | T03, MT1 ; condition : lancement du 4 novembre passé et couverture de Forever par l'API vérifiée |
 | FA3 | ForeverAssist V3 : compagnon de bureau, analyse des journaux après le combat | T08 |
 | T09 | Raid : moteur analytique porté, Monte Carlo, parité avec wowsims Forever | T02 |
 | T10 | Équipement : base d'objets par formules du client, optimiseur | T09 |
@@ -68,23 +80,75 @@ Une tranche = 1 à 3 sessions Claude Code. Ne commence la suivante que lorsque `
     - Le graphique est un fichier PNG déterministe à graine fixe (deux générations identiques octet pour octet).
 
 ## T04c — Quêtes Forever, XP, Ignite, Arcane Blast
-- **À faire** : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; cumul et rafraîchissement d'Ignite (A18) ; escalade d'Arcane Blast (B11) ; durée d'infobulle dans `tooltip_values`.
+- **À faire** : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; cumul et rafraîchissement d'Ignite (A18) ; escalade d'Arcane Blast (B11) ; durée d'infobulle dans `tooltip_values`. Routes de leveling (enchaînement des zones et des quêtes) : pas encore prévues, à cadrer au plan de T04c (dans T04c ou dans une tranche à part). Les quêtes de donjon restent ici ; DJ1 s'y réfère.
 - **Critères de fin** : à fixer au plan de T04c.
 
 ## T05 — Talents et respec
 - **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre.
 - **Critères de fin** : `forever optimize talents --from 10 --to 30` produit un ordre légal à chaque niveau ; le barème de respec est paramétrable ; tests de légalité et de non-régression.
 
+## PV1 — PvP : savoir des 9 classes (priorité haute)
+Les champs de bataille arrivent bientôt (date à confirmer par annonce officielle, `docs/OPEN_QUESTIONS.md`). T05 garde le profil PvP comparatif du Mage porté du seed (`pvp_et_respec`) ; PV1 élargit le savoir aux 9 classes et comble les limites de ce profil listées dans `seed/forever-mage/references/pvp-model.md` (ni rendements décroissants, ni bijou PvP). PV1 n'attend pas les moteurs par classe de T12 : il ne calcule aucun dégât hors Mage, il consulte et croise des données fixes.
+- **Fait** :
+    - Décodage étendu (dépendance T03, pas T12) : `decode_rules.json` couvre les lignes de compétence et les arbres de talents des 9 classes, en plus du Mage ; sorts de classe et de talent avec rangs, recharge, recharge globale, durée, portée, école, type d'aura et mécanique de contrôle ; raciaux des races jouables ; bijoux PvP (sort d'utilisation et recharge lus dans les tables d'objets, lecture ciblée, la base d'objets complète reste en T10).
+    - Espace de données par classe sans moteur : `GameData` expose les sorts, talents et raciaux des 9 classes ; T12 y branchera les moteurs de classe sans changer ce schéma.
+    - Classement de chaque sort : contrôle (catégorie de rendement décroissant, durée pleine, ruptures connues), défensif ou immunité, rupture de contrôle, interruption, dissipation, mobilité. Le classement vient des champs du client ; un sort que les données ne permettent pas de classer est listé comme non résolu, jamais deviné.
+    - Rendements décroissants : règles Classic (catégories, fenêtre, paliers) dans un fichier de `forever/data/<version>/`, certitude `suppose`, entrées du registre (nouvelle catégorie à fixer au plan) ; fonction pure dans `forever/engine/` qui donne la durée effective d'une suite de contrôles. Aucun chiffre de ces règles hors des données.
+    - Fiches par affrontement, générées depuis les données (jamais recopiées d'un guide) : contrôles subis et leur catégorie, défensifs et immunités adverses avec leur recharge, ruptures et interruptions adverses, mes réponses (sorts de rupture, bijou, raciaux, dissipations), fenêtres à surveiller. Conseils communautaires éventuels : faits sourcés, `suppose`, avec le lien.
+    - Profil PvP du Mage (T05) : ajout des rendements décroissants et du bijou PvP, résultat toujours comparatif, jamais un duel simulé.
+    - `forever pvp class <classe>`, `forever pvp matchup <ma classe> <classe adverse>`, outil MCP `forever_pvp` (paginé, compact) ; provenance et certitude par champ.
+- **Sources** : client (tables des sorts, talents, raciaux, objets ; `certain` ou `probable`) ; annonces officielles (changements PvP de Forever, règles des contrôles) ; communauté (Wowhead Forever, guides PvP : faits sourcés, `suppose`) ; journaux (rien en PV1, mesures en PV2) ; addon (affichage de fiches fixes par FA1).
+- **Addon** : le suivi en direct des temps de recharge adverses est impossible sur Forever (abonnement au journal de combat refusé aux addons, valeurs de combat secrètes : `docs/research/addon-forever.md`). En jeu, seules des informations fixes s'affichent : la fiche de la classe adverse, jamais un état (recharge en cours, bijou utilisé). Affichage par FA1.
+- **Hors périmètre** : dégâts et soins des autres classes (T12) ; simulation de duel ; résistances des joueurs ; mesures sur journaux (PV2) ; toute détection d'événement de combat dans un addon.
+- **Critères de fin** :
+    - `forever decode` sur des fixtures wago étendues produit, pour chacune des 9 classes, ses sorts et talents avec recharge, durée et école ; `verify` vert ; les sorts non classés sont listés dans le rapport.
+    - `forever pvp matchup` rend une fiche déterministe pour deux paires de classes fixées en test, avec provenance complète et certitude par champ.
+    - La fonction de rendement décroissant reproduit, sur des suites de contrôles de test, les durées attendues par les règles des données (valeurs lues dans les données, pas dans le test).
+    - Le profil PvP du Mage change quand on active les rendements décroissants ou le bijou (test de non-régression du mode sans).
+
+## PV2 — PvP : champs de bataille et monde ouvert
+- **Fait** :
+    - Champs de bataille : liste, niveaux d'accès, objectifs et conditions de victoire, récompenses (monnaie ou honneur, rang, marques : système de Forever à confirmer), temps de partie observés.
+    - Équipement PvP : objets, exigences (rang, réputation, niveau), coûts ; statistiques lues dans le client quand elles y sont ; la comparaison chiffrée et l'optimisation restent en T10.
+    - PvP en monde ouvert : type de royaume et règles, zones contestées, objectifs mondiaux et leurs récompenses, selon les annonces.
+    - Rendements décroissants mesurés dans mes journaux de champs de bataille : `forever logs pvp` relève les contrôles appliqués aux joueurs (aura posée puis retirée), leur rang dans la suite d'une même catégorie et leur durée observée ; les ruptures (dégâts, dissipation, bijou, mort) sont écartées quand le journal les montre. Les entrées du registre passent en `valide-journal` quand `n` atteint `tolerance.n_min`.
+    - Fixtures : journal de champ de bataille anonymisé (noms des autres joueurs remplacés, décision 49), compressé.
+    - `forever bg info <champ>`, `forever pvp gear`, `forever pvp world` ; outil MCP `forever_pvp` étendu.
+- **Sources** : client (cartes et listes de champs de bataille, objets PvP, tables de monnaie : noms de tables à identifier à l'inventaire) ; annonces officielles (dates, liste, système de récompenses, règles du monde ouvert) ; communauté (vendeurs et coûts, faits de stratégie sourcés, `suppose`) ; journaux (mes parties : contrôles, recharges adverses observées après coup, durées) ; addon (résultat de partie et honneur relevés hors combat, API à sonder sous `pcall`).
+- **Hors périmètre** : suivi de ma progression PvP (repris par LG2, même import après T07) ; suivi des recharges adverses en direct (impossible) ; classement ou matchmaking.
+- **Critères de fin** :
+    - `forever logs pvp` sur la fixture renvoie les contrôles par catégorie et rang, avec durée observée, écart à la règle des données et provenance, code 0, sans réseau.
+    - Au moins une entrée de rendement décroissant porte une preuve de journal contrôlée par le registre, ou la tranche documente le manque de données.
+    - `forever bg info` et `forever pvp gear` rendent des données avec source et certitude par champ ; toute information non annoncée est absente, pas devinée.
+
+## DJ1 — Donjons
+- **Fait** : liste des donjons de Forever avec plages de niveau (accès, recommandé) ; boss et leur niveau ; butin par boss (objets, emplacement, exigence de classe) avec taux quand une source existe ; donjons nouveaux ou modifiés dans Forever ; lien vers les quêtes de donjon de T04c ; `forever dungeon list --level N`, `forever dungeon info <donjon>`, outil MCP `forever_dungeons` ; fichier de données par version avec certitude par champ.
+- **Sources** : client (instances, niveaux, objets ; tables de journal de rencontre et de butin à identifier à l'inventaire, sans présumer de leur présence ; les taux de butin sont absents du client, `docs/DATA_SOURCES.md`) ; annonces officielles (donjons nouveaux ou modifiés, niveaux) ; communauté (Wowhead Forever pour le butin et les taux, `suppose` ; ForeverDungeonJournal en recoupement, non ingéré tant que sa licence n'est pas vérifiée) ; journaux (niveau et PV des boss et des monstres par le bloc avancé, registre H1, durée des passages) ; addon (butin observé relevé hors combat par ForeverLogger, API à sonder sous `pcall`).
+- **Hors périmètre** : stratégies de boss détaillées recopiées d'un guide ; valeur chiffrée d'un objet pour un personnage (T10) ; raids (T09 à T11).
+- **Critères de fin** :
+    - `forever dungeon list --level N` et `forever dungeon info` sur les données de test rendent niveaux, boss et butin avec provenance ; un taux absent est affiché comme inconnu.
+    - Le niveau d'un boss mesuré dans une fixture de journal l'emporte sur la valeur communautaire et passe `certain`.
+
+## LG1 — Legacy : catalogue et conseil par personnage
+Placé avant T07 parce que les bonus Legacy pèsent sur le leveling : le catalogue et le conseil n'ont pas besoin de la mémoire joueur (état Legacy saisi en paramètre). Le suivi vient en LG2.
+- **Fait** : catalogue des défis (conditions, points rapportés), des points et des arbres de bonus (nœuds, coûts, prérequis, effets, réinitialisation) ; effets chiffrés dans les données quand le client ou une annonce les donne, sinon marqués inconnus ; conseil des bonus par personnage : Mage chiffré par le moteur (effet sur le temps par monstre et l'XP par heure du simulateur de leveling), Paladin et Démoniste sans moteur de classe (T12) par un classement fondé sur les effets et l'objectif du joueur, marqué `suppose` et recalculé après T12 ; registre G5 mis à jour ; `forever legacy catalog`, `forever legacy advise --class <classe> [--state F] [--goal leveling|pvp|raid]`, outil MCP `forever_legacy`.
+- **Sources** : client (tables des arbres et des défis à identifier à l'inventaire) ; annonces officielles (système Legacy, état en bêta et au lancement) ; communauté (Icy Veins et Wowhead Forever, noms d'arbres divergents à recouper, `suppose`) ; journaux (validation d'un bonus mesurable, par exemple un gain d'XP) ; addon (lecture de la progression : LG2).
+- **Hors périmètre** : suivi de ma progression (LG2) ; points Legacy des métiers (MT1, qui s'appuie sur ce catalogue).
+- **Critères de fin** :
+    - Le catalogue passe `verify` (prérequis cohérents, coûts présents ou marqués inconnus, source par entrée).
+    - `forever legacy advise` rend un ordre déterministe pour les trois classes, avec justification et certitude ; pour le Mage, le gain vient d'un appel au simulateur de leveling (aucun calcul dans l'outil).
+
 ## FA1 — ForeverAssist V1 (affichage de données précalculées)
 Addon d'affichage seul (règles et canaux : `docs/ADDON.md`). Aucun calcul de combat dans l'addon : `forever` précalcule, l'addon affiche.
-- **Fait** : `forever export-addon` génère `addon/ForeverAssist/Data/Generated.lua` (schéma versionné, build, date de génération, écriture atomique) à partir des calculs de forever pour un personnage : **talent suivant proposé à chaque gain de niveau** (ordre de talents de l'optimiseur T05) et **comparaison de l'équipement dans l'infobulle des objets** (valeur des statistiques au niveau du personnage, calculée par le moteur ; l'addon affiche l'écart avec l'objet porté) ; table des monstres de la zone (PV mesurés, source). Affichage hors combat (`PLAYER_LEVEL_UP`, `TooltipDataProcessor`, `pcall`, `issecretvalue`), panneau `/fa`, avertissement si la build du client diffère de celle des données.
+- **Fait** : `forever export-addon` génère `addon/ForeverAssist/Data/Generated.lua` (schéma versionné, build, date de génération, écriture atomique) à partir des calculs de forever pour un personnage : **talent suivant proposé à chaque gain de niveau** (ordre de talents de l'optimiseur T05) et **comparaison de l'équipement dans l'infobulle des objets** (valeur des statistiques au niveau du personnage, calculée par le moteur ; l'addon affiche l'écart avec l'objet porté) ; table des monstres de la zone (PV mesurés, source) ; **fiche PvP fixe de la classe adverse** (données de PV1 : contrôles et catégories, défensifs, ruptures et leurs recharges nominales), sans aucun état en direct : le suivi des recharges adverses est impossible dans un addon sur Forever. Affichage hors combat (`PLAYER_LEVEL_UP`, `TooltipDataProcessor`, `pcall`, `issecretvalue`), panneau `/fa`, avertissement si la build du client diffère de celle des données.
 - **Hors périmètre** : conseil en combat, conversation, écriture de SavedVariables (V2), analyse des journaux (V3).
 - **Critères de fin** :
     - Le fichier généré est déterministe et validé par un schéma (pytest) ; `Generated.sample.lua` versionné, `Generated.lua` ignoré par git.
-    - Au gain de niveau, l'addon affiche le talent prévu pour ce niveau par les données ; l'infobulle d'un objet affiche l'écart avec l'objet porté (test hors jeu sur bouchons de l'API).
+    - Au gain de niveau, l'addon affiche le talent prévu pour ce niveau par les données ; l'infobulle d'un objet affiche l'écart avec l'objet porté ; la fiche PvP d'une classe adverse s'affiche hors combat, sans aucun abonnement à un événement de combat (tests hors jeu sur bouchons de l'API).
     - `test_addon_rules.py` étendu à ForeverAssist ; procédure de test en jeu dans `docs/ADDON.md`.
 
 ## T06 — Plugin Claude Code
+- **Fait** : skills des domaines disponibles à ce stade (leveling, Mage, PvP, donjons, Legacy), les suivants au fil des tranches (métiers, réputations, économie).
 - **Critères de fin** : installation locale du plugin ; SessionStart injecte une seule ligne de fraîcheur ; la statusline affiche version et statut ; jeu d'évaluation d'aiguillage de 30 requêtes (60 % doivent déclencher un skill, 40 % non) avec au moins 90 % de bonnes décisions.
 
 ## P06 — Évaluation d'un pont de conversation (après T06)
@@ -95,10 +159,36 @@ Addon d'affichage seul (règles et canaux : `docs/ADDON.md`). Aucun calcul de co
 ## T07 — Mémoire joueur
 - **Critères de fin** : import d'un export d'addon d'exemple ; fiche écrite dans le vault avec la version du jeu ; une fiche plus ancienne que la version courante est signalée.
 
+## LG2 — Suivi de ma progression Legacy
+- **Fait** : lecture de la progression Legacy du compte (défis faits, points gagnés et dépensés, nœuds pris) par l'addon hors combat (ForeverLogger ou ForeverAssist V2, API à sonder sous `pcall`), import par la voie de T07 dans `legacy.json` du vault (avec la version du jeu) ; `forever legacy status` : points disponibles, prochains défis accessibles par personnage, conseil de LG1 recalculé sur l'état réel ; par le même import, honneur et rang PvP (PV2) dans la fiche du personnage.
+- **Sources** : addon (source principale) ; client et catalogue de LG1 ; annonces officielles (changements du système) ; communauté (recoupement) ; journaux (rien).
+- **Hors périmètre** : écriture en jeu ; note d'impact Legacy par version (T08).
+- **Critères de fin** : import d'une SavedVariable d'exemple (fixture) ; `legacy.json` régénéré de façon déterministe ; une progression plus ancienne que la version courante est signalée ; `forever legacy status` avec provenance.
+
+## MT1 — Métiers
+- **Fait** : recettes par métier (composants, objet créé, niveau requis, seuils de couleur de difficulté) ; sources des recettes (entraîneur, vendeur, butin, quête) ; changements de Forever (recettes retirées ou ajoutées, bonus de métier) ; plan de montée de compétence `forever profession plan <métier> --from A --to B` qui minimise le nombre de fabrications (puis le coût quand EC1 fournit les prix) ; points Legacy des métiers par palier, depuis le catalogue de LG1 ; niveaux actuels lus dans la fiche du vault (T07) sinon saisis ; registre G6 mis à jour ; outil MCP `forever_professions`.
+- **Sources** : client (lignes de compétence et recettes, composants, objets créés, seuils de couleur ; certain) ; annonces officielles (changements de métiers, points Legacy) ; communauté (listes d'entraîneurs et sources de recettes, absentes du client ; chance de gain de point par couleur, règle Classic `suppose` ; `alcaras/forever-ref` en recoupement) ; journaux (rien : l'artisanat n'est pas un événement de combat utile) ; addon (niveaux de compétence et recettes connues, lus hors combat sous `pcall`).
+- **Hors périmètre** : prix et rentabilité (EC1) ; consommables de raid (T11).
+- **Critères de fin** : recettes décodées depuis des fixtures wago pour deux métiers ; `forever profession plan` déterministe à graine fixe, avec provenance et hypothèses (chance de gain `suppose`) ; points Legacy rattachés au catalogue de LG1 ou marqués inconnus.
+
+## RP1 — Réputations
+- **Fait** : factions de Forever (nouvelles ou modifiées), paliers, sources de réputation (quêtes, monstres, objets remis) et leurs gains, récompenses par palier (objets, recettes, accès) ; état actuel importé depuis l'addon (T07) ; `forever rep info <faction>`, `forever rep plan --faction X --to <palier>` (temps estimé à partir des gains et, pour les monstres, du temps par monstre du simulateur de leveling) ; outil MCP `forever_reputation`.
+- **Sources** : client (factions et paliers ; tables à identifier à l'inventaire) ; annonces officielles (réputations de Forever) ; communauté (gains par source, récompenses par palier, `suppose`) ; journaux (rien) ; addon (paliers et valeurs actuels, gains relevés hors combat, sous `pcall`).
+- **Hors périmètre** : valeur chiffrée des récompenses (T10).
+- **Critères de fin** : `forever rep info` avec source et certitude par champ ; `forever rep plan` déterministe sur un état d'exemple importé d'une fixture de SavedVariable.
+
 ## T08 — Veille
 - **Fait (repris de T03)** : installation d'une version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report`) ; application de `overrides.json` et de `confirmed_changes.json` ; substitution des coûts en mana relevés dans le client à l'estimation de `mechanics.json` (`mana.talent_rank_cost`) ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
 - **Durcissement du pipeline (relecture T03)** : `$d` entre dans les expressions `${…}` dans son unité d'affichage (minutes dès 60 s), aucune infobulle de talent ne l'exerce aujourd'hui ; un sort cité deux fois par une infobulle d'aura 226 compterait deux fois ses dégâts ; `SpellLevel` n'est pas lu (écart de niveau calculé depuis `BaseLevel`) ; `--locale` ignoré sans `--tables` ; un CSV réduit à son en-tête est accepté ; `verify` suppose `level` en tête de `rank_format`.
 - **Critères de fin** : `build-watch.yml` simulé en test (nouvelle version fictive → PR et note) ; alerte `silent` après 14 jours sans version.
+
+## EC1 — Économie (après le lancement du 4 novembre)
+Tranche gardée : sautée tant que le lancement n'a pas eu lieu et que la couverture de Forever par l'API Blizzard (produit, espace de noms, hôtel des ventes) n'est pas vérifiée.
+- **Fait** : client `forever/pipeline/bnet.py` (via `Deps.http_get`, clés dans `.env`, jamais lues par les tests) ; `forever prices fetch` (prix de l'hôtel des ventes de mon royaume, instantané daté) ; prix en cache hors de `forever/data/` (ce ne sont pas des données de version du jeu), âge de l'instantané dans les hypothèses ; `forever prices item <objet>` ; coût des plans de MT1 et budget des consommables (T11) ; outil MCP `forever_prices`.
+- **Arrêt obligatoire** : le plan de EC1 s'arrête pour demander l'accord de l'utilisateur avant d'ajouter un accès réseau ; une fois accordé, la commande entre dans la liste réseau de `CLAUDE.md`, de `docs/ARCHITECTURE.md` et de `tests/unit/test_network_boundary.py`.
+- **Sources** : API Blizzard (source principale, après le lancement) ; addon (base de prix d'Auctionator, installé, lue localement dans ses SavedVariables : format et fonctionnement sur Forever à vérifier ; possible repli avant le lancement) ; client (prix de vente aux marchands, tables à identifier) ; annonces officielles (ouverture et couverture de l'API) ; communauté (rien) ; journaux (rien).
+- **Hors périmètre** : achat ou vente automatisés ; historique long des prix.
+- **Critères de fin** : `forever prices fetch` testé hors ligne sur des réponses d'API en fixtures (client HTTP simulé) ; échec réseau → code 5 ; `test_network_boundary.py` à jour ; plan de MT1 chiffré en or sur les prix d'une fixture.
 
 ## ForeverAssist V2 et V3
 - **V2 (proposée avec T07, qui lit déjà les SavedVariables)** : l'addon écrit hors combat le contexte du personnage (niveau, talents `C_Traits`, équipement, zone, quêtes) dans `ForeverAssistCharDB` ; `forever ingest-sv` le lit après un `/reload`, recalcule et régénère `Generated.lua`. Hors périmètre : tout canal temps réel. Critères de fin : lecture d'une SavedVariable d'exemple, régénération déterministe, fiche du vault mise à jour.
