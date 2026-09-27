@@ -7,6 +7,10 @@ Garde : les lignes `## ` du `.toc` Camelot (version, titre, interface), l'en-tê
 `classicNpcDB.lua` (PNJ mesurés dans le journal de la fixture et leurres de rang élite ou rare), quelques entrées de
 `xpDB-classic.lua` (commentaires compris). Jamais la base complète : Questie reste lu sur le disque de l'utilisateur.
 
+Zones (T04c, `--zones`, défaut : Durotar 14, les Tarides 17, Wailing Caverns 718) : l'en-tête `questKeys` et les
+quêtes de `classicQuestDB.lua` dont `zoneOrSort` est l'une de ces zones, les lignes de `dungeons.lua` de quelques
+donjons (Wailing Caverns et deux leurres sans quête dans la fixture) et les noms de ces zones de `lookupZones.lua`.
+
 `--journey` (décision 3 du plan T04b) : extrait du carnet (`journey`) de la SavedVariable de Questie, pour le
 personnage `--guid` seulement : ses événements `Level` (horodatage, nouveau niveau), répartis comme dans le fichier
 entre ses blocs `char` (Questie peut en écrire plusieurs pour un même GUID, dont un « Unknown »), plus le premier
@@ -24,6 +28,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from forever.config import default_wow_dir
+from forever.pipeline.lua_table import parse_lua_value
 
 # Mesurés dans la première fixture (3099, 5951) ; leurres : 3111 jamais observé, 1531 rare (rang 4), 5945 élite
 # (rang 1) ; puis les 19 PNJ mesurés dans la seconde fixture (T04b, correction Questie -> Forever).
@@ -31,6 +36,11 @@ NPCS = (3099, 5951, 3111, 1531, 5945)
 NPCS_T04B = (3242, 3244, 3245, 3246, 3254, 3265, 3266, 3267, 3268, 3269, 3272, 3379, 3380, 3415, 3425, 3986, 6466)
 NPCS_T04B += (12319, 12320)
 QUESTS = (787, 788, 789)
+ZONES = (14, 17, 718)
+DUNGEONS = (718, 1581, 2437)  # Wailing Caverns ; leurres : The Deadmines, Ragefire Chasm (aucune quête extraite)
+QUEST_DB = Path("Database/Classic/classicQuestDB.lua")
+DUNGEON_DB = Path("Database/Zones/data/dungeons.lua")
+ZONE_NAMES = Path("Localization/lookups/lookupZones.lua")
 NPC_DB = Path("Database/Classic/classicNpcDB.lua")
 XP_DB = Path("Database/QuestXP/DB/xpDB-classic.lua")
 TOC = "Questie_Camelot.toc"
@@ -75,11 +85,48 @@ def journey(sv: Path, guid: str) -> str:
     return 'QuestieConfig = {\n["char"] = {\n' + "\n".join(blocks) + "\n},\n}\n"
 
 
+def quest_zone(line: str) -> int | None:
+    """`zoneOrSort` (17e champ) d'une ligne `[id] = {…},` de la base de quêtes."""
+    body = line.split(" = ", 1)[1].rstrip().rstrip(",")
+    row = parse_lua_value(body)
+    fields = row if isinstance(row, dict) else dict(enumerate(row, start=1)) if isinstance(row, list) else {}
+    zone = fields.get(17)
+    return zone if isinstance(zone, int) else None
+
+
+def extract_zones(addon: Path, out: Path, zones: tuple[int, ...]) -> None:
+    quests = (addon / QUEST_DB).read_text(encoding="utf-8")
+    keys = quests[: quests.index("QuestieDB.questData")]
+    lines = [line for line in entries(quests, tuple(range(1, 100000))) if quest_zone(line) in zones]
+    (out / QUEST_DB).parent.mkdir(parents=True, exist_ok=True)
+    (out / QUEST_DB).write_bytes(f"{keys}QuestieDB.questData = [[return {{\n{chr(10).join(lines)}\n}}]]\n".encode())
+    dungeons = (addon / DUNGEON_DB).read_text(encoding="utf-8")
+    kept = entries(dungeons, DUNGEONS)
+    (out / DUNGEON_DB).parent.mkdir(parents=True, exist_ok=True)
+    (out / DUNGEON_DB).write_bytes(("local dungeons = {\n" + "\n".join(kept) + "\n}\n").encode("utf-8"))
+    names = (addon / ZONE_NAMES).read_text(encoding="utf-8")
+    section = names[names.index("l10n.zoneLookup = {") : names.index("l10n.zoneCategoryLookup")]
+    wanted = {str(z) for z in (*zones, *DUNGEONS)}
+    found: dict[str, str] = {}
+    for m in re.finditer(r'\[(\d+)\]\s*=\s*"([^"]*)"', section):
+        if m[1] in wanted:
+            found.setdefault(m[1], m[2])
+    body = "\n".join(f'        [{k}]="{v}",' for k, v in sorted(found.items(), key=lambda kv: int(kv[0])))
+    (out / ZONE_NAMES).parent.mkdir(parents=True, exist_ok=True)
+    (out / ZONE_NAMES).write_bytes(f"l10n.zoneLookup = {{\n    [1]={{\n{body}\n    }},\n}}\n".encode())
+    print(f"quêtes : {len(lines)} ; donjons : {len(kept)} ; noms de zones : {len(found)}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Extrait une fixture minimale de Questie.")
     parser.add_argument("--addon", type=Path, default=default_wow_dir() / "Interface" / "AddOns" / "Questie")
     parser.add_argument("--journey", type=Path, help="SavedVariables/Questie.lua (extrait du carnet)")
     parser.add_argument("--guid", help="GUID du personnage dont on extrait le carnet")
+    parser.add_argument(
+        "--zones",
+        default=",".join(str(z) for z in ZONES),
+        help="zones (AreaTable) dont on extrait les quêtes (défaut : Durotar, les Tarides, Wailing Caverns)",
+    )
     args = parser.parse_args(argv)
     if args.journey:
         if not args.guid:
@@ -107,6 +154,7 @@ def main(argv: list[str] | None = None) -> int:
     head = xp[: xp.index("QuestXP.db = {")]
     lines = "\n".join(entries(xp, QUESTS))
     (out / XP_DB).write_bytes(f"{head}QuestXP.db = {{\n{lines}\n}}\n".encode())
+    extract_zones(args.addon, out, tuple(int(z) for z in args.zones.split(",")))
     print(f"Fixture écrite : {out}")
     return 0
 

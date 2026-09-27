@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import difflib
 import re
+from pathlib import Path
 from typing import Any, Literal, TypedDict, cast
 
 from forever.config import Deps
 from forever.errors import InvalidArgumentError, UnknownRankError, UnknownSpellError, UnsupportedKindError
 from forever.freshness import freshness_for_version
+from forever.pipeline.questie import ZoneAdvice
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.store import load_version
 
@@ -139,3 +141,12 @@ def lookup_spell(
         "details": details,
         "provenance": provenance,
     }
+
+
+class ZoneLookup(ZoneAdvice):
+    provenance: Provenance
+
+
+def lookup_zones(deps: Deps, level: int, *, faction: str | None = None, questie_dir: Path | None = None) -> ZoneLookup:
+    """Zones et donjons adaptés au niveau (base Questie lue sur disque), avec la provenance."""
+    raise NotImplementedError

@@ -15,7 +15,7 @@ def test_info_from_camelot_toc():
     db = read_questie(QUESTIE)
     info = db.info
     assert (info.version, info.title, info.interface) == ("11.38.0", "Forever-v27", 16001)
-    assert info.npc_count == 24 and info.quest_count is None  # T04b : + 19 PNJ de la seconde fixture
+    assert info.npc_count == 24 and info.quest_count == 138  # T04b : + 19 PNJ ; T04c : quêtes de trois zones
 
 
 def test_npcs():

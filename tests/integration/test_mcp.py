@@ -6,7 +6,7 @@ mécanique A5 : docs/MECHANICS_REGISTRY.yaml."""
 import asyncio
 
 import pytest
-from conftest import LOCAL_VERSION, FakeHttp, corrupt_manifest, tamper
+from conftest import FIXTURES, LOCAL_VERSION, FakeHttp, corrupt_manifest, tamper
 from mcp import Client
 
 from forever.manifest import compute_manifest
@@ -160,4 +160,15 @@ def test_sim_leveling_arcane_rotation(make_deps):
     r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
     assert not r.is_error and r.structured_content["options"]["ab_stacks"] == 2
     r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", {**args, "ab_stacks": 9}))
+    assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
+
+
+def test_lookup_zones(make_deps):
+    """T04c : domaine `zones` de forever_lookup (Questie lu sur disque, provenance, certitude suppose)."""
+    questie = str(FIXTURES / "questie" / "11.38.0")
+    args = {"kind": "zones", "level": 12, "faction": "horde", "questie": questie}
+    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", args))
+    assert not r.is_error and r.structured_content["zones"][0]["name"] == "The Barrens"
+    assert validate_provenance(r.structured_content["provenance"]) == []
+    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", {**args, "questie": questie + "-absent"}))
     assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"

@@ -85,6 +85,9 @@ CASES = {
         0,
         None,
     ),
+    # T04c : zone ou donjon à mon niveau
+    "lookup-zones": (["lookup", "zones", "--level", "12", "--questie", str(QUESTIE)], 0, None),
+    "lookup-zones-bad-level": (["lookup", "zones", "--level", "0", "--questie", str(QUESTIE)], 2, None),
     # T04c : rafraîchissement des mesures (simulation : aucune écriture)
     "measures-refresh": (["measures", "refresh", "--logs", str(COMBATLOG), "--dry-run"], 0, None),
     "measures-refresh-missing-logs": (["measures", "refresh", "--logs", "{tmp}/absent", "--dry-run"], 2, None),

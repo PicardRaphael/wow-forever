@@ -96,8 +96,11 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("--json", action="store_true", help="sortie JSON")
 
     lookup = sub.add_parser("lookup", help="consulter une entité du jeu")
-    lookup.add_argument("kind", help="type d'entité (T01 : spell)")
-    lookup.add_argument("name", help="nom anglais (casse, espaces et tirets ignorés)")
+    lookup.add_argument("kind", help="type d'entité : spell (T01), zones (T04c)")
+    lookup.add_argument("name", nargs="?", help="nom anglais du sort (casse, espaces et tirets ignorés)")
+    lookup.add_argument("--level", type=int, help="zones : niveau du personnage")
+    lookup.add_argument("--faction", choices=["horde", "alliance"], help="zones : faction (défaut : toutes)")
+    lookup.add_argument("--questie", help="zones : dossier de l'addon Questie (défaut : dans FOREVER_WOW_DIR)")
     lookup.add_argument("--rank", type=int, help="position du rang, à partir de 1")
     lookup.add_argument("--detail", action="store_true", help="champs complémentaires")
     lookup.add_argument("--limit", type=int, default=20, help="rangs par page")
@@ -422,8 +425,12 @@ def _cmd_status(deps: Deps, args: argparse.Namespace) -> int:
 
 
 def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
+    if args.kind == "zones":
+        raise NotImplementedError
     if args.kind != "spell":
-        raise UnsupportedKindError(f"type « {args.kind} »", ["spell"])
+        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "zones"])
+    if not args.name:
+        raise InvalidArgumentError("Nom du sort manquant.", "écrire forever lookup spell <nom>")
     res = lookup_spell(deps, args.name, args.rank, detail=args.detail, limit=args.limit, offset=args.offset)
     _emit(res, render_lookup(res), res["provenance"], args.json)
     return EXIT_OK

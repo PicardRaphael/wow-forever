@@ -11,8 +11,9 @@ from __future__ import annotations
 import re
 from functools import cached_property
 from pathlib import Path
-from typing import Literal, NamedTuple
+from typing import Literal, NamedTuple, TypedDict
 
+from forever.engine.model import GameData
 from forever.errors import DataSchemaError, PathNotFoundError
 from forever.pipeline.lua_table import parse_lua_value
 
@@ -20,6 +21,15 @@ TOC_NAME = "Questie_Camelot.toc"
 NPC_DB = Path("Database/Classic/classicNpcDB.lua")
 QUEST_DB = Path("Database/Classic/classicQuestDB.lua")
 XP_DB = Path("Database/QuestXP/DB/xpDB-classic.lua")
+DUNGEON_DB = Path("Database/Zones/data/dungeons.lua")
+ZONE_NAMES = Path("Localization/lookups/lookupZones.lua")
+# Champs lus dans `questKeys` (noms du fichier de Questie).
+QUEST_FIELDS = ("name", "requiredLevel", "questLevel", "requiredRaces", "requiredClasses", "zoneOrSort")
+# Masques du format de Questie : bit (identifiant - 1) des races (ChrRaces) et des classes (ChrClasses).
+FACTION_RACES = {"horde": (2, 5, 6, 8), "alliance": (1, 3, 4, 7)}
+FACTION_MASKS = {faction: sum(1 << (race - 1) for race in races) for faction, races in FACTION_RACES.items()}
+CLASS_IDS = {"mage": 8}
+CLASS_MASKS = {name: 1 << (class_id - 1) for name, class_id in CLASS_IDS.items()}
 # Champs lus dans `npcKeys` (noms du fichier de Questie).
 NPC_FIELDS = ("name", "minLevelHealth", "maxLevelHealth", "minLevel", "maxLevel", "rank", "zoneID")
 _ENTRY = re.compile(r"^\[\d+\] = \{", re.MULTILINE)
@@ -52,6 +62,23 @@ class QuestieNpc(NamedTuple):
             return self.min_level_health
         share = (level - self.min_level) / (self.max_level - self.min_level)
         return int(self.min_level_health + (self.max_level_health - self.min_level_health) * share + 0.5)
+
+
+class QuestieQuest(NamedTuple):
+    id: int
+    name: str
+    required_level: int
+    quest_level: int
+    required_races: int  # 0 : toutes les races
+    required_classes: int  # 0 : toutes les classes
+    zone_or_sort: int  # > 0 : zone (AreaTable), < 0 : catégorie (QuestSort)
+
+
+class QuestieDungeon(NamedTuple):
+    area_id: int
+    name: str
+    alternative_ids: tuple[int, ...]
+    parent_zone: int
 
 
 class QuestieDB:
@@ -126,6 +153,18 @@ class QuestieDB:
                     if isinstance(level, int) and isinstance(xp, int):
                         out[quest] = (level, xp)
         return out
+
+    def quests(self) -> dict[int, QuestieQuest]:
+        """Quêtes de `classicQuestDB.lua` (champs `QUEST_FIELDS`), lues à la première demande."""
+        raise NotImplementedError
+
+    def dungeons(self) -> dict[int, QuestieDungeon]:
+        """Donjons de `dungeons.lua` : zone, nom, identifiants de zone alternatifs, zone parente."""
+        raise NotImplementedError
+
+    def zone_names(self) -> dict[int, str]:
+        """Noms anglais des zones (`lookupZones.lua`, table `zoneLookup`)."""
+        raise NotImplementedError
 
     def quest_xp(self, quest_id: int) -> tuple[int, int] | None:
         """(niveau de la quête, XP) selon la base Classic de Questie."""
@@ -273,3 +312,37 @@ def read_journey(sv: Path, guid: str) -> list[tuple[int, int]]:
     except ValueError as exc:
         raise DataSchemaError(f"{sv.name} : {exc}.") from exc
     return sorted(out)
+
+
+class ZoneEntry(TypedDict):
+    area_id: int
+    name: str
+    kind: str  # zone ou dungeon
+    useful_quests: int
+    by_color: dict[str, int]
+    quests: list[int]  # quêtes disponibles (faction, classe, niveau requis)
+    quest_levels: list[int] | None  # [min, max] des quêtes de la zone pour la faction et la classe
+    npc_levels: list[int] | None  # [10e, 90e percentile] des PNJ normaux de la zone
+
+
+class ZoneAdvice(TypedDict):
+    level: int
+    faction: str | None
+    band: list[int]
+    zones: list[ZoneEntry]
+    dungeons: list[ZoneEntry]
+    certainty: str
+    source: str
+    notes: list[str]
+
+
+def quest_available(quest: QuestieQuest, level: int, faction: str | None, player_class: str) -> bool:
+    """Quête prenable : race de la faction (toutes si `faction` est None), classe, niveau requis atteint."""
+    raise NotImplementedError
+
+
+def zones_for_level(
+    db: QuestieDB, gd: GameData, level: int, *, faction: str | None = None, player_class: str = "mage"
+) -> ZoneAdvice:
+    """Zones et donjons classés par nombre de quêtes utiles au niveau `level`."""
+    raise NotImplementedError

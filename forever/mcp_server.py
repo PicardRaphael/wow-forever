@@ -7,7 +7,7 @@ provenance) : une exception brute ne montrerait au modèle qu'un message génér
 from __future__ import annotations
 
 import json
-from typing import cast
+from typing import Any, cast
 
 from mcp.server.mcpserver import MCPServer
 from mcp.types import CallToolResult, TextContent
@@ -17,7 +17,7 @@ from forever.config import Deps
 from forever.errors import ForeverError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.leveling import LevelingReport, simulate_leveling
-from forever.lookup import SpellLookup, lookup_spell
+from forever.lookup import lookup_spell
 from forever.provenance import error_payload
 from forever.status import StatusReport, status_report
 
@@ -52,23 +52,28 @@ def build_server(deps: Deps) -> MCPServer:
     @server.tool()
     def forever_lookup(
         kind: str,
-        name: str,
+        name: str = "",
         rank: int | None = None,
         detail: bool = False,
         limit: int = 20,
         offset: int = 0,
-    ) -> SpellLookup:
+        level: int | None = None,
+        faction: str | None = None,
+        questie: str | None = None,
+    ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
         `rank` : position du rang à partir de 1 (tous les rangs, paginés, s'il est omis).
         `detail=True` : champs complémentaires (ralentissement, vitesse de projectile…)."""
         try:
+            if kind == "zones":
+                raise NotImplementedError
             if kind != "spell":
-                raise UnsupportedKindError(f"type « {kind} »", ["spell"])
-            return lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset)
+                raise UnsupportedKindError(f"type « {kind} »", ["spell", "zones"])
+            return dict(lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset))
         except ForeverError as err:
             # Le SDK transmet tel quel un CallToolResult renvoyé par l'outil (vérifié avec mcp 2.2).
-            return cast(SpellLookup, _error_result(deps, err))
+            return cast("dict[str, Any]", _error_result(deps, err))
 
     @server.tool()
     def forever_explain_mechanic(mechanic_id: str) -> MechanicExplanation:
