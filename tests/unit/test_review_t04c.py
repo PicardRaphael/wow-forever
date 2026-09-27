@@ -11,7 +11,7 @@ from types import SimpleNamespace
 
 import pytest
 from conftest import FIXTURES, LOCAL_VERSION, REAL_LOG, read_json
-from test_measures_refresh import JOURNEY, QUESTIE, SECOND_LOG, refresh, world  # noqa: F401 (fixture)
+from test_measures_refresh import QUESTIE, SECOND_LOG, refresh, world  # noqa: F401 (fixture)
 
 from forever.cli import main
 from forever.engine.buffs import ArcaneBlastAura, arcane_blast_after_spell
@@ -144,6 +144,7 @@ def test_quest_following_the_player_level_is_not_gray(game_data):
     assert zone["by_color"]["yellow"] == 1 and zone["quest_levels"] == [12, 12]
 
 
+@pytest.mark.allow_hosts(["127.0.0.1"])
 def test_mcp_lookup_spell_needs_a_name(make_deps):
     import asyncio
 
@@ -157,7 +158,3 @@ def test_mcp_lookup_spell_needs_a_name(make_deps):
 
     r = asyncio.run(go())
     assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
-
-
-test_mcp_lookup_spell_needs_a_name = pytest.mark.allow_hosts(["127.0.0.1"])(test_mcp_lookup_spell_needs_a_name)
-_ = JOURNEY

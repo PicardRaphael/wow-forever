@@ -1,8 +1,8 @@
 """`forever measures refresh` : relance toutes les mesures sur les journaux et SavedVariables présents sur disque,
 compare au `monsters.json` installé, aux preuves du registre et au dernier instantané, puis écrit après accord.
 
-Écritures (après confirmation seulement) : `monsters.json` de la version installée et le manifeste, instantané des
-autres mesures dans le cache (`<cache>/measures/last.json`, état de l'outil). Les preuves du registre ne sont jamais
+Écritures (après confirmation seulement) : `monsters.json` de la version installée, le champ `source` de son entrée
+dans `sources.json`, le manifeste, et un instantané des autres mesures dans le cache (`<cache>/measures/last.json`, état de l'outil). Les preuves du registre ne sont jamais
 écrites : l'écart et le bloc `preuves` proposé s'affichent. Les PNJ d'un journal disparu du dossier sont conservés.
 Lecture sur disque uniquement, jamais de réseau."""
 

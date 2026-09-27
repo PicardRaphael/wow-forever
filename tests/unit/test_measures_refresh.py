@@ -129,7 +129,7 @@ def test_accepted_refresh_writes_monsters_manifest_and_snapshot(capsys, make_dep
     code, out, deps = refresh(capsys, make_deps, world, confirm=accept, http=http)
     assert code == 0 and out["status"] == "écrit"
     written = {p.replace("\\", "/").rsplit("/", 1)[-1] for p in out["written"]}
-    assert written == {"monsters.json", "manifest.json", "last.json"}
+    assert written == {"monsters.json", "sources.json", "manifest.json", "last.json"}
     assert read_json(world["data"] / LOCAL_VERSION / "monsters.json") == table_for(REAL_LOG, SECOND_LOG)
     assert main(["manifest", "--check"], deps) == 0
     capsys.readouterr()

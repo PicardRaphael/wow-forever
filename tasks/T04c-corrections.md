@@ -1,5 +1,7 @@
 # T04c — demandes de correction de tests verrouillés (regroupées avant la fusion)
 
+**Résolu** : accord de l'utilisateur le 2026-09-27, diff appliqué (commit « T04c: correction d'un test verrouillé du bloc E »).
+
 ## 1. `tests/unit/test_measures_refresh.py::test_accepted_refresh_writes_monsters_manifest_and_snapshot`
 
 - **Prémisse contredite** : le test (bloc E) fige l'ensemble des fichiers écrits par `forever measures refresh` à
