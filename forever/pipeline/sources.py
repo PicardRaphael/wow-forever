@@ -5,7 +5,6 @@ Une version candidate est un dossier de données complet (`manifest.json` + un s
 
 from __future__ import annotations
 
-import json
 from collections.abc import Iterable
 from pathlib import Path
 from typing import NamedTuple, cast
@@ -48,16 +47,11 @@ def load_source(deps: Deps, ref: str) -> tuple[DataSource, VersionData]:
 
 
 def inherited_files(v: VersionData) -> list[str]:
-    """Fichiers JSON de la version qui portent `inherited_from`."""
-    names = []
-    for path in sorted(v.path.glob("*.json")):
-        try:
-            doc = json.loads(path.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
-            continue
-        if isinstance(doc, dict) and "inherited_from" in doc:
-            names.append(path.name)
-    return names
+    """Fichiers repris tels quels d'une version antérieure (`inherited_from` dans leur entrée de `sources.json`)."""
+    files = v.sources.get("files", {})
+    if not isinstance(files, dict):
+        return []
+    return sorted(n for n, e in files.items() if isinstance(e, dict) and e.get("inherited_from"))
 
 
 def source_certainty(v: VersionData) -> Certainty:

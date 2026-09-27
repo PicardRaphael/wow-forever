@@ -533,6 +533,7 @@ def decode_version(
             **{
                 name: {
                     **files.get(name, {"source": "inconnue", "certainty": "suppose"}),
+                    "inherited_from": base_version,
                     "notes": [*files.get(name, {}).get("notes", []), f"hérité de {base_version}"],
                 }
                 for name in INHERITED_FILES
