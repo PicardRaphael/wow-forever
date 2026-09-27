@@ -11,6 +11,8 @@
       "Bash(uv run forever explain-mechanic:*)",
       "Bash(uv run forever diff:*)",
       "Bash(uv run forever verify:*)",
+      "Bash(uv run forever decode:*)",
+      "Bash(uv run forever report:*)",
       "Bash(uv run python scripts/:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
