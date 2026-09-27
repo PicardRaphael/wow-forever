@@ -1,4 +1,4 @@
-"""Serveur MCP : outils `forever_status` et `forever_lookup` (même cœur que la CLI).
+"""Serveur MCP : outils `forever_status`, `forever_lookup` et `forever_explain_mechanic` (même cœur que la CLI).
 
 Une erreur métier est renvoyée comme résultat d'outil (`is_error`, `structured_content` avec l'erreur et la
 provenance) : une exception brute ne montrerait au modèle qu'un message générique."""
@@ -14,6 +14,7 @@ from mcp.types import CallToolResult, TextContent
 from forever import __version__
 from forever.config import Deps
 from forever.errors import ForeverError, UnsupportedKindError
+from forever.explain import MechanicExplanation, explain_mechanic
 from forever.lookup import SpellLookup, lookup_spell
 from forever.provenance import error_payload
 from forever.status import StatusReport, status_report
@@ -66,5 +67,14 @@ def build_server(deps: Deps) -> MCPServer:
         except ForeverError as err:
             # Le SDK transmet tel quel un CallToolResult renvoyé par l'outil (vérifié avec mcp 2.2).
             return cast(SpellLookup, _error_result(deps, err))
+
+    @server.tool()
+    def forever_explain_mechanic(mechanic_id: str) -> MechanicExplanation:
+        """Explique une mécanique du registre (identifiant de la forme « A5 », casse ignorée) : description, statut,
+        certitude, formule symbolique, paramètres chiffrés de la version courante, implémentation, sources, tests."""
+        try:
+            return explain_mechanic(deps, mechanic_id)
+        except ForeverError as err:
+            return cast(MechanicExplanation, _error_result(deps, err))
 
     return server
