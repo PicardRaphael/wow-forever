@@ -44,7 +44,7 @@ mechanics:
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
     formule: "toucher = 1 − max(raté_min, raté_table[écart de niveau] − talents de toucher d'école − toucher_équipement)"
-    note: "règle Classic supposée inchangée dans Forever, non observée (voir OPEN_QUESTIONS)"
+    note: "règle Classic supposée inchangée dans Forever, non observée (voir OPEN_QUESTIONS) ; T04a : touchés et ratés comptés par hit_tally (forever/pipeline/measure.py) dès que ForeverLoggerDB donne le niveau du lanceur ; aucun raté dans le journal du 2026-09-27"
   - id: A4
     categorie: attaque
     description: "Toucher unifié Forever (sources, plafond, poisons et pièges)"
@@ -264,8 +264,15 @@ mechanics:
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_improved_frostbolt_gcd_floor
-    tolerance: null
+    tolerance:
+      n_min: 50  # effectif minimal d'une preuve de journal (protocole de collecte, docs/ADDON.md)
     formule: "incantation effective = max(recharge_globale, incantation)"
+    preuves:
+      - journal: tests/fixtures/combatlog/WoWCombatLog-092726_145346.anon.txt
+        date: "2026-09-27"
+        mesure: "intervalles entre sorts instantanés enchaînés du Mage (forever logs measure) : minimum compatible avec la recharge globale de leveling.json ; un « Not yet recovered » juste après un lancer"
+        n: 3
+        test: tests/unit/test_measure.py::test_gcd_intervals_between_chained_instants
     note: "règle Classic supposée inchangée dans Forever, non observée (voir OPEN_QUESTIONS)"
   - id: B2
     categorie: temps
@@ -381,7 +388,7 @@ mechanics:
       - tests/unit/test_engine_values.py::test_talent_rank_mana_estimate
     tolerance: null
     formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié"
-    note: "escalade d'Arcane Blast en T04 ; coût des rangs de talent estimé (voir OPEN_QUESTIONS)"
+    note: "escalade d'Arcane Blast en T04b ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2)"
   - id: B12
     categorie: ressources
     description: "Clearcasting"
@@ -904,7 +911,7 @@ mechanics:
     tests: ["tests/unit/test_engine_values.py::test_hit_by_level_diff"]
     tolerance: null
     formule: "écart de niveau avec la cible → ligne de la table de raté des sorts (au-delà de la table : dernière ligne)"
-    note: "règle Classic supposée inchangée dans Forever, non observée (voir OPEN_QUESTIONS)"
+    note: "règle Classic supposée inchangée dans Forever, non observée (voir OPEN_QUESTIONS) ; T04a : niveau des boss lisible dans le bloc avancé du journal, aucun boss dans les journaux du 2026-09-27 (protocole dans docs/ADDON.md)"
   - id: H2
     categorie: rencontre
     description: "Armure et résistances de la cible"

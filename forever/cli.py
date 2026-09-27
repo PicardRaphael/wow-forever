@@ -246,6 +246,8 @@ def render_explanation(res: MechanicExplanation) -> list[str]:
         ("Tests", res["tests"]),
     ):
         lines.append(f"{label} : {', '.join(values) if values else 'aucun'}")
+    for proof in res["proofs"]:
+        lines.append(f"Preuve de journal : {proof['journal']} ({proof['date']}, n = {proof['n']}) : {proof['mesure']}")
     return lines
 
 

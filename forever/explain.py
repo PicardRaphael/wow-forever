@@ -39,6 +39,7 @@ class MechanicExplanation(TypedDict):
     implementations: list[str]
     sources: list[str]
     tests: list[str]
+    proofs: list[dict[str, Any]]  # preuves de journal du registre (T04)
     provenance: Provenance
 
 
@@ -121,5 +122,6 @@ def explain_mechanic(deps: Deps, mechanic_id: str) -> MechanicExplanation:
         "implementations": implementations([ENGINE_DIR], ENGINE_DIR.parent.parent).get(entry.id, []),
         "sources": list(entry.sources),
         "tests": list(entry.tests),
+        "proofs": [dict(p) for p in entry.proofs],
         "provenance": provenance,
     }

@@ -1,7 +1,11 @@
 """Registre des mécaniques (`docs/MECHANICS_REGISTRY.yaml`) : lecture, validation, couverture.
 
 Une référence de test prend la forme `tests/…/fichier.py::test_nom` ; la fonction doit exister (analyse `ast`, sans
-import). Les fonctions du moteur citent leurs identifiants dans leur docstring : « Registre : A3, A4 »."""
+import). Les fonctions du moteur citent leurs identifiants dans leur docstring : « Registre : A3, A4 ».
+
+Preuves de journal (champ `preuves`, T04) : chaque preuve cite une fixture de journal sous `tests/fixtures/combatlog/`,
+sa date, la mesure, l'effectif `n` et le test qui la lit. `valide-journal` exige au moins une preuve valide avec
+`n` ≥ `tolerance.n_min` ; le statut ne change pas la certitude (règle observée, pas valeur)."""
 
 from __future__ import annotations
 
@@ -23,6 +27,8 @@ COVERED_STATUSES = frozenset({"teste", "valide-journal", "valide-jeu"})
 CERTAINTIES = frozenset({"certain", "probable", "suppose"})
 FOREVER_VALUES = frozenset({"oui", "modifie", "inconnu"})
 REQUIRED_FIELDS = ("id", "categorie", "description", "forever", "statut", "certitude", "sources", "tests")
+PROOF_FIELDS = ("journal", "date", "mesure", "n", "test")
+PROOF_DIR = "tests/fixtures/combatlog/"
 ENGINE_DIR = PACKAGE_DIR / "engine"
 # Catégories (première lettre de l'identifiant) dont une entrée testée doit être implémentée dans le moteur.
 ENGINE_CATEGORIES = frozenset("ABCDEFGH")
@@ -49,6 +55,7 @@ class Mechanic:
     tolerance: object
     formula: str | None
     note: str | None
+    proofs: tuple[dict[str, Any], ...] = ()
 
 
 @dataclass
@@ -103,6 +110,7 @@ def load(path: Path) -> list[Mechanic]:
                 tolerance=m.get("tolerance"),
                 formula=_optional(m.get("formule")),
                 note=_optional(m.get("note")),
+                proofs=tuple(p for p in m.get("preuves") or [] if isinstance(p, dict)),
             )
         )
     return out
@@ -163,6 +171,59 @@ def _check_tests(mid: str, tests: list[Any], repo_root: Path, cache: dict[Path, 
     return errors
 
 
+def _n_min(tolerance: object) -> int | None:
+    value = tolerance.get("n_min") if isinstance(tolerance, dict) else None
+    return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+
+def _check_proofs(
+    mid: str, status: object, m: dict[str, Any], repo_root: Path, cache: dict[Path, set[str]]
+) -> list[str]:
+    """Erreurs du champ `preuves` ; pour `valide-journal`, au moins une preuve valide avec n ≥ tolerance.n_min."""
+    raw = m.get("preuves")
+    if raw is None:
+        raw = []
+    if not isinstance(raw, list):
+        return [f"{mid} : 'preuves' doit être une liste"]
+    errors: list[str] = []
+    valid_n: list[int] = []
+    for i, proof in enumerate(raw, start=1):
+        where = f"{mid} : preuve {i}"
+        if not isinstance(proof, dict):
+            errors.append(f"{where} n'est pas un objet")
+            continue
+        missing = [f for f in PROOF_FIELDS if f not in proof]
+        errors += [f"{where} : champ '{f}' manquant" for f in missing]
+        if missing:
+            continue
+        own: list[str] = []
+        journal = str(proof["journal"])
+        path = repo_root / journal
+        if not journal.startswith(PROOF_DIR) or not path.resolve().is_relative_to((repo_root / PROOF_DIR).resolve()):
+            own.append(f"{where} : journal hors de {PROOF_DIR} refusé '{journal}'")
+        elif not path.is_file():
+            own.append(f"{where} : journal introuvable '{journal}'")
+        n = proof["n"]
+        if isinstance(n, bool) or not isinstance(n, int) or n < 1:
+            own.append(f"{where} : 'n' doit être un entier positif")
+        own += [e.replace(f"{mid} :", f"{where} :", 1) for e in _check_tests(mid, [proof["test"]], repo_root, cache)]
+        if "::" not in str(proof["test"]):
+            own.append(f"{where} : test sans référence ::nom de fonction")
+        errors += own
+        if not own:
+            valid_n.append(n)
+    if status == "valide-journal":
+        n_min = _n_min(m.get("tolerance"))
+        if n_min is None:
+            errors.append(f"{mid} : 'valide-journal' exige tolerance.n_min (effectif minimal d'une preuve)")
+        elif not raw:
+            errors.append(f"{mid} : 'valide-journal' sans preuve de journal")
+        elif not any(n >= n_min for n in valid_n):
+            best = max(valid_n, default=0)
+            errors.append(f"{mid} : 'valide-journal' sans preuve suffisante (n = {best} < n_min = {n_min})")
+    return errors
+
+
 def validate(
     path: Path, repo_root: Path, *, strict: bool, engine_dirs: Sequence[Path] = (ENGINE_DIR,)
 ) -> ValidationReport:
@@ -197,6 +258,7 @@ def validate(
             report.errors.append(f"{mid} : 'tests' doit être une liste")
             tests = []
         report.errors += _check_tests(mid, tests, repo_root, cache)
+        report.errors += _check_proofs(mid, status, m, repo_root, cache)
         rank = STATUSES.index(status) if status in STATUSES else 0
         if rank >= 2 and not tests:
             report.errors.append(f"{mid} : statut '{status}' sans test")
