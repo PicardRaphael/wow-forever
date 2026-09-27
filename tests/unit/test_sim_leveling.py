@@ -4,6 +4,7 @@ personnage). Valeur de référence du seed : L16, 5 Improved Frostbolt, n = 200,
 
 import pytest
 
+from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import mc
 
 SEED_MODE = {"mob_source": "seed", "spell_level": "rank"}
@@ -48,3 +49,51 @@ def test_invalid_options_are_refused(game_data):
         mc(game_data, 12, {}, n=10, mob_source="questie")
     with pytest.raises(ValueError, match="option"):
         mc(game_data, 12, {}, n=10, flee=True)
+
+
+# Cas des tests du seed (analytique_proche_du_monte_carlo)
+SEED_CASES = [
+    (12, "frost", {"improvedFrostbolt": 3}),
+    (16, "frost", {"improvedFrostbolt": 5, "elementalPrecision": 2}),
+    (
+        24,
+        "frost",
+        {"improvedFrostbolt": 5, "elementalPrecision": 3, "frostbite": 3, "iceLance": 1, "frostChanneling": 3},
+    ),
+    (16, "fire", {"improvedFireball": 5, "elementalPrecision": 2}),
+]
+# Cas du test du seed calibrage_cible_blizzard (combat de 8 à 20 s, cible Blizzard de 10 à 15 s)
+CALIBRATION = [
+    (12, {"improvedFrostbolt": 3}),
+    (20, {"improvedFrostbolt": 5, "elementalPrecision": 3, "frostbite": 2, "iceLance": 1}),
+]
+MODES = {"seed": SEED_MODE, "par défaut": {}}
+
+
+@pytest.mark.parametrize("mode", MODES)
+@pytest.mark.parametrize(("level", "rotation", "pts"), SEED_CASES)
+def test_analytic_close_to_monte_carlo(game_data, mode, level, rotation, pts):
+    """Test du seed porté à l'identique : analytique à moins de 15 % du Monte Carlo (n = 600), dans les deux modes."""
+    m = mc(game_data, level, pts, "Orc", rotation, 600, **MODES[mode])["total"]
+    a = kill_analytic(game_data, level, pts, "Orc", rotation, **MODES[mode])["total"]
+    assert abs(a / m - 1) < 0.15, (mode, level, rotation, round(m, 1), round(a, 1))
+
+
+@pytest.mark.parametrize("mode", MODES)
+@pytest.mark.parametrize(("level", "pts"), CALIBRATION)
+def test_calibration_blizzard_target(game_data, mode, level, pts):
+    """Test du seed porté à l'identique : combat entre 8 et 20 s (Monte Carlo, n = 600), dans les deux modes."""
+    c = mc(game_data, level, pts, "Orc", "frost", 600, **MODES[mode])["combat"]
+    assert 8 <= c <= 20, (mode, level, c)
+
+
+def test_calibration_values_of_the_seed(game_data):
+    got = [mc(game_data, level, pts, "Orc", "frost", 600, **SEED_MODE)["combat"] for level, pts in CALIBRATION]
+    assert got == pytest.approx([11.716904761904743, 14.127405952380936], rel=1e-12)
+
+
+def test_analytic_refuses_invalid_options(game_data):
+    with pytest.raises(ValueError, match="rotation"):
+        kill_analytic(game_data, 12, {}, rotation="arcane")
+    with pytest.raises(ValueError, match="option"):
+        kill_analytic(game_data, 12, {}, flee=True)

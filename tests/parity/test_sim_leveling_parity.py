@@ -15,6 +15,7 @@ import sys
 import pytest
 from conftest import LOCAL_VERSION, REPO_ROOT
 
+from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import kill_mc, mc
 
 SEED_SCRIPTS = REPO_ROOT / "seed" / "forever-mage" / "scripts"
@@ -115,3 +116,48 @@ def test_single_kill_with_an_injected_generator(game_data, seed_sim):
     )
     theirs = seed_sim.kill_mc(16, {"improvedFrostbolt": 5}, seed_sim.fm.character(16, "Orc"), "frost", random.Random(3))
     same(ours, theirs, "un combat")
+
+
+# (niveau, rotation, talents, total analytique du seed)
+ANALYTIC = [
+    (12, "frost", {"improvedFrostbolt": 3}, 23.85926190796625),
+    (16, "frost", {"improvedFrostbolt": 5, "elementalPrecision": 2}, 28.543428650870247),
+    (
+        24,
+        "frost",
+        {"improvedFrostbolt": 5, "elementalPrecision": 3, "frostbite": 3, "iceLance": 1, "frostChanneling": 3},
+        32.16470423598942,
+    ),
+    (16, "fire", {"improvedFireball": 5, "elementalPrecision": 2}, 27.871038699049066),
+]
+
+
+@pytest.mark.parametrize(("level", "rotation", "pts", "total"), ANALYTIC)
+def test_analytic_matches_the_seed(game_data, seed_sim, level, rotation, pts, total):
+    ours = kill_analytic(game_data, level, pts, "Orc", rotation, **SEED_MODE)
+    same(ours, seed_sim.kill_analytic(level, pts, "Orc", rotation), (level, rotation))
+    assert ours["total"] == pytest.approx(total, rel=1e-12)
+
+
+@pytest.mark.parametrize(
+    ("level", "rotation", "pts", "options"),
+    [
+        (40, "frost", FROST_ALL, {}),
+        (40, "frost", FROST_ALL, {"level_diff": 2, "run_between_s": 4.0}),
+        (30, "fire", FIRE_ALL, {}),
+        (30, "fire", {**FIRE_ALL, "wakeOfFire": 0}, {"level_diff": 1}),
+        (8, "frost", {}, {}),
+        (60, "fire", FIRE_ALL, {}),
+    ],
+)
+def test_every_analytic_branch_matches_the_seed(game_data, seed_sim, level, rotation, pts, options):
+    seed_options = {("run_between" if k == "run_between_s" else k): v for k, v in options.items()}
+    ours = kill_analytic(game_data, level, pts, "Orc", rotation, **SEED_MODE, **options)
+    same(ours, seed_sim.kill_analytic(level, pts, "Orc", rotation, **seed_options), (level, rotation, options))
+
+
+def test_analytic_with_character_overrides(game_data, seed_sim):
+    over = {"intellect": 180, "sp": 120, "hp": 900, "armor": 400}
+    seed_over = {("int" if k == "intellect" else k): v for k, v in over.items()}
+    ours = kill_analytic(game_data, 20, {"improvedFrostbolt": 5}, "Troll", "frost", over=over, **SEED_MODE)
+    same(ours, seed_sim.kill_analytic(20, {"improvedFrostbolt": 5}, "Troll", "frost", seed_over), "fiche")
