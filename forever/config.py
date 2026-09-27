@@ -4,10 +4,12 @@ Les constantes de ce module décrivent l'outil (cache, délais), jamais le jeu."
 
 from __future__ import annotations
 
+import http.client
 import os
+import urllib.request
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from forever import __version__
@@ -40,19 +42,33 @@ class Deps:
 
 def urllib_get(url: str, headers: Mapping[str, str], timeout: float) -> bytes:
     """Client HTTP de production (bibliothèque standard)."""
-    raise NotImplementedError
+    request = urllib.request.Request(url, headers=dict(headers))
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            body: bytes = response.read()
+            return body
+    except http.client.HTTPException as exc:  # réponse tronquée ou mal formée : même traitement qu'une panne
+        raise OSError(str(exc)) from exc
 
 
 def utc_now() -> datetime:
     """Heure courante en UTC, avec fuseau."""
-    raise NotImplementedError
+    return datetime.now(UTC)
 
 
 def default_cache_dir(environ: Mapping[str, str] = os.environ) -> Path:
     """FOREVER_CACHE_DIR, sinon ~/.cache/forever."""
-    raise NotImplementedError
+    configured = environ.get("FOREVER_CACHE_DIR")
+    return Path(configured) if configured else Path.home() / ".cache" / "forever"
 
 
 def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
     """Dépendances de production ; FOREVER_OFFLINE=1 interdit tout appel réseau."""
-    raise NotImplementedError
+    return Deps(
+        data_dir=DATA_DIR,
+        registry_path=REGISTRY_PATH,
+        cache_dir=default_cache_dir(environ),
+        http_get=urllib_get,
+        now=utc_now,
+        offline=environ.get("FOREVER_OFFLINE", "") not in ("", "0"),
+    )
