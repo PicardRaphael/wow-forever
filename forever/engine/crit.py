@@ -19,7 +19,7 @@ def crit_chance(
     ch: Character,
     *,
     frozen: bool = False,
-    wc_stacks: int = 0,
+    wc_stacks: float = 0,
     buffs: Buffs | None = None,
 ) -> float:
     """Chance de critique d'un sort (personnage, talents, cible gelée, Winter's Chill, buffs), bornée à [0, 1].

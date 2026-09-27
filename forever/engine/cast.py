@@ -23,7 +23,7 @@ def expected_cast(
     level_diff: int = 0,
     *,
     frozen: bool = False,
-    wc_stacks: int = 0,
+    wc_stacks: float = 0,
     buffs: Buffs | None = None,
     frozen_mult: bool = True,
     spell_level: str = "rank",
