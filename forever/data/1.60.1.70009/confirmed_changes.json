@@ -3,9 +3,202 @@
   "version": "1.60.1.70009",
   "reference": "talents.json et spells.json de cette version",
   "notes": [
-    "Écarts entre le décodage du client 1.60.1.70009 et les fichiers de référence de cette version, tranchés comme de vrais changements du client (pas des bogues du décodeur).",
-    "Chaque entrée reprend un changement de `forever diff 1.60.1.70009 <candidate>` : kind, key, change, field, old (référence), new (client), avec la certitude de la référence et la décision.",
+    "Écarts entre le décodage du client 1.60.1.70009 et les fichiers de référence de cette version, tranchés par l'utilisateur le 2026-09-27 (tasks/T03-ecarts.md).",
+    "Chaque entrée reprend un changement de `forever diff 1.60.1.70009 <candidate>` : kind, key, change, field, old (référence), new (client), avec la certitude de la référence, la nature et la décision.",
+    "nature : client (vrai changement du jeu), format (représentation différente), convention (règle de lecture).",
     "Les fichiers de référence ne sont pas modifiés : l'installation de ces valeurs revient à T08."
   ],
-  "changes": []
+  "changes": [
+    {
+      "kind": "talent",
+      "key": "presenceOfMind",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        10
+      ],
+      "new": [],
+      "reference_certainty": "FC-69893",
+      "nature": "format",
+      "decision": "l'infobulle du client écrit « 10 sec » en clair, sans variable"
+    },
+    {
+      "kind": "talent",
+      "key": "impact",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        6
+      ],
+      "new": [
+        7
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 3 / 7 / 10 (arrondi de 10 × rang / 3) ; aucun décalage de lecture ailleurs (tasks/T03-ecarts.md)"
+    },
+    {
+      "kind": "talent",
+      "key": "impact",
+      "change": "modified",
+      "field": "ranks[3]",
+      "old": [
+        9
+      ],
+      "new": [
+        10
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 3 / 7 / 10 (arrondi de 10 × rang / 3)"
+    },
+    {
+      "kind": "talent",
+      "key": "improvedScorch",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        66
+      ],
+      "new": [
+        67
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 33 / 67 / 100"
+    },
+    {
+      "kind": "talent",
+      "key": "hotStreak",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        15,
+        25,
+        3
+      ],
+      "new": [
+        20,
+        25,
+        3
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "durée de Hot Streak 20 s, déjà notée dans talents.json (duration_s, notes)"
+    },
+    {
+      "kind": "talent",
+      "key": "improvedBlizzard",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        30
+      ],
+      "new": [
+        25
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 15 / 25 / 40"
+    },
+    {
+      "kind": "spell",
+      "key": "pyroblast",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 95,
+      "new": 100,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    },
+    {
+      "kind": "spell",
+      "key": "pyroblast",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 125,
+      "new": 132,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    },
+    {
+      "kind": "spell",
+      "key": "ice_lance",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 26,
+      "new": 28,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    },
+    {
+      "kind": "spell",
+      "key": "ice_lance",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 30,
+      "new": 33,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 50,
+      "new": 57,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 58,
+      "new": 66,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    },
+    {
+      "kind": "spell",
+      "key": "blast_wave",
+      "change": "modified",
+      "field": "ranks[1].level",
+      "old": 36,
+      "new": 30,
+      "reference_certainty": "certain (spells.json, wowforevertalents.com)",
+      "nature": "client",
+      "decision": "niveau appris : SpellLevels.BaseLevel 30 (MaxLevel 36) ; la référence donne 36 aux rangs 1 et 2"
+    },
+    {
+      "kind": "spell",
+      "key": "blast_wave",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 148,
+      "new": 153,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    },
+    {
+      "kind": "spell",
+      "key": "blast_wave",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 178,
+      "new": 185,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs"
+    }
+  ]
 }

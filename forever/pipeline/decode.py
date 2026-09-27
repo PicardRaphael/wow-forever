@@ -233,6 +233,20 @@ def _tree_of(x: int, tabs: Mapping[str, int], step: int, divisor: int) -> tuple[
     raise DataSchemaError(f"Abscisse {x} hors des onglets de l'arbre ({dict(tabs)}).")
 
 
+def _select(key: str, values: list[list[int | float]], indices: Sequence[int] | None) -> list[list[int | float]]:
+    """Variables retenues dans `ranks` (`rank_variables` de decode_rules.json) ; toutes si le talent n'y figure pas."""
+    if indices is None:
+        return [list(v) for v in values]
+    out = []
+    for rank, row in enumerate(values, start=1):
+        if any(i >= len(row) for i in indices):
+            raise DataSchemaError(
+                f"{RULES_NAME} : rank_variables de {key} {list(indices)} hors de l'infobulle du rang {rank} ({row})."
+            )
+        out.append([row[i] for i in indices])
+    return out
+
+
 def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `talents.json` décodé : arbres, puis talents par palier et colonne."""
     client = _Client(tables, rules)
@@ -272,7 +286,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
         )
         key = talent_key(name)
         max_rank = int(entry["MaxRanks"])
-        ranks = []
+        values: list[list[int | float]] = []
         for rank in range(1, max_rank + 1):
             overrides: dict[int, float] = {}
             for p in points.get(int(definition["ID"]), []):
@@ -283,9 +297,12 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
                     raise DataSchemaError(f"{key} : courbe {p['CurveID']} sans valeur au rang {rank}.")
                 overrides[int(p["EffectIndex"])] = curve[float(rank)]
             try:
-                ranks.append(tooltip_values(desc, client.resolver(spell, rules["levels"]["talent_tooltip"], overrides)))
+                values.append(
+                    tooltip_values(desc, client.resolver(spell, rules["levels"]["talent_tooltip"], overrides))
+                )
             except ValueError as exc:
                 raise DataSchemaError(f"Infobulle du talent {key} (sort {spell}, rang {rank}) : {exc}.") from exc
+        ranks = _select(key, values, rules.get("rank_variables", {}).get(key))
         talents[int(node["ID"])] = {
             "key": key,
             "name": name,
@@ -295,6 +312,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "col": col,
             "max": max_rank,
             "ranks": ranks,
+            "tooltip_values": values,
             "desc": desc,
             "spellIds": [spell],
             "prereq": None,
@@ -321,6 +339,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
                 "Rangs : variables de l'infobulle du sort du nœud, dans leur ordre d'apparition, évaluées au niveau "
                 "de base du sort (decode_rules.json, levels.talent_tooltip)."
             ),
+            "tooltip_values : toutes les variables de l'infobulle ; ranks : celles retenues par rank_variables.",
             "desc : gabarit d'infobulle du client ; spellIds : sort unique du nœud (le client n'a pas un sort par rang).",
         ],
     }
