@@ -15,7 +15,7 @@ import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent
-STRICT_REGISTRY = False  # passer à True en T02 : une mécanique « modelise » sans test fera échouer verify
+STRICT_REGISTRY = True  # depuis T02 : une mécanique « modelise » sans test fait échouer verify
 
 
 def run(cmd: list[str], ok_codes: tuple[int, ...] = (0,)) -> bool:
