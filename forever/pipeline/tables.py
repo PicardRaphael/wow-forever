@@ -4,9 +4,12 @@ Les noms de colonnes sont ceux du format de fichier (WoWDBDefs), pas des chiffre
 
 from __future__ import annotations
 
+import csv
 from collections.abc import Mapping
 from pathlib import Path
 from typing import NamedTuple
+
+from forever.errors import DataSchemaError
 
 Value = int | float | str
 Row = Mapping[str, Value]
@@ -52,4 +55,32 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
 def read_table(path: Path, table: str) -> list[dict[str, Value]]:
     """Lignes typées d'une table (colonnes déclarées seulement) ; DataSchemaError si une colonne manque ou si une
     valeur n'a pas le type déclaré (le message nomme la table, la colonne et la ligne)."""
-    raise NotImplementedError
+    columns = TABLES.get(table)
+    if columns is None:
+        raise DataSchemaError(f"Table du client non déclarée : {table} ({path}).")
+    try:
+        with path.open(encoding="utf-8-sig", newline="") as f:
+            reader = csv.reader(f)
+            header = next(reader, [])
+            missing = [c.name for c in columns if c.name not in header]
+            if missing:
+                raise DataSchemaError(f"{table} : colonne(s) absente(s) {', '.join(missing)} ({path}).")
+            index = [(c, header.index(c.name)) for c in columns]
+            rows: list[dict[str, Value]] = []
+            for line, cells in enumerate(reader, start=2):
+                row: dict[str, Value] = {}
+                for column, i in index:
+                    raw = cells[i] if i < len(cells) else None
+                    try:
+                        if raw is None:
+                            raise ValueError("cellule absente")
+                        row[column.name] = column.kind(raw)
+                    except ValueError as exc:
+                        raise DataSchemaError(
+                            f"{table} : valeur {raw!r} invalide pour la colonne {column.name}, ligne {line} "
+                            f"({column.kind.__name__} attendu, {path})."
+                        ) from exc
+                rows.append(row)
+    except (OSError, UnicodeDecodeError, csv.Error) as exc:
+        raise DataSchemaError(f"{table} : fichier illisible ({path} : {exc}).") from exc
+    return rows
