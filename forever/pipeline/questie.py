@@ -40,6 +40,7 @@ _DUNGEON = re.compile(
 )
 NPC_LEVEL_QUANTILES = (0.1, 0.9)  # plage des niveaux des PNJ d'une zone : 10e et 90e percentiles (méthode)
 NORMAL_RANK = 0
+BATTLEGROUNDS = "Battlegrounds"  # catégorie de Questie (continentLookup) des champs de bataille
 
 
 class QuestieInfo(NamedTuple):
@@ -201,6 +202,8 @@ class QuestieDB:
     def _dungeons(self) -> dict[int, QuestieDungeon]:
         out: dict[int, QuestieDungeon] = {}
         for m in _DUNGEON.finditer(self._read(DUNGEON_DB)):
+            if int(m["id"]) in self.battlegrounds():
+                continue  # champ de bataille, pas un donjon
             alternatives = tuple(int(x) for x in re.findall(r"\d+", m["alt"])) if m["alt"] != "nil" else ()
             out[int(m["id"])] = QuestieDungeon(int(m["id"]), m["name"], alternatives, int(m["parent"]))
         return out
@@ -222,9 +225,25 @@ class QuestieDB:
             out.setdefault(int(m[1]), m[2])
         return out
 
+    @cached_property
+    def _battlegrounds(self) -> frozenset[int]:
+        text = self._read(ZONE_NAMES)
+        start = text.find("l10n.continentLookup = {")
+        categories = text.find("l10n.zoneCategoryLookup = {")
+        if start < 0 or categories < 0:
+            return frozenset()
+        index = next(
+            (m[1] for m in re.finditer(r'\[(\d+)\]\s*=\s*"([^"]*)"', text[start:categories]) if m[2] == BATTLEGROUNDS),
+            None,
+        )
+        block = re.search(rf"^\s*\[{index}\]\s*=\s*\{{(.*?)^\s*\}},", text[categories:], re.MULTILINE | re.DOTALL)
+        if index is None or block is None:
+            return frozenset()
+        return frozenset(int(m) for m in re.findall(r"\[(\d+)\]\s*=", block[1]))
+
     def battlegrounds(self) -> frozenset[int]:
-        """Zones des champs de bataille (catégorie « Battlegrounds » de `lookupZones.lua`)."""
-        raise NotImplementedError
+        """Zones des champs de bataille (catégorie « Battlegrounds » de `lookupZones.lua`), écartées des donjons."""
+        return self._battlegrounds
 
     def zone_names(self) -> dict[int, str]:
         """Noms anglais des zones (`lookupZones.lua`, table `zoneLookup`)."""
@@ -447,7 +466,7 @@ def zones_for_level(
     names = db.zone_names()
     grouped: dict[int, list[QuestieQuest]] = {}
     for q in db.quests().values():
-        if q.zone_or_sort <= 0 or not _eligible(q, faction, player_class):
+        if q.zone_or_sort <= 0 or q.zone_or_sort in db.battlegrounds() or not _eligible(q, faction, player_class):
             continue
         grouped.setdefault(dungeon_of.get(q.zone_or_sort, q.zone_or_sort), []).append(q)
     npc_levels: dict[int, list[int]] = {}
