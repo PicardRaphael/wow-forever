@@ -12,6 +12,7 @@ from forever.errors import DataIntegrityError, ManifestMissingError
 from forever.manifest import (
     SOURCES_NAME,
     IntegrityReport,
+    ManifestError,
     data_sha,
     load_manifest,
     verify,
@@ -41,8 +42,11 @@ def read_sources(data_dir: Path, version: str) -> dict[str, Any] | None:
 
 
 def current_identity(data_dir: Path) -> tuple[str, str]:
-    """(version, empreinte courte) sans contrôle : d'après le manifeste s'il existe, sinon d'après les fichiers."""
-    manifest = load_manifest(data_dir)
+    """(version, empreinte courte) sans contrôle : d'après le manifeste s'il est valide, sinon d'après les fichiers."""
+    try:
+        manifest = load_manifest(data_dir)
+    except ManifestError:
+        manifest = None
     if manifest is not None:
         version = manifest.get("game_version")
         if isinstance(version, str):
@@ -72,7 +76,12 @@ def ensure_integrity(data_dir: Path) -> IntegrityReport:
     """Lève ManifestMissingError ou DataIntegrityError si les données ne correspondent pas au manifeste."""
     report = verify(data_dir)
     if not report.manifest_found:
-        raise ManifestMissingError(f"Manifeste des données absent ou illisible dans {data_dir}.")
+        raise ManifestMissingError(f"Manifeste des données absent dans {data_dir}.")
+    if report.manifest_error is not None:
+        raise DataIntegrityError(
+            f"Manifeste des données illisible ({report.manifest_error}), réponse refusée.",
+            "restaurer le manifeste depuis git ; si les données sont voulues, lancer `uv run forever manifest --update`",
+        )
     if not report.ok:
         raise DataIntegrityError(f"Empreintes des données invalides, réponse refusée ({describe_integrity(report)}).")
     return report

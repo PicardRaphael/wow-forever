@@ -14,6 +14,7 @@ from forever.store import current_identity, describe_integrity
 class IntegrityInfo(TypedDict):
     ok: bool
     manifest_found: bool
+    manifest_error: str | None
     mismatched: list[str]
     missing: list[str]
     unexpected: list[str]
@@ -34,6 +35,8 @@ def status_report(deps: Deps, *, allow_network: bool = True) -> StatusReport:
     assumptions = list(fresh["assumptions"])
     if not report.manifest_found:
         assumptions.append("manifeste absent : lancer `forever manifest --update`")
+    elif report.manifest_error is not None:
+        assumptions.append(f"manifeste illisible ({report.manifest_error}) : les consultations sont refusées")
     elif not report.ok:
         assumptions.append(f"empreintes invalides ({describe_integrity(report)}) : les consultations sont refusées")
     provenance = make_provenance(
@@ -50,6 +53,7 @@ def status_report(deps: Deps, *, allow_network: bool = True) -> StatusReport:
         "integrity": {
             "ok": report.ok,
             "manifest_found": report.manifest_found,
+            "manifest_error": report.manifest_error,
             "mismatched": report.mismatched,
             "missing": report.missing,
             "unexpected": report.unexpected,

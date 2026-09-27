@@ -107,6 +107,8 @@ def render_status(rep: StatusReport) -> list[str]:
         integrity = "intégrité ok"
     elif not integ["manifest_found"]:
         integrity = "intégrité ÉCHEC (manifeste absent)"
+    elif integ["manifest_error"]:
+        integrity = f"intégrité ÉCHEC (manifeste illisible : {integ['manifest_error']})"
     else:
         integrity = f"intégrité ÉCHEC ({len(integ['mismatched'] + integ['missing'] + integ['unexpected'])} écart(s))"
     lines = [f"Données locales {rep['local_version']} · {integrity}"]

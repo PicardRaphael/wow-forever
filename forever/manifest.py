@@ -19,20 +19,32 @@ MANIFEST_NAME = "manifest.json"
 SOURCES_NAME = "sources.json"
 SCHEMA_VERSION = 1
 VERSION_DIR_RE = re.compile(r"^\d+\.\d+\.\d+\.\d+$")
+SHA256_RE = re.compile(r"^[0-9a-f]{64}$")
+
+
+class ManifestError(ValueError):
+    """Manifeste présent mais illisible, mal formé ou incohérent."""
 
 
 @dataclass
 class IntegrityReport:
-    """Résultat de la vérification : chemins relatifs à `data_dir`, séparateur `/`."""
+    """Résultat de la vérification : chemins relatifs à `data_dir`, séparateur `/`.
+
+    `manifest_error` : manifeste présent mais inutilisable (aucune comparaison de fichiers n'est faite)."""
 
     manifest_found: bool
+    manifest_error: str | None = None
     mismatched: list[str] = field(default_factory=list)
     missing: list[str] = field(default_factory=list)
     unexpected: list[str] = field(default_factory=list)
 
     @property
     def ok(self) -> bool:
-        return self.manifest_found and not (self.mismatched or self.missing or self.unexpected)
+        return (
+            self.manifest_found
+            and self.manifest_error is None
+            and not (self.mismatched or self.missing or self.unexpected)
+        )
 
 
 def version_dirs(data_dir: Path) -> list[str]:
@@ -100,24 +112,59 @@ def write_manifest(data_dir: Path) -> Path:
     return path
 
 
+def _check_manifest(data: object) -> dict[str, Any]:
+    """Contrôle la structure et la cohérence interne du manifeste ; lève ManifestError au premier écart."""
+    if not isinstance(data, dict):
+        raise ManifestError("le contenu n'est pas un objet JSON")
+    if data.get("schema_version") != SCHEMA_VERSION:
+        raise ManifestError(f"schema_version {data.get('schema_version')!r} non pris en charge")
+    versions = data.get("versions")
+    if not isinstance(versions, dict):
+        raise ManifestError("« versions » n'est pas un objet")
+    for version, entry in versions.items():
+        if not VERSION_DIR_RE.fullmatch(version):
+            raise ManifestError(f"version invalide : {version!r}")
+        if not isinstance(entry, dict):
+            raise ManifestError(f"{version} : l'entrée n'est pas un objet")
+        files = entry.get("files")
+        if not isinstance(files, dict) or not all(
+            isinstance(s, str) and SHA256_RE.fullmatch(s) for s in files.values()
+        ):
+            raise ManifestError(f"{version} : « files » doit associer chaque fichier à un sha256")
+        if entry.get("data_sha256") != data_sha256(files) or entry.get("data_sha") != data_sha(files):
+            raise ManifestError(f"{version} : empreinte globale incohérente avec « files »")
+    game_version = data.get("game_version")
+    if (game_version is None and versions) or (game_version is not None and game_version not in versions):
+        raise ManifestError(f"game_version {game_version!r} absente de « versions »")
+    return data
+
+
 def load_manifest(data_dir: Path) -> dict[str, Any] | None:
+    """Manifeste validé ; None s'il est absent ; lève ManifestError s'il est illisible, mal formé ou incohérent."""
     path = data_dir / MANIFEST_NAME
     if not path.is_file():
         return None
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
-    except (ValueError, UnicodeDecodeError):
-        return None
-    return data if isinstance(data, dict) and isinstance(data.get("versions"), dict) else None
+        data = json.loads(path.read_bytes().decode("utf-8"))
+    except OSError as exc:
+        raise ManifestError(f"lecture impossible ({exc.strerror or exc})") from exc
+    except UnicodeDecodeError as exc:
+        raise ManifestError("encodage invalide (UTF-8 attendu)") from exc
+    except ValueError as exc:
+        raise ManifestError("JSON invalide") from exc
+    return _check_manifest(data)
 
 
 def verify(data_dir: Path) -> IntegrityReport:
-    manifest = load_manifest(data_dir)
+    try:
+        manifest = load_manifest(data_dir)
+    except ManifestError as exc:
+        return IntegrityReport(manifest_found=True, manifest_error=str(exc))
     if manifest is None:
         return IntegrityReport(manifest_found=False)
     report = IntegrityReport(manifest_found=True)
     expected: dict[str, dict[str, str]] = {
-        version: dict(entry.get("files", {})) for version, entry in manifest["versions"].items()
+        version: dict(entry["files"]) for version, entry in manifest["versions"].items()
     }
     for version in sorted(set(expected) | set(version_dirs(data_dir)), key=version_key):
         vdir = data_dir / version

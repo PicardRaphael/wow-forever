@@ -46,11 +46,12 @@ class InvalidArgumentError(ForeverError):
 class DataIntegrityError(ForeverError):
     exit_code = EXIT_INTEGRITY
 
-    def __init__(self, message: str) -> None:
+    def __init__(self, message: str, action: str | None = None) -> None:
         super().__init__(
             "data_integrity",
             message,
-            "vérifier la modification des données ; lancer `uv run forever manifest --update` si elle est voulue",
+            action
+            or "vérifier la modification des données ; lancer `uv run forever manifest --update` si elle est voulue",
         )
 
 
