@@ -583,6 +583,7 @@ def build_game_data(version: VersionData) -> GameData:
         mob_model=_mob_model(raw[LEVELING_FILE]),
         leveling=_leveling(_Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")),
         utility=_utility(raw[SPELLS_FILE]),
+        armors={},
     )
 
 

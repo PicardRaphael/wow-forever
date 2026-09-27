@@ -5,7 +5,7 @@
 Filtre (fermeture transitive) :
 - arbre de talents associé aux lignes de compétence de `decode_rules.json`, ses nœuds, entrées, définitions, points
   d'effet, courbes et arêtes ;
-- sorts des talents, rangs des sorts suivis (toutes méthodes d'acquisition, pour garder les doublons écartés par le
+- sorts des talents, rangs des sorts suivis et des armures (`utility_spells`) (toutes méthodes d'acquisition, pour garder les doublons écartés par le
   décodeur), sorts déclenchés (EffectTriggerSpell) et sorts cités par les infobulles ($<id>…), jusqu'à stabilité ;
 - leurres : le premier nœud d'un autre arbre (avec sa définition et son sort) et des sorts homonymes des sorts
   suivis hors des lignes du Mage (PNJ), avec leurs lignes de SkillLineAbility ;
@@ -81,7 +81,7 @@ def main() -> int:
     curves = {r["CurveID"] for r in points}
 
     names = {r["ID"]: r["Name_lang"] for r in rows["SpellName"]}
-    followed = set(rules["spells"].values())
+    followed = set(rules["spells"].values()) | set(rules.get("utility_spells", {}).get("spells", {}).values())
     spells = {r["SpellID"] for r in defs}
     spells |= {
         r["Spell"] for r in rows["SkillLineAbility"] if r["SkillLine"] in lines and names.get(r["Spell"]) in followed

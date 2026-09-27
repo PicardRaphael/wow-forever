@@ -19,7 +19,7 @@ from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import kill_mc, mc
 
 SEED_SCRIPTS = REPO_ROOT / "seed" / "forever-mage" / "scripts"
-SEED_MODE = {"mob_source": "seed", "spell_level": "rank"}
+SEED_MODE = {"mob_source": "seed", "spell_level": "rank", "rules": "seed"}
 FIELDS = ("combat", "mana", "taken", "downtime", "total", "xp_h")
 # (niveau, rotation, talents, total Monte Carlo du seed à n = 600, graine 12345)
 CASES = [

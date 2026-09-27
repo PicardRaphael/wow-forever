@@ -140,3 +140,14 @@ def test_sim_leveling_illegal_build_is_structured_error(make_deps):
     r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
     assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
     assert validate_provenance(r.structured_content["provenance"]) == []
+
+
+def test_sim_leveling_armor_and_rules(make_deps):
+    """T04c : `armor` et `rules` sont des paramètres de build du simulateur ; Mage Armor sous son niveau refusée."""
+    args = {"level": 40, "n": 10, "armor": "mage", "rules": "forever"}
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
+    assert not r.is_error and r.structured_content["options"]["armor"] == "mage"
+    args = {"level": 30, "n": 10, "armor": "mage"}
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
+    assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
+    assert validate_provenance(r.structured_content["provenance"]) == []

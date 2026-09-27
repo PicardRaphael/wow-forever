@@ -230,6 +230,18 @@ def _leveling_arguments(p: argparse.ArgumentParser, *, n_default: int) -> None:
         choices=["character", "rank"],
         help="dégâts des rangs au niveau du personnage (défaut) ou du rang (seed)",
     )
+    p.add_argument(
+        "--rules",
+        default="forever",
+        choices=["forever", "seed"],
+        help="règles du simulateur : corrections de Forever (défaut) ou comportement du seed (parité)",
+    )
+    p.add_argument(
+        "--armor",
+        default="auto",
+        choices=["auto", "frost", "mage"],
+        help="armure portée : selon le niveau (défaut), Frost/Ice Armor ou Mage Armor",
+    )
     p.add_argument("--level-diff", type=int, help="niveau du monstre - niveau du personnage (défaut des données)")
     p.add_argument("--nova", action="store_true", help="Frost Nova au contact")
     p.add_argument("--json", action="store_true", help="sortie JSON")
@@ -745,6 +757,8 @@ def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
         spell_level=args.spell_level,
         level_diff=args.level_diff,
         nova=args.nova,
+        rules=args.rules,
+        armor=args.armor,
     )
     hp = rep["mob_hp"]
     gap = f"{rep['analytic_gap'] * 100:+.1f}".replace(".", ",")
@@ -784,7 +798,13 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
     check_level(args.level_to + diff, cap, "Niveau du monstre")
     pts = parse_talents(args.talents)
     check_talents(gd, pts, args.level_to)
-    options: dict[str, Any] = {"mob_source": args.mob_source, "spell_level": args.spell_level, "nova": args.nova}
+    options: dict[str, Any] = {
+        "mob_source": args.mob_source,
+        "spell_level": args.spell_level,
+        "nova": args.nova,
+        "rules": args.rules,
+        "armor": args.armor,
+    }
     if args.level_diff is not None:
         options["level_diff"] = args.level_diff
     try:

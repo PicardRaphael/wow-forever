@@ -4,12 +4,16 @@ ID,Name_lang
 120,Cone of Cold
 122,Frost Nova
 133,Fireball
+168,Frost Armor
+506,Ice Armor
 1449,Arcane Explosion
 2120,Flamestrike
 2136,Fire Blast
 2948,Scorch
 5143,Arcane Missiles
 6057,Wand Specialization
+6117,Mage Armor
+6136,Chilled
 7268,Arcane Missile
 10833,Arcane Blast
 11069,Improved Fireball
@@ -107,6 +111,13 @@ ID,Name_lang
 10150,Fireball
 10151,Fireball
 25306,Fireball
+1200,Frost Armor
+7300,Frost Armor
+7301,Frost Armor
+7302,Ice Armor
+7320,Ice Armor
+10219,Ice Armor
+10220,Ice Armor
 8437,Arcane Explosion
 8438,Arcane Explosion
 8439,Arcane Explosion
@@ -163,6 +174,9 @@ ID,Name_lang
 25345,Arcane Missiles
 25346,Arcane Missiles
 11124,Fire Power
+22782,Mage Armor
+22783,Mage Armor
+7321,Chilled
 12484,Chilled
 18459,Incineration
 400573,Arcane Blast

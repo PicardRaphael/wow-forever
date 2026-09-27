@@ -121,6 +121,10 @@ def assumptions(options: Mapping[str, Any], hp: MonsterHp, talents: Mapping[str,
         f"mob_source {options['mob_source']} : PV du monstre {hp.value:g} ({hp.certainty}, {hp.source})",
         f"spell_level {options['spell_level']} : "
         + ("dégâts des rangs au niveau du personnage" if options["spell_level"] == "character" else "dégâts des rangs"),
+        f"rules {options['rules']} : "
+        + ("corrections de Forever (T04c)" if options["rules"] == "forever" else "comportement du seed à l'identique"),
+        f"armor {options['armor']} : armure portée selon le niveau d'apprentissage lu dans le client"
+        + (" (auto)" if options["armor"] == "auto" else " (forcée)"),
         f"talents : {spec}",
         f"Monte Carlo : n = {n}, graine {seed} ; analytique : espérance fermée (seed)",
         "constantes leveling.* du seed sim_leveling.py (EST, suppose) ; XP de monstre : règle Classic (T04c)",
@@ -141,6 +145,8 @@ def simulate_leveling(
     level_diff: int | None = None,
     nova: bool = False,
     over: CharacterOverrides | None = None,
+    rules: str = "forever",
+    armor: str = "auto",
 ) -> LevelingReport:
     """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance."""
     data = load_version(deps)
@@ -152,7 +158,13 @@ def simulate_leveling(
         raise InvalidArgumentError(f"n = {n} hors de 1-{MAX_N}.", f"donner un nombre de combats de 1 à {MAX_N}")
     pts = dict(talents or {})
     check_talents(gd, pts, level)
-    raw: dict[str, Any] = {"mob_source": mob_source, "spell_level": spell_level, "nova": nova}
+    raw: dict[str, Any] = {
+        "mob_source": mob_source,
+        "spell_level": spell_level,
+        "nova": nova,
+        "rules": rules,
+        "armor": armor,
+    }
     if level_diff is not None:
         raw["level_diff"] = level_diff
     try:
@@ -165,7 +177,9 @@ def simulate_leveling(
         m = mc(gd, level, pts, race, rotation, n, seed, over, **raw)
         a = kill_analytic(gd, level, pts, race, rotation, over, **raw)
     except ValueError as exc:
-        raise InvalidArgumentError(f"{exc}.", "choisir un niveau où le sort principal est appris") from exc
+        raise InvalidArgumentError(
+            f"{exc}.", "choisir un niveau où le sort principal (et l'armure demandée) est appris"
+        ) from exc
     certainty = min_certainty([cast(Certainty, hp.certainty), constants_certainty(data), "suppose"])
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)
     provenance = make_provenance(

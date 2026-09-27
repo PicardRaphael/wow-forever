@@ -4,12 +4,16 @@ ID,Name_lang
 120,Cône de froid
 122,Nova de givre
 133,Boule de feu
+168,Armure de givre
+506,Armure de glace
 1449,Explosion des arcanes
 2120,Choc de flammes
 2136,Trait de feu
 2948,Brûlure
 5143,Projectiles des arcanes
 6057,Spécialisation Baguette
+6117,Armure du mage
+6136,Transi
 10833,Déflagration des arcanes
 11069,Boule de feu améliorée
 11070,Eclair de givre amélioré
@@ -107,6 +111,13 @@ ID,Name_lang
 10150,Boule de feu
 10151,Boule de feu
 25306,Boule de feu
+1200,Armure de givre
+7300,Armure de givre
+7301,Armure de givre
+7302,Armure de glace
+7320,Armure de glace
+10219,Armure de glace
+10220,Armure de glace
 8437,Explosion des arcanes
 8438,Explosion des arcanes
 8439,Explosion des arcanes
@@ -164,6 +175,9 @@ ID,Name_lang
 25345,Projectiles des arcanes
 25346,Projectiles des arcanes
 11124,Puissance du feu
+22782,Armure du mage
+22783,Armure du mage
+7321,Transi
 12484,Transi
 18459,Incinération
 11189,Protection contre le Givre

@@ -95,6 +95,20 @@
     "flamestrike": "Flamestrike",
     "blast_wave": "Blast Wave"
   },
+  "utility_spells": {
+    "spells": {
+      "frost_armor": "Frost Armor",
+      "ice_armor": "Ice Armor",
+      "mage_armor": "Mage Armor"
+    },
+    "effects": {
+      "armor": {"aura": 22, "misc_value": 1, "field": "EffectBasePointsF"},
+      "frost_resistance": {"aura": 22, "misc_value": 16, "field": "EffectBasePointsF"},
+      "magic_resistance": {"aura": 22, "misc_value": 126, "field": "EffectBasePointsF"},
+      "regen_while_casting_pct": {"aura": 134, "field": "EffectBasePointsF"},
+      "chill_on_hit_spell": {"aura": 42, "field": "EffectTriggerSpell"}
+    }
+  },
   "rank_format": ["level", "min", "max", "dot_total", "dot_duration", "cast_s", "mana", "cooldown_s"],
   "notes": [
     "Règles de lecture des tables du client (wago.tools) pour le Mage ; héritées par les versions suivantes tant qu'elles restent valides.",
@@ -107,6 +121,7 @@
     "levels : infobulles de talent évaluées au niveau de base du sort (valeurs affichées dans l'arbre) ; rangs de sort évalués au niveau min(MaxLevel, level_cap), MaxLevel 0 valant level_cap.",
     "tooltip.duration_units : unité d'affichage d'une durée, la plus grande dont la durée atteint le seuil.",
     "effects : identifiants d'effet et d'aura du client (SpellEffect.Effect, SpellEffect.EffectAura).",
-    "spell_ranks : rangs lus dans SkillLineAbility (lignes du Mage, méthodes d'acquisition retenues), numérotés par Spell.NameSubtext ; canalisé si Attributes_1 & channel_attributes_1_mask."
+    "spell_ranks : rangs lus dans SkillLineAbility (lignes du Mage, méthodes d'acquisition retenues), numérotés par Spell.NameSubtext ; canalisé si Attributes_1 & channel_attributes_1_mask.",
+    "utility_spells : armures lues comme les rangs de sort (SkillLineAbility, Spell.NameSubtext) ; niveau d'apprentissage = SpellLevels.BaseLevel ; effets retenus : aura (et EffectMiscValue_0 si donné) -> valeur du champ indiqué (aura 22 : armure si 1, résistance au givre si 16, à toute la magie si 126 ; aura 134 : part de la régénération gardée en incantation, en % ; aura 42 : sort de ralenti déclenché sur un coup reçu)."
   ]
 }

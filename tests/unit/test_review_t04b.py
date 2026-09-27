@@ -17,7 +17,7 @@ from forever.pipeline.questie import read_journey
 from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import mc
 
-SEED_MODE = {"mob_source": "seed", "spell_level": "rank"}
+SEED_MODE = {"mob_source": "seed", "spell_level": "rank", "rules": "seed"}
 
 
 def run_json(capsys, argv, deps):

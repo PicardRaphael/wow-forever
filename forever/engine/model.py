@@ -282,6 +282,18 @@ class Utility:
 
 
 @dataclass(frozen=True)
+class ArmorRank:
+    """Rang d'une armure du Mage lu dans le client (`spell_scaling.json.utility`) : niveau d'apprentissage
+    (`SpellLevels.BaseLevel`) et effets retenus par `decode_rules.json.utility_spells`."""
+
+    kind: str  # frost_armor, ice_armor, mage_armor
+    rank: int
+    spell_id: int
+    learned_level: int
+    effects: Mapping[str, float]
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
 
@@ -298,6 +310,7 @@ class GameData:
     mob_model: MobModel
     leveling: LevelingConstants
     utility: Utility
+    armors: Mapping[str, tuple[ArmorRank, ...]]  # armures du client (spell_scaling.json.utility), par rang
 
 
 class CharacterOverrides(TypedDict, total=False):

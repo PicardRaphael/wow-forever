@@ -91,6 +91,8 @@ def build_server(deps: Deps) -> MCPServer:
         spell_level: str = "character",
         level_diff: int | None = None,
         nova: bool = False,
+        rules: str = "forever",
+        armor: str = "auto",
     ) -> LevelingReport:
         """Leveling du Mage : temps par monstre (combat, repos, total), mana, dégâts subis et XP par heure, par Monte
         Carlo (moyenne de `n` combats, graine fixe) et par le modèle analytique, avec les PV du monstre (valeur,
@@ -98,7 +100,10 @@ def build_server(deps: Deps) -> MCPServer:
 
         `rotation` : frost ou fire. `talents` : clé de talent -> rang (ex. {"improvedFrostbolt": 3}), build vérifié.
         `mob_source` : measured (PV mesurés, puis Questie corrigé) ou seed (modèle du seed).
-        `spell_level` : character (dégâts au niveau du personnage) ou rank (dégâts du rang, parité avec le seed)."""
+        `spell_level` : character (dégâts au niveau du personnage) ou rank (dégâts du rang, parité avec le seed).
+        `rules` : forever (corrections de Forever, défaut) ou seed (comportement du seed, parité).
+        `armor` : auto (armure selon le niveau d'apprentissage lu dans le client), frost ou mage (paramètre de build ;
+        Mage Armor sous son niveau d'apprentissage est refusée)."""
         try:
             return simulate_leveling(
                 deps,
@@ -112,6 +117,8 @@ def build_server(deps: Deps) -> MCPServer:
                 spell_level=spell_level,
                 level_diff=level_diff,
                 nova=nova,
+                rules=rules,
+                armor=armor,
             )
         except ForeverError as err:
             return cast(LevelingReport, _error_result(deps, err))

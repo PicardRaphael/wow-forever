@@ -14,6 +14,7 @@ import random
 import statistics
 from typing import Any, TypedDict, cast
 
+from forever.engine.armor import ARMOR_CHOICES
 from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time, pushback_resist_chance, pushback_s, spell_cooldown
 from forever.engine.character import character
@@ -43,7 +44,9 @@ from forever.engine.spells import SPELL_LEVELS, best_rank
 from forever.engine.talents import talent_value
 
 ROTATIONS = {"frost": "frostbolt", "fire": "fireball"}  # sort principal de chaque rotation
-OPTIONS = ("level_diff", "nova", "nova_break", "run_between_s", "mob_source", "spell_level")
+OPTIONS = ("level_diff", "nova", "nova_break", "run_between_s", "mob_source", "spell_level", "rules", "armor")
+# Règles du simulateur : `forever` (corrections de T04c) ou `seed` (comportement du seed à l'identique, parité).
+RULES = ("forever", "seed")
 # Paramètres de méthode (pas des chiffres de jeu) : pas de temps, garde contre une boucle sans fin, marges de temps.
 STEP_S = 0.05
 GUARD_CASTS = 500
@@ -78,12 +81,20 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
         "run_between_s": lv.default_run_between_s,
         "mob_source": "measured",
         "spell_level": "character",
+        "rules": "forever",
+        "armor": "auto",
         **options,
     }
     if o["mob_source"] not in MOB_SOURCES:
         raise ValueError(f"mob_source inconnu « {o['mob_source']} » ({' ou '.join(MOB_SOURCES)} attendu)")
     if o["spell_level"] not in SPELL_LEVELS:
         raise ValueError(f"spell_level inconnu « {o['spell_level']} » ({' ou '.join(SPELL_LEVELS)} attendu)")
+    if o["rules"] not in RULES:
+        raise ValueError(f"rules inconnu « {o['rules']} » ({' ou '.join(RULES)} attendu)")
+    if o["armor"] not in ARMOR_CHOICES:
+        raise ValueError(f"armor inconnue « {o['armor']} » ({', '.join(ARMOR_CHOICES)} attendue)")
+    if o["rules"] == "seed" and o["armor"] != "auto":
+        raise ValueError(f"armor « {o['armor']} » sans effet avec rules seed (le seed porte Frost Armor)")
     return o
 
 

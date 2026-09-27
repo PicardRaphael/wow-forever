@@ -30,7 +30,9 @@ def mana_cost(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
     return m
 
 
-def in_combat_regen_fraction(gd: GameData, pts: Points, level: int) -> float:
+def in_combat_regen_fraction(
+    gd: GameData, pts: Points, level: int, *, armor: str = "auto", rules: str = "forever"
+) -> float:
     """Part de la régénération d'Esprit gardée en combat (règle d'incantation) : Arcane Meditation, ou Mage Armor
     dès le niveau de son premier rang (`spells.json.utility`), bornée à 1.
 
