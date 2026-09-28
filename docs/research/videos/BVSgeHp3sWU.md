@@ -7,7 +7,7 @@
 |---|---|
 | Source | « People don´t understand HOW Base Damage changes work - WoW Forever », chaîne Toleduck, <https://www.youtube.com/watch?v=BVSgeHp3sWU> |
 | Publication | 2026-09-27, 17:49 |
-| Document de travail | `~/Documents/videos/BVSgeHp3sWU/BVSgeHp3sWU.md` (transcription whisper horodatée, 24 images ; images lues : 004 à 023, la 024 est un commentaire YouTube) |
+| Document de travail | `~/Documents/videos/BVSgeHp3sWU/BVSgeHp3sWU.md` (transcription whisper horodatée, 24 images, toutes lues : 001 à 003 et 024 sans chiffre de calcul, 021 montre seulement la saisie « 400-600 ») |
 | Outil montré | tableur web « Toleduck Theorycrafting » (non publié), valeurs de niveau 60, bêta |
 | Certitude communautaire | **[Supposé]** dans l'ensemble : un seul créateur de contenu, outil non publié, hypothèse de 534 de puissance des sorts **estimée** par l'auteur (200 de pré-raid Vanilla + 334 de compensation), prévisions (pré-raid 500, raid 800) personnelles. **[Probable]** pour les coefficients et les dégâts de base affichés dans le tableur : ils coïncident, à l'arrondi près, avec les tables du client (section 4). La règle orale « incantation / 3,5 » est en revanche incomplète (section 2). |
 
@@ -34,6 +34,7 @@
 | V9 | [09:22](https://youtu.be/BVSgeHp3sWU?t=562), image 018 | Frostbolt r11 à 534, Piercing Ice 3/3 | base 457-493 (moy. 475), +434,7, +6 % → 964,3 ; critique 1 928,5 |
 | V10 | image 023 | Frostbolt r11 à 500 | +407, → 934,9 |
 | V11 | image 019 | Frostbolt r11 à 1 000 | +814, +77,3 → 1 366,3 |
+| V11b | images 022, 020 | Frostbolt r11 à 800 et à 2 000 | +651,2 → 1 193,8 ; +1 628 → 2 229,2 (critique 4 458,4) |
 | V12 | image 013 | Frostfire Bolt r3 à 534 | base 270-314, +434,7, +6 % → 770,3 ; critique 1 540,6 |
 | V13 | image 013 | Cone of Cold r5 à 534, Improved Cone of Cold 3/3 et Piercing Ice 3/3 | base 328-358 (moy. 343), +68,9, +43,1 % → 589,4 ; critique 1 178,8 |
 | V14 | image 013 | Fire Blast r7 à 534 | moy. 453, +229,1 → 682,1 |
@@ -79,6 +80,7 @@ Calcul : `best_rank`, `rank_damage(…, spell_level="character")` au niveau 60, 
 | V9 Frostbolt r11, 534 | 964,3 / 1 928,5 | 964,4 / 1 928,8 | +0,1 | 0,8143 calculé contre 0,814 du client |
 | V10 Frostbolt r11, 500 | 934,9 | 935,1 | +0,2 | idem |
 | V11 Frostbolt r11, 1 000 | 1 366,3 | 1 366,6 | +0,3 | idem |
+| V11b Frostbolt r11, 800 et 2 000 | 1 193,8 ; 2 229,2 | 1 194,0 ; 2 229,8 | +0,2 ; +0,6 | idem (l'écart croît avec la puissance des sorts : 0,0003 × SP × 1,06) |
 | V12 Frostfire Bolt r3, 534 | 770,3 / 1 540,6 | 770,4 / 1 540,9 | +0,1 | idem |
 | V8 Ice Lance r6 gelée, sans puissance (tableur) | 627,5 / 1 255 | 629,6 / 1 259,3 | +2,1 | moyenne de base 148 (troncature) contre 148,5 (demi supérieur) ; valeur exacte 148,6 |
 | V8 Ice Lance r6 gelée, 534, calcul oral | 932 / 1 864 | 953,2 / 1 906,4 | +21 | l'auteur multiplie la part de puissance par 4 mais oublie Piercing Ice (× 1,06) ; avec le coefficient du client (0) : 629,6 |
@@ -119,7 +121,7 @@ Interprétation « par tic » **[Probable]** : Immolate (Démoniste) donne 0,2 d
 | Frost Nova | 0,029 | 0,0269 (r1) ; 0,043 | **différent** |
 | Cone of Cold | 0,129 | 0,1358 (0,143 × 0,95) | **différent** |
 | Blast Wave | 0,129 | 0,143 | **différent** |
-| Blizzard | 0,042 par tic × 8 = 0,336 | 0,333 | **différent** (+1 %) |
+| Blizzard | 0,042 par tic × 8 = 0,336 (sort de dégâts déclenché 1279949) ; l'effet factice du sort canalisé porte 0,03 | 0,333 | **différent** (+1 %) ; Hurricane et Rain of Fire ont le même effet factice à 0,03, que le tableur applique à Hurricane (+16,0 par tic à 534, image 011) |
 | Flamestrike | direct 0,157 ; DoT 0,032 par tic × 4 | 0,1334 (r1) ; 0,157 ; DoT 0 | **DoT absent** |
 
 Les lignes à `AcquireMethod` 3 et les sorts de PNJ homonymes (Frostbolt 9672, Fireball 9053…) sont à écarter : ce sont les leurres déjà décrits dans `tests/fixtures/wago/1.60.1.70009/README.md`.
@@ -128,7 +130,7 @@ Les lignes à `AcquireMethod` 3 et les sorts de PNJ homonymes (Frostbolt 9672, F
 
 | # | Écart | Qui a raison | Comment trancher |
 |---|---|---|---|
-| E1 | Coefficients fixes de Frost Nova, Cone of Cold, Blast Wave, Blizzard | **Le client** [Probable → Certain à la lecture] : le client et le tableur concordent contre nous ; nos valeurs viennent de `fm.py` (valeurs Classic de mémoire) | Données du client : lire la colonne (correction C1). Contrôle dans un journal au niveau 60 si besoin. |
+| E1 | Coefficients fixes de Frost Nova, Cone of Cold, Blast Wave, Blizzard | **Le client** [Probable → Certain à la lecture] : le client et le tableur concordent contre nous ; nos valeurs viennent de `fm.py` (valeurs Classic de mémoire) | Données du client : lire la colonne (correction C1). Contrôle dans un journal au niveau 60 si besoin. Pour Blizzard, le journal dit aussi lequel des deux coefficients s'applique (0,042 du sort déclenché, probable, ou 0,03 de l'effet factice) : tic de Blizzard (sans variance) à deux niveaux de puissance des sorts. |
 | E2 | Pénalité des sorts de bas niveau (absente de la table, appliquée chez nous) | **Inconnu** [Supposé] : la règle Classic la fait appliquer par le serveur, hors table ; les doublons 400618-400619 montrent la même formule (0,0375 par niveau) dans les données de Forever | Journal : les fixtures ne départagent pas (98 Frostbolt r3, 127 Arcane Explosion r1, 24 Fire Blast r2, 22 Frost Nova r1, tous compatibles avec les deux hypothèses, 13-14 de puissance des sorts). **Test en jeu** : une dizaine de Frostbolt **de rang 1** sur un monstre gris, sans talent de dégâts : au niveau ≥ 8 du personnage, base 20-22 ; + 0,407 × SP sans pénalité, + 0,163 × SP avec. À 14 de puissance des sorts : 25,6-27,8 contre 22,2-24,4, sans recouvrement. La puissance des sorts se lit dans le bloc avancé des lignes `SPELL_CAST_SUCCESS` (champ 18, vérifié sur la fixture). |
 | E3 | Pas de puissance des sorts sur les DoT | **Le client** [Probable] (interprétation par tic, voir section 4) | Journal : un tic de DoT n'a pas de variance, donc tout écart est lisible. Pyroblast r1 (niveau 20, sans pénalité) : tic = 11 + 0,15 × SP (× talents) ; à 20 de puissance des sorts, 14 au lieu de 11. |
 | E4 | Ice Lance : client 0, nous 0,1429, l'auteur « non vérifié » | **Le client** [Probable] : le 0 est explicite alors que les autres sorts issus des runes portent un coefficient (Arcane Blast 0,714, Frostfire Bolt 0,814, Living Bomb 0,4) | Journal : Ice Lance sur cible non gelée, deux séries avec au moins 30 de puissance des sorts d'écart ; attendu + 4,3 par coup avec 0,1429, rien avec 0. Critère simple : un seul coup au-dessus du max de base (× talents) réfute 0. |
@@ -196,6 +198,8 @@ Aucun calcul de dégâts hors Mage n'est prévu avant T12 ; ces lignes servent a
 | Démoniste | Conflagrate (18932), Searing Pain (17923), Shadowburn (18871) | 0,429 | 0,429 (instantané borné à 1,5 s) | +229,1 | concordant ; « Conflagrate getting the short end of the stick » est une appréciation, pas une règle |
 | Démoniste | Immolate (25309), Corruption (25311) | 0,2 + 0,13 × 5 ; 0,2 × 6 = 1,2 | — | +106,8 par tic de Corruption | DoT par tic |
 | Démoniste | Drain Life (11700), Siphon Life (18881), Bane of Agony (11713), Bane of Doom (603), Hellfire (11684) | 0,1 × 5 ; 0,05 × 10 ; 0,133 par tic de 2 s ; 4 (un tic à 60 s) ; 0,022 par tic | — | — | Bane of Agony monte en puissance (tics inégaux, [06:45](https://youtu.be/BVSgeHp3sWU?t=405)) : répartition à lire dans le client |
+| Démoniste | réglages du tableur (images 008 à 011) | — | — | puissance des sorts effective 594 avec un démon actif (image 009 : +60, Demonic Knowledge ou démon, à vérifier) ; Immolate direct +65 % en Destruction (image 011) ; Corruption +33,4 % puis +43,9 % avec Wrack (images 008, 009) | options JcE / JcJ de l'auteur, pas des règles |
+| Druide | Hurricane (17402) | effet factice 0,03 ; dégâts par aura 226 (tic de 1 s) | — | +16,0 par tic | voir Blizzard (section 4) : coefficient du sort déclenché à lire |
 
 Leçon pour T12 : lire le coefficient de chaque effet dans le client. La règle « incantation / 3,5 » ne vaut que pour les sorts directs à cible unique ; elle se trompe pour les horions, les canalisations, les sorts hybrides, les DoT et les sorts de zone. Le tableur de l'auteur multiplie tous ses modificateurs (Shadowform, Darkness, Shadow Weaving, Twin Disciplines : 1,1 × 1,1 × 1,1 × 1,05 = 1,398) ; l'ordre de cumul par classe reste à confirmer par les journaux.
 
