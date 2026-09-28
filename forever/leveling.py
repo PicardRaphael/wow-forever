@@ -115,7 +115,27 @@ def target_hp(gd: GameData, level: int, mob_source: str) -> MonsterHp:
         raise InvalidArgumentError(f"{exc}.", "choisir un niveau de monstre couvert par les données") from exc
 
 
-def assumptions(options: Mapping[str, Any], hp: MonsterHp, talents: Mapping[str, int], n: int, seed: int) -> list[str]:
+def damage_assumptions(options: Mapping[str, Any], low_level_default: bool) -> list[str]:
+    """Hypothèses de calcul des dégâts du mode forever (T04e) ; aucune en mode seed (formule du seed)."""
+    if options["rules"] != "forever":
+        return []
+    penalty = low_level_default if options.get("low_level_penalty") is None else options["low_level_penalty"]
+    origin = "défaut des données" if options.get("low_level_penalty") is None else "option"
+    return [
+        "coefficients de puissance des sorts du client (SpellEffect.EffectBonusCoefficient), tics de DoT compris",
+        f"pénalité des sorts de bas niveau : {'appliquée' if penalty else 'non appliquée'} ({origin}, suppose)",
+        "bonus de dégâts en pourcentage multipliés entre sources (probable)",
+    ]
+
+
+def assumptions(
+    options: Mapping[str, Any],
+    hp: MonsterHp,
+    talents: Mapping[str, int],
+    n: int,
+    seed: int,
+    low_level_default: bool = True,
+) -> list[str]:
     spec = ", ".join(f"{k} {v}" for k, v in sorted(talents.items())) or "aucun"
     return [
         f"mob_source {options['mob_source']} : PV du monstre {hp.value:g} ({hp.certainty}, {hp.source})",
@@ -132,6 +152,7 @@ def assumptions(options: Mapping[str, Any], hp: MonsterHp, talents: Mapping[str,
         f"talents : {spec}",
         f"Monte Carlo : n = {n}, graine {seed} ; analytique : espérance fermée (seed)",
         "constantes leveling.* du seed sim_leveling.py (EST, suppose) ; XP de monstre : règle Classic (T04c)",
+        *damage_assumptions(options, low_level_default),
     ]
 
 
@@ -153,8 +174,11 @@ def simulate_leveling(
     armor: str = "auto",
     ab_stacks: int | None = None,
     ab_dump: str | None = None,
+    low_level_penalty: bool | None = None,
 ) -> LevelingReport:
-    """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance."""
+    """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance.
+
+    `low_level_penalty` : pénalité des sorts de bas niveau (None : `coefficient.low_level_default` des données)."""
     data = load_version(deps)
     gd = build_game_data(data)
     cap = level_cap(data)
@@ -170,6 +194,7 @@ def simulate_leveling(
         "nova": nova,
         "rules": rules,
         "armor": armor,
+        "low_level_penalty": low_level_penalty,
     }
     if ab_stacks is not None:
         raw["ab_stacks"] = ab_stacks
@@ -198,7 +223,10 @@ def simulate_leveling(
         data_sha=data.data_sha,
         freshness=fresh["freshness"],
         certainty=certainty,
-        assumptions=[*fresh["assumptions"], *assumptions(options, hp, pts, n, seed)],
+        assumptions=[
+            *fresh["assumptions"],
+            *assumptions(options, hp, pts, n, seed, gd.constants.coefficients.low_level_default),
+        ],
     )
     return {
         "level": level,

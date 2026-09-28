@@ -9,6 +9,8 @@ Option `rules` (T04c) : `seed` reproduit le seed à l'identique (parité) ; `for
 de T04c : armure portée selon le niveau d'apprentissage du client (`armor`), régénération cumulée d'Arcane
 Meditation et de Mage Armor, Ignite roulant (posé à l'impact du critique, reste perdu à la mort du monstre). Aucune
 correction ne consomme de tirage.
+T04e (`forever`) : coefficients du client, puissance des sorts et période des tics de DoT lues dans le client ;
+option `low_level_penalty` (pénalité des sorts de bas niveau, défaut des données, refusée à False en `seed`).
 
 Aucune formule de combat ici : chaque règle vient de `forever/engine/` ; ce module n'orchestre que le temps, les
 événements et les tirages. Registre : I1 (rotations frost, fire, arcane), I6 (leveling), J2 (graine)."""
@@ -86,6 +88,7 @@ OPTIONS = (
     "armor",
     "ab_stacks",
     "ab_dump",
+    "low_level_penalty",
 )
 # Règles du simulateur : `forever` (corrections de T04c) ou `seed` (comportement du seed à l'identique, parité).
 RULES = ("forever", "seed")
@@ -137,6 +140,7 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
         "armor": "auto",
         "ab_stacks": None,
         "ab_dump": None,
+        "low_level_penalty": None,
         **options,
     }
     if o["mob_source"] not in MOB_SOURCES:
@@ -149,6 +153,10 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
         raise ValueError(f"armor inconnue « {o['armor']} » ({', '.join(ARMOR_CHOICES)} attendue)")
     if o["rules"] == "seed" and o["armor"] != "auto":
         raise ValueError(f"armor « {o['armor']} » sans effet avec rules seed (le seed porte Frost Armor)")
+    if o["low_level_penalty"] is not None and not isinstance(o["low_level_penalty"], bool):
+        raise ValueError(f"low_level_penalty « {o['low_level_penalty']} » : True, False ou None (données) attendu")
+    if o["rules"] == "seed" and o["low_level_penalty"] is False:
+        raise ValueError("low_level_penalty False sans effet avec rules seed (le seed applique toujours la pénalité)")
     if rotation == "arcane" and o["rules"] == "seed":
         raise ValueError("rotation arcane absente du seed : rules forever attendu (rules seed refusé)")
     for key in ("ab_stacks", "ab_dump"):
@@ -264,6 +272,7 @@ def kill_mc(
             buffs=buffs,
             spell_level=o["spell_level"],
             rules=o["rules"],
+            low_level_penalty=o["low_level_penalty"],
         )
         assert e is not None  # seuls les sorts appris sont lancés
         paid = 0.0
@@ -284,7 +293,14 @@ def kill_mc(
         if landed:
             r = e["rank"]
             base = roll_base_damage(
-                gd, key, r, ch, rng.random(), frozen=frozen and key == "ice_lance", rules=o["rules"]
+                gd,
+                key,
+                r,
+                ch,
+                rng.random(),
+                frozen=frozen and key == "ice_lance",
+                rules=o["rules"],
+                low_level_penalty=o["low_level_penalty"],
             )
             crit = rng.random() < e["crit"]
             dmg = base * e["dmg_mult"] * (e["crit_mult"] if crit else 1.0)
@@ -294,7 +310,9 @@ def kill_mc(
                 s["cc"] = True
             if r.dot_total:
                 ticks = dot_tick_times(gd, r.dot_duration_s, dot_tick_period_s(gd, key, r, rules=o["rules"]))
-                per_tick = dot_coefficient(gd, key, r, rules=o["rules"]) * spell_power(ch)
+                per_tick = dot_coefficient(
+                    gd, key, r, rules=o["rules"], low_level_penalty=o["low_level_penalty"]
+                ) * spell_power(ch)
                 tick = dot_tick_damage(gd, r.dot_total, e["dmg_mult"], len(ticks), sp_per_tick=per_tick)
                 for at in ticks:
                     tick_crit = gd.rules.dot_can_crit and rng.random() < e["crit"]

@@ -35,6 +35,7 @@ from forever.leveling import (
     check_level,
     check_race,
     check_talents,
+    damage_assumptions,
     level_cap,
     parse_talents,
     simulate_leveling,
@@ -294,6 +295,12 @@ def _leveling_arguments(p: argparse.ArgumentParser, *, n_default: int) -> None:
     p.add_argument("--level-diff", type=int, help="niveau du monstre - niveau du personnage (défaut des données)")
     p.add_argument("--nova", action="store_true", help="Frost Nova au contact")
     p.add_argument("--json", action="store_true", help="sortie JSON")
+    p.add_argument(
+        "--low-level-penalty",
+        choices=["on", "off"],
+        help="pénalité des sorts de bas niveau (défaut : coefficient.low_level_default des données ; off refusé "
+        "avec --rules seed)",
+    )
 
 
 # --- Rendu texte ---------------------------------------------------------------------------------
@@ -844,6 +851,7 @@ def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
         armor=args.armor,
         ab_stacks=args.ab_stacks,
         ab_dump=args.ab_dump,
+        low_level_penalty=None if args.low_level_penalty is None else args.low_level_penalty == "on",
     )
     hp = rep["mob_hp"]
     gap = f"{rep['analytic_gap'] * 100:+.1f}".replace(".", ",")
@@ -889,6 +897,7 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
         "nova": args.nova,
         "rules": args.rules,
         "armor": args.armor,
+        "low_level_penalty": None if args.low_level_penalty is None else args.low_level_penalty == "on",
     }
     if args.ab_stacks is not None:
         options["ab_stacks"] = args.ab_stacks
@@ -916,6 +925,7 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
         f"mob_source {args.mob_source}, spell_level {args.spell_level}, n = {args.n} par niveau, graine {args.seed}",
         f"rules {args.rules}, armor {args.armor}",
         "constantes leveling.* du seed sim_leveling.py (EST, suppose) ; XP de monstre : règle Classic (T04c)",
+        *damage_assumptions(options, gd.constants.coefficients.low_level_default),
     ]
     provenance = local_provenance(deps, certainty=min_certainty([*certainties, "suppose"]), assumptions=notes)
     payload = {**res, "provenance": provenance}

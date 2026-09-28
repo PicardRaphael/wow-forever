@@ -107,6 +107,7 @@ def build_server(deps: Deps) -> MCPServer:
         armor: str = "auto",
         ab_stacks: int | None = None,
         ab_dump: str | None = None,
+        low_level_penalty: bool | None = None,
     ) -> LevelingReport:
         """Leveling du Mage : temps par monstre (combat, repos, total), mana, dégâts subis et XP par heure, par Monte
         Carlo (moyenne de `n` combats, graine fixe) et par le modèle analytique, avec les PV du monstre (valeur,
@@ -119,7 +120,8 @@ def build_server(deps: Deps) -> MCPServer:
         `armor` : auto (armure selon le niveau d'apprentissage lu dans le client), frost ou mage (paramètre de build ;
         Mage Armor sous son niveau d'apprentissage est refusée).
         Rotation arcane (niveau 20 et talent arcaneBlast) : `ab_stacks` cumuls d'Arcane Blast (0 au maximum du
-        talent ; défaut : maximum) puis `ab_dump` (frostbolt par défaut, fireball, arcane_missiles)."""
+        talent ; défaut : maximum) puis `ab_dump` (frostbolt par défaut, fireball, arcane_missiles).
+        `low_level_penalty` : pénalité des sorts de bas niveau (None : défaut des données ; False refusé avec seed)."""
         try:
             return simulate_leveling(
                 deps,
@@ -137,6 +139,7 @@ def build_server(deps: Deps) -> MCPServer:
                 armor=armor,
                 ab_stacks=ab_stacks,
                 ab_dump=ab_dump,
+                low_level_penalty=low_level_penalty,
             )
         except ForeverError as err:
             return cast(LevelingReport, _error_result(deps, err))

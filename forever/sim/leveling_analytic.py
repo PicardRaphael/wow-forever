@@ -66,6 +66,7 @@ def arcane_cycle(
     ab_dump: str = "frostbolt",
     spell_level: str = "character",
     rules: str = "forever",
+    low_level_penalty: bool | None = None,
 ) -> ArcaneCycle:
     """Espérance d'un cycle stationnaire de la rotation arcane (hors recul d'incantation) : `ab_stacks` Arcane Blast
     (défaut : maximum du talent), chacun au coût de son cumul (`arcane_blast_cost`), libérés par Clearcasting avec la
@@ -74,9 +75,10 @@ def arcane_cycle(
 
     Registre : B11, B15, I1"""
     n, dump = arcane_plan(gd, level, pts, ab_stacks, ab_dump)
-    ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, spell_level=spell_level, rules=rules)
+    eng: dict[str, Any] = {"spell_level": spell_level, "rules": rules, "low_level_penalty": low_level_penalty}
+    ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, **eng)
     buffs = arcane_blast_bonus(gd, pts, n, for_spell=dump)
-    de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=buffs, spell_level=spell_level, rules=rules)
+    de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=buffs, **eng)
     assert ab is not None and de is not None  # vérifiés par arcane_plan
     free = clearcast_cost_factor(gd, pts, ab["hit"])
     ab_mana = sum(arcane_blast_cost(gd, ab["rank"], pts, ch, i) for i in range(n)) * free
@@ -105,7 +107,8 @@ def kill_analytic(
     lv, mm, gcd = gd.leveling, gd.mob_model, gd.rules.gcd_s
     level_diff = o["level_diff"]
     spell_level = o["spell_level"]
-    eng = {"spell_level": spell_level, "rules": o["rules"]}  # options transmises au moteur
+    # options transmises au moteur
+    eng: dict[str, Any] = {"spell_level": spell_level, "rules": o["rules"], "low_level_penalty": o["low_level_penalty"]}
     ch = character(gd, level, race, over)
     mlevel = level + level_diff
     hp = mob_hp(gd, mlevel, o["mob_source"]).value
