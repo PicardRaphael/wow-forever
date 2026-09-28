@@ -23,7 +23,7 @@ disable-model-invocation: true
 ## 3. Fin
 1. Lancer le skill `/verifier`.
 2. Commit « $ARGUMENTS: <résumé> ».
-3. Résumé final : Bloqué sur moi, Fait, Tests ajoutés, Registre modifié, Questions ouvertes (ajoutées à `docs/OPEN_QUESTIONS.md`).
+3. Résumé final : Bloqué sur moi, Fait, Tests ajoutés, Registre modifié, Questions ouvertes (ajoutées à `docs/OPEN_QUESTIONS.md`), Angles morts (mécaniques absentes du registre, ou au statut `absent`, qui influencent les résultats de la tranche, chacune avec son effet estimé et son sens).
 
 ## Pièges
 <!-- Ajouter ici chaque erreur récurrente observée pendant les tranches. -->

@@ -36,7 +36,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - Tests d'abord : écrire les tests, constater l'échec, committer, puis implémenter jusqu'au vert sans modifier ces tests.
 - Petits commits, message `Txx: <ce qui change>`.
 - Continuer sans demander tant qu'une étape n'a pas besoin de moi. S'arrêter et demander avant : toucher `tests/golden/`, ajouter une dépendance, un accès réseau, supprimer des données, trancher une règle de jeu.
-- Fin de tranche : `/verifier`, puis un résumé avec, dans l'ordre : Bloqué sur moi, Fait, Tests ajoutés, Registre modifié, Questions ouvertes.
+- Fin de tranche : `/verifier`, puis un résumé avec, dans l'ordre : Bloqué sur moi, Fait, Tests ajoutés, Registre modifié, Questions ouvertes, Angles morts (mécaniques absentes du registre qui influencent les résultats, avec leur effet estimé).
 
 ## Code
 - Identifiants en anglais ; commentaires, docstrings, documentation et messages affichés à l'utilisateur en français.
