@@ -41,7 +41,8 @@ def dmg_mult(
     """Multiplicateur de dégâts : talents globaux et d'école, talent propre au sort `key` (Improved Cone of Cold),
     puis buffs (`dmg`, `dmg_sources`) et cumuls de Fire Vulnerability sur la cible.
 
-    `rules="forever"` : chaque source multiplie (probable, test en jeu E6) ; Improved Cone of Cold aux rangs de
+    `rules="forever"` : chaque source multiplie (`damage.bonus_stacking` `multiplicative`, probable, test en jeu E6 ;
+    variante `additive` : bonus des buffs et de Fire Vulnerability additionnés comme le seed) ; Improved Cone of Cold aux rangs de
     `talents.json` (courbe Trait du client, décision 77). `rules="seed"` : bonus des buffs et de Fire Vulnerability additionnés dans
     un seul facteur, Improved Cone of Cold ignoré (le seed ne le connaît pas).
 
@@ -57,11 +58,13 @@ def dmg_mult(
     fire = fire_vulnerability_part(gd, school, buffs.get("fire_vulnerability", 0))
     if rules == "seed":
         return m * (1 + buffs.get("dmg", 0.0) + sum(sources) + fire)
+    if key == CONE_OF_COLD:
+        m *= 1 + talent_value(gd, pts, IMPROVED_CONE_OF_COLD) / PERCENT
+    if gd.constants.bonus_stacking == "additive":
+        return m * (1 + buffs.get("dmg", 0.0) + sum(sources) + fire)
     m *= 1 + buffs.get("dmg", 0.0)
     for s in sources:
         m *= 1 + s
-    if key == CONE_OF_COLD:
-        m *= 1 + talent_value(gd, pts, IMPROVED_CONE_OF_COLD) / PERCENT
     return m * (1 + fire)
 
 
@@ -156,7 +159,9 @@ def dot_tick_damage(gd: GameData, dot_total: float, dmg_mult: float, ticks: int,
 
 
 def ignite_damage(gd: GameData, pts: Points, crit_damage: float) -> float:
-    """Dégâts totaux d'Ignite posés par un coup critique de feu (part du talent).
+    """Dégâts totaux d'Ignite posés par un coup critique de feu : part du talent × dégâts du critique final (bonus en
+    pourcentage déjà compris) ; les tics ne sont pas remultipliés (« Ignite no longer double dips on % damage
+    increase modifiers », notes de Blizzard du 24/09/2026, build 1.60.1.70009, probable).
 
     Registre : A18"""
     return crit_damage * talent_value(gd, pts, "ignite") / PERCENT
@@ -172,12 +177,11 @@ class IgniteState(NamedTuple):
 def roll_ignite(gd: GameData, state: IgniteState | None, now: float, amount: float) -> IgniteState:
     """Nouvel Ignite posé à `now` par un critique de feu de part `amount` (règle roulante, `leveling.ignite_rule`,
     suppose) : le reste non infligé de l'Ignite en cours s'ajoute, l'aura (non cumulable, client) repart pour sa
-    durée et le compteur de tics repart du critique (un tic par période de l'aura).
+    durée et le compteur de tics repart du critique (un tic par période de l'aura). La règle `independent`
+    (variante, règle du seed) ne passe pas par ici : un Ignite par critique, tics fixes (`ignite_tick_times`).
 
     Registre : A18"""
     lv = gd.leveling
-    if lv.ignite_rule != "rolling":
-        raise ValueError(f"règle d'Ignite inconnue « {lv.ignite_rule} » (rolling attendue)")
     remaining = amount + (state.remaining if state else 0.0)
     return IgniteState(remaining, tuple(now + lv.ignite_tick_s * i for i in range(1, lv.ignite_ticks + 1)))
 

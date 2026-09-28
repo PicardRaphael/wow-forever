@@ -134,7 +134,7 @@ def options_with_defaults(gd: GameData, rotation: str, options: dict[str, Any]) 
         "nova": False,
         "nova_break": lv.default_nova_break,
         "run_between_s": lv.default_run_between_s,
-        "mob_source": "measured",
+        "mob_source": lv.mob_source,
         "spell_level": "character",
         "rules": "forever",
         "armor": "auto",
@@ -232,6 +232,7 @@ def kill_mc(
     clearcast = talent_value(gd, pts, "arcaneConcentration") / PERCENT
     ignite = talent_value(gd, pts, "ignite")
     forever = o["rules"] == "forever"
+    rolling = forever and gd.leveling.ignite_rule == "rolling"  # Ignite roulant ; sinon un Ignite par critique
     # armure portée (forever) : ralenti des coups du monstre seulement sous Frost ou Ice Armor ; seed : toujours
     slows = worn_armor(gd, level, o["armor"]).slows_attackers if forever else True
     regen_c = in_combat_regen_fraction(gd, pts, level, armor=o["armor"], rules=o["rules"]) * ch.spirit_regen
@@ -319,7 +320,7 @@ def kill_mc(
                     dots.append((s["t"] + travel + at, tick * (e["crit_mult"] if tick_crit else 1.0)))
             if crit and e["school"] in SCHOOL_FIRE and ignite:
                 ig = ignite_damage(gd, pts, dmg)
-                if forever:
+                if rolling:
                     ignites.append((s["t"] + travel, ig))
                 else:
                     ig_ticks = ignite_tick_times(gd)

@@ -37,7 +37,8 @@
       "value": true,
       "certainty": "suppose",
       "registry": "G4",
-      "source": "T04e (décision 2) : pénalité des sorts de bas niveau (coefficient.low_level) appliquée par défaut en mode forever, règle Classic supposée gardée par Forever jusqu'au test en jeu E2 (docs/ADDON.md) ; toujours appliquée en mode seed"
+      "source": "T04e (décision 2) : pénalité des sorts de bas niveau (coefficient.low_level) appliquée par défaut en mode forever, règle Classic supposée gardée par Forever jusqu'au test en jeu E2 (docs/ADDON.md) ; toujours appliquée en mode seed",
+      "range": [{"value": true, "source": "règle Classic supposée gardée par Forever (T04e, décision 72)"}, {"value": false, "source": "coefficients du client sans pénalité des sorts de bas niveau (question E2)"}]
     },
     "coefficient.fixed": {
       "value": {
@@ -143,7 +144,8 @@
       "value": 0.01,
       "certainty": "suppose",
       "registry": "A3",
-      "source": "règle Classic (PC) supposée dans Forever : cible plus basse, raté = raté à écart 0 - 1 % par niveau d'écart, plancher min_miss (décision 4 du plan T04b) ; journal du 2026-09-27 : 0 raté sur 281 sorts directs, cibles 2 à 8 niveaux plus bas (très improbable avec 4 % : 0,96^281 ≈ 1e-5)"
+      "source": "règle Classic (PC) supposée dans Forever : cible plus basse, raté = raté à écart 0 - 1 % par niveau d'écart, plancher min_miss (décision 4 du plan T04b) ; journal du 2026-09-27 : 0 raté sur 281 sorts directs, cibles 2 à 8 niveaux plus bas (très improbable avec 4 % : 0,96^281 ≈ 1e-5)",
+      "range": [{"value": 0.01, "source": "règle Classic (décision 56) : 1 % de raté en moins par niveau d'écart sous la cible"}, {"value": 0.0, "source": "raté à écart 0 contre toute cible plus basse (lecture du seed : ligne « - » égale à l'écart 0)"}]
     },
     "leveling.mob_hit_damage": {
       "value": {"per_level": 0.8, "per_level_squared": 0.02},
@@ -185,7 +187,8 @@
       "value": "rolling",
       "certainty": "suppose",
       "registry": "A18",
-      "source": "T04c, décision 2 : Ignite roulant (aura non cumulable) ; à chaque critique de feu, montant = part du talent × critique + reste non infligé, l'aura repart pour sa durée et le compteur de tics repart du critique ; reste perdu à la mort du monstre. Règle côté serveur, à vérifier par les journaux (docs/OPEN_QUESTIONS.md)"
+      "source": "T04c, décision 2 : Ignite roulant (aura non cumulable) ; à chaque critique de feu, montant = part du talent × critique + reste non infligé, l'aura repart pour sa durée et le compteur de tics repart du critique ; reste perdu à la mort du monstre. Règle côté serveur, à vérifier par les journaux (docs/OPEN_QUESTIONS.md) ; assiette : part du talent × critique final, bonus en pourcentage pris une seule fois (notes de développement de Blizzard du 24/09/2026, https://us.forums.blizzard.com/en/wow/t/2360696/1 : « Ignite no longer double dips on % damage increase modifiers », build 1.60.1.70009 publié le même jour, probable)",
+      "range": [{"value": "rolling", "source": "T04c, décision 65 : Ignite roulant, une seule aura non cumulable (client)"}, {"value": "independent", "source": "seed sim_leveling.py : un Ignite par critique, tics fixes, sans cumul ni reste"}]
     },
     "leveling.quest_band": {
       "value": {
@@ -269,6 +272,34 @@
       "certainty": "probable",
       "registry": "I5",
       "source": "respec.json beta_observed (1 po puis 5 po observés sur la bêta) : les deux premiers paliers du barème sont observés (probable), les suivants suivent la règle Classic (suppose)"
+    },
+    "leveling.mob_source": {
+      "value": "measured",
+      "certainty": "probable",
+      "registry": "H11",
+      "source": "T04c : PV des monstres mesurés et corrigés Questie -> Forever (monsters.json, décision 57), défaut des simulateurs (option mob_source)",
+      "range": [{"value": "measured", "source": "monsters.json : PV mesurés dans les journaux, correction Questie -> Forever"}, {"value": "seed", "source": "leveling.json mob_model.hp_anchors : PV d'ancrage interpolés du seed"}]
+    },
+    "mana.regen_stacking": {
+      "value": "sum",
+      "certainty": "suppose",
+      "registry": "B7",
+      "source": "T04c, décision 66 : régénération en incantation d'Arcane Meditation et de Mage Armor additionnée (règle Classic : deux auras du même type s'additionnent), bornée à 100 %",
+      "range": [{"value": "sum", "source": "règle Classic (T04c) : somme des parts, bornée à 1"}, {"value": "max", "source": "seed fm.py : la plus grande des deux parts seulement"}]
+    },
+    "damage.bonus_stacking": {
+      "value": "multiplicative",
+      "certainty": "probable",
+      "registry": "A20",
+      "source": "T04e, décision 73 : bonus de dégâts en pourcentage de sources distinctes multipliés (vidéo BVSgeHp3sWU, exemples V13 et V18) ; test en jeu E6",
+      "range": [{"value": "multiplicative", "source": "vidéo BVSgeHp3sWU (V13, V18) : chaîne multiplicative"}, {"value": "additive", "source": "seed fm.py : bonus des buffs additionnés dans un seul facteur"}]
+    },
+    "coefficient.ice_lance_source": {
+      "value": "client",
+      "certainty": "suppose",
+      "registry": "G4",
+      "source": "T04e : coefficient d'Ice Lance lu dans le client (SpellEffect.EffectBonusCoefficient 0) en mode forever ; question E4",
+      "range": [{"value": "client", "source": "client 1.60.1.70009 : EffectBonusCoefficient 0 (spell_scaling.json)"}, {"value": "seed", "source": "coefficient.fixed.ice_lance de mechanics.json (estimation du seed)"}]
     }
   }
 }

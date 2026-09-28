@@ -44,9 +44,10 @@ mechanics:
       - tests/unit/test_engine_values.py::test_hit_by_level_diff
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
       - tests/unit/test_measure_second_log.py::test_hit_tally_with_the_questie_journey
+      - tests/unit/test_variants.py::test_a3_variant_misses_as_at_level_diff_zero
     tolerance: null
     formule: "raté = raté_table[écart] si écart ≥ 0 (dernière ligne au-delà) ; raté_table[0] + écart × raté_par_niveau_sous si écart < 0 ; toucher = 1 − max(raté_min, raté − talents de toucher d'école − toucher_équipement)"
-    note: "règle Classic supposée inchangée dans Forever (voir OPEN_QUESTIONS) ; T04b (décision 4) : cible plus basse selon la règle Classic (raté à écart 0 moins 1 % par niveau, plancher 1 %), la ligne « - » de leveling.json n'est plus lue ; journal du 2026-09-27 (seconde fixture, niveau du lanceur par le carnet de Questie) : 0 raté de table sur 281 sorts directs, cibles 2 à 8 niveaux plus bas — très improbable avec 4 % (0,96^281 ≈ 1e-5), plausible au plancher ; talents de toucher du Mage inconnus ; écarts 0 à +3 encore à mesurer (aucune cible de niveau égal ou supérieur)"
+    note: "règle Classic supposée inchangée dans Forever (voir OPEN_QUESTIONS) ; T04b (décision 4) : cible plus basse selon la règle Classic (raté à écart 0 moins 1 % par niveau, plancher 1 %), la ligne « - » de leveling.json n'est plus lue ; journal du 2026-09-27 (seconde fixture, niveau du lanceur par le carnet de Questie) : 0 raté de table sur 281 sorts directs, cibles 2 à 8 niveaux plus bas — très improbable avec 4 % (0,96^281 ≈ 1e-5), plausible au plancher ; talents de toucher du Mage inconnus ; écarts 0 à +3 encore à mesurer (aucune cible de niveau égal ou supérieur) ; T05 : plage de hit.miss_per_level_below (0,01 Classic ; 0 : raté à écart 0) pour la sensibilité des builds"
   - id: A4
     categorie: attaque
     description: "Toucher unifié Forever (sources, plafond, poisons et pièges)"
@@ -222,6 +223,7 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/talents.json"
       - "forever/data/1.60.1.70009/mechanics.json (clés leveling.*)"
+      - "notes de développement de Blizzard du 24/09/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/1), build 1.60.1.70009"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
@@ -233,9 +235,12 @@ mechanics:
       - tests/unit/test_engine_ignite.py::test_forever_monte_carlo_differs_from_the_seed_only_through_ignite
       - tests/unit/test_measures_refresh.py::test_ignite_prediction_of_both_variants
       - tests/unit/test_measures_refresh.py::test_refresh_compares_ignite_ticks_with_the_data_rule
+      - tests/unit/test_variants.py::test_ignite_takes_percentage_bonuses_once
+      - tests/unit/test_variants.py::test_ignite_amount_is_the_talent_share_of_the_final_crit
+      - tests/unit/test_variants.py::test_independent_ignite_variant_is_the_seed_rule
     tolerance: null
     formule: "Ignite = crit × base × mult_dégâts × mult_crit × part_Ignite (espérance par lancer) ; Monte Carlo (rules forever) : à chaque critique de feu, reste = part × critique + reste non infligé, tics repartis sur durée / période à partir du critique"
-    note: "espérance par lancer dans expected_cast (analytique inchangée : perte à la mort non modélisée) ; T04c : aura 412538 lue dans le client (4 s, période 2 s, CumulativeAura 1 : pas de cumul par empilement, certain) ; règle roulante leveling.ignite_rule (décision 2, suppose : le compteur de tics repart du critique, reste perdu à la mort), forever/engine/damage.py : roll_ignite, ignite_ticks_due ; variante « compteur conservé » (roll_ignite_keep_timer) pour la comparaison seulement ; rules seed : 2 tics de 2 s par critique sans cumul (parité) ; vérification par les journaux (forever measures refresh, protocole de collecte A18) : voir OPEN_QUESTIONS"
+    note: "espérance par lancer dans expected_cast (analytique inchangée : perte à la mort non modélisée) ; T04c : aura 412538 lue dans le client (4 s, période 2 s, CumulativeAura 1 : pas de cumul par empilement, certain) ; règle roulante leveling.ignite_rule (décision 2, suppose : le compteur de tics repart du critique, reste perdu à la mort), forever/engine/damage.py : roll_ignite, ignite_ticks_due ; variante « compteur conservé » (roll_ignite_keep_timer) pour la comparaison seulement ; rules seed : 2 tics de 2 s par critique sans cumul (parité) ; vérification par les journaux (forever measures refresh, protocole de collecte A18) : voir OPEN_QUESTIONS ; T05 (bloc B) : notes de Blizzard du 24/09/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/1) « Ignite no longer double dips on % damage increase modifiers », build 70009 publié le même jour (wago.tools 2026-09-24T22:02Z, aucun build ultérieur) : assiette = critique final, bonus en pourcentage pris une fois, tics non remultipliés (déjà le calcul du moteur, verrouillé par un test) ; variante independent (règle du seed) dans la plage de leveling.ignite_rule pour la sensibilité"
   - id: A19
     categorie: attaque
     description: "Procs exclus des critiques périodiques (Hot Streak)"
@@ -271,9 +276,10 @@ mechanics:
       - tests/unit/test_damage_modifiers.py::test_merge_buffs
       - tests/unit/test_video_examples.py::test_video_example
       - tests/unit/test_video_examples.py::test_seed_rules_miss_the_video
+      - tests/unit/test_variants.py::test_bonus_stacking_variant_adds_like_the_seed
     tolerance: null
     formule: "forever : mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts) × Π (1 + autre source) × (1 + Improved Cone of Cold, Cone of Cold seul) × (1 + cumuls × part de Fire Vulnerability, écoles de l'aura) ; seed : talents × (1 + buff + Σ sources + cumuls × part), Improved Cone of Cold ignoré ; Ice Lance contre cible gelée : × mult_gelé du sort"
-    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 12 / 23 / 35 %, rangs de talents.json (courbe Trait 83066 du client, absente des lignes hotfixées de Hotfix.log du 2026-09-27 ; décision 77 ; Classic : 15 / 25 / 35). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09)."
+    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 12 / 23 / 35 %, rangs de talents.json (courbe Trait 83066 du client, absente des lignes hotfixées de Hotfix.log du 2026-09-27 ; décision 77 ; Classic : 15 / 25 / 35). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09). ; T05 : cumul lu dans les données (damage.bonus_stacking, multiplicative, probable ; variante additive du seed)"
   - id: A21
     categorie: attaque
     description: "Multiplicateur de critique des sorts et talents qui l'augmentent"
@@ -395,9 +401,10 @@ mechanics:
       - tests/unit/test_engine_leveling.py::test_forever_regen_adds_arcane_meditation_and_worn_mage_armor
       - tests/unit/test_sim_rules.py::test_arcane_meditation_adds_to_mage_armor
       - tests/unit/test_sim_rules.py::test_monte_carlo_uses_the_cumulated_regen
+      - tests/unit/test_variants.py::test_regen_stacking_variant_keeps_the_best_source
     tolerance: null
     formule: "rules forever : part gardée en combat = min(1, Arcane Meditation + part de l'armure portée) ; rules seed : min(1, max(Arcane Meditation, Mage Armor dès son premier rang)) ; mana régénérée en combat = part × régénération d'Esprit × durée du combat"
-    note: "T04b : porté du seed (forever/engine/mana.py : in_combat_regen_fraction) ; agrégat part × régénération d'Esprit × durée du combat : ni règle des 5 s (combat_rules.five_second_rule non lu), ni tic de 2 s simulé ; T04c (décision 3) : cumul de la règle Classic (deux auras 134 s'additionnent, suppose) et armure portée selon le niveau d'apprentissage lu dans le client (worn_armor, I6) : plus de Mage Armor et de Frost Armor à la fois ; maximum du seed gardé en rules seed : voir OPEN_QUESTIONS"
+    note: "T04b : porté du seed (forever/engine/mana.py : in_combat_regen_fraction) ; agrégat part × régénération d'Esprit × durée du combat : ni règle des 5 s (combat_rules.five_second_rule non lu), ni tic de 2 s simulé ; T04c (décision 3) : cumul de la règle Classic (deux auras 134 s'additionnent, suppose) et armure portée selon le niveau d'apprentissage lu dans le client (worn_armor, I6) : plus de Mage Armor et de Frost Armor à la fois ; maximum du seed gardé en rules seed : voir OPEN_QUESTIONS ; T05 : cumul lu dans les données (mana.regen_stacking, sum, suppose ; variante max du seed)"
   - id: B8
     categorie: ressources
     description: "MP5"
@@ -978,9 +985,11 @@ mechanics:
       - tests/unit/test_gamedata.py::test_spell_ranks
       - tests/unit/test_gamedata.py::test_coefficient_reads_data
       - tests/parity/test_fm_parity.py::test_rank_and_coefficient_parity
+      - tests/unit/test_variants.py::test_ice_lance_variant_uses_the_seed_coefficient
+      - tests/unit/test_variants.py::test_low_level_penalty_variant_is_the_option
     tolerance: null
     formule: "forever : coefficient = Σ coefficient du client des coups directs + Σ coefficient par éclair × éclairs (canalisé), × pénalité ; seed : min(max, max(min, incantation)) / diviseur (× facteur si ralenti), canalisé min(durée, plafond) / diviseur, coefficient fixe pour les sorts listés, × pénalité ; pénalité = max(0, 1 − part × (seuil − niveau du sort)) sous le seuil"
-    note: "T04e : coefficients du client (certain) en mode forever, formule du seed en mode seed (parité à 1e-12). Pénalité des sorts de bas niveau : absente de la table du client (Frostbolt r1 0,407), règle Classic supposée gardée (suppose), appliquée par défaut (mechanics.json coefficient.low_level_default), option low_level_penalty ; test en jeu E2. Ice Lance : 0 dans le client (probable, test en jeu E4). Blizzard : coefficient du sort déclenché, 8 × 0,042 (probable ; l'effet factice du parent porte 0,03, question ouverte)."
+    note: "T04e : coefficients du client (certain) en mode forever, formule du seed en mode seed (parité à 1e-12). Pénalité des sorts de bas niveau : absente de la table du client (Frostbolt r1 0,407), règle Classic supposée gardée (suppose), appliquée par défaut (mechanics.json coefficient.low_level_default), option low_level_penalty ; test en jeu E2. Ice Lance : 0 dans le client (probable, test en jeu E4). Blizzard : coefficient du sort déclenché, 8 × 0,042 (probable ; l'effet factice du parent porte 0,03, question ouverte). ; T05 : coefficient d'Ice Lance du mode forever selon coefficient.ice_lance_source (client : 0 ; variante seed : coefficient.fixed.ice_lance) ; plage de coefficient.low_level_default pour la sensibilité"
   - id: G5
     categorie: personnage
     description: "Legacy (arbre de compte)"
@@ -1130,9 +1139,10 @@ mechanics:
       - tests/unit/test_monsters_correction.py::test_measured_levels_are_never_modified
       - tests/unit/test_engine_monsters.py::test_mob_hp_measured_first
       - tests/unit/test_engine_monsters.py::test_mob_hp_seed_model
+      - tests/unit/test_variants.py::test_mob_hp_variant_is_the_seed_source
     tolerance: null
     formule: "PV(niveau) = mesure si le niveau est mesuré ; sinon médiane Questie × max(1, pente × niveau + ordonnée) (médiane mesurée / Questie au niveau si elle existe) ; probable dans la plage mesurée, suppose au-delà"
-    note: "T04b (décision 5) : Questie charge sur Forever la base Classic Era ; rapport mesuré / Questie de 1 jusqu'au niveau 7 puis +0,0248 par niveau (genou 7,95), 7 niveaux d'une seule zone (les Tarides) ; extrapolé jusqu'à × 2,29 au niveau 60 (suppose). Sarilus Foulborne (PNJ de quête, rapport 1,62) exclu de l'ajustement. Forever semble donner une valeur commune par niveau aux PNJ normaux (lanceurs de sorts compris) ; Sunscale Lashtail à part. Modèle du seed (hp_anchors) gardé pour la parité (mob_source seed). La certitude probable couvre toute la plage 1 à 17 (règle de l'utilisateur), y compris les niveaux 2 à 5, 8 et 9 sans PNJ mesuré ; les niveaux 1, 6, 7, 15 et 17 reposent sur un seul PNJ"
+    note: "T04b (décision 5) : Questie charge sur Forever la base Classic Era ; rapport mesuré / Questie de 1 jusqu'au niveau 7 puis +0,0248 par niveau (genou 7,95), 7 niveaux d'une seule zone (les Tarides) ; extrapolé jusqu'à × 2,29 au niveau 60 (suppose). Sarilus Foulborne (PNJ de quête, rapport 1,62) exclu de l'ajustement. Forever semble donner une valeur commune par niveau aux PNJ normaux (lanceurs de sorts compris) ; Sunscale Lashtail à part. Modèle du seed (hp_anchors) gardé pour la parité (mob_source seed). La certitude probable couvre toute la plage 1 à 17 (règle de l'utilisateur), y compris les niveaux 2 à 5, 8 et 9 sans PNJ mesuré ; les niveaux 1, 6, 7, 15 et 17 reposent sur un seul PNJ ; T05 : source par défaut des simulateurs dans les données (leveling.mob_source, measured ; variante seed)"
   - id: I1
     categorie: optimisation
     description: "Rotations (listes de priorités) par spé et situation"

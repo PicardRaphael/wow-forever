@@ -90,6 +90,7 @@ class CoefficientRules:
     low_level_penalty_per_level: float
     fixed: Mapping[str, FixedCoefficient]
     low_level_default: bool  # pénalité des sorts de bas niveau appliquée par défaut en mode forever (T04e)
+    ice_lance_source: str = "client"  # coefficient d'Ice Lance en forever : client ou seed (coefficient.fixed), T05
 
 
 @dataclass(frozen=True)
@@ -152,6 +153,8 @@ class Constants:
     talent_rank_mana_default: float
     default_range_yd: float
     miss_per_level_below: float  # raté retiré par niveau d'écart sous la cible (écart négatif)
+    regen_stacking: str = "sum"  # régénération d'Arcane Meditation et de l'armure : sum ou max (mana.regen_stacking)
+    bonus_stacking: str = "multiplicative"  # bonus de dégâts : multiplicative ou additive (damage.bonus_stacking)
 
 
 @dataclass(frozen=True)
@@ -266,7 +269,7 @@ class LevelingConstants:
     ignite_duration_s: float  # aura d'Ignite du client
     ignite_tick_s: float
     ignite_cumulative: int
-    ignite_rule: str  # rolling : règle roulante (T04c, décision 2)
+    ignite_rule: str  # rolling : règle roulante (T04c, décision 2) ; independent : règle du seed (variante, T05)
     frost_nova_retreat_yd: float
     rest_hp_regen_fraction: float
     projectile_speed_default: float
@@ -278,6 +281,7 @@ class LevelingConstants:
     default_nova_break: float
     default_run_between_s: float
     quest_band: QuestBand
+    mob_source: str = "measured"  # PV des monstres par défaut des simulateurs (leveling.mob_source, T05)
 
     @property
     def ignite_ticks(self) -> int:
@@ -382,6 +386,8 @@ class GameData:
     talent_cooldowns_s: Mapping[str, float]  # recharges des talents actifs (spell_scaling.json.talent_cooldowns, T05)
     respec: RespecRules
     build: BuildMethod
+    # plages des hypothèses incertaines (champ range de mechanics.json), par clé de mechanics.json (T05)
+    assumption_ranges: Mapping[str, tuple[Variant, ...]]
 
 
 class CharacterOverrides(TypedDict, total=False):

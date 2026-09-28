@@ -78,6 +78,7 @@ def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:
 
 
 RULES = ("forever", "seed")
+ICE_LANCE = "ice_lance"  # sort dont le coefficient forever est une hypothèse (E4, coefficient.ice_lance_source)
 
 
 def check_rules(rules: str, low_level_penalty: bool | None) -> None:
@@ -127,7 +128,8 @@ def coefficient(
 
     `rules="forever"` (défaut) : coefficients du client (`spell_scaling.json`, EffectBonusCoefficient) : somme des
     composants `direct` et des composants `channel` × leurs tics, × pénalité des sorts de bas niveau
-    (`low_level_factor`). `rules="seed"` : formule du seed (incantation / `coefficient.cast_divisor`, bornes, canalisé, ralenti,
+    (`low_level_factor`) ; Ice Lance prend le coefficient fixe du seed (`coefficient.fixed`) si
+    `coefficient.ice_lance_source` vaut `seed` (variante, question E4). `rules="seed"` : formule du seed (incantation / `coefficient.cast_divisor`, bornes, canalisé, ralenti,
     coefficients fixes), pénalité toujours appliquée.
 
     Registre : G4"""
@@ -135,11 +137,15 @@ def coefficient(
     if rules == "seed":
         return _seed_coefficient(gd, key, rank)
     c = 0.0
-    for comp in gd.scaling[key][rank.position - 1].components:
-        if comp.kind == "direct":
-            c += comp.bonus_coefficient
-        elif comp.kind == "channel":
-            c += comp.bonus_coefficient * comp.ticks
+    fixed = gd.constants.coefficients.fixed.get(key)
+    if key == ICE_LANCE and gd.constants.coefficients.ice_lance_source == "seed" and fixed and fixed.value:
+        c = fixed.value
+    else:
+        for comp in gd.scaling[key][rank.position - 1].components:
+            if comp.kind == "direct":
+                c += comp.bonus_coefficient
+            elif comp.kind == "channel":
+                c += comp.bonus_coefficient * comp.ticks
     return c * low_level_factor(gd, rank, low_level_penalty)
 
 

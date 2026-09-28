@@ -36,6 +36,7 @@ from forever.engine.model import (
     Talent,
     TalentRules,
     Utility,
+    Variant,
 )
 from forever.errors import DataSchemaError
 from forever.store import VersionData, load_version
@@ -48,6 +49,14 @@ RACIALS_FILE = "racials.json"
 MONSTERS_FILE = "monsters.json"
 SCALING_FILE = "spell_scaling.json"
 RESPEC_FILE = "respec.json"
+# Valeurs acceptées des hypothèses nommées de mechanics.json (T05, décision 81) : noms de règles, pas des chiffres.
+CHOICES = {
+    "leveling.ignite_rule": ("rolling", "independent"),
+    "leveling.mob_source": ("measured", "seed"),
+    "mana.regen_stacking": ("sum", "max"),
+    "damage.bonus_stacking": ("multiplicative", "additive"),
+    "coefficient.ice_lance_source": ("client", "seed"),
+}
 SCALING_KINDS = ("direct", "dot", "channel")
 MS_PER_S = 1000.0  # conversion d'unité : durées du client en millisecondes
 SCALING_SCHEMA = 2  # spell_scaling.json : bonus_coefficient et period_ms par composant, auras (T04e)
@@ -384,9 +393,7 @@ def _leveling(values: Mapping[str, Any]) -> LevelingConstants:
         ignite_duration_s=r.num(ignite, "duration_s", "leveling.ignite"),
         ignite_tick_s=r.num(ignite, "tick_s", "leveling.ignite"),
         ignite_cumulative=r.int_(ignite, "cumulative", "leveling.ignite"),
-        ignite_rule=r.str_(
-            r.obj(values, "leveling.ignite_rule", "leveling.ignite_rule"), "value", "leveling.ignite_rule"
-        ),
+        ignite_rule=_choice(values, "leveling.ignite_rule"),
         frost_nova_retreat_yd=num("leveling.frost_nova_retreat_yd"),
         rest_hp_regen_fraction=num("leveling.rest_hp_regen_fraction"),
         projectile_speed_default=r.num(speed, "default", "leveling.projectile_speed"),
@@ -397,6 +404,7 @@ def _leveling(values: Mapping[str, Any]) -> LevelingConstants:
         default_level_diff=r.int_(defaults, "level_diff", "leveling.defaults"),
         default_nova_break=r.num(defaults, "nova_break", "leveling.defaults"),
         default_run_between_s=r.num(defaults, "run_between_s", "leveling.defaults"),
+        mob_source=_choice(values, "leveling.mob_source"),
     )
 
 
@@ -538,6 +546,34 @@ def _fire_vulnerability(raw: Any) -> FireVulnerability:
     )
 
 
+def _choice(values: Mapping[str, Any], key: str) -> str:
+    """Valeur d'une clé à choix de `mechanics.json` (`CHOICES`) ; DataSchemaError si elle n'est pas acceptée."""
+    r = _Reader(MECHANICS_FILE)
+    value = r.str_(r.obj(values, key, key), "value", key)
+    if value not in CHOICES[key]:
+        raise r.fail(key, " ou ".join(CHOICES[key]))
+    return value
+
+
+def _assumption_ranges(values: Mapping[str, Any]) -> dict[str, tuple[Variant, ...]]:
+    """Champs `range` de `mechanics.json` : variantes (valeur, source) d'une hypothèse incertaine ; la valeur des
+    données doit en faire partie et passe en premier (T05)."""
+    r = _Reader(MECHANICS_FILE)
+    out: dict[str, tuple[Variant, ...]] = {}
+    for key, entry in values.items():
+        if not isinstance(entry, dict) or "range" not in entry:
+            continue
+        items = r.list_(entry, "range", f"{key}.range")
+        variants = tuple(
+            Variant(r.obj({"v": v}, "v", f"{key}.range")["value"], r.str_(v, "source", f"{key}.range")) for v in items
+        )
+        current = [v for v in variants if v.value == entry.get("value")]
+        if len(variants) < 2 or len(current) != 1:
+            raise r.fail(f"{key}.range", "au moins deux variantes, dont la valeur des données")
+        out[key] = (current[0], *(v for v in variants if v is not current[0]))
+    return out
+
+
 def _talent_cooldowns(raw: Any) -> dict[str, float]:
     """`spell_scaling.json.talent_cooldowns` : recharge (s) des talents actifs, lue dans le client (T05)."""
     r = _Reader(SCALING_FILE)
@@ -627,6 +663,7 @@ def _constants(raw: Any) -> Constants:
         low_level_penalty_per_level=r.num(low, "penalty_per_level", "coefficient.low_level.penalty_per_level"),
         fixed=fixed,
         low_level_default=r.bool_(entry("coefficient.low_level_default"), "value", "coefficient.low_level_default"),
+        ice_lance_source=_choice(values, "coefficient.ice_lance_source"),
     )
 
     def growth(key: str) -> StatGrowth:
@@ -685,6 +722,8 @@ def _constants(raw: Any) -> Constants:
         talent_rank_mana_default=r.num(talent_mana, "default", "mana.talent_rank_cost"),
         default_range_yd=num("spell.default_range_yd"),
         miss_per_level_below=num("hit.miss_per_level_below"),
+        regen_stacking=_choice(values, "mana.regen_stacking"),
+        bonus_stacking=_choice(values, "damage.bonus_stacking"),
     )
 
 
@@ -718,6 +757,7 @@ def build_game_data(version: VersionData) -> GameData:
         talent_cooldowns_s=_talent_cooldowns(raw[SCALING_FILE]),
         respec=_respec(raw[RESPEC_FILE], values),
         build=_build_method(values),
+        assumption_ranges=_assumption_ranges(values),
     )
 
 

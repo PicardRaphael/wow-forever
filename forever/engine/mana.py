@@ -37,9 +37,10 @@ def in_combat_regen_fraction(
 ) -> float:
     """Part de la régénération d'Esprit gardée en combat (règle d'incantation), bornée à 1.
 
-    `rules="forever"` : Arcane Meditation + part de l'armure portée (`worn_armor`, Mage Armor : aura 134 du client),
-    cumul de la règle Classic (deux auras du même type s'additionnent ; suppose, T04c). `rules="seed"` : maximum
-    d'Arcane Meditation et de Mage Armor dès le niveau de son premier rang (`spells.json.utility`), comme le seed.
+    `rules="forever"` : Arcane Meditation et part de l'armure portée (`worn_armor`, Mage Armor : aura 134 du client),
+    cumulées selon `mana.regen_stacking` des données : somme (règle Classic, deux auras du même type s'additionnent ;
+    suppose, T04c) ou maximum (variante). `rules="seed"` : maximum d'Arcane Meditation et de Mage Armor dès le niveau
+    de son premier rang (`spells.json.utility`), comme le seed.
 
     Registre : B7"""
     f = talent_value(gd, pts, "arcaneMeditation") / PERCENT
@@ -47,7 +48,8 @@ def in_combat_regen_fraction(
         if level >= gd.utility.mage_armor_level:
             f = max(f, gd.utility.mage_armor_regen)
         return min(1.0, f)
-    return min(1.0, f + worn_armor(gd, level, armor).regen_while_casting)
+    worn = worn_armor(gd, level, armor).regen_while_casting
+    return min(1.0, max(f, worn) if gd.constants.regen_stacking == "max" else f + worn)
 
 
 def _restore_rate(r: Restore, level: int) -> float:
