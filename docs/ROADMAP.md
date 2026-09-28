@@ -16,7 +16,7 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 | T04b | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T04a |
 | T04c | Simulateur fiable pour comparer les builds : Ignite, Arcane Blast, recharges, régénération et armure, `forever measures refresh`, zone ou donjon à mon niveau | T04b |
 | T04e | Calculs de dégâts fidèles au client : coefficients du client, DoT, multiplicateurs, cumul des bonus | T04c |
-| T05 | Optimiseur de talents et conseiller de respec | T04b, T04c, T04e |
+| T05 | Builds du Mage par contexte : optimiseur (leveling, donjon, raid, PvP), Arcane Power et Hot Streak dans les rotations, sensibilité, respec | T04b, T04c, T04e |
 | T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
 | T04d | Quêtes propres à Forever et modèle d'XP de Forever (placée après T06 : ses sources viennent de l'inventaire des addons, `tasks/inventaire-addons.md`, et elle ne change pas le classement des builds) | T04c |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
@@ -91,9 +91,10 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 - **Hors périmètre, avec échéance** : Arcane Power dans les rotations des simulateurs en T05 (sans lui, l'Arcane est sous-évalué en leveling) ; Fire Vulnerability (Scorch et ses cumuls) dans les rotations en T09.
 - **Critères de fin** : mode `seed` identique au seed à 1e-12 ; coefficients égaux aux tables du client ; exemples de la vidéo à ±0,5 (trois exclus pour l'arrondi des bornes, question ouverte) ; `uv run tasks.py verify` vert.
 
-## T05 — Talents et respec
-- **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre ; comparer les builds avec les simulateurs de T04c, `armor` et `ab_stacks` compris parmi les paramètres de build à optimiser ; Arcane Power dans les rotations des simulateurs (aura et recharge du client, fonctions de T04e), sans quoi l'Arcane est sous-évalué en leveling.
-- **Critères de fin** : `forever optimize talents --from 10 --to 30` produit un ordre légal à chaque niveau ; le barème de respec est paramétrable ; tests de légalité et de non-régression.
+## T05 — Builds du Mage par contexte
+- **Fait** : `forever build <contexte> --level N` et l'outil MCP `forever_build` (contextes `leveling`, `dungeon`, `raid`, `pvp-bg`, `pvp-world`) : talents et ordre d'apprentissage, raison de chaque choix, alternative la plus proche avec écart apparié et intervalle de confiance, stabilité sur plusieurs graines, sensibilité aux hypothèses incertaines, conseil de respec, angles morts, certitude et provenance ; armure, `ab_stacks` et cumuls de Hot Streak traités comme des choix du build ; Arcane Power (aura et recharge du client) et Hot Streak (Pyroblast dans la rotation de feu) dans les rotations ; Missile Barrage, Flame Throwing et Arcane Geometry modélisés ; option `--talented-bonus N` (bonus Legacy « Talented ») ; scénarios de donjon et de raid provisoires ; portage des tests du seed `optimiseur_legal` et `pvp_et_respec` ; comparaison avec les builds de la communauté. Plan : `tasks/T05-plan.md` (décisions 79 à 89).
+- **Hors périmètre, avec échéance** : Presence of Mind, Combustion et Cold Snap (angles morts chiffrés) ; Fire Vulnerability dans les rotations et moteur de raid (T09) ; équipement réel (T07, T10) ; scénarios de donjon réels (DJ1).
+- **Critères de fin** : `forever build <contexte> --level N` pour les cinq contextes, légal, avec provenance ; parité du seed (`optimiseur_legal`, `pvp_et_respec`, glouton PvP) ; Arcane Power et Hot Streak dans les rotations ; décision au Monte Carlo avec intervalle ; stabilité et sensibilité affichées ; tout build au-delà du plafond de la bêta signalé comme non vérifiable en jeu avant la sortie ; comparaison communautaire documentée ; `uv run tasks.py verify` vert.
 
 ## T06 — Plugin Claude Code
 - **Fait** : skills des domaines disponibles à ce stade (leveling, Mage) ; chaque tranche de domaine suivante ajoute son skill (PvP, donjons, Legacy, métiers, réputations, économie).

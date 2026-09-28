@@ -3,6 +3,15 @@
 > Plan rédigé le 2026-09-28 (session de cadrage en arrière-plan), d'après la demande de l'utilisateur du même jour. **Décisions D1 à D10 à valider** (option recommandée en gras). Exécution : `/tranche T05` dans une nouvelle session, bloc par bloc (cycle rouge → vert par bloc) ; la tranche tiendra probablement en deux ou trois sessions.
 > Préalables faits dans la session de cadrage : Improved Cone of Cold à 12 / 23 / 35 % en mode forever (décision 77, commit `fa1c533`) ; T04d placée après T06 (décision 78, commit `4524943`) ; rubrique « Angles morts » ajoutée au résumé de fin de tranche (`.claude/skills/tranche/SKILL.md`, `CLAUDE.md`, commit du plan).
 
+## Validation (2026-09-28)
+Plan accepté par l'utilisateur ; décisions reportées dans `docs/DECISIONS.md` (79 à 89). Amendements :
+- **D5** : Hot Streak modélisé dès T05 : Pyroblast entre dans la rotation de feu quand le talent est pris ; le nombre de cumuls de Hot Streak avant de le lancer (`hs_stacks`) est un choix du build, comme `ab_stacks`. L'analytique porte aussi Hot Streak (l'optimiseur trie à l'analytique). Presence of Mind, Combustion et Cold Snap restent des angles morts chiffrés.
+- **D8** : option `--talented-bonus N` (bonus Legacy « Talented », défaut 0, hypothèse affichée), aussi dans `forever_build`.
+- **Ignite (bloc B)** : lire soi-même les notes de Blizzard du 24/09/2026 en source primaire, établir à quelle version du client elles s'appliquent (1.60.1.70009 ou suivante). Le moteur prend déjà Ignite sur le critique final (`ignite_damage` reçoit les dégâts multipliés, les tics ne sont pas remultipliés) : si les notes s'appliquent à 70009, un test verrouille cette assiette et A18 cite la source ; sinon, huitième hypothèse de sensibilité (variante : tics remultipliés, règle antérieure) et question ouverte. Wake of Fire, Hot Streak et Arcane Missiles vérifiés de même contre le client ; écart → `OPEN_QUESTIONS`, ou T08 s'il concerne une version suivante.
+- **Certitude** : tout build au-delà du plafond de la bêta (niveau 20, clé de données `build.beta_level_cap`) affiche qu'il n'est pas vérifiable en jeu avant la sortie.
+- Un test verrouillé faux : demandes regroupées dans `tasks/T05-corrections.md`, présentées avant la fusion. Contexte plein : arrêt après un bloc vert committé.
+- Bloc A découpé : A1 (documentation, sans cycle rouge) puis A2 (données, `decode`, chargeurs).
+
 ## Contexte
 Objectif de l'utilisateur : pouvoir demander « quel build pour tel contexte à tel niveau » et faire confiance à la réponse. Demande, dans l'ordre :
 1. contextes : **leveling** (ordre des talents niveau par niveau, de 10 à 60), **donjon**, **raid**, **PvP** (champs de bataille, monde ouvert) ; donjon et raid sur des scénarios **provisoires** clairement marqués (cible unique prolongée, paquets de monstres), affinés en DJ1 et T09 ; équipement = fiche de base par niveau tant que T07 et T10 ne sont pas faits, hypothèse affichée ;
