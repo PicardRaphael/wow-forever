@@ -111,3 +111,43 @@ def test_coefficient_reads_data(make_deps, data_copy):
     edit_mechanics(data_copy, lambda values: values["coefficient.cast_divisor"].update(value=4.0))
     gd = load_game_data(make_deps(data_dir=data_copy))
     assert coefficient(gd, "frostbolt", gd.spells["frostbolt"].ranks[-1]) == pytest.approx(3.0 / 4.0 * 0.95)
+
+
+# --- T04e : schéma 2 de spell_scaling.json, clés de mécanique ----------------------------------------
+
+
+def edit_scaling(data_dir, change):
+    path = data_dir / LOCAL_VERSION / "spell_scaling.json"
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    change(doc)
+    path.write_bytes(json.dumps(doc, ensure_ascii=False, indent=1).encode("utf-8"))
+    write_manifest(data_dir)  # modification voulue : seule la forme est en cause
+
+
+def test_spell_scaling_schema_1_is_refused(make_deps, data_copy):
+    edit_scaling(data_copy, lambda doc: doc.update(schema_version=1))
+    with pytest.raises(DataSchemaError) as exc:
+        load_game_data(make_deps(data_dir=data_copy))
+    assert "schema_version" in exc.value.message
+
+
+def test_spell_scaling_component_without_coefficient_is_refused(make_deps, data_copy):
+    edit_scaling(data_copy, lambda doc: doc["spells"]["frostbolt"][0]["components"][0].pop("bonus_coefficient"))
+    with pytest.raises(DataSchemaError) as exc:
+        load_game_data(make_deps(data_dir=data_copy))
+    assert "frostbolt" in exc.value.message
+
+
+def test_spell_scaling_without_fire_vulnerability_is_refused(make_deps, data_copy):
+    edit_scaling(data_copy, lambda doc: doc["auras"].pop("fire_vulnerability"))
+    with pytest.raises(DataSchemaError) as exc:
+        load_game_data(make_deps(data_dir=data_copy))
+    assert "fire_vulnerability" in exc.value.message
+
+
+def test_low_level_default_and_improved_cone_of_cold_read(game_data):
+    """mechanics.json : pénalité des sorts de bas niveau appliquée par défaut (suppose, T04e décision 2) ; rangs
+    d'Improved Cone of Cold en mode forever (15 / 25 / 35 %, décision de l'utilisateur du 2026-09-28)."""
+    c = game_data.constants
+    assert c.coefficients.low_level_default is True
+    assert c.improved_cone_of_cold_pct == (15, 25, 35)

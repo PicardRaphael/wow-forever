@@ -69,3 +69,74 @@ def test_decode_reproduces_installed_spell_scaling(candidate):
     assert read_json(candidate.root / LOCAL_VERSION / "spell_scaling.json") == read_json(
         DATA_DIR / LOCAL_VERSION / "spell_scaling.json"
     )
+
+
+# --- T04e : coefficients et périodes du client (schéma 2) ------------------------------------------
+# Valeurs lues dans tests/fixtures/wago/1.60.1.70009/enUS/SpellEffect.csv (DifficultyID 0) : EffectBonusCoefficient
+# de l'effet de dégâts ; période = EffectAuraPeriod de l'effet d'aura du sort parent (0 pour un coup direct).
+CLIENT_COMPONENTS = [
+    # (sort, rang, indice du composant, sort porteur, type, coefficient, période en ms)
+    ("frostbolt", 1, 0, 116, "direct", 0.40700000525, 0),
+    ("frostbolt", 11, 0, 25304, "direct", 0.81400001049, 0),
+    ("pyroblast", 8, 0, 18809, "direct", 1.0, 0),
+    ("pyroblast", 8, 1, 18809, "dot", 0.15000000596, 3000),
+    ("frostfire_bolt", 3, 1, 1237313, "dot", 0.0, 3000),
+    ("fireball", 12, 1, 25306, "dot", 0.0, 2000),
+    ("arcane_missiles", 8, 0, 25346, "channel", 0.28600001335, 1000),  # sort déclenché ; période de 25345
+    ("blizzard", 6, 0, 1279949, "channel", 0.04199999943, 1000),  # sort déclenché ; période de 10187 (aura 226)
+    ("flamestrike", 6, 0, 10216, "direct", 0.15700000525, 0),
+    ("flamestrike", 6, 1, 1279990, "dot", 0.03200000152, 2000),  # sort déclenché ; période de 10216 (aura 226)
+    ("ice_lance", 6, 0, 1240047, "direct", 0.0, 0),
+]
+
+
+@pytest.mark.parametrize(("key", "rank", "i", "spell_id", "kind", "coef", "period"), CLIENT_COMPONENTS)
+def test_decoded_component_carries_client_coefficient_and_period(
+    client_tables, decode_rules, key, rank, i, spell_id, kind, coef, period
+):
+    doc = decode_scaling(client_tables, decode_rules, LOCAL_VERSION)
+    c = doc["spells"][key][rank - 1]["components"][i]
+    assert (c["spell_id"], c["kind"]) == (spell_id, kind)
+    assert c["bonus_coefficient"] == coef
+    assert c["period_ms"] == period
+
+
+@pytest.mark.parametrize(("key", "rank", "i", "spell_id", "kind", "coef", "period"), CLIENT_COMPONENTS)
+def test_loaded_component_carries_client_coefficient_and_period(game_data, key, rank, i, spell_id, kind, coef, period):
+    c = game_data.scaling[key][rank - 1].components[i]
+    assert (c.spell_id, c.kind, c.bonus_coefficient, c.period_ms) == (spell_id, kind, coef, period)
+
+
+def test_every_component_has_coefficient_and_period(game_data):
+    """Chaque composant porte un coefficient du client ; seuls les coups directs ont une période nulle."""
+    for key, ranks in game_data.scaling.items():
+        for r in ranks:
+            for c in r.components:
+                assert c.bonus_coefficient >= 0, (key, r.rank)
+                assert (c.period_ms == 0) == (c.kind == "direct"), (key, r.rank, c.kind)
+
+
+def test_spell_scaling_schema_version_2(client_tables, decode_rules):
+    assert decode_scaling(client_tables, decode_rules, LOCAL_VERSION)["schema_version"] == 2
+    assert read_json(DATA_DIR / LOCAL_VERSION / "spell_scaling.json")["schema_version"] == 2
+
+
+def test_fire_vulnerability_decoded_from_improved_scorch(client_tables, decode_rules):
+    """Aura posée par Improved Scorch (11095, EffectTriggerSpell 22959) : SpellEffect aura 270, 3 par cumul, masque
+    d'école 4 (feu) ; SpellAuraOptions.CumulativeAura 5 ; SpellMisc.DurationIndex 9 -> SpellDuration 30 000 ms."""
+    doc = decode_scaling(client_tables, decode_rules, LOCAL_VERSION)
+    fv = doc["auras"]["fire_vulnerability"]
+    assert fv == {
+        "spell_id": 22959,
+        "source_spell_id": 11095,
+        "talent": "improvedScorch",
+        "pct_per_stack": 3,
+        "max_stacks": 5,
+        "duration_ms": 30000,
+        "schools": ["fire"],
+    }
+
+
+def test_fire_vulnerability_loaded(game_data):
+    fv = game_data.fire_vulnerability
+    assert (fv.spell_id, fv.pct_per_stack, fv.max_stacks, fv.duration_s, fv.schools) == (22959, 3, 5, 30, ("fire",))
