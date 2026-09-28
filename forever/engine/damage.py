@@ -42,6 +42,13 @@ def dot_tick_times(gd: GameData, duration_s: float) -> list[float]:
     return [tick * i for i in range(1, max(1, int(duration_s / tick)) + 1)]
 
 
+def dot_tick_period_s(gd: GameData, key: str, rank: Rank, *, rules: str = "forever") -> float:
+    """Période des tics du DoT d'un rang (s).
+
+    Registre : A17"""
+    raise NotImplementedError
+
+
 def ignite_tick_times(gd: GameData) -> list[float]:
     """Instants des tics d'Ignite après le critique, sans cumul ni rafraîchissement (`rules="seed"` : un tic par
     période de `leveling.ignite` pendant sa durée, comme le seed).

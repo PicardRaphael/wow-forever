@@ -141,3 +141,19 @@ def coefficient(
         elif comp.kind == "channel":
             c += comp.bonus_coefficient * comp.ticks
     return c * low_level_factor(gd, rank, low_level_penalty)
+
+
+def dot_coefficient(
+    gd: GameData, key: str, rank: Rank, *, rules: str = "forever", low_level_penalty: bool | None = None
+) -> float:
+    """Part de la puissance des sorts ajoutée à chaque tic de DoT d'un rang.
+
+    Registre : A17, G4"""
+    raise NotImplementedError
+
+
+def dot_ticks(gd: GameData, key: str, rank: Rank, *, rules: str = "forever") -> int:
+    """Nombre de tics du DoT d'un rang.
+
+    Registre : A17"""
+    raise NotImplementedError
