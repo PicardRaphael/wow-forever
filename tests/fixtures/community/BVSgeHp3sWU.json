@@ -1,0 +1,289 @@
+{
+ "source": {
+  "title": "People don´t understand HOW Base Damage changes work - WoW Forever",
+  "channel": "Toleduck",
+  "url": "https://www.youtube.com/watch?v=BVSgeHp3sWU",
+  "published": "2026-09-27",
+  "tool": "tableur « Toleduck Theorycrafting » (non publié, bêta), valeurs de niveau 60",
+  "report": "docs/research/videos/BVSgeHp3sWU.md (sections 1 et 3)"
+ },
+ "certainty": "communautaire",
+ "certainty_meaning": "suppose : source unique, outil non publié ; coefficients et bases du tableur concordants avec le client",
+ "tolerance": 0.5,
+ "notes": [
+  "Chaque exemple : sort, rang, niveau 60, puissance des sorts, talents cochés à l'écran (critique à 200 % pour le givre et l'arcane : Ice Shards 5/5 ou Arcane Mind 5/5, V7 ; talents d'apprentissage pyroblast, arcaneBlast, iceLance), bonus (arcane_power, arcane_blast_stacks), coup normal (normal) et critique (crit) affichés.",
+  "per missile : valeur d'un missile d'Arcane Missiles (dégâts du sort / nombre de missiles) ; sans per : dégâts du sort entier.",
+  "exclu E7 : écart d'arrondi des bornes de dégâts (le tableur tronque, sheet_bounds ; le moteur arrondit au demi supérieur, G7) ; hors de la tolérance, question ouverte E7 (docs/OPEN_QUESTIONS.md). engine_gap : écart moteur - vidéo au 2026-09-28.",
+  "Absents (non chiffrables par le moteur) : V1 (estimation de la puissance des sorts), V2 à V5 et V7 (règles sans exemple de sort), V6 (exemple générique sans sort), V8 oral (calcul de l'auteur sans Piercing Ice), V20 (ordres de grandeur d'un build feu, détail non affiché), V21 et V22 (autres classes, tics) ; exemples des autres classes (Flame Shock, Corruption, Mind Flay, Lightning Bolt)."
+ ],
+ "examples": [
+  {
+   "id": "V9",
+   "at": "09:22, image 018",
+   "spell": "frostbolt",
+   "rank": 11,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5
+   },
+   "normal": 964.3,
+   "crit": 1928.5
+  },
+  {
+   "id": "V10",
+   "at": "image 023",
+   "spell": "frostbolt",
+   "rank": 11,
+   "level": 60,
+   "sp": 500,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5
+   },
+   "normal": 934.9
+  },
+  {
+   "id": "V11",
+   "at": "image 019",
+   "spell": "frostbolt",
+   "rank": 11,
+   "level": 60,
+   "sp": 1000,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5
+   },
+   "normal": 1366.3
+  },
+  {
+   "id": "V11b-800",
+   "at": "image 022",
+   "spell": "frostbolt",
+   "rank": 11,
+   "level": 60,
+   "sp": 800,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5
+   },
+   "normal": 1193.8
+  },
+  {
+   "id": "V11b-2000",
+   "at": "image 020",
+   "spell": "frostbolt",
+   "rank": 11,
+   "level": 60,
+   "sp": 2000,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5
+   },
+   "normal": 2229.2,
+   "crit": 4458.4
+  },
+  {
+   "id": "V12",
+   "at": "image 013",
+   "spell": "frostfire_bolt",
+   "rank": 3,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5
+   },
+   "normal": 770.3,
+   "crit": 1540.6
+  },
+  {
+   "id": "V13",
+   "at": "image 013",
+   "spell": "cone_of_cold",
+   "rank": 5,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5,
+    "improvedConeOfCold": 3
+   },
+   "normal": 589.4,
+   "crit": 1178.8
+  },
+  {
+   "id": "V14",
+   "at": "image 013",
+   "spell": "fire_blast",
+   "rank": 7,
+   "level": 60,
+   "sp": 534,
+   "talents": {},
+   "normal": 682.1
+  },
+  {
+   "id": "V15-pyroblast",
+   "at": "image 014",
+   "spell": "pyroblast",
+   "rank": 8,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "pyroblast": 1
+   },
+   "normal": 1117.0,
+   "crit": 1675.5
+  },
+  {
+   "id": "V15-fireball",
+   "at": "image 014",
+   "spell": "fireball",
+   "rank": 12,
+   "level": 60,
+   "sp": 534,
+   "talents": {},
+   "normal": 1017.0,
+   "crit": 1525.5
+  },
+  {
+   "id": "V16",
+   "at": "images 015, 017",
+   "spell": "arcane_blast",
+   "rank": 5,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "arcaneInstability": 3,
+    "arcaneMind": 5,
+    "arcaneBlast": 1,
+    "arcanePower": 1
+   },
+   "arcane_power": true,
+   "normal": 1038.1,
+   "crit": 2076.2
+  },
+  {
+   "id": "V17",
+   "at": "image 015",
+   "spell": "arcane_missiles",
+   "rank": 8,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "arcaneInstability": 3,
+    "arcaneMind": 5,
+    "arcaneBlast": 1,
+    "arcanePower": 1
+   },
+   "arcane_power": true,
+   "per": "missile",
+   "normal": 484.3,
+   "crit": 968.7
+  },
+  {
+   "id": "V17-total",
+   "at": "image 015",
+   "spell": "arcane_missiles",
+   "rank": 8,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "arcaneInstability": 3,
+    "arcaneMind": 5,
+    "arcaneBlast": 1,
+    "arcanePower": 1
+   },
+   "arcane_power": true,
+   "normal": 2421.7
+  },
+  {
+   "id": "V18-missiles",
+   "at": "11:39, images 016, 017",
+   "spell": "arcane_missiles",
+   "rank": 8,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "arcaneInstability": 3,
+    "arcaneMind": 5,
+    "arcaneBlast": 1,
+    "arcanePower": 1
+   },
+   "arcane_power": true,
+   "arcane_blast_stacks": 4,
+   "per": "missile",
+   "normal": 678.1,
+   "crit": 1356.2
+  },
+  {
+   "id": "V18-explosion",
+   "at": "11:39, images 016, 017",
+   "spell": "arcane_explosion",
+   "rank": 6,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "arcaneInstability": 3,
+    "arcaneMind": 5,
+    "arcaneBlast": 1,
+    "arcanePower": 1
+   },
+   "arcane_power": true,
+   "arcane_blast_stacks": 4,
+   "exclu": "E7",
+   "sheet_bounds": [
+    238,
+    258
+   ],
+   "normal": 608.0,
+   "engine_gap": 0.99
+  },
+  {
+   "id": "V19",
+   "at": "11:39",
+   "spell": "arcane_explosion",
+   "rank": 6,
+   "level": 60,
+   "sp": 534,
+   "talents": {
+    "arcaneInstability": 3,
+    "arcaneMind": 5,
+    "arcaneBlast": 1,
+    "arcanePower": 1
+   },
+   "arcane_power": true,
+   "exclu": "E7",
+   "sheet_bounds": [
+    238,
+    258
+   ],
+   "note": "critique « 900 » dite à l'oral, arrondie : non retenue",
+   "normal": 434.0,
+   "engine_gap": 0.99
+  },
+  {
+   "id": "V8-tableur",
+   "at": "09:22, images 012, 017",
+   "spell": "ice_lance",
+   "rank": 6,
+   "level": 60,
+   "sp": 0,
+   "talents": {
+    "piercingIce": 3,
+    "iceShards": 5,
+    "iceLance": 1
+   },
+   "frozen": true,
+   "exclu": "E7",
+   "sheet_bounds": [
+    136,
+    160
+   ],
+   "normal": 627.5,
+   "crit": 1255.0,
+   "engine_gap": 2.14
+  }
+ ]
+}
