@@ -106,3 +106,59 @@ def merge_buffs(*buffs: Buffs | None) -> Buffs:
             else:
                 out[k] = out.get(k, 0.0) + v
     return cast(Buffs, out)
+
+
+# --- T05 : Arcane Power dans les rotations, Hot Streak, Missile Barrage ------------------------------------------
+
+
+def arcane_power_window(gd: GameData, pts: Points) -> tuple[float, float] | None:
+    """(durée de l'aura en s, recharge en s) d'Arcane Power si le talent est pris : durée du talent (`talents.json`),
+    recharge du client (`spell_scaling.json.talent_cooldowns`) ; None sans le talent.
+
+    Registre : B15"""
+    raise NotImplementedError
+
+
+def arcane_power_pull(clock_s: float, ready_at_s: float, window: tuple[float, float] | None) -> tuple[bool, float]:
+    """Politique « au pull dès que prête » (décision 79) : (aura posée au début du combat qui commence à `clock_s`,
+    instant où la recharge suivante sera écoulée).
+
+    Registre : B15"""
+    raise NotImplementedError
+
+
+def arcane_power_share(cycle_s: float, cooldown_s: float) -> float:
+    """Part des combats qui commencent avec Arcane Power prête (analytique) : min(1, cycle / recharge).
+
+    Registre : B15"""
+    raise NotImplementedError
+
+
+def hot_streak_rules(gd: GameData, pts: Points) -> tuple[float, float, int] | None:
+    """(durée de l'aura en s, réduction de l'incantation de Pyroblast par cumul en fraction, cumuls maximum) de Hot
+    Streak si le talent est pris ; None sinon.
+
+    Registre : B15"""
+    raise NotImplementedError
+
+
+def hot_streak_buffs(gd: GameData, pts: Points, stacks: int) -> Buffs:
+    """Buff de Pyroblast lancé avec `stacks` cumuls de Hot Streak : réduction de l'incantation (`cast_reduction`).
+
+    Registre : B15"""
+    raise NotImplementedError
+
+
+def missile_barrage_chance(gd: GameData, pts: Points, key: str) -> float:
+    """Chance qu'un sort `key` qui touche déclenche Missile Barrage (0 sans le talent ou pour un autre sort).
+
+    Registre : B14"""
+    raise NotImplementedError
+
+
+def missile_barrage_buffs(gd: GameData, pts: Points) -> Buffs:
+    """Buff de l'Arcane Missiles suivant sous Missile Barrage : canalisation raccourcie (`cast_reduction`) et coût
+    réduit (`cost`) ; {} sans le talent.
+
+    Registre : B14"""
+    raise NotImplementedError

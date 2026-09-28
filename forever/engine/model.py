@@ -434,6 +434,7 @@ class Buffs(TypedDict, total=False):
     cost: float
     sp_pct: float
     sp_flat: float
+    cast_reduction: float  # part de l'incantation retirée (Hot Streak, Missile Barrage), avant la hâte
 
 
 class CastEstimate(TypedDict):
