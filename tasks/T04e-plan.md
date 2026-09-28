@@ -111,7 +111,7 @@ Tests modifiés (justification dans le commit « tests » de leur bloc) :
 docs/MECHANICS_REGISTRY.yaml (G4, A17, A20, B15), docs/OPEN_QUESTIONS.md, docs/ADDON.md (protocole de collecte), docs/DECISIONS.md,
 docs/research/videos/BVSgeHp3sWU.md (corrections C1 à C6 : « appliquées en T04e »)
 ```
-`tests/parity/test_sim_leveling_parity.py` et `tests/unit/test_sim_leveling.py` ne changent pas (`SEED_MODE` porte déjà `rules="seed"`, désormais transmis au moteur).
+`tests/parity/test_sim_leveling_parity.py` et `tests/unit/test_sim_leveling.py` ne changent pas (`SEED_MODE` porte déjà `rules="seed"`, désormais transmis au moteur). `test_engine_values.py::test_ice_lance_frozen_multiplier` non plus (rapport × 4 entre deux appels, vrai avec un coefficient nul) ; aucun test d'`explain` ne lit la formule de G4.
 
 ## Interfaces
 ```python
@@ -139,7 +139,7 @@ def dot_tick_damage(gd, dot_total, dmg_mult, ticks, *, sp_per_tick: float = 0.0)
     # (dot_total / ticks + sp_per_tick) × dmg_mult ; sp_per_tick = dot_coefficient × puissance des sorts
 
 # forever/engine/buffs.py       (Registre : A20, B15)
-def arcane_power_buffs(gd, pts) -> Buffs              # {} sans le talent ; {"dmg_sources": (0,30,), "cost": 0,30} (talents.json)
+def arcane_power_buffs(gd, pts) -> Buffs              # {} sans le talent ; {"dmg_sources": (0.30,), "cost": 0.30} (talents.json)
 def fire_vulnerability_buffs(gd, stacks: int) -> Buffs   # {"fire_vulnerability": n}, n borné à max_stacks du client
 def merge_buffs(*buffs: Buffs | None) -> Buffs        # somme des scalaires, concaténation de dmg_sources, max des cumuls
 
