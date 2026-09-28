@@ -129,6 +129,17 @@ class CastLog(NamedTuple):
     dmg: float = 0.0
 
 
+class McStats(NamedTuple):
+    """Statistiques du temps par monstre (`total`) sur `n` combats d'un même Monte Carlo : moyenne (égale à
+    `mc()["total"]`), écart-type, erreur standard, temps de chaque combat dans l'ordre."""
+
+    mean: float
+    sd: float
+    se: float
+    n: int
+    totals: tuple[float, ...]
+
+
 class KillResult(TypedDict):
     combat: float
     mana: float
@@ -586,3 +597,20 @@ def mc(
         "total": avg("total"),
         "xp_h": avg("xp_h"),
     }
+
+
+def mc_stats(
+    gd: GameData,
+    level: int,
+    pts: Points,
+    race: str = "Orc",
+    rotation: str = "frost",
+    n: int = 1500,
+    seed: int = 12345,
+    over: CharacterOverrides | None = None,
+    **options: Any,
+) -> McStats:
+    """Statistiques du temps par monstre sur les mêmes combats que `mc()` (même graine, mêmes tirages).
+
+    Registre : I5, J2"""
+    raise NotImplementedError
