@@ -62,3 +62,24 @@ def arcane_blast_after_spell(
 
     Registre : B15"""
     return arcane_blast_after_cast(gd, pts, aura, now) if key == SPELL else None
+
+
+def arcane_power_buffs(gd: GameData, pts: Points) -> Buffs:
+    """Buffs de l'aura d'Arcane Power.
+
+    Registre : A20, B15"""
+    raise NotImplementedError
+
+
+def fire_vulnerability_buffs(gd: GameData, stacks: int) -> Buffs:
+    """Cumuls de Fire Vulnerability sur la cible.
+
+    Registre : A20"""
+    raise NotImplementedError
+
+
+def merge_buffs(*buffs: Buffs | None) -> Buffs:
+    """Réunion de plusieurs buffs.
+
+    Registre : A20"""
+    raise NotImplementedError
