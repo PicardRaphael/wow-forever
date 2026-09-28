@@ -11,7 +11,7 @@ Rappels utiles à la lecture :
 
 | Addon | Énoncé | Relevé | Commentaire |
 |---|---|---|---|
-| AtlasLoot Classic Forever | 1.1.2 | `## Version: Forever 1.60.1` dans les 16 `.toc` | « 1.1.2 » n'apparaît nulle part : ni dans les `.toc`, ni dans `Init.lua` ou `Constants.lua`, ni dans un journal des changements. C'est probablement le numéro affiché sur CurseForge (projet 1422985). `AtlasLootClassic_DungeonsAndRaids.toc` porte encore `BCC 2.5.4`. |
+| AtlasLoot Classic Forever | 1.1.2 | `## Version: Forever 1.60.1` dans 15 `.toc` sur 16 | « 1.1.2 » n'apparaît nulle part : ni dans les `.toc`, ni dans `Init.lua` ou `Constants.lua`, ni dans un journal des changements. C'est probablement le numéro affiché sur CurseForge (projet 1422985). `AtlasLootClassic_DungeonsAndRaids.toc` porte encore `BCC 2.5.4`. |
 | ForeverDungeonJournal | 1.2.0 | 1.2.0 (`.toc`) | `README.txt` dit v1.0.7 et les commentaires du code montent jusqu'à v1.0.26. |
 | GearQuestForever | 0.2.16-beta | 0.2.16-beta (`.toc`, `Core.lua:12`) | `tasks/T04-plan.md` notait 0.2.14-beta. Pas de journal des changements : on ne sait pas ce qui a changé entre les deux. |
 | Auctionator | 339 | 339 | Journal des changements 339 du 2026-09-21, avec trois correctifs « Forever ». |
@@ -103,7 +103,7 @@ Rappels utiles à la lecture :
     - 41 boss sur 52 sont dans le npcDB : 40 noms et 40 niveaux concordent. `BOSS_LEVELS` est donc bien une copie de Classic.
     - Les 11 boss des deux donjons Forever sont absents (Questie n'a aucun PNJ d'ID ≥ 200000). Ces deux donjons sont aussi absents de `dungeons.lua`.
     - Les 16 quêtes Forever sont absentes de questDB et de xpDB (ID max de Questie : 9665).
-    - Sur les 34 quêtes Classic, l'XP de base concorde pour 28 et diffère pour 5 (5723, 962, 1200, 6561, 6564).
+    - Sur les 34 quêtes Classic, 33 ont une XP de base : elle concorde pour 28 et diffère pour 5 (5723, 962, 1200, 6561, 6564).
 - Quest Master : aucune quête Forever.
 - AtlasLoot : voir plus haut. Trois sources, trois plages de niveau pour les donjons Forever, sans vérité locale.
 - **Caches du client** : `Cache/WDB/enUS/questcache.wdb` (en-tête `WQST`, build 70009, 184 enregistrements dont 50 d'ID ≥ 90000) contient 12 des quêtes de FDJ.
@@ -203,7 +203,7 @@ Réponse à la question ouverte « format et fonctionnement sur Forever » :
     - En revanche, `forever lookup zones` peut manquer des corrections de niveau, de races ou de zone.
 - **`QuestieForeverDB`** (SavedVariable de `Modules/ForeverQuestData.lua`, déjà désignée par `ROADMAP.md` pour T04d) : 139 quêtes apprises en jeu, dont 38 absentes de la base (37 d'ID ≥ 90000). Champs : titre, niveau, objectifs, points d'intérêt, sources, quête journalière ou non, rendue ou non. Pas d'XP. Les 11 quêtes découvertes par Quest Master (module `Discovery`) en font toutes partie.
 - **XP versée par le serveur** : `QuestMasterSavedDB.char.*.questHistory[].xp` est l'argument `xpReward` de `QUEST_TURNED_IN`, donc l'XP réellement reçue. Il n'y a qu'un seul point (quête 805, +2,2 % sur `xpDB-classic`, niveau du personnage inconnu) : aucune conclusion possible, mais c'est la bonne méthode de mesure.
-- Rapports d'XP de FDJ sur Questie, pour 49 quêtes Classic : 24 sont à environ 1,0 et les autres de 2,9 à 7,5, **à niveau égal**. Ce n'est ni un facteur global ni une courbe par niveau : c'est un réglage par quête, cohérent avec le multiplicateur lu dans `questcache.wdb`.
+- Rapports d'XP de FDJ sur Questie, pour 49 quêtes Classic : 24 sont à environ 1,0, une à 0,74 et les 24 autres de 2,9 à 7,5, **à niveau égal**. Ce n'est ni un facteur global ni une courbe par niveau : c'est un réglage par quête, cohérent avec le multiplicateur lu dans `questcache.wdb`.
 
 ## Usage proposé par domaine
 
