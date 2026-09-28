@@ -101,7 +101,9 @@ def test_expected_cast_parity(game_data, fm):
         for key, diff, frozen, wc, buffs, (_, ours_ch, seed_ch) in itertools.product(
             spells, (0, 3), (False, True), (0, 5), BUFFS, chars
         ):
-            ours = expected_cast(game_data, key, level, pts, ours_ch, diff, frozen=frozen, wc_stacks=wc, buffs=buffs)
+            ours = expected_cast(
+                game_data, key, level, pts, ours_ch, diff, frozen=frozen, wc_stacks=wc, buffs=buffs, rules="seed"
+            )
             theirs = fm.expected_cast(key, level, pts, seed_ch, diff, frozen, wc, buffs)
             case = (key, level, sorted(pts), diff, frozen, wc, bool(buffs))
             if theirs is None:
@@ -122,7 +124,7 @@ def test_rank_and_coefficient_parity(game_data, fm):
             ours_rank = game_data.spells[key].ranks[i]
             assert ours_rank.position == i + 1
             assert list(ours_rank[1:]) == seed_rank
-            assert close(coefficient(game_data, key, ours_rank), fm.coefficient(key, seed_rank)), (key, i)
+            assert close(coefficient(game_data, key, ours_rank, rules="seed"), fm.coefficient(key, seed_rank)), (key, i)
         for level, pts in itertools.product(range(1, 61), ({}, {spell.get("talent", "x"): 1})):
             ours = best_rank(game_data, key, level, pts)
             theirs = fm.best_rank(key, level, pts)

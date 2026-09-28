@@ -54,8 +54,13 @@ CHECKS = {
     "Ignite": lambda gd: E(gd, "fireball", {"ignite": 5})["ignite"] > 0,
     "Piercing Ice": lambda gd: E(gd, "frostbolt", {"piercingIce": 3})["dmg"] > fb(gd)["dmg"],
     "Fire Power": lambda gd: E(gd, "fireball", {"firePower": 5})["dmg"] > fi(gd)["dmg"],
-    "coefficients": lambda gd: coefficient(gd, "frostbolt", gd.spells["frostbolt"].ranks[-1]) == 3.0 / 3.5 * 0.95,
-    "pénalité < 20": lambda gd: coefficient(gd, "frostbolt", gd.spells["frostbolt"].ranks[1]) < 1.8 / 3.5 * 0.95,
+    # contrôles de la formule du seed (T04e : rules="seed" ; coefficients du client : test_client_coefficients.py)
+    "coefficients": lambda gd: (
+        coefficient(gd, "frostbolt", gd.spells["frostbolt"].ranks[-1], rules="seed") == 3.0 / 3.5 * 0.95
+    ),
+    "pénalité < 20": lambda gd: (
+        coefficient(gd, "frostbolt", gd.spells["frostbolt"].ranks[1], rules="seed") < 1.8 / 3.5 * 0.95
+    ),
     "Improved Frostbolt": lambda gd: E(gd, "frostbolt", {"improvedFrostbolt": 5})["cast_s"] == 2.5,
     "Improved Fireball": lambda gd: E(gd, "fireball", {"improvedFireball": 5})["cast_s"] == 3.0,
     "hâte": lambda gd: E(gd, "frostbolt", ch=ch_ref(gd, haste=0.1))["cast_s"] < fb(gd)["cast_s"],

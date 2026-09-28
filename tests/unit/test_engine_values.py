@@ -19,7 +19,8 @@ def ch(game_data):
 
 
 def test_frostbolt_values(game_data, ch):
-    e = expected_cast(game_data, "frostbolt", 60, {}, ch)
+    """Mode seed (formule du seed, T04e) ; valeurs du mode forever : tests/unit/test_client_coefficients.py."""
+    e = expected_cast(game_data, "frostbolt", 60, {}, ch, rules="seed")
     assert e["key"] == "frostbolt" and e["school"] == "frost"
     assert e["rank"] == Rank(11, 60, 457, 493, 0, 0, 3.0, 290, 0)
     assert e["hit"] == approx(0.96)
@@ -70,8 +71,8 @@ def test_hit_by_level_diff(game_data, ch):
 
 def test_coefficient_values(game_data):
     ranks = game_data.spells["frostbolt"].ranks
-    assert coefficient(game_data, "frostbolt", ranks[1]) == approx(0.26871428571428574)
-    assert coefficient(game_data, "frostbolt", ranks[10]) == approx(0.8142857142857142)
+    assert coefficient(game_data, "frostbolt", ranks[1], rules="seed") == approx(0.26871428571428574)
+    assert coefficient(game_data, "frostbolt", ranks[10], rules="seed") == approx(0.8142857142857142)
 
 
 def test_improved_frostbolt_gcd_floor(game_data, ch):

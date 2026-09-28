@@ -110,7 +110,9 @@ def test_coefficient_reads_data(make_deps, data_copy):
     """Preuve que le diviseur vient des données : le changer change le coefficient."""
     edit_mechanics(data_copy, lambda values: values["coefficient.cast_divisor"].update(value=4.0))
     gd = load_game_data(make_deps(data_dir=data_copy))
-    assert coefficient(gd, "frostbolt", gd.spells["frostbolt"].ranks[-1]) == pytest.approx(3.0 / 4.0 * 0.95)
+    assert coefficient(gd, "frostbolt", gd.spells["frostbolt"].ranks[-1], rules="seed") == pytest.approx(
+        3.0 / 4.0 * 0.95
+    )
 
 
 # --- T04e : schéma 2 de spell_scaling.json, clés de mécanique ----------------------------------------

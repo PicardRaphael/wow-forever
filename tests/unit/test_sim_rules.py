@@ -17,6 +17,7 @@ from forever.sim.leveling_mc import mc, options_with_defaults
 SEED_MODE = {"mob_source": "seed", "spell_level": "rank", "rules": "seed"}
 IF5 = {"improvedFrostbolt": 5}
 AM3 = {"arcaneMeditation": 3}
+NO_SP = {"sp": 0}  # puissance des sorts neutralisée : forever et seed ne diffèrent alors que par les autres règles
 
 
 def run_json(capsys, argv, deps):
@@ -67,11 +68,12 @@ def test_mage_armor_removes_the_attacker_slow_in_the_analytic_model(game_data):
 
 
 def test_seed_rules_keep_the_frost_armor_slow(game_data):
-    """Le seed garde le ralenti de Frost Armor à tout niveau : mêmes dégâts subis que sous Ice Armor forcée."""
-    seed = kill_analytic(game_data, 40, {}, rules="seed")
-    frost = kill_analytic(game_data, 40, {}, armor="frost")
+    """Le seed garde le ralenti de Frost Armor à tout niveau : mêmes dégâts subis que sous Ice Armor forcée.
+    Puissance des sorts neutralisée (`sp` 0, T04e) : les coefficients du client ne changent que ce terme."""
+    seed = kill_analytic(game_data, 40, {}, over=NO_SP, rules="seed")
+    frost = kill_analytic(game_data, 40, {}, over=NO_SP, armor="frost")
     assert seed["taken"] == frost["taken"]
-    assert seed["taken"] < kill_analytic(game_data, 40, {})["taken"]
+    assert seed["taken"] < kill_analytic(game_data, 40, {}, over=NO_SP)["taken"]
 
 
 def test_mage_armor_changes_the_monte_carlo(game_data):
@@ -100,14 +102,15 @@ def test_monte_carlo_uses_the_cumulated_regen(game_data):
 
 
 def test_analytic_fire_blast_cooldown_includes_wake_of_fire(game_data):
-    """B13 : en `forever`, le cycle de feu prend la recharge de Fire Blast réduite par Wake of Fire."""
+    """B13 : en `forever`, le cycle de feu prend la recharge de Fire Blast réduite par Wake of Fire. Égalité sans
+    Wake of Fire à puissance des sorts neutralisée (`sp` 0, T04e : seul terme changé par les coefficients du client)."""
     pts = {"improvedFireball": 5, "wakeOfFire": 2}
     forever = kill_analytic(game_data, 20, pts, rotation="fire")
     seed = kill_analytic(game_data, 20, pts, rotation="fire", rules="seed")
     assert forever["combat"] < seed["combat"]
     plain = {"improvedFireball": 5}
-    assert kill_analytic(game_data, 20, plain, rotation="fire") == kill_analytic(
-        game_data, 20, plain, rotation="fire", rules="seed"
+    assert kill_analytic(game_data, 20, plain, rotation="fire", over=NO_SP) == kill_analytic(
+        game_data, 20, plain, rotation="fire", over=NO_SP, rules="seed"
     )
 
 
