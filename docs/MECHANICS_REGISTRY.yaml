@@ -497,11 +497,17 @@ mechanics:
     categorie: temps
     description: "Procs : PPM, chance fixe, recharges internes"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: probable
-    sources: []
-    tests: []
+    sources:
+      - "forever/data/1.60.1.70009/talents.json (missileBarrage : chances, canalisation, coût)"
+    tests:
+      - tests/unit/test_rotations_t05.py::test_missile_barrage_rules
+      - tests/unit/test_rotations_t05.py::test_missile_barrage_halves_the_dump_and_makes_it_free
+      - tests/unit/test_rotations_t05.py::test_missile_barrage_in_the_arcane_cycle
     tolerance: null
+    formule: "Missile Barrage (T05, seul proc modélisé) : chaque Arcane Blast qui touche déclenche l'aura avec la chance du talent (Fireball, Frostbolt, Frostfire Bolt : autre chance) ; l'Arcane Missiles suivant est canalisé en (1 - réduction) du temps et gratuit ; analytique : P = 1 - (1 - chance × toucher)^cumuls par cycle arcane"
+    note: "T05 : rotation arcane à décharge Arcane Missiles seulement (un tirage par déclencheur qui touche, mode forever) ; tisser Arcane Missiles dans les rotations de givre ou de feu : angle mort ; autres procs (Impact ; Clearcasting compté en B12) absents"
   - id: B15
     categorie: temps
     description: "Durée, charges, rafraîchissement et cumul des buffs"
@@ -511,6 +517,8 @@ mechanics:
     sources:
       - "forever/data/1.60.1.70009/talents.json (arcaneBlast : bonus et coût par cumul, cumuls, durée ; arcanePower : durée, dégâts, coût)"
       - "tests/fixtures/wago/1.60.1.70009 (aura 400573 : CumulativeAura 4, durée 8000 ms ; Arcane Power 12042 : DurationIndex 8, 15 000 ms, SpellCooldowns 180 000 ms)"
+      - "forever/data/1.60.1.70009/spell_scaling.json (talent_cooldowns : recharges des talents actifs, T05)"
+      - "forever/data/1.60.1.70009/talents.json (hotStreak : 25 % par cumul, 3 cumuls, duration_s 20 au build 70009)"
     tests:
       - tests/unit/test_engine_arcane_blast.py::test_max_stacks_come_from_the_talent
       - tests/unit/test_engine_arcane_blast.py::test_stacks_are_capped_and_expire
@@ -518,9 +526,22 @@ mechanics:
       - tests/unit/test_engine_arcane_blast.py::test_clearcasting_makes_the_cast_free_and_keeps_the_stack
       - tests/unit/test_damage_modifiers.py::test_arcane_power_buffs
       - tests/unit/test_video_examples.py::test_video_example
+      - tests/unit/test_rotations_t05.py::test_arcane_power_window_reads_talent_and_client
+      - tests/unit/test_rotations_t05.py::test_session_clock_brings_the_aura_back_every_ceil_cooldown_over_cycle_fights
+      - tests/unit/test_rotations_t05.py::test_analytic_share_of_fights_with_the_aura
+      - tests/unit/test_rotations_t05.py::test_arcane_power_raises_cost_and_damage_inside_the_window_only
+      - tests/unit/test_rotations_t05.py::test_arcane_power_draws_no_random_number
+      - tests/unit/test_rotations_t05.py::test_arcane_power_option
+      - tests/unit/test_rotations_t05.py::test_arcane_power_in_the_analytic_model
+      - tests/unit/test_rotations_t05.py::test_seed_mode_never_uses_arcane_power
+      - tests/unit/test_rotations_t05.py::test_hot_streak_rules
+      - tests/unit/test_rotations_t05.py::test_hot_streak_shortens_pyroblast
+      - tests/unit/test_rotations_t05.py::test_pyroblast_enters_the_fire_rotation_after_enough_crits
+      - tests/unit/test_rotations_t05.py::test_fewer_stacks_cast_more_pyroblasts
+      - tests/unit/test_rotations_t05.py::test_hot_streak_in_the_analytic_model
     tolerance: null
     formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée ; expire sans nouvel Arcane Blast ; tout autre sort de dégâts profite de +x % par cumul et la consomme ; Arcane Power active : +y % de dégâts (source distincte) et +z % de coût"
-    note: "T04c : forever/engine/buffs.py, valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11). T04e : buffs d'Arcane Power (arcane_power_buffs), cumul avec Arcane Blast multiplicatif en forever (A20) ; aura de 15 s et recharge de 180 s non modélisées (l'appelant décide quand l'aura est active ; rotations : T05). Missile Barrage et autres buffs : absents"
+    note: "T04c : forever/engine/buffs.py, valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11). T04e : buffs d'Arcane Power (arcane_power_buffs), cumul avec Arcane Blast multiplicatif en forever (A20) ; aura de 15 s et recharge de 180 s non modélisées (l'appelant décide quand l'aura est active ; rotations : T05). Missile Barrage et autres buffs : absents ; T05 (décision 79) : Arcane Power dans les rotations, au pull dès que prête (horloge de session de mc, recharge du client 180 s), aura sur les lancers qui finissent dans sa durée (+30 % de dégâts multipliés aux autres bonus, +30 % de coût, multiplié au coût croissant d'Arcane Blast : suppose), aucun tirage ; analytique : combat à dégâts uniformes, part des combats min(1, cycle / recharge) au point fixe ; option arcane_power (auto, off), jamais en seed. Hot Streak (décision 83) : cumul à l'impact d'un critique non périodique de Fireball, Frostfire Bolt, Fire Blast, Scorch ; Pyroblast à hs_stacks cumuls (1 au maximum, choix du build), incantation × (1 - 25 % × cumuls), cumuls consommés ; durée 20 s (client 70009) ; cumuls remis à zéro entre deux combats (sous-évalue légèrement) ; analytique : un Pyroblast tous les hs_stacks critiques, expiration ignorée"
   - id: B16
     categorie: temps
     description: "Temps d'incantation réduits par talents"
@@ -581,8 +602,10 @@ mechanics:
     tests:
       - tests/unit/test_engine_values.py::test_range_values
       - tests/unit/test_engine_leveling.py::test_slow_freeze_and_range
+      - tests/unit/test_rotations_t05.py::test_flame_throwing_and_arcane_geometry_extend_the_range
+      - tests/unit/test_rotations_t05.py::test_range_talents_change_the_forever_simulation_only
     tolerance: null
-    formule: "portée = portée du sort, sinon portée par défaut des données ; Frostbolt × (1 + Arctic Reach)"
+    formule: "portée = portée du sort, sinon portée par défaut des données ; Frostbolt × (1 + Arctic Reach) ; rules forever (T05) : + Flame Throwing (sorts de feu, Givre-feu compris), + Arcane Geometry (sorts des arcanes), en mètres"
     note: "T04b : Arctic Reach (forever/engine/movement.py : spell_range) appliqué à Frostbolt seulement, comme le seed ; talents.json l'étend aussi à Blizzard et aux rayons de Frost Nova et Cone of Cold (non modélisé) ; expected_cast.range_yd reste la portée de base"
   - id: C3
     categorie: physique
@@ -1158,9 +1181,12 @@ mechanics:
       - tests/unit/test_engine_arcane_blast.py::test_zero_stacks_is_the_dump_rotation
       - tests/unit/test_engine_arcane_blast.py::test_analytic_close_to_monte_carlo
       - tests/unit/test_engine_arcane_blast.py::test_invalid_arcane_rotations_are_refused
+      - tests/unit/test_rotations_t05.py::test_pyroblast_enters_the_fire_rotation_after_enough_crits
+      - tests/unit/test_rotations_t05.py::test_missile_barrage_halves_the_dump_and_makes_it_free
+      - tests/unit/test_rotations_t05.py::test_arcane_power_raises_cost_and_damage_inside_the_window_only
     tolerance: null
     formule: "rotation arcane (T04c) : Arcane Blast jusqu'à ab_stacks cumuls, puis la décharge ab_dump ; rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
-    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test)"
+    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test) ; T05 : rotation fire avec Pyroblast à hs_stacks cumuls de Hot Streak (talent pris, mode forever) ; rotation arcane avec Missile Barrage sur la décharge Arcane Missiles ; Arcane Power au pull dès que prête dans toutes les rotations ; Pyroblast d'ouverture non modélisé"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"

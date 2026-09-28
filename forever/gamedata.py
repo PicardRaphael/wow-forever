@@ -217,6 +217,7 @@ def _talents(raw: Any) -> tuple[dict[str, Talent], tuple[str, ...]]:
                 max_rank=r.int_(t, "max", f"{where}.max"),
                 ranks=tuple(ranks),
                 prereq=prereq,
+                duration_s=r.opt_num(t, "duration_s", f"{where}.duration_s"),
             )
     return talents, tuple(trees)
 

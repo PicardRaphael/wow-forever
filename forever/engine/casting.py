@@ -11,9 +11,10 @@ PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
 
 
 def cast_time(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, buffs: Buffs | None = None) -> float:
-    """Temps d'incantation effectif : réductions de talents, hâte, plancher du temps de recharge global.
+    """Temps d'incantation effectif : réductions de talents, part retirée par un buff (`cast_reduction` : Hot Streak
+    sur Pyroblast, Missile Barrage sur la canalisation d'Arcane Missiles), hâte, plancher du temps de recharge global.
 
-    Registre : B1, B2, B16"""
+    Registre : B1, B2, B14, B15, B16"""
     buffs = buffs or {}
     gcd = gd.rules.gcd_s
     cast = rank.cast_time_s
@@ -21,6 +22,7 @@ def cast_time(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
         cast -= talent_value(gd, pts, "improvedFrostbolt")
     if key in IMPROVED_FIREBALL_SPELLS:
         cast -= talent_value(gd, pts, "improvedFireball")
+    cast *= 1 - buffs.get("cast_reduction", 0.0)
     if cast <= 0 or gd.spells[key].channel:
         return max(gcd, cast)
     cast /= 1 + ch.haste + buffs.get("haste", 0.0)

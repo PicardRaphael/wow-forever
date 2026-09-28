@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from forever.engine.model import GameData, Points, Rank
+from forever.engine.model import SCHOOL_FIRE, GameData, Points, Rank
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
@@ -59,14 +59,22 @@ def frostbite_freeze_s(gd: GameData) -> float:
     return gd.leveling.frostbite_freeze_s
 
 
-def spell_range(gd: GameData, key: str, pts: Points) -> float:
+def spell_range(gd: GameData, key: str, pts: Points, *, rules: str = "forever") -> float:
     """Portée d'un sort (portée par défaut des données sans portée publiée) ; Arctic Reach allonge Frostbolt
-    seulement, comme le seed.
+    seulement, comme le seed. `rules="forever"` : Flame Throwing (sorts de feu, Givre-feu compris) et Arcane Geometry
+    (sorts des arcanes) ajoutent leurs mètres (T05) ; `rules="seed"` : ni l'un ni l'autre.
 
     Registre : C2"""
-    base = gd.spells[key].range_yd
+    spell = gd.spells[key]
+    base = spell.range_yd
     base = gd.constants.default_range_yd if base is None else base
-    return float(base) * ((1 + talent_value(gd, pts, "arcticReach") / PERCENT) if key == "frostbolt" else 1)
+    r = float(base) * ((1 + talent_value(gd, pts, "arcticReach") / PERCENT) if key == "frostbolt" else 1)
+    if rules == "forever":
+        if spell.school in SCHOOL_FIRE:
+            r += talent_value(gd, pts, "flameThrowing")
+        if spell.school == "arcane":
+            r += talent_value(gd, pts, "arcaneGeometry")
+    return r
 
 
 def attacker_swing_s(gd: GameData, *, frost_armor: bool) -> float:

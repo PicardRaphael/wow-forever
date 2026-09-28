@@ -56,6 +56,7 @@ class Talent:
     max_rank: int
     ranks: tuple[tuple[float, ...], ...]
     prereq: tuple[int, int] | None  # (palier, colonne) dans le même arbre
+    duration_s: float | None = None  # durée d'aura corrigée d'après le client (talents.json, Hot Streak au build 70009)
 
 
 @dataclass(frozen=True)

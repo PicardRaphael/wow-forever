@@ -17,12 +17,24 @@ from __future__ import annotations
 from typing import Any, TypedDict
 
 from forever.engine.armor import worn_armor
-from forever.engine.buffs import arcane_blast_bonus
+from forever.engine.buffs import (
+    ARCANE_MISSILES,
+    PYROBLAST,
+    SPELL,
+    arcane_blast_bonus,
+    arcane_power_buffs,
+    arcane_power_share,
+    arcane_power_window,
+    hot_streak_buffs,
+    merge_buffs,
+    missile_barrage_buffs,
+    missile_barrage_chance,
+)
 from forever.engine.cast import expected_cast
 from forever.engine.casting import melee_cast_time, pushback_rate, spell_cooldown
 from forever.engine.character import character
 from forever.engine.mana import arcane_blast_cost, clearcast_cost_factor, downtime, in_combat_regen_fraction
-from forever.engine.model import Character, CharacterOverrides, GameData, Points
+from forever.engine.model import Buffs, Character, CharacterOverrides, GameData, Points
 from forever.engine.monsters import mob_expected_hit, mob_hp, mob_land_chance, mob_swing_damage, mob_xp
 from forever.engine.movement import (
     attacker_swing_s,
@@ -41,6 +53,7 @@ from forever.sim.leveling_mc import (
     SECONDS_PER_HOUR,
     KillResult,
     arcane_plan,
+    hot_streak_plan,
     options_with_defaults,
 )
 
@@ -67,26 +80,41 @@ def arcane_cycle(
     spell_level: str = "character",
     rules: str = "forever",
     low_level_penalty: bool | None = None,
+    extra_buffs: Buffs | None = None,
 ) -> ArcaneCycle:
     """Espérance d'un cycle stationnaire de la rotation arcane (hors recul d'incantation) : `ab_stacks` Arcane Blast
     (défaut : maximum du talent), chacun au coût de son cumul (`arcane_blast_cost`), libérés par Clearcasting avec la
     même espérance que `expected_cast`, puis une décharge `ab_dump` qui profite du bonus des cumuls et consomme
     l'aura. ValueError si la rotation est impossible (`arcane_plan`).
 
-    Registre : B11, B15, I1"""
+    Missile Barrage (mode forever, décharge Arcane Missiles) : chance qu'au moins un des `ab_stacks` Arcane Blast
+    touche et déclenche l'aura, P = 1 - (1 - chance × toucher)^cumuls ; la décharge est alors raccourcie et gratuite.
+    `extra_buffs` : buffs appliqués à tous les lancers du cycle (Arcane Power, coût compris).
+
+    Registre : B11, B14, B15, I1"""
     n, dump = arcane_plan(gd, level, pts, ab_stacks, ab_dump)
     eng: dict[str, Any] = {"spell_level": spell_level, "rules": rules, "low_level_penalty": low_level_penalty}
-    ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, **eng)
+    ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, buffs=extra_buffs, **eng)
     buffs = arcane_blast_bonus(gd, pts, n, for_spell=dump)
+    if extra_buffs:
+        buffs = merge_buffs(buffs, extra_buffs)
     de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=buffs, **eng)
     assert ab is not None and de is not None  # vérifiés par arcane_plan
     free = clearcast_cost_factor(gd, pts, ab["hit"])
     ab_mana = sum(arcane_blast_cost(gd, ab["rank"], pts, ch, i) for i in range(n)) * free
+    if extra_buffs:
+        ab_mana *= 1 + extra_buffs.get("cost", 0.0)
+    time_s, mana = n * ab["cast_s"] + de["cast_s"], ab_mana + de["mana"]
+    mb = missile_barrage_buffs(gd, pts) if dump == ARCANE_MISSILES and rules == "forever" else {}
+    if mb and n:
+        p = 1 - (1 - missile_barrage_chance(gd, pts, SPELL) * ab["hit"]) ** n
+        time_s = n * ab["cast_s"] + de["cast_s"] * (1 - p * mb.get("cast_reduction", 0.0))
+        mana = ab_mana + de["mana"] * (1 + p * mb.get("cost", 0.0))
     return {
         "ab_casts": n,
-        "time_s": n * ab["cast_s"] + de["cast_s"],
+        "time_s": time_s,
         "dmg": n * ab["dmg"] + de["dmg"],
-        "mana": ab_mana + de["mana"],
+        "mana": mana,
         "ab_mana": ab_mana,
     }
 
@@ -102,14 +130,84 @@ def kill_analytic(
 ) -> KillResult:
     """Espérance d'un combat contre un monstre normal de niveau `level + level_diff`, puis du repos.
 
-    Registre : I1, I6"""
+    Mode forever (T05) : Hot Streak (rotation fire) ajoute des Pyroblast au cycle en mêlée, un par `hs_stacks`
+    critiques de Fireball et de Fire Blast (expiration des cumuls ignorée) ; Arcane Power (`arcane_power="auto"`) :
+    l'aura couvre les `durée` premières secondes d'un combat à dégâts uniformes (le reste au rythme ordinaire), dans la
+    part des combats min(1, cycle / recharge) où elle est prête au pull, cycle et part au point fixe (deux itérations).
+
+    Registre : B14, B15, I1, I6"""
     o = options_with_defaults(gd, rotation, options)
+    hs_n = hot_streak_plan(gd, level, pts, rotation, o)
+    ch = character(gd, level, race, over)
+    window = arcane_power_window(gd, pts) if o["rules"] == "forever" and o["arcane_power"] == "auto" else None
+    plain = _fight(gd, level, pts, ch, rotation, o, hs_n, None)
+    if window is None:
+        return _result(gd, level, pts, ch, o, *plain)
+    duration, cooldown = window
+    buffed = _fight(gd, level, pts, ch, rotation, o, hs_n, arcane_power_buffs(gd, pts))
+    frac = min(1.0, duration / buffed[0])  # part du combat sous l'aura, à dégâts uniformes
+    with_ap = (
+        buffed[0] if frac >= 1 else duration + plain[0] * (1 - frac),
+        buffed[1] * frac + plain[1] * (1 - frac),
+        buffed[2] * frac + plain[2] * (1 - frac),
+    )
+    a, b = _result(gd, level, pts, ch, o, *with_ap), _result(gd, level, pts, ch, o, *plain)
+    share = arcane_power_share(b["total"], cooldown)
+    for _ in range(2):  # point fixe : le cycle moyen dépend de la part des combats avec l'aura
+        total = share * a["total"] + (1 - share) * b["total"]
+        share = arcane_power_share(total, cooldown)
+    mixed = {k: share * a[k] + (1 - share) * b[k] for k in ("combat", "mana", "taken", "downtime", "total")}
+    return {
+        "combat": mixed["combat"],
+        "mana": mixed["mana"],
+        "taken": mixed["taken"],
+        "downtime": mixed["downtime"],
+        "total": mixed["total"],
+        "xp_h": mob_xp(gd, level) * SECONDS_PER_HOUR / mixed["total"],
+    }
+
+
+def _result(
+    gd: GameData,
+    level: int,
+    pts: Points,
+    ch: Character,
+    o: dict[str, Any],
+    combat: float,
+    mana: float,
+    taken: float,
+) -> KillResult:
+    """Combat (durée, mana brute, dégâts subis) -> résultat : régénération en combat, repos, trajet, XP par heure."""
+    regen = in_combat_regen_fraction(gd, pts, level, armor=o["armor"], rules=o["rules"])
+    mana = max(0.0, mana - regen * ch.spirit_regen * combat)
+    down = downtime(gd, ch, level, mana, taken)
+    total = combat + down + o["run_between_s"]
+    return {
+        "combat": combat,
+        "mana": mana,
+        "taken": taken,
+        "downtime": down,
+        "total": total,
+        "xp_h": mob_xp(gd, level) * SECONDS_PER_HOUR / total,
+    }
+
+
+def _fight(
+    gd: GameData,
+    level: int,
+    pts: Points,
+    ch: Character,
+    rotation: str,
+    o: dict[str, Any],
+    hs_n: int,
+    extra: Buffs | None,
+) -> tuple[float, float, float]:
+    """(durée du combat, mana brute dépensée, dégâts subis) en espérance, `extra` appliqué à tous les lancers."""
     lv, mm, gcd = gd.leveling, gd.mob_model, gd.rules.gcd_s
     level_diff = o["level_diff"]
     spell_level = o["spell_level"]
     # options transmises au moteur
     eng: dict[str, Any] = {"spell_level": spell_level, "rules": o["rules"], "low_level_penalty": o["low_level_penalty"]}
-    ch = character(gd, level, race, over)
     mlevel = level + level_diff
     hp = mob_hp(gd, mlevel, o["mob_source"]).value
     main = ROTATIONS[rotation]
@@ -118,15 +216,17 @@ def kill_analytic(
     wc = talent_value(gd, pts, "wintersChill", 1, 0) * min(
         1.0, talent_value(gd, pts, "wintersChill", 0) / PERCENT * lv.analytic_winters_chill_casts
     )
-    e = expected_cast(gd, main, level, pts, ch, level_diff, wc_stacks=wc, **eng)
+    e = expected_cast(gd, main, level, pts, ch, level_diff, wc_stacks=wc, buffs=extra, **eng)
     if e is None:
         raise ValueError(f"{main} n'est pas appris au niveau {level}")
     c, d_cast, m_cast = e["cast_s"], e["dmg"], e["mana"]
     if rotation == "arcane":  # cycle stationnaire : moyenne par lancer
-        cyc = arcane_cycle(gd, level, pts, ch, level_diff, ab_stacks=o["ab_stacks"], ab_dump=o["ab_dump"], **eng)
+        cyc = arcane_cycle(
+            gd, level, pts, ch, level_diff, ab_stacks=o["ab_stacks"], ab_dump=o["ab_dump"], extra_buffs=extra, **eng
+        )
         casts = cyc["ab_casts"] + 1
         c, d_cast, m_cast = cyc["time_s"] / casts, cyc["dmg"] / casts, cyc["mana"] / casts
-    frng = spell_range(gd, main, pts)
+    frng = spell_range(gd, main, pts, rules=o["rules"])
     flight = travel_time(gd, main, frng, analytic=True)
     slow = frostbolt_slow(gd, pts) if frostbolt else 0.0
     run = mob_speed(gd, slow * e["hit"])
@@ -142,7 +242,9 @@ def kill_analytic(
     frz_per_cast = fbite * e["hit"] * frostbite_freeze_s(gd)
     has_il = best_rank(gd, "ice_lance", level, pts) is not None and rotation == "frost"
     il = (
-        expected_cast(gd, "ice_lance", level, pts, ch, level_diff, frozen=True, wc_stacks=wc, **eng) if has_il else None
+        expected_cast(gd, "ice_lance", level, pts, ch, level_diff, frozen=True, wc_stacks=wc, buffs=extra, **eng)
+        if has_il
+        else None
     )
     fof_p = talent_value(gd, pts, "fingersOfFrost", 0) / PERCENT if has_il else 0.0
     il_casts = (frz_per_cast / gcd + fof_p * e["hit"]) if has_il else 0.0
@@ -151,12 +253,22 @@ def kill_analytic(
     cyc_dmg = d_cast + (il_casts * il["dmg"] if il else 0.0)
     cyc_mana = m_cast + (il_casts * il["mana"] if il else 0.0)
     if main == "fireball":
-        fbl = expected_cast(gd, "fire_blast", level, pts, ch, level_diff, **eng)
+        hs_crits = e["hit"] * e["crit"]  # critiques de Hot Streak par sort principal
+        fbl = expected_cast(gd, "fire_blast", level, pts, ch, level_diff, buffs=extra, **eng)
         if fbl:
             fbl_cd = spell_cooldown(gd, "fire_blast", fbl["rank"], pts) if forever else fbl["cooldown_s"]
             cyc_dmg += fbl["dmg"] * c_melee / fbl_cd
             cyc_mana += fbl["mana"] * c_melee / fbl_cd
             cyc_time += gcd * c_melee / fbl_cd
+            hs_crits += fbl["hit"] * fbl["crit"] * c_melee / fbl_cd
+        if hs_n:  # un Pyroblast raccourci tous les `hs_n` critiques
+            py_buffs = merge_buffs(hot_streak_buffs(gd, pts, hs_n), extra)
+            py = expected_cast(gd, PYROBLAST, level, pts, ch, level_diff, buffs=py_buffs, **eng)
+            assert py is not None  # vérifié par hot_streak_plan
+            rate = hs_crits / hs_n
+            cyc_time += rate * melee_cast_time(gd, py["cast_s"], push_per_s)
+            cyc_dmg += rate * py["dmg"]
+            cyc_mana += rate * py["mana"]
     n_pre = t0 / c
     if hp <= n_pre * d_cast:
         combat = hp / d_cast * c + flight
@@ -169,15 +281,4 @@ def kill_analytic(
     frozen_frac = min(lv.analytic_freeze_cap, frz_per_cast / cyc_time) if t_melee else 0.0
     hit_raw = mob_swing_damage(gd, mlevel, ch.armor)
     taken = t_melee * (1 - frozen_frac) / swing * p_land * mob_expected_hit(gd, hit_raw)
-    regen = in_combat_regen_fraction(gd, pts, level, armor=o["armor"], rules=o["rules"])
-    mana = max(0.0, mana - regen * ch.spirit_regen * combat)
-    down = downtime(gd, ch, level, mana, taken)
-    total = combat + down + o["run_between_s"]
-    return {
-        "combat": combat,
-        "mana": mana,
-        "taken": taken,
-        "downtime": down,
-        "total": total,
-        "xp_h": mob_xp(gd, level) * SECONDS_PER_HOUR / total,
-    }
+    return combat, mana, taken

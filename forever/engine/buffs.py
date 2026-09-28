@@ -18,6 +18,18 @@ DMG_PER_STACK, COST_PER_STACK, MAX_STACKS, DURATION = 2, 3, 4, 5
 # Arcane Power (talents.json, « For the next {0} sec, your spells deal {1}% more damage while costing {2}% more mana »).
 ARCANE_POWER = "arcanePower"
 AP_DURATION, AP_DMG, AP_COST = 0, 1, 2
+# Hot Streak (« grant Hot Streak for {0} sec. Hot Streak reduces the cast time of Pyroblast by {1}%, stacking up to {2}
+# times ») : sorts dont un critique non périodique donne un cumul (description du talent).
+HOT_STREAK = "hotStreak"
+HS_DURATION, HS_CAST_PCT, HS_MAX_STACKS = 0, 1, 2
+HOT_STREAK_SPELLS = frozenset({"fireball", "frostfire_bolt", "fire_blast", "scorch"})
+PYROBLAST = "pyroblast"
+# Missile Barrage (« Arcane Blast {0}% chance, Fireball, Frostbolt, Frostfire Bolt {1}% chance ... reduce the channeled
+# duration of your next Arcane Missiles by {2}%, reduce the Mana cost by {3}% »).
+MISSILE_BARRAGE = "missileBarrage"
+MB_AB_CHANCE, MB_OTHER_CHANCE, MB_CHANNEL_PCT, MB_COST_PCT = 0, 1, 2, 3
+MB_OTHER_SPELLS = frozenset({"fireball", "frostbolt", "frostfire_bolt"})
+ARCANE_MISSILES = "arcane_missiles"
 
 
 class ArcaneBlastAura(NamedTuple):
@@ -116,7 +128,10 @@ def arcane_power_window(gd: GameData, pts: Points) -> tuple[float, float] | None
     recharge du client (`spell_scaling.json.talent_cooldowns`) ; None sans le talent.
 
     Registre : B15"""
-    raise NotImplementedError
+    duration = talent_value(gd, pts, ARCANE_POWER, AP_DURATION)
+    if duration <= 0:
+        return None
+    return duration, gd.talent_cooldowns_s[ARCANE_POWER]
 
 
 def arcane_power_pull(clock_s: float, ready_at_s: float, window: tuple[float, float] | None) -> tuple[bool, float]:
@@ -124,36 +139,54 @@ def arcane_power_pull(clock_s: float, ready_at_s: float, window: tuple[float, fl
     instant où la recharge suivante sera écoulée).
 
     Registre : B15"""
-    raise NotImplementedError
+    if window is None or clock_s < ready_at_s:
+        return False, ready_at_s
+    return True, clock_s + window[1]
 
 
 def arcane_power_share(cycle_s: float, cooldown_s: float) -> float:
     """Part des combats qui commencent avec Arcane Power prête (analytique) : min(1, cycle / recharge).
 
     Registre : B15"""
-    raise NotImplementedError
+    return min(1.0, cycle_s / cooldown_s)
 
 
 def hot_streak_rules(gd: GameData, pts: Points) -> tuple[float, float, int] | None:
     """(durée de l'aura en s, réduction de l'incantation de Pyroblast par cumul en fraction, cumuls maximum) de Hot
-    Streak si le talent est pris ; None sinon.
+    Streak si le talent est pris ; None sinon. Durée : `duration_s` du talent (corrigée d'après le client 70009, 20 s,
+    notes de Blizzard du 24/09/2026), sinon la variable de l'infobulle.
 
     Registre : B15"""
-    raise NotImplementedError
+    if pts.get(HOT_STREAK, 0) <= 0:
+        return None
+    talent = gd.talents[HOT_STREAK]
+    duration = talent.duration_s if talent.duration_s is not None else talent_value(gd, pts, HOT_STREAK, HS_DURATION)
+    return (
+        duration,
+        talent_value(gd, pts, HOT_STREAK, HS_CAST_PCT) / PERCENT,
+        int(talent_value(gd, pts, HOT_STREAK, HS_MAX_STACKS)),
+    )
 
 
 def hot_streak_buffs(gd: GameData, pts: Points, stacks: int) -> Buffs:
     """Buff de Pyroblast lancé avec `stacks` cumuls de Hot Streak : réduction de l'incantation (`cast_reduction`).
 
     Registre : B15"""
-    raise NotImplementedError
+    rules = hot_streak_rules(gd, pts)
+    if rules is None or stacks <= 0:
+        return {}
+    return {"cast_reduction": min(stacks, rules[2]) * rules[1]}
 
 
 def missile_barrage_chance(gd: GameData, pts: Points, key: str) -> float:
     """Chance qu'un sort `key` qui touche déclenche Missile Barrage (0 sans le talent ou pour un autre sort).
 
     Registre : B14"""
-    raise NotImplementedError
+    if key == SPELL:
+        return talent_value(gd, pts, MISSILE_BARRAGE, MB_AB_CHANCE) / PERCENT
+    if key in MB_OTHER_SPELLS:
+        return talent_value(gd, pts, MISSILE_BARRAGE, MB_OTHER_CHANCE) / PERCENT
+    return 0.0
 
 
 def missile_barrage_buffs(gd: GameData, pts: Points) -> Buffs:
@@ -161,4 +194,9 @@ def missile_barrage_buffs(gd: GameData, pts: Points) -> Buffs:
     réduit (`cost`) ; {} sans le talent.
 
     Registre : B14"""
-    raise NotImplementedError
+    if pts.get(MISSILE_BARRAGE, 0) <= 0:
+        return {}
+    return {
+        "cast_reduction": talent_value(gd, pts, MISSILE_BARRAGE, MB_CHANNEL_PCT) / PERCENT,
+        "cost": -talent_value(gd, pts, MISSILE_BARRAGE, MB_COST_PCT) / PERCENT,
+    }
