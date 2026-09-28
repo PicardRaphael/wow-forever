@@ -2697,7 +2697,8 @@
   "bonus_coefficient : EffectBonusCoefficient de l'effet de dégâts (par coup, par tic ou par éclair canalisé)",
   "period_ms : EffectAuraPeriod de l'aura qui porte l'effet (celle du sort parent pour un sort déclenché), 0 pour un coup direct",
   "utility : armures du Mage, niveau d'apprentissage (SpellLevels.BaseLevel) et effets retenus par decode_rules.json.utility_spells",
-  "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), cumuls maximum, durée, écoles touchées"
+  "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), cumuls maximum, durée, écoles touchées",
+  "talent_cooldowns : recharge des sorts de talent actifs (decode_rules.json.talent_cooldowns), maximum de RecoveryTime et CategoryRecoveryTime de SpellCooldowns, en millisecondes"
  ],
  "utility": {
   "frost_armor": [
@@ -2812,6 +2813,36 @@
    "schools": [
     "fire"
    ]
+  }
+ },
+ "talent_cooldowns": {
+  "arcanePower": {
+   "spell_id": 12042,
+   "cooldown_ms": 180000
+  },
+  "presenceOfMind": {
+   "spell_id": 12043,
+   "cooldown_ms": 180000
+  },
+  "combustion": {
+   "spell_id": 11129,
+   "cooldown_ms": 180000
+  },
+  "coldSnap": {
+   "spell_id": 12472,
+   "cooldown_ms": 600000
+  },
+  "iceBlock": {
+   "spell_id": 11958,
+   "cooldown_ms": 300000
+  },
+  "iceBarrier": {
+   "spell_id": 11426,
+   "cooldown_ms": 30000
+  },
+  "blastWave": {
+   "spell_id": 11113,
+   "cooldown_ms": 45000
   }
  }
 }

@@ -233,6 +233,42 @@
       "certainty": "suppose",
       "registry": "C2",
       "source": "portée par défaut d'un sort sans portée publiée (zone autour du lanceur), repli de fm.py"
+    },
+    "build.beta_level_cap": {
+      "value": 20,
+      "certainty": "probable",
+      "registry": "I5",
+      "source": "plafond de niveau de la bêta de Forever (niveau 30 annoncé ensuite) : docs/research/community-builds-mage.md (recherche du 2026-09-28) ; tout build au-delà n'est pas vérifiable en jeu avant la sortie (décision 89)"
+    },
+    "build.confidence": {
+      "value": 0.95,
+      "certainty": "certain",
+      "registry": "I5",
+      "source": "paramètre de méthode (T05, décision 85) : niveau de confiance de l'intervalle de la différence appariée au Monte Carlo ; pas un chiffre de jeu"
+    },
+    "build.stability_seeds": {
+      "value": 5,
+      "certainty": "certain",
+      "registry": "I5",
+      "source": "paramètre de méthode (T05, décision 85) : nombre de graines sur lesquelles la décision finale est rejouée ; pas un chiffre de jeu"
+    },
+    "respec.gold_per_hour": {
+      "value": {"10": 1.0, "20": 4.0, "30": 9.0, "40": 16.0, "50": 25.0, "60": 40.0},
+      "certainty": "suppose",
+      "registry": "I5",
+      "source": "seed/forever-mage/scripts/respec.py GOLD_PER_HOUR (EST, « à remplacer par ton propre rythme ») : or gagné par heure selon le niveau (palier le plus proche en dessous)"
+    },
+    "respec.trip_minutes": {
+      "value": 6.0,
+      "certainty": "suppose",
+      "registry": "I5",
+      "source": "seed/forever-mage/scripts/respec.py advise_leveling (trip_minutes = 6, EST) : aller-retour chez le maître de classe"
+    },
+    "respec.beta_observed_resets": {
+      "value": 2,
+      "certainty": "probable",
+      "registry": "I5",
+      "source": "respec.json beta_observed (1 po puis 5 po observés sur la bêta) : les deux premiers paliers du barème sont observés (probable), les suivants suivent la règle Classic (suppose)"
     }
   }
 }

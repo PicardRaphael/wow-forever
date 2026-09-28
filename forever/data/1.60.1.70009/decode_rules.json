@@ -112,6 +112,7 @@
   "target_auras": {
     "fire_vulnerability": {"talent": "Improved Scorch", "trigger_aura": 109, "aura": 270, "field": "EffectBasePointsF"}
   },
+  "talent_cooldowns": {"talents": ["Arcane Power", "Presence of Mind", "Combustion", "Cold Snap", "Ice Block", "Ice Barrier", "Blast Wave"]},
   "school_masks": {"fire": 4, "frost": 16, "arcane": 64},
   "rank_format": ["level", "min", "max", "dot_total", "dot_duration", "cast_s", "mana", "cooldown_s"],
   "notes": [

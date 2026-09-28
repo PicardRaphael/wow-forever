@@ -4,21 +4,21 @@
   "versions": {
     "1.60.1.70009": {
       "collected_at": "2026-09-26",
-      "data_sha": "82629bea60a2",
-      "data_sha256": "82629bea60a25fb8c4f590ad013b415688033e91c1642abdded98e43b0942055",
+      "data_sha": "90f39fd0dce1",
+      "data_sha256": "90f39fd0dce1833a1eed0c93a4693615dc69bb5a22c7e78910bf290cde62507e",
       "files": {
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
         "confirmed_changes.json": "627f306bd2a7bf086f0ff2bbfe2045f47e423e081339865b5845d11ac1d7f7d1",
-        "decode_rules.json": "df6d37aeb8846360eb24c66ab56634356f12becec8249190f00f850648ebe210",
+        "decode_rules.json": "ad3052448dd71e6c99d6b8021f09f3ae6af66d39c675f26ce977e0ec37f53e21",
         "leveling.json": "0244ad81f75114722917c96912ad393f11a21742260f69809aaff2a5e9f7380f",
-        "mechanics.json": "08d67e1f99e7449da1224038dc26b8a8e6a390fab4cb86ebd11fe6c697b33594",
+        "mechanics.json": "a848b1f54810b5357b787f87caf6a6955e7b06546066952304e23491d40515d5",
         "meta.json": "3ac4666f8dd47349d3b1e0f4f7e2936b17a2848071a5bc1dc7aa7e8634303095",
         "monsters.json": "4e46cbfb7ef3f2c5f01c8f55d59570f9f7974eb5cc2baaa16e3ead031c0d0f9f",
         "overrides.json": "e251b04e9fe407a72380f99f4eaea5d141d4361f6167650e8ca09c26451ec9b9",
         "racials.json": "e4cba8c29d0800913a8bc48c6e3db569f64d71d65ea06abbbefffe2f173f7bdf",
         "respec.json": "d0728942f79f45fa2eeafe52ddc75b74608cde77f5a2dcc8d65e1d80e2ed1358",
-        "sources.json": "af41aef9927958079c8f1b3ea04edd2e8364a90f73e7045eb8cadedaa61abe9a",
-        "spell_scaling.json": "2a0fea7b9a42808c293a85b45e2a0603e335e59b0e93d154125232a0d2178d4f",
+        "sources.json": "ff86b33335e7a4162b0c74f91a09d1c7d4e35364a5630b24be208269875b6fc7",
+        "spell_scaling.json": "b904c66bdc250cf53a3fe862d1bd35b5ef8d777b3fa4120862ec565dd4a14a7d",
         "spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
         "talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb"
       },

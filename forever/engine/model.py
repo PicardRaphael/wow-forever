@@ -331,6 +331,29 @@ class FireVulnerability:
 
 
 @dataclass(frozen=True)
+class RespecRules:
+    """Barème et valeur de la réinitialisation des talents : coût en or selon le nombre de réinitialisations déjà
+    faites (`respec.json`, dernier palier répété), paliers observés sur la bêta (les suivants sont supposés), or gagné
+    par heure selon le niveau (palier le plus proche en dessous) et trajet chez le maître de classe (`mechanics.json`,
+    clés `respec.*`)."""
+
+    schedule_gold: tuple[float, ...]
+    beta_observed_resets: int
+    gold_per_hour: Mapping[int, float]
+    trip_minutes: float
+
+
+@dataclass(frozen=True)
+class BuildMethod:
+    """Paramètres des builds par contexte (`mechanics.json`, clés `build.*`) : plafond de niveau de la bêta (au-delà,
+    un build n'est pas vérifiable en jeu avant la sortie), confiance de l'intervalle apparié, graines de stabilité."""
+
+    beta_level_cap: int
+    confidence: float
+    stability_seeds: int
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
 
@@ -349,6 +372,9 @@ class GameData:
     utility: Utility
     armors: Mapping[str, tuple[ArmorRank, ...]]  # armures du client (spell_scaling.json.utility), par rang
     fire_vulnerability: FireVulnerability  # spell_scaling.json.auras (T04e)
+    talent_cooldowns_s: Mapping[str, float]  # recharges des talents actifs (spell_scaling.json.talent_cooldowns, T05)
+    respec: RespecRules
+    build: BuildMethod
 
 
 class CharacterOverrides(TypedDict, total=False):

@@ -587,7 +587,33 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), "
             "cumuls maximum, durée, écoles touchées"
         )
+    if "talent_cooldowns" in rules:
+        doc["talent_cooldowns"] = _talent_cooldowns(tables, rules, client)
+        notes.append(
+            "talent_cooldowns : recharge des sorts de talent actifs (decode_rules.json.talent_cooldowns), maximum de "
+            "RecoveryTime et CategoryRecoveryTime de SpellCooldowns, en millisecondes"
+        )
     return doc
+
+
+def _talent_cooldowns(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, dict[str, int]]:
+    """Recharges des talents actifs (`talent_cooldowns.talents` : noms du client) : sort du talent (TraitDefinition,
+    nom du sort à défaut du nom de remplacement), recharge = max(RecoveryTime, CategoryRecoveryTime) en ms."""
+    talents: dict[str, int] = {}
+    for d in tables["TraitDefinition"]:
+        spell = int(d["SpellID"])
+        talents.setdefault(str(d["OverrideName_lang"]) or client.names.get(spell, ""), spell)
+    out: dict[str, dict[str, int]] = {}
+    for name in rules["talent_cooldowns"]["talents"]:
+        found = talents.get(name)
+        cd = client.cooldowns.get(found) if found is not None else None
+        if found is None or cd is None:
+            raise DataSchemaError(f"{RULES_NAME} : talent « {name} » sans sort ou sans recharge (talent_cooldowns).")
+        out[talent_key(name)] = {
+            "spell_id": found,
+            "cooldown_ms": max(int(cd["RecoveryTime"]), int(cd["CategoryRecoveryTime"])),
+        }
+    return out
 
 
 def _target_auras(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, dict[str, Any]]:
@@ -778,6 +804,7 @@ def decode_version(
                 "notes": [
                     "MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
                     "utility : armures du Mage, niveau d'apprentissage et effets (decode_rules.json.utility_spells)",
+                    "talent_cooldowns : recharges des talents actifs (decode_rules.json.talent_cooldowns)",
                 ],
             },
             **{

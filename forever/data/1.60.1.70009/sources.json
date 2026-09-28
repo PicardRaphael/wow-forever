@@ -69,7 +69,8 @@
       "source": "Observations de la bêta et barème Classic (voir le champ sources du fichier)",
       "certainty": "suppose",
       "notes": [
-        "règle Classic supposée inchangée (PC)"
+        "règle Classic supposée inchangée (PC)",
+        "lu par forever/gamedata.py depuis T05 (barème classic_schedule_gold) ; certitude du vocabulaire du seed PC traduite : deux premiers paliers observés (probable, respec.beta_observed_resets), suivants supposés"
       ]
     },
     "meta.json": {
@@ -122,14 +123,15 @@
       ]
     },
     "spell_scaling.json": {
-      "source": "Client Forever 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools, extraits tests/fixtures/wago/1.60.1.70009) décodées par forever decode le 2026-09-27 ; SpellCooldowns (start_recovery_ms) ajoutée le 2026-09-27 (T04b) ; schéma 2 le 2026-09-28 (T04e) : EffectBonusCoefficient et période des tics, auras de cible (SpellAuraOptions, SpellDuration, TraitDefinition)",
+      "source": "Client Forever 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools, extraits tests/fixtures/wago/1.60.1.70009) décodées par forever decode le 2026-09-27 ; SpellCooldowns (start_recovery_ms) ajoutée le 2026-09-27 (T04b) ; schéma 2 le 2026-09-28 (T04e) : EffectBonusCoefficient et période des tics, auras de cible (SpellAuraOptions, SpellDuration, TraitDefinition) ; talent_cooldowns le 2026-09-28 (T05) : SpellCooldowns des talents actifs",
       "certainty": "certain",
       "notes": [
         "points de base, points par niveau et variance par effet de dégâts ; MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
         "spells.json inchangé (décision 39) : rangs évalués au niveau min(MaxLevel, 60)",
         "utility (T04c, 2026-09-27) : armures du Mage (Frost Armor, Ice Armor, Mage Armor), niveau d'apprentissage SpellLevels.BaseLevel et effets retenus par decode_rules.json.utility_spells (SkillLineAbility, SpellEffect)",
         "schéma 2 (T04e, 2026-09-28) : bonus_coefficient (SpellEffect.EffectBonusCoefficient de l'effet de dégâts, par coup, tic ou éclair) et period_ms (EffectAuraPeriod de l'aura qui porte l'effet, celle du sort parent pour un sort déclenché) par composant",
-        "auras (T04e) : Fire Vulnerability, sort déclenché par Improved Scorch (decode_rules.json.target_auras) : part par cumul, cumuls maximum, durée, écoles"
+        "auras (T04e) : Fire Vulnerability, sort déclenché par Improved Scorch (decode_rules.json.target_auras) : part par cumul, cumuls maximum, durée, écoles",
+        "talent_cooldowns (T05, 2026-09-28) : recharge des sorts de talent actifs listés par decode_rules.json.talent_cooldowns (TraitDefinition, SpellCooldowns : max de RecoveryTime et CategoryRecoveryTime), en millisecondes"
       ]
     }
   }

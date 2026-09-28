@@ -10,6 +10,7 @@ from typing import Any
 from forever.config import Deps
 from forever.engine.model import (
     ArmorRank,
+    BuildMethod,
     CharacterModel,
     CoefficientRules,
     CombatRules,
@@ -27,6 +28,7 @@ from forever.engine.model import (
     Racials,
     Rank,
     RankScaling,
+    RespecRules,
     Restore,
     ScalingComponent,
     Spell,
@@ -45,6 +47,7 @@ LEVELING_FILE = "leveling.json"
 RACIALS_FILE = "racials.json"
 MONSTERS_FILE = "monsters.json"
 SCALING_FILE = "spell_scaling.json"
+RESPEC_FILE = "respec.json"
 SCALING_KINDS = ("direct", "dot", "channel")
 MS_PER_S = 1000.0  # conversion d'unité : durées du client en millisecondes
 SCALING_SCHEMA = 2  # spell_scaling.json : bonus_coefficient et period_ms par composant, auras (T04e)
@@ -535,6 +538,53 @@ def _fire_vulnerability(raw: Any) -> FireVulnerability:
     )
 
 
+def _talent_cooldowns(raw: Any) -> dict[str, float]:
+    """`spell_scaling.json.talent_cooldowns` : recharge (s) des talents actifs, lue dans le client (T05)."""
+    r = _Reader(SCALING_FILE)
+    cds = r.obj(raw, "talent_cooldowns", "talent_cooldowns")
+    return {key: r.num(r.obj(cds, key, f"talent_cooldowns.{key}"), "cooldown_ms", key) / MS_PER_S for key in cds}
+
+
+def _respec(raw: Any, values: Mapping[str, Any]) -> RespecRules:
+    """Barème de `respec.json` et clés `respec.*` de `mechanics.json` (T05)."""
+    r = _Reader(RESPEC_FILE)
+    if not isinstance(raw, dict):
+        raise r.fail("racine", "objet")
+    schedule = r.list_(raw, "classic_schedule_gold", "classic_schedule_gold")
+    if not schedule:
+        raise r.fail("classic_schedule_gold", "liste non vide de prix en or")
+    m = _Reader(MECHANICS_FILE)
+    gph = m.obj(m.obj(values, "respec.gold_per_hour", "respec.gold_per_hour"), "value", "respec.gold_per_hour")
+    if not gph:
+        raise m.fail("respec.gold_per_hour", "table niveau -> or par heure non vide")
+    return RespecRules(
+        schedule_gold=tuple(r.num({"v": g}, "v", "classic_schedule_gold") for g in schedule),
+        beta_observed_resets=m.int_(
+            m.obj(values, "respec.beta_observed_resets", "respec.beta_observed_resets"),
+            "value",
+            "respec.beta_observed_resets",
+        ),
+        gold_per_hour={
+            _level_key(m, k, "respec.gold_per_hour"): m.num(gph, k, "respec.gold_per_hour") for k in sorted(gph)
+        },
+        trip_minutes=m.num(m.obj(values, "respec.trip_minutes", "respec.trip_minutes"), "value", "respec.trip_minutes"),
+    )
+
+
+def _build_method(values: Mapping[str, Any]) -> BuildMethod:
+    """Clés `build.*` de `mechanics.json` : plafond de la bêta, paramètres de décision (T05)."""
+    m = _Reader(MECHANICS_FILE)
+
+    def entry(key: str) -> Mapping[str, Any]:
+        return m.obj(values, key, key)
+
+    return BuildMethod(
+        beta_level_cap=m.int_(entry("build.beta_level_cap"), "value", "build.beta_level_cap"),
+        confidence=m.num(entry("build.confidence"), "value", "build.confidence"),
+        stability_seeds=m.int_(entry("build.stability_seeds"), "value", "build.stability_seeds"),
+    )
+
+
 def _constants(raw: Any) -> Constants:
     r = _Reader(MECHANICS_FILE)
     if not isinstance(raw, dict):
@@ -641,11 +691,12 @@ def _constants(raw: Any) -> Constants:
 def build_game_data(version: VersionData) -> GameData:
     """Données typées d'une version déjà vérifiée ; lève DataSchemaError si une clé manque ou a un mauvais type."""
     try:
-        names = (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE, SCALING_FILE)
+        names = (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE, SCALING_FILE, RESPEC_FILE)
         raw = {name: version.read_json(name) for name in names}
         raw_mechanics = version.read_json(MECHANICS_FILE)
     except (OSError, ValueError) as exc:
         raise DataSchemaError(f"Données de la version {version.game_version} illisibles ({exc}).") from exc
+    values = _Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")
     talents, trees = _talents(raw[TALENTS_FILE])
     spells = _spells(raw[SPELLS_FILE])
     return GameData(
@@ -664,6 +715,9 @@ def build_game_data(version: VersionData) -> GameData:
         utility=_utility(raw[SPELLS_FILE]),
         armors=_armors(raw[SCALING_FILE]),
         fire_vulnerability=_fire_vulnerability(raw[SCALING_FILE]),
+        talent_cooldowns_s=_talent_cooldowns(raw[SCALING_FILE]),
+        respec=_respec(raw[RESPEC_FILE], values),
+        build=_build_method(values),
     )
 
 
