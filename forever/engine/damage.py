@@ -51,12 +51,24 @@ def ignite_tick_times(gd: GameData) -> list[float]:
     return [lv.ignite_tick_s * i for i in range(1, lv.ignite_ticks + 1)]
 
 
-def roll_base_damage(gd: GameData, key: str, rank: Rank, ch: Character, u: float, *, frozen: bool = False) -> float:
+def roll_base_damage(
+    gd: GameData,
+    key: str,
+    rank: Rank,
+    ch: Character,
+    u: float,
+    *,
+    frozen: bool = False,
+    rules: str = "forever",
+    low_level_penalty: bool | None = None,
+) -> float:
     """Dégâts de base d'un coup tiré : min + (max - min) × `u` (tirage uniforme dans [0, 1[ fourni par l'appelant)
-    + coefficient × puissance des sorts ; multiplicateur sur cible gelée du sort s'il en publie un (Ice Lance).
+    + coefficient (`coefficient`, selon `rules`) × puissance des sorts ; multiplicateur sur cible gelée du sort s'il
+    en publie un (Ice Lance).
 
     Registre : G4"""
-    base = rank.damage_min + (rank.damage_max - rank.damage_min) * u + coefficient(gd, key, rank) * spell_power(ch)
+    c = coefficient(gd, key, rank, rules=rules, low_level_penalty=low_level_penalty)
+    base = rank.damage_min + (rank.damage_max - rank.damage_min) * u + c * spell_power(ch)
     frozen_mult = gd.spells[key].frozen_mult
     if frozen and frozen_mult is not None:
         base *= frozen_mult

@@ -65,6 +65,7 @@ def arcane_cycle(
     ab_stacks: int | None = None,
     ab_dump: str = "frostbolt",
     spell_level: str = "character",
+    rules: str = "forever",
 ) -> ArcaneCycle:
     """Espérance d'un cycle stationnaire de la rotation arcane (hors recul d'incantation) : `ab_stacks` Arcane Blast
     (défaut : maximum du talent), chacun au coût de son cumul (`arcane_blast_cost`), libérés par Clearcasting avec la
@@ -73,9 +74,9 @@ def arcane_cycle(
 
     Registre : B11, B15, I1"""
     n, dump = arcane_plan(gd, level, pts, ab_stacks, ab_dump)
-    ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, spell_level=spell_level)
+    ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, spell_level=spell_level, rules=rules)
     buffs = arcane_blast_bonus(gd, pts, n, for_spell=dump)
-    de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=buffs, spell_level=spell_level)
+    de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=buffs, spell_level=spell_level, rules=rules)
     assert ab is not None and de is not None  # vérifiés par arcane_plan
     free = clearcast_cost_factor(gd, pts, ab["hit"])
     ab_mana = sum(arcane_blast_cost(gd, ab["rank"], pts, ch, i) for i in range(n)) * free
@@ -104,6 +105,7 @@ def kill_analytic(
     lv, mm, gcd = gd.leveling, gd.mob_model, gd.rules.gcd_s
     level_diff = o["level_diff"]
     spell_level = o["spell_level"]
+    eng = {"spell_level": spell_level, "rules": o["rules"]}  # options transmises au moteur
     ch = character(gd, level, race, over)
     mlevel = level + level_diff
     hp = mob_hp(gd, mlevel, o["mob_source"]).value
@@ -113,14 +115,12 @@ def kill_analytic(
     wc = talent_value(gd, pts, "wintersChill", 1, 0) * min(
         1.0, talent_value(gd, pts, "wintersChill", 0) / PERCENT * lv.analytic_winters_chill_casts
     )
-    e = expected_cast(gd, main, level, pts, ch, level_diff, wc_stacks=wc, spell_level=spell_level)
+    e = expected_cast(gd, main, level, pts, ch, level_diff, wc_stacks=wc, **eng)
     if e is None:
         raise ValueError(f"{main} n'est pas appris au niveau {level}")
     c, d_cast, m_cast = e["cast_s"], e["dmg"], e["mana"]
     if rotation == "arcane":  # cycle stationnaire : moyenne par lancer
-        cyc = arcane_cycle(
-            gd, level, pts, ch, level_diff, ab_stacks=o["ab_stacks"], ab_dump=o["ab_dump"], spell_level=spell_level
-        )
+        cyc = arcane_cycle(gd, level, pts, ch, level_diff, ab_stacks=o["ab_stacks"], ab_dump=o["ab_dump"], **eng)
         casts = cyc["ab_casts"] + 1
         c, d_cast, m_cast = cyc["time_s"] / casts, cyc["dmg"] / casts, cyc["mana"] / casts
     frng = spell_range(gd, main, pts)
@@ -139,9 +139,7 @@ def kill_analytic(
     frz_per_cast = fbite * e["hit"] * frostbite_freeze_s(gd)
     has_il = best_rank(gd, "ice_lance", level, pts) is not None and rotation == "frost"
     il = (
-        expected_cast(gd, "ice_lance", level, pts, ch, level_diff, frozen=True, wc_stacks=wc, spell_level=spell_level)
-        if has_il
-        else None
+        expected_cast(gd, "ice_lance", level, pts, ch, level_diff, frozen=True, wc_stacks=wc, **eng) if has_il else None
     )
     fof_p = talent_value(gd, pts, "fingersOfFrost", 0) / PERCENT if has_il else 0.0
     il_casts = (frz_per_cast / gcd + fof_p * e["hit"]) if has_il else 0.0
@@ -150,7 +148,7 @@ def kill_analytic(
     cyc_dmg = d_cast + (il_casts * il["dmg"] if il else 0.0)
     cyc_mana = m_cast + (il_casts * il["mana"] if il else 0.0)
     if main == "fireball":
-        fbl = expected_cast(gd, "fire_blast", level, pts, ch, level_diff, spell_level=spell_level)
+        fbl = expected_cast(gd, "fire_blast", level, pts, ch, level_diff, **eng)
         if fbl:
             fbl_cd = spell_cooldown(gd, "fire_blast", fbl["rank"], pts) if forever else fbl["cooldown_s"]
             cyc_dmg += fbl["dmg"] * c_melee / fbl_cd

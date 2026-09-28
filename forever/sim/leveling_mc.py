@@ -261,6 +261,7 @@ def kill_mc(
             wc_stacks=s["wc"],
             buffs=buffs,
             spell_level=o["spell_level"],
+            rules=o["rules"],
         )
         assert e is not None  # seuls les sorts appris sont lancés
         paid = 0.0
@@ -280,7 +281,9 @@ def kill_mc(
         travel = travel_time(gd, key, s["dist"] if key != "frost_nova" else 0.0)
         if landed:
             r = e["rank"]
-            base = roll_base_damage(gd, key, r, ch, rng.random(), frozen=frozen and key == "ice_lance")
+            base = roll_base_damage(
+                gd, key, r, ch, rng.random(), frozen=frozen and key == "ice_lance", rules=o["rules"]
+            )
             crit = rng.random() < e["crit"]
             dmg = base * e["dmg_mult"] * (e["crit_mult"] if crit else 1.0)
             if crit and e["school"] in (SCHOOL_FIRE | SCHOOL_FROST):

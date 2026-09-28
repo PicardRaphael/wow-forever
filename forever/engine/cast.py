@@ -27,6 +27,8 @@ def expected_cast(
     buffs: Buffs | None = None,
     frozen_mult: bool = True,
     spell_level: str = "rank",
+    rules: str = "forever",
+    low_level_penalty: bool | None = None,
 ) -> CastEstimate | None:
     """Espérance d'un sort : dégâts (toucher, critique, multiplicateurs, DoT qui critiquent, Ignite), mana
     (Frost Channeling, Master of Elements, Clearcasting), temps d'incantation, portée. None si le sort n'est pas appris.
@@ -37,7 +39,10 @@ def expected_cast(
     `spell_level` : dégâts du rang (`rank`, défaut, parité avec le seed) ou au niveau du personnage (`character`) ;
     le rang rendu porte les dégâts retenus.
 
-    Registre : A17, A18, A20, B12, B17, C2, G7"""
+    `rules` : coefficients du client (`forever`, défaut) ou formule du seed (`seed`) ; `low_level_penalty` : pénalité
+    des sorts de bas niveau (None : clé des données ; refusée à False avec `seed`), voir `coefficient`.
+
+    Registre : A17, A18, A20, B12, B17, C2, G4, G7"""
     r = best_rank(gd, key, level, pts)
     if not r:
         return None
@@ -51,7 +56,8 @@ def expected_cast(
     cm = crit_mult(gd, school, pts)
     dm = dmg_mult(gd, school, pts, buffs)
     sp = spell_power(ch, buffs)
-    base = (r.damage_min + r.damage_max) / 2.0 + coefficient(gd, key, r) * sp
+    c = coefficient(gd, key, r, rules=rules, low_level_penalty=low_level_penalty)
+    base = (r.damage_min + r.damage_max) / 2.0 + c * sp
     if frozen and frozen_mult and s.frozen_mult is not None:
         base *= s.frozen_mult
     direct = base * dm * (1 + crit * (cm - 1))

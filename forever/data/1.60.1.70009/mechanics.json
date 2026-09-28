@@ -7,31 +7,31 @@
       "value": 3.5,
       "certainty": "suppose",
       "registry": "G4",
-      "source": "règle Classic supposée inchangée (PC) : coefficient direct = incantation / 3,5 (fm.py, references/mechanics.md)"
+      "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic supposée inchangée (PC) : coefficient direct = incantation / 3,5 (fm.py, references/mechanics.md)"
     },
     "coefficient.cast_bounds_s": {
       "value": [1.5, 3.5],
       "certainty": "suppose",
       "registry": "G4",
-      "source": "règle Classic (PC) : incantation bornée à 1,5..3,5 s dans le coefficient direct (fm.py)"
+      "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic (PC) : incantation bornée à 1,5..3,5 s dans le coefficient direct (fm.py)"
     },
     "coefficient.slow_factor": {
       "value": 0.95,
       "certainty": "suppose",
       "registry": "G4",
-      "source": "règle Classic (PC) : ×0,95 pour un sort qui ralentit (fm.py)"
+      "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic (PC) : ×0,95 pour un sort qui ralentit (fm.py)"
     },
     "coefficient.channel_cap_s": {
       "value": 5.0,
       "certainty": "suppose",
       "registry": "G4",
-      "source": "règle Classic (PC) : canalisé = durée (plafonnée à 5 s) / 3,5 (fm.py)"
+      "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic (PC) : canalisé = durée (plafonnée à 5 s) / 3,5 (fm.py)"
     },
     "coefficient.low_level": {
       "value": {"threshold": 20, "penalty_per_level": 0.0375},
       "certainty": "suppose",
       "registry": "G4",
-      "source": "règle Classic (PC) : ×(1 - 0,0375 × (20 - niveau du sort)) pour un sort de niveau < 20 (fm.py)"
+      "source": "deux modes (T04e : en forever, appliquée au coefficient du client si coefficient.low_level_default ou l'option low_level_penalty le demande) ; règle Classic (PC) : ×(1 - 0,0375 × (20 - niveau du sort)) pour un sort de niveau < 20 (fm.py)"
     },
     "coefficient.low_level_default": {
       "value": true,
@@ -53,7 +53,7 @@
       },
       "certainty": "suppose",
       "registry": "G4",
-      "source": "valeurs Classic des sorts de zone et instantanés (PC) ; Ice Lance estimée (EST) ; COEF_FIXED de fm.py"
+      "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; valeurs Classic des sorts de zone et instantanés (PC) ; Ice Lance estimée (EST) ; COEF_FIXED de fm.py"
     },
     "talents.first_level": {
       "value": 10,

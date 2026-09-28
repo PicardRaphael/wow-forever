@@ -77,10 +77,30 @@ def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:
     return ok[-1] if ok else None
 
 
-def coefficient(gd: GameData, key: str, rank: Rank) -> float:
-    """Part de la puissance des sorts ajoutée aux dégâts d'un rang (pénalité des sorts de bas niveau comprise).
+RULES = ("forever", "seed")
+
+
+def _check_rules(rules: str, low_level_penalty: bool | None) -> None:
+    if rules not in RULES:
+        raise ValueError(f"rules inconnu « {rules} » ({' ou '.join(RULES)} attendu)")
+    if rules == "seed" and low_level_penalty is False:
+        raise ValueError("low_level_penalty False sans effet avec rules seed (le seed applique toujours la pénalité)")
+
+
+def low_level_factor(gd: GameData, rank: Rank, low_level_penalty: bool | None = None) -> float:
+    """Pénalité des sorts de bas niveau : × max(0, 1 - part par niveau × (seuil - niveau du rang)) sous le seuil
+    (`coefficient.low_level`, règle Classic supposée) ; 1 si elle n'est pas appliquée (`low_level_penalty` False ;
+    None : `coefficient.low_level_default` des données).
 
     Registre : G4"""
+    rules = gd.constants.coefficients
+    apply = rules.low_level_default if low_level_penalty is None else low_level_penalty
+    if not apply or rank.level >= rules.low_level_threshold:
+        return 1.0
+    return max(0.0, 1 - rules.low_level_penalty_per_level * (rules.low_level_threshold - rank.level))
+
+
+def _seed_coefficient(gd: GameData, key: str, rank: Rank) -> float:
     rules = gd.constants.coefficients
     spell = gd.spells[key]
     fixed = rules.fixed.get(key)
@@ -96,6 +116,28 @@ def coefficient(gd: GameData, key: str, rank: Rank) -> float:
         c = min(rules.cast_max_s, max(rules.cast_min_s, rank.cast_time_s)) / rules.cast_divisor
         if spell.slow:
             c *= rules.slow_factor
-    if rank.level < rules.low_level_threshold:
-        c *= max(0.0, 1 - rules.low_level_penalty_per_level * (rules.low_level_threshold - rank.level))
-    return c
+    return c * low_level_factor(gd, rank, True)
+
+
+def coefficient(
+    gd: GameData, key: str, rank: Rank, *, rules: str = "forever", low_level_penalty: bool | None = None
+) -> float:
+    """Part de la puissance des sorts ajoutée aux dégâts directs d'un rang (coup direct, ou somme des éclairs d'un
+    sort canalisé).
+
+    `rules="forever"` (défaut) : coefficients du client (`spell_scaling.json`, EffectBonusCoefficient) : somme des
+    composants `direct` et des composants `channel` × leurs tics, × pénalité des sorts de bas niveau
+    (`low_level_factor`). `rules="seed"` : formule du seed (incantation / 3,5, bornes, canalisé, ralenti,
+    coefficients fixes), pénalité toujours appliquée.
+
+    Registre : G4"""
+    _check_rules(rules, low_level_penalty)
+    if rules == "seed":
+        return _seed_coefficient(gd, key, rank)
+    c = 0.0
+    for comp in gd.scaling[key][rank.position - 1].components:
+        if comp.kind == "direct":
+            c += comp.bonus_coefficient
+        elif comp.kind == "channel":
+            c += comp.bonus_coefficient * comp.ticks
+    return c * low_level_factor(gd, rank, low_level_penalty)
