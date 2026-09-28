@@ -67,12 +67,6 @@
       "registry": "G3",
       "source": "5 points dans l'arbre par palier précédent (fm.py check_build)"
     },
-    "talents.improved_cone_of_cold_pct": {
-      "value": [15, 25, 35],
-      "certainty": "suppose",
-      "registry": "A20",
-      "source": "T04e : rangs 1 à 3 d'Improved Cone of Cold (% de dégâts de Cone of Cold) en mode forever, décision de l'utilisateur du 2026-09-28 (valeurs Classic ; SpellEffect 11190 du client 1.60.1.70009 : 15 au rang 1). La courbe Trait 83066 du même client donne 12 / 23 / 35 (talents.json) : écart ouvert, docs/OPEN_QUESTIONS.md ; talents.json reste la référence du mode seed"
-    },
     "character.crit_base": {
       "value": 0.002,
       "certainty": "suppose",

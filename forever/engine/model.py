@@ -152,7 +152,6 @@ class Constants:
     talent_rank_mana_default: float
     default_range_yd: float
     miss_per_level_below: float  # raté retiré par niveau d'écart sous la cible (écart négatif)
-    improved_cone_of_cold_pct: tuple[float, ...]  # rangs d'Improved Cone of Cold en mode forever (T04e)
 
 
 @dataclass(frozen=True)

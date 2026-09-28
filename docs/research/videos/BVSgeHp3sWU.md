@@ -1,7 +1,7 @@
 # Vidéo BVSgeHp3sWU : dégâts des sorts et puissance des sorts, confrontés au moteur
 
 > Analyse du 2026-09-28 (Claude Code), données du client 1.60.1.70009. Rien n'est appliqué : ce rapport propose des corrections et des tests, à trancher par l'utilisateur.
-> **Corrections C1 à C6 appliquées en T04e** (`tasks/T04e-plan.md`, 2026-09-28) ; les sections ci-dessous décrivent l'état d'avant T04e. Improved Cone of Cold : 15 / 25 / 35 % en mode forever (décision de l'utilisateur), courbe du client 12 / 23 / 35 (`docs/OPEN_QUESTIONS.md`).
+> **Corrections C1 à C6 appliquées en T04e** (`tasks/T04e-plan.md`, 2026-09-28) ; les sections ci-dessous décrivent l'état d'avant T04e. Improved Cone of Cold : 12 / 23 / 35 % en mode forever (courbe du client, décision 77 ; Classic : 15 / 25 / 35).
 > Légende : **[Certain]** lu dans les tables du client ou mesuré dans un journal ; **[Probable]** sources concordantes (client et tableur de l'auteur, règle Classic cohérente avec le client) ; **[Supposé]** source unique, inférence ou règle serveur non observée.
 
 | Champ | Valeur |

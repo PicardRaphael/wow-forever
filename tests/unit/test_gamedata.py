@@ -147,9 +147,9 @@ def test_spell_scaling_without_fire_vulnerability_is_refused(make_deps, data_cop
     assert "fire_vulnerability" in exc.value.message
 
 
-def test_low_level_default_and_improved_cone_of_cold_read(game_data):
-    """mechanics.json : pénalité des sorts de bas niveau appliquée par défaut (suppose, T04e décision 2) ; rangs
-    d'Improved Cone of Cold en mode forever (15 / 25 / 35 %, décision de l'utilisateur du 2026-09-28)."""
+def test_low_level_default_read(game_data):
+    """mechanics.json : pénalité des sorts de bas niveau appliquée par défaut (suppose, T04e décision 2) ; plus de
+    rangs d'Improved Cone of Cold propres au mode forever (décision 77 : talents.json, courbe du client)."""
     c = game_data.constants
     assert c.coefficients.low_level_default is True
-    assert c.improved_cone_of_cold_pct == (15, 25, 35)
+    assert not hasattr(c, "improved_cone_of_cold_pct")

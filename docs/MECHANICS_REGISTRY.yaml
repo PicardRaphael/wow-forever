@@ -255,7 +255,7 @@ mechanics:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/talents.json"
-      - "forever/data/1.60.1.70009/mechanics.json (talents.improved_cone_of_cold_pct, décision de l'utilisateur du 2026-09-28)"
+      - "tests/fixtures/wago/1.60.1.70009/enUS/CurvePoint.csv (courbe Trait 83066 d'Improved Cone of Cold, décision 77)"
       - "forever/data/1.60.1.70009/spell_scaling.json (auras.fire_vulnerability : SpellEffect aura 270, SpellAuraOptions, SpellDuration)"
       - "docs/research/videos/BVSgeHp3sWU.md (V13, V18 : bonus multipliés)"
     tests:
@@ -263,7 +263,7 @@ mechanics:
       - tests/unit/test_engine_values.py::test_ice_lance_frozen_multiplier
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
       - tests/unit/test_damage_modifiers.py::test_improved_cone_of_cold
-      - tests/unit/test_damage_modifiers.py::test_improved_cone_of_cold_ranks_come_from_forever_values
+      - tests/unit/test_damage_modifiers.py::test_improved_cone_of_cold_ranks_come_from_client_curve
       - tests/unit/test_damage_modifiers.py::test_improved_cone_of_cold_is_ignored_in_seed_mode
       - tests/unit/test_damage_modifiers.py::test_arcane_power_buffs
       - tests/unit/test_damage_modifiers.py::test_fire_vulnerability
@@ -273,7 +273,7 @@ mechanics:
       - tests/unit/test_video_examples.py::test_seed_rules_miss_the_video
     tolerance: null
     formule: "forever : mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts) × Π (1 + autre source) × (1 + Improved Cone of Cold, Cone of Cold seul) × (1 + cumuls × part de Fire Vulnerability, écoles de l'aura) ; seed : talents × (1 + buff + Σ sources + cumuls × part), Improved Cone of Cold ignoré ; Ice Lance contre cible gelée : × mult_gelé du sort"
-    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 15 / 25 / 35 % (décision de l'utilisateur, suppose ; la courbe Trait 83066 du client donne 12 / 23 / 35, talents.json, question ouverte). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09)."
+    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 12 / 23 / 35 %, rangs de talents.json (courbe Trait 83066 du client, absente des lignes hotfixées de Hotfix.log du 2026-09-27 ; décision 77 ; Classic : 15 / 25 / 35). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09)."
   - id: A21
     categorie: attaque
     description: "Multiplicateur de critique des sorts et talents qui l'augmentent"

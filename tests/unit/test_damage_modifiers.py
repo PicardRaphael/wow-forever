@@ -1,12 +1,15 @@
 """Multiplicateurs de dégâts ajoutés en T04e et cumul des bonus en pourcentage (registres A20, B15).
 
-Sources : Improved Cone of Cold : mechanics.json `talents.improved_cone_of_cold_pct` (15 / 25 / 35 %, mode forever,
-décision de l'utilisateur du 2026-09-28) et talents.json (mode seed, ignoré par le seed) ; Arcane Power : talents.json
+Sources : Improved Cone of Cold : talents.json `improvedConeOfCold` (12 / 23 / 35 %, courbe Trait 83066 du client,
+tests/fixtures/wago/1.60.1.70009/enUS/CurvePoint.csv ; décision 77 ; ignoré par le seed) ; Arcane Power : talents.json
 `arcanePower` (15 s, +30 % de dégâts, +30 % de coût) ; Fire Vulnerability : spell_scaling.json `auras` (client : 3 %
 par cumul, 5 cumuls) ; Cone of Cold r5 : spells.json (328-358), coefficient du client 0.12899999321 (SpellEffect.csv).
 Concordance : exemple V13 de docs/research/videos/BVSgeHp3sWU.md (589,4)."""
 
+import csv
+
 import pytest
+from conftest import WAGO_70009
 
 from forever.engine import character, dmg_mult, expected_cast, mana_cost
 from forever.engine.buffs import arcane_power_buffs, fire_vulnerability_buffs, merge_buffs
@@ -32,14 +35,18 @@ def test_improved_cone_of_cold(game_data, ch534):
     assert e["direct_per_hit"] == approx(589.4088608113944)
 
 
-def test_improved_cone_of_cold_ranks_come_from_forever_values(game_data):
-    """Rangs 1 et 2 : 15 et 25 % (mode forever), pas 12 et 23 (courbe de talents.json) ; rien sur les autres sorts."""
-    values = game_data.constants.improved_cone_of_cold_pct
-    assert values == (15, 25, 35)
-    for n, pct in enumerate(values, start=1):
+def test_improved_cone_of_cold_ranks_come_from_client_curve(game_data):
+    """Rangs 1 à 3 : 12 / 23 / 35 % en mode forever, courbe Trait 83066 du client (CurvePoint.csv), qui remplace la
+    valeur brute 15 de SpellEffect 11190 (Classic : 15 / 25 / 35) ; rien sur les autres sorts."""
+    with (WAGO_70009 / "enUS" / "CurvePoint.csv").open(encoding="utf-8", newline="") as f:
+        rows = sorted((int(r["OrderIndex"]), float(r["Pos_1"])) for r in csv.DictReader(f) if r["CurveID"] == "83066")
+    curve = tuple(v for _, v in rows)
+    assert curve == (12, 23, 35)
+    assert tuple(r[0] for r in game_data.talents["improvedConeOfCold"].ranks) == curve
+    for n, pct in enumerate(curve, start=1):
         m = dmg_mult(game_data, "frost", {"improvedConeOfCold": n}, key="cone_of_cold")
         assert m == approx(1 + pct / PERCENT)
-    assert dmg_mult(game_data, "frost", {"improvedConeOfCold": 1}, key="cone_of_cold") == approx(1.15)
+    assert dmg_mult(game_data, "frost", {"improvedConeOfCold": 1}, key="cone_of_cold") == approx(1.12)
     assert dmg_mult(game_data, "frost", {"improvedConeOfCold": 3}, key="frostbolt") == 1.0
     assert dmg_mult(game_data, "frost", {"improvedConeOfCold": 3}) == 1.0
 

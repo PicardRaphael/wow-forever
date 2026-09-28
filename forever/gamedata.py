@@ -635,10 +635,6 @@ def _constants(raw: Any) -> Constants:
         talent_rank_mana_default=r.num(talent_mana, "default", "mana.talent_rank_cost"),
         default_range_yd=num("spell.default_range_yd"),
         miss_per_level_below=num("hit.miss_per_level_below"),
-        improved_cone_of_cold_pct=tuple(
-            r.num({"v": v}, "v", "talents.improved_cone_of_cold_pct")
-            for v in r.list_(entry("talents.improved_cone_of_cold_pct"), "value", "talents.improved_cone_of_cold_pct")
-        ),
     )
 
 
