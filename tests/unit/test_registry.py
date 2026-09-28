@@ -124,7 +124,7 @@ def test_find_entry_unknown_suggests():
 
 def test_repository_coverage():
     """Seul test qui fige la couverture du registre après T02."""
-    assert coverage(REGISTRY_PATH) == "34/104"  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14
+    assert coverage(REGISTRY_PATH) == "36/104"  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14, H3, H5
 
 
 def test_load_reads_optional_fields():
@@ -137,7 +137,7 @@ def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
     assert out.startswith("Registre : 104 mécaniques")
-    assert "teste 33" in out and "valide-journal 1" in out  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14
+    assert "teste 35" in out and "valide-journal 1" in out  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14, H3, H5
 
 
 def test_main_reports_errors(capsys):
