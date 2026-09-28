@@ -17,6 +17,7 @@ Aucune formule de combat ici : chaque règle vient de `forever/engine/` ; ce mod
 
 from __future__ import annotations
 
+import math
 import random
 import statistics
 from typing import Any, NamedTuple, TypedDict, cast
@@ -555,6 +556,33 @@ def kill_mc(
     }
 
 
+def _kills(
+    gd: GameData,
+    level: int,
+    pts: Points,
+    race: str,
+    rotation: str,
+    n: int,
+    seed: int,
+    over: CharacterOverrides | None,
+    options: dict[str, Any],
+) -> list[KillResult]:
+    """`n` combats à la suite avec un générateur à graine fixe et l'horloge de session d'Arcane Power (décision 79) :
+    l'aura est posée au pull si sa recharge est écoulée."""
+    o = options_with_defaults(gd, rotation, options)
+    ch = character(gd, level, race, over)
+    rng = random.Random(seed)
+    window = arcane_power_window(gd, pts) if o["rules"] == "forever" and o["arcane_power"] == "auto" else None
+    clock, ready_at = 0.0, 0.0
+    rs = []
+    for _ in range(n):
+        ready, ready_at = arcane_power_pull(clock, ready_at, window)
+        r = kill_mc(gd, level, pts, ch, rotation, rng, arcane_power_ready=ready, **options)
+        clock += r["total"]
+        rs.append(r)
+    return rs
+
+
 def mc(
     gd: GameData,
     level: int,
@@ -571,20 +599,7 @@ def mc(
     Registre : I6, J2"""
     if n < 1:
         raise ValueError(f"n = {n} : au moins un combat (n ≥ 1)")
-    options_with_defaults(gd, rotation, options)
-    ch = character(gd, level, race, over)
-    rng = random.Random(seed)
-    o = options_with_defaults(gd, rotation, options)
-    # horloge de session d'Arcane Power (décision 79) : aura posée au pull si la recharge est écoulée
-    window = arcane_power_window(gd, pts) if o["rules"] == "forever" and o["arcane_power"] == "auto" else None
-    clock, ready_at = 0.0, 0.0
-    rs = []
-    for _ in range(n):
-        ready, ready_at = arcane_power_pull(clock, ready_at, window)
-        r = kill_mc(gd, level, pts, ch, rotation, rng, arcane_power_ready=ready, **options)
-        clock += r["total"]
-        rs.append(r)
-    rows = [cast("dict[str, float]", r) for r in rs]
+    rows = [cast("dict[str, float]", r) for r in _kills(gd, level, pts, race, rotation, n, seed, over, options)]
 
     def avg(key: str) -> float:
         return statistics.mean(r[key] for r in rows)
@@ -613,4 +628,8 @@ def mc_stats(
     """Statistiques du temps par monstre sur les mêmes combats que `mc()` (même graine, mêmes tirages).
 
     Registre : I5, J2"""
-    raise NotImplementedError
+    if n < 2:
+        raise ValueError(f"n = {n} : au moins deux combats pour une dispersion (n ≥ 2)")
+    totals = [r["total"] for r in _kills(gd, level, pts, race, rotation, n, seed, over, options)]
+    sd = statistics.stdev(totals)
+    return McStats(statistics.mean(totals), sd, sd / math.sqrt(n), n, tuple(totals))

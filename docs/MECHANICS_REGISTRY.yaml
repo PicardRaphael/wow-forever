@@ -1295,9 +1295,12 @@ mechanics:
       - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_seed_mode
       - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_default_mode
       - tests/unit/test_chart.py::test_two_generations_are_identical
+      - tests/unit/test_mc_stats.py::test_mc_stats_matches_mc
+      - tests/unit/test_mc_stats.py::test_known_gap_is_significant_on_five_seeds
+      - tests/unit/test_mc_stats.py::test_stability_over_seeds
     tolerance: null
     formule: "même graine, mêmes paramètres, mêmes données : même résultat (générateur injecté, ordre des tirages fixe)"
-    note: "T04b : graine par défaut du seed ; le graphique de leveling est identique octet pour octet à graine fixe"
+    note: "T04b : graine par défaut du seed ; le graphique de leveling est identique octet pour octet à graine fixe ; T05 (décision 85) : mc_stats rejoue les combats de mc (même graine) avec écart-type et erreur standard ; paired_gap : différence combat par combat, intervalle normal à build.confidence ; decide : gagnant si l'intervalle exclut 0, sinon analytique ; stability : décision rejouée sur build.stability_seeds graines. Tirages communs faibles : un seul générateur par Monte Carlo (parité), les combats des deux builds se désalignent après le premier ; l'horloge d'Arcane Power rend les combats d'un même Monte Carlo dépendants, l'erreur standard l'ignore (effet faible)"
   - id: J3
     categorie: meta
     description: "Erreur statistique cible"
