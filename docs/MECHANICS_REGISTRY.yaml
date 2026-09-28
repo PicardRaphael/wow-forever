@@ -191,13 +191,25 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/leveling.json (combat_rules)"
       - "forever/data/1.60.1.70009/mechanics.json (clés leveling.*)"
+      - "Tables du client SpellEffect (EffectBonusCoefficient par tic, EffectAuraPeriod), 1.60.1.70009 : spell_scaling.json (T04e)"
+      - "tests/fixtures/combatlog/WoWCombatLog-092726_150346.anon.txt.gz (tics de Fireball r3 à 13 de puissance des sorts : 2)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_fireball_values
       - tests/unit/test_engine_leveling.py::test_dot_and_ignite_ticks
+      - tests/unit/test_client_coefficients.py::test_dot_coefficient_per_tick
+      - tests/unit/test_client_coefficients.py::test_low_level_penalty_applies_to_tick_coefficient
+      - tests/unit/test_client_coefficients.py::test_dot_ticks
+      - tests/unit/test_client_coefficients.py::test_dot_ticks_follow_client_period
+      - tests/unit/test_client_coefficients.py::test_tick_times_match_tick_count_for_every_dot
+      - tests/unit/test_client_coefficients.py::test_pyroblast_dot_scales_with_spell_power
+      - tests/unit/test_client_coefficients.py::test_flamestrike_dot_scales_with_spell_power
+      - tests/unit/test_client_coefficients.py::test_pyroblast_r1_tick
+      - tests/unit/test_client_coefficients.py::test_fireball_dot_has_no_spell_power_in_log
+      - tests/unit/test_client_coefficients.py::test_monte_carlo_uses_the_client_dot_period
     tolerance: null
-    formule: "DoT = total × mult_dégâts × (1 + crit × (mult_crit − 1)) si les DoT critiquent"
-    note: "T04b : dans le Monte Carlo, un DoT tique toutes les leveling.dot_tick_s (au moins un tic), chaque tic critique si combat_rules.dot_can_crit (forever/engine/damage.py : dot_tick_times, dot_tick_damage)"
+    formule: "DoT = (total + tics × coefficient par tic × puissance des sorts) × mult_dégâts × (1 + crit × (mult_crit − 1)) si les DoT critiquent ; tic = (total / tics + coefficient par tic × puissance des sorts) × mult_dégâts"
+    note: "T04b : dans le Monte Carlo, chaque tic critique si combat_rules.dot_can_crit (forever/engine/damage.py : dot_tick_times, dot_tick_damage). T04e : mode forever, coefficient par tic, période et nombre de tics lus dans le client (Pyroblast et Frostfire Bolt : 3 s ; Fireball, Flamestrike : 2 s ; Fireball et Frostfire Bolt : coefficient 0, confirmé par le journal pour Fireball) ; mode seed : un tic toutes les leveling.dot_tick_s, sans puissance des sorts. Puissance des sorts et période de Pyroblast : test en jeu E3."
   - id: A18
     categorie: attaque
     description: "Ignite : cumul, rafraîchissement"
@@ -237,17 +249,30 @@ mechanics:
     description: "Multiplicateurs de dégâts des sorts (talents d'école, bonus globaux)"
     forever: oui
     statut: teste
-    certitude: certain
+    certitude: probable
     sources:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/talents.json"
+      - "forever/data/1.60.1.70009/mechanics.json (talents.improved_cone_of_cold_pct, décision de l'utilisateur du 2026-09-28)"
+      - "forever/data/1.60.1.70009/spell_scaling.json (auras.fire_vulnerability : SpellEffect aura 270, SpellAuraOptions, SpellDuration)"
+      - "docs/research/videos/BVSgeHp3sWU.md (V13, V18 : bonus multipliés)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_ice_lance_frozen_multiplier
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
+      - tests/unit/test_damage_modifiers.py::test_improved_cone_of_cold
+      - tests/unit/test_damage_modifiers.py::test_improved_cone_of_cold_ranks_come_from_forever_values
+      - tests/unit/test_damage_modifiers.py::test_improved_cone_of_cold_is_ignored_in_seed_mode
+      - tests/unit/test_damage_modifiers.py::test_arcane_power_buffs
+      - tests/unit/test_damage_modifiers.py::test_fire_vulnerability
+      - tests/unit/test_damage_modifiers.py::test_damage_bonuses_stack_multiplicatively_in_forever
+      - tests/unit/test_damage_modifiers.py::test_merge_buffs
+      - tests/unit/test_video_examples.py::test_video_example
+      - tests/unit/test_video_examples.py::test_seed_rules_miss_the_video
     tolerance: null
-    formule: "mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts) ; Ice Lance contre cible gelée : × mult_gelé du sort"
+    formule: "forever : mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts) × Π (1 + autre source) × (1 + Improved Cone of Cold, Cone of Cold seul) × (1 + cumuls × part de Fire Vulnerability, écoles de l'aura) ; seed : talents × (1 + buff + Σ sources + cumuls × part), Improved Cone of Cold ignoré ; Ice Lance contre cible gelée : × mult_gelé du sort"
+    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 15 / 25 / 35 % (décision de l'utilisateur, suppose ; la courbe Trait 83066 du client donne 12 / 23 / 35, talents.json, question ouverte). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09)."
   - id: A21
     categorie: attaque
     description: "Multiplicateur de critique des sorts et talents qui l'augmentent"
@@ -476,16 +501,18 @@ mechanics:
     statut: teste
     certitude: probable
     sources:
-      - "forever/data/1.60.1.70009/talents.json (arcaneBlast : bonus et coût par cumul, cumuls, durée)"
-      - "tests/fixtures/wago/1.60.1.70009 (aura 400573 : CumulativeAura 4, durée 8000 ms)"
+      - "forever/data/1.60.1.70009/talents.json (arcaneBlast : bonus et coût par cumul, cumuls, durée ; arcanePower : durée, dégâts, coût)"
+      - "tests/fixtures/wago/1.60.1.70009 (aura 400573 : CumulativeAura 4, durée 8000 ms ; Arcane Power 12042 : DurationIndex 8, 15 000 ms, SpellCooldowns 180 000 ms)"
     tests:
       - tests/unit/test_engine_arcane_blast.py::test_max_stacks_come_from_the_talent
       - tests/unit/test_engine_arcane_blast.py::test_stacks_are_capped_and_expire
       - tests/unit/test_engine_arcane_blast.py::test_bonus_applies_to_other_spells_only
       - tests/unit/test_engine_arcane_blast.py::test_clearcasting_makes_the_cast_free_and_keeps_the_stack
+      - tests/unit/test_damage_modifiers.py::test_arcane_power_buffs
+      - tests/unit/test_video_examples.py::test_video_example
     tolerance: null
-    formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée ; expire sans nouvel Arcane Blast ; tout autre sort de dégâts profite de +x % par cumul et la consomme"
-    note: "T04c : forever/engine/buffs.py (seule aura modélisée), valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11) ; Missile Barrage et autres buffs : absents"
+    formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée ; expire sans nouvel Arcane Blast ; tout autre sort de dégâts profite de +x % par cumul et la consomme ; Arcane Power active : +y % de dégâts (source distincte) et +z % de coût"
+    note: "T04c : forever/engine/buffs.py, valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11). T04e : buffs d'Arcane Power (arcane_power_buffs), cumul avec Arcane Blast multiplicatif en forever (A20) ; aura de 15 s et recharge de 180 s non modélisées (l'appelant décide quand l'aura est active ; rotations : T05). Missile Barrage et autres buffs : absents"
   - id: B16
     categorie: temps
     description: "Temps d'incantation réduits par talents"
@@ -923,11 +950,27 @@ mechanics:
     statut: teste
     certitude: probable
     sources:
+      - "Tables du client SpellEffect (EffectBonusCoefficient), 1.60.1.70009 : forever/data/1.60.1.70009/spell_scaling.json (schéma 2, T04e)"
+      - "tests/fixtures/wago/1.60.1.70009/enUS/SpellEffect.csv"
+      - "docs/research/videos/BVSgeHp3sWU.md (coefficients du tableur concordants avec le client)"
       - "seed/forever-mage/references/mechanics.md"
-      - "seed/forever-mage/scripts/fm.py (porté en T02)"
+      - "seed/forever-mage/scripts/fm.py (porté en T02, mode seed)"
       - "forever/data/1.60.1.70009/spells.json"
       - "forever/data/1.60.1.70009/mechanics.json"
     tests:
+      - tests/unit/test_client_coefficients.py::test_coefficient_matches_client_table
+      - tests/unit/test_client_coefficients.py::test_low_level_penalty_applies_to_client_coefficient
+      - tests/unit/test_client_coefficients.py::test_low_level_default_comes_from_data
+      - tests/unit/test_client_coefficients.py::test_client_coefficient_reads_data
+      - tests/unit/test_client_coefficients.py::test_ice_lance_coefficient
+      - tests/unit/test_client_coefficients.py::test_seed_rules_keep_the_seed_formula
+      - tests/unit/test_client_coefficients.py::test_unknown_rules_and_seed_without_penalty_are_refused
+      - tests/unit/test_client_coefficients.py::test_frostbolt_forever_values
+      - tests/unit/test_client_coefficients.py::test_roll_base_damage_uses_the_rules
+      - tests/unit/test_video_examples.py::test_video_example
+      - tests/unit/test_spell_scaling.py::test_decoded_component_carries_client_coefficient_and_period
+      - tests/unit/test_sim_rules.py::test_low_level_penalty_option_changes_the_forever_result
+      - tests/unit/test_sim_rules.py::test_ice_lance_damage_does_not_depend_on_spell_power
       - tests/unit/test_review_t04b.py::test_engine_helpers
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_values.py::test_coefficient_values
@@ -935,7 +978,8 @@ mechanics:
       - tests/unit/test_gamedata.py::test_coefficient_reads_data
       - tests/parity/test_fm_parity.py::test_rank_and_coefficient_parity
     tolerance: null
-    formule: "coefficient = min(max, max(min, incantation)) / diviseur (× facteur si ralenti) ; canalisé : min(durée, plafond) / diviseur ; coefficient fixe pour les sorts listés ; × max(0, 1 − pénalité × (seuil − niveau du sort)) sous le seuil"
+    formule: "forever : coefficient = Σ coefficient du client des coups directs + Σ coefficient par éclair × éclairs (canalisé), × pénalité ; seed : min(max, max(min, incantation)) / diviseur (× facteur si ralenti), canalisé min(durée, plafond) / diviseur, coefficient fixe pour les sorts listés, × pénalité ; pénalité = max(0, 1 − part × (seuil − niveau du sort)) sous le seuil"
+    note: "T04e : coefficients du client (certain) en mode forever, formule du seed en mode seed (parité à 1e-12). Pénalité des sorts de bas niveau : absente de la table du client (Frostbolt r1 0,407), règle Classic supposée gardée (suppose), appliquée par défaut (mechanics.json coefficient.low_level_default), option low_level_penalty ; test en jeu E2. Ice Lance : 0 dans le client (probable, test en jeu E4). Blizzard : coefficient du sort déclenché, 8 × 0,042 (probable ; l'effet factice du parent porte 0,03, question ouverte)."
   - id: G5
     categorie: personnage
     description: "Legacy (arbre de compte)"
