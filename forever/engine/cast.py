@@ -54,7 +54,7 @@ def expected_cast(
     hit = hit_chance(gd, school, level_diff, pts, ch)
     crit = crit_chance(gd, key, school, pts, ch, frozen=frozen, wc_stacks=wc_stacks, buffs=buffs)
     cm = crit_mult(gd, school, pts)
-    dm = dmg_mult(gd, school, pts, buffs)
+    dm = dmg_mult(gd, school, pts, buffs, key=key, rules=rules)
     sp = spell_power(ch, buffs)
     c = coefficient(gd, key, r, rules=rules, low_level_penalty=low_level_penalty)
     base = (r.damage_min + r.damage_max) / 2.0 + c * sp

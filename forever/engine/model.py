@@ -389,7 +389,9 @@ class Character:
 
 class Buffs(TypedDict, total=False):
     crit: float
-    dmg: float
+    dmg: float  # bonus de dégâts d'une source (fraction), par exemple les cumuls d'Arcane Blast
+    dmg_sources: tuple[float, ...]  # bonus de dégâts d'autres sources distinctes (Arcane Power…), une par entrée
+    fire_vulnerability: int  # cumuls de Fire Vulnerability sur la cible
     haste: float
     cost: float
     sp_pct: float

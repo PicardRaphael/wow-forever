@@ -5,6 +5,7 @@ libellé du contrôle -> identifiant du registre (`docs/MECHANICS_REGISTRY.yaml`
 
 from __future__ import annotations
 
+from forever.engine.buffs import arcane_power_buffs, fire_vulnerability_buffs, merge_buffs
 from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time
 from forever.engine.character import character, int_per_crit
@@ -23,7 +24,15 @@ from forever.engine.model import (
     Points,
     Rank,
 )
-from forever.engine.spells import RankValues, best_rank, coefficient, rank_values_at_level
+from forever.engine.spells import (
+    RankValues,
+    best_rank,
+    coefficient,
+    dot_coefficient,
+    dot_ticks,
+    low_level_factor,
+    rank_values_at_level,
+)
 from forever.engine.talents import check_build, legal_additions, points_available, talent_value, tree_split
 
 MECHANICS: dict[str, str] = {
@@ -71,6 +80,7 @@ __all__ = [
     "Points",
     "Rank",
     "RankValues",
+    "arcane_power_buffs",
     "best_rank",
     "cast_time",
     "character",
@@ -79,11 +89,16 @@ __all__ = [
     "crit_chance",
     "crit_mult",
     "dmg_mult",
+    "dot_coefficient",
+    "dot_ticks",
     "expected_cast",
+    "fire_vulnerability_buffs",
     "hit_chance",
     "int_per_crit",
     "legal_additions",
+    "low_level_factor",
     "mana_cost",
+    "merge_buffs",
     "points_available",
     "rank_values_at_level",
     "spell_power",

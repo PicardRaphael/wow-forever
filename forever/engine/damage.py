@@ -13,18 +13,67 @@ PERCENT = 100.0  # conversion d'unité : les talents de dégâts sont exprimés 
 MS_PER_S = 1000.0  # conversion d'unité : périodes du client en millisecondes
 
 
-def dmg_mult(gd: GameData, school: str, pts: Points, buffs: Buffs | None = None) -> float:
-    """Multiplicateur de dégâts : talents globaux et d'école, puis buffs.
+# Liens sort -> talent propre à un sort et école des auras -> écoles touchées (noms, pas des chiffres de jeu).
+CONE_OF_COLD, IMPROVED_CONE_OF_COLD = "cone_of_cold", "improvedConeOfCold"
+AURA_SCHOOLS = {"fire": SCHOOL_FIRE, "frost": SCHOOL_FROST}
+
+
+def _improved_cone_of_cold(gd: GameData, pts: Points) -> float:
+    """Part d'Improved Cone of Cold au rang pris (`talents.improved_cone_of_cold_pct`, mode forever)."""
+    n = pts.get(IMPROVED_CONE_OF_COLD, 0)
+    values = gd.constants.improved_cone_of_cold_pct
+    if n <= 0:
+        return 0.0
+    if n > len(values):
+        raise ValueError(f"{IMPROVED_CONE_OF_COLD} : rang {n} hors de 1-{len(values)}")
+    return values[n - 1] / PERCENT
+
+
+def fire_vulnerability_part(gd: GameData, school: str, stacks: int) -> float:
+    """Hausse des dégâts subis par la cible pour un sort de l'école `school` : cumuls × part par cumul, pour les
+    écoles de l'aura (client) ; Givre-feu compte comme feu (suppose, voir OPEN_QUESTIONS).
 
     Registre : A20"""
+    fv = gd.fire_vulnerability
+    if stacks <= 0 or not any(school in AURA_SCHOOLS.get(s, frozenset({s})) for s in fv.schools):
+        return 0.0
+    return min(stacks, fv.max_stacks) * fv.pct_per_stack / PERCENT
+
+
+def dmg_mult(
+    gd: GameData,
+    school: str,
+    pts: Points,
+    buffs: Buffs | None = None,
+    *,
+    key: str | None = None,
+    rules: str = "forever",
+) -> float:
+    """Multiplicateur de dégâts : talents globaux et d'école, talent propre au sort `key` (Improved Cone of Cold),
+    puis buffs (`dmg`, `dmg_sources`) et cumuls de Fire Vulnerability sur la cible.
+
+    `rules="forever"` : chaque source multiplie (probable, test en jeu E6) ; Improved Cone of Cold aux valeurs de
+    `talents.improved_cone_of_cold_pct`. `rules="seed"` : bonus des buffs et de Fire Vulnerability additionnés dans
+    un seul facteur, Improved Cone of Cold ignoré (le seed ne le connaît pas).
+
+    Registre : A20"""
+    check_rules(rules, None)
     buffs = buffs or {}
     m = 1 + talent_value(gd, pts, "arcaneInstability") / PERCENT
     if school in SCHOOL_FROST:
         m *= 1 + talent_value(gd, pts, "piercingIce") / PERCENT
     if school in SCHOOL_FIRE:
         m *= 1 + talent_value(gd, pts, "firePower") / PERCENT
+    sources = buffs.get("dmg_sources", ())
+    fire = fire_vulnerability_part(gd, school, buffs.get("fire_vulnerability", 0))
+    if rules == "seed":
+        return m * (1 + buffs.get("dmg", 0.0) + sum(sources) + fire)
     m *= 1 + buffs.get("dmg", 0.0)
-    return m
+    for s in sources:
+        m *= 1 + s
+    if key == CONE_OF_COLD:
+        m *= 1 + _improved_cone_of_cold(gd, pts)
+    return m * (1 + fire)
 
 
 def spell_power(ch: Character, buffs: Buffs | None = None) -> float:

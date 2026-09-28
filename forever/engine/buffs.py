@@ -5,7 +5,7 @@ autres sorts par cumul (%), hausse du coût d'Arcane Blast par cumul (%), cumuls
 
 from __future__ import annotations
 
-from typing import NamedTuple
+from typing import Any, NamedTuple, cast
 
 from forever.engine.model import Buffs, GameData, Points
 from forever.engine.talents import talent_value
@@ -15,6 +15,9 @@ SPELL = "arcane_blast"
 PERCENT = 100.0  # conversion d'unité : les variables du talent sont exprimées en %
 # Positions des variables du talent dans talents.json (lien talent -> effet, pas des chiffres de jeu).
 DMG_PER_STACK, COST_PER_STACK, MAX_STACKS, DURATION = 2, 3, 4, 5
+# Arcane Power (talents.json, « For the next {0} sec, your spells deal {1}% more damage while costing {2}% more mana »).
+ARCANE_POWER = "arcanePower"
+AP_DURATION, AP_DMG, AP_COST = 0, 1, 2
 
 
 class ArcaneBlastAura(NamedTuple):
@@ -65,21 +68,41 @@ def arcane_blast_after_spell(
 
 
 def arcane_power_buffs(gd: GameData, pts: Points) -> Buffs:
-    """Buffs de l'aura d'Arcane Power.
+    """Buffs de l'aura d'Arcane Power (talent pris) : bonus de dégâts en source distincte (`dmg_sources`, multiplié
+    aux autres bonus en mode forever) et hausse du coût (`cost`) ; {} sans le talent. L'aura (durée du talent,
+    recharge du client) n'est pas gérée ici : l'appelant décide quand elle est active.
 
     Registre : A20, B15"""
-    raise NotImplementedError
+    if talent_value(gd, pts, ARCANE_POWER, AP_DMG) <= 0:
+        return {}
+    return {
+        "dmg_sources": (talent_value(gd, pts, ARCANE_POWER, AP_DMG) / PERCENT,),
+        "cost": talent_value(gd, pts, ARCANE_POWER, AP_COST) / PERCENT,
+    }
 
 
 def fire_vulnerability_buffs(gd: GameData, stacks: int) -> Buffs:
-    """Cumuls de Fire Vulnerability sur la cible.
+    """Cumuls de Fire Vulnerability sur la cible (buff `fire_vulnerability`), bornés au maximum du client ; {} sans
+    cumul. Effet sur les dégâts : `dmg_mult`.
 
     Registre : A20"""
-    raise NotImplementedError
+    n = min(stacks, gd.fire_vulnerability.max_stacks)
+    return {"fire_vulnerability": n} if n > 0 else {}
 
 
 def merge_buffs(*buffs: Buffs | None) -> Buffs:
-    """Réunion de plusieurs buffs.
+    """Réunion de plusieurs buffs : somme des bonus scalaires, sources de dégâts distinctes mises bout à bout,
+    cumuls de Fire Vulnerability au plus grand (une seule aura sur la cible).
 
     Registre : A20"""
-    raise NotImplementedError
+    out: dict[str, Any] = {}
+    for b in buffs:
+        raw: dict[str, Any] = dict(b or {})
+        for k, v in raw.items():
+            if k == "dmg_sources":
+                out[k] = (*out.get(k, ()), *v)
+            elif k == "fire_vulnerability":
+                out[k] = max(out.get(k, 0), v)
+            else:
+                out[k] = out.get(k, 0.0) + v
+    return cast(Buffs, out)
