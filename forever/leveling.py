@@ -134,7 +134,7 @@ def assumptions(
     talents: Mapping[str, int],
     n: int,
     seed: int,
-    low_level_default: bool = True,
+    low_level_default: bool,
 ) -> list[str]:
     spec = ", ".join(f"{k} {v}" for k, v in sorted(talents.items())) or "aucun"
     return [

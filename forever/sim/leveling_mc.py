@@ -310,7 +310,9 @@ def kill_mc(
                 s["cc"] = True
             if r.dot_total:
                 ticks = dot_tick_times(gd, r.dot_duration_s, dot_tick_period_s(gd, key, r, rules=o["rules"]))
-                per_tick = dot_sp_per_tick(gd, key, r, ch, rules=o["rules"], low_level_penalty=o["low_level_penalty"])
+                per_tick = dot_sp_per_tick(
+                    gd, key, r, ch, buffs, rules=o["rules"], low_level_penalty=o["low_level_penalty"]
+                )
                 tick = dot_tick_damage(gd, r.dot_total, e["dmg_mult"], len(ticks), sp_per_tick=per_tick)
                 for at in ticks:
                     tick_crit = gd.rules.dot_can_crit and rng.random() < e["crit"]
