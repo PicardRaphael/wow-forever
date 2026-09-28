@@ -15,8 +15,9 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 | T04a | Sources locales du client : journaux de combat, Questie, table des monstres, points de base par niveau, preuves du registre, addon ForeverLogger | T02, T03 |
 | T04b | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T04a |
 | T04c | Simulateur fiable pour comparer les builds : Ignite, Arcane Blast, recharges, régénération et armure, `forever measures refresh`, zone ou donjon à mon niveau | T04b |
+| T04e | Calculs de dégâts fidèles au client : coefficients du client, DoT, multiplicateurs, cumul des bonus | T04c |
 | T04d | Quêtes propres à Forever et modèle d'XP de Forever | T04c |
-| T05 | Optimiseur de talents et conseiller de respec | T04b, T04c |
+| T05 | Optimiseur de talents et conseiller de respec | T04b, T04c, T04e |
 | T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
 | PV1 | PvP, savoir des 9 classes sans moteur de classe : sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants (règles Classic), fiches par affrontement | T03, T05 |
@@ -85,12 +86,17 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 - **Fait** : fins de ligne normalisées par Git ; option `rules` des simulateurs (`seed` : parité à 1e-12) ; Ignite roulant (A18) ; escalade d'Arcane Blast et rotation arcane (B11, B15, I1) ; recharge de Fire Blast dans l'analytique (B13) ; armure portée selon le niveau lu dans le client et régénération cumulée (B7, I6) ; `forever measures refresh` ; `forever lookup zones` (I7). Plan : `tasks/T04c-plan.md`.
 - **Paramètres de build prêts pour T05** : `armor` (`auto`, `frost`, `mage`) et `ab_stacks` (0 au maximum du talent), avec `ab_dump`.
 
+## T04e — Calculs de dégâts fidèles au client
+- **Fait** : coefficients de puissance des sorts lus dans le client (`SpellEffect.EffectBonusCoefficient`, par rang et par effet) en mode `forever`, formule du seed gardée en mode `seed` ; puissance des sorts et période des tics de DoT lues dans le client ; Improved Cone of Cold, Arcane Power et Fire Vulnerability dans le multiplicateur de dégâts ; bonus en pourcentage multipliés entre sources (`probable`) ; pénalité des sorts de bas niveau paramétrable ; exemples chiffrés de la vidéo BVSgeHp3sWU en tests ; protocole de collecte des tests en jeu. Plan : `tasks/T04e-plan.md`.
+- **Hors périmètre, avec échéance** : Arcane Power dans les rotations des simulateurs en T05 (sans lui, l'Arcane est sous-évalué en leveling) ; Fire Vulnerability (Scorch et ses cumuls) dans les rotations en T09.
+- **Critères de fin** : mode `seed` identique au seed à 1e-12 ; coefficients égaux aux tables du client ; exemples de la vidéo à ±0,5 (trois exclus pour l'arrondi des bornes, question ouverte) ; `uv run tasks.py verify` vert.
+
 ## T04d — Quêtes Forever et XP
 - **À faire** (reporté de T04c) : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; durée d'infobulle dans `tooltip_values`. Routes de leveling : pas de tranche dédiée (le joueur suit RestedXP en jeu ; RestedXP reste exclu comme source de données, `docs/DATA_SOURCES.md`). La réponse « quelle zone ou quel donjon à mon niveau » est faite en T04c (`forever lookup zones`, Questie lu localement, `suppose`) ; DJ1 affinera la partie donjons. Les quêtes de donjon restent ici ; DJ1 s'y réfère.
 - **Critères de fin** : à fixer au plan de T04d.
 
 ## T05 — Talents et respec
-- **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre ; comparer les builds avec les simulateurs de T04c, `armor` et `ab_stacks` compris parmi les paramètres de build à optimiser.
+- **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre ; comparer les builds avec les simulateurs de T04c, `armor` et `ab_stacks` compris parmi les paramètres de build à optimiser ; Arcane Power dans les rotations des simulateurs (aura et recharge du client, fonctions de T04e), sans quoi l'Arcane est sous-évalué en leveling.
 - **Critères de fin** : `forever optimize talents --from 10 --to 30` produit un ordre légal à chaque niveau ; le barème de respec est paramétrable ; tests de légalité et de non-régression.
 
 ## T06 — Plugin Claude Code
@@ -208,4 +214,6 @@ Tranche gardée : sautée tant que le lancement n'a pas eu lieu et que la couver
 - **V3 (proposée après T08)** : compagnon de bureau qui analyse `WoWCombatLog-*.txt` après le combat (`forever logs measure`), résume le dernier combat, l'expose au MCP et prépare le fichier de V1. Hors périmètre : toute consigne en direct. Critères de fin : découpe des combats testée sur fixtures, résumé avec provenance.
 
 ## T09 à T13
+- **T09, reporté de T04e** : Fire Vulnerability dans les rotations (Scorch jusqu'aux cumuls maximum, fonctions de T04e).
+
 Détaillées au moment de les planifier, avec la même structure (fait, hors périmètre, critères de fin testables).
