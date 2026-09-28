@@ -16,9 +16,9 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 | T04b | Simulateurs de leveling (MC + analytique) exposés en MCP + graphique | T04a |
 | T04c | Simulateur fiable pour comparer les builds : Ignite, Arcane Blast, recharges, régénération et armure, `forever measures refresh`, zone ou donjon à mon niveau | T04b |
 | T04e | Calculs de dégâts fidèles au client : coefficients du client, DoT, multiplicateurs, cumul des bonus | T04c |
-| T04d | Quêtes propres à Forever et modèle d'XP de Forever | T04c |
 | T05 | Optimiseur de talents et conseiller de respec | T04b, T04c, T04e |
 | T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
+| T04d | Quêtes propres à Forever et modèle d'XP de Forever (placée après T06 : ses sources viennent de l'inventaire des addons, `tasks/inventaire-addons.md`, et elle ne change pas le classement des builds) | T04c |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
 | PV1 | PvP, savoir des 9 classes sans moteur de classe : sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants (règles Classic), fiches par affrontement | T03, T05 |
 | PV2 | PvP, champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux de champs de bataille | PV1, T04a |
@@ -91,10 +91,6 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 - **Hors périmètre, avec échéance** : Arcane Power dans les rotations des simulateurs en T05 (sans lui, l'Arcane est sous-évalué en leveling) ; Fire Vulnerability (Scorch et ses cumuls) dans les rotations en T09.
 - **Critères de fin** : mode `seed` identique au seed à 1e-12 ; coefficients égaux aux tables du client ; exemples de la vidéo à ±0,5 (trois exclus pour l'arrondi des bornes, question ouverte) ; `uv run tasks.py verify` vert.
 
-## T04d — Quêtes Forever et XP
-- **À faire** (reporté de T04c) : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; durée d'infobulle dans `tooltip_values`. Routes de leveling : pas de tranche dédiée (le joueur suit RestedXP en jeu ; RestedXP reste exclu comme source de données, `docs/DATA_SOURCES.md`). La réponse « quelle zone ou quel donjon à mon niveau » est faite en T04c (`forever lookup zones`, Questie lu localement, `suppose`) ; DJ1 affinera la partie donjons. Les quêtes de donjon restent ici ; DJ1 s'y réfère.
-- **Critères de fin** : à fixer au plan de T04d.
-
 ## T05 — Talents et respec
 - **Fait** : porter les tests du seed `optimiseur_legal` et `pvp_et_respec` ; remonter I5 dans le registre ; comparer les builds avec les simulateurs de T04c, `armor` et `ab_stacks` compris parmi les paramètres de build à optimiser ; Arcane Power dans les rotations des simulateurs (aura et recharge du client, fonctions de T04e), sans quoi l'Arcane est sous-évalué en leveling.
 - **Critères de fin** : `forever optimize talents --from 10 --to 30` produit un ordre légal à chaque niveau ; le barème de respec est paramétrable ; tests de légalité et de non-régression.
@@ -102,6 +98,11 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 ## T06 — Plugin Claude Code
 - **Fait** : skills des domaines disponibles à ce stade (leveling, Mage) ; chaque tranche de domaine suivante ajoute son skill (PvP, donjons, Legacy, métiers, réputations, économie).
 - **Critères de fin** : installation locale du plugin ; SessionStart injecte une seule ligne de fraîcheur ; la statusline affiche version et statut ; jeu d'évaluation d'aiguillage de 30 requêtes (60 % doivent déclencher un skill, 40 % non) avec au moins 90 % de bonnes décisions.
+
+## T04d — Quêtes Forever et XP
+- **À faire** (reporté de T04c) : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; durée d'infobulle dans `tooltip_values`. Routes de leveling : pas de tranche dédiée (le joueur suit RestedXP en jeu ; RestedXP reste exclu comme source de données, `docs/DATA_SOURCES.md`). La réponse « quelle zone ou quel donjon à mon niveau » est faite en T04c (`forever lookup zones`, Questie lu localement, `suppose`) ; DJ1 affinera la partie donjons. Les quêtes de donjon restent ici ; DJ1 s'y réfère.
+- **Place** : après T06 (décision 78). Ses sources dépendent de l'inventaire des addons (`tasks/inventaire-addons.md` : ForeverDungeonJournal pour l'XP des quêtes, GearQuestForever pour la liste des quêtes absentes de Questie, tables de quêtes du client) ; l'XP ne change pas le classement des builds de T05, qui compare des taux de dégâts et de temps par monstre.
+- **Critères de fin** : à fixer au plan de T04d.
 
 ## FA1 — ForeverAssist V1 (affichage de données précalculées)
 Addon d'affichage seul (règles et canaux : `docs/ADDON.md`). Aucun calcul de combat dans l'addon : `forever` précalcule, l'addon affiche.
