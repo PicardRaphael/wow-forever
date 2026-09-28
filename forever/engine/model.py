@@ -89,6 +89,7 @@ class CoefficientRules:
     low_level_threshold: int
     low_level_penalty_per_level: float
     fixed: Mapping[str, FixedCoefficient]
+    low_level_default: bool  # pénalité des sorts de bas niveau appliquée par défaut en mode forever (T04e)
 
 
 @dataclass(frozen=True)
@@ -151,6 +152,7 @@ class Constants:
     talent_rank_mana_default: float
     default_range_yd: float
     miss_per_level_below: float  # raté retiré par niveau d'écart sous la cible (écart négatif)
+    improved_cone_of_cold_pct: tuple[float, ...]  # rangs d'Improved Cone of Cold en mode forever (T04e)
 
 
 @dataclass(frozen=True)
@@ -165,7 +167,8 @@ class Racials:
 @dataclass(frozen=True)
 class ScalingComponent:
     """Effet de dégâts d'un rang (`spell_scaling.json`) : `kind` direct, dot (× ticks, sur la durée) ou channel
-    (× ticks, dans le coup)."""
+    (× ticks, dans le coup) ; `bonus_coefficient` : part de la puissance des sorts par coup, par tic ou par éclair
+    (EffectBonusCoefficient du client) ; `period_ms` : période des tics (0 pour un coup direct)."""
 
     spell_id: int
     index: int
@@ -176,6 +179,8 @@ class ScalingComponent:
     base_points: float
     points_per_level: float
     variance: float
+    bonus_coefficient: float
+    period_ms: int
 
 
 @dataclass(frozen=True)
@@ -314,6 +319,19 @@ class ArmorRank:
 
 
 @dataclass(frozen=True)
+class FireVulnerability:
+    """Aura posée sur la cible par Improved Scorch, lue dans le client (`spell_scaling.json.auras`) : dégâts subis
+    des écoles `schools` augmentés de `pct_per_stack` % par cumul, jusqu'à `max_stacks` cumuls, pendant
+    `duration_s`."""
+
+    spell_id: int
+    pct_per_stack: float
+    max_stacks: int
+    duration_s: float
+    schools: tuple[str, ...]
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
 
@@ -331,6 +349,7 @@ class GameData:
     leveling: LevelingConstants
     utility: Utility
     armors: Mapping[str, tuple[ArmorRank, ...]]  # armures du client (spell_scaling.json.utility), par rang
+    fire_vulnerability: FireVulnerability  # spell_scaling.json.auras (T04e)
 
 
 class CharacterOverrides(TypedDict, total=False):

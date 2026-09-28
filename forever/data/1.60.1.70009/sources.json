@@ -122,12 +122,14 @@
       ]
     },
     "spell_scaling.json": {
-      "source": "Client Forever 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools, extraits tests/fixtures/wago/1.60.1.70009) décodées par forever decode le 2026-09-27 ; SpellCooldowns (start_recovery_ms) ajoutée le 2026-09-27 (T04b)",
+      "source": "Client Forever 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc (wago.tools, extraits tests/fixtures/wago/1.60.1.70009) décodées par forever decode le 2026-09-27 ; SpellCooldowns (start_recovery_ms) ajoutée le 2026-09-27 (T04b) ; schéma 2 le 2026-09-28 (T04e) : EffectBonusCoefficient et période des tics, auras de cible (SpellAuraOptions, SpellDuration, TraitDefinition)",
       "certainty": "certain",
       "notes": [
         "points de base, points par niveau et variance par effet de dégâts ; MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
         "spells.json inchangé (décision 39) : rangs évalués au niveau min(MaxLevel, 60)",
-        "utility (T04c, 2026-09-27) : armures du Mage (Frost Armor, Ice Armor, Mage Armor), niveau d'apprentissage SpellLevels.BaseLevel et effets retenus par decode_rules.json.utility_spells (SkillLineAbility, SpellEffect)"
+        "utility (T04c, 2026-09-27) : armures du Mage (Frost Armor, Ice Armor, Mage Armor), niveau d'apprentissage SpellLevels.BaseLevel et effets retenus par decode_rules.json.utility_spells (SkillLineAbility, SpellEffect)",
+        "schéma 2 (T04e, 2026-09-28) : bonus_coefficient (SpellEffect.EffectBonusCoefficient de l'effet de dégâts, par coup, tic ou éclair) et period_ms (EffectAuraPeriod de l'aura qui porte l'effet, celle du sort parent pour un sort déclenché) par composant",
+        "auras (T04e) : Fire Vulnerability, sort déclenché par Improved Scorch (decode_rules.json.target_auras) : part par cumul, cumuls maximum, durée, écoles"
       ]
     }
   }

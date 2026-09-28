@@ -471,7 +471,11 @@ def decode_spells(
     return doc
 
 
-def _component(client: _Client, spell: int, index: int, kind: str, ticks: float, variance: bool) -> dict[str, Any]:
+def _component(
+    client: _Client, spell: int, index: int, kind: str, ticks: float, variance: bool, period_ms: int = 0
+) -> dict[str, Any]:
+    """Effet de dégâts `index` du sort `spell` ; `period_ms` : période de l'aura qui le porte (celle du sort parent
+    pour un sort déclenché), 0 pour un coup direct."""
     e = client.effect(spell, index)
     base, top = client.level_for(spell, "max_capped")
     return {
@@ -484,6 +488,8 @@ def _component(client: _Client, spell: int, index: int, kind: str, ticks: float,
         "base_points": float(e["EffectBasePointsF"]),
         "points_per_level": float(e["EffectRealPointsPerLevel"]),
         "variance": float(e["Variance"]) if variance else 0.0,
+        "bonus_coefficient": float(e["EffectBonusCoefficient"]),
+        "period_ms": period_ms,
     }
 
 
@@ -505,10 +511,11 @@ def _components(client: _Client, spell: int, rules: Mapping[str, Any]) -> list[d
     for e in effects:
         if int(e["Effect"]) != fx["apply_aura"] or not int(e["EffectAuraPeriod"]) or duration is None:
             continue
-        ticks = duration / int(e["EffectAuraPeriod"])
+        period = int(e["EffectAuraPeriod"])
+        ticks = duration / period
         aura = int(e["EffectAura"])
         if aura == fx["aura_periodic_damage"]:
-            out.append(_component(client, spell, int(e["EffectIndex"]), kind, ticks, False))
+            out.append(_component(client, spell, int(e["EffectIndex"]), kind, ticks, False, period))
             continue
         if aura == fx["aura_periodic_trigger_spell"]:
             linked = [int(e["EffectTriggerSpell"])]
@@ -519,15 +526,15 @@ def _components(client: _Client, spell: int, rules: Mapping[str, Any]) -> list[d
         for other in linked:
             for te in client.effects.get(other, {}).values():
                 if int(te["Effect"]) == fx["school_damage"]:
-                    out.append(_component(client, other, int(te["EffectIndex"]), kind, ticks, True))
+                    out.append(_component(client, other, int(te["EffectIndex"]), kind, ticks, True, period))
     return out
 
 
 def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `spell_scaling.json` : pour chaque rang des sorts suivis, niveaux (`MaxLevel` 0 résolu au plafond
     de `decode_rules.json`), recharge globale déclenchée (`SpellCooldowns.StartRecoveryTime`, 0 sans ligne) et effets
-    de dégâts (points de base, points par niveau, variance, nombre de ticks), pour
-    calculer les dégâts au niveau du personnage (moteur : `rank_values_at_level`)."""
+    de dégâts (points de base, points par niveau, variance, nombre de ticks, coefficient de puissance des sorts,
+    période), pour calculer les dégâts au niveau du personnage (moteur : `rank_values_at_level`, `coefficient`)."""
     client = _Client(tables, rules)
     spells = decode_spells(tables, rules, {"rank_format": rules["rank_format"], "spells": {}}, version)["spells"]
     out: dict[str, list[dict[str, Any]]] = {}
@@ -553,9 +560,14 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
         "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
         "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
         "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)",
+        "bonus_coefficient : EffectBonusCoefficient de l'effet de dégâts (par coup, par tic ou par éclair canalisé)",
+        (
+            "period_ms : EffectAuraPeriod de l'aura qui porte l'effet (celle du sort parent pour un sort déclenché), "
+            "0 pour un coup direct"
+        ),
     ]
     doc: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
         "build": version,
         "source": f"Client {version} : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns, SkillLineAbility "
         "(wago.tools) décodées par forever decode",
@@ -569,7 +581,56 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "utility : armures du Mage, niveau d'apprentissage (SpellLevels.BaseLevel) et effets retenus par "
             "decode_rules.json.utility_spells"
         )
+    if "target_auras" in rules:
+        doc["auras"] = _target_auras(tables, rules, client)
+        notes.append(
+            "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), "
+            "cumuls maximum, durée, écoles touchées"
+        )
     return doc
+
+
+def _target_auras(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, dict[str, Any]]:
+    """Auras posées sur la cible par un talent (`target_auras`) : sort de l'aura (EffectTriggerSpell du talent),
+    part par cumul, cumuls maximum (SpellAuraOptions), durée (SpellDuration), écoles (bits de `school_masks`)."""
+    fx = rules["effects"]
+    masks = rules["school_masks"]
+    talents: dict[str, int] = {}
+    for d in tables["TraitDefinition"]:
+        spell = int(d["SpellID"])
+        talents.setdefault(str(d["OverrideName_lang"]) or client.names.get(spell, ""), spell)
+    out: dict[str, dict[str, Any]] = {}
+    for key, spec in rules["target_auras"].items():
+        source = talents.get(spec["talent"])
+        if source is None:
+            raise DataSchemaError(f"{RULES_NAME} : talent « {spec['talent']} » absent de TraitDefinition ({key}).")
+        triggers = [
+            int(e["EffectTriggerSpell"])
+            for e in client.effects.get(source, {}).values()
+            if int(e["Effect"]) == fx["apply_aura"] and int(e["EffectAura"]) == spec["trigger_aura"]
+        ]
+        if len(triggers) != 1:
+            raise DataSchemaError(f"{key} : {len(triggers)} sort(s) déclenché(s) par {source}, un seul attendu.")
+        aura = triggers[0]
+        effects = [
+            e
+            for e in client.effects.get(aura, {}).values()
+            if int(e["Effect"]) == fx["apply_aura"] and int(e["EffectAura"]) == spec["aura"]
+        ]
+        options, duration = client.auras.get(aura), client.duration_ms(aura)
+        if len(effects) != 1 or options is None or duration is None:
+            raise DataSchemaError(f"{key} (sort {aura}) : effet d'aura {spec['aura']}, cumuls ou durée absents.")
+        mask = int(effects[0]["EffectMiscValue_0"])
+        out[key] = {
+            "spell_id": aura,
+            "source_spell_id": source,
+            "talent": talent_key(spec["talent"]),
+            "pct_per_stack": normalize(float(effects[0][spec["field"]])),
+            "max_stacks": int(options["CumulativeAura"]),
+            "duration_ms": duration,
+            "schools": [school for school, bit in masks.items() if mask & int(bit)],
+        }
+    return out
 
 
 def _utility(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, list[dict[str, Any]]]:

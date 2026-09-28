@@ -109,6 +109,10 @@
       "chill_on_hit_spell": {"aura": 42, "field": "EffectTriggerSpell"}
     }
   },
+  "target_auras": {
+    "fire_vulnerability": {"talent": "Improved Scorch", "trigger_aura": 109, "aura": 270, "field": "EffectBasePointsF"}
+  },
+  "school_masks": {"fire": 4, "frost": 16, "arcane": 64},
   "rank_format": ["level", "min", "max", "dot_total", "dot_duration", "cast_s", "mana", "cooldown_s"],
   "notes": [
     "Règles de lecture des tables du client (wago.tools) pour le Mage ; héritées par les versions suivantes tant qu'elles restent valides.",
@@ -122,6 +126,8 @@
     "tooltip.duration_units : unité d'affichage d'une durée, la plus grande dont la durée atteint le seuil.",
     "effects : identifiants d'effet et d'aura du client (SpellEffect.Effect, SpellEffect.EffectAura).",
     "spell_ranks : rangs lus dans SkillLineAbility (lignes du Mage, méthodes d'acquisition retenues), numérotés par Spell.NameSubtext ; canalisé si Attributes_1 & channel_attributes_1_mask.",
-    "utility_spells : armures lues comme les rangs de sort (SkillLineAbility, Spell.NameSubtext) ; niveau d'apprentissage = SpellLevels.BaseLevel ; effets retenus : aura (et EffectMiscValue_0 si donné) -> valeur du champ indiqué (aura 22 : armure si 1, résistance au givre si 16, à toute la magie si 126 ; aura 134 : part de la régénération gardée en incantation, en % ; aura 42 : sort de ralenti déclenché sur un coup reçu)."
+    "utility_spells : armures lues comme les rangs de sort (SkillLineAbility, Spell.NameSubtext) ; niveau d'apprentissage = SpellLevels.BaseLevel ; effets retenus : aura (et EffectMiscValue_0 si donné) -> valeur du champ indiqué (aura 22 : armure si 1, résistance au givre si 16, à toute la magie si 126 ; aura 134 : part de la régénération gardée en incantation, en % ; aura 42 : sort de ralenti déclenché sur un coup reçu).",
+    "target_auras : auras posées sur la cible par un talent (spell_scaling.json.auras) ; talent désigné par son nom (TraitDefinition) ; aura = EffectTriggerSpell de l'effet d'aura trigger_aura du talent (109 : sort déclenché sur la cible) ; part par cumul = champ field de l'effet d'aura aura (270 : dégâts subis des écoles du masque EffectMiscValue_0, en %) ; cumuls maximum = SpellAuraOptions.CumulativeAura ; durée = SpellMisc.DurationIndex -> SpellDuration.",
+    "school_masks : bits d'école du client (EffectMiscValue_0 des auras d'école) -> école de spells.json."
   ]
 }

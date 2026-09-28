@@ -14,6 +14,7 @@ from forever.engine.model import (
     CoefficientRules,
     CombatRules,
     Constants,
+    FireVulnerability,
     FixedCoefficient,
     GameData,
     IntPerCrit,
@@ -45,6 +46,8 @@ RACIALS_FILE = "racials.json"
 MONSTERS_FILE = "monsters.json"
 SCALING_FILE = "spell_scaling.json"
 SCALING_KINDS = ("direct", "dot", "channel")
+MS_PER_S = 1000.0  # conversion d'unité : durées du client en millisecondes
+SCALING_SCHEMA = 2  # spell_scaling.json : bonus_coefficient et period_ms par composant, auras (T04e)
 
 # Colonnes attendues de `spells.json.rank_format`, dans l'ordre des champs de `Rank`.
 RANK_COLUMNS = ("level", "min", "max", "dot_total", "dot_duration", "cast_s", "mana", "cooldown_s")
@@ -420,6 +423,8 @@ def _scaling(raw: Any, spells: Mapping[str, Spell]) -> dict[str, tuple[RankScali
     r = _Reader(SCALING_FILE)
     if not isinstance(raw, dict):
         raise r.fail("racine", "objet")
+    if raw.get("schema_version") != SCALING_SCHEMA:
+        raise r.fail("schema_version", f"{SCALING_SCHEMA} (coefficients et périodes du client, T04e)")
     out: dict[str, tuple[RankScaling, ...]] = {}
     for key, ranks in r.obj(raw, "spells", "spells").items():
         where = f"spells.{key}"
@@ -448,6 +453,8 @@ def _scaling(raw: Any, spells: Mapping[str, Spell]) -> dict[str, tuple[RankScali
                         base_points=r.num(c, "base_points", cw),
                         points_per_level=r.num(c, "points_per_level", cw),
                         variance=r.num(c, "variance", cw),
+                        bonus_coefficient=r.num(c, "bonus_coefficient", cw),
+                        period_ms=r.int_(c, "period_ms", cw),
                     )
                 )
             parsed.append(
@@ -511,6 +518,23 @@ def _armors(raw: Any) -> dict[str, tuple[ArmorRank, ...]]:
     return out
 
 
+def _fire_vulnerability(raw: Any) -> FireVulnerability:
+    """`spell_scaling.json.auras.fire_vulnerability` : aura d'Improved Scorch lue dans le client."""
+    r = _Reader(SCALING_FILE)
+    where = "auras.fire_vulnerability"
+    fv = r.obj(r.obj(raw, "auras", "auras"), "fire_vulnerability", where)
+    schools = r.list_(fv, "schools", f"{where}.schools")
+    if not schools or not all(isinstance(s, str) for s in schools):
+        raise r.fail(f"{where}.schools", "liste d'écoles")
+    return FireVulnerability(
+        spell_id=r.int_(fv, "spell_id", where),
+        pct_per_stack=r.num(fv, "pct_per_stack", where),
+        max_stacks=r.int_(fv, "max_stacks", where),
+        duration_s=r.num(fv, "duration_ms", where) / MS_PER_S,
+        schools=tuple(schools),
+    )
+
+
 def _constants(raw: Any) -> Constants:
     r = _Reader(MECHANICS_FILE)
     if not isinstance(raw, dict):
@@ -552,6 +576,7 @@ def _constants(raw: Any) -> Constants:
         low_level_threshold=r.int_(low, "threshold", "coefficient.low_level.threshold"),
         low_level_penalty_per_level=r.num(low, "penalty_per_level", "coefficient.low_level.penalty_per_level"),
         fixed=fixed,
+        low_level_default=r.bool_(entry("coefficient.low_level_default"), "value", "coefficient.low_level_default"),
     )
 
     def growth(key: str) -> StatGrowth:
@@ -610,6 +635,10 @@ def _constants(raw: Any) -> Constants:
         talent_rank_mana_default=r.num(talent_mana, "default", "mana.talent_rank_cost"),
         default_range_yd=num("spell.default_range_yd"),
         miss_per_level_below=num("hit.miss_per_level_below"),
+        improved_cone_of_cold_pct=tuple(
+            r.num({"v": v}, "v", "talents.improved_cone_of_cold_pct")
+            for v in r.list_(entry("talents.improved_cone_of_cold_pct"), "value", "talents.improved_cone_of_cold_pct")
+        ),
     )
 
 
@@ -638,6 +667,7 @@ def build_game_data(version: VersionData) -> GameData:
         leveling=_leveling(_Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")),
         utility=_utility(raw[SPELLS_FILE]),
         armors=_armors(raw[SCALING_FILE]),
+        fire_vulnerability=_fire_vulnerability(raw[SCALING_FILE]),
     )
 
 

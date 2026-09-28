@@ -1,5 +1,5 @@
 {
- "schema_version": 1,
+ "schema_version": 2,
  "build": "1.60.1.70009",
  "source": "Client 1.60.1.70009 : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns, SkillLineAbility (wago.tools) décodées par forever decode",
  "level_cap": 60,
@@ -22,7 +22,9 @@
       "max_level": 8,
       "base_points": 19.0,
       "points_per_level": 0.5,
-      "variance": 0.10526315868
+      "variance": 0.10526315868,
+      "bonus_coefficient": 0.40700000525,
+      "period_ms": 0
      }
     ]
    },
@@ -43,7 +45,9 @@
       "max_level": 12,
       "base_points": 33.0,
       "points_per_level": 0.69999998808,
-      "variance": 0.12121211737
+      "variance": 0.12121211737,
+      "bonus_coefficient": 0.48899999261,
+      "period_ms": 0
      }
     ]
    },
@@ -64,7 +68,9 @@
       "max_level": 18,
       "base_points": 46.0,
       "points_per_level": 0.89999997616,
-      "variance": 0.11111111194
+      "variance": 0.11111111194,
+      "bonus_coefficient": 0.59700000286,
+      "period_ms": 0
      }
     ]
    },
@@ -85,7 +91,9 @@
       "max_level": 24,
       "base_points": 60.0,
       "points_per_level": 1.10000002384,
-      "variance": 0.10256409645
+      "variance": 0.10256409645,
+      "bonus_coefficient": 0.70599997044,
+      "period_ms": 0
      }
     ]
    },
@@ -106,7 +114,9 @@
       "max_level": 30,
       "base_points": 95.0,
       "points_per_level": 1.5,
-      "variance": 0.09090909362
+      "variance": 0.09090909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      }
     ]
    },
@@ -127,7 +137,9 @@
       "max_level": 36,
       "base_points": 134.0,
       "points_per_level": 1.70000004768,
-      "variance": 0.08791209012
+      "variance": 0.08791209012,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      }
     ]
    },
@@ -148,7 +160,9 @@
       "max_level": 42,
       "base_points": 181.0,
       "points_per_level": 2.0,
-      "variance": 0.08438818902
+      "variance": 0.08438818902,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      }
     ]
    },
@@ -169,7 +183,9 @@
       "max_level": 48,
       "base_points": 244.0,
       "points_per_level": 2.29999995232,
-      "variance": 0.07894736528
+      "variance": 0.07894736528,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      }
     ]
    },
@@ -190,7 +206,9 @@
       "max_level": 54,
       "base_points": 308.0,
       "points_per_level": 2.59999990463,
-      "variance": 0.08152174205
+      "variance": 0.08152174205,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      }
     ]
    },
@@ -211,7 +229,9 @@
       "max_level": 60,
       "base_points": 386.0,
       "points_per_level": 2.90000009537,
-      "variance": 0.07623318583
+      "variance": 0.07623318583,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      }
     ]
    },
@@ -232,7 +252,9 @@
       "max_level": 60,
       "base_points": 475.0,
       "points_per_level": 3.20000004768,
-      "variance": 0.07476635277
+      "variance": 0.07476635277,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      }
     ]
    }
@@ -255,7 +277,9 @@
       "max_level": 5,
       "base_points": 18.0,
       "points_per_level": 0.60000002384,
-      "variance": 0.44444444776
+      "variance": 0.44444444776,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      },
      {
       "spell_id": 133,
@@ -266,7 +290,9 @@
       "max_level": 5,
       "base_points": 1.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -287,7 +313,9 @@
       "max_level": 10,
       "base_points": 37.0,
       "points_per_level": 0.69999998808,
-      "variance": 0.36842104793
+      "variance": 0.36842104793,
+      "bonus_coefficient": 0.57099997997,
+      "period_ms": 0
      },
      {
       "spell_id": 143,
@@ -298,7 +326,9 @@
       "max_level": 10,
       "base_points": 1.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -319,7 +349,9 @@
       "max_level": 16,
       "base_points": 53.0,
       "points_per_level": 0.89999997616,
-      "variance": 0.31746032834
+      "variance": 0.31746032834,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
      },
      {
       "spell_id": 145,
@@ -330,7 +362,9 @@
       "max_level": 16,
       "base_points": 2.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -351,7 +385,9 @@
       "max_level": 22,
       "base_points": 74.0,
       "points_per_level": 1.10000002384,
-      "variance": 0.31999999285
+      "variance": 0.31999999285,
+      "bonus_coefficient": 0.85699999332,
+      "period_ms": 0
      },
      {
       "spell_id": 3140,
@@ -362,7 +398,9 @@
       "max_level": 22,
       "base_points": 3.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -383,7 +421,9 @@
       "max_level": 28,
       "base_points": 108.0,
       "points_per_level": 1.5,
-      "variance": 0.29447853565
+      "variance": 0.29447853565,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 8400,
@@ -394,7 +434,9 @@
       "max_level": 28,
       "base_points": 4.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -415,7 +457,9 @@
       "max_level": 34,
       "base_points": 153.0,
       "points_per_level": 1.79999995232,
-      "variance": 0.28448274732
+      "variance": 0.28448274732,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 8401,
@@ -426,7 +470,9 @@
       "max_level": 34,
       "base_points": 6.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -447,7 +493,9 @@
       "max_level": 40,
       "base_points": 187.0,
       "points_per_level": 2.29999995232,
-      "variance": 0.27118644118
+      "variance": 0.27118644118,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 8402,
@@ -458,7 +506,9 @@
       "max_level": 40,
       "base_points": 6.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -479,7 +529,9 @@
       "max_level": 46,
       "base_points": 235.0,
       "points_per_level": 2.20000004768,
-      "variance": 0.26229506731
+      "variance": 0.26229506731,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 10148,
@@ -490,7 +542,9 @@
       "max_level": 46,
       "base_points": 8.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -511,7 +565,9 @@
       "max_level": 52,
       "base_points": 300.0,
       "points_per_level": 2.40000009537,
-      "variance": 0.25389754772
+      "variance": 0.25389754772,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 10149,
@@ -522,7 +578,9 @@
       "max_level": 52,
       "base_points": 10.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -543,7 +601,9 @@
       "max_level": 58,
       "base_points": 374.0,
       "points_per_level": 2.70000004768,
-      "variance": 0.24723246694
+      "variance": 0.24723246694,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 10150,
@@ -554,7 +614,9 @@
       "max_level": 58,
       "base_points": 12.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -575,7 +637,9 @@
       "max_level": 60,
       "base_points": 451.0,
       "points_per_level": 3.0,
-      "variance": 0.24137930572
+      "variance": 0.24137930572,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 10151,
@@ -586,7 +650,9 @@
       "max_level": 60,
       "base_points": 14.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    },
@@ -607,7 +673,9 @@
       "max_level": 60,
       "base_points": 483.0,
       "points_per_level": 3.0,
-      "variance": 0.24188791215
+      "variance": 0.24188791215,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 25306,
@@ -618,7 +686,9 @@
       "max_level": 60,
       "base_points": 15.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
      }
     ]
    }
@@ -641,7 +711,9 @@
       "max_level": 11,
       "base_points": 28.0,
       "points_per_level": 0.60000002384,
-      "variance": 0.28571429849
+      "variance": 0.28571429849,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -662,7 +734,9 @@
       "max_level": 19,
       "base_points": 58.0,
       "points_per_level": 1.0,
-      "variance": 0.21875
+      "variance": 0.21875,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -683,7 +757,9 @@
       "max_level": 27,
       "base_points": 100.0,
       "points_per_level": 1.39999997616,
-      "variance": 0.2086956501
+      "variance": 0.2086956501,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -704,7 +780,9 @@
       "max_level": 35,
       "base_points": 163.0,
       "points_per_level": 1.79999995232,
-      "variance": 0.18378378451
+      "variance": 0.18378378451,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -725,7 +803,9 @@
       "max_level": 43,
       "base_points": 236.0,
       "points_per_level": 2.20000004768,
-      "variance": 0.18045112491
+      "variance": 0.18045112491,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -746,7 +826,9 @@
       "max_level": 51,
       "base_points": 331.0,
       "points_per_level": 2.59999990463,
-      "variance": 0.17079889774
+      "variance": 0.17079889774,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -767,7 +849,9 @@
       "max_level": 59,
       "base_points": 438.0,
       "points_per_level": 3.0,
-      "variance": 0.16595745087
+      "variance": 0.16595745087,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    }
@@ -790,7 +874,9 @@
       "max_level": 26,
       "base_points": 39.0,
       "points_per_level": 0.80000001192,
-      "variance": 0.20338982344
+      "variance": 0.20338982344,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -811,7 +897,9 @@
       "max_level": 32,
       "base_points": 55.0,
       "points_per_level": 1.0,
-      "variance": 0.1882352978
+      "variance": 0.1882352978,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -832,7 +920,9 @@
       "max_level": 38,
       "base_points": 69.0,
       "points_per_level": 1.0,
-      "variance": 0.18181818724
+      "variance": 0.18181818724,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -853,7 +943,9 @@
       "max_level": 44,
       "base_points": 93.0,
       "points_per_level": 1.20000004768,
-      "variance": 0.1780821979
+      "variance": 0.1780821979,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -874,7 +966,9 @@
       "max_level": 50,
       "base_points": 116.0,
       "points_per_level": 1.39999997616,
-      "variance": 0.16949152946
+      "variance": 0.16949152946,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -895,7 +989,9 @@
       "max_level": 56,
       "base_points": 150.0,
       "points_per_level": 1.5,
-      "variance": 0.1780821979
+      "variance": 0.1780821979,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    },
@@ -916,7 +1012,9 @@
       "max_level": 60,
       "base_points": 178.0,
       "points_per_level": 1.70000004768,
-      "variance": 0.16535432637
+      "variance": 0.16535432637,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
      }
     ]
    }
@@ -939,7 +1037,9 @@
       "max_level": 24,
       "base_points": 110.0,
       "points_per_level": 1.5,
-      "variance": 0.2804878056
+      "variance": 0.2804878056,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 11366,
@@ -950,7 +1050,9 @@
       "max_level": 24,
       "base_points": 11.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    },
@@ -971,7 +1073,9 @@
       "max_level": 30,
       "base_points": 134.0,
       "points_per_level": 1.70000004768,
-      "variance": 0.26923078299
+      "variance": 0.26923078299,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 12505,
@@ -982,7 +1086,9 @@
       "max_level": 30,
       "base_points": 14.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    },
@@ -1003,7 +1109,9 @@
       "max_level": 36,
       "base_points": 191.0,
       "points_per_level": 2.09999990463,
-      "variance": 0.24742268026
+      "variance": 0.24742268026,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 12522,
@@ -1014,7 +1122,9 @@
       "max_level": 36,
       "base_points": 19.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    },
@@ -1035,7 +1145,9 @@
       "max_level": 42,
       "base_points": 245.0,
       "points_per_level": 2.40000009537,
-      "variance": 0.24064171314
+      "variance": 0.24064171314,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 12523,
@@ -1046,7 +1158,9 @@
       "max_level": 42,
       "base_points": 25.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    },
@@ -1067,7 +1181,9 @@
       "max_level": 48,
       "base_points": 311.0,
       "points_per_level": 2.70000004768,
-      "variance": 0.23427331448
+      "variance": 0.23427331448,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 12524,
@@ -1078,7 +1194,9 @@
       "max_level": 48,
       "base_points": 31.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    },
@@ -1099,7 +1217,9 @@
       "max_level": 54,
       "base_points": 394.0,
       "points_per_level": 3.0,
-      "variance": 0.22574955225
+      "variance": 0.22574955225,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 12525,
@@ -1110,7 +1230,9 @@
       "max_level": 54,
       "base_points": 38.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    },
@@ -1131,7 +1253,9 @@
       "max_level": 60,
       "base_points": 481.0,
       "points_per_level": 3.40000009537,
-      "variance": 0.22222222388
+      "variance": 0.22222222388,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 12526,
@@ -1142,7 +1266,9 @@
       "max_level": 60,
       "base_points": 46.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    },
@@ -1163,7 +1289,9 @@
       "max_level": 60,
       "base_points": 583.0,
       "points_per_level": 4.59999990463,
-      "variance": 0.21668742597
+      "variance": 0.21668742597,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
      },
      {
       "spell_id": 18809,
@@ -1174,7 +1302,9 @@
       "max_level": 60,
       "base_points": 53.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
      }
     ]
    }
@@ -1197,7 +1327,9 @@
       "max_level": 48,
       "base_points": 100.0,
       "points_per_level": 1.29999995232,
-      "variance": 0.15340909362
+      "variance": 0.15340909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      },
      {
       "spell_id": 401502,
@@ -1208,7 +1340,9 @@
       "max_level": 48,
       "base_points": 9.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 3000
      }
     ]
    },
@@ -1229,7 +1363,9 @@
       "max_level": 58,
       "base_points": 182.0,
       "points_per_level": 1.70000004768,
-      "variance": 0.15340909362
+      "variance": 0.15340909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      },
      {
       "spell_id": 1237312,
@@ -1240,7 +1376,9 @@
       "max_level": 58,
       "base_points": 13.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 3000
      }
     ]
    },
@@ -1261,7 +1399,9 @@
       "max_level": 60,
       "base_points": 292.0,
       "points_per_level": 2.09999990463,
-      "variance": 0.15340909362
+      "variance": 0.15340909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
      },
      {
       "spell_id": 1237313,
@@ -1272,7 +1412,9 @@
       "max_level": 60,
       "base_points": 19.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 3000
      }
     ]
    }
@@ -1295,7 +1437,9 @@
       "max_level": 26,
       "base_points": 28.0,
       "points_per_level": 0.34999999404,
-      "variance": 0.16666667163
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
      }
     ]
    },
@@ -1316,7 +1460,9 @@
       "max_level": 32,
       "base_points": 36.0,
       "points_per_level": 0.40000000596,
-      "variance": 0.16666667163
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
      }
     ]
    },
@@ -1337,7 +1483,9 @@
       "max_level": 40,
       "base_points": 45.0,
       "points_per_level": 0.5,
-      "variance": 0.16666667163
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
      }
     ]
    },
@@ -1358,7 +1506,9 @@
       "max_level": 48,
       "base_points": 79.0,
       "points_per_level": 0.69999998808,
-      "variance": 0.16666667163
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
      }
     ]
    },
@@ -1379,7 +1529,9 @@
       "max_level": 56,
       "base_points": 98.0,
       "points_per_level": 0.69999998808,
-      "variance": 0.16666667163
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
      }
     ]
    },
@@ -1400,7 +1552,9 @@
       "max_level": 60,
       "base_points": 145.0,
       "points_per_level": 0.89999997616,
-      "variance": 0.16666667163
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
      }
     ]
    }
@@ -1423,7 +1577,9 @@
       "max_level": 28,
       "base_points": 54.0,
       "points_per_level": 0.89999997616,
-      "variance": 0.15102040768
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
      }
     ]
    },
@@ -1444,7 +1600,9 @@
       "max_level": 38,
       "base_points": 130.0,
       "points_per_level": 1.39999997616,
-      "variance": 0.15102040768
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
      }
     ]
    },
@@ -1465,7 +1623,9 @@
       "max_level": 48,
       "base_points": 169.0,
       "points_per_level": 1.60000002384,
-      "variance": 0.15102040768
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
      }
     ]
    },
@@ -1486,7 +1646,9 @@
       "max_level": 58,
       "base_points": 274.0,
       "points_per_level": 2.09999990463,
-      "variance": 0.15102040768
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
      }
     ]
    },
@@ -1507,7 +1669,9 @@
       "max_level": 60,
       "base_points": 394.0,
       "points_per_level": 2.59999990463,
-      "variance": 0.15102040768
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
      }
     ]
    }
@@ -1530,7 +1694,9 @@
       "max_level": 12,
       "base_points": 24.0,
       "points_per_level": 0.30000001192,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    },
@@ -1551,7 +1717,9 @@
       "max_level": 20,
       "base_points": 31.0,
       "points_per_level": 0.40000000596,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    },
@@ -1572,7 +1740,9 @@
       "max_level": 28,
       "base_points": 44.0,
       "points_per_level": 0.5,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    },
@@ -1593,7 +1763,9 @@
       "max_level": 36,
       "base_points": 66.0,
       "points_per_level": 0.60000002384,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    },
@@ -1614,7 +1786,9 @@
       "max_level": 44,
       "base_points": 95.0,
       "points_per_level": 0.69999998808,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    },
@@ -1635,7 +1809,9 @@
       "max_level": 52,
       "base_points": 130.0,
       "points_per_level": 0.80000001192,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    },
@@ -1656,7 +1832,9 @@
       "max_level": 60,
       "base_points": 171.0,
       "points_per_level": 0.89999997616,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    },
@@ -1677,7 +1855,9 @@
       "max_level": 60,
       "base_points": 209.0,
       "points_per_level": 1.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
      }
     ]
    }
@@ -1700,7 +1880,9 @@
       "max_level": 15,
       "base_points": 20.0,
       "points_per_level": 0.5,
-      "variance": 0.10000000149
+      "variance": 0.10000000149,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
      }
     ]
    },
@@ -1721,7 +1903,9 @@
       "max_level": 31,
       "base_points": 34.0,
       "points_per_level": 0.5,
-      "variance": 0.11428570747
+      "variance": 0.11428570747,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
      }
     ]
    },
@@ -1742,7 +1926,9 @@
       "max_level": 45,
       "base_points": 53.0,
       "points_per_level": 0.5,
-      "variance": 0.10909090936
+      "variance": 0.10909090936,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
      }
     ]
    },
@@ -1763,7 +1949,9 @@
       "max_level": 59,
       "base_points": 73.0,
       "points_per_level": 0.5,
-      "variance": 0.10666666925
+      "variance": 0.10666666925,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
      }
     ]
    }
@@ -1786,7 +1974,9 @@
       "max_level": 31,
       "base_points": 97.0,
       "points_per_level": 0.80000001192,
-      "variance": 0.09708737582
+      "variance": 0.09708737582,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -1807,7 +1997,9 @@
       "max_level": 39,
       "base_points": 144.0,
       "points_per_level": 1.0,
-      "variance": 0.09150326997
+      "variance": 0.09150326997,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -1828,7 +2020,9 @@
       "max_level": 47,
       "base_points": 204.0,
       "points_per_level": 1.20000004768,
-      "variance": 0.09389671683
+      "variance": 0.09389671683,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -1849,7 +2043,9 @@
       "max_level": 55,
       "base_points": 267.0,
       "points_per_level": 1.29999995232,
-      "variance": 0.09386281669
+      "variance": 0.09386281669,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -1870,7 +2066,9 @@
       "max_level": 60,
       "base_points": 340.0,
       "points_per_level": 1.5,
-      "variance": 0.08571428806
+      "variance": 0.08571428806,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    }
@@ -1893,7 +2091,9 @@
       "max_level": 19,
       "base_points": 32.0,
       "points_per_level": 0.40000000596,
-      "variance": 0.11764705926
+      "variance": 0.11764705926,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
      }
     ]
    },
@@ -1914,7 +2114,9 @@
       "max_level": 27,
       "base_points": 55.0,
       "points_per_level": 0.60000002384,
-      "variance": 0.10000000149
+      "variance": 0.10000000149,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
      }
     ]
    },
@@ -1935,7 +2137,9 @@
       "max_level": 35,
       "base_points": 94.0,
       "points_per_level": 0.89999997616,
-      "variance": 0.07920791954
+      "variance": 0.07920791954,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
      }
     ]
    },
@@ -1956,7 +2160,9 @@
       "max_level": 43,
       "base_points": 135.0,
       "points_per_level": 0.89999997616,
-      "variance": 0.08275862038
+      "variance": 0.08275862038,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
      }
     ]
    },
@@ -1977,7 +2183,9 @@
       "max_level": 51,
       "base_points": 183.0,
       "points_per_level": 1.10000002384,
-      "variance": 0.08247422427
+      "variance": 0.08247422427,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
      }
     ]
    },
@@ -1998,7 +2206,9 @@
       "max_level": 59,
       "base_points": 242.0,
       "points_per_level": 1.29999995232,
-      "variance": 0.07905138284
+      "variance": 0.07905138284,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
      }
     ]
    }
@@ -2021,7 +2231,9 @@
       "max_level": 25,
       "base_points": 24.0,
       "points_per_level": 0.10000000149,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
      }
     ]
    },
@@ -2042,7 +2254,9 @@
       "max_level": 33,
       "base_points": 42.0,
       "points_per_level": 0.20000000298,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
      }
     ]
    },
@@ -2063,7 +2277,9 @@
       "max_level": 41,
       "base_points": 62.0,
       "points_per_level": 0.20000000298,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
      }
     ]
    },
@@ -2084,7 +2300,9 @@
       "max_level": 49,
       "base_points": 87.0,
       "points_per_level": 0.30000001192,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
      }
     ]
    },
@@ -2105,7 +2323,9 @@
       "max_level": 57,
       "base_points": 114.0,
       "points_per_level": 0.30000001192,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
      }
     ]
    },
@@ -2126,7 +2346,9 @@
       "max_level": 60,
       "base_points": 146.0,
       "points_per_level": 0.40000000596,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
      }
     ]
    }
@@ -2149,7 +2371,9 @@
       "max_level": 21,
       "base_points": 60.0,
       "points_per_level": 0.60000002384,
-      "variance": 0.26666668057
+      "variance": 0.26666668057,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
      },
      {
       "spell_id": 1279983,
@@ -2160,7 +2384,9 @@
       "max_level": 21,
       "base_points": 11.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
      }
     ]
    },
@@ -2181,7 +2407,9 @@
       "max_level": 29,
       "base_points": 109.0,
       "points_per_level": 0.80000001192,
-      "variance": 0.23853211105
+      "variance": 0.23853211105,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
      },
      {
       "spell_id": 1279985,
@@ -2192,7 +2420,9 @@
       "max_level": 29,
       "base_points": 21.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
      }
     ]
    },
@@ -2213,7 +2443,9 @@
       "max_level": 37,
       "base_points": 173.0,
       "points_per_level": 1.0,
-      "variance": 0.21965317428
+      "variance": 0.21965317428,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
      },
      {
       "spell_id": 1279987,
@@ -2224,7 +2456,9 @@
       "max_level": 37,
       "base_points": 33.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
      }
     ]
    },
@@ -2245,7 +2479,9 @@
       "max_level": 45,
       "base_points": 246.0,
       "points_per_level": 1.29999995232,
-      "variance": 0.21138212085
+      "variance": 0.21138212085,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
      },
      {
       "spell_id": 1279988,
@@ -2256,7 +2492,9 @@
       "max_level": 45,
       "base_points": 47.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
      }
     ]
    },
@@ -2277,7 +2515,9 @@
       "max_level": 53,
       "base_points": 325.0,
       "points_per_level": 1.5,
-      "variance": 0.2092307657
+      "variance": 0.2092307657,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
      },
      {
       "spell_id": 1279989,
@@ -2288,7 +2528,9 @@
       "max_level": 53,
       "base_points": 64.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
      }
     ]
    },
@@ -2309,7 +2551,9 @@
       "max_level": 60,
       "base_points": 417.0,
       "points_per_level": 1.70000004768,
-      "variance": 0.2014388442
+      "variance": 0.2014388442,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
      },
      {
       "spell_id": 1279990,
@@ -2320,7 +2564,9 @@
       "max_level": 60,
       "base_points": 83.0,
       "points_per_level": 0.0,
-      "variance": 0.0
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
      }
     ]
    }
@@ -2343,7 +2589,9 @@
       "max_level": 36,
       "base_points": 163.0,
       "points_per_level": 1.0,
-      "variance": 0.1882352978
+      "variance": 0.1882352978,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -2364,7 +2612,9 @@
       "max_level": 42,
       "base_points": 212.0,
       "points_per_level": 1.20000004768,
-      "variance": 0.18099547923
+      "variance": 0.18099547923,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -2385,7 +2635,9 @@
       "max_level": 50,
       "base_points": 293.0,
       "points_per_level": 1.39999997616,
-      "variance": 0.17161716521
+      "variance": 0.17161716521,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -2406,7 +2658,9 @@
       "max_level": 58,
       "base_points": 389.0,
       "points_per_level": 1.60000002384,
-      "variance": 0.17042607069
+      "variance": 0.17042607069,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    },
@@ -2427,7 +2681,9 @@
       "max_level": 60,
       "base_points": 493.0,
       "points_per_level": 1.89999997616,
-      "variance": 0.16302186251
+      "variance": 0.16302186251,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
      }
     ]
    }
@@ -2438,7 +2694,10 @@
   "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
   "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
   "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)",
-  "utility : armures du Mage, niveau d'apprentissage (SpellLevels.BaseLevel) et effets retenus par decode_rules.json.utility_spells"
+  "bonus_coefficient : EffectBonusCoefficient de l'effet de dégâts (par coup, par tic ou par éclair canalisé)",
+  "period_ms : EffectAuraPeriod de l'aura qui porte l'effet (celle du sort parent pour un sort déclenché), 0 pour un coup direct",
+  "utility : armures du Mage, niveau d'apprentissage (SpellLevels.BaseLevel) et effets retenus par decode_rules.json.utility_spells",
+  "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), cumuls maximum, durée, écoles touchées"
  ],
  "utility": {
   "frost_armor": [
@@ -2541,5 +2800,18 @@
     }
    }
   ]
+ },
+ "auras": {
+  "fire_vulnerability": {
+   "spell_id": 22959,
+   "source_spell_id": 11095,
+   "talent": "improvedScorch",
+   "pct_per_stack": 3,
+   "max_stacks": 5,
+   "duration_ms": 30000,
+   "schools": [
+    "fire"
+   ]
+  }
  }
 }
