@@ -120,3 +120,45 @@ def test_chart_leveling_bad_range(capsys, make_deps, tmp_path):
     argv = ["chart", "leveling", "--out", str(tmp_path / "x.png"), "--from", "20", "--to", "10", "--json"]
     code, out, _ = run(capsys, argv, make_deps())
     assert code == 2 and json.loads(out)["error"]["code"] == "invalid_argument"
+
+
+# --- T04e : option --low-level-penalty et hypothèses de provenance ------------------------------------------------
+
+T04E_NOTES = ("EffectBonusCoefficient", "pénalité des sorts de bas niveau", "multipliés entre sources")
+
+
+def test_sim_leveling_low_level_penalty_option(capsys, make_deps, game_data):
+    base = ["sim", "leveling", "--level", "12", "--n", "30", "--json"]
+    code, out, _ = run(capsys, [*base, "--low-level-penalty", "off"], make_deps())
+    assert code == 0
+    payload = json.loads(out)
+    assert payload["options"]["low_level_penalty"] is False
+    assert payload["analytic"] == pytest.approx(kill_analytic(game_data, 12, {}, low_level_penalty=False), rel=1e-12)
+    assert any("pénalité des sorts de bas niveau : non appliquée" in a for a in payload["provenance"]["assumptions"])
+    code, on, _ = run(capsys, [*base, "--low-level-penalty", "on"], make_deps())
+    code_default, default, _ = run(capsys, base, make_deps())
+    assert code == code_default == 0
+    assert json.loads(on)["analytic"] == json.loads(default)["analytic"]
+    assert json.loads(default)["options"]["low_level_penalty"] is None
+    assert any(
+        "pénalité des sorts de bas niveau : appliquée" in a for a in json.loads(default)["provenance"]["assumptions"]
+    )
+
+
+def test_sim_leveling_low_level_penalty_off_is_refused_in_seed_mode(capsys, make_deps):
+    argv = ["sim", "leveling", "--level", "12", "--n", "5", "--rules", "seed", "--low-level-penalty", "off", "--json"]
+    code, out, _ = run(capsys, argv, make_deps())
+    assert code == 2 and json.loads(out)["error"]["code"] == "invalid_argument"
+
+
+def test_sim_leveling_t04e_assumptions(capsys, make_deps):
+    """Les trois hypothèses de T04e sont dans la provenance en forever, absentes en seed."""
+    base = ["sim", "leveling", "--level", "12", "--n", "5", "--json"]
+    code, out, _ = run(capsys, base, make_deps())
+    forever = json.loads(out)["provenance"]["assumptions"]
+    code_seed, out_seed, _ = run(capsys, [*base, "--rules", "seed"], make_deps())
+    seed = json.loads(out_seed)["provenance"]["assumptions"]
+    assert code == code_seed == 0
+    for note in T04E_NOTES:
+        assert any(note in a for a in forever), note
+        assert not any(note in a for a in seed), note

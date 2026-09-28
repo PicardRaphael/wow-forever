@@ -97,6 +97,17 @@ CASES = {
     "sim-leveling": (["sim", "leveling", "--level", "12", "--n", "20"], 0, None),
     "sim-leveling-illegal": (["sim", "leveling", "--level", "12", "--talents", "improvedFrostbolt=5"], 2, None),
     "sim-leveling-integrity": (["sim", "leveling", "--level", "12", "--n", "5"], 3, "tamper"),
+    # T04e : pénalité des sorts de bas niveau
+    "sim-leveling-low-level-off": (
+        ["sim", "leveling", "--level", "12", "--n", "5", "--low-level-penalty", "off"],
+        0,
+        None,
+    ),
+    "sim-leveling-low-level-seed": (
+        ["sim", "leveling", "--level", "12", "--n", "5", "--rules", "seed", "--low-level-penalty", "off"],
+        2,
+        None,
+    ),
     "chart-leveling": (
         ["chart", "leveling", "--out", "{tmp}/c.png", "--from", "12", "--to", "13", "--n", "5"],
         0,

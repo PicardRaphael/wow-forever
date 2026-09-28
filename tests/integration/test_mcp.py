@@ -172,3 +172,13 @@ def test_lookup_zones(make_deps):
     assert validate_provenance(r.structured_content["provenance"]) == []
     r = call(make_deps(), lambda c: c.call_tool("forever_lookup", {**args, "questie": questie + "-absent"}))
     assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
+
+
+def test_sim_leveling_low_level_penalty(make_deps):
+    """T04e : `low_level_penalty` paramètre de forever_sim_leveling ; False refusé avec rules seed."""
+    args = {"level": 12, "n": 10, "low_level_penalty": False}
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
+    assert not r.is_error and r.structured_content["options"]["low_level_penalty"] is False
+    r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", {**args, "rules": "seed"}))
+    assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
+    assert validate_provenance(r.structured_content["provenance"]) == []

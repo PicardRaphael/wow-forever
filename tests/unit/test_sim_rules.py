@@ -125,3 +125,40 @@ def test_cli_armor_and_rules(capsys, make_deps):
 def test_cli_mage_armor_below_its_level_is_refused(capsys, make_deps):
     code, out = run_json(capsys, ["sim", "leveling", "--level", "30", "--n", "10", "--armor", "mage"], make_deps())
     assert code == 2 and out["error"]["code"] == "invalid_argument" and "Mage Armor" in out["error"]["message"]
+
+
+# --- T04e : pénalité des sorts de bas niveau, coefficients du client dans les simulateurs --------------------------
+
+
+def test_low_level_penalty_option_changes_the_forever_result(game_data):
+    """Niveau 12, frost : Frostbolt r2 (niveau 8) porte la pénalité (× 0,55, suppose) ; sans elle, le combat est plus
+    court (effet déterministe sur l'analytique) et le Monte Carlo change ; `True` vaut le défaut des données."""
+    default = kill_analytic(game_data, 12, {})
+    off = kill_analytic(game_data, 12, {}, low_level_penalty=False)
+    assert off["combat"] < default["combat"]
+    assert kill_analytic(game_data, 12, {}, low_level_penalty=True) == default
+    assert mc(game_data, 12, {}, n=40, seed=2, low_level_penalty=False) != mc(game_data, 12, {}, n=40, seed=2)
+
+
+def test_low_level_penalty_option_is_checked(game_data):
+    assert options_with_defaults(game_data, "frost", {})["low_level_penalty"] is None
+    with pytest.raises(ValueError, match="low_level_penalty"):
+        options_with_defaults(game_data, "frost", {"rules": "seed", "low_level_penalty": False})
+    with pytest.raises(ValueError, match="low_level_penalty"):
+        options_with_defaults(game_data, "frost", {"low_level_penalty": "non"})
+    assert options_with_defaults(game_data, "frost", {"rules": "seed", "low_level_penalty": True})["rules"] == "seed"
+
+
+def test_ice_lance_damage_does_not_depend_on_spell_power(game_data):
+    """Ice Lance au niveau 24 : coefficient du client nul (probable, test en jeu E4) : mêmes dégâts à 0 et à 100 de
+    puissance des sorts en forever ; en seed (0,1429), les dégâts suivent la puissance."""
+    from forever.engine import character, expected_cast
+
+    pts = {"iceLance": 1}
+
+    def lance(sp, **kw):
+        ch = character(game_data, 24, "Orc", {"sp": sp})
+        return expected_cast(game_data, "ice_lance", 24, pts, ch, frozen=True, **kw)["direct_per_hit"]
+
+    assert lance(0) == lance(100)
+    assert lance(0, rules="seed") < lance(100, rules="seed")
