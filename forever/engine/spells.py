@@ -127,7 +127,7 @@ def coefficient(
 
     `rules="forever"` (défaut) : coefficients du client (`spell_scaling.json`, EffectBonusCoefficient) : somme des
     composants `direct` et des composants `channel` × leurs tics, × pénalité des sorts de bas niveau
-    (`low_level_factor`). `rules="seed"` : formule du seed (incantation / 3,5, bornes, canalisé, ralenti,
+    (`low_level_factor`). `rules="seed"` : formule du seed (incantation / `coefficient.cast_divisor`, bornes, canalisé, ralenti,
     coefficients fixes), pénalité toujours appliquée.
 
     Registre : G4"""

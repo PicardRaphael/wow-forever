@@ -301,3 +301,13 @@ def test_monte_carlo_uses_the_client_dot_period(make_deps, data_copy):
     args = (20, {}, "Orc", "fire", 40)
     assert mc(gd, *args, seed=3, spell_level="rank") != mc(base, *args, seed=3, spell_level="rank")
     assert mc(gd, *args, seed=3, **seed_mode) == mc(base, *args, seed=3, **seed_mode)
+
+
+def test_dot_sp_per_tick(game_data, ch534):
+    """Part de puissance d'un tic : coefficient par tic du client × puissance des sorts ; 0 en seed et sans DoT."""
+    from forever.engine.damage import dot_sp_per_tick
+
+    r8 = rank_of(game_data, "pyroblast", 8)
+    assert dot_sp_per_tick(game_data, "pyroblast", r8, ch534) == approx(0.15000000596 * 534)
+    assert dot_sp_per_tick(game_data, "pyroblast", r8, ch534, rules="seed") == 0.0
+    assert dot_sp_per_tick(game_data, "frostbolt", rank_of(game_data, "frostbolt", 11), ch534) == 0.0

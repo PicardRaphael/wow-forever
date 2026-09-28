@@ -4,11 +4,11 @@ from __future__ import annotations
 
 from forever.engine.casting import cast_time
 from forever.engine.crit import crit_chance, crit_mult
-from forever.engine.damage import dmg_mult, spell_power
+from forever.engine.damage import dmg_mult, dot_sp_per_tick, spell_power
 from forever.engine.hit import hit_chance
 from forever.engine.mana import clearcast_cost_factor, mana_cost
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, CastEstimate, Character, GameData, Points
-from forever.engine.spells import best_rank, coefficient, dot_coefficient, dot_ticks, rank_damage
+from forever.engine.spells import best_rank, coefficient, dot_ticks, rank_damage
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
@@ -63,8 +63,8 @@ def expected_cast(
     direct = base * dm * (1 + crit * (cm - 1))
     dot_sp = 0.0  # part de la puissance des sorts sur la durée du DoT (forever : coefficient par tic du client)
     if r.dot_total:
-        per_tick = dot_coefficient(gd, key, r, rules=rules, low_level_penalty=low_level_penalty)
-        dot_sp = dot_ticks(gd, key, r, rules=rules) * per_tick * sp
+        per_tick = dot_sp_per_tick(gd, key, r, ch, buffs, rules=rules, low_level_penalty=low_level_penalty)
+        dot_sp = dot_ticks(gd, key, r, rules=rules) * per_tick
     dot = (r.dot_total + dot_sp) * dm * (1 + (crit * (cm - 1) if gd.rules.dot_can_crit else 0.0))
     ignite = 0.0
     if school in SCHOOL_FIRE:

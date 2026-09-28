@@ -185,7 +185,7 @@ mechanics:
     description: "Les effets sur la durée critiquent (Forever)"
     forever: modifie
     statut: teste
-    certitude: certain
+    certitude: probable
     sources:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
@@ -207,9 +207,10 @@ mechanics:
       - tests/unit/test_client_coefficients.py::test_pyroblast_r1_tick
       - tests/unit/test_client_coefficients.py::test_fireball_dot_has_no_spell_power_in_log
       - tests/unit/test_client_coefficients.py::test_monte_carlo_uses_the_client_dot_period
+      - tests/unit/test_client_coefficients.py::test_dot_sp_per_tick
     tolerance: null
     formule: "DoT = (total + tics × coefficient par tic × puissance des sorts) × mult_dégâts × (1 + crit × (mult_crit − 1)) si les DoT critiquent ; tic = (total / tics + coefficient par tic × puissance des sorts) × mult_dégâts"
-    note: "T04b : dans le Monte Carlo, chaque tic critique si combat_rules.dot_can_crit (forever/engine/damage.py : dot_tick_times, dot_tick_damage). T04e : mode forever, coefficient par tic, période et nombre de tics lus dans le client (Pyroblast et Frostfire Bolt : 3 s ; Fireball, Flamestrike : 2 s ; Fireball et Frostfire Bolt : coefficient 0, confirmé par le journal pour Fireball) ; mode seed : un tic toutes les leveling.dot_tick_s, sans puissance des sorts. Puissance des sorts et période de Pyroblast : test en jeu E3."
+    note: "T04b : dans le Monte Carlo, chaque tic critique si combat_rules.dot_can_crit (forever/engine/damage.py : dot_tick_times, dot_tick_damage). T04e : mode forever, coefficient par tic, période et nombre de tics lus dans le client (Pyroblast et Frostfire Bolt : 3 s ; Fireball, Flamestrike : 2 s ; Fireball et Frostfire Bolt : coefficient 0, confirmé par le journal pour Fireball) ; mode seed : un tic toutes les leveling.dot_tick_s, sans puissance des sorts. Puissance des sorts et période de Pyroblast : test en jeu E3. Certitude : critique des DoT certain ; coefficient et période des tics lus dans le client, probable jusqu'au test E3 ; pénalité de bas niveau sur le tic, suppose."
   - id: A18
     categorie: attaque
     description: "Ignite : cumul, rafraîchissement"

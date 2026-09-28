@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from typing import NamedTuple
 
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, Character, GameData, Points, Rank
-from forever.engine.spells import check_rules, coefficient
+from forever.engine.spells import check_rules, coefficient, dot_coefficient
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents de dégâts sont exprimés en %
@@ -138,6 +138,24 @@ def roll_base_damage(
     if frozen and frozen_mult is not None:
         base *= frozen_mult
     return base
+
+
+def dot_sp_per_tick(
+    gd: GameData,
+    key: str,
+    rank: Rank,
+    ch: Character,
+    buffs: Buffs | None = None,
+    *,
+    rules: str = "forever",
+    low_level_penalty: bool | None = None,
+) -> float:
+    """Part de la puissance des sorts ajoutée à chaque tic du DoT d'un rang : `dot_coefficient` × puissance des sorts
+    (0 en `seed` ou sans coefficient par tic).
+
+    Registre : A17, G4"""
+    c = dot_coefficient(gd, key, rank, rules=rules, low_level_penalty=low_level_penalty)
+    return c * spell_power(ch, buffs) if c else 0.0
 
 
 def dot_tick_damage(gd: GameData, dot_total: float, dmg_mult: float, ticks: int, *, sp_per_tick: float = 0.0) -> float:
