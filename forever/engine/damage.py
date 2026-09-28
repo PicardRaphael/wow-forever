@@ -6,10 +6,11 @@ from collections.abc import Sequence
 from typing import NamedTuple
 
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, Character, GameData, Points, Rank
-from forever.engine.spells import coefficient
+from forever.engine.spells import check_rules, coefficient
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents de dégâts sont exprimés en %
+MS_PER_S = 1000.0  # conversion d'unité : périodes du client en millisecondes
 
 
 def dmg_mult(gd: GameData, school: str, pts: Points, buffs: Buffs | None = None) -> float:
@@ -34,19 +35,27 @@ def spell_power(ch: Character, buffs: Buffs | None = None) -> float:
     return ch.sp * (1 + buffs.get("sp_pct", 0.0)) + buffs.get("sp_flat", 0.0)
 
 
-def dot_tick_times(gd: GameData, duration_s: float) -> list[float]:
-    """Instants des tics d'un DoT après l'impact : un tic par `leveling.dot_tick_s`, au moins un (seed).
+def dot_tick_times(gd: GameData, duration_s: float, period_s: float | None = None) -> list[float]:
+    """Instants des tics d'un DoT après l'impact : un tic par période, au moins un ; période `period_s`
+    (`dot_tick_period_s`), `leveling.dot_tick_s` si elle n'est pas donnée (seed).
 
     Registre : A17"""
-    tick = gd.leveling.dot_tick_s
+    tick = gd.leveling.dot_tick_s if period_s is None else period_s
     return [tick * i for i in range(1, max(1, int(duration_s / tick)) + 1)]
 
 
 def dot_tick_period_s(gd: GameData, key: str, rank: Rank, *, rules: str = "forever") -> float:
-    """Période des tics du DoT d'un rang (s).
+    """Période des tics du DoT d'un rang (s) : période de l'aura du client (`period_ms` du composant `dot`) en
+    `forever` ; `leveling.dot_tick_s` pour tout DoT en `seed`. ValueError si le rang n'a pas de DoT (`forever`).
 
     Registre : A17"""
-    raise NotImplementedError
+    check_rules(rules, None)
+    if rules == "seed":
+        return gd.leveling.dot_tick_s
+    periods = {c.period_ms for c in gd.scaling[key][rank.position - 1].components if c.kind == "dot"}
+    if len(periods) != 1:
+        raise ValueError(f"{key} rang {rank.position} : {len(periods)} période(s) de DoT, une attendue")
+    return periods.pop() / MS_PER_S
 
 
 def ignite_tick_times(gd: GameData) -> list[float]:
@@ -82,11 +91,12 @@ def roll_base_damage(
     return base
 
 
-def dot_tick_damage(gd: GameData, dot_total: float, dmg_mult: float, ticks: int) -> float:
-    """Dégâts d'un tic de DoT, hors critique : total du rang × multiplicateur de dégâts, réparti sur les tics.
+def dot_tick_damage(gd: GameData, dot_total: float, dmg_mult: float, ticks: int, *, sp_per_tick: float = 0.0) -> float:
+    """Dégâts d'un tic de DoT, hors critique : (total du rang réparti sur les tics + part de la puissance des sorts
+    par tic, `dot_coefficient` × puissance des sorts) × multiplicateur de dégâts.
 
     Registre : A17"""
-    return dot_total * dmg_mult / ticks
+    return (dot_total + sp_per_tick * ticks) * dmg_mult / ticks
 
 
 def ignite_damage(gd: GameData, pts: Points, crit_damage: float) -> float:

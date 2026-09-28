@@ -33,12 +33,14 @@ from forever.engine.character import character
 from forever.engine.damage import (
     IgniteState,
     dot_tick_damage,
+    dot_tick_period_s,
     dot_tick_times,
     ignite_damage,
     ignite_tick_times,
     ignite_ticks_due,
     roll_base_damage,
     roll_ignite,
+    spell_power,
 )
 from forever.engine.mana import (
     arcane_blast_cost,
@@ -68,7 +70,7 @@ from forever.engine.movement import (
     spell_range,
     travel_time,
 )
-from forever.engine.spells import SPELL_LEVELS, best_rank
+from forever.engine.spells import SPELL_LEVELS, best_rank, dot_coefficient
 from forever.engine.talents import talent_value
 
 ROTATIONS = {"frost": "frostbolt", "fire": "fireball", "arcane": "arcane_blast"}  # sort principal de chaque rotation
@@ -291,8 +293,9 @@ def kill_mc(
             if rng.random() < clearcast:
                 s["cc"] = True
             if r.dot_total:
-                ticks = dot_tick_times(gd, r.dot_duration_s)
-                tick = dot_tick_damage(gd, r.dot_total, e["dmg_mult"], len(ticks))
+                ticks = dot_tick_times(gd, r.dot_duration_s, dot_tick_period_s(gd, key, r, rules=o["rules"]))
+                per_tick = dot_coefficient(gd, key, r, rules=o["rules"]) * spell_power(ch)
+                tick = dot_tick_damage(gd, r.dot_total, e["dmg_mult"], len(ticks), sp_per_tick=per_tick)
                 for at in ticks:
                     tick_crit = gd.rules.dot_can_crit and rng.random() < e["crit"]
                     dots.append((s["t"] + travel + at, tick * (e["crit_mult"] if tick_crit else 1.0)))

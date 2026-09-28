@@ -80,7 +80,7 @@ def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:
 RULES = ("forever", "seed")
 
 
-def _check_rules(rules: str, low_level_penalty: bool | None) -> None:
+def check_rules(rules: str, low_level_penalty: bool | None) -> None:
     if rules not in RULES:
         raise ValueError(f"rules inconnu « {rules} » ({' ou '.join(RULES)} attendu)")
     if rules == "seed" and low_level_penalty is False:
@@ -131,7 +131,7 @@ def coefficient(
     coefficients fixes), pénalité toujours appliquée.
 
     Registre : G4"""
-    _check_rules(rules, low_level_penalty)
+    check_rules(rules, low_level_penalty)
     if rules == "seed":
         return _seed_coefficient(gd, key, rank)
     c = 0.0
@@ -146,14 +146,26 @@ def coefficient(
 def dot_coefficient(
     gd: GameData, key: str, rank: Rank, *, rules: str = "forever", low_level_penalty: bool | None = None
 ) -> float:
-    """Part de la puissance des sorts ajoutée à chaque tic de DoT d'un rang.
+    """Part de la puissance des sorts ajoutée à chaque tic de DoT d'un rang : coefficient du client du composant
+    `dot` (EffectBonusCoefficient) × pénalité des sorts de bas niveau (`low_level_factor`, appliquée au tic comme au
+    coup direct : règle Classic supposée) en `forever` ; 0 en `seed` (le seed ne donne aucune puissance aux DoT).
 
     Registre : A17, G4"""
-    raise NotImplementedError
+    check_rules(rules, low_level_penalty)
+    if rules == "seed":
+        return 0.0
+    c = sum(comp.bonus_coefficient for comp in gd.scaling[key][rank.position - 1].components if comp.kind == "dot")
+    return c * low_level_factor(gd, rank, low_level_penalty) if c else 0.0
 
 
 def dot_ticks(gd: GameData, key: str, rank: Rank, *, rules: str = "forever") -> int:
-    """Nombre de tics du DoT d'un rang.
+    """Nombre de tics du DoT d'un rang (0 sans DoT) : tics du composant `dot` du client (durée / période de l'aura)
+    en `forever` ; durée / `leveling.dot_tick_s`, au moins un, en `seed`.
 
     Registre : A17"""
-    raise NotImplementedError
+    check_rules(rules, None)
+    if not rank.dot_total:
+        return 0
+    if rules == "seed":
+        return max(1, int(rank.dot_duration_s / gd.leveling.dot_tick_s))
+    return round(sum(c.ticks for c in gd.scaling[key][rank.position - 1].components if c.kind == "dot"))
