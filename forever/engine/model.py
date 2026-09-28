@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import NamedTuple, TypedDict
+from typing import Any, NamedTuple, TypedDict
 
 Points = Mapping[str, int]
 """Clé de talent -> rang pris."""
@@ -328,6 +328,13 @@ class FireVulnerability:
     max_stacks: int
     duration_s: float
     schools: tuple[str, ...]
+
+
+class Variant(NamedTuple):
+    """Valeur d'une hypothèse incertaine et sa source (champ `range` d'une entrée de `mechanics.json`)."""
+
+    value: Any
+    source: str
 
 
 @dataclass(frozen=True)
