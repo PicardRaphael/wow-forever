@@ -238,7 +238,14 @@ def _decide_step(
     return st.mean, choice, st
 
 
-def _opens_tier(gd: GameData, pts: Points, key: str, picks: Sequence[str], modeled: frozenset[str]) -> bool:
+def _opens_tier(
+    gd: GameData,
+    pts: Points,
+    key: str,
+    picks: Sequence[str],
+    modeled: frozenset[str],
+    rivals: Sequence[str] = (),
+) -> bool:
     """Point de passage vers un palier : le point porte son arbre au seuil d'un palier que l'anticipation ouvre sur un
     talent modélisé de ce palier (T06b, décision D7)."""
     tree = gd.talents[key].tree
@@ -246,6 +253,10 @@ def _opens_tier(gd: GameData, pts: Points, key: str, picks: Sequence[str], model
     after = before + 1
     opened = {t for t in {x.tier for x in gd.talents.values()} if before < tier_points_required(gd, t) <= after}
     return any(p in modeled and gd.talents[p].tree == tree and gd.talents[p].tier in opened for p in picks)
+
+
+def _shortlist(pre: Sequence[Any], shortlist: int, modeled: frozenset[str] | None) -> list[Any]:
+    raise NotImplementedError("T06b : présélection à égalité")
 
 
 def _state_meta(
