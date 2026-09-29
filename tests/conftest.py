@@ -86,6 +86,7 @@ def make_deps(tmp_path: Path) -> MakeDeps:
             http_get=http or FakeHttp.failing(),
             now=lambda: now,
             offline=offline,
+            profile_path=tmp_path / "profil" / "profile.json",  # jamais ~/.forever dans les tests (T06b)
         )
 
     return factory
@@ -178,6 +179,7 @@ def isolated_deps(tmp: Path, data_dir: Path = DATA_DIR) -> Deps:
         cache_dir=tmp / "cache",
         http_get=FakeHttp.failing(),
         now=lambda: NOW,
+        profile_path=tmp / "profil" / "profile.json",
     )
 
 

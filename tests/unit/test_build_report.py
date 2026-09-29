@@ -19,6 +19,7 @@ FIELDS = (
     "context",
     "level",
     "race",
+    "inputs",  # T06b : valeurs d'entrée et leur origine (argument ou défaut)
     "scenario",
     "talents",
     "talents_by_tree",

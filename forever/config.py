@@ -46,6 +46,7 @@ class Deps:
     offline: bool = False
     wow_dir: Path | None = None  # dossier du client (journaux, addons, SavedVariables), lu sans réseau
     confirm: Callable[[str], bool] | None = None  # demande d'accord avant une écriture (None : refus)
+    profile_path: Path | None = None  # profil joueur hors du dépôt (None : FOREVER_PROFILE ou ~/.forever, T06b)
 
 
 def terminal_confirm(prompt: str) -> bool:
