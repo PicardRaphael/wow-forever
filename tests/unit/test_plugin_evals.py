@@ -124,7 +124,7 @@ def test_respec_at_another_level_asks_for_the_current_build():
     """Demande du 2026-09-29 : une respec posée à un autre niveau que celui du profil (profil de test au niveau 23) ne se
     conseille pas sans le build actuel ; la bonne réponse le demande (outil attendu : le profil, pas encore le build)."""
     for name in RESPEC_AT_ANOTHER_LEVEL:
-        meta, question = front(EVALS / name / "prompt.md")
+        meta, _ = front(EVALS / name / "prompt.md")
         assert meta["tags"] == ["positif", "respec"]
         g = graders(EVALS / name)
         assert g["outil"][0]["tool"] == MCP_PREFIX + "forever_player_profile", name
