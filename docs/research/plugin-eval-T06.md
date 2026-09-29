@@ -141,7 +141,10 @@ claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_
 
 - **Outil attendu, deux échecs légitimes** : `respec-feu-vers-givre` et `respec-troisieme` posent la question à un
   autre niveau que celui du profil (32 et 36 contre 23) et sur un autre build ; le conseil de respec exige le build
-  actuel, que le modèle demande (règle « la question prime sur le profil »).
+  actuel, que le modèle demande (règle « la question prime sur le profil »). Attentes corrigées le 2026-09-29
+  (décision 117) : demander le build actuel est la bonne réponse, outil attendu `forever_player_profile` et juge
+  `demande-le-build` ; quatre cas ajoutés (questions générales et personnelles, dont une classe pas encore calculée),
+  57 cas au total, à passer avec le modèle.
 - **Chiffre signalé** (`build-givre-ou-feu`, « 11 153 XP/h ») : fausse alerte du contrôle. Le rapport du sous-agent
   `forever-sim-runner` écrit les XP/h avec une espace des milliers, que le contrôle lisait en deux nombres dans un
   résultat d'outil (11 et 153). Corrigé dans `forever/hooks.py` (test

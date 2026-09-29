@@ -412,7 +412,7 @@ class PvpRules:
 
 @dataclass(frozen=True)
 class GameData:
-    """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
+    """Données d'une version, pour la classe Mage (un espace par classe est prévu : données des 9 classes en PV1, moteurs dans les tranches de classe)."""
 
     game_version: str
     spells: Mapping[str, Spell]

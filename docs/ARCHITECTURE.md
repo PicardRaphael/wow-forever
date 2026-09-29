@@ -77,7 +77,7 @@ forever-core/
 - `forever monsters build … [--fit-exclude NPC]` : `monsters.json` schéma 2 avec `questie_correction` (rapports médians par niveau mesuré, droite, plage, PNJ exclus) appliquée aux niveaux connus seulement de Questie, et `inversions` listées.
 
 ## Moteur de mécaniques et registre
-- `forever/gamedata.py` lit une version après contrôle d'intégrité (`store.load_version`) et construit un `GameData` gelé (sorts, talents dans l'ordre du fichier, règles de combat, raciaux, constantes). Seul module qui touche au JSON brut du moteur ; tout écart de schéma lève `data_schema` (code 3). En T02, `GameData` ne couvre que le Mage (un espace par classe en T12).
+- `forever/gamedata.py` lit une version après contrôle d'intégrité (`store.load_version`) et construit un `GameData` gelé (sorts, talents dans l'ordre du fichier, règles de combat, raciaux, constantes). Seul module qui touche au JSON brut du moteur ; tout écart de schéma lève `data_schema` (code 3). En T02, `GameData` ne couvre que le Mage (un espace par classe : données des 9 classes décodées en PV1, moteurs dans les tranches de classe PA1 à DR1, décision 102).
 - `forever/engine/` : fonctions pures qui reçoivent `GameData` en premier paramètre (talents, personnage, sorts, toucher, critique, dégâts, incantation, mana, espérance d'un lancer). Aucun chiffre de jeu dans le code : seuls le lien talent → effet et la conversion d'unité `/ 100` (talents exprimés en %) y figurent. Chaque fonction cite ses identifiants de registre dans sa docstring (`Registre : A3, A4, H1`). `MECHANICS` (dans `forever/engine/__init__.py`) associe les 30 contrôles portés du seed à leurs identifiants.
 - `mechanics.json` (par version, haché) : constantes absentes des tables du client, chacune avec `value`, `certainty`, `registry` (identifiant du registre) et `source` ; T04b : clés `leveling.*` (chiffres du simulateur du seed) et `hit.miss_per_level_below`.
 - T04b, leveling : moteur `forever/engine/monsters.py` (PV par niveau et source, correction Questie, coup et XP des monstres, armure), `movement.py` (temps de vol, ralentis, gel, portée, cadence des coups), recul et recharges (`casting.py`), régénération en combat et repos (`mana.py`), tics de DoT et d'Ignite, tirage des dégâts (`damage.py`), dégâts au niveau du personnage (`spells.rank_damage`, `expected_cast(spell_level=…)`). Simulateurs `forever/sim/leveling_mc.py` (Monte Carlo, générateur injecté, ordre des tirages du seed) et `forever/sim/leveling_analytic.py` : orchestration seulement. Service commun CLI/MCP `forever/leveling.py` ; graphique `forever/chart.py` (matplotlib Agg sans pyplot, PNG déterministe, jamais dans `forever/data/`) ; `forever sim leveling`, `forever chart leveling`.
@@ -102,6 +102,7 @@ forever-core/
 | `forever_optimize_gear` | Ensemble réel simulé sous contraintes |
 | `forever_consumables_plan` | Plan par zone, métier, budget |
 | `forever_diff_versions` | Ce qui change entre deux versions, par classe |
+| `forever_analyze` | Analyse d'un combat de mes journaux : PvP (AN1) puis PvE (AN2), provenance ; nom et paramètres fixés au plan de AN1 (décision 104) |
 | `forever_player_profile` | Lire le profil du joueur (personnage actif ou nommé, `stale`, `missing`), en lecture seule ; écriture par `forever profile set` (T06b, décision 99) |
 
 ## Plugin Claude Code
@@ -109,9 +110,10 @@ Livré en T06 (`plugin/`, décisions 91 à 97), installé au niveau utilisateur 
 marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-forever`) ; mode d'emploi : `docs/USAGE.md`.
 - **Mince** : aucun calcul ni chiffre de jeu ; le serveur MCP (`plugin/.mcp.json`) et les hooks lancent le dépôt pointé
   par `FOREVER_HOME` (défaut `${CLAUDE_PLUGIN_ROOT}/..`, le dépôt quand le plugin est chargé sur place).
-- **Skills** : `forever-router` (aiguillage, carte des domaines couverts et non couverts avec leur tranche, format de
-  réponse `format-reponse.md`, règle « je ne sais pas »), `forever-leveling`, `forever-mage`. Chaque tranche de domaine
-  ajoute son skill et met à jour la carte du routeur. Chaque SKILL.md fait moins de 200 lignes, sans chiffre de jeu.
+- **Skills** : `forever-router` (aiguillage, carte des domaines couverts et non couverts avec leur tranche, classe pas
+  encore calculée, format de réponse `format-reponse.md` avec la règle « question personnelle ou générale », règle
+  « je ne sais pas »), `forever-leveling`, `forever-mage`. Un skill par domaine et par usage : chaque tranche ajoute le
+  sien et met à jour la carte du routeur (décision 115). Chaque SKILL.md fait moins de 200 lignes, sans chiffre de jeu.
 - **Sous-agents** : `forever-web-researcher` (WebSearch, WebFetch ; sources étiquetées officielle, communautaire,
   simulateur ; rien n'entre dans `forever/data/`), `forever-sim-runner` (calculs lourds par les outils forever).
   `data-updater` (T08) et `evaluator` (remplacé par `claude plugin eval`) : plus tard ou abandonnés.
@@ -121,9 +123,9 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
   Garde dans `hooks.json` : rien ne s'exécute sans `pyproject.toml` au chemin du dépôt (aucune erreur ailleurs).
 - **Pas de statusline** (décision 15), pas de commandes `/forever…` en T06 (le langage naturel suffit ; à reprendre si
   l'évaluation le justifie).
-- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b), relevée à chaque changement de `plugin/`, gardée par
+- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b, 0.3.0 le 2026-09-29 : décisions 116 et 117), relevée à chaque changement de `plugin/`, gardée par
   `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
-- **Évaluation** : `plugin/evals/` (33 questions réelles dont deux à profil vide, 20 voisines ; 53 cas depuis T06b ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
+- **Évaluation** : `plugin/evals/` (37 questions réelles dont deux à profil vide, deux générales et deux personnelles, 20 voisines ; 57 cas depuis le 2026-09-29 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
   (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
   (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
 
@@ -135,20 +137,31 @@ Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la
 | Domaine | Consultation (`forever_lookup`, domaine) | Calcul (outil séparé) | Skill | Tranche |
 | --- | --- | --- | --- | --- |
 | Leveling : zone ou donjon à mon niveau | `zones` (données de Questie lues localement) | — | `forever-leveling` | T04c |
+| Profil : import automatique | — | Import ForeverLogger et journaux (CLI `forever profile import`, écriture après accord) ; lecture par `forever_player_profile` | routeur (`format-reponse.md`) | PV1, T07 |
+| Builds de toutes les classes | `talent` étendu aux 9 classes | `forever_build` (classes à moteur) ; contrôle de légalité d'un build de la communauté (classes pas encore calculées) | `forever-builds` | PV1, puis chaque tranche de classe |
 | PvP | `pvp` : savoir des 9 classes, fiches par affrontement, champs de bataille, équipement PvP, monde ouvert, rendements décroissants mesurés | Profil PvP du Mage : `forever_build`, contextes `pvp-bg` et `pvp-world` | `forever-pvp` | PV1, PV2 (fiches en jeu : FA1p) |
+| Analyse de mes combats PvP | — | `forever_analyze` (AN1) | `forever-analyse-pvp` | AN1, étendue par chaque tranche de classe |
+| Classes (Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide) | `spell`, `talent` de la classe | `forever_build` et `forever_sim_leveling` avec la classe (forme au plan) | `forever-<classe>` | PA1 à DR1, parties raid après T09 |
+| Analyse de mes combats PvE | — | `forever_analyze` (AN2) | `forever-analyse-pve` | AN2 |
 | Donjons | `dungeons` : niveaux, boss, butin | — | `forever-dungeons` | DJ1 |
 | Legacy | `legacy` : catalogue, puis état importé | Conseil des bonus par personnage (appelle le simulateur de leveling) | `forever-legacy` | LG1, LG2 |
-| Métiers | `professions` : recettes, sources, points Legacy | Plan de montée de compétence (coût en or avec EC1) | `forever-professions` | MT1 |
+| Métiers | `professions` : recettes, sources, points Legacy | Plan de montée de compétence (coût en or avec EC1), répartition des métiers entre mes personnages | `forever-professions` | MT1 |
 | Réputations | `reputations` : factions, paliers, gains, récompenses | Plan de montée (temps estimé) | `forever-reputations` | RP1 |
 | Économie | — | `forever_prices` (seul outil qui ajoute un accès réseau, après accord) | rattaché à `forever-professions` ou skill propre | EC1 |
 
-- Skills : chacun sous 200 lignes, sans chiffre de jeu, ajouté par sa tranche de domaine (T06 ne livre que le routeur, le leveling et le Mage) ; le routeur `forever-router` reçoit la carte des domaines à chaque ajout.
-- Commandes CLI : `forever pvp …`, `forever dungeon …`, `forever legacy …`, `forever profession …`, `forever rep …`, `forever prices …` (détail dans chaque section de `docs/ROADMAP.md`), toutes branchées sur les mêmes services que le MCP.
+- Skills : un par domaine et par usage, chacun sous 200 lignes, sans chiffre de jeu, ajouté par sa tranche (T06 ne livre que le routeur, le leveling et le Mage) ; le routeur `forever-router` reçoit la carte des domaines à chaque ajout et choisit le skill selon la demande, sans ordre imposé (décision 115).
+- Commandes CLI : `forever profile import`, `forever pvp …`, `forever analyze …`, `forever dungeon …`, `forever legacy …`, `forever profession …`, `forever rep …`, `forever prices …` (détail dans chaque section de `docs/ROADMAP.md`), toutes branchées sur les mêmes services que le MCP.
 
 ## Mémoire joueur
 Profil minimal (T06b, décision 99) : `forever/profile.py`, fichier `FOREVER_PROFILE` ou `~/.forever/profile.json`, **hors du dépôt** (écriture refusée sous le dépôt) : personnages (classe, race, faction, niveau, talents, métiers, version des données), un actif. Les outils de calcul ne le lisent jamais : l'agent le lit (`forever_player_profile`) et passe les valeurs ; chaque rapport rend `inputs` (origine `argument` ou `default`).
+Import automatique minimal au début de PV1 (décision 105) : ForeverLogger (classe, race, niveau, talents) et journaux (personnages « à moi »), lus sur disque, écritures listées avant accord ; faction toujours donnée par le joueur.
 Vault de T07, hors du dépôt lui aussi (données personnelles) : fiches datées `personnages/<nom>.json` (avec la version du jeu), `objectifs.md`, `decisions.md`, `legacy.json`, `historique/`.
 La mémoire de Claude ne garde que des pointeurs et des décisions, jamais de chiffres de jeu.
+
+## Analyse des combats (AN1, AN2, provisoire)
+- Lecture des journaux par `forever/pipeline/combatlog.py` (T04a), découpe en combats et anonymisation des autres joueurs à la lecture (décision 49) ; aucune donnée de tiers écrite en clair.
+- Faits du journal (contrôles et leur rang de rendement décroissant, recharges, interruptions, morts, rotation réelle) : fonctions pures ; règles et seuils dans `forever/data/<version>/` ; jugement par rapport aux fiches de PV1 (AN1) et à la rotation optimale des simulateurs de la classe (AN2, rejeu à tirages communs dans `forever/sim/`).
+- Service commun CLI (`forever analyze <journal> [--combat N]`, texte et `--json`) et MCP (outil de calcul séparé, décision 63) ; rapport Markdown et graphique déterministes écrits hors du dépôt ; tout en local, sans réseau ; taux réels proposés au registre après accord.
 
 ## Veille
 `build-watch.yml` (cron 6 h) : `forever builds` ; si nouvelle version, `fetch`, `decode`, `diff`, `verify`, puis PR « data: A → B » avec le résumé du diff et une note pour le vault. Alerte si `silent`.

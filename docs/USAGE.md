@@ -80,8 +80,14 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
 ## Ce que le plugin ne sait pas encore
 PvP (PV1, PV2), boss et butin des donjons (DJ1), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
 ventes (EC1), quêtes et XP propres à Forever (T04d), mana des combats longs (T05b), mémoire du joueur (T07), raid
-complet (T09), équipement (T10), consommables (T11), autres classes que le Mage (T12). Sur ces sujets, il répond
-« je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les couvrira.
+complet (T09), équipement (T10), consommables (T11), analyse de mes combats (AN1, AN2), autres classes que le Mage
+(tranches PA1 à DR1). Sur ces sujets, il répond « je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les
+couvrira ; pour une classe pas encore calculée, il propose des builds de la communauté trouvés par le sous-agent de
+recherche, avec source et date, certitude au mieux supposée.
+
+Question personnelle (« mon Mage », « mon perso ») : il part du personnage actif du profil et demande ce qui manque ;
+question générale (« l'arbre optimal du Mage en raid ») : il ne demande rien et annonce l'hypothèse neutre de son
+calcul. Quand vous dites « j'ai … », il propose de mettre le profil à jour (`forever profile set`).
 
 ## Évaluation
 Jeu de questions : `plugin/evals/` (cas positifs et questions voisines qui ne doivent pas déclencher le plugin). La

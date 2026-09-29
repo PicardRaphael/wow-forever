@@ -5,7 +5,7 @@ données personnelles ne se committent pas, décision 99). Lu explicitement par 
 les outils de calcul ne le lisent jamais d'eux-mêmes. Schéma 1 :
 `{schema_version, active, characters: {<nom>: {class, race, faction, level, talents, professions, game_version,
 updated_at, validated}}}`. Mage : race (racials.json), niveau et talents (check_build) validés ; autres classes
-(T12) : gardées telles quelles, `validated: false`. Faction donnée par le joueur, jamais déduite."""
+(tranches de classe PA1 à DR1) : gardées telles quelles, `validated: false`. Faction donnée par le joueur, jamais déduite."""
 
 from __future__ import annotations
 
