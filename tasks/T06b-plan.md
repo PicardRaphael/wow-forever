@@ -351,3 +351,18 @@ dans `forever_build`, `forever_explain_mechanic`, `forever_lookup` et `forever_s
   donne toutes les données dans la question et le juge ne dépend pas du profil ; noter tout effet observé.
 - **Mise à jour du plugin versionné** : si `update` ne recopie pas après changement de version, arrêt et question.
 - **Fins de ligne** : écriture des données par `write_bytes` / `newline="\n"` ; `git diff --stat` avant chaque commit.
+
+## Validation (2026-09-29)
+Plan accepté par l'utilisateur avec l'option recommandée aux cinq questions (elles priment sur toute autre lecture du
+texte ci-dessus) :
+1. **D1** : révision 2 du dossier `1.60.1.70009` en place (`data_revision` dans la provenance, `revisions.json`,
+   rapport de diff, `.claude/rules/data.md` amendée, décisions 17, 37 et 58 remplacées).
+2. **D2** : copies figées `_seed_talents.json` et `_seed_spells.json`, contrôlées par le manifeste.
+3. **D5** : profil dans `%USERPROFILE%\.forever\profile.json`, déplaçable par `FOREVER_PROFILE`, lu explicitement par
+   `forever_player_profile`, jamais par les outils de calcul eux-mêmes.
+4. **D7** : talent non modélisé permis comme point de passage vers un palier quand c'est le seul moyen d'ouvrir un
+   talent modélisé, signalé (`passage_palier`).
+5. **D3** : la validation du plan vaut accord pour les changements listés en D3 ; tout autre écart du rapport
+   `forever install --dry-run` arrête l'exécution et est présenté à l'utilisateur.
+- Conduite : un test verrouillé faux → demandes de correction regroupées (`tasks/T06b-corrections.md`) et présentées
+  avant la fusion ; contexte plein → arrêt après un bloc vert et committé, avec l'état d'avancement.
