@@ -1,0 +1,233 @@
+{
+ "schemaVersion": 1,
+ "claudeVersion": "2.1.284",
+ "costUsd": 0.5,
+ "partial": false,
+ "cases": [
+  {
+   "name": "talent-a",
+   "arms": {
+    "with": [
+     {
+      "score": 1,
+      "passed": true,
+      "tracePath": "../transcripts/session_sourced.jsonl",
+      "graders": [
+       {
+        "name": "skill",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "outil",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "chiffres",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "certitude",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "provenance",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "talent-b",
+   "arms": {
+    "with": [
+     {
+      "score": 1,
+      "passed": false,
+      "tracePath": "../transcripts/session_invented.jsonl",
+      "graders": [
+       {
+        "name": "skill",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "outil",
+        "passed": false,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "chiffres",
+        "passed": false,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "certitude",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "provenance",
+        "passed": false,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "hors-x",
+   "arms": {
+    "with": [
+     {
+      "score": 1,
+      "passed": true,
+      "tracePath": null,
+      "graders": [
+       {
+        "name": "skill",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "outil",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "chiffres",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "certitude",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "provenance",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "je-ne-sais-pas",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       },
+       {
+        "name": "sans-estimation",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "neg-a",
+   "arms": {
+    "with": [
+     {
+      "score": 1,
+      "passed": true,
+      "tracePath": null,
+      "graders": [
+       {
+        "name": "aucun-skill-forever",
+        "passed": true,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       }
+      ]
+     }
+    ]
+   }
+  },
+  {
+   "name": "neg-b",
+   "arms": {
+    "with": [
+     {
+      "score": 1,
+      "passed": false,
+      "tracePath": null,
+      "graders": [
+       {
+        "name": "aucun-skill-forever",
+        "passed": false,
+        "weight": 1,
+        "explanation": "",
+        "withOnly": false,
+        "scored": true
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ],
+ "aggregates": {
+  "casesTotal": 5
+ }
+}
