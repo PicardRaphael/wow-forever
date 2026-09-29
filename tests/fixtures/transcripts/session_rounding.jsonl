@@ -1,0 +1,4 @@
+{"type": "user", "message": {"role": "user", "content": "Combien d'XP par heure au niveau 30 en Givre ?"}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_sim", "name": "mcp__plugin_forever_forever__forever_sim_leveling", "input": {"level": 30, "rotation": "frost"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_sim", "content": [{"type": "text", "text": "{\"xp_per_hour\": 12345.6, \"crit\": 0.052, \"kill_time_s\": 125.3, \"mana_per_kill\": 87.25, \"cast_time_s\": 1.5, \"provenance\": {\"game_version\": \"1.60.1.70009\", \"registry_coverage\": \"37/108\"}}"}]}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Environ 12 300 XP/h, soit 2,1 min par monstre, avec 5,2 % de critique et 87,3 de mana par monstre. Frostbolt se lance en 1.5 s (1,5 s). Nova ajoute 15 % de chances de survie."}]}}

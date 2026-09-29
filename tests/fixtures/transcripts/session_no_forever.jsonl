@@ -1,0 +1,2 @@
+{"type": "user", "message": {"role": "user", "content": "Combien dure le temps de recharge global dans WoW ?"}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Le GCD dure 1,5 s en général."}]}}

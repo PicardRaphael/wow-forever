@@ -1,0 +1,4 @@
+{"type": "user", "message": {"role": "user", "content": "Lance la simulation complète du build de raid au niveau 60."}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_agent", "name": "Agent", "input": {"description": "simulation", "prompt": "...", "subagent_type": "forever:forever-sim-runner"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_agent", "content": [{"type": "text", "text": "Build Feu : 812,4 DPS (intervalle 798 à 826)."}]}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Le build Feu donne environ 812 DPS (798 à 826 DPS selon l'intervalle)."}]}}

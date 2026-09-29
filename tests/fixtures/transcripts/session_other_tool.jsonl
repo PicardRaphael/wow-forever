@@ -1,0 +1,6 @@
+{"type": "user", "message": {"role": "user", "content": "Frostbolt rang 1 fait combien dans Forever ?"}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_skill", "name": "Skill", "input": {"skill": "forever:forever-mage"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_skill", "content": "Launching skill: forever:forever-mage"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_web", "name": "WebFetch", "input": {"url": "https://example.org/guide", "prompt": "dégâts de Frostbolt"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_web", "content": "Frostbolt (Rank 1) deals 18 to 20 Frost damage."}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Selon un guide, Frostbolt rang 1 inflige 18 à 20 dégâts."}]}}
