@@ -15,8 +15,6 @@ from forever.config import Deps
 from forever.hooks import GAME_NUMBER, NUMBERS_MARKER
 from forever.mcp_server import build_server
 
-pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
-
 EVALS = REPO_ROOT / "plugin" / "evals"
 MCP_PREFIX = "mcp__plugin_forever_forever__"
 POSITIVE_COUNTS = {"talent": 6, "build": 6, "respec": 4, "zone": 4, "mecanique": 5, "leveling": 3, "hors-perimetre": 3}

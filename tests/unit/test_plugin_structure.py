@@ -17,8 +17,6 @@ from forever.cli import build_parser
 from forever.hooks import GAME_NUMBER, NUMBERS_MARKER
 from forever.mcp_server import build_server
 
-pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
-
 PLUGIN = REPO_ROOT / "plugin"
 SKILLS = ("forever-router", "forever-leveling", "forever-mage")
 AGENTS = ("forever-web-researcher", "forever-sim-runner")

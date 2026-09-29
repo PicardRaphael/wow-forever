@@ -17,8 +17,6 @@ from forever.lookup import lookup_talent
 from forever.mcp_server import build_server
 from forever.provenance import validate_provenance
 
-pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
-
 
 def run(capsys, argv, deps):
     code = main(argv, deps)

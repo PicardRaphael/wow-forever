@@ -13,8 +13,6 @@ from forever.errors import UnknownMechanicError
 from forever.explain import explain_mechanic
 from forever.mcp_server import build_server
 
-pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
-
 
 @pytest.mark.parametrize(("query", "expected"), [("Ignite", "A18"), ("clearcasting", "B12"), ("a18", "A18")])
 def test_single_match_is_explained(make_deps, query, expected):

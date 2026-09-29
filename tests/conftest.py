@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
@@ -12,6 +13,32 @@ from typing import Any
 import pytest
 
 from forever.config import Deps
+
+LOCAL_HOSTS = ["127.0.0.1"]  # boucle asyncio de Windows : paire de sockets locale (tests MCP)
+
+
+_MCP_IMPORT = re.compile(r"^\s*(from mcp[ .]|import mcp\b)", re.MULTILINE)
+_MCP_MODULES: dict[str, bool] = {}
+
+
+def _uses_mcp(module: Any) -> bool:
+    """Le module de test importe le SDK `mcp` (en tête de fichier ou dans un test), client ou serveur MCP."""
+    path = getattr(module, "__file__", None)
+    if not isinstance(path, str):
+        return False
+    if path not in _MCP_MODULES:
+        _MCP_MODULES[path] = bool(_MCP_IMPORT.search(Path(path).read_text(encoding="utf-8")))
+    return _MCP_MODULES[path]
+
+
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    """T06b : tout test d'un module qui importe `mcp` reçoit `allow_hosts(LOCAL_HOSTS)` (socket local seulement) ;
+    plus de marqueur à écrire test par test."""
+    for item in items:
+        module = getattr(item, "module", None)
+        if module is not None and _uses_mcp(module):
+            item.add_marker(pytest.mark.allow_hosts(LOCAL_HOSTS))
+
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = REPO_ROOT / "tests" / "fixtures"

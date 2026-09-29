@@ -4,7 +4,6 @@ provenance, rubriques du texte, erreurs d'argument, même résultat par la CLI e
 import asyncio
 import json
 
-import pytest
 from conftest import FakeHttp
 from mcp import Client
 
@@ -12,8 +11,6 @@ from forever.cli import main
 from forever.mcp_server import build_server
 from forever.provenance import validate_provenance
 
-# La boucle asyncio de Windows ouvre une paire de sockets locale : autorisée, tout autre hôte reste bloqué.
-pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
 ARGV = ["build", "leveling", "--level", "14", "--preset", "rapide"]
 SECTIONS = ("Raisons", "Alternative", "Stabilité", "Sensibilité", "Respec", "Angles morts", "Hypothèses")
 

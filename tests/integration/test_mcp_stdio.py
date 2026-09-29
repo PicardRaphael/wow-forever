@@ -6,13 +6,10 @@ import asyncio
 import os
 import sys
 
-import pytest
 from conftest import REPO_ROOT
 from mcp import Client, StdioServerParameters
 
 from forever.provenance import validate_provenance
-
-pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
 
 
 def test_stdio_server(tmp_path):

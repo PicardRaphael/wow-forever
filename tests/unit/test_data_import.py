@@ -31,6 +31,8 @@ def test_overrides_copied_into_version_dir():
 def test_version_dir_contains_exactly_expected_files():
     names = {p.name for p in (DATA_DIR / LOCAL_VERSION).iterdir()}
     assert names == set(SEED_FILES) | {
+        "talents.json",  # T06b : valeurs du client (révision 2), plus des copies du seed
+        "spells.json",
         "overrides.json",
         "sources.json",
         "mechanics.json",

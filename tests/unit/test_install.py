@@ -118,7 +118,9 @@ def test_change_outside_the_rules_is_refused(r1, candidate, tmp_path):
     path.write_bytes(json.dumps(doc, ensure_ascii=False, indent=1).encode("utf-8"))
     write_manifest(copy)
     plan = plan_install(r1, str(copy))
-    assert [(c["path"], c["before"], c["after"]) for c in plan["refused"]] == [("improvedFrostbolt.ranks[1]", [1], [9])]
+    assert [(c["path"], c["before"], c["after"]) for c in plan["refused"]] == [
+        ("improvedFrostbolt.ranks[1]", [0.1], [9])
+    ]
     before = version_files(r1.data_dir / LOCAL_VERSION)
     with pytest.raises(InstallRefusedError):
         apply_install(r1, str(copy), motif="test")

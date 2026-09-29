@@ -5,16 +5,12 @@ mécanique A5 : docs/MECHANICS_REGISTRY.yaml."""
 
 import asyncio
 
-import pytest
 from conftest import FIXTURES, LOCAL_VERSION, FakeHttp, corrupt_manifest, tamper
 from mcp import Client
 
 from forever.manifest import compute_manifest
 from forever.mcp_server import build_server
 from forever.provenance import validate_provenance
-
-# La boucle asyncio de Windows ouvre une paire de sockets locale : autorisée, tout autre hôte reste bloqué.
-pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
 
 
 def call(deps, coro_fn):
