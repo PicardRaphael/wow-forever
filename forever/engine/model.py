@@ -369,6 +369,17 @@ class Scenario:
 
 
 @dataclass(frozen=True)
+class Preset:
+    """Préréglage de l'optimiseur (`build.presets`) : faisceau, profondeur d'anticipation, finalistes au Monte Carlo,
+    combats par Monte Carlo."""
+
+    beam: int
+    depth: int
+    shortlist: int
+    mc_n: int
+
+
+@dataclass(frozen=True)
 class BuildMethod:
     """Paramètres des builds par contexte (`mechanics.json`, clés `build.*`) : plafond de niveau de la bêta (au-delà,
     un build n'est pas vérifiable en jeu avant la sortie), confiance de l'intervalle apparié, graines de stabilité."""
@@ -377,6 +388,8 @@ class BuildMethod:
     confidence: float
     stability_seeds: int
     scenarios: Mapping[str, Scenario]
+    presets: Mapping[str, Preset]
+    contexts: Mapping[str, tuple[str, ...]]  # contexte de fin de partie -> scénarios (build.contexts)
 
 
 @dataclass(frozen=True)
@@ -399,6 +412,8 @@ class GameData:
     armors: Mapping[str, tuple[ArmorRank, ...]]  # armures du client (spell_scaling.json.utility), par rang
     fire_vulnerability: FireVulnerability  # spell_scaling.json.auras (T04e)
     talent_cooldowns_s: Mapping[str, float]  # recharges des talents actifs (spell_scaling.json.talent_cooldowns, T05)
+    level_cap: int  # plafond de niveau (spell_scaling.json)
+    xp_to_next: tuple[int, ...]  # XP pour passer au niveau suivant, niveau 1 en premier (leveling.json)
     respec: RespecRules
     build: BuildMethod
     # plages des hypothèses incertaines (champ range de mechanics.json), par clé de mechanics.json (T05)

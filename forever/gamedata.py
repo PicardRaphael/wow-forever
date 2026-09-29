@@ -23,6 +23,7 @@ from forever.engine.model import (
     MobModel,
     MonsterHp,
     MonsterTable,
+    Preset,
     QuestBand,
     QuestieCorrection,
     Racials,
@@ -576,6 +577,13 @@ def _assumption_ranges(values: Mapping[str, Any]) -> dict[str, tuple[Variant, ..
     return out
 
 
+def _xp_to_next(raw: Any) -> tuple[int, ...]:
+    """`leveling.json.xp_to_next.values` : XP pour passer au niveau suivant (courbe Classic conservée, T05)."""
+    r = _Reader(LEVELING_FILE)
+    values = r.list_(r.obj(raw, "xp_to_next", "xp_to_next"), "values", "xp_to_next.values")
+    return tuple(r.int_({"v": v}, "v", "xp_to_next.values") for v in values)
+
+
 def _talent_cooldowns(raw: Any) -> dict[str, float]:
     """`spell_scaling.json.talent_cooldowns` : recharge (s) des talents actifs, lue dans le client (T05)."""
     r = _Reader(SCALING_FILE)
@@ -621,7 +629,28 @@ def _build_method(values: Mapping[str, Any]) -> BuildMethod:
         confidence=m.num(entry("build.confidence"), "value", "build.confidence"),
         stability_seeds=m.int_(entry("build.stability_seeds"), "value", "build.stability_seeds"),
         scenarios=_scenarios(m, m.obj(entry("build.scenarios"), "value", "build.scenarios")),
+        presets=_presets(m, m.obj(entry("build.presets"), "value", "build.presets")),
+        contexts=_contexts(m, m.obj(entry("build.contexts"), "value", "build.contexts")),
     )
+
+
+def _presets(m: _Reader, raw: Mapping[str, Any]) -> dict[str, Preset]:
+    """`build.presets` : préréglages de l'optimiseur (T05)."""
+    out: dict[str, Preset] = {}
+    for name in raw:
+        where = f"build.presets.{name}"
+        p = m.obj(raw, name, where)
+        out[name] = Preset(**{k: m.int_(p, k, f"{where}.{k}") for k in ("beam", "depth", "shortlist", "mc_n")})
+    return out
+
+
+def _contexts(m: _Reader, raw: Mapping[str, Any]) -> dict[str, tuple[str, ...]]:
+    """`build.contexts` : scénarios de chaque contexte de fin de partie (T05)."""
+    out: dict[str, tuple[str, ...]] = {}
+    for name in raw:
+        items = m.list_(raw, name, f"build.contexts.{name}")
+        out[name] = tuple(m.str_({"v": s}, "v", f"build.contexts.{name}") for s in items)
+    return out
 
 
 SCENARIO_HP = ("boss", "mob")
@@ -781,6 +810,8 @@ def build_game_data(version: VersionData) -> GameData:
         armors=_armors(raw[SCALING_FILE]),
         fire_vulnerability=_fire_vulnerability(raw[SCALING_FILE]),
         talent_cooldowns_s=_talent_cooldowns(raw[SCALING_FILE]),
+        level_cap=_Reader(SCALING_FILE).int_(raw[SCALING_FILE], "level_cap", "level_cap"),
+        xp_to_next=_xp_to_next(raw[LEVELING_FILE]),
         respec=_respec(raw[RESPEC_FILE], values),
         build=_build_method(values),
         assumption_ranges=_assumption_ranges(values),

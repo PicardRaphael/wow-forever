@@ -293,11 +293,13 @@ def encounter_analytic(
     windows = arcane_power_windows(gd, pts, duration) if o["arcane_power"] == "auto" else []
     plain = _cycle(gd, level, pts, ch, rotation, sc, o, None, filler)
     buffed = _cycle(gd, level, pts, ch, rotation, sc, o, arcane_power_buffs(gd, pts), filler) if windows else plain
-    targets = sc.targets
+    # rotation de zone : chaque cible touchée, mortes ensemble ; à une cible : une cible après l'autre
+    targets = sc.targets if rotation == "aoe" else 1
     end = duration
     if sc.hp == "mob":
-        hp = scenario_hp(gd, sc, level, o["mob_source"])[0]
-        end = min(duration, _kill_time(hp, windows, plain[0], buffed[0], duration))
+        hp = scenario_hp(gd, sc, level, o["mob_source"])
+        need = hp[0] if rotation == "aoe" else sum(hp)
+        end = min(duration, _kill_time(need, windows, plain[0], buffed[0], duration))
     regen = in_combat_regen_fraction(gd, pts, level, armor=o["armor"], rules=o["rules"]) * ch.spirit_regen
     if rotation == "arcane" and sc.hp == "boss":
         return _arcane_walk(gd, level, pts, ch, sc, o, windows, regen)

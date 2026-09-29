@@ -16,3 +16,22 @@
 +    kill_mc(gd, 25, pts, character(gd, 25, "Orc", HIGH_CRIT), "fire", random.Random(seed), log, level_diff=3, **opts)
      return log
 ```
+
+## 2. Bloc F : `tests/unit/test_optimize_leveling.py::test_talented_bonus_adds_legal_points`
+
+- **Échec** : `assert 1 == 4` à la première étape (niveau 10, bonus « Talented » de 3).
+- **Preuve (prémisse du test contredite par sa propre structure, pas par le code)** : avec le bonus, `points_available(10, 3)` = 4 points dès le niveau 10 ; l'optimiseur rend une étape par point (`Step.talent` : un seul talent, forme du seed), donc quatre étapes au niveau 10, avec 1, 2, 3 puis 4 points. Le test exige la somme complète **après chaque étape**, ce qu'aucune suite d'étapes d'un point ne peut satisfaire. Le build de fin de chaque niveau, lui, dépense bien tous les points, est légal avec le bonus et illégal sans (vérifié sur une copie du test avec le diff ci-dessous : vert).
+- **Diff proposé** :
+
+```diff
+-    for s, pts in _points_by_level(bonus):
+-        assert sum(pts.values()) == points_available(game_data, s.level, 3)
+-        assert check_build(game_data, pts, s.level, 3) == []
+-        assert check_build(game_data, pts, s.level) != []  # illégal sans le bonus
++    by_level = {s.level: pts for s, pts in _points_by_level(bonus)}  # build de fin de chaque niveau
++    assert list(by_level) == [10, 11, 12, 13]
++    for level, pts in by_level.items():
++        assert sum(pts.values()) == points_available(game_data, level, 3)
++        assert check_build(game_data, pts, level, 3) == []
++        assert check_build(game_data, pts, level) != []  # illégal sans le bonus
+```

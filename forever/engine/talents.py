@@ -64,11 +64,31 @@ def legal_additions(gd: GameData, pts: Points, level: int, talented_bonus: int =
     out: list[str] = []
     if sum(pts.values()) >= points_available(gd, level, talented_bonus):
         return out
-    for k in gd.talents:
-        p2 = dict(pts)
-        p2[k] = p2.get(k, 0) + 1
-        if not check_build(gd, p2, level, talented_bonus):
-            out.append(k)
+    if check_build(gd, pts, level, talented_bonus):  # build illégal : les ajouts qui le rendent légal
+        for k in gd.talents:
+            p2 = dict(pts)
+            p2[k] = p2.get(k, 0) + 1
+            if not check_build(gd, p2, level, talented_bonus):
+                out.append(k)
+        return out
+    # build légal : ajouter un point ne peut rompre que les contraintes du talent ajouté (rang, palier, prérequis)
+    per_tier = gd.constants.talents.points_per_tier
+    spent: dict[tuple[str, int], int] = {}
+    for kk, v in pts.items():
+        if v > 0 and kk in gd.talents:
+            t = gd.talents[kk]
+            spent[(t.tree, t.tier)] = spent.get((t.tree, t.tier), 0) + v
+    for k, t in gd.talents.items():
+        if pts.get(k, 0) + 1 > t.max_rank:
+            continue
+        before = sum(v for (tree, tier), v in spent.items() if tree == t.tree and tier < t.tier)
+        if before < per_tier * (t.tier - 1):
+            continue
+        if t.prereq:
+            pk = gd.talent_at.get((t.tree, *t.prereq))
+            if pk and pts.get(pk, 0) < gd.talents[pk].max_rank:
+                continue
+        out.append(k)
     return out
 
 

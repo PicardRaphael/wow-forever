@@ -306,6 +306,18 @@
       "certainty": "suppose",
       "registry": "H3",
       "source": "scénario provisoire T05 (décision 82), affiné en DJ1 (donjons) et T09 (raid) : boss de donjon niveau + 2 pendant 60 s, paquet de 4 monstres normaux niveau + 1 (PV du monstre normal du niveau, au plus 40 s), boss de raid niveau + 3 pendant 180 s (durée du seed pve_raid.py) ; tank présent (aucun coup reçu, aucun recul) ; boss insensibles au gel (règle Classic supposée, voir OPEN_QUESTIONS) ; hp boss : PV sans limite (durée fixe), mob : PV du monstre normal ; valeurs inventées pour comparer les builds, pas des chiffres de jeu"
+    },
+    "build.presets": {
+      "value": {"rapide": {"beam": 2, "depth": 2, "shortlist": 2, "mc_n": 40}, "complet": {"beam": 3, "depth": 4, "shortlist": 4, "mc_n": 200}},
+      "certainty": "certain",
+      "registry": "I5",
+      "source": "paramètres de méthode (T05, décision 84) : faisceau, profondeur d'anticipation, finalistes au Monte Carlo, combats par Monte Carlo ; rapide pour les tests et le MCP, complet pour le CLI (complet = paramètres par défaut du seed optimize.py) ; pas des chiffres de jeu"
+    },
+    "build.contexts": {
+      "value": {"dungeon": ["dungeon_boss", "dungeon_pack"], "raid": ["raid_boss"]},
+      "certainty": "certain",
+      "registry": "I5",
+      "source": "paramètre de méthode (T05) : scénarios provisoires de chaque contexte de fin de partie (build.scenarios) ; métrique d'un contexte = dégâts totaux / durée totale retenue"
     }
   }
 }

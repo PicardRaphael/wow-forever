@@ -1086,6 +1086,7 @@ mechanics:
       - tests/unit/test_encounter.py::test_pack_area_damage_scales_with_the_number_of_targets
       - tests/unit/test_encounter.py::test_pack_rotation_uses_area_spells
       - tests/unit/test_encounter.py::test_scenarios_come_from_the_data
+      - tests/unit/test_encounter_pack_single_target.py::test_single_target_rotation_kills_the_pack_one_target_at_a_time
     tolerance: null
     formule: "paquet (T05) : cibles identiques de PV du monstre normal du niveau + écart ; sorts de zone sur chaque cible vivante, sans plafond de cibles (C7) ; rotation aoe : sorts à recharge (Blast Wave, Cone of Cold) dès qu'ils sont prêts, puis le sort de zone de remplissage (aoe_filler, meilleur à l'analytique par défaut)"
     note: "T05 (décision 82) : scénario provisoire de donjon, affiné en DJ1 ; plafond de cibles (C7) et menace (H9) : angles morts ; Frost Nova non lancée (tank présent)"
@@ -1236,12 +1237,27 @@ mechanics:
     categorie: optimisation
     description: "Optimiseur de talents et de respec"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: probable
-    sources: []
-    tests: []
+    sources:
+      - "seed/forever-mage/scripts/optimize.py (porté en T05)"
+      - "forever/data/1.60.1.70009/mechanics.json (build.presets, build.contexts, build.confidence, build.stability_seeds)"
+    tests:
+      - tests/parity/test_seed_optimize_parity.py::test_optimiseur_legal
+      - tests/parity/test_seed_optimize_parity.py::test_leveling_matches_the_seed
+      - tests/parity/test_seed_optimize_parity.py::test_level_weight_matches_the_seed
+      - tests/parity/test_seed_optimize_parity.py::test_score_plan_matches_the_seed
+      - tests/unit/test_optimize_leveling.py::test_order_is_legal_and_spends_every_point
+      - tests/unit/test_optimize_leveling.py::test_choices_are_legal
+      - tests/unit/test_optimize_leveling.py::test_talented_bonus_adds_legal_points
+      - tests/unit/test_optimize_leveling.py::test_best_choice_is_the_fastest
+      - tests/unit/test_optimize_endgame.py::test_candidates_are_legal_and_ranked
+      - tests/unit/test_optimize_endgame.py::test_every_candidate_is_a_local_optimum
+      - tests/unit/test_optimize_endgame.py::test_dungeon_combines_boss_and_pack
+      - tests/unit/test_mc_stats.py::test_decide_takes_the_monte_carlo_winner_when_the_gap_is_significant
     tolerance: null
-    note: "code du seed non encore porté dans forever/ : reprise en T05"
+    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo"
+    formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide)"
   - id: I6
     categorie: optimisation
     description: "Leveling : temps par monstre, XP, repos"
