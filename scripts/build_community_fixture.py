@@ -35,6 +35,11 @@ SECTION = "## Comparaison avec nos builds (T05, bloc J)"
 PRESET = "rapide"
 MC_N = 100  # combats par Monte Carlo de la comparaison (paramètre de méthode)
 SEED = 12345
+KIND_LABELS = {
+    "concorde": "concorde",
+    "mecanique_non_modelisee": "mécanique non modélisée",
+    "source_douteuse": "source douteuse",
+}
 SIMULATORS = ("wowsims", "elliotwood", "gunba", "mythicsim", "simulat")  # préréglages de simulateur
 
 
@@ -223,7 +228,15 @@ def write_section(gd: Any, doc: dict[str, Any]) -> None:
     for r in doc["references"]:
         pts = ", ".join(f"{k} {v}" for k, v in r["points"].items())
         lines.append(f"- {r['context']} niveau {r['level']} : {pts}")
+    counted = [b for b in doc["builds"] if not b.get("duplicate_of")]
+    by_kind = {k: sum(b["explanation"]["kind"] == k for b in counted) for k in KIND_LABELS}
     lines += [
+        "",
+        f"Décompte, doublons exclus ({len(counted)} builds sur {len(doc['builds'])}) : "
+        + ", ".join(f"{KIND_LABELS[k]} {n}" for k, n in by_kind.items())
+        + ". Doublons (même page qu'un autre build, non comptés) : "
+        + (", ".join(f"{b['id']} (de {b['duplicate_of']})" for b in doc["builds"] if b.get("duplicate_of")) or "aucun")
+        + ".",
         "",
         "| Id | Source | Date | Contexte | Niveau | Écart analytique | Écart Monte Carlo | Explication |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
@@ -237,9 +250,12 @@ def write_section(gd: Any, doc: dict[str, Any]) -> None:
             "mecanique_non_modelisee": f"mécanique non modélisée ({e['registry']})",
             "source_douteuse": "source douteuse",
         }[e["kind"]]
+        dup = f"doublon de {b['duplicate_of']} (même page), non compté ; " if b.get("duplicate_of") else ""
+        author = b["author"] or "auteur inconnu"
+        date = b["date"] or "non datée"
         lines.append(
-            f"| {b['id']} | [{b['author']}]({b['source_url']}) | {b['date']} | {b['context']} | {b['level']} | "
-            f"{_pct(g.get('analytic_rel')) if g else '—'} | {mc} | {kind} : {e['motif'].replace('|', '/')} |"
+            f"| {b['id']} | [{author}]({b['source_url']}) | {date} | {b['context']} | {b['level']} | "
+            f"{_pct(g.get('analytic_rel')) if g else '—'} | {mc} | {dup}{kind} : {e['motif'].replace('|', '/')} |"
         )
     text = RESEARCH.read_text(encoding="utf-8")
     if SECTION in text:

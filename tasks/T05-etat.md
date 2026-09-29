@@ -31,4 +31,4 @@ Branche `t05`. Un cycle rouge → vert par bloc ; demandes de correction regroup
 ## Fin de tranche (2026-09-29)
 - `/verifier` : lint, typage, registre (108 entrées, couverture 37/108) et contrôle des chiffres verts ; 1 244 tests passent, 7 échouent, exactement ceux des six demandes de `tasks/T05-corrections.md`.
 - Relecture du diff et audit du registre : suites appliquées (`c8977e1`, `7c96d77`).
-- Reste : accord de l'utilisateur sur les six demandes, application des diffs, `tasks/.rouge` et `tasks/.tests-verrouilles` supprimés, CI Ubuntu et Windows, fusion en avance rapide.
+- Corrections 1 à 6 et 6 bis acceptées et appliquées ; 6 ter refusée : données de la fixture corrigées (« auteur inconnu » pour A5, A7, A8, A9 ; A7 et A8 doublons de C15 et C16, non comptés). `uv run tasks.py verify` vert (1 251 tests).

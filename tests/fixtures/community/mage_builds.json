@@ -1737,7 +1737,8 @@
    "reliability_flags": [
     "Molten Armor",
     "non daté",
-    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09",
+    "auteur inconnu"
    ],
    "legal": true,
    "legal_notes": null,
@@ -1833,10 +1834,13 @@
    "reliability_flags": [
     "non daté",
     "Molten Armor",
-    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09",
+    "auteur inconnu",
+    "doublon de C15 : même page (autre contexte ou niveau), non compté deux fois dans la comparaison"
    ],
    "legal": true,
    "legal_notes": null,
+   "duplicate_of": "C15",
    "gap": {
     "analytic_rel": 0.13158320573658747,
     "mc_rel": 0.11165068865831117,
@@ -1877,10 +1881,13 @@
     "non daté",
     "Molten Armor",
     "identique à A4",
-    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09",
+    "auteur inconnu",
+    "doublon de C16 : même page (autre contexte ou niveau), non compté deux fois dans la comparaison"
    ],
    "legal": true,
    "legal_notes": null,
+   "duplicate_of": "C16",
    "gap": {
     "analytic_rel": -0.16975355803515726,
     "mc_rel": -0.18013044512980111,
@@ -1921,7 +1928,8 @@
    "reliability_flags": [
     "non daté",
     "Molten Armor",
-    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09",
+    "auteur inconnu"
    ],
    "legal": true,
    "legal_notes": null,
