@@ -116,3 +116,20 @@
          else:
              dt.date.fromisoformat(b["date"])
 ```
+
+## 6 ter. Complément de la correction n° 6 (même test), après la 6 bis
+
+- **Échec restant** : `AssertionError: A5` sur `assert "auteur inconnu" in flags`.
+- **Preuve** : 6 builds sans auteur viennent tous de wowtbc.gg (C15, A7 : page arcane-mage ; C16, A8 : frost-mage ; A5, A9 : fire-mage), mais seuls C15 et C16 portent « auteur inconnu » dans `reliability_flags`. Ma demande n° 6 affirmait à tort que chaque absence était signalée. L'absence de signature est une propriété du site, signalée par la recherche sur au moins une de ses pages. Diff essayé sur une copie du test : les 8 tests du fichier passent.
+- **Diff proposé** :
+
+```diff
+-        if b["author"] is None:  # page sans signature, signalée par la recherche
+-            assert "auteur inconnu" in flags, b["id"]
++        if b["author"] is None:  # site sans signature, signalé par la recherche pour au moins une de ses pages
++            site = b["source_url"].split("/")[2]
++            assert any(
++                o["source_url"].split("/")[2] == site and "auteur inconnu" in " ".join(o["reliability_flags"])
++                for o in doc["builds"]
++            ), b["id"]
+```

@@ -41,6 +41,9 @@ def test_every_build_has_source_date_context_level(doc):
             assert "auteur inconnu" in flags, b["id"]
         if b["date"] is None:  # date inconnue, signalée par la recherche
             assert "date" in flags and "inconnue" in flags, b["id"]
+        elif len(b["date"]) == 7:  # date au mois près, signalée par la recherche
+            assert "imprécise" in flags, b["id"]
+            dt.date.fromisoformat(b["date"] + "-01")
         else:
             dt.date.fromisoformat(b["date"])
         assert b["context"] in CONTEXTS and isinstance(b["level"], int) and 10 <= b["level"] <= 60
