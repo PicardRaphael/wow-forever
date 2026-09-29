@@ -94,8 +94,8 @@ forever-core/
 | Outil | Rôle |
 | --- | --- |
 | `forever_status` | Fraîcheur et couverture du registre |
-| `forever_lookup` | Sort, talent, objet, consommable, raciaux (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
-| `forever_explain_mechanic` | Entrée du registre, formule, certitude, paramètres de la version, implémentation, sources |
+| `forever_lookup` | Sort, talent (T06), zones (T04c) ; objet, consommable, raciaux à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
+| `forever_explain_mechanic` | Entrée du registre (par identifiant ou par mots de la description, T06), formule, certitude, paramètres de la version, implémentation, sources |
 | `forever_sim_leveling` | Temps par monstre, XP/h : Monte Carlo et analytique, PV du monstre (valeur, source, certitude) ; graphique par `forever chart leveling` (T04b) |
 | `forever_sim_raid` | DPS, intervalle de confiance, contributions |
 | `forever_build` | Build par contexte (leveling, donjon, raid, PvP) : talents, ordre, raisons, alternative, stabilité, sensibilité, respec, angles morts (T05, décision 86) |
@@ -105,10 +105,25 @@ forever-core/
 | `forever_player_profile` | Lire ou mettre à jour une fiche joueur |
 
 ## Plugin Claude Code
-- Skills : `forever-router` (aiguillage et règles), `forever-mage` puis une par classe, `forever-gear`, `forever-raid`, `forever-data`. Chaque SKILL.md fait moins de 200 lignes, sans aucun chiffre de jeu.
-- Sous-agents produit : `data-updater`, `sim-runner`, `web-researcher`, `evaluator` (sorties courtes et structurées).
-- Hooks produit : SessionStart (`forever status --json`).
-- Commandes : `/forever`, `/forever-update`, `/forever-sim`, `/forever-raid-prep`, `/forever-respec`.
+Livré en T06 (`plugin/`, décisions 91 à 97), installé au niveau utilisateur par `scripts/install_plugin.ps1` depuis la
+marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-forever`) ; mode d'emploi : `docs/USAGE.md`.
+- **Mince** : aucun calcul ni chiffre de jeu ; le serveur MCP (`plugin/.mcp.json`) et les hooks lancent le dépôt pointé
+  par `FOREVER_HOME` (défaut `${CLAUDE_PLUGIN_ROOT}/..`, le dépôt quand le plugin est chargé sur place).
+- **Skills** : `forever-router` (aiguillage, carte des domaines couverts et non couverts avec leur tranche, format de
+  réponse `format-reponse.md`, règle « je ne sais pas »), `forever-leveling`, `forever-mage`. Chaque tranche de domaine
+  ajoute son skill et met à jour la carte du routeur. Chaque SKILL.md fait moins de 200 lignes, sans chiffre de jeu.
+- **Sous-agents** : `forever-web-researcher` (WebSearch, WebFetch ; sources étiquetées officielle, communautaire,
+  simulateur ; rien n'entre dans `forever/data/`), `forever-sim-runner` (calculs lourds par les outils forever).
+  `data-updater` (T08) et `evaluator` (remplacé par `claude plugin eval`) : plus tard ou abandonnés.
+- **Hooks** (logique dans `forever/hooks.py`, sous-commandes `forever hook …`) : SessionStart → ligne de fraîcheur,
+  cache seulement, **seulement dans le dépôt** ; Stop → chiffres de jeu de la réponse absents des résultats des outils
+  `forever_*` de la session, message `[forever:chiffres]` sans blocage, **seulement si la session a utilisé forever**.
+  Garde dans `hooks.json` : rien ne s'exécute sans `pyproject.toml` au chemin du dépôt (aucune erreur ailleurs).
+- **Pas de statusline** (décision 15), pas de commandes `/forever…` en T06 (le langage naturel suffit ; à reprendre si
+  l'évaluation le justifie).
+- **Évaluation** : `plugin/evals/` (30 questions réelles, 20 voisines), contrôlée sans modèle en CI
+  (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
+  (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
 
 ## Outils et skills prévus (provisoires)
 Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la forme définitive (nom, paramètres, schéma de sortie) se fixe au plan de chaque tranche (décision 63).

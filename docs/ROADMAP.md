@@ -17,7 +17,7 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 | T04c | Simulateur fiable pour comparer les builds : Ignite, Arcane Blast, recharges, régénération et armure, `forever measures refresh`, zone ou donjon à mon niveau | T04b |
 | T04e | Calculs de dégâts fidèles au client : coefficients du client, DoT, multiplicateurs, cumul des bonus | T04c |
 | T05 | Builds du Mage par contexte : optimiseur (leveling, donjon, raid, PvP), Arcane Power et Hot Streak dans les rotations, sensibilité, respec | T04b, T04c, T04e |
-| T06 | Plugin Claude Code : skills, hooks, statusline, commandes, sous-agents | T04b |
+| T06 | Plugin Claude Code : skills, hooks, sous-agents, installation au niveau utilisateur, évaluation (sans statusline) | T04b |
 | T04d | Quêtes propres à Forever et modèle d'XP de Forever (placée après T06 : ses sources viennent de l'inventaire des addons, `tasks/inventaire-addons.md`, et elle ne change pas le classement des builds) | T04c |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
 | PV1 | PvP, savoir des 9 classes sans moteur de classe : sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants (règles Classic), fiches par affrontement | T03, T05 |
@@ -99,7 +99,7 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 
 ## T06 — Plugin Claude Code
 - **Fait** : skills des domaines disponibles à ce stade (leveling, Mage) ; chaque tranche de domaine suivante ajoute son skill (PvP, donjons, Legacy, métiers, réputations, économie).
-- **Critères de fin** : installation locale du plugin ; SessionStart injecte une seule ligne de fraîcheur ; la statusline affiche version et statut ; jeu d'évaluation d'aiguillage de 30 requêtes (60 % doivent déclencher un skill, 40 % non) avec au moins 90 % de bonnes décisions.
+- **Critères de fin** (plan `tasks/T06-plan.md`, décisions 91 à 97) : plugin installé au niveau utilisateur par `scripts/install_plugin.ps1` sur un PC et utilisable depuis un autre dossier ; SessionStart injecte une ligne de fraîcheur hors ligne, seulement dans le dépôt ; le hook Stop signale un chiffre inventé sur la fixture, seulement dans une session qui a utilisé forever ; skills sans chiffre de jeu ; `forever lookup talent` ; évaluation de 30 questions réelles et 20 voisines aux seuils de la décision 96 (passage local documenté dans `docs/research/plugin-eval-T06.md`, taux de fausses alertes du contrôle des chiffres mesuré) ; `uv run tasks.py verify` vert. Pas de statusline (décision 15).
 
 ## T04d — Quêtes Forever et XP
 - **À faire** (reporté de T04c) : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; durée d'infobulle dans `tooltip_values`. Routes de leveling : pas de tranche dédiée (le joueur suit RestedXP en jeu ; RestedXP reste exclu comme source de données, `docs/DATA_SOURCES.md`). La réponse « quelle zone ou quel donjon à mon niveau » est faite en T04c (`forever lookup zones`, Questie lu localement, `suppose`) ; DJ1 affinera la partie donjons. Les quêtes de donjon restent ici ; DJ1 s'y réfère.
