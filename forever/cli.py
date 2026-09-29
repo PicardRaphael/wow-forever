@@ -76,7 +76,7 @@ from forever.pipeline.refresh import (
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
-from forever.profile import ProfileView, read_profile, remove, set_character, use
+from forever.profile import ProfileView, load_profile, read_profile, remove, set_character, use
 from forever.provenance import (
     Certainty,
     Provenance,
@@ -161,12 +161,17 @@ def build_parser() -> argparse.ArgumentParser:
     plist.add_argument("--json", action="store_true", help="sortie JSON")
     pset = psub.add_parser("set", help="créer ou mettre à jour un personnage (champs donnés seulement)")
     pset.add_argument("name", help="nom du personnage")
-    pset.add_argument("--class", dest="cls", help="Mage, Paladin ou Démoniste")
+    pset.add_argument("--class", dest="cls", help="classe (neuf classes, nom français ou anglais)")
     pset.add_argument("--race", help="race (Mage : racials.json)")
     pset.add_argument("--faction", help="faction (jamais déduite)")
     pset.add_argument("--level", type=int, help="niveau")
     pset.add_argument("--talents", help="talents « clé=rang,… » (remplacent les précédents)")
     pset.add_argument("--profession", action="append", default=[], help="métier « Nom=compétence » (répétable)")
+    pstate = pset.add_mutually_exclusive_group()
+    pstate.add_argument(
+        "--planned", dest="planned", action="store_const", const=True, help="personnage prévu, pas encore créé"
+    )
+    pstate.add_argument("--created", dest="planned", action="store_const", const=False, help="personnage créé en jeu")
     pset.add_argument("--json", action="store_true", help="sortie JSON")
     puse = psub.add_parser("use", help="rendre un personnage actif")
     puse.add_argument("name", help="nom du personnage")
@@ -295,7 +300,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     b = sub.add_parser("build", help="build du Mage par contexte : talents, ordre, raisons, sensibilité, respec")
     b.add_argument("context", choices=CONTEXTS, help="contexte : leveling, dungeon, raid, pvp-bg, pvp-world")
-    b.add_argument("--level", type=int, required=True, help="niveau du build (leveling : ordre de 10 à ce niveau)")
+    b.add_argument("--level", type=int, help="niveau du build (défaut : niveau maximal des données)")
     b.add_argument("--race", help="race du personnage (défaut : Orc, signalé dans inputs)")
     b.add_argument("--current", default="", help="build actuel clé=rang,clé=rang (conseil de respec)")
     b.add_argument("--respecs", type=int, default=0, help="réinitialisations déjà faites (barème de respec)")
@@ -722,8 +727,11 @@ def render_profile(view: ProfileView) -> list[str]:
     if c is None:
         return [f"Profil joueur {view['path']} : aucun personnage (forever profile set <nom> --class Mage …)"]
     active = " (actif)" if c["name"] == view["active"] else ""
-    head = f"Profil : {c['name']}{active}, {c['class']} {c['race'] or 'race ?'}"
-    head += f", {c['faction'] or 'faction ?'}, niveau {c['level'] if c['level'] is not None else '?'}"
+    head = f"Profil : {c['name']}{active}, {c['class']} {c['race'] or 'race ?'}, {c['faction'] or 'faction ?'}"
+    if c.get("planned"):
+        head += ", personnage prévu (pas encore créé)"
+    else:
+        head += f", niveau {c['level'] if c['level'] is not None else '?'}"
     lines = [head]
     if c["talents"]:
         lines.append("Talents : " + ", ".join(f"{k} {v}" for k, v in c["talents"].items()))
@@ -764,6 +772,7 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
             level=args.level,
             talents=parse_talents(args.talents) if args.talents is not None else None,
             professions=_parse_professions(args.profession),
+            planned=args.planned,
         )
     elif cmd == "use":
         use(deps, target)
@@ -777,7 +786,11 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
     view = read_profile(deps, name if cmd in ("show", "set") else None)
     if cmd == "list":
         lines = [f"Profil joueur {view['path']} :"]
-        lines += [f"  {'* ' if n == view['active'] else '  '}{n}" for n in view["characters"]] or ["  (vide)"]
+        chars = load_profile(Path(view["path"]))["characters"]
+        lines += [
+            f"  {'* ' if n == view['active'] else '  '}{n}" + (" (prévu)" if chars[n].get("planned") else "")
+            for n in view["characters"]
+        ] or ["  (vide)"]
     else:
         lines = render_profile(view)
     _emit(view, lines, view["provenance"], args.json)

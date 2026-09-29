@@ -3,9 +3,11 @@
 Fichier : `Deps.profile_path`, sinon `FOREVER_PROFILE`, sinon `~/.forever/profile.json` ; jamais sous le dépôt (les
 données personnelles ne se committent pas, décision 99). Lu explicitement par l'agent (`forever_player_profile`) :
 les outils de calcul ne le lisent jamais d'eux-mêmes. Schéma 1 :
-`{schema_version, active, characters: {<nom>: {class, race, faction, level, talents, professions, game_version,
-updated_at, validated}}}`. Mage : race (racials.json), niveau et talents (check_build) validés ; autres classes
-(tranches de classe PA1 à DR1) : gardées telles quelles, `validated: false`. Faction donnée par le joueur, jamais déduite."""
+`{schema_version, active, characters: {<nom>: {class, race, faction, level, talents, professions, planned,
+game_version, updated_at, validated}}}`. Neuf classes (noms anglais du client, noms français acceptés). Mage : race
+(racials.json), niveau et talents (check_build) validés ; autres classes (tranches de classe PA1 à DR1) : gardées
+telles quelles, `validated: false`. Faction donnée par le joueur, jamais déduite. `planned` : personnage prévu, pas
+encore créé (classe, race, faction, métiers envisagés ; ni niveau ni talents attendus) ; absent : `false`."""
 
 from __future__ import annotations
 
@@ -26,15 +28,21 @@ from forever.timefmt import format_utc
 
 SCHEMA_VERSION = 1
 REPO_ROOT = Path(__file__).resolve().parent.parent
-CLASSES = ("Mage", "Paladin", "Warlock")
+CLASSES = ("Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid")
 CLASS_NAMES = {
-    "mage": "Mage",
-    "paladin": "Paladin",
-    "warlock": "Warlock",
+    **{c.lower(): c for c in CLASSES},
+    "guerrier": "Warrior",
+    "chasseur": "Hunter",
+    "voleur": "Rogue",
+    "prêtre": "Priest",
+    "pretre": "Priest",
+    "chaman": "Shaman",
     "démoniste": "Warlock",
     "demoniste": "Warlock",
+    "druide": "Druid",
 }
 FIELDS = ("race", "faction", "level", "talents", "professions")  # champs du joueur, dans l'ordre de `missing`
+PLANNED_UNUSED = ("level", "talents")  # champs qu'un personnage prévu n'a pas encore
 
 
 class ProfileView(TypedDict):
@@ -98,7 +106,8 @@ def _class(value: str) -> str:
     key = value.strip().lower()
     if key not in CLASS_NAMES:
         raise InvalidArgumentError(
-            f"Classe inconnue « {value} ».", "choisir Mage, Paladin ou Démoniste (seules classes du projet)"
+            f"Classe inconnue « {value} ».",
+            "choisir Guerrier, Paladin, Chasseur, Voleur, Prêtre, Chaman, Mage, Démoniste ou Druide",
         )
     return CLASS_NAMES[key]
 
@@ -144,8 +153,10 @@ def set_character(
     level: int | None = None,
     talents: Mapping[str, int] | None = None,
     professions: Mapping[str, int] | None = None,
+    planned: bool | None = None,
 ) -> dict[str, Any]:
-    """Crée ou met à jour un personnage (champs donnés seulement) ; le premier créé devient actif. Rend le profil."""
+    """Crée ou met à jour un personnage (champs donnés seulement) ; le premier créé devient actif. Rend le profil.
+    `planned` vrai : personnage prévu (pas encore créé) ; faux : créé en jeu."""
     if not name.strip():
         raise InvalidArgumentError("Nom de personnage vide.", "donner un nom")
     path = _path(deps)
@@ -170,6 +181,9 @@ def set_character(
         current["professions"] = merged
     for key in FIELDS:
         current.setdefault(key, {} if key in ("talents", "professions") else None)
+    if planned is not None:
+        current["planned"] = planned
+    current["planned"] = bool(current.get("planned", False))
     if current["level"] is not None:
         _check_level(deps, current["level"])
     validated = current["class"] == "Mage"
@@ -178,7 +192,7 @@ def set_character(
     current["validated"] = validated
     current["game_version"] = current_identity(deps.data_dir).game_version
     current["updated_at"] = format_utc(deps.now())
-    chars[name] = {k: current[k] for k in ("class", *FIELDS, "game_version", "updated_at", "validated")}
+    chars[name] = {k: current[k] for k in ("class", *FIELDS, "planned", "game_version", "updated_at", "validated")}
     if doc.get("active") is None:
         doc["active"] = name
     _save(path, doc)
@@ -226,8 +240,10 @@ def read_profile(deps: Deps, name: str | None = None) -> ProfileView:
         _known(doc, name)
     raw = doc["characters"].get(chosen) if chosen is not None else None
     version = current_identity(deps.data_dir).game_version
-    character = {"name": chosen, **raw} if raw is not None else None
-    missing = [k for k in FIELDS if raw is not None and raw.get(k) in (None, "", {})]
+    planned = bool(raw.get("planned", False)) if raw is not None else False
+    character = {"name": chosen, **raw, "planned": planned} if raw is not None else None
+    expected = [k for k in FIELDS if not (planned and k in PLANNED_UNUSED)]
+    missing = [k for k in expected if raw is not None and raw.get(k) in (None, "", {})]
     notes = [f"profil joueur : {path} (données personnelles, hors du dépôt)"]
     if raw is None:
         notes.append("aucun personnage dans le profil : demander les données au joueur (forever profile set)")

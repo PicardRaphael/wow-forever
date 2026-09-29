@@ -38,6 +38,8 @@ _ANY_NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
 _FOREVER_TOOL = re.compile(r"^mcp__.+__forever_\w+$")
 _FOREVER_SKILL = re.compile(r"^(?:forever:)?forever-[\w-]+$")
 _SOURCE_AGENT = re.compile(r"^(?:forever:)?forever-sim-runner$")
+_RESEARCH_AGENT = re.compile(r"^(?:forever:)?forever-web-researcher$")
+_ADDRESS = re.compile(r"https?://", re.IGNORECASE)
 _FOREVER_AGENT = re.compile(r"^(?:forever:)?forever-[\w-]+$")
 _EPS = 1e-9
 # Entier affiché avec des zéros finals (20, 12 300) : lu comme un arrondi à la dizaine, à la centaine…, écart borné à
@@ -112,6 +114,32 @@ def _is_source_use(use: Mapping[str, Any]) -> bool:
     return name in ("Agent", "Task") and bool(_SOURCE_AGENT.match(str(inp.get("subagent_type", ""))))
 
 
+def _is_research_use(use: Mapping[str, Any]) -> bool:
+    inp = use.get("input") if isinstance(use.get("input"), Mapping) else {}
+    assert isinstance(inp, Mapping)
+    return str(use.get("name", "")) in ("Agent", "Task") and bool(
+        _RESEARCH_AGENT.match(str(inp.get("subagent_type", "")))
+    )
+
+
+def _texts(obj: Any) -> Iterator[str]:
+    """Textes d'un résultat d'outil (chaîne, blocs `text`, listes)."""
+    if isinstance(obj, str):
+        yield obj
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from _texts(v.get("text") if isinstance(v, Mapping) and v.get("type") == "text" else v)
+
+
+def _sourced_lines(obj: Any) -> Iterator[str]:
+    """Lignes du rapport de `forever-web-researcher` qui portent l'adresse de leur source : seuls leurs chiffres sont
+    des sources (affirmation d'une source nommée, à citer comme telle, jamais comme un fait du projet)."""
+    for text in _texts(obj):
+        for line in text.splitlines():
+            if _ADDRESS.search(line):
+                yield line
+
+
 def session_used_forever(lines: Iterable[Mapping[str, Any]]) -> bool:
     """Vrai si le transcript contient un appel d'outil MCP `forever_*`, d'un skill `forever-*` ou d'un sous-agent
     `forever-*`."""
@@ -152,7 +180,9 @@ def _values(obj: Any) -> Iterator[float]:
 
 
 def _sources(lines: list[Mapping[str, Any]]) -> list[float]:
-    source_ids = {str(u.get("id")) for u in _tool_uses(lines) if _is_source_use(u)}
+    uses = list(_tool_uses(lines))
+    source_ids = {str(u.get("id")) for u in uses if _is_source_use(u)}
+    research_ids = {str(u.get("id")) for u in uses if _is_research_use(u)}
     values: list[float] = []
     for line in lines:
         if line.get("type") != "user":
@@ -163,6 +193,9 @@ def _sources(lines: list[Mapping[str, Any]]) -> list[float]:
             if b.get("type") == "tool_result":
                 if str(b.get("tool_use_id")) in source_ids:
                     values.extend(_values(b.get("content")))
+                elif str(b.get("tool_use_id")) in research_ids:
+                    for sourced in _sourced_lines(b.get("content")):
+                        values.extend(_values(sourced))
             elif b.get("type") == "text" and not line.get("isMeta"):
                 # question de l'utilisateur (le corps d'un skill chargé est marqué isMeta et ne compte pas)
                 values.extend(_parse(m.group(0))[0] for m in _NUMBER.finditer(str(b.get("text", ""))))
@@ -199,7 +232,8 @@ def _matches(x: float, decimals: int, unit: str, v: float) -> bool:
 
 def unsourced_numbers(lines: Iterable[Mapping[str, Any]], last_message: str | None = None) -> list[str]:
     """Chiffres de jeu de la dernière réponse absents des résultats des outils `forever_*` (et du sous-agent de
-    simulation) et de la question de l'utilisateur. Égalité à l'arrondi affiché près ; fraction acceptée pour un
+    simulation), des lignes sourcées (avec une adresse) du rapport du sous-agent de recherche et de la question de
+    l'utilisateur. Égalité à l'arrondi affiché près ; fraction acceptée pour un
     pourcentage, secondes pour des minutes ou des heures ; virgule et point équivalents."""
     all_lines = list(lines)
     text = last_message if last_message is not None else _last_assistant_text(all_lines)

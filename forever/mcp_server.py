@@ -171,7 +171,7 @@ def build_server(deps: Deps) -> MCPServer:
     @server.tool()
     def forever_build(
         context: str,
-        level: int,
+        level: int | None = None,
         race: str | None = None,
         current: dict[str, int] | None = None,
         respecs: int = 0,
@@ -190,7 +190,9 @@ def build_server(deps: Deps) -> MCPServer:
         angles morts (borne haute ou non chiffré), certitude, hypothèses et provenance. Donjon et raid : scénarios
         provisoires. Au-delà du plafond de la bêta, le build n'est pas vérifiable en jeu avant la sortie.
 
-        `current` : build actuel {clé: rang} (conseil de respec) ; `respecs` : réinitialisations déjà faites ;
+        `level` absent : niveau maximal des données (question générale sans niveau, `inputs.level.origin` vaut
+        `default`). `current` : build actuel {clé: rang} (conseil de respec ; à un niveau plus bas que `level`, le
+        bloc `respec.projected` donne le chemin conseillé depuis ce build jusqu'à `level`) ; `respecs` : réinitialisations déjà faites ;
         `sp`, `crit` : fiche remplacée (puissance des sorts, critique en fraction) ; `preset` : rapide (défaut) ou
         complet ; `rules` : forever, ou seed (leveling seulement, parité) ; `talented_bonus` : points du bonus Legacy
         « Talented » (hypothèse)."""

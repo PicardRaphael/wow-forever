@@ -380,10 +380,19 @@ def _respec(
             rules=rules,
             **m.sim,
         )
+        projected = {k: a.keep.points[k] for k in gd.talents if a.keep.points.get(k, 0) > 0}
         return {
             "verdict": a.verdict,
             "level": a.level,
             "current_level": now,
+            # chemin conseillé depuis le build actuel jusqu'au niveau demandé (chemin gardé du conseil) : planification
+            "projected": {
+                "from_level": now,
+                "to_level": level,
+                "steps": [{"level": s.level, "talent": s.talent} for s in a.keep.steps],
+                "talents": projected,
+                "points": build_points(gd, projected, level, bonus),
+            },
             "gain_hours": a.gain_hours,
             "cost_gold": a.cost_gold,
             "balance_gold": a.balance_gold,
@@ -422,7 +431,7 @@ def _respec(
 def build_report(
     deps: Deps,
     context: str,
-    level: int,
+    level: int | None = None,
     *,
     race: str | None = None,
     current: Mapping[str, int] | None = None,
@@ -439,17 +448,20 @@ def build_report(
 
     `current` : build actuel (conseil de respec) ; `respecs` : réinitialisations déjà faites ; `sp`, `crit` : fiche
     remplacée ; `preset` : préréglage de l'optimiseur (`build.presets`) ; `talented_bonus` : points de talent du bonus
-    Legacy « Talented » (hypothèse affichée) ; `race` absente : Orc, signalé dans `inputs` et les hypothèses."""
-    inputs = {
-        "race": given(race, DEFAULT_RACE),
-        "level": given(level, None),
-        "current": given(dict(current) if current is not None else None, None),
-    }
+    Legacy « Talented » (hypothèse affichée) ; `race` absente : Orc, signalé dans `inputs` et les hypothèses ;
+    `level` absent : niveau maximal des données (`level_cap`), signalé de même (question générale sans niveau)."""
+    race_given = race
     race = race if race is not None else DEFAULT_RACE
     data = load_version(deps)
     if rules not in RULES:
         raise InvalidArgumentError(f"rules inconnu « {rules} ».", "choisir forever ou seed")
     gd = build_game_data(data, rules=rules)
+    inputs = {
+        "race": given(race_given, DEFAULT_RACE),
+        "level": given(level, gd.level_cap),
+        "current": given(dict(current) if current is not None else None, None),
+    }
+    level = level if level is not None else gd.level_cap
     _validate(gd, data, context, level, race, current, respecs, preset, rules, talented_bonus)
     p = gd.build.presets[preset]
     over_raw: dict[str, float] = {}
@@ -577,6 +589,8 @@ def build_report(
     assumptions = _assumptions(gd, context, level, p, preset, seed, sp, crit, talented_bonus, build, options)
     if inputs["race"]["origin"] == "default":
         assumptions.insert(0, DEFAULT_RACE_NOTE)
+    if inputs["level"]["origin"] == "default":
+        assumptions.insert(0, f"niveau absent : niveau maximal des données ({level}, level_cap de spell_scaling.json)")
     if context == "leveling" and current is not None and next_step is None:
         assumptions.append(
             f"prochain talent (next_step) non calculé : il faut un build actuel légal au niveau {level - 1}, un point "

@@ -87,7 +87,7 @@ def test_mage_talents_must_be_legal_at_the_level(deps):
     with pytest.raises(InvalidArgumentError):
         set_character(deps, "Givrelame", cls="Mage", race="Orc", faction="Horde", level=99)
     with pytest.raises(InvalidArgumentError):
-        set_character(deps, "Givrelame", cls="Chasseur", race="Orc", faction="Horde", level=20)
+        set_character(deps, "Givrelame", cls="Chevalier de la mort", race="Orc", faction="Horde", level=20)
 
 
 def test_other_classes_are_kept_unvalidated(deps):
