@@ -1,0 +1,4 @@
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_s", "name": "Skill", "input": {"skill": "forever:forever-mage"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_s", "content": "Launching skill: forever:forever-mage"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Réponse finale sans chiffre."}]}}
+{"type": "system", "subtype": "informational", "content": "Stop says: [forever:chiffres] Chiffres de jeu sans source dans les outils forever de la session : « 10 % », « 31 points ». Ne pas s'y fier sans vérification.", "level": "notice"}

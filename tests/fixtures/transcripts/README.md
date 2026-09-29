@@ -15,3 +15,4 @@ contexte de session retirés ; noms du plugin de sonde remplacés par ceux du pl
 | `session_sim_runner.jsonl` | synthétique : résultat du sous-agent `forever-sim-runner` | aucun chiffre signalé |
 
 Régénération : `build_transcripts.py` du bloc A (hors dépôt), écriture en octets (LF).
+| `session_negative_values.jsonl` | synthétique, valeurs réelles du passage d'évaluation de T06 (écarts négatifs de `forever_build` : −10,65 s, −0,0016 s) | aucun chiffre signalé (le signe est dit en mots) |

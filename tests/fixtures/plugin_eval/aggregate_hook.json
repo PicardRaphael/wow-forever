@@ -1,0 +1,24 @@
+{
+ "schemaVersion": 1,
+ "claudeVersion": "2.1.284",
+ "costUsd": 0.1,
+ "cases": [
+  {
+   "name": "mage-x",
+   "arms": {
+    "with": [
+     {
+      "passed": false,
+      "tracePath": "trace_with_hook.jsonl",
+      "graders": [
+       {
+        "name": "chiffres",
+        "passed": false
+       }
+      ]
+     }
+    ]
+   }
+  }
+ ]
+}
