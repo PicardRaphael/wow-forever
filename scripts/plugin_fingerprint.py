@@ -34,7 +34,7 @@ def files(plugin: Path) -> list[Path]:
         if any(part in IGNORED_NAMES for part in rel.parts):
             continue
         out.append(rel)
-    return out
+    return sorted(out, key=lambda r: r.as_posix())  # ordre en octets, le même sous Windows et Linux
 
 
 def compute(plugin: Path) -> str:
