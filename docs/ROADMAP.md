@@ -129,7 +129,7 @@ Demande de l'utilisateur du 2026-09-29, après l'évaluation du plugin (`docs/re
   versionné, `validate --strict` vert.
 - **Fait** : `forever install` (révision 2, décision 98), copies figées du seed pour le mode seed, provenance
   `data_revision` ; totaux (`points`, `derived`, `monte_carlo_stats`, `advantage`) ; profil joueur hors du dépôt
-  (décision 99) ; recommandations départagées et `next_step` (décision 100) ; plugin 0.2.0 et empreinte (décision
+  (décision 99) ; recommandations départagées et `next_step` (décision 100) ; plugin 0.2.1 et empreinte (décision
   101) ; rejeu des builds (`docs/research/builds-T05.md`, section « Rejeu T06b ») ; évaluation (`docs/research/plugin-eval-T06.md`).
 - **Reste pour T08** : chaîne automatique de veille, installation d'une **nouvelle** version de données (copie des
   `_seed_*.json` comprise) et PR de données ; `forever_diff_versions`.

@@ -121,7 +121,7 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
   Garde dans `hooks.json` : rien ne s'exécute sans `pyproject.toml` au chemin du dépôt (aucune erreur ailleurs).
 - **Pas de statusline** (décision 15), pas de commandes `/forever…` en T06 (le langage naturel suffit ; à reprendre si
   l'évaluation le justifie).
-- **Version** : semver dans `plugin.json` (0.2.0 en T06b), relevée à chaque changement de `plugin/`, gardée par
+- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b), relevée à chaque changement de `plugin/`, gardée par
   `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
 - **Évaluation** : `plugin/evals/` (33 questions réelles dont deux à profil vide, 20 voisines ; 53 cas depuis T06b ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
   (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
