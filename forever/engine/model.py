@@ -308,6 +308,12 @@ class Utility:
     mage_armor_regen: float
     water: Restore
     food: Restore
+    blink_level: int = 0
+    blink_cooldown_s: float = 0.0
+    counterspell_level: int = 0
+    counterspell_cooldown_s: float = 0.0
+    counterspell_lockout_s: float = 0.0
+    ice_barrier: tuple[tuple[int, float], ...] = ()  # (niveau, absorption) par rang
 
 
 @dataclass(frozen=True)
@@ -393,6 +399,14 @@ class BuildMethod:
 
 
 @dataclass(frozen=True)
+class PvpRules:
+    """Barème du profil PvP du seed (`pvp.profile`, suppose) et poids des composantes par contexte (`pvp.weights`)."""
+
+    profile: Mapping[str, Any]
+    weights: Mapping[str, Mapping[str, float]]
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu en T12)."""
 
@@ -414,6 +428,7 @@ class GameData:
     talent_cooldowns_s: Mapping[str, float]  # recharges des talents actifs (spell_scaling.json.talent_cooldowns, T05)
     level_cap: int  # plafond de niveau (spell_scaling.json)
     xp_to_next: tuple[int, ...]  # XP pour passer au niveau suivant, niveau 1 en premier (leveling.json)
+    pvp: PvpRules
     respec: RespecRules
     build: BuildMethod
     # plages des hypothèses incertaines (champ range de mechanics.json), par clé de mechanics.json (T05)

@@ -24,6 +24,7 @@ from forever.engine.model import (
     MonsterHp,
     MonsterTable,
     Preset,
+    PvpRules,
     QuestBand,
     QuestieCorrection,
     Racials,
@@ -366,7 +367,47 @@ def _utility(raw: Any) -> Utility:
         mage_armor_regen=r.num(mage, "regen_while_casting", "utility.mage_armor.regen_while_casting"),
         water=restore("conjure_water"),
         food=restore("conjure_food"),
+        **_pvp_utility(r, u),
     )
+
+
+def _pvp_utility(r: _Reader, u: Mapping[str, Any]) -> dict[str, Any]:
+    """Blink, Counterspell et rangs d'Ice Barrier (`spells.json.utility`) pour le profil PvP (T05)."""
+    blink = r.obj(u, "blink", "utility.blink")
+    cs = r.obj(u, "counterspell", "utility.counterspell")
+    ib = r.obj(u, "ice_barrier", "utility.ice_barrier")
+    ranks = r.list_(ib, "ranks", "utility.ice_barrier.ranks")
+    if not all(isinstance(x, list) and len(x) >= 2 for x in ranks):
+        raise r.fail("utility.ice_barrier.ranks", "liste de rangs [niveau, absorption, …]")
+    return {
+        "blink_level": r.int_(blink, "level", "utility.blink.level"),
+        "blink_cooldown_s": r.num(blink, "cooldown", "utility.blink.cooldown"),
+        "counterspell_level": r.int_(cs, "level", "utility.counterspell.level"),
+        "counterspell_cooldown_s": r.num(cs, "cooldown", "utility.counterspell.cooldown"),
+        "counterspell_lockout_s": r.num(cs, "lockout", "utility.counterspell.lockout"),
+        "ice_barrier": tuple(
+            (
+                r.int_({"v": x[0]}, "v", "utility.ice_barrier.ranks"),
+                r.num({"v": x[1]}, "v", "utility.ice_barrier.ranks"),
+            )
+            for x in ranks
+        ),
+    }
+
+
+def _pvp(values: Mapping[str, Any]) -> PvpRules:
+    """`pvp.profile` et `pvp.weights` de `mechanics.json` (T05)."""
+    m = _Reader(MECHANICS_FILE)
+    profile = m.obj(m.obj(values, "pvp.profile", "pvp.profile"), "value", "pvp.profile")
+    for key in ("ref", "cap", "scale", "racial_s", "sheets"):
+        if key not in profile:
+            raise m.fail(f"pvp.profile.{key}", "valeur du barème")
+    raw = m.obj(m.obj(values, "pvp.weights", "pvp.weights"), "value", "pvp.weights")
+    weights = {
+        name: {k: m.num(m.obj(raw, name, f"pvp.weights.{name}"), k, f"pvp.weights.{name}.{k}") for k in profile["ref"]}
+        for name in raw
+    }
+    return PvpRules(profile=profile, weights=weights)
 
 
 def _leveling(values: Mapping[str, Any]) -> LevelingConstants:
@@ -812,6 +853,7 @@ def build_game_data(version: VersionData) -> GameData:
         talent_cooldowns_s=_talent_cooldowns(raw[SCALING_FILE]),
         level_cap=_Reader(SCALING_FILE).int_(raw[SCALING_FILE], "level_cap", "level_cap"),
         xp_to_next=_xp_to_next(raw[LEVELING_FILE]),
+        pvp=_pvp(values),
         respec=_respec(raw[RESPEC_FILE], values),
         build=_build_method(values),
         assumption_ranges=_assumption_ranges(values),

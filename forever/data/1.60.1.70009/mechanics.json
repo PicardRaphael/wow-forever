@@ -318,6 +318,18 @@
       "certainty": "certain",
       "registry": "I5",
       "source": "paramètre de méthode (T05) : scénarios provisoires de chaque contexte de fin de partie (build.scenarios) ; métrique d'un contexte = dégâts totaux / durée totale retenue"
+    },
+    "pvp.profile": {
+      "value": {"ref": {"burst": 2500.0, "control": 30.0, "survival": 30.0, "sustain": 350.0}, "cap": 1.5, "scale": 100, "burst_window_s": 6, "ice_lance_repeat_factor": 0.6, "combustion_factor": 1.12, "arcane_blasts": 2, "arcane_missiles_factor": 1.2, "arcane_without_pom_factor": 0.8, "freeze_s": 5.0, "slow_weight": 0.5, "average_cast_s": 2.5, "frost_share": 0.5, "frostbolt_slow_s_per_min": 40, "cone_slow_s": 6, "cone_per_min": 6, "impact_stun_s": 2.0, "blast_wave_slow_s": 6, "school_lock_weight": 0.3, "ice_block_s": 10, "cold_snap_factor": 1.6, "barrier_divisor": 300.0, "barrier_factor": 3, "blink_melee_avoided_s": 1.2, "frost_warding_factor": 2, "arcane_resilience_factor": 3, "improved_frost_nova_s": 0.5, "permafrost_factor": 0.1, "racial_s": {"Human": 6.0, "Undead": 3.0, "Orc": 3.5, "Gnome": 3.0, "Troll": 1.5}, "racial_default_s": 1.0, "moving_share": 0.4, "ice_lance_sustain_factor": 0.3, "sheets": {"60": {"sp": 400, "spell_crit": 0.12}}},
+      "certainty": "suppose",
+      "registry": "I5",
+      "source": "seed/forever-mage/scripts/pvp.py (EST : modèle de scénarios qui compare des builds, sans simulation de duel) : références de normalisation, plafond et échelle du score, fenêtre d'ouverture, facteurs des séquences, durées de contrôle et de survie par minute, bonus raciaux de survie, part du temps en mouvement, fiche de base du niveau 60 ; recharges lues dans le client (spell_scaling.json.talent_cooldowns) et sorts utilitaires dans spells.json"
+    },
+    "pvp.weights": {
+      "value": {"bg": {"burst": 0.35, "control": 0.25, "survival": 0.25, "sustain": 0.15}, "world": {"burst": 0.45, "control": 0.2, "survival": 0.2, "sustain": 0.15}},
+      "certainty": "suppose",
+      "registry": "I5",
+      "source": "bg : poids par défaut du seed (seed/forever-mage/scripts/pvp.py (EST : modèle de scénarios qui compare des builds, sans simulation de duel), DEFAULT_W) ; world : supposé (T05), plus de burst pour l'embuscade en monde ouvert, à régler avec l'utilisateur (voir OPEN_QUESTIONS) ; affinés en PV2"
     }
   }
 }

@@ -15,6 +15,7 @@ import statistics
 from typing import Any, NamedTuple
 
 from forever.engine.model import CharacterOverrides, GameData, Points
+from forever.engine.pvp import pvp_score, seed_rounded
 from forever.engine.spells import best_rank
 from forever.engine.talents import check_build, legal_additions, points_available
 from forever.optimize.decide import decide
@@ -22,6 +23,7 @@ from forever.optimize.leveling import BuildChoice, build_choices
 from forever.sim.encounter import AOE_FILLERS, EncounterResult, encounter_analytic, encounter_fight
 from forever.sim.leveling_mc import McStats
 
+PVP_CONTEXTS = {"pvp-bg": "bg", "pvp-world": "world"}  # contexte PvP -> poids du profil (pvp.weights)
 GAIN_EPSILON = 1e-9  # marge de méthode : un gain plus petit n'est pas une amélioration (erreurs d'arrondi)
 
 
@@ -186,13 +188,19 @@ def optimize_context(
     (gagnant par `decide`, puis les autres finalistes par moyenne), le reste sans Monte Carlo.
 
     Registre : I5"""
-    context_scenarios(gd, context)
+    pvp = context in PVP_CONTEXTS
+    if not pvp:
+        context_scenarios(gd, context)
     cache: dict[tuple[tuple[str, int], ...], tuple[float, dict[str, BuildChoice]]] = {}
 
     def value(pts: Points) -> float:
         sig = _sig(pts)
         if sig not in cache:
-            cache[sig] = context_analytic(gd, context, level, pts, race, over, **options)
+            if pvp:  # profil PvP : modèle déterministe, aucun choix de rotation
+                weights = gd.pvp.weights[PVP_CONTEXTS[context]]
+                cache[sig] = (pvp_score(gd, pts, level, race, weights, over).score, {})
+            else:
+                cache[sig] = context_analytic(gd, context, level, pts, race, over, **options)
         return cache[sig][0]
 
     total = points_available(gd, level, talented_bonus)
@@ -250,7 +258,7 @@ def optimize_context(
     ranked = sorted(optima.values(), key=lambda p: (-value(p), _sig(p)))
     cands = [Candidate(p, cache[_sig(p)][1], value(p), None) for p in ranked]
     finalists = cands[: max(0, shortlist)]
-    if len(finalists) < 2 or not mc_n:
+    if pvp or len(finalists) < 2 or not mc_n:  # PvP : pas de Monte Carlo, classement du profil
         return cands
     stats = {
         _sig(c.points): context_mc(gd, context, level, c.points, c.choices, race, mc_n, seed, over, **options)
@@ -272,8 +280,6 @@ def optimize_context(
 
 # --- PvP (bloc G) ------------------------------------------------------------------------------------------------
 
-PVP_CONTEXTS = {"pvp-bg": "bg", "pvp-world": "world"}  # contexte -> poids du profil (pvp.weights)
-
 
 def seed_pvp_greedy(
     gd: GameData,
@@ -287,4 +293,20 @@ def seed_pvp_greedy(
     """Optimiseur PvP glouton du seed (`optimize.pvp`) : faisceau point par point noté par le profil PvP.
 
     Registre : I5"""
-    raise NotImplementedError
+    beams: list[dict[str, int]] = [{}]
+    for _ in range(points_available(gd, level)):
+        cand: dict[tuple[tuple[str, int], ...], dict[str, int]] = {}
+        for pts in beams:
+            for k in legal_additions(gd, pts, level):
+                p2 = dict(pts)
+                p2[k] = p2.get(k, 0) + 1
+                cand[tuple(sorted(p2.items()))] = p2
+
+        def rounded(p: dict[str, int]) -> float:
+            score = seed_rounded(pvp_score(gd, p, level, race, weights, rules=rules))["score"]
+            assert isinstance(score, float)
+            return score
+
+        beams = sorted(cand.values(), key=lambda p: -rounded(p))[:beam]
+    best = beams[0]
+    return Candidate(best, {}, pvp_score(gd, best, level, race, weights, rules=rules).score, None)

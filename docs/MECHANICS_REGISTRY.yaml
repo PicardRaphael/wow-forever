@@ -1242,6 +1242,8 @@ mechanics:
     sources:
       - "seed/forever-mage/scripts/optimize.py (porté en T05)"
       - "forever/data/1.60.1.70009/mechanics.json (build.presets, build.contexts, build.confidence, build.stability_seeds)"
+      - "seed/forever-mage/scripts/pvp.py (porté en T05, EST)"
+      - "forever/data/1.60.1.70009/mechanics.json (pvp.profile, pvp.weights)"
     tests:
       - tests/parity/test_seed_optimize_parity.py::test_optimiseur_legal
       - tests/parity/test_seed_optimize_parity.py::test_leveling_matches_the_seed
@@ -1255,8 +1257,14 @@ mechanics:
       - tests/unit/test_optimize_endgame.py::test_every_candidate_is_a_local_optimum
       - tests/unit/test_optimize_endgame.py::test_dungeon_combines_boss_and_pack
       - tests/unit/test_mc_stats.py::test_decide_takes_the_monte_carlo_winner_when_the_gap_is_significant
+      - tests/parity/test_seed_pvp_parity.py::test_pvp_et_respec_pvp_part
+      - tests/parity/test_seed_pvp_parity.py::test_profile_matches_the_seed
+      - tests/parity/test_seed_pvp_parity.py::test_seed_pvp_greedy_parity
+      - tests/unit/test_pvp_profile.py::test_score_is_the_weighted_capped_sum
+      - tests/unit/test_pvp_profile.py::test_pvp_context_builds_are_legal_local_optima
+      - tests/unit/test_pvp_profile.py::test_multi_start_beats_the_seed_greedy
     tolerance: null
-    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo"
+    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo ; T05 bloc G : profil PvP porté (forever/engine/pvp.py, parité exacte en rules seed ; barème pvp.profile suppose, recharges du client, Blink et Counterspell de spells.json) ; contextes pvp-bg (poids du seed) et pvp-world (poids supposés) par départs multiples et recherche locale, sans Monte Carlo (modèle déterministe) ; le glouton du seed est gardé pour la parité"
     formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide)"
   - id: I6
     categorie: optimisation
