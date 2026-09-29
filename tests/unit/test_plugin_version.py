@@ -64,3 +64,10 @@ def test_fingerprint_changes_with_a_file_and_ignores_line_endings(tmp_path):
 def test_install_script_validates_strictly():
     text = (REPO_ROOT / "scripts" / "install_plugin.ps1").read_text(encoding="utf-8")
     assert "claude plugin validate --strict" in text
+
+
+def test_fingerprint_order_does_not_depend_on_the_system():
+    """CI T06b : sous Windows, trier des `Path` ignore la casse (format-reponse.md avant SKILL.md), pas sous Linux ;
+    l'empreinte trie les chemins en texte POSIX, même ordre partout."""
+    files = fingerprint_module().files(PLUGIN)
+    assert [p.as_posix() for p in files] == sorted(p.as_posix() for p in files)
