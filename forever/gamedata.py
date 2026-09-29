@@ -41,7 +41,7 @@ from forever.engine.model import (
     Utility,
     Variant,
 )
-from forever.errors import DataSchemaError
+from forever.errors import DataSchemaError, InvalidArgumentError
 from forever.store import VersionData, load_version
 
 MECHANICS_FILE = "mechanics.json"
@@ -52,6 +52,10 @@ RACIALS_FILE = "racials.json"
 MONSTERS_FILE = "monsters.json"
 SCALING_FILE = "spell_scaling.json"
 RESPEC_FILE = "respec.json"
+# Copies figées du seed (T06b, décision D2) : le mode seed lit ces deux fichiers à la place de spells.json et
+# talents.json ; tout le reste de la version est partagé entre les deux modes.
+SEED_FILES = {SPELLS_FILE: "_seed_spells.json", TALENTS_FILE: "_seed_talents.json"}
+RULES = ("forever", "seed")
 # Valeurs acceptées des hypothèses nommées de mechanics.json (T05, décision 81) : noms de règles, pas des chiffres.
 CHOICES = {
     "leveling.ignite_rule": ("rolling", "independent"),
@@ -126,8 +130,8 @@ class _Reader:
         return value
 
 
-def _spells(raw: Any) -> dict[str, Spell]:
-    r = _Reader(SPELLS_FILE)
+def _spells(raw: Any, file: str = SPELLS_FILE) -> dict[str, Spell]:
+    r = _Reader(file)
     if not isinstance(raw, dict):
         raise r.fail("racine", "objet")
     rank_format = r.list_(raw, "rank_format", "rank_format")
@@ -182,8 +186,8 @@ def _spells(raw: Any) -> dict[str, Spell]:
     return spells
 
 
-def _talents(raw: Any) -> tuple[dict[str, Talent], tuple[str, ...]]:
-    r = _Reader(TALENTS_FILE)
+def _talents(raw: Any, file: str = TALENTS_FILE) -> tuple[dict[str, Talent], tuple[str, ...]]:
+    r = _Reader(file)
     if not isinstance(raw, dict):
         raise r.fail("racine", "objet")
     talents: dict[str, Talent] = {}
@@ -335,10 +339,10 @@ def _correction(r: _Reader, raw: Any) -> QuestieCorrection | None:
     )
 
 
-def _utility(raw: Any) -> Utility:
+def _utility(raw: Any, file: str = SPELLS_FILE) -> Utility:
     """`spells.json.utility` : Frost Armor (ralenti des coups), Mage Armor (premier rang, régénération en
     incantation), nourriture et boisson conjurées (quantité et durée par rang)."""
-    r = _Reader(SPELLS_FILE)
+    r = _Reader(file)
     u = r.obj(raw, "utility", "utility")
     frost = r.obj(u, "frost_armor", "utility.frost_armor")
     mage = r.obj(u, "mage_armor", "utility.mage_armor")
@@ -829,18 +833,23 @@ def _constants(raw: Any) -> Constants:
 
 
 def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
-    """Données typées d'une version déjà vérifiée ; lève DataSchemaError si une clé manque ou a un mauvais type."""
-    if rules != "forever":
-        raise NotImplementedError("T06b : mode seed figé")
+    """Données typées d'une version déjà vérifiée ; lève DataSchemaError si une clé manque ou a un mauvais type.
+
+    `rules="seed"` : sorts et talents lus dans les copies figées du seed (`SEED_FILES`, T06b), pour la parité ; le
+    reste de la version est le même dans les deux modes."""
+    if rules not in RULES:
+        raise InvalidArgumentError(f"Règles inconnues : {rules}.", "choisir forever ou seed")
+    files = {SPELLS_FILE: SPELLS_FILE, TALENTS_FILE: TALENTS_FILE, **(SEED_FILES if rules == "seed" else {})}
     try:
-        names = (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE, SCALING_FILE, RESPEC_FILE)
+        names = (LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE, SCALING_FILE, RESPEC_FILE)
         raw = {name: version.read_json(name) for name in names}
+        raw |= {name: version.read_json(file) for name, file in files.items()}
         raw_mechanics = version.read_json(MECHANICS_FILE)
     except (OSError, ValueError) as exc:
         raise DataSchemaError(f"Données de la version {version.game_version} illisibles ({exc}).") from exc
     values = _Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")
-    talents, trees = _talents(raw[TALENTS_FILE])
-    spells = _spells(raw[SPELLS_FILE])
+    talents, trees = _talents(raw[TALENTS_FILE], files[TALENTS_FILE])
+    spells = _spells(raw[SPELLS_FILE], files[SPELLS_FILE])
     return GameData(
         game_version=version.game_version,
         spells=spells,
@@ -854,7 +863,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         scaling=_scaling(raw[SCALING_FILE], spells),
         mob_model=_mob_model(raw[LEVELING_FILE]),
         leveling=_leveling(_Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")),
-        utility=_utility(raw[SPELLS_FILE]),
+        utility=_utility(raw[SPELLS_FILE], files[SPELLS_FILE]),
         armors=_armors(raw[SCALING_FILE]),
         fire_vulnerability=_fire_vulnerability(raw[SCALING_FILE]),
         talent_cooldowns_s=_talent_cooldowns(raw[SCALING_FILE]),

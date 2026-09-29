@@ -15,7 +15,7 @@ from forever.engine.monsters import mob_hp
 from forever.engine.talents import check_build
 from forever.errors import InvalidArgumentError
 from forever.freshness import freshness_for_version
-from forever.gamedata import build_game_data
+from forever.gamedata import RULES, build_game_data
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import KillResult, mc, options_with_defaults
@@ -180,7 +180,9 @@ def simulate_leveling(
 
     `low_level_penalty` : pénalité des sorts de bas niveau (None : `coefficient.low_level_default` des données)."""
     data = load_version(deps)
-    gd = build_game_data(data)
+    if rules not in RULES:
+        raise InvalidArgumentError(f"Règles inconnues : {rules}.", "choisir forever ou seed")
+    gd = build_game_data(data, rules=rules)
     cap = level_cap(data)
     check_level(level, cap)
     check_race(data, race)

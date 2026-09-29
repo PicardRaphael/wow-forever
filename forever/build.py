@@ -22,7 +22,7 @@ from forever.engine.talents import check_build, legal_additions
 from forever.engine.variants import ASSUMPTIONS, assumption_range, current_value, with_assumption
 from forever.errors import InvalidArgumentError
 from forever.freshness import freshness_for_version
-from forever.gamedata import build_game_data
+from forever.gamedata import RULES, build_game_data
 from forever.leveling import check_level, check_race, check_talents, constants_certainty, damage_assumptions
 from forever.optimize.decide import Gap, paired_gap
 from forever.optimize.endgame import PVP_CONTEXTS, context_analytic, context_mc, neighbors, optimize_context
@@ -193,8 +193,6 @@ def _validate(
         raise InvalidArgumentError(
             f"Nom de préréglage inconnu « {preset} ».", f"choisir parmi {', '.join(gd.build.presets)}"
         )
-    if rules not in ("forever", "seed"):
-        raise InvalidArgumentError(f"rules inconnu « {rules} ».", "choisir forever ou seed")
     if rules == "seed" and context != "leveling":
         raise InvalidArgumentError(
             f"rules seed : le mode seed ne couvre que le leveling (contexte {context}).", "choisir rules forever"
@@ -362,7 +360,9 @@ def build_report(
     remplacée ; `preset` : préréglage de l'optimiseur (`build.presets`) ; `talented_bonus` : points de talent du bonus
     Legacy « Talented » (hypothèse affichée)."""
     data = load_version(deps)
-    gd = build_game_data(data)
+    if rules not in RULES:
+        raise InvalidArgumentError(f"rules inconnu « {rules} ».", "choisir forever ou seed")
+    gd = build_game_data(data, rules=rules)
     _validate(gd, data, context, level, race, current, respecs, preset, rules, talented_bonus)
     p = gd.build.presets[preset]
     over_raw: dict[str, float] = {}

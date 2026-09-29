@@ -1,6 +1,7 @@
 """Vérification d'une version de données (dépôt ou candidate), sans chiffre de jeu.
 
-Contrôles : intégrité du manifeste (DataIntegrityError), schéma du moteur (`build_game_data`), puis cohérence :
+Contrôles : intégrité du manifeste (DataIntegrityError), schéma du moteur (`build_game_data`, et en mode seed quand
+les copies figées du seed sont présentes), puis cohérence :
 `len(ranks) == max` pour chaque talent, prérequis existant dans le même arbre à un palier inférieur, position
 (arbre, palier, colonne) unique, rangs de sort de longueur `len(rank_format)` et de niveau croissant, chaque fichier
 décrit dans `sources.json` avec une certitude valide. Les fichiers hérités (`inherited_from`) sont listés."""
@@ -13,7 +14,7 @@ from typing import Any, TypedDict
 
 from forever.config import Deps
 from forever.errors import DataSchemaError
-from forever.gamedata import build_game_data
+from forever.gamedata import SEED_FILES, build_game_data
 from forever.manifest import SOURCES_NAME
 from forever.pipeline.sources import CERTAINTIES, inherited_files, load_source, source_provenance
 from forever.provenance import Provenance
@@ -97,6 +98,11 @@ def check_version(v: VersionData) -> tuple[list[str], list[str], list[str]]:
         build_game_data(v)
     except DataSchemaError as exc:
         errors.append(exc.message)
+    if all((v.path / name).is_file() for name in SEED_FILES.values()):
+        try:
+            build_game_data(v, rules="seed")
+        except DataSchemaError as exc:
+            errors.append(exc.message)
     try:
         errors += _talent_errors(_json(v, "talents.json"))
         errors += _spell_errors(_json(v, "spells.json"))

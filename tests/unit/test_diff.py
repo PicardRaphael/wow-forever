@@ -131,7 +131,13 @@ def test_integrity_is_required(make_deps, data_copy, next_version):
 def test_repository_against_candidate_path(make_deps, candidate):
     d = diff_versions(make_deps(), LOCAL_VERSION, str(candidate.root))
     files = {(c["key"], c["change"]) for c in d["changes"] if c["kind"] == "file"}
-    assert files == {("_source_gunba_mage_tree.json", "removed"), ("confirmed_changes.json", "removed")}
+    # Fichiers propres au dépôt, jamais produits par `forever decode` (copies figées du seed : T06b, décision D2).
+    assert files == {
+        ("_source_gunba_mage_tree.json", "removed"),
+        ("confirmed_changes.json", "removed"),
+        ("_seed_talents.json", "removed"),
+        ("_seed_spells.json", "removed"),
+    }
     assert d["b"] == str(candidate.root)
     assert not any(c["kind"] == "talent" and c["field"] in ("tier", "col", "prereq") for c in d["changes"])
 

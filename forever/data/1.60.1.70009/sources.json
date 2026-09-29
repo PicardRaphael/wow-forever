@@ -133,6 +133,22 @@
         "auras (T04e) : Fire Vulnerability, sort déclenché par Improved Scorch (decode_rules.json.target_auras) : part par cumul, cumuls maximum, durée, écoles",
         "talent_cooldowns (T05, 2026-09-28) : recharge des sorts de talent actifs listés par decode_rules.json.talent_cooldowns (TraitDefinition, SpellCooldowns : max de RecoveryTime et CategoryRecoveryTime), en millisecondes"
       ]
+    },
+    "_seed_talents.json": {
+      "source": "seed/forever-mage/data/1.60.1.70009/talents.json (copie octet pour octet, T06b)",
+      "certainty": "probable",
+      "notes": [
+        "copie figée du seed, lue par le mode seed seulement (build_game_data(rules=\"seed\"), décision D2 du plan T06b)",
+        "le mode forever lit talents.json"
+      ]
+    },
+    "_seed_spells.json": {
+      "source": "seed/forever-mage/data/1.60.1.70009/spells.json (copie octet pour octet, T06b)",
+      "certainty": "certain",
+      "notes": [
+        "copie figée du seed, lue par le mode seed seulement (build_game_data(rules=\"seed\"), décision D2 du plan T06b)",
+        "le mode forever lit spells.json"
+      ]
     }
   }
 }
