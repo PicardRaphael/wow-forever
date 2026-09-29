@@ -35,8 +35,14 @@ def test_fixture_comes_from_the_research(doc):
 
 def test_every_build_has_source_date_context_level(doc):
     for b in doc["builds"]:
-        assert b["source_url"].startswith("https://") and b["author"]
-        dt.date.fromisoformat(b["date"])
+        assert b["source_url"].startswith("https://")
+        flags = " ".join(b["reliability_flags"])
+        if b["author"] is None:  # page sans signature, signalée par la recherche
+            assert "auteur inconnu" in flags, b["id"]
+        if b["date"] is None:  # date inconnue, signalée par la recherche
+            assert "date" in flags and "inconnue" in flags, b["id"]
+        else:
+            dt.date.fromisoformat(b["date"])
         assert b["context"] in CONTEXTS and isinstance(b["level"], int) and 10 <= b["level"] <= 60
         assert b["points"]
 

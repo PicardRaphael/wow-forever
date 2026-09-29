@@ -91,10 +91,12 @@ def test_optimizer_is_deterministic(game_data, path):
 
 def test_talented_bonus_adds_legal_points(game_data):
     bonus = _run(game_data, 10, 13, talented_bonus=3)
-    for s, pts in _points_by_level(bonus):
-        assert sum(pts.values()) == points_available(game_data, s.level, 3)
-        assert check_build(game_data, pts, s.level, 3) == []
-        assert check_build(game_data, pts, s.level) != []  # illégal sans le bonus
+    by_level = {s.level: pts for s, pts in _points_by_level(bonus)}  # build de fin de chaque niveau
+    assert list(by_level) == [10, 11, 12, 13]
+    for level, pts in by_level.items():
+        assert sum(pts.values()) == points_available(game_data, level, 3)
+        assert check_build(game_data, pts, level, 3) == []
+        assert check_build(game_data, pts, level) != []  # illégal sans le bonus
 
 
 def test_start_build_is_kept(game_data):

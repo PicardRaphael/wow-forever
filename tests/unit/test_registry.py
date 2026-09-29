@@ -138,7 +138,7 @@ def test_load_reads_optional_fields():
 def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("Registre : 104 mécaniques")
+    assert out.startswith("Registre : 108 mécaniques")
     assert (
         "teste 36" in out and "valide-journal 1" in out
     )  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14, H3, H5, I5

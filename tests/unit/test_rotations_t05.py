@@ -208,7 +208,8 @@ def test_hs_stacks_is_refused_where_it_has_no_meaning(game_data, rotation, pts, 
 
 def _fire_log(gd, pts, seed, **opts):
     log = []
-    kill_mc(gd, 25, pts, character(gd, 25, "Orc", HIGH_CRIT), "fire", random.Random(seed), log, **opts)
+    # monstre de 3 niveaux de plus (valeur de test) : combats assez longs pour atteindre 3 cumuls
+    kill_mc(gd, 25, pts, character(gd, 25, "Orc", HIGH_CRIT), "fire", random.Random(seed), log, level_diff=3, **opts)
     return log
 
 

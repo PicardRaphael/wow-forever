@@ -127,7 +127,9 @@ def test_estimates_are_positive_bounds_from_the_data(game_data):
     assert wof is not None and 0 < wof < 1
     assert estimate_wake_of_fire_crit(game_data, 20, {}, "Orc") is None
     evo = estimate_evocation(game_data, 40, {}, "Orc")
-    assert evo is not None and 0 < evo < 1
+    u = game_data.utility
+    assert evo == pytest.approx(u.evocation_regen_mult * ch.spirit_regen * u.evocation_duration_s / ch.mana, rel=1e-12)
+    assert evo > 0
 
 
 def test_blind_spot_effects_come_from_the_estimators(game_data, rules):

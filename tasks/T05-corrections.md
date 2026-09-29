@@ -100,3 +100,19 @@
 +            dt.date.fromisoformat(b["date"])
          assert b["context"] in CONTEXTS and isinstance(b["level"], int) and 10 <= b["level"] <= 60
 ```
+
+## 6 bis. Complément de la correction n° 6 (même test), après application
+
+- **Échec restant** : `ValueError: Invalid isoformat string: '2026-09'`.
+- **Preuve** : 7 builds (C3, C4, C10, C11, C12, A1, A2) ont une date au mois près (`2026-09`) dans le bloc JSON de la recherche ; chacun porte « date inconnue ou imprécise par rapport aux notes de développement du 24/09 » dans `reliability_flags`. Mon diff n° 6 ne couvrait que les dates absentes (je ne l'avais pas essayé sur une copie).
+- **Diff proposé** (en plus du n° 6, déjà appliqué) :
+
+```diff
+         if b["date"] is None:  # date inconnue, signalée par la recherche
+             assert "date" in flags and "inconnue" in flags, b["id"]
++        elif len(b["date"]) == 7:  # date au mois près, signalée par la recherche
++            assert "imprécise" in flags, b["id"]
++            dt.date.fromisoformat(b["date"] + "-01")
+         else:
+             dt.date.fromisoformat(b["date"])
+```
