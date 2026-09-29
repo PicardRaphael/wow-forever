@@ -36,7 +36,17 @@ UNCOVERED_TRANCHES = (
     "T09",
     "T10",
     "T11",
-    "T12",
+    "AN1",
+    "AN2",
+    # Tranches de classe (remplacent T12, décision 102).
+    "PA1",
+    "DE1",
+    "PR1",
+    "CH1",
+    "CM1",
+    "GU1",
+    "VO1",
+    "DR1",
 )
 
 

@@ -23,6 +23,8 @@ POSITIVE_COUNTS = {
     "build": 6,
     "respec": 4,
     "zone": 4,
+    "generale": 2,
+    "personnelle": 2,
     "mecanique": 5,
     "leveling": 3,
     "hors-perimetre": 3,
@@ -74,10 +76,11 @@ def tool_names(tmp_path_factory):
 # --- Suite ---------------------------------------------------------------------------------------------------------
 
 
-def test_fifty_three_cases_thirty_three_positive_twenty_negative():
+def test_fifty_seven_cases_thirty_seven_positive_twenty_negative():
     polarity = [front(c / "prompt.md")[0]["tags"][0] for c in cases()]
-    assert len(polarity) == 53  # T06b : talent-niveau-22 et deux cas à profil vide
-    assert polarity.count("positif") == 33 and polarity.count("negatif") == 20
+    # T06b : talent-niveau-22 et deux cas à profil vide ; 2026-09-29 : deux questions générales, deux personnelles.
+    assert len(polarity) == 57
+    assert polarity.count("positif") == 37 and polarity.count("negatif") == 20
 
 
 def test_empty_profile_cases():
@@ -112,6 +115,63 @@ def test_talent_level_22_case():
     assert judge_meta["type"] == "llm"
     for words in ("non modélisé", "Monte Carlo", "analytique", "non départagé"):
         assert words in judge, words
+
+
+RESPEC_AT_ANOTHER_LEVEL = ("respec-feu-vers-givre", "respec-troisieme")
+
+
+def test_respec_at_another_level_asks_for_the_current_build():
+    """Demande du 2026-09-29 : une respec posée à un autre niveau que celui du profil (profil de test au niveau 23) ne se
+    conseille pas sans le build actuel ; la bonne réponse le demande (outil attendu : le profil, pas encore le build)."""
+    for name in RESPEC_AT_ANOTHER_LEVEL:
+        meta, question = front(EVALS / name / "prompt.md")
+        assert meta["tags"] == ["positif", "respec"]
+        g = graders(EVALS / name)
+        assert g["outil"][0]["tool"] == MCP_PREFIX + "forever_player_profile", name
+        judge_meta, judge = g["demande-le-build"]
+        assert judge_meta["type"] == "llm"
+        for words in ("build actuel", "respec", "forever profile set"):
+            assert words in judge, (name, words)
+    for name in ("respec-build-precis", "respec-leveling-vers-donjon"):
+        assert graders(EVALS / name)["outil"][0]["tool"] == MCP_PREFIX + "forever_build", name
+
+
+def test_general_and_personal_cases():
+    """Demande du 2026-09-29 (règle « question personnelle ou générale » de format-reponse.md) : une question générale
+    ne lit pas le profil et annonce son hypothèse neutre ; une question personnelle part du personnage actif ; une
+    question générale sur une classe pas encore calculée le dit sans rien demander."""
+    by_tag = {}
+    for c in cases():
+        tags = front(c / "prompt.md")[0]["tags"]
+        if tags[0] == "positif" and tags[1] in ("generale", "personnelle"):
+            by_tag.setdefault(tags[1], []).append(c.name)
+    assert by_tag == {
+        "generale": ["generale-classe-non-calculee", "generale-mage-raid"],
+        "personnelle": ["personnelle-mage-donjon", "personnelle-mage-temps"],
+    }
+    for name in by_tag["generale"]:
+        g = graders(EVALS / name)
+        no_profile = g["sans-profil"][0]
+        assert no_profile["type"] == "tool_used" and no_profile["tool"] == MCP_PREFIX + "forever_player_profile"
+        assert no_profile["min"] == 0 and no_profile["max"] == 0
+        assert g["hypothese-neutre"][0]["type"] == "llm"
+    raid = graders(EVALS / "generale-mage-raid")
+    assert raid["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
+    assert re.search(raid["outil"][0]["input_match"], '{"context": "raid", "level": 60}')
+    for words in ("hypothèse", "race", "profil"):
+        assert words in raid["hypothese-neutre"][1], words
+    uncomputed = graders(EVALS / "generale-classe-non-calculee")
+    assert uncomputed["outil"][0]["tool"] == MCP_PREFIX + "forever_status"
+    assert re.search(uncomputed["non-calcule"][0]["pattern"], "pas encore calculé par le moteur", re.IGNORECASE)
+    for words in ("PA1", "PV1", "supposé", "communauté", "source"):
+        assert words in uncomputed["hypothese-neutre"][1], words
+    for name in by_tag["personnelle"]:
+        g = graders(EVALS / name)
+        assert g["profil"][0] == {"type": "tool_used", "tool": MCP_PREFIX + "forever_player_profile"}
+        assert g["profil-actif"][0]["type"] == "llm" and "profil actif" in g["profil-actif"][1]
+        assert re.search(g["outil"][0]["input_match"], '{"level": 23, "race": "Orc"}'), name
+    assert graders(EVALS / "personnelle-mage-donjon")["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
+    assert graders(EVALS / "personnelle-mage-temps")["outil"][0]["tool"] == MCP_PREFIX + "forever_sim_leveling"
 
 
 def test_case_names_are_the_directories():
@@ -229,8 +289,8 @@ def test_report_thresholds_of_d10():
 def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    assert len(loaded) == 53
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 33
+    assert len(loaded) == 57
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 37
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 
