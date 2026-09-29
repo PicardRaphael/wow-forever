@@ -91,13 +91,15 @@ def build_server(deps: Deps) -> MCPServer:
             return cast("dict[str, Any]", _error_result(deps, err))
 
     @server.tool()
-    def forever_explain_mechanic(mechanic_id: str) -> MechanicExplanation:
+    def forever_explain_mechanic(mechanic_id: str, level: int | None = None) -> MechanicExplanation:
         """Explique une mécanique du registre (identifiant de la forme « A5 », casse ignorée, ou mots de sa
         description en français ou en anglais selon le registre, ex. « Ignite » ; plusieurs entrées : la liste
         « identifiant : description » est rendue en suggestions) : description, statut,
-        certitude, formule symbolique, paramètres chiffrés de la version courante, implémentation, sources, tests."""
+        certitude, formule symbolique, paramètres chiffrés de la version courante, implémentation, sources, tests,
+        et `derived` : valeurs par cumul calculées (coût d'Arcane Blast, critique de Winter's Chill, Hot Streak), en
+        mana au niveau `level` s'il est donné."""
         try:
-            return explain_mechanic(deps, mechanic_id)
+            return explain_mechanic(deps, mechanic_id, level)
         except ForeverError as err:
             return cast(MechanicExplanation, _error_result(deps, err))
 

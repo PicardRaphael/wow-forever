@@ -127,6 +127,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     explain = sub.add_parser("explain-mechanic", help="expliquer une mécanique du registre")
     explain.add_argument("mechanic_id", help="identifiant du registre (ex. A5, casse ignorée)")
+    explain.add_argument("--level", type=int, help="niveau des valeurs dérivées en mana (Arcane Blast)")
     explain.add_argument("--json", action="store_true", help="sortie JSON")
 
     builds = sub.add_parser("builds", help="versions publiées du client (réseau)")
@@ -546,7 +547,7 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
 
 
 def _cmd_explain(deps: Deps, args: argparse.Namespace) -> int:
-    res = explain_mechanic(deps, args.mechanic_id)
+    res = explain_mechanic(deps, args.mechanic_id, args.level)
     _emit(res, render_explanation(res), res["provenance"], args.json)
     return EXIT_OK
 
@@ -968,7 +969,11 @@ def render_build(rep: Mapping[str, Any]) -> list[str]:
     head += " · équipement : fiche de base par niveau"
     if not rep["verifiable_in_game"]:
         head += " · non vérifiable en jeu avant la sortie"
-    lines = [head, "Talents"]
+    p = rep["points"]
+    spent = f"Talents : {p['total']} point(s) sur {p['available']}"
+    if p["unspent"]:
+        spent += f", {p['unspent']} non dépensé(s)"
+    lines = [head, spent]
     for tree, pts in rep["talents_by_tree"].items():
         if pts:
             lines.append(f"  {tree} ({sum(pts.values())}) : " + ", ".join(f"{k} {v}" for k, v in pts.items()))
@@ -1086,6 +1091,14 @@ def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
         _fmt_kill("Analytique", rep["analytic"]),
         f"  Écart analytique / Monte Carlo : {gap} %",
     ]
+    st = rep["monte_carlo_stats"]
+    if st is not None:
+        conf = _num(st["confidence"] * 100)
+        lines.insert(
+            2,
+            f"  Temps par monstre : {_dec(st['mean'])} s, intervalle à {conf} % [{_dec(st['low'])} ; "
+            f"{_dec(st['high'])}] s (écart type {_dec(st['sd'])} s)",
+        )
     _emit(rep, lines, rep["provenance"], args.json)
     return EXIT_OK
 

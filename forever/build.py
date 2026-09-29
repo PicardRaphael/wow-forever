@@ -18,7 +18,7 @@ from forever.engine.model import CharacterOverrides, GameData, Preset
 from forever.engine.monsters import mob_hp
 from forever.engine.pvp import pvp_score
 from forever.engine.respec import respec_cost, respec_cost_certainty
-from forever.engine.talents import check_build, legal_additions
+from forever.engine.talents import build_points, check_build, legal_additions, tree_split
 from forever.engine.variants import ASSUMPTIONS, assumption_range, current_value, with_assumption
 from forever.errors import InvalidArgumentError
 from forever.freshness import freshness_for_version
@@ -46,6 +46,7 @@ class BuildReport(TypedDict):
     scenario: dict[str, Any]
     talents: dict[str, int]
     talents_by_tree: dict[str, dict[str, int]]
+    points: dict[str, Any]  # totaux : par arbre, dépensés, disponibles, non dépensés (T06b)
     order: list[dict[str, Any]]
     choices: dict[str, dict[str, Any]]
     metric: dict[str, Any]
@@ -80,7 +81,35 @@ Choices = dict[str, BuildChoice]
 
 
 def _gap_dict(g: Gap) -> dict[str, Any]:
-    return {"mean": g.mean, "low": g.low, "high": g.high, "confidence": g.confidence, "significant": g.significant}
+    """Écart brut (a − b) et `advantage` : sa valeur absolue, avantage du meilleur des deux (T06b)."""
+    return {
+        "mean": g.mean,
+        "advantage": abs(g.mean),
+        "low": g.low,
+        "high": g.high,
+        "confidence": g.confidence,
+        "significant": g.significant,
+    }
+
+
+def _mc_fields(stats: McStats | None) -> dict[str, Any]:
+    return {
+        "monte_carlo": stats.mean if stats else None,
+        "sd": stats.sd if stats else None,
+        "se": stats.se if stats else None,
+        "n": stats.n if stats else 0,
+    }
+
+
+def _order_points(gd: GameData, order: list[dict[str, Any]]) -> None:
+    """Points par arbre et au total cumulés à chaque étape de l'ordre (T06b)."""
+    acc: dict[str, int] = {}
+    for step in order:
+        if step["talent"]:
+            acc[step["talent"]] = acc.get(step["talent"], 0) + 1
+        split = tree_split(gd, acc)
+        step["points_by_tree"] = split
+        step["points_total"] = sum(split.values())
 
 
 class _Metric:
@@ -402,6 +431,7 @@ def build_report(
                 }
                 for s in path.steps
             ]
+            _order_points(gd, order)
             alt = _best_neighbor(m, build, talented_bonus)
         else:
             cands = optimize_context(
@@ -425,17 +455,28 @@ def build_report(
         alt = {k: alt[k] for k in gd.talents if alt.get(k, 0) > 0}
     value, choices = m.analytic(build)
     stats = m.mc(build, choices, seed)
-    alternative: dict[str, Any] = {"talents": None, "diff": {}, "gap": None, "decided_by": None, "better": None}
+    alternative: dict[str, Any] = {
+        "talents": None,
+        "points": None,
+        "diff": {},
+        "gap": None,
+        "decided_by": None,
+        "better": None,
+        **_mc_fields(None),
+    }
     winners: list[str] = []
     seeds = [seed + i for i in range(gd.build.stability_seeds)]
     if alt is not None:
         gap, by, better = m.compare(build, alt, seed)
         keys = [k for k in gd.talents if build.get(k, 0) != alt.get(k, 0)]
+        alt_value, alt_choices = m.analytic(alt)
         alternative = {
             "talents": alt,
+            "points": build_points(gd, alt, level, talented_bonus),
             "diff": {k: [build.get(k, 0), alt.get(k, 0)] for k in keys},
-            "choices": _choices_dict(m.analytic(alt)[1]),
-            "analytic": m.analytic(alt)[0],
+            "choices": _choices_dict(alt_choices),
+            "analytic": alt_value,
+            **_mc_fields(m.mc(alt, alt_choices, seed)),
             "gap": _gap_dict(gap),
             "decided_by": by,
             "better": "build" if better else "alternative",
@@ -496,6 +537,7 @@ def build_report(
         "scenario": _scenario(gd, context),
         "talents": build,
         "talents_by_tree": {tree: {k: v for k, v in build.items() if gd.talents[k].tree == tree} for tree in gd.trees},
+        "points": build_points(gd, build, level, talented_bonus),
         "order": order,
         "choices": _choices_dict(choices),
         "metric": {

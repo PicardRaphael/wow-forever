@@ -463,6 +463,7 @@ mechanics:
   - id: B11
     categorie: ressources
     description: "Coûts en % du mana de base, escalade d'Arcane Blast"
+    alias: ["Arcane Blast"]
     forever: modifie
     statut: teste
     certitude: probable
@@ -480,6 +481,8 @@ mechanics:
       - tests/unit/test_engine_arcane_blast.py::test_monte_carlo_pays_each_cast_at_its_stack_cost
       - tests/unit/test_install.py::test_forever_uses_client_costs_and_seed_keeps_its_estimate
       - tests/unit/test_lookup.py::test_talent_rank_mana_from_the_client
+      - tests/unit/test_totals.py::test_arcane_blast_cost_by_stack
+      - tests/unit/test_totals.py::test_explain_mechanic_gives_derived_values
     tolerance: null
     formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié ; Arcane Blast à n cumuls : coût × (1 + n × hausse par cumul du talent arcaneBlast)"
     note: "T04c : escalade d'Arcane Blast (mana.arcane_blast_cost ; hausses de l'aura additionnées : probable, voir OPEN_QUESTIONS), payée lancer par lancer (Monte Carlo) et sur le cycle (analytique) ; Clearcasting rend le lancer gratuit sans retirer de cumul (suppose) ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2) ; T06b (révision 2) : coûts des rangs 1 issus d'un talent (Pyroblast, Ice Lance, Blast Wave) lus dans le client (SpellPower.ManaCost), l'estimation mana.talent_rank_cost ne sert plus qu'au mode seed"
@@ -535,6 +538,7 @@ mechanics:
   - id: B15
     categorie: temps
     description: "Durée, charges, rafraîchissement et cumul des buffs"
+    alias: ["Hot Streak"]
     forever: oui
     statut: teste
     certitude: suppose
@@ -559,6 +563,8 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_arcane_power_in_the_analytic_model
       - tests/unit/test_rotations_t05.py::test_seed_mode_never_uses_arcane_power
       - tests/unit/test_install.py::test_hot_streak_lasts_twenty_seconds_everywhere
+      - tests/unit/test_totals.py::test_hot_streak_by_stack
+      - tests/unit/test_totals.py::test_explain_by_alias
       - tests/unit/test_rotations_t05.py::test_hot_streak_rules
       - tests/unit/test_rotations_t05.py::test_hot_streak_shortens_pyroblast
       - tests/unit/test_rotations_t05.py::test_pyroblast_enters_the_fire_rotation_after_enough_crits
@@ -790,6 +796,8 @@ mechanics:
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
+      - tests/unit/test_totals.py::test_winters_chill_crit_by_stack_and_rank
+      - tests/unit/test_totals.py::test_lookup_talent_gives_derived_values
     tolerance: null
     formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance)"
     note: "T04b : chance d'application de Winter's Chill portée dans les simulateurs de leveling (cumuls sans durée ni expiration dans le Monte Carlo, moyenne dans l'analytique), couverte par tests/parity/test_sim_leveling_parity.py ; durée des cumuls non modélisée"
@@ -1059,6 +1067,8 @@ mechanics:
       - tests/unit/test_lookup_talent.py::test_tier_prerequisite_and_tree_points
       - tests/unit/test_install.py::test_every_talent_is_certain
       - tests/unit/test_install.py::test_installed_client_values
+      - tests/unit/test_totals.py::test_build_points_engine
+      - tests/unit/test_totals.py::test_build_report_gives_points
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis au maximum"
     note: "4e talent doré non modélisé ; bonus Legacy « Talented » accepté en paramètre (G5 absent, non actif en bêta)"

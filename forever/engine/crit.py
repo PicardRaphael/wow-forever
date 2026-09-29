@@ -37,7 +37,7 @@ def crit_chance(
     if frozen:
         c += talent_value(gd, pts, "shatter") / PERCENT
     if key in WINTERS_CHILL_SPELLS:
-        c += gd.constants.crit_per_winters_chill_stack * wc_stacks
+        c += winters_chill_crit(gd, wc_stacks)
     c += buffs.get("crit", 0.0)
     return max(0.0, min(1.0, c))
 
@@ -55,4 +55,7 @@ def crit_mult(gd: GameData, school: str, pts: Points) -> float:
 
 
 def winters_chill_crit(gd: GameData, stacks: float) -> float:
-    raise NotImplementedError("T06b : Winter's Chill")
+    """Critique ajouté par `stacks` cumuls de Winter's Chill sur la cible (Frostbolt et Ice Lance), en fraction.
+
+    Registre : D4"""
+    return gd.constants.crit_per_winters_chill_stack * stacks

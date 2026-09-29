@@ -11,13 +11,20 @@ from collections.abc import Sequence
 from typing import Any, TypedDict, cast, get_args
 
 from forever.config import Deps
+from forever.engine.derived import StackTable, stack_tables
 from forever.errors import DataSchemaError, UnknownMechanicError
 from forever.freshness import freshness_for_version
-from forever.gamedata import COMBAT_RULE_MECHANICS, LEVELING_FILE, MECHANICS_FILE
+from forever.gamedata import COMBAT_RULE_MECHANICS, LEVELING_FILE, MECHANICS_FILE, build_game_data
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.registry import ENGINE_DIR, Mechanic, RegistryError, find_entry, implementations, load
 from forever.store import VersionData, load_version
 
+# Valeurs dérivées rendues par mécanique : (talent, effets de `stack_tables`) (T06b, décision D4).
+DERIVED: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
+    "B11": (("arcaneBlast", ("arcane_blast_cost",)),),
+    "B15": (("arcaneBlast", ("other_spells_damage",)), ("hotStreak", ("pyroblast_cast_reduction",))),
+    "D4": (("wintersChill", ("crit",)),),
+}
 ABSENT_NOTE = "mécanique non modélisée dans forever-core : aucun calcul ne s'appuie encore sur elle"
 _CERTAINTIES: tuple[str, ...] = get_args(Certainty)
 
@@ -43,6 +50,7 @@ class MechanicExplanation(TypedDict):
     sources: list[str]
     tests: list[str]
     proofs: list[dict[str, Any]]  # preuves de journal du registre (T04)
+    derived: list[StackTable]  # valeurs par cumul calculées par le moteur (T06b)
     provenance: Provenance
 
 
@@ -102,6 +110,9 @@ def _resolve(mechanics: Sequence[Mechanic], query: str) -> Mechanic:
     avec la liste « identifiant : description »."""
     if _ID.match(query):
         return find_entry(mechanics, query)
+    named = [m for m in mechanics if _fold(query.strip()) in {_fold(a) for a in m.aliases}]
+    if len(named) == 1:
+        return named[0]
     words = [w for w in re.findall(r"\w+", _fold(query)) if len(w) >= 3]
     matches = [m for m in mechanics if words and all(w in _fold(m.description) for w in words)]
     if len(matches) == 1:
@@ -112,8 +123,9 @@ def _resolve(mechanics: Sequence[Mechanic], query: str) -> Mechanic:
 
 
 def explain_mechanic(deps: Deps, mechanic_id: str, level: int | None = None) -> MechanicExplanation:
-    """Explication d'une mécanique du registre, par identifiant ou par mots de la description ; lève
-    UnknownMechanicError, DataSchemaError ou DataIntegrityError."""
+    """Explication d'une mécanique du registre, par identifiant, par nom du jeu (champ `alias`) ou par mots de la
+    description ; `level` : niveau des valeurs dérivées en mana. Lève UnknownMechanicError, DataSchemaError ou
+    DataIntegrityError."""
     version = load_version(deps)  # intégrité d'abord, comme les autres consultations
     try:
         mechanics = load(deps.registry_path)
@@ -123,6 +135,15 @@ def explain_mechanic(deps: Deps, mechanic_id: str, level: int | None = None) -> 
         ) from exc
     entry = _resolve(mechanics, mechanic_id)
     params = _parameters(version, entry.id)
+    derived: list[StackTable] = []
+    if entry.id in DERIVED:
+        gd = build_game_data(version)
+        derived = [
+            t
+            for talent, effects in DERIVED[entry.id]
+            for t in stack_tables(gd, talent, level)
+            if t["effect"] in effects
+        ]
     certainty = _certainty(entry.certainty)
     fresh = freshness_for_version(deps, version.game_version, allow_network=False)
     notes = [*fresh["assumptions"]]
@@ -150,5 +171,6 @@ def explain_mechanic(deps: Deps, mechanic_id: str, level: int | None = None) -> 
         "sources": list(entry.sources),
         "tests": list(entry.tests),
         "proofs": [dict(p) for p in entry.proofs],
+        "derived": derived,
         "provenance": provenance,
     }

@@ -6,6 +6,7 @@ Aucun calcul ici : les simulateurs (`forever/sim/`) orchestrent les fonctions du
 from __future__ import annotations
 
 import difflib
+import statistics
 from collections.abc import Mapping
 from typing import Any, TypedDict, cast
 
@@ -18,7 +19,7 @@ from forever.freshness import freshness_for_version
 from forever.gamedata import RULES, build_game_data
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.sim.leveling_analytic import kill_analytic
-from forever.sim.leveling_mc import KillResult, mc, options_with_defaults
+from forever.sim.leveling_mc import KillResult, McStats, mc, mc_stats, options_with_defaults
 from forever.store import VersionData, load_version
 
 MECHANICS_FILE = "mechanics.json"
@@ -45,6 +46,7 @@ class LevelingReport(TypedDict):
     seed: int
     options: dict[str, Any]
     monte_carlo: KillResult
+    monte_carlo_stats: dict[str, Any] | None  # moyenne, dispersion, intervalle (T06b)
     analytic: KillResult
     analytic_gap: float
     mob_hp: MobHpInfo
@@ -156,6 +158,25 @@ def assumptions(
     ]
 
 
+MIN_STATS_N = 2  # dispersion : au moins deux combats
+
+
+def _stats_dict(stats: McStats | None, confidence: float) -> dict[str, Any] | None:
+    """Moyenne, écart type, erreur type, nombre de combats et intervalle de la moyenne du temps par monstre (T06b)."""
+    if stats is None:
+        return None
+    half = statistics.NormalDist().inv_cdf((1 + confidence) / 2) * stats.se
+    return {
+        "mean": stats.mean,
+        "sd": stats.sd,
+        "se": stats.se,
+        "n": stats.n,
+        "low": stats.mean - half,
+        "high": stats.mean + half,
+        "confidence": confidence,
+    }
+
+
 def simulate_leveling(
     deps: Deps,
     level: int,
@@ -213,6 +234,7 @@ def simulate_leveling(
     try:
         m = mc(gd, level, pts, race, rotation, n, seed, over, **raw)
         a = kill_analytic(gd, level, pts, race, rotation, over, **raw)
+        stats = mc_stats(gd, level, pts, race, rotation, n, seed, over, **raw) if n >= MIN_STATS_N else None
     except ValueError as exc:
         raise InvalidArgumentError(
             f"{exc}.", "choisir un niveau où le sort principal (et l'armure demandée) est appris"
@@ -239,6 +261,7 @@ def simulate_leveling(
         "seed": seed,
         "options": options,
         "monte_carlo": m,
+        "monte_carlo_stats": _stats_dict(stats, gd.build.confidence),
         "analytic": a,
         "analytic_gap": a["total"] / m["total"] - 1,
         "mob_hp": {

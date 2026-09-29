@@ -63,6 +63,7 @@ class Mechanic:
     note: str | None
     proofs: tuple[dict[str, Any], ...] = ()
     blind_spot: dict[str, Any] | None = None  # champ angle_mort (T05, décision 88)
+    aliases: tuple[str, ...] = ()  # champ alias : noms du jeu qui désignent l'entrée (T06b)
 
 
 @dataclass
@@ -119,6 +120,7 @@ def load(path: Path) -> list[Mechanic]:
                 note=_optional(m.get("note")),
                 proofs=tuple(p for p in m.get("preuves") or [] if isinstance(p, dict)),
                 blind_spot=m.get("angle_mort") if isinstance(m.get("angle_mort"), dict) else None,
+                aliases=_texts(m.get("alias")),
             )
         )
     return out

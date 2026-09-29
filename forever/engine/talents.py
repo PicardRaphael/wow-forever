@@ -112,4 +112,11 @@ def tree_split(gd: GameData, pts: Points) -> dict[str, int]:
 
 
 def build_points(gd: GameData, pts: Points, level: int, talented_bonus: int = 0) -> dict[str, Any]:
-    raise NotImplementedError("T06b : totaux")
+    """Points par arbre (`by_tree`), dépensés (`total`), disponibles au niveau (`available`) et non dépensés
+    (`unspent`), pour que les outils rendent les totaux (T06b).
+
+    Registre : G3"""
+    by_tree = tree_split(gd, pts)
+    total = sum(by_tree.values())
+    available = points_available(gd, level, talented_bonus)
+    return {"by_tree": by_tree, "total": total, "available": available, "unspent": available - total}

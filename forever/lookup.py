@@ -176,6 +176,7 @@ class TalentLookup(TypedDict):
     spell: str | None
     source: str
     duration_s: float | None
+    derived: list[Any]  # valeurs par cumul des talents à cumuls (engine/derived.py, T06b)
     ranks: list[TalentRank]
     provenance: Provenance
 
@@ -185,6 +186,7 @@ def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLooku
     exigés dans l'arbre, prérequis, rangs et valeurs (description aux valeurs du rang), sort appris, provenance.
 
     Registre : G3"""
+    from forever.engine.derived import stack_tables
     from forever.engine.talents import tier_points_required
     from forever.gamedata import build_game_data
 
@@ -258,6 +260,7 @@ def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLooku
         "spell": spell,
         "source": source,
         "duration_s": talent.duration_s,
+        "derived": [t for t in stack_tables(gd, key) if rank is None or t["rank"] == rank],
         "ranks": ranks,
         "provenance": provenance,
     }
