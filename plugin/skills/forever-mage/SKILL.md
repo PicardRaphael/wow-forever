@@ -46,4 +46,5 @@ des outils ci-dessous.
 
 ## Hors de ce skill
 - Temps par monstre, XP/h, zone à mon niveau : skill `forever-leveling`.
-- Autres classes (tranche T12), équipement (T10), consommables (T11) : « je ne sais pas » + tranche.
+- Autres classes : section « Classe pas encore calculée » du routeur (tranches de classe PA1 à DR1).
+- Équipement (T10), consommables (T11) : « je ne sais pas » + tranche.

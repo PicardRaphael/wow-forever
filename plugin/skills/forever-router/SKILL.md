@@ -21,8 +21,9 @@ seulement par ce message, sans rien répondre à la question de mémoire :
   wow-forever, aucune ligne de fraîcheur n'est affichée au démarrage : c'est cet appel qui la remplace.
 - Intégrité en échec : les consultations sont refusées ; renvoie à `uv run forever status`.
 
-- Question qui dépend du personnage : `forever_player_profile` avant tout calcul (section « Données du joueur » de
-  `format-reponse.md`).
+- Question personnelle (« mon Mage », « mon perso », « j'ai … ») : `forever_player_profile` avant tout calcul ;
+  question générale (« l'arbre optimal du Mage en raid ») : ni profil ni question au joueur, hypothèse neutre annoncée
+  (section « Question personnelle ou générale » de `format-reponse.md`).
 
 ## 2. Carte des domaines couverts
 
@@ -62,11 +63,27 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Raid complet (le build de raid actuel est un scénario provisoire de `forever_build`) | T09 |
 | Équipement et objets | T10 |
 | Consommables et préparation de raid | T11 |
-| Autres classes (Paladin, Démoniste, …) | T12 |
+| Analyse de mes combats PvP (contrôles, recharges, morts, cibles) | AN1 |
+| Analyse de mes combats PvE (rotation réelle, écarts, perte chiffrée) | AN2 |
+| Profil rempli automatiquement (ForeverLogger, journaux) | PV1 |
+| Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide (leveling, donjon, PvP) | PA1, DE1, PR1, CH1, CM1, GU1, VO1, DR1 |
 
 Pour ces domaines : dis « je ne sais pas » (ou « le projet ne couvre pas encore … »), cite la tranche de
 `docs/ROADMAP.md`, et propose ce qui existe déjà (par exemple le niveau d'un donjon). Ne complète pas avec des
 valeurs de WoW Classic ou retail « pour info ».
+
+### Classe pas encore calculée
+Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin ») : réponds quand même, sans rien deviner.
+- Dis d'abord que la classe n'est pas encore calculée par le moteur (tranche de la classe ci-dessus) et que la
+  certitude est au mieux supposé.
+- Question générale : ne demande rien au joueur. Question personnelle : profil lu, rappelé en une ligne.
+- Propose des builds de la communauté trouvés par le sous-agent `forever-web-researcher` (lance-le si le joueur
+  l'accepte ou le demande) : chacun avec sa source, son type et sa date, en noms de talents et en points par arbre,
+  présenté comme l'avis de cette source (section « Sources extérieures » de `format-reponse.md`). Aucun chiffre de
+  jeu tiré de ce rapport : le contrôle des chiffres ne connaît que les outils forever.
+- Tant que PV1 n'a pas décodé les talents des neuf classes, dis que la légalité de ces builds et l'effet de leurs
+  talents ne sont pas vérifiés sur les données du client ; ensuite, vérifie-les et explique-les par les outils forever.
+- Rien de mémoire, de WoW Classic ni de retail.
 
 ## 4. Forme de la réponse
 Lis `format-reponse.md` (dans ce dossier) avant de répondre : français, réponse courte par défaut, pied de réponse fixe

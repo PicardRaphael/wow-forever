@@ -10,11 +10,15 @@ message fixe, rien de mémoire), forme de la réponse, règle « je ne sais pas 
 des outils ci-dessous.
 
 ## Ce qu'il faut savoir du joueur
-Suis la section « Données du joueur » de `format-reponse.md` : `forever_player_profile` d'abord, profil rappelé en
-une ligne, donnée manquante demandée avant le calcul avec la valeur la plus probable proposée.
+Suis les sections « Question personnelle ou générale » et « Données du joueur » de `format-reponse.md` : question
+personnelle (le cas courant en leveling), `forever_player_profile` d'abord, profil rappelé en une ligne, donnée
+manquante demandée avant le calcul avec la valeur la plus probable proposée ; question générale (« un Mage niveau
+N »), aucun appel au profil, hypothèse neutre annoncée.
 - **Niveau** : obligatoire.
 - **Race**, **faction**, **build actuel** : lus dans le profil ou la question ; absents des deux, demande-les avant
   l'appel (jamais la race par défaut de l'outil sans le dire : `inputs.race.origin`).
+- **Respec ou prochain talent à un autre niveau que celui du profil** : les talents du profil n'y valent pas ;
+  demande le build actuel avant tout conseil.
 - Build actuel donné en clair (« j'ai Improved Frostbolt au max ») : traduis en clés de talent avec
   `forever_lookup(kind="talent", name=…)` (la clé est le champ `id`).
 

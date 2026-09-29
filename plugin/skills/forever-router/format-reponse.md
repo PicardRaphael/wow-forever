@@ -29,10 +29,27 @@ Réponse directe et chiffres essentiels, puis, si une hypothèse ou un angle mor
 
 Plusieurs outils : la certitude la plus basse, la version et la fraîcheur du dernier résultat.
 
+## Question personnelle ou générale
+Décide d'abord de quel type est la question.
+- **Personnelle** : elle parle du personnage du joueur (« mon Mage », « mon perso », « je suis niveau N », « j'ai … »,
+  « mon build »). Pars du personnage actif du profil, ou de celui que la question nomme ; règles de « Données du
+  joueur » ci-dessous.
+- **Générale** : elle porte sur une classe, un niveau ou un contexte sans personnage (« l'arbre optimal du Mage en
+  raid », « un Mage niveau N », « le meilleur build Paladin »). N'appelle pas `forever_player_profile` et ne demande
+  rien : calcule avec une hypothèse neutre annoncée en tête de réponse (« Hypothèse : … » : niveau maximal si la
+  question n'en donne pas, et chaque champ de `inputs` dont `origin` vaut `default`). Ne présente jamais ce résultat
+  comme celui du joueur. Montre si une donnée personnelle change le résultat : pour un build, un second appel avec une
+  race de l'autre faction (même contexte, même niveau ; l'erreur de l'outil liste les races acceptées) et une ligne
+  « la race change / ne change pas le build » ; plus de deux races ou de contextes : sous-agent `forever-sim-runner`.
+- Ni l'un ni l'autre écrit (« au niveau N en Givre, combien de temps par monstre ? », « faut-il respec ? ») : le
+  joueur parle de son jeu, traite la question comme personnelle. Elle n'est générale que si elle vise une classe ou
+  un personnage quelconque (« le Mage », « un Mage », « du Paladin »).
+
 ## Données du joueur
 Race, faction, niveau, talents actuels et métiers sont des données personnelles.
-- Question qui en dépend (build, prochain talent, temps par monstre, respec, zone) : appelle `forever_player_profile`
-  **avant** tout calcul. Les outils de calcul ne lisent jamais le profil : passe-leur toi-même les valeurs.
+- Question personnelle qui en dépend (build, prochain talent, temps par monstre, respec, zone) : appelle
+  `forever_player_profile` **avant** tout calcul. Les outils de calcul ne lisent jamais le profil : passe-leur toi-même
+  les valeurs.
 - Donnée présente : utilise-la sans la redemander et rappelle le profil en une ligne en tête de réponse :
   « Profil : <nom>, <classe> <race>, niveau <niveau> (profil actif) ». `stale` vrai : signale que le profil date
   d'une autre version des données.
@@ -41,15 +58,21 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
   profil), et la commande pour l'enregistrer : `forever profile set <nom> --race … --level … --talents "clé=rang,…"`.
 - La question prime sur le profil : un niveau écrit dans la question remplace celui du profil ; les talents du
   profil ne valent qu'au niveau du profil (`current` de `forever_build` pour le niveau suivant). Question posée à un
-  autre niveau (« au niveau 30… ») : calcul pour ce niveau avec la race et la faction du profil, build conseillé par
-  `forever_build`, présenté comme tel (« build conseillé, pas le tien »), sans redemander les talents.
+  autre niveau (« au niveau 30… ») : pour un build conseillé, calcul pour ce niveau avec la race et la faction du
+  profil, présenté comme tel (« build conseillé, pas le tien »), sans redemander les talents. Pour une respec ou un
+  prochain talent à ce niveau, le build actuel de ce niveau est indispensable : demande-le (talents et rangs, ou arbre
+  et points) et ne donne aucun conseil de respec sans lui, sauf si la question le décrit (« un build Givre de
+  leveling » : build de leveling conseillé à ce niveau par `forever_build`, dit comme tel).
+- Le joueur donne en conversation une donnée qui diffère du profil (« j'ai … », « je suis passé niveau … ») : utilise
+  la valeur de la conversation et propose en une ligne de mettre le profil à jour, avec la commande
+  `forever profile set` ; ne l'écris jamais toi-même.
 - Jamais de défaut muet : un résultat dont `inputs.<champ>.origin` vaut `default` pour une donnée personnelle ne se
   présente pas comme la réponse du joueur ; redemande la donnée ou dis que le calcul suppose ce défaut.
 - Ne compte jamais toi-même les points du joueur ni ceux d'un niveau : `points.available` et `points_total` de
   `forever_build` les donnent.
 - Une réponse qui se limite à demander une donnée finit elle aussi par le pied de réponse (provenance de
   `forever_player_profile`).
-- Classe autre que Mage : profil lu, calcul « non couvert » (carte du routeur).
+- Classe pas encore calculée : section « Classe pas encore calculée » du routeur.
 
 ## Comparer deux options
 - Compare à mesure égale : un Monte Carlo contre un Monte Carlo (mêmes combats), jamais un Monte Carlo contre un
