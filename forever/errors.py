@@ -106,6 +106,14 @@ class UnknownSpellError(ForeverError):
         super().__init__("unknown_spell", f"Sort inconnu : « {name} ».", hint, suggestions=suggestions)
 
 
+class UnknownTalentError(ForeverError):
+    exit_code = EXIT_NOT_FOUND
+
+    def __init__(self, name: str, suggestions: list[str]) -> None:
+        hint = "reprendre un nom suggéré" if suggestions else "vérifier l'orthographe (nom anglais ou clé du talent)"
+        super().__init__("unknown_talent", f"Talent inconnu : « {name} ».", hint, suggestions=suggestions)
+
+
 class UnknownRankError(ForeverError):
     exit_code = EXIT_NOT_FOUND
 

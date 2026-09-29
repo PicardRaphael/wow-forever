@@ -143,6 +143,43 @@ def lookup_spell(
     }
 
 
+class TalentRank(TypedDict):
+    rank: int
+    values: list[float]
+    description: str
+
+
+class TalentPrereq(TypedDict):
+    id: str
+    name: str
+    max_rank: int
+
+
+class TalentLookup(TypedDict):
+    kind: Literal["talent"]
+    id: str
+    name: str
+    tree: str
+    tier: int
+    col: int
+    required_tree_points: int
+    prereq: TalentPrereq | None
+    max_rank: int
+    description_template: str
+    spell: str | None
+    source: str
+    ranks: list[TalentRank]
+    provenance: Provenance
+
+
+def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLookup:
+    """Talent du Mage par nom anglais ou clé (casse, espaces, tirets et soulignés ignorés) : arbre, palier, points
+    exigés dans l'arbre, prérequis, rangs et valeurs (description aux valeurs du rang), sort appris, provenance.
+
+    Registre : G3"""
+    raise NotImplementedError
+
+
 class ZoneLookup(ZoneAdvice):
     provenance: Provenance
 
