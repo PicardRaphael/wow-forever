@@ -22,19 +22,7 @@ from forever.engine.talents import talent_value
 from forever.registry import blind_spot_rules, load, validate
 
 # Talents non modélisés de la décision 83 (angles morts chiffrés ou non) et Wake of Fire (bonus de critique).
-UNMODELED = {
-    "presenceOfMind",
-    "combustion",
-    "coldSnap",
-    "impact",
-    "improvedScorch",
-    "improvedBlizzard",
-    "iceBarrier",
-    "iceBlock",
-    "improvedCounterspell",
-    "wandSpecialization",
-    "wakeOfFire",
-}
+CODE_DIRS = ("engine", "sim", "optimize")  # dossiers où un effet de talent est modélisé
 
 
 @pytest.fixture(scope="module")
@@ -42,12 +30,26 @@ def rules():
     return blind_spot_rules(load(REGISTRY_PATH))
 
 
-def test_every_unmodeled_talent_has_a_blind_spot(rules):
+def test_every_talent_is_read_by_the_code_or_has_a_blind_spot(rules, game_data):
+    """T06b (remplace la liste figée UNMODELED) : toute clé de talents.json est lue par le moteur, les simulateurs ou
+    l'optimiseur (littéral dans le code, ou talent qui apprend un sort de spells.json), ou figure dans un angle mort."""
+    code = "\n".join(
+        p.read_text(encoding="utf-8") for sub in CODE_DIRS for p in (REPO_ROOT / "forever" / sub).glob("*.py")
+    )
+    read = {k for k in game_data.talents if f'"{k}"' in code or f"'{k}'" in code}
+    read |= {s.talent for s in game_data.spells.values() if s.talent}
     covered = {t for r in rules for t in r.talents}
-    assert covered >= UNMODELED, UNMODELED - covered
+    orphans = sorted(k for k in game_data.talents if k not in read and k not in covered)
+    assert orphans == [], orphans
     for r in rules:
         assert set(r.contexts) <= set(CONTEXTS) and r.contexts
         assert r.estimate is None or r.estimate in ESTIMATORS
+
+
+def test_talents_without_effect_are_blind_spots(rules):
+    by_id = {r.id: r for r in rules}
+    assert "arcaneSubtlety" in by_id["H2"].talents  # résistances de la cible (T06b)
+    assert "improvedFlamestrike" in by_id["B19"].talents  # critique de Flamestrike (T06b)
 
 
 def test_new_registry_entries(rules):

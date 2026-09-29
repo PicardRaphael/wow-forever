@@ -25,6 +25,7 @@ FIELDS = (
     "talents_by_tree",
     "points",  # T06b : totaux (points par arbre, au total, disponibles, non dépensés)
     "order",
+    "next_step",  # T06b : prochain talent depuis le build actuel (leveling, current donné)
     "choices",
     "metric",
     "reasons",

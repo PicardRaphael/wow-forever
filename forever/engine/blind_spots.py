@@ -142,3 +142,7 @@ def select_blind_spots(
         effect = estimator(gd, level, {**(near or {}), **pts}, race, over) if estimator else None
         out.append(BlindSpot(rule.id, rule.description, rule.status, concerned, effect))
     return out
+
+
+def modeled_talents(gd: GameData, rules: Sequence[BlindSpotRule]) -> frozenset[str]:
+    raise NotImplementedError("T06b : talents modélisés")

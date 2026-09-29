@@ -239,6 +239,7 @@ def optimize_leveling(
     start: Points | None = None,
     over: CharacterOverrides | None = None,
     talented_bonus: int = 0,
+    modeled: frozenset[str] | None = None,
     **options: Any,
 ) -> LevelingPath:
     """Meilleur ordre des talents de `lfrom` à `lto` (faisceau, anticipation, Monte Carlo sur la présélection) ;

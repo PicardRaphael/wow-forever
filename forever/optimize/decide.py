@@ -7,7 +7,7 @@ from __future__ import annotations
 import math
 import statistics
 from collections.abc import Callable, Sequence
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 from forever.sim.leveling_mc import McStats
 
@@ -103,3 +103,24 @@ def stability[C](
         for s in seeds
     )
     return Stability(tuple(seeds), winners, len(set(map(repr, winners))) == 1)
+
+
+DECIDED_BY = (
+    "monte_carlo",
+    "modelise",
+    "non_departage",
+    "passage_palier",
+    "anticipation",
+    "analytique",
+    "seul_candidat",
+)
+
+
+def tie_break(
+    cands: Sequence[tuple[str, McStats]],
+    modeled: frozenset[str] | None,
+    confidence: float,
+    *,
+    lower_is_better: bool = True,
+) -> dict[str, Any]:
+    raise NotImplementedError("T06b : départage")
