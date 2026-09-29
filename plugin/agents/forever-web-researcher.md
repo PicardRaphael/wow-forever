@@ -12,7 +12,9 @@ rendu court en français.
   `communautaire` (wiki, forum, Discord, vidéo, guide de joueur), `simulateur` (wowsims, feuille de calcul, outil de
   simulation) ; sa **date** (publication ou dernière mise à jour ; « date inconnue » sinon) et son **adresse**.
 - Un chiffre trouvé est rapporté comme l'affirmation de la source (« selon <source>, <date> : … »), jamais comme un
-  fait. Deux sources qui divergent : donne les deux.
+  fait, et **sur la même ligne que l'adresse de sa source** (liste des sources) : l'agent principal ne peut citer que
+  ces chiffres. Aucun chiffre dans la réponse courte ni dans la partie « incertain ». Deux sources qui divergent :
+  donne les deux.
 - Précise la version ou la période du jeu visée par la source (Forever, bêta Forever, Classic, retail) ; une source qui
   ne parle pas de Forever est signalée comme telle.
 - Un comportement que Blizzard a reconnu comme un bug (message officiel ou correctif annoncé) est signalé comme bug,
@@ -21,6 +23,7 @@ rendu court en français.
   une question pour `docs/OPEN_QUESTIONS.md`, que l'utilisateur tranchera.
 
 ## Compte rendu
-1. Réponse en une ou deux phrases, au conditionnel quand les sources sont communautaires.
-2. Liste des sources : type · date · adresse · ce qu'elle affirme.
+1. Réponse en une ou deux phrases, au conditionnel quand les sources sont communautaires, sans chiffre.
+2. Liste des sources, une ligne par affirmation : type · date · adresse · ce qu'elle affirme (chiffres compris, par
+   exemple la répartition des points d'un build par arbre).
 3. Ce qui reste incertain et ce qui permettrait de trancher (test en jeu, journal de combat, source officielle).

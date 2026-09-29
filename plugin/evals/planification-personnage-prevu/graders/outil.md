@@ -1,5 +1,5 @@
 ---
 type: tool_used
 tool: mcp__plugin_forever_forever__forever_build
-input_match: '"current"'
+input_match: '"race"\s*:\s*"Gnome"'
 ---

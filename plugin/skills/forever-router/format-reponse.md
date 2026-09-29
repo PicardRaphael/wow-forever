@@ -36,8 +36,9 @@ Décide d'abord de quel type est la question.
   joueur » ci-dessous.
 - **Générale** : elle porte sur une classe, un niveau ou un contexte sans personnage (« l'arbre optimal du Mage en
   raid », « un Mage niveau N », « le meilleur build Paladin »). N'appelle pas `forever_player_profile` et ne demande
-  rien : calcule avec une hypothèse neutre annoncée en tête de réponse (« Hypothèse : … » : niveau maximal si la
-  question n'en donne pas, et chaque champ de `inputs` dont `origin` vaut `default`). Ne présente jamais ce résultat
+  rien : calcule avec une hypothèse neutre annoncée en tête de réponse (« Hypothèse : … » : chaque champ de `inputs`
+  dont `origin` vaut `default`). Sans niveau dans la question, n'en passe aucun : `forever_build` prend le niveau
+  maximal des données (`inputs.level`) ; n'écris jamais toi-même ce niveau. Ne présente jamais ce résultat
   comme celui du joueur. Montre si une donnée personnelle change le résultat : pour un build, un second appel avec une
   race de l'autre faction (même contexte, même niveau ; l'erreur de l'outil liste les races acceptées) et une ligne
   « la race change / ne change pas le build » ; plus de deux races ou de contextes : sous-agent `forever-sim-runner`.
@@ -57,15 +58,14 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
   le calcul, en une question courte, avec la valeur la plus probable proposée (celle de la conversation ou du
   profil), et la commande pour l'enregistrer : `forever profile set <nom> --race … --level … --talents "clé=rang,…"`.
 - La question prime sur le profil : un niveau écrit dans la question remplace celui du profil ; les talents du
-  profil ne valent qu'au niveau du profil (`current` de `forever_build` pour le niveau suivant). Question posée à un
-  autre niveau (« au niveau 30… ») : pour un build conseillé, calcul pour ce niveau avec la race et la faction du
-  profil, présenté comme tel (« build conseillé, pas le tien »), sans redemander les talents. Pour une respec ou un
-  prochain talent à ce niveau, le build actuel de ce niveau est indispensable : demande-le (talents et rangs, ou arbre
-  et points) et ne donne aucun conseil de respec sans lui, sauf si la question le décrit (« un build Givre de
-  leveling » : build de leveling conseillé à ce niveau par `forever_build`, dit comme tel).
+  profil ne valent qu'au niveau du profil. Question posée à un autre niveau (« au niveau 30… ») : pour un build
+  conseillé, calcul pour ce niveau avec la race et la faction du profil, présenté comme tel (« build conseillé, pas
+  le tien »), sans redemander les talents.
+
 - Le joueur donne en conversation une donnée qui diffère du profil (« j'ai … », « je suis passé niveau … ») : utilise
   la valeur de la conversation et propose en une ligne de mettre le profil à jour, avec la commande
-  `forever profile set` ; ne l'écris jamais toi-même.
+  `forever profile set` ; ne l'écris jamais toi-même. Personnage que le joueur prévoit de créer : propose
+  `forever profile set <nom> --class … --race … --faction … --planned` (`--created` une fois créé).
 - Jamais de défaut muet : un résultat dont `inputs.<champ>.origin` vaut `default` pour une donnée personnelle ne se
   présente pas comme la réponse du joueur ; redemande la donnée ou dis que le calcul suppose ce défaut.
 - Ne compte jamais toi-même les points du joueur ni ceux d'un niveau : `points.available` et `points_total` de
@@ -73,6 +73,19 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
 - Une réponse qui se limite à demander une donnée finit elle aussi par le pied de réponse (provenance de
   `forever_player_profile`).
 - Classe pas encore calculée : section « Classe pas encore calculée » du routeur.
+
+## Planification
+- Respec ou prochain talent à un niveau plus haut que celui du profil (« respec au niveau 32 » avec un profil au
+  niveau 23) : question de planification. Passe les talents du profil comme `current` à
+  `forever_build(context="leveling", level=<niveau de la question>, …)` : le bloc `respec.projected` donne le chemin
+  de leveling conseillé depuis ce build jusqu'au niveau demandé (`steps`, `talents`, `points`) et le bloc `respec`
+  le conseil (verdict, niveau, coût, gain). Dis que le chemin est projeté depuis le build du profil. Ne demande le
+  build que si le profil n'en contient aucun ; une question qui décrit un autre build (« tout en Feu ») : dis en une
+  ligne que tu pars du profil, ou prends le build décrit s'il est précis.
+- Personnage prévu (`planned` vrai : pas encore créé) : ni niveau ni talents à demander. Prépare son plan : builds
+  par niveau calculés par `forever_build` avec sa race (classe à moteur ; plusieurs niveaux ou contextes : sous-agent
+  `forever-sim-runner`), sinon builds de la communauté (section « Classe pas encore calculée » du routeur) ; métiers
+  envisagés rappelés, répartition et plan de montée non calculés (MT1) ; Legacy non calculé (LG1).
 
 ## Comparer deux options
 - Compare à mesure égale : un Monte Carlo contre un Monte Carlo (mêmes combats), jamais un Monte Carlo contre un
@@ -104,4 +117,5 @@ N'estime rien de mémoire et ne donne pas de valeur de WoW Classic ou retail à 
 
 ## Sources extérieures
 Un chiffre rapporté par le sous-agent `forever-web-researcher` s'écrit comme l'affirmation de sa source, avec son
-type (officielle Blizzard, communautaire, simulateur), sa date et son adresse ; jamais comme un fait du projet.
+type (officielle Blizzard, communautaire, simulateur), sa date et son adresse ; jamais comme un fait du projet. Seuls
+les chiffres des lignes du rapport qui portent l'adresse de leur source se citent.

@@ -19,6 +19,21 @@
       "game_version": "1.60.1.70009",
       "updated_at": "2026-09-29T12:00:00Z",
       "validated": true
+    },
+    "Étincelle": {
+      "class": "Mage",
+      "race": "Gnome",
+      "faction": "Alliance",
+      "level": null,
+      "talents": {},
+      "professions": {
+        "Enchantement": 0,
+        "Couture": 0
+      },
+      "planned": true,
+      "game_version": "1.60.1.70009",
+      "updated_at": "2026-09-29T12:00:00Z",
+      "validated": true
     }
   }
 }

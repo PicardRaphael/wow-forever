@@ -17,8 +17,9 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 - **Niveau** : obligatoire.
 - **Race**, **faction**, **build actuel** : lus dans le profil ou la question ; absents des deux, demande-les avant
   l'appel (jamais la race par défaut de l'outil sans le dire : `inputs.race.origin`).
-- **Respec ou prochain talent à un autre niveau que celui du profil** : les talents du profil n'y valent pas ;
-  demande le build actuel avant tout conseil.
+- **Respec ou prochain talent à un niveau plus haut que celui du profil** : planification (section du même nom
+  de `format-reponse.md`) : talents du profil en `current`, chemin projeté `respec.projected` ; le build n'est
+  demandé que si le profil n'en a aucun.
 - Build actuel donné en clair (« j'ai Improved Frostbolt au max ») : traduis en clés de talent avec
   `forever_lookup(kind="talent", name=…)` (la clé est le champ `id`).
 
@@ -49,7 +50,9 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 - **Monte Carlo** et **analytique** : donne le Monte Carlo ; si `analytic_gap` est grand, signale l'écart.
 - **PV du monstre** (`mob_hp`) : sa source et sa certitude comptent ; une valeur `suppose` fait baisser la certitude
   de la réponse.
-- **Respec** : donne le conseil du bloc `respec` (coût, gain, niveau conseillé), sans le recalculer.
+- **Respec** : donne le conseil du bloc `respec` (coût, gain, niveau conseillé), sans le recalculer ; chemin
+  projeté depuis le build actuel : `respec.projected` (`steps` : talent de chaque niveau ; `talents` et `points` au
+  niveau demandé).
 - **Angles morts** : `blind_spots` du rapport de build ; XP de Forever et quêtes propres au serveur : non modélisées
   (tranche T04d), à dire quand la question porte sur l'XP.
 

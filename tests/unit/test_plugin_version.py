@@ -27,8 +27,9 @@ def read_json(path):
 def test_plugin_json_has_a_semver_version():
     version = read_json(PLUGIN / ".claude-plugin" / "plugin.json")["version"]
     assert SEMVER.match(version), version
-    # 0.1.0 : T06 ; 0.2.0 puis 0.2.1 : T06b (0.2.0 installé en cours de tranche) ; 0.3.0 : décisions 116 et 117.
-    assert version == "0.3.0"
+    # 0.1.0 : T06 ; 0.2.0 puis 0.2.1 : T06b (0.2.0 installé en cours de tranche) ; 0.3.0 : décisions 116 et 117 ;
+    # 0.4.0 : planification, personnages prévus, rapport sourcé du sous-agent de recherche (décisions 118 à 121).
+    assert version == "0.4.0"
 
 
 def test_fingerprint_is_up_to_date():

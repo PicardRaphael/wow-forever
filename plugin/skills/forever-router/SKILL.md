@@ -33,7 +33,8 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Talent : effet à un rang, prérequis, palier | `forever_lookup(kind="talent", name=<nom anglais ou clé>, rank=…)` | `forever-mage` |
 | Meilleur build, ordre des talents, build par contexte | `forever_build(context, level, …)` | `forever-mage` |
 | Quel talent prendre au niveau N, faut-il respec | `forever_build(context="leveling", level, current, respecs)` | `forever-leveling` |
-| Mon personnage (race, faction, niveau, talents, métiers) | `forever_player_profile(name=…)` | selon la question |
+| Mon personnage (race, faction, niveau, talents, métiers), personnage prévu | `forever_player_profile(name=…)` | selon la question |
+| Planifier : respec à un autre niveau, plan d'un personnage prévu | `forever_build(context, level, current=<talents du profil>)` : `respec.projected` | `forever-leveling` |
 | Temps par monstre, XP par heure, repos, mana | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
 | Comment marche une mécanique | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` | selon le sujet |
@@ -79,8 +80,9 @@ Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin »)
 - Question générale : ne demande rien au joueur. Question personnelle : profil lu, rappelé en une ligne.
 - Propose des builds de la communauté trouvés par le sous-agent `forever-web-researcher` (lance-le si le joueur
   l'accepte ou le demande) : chacun avec sa source, son type et sa date, en noms de talents et en points par arbre,
-  présenté comme l'avis de cette source (section « Sources extérieures » de `format-reponse.md`). Aucun chiffre de
-  jeu tiré de ce rapport : le contrôle des chiffres ne connaît que les outils forever.
+  présenté comme l'avis de cette source (section « Sources extérieures » de `format-reponse.md`). Un chiffre de ce
+  rapport ne se cite que s'il figure sur une ligne qui porte l'adresse de sa source (le contrôle des chiffres ne
+  reconnaît que ces lignes).
 - Tant que PV1 n'a pas décodé les talents des neuf classes, dis que la légalité de ces builds et l'effet de leurs
   talents ne sont pas vérifiés sur les données du client ; ensuite, vérifie-les et explique-les par les outils forever.
 - Rien de mémoire, de WoW Classic ni de retail.
