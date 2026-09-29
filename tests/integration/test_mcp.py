@@ -32,6 +32,7 @@ def test_list_tools(make_deps):
         "forever_lookup",
         "forever_explain_mechanic",
         "forever_sim_leveling",
+        "forever_build",
     }
     for t in tools:
         assert t.output_schema is not None
