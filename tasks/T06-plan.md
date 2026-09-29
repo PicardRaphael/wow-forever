@@ -116,3 +116,23 @@ Plan accepté par l'utilisateur, avec ces précisions (elles priment sur le text
 - **D10** : ajout du seuil **100 % de réponses avec certitude affichée** (sur les cas positifs) ; mesure du **taux de fausses alertes** de la vérification des chiffres sur le jeu de questions (consigné dans `docs/research/plugin-eval-T06.md`).
 - D2, D5, D6, D7, D8, D9 : acceptées telles quelles.
 - Conduite : si le bloc A contredit une décision, la présenter avant d'aller plus loin ; un test verrouillé faux → demandes de correction regroupées avant la fusion ; contexte plein → arrêt après un bloc vert et committé.
+
+## Annexe — Bloc A : vérifications sur place (2026-09-29, Claude Code 2.1.284, Windows 11)
+Plugin de sonde hors dépôt (un skill, deux hooks qui enregistrent leur entrée, le vrai serveur `forever mcp`), sessions `claude -p --plugin-dir`, marketplace locale installée en portée `local` puis retirée, trois passages de `claude plugin eval`.
+
+| Point | Constat | Effet sur le plan |
+|---|---|---|
+| Noms des outils | skill : `forever:<skill>` (outil `Skill`, entrée `{"skill": "forever:forever-router"}`) ; outil MCP d'un serveur de plugin : `mcp__plugin_<plugin>_<serveur>__<outil>`, ici `mcp__plugin_forever_forever__forever_lookup` | noms repris par les correcteurs et par le filtre du hook Stop |
+| Entrée SessionStart | `session_id`, `transcript_path`, `cwd`, `hook_event_name`, `source` | `cwd` décide si la ligne s'affiche (D4 précisé) |
+| Entrée Stop | en plus : `last_assistant_message` (texte final), `stop_hook_active`, `permission_mode` | la réponse vient de `last_assistant_message`, les résultats d'outils du transcript |
+| Transcript | JSONL ; `tool_use` (`name`, `input`) dans `message.content` des lignes `assistant`, `tool_result` (`tool_use_id`, `content` texte JSON) dans les lignes `user` ; la trace d'évaluation (flux JSON) a la même forme de messages | un seul lecteur pour les deux |
+| Sortie des hooks | stdout texte ou `hookSpecificOutput.additionalContext` → contexte du modèle ; `systemMessage` → message à l'utilisateur, sans blocage (vu dans le transcript `hook_system_message`, et dans la trace d'évaluation « Stop says: … ») | SessionStart renvoie du JSON (ligne visible + contexte) au lieu d'un texte seul |
+| Shell des hooks | forme `command` : Git Bash (`/usr/bin/bash`) ; `${FOREVER_HOME:-défaut}` développé par bash ; forme `args` (exec) : `${CLAUDE_PLUGIN_ROOT}` développé, `${VAR:-…}` **non** | forme `command` ; Git est déjà exigé par le script |
+| `.mcp.json` | `${VAR}`, `${VAR:-défaut}` et défaut imbriqué `${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}` développés | défaut `${CLAUDE_PLUGIN_ROOT}/..` (le dépôt quand le plugin est chargé sur place : évaluation, `--plugin-dir`) |
+| Installation | `claude plugin marketplace add <dossier>` puis `claude plugin install forever@<marketplace> --scope user`, non interactifs ; le plugin est **copié** dans `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>` | `FOREVER_HOME` indispensable une fois installé |
+| Mise à jour | avec `version` dans `plugin.json`, `claude plugin update` ne recopie rien tant que la version ne change pas ; sans `version`, `claude plugin update forever@<marketplace>` recopie depuis la source (« refreshed from source ») | pas de `version` dans `plugin.json` ; mise à jour : `git pull`, `claude plugin marketplace update`, `claude plugin update`, redémarrer |
+| `claude plugin validate` | valide plugin et marketplace ; `--strict` échoue sur un avertissement (auteur absent) | contrôle final du script avec `--strict` |
+| Évaluation | cas `evals/<cas>/prompt.md` (frontmatter `max_turns`, `runs`, `allowed_tools`, `tags`) + `graders/*.md` (`regex` avec `target: trace` et `match: not_contains`, `tool_used` avec `input_match`, `min`/`max`, `arm: both`, `llm`) ; l'environnement de l'enfant est filtré (`FOREVER_HOME` absent : serveur MCP en échec sans le défaut ci-dessus) ; vrai serveur : `--mocks off --allow-tools mcp__plugin_forever_forever__…` ; coût relevé ≈ 0,05 à 0,06 $ par passage d'un cas simple | « aucun chiffre inventé » : correcteur `regex` sur la trace, qui cherche le message du hook Stop (même règle) |
+| Comportement observé | sans outil disponible, le modèle a donné un chiffre de WoW Classic « de mémoire » ; avec l'outil, il a écrit « 30 m » pour une portée en mètres alors que l'outil donne `range_yd` (unité fausse, nombre juste) | le format de réponse impose l'unité de l'outil ; le contrôle compare les nombres, pas les unités (limite notée) |
+
+Aucune décision D1 à D10 n'est contredite. Ajustements de détail : `plugin.json` sans `version` ; sortie JSON de SessionStart ; défauts `${CLAUDE_PLUGIN_ROOT}/..`. Transcripts anonymisés et réduits dans `tests/fixtures/transcripts/`.
