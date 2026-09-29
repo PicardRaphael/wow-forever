@@ -10,15 +10,26 @@ uv run python scripts/plugin_eval_report.py plugin/evals/results/passage-N.json
 
 ## Résultats
 
-| Critère (seuil) | Passage 1 | Passage 2 |
-|---|---|---|
-| Aiguillage, 50 cas (≥ 90 %) | 50/50 | 50/50 |
-| Outil attendu appelé, 30 positifs (≥ 90 %) | 30/30 | 30/30 |
-| Aucun chiffre inventé, 30 positifs (100 %) | **23/30** | 30/30 |
-| Certitude affichée, 30 positifs (100 %) | 30/30 | 30/30 |
-| Provenance affichée, 30 positifs (≥ 90 %) | 30/30 | 30/30 |
-| « Je ne sais pas » hors périmètre (3 sur 3) | 3/3 | 3/3 |
-| Coût du passage | 6,44 $ | 6,31 $ |
+| Critère (seuil) | Passage 1 | Passage 2 | Passage 3 |
+|---|---|---|---|
+| Aiguillage, 50 cas (≥ 90 %) | 50/50 | 50/50 | 50/50 |
+| Outil attendu appelé, 30 positifs (≥ 90 %) | 30/30 | 30/30 | 30/30 |
+| Aucun chiffre inventé, 30 positifs (100 %) | **23/30** | 30/30 (hook en partie aveugle) | 30/30 |
+| Certitude affichée, 30 positifs (100 %) | 30/30 | 30/30 | 30/30 |
+| Provenance affichée, 30 positifs (≥ 90 %) | 30/30 | 30/30 | 30/30 |
+| « Je ne sais pas » hors périmètre (3 sur 3) | 3/3 | 3/3 | **1/3** |
+| Coût du passage | 6,44 $ | 6,31 $ | 6,43 $ |
+
+Passage 2 : mesuré avec un hook qui lisait son entrée en cp1252 (relecture de la tranche : sans `PYTHONUTF8`,
+« dégâts », « mètres » et « à » échappaient au contrôle ; l'environnement de l'évaluation est filtré). Il ne compte pas
+pour le critère des chiffres. Passage 3 : entrée décodée en UTF-8 (commit `71ef7ec`), 129 chiffres de jeu dans les
+réponses positives (dont 4 à unité accentuée), aucun signalé.
+
+« Je ne sais pas » au passage 3 : le correcteur `regex` réussit 3/3 ; le juge `llm` (Haiku, trois votes) refuse les
+réponses de `hors-butin-mortemines` et `hors-hotel-des-ventes`, qui disent pourtant « Je ne sais pas », citent DJ1 ou
+EC1 et ne donnent aucune valeur (elles proposent ce que le projet sait déjà : niveau du donjon, recherche web
+étiquetée). Rejeu des trois cas à trois exécutions (0,99 $) : regex 9/9, juge 8/9. Sur l'ensemble des passages, le juge
+accepte 15 réponses sur 18 : variance du juge, question posée à l'utilisateur (`tasks/T06-corrections.md`).
 
 Durée : environ 25 s par cas en moyenne, 90 s au plus (cas de `forever_build`, calcul d'environ une minute).
 Le passage 2 suit deux corrections (commit `87acddc`) ; les 50 cas n'ont pas changé.
@@ -51,7 +62,9 @@ Corrections (commit `87acddc`) :
 - le rapport reprend le message du hook Stop dans la trace (le hook voit le transcript de la session ; recalculé sur
   la trace, qui contient aussi les résultats des sous-agents, le contrôle manquait deux alertes).
 
-**Passage 2** : 117 chiffres de jeu dans les 30 réponses positives, hook Stop exécuté dans les 30 sessions, **0 alerte,
+**Passage 2** : 117 chiffres de jeu, 0 alerte, mais hook en partie aveugle (voir plus haut) : non retenu.
+
+**Passage 3** : 129 chiffres de jeu dans les 30 réponses positives, hook Stop exécuté dans les 30 sessions, **0 alerte,
 donc 0 fausse alerte (0 %)**.
 
 ## Limites
