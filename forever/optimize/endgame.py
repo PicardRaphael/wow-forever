@@ -268,3 +268,23 @@ def optimize_context(
     rest = sorted((s for s in by_sig if s not in (d.winner, d.runner_up)), key=lambda s: (-stats[s].mean, s))
     ordered = [by_sig[s]._replace(stats=stats[s]) for s in (d.winner, d.runner_up, *rest)]
     return ordered + cands[len(finalists) :]
+
+
+# --- PvP (bloc G) ------------------------------------------------------------------------------------------------
+
+PVP_CONTEXTS = {"pvp-bg": "bg", "pvp-world": "world"}  # contexte -> poids du profil (pvp.weights)
+
+
+def seed_pvp_greedy(
+    gd: GameData,
+    level: int,
+    race: str = "Orc",
+    beam: int = 4,
+    weights: dict[str, float] | None = None,
+    *,
+    rules: str = "seed",
+) -> Candidate:
+    """Optimiseur PvP glouton du seed (`optimize.pvp`) : faisceau point par point noté par le profil PvP.
+
+    Registre : I5"""
+    raise NotImplementedError
