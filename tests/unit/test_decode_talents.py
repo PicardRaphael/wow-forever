@@ -162,9 +162,11 @@ def test_shared_spell_keeps_latest_node(client_tables, decode_rules):
 def test_confirmed_changes_are_well_formed():
     doc = read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")
     assert doc["version"] == LOCAL_VERSION
+    assert len(doc["changes"]) == 18  # T03 : 15 écarts tranchés ; T06b : 3 coûts en mana installés en révision 2
     for c in doc["changes"]:
         assert {"kind", "key", "change", "field", "old", "new", "reference_certainty", "decision"} <= set(c)
         assert c["kind"] in ("talent", "spell")
+        assert c["applied_in_revision"] == 2
 
 
 def test_every_confirmed_talent_change_exists(candidate):

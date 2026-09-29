@@ -17,6 +17,7 @@ from forever.registry import coverage
 VALID = {
     "game_version": LOCAL_VERSION,
     "data_sha": "3f9a1c2b7d4e",
+    "data_revision": 1,
     "generated_at": "2026-09-27T10:00:00Z",
     "freshness": "fresh",
     "certainty": "certain",
@@ -52,6 +53,9 @@ def test_other_invalid_values():
     assert validate_provenance({**VALID, "generated_at": "2026-09-27 10:00:00"})
     assert validate_provenance({**VALID, "assumptions": [1]})
     assert validate_provenance({**VALID, "registry_coverage": "16 sur 97"})
+    assert validate_provenance({**VALID, "data_revision": 0})
+    assert validate_provenance({**VALID, "data_revision": "2"})
+    assert validate_provenance({**VALID, "data_revision": True})
     assert validate_provenance("pas un objet")
 
 
@@ -82,7 +86,7 @@ def test_text_line_has_all_seven_fields():
     line = format_provenance_line(VALID)
     assert line.startswith("Provenance")
     for label in [
-        "version 1.60.1.70009",
+        "version 1.60.1.70009 r1",
         "données 3f9a1c2b7d4e",
         "générée 2026-09-27T10:00:00Z",
         "fraîcheur fresh",
@@ -113,6 +117,7 @@ def test_make_provenance(make_deps):
     assert p["generated_at"] == "2026-09-27T12:00:00Z"
     assert p["registry_coverage"] == coverage(REGISTRY_PATH)
     assert p["assumptions"] == ["a"]
+    assert p["data_revision"] == 2  # T06b : révision de la version, lue dans sources.json (via le manifeste)
 
 
 def test_make_provenance_without_registry(make_deps, tmp_path):

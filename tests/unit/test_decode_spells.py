@@ -113,6 +113,17 @@ def test_null_reference_values_are_observations(candidate):
     assert all(isinstance(c["new"], int) for c in observations)
 
 
+def test_installed_observations_are_recorded(candidate):
+    """T06b : les observations installées en révision 2 figurent dans confirmed_changes.json (nature client)."""
+    _, observations, _ = client_vs_reference(candidate, "spell")
+    recorded = [
+        c for c in read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"] if c["old"] is None
+    ]
+    assert sorted(map(change_key, recorded)) == sorted(map(change_key, observations))
+    assert {c["nature"] for c in recorded} == {"client"}
+    assert all(c["applied_in_revision"] == 2 for c in recorded)
+
+
 def test_every_confirmed_spell_change_exists(candidate):
     gaps, _, confirmed = client_vs_reference(candidate, "spell")
     observed = {change_key(c) for c in gaps}

@@ -87,8 +87,8 @@ def test_calibration_blizzard_target(game_data, mode, level, pts):
     assert 8 <= c <= 20, (mode, level, c)
 
 
-def test_calibration_values_of_the_seed(game_data):
-    got = [mc(game_data, level, pts, "Orc", "frost", 600, **SEED_MODE)["combat"] for level, pts in CALIBRATION]
+def test_calibration_values_of_the_seed(seed_game_data):
+    got = [mc(seed_game_data, level, pts, "Orc", "frost", 600, **SEED_MODE)["combat"] for level, pts in CALIBRATION]
     assert got == pytest.approx([11.716904761904743, 14.127405952380936], rel=1e-12)
 
 

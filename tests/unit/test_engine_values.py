@@ -50,9 +50,10 @@ def test_arcane_blast_mana_pct(game_data, ch):
     assert e["mana"] == approx(0.15 * ch.base_mana)
 
 
-def test_talent_rank_mana_estimate(game_data, ch):
-    """Rang 1 de Pyroblast sans coût publié : 0,75 × coût du premier rang publié (150), estimation du seed."""
-    e = expected_cast(game_data, "pyroblast", 20, {"pyroblast": 1}, ch)
+def test_talent_rank_mana_estimate(seed_game_data, ch):
+    """Rang 1 de Pyroblast sans coût publié : 0,75 × coût du premier rang publié (150), estimation du seed (mode seed
+    seulement depuis la révision 2 : le mode forever lit le coût du client, test_install.py)."""
+    e = expected_cast(seed_game_data, "pyroblast", 20, {"pyroblast": 1}, ch)
     assert e["rank"].position == 1
     assert e["rank"].mana is None
     assert e["mana"] == approx(112.5)

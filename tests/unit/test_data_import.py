@@ -1,5 +1,6 @@
 """Les données 1.60.1.70009 sont des copies octet pour octet du seed forever-mage (sauf sources.json et
-mechanics.json, rédigés dans forever-core)."""
+mechanics.json, rédigés dans forever-core). Depuis la révision 2 (T06b), talents.json et spells.json portent les
+valeurs du client ; leurs copies du seed sont `_seed_talents.json` et `_seed_spells.json` (test_seed_data.py)."""
 
 import hashlib
 
@@ -11,8 +12,6 @@ SEED_FILES = [
     "meta.json",
     "racials.json",
     "respec.json",
-    "spells.json",
-    "talents.json",
 ]
 
 
@@ -41,4 +40,5 @@ def test_version_dir_contains_exactly_expected_files():
         "spell_scaling.json",  # T04 : points de base des sorts par niveau (decode)
         "_seed_talents.json",  # T06b : copies figées du seed pour le mode seed (décision D2)
         "_seed_spells.json",
+        "revisions.json",  # T06b : journal des révisions de la version (forever install)
     }

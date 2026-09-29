@@ -90,10 +90,10 @@ def test_unknown_spell_suggests(make_deps):
     assert e.value.action
 
 
-def test_talent_rank_without_mana(make_deps):
+def test_talent_rank_mana_from_the_client(make_deps):
+    """T06b, révision 2 : coût du rang 1 de Pyroblast lu dans le client (SpellPower.ManaCost), plus de null."""
     r = lookup_spell(make_deps(), "pyroblast", 1)
-    assert r["ranks"][0]["mana"] is None
-    assert any("mana" in a for a in r["provenance"]["assumptions"])
+    assert r["ranks"][0]["mana"] == 125
     assert r["provenance"]["certainty"] == "certain"
 
 

@@ -230,17 +230,34 @@ SYNTHETIC_LOGS = COMBATLOG / "synthetic"
 MINE_GUID = "Player-0000-00000000"  # joueur « à moi » de la fixture anonymisée (Mage)
 
 
+def seed_view(root: Path) -> Any:
+    """Référence d'origine (copies figées du seed `_seed_talents.json`, `_seed_spells.json`) vue comme une version,
+    pour comparer le décodage du client à la référence de T03 une fois le dépôt en révision 2 (T06b)."""
+    from forever.store import VersionData
+
+    view = root / "seed-view" / LOCAL_VERSION
+    view.mkdir(parents=True, exist_ok=True)
+    for name in ("talents", "spells"):
+        shutil.copyfile(DATA_DIR / LOCAL_VERSION / f"_seed_{name}.json", view / f"{name}.json")
+    return VersionData(LOCAL_VERSION, "0" * 12, view, {})
+
+
 def client_vs_reference(candidate: Any, kind: str) -> tuple[list[Any], list[Any], list[Any]]:
-    """(écarts, observations, changements confirmés) entre la référence du dépôt et la candidate, pour `kind`.
+    """(écarts, observations, changements confirmés) entre la référence d'origine (copies du seed) et la candidate,
+    pour `kind`.
 
-    Observation : valeur relevée dans le client là où la référence a null (décision 2 du plan T03)."""
-    from forever.pipeline.diff import diff_versions
+    Observation : valeur relevée dans le client là où la référence a null (décision 2 du plan T03) ; installées en
+    révision 2, elles figurent aussi dans confirmed_changes.json (`old` null), exclues ici des changements confirmés."""
+    from forever.pipeline.diff import compare_data
+    from forever.store import load_version
 
-    deps = isolated_deps(candidate.root.parent)
-    changes = [c for c in diff_versions(deps, LOCAL_VERSION, str(candidate.root))["changes"] if c["kind"] == kind]
+    client = load_version(isolated_deps(candidate.root.parent, candidate.root))
+    changes = [c for c in compare_data(seed_view(candidate.root.parent), client) if c["kind"] == kind]
     observations = [c for c in changes if c["change"] == "modified" and c["old"] is None]
     gaps = [c for c in changes if c not in observations]
     confirmed = [
-        c for c in read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"] if c["kind"] == kind
+        c
+        for c in read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"]
+        if c["kind"] == kind and c["old"] is not None
     ]
     return gaps, observations, confirmed

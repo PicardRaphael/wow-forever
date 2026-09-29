@@ -137,6 +137,7 @@ def test_repository_against_candidate_path(make_deps, candidate):
         ("confirmed_changes.json", "removed"),
         ("_seed_talents.json", "removed"),
         ("_seed_spells.json", "removed"),
+        ("revisions.json", "removed"),
     }
     assert d["b"] == str(candidate.root)
     assert not any(c["kind"] == "talent" and c["field"] in ("tier", "col", "prereq") for c in d["changes"])

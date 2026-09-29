@@ -64,35 +64,35 @@ def test_seed_copies_are_covered_by_the_manifest_and_sources():
         assert "seed" in sources[copy]["source"], copy
 
 
-def test_seed_rules_read_the_frozen_copies(client_copy, game_data):
+def test_seed_rules_read_the_frozen_copies(client_copy, seed_game_data):
     version = load_version(client_copy)
     seed = build_game_data(version, rules="seed")
     forever = build_game_data(version, rules="forever")
     # talents.json du client : Hot Streak 20 s, Impact 3 / 7 / 10 ; copies du seed : 15 s, 3 / 6 / 9.
     assert forever.talents["hotStreak"].ranks == ((20, 25, 3),)
-    assert seed.talents["hotStreak"].ranks == game_data.talents["hotStreak"].ranks == ((15, 25, 3),)
+    assert seed.talents["hotStreak"].ranks == seed_game_data.talents["hotStreak"].ranks == ((15, 25, 3),)
     assert forever.talents["impact"].ranks[1] == (7,) and seed.talents["impact"].ranks[1] == (6,)
     # spells.json du client : coût de Pyroblast rang 1 (SpellPower.ManaCost) ; copie du seed : null.
     assert forever.spells["pyroblast"].ranks[0].mana == 125
     assert seed.spells["pyroblast"].ranks[0].mana is None
-    assert seed.spells == game_data.spells and seed.talents == game_data.talents
-    assert seed.talent_at == game_data.talent_at and seed.utility == game_data.utility
+    assert seed.spells == seed_game_data.spells and seed.talents == seed_game_data.talents
+    assert seed.talent_at == seed_game_data.talent_at and seed.utility == seed_game_data.utility
     # Le reste des données est partagé entre les deux modes.
     assert seed.scaling == forever.scaling and seed.constants == forever.constants
 
 
-def test_seed_results_do_not_move_with_the_client_values(client_copy, game_data):
+def test_seed_results_do_not_move_with_the_client_values(client_copy, seed_game_data):
     version = load_version(client_copy)
     seed = build_game_data(version, rules="seed")
     forever = build_game_data(version, rules="forever")
-    ch = character(game_data, 36, "Human")
+    ch = character(seed_game_data, 36, "Human")
     for key in ("pyroblast", "blast_wave", "ice_lance", "arcane_blast"):
-        before = expected_cast(game_data, key, 36, {}, ch, rules="seed")
+        before = expected_cast(seed_game_data, key, 36, {}, ch, rules="seed")
         assert expected_cast(seed, key, 36, {}, character(seed, 36, "Human"), rules="seed") == before, key
-    before = mc(game_data, 24, L24, "Orc", "frost", 120, **SEED_MODE)
+    before = mc(seed_game_data, 24, L24, "Orc", "frost", 120, **SEED_MODE)
     assert mc(seed, 24, L24, "Orc", "frost", 120, **SEED_MODE) == before
     assert mc(forever, 24, L24, "Orc", "frost", 120, **SEED_MODE) != before  # Ice Lance rang 1 du client
-    assert seed_pvp_greedy(seed, 20, "Orc", beam=2) == seed_pvp_greedy(game_data, 20, "Orc", beam=2)
+    assert seed_pvp_greedy(seed, 20, "Orc", beam=2) == seed_pvp_greedy(seed_game_data, 20, "Orc", beam=2)
 
 
 def test_simulate_leveling_passes_rules_to_the_loader(client_copy, make_deps):
@@ -102,8 +102,10 @@ def test_simulate_leveling_passes_rules_to_the_loader(client_copy, make_deps):
     seed_repo = simulate_leveling(repo, 24, rules="seed", **args)
     assert seed_here["monte_carlo"] == seed_repo["monte_carlo"]
     assert seed_here["analytic"] == seed_repo["analytic"]
+    # Révision 2 : le dépôt porte les valeurs du client, comme la copie ; le mode seed garde les siennes.
     forever_here = simulate_leveling(client_copy, 24, rules="forever", **args)
-    assert forever_here["monte_carlo"] != simulate_leveling(repo, 24, rules="forever", **args)["monte_carlo"]
+    assert forever_here["monte_carlo"] == simulate_leveling(repo, 24, rules="forever", **args)["monte_carlo"]
+    assert forever_here["monte_carlo"] != seed_here["monte_carlo"]
 
 
 def test_build_report_passes_rules_to_the_loader(make_deps, monkeypatch):
