@@ -398,6 +398,7 @@ class BuildMethod:
     scenarios: Mapping[str, Scenario]
     presets: Mapping[str, Preset]
     contexts: Mapping[str, tuple[str, ...]]  # contexte de fin de partie -> scénarios (build.contexts)
+    concord_threshold: float = 0.0  # écart relatif de concordance avec un build de la communauté
 
 
 @dataclass(frozen=True)

@@ -79,3 +79,24 @@
 +pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
  ARGV = ["build", "leveling", "--level", "14", "--preset", "rapide"]
 ```
+
+## 6. Bloc J : `tests/unit/test_community_builds.py::test_every_build_has_source_date_context_level`
+
+- **Échec attendu** : `dt.date.fromisoformat(None)` et `assert b["author"]` sur 9 builds.
+- **Preuve (prémisse contredite par les données de la recherche)** : dans le bloc JSON de `docs/research/community-builds-mage.md`, 9 builds n'ont pas de date (C15, C16, A5, A7, A8, A9, A14, A15, A16) et 6 pas d'auteur (C15, C16, A5, A7, A8, A9, pages de wowtbc.gg sans signature) ; la recherche le signale dans `reliability_flags` de chacun (« date inconnue ou imprécise… », « page non datée, auteur inconnu »). Je n'invente ni date ni auteur.
+- **Diff proposé** :
+
+```diff
+     for b in doc["builds"]:
+-        assert b["source_url"].startswith("https://") and b["author"]
+-        dt.date.fromisoformat(b["date"])
++        assert b["source_url"].startswith("https://")
++        flags = " ".join(b["reliability_flags"])
++        if b["author"] is None:  # page sans signature, signalée par la recherche
++            assert "auteur inconnu" in flags, b["id"]
++        if b["date"] is None:  # date inconnue, signalée par la recherche
++            assert "date" in flags and "inconnue" in flags, b["id"]
++        else:
++            dt.date.fromisoformat(b["date"])
+         assert b["context"] in CONTEXTS and isinstance(b["level"], int) and 10 <= b["level"] <= 60
+```

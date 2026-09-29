@@ -330,6 +330,12 @@
       "certainty": "suppose",
       "registry": "I5",
       "source": "bg : poids par défaut du seed (seed/forever-mage/scripts/pvp.py (EST : modèle de scénarios qui compare des builds, sans simulation de duel), DEFAULT_W) ; world : supposé (T05), plus de burst pour l'embuscade en monde ouvert, à régler avec l'utilisateur (voir OPEN_QUESTIONS) ; affinés en PV2"
+    },
+    "build.concord_threshold": {
+      "value": 0.02,
+      "certainty": "certain",
+      "registry": "I5",
+      "source": "paramètre de méthode (T05, bloc J) : écart relatif analytique en deçà duquel un build de la communauté concorde avec le nôtre (à peu près le bruit du Monte Carlo à n = 100) ; pas un chiffre de jeu"
     }
   }
 }

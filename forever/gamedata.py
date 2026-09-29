@@ -675,6 +675,7 @@ def _build_method(values: Mapping[str, Any]) -> BuildMethod:
         scenarios=_scenarios(m, m.obj(entry("build.scenarios"), "value", "build.scenarios")),
         presets=_presets(m, m.obj(entry("build.presets"), "value", "build.presets")),
         contexts=_contexts(m, m.obj(entry("build.contexts"), "value", "build.contexts")),
+        concord_threshold=m.num(entry("build.concord_threshold"), "value", "build.concord_threshold"),
     )
 
 

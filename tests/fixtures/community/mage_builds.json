@@ -1,0 +1,3368 @@
+{
+ "source": "docs/research/community-builds-mage.md (bloc JSON, recherche du 2026-09-28)",
+ "generated_by": "scripts/build_community_fixture.py",
+ "game_version": "1.60.1.70009",
+ "concord_threshold": 0.02,
+ "preset": "rapide",
+ "mc_n": 100,
+ "seed": 12345,
+ "references": [
+  {
+   "context": "dungeon",
+   "level": 20,
+   "points": {
+    "wandSpecialization": 2,
+    "arcaneFocus": 3,
+    "arcaneConcentration": 5,
+    "elementalPrecision": 1
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "dungeon",
+   "level": 30,
+   "points": {
+    "wandSpecialization": 1,
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1,
+    "arcaneImpact": 3,
+    "missileBarrage": 1,
+    "arcaneMeditation": 3,
+    "elementalPrecision": 2
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "dungeon",
+   "level": 60,
+   "points": {
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "frostChanneling": 3,
+    "piercingIce": 3,
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1,
+    "arcaneImpact": 3,
+    "missileBarrage": 1,
+    "arcaneMeditation": 3,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "improvedChanneling": 4,
+    "frostWarding": 2,
+    "incineration": 3
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "leveling",
+   "level": 20,
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "frostWarding": 1,
+    "frostbite": 1,
+    "iceLance": 1
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "leveling",
+   "level": 30,
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "frostWarding": 1,
+    "frostbite": 3,
+    "iceLance": 1,
+    "piercingIce": 2,
+    "shatter": 3,
+    "frostChanneling": 2,
+    "fingersOfFrost": 1
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "leveling",
+   "level": 40,
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "frostWarding": 1,
+    "frostbite": 3,
+    "iceLance": 1,
+    "piercingIce": 3,
+    "shatter": 3,
+    "frostChanneling": 3,
+    "fingersOfFrost": 1,
+    "iceShards": 5,
+    "wintersChill": 3
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "leveling",
+   "level": 60,
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "frostWarding": 2,
+    "frostbite": 3,
+    "iceLance": 1,
+    "piercingIce": 3,
+    "shatter": 3,
+    "frostChanneling": 3,
+    "fingersOfFrost": 2,
+    "iceShards": 5,
+    "wintersChill": 5,
+    "improvedFrostNova": 2,
+    "improvedBlizzard": 3,
+    "iceBlock": 1,
+    "coldSnap": 1,
+    "improvedConeOfCold": 3,
+    "permafrost": 3,
+    "iceBarrier": 1
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "pvp",
+   "level": 60,
+   "points": {
+    "elementalPrecision": 3,
+    "frostWarding": 2,
+    "improvedFrostNova": 2,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "shatter": 3,
+    "iceBlock": 1,
+    "permafrost": 3,
+    "coldSnap": 1,
+    "improvedConeOfCold": 3,
+    "arcaneFocus": 4,
+    "arcaneResilience": 2,
+    "improvedChanneling": 5,
+    "arcaneBlast": 1,
+    "iceLance": 1,
+    "arcaneImpact": 3,
+    "improvedFrostbolt": 5,
+    "iceBarrier": 1,
+    "incineration": 3
+   },
+   "preset": "rapide"
+  },
+  {
+   "context": "raid",
+   "level": 60,
+   "points": {
+    "wandSpecialization": 2,
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1,
+    "arcaneImpact": 3,
+    "missileBarrage": 1,
+    "arcaneMeditation": 3,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "improvedChanneling": 5,
+    "arcaneSubtlety": 2,
+    "magicAbsorption": 2,
+    "arcaneResilience": 2,
+    "arcaneGeometry": 2,
+    "arcaneShielding": 2,
+    "improvedCounterspell": 2,
+    "presenceOfMind": 1,
+    "incineration": 3,
+    "wakeOfFire": 2
+   },
+   "preset": "rapide"
+  }
+ ],
+ "builds": [
+  {
+   "id": "C1",
+   "context": "leveling",
+   "level": 20,
+   "source_url": "https://www.wowhead.com/forever/guide/classes/mage/frost/level-20-dps-overview",
+   "author": "Porom (Wowhead)",
+   "date": "2026-09-26",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "iceLance": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": "AoE (3 cibles et plus) : Blizzard, Arcane Explosion si le pack ne tiendra pas la canalisation ; Frost Nova pour limiter les coups ; Ice Lance sur cible gelée ; Frostbolt puis Fire Blast pour achever ; baguette quand la mana est basse ou si l'on est frappé.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Elemental Precision en premier : l'auteur dit préférer le toucher au temps d'incantation au niveau 20 (réponse à un commentaire).",
+    "Ice Shards conseillé si l'on joue en groupe ; en solo, alternative Frostbite + Permafrost.",
+    "Variante « baguette » : Wand Specialization (arbre Arcane), Ice Lance repoussée."
+   ],
+   "reliability_flags": [
+    "en-têtes de section copiés du guide Arcane (« most relevant ones early on for Arcane », matériel « Arcane Mages »)",
+    "contesté dans les commentaires (sans Improved Frostbolt, Ice Shards sans critique, 5 % de toucher jugés excessifs) ; l'auteur reconnaît un choix de préférence",
+    "aucun chiffre ni calcul à l'appui",
+    "variante Legacy à 16 points (EP 5, IS 5, PI 3, FC 1, IL 1, Ice Block 1) : suppose le bonus Legacy « Talented », hors de notre règle niveau − 9"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.049937122257210996,
+    "mc_rel": -0.1370040794152645,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "choix non chiffré par la source (en-têtes de section copiés du guide Arcane (« most relevant ones early on for Arcane », matériel « Arcane Mages »))"
+   }
+  },
+  {
+   "id": "C2",
+   "context": "leveling",
+   "level": 20,
+   "source_url": "https://www.icy-veins.com/wow-forever/frost-mage-ranged-dps-pve-guide",
+   "author": "Teloril (Icy Veins)",
+   "date": "2026-09-17",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "elementalPrecision": 5,
+    "frostbite": 3,
+    "iceShards": 2,
+    "iceLance": 1
+   },
+   "order": [
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "frostbite",
+    "frostbite",
+    "frostbite",
+    "iceShards",
+    "iceShards",
+    "iceLance"
+   ],
+   "armor": "Frost Armor en permanence (le ralentissement de Frost Armor peut déclencher Frostbite) ; Mage Armor exclusive, non retenue pour le solo",
+   "rotation": "Frostbolt jusqu'au gel par Frostbite puis Ice Lance ; ne pas interrompre Frostbolt pour Ice Lance ; Frost Nova puis recul et Ice Lance ; Arcane Explosion (niveau 14) et Flamestrike (niveau 16) dès deux cibles ; Evocation régulière.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Elemental Precision d'abord : un sort raté coûte plus que tout autre gain, et aide contre les ennemis de niveau supérieur.",
+    "Frostbite : chances de gel, donc d'Ice Lance renforcée.",
+    "Les deux derniers points en Ice Shards, jugé le meilleur gain de DPS pour tous les sorts de givre."
+   ],
+   "reliability_flags": [
+    "antérieur aux notes de développement du 24/09 (sans effet direct sur les talents de givre)",
+    "repris à l'identique par wowforeverbuilds.com (guide « beta-20-frost-mage-leveling », publié le 19/09, modifié le 21/09, qui dit suivre Icy Veins) : une seule source réelle",
+    "aucun chiffre de DPS publié"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.0009996133031639157,
+    "mc_rel": 0.00944411018051991,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart -0,1% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "C3",
+   "context": "leveling",
+   "level": 20,
+   "source_url": "https://www.warcrafttavern.com/forever/guides/mage/",
+   "author": "Nevermore (Warcraft Tavern)",
+   "date": "2026-09",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "elementalPrecision": 2,
+    "improvedFrostbolt": 5,
+    "frostbite": 3,
+    "iceLance": 1
+   },
+   "order": [
+    "elementalPrecision",
+    "elementalPrecision",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "frostbite",
+    "frostbite",
+    "frostbite",
+    "iceLance"
+   ],
+   "armor": null,
+   "rotation": "Ice Lance sur cible gelée ou avec Fingers of Frost ; Ice Lance après chaque Frostbolt quand c'est possible ; Frost Nova réservée aux pulls de zone après Shatter.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Frostbite : moyen le plus fiable de déclencher le multiplicateur d'Ice Lance sur cible gelée.",
+    "Les talents d'économie de mana sont jugés inutiles : les combats sont trop courts."
+   ],
+   "reliability_flags": [
+    "date au mois près seulement",
+    "même répartition que celle proposée par un commentateur du guide Wowhead (BlueSeekers) : IFB 5, EP 2, Frostbite 3, IL 1",
+    "décodage du lien : grille de 4 colonnes par palier supposée (cohérente : chaque caractère tombe sur un talent existant)",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.07415382135511255,
+    "mc_rel": 0.08460140805433236,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I5",
+    "motif": "leur build fait mieux de +7,4% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+   }
+  },
+  {
+   "id": "C4",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://www.warcrafttavern.com/forever/guides/mage/",
+   "author": "Nevermore (Warcraft Tavern)",
+   "date": "2026-09",
+   "game_version": "Forever (bêta, client 1.60.1), palier 30 de la bêta",
+   "points": {
+    "improvedFrostbolt": 3,
+    "elementalPrecision": 4,
+    "frostbite": 3,
+    "iceLance": 1,
+    "iceShards": 5,
+    "iceBlock": 1,
+    "shatter": 3,
+    "fingersOfFrost": 1
+   },
+   "order": [
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "frostbite",
+    "frostbite",
+    "frostbite",
+    "iceLance",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceBlock",
+    "shatter",
+    "shatter",
+    "shatter",
+    "iceShards",
+    "fingersOfFrost"
+   ],
+   "armor": null,
+   "rotation": "Comme C3.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Suite de C3 vers Shatter, Ice Block et Fingers of Frost ; le guide évoque aussi une variante Ice Shards au niveau 30."
+   ],
+   "reliability_flags": [
+    "palier 30 annoncé « après » le niveau 20 par Icy Veins (17/09) : build théorique, non vérifié en jeu",
+    "l'ordre diffère de C3 (EP 4 et IFB 3 au lieu de EP 2 et IFB 5)",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.02901199462366433,
+    "mc_rel": -0.015269227183904202,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "C5",
+   "context": "leveling",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/frost-shatter-mage-leveling",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie, non testée en bêta selon le site)",
+   "points": {
+    "improvedFrostbolt": 5,
+    "frostbite": 3,
+    "iceShards": 5,
+    "improvedFrostNova": 2,
+    "iceLance": 1,
+    "piercingIce": 3,
+    "shatter": 5,
+    "iceBlock": 1,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "frostChanneling": 3,
+    "iceBarrier": 1,
+    "wintersChill": 5,
+    "arcticReach": 2,
+    "elementalPrecision": 5,
+    "permafrost": 3,
+    "frostWarding": 2,
+    "improvedConeOfCold": 2
+   },
+   "order": [
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "frostbite",
+    "frostbite",
+    "frostbite",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "improvedFrostNova",
+    "improvedFrostNova",
+    "iceLance",
+    "piercingIce",
+    "piercingIce",
+    "piercingIce",
+    "shatter",
+    "shatter",
+    "shatter",
+    "shatter",
+    "shatter",
+    "iceBlock",
+    "coldSnap",
+    "fingersOfFrost",
+    "fingersOfFrost",
+    "frostChanneling",
+    "frostChanneling",
+    "iceBarrier",
+    "frostChanneling",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "arcticReach",
+    "arcticReach",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "permafrost",
+    "permafrost",
+    "permafrost",
+    "elementalPrecision",
+    "elementalPrecision",
+    "frostWarding",
+    "frostWarding",
+    "improvedConeOfCold",
+    "improvedConeOfCold"
+   ],
+   "armor": "Frost Armor, puis Ice Armor à partir du niveau 30 ; Ice Barrier avant le pull dès 40",
+   "rotation": "Frostbolt à distance, Frost Nova puis Ice Lance avec Shatter ; Ice Block et Cold Snap en secours.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Improved Frostbolt d'abord : plus d'incantations avant que la cible ralentie n'arrive.",
+    "Frostbite : fenêtres de Shatter gratuites pendant les Frostbolt.",
+    "Ice Shards ensuite pour doubler le bonus de critique des sorts de givre.",
+    "Improved Frost Nova : presque chaque monstre reçoit une Nova."
+   ],
+   "reliability_flags": [
+    "Shatter 5/5 : le calculateur du site porte encore le maximum Classic (5) ; notre talents.json et Icy Veins donnent 3 → 2 points à réattribuer (niveaux 32 et 33 de l'ordre)",
+    "le site avertit lui-même : « written from Classic knowledge and WoW Forever pre-release data », non vérifié en bêta",
+    "auteur = compte du site ; une dizaine de guides Mage publiés en lot le même jour, aucun vote",
+    "antérieur aux notes du 24/09"
+   ],
+   "legal": false,
+   "legal_notes": "shatter 5 > max 3; ordre : shatter rang 4 > max au niveau 32; ordre : shatter rang 5 > max au niveau 33",
+   "gap": null,
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "build illégal : shatter 5 > max 3; ordre : shatter rang 4 > max au niveau 32; ordre : shatter rang 5 > max au niveau 33"
+   }
+  },
+  {
+   "id": "C6",
+   "context": "leveling",
+   "level": 20,
+   "source_url": "https://www.icy-veins.com/wow-forever/fire-mage-ranged-dps-pve-guide",
+   "author": "Wrdlbrmpft (Icy Veins)",
+   "date": "2026-09-19",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "improvedFireball": 5,
+    "wakeOfFire": 2,
+    "ignite": 3,
+    "pyroblast": 1
+   },
+   "order": [
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "wakeOfFire",
+    "wakeOfFire",
+    "ignite",
+    "ignite",
+    "ignite",
+    "pyroblast"
+   ],
+   "armor": "Frost Armor contre les monstres physiques ; Mage Armor pour la régénération",
+   "rotation": "Pyroblast pour engager (DoT), Fireball, Fire Blast pour achever et sous l'effet de Wake of Fire ; baguette dès que possible ; Frostfire Bolt remplacera Fireball au niveau 40 selon l'auteur.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Improved Fireball d'abord : Fireball est le sort principal.",
+    "Ignite repoussé : trop peu de critiques à bas niveau.",
+    "Wake of Fire : achever au Fire Blast donne une forte chance de critique au Fire Blast suivant (ce qui rend Ignite utile) et réduit sa recharge.",
+    "Talents de toucher (arbre Givre) laissés de côté pour atteindre Pyroblast."
+   ],
+   "reliability_flags": [
+    "antérieur aux notes du 24/09 qui allongent la durée de Wake of Fire et modifient Ignite (raisonnement à revoir, pas les points)"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.020371348818242367,
+    "mc_rel": -0.03207235296198775,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I5",
+    "motif": "leur build fait mieux de +2,0% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+   }
+  },
+  {
+   "id": "C7",
+   "context": "leveling",
+   "level": 20,
+   "source_url": "https://www.wowhead.com/forever/guide/classes/mage/fire/level-20-dps-overview",
+   "author": "Foolipe (Wowhead)",
+   "date": "2026-09-26",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "wakeOfFire": 2,
+    "improvedFireball": 3,
+    "ignite": 5,
+    "pyroblast": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": "Pyroblast pré-incanté puis Fireball ; plus tard Pyroblast à 3 cumuls de Hot Streak ; baguette compétitive avec Wand Specialization ; AoE : Flamestrike pré-incanté puis Arcane Explosion.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Wake of Fire : achever un monstre à la baguette puis engager le suivant par un Fire Blast à forte chance de critique, qui peut déclencher Ignite.",
+    "Wand Specialization jugée utile mais empêche Pyroblast au niveau 20."
+   ],
+   "reliability_flags": [
+    "le texte dit que Hot Streak « increases the cast time of Pyroblast » (inversé : le talent réduit l'incantation)",
+    "variante Legacy à 16 points (WoF 2, IFB 5, Ignite 5, Burning Soul 2, Pyroblast 1, Hot Streak 1) : suppose le bonus Legacy",
+    "diffère d'Icy Veins (C6) : Improved Fireball 3 au lieu de 5, Ignite 5 au lieu de 3"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.008009104570374223,
+    "mc_rel": -0.07851208903562513,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart -0,8% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "C8",
+   "context": "leveling",
+   "level": 40,
+   "source_url": "https://wowforeverbuilds.com/guide/fire-mage-leveling",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "improvedFireball": 5,
+    "ignite": 5,
+    "pyroblast": 1,
+    "impact": 3,
+    "flameThrowing": 2,
+    "masterOfElements": 3,
+    "hotStreak": 1,
+    "blastWave": 1,
+    "criticalMass": 3,
+    "burningSoul": 1,
+    "firePower": 5,
+    "combustion": 1
+   },
+   "order": [
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "ignite",
+    "ignite",
+    "ignite",
+    "ignite",
+    "ignite",
+    "pyroblast",
+    "impact",
+    "impact",
+    "impact",
+    "flameThrowing",
+    "flameThrowing",
+    "masterOfElements",
+    "masterOfElements",
+    "masterOfElements",
+    "hotStreak",
+    "blastWave",
+    "criticalMass",
+    "criticalMass",
+    "criticalMass",
+    "burningSoul",
+    "firePower",
+    "firePower",
+    "firePower",
+    "firePower",
+    "firePower",
+    "combustion"
+   ],
+   "armor": "Frost Armor ou Ice Armor ; Mage Armor plus tard si la mana manque",
+   "rotation": "Pyroblast à portée maximale pour engager, Fireball, Hot Streak vers des Pyroblast rapides ; Blast Wave (30) et Combustion (40) sur les cibles difficiles.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Improved Fireball et Ignite d'abord pour les éliminations les plus rapides en cible unique.",
+    "Impact pour les étourdissements, Combustion pour les élites et rares."
+   ],
+   "reliability_flags": [
+    "compte du site, publication en lot, théorie non testée",
+    "antérieur aux notes du 24/09 (Hot Streak, Ignite)"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.2527994125916201,
+    "mc_rel": -0.28787211738705765,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "B19",
+    "motif": "3 point(s) sur des talents dont l'effet n'est pas modélisé (impact) : Procs de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort"
+   }
+  },
+  {
+   "id": "C9",
+   "context": "leveling",
+   "level": 20,
+   "source_url": "https://www.icy-veins.com/wow-forever/arcane-mage-ranged-dps-pve-guide",
+   "author": "Wrdlbrmpft (Icy Veins)",
+   "date": "2026-09-19",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "wandSpecialization": 2,
+    "arcaneFocus": 3,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 3,
+    "arcaneBlast": 1
+   },
+   "order": [
+    "wandSpecialization",
+    "wandSpecialization",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneSubtlety",
+    "arcaneSubtlety",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneBlast"
+   ],
+   "armor": "Frost Armor contre les monstres physiques ; Mage Armor pour la régénération en incantant",
+   "rotation": "Frostbolt pour engager (ralentit, peut déclencher Missile Barrage), puis Arcane Missiles ou baguette ; Arcane Blast dès le niveau 20 pour déclencher Missile Barrage, consommé par Arcane Missiles.",
+   "arcane_power": "évoqué pour plus tard, sans consigne d'usage",
+   "ab_stacks": "2 à 4 (Wowhead, même build : 4 cumuls vident la mana, 2 à 3 conseillés en jeu courant)",
+   "reasons": [
+    "Baguette très forte à bas niveau, d'où Wand Specialization en premier.",
+    "Arcane Focus (ou Improved Channeling au choix) : le toucher compte dès Arcane Blast.",
+    "Arcane Subtlety surtout pour la réduction de résistance, accessoirement la menace en donjon.",
+    "Arcane Concentration pour la mana et pour ouvrir Arcane Meditation plus tard."
+   ],
+   "reliability_flags": [
+    "répartition identique sur Wowhead (Foolipe, 26/09, lien v22302030001) et Overgear (25/09) : au moins une copie, sources non indépendantes",
+    "antérieur aux notes du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.005586222386277361,
+    "mc_rel": -0.011537649239929046,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart +0,6% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "C10",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://www.warcrafttavern.com/forever/guides/mage/",
+   "author": "Nevermore (Warcraft Tavern)",
+   "date": "2026-09",
+   "game_version": "Forever (bêta, client 1.60.1), palier 30 de la bêta",
+   "points": {
+    "improvedChanneling": 5,
+    "arcaneFocus": 3,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1,
+    "arcaneImpact": 2,
+    "missileBarrage": 1,
+    "arcaneMeditation": 3,
+    "arcaneMind": 1
+   },
+   "order": [
+    "improvedChanneling",
+    "improvedChanneling",
+    "improvedChanneling",
+    "improvedChanneling",
+    "arcaneFocus",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneBlast",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneImpact",
+    "arcaneImpact",
+    "missileBarrage",
+    "arcaneMeditation",
+    "arcaneMeditation",
+    "arcaneMeditation",
+    "improvedChanneling",
+    "arcaneMind"
+   ],
+   "armor": null,
+   "rotation": "Ne pas enchaîner Arcane Blast sans réfléchir (vide la mana) ; alterner avec Fireball ou Frostbolt tant que Missile Barrage manque ; dépenser Arcane Concentration sur un Arcane Blast.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Build « solo » : Improved Channeling (moins d'interruptions sous les coups) au lieu d'Arcane Subtlety."
+   ],
+   "reliability_flags": [
+    "palier 30 théorique",
+    "date au mois près",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.12506897636231068,
+    "mc_rel": 0.09632967805078005,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I5",
+    "motif": "leur build fait mieux de +12,5% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+   }
+  },
+  {
+   "id": "C11",
+   "context": "dungeon",
+   "level": 20,
+   "source_url": "https://www.warcrafttavern.com/forever/guides/mage/",
+   "author": "Nevermore (Warcraft Tavern)",
+   "date": "2026-09",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 4,
+    "wandSpecialization": 2,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 2,
+    "arcaneBlast": 1
+   },
+   "order": [
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "wandSpecialization",
+    "wandSpecialization",
+    "arcaneSubtlety",
+    "arcaneSubtlety",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneBlast"
+   ],
+   "armor": null,
+   "rotation": "En donjon, spammer Arcane Explosion donne le meilleur DPS mais la plus forte menace : garder de la vie et Frost Nova.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Variante donjon : Arcane Subtlety pour la menace, Wand Specialization conservée."
+   ],
+   "reliability_flags": [
+    "date au mois près",
+    "raisons non détaillées build par build",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.13030756956539719,
+    "mc_rel": -0.14644769599444202,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "choix non chiffré par la source (date au mois près)"
+   }
+  },
+  {
+   "id": "C12",
+   "context": "dungeon",
+   "level": 30,
+   "source_url": "https://www.warcrafttavern.com/forever/guides/mage/",
+   "author": "Nevermore (Warcraft Tavern)",
+   "date": "2026-09",
+   "game_version": "Forever (bêta, client 1.60.1), palier 30 de la bêta",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1,
+    "arcaneImpact": 3,
+    "missileBarrage": 1,
+    "arcaneMeditation": 3,
+    "arcaneMind": 1
+   },
+   "order": [
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneSubtlety",
+    "arcaneSubtlety",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneBlast",
+    "arcaneImpact",
+    "arcaneImpact",
+    "missileBarrage",
+    "arcaneMeditation",
+    "arcaneMeditation",
+    "arcaneMeditation",
+    "arcaneImpact",
+    "arcaneMind"
+   ],
+   "armor": null,
+   "rotation": "Comme C11.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Arcane Focus au maximum et Arcane Subtlety (menace) avant Missile Barrage et Arcane Meditation."
+   ],
+   "reliability_flags": [
+    "palier 30 théorique",
+    "date au mois près",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.0097466717058689,
+    "mc_rel": -0.01643253301383765,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart -1,0% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "C13",
+   "context": "dungeon",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/mage-cleave-arcane-mage-dungeon-leveling",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 3,
+    "arcaneSubtlety": 2,
+    "arcaneMeditation": 3,
+    "improvedCounterspell": 2,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcaneResilience": 2,
+    "arcanePower": 1,
+    "frostWarding": 2,
+    "elementalPrecision": 3,
+    "improvedFrostNova": 2,
+    "arcaneBlast": 1,
+    "improvedChanneling": 5,
+    "magicAbsorption": 2,
+    "arcaneGeometry": 2,
+    "arcaneShielding": 2
+   },
+   "order": [
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneFocus",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneImpact",
+    "arcaneImpact",
+    "arcaneImpact",
+    "arcaneSubtlety",
+    "arcaneSubtlety",
+    "arcaneMeditation",
+    "arcaneMeditation",
+    "arcaneMeditation",
+    "improvedCounterspell",
+    "improvedCounterspell",
+    "presenceOfMind",
+    "arcaneMind",
+    "arcaneMind",
+    "arcaneMind",
+    "arcaneMind",
+    "arcaneMind",
+    "arcaneInstability",
+    "arcaneInstability",
+    "arcaneInstability",
+    "arcaneResilience",
+    "arcanePower",
+    "frostWarding",
+    "frostWarding",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "improvedFrostNova",
+    "improvedFrostNova",
+    "arcaneResilience",
+    "arcaneBlast",
+    "improvedChanneling",
+    "improvedChanneling",
+    "improvedChanneling",
+    "improvedChanneling",
+    "improvedChanneling",
+    "magicAbsorption",
+    "magicAbsorption",
+    "arcaneGeometry",
+    "arcaneGeometry",
+    "arcaneShielding",
+    "arcaneShielding"
+   ],
+   "armor": "Frost Armor (évoquée pour le détour par Frost Warding)",
+   "rotation": "Groupe « mage cleave » (niveaux 40 à 60) derrière un paladin : attendre ~70 % de vie du pack sous Flamestrike, puis Frost Nova et Arcane Explosion en chaîne ; Arcane Blast réservé aux boss.",
+   "arcane_power": "pas sur un pull que le groupe aurait dû aborder après avoir bu (coût +30 % selon le guide)",
+   "ab_stacks": "arrêter tôt les cumuls sur les monstres de base",
+   "reasons": [
+    "Arcane Impact et Clearcasting pour Arcane Explosion ; Arcane Subtlety pour la menace.",
+    "Improved Counterspell : silence sur soigneurs et lanceurs de peur.",
+    "Improved Frost Nova depuis l'arbre Givre."
+   ],
+   "reliability_flags": [
+    "Arcane Blast pris seulement au niveau 49 (point 40 de l'ordre) : cohérent avec un build de zone, mais atypique",
+    "compte du site, théorie non testée",
+    "antérieur aux notes du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.2906064145808139,
+    "mc_rel": -0.3512650717494819,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "9 point(s) sur des talents dont l'effet n'est pas modélisé (arcaneResilience, magicAbsorption, arcaneShielding, improvedCounterspell, improvedChanneling) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "C14",
+   "context": "leveling",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/frost-aoe-mage-leveling",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "elementalPrecision": 5,
+    "improvedFrostNova": 2,
+    "permafrost": 3,
+    "improvedBlizzard": 3,
+    "frostChanneling": 3,
+    "arcticReach": 2,
+    "iceBlock": 1,
+    "piercingIce": 3,
+    "coldSnap": 1,
+    "improvedConeOfCold": 3,
+    "iceShards": 5,
+    "iceBarrier": 1,
+    "frostWarding": 2,
+    "wintersChill": 5,
+    "iceLance": 1,
+    "fingersOfFrost": 2,
+    "shatter": 5,
+    "frostbite": 3,
+    "improvedFrostbolt": 1
+   },
+   "order": [
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "improvedFrostNova",
+    "improvedFrostNova",
+    "permafrost",
+    "permafrost",
+    "permafrost",
+    "improvedBlizzard",
+    "improvedBlizzard",
+    "improvedBlizzard",
+    "frostChanneling",
+    "frostChanneling",
+    "frostChanneling",
+    "arcticReach",
+    "arcticReach",
+    "iceBlock",
+    "piercingIce",
+    "piercingIce",
+    "coldSnap",
+    "improvedConeOfCold",
+    "improvedConeOfCold",
+    "improvedConeOfCold",
+    "piercingIce",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceBarrier",
+    "iceShards",
+    "frostWarding",
+    "frostWarding",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "iceLance",
+    "fingersOfFrost",
+    "fingersOfFrost",
+    "shatter",
+    "shatter",
+    "shatter",
+    "shatter",
+    "shatter",
+    "frostbite",
+    "frostbite",
+    "frostbite",
+    "improvedFrostbolt"
+   ],
+   "armor": "Ice Armor, Mana Shield, puis Ice Barrier dès 40",
+   "rotation": "Leveling de zone (Blizzard) de 22 à 60 : Frost Nova puis Cone of Cold, Blizzard avec Improved Blizzard ; commencer mana pleine.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Improved Blizzard dès 22, Permafrost et Arctic Reach pour le kiting.",
+    "Winter's Chill, Shatter et Fingers of Frost repoussés en fin d'ordre."
+   ],
+   "reliability_flags": [
+    "Shatter 5/5 (maximum Classic ; 3 chez nous) → 2 points à réattribuer (niveaux 55 et 56)",
+    "deux vidéos (Farmerfarms 16/09, LostNiceland 19/09) signalent un affaiblissement du farm de zone (Improved Blizzard, Permafrost) : raisonnement possiblement périmé",
+    "compte du site, théorie non testée",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": false,
+   "legal_notes": "shatter 5 > max 3; ordre : shatter rang 4 > max au niveau 55; ordre : shatter rang 5 > max au niveau 56",
+   "gap": null,
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "build illégal : shatter 5 > max 3; ordre : shatter rang 4 > max au niveau 55; ordre : shatter rang 5 > max au niveau 56"
+   }
+  },
+  {
+   "id": "C15",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://wowtbc.gg/warcraftforever/class-guides/arcane-mage/",
+   "author": null,
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1) (build « Standard »)",
+   "points": {
+    "arcaneFocus": 5,
+    "improvedChanneling": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "wakeOfFire": 2,
+    "incineration": 3,
+    "ignite": 5,
+    "pyroblast": 1,
+    "elementalPrecision": 5
+   },
+   "order": null,
+   "armor": "Mage Armor ou Molten Armor",
+   "rotation": "Arcane Power avec les effets à activer ; Arcane Missiles sur Missile Barrage ou à 4 cumuls d'Arcane Blast ; Presence of Mind + Pyroblast à 4 cumuls ; sinon Arcane Blast ; Fire Blast ou Arcane Explosion en mouvement.",
+   "arcane_power": "avec les bijoux et effets à activer",
+   "ab_stacks": "4",
+   "reasons": [
+    "Des points « libres » servent à prendre Pyroblast (combo Presence of Mind + Pyroblast à 4 cumuls).",
+    "L'auteur annonce que les simulations trancheront la rotation."
+   ],
+   "reliability_flags": [
+    "Molten Armor recommandée : absente de la liste des sorts du client Forever selon wowforevertalents.com (Frost, Ice, Mage Armor seulement) et selon un commentaire du simulateur ElliotWood (probable, non vérifié dans spells.json qui ne couvre pas les armures)",
+    "page non datée, auteur inconnu",
+    "répartition identique à la référence MythicSim « Arcane Mage » (35/11/5, loadout 055205003100311531-230500001-005) : copie ou source commune",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.048383320326093174,
+    "mc_rel": -0.019146704662488828,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (pyroblast, arcanePower) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "C16",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://wowtbc.gg/warcraftforever/class-guides/frost-mage/",
+   "author": null,
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1) (build « Standard »)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "incineration": 3,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 3,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "shatter": 3,
+    "improvedConeOfCold": 3,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "wintersChill": 5,
+    "iceBarrier": 1
+   },
+   "order": null,
+   "armor": "Molten Armor",
+   "rotation": "Ice Lance sur Fingers of Frost ; Frostbolt ; Fire Blast ou Cone of Cold en mouvement.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Rotation centrée sur Fingers of Frost : pêcher les déclenchements au Frostbolt et les consommer par Ice Lance."
+   ],
+   "reliability_flags": [
+    "Molten Armor (voir C15)",
+    "non datée, auteur inconnu",
+    "identique à la référence MythicSim « Frost Mage » (10/3/38, loadout 050005-03-0555000331001331251)",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.1151909816357293,
+    "mc_rel": -0.2354953477781523,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock, iceBarrier) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "C17",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://mythicsim.com/wow-forever/tier-list/sims/223228c4-d2d4-4e2b-ba41-c13135cefb12",
+   "author": "MythicSim (dépôt sage3648/mythicsim-forever-engine)",
+   "date": "2026-09-28",
+   "game_version": "Forever (bêta, client 1.60.1) ; la page de classe parle aussi de « demo build from BlizzCon 2026 » (incohérence)",
+   "points": {
+    "wandSpecialization": 2,
+    "arcaneFocus": 3,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 2,
+    "burningSoul": 2,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "firePower": 5,
+    "combustion": 1,
+    "elementalPrecision": 5
+   },
+   "order": null,
+   "armor": "Molten Armor (preset ui/mage/presets.ts du moteur MythicSim)",
+   "rotation": "(guide wowforeverbuilds, même build) : le mage chargé du débuff tient 5 cumuls d'Improved Scorch ; Fireball en remplissage ; Pyroblast à 3 cumuls de Hot Streak ; Fire Blast en mouvement ; fenêtre : Eureka!, Combustion, Fireball et Pyroblast.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "(wowforeverbuilds) Elemental Precision pour le toucher, courte incursion Arcane pour Clearcasting ; Master of Elements rembourse la mana sur critique."
+   ],
+   "reliability_flags": [
+    "répartition identique au guide « Fire Mage PvE » de wowforeverbuilds.com (17/09, 12/34/5) : copie ou source commune",
+    "résultat de simulation publié (576 DPS, 10e sur 21 selon la page) : dépend du moteur et d'un équipement hérité de Classic",
+    "Molten Armor dans le preset (voir C15)",
+    "Shatter et arbres corrigés dans le moteur le 16/09 (commit « Keep tree order… ») : référence postérieure, cohérente avec notre arbre"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.49940833014284924,
+    "mc_rel": -0.5483714443104281,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "C18",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/ElliotWood/Forever/blob/HEAD/ui/specs/mage/dps/presets.ts",
+   "author": "Elliot Wood (simulateur ElliotWood/Forever)",
+   "date": "2026-09-22",
+   "game_version": "Forever (bêta, client 1.60.1) (moteur de simulation, règle Forever)",
+   "points": {
+    "arcaneFocus": 5,
+    "improvedChanneling": 5,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 3
+   },
+   "order": null,
+   "armor": "Mage Armor (le code note que Molten Armor, défaut de l'amont, n'existe pas dans Forever)",
+   "rotation": "APL arcane.apl.json : Evocation sous 15 % de mana s'il reste plus de 20 s ; Arcane Missiles si Missile Barrage ; Frostbolt si Arcane Blast a au moins 3 cumuls ou mana sous 40 % ; sinon Arcane Blast.",
+   "arcane_power": "automatique (autocastOtherCooldowns)",
+   "ab_stacks": "3 (Frostbolt consomme les cumuls)",
+   "reasons": [
+    "Build fourni avec le portage du Mage sur le moteur officiel (« UI presets carry our three builds and APLs »), sans justification écrite."
+   ],
+   "reliability_flags": [
+    "identique aux presets MythicSim « Arcane 35/0/16 » (ajoutés le 15/09 comme « community talent builds ») : origine communautaire non citée",
+    "aucune raison publiée talent par talent",
+    "le gunba/wow-forever-sim publie une variante voisine « Arcane 33/3/15 » (annexe A18)",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.06251790759586862,
+    "mc_rel": -0.03692537587251631,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (arcanePower) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "C19",
+   "context": "pvp",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/frost-mage-pvp-guide",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-17",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie ; champs de bataille et monde ouvert, dont Darkspear Islands annoncé)",
+   "points": {
+    "arcaneFocus": 5,
+    "magicAbsorption": 2,
+    "arcaneConcentration": 5,
+    "arcaneResilience": 2,
+    "arcaneImpact": 1,
+    "improvedCounterspell": 2,
+    "arcaneMeditation": 3,
+    "improvedFrostbolt": 5,
+    "iceShards": 3,
+    "permafrost": 2,
+    "improvedFrostNova": 2,
+    "frostbite": 3,
+    "iceLance": 1,
+    "arcticReach": 1,
+    "iceBlock": 1,
+    "shatter": 5,
+    "improvedConeOfCold": 2,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "wintersChill": 2,
+    "iceBarrier": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": "Polymorph sur le soigneur ; Frost Nova puis Ice Lance ou Frostbolt (Shatter) ; Improved Counterspell sur un soin ; Blink, Ice Block et Cold Snap ; Eureka! pour engager.",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Rôle de contrôle et de protection : ralentir les poursuivants du porteur de drapeau, geler les groupes sur un point.",
+    "Improved Counterspell pour verrouiller les lanceurs ; Arcane Resilience contre la mêlée."
+   ],
+   "reliability_flags": [
+    "Shatter 5/5 (maximum Classic) → 2 points à réattribuer",
+    "théorie annoncée comme non testée ; carte Darkspear Islands inconnue",
+    "compte du site, publication en lot",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": false,
+   "legal_notes": "shatter 5 > max 3",
+   "gap": null,
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "build illégal : shatter 5 > max 3"
+   }
+  },
+  {
+   "id": "C20",
+   "context": "pvp",
+   "level": 60,
+   "source_url": "https://www.youtube.com/watch?v=6XaQz14C-Dw",
+   "author": "Dave The Gamer (YouTube)",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie « pré-bêta » selon la description)",
+   "points": {
+    "frostWarding": 2,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "permafrost": 3,
+    "improvedFrostNova": 2,
+    "frostbite": 3,
+    "piercingIce": 3,
+    "frostChanneling": 3,
+    "iceLance": 1,
+    "improvedBlizzard": 1,
+    "arcticReach": 2,
+    "iceBlock": 1,
+    "shatter": 3,
+    "improvedConeOfCold": 3,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "wintersChill": 5,
+    "iceBarrier": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": "non publiée dans la description (vidéo non transcrite)",
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Description : contrôle en PvP pour le Givre ; l'auteur prévient qu'il s'agit d'idées de théorie, pas de builds testés."
+   ],
+   "reliability_flags": [
+    "enregistré avant les notes du 24/09 (la description le signale pour Hot Streak et Wake of Fire)",
+    "raisons détaillées seulement dans la vidéo (non transcrite ici)"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.10926338108752141,
+    "mc_rel": null,
+    "mc_significant": null
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (improvedBlizzard) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "A1",
+   "context": "leveling",
+   "level": 20,
+   "source_url": "https://www.warcrafttavern.com/forever/guides/mage/",
+   "author": "Nevermore (Warcraft Tavern)",
+   "date": "2026-09",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "improvedChanneling": 3,
+    "arcaneFocus": 2,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1
+   },
+   "order": [
+    "improvedChanneling",
+    "arcaneFocus",
+    "arcaneFocus",
+    "improvedChanneling",
+    "improvedChanneling",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneBlast"
+   ],
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Arcane « solo » niveau 20 (Improved Channeling 3, AF 2, AC 5, AB)."
+   ],
+   "reliability_flags": [
+    "date au mois près",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.009610978651662336,
+    "mc_rel": -0.004304184447057095,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart +1,0% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "A2",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://www.warcrafttavern.com/forever/guides/mage/",
+   "author": "Nevermore (Warcraft Tavern)",
+   "date": "2026-09",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "improvedFireball": 5,
+    "ignite": 5,
+    "pyroblast": 1,
+    "incineration": 3,
+    "burningSoul": 2,
+    "hotStreak": 1,
+    "improvedScorch": 3,
+    "criticalMass": 1
+   },
+   "order": [
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "ignite",
+    "ignite",
+    "ignite",
+    "ignite",
+    "ignite",
+    "pyroblast",
+    "incineration",
+    "incineration",
+    "incineration",
+    "burningSoul",
+    "hotStreak",
+    "improvedScorch",
+    "improvedScorch",
+    "improvedScorch",
+    "burningSoul",
+    "criticalMass"
+   ],
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Feu niveau 30 ; conseils : Pyroblast avant le pull, Scorch en combat long, Fire Blast après Fireball, Pyroblast dès 3 cumuls de Hot Streak."
+   ],
+   "reliability_flags": [
+    "palier 30 théorique",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.07735278412320915,
+    "mc_rel": -0.15730537523081237,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A3",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://www.youtube.com/watch?v=NpT5MPQPBro",
+   "author": "LostNiceland tv (YouTube)",
+   "date": "2026-09-19",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 2,
+    "frostbite": 3,
+    "iceLance": 1,
+    "iceShards": 5,
+    "shatter": 3,
+    "iceBlock": 1,
+    "fingersOfFrost": 1
+   },
+   "order": [
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "elementalPrecision",
+    "elementalPrecision",
+    "frostbite",
+    "frostbite",
+    "frostbite",
+    "iceLance",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "shatter",
+    "shatter",
+    "shatter",
+    "iceBlock",
+    "iceShards",
+    "fingersOfFrost"
+   ],
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Givre 1 à 30, ordre écrit dans la description ; la vidéo dit que Blizzard a affaibli le farm de zone."
+   ],
+   "reliability_flags": [
+    "ordre tiré d'un texte, pas d'un lien de calculateur",
+    "répartition identique à Mobalytics « Level 30 BETA » (A30, 24/09)"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.00618930206670058,
+    "mc_rel": 0.0013938477213001335,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart -0,6% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "A4",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://www.youtube.com/watch?v=NpT5MPQPBro",
+   "author": "LostNiceland tv (YouTube)",
+   "date": "2026-09-19",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "iceLance": 1,
+    "shatter": 3,
+    "fingersOfFrost": 1
+   },
+   "order": [
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "piercingIce",
+    "iceLance",
+    "piercingIce",
+    "piercingIce",
+    "shatter",
+    "shatter",
+    "shatter",
+    "fingersOfFrost"
+   ],
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Variante « Ice Shards » de la même description (sans Frostbite)."
+   ],
+   "reliability_flags": [
+    "ordre tiré d'un texte",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.16975355803515726,
+    "mc_rel": -0.18013044512980111,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "théorie au-delà du plafond de la bêta (niveau 20), sans mesure en jeu"
+   }
+  },
+  {
+   "id": "A5",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://wowtbc.gg/warcraftforever/class-guides/fire-mage/",
+   "author": null,
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 1,
+    "burningSoul": 3,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "firePower": 4,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 3,
+    "iceLance": 1,
+    "shatter": 3,
+    "fingersOfFrost": 2
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Feu « Frostfire » 0/29/22 : Molten Armor, 5 cumuls d'Improved Scorch, Pyroblast à 3 cumuls de Hot Streak, Frostfire Bolt ou Fireball ; « double dip » avec les talents de givre."
+   ],
+   "reliability_flags": [
+    "Molten Armor",
+    "non daté",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.23125672678351528,
+    "mc_rel": -0.33109954281395254,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A6",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://mythicsim.com/wow-forever/tier-list/sims/4d93d308-3fe2-40b6-9d3d-1c72657f02d0",
+   "author": "MythicSim",
+   "date": "2026-09-28",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "wakeOfFire": 1,
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "firePower": 4,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 2,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "shatter": 3,
+    "fingersOfFrost": 2
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Référence « Frostfire Mage (Experimental) » 0/29/22, race Gnome ; rotation hybride Frostfire Bolt + Pyroblast sur Hot Streak ; distincte de A5 malgré la même répartition par arbre."
+   ],
+   "reliability_flags": [
+    "marquée expérimentale par le site"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.27169183032494587,
+    "mc_rel": -0.3617469340317839,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A7",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://wowtbc.gg/warcraftforever/class-guides/arcane-mage/",
+   "author": null,
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : « Level 30 (Beta) » Arcane : Arcane Missiles sur Missile Barrage, sinon Arcane Blast."
+   ],
+   "reliability_flags": [
+    "non daté",
+    "Molten Armor",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.13158320573658747,
+    "mc_rel": 0.11165068865831117,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I5",
+    "motif": "leur build fait mieux de +13,2% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+   }
+  },
+  {
+   "id": "A8",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://wowtbc.gg/warcraftforever/class-guides/frost-mage/",
+   "author": null,
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "iceLance": 1,
+    "shatter": 3,
+    "fingersOfFrost": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : « Level 30 (Beta) » Givre ; même répartition que A4 (LostNiceland, variante 2)."
+   ],
+   "reliability_flags": [
+    "non daté",
+    "Molten Armor",
+    "identique à A4",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.16975355803515726,
+    "mc_rel": -0.18013044512980111,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "théorie au-delà du plafond de la bêta (niveau 20), sans mesure en jeu"
+   }
+  },
+  {
+   "id": "A9",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://wowtbc.gg/warcraftforever/class-guides/fire-mage/",
+   "author": null,
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 1,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "elementalPrecision": 2
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : « Level 30 (Beta) » Feu."
+   ],
+   "reliability_flags": [
+    "non daté",
+    "Molten Armor",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.10061271835424453,
+    "mc_rel": -0.1855520768347203,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A10",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/arcane-mage-pve-guide",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-17",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "arcaneFocus": 5,
+    "improvedChanneling": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 1,
+    "burningSoul": 2,
+    "masterOfElements": 3
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": "en fenêtre de burst avec Eureka! et 4 cumuls",
+   "ab_stacks": "4",
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Arcane 32/19/0 : Arcane Blast à 4 cumuls puis Arcane Missiles sur Missile Barrage ; phase Fireball pour récupérer la mana ; fenêtre Eureka! + Arcane Power + Presence of Mind sur le dernier Arcane Blast."
+   ],
+   "reliability_flags": [
+    "cite Arcane Meditation à « 15 % » (valeur Classic ; notre table donne une autre valeur au rang 3)",
+    "théorie non testée",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.09858869951860279,
+    "mc_rel": -0.0728666751221635,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (arcanePower) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A11",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/frost-mage-pve-guide",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-17",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "improvedChanneling": 5,
+    "arcaneSubtlety": 2,
+    "magicAbsorption": 1,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 2,
+    "missileBarrage": 1,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 2,
+    "iceLance": 1,
+    "shatter": 5,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "wintersChill": 5,
+    "iceBarrier": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Givre 16/0/35 avec incursion Arcane jusqu'à Missile Barrage ; Ice Armor ou Mage Armor ; Frostbolt, Ice Lance sur Fingers of Frost, Arcane Missiles sur Missile Barrage."
+   ],
+   "reliability_flags": [
+    "Shatter 5/5 (maximum Classic)",
+    "théorie non testée",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": false,
+   "legal_notes": "shatter 5 > max 3",
+   "gap": null,
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "build illégal : shatter 5 > max 3"
+   }
+  },
+  {
+   "id": "A12",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/ElliotWood/Forever/blob/HEAD/ui/specs/mage/dps/presets.ts",
+   "author": "ElliotWood/Forever et MythicSim (même preset)",
+   "date": "2026-09-22",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 2,
+    "burningSoul": 2,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "blastWave": 1,
+    "firePower": 5,
+    "combustion": 1,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 3
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset « Fire 0/35/16 » ; APL feu : Pyroblast à 3 cumuls de Hot Streak, Scorch pour tenir 5 cumuls d'Improved Scorch, Fireball ; Mage Armor (EW) ou Molten Armor (MythicSim)."
+   ],
+   "reliability_flags": [
+    "identique chez EW, MythicSim et gunba",
+    "origine non citée",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.4140713901186956,
+    "mc_rel": -0.47213902094578886,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A13",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/ElliotWood/Forever/blob/HEAD/ui/specs/mage/dps/presets.ts",
+   "author": "ElliotWood/Forever et MythicSim",
+   "date": "2026-09-22",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 1,
+    "arcaneImpact": 3,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "frostbite": 3,
+    "piercingIce": 3,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "shatter": 3,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "wintersChill": 5,
+    "iceBarrier": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset nommé « Frost 14/0/37 » : décode en 14/0/35 (49 points) depuis le passage de Shatter de 5 à 3 rangs."
+   ],
+   "reliability_flags": [
+    "nom du preset périmé : 2 points non placés",
+    "construit à l'origine avec Shatter 5/5",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.27424475246716296,
+    "mc_rel": -0.3749787122261922,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock, iceBarrier) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "A14",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/ElliotWood/Forever/blob/HEAD/ui/specs/mage/dps/presets.ts",
+   "author": "défaut de l'amont wowsims/forever (repris par EW, gunba, MythicSim)",
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 3,
+    "arcaneMeditation": 3,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 3,
+    "iceLance": 1,
+    "shatter": 3,
+    "fingersOfFrost": 2,
+    "wintersChill": 4
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset « Frost DPS » (P1)."
+   ],
+   "reliability_flags": [
+    "49 points : Winter's Chill 4 et 2 points non placés (ancien Shatter 5 ramené à 3)",
+    "date d'origine inconnue (amont)",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.02834848475483694,
+    "mc_rel": -0.10590878153664807,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "H5",
+    "motif": "l'analytique donne +2,8% mais le Monte Carlo -10,6% : notre build fait mieux au Monte Carlo (approximation de l'analytique)"
+   }
+  },
+  {
+   "id": "A15",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/ElliotWood/Forever/blob/HEAD/ui/specs/mage/dps/presets.ts",
+   "author": "défaut de l'amont wowsims/forever",
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneSubtlety": 2,
+    "magicAbsorption": 1,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "wakeOfFire": 2,
+    "incineration": 3,
+    "ignite": 5,
+    "burningSoul": 3,
+    "improvedFlamestrike": 2,
+    "improvedScorch": 2,
+    "masterOfElements": 3
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset « Arcane DPS » (P1) 31/20/0."
+   ],
+   "reliability_flags": [
+    "date d'origine inconnue",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.048383320326093174,
+    "mc_rel": -0.019146704662488828,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "3 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, arcanePower) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A16",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/ElliotWood/Forever/blob/HEAD/ui/specs/mage/dps/presets.ts",
+   "author": "défaut de l'amont wowsims/forever",
+   "date": null,
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneSubtlety": 2,
+    "magicAbsorption": 2,
+    "arcaneConcentration": 5,
+    "arcaneResilience": 2,
+    "arcaneMeditation": 3,
+    "wakeOfFire": 2,
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "firePower": 5,
+    "combustion": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset « Fire DPS » (P1) 19/32/0 ; gunba publie une variante « Fire 17/31/3 » (A20)."
+   ],
+   "reliability_flags": [
+    "date d'origine inconnue",
+    "date inconnue ou imprécise par rapport aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.4383898121659133,
+    "mc_rel": -0.5018260388447882,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A17",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/gunba/wow-forever-sim/blob/HEAD/ui/mage/presets.ts",
+   "author": "gunba/wow-forever-sim",
+   "date": "2026-09-22",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 1,
+    "incineration": 3,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "frostbite": 3,
+    "piercingIce": 3,
+    "frostChanneling": 2,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "shatter": 3,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "wintersChill": 5,
+    "iceBarrier": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset « Frost 11/3/37 » (commit « refresh research builds and rankings »)."
+   ],
+   "reliability_flags": [
+    "aucune justification écrite",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.17184677257838163,
+    "mc_rel": -0.2860569338759694,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock, iceBarrier) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "A18",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/gunba/wow-forever-sim/blob/HEAD/ui/mage/presets.ts",
+   "author": "gunba/wow-forever-sim",
+   "date": "2026-09-22",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "improvedChanneling": 3,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "incineration": 3,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "frostChanneling": 2
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": "4",
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset « Arcane 33/3/15 » ; APL arcane de gunba : condition sur 4 cumuls d'Arcane Blast ; Mage Armor."
+   ],
+   "reliability_flags": [
+    "aucune justification écrite",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.048383320326093174,
+    "mc_rel": -0.019146704662488828,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (arcanePower) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A19",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/gunba/wow-forever-sim/blob/HEAD/ui/mage/presets.ts",
+   "author": "gunba/wow-forever-sim",
+   "date": "2026-09-22",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 2,
+    "iceLance": 1,
+    "shatter": 3,
+    "fingersOfFrost": 2
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset hybride « Arcane–Frost 28/0/23 » (APL forever_arcane_frost), sans Arcane Power ni Presence of Mind."
+   ],
+   "reliability_flags": [
+    "aucune justification écrite",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.014792009933485952,
+    "mc_rel": -0.01859418816601716,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart -1,5% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "A20",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://github.com/gunba/wow-forever-sim/blob/HEAD/ui/mage/presets.ts",
+   "author": "gunba/wow-forever-sim",
+   "date": "2026-09-22",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneSubtlety": 1,
+    "magicAbsorption": 2,
+    "arcaneConcentration": 5,
+    "arcaneResilience": 2,
+    "arcaneMeditation": 2,
+    "wakeOfFire": 2,
+    "incineration": 3,
+    "improvedFireball": 4,
+    "ignite": 5,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "firePower": 5,
+    "combustion": 1,
+    "elementalPrecision": 3
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Preset « Fire 17/31/3 »."
+   ],
+   "reliability_flags": [
+    "aucune justification écrite",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.4522057907641688,
+    "mc_rel": -0.5101361633011918,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A21",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://www.youtube.com/watch?v=4TanuDFm7oo",
+   "author": "Kasum Adventurer (YouTube), crédite Xaryu et Jelako",
+   "date": "2026-09-21",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 5,
+    "improvedChanneling": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "wakeOfFire": 2,
+    "incineration": 3,
+    "ignite": 5,
+    "improvedFlamestrike": 3,
+    "pyroblast": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Arcane 37/14/0 « POM Pyro » (Improved Flamestrike 3, Pyroblast) ; lien https://www.wowhead.com/forever/talent-calc/mage/v1055205023100311531-230500031_t0."
+   ],
+   "reliability_flags": [
+    "encodage Wowhead v1 (les guides actuels utilisent v2) : correspondance d'ordre des talents supposée identique",
+    "titre racoleur (« Most Broken »), aucun chiffre",
+    "antérieur aux notes du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.048383320326093174,
+    "mc_rel": -0.019146704662488828,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (pyroblast, arcanePower) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A22",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://www.youtube.com/watch?v=6XaQz14C-Dw",
+   "author": "Dave The Gamer (YouTube)",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie pré-bêta)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "improvedCounterspell": 2,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "incineration": 3,
+    "frostWarding": 2,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "improvedFrostNova": 1,
+    "iceLance": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Arcane PvE 34/3/14 (lien Zockify)."
+   ],
+   "reliability_flags": [
+    "décodage Zockify : identifiants de talents supposés consécutifs dans l'ordre de nos arbres (cohérent : tous les rangs respectent les maximums)",
+    "antérieur aux notes du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.048383320326093174,
+    "mc_rel": -0.019146704662488828,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (frostWarding) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "A23",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://www.youtube.com/watch?v=6XaQz14C-Dw",
+   "author": "Dave The Gamer (YouTube)",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie pré-bêta)",
+   "points": {
+    "wandSpecialization": 2,
+    "arcaneFocus": 3,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "wakeOfFire": 2,
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 2,
+    "burningSoul": 3,
+    "improvedFlamestrike": 1,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "blastWave": 1,
+    "combustion": 1,
+    "elementalPrecision": 5
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Feu PvE 12/34/5 sans Fire Power (Blast Wave, Improved Flamestrike 1) ; l'auteur dit réviser le compromis toucher / mana pendant la vidéo."
+   ],
+   "reliability_flags": [
+    "décodage Zockify supposé (voir A22)",
+    "même répartition par arbre que C17 mais points différents",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.49940833014284924,
+    "mc_rel": -0.5483714443104281,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A24",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://www.youtube.com/watch?v=6XaQz14C-Dw",
+   "author": "Dave The Gamer (YouTube)",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie pré-bêta)",
+   "points": {
+    "elementalPrecision": 5,
+    "improvedFrostbolt": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "arcticReach": 2,
+    "improvedConeOfCold": 3,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "shatter": 3,
+    "wintersChill": 5,
+    "iceBarrier": 1,
+    "frostChanneling": 2,
+    "frostbite": 1,
+    "wandSpecialization": 2,
+    "improvedChanneling": 3,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 4
+   },
+   "order": [
+    "elementalPrecision",
+    "improvedFrostbolt",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "iceShards",
+    "piercingIce",
+    "piercingIce",
+    "piercingIce",
+    "iceLance",
+    "iceBlock",
+    "arcticReach",
+    "arcticReach",
+    "improvedConeOfCold",
+    "improvedConeOfCold",
+    "improvedConeOfCold",
+    "coldSnap",
+    "fingersOfFrost",
+    "fingersOfFrost",
+    "shatter",
+    "shatter",
+    "shatter",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "wintersChill",
+    "iceBarrier",
+    "frostChanneling",
+    "frostChanneling",
+    "frostbite",
+    "wandSpecialization",
+    "wandSpecialization",
+    "improvedChanneling",
+    "improvedChanneling",
+    "improvedChanneling",
+    "arcaneSubtlety",
+    "arcaneSubtlety",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration",
+    "arcaneConcentration"
+   ],
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Givre PvE 11/0/40 (lien Icy Veins, ordre conservé)."
+   ],
+   "reliability_flags": [
+    "antérieur aux notes du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.19911585204796195,
+    "mc_rel": -0.324477590059736,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock, iceBarrier) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "A25",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://overgear.com/guides/wow-forever/arcane-mage-how-to-play/",
+   "author": "Nurseos (Overgear, vendeur de services)",
+   "date": "2026-09-25",
+   "game_version": "Forever (bêta, client 1.60.1)",
+   "points": {
+    "arcaneFocus": 2,
+    "improvedChanneling": 5,
+    "arcaneConcentration": 5,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": "2 à 4",
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Arcane niveau 30 ; conseille 2 à 3 cumuls d'Arcane Blast en leveling, 4 pour le burst."
+   ],
+   "reliability_flags": [
+    "liens de sorts mal étiquetés (lien Arcane Geometry affiché « Arcane Focus »)"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": 0.11726162784215735,
+    "mc_rel": 0.08813164242423803,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I5",
+    "motif": "leur build fait mieux de +11,7% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+   }
+  },
+  {
+   "id": "A26",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://overgear.com/guides/wow-forever/arcane-mage-how-to-play/",
+   "author": "Nurseos (Overgear)",
+   "date": "2026-09-25",
+   "game_version": "Forever annoncé, contenu mêlé de Classic",
+   "points": {
+    "arcaneFocus": 5,
+    "improvedChanneling": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "incineration": 3,
+    "elementalPrecision": 5,
+    "permafrost": 3,
+    "improvedFrostNova": 2,
+    "improvedBlizzard": 3
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Annoncé « 35/8/8 » ; la liste détaillée fait 37/3/13."
+   ],
+   "reliability_flags": [
+    "53 points pour 51 disponibles, cumuls faux dans le tableau de l'auteur",
+    "Elemental Precision rangé dans l'arbre Feu",
+    "le tableau de leveling cite Improved Arcane Missiles et Improved Arcane Explosion, talents Classic absents de Forever",
+    "site de vente de services (boost, or)",
+    "copie probable de Mobalytics Arcane 60 (A33, 24/09), identique sauf Improved Blizzard 3 au lieu de 1"
+   ],
+   "legal": false,
+   "legal_notes": "53 points > 51 disponibles au niveau 60",
+   "gap": null,
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "build illégal : 53 points > 51 disponibles au niveau 60"
+   }
+  },
+  {
+   "id": "A27",
+   "context": "pvp",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/arcane-mage-pvp-guide",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-17",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "arcaneFocus": 2,
+    "improvedChanneling": 3,
+    "magicAbsorption": 2,
+    "arcaneConcentration": 5,
+    "arcaneResilience": 2,
+    "arcaneBlast": 1,
+    "improvedCounterspell": 2,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "frostWarding": 2,
+    "elementalPrecision": 3,
+    "permafrost": 3,
+    "improvedFrostNova": 2,
+    "frostbite": 3,
+    "piercingIce": 1,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "shatter": 4
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": "avec Presence of Mind et Eureka!, pas sur une cible sur le point d'être soignée ou immunisée",
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Arcane PvP 31/0/20 : Presence of Mind + Arcane Power sur un Frostbolt ou Arcane Blast instantané après Frost Nova ; Improved Counterspell sur le soigneur."
+   ],
+   "reliability_flags": [
+    "Shatter 4 (maximum Classic 5 ; 3 chez nous)",
+    "théorie non testée",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": false,
+   "legal_notes": "shatter 4 > max 3",
+   "gap": null,
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "build illégal : shatter 4 > max 3"
+   }
+  },
+  {
+   "id": "A28",
+   "context": "pvp",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/fire-mage-pvp-guide",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-17",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "impact": 3,
+    "burningSoul": 3,
+    "pyroblast": 1,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "blastWave": 1,
+    "firePower": 2,
+    "combustion": 1,
+    "frostWarding": 2,
+    "elementalPrecision": 3,
+    "permafrost": 3,
+    "improvedFrostNova": 2,
+    "frostbite": 3,
+    "frostChanneling": 1,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "shatter": 4
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Feu PvP 0/31/20 : Frost Nova puis Fire Blast (Shatter), Blast Wave au contact, Combustion avec Eureka!."
+   ],
+   "reliability_flags": [
+    "Shatter 4 (maximum Classic)",
+    "théorie non testée",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": false,
+   "legal_notes": "shatter 4 > max 3",
+   "gap": null,
+   "explanation": {
+    "kind": "source_douteuse",
+    "registry": null,
+    "motif": "build illégal : shatter 4 > max 3"
+   }
+  },
+  {
+   "id": "A29",
+   "context": "dungeon",
+   "level": 60,
+   "source_url": "https://wowforeverbuilds.com/guide/mage-cleave-fire-mage-dungeon-leveling",
+   "author": "compte du site « WoWForeverBuilds »",
+   "date": "2026-09-16",
+   "game_version": "Forever (bêta, client 1.60.1) (théorie)",
+   "points": {
+    "improvedFireball": 5,
+    "ignite": 5,
+    "burningSoul": 3,
+    "improvedFlamestrike": 3,
+    "flameThrowing": 2,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "blastWave": 1,
+    "firePower": 5,
+    "combustion": 1,
+    "pyroblast": 1,
+    "hotStreak": 1,
+    "improvedScorch": 3,
+    "elementalPrecision": 5,
+    "improvedFrostNova": 2,
+    "incineration": 3,
+    "impact": 3,
+    "wakeOfFire": 2
+   },
+   "order": [
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "improvedFireball",
+    "ignite",
+    "ignite",
+    "ignite",
+    "ignite",
+    "ignite",
+    "burningSoul",
+    "burningSoul",
+    "burningSoul",
+    "improvedFlamestrike",
+    "improvedFlamestrike",
+    "improvedFlamestrike",
+    "flameThrowing",
+    "flameThrowing",
+    "masterOfElements",
+    "masterOfElements",
+    "masterOfElements",
+    "criticalMass",
+    "criticalMass",
+    "criticalMass",
+    "blastWave",
+    "firePower",
+    "firePower",
+    "firePower",
+    "firePower",
+    "firePower",
+    "combustion",
+    "pyroblast",
+    "hotStreak",
+    "improvedScorch",
+    "improvedScorch",
+    "improvedScorch",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "improvedFrostNova",
+    "improvedFrostNova",
+    "incineration",
+    "incineration",
+    "incineration",
+    "impact",
+    "impact",
+    "impact",
+    "wakeOfFire",
+    "wakeOfFire"
+   ],
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Feu « mage cleave » 40 à 60 (Improved Flamestrike, Burning Soul, Blast Wave, Combustion à 40, Improved Frost Nova) ; lien relevé sur la page du cleave Arcane."
+   ],
+   "reliability_flags": [
+    "Pyroblast et Hot Streak pris après Combustion (niveaux 41-42)",
+    "théorie non testée",
+    "antérieur aux notes de développement du 24/09"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.4535388101041282,
+    "mc_rel": -0.44788198064994716,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "B19",
+    "motif": "5 point(s) sur des talents dont l'effet n'est pas modélisé (impact, wakeOfFire) : Procs de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort"
+   }
+  },
+  {
+   "id": "A30",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://mobalytics.gg/wow-forever/classes/frost-mage-guide",
+   "author": "FF (Mobalytics)",
+   "date": "2026-09-24",
+   "game_version": "Forever (bêta, client 1.60.1), palier 30 de la bêta",
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 2,
+    "iceShards": 5,
+    "frostbite": 3,
+    "iceLance": 1,
+    "iceBlock": 1,
+    "shatter": 3,
+    "fingersOfFrost": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Variante « Level 30 BETA » (page lue dans un navigateur) ; guide marqué « work in progress », sans rotation."
+   ],
+   "reliability_flags": [
+    "identique à A3 (LostNiceland, 19/09) : copie probable dans un sens ou l'autre",
+    "palier 30 théorique"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.00618930206670058,
+    "mc_rel": 0.0013938477213001335,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "concorde",
+    "registry": null,
+    "motif": "écart -0,6% à l'analytique, sous le seuil de concordance"
+   }
+  },
+  {
+   "id": "A31",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://mobalytics.gg/wow-forever/classes/frost-mage-guide",
+   "author": "FF (Mobalytics)",
+   "date": "2026-09-24",
+   "game_version": "Forever (bêta, client 1.60.1), palier 30 de la bêta",
+   "points": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "permafrost": 3,
+    "piercingIce": 2,
+    "iceLance": 1,
+    "improvedBlizzard": 3,
+    "arcticReach": 2,
+    "iceBlock": 1,
+    "coldSnap": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Variante « Level 30 AOE BETA » (Improved Blizzard, Permafrost, Arctic Reach, Cold Snap) ; le guide signale un affaiblissement du ralentissement de Blizzard."
+   ],
+   "reliability_flags": [
+    "palier 30 théorique"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.19330239581022082,
+    "mc_rel": -0.29802949101828713,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock, improvedBlizzard) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "A32",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://mobalytics.gg/wow-forever/classes/frost-mage-guide",
+   "author": "FF (Mobalytics)",
+   "date": "2026-09-24",
+   "game_version": "Forever (bêta, client 1.60.1) (build de niveau 60 « attendu »)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneMeditation": 2,
+    "missileBarrage": 1,
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "piercingIce": 3,
+    "iceLance": 1,
+    "arcticReach": 2,
+    "iceBlock": 1,
+    "shatter": 3,
+    "coldSnap": 1,
+    "fingersOfFrost": 2,
+    "wintersChill": 5
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Givre 18/0/33 avec Missile Barrage, sans Ice Barrier ni Frost Channeling."
+   ],
+   "reliability_flags": [
+    "aucune justification publiée"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.20311074540868476,
+    "mc_rel": -0.3138099500156899,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "B18",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (coldSnap) : Talents actifs à recharge : Presence of Mind, Combustion, Cold Snap"
+   }
+  },
+  {
+   "id": "A33",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://mobalytics.gg/wow-forever/classes/arcane-mage-guide",
+   "author": "Mobalytics",
+   "date": "2026-09-24",
+   "game_version": "Forever (bêta, client 1.60.1) (build de niveau 60 « attendu »)",
+   "points": {
+    "arcaneFocus": 5,
+    "improvedChanneling": 5,
+    "arcaneSubtlety": 2,
+    "arcaneConcentration": 5,
+    "arcaneGeometry": 2,
+    "arcaneImpact": 3,
+    "arcaneBlast": 1,
+    "arcaneMeditation": 3,
+    "missileBarrage": 1,
+    "presenceOfMind": 1,
+    "arcaneMind": 5,
+    "arcaneInstability": 3,
+    "arcanePower": 1,
+    "incineration": 3,
+    "elementalPrecision": 5,
+    "permafrost": 3,
+    "improvedFrostNova": 2,
+    "improvedBlizzard": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Arcane 37/3/11 ; le guide dit que le build ne fonctionne qu'à partir du niveau 25 (Missile Barrage) et conseille de monter en Givre avant. Variante niveau 30 non récupérée (onglet non rendu)."
+   ],
+   "reliability_flags": [
+    "reprise par Overgear le 25/09 avec 2 points d'Improved Blizzard en trop (A26)",
+    "aucune justification publiée"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.048383320326093174,
+    "mc_rel": -0.019146704662488828,
+    "mc_significant": false
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (improvedBlizzard) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+   }
+  },
+  {
+   "id": "A34",
+   "context": "leveling",
+   "level": 30,
+   "source_url": "https://mobalytics.gg/wow-forever/classes/fire-mage-guide",
+   "author": "Mobalytics",
+   "date": "2026-09-24",
+   "game_version": "Forever (bêta, client 1.60.1), palier 30 de la bêta",
+   "points": {
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 2,
+    "burningSoul": 3,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "blastWave": 1
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Feu « Level 30 BETA » (Blast Wave, Hot Streak, Improved Scorch) ; Frostbolt pour ralentir puis Fireball ou Scorch."
+   ],
+   "reliability_flags": [
+    "palier 30 théorique"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.10300167069857012,
+    "mc_rel": -0.1563272668438554,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  },
+  {
+   "id": "A35",
+   "context": "raid",
+   "level": 60,
+   "source_url": "https://mobalytics.gg/wow-forever/classes/fire-mage-guide",
+   "author": "Mobalytics",
+   "date": "2026-09-24",
+   "game_version": "Forever (bêta, client 1.60.1) (build de niveau 60 « attendu »)",
+   "points": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "incineration": 3,
+    "improvedFireball": 5,
+    "ignite": 5,
+    "flameThrowing": 2,
+    "burningSoul": 3,
+    "pyroblast": 1,
+    "improvedScorch": 3,
+    "hotStreak": 1,
+    "masterOfElements": 3,
+    "criticalMass": 3,
+    "blastWave": 1,
+    "firePower": 5,
+    "combustion": 1,
+    "elementalPrecision": 5
+   },
+   "order": null,
+   "armor": null,
+   "rotation": null,
+   "arcane_power": null,
+   "ab_stacks": null,
+   "reasons": [
+    "Résumé du relevé (pas une raison de l'auteur) : Feu 10/36/5 avec Blast Wave, Fire Power 5, Combustion, Elemental Precision."
+   ],
+   "reliability_flags": [
+    "aucune justification publiée"
+   ],
+   "legal": true,
+   "legal_notes": null,
+   "gap": {
+    "analytic_rel": -0.49940833014284924,
+    "mc_rel": -0.5483714443104281,
+    "mc_significant": true
+   },
+   "explanation": {
+    "kind": "mecanique_non_modelisee",
+    "registry": "I8",
+    "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+   }
+  }
+ ]
+}

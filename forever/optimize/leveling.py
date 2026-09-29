@@ -244,11 +244,52 @@ def optimize_leveling(
     """Meilleur ordre des talents de `lfrom` à `lto` (faisceau, anticipation, Monte Carlo sur la présélection) ;
     ValueError si le build de départ est illégal au niveau `lfrom`.
 
+    En mode forever, plusieurs départs : le faisceau libre et un faisceau par arbre (points placés dans l'arbre tant
+    qu'un talent y est prenable), le chemin le plus court gagne ; un faisceau peu profond ne voit pas le gain d'un
+    arbre qui ne paie qu'au troisième palier. Mode seed : le faisceau du seed seul (parité).
+
     Registre : I5, I6"""
     start_pts = {k: v for k, v in (start or {}).items() if v}
     errors = check_build(gd, start_pts, lfrom, talented_bonus)
     if errors:
         raise ValueError(f"build de départ illégal au niveau {lfrom} : {' ; '.join(errors)}")
+    common: dict[str, Any] = {
+        "beam": beam,
+        "depth": depth,
+        "shortlist": shortlist,
+        "mc_n": mc_n,
+        "seed": seed,
+        "rules": rules,
+        "start": start_pts,
+        "over": over,
+        "talented_bonus": talented_bonus,
+        **options,
+    }
+    focuses: list[str | None] = [None] if rules == "seed" else [None, *gd.trees]
+    paths = [_beam_search(gd, race, lfrom, lto, focus=f, **common) for f in focuses]
+    return min(paths, key=lambda path: path.hours_equiv)
+
+
+def _beam_search(
+    gd: GameData,
+    race: str,
+    lfrom: int,
+    lto: int,
+    *,
+    focus: str | None,
+    beam: int,
+    depth: int,
+    shortlist: int,
+    mc_n: int,
+    seed: int,
+    rules: str,
+    start: dict[str, int],
+    over: CharacterOverrides | None,
+    talented_bonus: int,
+    **options: Any,
+) -> LevelingPath:
+    """Faisceau du seed ; `focus` : arbre où placer les points tant qu'un de ses talents est prenable."""
+    start_pts = start
     beams: list[tuple[float, dict[str, int], list[Step]]] = [(0.0, dict(start_pts), [])]
     for level, last in _passes(gd, lfrom, lto, sum(start_pts.values()), talented_bonus):
         # plusieurs points au même niveau (bonus Talented, build de départ) : une étape par point, le temps du niveau
@@ -256,7 +297,9 @@ def optimize_leveling(
         weight = level_weight(gd, level) if last else 0.0
         nxt: list[tuple[float, float, dict[str, int], list[Step]]] = []
         for score, pts, hist in beams:
-            cands: list[str | None] = [*legal_additions(gd, pts, level, talented_bonus)] or [None]
+            legal = legal_additions(gd, pts, level, talented_bonus)
+            inside = [k for k in legal if focus is not None and gd.talents[k].tree == focus]
+            cands: list[str | None] = [*(inside or legal)] or [None]
             pre = []
             for k in cands:
                 p2 = dict(pts)
