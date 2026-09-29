@@ -5,7 +5,7 @@ Répondre à toute question sur WoW Forever avec des chiffres exacts pour la ver
 
 ## Vocabulaire
 - **Version du jeu** (build client) : numéro des fichiers publiés par Blizzard, par exemple 1.60.1.70009. Produit TACT de la bêta : `wow_classic_beta`.
-- **Build de personnage** : talents, équipement, rotation d'un personnage.
+- **Build de personnage** : talents, équipement, rotation d'un personnage. T05 : build du Mage par contexte (leveling, donjon, raid, PvP en champs de bataille et en monde ouvert) à un niveau donné, avec l'ordre des talents, la raison de chaque choix, l'alternative la plus proche et son écart chiffré, la stabilité, la sensibilité aux hypothèses incertaines, le conseil de respec et les angles morts (`forever build`, `forever_build`).
 - **Certitude** : `certain` (lu dans le client), `probable` (calculé par une formule du client, ou recoupé), `suppose` (hérité de Classic ou estimé).
 - **Fiche fixe** : information qui ne dépend pas de l'état du combat (sorts, recharges nominales, catégories de contrôle), seule forme d'aide PvP affichable en jeu.
 

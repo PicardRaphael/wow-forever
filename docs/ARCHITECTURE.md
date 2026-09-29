@@ -84,6 +84,12 @@ forever-core/
 - Registre (`docs/MECHANICS_REGISTRY.yaml`) : champs obligatoires `id`, `categorie`, `description`, `forever`, `statut`, `certitude`, `sources`, `tests` ; champs optionnels `formule` (symbolique, seuls 0 et 1 admis) et `note` (périmètre couvert, reprise prévue). Une référence de test prend la forme `tests/…/fichier.py::test_nom` ; `teste` ou mieux en exige une dont la fonction existe (analyse `ast`). `forever.registry.validate` (via `scripts/check_registry.py --strict`, étape `registry` de `verify`) refuse aussi les chemins hors de `tests/`, les formules chiffrées, un identifiant cité par le moteur mais absent du registre, et une entrée testée des catégories A à H sans implémentation citée.
 - `forever explain-mechanic <id>` / `forever_explain_mechanic` : entrée du registre, paramètres de la version courante (`mechanics.json` étiqueté par l'identifiant, règles de `combat_rules` associées), implémentations citées ; `certainty` reprend le registre, la certitude de la provenance est le minimum avec celles des paramètres.
 
+## Builds par contexte (T05)
+- `forever build <contexte> --level N` (`leveling`, `dungeon`, `raid`, `pvp-bg`, `pvp-world`) et l'outil MCP `forever_build` : même service, `forever/build.py` (validation, rapport, hypothèses, certitude = minimum des sources, provenance ; au-delà de `build.beta_level_cap`, « non vérifiable en jeu avant la sortie »).
+- `forever/optimize/` : `leveling.py` (faisceau du seed, parité exacte en mode seed ; en mode forever, choix du build cherchés avec les talents et départs multiples par arbre), `endgame.py` (donjon, raid, PvP : départs par arbre et par paire d'arbres, recherche locale, décision au Monte Carlo apparié ; glouton PvP du seed pour la parité), `decide.py` (écart apparié, intervalle, stabilité), `respec.py` (conseil du seed et conseil forever par niveau).
+- `forever/sim/encounter.py` : scénarios provisoires de donjon et de raid (`build.scenarios`), analytique et Monte Carlo ; règles dans `forever/engine/encounter.py`. `forever/sim/community.py` : écart d'un build de la communauté avec le nôtre (bloc J, `scripts/build_community_fixture.py`).
+- Moteur : `variants.py` (hypothèses incertaines, plages `range` de `mechanics.json`), `pvp.py` (profil PvP du seed), `respec.py`, `blind_spots.py` (angles morts : champ `angle_mort` du registre, estimations bornées).
+
 ## Outils MCP (peu nombreux, à fort levier)
 | Outil | Rôle |
 | --- | --- |
