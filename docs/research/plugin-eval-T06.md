@@ -4,7 +4,7 @@ Suite : `plugin/evals/` (30 questions réelles, 20 voisines ; décision 96). Pas
 modèle par défaut de la session (Opus 5.5), vrai serveur MCP, un passage par cas :
 
 ```
-claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_forever_forever__*" --runs 1 --ablation none -j 4 --max-cost-usd 15 --no-publish --keep-temp --threshold 0 --json plugin/evals/results/passage-N.json
+claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_forever_forever__*" --runs 1 --ablation none -j 4 --judge-model opus --max-cost-usd 15 --no-publish --keep-temp --threshold 0 --json plugin/evals/results/passage-N.json
 uv run python scripts/plugin_eval_report.py plugin/evals/results/passage-N.json
 ```
 
@@ -30,6 +30,10 @@ réponses de `hors-butin-mortemines` et `hors-hotel-des-ventes`, qui disent pour
 EC1 et ne donnent aucune valeur (elles proposent ce que le projet sait déjà : niveau du donjon, recherche web
 étiquetée). Rejeu des trois cas à trois exécutions (0,99 $) : regex 9/9, juge 8/9. Sur l'ensemble des passages, le juge
 accepte 15 réponses sur 18 : variance du juge, question posée à l'utilisateur (`tasks/T06-corrections.md`).
+
+Décision de l'utilisateur : critère `llm` des cas `hors-*` précisé (offres de ce que le projet couvre déjà et recherche
+web étiquetée permises, toute valeur ou recommandation inventée interdite) et juge Opus (`--judge-model opus`). Rejeu
+des trois cas à trois exécutions : « je ne sais pas » regex 9/9, juge 9/9, aucun chiffre inventé 9/9 (1,14 $).
 
 Durée : environ 25 s par cas en moyenne, 90 s au plus (cas de `forever_build`, calcul d'environ une minute).
 Le passage 2 suit deux corrections (commit `87acddc`) ; les 50 cas n'ont pas changé.

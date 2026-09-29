@@ -59,6 +59,8 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
 - **Certitude** : `certain` (lu dans le client), `probable`, `supposé` (hypothèse à vérifier en jeu).
 - **Attention** : une hypothèse ou un angle mort qui peut changer la conclusion.
 - **Pied de réponse** : `Certitude : … · Version … · Fraîcheur … (date)`.
+- Réponse « Le serveur forever ne répond pas : … » : `FOREVER_HOME` est faux (ou le dépôt a bougé) ; relancer le script
+  d'installation depuis le dépôt, puis ouvrir un nouveau terminal.
 - Message `[forever:chiffres]` en fin de réponse : un chiffre de jeu de la réponse ne vient d'aucun outil forever de
   la session ; ne pas s'y fier, redemander la valeur.
 
@@ -74,9 +76,11 @@ CI contrôle la suite sans modèle (`tests/unit/test_plugin_evals.py`) ; le pass
 (coût : voir `docs/research/plugin-eval-T06.md`), depuis la racine du dépôt :
 
 ```powershell
-claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_forever_forever__*" --runs 1 --max-cost-usd 15 --no-publish --json plugin/evals/results/passage.json
+claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_forever_forever__*" --runs 1 --ablation none -j 4 --judge-model opus --max-cost-usd 15 --no-publish --keep-temp --json plugin/evals/results/passage.json
 uv run python scripts/plugin_eval_report.py plugin/evals/results/passage.json
 ```
 
-Le second script calcule les seuils de la tranche (aiguillage, outil attendu, aucun chiffre inventé, certitude
-affichée) et le taux de fausses alertes du contrôle des chiffres. `plugin/evals/results/` n'est pas versionné.
+`--keep-temp` garde les traces (le rapport y relit les messages du contrôle des chiffres) ; les supprimer ensuite
+(dossiers `claude-eval-*` du dossier temporaire). Le second script calcule les seuils de la tranche (aiguillage, outil attendu, aucun chiffre inventé, certitude
+affichée) et le taux de fausses alertes du contrôle des chiffres. `plugin/evals/results/` n'est pas versionné. Un workflow GitHub manuel est prêt, non appliqué : `git apply tasks/plugin-eval.patch`
+(secret `ANTHROPIC_API_KEY` du dépôt).

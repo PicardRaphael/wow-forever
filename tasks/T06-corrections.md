@@ -18,3 +18,8 @@
      puis rejouer les trois cas à trois exécutions.
   2. Garder le critère et accepter le résultat comme variance du juge (15/18 sur l'ensemble des passages).
   3. Garder le critère et ajuster les skills pour que la réponse hors périmètre ne propose rien d'autre.
+
+## Décision de l'utilisateur (2026-09-29)
+Option 1 retenue : critère `llm` des trois cas `hors-*` précisé (offres de ce que le projet couvre déjà et recherche web
+étiquetée permises ; toute valeur ou recommandation inventée sur la question posée interdite) ; juge plus fort que
+Haiku (`--judge-model opus`). Rejeu des trois cas à trois exécutions : regex 9/9, juge 9/9 (1,14 $).

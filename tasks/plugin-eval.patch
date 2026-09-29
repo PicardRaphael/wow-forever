@@ -32,7 +32,7 @@ new file mode 100644
 +        run: |
 +          mkdir -p plugin/evals/results
 +          claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_forever_forever__*" \
-+            --runs "${{ inputs.runs }}" --ablation none --max-cost-usd "${{ inputs.max_cost_usd }}" --no-publish \
++            --runs "${{ inputs.runs }}" --ablation none --judge-model opus --max-cost-usd "${{ inputs.max_cost_usd }}" --no-publish \
 +            --keep-temp --threshold 0 --json plugin/evals/results/passage.json
 +      - name: Rapport (seuils de la tranche)
 +        run: uv run python scripts/plugin_eval_report.py plugin/evals/results/passage.json

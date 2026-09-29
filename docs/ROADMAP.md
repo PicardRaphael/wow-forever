@@ -19,6 +19,7 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 | T05 | Builds du Mage par contexte : optimiseur (leveling, donjon, raid, PvP), Arcane Power et Hot Streak dans les rotations, sensibilité, respec | T04b, T04c, T04e |
 | T06 | Plugin Claude Code : skills, hooks, sous-agents, installation au niveau utilisateur, évaluation (sans statusline) | T04b |
 | T04d | Quêtes propres à Forever et modèle d'XP de Forever (placée après T06 : ses sources viennent de l'inventaire des addons, `tasks/inventaire-addons.md`, et elle ne change pas le classement des builds) | T04c |
+| T06b | Données décodées du client installées pour 1.60.1.70009 (talents redécodés, Hot Streak à 20 s, coûts en mana relevés, changements confirmés appliqués) et totaux dans les sorties des outils (points d'un build par arbre…) pour que le modèle n'ait plus à calculer | T03, T05, T06 |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
 | PV1 | PvP, savoir des 9 classes sans moteur de classe : sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants (règles Classic), fiches par affrontement | T03, T05 |
 | PV2 | PvP, champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux de champs de bataille | PV1, T04a |
@@ -105,6 +106,23 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 - **À faire** (reporté de T04c) : ingestion des quêtes propres à Forever (`QuestieForeverDB`) et modèle d'XP (XP des monstres et des quêtes de Forever, remplaçant la règle Classic `leveling.mob_xp`) ; durée d'infobulle dans `tooltip_values`. Routes de leveling : pas de tranche dédiée (le joueur suit RestedXP en jeu ; RestedXP reste exclu comme source de données, `docs/DATA_SOURCES.md`). La réponse « quelle zone ou quel donjon à mon niveau » est faite en T04c (`forever lookup zones`, Questie lu localement, `suppose`) ; DJ1 affinera la partie donjons. Les quêtes de donjon restent ici ; DJ1 s'y réfère.
 - **Place** : après T06 (décision 78). Ses sources dépendent de l'inventaire des addons (`tasks/inventaire-addons.md` : ForeverDungeonJournal pour l'XP des quêtes, GearQuestForever pour la liste des quêtes absentes de Questie, tables de quêtes du client) ; l'XP ne change pas le classement des builds de T05, qui compare des taux de dégâts et de temps par monstre.
 - **Critères de fin** : à fixer au plan de T04d.
+
+## T06b — Données du client installées et totaux dans les sorties
+Demande de l'utilisateur du 2026-09-29, après l'évaluation du plugin (`docs/research/plugin-eval-T06.md`).
+- **Données** : installer dans `forever/data/1.60.1.70009/` les valeurs décodées du client à la place des valeurs de
+  référence, en reprenant de T08 ce qu'il faut (installation d'une version candidate, `forever manifest --update`,
+  rapport `forever report`, accord de l'utilisateur avant l'écriture) : talents redécodés au build 70009 (49 talents
+  encore `FC-69893`, certitude `probable`), Hot Streak à 20 s dans ses rangs (aujourd'hui 15 s dans les rangs et
+  20 s dans `duration_s`), coûts en mana relevés dans le client substitués à l'estimation `mana.talent_rank_cost`,
+  changements de `confirmed_changes.json` appliqués. Chaque valeur remplacée garde sa source et sa certitude ; les
+  golden et la parité avec le seed (`rules=seed`) ne bougent pas.
+- **Totaux** : ajouter aux sorties des outils les grandeurs que le modèle calculait lui-même au premier passage
+  d'évaluation (points du build par arbre et au total dans `forever_build`, effet au maximum des cumuls quand un
+  talent ou une mécanique le définit…), calculées dans `forever/engine/` ; consigne « aucun calcul » du plugin
+  inchangée.
+- **Critères de fin** : à fixer au plan de T06b ; au moins `forever lookup talent` à certitude `certain` pour les
+  talents redécodés, Hot Streak à 20 s partout, totaux présents dans `forever_build` avec leurs tests, évaluation du
+  plugin rejouée sans alerte du contrôle des chiffres.
 
 ## FA1 — ForeverAssist V1 (affichage de données précalculées)
 Addon d'affichage seul (règles et canaux : `docs/ADDON.md`). Aucun calcul de combat dans l'addon : `forever` précalcule, l'addon affiche.
@@ -206,7 +224,7 @@ Placé avant T07 parce que les bonus Legacy pèsent sur le leveling : le catalog
 - **Critères de fin** : `forever rep info` avec source et certitude par champ ; `forever rep plan` déterministe sur un état d'exemple importé d'une fixture de SavedVariable.
 
 ## T08 — Veille
-- **Fait (repris de T03)** : installation d'une version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report`) ; application de `overrides.json` et de `confirmed_changes.json` ; substitution des coûts en mana relevés dans le client à l'estimation de `mechanics.json` (`mana.talent_rank_cost`) ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
+- **Fait (repris de T03)** (l'installation pour 1.60.1.70009 passe en T06b ; T08 garde l'automatisation pour les versions suivantes) : installation d'une version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report`) ; application de `overrides.json` et de `confirmed_changes.json` ; substitution des coûts en mana relevés dans le client à l'estimation de `mechanics.json` (`mana.talent_rank_cost`) ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
 - **Durcissement du pipeline (relecture T03)** : `$d` entre dans les expressions `${…}` dans son unité d'affichage (minutes dès 60 s), aucune infobulle de talent ne l'exerce aujourd'hui ; un sort cité deux fois par une infobulle d'aura 226 compterait deux fois ses dégâts ; `SpellLevel` n'est pas lu (écart de niveau calculé depuis `BaseLevel`) ; `--locale` ignoré sans `--tables` ; un CSV réduit à son en-tête est accepté ; `verify` suppose `level` en tête de `rank_format`.
 - **Critères de fin** : `build-watch.yml` simulé en test (nouvelle version fictive → PR et note) ; alerte `silent` après 14 jours sans version.
 
