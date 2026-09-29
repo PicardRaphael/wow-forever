@@ -135,6 +135,10 @@ def _values(obj: Any) -> Iterator[float]:
                 pass
         for m in _ANY_NUMBER.finditer(obj):
             yield _parse(m.group(0))[0]
+        # nombres écrits avec une espace des milliers (« 11 153 », rapport d'un sous-agent), lus aussi en entier
+        for m in _NUMBER.finditer(obj):
+            if any(c in m.group(0) for c in "   "):
+                yield _parse(m.group(0))[0]
     elif isinstance(obj, Mapping):
         for k, v in obj.items():
             if k != "provenance":

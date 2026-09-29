@@ -123,7 +123,7 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
   l'évaluation le justifie).
 - **Version** : semver dans `plugin.json` (0.2.0 en T06b), relevée à chaque changement de `plugin/`, gardée par
   `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
-- **Évaluation** : `plugin/evals/` (31 questions réelles, 20 voisines ; 51 cas depuis T06b), contrôlée sans modèle en CI
+- **Évaluation** : `plugin/evals/` (33 questions réelles dont deux à profil vide, 20 voisines ; 53 cas depuis T06b ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
   (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
   (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
 

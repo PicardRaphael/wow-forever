@@ -111,6 +111,42 @@ Même commande, `--json plugin/evals/results/passage-T06b.json` ; coût 5,99 $.
   `current`, Ice Lance recommandé, écart significatif de 6,1 s par monstre (intervalle 3,7 à 8,5 s), comparaison
   Monte Carlo contre Monte Carlo ; juge `mesure-et-modelise` satisfait.
 
-À trancher par l'utilisateur, avant la fusion : garder la règle D6 et donner les données du joueur dans les
+Tranché par l'utilisateur le 2026-09-29 (option A, variante : profil de test rempli), voir le passage suivant. Options d'alors : garder la règle D6 et donner les données du joueur dans les
 questions des cas touchés (ou accepter une question de précision comme bonne réponse), ou assouplir la règle
 (calcul immédiat avec la valeur la plus probable, dite en tête de réponse).
+
+## Passage T06b avec profil de test (2026-09-29, 53 cas)
+
+Décision de l'utilisateur : garder la règle « Données du joueur » et faire tourner la suite avec un profil de test
+rempli, comme à l'usage une fois le profil créé ; deux cas à profil vide vérifient que la donnée manquante est demandée.
+`claude plugin eval` ne transmet au serveur MCP que les variables `EVAL_*` : `forever/profile.py` lit
+`FOREVER_PROFILE`, sinon `EVAL_FOREVER_PROFILE`. Profil de test : `tests/fixtures/plugin_eval/profile-rempli.json`
+(Mage Orc Horde, niveau 23, build Givre légal) ; cas `profil-vide-leveling-18` et `profil-vide-zone-18` (champ `env`
+vers un fichier absent, juge `demande-la-donnee`).
+
+```
+$env:EVAL_FOREVER_PROFILE = "$PWD	estsixtures\plugin_eval\profile-rempli.json"
+claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_forever_forever__*" --runs 1 --ablation none -j 4 --judge-model opus --max-cost-usd 15 --no-publish --keep-temp --threshold 0 --json plugin/evals/results/passage-T06b-profil.json
+```
+
+| Critère (seuil) | Passage avec profil |
+|---|---|
+| Aiguillage, 53 cas (≥ 90 %) | 53/53 |
+| Outil attendu appelé, 33 positifs (≥ 90 %) | 31/33 |
+| Aucun chiffre inventé, 33 positifs (100 %) | 32/33, puis 33/33 après correction du contrôle |
+| Certitude affichée, 33 positifs (100 %) | 33/33 |
+| Provenance affichée, 33 positifs (≥ 90 %) | 33/33 |
+| « Je ne sais pas » hors périmètre (3 sur 3) | 3/3 |
+| Coût | 7,81 $ (+ 0,47 $ de rejeu d'un cas) |
+
+- **Outil attendu, deux échecs légitimes** : `respec-feu-vers-givre` et `respec-troisieme` posent la question à un
+  autre niveau que celui du profil (32 et 36 contre 23) et sur un autre build ; le conseil de respec exige le build
+  actuel, que le modèle demande (règle « la question prime sur le profil »).
+- **Chiffre signalé** (`build-givre-ou-feu`, « 11 153 XP/h ») : fausse alerte du contrôle. Le rapport du sous-agent
+  `forever-sim-runner` écrit les XP/h avec une espace des milliers, que le contrôle lisait en deux nombres dans un
+  résultat d'outil (11 et 153). Corrigé dans `forever/hooks.py` (test
+  `tests/unit/test_review_t06b.py::test_hook_reads_thousands_in_tool_results`) ; contrôle rejoué sur la session du
+  cas : aucun chiffre sans source ; cas rejoué seul : cinq correcteurs sur cinq.
+- Les deux cas à profil vide et `talent-niveau-22` réussissent ; `talent-niveau-24` part désormais du build du profil
+  (`next_step`).
+

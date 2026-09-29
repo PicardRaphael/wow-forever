@@ -125,7 +125,7 @@ Demande de l'utilisateur du 2026-09-29, après l'évaluation du plugin (`docs/re
   seed ; révision 2 visible dans la provenance, `revisions.json` et le rapport de diff ; parité du seed verte sans
   valeur attendue changée ; totaux dans `forever_build`, `forever_explain_mechanic`, `forever_lookup`,
   `forever_sim_leveling` ; `forever profile` et `forever_player_profile` ; départage et `next_step` ; builds de T05
-  rejoués et documentés ; évaluation du plugin (51 cas) sans alerte du contrôle des chiffres ; `plugin.json`
+  rejoués et documentés ; évaluation du plugin (53 cas, profil de test rempli, deux cas à profil vide) sans alerte du contrôle des chiffres ; `plugin.json`
   versionné, `validate --strict` vert.
 - **Fait** : `forever install` (révision 2, décision 98), copies figées du seed pour le mode seed, provenance
   `data_revision` ; totaux (`points`, `derived`, `monte_carlo_stats`, `advantage`) ; profil joueur hors du dépôt
