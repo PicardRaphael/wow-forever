@@ -119,13 +119,13 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
   `data-updater` (T08) et `evaluator` (remplacé par `claude plugin eval`) : plus tard ou abandonnés.
 - **Hooks** (logique dans `forever/hooks.py`, sous-commandes `forever hook …`) : SessionStart → ligne de fraîcheur,
   cache seulement, **seulement dans le dépôt** ; Stop → chiffres de jeu de la réponse absents des résultats des outils
-  `forever_*` de la session, message `[forever:chiffres]` sans blocage, **seulement si la session a utilisé forever**.
+  `forever_*` de la session (et des lignes sourcées du rapport de `forever-web-researcher`, décision 120), message `[forever:chiffres]` sans blocage, **seulement si la session a utilisé forever**.
   Garde dans `hooks.json` : rien ne s'exécute sans `pyproject.toml` au chemin du dépôt (aucune erreur ailleurs).
 - **Pas de statusline** (décision 15), pas de commandes `/forever…` en T06 (le langage naturel suffit ; à reprendre si
   l'évaluation le justifie).
-- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b, 0.3.0 le 2026-09-29 : décisions 116 et 117), relevée à chaque changement de `plugin/`, gardée par
+- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b, 0.3.0 le 2026-09-29 : décisions 116 et 117 ; 0.4.0 : décisions 118 à 121), relevée à chaque changement de `plugin/`, gardée par
   `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
-- **Évaluation** : `plugin/evals/` (37 questions réelles dont deux à profil vide, deux générales et deux personnelles, 20 voisines ; 57 cas depuis le 2026-09-29 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
+- **Évaluation** : `plugin/evals/` (38 questions réelles dont deux à profil vide, deux générales, deux personnelles et un personnage prévu, 20 voisines ; 58 cas depuis le 2026-09-29 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
   (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
   (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
 
@@ -154,6 +154,7 @@ Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la
 
 ## Mémoire joueur
 Profil minimal (T06b, décision 99) : `forever/profile.py`, fichier `FOREVER_PROFILE` ou `~/.forever/profile.json`, **hors du dépôt** (écriture refusée sous le dépôt) : personnages (classe, race, faction, niveau, talents, métiers, version des données), un actif. Les outils de calcul ne le lisent jamais : l'agent le lit (`forever_player_profile`) et passe les valeurs ; chaque rapport rend `inputs` (origine `argument` ou `default`).
+Neuf classes et personnages prévus (`planned`, `--planned` / `--created`, décision 119) ; planification d'une respec à un autre niveau par `respec.projected` de `forever_build` (décision 118) ; `forever_build` sans niveau : niveau maximal des données (décision 121).
 Import automatique minimal au début de PV1 (décision 105) : ForeverLogger (classe, race, niveau, talents) et journaux (personnages « à moi »), lus sur disque, écritures listées avant accord ; faction toujours donnée par le joueur.
 Vault de T07, hors du dépôt lui aussi (données personnelles) : fiches datées `personnages/<nom>.json` (avec la version du jeu), `objectifs.md`, `decisions.md`, `legacy.json`, `historique/`.
 La mémoire de Claude ne garde que des pointeurs et des décisions, jamais de chiffres de jeu.

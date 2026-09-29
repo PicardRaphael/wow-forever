@@ -144,7 +144,9 @@ claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_
   actuel, que le modèle demande (règle « la question prime sur le profil »). Attentes corrigées le 2026-09-29
   (décision 117) : demander le build actuel est la bonne réponse, outil attendu `forever_player_profile` et juge
   `demande-le-build` ; quatre cas ajoutés (questions générales et personnelles, dont une classe pas encore calculée),
-  57 cas au total, à passer avec le modèle.
+  57 cas au total. Puis, même jour (décision 118) : ces deux cas deviennent des questions de planification (le
+  chemin est projeté depuis le build du profil, `respec.projected`, outil attendu `forever_build` avec `current`,
+  juge `planification`) ; cas `planification-personnage-prevu` ajouté (décision 119) : 58 cas.
 - **Chiffre signalé** (`build-givre-ou-feu`, « 11 153 XP/h ») : fausse alerte du contrôle. Le rapport du sous-agent
   `forever-sim-runner` écrit les XP/h avec une espace des milliers, que le contrôle lisait en deux nombres dans un
   résultat d'outil (11 et 153). Corrigé dans `forever/hooks.py` (test
