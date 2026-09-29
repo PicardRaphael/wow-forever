@@ -4,6 +4,14 @@ Calculés le 2026-09-29 par `uv run forever build <contexte> --level N --preset 
 
 ## Synthèse
 
+Correction du 2026-09-29 (T06b) : analytique du donjon 40 et 60 rendu tel que le calcule le code de fin de T05
+(164,28 et 364,67 ; le document donnait 161,96 et 359,53). Ce document a été écrit au commit `29c2e47` ; vingt minutes
+plus tard, le commit `7c96d77` (suites de la relecture de T05) a corrigé `context_analytic`
+(`forever/optimize/endgame.py`) : la durée d'un scénario y est la durée effective (dégâts ÷ dégâts par seconde, comme
+au Monte Carlo), et non plus la durée prévue du scénario, plus longue quand la mana s'épuise ou que les monstres meurent
+avant la fin. Seuls les deux donjons à fin de mana bougent ; builds, Monte Carlo, alternatives et verdicts sont
+inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits `c8977e1` et `7c96d77`).
+
 Écart de l'alternative : avantage du build (positif : le build fait mieux), intervalle à 95 %, dans l'unité de la métrique (leveling : secondes par monstre ; donjon et raid : dégâts par seconde ; PvP : points du profil).
 
 | Contexte | Niveau | Arcanes/Feu/Givre | Monte Carlo | Analytique | Avantage sur l'alternative | Retenu | Stabilité | Sensibilité | Calcul |
@@ -12,8 +20,8 @@ Calculés le 2026-09-29 par `uv run forever build <contexte> --level N --preset 
 | leveling | 40 | 0/0/31 | 51,72 | 49,89 | 0,66 [-0,93 ; 2,24] (égalité) | build (analytique) | stable (build) | tient | 159 s |
 | leveling | 60 | 0/0/51 | 43,66 | 47,01 | 0,67 [-1,03 ; 2,38] (égalité) | alternative (analytique) | stable (alternative) | tient | 283 s |
 | dungeon | 20 | 10/0/1 | 40,70 | 51,00 | 4,37 [3,76 ; 4,98] | build (monte_carlo) | stable (build) | mob_hp | 7 s |
-| dungeon | 40 | 31/0/0 | 144,93 | 161,96 | 1,27 [-1,76 ; 4,30] (égalité) | build (analytique) | stable (build) | regen_stacking | 28 s |
-| dungeon | 60 | 30/3/18 | 314,62 | 359,53 | 27,40 [18,79 ; 36,02] | build (monte_carlo) | stable (build) | tient | 75 s |
+| dungeon | 40 | 31/0/0 | 144,93 | 164,28 | 1,27 [-1,76 ; 4,30] (égalité) | build (analytique) | stable (build) | regen_stacking | 28 s |
+| dungeon | 60 | 30/3/18 | 314,62 | 364,67 | 27,40 [18,79 ; 36,02] | build (monte_carlo) | stable (build) | tient | 75 s |
 | raid | 20 | 11/0/0 | 6,18 | 6,36 | -0,12 [-0,30 ; 0,06] (égalité) | build (analytique) | instable (4/5 build) | tient | 5 s |
 | raid | 40 | 28/3/0 | 40,38 | 38,53 | 0,00 [0,00 ; 0,00] (égalité) | build (analytique) | stable (build) | tient | 25 s |
 | raid | 60 | 46/5/0 | 79,92 | 75,58 | 0,00 [0,00 ; 0,00] (égalité) | build (analytique) | stable (build) | tient | 62 s |
@@ -31,7 +39,7 @@ Calculés le 2026-09-29 par `uv run forever build <contexte> --level N --preset 
 - Plusieurs builds de fin de partie placent des points sur des talents sans effet dans nos modèles (Wand Specialization, Magic Absorption, Arcane Shielding, Improved Counterspell) : ce sont des égalités (écart nul avec l'alternative au raid 40 et 60), pas des recommandations ; les raisons du rapport le montrent (valeur marginale nulle) et l'angle mort C9 le signale.
 - Stabilité : un seul cas instable (raid niveau 20 : 4 graines sur 5 pour le build, écart dans le bruit). Sensibilité : deux bascules, au donjon 20 (PV des monstres du seed) et au donjon 40 (cumul de régénération au maximum) ; ailleurs, les sept hypothèses tiennent.
 - PvP : profil du seed (EST) sans duel ; les builds de niveau 40 sont Arcanes purs, ceux de 60 hybrides Givre-Arcanes. Les poids du monde ouvert sont supposés (question ouverte).
-- Écart analytique / Monte Carlo : faible en leveling (−4 à +8 %), faible en raid (−5 à +3 %), plus fort en donjon (+12 à +25 % à l'analytique : fin de mana et sorts de zone) ; la décision revient au Monte Carlo.
+- Écart analytique / Monte Carlo : faible en leveling (−4 à +8 %), faible en raid (−5 à +3 %), plus fort en donjon (+13 à +25 % à l'analytique : fin de mana et sorts de zone) ; la décision revient au Monte Carlo.
 
 ## Détail
 
@@ -74,7 +82,7 @@ Calculés le 2026-09-29 par `uv run forever build <contexte> --level N --preset 
 ### dungeon niveau 40
 - Talents (Arcanes/Feu/Givre 31/0/0) : wandSpecialization 2, arcaneFocus 5, improvedChanneling 1, arcaneConcentration 5, arcaneImpact 3, arcaneBlast 1, arcaneMeditation 3, missileBarrage 1, presenceOfMind 1, arcaneMind 5, arcaneInstability 3, arcanePower 1
 - Choix : dungeon_boss : arcane, mage, ab_stacks 1, ab_dump arcane_missiles ; dungeon_pack : aoe, mage, aoe_filler blizzard
-- Métrique (dégâts par seconde, dégâts/s) : Monte Carlo 144,93, analytique 161,96
+- Métrique (dégâts par seconde, dégâts/s) : Monte Carlo 144,93, analytique 164,28
 - Alternative la plus proche : wandSpecialization 2→0, arcaneFocus 5→0, improvedChanneling 1→0, arcaneConcentration 5→0, arcaneImpact 3→0, arcaneBlast 1→0, arcaneMeditation 3→0, missileBarrage 1→0, presenceOfMind 1→0, arcaneMind 5→0, arcaneInstability 3→0, arcanePower 1→0, improvedFrostbolt 0→3, elementalPrecision 0→4, iceShards 0→5, piercingIce 0→3, frostChanneling 0→3, iceLance 0→1, shatter 0→3, improvedConeOfCold 0→3, fingersOfFrost 0→2, wintersChill 0→4 ; avantage du build 1,27 [-1,76 ; 4,30] (égalité) ; retenu : build (analytique)
 - Stabilité : stable (build) sur les graines [12345, 12346, 12347, 12348, 12349] ; sensibilité : regen_stacking bascule
 - Angles morts : B10 ≤ 100,9 %, B18 ≤ 1,9 %, C7 non chiffré, C9 non chiffré, D1 non chiffré, H9 non chiffré, I8 non chiffré
@@ -83,7 +91,7 @@ Calculés le 2026-09-29 par `uv run forever build <contexte> --level N --preset 
 ### dungeon niveau 60
 - Talents (Arcanes/Feu/Givre 30/3/18) : arcaneFocus 5, improvedChanneling 4, arcaneConcentration 5, arcaneImpact 3, arcaneBlast 1, arcaneMeditation 3, missileBarrage 1, arcaneMind 5, arcaneInstability 3, incineration 3, frostWarding 2, elementalPrecision 5, iceShards 5, piercingIce 3, frostChanneling 3
 - Choix : dungeon_boss : arcane, mage, ab_stacks 1, ab_dump arcane_missiles ; dungeon_pack : aoe, mage, aoe_filler blizzard
-- Métrique (dégâts par seconde, dégâts/s) : Monte Carlo 314,62, analytique 359,53
+- Métrique (dégâts par seconde, dégâts/s) : Monte Carlo 314,62, analytique 364,67
 - Alternative la plus proche : improvedChanneling 4→5, arcaneSubtlety 0→2, magicAbsorption 0→2, arcaneResilience 0→2, arcaneGeometry 0→2, arcaneShielding 0→2, improvedCounterspell 0→2, presenceOfMind 0→1, frostWarding 2→0, elementalPrecision 5→4, iceShards 5→0, piercingIce 3→0, frostChanneling 3→0 ; avantage du build 27,40 [18,79 ; 36,02] ; retenu : build (monte_carlo)
 - Stabilité : stable (build) sur les graines [12345, 12346, 12347, 12348, 12349] ; sensibilité : les sept hypothèses tiennent
 - Angles morts : B10 ≤ 86,3 %, B18 ≤ 1,9 %, C7 non chiffré, C9 non chiffré, D1 non chiffré, H9 non chiffré, I8 non chiffré
@@ -175,9 +183,9 @@ Calculés le 2026-09-29 par `uv run forever build <contexte> --level N --preset 
 Rejoué le 2026-09-29 par `scripts/replay_builds.py` (mêmes réglages que ci-dessus : préréglage complet, graine 12345,
 race Orc), en trois passages, chacun rendu dans `<cache>/builds/<passage>/` :
 
-1. `r1` : données de la révision 1 (empreinte `bc8ce3e99480`) et règles de T05 ; mêmes talents, choix, alternatives
-   et verdicts que le tableau ci-dessus. Seul l'analytique du donjon diffère du document (40 : 164,28 au lieu de
-   161,96 ; 60 : 364,67 au lieu de 359,53) : changement antérieur à T06b, le Monte Carlo et le build restent les mêmes.
+1. `r1` : données de la révision 1 (empreinte `bc8ce3e99480`) et règles de T05 ; mêmes talents, choix, alternatives,
+   métriques et verdicts que le tableau ci-dessus (analytique du donjon corrigé, voir la note de la synthèse : écart
+   du document venu du commit `7c96d77`, pas de T06b).
    Durée totale : environ 15 min (leveling 60 : 356 s).
 2. `r2-donnees` : révision 2 installée (`forever install`, `revisions.json`), règles de T05. **Aucune recommandation
    changée.** Seules bougent des mesures : leveling 20, Monte Carlo 34,74 → 34,90 s et analytique 35,37 → 35,48 s
