@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "H=\"${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}\"; [ -f \"$H/pyproject.toml\" ] && uv run --no-sync --quiet --project \"$H\" forever hook session-start; exit 0",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "H=\"${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}\"; [ -f \"$H/pyproject.toml\" ] && uv run --no-sync --quiet --project \"$H\" forever hook check-numbers; exit 0",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

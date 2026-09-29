@@ -5,14 +5,17 @@ règles de `leveling.json.combat_rules`), avec leur certitude."""
 
 from __future__ import annotations
 
+import re
+import unicodedata
+from collections.abc import Sequence
 from typing import Any, TypedDict, cast, get_args
 
 from forever.config import Deps
-from forever.errors import DataSchemaError
+from forever.errors import DataSchemaError, UnknownMechanicError
 from forever.freshness import freshness_for_version
 from forever.gamedata import COMBAT_RULE_MECHANICS, LEVELING_FILE, MECHANICS_FILE
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
-from forever.registry import ENGINE_DIR, RegistryError, find_entry, implementations, load
+from forever.registry import ENGINE_DIR, Mechanic, RegistryError, find_entry, implementations, load
 from forever.store import VersionData, load_version
 
 ABSENT_NOTE = "mécanique non modélisée dans forever-core : aucun calcul ne s'appuie encore sur elle"
@@ -85,8 +88,32 @@ def _parameters(version: VersionData, mechanic_id: str) -> list[MechanicParamete
     return params
 
 
+_ID = re.compile(r"^\s*[A-Za-z]{1,2}\d{1,3}\s*$")
+MAX_MATCHES = 10
+
+
+def _fold(text: str) -> str:
+    """Minuscules sans accents, pour comparer des mots."""
+    return "".join(c for c in unicodedata.normalize("NFKD", text.lower()) if not unicodedata.combining(c))
+
+
+def _resolve(mechanics: Sequence[Mechanic], query: str) -> Mechanic:
+    """Entrée par identifiant (« A18 ») ou par les mots de sa description (« Ignite ») ; plusieurs entrées : erreur
+    avec la liste « identifiant : description »."""
+    if _ID.match(query):
+        return find_entry(mechanics, query)
+    words = [w for w in re.findall(r"\w+", _fold(query)) if len(w) >= 3]
+    matches = [m for m in mechanics if words and all(w in _fold(m.description) for w in words)]
+    if len(matches) == 1:
+        return matches[0]
+    if not matches:
+        raise UnknownMechanicError(query, [])
+    raise UnknownMechanicError(query, [f"{m.id} : {m.description}" for m in matches[:MAX_MATCHES]])
+
+
 def explain_mechanic(deps: Deps, mechanic_id: str) -> MechanicExplanation:
-    """Explication d'une mécanique du registre ; lève UnknownMechanicError, DataSchemaError ou DataIntegrityError."""
+    """Explication d'une mécanique du registre, par identifiant ou par mots de la description ; lève
+    UnknownMechanicError, DataSchemaError ou DataIntegrityError."""
     version = load_version(deps)  # intégrité d'abord, comme les autres consultations
     try:
         mechanics = load(deps.registry_path)
@@ -94,7 +121,7 @@ def explain_mechanic(deps: Deps, mechanic_id: str) -> MechanicExplanation:
         raise DataSchemaError(
             f"Registre des mécaniques inutilisable ({exc}).", "restaurer docs/MECHANICS_REGISTRY.yaml depuis git"
         ) from exc
-    entry = find_entry(mechanics, mechanic_id)
+    entry = _resolve(mechanics, mechanic_id)
     params = _parameters(version, entry.id)
     certainty = _certainty(entry.certainty)
     fresh = freshness_for_version(deps, version.game_version, allow_network=False)

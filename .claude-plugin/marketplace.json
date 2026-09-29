@@ -1,0 +1,12 @@
+{
+  "name": "wow-forever",
+  "description": "Marketplace locale du dépôt wow-forever : plugin forever (système expert World of Warcraft: Forever).",
+  "owner": { "name": "Raphael PICARD" },
+  "plugins": [
+    {
+      "name": "forever",
+      "source": "./plugin",
+      "description": "Questions sur WoW Forever en langage naturel, réponses sourcées par les outils forever."
+    }
+  ]
+}
