@@ -577,6 +577,11 @@ def build_report(
     assumptions = _assumptions(gd, context, level, p, preset, seed, sp, crit, talented_bonus, build, options)
     if inputs["race"]["origin"] == "default":
         assumptions.insert(0, DEFAULT_RACE_NOTE)
+    if context == "leveling" and current is not None and next_step is None:
+        assumptions.append(
+            f"prochain talent (next_step) non calculé : il faut un build actuel légal au niveau {level - 1}, un point "
+            f"à placer au niveau {level}, le mode forever et le Monte Carlo"
+        )
     sources: dict[str, str] = {
         "talents et sorts (client)": "certain",
         "constantes du simulateur (leveling.*)": constants_certainty(data),

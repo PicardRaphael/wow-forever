@@ -1225,7 +1225,7 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
             f"Le graphique ne s'écrit jamais dans {deps.data_dir}.", "choisir un fichier --out hors des données"
         )
     data = load_version(deps)
-    gd = build_game_data(data)
+    gd = build_game_data(data, rules=args.rules)
     cap = level_cap(data)
     check_level(args.level_from, cap)
     check_level(args.level_to, cap)

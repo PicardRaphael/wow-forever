@@ -247,8 +247,11 @@ def _opens_tier(
     rivals: Sequence[str] = (),
 ) -> bool:
     """Point de passage vers un palier : le point porte son arbre au seuil d'un palier que l'anticipation ouvre sur un
-    talent modélisé de ce palier (T06b, décision D7)."""
+    talent modélisé de ce palier, et aucun talent modélisé à égalité (`rivals`) du même arbre n'ouvre ce palier à sa
+    place (T06b, décision D7)."""
     tree = gd.talents[key].tree
+    if any(gd.talents[r].tree == tree for r in rivals):
+        return False
     before = sum(r for k, r in pts.items() if gd.talents[k].tree == tree)
     after = before + 1
     opened = {t for t in {x.tier for x in gd.talents.values()} if before < tier_points_required(gd, t) <= after}
@@ -256,7 +259,16 @@ def _opens_tier(
 
 
 def _shortlist(pre: Sequence[Any], shortlist: int, modeled: frozenset[str] | None) -> list[Any]:
-    raise NotImplementedError("T06b : présélection à égalité")
+    """Présélection du faisceau : les `shortlist` meilleurs scores ; à score égal, un talent modélisé passe devant un
+    non modélisé (mode forever, `modeled` donné) ; sinon l'ordre des données (seed).
+
+    Registre : I5"""
+
+    def key(entry: Any) -> tuple[float, int]:
+        unmodeled = modeled is not None and entry[1] is not None and entry[1] not in modeled
+        return entry[0], int(unmodeled)
+
+    return sorted(pre, key=key)[:shortlist]
 
 
 def _state_meta(
@@ -298,6 +310,7 @@ def _state_meta(
     d = tie_break([(e.talent or "", st) for e, st in zip(evals, stats, strict=True)], modeled, conf)
     rows = d["rows"]
     tied_modeled = any(r["modeled"] and not r["significant"] for r in rows)
+    rivals = [r["talent"] for r in rows if r["modeled"] and not r["significant"] and r["talent"]]
     chosen = next(i for i, e in enumerate(evals) if (e.talent or "") == d["choice"])
     out = []
     for i, (e, row) in enumerate(zip(evals, rows, strict=True)):
@@ -319,7 +332,7 @@ def _state_meta(
             e.talent is not None
             and not row["modeled"]
             and modeled is not None
-            and _opens_tier(gd, pts, e.talent, e.picks, modeled)
+            and _opens_tier(gd, pts, e.talent, e.picks, modeled, rivals)
         )
         if tied and not row["modeled"] and tied_modeled and not passage:
             out.append(None)
@@ -440,9 +453,8 @@ def _beam_search(
                     else (t_now, ())
                 )
                 pre.append((NOW_WEIGHT * t_now + LOOK_WEIGHT * look, k, p2, picks))
-            pre.sort(key=lambda x: x[0])
             evals = []
-            for look, k, p2, picks in pre[:shortlist]:
+            for look, k, p2, picks in _shortlist(pre, shortlist, modeled if rules != "seed" else None):
                 t_now, choice, st = _decide_step(gd, level, p2, race, over, rules, mc_n if last else 0, seed, options)
                 evals.append(_Eval(look, k, p2, picks, t_now, choice, st))
             metas: list[dict[str, Any] | None] = (

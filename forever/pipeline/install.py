@@ -231,6 +231,18 @@ class _Merge:
         return doc
 
 
+def display_path(deps: Deps, path: str) -> str:
+    """Chemin d'une candidate tel qu'il s'écrit dans la trace versionnée : `<cache>/…` sous le cache, `~/…` sous le
+    dossier personnel, jamais un chemin personnel absolu (décision 99)."""
+    p = Path(path).resolve()
+    for root, label in ((deps.cache_dir, "<cache>"), (Path.home(), "~")):
+        try:
+            return f"{label}/{p.relative_to(Path(root).resolve()).as_posix()}"
+        except ValueError:
+            continue
+    return Path(path).as_posix()
+
+
 def _merge(deps: Deps, candidate: str) -> tuple[InstallPlan, dict[str, Any]]:
     identity = current_identity(deps.data_dir)
     src, cv = load_source(deps, candidate)
@@ -259,11 +271,13 @@ def _merge(deps: Deps, candidate: str) -> tuple[InstallPlan, dict[str, Any]]:
         data_sha=rv.data_sha,
         freshness=local_provenance(deps)["freshness"],
         certainty="certain",
-        assumptions=[f"candidate {candidate} (données {cv.data_sha}) sur la version {rv.game_version} r{rev}"],
+        assumptions=[
+            f"candidate {display_path(deps, candidate)} (données {cv.data_sha}) sur la version {rv.game_version} r{rev}"
+        ],
     )
     plan: InstallPlan = {
         "version": rv.game_version,
-        "candidate": candidate,
+        "candidate": display_path(deps, candidate),
         "candidate_sha": cv.data_sha,
         "revision_from": rev,
         "revision_to": rev + 1,
@@ -393,8 +407,8 @@ def apply_install(
         "revision": n,
         "date": day,
         "motif": motif,
-        "command": f"forever install {candidate} --yes",
-        "candidate": {"path": candidate, "data_sha": plan["candidate_sha"]},
+        "command": f"forever install {plan['candidate']} --yes",
+        "candidate": {"path": plan["candidate"], "data_sha": plan["candidate_sha"]},
         "report": report,
         "counts": {k: v for k, v in plan["counts"].items() if k != "refused"},
         "changes": plan["changes"],

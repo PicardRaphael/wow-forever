@@ -112,15 +112,15 @@ def _check_mage(deps: Deps, c: Mapping[str, Any]) -> None:
         hint = f"proches : {', '.join(close)}" if close else f"choisir parmi {', '.join(races)}"
         raise InvalidArgumentError(f"Race inconnue « {race} » pour un Mage.", f"{hint} (racials.json)")
     gd = build_game_data(data)
+    unknown = [k for k in c.get("talents") or {} if k not in gd.talents]
+    if unknown:
+        raise InvalidArgumentError(
+            f"Talent(s) inconnu(s) : {', '.join(unknown)}.",
+            "donner les clés de talents.json (ex. improvedFrostbolt)",
+        )
     level = c.get("level")
     if level is not None:
         errors = check_build(gd, c.get("talents") or {}, level)
-        unknown = [k for k in c.get("talents") or {} if k not in gd.talents]
-        if unknown:
-            raise InvalidArgumentError(
-                f"Talent(s) inconnu(s) : {', '.join(unknown)}.",
-                "donner les clés de talents.json (ex. improvedFrostbolt)",
-            )
         if errors:
             raise InvalidArgumentError(
                 f"Talents illégaux au niveau {level} : {' ; '.join(errors)}.", "corriger les rangs ou le niveau"

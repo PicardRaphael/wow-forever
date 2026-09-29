@@ -12,7 +12,7 @@ from typing import Any, TypedDict, cast, get_args
 
 from forever.config import Deps
 from forever.engine.derived import StackTable, stack_tables
-from forever.errors import DataSchemaError, UnknownMechanicError
+from forever.errors import DataSchemaError, InvalidArgumentError, UnknownMechanicError
 from forever.freshness import freshness_for_version
 from forever.gamedata import COMBAT_RULE_MECHANICS, LEVELING_FILE, MECHANICS_FILE, build_game_data
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
@@ -138,6 +138,10 @@ def explain_mechanic(deps: Deps, mechanic_id: str, level: int | None = None) -> 
     derived: list[StackTable] = []
     if entry.id in DERIVED:
         gd = build_game_data(version)
+        if level is not None and not 1 <= level <= gd.level_cap:
+            raise InvalidArgumentError(
+                f"Niveau {level} hors de 1-{gd.level_cap}.", f"donner un niveau de 1 à {gd.level_cap}"
+            )
         derived = [
             t
             for talent, effects in DERIVED[entry.id]

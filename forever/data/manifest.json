@@ -4,8 +4,8 @@
   "versions": {
     "1.60.1.70009": {
       "collected_at": "2026-09-26",
-      "data_sha": "95eecfbf99e7",
-      "data_sha256": "95eecfbf99e7d9f099314672e76da47ebf462fb17e89d884fb1cbcb74884acca",
+      "data_sha": "5ec8369f724b",
+      "data_sha256": "5ec8369f724b4eb65b83faf49159351fb840fb2d83146d0afd0802cc4718415b",
       "files": {
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
         "_seed_talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb",
@@ -19,7 +19,7 @@
         "overrides.json": "e251b04e9fe407a72380f99f4eaea5d141d4361f6167650e8ca09c26451ec9b9",
         "racials.json": "e4cba8c29d0800913a8bc48c6e3db569f64d71d65ea06abbbefffe2f173f7bdf",
         "respec.json": "d0728942f79f45fa2eeafe52ddc75b74608cde77f5a2dcc8d65e1d80e2ed1358",
-        "revisions.json": "91e71f4c0bd7cb487a528db9bd938e2234202b26c33cd3c2d7b1fe50210c73c4",
+        "revisions.json": "90b97134c5622972e5cd7536058451f764979c7c35c4b8c6bd990198a2b886f4",
         "sources.json": "2cbdba7faba6bf292a0859fe09215a30d24a12e7f6b4f15dc7493d4214ac1676",
         "spell_scaling.json": "b904c66bdc250cf53a3fe862d1bd35b5ef8d777b3fa4120862ec565dd4a14a7d",
         "spells.json": "aaa34d723d35fac686bf936e77cc6194cdb7a0146b72ceb81f82607849573039",

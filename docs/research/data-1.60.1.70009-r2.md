@@ -1,6 +1,6 @@
 # data: 1.60.1.70009 r1 → r2
 
-Candidate : `C:/Users/rapha/.cache/forever/candidates/1.60.1.70009` (données 2b344940521e).
+Candidate : `<cache>/candidates/1.60.1.70009` (données 2b344940521e).
 
 | Règle | Changements |
 | --- | --- |
@@ -49,4 +49,4 @@ wandSpecialization, arcaneFocus, improvedChanneling, arcaneSubtlety, magicAbsorp
 - talents.json : source (54)
 - talents.json : tooltip_values (54)
 
-Provenance · version 1.60.1.70009 r1 · données 3a15c9a67ba0 · générée 2026-09-29T15:35:46Z · fraîcheur fresh · certitude certain · registre 37/108 · hypothèses : candidate C:/Users/rapha/.cache/forever/candidates/1.60.1.70009 (données 2b344940521e) sur la version 1.60.1.70009 r1
+Provenance · version 1.60.1.70009 r1 · données 3a15c9a67ba0 · générée 2026-09-29T15:35:46Z · fraîcheur fresh · certitude certain · registre 37/108 · hypothèses : candidate <cache>/candidates/1.60.1.70009 (données 2b344940521e) sur la version 1.60.1.70009 r1

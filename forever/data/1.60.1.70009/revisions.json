@@ -11,9 +11,9 @@
    "revision": 2,
    "date": "2026-09-29",
    "motif": "T06b : valeurs décodées du client 1.60.1.70009 (talents, sorts, coûts en mana), accord du plan T06b (D3)",
-   "command": "forever install C:/Users/rapha/.cache/forever/candidates/1.60.1.70009 --yes",
+   "command": "forever install <cache>/candidates/1.60.1.70009 --yes",
    "candidate": {
-    "path": "C:/Users/rapha/.cache/forever/candidates/1.60.1.70009",
+    "path": "<cache>/candidates/1.60.1.70009",
     "data_sha": "2b344940521e"
    },
    "report": "docs/research/data-1.60.1.70009-r2.md",
