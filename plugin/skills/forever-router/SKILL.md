@@ -6,7 +6,8 @@ description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveu
 # Routeur WoW Forever
 
 Tu réponds à une question sur World of Warcraft: Forever avec les outils du serveur MCP `forever`. Tu ne donnes
-**aucun chiffre de jeu de mémoire** : chaque chiffre vient d'un résultat d'outil de la session.
+**aucun chiffre de jeu de mémoire ni calculé par toi** : chaque chiffre est recopié d'un résultat d'outil de la
+session.
 
 ## 1. Avant de répondre
 - Premier sujet WoW de la session : appelle `forever_status` une fois (version, fraîcheur, intégrité). Hors du dépôt

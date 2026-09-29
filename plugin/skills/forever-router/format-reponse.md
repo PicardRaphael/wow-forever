@@ -7,7 +7,10 @@ sensibilité) seulement si l'utilisateur le demande (« détaille », « pourquo
 1. **Réponse directe** : une ou deux phrases qui répondent à la question.
 2. **Chiffres** : chacun tiré d'un résultat d'outil de la session, avec l'unité du champ (`_s` : secondes ;
    `range_yd` : portée du jeu, que le client français écrit « m ») et l'outil entre parenthèses. Arrondis permis,
-   jamais d'estimation.
+   jamais d'estimation. **Aucun calcul** : ni somme (points dépensés par arbre), ni produit (effet au maximum des
+   cumuls), ni formule du registre appliquée à la main, ni moyenne de deux valeurs. Cite chaque valeur telle que
+   l'outil la rend (un écart négatif se dit en mots : « de moins »). Si la question demande une valeur que l'outil ne
+   rend pas, dis-le et donne la formule et ses paramètres tels quels.
 3. **Certitude** : `provenance.certainty` traduite (certain, probable, supposé) ; pour un build, le champ `certainty`
    du rapport et `verifiable_in_game` (au-delà du plafond de la bêta, il n'est pas vérifiable avant la sortie).
 4. **Hypothèses** : les plus importantes de `provenance.assumptions` (une ligne ; toutes sur demande).

@@ -19,7 +19,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from forever.hooks import read_transcript, session_used_forever, unsourced_numbers
+from forever.hooks import NUMBERS_MARKER, read_transcript, session_used_forever, unsourced_numbers
 
 # Seuils de réussite de la tranche (paramètres de l'évaluation, décision D10 et précisions de l'utilisateur).
 THRESHOLDS: dict[str, float] = {
@@ -97,6 +97,16 @@ def metrics(result: dict[str, Any], cases: dict[str, dict[str, str]]) -> dict[st
     }
 
 
+_HOOK = re.compile(r"Stop says: " + re.escape(NUMBERS_MARKER) + r"[^:]*:(.*)")
+
+
+def _hook_numbers(line: dict[str, Any]) -> list[str]:
+    """Chiffres cités par le message du hook Stop dans une ligne de trace (« Stop says: [forever:chiffres] … »)."""
+    content = line.get("content")
+    m = _HOOK.match(content) if line.get("type") == "system" and isinstance(content, str) else None
+    return re.findall(r"« (.+?) »", m.group(1)) if m else []
+
+
 def flagged_numbers(result: dict[str, Any], base: Path) -> list[dict[str, Any]]:
     """Chiffres de jeu sans source relevés dans les traces gardées (même règle que le hook Stop) ; chemins relatifs
     résolus depuis `base`."""
@@ -106,9 +116,11 @@ def flagged_numbers(result: dict[str, Any], base: Path) -> list[dict[str, Any]]:
         if not trace:
             continue
         lines = read_transcript(base / trace)
-        if not lines or not session_used_forever(lines):
-            continue
-        found = unsourced_numbers(lines)
+        # Le hook Stop a vu le transcript de la session (résultats complets, sous-agents à part) : son message fait foi ;
+        # sans message dans la trace, même règle recalculée sur la trace.
+        found = [n for line in lines for n in _hook_numbers(line)]
+        if not found and lines and session_used_forever(lines):
+            found = unsourced_numbers(lines)
         if found:
             out.append({"case": name, "numbers": found})
     return out

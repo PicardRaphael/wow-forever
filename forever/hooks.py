@@ -182,13 +182,13 @@ def _matches(x: float, decimals: int, unit: str, v: float) -> bool:
         digits = str(int(x))
         zeros = len(digits) - len(digits.rstrip("0")) if x >= 10 else 0
         tol = min(0.5 * 10**zeros, _ROUNDING_REL * x) if zeros else 0.5
-    candidates = [v]
+    candidates = [abs(v)]  # un écart négatif de l'outil se cite en valeur absolue, le signe dit en mots
     if unit == "%":
-        candidates.append(v * 100)
+        candidates.append(abs(v) * 100)
     elif unit.startswith("min"):
-        candidates.append(v / 60)
+        candidates.append(abs(v) / 60)
     elif unit in ("h", "heure", "heures"):
-        candidates.append(v / 3600)
+        candidates.append(abs(v) / 3600)
     return any(abs(x - c) <= tol + _EPS for c in candidates)
 
 
