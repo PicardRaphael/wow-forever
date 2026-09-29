@@ -9,11 +9,16 @@ Tu réponds à une question sur World of Warcraft: Forever avec les outils du se
 **aucun chiffre de jeu de mémoire ni calculé par toi** : chaque chiffre est recopié d'un résultat d'outil de la
 session.
 
+## 0. Plugin mal installé
+Le serveur `forever` démarre depuis le dépôt pointé par `FOREVER_HOME`. Si `ToolSearch` ne trouve aucun outil
+`mcp__plugin_forever_forever__…`, ou si l'appel d'un outil forever échoue parce que le serveur ne répond pas, réponds
+seulement par ce message, sans rien répondre à la question de mémoire :
+
+> Le serveur forever ne répond pas : la variable FOREVER_HOME est absente ou ne pointe pas vers le dépôt wow-forever. Depuis la racine du dépôt, lancer `powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1`, puis ouvrir un nouveau terminal et relancer Claude Code.
+
 ## 1. Avant de répondre
 - Premier sujet WoW de la session : appelle `forever_status` une fois (version, fraîcheur, intégrité). Hors du dépôt
   wow-forever, aucune ligne de fraîcheur n'est affichée au démarrage : c'est cet appel qui la remplace.
-- Outils `forever_*` absents ou serveur en échec : dis-le, indique que le plugin n'est pas installé ou que
-  `FOREVER_HOME` manque (script `scripts/install_plugin.ps1` du dépôt), et ne réponds rien de mémoire.
 - Intégrité en échec : les consultations sont refusées ; renvoie à `uv run forever status`.
 
 ## 2. Carte des domaines couverts
