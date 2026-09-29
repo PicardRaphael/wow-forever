@@ -169,3 +169,47 @@ Calculés le 2026-09-29 par `uv run forever build <contexte> --level N --preset 
 - Stabilité : stable (build) sur les graines [12345, 12346, 12347, 12348, 12349] ; sensibilité : les sept hypothèses tiennent
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
+
+## Rejeu T06b (révision 2)
+
+Rejoué le 2026-09-29 par `scripts/replay_builds.py` (mêmes réglages que ci-dessus : préréglage complet, graine 12345,
+race Orc), en trois passages, chacun rendu dans `<cache>/builds/<passage>/` :
+
+1. `r1` : données de la révision 1 (empreinte `bc8ce3e99480`) et règles de T05 ; mêmes talents, choix, alternatives
+   et verdicts que le tableau ci-dessus. Seul l'analytique du donjon diffère du document (40 : 164,28 au lieu de
+   161,96 ; 60 : 364,67 au lieu de 359,53) : changement antérieur à T06b, le Monte Carlo et le build restent les mêmes.
+   Durée totale : environ 15 min (leveling 60 : 356 s).
+2. `r2-donnees` : révision 2 installée (`forever install`, `revisions.json`), règles de T05. **Aucune recommandation
+   changée.** Seules bougent des mesures : leveling 20, Monte Carlo 34,74 → 34,90 s et analytique 35,37 → 35,48 s
+   (coût d'Ice Lance rang 1 lu dans le client, 45, au lieu de l'estimation 41,25 : ligne `ice_lance.ranks[1].mana`
+   de `revisions.json`) ; PvP champ de bataille 20, avantage 11,04 → 10,84 (Ice Lance rang 1 : 28-33 au lieu de 26-30,
+   `ice_lance.ranks[1].min`/`max`).
+3. `r2-departage` : révision 2 et départage de T06b (décision 100). **Seul l'ordre du leveling 60 change** ; le build
+   final, l'alternative et les verdicts restent les mêmes. Entre les niveaux 42 et 60, les points sans effet modélisé
+   (Frost Warding, Ice Block, Improved Blizzard : angle mort C9) sont repoussés après les talents modélisés à égalité
+   (`decided_by` : `modelise` aux niveaux 44 à 48, 52, 54, 55), puis pris quand il ne reste que des égalités
+   (`non_departage`). Limite : Improved Cone of Cold compte comme modélisé alors qu'il n'agit pas en leveling
+   (question ouverte I5, contexte du départage).
+
+Décisions des étapes de l'ordre (`r2-departage`) : leveling 20 : 5 non départagées, 4 au Monte Carlo, 2 gardées par
+l'anticipation ; 40 : 19, 6, 6 ; 60 : 28 non départagées, 10 départagées en faveur d'un talent modélisé, 7 au Monte
+Carlo, 6 par l'anticipation. La plupart des étapes du leveling ne sont donc **pas départagées par le calcul** à
+n = 200 : l'ordre y reste une proposition parmi des choix équivalents.
+
+| Contexte | Niveau | Arcanes/Feu/Givre | Monte Carlo | Analytique | Avantage sur l'alternative | Retenu | Stabilité | Sensibilité | Calcul |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| leveling | 20 | 0/0/11 | 34,90 | 35,48 | 0,45 [-0,82 ; 1,71] (égalité) | build (analytique) | stable (build) | tient | 42 s |
+| leveling | 40 | 0/0/31 | 51,72 | 49,89 | 0,66 [-0,93 ; 2,24] (égalité) | build (analytique) | stable (build) | tient | 190 s |
+| leveling | 60 | 0/0/51 | 43,66 | 47,01 | 0,67 [-1,03 ; 2,38] (égalité) | alternative (analytique) | stable (alternative) | tient | 349 s |
+| dungeon | 20 | 10/0/1 | 40,70 | 51,00 | 4,37 [3,76 ; 4,98] | build (monte_carlo) | stable (build) | mob_hp | 7 s |
+| dungeon | 40 | 31/0/0 | 144,93 | 164,28 | 1,27 [-1,76 ; 4,30] (égalité) | build (analytique) | stable (build) | regen_stacking | 34 s |
+| dungeon | 60 | 30/3/18 | 314,62 | 364,67 | 27,40 [18,79 ; 36,02] | build (monte_carlo) | stable (build) | tient | 87 s |
+| raid | 20 | 11/0/0 | 6,18 | 6,36 | -0,12 [-0,30 ; 0,06] (égalité) | build (analytique) | instable (4/5 build) | tient | 5 s |
+| raid | 40 | 28/3/0 | 40,38 | 38,53 | 0,00 [0,00 ; 0,00] (égalité) | build (analytique) | stable (build) | tient | 28 s |
+| raid | 60 | 46/5/0 | 79,92 | 75,58 | 0,00 [0,00 ; 0,00] (égalité) | build (analytique) | stable (build) | tient | 69 s |
+| pvp-bg | 20 | 0/0/11 | — | 50,17 | 10,84 [10,84 ; 10,84] | build (profil) | stable (build) | tient | 2 s |
+| pvp-bg | 40 | 31/0/0 | — | 69,32 | 0,35 [0,35 ; 0,35] | build (profil) | stable (build) | tient | 17 s |
+| pvp-bg | 60 | 15/3/33 | — | 118,14 | 2,05 [2,05 ; 2,05] | build (profil) | stable (build) | tient | 33 s |
+| pvp-world | 20 | 0/0/11 | — | 41,14 | 8,07 [8,07 ; 8,07] | build (profil) | stable (build) | tient | 3 s |
+| pvp-world | 40 | 31/0/0 | — | 65,88 | 6,04 [6,04 ; 6,04] | build (profil) | stable (build) | tient | 18 s |
+| pvp-world | 60 | 29/3/19 | — | 121,02 | 1,30 [1,30 ; 1,30] | build (profil) | stable (build) | tient | 33 s |

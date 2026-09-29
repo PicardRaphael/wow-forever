@@ -81,3 +81,36 @@ donc 0 fausse alerte (0 %)**.
   sur Ignite a donné une réponse détaillée sans demande de détail.
 - Traces des passages supprimées après lecture (dossiers temporaires de l'évaluation) ; résultats JSON dans
   `plugin/evals/results/` (non versionné).
+
+## Passage T06b (2026-09-29, plugin 0.2.0, 51 cas)
+
+Même commande, `--json plugin/evals/results/passage-T06b.json` ; coût 5,99 $.
+
+| Critère (seuil) | Passage T06b |
+|---|---|
+| Aiguillage, 51 cas (≥ 90 %) | 51/51 |
+| Outil attendu appelé, 31 positifs (≥ 90 %) | **16/31** |
+| Aucun chiffre inventé, 31 positifs (100 %) | **30/31** |
+| Certitude affichée, 31 positifs (100 %) | **29/31** |
+| Provenance affichée, 31 positifs (≥ 90 %) | 29/31 |
+| « Je ne sais pas » hors périmètre (3 sur 3) | **2/3** |
+
+- **Outil attendu : 15 échecs, tous par la règle « Données du joueur » (D6)**. Le profil est vide et la question ne
+  donne ni la race, ni la faction, ni le build actuel. Le modèle appelle alors `forever_player_profile`, puis demande
+  la donnée manquante avant tout calcul, avec la commande `forever profile set` (six tours, aucun outil de calcul).
+  C'est le comportement demandé par la règle, mais les cas de T06 attendent un calcul dès le premier tour. Cas
+  touchés : `build-donjon-50`, `build-givre-ou-feu`, `build-leveling-30`, `build-ordre-20`, `build-raid-60`,
+  `leveling-repos-26`, `leveling-temps-18`, `leveling-xp-35`, les quatre `respec-*`, `talent-niveau-24`,
+  `zone-donjon-18` et `zone-niveau-45`.
+- **Chiffre signalé** (`talent-niveau-24`, « 14 points ») : le modèle compte lui-même les points du niveau précédent
+  en demandant le build actuel. C'est une vraie alerte : un calcul, alors que l'outil rend ce total (`points.available`).
+- **Certitude et provenance absentes** (`respec-troisieme`, `zone-donjon-18`) : réponses réduites à une question
+  de précision, sans pied de réponse.
+- **« Je ne sais pas »** : `hors-hotel-des-ventes` est refusé par le juge `sans-estimation` (déjà vu au passage 3).
+- **Nouveau cas `talent-niveau-22`** (toutes les données dans la question) : réussi. `next_step` appelé avec
+  `current`, Ice Lance recommandé, écart significatif de 6,1 s par monstre (intervalle 3,7 à 8,5 s), comparaison
+  Monte Carlo contre Monte Carlo ; juge `mesure-et-modelise` satisfait.
+
+À trancher par l'utilisateur, avant la fusion : garder la règle D6 et donner les données du joueur dans les
+questions des cas touchés (ou accepter une question de précision comme bonne réponse), ou assouplir la règle
+(calcul immédiat avec la valeur la plus probable, dite en tête de réponse).
