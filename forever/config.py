@@ -68,7 +68,10 @@ def default_cache_dir(environ: Mapping[str, str] = os.environ) -> Path:
     return Path(configured) if configured else Path.home() / ".cache" / "forever"
 
 
-def default_wow_dir(environ: Mapping[str, str] = os.environ) -> Path:
+WOW_DIR_CANDIDATES: tuple[Path, ...] = ()
+
+
+def default_wow_dir(environ: Mapping[str, str] = os.environ, exists: Callable[[Path], bool] = Path.is_dir) -> Path:
     """FOREVER_WOW_DIR, sinon le dossier de la bêta Forever sous Windows."""
     configured = environ.get("FOREVER_WOW_DIR")
     return Path(configured) if configured else DEFAULT_WOW_DIR
