@@ -71,6 +71,11 @@ LABELS = {
     "pvp-world": "PvP monde ouvert",
 }
 ENDGAME = ("dungeon", "raid")
+# Tant que la tranche T05b n'est pas faite : limite affichée sur chaque sortie de donjon et de raid.
+MANA_NOTE = (
+    "mana des combats longs non modélisée (Évocation, potions et gemmes de mana ; tranche T05b à venir) : "
+    "classement de donjon et de raid fragile, angle mort B10"
+)
 Choices = dict[str, BuildChoice]
 
 
@@ -578,6 +583,7 @@ def _assumptions(
                 f"scénario provisoire {s} (build.scenarios, suppose ; DJ1 et T09 à venir) : {sc.targets} cible(s), "
                 f"niveau + {sc.level_offset}, {sc.duration_s:g} s au plus, tank présent, sans Évocation ni potion"
             )
+        out.append(MANA_NOTE)
     if context in PVP_CONTEXTS:
         out.append("profil PvP du seed (EST) : modèle de scénarios, sans simulation de duel (pvp.profile, pvp.weights)")
     out += damage_assumptions(options, gd.constants.coefficients.low_level_default)

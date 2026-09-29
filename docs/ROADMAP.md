@@ -22,6 +22,7 @@ Tranches lettrées par domaine (sans renuméroter les tranches T existantes) : P
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
 | PV1 | PvP, savoir des 9 classes sans moteur de classe : sorts, recharges, contrôles et durées, défensifs, raciaux, bijoux, rendements décroissants (règles Classic), fiches par affrontement | T03, T05 |
 | PV2 | PvP, champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux de champs de bataille | PV1, T04a |
+| T05b | Mana des combats longs : Évocation, potions et gemmes de mana, régénération en combat, dans les scénarios de donjon et de raid et le conseil de build | T05 |
 | DJ1 | Donjons : niveaux, boss, butin | T03, T04a |
 | LG1 | Legacy : défis, points, arbres de bonus, conseil des bonus par personnage (Mage, Paladin, Démoniste) | T03, T04b |
 | FA1p | Extension PvP de ForeverAssist V1 : fiche fixe de la classe adverse | FA1, PV1 |
@@ -147,6 +148,12 @@ Les champs de bataille arrivent bientôt (date à confirmer par annonce officiel
     - `forever logs pvp` sur la fixture renvoie les contrôles par catégorie et rang, avec durée observée, écart à la règle des données et provenance, code 0, sans réseau.
     - Au moins une entrée de rendement décroissant porte une preuve de journal contrôlée par le registre, ou la tranche documente le manque de données.
     - `forever bg info` et `forever pvp gear` rendent des données avec source et certitude par champ ; toute information non annoncée est absente, pas devinée.
+
+## T05b — Mana des combats longs
+- **Pourquoi** : en T05, la mana borne les scénarios de donjon et de raid (fiche de base, sans Évocation ni potion) ; l'angle mort B10 a une borne haute de 86 à 144 % de la métrique (`docs/research/builds-T05.md`) : les classements de donjon et de raid sont fragiles. Placée après FA1 et avant DJ1 (décision de l'utilisateur du 2026-09-29).
+- **Fait** : Évocation (recharge, durée, régénération lues dans le client), potions et gemmes de mana (rendement, recharges partagées, rangs par niveau), régénération en combat (règle des 5 s si Forever la garde, B7) dans `forever/sim/encounter.py` et l'analytique ; politique d'usage (au plus tôt utile, sous un seuil de mana) ; rotation qui s'adapte à la mana restante (I8) ; B10 passe de l'angle mort au modèle ; `forever build dungeon|raid` refait aux niveaux 20, 40, 60.
+- **En attendant** : chaque sortie de donjon et de raid de `forever build` et de `forever_build` affiche que la mana des combats longs n'est pas modélisée (hypothèse du rapport).
+- **Critères de fin** : Évocation et potions dans les deux simulateurs des scénarios, analytique à ±3 % du Monte Carlo sur un boss avec fin de mana ; B10 `teste` ; sensibilité des builds de donjon et de raid recalculée ; `uv run tasks.py verify` vert.
 
 ## DJ1 — Donjons
 - **Fait** : liste des donjons de Forever avec plages de niveau (accès, recommandé) ; boss et leur niveau ; butin par boss (objets, emplacement, exigence de classe) avec taux quand une source existe ; donjons nouveaux ou modifiés dans Forever ; lien vers les quêtes de donjon de T04c ; `forever dungeon list --level N`, `forever dungeon info <donjon>`, consultation MCP par `forever_lookup`, domaine `dungeons` ; fichier de données par version avec certitude par champ.

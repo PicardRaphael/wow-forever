@@ -55,6 +55,9 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 4. Hors du jeu : `uv run forever logs scan`, puis `uv run forever logs measure <journal> --addon-sv <SavedVariables>/ForeverLogger.lua`.
 
 ### Protocole de collecte (mesures pour le registre)
+- **Prioritaires (sensibilité de T05, `docs/research/builds-T05.md`)** : deux hypothèses font basculer un build recommandé.
+    - **B7, cumul de la régénération en incantation** (bascule du build de donjon au niveau 40) : relever la mana gagnée pendant une incantation continue de 30 s environ, sans consommable, dans trois cas : Arcane Meditation seule, Mage Armor seule, les deux à la fois. Les deux ensemble donnent la somme des deux parts (modèle, `mana.regen_stacking` = `sum`) ou la plus grande seulement (`max`). ForeverLogger installé (talents), journal de combat actif (`SPELL_ENERGIZE` absent : régénération lue par la différence de mana entre deux lancers).
+    - **H11, PV des monstres de donjon vers le niveau 20** (bascule du build de donjon au niveau 20) : journaux de combat de donjons de niveau 18 à 22 environ, monstres normaux et boss tués entiers par le groupe ; `uv run forever monsters build --logs <dossier> --questie <addon Questie>` puis `uv run forever measures refresh` : les PV mesurés remplacent l'extrapolation (Questie corrigé) aux niveaux concernés.
 - **B1** (recharge globale) : sur un mannequin ou des monstres faciles, 50 sorts instantanés enchaînés sans pause → intervalles minimaux ; `tolerance.n_min` de B1 dans le registre.
 - **A3** (raté des sorts selon l'écart de niveau) : leveling ordinaire au Frostbolt, ForeverLogger installé (niveau du lanceur) ; il faut plusieurs centaines de lancers par écart de niveau pour distinguer des taux voisins ; noter les talents de toucher (instantané de l'addon).
 - **H1** (niveau d'un boss) : un boss de donjon → niveau lu dans le bloc avancé du journal.

@@ -39,6 +39,8 @@ def test_report_end_to_end(game_data, deps, context):
     assert check_build(game_data, rep["talents"], 20) == []
     assert sum(rep["talents"].values()) == points_available(game_data, 20)
     assert rep["verifiable_in_game"] is True and rep["reasons"]
+    mana = [a for a in rep["assumptions"] if "T05b" in a]  # mana des combats longs : affichée tant que T05b manque
+    assert bool(mana) == (context == "raid")
 
 
 def test_context_value_uses_the_effective_duration_in_the_arcane_rotation(game_data):

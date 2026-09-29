@@ -880,7 +880,7 @@ def render_build(rep: Mapping[str, Any]) -> list[str]:
     unit, up = mt["unit"], mt["higher_is_better"]
     head = f"Build {rep['context']} niveau {rep['level']} · {rep['race']}"
     if rep["scenario"]["provisional"]:
-        head += " · scénario provisoire"
+        head += " · scénario provisoire · mana des combats longs non modélisée (T05b)"
     head += " · équipement : fiche de base par niveau"
     if not rep["verifiable_in_game"]:
         head += " · non vérifiable en jeu avant la sortie"
