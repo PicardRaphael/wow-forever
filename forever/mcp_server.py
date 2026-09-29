@@ -20,6 +20,7 @@ from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindEr
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.leveling import LevelingReport, simulate_leveling
 from forever.lookup import lookup_spell, lookup_talent, lookup_zones
+from forever.profile import ProfileView, read_profile
 from forever.provenance import error_payload
 from forever.status import StatusReport, status_report
 
@@ -91,6 +92,17 @@ def build_server(deps: Deps) -> MCPServer:
             return cast("dict[str, Any]", _error_result(deps, err))
 
     @server.tool()
+    def forever_player_profile(name: str | None = None) -> ProfileView:
+        """Profil du joueur (lecture seule, hors du dépôt) : personnage actif, ou `name` ; liste des personnages,
+        `stale` (saisi sur une autre version des données), `missing` (race, faction, niveau, talents ou métiers non
+        renseignés). À lire avant tout calcul qui dépend du personnage ; les outils de calcul ne le lisent jamais
+        d'eux-mêmes. Écriture : `forever profile set` (CLI)."""
+        try:
+            return read_profile(deps, name)
+        except ForeverError as err:
+            return cast(ProfileView, _error_result(deps, err))
+
+    @server.tool()
     def forever_explain_mechanic(mechanic_id: str, level: int | None = None) -> MechanicExplanation:
         """Explique une mécanique du registre (identifiant de la forme « A5 », casse ignorée, ou mots de sa
         description en français ou en anglais selon le registre, ex. « Ignite » ; plusieurs entrées : la liste
@@ -106,7 +118,7 @@ def build_server(deps: Deps) -> MCPServer:
     @server.tool()
     def forever_sim_leveling(
         level: int,
-        race: str = "Orc",
+        race: str | None = None,
         rotation: str = "frost",
         talents: dict[str, int] | None = None,
         n: int = 1500,
@@ -160,7 +172,7 @@ def build_server(deps: Deps) -> MCPServer:
     def forever_build(
         context: str,
         level: int,
-        race: str = "Orc",
+        race: str | None = None,
         current: dict[str, int] | None = None,
         respecs: int = 0,
         sp: float | None = None,

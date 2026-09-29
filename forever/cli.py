@@ -33,6 +33,7 @@ from forever.errors import (
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.gamedata import build_game_data, load_game_data
 from forever.leveling import (
+    DEFAULT_RACE,
     MAX_N,
     check_level,
     check_race,
@@ -75,6 +76,7 @@ from forever.pipeline.refresh import (
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
+from forever.profile import ProfileView, read_profile, remove, set_character, use
 from forever.provenance import (
     Certainty,
     Provenance,
@@ -149,6 +151,30 @@ def build_parser() -> argparse.ArgumentParser:
     decode.add_argument("--out", help="dossier de la candidate (défaut : <cache>/candidates/<version>)")
     decode.add_argument("--force", action="store_true", help="remplacer une candidate existante")
     decode.add_argument("--json", action="store_true", help="sortie JSON")
+
+    profile = sub.add_parser("profile", help="profil joueur hors du dépôt (FOREVER_PROFILE, ~/.forever)")
+    psub = profile.add_subparsers(dest="profile_cmd", required=True)
+    show = psub.add_parser("show", help="personnage actif (ou nommé)")
+    show.add_argument("name", nargs="?", help="nom du personnage (défaut : actif)")
+    show.add_argument("--json", action="store_true", help="sortie JSON")
+    plist = psub.add_parser("list", help="personnages du profil")
+    plist.add_argument("--json", action="store_true", help="sortie JSON")
+    pset = psub.add_parser("set", help="créer ou mettre à jour un personnage (champs donnés seulement)")
+    pset.add_argument("name", help="nom du personnage")
+    pset.add_argument("--class", dest="cls", help="Mage, Paladin ou Démoniste")
+    pset.add_argument("--race", help="race (Mage : racials.json)")
+    pset.add_argument("--faction", help="faction (jamais déduite)")
+    pset.add_argument("--level", type=int, help="niveau")
+    pset.add_argument("--talents", help="talents « clé=rang,… » (remplacent les précédents)")
+    pset.add_argument("--profession", action="append", default=[], help="métier « Nom=compétence » (répétable)")
+    pset.add_argument("--json", action="store_true", help="sortie JSON")
+    puse = psub.add_parser("use", help="rendre un personnage actif")
+    puse.add_argument("name", help="nom du personnage")
+    puse.add_argument("--json", action="store_true", help="sortie JSON")
+    prm = psub.add_parser("remove", help="retirer un personnage")
+    prm.add_argument("name", help="nom du personnage")
+    prm.add_argument("--yes", action="store_true", help="retirer sans demander l'accord")
+    prm.add_argument("--json", action="store_true", help="sortie JSON")
 
     install = sub.add_parser(
         "install", help="installer une candidate en révision suivante de la version courante (T06b)"
@@ -270,7 +296,7 @@ def build_parser() -> argparse.ArgumentParser:
     b = sub.add_parser("build", help="build du Mage par contexte : talents, ordre, raisons, sensibilité, respec")
     b.add_argument("context", choices=CONTEXTS, help="contexte : leveling, dungeon, raid, pvp-bg, pvp-world")
     b.add_argument("--level", type=int, required=True, help="niveau du build (leveling : ordre de 10 à ce niveau)")
-    b.add_argument("--race", default="Orc", help="race du personnage (défaut : Orc)")
+    b.add_argument("--race", help="race du personnage (défaut : Orc, signalé dans inputs)")
     b.add_argument("--current", default="", help="build actuel clé=rang,clé=rang (conseil de respec)")
     b.add_argument("--respecs", type=int, default=0, help="réinitialisations déjà faites (barème de respec)")
     b.add_argument("--sp", type=float, help="puissance des sorts de la fiche (remplace l'estimation)")
@@ -297,7 +323,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def _leveling_arguments(p: argparse.ArgumentParser, *, n_default: int) -> None:
-    p.add_argument("--race", default="Orc", help="race du personnage (défaut : Orc)")
+    p.add_argument("--race", help="race du personnage (défaut : Orc, signalé dans inputs)")
     p.add_argument("--rotation", default="frost", choices=["frost", "fire", "arcane"], help="rotation (défaut : frost)")
     p.add_argument(
         "--ab-stacks", type=int, help="rotation arcane : cumuls d'Arcane Blast avant la décharge (défaut : maximum)"
@@ -689,6 +715,73 @@ def render_verify(r: VerifyReport) -> list[str]:
     if r["inherited"]:
         lines.append(f"Fichiers hérités : {', '.join(r['inherited'])}")
     return lines
+
+
+def render_profile(view: ProfileView) -> list[str]:
+    c = view["character"]
+    if c is None:
+        return [f"Profil joueur {view['path']} : aucun personnage (forever profile set <nom> --class Mage …)"]
+    active = " (actif)" if c["name"] == view["active"] else ""
+    head = f"Profil : {c['name']}{active}, {c['class']} {c['race'] or 'race ?'}"
+    head += f", {c['faction'] or 'faction ?'}, niveau {c['level'] if c['level'] is not None else '?'}"
+    lines = [head]
+    if c["talents"]:
+        lines.append("Talents : " + ", ".join(f"{k} {v}" for k, v in c["talents"].items()))
+    if c["professions"]:
+        lines.append("Métiers : " + ", ".join(f"{k} {v}" for k, v in c["professions"].items()))
+    if view["missing"]:
+        lines.append("Manquant : " + ", ".join(view["missing"]))
+    if view["stale"]:
+        lines.append(f"Saisi sur {c['game_version']} : à revérifier sur les données actuelles")
+    if not c["validated"]:
+        lines.append("Classe non couverte par les calculs : valeurs gardées sans contrôle")
+    return lines
+
+
+def _parse_professions(items: list[str]) -> dict[str, int] | None:
+    if not items:
+        return None
+    out: dict[str, int] = {}
+    for item in items:
+        name, sep, value = item.partition("=")
+        if not sep or not name.strip() or not value.strip().isdigit():
+            raise InvalidArgumentError(f"Métier mal écrit « {item} ».", 'écrire --profession "Couture=150"')
+        out[name.strip()] = int(value)
+    return out
+
+
+def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
+    cmd = args.profile_cmd
+    name: str | None = getattr(args, "name", None)
+    target = name or ""
+    if cmd == "set":
+        set_character(
+            deps,
+            target,
+            cls=args.cls,
+            race=args.race,
+            faction=args.faction,
+            level=args.level,
+            talents=parse_talents(args.talents) if args.talents is not None else None,
+            professions=_parse_professions(args.profession),
+        )
+    elif cmd == "use":
+        use(deps, target)
+    elif cmd == "remove":
+        if args.yes or (deps.confirm is not None and deps.confirm(f"Retirer {name} du profil ? [o/N] ")):
+            remove(deps, target)
+        else:
+            view = read_profile(deps)
+            _emit(view, [f"Retrait de {name} refusé : rien n'est écrit."], view["provenance"], args.json)
+            return EXIT_OK
+    view = read_profile(deps, name if cmd in ("show", "set") else None)
+    if cmd == "list":
+        lines = [f"Profil joueur {view['path']} :"]
+        lines += [f"  {'* ' if n == view['active'] else '  '}{n}" for n in view["characters"]] or ["  (vide)"]
+    else:
+        lines = render_profile(view)
+    _emit(view, lines, view["provenance"], args.json)
+    return EXIT_OK
 
 
 def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
@@ -1120,7 +1213,8 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
         )
     if not 1 <= args.n <= MAX_N:
         raise InvalidArgumentError(f"n = {args.n} hors de 1-{MAX_N}.", f"donner un nombre de combats de 1 à {MAX_N}")
-    check_race(data, args.race)
+    race = args.race or DEFAULT_RACE
+    check_race(data, race)
     diff = args.level_diff if args.level_diff is not None else gd.leveling.default_level_diff
     check_level(args.level_from + diff, cap, "Niveau du monstre")
     check_level(args.level_to + diff, cap, "Niveau du monstre")
@@ -1145,7 +1239,7 @@ def _cmd_chart(deps: Deps, args: argparse.Namespace) -> int:
             gd,
             range(args.level_from, args.level_to + 1),
             pts,
-            race=args.race,
+            race=race,
             rotation=args.rotation,
             n=args.n,
             seed=args.seed,
@@ -1427,6 +1521,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "fetch": _cmd_fetch,
         "decode": _cmd_decode,
         "install": _cmd_install,
+        "profile": _cmd_profile,
         "diff": _cmd_diff,
         "verify": _cmd_verify,
         "report": _cmd_report,

@@ -32,6 +32,7 @@ def test_stdio_server(tmp_path):
         "forever_explain_mechanic",
         "forever_sim_leveling",
         "forever_build",
+        "forever_player_profile",  # T06b : profil joueur, lecture seule
     }
     assert not result.is_error
     assert result.structured_content["ranks"][0]["damage_min"] == 34

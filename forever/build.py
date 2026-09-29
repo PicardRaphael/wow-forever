@@ -23,7 +23,16 @@ from forever.engine.variants import ASSUMPTIONS, assumption_range, current_value
 from forever.errors import InvalidArgumentError
 from forever.freshness import freshness_for_version
 from forever.gamedata import RULES, build_game_data
-from forever.leveling import check_level, check_race, check_talents, constants_certainty, damage_assumptions
+from forever.leveling import (
+    DEFAULT_RACE,
+    DEFAULT_RACE_NOTE,
+    check_level,
+    check_race,
+    check_talents,
+    constants_certainty,
+    damage_assumptions,
+    given,
+)
 from forever.optimize.decide import Gap, paired_gap
 from forever.optimize.endgame import PVP_CONTEXTS, context_analytic, context_mc, neighbors, optimize_context
 from forever.optimize.leveling import BuildChoice, best_choice, optimize_leveling
@@ -43,6 +52,7 @@ class BuildReport(TypedDict):
     context: str
     level: int
     race: str
+    inputs: dict[str, Any]  # valeurs d'entrée et leur origine (T06b)
     scenario: dict[str, Any]
     talents: dict[str, int]
     talents_by_tree: dict[str, dict[str, int]]
@@ -372,7 +382,7 @@ def build_report(
     context: str,
     level: int,
     *,
-    race: str = "Orc",
+    race: str | None = None,
     current: Mapping[str, int] | None = None,
     respecs: int = 0,
     sp: float | None = None,
@@ -387,7 +397,13 @@ def build_report(
 
     `current` : build actuel (conseil de respec) ; `respecs` : réinitialisations déjà faites ; `sp`, `crit` : fiche
     remplacée ; `preset` : préréglage de l'optimiseur (`build.presets`) ; `talented_bonus` : points de talent du bonus
-    Legacy « Talented » (hypothèse affichée)."""
+    Legacy « Talented » (hypothèse affichée) ; `race` absente : Orc, signalé dans `inputs` et les hypothèses."""
+    inputs = {
+        "race": given(race, DEFAULT_RACE),
+        "level": given(level, None),
+        "current": given(dict(current) if current is not None else None, None),
+    }
+    race = race if race is not None else DEFAULT_RACE
     data = load_version(deps)
     if rules not in RULES:
         raise InvalidArgumentError(f"rules inconnu « {rules} ».", "choisir forever ou seed")
@@ -508,6 +524,8 @@ def build_report(
     cap = gd.build.beta_level_cap
     options = {"rules": rules, "low_level_penalty": None}
     assumptions = _assumptions(gd, context, level, p, preset, seed, sp, crit, talented_bonus, build, options)
+    if inputs["race"]["origin"] == "default":
+        assumptions.insert(0, DEFAULT_RACE_NOTE)
     sources: dict[str, str] = {
         "talents et sorts (client)": "certain",
         "constantes du simulateur (leveling.*)": constants_certainty(data),
@@ -534,6 +552,7 @@ def build_report(
         "context": context,
         "level": level,
         "race": race,
+        "inputs": inputs,
         "scenario": _scenario(gd, context),
         "talents": build,
         "talents_by_tree": {tree: {k: v for k, v in build.items() if gd.talents[k].tree == tree} for tree in gd.trees},

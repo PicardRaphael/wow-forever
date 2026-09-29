@@ -40,6 +40,7 @@ class MobHpInfo(TypedDict):
 class LevelingReport(TypedDict):
     level: int
     race: str
+    inputs: dict[str, Any]  # valeurs d'entrée et leur origine (T06b)
     rotation: str
     talents: dict[str, int]
     n: int
@@ -51,6 +52,17 @@ class LevelingReport(TypedDict):
     analytic_gap: float
     mob_hp: MobHpInfo
     provenance: Provenance
+
+
+DEFAULT_RACE = "Orc"  # race par défaut des outils de calcul (T04), toujours signalée dans `inputs` (T06b)
+DEFAULT_RACE_NOTE = (
+    "race non donnée : Orc par défaut (donnée personnelle : la demander au joueur ou lire forever_player_profile)"
+)
+
+
+def given(value: Any, default: Any) -> dict[str, Any]:
+    """Valeur d'entrée et son origine : `argument` (donnée par l'appelant) ou `default` (défaut de l'outil)."""
+    return {"value": value if value is not None else default, "origin": "argument" if value is not None else "default"}
 
 
 def parse_talents(text: str | None) -> dict[str, int]:
@@ -181,7 +193,7 @@ def simulate_leveling(
     deps: Deps,
     level: int,
     *,
-    race: str = "Orc",
+    race: str | None = None,
     rotation: str = "frost",
     talents: Mapping[str, int] | None = None,
     n: int = 1500,
@@ -200,6 +212,12 @@ def simulate_leveling(
     """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance.
 
     `low_level_penalty` : pénalité des sorts de bas niveau (None : `coefficient.low_level_default` des données)."""
+    inputs = {
+        "race": given(race, DEFAULT_RACE),
+        "level": given(level, None),
+        "talents": given(dict(talents) if talents is not None else None, {}),
+    }
+    race = race if race is not None else DEFAULT_RACE
     data = load_version(deps)
     if rules not in RULES:
         raise InvalidArgumentError(f"Règles inconnues : {rules}.", "choisir forever ou seed")
@@ -250,11 +268,13 @@ def simulate_leveling(
         assumptions=[
             *fresh["assumptions"],
             *assumptions(options, hp, pts, n, seed, gd.constants.coefficients.low_level_default),
+            *([DEFAULT_RACE_NOTE] if inputs["race"]["origin"] == "default" else []),
         ],
     )
     return {
         "level": level,
         "race": race,
+        "inputs": inputs,
         "rotation": rotation,
         "talents": pts,
         "n": n,

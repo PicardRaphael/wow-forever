@@ -34,3 +34,17 @@ Présentées ensemble avant la fusion (règle du skill `/tranche`). Chaque corre
 +        "spells.json",
          "overrides.json",
 ```
+
+## 3. `tests/unit/test_profile.py::test_cli_and_mcp_give_the_same_json` (bloc D)
+
+- **Oubli dans le test** : l'appel MCP (`mcp.Client`, boucle asyncio) ouvre sous Windows une paire de sockets locale ;
+  `pytest-socket` la bloque sans le marqueur que portent les autres tests MCP.
+- **Preuve** : `tests/unit/test_build_cli.py:15` (« La boucle asyncio de Windows ouvre une paire de sockets locale :
+  autorisée, tout autre hôte reste bloqué ») : `pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])` ; sortie du test :
+  `pytest_socket.SocketBlockedError: A test tried to use socket.socket.`
+- **Diff proposé** (marqueur sur ce seul test, aucun autre accès réseau permis) :
+
+```diff
++@pytest.mark.allow_hosts(["127.0.0.1"])  # boucle asyncio de Windows : paire de sockets locale (test_build_cli.py)
+ def test_cli_and_mcp_give_the_same_json(deps, capsys):
+```

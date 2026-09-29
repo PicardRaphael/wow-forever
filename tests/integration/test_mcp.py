@@ -33,6 +33,7 @@ def test_list_tools(make_deps):
         "forever_explain_mechanic",
         "forever_sim_leveling",
         "forever_build",
+        "forever_player_profile",  # T06b : profil joueur, lecture seule
     }
     for t in tools:
         assert t.output_schema is not None
