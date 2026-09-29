@@ -13,7 +13,19 @@ from __future__ import annotations
 from typing import Any, NamedTuple
 
 from forever.engine.model import CharacterOverrides, GameData, Points, Preset
-from forever.optimize.leveling import LevelingPath
+from forever.engine.respec import gold_per_hour, respec_balance, respec_cost, respec_cost_certainty
+from forever.engine.talents import check_build
+from forever.optimize.leveling import (
+    SECONDS_PER_HOUR,
+    LevelingPath,
+    best_choice,
+    build_choices,
+    level_weight,
+    optimize_leveling,
+)
+from forever.sim.leveling_analytic import kill_analytic
+
+RESET, KEEP = "réinitialiser", "garder"
 
 
 class RespecAdvice(NamedTuple):
@@ -50,7 +62,37 @@ def advise_leveling(
     à l'analytique), heures gagnées sur `hours` heures, bilan en or, verdict ; mêmes arrondis que le seed.
 
     Registre : I5"""
-    raise NotImplementedError
+    sim = {"rules": rules, **options}
+
+    def xp_h(pts: Points) -> float:
+        return max(
+            kill_analytic(gd, level, pts, race, c.rotation, **sim)["xp_h"]
+            for c in build_choices(gd, level, pts, rules=rules)
+        )
+
+    cur, tgt = xp_h(current), xp_h(target)
+    gain_h = hours * (1 - cur / tgt) if tgt > cur else -hours * (1 - tgt / cur)
+    cost = respec_cost(gd, n_previous)
+    rate = gph or gold_per_hour(gd, level)
+    trip = gd.respec.trip_minutes
+    value = respec_balance(gain_h, cost, rate, trip)
+    return {
+        "xp_h_actuel": round(cur),
+        "xp_h_cible": round(tgt),
+        "heures_gagnees": round(gain_h, 2),
+        "cout_po": cost,
+        "bilan_po_equiv": round(value, 1),
+        "verdict": RESET if value > 0 else KEEP,
+        "hypotheses": f"{rate} po/h (suppose), trajet {trip} min, barème {list(gd.respec.schedule_gold)}",
+    }
+
+
+def _hours_by_level(gd: GameData, path: LevelingPath) -> dict[int, float]:
+    """Heures équivalentes de chaque niveau d'un chemin (temps de la dernière étape du niveau × poids du niveau)."""
+    out: dict[int, float] = {}
+    for s in path.steps:
+        out[s.level] = s.time_s * level_weight(gd, s.level) / SECONDS_PER_HOUR
+    return out
 
 
 def advise_respec(
@@ -70,4 +112,38 @@ def advise_respec(
     à quel niveau ; ValueError si le build actuel est illégal.
 
     Registre : I5"""
-    raise NotImplementedError
+    errors = check_build(gd, current, level, talented_bonus)
+    if errors:
+        raise ValueError(f"build actuel illégal au niveau {level} : {' ; '.join(errors)}")
+    search = {"beam": preset.beam, "depth": preset.depth, "shortlist": preset.shortlist, "mc_n": 0}
+    common = {"over": over, "talented_bonus": talented_bonus, **search, **options}
+    keep = (
+        optimize_leveling(gd, race, level + 1, target_level, start=current, **common)
+        if target_level > level
+        else LevelingPath(0.0, dict(current), ())
+    )
+    free = optimize_leveling(gd, race, gd.constants.talents.first_level, target_level, **common)
+    keep_h = _hours_by_level(gd, keep)
+    now = best_choice(gd, level, current, race, over, full=True, **options)[0]
+    keep_h[level] = round(now, 2) * level_weight(gd, level) / SECONDS_PER_HOUR
+    free_h = _hours_by_level(gd, free)
+    cost = respec_cost(gd, n_previous)
+    trip = gd.respec.trip_minutes
+    rows = []
+    for lv in range(level, target_level + 1):
+        gain = sum(keep_h[x] - free_h[x] for x in range(lv, target_level + 1))
+        rows.append((lv, gain, respec_balance(gain, cost, gold_per_hour(gd, lv), trip)))
+    best = max(rows, key=lambda r: (r[2], -r[0]))
+    reset = best[2] > 0
+    return RespecAdvice(
+        RESET if reset else KEEP,
+        best[0] if reset else None,
+        best[1],
+        cost,
+        best[2],
+        gold_per_hour(gd, best[0]),
+        respec_cost_certainty(gd, n_previous),
+        tuple(rows),
+        keep,
+        free,
+    )
