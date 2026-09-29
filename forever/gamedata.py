@@ -386,6 +386,7 @@ def _pvp_utility(r: _Reader, u: Mapping[str, Any]) -> dict[str, Any]:
         "counterspell_level": r.int_(cs, "level", "utility.counterspell.level"),
         "counterspell_cooldown_s": r.num(cs, "cooldown", "utility.counterspell.cooldown"),
         "counterspell_lockout_s": r.num(cs, "lockout", "utility.counterspell.lockout"),
+        "evocation_level": r.int_(evo, "level", "utility.evocation.level"),
         "evocation_duration_s": r.num(evo, "duration", "utility.evocation.duration"),
         "evocation_regen_mult": r.num(evo, "regen_mult", "utility.evocation.regen_mult"),
         "ice_barrier": tuple(

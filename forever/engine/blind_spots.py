@@ -59,7 +59,7 @@ def estimate_cooldown_talents(
     et Combustion (au plus ses critiques garantis par recharge, chacun du bonus de critique) ; Cold Snap : non chiffré.
     Borne haute, fraction du temps ou des dégâts.
 
-    Registre : B18"""
+    Registre : I5 (estimation de l'angle mort B18)"""
     ch = character(gd, level, race, over)
     bound = 0.0
     rated = False
@@ -83,7 +83,7 @@ def estimate_wake_of_fire_crit(
     """Bonus de critique de Wake of Fire sur le Fire Blast qui suit une mise à mort : au plus un critique de plus par
     combat, rapporté aux PV du monstre du niveau. Borne haute, fraction des dégâts d'un combat.
 
-    Registre : B19"""
+    Registre : I5 (estimation de l'angle mort B19)"""
     if pts.get(WAKE_OF_FIRE, 0) <= 0:
         return None
     ch = character(gd, level, race, over)
@@ -101,10 +101,10 @@ def estimate_evocation(
     """Évocation : mana rendue par une Évocation (régénération d'Esprit multipliée pendant sa durée) rapportée à la
     réserve : au plus autant d'incantation en plus quand la mana borne le combat. Borne haute.
 
-    Registre : B10"""
+    Registre : I5 (estimation de l'angle mort B10)"""
     ch = character(gd, level, race, over)
     u = gd.utility
-    if level < u.blink_level or not u.evocation_regen_mult:
+    if level < u.evocation_level or not u.evocation_regen_mult:
         return None
     return u.evocation_regen_mult * ch.spirit_regen * u.evocation_duration_s / ch.mana
 

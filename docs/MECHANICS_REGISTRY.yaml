@@ -141,26 +141,26 @@ mechanics:
     description: "Résistances partielles (paliers, moyenne, plafond 75 %)"
     forever: oui
     statut: absent
-    certitude: certain
+    certitude: suppose
     sources: []
     tests: []
     tolerance: null
     angle_mort:
       talents: []
-      contextes: [raid]
+      contextes: [dungeon, raid]
       estimation: null
   - id: A13
     categorie: attaque
     description: "Sorts binaires et non binaires"
     forever: oui
     statut: absent
-    certitude: certain
+    certitude: suppose
     sources: []
     tests: []
     tolerance: null
     angle_mort:
       talents: []
-      contextes: [raid]
+      contextes: [dungeon, raid]
       estimation: null
   - id: A14
     categorie: attaque
@@ -173,7 +173,7 @@ mechanics:
     tolerance: null
     angle_mort:
       talents: []
-      contextes: [raid]
+      contextes: [leveling, dungeon, raid]
       estimation: null
   - id: A15
     categorie: attaque
@@ -193,6 +193,7 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    note: "T05 : boss des scénarios insensibles au gel (build.scenarios, freeze_immune, suppose ; test_encounter.py::test_bosses_cannot_be_frozen) ; Givre-feu compté comme givre et feu (A20, C2)"
   - id: A17
     categorie: attaque
     description: "Les effets sur la durée critiquent (Forever)"
@@ -262,6 +263,7 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    note: "T05 : Hot Streak ne compte que les critiques directs (les tics de DoT et d'Ignite ne donnent pas de cumul, forever/sim/leveling_mc.py et encounter.py) ; entrée gardée absent (règle Forever des critiques périodiques non vérifiée)"
   - id: A20
     categorie: attaque
     description: "Multiplicateurs de dégâts des sorts (talents d'école, bonus globaux)"
@@ -449,13 +451,15 @@ mechanics:
     forever: oui
     statut: absent
     certitude: probable
-    sources: []
+    sources:
+      - "forever/data/1.60.1.70009/spells.json (utility.evocation : niveau, durée, régénération)"
     tests: []
     tolerance: null
     angle_mort:
       talents: []
       contextes: [dungeon, raid]
       estimation: evocation
+    note: "T05 : borne haute de l'angle mort calculée par forever/engine/blind_spots.py (test : tests/unit/test_blind_spots.py::test_estimates_are_positive_bounds_from_the_data)"
   - id: B11
     categorie: ressources
     description: "Coûts en % du mana de base, escalade d'Arcane Blast"
@@ -507,6 +511,7 @@ mechanics:
       - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
       - tests/unit/test_sim_rules.py::test_analytic_fire_blast_cooldown_includes_wake_of_fire
       - tests/unit/test_encounter.py::test_analytic_close_to_monte_carlo_on_a_single_target
+      - tests/unit/test_cooldown_period.py::test_cooldown_period_waits_for_whole_filler_casts
     tolerance: null
     formule: "recharge = recharge du rang − Improved Frost Nova (Frost Nova) ou − Wake of Fire (Fire Blast)"
     note: "T04b : porté du seed (forever/engine/casting.py : spell_cooldown), appliqué par le Monte Carlo ; T04c : l'analytique prend aussi la recharge réduite par Wake of Fire en rules forever ; rules seed garde la recharge du rang (parité) ; Frost Nova reste hors de l'analytique ; T05 : cooldown_period (forever/engine/casting.py) : période effective d'un instantané à recharge dans une rotation sans interruption (recharge globale puis incantations de remplissage entières), utilisée par l'analytique des scénarios pour Fire Blast"
@@ -523,14 +528,14 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_missile_barrage_halves_the_dump_and_makes_it_free
       - tests/unit/test_rotations_t05.py::test_missile_barrage_in_the_arcane_cycle
     tolerance: null
-    formule: "Missile Barrage (T05, seul proc modélisé) : chaque Arcane Blast qui touche déclenche l'aura avec la chance du talent (Fireball, Frostbolt, Frostfire Bolt : autre chance) ; l'Arcane Missiles suivant est canalisé en (1 - réduction) du temps et gratuit ; analytique : P = 1 - (1 - chance × toucher)^cumuls par cycle arcane"
+    formule: "Missile Barrage (T05) : chaque Arcane Blast qui touche déclenche l'aura avec la chance du talent (Fireball, Frostbolt, Frostfire Bolt : autre chance) ; l'Arcane Missiles suivant est canalisé en (1 - réduction) du temps et gratuit ; analytique : P = 1 - (1 - chance × toucher)^cumuls par cycle arcane ; Fingers of Frost (chance et charges du talent) et Frostbite (C5) : procs modélisés depuis T04b"
     note: "T05 : rotation arcane à décharge Arcane Missiles seulement (un tirage par déclencheur qui touche, mode forever) ; tisser Arcane Missiles dans les rotations de givre ou de feu : angle mort ; autres procs (Impact ; Clearcasting compté en B12) absents"
   - id: B15
     categorie: temps
     description: "Durée, charges, rafraîchissement et cumul des buffs"
     forever: oui
     statut: teste
-    certitude: probable
+    certitude: suppose
     sources:
       - "forever/data/1.60.1.70009/talents.json (arcaneBlast : bonus et coût par cumul, cumuls, durée ; arcanePower : durée, dégâts, coût)"
       - "tests/fixtures/wago/1.60.1.70009 (aura 400573 : CumulativeAura 4, durée 8000 ms ; Arcane Power 12042 : DurationIndex 8, 15 000 ms, SpellCooldowns 180 000 ms)"
@@ -557,8 +562,8 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_fewer_stacks_cast_more_pyroblasts
       - tests/unit/test_rotations_t05.py::test_hot_streak_in_the_analytic_model
     tolerance: null
-    formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée ; expire sans nouvel Arcane Blast ; tout autre sort de dégâts profite de +x % par cumul et la consomme ; Arcane Power active : +y % de dégâts (source distincte) et +z % de coût"
-    note: "T04c : forever/engine/buffs.py, valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11). T04e : buffs d'Arcane Power (arcane_power_buffs), cumul avec Arcane Blast multiplicatif en forever (A20) ; aura de 15 s et recharge de 180 s non modélisées (l'appelant décide quand l'aura est active ; rotations : T05). Missile Barrage et autres buffs : absents ; T05 (décision 79) : Arcane Power dans les rotations, au pull dès que prête (horloge de session de mc, recharge du client 180 s), aura sur les lancers qui finissent dans sa durée (+30 % de dégâts multipliés aux autres bonus, +30 % de coût, multiplié au coût croissant d'Arcane Blast : suppose), aucun tirage ; analytique : combat à dégâts uniformes, part des combats min(1, cycle / recharge) au point fixe ; option arcane_power (auto, off), jamais en seed. Hot Streak (décision 83) : cumul à l'impact d'un critique non périodique de Fireball, Frostfire Bolt, Fire Blast, Scorch ; Pyroblast à hs_stacks cumuls (1 au maximum, choix du build), incantation × (1 - 25 % × cumuls), cumuls consommés ; durée 20 s (client 70009) ; cumuls remis à zéro entre deux combats (sous-évalue légèrement) ; analytique : un Pyroblast tous les hs_stacks critiques, expiration ignorée"
+    formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée, consommée par tout autre sort de dégâts ; Arcane Power (T05) : au pull dès que la recharge du client est écoulée, + dégâts (multipliés aux autres bonus) et + coût sur les lancers qui finissent dans sa durée ; Hot Streak (T05) : un cumul par critique direct de Fireball, Frostfire Bolt, Fire Blast, Scorch, Pyroblast à hs_stacks cumuls, incantation × (1 - part × cumuls), cumuls consommés"
+    note: "T04c : forever/engine/buffs.py, valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11). T04e : buffs d'Arcane Power (arcane_power_buffs), cumul avec Arcane Blast multiplicatif en forever (A20) ; aura de 15 s et recharge de 180 s non modélisées (l'appelant décide quand l'aura est active ; rotations : T05). Missile Barrage et autres buffs : absents ; T05 (décision 79) : Arcane Power dans les rotations, au pull dès que prête (horloge de session de mc, recharge du client 180 s), aura sur les lancers qui finissent dans sa durée (+30 % de dégâts multipliés aux autres bonus, +30 % de coût, multiplié au coût croissant d'Arcane Blast : suppose), aucun tirage ; analytique : combat à dégâts uniformes, part des combats min(1, cycle / recharge) au point fixe ; option arcane_power (auto, off), jamais en seed. Hot Streak (décision 83) : cumul à l'impact d'un critique non périodique de Fireball, Frostfire Bolt, Fire Blast, Scorch ; Pyroblast à hs_stacks cumuls (1 au maximum, choix du build), incantation × (1 - 25 % × cumuls), cumuls consommés ; durée 20 s (client 70009) ; cumuls remis à zéro entre deux combats (sous-évalue légèrement) ; analytique : un Pyroblast tous les hs_stacks critiques, expiration ignorée ; T05 (relecture) : certitude suppose (Arcane Power multiplié au coût croissant d'Arcane Blast, Clearcasting qui garde le cumul, cumuls de Hot Streak remis à zéro entre deux combats) ; cumul de Hot Streak posé à l'impact en leveling, à la fin de l'incantation dans les scénarios (écart de moins d'un temps de vol)"
   - id: B16
     categorie: temps
     description: "Temps d'incantation réduits par talents"
@@ -600,7 +605,7 @@ mechanics:
       - "forever/data/1.60.1.70009/spell_scaling.json (talent_cooldowns)"
     tests: []
     tolerance: null
-    note: "T05 (décision 83) : absents des rotations ; angle mort chiffré par une borne haute (forever/engine/blind_spots.py : une incantation rendue instantanée par recharge, critiques garantis de Combustion) ; Cold Snap non chiffré"
+    note: "T05 (décision 83) : absents des rotations ; angle mort chiffré par une borne haute (forever/engine/blind_spots.py : une incantation rendue instantanée par recharge, critiques garantis de Combustion) ; Cold Snap non chiffré ; test de l'estimation : tests/unit/test_blind_spots.py::test_estimates_are_positive_bounds_from_the_data"
     angle_mort:
       talents: [presenceOfMind, combustion, coldSnap]
       contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
@@ -616,7 +621,7 @@ mechanics:
       - "docs/research/notes-blizzard-2026-09-24.md (Wake of Fire 30 s)"
     tests: []
     tolerance: null
-    note: "T05 : Impact (étourdissement) absent des simulateurs (le profil PvP en compte une part) ; Wake of Fire : seule la réduction de recharge est modélisée (B13), le bonus de critique du Fire Blast qui suit une mise à mort est un angle mort chiffré (un critique de plus par combat, borne haute)"
+    note: "T05 : Impact (étourdissement) absent des simulateurs (le profil PvP en compte une part) ; Wake of Fire : seule la réduction de recharge est modélisée (B13), le bonus de critique du Fire Blast qui suit une mise à mort est un angle mort chiffré (un critique de plus par combat, borne haute) ; test de l'estimation : tests/unit/test_blind_spots.py::test_estimates_are_positive_bounds_from_the_data"
     angle_mort:
       talents: [impact, wakeOfFire]
       contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
@@ -654,8 +659,8 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_flame_throwing_and_arcane_geometry_extend_the_range
       - tests/unit/test_rotations_t05.py::test_range_talents_change_the_forever_simulation_only
     tolerance: null
-    formule: "portée = portée du sort, sinon portée par défaut des données ; Frostbolt × (1 + Arctic Reach) ; rules forever (T05) : + Flame Throwing (sorts de feu, Givre-feu compris), + Arcane Geometry (sorts des arcanes), en mètres"
-    note: "T04b : Arctic Reach (forever/engine/movement.py : spell_range) appliqué à Frostbolt seulement, comme le seed ; talents.json l'étend aussi à Blizzard et aux rayons de Frost Nova et Cone of Cold (non modélisé) ; expected_cast.range_yd reste la portée de base"
+    formule: "portée = portée du sort, sinon portée par défaut des données ; Frostbolt × (1 + Arctic Reach) ; rules forever (T05) : + Flame Throwing (sorts de feu, Givre-feu compris) et + Arcane Geometry (sorts des arcanes), en yards"
+    note: "T04b : Arctic Reach (forever/engine/movement.py : spell_range) appliqué à Frostbolt seulement, comme le seed ; talents.json l'étend aussi à Blizzard et aux rayons de Frost Nova et Cone of Cold (non modélisé) ; expected_cast.range_yd reste la portée de base ; T05 : Flame Throwing et Arcane Geometry ajoutés en mode forever seulement (rules seed : portée du seed) ; Givre-feu compté comme feu pour Flame Throwing : suppose (comme A20)"
   - id: C3
     categorie: physique
     description: "Marge de mêlée et hitbox"
@@ -743,7 +748,7 @@ mechanics:
     description: "Buffs de raid et de groupe (dont ceux devenus passifs)"
     forever: modifie
     statut: absent
-    certitude: certain
+    certitude: suppose
     sources: []
     tests: []
     tolerance: null
@@ -1295,6 +1300,7 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    note: "T05 : paramètres de rotation (rotation, armure, ab_stacks, ab_dump, hs_stacks, aoe_filler) cherchés avec les talents par l'optimiseur (I5) ; les listes de priorités elles-mêmes ne sont pas optimisées"
   - id: I3
     categorie: optimisation
     description: "Poids de stats avec erreur standard"
@@ -1318,7 +1324,7 @@ mechanics:
     description: "Optimiseur de talents et de respec"
     forever: oui
     statut: teste
-    certitude: probable
+    certitude: suppose
     sources:
       - "seed/forever-mage/scripts/optimize.py (porté en T05)"
       - "forever/data/1.60.1.70009/mechanics.json (build.presets, build.contexts, build.confidence, build.stability_seeds)"
@@ -1361,7 +1367,7 @@ mechanics:
       - tests/unit/test_community_builds.py::test_gaps_are_computed_by_the_engine
       - tests/unit/test_community_builds.py::test_no_community_value_in_the_data
     tolerance: null
-    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo ; T05 bloc G : profil PvP porté (forever/engine/pvp.py, parité exacte en rules seed ; barème pvp.profile suppose, recharges du client, Blink et Counterspell de spells.json) ; contextes pvp-bg (poids du seed) et pvp-world (poids supposés) par départs multiples et recherche locale, sans Monte Carlo (modèle déterministe) ; le glouton du seed est gardé pour la parité ; T05 bloc H : respec (forever/engine/respec.py : coût du barème, certitude probable pour les paliers observés sur la bêta puis suppose, or par heure, bilan ; forever/optimize/respec.py : conseil du seed à l'identique en rules seed ; conseil forever à deux chemins de l'optimiseur à l'analytique, gain par niveau de respec, niveau conseillé = meilleur bilan positif) ; T05 bloc I2 : forever build <contexte> --level N et l'outil MCP forever_build (forever/build.py) : raisons (valeur d'un point contre son meilleur autre emplacement, trois confirmées au Monte Carlo apparié), alternative la plus proche, stabilité sur build.stability_seeds graines, sensibilité aux sept hypothèses (with_assumption), respec, angles morts du registre, certitude = minimum des sources, plafond de la bêta ; T05 bloc J : leveling en mode forever par départs multiples (faisceau libre et un faisceau par arbre, le chemin le plus court gagne) : sans eux, le faisceau rapide restait enfermé dans le Feu (Givre de la communauté 17 % plus rapide au niveau 30) ; comparaison avec 55 builds de la communauté (scripts/build_community_fixture.py, tests/fixtures/community/mage_builds.json) : 8 concordent, les autres écarts expliqués par une entrée du registre ou une source douteuse ; au niveau 30, des builds Arcanes font mieux au seul niveau 30 (notre référence suit le meilleur chemin cumulé de 10 à 30)"
+    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo ; T05 bloc G : profil PvP porté (forever/engine/pvp.py, parité exacte en rules seed ; barème pvp.profile suppose, recharges du client, Blink et Counterspell de spells.json) ; contextes pvp-bg (poids du seed) et pvp-world (poids supposés) par départs multiples et recherche locale, sans Monte Carlo (modèle déterministe) ; le glouton du seed est gardé pour la parité ; T05 bloc H : respec (forever/engine/respec.py : coût du barème, certitude probable pour les paliers observés sur la bêta puis suppose, or par heure, bilan ; forever/optimize/respec.py : conseil du seed à l'identique en rules seed ; conseil forever à deux chemins de l'optimiseur à l'analytique, gain par niveau de respec, niveau conseillé = meilleur bilan positif) ; T05 bloc I2 : forever build <contexte> --level N et l'outil MCP forever_build (forever/build.py) : raisons (valeur d'un point contre son meilleur autre emplacement, trois confirmées au Monte Carlo apparié), alternative la plus proche, stabilité sur build.stability_seeds graines, sensibilité aux sept hypothèses (with_assumption), respec, angles morts du registre, certitude = minimum des sources, plafond de la bêta ; T05 bloc J : leveling en mode forever par départs multiples (faisceau libre et un faisceau par arbre, le chemin le plus court gagne) : sans eux, le faisceau rapide restait enfermé dans le Feu (Givre de la communauté 17 % plus rapide au niveau 30) ; comparaison avec 55 builds de la communauté (scripts/build_community_fixture.py, tests/fixtures/community/mage_builds.json) : 8 concordent, les autres écarts expliqués par une entrée du registre ou une source douteuse ; au niveau 30, des builds Arcanes font mieux au seul niveau 30 (notre référence suit le meilleur chemin cumulé de 10 à 30) ; T05 (relecture) : certitude suppose (profil PvP du seed, poids pvp-world supposés, respec au-delà des paliers observés, scénarios provisoires) ; le coût de respec vit dans forever/engine/respec.py sous cette entrée (entrée propre à créer)"
     formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide)"
   - id: I6
     categorie: optimisation
@@ -1418,7 +1424,8 @@ mechanics:
     statut: absent
     certitude: probable
     sources:
-      - "tasks/T05-etat.md (constats du bloc C)"
+      - "docs/DECISIONS.md (décisions 79 et 83)"
+      - "docs/OPEN_QUESTIONS.md (B15, T05)"
     tests: []
     tolerance: null
     note: "T05 : Scorch et Fire Vulnerability dans les rotations en T09 ; Missile Barrage seulement sur la décharge de la rotation arcane ; Arcane Power au pull (décision 79) ; aucune rotation ne passe à un sort moins cher quand la mana manque ; non chiffré"
