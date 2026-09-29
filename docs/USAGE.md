@@ -24,8 +24,8 @@ Ce que fait le script (relançable sans risque) :
 - `uv sync` ;
 - déclare la marketplace locale `wow-forever` (le dépôt) et installe le plugin `forever@wow-forever` en portée
   utilisateur ;
-- contrôle : `claude plugin validate` (seul avertissement attendu : pas de numéro de version, voulu pour que la mise à
-  jour recopie le plugin), `forever status --offline`, plugin présent et activé.
+- contrôle : `claude plugin validate --strict` (plugin versionné : la mise à jour recopie le plugin quand la version
+  de `plugin.json` change), `forever status --offline`, plugin présent et activé.
 
 Second PC : même procédure. L'addon ForeverLogger s'installe à part : `uv run python scripts/install_addon.py`
 (il lit `FOREVER_WOW_DIR`, sinon cherche le client dans les deux dossiers Program Files).
@@ -52,6 +52,19 @@ Lancer `claude` dans n'importe quel dossier et poser la question en français. E
 
 Dans le dépôt, une ligne de fraîcheur des données s'affiche au démarrage de la session. Ailleurs, rien au démarrage :
 le routeur vérifie la fraîcheur (`forever_status`) à la première question sur WoW.
+
+## Mon personnage (profil)
+Le profil vit hors du dépôt (`%USERPROFILE%\.forever\profile.json`, ou le fichier désigné par `FOREVER_PROFILE`) ;
+plusieurs personnages, un actif. Les réponses le lisent avant tout calcul et le rappellent en une ligne ; une donnée
+absente est demandée avant le calcul.
+```powershell
+uv run forever profile set Givrelame --class Mage --race Orc --faction Horde --level 22 --talents "improvedFrostbolt=5,elementalPrecision=3"
+uv run forever profile set Givrelame --profession "Couture=150"
+uv run forever profile list
+uv run forever profile use Givrelame
+uv run forever profile show
+uv run forever profile remove Givrelame
+```
 
 ## Lire la réponse
 Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour les raisons, hypothèses et alternatives.

@@ -120,9 +120,19 @@ Demande de l'utilisateur du 2026-09-29, après l'évaluation du plugin (`docs/re
   d'évaluation (points du build par arbre et au total dans `forever_build`, effet au maximum des cumuls quand un
   talent ou une mécanique le définit…), calculées dans `forever/engine/` ; consigne « aucun calcul » du plugin
   inchangée.
-- **Critères de fin** : à fixer au plan de T06b ; au moins `forever lookup talent` à certitude `certain` pour les
-  talents redécodés, Hot Streak à 20 s partout, totaux présents dans `forever_build` avec leurs tests, évaluation du
-  plugin rejouée sans alerte du contrôle des chiffres.
+- **Critères de fin** (plan `tasks/T06b-plan.md`, validé le 2026-09-29) : `forever lookup talent` à `certain` pour
+  les 54 talents ; Hot Streak à 20 s partout ; coûts en mana du client en mode forever, estimation B11 réservée au
+  seed ; révision 2 visible dans la provenance, `revisions.json` et le rapport de diff ; parité du seed verte sans
+  valeur attendue changée ; totaux dans `forever_build`, `forever_explain_mechanic`, `forever_lookup`,
+  `forever_sim_leveling` ; `forever profile` et `forever_player_profile` ; départage et `next_step` ; builds de T05
+  rejoués et documentés ; évaluation du plugin (51 cas) sans alerte du contrôle des chiffres ; `plugin.json`
+  versionné, `validate --strict` vert.
+- **Fait** : `forever install` (révision 2, décision 98), copies figées du seed pour le mode seed, provenance
+  `data_revision` ; totaux (`points`, `derived`, `monte_carlo_stats`, `advantage`) ; profil joueur hors du dépôt
+  (décision 99) ; recommandations départagées et `next_step` (décision 100) ; plugin 0.2.0 et empreinte (décision
+  101) ; rejeu des builds (`docs/research/builds-T05.md`, section « Rejeu T06b ») ; évaluation (`docs/research/plugin-eval-T06.md`).
+- **Reste pour T08** : chaîne automatique de veille, installation d'une **nouvelle** version de données (copie des
+  `_seed_*.json` comprise) et PR de données ; `forever_diff_versions`.
 
 ## FA1 — ForeverAssist V1 (affichage de données précalculées)
 Addon d'affichage seul (règles et canaux : `docs/ADDON.md`). Aucun calcul de combat dans l'addon : `forever` précalcule, l'addon affiche.
@@ -224,7 +234,7 @@ Placé avant T07 parce que les bonus Legacy pèsent sur le leveling : le catalog
 - **Critères de fin** : `forever rep info` avec source et certitude par champ ; `forever rep plan` déterministe sur un état d'exemple importé d'une fixture de SavedVariable.
 
 ## T08 — Veille
-- **Fait (repris de T03)** (l'installation pour 1.60.1.70009 passe en T06b ; T08 garde l'automatisation pour les versions suivantes) : installation d'une version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report`) ; application de `overrides.json` et de `confirmed_changes.json` ; substitution des coûts en mana relevés dans le client à l'estimation de `mechanics.json` (`mana.talent_rank_cost`) ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
+- **Fait (repris de T03)** (l'installation pour 1.60.1.70009 passe en T06b ; T08 garde l'automatisation pour les versions suivantes) : installation d'une nouvelle version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report` ; la révision de la version courante existe depuis T06b : `forever install`) ; application de `overrides.json` ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
 - **Durcissement du pipeline (relecture T03)** : `$d` entre dans les expressions `${…}` dans son unité d'affichage (minutes dès 60 s), aucune infobulle de talent ne l'exerce aujourd'hui ; un sort cité deux fois par une infobulle d'aura 226 compterait deux fois ses dégâts ; `SpellLevel` n'est pas lu (écart de niveau calculé depuis `BaseLevel`) ; `--locale` ignoré sans `--tables` ; un CSV réduit à son en-tête est accepté ; `verify` suppose `level` en tête de `rank_format`.
 - **Critères de fin** : `build-watch.yml` simulé en test (nouvelle version fictive → PR et note) ; alerte `silent` après 14 jours sans version.
 

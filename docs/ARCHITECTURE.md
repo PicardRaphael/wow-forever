@@ -102,7 +102,7 @@ forever-core/
 | `forever_optimize_gear` | Ensemble réel simulé sous contraintes |
 | `forever_consumables_plan` | Plan par zone, métier, budget |
 | `forever_diff_versions` | Ce qui change entre deux versions, par classe |
-| `forever_player_profile` | Lire ou mettre à jour une fiche joueur |
+| `forever_player_profile` | Lire le profil du joueur (personnage actif ou nommé, `stale`, `missing`), en lecture seule ; écriture par `forever profile set` (T06b, décision 99) |
 
 ## Plugin Claude Code
 Livré en T06 (`plugin/`, décisions 91 à 97), installé au niveau utilisateur par `scripts/install_plugin.ps1` depuis la
@@ -121,7 +121,9 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
   Garde dans `hooks.json` : rien ne s'exécute sans `pyproject.toml` au chemin du dépôt (aucune erreur ailleurs).
 - **Pas de statusline** (décision 15), pas de commandes `/forever…` en T06 (le langage naturel suffit ; à reprendre si
   l'évaluation le justifie).
-- **Évaluation** : `plugin/evals/` (30 questions réelles, 20 voisines), contrôlée sans modèle en CI
+- **Version** : semver dans `plugin.json` (0.2.0 en T06b), relevée à chaque changement de `plugin/`, gardée par
+  `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
+- **Évaluation** : `plugin/evals/` (31 questions réelles, 20 voisines ; 51 cas depuis T06b), contrôlée sans modèle en CI
   (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
   (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
 
@@ -144,7 +146,8 @@ Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la
 - Commandes CLI : `forever pvp …`, `forever dungeon …`, `forever legacy …`, `forever profession …`, `forever rep …`, `forever prices …` (détail dans chaque section de `docs/ROADMAP.md`), toutes branchées sur les mêmes services que le MCP.
 
 ## Mémoire joueur
-Fichiers du vault, suivis dans Git : `joueur/personnages/<nom>.json` (avec la version du jeu), `objectifs.md`, `decisions.md` (datées), `legacy.json`, `historique/`.
+Profil minimal (T06b, décision 99) : `forever/profile.py`, fichier `FOREVER_PROFILE` ou `~/.forever/profile.json`, **hors du dépôt** (écriture refusée sous le dépôt) : personnages (classe, race, faction, niveau, talents, métiers, version des données), un actif. Les outils de calcul ne le lisent jamais : l'agent le lit (`forever_player_profile`) et passe les valeurs ; chaque rapport rend `inputs` (origine `argument` ou `default`).
+Vault de T07, hors du dépôt lui aussi (données personnelles) : fiches datées `personnages/<nom>.json` (avec la version du jeu), `objectifs.md`, `decisions.md`, `legacy.json`, `historique/`.
 La mémoire de Claude ne garde que des pointeurs et des décisions, jamais de chiffres de jeu.
 
 ## Veille
