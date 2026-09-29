@@ -232,11 +232,18 @@ def write_section(gd: Any, doc: dict[str, Any]) -> None:
     by_kind = {k: sum(b["explanation"]["kind"] == k for b in counted) for k in KIND_LABELS}
     lines += [
         "",
-        f"Décompte, doublons exclus ({len(counted)} builds sur {len(doc['builds'])}) : "
+        f"Décompte ({len(counted)} builds"
+        + (f" sur {len(doc['builds'])}, doublons exclus" if len(counted) < len(doc["builds"]) else "")
+        + ") : "
         + ", ".join(f"{KIND_LABELS[k]} {n}" for k, n in by_kind.items())
-        + ". Doublons (même page qu'un autre build, non comptés) : "
-        + (", ".join(f"{b['id']} (de {b['duplicate_of']})" for b in doc["builds"] if b.get("duplicate_of")) or "aucun")
-        + ".",
+        + "."
+        + (
+            " Doublons (même page et même build qu'un autre, non comptés) : "
+            + ", ".join(f"{b['id']} (de {b['duplicate_of']})" for b in doc["builds"] if b.get("duplicate_of"))
+            + "."
+            if len(counted) < len(doc["builds"])
+            else ""
+        ),
         "",
         "| Id | Source | Date | Contexte | Niveau | Écart analytique | Écart Monte Carlo | Explication |",
         "| --- | --- | --- | --- | --- | --- | --- | --- |",
