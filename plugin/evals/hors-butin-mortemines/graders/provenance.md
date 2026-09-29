@@ -1,4 +1,4 @@
 ---
 type: regex
-pattern: '1\.60\.\d+\.\d+'
+pattern: '\d+\.\d+\.\d+\.\d{4,}'
 ---

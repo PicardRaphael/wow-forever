@@ -1313,7 +1313,9 @@ def _cmd_hook(deps: Deps, args: argparse.Namespace) -> int:
     from forever.hooks import check_numbers_output, session_start_output
 
     try:
-        hook_input = json.loads(sys.stdin.read() or "{}")
+        # Octets décodés en UTF-8 : sous Windows, sys.stdin suit l'encodage local (cp1252) sans PYTHONUTF8.
+        raw = sys.stdin.buffer.read() if hasattr(sys.stdin, "buffer") else sys.stdin.read().encode("utf-8")
+        hook_input = json.loads(raw.decode("utf-8", errors="replace") or "{}")
     except (ValueError, OSError):
         hook_input = {}
     if not isinstance(hook_input, dict):

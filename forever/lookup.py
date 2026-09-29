@@ -185,6 +185,7 @@ def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLooku
     exigés dans l'arbre, prérequis, rangs et valeurs (description aux valeurs du rang), sort appris, provenance.
 
     Registre : G3"""
+    from forever.engine.talents import tier_points_required
     from forever.gamedata import build_game_data
 
     data = load_version(deps)
@@ -250,7 +251,7 @@ def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLooku
         "tree": talent.tree,
         "tier": talent.tier,
         "col": talent.col,
-        "required_tree_points": gd.constants.talents.points_per_tier * (talent.tier - 1),
+        "required_tree_points": tier_points_required(gd, talent.tier),
         "prereq": prereq,
         "max_rank": talent.max_rank,
         "description_template": entry["desc"],

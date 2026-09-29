@@ -40,7 +40,8 @@ _FOREVER_SKILL = re.compile(r"^(?:forever:)?forever-[\w-]+$")
 _SOURCE_AGENT = re.compile(r"^(?:forever:)?forever-sim-runner$")
 _FOREVER_AGENT = re.compile(r"^(?:forever:)?forever-[\w-]+$")
 _EPS = 1e-9
-# Au-delà de deux zéros finals, un entier affiché est un arrondi ; écart relatif accepté (paramètre de l'outil).
+# Entier affiché avec des zéros finals (20, 12 300) : lu comme un arrondi à la dizaine, à la centaine…, écart borné à
+# cette fraction de la valeur (paramètre de l'outil). « 20 » accepte ainsi une valeur d'outil entre 19 et 21.
 _ROUNDING_REL = 0.05
 
 

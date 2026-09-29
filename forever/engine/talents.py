@@ -24,6 +24,13 @@ def points_available(gd: GameData, level: int, talented_bonus: int = 0) -> int:
     return max(0, level - (gd.constants.talents.first_level - 1) + talented_bonus)
 
 
+def tier_points_required(gd: GameData, tier: int) -> int:
+    """Points à dépenser dans l'arbre avant de prendre un talent du palier `tier`.
+
+    Registre : G3"""
+    return gd.constants.talents.points_per_tier * (tier - 1)
+
+
 def check_build(gd: GameData, pts: Points, level: int, talented_bonus: int = 0) -> list[str]:
     """Erreurs de légalité en français (liste vide : build légal).
 
