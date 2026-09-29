@@ -26,6 +26,12 @@ Réponse directe et chiffres essentiels, puis, si une hypothèse ou un angle mor
 
 Plusieurs outils : la certitude la plus basse, la version et la fraîcheur du dernier résultat.
 
+## Plugin mal installé
+Avant tout, vérifie que les outils `mcp__plugin_forever_forever__…` existent (`ToolSearch`). Introuvables, ou
+serveur qui ne répond pas : réponds seulement par ce message, sans rien répondre de mémoire :
+
+> Le serveur forever ne répond pas : la variable FOREVER_HOME est absente ou ne pointe pas vers le dépôt wow-forever. Depuis la racine du dépôt, lancer `powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1`, puis ouvrir un nouveau terminal et relancer Claude Code.
+
 ## Règle « je ne sais pas »
 Dis « je ne sais pas » (ou « le projet ne couvre pas encore … ») quand :
 - le domaine n'est pas couvert (carte du routeur) ;

@@ -5,8 +5,9 @@ description: "Mage de WoW Forever : sorts (dégâts, rangs, coût, temps d'incan
 
 # Mage (WoW Forever)
 
-Lis d'abord `../forever-router/format-reponse.md` (forme de la réponse, règle « je ne sais pas »). Aucun chiffre de
-mémoire : tout vient des outils ci-dessous.
+Lis d'abord `../forever-router/format-reponse.md` : section « Plugin mal installé » (outils forever introuvables :
+message fixe, rien de mémoire), forme de la réponse, règle « je ne sais pas ». Aucun chiffre de mémoire : tout vient
+des outils ci-dessous.
 
 ## Sorts
 - `forever_lookup(kind="spell", name=<nom anglais>, rank=<rang>)` ; sans `rank`, tous les rangs.

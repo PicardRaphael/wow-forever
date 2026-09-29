@@ -5,8 +5,9 @@ description: "Leveling du Mage dans WoW Forever : temps pour tuer un monstre, XP
 
 # Leveling du Mage (WoW Forever)
 
-Lis d'abord `../forever-router/format-reponse.md` (forme de la réponse, règle « je ne sais pas »). Aucun chiffre de
-mémoire : tout vient des outils ci-dessous.
+Lis d'abord `../forever-router/format-reponse.md` : section « Plugin mal installé » (outils forever introuvables :
+message fixe, rien de mémoire), forme de la réponse, règle « je ne sais pas ». Aucun chiffre de mémoire : tout vient
+des outils ci-dessous.
 
 ## Ce qu'il faut savoir du joueur
 - **Niveau** : obligatoire. S'il manque, demande-le (une question courte) avant d'appeler un outil.
