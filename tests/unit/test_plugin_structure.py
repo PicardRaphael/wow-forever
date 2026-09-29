@@ -94,8 +94,8 @@ def test_plugin_manifest():
     assert p["name"] == "forever"
     assert p["description"]
     assert p["author"]["name"]
-    # Bloc A : avec une version fixe, `claude plugin update` ne recopie rien tant qu'elle ne change pas.
-    assert "version" not in p
+    # T06b (D8) : version semver, relevée à chaque changement de plugin/ (test_plugin_version.py).
+    assert "version" in p
 
 
 def test_mcp_server_runs_forever_mcp_from_the_repo():
@@ -176,8 +176,35 @@ def test_response_format():
         assert heading in text
     assert "je ne sais pas" in text.lower()
     assert "français" in text and "courte" in text  # D3
-    # pied de réponse fixe, cherché par les correcteurs de l'évaluation
+    # pied de réponse fixe, cherché par les correcteurs de l'évaluation ; révision des données (T06b)
     assert re.search(r"Certitude : .* · Version .* · Fraîcheur", text)
+    assert "r<provenance.data_revision>" in text
+
+
+def test_player_data_rule():
+    """T06b (D6) : donnée personnelle lue dans le profil, demandée avant le calcul sinon, jamais un défaut muet."""
+    text = (PLUGIN / "skills" / "forever-router" / "format-reponse.md").read_text(encoding="utf-8")
+    assert "## Données du joueur" in text
+    section = text.split("## Données du joueur", 1)[1].split("\n## ", 1)[0]
+    assert "forever_player_profile" in section
+    assert "forever profile set" in section
+    assert "avant" in section and "inputs" in section and "Profil :" in section
+    for name in SKILLS:
+        _, body = frontmatter(PLUGIN / "skills" / name / "SKILL.md")
+        assert "forever_player_profile" in body or name == "forever-mage", name
+    _, leveling = frontmatter(PLUGIN / "skills" / "forever-leveling" / "SKILL.md")
+    assert "garde le défaut de l'outil" not in leveling
+    assert "next_step" in leveling
+
+
+def test_measured_comparison_rule():
+    """T06b (D6, D7) : Monte Carlo contre Monte Carlo avec intervalle ; « non départagé » quand il contient zéro."""
+    text = (PLUGIN / "skills" / "forever-router" / "format-reponse.md").read_text(encoding="utf-8")
+    assert "## Comparer deux options" in text
+    section = text.split("## Comparer deux options", 1)[1].split("\n## ", 1)[0]
+    assert "non départagé par le calcul" in section
+    assert "analytique" in section and "Monte Carlo" in section and "intervalle" in section
+    assert "non modélisé" in section
 
 
 @pytest.mark.parametrize("name", AGENTS)

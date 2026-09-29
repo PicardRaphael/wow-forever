@@ -19,7 +19,7 @@ pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
 
 EVALS = REPO_ROOT / "plugin" / "evals"
 MCP_PREFIX = "mcp__plugin_forever_forever__"
-POSITIVE_COUNTS = {"talent": 5, "build": 6, "respec": 4, "zone": 4, "mecanique": 5, "leveling": 3, "hors-perimetre": 3}
+POSITIVE_COUNTS = {"talent": 6, "build": 6, "respec": 4, "zone": 4, "mecanique": 5, "leveling": 3, "hors-perimetre": 3}
 NEGATIVE_CATEGORIES = ("wow-autre", "autre-jeu", "programmation")
 POSITIVE_GRADERS = {"skill", "outil", "chiffres", "certitude", "provenance"}
 
@@ -67,10 +67,28 @@ def tool_names(tmp_path_factory):
 # --- Suite ---------------------------------------------------------------------------------------------------------
 
 
-def test_fifty_cases_thirty_positive_twenty_negative():
+def test_fifty_one_cases_thirty_one_positive_twenty_negative():
     polarity = [front(c / "prompt.md")[0]["tags"][0] for c in cases()]
-    assert len(polarity) == 50
-    assert polarity.count("positif") == 30 and polarity.count("negatif") == 20
+    assert len(polarity) == 51  # T06b : cas talent-niveau-22
+    assert polarity.count("positif") == 31 and polarity.count("negatif") == 20
+
+
+def test_talent_level_22_case():
+    """T06b (D7) : prochain talent depuis un build actuel écrit en toutes lettres ; juge « mesuré et modélisé »."""
+    case = EVALS / "talent-niveau-22"
+    meta, question = front(case / "prompt.md")
+    assert meta["tags"] == ["positif", "talent"]
+    assert "22" in question and "Givre" in question
+    g = graders(case)
+    assert set(g) == POSITIVE_GRADERS | {"mesure-et-modelise"}
+    outil = g["outil"][0]
+    assert outil["tool"] == MCP_PREFIX + "forever_build"
+    assert "current" in outil["input_match"] and re.search(r"level", outil["input_match"])
+    assert re.search(outil["input_match"], '{"context": "leveling", "level": 22, "current": {"x": 1}}')
+    judge_meta, judge = g["mesure-et-modelise"]
+    assert judge_meta["type"] == "llm"
+    for words in ("non modélisé", "Monte Carlo", "analytique", "non départagé"):
+        assert words in judge, words
 
 
 def test_case_names_are_the_directories():
@@ -188,8 +206,9 @@ def test_report_thresholds_of_d10():
 def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    assert len(loaded) == 50
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 30
+    assert len(loaded) == 51
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 31
+    assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 
 
