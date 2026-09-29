@@ -27,3 +27,8 @@ Branche `t05`. Un cycle rouge → vert par bloc ; demandes de correction regroup
 - Boss insensibles au gel (suppose, question ouverte ajoutée) : pas d'Ice Lance sur gel en boss, Fingers of Frost seulement.
 - **Optimiseur, premiers résultats (préréglage rapide, fiche de base)** : leveling 10 → 30 en Feu (Improved Fireball, Elemental Precision, Ignite, Burning Soul) ; raid et donjon au niveau 30 en Arcanes (`ab_stacks` 1, mana limitée) ; raid au niveau 60 : Arcanes 46/5, beaucoup de points sur des talents sans effet modélisé (Wand Specialization, Magic Absorption, Arcane Shielding…) : égalités, à signaler dans les raisons et les angles morts.
 - **Analytique des scénarios avec fin de mana** : ~10 % sous le Monte Carlo (niveau 60, raid, Arcanes : 75,6 contre 83,5) ; le hasard de Missile Barrage et de Clearcasting prolonge le Monte Carlo. Décision au Monte Carlo.
+
+## Fin de tranche (2026-09-29)
+- `/verifier` : lint, typage, registre (108 entrées, couverture 37/108) et contrôle des chiffres verts ; 1 244 tests passent, 7 échouent, exactement ceux des six demandes de `tasks/T05-corrections.md`.
+- Relecture du diff et audit du registre : suites appliquées (`c8977e1`, `7c96d77`).
+- Reste : accord de l'utilisateur sur les six demandes, application des diffs, `tasks/.rouge` et `tasks/.tests-verrouilles` supprimés, CI Ubuntu et Windows, fusion en avance rapide.
