@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from forever.engine.model import GameData, Points
 
 
@@ -107,3 +109,7 @@ def tree_split(gd: GameData, pts: Points) -> dict[str, int]:
     for k, r in pts.items():
         s[gd.talents[k].tree] += r
     return s
+
+
+def build_points(gd: GameData, pts: Points, level: int, talented_bonus: int = 0) -> dict[str, Any]:
+    raise NotImplementedError("T06b : totaux")

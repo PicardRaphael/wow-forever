@@ -111,7 +111,7 @@ def _resolve(mechanics: Sequence[Mechanic], query: str) -> Mechanic:
     raise UnknownMechanicError(query, [f"{m.id} : {m.description}" for m in matches[:MAX_MATCHES]])
 
 
-def explain_mechanic(deps: Deps, mechanic_id: str) -> MechanicExplanation:
+def explain_mechanic(deps: Deps, mechanic_id: str, level: int | None = None) -> MechanicExplanation:
     """Explication d'une mécanique du registre, par identifiant ou par mots de la description ; lève
     UnknownMechanicError, DataSchemaError ou DataIntegrityError."""
     version = load_version(deps)  # intégrité d'abord, comme les autres consultations

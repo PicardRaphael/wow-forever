@@ -22,6 +22,7 @@ FIELDS = (
     "scenario",
     "talents",
     "talents_by_tree",
+    "points",  # T06b : totaux (points par arbre, au total, disponibles, non dépensés)
     "order",
     "choices",
     "metric",

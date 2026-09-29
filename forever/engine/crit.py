@@ -52,3 +52,7 @@ def crit_mult(gd: GameData, school: str, pts: Points) -> float:
     if school == "arcane":
         return 1 + base_bonus * (1 + talent_value(gd, pts, "arcaneMind", 1) / PERCENT)
     return 1 + base_bonus
+
+
+def winters_chill_crit(gd: GameData, stacks: float) -> float:
+    raise NotImplementedError("T06b : Winter's Chill")
