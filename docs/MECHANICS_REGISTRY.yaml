@@ -484,7 +484,7 @@ mechanics:
       - tests/unit/test_totals.py::test_arcane_blast_cost_by_stack
       - tests/unit/test_totals.py::test_explain_mechanic_gives_derived_values
     tolerance: null
-    formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié ; Arcane Blast à n cumuls : coût × (1 + n × hausse par cumul du talent arcaneBlast)"
+    formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié ; Arcane Blast à n cumuls : coût × (1 + n × hausse par cumul du talent arcaneBlast) (mode seed seulement depuis T06b)"
     note: "T04c : escalade d'Arcane Blast (mana.arcane_blast_cost ; hausses de l'aura additionnées : probable, voir OPEN_QUESTIONS), payée lancer par lancer (Monte Carlo) et sur le cycle (analytique) ; Clearcasting rend le lancer gratuit sans retirer de cumul (suppose) ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2) ; T06b (révision 2) : coûts des rangs 1 issus d'un talent (Pyroblast, Ice Lance, Blast Wave) lus dans le client (SpellPower.ManaCost), l'estimation mana.talent_rank_cost ne sert plus qu'au mode seed"
   - id: B12
     categorie: ressources
@@ -786,10 +786,12 @@ mechanics:
   - id: D4
     categorie: environnement
     description: "Débuffs de cible (Winter's Chill personnel)"
+    alias: ["Winter's Chill"]
     forever: modifie
     statut: teste
     certitude: probable
     sources:
+      - "forever/data/1.60.1.70009/talents.json (wintersChill : chance, cumuls maximum = 2e variable du rang, révision 2)"
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/mechanics.json"
@@ -799,7 +801,7 @@ mechanics:
       - tests/unit/test_totals.py::test_winters_chill_crit_by_stack_and_rank
       - tests/unit/test_totals.py::test_lookup_talent_gives_derived_values
     tolerance: null
-    formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance)"
+    formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance) ; cumuls ≤ 2e variable du rang du talent"
     note: "T04b : chance d'application de Winter's Chill portée dans les simulateurs de leveling (cumuls sans durée ni expiration dans le Monte Carlo, moyenne dans l'analytique), couverte par tests/parity/test_sim_leveling_parity.py ; durée des cumuls non modélisée"
   - id: D5
     categorie: environnement
@@ -1167,7 +1169,9 @@ mechanics:
     forever: oui
     statut: absent
     certitude: suppose
-    sources: []
+    sources:
+      - "forever/data/1.60.1.70009/talents.json (arcaneSubtlety)"
+      - "forever/data/1.60.1.70009/leveling.json (level_resist, non appliqué)"
     tests: []
     tolerance: null
     note: "T04b : le seed n'applique l'armure qu'aux coups des monstres sur le Mage (rattachée à I6) ; la cible n'a ni armure ni résistance dans le simulateur (level_resist de leveling.json non appliqué) : reste absente ; T06b : Arcane Subtlety (réduction des résistances de la cible) sans effet modélisé, angle mort"
@@ -1395,8 +1399,8 @@ mechanics:
       - tests/unit/test_community_builds.py::test_gaps_are_computed_by_the_engine
       - tests/unit/test_community_builds.py::test_no_community_value_in_the_data
     tolerance: null
-    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo ; T05 bloc G : profil PvP porté (forever/engine/pvp.py, parité exacte en rules seed ; barème pvp.profile suppose, recharges du client, Blink et Counterspell de spells.json) ; contextes pvp-bg (poids du seed) et pvp-world (poids supposés) par départs multiples et recherche locale, sans Monte Carlo (modèle déterministe) ; le glouton du seed est gardé pour la parité ; T05 bloc H : respec (forever/engine/respec.py : coût du barème, certitude probable pour les paliers observés sur la bêta puis suppose, or par heure, bilan ; forever/optimize/respec.py : conseil du seed à l'identique en rules seed ; conseil forever à deux chemins de l'optimiseur à l'analytique, gain par niveau de respec, niveau conseillé = meilleur bilan positif) ; T05 bloc I2 : forever build <contexte> --level N et l'outil MCP forever_build (forever/build.py) : raisons (valeur d'un point contre son meilleur autre emplacement, trois confirmées au Monte Carlo apparié), alternative la plus proche, stabilité sur build.stability_seeds graines, sensibilité aux sept hypothèses (with_assumption), respec, angles morts du registre, certitude = minimum des sources, plafond de la bêta ; T05 bloc J : leveling en mode forever par départs multiples (faisceau libre et un faisceau par arbre, le chemin le plus court gagne) : sans eux, le faisceau rapide restait enfermé dans le Feu (Givre de la communauté 17 % plus rapide au niveau 30) ; comparaison avec 55 builds de la communauté (scripts/build_community_fixture.py, tests/fixtures/community/mage_builds.json) : 8 concordent, les autres écarts expliqués par une entrée du registre ou une source douteuse ; au niveau 30, des builds Arcanes font mieux au seul niveau 30 (notre référence suit le meilleur chemin cumulé de 10 à 30) ; T05 (relecture) : certitude suppose (profil PvP du seed, poids pvp-world supposés, respec au-delà des paliers observés, scénarios provisoires) ; le coût de respec vit dans forever/engine/respec.py sous cette entrée (entrée propre à créer) ; T05 (relecture) : valeur analytique d'un contexte sur la durée effective de chaque scénario (dégâts / dégâts par seconde) ; part des combats avec Arcane Power à l'analytique min(1, cycle / recharge), plus haute que la politique au pull du Monte Carlo (1 / plafond(recharge / cycle)) : surestime Arcane Power, décision au Monte Carlo"
-    formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide)"
+    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo ; T05 bloc G : profil PvP porté (forever/engine/pvp.py, parité exacte en rules seed ; barème pvp.profile suppose, recharges du client, Blink et Counterspell de spells.json) ; contextes pvp-bg (poids du seed) et pvp-world (poids supposés) par départs multiples et recherche locale, sans Monte Carlo (modèle déterministe) ; le glouton du seed est gardé pour la parité ; T05 bloc H : respec (forever/engine/respec.py : coût du barème, certitude probable pour les paliers observés sur la bêta puis suppose, or par heure, bilan ; forever/optimize/respec.py : conseil du seed à l'identique en rules seed ; conseil forever à deux chemins de l'optimiseur à l'analytique, gain par niveau de respec, niveau conseillé = meilleur bilan positif) ; T05 bloc I2 : forever build <contexte> --level N et l'outil MCP forever_build (forever/build.py) : raisons (valeur d'un point contre son meilleur autre emplacement, trois confirmées au Monte Carlo apparié), alternative la plus proche, stabilité sur build.stability_seeds graines, sensibilité aux sept hypothèses (with_assumption), respec, angles morts du registre, certitude = minimum des sources, plafond de la bêta ; T05 bloc J : leveling en mode forever par départs multiples (faisceau libre et un faisceau par arbre, le chemin le plus court gagne) : sans eux, le faisceau rapide restait enfermé dans le Feu (Givre de la communauté 17 % plus rapide au niveau 30) ; comparaison avec 55 builds de la communauté (scripts/build_community_fixture.py, tests/fixtures/community/mage_builds.json) : 8 concordent, les autres écarts expliqués par une entrée du registre ou une source douteuse ; au niveau 30, des builds Arcanes font mieux au seul niveau 30 (notre référence suit le meilleur chemin cumulé de 10 à 30) ; T05 (relecture) : certitude suppose (profil PvP du seed, poids pvp-world supposés, respec au-delà des paliers observés, scénarios provisoires) ; le coût de respec vit dans forever/engine/respec.py sous cette entrée (entrée propre à créer) ; T05 (relecture) : valeur analytique d'un contexte sur la durée effective de chaque scénario (dégâts / dégâts par seconde) ; part des combats avec Arcane Power à l'analytique min(1, cycle / recharge), plus haute que la politique au pull du Monte Carlo (1 / plafond(recharge / cycle)) : surestime Arcane Power, décision au Monte Carlo ; T06b (décision 100) : départage en mode forever (engine/blind_spots.modeled_talents, optimize/decide.tie_break, optimize/leveling._state_meta, build._next_step) : meilleur au Monte Carlo si l'écart apparié est significatif, sinon talent modélisé préféré (modelise), sinon non_departage ; un non modélisé à égalité avec un modélisé est retiré du faisceau, sauf point de passage vers un palier (passage_palier) ; modélisé = hors des angles morts absent, sans distinguer les talents en partie modélisés (I8 : pyroblast, arcanePower) ni le contexte (voir OPEN_QUESTIONS)"
+    formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide) ; T06b : à égalité statistique (intervalle apparié qui contient 0), talent modélisé d'abord ; next_step : toutes les additions légales au niveau N depuis un build légal au niveau N − 1"
   - id: I6
     categorie: optimisation
     description: "Leveling : temps par monstre, XP, repos"
@@ -1481,6 +1485,7 @@ mechanics:
     sources:
       - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
     tests:
+      - tests/unit/test_next_step.py::test_significant_gap_is_decided_by_monte_carlo
       - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_seed_mode
       - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_default_mode
       - tests/unit/test_chart.py::test_two_generations_are_identical
@@ -1489,7 +1494,7 @@ mechanics:
       - tests/unit/test_mc_stats.py::test_stability_over_seeds
     tolerance: null
     formule: "même graine, mêmes paramètres, mêmes données : même résultat (générateur injecté, ordre des tirages fixe)"
-    note: "T04b : graine par défaut du seed ; le graphique de leveling est identique octet pour octet à graine fixe ; T05 (décision 85) : mc_stats rejoue les combats de mc (même graine) avec écart-type et erreur standard ; paired_gap : différence combat par combat, intervalle normal à build.confidence ; decide : gagnant si l'intervalle exclut 0, sinon analytique ; stability : décision rejouée sur build.stability_seeds graines. Tirages communs faibles : un seul générateur par Monte Carlo (parité), les combats des deux builds se désalignent après le premier ; l'horloge d'Arcane Power rend les combats d'un même Monte Carlo dépendants, l'erreur standard l'ignore (effet faible)"
+    note: "T04b : graine par défaut du seed ; le graphique de leveling est identique octet pour octet à graine fixe ; T05 (décision 85) : mc_stats rejoue les combats de mc (même graine) avec écart-type et erreur standard ; paired_gap : différence combat par combat, intervalle normal à build.confidence ; decide : gagnant si l'intervalle exclut 0, sinon analytique ; stability : décision rejouée sur build.stability_seeds graines. Tirages communs faibles : un seul générateur par Monte Carlo (parité), les combats des deux builds se désalignent après le premier ; l'horloge d'Arcane Power rend les combats d'un même Monte Carlo dépendants, l'erreur standard l'ignore (effet faible) ; T06b : decide garde l'analytique pour les écarts de l'alternative ; le départage des étapes du leveling et de next_step suit tie_break (I5)"
   - id: J3
     categorie: meta
     description: "Erreur statistique cible"

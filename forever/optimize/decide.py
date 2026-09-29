@@ -144,7 +144,7 @@ def tie_break(
     (`non_departage`). Rend le choix, sa décision, le second et l'écart apparié choix − second, et pour chaque candidat
     sa moyenne, son écart au meilleur et s'il est modélisé (`modeled` None : aucun talent n'est dit modélisé).
 
-    Registre : I5, J2"""
+    Registre : I5"""
     sign = 1.0 if lower_is_better else -1.0
     order = sorted(range(len(cands)), key=lambda i: (sign * cands[i][1].mean, i))
     best = cands[order[0]][1]
