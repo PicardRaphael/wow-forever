@@ -1015,7 +1015,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.2906064145808139,
+    "analytic_rel": -0.28267575808740975,
     "mc_rel": -0.3512650717494819,
     "mc_significant": true
    },
@@ -3072,7 +3072,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.4535388101041282,
+    "analytic_rel": -0.4612439128816601,
     "mc_rel": -0.44788198064994716,
     "mc_significant": true
    },

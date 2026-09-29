@@ -92,14 +92,17 @@ def context_analytic(
     **options: Any,
 ) -> tuple[float, dict[str, BuildChoice]]:
     """(dégâts par seconde du contexte, meilleur choix par scénario) à l'analytique : dégâts totaux / durée totale
-    retenue des scénarios, chacun avec son meilleur choix.
+    retenue des scénarios (durée effective : dégâts / dégâts par seconde, comme au Monte Carlo), chacun avec son
+    meilleur choix.
 
     Registre : H3, H5, I5"""
     dmg = dur = 0.0
     choices: dict[str, BuildChoice] = {}
     for s in context_scenarios(gd, context):
         r, c = _scenario_best(gd, s, level, pts, race, over, options)
-        dmg, dur, choices[s] = dmg + r["dmg"], dur + r["duration_s"], c
+        # durée effective du scénario : celle qui donne ses dégâts par seconde (fin du dernier lancer sans fin de mana)
+        length = r["dmg"] / r["dps"] if r["dps"] > 0 else r["duration_s"]
+        dmg, dur, choices[s] = dmg + r["dmg"], dur + length, c
     return (dmg / dur if dur > 0 else 0.0), choices
 
 
