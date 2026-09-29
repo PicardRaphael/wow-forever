@@ -28,8 +28,10 @@ def seed_respec():
         sys.path.remove(str(SEED_SCRIPTS))
 
 
-def test_pvp_et_respec_respec_part(game_data):
-    r = advise_leveling(game_data, 20, {"improvedFireball": 5}, {"improvedFrostbolt": 5}, 5, rules="seed", **SEED_MODE)
+def test_pvp_et_respec_respec_part(seed_game_data):
+    r = advise_leveling(
+        seed_game_data, 20, {"improvedFireball": 5}, {"improvedFrostbolt": 5}, 5, rules="seed", **SEED_MODE
+    )
     assert (r["xp_h_actuel"], r["xp_h_cible"], r["heures_gagnees"], r["cout_po"], r["bilan_po_equiv"]) == (
         17643,
         16537,
@@ -38,7 +40,7 @@ def test_pvp_et_respec_respec_part(game_data):
         -2.7,
     )
     assert r["verdict"] == "garder"
-    assert [respec_cost(game_data, i) for i in range(12)] == [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 50]
+    assert [respec_cost(seed_game_data, i) for i in range(12)] == [1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 50]
 
 
 @pytest.mark.parametrize(
@@ -50,15 +52,15 @@ def test_pvp_et_respec_respec_part(game_data):
         (45, {}, {"improvedFireball": 5, "ignite": 5, "incineration": 3}, 20, 12, None),
     ],
 )
-def test_advice_matches_the_seed(game_data, seed_respec, level, current, target, hours, n, gph):
-    ours = advise_leveling(game_data, level, current, target, hours, "Orc", n, gph, rules="seed", **SEED_MODE)
+def test_advice_matches_the_seed(seed_game_data, seed_respec, level, current, target, hours, n, gph):
+    ours = advise_leveling(seed_game_data, level, current, target, hours, "Orc", n, gph, rules="seed", **SEED_MODE)
     theirs = seed_respec.advise_leveling(level, current, target, hours, "Orc", n, gph=gph)
     keys = ("xp_h_actuel", "xp_h_cible", "heures_gagnees", "cout_po", "bilan_po_equiv", "verdict")
     assert {k: ours[k] for k in keys} == {k: theirs[k] for k in keys}
 
 
-def test_cost_and_gold_per_hour_match_the_seed(game_data, seed_respec):
+def test_cost_and_gold_per_hour_match_the_seed(seed_game_data, seed_respec):
     for i in range(15):
-        assert respec_cost(game_data, i) == seed_respec.cost(i)
+        assert respec_cost(seed_game_data, i) == seed_respec.cost(i)
     for level in range(1, 61):
-        assert gold_per_hour(game_data, level) == seed_respec.gold_per_hour(level)
+        assert gold_per_hour(seed_game_data, level) == seed_respec.gold_per_hour(level)

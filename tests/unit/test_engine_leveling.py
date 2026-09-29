@@ -65,20 +65,20 @@ def test_leveling_constants_come_from_mechanics_json(game_data):
     assert game_data.rules.pushback_s == 0.5  # leveling.json combat_rules
 
 
-def test_monster_formulas_match_the_seed(game_data, seed_sim):
+def test_monster_formulas_match_the_seed(seed_game_data, seed_sim):
     for level in range(1, 61):
-        assert close(mob_hit_damage(game_data, level), seed_sim.mob_hit_raw(level)), level
-        assert close(mob_xp(game_data, level), seed_sim.mob_xp(level)), level
-        assert close(mob_hp(game_data, level, "seed").value, seed_sim.mob_hp(level)), level
+        assert close(mob_hit_damage(seed_game_data, level), seed_sim.mob_hit_raw(level)), level
+        assert close(mob_xp(seed_game_data, level), seed_sim.mob_xp(level)), level
+        assert close(mob_hp(seed_game_data, level, "seed").value, seed_sim.mob_hp(level)), level
         for armor in (0, 137.5, 600):
-            assert close(armor_reduction(game_data, armor, level), seed_sim.armor_dr(armor, level)), (armor, level)
+            assert close(armor_reduction(seed_game_data, armor, level), seed_sim.armor_dr(armor, level)), (armor, level)
 
 
-def test_rest_and_regen_match_the_seed(game_data, seed_sim):
+def test_rest_and_regen_match_the_seed(seed_game_data, seed_sim):
     for level in range(1, 61):
-        assert all(map(close, consumables(game_data, level), seed_sim.consumables(level))), level
+        assert all(map(close, consumables(seed_game_data, level), seed_sim.consumables(level))), level
         for pts in TALENTS:
-            got = in_combat_regen_fraction(game_data, pts, level, rules="seed")
+            got = in_combat_regen_fraction(seed_game_data, pts, level, rules="seed")
             assert close(got, seed_sim.in_combat_regen_frac(pts, level)), (pts, level)
 
 
@@ -89,7 +89,7 @@ def test_mage_armor_regen_from_its_first_rank(game_data):
     )  # Mage Armor du client : rang 1 au niveau 34, aura 134 à 50 %
 
 
-def test_forever_regen_adds_arcane_meditation_and_worn_mage_armor(game_data):
+def test_forever_regen_adds_arcane_meditation_and_worn_mage_armor(game_data, seed_game_data):
     """T04c, B7 (règle Classic, suppose) : Arcane Meditation (talents.json 17 / 33 / 50 %) + Mage Armor portée
     (aura 134 à 50 %, client), bornée à 1 ; sous le niveau d'apprentissage de Mage Armor (34), le talent seul."""
     assert in_combat_regen_fraction(game_data, {}, 40) == 0.5
@@ -98,7 +98,7 @@ def test_forever_regen_adds_arcane_meditation_and_worn_mage_armor(game_data):
     assert in_combat_regen_fraction(game_data, {"arcaneMeditation": 3}, 33) == 0.5
     frost = in_combat_regen_fraction(game_data, {"arcaneMeditation": 1}, 40, armor="frost")
     assert frost == pytest.approx(0.17, rel=1e-12)  # Ice Armor portée : pas de régénération en incantation
-    seed = in_combat_regen_fraction(game_data, {"arcaneMeditation": 1}, 40, rules="seed")
+    seed = in_combat_regen_fraction(seed_game_data, {"arcaneMeditation": 1}, 40, rules="seed")
     assert seed == 0.5  # seed : maximum des deux
 
 

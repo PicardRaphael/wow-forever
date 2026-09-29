@@ -39,4 +39,6 @@ def test_version_dir_contains_exactly_expected_files():
         "confirmed_changes.json",  # T03 : écarts client ↔ référence tranchés
         "monsters.json",  # T04 : PV des monstres (journaux, Questie en regard)
         "spell_scaling.json",  # T04 : points de base des sorts par niveau (decode)
+        "_seed_talents.json",  # T06b : copies figées du seed pour le mode seed (décision D2)
+        "_seed_spells.json",
     }

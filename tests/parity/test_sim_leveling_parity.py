@@ -70,15 +70,15 @@ def same(ours, theirs, case):
 
 
 @pytest.mark.parametrize(("level", "rotation", "pts", "total"), CASES)
-def test_mc_matches_the_seed(game_data, seed_sim, level, rotation, pts, total):
-    ours = mc(game_data, level, pts, "Orc", rotation, 600, **SEED_MODE)
+def test_mc_matches_the_seed(seed_game_data, seed_sim, level, rotation, pts, total):
+    ours = mc(seed_game_data, level, pts, "Orc", rotation, 600, **SEED_MODE)
     same(ours, seed_sim.mc(level, pts, "Orc", rotation, 600), (level, rotation))
     assert ours["total"] == pytest.approx(total, rel=1e-12)
 
 
-def test_mc_default_n_matches_the_seed(game_data, seed_sim):
+def test_mc_default_n_matches_the_seed(seed_game_data, seed_sim):
     """n = 1500 (défaut de `mc`), niveau 12, 3 Improved Frostbolt : critère de la feuille de route."""
-    ours = mc(game_data, 12, {"improvedFrostbolt": 3}, **SEED_MODE)
+    ours = mc(seed_game_data, 12, {"improvedFrostbolt": 3}, **SEED_MODE)
     same(ours, seed_sim.mc(12, {"improvedFrostbolt": 3}), "L12 n=1500")
     assert ours["total"] == pytest.approx(25.48655329665798, rel=1e-12)
     assert ours["xp_h"] == pytest.approx(14897.22498356594, rel=1e-12)
@@ -93,26 +93,32 @@ def test_mc_default_n_matches_the_seed(game_data, seed_sim):
         (8, "frost", {}, {}),
     ],
 )
-def test_every_branch_matches_the_seed(game_data, seed_sim, level, rotation, pts, options):
+def test_every_branch_matches_the_seed(seed_game_data, seed_sim, level, rotation, pts, options):
     seed_options = {("run_between" if k == "run_between_s" else k): v for k, v in options.items()}
-    ours = mc(game_data, level, pts, "Orc", rotation, 200, seed=7, **SEED_MODE, **options)
+    ours = mc(seed_game_data, level, pts, "Orc", rotation, 200, seed=7, **SEED_MODE, **options)
     same(ours, seed_sim.mc(level, pts, "Orc", rotation, 200, seed=7, **seed_options), (level, rotation, options))
 
 
-def test_character_overrides_reach_the_simulation(game_data, seed_sim):
+def test_character_overrides_reach_the_simulation(seed_game_data, seed_sim):
     over = {"intellect": 180, "sp": 120, "hp": 900, "armor": 400}
     seed_over = {("int" if k == "intellect" else k): v for k, v in over.items()}
-    ours = mc(game_data, 20, {"improvedFrostbolt": 5}, "Troll", "frost", 150, over=over, **SEED_MODE)
+    ours = mc(seed_game_data, 20, {"improvedFrostbolt": 5}, "Troll", "frost", 150, over=over, **SEED_MODE)
     same(ours, seed_sim.mc(20, {"improvedFrostbolt": 5}, "Troll", "frost", 150, over=seed_over), "fiche")
 
 
-def test_single_kill_with_an_injected_generator(game_data, seed_sim):
+def test_single_kill_with_an_injected_generator(seed_game_data, seed_sim):
     import random
 
     from forever.engine import character
 
     ours = kill_mc(
-        game_data, 16, {"improvedFrostbolt": 5}, character(game_data, 16), "frost", random.Random(3), **SEED_MODE
+        seed_game_data,
+        16,
+        {"improvedFrostbolt": 5},
+        character(seed_game_data, 16),
+        "frost",
+        random.Random(3),
+        **SEED_MODE,
     )
     theirs = seed_sim.kill_mc(16, {"improvedFrostbolt": 5}, seed_sim.fm.character(16, "Orc"), "frost", random.Random(3))
     same(ours, theirs, "un combat")
@@ -133,8 +139,8 @@ ANALYTIC = [
 
 
 @pytest.mark.parametrize(("level", "rotation", "pts", "total"), ANALYTIC)
-def test_analytic_matches_the_seed(game_data, seed_sim, level, rotation, pts, total):
-    ours = kill_analytic(game_data, level, pts, "Orc", rotation, **SEED_MODE)
+def test_analytic_matches_the_seed(seed_game_data, seed_sim, level, rotation, pts, total):
+    ours = kill_analytic(seed_game_data, level, pts, "Orc", rotation, **SEED_MODE)
     same(ours, seed_sim.kill_analytic(level, pts, "Orc", rotation), (level, rotation))
     assert ours["total"] == pytest.approx(total, rel=1e-12)
 
@@ -150,14 +156,14 @@ def test_analytic_matches_the_seed(game_data, seed_sim, level, rotation, pts, to
         (60, "fire", FIRE_ALL, {}),
     ],
 )
-def test_every_analytic_branch_matches_the_seed(game_data, seed_sim, level, rotation, pts, options):
+def test_every_analytic_branch_matches_the_seed(seed_game_data, seed_sim, level, rotation, pts, options):
     seed_options = {("run_between" if k == "run_between_s" else k): v for k, v in options.items()}
-    ours = kill_analytic(game_data, level, pts, "Orc", rotation, **SEED_MODE, **options)
+    ours = kill_analytic(seed_game_data, level, pts, "Orc", rotation, **SEED_MODE, **options)
     same(ours, seed_sim.kill_analytic(level, pts, "Orc", rotation, **seed_options), (level, rotation, options))
 
 
-def test_analytic_with_character_overrides(game_data, seed_sim):
+def test_analytic_with_character_overrides(seed_game_data, seed_sim):
     over = {"intellect": 180, "sp": 120, "hp": 900, "armor": 400}
     seed_over = {("int" if k == "intellect" else k): v for k, v in over.items()}
-    ours = kill_analytic(game_data, 20, {"improvedFrostbolt": 5}, "Troll", "frost", over=over, **SEED_MODE)
+    ours = kill_analytic(seed_game_data, 20, {"improvedFrostbolt": 5}, "Troll", "frost", over=over, **SEED_MODE)
     same(ours, seed_sim.kill_analytic(20, {"improvedFrostbolt": 5}, "Troll", "frost", seed_over), "fiche")

@@ -106,6 +106,15 @@ def game_data() -> Any:
     return load_game_data(deps)
 
 
+@pytest.fixture(scope="session")
+def seed_game_data() -> Any:
+    """Données typées du mode seed (copies figées `_seed_talents.json` et `_seed_spells.json`, T06b), pour la parité."""
+    from forever.gamedata import build_game_data
+    from forever.store import load_version
+
+    return build_game_data(load_version(isolated_deps(REPO_ROOT / ".cache-tests-inutilise")), rules="seed")
+
+
 @pytest.fixture
 def data_copy(tmp_path: Path) -> Path:
     """Copie modifiable de forever/data (manifeste compris)."""

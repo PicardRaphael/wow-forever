@@ -34,8 +34,8 @@ def seed():
         sys.path.remove(str(SEED_SCRIPTS))
 
 
-def test_pvp_et_respec_pvp_part(game_data):
-    p20 = seed_rounded(pvp_score(game_data, BUILD_20, 20, "Orc", rules="seed"))
+def test_pvp_et_respec_pvp_part(seed_game_data):
+    p20 = seed_rounded(pvp_score(seed_game_data, BUILD_20, 20, "Orc", rules="seed"))
     assert p20 == {
         "score": 45.1,
         "burst_seq": "Givre : Éclair, Nova, Javelot(s) sur gel",
@@ -45,7 +45,7 @@ def test_pvp_et_respec_pvp_part(game_data):
         "sustain": 26.0,
         "statut": "EST",
     }
-    p60 = seed_rounded(pvp_score(game_data, BUILD_60, 60, "Orc", rules="seed"))
+    p60 = seed_rounded(pvp_score(seed_game_data, BUILD_60, 60, "Orc", rules="seed"))
     assert (p60["score"], p60["burst"], p60["control"], p60["survival"], p60["sustain"]) == (
         82.0,
         1878.4,
@@ -66,14 +66,14 @@ def test_pvp_et_respec_pvp_part(game_data):
         ({"combustion": 1, "blastWave": 1, "impact": 3, "improvedCounterspell": 2, "frostWarding": 2}, 45, "Troll"),
     ],
 )
-def test_profile_matches_the_seed(game_data, seed, pts, level, race):
+def test_profile_matches_the_seed(seed_game_data, seed, pts, level, race):
     pv, _ = seed
-    assert seed_rounded(pvp_score(game_data, pts, level, race, rules="seed")) == pv.score(pts, level, race)
+    assert seed_rounded(pvp_score(seed_game_data, pts, level, race, rules="seed")) == pv.score(pts, level, race)
 
 
-def test_seed_pvp_greedy_parity(game_data, seed):
+def test_seed_pvp_greedy_parity(seed_game_data, seed):
     _, op = seed
-    ours = seed_pvp_greedy(game_data, 20, "Orc", beam=2)
+    ours = seed_pvp_greedy(seed_game_data, 20, "Orc", beam=2)
     theirs = op.pvp(None, 20, "Orc", beam=2)
     assert ours.points == theirs["points"]
     assert ours.points == {
@@ -83,4 +83,4 @@ def test_seed_pvp_greedy_parity(game_data, seed):
         "wandSpecialization": 2,
         "arcaneResilience": 2,
     }
-    assert seed_rounded(pvp_score(game_data, ours.points, 20, "Orc", rules="seed"))["score"] == 38.6
+    assert seed_rounded(pvp_score(seed_game_data, ours.points, 20, "Orc", rules="seed"))["score"] == 38.6

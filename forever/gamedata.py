@@ -828,8 +828,10 @@ def _constants(raw: Any) -> Constants:
     )
 
 
-def build_game_data(version: VersionData) -> GameData:
+def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
     """Données typées d'une version déjà vérifiée ; lève DataSchemaError si une clé manque ou a un mauvais type."""
+    if rules != "forever":
+        raise NotImplementedError("T06b : mode seed figé")
     try:
         names = (SPELLS_FILE, TALENTS_FILE, LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE, SCALING_FILE, RESPEC_FILE)
         raw = {name: version.read_json(name) for name in names}

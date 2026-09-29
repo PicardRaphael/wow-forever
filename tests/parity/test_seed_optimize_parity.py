@@ -41,11 +41,11 @@ def seed_optimize():
 
 
 @pytest.fixture(scope="module")
-def ported(game_data):
-    return optimize_leveling(game_data, "Orc", 10, 14, beam=2, depth=2, mc_n=40, rules="seed", **SEED_MODE)
+def ported(seed_game_data):
+    return optimize_leveling(seed_game_data, "Orc", 10, 14, beam=2, depth=2, mc_n=40, rules="seed", **SEED_MODE)
 
 
-def test_optimiseur_legal(game_data, ported):
+def test_optimiseur_legal(seed_game_data, ported):
     assert ported.hours_equiv == pytest.approx(HOURS, rel=1e-12)
     assert ported.points == POINTS
     assert [(s.level, s.talent, s.time_s, s.rotation) for s in ported.steps] == STEPS
@@ -53,7 +53,7 @@ def test_optimiseur_legal(game_data, ported):
     for s in ported.steps:
         if s.talent:
             pts[s.talent] = pts.get(s.talent, 0) + 1
-        assert check_build(game_data, pts, s.level) == [], s
+        assert check_build(seed_game_data, pts, s.level) == [], s
 
 
 def test_leveling_matches_the_seed(ported, seed_optimize):
@@ -63,21 +63,21 @@ def test_leveling_matches_the_seed(ported, seed_optimize):
     assert [(s.level, s.talent, s.time_s, s.rotation) for s in ported.steps] == [tuple(x) for x in r["steps"]]
 
 
-def test_level_weight_matches_the_seed(game_data, seed_optimize):
+def test_level_weight_matches_the_seed(seed_game_data, seed_optimize):
     for level in range(1, 61):
-        assert level_weight(game_data, level) == pytest.approx(seed_optimize.level_weight(level), rel=1e-12), level
-    assert level_weight(game_data, 60) == 0.0
+        assert level_weight(seed_game_data, level) == pytest.approx(seed_optimize.level_weight(level), rel=1e-12), level
+    assert level_weight(seed_game_data, 60) == 0.0
 
 
-def test_score_plan_matches_the_seed(game_data, seed_optimize):
+def test_score_plan_matches_the_seed(seed_game_data, seed_optimize):
     plan = [(s[0], s[1]) for s in STEPS]
     r = seed_optimize.score_plan(plan, "Orc")
-    ours = score_plan(game_data, plan, "Orc", rules="seed", **SEED_MODE)
+    ours = score_plan(seed_game_data, plan, "Orc", rules="seed", **SEED_MODE)
     assert ours.hours_equiv == pytest.approx(r["hours_equiv"], rel=1e-12)
     assert list(ours.steps) == [tuple(x) for x in r["steps"]]
     assert ours.points == r["points"]
 
 
-def test_illegal_plan_is_refused(game_data):
+def test_illegal_plan_is_refused(seed_game_data):
     with pytest.raises(ValueError, match="illégal au niveau 10"):
-        score_plan(game_data, [(10, "iceLance")], "Orc", rules="seed", **SEED_MODE)
+        score_plan(seed_game_data, [(10, "iceLance")], "Orc", rules="seed", **SEED_MODE)

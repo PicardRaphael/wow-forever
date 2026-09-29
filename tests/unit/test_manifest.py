@@ -84,12 +84,14 @@ def test_manifest_content():
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert len(v["files"]) == 14 and {
+    assert len(v["files"]) == 16 and {
         "mechanics.json",
         "decode_rules.json",
         "confirmed_changes.json",
         "monsters.json",
         "spell_scaling.json",
+        "_seed_talents.json",
+        "_seed_spells.json",
     } <= set(v["files"])
 
 

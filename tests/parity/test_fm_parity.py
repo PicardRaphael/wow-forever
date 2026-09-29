@@ -81,28 +81,28 @@ def talent_sets(fm):
     return [{}, by_tree["Frost"], by_tree["Fire"], by_tree["Arcane"], spells, everything]
 
 
-def test_character_parity(game_data, fm):
+def test_character_parity(seed_game_data, fm):
     for level, race, overrides in itertools.product(range(1, 61), RACES, OVERRIDE_SETS):
-        ours = character(game_data, level, race, overrides)
+        ours = character(seed_game_data, level, race, overrides)
         theirs = fm.character(level, race, seed_overrides(overrides))
         for field, seed_field in CHARACTER_FIELDS.items():
             assert close(getattr(ours, field), theirs[seed_field]), (level, race, overrides, field)
 
 
-def test_expected_cast_parity(game_data, fm):
+def test_expected_cast_parity(seed_game_data, fm):
     spells = sorted(fm.data().spells)
     assert len(spells) >= 15
     count = 0
     for pts, level in itertools.product(talent_sets(fm), LEVELS):
         chars = [
-            (o, character(game_data, level, "Human", o), fm.character(level, "Human", seed_overrides(o)))
+            (o, character(seed_game_data, level, "Human", o), fm.character(level, "Human", seed_overrides(o)))
             for o in (None, OVERRIDE_SETS[1])
         ]
         for key, diff, frozen, wc, buffs, (_, ours_ch, seed_ch) in itertools.product(
             spells, (0, 3), (False, True), (0, 5), BUFFS, chars
         ):
             ours = expected_cast(
-                game_data, key, level, pts, ours_ch, diff, frozen=frozen, wc_stacks=wc, buffs=buffs, rules="seed"
+                seed_game_data, key, level, pts, ours_ch, diff, frozen=frozen, wc_stacks=wc, buffs=buffs, rules="seed"
             )
             theirs = fm.expected_cast(key, level, pts, seed_ch, diff, frozen, wc, buffs)
             case = (key, level, sorted(pts), diff, frozen, wc, bool(buffs))
@@ -118,20 +118,23 @@ def test_expected_cast_parity(game_data, fm):
     assert count > 5000
 
 
-def test_rank_and_coefficient_parity(game_data, fm):
+def test_rank_and_coefficient_parity(seed_game_data, fm):
     for key, spell in fm.data().spells.items():
         for i, seed_rank in enumerate(spell["ranks"]):
-            ours_rank = game_data.spells[key].ranks[i]
+            ours_rank = seed_game_data.spells[key].ranks[i]
             assert ours_rank.position == i + 1
             assert list(ours_rank[1:]) == seed_rank
-            assert close(coefficient(game_data, key, ours_rank, rules="seed"), fm.coefficient(key, seed_rank)), (key, i)
+            assert close(coefficient(seed_game_data, key, ours_rank, rules="seed"), fm.coefficient(key, seed_rank)), (
+                key,
+                i,
+            )
         for level, pts in itertools.product(range(1, 61), ({}, {spell.get("talent", "x"): 1})):
-            ours = best_rank(game_data, key, level, pts)
+            ours = best_rank(seed_game_data, key, level, pts)
             theirs = fm.best_rank(key, level, pts)
             assert (None if ours is None else list(ours[1:])) == theirs, (key, level, pts)
 
 
-def test_build_parity(game_data, fm):
+def test_build_parity(seed_game_data, fm):
     rng = random.Random(70009)
     keys = list(fm.data().T)
     builds = [{}, {"improvedFrostbolt": 5, "iceLance": 1}, {"improvedFrostbolt": 6}, {"inconnu": 2}]
@@ -142,6 +145,6 @@ def test_build_parity(game_data, fm):
             build[key] = rng.randint(0, fm.data().T[key]["max"] + 1)
         builds.append(build)
     for build, level in itertools.product(builds, (10, 19, 20, 30, 45, 60)):
-        assert check_build(game_data, build, level) == fm.check_build(build, level), (build, level)
+        assert check_build(seed_game_data, build, level) == fm.check_build(build, level), (build, level)
         if "inconnu" not in build:
-            assert legal_additions(game_data, build, level) == fm.legal_additions(build, level), (build, level)
+            assert legal_additions(seed_game_data, build, level) == fm.legal_additions(build, level), (build, level)
