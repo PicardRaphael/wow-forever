@@ -2,9 +2,9 @@
 
     uv run python scripts/install_addon.py [--wow-dir <dossier du client>] [--dry-run]
 
-Destination : `<wow-dir>/Interface/AddOns/ForeverLogger/` (défaut : FOREVER_WOW_DIR, sinon la bêta Forever). Refuse
-une destination sans dossier `Interface/AddOns`. Seul le dossier `ForeverLogger` est remplacé ; l'ancien contenu est
-renommé `ForeverLogger.bak-<date>` (ignoré par le client : le nom du dossier ne correspond plus au .toc).
+Destination : `<wow-dir>/Interface/AddOns/ForeverLogger/` (défaut : FOREVER_WOW_DIR, sinon la bêta Forever trouvée
+sous Program Files (x86) ou Program Files). Refuse une destination sans dossier `Interface/AddOns`. Seul le dossier
+`ForeverLogger` est remplacé ; l'ancien contenu est renommé `ForeverLogger.bak-<date>` (ignoré par le client : le nom du dossier ne correspond plus au .toc).
 `--dry-run` affiche les opérations sans rien écrire. Aucun accès réseau."""
 
 from __future__ import annotations

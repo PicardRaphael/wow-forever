@@ -68,13 +68,20 @@ def default_cache_dir(environ: Mapping[str, str] = os.environ) -> Path:
     return Path(configured) if configured else Path.home() / ".cache" / "forever"
 
 
-WOW_DIR_CANDIDATES: tuple[Path, ...] = ()
+# Emplacements usuels du client sous Windows, dans l'ordre d'essai (Program Files 32 bits, puis 64 bits).
+WOW_DIR_CANDIDATES: tuple[Path, ...] = (
+    DEFAULT_WOW_DIR,
+    Path(r"C:\Program Files\World of Warcraft\_classic_beta_"),
+)
 
 
 def default_wow_dir(environ: Mapping[str, str] = os.environ, exists: Callable[[Path], bool] = Path.is_dir) -> Path:
-    """FOREVER_WOW_DIR, sinon le dossier de la bêta Forever sous Windows."""
+    """FOREVER_WOW_DIR, sinon le premier dossier de `WOW_DIR_CANDIDATES` présent, sinon le dossier de la bêta Forever
+    sous Program Files (x86)."""
     configured = environ.get("FOREVER_WOW_DIR")
-    return Path(configured) if configured else DEFAULT_WOW_DIR
+    if configured:
+        return Path(configured)
+    return next((p for p in WOW_DIR_CANDIDATES if exists(p)), DEFAULT_WOW_DIR)
 
 
 def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
