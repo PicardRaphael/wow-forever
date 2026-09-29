@@ -96,3 +96,22 @@ def test_missing_next_step_is_explained(make_deps):
     rep = build_report(make_deps(), "leveling", 22, current=over, preset="rapide", sensitivity=False)
     assert rep["next_step"] is None
     assert any("prochain talent" in a for a in rep["assumptions"])
+
+
+def test_hook_reads_thousands_in_tool_results():
+    """Évaluation T06b (build-givre-ou-feu) : un rapport de sous-agent écrit « 11 153 » (espace des milliers) ; le
+    contrôle lisait 11 et 153 dans le résultat d'outil, et signalait à tort « 11 153 XP/h » de la réponse."""
+    from forever import hooks
+
+    tool = "mcp__plugin_forever_forever__forever_sim_leveling"
+    lines = [
+        {"type": "assistant", "message": {"content": [{"type": "tool_use", "id": "t1", "name": tool, "input": {}}]}},
+        {
+            "type": "user",
+            "message": {
+                "content": [{"type": "tool_result", "tool_use_id": "t1", "content": "| 23 | 11 153 | 10 770 |"}]
+            },
+        },
+    ]
+    assert hooks.unsourced_numbers(lines, "Givre : 11 153 XP/h, Feu : 10 770 XP/h.") == []
+    assert hooks.unsourced_numbers(lines, "Givre : 12 153 XP/h.") == ["12 153 XP/h"]
