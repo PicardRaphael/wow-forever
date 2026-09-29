@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import io
 import json
+import os
 import sys
 from collections.abc import Mapping
 from dataclasses import replace
@@ -271,6 +272,12 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
+    hook = sub.add_parser("hook", help="hooks du plugin Claude Code (entrée JSON sur stdin)")
+    hook.add_argument(
+        "hook_name",
+        choices=["session-start", "check-numbers"],
+        help="session-start : ligne de fraîcheur (dans le dépôt) ; check-numbers : chiffres sans source (hook Stop)",
+    )
     return parser
 
 
@@ -1301,6 +1308,25 @@ def _use_utf8_output() -> None:
             stream.reconfigure(encoding="utf-8")
 
 
+def _cmd_hook(deps: Deps, args: argparse.Namespace) -> int:
+    """Hook du plugin : entrée JSON sur stdin, sortie JSON (ou rien) sur stdout, toujours le code 0."""
+    from forever.hooks import check_numbers_output, session_start_output
+
+    try:
+        hook_input = json.loads(sys.stdin.read() or "{}")
+    except (ValueError, OSError):
+        hook_input = {}
+    if not isinstance(hook_input, dict):
+        hook_input = {}
+    if args.hook_name == "session-start":
+        out = session_start_output(hook_input, deps, os.environ)
+    else:
+        out = check_numbers_output(hook_input)
+    if out is not None:
+        print(json.dumps(out, ensure_ascii=False))
+    return EXIT_OK
+
+
 def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     try:
@@ -1321,6 +1347,8 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         build_server(deps).run()
         return EXIT_OK
     _use_utf8_output()
+    if args.command == "hook":
+        return _cmd_hook(deps, args)
     handlers = {
         "status": _cmd_status,
         "lookup": _cmd_lookup,

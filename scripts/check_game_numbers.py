@@ -1,15 +1,18 @@
 """Contrôle : pas de chiffres de jeu dans le plugin (skills, agents, commandes, prompts produit) ni dans l'addon.
-Signale les nombres suivis d'une unité de jeu (dégâts, mana, %, s, secondes, points, PV, DPS)."""
+Signale les nombres suivis d'une unité de jeu (motif `GAME_NUMBER` de forever/hooks.py : dégâts, mana, %, s, min,
+points, PV, DPS, XP, portée…)."""
 
 import pathlib
 import re
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from forever.hooks import GAME_NUMBER
+
 ZONES = [ROOT / "plugin", ROOT / "addon"]
-MOTIF = re.compile(
-    r"\b\d+(?:[.,]\d+)?\s?(?:%|s\b|sec|secondes|mana|dégâts|degats|damage|points|pv|hp|dps)\b", re.IGNORECASE
-)
+MOTIF = GAME_NUMBER  # même motif que le contrôle des réponses (forever/hooks.py)
 AUTORISE = re.compile(r"<!--\s*chiffres-autorisés\s*-->")
 
 
