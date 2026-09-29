@@ -14,6 +14,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.types import CallToolResult, TextContent
 
 from forever import __version__
+from forever.build import BuildReport, build_report
 from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
@@ -143,5 +144,50 @@ def build_server(deps: Deps) -> MCPServer:
             )
         except ForeverError as err:
             return cast(LevelingReport, _error_result(deps, err))
+
+    @server.tool()
+    def forever_build(
+        context: str,
+        level: int,
+        race: str = "Orc",
+        current: dict[str, int] | None = None,
+        respecs: int = 0,
+        sp: float | None = None,
+        crit: float | None = None,
+        preset: str = "rapide",
+        seed: int = 12345,
+        rules: str = "forever",
+        sensitivity: bool = True,
+        talented_bonus: int = 0,
+    ) -> BuildReport:
+        """Build du Mage par contexte (leveling, dungeon, raid, pvp-bg, pvp-world) à un niveau : talents et ordre
+        d'apprentissage, choix du build (rotation, armure, cumuls d'Arcane Blast et de Hot Streak), raison de chaque
+        talent (valeur marginale), alternative la plus proche avec écart apparié et intervalle de confiance, stabilité
+        sur plusieurs graines, sensibilité aux sept hypothèses incertaines, respec (coût, gain, niveau conseillé),
+        angles morts (borne haute ou non chiffré), certitude, hypothèses et provenance. Donjon et raid : scénarios
+        provisoires. Au-delà du plafond de la bêta, le build n'est pas vérifiable en jeu avant la sortie.
+
+        `current` : build actuel {clé: rang} (conseil de respec) ; `respecs` : réinitialisations déjà faites ;
+        `sp`, `crit` : fiche remplacée (puissance des sorts, critique en fraction) ; `preset` : rapide (défaut) ou
+        complet ; `rules` : forever, ou seed (leveling seulement, parité) ; `talented_bonus` : points du bonus Legacy
+        « Talented » (hypothèse)."""
+        try:
+            return build_report(
+                deps,
+                context,
+                level,
+                race=race,
+                current=current,
+                respecs=respecs,
+                sp=sp,
+                crit=crit,
+                preset=preset,
+                seed=seed,
+                rules=rules,
+                sensitivity=sensitivity,
+                talented_bonus=talented_bonus,
+            )
+        except ForeverError as err:
+            return cast(BuildReport, _error_result(deps, err))
 
     return server

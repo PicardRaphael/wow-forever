@@ -314,7 +314,8 @@ def encounter_analytic(
         pool = min(ch.mana, pool - drain * (b - a))
         dmg += targets * dps * (b - a)
         t = b
-    length = t if sc.hp == "mob" else duration
+    dead = t if sc.hp == "mob" and oom is None and t < duration else None  # paquet mort avant la fin
+    length = encounter_length(duration, duration, oom, dead)
     return {
         "dps": dmg / length if length > 0 else 0.0,
         "dmg": dmg,

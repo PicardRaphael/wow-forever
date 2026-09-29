@@ -60,3 +60,22 @@
 -    assert out.startswith("Registre : 104 mécaniques")
 +    assert out.startswith("Registre : 108 mécaniques")
 ```
+
+## 5. Bloc I2 : `tests/unit/test_build_cli.py::test_mcp_returns_the_cli_json` et `::test_mcp_default_preset_is_fast`
+
+- **Échec** : `pytest_socket.SocketBlockedError: A test tried to use socket.socket.`
+- **Preuve (défaut du test, pas du code)** : sous Windows, la boucle asyncio du client MCP ouvre une paire de sockets locale ; `pyproject.toml` bloque les sockets (`--disable-socket --allow-unix-socket`) et `tests/integration/test_mcp.py` les autorise pour l'hôte local par `pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])`. Mon test n'a pas repris cette marque. Avec elle (copie du test), les 6 tests du fichier passent, dont les deux cités (même JSON par la CLI et le MCP ; préréglage rapide par défaut).
+- **Diff proposé** :
+
+```diff
+ import asyncio
+ import json
+ 
++import pytest
+ from conftest import FakeHttp
+ from mcp import Client
+@@
++# La boucle asyncio de Windows ouvre une paire de sockets locale : autorisée, tout autre hôte reste bloqué.
++pytestmark = pytest.mark.allow_hosts(["127.0.0.1"])
+ ARGV = ["build", "leveling", "--level", "14", "--preset", "rapide"]
+```

@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any, NoReturn, cast
 
 from forever import registry
+from forever.build import CONTEXTS, build_report
 from forever.chart import leveling_chart
 from forever.config import CHAIN_MAX_GAP_S, Deps, default_deps
 from forever.errors import (
@@ -249,6 +250,25 @@ def build_parser() -> argparse.ArgumentParser:
     chart_leveling.add_argument("--from", dest="level_from", type=int, default=10, help="premier niveau")
     chart_leveling.add_argument("--to", dest="level_to", type=int, default=30, help="dernier niveau")
     _leveling_arguments(chart_leveling, n_default=300)
+
+    b = sub.add_parser("build", help="build du Mage par contexte : talents, ordre, raisons, sensibilité, respec")
+    b.add_argument("context", choices=CONTEXTS, help="contexte : leveling, dungeon, raid, pvp-bg, pvp-world")
+    b.add_argument("--level", type=int, required=True, help="niveau du build (leveling : ordre de 10 à ce niveau)")
+    b.add_argument("--race", default="Orc", help="race du personnage (défaut : Orc)")
+    b.add_argument("--current", default="", help="build actuel clé=rang,clé=rang (conseil de respec)")
+    b.add_argument("--respecs", type=int, default=0, help="réinitialisations déjà faites (barème de respec)")
+    b.add_argument("--sp", type=float, help="puissance des sorts de la fiche (remplace l'estimation)")
+    b.add_argument("--crit", type=float, help="critique des sorts de la fiche, en fraction (0.1 = 10 %%)")
+    b.add_argument("--preset", default="complet", help="préréglage de l'optimiseur : rapide ou complet (défaut)")
+    b.add_argument("--seed", type=int, default=12345, help="graine du Monte Carlo (défaut : 12345)")
+    b.add_argument("--rules", default="forever", choices=["forever", "seed"], help="règles (seed : leveling seulement)")
+    b.add_argument(
+        "--sensitivity", default="on", choices=["on", "off"], help="sensibilité aux hypothèses (défaut : on)"
+    )
+    b.add_argument(
+        "--talented-bonus", type=int, default=0, help="points du bonus Legacy « Talented » (défaut : 0, hypothèse)"
+    )
+    b.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     return parser
@@ -834,6 +854,124 @@ def _fmt_kill(label: str, k: KillResult) -> str:
     )
 
 
+def _pct(x: float | None, digits: int = 1) -> str:
+    return "?" if x is None else f"{x * 100:+.{digits}f} %".replace(".", ",")
+
+
+def _dec(x: float, digits: int = 2) -> str:
+    return _num(round(x, digits))
+
+
+def _advantage(gap: Mapping[str, Any] | None, unit: str, higher_is_better: bool) -> str:
+    """Écart brut (a - b) présenté comme avantage de a (positif = a fait mieux), intervalle compris."""
+    if not gap:
+        return "aucun"
+    s = 1 if higher_is_better else -1
+    lo, hi = sorted((s * gap["low"], s * gap["high"]))
+    sig = "significatif" if gap["significant"] else "égalité statistique"
+    return f"{_dec(s * gap['mean'])} {unit} [{_dec(lo)} ; {_dec(hi)}] ({sig})"
+
+
+def render_build(rep: Mapping[str, Any]) -> list[str]:
+    """Texte du rapport de build (français) : en-tête, talents par arbre, ordre, choix, métrique, raisons,
+    alternative, stabilité, sensibilité, respec, angles morts, hypothèses. Écarts présentés comme avantage du build
+    (positif = le build fait mieux) ; le JSON garde les écarts bruts (build - autre)."""
+    mt = rep["metric"]
+    unit, up = mt["unit"], mt["higher_is_better"]
+    head = f"Build {rep['context']} niveau {rep['level']} · {rep['race']}"
+    if rep["scenario"]["provisional"]:
+        head += " · scénario provisoire"
+    head += " · équipement : fiche de base par niveau"
+    if not rep["verifiable_in_game"]:
+        head += " · non vérifiable en jeu avant la sortie"
+    lines = [head, "Talents"]
+    for tree, pts in rep["talents_by_tree"].items():
+        if pts:
+            lines.append(f"  {tree} ({sum(pts.values())}) : " + ", ".join(f"{k} {v}" for k, v in pts.items()))
+    if rep["order"]:
+        lines.append("Ordre : " + ", ".join(f"{s['level']} {s['talent'] or '-'}" for s in rep["order"]))
+    for name, c in rep["choices"].items():
+        extra = [f"{k} {c[k]}" for k in ("ab_stacks", "ab_dump", "hs_stacks", "aoe_filler") if c.get(k) is not None]
+        lines.append(
+            f"Choix ({name}) : rotation {c['rotation']}, armure {c['armor']}" + "".join(f", {x}" for x in extra)
+        )
+    sense = "plus grand vaut mieux" if up else "plus petit vaut mieux"
+    mc_text = "profil déterministe" if mt["monte_carlo"] is None else f"Monte Carlo {_dec(mt['monte_carlo'])}"
+    lines.append(f"Métrique : {mt['name']} ({unit}, {sense}) : {mc_text} · analytique {_dec(mt['analytic'])}")
+    lines.append("Raisons (valeur d'un point : avantage sur le meilleur autre emplacement)")
+    for r in rep["reasons"]:
+        if r["marginal"] is None:
+            lines.append(f"  {r['name']} {r['rank']} : aucun déplacement légal du point")
+            continue
+        conf = f" ; Monte Carlo : {_advantage(r['confirmed'], unit, up)}" if r["confirmed"] else ""
+        verdict = "à sa place" if r["marginal"] >= 0 else f"mieux placé sur {r['moved_to']}"
+        lines.append(
+            f"  {r['name']} {r['rank']} : {_dec(r['marginal'], 3)} {unit} ({_pct(r['relative'])}) face à "
+            f"{r['moved_to']}, {verdict}{conf}"
+        )
+    alt = rep["alternative"]
+    diff = ", ".join(f"{k} {a}→{b}" for k, (a, b) in alt["diff"].items()) if alt["diff"] else "aucune"
+    who = "le build" if alt.get("better") == "build" else "l'alternative"
+    lines.append(
+        f"Alternative la plus proche : {diff} ; avantage du build : {_advantage(alt['gap'], unit, up)} ; "
+        f"retenu : {who} ({alt['decided_by']})"
+    )
+    st = rep["stability"]
+    names = sorted(set(st["winners"]))
+    if st["stable"] and names:
+        lines.append(f"Stabilité : même gagnant ({names[0]}) sur les {len(st['seeds'])} graines {st['seeds']}")
+    else:
+        lines.append(f"Stabilité : gagnant différent selon la graine ({st['winners']}, graines {st['seeds']})")
+    lines.append("Sensibilité" + ("" if rep["sensitivity"] else " : non calculée (--sensitivity off)"))
+    for row in rep["sensitivity"]:
+        verdict = "tient" if row["holds"] else f"bascule vers {row['winner']}"
+        lines.append(f"  {row['assumption']} : {row['value']} → {row['variant']} : {verdict} ({row['source']})")
+    rs = rep["respec"]
+    if rs.get("verdict") is None:
+        lines.append(f"Respec : coût {_num(rs['cost_gold'])} po ({rs['cost_certainty']}) ; {rs.get('note', '')}")
+    elif "gain_hours" in rs:
+        lines.append(
+            f"Respec : {rs['verdict']}"
+            + (f" au niveau {rs['level']}" if rs["level"] else "")
+            + f" ; gain {_dec(rs['gain_hours'])} h, coût {_num(rs['cost_gold'])} po ({rs['cost_certainty']}), "
+            f"bilan {_dec(rs['balance_gold'], 1)} po à {_num(rs['gold_per_hour'])} po/h (suppose)"
+        )
+    else:
+        lines.append(
+            f"Respec : {rs['verdict']} ; coût {_num(rs['cost_gold'])} po ({rs['cost_certainty']}) ; avantage sur le "
+            f"build {rs['reference']} : {_advantage(rs['gap'], unit, up)}"
+        )
+    lines.append("Angles morts" + ("" if rep["blind_spots"] else " : aucun déclaré au registre pour ce build"))
+    for bs in rep["blind_spots"]:
+        eff = "non chiffré" if bs["effect_pct"] is None else f"borne haute {_dec(bs['effect_pct'], 1)} %"
+        talents = f" ({', '.join(bs['talents'])})" if bs["talents"] else ""
+        lines.append(f"  {bs['id']}{talents} : {bs['description']} — {eff}")
+    lines.append(f"Certitude : {rep['certainty']}")
+    lines.append("Hypothèses")
+    lines += [f"  - {a}" for a in rep["assumptions"]]
+    return lines
+
+
+def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
+    rep = build_report(
+        deps,
+        args.context,
+        args.level,
+        race=args.race,
+        current=parse_talents(args.current) or None,
+        respecs=args.respecs,
+        sp=args.sp,
+        crit=args.crit,
+        preset=args.preset,
+        seed=args.seed,
+        rules=args.rules,
+        sensitivity=args.sensitivity == "on",
+        talented_bonus=args.talented_bonus,
+    )
+    _emit(rep, render_build(rep), rep["provenance"], args.json)
+    return EXIT_OK
+
+
 def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
     rep = simulate_leveling(
         deps,
@@ -1177,6 +1315,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "measures": _cmd_measures_refresh,
         "sim": _cmd_sim,
         "chart": _cmd_chart,
+        "build": _cmd_build,
     }
     try:
         return handlers[args.command](deps, args)

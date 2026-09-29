@@ -31,6 +31,7 @@ def test_stdio_server(tmp_path):
         "forever_lookup",
         "forever_explain_mechanic",
         "forever_sim_leveling",
+        "forever_build",
     }
     assert not result.is_error
     assert result.structured_content["ranks"][0]["damage_min"] == 34
