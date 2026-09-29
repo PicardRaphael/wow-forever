@@ -10,3 +10,6 @@ cache/
 CLAUDE.local.md
 tasks/.rouge
 tasks/.tests-verrouilles
+
+# Résultats des passages de claude plugin eval (chiffres de jeu, traces)
+plugin/evals/results/

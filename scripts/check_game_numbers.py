@@ -12,6 +12,8 @@ sys.path.insert(0, str(ROOT))
 from forever.hooks import GAME_NUMBER
 
 ZONES = [ROOT / "plugin", ROOT / "addon"]
+# Résultats des passages de claude plugin eval : réponses du modèle et traces, non versionnés.
+EXCLUDED = [ROOT / "plugin" / "evals" / "results"]
 MOTIF = GAME_NUMBER  # même motif que le contrôle des réponses (forever/hooks.py)
 AUTORISE = re.compile(r"<!--\s*chiffres-autorisés\s*-->")
 
@@ -22,6 +24,8 @@ def main() -> int:
         if not zone.exists():
             continue
         for f in zone.rglob("*"):
+            if any(f.is_relative_to(x) for x in EXCLUDED):
+                continue
             if f.suffix not in {".md", ".json", ".yaml", ".yml", ".txt", ".lua", ".toc"}:
                 continue
             text = f.read_text(encoding="utf-8", errors="ignore")
