@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import math
+
 from forever.engine.model import Buffs, Character, GameData, Points, Rank
 from forever.engine.talents import talent_value
 
@@ -76,3 +78,13 @@ def melee_cast_time(gd: GameData, cast_s: float, push_per_s: float) -> float:
 
     Registre : B6"""
     return cast_s / max(gd.leveling.analytic_min_cast_fraction, 1 - push_per_s)
+
+
+def cooldown_period(gd: GameData, cooldown_s: float, filler_cast_s: float) -> float:
+    """Période effective d'un instantané à recharge dans une rotation sans interruption : son temps de recharge global,
+    puis des incantations de remplissage entières jusqu'à ce que la recharge soit écoulée (le sort attend la fin de
+    l'incantation en cours).
+
+    Registre : B13"""
+    gcd = gd.rules.gcd_s
+    return gcd + math.ceil((cooldown_s - gcd) / filler_cast_s) * filler_cast_s

@@ -490,9 +490,10 @@ mechanics:
       - tests/unit/test_engine_leveling.py::test_spell_cooldowns
       - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
       - tests/unit/test_sim_rules.py::test_analytic_fire_blast_cooldown_includes_wake_of_fire
+      - tests/unit/test_encounter.py::test_analytic_close_to_monte_carlo_on_a_single_target
     tolerance: null
     formule: "recharge = recharge du rang − Improved Frost Nova (Frost Nova) ou − Wake of Fire (Fire Blast)"
-    note: "T04b : porté du seed (forever/engine/casting.py : spell_cooldown), appliqué par le Monte Carlo ; T04c : l'analytique prend aussi la recharge réduite par Wake of Fire en rules forever ; rules seed garde la recharge du rang (parité) ; Frost Nova reste hors de l'analytique"
+    note: "T04b : porté du seed (forever/engine/casting.py : spell_cooldown), appliqué par le Monte Carlo ; T04c : l'analytique prend aussi la recharge réduite par Wake of Fire en rules forever ; rules seed garde la recharge du rang (parité) ; Frost Nova reste hors de l'analytique ; T05 : cooldown_period (forever/engine/casting.py) : période effective d'un instantané à recharge dans une rotation sans interruption (recharge globale puis incantations de remplissage entières), utilisée par l'analytique des scénarios pour Fire Blast"
   - id: B14
     categorie: temps
     description: "Procs : PPM, chance fixe, recharges internes"
@@ -1077,11 +1078,17 @@ mechanics:
     categorie: rencontre
     description: "Nombre de cibles et adds"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: suppose
-    sources: []
-    tests: []
+    sources:
+      - "forever/data/1.60.1.70009/mechanics.json (build.scenarios : scénarios provisoires T05, suppose)"
+    tests:
+      - tests/unit/test_encounter.py::test_pack_area_damage_scales_with_the_number_of_targets
+      - tests/unit/test_encounter.py::test_pack_rotation_uses_area_spells
+      - tests/unit/test_encounter.py::test_scenarios_come_from_the_data
     tolerance: null
+    formule: "paquet (T05) : cibles identiques de PV du monstre normal du niveau + écart ; sorts de zone sur chaque cible vivante, sans plafond de cibles (C7) ; rotation aoe : sorts à recharge (Blast Wave, Cone of Cold) dès qu'ils sont prêts, puis le sort de zone de remplissage (aoe_filler, meilleur à l'analytique par défaut)"
+    note: "T05 (décision 82) : scénario provisoire de donjon, affiné en DJ1 ; plafond de cibles (C7) et menace (H9) : angles morts ; Frost Nova non lancée (tank présent)"
   - id: H4
     categorie: rencontre
     description: "Phase d'exécution"
@@ -1095,11 +1102,20 @@ mechanics:
     categorie: rencontre
     description: "Durée et variance"
     forever: oui
-    statut: absent
+    statut: teste
     certitude: suppose
-    sources: []
-    tests: []
+    sources:
+      - "forever/data/1.60.1.70009/mechanics.json (build.scenarios : scénarios provisoires T05, suppose)"
+    tests:
+      - tests/unit/test_encounter.py::test_analytic_close_to_monte_carlo_on_a_single_target
+      - tests/unit/test_encounter.py::test_no_damage_once_the_mana_is_gone
+      - tests/unit/test_encounter.py::test_casts_fit_inside_the_duration
+      - tests/unit/test_encounter.py::test_tank_present_no_damage_taken_and_no_pushback
+      - tests/unit/test_encounter.py::test_arcane_power_at_the_pull_then_at_each_cooldown
+      - tests/unit/test_encounter.py::test_monte_carlo_statistics_are_per_fight_dps
     tolerance: null
+    formule: "durée fixe du scénario (build.scenarios, duration_s) ; un lancer n'est commencé que s'il finit dans la durée (cast_fits) ; dégâts par seconde = dégâts / durée retenue (encounter_length : mort du paquet, sinon durée entière après une fin de mana, sinon fin du dernier lancer) ; tank présent : aucun coup reçu, aucun recul ; mana : réserve + régénération en combat, sans Évocation ni potion (B10)"
+    note: "T05 (décision 82) : scénarios provisoires, affinés en DJ1 et T09 ; analytique : cycle en taux (Fire Blast à période arrondie aux incantations de Fireball) ou déroulé lancer par lancer en espérance (Arcanes sur un boss : cycle incomplet de fin de combat, fenêtres d'Arcane Power, fin de mana) ; écart au Monte Carlo ≤ 1,5 % au niveau 40 (boss de donjon, n = 400) ; boss insensibles au gel (suppose, OPEN_QUESTIONS) ; la rotation ne s'adapte pas à la mana restante (angle mort)"
   - id: H6
     categorie: rencontre
     description: "Mouvement programmé"
@@ -1184,9 +1200,11 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_pyroblast_enters_the_fire_rotation_after_enough_crits
       - tests/unit/test_rotations_t05.py::test_missile_barrage_halves_the_dump_and_makes_it_free
       - tests/unit/test_rotations_t05.py::test_arcane_power_raises_cost_and_damage_inside_the_window_only
+      - tests/unit/test_encounter.py::test_pack_rotation_uses_area_spells
+      - tests/unit/test_encounter.py::test_bosses_cannot_be_frozen
     tolerance: null
     formule: "rotation arcane (T04c) : Arcane Blast jusqu'à ab_stacks cumuls, puis la décharge ab_dump ; rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
-    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test) ; T05 : rotation fire avec Pyroblast à hs_stacks cumuls de Hot Streak (talent pris, mode forever) ; rotation arcane avec Missile Barrage sur la décharge Arcane Missiles ; Arcane Power au pull dès que prête dans toutes les rotations ; Pyroblast d'ouverture non modélisé"
+    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test) ; T05 : rotation fire avec Pyroblast à hs_stacks cumuls de Hot Streak (talent pris, mode forever) ; rotation arcane avec Missile Barrage sur la décharge Arcane Missiles ; Arcane Power au pull dès que prête dans toutes les rotations ; Pyroblast d'ouverture non modélisé ; T05 : rotations des scénarios (forever/sim/encounter.py) : mêmes priorités qu'en leveling sans approche ni mêlée ; rotation aoe pour les paquets"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"

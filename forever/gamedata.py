@@ -31,6 +31,7 @@ from forever.engine.model import (
     RespecRules,
     Restore,
     ScalingComponent,
+    Scenario,
     Spell,
     StatGrowth,
     Talent,
@@ -619,7 +620,31 @@ def _build_method(values: Mapping[str, Any]) -> BuildMethod:
         beta_level_cap=m.int_(entry("build.beta_level_cap"), "value", "build.beta_level_cap"),
         confidence=m.num(entry("build.confidence"), "value", "build.confidence"),
         stability_seeds=m.int_(entry("build.stability_seeds"), "value", "build.stability_seeds"),
+        scenarios=_scenarios(m, m.obj(entry("build.scenarios"), "value", "build.scenarios")),
     )
+
+
+SCENARIO_HP = ("boss", "mob")
+
+
+def _scenarios(m: _Reader, raw: Mapping[str, Any]) -> dict[str, Scenario]:
+    """`build.scenarios` : scénarios provisoires de donjon et de raid (T05)."""
+    out: dict[str, Scenario] = {}
+    for name in raw:
+        where = f"build.scenarios.{name}"
+        s = m.obj(raw, name, where)
+        hp = m.str_(s, "hp", f"{where}.hp")
+        if hp not in SCENARIO_HP:
+            raise m.fail(f"{where}.hp", " ou ".join(SCENARIO_HP))
+        out[name] = Scenario(
+            name=name,
+            targets=m.int_(s, "targets", f"{where}.targets"),
+            level_offset=m.int_(s, "level_offset", f"{where}.level_offset"),
+            duration_s=m.num(s, "duration_s", f"{where}.duration_s"),
+            freeze_immune=m.bool_(s, "freeze_immune", f"{where}.freeze_immune"),
+            hp=hp,
+        )
+    return out
 
 
 def _constants(raw: Any) -> Constants:

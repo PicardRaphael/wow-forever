@@ -356,6 +356,19 @@ class RespecRules:
 
 
 @dataclass(frozen=True)
+class Scenario:
+    """Scénario provisoire de donjon ou de raid (`build.scenarios`, suppose) : cibles, écart de niveau, durée (s),
+    boss insensibles au gel, PV (`boss` : sans limite, durée fixe ; `mob` : PV du monstre normal du niveau)."""
+
+    name: str
+    targets: int
+    level_offset: int
+    duration_s: float
+    freeze_immune: bool
+    hp: str
+
+
+@dataclass(frozen=True)
 class BuildMethod:
     """Paramètres des builds par contexte (`mechanics.json`, clés `build.*`) : plafond de niveau de la bêta (au-delà,
     un build n'est pas vérifiable en jeu avant la sortie), confiance de l'intervalle apparié, graines de stabilité."""
@@ -363,6 +376,7 @@ class BuildMethod:
     beta_level_cap: int
     confidence: float
     stability_seeds: int
+    scenarios: Mapping[str, Scenario]
 
 
 @dataclass(frozen=True)

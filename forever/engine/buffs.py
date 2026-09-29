@@ -5,6 +5,7 @@ autres sorts par cumul (%), hausse du coût d'Arcane Blast par cumul (%), cumuls
 
 from __future__ import annotations
 
+import math
 from typing import Any, NamedTuple, cast
 
 from forever.engine.model import Buffs, GameData, Points
@@ -200,3 +201,15 @@ def missile_barrage_buffs(gd: GameData, pts: Points) -> Buffs:
         "cast_reduction": talent_value(gd, pts, MISSILE_BARRAGE, MB_CHANNEL_PCT) / PERCENT,
         "cost": -talent_value(gd, pts, MISSILE_BARRAGE, MB_COST_PCT) / PERCENT,
     }
+
+
+def arcane_power_windows(gd: GameData, pts: Points, duration_s: float) -> list[tuple[float, float]]:
+    """Fenêtres d'Arcane Power d'une rencontre de durée fixe : aura à 0 s puis à chaque recharge (décision 79) ;
+    aucune sans le talent.
+
+    Registre : B15"""
+    window = arcane_power_window(gd, pts)
+    if window is None:
+        return []
+    length, cooldown = window
+    return [(k * cooldown, min(duration_s, k * cooldown + length)) for k in range(math.ceil(duration_s / cooldown))]

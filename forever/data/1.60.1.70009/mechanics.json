@@ -300,6 +300,12 @@
       "registry": "G4",
       "source": "T04e : coefficient d'Ice Lance lu dans le client (SpellEffect.EffectBonusCoefficient 0) en mode forever ; question E4",
       "range": [{"value": "client", "source": "client 1.60.1.70009 : EffectBonusCoefficient 0 (spell_scaling.json)"}, {"value": "seed", "source": "coefficient.fixed.ice_lance de mechanics.json (estimation du seed)"}]
+    },
+    "build.scenarios": {
+      "value": {"dungeon_boss": {"targets": 1, "level_offset": 2, "duration_s": 60, "freeze_immune": true, "hp": "boss"}, "dungeon_pack": {"targets": 4, "level_offset": 1, "duration_s": 40, "freeze_immune": false, "hp": "mob"}, "raid_boss": {"targets": 1, "level_offset": 3, "duration_s": 180, "freeze_immune": true, "hp": "boss"}},
+      "certainty": "suppose",
+      "registry": "H3",
+      "source": "scénario provisoire T05 (décision 82), affiné en DJ1 (donjons) et T09 (raid) : boss de donjon niveau + 2 pendant 60 s, paquet de 4 monstres normaux niveau + 1 (PV du monstre normal du niveau, au plus 40 s), boss de raid niveau + 3 pendant 180 s (durée du seed pve_raid.py) ; tank présent (aucun coup reçu, aucun recul) ; boss insensibles au gel (règle Classic supposée, voir OPEN_QUESTIONS) ; hp boss : PV sans limite (durée fixe), mob : PV du monstre normal ; valeurs inventées pour comparer les builds, pas des chiffres de jeu"
     }
   }
 }
