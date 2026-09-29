@@ -48,8 +48,9 @@ class ProfileView(TypedDict):
 
 
 def profile_path(environ: Mapping[str, str] = os.environ) -> Path:
-    """FOREVER_PROFILE, sinon ~/.forever/profile.json."""
-    configured = environ.get("FOREVER_PROFILE")
+    """FOREVER_PROFILE, sinon EVAL_FOREVER_PROFILE (évaluation du plugin : `claude plugin eval` ne transmet que les
+    variables `EVAL_*`), sinon ~/.forever/profile.json."""
+    configured = environ.get("FOREVER_PROFILE") or environ.get("EVAL_FOREVER_PROFILE")
     return Path(configured) if configured else Path.home() / ".forever" / "profile.json"
 
 

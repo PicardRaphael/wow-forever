@@ -39,6 +39,10 @@ def test_default_path_is_outside_the_repository(tmp_path):
     assert default.name == "profile.json" and default.parent.name == ".forever"
     assert not default.resolve().is_relative_to(REPO_ROOT.resolve())
     assert profile_path({"FOREVER_PROFILE": str(tmp_path / "p.json")}) == tmp_path / "p.json"
+    # T06b : repli de l'évaluation du plugin (claude plugin eval ne transmet que EVAL_*) ; FOREVER_PROFILE prime.
+    assert profile_path({"EVAL_FOREVER_PROFILE": str(tmp_path / "e.json")}) == tmp_path / "e.json"
+    both = {"FOREVER_PROFILE": str(tmp_path / "p.json"), "EVAL_FOREVER_PROFILE": str(tmp_path / "e.json")}
+    assert profile_path(both) == tmp_path / "p.json"
 
 
 def test_profile_under_the_repository_is_refused(make_deps):

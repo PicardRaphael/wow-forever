@@ -39,8 +39,16 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
 - Donnée absente (`missing`, ou profil vide) et donnée écrite dans la question absente aussi : demande-la **avant**
   le calcul, en une question courte, avec la valeur la plus probable proposée (celle de la conversation ou du
   profil), et la commande pour l'enregistrer : `forever profile set <nom> --race … --level … --talents "clé=rang,…"`.
+- La question prime sur le profil : un niveau écrit dans la question remplace celui du profil ; les talents du
+  profil ne valent qu'au niveau du profil (`current` de `forever_build` pour le niveau suivant). Question posée à un
+  autre niveau (« au niveau 30… ») : calcul pour ce niveau avec la race et la faction du profil, build conseillé par
+  `forever_build`, présenté comme tel (« build conseillé, pas le tien »), sans redemander les talents.
 - Jamais de défaut muet : un résultat dont `inputs.<champ>.origin` vaut `default` pour une donnée personnelle ne se
   présente pas comme la réponse du joueur ; redemande la donnée ou dis que le calcul suppose ce défaut.
+- Ne compte jamais toi-même les points du joueur ni ceux d'un niveau : `points.available` et `points_total` de
+  `forever_build` les donnent.
+- Une réponse qui se limite à demander une donnée finit elle aussi par le pied de réponse (provenance de
+  `forever_player_profile`).
 - Classe autre que Mage : profil lu, calcul « non couvert » (carte du routeur).
 
 ## Comparer deux options

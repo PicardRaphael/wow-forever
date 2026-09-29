@@ -2,7 +2,15 @@
   "mcpServers": {
     "forever": {
       "command": "uv",
-      "args": ["run", "--no-sync", "--quiet", "--project", "${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}", "forever", "mcp"]
+      "args": [
+        "run",
+        "--no-sync",
+        "--quiet",
+        "--project",
+        "${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}",
+        "forever",
+        "mcp"
+      ]
     }
   }
 }

@@ -17,7 +17,16 @@ from forever.mcp_server import build_server
 
 EVALS = REPO_ROOT / "plugin" / "evals"
 MCP_PREFIX = "mcp__plugin_forever_forever__"
-POSITIVE_COUNTS = {"talent": 6, "build": 6, "respec": 4, "zone": 4, "mecanique": 5, "leveling": 3, "hors-perimetre": 3}
+POSITIVE_COUNTS = {
+    "profil": 2,
+    "talent": 6,
+    "build": 6,
+    "respec": 4,
+    "zone": 4,
+    "mecanique": 5,
+    "leveling": 3,
+    "hors-perimetre": 3,
+}
 NEGATIVE_CATEGORIES = ("wow-autre", "autre-jeu", "programmation")
 POSITIVE_GRADERS = {"skill", "outil", "chiffres", "certitude", "provenance"}
 
@@ -65,10 +74,26 @@ def tool_names(tmp_path_factory):
 # --- Suite ---------------------------------------------------------------------------------------------------------
 
 
-def test_fifty_one_cases_thirty_one_positive_twenty_negative():
+def test_fifty_three_cases_thirty_three_positive_twenty_negative():
     polarity = [front(c / "prompt.md")[0]["tags"][0] for c in cases()]
-    assert len(polarity) == 51  # T06b : cas talent-niveau-22
-    assert polarity.count("positif") == 31 and polarity.count("negatif") == 20
+    assert len(polarity) == 53  # T06b : talent-niveau-22 et deux cas à profil vide
+    assert polarity.count("positif") == 33 and polarity.count("negatif") == 20
+
+
+def test_empty_profile_cases():
+    """T06b (demande du 2026-09-29) : la suite tourne avec un profil rempli (EVAL_FOREVER_PROFILE, fixture
+    tests/fixtures/plugin_eval/profile-rempli.json) ; deux cas pointent vers un profil absent et attendent la question."""
+    named = [c for c in cases() if front(c / "prompt.md")[0]["tags"] == ["positif", "profil"]]
+    assert [c.name for c in named] == ["profil-vide-leveling-18", "profil-vide-zone-18"]
+    for c in named:
+        meta, _ = front(c / "prompt.md")
+        assert set(meta["env"]) == {"EVAL_FOREVER_PROFILE"}
+        assert not (REPO_ROOT / meta["env"]["EVAL_FOREVER_PROFILE"]).exists()
+        g = graders(c)
+        assert g["outil"][0]["tool"] == MCP_PREFIX + "forever_player_profile"
+        assert g["demande-la-donnee"][0]["type"] == "llm" and "forever profile set" in g["demande-la-donnee"][1]
+    profile = json.loads((FIXTURES / "plugin_eval" / "profile-rempli.json").read_text(encoding="utf-8"))
+    assert profile["active"] in profile["characters"]
 
 
 def test_talent_level_22_case():
@@ -204,8 +229,8 @@ def test_report_thresholds_of_d10():
 def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    assert len(loaded) == 51
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 31
+    assert len(loaded) == 53
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 33
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 

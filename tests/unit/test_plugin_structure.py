@@ -106,6 +106,7 @@ def test_mcp_server_runs_forever_mcp_from_the_repo():
     assert args[-2:] == ["forever", "mcp"]
     project = args[args.index("--project") + 1]
     assert project == "${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}"
+    assert "env" not in s  # le profil passe par l'environnement hérité (forever/profile.py)
 
 
 def hook_commands(event):
