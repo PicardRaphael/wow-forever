@@ -13,7 +13,7 @@ from dataclasses import asdict
 from typing import Any, TypedDict, cast
 
 from forever.config import Deps
-from forever.engine.blind_spots import select_blind_spots
+from forever.engine.blind_spots import modeled_talents, select_blind_spots
 from forever.engine.model import CharacterOverrides, GameData, Preset
 from forever.engine.monsters import mob_hp
 from forever.engine.pvp import pvp_score
@@ -33,7 +33,7 @@ from forever.leveling import (
     damage_assumptions,
     given,
 )
-from forever.optimize.decide import Gap, paired_gap
+from forever.optimize.decide import Gap, gap_dict, paired_gap, tie_break
 from forever.optimize.endgame import PVP_CONTEXTS, context_analytic, context_mc, neighbors, optimize_context
 from forever.optimize.leveling import BuildChoice, best_choice, optimize_leveling
 from forever.optimize.respec import advise_respec
@@ -44,6 +44,7 @@ from forever.sim.leveling_mc import McStats, mc_stats
 from forever.store import VersionData, load_version
 
 PERCENT = 100.0  # conversion d'unité : effets des angles morts en %
+MIN_PAIRED_N = 2  # écart apparié : au moins deux combats
 
 CONTEXTS = ("leveling", "dungeon", "raid", "pvp-bg", "pvp-world")
 
@@ -58,6 +59,7 @@ class BuildReport(TypedDict):
     talents_by_tree: dict[str, dict[str, int]]
     points: dict[str, Any]  # totaux : par arbre, dépensés, disponibles, non dépensés (T06b)
     order: list[dict[str, Any]]
+    next_step: dict[str, Any] | None  # prochain talent depuis le build actuel (T06b)
     choices: dict[str, dict[str, Any]]
     metric: dict[str, Any]
     reasons: list[dict[str, Any]]
@@ -91,15 +93,7 @@ Choices = dict[str, BuildChoice]
 
 
 def _gap_dict(g: Gap) -> dict[str, Any]:
-    """Écart brut (a − b) et `advantage` : sa valeur absolue, avantage du meilleur des deux (T06b)."""
-    return {
-        "mean": g.mean,
-        "advantage": abs(g.mean),
-        "low": g.low,
-        "high": g.high,
-        "confidence": g.confidence,
-        "significant": g.significant,
-    }
+    return gap_dict(g)
 
 
 def _mc_fields(stats: McStats | None) -> dict[str, Any]:
@@ -108,6 +102,54 @@ def _mc_fields(stats: McStats | None) -> dict[str, Any]:
         "sd": stats.sd if stats else None,
         "se": stats.se if stats else None,
         "n": stats.n if stats else 0,
+    }
+
+
+def _next_step(
+    gd: GameData,
+    level: int,
+    race: str,
+    current: Mapping[str, int] | None,
+    over: CharacterOverrides | None,
+    rules: str,
+    mc_n: int,
+    seed: int,
+    bonus: int,
+    modeled: frozenset[str] | None,
+) -> dict[str, Any] | None:
+    """Prochain talent depuis le build actuel (T06b, décision D7) : `current` légal au niveau `level` − 1, chaque
+    addition légale au niveau `level` passée au Monte Carlo (même graine, meilleure combinaison du build), écart
+    apparié au meilleur, départage (`tie_break`). Sans anticipation : jamais `passage_palier`. None : pas de
+    `current`, `current` illégal au niveau précédent, mode seed ou Monte Carlo désactivé."""
+    if current is None or rules != "forever" or mc_n < MIN_PAIRED_N or level - 1 < gd.constants.talents.first_level:
+        return None
+    base = {k: v for k, v in current.items() if v}
+    if check_build(gd, base, level - 1, bonus):
+        return None
+    cands = legal_additions(gd, base, level, bonus)
+    if not cands:
+        return None
+    measured = []
+    choices = {}
+    for k in cands:
+        p2 = {**base, k: base.get(k, 0) + 1}
+        _, choice = best_choice(gd, level, p2, race, over, rules=rules, full=True)
+        choices[k] = choice
+        measured.append(
+            (k, mc_stats(gd, level, p2, race, choice.rotation, mc_n, seed, over, rules=rules, **choice.options()))
+        )
+    d = tie_break(measured, modeled, gd.build.confidence)
+    rows = [{**r, "choice": dict(choices[r["talent"]]._asdict())} for r in d["rows"]]
+    return {
+        "level": level,
+        "from": base,
+        "choice": d["choice"],
+        "decided_by": d["decided_by"],
+        "runner_up": d["runner_up"],
+        "gap": d["gap"],
+        "n": mc_n,
+        "seed": seed,
+        "candidates": rows,
     }
 
 
@@ -419,8 +461,12 @@ def build_report(
     m = _Metric(gd, context, level, race, over, rules, p.mc_n)
     first = gd.constants.talents.first_level
     order: list[dict[str, Any]] = []
+    rules_bs = blind_spot_rules(load_registry(deps.registry_path))
+    modeled = modeled_talents(gd, rules_bs) if rules == "forever" else None
+    next_step: dict[str, Any] | None = None
     try:
         if context == "leveling":
+            next_step = _next_step(gd, level, race, current, over, rules, p.mc_n, seed, talented_bonus, modeled)
             path = optimize_leveling(
                 gd,
                 race,
@@ -434,6 +480,7 @@ def build_report(
                 rules=rules,
                 over=over,
                 talented_bonus=talented_bonus,
+                modeled=modeled,
                 **m.sim,
             )
             build = dict(path.points)
@@ -444,6 +491,11 @@ def build_report(
                     "time_s": s.time_s,
                     "rotation": s.rotation,
                     "choice": dict(s.choice._asdict()),
+                    "runner_up": s.runner_up,
+                    "gap": s.gap,
+                    "significant": s.significant,
+                    "modeled": s.modeled,
+                    "decided_by": s.decided_by,
                 }
                 for s in path.steps
             ]
@@ -519,7 +571,6 @@ def build_report(
                     "gap": {**_gap_dict(g), "decided_by": by},
                 }
             )
-    rules_bs = blind_spot_rules(load_registry(deps.registry_path))
     spots = select_blind_spots(gd, rules_bs, context, level, build, near=alt, race=race, over=over)
     cap = gd.build.beta_level_cap
     options = {"rules": rules, "low_level_penalty": None}
@@ -558,6 +609,7 @@ def build_report(
         "talents_by_tree": {tree: {k: v for k, v in build.items() if gd.talents[k].tree == tree} for tree in gd.trees},
         "points": build_points(gd, build, level, talented_bonus),
         "order": order,
+        "next_step": next_step,
         "choices": _choices_dict(choices),
         "metric": {
             "name": {"leveling": "temps par monstre"}.get(context, "score PvP" if m.pvp else "dégâts par seconde"),

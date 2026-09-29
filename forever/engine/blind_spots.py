@@ -145,4 +145,9 @@ def select_blind_spots(
 
 
 def modeled_talents(gd: GameData, rules: Sequence[BlindSpotRule]) -> frozenset[str]:
-    raise NotImplementedError("T06b : talents modélisés")
+    """Talents modélisés : ceux qui ne figurent dans aucun angle mort d'une entrée `absent` du registre (T06b,
+    décision D7 ; départage des recommandations à égalité).
+
+    Registre : I5"""
+    unmodeled = {t for r in rules if r.status == "absent" for t in r.talents}
+    return frozenset(k for k in gd.talents if k not in unmodeled)

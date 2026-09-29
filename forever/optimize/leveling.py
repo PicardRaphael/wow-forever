@@ -19,9 +19,10 @@ from forever.engine.armor import worn_armor
 from forever.engine.buffs import hot_streak_rules
 from forever.engine.model import CharacterOverrides, GameData, Points
 from forever.engine.monsters import mob_xp
-from forever.engine.talents import check_build, legal_additions, points_available
+from forever.engine.talents import check_build, legal_additions, points_available, tier_points_required
+from forever.optimize.decide import gap_dict, paired_gap, tie_break
 from forever.sim.leveling_analytic import kill_analytic
-from forever.sim.leveling_mc import AB_DUMPS, ROTATIONS, arcane_plan, mc
+from forever.sim.leveling_mc import AB_DUMPS, ROTATIONS, McStats, arcane_plan, mc, mc_stats
 
 # Paramètres de méthode du seed (optimize.py), pas des chiffres de jeu : poids du temps immédiat et de l'anticipation
 # dans la présélection, poids de l'anticipation dans le tri du faisceau.
@@ -53,13 +54,32 @@ class BuildChoice(NamedTuple):
 
 class Step(NamedTuple):
     """Étape du chemin : niveau, talent pris (None si aucun point), temps par monstre arrondi comme le seed, rotation,
-    choix complet du build."""
+    choix complet du build ; en mode forever (T06b, décision D7), la décision : second candidat de l'état, écart
+    apparié (étape − second), significativité, talent modélisé, origine (`DECIDED_BY`). Mode seed : None."""
 
     level: int
     talent: str | None
     time_s: float
     rotation: str
     choice: BuildChoice
+    runner_up: str | None = None
+    gap: dict[str, Any] | None = None
+    significant: bool | None = None
+    modeled: bool | None = None
+    decided_by: str | None = None
+
+
+class _Eval(NamedTuple):
+    """Candidat présélectionné d'un état du faisceau : score de présélection, talent, build, additions de
+    l'anticipation, temps retenu, choix, statistiques du Monte Carlo (None : passe sans Monte Carlo)."""
+
+    look: float
+    talent: str | None
+    points: dict[str, int]
+    picks: tuple[str, ...]
+    time_s: float
+    choice: BuildChoice
+    stats: McStats | None
 
 
 class LevelingPath(NamedTuple):
@@ -163,7 +183,7 @@ def best_choice(
     return total, choice
 
 
-def _rollout(
+def _rollout_path(
     gd: GameData,
     level: int,
     pts: Points,
@@ -173,9 +193,10 @@ def _rollout(
     rules: str,
     bonus: int,
     opts: dict[str, Any],
-) -> float:
-    """Anticipation gloutonne du seed : `depth` points ajoutés un par un au meilleur temps, temps au dernier niveau."""
+) -> tuple[float, tuple[str, ...]]:
+    """(temps au dernier niveau, talents ajoutés dans l'ordre) de l'anticipation gloutonne."""
     p = dict(pts)
+    picks: list[str] = []
     for d in range(depth):
         lv = level + d + 1
         cands = legal_additions(gd, p, lv, bonus)
@@ -187,7 +208,8 @@ def _rollout(
 
         best = min(cands, key=time_with)
         p[best] = p.get(best, 0) + 1
-    return best_choice(gd, min(gd.level_cap, level + depth), p, race, over, rules=rules, **opts)[0]
+        picks.append(best)
+    return best_choice(gd, min(gd.level_cap, level + depth), p, race, over, rules=rules, **opts)[0], tuple(picks)
 
 
 def _decide_step(
@@ -200,17 +222,107 @@ def _decide_step(
     mc_n: int,
     seed: int,
     options: dict[str, Any],
-) -> tuple[float, BuildChoice]:
+) -> tuple[float, BuildChoice, McStats | None]:
     """Temps retenu pour un candidat présélectionné : seed, un Monte Carlo par rotation (le plus court) ; forever, la
-    meilleure combinaison complète à l'analytique, passée une fois au Monte Carlo ; sans Monte Carlo, l'analytique."""
+    meilleure combinaison complète à l'analytique, passée une fois au Monte Carlo (échantillons gardés pour le
+    départage, T06b) ; sans Monte Carlo, l'analytique."""
     if not mc_n:
-        return best_choice(gd, level, pts, race, over, rules=rules, full=rules != "seed", **options)
+        t, c = best_choice(gd, level, pts, race, over, rules=rules, full=rules != "seed", **options)
+        return t, c, None
     sim = {"rules": rules, **options}
     if rules == "seed":
         t, rot = min((mc(gd, level, pts, race, r, mc_n, seed, over, **sim)["total"], r) for r in SEED_ROTATIONS)
-        return t, BuildChoice(rot)
+        return t, BuildChoice(rot), None
     _, choice = best_choice(gd, level, pts, race, over, rules=rules, full=True, **options)
-    return mc(gd, level, pts, race, choice.rotation, mc_n, seed, over, **sim, **choice.options())["total"], choice
+    st = mc_stats(gd, level, pts, race, choice.rotation, mc_n, seed, over, **sim, **choice.options())
+    return st.mean, choice, st
+
+
+def _opens_tier(gd: GameData, pts: Points, key: str, picks: Sequence[str], modeled: frozenset[str]) -> bool:
+    """Point de passage vers un palier : le point porte son arbre au seuil d'un palier que l'anticipation ouvre sur un
+    talent modélisé de ce palier (T06b, décision D7)."""
+    tree = gd.talents[key].tree
+    before = sum(r for k, r in pts.items() if gd.talents[k].tree == tree)
+    after = before + 1
+    opened = {t for t in {x.tier for x in gd.talents.values()} if before < tier_points_required(gd, t) <= after}
+    return any(p in modeled and gd.talents[p].tree == tree and gd.talents[p].tier in opened for p in picks)
+
+
+def _state_meta(
+    gd: GameData, evals: Sequence[_Eval], pts: Points, modeled: frozenset[str] | None
+) -> list[dict[str, Any] | None]:
+    """Décision de chaque candidat d'un état du faisceau (mode forever) ; None : candidat écarté (non modélisé à
+    égalité avec un modélisé, hors point de passage vers un palier)."""
+
+    def is_mod(k: str | None) -> bool:
+        return k is not None and modeled is not None and k in modeled
+
+    if len(evals) == 1:
+        e = evals[0]
+        return [
+            {
+                "runner_up": None,
+                "gap": None,
+                "significant": None,
+                "modeled": is_mod(e.talent),
+                "decided_by": "seul_candidat",
+            }
+        ]
+    if any(e.stats is None for e in evals):
+        out: list[dict[str, Any] | None] = []
+        for e in evals:
+            other = min((x for x in evals if x is not e), key=lambda x: x.time_s)
+            out.append(
+                {
+                    "runner_up": other.talent,
+                    "gap": None,
+                    "significant": None,
+                    "modeled": is_mod(e.talent),
+                    "decided_by": "analytique",
+                }
+            )
+        return out
+    conf = gd.build.confidence
+    stats = [e.stats for e in evals if e.stats is not None]
+    d = tie_break([(e.talent or "", st) for e, st in zip(evals, stats, strict=True)], modeled, conf)
+    rows = d["rows"]
+    tied_modeled = any(r["modeled"] and not r["significant"] for r in rows)
+    chosen = next(i for i, e in enumerate(evals) if (e.talent or "") == d["choice"])
+    out = []
+    for i, (e, row) in enumerate(zip(evals, rows, strict=True)):
+        if i == chosen:
+            gap = d["gap"]
+            out.append(
+                {
+                    "runner_up": d["runner_up"],
+                    "gap": gap,
+                    "significant": gap["significant"] if gap else None,
+                    "modeled": row["modeled"],
+                    "decided_by": d["decided_by"],
+                }
+            )
+            continue
+        g = gap_dict(paired_gap(stats[i], stats[chosen], conf))
+        tied = not row["significant"]
+        passage = (
+            e.talent is not None
+            and not row["modeled"]
+            and modeled is not None
+            and _opens_tier(gd, pts, e.talent, e.picks, modeled)
+        )
+        if tied and not row["modeled"] and tied_modeled and not passage:
+            out.append(None)
+            continue
+        out.append(
+            {
+                "runner_up": d["choice"],
+                "gap": g,
+                "significant": g["significant"],
+                "modeled": row["modeled"],
+                "decided_by": "passage_palier" if passage and tied and tied_modeled else "anticipation",
+            }
+        )
+    return out
 
 
 def _passes(gd: GameData, lfrom: int, lto: int, spent: int, bonus: int) -> list[tuple[int, bool]]:
@@ -264,6 +376,7 @@ def optimize_leveling(
         "start": start_pts,
         "over": over,
         "talented_bonus": talented_bonus,
+        "modeled": modeled,
         **options,
     }
     focuses: list[str | None] = [None] if rules == "seed" else [None, *gd.trees]
@@ -287,9 +400,11 @@ def _beam_search(
     start: dict[str, int],
     over: CharacterOverrides | None,
     talented_bonus: int,
+    modeled: frozenset[str] | None = None,
     **options: Any,
 ) -> LevelingPath:
-    """Faisceau du seed ; `focus` : arbre où placer les points tant qu'un de ses talents est prenable."""
+    """Faisceau du seed ; `focus` : arbre où placer les points tant qu'un de ses talents est prenable. Mode forever :
+    décision de chaque étape (`_state_meta`) et non modélisé écarté à égalité avec un modélisé (T06b)."""
     start_pts = start
     beams: list[tuple[float, dict[str, int], list[Step]]] = [(0.0, dict(start_pts), [])]
     for level, last in _passes(gd, lfrom, lto, sum(start_pts.values()), talented_bonus):
@@ -308,17 +423,25 @@ def _beam_search(
                     p2[k] = p2.get(k, 0) + 1
                 t_now = best_choice(gd, level, p2, race, over, rules=rules, **options)[0]
                 d = min(depth, gd.level_cap - level)
-                look = (
-                    _rollout(gd, level, p2, race, over, d, rules, talented_bonus, options)
+                look, picks = (
+                    _rollout_path(gd, level, p2, race, over, d, rules, talented_bonus, options)
                     if depth and level < lto
-                    else t_now
+                    else (t_now, ())
                 )
-                pre.append((NOW_WEIGHT * t_now + LOOK_WEIGHT * look, k, p2))
+                pre.append((NOW_WEIGHT * t_now + LOOK_WEIGHT * look, k, p2, picks))
             pre.sort(key=lambda x: x[0])
-            for look, k, p2 in pre[:shortlist]:
-                t_now, choice = _decide_step(gd, level, p2, race, over, rules, mc_n if last else 0, seed, options)
-                step = Step(level, k, round(t_now, 2), choice.rotation, choice)
-                nxt.append((score + t_now * weight, look, p2, [*hist, step]))
+            evals = []
+            for look, k, p2, picks in pre[:shortlist]:
+                t_now, choice, st = _decide_step(gd, level, p2, race, over, rules, mc_n if last else 0, seed, options)
+                evals.append(_Eval(look, k, p2, picks, t_now, choice, st))
+            metas: list[dict[str, Any] | None] = (
+                _state_meta(gd, evals, pts, modeled) if rules != "seed" else [{} for _ in evals]
+            )
+            for e, meta in zip(evals, metas, strict=True):
+                if meta is None:
+                    continue
+                step = Step(level, e.talent, round(e.time_s, 2), e.choice.rotation, e.choice, **meta)
+                nxt.append((score + e.time_s * weight, e.look, e.points, [*hist, step]))
         nxt.sort(key=lambda x: x[0] + BEAM_LOOK_WEIGHT * x[1] * weight)
         seen: set[tuple[tuple[str, int], ...]] = set()
         beams = []

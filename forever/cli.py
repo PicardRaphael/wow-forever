@@ -1072,6 +1072,28 @@ def render_build(rep: Mapping[str, Any]) -> list[str]:
             lines.append(f"  {tree} ({sum(pts.values())}) : " + ", ".join(f"{k} {v}" for k, v in pts.items()))
     if rep["order"]:
         lines.append("Ordre : " + ", ".join(f"{s['level']} {s['talent'] or '-'}" for s in rep["order"]))
+        undecided = [f"{s['level']} {s['talent']}" for s in rep["order"] if s.get("decided_by") == "non_departage"]
+        if undecided:
+            lines.append("  Choix non départagés par le calcul : " + ", ".join(undecided))
+        passages = [f"{s['level']} {s['talent']}" for s in rep["order"] if s.get("decided_by") == "passage_palier"]
+        if passages:
+            lines.append("  Points de passage vers un palier (effet non modélisé) : " + ", ".join(passages))
+    ns = rep.get("next_step")
+    if ns is not None:
+        verdict = {
+            "monte_carlo": "écart significatif au Monte Carlo",
+            "modelise": "à égalité, talent modélisé préféré",
+            "non_departage": "choix non départagé par le calcul",
+            "seul_candidat": "seul candidat légal",
+        }.get(ns["decided_by"], ns["decided_by"])
+        lines.append(f"Prochain talent au niveau {ns['level']} depuis le build actuel : {ns['choice']} ({verdict})")
+        for r in sorted(ns["candidates"], key=lambda r: r["mean"] * (1 if not up else -1)):
+            g = r["gap"]
+            mark = "" if r["modeled"] else " (effet non modélisé)"
+            lines.append(
+                f"  {r['talent']}{mark} : {_dec(r['mean'])} {unit}, écart au meilleur {_dec(g['mean'])} "
+                f"[{_dec(g['low'])} ; {_dec(g['high'])}]" + ("" if g["significant"] or g["mean"] == 0 else " (égalité)")
+            )
     for name, c in rep["choices"].items():
         extra = [f"{k} {c[k]}" for k in ("ab_stacks", "ab_dump", "hs_stacks", "aoe_filler") if c.get(k) is not None]
         lines.append(

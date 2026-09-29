@@ -105,6 +105,9 @@ def stability[C](
     return Stability(tuple(seeds), winners, len(set(map(repr, winners))) == 1)
 
 
+# Origine d'une décision de l'optimiseur (T06b, décision D7) : écart significatif au Monte Carlo ; talent modélisé
+# préféré à égalité ; choix non départagé par le calcul ; point de passage vers un palier ; candidat gardé par
+# l'anticipation du faisceau ; passe sans Monte Carlo ; un seul candidat.
 DECIDED_BY = (
     "monte_carlo",
     "modelise",
@@ -116,6 +119,18 @@ DECIDED_BY = (
 )
 
 
+def gap_dict(g: Gap) -> dict[str, Any]:
+    """Écart brut (a − b) et `advantage` : sa valeur absolue, avantage du meilleur des deux (T06b)."""
+    return {
+        "mean": g.mean,
+        "advantage": abs(g.mean),
+        "low": g.low,
+        "high": g.high,
+        "confidence": g.confidence,
+        "significant": g.significant,
+    }
+
+
 def tie_break(
     cands: Sequence[tuple[str, McStats]],
     modeled: frozenset[str] | None,
@@ -123,4 +138,45 @@ def tie_break(
     *,
     lower_is_better: bool = True,
 ) -> dict[str, Any]:
-    raise NotImplementedError("T06b : départage")
+    """Choix entre candidats mesurés sur les mêmes combats : le meilleur au Monte Carlo si son avance est
+    significative ; sinon, parmi les candidats à égalité (écart apparié non significatif avec le meilleur), un talent
+    modélisé passe devant un non modélisé (`modelise`) ; sinon le meilleur, « non départagé par le calcul »
+    (`non_departage`). Rend le choix, sa décision, le second et l'écart apparié choix − second, et pour chaque candidat
+    sa moyenne, son écart au meilleur et s'il est modélisé (`modeled` None : aucun talent n'est dit modélisé).
+
+    Registre : I5, J2"""
+    sign = 1.0 if lower_is_better else -1.0
+    order = sorted(range(len(cands)), key=lambda i: (sign * cands[i][1].mean, i))
+    best = cands[order[0]][1]
+    rows: list[dict[str, Any]] = []
+    for key, st in cands:
+        g = paired_gap(st, best, confidence)
+        rows.append(
+            {
+                "talent": key,
+                "mean": st.mean,
+                "n": st.n,
+                "gap": gap_dict(g),
+                "significant": g.significant,
+                "modeled": modeled is not None and key in modeled,
+            }
+        )
+    if len(cands) == 1:
+        return {"choice": cands[0][0], "decided_by": "seul_candidat", "runner_up": None, "gap": None, "rows": rows}
+    tied = [i for i in order if not rows[i]["significant"]]
+    pool = [i for i in tied if rows[i]["modeled"]]
+    if len(tied) == 1:
+        choice, by = tied[0], "monte_carlo"
+    elif pool and len(pool) < len(tied):
+        choice, by = pool[0], "modelise" if len(pool) == 1 else "non_departage"
+    else:
+        choice, by = tied[0], "non_departage"
+    runner = next(i for i in order if i != choice)
+    g = paired_gap(cands[choice][1], cands[runner][1], confidence)
+    return {
+        "choice": cands[choice][0],
+        "decided_by": by,
+        "runner_up": cands[runner][0],
+        "gap": gap_dict(g),
+        "rows": rows,
+    }
