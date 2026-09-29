@@ -103,7 +103,7 @@ def test_lookup_with_tampered_data_shows_disk_fingerprint(make_deps, data_copy):
 
 
 def test_unsupported_kind(make_deps):
-    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", {"kind": "talent", "name": "iceLance"}))
+    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", {"kind": "item", "name": "iceLance"}))
     assert r.is_error
     assert r.structured_content["error"]["code"] == "unsupported_kind"
     assert validate_provenance(r.structured_content["provenance"]) == []

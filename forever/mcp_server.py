@@ -1,5 +1,5 @@
-"""Serveur MCP : outils `forever_status`, `forever_lookup`, `forever_explain_mechanic` et `forever_sim_leveling` (même
-cœur que la CLI).
+"""Serveur MCP : outils `forever_status`, `forever_lookup`, `forever_explain_mechanic`, `forever_sim_leveling` et
+`forever_build` (même cœur que la CLI).
 
 Une erreur métier est renvoyée comme résultat d'outil (`is_error`, `structured_content` avec l'erreur et la
 provenance) : une exception brute ne montrerait au modèle qu'un message générique."""
@@ -19,7 +19,7 @@ from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.leveling import LevelingReport, simulate_leveling
-from forever.lookup import lookup_spell, lookup_zones
+from forever.lookup import lookup_spell, lookup_talent, lookup_zones
 from forever.provenance import error_payload
 from forever.status import StatusReport, status_report
 
@@ -69,13 +69,20 @@ def build_server(deps: Deps) -> MCPServer:
         `detail=True` : champs complémentaires (ralentissement, vitesse de projectile…).
         T04c : `kind="zones"` avec `level` (niveau du personnage), `faction` (horde ou alliance, défaut : toutes) et
         `questie` (dossier de l'addon, défaut : dans FOREVER_WOW_DIR) : zones et donjons classés par quêtes utiles
-        (base Questie Classic Era lue sur disque, noms anglais, certitude suppose)."""
+        (base Questie Classic Era lue sur disque, noms anglais, certitude suppose).
+        T06 : `kind="talent"` avec `name` (nom anglais ou clé, ex. « Improved Frostbolt » ou « improvedFrostbolt »)
+        et `rank` (tous les rangs s'il est omis) : arbre, palier, points exigés dans l'arbre, prérequis, valeurs et
+        description de chaque rang, sort appris, source des valeurs."""
         try:
             if kind == "zones":
                 path = Path(questie) if questie else None
                 return dict(lookup_zones(deps, level, faction=faction, questie_dir=path))
+            if kind == "talent":
+                if not name:
+                    raise InvalidArgumentError("Nom du talent manquant.", "donner name (nom anglais ou clé du talent)")
+                return dict(lookup_talent(deps, name, rank))
             if kind != "spell":
-                raise UnsupportedKindError(f"type « {kind} »", ["spell", "zones"])
+                raise UnsupportedKindError(f"type « {kind} »", ["spell", "talent", "zones"])
             if not name:
                 raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")
             return dict(lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset))

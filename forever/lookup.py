@@ -8,13 +8,20 @@ from pathlib import Path
 from typing import Any, Literal, TypedDict, cast
 
 from forever.config import Deps
-from forever.errors import InvalidArgumentError, UnknownRankError, UnknownSpellError, UnsupportedKindError
+from forever.errors import (
+    InvalidArgumentError,
+    UnknownRankError,
+    UnknownSpellError,
+    UnknownTalentError,
+    UnsupportedKindError,
+)
 from forever.freshness import freshness_for_version
 from forever.pipeline.questie import TOC_NAME, ZoneAdvice, read_questie, zones_for_level
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.store import load_version
 
 SPELLS_FILE = "spells.json"
+TALENTS_FILE = "talents.json"
 # Champs du spell exposés hors de `details`.
 _BASE_FIELDS = frozenset({"school", "range", "ranks", "mana_pct_base"})
 
@@ -168,6 +175,7 @@ class TalentLookup(TypedDict):
     description_template: str
     spell: str | None
     source: str
+    duration_s: float | None
     ranks: list[TalentRank]
     provenance: Provenance
 
@@ -177,7 +185,98 @@ def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLooku
     exigés dans l'arbre, prérequis, rangs et valeurs (description aux valeurs du rang), sort appris, provenance.
 
     Registre : G3"""
-    raise NotImplementedError
+    from forever.gamedata import build_game_data
+
+    data = load_version(deps)
+    raw: dict[str, Any] = data.read_json(TALENTS_FILE)
+    entries: dict[str, dict[str, Any]] = {t["key"]: t for tree in raw["trees"] for t in tree["talents"]}
+    index: dict[str, str] = {}
+    for key, t in entries.items():
+        index[_talent_key(key)] = key
+        index[_talent_key(t["name"])] = key
+    wanted = _talent_key(name)
+    if wanted not in index:
+        names = {_talent_key(t["name"]): t["name"] for t in entries.values()}
+        close = difflib.get_close_matches(wanted, sorted(names), n=3, cutoff=0.6)
+        raise UnknownTalentError(name, [names[c] for c in close])
+    key = index[wanted]
+    entry = entries[key]
+    gd = build_game_data(data)
+    talent = gd.talents[key]
+    all_ranks: list[TalentRank] = [
+        {"rank": i, "values": list(values), "description": _describe(entry["desc"], values)}
+        for i, values in enumerate(talent.ranks, start=1)
+    ]
+    if rank is not None:
+        if not 1 <= rank <= talent.max_rank:
+            raise UnknownRankError(key, rank, talent.max_rank)
+        ranks = [all_ranks[rank - 1]]
+    else:
+        ranks = all_ranks
+
+    prereq: TalentPrereq | None = None
+    if talent.prereq is not None:
+        pk = gd.talent_at[(talent.tree, *talent.prereq)]
+        prereq = {"id": pk, "name": gd.talents[pk].name, "max_rank": gd.talents[pk].max_rank}
+    spells_file = data.read_json(SPELLS_FILE)
+    spell_key = normalize_name(talent.name)
+    spell = spell_key if spell_key in spells_file["spells"] or spell_key in spells_file.get("utility", {}) else None
+
+    # Certitude par talent : rangs lus sur la version courante (certain) ou sur un build antérieur (probable).
+    source = str(entry["certainty"])
+    current_build = data.game_version.rsplit(".", 1)[-1]
+    notes: list[str] = []
+    if source == f"FC-{current_build}":
+        certainty: Certainty = "certain"
+    else:
+        certainty = "probable"
+        notes.append(f"valeurs lues sur le build {source.removeprefix('FC-')}, pas sur {data.game_version}")
+    if talent.duration_s is not None:
+        # Durée d'aura corrigée d'après le client : la description, tirée des rangs, peut garder l'ancienne valeur.
+        notes.append(f"durée corrigée d'après le client : {_fmt_value(talent.duration_s)} s (champ duration_s)")
+    fresh = freshness_for_version(deps, data.game_version, allow_network=False)
+    provenance = make_provenance(
+        deps,
+        game_version=data.game_version,
+        data_sha=data.data_sha,
+        freshness=fresh["freshness"],
+        certainty=certainty,
+        assumptions=[*fresh["assumptions"], *notes],
+    )
+    return {
+        "kind": "talent",
+        "id": key,
+        "name": talent.name,
+        "tree": talent.tree,
+        "tier": talent.tier,
+        "col": talent.col,
+        "required_tree_points": gd.constants.talents.points_per_tier * (talent.tier - 1),
+        "prereq": prereq,
+        "max_rank": talent.max_rank,
+        "description_template": entry["desc"],
+        "spell": spell,
+        "source": source,
+        "duration_s": talent.duration_s,
+        "ranks": ranks,
+        "provenance": provenance,
+    }
+
+
+def _talent_key(name: str) -> str:
+    return re.sub(r"[\s\-_']+", "", name.strip().lower())
+
+
+def _fmt_value(v: float) -> str:
+    return str(int(v)) if float(v).is_integer() else repr(float(v))
+
+
+def _describe(template: str, values: tuple[float, ...]) -> str:
+    """Description du rang : `{i}` remplacé par la valeur i du rang (laissé tel quel si la valeur manque)."""
+    return re.sub(
+        r"\{(\d+)\}",
+        lambda m: _fmt_value(values[int(m.group(1))]) if int(m.group(1)) < len(values) else m.group(0),
+        template,
+    )
 
 
 class ZoneLookup(ZoneAdvice):

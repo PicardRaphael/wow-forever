@@ -1052,6 +1052,7 @@ mechanics:
       - tests/unit/test_engine_talents.py::test_points_available
       - tests/unit/test_engine_talents.py::test_legal_additions_tier_one
       - tests/parity/test_fm_parity.py::test_build_parity
+      - tests/unit/test_lookup_talent.py::test_tier_prerequisite_and_tree_points
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis au maximum"
     note: "4e talent doré non modélisé ; bonus Legacy « Talented » accepté en paramètre (G5 absent, non actif en bêta)"

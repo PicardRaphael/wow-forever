@@ -41,7 +41,7 @@ from forever.leveling import (
     parse_talents,
     simulate_leveling,
 )
-from forever.lookup import SpellLookup, SpellRank, lookup_spell, lookup_zones
+from forever.lookup import SpellLookup, SpellRank, TalentLookup, lookup_spell, lookup_talent, lookup_zones
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
@@ -106,8 +106,8 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("--json", action="store_true", help="sortie JSON")
 
     lookup = sub.add_parser("lookup", help="consulter une entité du jeu")
-    lookup.add_argument("kind", help="type d'entité : spell (T01), zones (T04c)")
-    lookup.add_argument("name", nargs="?", help="nom anglais du sort (casse, espaces et tirets ignorés)")
+    lookup.add_argument("kind", help="type d'entité : spell (T01), zones (T04c), talent (T06)")
+    lookup.add_argument("name", nargs="?", help="nom anglais du sort ou du talent (casse, espaces et tirets ignorés)")
     lookup.add_argument("--level", type=int, help="zones : niveau du personnage")
     lookup.add_argument("--faction", choices=["horde", "alliance"], help="zones : faction (défaut : toutes)")
     lookup.add_argument("--questie", help="zones : dossier de l'addon Questie (défaut : dans FOREVER_WOW_DIR)")
@@ -392,6 +392,23 @@ def render_lookup(res: SpellLookup) -> list[str]:
     return lines
 
 
+def render_talent(res: TalentLookup) -> list[str]:
+    head = f"{res['name']} (arbre {res['tree']}, palier {res['tier']}, {res['max_rank']} rang(s))"
+    lines = [head]
+    needs = [f"{res['required_tree_points']} points dans l'arbre"] if res["required_tree_points"] else []
+    if res["prereq"] is not None:
+        needs.append(f"{res['prereq']['name']} au maximum")
+    if needs:
+        lines.append("Exige : " + ", ".join(needs))
+    if res["spell"] is not None:
+        lines.append(f"Apprend le sort : {res['spell']} (forever lookup spell {res['spell']})")
+    lines += [f"rang {r['rank']}/{res['max_rank']} : {r['description']}" for r in res["ranks"]]
+    if res["duration_s"] is not None:
+        lines.append(f"Durée corrigée d'après le client : {_num(res['duration_s'])} s")
+    lines.append(f"Source des valeurs : {res['source']}")
+    return lines
+
+
 def render_status(rep: StatusReport) -> list[str]:
     f, integ = rep["freshness"], rep["integrity"]
     if integ["ok"]:
@@ -492,8 +509,14 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         )
         _emit(zones, render_zones(zones), zones["provenance"], args.json)
         return EXIT_OK
+    if args.kind == "talent":
+        if not args.name:
+            raise InvalidArgumentError("Nom du talent manquant.", "écrire forever lookup talent <nom>")
+        talent = lookup_talent(deps, args.name, args.rank)
+        _emit(talent, render_talent(talent), talent["provenance"], args.json)
+        return EXIT_OK
     if args.kind != "spell":
-        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "zones"])
+        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones"])
     if not args.name:
         raise InvalidArgumentError("Nom du sort manquant.", "écrire forever lookup spell <nom>")
     res = lookup_spell(deps, args.name, args.rank, detail=args.detail, limit=args.limit, offset=args.offset)
