@@ -53,7 +53,7 @@ def check(name, *, strict=True, engine_dirs=()):
 def test_repository_registry_is_valid_strict():
     report = validate(REGISTRY_PATH, REPO_ROOT, strict=True)
     assert report.errors == []
-    assert report.total == 104  # T04b : H11 (PV des monstres par niveau) ; T04c : I7 (zone ou donjon à mon niveau)
+    assert report.total == 108  # T04b : H11 ; T04c : I7 ; T05 : B18, B19, C9, I8 (angles morts)
 
 
 def test_tested_entries_reference_existing_test_functions():
@@ -125,7 +125,7 @@ def test_find_entry_unknown_suggests():
 def test_repository_coverage():
     """Seul test qui fige la couverture du registre après T02."""
     assert (
-        coverage(REGISTRY_PATH) == "37/104"
+        coverage(REGISTRY_PATH) == "37/108"
     )  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14, H3, H5, I5
 
 

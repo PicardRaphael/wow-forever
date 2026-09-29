@@ -23,6 +23,7 @@ from typing import Any
 import yaml
 
 from forever.config import PACKAGE_DIR, REGISTRY_PATH, REPO_ROOT
+from forever.engine.blind_spots import BlindSpotRule
 from forever.errors import UnknownMechanicError
 
 STATUSES = ("absent", "modelise", "teste", "valide-journal", "valide-jeu")
@@ -350,3 +351,9 @@ def main(argv: Sequence[str], path: Path = REGISTRY_PATH, repo_root: Path = REPO
     for e in report.errors:
         print(f"  ERREUR : {e}")
     return 1 if report.errors else 0
+
+
+def blind_spot_rules(mechanics: Sequence[Mechanic]) -> list[BlindSpotRule]:
+    """Angles morts déclarés au registre (champ `angle_mort` : talents, contextes, estimation), dans l'ordre du
+    registre (T05, décision 88)."""
+    raise NotImplementedError
