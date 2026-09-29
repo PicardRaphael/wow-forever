@@ -35,3 +35,28 @@
 +        assert check_build(game_data, pts, level, 3) == []
 +        assert check_build(game_data, pts, level) != []  # illégal sans le bonus
 ```
+
+## 3. Bloc I1 : `tests/unit/test_blind_spots.py::test_estimates_are_positive_bounds_from_the_data`
+
+- **Échec** : `assert (1.009432743248482 is not None and 1.009432743248482 < 1)` (borne d'Évocation).
+- **Preuve (prémisse contredite par les données)** : `spells.json.utility.evocation` : `regen_mult` 15, `duration` 8 s ; au niveau 40 (fiche de base, Orc), régénération d'Esprit 19,53 mana/s et réserve 2 321,7 : une Évocation rend 15 × 19,53 × 8 = 2 343 mana, soit 1,009 réserve. Quand la mana borne le combat, l'effet peut donc dépasser 100 % du temps d'incantation ; la borne n'a pas à être inférieure à 1. Les autres assertions du test (Presence of Mind, Combustion, Cold Snap, Wake of Fire) passent.
+- **Diff proposé** :
+
+```diff
+     evo = estimate_evocation(game_data, 40, {}, "Orc")
+-    assert evo is not None and 0 < evo < 1
++    u = game_data.utility
++    assert evo == pytest.approx(u.evocation_regen_mult * ch.spirit_regen * u.evocation_duration_s / ch.mana, rel=1e-12)
++    assert evo > 0
+```
+
+## 4. Bloc I1 : `tests/unit/test_registry.py::test_main_strict_on_repository`
+
+- **Échec** : la sortie commence par `Registre : 108 mécaniques`, le test attend `Registre : 104 mécaniques`.
+- **Preuve** : le bloc I1 ajoute quatre entrées au registre (B18, B19, C9, I8, décision 88) ; le commit « tests (bloc I1) » a mis à jour `report.total` (108) et la couverture (`37/108`), mais pas la troisième assertion, sur la première ligne de `main` (oubli de ma part, piège déjà noté dans le skill `/tranche`).
+- **Diff proposé** :
+
+```diff
+-    assert out.startswith("Registre : 104 mécaniques")
++    assert out.startswith("Registre : 108 mécaniques")
+```

@@ -314,6 +314,8 @@ class Utility:
     counterspell_cooldown_s: float = 0.0
     counterspell_lockout_s: float = 0.0
     ice_barrier: tuple[tuple[int, float], ...] = ()  # (niveau, absorption) par rang
+    evocation_duration_s: float = 0.0
+    evocation_regen_mult: float = 0.0  # régénération d'Esprit multipliée pendant l'Évocation
 
 
 @dataclass(frozen=True)

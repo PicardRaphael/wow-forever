@@ -23,7 +23,7 @@ from typing import Any
 import yaml
 
 from forever.config import PACKAGE_DIR, REGISTRY_PATH, REPO_ROOT
-from forever.engine.blind_spots import BlindSpotRule
+from forever.engine.blind_spots import CONTEXTS, ESTIMATORS, BlindSpotRule
 from forever.errors import UnknownMechanicError
 
 STATUSES = ("absent", "modelise", "teste", "valide-journal", "valide-jeu")
@@ -62,6 +62,7 @@ class Mechanic:
     formula: str | None
     note: str | None
     proofs: tuple[dict[str, Any], ...] = ()
+    blind_spot: dict[str, Any] | None = None  # champ angle_mort (T05, décision 88)
 
 
 @dataclass
@@ -117,6 +118,7 @@ def load(path: Path) -> list[Mechanic]:
                 formula=_optional(m.get("formule")),
                 note=_optional(m.get("note")),
                 proofs=tuple(p for p in m.get("preuves") or [] if isinstance(p, dict)),
+                blind_spot=m.get("angle_mort") if isinstance(m.get("angle_mort"), dict) else None,
             )
         )
     return out
@@ -303,6 +305,8 @@ def validate(
             report.errors.append(f"{mid} : statut '{status}' sans source")
         if rank >= 2 and mid[:1] in ENGINE_CATEGORIES and not impl.get(mid):
             report.errors.append(f"{mid} : statut '{status}' sans aucune implémentation citée dans le moteur")
+        if "angle_mort" in m:
+            report.errors += _check_blind_spot(mid, m["angle_mort"], repo_root)
         formula = m.get("formule")
         if formula is not None:
             numbers = [n for n in NUMBER_RE.findall(str(formula)) if n not in ("0", "1")]
@@ -353,7 +357,49 @@ def main(argv: Sequence[str], path: Path = REGISTRY_PATH, repo_root: Path = REPO
     return 1 if report.errors else 0
 
 
+def _known_talents(repo_root: Path) -> set[str]:
+    """Clés de talent de toutes les versions de données du dépôt (`forever/data/<version>/talents.json`)."""
+    keys: set[str] = set()
+    for path in sorted((repo_root / "forever" / "data").glob("*/talents.json")):
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))  # JSON est un sous-ensemble de YAML
+        for tree in doc.get("trees", []):
+            keys |= {str(x.get("key")) for x in tree.get("talents", [])}
+    return keys
+
+
+def _check_blind_spot(mid: str, raw: Any, repo_root: Path) -> list[str]:
+    """Contrôle du champ `angle_mort` : talents existants, contextes connus, fonction d'estimation existante."""
+    if not isinstance(raw, dict):
+        return [f"{mid} : angle_mort doit être un objet (talents, contextes, estimation)"]
+    errors = []
+    talents, contexts = raw.get("talents", []), raw.get("contextes", [])
+    if not isinstance(talents, list) or not isinstance(contexts, list) or not contexts:
+        return [f"{mid} : angle_mort : talents (liste) et contextes (liste non vide) attendus"]
+    known = _known_talents(repo_root)
+    errors += [f"{mid} : angle_mort : talent inconnu « {k} »" for k in talents if k not in known]
+    errors += [f"{mid} : angle_mort : contexte inconnu « {c} »" for c in contexts if c not in CONTEXTS]
+    estimate = raw.get("estimation")
+    if estimate is not None and estimate not in ESTIMATORS:
+        errors.append(f"{mid} : angle_mort : estimation inconnue « {estimate} » ({', '.join(ESTIMATORS)} attendue)")
+    return errors
+
+
 def blind_spot_rules(mechanics: Sequence[Mechanic]) -> list[BlindSpotRule]:
     """Angles morts déclarés au registre (champ `angle_mort` : talents, contextes, estimation), dans l'ordre du
     registre (T05, décision 88)."""
-    raise NotImplementedError
+    out = []
+    for m in mechanics:
+        if m.blind_spot is None:
+            continue
+        b = m.blind_spot
+        out.append(
+            BlindSpotRule(
+                m.id,
+                m.description,
+                m.status,
+                tuple(str(k) for k in b.get("talents") or []),
+                tuple(str(c) for c in b.get("contextes") or []),
+                str(b["estimation"]) if b.get("estimation") else None,
+            )
+        )
+    return out

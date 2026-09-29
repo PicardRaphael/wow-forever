@@ -145,6 +145,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: []
+      contextes: [raid]
+      estimation: null
   - id: A13
     categorie: attaque
     description: "Sorts binaires et non binaires"
@@ -154,6 +158,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: []
+      contextes: [raid]
+      estimation: null
   - id: A14
     categorie: attaque
     description: "Résistance liée au niveau (non réductible)"
@@ -163,6 +171,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: []
+      contextes: [raid]
+      estimation: null
   - id: A15
     categorie: attaque
     description: "Pénétration des sorts"
@@ -440,6 +452,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: []
+      contextes: [dungeon, raid]
+      estimation: evocation
   - id: B11
     categorie: ressources
     description: "Coûts en % du mana de base, escalade d'Arcane Blast"
@@ -573,6 +589,38 @@ mechanics:
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
     tolerance: null
     formule: "coût × (1 − Frost Channeling) (givre) ; − toucher × crit × Master of Elements × coût de base (feu, givre)"
+  - id: B18
+    categorie: temps
+    description: "Talents actifs à recharge : Presence of Mind, Combustion, Cold Snap"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70009/talents.json"
+      - "forever/data/1.60.1.70009/spell_scaling.json (talent_cooldowns)"
+    tests: []
+    tolerance: null
+    note: "T05 (décision 83) : absents des rotations ; angle mort chiffré par une borne haute (forever/engine/blind_spots.py : une incantation rendue instantanée par recharge, critiques garantis de Combustion) ; Cold Snap non chiffré"
+    angle_mort:
+      talents: [presenceOfMind, combustion, coldSnap]
+      contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
+      estimation: cooldown_talents
+  - id: B19
+    categorie: temps
+    description: "Procs de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70009/talents.json"
+      - "docs/research/notes-blizzard-2026-09-24.md (Wake of Fire 30 s)"
+    tests: []
+    tolerance: null
+    note: "T05 : Impact (étourdissement) absent des simulateurs (le profil PvP en compte une part) ; Wake of Fire : seule la réduction de recharge est modélisée (B13), le bonus de critique du Fire Blast qui suit une mise à mort est un angle mort chiffré (un critique de plus par combat, borne haute)"
+    angle_mort:
+      talents: [impact, wakeOfFire]
+      contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
+      estimation: wake_of_fire_crit
   - id: C1
     categorie: physique
     description: "Temps de vol des projectiles"
@@ -662,6 +710,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: []
+      contextes: [dungeon]
+      estimation: null
   - id: C8
     categorie: physique
     description: "Ligne de vue et temps morts aux changements de phase"
@@ -671,6 +723,21 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+  - id: C9
+    categorie: physique
+    description: "Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70009/talents.json"
+    tests: []
+    tolerance: null
+    note: "T05 : sans effet dans les simulateurs de leveling et des scénarios (dégâts subis, contrôle, survie) ; le profil PvP du seed en compte une part (Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Improved Counterspell) ; non chiffré"
+    angle_mort:
+      talents: [iceBlock, iceBarrier, frostWarding, arcaneResilience, magicAbsorption, arcaneShielding, improvedFireWard, improvedCounterspell, improvedChanneling, improvedBlizzard]
+      contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
+      estimation: null
   - id: D1
     categorie: environnement
     description: "Buffs de raid et de groupe (dont ceux devenus passifs)"
@@ -680,6 +747,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: []
+      contextes: [dungeon, raid]
+      estimation: null
   - id: D2
     categorie: environnement
     description: "Non-cumuls métier, campement, classe"
@@ -903,6 +974,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: [wandSpecialization]
+      contextes: [leveling]
+      estimation: null
   - id: F7
     categorie: equipement
     description: "Bonus de soins : un tiers en dégâts"
@@ -1153,6 +1228,10 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    angle_mort:
+      talents: []
+      contextes: [dungeon, raid]
+      estimation: null
   - id: H10
     categorie: rencontre
     description: "Mort et ressources"
@@ -1323,6 +1402,21 @@ mechanics:
     tolerance: null
     formule: "couleur = rouge si niveau de quête − niveau ≥ seuil rouge, orange ≥ seuil orange, jaune ≥ seuil jaune, sinon verte au-dessus du niveau gris, grise ; zone classée par quêtes utiles (vertes, jaunes, orange) prenables (faction, classe, niveau requis)"
     note: "T04c : forever/engine/leveling.py (gray_level, quest_color, level_band), forever/pipeline/questie.py (zones_for_level) ; base Classic Era de Questie sans correction Forever, noms de zones en anglais ; plage verte (GetQuestGreenRange, API du client) remplacée par le niveau gris communautaire de Classic : voir OPEN_QUESTIONS"
+  - id: I8
+    categorie: optimisation
+    description: "Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+    forever: oui
+    statut: absent
+    certitude: probable
+    sources:
+      - "tasks/T05-etat.md (constats du bloc C)"
+    tests: []
+    tolerance: null
+    note: "T05 : Scorch et Fire Vulnerability dans les rotations en T09 ; Missile Barrage seulement sur la décharge de la rotation arcane ; Arcane Power au pull (décision 79) ; aucune rotation ne passe à un sort moins cher quand la mana manque ; non chiffré"
+    angle_mort:
+      talents: [improvedScorch, missileBarrage, pyroblast, arcanePower]
+      contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
+      estimation: null
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

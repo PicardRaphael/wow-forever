@@ -9,9 +9,21 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping, Sequence
 from typing import NamedTuple
 
+from forever.engine.cast import expected_cast
+from forever.engine.casting import cast_time
+from forever.engine.character import character
+from forever.engine.crit import crit_mult
 from forever.engine.model import CharacterOverrides, GameData, Points
+from forever.engine.monsters import mob_hp
+from forever.engine.spells import best_rank
+from forever.engine.talents import talent_value
 
 CONTEXTS = ("leveling", "dungeon", "raid", "pvp-bg", "pvp-world")  # contextes des builds (forever build)
+# Liens talent -> effet (noms et positions des variables de talents.json, pas des chiffres de jeu).
+PRESENCE_OF_MIND, COMBUSTION, WAKE_OF_FIRE = "presenceOfMind", "combustion", "wakeOfFire"
+COMBUSTION_CHARGES, WOF_CRIT = 1, 2
+MAIN_SPELLS = ("frostbolt", "fireball", "pyroblast", "arcane_blast", "frostfire_bolt")
+PERCENT = 100.0  # conversion d'unité
 
 
 class BlindSpotRule(NamedTuple):
@@ -48,7 +60,21 @@ def estimate_cooldown_talents(
     Borne haute, fraction du temps ou des dégâts.
 
     Registre : B18"""
-    raise NotImplementedError
+    ch = character(gd, level, race, over)
+    bound = 0.0
+    rated = False
+    cds = gd.talent_cooldowns_s
+    if pts.get(PRESENCE_OF_MIND, 0) > 0:
+        casts = [cast_time(gd, k, r, pts, ch) for k in MAIN_SPELLS if (r := best_rank(gd, k, level, pts)) is not None]
+        if casts:
+            bound += max(casts) / cds[PRESENCE_OF_MIND]
+            rated = True
+    if pts.get(COMBUSTION, 0) > 0 and (r := best_rank(gd, "fireball", level, pts)) is not None:
+        charges = talent_value(gd, pts, COMBUSTION, COMBUSTION_CHARGES)
+        extra = crit_mult(gd, "fire", pts) - 1
+        bound += charges * extra * cast_time(gd, "fireball", r, pts, ch) / cds[COMBUSTION]
+        rated = True
+    return bound if rated else None
 
 
 def estimate_wake_of_fire_crit(
@@ -58,7 +84,15 @@ def estimate_wake_of_fire_crit(
     combat, rapporté aux PV du monstre du niveau. Borne haute, fraction des dégâts d'un combat.
 
     Registre : B19"""
-    raise NotImplementedError
+    if pts.get(WAKE_OF_FIRE, 0) <= 0:
+        return None
+    ch = character(gd, level, race, over)
+    e = expected_cast(gd, "fire_blast", level, pts, ch, 0, spell_level="character")
+    if e is None:
+        return None
+    hit_dmg = e["direct_per_hit"] / (1 + e["crit"] * (e["crit_mult"] - 1))  # coup sans critique
+    bonus = min(1.0, talent_value(gd, pts, WAKE_OF_FIRE, WOF_CRIT) / PERCENT)
+    return bonus * (e["crit_mult"] - 1) * hit_dmg / mob_hp(gd, level, gd.leveling.mob_source).value  # type: ignore[arg-type]
 
 
 def estimate_evocation(
@@ -68,7 +102,11 @@ def estimate_evocation(
     réserve : au plus autant d'incantation en plus quand la mana borne le combat. Borne haute.
 
     Registre : B10"""
-    raise NotImplementedError
+    ch = character(gd, level, race, over)
+    u = gd.utility
+    if level < u.blink_level or not u.evocation_regen_mult:
+        return None
+    return u.evocation_regen_mult * ch.spirit_regen * u.evocation_duration_s / ch.mana
 
 
 ESTIMATORS: Mapping[str, Estimator] = {
@@ -92,4 +130,15 @@ def select_blind_spots(
     l'alternative proche `near` (toutes les règles sans talent), avec l'estimation du moteur.
 
     Registre : I5"""
-    raise NotImplementedError
+    taken = {k for k, v in pts.items() if v > 0} | {k for k, v in (near or {}).items() if v > 0}
+    out: list[BlindSpot] = []
+    for rule in rules:
+        if context not in rule.contexts:
+            continue
+        concerned = tuple(k for k in rule.talents if k in taken)
+        if rule.talents and not concerned:
+            continue
+        estimator = ESTIMATORS.get(rule.estimate) if rule.estimate else None
+        effect = estimator(gd, level, {**(near or {}), **pts}, race, over) if estimator else None
+        out.append(BlindSpot(rule.id, rule.description, rule.status, concerned, effect))
+    return out

@@ -376,6 +376,7 @@ def _pvp_utility(r: _Reader, u: Mapping[str, Any]) -> dict[str, Any]:
     blink = r.obj(u, "blink", "utility.blink")
     cs = r.obj(u, "counterspell", "utility.counterspell")
     ib = r.obj(u, "ice_barrier", "utility.ice_barrier")
+    evo = r.obj(u, "evocation", "utility.evocation")
     ranks = r.list_(ib, "ranks", "utility.ice_barrier.ranks")
     if not all(isinstance(x, list) and len(x) >= 2 for x in ranks):
         raise r.fail("utility.ice_barrier.ranks", "liste de rangs [niveau, absorption, …]")
@@ -385,6 +386,8 @@ def _pvp_utility(r: _Reader, u: Mapping[str, Any]) -> dict[str, Any]:
         "counterspell_level": r.int_(cs, "level", "utility.counterspell.level"),
         "counterspell_cooldown_s": r.num(cs, "cooldown", "utility.counterspell.cooldown"),
         "counterspell_lockout_s": r.num(cs, "lockout", "utility.counterspell.lockout"),
+        "evocation_duration_s": r.num(evo, "duration", "utility.evocation.duration"),
+        "evocation_regen_mult": r.num(evo, "regen_mult", "utility.evocation.regen_mult"),
         "ice_barrier": tuple(
             (
                 r.int_({"v": x[0]}, "v", "utility.ice_barrier.ranks"),

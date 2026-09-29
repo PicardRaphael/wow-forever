@@ -12,7 +12,8 @@ Branche `t05`. Un cycle rouge → vert par bloc ; demandes de correction regroup
 - F (optimiseur : `forever/optimize/leveling.py`, parité exacte avec le seed ; `forever/optimize/endgame.py`) : implémenté ; **un test verrouillé en attente de correction** (`test_talented_bonus_adds_legal_points`, corrections n° 2). Défaut de l'analytique du bloc E corrigé au passage (rotation à une cible sur un paquet), avec son test.
 - G (profil PvP porté, parité exacte ; contextes pvp-bg et pvp-world) : vert.
 - H (respec : parité exacte avec le seed ; conseil forever par niveau) : vert.
-- I à K : à faire (ordre du plan).
+- I1 (angles morts : champ `angle_mort` du registre, entrées B18, B19, C9, I8, estimations bornées) : implémenté ; **deux tests verrouillés en attente de correction** (corrections n° 3 et 4).
+- I2 (rapport, CLI, MCP), J, K : à faire.
 
 ## Constats à reporter (angles morts, rapport final, bloc J/K)
 - **Arcane Power, politique « au pull » (D1)** : au Monte Carlo, l'aura couvre les lancers qui finissent dans ses 15 s ; en rotation arcane, la décharge Arcane Missiles finit vers 16 s et n'en profite pas, les Arcane Blast de montée en profitent. Niveau 40, build Arcanes 31 points, décharge Arcane Missiles, n = 600 : temps par monstre 73,45 s (auto) contre 72,71 s (off) au Monte Carlo (graine 7 ; 73,14 contre 72,21 graine 8) : le surcoût de mana (+5 %) l'emporte. L'analytique, à dégâts uniformes, donne l'inverse (66,51 contre 67,92) : **l'analytique surestime Arcane Power en leveling** ; la décision revient au Monte Carlo. Angle mort : un joueur lance Arcane Power juste avant la décharge (sous-évalue Arcane Power en rotation arcane).
