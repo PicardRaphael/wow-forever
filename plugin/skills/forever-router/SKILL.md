@@ -21,6 +21,9 @@ seulement par ce message, sans rien répondre à la question de mémoire :
   wow-forever, aucune ligne de fraîcheur n'est affichée au démarrage : c'est cet appel qui la remplace.
 - Intégrité en échec : les consultations sont refusées ; renvoie à `uv run forever status`.
 
+- Question qui dépend du personnage : `forever_player_profile` avant tout calcul (section « Données du joueur » de
+  `format-reponse.md`).
+
 ## 2. Carte des domaines couverts
 
 | Question | Outil | Skill |
@@ -29,6 +32,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Talent : effet à un rang, prérequis, palier | `forever_lookup(kind="talent", name=<nom anglais ou clé>, rank=…)` | `forever-mage` |
 | Meilleur build, ordre des talents, build par contexte | `forever_build(context, level, …)` | `forever-mage` |
 | Quel talent prendre au niveau N, faut-il respec | `forever_build(context="leveling", level, current, respecs)` | `forever-leveling` |
+| Mon personnage (race, faction, niveau, talents, métiers) | `forever_player_profile(name=…)` | selon la question |
 | Temps par monstre, XP par heure, repos, mana | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
 | Comment marche une mécanique | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` | selon le sujet |
@@ -54,7 +58,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Hôtel des ventes, prix, économie | EC1 |
 | Quêtes propres à Forever, modèle d'XP de Forever | T04d |
 | Mana des combats longs (Évocation, potions, gemmes) | T05b |
-| Mémoire du joueur (mon personnage, mon équipement enregistré) | T07 |
+| Mémoire du joueur au-delà du profil (équipement enregistré, historique, fiches datées) | T07 |
 | Raid complet (le build de raid actuel est un scénario provisoire de `forever_build`) | T09 |
 | Équipement et objets | T10 |
 | Consommables et préparation de raid | T11 |

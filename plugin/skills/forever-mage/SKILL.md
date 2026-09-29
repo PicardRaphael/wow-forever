@@ -5,6 +5,9 @@ description: "Mage de WoW Forever : sorts (dégâts, rangs, coût, temps d'incan
 
 # Mage (WoW Forever)
 
+Race et niveau du joueur : `forever_player_profile` (section « Données du joueur » de `format-reponse.md`) ;
+comparer deux builds : section « Comparer deux options ».
+
 Lis d'abord `../forever-router/format-reponse.md` : section « Plugin mal installé » (outils forever introuvables :
 message fixe, rien de mémoire), forme de la réponse, règle « je ne sais pas ». Aucun chiffre de mémoire : tout vient
 des outils ci-dessous.

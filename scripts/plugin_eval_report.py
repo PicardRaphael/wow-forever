@@ -31,7 +31,7 @@ THRESHOLDS: dict[str, float] = {
     "je_ne_sais_pas": 1.0,
 }
 LABELS = {
-    "aiguillage": "bonnes décisions d'aiguillage (50 cas)",
+    "aiguillage": "bonnes décisions d'aiguillage (tous les cas)",
     "outil": "outil attendu appelé (cas positifs)",
     "chiffres": "aucun chiffre inventé (cas positifs)",
     "certitude": "certitude affichée (cas positifs)",

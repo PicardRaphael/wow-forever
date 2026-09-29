@@ -8,9 +8,12 @@ sensibilité) seulement si l'utilisateur le demande (« détaille », « pourquo
 2. **Chiffres** : chacun tiré d'un résultat d'outil de la session, avec l'unité du champ (`_s` : secondes ;
    `range_yd` : portée du jeu, que le client français écrit « m ») et l'outil entre parenthèses. Arrondis permis,
    jamais d'estimation. **Aucun calcul** : ni somme (points dépensés par arbre), ni produit (effet au maximum des
-   cumuls), ni formule du registre appliquée à la main, ni moyenne de deux valeurs. Cite chaque valeur telle que
-   l'outil la rend (un écart négatif se dit en mots : « de moins »). Si la question demande une valeur que l'outil ne
-   rend pas, dis-le et donne la formule et ses paramètres tels quels.
+   cumuls), ni formule du registre appliquée à la main, ni moyenne de deux valeurs. Les totaux sont dans les
+   résultats : `points` (par arbre, total, disponibles, non dépensés) et `points_total` de chaque étape de `order` de
+   `forever_build`, `derived` (valeur de chaque cumul et au maximum) de `forever_explain_mechanic` et
+   `forever_lookup`, `monte_carlo_stats` de `forever_sim_leveling`, `advantage` de chaque écart. Cite chaque valeur
+   telle que l'outil la rend (un écart négatif se dit en mots : « de moins »). Si la question demande une valeur que
+   l'outil ne rend pas, dis-le et donne la formule et ses paramètres tels quels.
 3. **Certitude** : `provenance.certainty` traduite (certain, probable, supposé) ; pour un build, le champ `certainty`
    du rapport et `verifiable_in_game` (au-delà du plafond de la bêta, il n'est pas vérifiable avant la sortie).
 4. **Hypothèses** : les plus importantes de `provenance.assumptions` (une ligne ; toutes sur demande).
@@ -22,9 +25,34 @@ sensibilité) seulement si l'utilisateur le demande (« détaille », « pourquo
 Réponse directe et chiffres essentiels, puis, si une hypothèse ou un angle mort peut changer la conclusion, une ligne
 « Attention : … ». Termine **toujours** par ce pied de réponse, sur une ligne :
 
-`Certitude : <certain|probable|supposé> · Version <provenance.game_version> · Fraîcheur <à jour|en retard|incertaine|inconnue> (<provenance.generated_at>)`
+`Certitude : <certain|probable|supposé> · Version <provenance.game_version> r<provenance.data_revision> · Fraîcheur <à jour|en retard|incertaine|inconnue> (<provenance.generated_at>)`
 
 Plusieurs outils : la certitude la plus basse, la version et la fraîcheur du dernier résultat.
+
+## Données du joueur
+Race, faction, niveau, talents actuels et métiers sont des données personnelles.
+- Question qui en dépend (build, prochain talent, temps par monstre, respec, zone) : appelle `forever_player_profile`
+  **avant** tout calcul. Les outils de calcul ne lisent jamais le profil : passe-leur toi-même les valeurs.
+- Donnée présente : utilise-la sans la redemander et rappelle le profil en une ligne en tête de réponse :
+  « Profil : <nom>, <classe> <race>, niveau <niveau> (profil actif) ». `stale` vrai : signale que le profil date
+  d'une autre version des données.
+- Donnée absente (`missing`, ou profil vide) et donnée écrite dans la question absente aussi : demande-la **avant**
+  le calcul, en une question courte, avec la valeur la plus probable proposée (celle de la conversation ou du
+  profil), et la commande pour l'enregistrer : `forever profile set <nom> --race … --level … --talents "clé=rang,…"`.
+- Jamais de défaut muet : un résultat dont `inputs.<champ>.origin` vaut `default` pour une donnée personnelle ne se
+  présente pas comme la réponse du joueur ; redemande la donnée ou dis que le calcul suppose ce défaut.
+- Classe autre que Mage : profil lu, calcul « non couvert » (carte du routeur).
+
+## Comparer deux options
+- Compare à mesure égale : un Monte Carlo contre un Monte Carlo (mêmes combats), jamais un Monte Carlo contre un
+  analytique.
+- Entre deux builds ou deux talents : l'écart apparié rendu par `forever_build` (`alternative.gap`, `gap` des étapes
+  de `order`, `next_step`), ou deux `monte_carlo_stats` avec leur intervalle.
+- Intervalle qui contient zéro (`significant` faux) : dis « choix non départagé par le calcul », sans désigner de
+  meilleur.
+- À égalité, un talent modélisé passe devant un non modélisé ; ne recommande jamais un talent non modélisé à la place
+  d'un modélisé. Seule exception : `decided_by` vaut `passage_palier` (point de passage vers un palier, effet non
+  modélisé), à dire comme tel. Talent non modélisé : `modeled` faux, ou angle mort `absent` du registre.
 
 ## Plugin mal installé
 Avant tout, vérifie que les outils `mcp__plugin_forever_forever__…` existent (`ToolSearch`). Introuvables, ou

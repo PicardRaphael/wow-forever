@@ -109,7 +109,7 @@ if ($plugins | Where-Object { $_.id -eq $Plugin -and $_.scope -eq "user" }) {
 
 # 6. Contrôles
 Step "Contrôles"
-Invoke-Checked "validation du plugin" { claude plugin validate $Root }
+Invoke-Checked "validation du plugin" { claude plugin validate --strict $Root }
 Invoke-Checked "état des données" { uv run --no-sync --quiet --project $Root forever status --offline }
 $installed = @(Read-Json { claude plugin list --json }) | Where-Object { $_.id -eq $Plugin -and $_.scope -eq "user" }
 if (-not $installed) { Fail "plugin $Plugin absent de claude plugin list." }

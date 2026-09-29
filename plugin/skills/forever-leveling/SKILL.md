@@ -10,8 +10,11 @@ message fixe, rien de mémoire), forme de la réponse, règle « je ne sais pas 
 des outils ci-dessous.
 
 ## Ce qu'il faut savoir du joueur
-- **Niveau** : obligatoire. S'il manque, demande-le (une question courte) avant d'appeler un outil.
-- **Race**, **faction**, **build actuel** : utiles ; sans eux, garde le défaut de l'outil et écris-le en hypothèse.
+Suis la section « Données du joueur » de `format-reponse.md` : `forever_player_profile` d'abord, profil rappelé en
+une ligne, donnée manquante demandée avant le calcul avec la valeur la plus probable proposée.
+- **Niveau** : obligatoire.
+- **Race**, **faction**, **build actuel** : lus dans le profil ou la question ; absents des deux, demande-les avant
+  l'appel (jamais la race par défaut de l'outil sans le dire : `inputs.race.origin`).
 - Build actuel donné en clair (« j'ai Improved Frostbolt au max ») : traduis en clés de talent avec
   `forever_lookup(kind="talent", name=…)` (la clé est le champ `id`).
 
@@ -19,7 +22,8 @@ des outils ci-dessous.
 | Question | Appel |
 |---|---|
 | Temps par monstre, XP/h, repos, dégâts subis | `forever_sim_leveling(level, race, rotation, talents)` : champs `monte_carlo` et `analytic` (`combat`, `downtime`, `total`, `xp_h`) et `mob_hp` |
-| Quel talent prendre maintenant, ordre des talents | `forever_build(context="leveling", level, race)` : `talents`, `order`, `reasons` |
+| Quel talent prendre au niveau N depuis mon build | `forever_build(context="leveling", level=N, race, current=<build actuel du niveau précédent>)` : bloc `next_step` (`choice`, `decided_by`, `candidates` avec écart et intervalle) |
+| Ordre des talents depuis le premier niveau de talent | `forever_build(context="leveling", level, race)` : `talents`, `order` (avec `decided_by`), `reasons` |
 | Faut-il respec, à quel niveau | `forever_build(context="leveling", level, current=<build actuel>, respecs=<nombre déjà fait>)` : bloc `respec` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` |
 | Pourquoi ce résultat (mécanique) | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` |
@@ -35,6 +39,9 @@ des outils ci-dessous.
   (base Classic Era, quêtes propres à Forever non couvertes : tranche T04d).
 
 ## Lire les résultats
+- **Prochain talent** (`next_step`) : donne `choice` et sa raison (`decided_by` : `monte_carlo`, écart significatif ;
+  `modelise`, égalité départagée en faveur du talent modélisé ; `non_departage`, choix non départagé par le calcul :
+  cite les candidats à égalité). Pas de `current` : `next_step` est vide, demande le build actuel.
 - **Monte Carlo** et **analytique** : donne le Monte Carlo ; si `analytic_gap` est grand, signale l'écart.
 - **PV du monstre** (`mob_hp`) : sa source et sa certitude comptent ; une valeur `suppose` fait baisser la certitude
   de la réponse.
