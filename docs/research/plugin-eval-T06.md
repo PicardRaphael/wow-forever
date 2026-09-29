@@ -125,7 +125,7 @@ rempli, comme à l'usage une fois le profil créé ; deux cas à profil vide vé
 vers un fichier absent, juge `demande-la-donnee`).
 
 ```
-$env:EVAL_FOREVER_PROFILE = "$PWD	estsixtures\plugin_eval\profile-rempli.json"
+$env:EVAL_FOREVER_PROFILE = "$PWD\tests\fixtures\plugin_eval\profile-rempli.json"
 claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_forever_forever__*" --runs 1 --ablation none -j 4 --judge-model opus --max-cost-usd 15 --no-publish --keep-temp --threshold 0 --json plugin/evals/results/passage-T06b-profil.json
 ```
 
