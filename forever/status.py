@@ -22,6 +22,7 @@ class IntegrityInfo(TypedDict):
 
 class StatusReport(TypedDict):
     local_version: str
+    data_revision: int
     freshness: FreshnessResult
     integrity: IntegrityInfo
     registry_coverage: str
@@ -51,6 +52,7 @@ def status_report(deps: Deps, *, allow_network: bool = True) -> StatusReport:
     )
     return {
         "local_version": local_version,
+        "data_revision": provenance["data_revision"],
         "freshness": fresh,
         "integrity": {
             "ok": report.ok,

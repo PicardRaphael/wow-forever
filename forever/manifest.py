@@ -97,6 +97,9 @@ def compute_manifest(data_dir: Path) -> dict[str, Any]:
             "data_sha256": data_sha256(files),
             "files": files,
         }
+        if "revision" in sources:  # T06b : révision de la version (forever install)
+            versions[name]["revision"] = sources["revision"]
+            versions[name]["revised_at"] = sources.get("revised_at")
     names = list(versions)
     return {"schema_version": SCHEMA_VERSION, "game_version": names[-1] if names else None, "versions": versions}
 

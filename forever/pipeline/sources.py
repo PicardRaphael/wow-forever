@@ -12,7 +12,14 @@ from typing import NamedTuple, cast
 from forever.config import Deps
 from forever.errors import UnknownVersionError
 from forever.manifest import MANIFEST_NAME, VERSION_DIR_RE, data_sha, version_dirs, version_files
-from forever.provenance import Certainty, Provenance, local_provenance, make_provenance, min_certainty
+from forever.provenance import (
+    Certainty,
+    Provenance,
+    data_revision_of,
+    local_provenance,
+    make_provenance,
+    min_certainty,
+)
 from forever.store import VersionData, ensure_integrity, read_sources
 
 CERTAINTIES = ("certain", "probable", "suppose")
@@ -82,4 +89,5 @@ def source_provenance(deps: Deps, src: DataSource, v: VersionData, extra: Iterab
         freshness=local["freshness"],
         certainty=source_certainty(v),
         assumptions=[*local["assumptions"], *source_notes(src, v), *extra],
+        data_revision=data_revision_of(v.sources),
     )

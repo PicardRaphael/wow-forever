@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Iterable
-from typing import Literal, TypedDict, get_args
+from collections.abc import Iterable, Mapping
+from typing import Any, Literal, TypedDict, get_args
 
 from forever.config import Deps
 from forever.errors import ErrorInfo, ForeverError
 from forever.freshness import Freshness, freshness_for_version
 from forever.registry import coverage
-from forever.store import current_identity
+from forever.store import current_identity, read_sources
 from forever.timefmt import format_utc
 
 Certainty = Literal["certain", "probable", "suppose"]
@@ -20,6 +20,7 @@ LEGACY_CERTAINTY: dict[str, Certainty] = {"FC": "certain", "FS": "probable", "PC
 PROVENANCE_KEYS = (
     "game_version",
     "data_sha",
+    "data_revision",
     "generated_at",
     "freshness",
     "certainty",
@@ -40,6 +41,7 @@ _ENUMS: dict[str, tuple[str, ...]] = {"freshness": get_args(Freshness), "certain
 class Provenance(TypedDict):
     game_version: str
     data_sha: str
+    data_revision: int  # révision de la version de données (sources.json, T06b) ; 1 : état d'origine
     generated_at: str
     freshness: Freshness
     certainty: Certainty
@@ -60,19 +62,30 @@ def make_provenance(
     freshness: Freshness,
     certainty: Certainty,
     assumptions: Iterable[str],
+    data_revision: int | None = None,
 ) -> Provenance:
+    """`data_revision` : révision de la version (None : celle de `sources.json` dans `deps.data_dir`, 1 si absente)."""
     notes = list(assumptions)
+    if data_revision is None:
+        data_revision = data_revision_of(read_sources(deps.data_dir, game_version) or {})
     if not deps.registry_path.is_file():
         notes.append(f"registre introuvable ({deps.registry_path.name}) : couverture inconnue")
     return {
         "game_version": game_version,
         "data_sha": data_sha,
+        "data_revision": data_revision,
         "generated_at": format_utc(deps.now()),
         "freshness": freshness,
         "certainty": certainty,
         "assumptions": notes,
         "registry_coverage": coverage(deps.registry_path),
     }
+
+
+def data_revision_of(sources: Mapping[str, Any]) -> int:
+    """Révision annoncée par `sources.json` (`revision`, entier ≥ 1) ; 1 si absente ou invalide (état d'origine)."""
+    value = sources.get("revision", 1)
+    return value if isinstance(value, int) and not isinstance(value, bool) and value >= 1 else 1
 
 
 def validate_provenance(obj: object) -> list[str]:
@@ -88,6 +101,10 @@ def validate_provenance(obj: object) -> list[str]:
     for key, allowed in _ENUMS.items():
         if key in obj and obj[key] not in allowed:
             errors.append(f"{key} invalide : {obj[key]!r} (attendu : {', '.join(allowed)})")
+    if "data_revision" in obj:
+        rev = obj["data_revision"]
+        if isinstance(rev, bool) or not isinstance(rev, int) or rev < 1:
+            errors.append(f"data_revision invalide : {rev!r} (entier ≥ 1 attendu)")
     if "assumptions" in obj:
         value = obj["assumptions"]
         if not (isinstance(value, list) and all(isinstance(a, str) for a in value)):
@@ -98,7 +115,8 @@ def validate_provenance(obj: object) -> list[str]:
 def format_provenance_line(p: Provenance) -> str:
     notes = " ; ".join(p["assumptions"]) if p["assumptions"] else "aucune"
     return (
-        f"Provenance · version {p['game_version']} · données {p['data_sha']} · générée {p['generated_at']}"
+        f"Provenance · version {p['game_version']} r{p['data_revision']} · données {p['data_sha']}"
+        f" · générée {p['generated_at']}"
         f" · fraîcheur {p['freshness']} · certitude {p['certainty']} · registre {p['registry_coverage']}"
         f" · hypothèses : {notes}"
     )

@@ -12,22 +12,27 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client Forever 1.60.1.70009 via https://wowforevertalents.com/abilities/mage/ (lu le 26/09/2026)",
+      "source": "Client 1.60.1.70009 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-09-29)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
       },
       "field_notes": {
-        "mana": "mana null : coût non publié pour le rang issu d'un talent (à relever en jeu)",
+        "mana": "mana : SpellPower.ManaCost du client ; null pour arcane_blast : coût en part du mana de base (mana_pct_base, SpellPower.PowerCostPct)",
         "projectile_speed": "vitesse de projectile estimée (EST), à calibrer"
       },
-      "notes": []
+      "notes": [
+        "min et max des rangs issus d'un talent lus au niveau de base du sort (convention de la décision 39)",
+        "copie figée du seed : _seed_spells.json"
+      ]
     },
     "talents.json": {
-      "source": "gunba/wow-forever-sim mage.json (MIT) + corrections https://foreverchanges.pro/talents/mage",
-      "certainty": "probable",
+      "source": "Client 1.60.1.70009 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-09-29)",
+      "certainty": "certain",
       "notes": [
-        "certitude par talent dans le champ certainty : la plupart des rangs sont lus sur le build 1.60.1.69893, pas sur 1.60.1.70009"
+        "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
+        "desc : gabarit du dépôt ({i}) ; gabarit brut et identifiants de sort du client dans source",
+        "certitude par talent FC-70009 ; copie figée du seed : _seed_talents.json"
       ]
     },
     "racials.json": {
@@ -149,6 +154,15 @@
         "copie figée du seed, lue par le mode seed seulement (build_game_data(rules=\"seed\"), décision D2 du plan T06b)",
         "le mode forever lit spells.json"
       ]
+    },
+    "revisions.json": {
+      "source": "forever install : journal des révisions de la version (motif, commande, rapport, valeurs changées)",
+      "certainty": "certain",
+      "notes": [
+        "chaque valeur changée porte sa source et sa certitude (champs source et certainty)"
+      ]
     }
-  }
+  },
+  "revision": 2,
+  "revised_at": "2026-09-29"
 }

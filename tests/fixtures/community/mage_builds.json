@@ -212,8 +212,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.049937122257210996,
-    "mc_rel": -0.1370040794152645,
+    "analytic_rel": -0.04852689326768294,
+    "mc_rel": -0.13459309390670116,
     "mc_significant": true
    },
    "explanation": {
@@ -266,14 +266,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.0009996133031639157,
-    "mc_rel": 0.00944411018051991,
+    "analytic_rel": -0.0027678605556457664,
+    "mc_rel": 0.007402699521455597,
     "mc_significant": false
    },
    "explanation": {
     "kind": "concorde",
     "registry": null,
-    "motif": "écart -0,1% à l'analytique, sous le seuil de concordance"
+    "motif": "écart -0,3% à l'analytique, sous le seuil de concordance"
    }
   },
   {
@@ -320,14 +320,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.07415382135511255,
-    "mc_rel": 0.08460140805433236,
+    "analytic_rel": 0.07255131637982679,
+    "mc_rel": 0.08265825589670102,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +7,4% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +7,3% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -545,14 +545,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.020371348818242367,
-    "mc_rel": -0.03207235296198775,
+    "analytic_rel": 0.021687142586824196,
+    "mc_rel": -0.02988387225920971,
     "mc_significant": false
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +2,0% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +2,2% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -586,14 +586,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.008009104570374223,
-    "mc_rel": -0.07851208903562513,
+    "analytic_rel": -0.006655191435159721,
+    "mc_rel": -0.07622513416488051,
     "mc_significant": true
    },
    "explanation": {
     "kind": "concorde",
     "registry": null,
-    "motif": "écart -0,8% à l'analytique, sous le seuil de concordance"
+    "motif": "écart -0,7% à l'analytique, sous le seuil de concordance"
    }
   },
   {
@@ -721,14 +721,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.005586222386277361,
-    "mc_rel": -0.011537649239929046,
+    "analytic_rel": 0.00692187488112593,
+    "mc_rel": -0.009392711804930655,
     "mc_significant": false
    },
    "explanation": {
     "kind": "concorde",
     "registry": null,
-    "motif": "écart +0,6% à l'analytique, sous le seuil de concordance"
+    "motif": "écart +0,7% à l'analytique, sous le seuil de concordance"
    }
   },
   {
@@ -1495,14 +1495,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.009610978651662336,
-    "mc_rel": -0.004304184447057095,
+    "analytic_rel": 0.010941225272348623,
+    "mc_rel": -0.002174585372850942,
     "mc_significant": false
    },
    "explanation": {
     "kind": "concorde",
     "registry": null,
-    "motif": "écart +1,0% à l'analytique, sous le seuil de concordance"
+    "motif": "écart +1,1% à l'analytique, sous le seuil de concordance"
    }
   },
   {

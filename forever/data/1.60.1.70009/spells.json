@@ -143,7 +143,26 @@
      290,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     116,
+     205,
+     837,
+     7322,
+     8406,
+     8407,
+     8408,
+     10179,
+     10180,
+     10181,
+     25304
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "fireball": {
    "school": "fire",
@@ -270,7 +289,27 @@
      410,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     133,
+     143,
+     145,
+     3140,
+     8400,
+     8401,
+     8402,
+     10148,
+     10149,
+     10150,
+     10151,
+     25306
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "fire_blast": {
    "school": "fire",
@@ -346,7 +385,22 @@
      340,
      8
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     2136,
+     2137,
+     2138,
+     8412,
+     8413,
+     10197,
+     10199
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "scorch": {
    "school": "fire",
@@ -422,7 +476,22 @@
      150,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     2948,
+     8444,
+     8445,
+     8446,
+     10205,
+     10206,
+     10207
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "pyroblast": {
    "school": "fire",
@@ -432,12 +501,12 @@
    "ranks": [
     [
      20,
-     95,
-     125,
+     100,
+     132,
      44,
      12,
      6.0,
-     null,
+     125,
      0
     ],
     [
@@ -510,7 +579,23 @@
      440,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     11366,
+     12505,
+     12522,
+     12523,
+     12524,
+     12525,
+     12526,
+     18809
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "frostfire_bolt": {
    "school": "frostfire",
@@ -553,7 +638,18 @@
      370,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     401502,
+     1237312,
+     1237313
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "ice_lance": {
    "school": "frost",
@@ -564,12 +660,12 @@
    "ranks": [
     [
      20,
-     26,
-     30,
+     28,
+     33,
      0,
      0,
      0,
-     null,
+     45,
      0
     ],
     [
@@ -622,7 +718,21 @@
      160,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     1312002,
+     400640,
+     1240044,
+     1240045,
+     1240046,
+     1240047
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "arcane_blast": {
    "school": "arcane",
@@ -632,8 +742,8 @@
    "ranks": [
     [
      20,
-     50,
-     58,
+     57,
+     66,
      0,
      0,
      2.5,
@@ -680,7 +790,21 @@
      null,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     400574,
+     1239696,
+     1239697,
+     1239699,
+     1239700
+    ],
+    "mana": "SpellPower.ManaCost",
+    "mana_pct_base": "SpellPower.PowerCostPct"
+   }
   },
   "arcane_missiles": {
    "school": "arcane",
@@ -767,7 +891,23 @@
      655,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     5143,
+     5144,
+     5145,
+     8416,
+     8417,
+     10211,
+     10212,
+     25345
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "frost_nova": {
    "school": "frost",
@@ -815,7 +955,19 @@
      145,
      25
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     122,
+     865,
+     6131,
+     10230
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "cone_of_cold": {
    "school": "frost",
@@ -879,7 +1031,20 @@
      555,
      10
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     120,
+     8492,
+     10159,
+     10160,
+     10161
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "arcane_explosion": {
    "school": "arcane",
@@ -946,7 +1111,21 @@
      390,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     1449,
+     8437,
+     8438,
+     8439,
+     10201,
+     10202
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "blizzard": {
    "school": "frost",
@@ -1013,7 +1192,21 @@
      1400,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     10,
+     6141,
+     8427,
+     10185,
+     10186,
+     10187
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "flamestrike": {
    "school": "fire",
@@ -1079,7 +1272,21 @@
      990,
      0
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     2120,
+     2121,
+     8422,
+     8423,
+     10215,
+     10216
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   },
   "blast_wave": {
    "school": "fire",
@@ -1088,13 +1295,13 @@
    "daze": 0.5,
    "ranks": [
     [
-     36,
-     148,
-     178,
+     30,
+     153,
+     185,
      0,
      0,
      0,
-     null,
+     215,
      45
     ],
     [
@@ -1137,7 +1344,20 @@
      545,
      45
     ]
-   ]
+   ],
+   "source": {
+    "build": "1.60.1.70009",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-09-29",
+    "rank_spell_ids": [
+     11113,
+     13018,
+     13019,
+     13020,
+     13021
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
   }
  },
  "utility": {

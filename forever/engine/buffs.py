@@ -154,8 +154,8 @@ def arcane_power_share(cycle_s: float, cooldown_s: float) -> float:
 
 def hot_streak_rules(gd: GameData, pts: Points) -> tuple[float, float, int] | None:
     """(durée de l'aura en s, réduction de l'incantation de Pyroblast par cumul en fraction, cumuls maximum) de Hot
-    Streak si le talent est pris ; None sinon. Durée : `duration_s` du talent (corrigée d'après le client 70009,
-    notes de Blizzard du 24/09/2026), sinon la variable de l'infobulle.
+    Streak si le talent est pris ; None sinon. Durée : variable de l'infobulle du client (20 s depuis la révision 2,
+    T06b) ; `duration_s` du talent seulement dans la copie du seed (`_seed_talents.json`, mode seed).
 
     Registre : B15"""
     if pts.get(HOT_STREAK, 0) <= 0:

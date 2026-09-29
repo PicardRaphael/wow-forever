@@ -50,6 +50,7 @@ from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_lo
 from forever.pipeline.decode import Candidate, decode_version
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
+from forever.pipeline.install import InstallRefusedError, apply_install, plan_install, render_install_report
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
 from forever.pipeline.measure import (
     Conflict,
@@ -147,6 +148,19 @@ def build_parser() -> argparse.ArgumentParser:
     decode.add_argument("--out", help="dossier de la candidate (défaut : <cache>/candidates/<version>)")
     decode.add_argument("--force", action="store_true", help="remplacer une candidate existante")
     decode.add_argument("--json", action="store_true", help="sortie JSON")
+
+    install = sub.add_parser(
+        "install", help="installer une candidate en révision suivante de la version courante (T06b)"
+    )
+    install.add_argument("candidate", help="dossier de la candidate écrit par forever decode")
+    mode = install.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", action="store_true", help="afficher les changements sans rien écrire")
+    mode.add_argument("--yes", action="store_true", help="écrire sans demander l'accord")
+    install.add_argument("--report", help="écrire aussi le rapport Markdown dans ce fichier (hors des données)")
+    install.add_argument(
+        "--motif", default="installation des valeurs décodées du client", help="motif noté dans revisions.json"
+    )
+    install.add_argument("--json", action="store_true", help="sortie JSON")
 
     diff = sub.add_parser("diff", help="comparer deux versions de données (dépôt ou candidate)")
     diff.add_argument("a", help="version du dépôt ou chemin d'une candidate")
@@ -426,7 +440,7 @@ def render_status(rep: StatusReport) -> list[str]:
         integrity = f"intégrité ÉCHEC (manifeste illisible : {integ['manifest_error']})"
     else:
         integrity = f"intégrité ÉCHEC ({len(integ['mismatched'] + integ['missing'] + integ['unexpected'])} écart(s))"
-    lines = [f"Données locales {rep['local_version']} · {integrity}"]
+    lines = [f"Données locales {rep['local_version']} r{rep['data_revision']} · {integrity}"]
     freshness = f"Fraîcheur {f['freshness']}"
     if f["latest_version"]:
         freshness += f" · dernière version publiée {f['latest_version']} ({f['latest_created_at']})"
@@ -674,6 +688,46 @@ def render_verify(r: VerifyReport) -> list[str]:
     if r["inherited"]:
         lines.append(f"Fichiers hérités : {', '.join(r['inherited'])}")
     return lines
+
+
+def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
+    report_path = Path(args.report) if args.report else None
+    if report_path is not None and report_path.resolve().is_relative_to(deps.data_dir.resolve()):
+        raise InvalidArgumentError(
+            f"Le rapport ne s'écrit jamais dans {deps.data_dir}.", "choisir un fichier --report hors des données"
+        )
+    plan = plan_install(deps, args.candidate)
+    text = render_install_report(plan)
+    if report_path is not None:
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_bytes(text.encode("utf-8"))
+    revision = None
+    if plan["refused"]:
+        raise InstallRefusedError(plan["refused"])
+    if not plan["changes"]:
+        status = "rien à écrire"
+    elif args.dry_run:
+        status = "simulation"
+    elif args.yes or (deps.confirm is not None and deps.confirm("Installer cette révision ? [o/N] ")):
+        report_rel = args.report.replace("\\", "/") if args.report else None
+        revision = apply_install(deps, args.candidate, motif=args.motif, report=report_rel)
+        status = "écrit"
+    else:
+        status = "refusé"
+    provenance = local_provenance(deps, assumptions=[f"installation : {status}"])
+    payload = {"status": status, "plan": plan, "revision": revision, "provenance": provenance}
+    counts = ", ".join(f"{k} {v}" for k, v in plan["counts"].items())
+    lines = [
+        (
+            f"Installation de {args.candidate} dans {plan['version']} r{plan['revision_from']} → "
+            f"r{plan['revision_to']} : {status}"
+        ),
+        f"Changements : {counts}",
+    ]
+    if report_path is not None:
+        lines.append(f"Rapport : {report_path}")
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
 
 
 def _cmd_decode(deps: Deps, args: argparse.Namespace) -> int:
@@ -1359,6 +1413,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "builds": _cmd_builds,
         "fetch": _cmd_fetch,
         "decode": _cmd_decode,
+        "install": _cmd_install,
         "diff": _cmd_diff,
         "verify": _cmd_verify,
         "report": _cmd_report,

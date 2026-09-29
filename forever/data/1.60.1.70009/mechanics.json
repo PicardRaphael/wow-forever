@@ -138,7 +138,8 @@
       "value": {"ratio_of_next_rank": 0.75, "default": 50.0},
       "certainty": "suppose",
       "registry": "B11",
-      "source": "estimation du seed (EST) pour un rang de talent sans coût publié ; voir docs/OPEN_QUESTIONS.md"
+      "source": "estimation du seed (EST) pour un rang de talent sans coût publié ; voir docs/OPEN_QUESTIONS.md",
+      "note": "mode seed seulement depuis la révision 2 (T06b) : le mode forever lit SpellPower.ManaCost du client (spells.json) ; seul le seed garde mana null et cette estimation"
     },
     "hit.miss_per_level_below": {
       "value": 0.01,
