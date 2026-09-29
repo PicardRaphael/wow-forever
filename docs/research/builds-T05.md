@@ -184,23 +184,25 @@ race Orc), en trois passages, chacun rendu dans `<cache>/builds/<passage>/` :
    (coût d'Ice Lance rang 1 lu dans le client, 45, au lieu de l'estimation 41,25 : ligne `ice_lance.ranks[1].mana`
    de `revisions.json`) ; PvP champ de bataille 20, avantage 11,04 → 10,84 (Ice Lance rang 1 : 28-33 au lieu de 26-30,
    `ice_lance.ranks[1].min`/`max`).
-3. `r2-departage` : révision 2 et départage de T06b (décision 100). **Seul l'ordre du leveling 60 change** ; le build
-   final, l'alternative et les verdicts restent les mêmes. Entre les niveaux 42 et 60, les points sans effet modélisé
-   (Frost Warding, Ice Block, Improved Blizzard : angle mort C9) sont repoussés après les talents modélisés à égalité
-   (`decided_by` : `modelise` aux niveaux 44 à 48, 52, 54, 55), puis pris quand il ne reste que des égalités
-   (`non_departage`). Limite : Improved Cone of Cold compte comme modélisé alors qu'il n'agit pas en leveling
-   (question ouverte I5, contexte du départage).
+3. `r2-departage` : révision 2 et départage de T06b (décision 100), présélection du faisceau corrigée après la
+   relecture (à score égal, talent modélisé d'abord). **Seul l'ordre du leveling 60 change** ; le build final,
+   l'alternative, les métriques et les verdicts restent les mêmes. Entre les niveaux 41 et 60, les points sans effet
+   modélisé (Frost Warding, Ice Block, Improved Blizzard : angle mort C9) passent après les talents modélisés à
+   égalité (`decided_by` : `modelise` aux niveaux 48, 49, 54, 57), puis sont pris quand il ne reste que des
+   égalités (`non_departage`) ; aucune étape ne prend un non modélisé à égalité avec un modélisé (contrôlé sur les
+   trois chemins). Limite : Improved Cone of Cold compte comme modélisé alors qu'il n'agit pas en leveling (question
+   ouverte I5, contexte du départage).
 
 Décisions des étapes de l'ordre (`r2-departage`) : leveling 20 : 5 non départagées, 4 au Monte Carlo, 2 gardées par
-l'anticipation ; 40 : 19, 6, 6 ; 60 : 28 non départagées, 10 départagées en faveur d'un talent modélisé, 7 au Monte
-Carlo, 6 par l'anticipation. La plupart des étapes du leveling ne sont donc **pas départagées par le calcul** à
+l'anticipation ; 40 : 19, 6, 6 ; 60 : 29 non départagées, 7 départagées en faveur d'un talent modélisé, 7 au Monte
+Carlo, 8 par l'anticipation. La plupart des étapes du leveling ne sont donc **pas départagées par le calcul** à
 n = 200 : l'ordre y reste une proposition parmi des choix équivalents.
 
 | Contexte | Niveau | Arcanes/Feu/Givre | Monte Carlo | Analytique | Avantage sur l'alternative | Retenu | Stabilité | Sensibilité | Calcul |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | leveling | 20 | 0/0/11 | 34,90 | 35,48 | 0,45 [-0,82 ; 1,71] (égalité) | build (analytique) | stable (build) | tient | 42 s |
-| leveling | 40 | 0/0/31 | 51,72 | 49,89 | 0,66 [-0,93 ; 2,24] (égalité) | build (analytique) | stable (build) | tient | 190 s |
-| leveling | 60 | 0/0/51 | 43,66 | 47,01 | 0,67 [-1,03 ; 2,38] (égalité) | alternative (analytique) | stable (alternative) | tient | 349 s |
+| leveling | 40 | 0/0/31 | 51,72 | 49,89 | 0,66 [-0,93 ; 2,24] (égalité) | build (analytique) | stable (build) | tient | 180 s |
+| leveling | 60 | 0/0/51 | 43,66 | 47,01 | 0,67 [-1,03 ; 2,38] (égalité) | alternative (analytique) | stable (alternative) | tient | 333 s |
 | dungeon | 20 | 10/0/1 | 40,70 | 51,00 | 4,37 [3,76 ; 4,98] | build (monte_carlo) | stable (build) | mob_hp | 7 s |
 | dungeon | 40 | 31/0/0 | 144,93 | 164,28 | 1,27 [-1,76 ; 4,30] (égalité) | build (analytique) | stable (build) | regen_stacking | 34 s |
 | dungeon | 60 | 30/3/18 | 314,62 | 364,67 | 27,40 [18,79 ; 36,02] | build (monte_carlo) | stable (build) | tient | 87 s |
