@@ -155,3 +155,37 @@ claude plugin eval plugin --trust-plugin --mocks off --allow-tools "mcp__plugin_
 - Les deux cas à profil vide et `talent-niveau-22` réussissent ; `talent-niveau-24` part désormais du build du profil
   (`next_step`).
 
+
+## Passage 0.4.0 avec profil de test (2026-09-29, 58 cas), rejeux 0.4.1
+
+Plugin 0.4.0 (décisions 118 à 121), profil de test avec le personnage prévu Étincelle, commande du passage T06b
+(`--json plugin/evals/results/passage-0.4.0.json`), rapport par `scripts/plugin_eval_report.py`.
+
+| Critère (seuil) | Passage 0.4.0 |
+|---|---|
+| Aiguillage, 58 cas (≥ 90 %) | 58/58 |
+| Outil attendu appelé, 38 positifs (≥ 90 %) | 37/38 |
+| Aucun chiffre inventé, 38 positifs (100 %) | 38/38 (aucune alerte du contrôle) |
+| Certitude affichée, 38 positifs (100 %) | 38/38 |
+| Provenance affichée, 38 positifs (≥ 90 %) | 38/38 |
+| « Je ne sais pas » hors périmètre (3 sur 3) | **2/3** |
+| Coût | 10,64 $ (+ 0,47 $ de rejeux) |
+
+Nouveaux cas réussis : `generale-mage-raid`, `personnelle-mage-donjon`, `personnelle-mage-temps`,
+`planification-personnage-prevu`, `respec-troisieme` (planification depuis le build du profil).
+
+Échecs, un par un :
+- `hors-hotel-des-ventes` (juge `sans-estimation`) : la réponse ajoute une information de jeu de mémoire (le métier
+  qui fabrique l'objet). Comportement du modèle, déjà vu aux passages précédents ; vrai échec.
+- `talent-niveau-22` (juge `mesure-et-modelise`) : Ice Lance recommandé avec l'écart apparié et son intervalle, mais
+  un second écart (« 6,6 s ») cité sans intervalle. Comportement du modèle ; vrai échec.
+- `generale-classe-non-calculee` : au passage 0.4.0, la réponse demandait l'accord et le contexte avant la recherche
+  (consigne du routeur contraire à « question générale : ne rien demander ») et le motif `non-calcule` ignorait « ne
+  calcule que ». Corrigé en 0.4.1 (lancement direct du sous-agent, motif élargi). Rejeu : plus de question, motif
+  reconnu, juge encore en échec : dans le bac à sable de l'évaluation, le sous-agent de recherche n'a ni WebSearch ni
+  WebFetch, et la réponse en conclut à tort qu'il faut corriger le plugin. Limite de l'évaluation plus qu'un défaut.
+- `respec-feu-vers-givre` (outil, juge `planification`) : le modèle redemande les rangs du build Feu, en 0.4.0 comme
+  au rejeu 0.4.1 (consigne durcie : build décrit sans rangs, partir du profil). La question contredit le profil de
+  test (tout en Feu contre un build Givre) : partir du build Givre du profil pour juger une respec vers le Givre n'a
+  pas de sens. Cas à trancher par l'utilisateur (reformuler la question ou accepter la question de précision quand la
+  question contredit le profil).

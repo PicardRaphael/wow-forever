@@ -78,8 +78,10 @@ Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin »)
 - Dis d'abord que la classe n'est pas encore calculée par le moteur (tranche de la classe ci-dessus) et que la
   certitude est au mieux supposé.
 - Question générale : ne demande rien au joueur. Question personnelle : profil lu, rappelé en une ligne.
-- Propose des builds de la communauté trouvés par le sous-agent `forever-web-researcher` (lance-le si le joueur
-  l'accepte ou le demande) : chacun avec sa source, son type et sa date, en noms de talents et en points par arbre,
+- Donne des builds de la communauté trouvés par le sous-agent `forever-web-researcher`, lancé tout de suite sans
+  demander ni accord ni contexte (contextes courants, ou celui de la question) ; sous-agent indisponible : dis que
+  cette recherche est la suite prévue, sans poser de question. Chaque build avec sa source, son type et sa date, en
+  noms de talents et en points par arbre,
   présenté comme l'avis de cette source (section « Sources extérieures » de `format-reponse.md`). Un chiffre de ce
   rapport ne se cite que s'il figure sur une ligne qui porte l'adresse de sa source (le contrôle des chiffres ne
   reconnaît que ces lignes).
