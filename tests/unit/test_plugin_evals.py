@@ -25,6 +25,7 @@ POSITIVE_COUNTS = {
     "zone": 4,
     "generale": 2,
     "personnelle": 2,
+    "planification": 1,
     "mecanique": 5,
     "leveling": 3,
     "hors-perimetre": 3,
@@ -76,11 +77,12 @@ def tool_names(tmp_path_factory):
 # --- Suite ---------------------------------------------------------------------------------------------------------
 
 
-def test_fifty_seven_cases_thirty_seven_positive_twenty_negative():
+def test_fifty_eight_cases_thirty_eight_positive_twenty_negative():
     polarity = [front(c / "prompt.md")[0]["tags"][0] for c in cases()]
-    # T06b : talent-niveau-22 et deux cas à profil vide ; 2026-09-29 : deux questions générales, deux personnelles.
-    assert len(polarity) == 57
-    assert polarity.count("positif") == 37 and polarity.count("negatif") == 20
+    # T06b : talent-niveau-22 et deux cas à profil vide ; 2026-09-29 : deux questions générales, deux personnelles,
+    # un personnage prévu.
+    assert len(polarity) == 58
+    assert polarity.count("positif") == 38 and polarity.count("negatif") == 20
 
 
 def test_empty_profile_cases():
@@ -120,20 +122,45 @@ def test_talent_level_22_case():
 RESPEC_AT_ANOTHER_LEVEL = ("respec-feu-vers-givre", "respec-troisieme")
 
 
-def test_respec_at_another_level_asks_for_the_current_build():
-    """Demande du 2026-09-29 : une respec posée à un autre niveau que celui du profil (profil de test au niveau 23) ne se
-    conseille pas sans le build actuel ; la bonne réponse le demande (outil attendu : le profil, pas encore le build)."""
+def test_respec_at_another_level_is_planned_from_the_profile_build():
+    """Demande du 2026-09-29 (complément) : une respec posée à un autre niveau que celui du profil (profil de test au
+    niveau 23) est une question de planification ; l'agent part du build du profil, projette le chemin conseillé
+    jusqu'au niveau demandé (`respec.projected`) et conseille, sans redemander le build."""
     for name in RESPEC_AT_ANOTHER_LEVEL:
         meta, _ = front(EVALS / name / "prompt.md")
         assert meta["tags"] == ["positif", "respec"]
         g = graders(EVALS / name)
-        assert g["outil"][0]["tool"] == MCP_PREFIX + "forever_player_profile", name
-        judge_meta, judge = g["demande-le-build"]
+        assert "demande-le-build" not in g, name
+        outil = g["outil"][0]
+        assert outil["tool"] == MCP_PREFIX + "forever_build", name
+        assert re.search(outil["input_match"], '{"context": "leveling", "level": 32, "current": {"x": 1}}'), name
+        assert g["profil"][0] == {"type": "tool_used", "tool": MCP_PREFIX + "forever_player_profile"}
+        judge_meta, judge = g["planification"]
         assert judge_meta["type"] == "llm"
-        for words in ("build actuel", "respec", "forever profile set"):
+        for words in ("build du profil", "chemin", "projeté", "ne redemande pas"):
             assert words in judge, (name, words)
     for name in ("respec-build-precis", "respec-leveling-vers-donjon"):
         assert graders(EVALS / name)["outil"][0]["tool"] == MCP_PREFIX + "forever_build", name
+
+
+def test_planned_character_case():
+    """Demande du 2026-09-29 (complément) : plan d'un personnage prévu du profil de test (pas encore créé)."""
+    case = EVALS / "planification-personnage-prevu"
+    meta, question = front(case / "prompt.md")
+    assert meta["tags"] == ["positif", "planification"]
+    profile = json.loads((FIXTURES / "plugin_eval" / "profile-rempli.json").read_text(encoding="utf-8"))
+    planned = [n for n, c in profile["characters"].items() if c.get("planned")]
+    assert len(planned) == 1 and planned[0] in question and profile["active"] != planned[0]
+    c = profile["characters"][planned[0]]
+    assert c["class"] == "Mage" and c["level"] is None and c["race"]
+    g = graders(case)
+    assert g["profil"][0]["tool"] == MCP_PREFIX + "forever_player_profile"
+    outil = g["outil"][0]
+    assert outil["tool"] == MCP_PREFIX + "forever_build"
+    assert re.search(outil["input_match"], f'{{"context": "leveling", "race": "{c["race"]}"}}')
+    judge = g["plan"][1]
+    for words in ("prévu", "builds par niveau", "métiers", "Legacy", "MT1", "LG1"):
+        assert words in judge, words
 
 
 def test_general_and_personal_cases():
@@ -289,8 +316,8 @@ def test_report_thresholds_of_d10():
 def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    assert len(loaded) == 57
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 37
+    assert len(loaded) == 58
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 38
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 

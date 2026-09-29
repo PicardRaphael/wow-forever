@@ -1,0 +1,4 @@
+{"type": "user", "message": {"role": "user", "content": "Donne-moi les talents optimaux du Paladin."}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_research", "name": "Agent", "input": {"description": "recherche", "prompt": "...", "subagent_type": "forever:forever-web-researcher"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_research", "content": [{"type": "text", "text": "Réponse : un build Sacré serait courant ; un autre avis parle de 45 points en Vindicte.\nSources :\n- communautaire · 2026-09-20 · https://example.org/guide-paladin · 31 points en Sacré, 17 points en Protection\nIncertain : à vérifier sur les données du client."}]}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Selon le guide (communautaire, 2026-09-20) : 31 points en Sacré et 17 points en Protection."}]}}
