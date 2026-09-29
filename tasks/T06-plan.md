@@ -107,3 +107,12 @@ Critères de fin (ROADMAP, D9) : plugin installé au niveau utilisateur par le s
 - **Déclenchement des skills imprévisible** : mesuré par l'évaluation ; on ajuste les descriptions, jamais les cas.
 - **Coût de l'évaluation** : plafond de coût, nombre de passages par cas réduit en local ; hors de la CI de chaque push.
 - **Windows** : shell des hooks, chemins avec espaces, variable d'environnement visible seulement dans les nouveaux terminaux après le script.
+
+## Validation (2026-09-29)
+Plan accepté par l'utilisateur, avec ces précisions (elles priment sur le texte ci-dessus) :
+- **D4** : le plugin est installé au niveau utilisateur, ses hooks tournent dans toutes les sessions. Ils n'agissent que là où le plugin sert : la ligne de fraîcheur au démarrage **seulement dans le dépôt wow-forever** (ailleurs, rien ; le routeur appelle `forever_status` quand une question sur WoW arrive) ; la vérification des chiffres **seulement si la session a utilisé un outil MCP ou un skill de forever** (sinon, sortie vide). Un test pour chacun des deux cas.
+- **D1** : le script d'installation détecte aussi WoW dans les deux dossiers Program Files (`C:\Program Files\World of Warcraft`, `C:\Program Files (x86)\World of Warcraft`) et fixe `FOREVER_WOW_DIR` sur chaque PC ; `scripts/install_addon.py` lit `FOREVER_WOW_DIR` et cherche lui aussi dans les deux dossiers. `docs/USAGE.md` donne la commande PowerShell qui contourne la politique d'exécution des scripts (`powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1`).
+- **D3** : réponses en français, courtes par défaut, détail seulement sur demande.
+- **D10** : ajout du seuil **100 % de réponses avec certitude affichée** (sur les cas positifs) ; mesure du **taux de fausses alertes** de la vérification des chiffres sur le jeu de questions (consigné dans `docs/research/plugin-eval-T06.md`).
+- D2, D5, D6, D7, D8, D9 : acceptées telles quelles.
+- Conduite : si le bloc A contredit une décision, la présenter avant d'aller plus loin ; un test verrouillé faux → demandes de correction regroupées avant la fusion ; contexte plein → arrêt après un bloc vert et committé.
