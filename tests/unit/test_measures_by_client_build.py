@@ -82,8 +82,8 @@ def test_refresh_refuses_logs_of_another_version(tmp_path, make_deps, capsys, da
     code = main(["measures", "refresh", "--logs", str(wow_dir / "Logs"), "--dry-run", "--json"], deps)
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
-    held = payload["measures"]["held_back"]
-    assert held, payload["measures"]
+    held = payload["diff"]["measures"]["held_back"]
+    assert held, payload["diff"]["measures"]
     assert {h["client_version"] for h in held} == {PREVIOUS_VERSION}
     assert all(LOCAL_VERSION in h["reason"] for h in held)
 
@@ -95,18 +95,20 @@ def test_refresh_measures_logs_of_the_installed_version(tmp_path, make_deps, cap
     code = main(["measures", "refresh", "--logs", str(wow_dir / "Logs"), "--dry-run", "--json"], deps)
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
-    assert payload["measures"]["held_back"] == []
+    assert payload["diff"]["measures"]["held_back"] == []
 
 
-def test_refresh_without_a_journal_measures_everything_and_says_so(tmp_path, make_deps, capsys, data_copy):
-    """Sans relevé de version (cache neuf), rien n'est écarté, mais l'incertitude est dite."""
+def test_refresh_measures_a_log_of_unknown_version_and_says_so(tmp_path, make_deps, capsys, data_copy):
+    """Journal antérieur au premier relevé de `.build.info` : on ne sait pas de quelle version il vient. Il est
+    mesuré quand même — l'écarter serait aussi faux que l'attribuer — et l'incertitude est dite."""
     wow_dir = wow_dir_with(tmp_path, LOCAL_VERSION)
     deps = make_deps(wow_dir=wow_dir, data_dir=data_copy)
     code = main(["measures", "refresh", "--logs", str(wow_dir / "Logs"), "--dry-run", "--json"], deps)
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
-    assert payload["measures"]["held_back"] == []
-    assert any("version du client" in note for note in payload["new"]["notes"]), payload["new"]["notes"]
+    assert payload["diff"]["measures"]["held_back"] == []
+    notes = payload["provenance"]["assumptions"]
+    assert any("version du client" in note for note in notes), notes
 
 
 def test_a_measure_carried_from_another_version_keeps_its_origin(make_deps):

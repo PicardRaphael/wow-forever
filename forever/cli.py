@@ -47,6 +47,13 @@ from forever.lookup import SpellLookup, SpellRank, TalentLookup, lookup_spell, l
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
+from forever.pipeline.client_builds import (
+    load_builds,
+    read_build_info,
+    record_build,
+    split_by_version,
+    version_at,
+)
 from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
 from forever.pipeline.decode import Candidate, decode_version
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
@@ -924,12 +931,25 @@ def _log_provenance(deps: Deps, headers: list[LogHeader], certainty: Certainty, 
     return local_provenance(deps, certainty=certainty, assumptions=assumptions)
 
 
-def _summary_json(s: LogSummary) -> dict[str, Any]:
+def _client_builds(deps: Deps) -> list[Any]:
+    """Journal des versions du client, complété du relevé courant quand le dossier du client est lisible (T08a).
+
+    Rien n'est écrit si `.build.info` est absent : l'attribution reste alors inconnue, jamais devinée."""
+    if deps.wow_dir is not None:
+        found = read_build_info(deps.wow_dir)
+        if found is not None:
+            return record_build(deps.cache_dir, found)
+    return load_builds(deps.cache_dir)
+
+
+def _summary_json(s: LogSummary, builds: list[Any]) -> dict[str, Any]:
     return {
         "name": s.name,
         "lines": s.lines,
         "events": s.events,
+        # Entête du journal : tronquée (« 1.60.1 »), jamais utilisée pour attribuer une version (décision 135).
         "build": s.header.build if s.header else None,
+        "client_version": version_at(builds, s.start) if s.start else None,
         "start": s.start.isoformat() if s.start else None,
         "end": s.end.isoformat() if s.end else None,
         "mine": s.mine,
@@ -942,6 +962,7 @@ def _cmd_logs_scan(deps: Deps, args: argparse.Namespace) -> int:
     if not directory.is_dir():
         raise PathNotFoundError("Dossier des journaux", str(directory), "donner --dir ou définir FOREVER_WOW_DIR")
     summaries = scan_logs(directory)
+    builds = _client_builds(deps)
     provenance = _log_provenance(deps, [s.header for s in summaries if s.header], "certain", [])
     lines = [f"Journaux de combat dans {directory} : {len(summaries)}"]
     for s in summaries:
@@ -950,8 +971,14 @@ def _cmd_logs_scan(deps: Deps, args: argparse.Namespace) -> int:
         else:
             span = f"{s.start:%Y-%m-%d %H:%M:%S} → {s.end:%H:%M:%S}" if s.start and s.end else "aucun événement"
             who = ", ".join(s.mine) or "aucun joueur « à moi »"
-            lines.append(f"  {s.name} · {s.lines} lignes · {span} · {who}")
-    payload = {"dir": str(directory), "logs": [_summary_json(s) for s in summaries], "provenance": provenance}
+            seen = version_at(builds, s.start) if s.start else None
+            lines.append(f"  {s.name} · {s.lines} lignes · {span} · {who} · client {seen or 'inconnu'}")
+    payload = {
+        "dir": str(directory),
+        "logs": [_summary_json(s, builds) for s in summaries],
+        "client_builds": [{"build": b.build, "installed_at": format_utc(b.installed_at)} for b in builds],
+        "provenance": provenance,
+    }
     _emit(payload, lines, provenance, args.json)
     return EXIT_OK
 
@@ -1412,13 +1439,30 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     excluded = (installed.get("questie_correction") or {}).get("excluded", [])
     fit_exclude = args.fit_exclude if args.fit_exclude is not None else [int(e["npc_id"]) for e in excluded]
     offset = timedelta(hours=args.utc_offset) if args.utc_offset is not None else None
+    # Une mesure n'est jamais attribuée à une autre version du jeu (T08a, décision 135) : seuls les journaux écrits
+    # sous la version installée sont mesurés, les autres attendent son installation.
+    builds = _client_builds(deps)
+    starts = {s.name: s.start for s in scan_logs(logs_dir)}
+    keep, held, unknown = split_by_version(
+        [(p.name, starts.get(p.name)) for p in sources.logs], builds, data.game_version, utc_offset=offset
+    )
+    sources = sources._replace(logs=tuple(p for p in sources.logs if p.name in keep))
     new = remeasure(
         gd, sources, questie, version=data.game_version, installed=installed, fit_exclude=fit_exclude, utc_offset=offset
     )
+    if unknown:
+        new["notes"].append(
+            f"version du client inconnue pour {len(unknown)} journal/journaux ({', '.join(unknown)}) : "
+            "antérieurs au premier relevé de .build.info, mesurés sans garantie qu'ils viennent de la version "
+            f"installée ({data.game_version})"
+        )
+    for h in held:
+        new["notes"].append(f"{h.name} retenu : {h.reason}")
     previous = read_snapshot(deps.cache_dir)
     if previous is None and snapshot_exists(deps.cache_dir):
         new["notes"].append("instantané illisible (<cache>/measures/last.json) : traité comme un premier instantané")
     diff = compare(installed, registry.load(deps.registry_path), previous, new)
+    diff["measures"]["held_back"] = [h._asdict() for h in held]
     written: list[Path] = []
     if not diff["changed"]:
         status = "rien à écrire"
@@ -1443,7 +1487,9 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
         "written": [str(p) for p in written],
         "provenance": provenance,
     }
-    _emit(payload, _refresh_lines(sources, diff, status), provenance, args.json)
+    lines = _refresh_lines(sources, diff, status)
+    lines += [f"  {h.name} retenu · client {h.client_version} · {h.reason}" for h in held]
+    _emit(payload, lines, provenance, args.json)
     return EXIT_OK
 
 

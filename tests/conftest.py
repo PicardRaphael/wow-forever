@@ -111,6 +111,7 @@ def make_deps(tmp_path: Path) -> MakeDeps:
         registry_path: Path = REGISTRY_PATH,
         cache_dir: Path | None = None,
         offline: bool = False,
+        wow_dir: Path | None = None,
     ) -> Deps:
         return Deps(
             data_dir=data_dir,
@@ -119,6 +120,7 @@ def make_deps(tmp_path: Path) -> MakeDeps:
             http_get=http or FakeHttp.failing(),
             now=lambda: now,
             offline=offline,
+            wow_dir=wow_dir,
             profile_path=tmp_path / "profil" / "profile.json",  # jamais ~/.forever dans les tests (T06b)
         )
 

@@ -13,6 +13,7 @@ Valeurs des fixtures : forme réelle de `.build.info` relevée le 2026-09-30 sur
 from datetime import UTC, datetime, timedelta
 
 import pytest
+
 from forever.pipeline.client_builds import (
     ClientBuild,
     load_builds,
@@ -115,9 +116,12 @@ def test_before_the_first_entry_the_version_is_unknown(tmp_path):
 def test_a_naive_moment_is_read_as_local_time(tmp_path):
     """Les journaux de combat datent leurs événements en heure locale, sans fuseau."""
     journal = [entry(OLD, 25), entry(BETA, 30, hour=5)]
-    local = datetime(2026, 9, 30, 4) - timedelta(hours=0)  # naïf
-    assert version_at(journal, local, utc_offset=timedelta(hours=2)) == OLD
-    assert version_at(journal, datetime(2026, 9, 30, 8), utc_offset=timedelta(hours=2)) == BETA
+    paris = timedelta(hours=2)
+    # 06:00 à Paris = 04:00 UTC, avant la mise à jour de 05:00 UTC ; 08:00 à Paris = 06:00 UTC, après.
+    before = datetime(2026, 9, 30, 6, tzinfo=UTC).replace(tzinfo=None)
+    after = datetime(2026, 9, 30, 8, tzinfo=UTC).replace(tzinfo=None)
+    assert version_at(journal, before, utc_offset=paris) == OLD
+    assert version_at(journal, after, utc_offset=paris) == BETA
 
 
 def test_recording_reads_and_writes_in_one_call(tmp_path):
