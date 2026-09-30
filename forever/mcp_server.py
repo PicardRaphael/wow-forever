@@ -26,7 +26,19 @@ from forever.status import StatusReport, status_report
 
 INSTRUCTIONS = (
     "Données de World of Warcraft: Forever, versionnées par version du jeu. Chaque résultat porte un bloc "
-    "`provenance` (version, empreinte, fraîcheur, certitude, hypothèses) à citer dans la réponse."
+    "`provenance` (version, empreinte, fraîcheur, certitude, hypothèses) à citer dans la réponse.\n"
+    "\n"
+    "Règles de réponse, pour toute IA cliente :\n"
+    "1. Aucun chiffre de jeu sans appel d'outil. Chaque valeur est recopiée telle quelle d'un résultat de ces "
+    "outils : jamais tirée de la mémoire du modèle, jamais calculée (ni somme, ni produit, ni moyenne, ni formule "
+    "appliquée à la main). Si le chiffre voulu n'est dans aucun résultat, demander l'outil qui le rend ou dire "
+    "qu'il manque.\n"
+    "2. Afficher la certitude et la provenance de toute réponse chiffrée : certitude (`certain` lu dans le client "
+    "ou observé en jeu, `probable` calculé ou recoupé, `suppose` estimé ou hérité), version du jeu, fraîcheur des "
+    "données, et les hypothèses du bloc `provenance`. Une fraîcheur `stale`, `unknown` ou `silent` se signale.\n"
+    "3. Dire ce qui n'est pas couvert. Quand aucun outil ne répond à la question, répondre « je ne sais pas », "
+    "nommer ce qui manque et ne rien inventer ; une source extérieure citée reste étiquetée comme telle, avec sa "
+    "date, et sa certitude ne dépasse jamais `suppose`."
 )
 
 
