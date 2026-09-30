@@ -16,7 +16,8 @@ des outils ci-dessous.
 - `forever_lookup(kind="spell", name=<nom anglais>, rank=<rang>)` ; sans `rank`, tous les rangs.
 - Nom donné en français : traduis-le en nom anglais du client (par exemple « Éclair de givre » → Frostbolt). Nom
   inconnu : l'erreur propose des noms proches, reprends-en un.
-- Sort utilitaire (Blink, Polymorph, armures…) : non exposé par l'outil à ce stade ; dis-le.
+- Sort utilitaire (Blink, Polymorph, armures…) : pas dans `kind="spell"` ; son rôle PvP (durée, recharge, catégorie)
+  est dans la fiche `forever_lookup(kind="pvp", name="Mage")` (skill `forever-pvp`).
 
 ## Talents
 - `forever_lookup(kind="talent", name=<nom anglais ou clé>, rank=<rang>)` : arbre, palier, points exigés dans
@@ -33,8 +34,8 @@ des outils ci-dessous.
   en jeu.
 - Donjon et raid : scénarios provisoires, mana des combats longs non modélisée (tranche T05b) : écris-le en
   « Attention ». Raid complet : tranche T09.
-- PvP : le build sort de `forever_build`, mais les classes adverses, contrôles et rendements décroissants ne sont pas
-  couverts (tranches PV1, PV2).
+- PvP : le build sort de `forever_build` ; classes adverses, contrôles et affrontements : skill `forever-pvp` ;
+  profil PvP du Mage avec rendements décroissants et bijou : tranche PV2.
 - `sensitivity` et `stability` : seulement si le joueur demande le détail ou si une hypothèse retourne le choix.
 - Preset `complet` ou comparaison de plusieurs contextes : sous-agent `forever-sim-runner`.
 

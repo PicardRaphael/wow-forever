@@ -94,7 +94,7 @@ forever-core/
 | Outil | Rôle |
 | --- | --- |
 | `forever_status` | Fraîcheur et couverture du registre |
-| `forever_lookup` | Sort, talent (T06), zones (T04c) ; objet, consommable, raciaux à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
+| `forever_lookup` | Sort, talent (T06 ; 9 classes en PV1 avec `class_name`), zones (T04c), fiches PvP `pvp` et contrôle de build `build_check` (PV1) ; objet, consommable à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
 | `forever_explain_mechanic` | Entrée du registre (par identifiant ou par mots de la description, T06), formule, certitude, paramètres de la version, implémentation, sources |
 | `forever_sim_leveling` | Temps par monstre, XP/h : Monte Carlo et analytique, PV du monstre (valeur, source, certitude) ; graphique par `forever chart leveling` (T04b) |
 | `forever_sim_raid` | DPS, intervalle de confiance, contributions |
@@ -112,20 +112,21 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
   par `FOREVER_HOME` (défaut `${CLAUDE_PLUGIN_ROOT}/..`, le dépôt quand le plugin est chargé sur place).
 - **Skills** : `forever-router` (aiguillage, carte des domaines couverts et non couverts avec leur tranche, classe pas
   encore calculée, format de réponse `format-reponse.md` avec la règle « question personnelle ou générale », règle
-  « je ne sais pas »), `forever-leveling`, `forever-mage`. Un skill par domaine et par usage : chaque tranche ajoute le
+  « je ne sais pas », consignes « donnée manquante » et « pas encore construit », PV1), `forever-leveling`,
+  `forever-mage`, `forever-pvp` et `forever-builds` (PV1). Un skill par domaine et par usage : chaque tranche ajoute le
   sien et met à jour la carte du routeur (décision 115). Chaque SKILL.md fait moins de 200 lignes, sans chiffre de jeu.
 - **Sous-agents** : `forever-web-researcher` (WebSearch, WebFetch ; sources étiquetées officielle, communautaire,
   simulateur ; rien n'entre dans `forever/data/`), `forever-sim-runner` (calculs lourds par les outils forever).
   `data-updater` (T08) et `evaluator` (remplacé par `claude plugin eval`) : plus tard ou abandonnés.
 - **Hooks** (logique dans `forever/hooks.py`, sous-commandes `forever hook …`) : SessionStart → ligne de fraîcheur,
   cache seulement, **seulement dans le dépôt** ; Stop → chiffres de jeu de la réponse absents des résultats des outils
-  `forever_*` de la session (et des lignes sourcées du rapport de `forever-web-researcher`, décision 120), message `[forever:chiffres]` sans blocage, **seulement si la session a utilisé forever**.
+  `forever_*` de la session (et des lignes sourcées du rapport de `forever-web-researcher`, décision 120), message `[forever:chiffres]` sans blocage, **seulement pour une réponse produite avec un skill de jeu du plugin**, jamais dans une session de travail sur une tranche (`/tranche`, skills `tranche` et `verifier` ; PV1, demande de l'utilisateur du 2026-09-30).
   Garde dans `hooks.json` : rien ne s'exécute sans `pyproject.toml` au chemin du dépôt (aucune erreur ailleurs).
 - **Pas de statusline** (décision 15), pas de commandes `/forever…` en T06 (le langage naturel suffit ; à reprendre si
   l'évaluation le justifie).
-- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b, 0.3.0 le 2026-09-29 : décisions 116 et 117 ; 0.4.0 : décisions 118 à 121), relevée à chaque changement de `plugin/`, gardée par
+- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b, 0.3.0 le 2026-09-29 : décisions 116 et 117 ; 0.4.0 : décisions 118 à 121 ; 0.5.0 : PV1), relevée à chaque changement de `plugin/`, gardée par
   `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
-- **Évaluation** : `plugin/evals/` (38 questions réelles dont deux à profil vide, deux générales, deux personnelles et un personnage prévu, 20 voisines ; 58 cas depuis le 2026-09-29 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
+- **Évaluation** : `plugin/evals/` (41 questions réelles dont deux à profil vide, deux générales, deux personnelles, un personnage prévu et trois PvP, 21 voisines ; 62 cas depuis PV1 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
   (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
   (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
 
@@ -137,9 +138,9 @@ Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la
 | Domaine | Consultation (`forever_lookup`, domaine) | Calcul (outil séparé) | Skill | Tranche |
 | --- | --- | --- | --- | --- |
 | Leveling : zone ou donjon à mon niveau | `zones` (données de Questie lues localement) | — | `forever-leveling` | T04c |
-| Profil : import automatique | — | Import ForeverLogger et journaux (CLI `forever profile import`, écriture après accord) ; lecture par `forever_player_profile` | routeur (`format-reponse.md`) | PV1, T07 |
-| Builds de toutes les classes | `talent` étendu aux 9 classes | `forever_build` (classes à moteur) ; contrôle de légalité d'un build de la communauté (classes pas encore calculées) | `forever-builds` | PV1, puis chaque tranche de classe |
-| PvP | `pvp` : savoir des 9 classes, fiches par affrontement, champs de bataille, équipement PvP, monde ouvert, rendements décroissants mesurés | Profil PvP du Mage : `forever_build`, contextes `pvp-bg` et `pvp-world` | `forever-pvp` | PV1, PV2 (fiches en jeu : FA1p) |
+| Profil : import automatique (**fait, PV1**) | — | `forever profile import` (ForeverLogger, Questie, Auctionator, journaux ; changements listés avant accord) ; lecture par `forever_player_profile` | routeur (`format-reponse.md`) | PV1, T07 |
+| Builds de toutes les classes (**fait, PV1**) | `talent` avec `class_name` ; `build_check` (classe, niveau, talents) | `forever_build` (Mage) ; CLI `forever talents check` | `forever-builds` | PV1, puis chaque tranche de classe |
+| PvP (**fiches faites, PV1**) | `pvp` : fiche de classe (`name`, `level`) ou d'affrontement (`opponent`, `race`, `talents`, `opponent_level`), valeurs avec chemin `from` en `detail=true` ; CLI `forever pvp class`, `forever pvp matchup` ; à venir : champs de bataille, équipement PvP, rendements décroissants mesurés | Profil PvP du Mage : `forever_build`, contextes `pvp-bg` et `pvp-world` (rendements et bijou en PV2) | `forever-pvp` | PV1, PV2 (fiches en jeu : FA1p) |
 | Analyse de mes combats PvP | — | `forever_analyze` (AN1) | `forever-analyse-pvp` | AN1, étendue par chaque tranche de classe |
 | Classes (Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide) | `spell`, `talent` de la classe | `forever_build` et `forever_sim_leveling` avec la classe (forme au plan) | `forever-<classe>` | PA1 à DR1, parties raid après T09 |
 | Analyse de mes combats PvE | — | `forever_analyze` (AN2) | `forever-analyse-pve` | AN2 |
@@ -155,7 +156,7 @@ Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la
 ## Mémoire joueur
 Profil minimal (T06b, décision 99) : `forever/profile.py`, fichier `FOREVER_PROFILE` ou `~/.forever/profile.json`, **hors du dépôt** (écriture refusée sous le dépôt) : personnages (classe, race, faction, niveau, talents, métiers, version des données), un actif. Les outils de calcul ne le lisent jamais : l'agent le lit (`forever_player_profile`) et passe les valeurs ; chaque rapport rend `inputs` (origine `argument` ou `default`).
 Neuf classes et personnages prévus (`planned`, `--planned` / `--created`, décision 119) ; planification d'une respec à un autre niveau par `respec.projected` de `forever_build` (décision 118) ; `forever_build` sans niveau : niveau maximal des données (décision 121).
-Import automatique minimal au début de PV1 (décision 105) : ForeverLogger (classe, race, niveau, talents) et journaux (personnages « à moi »), lus sur disque, écritures listées avant accord ; faction toujours donnée par le joueur.
+Import automatique minimal (PV1, décisions 105 et 125) : schéma 2, chaque champ `{value, source, at, client_build, certainty}` ; fusion par `merge_field` (la plus récente l'emporte, à date égale la plus directe : joueur, ForeverLogger, Questie et Auctionator, journal, API) et désaccords gardés dans `conflicts` ; un profil de schéma 1 est migré à la lecture. Sources : ForeverLogger (classe, race, niveau, nœuds de talents traduits en clés par `classes.json`), journaux (personnages « à moi », classe déduite des sorts de classe, `probable`), Questie (quêtes faites par personnage), Auctionator (mes prix, par royaume, décodeur CBOR maison) ; version du client par instantané et par session ; lus sur disque, écritures listées avant accord ; faction toujours donnée par le joueur. Les 9 classes sont validées (race permise, build légal).
 Vault de T07, hors du dépôt lui aussi (données personnelles) : fiches datées `personnages/<nom>.json` (avec la version du jeu), `objectifs.md`, `decisions.md`, `legacy.json`, `historique/`.
 La mémoire de Claude ne garde que des pointeurs et des décisions, jamais de chiffres de jeu.
 

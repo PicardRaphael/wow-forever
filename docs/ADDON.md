@@ -5,6 +5,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 ## 1. Objectif et non-objectifs
 - **Objectif** : afficher dans le jeu des données **précalculées par `forever`**, et rapporter hors du jeu le contexte du personnage ; analyser les journaux de combat **après** le combat, hors du jeu.
 - **Non-objectifs** : aucune automatisation, aucun conseil de rotation en combat, aucun calcul sur des valeurs de combat dans l'addon, aucun canal temps réel.
+- **PvP (PV1)** : aucun suivi en direct des recharges adverses dans un addon : le journal de combat est refusé aux addons sur Forever et les valeurs de combat y sont secrètes ; seules des fiches fixes (`forever pvp`, `forever_lookup(kind="pvp")`), consultées hors combat ou affichées en jeu par la tranche FA1p.
 
 ## 2. Règles
 ### Politique de Blizzard

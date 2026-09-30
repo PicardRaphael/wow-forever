@@ -109,3 +109,18 @@ Présentées ensemble avant la fusion (règle du skill `/tranche`). Chaque corre
 -    record = read_json(DATA_DIR / LOCAL_VERSION / "racials.json")["races"]
 +    record = read_json(DATA_DIR / LOCAL_VERSION / "_seed_racials.json")["races"]  # copie figée du relevé (D5)
 ```
+
+## 6. `tests/unit/test_plugin_evals.py::test_report_loads_the_real_suite` (bloc F)
+
+- **Prémisse devenue fausse** : compte oublié dans le commit « tests » du bloc F. Le test fige encore 58 cas dont
+  38 positifs ; la suite en compte 62 dont 41 positifs (plan de PV1, bloc F.5 : trois cas PvP et un voisin),
+  comptes déjà verrouillés dans `test_fifty_eight_cases_thirty_eight_positive_twenty_negative`.
+- **Preuve** : sortie du test : `assert 62 == 58` (`scripts/plugin_eval_report.py`, `load_cases(plugin/evals)`).
+- **Diff proposé** :
+
+```diff
+-    assert len(loaded) == 58
+-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 38
++    assert len(loaded) == 62  # PV1 : trois cas PvP et un voisin
++    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 41
+```

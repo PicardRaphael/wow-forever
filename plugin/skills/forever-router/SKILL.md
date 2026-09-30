@@ -1,6 +1,6 @@
 ---
 name: forever-router
-description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, fraîcheur des données, et ce que le projet ne couvre pas encore (PvP, Legacy, métiers, réputations, hôtel des ventes, autres classes). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
+description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, PvP des 9 classes (contrôles, affrontements), builds de toutes les classes, fraîcheur des données, et ce que le projet ne couvre pas encore (champs de bataille, Legacy, métiers, réputations, hôtel des ventes, dégâts des autres classes). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
 ---
 
 # Routeur WoW Forever
@@ -44,9 +44,14 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Temps par monstre, XP par heure, repos, mana | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
 | Comment marche une mécanique | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` | selon le sujet |
+| PvP d'une classe : contrôles, défensifs, ruptures, recharges | `forever_lookup(kind="pvp", name=<classe>, level)` | `forever-pvp` |
+| Affrontement : mon Mage contre un Démoniste | `forever_lookup(kind="pvp", name, opponent, level, race, talents)` | `forever-pvp` |
+| Build d'une autre classe : légalité, effet des talents | `forever_lookup(kind="build_check", name=<classe>, level, talents)` | `forever-builds` |
+| Talent d'une autre classe | `forever_lookup(kind="talent", name, class_name=<classe>)` | `forever-builds` |
 | Données à jour ? version du jeu ? | `forever_status` | — |
 
-- Charge le skill du domaine (`forever-leveling` ou `forever-mage`) dès que la question en relève.
+- Charge le skill du domaine (`forever-leveling`, `forever-mage`, `forever-pvp` ou `forever-builds`) dès que la
+  question en relève.
 - `forever_explain_mechanic` accepte un identifiant du registre (« A18 ») ou des mots de sa description (« Ignite ») ;
   plusieurs entrées : l'erreur liste « identifiant : description », choisis puis rappelle l'outil.
 - Calcul lourd (preset `complet`, plusieurs niveaux ou contextes à comparer) : sous-agent `forever-sim-runner`.
@@ -57,8 +62,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 
 | Domaine | Tranche qui le couvrira |
 |---|---|
-| PvP : classes adverses, contrôles, rendements décroissants | PV1 |
-| PvP : champs de bataille, récompenses, monde ouvert | PV2 |
+| PvP : champs de bataille, récompenses, monde ouvert ; rendements décroissants mesurés, profil PvP du Mage | PV2 |
 | Donjons : boss, butin (le niveau d'un donjon : `forever_lookup(kind="zones")`) | DJ1 |
 | Legacy : défis, points, bonus ; suivi de ma progression | LG1, LG2 |
 | Métiers | MT1 |
@@ -72,8 +76,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Consommables et préparation de raid | T11 |
 | Analyse de mes combats PvP (contrôles, recharges, morts, cibles) | AN1 |
 | Analyse de mes combats PvE (rotation réelle, écarts, perte chiffrée) | AN2 |
-| Profil rempli automatiquement (ForeverLogger, journaux) | PV1 |
-| Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide (leveling, donjon, PvP) | PA1, DE1, PR1, CH1, CM1, GU1, VO1, DR1 |
+| Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide : dégâts, rotations, leveling | PA1, DE1, PR1, CH1, CM1, GU1, VO1, DR1 |
 
 Pour ces domaines : dis « je ne sais pas » (ou « le projet ne couvre pas encore … »), cite la tranche de
 `docs/ROADMAP.md`, et propose ce qui existe déjà (par exemple le niveau d'un donjon). Ne complète pas avec des
@@ -91,9 +94,26 @@ Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin »)
   présenté comme l'avis de cette source (section « Sources extérieures » de `format-reponse.md`). Un chiffre de ce
   rapport ne se cite que s'il figure sur une ligne qui porte l'adresse de sa source (le contrôle des chiffres ne
   reconnaît que ces lignes).
-- Tant que PV1 n'a pas décodé les talents des neuf classes, dis que la légalité de ces builds et l'effet de leurs
-  talents ne sont pas vérifiés sur les données du client ; ensuite, vérifie-les et explique-les par les outils forever.
+- Les talents des neuf classes sont décodés du client (PV1) : vérifie la légalité de chaque build par
+  `forever_lookup(kind="build_check", name=<classe>, level, talents)` et explique ses talents par
+  `forever_lookup(kind="talent", name, class_name)` (skill `forever-builds`) ; un build illégal se dit tel.
 - Rien de mémoire, de WoW Classic ni de retail.
+
+### Donnée manquante
+Quand une réponse bute sur une donnée que ni le client ni mes observations ne donnent (décision 131) :
+- dis ce qui manque et quelle tranche l'apporterait ;
+- propose un addon qui la comblerait : recherche par le sous-agent `forever-web-researcher` (CurseForge, Wago, liste
+  d'addons de foreverchanges.pro), chaque candidat avec son lien, sa version, sa date et sa licence ;
+- l'agent ne télécharge ni n'installe jamais rien : le joueur décide et installe lui-même.
+
+### Pas encore construit
+Les objets, les réputations, le PvP des champs de bataille et tout domaine de la table ci-dessus (décision 130) : cite une source
+extérieure si elle existe (sous-agent `forever-web-researcher`, affirmation d'une source datée, jamais un fait du
+projet), sinon dis que le projet ne le couvre pas encore et cite sa tranche.
+
+### Profil vide ou daté
+Profil absent, vide ou saisi sur une autre version (`stale`) : propose `forever profile import` (ForeverLogger,
+Questie, Auctionator, journaux ; lecture locale, changements listés avant tout accord), sans le lancer toi-même.
 
 ## 4. Forme de la réponse
 Lis `format-reponse.md` (dans ce dossier) avant de répondre : français, réponse courte par défaut, pied de réponse fixe

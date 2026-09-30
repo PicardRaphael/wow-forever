@@ -2,9 +2,9 @@
 fin de réponse.
 
 Le plugin reste mince : `plugin/hooks/hooks.json` appelle `forever hook session-start` et `forever hook check-numbers`.
-Les deux n'agissent que là où le plugin sert (dans le dépôt pour la ligne de fraîcheur ; dans une session qui a utilisé
-un outil ou un skill de forever pour le contrôle des chiffres), ne lèvent jamais d'exception et n'appellent pas le
-réseau."""
+Les deux n'agissent que là où le plugin sert (dans le dépôt pour la ligne de fraîcheur ; pour le contrôle des
+chiffres, dans une session où un skill de jeu du plugin a produit la réponse, jamais dans une session de travail sur
+une tranche, PV1), ne lèvent jamais d'exception et n'appellent pas le réseau."""
 
 from __future__ import annotations
 
@@ -41,6 +41,9 @@ _SOURCE_AGENT = re.compile(r"^(?:forever:)?forever-sim-runner$")
 _RESEARCH_AGENT = re.compile(r"^(?:forever:)?forever-web-researcher$")
 _ADDRESS = re.compile(r"https?://", re.IGNORECASE)
 _FOREVER_AGENT = re.compile(r"^(?:forever:)?forever-[\w-]+$")
+# Session de travail sur le dépôt (skills du projet, commandes) : le contrôle des chiffres ne s'y applique jamais.
+_WORK_SKILL = re.compile(r"^(?:[\w-]+:)?(?:tranche|verifier)$")
+_WORK_COMMAND = re.compile(r"<command-name>/?(?:tranche|verifier)</command-name>")
 _EPS = 1e-9
 # Entier affiché avec des zéros finals (20, 12 300) : lu comme un arrondi à la dizaine, à la centaine…, écart borné à
 # cette fraction de la valeur (paramètre de l'outil). « 20 » accepte ainsi une valeur d'outil entre 19 et 21.
@@ -144,6 +147,41 @@ def session_used_forever(lines: Iterable[Mapping[str, Any]]) -> bool:
     """Vrai si le transcript contient un appel d'outil MCP `forever_*`, d'un skill `forever-*` ou d'un sous-agent
     `forever-*`."""
     return any(_is_forever_use(u) for u in _tool_uses(lines))
+
+
+def _is_game_skill(use: Mapping[str, Any]) -> bool:
+    inp = use.get("input") if isinstance(use.get("input"), Mapping) else {}
+    assert isinstance(inp, Mapping)
+    return str(use.get("name", "")) == "Skill" and bool(_FOREVER_SKILL.match(str(inp.get("skill", ""))))
+
+
+def _is_work_marker(line: Mapping[str, Any], use: Mapping[str, Any] | None = None) -> bool:
+    if use is not None:
+        inp = use.get("input") if isinstance(use.get("input"), Mapping) else {}
+        assert isinstance(inp, Mapping)
+        return str(use.get("name", "")) == "Skill" and bool(_WORK_SKILL.match(str(inp.get("skill", ""))))
+    if line.get("type") != "user":
+        return False
+    return any(_WORK_COMMAND.search(text) for text in _texts(_user_content(line)))
+
+
+def _user_content(line: Mapping[str, Any]) -> Any:
+    message = line.get("message")
+    return message.get("content") if isinstance(message, Mapping) else None
+
+
+def session_is_game_answer(lines: Iterable[Mapping[str, Any]]) -> bool:
+    """Vrai si un skill de jeu du plugin (`forever-*` : routeur, leveling, Mage, PvP, builds…) a servi dans la session
+    et qu'aucune marque de travail sur le dépôt n'y figure (commande ou skill `tranche`, `verifier`) : seules ces
+    réponses passent le contrôle des chiffres (PV1, demande de l'utilisateur du 2026-09-30). Un outil ou un
+    sous-agent forever seul ne suffit pas."""
+    all_lines = list(lines)
+    if any(_is_work_marker(line) for line in all_lines):
+        return False
+    uses = list(_tool_uses(all_lines))
+    if any(_is_work_marker({}, u) for u in uses):
+        return False
+    return any(_is_game_skill(u) for u in uses)
 
 
 def _values(obj: Any) -> Iterator[float]:
@@ -270,7 +308,7 @@ def check_numbers_output(hook_input: Mapping[str, Any]) -> dict[str, Any] | None
         if not path:
             return None
         lines = read_transcript(Path(str(path)))
-        if not session_used_forever(lines):
+        if not session_is_game_answer(lines):
             return None
         last = hook_input.get("last_assistant_message")
         found = unsourced_numbers(lines, str(last) if last is not None else None)
