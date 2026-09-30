@@ -525,5 +525,12 @@
     "build": "1.60.1.70124"
    }
   }
+ },
+ "retired_files": {
+  "racials.json": {
+   "replaced_by": "races.json",
+   "frozen_copy": "_seed_racials.json",
+   "reason": "PV1, D5 (accord de l'utilisateur du 2026-09-30) : raciaux décodés du client (décision 106) ; copie figée du relevé communautaire pour le mode seed ; retiré seulement quand races.json est décodé de la version installée"
+  }
  }
 }
