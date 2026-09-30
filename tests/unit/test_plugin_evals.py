@@ -29,6 +29,7 @@ POSITIVE_COUNTS = {
     "mecanique": 5,
     "leveling": 3,
     "hors-perimetre": 3,
+    "pvp": 3,  # PV1 : contrôles du Voleur, Mage contre Démoniste, défensif du Paladin
 }
 NEGATIVE_CATEGORIES = ("wow-autre", "autre-jeu", "programmation")
 POSITIVE_GRADERS = {"skill", "outil", "chiffres", "certitude", "provenance"}
@@ -81,8 +82,9 @@ def test_fifty_eight_cases_thirty_eight_positive_twenty_negative():
     polarity = [front(c / "prompt.md")[0]["tags"][0] for c in cases()]
     # T06b : talent-niveau-22 et deux cas à profil vide ; 2026-09-29 : deux questions générales, deux personnelles,
     # un personnage prévu.
-    assert len(polarity) == 58
-    assert polarity.count("positif") == 38 and polarity.count("negatif") == 20
+    # PV1 : trois cas PvP et un voisin (retail).
+    assert len(polarity) == 62
+    assert polarity.count("positif") == 41 and polarity.count("negatif") == 21
 
 
 def test_empty_profile_cases():
@@ -246,7 +248,7 @@ def test_negative_categories():
         tags = front(c / "prompt.md")[0]["tags"]
         if tags[0] == "negatif":
             counts[tags[1]] += 1
-    assert sum(counts.values()) == 20
+    assert sum(counts.values()) == 21
     assert all(n >= 4 for n in counts.values()), counts
 
 
@@ -384,3 +386,13 @@ def test_report_main_exit_code(tmp_path, capsys):
     out = capsys.readouterr().out
     assert "aiguillage" in out and "ÉCHEC" in out
     assert "18 à 20 points de dégâts" in out
+
+
+def test_pvp_cases_use_the_pvp_lookup():
+    """PV1 : les trois cas PvP attendent forever_lookup (fiche PvP), la certitude, la provenance et `missing` cité."""
+    names = ("pvp-controles-voleur", "pvp-mage-contre-demoniste", "pvp-defensif-paladin")
+    for name in names:
+        g = graders(EVALS / name)
+        assert g["outil"][0]["tool"] == MCP_PREFIX + "forever_lookup", name
+        assert any(meta["type"] == "llm" and "manque" in body for meta, body in g.values()), name
+    assert "neg-retail-pvp-voleur" in {c.name for c in cases()}

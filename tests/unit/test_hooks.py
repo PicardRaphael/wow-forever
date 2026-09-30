@@ -237,3 +237,24 @@ def test_cli_session_start_in_the_repo(capsys, monkeypatch, make_deps):
 def test_cli_hook_bad_input_is_silent(capsys, monkeypatch, make_deps, sub):
     code, out, _ = run_hook(capsys, monkeypatch, ["hook", sub], "pas du JSON", make_deps())
     assert code == 0 and out == ""
+
+
+# --- PV1, bloc F : périmètre du contrôle des chiffres (demande de l'utilisateur du 2026-09-30) ---------------------
+
+
+def test_check_numbers_applies_to_answers_made_with_a_game_skill():
+    """Réponse produite avec un skill de jeu du plugin (ici forever-leveling) : le contrôle s'applique."""
+    assert hooks.session_is_game_answer(lines("session_game_skill_estimate.jsonl"))
+    out = hooks.check_numbers_output(hook_input("session_game_skill_estimate.jsonl"))
+    assert out is not None and "7 minutes" in out["systemMessage"]
+
+
+def test_check_numbers_never_applies_to_tranche_work_sessions():
+    """Session de travail sur une tranche (commande /tranche, skill tranche ou verifier, compte rendu
+    d'avancement) : jamais de contrôle, même si un outil ou un sous-agent forever a servi ; sans skill de jeu du
+    plugin, un outil ou un sous-agent forever seul ne suffit pas non plus."""
+    work = lines("session_tranche_progress.jsonl")
+    assert hooks.session_used_forever(work)  # outil et sous-agent forever présents
+    assert not hooks.session_is_game_answer(work)
+    assert hooks.check_numbers_output(hook_input("session_tranche_progress.jsonl")) is None
+    assert not hooks.session_is_game_answer(lines("session_web_researcher.jsonl"))

@@ -18,12 +18,11 @@ from forever.hooks import GAME_NUMBER, NUMBERS_MARKER
 from forever.mcp_server import build_server
 
 PLUGIN = REPO_ROOT / "plugin"
-SKILLS = ("forever-router", "forever-leveling", "forever-mage")
+SKILLS = ("forever-router", "forever-leveling", "forever-mage", "forever-pvp", "forever-builds")
 AGENTS = ("forever-web-researcher", "forever-sim-runner")
 MCP_PREFIX = "mcp__plugin_forever_forever__"
 # Domaines non couverts à ce stade et tranche qui les couvrira (docs/ROADMAP.md).
 UNCOVERED_TRANCHES = (
-    "PV1",
     "PV2",
     "DJ1",
     "LG1",
@@ -162,18 +161,24 @@ def test_skill_descriptions_carry_trigger_words():
         assert word in desc["forever-leveling"]
     for word in ("mage", "talent", "build", "givre", "feu", "arcanes"):
         assert word in desc["forever-mage"]
+    for word in ("pvp", "contrôle", "affrontement", "recharge", "rendements décroissants"):
+        assert word in desc["forever-pvp"]
+    for word in ("build", "classe", "légal", "communauté", "talents"):
+        assert word in desc["forever-builds"]
 
 
 def test_router_maps_skills_and_uncovered_domains():
     _, body = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
     assert "forever-leveling" in body and "forever-mage" in body
+    assert "forever-pvp" in body and "forever-builds" in body
+    assert 'kind="pvp"' in body and 'kind="build_check"' in body
     assert "format-reponse.md" in body
     assert "forever_status" in body
     for tranche in UNCOVERED_TRANCHES:
         assert re.search(rf"\b{tranche}\b", body), tranche
 
 
-@pytest.mark.parametrize("name", ["forever-leveling", "forever-mage"])
+@pytest.mark.parametrize("name", ["forever-leveling", "forever-mage", "forever-pvp", "forever-builds"])
 def test_domain_skills_use_the_response_format(name):
     _, body = frontmatter(PLUGIN / "skills" / name / "SKILL.md")
     assert "format-reponse.md" in body
@@ -255,3 +260,51 @@ def test_no_game_number_marker_or_statusline_in_the_plugin():
         assert NUMBERS_MARKER not in text, path
         assert "statusLine" not in text and "statusline" not in text.lower(), path
     assert not (PLUGIN / "settings.json").exists()
+
+
+# --- PV1, blocs F et G ----------------------------------------------------------------------------------------------
+
+
+def router_section(title):
+    _, body = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
+    assert title in body, title
+    return body.split(title, 1)[1].split("\n## ", 1)[0].split("\n### ", 1)[0]
+
+
+def test_router_uncovered_table_drops_pv1_rows():
+    table = router_section("## 3. Domaines non couverts")
+    assert "PvP : classes adverses" not in table and "Profil rempli automatiquement" not in table
+    assert "PV1" not in table  # tout ce que PV1 couvre est sorti de la table
+    assert "PV2" in table
+
+
+def test_router_missing_data_and_not_built_instructions():
+    missing = router_section("### Donnée manquante")
+    for word in ("addon", "forever-web-researcher", "CurseForge", "Wago", "foreverchanges.pro"):
+        assert word in missing, word
+    assert "installe" in missing and "jamais" in missing  # rien téléchargé ni installé par l'agent
+    built = router_section("### Pas encore construit")
+    for word in ("objets", "réputations", "champs de bataille", "source", "tranche"):
+        assert word in built, word
+    other = router_section("### Classe pas encore calculée")
+    assert 'kind="build_check"' in other and "légalité" in other
+
+
+def test_router_proposes_the_profile_import():
+    _, body = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
+    assert "forever profile import" in body
+
+
+def test_pvp_skill_states_no_live_cooldown_tracking():
+    _, body = frontmatter(PLUGIN / "skills" / "forever-pvp" / "SKILL.md")
+    lowered = body.lower()
+    assert "aucun suivi en direct" in lowered and "journal de combat" in lowered
+    assert "missing" in body and 'kind="pvp"' in body and "forever_player_profile" in body
+    addon = (REPO_ROOT / "docs" / "ADDON.md").read_text(encoding="utf-8").lower()
+    assert "aucun suivi en direct des recharges adverses" in addon
+
+
+def test_builds_skill_checks_community_builds():
+    _, body = frontmatter(PLUGIN / "skills" / "forever-builds" / "SKILL.md")
+    for word in ("forever_build", "forever-web-researcher", 'kind="build_check"', "légal"):
+        assert word in body, word

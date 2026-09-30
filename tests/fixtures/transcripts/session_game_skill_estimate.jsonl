@@ -1,0 +1,4 @@
+{"type": "user", "message": {"role": "user", "content": "Combien de temps pour monter mon Mage du niveau 20 au niveau 21 dans WoW Forever ?"}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "tool_use", "id": "toolu_skill", "name": "Skill", "input": {"skill": "forever:forever-leveling"}}]}}
+{"type": "user", "message": {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "toolu_skill", "content": "Launching skill: forever:forever-leveling"}]}}
+{"type": "assistant", "message": {"role": "assistant", "content": [{"type": "text", "text": "Il te faut environ 7 minutes par niveau à ce rythme."}]}}
