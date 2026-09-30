@@ -41,7 +41,12 @@
   "row_base": 2130,
   "row_step": 600,
   "col_step": 600,
-  "extra_zero_divisor": 10
+  "extra_zero_divisor": 10,
+  "tab_origins": [
+   1020,
+   5020,
+   9080
+  ]
  },
  "shared_spell": "latest_node",
  "rank_variables": {
@@ -203,5 +208,129 @@
   "target_auras : auras posées sur la cible par un talent (spell_scaling.json.auras) ; talent désigné par son nom (TraitDefinition) ; aura = EffectTriggerSpell de l'effet d'aura trigger_aura du talent (109 : sort déclenché sur la cible) ; part par cumul = champ field de l'effet d'aura aura (270 : dégâts subis des écoles du masque EffectMiscValue_0, en %) ; cumuls maximum = SpellAuraOptions.CumulativeAura ; durée = SpellMisc.DurationIndex -> SpellDuration.",
   "school_masks : bits d'école du client (EffectMiscValue_0 des auras d'école) -> école de spells.json."
  ],
- "inherited_from": "1.60.1.70009"
+ "inherited_from": "1.60.1.70009",
+ "class_tables": [
+  "ChrClasses",
+  "SkillLine",
+  "SpellRange",
+  "SpellCategories",
+  "SpellCategory",
+  "SpellMechanic",
+  "SpellDispelType",
+  "SpellInterrupts",
+  "SpellClassOptions",
+  "SpellAuraRestrictions",
+  "SpellShapeshift",
+  "ChrRaces",
+  "CharBaseInfo",
+  "SkillRaceClassInfo",
+  "Item",
+  "ItemSparse",
+  "ItemEffect",
+  "ItemXItemEffect"
+ ],
+ "localized_class_tables": {
+  "frFR": [
+   "ChrRaces"
+  ]
+ },
+ "classes": {
+  "Warrior": {
+   "skill_lines": [
+    26,
+    256,
+    257
+   ]
+  },
+  "Paladin": {
+   "skill_lines": [
+    594,
+    267,
+    184
+   ]
+  },
+  "Hunter": {
+   "skill_lines": [
+    50,
+    163,
+    51
+   ],
+   "pet_skill_lines": [
+    203,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    214,
+    215,
+    217,
+    218,
+    236,
+    251,
+    261,
+    270,
+    653,
+    654,
+    655,
+    656,
+    2897,
+    3015,
+    3016
+   ]
+  },
+  "Rogue": {
+   "skill_lines": [
+    253,
+    38,
+    39
+   ]
+  },
+  "Priest": {
+   "skill_lines": [
+    613,
+    56,
+    78
+   ]
+  },
+  "Shaman": {
+   "skill_lines": [
+    375,
+    373,
+    374
+   ]
+  },
+  "Mage": {
+   "skill_lines": [
+    237,
+    8,
+    6
+   ]
+  },
+  "Warlock": {
+   "skill_lines": [
+    355,
+    354,
+    593
+   ],
+   "pet_skill_lines": [
+    188,
+    189,
+    204,
+    205,
+    206,
+    207,
+    2887
+   ]
+  },
+  "Druid": {
+   "skill_lines": [
+    574,
+    134,
+    573
+   ]
+  }
+ },
+ "classes_note": "PV1 : lignes de compétence de chaque classe dans l'ordre des onglets (onglet i : abscisse tab_origins[i]), vérifié par la ligne majoritaire des sorts des talents de l'onglet ; lignes des familiers (Chasseur, Démoniste) : SkillLine « Pet - … » et Beast Training. Nœud hors grille : zéro en trop corrigé (extra_zero_divisor), tout autre écart listé non résolu, jamais arrondi."
 }

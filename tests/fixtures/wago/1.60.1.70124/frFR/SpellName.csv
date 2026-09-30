@@ -1,0 +1,724 @@
+ID,Name_lang
+10,Blizzard
+116,Eclair de givre
+120,Cône de froid
+122,Nova de givre
+133,Boule de feu
+168,Armure de givre
+1449,Explosion des arcanes
+2120,Choc de flammes
+2136,Trait de feu
+2948,Brûlure
+5143,Projectiles des arcanes
+5570,Essaim d'insectes
+5923,Puissance sacrée
+6057,Spécialisation Baguette
+6117,Armure du mage
+6136,Transi
+6150,Tirs accélérés
+9453,Foi inflexible
+9799,Oeil pour oeil
+10060,Infusion de puissance
+11069,Boule de feu améliorée
+11070,Eclair de givre amélioré
+11071,Morsure de givre
+11078,Sillage de feu
+11083,Ame ardente
+11094,Gardien de feu amélioré
+11095,Brûlure améliorée
+11100,Jet de flammes
+11103,Impact
+11108,Choc de flammes amélioré
+11113,Vague explosive
+11115,Masse critique
+11129,Combustion
+11151,Glace perçante
+11160,Canalisation du givre
+11165,Nova de givre améliorée
+11170,Fracasser
+11175,Gel prolongé
+11180,Froid hivernal
+11185,Blizzard amélioré
+11190,Cône de froid amélioré
+11207,Eclats de glace
+11210,Subtilité des arcanes
+11213,Concentration des arcanes
+11222,Focalisation des arcanes
+11232,Esprit des arcanes
+11237,Canalisation améliorée
+11242,Impact des arcanes
+11247,Géométrie des arcanes
+11252,Sauvegarde des arcanes
+11255,Contresort amélioré
+11366,Explosion pyrotechnique
+11426,Barrière de glace
+11958,Bloc de glace
+12042,Pouvoir des arcanes
+12043,Présence spirituelle
+12162,Blessures profondes
+12163,Spécialisation Arme 2M
+12282,Frappe héroïque améliorée
+12285,Charge améliorée
+12286,Pourfendre amélioré
+12287,Coup de tonnerre amélioré
+12289,Brise-genou amélioré
+12290,Fulgurance améliorée
+12292,Attaques circulaires
+12295,Maîtrise tactique améliorée
+12296,Maîtrise de la Rage
+12297,Anticipation
+12298,Spécialisation Bouclier
+12301,Rage sanguinaire améliorée
+12308,Fracasser armure amélioré
+12311,Coup de bouclier amélioré
+12312,Mur protecteur amélioré
+12313,Désarmement amélioré
+12319,Rafale
+12320,Cruauté
+12321,Voix tonitruante
+12322,Colère déchaînée
+12328,Souhait mortel
+12329,Enchaînement amélioré
+12472,Morsure du froid
+12494,Morsure du givre
+12536,Idées claires
+12792,Défi
+12797,Vengeance améliorée
+12862,Heurtoir amélioré
+12962,Volonté de fer
+12975,Dernier rempart
+13712,Réflexes-éclairs
+13713,Déviation
+13715,Spécialisation Ambidextrie
+13732,Attaque pernicieuse améliorée
+13741,Suriner amélioré
+13742,Endurcissement
+13743,Sprint amélioré
+13750,Poussée d'adrénaline
+13754,Coup de pied amélioré
+13877,Déluge de lames
+13958,Maître des illusions
+13975,Dissimulation
+13976,Initiative
+13981,Insaisissable
+13983,Préparatifs
+14057,Opportunité
+14079,Embuscade améliorée
+14082,Coups fourrés
+14084,Distraction améliorée
+14113,Poisons améliorés
+14128,Mortalité
+14138,Malice
+14143,Impitoyable
+14144,Attaques impitoyables
+14156,Némésis
+14158,Meurtre
+14162,Éviscération améliorée
+14165,Débiter amélioré
+14168,Exposer l'armure amélioré
+14171,Lames dentelées
+14174,Aiguillon perfide amélioré
+14177,Sang froid
+14179,Frappes implacables
+14181,Effet Frappes implacables
+14183,Préméditation
+14185,Préparation
+14186,Scelle le destin
+14278,Frappe fantomatique
+14520,Sagacité
+14523,Résolution silencieuse
+14531,Martyre
+14747,Feu intérieur amélioré
+14748,Mot de pouvoir : Bouclier amélioré
+14750,Brûlure de mana améliorée
+14751,Focalisation améliorée
+14889,Spécialisation (Sacré)
+14892,Inspiration
+14898,Soins spirituels
+14901,Direction spirituelle
+14908,Rénovation améliorée
+14909,Lumière incendiaire
+14912,Soin amélioré
+14913,Concentration crépusculaire
+14983,Vigueur
+15058,Instabilité des arcanes
+15237,Nova sacrée
+15257,Tissage de l'ombre
+15259,Ténèbres
+15260,Focalisation de l'ombre
+15270,Connexion spirituelle
+15273,Attaque mentale améliorée
+15274,Oubli amélioré
+15275,Mot de l'ombre : Douleur amélioré
+15286,Etreinte vampirique
+15318,Affinité avec l'Ombre
+15392,Cri psychique amélioré
+15407,Fouet mental
+15473,Forme d'Ombre
+16035,Commotion
+16038,Appel des flammes
+16039,Convection
+16040,Réverbération
+16043,Emprise de la terre
+16086,Nova de feu améliorée
+16120,Appel de la foudre
+16164,Focalisation élémentaire
+16173,Focalisation totémique
+16176,Guérison des anciens
+16177,Robustesse des anciens
+16179,Focalisation des flots
+16181,Focalisation des soins
+16182,Vague de soins améliorée
+16184,Réincarnation améliorée
+16187,Totems de restauration
+16188,Rapidité de la nature
+16190,Totem de Vague de mana
+16191,Vague de mana
+16194,Maîtrise des flots
+16255,Frappe foudroyante
+16258,Totems gardiens
+16261,Bouclier de foudre amélioré
+16262,Loup fantôme amélioré
+16266,Armes élémentaires
+16268,Armes spirituelles
+16487,Folie sanguinaire
+16511,Hémorragie
+16513,Poisons abominables
+16538,Bastion
+16578,Empressement élémentaire
+16757,Allonge arctique
+16814,Colère améliorée
+16819,Allonge de la Nature
+16821,Eclat lunaire amélioré
+16833,Changeforme naturel
+16845,Lueur de la lune
+16850,Feu stellaire amélioré
+16880,Grâce de la nature
+16896,Fureur lunaire
+16918,Sarments améliorés
+16922,Feu stellaire étourdissant
+16929,Peau épaisse
+16940,Impact brutal
+16942,Griffes aiguisées
+16947,Instinct farouche
+16966,Attaques lacérantes
+16972,Frappes de prédateur
+16998,Furie sauvage
+17002,Célérité farouche
+17003,Cœur de fauve
+17007,Chef de la meute
+17056,Fureur
+17069,Naturaliste
+17074,Rétablissement amélioré
+17104,Don de la Nature
+17111,Récupération améliorée
+17118,Discrétion
+17123,Tranquillité améliorée
+17245,Lacis
+17322,Allonge de l'Ombre
+17364,Courroux naturel
+17485,Connaissance ancestrale
+17778,Cataclysme
+17783,Concentration corrompue
+17788,Fléau
+17793,Trait de l'ombre amélioré
+17794,Vulnérabilité à l'Ombre
+17810,Corruption améliorée
+17877,Brûlure de l'ombre
+17917,Allonge de destruction
+17927,Flammes déchirantes
+17941,Transe de l'ombre
+17959,Ruine
+18073,Pyroclasme
+18094,Crépuscule
+18118,Conséquences
+18135,Intensité
+18182,Connexion améliorée
+18223,Malédiction de fatigue
+18265,Siphon de vie
+18271,Maîtrise de l'ombre
+18288,Malédiction amplifiée
+18425,Silence – Coup de pied
+18427,Agressivité
+18462,Méditation des arcanes
+18530,Fureur divine
+18551,Force mentale
+18562,Prompte guérison
+18694,Diablotin amélioré
+18697,Baiser démoniaque
+18703,Captation de vie améliorée
+18705,Marcheur du Vide amélioré
+18708,Domination corrompue
+18709,Maître invocateur
+18731,Vitalité gangrenée
+18754,Sayaad amélioré
+18769,Puissance impie
+18788,Sacrifice démoniaque
+18789,Ombre ardente
+18790,Endurance corrompue
+18791,Toucher brûlant
+18792,Energie corrompue
+18814,OLDSoul Link Effect
+18827,Plaie d’agonie améliorée
+19028,Lien spirituel
+19159,Frappes sauvages
+19228,Coupure d'ailes améliorée
+19239,Pièges astucieux
+19255,Survivant
+19263,Dissuasion
+19290,Pied sûr
+19306,Contre-attaque
+19376,Tactique de survie
+19407,Trait de choc amélioré
+19416,Efficacité
+19426,Attaques mortelles
+19454,Tir des arcanes amélioré
+19461,Barrage
+19464,Morsure de serpent améliorée
+19485,Coups mortels
+19498,Oeil de faucon
+19507,Spécialisation Armes à distance
+19549,Aspect du singe amélioré
+19552,Aspects mortels
+19572,Guérison du familier améliorée
+19574,Courroux bestial
+19578,Engagement spirituel
+19583,Entraînement à l'Endurance
+19590,Discipline bestiale
+19596,Rapidité bestiale
+19598,Ferocité
+19616,Fureur libérée
+19675,Charge farouche
+20066,Repentir
+20101,Bénédiction
+20117,Conviction
+20127,Redoute
+20174,Faveur du Gardien
+20177,Rétribution
+20196,Spécialisation Arme 1M
+20205,Focalisation spirituelle
+20216,Faveur divine
+20224,Sceaux améliorés
+20237,Lumière guérisseuse
+20257,Intelligence divine
+20262,Force divine
+20375,Sceau d'autorité
+20468,Fureur vertueuse améliorée
+20487,Marteau de la justice amélioré
+20500,Rage berserker améliorée
+20502,Exécution améliorée
+20504,Interception améliorée
+20711,Esprit de rédemption
+22959,Vulnérabilité au Feu
+23602,Maîtrise de la défense
+23881,Sanguinaire
+24293,Pistage amélioré
+24443,Ressusciter le familier amélioré
+24858,Forme de sélénien
+24905,Forme de sélénien (passif)
+24907,Aura de sélénien
+24968,Tranquillité de l'esprit
+25771,Longanimité
+25956,Jugement amélioré
+26022,Poursuite de la justice
+27789,Allonge du Sacré
+27811,Rétablissement béni
+27828,Incantation focalisée
+27900,Protection contre les sorts
+28574,Résistance des arcanes
+28996,Protection contre les éléments
+28999,Allonge élémentaire
+29062,Oeil du cyclone
+29074,Maître des éléments
+29187,Grâce naturelle
+29206,Flots de soins
+29438,Précision élémentaire
+29441,Absorption de magie
+29787,Rage focalisée
+30160,Dévastation élémentaire
+30812,Rapidité mentale
+30919,Expertise en armes
+400588,Barrage de projectiles
+400624,Bonne série
+400640,Javelot de glace
+400647,Doigts de givre
+401502,Éclair de givrefeu
+401937,Soins de lien
+402000,Protection de l’âme
+402174,Pénitence
+403511,Drains améliorés
+407995,Primal Bite
+408120,Croissance sauvage
+408248,Éclipse
+408438,Surcharge de foudre
+408498,Arme du Maelström
+408510,Bouclier d’eau
+412609,Blessure profonde
+412732,Connaissance démoniaque
+412751,Feu et soufre
+414673,Don de la Terre-mère
+415140,Dextérité mentale
+415405,Tueur rapide
+417046,Roi de la jungle
+417051,Réaction naturelle
+425280,Regain d’espoir
+425336,Rage long-voyante
+425464,Pacte démoniaque
+426311,Flamme
+426316,Ombre et flammes
+429144,Puissance purifiante
+431622,Égide divine
+437032,Moisson d’âme
+440529,Ingéniosité
+440870,Décimation
+1222988,Lien terrestre
+1223030,Focalisation chamanique
+1223031,Frappe-tempête amélioré
+1223033,Pleine conscience
+1223082,Majesté de la nature
+1223083,Splendeur de la nature
+1223242,Instincts prédateurs
+1223246,Pourfendre et déchirer
+1223755,Feu focalisé
+1223984,Visée minutieuse
+1223987,Recouvrement rapide
+1224697,Devoir sacré
+1224716,Blessures transperçantes
+1225132,Disciplines jumelles
+1225139,Fouet mental amélioré
+1225177,Malédiction
+1225214,Énergie démoniaque
+1225217,Chasseur corrompu amélioré
+1225220,Peau de la fournaise
+1225228,Plaie de tumulte
+1237268,Conduit sacré
+1242853,Récolte d’âmes
+1284536,Dessein sacré
+1289681,Exaltation sanguinaire
+1293241,Invocation de faucon
+1293695,Marque démoniaque
+1309631,Esprit vif
+1309950,Contagion dévorante
+1309957,Précision sacrée
+1309969,Puissance de la Lumière
+1310076,Trépas prématuré
+1310222,Frappe transperçante
+1310315,Coups déchaînés
+1310317,Avant-garde
+1310496,Discipline de survivaliste
+1310532,Exposition de proie
+1310533,Frappes lacérantes
+1310627,Tranchant de prédateur
+1310661,Morsures et piqûres améliorées
+1310697,Exposer l’armure amélioré
+1310710,Attaque sournoise améliorée
+1310711,Exécution parfaite
+1310721,Mille coupures
+1310735,Effet de lumière
+1310897,Voix de la vérité
+1310899,Révérence
+1310904,Précision divine
+1310905,Terre consacrée
+1310909,Vigile de Lumière
+1311015,Rempart de templier
+1311033,Credo de fer
+1311074,Jugement sanctifié
+1311084,Champion de la lumière
+1311085,Instrument de la loi
+1311087,Sentence sacrée
+1314103,Sceau de fureur amélioré
+1316697,Calvaire
+1317006,Litanie de Lumière
+1317257,Coup de trotteur
+6141,Blizzard
+8427,Blizzard
+10185,Blizzard
+10186,Blizzard
+10187,Blizzard
+1279949,Blizzard
+1279976,Blizzard
+1279977,Blizzard
+1279978,Blizzard
+1279979,Blizzard
+1279980,Blizzard
+9452,Justification
+440667,Justification
+5302,Posture défensive
+205,Eclair de givre
+837,Eclair de givre
+7322,Eclair de givre
+8406,Eclair de givre
+8407,Eclair de givre
+8408,Eclair de givre
+10179,Eclair de givre
+10180,Eclair de givre
+10181,Eclair de givre
+25304,Eclair de givre
+8492,Cône de froid
+10159,Cône de froid
+10160,Cône de froid
+10161,Cône de froid
+865,Nova de givre
+6131,Nova de givre
+10230,Nova de givre
+143,Boule de feu
+145,Boule de feu
+3140,Boule de feu
+8400,Boule de feu
+8401,Boule de feu
+8402,Boule de feu
+10148,Boule de feu
+10149,Boule de feu
+10150,Boule de feu
+10151,Boule de feu
+25306,Boule de feu
+7300,Armure de givre
+7301,Armure de givre
+7302,Armure de glace
+7320,Armure de glace
+10219,Armure de glace
+10220,Armure de glace
+12299,Résistance
+16252,Résistance
+20143,Résistance
+14521,Méditation
+16089,Fureur élémentaire
+16178,Purification
+1310705,Estropier
+1310706,Estropier
+1310707,Estropier
+8437,Explosion des arcanes
+8438,Explosion des arcanes
+8439,Explosion des arcanes
+10201,Explosion des arcanes
+10202,Explosion des arcanes
+12317,Enrager
+12880,Enrager
+1310687,Tir de précision
+19503,Flèche de dispersion
+2121,Choc de flammes
+8422,Choc de flammes
+8423,Choc de flammes
+10215,Choc de flammes
+10216,Choc de flammes
+1279983,Choc de flammes
+1279985,Choc de flammes
+1279987,Choc de flammes
+1279988,Choc de flammes
+1279989,Choc de flammes
+1279990,Choc de flammes
+2137,Trait de feu
+2138,Trait de feu
+8412,Trait de feu
+8413,Trait de feu
+10197,Trait de feu
+10199,Trait de feu
+400616,Trait de feu
+400618,Trait de feu
+400619,Trait de feu
+400620,Trait de feu
+400621,Trait de feu
+400622,Trait de feu
+400623,Trait de feu
+8444,Brûlure
+8445,Brûlure
+8446,Brûlure
+10205,Brûlure
+10206,Brûlure
+10207,Brûlure
+13705,Précision
+20189,Précision
+1225295,Précision
+11119,Enflammer
+412538,Enflammer
+16934,Férocité
+19168,Réflexes éclairs
+5144,Projectiles des arcanes
+5145,Projectiles des arcanes
+7268,Projectiles des arcanes
+7269,Projectiles des arcanes
+7270,Projectiles des arcanes
+8416,Projectiles des arcanes
+8417,Projectiles des arcanes
+8418,Projectiles des arcanes
+8419,Projectiles des arcanes
+10211,Projectiles des arcanes
+10212,Projectiles des arcanes
+10273,Projectiles des arcanes
+10274,Projectiles des arcanes
+25345,Projectiles des arcanes
+25346,Projectiles des arcanes
+14251,Riposte
+17063,Focalisation de la nature
+11124,Puissance du feu
+14524,Spécialisation Baguette
+22782,Armure du mage
+22783,Armure du mage
+7321,Transi
+12484,Transi
+18459,Incinération
+16909,Vengeance
+20049,Vengeance
+20050,Vengeance
+19559,Science des chemins
+15487,Silence
+18498,Silence
+12809,Bourrasque
+19577,Intimidation
+24394,Intimidation
+1224782,Coup tordu
+11189,Protection contre le Givre
+17804,Siphon d’âme
+1282733,Fulgurance
+23922,Heurt de bouclier
+19184,Piège
+12294,Frappe mortelle
+20925,Bouclier sacré
+17106,Renvoi
+12323,Hurlement perçant
+400573,Déflagration des arcanes
+400574,Déflagration des arcanes
+1239696,Déflagration des arcanes
+1239697,Déflagration des arcanes
+1239699,Déflagration des arcanes
+1239700,Déflagration des arcanes
+1312934,Sillage de feu
+12355,Impact
+13018,Vague explosive
+13019,Vague explosive
+13020,Vague explosive
+13021,Vague explosive
+28682,Combustion
+12579,Froid hivernal
+12505,Explosion pyrotechnique
+12522,Explosion pyrotechnique
+12523,Explosion pyrotechnique
+12524,Explosion pyrotechnique
+12525,Explosion pyrotechnique
+12526,Explosion pyrotechnique
+18809,Explosion pyrotechnique
+12834,Blessures profondes
+20111,Spécialisation Arme 2M
+1290261,Maître d’armes
+23694,Brise-genou amélioré
+16254,Anticipation
+20096,Anticipation
+20150,Spécialisation Bouclier
+1310318,Spécialisation Bouclier
+1310925,Spécialisation Bouclier
+12966,Rafale
+16256,Rafale
+16257,Rafale
+12964,Colère déchaînée
+16246,Idées claires
+18174,Suppression
+20210,Illumination
+12976,Dernier rempart
+18350,Faux déclencheur
+13960,Taillader et trancher
+16462,Déviation
+19295,Déviation
+20060,Déviation
+23584,Spécialisation Ambidextrie
+30918,Sprint amélioré
+13977,Initiative
+15250,Préparatifs
+14157,Némésis
+14893,Inspiration
+23455,Nova sacrée
+15258,Tissage de l'ombre
+15269,Aveuglement
+15326,Aveuglement
+15271,Connexion spirituelle
+16493,Empaler
+17116,Rapidité de la nature
+16488,Folie sanguinaire
+16886,Grâce de la nature
+16958,Blood Frenzy
+16959,Blood Frenzy
+24932,Chef de la meute
+427712,Pandémie
+1293817,Conflagration
+18093,Pyroclasme
+18119,Conséquences
+25228,Lien spirituel
+19229,Coupure d'ailes améliorée
+412758,Incinérer
+19410,Trait de choc amélioré
+19615,Frénésie
+19621,Frénésie
+1299346,Aura de précision
+24406,Guérison du familier améliorée
+1238122,Charge farouche
+20924,Consécration
+1280349,Consécration
+20128,Redoute
+20178,Rétribution
+20424,Sceau d'autorité
+20467,Jugement d'autorité
+1311604,Horion sacré
+1311605,Horion sacré
+1311606,Horion sacré
+27827,Esprit de rédemption
+408490,Explosion de lave
+408521,Remous
+417141,Berserk
+1310316,Maîtrise de la défense
+23785,Maître démonologue
+1310703,Toxine
+27813,Rétablissement béni
+30165,Dévastation élémentaire
+30894,Sens amplifiés
+401859,Prière de guérison
+401877,Prière de guérison
+401880,Prière de guérison
+426065,Imprégnation de lumière
+437063,Imprégnation de lumière
+400589,Barrage de projectiles
+400625,Bonne série
+1240044,Javelot de glace
+1240045,Javelot de glace
+1240046,Javelot de glace
+1240047,Javelot de glace
+1312002,Javelot de glace
+400669,Doigts de givre
+1237312,Éclair de givrefeu
+1237313,Éclair de givrefeu
+402261,Pénitence
+402277,Pénitence
+402284,Pénitence
+402289,Pénitence
+1310236,Rage infinie
+408255,Éclipse
+408505,Arme du Maelström
+408511,Bouclier d’eau
+415370,Loup solitaire
+415407,Tueur rapide
+417053,Réaction naturelle
+462707,Coupe-gorge
+462708,Coupe-gorge
+431624,Égide divine
+1242688,Ingéniosité
+440873,Décimation
+1310949,Malveillance
+1241057,Interruption
+1310994,Jugement rapide
+1299448,Frappes rapides
+1235316,Égide démoniaque
+1293816,Ombre
+1223081,Genèse
+1238289,Lien terrestre
+1238931,Frappe-tempête amélioré
+1242512,Recouvrement rapide
+1310728,Quiétus
+1289682,Exaltation sanguinaire
+1293248,Invocation de faucon
+1312639,Invocation de faucon
+1293696,Marque démoniaque
+1310726,Exposition de proie
+1310536,Frappes lacérantes
+1310723,Mille coupures
+1310911,Vigile de Lumière
+1310912,Vigile de Lumière
+1310914,Vigile de Lumière
+1311034,Credo de fer
