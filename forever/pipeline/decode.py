@@ -87,6 +87,18 @@ def load_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]
     return {key: list(read_table(csv_dir / rel, key.rsplit("/", 1)[-1])) for key, rel in files}
 
 
+def fetch_list(rules: Mapping[str, Any]) -> tuple[list[str], dict[str, list[str]]]:
+    """(tables enUS, tables par autre locale) à télécharger : celles du Mage (`tables`, `localized_tables`) puis
+    celles des 9 classes (`class_tables`, `localized_class_tables`, PV1), sans doublon, dans l'ordre des règles."""
+    raise NotImplementedError
+
+
+def load_class_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]:
+    """Tables du Mage et des 9 classes lues dans `csv_dir/<locale>/<Table>.csv` (CsvMissingError si un fichier
+    manque, DataSchemaError si une colonne manque)."""
+    raise NotImplementedError
+
+
 class _Client:
     """Index des tables du client et évaluation des points d'effet."""
 
@@ -344,6 +356,15 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "desc : gabarit d'infobulle du client ; spellIds : sort unique du nœud (le client n'a pas un sort par rang).",
         ],
     }
+
+
+def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
+    """Contenu de `classes.json` (PV1) : pour chacune des 9 classes (`classes` des règles), identifiant et jeton du
+    client, arbre de traits, trois arbres de talents (nom de la ligne de compétence de l'onglet), talents avec leur
+    nœud (`node_id`), palier, colonne, rangs, prérequis (nœud), sort et description du client ; nœuds hors grille
+    listés non résolus (`unresolved_nodes`, jamais arrondis), doublons périmés écartés (`dropped_nodes`, règle
+    `shared_spell`), contrôle de l'ordre des onglets (`tree_checks`)."""
+    raise NotImplementedError
 
 
 # --- Sorts ---------------------------------------------------------------------------------------

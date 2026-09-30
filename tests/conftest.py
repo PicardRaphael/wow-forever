@@ -201,6 +201,7 @@ def corrupt_manifest(data_dir: Path, kind: str = "tronque") -> None:
 
 # Extraits des tables du client (voir son README.md) : relevés sur 1.60.1.70009, identiques en 1.60.1.70124.
 WAGO_70009 = FIXTURES / "wago" / PREVIOUS_VERSION
+WAGO_70124 = FIXTURES / "wago" / LOCAL_VERSION  # 9 classes (PV1)
 
 
 def read_json(path: Path) -> Any:
@@ -230,6 +231,14 @@ def client_tables(decode_rules: Any) -> Any:
     from forever.pipeline.decode import load_tables
 
     return load_tables(WAGO_70009, decode_rules)
+
+
+@pytest.fixture(scope="session")
+def class_tables(decode_rules: Any) -> Any:
+    """Tables typées des fixtures wago 1.60.1.70124 : Mage et 9 classes (PV1)."""
+    from forever.pipeline.decode import load_class_tables
+
+    return load_class_tables(WAGO_70124, decode_rules)
 
 
 @pytest.fixture(scope="session")
