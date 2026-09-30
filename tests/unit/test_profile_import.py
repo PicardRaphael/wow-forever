@@ -200,9 +200,10 @@ def test_client_build_attached_per_snapshot_and_session(deps, sv, log1_only):
     assert char(deps, "Moi")["fields"]["level"]["client_build"] == "1.60.1.70009"  # 13:33:20 UTC
     assert char(deps, "Traqueur")["fields"]["level"]["client_build"] == "1.60.1.70124"  # 14:40 UTC
     # Classe venue du journal seul : version de la session (dernier événement vu).
-    first = planned_char(plan_import(deps, sv_dir=None, logs_dir=log1_only, utc_offset=OFFSET), "Moi")
+    fresh = replace(deps, profile_path=deps.profile_path.with_name("journal-seul.json"))  # profil vide
+    first = planned_char(plan_import(fresh, sv_dir=None, logs_dir=log1_only, utc_offset=OFFSET), "Moi")
     assert first["fields"]["class"]["client_build"] == "1.60.1.70009"  # 14:55:24 locale, 12:55:24 UTC
-    both = planned_char(plan_import(deps, sv_dir=None, logs_dir=LOGS, utc_offset=OFFSET), "Moi")
+    both = planned_char(plan_import(fresh, sv_dir=None, logs_dir=LOGS, utc_offset=OFFSET), "Moi")
     assert both["fields"]["class"]["client_build"] == "1.60.1.70124"  # 16:48:23 locale, 14:48:23 UTC
 
 

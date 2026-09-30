@@ -100,9 +100,9 @@ def test_mage_part_matches_spells_json(doc, decode_rules):
     mage = doc["classes"]["Mage"]["spells"]
     for key in decode_rules["spells"]:
         ref = reference["spells"][key]
-        (spell,) = [s for s in mage.values() if s["name"] == ref["name"]]
+        (spell,) = [s for s in mage.values() if s["name"] == decode_rules["spells"][key]]
         ranked = [r for r in spell["ranks"] if r["rank"] is not None]
-        assert [r["spell_id"] for r in ranked] == ref["spell_ids"], key
+        assert [r["spell_id"] for r in ranked] == ref["source"]["rank_spell_ids"], key
         for got, row in zip(ranked, ref["ranks"], strict=True):
             want = dict(zip(fields, row, strict=True))
             cost = got["cost"]

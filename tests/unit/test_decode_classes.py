@@ -122,9 +122,9 @@ def test_mage_part_matches_talents_json(doc):
                 r["tier"],
                 r["col"],
                 r["max"],
-                r["desc"],
+                r["source"]["client_desc"],
             )
-            assert g["spell_id"] == r["spellIds"][0]
+            assert g["spell_id"] == r["source"]["client_spell_ids"][0]
             prereq = None if g["prereq"] is None else {"tier": g["prereq"]["tier"], "col": g["prereq"]["col"]}
             assert prereq == r["prereq"]
     assert mage["unresolved_nodes"] == []
