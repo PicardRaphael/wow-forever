@@ -198,3 +198,26 @@ def test_windows_list_long_opponent_cooldowns(data):
     assert sheet["windows"]
     cooldowns = [w["cooldown_s"]["value"] for w in sheet["windows"]]
     assert all(cd >= threshold for cd in cooldowns) and cooldowns == sorted(cooldowns, reverse=True)
+
+
+def test_values_come_from_the_rank_known_at_the_level(data):
+    """Relecture de PV1 : à un niveau donné, durée, durée PvP et recharge viennent du rang connu à ce niveau (pas du
+    rang le plus haut), sauf pour un effet porté par un sort déclenché (`via`)."""
+    low = min(
+        r["level"]
+        for s in data.read_json("classes.json")["classes"]["Paladin"]["spells"].values()
+        if s["name"] == "Hammer of Justice"
+        for r in s["ranks"]
+        if r["level"]
+    )
+    sheet = class_sheet(data, "Paladin", low)
+    hammer = by_name(sheet["controls"], "Hammer of Justice")
+    assert (
+        ".ranks[0]" in hammer["duration_s"]["from"]
+        and resolve(hammer["duration_s"]["from"]) == hammer["duration_s"]["value"]
+    )
+    for section in ("controls", "defensives", "interrupts", "bursts"):
+        for item in sheet[section]:
+            if item.get("via") is None:
+                for field in ("duration_s", "pvp_duration_s", "cooldown_s"):
+                    assert ".ranks[" in item[field]["from"], (item["name"], field)
