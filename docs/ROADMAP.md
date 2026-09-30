@@ -198,7 +198,7 @@ plugin en 0.4.3. Rejeu des builds de T05 identique à celui de T06b (`docs/resea
 ## PV1 — Profil automatique, puis PvP : savoir des 9 classes (priorité haute)
 **Fait le 2026-09-30** (plan `tasks/PV1-plan.md`, rapport de données `docs/research/data-1.60.1.70124-r2.md`,
 corrections de tests `tasks/PV1-corrections.md`) : `forever profile import` (ForeverLogger, journaux, Questie,
-Auctionator ; profil de schéma 2) ; 1.60.1.70124 en révision 2 (`classes.json`, `races.json`, `pvp_items.json`,
+Auctionator ; profil de schéma 2) ; 1.60.1.70124 en révision 2, puis 3 après relecture (sens des dissipations) (`classes.json`, `races.json`, `pvp_items.json`,
 `pvp_rules.json`, `racials.json` retiré, copie figée `_seed_racials.json`) ; rendements décroissants (registre K1 à
 K4) ; `forever pvp class`, `forever pvp matchup`, `forever_lookup(kind="pvp")` ; légalité des builds des 9 classes
 (`forever talents check`, `kind="build_check"`) ; plugin 0.5.0 (`forever-pvp`, `forever-builds`). Rejeu des builds

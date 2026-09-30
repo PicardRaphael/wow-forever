@@ -26,7 +26,7 @@ from typing import Any, TypedDict
 from forever.config import Deps
 from forever.engine.talents import check_build, check_class_build
 from forever.errors import DataSchemaError, InvalidArgumentError
-from forever.gamedata import RACES_FILE, RACIALS_FILE, build_game_data, mage_races
+from forever.gamedata import RACES_FILE, RACIALS_FILE, SEED_RACIALS_FILE, build_game_data, mage_races
 from forever.provenance import Provenance, local_provenance
 from forever.store import current_identity, load_version
 from forever.timefmt import format_utc
@@ -223,9 +223,16 @@ def _mage_errors(deps: Deps, c: Mapping[str, Any]) -> list[tuple[str, str]]:
     """Erreurs (message, action) de race, de talents et de niveau d'un Mage contre les données courantes."""
     data = load_version(deps)
     races = mage_races(data)
+    accepted = set(races)
+    if (
+        data.path / RACES_FILE
+    ).is_file():  # jeton du client (ForeverLogger) et noms de l'ancien relevé (profils d'avant PV1)
+        accepted |= {r["client_file"] for r in data.read_json(RACES_FILE)["races"].values() if "Mage" in r["classes"]}
+        if (data.path / SEED_RACIALS_FILE).is_file():
+            accepted |= set(data.read_json(SEED_RACIALS_FILE)["races"])
     source = RACES_FILE if (data.path / RACES_FILE).is_file() else RACIALS_FILE
     race = c.get("race")
-    if race is not None and race not in races:
+    if race is not None and race not in accepted:
         close = difflib.get_close_matches(race, races, n=3, cutoff=0.5)
         hint = f"proches : {', '.join(close)}" if close else f"choisir parmi {', '.join(races)}"
         return [(f"Race inconnue « {race} » pour un Mage.", f"{hint} ({source})")]

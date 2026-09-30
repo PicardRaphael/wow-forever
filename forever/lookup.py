@@ -341,6 +341,8 @@ def lookup_class_talent(deps: Deps, cls: str, name: str) -> dict[str, Any]:
     colonne, points exigés, prérequis, rangs, description du client, provenance (PV1, bloc E).
 
     Registre : G3"""
+    from forever.engine.talents import tier_points_required
+
     cls_name, knowledge, gd = _class_knowledge(deps, cls)
     entries = {t["key"]: t for tree in knowledge.trees for t in tree["talents"]}
     index = {_talent_key(k): k for k in entries} | {_talent_key(t["name"]): k for k, t in entries.items()}
@@ -372,7 +374,7 @@ def lookup_class_talent(deps: Deps, cls: str, name: str) -> dict[str, Any]:
         "tier": tier,
         "col": t["col"],
         "node_id": t["node_id"],
-        "required_tree_points": gd.constants.talents.points_per_tier * (tier - 1) if tier else None,
+        "required_tree_points": tier_points_required(gd, tier) if tier else None,
         "prereqs": [
             {"id": by_node[p["node_id"]]["key"], "name": by_node[p["node_id"]]["name"], "kind": p["kind"]}
             for p in t["prereqs"]
@@ -397,7 +399,7 @@ def check_talents(deps: Deps, cls: str, talents: dict[str, int], level: int) -> 
     pris (PV1, bloc E).
 
     Registre : G3"""
-    from forever.engine.talents import check_class_build
+    from forever.engine.talents import check_class_build, points_available
 
     cls_name, knowledge, gd = _class_knowledge(deps, cls)
     rules = gd.constants.talents
@@ -431,7 +433,7 @@ def check_talents(deps: Deps, cls: str, talents: dict[str, int], level: int) -> 
         "errors": errors,
         "points": {
             "spent": sum(max(0, r) for r in talents.values()),
-            "available": max(0, level - (rules.first_level - 1)),
+            "available": points_available(gd, level),
             "by_tree": by_tree,
         },
         "talents": taken,

@@ -166,9 +166,12 @@ def check_class_build(
         )
         if before < per_tier * (tier - 1):
             err.append(f"{t['name']} (palier {tier}) exige {per_tier * (tier - 1)} points avant, {before} dépensés")
+        strange = [p for p in t["prereqs"] if p["kind"] not in ("required", "sufficient")]
+        if strange:
+            err.append(f"{t['name']} : prérequis de type inconnu ({strange[0]['kind']}), légalité non décidable")
         required = [by_node[p["node_id"]] for p in t["prereqs"] if p["kind"] == "required" and p["node_id"] in by_node]
         sufficient = [
-            by_node[p["node_id"]] for p in t["prereqs"] if p["kind"] != "required" and p["node_id"] in by_node
+            by_node[p["node_id"]] for p in t["prereqs"] if p["kind"] == "sufficient" and p["node_id"] in by_node
         ]
         for p in required:
             if pts.get(p["key"], 0) < p["max"]:

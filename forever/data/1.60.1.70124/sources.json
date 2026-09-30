@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-09-30)",
+      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-09-30)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-09-30)",
+      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-09-30)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -172,7 +172,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 2 (forever install, 2026-09-30)"
+        "installé en révision 3 (forever install, 2026-09-30)"
       ]
     },
     "races.json": {
@@ -200,10 +200,10 @@
         "certitude mixte (FC et PC) : la plus basse est retenue ; détail par entrée dans le fichier",
         "hérité de 1.60.1.70009",
         "copie figée de racials.json (retired_files de decode_rules.json)",
-        "hérité de 1.60.1.70124",
-        "installé en révision 2 (forever install, 2026-09-30)"
+        "installé en révision 2 (forever install, 2026-09-30)",
+        "copie figée du relevé communautaire de 1.60.1.70009 (racials.json), reportée à la révision 2"
       ],
-      "inherited_from": "1.60.1.70124"
+      "inherited_from": "1.60.1.70009"
     },
     "pvp_rules.json": {
       "source": "Règles serveur des rendements décroissants de WoW Classic (1.12) : émulateur vmangos, forum Blizzard (2019), liste « Not a Bug » de Classic, wiki communautaire ; aucune annonce de WoW Forever à ce sujet au 2026-09-30 (notes de la bêta du 2026-09-24). Recherche du sous-agent forever-web-researcher du 2026-09-30, autorisée par l'utilisateur (PV1, D3).",
@@ -213,6 +213,6 @@
       ]
     }
   },
-  "revision": 2,
+  "revision": 3,
   "revised_at": "2026-09-30"
 }

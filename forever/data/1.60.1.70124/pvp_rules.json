@@ -34,7 +34,7 @@
     "https://us.forums.blizzard.com/en/wow/t/classic-pvp-cc-duration-and-diminishing-returns/200700",
     "https://www.warcrafttavern.com/tbc/guides/diminishing-returns/"
    ],
-   "note": "point de départ de la fenêtre : fin de l'effet précédent (forum 2019, warcraftTavern) ; le commentaire de vmangos parle de l'instant du dernier coup (application) : question ouverte"
+   "note": "point de départ de la fenêtre : fin de l'effet précédent (forum 2019, warcraftTavern) ; le commentaire de vmangos parle de l'instant du dernier coup (application) : question ouverte ; une application en immunité relance aussi la fenêtre (choix supposé : répéter le contrôle prolonge l'immunité ; question ouverte)"
   },
   "pvp_duration_cap_s": {
    "value": 10,

@@ -86,9 +86,11 @@ def class_spell_index(data: VersionData) -> dict[int, str]:
 
 
 def _utc_of_local(when: datetime, offset: timedelta | None) -> datetime:
-    """Heure locale du client (sans fuseau) ramenée en UTC (décalage donné, sinon celui du système)."""
-    shift = offset if offset is not None else datetime.now().astimezone().utcoffset() or timedelta()
-    return when.replace(tzinfo=UTC) - shift
+    """Heure locale du client (sans fuseau) ramenée en UTC : décalage donné, sinon celui du système **à cette date**
+    (heure d'été ou d'hiver du journal, pas de l'import)."""
+    if offset is None:
+        return when.astimezone(UTC)
+    return when.replace(tzinfo=UTC) - offset
 
 
 class _Stamper:

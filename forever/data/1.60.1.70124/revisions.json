@@ -2472,6 +2472,39 @@
      "rule": "added_file"
     }
    ]
+  },
+  {
+   "revision": 3,
+   "date": "2026-09-30",
+   "motif": "PV1 (relecture) : sens des dissipations (allié ou ennemi) dans le classement PvP de classes.json",
+   "command": "forever install <cache>/candidates/1.60.1.70124 --yes",
+   "candidate": {
+    "path": "<cache>/candidates/1.60.1.70124",
+    "data_sha": "256252671a48"
+   },
+   "report": "docs/research/data-1.60.1.70124-r3.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 0,
+    "added_file": 0,
+    "replaced_file": 1,
+    "retired_file": 0
+   },
+   "changes": [
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": "f46e560a920b",
+     "after": "74460f876a4f",
+     "source": "Client 1.60.1.70124 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    }
+   ]
   }
  ]
 }

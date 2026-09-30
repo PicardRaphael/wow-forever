@@ -84,7 +84,7 @@ def test_manifest_content():
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert v["revision"] == 2 and v["revised_at"] == "2026-09-30"  # PV1 : révision 2 (9 classes, raciaux du client)
+    assert v["revision"] == 3 and v["revised_at"] == "2026-09-30"  # PV1 : r2 (9 classes, raciaux), r3 (dissipations)
     assert (
         len(v["files"]) == 21  # PV1, bloc C : pvp_rules.json
         and "racials.json" not in v["files"]

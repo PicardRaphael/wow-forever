@@ -44,6 +44,7 @@ _FOREVER_AGENT = re.compile(r"^(?:forever:)?forever-[\w-]+$")
 # Session de travail sur le dépôt (skills du projet, commandes) : le contrôle des chiffres ne s'y applique jamais.
 _WORK_SKILL = re.compile(r"^(?:[\w-]+:)?(?:tranche|verifier)$")
 _WORK_COMMAND = re.compile(r"<command-name>/?(?:tranche|verifier)</command-name>")
+_GAME_COMMAND = re.compile(r"<command-name>/?(?:forever:)?forever-[\w-]+</command-name>")
 _EPS = 1e-9
 # Entier affiché avec des zéros finals (20, 12 300) : lu comme un arrondi à la dizaine, à la centaine…, écart borné à
 # cette fraction de la valeur (paramètre de l'outil). « 20 » accepte ainsi une valeur d'outil entre 19 et 21.
@@ -181,7 +182,13 @@ def session_is_game_answer(lines: Iterable[Mapping[str, Any]]) -> bool:
     uses = list(_tool_uses(all_lines))
     if any(_is_work_marker({}, u) for u in uses):
         return False
-    return any(_is_game_skill(u) for u in uses)
+    commands = any(
+        _GAME_COMMAND.search(text)
+        for line in all_lines
+        if line.get("type") == "user"
+        for text in _texts(_user_content(line))
+    )
+    return commands or any(_is_game_skill(u) for u in uses)
 
 
 def _values(obj: Any) -> Iterator[float]:

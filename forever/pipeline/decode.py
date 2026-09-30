@@ -649,7 +649,10 @@ def _own_roles(client: _Client, index: _ClassIndex, spell: int, rules: Mapping[s
         if effect == spec["dispel_mechanic_effect"] and misc in cc:
             roles["cc_break"].append(("dissipation", misc))
         if effect == spec["dispel_effect"]:
-            roles["dispel"].append(misc)
+            if targets & hostile:
+                roles["dispel"].append((misc, "ennemi"))
+            if targets & friendly:
+                roles["dispel"].append((misc, "allié"))
         if effect == spec["interrupt_effect"]:
             roles["interrupt"].append(True)
         if str(effect) in spec["mobility_effects"]:
@@ -738,8 +741,13 @@ def _classify(
         elif kind == "interrupt":
             detail = {"lockout_s": rank["duration_s"], "via": via}
         elif kind == "dispel":
-            types = sorted(set(roles["dispel"]))
-            detail = {"types": types, "type_names": [index.dispels.get(t, "") for t in types], "via": via}
+            types = sorted({t for t, _ in roles["dispel"]})
+            detail = {
+                "types": types,
+                "type_names": [index.dispels.get(t, "") for t in types],
+                "targets": sorted({d for _, d in roles["dispel"]}),
+                "via": via,
+            }
         elif kind == "mobility":
             detail = {"types": list(dict.fromkeys(roles["mobility"])), "via": via}
         else:

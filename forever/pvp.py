@@ -32,7 +32,7 @@ SECTIONS = {
 }
 RANK_FIELDS = ("cooldown_s", "duration_s", "pvp_duration_s", "cast_s")
 # Interprétations des champs du client par la table des règles (classement, masque de rupture, verrouillage).
-INTERPRETED_FIELDS = ("types", "breaks_on_damage", "lockout_s", "how")
+INTERPRETED_FIELDS = ("types", "breaks_on_damage", "lockout_s", "how", "targets")
 SNARE_TYPES = ("ralentissement",)  # libellé de pvp_classification.control_auras : pas un contrôle diminué
 LIMIT = (
     "Aucun suivi en direct des recharges adverses : le journal de combat est refusé aux addons sur Forever et les "
@@ -235,9 +235,13 @@ def matchup(
     long_cd = ((rules.get("sheets") or {}).get("long_cooldown_s") or {}).get("value")
     missing = [*me["missing"], *(f"adversaire : {m}" for m in them["missing"])]
     race = mine.get("race")
-    racials = [r for r in me["racials"] if race is not None and r["race"] == race]
+    races = data.read_json(RACES_FILE)["races"]
+    race_name = next((n for n, r in races.items() if race in (n, r["client_file"], r["name_fr"])), None)
+    racials = [r for r in me["racials"] if race_name is not None and r["race"] == race_name]
     if race is None:
         missing.append("race inconnue : raciaux non retenus")
+    elif race_name is None:
+        missing.append(f"race « {race} » absente de races.json : raciaux non retenus")
     casts = []
     for key, spell in (their_raw.get("spells") or {}).items():
         index = _rank_index(spell, opponent.get("level"))
@@ -247,8 +251,12 @@ def matchup(
         if rank["cast_s"]:
             path = f"{CLASSES_FILE}:classes.{them['class']}.spells.{key}.ranks[{index}].cast_s"
             casts.append({"key": key, "name": spell["name"], "cast_s": _value(rank["cast_s"], path, "certain")})
-    my_dispel_types = {t for d in me["dispels"] for t in d["types"]["value"]}
-    their_dispel_types = {t for d in them["dispels"] for t in d["types"]["value"]}
+
+    def dispel_types(sheet: Mapping[str, Any], direction: str) -> set[int]:
+        return {t for d in sheet["dispels"] if direction in d["targets"]["value"] for t in d["types"]["value"]}
+
+    my_dispel_types = dispel_types(me, "ennemi")  # mes dissipations offensives : ses buffs
+    their_dispel_types = dispel_types(them, "allié")  # ses dissipations amies : mes contrôles sur lui ou ses alliés
 
     def dispellable(items: Sequence[dict[str, Any]], types: set[int]) -> list[dict[str, Any]]:
         return [i for i in items if i["dispel_type"]["value"] in types]
@@ -345,13 +353,14 @@ def compact(report: Mapping[str, Any], *, detail: bool = False, limit: int = 20,
     liste dans `totals` ; `detail=False` : valeurs sans leur chemin."""
     totals: dict[str, int] = {}
 
-    def cut(node: Any, name: str | None = None) -> Any:
+    def cut(node: Any, path: str = "") -> Any:
+        name = path.rsplit(".", 1)[-1]
         if isinstance(node, dict):
             if set(node) == {"value", "from", "certainty"}:
                 return node if detail else node["value"]
-            return {k: cut(v, k) for k, v in node.items()}
+            return {k: cut(v, f"{path}.{k}" if path else k) for k, v in node.items()}
         if isinstance(node, list) and name in _LISTS:
-            totals[name] = len(node)
+            totals[path] = len(node)  # chemin complet : answers.cc_breaks et their_answers.cc_breaks distincts
             return [cut(v) for v in node[offset : offset + limit]]
         if isinstance(node, list):
             return [cut(v) for v in node]

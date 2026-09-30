@@ -9880,6 +9880,9 @@
        "type_names": [
         "Magic"
        ],
+       "targets": [
+        "ennemi"
+       ],
        "via": null
       }
      },
@@ -12226,6 +12229,9 @@
         "Disease",
         "Poison"
        ],
+       "targets": [
+        "allié"
+       ],
        "via": null
       }
      },
@@ -12434,6 +12440,9 @@
         "Magic",
         "Disease",
         "Poison"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -28479,20 +28488,9 @@
       }
      ],
      "pvp": {
-      "kinds": [
-       "dispel"
-      ],
+      "kinds": [],
       "certainty": "probable",
-      "via": [],
-      "dispel": {
-       "types": [
-        7
-       ],
-       "type_names": [
-        "All(M+C+D+P)"
-       ],
-       "via": null
-      }
+      "via": []
      },
      "certainty": "FC-1.60.1.70124"
     },
@@ -29617,6 +29615,9 @@
        ],
        "type_names": [
         "Frenzy"
+       ],
+       "targets": [
+        "ennemi"
        ],
        "via": null
       }
@@ -49908,20 +49909,9 @@
       }
      ],
      "pvp": {
-      "kinds": [
-       "dispel"
-      ],
+      "kinds": [],
       "certainty": "probable",
-      "via": [],
-      "dispel": {
-       "types": [
-        1
-       ],
-       "type_names": [
-        "Magic"
-       ],
-       "via": null
-      }
+      "via": []
      },
      "certainty": "FC-1.60.1.70124"
     },
@@ -49967,6 +49957,9 @@
        ],
        "type_names": [
         "Disease"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -50015,6 +50008,9 @@
        ],
        "type_names": [
         "Disease"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -62129,6 +62125,9 @@
        "type_names": [
         "Magic"
        ],
+       "targets": [
+        "ennemi"
+       ],
        "via": null
       }
      },
@@ -62526,6 +62525,9 @@
        ],
        "type_names": [
         "Poison"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -62942,6 +62944,9 @@
        ],
        "type_names": [
         "Disease"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -73714,6 +73719,9 @@
        ],
        "type_names": [
         "Curse"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -95704,20 +95712,9 @@
       }
      ],
      "pvp": {
-      "kinds": [
-       "dispel"
-      ],
+      "kinds": [],
       "certainty": "probable",
-      "via": [],
-      "dispel": {
-       "types": [
-        1
-       ],
-       "type_names": [
-        "Magic"
-       ],
-       "via": null
-      }
+      "via": []
      },
      "certainty": "FC-1.60.1.70124",
      "pet_families": [
@@ -98857,6 +98854,9 @@
        "type_names": [
         "Curse"
        ],
+       "targets": [
+        "allié"
+       ],
        "via": null
       }
      },
@@ -98904,6 +98904,9 @@
        ],
        "type_names": [
         "Poison"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -99239,6 +99242,9 @@
        ],
        "type_names": [
         "Poison"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }
@@ -101210,6 +101216,9 @@
        ],
        "type_names": [
         "Poison"
+       ],
+       "targets": [
+        "allié"
        ],
        "via": null
       }

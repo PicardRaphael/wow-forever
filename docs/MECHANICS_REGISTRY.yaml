@@ -1620,4 +1620,4 @@ mechanics:
       - tests/unit/test_pvp_sheets.py::test_values_come_from_the_rank_known_at_the_level
       - tests/unit/test_pvp_sheets.py::test_windows_list_long_opponent_cooldowns
     tolerance: null
-    note: "modificateurs de talents sur la recharge, la durée et la portée non appliqués ; raciaux passifs (Hardiness…) hors des fiches ; sens ami ou ennemi des dissipations non décodé (dispellable_auras peut lister une dissipation amie) ; sorts non interruptibles non filtrés ; toucher et résistance des contrôles non modélisés"
+    note: "modificateurs de talents sur la recharge, la durée et la portée non appliqués ; raciaux passifs (Hardiness…) hors des fiches ; sorts non interruptibles non filtrés ; toucher et résistance des contrôles non modélisés"
