@@ -119,7 +119,7 @@ def test_talent_level_22_case():
         assert words in judge, words
 
 
-RESPEC_AT_ANOTHER_LEVEL = ("respec-feu-vers-givre", "respec-troisieme")
+RESPEC_AT_ANOTHER_LEVEL = ("respec-troisieme",)
 
 
 def test_respec_at_another_level_is_planned_from_the_profile_build():
@@ -141,6 +141,29 @@ def test_respec_at_another_level_is_planned_from_the_profile_build():
             assert words in judge, (name, words)
     for name in ("respec-build-precis", "respec-leveling-vers-donjon"):
         assert graders(EVALS / name)["outil"][0]["tool"] == MCP_PREFIX + "forever_build", name
+
+
+def test_respec_whose_question_contradicts_the_profile():
+    """Décision de l'utilisateur du 2026-09-30 : la question l'emporte sur le profil. « Tous mes points en Feu »
+    (profil de test : build Givre) : l'agent signale l'écart, propose la mise à jour du profil, puis demande les rangs
+    exacts en Feu ou suppose, en l'annonçant, le build Feu conseillé au niveau demandé ; le juge accepte les deux."""
+    case = EVALS / "respec-feu-vers-givre"
+    meta, question = front(case / "prompt.md")
+    assert meta["tags"] == ["positif", "respec"] and "Feu" in question  # question gardée telle quelle
+    g = graders(case)
+    assert "planification" not in g and "demande-le-build" not in g
+    assert g["outil"][0] == {"type": "tool_used", "tool": MCP_PREFIX + "forever_player_profile"}
+    judge_meta, judge = g["ecart-profil"]
+    assert judge_meta["type"] == "llm"
+    for words in (
+        "l'emporte sur le profil",
+        "écart",
+        "forever profile set",
+        "rangs exacts",
+        "build Feu conseillé",
+        "les deux",
+    ):
+        assert words in judge, words
 
 
 def test_planned_character_case():
