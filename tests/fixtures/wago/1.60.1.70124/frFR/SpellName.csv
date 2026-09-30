@@ -1,16 +1,60 @@
 ID,Name_lang
 10,Blizzard
+17,Mot de pouvoir : Bouclier
+100,Charge
 116,Eclair de givre
+118,Métamorphose
 120,Cône de froid
 122,Nova de givre
 133,Boule de feu
 168,Armure de givre
+339,Sarments
+370,Expiation
+408,Aiguillon perfide
+475,Délivrance de la malédiction mineure
+519,Loup fantôme
+526,Guérison du poison
+527,Dissipation de la magie
+605,Contrôle mental
+642,Bouclier divin
+663,Peur
+676,Désarmement
+710,Bannir
+853,Marteau de la justice
+871,Mur protecteur
+1022,Bénédiction de protection
+1044,Bénédiction de liberté
+1098,Subjugation de démon
 1449,Explosion des arcanes
+1499,Piège givrant
+1715,Brise-genou
+1719,Témérité
+1766,Coup de pied
+1776,Suriner
+1833,Coup bas
+1850,Célérité
+1953,Transfert
+1988,Flèche de dispersion
+2070,Assommer
+2094,Cécité
 2120,Choc de flammes
 2136,Trait de feu
+2139,Contresort
 2481,Découverte de trésors
+2637,Hibernation
+2782,Délivrance de la malédiction
 2948,Brûlure
+2983,Sprint
+3045,Tir rapide
+3355,Effet Piège givrant
+4086,Evasion
+4511,Changement de phase
+4987,Epuration
+5116,Trait de choc
 5143,Projectiles des arcanes
+5211,Sonner
+5246,Cri d’intimidation
+5484,Hurlement de terreur
 5570,Essaim d'insectes
 5579,Immunité : Immobiliser/Ralentir/Etourdir
 5923,Puissance sacrée
@@ -18,8 +62,21 @@ ID,Name_lang
 6117,Armure du mage
 6136,Transi
 6150,Tirs accélérés
+6346,Gardien de peur
+6358,Séduction
+6552,Volée de coups
 6615,Libre action
+6726,Silence
+6788,Ame affaiblie
+6789,Voile mortel
 7744,Volonté des Réprouvés
+7922,Charge étourdissante
+8042,Horion de terre
+8056,Horion de givre
+8122,Cri psychique
+8177,Totem de Glèbe
+8178,Effet Totem de Glèbe
+8179,Totem de Glèbe (passif)
 9453,Foi inflexible
 9799,Oeil pour oeil
 10060,Infusion de puissance
@@ -211,6 +268,7 @@ ID,Name_lang
 17002,Célérité farouche
 17003,Cœur de fauve
 17007,Chef de la meute
+17012,Dévorer la magie
 17056,Fureur
 17069,Naturaliste
 17074,Rétablissement amélioré
@@ -268,6 +326,7 @@ ID,Name_lang
 19159,Frappes sauvages
 19228,Coupure d'ailes améliorée
 19239,Pièges astucieux
+19244,Verrou magique
 19255,Survivant
 19263,Dissuasion
 19290,Pied sûr
@@ -292,7 +351,9 @@ ID,Name_lang
 19596,Rapidité bestiale
 19598,Ferocité
 19616,Fureur libérée
+19658,Effet dévorer la magie
 19675,Charge farouche
+19801,Tir tranquillisant
 20066,Repentir
 20101,Bénédiction
 20117,Conviction
@@ -325,6 +386,7 @@ ID,Name_lang
 20593,Spécialisation (Ingénierie)
 20598,L'esprit humain
 20600,Perception
+20655,Ecorce
 20711,Esprit de rédemption
 21009,Rapidité (passif)
 22959,Vulnérabilité au Feu
@@ -478,10 +540,35 @@ ID,Name_lang
 1279979,Blizzard
 1279980,Blizzard
 20582,Rapidité
+592,Mot de pouvoir : Bouclier
+600,Mot de pouvoir : Bouclier
+3747,Mot de pouvoir : Bouclier
+6065,Mot de pouvoir : Bouclier
+6066,Mot de pouvoir : Bouclier
+10898,Mot de pouvoir : Bouclier
+10899,Mot de pouvoir : Bouclier
+10900,Mot de pouvoir : Bouclier
+10901,Mot de pouvoir : Bouclier
+11647,Mot de pouvoir : Bouclier
 20549,Choc martial
 9452,Justification
 440667,Justification
 5302,Posture défensive
+6178,Charge
+7370,Charge
+7371,Charge
+11578,Charge
+20508,Charge
+26177,Charge
+26178,Charge
+26179,Charge
+26184,Charge
+26185,Charge
+26186,Charge
+26201,Charge
+26202,Charge
+27685,Charge
+28343,Charge
 205,Eclair de givre
 837,Eclair de givre
 7322,Eclair de givre
@@ -492,6 +579,12 @@ ID,Name_lang
 10180,Eclair de givre
 10181,Eclair de givre
 25304,Eclair de givre
+12824,Métamorphose
+12825,Métamorphose
+12826,Métamorphose
+13323,Métamorphose
+28271,Métamorphose
+28272,Métamorphose
 8492,Cône de froid
 10159,Cône de froid
 10160,Cône de froid
@@ -513,16 +606,54 @@ ID,Name_lang
 25306,Boule de feu
 7300,Armure de givre
 7301,Armure de givre
+1062,Sarments
+5195,Sarments
+5196,Sarments
+9852,Sarments
+9853,Sarments
+11922,Sarments
+8012,Expiation
+25756,Expiation
+8643,Aiguillon perfide
+8644,Aiguillon perfide
+1176,Délivrance de la malédiction mineure
 7302,Armure de glace
 7320,Armure de glace
 10219,Armure de glace
 10220,Armure de glace
+2645,Loup fantôme
+8946,Guérison du poison
+8947,Guérison du poison
+615,Dissipation de la magie
+988,Dissipation de la magie
+627,Contrôle mental
+10911,Contrôle mental
+10912,Contrôle mental
+659,Bouclier divin
+1020,Bouclier divin
+5782,Peur
+6213,Peur
+6215,Peur
+6713,Désarmement
+8994,Bannir
+18647,Bannir
 12299,Résistance
 16252,Résistance
 20143,Résistance
 20555,Régénération
 14521,Méditation
+5588,Marteau de la justice
+5589,Marteau de la justice
+10308,Marteau de la justice
+13005,Marteau de la justice
+15062,Mur protecteur
 16089,Fureur élémentaire
+5599,Bénédiction de protection
+10278,Bénédiction de protection
+442948,Bénédiction de protection
+11725,Subjugation de démon
+11726,Subjugation de démon
+11727,Subjugation de démon
 16178,Purification
 1310705,Estropier
 1310706,Estropier
@@ -532,10 +663,38 @@ ID,Name_lang
 8439,Explosion des arcanes
 10201,Explosion des arcanes
 10202,Explosion des arcanes
+14310,Piège givrant
+14311,Piège givrant
+27753,Piège givrant
 12317,Enrager
 12880,Enrager
+7372,Brise-genou
+7373,Brise-genou
+9080,Brise-genou
+13847,Témérité
+1767,Coup de pied
+1768,Coup de pied
+1769,Coup de pied
+1775,Coup de pied
+1777,Suriner
+8629,Suriner
+11285,Suriner
+11286,Suriner
+12540,Suriner
+6409,Coup bas
+9821,Célérité
+23099,Célérité
+23100,Célérité
+23109,Célérité
+23110,Célérité
+23111,Célérité
+23112,Célérité
+14514,Transfert
 1310687,Tir de précision
 19503,Flèche de dispersion
+6770,Assommer
+11297,Assommer
+21060,Cécité
 2121,Choc de flammes
 8422,Choc de flammes
 8423,Choc de flammes
@@ -560,22 +719,39 @@ ID,Name_lang
 400621,Trait de feu
 400622,Trait de feu
 400623,Trait de feu
+3576,Contresort
+18657,Hibernation
+18658,Hibernation
+2786,Délivrance de la malédiction
 8444,Brûlure
 8445,Brûlure
 8446,Brûlure
 10205,Brûlure
 10206,Brûlure
 10207,Brûlure
+8696,Sprint
+11305,Sprint
+26542,Sprint
+26543,Sprint
 13705,Précision
 20189,Précision
 1225295,Précision
+28755,Tir rapide
 11119,Enflammer
 412538,Enflammer
+14308,Effet Piège givrant
+14309,Effet Piège givrant
+25999,Boutoir
+5277,Evasion
 16934,Férocité
 20574,Spécialisation Hache
 20597,Spécialisation Epée
 1259719,Spécialisation Masse
+4630,Changement de phase
 19168,Réflexes éclairs
+28787,Epuration
+28788,Epuration
+17174,Trait de choc
 5144,Projectiles des arcanes
 5145,Projectiles des arcanes
 7268,Projectiles des arcanes
@@ -591,7 +767,14 @@ ID,Name_lang
 10274,Projectiles des arcanes
 25345,Projectiles des arcanes
 25346,Projectiles des arcanes
+6798,Sonner
+8983,Sonner
+8984,Sonner
 14251,Riposte
+19134,Cri d’intimidation
+20511,Cri d’intimidation
+29544,Cri d’intimidation
+17928,Hurlement de terreur
 17063,Focalisation de la nature
 11124,Puissance du feu
 14524,Spécialisation Baguette
@@ -600,12 +783,19 @@ ID,Name_lang
 7321,Transi
 12484,Transi
 18459,Incinération
+459699,Gardien de peur
+6359,Séduction
+6554,Volée de coups
+12555,Volée de coups
 16909,Vengeance
 20049,Vengeance
 20050,Vengeance
 19559,Science des chemins
 15487,Silence
 18498,Silence
+17925,Voile mortel
+17926,Voile mortel
+28412,Voile mortel
 12809,Bourrasque
 20594,Forme de pierre
 19577,Intimidation
@@ -616,6 +806,21 @@ ID,Name_lang
 18805,Recombobuler
 1282733,Fulgurance
 20550,Endurance
+8044,Horion de terre
+8045,Horion de terre
+8046,Horion de terre
+10412,Horion de terre
+10413,Horion de terre
+10414,Horion de terre
+13281,Horion de terre
+8058,Horion de givre
+10472,Horion de givre
+10473,Horion de givre
+12548,Horion de givre
+8124,Cri psychique
+10888,Cri psychique
+10890,Cri psychique
+13704,Cri psychique
 23922,Heurt de bouclier
 19184,Piège
 20584,Fantôme
@@ -644,6 +849,8 @@ ID,Name_lang
 12525,Explosion pyrotechnique
 12526,Explosion pyrotechnique
 18809,Explosion pyrotechnique
+27619,Bloc de glace
+430952,Pouvoir des arcanes
 12834,Blessures profondes
 20111,Spécialisation Arme 2M
 1290261,Maître d’armes
@@ -669,6 +876,8 @@ ID,Name_lang
 20060,Déviation
 23584,Spécialisation Ambidextrie
 30918,Sprint amélioré
+28752,Poussée d'adrénaline
+28753,Poussée d'adrénaline
 13977,Initiative
 15250,Préparatifs
 14157,Némésis
@@ -685,19 +894,31 @@ ID,Name_lang
 16958,Blood Frenzy
 16959,Blood Frenzy
 24932,Chef de la meute
+19505,Dévorer la magie
+19731,Dévorer la magie
+19734,Dévorer la magie
+19736,Dévorer la magie
 427712,Pandémie
+20527,Eruption
 1293817,Conflagration
 18093,Pyroclasme
 18119,Conséquences
 25228,Lien spirituel
 19229,Coupure d'ailes améliorée
+19647,Verrou magique
+19648,Verrou magique
+24259,Verrou magique
 412758,Incinérer
 19410,Trait de choc amélioré
 19615,Frénésie
 19621,Frénésie
 1299346,Aura de précision
 24406,Guérison du familier améliorée
+19732,Effet dévorer la magie
+19733,Effet dévorer la magie
+19735,Effet dévorer la magie
 1238122,Charge farouche
+1218134,Tir tranquillisant
 20924,Consécration
 1280349,Consécration
 20128,Redoute
@@ -710,6 +931,7 @@ ID,Name_lang
 20578,Cannibalisme
 1259802,Pensée expansive
 1259803,Pensée expansive
+22812,Ecorce
 27827,Esprit de rédemption
 408490,Explosion de lave
 408521,Remous

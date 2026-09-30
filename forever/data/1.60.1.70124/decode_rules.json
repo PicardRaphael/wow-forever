@@ -385,5 +385,134 @@
   "dispel_mechanic_effect": 108,
   "mechanic_immunity_aura": 77
  },
- "races_note": "PV1 (décision 106) : races jouables = présentes dans CharBaseInfo ; faction lue dans ChrRaces.Alliance (race_factions) ; raciaux = sorts des lignes racial_skill_lines de SkillLineAbility, race par RaceMasks_0 | RaceMasks_1 << 32 et PlayableRaceBit, classes par ClassMask (bit = 1 << (ID de ChrClasses - 1), 0 ou -1 : toutes) ; passif : Attributes_0 & passive_attributes_0_mask. racial_values : grandeurs lues par le moteur du Mage (aura, valeur annexe de l'effet, échelle ; sword_crit : sort nommé, arme exigée hors des tables lues). pvp_trinkets : bijou (InventoryType) dont le sort d'utilisation (TriggerType) dissipe par mécanique (effet) ou donne une immunité de mécanique (aura)."
+ "races_note": "PV1 (décision 106) : races jouables = présentes dans CharBaseInfo ; faction lue dans ChrRaces.Alliance (race_factions) ; raciaux = sorts des lignes racial_skill_lines de SkillLineAbility, race par RaceMasks_0 | RaceMasks_1 << 32 et PlayableRaceBit, classes par ClassMask (bit = 1 << (ID de ChrClasses - 1), 0 ou -1 : toutes) ; passif : Attributes_0 & passive_attributes_0_mask. racial_values : grandeurs lues par le moteur du Mage (aura, valeur annexe de l'effet, échelle ; sword_crit : sort nommé, arme exigée hors des tables lues). pvp_trinkets : bijou (InventoryType) dont le sort d'utilisation (TriggerType) dissipe par mécanique (effet) ou donne une immunité de mécanique (aura).",
+ "pvp_classification": {
+  "note": "PV1 : classement PvP des sorts de classe par les champs du client. Sens des identifiants d'aura, d'effet et de cible tiré des énumérations AuraType, SpellEffectName et Targets des émulateurs de Classic (CMaNGOS, TrinityCore) : certitude probable. Les valeurs du client (mécanique, catégorie de rendement décroissant, durées, recharges) restent certaines. Un sort qui porte un marqueur PvP (mécanique, catégorie de rendement, mécanique d'effet, invocation) sans classement possible est listé non résolu, jamais deviné.",
+  "aura_effects": [
+   6,
+   27,
+   35,
+   65,
+   119
+  ],
+  "self_targets": [
+   1
+  ],
+  "hostile_targets": [
+   6,
+   15,
+   16,
+   24,
+   53,
+   54
+  ],
+  "friendly_targets": [
+   1,
+   20,
+   21,
+   30,
+   31,
+   57
+  ],
+  "control_auras": {
+   "2": "possession",
+   "5": "confusion",
+   "6": "charme",
+   "7": "peur",
+   "12": "étourdissement",
+   "25": "pacification",
+   "26": "immobilisation",
+   "27": "silence",
+   "33": "ralentissement",
+   "56": "métamorphose",
+   "60": "pacification et silence",
+   "67": "désarmement"
+  },
+  "defensive_auras": {
+   "39": "immunité d'école",
+   "40": "immunité aux dégâts",
+   "47": "parade",
+   "49": "esquive",
+   "69": "absorption",
+   "87": "dégâts subis réduits",
+   "93": "inattaquable",
+   "97": "bouclier de mana"
+  },
+  "negative_only_auras": [
+   87
+  ],
+  "mechanic_immunity_aura": 77,
+  "cc_mechanics": [
+   1,
+   2,
+   5,
+   7,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   17,
+   20,
+   24,
+   30
+  ],
+  "dispel_effect": 38,
+  "dispel_mechanic_effect": 108,
+  "interrupt_effect": 68,
+  "mobility_effects": {
+   "29": "bond",
+   "96": "charge"
+  },
+  "mobility_auras": {
+   "31": "vitesse accrue"
+  },
+  "burst_auras": {
+   "65": "hâte des sorts",
+   "79": "dégâts infligés",
+   "107": "modificateur de sort",
+   "108": "modificateur de sort",
+   "110": "régénération de ressource",
+   "138": "hâte de mêlée",
+   "140": "hâte à distance",
+   "216": "hâte des sorts",
+   "290": "chances de critique",
+   "319": "hâte de mêlée"
+  },
+  "positive_only_auras": [
+   79
+  ],
+  "burst_min_cooldown_s": 60,
+  "summon_effects": {
+   "28": "créature invoquée (totem, familier) : effet porté par la créature, absente des tables lues",
+   "50": "objet invoqué : effet porté par l'objet, absent des tables lues",
+   "104": "objet invoqué (piège) : effet porté par l'objet, absent des tables lues"
+  },
+  "learn_spell_effect": 36,
+  "damage_break_aura_interrupt_mask": 2
+ },
+ "community_positions": {
+  "note": "PV1 (D3, recherche autorisée par l'utilisateur le 2026-09-30) : palier de talents hors grille lu dans deux calculateurs communautaires de la bêta 1.60.1.70124, concordants entre eux et avec l'ordonnée du client ; certitude probable (consigne de l'utilisateur). Rangé à part (tier_community) : le palier décodé reste null. Colonnes du Paladin (Improved Seal of Fury, Swift Judgement) : aucune source, non résolues.",
+  "Warlock": {
+   "improvedLifeTap": {
+    "tier": 1,
+    "sources": [
+     "https://wowforevertalents.com/warlock/talents/improved-life-tap/",
+     "https://foreverchanges.pro/talents/warlock"
+    ],
+    "read_at": "2026-09-30",
+    "build": "1.60.1.70124"
+   },
+   "amplifyCurse": {
+    "tier": 3,
+    "sources": [
+     "https://wowforevertalents.com/warlock/talents/amplify-curse/",
+     "https://foreverchanges.pro/talents/warlock"
+    ],
+    "read_at": "2026-09-30",
+    "build": "1.60.1.70124"
+   }
+  }
+ }
 }

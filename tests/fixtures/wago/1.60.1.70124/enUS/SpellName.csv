@@ -1,18 +1,62 @@
 ID,Name_lang
 10,Blizzard
+17,Power Word: Shield
+100,Charge
 116,Frostbolt
+118,Polymorph
 120,Cone of Cold
 122,Frost Nova
 133,Fireball
 168,Frost Armor
+339,Entangling Roots
+370,Purge
+408,Kidney Shot
+475,Remove Lesser Curse
+519,Ghost Wolf
+526,Cure Poison
+527,Dispel Magic
+605,Mind Control
+642,Divine Shield
+663,Fear
+676,Disarm
+710,Banish
+853,Hammer of Justice
+871,Shield Wall
+1022,Blessing of Protection
+1044,Blessing of Freedom
+1098,Subjugate Demon
 1449,Arcane Explosion
+1499,Freezing Trap
+1715,Hamstring
+1719,Recklessness
+1766,Kick
+1776,Gouge
+1833,Cheap Shot
+1850,Dash
+1953,Blink
+1988,Scatter Shot
+2070,Sap
+2094,Blind
 2120,Flamestrike
 2136,Fire Blast
+2139,Counterspell
 2481,Find Treasure
+2637,Hibernate
+2782,Remove Curse
 2948,Scorch
+2983,Sprint
+3045,Rapid Fire
+3355,Freezing Trap Effect
+4086,Evasion
+4511,Phase Shift
+4987,Cleanse
+5116,Concussive Shot
 5143,Arcane Missiles
+5211,Bash
 5227,Underwater Breathing
+5246,Intimidating Shout
 5302,Defensive State
+5484,Howl of Terror
 5570,Insect Swarm
 5579,Immune Root/Snare/Stun
 5923,Holy Power
@@ -20,9 +64,22 @@ ID,Name_lang
 6117,Mage Armor
 6136,Chilled
 6150,Quick Shots
+6346,Fear Ward
+6358,Seduction
+6552,Pummel
 6615,Free Action
+6726,Silence
+6788,Weakened Soul
+6789,Death Coil
 7268,Arcane Missile
 7744,Will of the Forsaken
+7922,Charge Stun
+8042,Earth Shock
+8056,Frost Shock
+8122,Psychic Scream
+8177,Grounding Totem
+8178,Grounding Totem Effect
+8179,Grounding Totem Passive
 9453,Unyielding Faith
 9799,Eye for an Eye
 10060,Power Infusion
@@ -216,6 +273,7 @@ ID,Name_lang
 17002,Feral Swiftness
 17003,Heart of the Wild
 17007,Leader of the Pack
+17012,Devour Magic
 17056,Furor
 17063,Nature's Focus
 17069,Naturalist
@@ -275,6 +333,7 @@ ID,Name_lang
 19184,Entrapment
 19228,Improved Wing Clip
 19239,Clever Traps
+19244,Spell Lock
 19255,Survivalist
 19263,Deterrence
 19290,Surefooted
@@ -298,7 +357,9 @@ ID,Name_lang
 19590,Bestial Discipline
 19596,Bestial Swiftness
 19616,Unleashed Fury
+19658,Devour Magic Effect
 19675,Feral Charge
+19801,Tranquilizing Shot
 20066,Repentance
 20101,Benediction
 20117,Conviction
@@ -332,6 +393,7 @@ ID,Name_lang
 20593,Engineering Specialization
 20598,The Human Spirit
 20600,Perception
+20655,Barkskin
 20711,Spirit of Redemption
 21009,Quickness Passive
 22959,Fire Vulnerability
@@ -488,9 +550,34 @@ ID,Name_lang
 1279978,Blizzard
 1279979,Blizzard
 1279980,Blizzard
+592,Power Word: Shield
+600,Power Word: Shield
+3747,Power Word: Shield
+6065,Power Word: Shield
+6066,Power Word: Shield
+10898,Power Word: Shield
+10899,Power Word: Shield
+10900,Power Word: Shield
+10901,Power Word: Shield
+11647,Power Word: Shield
 20549,War Stomp
 9452,Vindication
 440667,Vindication
+6178,Charge
+7370,Charge
+7371,Charge
+11578,Charge
+20508,Charge
+26177,Charge
+26178,Charge
+26179,Charge
+26184,Charge
+26185,Charge
+26186,Charge
+26201,Charge
+26202,Charge
+27685,Charge
+28343,Charge
 205,Frostbolt
 837,Frostbolt
 7322,Frostbolt
@@ -501,6 +588,12 @@ ID,Name_lang
 10180,Frostbolt
 10181,Frostbolt
 25304,Frostbolt
+12824,Polymorph
+12825,Polymorph
+12826,Polymorph
+13323,Polymorph
+28271,Polymorph
+28272,Polymorph
 8492,Cone of Cold
 10159,Cone of Cold
 10160,Cone of Cold
@@ -521,16 +614,54 @@ ID,Name_lang
 25306,Fireball
 7300,Frost Armor
 7301,Frost Armor
+1062,Entangling Roots
+5195,Entangling Roots
+5196,Entangling Roots
+9852,Entangling Roots
+9853,Entangling Roots
+11922,Entangling Roots
+8012,Purge
+25756,Purge
+8643,Kidney Shot
+8644,Kidney Shot
+1176,Remove Lesser Curse
 7302,Ice Armor
 7320,Ice Armor
 10219,Ice Armor
 10220,Ice Armor
+2645,Ghost Wolf
+8946,Cure Poison
+8947,Cure Poison
+615,Dispel Magic
+988,Dispel Magic
+627,Mind Control
+10911,Mind Control
+10912,Mind Control
+659,Divine Shield
+1020,Divine Shield
+5782,Fear
+6213,Fear
+6215,Fear
+6713,Disarm
+8994,Banish
+18647,Banish
 12299,Toughness
 16252,Toughness
 20143,Toughness
 20555,Regeneration
 14521,Meditation
+5588,Hammer of Justice
+5589,Hammer of Justice
+10308,Hammer of Justice
+13005,Hammer of Justice
+15062,Shield Wall
 16089,Elemental Fury
+5599,Blessing of Protection
+10278,Blessing of Protection
+442948,Blessing of Protection
+11725,Subjugate Demon
+11726,Subjugate Demon
+11727,Subjugate Demon
 1310705,Mutilate
 1310706,Mutilate
 1310707,Mutilate
@@ -539,11 +670,39 @@ ID,Name_lang
 8439,Arcane Explosion
 10201,Arcane Explosion
 10202,Arcane Explosion
+14310,Freezing Trap
+14311,Freezing Trap
+27753,Freezing Trap
 12317,Enrage
 12880,Enrage
+7372,Hamstring
+7373,Hamstring
+9080,Hamstring
+13847,Recklessness
+1767,Kick
+1768,Kick
+1769,Kick
+1775,Kick
+1777,Gouge
+8629,Gouge
+11285,Gouge
+11286,Gouge
+12540,Gouge
+6409,Cheap Shot
+9821,Dash
+23099,Dash
+23100,Dash
+23109,Dash
+23110,Dash
+23111,Dash
+23112,Dash
 18498,Silenced
+14514,Blink
 1310687,Sniper Shot
 19503,Scatter Shot
+6770,Sap
+11297,Sap
+21060,Blind
 2121,Flamestrike
 8422,Flamestrike
 8423,Flamestrike
@@ -568,22 +727,39 @@ ID,Name_lang
 400621,Fire Blast
 400622,Fire Blast
 400623,Fire Blast
+3576,Counterspell
+18657,Hibernate
+18658,Hibernate
+2786,Remove Curse
 8444,Scorch
 8445,Scorch
 8446,Scorch
 10205,Scorch
 10206,Scorch
 10207,Scorch
+8696,Sprint
+11305,Sprint
+26542,Sprint
+26543,Sprint
+28755,Rapid Fire
 11119,Ignite
 412538,Ignite
+14308,Freezing Trap Effect
+14309,Freezing Trap Effect
+25999,Boar Charge
+5277,Evasion
 16934,Ferocity
 19598,Ferocity
 20582,Quickness
 20574,Axe Specialization
 20597,Sword Specialization
 1259719,Mace Specialization
+4630,Phase Shift
 13712,Lightning Reflexes
 19168,Lightning Reflexes
+28787,Cleanse
+28788,Cleanse
+17174,Concussive Shot
 5144,Arcane Missiles
 5145,Arcane Missiles
 7269,Arcane Missiles
@@ -598,7 +774,14 @@ ID,Name_lang
 10274,Arcane Missiles
 25345,Arcane Missiles
 25346,Arcane Missiles
+6798,Bash
+8983,Bash
+8984,Bash
 14251,Riposte
+19134,Intimidating Shout
+20511,Intimidating Shout
+29544,Intimidating Shout
+17928,Howl of Terror
 11124,Fire Power
 14524,Wand Specialization
 22782,Mage Armor
@@ -606,14 +789,36 @@ ID,Name_lang
 7321,Chilled
 12484,Chilled
 18459,Incineration
+459699,Fear Ward
+6359,Seduction
+6554,Pummel
+12555,Pummel
 19559,Pathfinding
 15487,Silence
+17925,Death Coil
+17926,Death Coil
+28412,Death Coil
 20594,Stoneform
 19577,Intimidation
 24394,Intimidation
 17804,Soul Siphon
 18805,Recombobulate
 1282733,Overpower
+8044,Earth Shock
+8045,Earth Shock
+8046,Earth Shock
+10412,Earth Shock
+10413,Earth Shock
+10414,Earth Shock
+13281,Earth Shock
+8058,Frost Shock
+10472,Frost Shock
+10473,Frost Shock
+12548,Frost Shock
+8124,Psychic Scream
+10888,Psychic Scream
+10890,Psychic Scream
+13704,Psychic Scream
 23922,Shield Slam
 20584,Ghost
 16909,Vengeance
@@ -645,6 +850,8 @@ ID,Name_lang
 12525,Pyroblast
 12526,Pyroblast
 18809,Pyroblast
+27619,Ice Block
+430952,Arcane Power
 12834,Deep Wounds
 20111,Two-Handed Weapon Specialization
 1290261,Weaponmaster
@@ -672,6 +879,8 @@ ID,Name_lang
 23584,Dual Wield Specialization
 20550,Endurance
 30918,Improved Sprint
+28752,Adrenaline Rush
+28753,Adrenaline Rush
 13977,Initiative
 15250,Setup
 14157,Ruthlessness
@@ -689,18 +898,30 @@ ID,Name_lang
 16958,Blood Frenzy
 16959,Blood Frenzy
 24932,Leader of the Pack
+19505,Devour Magic
+19731,Devour Magic
+19734,Devour Magic
+19736,Devour Magic
+20527,Eruption
 1293817,Conflagrate
 18093,Pyroclasm
 18119,Aftermath
 25228,Soul Link
 19229,Improved Wing Clip
+19647,Spell Lock
+19648,Spell Lock
+24259,Spell Lock
 412758,Incinerate
 19410,Improved Concussive Shot
 19615,Frenzy
 19621,Frenzy
 1299346,Trueshot Aura
 24406,Improved Mend Pet
+19732,Devour Magic Effect
+19733,Devour Magic Effect
+19735,Devour Magic Effect
 1238122,Feral Charge
+1218134,Tranquilizing Shot
 20924,Consecration
 1280349,Consecration
 20128,Redoubt
@@ -713,6 +934,7 @@ ID,Name_lang
 20578,Cannibalize
 1259802,Expansive Mind
 1259803,Expansive Mind
+22812,Barkskin
 27827,Spirit of Redemption
 408490,Lava Burst
 408521,Riptide
