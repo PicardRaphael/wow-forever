@@ -1535,3 +1535,65 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+  - id: K1
+    categorie: pvp
+    description: "Rendements décroissants des contrôles en PvP (paliers, fenêtre de remise à zéro, immunité)"
+    forever: inconnu
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pvp_rules.json (règles serveur de Classic : vmangos, forum Blizzard 2019, wiki)"
+      - "forever/data/1.60.1.70124/classes.json (catégorie de chaque sort : SpellCategories.DiminishType, certain)"
+      - "docs/research/pvp-dr-protocole.md (mesure prévue en PV2)"
+    tests:
+      - tests/unit/test_diminishing.py::test_first_application_has_full_duration
+      - tests/unit/test_diminishing.py::test_successive_applications_follow_the_data_steps
+      - tests/unit/test_diminishing.py::test_window_resets_after_the_data_window
+      - tests/unit/test_diminishing.py::test_categories_are_independent
+      - tests/unit/test_diminishing.py::test_immune_after_the_last_step
+      - tests/unit/test_diminishing.py::test_unmapped_mechanic_has_no_category
+      - tests/unit/test_diminishing.py::test_rules_are_suppose_with_a_source
+    tolerance: null
+    formule: "durée effective = base × palier de la k-ième application de la catégorie ; immunité au-delà du dernier palier ; remise à zéro après la fenêtre"
+    note: "catégorie du client certaine ; paliers, fenêtre (point de départ incertain), plafond et noms des catégories supposés d'après Classic ; rendements contre les PNJ non modélisés ; aucune annonce de Forever au 2026-09-30"
+  - id: K2
+    categorie: pvp
+    description: "Classement PvP des sorts depuis les champs du client (contrôle, défensif, rupture, interruption, dissipation, mobilité, recharge offensive)"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70124/decode_rules.json (pvp_classification : sens des auras, effets et cibles, probable)"
+      - "forever/pipeline/decode.py (décodeur ; mécanique hors du moteur, aucune formule de combat)"
+    tests:
+      - tests/unit/test_decode_class_spells.py::test_every_spell_is_classified_or_unresolved
+      - tests/unit/test_decode_class_spells.py::test_trigger_spell_is_followed_once
+      - tests/unit/test_decode_class_spells.py::test_classification_certainty_per_field
+      - tests/unit/test_decode_class_spells.py::test_known_roles_of_sample_spells
+    tolerance: null
+    note: "sorts marqués sans classement listés non résolus (pièges, totems, portails, invocations : effet porté par un objet ou une créature absents des tables lues) ; conditions d'emploi (posture, forme, camouflage) non décodées"
+  - id: K3
+    categorie: pvp
+    description: "Durée des contrôles en PvP (durée PvP du client, plafond sur un joueur)"
+    forever: inconnu
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/classes.json (SpellMisc.PvPDurationIndex, certain, rare dans ce client)"
+      - "forever/data/1.60.1.70124/pvp_rules.json (plafond de durée, suppose)"
+    tests:
+      - tests/unit/test_diminishing.py::test_pvp_duration_is_the_base_when_present
+      - tests/unit/test_decode_class_spells.py::test_pvp_duration_read_when_present
+    tolerance: null
+    note: "durée PvP du client quand elle existe, sinon durée pleine, bornée par le plafond supposé ; durée à points de combo (Kidney Shot…) : durée de base seule"
+  - id: K4
+    categorie: pvp
+    description: "Recharge partagée entre un bijou PvP et un racial (Will of the Forsaken…)"
+    forever: inconnu
+    statut: absent
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pvp_items.json (shared_cooldown_with_racials : null, non décidé par le client)"
+    tests: []
+    tolerance: null
+    note: "le client ne décide pas la recharge partagée ; question ouverte, à mesurer en PV2"

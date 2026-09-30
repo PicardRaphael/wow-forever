@@ -966,6 +966,36 @@ def load_game_data(deps: Deps) -> GameData:
     return build_game_data(load_version(deps))
 
 
+PVP_RULES_FILE = "pvp_rules.json"  # règles du serveur des rendements décroissants (PV1, suppose)
+
+
 def dr_rules(raw: Any) -> DrRules:
-    """Règles des rendements décroissants lues dans `pvp_rules.json` (`diminishing_returns`, `suppose`)."""
-    raise NotImplementedError
+    """Règles des rendements décroissants lues dans `pvp_rules.json` (`diminishing_returns`, `suppose`) ; chaque
+    entrée porte sa valeur, sa certitude et ses sources. DataSchemaError si une clé manque ou a un mauvais type."""
+    r = _Reader(PVP_RULES_FILE)
+    if not isinstance(raw, dict):
+        raise r.fail("racine", "objet")
+    dr = r.obj(raw, "diminishing_returns", "diminishing_returns")
+
+    def entry(key: str) -> Any:
+        found = dr.get(key)
+        if not isinstance(found, dict) or "value" not in found:
+            raise r.fail(f"diminishing_returns.{key}", "objet avec value")
+        return found["value"]
+
+    steps = entry("steps")
+    if not isinstance(steps, list) or not steps or not all(isinstance(x, int | float) for x in steps):
+        raise r.fail("diminishing_returns.steps.value", "liste de nombres")
+    window, start, cap = entry("window_s"), entry("window_from"), entry("pvp_duration_cap_s")
+    if isinstance(window, bool) or not isinstance(window, int | float):
+        raise r.fail("diminishing_returns.window_s.value", "nombre")
+    if start not in ("fin", "application"):
+        raise r.fail("diminishing_returns.window_from.value", "« fin » ou « application »")
+    if cap is not None and (isinstance(cap, bool) or not isinstance(cap, int | float)):
+        raise r.fail("diminishing_returns.pvp_duration_cap_s.value", "nombre ou null")
+    return DrRules(
+        steps=tuple(float(x) for x in steps),
+        window_s=float(window),
+        window_from=str(start),
+        pvp_cap_s=None if cap is None else float(cap),
+    )

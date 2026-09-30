@@ -28,6 +28,7 @@ CLASS_FILES = ("classes.json", "races.json", "pvp_items.json")  # PV1 : 9 classe
 DECODED_FILES = ("talents.json", "spells.json", "spell_scaling.json", *CLASS_FILES)
 INHERITED_FILES = (
     "_seed_racials.json",  # PV1, D5 : copie figée du relevé communautaire (mode seed), racials.json retiré
+    "pvp_rules.json",  # PV1 : règles du serveur des rendements décroissants (suppose)
     "leveling.json",
     "mechanics.json",
     "respec.json",

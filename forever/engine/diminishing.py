@@ -44,5 +44,30 @@ class DrResult:
 
 
 def effective_durations(rules: DrRules, applications: Sequence[Application]) -> list[DrResult]:
-    """Durée effective de chaque application, dans l'ordre de leurs instants. Registre : K1, K3."""
-    raise NotImplementedError
+    """Durée effective de chaque application, dans l'ordre donné (trié par instant). Base : durée PvP du client si
+    présente, sinon durée pleine, bornée par le plafond PvP ; puis multiplicateur du palier de la catégorie ; au-delà
+    du dernier palier, immunité (durée nulle) jusqu'à la remise à zéro. Registre : K1, K3."""
+    if rules.window_from not in ("fin", "application"):
+        raise ValueError(f"point de départ de la fenêtre inconnu : {rules.window_from}")
+    count: dict[int, int] = {}
+    reference: dict[int, float] = {}
+    out: list[DrResult] = []
+    for app in sorted(applications, key=lambda a: a.time_s):
+        base = app.pvp_duration_s if app.pvp_duration_s is not None else app.duration_s
+        if rules.pvp_cap_s is not None:
+            base = min(base, rules.pvp_cap_s)
+        if app.category == 0:
+            out.append(DrResult(base, None, False))
+            continue
+        if app.category in reference and app.time_s - reference[app.category] >= rules.window_s:
+            count[app.category] = 0
+        n = count.get(app.category, 0) + 1
+        count[app.category] = n
+        if n > len(rules.steps):
+            out.append(DrResult(0.0, None, True))
+            reference[app.category] = app.time_s
+            continue
+        duration = base * rules.steps[n - 1]
+        out.append(DrResult(duration, n, False))
+        reference[app.category] = app.time_s + duration if rules.window_from == "fin" else app.time_s
+    return out

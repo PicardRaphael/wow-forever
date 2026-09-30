@@ -204,6 +204,13 @@
         "installé en révision 2 (forever install, 2026-09-30)"
       ],
       "inherited_from": "1.60.1.70124"
+    },
+    "pvp_rules.json": {
+      "source": "Règles serveur des rendements décroissants de WoW Classic (1.12) : émulateur vmangos, forum Blizzard (2019), liste « Not a Bug » de Classic, wiki communautaire ; aucune annonce de WoW Forever à ce sujet au 2026-09-30 (notes de la bêta du 2026-09-24). Recherche du sous-agent forever-web-researcher du 2026-09-30, autorisée par l'utilisateur (PV1, D3).",
+      "certainty": "suppose",
+      "notes": [
+        "PV1, bloc C : règles du serveur de Classic (paliers, fenêtre, plafond) et noms des catégories ; catégorie de chaque sort lue dans le client (classes.json) ; à mesurer en PV2 (docs/research/pvp-dr-protocole.md)"
+      ]
     }
   },
   "revision": 2,
