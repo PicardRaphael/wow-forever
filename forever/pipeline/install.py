@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import copy
 import json
+import shutil
 from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, TypedDict
@@ -21,6 +22,7 @@ from typing import Any, TypedDict
 from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError
 from forever.manifest import SOURCES_NAME, write_manifest
+from forever.pipeline.builds import version_key
 from forever.pipeline.diff import TALENT_FIELDS, Change, _rows
 from forever.pipeline.sources import load_source
 from forever.provenance import Provenance, data_revision_of, format_provenance_line, local_provenance, make_provenance
@@ -32,6 +34,8 @@ SPELLS = "spells.json"
 CONFIRMED = "confirmed_changes.json"
 REVISIONS = "revisions.json"
 RULES = ("confirmed", "observation", "certainty", "added_field", "removed_field", "metadata")
+# Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
+CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json")
 TALENT_TABLES = "tables Trait* et Spell* (wago.tools)"
 SPELL_TABLES = "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)"
 
@@ -48,6 +52,9 @@ class InstallChange(TypedDict):
 
 class InstallPlan(TypedDict):
     version: str
+    version_from: str
+    version_to: str
+    new_version: bool
     candidate: str
     candidate_sha: str
     revision_from: int
@@ -243,7 +250,7 @@ def display_path(deps: Deps, path: str) -> str:
     return Path(path).as_posix()
 
 
-def _merge(deps: Deps, candidate: str) -> tuple[InstallPlan, dict[str, Any]]:
+def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[InstallPlan, dict[str, Any]]:
     identity = current_identity(deps.data_dir)
     src, cv = load_source(deps, candidate)
     if not src.candidate:
@@ -251,48 +258,71 @@ def _merge(deps: Deps, candidate: str) -> tuple[InstallPlan, dict[str, Any]]:
             f"{candidate} n'est pas une version candidate.", "donner le dossier écrit par `forever decode`"
         )
     _, rv = load_source(deps, identity.game_version)
-    if cv.game_version != rv.game_version:
+    if new_version:
+        if cv.game_version == rv.game_version:
+            raise InvalidArgumentError(
+                f"Candidate {cv.game_version} = version courante : --new-version installe une version différente.",
+                "installer une révision sans --new-version",
+            )
+        if version_key(cv.game_version) < version_key(rv.game_version):
+            raise InvalidArgumentError(
+                f"Candidate {cv.game_version} antérieure à la version courante {rv.game_version}.",
+                "installer une version plus récente",
+            )
+    elif cv.game_version != rv.game_version:
         raise InvalidArgumentError(
             f"Candidate {cv.game_version} ≠ version courante {rv.game_version} : une installation révise la version "
             "courante seulement.",
-            "une nouvelle version de données passe par la chaîne de T08",
+            "installer une nouvelle version avec --new-version (T08a)",
         )
     confirmed_doc = _json(rv.path / CONFIRMED)
     read_at = str(cv.sources.get("collected_at") or format_utc(deps.now())[:10])
-    m = _Merge(rv.game_version, confirmed_doc["changes"], read_at)
+    # Les valeurs sont relues dans la candidate : leur certitude et leur bloc `source` nomment le build lu.
+    m = _Merge(cv.game_version if new_version else rv.game_version, confirmed_doc["changes"], read_at)
     talents = m.talents(_json(rv.path / TALENTS), _json(cv.path / TALENTS))
     spells = m.spells(_json(rv.path / SPELLS), _json(cv.path / SPELLS))
     rev = data_revision_of(rv.sources)
     counts = {r: sum(1 for c in m.changes if c["rule"] == r) for r in RULES}
     counts["refused"] = len(m.refused)
+    target = cv.game_version if new_version else rv.game_version
+    assumption = f"candidate {display_path(deps, candidate)} (données {cv.data_sha}) sur la version {rv.game_version}"
     provenance = make_provenance(
         deps,
-        game_version=rv.game_version,
+        game_version=target,
         data_sha=rv.data_sha,
         freshness=local_provenance(deps)["freshness"],
         certainty="certain",
-        assumptions=[
-            f"candidate {display_path(deps, candidate)} (données {cv.data_sha}) sur la version {rv.game_version} r{rev}"
-        ],
+        assumptions=[assumption + (f" (nouvelle version {target})" if new_version else f" r{rev}")],
     )
     plan: InstallPlan = {
-        "version": rv.game_version,
+        "version": target,
+        "version_from": rv.game_version,
+        "version_to": target,
+        "new_version": new_version,
         "candidate": display_path(deps, candidate),
         "candidate_sha": cv.data_sha,
         "revision_from": rev,
-        "revision_to": rev + 1,
+        "revision_to": 1 if new_version else rev + 1,
         "changes": m.changes,
         "refused": m.refused,
         "counts": counts,
         "provenance": provenance,
     }
-    docs = {"talents": talents, "spells": spells, "applied": m.applied, "observed": m.observed, "path": rv.path}
+    docs = {
+        "talents": talents,
+        "spells": spells,
+        "applied": m.applied,
+        "observed": m.observed,
+        "path": rv.path,
+        "candidate_path": cv.path,
+        "collected_at": cv.sources.get("collected_at"),
+    }
     return plan, docs
 
 
-def plan_install(deps: Deps, candidate: str) -> InstallPlan:
+def plan_install(deps: Deps, candidate: str, *, new_version: bool = False) -> InstallPlan:
     """Changements qu'écrirait l'installation de `candidate` (rien n'est écrit)."""
-    return _merge(deps, candidate)[0]
+    return _merge(deps, candidate, new_version=new_version)[0]
 
 
 class Revision(TypedDict):
@@ -384,30 +414,86 @@ def _sources(doc: dict[str, Any], docs: Mapping[str, Any], n: int, version: str,
     return doc
 
 
+def _new_version_dir(deps: Deps, plan: InstallPlan, docs: Mapping[str, Any], day: str) -> Path:
+    """Crée le dossier de la nouvelle version : fichiers décodés de la candidate, copies figées du seed et
+    `confirmed_changes.json` repris de la version précédente. Les fichiers fusionnés (talents, sorts), `sources.json`
+    et `revisions.json` sont écrits par l'appelant."""
+    vdir = deps.data_dir / plan["version_to"]
+    if vdir.exists():
+        raise InvalidArgumentError(
+            f"{plan['version_to']} est déjà installée ({vdir}).", "supprimer le dossier ou choisir une autre version"
+        )
+    previous: Path = docs["path"]
+    cand: Path = docs["candidate_path"]
+    vdir.mkdir(parents=True)
+    for path in sorted(cand.iterdir()):  # décodés et hérités, hors fusionnés et sources.json
+        if path.is_file() and path.name not in (TALENTS, SPELLS, SOURCES_NAME):
+            shutil.copyfile(path, vdir / path.name)
+    for name in CARRIED:  # copies figées du seed : le mode seed doit rendre les mêmes valeurs
+        source = previous / name
+        if source.is_file():
+            shutil.copyfile(source, vdir / name)
+    confirmed = _json(previous / CONFIRMED)
+    confirmed["version"] = plan["version_to"]
+    confirmed["carried_from"] = plan["version_from"]
+    confirmed["notes"] = [
+        *confirmed.get("notes", []),
+        (
+            f"Repris de {plan['version_from']} à l'installation de {plan['version_to']} "
+            f"(forever install --new-version, {day}) : applied_in_revision garde la révision d'origine."
+        ),
+    ]
+    _write(vdir / CONFIRMED, confirmed, 2)
+    return vdir
+
+
+def _new_version_sources(docs: Mapping[str, Any], plan: InstallPlan, day: str) -> dict[str, Any]:
+    """`sources.json` de la nouvelle version : entrées de la version précédente, recouvertes par celles de la
+    candidate (sources du client et marques `inherited_from`), révision remise à 1."""
+    doc: dict[str, Any] = _json(Path(docs["path"]) / SOURCES_NAME)
+    cand = _json(Path(docs["candidate_path"]) / SOURCES_NAME)
+    doc["files"] = {**doc.get("files", {}), **cand.get("files", {})}
+    doc["game_version"] = plan["version_to"]
+    doc["collected_at"] = docs["collected_at"] or day
+    doc["revision"] = 1
+    doc["revised_at"] = day
+    doc.pop("candidate", None)
+    return doc
+
+
 def apply_install(
-    deps: Deps, candidate: str, *, motif: str, report: str | None = None, date: str | None = None
+    deps: Deps,
+    candidate: str,
+    *,
+    motif: str,
+    report: str | None = None,
+    date: str | None = None,
+    new_version: bool = False,
 ) -> Revision:
     """Écrit la révision suivante de la version courante (talents.json, spells.json, confirmed_changes.json,
-    sources.json, revisions.json), puis le manifeste. Refuse tout écart hors règles (InstallRefusedError) et toute
-    installation qui ne change rien (InvalidArgumentError)."""
-    plan, docs = _merge(deps, candidate)
+    sources.json, revisions.json), puis le manifeste. Avec `new_version`, écrit le dossier d'une **nouvelle** version
+    (T08a) : fichiers décodés de la candidate, copies figées du seed et changements confirmés repris de la version
+    précédente, `revisions.json` en révision 1. Refuse tout écart hors règles (InstallRefusedError) et, sans
+    `new_version`, toute installation qui ne change rien (InvalidArgumentError)."""
+    plan, docs = _merge(deps, candidate, new_version=new_version)
     if plan["refused"]:
         raise InstallRefusedError(plan["refused"])
-    if not plan["changes"]:
+    if not plan["changes"] and not new_version:
         raise InvalidArgumentError(
             f"Rien à installer : la candidate ne change rien à {plan['version']} r{plan['revision_from']}.",
             "aucune action nécessaire",
         )
     day = date or format_utc(deps.now())[:10]
     n, version = plan["revision_to"], plan["version"]
-    vdir: Path = docs["path"]
+    vdir: Path = _new_version_dir(deps, plan, docs, day) if new_version else docs["path"]
     confirmed = _confirmed(_json(vdir / CONFIRMED), docs, n, version, day)
-    sources = _sources(_json(vdir / SOURCES_NAME), docs, n, version, day)
+    base = _new_version_sources(docs, plan, day) if new_version else _json(vdir / SOURCES_NAME)
+    sources = _sources(base, docs, n, version, day)
     revision: Revision = {
         "revision": n,
         "date": day,
         "motif": motif,
-        "command": f"forever install {plan['candidate']} --yes",
+        "command": f"forever install{' --new-version' if new_version else ''} {plan['candidate']} --yes",
         "candidate": {"path": plan["candidate"], "data_sha": plan["candidate_sha"]},
         "report": report,
         "counts": {k: v for k, v in plan["counts"].items() if k != "refused"},
@@ -415,7 +501,9 @@ def apply_install(
     }
     path = vdir / REVISIONS
     history: dict[str, Any] = (
-        _json(path)
+        {"schema_version": 1, "version": version, "revisions": []}
+        if new_version
+        else _json(path)
         if path.is_file()
         else {
             "schema_version": 1,

@@ -185,6 +185,11 @@ def build_parser() -> argparse.ArgumentParser:
         "install", help="installer une candidate en révision suivante de la version courante (T06b)"
     )
     install.add_argument("candidate", help="dossier de la candidate écrit par forever decode")
+    install.add_argument(
+        "--new-version",
+        action="store_true",
+        help="installer une nouvelle version du jeu (nouveau dossier) au lieu d'une révision (T08a)",
+    )
     mode = install.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="afficher les changements sans rien écrire")
     mode.add_argument("--yes", action="store_true", help="écrire sans demander l'accord")
@@ -797,13 +802,25 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _install_target(plan: Any) -> str:
+    """Cible d'une installation : nouvelle version (T08a) ou révision de la version courante (T06b)."""
+    if plan["new_version"]:
+        return f"nouvelle version {plan['version_from']} → {plan['version_to']} r{plan['revision_to']}"
+    return f"{plan['version']} r{plan['revision_from']} → r{plan['revision_to']}"
+
+
+def _install_prompt(plan: Any) -> str:
+    what = "cette nouvelle version" if plan["new_version"] else "cette révision"
+    return f"Installer {what} ({_install_target(plan)}) ? [o/N] "
+
+
 def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
     report_path = Path(args.report) if args.report else None
     if report_path is not None and report_path.resolve().is_relative_to(deps.data_dir.resolve()):
         raise InvalidArgumentError(
             f"Le rapport ne s'écrit jamais dans {deps.data_dir}.", "choisir un fichier --report hors des données"
         )
-    plan = plan_install(deps, args.candidate)
+    plan = plan_install(deps, args.candidate, new_version=args.new_version)
     text = render_install_report(plan)
     if report_path is not None:
         report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -811,26 +828,22 @@ def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
     revision = None
     if plan["refused"]:
         raise InstallRefusedError(plan["refused"])
-    if not plan["changes"]:
+    if not plan["changes"] and not args.new_version:
         status = "rien à écrire"
     elif args.dry_run:
         status = "simulation"
-    elif args.yes or (deps.confirm is not None and deps.confirm("Installer cette révision ? [o/N] ")):
+    elif args.yes or (deps.confirm is not None and deps.confirm(_install_prompt(plan))):
         report_rel = args.report.replace("\\", "/") if args.report else None
-        revision = apply_install(deps, args.candidate, motif=args.motif, report=report_rel)
+        revision = apply_install(
+            deps, args.candidate, motif=args.motif, report=report_rel, new_version=args.new_version
+        )
         status = "écrit"
     else:
         status = "refusé"
     provenance = local_provenance(deps, assumptions=[f"installation : {status}"])
     payload = {"status": status, "plan": plan, "revision": revision, "provenance": provenance}
     counts = ", ".join(f"{k} {v}" for k, v in plan["counts"].items())
-    lines = [
-        (
-            f"Installation de {args.candidate} dans {plan['version']} r{plan['revision_from']} → "
-            f"r{plan['revision_to']} : {status}"
-        ),
-        f"Changements : {counts}",
-    ]
+    lines = [f"Installation de {args.candidate} : {_install_target(plan)} : {status}", f"Changements : {counts}"]
     if report_path is not None:
         lines.append(f"Rapport : {report_path}")
     _emit(payload, lines, provenance, args.json)

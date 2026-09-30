@@ -47,6 +47,15 @@ INHERITED = (
 )
 
 
+def strip_provenance(doc):
+    """Document sans les blocs `source` ni les certitudes par talent : ce qui reste est la valeur de jeu."""
+    if isinstance(doc, dict):
+        return {k: strip_provenance(v) for k, v in doc.items() if k not in ("source", "certainty")}
+    if isinstance(doc, list):
+        return [strip_provenance(x) for x in doc]
+    return doc
+
+
 @pytest.fixture
 def installed(tmp_path):
     """Dépôt en l'état (1.60.1.70009 en révision 2), sur une copie."""
@@ -92,10 +101,10 @@ def test_frozen_seed_copies_are_carried_unchanged(installed, newer):
 def test_diff_between_the_two_installed_versions_has_no_removed_file(installed, newer):
     """Critère d'acceptation du bloc A : les 5 « fichiers retirés » de la comparaison avec la candidate brute
     disparaissent une fois la version installée."""
-    raw = diff_versions(installed, LOCAL_VERSION, newer)
+    raw = diff_versions(installed, LOCAL_VERSION, newer)["changes"]
     assert sorted(c["key"] for c in raw if c["kind"] == "file") == sorted(CARRIED)
     apply_install(installed, newer, motif="T08a", new_version=True)
-    installed_diff = diff_versions(installed, LOCAL_VERSION, NEW_VERSION)
+    installed_diff = diff_versions(installed, LOCAL_VERSION, NEW_VERSION)["changes"]
     assert [c for c in installed_diff if c["kind"] == "file"] == []
 
 
@@ -144,9 +153,18 @@ def test_nothing_changed_is_installed_anyway(installed, newer):
     """1.60.1.70124 ne change aucune valeur (22 tables identiques) : l'installation passe quand même, alors que
     `forever install` sans `--new-version` refuse une candidate qui ne change rien."""
     plan = plan_install(installed, newer, new_version=True)
-    assert plan["changes"] == []
     assert plan["refused"] == []
     assert (plan["version_from"], plan["version_to"]) == (LOCAL_VERSION, NEW_VERSION)
+    # Aucune valeur de jeu ne change : ni changement confirmé, ni observation, ni champ retiré.
+    assert {k: plan["counts"][k] for k in ("confirmed", "observation", "removed_field")} == {
+        "confirmed": 0,
+        "observation": 0,
+        "removed_field": 0,
+    }
+    # Seule la provenance bouge : les valeurs ont été relues dans la candidate, leur bloc `source` la nomme.
+    # `metadata` : le bloc `source` existait déjà (révision 2) et nomme désormais le build relu.
+    assert {c["rule"] for c in plan["changes"]} <= {"added_field", "metadata", "certainty"}
+    assert all(c["path"].endswith(".source") or c["rule"] == "certainty" for c in plan["changes"])
     apply_install(installed, newer, motif="T08a", new_version=True)
     assert (installed.data_dir / NEW_VERSION / "talents.json").is_file()
 
@@ -155,7 +173,9 @@ def test_the_installed_values_are_those_of_the_previous_version(installed, newer
     """Aucune valeur ne change : les fichiers fusionnés de la nouvelle version sont ceux de l'ancienne."""
     apply_install(installed, newer, motif="T08a", new_version=True)
     for name in ("talents.json", "spells.json"):
-        assert read_json(installed.data_dir / NEW_VERSION / name) == read_json(DATA_DIR / LOCAL_VERSION / name)
+        new = strip_provenance(read_json(installed.data_dir / NEW_VERSION / name))
+        old = strip_provenance(read_json(DATA_DIR / LOCAL_VERSION / name))
+        assert new == old, name
 
 
 def test_an_existing_version_directory_is_refused(installed, newer):
@@ -192,9 +212,8 @@ def test_a_value_outside_the_rules_is_still_refused(installed, newer, tmp_path):
 
 
 def test_cli_new_version_without_consent_writes_nothing(installed, newer, capsys):
-    code = main(["install", "--new-version", newer], deps=installed)
-    capsys.readouterr()
-    assert code != 0
+    assert main(["install", "--new-version", newer], deps=installed) == 0
+    assert "refusé" in capsys.readouterr().out
     assert not (installed.data_dir / NEW_VERSION).exists()
 
 
