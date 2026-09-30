@@ -56,6 +56,7 @@ def test_version_dir_contains_exactly_expected_files():
         "classes.json",  # PV1 : savoir des 9 classes décodé du client (révision 2)
         "races.json",  # PV1 : races et raciaux décodés du client (décision 106)
         "pvp_items.json",  # PV1 : bijoux PvP décodés du client
+        "pvp_rules.json",  # PV1 : règles du serveur des rendements décroissants (suppose, sources citées)
         "talents.json",  # T06b : valeurs du client (révision 2), plus des copies du seed
         "spells.json",
         "overrides.json",

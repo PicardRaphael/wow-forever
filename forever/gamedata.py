@@ -8,6 +8,7 @@ from collections.abc import Iterator, Mapping
 from typing import Any
 
 from forever.config import Deps
+from forever.engine.diminishing import DrRules
 from forever.engine.model import (
     ArmorRank,
     BuildMethod,
@@ -963,3 +964,8 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
 def load_game_data(deps: Deps) -> GameData:
     """Version courante, après contrôle d'intégrité (DataIntegrityError, ManifestMissingError)."""
     return build_game_data(load_version(deps))
+
+
+def dr_rules(raw: Any) -> DrRules:
+    """Règles des rendements décroissants lues dans `pvp_rules.json` (`diminishing_returns`, `suppose`)."""
+    raise NotImplementedError

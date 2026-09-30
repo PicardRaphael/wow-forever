@@ -28,7 +28,7 @@ def test_candidate_is_a_complete_data_dir(candidate):
     names = {p.name for p in (candidate.root / PREVIOUS_VERSION).iterdir()}
     # T04 : monsters.json hérité, spell_scaling.json décodé ; PV1 : fichiers des 9 classes (hérités ici : la
     # fixture 70009 n'a pas leurs tables), _seed_racials.json hérité, racials.json retiré.
-    assert names == EXPECTED_FILES and len(names) == 15
+    assert names == EXPECTED_FILES and len(names) == 16  # PV1, bloc C : pvp_rules.json hérité
     assert "_source_gunba_mage_tree.json" not in names and "confirmed_changes.json" not in names
 
 

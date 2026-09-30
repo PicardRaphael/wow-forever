@@ -53,7 +53,7 @@ def check(name, *, strict=True, engine_dirs=()):
 def test_repository_registry_is_valid_strict():
     report = validate(REGISTRY_PATH, REPO_ROOT, strict=True)
     assert report.errors == []
-    assert report.total == 108  # T04b : H11 ; T04c : I7 ; T05 : B18, B19, C9, I8 (angles morts)
+    assert report.total == 112  # T04b : H11 ; T04c : I7 ; T05 : B18, B19, C9, I8 ; PV1 : K1 à K4
 
 
 def test_tested_entries_reference_existing_test_functions():
@@ -125,8 +125,8 @@ def test_find_entry_unknown_suggests():
 def test_repository_coverage():
     """Seul test qui fige la couverture du registre après T02."""
     assert (
-        coverage(REGISTRY_PATH) == "37/108"
-    )  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14, H3, H5, I5
+        coverage(REGISTRY_PATH) == "40/112"
+    )  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3
 
 
 def test_load_reads_optional_fields():
@@ -138,10 +138,10 @@ def test_load_reads_optional_fields():
 def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("Registre : 108 mécaniques")
+    assert out.startswith("Registre : 112 mécaniques")
     assert (
-        "teste 36" in out and "valide-journal 1" in out
-    )  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14, H3, H5, I5
+        "teste 39" in out and "valide-journal 1" in out
+    )  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3
 
 
 def test_main_reports_errors(capsys):
@@ -197,3 +197,16 @@ def test_leveling_mechanics_are_tested_after_t04b():
     impl = implementations([ENGINE_DIR], REPO_ROOT)
     for mid in ("B6", "B7", "B13", "C1", "C5"):
         assert impl.get(mid), mid
+
+
+def test_pvp_mechanics_after_pv1():
+    """PV1, bloc C : rendements décroissants (K1), classement des sorts tiré du client (K2) et durée PvP (K3)
+    testés ; recharge partagée bijou PvP et racial (K4) absente (non décidée par le client). K1 et K3 sont cités
+    dans le moteur ; K2 vit dans le décodeur (forever/pipeline/decode.py)."""
+    entries = {m.id: m for m in load(REGISTRY_PATH)}
+    for mid in ("K1", "K2", "K3"):
+        assert entries[mid].status == "teste" and entries[mid].category == "pvp", mid
+        assert any("::" in t for t in entries[mid].tests), mid
+    assert entries["K4"].status == "absent"
+    impl = implementations([ENGINE_DIR], REPO_ROOT)
+    assert impl.get("K1") and impl.get("K3")
