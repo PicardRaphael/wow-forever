@@ -180,3 +180,19 @@ def test_sim_leveling_low_level_penalty(make_deps):
     r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", {**args, "rules": "seed"}))
     assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
     assert validate_provenance(r.structured_content["provenance"]) == []
+
+
+def test_instructions_rules(make_deps):
+    """Règles essentielles rendues à toute IA cliente : aucun chiffre sans outil, certitude et provenance
+    affichées, ce qui n'est pas couvert annoncé."""
+
+    async def go():
+        async with Client(build_server(make_deps())) as client:
+            return client.instructions
+
+    text = asyncio.run(go())
+    assert text
+    low = text.lower()
+    assert "aucun chiffre" in low and "outil" in low
+    assert "certitude" in low and "provenance" in low
+    assert "je ne sais pas" in low
