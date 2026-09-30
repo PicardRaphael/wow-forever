@@ -1,0 +1,181 @@
+{
+  "schema_version": 1,
+  "game_version": "1.60.1.70124",
+  "product": "wow_classic_beta",
+  "version_prefix": "1.60.",
+  "collected_at": "2026-09-30",
+  "certainty_mapping": {
+    "FC": "certain",
+    "FS": "probable",
+    "PC": "suppose",
+    "EST": "suppose"
+  },
+  "files": {
+    "spells.json": {
+      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-09-30)",
+      "certainty": "certain",
+      "field_certainty": {
+        "projectile_speed": "suppose"
+      },
+      "field_notes": {
+        "mana": "mana : SpellPower.ManaCost du client ; null pour arcane_blast : coût en part du mana de base (mana_pct_base, SpellPower.PowerCostPct)",
+        "projectile_speed": "vitesse de projectile estimée (EST), à calibrer"
+      },
+      "notes": [
+        "min et max des rangs issus d'un talent lus au niveau de base du sort (convention de la décision 39)",
+        "copie figée du seed : _seed_spells.json"
+      ]
+    },
+    "talents.json": {
+      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-09-30)",
+      "certainty": "certain",
+      "notes": [
+        "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
+        "desc : gabarit du dépôt ({i}) ; gabarit brut et identifiants de sort du client dans source",
+        "certitude par talent FC-70124 ; copie figée du seed : _seed_talents.json"
+      ]
+    },
+    "racials.json": {
+      "source": "https://foreverchanges.pro/fr/racials (client 1.60.1.70009) + Icy Veins / AOEAH pour les recharges",
+      "certainty": "suppose",
+      "notes": [
+        "certitude mixte (FC et PC) : la plus basse est retenue ; détail par entrée dans le fichier",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "leveling.json": {
+      "source": "Tables d'XP Classic et modèles de monstres et de joueur (voir les champs du fichier)",
+      "certainty": "suppose",
+      "field_certainty": {
+        "combat_rules.gcd": "suppose",
+        "combat_rules.spell_miss_by_level_diff": "suppose",
+        "combat_rules.min_miss": "suppose",
+        "combat_rules.crit_mult_spell": "certain",
+        "combat_rules.dot_can_crit": "certain"
+      },
+      "field_notes": {
+        "combat_rules.gcd": "temps de recharge global, règle Classic (PC) : seed/forever-mage/references/mechanics.md",
+        "combat_rules.spell_miss_by_level_diff": "raté des sorts selon l'écart de niveau, règle Classic (PC) : references/mechanics.md",
+        "combat_rules.min_miss": "plancher de raté des sorts, règle Classic (PC) : references/mechanics.md",
+        "combat_rules.crit_mult_spell": "multiplicateur de critique des sorts (FC) : references/mechanics.md",
+        "combat_rules.dot_can_crit": "les effets sur la durée critiquent dans Forever (FS/FC) : references/mechanics.md"
+      },
+      "notes": [
+        "certitude mixte (FC, PC, EST) : la plus basse est retenue ; modèles à calibrer",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "mechanics.json": {
+      "source": "Constantes de seed/forever-mage/scripts/fm.py absentes des tables (portage T02) ; statuts FC/FS/PC/EST de fm.py et de references/mechanics.md",
+      "certainty": "suppose",
+      "notes": [
+        "certitude par entrée dans le champ certainty ; identifiant du registre des mécaniques dans le champ registry",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "respec.json": {
+      "source": "Observations de la bêta et barème Classic (voir le champ sources du fichier)",
+      "certainty": "suppose",
+      "notes": [
+        "règle Classic supposée inchangée (PC)",
+        "lu par forever/gamedata.py depuis T05 (barème classic_schedule_gold) ; certitude du vocabulaire du seed PC traduite : deux premiers paliers observés (probable, respec.beta_observed_resets), suivants supposés",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "meta.json": {
+      "source": "Métadonnées de collecte du seed forever-mage",
+      "certainty": "certain",
+      "notes": [
+        "ne décrit pas le jeu : liste des sources et légende des certitudes",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "_source_gunba_mage_tree.json": {
+      "source": "https://raw.githubusercontent.com/gunba/wow-forever-sim/master/ui/core/talents/trees/mage.json (MIT)",
+      "certainty": "probable",
+      "notes": [
+        "copie brute de l'arbre open source ayant servi à construire talents.json"
+      ]
+    },
+    "overrides.json": {
+      "source": "Corrections manuelles relevées sur https://foreverchanges.pro/talents/mage",
+      "certainty": "certain",
+      "notes": [
+        "corrections de rangs lues sur le build 1.60.1.70009 (FC)",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "decode_rules.json": {
+      "source": "Inventaire des tables du client 1.60.1.70009 (https://wago.tools/db2/<Table>/csv?build=1.60.1.70009, collecte du 2026-09-27) et docs/DATA_SOURCES.md ; voir tasks/T03-inventaire.md",
+      "certainty": "certain",
+      "notes": [
+        "règles de lecture des tables (géométrie, lignes de compétence, identifiants d'effet) ; ne décrit pas une règle de combat",
+        "levels : convention d'évaluation des infobulles (niveau de base pour les talents, min(MaxLevel, 60) pour les rangs de sort), à ratifier (docs/OPEN_QUESTIONS.md)",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "confirmed_changes.json": {
+      "source": "Écarts entre le décodage du client 1.60.1.70009 et talents.json / spells.json, tranchés par l'utilisateur (T03)",
+      "certainty": "certain",
+      "notes": [
+        "15 écarts tranchés le 2026-09-27 (tasks/T03-ecarts.md), avec leur nature (client, format, convention) ; appliqués aux données par l'installation (T08)"
+      ]
+    },
+    "monsters.json": {
+      "source": "Journaux de combat du client 1.60.1 (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt et WoWCombatLog-092726_174130.txt du 2026-09-27, PV max du bloc avancé ; le troisième, 635 événements, ne contient aucun relevé de PV de monstre) par forever monsters build ; valeurs en regard et agrégat des niveaux non observés : Questie 11.38.0 Forever-v27 (communautaire, Classic Era, aucune correction Forever), corrigé vers Forever par le rapport mesuré / Questie (schéma 2, T04b, forever monsters build --fit-exclude 3986 : Sarilus Foulborne hors de l'ajustement)",
+      "certainty": "suppose",
+      "field_certainty": {
+        "npcs": "certain",
+        "hp_by_level": "suppose",
+        "questie_correction": "probable"
+      },
+      "notes": [
+        "certitude par entrée dans le champ certainty (journal certain, Questie suppose) : la plus basse est retenue pour le fichier",
+        "collecté le 2026-09-27 ; les données communautaires ne remplacent jamais une mesure",
+        "hérité de 1.60.1.70009"
+      ],
+      "inherited_from": "1.60.1.70009"
+    },
+    "spell_scaling.json": {
+      "source": "Client 1.60.1.70124 : points de base par niveau, tables du client 1.60.1.70124 (wago.tools, 1.60.1.70124) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
+        "utility : armures du Mage, niveau d'apprentissage et effets (decode_rules.json.utility_spells)",
+        "talent_cooldowns : recharges des talents actifs (decode_rules.json.talent_cooldowns)"
+      ]
+    },
+    "_seed_talents.json": {
+      "source": "seed/forever-mage/data/1.60.1.70009/talents.json (copie octet pour octet, T06b)",
+      "certainty": "probable",
+      "notes": [
+        "copie figée du seed, lue par le mode seed seulement (build_game_data(rules=\"seed\"), décision D2 du plan T06b)",
+        "le mode forever lit talents.json"
+      ]
+    },
+    "_seed_spells.json": {
+      "source": "seed/forever-mage/data/1.60.1.70009/spells.json (copie octet pour octet, T06b)",
+      "certainty": "certain",
+      "notes": [
+        "copie figée du seed, lue par le mode seed seulement (build_game_data(rules=\"seed\"), décision D2 du plan T06b)",
+        "le mode forever lit spells.json"
+      ]
+    },
+    "revisions.json": {
+      "source": "forever install : journal des révisions de la version (motif, commande, rapport, valeurs changées)",
+      "certainty": "certain",
+      "notes": [
+        "chaque valeur changée porte sa source et sa certitude (champs source et certainty)"
+      ]
+    }
+  },
+  "revision": 1,
+  "revised_at": "2026-09-30"
+}

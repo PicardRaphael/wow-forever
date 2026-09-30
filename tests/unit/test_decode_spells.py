@@ -5,7 +5,15 @@ la valeur du client est une observation. Les autres écarts sont comparés à co
 sens."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, change_key, client_vs_reference, format_changes, read_json
+from conftest import (
+    DATA_DIR,
+    LOCAL_VERSION,
+    PREVIOUS_VERSION,
+    change_key,
+    client_vs_reference,
+    format_changes,
+    read_json,
+)
 
 from forever.pipeline.decode import decode_spells
 
@@ -15,7 +23,8 @@ DECODED_FIELDS = {"ranks", "name", "name_fr", "spell_ids"}
 
 @pytest.fixture(scope="module")
 def decoded(client_tables, decode_rules):
-    return decode_spells(client_tables, decode_rules, REFERENCE, LOCAL_VERSION)
+    # Les fixtures wago sont les tables de 1.60.1.70009 : c'est ce build qu'on décode ici.
+    return decode_spells(client_tables, decode_rules, REFERENCE, PREVIOUS_VERSION)
 
 
 @pytest.fixture(scope="module")
@@ -71,8 +80,8 @@ def test_other_fields_are_inherited(decoded, spells):
         kept = {k: v for k, v in spells[key].items() if k not in DECODED_FIELDS}
         assert kept == {k: v for k, v in ref.items() if k != "ranks"}, key
     assert decoded["utility"] == REFERENCE["utility"]
-    assert decoded["inherited_from"] == LOCAL_VERSION
-    assert decoded["build"] == LOCAL_VERSION
+    assert decoded["inherited_from"] == PREVIOUS_VERSION
+    assert decoded["build"] == PREVIOUS_VERSION
 
 
 def test_names_and_client_ids(spells):

@@ -7,7 +7,7 @@ from dataclasses import replace
 from pathlib import Path
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, REPO_ROOT, isolated_deps
+from conftest import DATA_DIR, PREVIOUS_VERSION, REPO_ROOT, isolated_deps
 from test_install import rewind_to_r1
 
 import forever.cli as cli_module
@@ -16,6 +16,7 @@ from forever.cli import main
 from forever.engine.talents import tier_points_required
 from forever.errors import InvalidArgumentError
 from forever.explain import explain_mechanic
+from forever.manifest import write_manifest
 from forever.optimize.leveling import _opens_tier, _shortlist
 from forever.pipeline.install import apply_install, plan_install, render_install_report
 from forever.profile import set_character
@@ -71,21 +72,25 @@ def test_derived_values_refuse_a_level_out_of_bounds(make_deps, level):
 def test_revision_records_no_personal_path(tmp_path, candidate):
     data = tmp_path / "data"
     shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
+    for d in data.iterdir():  # révision de la version courante : les versions plus récentes sont retirées
+        if d.is_dir() and d.name != PREVIOUS_VERSION:
+            shutil.rmtree(d)
     rewind_to_r1(data)
+    write_manifest(data)
     deps = isolated_deps(tmp_path, data)
-    inside = deps.cache_dir / "candidates" / LOCAL_VERSION
+    inside = deps.cache_dir / "candidates" / PREVIOUS_VERSION
     shutil.copytree(candidate.root, inside)
     text = render_install_report(plan_install(deps, str(inside)))
-    assert f"Candidate : `<cache>/candidates/{LOCAL_VERSION}`" in text
+    assert f"Candidate : `<cache>/candidates/{PREVIOUS_VERSION}`" in text
     assert str(tmp_path) not in text and tmp_path.as_posix() not in text
     rev = apply_install(deps, str(inside), motif="test", date="2026-09-29")
-    assert rev["candidate"]["path"] == f"<cache>/candidates/{LOCAL_VERSION}"
-    assert rev["command"] == f"forever install <cache>/candidates/{LOCAL_VERSION} --yes"
+    assert rev["candidate"]["path"] == f"<cache>/candidates/{PREVIOUS_VERSION}"
+    assert rev["command"] == f"forever install <cache>/candidates/{PREVIOUS_VERSION} --yes"
 
 
 def test_repository_trace_has_no_personal_path():
     home = Path.home()
-    for path in (DATA_DIR / LOCAL_VERSION / "revisions.json", REPO_ROOT / "docs/research/data-1.60.1.70009-r2.md"):
+    for path in (DATA_DIR / PREVIOUS_VERSION / "revisions.json", REPO_ROOT / "docs/research/data-1.60.1.70009-r2.md"):
         text = path.read_text(encoding="utf-8")
         for form in (str(home), home.as_posix(), json.dumps(str(home))[1:-1]):
             assert form not in text, (path.name, form)

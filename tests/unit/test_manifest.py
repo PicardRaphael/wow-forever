@@ -5,7 +5,7 @@ import re
 import shutil
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, MANIFEST_CORRUPTIONS, corrupt_manifest, tamper
+from conftest import DATA_DIR, LOCAL_VERSION, MANIFEST_CORRUPTIONS, PREVIOUS_VERSION, corrupt_manifest, tamper
 
 from forever.manifest import compute_manifest, data_sha, verify, write_manifest
 
@@ -79,12 +79,12 @@ def test_manifest_content():
     v = m["versions"][LOCAL_VERSION]
     assert v["product"] == "wow_classic_beta"
     assert v["version_prefix"] == "1.60."
-    assert v["collected_at"] == "2026-09-26"
+    assert v["collected_at"] == "2026-09-30"  # T08a : collecte de 1.60.1.70124
     assert v["hotfixes"] == []
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert v["revision"] == 2 and v["revised_at"] == "2026-09-29"
+    assert v["revision"] == 1 and v["revised_at"] == "2026-09-30"  # une nouvelle version repart en révision 1
     assert len(v["files"]) == 17 and {
         "mechanics.json",
         "decode_rules.json",
@@ -112,7 +112,7 @@ def test_game_version_is_highest_version_dir(data_copy):
     (data_copy / "__pycache__").mkdir()
     m = compute_manifest(data_copy)
     assert m["game_version"] == "1.60.1.70150"
-    assert set(m["versions"]) == {LOCAL_VERSION, "1.60.1.70150"}
+    assert set(m["versions"]) == {PREVIOUS_VERSION, LOCAL_VERSION, "1.60.1.70150"}
 
 
 def test_manifest_json_is_sorted_and_parsable():

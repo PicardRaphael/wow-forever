@@ -1,0 +1,207 @@
+{
+ "schema_version": 1,
+ "class": "Mage",
+ "tables": [
+  "SkillLineXTraitTree",
+  "TraitNode",
+  "TraitNodeXTraitNodeEntry",
+  "TraitNodeEntry",
+  "TraitDefinition",
+  "TraitDefinitionEffectPoints",
+  "TraitEdge",
+  "CurvePoint",
+  "SkillLineAbility",
+  "Spell",
+  "SpellName",
+  "SpellEffect",
+  "SpellLevels",
+  "SpellMisc",
+  "SpellCastTimes",
+  "SpellDuration",
+  "SpellPower",
+  "SpellCooldowns",
+  "SpellAuraOptions"
+ ],
+ "localized_tables": {
+  "frFR": [
+   "SpellName"
+  ]
+ },
+ "skill_lines": {
+  "Arcane": 237,
+  "Fire": 8,
+  "Frost": 6
+ },
+ "talent_geometry": {
+  "tabs": {
+   "Arcane": 1020,
+   "Fire": 5020,
+   "Frost": 9080
+  },
+  "row_base": 2130,
+  "row_step": 600,
+  "col_step": 600,
+  "extra_zero_divisor": 10
+ },
+ "shared_spell": "latest_node",
+ "rank_variables": {
+  "arcaneConcentration": [
+   0
+  ],
+  "ignite": [
+   0
+  ],
+  "impact": [
+   0
+  ],
+  "improvedScorch": [
+   0
+  ],
+  "frostbite": [
+   0
+  ],
+  "improvedBlizzard": [
+   0
+  ],
+  "wintersChill": [
+   0,
+   3
+  ]
+ },
+ "curve_operations": {
+  "0": "set"
+ },
+ "levels": {
+  "level_cap": 60,
+  "talent_tooltip": "base",
+  "spell_rank": "max_capped"
+ },
+ "tooltip": {
+  "duration_units": [
+   {
+    "ms": 60000,
+    "unit": "min"
+   },
+   {
+    "ms": 1000,
+    "unit": "sec"
+   }
+  ]
+ },
+ "effects": {
+  "school_damage": 2,
+  "apply_aura": 6,
+  "aura_periodic_damage": 3,
+  "aura_periodic_trigger_spell": 23,
+  "aura_periodic_dummy": 226
+ },
+ "spell_ranks": {
+  "acquire_methods": [
+   0,
+   2
+  ],
+  "rank_subtext": "^Rank (\\d+)$",
+  "channel_attributes_1_mask": 68,
+  "mana_power_type": 0
+ },
+ "spells": {
+  "frostbolt": "Frostbolt",
+  "fireball": "Fireball",
+  "fire_blast": "Fire Blast",
+  "scorch": "Scorch",
+  "pyroblast": "Pyroblast",
+  "frostfire_bolt": "Frostfire Bolt",
+  "ice_lance": "Ice Lance",
+  "arcane_blast": "Arcane Blast",
+  "arcane_missiles": "Arcane Missiles",
+  "frost_nova": "Frost Nova",
+  "cone_of_cold": "Cone of Cold",
+  "arcane_explosion": "Arcane Explosion",
+  "blizzard": "Blizzard",
+  "flamestrike": "Flamestrike",
+  "blast_wave": "Blast Wave"
+ },
+ "utility_spells": {
+  "spells": {
+   "frost_armor": "Frost Armor",
+   "ice_armor": "Ice Armor",
+   "mage_armor": "Mage Armor"
+  },
+  "effects": {
+   "armor": {
+    "aura": 22,
+    "misc_value": 1,
+    "field": "EffectBasePointsF"
+   },
+   "frost_resistance": {
+    "aura": 22,
+    "misc_value": 16,
+    "field": "EffectBasePointsF"
+   },
+   "magic_resistance": {
+    "aura": 22,
+    "misc_value": 126,
+    "field": "EffectBasePointsF"
+   },
+   "regen_while_casting_pct": {
+    "aura": 134,
+    "field": "EffectBasePointsF"
+   },
+   "chill_on_hit_spell": {
+    "aura": 42,
+    "field": "EffectTriggerSpell"
+   }
+  }
+ },
+ "target_auras": {
+  "fire_vulnerability": {
+   "talent": "Improved Scorch",
+   "trigger_aura": 109,
+   "aura": 270,
+   "field": "EffectBasePointsF"
+  }
+ },
+ "talent_cooldowns": {
+  "talents": [
+   "Arcane Power",
+   "Presence of Mind",
+   "Combustion",
+   "Cold Snap",
+   "Ice Block",
+   "Ice Barrier",
+   "Blast Wave"
+  ]
+ },
+ "school_masks": {
+  "fire": 4,
+  "frost": 16,
+  "arcane": 64
+ },
+ "rank_format": [
+  "level",
+  "min",
+  "max",
+  "dot_total",
+  "dot_duration",
+  "cast_s",
+  "mana",
+  "cooldown_s"
+ ],
+ "notes": [
+  "Règles de lecture des tables du client (wago.tools) pour le Mage ; héritées par les versions suivantes tant qu'elles restent valides.",
+  "tables : téléchargées en enUS ; localized_tables : tables de noms téléchargées en plus dans la locale indiquée.",
+  "skill_lines : lignes de compétence du Mage ; l'arbre de talents est celui que SkillLineXTraitTree associe à ces lignes.",
+  "talent_geometry : colonne = (PosX - onglet) / col_step + 1, palier = (PosY - row_base) / row_step + 1 ; une position qui ne tombe pas sur la grille est divisée par extra_zero_divisor (zéro en trop).",
+  "rank_variables : pour ces talents, ranks ne garde que les variables d'infobulle d'indice donné (à partir de 0), pour la forme de talents.json (positions lues par le moteur) ; tooltip_values garde toujours toutes les variables (décision T03, tasks/T03-ecarts.md).",
+  "shared_spell latest_node : si deux nœuds de l'arbre portent le même sort, le nœud d'identifiant le plus grand est retenu.",
+  "curve_operations : TraitDefinitionEffectPoints.OperationType pris en charge ; 0 remplace les points de l'effet par la valeur de la courbe au rang.",
+  "levels : infobulles de talent évaluées au niveau de base du sort (valeurs affichées dans l'arbre) ; rangs de sort évalués au niveau min(MaxLevel, level_cap), MaxLevel 0 valant level_cap.",
+  "tooltip.duration_units : unité d'affichage d'une durée, la plus grande dont la durée atteint le seuil.",
+  "effects : identifiants d'effet et d'aura du client (SpellEffect.Effect, SpellEffect.EffectAura).",
+  "spell_ranks : rangs lus dans SkillLineAbility (lignes du Mage, méthodes d'acquisition retenues), numérotés par Spell.NameSubtext ; canalisé si Attributes_1 & channel_attributes_1_mask.",
+  "utility_spells : armures lues comme les rangs de sort (SkillLineAbility, Spell.NameSubtext) ; niveau d'apprentissage = SpellLevels.BaseLevel ; effets retenus : aura (et EffectMiscValue_0 si donné) -> valeur du champ indiqué (aura 22 : armure si 1, résistance au givre si 16, à toute la magie si 126 ; aura 134 : part de la régénération gardée en incantation, en % ; aura 42 : sort de ralenti déclenché sur un coup reçu).",
+  "target_auras : auras posées sur la cible par un talent (spell_scaling.json.auras) ; talent désigné par son nom (TraitDefinition) ; aura = EffectTriggerSpell de l'effet d'aura trigger_aura du talent (109 : sort déclenché sur la cible) ; part par cumul = champ field de l'effet d'aura aura (270 : dégâts subis des écoles du masque EffectMiscValue_0, en %) ; cumuls maximum = SpellAuraOptions.CumulativeAura ; durée = SpellMisc.DurationIndex -> SpellDuration.",
+  "school_masks : bits d'école du client (EffectMiscValue_0 des auras d'école) -> école de spells.json."
+ ],
+ "inherited_from": "1.60.1.70009"
+}

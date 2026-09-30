@@ -4,7 +4,7 @@ import json
 from datetime import UTC, datetime
 
 import pytest
-from conftest import FIXTURES, PREFIX, PRODUCT, FakeHttp
+from conftest import FIXTURES, LOCAL_VERSION, PREFIX, PRODUCT, FakeHttp
 
 from forever.pipeline.builds import (
     BUILDS_URL,
@@ -121,13 +121,23 @@ def test_builds_unavailable_exits_with_network_code():
     assert BuildsUnavailable("x").exit_code == EXIT_NETWORK == 5
 
 
+def builds_with_local():
+    """Échantillon des builds publiés où la version la plus récente est celle installée : `forever builds` doit la
+    marquer « locale ». La fixture nomme 1.60.1.70009 ; le dépôt suit les versions du jeu (T08a)."""
+    payload = json.loads((FIXTURES / "wago" / "builds_mixed_dates.json").read_text(encoding="utf-8"))
+    for entry in payload[PRODUCT]:
+        if entry["version"] == "1.60.1.70009":
+            entry["version"] = LOCAL_VERSION
+    return FakeHttp(body=json.dumps(payload).encode("utf-8"))
+
+
 def test_cli_builds_marks_local_version(capsys, make_deps):
     from forever.cli import main
 
-    code = main(["builds"], make_deps(http=FakeHttp.fixture("builds_mixed_dates.json")))
+    code = main(["builds"], make_deps(http=builds_with_local()))
     out = capsys.readouterr().out
     assert code == 0
-    local_line = next(line for line in out.splitlines() if "1.60.1.70009" in line)
+    local_line = next(line for line in out.splitlines() if LOCAL_VERSION in line)
     assert "locale" in local_line
     assert out.rstrip().splitlines()[-1].startswith("Provenance")
 
@@ -135,11 +145,11 @@ def test_cli_builds_marks_local_version(capsys, make_deps):
 def test_cli_builds_json(capsys, make_deps):
     from forever.cli import main
 
-    code = main(["builds", "--json", "--limit", "2"], make_deps(http=FakeHttp.fixture("builds_mixed_dates.json")))
+    code = main(["builds", "--json", "--limit", "2"], make_deps(http=builds_with_local()))
     payload = json.loads(capsys.readouterr().out)
     assert code == 0
-    assert payload["local_version"] == "1.60.1.70009" and payload["latest"] == "1.60.1.70009"
-    assert [b["version"] for b in payload["builds"]] == ["1.60.1.70009", "1.60.1.69977"]
+    assert payload["local_version"] == LOCAL_VERSION and payload["latest"] == LOCAL_VERSION
+    assert [b["version"] for b in payload["builds"]] == [LOCAL_VERSION, "1.60.1.69977"]
     assert payload["builds"][0]["local"] is True and payload["total"] == 3
     assert "provenance" in payload
 

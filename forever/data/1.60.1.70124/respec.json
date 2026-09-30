@@ -1,0 +1,34 @@
+{
+ "build": "1.60.1.70009",
+ "certainty": "PC",
+ "beta_observed": {
+  "first": "1 po",
+  "second": "5 po",
+  "then": "montée attendue jusqu'à 50 po (règle Classic)",
+  "temporary_beta": "1 pa si aucune réinitialisation depuis 1 h (bêta uniquement)"
+ },
+ "classic_schedule_gold": [
+  1,
+  5,
+  10,
+  15,
+  20,
+  25,
+  30,
+  35,
+  40,
+  45,
+  50
+ ],
+ "classic_decay": "-5 po par mois sans réinitialisation (règle Classic, non confirmée pour Forever)",
+ "legacy_reset": "au maître de classe ; coût inconnu",
+ "dual_spec": "non annoncée ; l'interface semble prévoir une 2e spé (spéculation ~niveau 40)",
+ "sources": [
+  "wowforeverbuilds.com (21/09)",
+  "sportskeeda (20/09)",
+  "Icy Veins (24/09)",
+  "forums Blizzard EU (23/09)",
+  "lfcarry (24/09)"
+ ],
+ "inherited_from": "1.60.1.70009"
+}

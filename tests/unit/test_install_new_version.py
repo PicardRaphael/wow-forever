@@ -14,9 +14,10 @@ toujours l'installation."""
 
 import json
 import shutil
+from pathlib import Path
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, isolated_deps, read_json
+from conftest import DATA_DIR, PREVIOUS_VERSION, isolated_deps, read_json
 
 from forever.cli import main
 from forever.errors import InvalidArgumentError
@@ -25,7 +26,9 @@ from forever.pipeline.diff import diff_versions
 from forever.pipeline.install import InstallRefusedError, apply_install, plan_install
 from forever.store import load_version
 
-NEW_VERSION = "1.60.1.70124"
+# Version fictive, plus récente que la version précédente : les tests ne dépendent pas de la version réellement
+# installée, qui changera à chaque veille.
+NEW_VERSION = "1.60.1.70150"
 # Fichiers que `forever decode` n'écrit pas dans une candidate : `forever diff 1.60.1.70009 <candidate>` les compte
 # comme « fichiers retirés » (rapport du 2026-09-30).
 CARRIED = (
@@ -58,18 +61,23 @@ def strip_provenance(doc):
 
 @pytest.fixture
 def installed(tmp_path):
-    """Dépôt en l'état (1.60.1.70009 en révision 2), sur une copie."""
+    """Dépôt ramené à 1.60.1.70009 en révision 2 (les versions plus récentes sont retirées) : l'installation d'une
+    nouvelle version part de là."""
     data = tmp_path / "data"
     shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
+    for d in data.iterdir():
+        if d.is_dir() and d.name != PREVIOUS_VERSION:
+            shutil.rmtree(d)
+    write_manifest(data)
     return isolated_deps(tmp_path, data)
 
 
 @pytest.fixture
 def newer(candidate, tmp_path):
     """Candidate de la session, relabellisée en version plus récente (aucun accès réseau)."""
-    copy = tmp_path / "cand-70124"
+    copy = tmp_path / "cand-new"
     shutil.copytree(candidate.root, copy)
-    (copy / LOCAL_VERSION).rename(copy / NEW_VERSION)
+    (copy / PREVIOUS_VERSION).rename(copy / NEW_VERSION)
     sources = copy / NEW_VERSION / "sources.json"
     doc = read_json(sources)
     doc["game_version"] = NEW_VERSION
@@ -84,27 +92,29 @@ def test_new_version_creates_its_own_directory(installed, newer):
     after = sorted(p.name for p in installed.data_dir.iterdir() if p.is_dir())
     assert after == sorted([*before, NEW_VERSION])
     # La version précédente n'est pas touchée.
-    assert version_files(installed.data_dir / LOCAL_VERSION) == version_files(DATA_DIR / LOCAL_VERSION)
+    assert version_files(installed.data_dir / PREVIOUS_VERSION) == version_files(DATA_DIR / PREVIOUS_VERSION)
 
 
 def test_the_new_version_has_every_file_of_the_previous_one(installed, newer):
     apply_install(installed, newer, motif="T08a", new_version=True)
-    assert set(version_files(installed.data_dir / NEW_VERSION)) == set(version_files(DATA_DIR / LOCAL_VERSION))
+    assert set(version_files(installed.data_dir / NEW_VERSION)) == set(version_files(DATA_DIR / PREVIOUS_VERSION))
 
 
 def test_frozen_seed_copies_are_carried_unchanged(installed, newer):
     apply_install(installed, newer, motif="T08a", new_version=True)
     for name in ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json"):
-        assert (installed.data_dir / NEW_VERSION / name).read_bytes() == (DATA_DIR / LOCAL_VERSION / name).read_bytes()
+        assert (installed.data_dir / NEW_VERSION / name).read_bytes() == (
+            DATA_DIR / PREVIOUS_VERSION / name
+        ).read_bytes()
 
 
 def test_diff_between_the_two_installed_versions_has_no_removed_file(installed, newer):
     """Critère d'acceptation du bloc A : les 5 « fichiers retirés » de la comparaison avec la candidate brute
     disparaissent une fois la version installée."""
-    raw = diff_versions(installed, LOCAL_VERSION, newer)["changes"]
+    raw = diff_versions(installed, PREVIOUS_VERSION, newer)["changes"]
     assert sorted(c["key"] for c in raw if c["kind"] == "file") == sorted(CARRIED)
     apply_install(installed, newer, motif="T08a", new_version=True)
-    installed_diff = diff_versions(installed, LOCAL_VERSION, NEW_VERSION)["changes"]
+    installed_diff = diff_versions(installed, PREVIOUS_VERSION, NEW_VERSION)["changes"]
     assert [c for c in installed_diff if c["kind"] == "file"] == []
 
 
@@ -123,10 +133,10 @@ def test_the_new_version_starts_at_revision_one(installed, newer):
 
 def test_confirmed_changes_are_carried_with_their_origin(installed, newer):
     apply_install(installed, newer, motif="T08a", new_version=True)
-    before = read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")
+    before = read_json(DATA_DIR / PREVIOUS_VERSION / "confirmed_changes.json")
     after = read_json(installed.data_dir / NEW_VERSION / "confirmed_changes.json")
     assert after["version"] == NEW_VERSION
-    assert after["carried_from"] == LOCAL_VERSION
+    assert after["carried_from"] == PREVIOUS_VERSION
     assert len(after["changes"]) == len(before["changes"])
     # La révision d'origine de chaque changement est gardée telle quelle.
     assert [c.get("applied_in_revision") for c in after["changes"]] == [
@@ -135,17 +145,22 @@ def test_confirmed_changes_are_carried_with_their_origin(installed, newer):
 
 
 def test_inherited_files_keep_their_origin_and_certainty(installed, newer):
+    """L'installation reporte la marque d'origine telle que `forever decode` l'a écrite : elle nomme la version dont
+    le fichier vient, pas celle qu'on installe."""
+    expected = read_json(Path(newer) / NEW_VERSION / "sources.json")["files"]
     apply_install(installed, newer, motif="T08a", new_version=True)
     files = read_json(installed.data_dir / NEW_VERSION / "sources.json")["files"]
     for name in INHERITED:
-        assert files[name]["inherited_from"] == LOCAL_VERSION, name
+        origin = files[name]["inherited_from"]
+        assert origin == expected[name]["inherited_from"], name
+        assert origin != NEW_VERSION, name
 
 
 def test_manifest_points_to_the_new_version_and_keeps_the_old_one(installed, newer):
     apply_install(installed, newer, motif="T08a", new_version=True)
     manifest = load_manifest(installed.data_dir)
     assert manifest["game_version"] == NEW_VERSION
-    assert set(manifest["versions"]) == {LOCAL_VERSION, NEW_VERSION}
+    assert set(manifest["versions"]) == {PREVIOUS_VERSION, NEW_VERSION}
     assert manifest == compute_manifest(installed.data_dir)
 
 
@@ -154,7 +169,7 @@ def test_nothing_changed_is_installed_anyway(installed, newer):
     `forever install` sans `--new-version` refuse une candidate qui ne change rien."""
     plan = plan_install(installed, newer, new_version=True)
     assert plan["refused"] == []
-    assert (plan["version_from"], plan["version_to"]) == (LOCAL_VERSION, NEW_VERSION)
+    assert (plan["version_from"], plan["version_to"]) == (PREVIOUS_VERSION, NEW_VERSION)
     # Aucune valeur de jeu ne change : ni changement confirmé, ni observation, ni champ retiré.
     assert {k: plan["counts"][k] for k in ("confirmed", "observation", "removed_field")} == {
         "confirmed": 0,
@@ -174,7 +189,7 @@ def test_the_installed_values_are_those_of_the_previous_version(installed, newer
     apply_install(installed, newer, motif="T08a", new_version=True)
     for name in ("talents.json", "spells.json"):
         new = strip_provenance(read_json(installed.data_dir / NEW_VERSION / name))
-        old = strip_provenance(read_json(DATA_DIR / LOCAL_VERSION / name))
+        old = strip_provenance(read_json(DATA_DIR / PREVIOUS_VERSION / name))
         assert new == old, name
 
 
@@ -198,12 +213,12 @@ def test_plain_install_still_refuses_another_version(installed, newer):
 
 
 def test_a_value_outside_the_rules_is_still_refused(installed, newer, tmp_path):
-    path = tmp_path / "cand-70124" / NEW_VERSION / "talents.json"
+    path = tmp_path / "cand-new" / NEW_VERSION / "talents.json"
     doc = read_json(path)
     t = next(t for tree in doc["trees"] for t in tree["talents"] if t["key"] == "improvedFrostbolt")
     t["ranks"][0] = [9]
     path.write_bytes(json.dumps(doc, ensure_ascii=False, indent=1).encode("utf-8"))
-    write_manifest(tmp_path / "cand-70124")
+    write_manifest(tmp_path / "cand-new")
     plan = plan_install(installed, newer, new_version=True)
     assert [c["path"] for c in plan["refused"]] == ["improvedFrostbolt.ranks[1]"]
     with pytest.raises(InstallRefusedError):

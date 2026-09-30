@@ -45,9 +45,15 @@ FIXTURES = REPO_ROOT / "tests" / "fixtures"
 DATA_DIR = REPO_ROOT / "forever" / "data"
 REGISTRY_PATH = REPO_ROOT / "docs" / "MECHANICS_REGISTRY.yaml"
 SEED_DATA = REPO_ROOT / "seed" / "forever-mage" / "data"
+# Version des données du seed (lecture seule, figée à la version portée en T02) : le seed ne suit pas les
+# versions du jeu, la parité se joue toujours sur la sienne.
+SEED_VERSION = max(d.name for d in SEED_DATA.iterdir() if d.is_dir() and d.name[0].isdigit())
 
-# Version des données du dépôt (dossier forever/data/1.60.1.70009/, copié du seed).
-LOCAL_VERSION = "1.60.1.70009"
+# Version installée du dépôt (dossier forever/data/<version>/ le plus récent). Passée à 1.60.1.70124 en T08a :
+# les 22 tables du client sont identiques à celles de 1.60.1.70009, aucune valeur de jeu ne change.
+LOCAL_VERSION = "1.60.1.70124"
+# Version précédente, gardée dans le dépôt : sert aux comparaisons entre versions installées.
+PREVIOUS_VERSION = "1.60.1.70009"
 PRODUCT = "wow_classic_beta"
 PREFIX = "1.60."
 NOW = datetime(2026, 9, 27, 12, 0, tzinfo=UTC)
@@ -191,7 +197,8 @@ def corrupt_manifest(data_dir: Path, kind: str = "tronque") -> None:
 
 # --- Pipeline de données (T03) -------------------------------------------------------------------
 
-WAGO_70009 = FIXTURES / "wago" / LOCAL_VERSION  # extraits des tables du client (voir son README.md)
+# Extraits des tables du client (voir son README.md) : relevés sur 1.60.1.70009, identiques en 1.60.1.70124.
+WAGO_70009 = FIXTURES / "wago" / PREVIOUS_VERSION
 
 
 def read_json(path: Path) -> Any:
@@ -225,11 +232,13 @@ def client_tables(decode_rules: Any) -> Any:
 
 @pytest.fixture(scope="session")
 def candidate(tmp_path_factory: pytest.TempPathFactory) -> Any:
-    """Version candidate décodée des fixtures (dossier temporaire partagé par la session)."""
+    """Version candidate décodée des fixtures, à **leur** version (1.60.1.70009 : ce sont des extraits de ce
+    client), dossier temporaire partagé par la session. Les tests de la révision (T06b) l'installent dans un dépôt
+    ramené à cette version ; ceux de la nouvelle version (T08a) la relabellisent."""
     from forever.pipeline.decode import decode_version
 
     tmp = tmp_path_factory.mktemp("candidate")
-    return decode_version(isolated_deps(tmp), LOCAL_VERSION, csv_dir=WAGO_70009, out=tmp / "candidate")
+    return decode_version(isolated_deps(tmp), PREVIOUS_VERSION, csv_dir=WAGO_70009, out=tmp / "candidate")
 
 
 def change_key(c: Mapping[str, Any]) -> tuple[str, str, str, str, str, str]:
@@ -264,11 +273,11 @@ def seed_view(root: Path) -> Any:
     pour comparer le décodage du client à la référence de T03 une fois le dépôt en révision 2 (T06b)."""
     from forever.store import VersionData
 
-    view = root / "seed-view" / LOCAL_VERSION
+    view = root / "seed-view" / PREVIOUS_VERSION
     view.mkdir(parents=True, exist_ok=True)
     for name in ("talents", "spells"):
         shutil.copyfile(DATA_DIR / LOCAL_VERSION / f"_seed_{name}.json", view / f"{name}.json")
-    return VersionData(LOCAL_VERSION, "0" * 12, view, {})
+    return VersionData(PREVIOUS_VERSION, "0" * 12, view, {})
 
 
 def client_vs_reference(candidate: Any, kind: str) -> tuple[list[Any], list[Any], list[Any]]:

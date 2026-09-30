@@ -9,7 +9,7 @@ import math
 import random
 
 import pytest
-from conftest import LOCAL_VERSION, REPO_ROOT
+from conftest import REPO_ROOT, SEED_VERSION
 
 from forever.engine import best_rank, character, check_build, coefficient, expected_cast, legal_additions
 
@@ -60,7 +60,7 @@ def fm():
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    module.data(LOCAL_VERSION)
+    module.data(SEED_VERSION)
     return module
 
 

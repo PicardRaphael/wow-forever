@@ -14,6 +14,7 @@ import pytest
 from conftest import (
     DATA_DIR,
     LOCAL_VERSION,
+    PREVIOUS_VERSION,
     change_key,
     isolated_deps,
     read_json,
@@ -52,7 +53,7 @@ def sha(path):
 def rewind_to_r1(data):
     """État r1 sur une copie des données : talents.json et spells.json = copies du seed, confirmed_changes.json sans
     trace d'application ni observation installée, sources.json sans révision, pas de revisions.json."""
-    v = data / LOCAL_VERSION
+    v = data / PREVIOUS_VERSION
     shutil.copyfile(v / "_seed_talents.json", v / "talents.json")
     shutil.copyfile(v / "_seed_spells.json", v / "spells.json")
     confirmed = read_json(v / "confirmed_changes.json")
@@ -70,9 +71,15 @@ def rewind_to_r1(data):
 
 @pytest.fixture
 def r1(tmp_path):
+    """Dépôt ramené à 1.60.1.70009 en révision 1 : les versions plus récentes sont retirées, `forever install`
+    (sans --new-version) révise la version courante et c'est celle-là qu'on teste ici (T06b)."""
     data = tmp_path / "data"
     shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
+    for d in data.iterdir():
+        if d.is_dir() and d.name != PREVIOUS_VERSION:
+            shutil.rmtree(d)
     rewind_to_r1(data)
+    write_manifest(data)
     return isolated_deps(tmp_path, data)
 
 
@@ -91,7 +98,7 @@ def test_plan_lists_exactly_the_allowed_changes(r1, candidate):
             key = (c["file"], c["path"].split(".", 1)[1])
             added[key] = added.get(key, 0) + 1
     assert added == ADDED
-    confirmed = read_json(r1.data_dir / LOCAL_VERSION / "confirmed_changes.json")["changes"]
+    confirmed = read_json(r1.data_dir / PREVIOUS_VERSION / "confirmed_changes.json")["changes"]
     wanted = {(c["kind"] + "s.json", f"{c['key']}.{c['field']}", json.dumps(c["new"])) for c in confirmed}
     got = {(c["file"], c["path"], json.dumps(c["after"])) for c in plan["changes"] if c["rule"] == "confirmed"}
     assert got == wanted
@@ -103,15 +110,15 @@ def test_plan_lists_exactly_the_allowed_changes(r1, candidate):
 
 
 def test_plan_writes_nothing(r1, candidate):
-    before = version_files(r1.data_dir / LOCAL_VERSION)
+    before = version_files(r1.data_dir / PREVIOUS_VERSION)
     plan_install(r1, cand(candidate))
-    assert version_files(r1.data_dir / LOCAL_VERSION) == before
+    assert version_files(r1.data_dir / PREVIOUS_VERSION) == before
 
 
 def test_change_outside_the_rules_is_refused(r1, candidate, tmp_path):
     copy = tmp_path / "cand"
     shutil.copytree(candidate.root, copy)
-    path = copy / LOCAL_VERSION / "talents.json"
+    path = copy / PREVIOUS_VERSION / "talents.json"
     doc = read_json(path)
     t = next(t for tree in doc["trees"] for t in tree["talents"] if t["key"] == "improvedFrostbolt")
     t["ranks"][0] = [9]
@@ -121,33 +128,33 @@ def test_change_outside_the_rules_is_refused(r1, candidate, tmp_path):
     assert [(c["path"], c["before"], c["after"]) for c in plan["refused"]] == [
         ("improvedFrostbolt.ranks[1]", [0.1], [9])
     ]
-    before = version_files(r1.data_dir / LOCAL_VERSION)
+    before = version_files(r1.data_dir / PREVIOUS_VERSION)
     with pytest.raises(InstallRefusedError):
         apply_install(r1, str(copy), motif="test")
-    assert version_files(r1.data_dir / LOCAL_VERSION) == before
+    assert version_files(r1.data_dir / PREVIOUS_VERSION) == before
 
 
 def test_candidate_of_another_version_is_refused(r1, candidate, tmp_path):
     copy = tmp_path / "cand"
     shutil.copytree(candidate.root, copy)
-    (copy / LOCAL_VERSION).rename(copy / "1.60.1.70150")
+    (copy / PREVIOUS_VERSION).rename(copy / "1.60.1.70150")
     write_manifest(copy)
     with pytest.raises(InvalidArgumentError):
         plan_install(r1, str(copy))
 
 
 def test_apply_writes_revision_two(r1, candidate):
-    seed_before = {n: sha(r1.data_dir / LOCAL_VERSION / n) for n in ("_seed_talents.json", "_seed_spells.json")}
+    seed_before = {n: sha(r1.data_dir / PREVIOUS_VERSION / n) for n in ("_seed_talents.json", "_seed_spells.json")}
     rev = apply_install(r1, cand(candidate), motif="valeurs du client", report=REPORT, date="2026-09-29")
     assert rev["revision"] == 2 and rev["report"] == REPORT
     ensure_integrity(r1.data_dir)
-    v = r1.data_dir / LOCAL_VERSION
+    v = r1.data_dir / PREVIOUS_VERSION
     history = read_json(v / "revisions.json")
     assert [r["revision"] for r in history["revisions"]] == [1, 2]
     assert history["revisions"][1]["counts"]["confirmed"] == 15
     sources = read_json(v / "sources.json")
     assert (sources["revision"], sources["revised_at"]) == (2, "2026-09-29")
-    assert compute_manifest(r1.data_dir)["versions"][LOCAL_VERSION]["revision"] == 2
+    assert compute_manifest(r1.data_dir)["versions"][PREVIOUS_VERSION]["revision"] == 2
     assert {n: sha(v / n) for n in seed_before} == seed_before
     confirmed = read_json(v / "confirmed_changes.json")["changes"]
     assert len(confirmed) == 18 and all(c["applied_in_revision"] == 2 for c in confirmed)
@@ -162,7 +169,7 @@ def test_apply_writes_revision_two(r1, candidate):
 
 def test_report_is_markdown_with_every_value(r1, candidate):
     text = render_install_report(plan_install(r1, cand(candidate)))
-    assert text.startswith(f"# data: {LOCAL_VERSION} r1 → r2")
+    assert text.startswith(f"# data: {PREVIOUS_VERSION} r1 → r2")
     for path in ("impact.ranks[2]", "hotStreak.ranks[1]", "hotStreak.duration_s", "blast_wave.ranks[1].level"):
         assert path in text, path
     for key, cost in COSTS.items():
@@ -172,18 +179,18 @@ def test_report_is_markdown_with_every_value(r1, candidate):
 
 def test_cli_dry_run_writes_only_the_report(r1, candidate, tmp_path, capsys):
     out = tmp_path / "rapport.md"
-    before = version_files(r1.data_dir / LOCAL_VERSION)
+    before = version_files(r1.data_dir / PREVIOUS_VERSION)
     code = main(["install", cand(candidate), "--dry-run", "--report", str(out)], deps=r1)
     assert code == 0
-    assert version_files(r1.data_dir / LOCAL_VERSION) == before
-    assert out.read_text(encoding="utf-8").startswith(f"# data: {LOCAL_VERSION} r1 → r2")
+    assert version_files(r1.data_dir / PREVIOUS_VERSION) == before
+    assert out.read_text(encoding="utf-8").startswith(f"# data: {PREVIOUS_VERSION} r1 → r2")
     assert "simulation" in capsys.readouterr().out
 
 
 def test_cli_without_consent_writes_nothing(r1, candidate, capsys):
-    before = version_files(r1.data_dir / LOCAL_VERSION)
+    before = version_files(r1.data_dir / PREVIOUS_VERSION)
     assert main(["install", cand(candidate)], deps=r1) == 0
-    assert version_files(r1.data_dir / LOCAL_VERSION) == before
+    assert version_files(r1.data_dir / PREVIOUS_VERSION) == before
     assert "refusé" in capsys.readouterr().out
 
 
@@ -195,7 +202,7 @@ def test_cli_yes_installs(r1, candidate, capsys):
 
 
 def test_cli_report_never_goes_into_the_data(r1, candidate):
-    target = r1.data_dir / LOCAL_VERSION / "rapport.md"
+    target = r1.data_dir / PREVIOUS_VERSION / "rapport.md"
     assert main(["install", cand(candidate), "--dry-run", "--report", str(target)], deps=r1) != 0
     assert not target.exists()
 
@@ -204,7 +211,7 @@ def test_cli_report_never_goes_into_the_data(r1, candidate):
 
 
 def test_repository_is_revision_two(make_deps):
-    v = DATA_DIR / LOCAL_VERSION
+    v = DATA_DIR / PREVIOUS_VERSION
     history = read_json(v / "revisions.json")
     assert [r["revision"] for r in history["revisions"]] == [1, 2]
     assert history["revisions"][1]["report"] == REPORT
@@ -214,13 +221,16 @@ def test_repository_is_revision_two(make_deps):
     p = make_provenance(
         deps, game_version=LOCAL_VERSION, data_sha="0" * 12, freshness="fresh", certainty="certain", assumptions=[]
     )
-    assert p["data_revision"] == 2
+    # T08a : la version installée est 1.60.1.70124, en révision 1 (une nouvelle version repart à 1).
+    assert p["data_revision"] == 1
 
 
 def test_every_talent_is_certain(make_deps, game_data):
+    # La certitude nomme le build où la valeur a été lue : relue en 1.60.1.70124 à l'installation (T08a).
+    build = "FC-" + LOCAL_VERSION.rsplit(".", 1)[-1]
     for key in game_data.talents:
         res = lookup_talent(make_deps(), key)
-        assert res["source"] == "FC-70009", key
+        assert res["source"] == build, key
         assert res["provenance"]["certainty"] == "certain", key
         assert all("$" not in r["description"] for r in res["ranks"]), key
 
@@ -256,19 +266,19 @@ def test_forever_uses_client_costs_and_seed_keeps_its_estimate(game_data, seed_g
 
 
 def test_client_decode_matches_the_installed_data(make_deps, candidate):
-    d = diff_versions(make_deps(), LOCAL_VERSION, cand(candidate))
+    d = diff_versions(make_deps(), PREVIOUS_VERSION, cand(candidate))
     assert [c for c in d["changes"] if c["kind"] != "file"] == []
 
 
 def test_client_decode_against_the_seed_copies_is_the_confirmed_list(tmp_path, candidate):
     client = load_version(isolated_deps(tmp_path, candidate.root))
     changes = [c for c in compare_data(seed_view(tmp_path), client) if c["kind"] != "file"]
-    confirmed = read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"]
+    confirmed = read_json(DATA_DIR / PREVIOUS_VERSION / "confirmed_changes.json")["changes"]
     assert len(confirmed) == 18
     assert sorted(map(change_key, changes)) == sorted(map(change_key, confirmed))
 
 
 def test_status_shows_the_revision(make_deps):
     rep = status_report(make_deps(), allow_network=False)
-    assert rep["data_revision"] == 2
-    assert render_status(rep)[0].startswith(f"Données locales {LOCAL_VERSION} r2 ·")
+    assert rep["data_revision"] == 1
+    assert render_status(rep)[0].startswith(f"Données locales {LOCAL_VERSION} r1 ·")

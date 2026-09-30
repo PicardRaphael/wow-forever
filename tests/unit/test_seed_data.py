@@ -9,7 +9,7 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, SEED_DATA, isolated_deps
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, SEED_DATA, SEED_VERSION, isolated_deps
 
 import forever.build as build_module
 from forever.build import build_report
@@ -44,14 +44,14 @@ def client_copy(tmp_path_factory, candidate):
     data = tmp / "data"
     shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
     for name in ("talents.json", "spells.json"):
-        shutil.copyfile(candidate.root / LOCAL_VERSION / name, data / LOCAL_VERSION / name)
+        shutil.copyfile(candidate.root / PREVIOUS_VERSION / name, data / LOCAL_VERSION / name)
     write_manifest(data)
     return isolated_deps(tmp, data)
 
 
 def test_seed_copies_are_byte_identical_to_the_seed():
     for copy, (name, digest) in SEED_COPIES.items():
-        assert sha(SEED_DATA / LOCAL_VERSION / name) == digest, name
+        assert sha(SEED_DATA / SEED_VERSION / name) == digest, name
         assert sha(DATA_DIR / LOCAL_VERSION / copy) == digest, copy
 
 

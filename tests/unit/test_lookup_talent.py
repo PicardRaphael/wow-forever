@@ -82,15 +82,16 @@ def test_rank_out_of_bounds(make_deps, rank):
 
 
 def test_provenance_and_certainty_by_source_build(make_deps):
-    # T06b, révision 2 : les 54 talents sont lus dans le client 1.60.1.70009 (FC-69893 auparavant pour 49).
+    # Les 54 talents sont lus dans le client ; la certitude nomme le build relu (T08a : 1.60.1.70124).
+    build = "FC-" + LOCAL_VERSION.rsplit(".", 1)[-1]
     old = lookup_talent(make_deps(http=FakeHttp.failing()), "Improved Frostbolt")
     assert validate_provenance(old["provenance"]) == []
     assert old["provenance"]["game_version"] == LOCAL_VERSION
-    assert old["source"] == "FC-70009"
+    assert old["source"] == build
     assert old["provenance"]["certainty"] == "certain"
     assert not any("69893" in a for a in old["provenance"]["assumptions"])
     new = lookup_talent(make_deps(), "Pyroblast")
-    assert new["source"] == "FC-70009"
+    assert new["source"] == build
     assert new["provenance"]["certainty"] == "certain"
 
 

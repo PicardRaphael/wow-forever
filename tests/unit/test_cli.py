@@ -29,7 +29,7 @@ def test_lookup_text(capsys, make_deps):
         "1,8 s",
         "35 mana",
         "portée 30 m",
-        "1.60.1.70009",
+        LOCAL_VERSION,
         "certitude certain",
     ]:
         assert fragment in out, fragment

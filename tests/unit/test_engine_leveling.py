@@ -10,7 +10,7 @@ import math
 import sys
 
 import pytest
-from conftest import LOCAL_VERSION, REPO_ROOT
+from conftest import REPO_ROOT, SEED_VERSION
 
 from forever.engine import best_rank, character, expected_cast, rank_values_at_level
 from forever.engine.casting import pushback_chance, pushback_s, spell_cooldown
@@ -44,7 +44,7 @@ def seed_sim():
         spec.loader.exec_module(module)
     finally:
         sys.path.remove(str(SEED_SCRIPTS))
-    module.fm.data(LOCAL_VERSION)
+    module.fm.data(SEED_VERSION)
     return module
 
 

@@ -4,7 +4,7 @@ Valeurs des fixtures wago 1.60.1.70009 : Frostbolt rang 3 (837) a 46 points au n
 18, variance 0,111 ; Arcane Explosion rang 1 (1449) 32 points +0,4 par niveau de 14 à 19."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, read_json
 
 from forever.engine.spells import RankValues, rank_values_at_level
 from forever.pipeline.decode import decode_scaling
@@ -24,7 +24,7 @@ def test_arcane_explosion_rank1_at_19(game_data):
 def test_reproduces_decoded_ranks_at_capped_max_level(game_data, candidate, decode_rules):
     """Au plafond de niveau, chaque sort (et chaque sort déclenché) est évalué à min(MaxLevel, plafond) : les 99
     rangs décodés du client (min, max, dot_total) sont reproduits."""
-    decoded = read_json(candidate.root / LOCAL_VERSION / "spells.json")["spells"]
+    decoded = read_json(candidate.root / PREVIOUS_VERSION / "spells.json")["spells"]
     cap = decode_rules["levels"]["level_cap"]
     checked = 0
     for key, spell in decoded.items():
@@ -66,9 +66,16 @@ def test_start_recovery_of_every_rank(game_data):
 
 
 def test_decode_reproduces_installed_spell_scaling(candidate):
-    assert read_json(candidate.root / LOCAL_VERSION / "spell_scaling.json") == read_json(
-        DATA_DIR / LOCAL_VERSION / "spell_scaling.json"
-    )
+    """Le décodage reproduit les valeurs installées ; seuls `build` et `source` diffèrent, qui nomment le build
+    décodé (les tables de 1.60.1.70009 et de 1.60.1.70124 sont identiques, T08a)."""
+    decoded = read_json(candidate.root / PREVIOUS_VERSION / "spell_scaling.json")
+    installed = read_json(DATA_DIR / LOCAL_VERSION / "spell_scaling.json")
+    assert decoded["build"] == PREVIOUS_VERSION and installed["build"] == LOCAL_VERSION
+    assert PREVIOUS_VERSION in decoded["source"] and LOCAL_VERSION in installed["source"]
+    ignored = ("build", "source")
+    assert {k: v for k, v in decoded.items() if k not in ignored} == {
+        k: v for k, v in installed.items() if k not in ignored
+    }
 
 
 # --- T04e : coefficients et périodes du client (schéma 2) ------------------------------------------

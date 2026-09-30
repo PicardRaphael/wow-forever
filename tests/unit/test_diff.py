@@ -7,7 +7,7 @@ import json
 import shutil
 
 import pytest
-from conftest import LOCAL_VERSION, read_json, tamper
+from conftest import LOCAL_VERSION, PREVIOUS_VERSION, read_json, tamper
 
 from forever.errors import DataIntegrityError, UnknownVersionError
 from forever.manifest import write_manifest
@@ -146,6 +146,6 @@ def test_repository_against_candidate_path(make_deps, candidate):
 def test_candidate_integrity_is_required(make_deps, candidate, tmp_path):
     copy = tmp_path / "cand"
     shutil.copytree(candidate.root, copy)
-    tamper(copy / LOCAL_VERSION / "talents.json")
+    tamper(copy / PREVIOUS_VERSION / "talents.json")  # la candidate est décodée à la version des fixtures
     with pytest.raises(DataIntegrityError):
         diff_versions(make_deps(), LOCAL_VERSION, str(copy))

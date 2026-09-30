@@ -4,7 +4,7 @@ import json
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from conftest import LOCAL_VERSION, NOW, PREFIX, PRODUCT, FakeHttp
+from conftest import FIXTURES, LOCAL_VERSION, NOW, PREFIX, PRODUCT, FakeHttp
 
 from forever.cli import main
 from forever.freshness import check_freshness, classify, freshness_for_version
@@ -18,8 +18,18 @@ def check(deps, *, allow_network=True):
 # --- Critère 2 : les quatre statuts ---------------------------------------------------------------
 
 
+def fresh_http():
+    """Réponse où la dernière version publiée est celle installée. La fixture nomme 1.60.1.70009 ; le dépôt suit les
+    versions du jeu (T08a), la fraîcheur se juge donc contre la version installée, pas contre une chaîne figée."""
+    payload = json.loads((FIXTURES / "wago" / "builds_fresh.json").read_text(encoding="utf-8"))
+    for entry in payload["wow_classic_beta"]:
+        if entry["version"] == "1.60.1.70009":
+            entry["version"] = LOCAL_VERSION
+    return FakeHttp(body=json.dumps(payload).encode("utf-8"))
+
+
 def test_fresh(make_deps):
-    r = check(make_deps(http=FakeHttp.fixture("builds_fresh.json")))
+    r = check(make_deps(http=fresh_http()))
     assert r["freshness"] == "fresh"
     assert r["source"] == "network"
     assert r["latest_version"] == LOCAL_VERSION
@@ -70,7 +80,7 @@ def test_no_prefixed_version_is_silent(make_deps):
 
 def test_recent_cache_avoids_network(make_deps, tmp_path):
     cache = tmp_path / "shared-cache"
-    check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), now=NOW - timedelta(hours=2), cache_dir=cache))
+    check(make_deps(http=fresh_http(), now=NOW - timedelta(hours=2), cache_dir=cache))
     http = FakeHttp.fixture("builds_stale.json")
     r = check(make_deps(http=http, cache_dir=cache))
     assert http.calls == []
@@ -80,7 +90,7 @@ def test_recent_cache_avoids_network(make_deps, tmp_path):
 
 def test_old_cache_triggers_network(make_deps, tmp_path):
     cache = tmp_path / "shared-cache"
-    check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), now=NOW - timedelta(hours=7), cache_dir=cache))
+    check(make_deps(http=fresh_http(), now=NOW - timedelta(hours=7), cache_dir=cache))
     http = FakeHttp.fixture("builds_stale.json")
     r = check(make_deps(http=http, cache_dir=cache))
     assert len(http.calls) == 1
@@ -90,7 +100,7 @@ def test_old_cache_triggers_network(make_deps, tmp_path):
 
 def test_network_failure_with_cache_is_unknown_with_last_state(make_deps, tmp_path):
     cache = tmp_path / "shared-cache"
-    check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), now=NOW - timedelta(hours=9), cache_dir=cache))
+    check(make_deps(http=fresh_http(), now=NOW - timedelta(hours=9), cache_dir=cache))
     r = check(make_deps(http=FakeHttp.failing(), cache_dir=cache))
     assert r["freshness"] == "unknown"
     assert r["checked_at"] == "2026-09-27T03:00:00Z"
@@ -104,7 +114,7 @@ def test_network_failure_with_cache_is_unknown_with_last_state(make_deps, tmp_pa
 
 def test_tool_without_network_reuses_old_cache_with_assumption(make_deps, tmp_path):
     cache = tmp_path / "shared-cache"
-    check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), now=NOW - timedelta(hours=9), cache_dir=cache))
+    check(make_deps(http=fresh_http(), now=NOW - timedelta(hours=9), cache_dir=cache))
     http = FakeHttp.fixture("builds_stale.json")
     r = check(make_deps(http=http, cache_dir=cache), allow_network=False)
     assert http.calls == []
@@ -117,14 +127,14 @@ def test_tool_without_network_reuses_old_cache_with_assumption(make_deps, tmp_pa
 def test_tool_without_network_reclassifies_cache_with_now(make_deps, tmp_path):
     cache = tmp_path / "shared-cache"
     # observation du 2026-09-27 : 70009 publiée le 2026-09-24 ; relue 20 jours plus tard
-    check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), cache_dir=cache))
+    check(make_deps(http=fresh_http(), cache_dir=cache))
     later = datetime(2026, 10, 17, 12, 0, tzinfo=UTC)
     r = check(make_deps(now=later, cache_dir=cache), allow_network=False)
     assert r["freshness"] == "silent"
 
 
 def test_tool_without_network_and_without_cache_is_unknown(make_deps):
-    http = FakeHttp.fixture("builds_fresh.json")
+    http = fresh_http()
     r = check(make_deps(http=http), allow_network=False)
     assert http.calls == []
     assert r["freshness"] == "unknown"
@@ -132,7 +142,7 @@ def test_tool_without_network_and_without_cache_is_unknown(make_deps):
 
 
 def test_offline_deps_never_call_network(make_deps):
-    http = FakeHttp.fixture("builds_fresh.json")
+    http = fresh_http()
     r = check(make_deps(http=http, offline=True))
     assert http.calls == []
     assert r["freshness"] == "unknown"
@@ -142,7 +152,7 @@ def test_corrupt_cache_is_ignored(make_deps, tmp_path):
     cache = tmp_path / "shared-cache"
     cache.mkdir()
     (cache / "status.json").write_text("{pas du json", encoding="utf-8")
-    r = check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), cache_dir=cache))
+    r = check(make_deps(http=fresh_http(), cache_dir=cache))
     assert r["freshness"] == "fresh"
 
 
@@ -151,7 +161,7 @@ def test_corrupt_cache_is_ignored(make_deps, tmp_path):
 
 def future_cache(make_deps, cache):
     """Cache écrit par une horloge en avance d'un jour sur NOW."""
-    check(make_deps(http=FakeHttp.fixture("builds_fresh.json"), now=NOW + timedelta(days=1), cache_dir=cache))
+    check(make_deps(http=fresh_http(), now=NOW + timedelta(days=1), cache_dir=cache))
 
 
 def write_cache(cache, fetched_at, version=LOCAL_VERSION):

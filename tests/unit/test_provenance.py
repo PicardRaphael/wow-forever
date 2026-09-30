@@ -86,7 +86,7 @@ def test_text_line_has_all_seven_fields():
     line = format_provenance_line(VALID)
     assert line.startswith("Provenance")
     for label in [
-        "version 1.60.1.70009 r1",
+        f"version {VALID['game_version']} r{VALID['data_revision']}",
         "données 3f9a1c2b7d4e",
         "générée 2026-09-27T10:00:00Z",
         "fraîcheur fresh",
@@ -117,7 +117,8 @@ def test_make_provenance(make_deps):
     assert p["generated_at"] == "2026-09-27T12:00:00Z"
     assert p["registry_coverage"] == coverage(REGISTRY_PATH)
     assert p["assumptions"] == ["a"]
-    assert p["data_revision"] == 2  # T06b : révision de la version, lue dans sources.json (via le manifeste)
+    # Révision de la version installée, lue dans sources.json (via le manifeste) : 1 depuis T08a.
+    assert p["data_revision"] == 1
 
 
 def test_make_provenance_without_registry(make_deps, tmp_path):

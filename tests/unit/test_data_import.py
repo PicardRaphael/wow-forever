@@ -1,10 +1,15 @@
-"""Les données 1.60.1.70009 sont des copies octet pour octet du seed forever-mage (sauf sources.json et
+"""Les fichiers non décodés de la version installée viennent du seed forever-mage (sauf sources.json et
 mechanics.json, rédigés dans forever-core). Depuis la révision 2 (T06b), talents.json et spells.json portent les
-valeurs du client ; leurs copies du seed sont `_seed_talents.json` et `_seed_spells.json` (test_seed_data.py)."""
+valeurs du client ; leurs copies du seed sont `_seed_talents.json` et `_seed_spells.json` (test_seed_data.py).
+
+Depuis T08a, la version installée (1.60.1.70124) hérite ces fichiers de 1.60.1.70009 : `forever decode` y ajoute
+`inherited_from` et les réécrit. Ils ne sont donc plus identiques octet pour octet au seed ; leur **contenu** l'est,
+cette marque d'origine mise à part."""
 
 import hashlib
+import json
 
-from conftest import DATA_DIR, LOCAL_VERSION, SEED_DATA
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, SEED_DATA, SEED_VERSION
 
 SEED_FILES = [
     "_source_gunba_mage_tree.json",
@@ -19,13 +24,25 @@ def sha(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def test_seed_files_are_byte_identical():
+def content(path):
+    """Contenu du fichier, sa marque d'origine mise à part (`inherited_from`, écrite par forever decode)."""
+    doc = json.loads(path.read_text(encoding="utf-8"))
+    return {k: v for k, v in doc.items() if k != "inherited_from"} if isinstance(doc, dict) else doc
+
+
+def test_seed_files_are_byte_identical_in_the_version_they_came_from():
     for name in SEED_FILES:
-        assert sha(DATA_DIR / LOCAL_VERSION / name) == sha(SEED_DATA / LOCAL_VERSION / name), name
+        assert sha(DATA_DIR / PREVIOUS_VERSION / name) == sha(SEED_DATA / SEED_VERSION / name), name
+
+
+def test_seed_files_are_inherited_unchanged_by_the_installed_version():
+    for name in SEED_FILES:
+        assert content(DATA_DIR / LOCAL_VERSION / name) == content(SEED_DATA / SEED_VERSION / name), name
 
 
 def test_overrides_copied_into_version_dir():
-    assert sha(DATA_DIR / LOCAL_VERSION / "overrides.json") == sha(SEED_DATA / "overrides.json")
+    assert sha(DATA_DIR / PREVIOUS_VERSION / "overrides.json") == sha(SEED_DATA / "overrides.json")
+    assert content(DATA_DIR / LOCAL_VERSION / "overrides.json") == content(SEED_DATA / "overrides.json")
 
 
 def test_version_dir_contains_exactly_expected_files():

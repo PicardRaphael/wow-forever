@@ -3,7 +3,7 @@
 import shutil
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, WAGO_70009, FakeHttp, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, WAGO_70009, FakeHttp, read_json
 
 from forever.errors import CandidateExistsError, CsvMissingError
 from forever.gamedata import build_game_data
@@ -18,14 +18,14 @@ EXPECTED_FILES = {*DECODED_FILES, *INHERITED_FILES, "sources.json"}
 def version_data(root):
     identity = current_identity(root)
     return VersionData(
-        identity.game_version, identity.data_sha, root / LOCAL_VERSION, read_sources(root, LOCAL_VERSION)
+        identity.game_version, identity.data_sha, root / PREVIOUS_VERSION, read_sources(root, PREVIOUS_VERSION)
     )
 
 
 def test_candidate_is_a_complete_data_dir(candidate):
-    assert candidate.version == LOCAL_VERSION
+    assert candidate.version == PREVIOUS_VERSION
     assert verify(candidate.root).ok
-    names = {p.name for p in (candidate.root / LOCAL_VERSION).iterdir()}
+    names = {p.name for p in (candidate.root / PREVIOUS_VERSION).iterdir()}
     assert names == EXPECTED_FILES and len(names) == 12  # T04 : monsters.json hérité, spell_scaling.json décodé
     assert "_source_gunba_mage_tree.json" not in names and "confirmed_changes.json" not in names
 
@@ -36,12 +36,12 @@ def test_counts(candidate):
 
 def test_inherited_files_are_marked(candidate):
     for name in INHERITED_FILES:
-        assert read_json(candidate.root / LOCAL_VERSION / name)["inherited_from"] == LOCAL_VERSION, name
+        assert read_json(candidate.root / PREVIOUS_VERSION / name)["inherited_from"] == LOCAL_VERSION, name
 
 
 def test_sources_describe_every_file(candidate):
-    sources = read_json(candidate.root / LOCAL_VERSION / "sources.json")
-    assert sources["game_version"] == LOCAL_VERSION
+    sources = read_json(candidate.root / PREVIOUS_VERSION / "sources.json")
+    assert sources["game_version"] == PREVIOUS_VERSION
     assert set(sources["files"]) == EXPECTED_FILES - {"sources.json"}
     assert sources["files"]["talents.json"]["certainty"] == "certain"
     assert sources["files"]["spells.json"]["certainty"] == "certain"
@@ -62,7 +62,7 @@ def test_observations_mention_client_spell_ids(candidate):
 
 def test_repository_data_is_untouched(make_deps, tmp_path):
     before = compute_manifest(DATA_DIR)
-    decode_version(make_deps(), LOCAL_VERSION, csv_dir=WAGO_70009, out=tmp_path / "c")
+    decode_version(make_deps(), PREVIOUS_VERSION, csv_dir=WAGO_70009, out=tmp_path / "c")
     assert compute_manifest(DATA_DIR) == before
     assert verify(DATA_DIR).ok
 
@@ -70,23 +70,23 @@ def test_repository_data_is_untouched(make_deps, tmp_path):
 def test_default_out_and_csv_dir_use_the_cache(make_deps):
     http = FakeHttp.failing()
     deps = make_deps(http=http)
-    shutil.copytree(WAGO_70009, wago_dir(deps.cache_dir, LOCAL_VERSION))
-    c = decode_version(deps, LOCAL_VERSION)
-    assert c.root == deps.cache_dir / "candidates" / LOCAL_VERSION
+    shutil.copytree(WAGO_70009, wago_dir(deps.cache_dir, PREVIOUS_VERSION))
+    c = decode_version(deps, PREVIOUS_VERSION)
+    assert c.root == deps.cache_dir / "candidates" / PREVIOUS_VERSION
     assert http.calls == []
 
 
 def test_existing_candidate_needs_force(make_deps, tmp_path):
     out = tmp_path / "c"
-    decode_version(make_deps(), LOCAL_VERSION, csv_dir=WAGO_70009, out=out)
+    decode_version(make_deps(), PREVIOUS_VERSION, csv_dir=WAGO_70009, out=out)
     with pytest.raises(CandidateExistsError) as info:
-        decode_version(make_deps(), LOCAL_VERSION, csv_dir=WAGO_70009, out=out)
+        decode_version(make_deps(), PREVIOUS_VERSION, csv_dir=WAGO_70009, out=out)
     assert info.value.exit_code == 2
-    assert decode_version(make_deps(), LOCAL_VERSION, csv_dir=WAGO_70009, out=out, force=True).root == out
+    assert decode_version(make_deps(), PREVIOUS_VERSION, csv_dir=WAGO_70009, out=out, force=True).root == out
 
 
 def test_missing_csv_asks_for_fetch(make_deps, tmp_path):
     with pytest.raises(CsvMissingError) as info:
-        decode_version(make_deps(), LOCAL_VERSION, csv_dir=tmp_path / "vide", out=tmp_path / "c")
+        decode_version(make_deps(), PREVIOUS_VERSION, csv_dir=tmp_path / "vide", out=tmp_path / "c")
     assert info.value.exit_code == 4 and "forever fetch" in info.value.action
     assert not (tmp_path / "c").exists()

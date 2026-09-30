@@ -13,7 +13,7 @@ import math
 import sys
 
 import pytest
-from conftest import LOCAL_VERSION, REPO_ROOT
+from conftest import REPO_ROOT, SEED_VERSION
 
 from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import kill_mc, mc
@@ -60,7 +60,7 @@ def seed_sim():
         spec.loader.exec_module(module)
     finally:
         sys.path.remove(str(SEED_SCRIPTS))
-    module.fm.data(LOCAL_VERSION)
+    module.fm.data(SEED_VERSION)
     return module
 
 

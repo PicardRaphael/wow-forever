@@ -48,7 +48,7 @@ def test_structure_matches_reference(talents, key):
 
 @pytest.mark.parametrize(
     ("key", "ranks"),
-    [  # oracles FC-70009 de talents.json (rangs relus sur le build 70009)
+    [  # oracles de talents.json : rangs relus sur le build 70009, inchangés en 70124 (tables identiques)
         ("iceLance", [[26, 30, 300]]),
         ("pyroblast", [[95, 125, 44, 12]]),
         ("arcaneBlast", [[50, 58, 10, 175, 4, 8]]),
@@ -56,8 +56,10 @@ def test_structure_matches_reference(talents, key):
         ("iceBarrier", [[431, 1]]),
     ],
 )
-def test_fc_70009_oracles(talents, key, ranks):
-    assert REF[key]["ranks"] == ranks and REF[key]["certainty"] == "FC-70009"
+def test_client_rank_oracles(talents, key, ranks):
+    # La certitude nomme le build où la valeur a été lue : celui de la version installée (T08a).
+    assert REF[key]["certainty"] == "FC-" + LOCAL_VERSION.rsplit(".", 1)[-1]
+    assert REF[key]["ranks"] == ranks
     assert talents[key]["ranks"] == ranks
 
 
