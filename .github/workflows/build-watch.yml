@@ -1,0 +1,134 @@
+name: build-watch
+# Veille des versions du client (T08a) : une fois par jour, compare la dernière version publiée sur wago.tools à
+# la version installée dans forever/data/manifest.json. Si une version plus récente paraît, télécharge ses tables,
+# les décode en version candidate, la vérifie, la compare à la version installée et ouvre une pull request avec le
+# rapport. N'installe RIEN : forever/data/ n'est jamais modifié, l'installation reste validée par l'utilisateur.
+# Réseau : forever builds et forever fetch seulement (liste réseau de CLAUDE.md), aucun nouvel accès.
+# Les addons de données ne sont pas couverts : ils vivent sur le poste de l'utilisateur, pas sur le serveur de CI
+# (décision 124) ; forever addons status reste en DJ1 et son automatisation en T08.
+on:
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+concurrency:
+  group: build-watch
+  cancel-in-progress: false
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync
+
+      - name: Version publiée et version installée
+        id: versions
+        run: |
+          set -euo pipefail
+          uv run forever builds --json > builds.json
+          latest=$(uv run python -c "import json;print(json.load(open('builds.json'))['latest'])")
+          installed=$(uv run python -c "import json;print(json.load(open('forever/data/manifest.json'))['game_version'])")
+          echo "latest=$latest" >> "$GITHUB_OUTPUT"
+          echo "installed=$installed" >> "$GITHUB_OUTPUT"
+          if [ "$latest" = "$installed" ]; then echo "nouvelle=non" >> "$GITHUB_OUTPUT";
+          else echo "nouvelle=oui" >> "$GITHUB_OUTPUT"; fi
+          echo "Installée : $installed — publiée : $latest"
+
+      # --- Aucune version nouvelle : contrôle du silence (14 jours, SILENT_AFTER de forever/config.py) ---
+      - name: Silence prolongé
+        if: steps.versions.outputs.nouvelle == 'non'
+        run: |
+          set -euo pipefail
+          uv run python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, datetime
+          builds = json.load(open("builds.json"))["builds"]
+          last = max(b["created_at"] for b in builds)
+          age = (datetime.datetime.now(datetime.UTC)
+                 - datetime.datetime.fromisoformat(last.replace("Z", "+00:00"))).days
+          print(f"Version installée à jour ({builds[0]['version']}).")
+          print(f"Dernière publication : {last} ({age} jours).")
+          open("age.txt", "w").write(str(age))
+          PY
+      - name: Alerte silence
+        if: steps.versions.outputs.nouvelle == 'non'
+        run: |
+          set -euo pipefail
+          age=$(cat age.txt)
+          if [ "$age" -gt 14 ]; then
+            titre="veille : aucune version publiée depuis $age jours"
+            existante=$(gh issue list --label veille --state open --json number,title \
+              --jq '.[] | select(.title | startswith("veille : aucune version")) | .number' | head -1)
+            if [ -n "$existante" ]; then
+              gh issue edit "$existante" --title "$titre"
+            else
+              gh issue create --label veille --title "$titre" \
+                --body "Aucune version du client publiée depuis $age jours (seuil : 14, SILENT_AFTER). Vérifier que wago.tools répond et que le produit wow_classic_beta est toujours le bon."
+            fi
+          fi
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      # --- Version nouvelle : chaîne complète, sans installation ---
+      - name: Télécharger, décoder, vérifier
+        if: steps.versions.outputs.nouvelle == 'oui'
+        id: chaine
+        run: |
+          set -euo pipefail
+          v="${{ steps.versions.outputs.latest }}"
+          uv run forever fetch --version "$v"
+          uv run forever decode --version "$v"
+          candidate="$HOME/.cache/forever/candidates/$v"
+          echo "candidate=$candidate" >> "$GITHUB_OUTPUT"
+          # verify non bloquant : une version qui casse le décodeur est justement celle qu'il faut voir (D4).
+          if uv run forever verify "$candidate" > verify.txt 2>&1; then
+            echo "verify=ok" >> "$GITHUB_OUTPUT"
+          else
+            echo "verify=echec" >> "$GITHUB_OUTPUT"
+          fi
+          cat verify.txt
+
+      - name: Comparer et écrire le rapport
+        if: steps.versions.outputs.nouvelle == 'oui'
+        run: |
+          set -euo pipefail
+          v="${{ steps.versions.outputs.latest }}"
+          a="${{ steps.versions.outputs.installed }}"
+          candidate="${{ steps.chaine.outputs.candidate }}"
+          mkdir -p docs/research tasks/veille
+          rapport="docs/research/data-$v-candidate.md"
+          uv run forever report "$a" "$candidate" --out "$rapport"
+          uv run forever diff "$a" "$candidate" --json > "tasks/veille/$v.json"
+          if [ "${{ steps.chaine.outputs.verify }}" = "echec" ]; then
+            { echo "# ATTENTION : forever verify a échoué sur la candidate $v"; echo;
+              echo '```'; cat verify.txt; echo '```'; echo;
+              cat "$rapport"; } > "$rapport.tmp"
+            mv "$rapport.tmp" "$rapport"
+          fi
+          { echo; echo "---"; echo;
+            echo "Rapport produit par le workflow build-watch. **Rien n'est installé** :";
+            echo "\`forever/data/\` n'a pas changé. L'installation reste validée à la main";
+            echo "(\`forever install --new-version <candidate>\`, tranche T08a)."; } >> "$rapport"
+
+      - name: Contrôle — aucune donnée installée
+        if: steps.versions.outputs.nouvelle == 'oui'
+        run: git diff --exit-code -- forever/data
+
+      - name: Ouvrir ou mettre à jour la pull request
+        if: steps.versions.outputs.nouvelle == 'oui'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: data/${{ steps.versions.outputs.latest }}
+          base: main
+          commit-message: |
+            Veille : ${{ steps.versions.outputs.latest }} publiée, rapport de changements (rien installé)
+          title: "data: ${{ steps.versions.outputs.installed }} → ${{ steps.versions.outputs.latest }}"
+          body-path: docs/research/data-${{ steps.versions.outputs.latest }}-candidate.md
+          labels: veille, data
+          add-paths: |
+            docs/research/
+            tasks/veille/
