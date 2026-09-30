@@ -84,6 +84,36 @@ HEADER = (
 )
 
 
+def _builds_root() -> Path:
+    """Dossier qui contient les passages (`Path / ""` ne descend pas : on passe par un nom quelconque)."""
+    return _dir("x").parent
+
+
+def _available() -> list[str]:
+    """Passages présents dans le cache, par ordre alphabétique."""
+    root = _builds_root()
+    if not root.is_dir():
+        return []
+    return sorted(d.name for d in root.iterdir() if d.is_dir() and any(d.glob("*.json")))
+
+
+def _require(*labels: str) -> None:
+    """Refuse une étiquette absente ou vide.
+
+    Sans ce contrôle, `compare` lisait un dictionnaire vide et concluait « aucune recommandation changée » : une
+    comparaison contre rien passait pour une comparaison réussie (constat du 2026-09-30, T08a)."""
+    missing = [label for label in labels if not any(_dir(label).glob("*.json"))]
+    if not missing:
+        return
+    found = _available()
+    known = ", ".join(found) if found else "aucun"
+    raise SystemExit(
+        f"Passage introuvable dans le cache : {', '.join(missing)}.\n"
+        f"Cherché dans {_builds_root()} ; passages disponibles : {known}.\n"
+        f"Produire le passage manquant avec : uv run python scripts/replay_builds.py run {missing[0]}"
+    )
+
+
 def _load(label: str) -> dict[str, dict[str, Any]]:
     out = {}
     for path in sorted(_dir(label).glob("*.json")):
@@ -96,6 +126,7 @@ def _cases() -> list[tuple[str, int]]:
 
 
 def table(label: str) -> str:
+    _require(label)
     cases = _load(label)
     rows = [_row(cases[f"{c}-{lv}"]) for c, lv in _cases() if f"{c}-{lv}" in cases]
     first = next(iter(cases.values()), None)
@@ -129,6 +160,7 @@ def _order(rep: dict[str, Any]) -> list[str]:
 
 
 def compare(before: str, after: str) -> str:
+    _require(before, after)
     a, b = _load(before), _load(after)
     lines = [f"Changements de `{before}` à `{after}` :", ""]
     for context, level in _cases():

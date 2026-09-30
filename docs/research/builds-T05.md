@@ -192,10 +192,11 @@ C'était attendu : les 22 tables du client sont identiques entre 1.60.1.70009 et
 (`docs/research/data-1.60.1.70124.md`), `forever diff` entre les deux versions installées ne rend « aucun
 changement », et l'optimiseur reçoit donc exactement les mêmes entrées.
 
-**Limite de l'outil, relevée à cette occasion** : `scripts/replay_builds.py compare <avant> <après>` rend
-« aucune recommandation changée » quand l'étiquette `<avant>` n'existe pas dans le cache, sans rien signaler. La
-comparaison ci-dessus a donc été faite ligne à ligne contre le tableau de la section suivante, pas avec `compare`.
-À corriger (refus d'une étiquette absente) ; question ouverte notée dans `docs/OPEN_QUESTIONS.md`.
+**Limite de l'outil, relevée à cette occasion et corrigée** : `scripts/replay_builds.py compare <avant> <après>`
+rendait « aucune recommandation changée » quand l'étiquette `<avant>` n'existait pas dans le cache, sans rien
+signaler. La comparaison ci-dessus a donc été faite ligne à ligne contre le tableau de la section suivante, pas
+avec `compare`. Le script refuse désormais une étiquette absente ou vide, en nommant le dossier cherché, les
+passages disponibles et la commande qui produit celui qui manque (`tests/unit/test_replay_builds_labels.py`).
 
 ## Rejeu T06b (révision 2)
 

@@ -32,26 +32,32 @@ def replay(tmp_path, monkeypatch):
     return mod
 
 
-def write_pass(tmp_path, label, *, seconds=1.0):
-    """Passage minimal : un cas, de quoi rendre une ligne de tableau."""
+def write_pass(tmp_path, label):
+    """Passage d'un seul cas, à la forme rendue par `build_report` (clés relevées sur un rejeu réel)."""
     out = tmp_path / "builds" / label
     out.mkdir(parents=True)
     report = {
         "context": "leveling",
         "level": 20,
         "talents": {"frostbolt": 5},
+        "talents_by_tree": {"Frost": {"frostbolt": 5}},
+        "points": {"by_tree": {"Arcane": 0, "Fire": 0, "Frost": 5}, "total": 5, "available": 5, "unspent": 0},
         "order": [{"level": 10, "talent": "frostbolt"}],
         "choices": [],
-        "alternative": None,
-        "advantage": None,
-        "points": {"arcane": 0, "fire": 0, "frost": 5},
+        "metric": {"analytic": 35.48, "monte_carlo": 34.9},
         "monte_carlo_stats": None,
-        "stability": None,
-        "sensitivity": None,
-        "decided_by": None,
+        "alternative": {
+            "talents": {"frostbolt": 4},
+            "diff": "frostbolt -1",
+            "gap": 0.45,
+            "decided_by": "analytique",
+            "better": "build",
+        },
+        "stability": {"seeds": 5, "stable": True, "winners": {"build": 5}},
+        "sensitivity": [{"assumption": "mob_hp", "holds": True}],
     }
     (out / "leveling-20.json").write_text(
-        json.dumps({"report": report, "seconds": seconds}, ensure_ascii=False), encoding="utf-8"
+        json.dumps({"report": report, "duration_s": 1.0}, ensure_ascii=False), encoding="utf-8"
     )
     return out
 
