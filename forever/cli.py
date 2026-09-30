@@ -91,6 +91,7 @@ from forever.provenance import (
     local_provenance,
     min_certainty,
 )
+from forever.pvp import pvp_report
 from forever.sim.leveling_mc import KillResult
 from forever.status import StatusReport, status_report
 from forever.store import current_identity, ensure_integrity, load_version, read_sources
@@ -116,7 +117,9 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("--json", action="store_true", help="sortie JSON")
 
     lookup = sub.add_parser("lookup", help="consulter une entité du jeu")
-    lookup.add_argument("kind", help="type d'entité : spell (T01), zones (T04c), talent (T06)")
+    lookup.add_argument(
+        "kind", help="type d'entité : spell (T01), zones (T04c), talent (T06) ; fiches PvP : forever pvp"
+    )
     lookup.add_argument("name", nargs="?", help="nom anglais du sort ou du talent (casse, espaces et tirets ignorés)")
     lookup.add_argument("--level", type=int, help="zones : niveau du personnage")
     lookup.add_argument("--faction", choices=["horde", "alliance"], help="zones : faction (défaut : toutes)")
@@ -337,6 +340,24 @@ def build_parser() -> argparse.ArgumentParser:
         "--talented-bonus", type=int, default=0, help="points du bonus Legacy « Talented » (défaut : 0, hypothèse)"
     )
     b.add_argument("--json", action="store_true", help="sortie JSON")
+
+    pvp = sub.add_parser("pvp", help="fiches PvP fixes des 9 classes (savoir du client, sans calcul de combat)")
+    pvp_sub = pvp.add_subparsers(dest="pvp_cmd", required=True)
+    pvp_class = pvp_sub.add_parser("class", help="fiche d'une classe : contrôles, défensifs, ruptures, recharges")
+    pvp_class.add_argument("cls", help="classe (nom français ou anglais)")
+    pvp_class.add_argument("--level", type=int, help="niveau (défaut : rang le plus haut de chaque sort)")
+    pvp_class.add_argument(
+        "--talents", help="talents « clé=rang,… » (défaut : inconnus, sorts de talent « si talent »)"
+    )
+    pvp_class.add_argument("--json", action="store_true", help="sortie JSON")
+    pvp_match = pvp_sub.add_parser("matchup", help="fiche d'affrontement : menaces, réponses, fenêtres")
+    pvp_match.add_argument("cls", help="ma classe")
+    pvp_match.add_argument("opponent", help="classe adverse")
+    pvp_match.add_argument("--level", type=int, help="mon niveau")
+    pvp_match.add_argument("--race", help="ma race (raciaux)")
+    pvp_match.add_argument("--talents", help="mes talents « clé=rang,… »")
+    pvp_match.add_argument("--opponent-level", type=int, help="niveau adverse (défaut : le mien)")
+    pvp_match.add_argument("--json", action="store_true", help="sortie JSON")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     hook = sub.add_parser("hook", help="hooks du plugin Claude Code (entrée JSON sur stdin)")
@@ -590,7 +611,7 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         _emit(talent, render_talent(talent), talent["provenance"], args.json)
         return EXIT_OK
     if args.kind != "spell":
-        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones"])
+        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones", "pvp"])
     if not args.name:
         raise InvalidArgumentError("Nom du sort manquant.", "écrire forever lookup spell <nom>")
     res = lookup_spell(deps, args.name, args.rank, detail=args.detail, limit=args.limit, offset=args.offset)
@@ -831,6 +852,81 @@ def _cmd_profile_import(deps: Deps, args: argparse.Namespace) -> int:
     }[status]
     payload = {key: value for key, value in plan.items() if key != "doc"} | {"status": status}
     _emit(payload, [*([] if printed else lines), verdict, *plan["notes"]], plan["provenance"], args.json)
+    return EXIT_OK
+
+
+def _pvp_value(v: Any) -> str:
+    value = v["value"] if isinstance(v, dict) and "value" in v else v
+    return "?" if value is None else str(value)
+
+
+def _pvp_items(title: str, items: list[dict[str, Any]]) -> list[str]:
+    if not items:
+        return [f"{title} : aucun"]
+    lines = [f"{title} :"]
+    for i in items:
+        parts = [i["name"]]
+        if i.get("conditional"):
+            parts.append(str(i["conditional"]))
+        if i.get("pet"):
+            parts.append("familier")
+        for field, label in (
+            ("diminish_name", "catégorie"),
+            ("duration_s", "durée s"),
+            ("cooldown_s", "recharge s"),
+            ("range_yd", "portée m"),
+            ("lockout_s", "verrouillage s"),
+        ):
+            if field in i:
+                parts.append(f"{label} {_pvp_value(i[field])}")
+        lines.append("  " + " · ".join(parts))
+    return lines
+
+
+def render_pvp(report: Mapping[str, Any]) -> list[str]:
+    lines: list[str] = []
+    if "threats" in report:
+        mine, them = report["mine"], report["opponent"]
+        lines.append(f"Affrontement : {mine['class']} contre {them['class']}")
+        lines += _pvp_items("Ses recharges offensives", report["threats"]["bursts"])
+        lines += _pvp_items("Ses contrôles", report["threats"]["controls"])
+        lines += _pvp_items("Ses défensifs", report["threats"]["defensives"])
+        lines += _pvp_items("Mes ruptures de contrôle", report["answers"]["cc_breaks"])
+        lines += _pvp_items("Mes interruptions", report["answers"]["interrupts"])
+        lines += _pvp_items("Ses ruptures de contrôle", report["their_answers"]["cc_breaks"])
+        lines += [f"Fenêtre : {w['name']} (recharge {_pvp_value(w['cooldown_s'])} s)" for w in report["windows"]]
+    else:
+        lines.append(f"Fiche PvP : {report['class']}" + (f", niveau {report['level']}" if report["level"] else ""))
+        for key, title in (
+            ("controls", "Contrôles"),
+            ("defensives", "Défensifs"),
+            ("cc_breaks", "Ruptures de contrôle"),
+            ("interrupts", "Interruptions"),
+            ("dispels", "Dissipations"),
+            ("mobility", "Mobilité"),
+            ("bursts", "Recharges offensives"),
+        ):
+            lines += _pvp_items(title, report[key])
+    lines += [f"Manquant : {m}" for m in report["missing"]]
+    lines += [f"Limite : {x}" for x in report["limits"]]
+    return lines
+
+
+def _cmd_pvp(deps: Deps, args: argparse.Namespace) -> int:
+    talents = parse_talents(args.talents) if args.talents else None
+    if args.pvp_cmd == "class":
+        report = pvp_report(deps, args.cls, level=args.level, talents=talents)
+    else:
+        report = pvp_report(
+            deps,
+            args.cls,
+            opponent=args.opponent,
+            level=args.level,
+            race=args.race,
+            talents=talents,
+            opponent_level=args.opponent_level,
+        )
+    _emit(report, render_pvp(report), report["provenance"], args.json)
     return EXIT_OK
 
 
@@ -1676,6 +1772,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "decode": _cmd_decode,
         "install": _cmd_install,
         "profile": _cmd_profile,
+        "pvp": _cmd_pvp,
         "diff": _cmd_diff,
         "verify": _cmd_verify,
         "report": _cmd_report,

@@ -18,10 +18,11 @@ from forever.build import BuildReport, build_report
 from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
-from forever.leveling import LevelingReport, simulate_leveling
+from forever.leveling import LevelingReport, parse_talents, simulate_leveling
 from forever.lookup import lookup_spell, lookup_talent, lookup_zones
 from forever.profile import ProfileView, read_profile
 from forever.provenance import error_payload
+from forever.pvp import compact, pvp_report
 from forever.status import StatusReport, status_report
 
 INSTRUCTIONS = (
@@ -75,6 +76,10 @@ def build_server(deps: Deps) -> MCPServer:
         level: int | None = None,
         faction: str | None = None,
         questie: str | None = None,
+        opponent: str | None = None,
+        race: str | None = None,
+        talents: str | None = None,
+        opponent_level: int | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -85,7 +90,13 @@ def build_server(deps: Deps) -> MCPServer:
         (base Questie Classic Era lue sur disque, noms anglais, certitude suppose).
         T06 : `kind="talent"` avec `name` (nom anglais ou clé, ex. « Improved Frostbolt » ou « improvedFrostbolt »)
         et `rank` (tous les rangs s'il est omis) : arbre, palier, points exigés dans l'arbre, prérequis, valeurs et
-        description de chaque rang, sort appris, source des valeurs."""
+        description de chaque rang, sort appris, source des valeurs.
+        PV1 : `kind="pvp"` avec `name` (classe, nom français ou anglais), `level`, et pour un affrontement
+        `opponent` (classe adverse), `race`, `talents` (« clé=rang,… » ; défaut : inconnus, sorts de talent
+        « si talent »), `opponent_level` : fiche PvP fixe tirée du client (contrôles, défensifs, ruptures,
+        interruptions, dissipations, recharges, raciaux, bijoux), listes paginées (`limit`, `offset`, `totals`),
+        valeurs avec leur chemin dans les données si `detail=True`, `missing` à citer. Ne lit jamais le profil :
+        passer la classe, le niveau, la race et les talents lus par forever_player_profile."""
         try:
             if kind == "zones":
                 path = Path(questie) if questie else None
@@ -94,8 +105,21 @@ def build_server(deps: Deps) -> MCPServer:
                 if not name:
                     raise InvalidArgumentError("Nom du talent manquant.", "donner name (nom anglais ou clé du talent)")
                 return dict(lookup_talent(deps, name, rank))
+            if kind == "pvp":
+                if not name:
+                    raise InvalidArgumentError("Classe manquante.", "donner name (classe, nom français ou anglais)")
+                report = pvp_report(
+                    deps,
+                    name,
+                    opponent=opponent,
+                    level=level,
+                    race=race,
+                    talents=parse_talents(talents) if talents else None,
+                    opponent_level=opponent_level,
+                )
+                return compact(report, detail=detail, limit=limit, offset=offset)
             if kind != "spell":
-                raise UnsupportedKindError(f"type « {kind} »", ["spell", "talent", "zones"])
+                raise UnsupportedKindError(f"type « {kind} »", ["spell", "talent", "zones", "pvp"])
             if not name:
                 raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")
             return dict(lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset))

@@ -110,5 +110,13 @@
   "https://world-of-warcraft-forever.wiki/en/pvp/world-of-warcraft-forever-crowd-control/",
   "https://us.forums.blizzard.com/en/wow/t/wow-forever-beta-development-notes-%E2%80%93-updated-september-24/2360696/1"
  ],
- "open_question": "Point de départ de la fenêtre (fin de l'effet ou application), fenêtre fixe ou aléatoire (15 à 20 s), paliers des racines et des silences (wiki de fans de Forever : immunité à la 2e application), plafond de 10 s (groupes, ordre avec les paliers), rendements contre les PNJ : à mesurer dans mes journaux de champ de bataille (PV2)."
+ "open_question": "Point de départ de la fenêtre (fin de l'effet ou application), fenêtre fixe ou aléatoire (15 à 20 s), paliers des racines et des silences (wiki de fans de Forever : immunité à la 2e application), plafond de 10 s (groupes, ordre avec les paliers), rendements contre les PNJ : à mesurer dans mes journaux de champ de bataille (PV2).",
+ "sheets": {
+  "long_cooldown_s": {
+   "value": 60,
+   "certainty": "certain",
+   "sources": [],
+   "note": "paramètre d'affichage des fiches PvP (fenêtres à surveiller : recharges adverses au moins aussi longues), pas une règle du jeu"
+  }
+ }
 }

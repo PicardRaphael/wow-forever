@@ -33,8 +33,8 @@
     },
     "1.60.1.70124": {
       "collected_at": "2026-09-30",
-      "data_sha": "b3ffcba20bf8",
-      "data_sha256": "b3ffcba20bf847f1c92d0ba59135a85e9e699de03c563e0eebbbef6628827d90",
+      "data_sha": "267225d17a10",
+      "data_sha256": "267225d17a109b46ad2eb6b11037a3a8bb479b3993f6210ff4d83dceabd0c01d",
       "files": {
         "_seed_racials.json": "7e884d146e7a8f4f23d25bb496ac01084f5c247c28ea7c607ef8a95c03d770b5",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -49,7 +49,7 @@
         "monsters.json": "96eb70987df03cbfacd55cb6a194239af381e9b786b87897e3aba9fa8ba4381b",
         "overrides.json": "adf5b1ee4d94f5a06bb52eca375cdfb59df3b1b663dd77d25e6077282935cc10",
         "pvp_items.json": "489cfaae4ed9775a6214639a27828eb3e27bf5477c9e1972232464c5c35162c2",
-        "pvp_rules.json": "3448e627593e0340d322f2840c40407a8fe17e3d6db03191efcd1c9bfeb8678a",
+        "pvp_rules.json": "a9392e7c33ce08c9a8b80cea8fd98cd6d9cbe8a128d5e4d15df2e4de4f90598c",
         "races.json": "b32091e64e83d42e5ceba6d93377cd413a8547a2e5131cd31fdc3ef0b5325c4d",
         "respec.json": "c8cf86150a00959aa0de2ace34c2dd91c03b0ea9b4c08975850f1e36b1338e24",
         "revisions.json": "47613d319670e702137f02f3c1062a2f551d26837d4c67b5f3687674b48ea4fb",
