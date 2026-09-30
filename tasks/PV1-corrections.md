@@ -67,3 +67,31 @@ Présentées ensemble avant la fusion (règle du skill `/tranche`). Chaque corre
 -        assert [r["spell_id"] for r in ranked] == ref["spell_ids"], key
 +        assert [r["spell_id"] for r in ranked] == ref["source"]["rank_spell_ids"], key
 ```
+
+## 4. `tests/unit/test_decode_classes.py::test_off_grid_nodes_are_listed_unresolved` (bloc B1)
+
+- **Prémisse devenue fausse** : le test exige que tout nœud hors grille garde une colonne ou un palier `null` et
+  figure dans `unresolved_nodes`, et que le Paladin en ait au moins un. Ton relevé en jeu du 2026-09-30 place
+  Improved Seal of Fury (palier 3, colonne 1) et Swift Judgement (palier 4, colonne 1), certitude certain ; tu as
+  demandé de les retirer des nœuds non résolus.
+- **Preuve** : `decode_rules.json`, `observed_positions.Paladin` ; paliers décodés du client (ordonnées 3330 et 3930)
+  identiques à ceux du relevé, colonne 1 libre dans ces deux rangées de Protection (colonnes 2 à 4 occupées). Le
+  nouveau test `tests/unit/test_observed_positions.py` couvre le placement, le prérequis et l'arrêt en cas de
+  désaccord avec le client. Restent non résolus : les deux nœuds du Démoniste (palier seulement communautaire).
+- **Diff proposé** (le test ignore les nœuds placés par un relevé en jeu ; la prémisse « Paladin » devient « au
+  moins une classe », le Démoniste) :
+
+```diff
+     nodes = {int(r["ID"]): r for r in csv_rows("TraitNode")}
++    observed = decode_rules.get("observed_positions", {})
+     with_unresolved = set()
+     for cls, c in doc["classes"].items():
+         expected = {}
+         for t in talents_of(c):
++            if t["key"] in observed.get(cls, {}):
++                continue  # placé par un relevé en jeu (test_observed_positions.py)
+             x, y = int(nodes[t["node_id"]]["PosX"]), int(nodes[t["node_id"]]["PosY"])
+@@
+-    assert "Paladin" in with_unresolved  # plan de PV1 : écart relevé sur l'arbre du Paladin
++    assert "Warlock" in with_unresolved  # paliers du Démoniste : sources communautaires seulement
+```

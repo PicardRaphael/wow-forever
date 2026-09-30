@@ -504,7 +504,7 @@
   "neutral_mechanics_note": "mécaniques sans rôle PvP retenu (saignement, soin, monture, enragé, blessé, infecté) : ne font pas d'un sort un sort à classer"
  },
  "community_positions": {
-  "note": "PV1 (D3, recherche autorisée par l'utilisateur le 2026-09-30) : palier de talents hors grille lu dans deux calculateurs communautaires de la bêta 1.60.1.70124, concordants entre eux et avec l'ordonnée du client ; certitude probable (consigne de l'utilisateur). Rangé à part (tier_community) : le palier décodé reste null. Colonnes du Paladin (Improved Seal of Fury, Swift Judgement) : aucune source, non résolues.",
+  "note": "PV1 (D3, recherche autorisée par l'utilisateur le 2026-09-30) : palier de talents hors grille lu dans deux calculateurs communautaires de la bêta 1.60.1.70124, concordants entre eux et avec l'ordonnée du client ; certitude probable (consigne de l'utilisateur). Rangé à part (tier_community) : le palier décodé reste null. Colonnes du Paladin (Improved Seal of Fury, Swift Judgement) : aucune source communautaire ; relevées en jeu (observed_positions).",
   "Warlock": {
    "improvedLifeTap": {
     "tier": 1,
@@ -531,6 +531,23 @@
    "replaced_by": "races.json",
    "frozen_copy": "_seed_racials.json",
    "reason": "PV1, D5 (accord de l'utilisateur du 2026-09-30) : raciaux décodés du client (décision 106) ; copie figée du relevé communautaire pour le mode seed ; retiré seulement quand races.json est décodé de la version installée"
+  }
+ },
+ "observed_positions": {
+  "note": "PV1 : positions relevées en jeu par l'utilisateur (colonnes 1 à 4 depuis la gauche, paliers depuis le haut), certitude certain ; appliquées aux nœuds hors grille seulement, après contrôle : un palier ou une colonne décodés du client qui diffèrent du relevé arrêtent le décodage.",
+  "Paladin": {
+   "improvedSealOfFury": {
+    "tier": 3,
+    "col": 1,
+    "source": "relevé en jeu (fenêtre des talents du Paladin de l'utilisateur, recherche par nom), 2026-09-30",
+    "certainty": "certain"
+   },
+   "swiftJudgement": {
+    "tier": 4,
+    "col": 1,
+    "source": "relevé en jeu (fenêtre des talents du Paladin de l'utilisateur, recherche par nom), 2026-09-30",
+    "certainty": "certain"
+   }
   }
  }
 }
