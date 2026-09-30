@@ -7,6 +7,20 @@ Rappels utiles à la lecture :
 - `WOW_PROJECT_ID` vaut `WOW_PROJECT_MAINLINE`.
 - Cache wago local : tables de sorts et de talents seulement. Aucune table d'objets, d'instances ni de quêtes n'a été téléchargée : les recoupements « client » se limitent à ces tables et aux caches du client sur disque.
 
+## Versions relevées le 2026-09-30
+
+Nouveau relevé des `.toc`, en lecture seule, sans réseau. **Seules les versions sont mises à jour** : le contenu (comptes, recoupements) n'a pas été recompté et reste celui du 2026-09-28 ci-dessous ; c'est ce que `forever addons status` devra signaler et relire (DJ1, décision 124).
+
+| Addon | Relevé du 2026-09-28 | Relevé du 2026-09-30 | Fichiers datés du | Commentaire |
+|---|---|---|---|---|
+| ForeverDungeonJournal | 1.2.0 | **1.3.1** (`## Version`), `## Interface: 16001` | 2026-09-29 | Structure changée : le `.lua` unique est éclaté en 7 fichiers de `Data/` (`Dungeons`, `Bosses`, `QuestMaps`, `QuestChains`, `QuestRewards`, `DungeonEntrances`, `DungeonRoutes`), plus `Localization/Content_frFR.lua` et d'autres langues ; `README.txt` dit toujours v1.0.7 ; **toujours aucune licence**. La description « un seul `.lua` » de la section plus bas est périmée. |
+| AtlasLoot Classic Forever | « 1.1.2 » (énoncé), `Forever 1.60.1` | **1.1.3 annoncé par l'utilisateur, non lisible dans les fichiers** : les `.toc` disent toujours `## Version: Forever 1.60.1`, aucune occurrence de « 1.1.3 » dans les modules | 2026-09-29 | Toujours aucun `_Camelot.toc` (`.toc` 11508 et `_Forever.toc` 11601). La chaîne de version ne suffit donc pas à détecter un changement : il faut l'empreinte des fichiers de données. |
+| GearQuestForever | 0.2.16-beta | **0.2.19-beta** (`.toc`, `Core.lua:12`), `## Interface: 16001` | 2026-09-29 | Toujours aucune licence ni journal des changements. |
+| Auctionator | 339 | 339 | — | Inchangé. |
+| Questie | 11.38.0 Forever-v27 | 11.38.0 Forever-v27 | — | Inchangé. |
+| Quest Master | 2.5.0 | 2.5.0 | — | Inchangé. |
+| ForeverLogger | 0.2.0 | 0.2.0 | — | Addon du dépôt. |
+
 ## Écarts avec l'énoncé
 
 | Addon | Énoncé | Relevé | Commentaire |
@@ -216,7 +230,7 @@ Réponse à la question ouverte « format et fonctionnement sur Forever » :
 | **EC1** économie | Peu utile : prix marchands et composants de `Profession.lua` (à recouper avec `SpellEffect`). | Rien. | Rien (prix seulement dans le texte des infobulles). | Repli local avant le lancement, lecteur sur disque en `probable`. Limites : 1 jour, 1 royaume de bêta, minimum et non médiane, données personnelles mêlées. **Préalable : ta décision sur la licence.** | Rien. |
 
 ## Bloqué sur moi
-1. **Auctionator et sa licence** : « All Rights Reserved », plus un `AGENTS.md` adressé aux agents d'IA. Un lecteur maison du format de tes propres SavedVariables (CBOR standard) relève de l'interopérabilité, mais c'est à toi de décider si EC1 peut s'y appuyer. Sinon, l'API Blizzard reste la seule source.
+1. *Tranché par l'utilisateur le 2026-09-30 (décision 123) : lecture locale de ses propres SavedVariables, décodage maison, code de l'addon jamais lu ni repris.* **Auctionator et sa licence** : « All Rights Reserved », plus un `AGENTS.md` adressé aux agents d'IA. Un lecteur maison du format de tes propres SavedVariables (CBOR standard) relève de l'interopérabilité, mais c'est à toi de décider si EC1 peut s'y appuyer. Sinon, l'API Blizzard reste la seule source.
 2. **Tables du client à télécharger** (réseau, `forever fetch`, accord nécessaire). Noms et colonnes non vérifiés sur 70009 :
     - T10 : `Item`, `ItemSparse`, `ItemEffect`, `ItemXItemEffect`, `ItemSet`, `ItemRandomProperties`, `ItemRandomSuffix`, `RandPropPoints` ;
     - DJ1 : `JournalInstance`, `JournalEncounter`, `JournalEncounterItem`, `JournalEncounterCreature`, `LFGDungeons`, `Map`, `MapDifficulty` ;
