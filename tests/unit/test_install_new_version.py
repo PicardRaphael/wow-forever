@@ -45,9 +45,12 @@ INHERITED = (
     "meta.json",
     "monsters.json",
     "overrides.json",
-    "racials.json",
+    "_seed_racials.json",  # PV1, D5 : copie figée du relevé ; racials.json retiré
     "respec.json",
 )
+# PV1 : racials.json retiré (races.json décodé), fichiers des 9 classes et copie figée hérités de la version courante.
+PV1_RETIRED = {"racials.json"}
+PV1_ADDED = {"_seed_racials.json", "classes.json", "races.json", "pvp_items.json"}
 
 
 def strip_provenance(doc):
@@ -97,7 +100,8 @@ def test_new_version_creates_its_own_directory(installed, newer):
 
 def test_the_new_version_has_every_file_of_the_previous_one(installed, newer):
     apply_install(installed, newer, motif="T08a", new_version=True)
-    assert set(version_files(installed.data_dir / NEW_VERSION)) == set(version_files(DATA_DIR / PREVIOUS_VERSION))
+    previous = set(version_files(DATA_DIR / PREVIOUS_VERSION))
+    assert set(version_files(installed.data_dir / NEW_VERSION)) == (previous - PV1_RETIRED) | PV1_ADDED
 
 
 def test_frozen_seed_copies_are_carried_unchanged(installed, newer):
@@ -112,10 +116,11 @@ def test_diff_between_the_two_installed_versions_has_no_removed_file(installed, 
     """Critère d'acceptation du bloc A : les 5 « fichiers retirés » de la comparaison avec la candidate brute
     disparaissent une fois la version installée."""
     raw = diff_versions(installed, PREVIOUS_VERSION, newer)["changes"]
-    assert sorted(c["key"] for c in raw if c["kind"] == "file") == sorted(CARRIED)
+    assert sorted(c["key"] for c in raw if c["kind"] == "file") == sorted({*CARRIED, *PV1_RETIRED, *PV1_ADDED})
     apply_install(installed, newer, motif="T08a", new_version=True)
     installed_diff = diff_versions(installed, PREVIOUS_VERSION, NEW_VERSION)["changes"]
-    assert [c for c in installed_diff if c["kind"] == "file"] == []
+    # Seuls restent les fichiers de PV1 (retrait déclaré de racials.json, fichiers des classes hérités).
+    assert {c["key"] for c in installed_diff if c["kind"] == "file"} == PV1_RETIRED | PV1_ADDED
 
 
 def test_the_new_version_starts_at_revision_one(installed, newer):

@@ -6,7 +6,7 @@ moteur par `forever/gamedata.py`, après contrôle d'intégrité, puis passé en
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, NamedTuple, TypedDict
 
 Points = Mapping[str, int]
@@ -411,6 +411,21 @@ class PvpRules:
 
 
 @dataclass(frozen=True)
+class ClassKnowledge:
+    """Savoir d'une classe décodé du client (`classes.json`, PV1, décision 31) : arbres de talents (nœuds, paliers,
+    colonnes, prérequis), sorts et sorts de familier avec leurs rangs et leur classement PvP, éléments non résolus.
+    Les tranches de classe y brancheront leurs moteurs sans changer ce schéma."""
+
+    name: str
+    id: int
+    trees: tuple[Mapping[str, Any], ...]
+    spells: Mapping[str, Mapping[str, Any]]
+    pet_spells: Mapping[str, Mapping[str, Any]]
+    unresolved_nodes: tuple[Mapping[str, Any], ...]
+    unresolved_spells: tuple[Mapping[str, Any], ...]
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu : données des 9 classes en PV1, moteurs dans les tranches de classe)."""
 
@@ -437,6 +452,8 @@ class GameData:
     build: BuildMethod
     # plages des hypothèses incertaines (champ range de mechanics.json), par clé de mechanics.json (T05)
     assumption_ranges: Mapping[str, tuple[Variant, ...]]
+    # savoir des 9 classes (classes.json, PV1), lu à la première consultation ; vide pour une version sans ce fichier
+    classes: Mapping[str, ClassKnowledge] = field(default_factory=dict)
 
 
 class CharacterOverrides(TypedDict, total=False):

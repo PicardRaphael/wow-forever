@@ -1023,15 +1023,19 @@ mechanics:
     sources:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
-      - "forever/data/1.60.1.70009/racials.json"
+      - "forever/data/1.60.1.70124/races.json (client 1.60.1.70124, PV1, décision 106)"
+      - "forever/data/1.60.1.70124/_seed_racials.json (copie figée du relevé, mode seed)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_character.py::test_human_spirit_bonus
       - tests/unit/test_engine_character.py::test_human_sword_crit
       - tests/unit/test_engine_character.py::test_character_gnome_mana
+      - tests/unit/test_gamedata.py::test_engine_racials_read_from_races_json
+      - tests/unit/test_decode_races.py::test_mage_racial_values_equal_the_community_record
+      - tests/unit/test_decode_races.py::test_racials_have_effect_cooldown_duration
     tolerance: null
     formule: "esprit × (1 + bonus racial) ; mana × (1 + bonus racial) ; crit + bonus d'épée (racial)"
-    note: "passifs Humain et Gnome seulement ; raciaux actifs et Skyborne non modélisés"
+    note: "PV1 : raciaux des 10 races jouables décodés du client (races.json : effets, recharges, durées, variantes de classe, Skyborne compris) ; grandeurs du moteur du Mage (esprit, mana, critique à l'épée) égales au relevé communautaire ; seuls les passifs Humain et Gnome entrent dans les calculs du Mage, raciaux actifs non modélisés (affichés dans les fiches PvP)"
   - id: G2
     categorie: personnage
     description: "Stats de base par race, classe et niveau"

@@ -41,6 +41,7 @@ LOGGER_FILE = "ForeverLogger.lua"
 QUESTIE_FILE = "Questie.lua"
 AUCTIONATOR_FILE = "Auctionator.lua"
 SPELLS_FILE = "spells.json"
+CLASSES_FILE = "classes.json"
 UNKNOWN_BUILD_NOTE = "version du client inconnue"
 
 
@@ -66,8 +67,17 @@ class _Seen:
 
 
 def class_spell_index(data: VersionData) -> dict[int, str]:
-    """Identifiant de sort -> classe (nom anglais du client), d'après les sorts de classe des données (rangs des
-    sorts du Mage de `spells.json`)."""
+    """Identifiant de sort -> classe (nom anglais du client), d'après les sorts de classe et de familier des 9
+    classes (`classes.json`, PV1) ; un sort présent dans plusieurs classes n'indique aucune classe. Version sans
+    `classes.json` : rangs des sorts du Mage de `spells.json`."""
+    if (data.path / CLASSES_FILE).is_file():
+        owners: dict[int, set[str]] = {}
+        for cls, c in data.read_json(CLASSES_FILE)["classes"].items():
+            for spells in (c.get("spells") or {}, c.get("pet_spells") or {}):
+                for spell in spells.values():
+                    for rank in spell.get("ranks", []):
+                        owners.setdefault(int(rank["spell_id"]), set()).add(cls)
+        return {spell_id: next(iter(classes)) for spell_id, classes in owners.items() if len(classes) == 1}
     out: dict[int, str] = {}
     for spell in data.read_json(SPELLS_FILE)["spells"].values():
         for spell_id in (spell.get("source") or {}).get("rank_spell_ids") or []:

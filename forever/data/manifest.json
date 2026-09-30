@@ -33,23 +33,26 @@
     },
     "1.60.1.70124": {
       "collected_at": "2026-09-30",
-      "data_sha": "9173a948701c",
-      "data_sha256": "9173a948701c3085514a1306c02c09b624223697f82b59033b2ce8ef59f0b236",
+      "data_sha": "5621008f05c0",
+      "data_sha256": "5621008f05c0a4bb4881b06d3abf42bf34e3c27789295d25dea6ade98ac09b6e",
       "files": {
+        "_seed_racials.json": "7e884d146e7a8f4f23d25bb496ac01084f5c247c28ea7c607ef8a95c03d770b5",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
         "_seed_talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb",
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
-        "confirmed_changes.json": "fb2036bec4a46bc0feeae627d4dc3c58862785d4d170b64aaaf05cb2ab33c3d7",
-        "decode_rules.json": "58bff210bd795f34003006bd5b4e4a79ad3865a862bad77d9a150d8afa0dee86",
+        "classes.json": "f46e560a920bca9f4bad1d984017f3427637624b979cd2c6a0b2a6489db40623",
+        "confirmed_changes.json": "a6e693a5eaf4d472319001d52067ba6c6f6a111abc340862b8a79cb8909ad850",
+        "decode_rules.json": "c5368ca325ba6a2b70e2c8904349ec860f54a8b4b3d254bc3b0bb5e5b8cf62e4",
         "leveling.json": "34a1d484e1d131b324b49483c87b95316add6e7aded8f38d0bb3c862a260ab8d",
         "mechanics.json": "7df8be9b8a00f875cefadd981906dc7c0961c1c5b3e40120ec7dd3966609a19a",
         "meta.json": "8d1bc104db1c9a2dfb7a89a55f8f17ae27afaa3a5c18b49b5f5c8392d12c64d3",
         "monsters.json": "96eb70987df03cbfacd55cb6a194239af381e9b786b87897e3aba9fa8ba4381b",
         "overrides.json": "adf5b1ee4d94f5a06bb52eca375cdfb59df3b1b663dd77d25e6077282935cc10",
-        "racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
+        "pvp_items.json": "489cfaae4ed9775a6214639a27828eb3e27bf5477c9e1972232464c5c35162c2",
+        "races.json": "b32091e64e83d42e5ceba6d93377cd413a8547a2e5131cd31fdc3ef0b5325c4d",
         "respec.json": "c8cf86150a00959aa0de2ace34c2dd91c03b0ea9b4c08975850f1e36b1338e24",
-        "revisions.json": "c51f5438c931615db7d42acf53cae18bb05e7c6323587c8b50534ffed37d57cb",
-        "sources.json": "5374fe41bda43f40397c524637cb08c974b153736a26ddbbe74e2e1e5c377544",
+        "revisions.json": "47613d319670e702137f02f3c1062a2f551d26837d4c67b5f3687674b48ea4fb",
+        "sources.json": "531bb02cffb4e29b54ddea4b011e9d03009bc2bcbcc726cb217776c3434e47a6",
         "spell_scaling.json": "a34fc3c20c54711ac41731edb71088b4ed0cdb3fd6368a181d5c42557c428dd1",
         "spells.json": "d9365ef6124b02534ac8d2e59bb2465956a15378b0707aa9b5a459afabd1e1fa",
         "talents.json": "14403a6685d54517b818ebc6d6614f513f769c387243e5714154dd5fe0a48503"
@@ -57,7 +60,7 @@
       "hotfixes": [],
       "product": "wow_classic_beta",
       "revised_at": "2026-09-30",
-      "revision": 1,
+      "revision": 2,
       "version_prefix": "1.60."
     }
   }

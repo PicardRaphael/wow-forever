@@ -16,7 +16,7 @@ from forever.engine.monsters import mob_hp
 from forever.engine.talents import check_build
 from forever.errors import InvalidArgumentError
 from forever.freshness import freshness_for_version
-from forever.gamedata import RULES, build_game_data
+from forever.gamedata import RACES_FILE, RULES, build_game_data, mage_races
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import KillResult, McStats, mc, mc_stats, options_with_defaults
@@ -110,9 +110,10 @@ def check_level(level: int, cap: int, what: str = "Niveau") -> None:
 
 
 def check_race(data: VersionData, race: str) -> None:
-    races = sorted(data.read_json(RACIALS_FILE)["races"])
+    races = mage_races(data)
     if race not in races:
-        raise InvalidArgumentError(f"Race inconnue « {race} ».", f"choisir parmi {', '.join(races)} (racials.json)")
+        source = RACES_FILE if (data.path / RACES_FILE).is_file() else RACIALS_FILE
+        raise InvalidArgumentError(f"Race inconnue « {race} ».", f"choisir parmi {', '.join(races)} ({source})")
 
 
 def constants_certainty(data: VersionData) -> Certainty:

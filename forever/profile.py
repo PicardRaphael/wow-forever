@@ -9,7 +9,7 @@ sourcés : `WRAPPED`. Chaque champ garde sa source, sa date UTC et la version du
 `merge_field` (la plus récente l'emporte, à date égale la source la plus directe, `SOURCE_RANK`) et garde les
 désaccords dans `conflicts`, jamais effacés. Un profil de schéma 1 est migré à la lecture (source `joueur`, date
 `updated_at`) et réécrit seulement par une commande qui écrit. `read_profile` rend les valeurs à plat, plus `fields`
-et `conflicts`. Neuf classes (noms anglais du client, noms français acceptés). Mage : race (racials.json), niveau et
+et `conflicts`. Neuf classes (noms anglais du client, noms français acceptés). Mage : race (races.json), niveau et
 talents (check_build) validés ; autres classes : gardées telles quelles, `validated: false`. Faction donnée par le
 joueur, jamais déduite ni importée. `planned` : personnage prévu, pas encore créé ; absent : `false`."""
 
@@ -26,7 +26,7 @@ from typing import Any, TypedDict
 from forever.config import Deps
 from forever.engine.talents import check_build
 from forever.errors import DataSchemaError, InvalidArgumentError
-from forever.gamedata import RACIALS_FILE, build_game_data
+from forever.gamedata import RACES_FILE, RACIALS_FILE, build_game_data, mage_races
 from forever.provenance import Provenance, local_provenance
 from forever.store import current_identity, load_version
 from forever.timefmt import format_utc
@@ -222,12 +222,13 @@ def normalize_class(value: str) -> str:
 def _mage_errors(deps: Deps, c: Mapping[str, Any]) -> list[tuple[str, str]]:
     """Erreurs (message, action) de race, de talents et de niveau d'un Mage contre les données courantes."""
     data = load_version(deps)
-    races = sorted(data.read_json(RACIALS_FILE)["races"])
+    races = mage_races(data)
+    source = RACES_FILE if (data.path / RACES_FILE).is_file() else RACIALS_FILE
     race = c.get("race")
     if race is not None and race not in races:
         close = difflib.get_close_matches(race, races, n=3, cutoff=0.5)
         hint = f"proches : {', '.join(close)}" if close else f"choisir parmi {', '.join(races)}"
-        return [(f"Race inconnue « {race} » pour un Mage.", f"{hint} (racials.json)")]
+        return [(f"Race inconnue « {race} » pour un Mage.", f"{hint} ({source})")]
     gd = build_game_data(data)
     unknown = [k for k in c.get("talents") or {} if k not in gd.talents]
     if unknown:

@@ -24,9 +24,10 @@ from forever.pipeline.tooltip import half_up, normalize, tooltip_values
 from forever.timefmt import format_utc
 
 RULES_NAME = "decode_rules.json"
-DECODED_FILES = ("talents.json", "spells.json", "spell_scaling.json")
+CLASS_FILES = ("classes.json", "races.json", "pvp_items.json")  # PV1 : 9 classes, races, bijoux PvP
+DECODED_FILES = ("talents.json", "spells.json", "spell_scaling.json", *CLASS_FILES)
 INHERITED_FILES = (
-    "racials.json",
+    "_seed_racials.json",  # PV1, D5 : copie figée du relevé communautaire (mode seed), racials.json retiré
     "leveling.json",
     "mechanics.json",
     "respec.json",
@@ -471,6 +472,23 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
             )
         talents[int(node["ID"])] = talent
 
+    observed_nodes = []
+    for key, pos in (rules.get("observed_positions", {}).get(cls) or {}).items():
+        found = [t for t in talents.values() if t["key"] == key]
+        if not found:
+            raise DataSchemaError(f"{cls} : position relevée pour un talent inconnu « {key} ».")
+        t = found[0]
+        for field in ("tier", "col"):
+            if t[field] is not None and t[field] != pos[field]:
+                raise DataSchemaError(
+                    f"{cls}, {key} : {field} décodé du client ({t[field]}) différent du relevé en jeu ({pos[field]})."
+                )
+        t["tier"], t["col"] = pos["tier"], pos["col"]
+        t.pop("unresolved", None)
+        t["position"] = {"source": pos["source"], "certainty": pos["certainty"]}
+        unresolved = [u for u in unresolved if u["node_id"] != t["node_id"]]
+        observed_nodes.append({"node_id": t["node_id"], "key": key, "tier": t["tier"], "col": t["col"]})
+
     kinds = rules.get("trait_edge_types", {})
     visual = {int(v) for v in kinds.get("visual", [])}
     kind_of = {int(v): name for name in ("sufficient", "required") for v in kinds.get(name, [])}
@@ -529,6 +547,7 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
         "unresolved_nodes": sorted(unresolved, key=lambda u: u["node_id"]),
         "dropped_nodes": sorted(dropped, key=lambda d: d["node_id"]),
         "tree_checks": checks,
+        "observed_nodes": observed_nodes,
     }
 
 
@@ -1426,6 +1445,33 @@ def _is_candidate(path: Path, version: str) -> bool:
     return isinstance(sources, dict) and sources.get("candidate") is True
 
 
+def _class_observations(doc: Mapping[str, Any]) -> list[str]:
+    """Nœuds hors grille, doublons écartés et sorts marqués sans classement, par classe (rapport de décodage)."""
+    notes: list[str] = []
+    for cls, c in doc.get("classes", {}).items():
+        if c.get("unresolved_nodes"):
+            keys = ", ".join(u["key"] for u in c["unresolved_nodes"])
+            notes.append(f"{cls} : {len(c['unresolved_nodes'])} nœud(s) hors grille non résolu(s) ({keys})")
+        if c.get("dropped_nodes"):
+            notes.append(f"{cls} : {len(c['dropped_nodes'])} nœud(s) en double écarté(s) (même sort, nœud plus récent)")
+        if c.get("unresolved_spells"):
+            names = ", ".join(u["name"] for u in c["unresolved_spells"])
+            notes.append(f"{cls} : {len(c['unresolved_spells'])} sort(s) marqué(s) non classé(s) ({names})")
+    return notes
+
+
+def _inherited_source(base: Path, name: str, rules: Mapping[str, Any]) -> Path | None:
+    """Fichier de la version de base dont `name` hérite : lui-même, ou le fichier retiré dont il est la copie figée
+    (`retired_files`, première installation de la copie)."""
+    if (base / name).is_file():
+        return base / name
+    for old, spec in rules.get("retired_files", {}).items():
+        retired = base / str(old)
+        if spec.get("frozen_copy") == name and retired.is_file():
+            return retired
+    return None
+
+
 def decode_version(
     deps: Deps, version: str, *, csv_dir: Path | None = None, out: Path | None = None, force: bool = False
 ) -> Candidate:
@@ -1449,21 +1495,61 @@ def decode_version(
     missing = [rel for _, rel in table_files(rules) if not (csv_dir / rel).is_file()]
     if missing:
         raise CsvMissingError(version, missing)
+    # Tables des 9 classes : toutes (décodées) ou aucune (fichiers hérités de la base) ; une partie est une erreur.
+    class_files = class_table_files(rules)
+    class_missing = [rel for _, rel in class_files if not (csv_dir / rel).is_file()]
+    if class_missing and len(class_missing) < len(class_files):
+        raise CsvMissingError(version, class_missing)
     if out.exists() and any(out.iterdir()) and (not force or not _is_candidate(out, version)):
         raise CandidateExistsError(str(out))
     tables = load_tables(csv_dir, rules)
     talents = decode_talents(tables, rules, version)
     spells = decode_spells(tables, rules, _read_json(base / "spells.json"), version)
     scaling = decode_scaling(tables, rules, version)
+    extra_notes: list[str] = []
+    decoded_classes: dict[str, Any] = {}
+    if class_files and not class_missing:
+        more = load_class_tables(csv_dir, rules)
+        decoded_classes = {
+            "classes.json": decode_classes(more, rules, version),
+            "races.json": decode_races(more, rules, version),
+            "pvp_items.json": decode_pvp_items(more, rules, version),
+        }
+        extra_notes += _class_observations(decoded_classes["classes.json"])
     inherited = {}
-    for name in INHERITED_FILES:
-        doc = _read_json(base / name)
+    names = [*INHERITED_FILES, *(n for n in CLASS_FILES if n not in decoded_classes)]
+    for name in names:
+        path = _inherited_source(base, name, rules)
+        if path is None:
+            if name in CLASS_FILES:
+                extra_notes.append(
+                    f"{name} absent : tables des 9 classes absentes de {csv_dir.name} et de {base_version}"
+                )
+                continue
+            raise DataSchemaError(f"{base / name} introuvable : fichier hérité attendu.")
+        doc = _read_json(path)
         if not isinstance(doc, dict):
-            raise DataSchemaError(f"{base / name} : objet JSON attendu pour y noter inherited_from.")
+            raise DataSchemaError(f"{path} : objet JSON attendu pour y noter inherited_from.")
         inherited[name] = {**doc, "inherited_from": base_version}
+        if name in CLASS_FILES:
+            extra_notes.append(f"{name} hérité de {base_version} : tables des 9 classes absentes de {csv_dir.name}")
     local_sources = _read_json(base / SOURCES_NAME)
     files = local_sources.get("files", {})
     decoded_note = f"tables du client {version} (wago.tools, {csv_dir.name}) décodées par forever decode"
+    frozen_of = {spec.get("frozen_copy"): old for old, spec in rules.get("retired_files", {}).items()}
+
+    def inherited_entry(name: str) -> dict[str, Any]:
+        entry = files.get(name) or files.get(frozen_of.get(name, ""), {"source": "inconnue", "certainty": "suppose"})
+        notes = [*entry.get("notes", [])]
+        if name not in files and name in frozen_of:
+            notes.append(f"copie figée de {frozen_of[name]} (retired_files de {RULES_NAME})")
+        return {**entry, "inherited_from": base_version, "notes": [*notes, f"hérité de {base_version}"]}
+
+    class_notes = {
+        "classes.json": "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
+        "races.json": "races jouables, classes permises et raciaux (decode_rules.json, racial_skill_lines)",
+        "pvp_items.json": "bijoux dont le sort d'utilisation rompt un contrôle (decode_rules.json, pvp_trinkets)",
+    }
     sources = {
         **{k: v for k, v in local_sources.items() if k != "files"},
         "game_version": version,
@@ -1495,14 +1581,17 @@ def decode_version(
             },
             **{
                 name: {
-                    **files.get(name, {"source": "inconnue", "certainty": "suppose"}),
-                    "inherited_from": base_version,
-                    "notes": [*files.get(name, {}).get("notes", []), f"hérité de {base_version}"],
+                    "source": f"Client {version} : {decoded_note}",
+                    "certainty": "certain",
+                    "notes": [class_notes[name], "classement PvP : table de decode_rules.json, certitude probable"],
                 }
-                for name in INHERITED_FILES
+                for name in decoded_classes
             },
+            **{name: inherited_entry(name) for name in inherited},
         },
     }
+    if rules.get("retired_files"):
+        sources["retired_files"] = copy.deepcopy(rules["retired_files"])
     if out.exists():
         shutil.rmtree(out)
     vdir = out / version
@@ -1510,6 +1599,8 @@ def decode_version(
     _write_json(vdir / "talents.json", talents)
     _write_json(vdir / "spells.json", spells)
     _write_json(vdir / "spell_scaling.json", scaling)
+    for name, doc in decoded_classes.items():
+        _write_json(vdir / name, doc)
     for name, doc in inherited.items():
         _write_json(vdir / name, doc)
     _write_json(vdir / SOURCES_NAME, sources)
@@ -1520,5 +1611,5 @@ def decode_version(
         talents=sum(len(t["talents"]) for t in talents["trees"]),
         spells=len(rules["spells"]),
         spell_ranks=sum(len(spells["spells"][k]["ranks"]) for k in rules["spells"]),
-        observations=_observations(talents, spells, base),
+        observations=[*_observations(talents, spells, base), *extra_notes],
     )

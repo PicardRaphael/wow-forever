@@ -8,7 +8,8 @@
     "nature : client (vrai changement du jeu), format (représentation différente), convention (règle de lecture).",
     "Changements installés dans 1.60.1.70009 en révision 2 (forever install, 2026-09-29) : champ applied_in_revision.",
     "Repris de 1.60.1.70009 à l'installation de 1.60.1.70124 (forever install --new-version, 2026-09-30) : applied_in_revision garde la révision d'origine.",
-    "Changements installés dans 1.60.1.70124 en révision 1 (forever install, 2026-09-30) : champ applied_in_revision."
+    "Changements installés dans 1.60.1.70124 en révision 1 (forever install, 2026-09-30) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70124 en révision 2 (forever install, 2026-09-30) : champ applied_in_revision."
   ],
   "changes": [
     {

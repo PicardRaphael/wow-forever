@@ -4,7 +4,7 @@ Le moteur reste pur : il reçoit `GameData` en paramètre. Tout écart de schém
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Iterator, Mapping
 from typing import Any
 
 from forever.config import Deps
@@ -12,6 +12,7 @@ from forever.engine.model import (
     ArmorRank,
     BuildMethod,
     CharacterModel,
+    ClassKnowledge,
     CoefficientRules,
     CombatRules,
     Constants,
@@ -48,7 +49,10 @@ MECHANICS_FILE = "mechanics.json"
 SPELLS_FILE = "spells.json"
 TALENTS_FILE = "talents.json"
 LEVELING_FILE = "leveling.json"
-RACIALS_FILE = "racials.json"
+RACIALS_FILE = "racials.json"  # relevé communautaire (versions antérieures à PV1)
+RACES_FILE = "races.json"  # races et raciaux décodés du client (PV1, décision 106)
+SEED_RACIALS_FILE = "_seed_racials.json"  # copie figée du relevé, lue en mode seed (PV1, D5)
+CLASSES_FILE = "classes.json"  # savoir des 9 classes (PV1)
 MONSTERS_FILE = "monsters.json"
 SCALING_FILE = "spell_scaling.json"
 RESPEC_FILE = "respec.json"
@@ -246,6 +250,83 @@ def _rules(raw: Any) -> CombatRules:
         dot_can_crit=r.bool_(cr, "dot_can_crit", "combat_rules.dot_can_crit"),
         pushback_s=r.num(cr, "pushback_s", "combat_rules.pushback_s"),
     )
+
+
+def _racials_from_races(raw: Any) -> Racials:
+    """Grandeurs raciales du moteur du Mage décodées du client (`races.json`, `mage_values` de chaque race)."""
+    r = _Reader(RACES_FILE)
+    if not isinstance(raw, dict):
+        raise r.fail("racine", "objet")
+    tables: dict[str, dict[str, float]] = {"sword_crit": {}, "spirit_pct": {}, "mana_pct": {}}
+    for race, entry in r.obj(raw, "races", "races").items():
+        values = r.obj(entry, "mage_values", f"races.{race}.mage_values") if isinstance(entry, dict) else None
+        if values is None:
+            raise r.fail(f"races.{race}", "objet")
+        for key, table in tables.items():
+            if key in values:
+                table[race] = r.num(values, key, f"races.{race}.mage_values.{key}")
+    return Racials(sword_crit=tables["sword_crit"], spirit_pct=tables["spirit_pct"], mana_pct=tables["mana_pct"])
+
+
+def racials_source(version: VersionData, rules: str = "forever") -> str:
+    """Fichier des raciaux lu par le moteur : `races.json` (client) en mode forever, la copie figée du relevé en mode
+    seed ; `racials.json` pour une version antérieure à PV1."""
+    wanted = SEED_RACIALS_FILE if rules == "seed" else RACES_FILE
+    return wanted if (version.path / wanted).is_file() else RACIALS_FILE
+
+
+def mage_races(version: VersionData) -> list[str]:
+    """Races jouables en Mage : celles de `races.json` dont les classes permises comptent le Mage ; toutes celles de
+    `racials.json` pour une version antérieure à PV1."""
+    if (version.path / RACES_FILE).is_file():
+        races = version.read_json(RACES_FILE)["races"]
+        return sorted(name for name, r in races.items() if "Mage" in r.get("classes", []))
+    return sorted(version.read_json(RACIALS_FILE)["races"])
+
+
+class _ClassFile(Mapping[str, ClassKnowledge]):
+    """`classes.json` lu à la première consultation (2 Mo : jamais chargé par les calculs du Mage)."""
+
+    def __init__(self, version: VersionData) -> None:
+        self._version = version
+        self._raw: dict[str, Any] | None = None
+        self._built: dict[str, ClassKnowledge] = {}
+
+    def _classes(self) -> dict[str, Any]:
+        if self._raw is None:
+            try:
+                doc = self._version.read_json(CLASSES_FILE)
+            except (OSError, ValueError) as exc:
+                raise DataSchemaError(f"{CLASSES_FILE} illisible ({exc}).") from exc
+            classes = doc.get("classes") if isinstance(doc, dict) else None
+            if not isinstance(classes, dict):
+                raise _Reader(CLASSES_FILE).fail("classes", "objet")
+            self._raw = classes
+        return self._raw
+
+    def __getitem__(self, name: str) -> ClassKnowledge:
+        if name not in self._built:
+            raw = self._classes()[name]
+            r = _Reader(CLASSES_FILE)
+            trees = raw.get("trees") if isinstance(raw, dict) else None
+            if not isinstance(trees, list) or not all(isinstance(t, dict) and "talents" in t for t in trees):
+                raise r.fail(f"classes.{name}.trees", "liste d'arbres")
+            self._built[name] = ClassKnowledge(
+                name=name,
+                id=r.int_(raw, "id", f"classes.{name}.id"),
+                trees=tuple(trees),
+                spells=r.obj(raw, "spells", f"classes.{name}.spells"),
+                pet_spells=raw.get("pet_spells") or {},
+                unresolved_nodes=tuple(raw.get("unresolved_nodes") or ()),
+                unresolved_spells=tuple(raw.get("unresolved_spells") or ()),
+            )
+        return self._built[name]
+
+    def __iter__(self) -> Iterator[str]:
+        return iter(self._classes())
+
+    def __len__(self) -> int:
+        return len(self._classes())
 
 
 def _racials(raw: Any) -> Racials:
@@ -841,8 +922,10 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         raise InvalidArgumentError(f"Règles inconnues : {rules}.", "choisir forever ou seed")
     files = {SPELLS_FILE: SPELLS_FILE, TALENTS_FILE: TALENTS_FILE, **(SEED_FILES if rules == "seed" else {})}
     try:
-        names = (LEVELING_FILE, RACIALS_FILE, MONSTERS_FILE, SCALING_FILE, RESPEC_FILE)
+        names = (LEVELING_FILE, MONSTERS_FILE, SCALING_FILE, RESPEC_FILE)
         raw = {name: version.read_json(name) for name in names}
+        racials_file = racials_source(version, rules)
+        raw[racials_file] = version.read_json(racials_file)
         raw |= {name: version.read_json(file) for name, file in files.items()}
         raw_mechanics = version.read_json(MECHANICS_FILE)
     except (OSError, ValueError) as exc:
@@ -858,7 +941,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         trees=trees,
         rules=_rules(raw[LEVELING_FILE]),
         constants=_constants(raw_mechanics),
-        racials=_racials(raw[RACIALS_FILE]),
+        racials=_racials_from_races(raw[racials_file]) if racials_file == RACES_FILE else _racials(raw[racials_file]),
         monsters=_monsters(raw[MONSTERS_FILE]),
         scaling=_scaling(raw[SCALING_FILE], spells),
         mob_model=_mob_model(raw[LEVELING_FILE]),
@@ -873,6 +956,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         respec=_respec(raw[RESPEC_FILE], values),
         build=_build_method(values),
         assumption_ranges=_assumption_ranges(values),
+        classes=_ClassFile(version) if (version.path / CLASSES_FILE).is_file() else {},
     )
 
 

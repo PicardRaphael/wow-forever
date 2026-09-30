@@ -7,12 +7,17 @@ Règles de fusion (seuls changements permis) :
 - certitude d'un talent passée à `FC-<build>` (`certainty`) ;
 - champs du client ajoutés (`added_field`) : `name_fr`, `tooltip_values`, `source` ; `desc` et `spellIds` du dépôt
   gardés (gabarit `{i}` et identifiants par rang), ceux du client rangés dans `source` ;
-- `duration_s` retiré (`removed_field`) quand la durée corrigée est la valeur du rang du client.
+- `duration_s` retiré (`removed_field`) quand la durée corrigée est la valeur du rang du client ;
+- fichiers des 9 classes (PV1, `CLASS_FILES`) ajoutés (`added_file`) ou remplacés (`replaced_file`), seulement s'ils
+  sont décodés des tables de cette version (jamais un fichier hérité, marqué `inherited_from`) ;
+- fichier retiré (`retired_file`) seulement s'il est déclaré dans `retired_files` de la candidate et que son
+  remplaçant y est décodé ; sa copie figée (`frozen_copy`) est alors ajoutée. Aucun retrait n'est jamais déduit.
 Tout autre écart (structure d'un talent, rang en plus ou en moins, valeur non confirmée) refuse l'installation."""
 
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 import shutil
 from collections.abc import Mapping, Sequence
@@ -33,9 +38,21 @@ TALENTS = "talents.json"
 SPELLS = "spells.json"
 CONFIRMED = "confirmed_changes.json"
 REVISIONS = "revisions.json"
-RULES = ("confirmed", "observation", "certainty", "added_field", "removed_field", "metadata")
+RULES = (
+    "confirmed",
+    "observation",
+    "certainty",
+    "added_field",
+    "removed_field",
+    "metadata",
+    "added_file",
+    "replaced_file",
+    "retired_file",
+)
+FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
-CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json")
+CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json", "_seed_racials.json")
+CLASS_FILES = ("classes.json", "races.json", "pvp_items.json")
 TALENT_TABLES = "tables Trait* et Spell* (wago.tools)"
 SPELL_TABLES = "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)"
 
@@ -250,6 +267,71 @@ def display_path(deps: Deps, path: str) -> str:
     return Path(path).as_posix()
 
 
+def _short_sha(path: Path) -> str | None:
+    return hashlib.sha256(path.read_bytes()).hexdigest()[:12] if path.is_file() else None
+
+
+def _decoded(path: Path) -> bool:
+    """Fichier de la candidate décodé des tables de sa version (pas une copie héritée d'une autre version)."""
+    if not path.is_file():
+        return False
+    doc = _json(path)
+    return isinstance(doc, dict) and "inherited_from" not in doc
+
+
+def _file_changes(repo: Path, cand: Path, cand_sources: Mapping[str, Any], version: str) -> list[InstallChange]:
+    """Fichiers ajoutés, remplacés ou retirés (règles `added_file`, `replaced_file`, `retired_file`)."""
+    changes: list[InstallChange] = []
+    source = f"Client {version} : fichier décodé par forever decode (candidate)"
+    for name in CLASS_FILES:
+        if not _decoded(cand / name):
+            continue
+        before, after = _short_sha(repo / name), _short_sha(cand / name)
+        if before != after:
+            rule = "added_file" if before is None else "replaced_file"
+            changes.append(
+                {
+                    "file": name,
+                    "path": "*",
+                    "before": before,
+                    "after": after,
+                    "source": source,
+                    "certainty": "certain",
+                    "rule": rule,
+                }
+            )
+    for old, spec in (cand_sources.get("retired_files") or {}).items():
+        replacement = str(spec.get("replaced_by", ""))
+        if not (repo / old).is_file() or replacement not in CLASS_FILES or not _decoded(cand / replacement):
+            continue
+        reason = f"retiré : remplacé par {replacement} ({spec.get('reason', 'retired_files')})"
+        changes.append(
+            {
+                "file": old,
+                "path": "*",
+                "before": _short_sha(repo / old),
+                "after": None,
+                "source": reason,
+                "certainty": "certain",
+                "rule": "retired_file",
+            }
+        )
+        frozen = spec.get("frozen_copy")
+        if frozen and not (repo / frozen).is_file() and (cand / frozen).is_file():
+            changes.append(
+                {
+                    "file": str(frozen),
+                    "path": "*",
+                    "before": None,
+                    "after": _short_sha(cand / frozen),
+                    "source": f"copie figée de {old} (mode seed)",
+                    "certainty": "certain",
+                    "rule": "added_file",
+                }
+            )
+    return changes
+
+
 def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[InstallPlan, dict[str, Any]]:
     identity = current_identity(deps.data_dir)
     src, cv = load_source(deps, candidate)
@@ -281,6 +363,8 @@ def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[In
     m = _Merge(cv.game_version if new_version else rv.game_version, confirmed_doc["changes"], read_at)
     talents = m.talents(_json(rv.path / TALENTS), _json(cv.path / TALENTS))
     spells = m.spells(_json(rv.path / SPELLS), _json(cv.path / SPELLS))
+    if not new_version:
+        m.changes += _file_changes(rv.path, cv.path, cv.sources, rv.game_version)
     rev = data_revision_of(rv.sources)
     counts = {r: sum(1 for c in m.changes if c["rule"] == r) for r in RULES}
     counts["refused"] = len(m.refused)
@@ -316,6 +400,7 @@ def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[In
         "path": rv.path,
         "candidate_path": cv.path,
         "collected_at": cv.sources.get("collected_at"),
+        "candidate_sources": cv.sources,
     }
     return plan, docs
 
@@ -406,6 +491,15 @@ def _sources(doc: dict[str, Any], docs: Mapping[str, Any], n: int, version: str,
             "copie figée du seed : _seed_spells.json",
         ],
     }
+    cand_files = (docs.get("candidate_sources") or {}).get("files", {})
+    for change in docs.get("file_changes", []):
+        if change["rule"] == "retired_file":
+            files.pop(change["file"], None)
+        elif change["file"] in cand_files:
+            files[change["file"]] = {
+                **cand_files[change["file"]],
+                "notes": [*cand_files[change["file"]].get("notes", []), installed],
+            }
     files[REVISIONS] = {
         "source": "forever install : journal des révisions de la version (motif, commande, rapport, valeurs changées)",
         "certainty": "certain",
@@ -486,6 +580,7 @@ def apply_install(
     day = date or format_utc(deps.now())[:10]
     n, version = plan["revision_to"], plan["version"]
     vdir: Path = _new_version_dir(deps, plan, docs, day) if new_version else docs["path"]
+    docs = {**docs, "file_changes": [c for c in plan["changes"] if c["rule"] in FILE_RULES]}
     confirmed = _confirmed(_json(vdir / CONFIRMED), docs, n, version, day)
     base = _new_version_sources(docs, plan, day) if new_version else _json(vdir / SOURCES_NAME)
     sources = _sources(base, docs, n, version, day)
@@ -518,6 +613,11 @@ def apply_install(
         }
     )
     history["revisions"].append(revision)
+    for change in docs["file_changes"]:
+        if change["rule"] == "retired_file":
+            (vdir / change["file"]).unlink()
+        else:
+            shutil.copyfile(Path(docs["candidate_path"]) / change["file"], vdir / change["file"])
     _write(vdir / TALENTS, docs["talents"], 1)
     _write(vdir / SPELLS, docs["spells"], 1)
     _write(vdir / CONFIRMED, confirmed, 2)
@@ -534,6 +634,9 @@ LABELS = {
     "added_field": "champ ajouté",
     "removed_field": "champ retiré",
     "metadata": "métadonnée",
+    "added_file": "fichier ajouté (décodé du client)",
+    "replaced_file": "fichier remplacé (décodé du client)",
+    "retired_file": "fichier retiré (retired_files)",
     "refused": "hors règles (refusé)",
 }
 CELL_MAX = 80
@@ -562,7 +665,8 @@ def render_install_report(plan: InstallPlan) -> str:
     lines += [f"| {LABELS[r]} | {plan['counts'].get(r, 0)} |" for r in (*RULES, "refused")]
     lines.append("")
     values = [c for c in plan["changes"] if c["rule"] in ("confirmed", "observation", "removed_field")]
-    for title, rows in (("Valeurs changées", values), ("Écarts refusés", plan["refused"])):
+    files = [c for c in plan["changes"] if c["rule"] in FILE_RULES]
+    for title, rows in (("Valeurs changées", values), ("Fichiers", files), ("Écarts refusés", plan["refused"])):
         if not rows:
             continue
         lines += [f"## {title}", "", "| Fichier | Chemin | Avant | Après | Règle | Source | Certitude |"]

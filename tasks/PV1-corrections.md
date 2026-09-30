@@ -95,3 +95,17 @@ Présentées ensemble avant la fusion (règle du skill `/tranche`). Chaque corre
 -    assert "Paladin" in with_unresolved  # plan de PV1 : écart relevé sur l'arbre du Paladin
 +    assert "Warlock" in with_unresolved  # paliers du Démoniste : sources communautaires seulement
 ```
+
+## 5. `tests/unit/test_decode_races.py::test_mage_racial_values_equal_the_community_record` (bloc B2)
+
+- **Prémisse devenue fausse** : le test lit le relevé communautaire dans `forever/data/1.60.1.70124/racials.json`,
+  retiré à la révision 2 (D5, ton accord) ; le relevé y vit désormais dans la copie figée `_seed_racials.json`,
+  de contenu identique (`tests/unit/test_install_r2.py::test_seed_racials_is_a_frozen_copy_of_the_community_record`).
+- **Preuve** : sortie du test : `FileNotFoundError: …\1.60.1.70124\racials.json`. Le test corrigé passe (essayé sur
+  une copie) : les grandeurs du Mage décodées du client restent égales au relevé.
+- **Diff proposé** :
+
+```diff
+-    record = read_json(DATA_DIR / LOCAL_VERSION / "racials.json")["races"]
++    record = read_json(DATA_DIR / LOCAL_VERSION / "_seed_racials.json")["races"]  # copie figée du relevé (D5)
+```

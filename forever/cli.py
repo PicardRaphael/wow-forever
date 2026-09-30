@@ -168,7 +168,7 @@ def build_parser() -> argparse.ArgumentParser:
     pset = psub.add_parser("set", help="créer ou mettre à jour un personnage (champs donnés seulement)")
     pset.add_argument("name", help="nom du personnage")
     pset.add_argument("--class", dest="cls", help="classe (neuf classes, nom français ou anglais)")
-    pset.add_argument("--race", help="race (Mage : racials.json)")
+    pset.add_argument("--race", help="race (Mage : races.json)")
     pset.add_argument("--faction", help="faction (jamais déduite)")
     pset.add_argument("--level", type=int, help="niveau")
     pset.add_argument("--talents", help="talents « clé=rang,… » (remplacent les précédents)")

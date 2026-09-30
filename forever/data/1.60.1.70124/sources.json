@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-09-30)",
+      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-09-30)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,22 +27,13 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-09-30)",
+      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-09-30)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
         "desc : gabarit du dépôt ({i}) ; gabarit brut et identifiants de sort du client dans source",
         "certitude par talent FC-70124 ; copie figée du seed : _seed_talents.json"
       ]
-    },
-    "racials.json": {
-      "source": "https://foreverchanges.pro/fr/racials (client 1.60.1.70009) + Icy Veins / AOEAH pour les recharges",
-      "certainty": "suppose",
-      "notes": [
-        "certitude mixte (FC et PC) : la plus basse est retenue ; détail par entrée dans le fichier",
-        "hérité de 1.60.1.70009"
-      ],
-      "inherited_from": "1.60.1.70009"
     },
     "leveling.json": {
       "source": "Tables d'XP Classic et modèles de monstres et de joueur (voir les champs du fichier)",
@@ -174,8 +165,47 @@
       "notes": [
         "chaque valeur changée porte sa source et sa certitude (champs source et certainty)"
       ]
+    },
+    "classes.json": {
+      "source": "Client 1.60.1.70124 : tables du client 1.60.1.70124 (wago.tools, 1.60.1.70124) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
+        "classement PvP : table de decode_rules.json, certitude probable",
+        "installé en révision 2 (forever install, 2026-09-30)"
+      ]
+    },
+    "races.json": {
+      "source": "Client 1.60.1.70124 : tables du client 1.60.1.70124 (wago.tools, 1.60.1.70124) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "races jouables, classes permises et raciaux (decode_rules.json, racial_skill_lines)",
+        "classement PvP : table de decode_rules.json, certitude probable",
+        "installé en révision 2 (forever install, 2026-09-30)"
+      ]
+    },
+    "pvp_items.json": {
+      "source": "Client 1.60.1.70124 : tables du client 1.60.1.70124 (wago.tools, 1.60.1.70124) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "bijoux dont le sort d'utilisation rompt un contrôle (decode_rules.json, pvp_trinkets)",
+        "classement PvP : table de decode_rules.json, certitude probable",
+        "installé en révision 2 (forever install, 2026-09-30)"
+      ]
+    },
+    "_seed_racials.json": {
+      "source": "https://foreverchanges.pro/fr/racials (client 1.60.1.70009) + Icy Veins / AOEAH pour les recharges",
+      "certainty": "suppose",
+      "notes": [
+        "certitude mixte (FC et PC) : la plus basse est retenue ; détail par entrée dans le fichier",
+        "hérité de 1.60.1.70009",
+        "copie figée de racials.json (retired_files de decode_rules.json)",
+        "hérité de 1.60.1.70124",
+        "installé en révision 2 (forever install, 2026-09-30)"
+      ],
+      "inherited_from": "1.60.1.70124"
     }
   },
-  "revision": 1,
+  "revision": 2,
   "revised_at": "2026-09-30"
 }

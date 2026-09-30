@@ -2403,6 +2403,75 @@
      "rule": "metadata"
     }
    ]
+  },
+  {
+   "revision": 2,
+   "date": "2026-09-30",
+   "motif": "PV1 : savoir des 9 classes (classes.json), races et raciaux (races.json) et bijoux PvP (pvp_items.json) décodés du client ; racials.json retiré, copie figée _seed_racials.json pour le mode seed (D5, décision 106) ; positions des deux talents hors grille du Paladin relevées en jeu",
+   "command": "forever install <cache>/candidates/1.60.1.70124 --yes",
+   "candidate": {
+    "path": "<cache>/candidates/1.60.1.70124",
+    "data_sha": "151a201bd950"
+   },
+   "report": "docs/research/data-1.60.1.70124-r2.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 0,
+    "added_file": 4,
+    "replaced_file": 0,
+    "retired_file": 1
+   },
+   "changes": [
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": null,
+     "after": "f46e560a920b",
+     "source": "Client 1.60.1.70124 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "added_file"
+    },
+    {
+     "file": "races.json",
+     "path": "*",
+     "before": null,
+     "after": "b32091e64e83",
+     "source": "Client 1.60.1.70124 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "added_file"
+    },
+    {
+     "file": "pvp_items.json",
+     "path": "*",
+     "before": null,
+     "after": "489cfaae4ed9",
+     "source": "Client 1.60.1.70124 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "added_file"
+    },
+    {
+     "file": "racials.json",
+     "path": "*",
+     "before": "3a7daa39480e",
+     "after": null,
+     "source": "retiré : remplacé par races.json (PV1, D5 (accord de l'utilisateur du 2026-09-30) : raciaux décodés du client (décision 106) ; copie figée du relevé communautaire pour le mode seed ; retiré seulement quand races.json est décodé de la version installée)",
+     "certainty": "certain",
+     "rule": "retired_file"
+    },
+    {
+     "file": "_seed_racials.json",
+     "path": "*",
+     "before": null,
+     "after": "7e884d146e7a",
+     "source": "copie figée de racials.json (mode seed)",
+     "certainty": "certain",
+     "rule": "added_file"
+    }
+   ]
   }
  ]
 }

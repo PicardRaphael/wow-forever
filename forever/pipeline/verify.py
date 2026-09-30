@@ -95,7 +95,9 @@ def check_version(v: VersionData) -> tuple[list[str], list[str], list[str]]:
     errors: list[str] = []
     warnings: list[str] = []
     try:
-        build_game_data(v)
+        gd = build_game_data(v)
+        for name in gd.classes:  # classes.json lu à la demande : chaque classe est contrôlée ici
+            gd.classes[name]
     except DataSchemaError as exc:
         errors.append(exc.message)
     if all((v.path / name).is_file() for name in SEED_FILES.values()):
