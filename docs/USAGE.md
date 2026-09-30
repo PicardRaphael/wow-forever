@@ -64,7 +64,22 @@ uv run forever profile list
 uv run forever profile use Givrelame
 uv run forever profile show
 uv run forever profile remove Givrelame
+uv run forever profile import --dry-run           # ForeverLogger, Questie, Auctionator, journaux : changements listés
+uv run forever profile import                     # écriture après accord (--yes pour ne pas la demander)
 ```
+L'import lit sur disque (SavedVariables sous `FOREVER_WOW_DIR`, `--wtf` et `--logs` pour d'autres dossiers ;
+`--utc-offset` pour l'heure locale des journaux). Chaque champ garde sa source, sa date et la version du client ; un
+désaccord entre sources est gardé dans `conflicts`, jamais effacé ; la faction n'est jamais importée.
+
+## PvP et builds des autres classes
+```powershell
+uv run forever pvp class Voleur --level 60                     # contrôles, défensifs, ruptures, recharges
+uv run forever pvp matchup Mage Démoniste --level 60 --race Orc # menaces, mes réponses, fenêtres
+uv run forever talents check --class Chasseur --level 20 deadlyAspects=5 enduranceTraining=5
+uv run forever lookup talent Intimidation --class Chasseur
+```
+Les fiches sont fixes (valeurs du client, classement probable, rendements décroissants supposés) : aucun suivi en
+direct des recharges adverses n'est possible dans un addon sur Forever.
 
 ## Lire la réponse
 Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour les raisons, hypothèses et alternatives.
@@ -78,10 +93,10 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
   la session ; ne pas s'y fier, redemander la valeur.
 
 ## Ce que le plugin ne sait pas encore
-PvP (PV1, PV2), boss et butin des donjons (DJ1), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
+PvP de champ de bataille et rendements décroissants mesurés (PV2), boss et butin des donjons (DJ1), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
 ventes (EC1), quêtes et XP propres à Forever (T04d), mana des combats longs (T05b), mémoire du joueur (T07), raid
 complet (T09), équipement (T10), consommables (T11), analyse de mes combats (AN1, AN2), autres classes que le Mage
-(tranches PA1 à DR1). Sur ces sujets, il répond « je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les
+(dégâts et rotations : tranches PA1 à DR1 ; leur PvP et la légalité de leurs builds sont couverts depuis PV1). Sur ces sujets, il répond « je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les
 couvrira ; pour une classe pas encore calculée, il propose des builds de la communauté trouvés par le sous-agent de
 recherche, avec source et date, certitude au mieux supposée.
 

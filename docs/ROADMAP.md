@@ -26,7 +26,7 @@ Sources communautaires (décisions 123 à 131, `docs/DATA_SOURCES.md`) : les add
 | T08a | Installer une **nouvelle** version du jeu (`forever install --new-version` : nouveau dossier, copies figées du seed et changements confirmés reportés, provenance et fraîcheur) ; version du client attachée à chaque session de journal pour qu'une mesure ne soit jamais attribuée à une autre version ; veille quotidienne en CI (fetch, decode, verify, diff, report, PR, rien installé) ; routeur du plugin qui propose l'analyse quand la fraîcheur est en retard | T06b |
 | PV1 | Import automatique minimal du profil (ForeverLogger, journaux), puis PvP : savoir des 9 classes sans moteur de classe (sorts, recharges, contrôles et durées, défensifs, raciaux de toutes les races décodés du client, bijoux, rendements décroissants selon les règles Classic, fiches par affrontement) ; builds de la communauté vérifiés sur le client pour les classes pas encore calculées | T03, T04a, T05, T06b |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
-| PV2 | PvP, champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux de champs de bataille | PV1, T04a |
+| PV2 | PvP, champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux de champs de bataille (`docs/research/pvp-dr-protocole.md`) ; profil PvP du Mage avec rendements décroissants et bijou (reporté de PV1) | PV1, T04a |
 | AN1 | Analyse PvP de mes combats (champs de bataille, monde ouvert) : contrôles donnés et subis, recharges, burst, interruptions, morts, cibles, comparés aux fiches de PV1 ; taux réels comparés au modèle ; `forever analyze`, outil MCP, rapport | PV1, PV2, T04a |
 | PA1 | Paladin : moteur (table d'attaque de mêlée, soins, sceaux et jugements), leveling, donjon, PvP, builds par contexte ; analyse AN1 étendue | PV1, AN1 |
 | DE1 | Démoniste : moteur (familiers, DoT, fragments d'âme), leveling, donjon, PvP, builds par contexte ; analyse AN1 étendue | PA1 |
@@ -43,7 +43,7 @@ Sources communautaires (décisions 123 à 131, `docs/DATA_SOURCES.md`) : les add
 | LG1 | Legacy : défis, points, arbres de bonus, conseil des bonus pour chacun de mes personnages, chiffré par le moteur de sa classe | T03, T04b, DR1 |
 | FA1p | Extension PvP de ForeverAssist V1 : fiche fixe de la classe adverse | FA1, PV1 |
 | P06 | Évaluation d'un pont de conversation existant (wow-claude / wow-ai) pointé sur ce dépôt | T06 |
-| T07 | Mémoire joueur : import complet et multi-sources (ForeverLogger, quêtes faites dans Questie, mes prix d'Auctionator, journaux ; API Blizzard branchée par EC1) et fiches du vault (+ ForeverAssist V2 proposée) ; l'import minimal du profil est fait en PV1 | T06, PV1 |
+| T07 | Mémoire joueur : import complet (équipement, métiers, réputations, historique ; API Blizzard branchée par EC1) et fiches du vault (+ ForeverAssist V2 proposée) ; l'import minimal du profil, les quêtes faites dans Questie et mes prix d'Auctionator sont faits en PV1 | T06, PV1 |
 | LG2 | Suivi de ma progression Legacy (et, par le même import, honneur et rang PvP) | LG1, T07 |
 | MT1 | Métiers : recettes, montée de compétence, points Legacy des métiers, répartition des métiers entre mes personnages | T03, LG1, T07 |
 | RP1 | Réputations : factions, paliers, gains, récompenses, suivi, « combien coûte telle réputation » (gains relevés par ForeverLogger depuis DJ1) | T03, T07, DJ1 |
@@ -196,6 +196,16 @@ plugin en 0.4.3. Rejeu des builds de T05 identique à celui de T06b (`docs/resea
   `uv run tasks.py verify` vert.
 
 ## PV1 — Profil automatique, puis PvP : savoir des 9 classes (priorité haute)
+**Fait le 2026-09-30** (plan `tasks/PV1-plan.md`, rapport de données `docs/research/data-1.60.1.70124-r2.md`,
+corrections de tests `tasks/PV1-corrections.md`) : `forever profile import` (ForeverLogger, journaux, Questie,
+Auctionator ; profil de schéma 2) ; 1.60.1.70124 en révision 2 (`classes.json`, `races.json`, `pvp_items.json`,
+`pvp_rules.json`, `racials.json` retiré, copie figée `_seed_racials.json`) ; rendements décroissants (registre K1 à
+K4) ; `forever pvp class`, `forever pvp matchup`, `forever_lookup(kind="pvp")` ; légalité des builds des 9 classes
+(`forever talents check`, `kind="build_check"`) ; plugin 0.5.0 (`forever-pvp`, `forever-builds`). Rejeu des builds
+de T05 identique à T08a. Écarts au texte ci-dessous : Questie et Auctionator importés dès PV1 (D1) ; profil PvP du
+Mage avec rendements décroissants et bijou reporté à PV2 (D4) ; catégorie de rendement décroissant lue dans le client
+(`SpellCategories.DiminishType`, certain), seules les règles du serveur restent supposées ; positions des deux
+talents hors grille du Paladin relevées en jeu par l'utilisateur, paliers des deux du Démoniste communautaires.
 Les champs de bataille arrivent bientôt (date à confirmer par annonce officielle, `docs/OPEN_QUESTIONS.md`). T05 garde le profil PvP comparatif du Mage porté du seed (`pvp_et_respec`) ; PV1 élargit le savoir aux 9 classes et comble les limites de ce profil listées dans `seed/forever-mage/references/pvp-model.md` (ni rendements décroissants, ni bijou PvP). PV1 n'attend pas les moteurs des tranches de classe : il ne calcule aucun dégât hors Mage, il consulte et croise des données fixes.
 - **Fait, au début de la tranche : import automatique minimal du profil** (décision 105) :
     - `forever profile import` (forme au plan) lit sur disque, jamais par le réseau, les SavedVariables de ForeverLogger (`ForeverLoggerDB` : classe, race, niveau, talents de chaque personnage connecté, instantanés datés) et les journaux de combat (personnages que le journal marque comme joueur « à moi » : GUID, nom, classe) ; il crée ou met à jour les personnages du profil (décisions 99 et 119 : hors du dépôt, plusieurs personnages de toutes les classes, un actif), marque « créé » un personnage prévu qu'il retrouve, garde la source et la date de chaque champ, ne remplace jamais une valeur plus récente par une plus ancienne et liste ce qu'il change avant d'écrire (accord ou `--yes`). La faction reste donnée par le joueur (décision 99).
@@ -211,7 +221,7 @@ Les champs de bataille arrivent bientôt (date à confirmer par annonce officiel
     - Classement de chaque sort : contrôle (catégorie de rendement décroissant, durée pleine, ruptures connues), défensif ou immunité, rupture de contrôle, interruption, dissipation, mobilité. Le classement vient des champs du client ; un sort que les données ne permettent pas de classer est listé comme non résolu, jamais deviné.
     - Rendements décroissants : règles Classic (catégories, fenêtre, paliers) dans un fichier de `forever/data/<version>/`, certitude `suppose`, entrées du registre (nouvelle catégorie à fixer au plan) ; fonction pure dans `forever/engine/` qui donne la durée effective d'une suite de contrôles. Aucun chiffre de ces règles hors des données.
     - Fiches par affrontement, générées depuis les données (jamais recopiées d'un guide) : contrôles subis et leur catégorie, défensifs et immunités adverses avec leur recharge, ruptures et interruptions adverses, mes réponses (sorts de rupture, bijou, raciaux, dissipations), fenêtres à surveiller. Conseils communautaires éventuels : faits sourcés, `suppose`, avec le lien.
-    - Profil PvP du Mage (T05) : ajout des rendements décroissants et du bijou PvP, résultat toujours comparatif, jamais un duel simulé.
+    - Profil PvP du Mage (T05) : ajout des rendements décroissants et du bijou PvP, résultat toujours comparatif, jamais un duel simulé (**reporté à PV2**, D4 de PV1).
     - Classes pas encore calculées (décision 114) : talents des 9 classes consultables (`forever_lookup(kind="talent", class=…)`, forme au plan) et contrôle de légalité d'un build de n'importe quelle classe (points par palier, prérequis, niveau), pour vérifier les builds de la communauté trouvés par le sous-agent de recherche et les expliquer par les descriptions de talents du client (le contrôle des chiffres reconnaît déjà les lignes sourcées du rapport de ce sous-agent, décision 120).
     - `forever pvp class <classe>`, `forever pvp matchup <ma classe> <classe adverse>`, consultation MCP par `forever_lookup`, domaine `pvp` (paginé, compact ; forme provisoire, `docs/ARCHITECTURE.md`) ; provenance et certitude par champ.
     - Skills : `forever-pvp` (savoir PvP, fiches) et `forever-builds` (builds de toutes les classes : calculés pour les classes à moteur, communautaires vérifiés pour les autres), décision 115.
