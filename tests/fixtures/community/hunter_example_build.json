@@ -1,0 +1,6 @@
+{
+ "note": "Build d'exemple pour les tests (PV1, bloc E) : pas un relevé communautaire, aucun build du Chasseur n'ayant été relevé sans accès réseau ; mêmes nœuds que le Chasseur fictif de tests/fixtures/addon/ForeverLoggerDB.lua (Beast Mastery).",
+ "class": "Hunter",
+ "level": 20,
+ "talents": {"deadlyAspects": 5, "enduranceTraining": 5, "pathfinding": 1}
+}
