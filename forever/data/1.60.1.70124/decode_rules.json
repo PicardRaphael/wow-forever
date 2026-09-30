@@ -344,5 +344,46 @@
    3
   ],
   "note": "TraitEdge.Type (PV1) : 0 visuel seulement (jamais un prérequis), 2 suffisant (un seul des prérequis suffisants suffit), 3 requis ; sens tiré de l'énumération Enum.TraitEdgeType de l'API du client (VisualOnly, DeprecatedRankConnection, SufficientForAvailability, RequiredForAvailability), certitude probable ; relevé dans les arbres de 1.60.1.70124 : l'arête visuelle et l'arête requise entre Nature's Splendor et Nature's Majesty (Druide), deux arêtes suffisantes vers Intimidation (Chasseur)"
- }
+ },
+ "racial_skill_lines": [
+  101,
+  124,
+  125,
+  126,
+  220,
+  733,
+  753,
+  754,
+  2980
+ ],
+ "race_factions": {
+  "0": "Alliance",
+  "1": "Horde"
+ },
+ "passive_attributes_0_mask": 64,
+ "racial_values": {
+  "spirit_pct": {
+   "aura": 137,
+   "misc": 4,
+   "scale": 0.01
+  },
+  "mana_pct": {
+   "aura": 178,
+   "misc": 0,
+   "scale": 0.01
+  },
+  "sword_crit": {
+   "aura": 290,
+   "spell_name": "Sword Specialization",
+   "scale": 0.01
+  }
+ },
+ "pvp_trinkets": {
+  "inventory_type": 12,
+  "use_trigger": 0,
+  "apply_aura_effect": 6,
+  "dispel_mechanic_effect": 108,
+  "mechanic_immunity_aura": 77
+ },
+ "races_note": "PV1 (décision 106) : races jouables = présentes dans CharBaseInfo ; faction lue dans ChrRaces.Alliance (race_factions) ; raciaux = sorts des lignes racial_skill_lines de SkillLineAbility, race par RaceMasks_0 | RaceMasks_1 << 32 et PlayableRaceBit, classes par ClassMask (bit = 1 << (ID de ChrClasses - 1), 0 ou -1 : toutes) ; passif : Attributes_0 & passive_attributes_0_mask. racial_values : grandeurs lues par le moteur du Mage (aura, valeur annexe de l'effet, échelle ; sword_crit : sort nommé, arme exigée hors des tables lues). pvp_trinkets : bijou (InventoryType) dont le sort d'utilisation (TriggerType) dissipe par mécanique (effet) ou donne une immunité de mécanique (aura)."
 }

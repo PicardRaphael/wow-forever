@@ -8,16 +8,21 @@ ID,Name_lang
 1449,Arcane Explosion
 2120,Flamestrike
 2136,Fire Blast
+2481,Find Treasure
 2948,Scorch
 5143,Arcane Missiles
+5227,Underwater Breathing
 5302,Defensive State
 5570,Insect Swarm
+5579,Immune Root/Snare/Stun
 5923,Holy Power
 6057,Wand Specialization
 6117,Mage Armor
 6136,Chilled
 6150,Quick Shots
+6615,Free Action
 7268,Arcane Missile
+7744,Will of the Forsaken
 9453,Unyielding Faith
 9799,Eye for an Eye
 10060,Power Infusion
@@ -314,8 +319,23 @@ ID,Name_lang
 20500,Improved Berserker Rage
 20502,Improved Execute
 20504,Improved Intercept
+20552,Cultivation
+20554,Berserking
+20557,Beast Slaying
+20572,Blood Fury
+20573,Hardiness
+20577,Cannibalize
+20580,Shadowmeld
+20585,Wisp Spirit
+20589,Escape Artist
+20591,Expansive Mind
+20593,Engineering Specialization
+20598,The Human Spirit
+20600,Perception
 20711,Spirit of Redemption
+21009,Quickness Passive
 22959,Fire Vulnerability
+23273,Immune Charm/Fear/Polymorph
 23602,Master of Defense
 23881,Bloodthirst
 24293,Improved Tracking
@@ -325,6 +345,7 @@ ID,Name_lang
 24907,Moonkin Aura
 24968,Tranquil Spirit
 25771,Forbearance
+25891,Earthstrike
 25956,Improved Judgement
 26022,Pursuit of Justice
 27789,Holy Reach
@@ -374,7 +395,10 @@ ID,Name_lang
 427712,Pandemic
 429144,Purifying Power
 431622,Divine Aegis
+435893,Gniodine Side Effect
+435895,Gniodine Dispel
 437032,Soul Harvesting
+438273,PvP Trinket
 440529,Resourcefulness
 440870,Decimation
 1222988,Earthbound
@@ -401,10 +425,24 @@ ID,Name_lang
 1237268,Holy Conduit
 1241057,Interrupted
 1242853,Soul Harvest
+1259416,Walk on Air
+1259417,Walking on Air
+1259686,Skysight
+1259688,Elemental Blessing
+1259691,Energized
+1259705,Read Ley Line
+1259707,Elemental Insight
+1259710,Wind Blessed
+1259718,Will to Survive
+1259721,Big Game Hunter
+1259799,Elune's Light
+1259812,Eureka!
+1260189,Touch of the Grave
 1284536,Holy Purpose
 1289681,Bloodthrill
 1293241,Summon Hawk
 1293695,Demonic Brand
+1299026,Shatter Curse
 1309631,Living Spirit
 1309950,Devouring Contagion
 1309957,Holy Precision
@@ -450,6 +488,7 @@ ID,Name_lang
 1279978,Blizzard
 1279979,Blizzard
 1279980,Blizzard
+20549,War Stomp
 9452,Vindication
 440667,Vindication
 205,Frostbolt
@@ -489,6 +528,7 @@ ID,Name_lang
 12299,Toughness
 16252,Toughness
 20143,Toughness
+20555,Regeneration
 14521,Meditation
 16089,Elemental Fury
 1310705,Mutilate
@@ -538,6 +578,10 @@ ID,Name_lang
 412538,Ignite
 16934,Ferocity
 19598,Ferocity
+20582,Quickness
+20574,Axe Specialization
+20597,Sword Specialization
+1259719,Mace Specialization
 13712,Lightning Reflexes
 19168,Lightning Reflexes
 5144,Arcane Missiles
@@ -564,11 +608,14 @@ ID,Name_lang
 18459,Incineration
 19559,Pathfinding
 15487,Silence
+20594,Stoneform
 19577,Intimidation
 24394,Intimidation
 17804,Soul Siphon
+18805,Recombobulate
 1282733,Overpower
 23922,Shield Slam
+20584,Ghost
 16909,Vengeance
 20049,Vengeance
 20050,Vengeance
@@ -612,6 +659,7 @@ ID,Name_lang
 16257,Flurry
 12964,Unbridled Wrath
 16246,Clearcasting
+1259918,Plainsrunning
 18174,Suppression
 12976,Last Stand
 18350,Dummy Trigger
@@ -622,6 +670,7 @@ ID,Name_lang
 19295,Deflection
 20060,Deflection
 23584,Dual Wield Specialization
+20550,Endurance
 30918,Improved Sprint
 13977,Initiative
 15250,Setup
@@ -661,6 +710,9 @@ ID,Name_lang
 1311604,Holy Shock
 1311605,Holy Shock
 1311606,Holy Shock
+20578,Cannibalize
+1259802,Expansive Mind
+1259803,Expansive Mind
 27827,Spirit of Redemption
 408490,Lava Burst
 408521,Riptide
@@ -684,6 +736,7 @@ ID,Name_lang
 1240047,Ice Lance
 1312002,Ice Lance
 400669,Fingers of Frost
+1260270,Rapid Regeneration
 1237312,Frostfire Bolt
 1237313,Frostfire Bolt
 402261,Penance
@@ -711,6 +764,13 @@ ID,Name_lang
 1238931,Improved Stormstrike
 1242512,Rapid Recuperation
 1310728,Quietus
+1270893,Elemental Blessing
+1270842,Energized
+1259813,Eureka!
+1259817,Eureka!
+1259821,Eureka!
+1259823,Eureka!
+1260201,Touch of the Grave
 1289682,Bloodthrill
 1293248,Summon Hawk
 1312639,Summon Hawk

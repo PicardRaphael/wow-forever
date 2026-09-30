@@ -555,6 +555,21 @@ def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> di
     }
 
 
+def decode_races(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
+    """Contenu de `races.json` (PV1, décision 106) : races jouables (présentes dans CharBaseInfo), nom anglais et
+    français, jeton du client, faction, classes permises ; raciaux (lignes `racial_skill_lines`) par race avec les
+    classes concernées, passif ou non, recharge, durée et effets bruts du client ; `mage_values` : les grandeurs lues
+    par le moteur du Mage (`racial_values` des règles)."""
+    raise NotImplementedError
+
+
+def decode_pvp_items(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
+    """Contenu de `pvp_items.json` (PV1) : bijoux (`pvp_trinkets.inventory_type`) dont le sort d'utilisation rompt
+    un contrôle (dissipation par mécanique ou immunité de mécanique), avec classes permises, recharge, recharge de
+    catégorie et mécaniques rompues ; recharge partagée avec un racial non décidée par le client (registre K4)."""
+    raise NotImplementedError
+
+
 # --- Sorts ---------------------------------------------------------------------------------------
 
 

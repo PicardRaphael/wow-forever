@@ -33,14 +33,14 @@
     },
     "1.60.1.70124": {
       "collected_at": "2026-09-30",
-      "data_sha": "f91a1fc05cb6",
-      "data_sha256": "f91a1fc05cb630cb169cfe577e1ac27ad289eb662505c6e627dc7b62e5c559e7",
+      "data_sha": "62ad1af164e6",
+      "data_sha256": "62ad1af164e6430c9c789509a80b76569d10d7011936b6c68f57249d5979fbbc",
       "files": {
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
         "_seed_talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb",
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
         "confirmed_changes.json": "fb2036bec4a46bc0feeae627d4dc3c58862785d4d170b64aaaf05cb2ab33c3d7",
-        "decode_rules.json": "f7207d462c8be4562cb1335634f5929270a63564bcee6ea449a538145e860ace",
+        "decode_rules.json": "a14fafad5dff54b35683c6309dd0c95b708f931f672eabe87445385b1e6f2524",
         "leveling.json": "34a1d484e1d131b324b49483c87b95316add6e7aded8f38d0bb3c862a260ab8d",
         "mechanics.json": "7df8be9b8a00f875cefadd981906dc7c0961c1c5b3e40120ec7dd3966609a19a",
         "meta.json": "8d1bc104db1c9a2dfb7a89a55f8f17ae27afaa3a5c18b49b5f5c8392d12c64d3",

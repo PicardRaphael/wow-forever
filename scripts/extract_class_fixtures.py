@@ -49,9 +49,12 @@ FULL_TABLES = (
 )
 # Sorts nommés par classe (blocs B3 et D) : complétés au fil des blocs ; noms anglais du client.
 SAMPLE_SPELLS: dict[str, tuple[str, ...]] = {}
-# Lignes de compétence raciales (bloc B2) et objets (bloc B2 : bijoux PvP et leurre).
-RACIAL_LINES: tuple[int, ...] = ()
-SAMPLE_ITEMS: tuple[int, ...] = ()
+# Lignes de compétence raciales (bloc B2 : decode_rules.json, racial_skill_lines).
+RACIAL_LINES: tuple[int, ...] = (101, 124, 125, 126, 220, 733, 753, 754, 2980)
+# Objets (bloc B2) : Insignes de la Horde (Guerrier, Mage), de l'Alliance (Chasseur), Insigne supérieur de la Horde,
+# Minor Recombobulator ; leurres : Free Action Potion (immunité, pas un bijou), Earthstrike (bijou sans rupture de
+# contrôle), 213349 (bijou à rupture de contrôle absent d'ItemSparse).
+SAMPLE_ITEMS: tuple[int, ...] = (18834, 18849, 209611, 274444, 4381, 5634, 21180, 213349)
 
 
 def read(path: Path) -> tuple[list[str], list[dict[str, str]]]:

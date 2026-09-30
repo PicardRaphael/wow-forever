@@ -8,14 +8,18 @@ ID,Name_lang
 1449,Explosion des arcanes
 2120,Choc de flammes
 2136,Trait de feu
+2481,Découverte de trésors
 2948,Brûlure
 5143,Projectiles des arcanes
 5570,Essaim d'insectes
+5579,Immunité : Immobiliser/Ralentir/Etourdir
 5923,Puissance sacrée
 6057,Spécialisation Baguette
 6117,Armure du mage
 6136,Transi
 6150,Tirs accélérés
+6615,Libre action
+7744,Volonté des Réprouvés
 9453,Foi inflexible
 9799,Oeil pour oeil
 10060,Infusion de puissance
@@ -308,8 +312,23 @@ ID,Name_lang
 20500,Rage berserker améliorée
 20502,Exécution améliorée
 20504,Interception améliorée
+20552,Culture
+20554,Berserker
+20557,Tueur de bêtes
+20572,Fureur sanguinaire
+20573,Solidité
+20577,Cannibalisme
+20580,Camouflage dans l'ombre
+20585,Esprit feu follet
+20589,Maître de l'évasion
+20591,Pensée expansive
+20593,Spécialisation (Ingénierie)
+20598,L'esprit humain
+20600,Perception
 20711,Esprit de rédemption
+21009,Rapidité (passif)
 22959,Vulnérabilité au Feu
+23273,Immunité : Charme/Peur/Métamorphose
 23602,Maîtrise de la défense
 23881,Sanguinaire
 24293,Pistage amélioré
@@ -319,6 +338,7 @@ ID,Name_lang
 24907,Aura de sélénien
 24968,Tranquillité de l'esprit
 25771,Longanimité
+25891,Choc de terre
 25956,Jugement amélioré
 26022,Poursuite de la justice
 27789,Allonge du Sacré
@@ -368,7 +388,10 @@ ID,Name_lang
 426316,Ombre et flammes
 429144,Puissance purifiante
 431622,Égide divine
+435893,Effet secondaire de gniode
+435895,Dissipation de gniode
 437032,Moisson d’âme
+438273,Bijou JcJ
 440529,Ingéniosité
 440870,Décimation
 1222988,Lien terrestre
@@ -393,10 +416,23 @@ ID,Name_lang
 1225228,Plaie de tumulte
 1237268,Conduit sacré
 1242853,Récolte d’âmes
+1259416,Marche sur l’air
+1259686,Vue céleste
+1259688,Bénédiction élémentaire
+1259691,Afflux d’énergie
+1259705,Lecture des lignes telluriques
+1259707,Connaissance élémentaire
+1259710,Bénédiction du vent
+1259718,Volonté de survie
+1259721,Chasseur de gros gibier
+1259799,Lumière d’Élune
+1259812,Eurêka !
+1260189,Toucher du tombeau
 1284536,Dessein sacré
 1289681,Exaltation sanguinaire
 1293241,Invocation de faucon
 1293695,Marque démoniaque
+1299026,Bris de malédictions
 1309631,Esprit vif
 1309950,Contagion dévorante
 1309957,Précision sacrée
@@ -441,6 +477,8 @@ ID,Name_lang
 1279978,Blizzard
 1279979,Blizzard
 1279980,Blizzard
+20582,Rapidité
+20549,Choc martial
 9452,Justification
 440667,Justification
 5302,Posture défensive
@@ -461,6 +499,7 @@ ID,Name_lang
 865,Nova de givre
 6131,Nova de givre
 10230,Nova de givre
+5227,Respiration aquatique
 143,Boule de feu
 145,Boule de feu
 3140,Boule de feu
@@ -481,6 +520,7 @@ ID,Name_lang
 12299,Résistance
 16252,Résistance
 20143,Résistance
+20555,Régénération
 14521,Méditation
 16089,Fureur élémentaire
 16178,Purification
@@ -532,6 +572,9 @@ ID,Name_lang
 11119,Enflammer
 412538,Enflammer
 16934,Férocité
+20574,Spécialisation Hache
+20597,Spécialisation Epée
+1259719,Spécialisation Masse
 19168,Réflexes éclairs
 5144,Projectiles des arcanes
 5145,Projectiles des arcanes
@@ -564,14 +607,18 @@ ID,Name_lang
 15487,Silence
 18498,Silence
 12809,Bourrasque
+20594,Forme de pierre
 19577,Intimidation
 24394,Intimidation
 1224782,Coup tordu
 11189,Protection contre le Givre
 17804,Siphon d’âme
+18805,Recombobuler
 1282733,Fulgurance
+20550,Endurance
 23922,Heurt de bouclier
 19184,Piège
+20584,Fantôme
 12294,Frappe mortelle
 20925,Bouclier sacré
 17106,Renvoi
@@ -611,6 +658,7 @@ ID,Name_lang
 16257,Rafale
 12964,Colère déchaînée
 16246,Idées claires
+1259918,Course dans les plaines
 18174,Suppression
 20210,Illumination
 12976,Dernier rempart
@@ -659,6 +707,9 @@ ID,Name_lang
 1311604,Horion sacré
 1311605,Horion sacré
 1311606,Horion sacré
+20578,Cannibalisme
+1259802,Pensée expansive
+1259803,Pensée expansive
 27827,Esprit de rédemption
 408490,Explosion de lave
 408521,Remous
@@ -682,6 +733,7 @@ ID,Name_lang
 1240047,Javelot de glace
 1312002,Javelot de glace
 400669,Doigts de givre
+1260270,Régénération rapide
 1237312,Éclair de givrefeu
 1237313,Éclair de givrefeu
 402261,Pénitence
@@ -711,6 +763,14 @@ ID,Name_lang
 1238931,Frappe-tempête amélioré
 1242512,Recouvrement rapide
 1310728,Quiétus
+1259417,Marche sur l’air
+1270893,Bénédiction élémentaire
+1270842,Afflux d’énergie
+1259813,Eurêka !
+1259817,Eurêka !
+1259821,Eurêka !
+1259823,Eurêka !
+1260201,Toucher du tombeau
 1289682,Exaltation sanguinaire
 1293248,Invocation de faucon
 1312639,Invocation de faucon
