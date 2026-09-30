@@ -492,6 +492,11 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
             first = t["prereqs"][0]
             t["prereq"] = {"node_id": first["node_id"], "tier": first["tier"], "col": first["col"]}
 
+    community = rules.get("community_positions", {}).get(cls, {})
+    for t in talents.values():
+        found = community.get(t["key"])
+        if isinstance(found, dict) and t["tier"] is None:
+            t["tier_community"] = {"tier": found["tier"], "sources": list(found["sources"]), "certainty": "probable"}
     keys = [t["key"] for t in talents.values()]
     doubles = sorted({k for k in keys if keys.count(k) > 1})
     if doubles:
@@ -527,6 +532,294 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
     }
 
 
+_PVP_KINDS = ("control", "defensive", "cc_break", "interrupt", "dispel", "mobility", "burst")
+
+
+class _ClassIndex:
+    """Index des tables des 9 classes (catégories, ruptures, portées, noms des mécaniques et des dissipations)."""
+
+    def __init__(self, tables: Tables) -> None:
+        self.categories = {int(r["SpellID"]): r for r in tables["SpellCategories"] if int(r["DifficultyID"]) == 0}
+        self.interrupts = {int(r["SpellID"]): r for r in tables["SpellInterrupts"] if int(r["DifficultyID"]) == 0}
+        self.ranges = {int(r["ID"]): r for r in tables["SpellRange"]}
+        self.mechanics = {int(r["ID"]): str(r["StateName_lang"]) for r in tables["SpellMechanic"]}
+        self.dispels = {int(r["ID"]): str(r["Name_lang"]) for r in tables["SpellDispelType"]}
+        self.skill_names = {int(r["ID"]): str(r["DisplayName_lang"]) for r in tables["SkillLine"]}
+
+
+def _spell_rank(client: _Client, index: _ClassIndex, spell: int, rules: Mapping[str, Any]) -> dict[str, Any]:
+    """Champs du client d'un rang de sort (certains)."""
+    misc = client.misc.get(spell)
+    duration = client.duration_ms(spell)
+    duration_ms = duration if duration is not None and duration > 0 else 0
+    channel = misc is not None and bool(
+        int(misc["Attributes_1"]) & int(rules["spell_ranks"]["channel_attributes_1_mask"])
+    )
+    cast_ms = (
+        duration_ms if channel and duration_ms else client.cast.get(int(misc["CastingTimeIndex"]) if misc else 0, 0)
+    )
+    cd = client.cooldowns.get(spell)
+    recovery = max(int(cd["RecoveryTime"]), int(cd["CategoryRecoveryTime"])) if cd else 0
+    gcd = int(cd["StartRecoveryTime"]) if cd else 0
+    pvp_index = int(misc["PvPDurationIndex"]) if misc else 0
+    pvp_ms = client.duration.get(pvp_index) if pvp_index else None
+    range_row = index.ranges.get(int(misc["RangeIndex"])) if misc and int(misc["RangeIndex"]) else None
+    cost = None
+    for p in client.power.get(spell, []):
+        if int(p["ManaCost"]) > 0 or float(p["PowerCostPct"]) > 0:
+            cost = {
+                "power_type": int(p["PowerType"]),
+                "amount": int(p["ManaCost"]),
+                "pct": normalize(float(p["PowerCostPct"])),
+            }
+            break
+    category = index.categories.get(spell)
+    level = client.levels.get(spell)
+    subtext = str(client.spell.get(spell, {}).get("NameSubtext_lang", ""))
+    match = re.match(rules["spell_ranks"]["rank_subtext"], subtext)
+    return {
+        "spell_id": spell,
+        "rank": int(match[1]) if match else None,
+        "level": int(level["BaseLevel"]) if level else None,
+        "cast_s": normalize(cast_ms / 1000),
+        "cooldown_s": normalize(recovery / 1000) if recovery > 0 else None,
+        "gcd_s": normalize(gcd / 1000) if gcd > 0 else None,
+        "duration_s": normalize(duration_ms / 1000) if duration_ms else None,
+        "pvp_duration_s": normalize(pvp_ms / 1000) if pvp_ms is not None and pvp_ms > 0 else None,
+        "range_yd": (
+            {"min": normalize(float(range_row["RangeMin_0"])), "max": normalize(float(range_row["RangeMax_0"]))}
+            if range_row is not None
+            else None
+        ),
+        "school": int(misc["SchoolMask"]) if misc else 0,
+        "cost": cost,
+        "mechanic": int(category["Mechanic"]) if category else 0,
+        "diminish": int(category["DiminishType"]) if category else 0,
+        "dispel_type": int(category["DispelType"]) if category else 0,
+    }
+
+
+def _own_roles(client: _Client, index: _ClassIndex, spell: int, rules: Mapping[str, Any]) -> dict[str, Any]:
+    """Rôles PvP portés par les effets d'un sort (sans ses déclencheurs), d'après la table `pvp_classification`."""
+    spec = rules["pvp_classification"]
+    aura_effects = {int(e) for e in spec["aura_effects"]}
+    hostile, friendly = {int(t) for t in spec["hostile_targets"]}, {int(t) for t in spec["friendly_targets"]}
+    self_targets = {int(t) for t in spec["self_targets"]}
+    cc = {int(m) for m in spec["cc_mechanics"]}
+    negative_only, positive_only = set(spec.get("negative_only_auras", [])), set(spec.get("positive_only_auras", []))
+    roles: dict[str, Any] = defaultdict(list)
+    for _, e in sorted(client.effects.get(spell, {}).items()):
+        effect, aura, misc = int(e["Effect"]), int(e["EffectAura"]), int(e["EffectMiscValue_0"])
+        targets = {int(e["ImplicitTarget_0"]), int(e["ImplicitTarget_1"])} - {0}
+        points = float(e["EffectBasePointsF"])
+        on_self = bool(targets) and targets <= self_targets
+        if effect in aura_effects:
+            name = str(aura)
+            if name in spec["control_auras"] and targets & hostile:
+                roles["control"].append((spec["control_auras"][name], int(e["EffectMechanic"])))
+            wrong_sign = aura in negative_only and points >= 0
+            if name in spec["defensive_auras"] and targets & friendly and not wrong_sign:
+                roles["defensive"].append(spec["defensive_auras"][name])
+            if aura == spec["mechanic_immunity_aura"] and targets & friendly and misc in cc:
+                roles["cc_break"].append(("immunité", misc))
+            if name in spec["mobility_auras"] and on_self:
+                roles["mobility"].append(spec["mobility_auras"][name])
+            if name in spec["burst_auras"] and on_self and not (aura in positive_only and points <= 0):
+                roles["burst"].append(spec["burst_auras"][name])
+        if effect == spec["dispel_mechanic_effect"] and misc in cc:
+            roles["cc_break"].append(("dissipation", misc))
+        if effect == spec["dispel_effect"]:
+            roles["dispel"].append(misc)
+        if effect == spec["interrupt_effect"]:
+            roles["interrupt"].append(True)
+        if str(effect) in spec["mobility_effects"]:
+            roles["mobility"].append(spec["mobility_effects"][str(effect)])
+        if str(effect) in spec["summon_effects"]:
+            roles["summon"].append(spec["summon_effects"][str(effect)])
+    return roles
+
+
+def _markers(client: _Client, index: _ClassIndex, spell: int, rules: Mapping[str, Any]) -> list[str]:
+    """Marqueurs PvP du client portés par un sort (mécanique, catégorie de rendement, mécanique d'effet, invocation)."""
+    spec = rules["pvp_classification"]
+    neutral = {int(m) for m in spec["neutral_mechanics"]} | {0}
+    out = []
+    category = index.categories.get(spell)
+    if category is not None and int(category["Mechanic"]) not in neutral:
+        m = int(category["Mechanic"])
+        out.append(f"mécanique {m} ({index.mechanics.get(m, '?')})")
+    if category is not None and int(category["DiminishType"]):
+        out.append(f"catégorie de rendement décroissant {int(category['DiminishType'])}")
+    for _, e in sorted(client.effects.get(spell, {}).items()):
+        if int(e["EffectMechanic"]) not in neutral:
+            m = int(e["EffectMechanic"])
+            out.append(f"mécanique d'effet {m} ({index.mechanics.get(m, '?')})")
+        if str(int(e["Effect"])) in spec["summon_effects"]:
+            out.append(spec["summon_effects"][str(int(e["Effect"]))])
+    return list(dict.fromkeys(out))
+
+
+def _classify(
+    client: _Client, index: _ClassIndex, ranks: list[dict[str, Any]], rules: Mapping[str, Any]
+) -> tuple[dict[str, Any], list[str]]:
+    """(classement PvP du rang le plus haut, suivi de ses déclencheurs directs ; marqueurs non classés)."""
+    spec = rules["pvp_classification"]
+    top = ranks[-1]
+    spell = top["spell_id"]
+    own = _own_roles(client, index, spell, rules)
+    triggers = sorted(
+        {int(e["EffectTriggerSpell"]) for r in ranks for e in client.effects.get(r["spell_id"], {}).values()} - {0}
+    )
+    pvp: dict[str, Any] = {"kinds": [], "certainty": "probable", "via": []}
+    sources: dict[str, tuple[int, dict[str, Any], int | None]] = {}
+    for kind in _PVP_KINDS:
+        if own.get(kind):
+            sources[kind] = (spell, own, None)
+    for trigger in triggers:
+        theirs = _own_roles(client, index, trigger, rules)
+        for kind in _PVP_KINDS:
+            if kind not in sources and theirs.get(kind):
+                sources[kind] = (trigger, theirs, trigger)
+    passive = bool(int((client.misc.get(spell) or {}).get("Attributes_0", 0)) & int(rules["passive_attributes_0_mask"]))
+    if "burst" in sources and (passive or (top["cooldown_s"] or 0) < spec["burst_min_cooldown_s"]):
+        del sources["burst"]
+    for kind in _PVP_KINDS:
+        if kind not in sources:
+            continue
+        origin, roles, via = sources[kind]
+        rank = top if via is None else _spell_rank(client, index, origin, rules)
+        detail: dict[str, Any]
+        if kind == "control":
+            types = list(dict.fromkeys(t for t, _ in roles["control"]))
+            effect_mechanics = [m for _, m in roles["control"] if m]
+            mechanic = rank["mechanic"] or (effect_mechanics[0] if effect_mechanics else 0)
+            interrupt = index.interrupts.get(origin)
+            flags = int(interrupt["AuraInterruptFlags_0"]) if interrupt else 0
+            detail = {
+                "types": types,
+                "mechanic": mechanic,
+                "mechanic_name": index.mechanics.get(mechanic, "") if mechanic else "",
+                "diminish": rank["diminish"],
+                "breaks_on_damage": bool(flags & int(spec["damage_break_aura_interrupt_mask"])),
+                "duration_s": rank["duration_s"],
+                "pvp_duration_s": rank["pvp_duration_s"],
+                "via": via,
+            }
+        elif kind == "defensive":
+            detail = {"types": list(dict.fromkeys(roles["defensive"])), "duration_s": rank["duration_s"], "via": via}
+        elif kind == "cc_break":
+            mechanics = sorted({m for _, m in roles["cc_break"]})
+            detail = {
+                "mechanics": mechanics,
+                "mechanic_names": [index.mechanics.get(m, "") for m in mechanics],
+                "how": sorted({how for how, _ in roles["cc_break"]}),
+                "via": via,
+            }
+        elif kind == "interrupt":
+            detail = {"lockout_s": rank["duration_s"], "via": via}
+        elif kind == "dispel":
+            types = sorted(set(roles["dispel"]))
+            detail = {"types": types, "type_names": [index.dispels.get(t, "") for t in types], "via": via}
+        elif kind == "mobility":
+            detail = {"types": list(dict.fromkeys(roles["mobility"])), "via": via}
+        else:
+            detail = {"types": list(dict.fromkeys(roles["burst"])), "cooldown_s": top["cooldown_s"], "via": via}
+        pvp["kinds"].append(kind)
+        pvp[kind] = detail
+        if via is not None and via not in pvp["via"]:
+            pvp["via"].append(via)
+    markers: list[str] = []
+    for r in ranks:
+        markers += _markers(client, index, r["spell_id"], rules)
+    return pvp, list(dict.fromkeys(markers))
+
+
+def _spell_entries(
+    tables: Tables,
+    rules: Mapping[str, Any],
+    client: _Client,
+    index: _ClassIndex,
+    lines: Sequence[int],
+    version: str,
+    talent_of: Mapping[int, dict[str, Any]],
+    pets: bool,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    methods = {int(m) for m in rules["spell_ranks"]["acquire_methods"]}
+    wanted = set(lines)
+    rows_of: dict[int, list[Row]] = defaultdict(list)
+    for r in tables["SkillLineAbility"]:
+        if int(r["SkillLine"]) in wanted and int(r["AcquireMethod"]) in methods:
+            rows_of[int(r["Spell"])].append(r)
+    by_name: dict[str, list[int]] = defaultdict(list)
+    for spell in sorted(rows_of):
+        by_name[client.names.get(spell, f"sort {spell}")].append(spell)
+    entries: dict[str, Any] = {}
+    unresolved: list[dict[str, Any]] = []
+    for name, spells in sorted(by_name.items(), key=lambda kv: min(kv[1])):
+        ranks = sorted(
+            (_spell_rank(client, index, s, rules) for s in spells),
+            key=lambda r: (r["rank"] is None, r["rank"] or 0, r["level"] or 0, r["spell_id"]),
+        )
+        try:
+            key = talent_key(name)
+        except DataSchemaError:
+            key = f"spell{min(spells)}"
+        if key in entries:
+            key = f"{key}{min(spells)}"
+        pvp, markers = _classify(client, index, ranks, rules)
+        talent = next((talent_of[s] for s in spells if s in talent_of), None)
+        entry: dict[str, Any] = {
+            "name": name,
+            "name_fr": client.names_fr.get(min(spells), ""),
+            "skill_line": int(rows_of[min(spells)][0]["SkillLine"]),
+            "talent": talent,
+            "ranks": ranks,
+            "pvp": pvp,
+            "certainty": f"FC-{version}",
+        }
+        if pets:
+            entry["pet_families"] = sorted(
+                {index.skill_names.get(int(r["SkillLine"]), "") for s in spells for r in rows_of[s]}
+            )
+        entries[key] = entry
+        if markers and not pvp["kinds"]:
+            unresolved.append(
+                {"key": key, "spell_id": ranks[-1]["spell_id"], "name": name, "reason": " ; ".join(markers)}
+            )
+    return entries, unresolved
+
+
+def _class_spells(
+    tables: Tables,
+    rules: Mapping[str, Any],
+    client: _Client,
+    index: _ClassIndex,
+    cls: str,
+    c: dict[str, Any],
+    version: str,
+) -> None:
+    """Ajoute à la classe `c` ses sorts, ceux de ses familiers et les sorts non résolus."""
+    spec = rules["classes"][cls]
+    learn = int(rules["pvp_classification"]["learn_spell_effect"])
+    talent_of: dict[int, dict[str, Any]] = {}
+    for tree in c["trees"]:
+        for t in tree["talents"]:
+            link = {"node_id": t["node_id"], "key": t["key"]}
+            talent_of[t["spell_id"]] = link
+            for e in client.effects.get(t["spell_id"], {}).values():
+                if int(e["Effect"]) == learn and int(e["EffectTriggerSpell"]):
+                    talent_of[int(e["EffectTriggerSpell"])] = link
+    c["spells"], unresolved = _spell_entries(
+        tables, rules, client, index, [int(i) for i in spec["skill_lines"]], version, talent_of, pets=False
+    )
+    if spec.get("pet_skill_lines"):
+        c["pet_spells"], pet_unresolved = _spell_entries(
+            tables, rules, client, index, [int(i) for i in spec["pet_skill_lines"]], version, {}, pets=True
+        )
+        unresolved += pet_unresolved
+    c["unresolved_spells"] = unresolved
+
+
 def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `classes.json` (PV1) : pour chacune des 9 classes (`classes` des règles), identifiant et jeton du
     client, arbre de traits, trois arbres de talents (nom de la ligne de compétence de l'onglet), talents avec leur
@@ -534,7 +827,10 @@ def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> di
     listés non résolus (`unresolved_nodes`, jamais arrondis), doublons périmés écartés (`dropped_nodes`, règle
     `shared_spell`), contrôle de l'ordre des onglets (`tree_checks`)."""
     client = _Client(tables, rules)
+    index = _ClassIndex(tables)
     classes = {cls: _class_talents(tables, rules, client, cls, version) for cls in rules["classes"]}
+    for cls, c in classes.items():
+        _class_spells(tables, rules, client, index, cls, c, version)
     return {
         "build": version,
         "source": (

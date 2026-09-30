@@ -43,11 +43,12 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "SpellEffect": _cols(
         "ID:int SpellID:int DifficultyID:int EffectIndex:int Effect:int EffectAura:int EffectAuraPeriod:int "
         "EffectBasePointsF:float EffectRealPointsPerLevel:float Variance:float EffectTriggerSpell:int EffectMiscValue_0:int "
-        "EffectBonusCoefficient:float EffectMechanic:int"
+        "EffectBonusCoefficient:float EffectMechanic:int ImplicitTarget_0:int ImplicitTarget_1:int"
     ),
     "SpellLevels": _cols("ID:int SpellID:int DifficultyID:int BaseLevel:int MaxLevel:int SpellLevel:int"),
     "SpellMisc": _cols(
-        "ID:int SpellID:int DifficultyID:int Attributes_0:int Attributes_1:int CastingTimeIndex:int DurationIndex:int"
+        "ID:int SpellID:int DifficultyID:int Attributes_0:int Attributes_1:int CastingTimeIndex:int DurationIndex:int "
+        "PvPDurationIndex:int RangeIndex:int SchoolMask:int"
     ),
     "SpellCastTimes": _cols("ID:int Base:int"),
     "SpellDuration": _cols("ID:int Duration:int"),

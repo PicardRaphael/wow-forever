@@ -47,3 +47,23 @@ Présentées ensemble avant la fusion (règle du skill `/tranche`). Chaque corre
 -            assert g["spell_id"] == r["spellIds"][0]
 +            assert g["spell_id"] == r["source"]["client_spell_ids"][0]
 ```
+
+## 3. `tests/unit/test_decode_class_spells.py::test_mage_part_matches_spells_json` (bloc B3)
+
+- **Prémisse fausse** : le test lit `name` et `spell_ids` au premier niveau de chaque sort de `spells.json` ; le
+  fichier installé ne les porte pas : le nom anglais est dans `decode_rules.json` (`spells.<clé>`) et les
+  identifiants des rangs dans `source.rank_spell_ids`.
+- **Preuve** : `forever/data/1.60.1.70124/spells.json`, sort `frostbolt` : clés `school, range, slow, slow_dur,
+  binary, projectile_speed, ranks, source` ; `source.rank_spell_ids` = identifiants des 11 rangs. Sortie du test :
+  `KeyError: 'name'`.
+- **Code** : conforme (le test corrigé passe, essayé sur une copie : rangs, niveaux, temps d'incantation, mana et
+  recharges des 15 sorts suivis identiques).
+- **Diff proposé** :
+
+```diff
+-        (spell,) = [s for s in mage.values() if s["name"] == ref["name"]]
++        (spell,) = [s for s in mage.values() if s["name"] == decode_rules["spells"][key]]
+         ranked = [r for r in spell["ranks"] if r["rank"] is not None]
+-        assert [r["spell_id"] for r in ranked] == ref["spell_ids"], key
++        assert [r["spell_id"] for r in ranked] == ref["source"]["rank_spell_ids"], key
+```
