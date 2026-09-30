@@ -332,5 +332,17 @@
    ]
   }
  },
- "classes_note": "PV1 : lignes de compétence de chaque classe dans l'ordre des onglets (onglet i : abscisse tab_origins[i]), vérifié par la ligne majoritaire des sorts des talents de l'onglet ; lignes des familiers (Chasseur, Démoniste) : SkillLine « Pet - … » et Beast Training. Nœud hors grille : zéro en trop corrigé (extra_zero_divisor), tout autre écart listé non résolu, jamais arrondi."
+ "classes_note": "PV1 : lignes de compétence de chaque classe dans l'ordre des onglets (onglet i : abscisse tab_origins[i]), vérifié par la ligne majoritaire des sorts des talents de l'onglet ; lignes des familiers (Chasseur, Démoniste) : SkillLine « Pet - … » et Beast Training. Nœud hors grille : zéro en trop corrigé (extra_zero_divisor), tout autre écart listé non résolu, jamais arrondi.",
+ "trait_edge_types": {
+  "visual": [
+   0
+  ],
+  "sufficient": [
+   2
+  ],
+  "required": [
+   3
+  ],
+  "note": "TraitEdge.Type (PV1) : 0 visuel seulement (jamais un prérequis), 2 suffisant (un seul des prérequis suffisants suffit), 3 requis ; sens tiré de l'énumération Enum.TraitEdgeType de l'API du client (VisualOnly, DeprecatedRankConnection, SufficientForAvailability, RequiredForAvailability), certitude probable ; relevé dans les arbres de 1.60.1.70124 : l'arête visuelle et l'arête requise entre Nature's Splendor et Nature's Majesty (Druide), deux arêtes suffisantes vers Intimidation (Chasseur)"
+ }
 }

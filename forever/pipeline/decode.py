@@ -90,13 +90,30 @@ def load_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]
 def fetch_list(rules: Mapping[str, Any]) -> tuple[list[str], dict[str, list[str]]]:
     """(tables enUS, tables par autre locale) à télécharger : celles du Mage (`tables`, `localized_tables`) puis
     celles des 9 classes (`class_tables`, `localized_class_tables`, PV1), sans doublon, dans l'ordre des règles."""
-    raise NotImplementedError
+    tables = list(dict.fromkeys([*rules["tables"], *rules.get("class_tables", [])]))
+    localized: dict[str, list[str]] = {}
+    for source in (rules.get("localized_tables", {}), rules.get("localized_class_tables", {})):
+        for locale, names in source.items():
+            localized[locale] = list(dict.fromkeys([*localized.get(locale, []), *names]))
+    return tables, localized
+
+
+def class_table_files(rules: Mapping[str, Any]) -> list[tuple[str, str]]:
+    """(clé de table, chemin relatif) de chaque CSV des 9 classes (`class_tables`, `localized_class_tables`)."""
+    files = [(name, f"{DEFAULT_LOCALE}/{name}.csv") for name in rules.get("class_tables", [])]
+    for locale, names in rules.get("localized_class_tables", {}).items():
+        files += [(f"{locale}/{name}", f"{locale}/{name}.csv") for name in names]
+    return files
 
 
 def load_class_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]:
     """Tables du Mage et des 9 classes lues dans `csv_dir/<locale>/<Table>.csv` (CsvMissingError si un fichier
     manque, DataSchemaError si une colonne manque)."""
-    raise NotImplementedError
+    files = [*table_files(rules), *class_table_files(rules)]
+    missing = [rel for _, rel in files if not (csv_dir / rel).is_file()]
+    if missing:
+        raise CsvMissingError(csv_dir.name, missing)
+    return {key: list(read_table(csv_dir / rel, key.rsplit("/", 1)[-1])) for key, rel in files}
 
 
 class _Client:
@@ -358,13 +375,184 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
     }
 
 
+def _place(value: int, origins: Sequence[int], step: int, divisor: int) -> tuple[int, int] | None:
+    """(indice de l'origine, position à partir de 1) d'une coordonnée sur la grille, directement ou après la règle
+    du zéro en trop ; None si elle tombe hors de la grille (jamais arrondie)."""
+    ordered = sorted(range(len(origins)), key=lambda i: origins[i])
+    for v in (value, value // divisor if divisor and value % divisor == 0 else None):
+        if v is None:
+            continue
+        inside = [i for i in ordered if origins[i] <= v]
+        if inside and (v - origins[inside[-1]]) % step == 0:
+            return inside[-1], (v - origins[inside[-1]]) // step + 1
+    return None
+
+
+def _region(x: int, origins: Sequence[int], divisor: int) -> int | None:
+    """Onglet dont la zone contient une abscisse hors grille (zone : de son origine à celle de l'onglet suivant)."""
+    ordered = sorted(origins)
+    width = ordered[1] - ordered[0] if len(ordered) > 1 else 0
+    for v in (x, x // divisor if divisor and x % divisor == 0 else None):
+        if v is not None and ordered[0] <= v < ordered[-1] + width:
+            return list(origins).index(max(o for o in ordered if o <= v))
+    return None
+
+
+def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cls: str, version: str) -> dict[str, Any]:
+    spec = rules["classes"][cls]
+    geo = rules["talent_geometry"]
+    origins, div = [int(o) for o in geo["tab_origins"]], int(geo["extra_zero_divisor"])
+    lines = [int(i) for i in spec["skill_lines"]]
+    skill_names = {int(r["ID"]): str(r["DisplayName_lang"]) for r in tables["SkillLine"]}
+    trees = {int(r["TraitTreeID"]) for r in tables["SkillLineXTraitTree"] if int(r["SkillLineID"]) in lines}
+    if len(trees) != 1:
+        raise DataSchemaError(f"{cls} : arbre de traits introuvable ou ambigu pour les lignes {lines} : {trees}.")
+    tree_id = trees.pop()
+    links: dict[int, list[Row]] = defaultdict(list)
+    for r in tables["TraitNodeXTraitNodeEntry"]:
+        links[int(r["TraitNodeID"])].append(r)
+    entries = {int(r["ID"]): r for r in tables["TraitNodeEntry"]}
+    definitions = {int(r["ID"]): r for r in tables["TraitDefinition"]}
+    by_spell: dict[int, tuple[Row, Row, Row]] = {}
+    dropped: list[dict[str, Any]] = []
+    for node in sorted((n for n in tables["TraitNode"] if int(n["TraitTreeID"]) == tree_id), key=lambda n: n["ID"]):
+        node_links = links.get(int(node["ID"]), [])
+        if len(node_links) != 1:
+            raise DataSchemaError(f"{cls}, nœud {node['ID']} : {len(node_links)} entrée(s), une seule prise en charge.")
+        entry = entries[int(node_links[0]["TraitNodeEntryID"])]
+        definition = definitions[int(entry["TraitDefinitionID"])]
+        spell = int(definition["SpellID"])
+        if spell in by_spell:  # nœuds triés : le plus récent l'emporte (shared_spell « latest_node »)
+            old = int(by_spell[spell][0]["ID"])
+            reason = f"même sort ({spell}) qu'un nœud plus récent : {rules['shared_spell']}"
+            dropped.append({"node_id": old, "kept_node": int(node["ID"]), "reason": reason})
+        by_spell[spell] = (node, entry, definition)
+
+    talents: dict[int, dict[str, Any]] = {}
+    unresolved: list[dict[str, Any]] = []
+    for spell, (node, entry, definition) in by_spell.items():
+        x, y = int(node["PosX"]), int(node["PosY"])
+        at_x = _place(x, origins, int(geo["col_step"]), div)
+        at_y = _place(y, [int(geo["row_base"])], int(geo["row_step"]), div)
+        reasons = []
+        if at_x is None:
+            reasons.append(f"abscisse {x} hors de la grille des onglets {origins} (pas {geo['col_step']})")
+        if at_y is None:
+            reasons.append(
+                f"ordonnée {y} hors de la grille des paliers (base {geo['row_base']}, pas {geo['row_step']})"
+            )
+        tab = at_x[0] if at_x is not None else _region(x, origins, div)
+        if tab is None:
+            raise DataSchemaError(f"{cls}, nœud {node['ID']} : abscisse {x} hors de tous les onglets {origins}.")
+        name = str(definition["OverrideName_lang"]) or client.names.get(spell, "")
+        desc = str(definition["OverrideDescription_lang"]) or str(
+            client.spell.get(spell, {}).get("Description_lang", "")
+        )
+        key = talent_key(name)
+        talent: dict[str, Any] = {
+            "key": key,
+            "name": name,
+            "name_fr": client.names_fr.get(spell, ""),
+            "node_id": int(node["ID"]),
+            "tree": skill_names.get(lines[tab], str(lines[tab])),
+            "tier": at_y[1] if at_y is not None else None,
+            "col": at_x[1] if at_x is not None else None,
+            "max": int(entry["MaxRanks"]),
+            "desc": desc,
+            "spell_id": spell,
+            "prereq": None,
+            "prereqs": [],
+            "certainty": f"FC-{version}",
+        }
+        if reasons:
+            talent["unresolved"] = reasons
+            unresolved.append(
+                {"node_id": int(node["ID"]), "key": key, "pos_x": x, "pos_y": y, "reason": " ; ".join(reasons)}
+            )
+        talents[int(node["ID"])] = talent
+
+    kinds = rules.get("trait_edge_types", {})
+    visual = {int(v) for v in kinds.get("visual", [])}
+    kind_of = {int(v): name for name in ("sufficient", "required") for v in kinds.get(name, [])}
+    for edge in tables["TraitEdge"]:
+        left, right = int(edge["LeftTraitNodeID"]), int(edge["RightTraitNodeID"])
+        edge_type = int(edge["Type"])
+        if left in talents and right in talents and edge_type not in visual:
+            source = talents[left]
+            talents[right]["prereqs"].append(
+                {
+                    "node_id": left,
+                    "tier": source["tier"],
+                    "col": source["col"],
+                    "kind": kind_of.get(edge_type, f"type {edge_type}"),
+                }
+            )
+    for t in talents.values():
+        if len(t["prereqs"]) == 1:
+            first = t["prereqs"][0]
+            t["prereq"] = {"node_id": first["node_id"], "tier": first["tier"], "col": first["col"]}
+
+    keys = [t["key"] for t in talents.values()]
+    doubles = sorted({k for k in keys if keys.count(k) > 1})
+    if doubles:
+        raise DataSchemaError(f"{cls} : clés de talents en double ({', '.join(doubles)}).")
+    ability_lines: dict[int, set[int]] = defaultdict(set)
+    for r in tables["SkillLineAbility"]:
+        ability_lines[int(r["Spell"])].add(int(r["SkillLine"]))
+    trees_out, checks = [], []
+    for line in lines:
+        name = skill_names.get(line, str(line))
+        members = sorted(
+            (t for t in talents.values() if t["tree"] == name),
+            key=lambda t: (t["tier"] is None, t["tier"] or 0, t["col"] is None, t["col"] or 0, t["node_id"]),
+        )
+        counts: dict[int, int] = defaultdict(int)
+        for t in members:
+            for owner in ability_lines.get(t["spell_id"], set()) & set(lines):
+                counts[owner] += 1
+        majority = max(counts, key=lambda k: (counts[k], k == line)) if counts else None
+        checks.append({"tree": name, "skill_line": line, "majority": majority, "counts": dict(sorted(counts.items()))})
+        trees_out.append({"name": name, "skill_line": line, "talents": members})
+    client_class = next((r for r in tables["ChrClasses"] if str(r["Name_lang"]) == cls), None)
+    if client_class is None:
+        raise DataSchemaError(f"Classe {cls} absente de ChrClasses.")
+    return {
+        "id": int(client_class["ID"]),
+        "file": str(client_class["Filename"]),
+        "trait_tree": tree_id,
+        "trees": trees_out,
+        "unresolved_nodes": sorted(unresolved, key=lambda u: u["node_id"]),
+        "dropped_nodes": sorted(dropped, key=lambda d: d["node_id"]),
+        "tree_checks": checks,
+    }
+
+
 def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `classes.json` (PV1) : pour chacune des 9 classes (`classes` des règles), identifiant et jeton du
     client, arbre de traits, trois arbres de talents (nom de la ligne de compétence de l'onglet), talents avec leur
     nœud (`node_id`), palier, colonne, rangs, prérequis (nœud), sort et description du client ; nœuds hors grille
     listés non résolus (`unresolved_nodes`, jamais arrondis), doublons périmés écartés (`dropped_nodes`, règle
     `shared_spell`), contrôle de l'ordre des onglets (`tree_checks`)."""
-    raise NotImplementedError
+    client = _Client(tables, rules)
+    classes = {cls: _class_talents(tables, rules, client, cls, version) for cls in rules["classes"]}
+    return {
+        "build": version,
+        "source": (
+            f"Client {version} : tables Trait*, SkillLine*, ChrClasses et Spell* (wago.tools) décodées par forever decode"
+        ),
+        "classes": classes,
+        "notes": [
+            "Onglet i : lignes de compétence classes.<Classe>.skill_lines[i] (decode_rules.json), abscisse tab_origins[i].",
+            (
+                "Position hors grille : zéro en trop corrigé (extra_zero_divisor) ; tout autre écart laissé à null "
+                "et listé dans unresolved_nodes, jamais arrondi."
+            ),
+            (
+                "prereqs : arêtes non visuelles du client, sens tiré de TraitEdge.Type (decode_rules.json, "
+                "trait_edge_types, probable) ; prereq : le prérequis unique quand il n'y en a qu'un."
+            ),
+        ],
+    }
 
 
 # --- Sorts ---------------------------------------------------------------------------------------

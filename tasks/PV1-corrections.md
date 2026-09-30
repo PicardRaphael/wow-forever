@@ -24,3 +24,26 @@ Présentées ensemble avant la fusion (règle du skill `/tranche`). Chaque corre
 -    both = planned_char(plan_import(deps, sv_dir=None, logs_dir=LOGS, utc_offset=OFFSET), "Moi")
 +    both = planned_char(plan_import(fresh, sv_dir=None, logs_dir=LOGS, utc_offset=OFFSET), "Moi")
 ```
+
+## 2. `tests/unit/test_decode_classes.py::test_mage_part_matches_talents_json` (bloc B1)
+
+- **Prémisse fausse** : le test compare la description et le sort décodés du client aux champs `desc` et
+  `spellIds` de `talents.json`, qui sont ceux **du dépôt** (gabarit `{0}`, identifiants du seed) ; les valeurs du
+  client sont rangées dans `source.client_desc` et `source.client_spell_ids` de chaque talent
+  (`forever/pipeline/install.py`, champs du client ajoutés à l'installation ; `sources.json` : « desc : gabarit du
+  dépôt ({i}) ; gabarit brut et identifiants de sort du client dans source »).
+- **Preuve** : `forever/data/1.60.1.70124/talents.json`, talent `wandSpecialization` : `desc` =
+  « Increases your damage with Wands by {0}%. », `source.client_desc` = « … by $s1%. » ; sortie du test :
+  `'Increases your damage with Wands by $s1%.' != 'Increases your damage with Wands by {0}%.'`. Sept talents ont un
+  `spellIds[0]` du dépôt différent du sort du client (arcaneGeometry, arcaneBlast, missileBarrage, flameThrowing,
+  hotStreak, iceLance, fingersOfFrost).
+- **Code** : conforme (le test corrigé passe, essayé sur une copie).
+- **Diff proposé** :
+
+```diff
+-                r["desc"],
++                r["source"]["client_desc"],
+             )
+-            assert g["spell_id"] == r["spellIds"][0]
++            assert g["spell_id"] == r["source"]["client_spell_ids"][0]
+```
