@@ -75,7 +75,8 @@ valeur, il appelle un autre outil ou dit qu'elle manque.
 Deux garde-fous rendent la règle vérifiable :
 
 - **Le dépôt ne contient aucun chiffre de jeu hors de `forever/data/`** — ni dans un skill, ni dans un prompt, ni dans
-  un commentaire. Un contrôle automatique le vérifie à chaque validation.
+  un commentaire. Un contrôle automatique le vérifie à chaque validation pour le plugin et l'addon, là où un chiffre
+  écrit en dur arriverait directement dans une réponse ; ailleurs, c'est la relecture qui s'en charge.
 - **Un contrôle des chiffres** relit chaque réponse à la fin : tout nombre suivi d'une unité de jeu qui ne figure dans
   aucun résultat d'outil de la session est signalé par un message `[forever:chiffres]`. Il ne bloque rien, il prévient.
 
@@ -208,10 +209,12 @@ La chaîne de mise à jour des données, quand une nouvelle version du jeu sort 
 uv run forever builds                      # versions publiées du client
 uv run forever fetch --version <version>   # télécharger ses tables (seule étape en réseau)
 uv run forever decode --version <version>  # les décoder en version candidate, hors du dépôt
-uv run forever diff <ancienne> <nouvelle>  # ce qui change
+uv run forever diff <ancienne> <candidate> # ce qui change
 uv run forever verify <candidate>          # contrôles de cohérence
-uv run forever install --new-version       # installer, après lecture du diff
+uv run forever install <candidate> --new-version   # installer, après lecture du diff
 ```
+
+`<candidate>` est le dossier écrit par `decode`, hors du dépôt (`--dry-run` montre ce que l'installation changerait).
 
 Rien ne s'installe tout seul : le diff se lit, puis on décide.
 
