@@ -151,7 +151,15 @@ Demande de l'utilisateur du 2026-09-29, après l'évaluation du plugin (`docs/re
 
 ## T08a — Nouvelle version du jeu installée, et veille automatique
 Demande de l'utilisateur du 2026-09-30, à la publication de 1.60.1.70124 (décisions 134 et 135). Plan
-`tasks/T08a-plan.md`, analyse `docs/research/data-1.60.1.70124.md`. Reprend de T08 l'installation d'une
+`tasks/T08a-plan.md`, analyse `docs/research/data-1.60.1.70124.md`, rapport d'installation
+`docs/research/data-1.60.1.70124-install.md`.
+
+**Fait le 2026-09-30** (blocs A, B, C et E ; le workflow du bloc D est livré en patch, à appliquer par
+l'utilisateur) : `forever install --new-version` ; 1.60.1.70124 installée en révision 1, aucune valeur de jeu
+changée, `forever diff` entre les deux versions installées rend « aucun changement » et la fraîcheur repasse à
+`fresh` ; `forever/pipeline/client_builds.py` et l'attribution des mesures par version du client ; routeur du
+plugin en 0.4.3. Rejeu des builds de T05 identique à celui de T06b (`docs/research/builds-T05.md`, section
+« Rejeu T08a »). Reprend de T08 l'installation d'une
 **nouvelle** version et la veille planifiée ; le reste de T08 ne bouge pas.
 - **Installer une nouvelle version** : `forever install --new-version` (T06b n'installe qu'une **révision** de la
   version courante). Nouveau dossier `forever/data/<version>/` ; copies figées du seed (`_seed_*.json`,
