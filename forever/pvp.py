@@ -31,6 +31,8 @@ SECTIONS = {
     "burst": "bursts",
 }
 RANK_FIELDS = ("cooldown_s", "duration_s", "pvp_duration_s", "cast_s")
+# Interprétations des champs du client par la table des règles (classement, masque de rupture, verrouillage).
+INTERPRETED_FIELDS = ("types", "breaks_on_damage", "lockout_s", "how")
 SNARE_TYPES = ("ralentissement",)  # libellé de pvp_classification.control_auras : pas un contrôle diminué
 LIMIT = (
     "Aucun suivi en direct des recharges adverses : le journal de combat est refusé aux addons sur Forever et les "
@@ -91,11 +93,18 @@ def _entry(
     )
     entry["dispel_type"] = _value(rank["dispel_type"], f"{rank_path}.dispel_type", "certain")
     kind_path = f"{base}.pvp.{kind}"
+    via = detail.get("via")
     for field, value in detail.items():
         if field == "via":
             entry["via"] = value
             continue
-        entry[field] = _value(value, f"{kind_path}.{field}", "probable" if field == "types" else "certain")
+        if via is None and field in RANK_FIELDS:
+            continue  # valeur du rang connu au niveau, déjà lue (le détail porte celle du rang le plus haut)
+        if via is None and field == "lockout_s":
+            entry[field] = _value(rank["duration_s"], f"{rank_path}.duration_s", "probable")
+            continue
+        certainty = "probable" if field in INTERPRETED_FIELDS else "certain"
+        entry[field] = _value(value, f"{kind_path}.{field}", certainty)
     if kind == "control":
         bit = detail.get("diminish") or 0
         category = categories.get(str(bit)) if bit else None

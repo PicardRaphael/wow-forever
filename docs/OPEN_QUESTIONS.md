@@ -77,3 +77,4 @@ Chaque règle de jeu incertaine, avec la façon de la vérifier (journal, test e
 - Époque des jours d'Auctionator (`DAY_EPOCH`, jours depuis le 2020-01-01, probable) : confirmer par une seconde date de relevé.
 - Pièges, totems et portails (sorts dont l'effet est porté par un objet ou une créature invoqués, absents des tables lues) : non classés en PvP ; tables `GameObjects` ou `Creature*` à identifier.
 - Conditions d'emploi des sorts (posture, forme, camouflage : SpellShapeshift, SpellAuraRestrictions téléchargées mais non décodées) et durées à points de combo (Kidney Shot : durée de base seule) : à décoder avant PV2.
+- Plafond de durée PvP (K3) appliqué aussi aux contrôles sans catégorie de rendement décroissant (choix supposé, `pvp_rules.json` : groupes concernés non établis) : mesurer sur un contrôle sans catégorie (Death Coil, Blind) en champ de bataille.

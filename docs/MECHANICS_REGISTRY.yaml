@@ -8,7 +8,7 @@
 # formule (optionnelle) : symbolique, seuls 0 et 1 y sont admis ; les valeurs vivent dans forever/data/<version>/.
 # note (optionnelle) : périmètre couvert, reprise prévue.
 version: 1
-game_version: 1.60.1.70009
+game_version: 1.60.1.70124
 mechanics:
   - id: A1
     categorie: attaque
@@ -1081,8 +1081,8 @@ mechanics:
       - tests/unit/test_class_build_legality.py::test_mage_check_is_unchanged
       - tests/unit/test_class_build_legality.py::test_unresolved_tier_uses_community_tier_else_is_undecidable
     tolerance: null
-    formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis au maximum"
-    note: "4e talent doré non modélisé ; bonus Legacy « Talented » accepté en paramètre (G5 absent, non actif en bêta)"
+    formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis requis : tous au maximum ; prérequis suffisants : un au maximum"
+    note: "4e talent doré non modélisé ; bonus Legacy « Talented » accepté en paramètre (G5 absent, non actif en bêta) ; PV1 : les autres classes que le Mage sont contrôlées sur classes.json avec une certitude probable (sens de TraitEdge.Type, paliers communautaires du Démoniste, premier niveau et points par palier de mechanics.json relevés sur le Mage et étendus aux autres classes)"
   - id: G4
     categorie: personnage
     description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"
@@ -1558,9 +1558,10 @@ mechanics:
       - tests/unit/test_diminishing.py::test_immune_after_the_last_step
       - tests/unit/test_diminishing.py::test_unmapped_mechanic_has_no_category
       - tests/unit/test_diminishing.py::test_rules_are_suppose_with_a_source
+      - tests/unit/test_diminishing.py::test_every_category_of_the_client_is_named_or_flagged
     tolerance: null
     formule: "durée effective = base × palier de la k-ième application de la catégorie ; immunité au-delà du dernier palier ; remise à zéro après la fenêtre"
-    note: "catégorie du client certaine ; paliers, fenêtre (point de départ incertain), plafond et noms des catégories supposés d'après Classic ; rendements contre les PNJ non modélisés ; aucune annonce de Forever au 2026-09-30"
+    note: "catégorie du client certaine ; paliers, fenêtre (point de départ incertain), plafond et noms des catégories supposés d'après Classic ; rendements contre les PNJ non modélisés ; aucune annonce de Forever au 2026-09-30 ; fonction pas encore branchée aux fiches PvP (durées pleines affichées, suite de contrôles calculée en AN1)"
   - id: K2
     categorie: pvp
     description: "Classement PvP des sorts depuis les champs du client (contrôle, défensif, rupture, interruption, dissipation, mobilité, recharge offensive)"
@@ -1590,7 +1591,7 @@ mechanics:
       - tests/unit/test_diminishing.py::test_pvp_duration_is_the_base_when_present
       - tests/unit/test_decode_class_spells.py::test_pvp_duration_read_when_present
     tolerance: null
-    note: "durée PvP du client quand elle existe, sinon durée pleine, bornée par le plafond supposé ; durée à points de combo (Kidney Shot…) : durée de base seule"
+    note: "durée PvP du client quand elle existe, sinon durée pleine, bornée par le plafond supposé, appliqué aussi aux contrôles sans catégorie (groupes concernés non établis : choix supposé, question ouverte) ; durée à points de combo (Kidney Shot…) : durée de base seule ; pas encore branchée aux fiches"
   - id: K4
     categorie: pvp
     description: "Recharge partagée entre un bijou PvP et un racial (Will of the Forsaken…)"
@@ -1602,3 +1603,21 @@ mechanics:
     tests: []
     tolerance: null
     note: "le client ne décide pas la recharge partagée ; question ouverte, à mesurer en PV2"
+  - id: K5
+    categorie: pvp
+    description: "Fiches PvP par classe et par affrontement (rang connu au niveau, sorts selon les talents, réponses et fenêtres)"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "forever/pvp.py (service de lecture, aucun calcul de combat)"
+      - "forever/data/1.60.1.70124/classes.json, races.json, pvp_items.json, pvp_rules.json"
+    tests:
+      - tests/unit/test_pvp_sheets.py::test_matchup_is_deterministic
+      - tests/unit/test_pvp_sheets.py::test_every_value_traces_to_the_data
+      - tests/unit/test_pvp_sheets.py::test_missing_values_are_flagged_not_invented
+      - tests/unit/test_pvp_sheets.py::test_talent_spells_marked_conditional_without_talents
+      - tests/unit/test_pvp_sheets.py::test_values_come_from_the_rank_known_at_the_level
+      - tests/unit/test_pvp_sheets.py::test_windows_list_long_opponent_cooldowns
+    tolerance: null
+    note: "modificateurs de talents sur la recharge, la durée et la portée non appliqués ; raciaux passifs (Hardiness…) hors des fiches ; sens ami ou ennemi des dissipations non décodé (dispellable_auras peut lister une dissipation amie) ; sorts non interruptibles non filtrés ; toucher et résistance des contrôles non modélisés"
