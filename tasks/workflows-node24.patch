@@ -1,0 +1,46 @@
+diff --git a/.github/workflows/build-watch.yml b/.github/workflows/build-watch.yml
+index 3d84f14..92eae2f 100644
+--- a/.github/workflows/build-watch.yml
++++ b/.github/workflows/build-watch.yml
+@@ -19,11 +19,11 @@ concurrency:
+   cancel-in-progress: false
+ jobs:
+   watch:
+-    runs-on: ubuntu-latest
++    runs-on: ubuntu-24.04
+     timeout-minutes: 30
+     steps:
+-      - uses: actions/checkout@v4
+-      - uses: astral-sh/setup-uv@v5
++      - uses: actions/checkout@v7
++      - uses: astral-sh/setup-uv@v10.2.0
+       - run: uv sync
+ 
+       - name: Version publiée et version installée
+@@ -120,7 +120,7 @@ jobs:
+ 
+       - name: Ouvrir ou mettre à jour la pull request
+         if: steps.versions.outputs.nouvelle == 'oui'
+-        uses: peter-evans/create-pull-request@v7
++        uses: peter-evans/create-pull-request@v8
+         with:
+           branch: data/${{ steps.versions.outputs.latest }}
+           base: main
+diff --git a/.github/workflows/ci.yml b/.github/workflows/ci.yml
+index ebff3b1..556ec36 100644
+--- a/.github/workflows/ci.yml
++++ b/.github/workflows/ci.yml
+@@ -7,10 +7,10 @@ jobs:
+     strategy:
+       fail-fast: false
+       matrix:
+-        os: [ubuntu-latest, windows-latest]
++        os: [ubuntu-24.04, windows-latest]
+     runs-on: ${{ matrix.os }}
+     steps:
+-      - uses: actions/checkout@v4
+-      - uses: astral-sh/setup-uv@v5
++      - uses: actions/checkout@v7
++      - uses: astral-sh/setup-uv@v10.2.0
+       - run: uv sync
+       - run: uv run tasks.py verify
