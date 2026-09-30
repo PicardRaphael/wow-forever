@@ -555,19 +555,185 @@ def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> di
     }
 
 
+def _class_mask_names(tables: Tables, rules: Mapping[str, Any], mask: int) -> list[str] | None:
+    """Classes d'un masque du client (bit = 1 << (ID de ChrClasses - 1)), par ordre alphabétique ; None : toutes."""
+    if mask in (0, -1):
+        return None
+    ids = {str(r["Name_lang"]): int(r["ID"]) for r in tables["ChrClasses"]}
+    return sorted(c for c in rules["classes"] if c in ids and mask & (1 << (ids[c] - 1)))
+
+
+def _race_mask(row: Row) -> int:
+    """Masque de races sur 64 bits (RaceMasks_0 | RaceMasks_1 << 32) ; -1 : toutes."""
+    low, high = int(row["RaceMasks_0"]), int(row["RaceMasks_1"])
+    return -1 if low == -1 else (low & 0xFFFFFFFF) | (high << 32)
+
+
+def _spell_effects(client: _Client, spell: int) -> list[dict[str, Any]]:
+    return [
+        {
+            "effect": int(e["Effect"]),
+            "aura": int(e["EffectAura"]),
+            "base_points": normalize(float(e["EffectBasePointsF"])),
+            "misc": int(e["EffectMiscValue_0"]),
+            "mechanic": int(e["EffectMechanic"]),
+        }
+        for _, e in sorted(client.effects.get(spell, {}).items())
+    ]
+
+
+def _cooldown_s(client: _Client, spell: int) -> float | None:
+    cd = client.cooldowns.get(spell)
+    value = max(int(cd["RecoveryTime"]), int(cd["CategoryRecoveryTime"])) / 1000 if cd else 0
+    return normalize(value) if value > 0 else None
+
+
+def _duration_s(client: _Client, spell: int) -> float | None:
+    ms = client.duration_ms(spell)
+    return normalize(ms / 1000) if ms is not None and ms > 0 else None  # -1 : jusqu'à annulation
+
+
 def decode_races(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `races.json` (PV1, décision 106) : races jouables (présentes dans CharBaseInfo), nom anglais et
     français, jeton du client, faction, classes permises ; raciaux (lignes `racial_skill_lines`) par race avec les
     classes concernées, passif ou non, recharge, durée et effets bruts du client ; `mage_values` : les grandeurs lues
     par le moteur du Mage (`racial_values` des règles)."""
-    raise NotImplementedError
+    client = _Client(tables, rules)
+    chr_races = {int(r["ID"]): r for r in tables["ChrRaces"]}
+    french = {int(r["ID"]): str(r["Name_lang"]) for r in tables.get("frFR/ChrRaces", [])}
+    class_ids = {int(r["ID"]): str(r["Name_lang"]) for r in tables["ChrClasses"]}
+    order = list(rules["classes"])
+    allowed: dict[int, set[str]] = defaultdict(set)
+    for r in tables["CharBaseInfo"]:
+        allowed[int(r["RaceID"])].add(class_ids[int(r["ClassID"])])
+    lines = {int(i) for i in rules["racial_skill_lines"]}
+    abilities = [r for r in tables["SkillLineAbility"] if int(r["SkillLine"]) in lines]
+    passive_mask = int(rules["passive_attributes_0_mask"])
+    values_rules = rules["racial_values"]
+    races: dict[str, Any] = {}
+    for race_id in sorted(allowed):
+        row = chr_races.get(race_id)
+        if row is None:
+            raise DataSchemaError(f"Race {race_id} de CharBaseInfo absente de ChrRaces.")
+        bit = 1 << int(row["PlayableRaceBit"])
+        racials = []
+        mage_values: dict[str, float] = {}
+        for a in abilities:
+            mask = _race_mask(a)
+            if mask != -1 and not mask & bit:
+                continue
+            spell = int(a["Spell"])
+            misc = client.misc.get(spell)
+            classes = _class_mask_names(tables, rules, int(a["ClassMask"]))
+            effects = _spell_effects(client, spell)
+            name = client.names.get(spell, "")
+            racials.append(
+                {
+                    "spell_id": spell,
+                    "name": name,
+                    "name_fr": client.names_fr.get(spell, ""),
+                    "classes": classes,
+                    "passive": bool(misc is not None and int(misc["Attributes_0"]) & passive_mask),
+                    "cooldown_s": _cooldown_s(client, spell),
+                    "duration_s": _duration_s(client, spell),
+                    "effects": effects,
+                    "certainty": f"FC-{version}",
+                }
+            )
+            if classes is not None and "Mage" not in classes:
+                continue
+            for key, rule in values_rules.items():
+                if "spell_name" in rule and rule["spell_name"] != name:
+                    continue
+                for e in effects:
+                    if e["aura"] == rule["aura"] and ("misc" not in rule or e["misc"] == rule["misc"]):
+                        mage_values[key] = round(mage_values.get(key, 0.0) + e["base_points"] * rule["scale"], 10)
+        races[str(row["Name_lang"])] = {
+            "id": race_id,
+            "client_file": str(row["ClientFileString"]),
+            "name": str(row["Name_lang"]),
+            "name_fr": french.get(race_id, ""),
+            "faction": rules["race_factions"].get(str(row["Alliance"])),
+            "classes": sorted(allowed[race_id], key=order.index),
+            "racials": racials,
+            "mage_values": mage_values,
+        }
+    return {
+        "build": version,
+        "source": (
+            f"Client {version} : tables ChrRaces, CharBaseInfo, SkillLineAbility et Spell* (wago.tools) décodées par "
+            "forever decode"
+        ),
+        "races": races,
+        "notes": [
+            "Races jouables : celles de CharBaseInfo (combinaisons de Forever comprises), sans liste de Classic.",
+            "Raciaux : lignes racial_skill_lines de decode_rules.json ; classes null : toutes les classes.",
+            (
+                "mage_values : grandeurs lues par le moteur du Mage (racial_values de decode_rules.json), variantes "
+                "de classe qui concernent le Mage seulement ; sword_crit exige une épée (arme hors des tables lues)."
+            ),
+        ],
+    }
 
 
 def decode_pvp_items(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `pvp_items.json` (PV1) : bijoux (`pvp_trinkets.inventory_type`) dont le sort d'utilisation rompt
     un contrôle (dissipation par mécanique ou immunité de mécanique), avec classes permises, recharge, recharge de
     catégorie et mécaniques rompues ; recharge partagée avec un racial non décidée par le client (registre K4)."""
-    raise NotImplementedError
+    spec = rules["pvp_trinkets"]
+    client = _Client(tables, rules)
+    items = {int(r["ID"]): r for r in tables["Item"]}
+    sparse = {int(r["ID"]): r for r in tables["ItemSparse"]}
+    item_effects = {int(r["ID"]): r for r in tables["ItemEffect"]}
+    mechanics = {int(r["ID"]): str(r["StateName_lang"]) for r in tables["SpellMechanic"]}
+    trinkets = []
+    for link in sorted(tables["ItemXItemEffect"], key=lambda r: (int(r["ItemID"]), int(r["ID"]))):
+        item_id = int(link["ItemID"])
+        item, name_row = items.get(item_id), sparse.get(item_id)
+        effect = item_effects.get(int(link["ItemEffectID"]))
+        if item is None or name_row is None or effect is None:
+            continue
+        if int(item["InventoryType"]) != spec["inventory_type"] or int(effect["TriggerType"]) != spec["use_trigger"]:
+            continue
+        spell = int(effect["SpellID"])
+        breaks = []
+        for e in _spell_effects(client, spell):
+            if e["effect"] == spec["dispel_mechanic_effect"]:
+                breaks.append({"kind": "dispel", "mechanic": e["misc"], "mechanic_name": mechanics.get(e["misc"], "")})
+            elif e["effect"] == spec["apply_aura_effect"] and e["aura"] == spec["mechanic_immunity_aura"]:
+                breaks.append(
+                    {"kind": "immunity", "mechanic": e["misc"], "mechanic_name": mechanics.get(e["misc"], "")}
+                )
+        if not breaks:
+            continue
+        category_ms = int(effect["CategoryCoolDownMSec"])
+        trinkets.append(
+            {
+                "item_id": item_id,
+                "name": str(name_row["Display_lang"]),
+                "classes": _class_mask_names(tables, rules, int(name_row["AllowableClass"])),
+                "spell_id": spell,
+                "spell_name": client.names.get(spell, ""),
+                "cooldown_s": normalize(int(effect["CoolDownMSec"]) / 1000),
+                "category_cooldown_s": normalize(category_ms / 1000) if category_ms > 0 else None,
+                "spell_category": int(effect["SpellCategoryID"]),
+                "breaks": breaks,
+                "certainty": f"FC-{version}",
+            }
+        )
+    return {
+        "build": version,
+        "source": f"Client {version} : tables Item, ItemSparse, ItemEffect, ItemXItemEffect et Spell* décodées",
+        "trinkets": trinkets,
+        "shared_cooldown_with_racials": None,
+        "notes": [
+            (
+                "Recharge partagée entre un bijou PvP et un racial (Will of the Forsaken…) : non décidée par le "
+                "client (registre K4, absent ; docs/OPEN_QUESTIONS.md)."
+            ),
+            "Faction d'un Insigne : absente des tables lues (nom seulement).",
+        ],
+    }
 
 
 # --- Sorts ---------------------------------------------------------------------------------------

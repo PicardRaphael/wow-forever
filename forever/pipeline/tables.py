@@ -35,16 +35,20 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "TraitDefinitionEffectPoints": _cols("ID:int TraitDefinitionID:int EffectIndex:int OperationType:int CurveID:int"),
     "TraitEdge": _cols("ID:int LeftTraitNodeID:int RightTraitNodeID:int Type:int"),
     "CurvePoint": _cols("ID:int CurveID:int Pos_0:float Pos_1:float OrderIndex:int"),
-    "SkillLineAbility": _cols("ID:int SkillLine:int Spell:int AcquireMethod:int"),
+    "SkillLineAbility": _cols(
+        "ID:int SkillLine:int Spell:int AcquireMethod:int ClassMask:int RaceMasks_0:int RaceMasks_1:int"
+    ),
     "Spell": _cols("ID:int NameSubtext_lang:str Description_lang:str"),
     "SpellName": _cols("ID:int Name_lang:str"),
     "SpellEffect": _cols(
         "ID:int SpellID:int DifficultyID:int EffectIndex:int Effect:int EffectAura:int EffectAuraPeriod:int "
         "EffectBasePointsF:float EffectRealPointsPerLevel:float Variance:float EffectTriggerSpell:int EffectMiscValue_0:int "
-        "EffectBonusCoefficient:float"
+        "EffectBonusCoefficient:float EffectMechanic:int"
     ),
     "SpellLevels": _cols("ID:int SpellID:int DifficultyID:int BaseLevel:int MaxLevel:int SpellLevel:int"),
-    "SpellMisc": _cols("ID:int SpellID:int DifficultyID:int Attributes_1:int CastingTimeIndex:int DurationIndex:int"),
+    "SpellMisc": _cols(
+        "ID:int SpellID:int DifficultyID:int Attributes_0:int Attributes_1:int CastingTimeIndex:int DurationIndex:int"
+    ),
     "SpellCastTimes": _cols("ID:int Base:int"),
     "SpellDuration": _cols("ID:int Duration:int"),
     "SpellPower": _cols("ID:int SpellID:int ManaCost:int PowerCostPct:float PowerType:int"),
@@ -81,7 +85,7 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "CharBaseInfo": _cols("ID:int RaceID:int ClassID:int"),
     "SkillRaceClassInfo": _cols("ID:int SkillID:int ClassMask:int Flags:int RaceMasks_0:int RaceMasks_1:int"),
     "Item": _cols("ID:int ClassID:int SubclassID:int InventoryType:int"),
-    "ItemSparse": _cols("ID:int Display_lang:str"),
+    "ItemSparse": _cols("ID:int Display_lang:str AllowableClass:int"),
     "ItemEffect": _cols(
         "ID:int TriggerType:int CoolDownMSec:int CategoryCoolDownMSec:int SpellCategoryID:int SpellID:int"
     ),
