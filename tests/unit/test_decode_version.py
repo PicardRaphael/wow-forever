@@ -26,7 +26,9 @@ def test_candidate_is_a_complete_data_dir(candidate):
     assert candidate.version == PREVIOUS_VERSION
     assert verify(candidate.root).ok
     names = {p.name for p in (candidate.root / PREVIOUS_VERSION).iterdir()}
-    assert names == EXPECTED_FILES and len(names) == 12  # T04 : monsters.json hérité, spell_scaling.json décodé
+    # T04 : monsters.json hérité, spell_scaling.json décodé ; PV1 : fichiers des 9 classes (hérités ici : la
+    # fixture 70009 n'a pas leurs tables), _seed_racials.json hérité, racials.json retiré.
+    assert names == EXPECTED_FILES and len(names) == 15
     assert "_source_gunba_mage_tree.json" not in names and "confirmed_changes.json" not in names
 
 
@@ -45,7 +47,7 @@ def test_sources_describe_every_file(candidate):
     assert set(sources["files"]) == EXPECTED_FILES - {"sources.json"}
     assert sources["files"]["talents.json"]["certainty"] == "certain"
     assert sources["files"]["spells.json"]["certainty"] == "certain"
-    for name in INHERITED_FILES:
+    for name in (*INHERITED_FILES, "classes.json", "races.json", "pvp_items.json"):
         assert f"hérité de {LOCAL_VERSION}" in " ".join(sources["files"][name]["notes"]), name
     local = read_json(DATA_DIR / LOCAL_VERSION / "sources.json")
     assert sources["product"] == local["product"] and sources["version_prefix"] == local["version_prefix"]

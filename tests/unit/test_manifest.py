@@ -84,17 +84,26 @@ def test_manifest_content():
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert v["revision"] == 1 and v["revised_at"] == "2026-09-30"  # une nouvelle version repart en révision 1
-    assert len(v["files"]) == 17 and {
-        "mechanics.json",
-        "decode_rules.json",
-        "confirmed_changes.json",
-        "monsters.json",
-        "spell_scaling.json",
-        "_seed_talents.json",
-        "_seed_spells.json",
-        "revisions.json",
-    } <= set(v["files"])
+    assert v["revision"] == 2 and v["revised_at"] == "2026-09-30"  # PV1 : révision 2 (9 classes, raciaux du client)
+    assert (
+        len(v["files"]) == 20
+        and "racials.json" not in v["files"]
+        and {
+            "classes.json",
+            "races.json",
+            "pvp_items.json",
+            "_seed_racials.json",
+            "mechanics.json",
+            "decode_rules.json",
+            "confirmed_changes.json",
+            "monsters.json",
+            "spell_scaling.json",
+            "_seed_talents.json",
+            "_seed_spells.json",
+            "revisions.json",
+        }
+        <= set(v["files"])
+    )
 
 
 def test_data_sha_is_short_and_changes_with_content(data_copy):

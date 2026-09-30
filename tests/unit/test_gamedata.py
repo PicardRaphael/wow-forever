@@ -7,12 +7,14 @@ import json
 from collections import Counter
 
 import pytest
-from conftest import LOCAL_VERSION, tamper
+from conftest import DATA_DIR, LOCAL_VERSION, read_json, tamper
 
 from forever.engine import Rank, coefficient
 from forever.errors import DataIntegrityError, DataSchemaError
-from forever.gamedata import load_game_data
+from forever.gamedata import build_game_data, load_game_data
 from forever.manifest import write_manifest
+from forever.profile import CLASSES
+from forever.store import load_version
 
 
 def edit_mechanics(data_dir, change):
@@ -153,3 +155,34 @@ def test_low_level_default_read(game_data):
     c = game_data.constants
     assert c.coefficients.low_level_default is True
     assert not hasattr(c, "improved_cone_of_cold_pct")
+
+
+# --- PV1, bloc B4 : savoir des 9 classes et raciaux décodés du client (décisions 31, 106 ; D5) ---------------
+
+
+def test_game_data_exposes_nine_classes(game_data):
+    assert set(game_data.classes) == set(CLASSES)
+    rogue = game_data.classes["Rogue"]
+    assert len(rogue.trees) == 3 and all(tree["talents"] for tree in rogue.trees)
+    assert any(s["name"] == "Kidney Shot" for s in rogue.spells.values())
+    assert game_data.classes["Warlock"].pet_spells and not game_data.classes["Rogue"].pet_spells
+    mage_talents = {t["key"] for tree in game_data.classes["Mage"].trees for t in tree["talents"]}
+    assert mage_talents == set(game_data.talents)  # même savoir que le moteur du Mage
+
+
+def test_engine_racials_read_from_races_json(game_data):
+    races = read_json(DATA_DIR / LOCAL_VERSION / "races.json")["races"]
+    assert not (DATA_DIR / LOCAL_VERSION / "racials.json").exists()
+    fields = {"spirit_pct": game_data.racials.spirit_pct, "mana_pct": game_data.racials.mana_pct}
+    fields["sword_crit"] = game_data.racials.sword_crit
+    for name, race in races.items():
+        for key, table in fields.items():
+            assert table.get(name, 0.0) == race["mage_values"].get(key, 0.0), (name, key)
+
+
+def test_seed_mode_reads_frozen_racials(make_deps):
+    frozen = read_json(DATA_DIR / LOCAL_VERSION / "_seed_racials.json")["races"]
+    seed = build_game_data(load_version(make_deps()), rules="seed")
+    assert seed.racials.spirit_pct["Human"] == frozen["Human"]["human_spirit"]["spirit_pct"]
+    assert seed.racials.mana_pct["Gnome"] == frozen["Gnome"]["expansive_mind"]["mana_pct"]
+    assert seed.racials.sword_crit["Human"] == frozen["Human"]["sword_spec"]["crit"]

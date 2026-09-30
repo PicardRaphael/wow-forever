@@ -35,9 +35,14 @@ def test_seed_files_are_byte_identical_in_the_version_they_came_from():
         assert sha(DATA_DIR / PREVIOUS_VERSION / name) == sha(SEED_DATA / SEED_VERSION / name), name
 
 
+# PV1, D5 : racials.json retiré de la version installée (raciaux décodés dans races.json), copie figée gardée.
+INSTALLED_NAME = {"racials.json": "_seed_racials.json"}
+
+
 def test_seed_files_are_inherited_unchanged_by_the_installed_version():
     for name in SEED_FILES:
-        assert content(DATA_DIR / LOCAL_VERSION / name) == content(SEED_DATA / SEED_VERSION / name), name
+        local = INSTALLED_NAME.get(name, name)
+        assert content(DATA_DIR / LOCAL_VERSION / local) == content(SEED_DATA / SEED_VERSION / name), name
 
 
 def test_overrides_copied_into_version_dir():
@@ -47,7 +52,10 @@ def test_overrides_copied_into_version_dir():
 
 def test_version_dir_contains_exactly_expected_files():
     names = {p.name for p in (DATA_DIR / LOCAL_VERSION).iterdir()}
-    assert names == set(SEED_FILES) | {
+    assert names == {INSTALLED_NAME.get(n, n) for n in SEED_FILES} | {
+        "classes.json",  # PV1 : savoir des 9 classes décodé du client (révision 2)
+        "races.json",  # PV1 : races et raciaux décodés du client (décision 106)
+        "pvp_items.json",  # PV1 : bijoux PvP décodés du client
         "talents.json",  # T06b : valeurs du client (révision 2), plus des copies du seed
         "spells.json",
         "overrides.json",
