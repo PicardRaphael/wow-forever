@@ -19,7 +19,8 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
   l'appel (jamais la race par défaut de l'outil sans le dire : `inputs.race.origin`).
 - **Respec ou prochain talent à un niveau plus haut que celui du profil** : planification (section du même nom
   de `format-reponse.md`) : talents du profil en `current`, chemin projeté `respec.projected` ; le build n'est
-  demandé que si le profil n'en a aucun, jamais pour un build décrit sans rangs (« tout en Feu »).
+  demandé que si le profil n'en a aucun. Question qui contredit le profil (« tout en Feu ») : elle l'emporte ;
+  écart signalé, mise à jour proposée, puis rangs exacts demandés ou build conseillé de ce type supposé et annoncé.
 - Build actuel donné en clair (« j'ai Improved Frostbolt au max ») : traduis en clés de talent avec
   `forever_lookup(kind="talent", name=…)` (la clé est le champ `id`).
 

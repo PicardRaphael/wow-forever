@@ -80,9 +80,13 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
   `forever_build(context="leveling", level=<niveau de la question>, …)` : le bloc `respec.projected` donne le chemin
   de leveling conseillé depuis ce build jusqu'au niveau demandé (`steps`, `talents`, `points`) et le bloc `respec`
   le conseil (verdict, niveau, coût, gain). Dis que le chemin est projeté depuis le build du profil. Ne demande le
-  build que si le profil n'en contient aucun. Build décrit sans rangs (« tous mes points en Feu ») : ne le demande
-  pas, calcule depuis le build du profil, dis-le en tête et propose de refaire le calcul avec les rangs exacts ; build
-  donné avec ses talents et rangs : il prime sur le profil.
+  build que si le profil n'en contient aucun.
+- Question qui contredit le profil (« tous mes points en Feu » avec un build Givre au profil) : ce que dit la
+  question l'emporte. Signale l'écart avec le profil et propose sa mise à jour (`forever profile set`, règle du
+  « j'ai … ») ; ne calcule jamais depuis le build du profil. Puis, au choix : demande les rangs exacts du build
+  décrit, ou suppose le build conseillé de ce type au niveau demandé (`forever_build`), annoncé en tête comme une
+  hypothèse (« build Feu conseillé supposé, pas le tien »), et donne le conseil qui en découle. Build donné avec ses
+  talents et rangs : utilise-le tel quel.
 - Personnage prévu (`planned` vrai : pas encore créé) : ni niveau ni talents à demander. Prépare son plan : builds
   par niveau calculés par `forever_build` avec sa race (classe à moteur ; plusieurs niveaux ou contextes : sous-agent
   `forever-sim-runner`), sinon builds de la communauté (section « Classe pas encore calculée » du routeur) ; métiers

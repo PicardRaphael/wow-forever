@@ -1,7 +1,7 @@
 {
   "name": "forever",
   "description": "Système expert World of Warcraft: Forever : skills d'aiguillage, de leveling et du Mage, serveur MCP forever, contrôle des chiffres de jeu en fin de réponse. Aucun calcul dans le plugin : tout vient du dépôt pointé par FOREVER_HOME.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "author": { "name": "Raphael PICARD" },
   "repository": "https://github.com/PicardRaphael/wow-forever",
   "keywords": ["wow", "forever", "mage", "leveling"]

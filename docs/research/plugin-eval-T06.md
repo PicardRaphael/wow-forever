@@ -187,5 +187,6 @@ Nouveaux cas réussis : `generale-mage-raid`, `personnelle-mage-donjon`, `person
 - `respec-feu-vers-givre` (outil, juge `planification`) : le modèle redemande les rangs du build Feu, en 0.4.0 comme
   au rejeu 0.4.1 (consigne durcie : build décrit sans rangs, partir du profil). La question contredit le profil de
   test (tout en Feu contre un build Givre) : partir du build Givre du profil pour juger une respec vers le Givre n'a
-  pas de sens. Cas à trancher par l'utilisateur (reformuler la question ou accepter la question de précision quand la
-  question contredit le profil).
+  pas de sens. Tranché par l'utilisateur le 2026-09-30 (décision 122) : question gardée, elle l'emporte sur le
+  profil ; écart signalé, mise à jour proposée, rangs exacts demandés ou build Feu conseillé supposé et annoncé ;
+  juge `ecart-profil` qui accepte les deux, outil attendu `forever_player_profile`.
