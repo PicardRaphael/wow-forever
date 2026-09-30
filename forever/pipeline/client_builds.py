@@ -59,10 +59,17 @@ def read_build_info(wow_dir: Path) -> ClientBuild | None:
         version_at_column = columns.index("Version")
         product_at_column = columns.index("Product")
         rows = [line.split("|") for line in lines[1:]]
-        # Le fichier liste un produit par ligne (wow, wow_classic_beta…) : on garde celui du dossier lu quand il
-        # s'y trouve, sinon la première ligne.
-        wanted = wow_dir.name.strip("_")
-        chosen = next((r for r in rows if wanted in r[product_at_column]), rows[0])
+        # Le fichier liste un produit par ligne (wow, wow_classic_beta…). On exige le produit exact du dossier lu
+        # (`_classic_beta_` -> `wow_classic_beta`) : une correspondance approchée attribuerait la version d'un autre
+        # produit installé à côté, c'est-à-dire exactement l'erreur que ce journal doit empêcher.
+        wanted = f"wow_{wow_dir.name.strip('_')}"
+        matching = [r for r in rows if r[product_at_column].strip() == wanted]
+        if not matching:
+            # Aucun produit ne correspond : acceptable seulement si le fichier n'en décrit qu'un seul.
+            if len(rows) != 1:
+                return None
+            matching = rows
+        chosen = matching[0]
         build = chosen[version_at_column].strip()
         if not build:
             return None

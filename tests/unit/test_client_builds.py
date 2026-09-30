@@ -62,6 +62,23 @@ def test_the_right_product_is_picked(tmp_path):
     assert found is not None and found.build == BETA
 
 
+def test_another_product_is_never_taken_for_this_one(tmp_path):
+    """Deux produits installés côte à côte : la version de l'autre ne doit jamais être attribuée à ce client."""
+    root = tmp_path / "World of Warcraft"
+    (root / "_classic_beta_").mkdir(parents=True)
+    other = "us|1|12.0.1.70210|wow"
+    era = "us|1|1.60.1.69999|wow_classic"
+    (root / ".build.info").write_text(f"{HEADER}\n{other}\n{era}\n", encoding="utf-8")
+    assert read_build_info(root / "_classic_beta_") is None
+
+
+def test_a_single_product_is_accepted_even_if_its_name_differs(tmp_path):
+    """Un seul produit décrit : c'est forcément celui du dossier lu."""
+    wow_dir = build_info(tmp_path, product="wow_classic_beta_ptr")
+    found = read_build_info(wow_dir)
+    assert found is not None and found.build == BETA
+
+
 def test_a_missing_file_is_not_an_error(tmp_path):
     (tmp_path / "wow" / "_classic_beta_").mkdir(parents=True)
     assert read_build_info(tmp_path / "wow" / "_classic_beta_") is None
