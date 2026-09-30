@@ -51,7 +51,8 @@ Ces addons compilent des données relevées par de nombreux joueurs, souvent plu
 - **Lecture locale seulement** (`Interface/AddOns` et `WTF/.../SavedVariables`), jamais par le réseau, jamais dans les tests (fixtures minimales dans `tests/fixtures/`).
 - **Version de l'addon dans la provenance** de chaque valeur, avec l'empreinte de ses fichiers de données (décision 124).
 - **Seuls des agrégats entrent dans le dépôt** (comptes, écarts, valeurs recoupées avec leur source), jamais les tables de l'addon.
-- **Licences à vérifier avant tout usage élargi** (redistribution, données dans `forever/data/`).
+- **Lecture locale libre** de tout addon installé, quelle que soit sa licence (décision de l'utilisateur du 2026-09-30, décision 133) ; la licence ne compte que pour ce qui entrerait dans le dépôt, limité aux agrégats.
+- **Seulement des addons à jour pour Forever** (version Forever explicite, fichier publié depuis la version du jeu jouée) ; un addon périmé est signalé et n'est plus lu comme source.
 - Certitude au mieux `suppose` ; une observation réelle l'emporte (décision 127).
 
 | Addon | Version relevée (2026-09-30) | Apport | Licence | Usage |
@@ -59,7 +60,7 @@ Ces addons compilent des données relevées par de nombreux joueurs, souvent plu
 | AtlasLoot Classic Forever | 1.1.3 (nom de la version publiée sur CurseForge), `.toc` : « Forever 1.60.1 » | Butin par boss (instance → boss → `npcID` → objets), taux Classic de `droprate.lua` | GPL-2 (installée) | DJ1, T10 ; valeur Classic de `GetForVersion` (premier argument) |
 | ForeverDungeonJournal | 1.3.1 | Donjons, boss, butin, quêtes Forever et leur XP (base et réglée), textes français | aucune ; données de sites tiers (`SOURCES.txt`) | DJ1, T04d ; niveaux des boss hérités copiés de Classic (pas un recoupement de H1) |
 | Questie Forever | 11.38.0 Forever-v27 | Quêtes, PNJ, récompenses ; `QuestieForeverDB` (quêtes Forever apprises en jeu) ; quêtes faites de mes personnages | à vérifier (CurseForge 334372) | Déjà lu (T04a à T04c) ; profil (T07), T04d |
-| GearQuestForever | 0.2.19-beta | Fiches d'objets, infobulles Wowhead Forever, sources (boss, quête, marchand, métier) | aucune ; données Wowhead | **Recoupement seulement** (T10, T04d), jamais source d'une valeur |
+| GearQuestForever | 0.2.19-beta | Fiches d'objets, infobulles Wowhead Forever, sources (boss, quête, marchand, métier) | aucune ; données Wowhead | **Recoupement seulement** (T10, T04d) : valeurs Classic et infobulles Wowhead, jamais source d'une valeur |
 | Auctionator | 339 | **Mes relevés de prix** (`AUCTIONATOR_PRICE_DATABASE`, CBOR), cache des prix marchands | All Rights Reserved ; `AGENTS.md` adressé aux agents d'IA | Lecture de mes propres SavedVariables par un décodeur maison, code de l'addon jamais lu ni repris (décision de l'utilisateur, confirmée le 2026-09-30) ; profil (T07), prix avant l'API (EC1, T10) |
 
 Détail des formats, comptes et recoupements : `tasks/inventaire-addons.md`.
@@ -82,7 +83,8 @@ Liste tenue à chaque fin de tranche (tirée du registre et de `docs/OPEN_QUESTI
 - **Compatibilité Forever** : étiquette de jeu « 1.60.1 » de CurseForge, sauf mention « `.toc` lu » (interface 16001 lue dans le dépôt de l'addon). Aucun `_Camelot.toc` vu ; le client charge aussi un `.toc` sans suffixe qui déclare 16001 (`docs/ADDON.md`). À relire sur disque après installation.
 - **Stabilité** : **non vérifiée** pour tous les addons (les commentaires CurseForge ne sont pas lisibles par ce canal) ; seules les mises en garde des auteurs sont notées.
 - **Collecteurs** : un addon qui relève en jeu ne vaut que si ses SavedVariables sont relues d'une session à l'autre (défaut de relecture signalé par des joueurs sur 1.60.1.69893 et 69913, dit corrigé sur 70009 par des joueurs, sans message de Blizzard : `docs/OPEN_QUESTIONS.md`) et s'il ne dépend ni du journal de combat ni d'une valeur secrète.
-- **Licence** « All Rights Reserved » : au mieux lecture de mes propres SavedVariables (règle d'Auctionator, décision 123) ; ses fichiers de données ne sont pas lus sans décision de l'utilisateur.
+- **Licence** : aucune restriction à la lecture locale ; tout addon installé peut être lu, y compris « All Rights Reserved » (décision 133) ; seuls des agrégats entrent dans le dépôt.
+- **À jour pour Forever** : seuls sont retenus les addons à version Forever explicite dont le dernier fichier est postérieur à la sortie de la version du jeu jouée (vers le 2026-09-24 pour 1.60.1.70009) ; à revérifier à chaque nouvelle version du jeu (1.60.1.70124 publiée le 2026-09-30).
 
 | Donnée manquante | Où elle manque | Candidat |
 |---|---|---|
@@ -108,17 +110,13 @@ Liste tenue à chaque fin de tranche (tirée du registre et de `docs/OPEN_QUESTI
 | Armure et résistances des monstres | H2 | **Aucun trouvé (2026-09-30)** ; MobInfo2 compte les résistances et immunités observées (pas de valeur), méthode non vérifiée sur Forever |
 | Statistiques des objets de Forever | T10, F1 | GearQuestForever (recoupement seulement) ; source : tables du client |
 
-**Addons conseillés à l'installation** (2026-09-30, par ordre d'utilité pour le projet ; l'utilisateur installe, l'agent inventorie ensuite en lecture seule) :
-1. Legacy Forever : seul addon qui embarque des données Legacy tirées du client (défis, points) et l'état des défis du compte ; licence libre ; LG1, LG2.
-2. SkillUp Forever : recettes et seuils de couleur tirés du client ; entraîneurs Classic en recoupement ; licence libre ; MT1.
-3. Recipe Registry : recettes de Forever et prix des marchands appris en jeu ; MIT ; MT1, T10.
-4. MobInfo2 : collecteur d'XP, de butin et de résistances par monstre ; MIT ; à tester une session (PV probablement secrets) ; T04d, DJ1, H2.
-5. Forever Journal : gains de réputation, quêtes, donjons relevés en jeu ; MIT ; RP1.
-6. KillDex : taux de butin par monstre en monde ouvert ; All Rights Reserved (lecture de mes SavedVariables seulement) ; DJ1, T10.
-7. TrainForever : entraîneurs et vendeurs visités, coûts ; MIT ; MT1.
-8. Campfire Tooltips : effets des buffs de campement relevés sur 70009 ; GPLv3 ; T11.
-9. Atlas Forever : cartes d'instance, PNJ, donjons Forever ; GPLv2 ; recoupement DJ1.
-Et mettre à jour AtlasLoot Classic Forever (1.1.4 publiée).
+**Addons conseillés à l'installation** (2026-09-30, décision 133 : seulement des addons à jour pour Forever, et seulement pour un manque réel ; l'utilisateur installe, l'agent inventorie ensuite en lecture seule) :
+1. Mettre à jour AtlasLoot Classic Forever en 1.1.4 (publiée le 2026-09-29) : source du butin de DJ1 déjà installée.
+2. Forever Guide (1.16.2, 2026-09-30) : butin des boss et donjons de Forever, recettes des métiers, quêtes ; un seul addon pour DJ1, MT1 et T04d (taux de butin Classic, `suppose`).
+3. Legacy Forever (0.6.5-forever, 2026-09-29, `.toc` 16001 lu) : défis et points Legacy tirés du client, état des défis du compte ; seule source pour LG1 et LG2.
+4. Zone Level: Forever (1.4, 2026-09-29) : niveaux des zones et des instances de Forever, pour corriger « quelle zone à mon niveau », qui repose aujourd'hui sur les niveaux Classic de Questie.
+
+Non conseillés pour l'instant : MobInfo2 (dernier fichier du 2026-09-20, antérieur à la version du jeu 70009, et PV secrets selon son auteur ; l'XP des monstres passera par un relevé de ForeverLogger), KillDex (date du dernier fichier non relevée), Forever Journal et TrainForever (le relevé de ForeverLogger prévu en DJ1 couvre réputation et marchands), SkillUp Forever et Recipe Registry (recouvrent Forever Guide ; entraîneurs de SkillUp tirés de Classic), Campfire Tooltips et Atlas Forever (besoin lointain, T11 et recoupement). À revoir quand une tranche bute sur leur donnée.
 
 Écartés : addons sans version Forever (Exalted, RepMatic, GrindPlus, HonorSpy, Rank Marshal, What's Crafting?, WhatItDrops…), ForeverQuest (base Classic, licence incohérente : « All Rights Reserved » sur des données de Questie en GPLv3), ForeverWisp (quêtes Classic-DB), AtlasLootClassic Continued (donjons Forever en attente).
 

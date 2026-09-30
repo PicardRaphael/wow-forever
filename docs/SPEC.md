@@ -79,6 +79,6 @@ Chaque valeur garde sa source et sa certitude. « — » : la source n'apporte r
 ## Contraintes
 - La bêta publie environ une version par semaine : tout doit se régénérer automatiquement.
 - Le client ne contient ni PV des monstres, ni quêtes, ni taux de butin, ni listes d'entraîneurs ou de vendeurs, ni gains de réputation : ces données sont communautaires, mesurées ou relevées par l'addon, et marquées comme telles.
-- Addons de données : lus en local, jamais par le réseau ni dans les tests ; version et empreinte de l'addon dans la provenance ; seuls des agrégats entrent dans le dépôt ; licence vérifiée avant tout usage élargi (décision 123).
+- Addons de données : lus en local, jamais par le réseau ni dans les tests ; version et empreinte de l'addon dans la provenance ; seuls des agrégats entrent dans le dépôt ; lecture locale libre quelle que soit la licence ; seulement des addons à jour pour Forever (décisions 123, 133).
 - Les prix de l'hôtel des ventes ne sont pas des données de version : ils vivent en cache daté, hors de `forever/data/`, et viennent de mes relevés d'Auctionator, puis de l'API Blizzard après le lancement (accès réseau soumis à accord).
 - Coût en tokens maîtrisé : les données ne passent jamais dans le contexte, seulement des résultats compacts.
