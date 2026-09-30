@@ -45,6 +45,29 @@ FIELDS = ("race", "faction", "level", "talents", "professions")  # champs du jou
 PLANNED_UNUSED = ("level", "talents")  # champs qu'un personnage prévu n'a pas encore
 
 
+# Ordre des sources à date égale, de la plus directe à la moins directe (PV1, D2 ; décision 125) : rang croissant.
+SOURCE_RANK = {"joueur": 0, "ForeverLogger": 1, "Questie": 2, "Auctionator": 2, "journal": 3, "api": 4}
+
+
+def make_field(
+    value: Any, source: str, at: str | None, client_build: str | None = None, certainty: str = "certain"
+) -> dict[str, Any]:
+    """Champ du profil (schéma 2) : valeur, source, date UTC, version du client en vigueur, certitude."""
+    raise NotImplementedError
+
+
+def merge_field(current: Mapping[str, Any] | None, new: Mapping[str, Any]) -> tuple[dict[str, Any], dict | None]:
+    """(champ gardé, désaccord ou None) : la valeur la plus récente l'emporte, à date égale la source la plus
+    directe (`SOURCE_RANK`) ; un désaccord est rendu, jamais effacé."""
+    raise NotImplementedError
+
+
+def character_values(raw: Mapping[str, Any]) -> dict[str, Any]:
+    """Personnage du profil à plat (valeurs seules), plus `fields` (source, date, version du client, certitude par
+    champ) et `conflicts`."""
+    raise NotImplementedError
+
+
 class ProfileView(TypedDict):
     path: str
     active: str | None

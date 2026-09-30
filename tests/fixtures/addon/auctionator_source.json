@@ -1,0 +1,18 @@
+{
+  "note": "Valeurs inventées pour les tests (pas des relevés) ; encodées en CBOR dans Auctionator.lua par scripts/build_auctionator_fixture.py. 1002, 1004 et 1005 font apparaître dans la chaîne Lua les octets à échapper (saut de ligne, retour chariot, guillemet, barre oblique inverse, octet nul).",
+  "dbversion": 8,
+  "realms": {
+    "RoyaumePvE": {"version": 2},
+    "Royaume": {
+      "1001": {"m": 120, "h": {"2462": 150, "2463": 120}, "l": {"2463": 110}, "a": {"2462": 3, "2463": 20}},
+      "1002": {"m": 10, "h": {"2463": 10}, "l": {}, "a": {"2463": 13}},
+      "1003": {"m": 45000, "h": {"2463": 45000}, "l": {}, "a": {}},
+      "1004": {"m": 34, "h": {"2463": 34}, "l": {}, "a": {"2463": 92}},
+      "1005": {"m": 0, "h": {"2463": 0}, "l": {}, "a": {"2463": 0}}
+    },
+    "AutreRoyaume": {
+      "1001": {"m": 99, "h": {"2460": 99}, "l": {}, "a": {"2460": 4}}
+    }
+  },
+  "posting_history_sentinel": "SENTINELLE-HISTORIQUE-DES-VENTES"
+}

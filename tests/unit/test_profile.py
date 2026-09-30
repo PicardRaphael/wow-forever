@@ -17,7 +17,7 @@ from forever.cli import main
 from forever.errors import InvalidArgumentError
 from forever.leveling import simulate_leveling
 from forever.mcp_server import build_server
-from forever.profile import load_profile, profile_path, read_profile, remove, set_character, use
+from forever.profile import character_values, load_profile, profile_path, read_profile, remove, set_character, use
 from forever.provenance import validate_provenance
 
 FROST_22 = {"improvedFrostbolt": 5, "elementalPrecision": 3, "frostbite": 3, "iceShards": 2}
@@ -55,10 +55,10 @@ def test_profile_under_the_repository_is_refused(make_deps):
 def test_three_characters_and_the_active_one(deps):
     three(deps)
     p = load_profile(deps.profile_path)
-    assert p["schema_version"] == 1
+    assert p["schema_version"] == 2
     assert list(p["characters"]) == ["Givrelame", "Lumière", "Ombre"]
     assert p["active"] == "Givrelame"  # premier personnage créé
-    assert p["characters"]["Ombre"]["class"] == "Warlock"
+    assert character_values(p["characters"]["Ombre"])["class"] == "Warlock"
     use(deps, "Ombre")
     assert load_profile(deps.profile_path)["active"] == "Ombre"
     with pytest.raises(InvalidArgumentError):
@@ -68,10 +68,12 @@ def test_three_characters_and_the_active_one(deps):
 def test_partial_update_keeps_the_other_fields(deps):
     three(deps)
     set_character(deps, "Givrelame", level=23)
-    c = load_profile(deps.profile_path)["characters"]["Givrelame"]
+    c = character_values(load_profile(deps.profile_path)["characters"]["Givrelame"])
     assert (c["level"], c["race"], c["faction"], c["talents"]) == (23, "Orc", "Horde", FROST_22)
     set_character(deps, "Givrelame", professions={"Couture": 150})
-    assert load_profile(deps.profile_path)["characters"]["Givrelame"]["professions"] == {"Couture": 150}
+    assert character_values(load_profile(deps.profile_path)["characters"]["Givrelame"])["professions"] == {
+        "Couture": 150
+    }
 
 
 def test_mage_race_is_checked_with_close_names(deps):
@@ -92,7 +94,7 @@ def test_mage_talents_must_be_legal_at_the_level(deps):
 
 def test_other_classes_are_kept_unvalidated(deps):
     three(deps)
-    chars = load_profile(deps.profile_path)["characters"]
+    chars = {n: character_values(c) for n, c in load_profile(deps.profile_path)["characters"].items()}
     assert chars["Lumière"]["validated"] is False and chars["Lumière"]["talents"] == {"x": 1}
     assert chars["Givrelame"]["validated"] is True
 
@@ -163,7 +165,7 @@ def test_cli_set_list_use_show(deps, capsys):
         )
         == 0
     )
-    c = load_profile(deps.profile_path)["characters"]["Givrelame"]
+    c = character_values(load_profile(deps.profile_path)["characters"]["Givrelame"])
     assert c["talents"] == FROST_22 and c["professions"] == {"Couture": 150, "Enchantement": 90}
     capsys.readouterr()
     assert main(["profile", "list"], deps=deps) == 0

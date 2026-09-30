@@ -517,3 +517,9 @@ def zones_for_level(
             f"quêtes disponibles : faction {faction or 'toutes'}, classe {player_class}, niveau requis atteint",
         ],
     }
+
+
+def read_completed_quests(sv: Path, guid: str) -> list[tuple[int, int]]:
+    """(identifiant de quête, heure Unix du rendu) des événements `Quest` de sous-type `Complete` du carnet de Questie
+    pour le personnage `guid`, tous blocs `char` réunis, triés ; quêtes acceptées ou abandonnées ignorées."""
+    raise NotImplementedError
