@@ -258,3 +258,22 @@ def test_check_numbers_never_applies_to_tranche_work_sessions():
     assert not hooks.session_is_game_answer(work)
     assert hooks.check_numbers_output(hook_input("session_tranche_progress.jsonl")) is None
     assert not hooks.session_is_game_answer(lines("session_web_researcher.jsonl"))
+
+
+def test_work_marker_wins_over_a_game_skill_and_game_commands_count():
+    """Relecture de PV1 : /tranche avec un skill de jeu chargé reste une session de travail ; un skill de jeu lancé
+    par commande (/forever:forever-pvp) compte comme un skill de jeu."""
+    game = {
+        "type": "assistant",
+        "message": {
+            "role": "assistant",
+            "content": [{"type": "tool_use", "id": "t", "name": "Skill", "input": {"skill": "forever:forever-pvp"}}],
+        },
+    }
+    work = {"type": "user", "message": {"role": "user", "content": "<command-name>/tranche</command-name>"}}
+    command = {
+        "type": "user",
+        "message": {"role": "user", "content": "<command-name>/forever:forever-pvp</command-name>"},
+    }
+    assert not hooks.session_is_game_answer([work, game])
+    assert hooks.session_is_game_answer([command])

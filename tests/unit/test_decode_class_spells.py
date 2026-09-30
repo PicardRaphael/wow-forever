@@ -250,3 +250,11 @@ def test_community_positions_are_separate_and_probable(doc, decode_rules):
             else:
                 assert "tier_community" not in t
     assert positions["Warlock"]
+
+
+def test_dispels_carry_their_direction(doc):
+    """Relecture de PV1 : une dissipation vise un allié (Cleanse) ou un ennemi (Purge), d'après ses cibles."""
+    paladin = {s["name"]: s for s in doc["classes"]["Paladin"]["spells"].values()}
+    shaman = {s["name"]: s for s in doc["classes"]["Shaman"]["spells"].values()}
+    assert paladin["Cleanse"]["pvp"]["dispel"]["targets"] == ["allié"]
+    assert shaman["Purge"]["pvp"]["dispel"]["targets"] == ["ennemi"]

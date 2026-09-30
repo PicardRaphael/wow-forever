@@ -221,3 +221,31 @@ def test_values_come_from_the_rank_known_at_the_level(data):
             if item.get("via") is None:
                 for field in ("duration_s", "pvp_duration_s", "cooldown_s"):
                     assert ".ranks[" in item[field]["from"], (item["name"], field)
+
+
+def test_dispels_are_matched_by_direction(data):
+    """Relecture de PV1 : mes dissipations ennemies seules visent ses buffs ; ses dissipations amies seules
+    retirent mes contrôles (Cleanse d'un Paladin ne dissipe pas le bouclier d'un Prêtre ennemi)."""
+    me = {"class": "Paladin", "level": 60, "race": "Human", "talents": None}
+    sheet = matchup(data, me, {"class": "Priest", "level": 60})
+    assert "Power Word: Shield" not in {a["name"] for a in sheet["answers"]["dispellable_auras"]}
+    mage = {"class": "Mage", "level": 60, "race": "Orc", "talents": None}
+    against = matchup(data, mage, {"class": "Shaman", "level": 60})["their_answers"]["dispels_against_my_controls"]
+    assert "Polymorph" not in {c["name"] for c in against}  # Purge vise un ennemi, pas un allié métamorphosé
+
+
+def test_client_race_token_selects_the_racials(data):
+    me = {"class": "Mage", "level": 60, "race": "Scourge", "talents": None}  # jeton du client (ForeverLogger)
+    sheet = matchup(data, me, {"class": "Warlock", "level": 60})
+    assert sheet["answers"]["racials"] and all(r["race"] == "Undead" for r in sheet["answers"]["racials"])
+    unknown = matchup(data, {**me, "race": "Inconnue"}, {"class": "Warlock"})
+    assert any("race" in m for m in unknown["missing"])
+
+
+def test_totals_keep_each_list_apart(make_deps):
+    from forever.pvp import compact, pvp_report
+
+    report = pvp_report(make_deps(), "Voleur", opponent="Prêtre", level=60, race="Human")
+    totals = compact(report)["totals"]
+    assert totals["answers.cc_breaks"] == len(report["answers"]["cc_breaks"])
+    assert totals["their_answers.cc_breaks"] == len(report["their_answers"]["cc_breaks"])

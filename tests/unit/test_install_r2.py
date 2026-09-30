@@ -194,3 +194,26 @@ def test_verify_rejects_a_broken_classes_json(tmp_path, make_deps):
     gd = build_game_data(load_version(deps))
     with pytest.raises(DataSchemaError):  # la classe cassée n'est jamais rendue à moitié
         _ = gd.classes["Rogue"]
+
+
+def test_no_retirement_without_its_declaration(before_r2, class_candidate, tmp_path):
+    """Relecture de PV1 : sans `retired_files` dans la candidate, racials.json n'est jamais retiré."""
+    copy = tmp_path / "cand"
+    shutil.copytree(class_candidate.root, copy)
+    sources = copy / LOCAL_VERSION / "sources.json"
+    doc = read_json(sources)
+    doc.pop("retired_files")
+    sources.write_bytes(json.dumps(doc, ensure_ascii=False, indent=2).encode("utf-8"))
+    write_manifest(copy)
+    plan = plan_install(before_r2, str(copy))
+    assert "racials.json" not in {c["file"] for c in plan["changes"] if c["rule"] == "retired_file"}
+
+
+def test_imported_mage_race_token_is_accepted(make_deps):
+    races = read_json(DATA_DIR / LOCAL_VERSION / "races.json")["races"]
+    token = next(r["client_file"] for n, r in races.items() if "Mage" in r["classes"] and r["client_file"] != n)
+    deps = make_deps()
+    set_character(deps, "Jeton", cls="Mage", race=token, level=10)  # jeton du client écrit par ForeverLogger
+    frozen = read_json(DATA_DIR / LOCAL_VERSION / "_seed_racials.json")["races"]
+    old = next(n for n in frozen if n not in races)  # nom de l'ancien relevé communautaire
+    set_character(deps, "Ancien", cls="Mage", race=old, level=10)  # profil saisi avant PV1 : toujours accepté
