@@ -178,6 +178,25 @@ inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits 
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
 
+## Rejeu T08a (1.60.1.70124)
+
+Rejoué le 2026-09-30 par `scripts/replay_builds.py run T08a` (mêmes réglages : préréglage complet, graine 12345,
+race Orc), sur les données de 1.60.1.70124 révision 1 (empreinte `b57929e561ea`), après
+`forever install --new-version`.
+
+**Aucune recommandation changée, et aucune mesure changée non plus** : les quinze lignes du tableau (contexte,
+niveau, répartition des points, Monte Carlo, analytique, avantage, retenu, stabilité, sensibilité) sont identiques
+à celles du rejeu `r2-departage` de T06b, la durée de calcul mise à part, qui dépend de la machine.
+
+C'était attendu : les 22 tables du client sont identiques entre 1.60.1.70009 et 1.60.1.70124
+(`docs/research/data-1.60.1.70124.md`), `forever diff` entre les deux versions installées ne rend « aucun
+changement », et l'optimiseur reçoit donc exactement les mêmes entrées.
+
+**Limite de l'outil, relevée à cette occasion** : `scripts/replay_builds.py compare <avant> <après>` rend
+« aucune recommandation changée » quand l'étiquette `<avant>` n'existe pas dans le cache, sans rien signaler. La
+comparaison ci-dessus a donc été faite ligne à ligne contre le tableau de la section suivante, pas avec `compare`.
+À corriger (refus d'une étiquette absente) ; question ouverte notée dans `docs/OPEN_QUESTIONS.md`.
+
 ## Rejeu T06b (révision 2)
 
 Rejoué le 2026-09-29 par `scripts/replay_builds.py` (mêmes réglages que ci-dessus : préréglage complet, graine 12345,

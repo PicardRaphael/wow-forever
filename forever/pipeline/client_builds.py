@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, NamedTuple
 
 from forever.errors import DataSchemaError
+from forever.pipeline.builds import version_key
 from forever.timefmt import format_utc
 
 JOURNAL_NAME = "client_builds.json"
@@ -34,6 +35,9 @@ class ClientBuild(NamedTuple):
     build: str
     installed_at: datetime
     product: str
+    # D'où vient la date : `.build.info` pour un relevé automatique, sinon la preuve citée (rapport d'erreur du
+    # client, date de publication…) quand l'entrée est écrite à la main pour une version déjà remplacée.
+    source: str = ".build.info"
 
 
 def _journal_path(cache_dir: Path) -> Path:
@@ -80,6 +84,7 @@ def load_builds(cache_dir: Path) -> list[ClientBuild]:
                 build=str(e["build"]),
                 installed_at=datetime.fromisoformat(str(e["installed_at"])),
                 product=str(e.get("product", "")),
+                source=str(e.get("source", ".build.info")),
             )
             for e in doc["builds"]
         ]
@@ -108,7 +113,8 @@ def record_build(cache_dir: Path, build: ClientBuild) -> list[ClientBuild]:
             "En ajout seulement : sert à attribuer une mesure à la version du client qui l'a produite (T08a)."
         ),
         "builds": [
-            {"build": e.build, "installed_at": format_utc(e.installed_at), "product": e.product} for e in entries
+            {"build": e.build, "installed_at": format_utc(e.installed_at), "product": e.product, "source": e.source}
+            for e in entries
         ],
     }
     _journal_path(cache_dir).write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
@@ -165,14 +171,15 @@ def split_by_version(
         if seen == installed:
             keep.append(name)
             continue
+        if version_key(seen) > version_key(installed):
+            why = f"mesure en attente de l'installation de {seen}"
+        else:
+            why = f"mesure d'une version antérieure, jamais écrite dans les données de {installed}"
         held.append(
             HeldBack(
                 name=name,
                 client_version=seen,
-                reason=(
-                    f"écrit sous le client {seen}, la version installée est {installed} : "
-                    f"mesure en attente de l'installation de {seen}"
-                ),
+                reason=f"écrit sous le client {seen}, la version courante est {installed} : {why}",
             )
         )
     return keep, held, unknown

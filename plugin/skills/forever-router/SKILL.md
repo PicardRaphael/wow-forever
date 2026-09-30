@@ -20,6 +20,12 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 - Premier sujet WoW de la session : appelle `forever_status` une fois (version, fraîcheur, intégrité). Hors du dépôt
   wow-forever, aucune ligne de fraîcheur n'est affichée au démarrage : c'est cet appel qui la remplace.
 - Intégrité en échec : les consultations sont refusées ; renvoie à `uv run forever status`.
+- Fraîcheur `stale` (une version du jeu plus récente est publiée) : dis-le en une ligne, avec la version des données
+  et la version publiée telles que l'outil les rend, et **propose** de lancer l'analyse de cette nouvelle version :
+  téléchargement de ses tables, décodage en version candidate, vérification, comparaison avec les données installées
+  et rapport. Ne lance rien sans l'accord du joueur : l'accès réseau et l'installation se demandent. Tant que
+  l'accord n'est pas donné, réponds normalement avec les données installées, en gardant la mention du retard dans la
+  provenance.
 
 - Question personnelle (« mon Mage », « mon perso », « j'ai … ») : `forever_player_profile` avant tout calcul ;
   question générale (« l'arbre optimal du Mage en raid ») : ni profil ni question au joueur, hypothèse neutre annoncée
