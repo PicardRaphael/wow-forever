@@ -1064,6 +1064,7 @@ mechanics:
       - "forever/data/1.60.1.70009/talents.json (révision 2, T06b : rangs et variables d'infobulle du client 1.60.1.70009 pour les 54 talents, FC-70009)"
       - "forever/data/1.60.1.70009/revisions.json"
       - "forever/data/1.60.1.70009/mechanics.json"
+      - "forever/data/1.60.1.70124/classes.json (PV1 : arbres des 9 classes, prérequis typés d'après TraitEdge.Type, probable)"
     tests:
       - tests/unit/test_engine_talents.py::test_prerequisites
       - tests/unit/test_engine_talents.py::test_build_legality
@@ -1075,6 +1076,10 @@ mechanics:
       - tests/unit/test_install.py::test_installed_client_values
       - tests/unit/test_totals.py::test_build_points_engine
       - tests/unit/test_totals.py::test_build_report_gives_points
+      - tests/unit/test_class_build_legality.py::test_rejects_tier_overflow_other_class
+      - tests/unit/test_class_build_legality.py::test_rejects_missing_prerequisite
+      - tests/unit/test_class_build_legality.py::test_mage_check_is_unchanged
+      - tests/unit/test_class_build_legality.py::test_unresolved_tier_uses_community_tier_else_is_undecidable
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis au maximum"
     note: "4e talent doré non modélisé ; bonus Legacy « Talented » accepté en paramètre (G5 absent, non actif en bêta)"

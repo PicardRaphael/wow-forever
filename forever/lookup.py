@@ -323,3 +323,124 @@ def lookup_zones(
         assumptions=[*fresh["assumptions"], f"source : {advice['source']}", *advice["notes"]],
     )
     return {**advice, "provenance": provenance}
+
+
+def _class_knowledge(deps: Deps, cls: str) -> tuple[str, Any, Any]:
+    from forever.gamedata import build_game_data
+    from forever.profile import normalize_class
+
+    name = normalize_class(cls)
+    gd = build_game_data(load_version(deps))
+    if name not in gd.classes:
+        raise InvalidArgumentError(f"Classe {name} absente des données.", "installer classes.json (forever install)")
+    return name, gd.classes[name], gd
+
+
+def lookup_class_talent(deps: Deps, cls: str, name: str) -> dict[str, Any]:
+    """Talent d'une des 9 classes par nom anglais ou clé : arbre, palier (communautaire s'il est inconnu du client),
+    colonne, points exigés, prérequis, rangs, description du client, provenance (PV1, bloc E).
+
+    Registre : G3"""
+    cls_name, knowledge, gd = _class_knowledge(deps, cls)
+    entries = {t["key"]: t for tree in knowledge.trees for t in tree["talents"]}
+    index = {_talent_key(k): k for k in entries} | {_talent_key(t["name"]): k for k, t in entries.items()}
+    wanted = _talent_key(name)
+    if wanted not in index:
+        names = {_talent_key(t["name"]): t["name"] for t in entries.values()}
+        close = difflib.get_close_matches(wanted, sorted(names), n=3, cutoff=0.6)
+        raise UnknownTalentError(name, [names[c] for c in close])
+    t = entries[index[wanted]]
+    by_node = {x["node_id"]: x for x in entries.values()}
+    tier = t["tier"] if t["tier"] is not None else (t.get("tier_community") or {}).get("tier")
+    notes = [f"classes.json : talent {t['key']} de {cls_name} décodé du client (nœud {t['node_id']})"]
+    certainty: Certainty = "certain"
+    if t["tier"] is None and t.get("tier_community"):
+        certainty = "probable"
+        notes.append(f"palier communautaire ({', '.join(t['tier_community']['sources'])})")
+    if t.get("unresolved"):
+        notes += t["unresolved"]
+    if t.get("position"):
+        notes.append(f"position : {t['position']['source']}")
+    notes.append("valeurs par rang non décodées pour cette classe : gabarit de description du client")
+    return {
+        "kind": "talent",
+        "class": cls_name,
+        "id": t["key"],
+        "name": t["name"],
+        "name_fr": t["name_fr"],
+        "tree": t["tree"],
+        "tier": tier,
+        "col": t["col"],
+        "node_id": t["node_id"],
+        "required_tree_points": gd.constants.talents.points_per_tier * (tier - 1) if tier else None,
+        "prereqs": [
+            {"id": by_node[p["node_id"]]["key"], "name": by_node[p["node_id"]]["name"], "kind": p["kind"]}
+            for p in t["prereqs"]
+            if p["node_id"] in by_node
+        ],
+        "max_rank": t["max"],
+        "description_template": t["desc"],
+        "spell_id": t["spell_id"],
+        "provenance": make_provenance(
+            deps,
+            game_version=load_version(deps).game_version,
+            data_sha=load_version(deps).data_sha,
+            freshness=freshness_for_version(deps, load_version(deps).game_version, allow_network=False)["freshness"],
+            certainty=certainty,
+            assumptions=notes,
+        ),
+    }
+
+
+def check_talents(deps: Deps, cls: str, talents: dict[str, int], level: int) -> dict[str, Any]:
+    """Légalité d'un build d'une des 9 classes au niveau donné : légal ou erreurs, points, description des talents
+    pris (PV1, bloc E).
+
+    Registre : G3"""
+    from forever.engine.talents import check_class_build
+
+    cls_name, knowledge, gd = _class_knowledge(deps, cls)
+    rules = gd.constants.talents
+    errors = check_class_build(knowledge, rules, talents, level)
+    entries = {t["key"]: t for tree in knowledge.trees for t in tree["talents"]}
+    taken = [
+        {
+            "key": k,
+            "name": entries[k]["name"],
+            "rank": r,
+            "max_rank": entries[k]["max"],
+            "tree": entries[k]["tree"],
+            "description_template": entries[k]["desc"],
+        }
+        for k, r in talents.items()
+        if k in entries and r > 0
+    ]
+    by_tree: dict[str, int] = {}
+    for t in taken:
+        by_tree[t["tree"]] = by_tree.get(t["tree"], 0) + int(t["rank"])
+    community = [k for k in talents if k in entries and entries[k]["tier"] is None and entries[k].get("tier_community")]
+    notes = [f"légalité contrôlée sur classes.json ({cls_name}) : points par palier, rangs, prérequis, niveau"]
+    if community:
+        notes.append(f"palier communautaire (probable) pour {', '.join(community)}")
+    data = load_version(deps)
+    return {
+        "kind": "build_check",
+        "class": cls_name,
+        "level": level,
+        "legal": not errors,
+        "errors": errors,
+        "points": {
+            "spent": sum(max(0, r) for r in talents.values()),
+            "available": max(0, level - (rules.first_level - 1)),
+            "by_tree": by_tree,
+        },
+        "talents": taken,
+        "provenance": make_provenance(
+            deps,
+            game_version=data.game_version,
+            data_sha=data.data_sha,
+            freshness=freshness_for_version(deps, data.game_version, allow_network=False)["freshness"],
+            certainty="probable" if community else "certain",
+            assumptions=notes,
+        ),
+    }

@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 from forever.config import Deps
-from forever.engine.talents import check_build
+from forever.engine.talents import check_build, check_class_build
 from forever.errors import DataSchemaError, InvalidArgumentError
 from forever.gamedata import RACES_FILE, RACIALS_FILE, build_game_data, mage_races
 from forever.provenance import Provenance, local_provenance
@@ -243,9 +243,37 @@ def _mage_errors(deps: Deps, c: Mapping[str, Any]) -> list[tuple[str, str]]:
     return []
 
 
+def validation_errors(deps: Deps, c: Mapping[str, Any]) -> list[str]:
+    """Erreurs de race, de niveau et de talents d'un personnage contre les données courantes (liste vide : légal).
+    Mage : contrôle du moteur du Mage ; autres classes (PV1) : race permise (`races.json`, nom ou jeton du client),
+    légalité du build sur `classes.json` (`check_class_build`)."""
+    cls = c.get("class")
+    if cls == "Mage":
+        return [message for message, _ in _mage_errors(deps, c)]
+    data = load_version(deps)
+    gd = build_game_data(data)
+    if not isinstance(cls, str) or cls not in gd.classes:
+        return [f"classe {cls} absente des données (classes.json)"]
+    errors = []
+    race = c.get("race")
+    if race is not None and (data.path / RACES_FILE).is_file():
+        races = data.read_json(RACES_FILE)["races"]
+        allowed = {n for n, r in races.items() if cls in r["classes"]}
+        allowed |= {r["client_file"] for n, r in races.items() if cls in r["classes"]}
+        if race not in allowed:
+            errors.append(f"race {race} non permise pour {cls} (races.json)")
+    talents = c.get("talents") or {}
+    level = c.get("level")
+    if talents and level is None:
+        errors.append("niveau inconnu : légalité des talents non contrôlée")
+    elif level is not None:
+        errors += check_class_build(gd.classes[cls], gd.constants.talents, talents, level)
+    return errors
+
+
 def is_valid(deps: Deps, c: Mapping[str, Any]) -> bool:
-    """Personnage contrôlé et légal (Mage seulement à ce jour), sans lever d'erreur."""
-    return c.get("class") == "Mage" and not _mage_errors(deps, c)
+    """Personnage contrôlé et légal (9 classes), sans lever d'erreur."""
+    return c.get("class") is not None and not validation_errors(deps, c)
 
 
 def _check_level(deps: Deps, level: int) -> None:
@@ -311,7 +339,7 @@ def set_character(
             conflicts.append(record)
     if conflicts:
         raw["conflicts"] = conflicts
-    raw["validated"] = flat["class"] == "Mage"
+    raw["validated"] = is_valid(deps, flat)
     raw["game_version"] = current_identity(deps.data_dir).game_version
     raw["updated_at"] = at
     chars[name] = raw

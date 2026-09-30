@@ -19,8 +19,8 @@ from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.leveling import LevelingReport, parse_talents, simulate_leveling
-from forever.lookup import lookup_spell, lookup_talent, lookup_zones
-from forever.profile import ProfileView, read_profile
+from forever.lookup import check_talents, lookup_class_talent, lookup_spell, lookup_talent, lookup_zones
+from forever.profile import ProfileView, normalize_class, read_profile
 from forever.provenance import error_payload
 from forever.pvp import compact, pvp_report
 from forever.status import StatusReport, status_report
@@ -80,6 +80,7 @@ def build_server(deps: Deps) -> MCPServer:
         race: str | None = None,
         talents: str | None = None,
         opponent_level: int | None = None,
+        class_name: str | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -96,7 +97,9 @@ def build_server(deps: Deps) -> MCPServer:
         « si talent »), `opponent_level` : fiche PvP fixe tirée du client (contrôles, défensifs, ruptures,
         interruptions, dissipations, recharges, raciaux, bijoux), listes paginées (`limit`, `offset`, `totals`),
         valeurs avec leur chemin dans les données si `detail=True`, `missing` à citer. Ne lit jamais le profil :
-        passer la classe, le niveau, la race et les talents lus par forever_player_profile."""
+        passer la classe, le niveau, la race et les talents lus par forever_player_profile.
+        PV1 : `kind="talent"` avec `class_name` (9 classes, défaut Mage) ; `kind="build_check"` avec `name` (classe),
+        `level` et `talents` (« clé=rang,… ») : légal ou liste des erreurs, description des talents du client."""
         try:
             if kind == "zones":
                 path = Path(questie) if questie else None
@@ -104,7 +107,13 @@ def build_server(deps: Deps) -> MCPServer:
             if kind == "talent":
                 if not name:
                     raise InvalidArgumentError("Nom du talent manquant.", "donner name (nom anglais ou clé du talent)")
+                if class_name and normalize_class(class_name) != "Mage":
+                    return lookup_class_talent(deps, class_name, name)
                 return dict(lookup_talent(deps, name, rank))
+            if kind == "build_check":
+                if not name or level is None:
+                    raise InvalidArgumentError("Classe ou niveau manquant.", "donner name (classe), level et talents")
+                return check_talents(deps, name, parse_talents(talents) if talents else {}, level)
             if kind == "pvp":
                 if not name:
                     raise InvalidArgumentError("Classe manquante.", "donner name (classe, nom français ou anglais)")
@@ -119,7 +128,7 @@ def build_server(deps: Deps) -> MCPServer:
                 )
                 return compact(report, detail=detail, limit=limit, offset=offset)
             if kind != "spell":
-                raise UnsupportedKindError(f"type « {kind} »", ["spell", "talent", "zones", "pvp"])
+                raise UnsupportedKindError(f"type « {kind} »", ["spell", "talent", "zones", "pvp", "build_check"])
             if not name:
                 raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")
             return dict(lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset))

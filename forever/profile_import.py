@@ -105,7 +105,23 @@ class _Stamper:
         return make_field(value, source, format_utc(moment), build, certainty)
 
 
-def _from_logger(path: Path, stamp: _Stamper, offset: timedelta | None) -> dict[str, _Seen]:
+def node_keys(data: VersionData) -> dict[str, dict[str, str]]:
+    """Classe -> identifiant de nœud (texte) -> clé de talent, d'après `classes.json` (vide sans ce fichier)."""
+    if not (data.path / CLASSES_FILE).is_file():
+        return {}
+    return {
+        cls: {str(t["node_id"]): t["key"] for tree in c["trees"] for t in tree["talents"]}
+        for cls, c in data.read_json(CLASSES_FILE)["classes"].items()
+    }
+
+
+def _from_logger(
+    path: Path,
+    stamp: _Stamper,
+    offset: timedelta | None,
+    nodes: Mapping[str, Mapping[str, str]] | None = None,
+    notes: list[str] | None = None,
+) -> dict[str, _Seen]:
     db = read_logger_db(path)
     out: dict[str, _Seen] = {}
     for guid, c in db.characters.items():
@@ -131,8 +147,15 @@ def _from_logger(path: Path, stamp: _Stamper, offset: timedelta | None) -> dict[
                 seen.fields["level"] = stamp.field(levels[-1][1], "ForeverLogger", levels[-1][0])
             talents = [(m, s.talents) for m, s in snaps if s.talents is not None]
             if talents:
-                nodes = {str(k): v for k, v in sorted(talents[-1][1].items())}
-                seen.fields["talent_nodes"] = stamp.field(nodes, "ForeverLogger", talents[-1][0])
+                taken = {str(k): v for k, v in sorted(talents[-1][1].items())}
+                seen.fields["talent_nodes"] = stamp.field(taken, "ForeverLogger", talents[-1][0])
+                known = (nodes or {}).get(cls or "")
+                if known:
+                    keys = {known[n]: r for n, r in taken.items() if n in known and r > 0}
+                    unknown = sorted(n for n in taken if n not in known)
+                    if unknown and notes is not None:
+                        notes.append(f"{c.name} : nœud(s) de talent inconnu(s) de classes.json ({', '.join(unknown)})")
+                    seen.fields["talents"] = stamp.field(keys, "ForeverLogger", talents[-1][0])
         out[guid] = seen
     return out
 
@@ -261,7 +284,7 @@ def plan_import(
     }
     notes += [f"source absente : {name}" for name, path in sources.items() if path is None]
 
-    seen = _from_logger(logger, stamp, utc_offset) if logger else {}
+    seen = _from_logger(logger, stamp, utc_offset, node_keys(data), notes) if logger else {}
     skipped: list[dict[str, Any]] = []
     for guid, (name, realm, last, casts) in (_from_logs(logs, utc_offset, notes) if logs else {}).items():
         if guid in seen:

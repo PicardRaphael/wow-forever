@@ -43,7 +43,16 @@ from forever.leveling import (
     parse_talents,
     simulate_leveling,
 )
-from forever.lookup import SpellLookup, SpellRank, TalentLookup, lookup_spell, lookup_talent, lookup_zones
+from forever.lookup import (
+    SpellLookup,
+    SpellRank,
+    TalentLookup,
+    lookup_class_talent,
+    lookup_spell,
+    lookup_talent,
+    lookup_zones,
+)
+from forever.lookup import check_talents as check_class_talents
 from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
@@ -81,7 +90,16 @@ from forever.pipeline.refresh import (
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
-from forever.profile import ProfileView, load_profile, read_profile, remove, resolve_path, set_character, use
+from forever.profile import (
+    ProfileView,
+    load_profile,
+    normalize_class,
+    read_profile,
+    remove,
+    resolve_path,
+    set_character,
+    use,
+)
 from forever.profile_import import ImportPlan, apply_import, plan_import
 from forever.provenance import (
     Certainty,
@@ -125,6 +143,7 @@ def build_parser() -> argparse.ArgumentParser:
     lookup.add_argument("--faction", choices=["horde", "alliance"], help="zones : faction (défaut : toutes)")
     lookup.add_argument("--questie", help="zones : dossier de l'addon Questie (défaut : dans FOREVER_WOW_DIR)")
     lookup.add_argument("--rank", type=int, help="position du rang, à partir de 1")
+    lookup.add_argument("--class", dest="cls", help="talent : classe (défaut : Mage ; 9 classes depuis PV1)")
     lookup.add_argument("--detail", action="store_true", help="champs complémentaires")
     lookup.add_argument("--limit", type=int, default=20, help="rangs par page")
     lookup.add_argument("--offset", type=int, default=0, help="premier rang de la page (à partir de 0)")
@@ -340,6 +359,14 @@ def build_parser() -> argparse.ArgumentParser:
         "--talented-bonus", type=int, default=0, help="points du bonus Legacy « Talented » (défaut : 0, hypothèse)"
     )
     b.add_argument("--json", action="store_true", help="sortie JSON")
+
+    tal = sub.add_parser("talents", help="talents des 9 classes (savoir du client)")
+    tal_sub = tal.add_subparsers(dest="talents_cmd", required=True)
+    tal_check = tal_sub.add_parser("check", help="légalité d'un build : légal ou liste des erreurs")
+    tal_check.add_argument("--class", dest="cls", required=True, help="classe (nom français ou anglais)")
+    tal_check.add_argument("--level", type=int, required=True, help="niveau du personnage")
+    tal_check.add_argument("points", nargs="*", help="talents « clé=rang » (clés de classes.json)")
+    tal_check.add_argument("--json", action="store_true", help="sortie JSON")
 
     pvp = sub.add_parser("pvp", help="fiches PvP fixes des 9 classes (savoir du client, sans calcul de combat)")
     pvp_sub = pvp.add_subparsers(dest="pvp_cmd", required=True)
@@ -607,6 +634,18 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
     if args.kind == "talent":
         if not args.name:
             raise InvalidArgumentError("Nom du talent manquant.", "écrire forever lookup talent <nom>")
+        if args.cls and normalize_class(args.cls) != "Mage":
+            other = lookup_class_talent(deps, args.cls, args.name)
+            lines = [
+                (
+                    f"{other['name']} ({other['class']}, {other['tree']}, palier {other['tier'] or '?'}, "
+                    f"colonne {other['col'] or '?'}, {other['max_rank']} rang(s))"
+                ),
+                f"Description : {other['description_template']}",
+            ]
+            lines += [f"Prérequis : {p['name']} ({p['kind']})" for p in other["prereqs"]]
+            _emit(other, lines, other["provenance"], args.json)
+            return EXIT_OK
         talent = lookup_talent(deps, args.name, args.rank)
         _emit(talent, render_talent(talent), talent["provenance"], args.json)
         return EXIT_OK
@@ -910,6 +949,22 @@ def render_pvp(report: Mapping[str, Any]) -> list[str]:
     lines += [f"Manquant : {m}" for m in report["missing"]]
     lines += [f"Limite : {x}" for x in report["limits"]]
     return lines
+
+
+def _cmd_talents(deps: Deps, args: argparse.Namespace) -> int:
+    points = parse_talents(",".join(args.points)) if args.points else {}
+    report = check_class_talents(deps, args.cls, points, args.level)
+    verdict = "légal" if report["legal"] else "illégal"
+    lines = [
+        (
+            f"Build {report['class']} niveau {report['level']} : {verdict} "
+            f"({report['points']['spent']}/{report['points']['available']} points)"
+        )
+    ]
+    lines += [f"  erreur : {e}" for e in report["errors"]]
+    lines += [f"  {t['name']} {t['rank']}/{t['max_rank']} : {t['description_template']}" for t in report["talents"]]
+    _emit(report, lines, report["provenance"], args.json)
+    return EXIT_OK
 
 
 def _cmd_pvp(deps: Deps, args: argparse.Namespace) -> int:
@@ -1773,6 +1828,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "install": _cmd_install,
         "profile": _cmd_profile,
         "pvp": _cmd_pvp,
+        "talents": _cmd_talents,
         "diff": _cmd_diff,
         "verify": _cmd_verify,
         "report": _cmd_report,

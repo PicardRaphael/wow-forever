@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from forever.engine.model import GameData, Points
+from forever.engine.model import ClassKnowledge, GameData, Points, TalentRules
 
 
 def talent_value(gd: GameData, pts: Points, key: str, i: int = 0, default: float = 0.0) -> float:
@@ -120,3 +120,60 @@ def build_points(gd: GameData, pts: Points, level: int, talented_bonus: int = 0)
     total = sum(by_tree.values())
     available = points_available(gd, level, talented_bonus)
     return {"by_tree": by_tree, "total": total, "available": available, "unspent": available - total}
+
+
+def check_class_build(
+    knowledge: ClassKnowledge, rules: TalentRules, pts: Points, level: int, talented_bonus: int = 0
+) -> list[str]:
+    """Erreurs de légalité d'un build d'une des 9 classes (liste vide : légal), d'après son savoir décodé du client
+    (`classes.json`) : points disponibles au niveau, rangs maximaux, points exigés par palier dans l'arbre,
+    prérequis (requis : tous au maximum ; suffisants : un au maximum). Palier inconnu : palier communautaire s'il
+    existe (probable), sinon légalité non décidable (erreur).
+
+    Registre : G3"""
+    per_tier = rules.points_per_tier
+    known = {t["key"]: t for tree in knowledge.trees for t in tree["talents"]}
+    by_node = {t["node_id"]: t for t in known.values()}
+
+    def tier_of(t: Any) -> int | None:
+        if t.get("tier") is not None:
+            return int(t["tier"])
+        community = t.get("tier_community")
+        return int(community["tier"]) if community else None
+
+    err = []
+    total = sum(pts.values())
+    available = max(0, level - (rules.first_level - 1) + talented_bonus)
+    if total > available:
+        err.append(f"{total} points pour {available} disponibles au niveau {level}")
+    for k, r in pts.items():
+        if r <= 0:
+            continue
+        if k not in known:
+            err.append(f"talent inconnu : {k}")
+            continue
+        t = known[k]
+        if r > t["max"]:
+            err.append(f"{t['name']} : {r}/{t['max']}")
+        tier = tier_of(t)
+        if tier is None:
+            err.append(f"{t['name']} : palier inconnu (nœud hors grille), légalité non décidable")
+            continue
+        before = sum(
+            v
+            for kk, v in pts.items()
+            if kk in known and known[kk]["tree"] == t["tree"] and (tier_of(known[kk]) or tier) < tier
+        )
+        if before < per_tier * (tier - 1):
+            err.append(f"{t['name']} (palier {tier}) exige {per_tier * (tier - 1)} points avant, {before} dépensés")
+        required = [by_node[p["node_id"]] for p in t["prereqs"] if p["kind"] == "required" and p["node_id"] in by_node]
+        sufficient = [
+            by_node[p["node_id"]] for p in t["prereqs"] if p["kind"] != "required" and p["node_id"] in by_node
+        ]
+        for p in required:
+            if pts.get(p["key"], 0) < p["max"]:
+                err.append(f"{t['name']} exige {p['name']} au maximum")
+        if sufficient and not any(pts.get(p["key"], 0) >= p["max"] for p in sufficient):
+            names = " ou ".join(p["name"] for p in sufficient)
+            err.append(f"{t['name']} exige {names} au maximum")
+    return err

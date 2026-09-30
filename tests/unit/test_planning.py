@@ -120,7 +120,7 @@ def test_planned_character(pdeps):
     view = read_profile(pdeps, "Futur")
     c = view["character"]
     assert c is not None and c["planned"] is True and c["class"] == "Druid" and c["level"] is None
-    assert c["validated"] is False
+    assert c["validated"] is True  # PV1 : 9 classes contrôlées ; Tauren permis pour le Druide (races.json)
     assert view["missing"] == []  # ni niveau ni talents attendus d'un personnage prévu
     set_character(pdeps, "Futur", planned=False)  # créé en jeu : niveau et talents attendus
     view = read_profile(pdeps, "Futur")
