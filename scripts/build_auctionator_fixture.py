@@ -6,7 +6,7 @@ Valeurs inventées (pas des relevés). La forme reproduit celle de mes SavedVari
 `AUCTIONATOR_PRICE_DATABASE = {["__dbversion"] = 8, ["<royaume>"] = "<chaîne CBOR>"}`, chaîne écrite octet par
 octet avec les échappements du client (`\\"`, `\\\\`, `\\n`, `\\r`, `\\000`), lignes terminées par CRLF comme le
 fichier du client. `AUCTIONATOR_POSTING_HISTORY` porte une sentinelle que l'import ne doit jamais lire. Encodeur
-CBOR minimal (RFC 8949 : entiers positifs, texte, tables), écrit pour cette fixture seulement."""
+CBOR minimal (RFC 8949 : entiers positifs, chaînes d'octets, tables), écrit pour cette fixture seulement."""
 
 from __future__ import annotations
 
@@ -33,9 +33,9 @@ def encode(value: object) -> bytes:
         if value < 0:
             raise ValueError(value)
         return _head(0, value)
-    if isinstance(value, str):
+    if isinstance(value, str):  # chaîne Lua : chaîne d'octets CBOR (type majeur 2), comme dans le fichier du client
         raw = value.encode("utf-8")
-        return _head(3, len(raw)) + raw
+        return _head(2, len(raw)) + raw
     if isinstance(value, dict):
         return _head(5, len(value)) + b"".join(encode(k) + encode(v) for k, v in value.items())
     raise TypeError(value)

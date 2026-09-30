@@ -190,3 +190,14 @@ def split_by_version(
             )
         )
     return keep, held, unknown
+
+
+def current_builds(cache_dir: Path, wow_dir: Path | None) -> list[ClientBuild]:
+    """Journal des versions du client, complété du relevé courant quand le dossier du client est lisible (T08a).
+
+    Rien n'est écrit si `.build.info` est absent : l'attribution reste alors inconnue, jamais devinée."""
+    if wow_dir is not None:
+        found = read_build_info(wow_dir)
+        if found is not None:
+            return record_build(cache_dir, found)
+    return load_builds(cache_dir)

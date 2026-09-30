@@ -11,7 +11,7 @@ from __future__ import annotations
 import re
 from functools import cached_property
 from pathlib import Path
-from typing import Literal, NamedTuple, TypedDict
+from typing import Any, Literal, NamedTuple, TypedDict
 
 from forever.engine.leveling import USEFUL_COLORS, level_band, quest_color
 from forever.engine.model import GameData
@@ -372,10 +372,10 @@ def _items(text: str, start: int, end: int) -> dict[str, tuple[int, int]]:
     return out
 
 
-def read_journey(sv: Path, guid: str) -> list[tuple[int, int]]:
-    """(heure Unix, niveau atteint) des événements `Level` du carnet de Questie pour le personnage `guid`, triés ;
-    tous les blocs `char` du GUID sont réunis (Questie peut en écrire plusieurs, dont un « Unknown »).
-    PathNotFoundError si le fichier manque ; DataSchemaError s'il ne contient pas `QuestieConfig`."""
+def _journey_events(sv: Path, guid: str) -> list[dict[Any, Any]]:
+    """Événements du carnet (`journey`) de Questie pour le personnage `guid`, tous blocs `char` réunis (Questie peut
+    en écrire plusieurs, dont un « Unknown »). PathNotFoundError si le fichier manque ; DataSchemaError s'il ne
+    contient pas `QuestieConfig`."""
     if not sv.is_file():
         raise PathNotFoundError(
             "SavedVariables de Questie",
@@ -386,7 +386,7 @@ def read_journey(sv: Path, guid: str) -> list[tuple[int, int]]:
     found = _VARIABLE.search(text)
     if found is None:
         raise DataSchemaError(f"{sv.name} : variable {JOURNEY_VARIABLE} absente.")
-    out: list[tuple[int, int]] = []
+    out: list[dict[Any, Any]] = []
     try:
         root = found.end() - 1
         chars = _items(text, root, _table_end(text, root)).get("char")
@@ -398,14 +398,21 @@ def read_journey(sv: Path, guid: str) -> list[tuple[int, int]]:
             if g is None or journey is None or text[g[0] + 1 : g[1] - 1] != guid:
                 continue
             events = parse_lua_value(text[journey[0] : journey[1]])
-            for e in events if isinstance(events, list) else []:
-                if not isinstance(e, dict) or e.get("Event") != "Level":
-                    continue
-                ts, level = e.get("Timestamp"), e.get("NewLevel")
-                if isinstance(ts, int) and isinstance(level, int):
-                    out.append((ts, level))
+            out += [e for e in (events if isinstance(events, list) else []) if isinstance(e, dict)]
     except ValueError as exc:
         raise DataSchemaError(f"{sv.name} : {exc}.") from exc
+    return out
+
+
+def read_journey(sv: Path, guid: str) -> list[tuple[int, int]]:
+    """(heure Unix, niveau atteint) des événements `Level` du carnet de Questie pour le personnage `guid`, triés ;
+    tous les blocs `char` du GUID sont réunis (Questie peut en écrire plusieurs, dont un « Unknown »).
+    PathNotFoundError si le fichier manque ; DataSchemaError s'il ne contient pas `QuestieConfig`."""
+    out: list[tuple[int, int]] = []
+    for e in _journey_events(sv, guid):
+        ts, level = e.get("Timestamp"), e.get("NewLevel")
+        if e.get("Event") == "Level" and isinstance(ts, int) and isinstance(level, int):
+            out.append((ts, level))
     return sorted(out)
 
 
@@ -521,5 +528,11 @@ def zones_for_level(
 
 def read_completed_quests(sv: Path, guid: str) -> list[tuple[int, int]]:
     """(identifiant de quête, heure Unix du rendu) des événements `Quest` de sous-type `Complete` du carnet de Questie
-    pour le personnage `guid`, tous blocs `char` réunis, triés ; quêtes acceptées ou abandonnées ignorées."""
-    raise NotImplementedError
+    pour le personnage `guid`, tous blocs `char` réunis, triés par heure ; quêtes acceptées ou abandonnées ignorées."""
+    out: list[tuple[int, int]] = []
+    for e in _journey_events(sv, guid):
+        quest, ts = e.get("Quest"), e.get("Timestamp")
+        done = e.get("Event") == "Quest" and e.get("SubType") == "Complete"
+        if done and isinstance(quest, int) and isinstance(ts, int):
+            out.append((quest, ts))
+    return sorted(out, key=lambda q: (q[1], q[0]))

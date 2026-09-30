@@ -3,9 +3,9 @@ AUCTIONATOR_CONFIG = {
 }
 AUCTIONATOR_PRICE_DATABASE = {
 ["__dbversion"] = 8,
-["RoyaumePvE"] = "¡gversion",
-["Royaume"] = "¥d1001¤amxah¢d2462–d2463xal¡d2463naa¢d2462d2463d1002¤am\nah¡d2463\nal aa¡d2463\rd1003¤am¯Èah¡d2463¯Èal aa d1004¤am\"ah¡d2463\"al aa¡d2463\\d1005¤am\000ah¡d2463\000al aa¡d2463\000",
-["AutreRoyaume"] = "¡d1001¤amcah¡d2460cal aa¡d2460",
+["RoyaumePvE"] = "¡Gversion",
+["Royaume"] = "¥D1001¤AmxAh¢D2462–D2463xAl¡D2463nAa¢D2462D2463D1002¤Am\nAh¡D2463\nAl Aa¡D2463\rD1003¤Am¯ÈAh¡D2463¯ÈAl Aa D1004¤Am\"Ah¡D2463\"Al Aa¡D2463\\D1005¤Am\000Ah¡D2463\000Al Aa¡D2463\000",
+["AutreRoyaume"] = "¡D1001¤AmcAh¡D2460cAl Aa¡D2460",
 }
 AUCTIONATOR_POSTING_HISTORY = {
 ["1001"] = {

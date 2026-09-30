@@ -48,9 +48,7 @@ from forever.manifest import load_manifest, version_dirs, write_manifest
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
 from forever.pipeline.client_builds import (
-    load_builds,
-    read_build_info,
-    record_build,
+    current_builds,
     split_by_version,
     version_at,
 )
@@ -83,7 +81,8 @@ from forever.pipeline.refresh import (
 from forever.pipeline.report import render_report
 from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
-from forever.profile import ProfileView, load_profile, read_profile, remove, set_character, use
+from forever.profile import ProfileView, load_profile, read_profile, remove, resolve_path, set_character, use
+from forever.profile_import import ImportPlan, apply_import, plan_import
 from forever.provenance import (
     Certainty,
     Provenance,
@@ -187,6 +186,16 @@ def build_parser() -> argparse.ArgumentParser:
     prm.add_argument("name", help="nom du personnage")
     prm.add_argument("--yes", action="store_true", help="retirer sans demander l'accord")
     prm.add_argument("--json", action="store_true", help="sortie JSON")
+    pimp = psub.add_parser(
+        "import", help="remplir le profil depuis ForeverLogger, Questie, Auctionator et les journaux (sans réseau)"
+    )
+    pimp.add_argument("--wtf", help="dossier SavedVariables (défaut : WTF/Account/*/SavedVariables du client)")
+    pimp.add_argument("--logs", help="dossier des journaux de combat (défaut : Logs du client)")
+    pimp.add_argument("--utc-offset", type=float, help="décalage de l'heure locale des journaux, en heures")
+    pmode = pimp.add_mutually_exclusive_group()
+    pmode.add_argument("--dry-run", action="store_true", help="lister les changements sans rien écrire")
+    pmode.add_argument("--yes", action="store_true", help="écrire sans demander l'accord")
+    pimp.add_argument("--json", action="store_true", help="sortie JSON")
 
     install = sub.add_parser(
         "install", help="installer une candidate en révision suivante de la version courante (T06b)"
@@ -770,8 +779,65 @@ def _parse_professions(items: list[str]) -> dict[str, int] | None:
     return out
 
 
+def _import_lines(plan: ImportPlan) -> list[str]:
+    def shown(value: Any) -> str:
+        text = json.dumps(value, ensure_ascii=False) if isinstance(value, dict | list) else str(value)
+        return text if len(text) <= 80 else text[:77] + "…"
+
+    lines = [f"Import du profil : {len(plan['changes'])} changement(s)"]
+    for c in plan["changes"]:
+        who = c["character"] if c["character"] is not None else f"royaume {c.get('realm')}"
+        build = c["client_build"] or "inconnue"
+        lines.append(
+            f"  {who} · {c['field']} : {shown(c['old'])} → {shown(c['new'])} ({c['source']}, {c['at']}, client {build})"
+        )
+    lines += [
+        f"  désaccord · {c['character']} · {c['field']} : gardé {shown(c['kept']['value'])} ({c['kept']['source']}), "
+        f"autre {shown(c['other']['value'])} ({c['other']['source']})"
+        for c in plan["conflicts"]
+    ]
+    lines += [f"  non créé · {s['name']} ({s['guid']}) : {s['reason']}" for s in plan["skipped"]]
+    return lines
+
+
+def _cmd_profile_import(deps: Deps, args: argparse.Namespace) -> int:
+    sv_dir = Path(args.wtf) if args.wtf else _default_sv(deps)
+    logs_dir = Path(args.logs) if args.logs else (deps.wow_dir / "Logs" if deps.wow_dir is not None else None)
+    offset = timedelta(hours=args.utc_offset) if args.utc_offset is not None else None
+    plan = plan_import(deps, sv_dir=sv_dir, logs_dir=logs_dir, utc_offset=offset)
+    lines = _import_lines(plan)
+    printed = False
+    if not plan["changes"]:
+        status = "aucun changement"
+    elif args.dry_run:
+        status = "simulation"
+    elif args.yes:
+        apply_import(deps, plan)
+        status = "écrit"
+    else:
+        if deps.confirm is not None and not args.json:
+            print("\n".join(lines))  # changements listés avant la demande d'accord
+            printed = True
+        if deps.confirm is not None and deps.confirm("Écrire ces changements dans le profil ? [o/N] "):
+            apply_import(deps, plan)
+            status = "écrit"
+        else:
+            status = "refusé"
+    verdict = {
+        "aucun changement": "Aucun changement : rien n'est écrit.",
+        "simulation": "Import en simulation : rien n'est écrit (--yes pour écrire).",
+        "écrit": f"Profil écrit : {resolve_path(deps)}.",
+        "refusé": "Import refusé : rien n'est écrit.",
+    }[status]
+    payload = {key: value for key, value in plan.items() if key != "doc"} | {"status": status}
+    _emit(payload, [*([] if printed else lines), verdict, *plan["notes"]], plan["provenance"], args.json)
+    return EXIT_OK
+
+
 def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
     cmd = args.profile_cmd
+    if cmd == "import":
+        return _cmd_profile_import(deps, args)
     name: str | None = getattr(args, "name", None)
     target = name or ""
     if cmd == "set":
@@ -932,14 +998,8 @@ def _log_provenance(deps: Deps, headers: list[LogHeader], certainty: Certainty, 
 
 
 def _client_builds(deps: Deps) -> list[Any]:
-    """Journal des versions du client, complété du relevé courant quand le dossier du client est lisible (T08a).
-
-    Rien n'est écrit si `.build.info` est absent : l'attribution reste alors inconnue, jamais devinée."""
-    if deps.wow_dir is not None:
-        found = read_build_info(deps.wow_dir)
-        if found is not None:
-            return record_build(deps.cache_dir, found)
-    return load_builds(deps.cache_dir)
+    """Journal des versions du client, complété du relevé courant quand le dossier du client est lisible (T08a)."""
+    return current_builds(deps.cache_dir, deps.wow_dir)
 
 
 def _summary_json(s: LogSummary, builds: list[Any]) -> dict[str, Any]:

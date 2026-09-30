@@ -107,8 +107,8 @@ CLASSES_FR = {
 def test_all_nine_classes_are_accepted(pdeps):
     for i, (fr, en) in enumerate(CLASSES_FR.items()):
         doc = set_character(pdeps, f"P{i}", cls=fr, planned=True)
-        assert doc["characters"][f"P{i}"]["class"] == en
-        assert set_character(pdeps, f"E{i}", cls=en, planned=True)["characters"][f"E{i}"]["class"] == en
+        assert doc["characters"][f"P{i}"]["class"]["value"] == en  # schéma 2 (PV1) : champ sourcé
+        assert set_character(pdeps, f"E{i}", cls=en, planned=True)["characters"][f"E{i}"]["class"]["value"] == en
     with pytest.raises(InvalidArgumentError):
         set_character(pdeps, "X", cls="Chevalier de la mort")
 
