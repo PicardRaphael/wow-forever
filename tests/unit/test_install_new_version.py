@@ -50,7 +50,7 @@ INHERITED = (
 )
 # PV1 : racials.json retiré (races.json décodé), fichiers des 9 classes et copie figée hérités de la version courante.
 PV1_RETIRED = {"racials.json"}
-PV1_ADDED = {"_seed_racials.json", "classes.json", "races.json", "pvp_items.json"}
+PV1_ADDED = {"_seed_racials.json", "classes.json", "races.json", "pvp_items.json", "pvp_rules.json"}
 
 
 def strip_provenance(doc):
