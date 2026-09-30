@@ -15,7 +15,9 @@ ni du code n'a changé. Aucun contenu n'a été recompté : les comptes des sect
 2026-09-28 et doivent être relus par `forever addons status` (DJ1, décision 124).
 
 Les **quatre addons conseillés par la décision 133 sont installés** (AtlasLoot mis à jour, Forever Guide,
-Legacy Forever, Zone Level: Forever). Neuf autres addons, non conseillés par l'agent, sont apparus.
+Legacy Forever, Zone Level: Forever). D'autres addons, jamais conseillés par l'agent, sont **présents sans avoir
+été inventoriés** jusqu'ici : leurs fichiers datent pour la plupart d'avant le relevé du 2026-09-28, ils n'étaient
+donc pas nouveaux, seulement hors de l'inventaire.
 
 ### Empreintes de référence (pour `forever addons status`)
 
@@ -39,7 +41,7 @@ antérieur n'existe**, un premier passage de `forever addons status` ne pourra d
 | CraftingOrderClassic | **1.40.0** | 215 | 13 Mo | `0455f0f3167c` | 2026-09-30 |
 | RXPGuides | **v4.11.11** | 402 | 43 Mo | `9a62e39fe16b` | 2026-09-28 |
 | ForeverMapFix | **0.2.0** | 2 | 84 Mo | `c58bbcce05af` | 2026-09-21 |
-| AtlasBIStooltips | **1.0.1** | 32 | 1 Mo | `cb98d658c574` | 2026-09-21 |
+| AtlasBIStooltips | **1.0.1** | 32 | 1 Mo | `cb98d658c574` | 2026-09-30 |
 | RaphCompletionist | **0.2.1** | 5 | 1 Mo | `27159f4bdb32` | 2026-09-21 |
 
 ### Écarts avec le relevé du matin (non résolus)
@@ -80,7 +82,7 @@ C'est la **même source que forever-core** (wago.tools), à la même version (70
 comparables aux nôtres, et son `tools/gen_legacy.py` donne la liste des tables du client à lire pour le Legacy —
 un raccourci pour l'inventaire de LG1. Licence GPL-3 : agrégats seulement dans le dépôt, comme partout.
 
-### Les autres addons apparus (non conseillés par l'agent)
+### Les autres addons présents, non inventoriés jusqu'ici
 
 | Addon | Version | Licence | Nature | Donnée exploitable ? |
 | --- | --- | --- | --- | --- |

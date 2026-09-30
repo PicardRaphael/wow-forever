@@ -36,8 +36,8 @@ new file mode 100644
 +        run: |
 +          set -euo pipefail
 +          uv run forever builds --json > builds.json
-+          latest=$(python -c "import json;print(json.load(open('builds.json'))['latest'])")
-+          installed=$(python -c "import json;print(json.load(open('forever/data/manifest.json'))['game_version'])")
++          latest=$(uv run python -c "import json;print(json.load(open('builds.json'))['latest'])")
++          installed=$(uv run python -c "import json;print(json.load(open('forever/data/manifest.json'))['game_version'])")
 +          echo "latest=$latest" >> "$GITHUB_OUTPUT"
 +          echo "installed=$installed" >> "$GITHUB_OUTPUT"
 +          if [ "$latest" = "$installed" ]; then echo "nouvelle=non" >> "$GITHUB_OUTPUT";
@@ -49,7 +49,7 @@ new file mode 100644
 +        if: steps.versions.outputs.nouvelle == 'non'
 +        run: |
 +          set -euo pipefail
-+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
++          uv run python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
 +          import json, datetime
 +          builds = json.load(open("builds.json"))["builds"]
 +          last = max(b["created_at"] for b in builds)

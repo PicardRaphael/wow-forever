@@ -87,8 +87,9 @@ Ce constat ne dépend pas du décodeur, qui ne couvre que le Mage jusqu'à PV1 :
 ### Correctifs serveur (hotfixes)
 
 Les tables téléchargées sont celles **livrées** avec le client. Les correctifs poussés par le serveur les
-surchargent à l'exécution et n'y apparaissent pas (décision 128). Relevé de `Logs/Hotfix.log` (106 307 lignes,
-3 démarrages du client le 2026-09-30) :
+surchargent à l'exécution et n'y apparaissent pas (décision 128). Relevé de `Logs/Hotfix.log` (106 307 lignes, **un seul `---- Startup ----`**, à
+08:58:29 le 2026-09-30 : le fichier est recréé à chaque lancement du client et ne couvre donc que la dernière
+session ; ses trois blocs de validation, à 08:58:43, 08:58:59 et 09:07:41, appartiennent à cette seule session) :
 
 | Table surchargée | Enregistrements distincts | Lesquels |
 | --- | --- | --- |
@@ -112,6 +113,7 @@ quête, aucune classe jouable. Les deux lignes `SpellMisc` renvoient aux sorts 1
 | Tables non téléchargées : `Item`, `ItemSparse`, `Creature`, `Quest`, `Map`, `JournalEncounter`… | Un changement d'objet, de monstre, de quête ou de carte en 70124 est invisible ici. Les 4 386 objets surchargés par hotfix indiquent que **quelque chose a bougé côté objets**. |
 | 1.60.1.70058 non décodée | Un changement introduit en 70058 puis annulé en 70124 ne laisserait aucune trace. |
 | `DBCache.bin` | Non lu (hors périmètre, T08). |
+| Correctifs serveur des sessions antérieures | `Logs/Hotfix.log` est recréé à chaque lancement du client : les correctifs reçus pendant la première session du 2026-09-30 et pendant tous les jours sous 70009 sont **perdus**. |
 | Contenu non décodé : `leveling.json`, `mechanics.json`, `monsters.json`, `racials.json`, `respec.json`, `overrides.json` | Hérités de 70009 dans la candidate, à revérifier à l'installation (avertissement de `forever verify`). |
 
 ## Rapport machine (`forever report`)
