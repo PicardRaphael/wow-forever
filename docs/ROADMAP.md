@@ -23,6 +23,7 @@ Sources communautaires (décisions 123 à 131, `docs/DATA_SOURCES.md`) : les add
 | T05 | Builds du Mage par contexte : optimiseur (leveling, donjon, raid, PvP), Arcane Power et Hot Streak dans les rotations, sensibilité, respec | T04b, T04c, T04e |
 | T06 | Plugin Claude Code : skills, hooks, sous-agents, installation au niveau utilisateur, évaluation (sans statusline) | T04b |
 | T06b | Données décodées du client installées pour 1.60.1.70009 (talents redécodés, Hot Streak à 20 s, coûts en mana relevés, changements confirmés appliqués) et totaux dans les sorties des outils (points d'un build par arbre…) pour que le modèle n'ait plus à calculer | T03, T05, T06 |
+| T08a | Installer une **nouvelle** version du jeu (`forever install --new-version` : nouveau dossier, copies figées du seed et changements confirmés reportés, provenance et fraîcheur) ; version du client attachée à chaque session de journal pour qu'une mesure ne soit jamais attribuée à une autre version ; veille quotidienne en CI (fetch, decode, verify, diff, report, PR, rien installé) ; routeur du plugin qui propose l'analyse quand la fraîcheur est en retard | T06b |
 | PV1 | Import automatique minimal du profil (ForeverLogger, journaux), puis PvP : savoir des 9 classes sans moteur de classe (sorts, recharges, contrôles et durées, défensifs, raciaux de toutes les races décodés du client, bijoux, rendements décroissants selon les règles Classic, fiches par affrontement) ; builds de la communauté vérifiés sur le client pour les classes pas encore calculées | T03, T04a, T05, T06b |
 | FA1 | ForeverAssist V1 : talent suivant à chaque gain de niveau, comparaison de l'équipement dans l'infobulle, données précalculées par forever | T04b, T05 |
 | PV2 | PvP, champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux de champs de bataille | PV1, T04a |
@@ -46,7 +47,7 @@ Sources communautaires (décisions 123 à 131, `docs/DATA_SOURCES.md`) : les add
 | LG2 | Suivi de ma progression Legacy (et, par le même import, honneur et rang PvP) | LG1, T07 |
 | MT1 | Métiers : recettes, montée de compétence, points Legacy des métiers, répartition des métiers entre mes personnages | T03, LG1, T07 |
 | RP1 | Réputations : factions, paliers, gains, récompenses, suivi, « combien coûte telle réputation » (gains relevés par ForeverLogger depuis DJ1) | T03, T07, DJ1 |
-| T08 | Veille : workflow planifié, PR de données, note d'impact par personnage ; versions des addons de données (relecture, changements signalés) | T03, T07, DJ1 |
+| T08 | Veille (suite de T08a) : note d'impact par personnage ; versions des addons de données (relecture, changements signalés) ; `forever_diff_versions` ; correctifs serveur (`DBCache.bin`, `Hotfix.log`) | T08a, T07, DJ1 |
 | EC1 | API Blizzard : hôtel des ventes, personnages, PvP (prix, fiches de personnages avec équipement, niveau et talents si disponibles, honneur, rang et classements), branchée sur le profil multi-sources | T03, MT1, T07 ; condition : lancement du 4 novembre passé et couverture de Forever par l'API vérifiée |
 | FA3 | ForeverAssist V3 : compagnon de bureau, analyse des journaux après le combat (reprend `forever analyze` de AN1 et AN2) | T08, AN1, AN2 |
 | T09 | Raid : moteur analytique porté (`seed/grimoire-engine/`), Monte Carlo, parité avec wowsims Forever ; partie raid des classes que couvre ce moteur (Mage, Démoniste, Prêtre, Paladin Sacré et Protection) ; rejeu de raid de AN2 | T02, AN2, PA1, DE1, PR1 |
@@ -147,6 +148,44 @@ Demande de l'utilisateur du 2026-09-29, après l'évaluation du plugin (`docs/re
   101) ; rejeu des builds (`docs/research/builds-T05.md`, section « Rejeu T06b ») ; évaluation (`docs/research/plugin-eval-T06.md`).
 - **Reste pour T08** : chaîne automatique de veille, installation d'une **nouvelle** version de données (copie des
   `_seed_*.json` comprise) et PR de données ; `forever_diff_versions`.
+
+## T08a — Nouvelle version du jeu installée, et veille automatique
+Demande de l'utilisateur du 2026-09-30, à la publication de 1.60.1.70124 (décisions 134 et 135). Plan
+`tasks/T08a-plan.md`, analyse `docs/research/data-1.60.1.70124.md`. Reprend de T08 l'installation d'une
+**nouvelle** version et la veille planifiée ; le reste de T08 ne bouge pas.
+- **Installer une nouvelle version** : `forever install --new-version` (T06b n'installe qu'une **révision** de la
+  version courante). Nouveau dossier `forever/data/<version>/` ; copies figées du seed (`_seed_*.json`,
+  `_source_gunba_mage_tree.json`), `confirmed_changes.json`, `overrides.json` et `sources.json` reportés ;
+  fichiers non décodés (`leveling.json`, `mechanics.json`, `monsters.json`, `racials.json`, `respec.json`) reportés
+  avec la mention « hérité de <version> » et leur date ; `revisions.json` neuf en révision 1 ;
+  `forever manifest --update` ; fraîcheur de retour à `fresh` ; accord avant écriture ; rapport hors des données.
+  Critère : `forever diff` entre les deux versions installées ne montre **aucun fichier retiré**.
+- **Installation de 1.60.1.70124** : les 22 tables du client sont identiques à celles de 1.60.1.70009 (0 talent,
+  0 sort changés) ; l'installation aligne la version des données sur le client joué et remet la fraîcheur à
+  `fresh`, sans changer une seule valeur. Parité du seed et builds de T05 attendus identiques.
+- **Mesure attribuée à la bonne version** (décision 135) : journal `client_builds.json` dans le cache (build lu
+  dans `.build.info`, date de la mise à jour, en ajout seulement, écrit à chaque lecture des journaux) ; version du
+  client attachée à chaque **session** et non à chaque fichier (un journal peut chevaucher une mise à jour) ;
+  `forever measures refresh` n'écrit que les sessions de la version installée et liste les autres « en attente » ;
+  une mesure reportée d'une version à l'autre garde « mesuré sous <version d'origine> ». L'entête du journal
+  (`BUILD_VERSION 1.60.1`, tronquée) n'est jamais utilisée pour attribuer. PV1 consomme la même règle pour les
+  instantanés de ForeverLogger.
+- **Veille** : `.github/workflows/build-watch.yml` quotidien — `forever builds` contre le manifeste, puis `fetch`,
+  `decode`, `verify` (échec non bloquant), `diff`, `report` ; rapport et résumé committés (la candidate vit dans le
+  cache : sans cela la PR serait vide), PR sur la branche `data/<version>`, **rien installé** (contrôle
+  `git diff --exit-code -- forever/data`) ; alerte `silent` après 14 jours. Livré en **patch**
+  (`tasks/T08a-build-watch.patch`) : le mode auto n'écrit pas dans `.github/workflows`. Les addons restent hors
+  veille de CI (ils sont sur le poste de l'utilisateur, décision 124).
+- **Plugin** : le routeur propose l'analyse de la nouvelle version quand la fraîcheur est `stale` au démarrage,
+  sans rien lancer sans accord, et répond quand même avec les données installées. Plugin 0.4.3.
+- **Sources** : tables du client (wago.tools), `.build.info` et les journaux du client (lus sur disque).
+- **Hors périmètre** (reste en T08) : `forever addons status` et le suivi des versions d'addons,
+  `forever_diff_versions`, baisse ciblée de certitude sur un diff `stale`, durcissement du pipeline relevé à la
+  relecture de T03, `DBCache.bin` et les correctifs serveur, décodage de 1.60.1.70058 (sautée).
+- **Critères de fin** : `install --new-version` testé sur fixtures et `diff` sans fichier retiré ; 70124 installée
+  et `forever status` en `fresh` ; une mesure d'une autre version n'est jamais écrite ; `build-watch.yml` simulé en
+  test (version fictive → rapport, résumé, PR, `forever/data/` inchangé) ; routeur et plugin 0.4.3 ;
+  `uv run tasks.py verify` vert.
 
 ## PV1 — Profil automatique, puis PvP : savoir des 9 classes (priorité haute)
 Les champs de bataille arrivent bientôt (date à confirmer par annonce officielle, `docs/OPEN_QUESTIONS.md`). T05 garde le profil PvP comparatif du Mage porté du seed (`pvp_et_respec`) ; PV1 élargit le savoir aux 9 classes et comble les limites de ce profil listées dans `seed/forever-mage/references/pvp-model.md` (ni rendements décroissants, ni bijou PvP). PV1 n'attend pas les moteurs des tranches de classe : il ne calcule aucun dégât hors Mage, il consulte et croise des données fixes.
@@ -339,10 +378,10 @@ Placé avant T07 parce que les bonus Legacy pèsent sur le leveling : le catalog
 - **Critères de fin** : `forever rep info` avec source et certitude par champ ; `forever rep plan` déterministe sur un état d'exemple importé d'une fixture de SavedVariable.
 
 ## T08 — Veille
-- **Fait (repris de T03)** (l'installation pour 1.60.1.70009 passe en T06b ; T08 garde l'automatisation pour les versions suivantes) : installation d'une nouvelle version candidate (copie dans `forever/data/`, `forever manifest --update`, PR « data: A → B » avec `forever report` ; la révision de la version courante existe depuis T06b : `forever install`) ; application de `overrides.json` ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19).
+- **Fait (repris de T03)** (l'installation pour 1.60.1.70009 passe en T06b ; **l'installation d'une nouvelle version et la veille planifiée passent en T08a**, décision 134) : application de `overrides.json` ; outil MCP `forever_diff_versions` ; baisse ciblée de la certitude des entités touchées par un diff quand le statut est `stale` (décision 19) ; lecture de `DBCache.bin` et des correctifs serveur (`Logs/Hotfix.log`).
 - **Durcissement du pipeline (relecture T03)** : `$d` entre dans les expressions `${…}` dans son unité d'affichage (minutes dès 60 s), aucune infobulle de talent ne l'exerce aujourd'hui ; un sort cité deux fois par une infobulle d'aura 226 compterait deux fois ses dégâts ; `SpellLevel` n'est pas lu (écart de niveau calculé depuis `BaseLevel`) ; `--locale` ignoré sans `--tables` ; un CSV réduit à son en-tête est accepté ; `verify` suppose `level` en tête de `rank_format`.
 - **Versions des addons de données** (décision 124) : à chaque veille, `forever addons status` (DJ1) compare version et empreinte des fichiers de données de chaque addon au dernier relevé ; un changement relit ses données, régénère les agrégats du dépôt qui en viennent et produit une note de changement (valeurs changées, certitude, personnages touchés), comme pour une version du jeu. Lecture locale sur le poste de l'utilisateur (les addons ne sont pas sur le serveur de CI) : la veille planifiée de CI ne couvre que les versions du jeu.
-- **Critères de fin** : `build-watch.yml` simulé en test (nouvelle version fictive → PR et note) ; alerte `silent` après 14 jours sans version ; changement de version fictif d'un addon (fixtures) → relecture et note de changement déterministes.
+- **Critères de fin** : changement de version fictif d'un addon (fixtures) → relecture et note de changement déterministes ; `forever_diff_versions` testé ; certitude abaissée sur un diff `stale`. (`build-watch.yml` simulé et alerte `silent` : passés en T08a.)
 
 ## EC1 — API Blizzard : hôtel des ventes, personnages, PvP (après le lancement du 4 novembre)
 Tranche gardée : sautée tant que le lancement n'a pas eu lieu et que la couverture de Forever par l'API Blizzard (produit, espace de noms, hôtel des ventes, profils de personnages, PvP) n'est pas vérifiée. Élargie le 2026-09-30 à tout ce que l'API couvre pour Forever ; identifiant EC1 gardé (décision 126).

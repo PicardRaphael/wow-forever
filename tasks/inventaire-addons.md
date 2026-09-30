@@ -7,6 +7,101 @@ Rappels utiles à la lecture :
 - `WOW_PROJECT_ID` vaut `WOW_PROJECT_MAINLINE`.
 - Cache wago local : tables de sorts et de talents seulement. Aucune table d'objets, d'instances ni de quêtes n'a été téléchargée : les recoupements « client » se limitent à ces tables et aux caches du client sur disque.
 
+## Relevé du 2026-09-30 (après installation de nouveaux addons)
+
+Deuxième relevé du jour, en lecture seule, sans réseau, **sous le client 1.60.1.70124** (le relevé précédent du
+2026-09-30 a été fait sous 70009). **Rien n'est ingéré** : aucun fichier de `forever/data/`, de `tests/fixtures/`
+ni du code n'a changé. Aucun contenu n'a été recompté : les comptes des sections plus bas restent ceux du
+2026-09-28 et doivent être relus par `forever addons status` (DJ1, décision 124).
+
+Les **quatre addons conseillés par la décision 133 sont installés** (AtlasLoot mis à jour, Forever Guide,
+Legacy Forever, Zone Level: Forever). Neuf autres addons, non conseillés par l'agent, sont apparus.
+
+### Empreintes de référence (pour `forever addons status`)
+
+La version du `.toc` ne suffit pas (décision 124). Empreinte = SHA-256 de la liste triée des SHA-256 des fichiers
+`.lua` et `.json` de l'addon, hors `.bak`, 12 premiers caractères. **C'est la ligne de base : aucun relevé
+antérieur n'existe**, un premier passage de `forever addons status` ne pourra donc que constater « inchangé » ou
+« changé » à partir d'ici.
+
+| Addon | Version `.toc` | Fichiers | Taille | Empreinte | Dernier fichier |
+| --- | --- | --- | --- | --- | --- |
+| AtlasLootClassic | `Forever 1.60.1` | 82 | 3 Mo | `82c0718e9d98` | 2026-09-30 |
+| AtlasLootClassic_Data | — | 3 | 1 Mo | `7f22ad2849eb` | 2026-09-30 |
+| ForeverDungeonJournal | **1.3.2** | 25 | 6 Mo | `886ffc832e76` | 2026-09-30 |
+| GearQuestForever | **0.2.20-beta** | 23 | 24 Mo | `faa3d66f772a` | 2026-09-30 |
+| ForeverGuide | **1.16.2** | 24 | 17 Mo | `078fad14acc9` | 2026-09-30 |
+| LegacyForever | **v0.6.5** | 13 | 1 Mo | `c4828de32092` | 2026-09-30 |
+| ZoneLevelForever | **1.4** | 1 | 1 Mo | `a7e922c83b89` | 2026-09-30 |
+| Questie | 11.38.0 Forever-v27 | 522 | 233 Mo | `6d58cf035130` | 2026-09-21 |
+| QuestMaster | **2.4.0** | 120 | 78 Mo | `dea273f11e7f` | 2026-09-22 |
+| Auctionator | 339 | 344 | 5 Mo | `2730bf985375` | 2026-09-28 |
+| CraftingOrderClassic | **1.40.0** | 215 | 13 Mo | `0455f0f3167c` | 2026-09-30 |
+| RXPGuides | **v4.11.11** | 402 | 43 Mo | `9a62e39fe16b` | 2026-09-28 |
+| ForeverMapFix | **0.2.0** | 2 | 84 Mo | `c58bbcce05af` | 2026-09-21 |
+| AtlasBIStooltips | **1.0.1** | 32 | 1 Mo | `cb98d658c574` | 2026-09-21 |
+| RaphCompletionist | **0.2.1** | 5 | 1 Mo | `27159f4bdb32` | 2026-09-21 |
+
+### Écarts avec le relevé du matin (non résolus)
+
+| Addon | Relevé du matin | Relevé du soir | Commentaire |
+| --- | --- | --- | --- |
+| ForeverDungeonJournal | 1.3.1 | **1.3.2** | Deux versions publiées dans la même journée. Contenu non recompté. |
+| GearQuestForever | 0.2.19-beta | **0.2.20-beta** | **Changement de structure** : l'addon est maintenant éclaté en 9 modules par classe (`GearQuestForever_DRUID`, `_HUNTER`, `_MAGE`, `_PALADIN`, `_PRIEST`, `_ROGUE`, `_SHAMAN`, `_WARLOCK`, `_WARRIOR`). La description d'un dossier unique des sections plus bas est périmée, comme pour FDJ en 1.3.1. |
+| AtlasLoot Classic Forever | « 1.1.3 » (CurseForge), `.toc` `Forever 1.60.1` | « 1.1.4 » attendue (décision 133), `.toc` **toujours** `Forever 1.60.1` | Les fichiers datent du 2026-09-30 : l'addon **a bien été mis à jour**, mais la chaîne de version ne le dit toujours pas. Seule l'empreinte `82c0718e9d98` le prouvera au prochain relevé. Confirme la décision 124. |
+| QuestMaster | 2.5.0 (`_Camelot.toc`, `X-Date: 2026-09-26`) | **2.4.0** dans les 6 `.toc`, dernier fichier du **2026-09-22** | **Écart non expliqué** : version en recul et fichiers plus anciens que le relevé du matin. Soit une erreur de lecture le matin, soit un retour à une version antérieure. À trancher par toi ; sans effet sur le projet (Quest Master est écarté, copie exacte de Questie). |
+
+### Les quatre addons de la décision 133
+
+| Addon | Version | Licence installée | Contenu utile | Format | Propre à Forever | Usage possible par domaine |
+| --- | --- | --- | --- | --- | --- | --- |
+| **AtlasLoot Classic Forever** (mise à jour) | `.toc` `Forever 1.60.1`, fichiers du 2026-09-30 | GPL-2 (`LICENSE`) | Butin par boss. Contenu non recompté depuis le 2026-09-28 (45 instances, 311 boss, 2 381 ID d'objets) | Lua, inchangé | À revérifier : les instances Forever étaient vides au 2026-09-28 | DJ1 (recoupement), T10 (liste d'ID) |
+| **Forever Guide** | 1.16.2 | **aucune** (`LICENSE` absent ; « All Rights Reserved » d'après sa page CurseForge, `docs/DATA_SOURCES.md`) | 35 donjons (quêtes, chaînes de prérequis, butin des boss et des monstres normaux), environ 2 500 recettes des 12 métiers, recherche d'objets (14 831 ID distincts dans `ItemSearchData.lua`), livres de bibliothèque avec points d'apparition | Lua généré (`gen.py`, `build_search.py`) ; `Data.lua` (livres), `Dungeons.lua`, `DungeonLoot.lua`, `DungeonData.lua`, `DungeonTrash.lua`, `ItemSearchData.lua`, `ItemCatalogData.lua`, `Catalog.lua` ; interface traduite en 8 langues, **dont `DataFrFR.lua`** | Oui (donjons et quêtes Forever) | DJ1 (butin et quêtes de donjon), MT1 (recettes), T04d (XP des quêtes), T10 (objets) |
+| **Legacy Forever** | v0.6.5 | **GPL-3.0-or-later** (`LICENSE` présent, `X-License` dans le `.toc`) | Catalogue Legacy : `rewards` (défis porteurs de récompense), `feeds`, `zones`, `completion` ; 266 entrées indexées dans `Data/Legacy.lua` (3 886 lignes) | Lua généré par `tools/gen_legacy.py` | Oui, entièrement | **LG1** (catalogue des défis et points), **LG2** (progression du compte via `LegacyForeverDB`) |
+| **Zone Level: Forever** | 1.4 | **aucune** | 50 zones avec `minLevel`, `maxLevel`, `minFish`, donjons de la zone avec leur plage de niveau, moyen de transport, faction | Un seul `.lua` (916 lignes), table indexée par `uiMapID` | Oui (plages de niveau et donjons de Forever, dont The Hall of Thanes 13-18) | **forever-leveling** (« quelle zone à mon niveau », qui repose aujourd'hui sur les niveaux Classic de Questie), DJ1 (plages de niveau des donjons), H1 |
+
+#### Point d'attention sur Forever Guide
+
+Ses fichiers datent du 2026-09-30, mais **ses données sont figées à une version antérieure du jeu** : l'entête de
+`Data.lua` cite « ForeverChanges (бета Forever, сборка **1.60.1.69913**, 22.09.2026) », et `ItemSearchData.lua`
+et `DungeonLoot.lua` sont générés depuis la base Classic de cmangos et les taux de butin Classic de Wowhead.
+
+Le critère « à jour pour Forever » de la décision 133 porte sur la **version des données**, pas sur la date du
+fichier : Forever Guide **échoue** à ce critère pour tout ce qui vient du client (69913, trois versions de retard),
+et n'apporte rien pour les taux de butin (Classic, `suppose`, comme AtlasLoot). Il reste utile pour ce qui n'a pas
+d'autre source : quêtes et butin **de donjon** de Forever, recettes des métiers.
+
+#### Point d'attention sur Legacy Forever
+
+À l'inverse, ses données sont **générées des tables du client** : `-- Generated by tools/gen_legacy.py from
+WoW: Forever build 1.60.1.70009. Source snapshot: 2026-09-25; https://wago.tools/db2/ (pinned CSV exports).`
+
+C'est la **même source que forever-core** (wago.tools), à la même version (70009) : ses valeurs sont directement
+comparables aux nôtres, et son `tools/gen_legacy.py` donne la liste des tables du client à lire pour le Legacy —
+un raccourci pour l'inventaire de LG1. Licence GPL-3 : agrégats seulement dans le dépôt, comme partout.
+
+### Les autres addons apparus (non conseillés par l'agent)
+
+| Addon | Version | Licence | Nature | Donnée exploitable ? |
+| --- | --- | --- | --- | --- |
+| **EllesmereUI** (20 modules) | — | `license.txt`, licence propre à l'auteur | Suite d'interface (barres, cadres, chat, compteurs de dégâts, minuteur mythique) | Non : présentation, aucune donnée de jeu |
+| **RXPGuides** (RestedXP) | v4.11.11 | **CC BY-NC-SA 4.0** | Guides de leveling pas à pas | Itinéraires de leveling. **Clause NC** : la licence interdit l'usage commercial ; un agrégat dans le dépôt demande ton accord explicite avant tout usage |
+| **CraftingOrderClassic** | 1.40.0 | **aucune** | Commandes de craft et de récolte | Recettes et composants (recoupe Forever Guide) ; MT1 |
+| **ForeverMapFix** | 0.2.0 | **MIT** | 84 Mo de tuiles de carte ; auteur « OpenAI / based on Alexey Sofronov and Rhyster » | Non : images. Les 2 `.lua` sont du code |
+| **AtlasBIStooltips** | 1.0.1 | **aucune** | Lignes « BiS » dans l'infobulle, 23 spécialisations | Listes BiS de la communauté ; recoupement lointain pour T10. Déjà écarté de l'inventaire du 2026-09-28 |
+| **RaphCompletionist** | 0.2.1 | **aucune** | **Ton addon** (`## Author: Raph + ChatGPT`) ; ponts vers Questie et les métiers | À toi de dire s'il collecte quelque chose d'utile |
+| **ForeverCompletionist** | — | — | **Ce n'est pas un addon** : aucun `.toc`, contient `baseline.json`, `inventory.json`, `tests/`, `source_importers/`, `LOCAL_INVENTORY.md`. Dossier de projet déposé dans `Interface/AddOns` | Le client ne le charge pas. À vérifier par toi : rien fait dessus |
+| `AllTheThings.lua` (SavedVariables) | — | — | Sauvegarde **sans dossier d'addon** : reste d'une désinstallation | Non |
+
+### Ce que ce relevé ne dit pas
+
+- Aucun contenu n'a été recompté pour les addons déjà inventoriés : les chiffres des sections suivantes datent du
+  2026-09-28 et sont **périmés** pour AtlasLoot, FDJ et GearQuestForever, qui ont tous changé depuis.
+- Le chargement effectif en jeu n'a pas été vérifié. Aucun `_Camelot.toc` pour AtlasLoot, ForeverGuide,
+  LegacyForever, ZoneLevelForever, GearQuestForever ni ForeverDungeonJournal : ils portent `## Interface: 16001`
+  seul, ce qui suffit d'après `docs/ADDON.md` puisque 16001 est l'interface du client.
+- Les recoupements avec le client et avec Questie n'ont pas été refaits.
+
 ## Versions relevées le 2026-09-30
 
 Nouveau relevé des `.toc`, en lecture seule, sans réseau. **Seules les versions sont mises à jour** : le contenu (comptes, recoupements) n'a pas été recompté et reste celui du 2026-09-28 ci-dessous ; c'est ce que `forever addons status` devra signaler et relire (DJ1, décision 124).
