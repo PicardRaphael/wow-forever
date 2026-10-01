@@ -48,7 +48,16 @@ def parse_hotfix_log(text: str, year: int) -> list[HotfixLine]:
 
 
 def read_log(path: Path) -> list[HotfixLine]:
-    raise NotImplementedError
+    """Lignes du journal, datées par l'année du fichier ; une ligne d'un mois postérieur à celui du fichier date de
+    l'année précédente (ligne de décembre lue en janvier)."""
+    stamp = datetime.fromtimestamp(path.stat().st_mtime, tz=UTC)
+    lines = parse_hotfix_log(path.read_text(encoding="utf-8", errors="replace"), stamp.year)
+    out = []
+    for ln in lines:
+        if int(ln.at[5:7]) > stamp.month:
+            ln = ln._replace(at=f"{stamp.year - 1:04d}{ln.at[4:]}")
+        out.append(ln)
+    return out
 
 
 def log_year(path: Path) -> int:
@@ -64,7 +73,9 @@ def tracked_tables(rules: Mapping[str, Any]) -> set[str]:
 
 
 def _key(e: Mapping[str, Any]) -> str:
-    return f"{e['push']}|{e['table']}|{e['rec_id']}|{e['result']}"  # une ligne répétée au démarrage compte une fois
+    # une ligne répétée au démarrage compte une fois ; une réponse DBReply d'un autre jour est une entrée nouvelle
+    day = f"|{str(e['at'])[:10]}" if e["push"] == "DBReply" else ""
+    return f"{e['push']}|{e['table']}|{e['rec_id']}|{e['result']}{day}"
 
 
 def load_journal(cache_dir: Path) -> list[dict[str, Any]]:

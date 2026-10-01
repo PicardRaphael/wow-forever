@@ -960,6 +960,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
     leveling = _leveling(values)
     xp_to_next = _xp_to_next(raw[LEVELING_FILE])
     ratios = "estimations"
+    ratios_from = None
     if rules == "forever" and (version.path / CHARACTER_FILE).is_file():
         try:
             raw_char = version.read_json(CHARACTER_FILE)
@@ -967,6 +968,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
             raise DataSchemaError(f"{CHARACTER_FILE} de {version.game_version} illisible ({exc}).") from exc
         constants, leveling, xp_to_next = _client_ratios(raw_char, constants, leveling, xp_to_next)
         ratios = "client"
+        ratios_from = raw_char.get("inherited_from") if isinstance(raw_char, dict) else None
     utility, utility_source = _utility(raw[SPELLS_FILE], files[SPELLS_FILE]), files[SPELLS_FILE]
     if rules == "forever":
         constants, leveling = _client_mechanics(raw[SCALING_FILE], constants, leveling)
@@ -1004,6 +1006,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         assumption_ranges=_assumption_ranges(values),
         classes=_ClassFile(version) if (version.path / CLASSES_FILE).is_file() else {},
         character_ratios=ratios,
+        character_ratios_from=str(ratios_from) if ratios_from else None,
         utility_source=utility_source,
     )
 

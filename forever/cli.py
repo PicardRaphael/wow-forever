@@ -1750,7 +1750,7 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
     new: list[dict[str, Any]] = []
     if log is not None and log.is_file():
         build = read_build_info(deps.wow_dir) if deps.wow_dir else None
-        lines = hotfixes.parse_hotfix_log(log.read_text(encoding="utf-8", errors="replace"), hotfixes.log_year(log))
+        lines = hotfixes.read_log(log)
         new = hotfixes.update_journal(
             deps.cache_dir, lines, hotfixes.tracked_tables(rules), build.build if build else None, deps.now()
         )

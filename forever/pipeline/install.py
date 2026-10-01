@@ -411,6 +411,8 @@ def _game_state(
             "carried": True,
             "carried_from": f"révision {rev}",
         }
+        if prev and prev.get("date") and prev.get("revision") is not None:
+            state |= {"date": prev["date"], "revision": prev["revision"]}  # date et révision d'origine gardées
     if old is not None:
         changes.append(
             {
@@ -766,6 +768,30 @@ def apply_install(
     return revision
 
 
+def _game_state_origin(vdir: Path, entries: Mapping[str, Any]) -> None:
+    """Origine déclarée du plafond (`origins.json`) accordée à sa source : `journal` pour une observation en jeu
+    (certain), `manuel` sinon (au plus probable)."""
+    path = vdir / "origins.json"
+    cap = entries.get("beta_level_cap")
+    if not path.is_file() or not cap:
+        return
+    doc = _json(path)
+    rule = next(
+        (r for r in doc.get("rules", []) if r.get("file") == META and "/game_state" in r.get("paths", [])), None
+    )
+    if rule is None:
+        return
+    observed = cap.get("certainty") == "certain"
+    rule["origin"] = "journal" if observed else "manuel"
+    rule["certainty"] = "certain" if observed else "probable"
+    rule["source"] = (
+        "relevé en jeu par l'utilisateur (forever install --beta-level-cap-source observation)"
+        if observed
+        else "forever install --beta-level-cap (note officielle), sinon valeur reportée"
+    )
+    _write(path, doc, 2)
+
+
 def _write_game_state(vdir: Path, state: Mapping[str, Any], n: int, day: str) -> None:
     """`meta.json` `game_state` (valeur, source, certitude, date, révision ; report signalé) et retrait de
     l'ancienne clé de `mechanics.json`."""
@@ -773,9 +799,13 @@ def _write_game_state(vdir: Path, state: Mapping[str, Any], n: int, day: str) ->
     entries = {}
     for key, s in state.items():
         entry = {k: v for k, v in s.items() if k != "carried"}
-        entries[key] = {**entry, "date": day, "revision": n}
+        if s.get("carried") and "date" in entry and "revision" in entry:
+            entries[key] = {**entry, "carried_to": n}
+        else:
+            entries[key] = {**entry, "date": day, "revision": n}
     meta["game_state"] = {**meta.get("game_state", {}), **entries}
     _write(vdir / META, meta, 1)
+    _game_state_origin(vdir, entries)
     mech_path = vdir / MECHANICS
     if mech_path.is_file():
         mech = _json(mech_path)

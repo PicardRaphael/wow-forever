@@ -101,12 +101,13 @@ def watch(deps: Deps, *, report: bool = False) -> dict[str, Any]:
     if log.is_file():
         st = log.stat()
         stamp = {"size": st.st_size, "mtime": st.st_mtime_ns}
-        new["hotfix_log"] = stamp
-        if old.get("hotfix_log") != stamp:
-            lines = hotfixes.parse_hotfix_log(log.read_text(encoding="utf-8", errors="replace"), hotfixes.log_year(log))
-            added = hotfixes.update_journal(
-                deps.cache_dir, lines, hotfixes.tracked_tables(_rules(deps)), new["build"], deps.now()
-            )
+        tracked = hotfixes.tracked_tables(_rules(deps))
+        # sans règles lisibles, le journal n'est pas marqué lu : le passage suivant le relira (il est réécrit au
+        # démarrage du client, ses lignes seraient sinon perdues)
+        new["hotfix_log"] = stamp if tracked else old.get("hotfix_log")
+        if tracked and old.get("hotfix_log") != stamp:
+            lines = hotfixes.read_log(log)
+            added = hotfixes.update_journal(deps.cache_dir, lines, tracked, new["build"], deps.now())
             if added:
                 tables = sorted({str(e["table"]) for e in added})
                 events.append(

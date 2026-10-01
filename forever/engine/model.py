@@ -461,6 +461,7 @@ class GameData:
     classes: Mapping[str, ClassKnowledge] = field(default_factory=dict)
     # T08b, bloc A : origine des ratios du personnage : « client » (character_scaling.json) ou « estimations »
     character_ratios: str = "estimations"
+    character_ratios_from: str | None = None  # version d'origine d'un character_scaling.json hérité
     # T08b, bloc B (D2) : fichier dont viennent les utilitaires du Mage (classes.json en mode forever s'il les porte)
     utility_source: str = "spells.json"
 

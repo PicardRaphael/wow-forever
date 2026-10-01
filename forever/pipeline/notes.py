@@ -150,7 +150,7 @@ def recognise(text: str, names: Sequence[tuple[str, str]]) -> tuple[list[dict[st
     keywords = [
         {"keyword": kw, "registry": reg}
         for kw, reg in sorted(KEYWORDS.items())
-        if re.search(rf"(?<![\w']){re.escape(kw)}", lower)
+        if re.search(rf"(?<![\w']){re.escape(kw)}(?![\w'])", lower)
     ]
     return entities, keywords
 

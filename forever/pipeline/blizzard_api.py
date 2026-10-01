@@ -137,7 +137,7 @@ def probe(
                     deps.http_get(url, headers, FETCH_TIMEOUT)
                     status = "répond"
                 except OSError as exc:
-                    status = f"ne répond pas ({str(exc)[:60]})".replace(token, "…")
+                    status = f"ne répond pas ({str(exc).replace(token, '…')[:60]})"
                 results.append(
                     {"region": region, "namespace": namespace, "route": path, "section": section, "status": status}
                 )

@@ -144,10 +144,15 @@ def damage_assumptions(options: Mapping[str, Any], low_level_default: bool) -> l
 
 
 def ratio_assumption(gd: GameData) -> str:
-    """Origine des ratios du personnage (critique par Intelligence, mana de base, XP par niveau, constante d'armure)."""
+    """Origine des ratios du personnage (critique par Intelligence, mana de base, XP par niveau, constante d'armure)
+    et des utilitaires du Mage."""
+    what = "critique par Intelligence, mana de base, XP par niveau, constante d'armure"
     if gd.character_ratios == "client":
-        return "ratios du personnage décodés du client (character_scaling.json) : critique par Intelligence, mana de base, XP par niveau, constante d'armure"
-    return "ratios du personnage estimés (mechanics.json, fm.py) : critique par Intelligence, mana de base, XP par niveau, constante d'armure"
+        inherited = f", hérité de {gd.character_ratios_from}" if gd.character_ratios_from else ""
+        head = f"ratios du personnage décodés du client (character_scaling.json{inherited}) : {what}"
+    else:
+        head = f"ratios du personnage estimés (mechanics.json, fm.py) : {what}"
+    return f"{head} ; utilitaires du Mage lus dans {gd.utility_source}"
 
 
 def assumptions(
