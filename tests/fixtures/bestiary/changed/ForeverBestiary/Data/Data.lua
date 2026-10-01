@@ -1,4 +1,4 @@
--- Forever Bestiary : base synthétique pour les tests (structure de Data/Data.lua 0.5.0, bêtes et noms inventés).
+-- Forever Bestiary : base synthétique pour les tests, second état (taille différente) (structure de Data/Data.lua 0.5.0, bêtes et noms inventés).
 local _, ns = ...
 ns.Data = {
   date = "2026-09-25",
