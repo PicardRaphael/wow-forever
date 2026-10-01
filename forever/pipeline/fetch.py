@@ -200,9 +200,11 @@ def fetch_tables(
     *,
     locales: Sequence[str] = (DEFAULT_LOCALE,),
     refresh: bool = False,
+    timeout: float = FETCH_TIMEOUT,
 ) -> list[TableFetch]:
     """Télécharge chaque table pour chaque locale (dans l'ordre donné) ; un fichier du cache conforme à son
-    empreinte n'est pas retéléchargé, sauf `refresh`. Les tables réussies sont écrites même si d'autres
+    empreinte n'est pas retéléchargé, sauf `refresh`. `timeout` : délai d'une requête (CH0 : Creature dépasse le
+    délai par défaut). Les tables réussies sont écrites même si d'autres
     échouent ; les échecs sont signalés ensemble à la fin (FetchFailedError)."""
     _check_arguments(version, tables, locales)
     if deps.offline:
@@ -223,7 +225,7 @@ def fetch_tables(
                 results.append({**entry, "from_cache": True})  # type: ignore[typeddict-item]
                 continue
             try:
-                body = deps.http_get(url, headers, FETCH_TIMEOUT)
+                body = deps.http_get(url, headers, timeout)
             except OSError as exc:
                 failures.append(f"{key} ({exc})")
                 continue

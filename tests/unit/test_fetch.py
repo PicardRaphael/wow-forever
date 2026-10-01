@@ -150,6 +150,24 @@ def test_timeout_and_user_agent(make_deps):
     assert headers.get("User-Agent")
 
 
+def test_cli_timeout_option_reaches_the_request(make_deps):
+    # CH0 : une table volumineuse (Creature) dépasse le délai par défaut ; `--timeout` l'allonge pour un appel
+    http = FakeHttp(routes=routes())
+    code = main(
+        ["fetch", "--version", PREVIOUS_VERSION, "--tables", "SpellName", "--timeout", "300"], make_deps(http=http)
+    )
+    assert code == 0
+    assert [timeout for _, _, timeout in http.calls] == [300.0]
+
+
+@pytest.mark.parametrize("value", ["0", "-5", "abc"])
+def test_cli_timeout_must_be_positive(capsys, make_deps, value):
+    http = FakeHttp(routes=routes())
+    argv = ["fetch", "--version", PREVIOUS_VERSION, "--tables", "SpellName", f"--timeout={value}", "--json"]
+    assert main(argv, make_deps(http=http)) == 2
+    assert http.calls == []
+
+
 def test_network_errors_exit_with_code_5():
     assert EXIT_NETWORK == 5
     assert OfflineError().exit_code == FetchFailedError("x").exit_code == EXIT_NETWORK

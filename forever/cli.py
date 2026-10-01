@@ -21,7 +21,7 @@ from forever import registry
 from forever.addons import addons_status
 from forever.build import CONTEXTS, build_report
 from forever.chart import leveling_chart
-from forever.config import CHAIN_MAX_GAP_S, Deps, default_deps
+from forever.config import CHAIN_MAX_GAP_S, FETCH_TIMEOUT, Deps, default_deps
 from forever.errors import (
     EXIT_INTEGRITY,
     EXIT_OK,
@@ -179,6 +179,9 @@ def build_parser() -> argparse.ArgumentParser:
     fetch.add_argument("--tables", help="tables séparées par des virgules (défaut : decode_rules.json)")
     fetch.add_argument("--locale", help="locales séparées par des virgules (défaut : enUS)")
     fetch.add_argument("--refresh", action="store_true", help="retélécharger même si le cache est conforme")
+    fetch.add_argument(
+        "--timeout", type=_positive_seconds, default=FETCH_TIMEOUT, help="délai d'une requête en secondes"
+    )
     fetch.add_argument(
         "--gametables", action="store_true", help="GameTables de decode_rules.json (api/casc, T08b) au lieu des tables"
     )
@@ -781,6 +784,16 @@ def _cmd_builds(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _positive_seconds(text: str) -> float:
+    try:
+        value = float(text)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"durée invalide : « {text} »") from None
+    if not value > 0:
+        raise argparse.ArgumentTypeError(f"durée strictement positive attendue : « {text} »")
+    return value
+
+
 def _fetch_defaults(deps: Deps) -> tuple[list[str], dict[str, list[str]]]:
     """Tables et tables localisées de decode_rules.json (version locale la plus récente qui en a un)."""
     for version in reversed(version_dirs(deps.data_dir)):
@@ -802,12 +815,16 @@ def _cmd_fetch(deps: Deps, args: argparse.Namespace) -> int:
         return _fetch_gametables(deps, args)
     if args.tables:
         locales = _split(args.locale) if args.locale else [DEFAULT_LOCALE]
-        results = fetch_tables(deps, args.version, _split(args.tables), locales=locales, refresh=args.refresh)
+        results = fetch_tables(
+            deps, args.version, _split(args.tables), locales=locales, refresh=args.refresh, timeout=args.timeout
+        )
     else:
         tables, localized = _fetch_defaults(deps)
-        results = fetch_tables(deps, args.version, tables, refresh=args.refresh)
+        results = fetch_tables(deps, args.version, tables, refresh=args.refresh, timeout=args.timeout)
         for locale, names in localized.items():
-            results += fetch_tables(deps, args.version, names, locales=[locale], refresh=args.refresh)
+            results += fetch_tables(
+                deps, args.version, names, locales=[locale], refresh=args.refresh, timeout=args.timeout
+            )
     provenance = local_provenance(deps)
     downloaded = sum(1 for r in results if not r["from_cache"])
     lines = [
