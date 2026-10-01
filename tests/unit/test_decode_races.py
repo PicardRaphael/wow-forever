@@ -115,7 +115,7 @@ def test_racials_have_effect_cooldown_duration(races, decode_rules):
 def test_mage_racial_values_equal_the_community_record(races):
     """D5 : les trois grandeurs raciales du moteur du Mage, lues dans le client, égales au relevé de racials.json ;
     un écart ici changerait les builds de T05 (arrêt avant le commit)."""
-    record = read_json(DATA_DIR / LOCAL_VERSION / "racials.json")["races"]
+    record = read_json(DATA_DIR / LOCAL_VERSION / "_seed_racials.json")["races"]  # copie figée du relevé (D5)
     expected: dict[str, dict[str, float]] = {}
     for race, traits in record.items():
         for key, trait in traits.items():

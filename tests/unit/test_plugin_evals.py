@@ -341,8 +341,8 @@ def test_report_thresholds_of_d10():
 def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    assert len(loaded) == 58
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 38
+    assert len(loaded) == 62  # PV1 : trois cas PvP et un voisin
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 41
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 

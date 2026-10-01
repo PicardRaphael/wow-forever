@@ -148,10 +148,13 @@ def test_off_grid_nodes_are_listed_unresolved(doc, decode_rules):
     geo = decode_rules["talent_geometry"]
     origins, div = geo["tab_origins"], geo["extra_zero_divisor"]
     nodes = {int(r["ID"]): r for r in csv_rows("TraitNode")}
+    observed = decode_rules.get("observed_positions", {})
     with_unresolved = set()
     for cls, c in doc["classes"].items():
         expected = {}
         for t in talents_of(c):
+            if t["key"] in observed.get(cls, {}):
+                continue  # placé par un relevé en jeu (test_observed_positions.py)
             x, y = int(nodes[t["node_id"]]["PosX"]), int(nodes[t["node_id"]]["PosY"])
             bad_x = not placed(x, origins, geo["col_step"], div)
             bad_y = not placed(y, [geo["row_base"]], geo["row_step"], div)
@@ -168,7 +171,7 @@ def test_off_grid_nodes_are_listed_unresolved(doc, decode_rules):
             assert u["reason"]
         if expected:
             with_unresolved.add(cls)
-    assert "Paladin" in with_unresolved  # plan de PV1 : écart relevé sur l'arbre du Paladin
+    assert "Warlock" in with_unresolved  # paliers du Démoniste : sources communautaires seulement
 
 
 def test_stale_duplicate_nodes_are_dropped_for_the_newer_node(doc, decode_rules):
