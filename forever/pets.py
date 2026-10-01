@@ -678,3 +678,13 @@ def tame_guide(
         },
         "assumptions": assumptions,
     }
+
+
+# --- Relevé du familier (bloc F) ------------------------------------------------------------------------------
+
+
+def measure_pets(pets: Mapping[str, Any], rules: Mapping[str, Any], db: Any) -> dict[str, Any]:
+    """Relevés de ForeverLogger comparés au client : coût et niveau requis observés dans la fenêtre Beast Training,
+    régime observé, PV du familier par point d'Endurance du Chasseur par paire d'instantanés (même familier, même
+    niveau), vitesse d'attaque par famille ; chaque mesure avec `n`. Rien n'est écrit dans les données."""
+    raise NotImplementedError

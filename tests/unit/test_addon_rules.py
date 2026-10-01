@@ -62,3 +62,16 @@ def test_comments_and_strings_do_not_trigger_rules(tmp_path):
         '-- CastSpellByName est interdit ; frame:RegisterEvent("X") aussi\nlocal s = "UseAction"\n', encoding="utf-8"
     )
     assert check_addon.check_lua(path) == []
+
+
+def test_forever_logger_records_the_pet_out_of_combat():
+    """CH0, bloc F : instantané du familier et du Chasseur hors combat (UNIT_PET, PET_UI_UPDATE, reporté à la sortie
+    du combat), relevé de la fenêtre Beast Training (CRAFT_SHOW, CRAFT_UPDATE) ; toujours aucune fonction d'action ni
+    aucun abonnement au journal de combat (les règles ci-dessus restent vraies)."""
+    text = (ADDON / "ForeverLogger.lua").read_text(encoding="utf-8")
+    for event in ("UNIT_PET", "PET_UI_UPDATE", "PLAYER_REGEN_ENABLED", "CRAFT_SHOW", "CRAFT_UPDATE"):
+        assert f"function handlers.{event}(" in text, event
+    assert "InCombatLockdown" in text and "pet_snapshots" in text and "training" in text
+    assert check_addon.check_addon(ADDON) == []
+    toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
+    assert "## Version: 0.3.0" in toc.splitlines()
