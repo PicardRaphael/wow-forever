@@ -2813,6 +2813,23 @@
    "schools": [
     "fire"
    ]
+  },
+  "winters_chill": {
+   "spell_id": 12579,
+   "source_spell_id": 11180,
+   "talent": "wintersChill",
+   "pct_per_stack": 2,
+   "max_stacks": 5,
+   "duration_ms": 15000,
+   "schools": [
+    "frost"
+   ]
+  },
+  "ignite": {
+   "spell_id": 412538,
+   "duration_ms": 4000,
+   "period_ms": 2000,
+   "cumulative": 1
   }
  },
  "talent_cooldowns": {

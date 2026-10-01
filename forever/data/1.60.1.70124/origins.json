@@ -38,13 +38,6 @@
       "reason": "ne décrit pas le jeu : journal, sources ou légende"
     },
     {
-      "file": "meta.json",
-      "paths": [
-        "**"
-      ],
-      "reason": "ne décrit pas le jeu : journal, sources ou légende"
-    },
-    {
       "file": "confirmed_changes.json",
       "paths": [
         "**"
@@ -83,6 +76,16 @@
         "/hotfix_related_tables_note"
       ],
       "reason": "notes de lecture, texte"
+    },
+    {
+      "file": "meta.json",
+      "paths": [
+        "/collected",
+        "/launch",
+        "/certainty_legend",
+        "/sources"
+      ],
+      "reason": "ne décrit pas le jeu : collecte, légende des certitudes, sources"
     }
   ],
   "rules": [
@@ -324,7 +327,7 @@
       "origin": "manuel",
       "source": "fm.py du seed (points_available)",
       "certainty": "probable",
-      "reason": "décodable (NumTalentsAtLevel) : décodage au bloc B",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel)",
       "registry": "G3"
     },
     {
@@ -335,7 +338,7 @@
       "origin": "manuel",
       "source": "fm.py du seed (check_build)",
       "certainty": "probable",
-      "reason": "décodable si TraitCond porte les points dépensés : bloc B",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json (TraitCond)",
       "registry": "G3"
     },
     {
@@ -357,7 +360,7 @@
       "origin": "manuel",
       "source": "fm.py du seed (EST, interpolation)",
       "certainty": "suppose",
-      "reason": "décodable (PlayerExpectedStat) : décodage au bloc A",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json",
       "registry": "A5"
     },
     {
@@ -392,7 +395,7 @@
       "origin": "manuel",
       "source": "règle Classic (PC)",
       "certainty": "suppose",
-      "reason": "décodable (PlayerExpectedStat.BaseMana) : décodage au bloc A",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json",
       "registry": "B9"
     },
     {
@@ -436,7 +439,7 @@
       "origin": "manuel",
       "source": "relevé du client 1.60.1.70009 recopié à la main (references/mechanics.md)",
       "certainty": "probable",
-      "reason": "décodable (aura du talent) : décodage au bloc B",
+      "reason": "mode seed seulement : le mode forever lit spell_scaling.json auras.winters_chill",
       "registry": "D4"
     },
     {
@@ -480,7 +483,7 @@
       "origin": "manuel",
       "source": "règle Classic (PC)",
       "certainty": "suppose",
-      "reason": "décodable (ExpectedStat.ArmorConstant) : décodage au bloc A",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json armor_constant",
       "registry": "I6"
     },
     {
@@ -524,7 +527,7 @@
       "origin": "manuel",
       "source": "tables du client 1.60.1.70009 relues à la main (T04c)",
       "certainty": "probable",
-      "reason": "décodable (aura dans SpellEffect, SpellMisc, SpellDuration) : décodage au bloc B",
+      "reason": "mode seed seulement : le mode forever lit spell_scaling.json auras.ignite",
       "registry": "A18"
     },
     {
@@ -614,17 +617,6 @@
       "certainty": "suppose",
       "reason": "portée par défaut d'un sort sans portée publiée",
       "registry": "C2"
-    },
-    {
-      "file": "mechanics.json",
-      "paths": [
-        "/values/build.beta_level_cap"
-      ],
-      "origin": "manuel",
-      "source": "recherche communautaire du 2026-09-28 (docs/research/community-builds-mage.md)",
-      "certainty": "probable",
-      "reason": "plafond de la bêta : fait d'installation au bloc B (D2)",
-      "registry": "I5"
     },
     {
       "file": "mechanics.json",
@@ -746,7 +738,7 @@
       "origin": "manuel",
       "source": "courbe Classic (FC dans le seed)",
       "certainty": "suppose",
-      "reason": "décodable (LevelExperience) : décodage au bloc A"
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json (LevelExperience)"
     },
     {
       "file": "leveling.json",
@@ -976,48 +968,37 @@
       "origin": "journal",
       "source": "positions relevées en jeu par l'utilisateur (décision 144)",
       "certainty": "certain"
+    },
+    {
+      "file": "character_scaling.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "PlayerExpectedStat, LevelExperience, Exhaustion, ExpectedStat, GlobalCurve, CurvePoint, NumTalentsAtLevel, TraitCond du client (forever decode), recoupés par les GameTables",
+      "certainty": "certain"
+    },
+    {
+      "file": "character_scaling.json",
+      "paths": [
+        "/level_cap"
+      ],
+      "origin": "manuel",
+      "source": "decode_rules.json levels.level_cap",
+      "certainty": "probable",
+      "reason": "niveau maximal écrit à la main, recopié du fichier des règles de lecture (D2)"
+    },
+    {
+      "file": "meta.json",
+      "paths": [
+        "/game_state"
+      ],
+      "origin": "manuel",
+      "source": "forever install --beta-level-cap (note officielle ou relevé en jeu), sinon valeur reportée",
+      "certainty": "probable",
+      "reason": "fait d'installation (D2) : plafond de la bêta donné à l'installation avec sa source",
+      "registry": "I5"
     }
   ],
-  "pending": [
-    {
-      "file": "mechanics.json",
-      "path": "/values/talents.first_level",
-      "declared": "certain",
-      "target": "probable",
-      "reason": "décodable (NumTalentsAtLevel) : décodage au bloc B",
-      "until": "révision 4 de 1.60.1.70124 (T08b, bloc I) ; décodage au bloc B"
-    },
-    {
-      "file": "mechanics.json",
-      "path": "/values/talents.points_per_tier",
-      "declared": "certain",
-      "target": "probable",
-      "reason": "décodable si TraitCond porte les points dépensés : bloc B",
-      "until": "révision 4 de 1.60.1.70124 (T08b, bloc I) ; décodage au bloc B"
-    },
-    {
-      "file": "mechanics.json",
-      "path": "/values/leveling.ignite",
-      "declared": "certain",
-      "target": "probable",
-      "reason": "décodable (aura dans SpellEffect, SpellMisc, SpellDuration) : décodage au bloc B",
-      "until": "révision 4 de 1.60.1.70124 (T08b, bloc I) ; décodage au bloc B"
-    },
-    {
-      "file": "leveling.json",
-      "path": "/combat_rules/crit_mult_spell",
-      "declared": "certain",
-      "target": "suppose",
-      "reason": "règle du serveur, absente des tables ; probable seulement si les journaux la recoupent (bloc B)",
-      "until": "révision 4 de 1.60.1.70124 (T08b, bloc I)"
-    },
-    {
-      "file": "leveling.json",
-      "path": "/combat_rules/dot_can_crit",
-      "declared": "certain",
-      "target": "suppose",
-      "reason": "règle du serveur, absente des tables ; probable seulement si les journaux la recoupent (bloc B)",
-      "until": "révision 4 de 1.60.1.70124 (T08b, bloc I)"
-    }
-  ]
+  "pending": []
 }

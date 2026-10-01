@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-09-30)",
+      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-01)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-09-30)",
+      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-01)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -42,8 +42,8 @@
         "combat_rules.gcd": "suppose",
         "combat_rules.spell_miss_by_level_diff": "suppose",
         "combat_rules.min_miss": "suppose",
-        "combat_rules.crit_mult_spell": "certain",
-        "combat_rules.dot_can_crit": "certain"
+        "combat_rules.crit_mult_spell": "suppose",
+        "combat_rules.dot_can_crit": "suppose"
       },
       "field_notes": {
         "combat_rules.gcd": "temps de recharge global, règle Classic (PC) : seed/forever-mage/references/mechanics.md",
@@ -140,7 +140,8 @@
       "notes": [
         "MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
         "utility : armures du Mage, niveau d'apprentissage et effets (decode_rules.json.utility_spells)",
-        "talent_cooldowns : recharges des talents actifs (decode_rules.json.talent_cooldowns)"
+        "talent_cooldowns : recharges des talents actifs (decode_rules.json.talent_cooldowns)",
+        "installé en révision 4 (forever install, 2026-10-01)"
       ]
     },
     "_seed_talents.json": {
@@ -219,8 +220,17 @@
         "ne décrit pas le jeu : règles d'origine (client, journal, addon, manuel, copie_figee, parametre), contrôlées par uv run tasks.py verify (étape origins)",
         "hérité d'une version à l'autre et complété par le décodage"
       ]
+    },
+    "character_scaling.json": {
+      "source": "Client 1.60.1.70124 : tables du client 1.60.1.70124 (wago.tools, 1.60.1.70124) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "ratios du personnage par classe et par niveau, XP, repos, constante d'armure, courbes de régénération (decode_rules.json, character_scaling) ; recoupement par les GameTables dans crosscheck",
+        "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
+        "installé en révision 4 (forever install, 2026-10-01)"
+      ]
     }
   },
-  "revision": 3,
-  "revised_at": "2026-09-30"
+  "revision": 4,
+  "revised_at": "2026-10-01"
 }

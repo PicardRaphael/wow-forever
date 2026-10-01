@@ -92,15 +92,15 @@
   },
   "talents.first_level": {
    "value": 10,
-   "certainty": "certain",
+   "certainty": "probable",
    "registry": "G3",
-   "source": "premier point de talent au niveau 10 : points = niveau - 9 (fm.py points_available)"
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json talents.first_level (NumTalentsAtLevel)) ; premier point de talent au niveau 10 : points = niveau - 9 (fm.py points_available)"
   },
   "talents.points_per_tier": {
    "value": 5,
-   "certainty": "certain",
+   "certainty": "probable",
    "registry": "G3",
-   "source": "5 points dans l'arbre par palier précédent (fm.py check_build)"
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json talents.points_per_tier (TraitCond)) ; 5 points dans l'arbre par palier précédent (fm.py check_build)"
   },
   "character.crit_base": {
    "value": 0.002,
@@ -117,7 +117,7 @@
    },
    "certainty": "suppose",
    "registry": "A5",
-   "source": "Int pour 1 % de critique : 59,5 au niveau 60 (Mage Classic) ; interpolation linéaire depuis 6 au niveau 1 (EST, fm.py)"
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json (PlayerExpectedStat.SpellCritPerIntellect)) ; Int pour 1 % de critique : 59,5 au niveau 60 (Mage Classic) ; interpolation linéaire depuis 6 au niveau 1 (EST, fm.py)"
   },
   "character.intellect": {
    "value": {
@@ -157,7 +157,7 @@
    },
    "certainty": "suppose",
    "registry": "B9",
-   "source": "mana de base 100 + 18,9 × (niveau - 1) (PC, leveling.json player_model)"
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json (PlayerExpectedStat.BaseMana)) ; mana de base 100 + 18,9 × (niveau - 1) (PC, leveling.json player_model)"
   },
   "character.mana_from_intellect": {
    "value": {
@@ -203,7 +203,7 @@
    "value": 0.02,
    "certainty": "probable",
    "registry": "D4",
-   "source": "Winter's Chill +2 % de critique par cumul, Frostbolt et Ice Lance seulement dans Forever (FC, references/mechanics.md)"
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit spell_scaling.json auras.winters_chill (aura posée par le talent)) ; Winter's Chill +2 % de critique par cumul, Frostbolt et Ice Lance seulement dans Forever (FC, references/mechanics.md)"
   },
   "mana.talent_rank_cost": {
    "value": {
@@ -247,7 +247,7 @@
    },
    "certainty": "suppose",
    "registry": "I6",
-   "source": "règle Classic (PC) reprise par sim_leveling.py du seed : réduction = armure / (armure + 400 + 85 × niveau de l'attaquant), attaquant < 60 (leveling.json combat_rules.armor_dr)"
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json armor_constant (ExpectedStat.ArmorConstant)) ; règle Classic (PC) reprise par sim_leveling.py du seed : réduction = armure / (armure + 400 + 85 × niveau de l'attaquant), attaquant < 60 (leveling.json combat_rules.armor_dr)"
   },
   "leveling.mob_xp": {
    "value": {
@@ -277,9 +277,9 @@
     "tick_s": 2.0,
     "cumulative": 1
    },
-   "certainty": "certain",
+   "certainty": "probable",
    "registry": "A18",
-   "source": "Client 1.60.1.70009 (tables wago, extraits tests/fixtures/wago/1.60.1.70009) : aura 412538 « Ignite », SpellMisc.DurationIndex 35 -> SpellDuration 4000 ms, SpellEffect aura 226 période 2000 ms, SpellAuraOptions.CumulativeAura 1 (T04c) ; rules seed : durée / période = 2 tics de 2 s par critique, comme sim_leveling.py du seed"
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit spell_scaling.json auras.ignite (SpellEffect, SpellMisc, SpellDuration, SpellAuraOptions)) ; Client 1.60.1.70009 (tables wago, extraits tests/fixtures/wago/1.60.1.70009) : aura 412538 « Ignite », SpellMisc.DurationIndex 35 -> SpellDuration 4000 ms, SpellEffect aura 226 période 2000 ms, SpellAuraOptions.CumulativeAura 1 (T04c) ; rules seed : durée / période = 2 tics de 2 s par critique, comme sim_leveling.py du seed"
   },
   "leveling.ignite_rule": {
    "value": "rolling",
@@ -375,12 +375,6 @@
    "certainty": "suppose",
    "registry": "C2",
    "source": "portée par défaut d'un sort sans portée publiée (zone autour du lanceur), repli de fm.py"
-  },
-  "build.beta_level_cap": {
-   "value": 20,
-   "certainty": "probable",
-   "registry": "I5",
-   "source": "plafond de niveau de la bêta de Forever (niveau 30 annoncé ensuite) : docs/research/community-builds-mage.md (recherche du 2026-09-28) ; tout build au-delà n'est pas vérifiable en jeu avant la sortie (décision 89)"
   },
   "build.confidence": {
    "value": 0.95,
