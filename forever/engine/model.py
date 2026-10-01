@@ -134,6 +134,9 @@ class CharacterModel:
     regen_base: float
     regen_spirit_divisor: float
     regen_tick_s: float
+    # T08b, bloc A : ratios du client par niveau (character_scaling.json, mode forever) ; vides : estimations
+    spell_crit_per_int_by_level: tuple[float, ...] = ()
+    base_mana_by_level: tuple[float, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -283,6 +286,8 @@ class LevelingConstants:
     default_run_between_s: float
     quest_band: QuestBand
     mob_source: str = "measured"  # PV des monstres par défaut des simulateurs (leveling.mob_source, T05)
+    # T08b, bloc A : constante d'armure par niveau de l'attaquant (character_scaling.json, mode forever) ; vide : formule
+    armor_constant_by_level: tuple[float, ...] = ()
 
     @property
     def ignite_ticks(self) -> int:
@@ -454,6 +459,8 @@ class GameData:
     assumption_ranges: Mapping[str, tuple[Variant, ...]]
     # savoir des 9 classes (classes.json, PV1), lu à la première consultation ; vide pour une version sans ce fichier
     classes: Mapping[str, ClassKnowledge] = field(default_factory=dict)
+    # T08b, bloc A : origine des ratios du personnage : « client » (character_scaling.json) ou « estimations »
+    character_ratios: str = "estimations"
 
 
 class CharacterOverrides(TypedDict, total=False):

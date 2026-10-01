@@ -144,7 +144,10 @@ def damage_assumptions(options: Mapping[str, Any], low_level_default: bool) -> l
 
 
 def ratio_assumption(gd: GameData) -> str:
-    raise NotImplementedError
+    """Origine des ratios du personnage (critique par Intelligence, mana de base, XP par niveau, constante d'armure)."""
+    if gd.character_ratios == "client":
+        return "ratios du personnage décodés du client (character_scaling.json) : critique par Intelligence, mana de base, XP par niveau, constante d'armure"
+    return "ratios du personnage estimés (mechanics.json, fm.py) : critique par Intelligence, mana de base, XP par niveau, constante d'armure"
 
 
 def assumptions(
@@ -273,6 +276,7 @@ def simulate_leveling(
         assumptions=[
             *fresh["assumptions"],
             *assumptions(options, hp, pts, n, seed, gd.constants.coefficients.low_level_default),
+            ratio_assumption(gd),
             *([DEFAULT_RACE_NOTE] if inputs["race"]["origin"] == "default" else []),
         ],
     )

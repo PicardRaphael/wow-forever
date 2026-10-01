@@ -16,6 +16,7 @@ from forever.config import Deps
 from forever.errors import DataSchemaError
 from forever.gamedata import SEED_FILES, build_game_data
 from forever.manifest import SOURCES_NAME
+from forever.pipeline.character_scaling import CHARACTER_FILE, character_errors
 from forever.pipeline.sources import CERTAINTIES, inherited_files, load_source, source_provenance
 from forever.provenance import Provenance
 from forever.store import VersionData, current_identity
@@ -111,6 +112,12 @@ def check_version(v: VersionData) -> tuple[list[str], list[str], list[str]]:
     except (OSError, ValueError, AttributeError, TypeError) as exc:
         errors.append(f"talents.json ou spells.json illisible ({exc})")
     errors += _sources_errors(v)
+    if (v.path / CHARACTER_FILE).is_file():  # T08b, bloc A : 9 classes, niveaux 1 au plafond sans trou
+        try:
+            rules = _json(v, "decode_rules.json") if (v.path / "decode_rules.json").is_file() else {}
+            errors += character_errors(_json(v, CHARACTER_FILE), list(rules.get("classes", {})))
+        except (OSError, ValueError) as exc:
+            errors.append(f"{CHARACTER_FILE} illisible ({exc})")
     inherited = inherited_files(v)
     if inherited:
         warnings.append(f"{len(inherited)} fichier(s) hérité(s) d'une version antérieure, à revérifier")

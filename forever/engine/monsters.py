@@ -96,6 +96,9 @@ def armor_reduction(gd: GameData, armor: float, attacker_level: int) -> float:
 
     Registre : I6"""
     lv = gd.leveling
+    table = lv.armor_constant_by_level
+    if table and 1 <= attacker_level <= len(table):  # constante du client (character_scaling.json, mode forever)
+        return armor / (armor + table[attacker_level - 1])
     return armor / (armor + lv.armor_base + lv.armor_per_attacker_level * attacker_level)
 
 

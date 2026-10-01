@@ -75,13 +75,18 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/mechanics.json"
       - "forever/data/1.60.1.70009/talents.json"
+      - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : PlayerExpectedStat.SpellCritPerIntellect, T08b)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_character.py::test_character_orc_60
       - tests/unit/test_engine_character.py::test_int_per_crit
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
+      - tests/unit/test_decode_character.py::test_mage_values_equal_player_expected_stat
+      - tests/unit/test_engine_character_rules.py::test_forever_mode_reads_decoded_ratios
+      - tests/unit/test_engine_character_rules.py::test_seed_mode_keeps_estimates
     tolerance: null
     formule: "crit = crit_base + Int / int_par_crit(niveau) + crit_équipement (+ épée, racial) + talents (Arcane Instability, Critical Mass, Arcane Impact, Incineration, Shatter si gelé) + crit_par_cumul × cumuls de Winter's Chill + buffs, bornée à [0, 1]"
+    note: "T08b, bloc A : en mode forever, Intelligence par point de critique lue dans le client par niveau (character_scaling.json, terme certain) dès que la version porte le fichier ; critique de base absente du client (suppose) ; mode seed : interpolation de fm.py"
   - id: A6
     categorie: attaque
     description: "Érafles (taux et pénalité selon la compétence d'arme)"
@@ -438,13 +443,17 @@ mechanics:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/mechanics.json"
+      - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : PlayerExpectedStat.BaseMana, recoupée par la GameTable basemp, T08b)"
     tests:
       - tests/unit/test_engine_character.py::test_character_orc_60
       - tests/unit/test_engine_character.py::test_character_gnome_mana
       - tests/unit/test_engine_character.py::test_overrides_replace_estimates
       - tests/parity/test_fm_parity.py::test_character_parity
+      - tests/unit/test_decode_character.py::test_crosscheck_against_gametables
+      - tests/unit/test_engine_character_rules.py::test_forever_mode_reads_decoded_ratios
     tolerance: null
     formule: "mana = mana_base(niveau) + min(Int, premiers_points) + mana_par_point × max(0, Int − premiers_points), × (1 + bonus racial)"
+    note: "T08b, bloc A : en mode forever, mana de base par niveau lue dans le client (character_scaling.json, terme certain, concorde avec basemp) ; mana par Intelligence absente du client (suppose)"
   - id: B10
     categorie: ressources
     description: "Évocation, gemmes, potions (recharges partagées)"
@@ -827,9 +836,12 @@ mechanics:
     forever: modifie
     statut: absent
     certitude: probable
-    sources: []
-    tests: []
+    sources:
+      - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : Exhaustion, T08b)"
+    tests:
+      - tests/unit/test_decode_character.py::test_rested_equals_exhaustion
     tolerance: null
+    note: "T08b, bloc A : paliers du repos décodés du client (Exhaustion, character_scaling.json), non modélisés dans le leveling (T04d)"
   - id: E1
     categorie: consommables
     description: "Flacons : un seul actif, conservé à la mort, conditions de zone"
@@ -1046,13 +1058,15 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/mechanics.json"
       - "forever/data/1.60.1.70009/leveling.json (player_model)"
+      - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : PV par Endurance, colonne Field_1_60_1_69876_005, recoupée par hppersta, T08b)"
     tests:
       - tests/unit/test_engine_character.py::test_character_orc_60
       - tests/unit/test_engine_character.py::test_spell_power_starts_at_level_10
       - tests/parity/test_fm_parity.py::test_character_parity
+      - tests/unit/test_decode_character.py::test_mage_values_equal_player_expected_stat
     tolerance: null
     formule: "stat = base + par_niveau × (niveau − 1) + bonus_tardif × max(0, niveau − niveau_tardif) ; la fiche du personnage remplace l'estimation"
-    note: "Mage seulement ; modèle estimé (EST), la fiche du personnage fait foi"
+    note: "Mage seulement ; modèle estimé (EST), la fiche du personnage fait foi. T08b : PV par Endurance décodés (sens de la colonne probable), non utilisés : PV de base et statistiques de base absents du client"
   - id: G3
     categorie: personnage
     description: "Talents : rangs, prérequis, paliers, 4e talent doré"
@@ -1423,6 +1437,7 @@ mechanics:
       - "forever/data/1.60.1.70009/spells.json (utility.conjure_water, conjure_food)"
       - "forever/data/1.60.1.70009/leveling.json (mob_model)"
       - "forever/data/1.60.1.70009/spell_scaling.json (utility : armures du client, niveaux d'apprentissage)"
+      - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : LevelExperience, ExpectedStat.ArmorConstant, T08b)"
     tests:
       - tests/unit/test_engine_leveling.py::test_monster_formulas_match_the_seed
       - tests/unit/test_engine_leveling.py::test_downtime_is_the_longer_of_drinking_and_eating
@@ -1435,9 +1450,11 @@ mechanics:
       - tests/unit/test_engine_armor.py::test_mage_armor_below_its_learned_level_is_refused
       - tests/unit/test_sim_rules.py::test_mage_armor_removes_the_attacker_slow_in_the_analytic_model
       - tests/unit/test_sim_rules.py::test_mage_armor_changes_the_monte_carlo
+      - tests/unit/test_decode_character.py::test_xp_to_next_equals_level_experience
+      - tests/unit/test_decode_character.py::test_armor_constant_equals_expected_stat
     tolerance: null
     formule: "temps par monstre = combat + repos + course entre monstres ; repos = max(mana dépensée / (boisson + Esprit), dégâts subis / (nourriture + régénération de repos × PV)) ; XP par heure = XP du monstre × secondes par heure / temps par monstre"
-    note: "T04b : Monte Carlo (forever/sim/leveling_mc.py) et analytique (forever/sim/leveling_analytic.py) portés du seed, parité à 1e-12 en mode seed ; mode par défaut : PV mesurés puis Questie corrigé (H11) et dégâts au niveau du personnage (G7) ; attaques des monstres sur le Mage du modèle du seed (mob_model : esquive, critique, cadence ; forever/engine/monsters.py : mob_land_chance, mob_hit_taken, mob_expected_hit, mob_swing_damage), aucune entrée dédiée (A1 et A11 absentes) ; l'armure du Mage réduit les coups reçus (leveling.armor_reduction), celle de la cible reste absente (H2) ; XP : règle Classic ; T04c : option rules (forever par défaut, seed pour la parité) ; armure portée (worn_armor, forever/engine/armor.py) selon le niveau d'apprentissage lu dans le client (spell_scaling.json.utility) : Frost puis Ice Armor, Mage Armor dès 34 ; armor paramètre de build (auto, frost, mage ; Mage Armor sous son niveau refusée) ; ralenti des coups seulement sous Frost ou Ice Armor ; bonus d'armure de Frost et Ice Armor non ajouté à l'armure du personnage (voir OPEN_QUESTIONS)"
+    note: "T08b, bloc A : en mode forever, XP par niveau (LevelExperience, concorde avec la GameTable xp) et constante d'armure par niveau (ExpectedStat, probable : table lue par le serveur inconnue, armormitigationbylvl en écart) lues dans le client ; XP par monstre et modulation par l'écart de niveau restent la règle Classic (suppose)"
   - id: I7
     categorie: optimisation
     description: "Zone ou donjon à mon niveau (quêtes utiles, plages de niveau des quêtes et des PNJ)"

@@ -18,6 +18,15 @@ from typing import Any, NamedTuple
 from forever.config import Deps
 from forever.errors import CandidateExistsError, CsvMissingError, DataSchemaError, InvalidArgumentError
 from forever.manifest import SOURCES_NAME, VERSION_DIR_RE, version_dirs, write_manifest
+from forever.pipeline.character_scaling import (
+    CHARACTER_FILE,
+    CHARACTER_FILES,
+    character_table_files,
+    decode_character_scaling,
+    gametables_dir,
+    load_character_tables,
+    load_gametables,
+)
 from forever.pipeline.fetch import DEFAULT_LOCALE, wago_dir
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
@@ -1526,11 +1535,30 @@ def decode_version(
             "pvp_items.json": decode_pvp_items(more, rules, version),
         }
         extra_notes += _class_observations(decoded_classes["classes.json"])
+    # T08b, bloc A : ratios du personnage (character_tables) : toutes les tables (décodées) ou aucune (héritées).
+    char_files = [(n, rel) for n, rel in character_table_files(rules) if n in rules.get("character_tables", [])]
+    char_missing = [rel for _, rel in char_files if not (csv_dir / rel).is_file()]
+    if char_missing and len(char_missing) < len(char_files):
+        raise CsvMissingError(version, char_missing)
+    if char_files and not char_missing:
+        char_doc = decode_character_scaling(
+            load_character_tables(csv_dir, rules), rules, load_gametables(gametables_dir(csv_dir), rules), version
+        )
+        decoded_classes[CHARACTER_FILE] = char_doc
+        extra_notes += [
+            f"{CHARACTER_FILE} : {c['value']} / GameTable {c['gametable']} : {c['status']}"
+            + (f" ({len(c['gaps'])} écart(s))" if c["gaps"] else "")
+            for c in char_doc["crosscheck"]
+        ]
     inherited = {}
-    names = [*INHERITED_FILES, *(n for n in CLASS_FILES if n not in decoded_classes)]
+    optional = (*CLASS_FILES, *CHARACTER_FILES)
+    names = [*INHERITED_FILES, *(n for n in optional if n not in decoded_classes)]
     for name in names:
         path = _inherited_source(base, name, rules)
         if path is None:
+            if name in CHARACTER_FILES:
+                extra_notes.append(f"{name} absent : tables des ratios absentes de {csv_dir.name} et de {base_version}")
+                continue
             if name in CLASS_FILES:
                 extra_notes.append(
                     f"{name} absent : tables des 9 classes absentes de {csv_dir.name} et de {base_version}"
@@ -1559,6 +1587,11 @@ def decode_version(
         "classes.json": "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "races.json": "races jouables, classes permises et raciaux (decode_rules.json, racial_skill_lines)",
         "pvp_items.json": "bijoux dont le sort d'utilisation rompt un contrôle (decode_rules.json, pvp_trinkets)",
+        CHARACTER_FILE: "ratios du personnage par classe et par niveau, XP, repos, constante d'armure, courbes de "
+        "régénération (decode_rules.json, character_scaling) ; recoupement par les GameTables dans crosscheck",
+    }
+    class_certainty_note = {
+        CHARACTER_FILE: "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
     }
     sources = {
         **{k: v for k, v in local_sources.items() if k != "files"},
@@ -1593,7 +1626,12 @@ def decode_version(
                 name: {
                     "source": f"Client {version} : {decoded_note}",
                     "certainty": "certain",
-                    "notes": [class_notes[name], "classement PvP : table de decode_rules.json, certitude probable"],
+                    "notes": [
+                        class_notes[name],
+                        class_certainty_note.get(
+                            name, "classement PvP : table de decode_rules.json, certitude probable"
+                        ),
+                    ],
                 }
                 for name in decoded_classes
             },

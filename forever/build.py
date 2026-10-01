@@ -32,6 +32,7 @@ from forever.leveling import (
     constants_certainty,
     damage_assumptions,
     given,
+    ratio_assumption,
 )
 from forever.optimize.decide import Gap, gap_dict, paired_gap, tie_break
 from forever.optimize.endgame import PVP_CONTEXTS, context_analytic, context_mc, neighbors, optimize_context
@@ -719,6 +720,7 @@ def _assumptions(
     if context in PVP_CONTEXTS:
         out.append("profil PvP du seed (EST) : modèle de scénarios, sans simulation de duel (pvp.profile, pvp.weights)")
     out += damage_assumptions(options, gd.constants.coefficients.low_level_default)
+    out.append(ratio_assumption(gd))
     if build.get("arcanePower"):
         out.append("Arcane Power posée au pull dès que sa recharge est écoulée (décision 79)")
     if context in PVP_CONTEXTS:

@@ -5,6 +5,7 @@ Le moteur reste pur : il reçoit `GameData` en paramètre. Tout écart de schém
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping
+from dataclasses import replace
 from typing import Any
 
 from forever.config import Deps
@@ -54,6 +55,7 @@ RACIALS_FILE = "racials.json"  # relevé communautaire (versions antérieures à
 RACES_FILE = "races.json"  # races et raciaux décodés du client (PV1, décision 106)
 SEED_RACIALS_FILE = "_seed_racials.json"  # copie figée du relevé, lue en mode seed (PV1, D5)
 CLASSES_FILE = "classes.json"  # savoir des 9 classes (PV1)
+CHARACTER_FILE = "character_scaling.json"  # ratios du personnage décodés du client (T08b, mode forever)
 MONSTERS_FILE = "monsters.json"
 SCALING_FILE = "spell_scaling.json"
 RESPEC_FILE = "respec.json"
@@ -934,6 +936,17 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
     values = _Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")
     talents, trees = _talents(raw[TALENTS_FILE], files[TALENTS_FILE])
     spells = _spells(raw[SPELLS_FILE], files[SPELLS_FILE])
+    constants = _constants(raw_mechanics)
+    leveling = _leveling(values)
+    xp_to_next = _xp_to_next(raw[LEVELING_FILE])
+    ratios = "estimations"
+    if rules == "forever" and (version.path / CHARACTER_FILE).is_file():
+        try:
+            raw_char = version.read_json(CHARACTER_FILE)
+        except (OSError, ValueError) as exc:
+            raise DataSchemaError(f"{CHARACTER_FILE} de {version.game_version} illisible ({exc}).") from exc
+        constants, leveling, xp_to_next = _client_ratios(raw_char, constants, leveling)
+        ratios = "client"
     return GameData(
         game_version=version.game_version,
         spells=spells,
@@ -941,24 +954,52 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         talent_at={(t.tree, t.tier, t.col): t.key for t in talents.values()},
         trees=trees,
         rules=_rules(raw[LEVELING_FILE]),
-        constants=_constants(raw_mechanics),
+        constants=constants,
         racials=_racials_from_races(raw[racials_file]) if racials_file == RACES_FILE else _racials(raw[racials_file]),
         monsters=_monsters(raw[MONSTERS_FILE]),
         scaling=_scaling(raw[SCALING_FILE], spells),
         mob_model=_mob_model(raw[LEVELING_FILE]),
-        leveling=_leveling(_Reader(MECHANICS_FILE).obj(raw_mechanics, "values", "values")),
+        leveling=leveling,
         utility=_utility(raw[SPELLS_FILE], files[SPELLS_FILE]),
         armors=_armors(raw[SCALING_FILE]),
         fire_vulnerability=_fire_vulnerability(raw[SCALING_FILE]),
         talent_cooldowns_s=_talent_cooldowns(raw[SCALING_FILE]),
         level_cap=_Reader(SCALING_FILE).int_(raw[SCALING_FILE], "level_cap", "level_cap"),
-        xp_to_next=_xp_to_next(raw[LEVELING_FILE]),
+        xp_to_next=xp_to_next,
         pvp=_pvp(values),
         respec=_respec(raw[RESPEC_FILE], values),
         build=_build_method(values),
         assumption_ranges=_assumption_ranges(values),
         classes=_ClassFile(version) if (version.path / CLASSES_FILE).is_file() else {},
+        character_ratios=ratios,
     )
+
+
+MAGE_CLASS = "Mage"  # moteur du Mage : ses ratios dans character_scaling.json
+
+
+def _client_ratios(
+    raw: Any, constants: Constants, leveling: LevelingConstants
+) -> tuple[Constants, LevelingConstants, tuple[int, ...]]:
+    """Ratios du client (`character_scaling.json`, T08b, bloc A) à la place des estimations, mode forever : critique
+    par Intelligence et mana de base du Mage par niveau, constante d'armure par niveau, XP par niveau."""
+    r = _Reader(CHARACTER_FILE)
+    mage = r.obj(r.obj(raw, "classes", "classes"), MAGE_CLASS, f"classes.{MAGE_CLASS}")
+
+    def numbers(obj: Any, key: str, where: str) -> tuple[float, ...]:
+        values = r.list_(obj, key, where)
+        if not all(isinstance(v, int | float) and not isinstance(v, bool) for v in values):
+            raise r.fail(where, "liste de nombres")
+        return tuple(float(v) for v in values)
+
+    character = replace(
+        constants.character,
+        spell_crit_per_int_by_level=numbers(mage, "spell_crit_per_intellect", "classes.Mage.spell_crit_per_intellect"),
+        base_mana_by_level=numbers(mage, "base_mana", "classes.Mage.base_mana"),
+    )
+    xp = tuple(r.int_({"v": v}, "v", "xp_to_next") for v in r.list_(raw, "xp_to_next", "xp_to_next"))
+    armor = numbers(raw, "armor_constant", "armor_constant")
+    return replace(constants, character=character), replace(leveling, armor_constant_by_level=armor), xp
 
 
 def load_game_data(deps: Deps) -> GameData:
