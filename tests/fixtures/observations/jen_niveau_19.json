@@ -1,0 +1,13 @@
+{
+ "source": "fiche du personnage relevée en jeu par l'utilisateur le 2026-10-01 (Jen, Mage orc, client 1.60.1.70124) ; critique des sorts aussi lue par ForeverLogger (GetSpellCritChance) le 2026-09-30 à 09:03",
+ "character": "Jen",
+ "race": "Orc",
+ "level": 19,
+ "intellect": 70,
+ "mana_max": 1113,
+ "crit_sheet_pct": 4.9,
+ "spell_crit_logger_pct": 4.624,
+ "gear_crit_pct": 0,
+ "talents": {"improvedFrostbolt": 5, "elementalPrecision": 5},
+ "note": "talents sans effet sur la mana ni la critique affichée ; « Critical Strike » de la fiche probablement générale (question ouverte)"
+}

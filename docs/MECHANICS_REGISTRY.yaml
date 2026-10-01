@@ -76,6 +76,7 @@ mechanics:
       - "forever/data/1.60.1.70009/mechanics.json"
       - "forever/data/1.60.1.70009/talents.json"
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : PlayerExpectedStat.SpellCritPerIntellect, T08b)"
+      - "tests/fixtures/observations/jen_niveau_19.json (relevé en jeu de l'utilisateur, 2026-10-01)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/unit/test_engine_character.py::test_character_orc_60
@@ -84,9 +85,10 @@ mechanics:
       - tests/unit/test_decode_character.py::test_mage_values_equal_player_expected_stat
       - tests/unit/test_engine_character_rules.py::test_forever_mode_reads_decoded_ratios
       - tests/unit/test_engine_character_rules.py::test_seed_mode_keeps_estimates
+      - tests/unit/test_observation_jen.py::test_client_ratios_predict_the_observed_spell_crit
     tolerance: null
     formule: "crit = crit_base + Int / int_par_crit(niveau) + crit_équipement (+ épée, racial) + talents (Arcane Instability, Critical Mass, Arcane Impact, Incineration, Shatter si gelé) + crit_par_cumul × cumuls de Winter's Chill + buffs, bornée à [0, 1]"
-    note: "T08b, bloc A : en mode forever, Intelligence par point de critique lue dans le client par niveau (character_scaling.json, terme certain) dès que la version porte le fichier ; critique de base absente du client (suppose) ; mode seed : interpolation de fm.py"
+    note: "T08b, bloc A : en mode forever, Intelligence par point de critique lue dans le client par niveau (character_scaling.json, terme certain) ; critique de base absente du client (suppose) ; mode seed : interpolation de fm.py. Preuve en jeu (2026-10-01, Jen, Mage orc niveau 19, Intelligence de la fiche) : la critique des sorts prédite par la révision 4 égale celle rendue par GetSpellCritChance (ForeverLogger), la révision 3 s'en écarte davantage ; certain pour ce terme à ce niveau"
   - id: A6
     categorie: attaque
     description: "Érafles (taux et pénalité selon la compétence d'arme)"
@@ -446,6 +448,7 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/mechanics.json"
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : PlayerExpectedStat.BaseMana, recoupée par la GameTable basemp, T08b)"
+      - "tests/fixtures/observations/jen_niveau_19.json (relevé en jeu de l'utilisateur, 2026-10-01)"
     tests:
       - tests/unit/test_engine_character.py::test_character_orc_60
       - tests/unit/test_engine_character.py::test_character_gnome_mana
@@ -453,9 +456,10 @@ mechanics:
       - tests/parity/test_fm_parity.py::test_character_parity
       - tests/unit/test_decode_character.py::test_crosscheck_against_gametables
       - tests/unit/test_engine_character_rules.py::test_forever_mode_reads_decoded_ratios
+      - tests/unit/test_observation_jen.py::test_client_ratios_predict_the_observed_mana
     tolerance: null
     formule: "mana = mana_base(niveau) + min(Int, premiers_points) + mana_par_point × max(0, Int − premiers_points), × (1 + bonus racial)"
-    note: "T08b, bloc A : en mode forever, mana de base par niveau lue dans le client (character_scaling.json, terme certain, concorde avec basemp) ; mana par Intelligence absente du client (suppose)"
+    note: "T08b, bloc A : en mode forever, mana de base par niveau lue dans le client (character_scaling.json, terme certain, concorde avec basemp) ; mana par Intelligence absente du client (suppose). Preuve en jeu (2026-10-01, Jen, niveau 19) : la mana maximale prédite par la révision 4 égale la fiche du personnage, la révision 3 la surestime ; certain pour la mana de base à ce niveau (la règle de mana par Intelligence est recoupée à cette Intelligence seulement)"
   - id: B10
     categorie: ressources
     description: "Évocation, gemmes, potions (recharges partagées)"
