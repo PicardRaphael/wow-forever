@@ -357,3 +357,14 @@ Réponse à la question ouverte « format et fonctionnement sur Forever » :
 - `docs/ROADMAP.md` :
     - T04d : ajouter aux sources `questcache.wdb`, les tables de quêtes du client, `QuestieForeverDB` et la mesure de `xpReward`.
     - DJ1 : ajouter AtlasLoot aux recoupements ; retirer l'idée que `BOSS_LEVELS` de FDJ recoupe H1 pour les donjons hérités (c'est une copie de Classic).
+
+## Relevé du 2026-10-01 par `forever addons status --save` (T08b, bloc D)
+
+Les empreintes de référence ci-dessus sont **remplacées** par le relevé de la commande, gardé dans
+`<cache>/addons/state.json` (empreinte de chaque fichier `.lua` et `.json`, version du `.toc`, agrégats de Questie).
+Empreinte de la commande : SHA-256 de la liste triée des SHA-256 des fichiers de données de l'addon **et de ses
+modules** (`AtlasLootClassic_*`, `GearQuestForever_*`), 12 caractères : elle diffère donc de la colonne ci-dessus
+pour les addons à modules. Versions relevées (premier relevé, statut `nouveau`) : Questie 11.38.0 Forever-v27,
+AtlasLootClassic `Forever 1.60.1`, ForeverDungeonJournal **1.3.3**, GearQuestForever 0.2.20-beta, ForeverGuide
+**1.17.0**, LegacyForever **v0.6.7**, ZoneLevelForever 1.4, Auctionator 339, ForeverLogger 0.2.0 (en gras : nouvelle
+version depuis le relevé du 2026-09-30). Les passages suivants rendent `inchangé` ou `changé`.

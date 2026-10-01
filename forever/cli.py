@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, NoReturn, cast
 
 from forever import registry
+from forever.addons import addons_status
 from forever.build import CONTEXTS, build_report
 from forever.chart import leveling_chart
 from forever.config import CHAIN_MAX_GAP_S, Deps, default_deps
@@ -294,6 +295,13 @@ def build_parser() -> argparse.ArgumentParser:
     info = questie_sub.add_parser("info", help="version et contenu de l'addon Questie installé")
     info.add_argument("--dir", help="dossier de l'addon (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)")
     info.add_argument("--json", action="store_true", help="sortie JSON")
+
+    addons = sub.add_parser("addons", help="addons de données installés (lecture locale)")
+    addons_sub = addons.add_subparsers(dest="addons_command", required=True, parser_class=_Parser)
+    a_status = addons_sub.add_parser("status", help="versions, empreintes et changements depuis le dernier relevé")
+    a_status.add_argument("--dir", help="dossier des addons (défaut : <FOREVER_WOW_DIR>/Interface/AddOns)")
+    a_status.add_argument("--save", action="store_true", help="enregistrer le relevé dans le cache")
+    a_status.add_argument("--json", action="store_true", help="sortie JSON")
 
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
@@ -1633,6 +1641,36 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
+    report = addons_status(deps, save=args.save, addons_dir=Path(args.dir) if args.dir else None)
+    provenance = local_provenance(
+        deps, certainty="suppose", assumptions=["addons communautaires : versions et empreintes, lecture locale"]
+    )
+    lines = [
+        f"Addons de données ({report['addons_dir'] or 'dossier absent'}){' : relevé enregistré' if args.save else ''}"
+    ]
+    for a in report["addons"]:
+        if a["status"] == "absent":
+            lines.append(f"  {a['name']} : absent")
+            continue
+        files = a["files"]
+        detail = ", ".join(f"{k} {len(v)}" for k, v in files.items() if v)
+        lines.append(
+            f"  {a['name']} {a.get('version') or '?'} : {a['status']} (empreinte {a['fingerprint']}"
+            + (f" ; fichiers {detail}" if detail else "")
+            + ")"
+        )
+        if a.get("aggregates_diff"):
+            lines.append(
+                f"    agrégats changés : {len(a['aggregates_diff'])} ; dépendants : {', '.join(a.get('depends', []))}"
+            )
+        if a["status"] == "changé" and a.get("action"):
+            lines.append(f"    action proposée : {a['action']}")
+    payload = {**report, "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
     log = Path(args.log) if args.log else (deps.wow_dir.joinpath(*hotfixes.HOTFIX_LOG) if deps.wow_dir else None)
     version = current_identity(deps.data_dir).game_version
@@ -1977,6 +2015,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "questie": _cmd_questie_info,
         "origins": _cmd_origins,
         "hotfixes": _cmd_hotfixes,
+        "addons": _cmd_addons,
         "monsters": _cmd_monsters_build,
         "measures": _cmd_measures_refresh,
         "sim": _cmd_sim,
