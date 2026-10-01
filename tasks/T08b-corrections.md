@@ -52,3 +52,19 @@ Regroupées pour être présentées en une fois avant la fusion (consigne de l'u
 - **Pas de correction demandée** : le décodage ajoute `auras.ignite` et `auras.winters_chill` (bloc B) ;
   `spell_scaling.json` installé ne les porte qu'à la révision 4 (bloc I, après accord). Le test redevient vert à
   l'installation de la révision 4 ; s'il ne l'est pas, une demande sera ajoutée ici.
+
+## 5. `tests/unit/test_install.py::test_client_decode_matches_the_installed_data` (T06b, blocs B et C de T08b)
+
+- **Prémisse changée** : `forever diff` compare désormais les valeurs de `spell_scaling.json` (bloc C, demande de
+  l'utilisateur, point 3), et le décodage porte deux auras de plus (bloc B : `auras.ignite`, `auras.winters_chill`).
+  La version 1.60.1.70009 installée ne recevra jamais ces champs (aucune révision prévue) : le diff liste 11 valeurs
+  **ajoutées**, aucune valeur modifiée.
+- **Preuve** : `diff_versions(1.60.1.70009, candidate)` rend 11 lignes `scaling` `added` (`auras ignite` : 4 champs,
+  `auras winters_chill` : 7 champs) ; aucune ligne `modified` ni `removed`.
+- **Diff proposé** (le test garde son sens : le décodage reproduit toutes les valeurs installées ; les champs
+  décodés depuis sont des ajouts) :
+
+```diff
+-    assert [c for c in d["changes"] if c["kind"] != "file"] == []
++    assert [c for c in d["changes"] if c["kind"] != "file" and not (c["kind"] == "scaling" and c["change"] == "added")] == []
+```

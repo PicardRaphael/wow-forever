@@ -8,18 +8,21 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal, TypedDict
+from typing import Any, Literal, TypedDict, cast
 
 from forever.config import Deps
 from forever.errors import DataSchemaError
 from forever.pipeline.sources import load_source, source_provenance
+from forever.pipeline.value_diff import character_lines, scaling_lines
 from forever.provenance import Provenance
 from forever.store import VersionData
 
 TALENT_FIELDS = ("name", "tree", "tier", "col", "max", "prereq")
-KINDS = ("talent", "spell", "file")
+SCALING = "spell_scaling.json"
+CHARACTER = "character_scaling.json"
+KINDS = ("talent", "spell", "file", "scaling", "character")
 
-Kind = Literal["talent", "spell", "file"]
+Kind = Literal["talent", "spell", "file", "scaling", "character"]
 ChangeType = Literal["added", "removed", "modified"]
 
 
@@ -122,6 +125,14 @@ def compare_data(a: VersionData, b: VersionData) -> list[Change]:
             changes.append(_change("spell", key, "added", None, None, None))
         else:
             changes += _rows("spell", key, spells_a[key].get("ranks", []), spells_b[key].get("ranks", []), fields)
+    # T08b, bloc C : valeurs des fichiers décodés, une ligne par valeur changée (plus de simple « fichier remplacé »)
+    for kind, name, lines in (("scaling", SCALING, scaling_lines), ("character", CHARACTER, character_lines)):
+        da, db = _read(a, name), _read(b, name)
+        if isinstance(da, dict) and isinstance(db, dict):
+            changes += [
+                _change(cast(Kind, kind), key, cast(ChangeType, change), field, old, new)
+                for change, key, field, old, new in lines(da, db)
+            ]
     return changes
 
 
@@ -131,6 +142,8 @@ def diff_versions(deps: Deps, a: str, b: str) -> VersionDiff:
     src_b, vb = load_source(deps, b)
     changes = compare_data(va, vb)
     counts = {k: sum(1 for c in changes if c["kind"] == k) for k in KINDS}
+    # valeurs des fichiers décodés (T08b) : comptées seulement quand il y en a (forme du résumé inchangée sinon)
+    counts = {k: n for k, n in counts.items() if k in ("talent", "spell", "file") or n}
     extra = [f"comparaison {a} (données {va.data_sha}) -> {b} (données {vb.data_sha})"]
     if src_a.candidate:
         extra.append(f"{a} : version candidate non installée")

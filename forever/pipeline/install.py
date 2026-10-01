@@ -30,6 +30,7 @@ from forever.manifest import SOURCES_NAME, write_manifest
 from forever.pipeline.builds import version_key
 from forever.pipeline.diff import TALENT_FIELDS, Change, _rows
 from forever.pipeline.sources import load_source
+from forever.pipeline.value_diff import character_lines, scaling_lines
 from forever.provenance import Provenance, data_revision_of, format_provenance_line, local_provenance, make_provenance
 from forever.store import current_identity
 from forever.timefmt import format_utc
@@ -52,11 +53,14 @@ RULES = (
     "replaced_file",
     "retired_file",
     "game_state",
+    "value",
 )
 FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
 CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json", "_seed_racials.json")
 CLASS_FILES = ("classes.json", "races.json", "pvp_items.json")
+# T08b, bloc C : fichiers décodés installés par une révision, avec la liste de leurs valeurs changées.
+VALUE_FILES = ("spell_scaling.json", "character_scaling.json")
 TALENT_TABLES = "tables Trait* et Spell* (wago.tools)"
 SPELL_TABLES = "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)"
 
@@ -288,6 +292,35 @@ def _file_changes(repo: Path, cand: Path, cand_sources: Mapping[str, Any], versi
     """Fichiers ajoutés, remplacés ou retirés (règles `added_file`, `replaced_file`, `retired_file`)."""
     changes: list[InstallChange] = []
     source = f"Client {version} : fichier décodé par forever decode (candidate)"
+    for name in VALUE_FILES:
+        if not _decoded(cand / name):
+            continue
+        if not (repo / name).is_file():
+            changes.append(
+                {
+                    "file": name,
+                    "path": "*",
+                    "before": None,
+                    "after": _short_sha(cand / name),
+                    "source": source,
+                    "certainty": "certain",
+                    "rule": "added_file",
+                }
+            )
+            continue
+        lines = (scaling_lines if name == VALUE_FILES[0] else character_lines)(_json(repo / name), _json(cand / name))
+        changes += [
+            {
+                "file": name,
+                "path": f"{key} · {field}" if field else key,
+                "before": old,
+                "after": new,
+                "source": source,
+                "certainty": "certain",
+                "rule": "value",
+            }
+            for _, key, field, old, new in lines
+        ]
     for name in CLASS_FILES:
         if not _decoded(cand / name):
             continue
@@ -577,6 +610,9 @@ def _sources(doc: dict[str, Any], docs: Mapping[str, Any], n: int, version: str,
         ],
     }
     cand_files = (docs.get("candidate_sources") or {}).get("files", {})
+    for name in sorted(docs.get("value_files", [])):
+        if name in cand_files:
+            files[name] = {**cand_files[name], "notes": [*cand_files[name].get("notes", []), installed]}
     for change in docs.get("file_changes", []):
         if change["rule"] == "retired_file":
             files.pop(change["file"], None)
@@ -673,7 +709,11 @@ def apply_install(
     day = date or format_utc(deps.now())[:10]
     n, version = plan["revision_to"], plan["version"]
     vdir: Path = _new_version_dir(deps, plan, docs, day) if new_version else docs["path"]
-    docs = {**docs, "file_changes": [c for c in plan["changes"] if c["rule"] in FILE_RULES]}
+    docs = {
+        **docs,
+        "file_changes": [c for c in plan["changes"] if c["rule"] in FILE_RULES],
+        "value_files": {c["file"] for c in plan["changes"] if c["rule"] == "value"},
+    }
     confirmed = _confirmed(_json(vdir / CONFIRMED), docs, n, version, day)
     base = _new_version_sources(docs, plan, day) if new_version else _json(vdir / SOURCES_NAME)
     sources = _sources(base, docs, n, version, day)
@@ -708,6 +748,8 @@ def apply_install(
         }
     )
     history["revisions"].append(revision)
+    for name in sorted({c["file"] for c in plan["changes"] if c["rule"] == "value"}):
+        shutil.copyfile(Path(docs["candidate_path"]) / name, vdir / name)
     for change in docs["file_changes"]:
         if change["rule"] == "retired_file":
             (vdir / change["file"]).unlink()
@@ -753,6 +795,7 @@ LABELS = {
     "replaced_file": "fichier remplacé (décodé du client)",
     "retired_file": "fichier retiré (retired_files)",
     "game_state": "état du jeu (plafond de la bêta, meta.json game_state)",
+    "value": "valeur d'un fichier décodé (spell_scaling.json, character_scaling.json)",
     "refused": "hors règles (refusé)",
 }
 CELL_MAX = 80
@@ -780,7 +823,7 @@ def render_install_report(plan: InstallPlan) -> str:
     lines += ["| Règle | Changements |", "| --- | --- |"]
     lines += [f"| {LABELS[r]} | {plan['counts'].get(r, 0)} |" for r in (*RULES, "refused")]
     lines.append("")
-    values = [c for c in plan["changes"] if c["rule"] in ("confirmed", "observation", "removed_field")]
+    values = [c for c in plan["changes"] if c["rule"] in ("confirmed", "observation", "removed_field", "value")]
     files = [c for c in plan["changes"] if c["rule"] in FILE_RULES]
     for title, rows in (("Valeurs changées", values), ("Fichiers", files), ("Écarts refusés", plan["refused"])):
         if not rows:

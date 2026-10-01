@@ -8,9 +8,21 @@ from forever.pipeline.diff import Change, VersionDiff
 from forever.pipeline.verify import VerifyReport
 from forever.provenance import format_provenance_line
 
-SECTIONS = (("talent", "Talents", "Talent"), ("spell", "Sorts", "Sort"), ("file", "Fichiers", "Fichier"))
+SECTIONS = (
+    ("talent", "Talents", "Talent"),
+    ("spell", "Sorts", "Sort"),
+    ("file", "Fichiers", "Fichier"),
+    ("scaling", "Valeurs de spell_scaling.json", "Sort, rang ou section"),
+    ("character", "Valeurs de character_scaling.json", "Classe, niveau ou section"),
+)
 CHANGES_FR = {"added": "ajouté", "removed": "retiré", "modified": "modifié"}
-KINDS_FR = {"talent": "talent(s)", "spell": "sort(s)", "file": "fichier(s)"}
+KINDS_FR = {
+    "talent": "talent(s)",
+    "spell": "sort(s)",
+    "file": "fichier(s)",
+    "scaling": "valeur(s) de spell_scaling.json",
+    "character": "valeur(s) de character_scaling.json",
+}
 
 
 def _cell(value: object) -> str:
