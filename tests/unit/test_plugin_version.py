@@ -31,8 +31,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.4.0 : planification, personnages prévus, rapport sourcé du sous-agent de recherche (décisions 118 à 121) ;
     # 0.4.1 : corrections après le passage d'évaluation 0.4.0 ; 0.4.2 : question contraire au profil (décision 122) ;
     # 0.4.3 : proposition d'analyser la nouvelle version quand la fraîcheur est en retard (T08a, décision 134) ;
-    # 0.5.0 : skills forever-pvp et forever-builds, routeur (PV1).
-    assert version == "0.5.0"
+    # 0.5.0 : skills forever-pvp et forever-builds, routeur (PV1) ; 0.6.0 : skill forever-familiers (CH0).
+    assert version == "0.6.0"
 
 
 def test_fingerprint_is_up_to_date():

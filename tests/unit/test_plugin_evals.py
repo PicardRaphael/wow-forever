@@ -30,6 +30,7 @@ POSITIVE_COUNTS = {
     "leveling": 3,
     "hors-perimetre": 3,
     "pvp": 3,  # PV1 : contrôles du Voleur, Mage contre Démoniste, défensif du Paladin
+    "familiers": 3,  # CH0 : guide d'apprivoisement, capacités du loup, entraînement des familiers
 }
 NEGATIVE_CATEGORIES = ("wow-autre", "autre-jeu", "programmation")
 POSITIVE_GRADERS = {"skill", "outil", "chiffres", "certitude", "provenance"}
@@ -83,8 +84,8 @@ def test_fifty_eight_cases_thirty_eight_positive_twenty_negative():
     # T06b : talent-niveau-22 et deux cas à profil vide ; 2026-09-29 : deux questions générales, deux personnelles,
     # un personnage prévu.
     # PV1 : trois cas PvP et un voisin (retail).
-    assert len(polarity) == 62
-    assert polarity.count("positif") == 41 and polarity.count("negatif") == 21
+    assert len(polarity) == 66  # CH0 : trois cas familiers et un voisin
+    assert polarity.count("positif") == 44 and polarity.count("negatif") == 22
 
 
 def test_empty_profile_cases():
@@ -248,7 +249,7 @@ def test_negative_categories():
         tags = front(c / "prompt.md")[0]["tags"]
         if tags[0] == "negatif":
             counts[tags[1]] += 1
-    assert sum(counts.values()) == 21
+    assert sum(counts.values()) == 22
     assert all(n >= 4 for n in counts.values()), counts
 
 
@@ -341,8 +342,8 @@ def test_report_thresholds_of_d10():
 def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    assert len(loaded) == 62  # PV1 : trois cas PvP et un voisin
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 41
+    assert len(loaded) == 66  # PV1 : trois cas PvP et un voisin ; CH0 : trois cas familiers et un voisin
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 44
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 
@@ -396,3 +397,36 @@ def test_pvp_cases_use_the_pvp_lookup():
         assert g["outil"][0]["tool"] == MCP_PREFIX + "forever_lookup", name
         assert any(meta["type"] == "llm" and "manque" in body for meta, body in g.values()), name
     assert "neg-retail-pvp-voleur" in {c.name for c in cases()}
+
+
+FAMILIERS = ("familiers-bite-rang-tarides", "familiers-capacites-loup", "familiers-entrainement")
+
+
+def test_familiers_cases_expect_the_pets_lookup_and_a_judge():
+    """CH0 : les trois questions de la demande attendent `forever_lookup` avec `"kind": "pets"` et un juge."""
+    named = [c.name for c in cases() if front(c / "prompt.md")[0]["tags"] == ["positif", "familiers"]]
+    assert named == sorted(FAMILIERS)
+    for name in FAMILIERS:
+        g = graders(EVALS / name)
+        outil = g["outil"][0]
+        assert outil["tool"] == MCP_PREFIX + "forever_lookup" and re.search(outil["input_match"], '"kind": "pets"')
+        judges = [body for meta, body in g.values() if meta["type"] == "llm"]
+        assert judges and all(judges), name
+
+
+def test_guide_case_runs_with_a_hunter_profile():
+    meta, _ = front(EVALS / "familiers-bite-rang-tarides" / "prompt.md")
+    path = REPO_ROOT / meta["env"]["EVAL_FOREVER_PROFILE"]
+    profile = json.loads(path.read_text(encoding="utf-8"))
+    active = profile["characters"][profile["active"]]
+    assert active["class"] == "Hunter" and isinstance(active["level"], int)
+    g = graders(EVALS / "familiers-bite-rang-tarides")
+    assert g["profil"][0] == {"type": "tool_used", "tool": MCP_PREFIX + "forever_player_profile"}
+    # le profil de la suite reste celui du Mage : les cas existants ne bougent pas
+    rempli = json.loads((FIXTURES / "plugin_eval" / "profile-rempli.json").read_text(encoding="utf-8"))
+    assert rempli["characters"][rempli["active"]]["class"] == "Mage"
+
+
+def test_retail_exotic_pet_neighbour_is_negative():
+    meta, question = front(EVALS / "neg-retail-familier-exotique" / "prompt.md")
+    assert meta["tags"] == ["negatif", "wow-autre"] and "retail" in question.lower()

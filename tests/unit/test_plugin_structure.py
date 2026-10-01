@@ -18,10 +18,11 @@ from forever.hooks import GAME_NUMBER, NUMBERS_MARKER
 from forever.mcp_server import build_server
 
 PLUGIN = REPO_ROOT / "plugin"
-SKILLS = ("forever-router", "forever-leveling", "forever-mage", "forever-pvp", "forever-builds")
+SKILLS = ("forever-router", "forever-leveling", "forever-mage", "forever-pvp", "forever-builds", "forever-familiers")
 AGENTS = ("forever-web-researcher", "forever-sim-runner")
 MCP_PREFIX = "mcp__plugin_forever_forever__"
-# Domaines non couverts à ce stade et tranche qui les couvrira (docs/ROADMAP.md).
+# Domaines non couverts à ce stade et tranche qui les couvrira (docs/ROADMAP.md). CH0 (savoir des familiers)
+# est couverte depuis CH0 ; CH1 reste citée pour le moteur du Chasseur et le choix du familier.
 UNCOVERED_TRANCHES = (
     "PV2",
     "DJ1",
@@ -165,6 +166,20 @@ def test_skill_descriptions_carry_trigger_words():
         assert word in desc["forever-pvp"]
     for word in ("build", "classe", "légal", "communauté", "talents"):
         assert word in desc["forever-builds"]
+    for word in (
+        "familier",
+        "chasseur",
+        "apprivois",
+        "capacité",
+        "rang",
+        "entraînement",
+        "beast training",
+        "loyauté",
+        "régime",
+        "famille",
+        "retail",
+    ):
+        assert word in desc["forever-familiers"], word
 
 
 def test_router_maps_skills_and_uncovered_domains():
@@ -172,13 +187,16 @@ def test_router_maps_skills_and_uncovered_domains():
     assert "forever-leveling" in body and "forever-mage" in body
     assert "forever-pvp" in body and "forever-builds" in body
     assert 'kind="pvp"' in body and 'kind="build_check"' in body
+    assert 'kind="pets"' in body and "forever-familiers" in body
     assert "format-reponse.md" in body
     assert "forever_status" in body
     for tranche in UNCOVERED_TRANCHES:
         assert re.search(rf"\b{tranche}\b", body), tranche
 
 
-@pytest.mark.parametrize("name", ["forever-leveling", "forever-mage", "forever-pvp", "forever-builds"])
+@pytest.mark.parametrize(
+    "name", ["forever-leveling", "forever-mage", "forever-pvp", "forever-builds", "forever-familiers"]
+)
 def test_domain_skills_use_the_response_format(name):
     _, body = frontmatter(PLUGIN / "skills" / name / "SKILL.md")
     assert "format-reponse.md" in body
@@ -308,3 +326,20 @@ def test_builds_skill_checks_community_builds():
     _, body = frontmatter(PLUGIN / "skills" / "forever-builds" / "SKILL.md")
     for word in ("forever_build", "forever-web-researcher", 'kind="build_check"', "légal"):
         assert word in body, word
+
+
+def test_ch0_is_covered_and_ch1_keeps_the_hunter_engine():
+    """CH0 : le savoir des familiers est couvert (aucune ligne « non couvert » ne cite CH0) ; la ligne du Chasseur
+    renvoie à CH1 pour les dégâts, les rotations et le choix du familier par contexte."""
+    _, body = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
+    uncovered = body.split("## 3. Domaines non couverts", 1)[1].split("\n## 4.", 1)[0]
+    assert not re.search(r"\bCH0\b", uncovered)
+    hunter = [line for line in uncovered.splitlines() if "Chasseur" in line]
+    assert hunter and any("familier" in line and "CH1" in line for line in hunter)
+
+
+def test_familiers_skill_states_its_limits():
+    _, body = frontmatter(PLUGIN / "skills" / "forever-familiers" / "SKILL.md")
+    assert 'kind="pets"' in body and "forever_player_profile" in body
+    for words in ("zone", "niveau", "CH1", "Forever Bestiary", "relevés de joueurs"):
+        assert words in body, words
