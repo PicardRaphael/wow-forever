@@ -16,6 +16,7 @@ from forever.errors import (
     UnsupportedKindError,
 )
 from forever.freshness import freshness_for_version
+from forever.pipeline.hotfixes import entity_assumptions
 from forever.pipeline.questie import TOC_NAME, ZoneAdvice, read_questie, zones_for_level
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.store import load_version
@@ -133,7 +134,11 @@ def lookup_spell(
         data_sha=data.data_sha,
         freshness=fresh["freshness"],
         certainty=min_certainty(certainties),
-        assumptions=[*fresh["assumptions"], *notes],
+        assumptions=[
+            *fresh["assumptions"],
+            *notes,
+            *entity_assumptions(deps.cache_dir, data.game_version, data.path, "spell", key),
+        ],
     )
     range_yd = spell.get("range")
     return {

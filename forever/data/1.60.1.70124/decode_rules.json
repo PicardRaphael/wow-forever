@@ -616,5 +616,9 @@
    "periodic_aura": 226
   },
   "note": "T08b, bloc B : aura d'une mécanique lue par son nom et son effet périodique (Ignite : aura distincte du talent, posée par le serveur) ; durée par SpellMisc.DurationIndex, période par SpellEffect.EffectAuraPeriod, cumul par SpellAuraOptions.CumulativeAura"
- }
+ },
+ "hotfix_related_tables": [
+  "Curve"
+ ],
+ "hotfix_related_tables_note": "T08b, bloc E : tables du client non téléchargées mais reliées à une table suivie (Curve : courbes des rangs de talent, points dans CurvePoint) ; un correctif sur elles est listé par forever hotfixes"
 }

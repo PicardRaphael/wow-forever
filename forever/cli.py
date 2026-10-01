@@ -58,17 +58,19 @@ from forever.origins import check_all as check_origins
 from forever.origins import inventory as origins_inventory
 from forever.origins import inventory_payload, render_inventory
 from forever.origins import render_report as render_origins_report
+from forever.pipeline import hotfixes
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
 from forever.pipeline.client_builds import (
     current_builds,
+    read_build_info,
     split_by_version,
     version_at,
 )
 from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
 from forever.pipeline.decode import Candidate, decode_version, load_rules
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
-from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_gametables, fetch_tables
+from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_gametables, fetch_tables, wago_dir
 from forever.pipeline.install import InstallRefusedError, apply_install, plan_install, render_install_report
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
 from forever.pipeline.measure import (
@@ -292,6 +294,11 @@ def build_parser() -> argparse.ArgumentParser:
     info = questie_sub.add_parser("info", help="version et contenu de l'addon Questie installé")
     info.add_argument("--dir", help="dossier de l'addon (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)")
     info.add_argument("--json", action="store_true", help="sortie JSON")
+
+    hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
+    hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
+    hot.add_argument("--since-install", action="store_true", help="seulement depuis la révision installée")
+    hot.add_argument("--json", action="store_true", help="sortie JSON")
 
     origins = sub.add_parser("origins", help="origine déclarée de chaque valeur des données (hors ligne)")
     origins_sub = origins.add_subparsers(dest="origins_command", required=True, parser_class=_Parser)
@@ -1626,6 +1633,53 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
+    log = Path(args.log) if args.log else (deps.wow_dir.joinpath(*hotfixes.HOTFIX_LOG) if deps.wow_dir else None)
+    version = current_identity(deps.data_dir).game_version
+    _, rules = load_rules(deps.data_dir)
+    new: list[dict[str, Any]] = []
+    if log is not None and log.is_file():
+        build = read_build_info(deps.wow_dir) if deps.wow_dir else None
+        lines = hotfixes.parse_hotfix_log(log.read_text(encoding="utf-8", errors="replace"), hotfixes.log_year(log))
+        new = hotfixes.update_journal(
+            deps.cache_dir, lines, hotfixes.tracked_tables(rules), build.build if build else None, deps.now()
+        )
+    entries = hotfixes.load_journal(deps.cache_dir)
+    sources = read_sources(deps.data_dir, version) or {}
+    since = str(sources.get("revised_at") or sources.get("collected_at") or "") if args.since_install else None
+    kept = [e for e in entries if since is None or str(e["at"])[:10] >= since]
+    summary = hotfixes.summarize(entries, since=since)
+    csv_dir = wago_dir(deps.cache_dir, version) / DEFAULT_LOCALE
+    entities = hotfixes.touched_entities(kept, csv_dir, deps.data_dir / version)
+    notes = [
+        "valeurs des correctifs non lues (DBCache.bin, T08)",
+        "VALIDATION_RESULT_INVALID compté à part : sens non établi (docs/OPEN_QUESTIONS.md)",
+    ]
+    if log is None or not log.is_file():
+        notes.append(f"journal {log or 'Hotfix.log'} absent : journal du cache seulement")
+    provenance = local_provenance(deps, certainty="probable", assumptions=notes)
+    payload = {
+        "log": str(log) if log else None,
+        "new": len(new),
+        "summary": summary,
+        "entities": entities,
+        "provenance": provenance,
+    }
+    head = f"Correctifs du serveur ({'depuis le ' + since if since else 'tous'}) : {summary['lines']} ligne(s), {len(new)} nouvelle(s)"
+    lines_out = [head]
+    lines_out += [
+        f"  {t} : {s['valid']} VALID, {s['delete']} DELETE, plages {s['ranges'][:5]}"
+        for t, s in summary["tables"].items()
+    ]
+    if summary["invalid"]:
+        lines_out.append(
+            "  INVALID (sens non établi) : " + ", ".join(f"{t} {n}" for t, n in summary["invalid"].items())
+        )
+    lines_out += [f"  touché : {e['kind']} {e['key']} (le {e['date']})" for e in entities]
+    _emit(payload, lines_out, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_origins(deps: Deps, args: argparse.Namespace) -> int:
     provenance = local_provenance(deps)
     if args.origins_command == "check":
@@ -1922,6 +1976,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
         "origins": _cmd_origins,
+        "hotfixes": _cmd_hotfixes,
         "monsters": _cmd_monsters_build,
         "measures": _cmd_measures_refresh,
         "sim": _cmd_sim,

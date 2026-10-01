@@ -79,7 +79,8 @@
       "paths": [
         "/classes_note",
         "/races_note",
-        "/gametables_note"
+        "/gametables_note",
+        "/hotfix_related_tables_note"
       ],
       "reason": "notes de lecture, texte"
     }
@@ -939,7 +940,8 @@
         "/gametables",
         "/character_tables",
         "/character_scaling",
-        "/mechanic_auras"
+        "/mechanic_auras",
+        "/hotfix_related_tables"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1)",
