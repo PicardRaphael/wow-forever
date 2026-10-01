@@ -86,7 +86,7 @@ def test_manifest_content():
     assert v["data_sha256"].startswith(v["data_sha"])
     assert v["revision"] == 3 and v["revised_at"] == "2026-09-30"  # PV1 : r2 (9 classes, raciaux), r3 (dissipations)
     assert (
-        len(v["files"]) == 21  # PV1, bloc C : pvp_rules.json
+        len(v["files"]) == 22  # PV1, bloc C : pvp_rules.json ; T08b, bloc H : origins.json
         and "racials.json" not in v["files"]
         and {
             "pvp_rules.json",
@@ -102,6 +102,7 @@ def test_manifest_content():
             "_seed_talents.json",
             "_seed_spells.json",
             "revisions.json",
+            "origins.json",
         }
         <= set(v["files"])
     )

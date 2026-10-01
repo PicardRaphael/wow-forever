@@ -69,4 +69,5 @@ def test_version_dir_contains_exactly_expected_files():
         "_seed_talents.json",  # T06b : copies figées du seed pour le mode seed (décision D2)
         "_seed_spells.json",
         "revisions.json",  # T06b : journal des révisions de la version (forever install)
+        "origins.json",  # T08b, bloc H : origine déclarée de chaque valeur
     }
