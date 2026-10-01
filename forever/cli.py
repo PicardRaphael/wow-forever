@@ -235,6 +235,10 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="installer une nouvelle version du jeu (nouveau dossier) au lieu d'une révision (T08a)",
     )
+    install.add_argument("--beta-level-cap", type=int, help="plafond de niveau de la bêta (T08b, avec sa source)")
+    install.add_argument(
+        "--beta-level-cap-source", help="source du plafond : adresse de la note officielle, ou « observation »"
+    )
     mode = install.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="afficher les changements sans rien écrire")
     mode.add_argument("--yes", action="store_true", help="écrire sans demander l'accord")
@@ -1088,7 +1092,8 @@ def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
         raise InvalidArgumentError(
             f"Le rapport ne s'écrit jamais dans {deps.data_dir}.", "choisir un fichier --report hors des données"
         )
-    plan = plan_install(deps, args.candidate, new_version=args.new_version)
+    cap_args = {"beta_level_cap": args.beta_level_cap, "beta_level_cap_source": args.beta_level_cap_source}
+    plan = plan_install(deps, args.candidate, new_version=args.new_version, **cap_args)
     text = render_install_report(plan)
     if report_path is not None:
         report_path.parent.mkdir(parents=True, exist_ok=True)
@@ -1103,7 +1108,7 @@ def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
     elif args.yes or (deps.confirm is not None and deps.confirm(_install_prompt(plan))):
         report_rel = args.report.replace("\\", "/") if args.report else None
         revision = apply_install(
-            deps, args.candidate, motif=args.motif, report=report_rel, new_version=args.new_version
+            deps, args.candidate, motif=args.motif, report=report_rel, new_version=args.new_version, **cap_args
         )
         status = "écrit"
     else:
@@ -1112,6 +1117,12 @@ def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
     payload = {"status": status, "plan": plan, "revision": revision, "provenance": provenance}
     counts = ", ".join(f"{k} {v}" for k, v in plan["counts"].items())
     lines = [f"Installation de {args.candidate} : {_install_target(plan)} : {status}", f"Changements : {counts}"]
+    cap = (plan.get("game_state") or {}).get("beta_level_cap")
+    if cap:
+        how = f"reporté de la {cap['carried_from']}" if cap.get("carried") else "donné"
+        lines.append(
+            f"État du jeu : plafond de la bêta {cap.get('value')} ({how} ; source {cap.get('source')} ; {cap.get('certainty')})"
+        )
     if report_path is not None:
         lines.append(f"Rapport : {report_path}")
     _emit(payload, lines, provenance, args.json)

@@ -4,8 +4,11 @@ Le moteur reste pur : il reçoit `GameData` en paramètre. Tout écart de schém
 
 from __future__ import annotations
 
+import json
 from collections.abc import Iterator, Mapping
 from dataclasses import replace
+from functools import lru_cache
+from pathlib import Path
 from typing import Any
 
 from forever.config import Deps
@@ -55,6 +58,8 @@ RACIALS_FILE = "racials.json"  # relevé communautaire (versions antérieures à
 RACES_FILE = "races.json"  # races et raciaux décodés du client (PV1, décision 106)
 SEED_RACIALS_FILE = "_seed_racials.json"  # copie figée du relevé, lue en mode seed (PV1, D5)
 CLASSES_FILE = "classes.json"  # savoir des 9 classes (PV1)
+META_FILE = "meta.json"
+BETA_CAP_KEY = "build.beta_level_cap"  # retirée par forever install (T08b, D2) : plafond dans meta.json game_state
 CHARACTER_FILE = "character_scaling.json"  # ratios du personnage décodés du client (T08b, mode forever)
 MONSTERS_FILE = "monsters.json"
 SCALING_FILE = "spell_scaling.json"
@@ -750,7 +755,7 @@ def _respec(raw: Any, values: Mapping[str, Any]) -> RespecRules:
     )
 
 
-def _build_method(values: Mapping[str, Any]) -> BuildMethod:
+def _build_method(values: Mapping[str, Any], game_state: Mapping[str, Any] | None = None) -> BuildMethod:
     """Clés `build.*` de `mechanics.json` : plafond de la bêta, paramètres de décision (T05)."""
     m = _Reader(MECHANICS_FILE)
 
@@ -758,7 +763,7 @@ def _build_method(values: Mapping[str, Any]) -> BuildMethod:
         return m.obj(values, key, key)
 
     return BuildMethod(
-        beta_level_cap=m.int_(entry("build.beta_level_cap"), "value", "build.beta_level_cap"),
+        beta_level_cap=_beta_level_cap(m, values, game_state),
         confidence=m.num(entry("build.confidence"), "value", "build.confidence"),
         stability_seeds=m.int_(entry("build.stability_seeds"), "value", "build.stability_seeds"),
         scenarios=_scenarios(m, m.obj(entry("build.scenarios"), "value", "build.scenarios")),
@@ -766,6 +771,19 @@ def _build_method(values: Mapping[str, Any]) -> BuildMethod:
         contexts=_contexts(m, m.obj(entry("build.contexts"), "value", "build.contexts")),
         concord_threshold=m.num(entry("build.concord_threshold"), "value", "build.concord_threshold"),
     )
+
+
+def _beta_level_cap(m: _Reader, values: Mapping[str, Any], game_state: Mapping[str, Any] | None) -> int:
+    """Plafond de la bêta : fait d'installation (`meta.json` `game_state`, T08b, D2) ; l'ancienne clé de
+    `mechanics.json` n'est lue que pour une version installée avant T08b, et refusée à côté de `game_state`."""
+    old = values.get(BETA_CAP_KEY)
+    if game_state and "beta_level_cap" in game_state:
+        if old is not None:
+            raise DataSchemaError(
+                f"{MECHANICS_FILE} : {BETA_CAP_KEY} retirée depuis T08b (plafond de la bêta dans meta.json game_state)."
+            )
+        return _Reader(META_FILE).int_(game_state["beta_level_cap"], "value", "game_state.beta_level_cap.value")
+    return m.int_(m.obj(values, BETA_CAP_KEY, BETA_CAP_KEY), "value", BETA_CAP_KEY)
 
 
 def _presets(m: _Reader, raw: Mapping[str, Any]) -> dict[str, Preset]:
@@ -947,6 +965,18 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
             raise DataSchemaError(f"{CHARACTER_FILE} de {version.game_version} illisible ({exc}).") from exc
         constants, leveling, xp_to_next = _client_ratios(raw_char, constants, leveling)
         ratios = "client"
+    utility, utility_source = _utility(raw[SPELLS_FILE], files[SPELLS_FILE]), files[SPELLS_FILE]
+    if rules == "forever":
+        constants, leveling = _client_mechanics(raw[SCALING_FILE], constants, leveling)
+        mage = _mage_client_spells(version) if (version.path / CLASSES_FILE).is_file() else None
+        if mage:
+            utility, spells = _client_utility(mage, utility, spells, _spell_names(version))
+            utility_source = CLASSES_FILE
+    try:
+        meta = version.read_json(META_FILE) if (version.path / META_FILE).is_file() else {}
+    except (OSError, ValueError) as exc:
+        raise DataSchemaError(f"{META_FILE} de {version.game_version} illisible ({exc}).") from exc
+    game_state = meta.get("game_state") if isinstance(meta, dict) else None
     return GameData(
         game_version=version.game_version,
         spells=spells,
@@ -960,7 +990,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         scaling=_scaling(raw[SCALING_FILE], spells),
         mob_model=_mob_model(raw[LEVELING_FILE]),
         leveling=leveling,
-        utility=_utility(raw[SPELLS_FILE], files[SPELLS_FILE]),
+        utility=utility,
         armors=_armors(raw[SCALING_FILE]),
         fire_vulnerability=_fire_vulnerability(raw[SCALING_FILE]),
         talent_cooldowns_s=_talent_cooldowns(raw[SCALING_FILE]),
@@ -968,14 +998,110 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         xp_to_next=xp_to_next,
         pvp=_pvp(values),
         respec=_respec(raw[RESPEC_FILE], values),
-        build=_build_method(values),
+        build=_build_method(values, game_state if isinstance(game_state, dict) else None),
         assumption_ranges=_assumption_ranges(values),
         classes=_ClassFile(version) if (version.path / CLASSES_FILE).is_file() else {},
         character_ratios=ratios,
+        utility_source=utility_source,
     )
 
 
 MAGE_CLASS = "Mage"  # moteur du Mage : ses ratios dans character_scaling.json
+PERCENT = 100.0  # conversion d'unité : pourcentage du client -> fraction
+
+
+@lru_cache(maxsize=8)
+def _mage_spells_cached(path: str, data_sha: str) -> dict[str, Any]:
+    doc = json.loads(Path(path).read_text(encoding="utf-8"))
+    spells = doc.get("classes", {}).get(MAGE_CLASS, {}).get("spells", {}) if isinstance(doc, dict) else {}
+    return {str(s.get("name")): s for s in spells.values() if isinstance(s, dict)}
+
+
+def _mage_client_spells(version: VersionData) -> dict[str, Any]:
+    """Sorts du Mage de `classes.json`, par nom anglais (lu une fois par version et empreinte : 2 Mo)."""
+    try:
+        return _mage_spells_cached(str(version.path / CLASSES_FILE), version.data_sha)
+    except (OSError, ValueError) as exc:
+        raise DataSchemaError(f"{CLASSES_FILE} illisible ({exc}).") from exc
+
+
+def _spell_names(version: VersionData) -> dict[str, str]:
+    """Clé de sort du dépôt -> nom anglais du client (`decode_rules.json` `spells`), vide sans règles."""
+    if not (version.path / "decode_rules.json").is_file():
+        return {}
+    try:
+        names = version.read_json("decode_rules.json").get("spells", {})
+    except (OSError, ValueError, AttributeError):
+        return {}
+    return {str(k): str(v) for k, v in names.items()} if isinstance(names, dict) else {}
+
+
+def _first_rank(spell: Mapping[str, Any] | None) -> Mapping[str, Any] | None:
+    ranks = spell.get("ranks") if isinstance(spell, Mapping) else None
+    return ranks[0] if isinstance(ranks, list) and ranks and isinstance(ranks[0], Mapping) else None
+
+
+def _client_utility(
+    mage: Mapping[str, Any], utility: Utility, spells: dict[str, Spell], names: Mapping[str, str]
+) -> tuple[Utility, dict[str, Spell]]:
+    """Mode forever (T08b, D2) : niveaux, recharges, durées, coupure de Counterspell et coûts en pourcentage du mana
+    de base lus dans `classes.json` (décodé du client) quand il les porte ; le reste (absorption d'Ice Barrier,
+    régénération de l'Évocation) garde la copie du seed."""
+    changes: dict[str, Any] = {}
+
+    def num(value: Any) -> float | None:
+        return float(value) if isinstance(value, int | float) and not isinstance(value, bool) else None
+
+    blink, cs, evo = (_first_rank(mage.get(n)) for n in ("Blink", "Counterspell", "Evocation"))
+    if blink:
+        changes |= {"blink_level": int(blink["level"]), "blink_cooldown_s": num(blink.get("cooldown_s"))}
+    if cs:
+        lockout = ((mage["Counterspell"].get("pvp") or {}).get("interrupt") or {}).get("lockout_s")
+        changes |= {
+            "counterspell_level": int(cs["level"]),
+            "counterspell_cooldown_s": num(cs.get("cooldown_s")),
+            "counterspell_lockout_s": num(lockout),
+        }
+    if evo:
+        changes |= {"evocation_level": int(evo["level"]), "evocation_duration_s": num(evo.get("duration_s"))}
+    barrier = (mage.get("Ice Barrier") or {}).get("ranks")
+    if isinstance(barrier, list) and len(barrier) == len(utility.ice_barrier):
+        changes["ice_barrier"] = tuple(
+            (int(r["level"]), absorb) for r, (_, absorb) in zip(barrier, utility.ice_barrier, strict=True)
+        )
+    kept = {k: v for k, v in changes.items() if v is not None}
+    new_spells = dict(spells)
+    for key, spell in spells.items():
+        rank = _first_rank(mage.get(names.get(key, "")))
+        pct = num(((rank or {}).get("cost") or {}).get("pct"))
+        if spell.mana_pct_base is not None and pct:
+            new_spells[key] = replace(spell, mana_pct_base=pct / PERCENT)
+    return replace(utility, **kept), new_spells
+
+
+def _client_mechanics(
+    raw_scaling: Any, constants: Constants, leveling: LevelingConstants
+) -> tuple[Constants, LevelingConstants]:
+    """Mode forever (T08b, bloc B) : aura d'Ignite et critique par cumul de Winter's Chill lus dans
+    `spell_scaling.json` (`auras`) quand la version les porte ; sinon les copies de `mechanics.json`."""
+    r = _Reader(SCALING_FILE)
+    auras = raw_scaling.get("auras", {}) if isinstance(raw_scaling, dict) else {}
+    ignite = auras.get("ignite")
+    if isinstance(ignite, dict):
+        leveling = replace(
+            leveling,
+            ignite_aura_id=r.int_(ignite, "spell_id", "auras.ignite.spell_id"),
+            ignite_duration_s=r.num(ignite, "duration_ms", "auras.ignite.duration_ms") / MS_PER_S,
+            ignite_tick_s=r.num(ignite, "period_ms", "auras.ignite.period_ms") / MS_PER_S,
+            ignite_cumulative=r.int_(ignite, "cumulative", "auras.ignite.cumulative"),
+        )
+    wc = auras.get("winters_chill")
+    if isinstance(wc, dict):
+        constants = replace(
+            constants,
+            crit_per_winters_chill_stack=r.num(wc, "pct_per_stack", "auras.winters_chill.pct_per_stack") / PERCENT,
+        )
+    return constants, leveling
 
 
 def _client_ratios(
@@ -999,6 +1125,11 @@ def _client_ratios(
     )
     xp = tuple(r.int_({"v": v}, "v", "xp_to_next") for v in r.list_(raw, "xp_to_next", "xp_to_next"))
     armor = numbers(raw, "armor_constant", "armor_constant")
+    talents = raw.get("talents") if isinstance(raw.get("talents"), dict) else {}
+    first = talents.get("first_level")
+    per_tier = (talents.get("points_per_tier") or {}).get(MAGE_CLASS)
+    if isinstance(first, int) and isinstance(per_tier, int):
+        constants = replace(constants, talents=TalentRules(first_level=first, points_per_tier=per_tier))
     return replace(constants, character=character), replace(leveling, armor_constant_by_level=armor), xp
 
 

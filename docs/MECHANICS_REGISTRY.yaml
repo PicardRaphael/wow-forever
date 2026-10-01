@@ -242,6 +242,7 @@ mechanics:
       - "forever/data/1.60.1.70009/talents.json"
       - "forever/data/1.60.1.70009/mechanics.json (clés leveling.*)"
       - "notes de développement de Blizzard du 24/09/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/1), build 1.60.1.70009"
+      - "forever/data/1.60.1.70124/decode_rules.json (mechanic_auras.ignite : aura, SpellDuration, SpellEffect.EffectAuraPeriod, SpellAuraOptions, T08b)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
@@ -256,9 +257,10 @@ mechanics:
       - tests/unit/test_variants.py::test_ignite_takes_percentage_bonuses_once
       - tests/unit/test_variants.py::test_ignite_amount_is_the_talent_share_of_the_final_crit
       - tests/unit/test_variants.py::test_independent_ignite_variant_is_the_seed_rule
+      - tests/unit/test_decode_mechanics.py::test_ignite_aura_equals_client_rows
     tolerance: null
     formule: "Ignite = crit × base × mult_dégâts × mult_crit × part_Ignite (espérance par lancer) ; Monte Carlo (rules forever) : à chaque critique de feu, reste = part × critique + reste non infligé, tics repartis sur durée / période à partir du critique"
-    note: "espérance par lancer dans expected_cast (analytique inchangée : perte à la mort non modélisée) ; T04c : aura 412538 lue dans le client (4 s, période 2 s, CumulativeAura 1 : pas de cumul par empilement, certain) ; règle roulante leveling.ignite_rule (décision 2, suppose : le compteur de tics repart du critique, reste perdu à la mort), forever/engine/damage.py : roll_ignite, ignite_ticks_due ; variante « compteur conservé » (roll_ignite_keep_timer) pour la comparaison seulement ; rules seed : 2 tics de 2 s par critique sans cumul (parité) ; vérification par les journaux (forever measures refresh, protocole de collecte A18) : voir OPEN_QUESTIONS ; T05 (bloc B) : notes de Blizzard du 24/09/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/1) « Ignite no longer double dips on % damage increase modifiers », build 70009 publié le même jour (wago.tools 2026-09-24T22:02Z, aucun build ultérieur) : assiette = critique final, bonus en pourcentage pris une fois, tics non remultipliés (déjà le calcul du moteur, verrouillé par un test) ; variante independent (règle du seed) dans la plage de leveling.ignite_rule pour la sensibilité"
+    note: "T08b, bloc B : aura d'Ignite (identifiant, durée, période, cumul) décodée du client dans spell_scaling.json (auras.ignite), lue en mode forever dès la révision qui l'installe ; mode seed : copie de mechanics.json ; la règle roulante reste supposée (serveur)"
   - id: A19
     categorie: attaque
     description: "Procs exclus des critiques périodiques (Hot Streak)"
@@ -462,13 +464,15 @@ mechanics:
     certitude: probable
     sources:
       - "forever/data/1.60.1.70009/spells.json (utility.evocation : niveau, durée, régénération)"
-    tests: []
+    tests:
+      - tests/unit/test_utility_source.py::test_forever_mode_reads_classes_json
+      - tests/unit/test_utility_source.py::test_seed_mode_keeps_seed_copies
     tolerance: null
     angle_mort:
       talents: []
       contextes: [dungeon, raid]
       estimation: evocation
-    note: "T05 : borne haute de l'angle mort calculée par forever/engine/blind_spots.py (test : tests/unit/test_blind_spots.py::test_estimates_are_positive_bounds_from_the_data)"
+    note: "T08b, bloc B (D2) : en mode forever, niveaux, recharges, durées, coupure de Counterspell et coûts en pourcentage du mana de base des utilitaires du Mage (Blink, Counterspell, Evocation, Ice Barrier, Arcane Blast) lus dans classes.json (décodé du client) ; régénération de l'Évocation et absorption d'Ice Barrier gardées du seed ; mode seed : copies du seed"
   - id: B11
     categorie: ressources
     description: "Coûts en % du mana de base, escalade d'Arcane Blast"
@@ -804,14 +808,16 @@ mechanics:
       - "seed/forever-mage/references/mechanics.md"
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/mechanics.json"
+      - "forever/data/1.60.1.70124/decode_rules.json (target_auras.winters_chill : aura posée par le talent, EffectBasePointsF, CumulativeAura, T08b)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
       - tests/unit/test_totals.py::test_winters_chill_crit_by_stack_and_rank
       - tests/unit/test_totals.py::test_lookup_talent_gives_derived_values
+      - tests/unit/test_decode_mechanics.py::test_winters_chill_equals_client_rows
     tolerance: null
     formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance) ; cumuls ≤ 2e variable du rang du talent"
-    note: "T04b : chance d'application de Winter's Chill portée dans les simulateurs de leveling (cumuls sans durée ni expiration dans le Monte Carlo, moyenne dans l'analytique), couverte par tests/parity/test_sim_leveling_parity.py ; durée des cumuls non modélisée"
+    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json"
   - id: D5
     categorie: environnement
     description: "Buffs de campement et de Legacy"
@@ -1079,6 +1085,7 @@ mechanics:
       - "forever/data/1.60.1.70009/revisions.json"
       - "forever/data/1.60.1.70009/mechanics.json"
       - "forever/data/1.60.1.70124/classes.json (PV1 : arbres des 9 classes, prérequis typés d'après TraitEdge.Type, probable)"
+      - "forever/data/1.60.1.70124/decode_rules.json (character_tables : NumTalentsAtLevel, TraitCond.SpentAmountRequired, T08b)"
     tests:
       - tests/unit/test_engine_talents.py::test_prerequisites
       - tests/unit/test_engine_talents.py::test_build_legality
@@ -1094,9 +1101,11 @@ mechanics:
       - tests/unit/test_class_build_legality.py::test_rejects_missing_prerequisite
       - tests/unit/test_class_build_legality.py::test_mage_check_is_unchanged
       - tests/unit/test_class_build_legality.py::test_unresolved_tier_uses_community_tier_else_is_undecidable
+      - tests/unit/test_decode_mechanics.py::test_first_talent_level_equals_num_talents_at_level
+      - tests/unit/test_decode_mechanics.py::test_points_per_tier_equals_trait_cond_step
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis requis : tous au maximum ; prérequis suffisants : un au maximum"
-    note: "4e talent doré non modélisé ; bonus Legacy « Talented » accepté en paramètre (G5 absent, non actif en bêta) ; PV1 : les autres classes que le Mage sont contrôlées sur classes.json avec une certitude probable (sens de TraitEdge.Type, paliers communautaires du Démoniste, premier niveau et points par palier de mechanics.json relevés sur le Mage et étendus aux autres classes)"
+    note: "T08b, bloc B : premier niveau à point de talent (NumTalentsAtLevel) et points par palier de chaque classe (TraitCond, suite k × pas, None sinon) décodés du client (character_scaling.json talents), lus en mode forever ; mode seed : mechanics.json (fm.py)"
   - id: G4
     categorie: personnage
     description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"
@@ -1383,6 +1392,7 @@ mechanics:
       - "forever/data/1.60.1.70009/respec.json (barème)"
       - "forever/data/1.60.1.70009/mechanics.json (respec.gold_per_hour, respec.trip_minutes, respec.beta_observed_resets)"
       - "docs/research/community-builds-mage.md (recherche communautaire du 2026-09-28 et comparaison du bloc J)"
+      - "forever/data/<version>/meta.json (game_state.beta_level_cap : fait d'installation, forever install --beta-level-cap, T08b, D2)"
     tests:
       - tests/unit/test_next_step.py::test_tie_prefers_the_modeled_talent
       - tests/unit/test_next_step.py::test_two_unmodeled_talents_are_not_decided
@@ -1421,8 +1431,10 @@ mechanics:
       - tests/unit/test_community_builds.py::test_every_gap_is_explained
       - tests/unit/test_community_builds.py::test_gaps_are_computed_by_the_engine
       - tests/unit/test_community_builds.py::test_no_community_value_in_the_data
+      - tests/unit/test_install_game_state.py::test_option_writes_cap_source_and_certainty
+      - tests/unit/test_install_game_state.py::test_without_option_the_value_is_carried_and_said
     tolerance: null
-    note: "T05 (décisions 84, 85) : forever/optimize/leveling.py (parité exacte avec le seed en rules seed), forever/optimize/endgame.py, forever/optimize/decide.py ; legal_additions accéléré (même résultat, contrôlé sur 3 000 builds) ; optimum local seulement (départs multiples) ; respec et PvP : blocs G et H ; l'analytique des scénarios sous-estime le Monte Carlo d'environ 10 % quand la mana s'épuise (niveau 60, fiche de base), la décision revient au Monte Carlo ; T05 bloc G : profil PvP porté (forever/engine/pvp.py, parité exacte en rules seed ; barème pvp.profile suppose, recharges du client, Blink et Counterspell de spells.json) ; contextes pvp-bg (poids du seed) et pvp-world (poids supposés) par départs multiples et recherche locale, sans Monte Carlo (modèle déterministe) ; le glouton du seed est gardé pour la parité ; T05 bloc H : respec (forever/engine/respec.py : coût du barème, certitude probable pour les paliers observés sur la bêta puis suppose, or par heure, bilan ; forever/optimize/respec.py : conseil du seed à l'identique en rules seed ; conseil forever à deux chemins de l'optimiseur à l'analytique, gain par niveau de respec, niveau conseillé = meilleur bilan positif) ; T05 bloc I2 : forever build <contexte> --level N et l'outil MCP forever_build (forever/build.py) : raisons (valeur d'un point contre son meilleur autre emplacement, trois confirmées au Monte Carlo apparié), alternative la plus proche, stabilité sur build.stability_seeds graines, sensibilité aux sept hypothèses (with_assumption), respec, angles morts du registre, certitude = minimum des sources, plafond de la bêta ; T05 bloc J : leveling en mode forever par départs multiples (faisceau libre et un faisceau par arbre, le chemin le plus court gagne) : sans eux, le faisceau rapide restait enfermé dans le Feu (Givre de la communauté 17 % plus rapide au niveau 30) ; comparaison avec 55 builds de la communauté (scripts/build_community_fixture.py, tests/fixtures/community/mage_builds.json) : 8 concordent, les autres écarts expliqués par une entrée du registre ou une source douteuse ; au niveau 30, des builds Arcanes font mieux au seul niveau 30 (notre référence suit le meilleur chemin cumulé de 10 à 30) ; T05 (relecture) : certitude suppose (profil PvP du seed, poids pvp-world supposés, respec au-delà des paliers observés, scénarios provisoires) ; le coût de respec vit dans forever/engine/respec.py sous cette entrée (entrée propre à créer) ; T05 (relecture) : valeur analytique d'un contexte sur la durée effective de chaque scénario (dégâts / dégâts par seconde) ; part des combats avec Arcane Power à l'analytique min(1, cycle / recharge), plus haute que la politique au pull du Monte Carlo (1 / plafond(recharge / cycle)) : surestime Arcane Power, décision au Monte Carlo ; T06b (décision 100) : départage en mode forever (engine/blind_spots.modeled_talents, optimize/decide.tie_break, optimize/leveling._state_meta, build._next_step) : meilleur au Monte Carlo si l'écart apparié est significatif, sinon talent modélisé préféré (modelise), sinon non_departage ; un non modélisé à égalité avec un modélisé est retiré du faisceau, sauf point de passage vers un palier (passage_palier) ; modélisé = hors des angles morts absent, sans distinguer les talents en partie modélisés (I8 : pyroblast, arcanePower) ni le contexte (voir OPEN_QUESTIONS)"
+    note: "T08b, bloc B (D2) : plafond de la bêta, fait d'installation (valeur, source, certitude probable pour une note, certain pour une observation ; reporté sinon, report signalé) ; l'ancienne clé de mechanics.json est retirée par l'installation puis refusée"
     formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide) ; T06b : à égalité statistique (intervalle apparié qui contient 0), talent modélisé d'abord ; next_step : toutes les additions légales au niveau N depuis un build légal au niveau N − 1"
   - id: I6
     categorie: optimisation

@@ -1306,7 +1306,7 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "decode_rules.json.utility_spells"
         )
     if "target_auras" in rules:
-        doc["auras"] = _target_auras(tables, rules, client)
+        doc["auras"] = {**_target_auras(tables, rules, client), **_mechanic_auras(rules, client)}
         notes.append(
             "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), "
             "cumuls maximum, durée, écoles touchées"
@@ -1336,6 +1336,38 @@ def _talent_cooldowns(tables: Tables, rules: Mapping[str, Any], client: _Client)
         out[talent_key(name)] = {
             "spell_id": found,
             "cooldown_ms": max(int(cd["RecoveryTime"]), int(cd["CategoryRecoveryTime"])),
+        }
+    return out
+
+
+def _mechanic_auras(rules: Mapping[str, Any], client: _Client) -> dict[str, dict[str, Any]]:
+    """Auras des mécaniques lues par leur nom et leur effet périodique (`mechanic_auras`, T08b, bloc B) : sort de
+    l'aura, durée (SpellDuration), période (SpellEffect.EffectAuraPeriod), cumul (SpellAuraOptions)."""
+    out: dict[str, dict[str, Any]] = {}
+    for key, spec in rules.get("mechanic_auras", {}).items():
+        if not isinstance(spec, dict):
+            continue
+        ids = [s for s, n in client.names.items() if n == spec["aura_spell"]]
+        found = [
+            (s, e)
+            for s in ids
+            for e in client.effects.get(s, {}).values()
+            if int(e["EffectAura"]) == int(spec["periodic_aura"])
+        ]
+        if len(found) != 1:
+            raise DataSchemaError(
+                f"{RULES_NAME} : {len(found)} aura(s) « {spec['aura_spell']} » d'effet {spec['periodic_aura']} ({key}), "
+                "une seule attendue."
+            )
+        spell, effect = found[0]
+        options, duration = client.auras.get(spell), client.duration_ms(spell)
+        if options is None or duration is None:
+            raise DataSchemaError(f"{key} (sort {spell}) : cumul ou durée absents.")
+        out[key] = {
+            "spell_id": spell,
+            "duration_ms": duration,
+            "period_ms": int(effect["EffectAuraPeriod"]),
+            "cumulative": int(options["CumulativeAura"]),
         }
     return out
 

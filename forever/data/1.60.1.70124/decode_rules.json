@@ -164,6 +164,12 @@
    "trigger_aura": 109,
    "aura": 270,
    "field": "EffectBasePointsF"
+  },
+  "winters_chill": {
+   "talent": "Winter's Chill",
+   "trigger_aura": 42,
+   "aura": 308,
+   "field": "EffectBasePointsF"
   }
  },
  "talent_cooldowns": {

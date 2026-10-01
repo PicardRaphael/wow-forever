@@ -33,7 +33,10 @@ def character_table_files(rules: Mapping[str, Any]) -> list[tuple[str, str]]:
     names = list(rules.get("character_tables", []))
     if not names:
         return []
-    return [(name, f"{DEFAULT_LOCALE}/{name}.csv") for name in dict.fromkeys([*names, "ChrClasses", "CurvePoint"])]
+    return [
+        (name, f"{DEFAULT_LOCALE}/{name}.csv")
+        for name in dict.fromkeys([*names, "ChrClasses", "CurvePoint", "SkillLineXTraitTree"])
+    ]
 
 
 def load_character_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]:
@@ -189,8 +192,27 @@ def decode_character_scaling(
             "rested : paliers du repos, non modélisés (D7)",
         ],
     }
+    doc["talents"] = _talent_rules(tables, rules)
     doc["crosscheck"] = [_crosscheck(c, doc, gametables, cap) for c in spec.get("crosscheck", [])]
     return doc
+
+
+def _talent_rules(tables: Mapping[str, Sequence[Row]], rules: Mapping[str, Any]) -> dict[str, Any]:
+    """Premier niveau qui donne un point de talent (`NumTalentsAtLevel`, identifiant = niveau) et points dépensés
+    exigés par palier pour chaque classe (`TraitCond.SpentAmountRequired` de l'arbre de la classe) : pas de la suite
+    k × pas ; None si les seuils ne forment pas une telle suite (signalé, jamais deviné)."""
+    first = min((int(r["ID"]) for r in tables["NumTalentsAtLevel"] if int(r["NumTalents"]) > 0), default=None)
+    tree_of = {int(r["SkillLineID"]): int(r["TraitTreeID"]) for r in tables["SkillLineXTraitTree"]}
+    per_tier: dict[str, int | None] = {}
+    for cls, spec in rules["classes"].items():
+        trees = {tree_of[s] for s in spec.get("skill_lines", []) if s in tree_of}
+        spent = sorted(
+            {int(r["SpentAmountRequired"]) for r in tables["TraitCond"] if int(r["TraitTreeID"]) in trees} - {0}
+        )
+        step = spent[0] if spent else None
+        ok = step is not None and spent == [step * (i + 1) for i in range(len(spent))]
+        per_tier[cls] = step if ok else None
+    return {"first_level": first, "points_per_tier": per_tier}
 
 
 def character_errors(doc: Any, classes: Sequence[str]) -> list[str]:

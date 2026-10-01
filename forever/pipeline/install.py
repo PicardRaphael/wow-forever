@@ -22,7 +22,7 @@ import json
 import shutil
 from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any, NotRequired, TypedDict
 
 from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError
@@ -38,6 +38,9 @@ TALENTS = "talents.json"
 SPELLS = "spells.json"
 CONFIRMED = "confirmed_changes.json"
 REVISIONS = "revisions.json"
+META = "meta.json"
+MECHANICS = "mechanics.json"
+BETA_CAP_KEY = "build.beta_level_cap"  # retirée de mechanics.json par l'installation (T08b, D2)
 RULES = (
     "confirmed",
     "observation",
@@ -48,6 +51,7 @@ RULES = (
     "added_file",
     "replaced_file",
     "retired_file",
+    "game_state",
 )
 FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
@@ -80,6 +84,7 @@ class InstallPlan(TypedDict):
     refused: list[InstallChange]
     counts: dict[str, int]
     provenance: Provenance
+    game_state: dict[str, Any]
 
 
 class InstallRefusedError(ForeverError):
@@ -332,7 +337,70 @@ def _file_changes(repo: Path, cand: Path, cand_sources: Mapping[str, Any], versi
     return changes
 
 
-def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[InstallPlan, dict[str, Any]]:
+def _game_state(
+    repo: Path, rev: int, cap: int | None, source: str | None
+) -> tuple[dict[str, Any], list[InstallChange]]:
+    """Plafond de la bêta, fait d'installation (T08b, D2) : valeur donnée avec sa source (`probable` pour une note,
+    `certain` pour une observation en jeu), sinon valeur précédente reportée (« reportée de la révision N »).
+    L'ancienne clé de `mechanics.json` est retirée (règle `game_state`)."""
+    if cap is not None and not source:
+        raise InvalidArgumentError(
+            "--beta-level-cap exige sa source.", "ajouter --beta-level-cap-source <adresse de la note | observation>"
+        )
+    meta = _json(repo / META) if (repo / META).is_file() else {}
+    prev = (meta.get("game_state") or {}).get("beta_level_cap") if isinstance(meta, dict) else None
+    mech = _json(repo / MECHANICS) if (repo / MECHANICS).is_file() else {}
+    old = (mech.get("values") or {}).get(BETA_CAP_KEY) if isinstance(mech, dict) else None
+    changes: list[InstallChange] = []
+    if cap is not None:
+        certainty = "certain" if source == "observation" else "probable"
+        state: dict[str, Any] = {"value": cap, "source": source, "certainty": certainty, "carried": False}
+        before = (prev or old or {}).get("value")
+        changes.append(
+            {
+                "file": META,
+                "path": "game_state.beta_level_cap",
+                "before": before,
+                "after": cap,
+                "source": str(source),
+                "certainty": certainty,
+                "rule": "game_state",
+            }
+        )
+    else:
+        base = prev or old
+        if not base:
+            return {}, []
+        state = {
+            "value": base.get("value"),
+            "source": base.get("source"),
+            "certainty": base.get("certainty"),
+            "carried": True,
+            "carried_from": f"révision {rev}",
+        }
+    if old is not None:
+        changes.append(
+            {
+                "file": MECHANICS,
+                "path": f"values.{BETA_CAP_KEY}",
+                "before": old.get("value"),
+                "after": None,
+                "source": "plafond de la bêta, fait d'installation : meta.json game_state (T08b, D2)",
+                "certainty": str(state.get("certainty")),
+                "rule": "game_state",
+            }
+        )
+    return {"beta_level_cap": state}, changes
+
+
+def _merge(
+    deps: Deps,
+    candidate: str,
+    *,
+    new_version: bool = False,
+    beta_level_cap: int | None = None,
+    beta_level_cap_source: str | None = None,
+) -> tuple[InstallPlan, dict[str, Any]]:
     identity = current_identity(deps.data_dir)
     src, cv = load_source(deps, candidate)
     if not src.candidate:
@@ -366,6 +434,8 @@ def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[In
     if not new_version:
         m.changes += _file_changes(rv.path, cv.path, cv.sources, rv.game_version)
     rev = data_revision_of(rv.sources)
+    game_state, state_changes = _game_state(rv.path, rev, beta_level_cap, beta_level_cap_source)
+    m.changes += state_changes
     counts = {r: sum(1 for c in m.changes if c["rule"] == r) for r in RULES}
     counts["refused"] = len(m.refused)
     target = cv.game_version if new_version else rv.game_version
@@ -391,6 +461,7 @@ def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[In
         "refused": m.refused,
         "counts": counts,
         "provenance": provenance,
+        "game_state": game_state,
     }
     docs = {
         "talents": talents,
@@ -405,9 +476,22 @@ def _merge(deps: Deps, candidate: str, *, new_version: bool = False) -> tuple[In
     return plan, docs
 
 
-def plan_install(deps: Deps, candidate: str, *, new_version: bool = False) -> InstallPlan:
+def plan_install(
+    deps: Deps,
+    candidate: str,
+    *,
+    new_version: bool = False,
+    beta_level_cap: int | None = None,
+    beta_level_cap_source: str | None = None,
+) -> InstallPlan:
     """Changements qu'écrirait l'installation de `candidate` (rien n'est écrit)."""
-    return _merge(deps, candidate, new_version=new_version)[0]
+    return _merge(
+        deps,
+        candidate,
+        new_version=new_version,
+        beta_level_cap=beta_level_cap,
+        beta_level_cap_source=beta_level_cap_source,
+    )[0]
 
 
 class Revision(TypedDict):
@@ -419,6 +503,7 @@ class Revision(TypedDict):
     report: str | None
     counts: dict[str, int]
     changes: list[InstallChange]
+    game_state: NotRequired[dict[str, Any]]
 
 
 def _mana_note(spells: Mapping[str, Any]) -> str:
@@ -563,13 +648,21 @@ def apply_install(
     report: str | None = None,
     date: str | None = None,
     new_version: bool = False,
+    beta_level_cap: int | None = None,
+    beta_level_cap_source: str | None = None,
 ) -> Revision:
     """Écrit la révision suivante de la version courante (talents.json, spells.json, confirmed_changes.json,
     sources.json, revisions.json), puis le manifeste. Avec `new_version`, écrit le dossier d'une **nouvelle** version
     (T08a) : fichiers décodés de la candidate, copies figées du seed et changements confirmés repris de la version
     précédente, `revisions.json` en révision 1. Refuse tout écart hors règles (InstallRefusedError) et, sans
     `new_version`, toute installation qui ne change rien (InvalidArgumentError)."""
-    plan, docs = _merge(deps, candidate, new_version=new_version)
+    plan, docs = _merge(
+        deps,
+        candidate,
+        new_version=new_version,
+        beta_level_cap=beta_level_cap,
+        beta_level_cap_source=beta_level_cap_source,
+    )
     if plan["refused"]:
         raise InstallRefusedError(plan["refused"])
     if not plan["changes"] and not new_version:
@@ -594,6 +687,8 @@ def apply_install(
         "counts": {k: v for k, v in plan["counts"].items() if k != "refused"},
         "changes": plan["changes"],
     }
+    if plan["game_state"]:
+        revision["game_state"] = plan["game_state"]
     path = vdir / REVISIONS
     history: dict[str, Any] = (
         {"schema_version": 1, "version": version, "revisions": []}
@@ -623,8 +718,28 @@ def apply_install(
     _write(vdir / CONFIRMED, confirmed, 2)
     _write(vdir / SOURCES_NAME, sources, 2)
     _write(path, history, 1)
+    if plan["game_state"]:
+        _write_game_state(vdir, plan["game_state"], n, day)
     write_manifest(deps.data_dir)
     return revision
+
+
+def _write_game_state(vdir: Path, state: Mapping[str, Any], n: int, day: str) -> None:
+    """`meta.json` `game_state` (valeur, source, certitude, date, révision ; report signalé) et retrait de
+    l'ancienne clé de `mechanics.json`."""
+    meta = _json(vdir / META) if (vdir / META).is_file() else {}
+    entries = {}
+    for key, s in state.items():
+        entry = {k: v for k, v in s.items() if k != "carried"}
+        entries[key] = {**entry, "date": day, "revision": n}
+    meta["game_state"] = {**meta.get("game_state", {}), **entries}
+    _write(vdir / META, meta, 1)
+    mech_path = vdir / MECHANICS
+    if mech_path.is_file():
+        mech = _json(mech_path)
+        if BETA_CAP_KEY in mech.get("values", {}):
+            del mech["values"][BETA_CAP_KEY]
+            _write(mech_path, mech, 1)
 
 
 LABELS = {
@@ -637,6 +752,7 @@ LABELS = {
     "added_file": "fichier ajouté (décodé du client)",
     "replaced_file": "fichier remplacé (décodé du client)",
     "retired_file": "fichier retiré (retired_files)",
+    "game_state": "état du jeu (plafond de la bêta, meta.json game_state)",
     "refused": "hors règles (refusé)",
 }
 CELL_MAX = 80
@@ -677,6 +793,15 @@ def render_install_report(plan: InstallPlan) -> str:
             for c in rows
         ]
         lines.append("")
+    for key, s in (plan.get("game_state") or {}).items():
+        label = {"beta_level_cap": "plafond de la bêta"}.get(key, key)
+        how = f"reporté de la {s['carried_from']}" if s.get("carried") else "donné à l'installation"
+        lines += [
+            "## État du jeu",
+            "",
+            f"- {label} : {s.get('value')} ({how} ; source {s.get('source')} ; certitude {s.get('certainty')})",
+            "",
+        ]
     cert = [c for c in plan["changes"] if c["rule"] == "certainty"]
     if cert:
         befores = ", ".join(sorted({str(c["before"]) for c in cert}))
