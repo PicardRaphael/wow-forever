@@ -7,6 +7,7 @@ Givre légal au niveau 22 (13 points = 22 − 9, `points_available`) ; Ice Lance
 import asyncio
 import json
 from dataclasses import replace
+from pathlib import Path
 
 import pytest
 from conftest import REPO_ROOT, FakeHttp
@@ -43,6 +44,14 @@ def test_default_path_is_outside_the_repository(tmp_path):
     assert profile_path({"EVAL_FOREVER_PROFILE": str(tmp_path / "e.json")}) == tmp_path / "e.json"
     both = {"FOREVER_PROFILE": str(tmp_path / "p.json"), "EVAL_FOREVER_PROFILE": str(tmp_path / "e.json")}
     assert profile_path(both) == tmp_path / "p.json"
+
+
+def test_relative_eval_profile_is_resolved_against_the_repository():
+    # CH0 : le champ `env` d'un cas d'évaluation donne un chemin relatif au dépôt ; le serveur MCP ne tourne pas
+    # forcément depuis la racine du dépôt (claude plugin eval)
+    rel = "tests/fixtures/plugin_eval/profile-chasseur.json"
+    assert profile_path({"EVAL_FOREVER_PROFILE": rel}) == REPO_ROOT / rel
+    assert profile_path({"FOREVER_PROFILE": "relatif.json"}) == Path("relatif.json")  # FOREVER_PROFILE inchangé
 
 
 def test_profile_under_the_repository_is_refused(make_deps):

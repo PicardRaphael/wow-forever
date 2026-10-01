@@ -144,9 +144,15 @@ def character_values(raw: Mapping[str, Any]) -> dict[str, Any]:
 
 def profile_path(environ: Mapping[str, str] = os.environ) -> Path:
     """FOREVER_PROFILE, sinon EVAL_FOREVER_PROFILE (évaluation du plugin : `claude plugin eval` ne transmet que les
-    variables `EVAL_*`), sinon ~/.forever/profile.json."""
-    configured = environ.get("FOREVER_PROFILE") or environ.get("EVAL_FOREVER_PROFILE")
-    return Path(configured) if configured else Path.home() / ".forever" / "profile.json"
+    variables `EVAL_*`), sinon ~/.forever/profile.json. Un EVAL_FOREVER_PROFILE relatif (champ `env` d'un cas
+    d'évaluation) se lit depuis la racine du dépôt (CH0) : le serveur MCP ne tourne pas forcément depuis elle."""
+    if environ.get("FOREVER_PROFILE"):
+        return Path(environ["FOREVER_PROFILE"])
+    configured = environ.get("EVAL_FOREVER_PROFILE")
+    if not configured:
+        return Path.home() / ".forever" / "profile.json"
+    path = Path(configured)
+    return path if path.is_absolute() else Path(__file__).resolve().parent.parent / path
 
 
 def resolve_path(deps: Deps) -> Path:
