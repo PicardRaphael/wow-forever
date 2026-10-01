@@ -72,4 +72,6 @@ def test_version_dir_contains_exactly_expected_files():
         "revisions.json",  # T06b : journal des révisions de la version (forever install)
         "origins.json",  # T08b, bloc H : origine déclarée de chaque valeur
         "character_scaling.json",  # T08b, révision 4 : ratios du personnage décodés du client
+        "pets.json",  # CH0, révision 5 : familiers du Chasseur décodés du client
+        "pet_rules.json",  # CH0, révision 5 : règles des familiers hors du client (suppose, sources citées)
     }
