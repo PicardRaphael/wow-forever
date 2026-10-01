@@ -195,3 +195,82 @@ def render_crosscheck_markdown(report: Mapping[str, Any]) -> str:
         ]
         lines.append("")
     return "\n".join(lines).rstrip("\n") + "\n"
+
+
+# --- Fiches et guide (bloc D) ------------------------------------------------------------------------------
+
+
+def normalize_text(text: str) -> str:
+    """Nom comparable : minuscules, sans accents, mots séparés par une espace."""
+    raise NotImplementedError
+
+
+def resolve_zone(pets: Mapping[str, Any], name: str) -> dict[str, Any]:
+    """Zone du client (`maps` de pets.json) par son nom français ou anglais ; InvalidArgumentError qui liste des
+    candidats si aucune ne correspond."""
+    raise NotImplementedError
+
+
+def resolve_name(pets: Mapping[str, Any], bestiary: Mapping[str, Any] | None, name: str) -> dict[str, Any]:
+    """Famille, capacité ou bête par son nom (français, anglais, clé, alias ; casse et accents ignorés) :
+    `{"kind": "family" | "ability" | "beast", "key": …}` ; InvalidArgumentError qui liste les candidats si le nom
+    est ambigu ou inconnu."""
+    raise NotImplementedError
+
+
+def rules_sheet(rules: Mapping[str, Any]) -> dict[str, Any]:
+    """Règles du système de familiers (`pet_rules.json`), une par entrée, avec source, date, certitude, registre."""
+    raise NotImplementedError
+
+
+def family_sheet(pets: Mapping[str, Any], key: str, gaps: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """Fiche d'une famille : noms, bonus, régime, capacités et rangs (niveau, coût propre à la famille, focus,
+    recharge), certitude par champ, écarts du recoupement."""
+    raise NotImplementedError
+
+
+def ability_sheet(
+    pets: Mapping[str, Any],
+    key: str,
+    bestiary: Mapping[str, Any] | None = None,
+    rank: int | None = None,
+    detail: bool = False,
+) -> dict[str, Any]:
+    """Fiche d'une capacité : rangs, familles, nombre de bêtes de l'addon qui enseignent chaque rang (liste avec
+    `detail`)."""
+    raise NotImplementedError
+
+
+def beast_sheet(
+    bestiary: Mapping[str, Any],
+    beast_id: int,
+    pets: Mapping[str, Any],
+    questie_levels: list[int] | None = None,
+    gaps: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Fiche d'une bête : famille, niveaux (addon et Questie), zones, coordonnées, rangs enseignés et leur marque,
+    vitesse, observations de la carte communautaire."""
+    raise NotImplementedError
+
+
+def tame_guide(
+    pets: Mapping[str, Any],
+    rules: Mapping[str, Any],
+    bestiary: Mapping[str, Any],
+    *,
+    level: int | None,
+    zone: str,
+    band: tuple[int, int],
+    zone_levels: Mapping[str, list[int]],
+    ability: str | None = None,
+    rank: int | None = None,
+    family: str | None = None,
+    beast: int | None = None,
+    saved: Mapping[str, Any] | None = None,
+    gaps: list[dict[str, Any]] | None = None,
+) -> dict[str, Any]:
+    """Guide d'apprivoisement : bêtes qui enseignent le rang (ou de la famille, ou la bête) dans la zone demandée,
+    puis dans les zones du même continent dont la plage de niveau des PNJ normaux (`zone_levels`, Questie) recoupe
+    la bande de niveau du joueur (`band`) ; apprivoisable maintenant selon `tame.level_margin`, sinon le niveau où
+    elle le devient ; rang le plus haut atteignable au niveau donné ; certitude par champ."""
+    raise NotImplementedError

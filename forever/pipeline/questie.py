@@ -536,3 +536,9 @@ def read_completed_quests(sv: Path, guid: str) -> list[tuple[int, int]]:
         if done and isinstance(quest, int) and isinstance(ts, int):
             out.append((quest, ts))
     return sorted(out, key=lambda q: (q[1], q[0]))
+
+
+def npc_level_ranges(db: QuestieDB) -> dict[str, list[int]]:
+    """Plage de niveau des PNJ normaux de chaque zone (nom anglais de Questie -> [10e, 90e percentile]), méthode de
+    `zones_for_level`. Base Classic Era sans correction Forever (suppose)."""
+    raise NotImplementedError
