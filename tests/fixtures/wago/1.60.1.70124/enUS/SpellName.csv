@@ -29,10 +29,12 @@ ID,Name_lang
 1499,Freezing Trap
 1715,Hamstring
 1719,Recklessness
+1742,Cower
 1766,Kick
 1776,Gouge
 1833,Cheap Shot
 1850,Dash
+1853,Growl
 1953,Blink
 1988,Scatter Shot
 2070,Sap
@@ -49,10 +51,12 @@ ID,Name_lang
 3261,Ignite
 3355,Freezing Trap Effect
 4086,Evasion
+4187,Great Stamina
 4511,Phase Shift
 4987,Cleanse
 5116,Concussive Shot
 5143,Arcane Missiles
+5149,Beast Training
 5211,Bash
 5227,Underwater Breathing
 5246,Intimidating Shout
@@ -65,8 +69,13 @@ ID,Name_lang
 6117,Mage Armor
 6136,Chilled
 6150,Quick Shots
+6280,Pet Hardiness
+6307,Blood Pact
+6311,Pet Aggression
+6328,Pet Recovery
 6346,Fear Ward
 6358,Seduction
+6443,Pet Resistance
 6552,Pummel
 6615,Free Action
 6726,Silence
@@ -284,6 +293,7 @@ ID,Name_lang
 17118,Subtlety
 17123,Improved Tranquility
 17245,Overgrowth
+17253,Bite
 17322,Shadow Reach
 17364,Stormstrike
 17485,Ancestral Knowledge
@@ -398,19 +408,28 @@ ID,Name_lang
 20711,Spirit of Redemption
 21009,Quickness Passive
 22959,Fire Vulnerability
+23145,Dive
+23162,Harass
 23273,Immune Charm/Fear/Polymorph
 23602,Master of Defense
 23881,Bloodthirst
 24293,Improved Tracking
+24423,Demoralizing Screech
 24443,Improved Revive Pet
+24488,Shadow Resistance
+24493,Arcane Resistance
+24545,Natural Armor
 24858,Moonkin Form
 24905,Moonkin Form (Passive)
 24907,Moonkin Aura
 24968,Tranquil Spirit
+25076,Cobra Reflexes
 25771,Forbearance
 25891,Earthstrike
 25956,Improved Judgement
 26022,Pursuit of Justice
+26064,Shell Shield
+26090,Thunderstomp
 27789,Holy Reach
 27811,Blessed Recovery
 27828,Focused Casting
@@ -448,6 +467,8 @@ ID,Name_lang
 414673,Gift of the Earthmother
 415140,Mental Dexterity
 415405,Rapid Killing
+415429,Hunter Pet Scaling
+416189,Warlock Pet Scaling
 417046,King of the Jungle
 417051,Natural Reaction
 425280,Renewed Hope
@@ -501,6 +522,18 @@ ID,Name_lang
 1259799,Elune's Light
 1259812,Eureka!
 1260189,Touch of the Grave
+1263099,Faster Attack I
+1263100,Faster Attack II
+1263102,Faster Attack III
+1263104,Faster Attack IV
+1263107,Faster Attack V
+1263109,Faster Attack VI
+1263110,Faster Attack VII
+1263113,Slower Attack II
+1263114,Slower Attack III
+1264735,Pinch
+1265054,Mine!
+1265065,Savage Rend
 1284536,Holy Purpose
 1289681,Bloodthrill
 1293241,Summon Hawk
@@ -518,6 +551,7 @@ ID,Name_lang
 1310496,Survivalist's Discipline
 1310532,Expose Prey
 1310533,Lacerating Strikes
+1310612,Trickster's Dance
 1310627,Predator's Edge
 1310661,Improved Stings
 1310703,Venom
@@ -564,6 +598,16 @@ ID,Name_lang
 20549,War Stomp
 9452,Vindication
 440667,Vindication
+1264758,Dismember
+1264927,Dismember
+1264929,Dismember
+1264930,Dismember
+1264933,Dismember
+1264937,Dismember
+1264939,Dismember
+1264970,Dismember
+1264971,Dismember
+1264972,Dismember
 6178,Charge
 7370,Charge
 7371,Charge
@@ -613,6 +657,11 @@ ID,Name_lang
 10150,Fireball
 10151,Fireball
 25306,Fireball
+2947,Fire Shield
+8316,Fire Shield
+8317,Fire Shield
+11770,Fire Shield
+11771,Fire Shield
 7300,Frost Armor
 7301,Frost Armor
 1062,Entangling Roots
@@ -635,6 +684,14 @@ ID,Name_lang
 8947,Cure Poison
 615,Dispel Magic
 988,Dispel Magic
+23992,Fire Resistance
+24439,Fire Resistance
+24440,Fire Resistance
+24441,Fire Resistance
+24444,Fire Resistance
+24445,Fire Resistance
+24463,Fire Resistance
+24464,Fire Resistance
 627,Mind Control
 10911,Mind Control
 10912,Mind Control
@@ -644,8 +701,35 @@ ID,Name_lang
 6213,Fear
 6215,Fear
 6713,Disarm
+3110,Firebolt
+7799,Firebolt
+7800,Firebolt
+7801,Firebolt
+7802,Firebolt
+11762,Firebolt
+11763,Firebolt
 8994,Banish
 18647,Banish
+1265843,Web
+1265878,Web
+1265880,Web
+1265881,Web
+1265883,Web
+1265887,Web
+1265888,Web
+1265890,Web
+1265891,Web
+1265892,Web
+1264494,Swipe
+1264497,Swipe
+1264498,Swipe
+1264501,Swipe
+1264502,Swipe
+1264727,Swipe
+1264729,Swipe
+1264730,Swipe
+1264731,Swipe
+1264732,Swipe
 12299,Toughness
 16252,Toughness
 20143,Toughness
@@ -660,6 +744,22 @@ ID,Name_lang
 5599,Blessing of Protection
 10278,Blessing of Protection
 442948,Blessing of Protection
+2975,Claw
+2976,Claw
+2977,Claw
+2980,Claw
+2981,Claw
+2982,Claw
+3009,Claw
+3010,Claw
+3666,Claw
+3667,Claw
+16827,Claw
+16828,Claw
+16829,Claw
+16830,Claw
+16831,Claw
+16832,Claw
 11725,Subjugate Demon
 11726,Subjugate Demon
 11727,Subjugate Demon
@@ -680,6 +780,17 @@ ID,Name_lang
 7373,Hamstring
 9080,Hamstring
 13847,Recklessness
+1747,Cower
+1748,Cower
+1749,Cower
+1750,Cower
+1751,Cower
+1753,Cower
+1754,Cower
+1755,Cower
+1756,Cower
+16697,Cower
+16698,Cower
 1767,Kick
 1768,Kick
 1769,Kick
@@ -698,6 +809,19 @@ ID,Name_lang
 23111,Dash
 23112,Dash
 18498,Silenced
+2649,Growl
+14916,Growl
+14917,Growl
+14918,Growl
+14919,Growl
+14920,Growl
+14921,Growl
+14922,Growl
+14923,Growl
+14924,Growl
+14925,Growl
+14926,Growl
+14927,Growl
 14514,Blink
 1310687,Sniper Shot
 19503,Scatter Shot
@@ -743,6 +867,14 @@ ID,Name_lang
 26542,Sprint
 26543,Sprint
 28755,Rapid Fire
+24597,Furious Howl
+24599,Furious Howl
+24603,Furious Howl
+24604,Furious Howl
+24605,Furious Howl
+24607,Furious Howl
+24608,Furious Howl
+24609,Furious Howl
 11119,Ignite
 412538,Ignite
 412545,Ignite
@@ -750,9 +882,46 @@ ID,Name_lang
 14308,Freezing Trap Effect
 14309,Freezing Trap Effect
 25999,Boar Charge
+1265038,Tendon Rip
+1265039,Tendon Rip
+1265040,Tendon Rip
+1265041,Tendon Rip
+1265042,Tendon Rip
+1265043,Tendon Rip
+1265045,Tendon Rip
+1265046,Tendon Rip
+1265047,Tendon Rip
+1265048,Tendon Rip
+24446,Frost Resistance
+24447,Frost Resistance
+24448,Frost Resistance
+24449,Frost Resistance
+24475,Frost Resistance
+24476,Frost Resistance
+24477,Frost Resistance
+24478,Frost Resistance
 5277,Evasion
 16934,Ferocity
 19598,Ferocity
+4188,Great Stamina
+4189,Great Stamina
+4190,Great Stamina
+4191,Great Stamina
+4192,Great Stamina
+4193,Great Stamina
+4194,Great Stamina
+4195,Great Stamina
+4196,Great Stamina
+4197,Great Stamina
+4198,Great Stamina
+4199,Great Stamina
+4200,Great Stamina
+4201,Great Stamina
+4202,Great Stamina
+5041,Great Stamina
+5042,Great Stamina
+5048,Great Stamina
+5049,Great Stamina
 20582,Quickness
 20574,Axe Specialization
 20597,Sword Specialization
@@ -780,6 +949,12 @@ ID,Name_lang
 6798,Bash
 8983,Bash
 8984,Bash
+24450,Prowl
+24451,Prowl
+24452,Prowl
+24453,Prowl
+24454,Prowl
+24455,Prowl
 14251,Riposte
 19134,Intimidating Shout
 20511,Intimidating Shout
@@ -792,8 +967,36 @@ ID,Name_lang
 7321,Chilled
 12484,Chilled
 18459,Incineration
+6281,Pet Hardiness
+6282,Pet Hardiness
+6283,Pet Hardiness
+6286,Pet Hardiness
+7804,Blood Pact
+7805,Blood Pact
+11766,Blood Pact
+11767,Blood Pact
+6314,Pet Aggression
+6315,Pet Aggression
+6316,Pet Aggression
+6317,Pet Aggression
+6331,Pet Recovery
+6332,Pet Recovery
+6333,Pet Recovery
+6334,Pet Recovery
 459699,Fear Ward
 6359,Seduction
+24583,Scorpid Poison
+24584,Scorpid Poison
+24586,Scorpid Poison
+24587,Scorpid Poison
+24588,Scorpid Poison
+24589,Scorpid Poison
+24640,Scorpid Poison
+24641,Scorpid Poison
+6444,Pet Resistance
+6445,Pet Resistance
+6446,Pet Resistance
+6447,Pet Resistance
 6554,Pummel
 12555,Pummel
 19559,Pathfinding
@@ -801,9 +1004,35 @@ ID,Name_lang
 17925,Death Coil
 17926,Death Coil
 28412,Death Coil
+8875,Tamed Pet Passive (DND)
+17206,Tamed Pet Passive (DND)
+17212,Tamed Pet Passive (DND)
+17223,Tamed Pet Passive (DND)
+18728,Tamed Pet Passive (DND)
+18737,Tamed Pet Passive (DND)
+18740,Tamed Pet Passive (DND)
+19580,Tamed Pet Passive (DND)
+19581,Tamed Pet Passive (DND)
+19582,Tamed Pet Passive (DND)
+19589,Tamed Pet Passive (DND)
+19591,Tamed Pet Passive (DND)
+20782,Tamed Pet Passive (DND)
+20784,Tamed Pet Passive (DND)
+409365,Tamed Pet Passive (DND)
+412729,Tamed Pet Passive (DND)
 20594,Stoneform
 19577,Intimidation
 24394,Intimidation
+1265899,Dust Cloud
+1265901,Dust Cloud
+1265902,Dust Cloud
+1265903,Dust Cloud
+1265904,Dust Cloud
+1265907,Dust Cloud
+1265908,Dust Cloud
+1265909,Dust Cloud
+1265911,Dust Cloud
+1265913,Dust Cloud
 17804,Soul Siphon
 18805,Recombobulate
 1282733,Overpower
@@ -831,6 +1060,14 @@ ID,Name_lang
 20925,Holy Shield
 17106,Reflection
 12323,Piercing Howl
+24492,Nature Resistance
+24494,Nature Resistance
+24502,Nature Resistance
+24503,Nature Resistance
+24504,Nature Resistance
+24511,Nature Resistance
+24512,Nature Resistance
+24513,Nature Resistance
 400573,Arcane Blast
 400574,Arcane Blast
 1239696,Arcane Blast
@@ -894,6 +1131,18 @@ ID,Name_lang
 15269,Blackout
 15326,Blackout
 15271,Spirit Tap
+24844,Lightning Breath
+24845,Lightning Breath
+25008,Lightning Breath
+25009,Lightning Breath
+25010,Lightning Breath
+25011,Lightning Breath
+25012,Lightning Breath
+25013,Lightning Breath
+25014,Lightning Breath
+25015,Lightning Breath
+25016,Lightning Breath
+25017,Lightning Breath
 16493,Impale
 17116,Nature's Swiftness
 16488,Blood Craze
@@ -905,6 +1154,21 @@ ID,Name_lang
 19731,Devour Magic
 19734,Devour Magic
 19736,Devour Magic
+17254,Bite
+17255,Bite
+17256,Bite
+17257,Bite
+17258,Bite
+17259,Bite
+17260,Bite
+17261,Bite
+17262,Bite
+17263,Bite
+17264,Bite
+17265,Bite
+17266,Bite
+17267,Bite
+17268,Bite
 20527,Eruption
 1293817,Conflagrate
 18093,Pyroclasm
@@ -914,6 +1178,10 @@ ID,Name_lang
 19647,Spell Lock
 19648,Spell Lock
 24259,Spell Lock
+444678,Lava Breath
+444680,Lava Breath
+444681,Lava Breath
+444682,Lava Breath
 412758,Incinerate
 19410,Improved Concussive Shot
 19615,Frenzy
@@ -941,9 +1209,68 @@ ID,Name_lang
 27827,Spirit of Redemption
 408490,Lava Burst
 408521,Riptide
+23146,Dive
+23147,Dive
+23148,Dive
+23149,Dive
+23150,Dive
+23163,Harass
+23164,Harass
+23165,Harass
+23166,Harass
+23167,Harass
 417141,Berserk
 1310316,Master of Defense
 23785,Master Demonologist
+24424,Demoralizing Screech
+24577,Demoralizing Screech
+24578,Demoralizing Screech
+24579,Demoralizing Screech
+24580,Demoralizing Screech
+24581,Demoralizing Screech
+24582,Demoralizing Screech
+24490,Shadow Resistance
+24505,Shadow Resistance
+24506,Shadow Resistance
+24507,Shadow Resistance
+24514,Shadow Resistance
+24515,Shadow Resistance
+24516,Shadow Resistance
+24495,Arcane Resistance
+24497,Arcane Resistance
+24500,Arcane Resistance
+24501,Arcane Resistance
+24508,Arcane Resistance
+24509,Arcane Resistance
+24510,Arcane Resistance
+24547,Natural Armor
+24549,Natural Armor
+24550,Natural Armor
+24551,Natural Armor
+24552,Natural Armor
+24553,Natural Armor
+24554,Natural Armor
+24555,Natural Armor
+24556,Natural Armor
+24557,Natural Armor
+24558,Natural Armor
+24559,Natural Armor
+24560,Natural Armor
+24561,Natural Armor
+24562,Natural Armor
+24629,Natural Armor
+24630,Natural Armor
+24631,Natural Armor
+24632,Natural Armor
+25077,Cobra Reflexes
+26065,Shell Shield
+26094,Thunderstomp
+26187,Thunderstomp
+26188,Thunderstomp
+26189,Thunderstomp
+26190,Thunderstomp
+1264455,Thunderstomp
+1264456,Thunderstomp
 27813,Blessed Recovery
 30165,Elemental Devastation
 30894,Heightened Senses
@@ -981,6 +1308,7 @@ ID,Name_lang
 440873,Decimation
 1310949,Malevolence
 1310994,Swift Judgement
+1278934,Summoning
 1299448,Quick Strikes
 1235316,Demonic Aegis
 1293816,Shadow
@@ -996,12 +1324,40 @@ ID,Name_lang
 1259821,Eureka!
 1259823,Eureka!
 1260201,Touch of the Grave
+1264736,Pinch
+1264739,Pinch
+1264741,Pinch
+1264742,Pinch
+1264745,Pinch
+1264749,Pinch
+1264750,Pinch
+1264751,Pinch
+1264752,Pinch
+1265055,Mine!
+1265056,Mine!
+1265057,Mine!
+1265058,Mine!
+1265059,Mine!
+1265060,Mine!
+1265061,Mine!
+1265062,Mine!
+1265064,Mine!
+1265066,Savage Rend
+1265067,Savage Rend
+1265068,Savage Rend
+1265069,Savage Rend
+1265831,Savage Rend
+1265833,Savage Rend
+1265834,Savage Rend
+1265835,Savage Rend
+1265836,Savage Rend
 1289682,Bloodthrill
 1293248,Summon Hawk
 1312639,Summon Hawk
 1293696,Demonic Brand
 1310726,Expose Prey
 1310536,Lacerating Strikes
+1310617,Trickster's Dance
 1310723,Thousand Cuts
 1310911,Light's Vigil
 1310912,Light's Vigil

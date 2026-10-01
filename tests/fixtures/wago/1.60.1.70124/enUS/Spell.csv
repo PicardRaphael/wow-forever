@@ -47,6 +47,12 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
 1499,Rank 1,"Place a Frost trap that freezes the first enemy that approaches, preventing all action for up to $3355d.  Any damage caused will break the ice. Trap will exist for $d. Only one Frost trap can be active at a time.",
 1715,Rank 1,"Maims the enemy, causing $s1 damage and slowing the enemy's movement by $s2% for $d.",Movement slowed by $s2%.
 1719,,"The warrior will gain $s1% increased critical strike chance and will be immune to Fear effects for the next $d, but all damage taken is increased by $s2%.","Immune to Fear effects, $w1% increased critical strike chance, but all damage taken is increased by $w2%."
+1742,Rank 1,"Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+1751,Rank 5,,
+1753,Rank 2,"Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+1754,Rank 3,"Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+1755,Rank 4,"Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+1756,Rank 5,"Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
 1766,Rank 1,A quick kick that injures a single foe for $s1 damage.  It also interrupts spellcasting and prevents any spell in that school from being cast for $d.,
 1767,Rank 2,A quick kick that injures a single foe for $s1 damage.  It also interrupts spellcasting and prevents any spell in that school from being cast for $d.,
 1768,Rank 3,A quick kick that injures a single foe for $s1 damage.  It also interrupts spellcasting and prevents any spell in that school from being cast for $d.,
@@ -55,6 +61,7 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
 1777,Rank 2,"Causes $s1 damage, stops your attack, and incapacitates the target for $d.  The target must be facing you.  Any damage taken will break the effect.  Awards $s2 combo $lpoint:points;.",Incapacitated.
 1833,,Stuns the target for $d.  Must be stealthed.  Awards $s2 combo $lpoint:points;.,Stunned.
 1850,Rank 1,Increases movement speed by $s1% for $d.  Does not break prowling.,Increases movement speed by $s1%.
+1853,Rank 1,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
 1953,,"Teleports the caster 20 yards forward, unless something is in the way. Also frees the caster from Stuns and Immobilizes.",Blinking.
 2070,Rank 2,Incapacitates the target for up to $d. Only works on Humanoids that are not in combat.  Any damage taken will break the effect. Only 1 target may be sapped at a time. Does not break Stealth.,Incapacitated.
 2094,,"Blinds the target, causing it to wander disoriented for up to $d.  Any damage caused will remove the effect.",Disoriented.
@@ -68,20 +75,48 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
 2637,Rank 1,Forces the enemy target to sleep for up to $d.  Any damage will awaken the target.  Only one target can be forced to hibernate at a time.  Only works on Beasts and Dragonkin.,Asleep.
 2645,,"Turns the Shaman into a Ghost Wolf, increasing speed by $s2%.  Only useable outdoors.",Increases movement speed by $s2%.
 2782,,Dispels $s1 Curse or Bane from a friendly target.,
+2947,Rank 1,Surrounds the target in a shield of fire.  Every strike against the target causes $s1 Fire damage to the attacker.  Lasts $d.  Your pet cannot cast Fire Shield on itself.,Does $w1 Fire damage to attacker when struck.
 2948,Rank 1,Scorch the enemy for $s1 Fire damage.,
+2976,Rank 6,,
+2977,Rank 7,,
 2983,Rank 1,Increases the rogue's movement speed by $s1% for $d.  Does not break stealth.,Movement speed increased by $s1%.
+3009,Rank 8,"Claw the enemy, causing $s1 damage.",
+3010,Rank 7,"Claw the enemy, causing $s1 damage.",
 3045,,Increases ranged and melee attack speed by $s1% for $d.,"Ranged and melee attack speed increased by $s1%$?$w2>0[,  Mana regeneration increased by $w2%, and $w3% of mana regeneration continued while casting][]."
+3110,Rank 1,Deals $?s18769[${$m1*($18769m1/100+1)} to ${$M1*($18769m1/100+1)}][$s1] Fire damage to a target.,
 3140,Rank 4,Hurls a fiery ball that causes $s1 Fire damage and an additional $o2 Fire damage over $d.,$s2 Fire damage every $t2 seconds.
 3261,,Inflicts $s1 Fire damage to an enemy every $t1 sec. for $d.,$s1 Fire damage inflicted every $t1 sec.
 3355,Rank 1,,Frozen.
+3666,Rank 8,,
 3747,Rank 4,"Draws on the soul of the party member to shield them, absorbing $s1 damage.  Lasts $d.  While the shield holds, spellcasting will not be interrupted by damage.  Once shielded, the target cannot be shielded again for $6788d.",Absorbs $w1 damage.
 4086,,Increases the caster's chance to dodge by $s1%. Lasts until cancelled.,Chance to dodge increased by $s1%.
+4187,Rank 1,Stamina increased by $s1.,
+4188,Rank 2,Stamina increased by $s1.,
+4189,Rank 3,Stamina increased by $s1.,
+4190,Rank 4,Stamina increased by $s1.,
+4191,Rank 5,Stamina increased by $s1.,
+4192,Rank 6,Stamina increased by $s1.,
+4193,Rank 7,Stamina increased by $s1.,
+4194,Rank 8,Stamina increased by $s1.,
+4195,Rank 1,Stamina increased by $4187s1.,
+4196,Rank 2,Stamina increased by $4188s1.,
+4197,Rank 3,Stamina increased by $4189s1.,
+4198,Rank 4,Stamina increased by $4190s1.,
+4199,Rank 5,Stamina increased by $4191s1.,
+4200,Rank 6,Stamina increased by $4192s1.,
+4201,Rank 7,Stamina increased by $4193s1.,
+4202,Rank 8,Stamina increased by $4194s1.,
 4511,,"Shifts the imp out of phase with the world, making it unattackable unless it attacks.",
 4987,,"Cleanses a friendly target, removing $s1 poison effect, $s2 disease effect, and $s3 magic effect.",
+5041,Rank 9,Stamina increased by $s1.,
+5042,Rank 10,Stamina increased by $s1.,
+5048,Rank 9,Stamina increased by $5041s1.,
+5049,Rank 10,Stamina increased by $5042s1.,
 5116,,"Dazes the target, slowing movement speed by $s1% for $d.",Movement slowed by $s1%.
 5143,Rank 1,"Launches Arcane Missiles at the enemy, causing $7268s1 Arcane damage each second for $d.",
 5144,Rank 2,"Launches Arcane Missiles at the enemy, causing $7269s1 Arcane damage each second for $d.",
 5145,Rank 3,"Launches Arcane Missiles at the enemy, causing $7270s1 Arcane damage each second for $d.",
+5149,,Lets you train your pet with various abilities that you have learned how to teach.,
 5195,Rank 3,Roots the target in place and causes $o2 Nature damage over $d.  Damage caused may interrupt the effect.  You may $?s17245[have up to ${$17245m1+1} $ltarget:targets;][only have 1 target] Rooted at a time.,Rooted. Causes $w2 Nature damage every $t2 sec.
 5196,Rank 4,Roots the target in place and causes $o2 Nature damage over $d.  Damage caused may interrupt the effect.  You may $?s17245[have up to ${$17245m1+1} $ltarget:targets;][only have 1 target] Rooted at a time.,Rooted. Causes $w2 Nature damage every $t2 sec.
 5227,Racial Passive,Underwater breath lasts $s1% longer than normal.,
@@ -107,9 +142,30 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
 6178,Rank 2,"Charge an enemy, generate $/10;s2 Rage, and Stun it for $7922d.  Cannot be used in combat.",
 6213,Rank 2,"Strikes fear in the enemy, causing it to run in fear for up to $d.  Damage caused may interrupt the effect.  Only 1 target can be feared at a time.",Feared.
 6215,Rank 3,"Strikes fear in the enemy, causing it to run in fear for up to $d.  Damage caused may interrupt the effect.  Only 1 target can be feared at a time.",Feared.
+6280,Rank 1,Increases the health of the pet by $s1.,
+6281,Rank 2,Increases the health of the pet by $s1.,
+6282,Rank 3,Increases the health of the pet by $s1.,
+6283,Rank 4,Increases the health of the pet by $s1.,
+6286,Rank 5,Increases the health of the pet by $s1.,
+6307,Rank 1,Increases party members' Stamina by $s1.,Increases Stamina by $s1.
+6311,Rank 1,Increases the damage done by the pet by $s1.,
+6314,Rank 2,Increases the damage done by the pet by $s1.,
+6315,Rank 3,Increases the damage done by the pet by $s1.,
+6316,Rank 4,Increases the damage done by the pet by $s1.,
+6317,Rank 5,Increases the damage done by the pet by $s1.,
+6328,Rank 1,Increases the pet's Spirit by $s1.  Must be trained using beast training.,
+6331,Rank 2,Increases the pet's Spirit by $s1.  Must be trained using beast training.,
+6332,Rank 3,Increases the pet's Spirit by $s1.  Must be trained using beast training.,
+6333,Rank 4,Increases the pet's Spirit by $s1.  Must be trained using beast training.,
+6334,Rank 5,Increases the pet's Spirit by $s1.  Must be trained using beast training.,
 6346,,"Wards the friendly target against Fear.  The next Fear effect used against the target will fail, using up the ward.  Lasts $d.",Warded against Fear.
 6358,,"Seduces the target, preventing all actions for up to $d.  Any damage caused will remove the effect.  Only works against Humanoids.",Charmed.
 6409,Rank 1,"Inflicts normal damage plus $s1 on an enemy, stunning it for $d. when attacking from stealth.",Stunned.
+6443,Rank 1,Increases the pets Resistance to all Magic Schools by $s1.,
+6444,Rank 2,Increases the pets Resistance to all Magic Schools by $s1.,
+6445,Rank 3,Increases the pets Resistance to all Magic Schools by $s1.,
+6446,Rank 4,Increases the pets Resistance to all Magic Schools by $s1.,
+6447,Rank 5,Increases the pets Resistance to all Magic Schools by $s1.,
 6552,Rank 1,Pummel the target for $s1 damage.  It also interrupts spellcasting and prevents any spell in that school from being cast for $d.,
 6554,Rank 2,Pummel the target for $s1 damage.  It also interrupts spellcasting and prevents any spell in that school from being cast for $d.,
 6615,,Makes you immune to Stun and Movement Impairing effects for the next $d.   Does not remove effects already on the imbiber.,Free Action.
@@ -130,6 +186,12 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
 7372,Rank 2,"Maims the enemy, causing $s1 damage and slowing the enemy's movement by $s2% for $d.",Movement slowed by $s2%.
 7373,Rank 3,"Maims the enemy, causing $s1 damage and slowing the enemy's movement by $s2% for $d.",Movement slowed by $s2%.
 7744,Racial,"Instantly removes all Charm, Fear and Sleep effects.",
+7799,Rank 2,Deals $?s18769[${$m1*($18769m1/100+1)} to ${$M1*($18769m1/100+1)}][$s1] Fire damage to a target.,
+7800,Rank 3,Deals $?s18769[${$m1*($18769m1/100+1)} to ${$M1*($18769m1/100+1)}][$s1] Fire damage to a target.,
+7801,Rank 4,Deals $?s18769[${$m1*($18769m1/100+1)} to ${$M1*($18769m1/100+1)}][$s1] Fire damage to a target.,
+7802,Rank 5,Deals $?s18769[${$m1*($18769m1/100+1)} to ${$M1*($18769m1/100+1)}][$s1] Fire damage to a target.,
+7804,Rank 2,Increases party members' Stamina by $s1.,Increases Stamina by $s1.
+7805,Rank 3,Increases party members' Stamina by $s1.,Increases Stamina by $s1.
 8012,Rank 2,"Purges the enemy target, removing $m1 beneficial magic $leffect:effects;.",
 8042,Rank 1,"Instantly shocks the target with concussive force, causing $s1 Nature damage.  It also interrupts spellcasting and prevents any spell in that school from being cast for $d.  Causes a high amount of threat.",
 8044,Rank 2,"Instantly shocks the target with concussive force, causing $s1 Nature damage.  It also interrupts spellcasting and prevents any spell in that school from being cast for $d.  Causes a high amount of threat.",
@@ -141,6 +203,8 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
 8124,Rank 2,"The caster lets out a psychic scream, causing $i enemies within $a1 yards to flee for $d.  Damage caused may interrupt the effect.",Running in Fear.
 8177,,Summons a Grounding Totem with $s1 health at the feet of the caster that will redirect one harmful spell cast on a nearby party member to itself every $8179t1 seconds.  Will not redirect area of effect spells.  Lasts $d.,
 8178,Rank 1,,Will redirect one harmful spell to the Grounding Totem.
+8316,Rank 2,Surrounds the target in a shield of fire.  Every strike against the target causes $s1 Fire damage to the attacker.  Lasts $d.  Your pet cannot cast Fire Shield on itself.,Does $w1 Fire damage to attacker when struck.
+8317,Rank 3,Surrounds the target in a shield of fire.  Every strike against the target causes $s1 Fire damage to the attacker.  Lasts $d.  Your pet cannot cast Fire Shield on itself.,Does $w1 Fire damage to attacker when struck.
 8400,Rank 5,Hurls a fiery ball that causes $s1 Fire damage and an additional $o2 Fire damage over $d.,$s2 Fire damage every $t2 seconds.
 8401,Rank 6,Hurls a fiery ball that causes $s1 Fire damage and an additional $o2 Fire damage over $d.,$s2 Fire damage every $t2 seconds.
 8402,Rank 7,Hurls a fiery ball that causes $s1 Fire damage and an additional $o2 Fire damage over $d.,$s2 Fire damage every $t2 seconds.
@@ -171,6 +235,7 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
    4 points: 5 seconds
    5 points: 6 seconds",Stunned$?s14174[ and taking $w3% increased damage from the Rogue][].
 8696,Rank 2,Increases the rogue's movement speed by $s1% for $d.  Does not break stealth.,Movement speed increased by $s1%.
+8875,,,Damage increased by $s1%.
 8994,,"Banishes an enemy, preventing all action but making it invulnerable for up to $d. Only one target can be banished at a time.","Immune to all attacks and spells, but unable to act."
 9080,,"Inflicts weapon damage plus $s1 to an enemy, reducing its movement speed by $s2% for $d.",Movement speed reduced by $s2%.
 9452,,"Gives your damaging melee attacks a chance to reduce the target's Attack Power by ${$m1/-3*$440667m1}, and increase your Attack Power by $m1% for $440667d.",
@@ -269,6 +334,12 @@ ID,NameSubtext_lang,Description_lang,AuraDescription_lang
 11647,,"Wraps the caster in a shield that lasts up to $d., absorbing a maximum of $s1 Physical or magical damage. While the shield holds, spells will not be interrupted by Physical attacks.",Shielded against Physical and magical damage.
 11725,Rank 2,"Subjugates the target demon, up to level $m1, forcing it to do your bidding.  While subjugated, the time between the demon's attacks is increased by $s2% and its casting speed is slowed by $s3%.  Lasts up to $d.  If you repeatedly subjugate the same demon, it will become more difficult to control with each attempt.",Enslaved.
 11726,Rank 3,"Subjugates the target demon, up to level $m1, forcing it to do your bidding.  While subjugated, the time between the demon's attacks is increased by $s2% and its casting speed is slowed by $s3%.  Lasts up to $d.  If you repeatedly subjugate the same demon, it will become more difficult to control with each attempt.",Enslaved.
+11762,Rank 6,Deals $?s18769[${$m1*($18769m1/100+1)} to ${$M1*($18769m1/100+1)}][$s1] Fire damage to a target.,
+11763,Rank 7,Deals $?s18769[${$m1*($18769m1/100+1)} to ${$M1*($18769m1/100+1)}][$s1] Fire damage to a target.,
+11766,Rank 4,Increases party members' Stamina by $s1.,Increases Stamina by $s1.
+11767,Rank 5,Increases party members' Stamina by $s1.,Increases Stamina by $s1.
+11770,Rank 4,Surrounds the target in a shield of fire.  Every strike against the target causes $s1 Fire damage to the attacker.  Lasts $d.  Your pet cannot cast Fire Shield on itself.,Does $w1 Fire damage to attacker when struck.
+11771,Rank 5,Surrounds the target in a shield of fire. Every strike against the target causes $s1 Fire damage to the attacker. Lasts $d.  Your pet cannot cast Fire Shield on itself.,Does $w1 Fire damage to attacker when struck.
 11922,,"Entangles an enemy in roots, inflicting Nature damage every $t2 sec. and immobilizing it for up to $d.","Immobilized.
 Nature damage inflicted every $t2 sec."
 11958,,"You become encased in a block of ice, protecting you from all physical attacks and spells for $d, but during that time you cannot attack, move, or cast spells.","Immune to all attacks and spells. Cannot attack, move, or use spells."
@@ -415,6 +486,12 @@ Armor reduced by $s2%."
 14909,,"Increases your Holy damage done by $m1%, and gives a $m2% chance each time your Holy Fire spell deals periodic damage for your next Holy Nova to cost no Mana.",
 14912,,"Reduces the Mana cost of your Lesser Heal, Heal, Greater Heal, Penance, and Prayer of Mending spells by $s1%.",
 14913,,Gives you a $s1% chance to avoid interruption caused by damage while casting any spell.,
+14916,Rank 2,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14917,Rank 3,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14918,Rank 4,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14919,Rank 5,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14920,Rank 6,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14921,Rank 7,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
 14983,,Increases your maximum Energy by $s1.,
 15058,,Increases the damage done by your spells by $m1% and your critical strike chance by $m2%.,
 15062,,Reduces the Physical and magical damage taken by the caster by $s1% for $d.,Physical and magical damage taken is reduced by $s1%.
@@ -474,10 +551,17 @@ Armor reduced by $s2%."
 16513,,Increases the damage dealt by your poisons by $m1% and gives your poisons an additional $m3% chance to resist dispel effects.,
 16538,,Increases all damage you deal by $s1% while a shield is equipped.,
 16578,,"Reduces the cast time of your Lightning Bolt, Chain Lightning, and Lava Burst spells by ${$m1/-1000}.2 sec.",
+16697,Rank 6,"Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
 16757,,Increases the range of your Frostbolt and Blizzard spells and the radius of your Frost Nova and Cone of Cold spells by $s1%.,
 16814,,Reduces the cast time of your Wrath spell by $/1000;S1 sec and its Mana cost by $s2%.,
 16819,,Increases the range of your offensive Balance spells by $m1% and improves your chance to hit by $m2%.,
 16821,,Increases the damage and critical strike chance of your Moonfire spell by $s1%.,
+16827,Rank 1,"Claw the enemy, causing $s1 damage.",
+16828,Rank 2,"Claw the enemy, causing $s1 damage.",
+16829,Rank 3,"Claw the enemy, causing $s1 damage.",
+16830,Rank 4,"Claw the enemy, causing $s1 damage.",
+16831,Rank 5,"Claw the enemy, causing $s1 damage.",
+16832,Rank 6,"Claw the enemy, causing $s1 damage.",
 16833,,Reduces the mana cost of all shapeshifting by $s1%.,
 16845,Rank 1,Reduces the Mana cost of your damaging spells by $s1%.,
 16850,,"Reduces the cast time of Starfire by $/1000;S1 sec and Starfire has a $s2% chance to stun its target for $16922d.
@@ -512,6 +596,14 @@ Armor reduced by $s2%."
 17123,,Reduces threat caused by Tranquility by $s1% and its cooldown by $m2%.,
 17174,,"Dazes an enemy, reducing its movement speed by $s1% for $d.",Movement speed reduced by $s1%.
 17245,,Increases the maximum number of targets you may have affected by Entangling Roots by $s1.,
+17253,Rank 1,"Bite the enemy, causing $s1 damage.",
+17255,Rank 2,"Bite the enemy, causing $s1 damage.",
+17256,Rank 3,"Bite the enemy, causing $s1 damage.",
+17257,Rank 4,"Bite the enemy, causing $s1 damage.",
+17258,Rank 5,"Bite the enemy, causing $s1 damage.",
+17259,Rank 6,"Bite the enemy, causing $s1 damage.",
+17260,Rank 7,"Bite the enemy, causing $s1 damage.",
+17261,Rank 8,"Bite the enemy, causing $s1 damage.",
 17322,,Increases the range of your offensive Shadow spells by $s1%.,
 17364,,"Instantly strike for normal weapon damage and increase the damage you deal to the target with your next Lightning Bolt, Chain Lightning, or Earth Shock spell by $s2% for $d.","Increases damage taken from the Shaman's next Lightning Bolt, Chain Lightning, or Earth Shock spell by $s2%."
 17485,,Increases your Intellect by $m1%.,
@@ -606,8 +698,13 @@ Felhunter: Restores $18790s1% of your total Health every $18790t1 sec.",
 19574,,"Send your pet into a rage causing $s2% additional damage for $d.  While enraged, the beast does not feel pity or remorse or fear and it cannot be stopped unless killed.",Enraged. Unstoppable and damage done increased by $s2%.
 19577,,"Command your pet to Stun the target for $24394d on its next successful attack, which also gains $m2% increased critical strike chance. Generates high threat.",Intimidating.
 19578,,"While your pet is active, you and your pet will regenerate $m1% of total health every $m2 sec.",
+19580,,,Base armor increased by $s1%.
+19581,,,Max Health increased by $s1%.
+19582,,,Speed increased by $s1%.
 19583,,Increases the Health and Armor of your pets by $s1%.,
+19589,,,Focus regeneration increased by $s1%.
 19590,,Increases the Focus regeneration of your pets by $s1% and allows $m2% of your Mana regeneration to continue while casting.,
+19591,,,Critical strike chance increased by $s1%.
 19596,,Increases the movement speed of your pets by $s1%.,
 19598,,Increases the critical strike chance of your pets and hawks by $s1%.,
 19615,,Gives your pet a chance to gain a $19615s1% attack speed increase for $19615d after dealing a critical strike.,Attack speed increased by $s1%.
@@ -671,6 +768,8 @@ Unleashing this Seal's energy will judge an enemy, instantly causing $/2;20467s1
 20655,,Heals an ally for $s2 damage every $t2 sec. and increases its armor by $s1 for $d.,"Armor increased by $s1.
 $s2 damage healed every $t2 sec."
 20711,,"Upon death, the priest becomes the Spirit of Redemption for $27827d.  The Spirit of Redemption cannot move, attack, be attacked or targeted by any spells or effects.  While in this form the priest can cast any healing spell free of cost.  When the effect ends, the priest dies.",
+20782,,Tom - Do NOT use this spell for talents.  Use Passive 1 instead.,Damage reduced by $s1%.
+20784,,,Chance to proc frenzy.
 20924,Rank 5,"Consecrates the land beneath the Paladin, doing ${$1280349m1*8} Holy damage over $d to enemies who enter the area The first $s3 enemies who enter the area will take an additional ${$1280349m2*8} damage over $d.",
 20925,Rank 1,"Increases chance to block by $s1% for $d, and deals $s2 Holy damage for each attack blocked while active.  Damage caused by Holy Shield causes 20% additional threat. Each block expends a charge. $n charges.",Block chance increased by ${$m1/$m3}%. $w2 Holy damage dealt to attacker when blocked. Damage caused by Holy Shield causes 20% additional threat.$?$n>0[ $n charges.][]
 21009,Racial Passive,,
@@ -682,6 +781,9 @@ $s2 damage healed every $t2 sec."
 23099,Rank 1,Increases movement speed by $s1% for $d.,Increases movement speed by $s1%.
 23109,Rank 2,Increases movement speed by $s1% for $d.,Increases movement speed by $s1%.
 23110,Rank 3,Increases movement speed by $s1% for $d.,Increases movement speed by $s1%.
+23162,Rank 1,"Decreases Defense by $s1 for $d.  This decrease increases the chance attacks will Hit and Critical the target and reduces the chance the target will Block, Dodge, or Parry the attack.",Decreases Defense by $s1 for $d.
+23164,Rank 2,"Decreases Defense by $s1 for $d.  This decrease increases the chance attacks will Hit and Critical the target and reduces the chance the target will Block, Dodge, or Parry the attack.",Decreases Defense by $s1 for $d.
+23165,Rank 3,"Decreases Defense by $s1 for $d.  This decrease increases the chance attacks will Hit and Critical the target and reduces the chance the target will Block, Dodge, or Parry the attack.",Decreases Defense by $s1 for $d.
 23273,,"Dispels all Charm, Fear and Polymorph effects.",
 23584,,"Increases your off-hand weapon damage by $m1%, off-hand Rage generation by $m2%, and chance to hit with off-hand attacks by $m3%.",
 23602,,Generate ${$23602m1/10} Rage when you Dodge or Parry while you have a shield equipped.,Generate ${$23602m1/10} Rage.
@@ -696,13 +798,120 @@ Succubus/Incubus - Increases Shadow damage done by $m3%.
 Felhunter - Reduces Magic damage taken by $m4%.",
 23881,Rank 1,Instantly attack the target causing damage equal to $s2% of your Attack Power plus $s1 and increasing your movement speed by $s3% for $d.,Movement speed increased by $s3%.
 23922,Rank 1,"Slam the target with your shield, causing $s2 damage, increased by your Block Value, and has a 50% chance of dispelling $s1 magic effect on the target. Causes a very high amount of threat.",
+23992,Rank 1,Increases Fire resistance by $s1.,Increases Fire resistance by $s1.
 24293,,"While tracking Beasts, Demons, Dragonkin, Elementals, Giants, Humanoids, or Undead, all damage you deal to the tracked creature type is increased by $m1%.",
+24423,Rank 1,Blasts a single enemy for $s1 damage and lowers the melee attack power of all enemies in melee range by $s2 for $d.,Melee attack power reduced by $s2.
+24424,Rank 1,Blasts a single enemy for $24423s1 damage and lowers the attack power of all enemies in melee range by $24423s2.  Effect lasts $24423d.,
+24439,Rank 2,Increases Fire resistance by $s1.,Increases Fire resistance by $s1.
+24440,Rank 1,Increases Fire resistance by $23992s1.,Increases Fire resistance by $23992s1.
+24441,Rank 2,Increases Fire resistance by $24439s1.,
 24443,,"Revive Pet's casting time is reduced by $/1000;s1 sec, mana cost is reduced by $s2%, and increases the health your pet returns with by an additional $s3%.",
+24444,Rank 3,Increases Fire resistance by $s1.,Increases Fire resistance by $s1.
+24445,Rank 4,Increases Fire resistance by $s1.,Increases Fire resistance by $s1.
+24446,Rank 1,Increases Frost resistance by $s1.,Increases Frost resistance by $s1.
+24447,Rank 2,Increases Frost resistance by $s1.,Increases Frost resistance by $s1.
+24448,Rank 3,Increases Frost resistance by $s1.,Increases Frost resistance by $s1.
+24449,Rank 4,Increases Frost resistance by $s1.,Increases Frost resistance by $s1.
+24450,Rank 1,"Puts your pet in stealth mode, but slows its movement speed by $s2%. The first attack from stealth receives a $s3% bonus to damage.  Lasts until cancelled.","Stealthed.
+Movement speed slowed by $s2%."
+24451,Rank 1,"Puts your pet in stealth mode, but slows its movement to $24450s2% of normal. The first attack from stealth receives a $24450s3% bonus to damage.  Lasts until cancelled.",
+24452,Rank 2,"Puts your pet in stealth mode, but slows its movement speed by $s2%. The first attack from stealth receives a $s3% bonus to damage.  Lasts until cancelled.","Stealthed.
+Movement speed slowed by $s2%."
+24453,Rank 3,"Puts your pet in stealth mode, but slows its movement speed by $s2%. The first attack from stealth receives a $s3% bonus to damage.  Lasts until cancelled.","Stealthed.
+Movement speed slowed by $s2%."
+24454,Rank 2,"Puts your pet in stealth mode, but slows its movement to $24452s2% of normal. The first attack from stealth receives a $24452s3% bonus to damage.  Lasts until cancelled.",
+24455,Rank 3,"Puts your pet in stealth mode, but slows its movement to $24453s2% of normal. The first attack from stealth receives a $24453s3% bonus to damage.  Lasts until cancelled.",
+24463,Rank 3,Increases Fire resistance by $24444s1.,
+24464,Rank 4,Increases Fire resistance by $24445s1.,
+24475,Rank 1,Increases Frost resistance by $24446s1.,Increases Frost resistance by $24446s1.
+24476,Rank 2,Increases Frost resistance by $24447s1.,Increases Frost resistance by $24447s1.
+24477,Rank 3,Increases Frost resistance by $24448s1.,Increases Frost resistance by $24448s1.
+24478,Rank 4,Increases Frost resistance by $24449s1.,Increases Frost resistance by $24449s1.
+24488,Rank 1,Increases Shadow resistance by $s1.,Increases Shadow resistance by $s1.
+24490,Rank 1,Increases Shadow resistance by $24488s1.,Increases Shadow resistance by $24488s1.
+24492,Rank 1,Increases Nature resistance by $s1.,Increases Nature resistance by $s1.
+24493,Rank 1,Increases Arcane resistance by $s1.,Increases Arcane resistance by $s1.
+24494,Rank 1,Increases Nature resistance by $24492s1.,Increases Shadow resistance by $24492s1.
+24495,Rank 1,Increases Arcane resistance by $24493s1.,Increases Arcane resistance by $24493s1.
+24497,Rank 2,Increases Arcane resistance by $s1.,Increases Arcane resistance by $s1.
+24500,Rank 3,Increases Arcane resistance by $s1.,Increases Arcane resistance by $s1.
+24501,Rank 4,Increases Arcane resistance by $s1.,Increases Arcane resistance by $s1.
+24502,Rank 2,Increases Nature resistance by $s1.,Increases Nature resistance by $s1.
+24503,Rank 3,Increases Nature resistance by $s1.,Increases Nature resistance by $s1.
+24504,Rank 4,Increases Nature resistance by $s1.,Increases Nature resistance by $s1.
+24505,Rank 2,Increases Shadow resistance by $s1.,Increases Shadow resistance by $s1.
+24506,Rank 3,Increases Shadow resistance by $s1.,Increases Shadow resistance by $s1.
+24507,Rank 4,Increases Shadow resistance by $s1.,Increases Shadow resistance by $s1.
+24508,Rank 2,Increases Arcane resistance by $24497s1.,Increases Arcane resistance by $24497s1.
+24509,Rank 3,Increases Arcane resistance by $24500s1.,Increases Arcane resistance by $24500s1.
+24510,Rank 4,Increases Arcane resistance by $24501s1.,Increases Arcane resistance by $24501s1.
+24511,Rank 2,Increases Nature resistance by $24502s1.,Increases Nature resistance by $24502s1.
+24512,Rank 3,Increases Nature resistance by $24503s1.,Increases Nature resistance by $24503s1.
+24513,Rank 4,Increases Nature resistance by $24504s1.,Increases Nature resistance by $24504s1.
+24514,Rank 2,Increases Shadow resistance by $24505s1.,Increases Shadow resistance by $24505s1.
+24515,Rank 3,Increases Shadow resistance by $24506s1.,Increases Shadow resistance by $24506s1.
+24516,Rank 4,Increases Shadow resistance by $24507s1.,Increases Shadow resistance by $24507s1.
+24545,Rank 1,Armor increased by $s1.,
+24547,Rank 1,Armor increased by $24545s1.,
+24549,Rank 2,Armor increased by $s1.,
+24550,Rank 3,Armor increased by $s1.,
+24551,Rank 4,Armor increased by $s1.,
+24552,Rank 5,Armor increased by $s1.,
+24553,Rank 6,Armor increased by $s1.,
+24554,Rank 7,Armor increased by $s1.,
+24555,Rank 8,Armor increased by $s1.,
+24556,Rank 2,Armor increased by $24549s1.,
+24557,Rank 3,Armor increased by $24550s1.,
+24558,Rank 4,Armor increased by $24551s1.,
+24559,Rank 5,Armor increased by $24552s1.,
+24560,Rank 6,Armor increased by $24553s1.,
+24561,Rank 7,Armor increased by $24554s1.,
+24562,Rank 8,Armor increased by $24555s1.,
+24577,Rank 2,Blasts a single enemy for $s1 damage and lowers the attack power of all enemies in melee range by $s2 for $d.,Melee attack power reduced by $s2.
+24578,Rank 3,Blasts a single enemy for $s1 damage and lowers the melee attack power of all enemies in melee range by $s2 for $d.,Melee attack power reduced by $s2.
+24579,Rank 4,Blasts a single enemy for $s1 damage and lowers the melee attack power of all enemies in melee range by $s2 for $d.,Melee attack power reduced by $s2.
+24580,Rank 2,Blasts a single enemy for $24577s1 damage and lowers the attack power of all enemies in melee range by $24577s2.  Effect lasts $24577d.,
+24581,Rank 3,Blasts a single enemy for $24578s1 damage and lowers the attack power of all enemies in melee range by $24578s2.  Effect lasts $24578d.,
+24582,Rank 4,Blasts a single enemy for $24579s1 damage and lowers the attack power of all enemies in melee range by $24579s2.  Effect lasts $24579d.,
+24583,Rank 2,Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.,$s2 Nature damage every $t2 sec.
+24584,Rank 2,Inflicts $24583o2 Nature damage over $24583d. Effect can stack up to 5 times on a single target.,
+24586,Rank 3,Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.,$s2 Nature damage every $t2 sec.
+24587,Rank 4,Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.,$s2 Nature damage every $t2 sec.
+24588,Rank 3,Inflicts $24586o2 Nature damage over $24586d. Effect can stack up to 5 times on a single target.,
+24589,Rank 4,Inflicts $24587o2 Nature damage over $24587d. Effect can stack up to 5 times on a single target.,
+24597,Rank 4,"The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",Increases your melee attack power by $w1.
+24599,Rank 4,Party members within $24597a1 yards receive an extra $24597s1 damage to their next Physical attack.  Lasts $24597d.,
+24603,Rank 3,"The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",Increases your melee attack power by $w1.
+24604,Rank 1,"The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",Increases your melee attack power by $w1.
+24605,Rank 2,"The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",Increases your melee attack power by $w1.
+24607,Rank 3,Party members within $24603a1 yards receive an extra $24603s1 damage to their next Physical attack.  Lasts $24603d.,
+24608,Rank 2,Party members within $24605a1 yards receive an extra $24605s1 damage to their next Physical attack.  Lasts $24605d.,
+24609,Rank 1,Party members within $24604a1 yards receive an extra $24604s1 damage to their next Physical attack.  Lasts $24604d.,
+24629,Rank 9,Armor increased by $s1.,
+24630,Rank 10,Armor increased by $s1.,
+24631,Rank 9,Armor increased by $24629s1.,
+24632,Rank 10,Armor increased by $24630s1.,
+24640,Rank 1,Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.,$s2 Nature damage every $t2 sec.
+24641,Rank 1,Inflicts $24640o2 Nature damage over $24640d. Effect can stack up to 5 times on a single target.,
+24844,Rank 1,"Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+24845,Rank 1,"Breathes lightning, instantly dealing $24844s1 Nature damage to a single target.",
 24858,Shapeshift,"Transforms the Druid into Moonkin Form. While in this form, the armor contribution from items is increased by $24905s1%, Omen of Clarity gains $s5% increased chance to trigger, and all party members within $24907a1 yards have their critical strike chance increased by $24907s1%, exclusive with Leader of the Pack. The Moonkin cannot cast healing spells while shapeshifted.
 
 The act of shapeshifting frees the caster of Polymorph and Movement Impairing effects.",Immune to Polymorph effects. Omen of Clarity trigger chance increased. Armor contribution from items is increased by $24905s1%.
 24907,,,Increases critical strike chance by $s1%.
 24968,,Reduces the mana cost of your Healing Touch and Tranquility spells by $s1%.,
+25008,Rank 2,"Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+25009,Rank 3,"Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+25010,Rank 4,"Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+25011,Rank 5,"Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+25012,Rank 6,"Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+25013,Rank 2,"Breathes lightning, instantly dealing $25008s1 Nature damage to a single target.",
+25014,Rank 3,"Breathes lightning, instantly dealing $25009s1 Nature damage to a single target.",
+25015,Rank 4,"Breathes lightning, instantly dealing $25010s1 Nature damage to a single target.",
+25016,Rank 5,"Breathes lightning, instantly dealing $25011s1 Nature damage to a single target.",
+25017,Rank 6,"Breathes lightning, instantly dealing $25012s1 Nature damage to a single target.",
+25076,Rank 1,"Attack speed increased by $s1%, but reduces damage.",
+25077,Rank 1,"Increases attack speed by $25076s1%, but decreases damage.",
 25228,,,$s2% of damage taken by master is split with demon. All damage done increased by $s1%.
 25304,Rank 11,"Launches a bolt of frost at the enemy, causing ${$m2$*$<frostdamage>} to ${$M2*$<frostdamage>}  Frost damage and slowing movement speed by $s1% for $d.",Movement slowed by $w1%.
 25306,Rank 12,Hurls a fiery ball that causes $s1 Fire damage and an additional $o2 Fire damage over $d.,$s2 Fire damage every $t2 seconds.
@@ -713,9 +922,13 @@ The act of shapeshifting frees the caster of Polymorph and Movement Impairing ef
 25956,,Decreases the cooldown of your Judgement ability by $/1000;s1 sec.,
 25999,,Immobilize the target for $d.,Immobilized.
 26022,,Increases movement speed and mounted movement speed by $s1%.  This does not stack with other movement speed increasing effects.,
+26064,Rank 1,"Reduces all damage your pet takes by $s1% and increases the time between your pet's attacks by $s2%, but deals more damage with each attack. Lasts $d.","Damage reduced by $s1% and time between attacks increased by $s2%, but deal more damage."
+26090,Rank 1,"Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
 26177,Rank 2,"Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
 26178,Rank 3,"Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
 26179,Rank 4,"Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
+26187,Rank 2,"Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
+26188,Rank 3,"Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
 26201,Rank 5,"Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
 27619,,"You become encased in a block of ice, protecting you from all physical attacks and spells for $d, but during that time you cannot attack, move or cast spells.","Immune to all attacks and spells.  Cannot attack, move or use spells."
 27685,Rank 6,"Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
@@ -785,6 +998,7 @@ Only one Elemental Shield can be active on the Shaman at any one time.",Attacks 
 408511,,Gaining mana when hit while Water Shield is active.,
 408521,Rank 1,"Heals a friendly target for $s1, an additional $o2 over $d, and increases the effectiveness of your Chain Heal casts directly on that target by $s3%.","Heals $w2 every $t2 sec.
 Increases the effectiveness of the caster's Chain Heal spells cast directly on this target by $s3%."
+409365,,,Attack speed.
 412538,,Deals Fire damage every $t1 sec.,Deals ${$w1/2} Fire damage every $t1 sec.
 412545,,Deals Fire damage every $t sec.,Deals fire damage every $t1 sec.
 412609,,,Bleeding.
@@ -825,6 +1039,10 @@ Immune to Fear effects."
 440870,,"Reduces the cooldown of your Soul Fire spell by $m2%. When you cast Shadow Bolt or Searing Pain on an enemy below $m3% health, they deal $m4% increased damage, and for the next $440873d your Soul Fire spell has its cast time reduced by $m1% and costs no Soul Shards.",
 440873,,,Your Soul Fire cast time is reduced by $w1% and costs no shard.
 442948,,"A targeted party member is protected from all physical attacks for $d, but during that time they cannot attack or use physical abilities.  Players may only have one Blessing on them per Paladin at any one time.  Once protected, the target cannot be made invulnerable by Divine Shield, Divine Protection or Blessing of Protection again for $25771d.",Immune to physical attacks.  Cannot attack or use physical abilities.
+444678,Rank 1,"Breathes molten lava at $x1 nearby enemies, instantly dealing $s1 Fire damage and reducing the target's casting speed by $s2% for $d.",Casting speed reduced by $s2%.
+444680,Rank 1,"Breathes molten lava at the target, instantly dealing $444678s1 Fire damage and reducing the target's casting speed by $444678s2% for $444678d.",
+444681,Rank 2,"Breathes molten lava at $x1 nearby enemies, instantly dealing $s1 Fire damage and reducing the target's casting speed by $s2% for $d.",Casting speed reduced by $s2%.
+444682,Rank 2,"Breathes molten lava at the target, instantly dealing $444681s1 Fire damage and reducing the target's casting speed by $$444681s2% for $444681d.",
 459699,,"Gain the Fear Ward ability:
 
 $@spellicon6346
@@ -892,6 +1110,88 @@ $@spelltooltip414924",Immobilized.
 1259918,Racial Passive,"Gain $s1% increased movement speed every $s2 sec spent moving, up to a maximum of $s3% increase. Taking damage or standing still will reduce this effect.",
 1260189,Racial Passive,"Your spells and attacks have a $h% chance to drain Health from the target, up to $s1% of your maximum Health.",
 1260270,,"Regenerate $o1% of your maximum Health over $d. Any movement, action, or damage taken will cancel the effect.",Regenerating $o1% of maximum Health over $d.
+1263099,,Increases attack speed by $s1%.,Attack speed increased by $s1%.
+1264455,Rank 4,"Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
+1264727,Rank 1,"Swipe $1264494x1 nearby enemies, inflicting $1264494s1 damage.
+",
+1264729,Rank 2,"Swipe $1264497x1 nearby enemies, inflicting $1264497s1 damage.
+",
+1264730,Rank 3,"Swipe $1264498x1 nearby enemies, inflicting $1264498s1 damage.
+",
+1264731,Rank 4,"Swipe $1264501x1 nearby enemies, inflicting $1264501s1 damage.
+",
+1264732,Rank 5,"Swipe $1264502x1 nearby enemies, inflicting $1264502s1 damage.
+",
+1264735,Rank 1,Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.
+1264736,Rank 2,Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.
+1264739,Rank 3,Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.
+1264741,Rank 4,Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.
+1264742,Rank 5,Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.
+1264745,Rank 1,Pinches an enemy's legs for $1264735s1 damage and reduces movement speed by $1264735s2% for $1264735d.,
+1264749,Rank 2,Pinches an enemy's legs for $1264736s1 damage and reduces movement speed by $1264736s2% for $1264736d.,
+1264750,Rank 3,Pinches an enemy's legs for $1264739s1 damage and reduces movement speed by $1264739s2% for $1264739d.,
+1264751,Rank 4,Pinches an enemy's legs for $1264741s1 damage and reduces movement speed by $1264741s2% for $1264741d.,
+1264752,Rank 5,Pinches an enemy's legs for $1264742s1 damage and reduces movement speed by $1264742s2% for $1264742d.,
+1264758,Rank 1,Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.,Healing effects reduced by $s2%.
+1264927,Rank 2,Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.,Healing effects reduced by $s2%.
+1264929,Rank 3,Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.,Healing effects reduced by $s2%.
+1264930,Rank 4,Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.,Healing effects reduced by $s2%.
+1264933,Rank 5,Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.,Healing effects reduced by $s2%.
+1264937,Rank 1,Viciously bites enemy appendages for $1264758s1 damage and reduces the effectiveness of any healing by $1264758s2% for $1264758d.,
+1264939,Rank 2,Viciously bites enemy appendages for $1264927s1 damage and reduces the effectiveness of any healing by $1264927s2% for $1264927d.,
+1264970,Rank 3,Viciously bites enemy appendages for $1264929s1 damage and reduces the effectiveness of any healing by $1264929s2% for $1264929d.,
+1264971,Rank 4,Viciously bites enemy appendages for $1264930s1 damage and reduces the effectiveness of any healing by $1264930s2% for $1264930d.,
+1264972,Rank 5,Viciously bites enemy appendages for $1264933s1 damage and reduces the effectiveness of any healing by $1264933s2% for $1264933d.,
+1265038,Rank 1,Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.  $w1 Bleed damage every $t1 sec.
+1265039,Rank 2,Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.  $w1 Bleed damage every $t1 sec.
+1265040,Rank 3,Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.  $w1 Bleed damage every $t1 sec.
+1265041,Rank 4,Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.  $w1 Bleed damage every $t1 sec.
+1265042,Rank 5,Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.,Movement slowed by $w2%.  $w1 Bleed damage every $t1 sec.
+1265043,Rank 1,Tears at an enemy's legs for $1265038o1 damage over $1265038d and reduces movement speed by $1265038s2% for $1265038d.,
+1265045,Rank 2,Tears at an enemy's legs for $1265039o1 damage over $1265039d and reduces movement speed by $1265039s2% for $1265039d.,
+1265046,Rank 3,Tears at an enemy's legs for $1265040o1 damage over $1265040d and reduces movement speed by $1265040s2% for $1265040d.,
+1265047,Rank 4,Tears at an enemy's legs for $1265041o1 damage over $1265041d and reduces movement speed by $1265041s2% for $1265041d.,
+1265048,Rank 5,Tears at an enemy's legs for $1265042o1 damage over $1265042d and reduces movement speed by $1265042s2% for $1265042d.,
+1265054,Rank 1,"Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",Disarmed.
+1265055,Rank 2,"Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",Disarmed.
+1265056,Rank 3,"Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",Disarmed.
+1265057,Rank 4,"Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",Disarmed.
+1265058,Rank 5,"Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",Disarmed.
+1265059,Rank 1,"Grabs an enemy's weapon with its talons, causing $1265054s1 damage and disarming them for $1265054d.",
+1265060,Rank 2,"Grabs an enemy's weapon with its talons, causing $1265055s1 damage and disarming them for $1265055d.",
+1265061,Rank 3,"Grabs an enemy's weapon with its talons, causing $1265056s1 damage and disarming them for $1265056d.",
+1265062,Rank 4,"Grabs an enemy's weapon with its talons, causing $1265057s1 damage and disarming them for $1265057d.",
+1265064,Rank 5,"Grabs an enemy's weapon with its talons, causing $1265058s1 damage and disarming them for $1265058d.",
+1265065,Rank 1,"Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",Bleeding for $w1 damage every $t1 sec.
+1265066,Rank 2,"Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",Bleeding for $w1 damage every $t1 sec.
+1265067,Rank 3,"Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",Bleeding for $w1 damage every $t1 sec.
+1265068,Rank 4,"Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",Bleeding for $w1 damage every $t1 sec.
+1265069,Rank 5,"Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",Bleeding for $w1 damage every $t1 sec.
+1265831,Rank 1,"Slash an enemy with razor talons, causing the target to Bleed for $1265065o1 damage over $1265065d and take $1265065s2% additional damage from Bleed effects for the duration.",
+1265833,Rank 2,"Slash an enemy with razor talons, causing the target to Bleed for $1265066o1 damage over $1265066d and take $1265066s2% additional damage from Bleed effects for the duration.",
+1265834,Rank 3,"Slash an enemy with razor talons, causing the target to Bleed for $1265067o1 damage over $1265067d and take $1265067s2% additional damage from Bleed effects for the duration.",
+1265835,Rank 4,"Slash an enemy with razor talons, causing the target to Bleed for $1265068o1 damage over $1265068d and take $1265068s2% additional damage from Bleed effects for the duration.",
+1265836,Rank 5,"Slash an enemy with razor talons, causing the target to Bleed for $1265069o1 damage over $1265069d and take $1265069s2% additional damage from Bleed effects for the duration.",
+1265843,Rank 1,"Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",Rooted. Taking $w1 Nature damage every $t sec.
+1265878,Rank 2,"Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",Rooted. Taking $w1 Nature damage every $t sec.
+1265880,Rank 3,"Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",Rooted. Taking $w1 Nature damage every $t sec.
+1265881,Rank 4,"Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",Rooted. Taking $w1 Nature damage every $t sec.
+1265883,Rank 5,"Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",Rooted. Taking $w1 Nature damage every $t sec.
+1265887,Rank 1,"Entangles an enemy in a corrosive web, immobilizing them and dealing $1265843o1 Nature damage over $1265843d.",
+1265888,Rank 2,"Entangles an enemy in a corrosive web, immobilizing them and dealing $1265878o1 Nature damage over $1265878d.",
+1265890,Rank 3,"Entangles an enemy in a corrosive web, immobilizing them and dealing $1265880o1 Nature damage over $1265880d.",
+1265891,Rank 4,"Entangles an enemy in a corrosive web, immobilizing them and dealing $1265881o1 Nature damage over $1265881d.",
+1265892,Rank 5,"Entangles an enemy in a corrosive web, immobilizing them and dealing $1265883o1 Nature damage over $1265883d.",
+1265899,Rank 1,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",Decreases armor by $s1.
+1265901,Rank 2,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",Decreases armor by $s1.
+1265902,Rank 3,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",Decreases armor by $s1.
+1265903,Rank 4,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",Decreases armor by $s1.
+1265904,Rank 5,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",Decreases armor by $s1.
+1265907,Rank 1,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $1265899s1 for $1265899d, stacking up to $1265899u times.",
+1265908,Rank 2,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $1265901s1 for $1265901d, stacking up to $1265901u times.",
+1265909,Rank 3,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $1265902s1 for $1265902d, stacking up to $1265902u times.",
+1265911,Rank 5,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $1265904s1 for $1265904d, stacking up to $1265904u times.",
+1265913,Rank 4,"Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $1265903s1 for $1265903d, stacking up to $1265903u times.",
 1279983,Rank 1,$s1 Fire damage dealt to all enemies in target area.,
 1279985,Rank 2,$s1 Fire damage dealt to all enemies in target area.,
 1279987,Rank 3,$s1 Fire damage dealt to all enemies in target area.,
@@ -941,6 +1241,7 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 1310532,,Your attacks against targets with Hunter's Mark have a $s1% chance to activate your Mongoose Bite for $5302d.,
 1310533,,Your Mongoose Bite also causes the target to Bleed for damage over $1310536d equal to $s1% of the damage done by Mongoose Bite.,
 1310536,,Wounds the target causing them to bleed for $o1 damage over $d.,Bleeding for $w1 damage every $t1 seconds.
+1310612,Rank 1,Increases your pet's chance to Dodge by $s1% and decreases the time between your pet's attacks by $s2%. Lasts $d.,Dodge chance increased by $s1% and time between attacks decreased by $s2%.
 1310627,,Increases your melee critical strike damage by $s1% and your offhand weapon damage by $s2%.,
 1310661,,"Increased the damage of your Serpent Sting ability by $s1%, reduces the cooldown of your Viper Sting ability by ${$m2/-1000} sec, and increases the duration of your Scorpid Sting ability by ${$m3/1000} sec.",
 1310687,Rank 1,A steady snipe that increases ranged damage by $s1.,
@@ -982,9 +1283,19 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 1317006,,"When you cast a healing spell, gain Mana equal to $m1% of the base cost of the spell if your previous heal was a different spell.",
 1317257,Rank 1,A powerful kick that deals $s2% melee weapon damage and increases movement speed by $s3% for $d.,Movement speed increased by $w3%.
 1176,,,
+1747,Rank 1,,
+1748,Rank 2,,
+1749,Rank 3,,
+1750,Rank 4,,
 1775,Rank 5,,
+2649,Rank 1,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
 2786,Rank 2,,
+2975,Rank 5,,
+2980,Rank 1,,
+2981,Rank 2,,
+2982,Rank 3,,
 3576,,,
+3667,Rank 4,,
 4630,,,
 5211,Rank 1,Stuns the target for $d.,Stunned.
 6359,,,
@@ -1006,16 +1317,37 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 13977,,,
 14157,,,
 14524,,Increases your damage with Wands by $s1%.,
+14922,Rank 2,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14923,Rank 3,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14924,Rank 4,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14925,Rank 5,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14926,Rank 6,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+14927,Rank 7,"Taunt the target, increasing the likelihood the creature will focus attacks on you.",
 15250,,,
 16191,Rank 1,,Gain $s1 mana every $t1 seconds.
 16462,,Increases your Parry chance by $s1%.,
+16698,Rank 6,,
 16959,,,
 17106,,Allows $s1% of your Mana regeneration to continue while casting.,
+17206,,,
+17212,,,
+17223,,,
+17254,Rank 1,,
+17262,Rank 2,,
+17263,Rank 3,,
+17264,Rank 4,,
+17265,Rank 5,,
+17266,Rank 6,,
+17267,Rank 7,,
+17268,Rank 8,,
 18093,,,Stunned.
 18118,,,Movement slowed by $s1%.
 18350,,,
 18462,,Allows $s1% of your Mana regeneration to continue while casting.,
 18498,,,Silenced.
+18728,,,
+18737,,,
+18740,,,
 18814,,,
 19229,,,Immobilized.
 19295,,Increases your Parry chance by $s1%.,
@@ -1037,6 +1369,15 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 23100,Rank 1,,
 23111,Rank 2,,
 23112,Rank 3,,
+23145,Rank 1,Increases movement speed by $s1% for $d.,Increases movement speed by $s1%.
+23146,Rank 1,,
+23147,Rank 2,Increases movement speed by $s1% for $d.,Increases movement speed by $s1%.
+23148,Rank 3,Increases movement speed by $s1% for $d.,Increases movement speed by $s1%.
+23149,Rank 2,,
+23150,Rank 3,,
+23163,Rank 1,,
+23166,Rank 2,,
+23167,Rank 3,,
 23455,Rank 1,,
 23694,,,Immobilized.
 24259,,,Silenced.
@@ -1045,9 +1386,13 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 24905,Passive,,
 24932,,,Increases critical strike chance by $s1%.
 25756,,,Stunned.
+26065,Rank 1,,
+26094,Rank 1,,
 26184,Rank 2,,
 26185,Rank 3,,
 26186,Rank 4,,
+26189,Rank 2,,
+26190,Rank 3,,
 26202,Rank 5,,
 26542,,,
 26543,,,
@@ -1063,6 +1408,9 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 400622,Rank 6,Blasts the enemy for $s1 Fire damage.,
 400623,Rank 7,Blasts the enemy for $s1 Fire damage.,
 401880,Rank 1,,
+412729,,,
+415429,,,
+416189,,,
 417053,,,
 1218134,,Attempts to remove $s1 Frenzy effect from an enemy creature.,
 1225220,,Reduces all damage taken by $s1%.,
@@ -1074,8 +1422,23 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 1259721,Racial Passive,Damage dealt versus Beasts increased by $s1%.,
 1259821,Racial,Your next $n damaging abilities have their Mana cost reduced by $s1% and deal $s2% more damage.,Next $s4 damaging abilities cost $w1% less Mana and deal $w2% more damage.
 1260201,Racial Passive,"Your spells and attacks have a $h% chance to drain Health from the target, up to $s1% of your maximum Health.",
+1263100,,Increases attack speed by $s1%.,Attack speed increased by $s1%.
+1263102,,Increases attack speed by $s1%.,Attack speed increased by $s1%.
+1263104,,Increases attack speed by $s1%.,Attack speed increased by $s1%.
+1263107,,Increases attack speed by $s1%.,Attack speed increased by $s1%.
+1263109,,Increases attack speed by $s1%.,Attack speed increased by $s1%.
+1263110,,Increases attack speed by $s1%.,Attack speed increased by $s1%.
+1263113,,Decreases attack speed by $s1%.,Attack speed decreased by $s1%.
+1263114,,Decreases attack speed by $s1%.,Attack speed decreased by $s1%.
+1264456,Rank 4,,
+1264494,Rank 1,"Swipe $x1 nearby enemies, inflicting $s1 damage.",
+1264497,Rank 2,"Swipe $x1 nearby enemies, inflicting $s1 damage.",
+1264498,Rank 3,"Swipe $x1 nearby enemies, inflicting $s1 damage.",
+1264501,Rank 4,"Swipe $x1 nearby enemies, inflicting $s1 damage.",
+1264502,Rank 5,"Swipe $x1 nearby enemies, inflicting $s1 damage.",
 1270842,,,Mana and health regeneration rate increased by $s1%.
 1270893,,,Movement speed and mounted movement speed increased by $s1%.
+1278934,,,
 1279949,Rank 6,,
 1279976,Rank 1,,
 1279977,Rank 2,,
@@ -1085,6 +1448,7 @@ Targets that die while Devouring Plague is active spreads it, jumping to a nearb
 1280349,Rank 5,,
 1282733,,,
 1299448,,,Melee attack speed increased by $s1%.
+1310617,Rank 1,,
 1310697,,,
 1310705,Rank 1,,
 1310706,Rank 1,,

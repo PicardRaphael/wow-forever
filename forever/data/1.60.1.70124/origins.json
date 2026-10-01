@@ -933,10 +933,13 @@
         "/character_tables",
         "/character_scaling",
         "/mechanic_auras",
-        "/hotfix_related_tables"
+        "/hotfix_related_tables",
+        "/pet_tables",
+        "/localized_pet_tables",
+        "/pets"
       ],
       "origin": "parametre",
-      "source": "règles de lecture du client (T03, PV1)",
+      "source": "règles de lecture du client (T03, PV1, CH0)",
       "reason": "règle de lecture des tables, pas une valeur de jeu"
     },
     {

@@ -11,6 +11,9 @@ localisées). Filtre (fermeture transitive) :
   lignes raciales (`RACIAL_LINES`), sorts d'utilisation des objets de `SAMPLE_ITEMS` ; puis sorts déclenchés
   (EffectTriggerSpell) et cités par les infobulles, jusqu'à stabilité ; leurres : un sort homonyme hors des lignes
   de classe (PNJ) par sort nommé ;
+- CH0 : tables des familiers (`pet_tables`, `localized_pet_tables`) : toutes les capacités des lignes de
+  `PET_LINES` (deux familles du Chasseur, les deux lignes « Pet - Bat », une ligne de démon, Beast Training,
+  Pet - Generic) entrent dans la fermeture ; CreatureFamily, ItemPetFood et UiMap recopiées en entier ;
 - tables petites recopiées en entier (`FULL_TABLES`) ; les autres réduites aux sorts ou objets retenus.
 Lignes réécrites par le module csv (mêmes colonnes, même ordre), fins de ligne LF. Ne pas éditer la fixture à la
 main : relancer le script."""
@@ -46,7 +49,13 @@ FULL_TABLES = (
     "ChrRaces",
     "CharBaseInfo",
     "SkillRaceClassInfo",
+    "CreatureFamily",  # CH0 : familles, régime, lignes de compétence
+    "ItemPetFood",  # CH0 : noms des régimes
+    "UiMap",  # CH0 : cartes et zones
 )
+# CH0 : lignes de familier recopiées en entier (noms du client) : Loup et Crocilisk (coût nul de Dash, orthographe),
+# les deux lignes Bat (ligne orpheline), le Diablotin (ligne de démon, exclue), Beast Training et Pet - Generic.
+PET_LINES = ("Pet - Wolf", "Pet - Crocilisk", "Pet - Bat", "Pet - Imp", "Beast Training", "Pet - Generic")
 # Sorts nommés par classe (blocs B3 et D) : complétés au fil des blocs ; noms anglais du client.
 SAMPLE_SPELLS: dict[str, tuple[str, ...]] = {
     "Warrior": ("Charge", "Intimidating Shout", "Pummel", "Hamstring", "Shield Wall", "Recklessness", "Disarm"),
@@ -100,7 +109,7 @@ def main() -> int:
     rules = json.loads((DATA_DIR / args.version / "decode_rules.json").read_text(encoding="utf-8"))
     src = wago_dir(default_cache_dir(), args.version)
     dst = FIXTURES / args.version
-    names_all = [*rules["tables"], *rules["class_tables"]]
+    names_all = list(dict.fromkeys([*rules["tables"], *rules["class_tables"], *rules.get("pet_tables", [])]))
     t = {name: read(src / "enUS" / f"{name}.csv") for name in names_all}
     rows = {name: r for name, (_, r) in t.items()}
 
@@ -154,6 +163,8 @@ def main() -> int:
         npc += homonyms
     spells |= set(npc)
     spells |= {r["Spell"] for r in rows["SkillLineAbility"] if int(r["SkillLine"]) in RACIAL_LINES}
+    pet_lines_ids = {r["ID"] for r in rows["SkillLine"] if r["DisplayName_lang"] in PET_LINES}
+    spells |= {r["Spell"] for r in rows["SkillLineAbility"] if r["SkillLine"] in pet_lines_ids}
     items = {str(i) for i in SAMPLE_ITEMS}
     item_links = [r for r in rows["ItemXItemEffect"] if r["ItemID"] in items]
     effect_ids = {r["ItemEffectID"] for r in item_links}
@@ -224,11 +235,15 @@ def main() -> int:
         (dst / "gametables" / f"{gt}.txt").write_bytes(("\n".join(kept) + "\n").encode("utf-8"))
         print(f"gametables/{gt} : {len(kept) - 1} lignes")
     localized: dict[str, list[str]] = {}
-    for source in (rules.get("localized_tables", {}), rules.get("localized_class_tables", {})):
+    for source in (
+        rules.get("localized_tables", {}),
+        rules.get("localized_class_tables", {}),
+        rules.get("localized_pet_tables", {}),
+    ):
         for locale, tables in source.items():
             localized.setdefault(locale, []).extend(tables)
     for locale, tables in localized.items():
-        for name in tables:
+        for name in dict.fromkeys(tables):
             header, loc_rows = read(src / locale / f"{name}.csv")
             keep = loc_rows if name in FULL_TABLES else [r for r in loc_rows if r["ID"] in spells]
             n = write(dst / locale / f"{name}.csv", header, keep)
