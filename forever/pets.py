@@ -116,6 +116,9 @@ def crosscheck(
 
     beasts = bestiary.get("beasts", [])
     zone_names = questie.zone_names() if questie is not None else {}
+    maps: Mapping[str, Any] = pets.get("maps", {})
+    continents = {maps[str(m["continent"])]["name"]["en"] for m in maps.values() if str(m.get("continent")) in maps}
+    vague_zone = 0
     for b in beasts:
         subject = str(b.get("id"))
         family = _family_of(aliases, b.get("family"))
@@ -135,7 +138,9 @@ def crosscheck(
                 ("addon", b["level"]),
             )
         zone = zone_names.get(npc.zone_id)
-        if zone and b.get("zones") and zone not in b["zones"]:
+        if zone in continents:
+            vague_zone += 1  # Questie ne donne que le continent : pas une contradiction
+        elif zone and b.get("zones") and zone not in b["zones"]:
             gap("beast_zone_questie", subject, "zone", ("questie", zone), ("addon", list(b["zones"])))
 
     order = {k: i for i, k in enumerate(GAP_KINDS)}
@@ -151,8 +156,17 @@ def crosscheck(
             "beasts_in_questie": sum(
                 1 for b in beasts if questie is not None and isinstance(b.get("id"), int) and questie.npc(b["id"])
             ),
+            "beasts_questie_continent_only": vague_zone,
         },
         "gaps": gaps,
+        "client_notes": [str(o) for o in pets.get("observations", [])],
+        "never_seen": [
+            {
+                "family": key,
+                "note": "famille du client absente de Forever Bestiary : jamais vue en jeu selon ses relevés",
+            }
+            for key in sorted(set(client_fams) - set(addon_fams))
+        ],
     }
 
 
@@ -181,9 +195,20 @@ def render_crosscheck_markdown(report: Mapping[str, Any]) -> str:
             f"{counts['families_compared']} comparées ; capacités de l'addon : {counts['abilities_addon']} ; "
             f"bêtes de l'addon : {counts['beasts']} (dont {counts['beasts_in_questie']} dans Questie)"
         ),
-        f"- Écarts : {len(report['gaps'])}",
+        (
+            f"- Écarts : {len(report['gaps'])} ; PNJ dont Questie ne donne que le continent (non comptés) : "
+            f"{counts.get('beasts_questie_continent_only', 0)}"
+        ),
         "",
     ]
+    if report.get("never_seen"):
+        lines += ["## Entrées du client jamais vues en jeu", ""]
+        lines += [f"- {n['family']} : {n['note']}" for n in report["never_seen"]]
+        lines.append("")
+    if report.get("client_notes"):
+        lines += ["## Écarts internes au client (pets.json, observations du décodage)", ""]
+        lines += [f"- {_cell(note)}" for note in report["client_notes"]]
+        lines.append("")
     for kind in GAP_KINDS:
         rows = [g for g in report["gaps"] if g["kind"] == kind]
         if not rows:
@@ -350,8 +375,15 @@ def family_sheet(pets: Mapping[str, Any], key: str, gaps: list[dict[str, Any]] |
         abilities.append({"key": ability_key, "name": ability["name"], "kind": ability["kind"], "ranks": ranks})
     certainty = dict(fam.get("certainty", {}))
     certainty.update({"level": "certain", "training_cost": fam.get("certainty", {}).get("training_costs", "probable")})
+    seen = (
+        None
+        if gaps is None
+        else not any(g.get("kind") == "family_missing_addon" and g.get("subject") == key for g in gaps)
+    )
     return {
         "key": key,
+        "in_addon": seen,
+        "note": "absente de Forever Bestiary : jamais vue en jeu selon ses relevés" if seen is False else None,
         "family_id": fam["family_id"],
         "name": fam["name"],
         "skill_line_name": fam.get("skill_line_name"),

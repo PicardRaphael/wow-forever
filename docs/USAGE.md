@@ -95,6 +95,20 @@ uv run forever lookup talent Intimidation --class Chasseur
 Les fiches sont fixes (valeurs du client, classement probable, rendements décroissants supposés) : aucun suivi en
 direct des recharges adverses n'est possible dans un addon sur Forever.
 
+## Familiers du Chasseur (CH0)
+```powershell
+uv run forever pets rules                                           # système : entraînement, loyauté, apprivoisement
+uv run forever pets family Loup                                     # capacités, rangs, coût, bonus, régime
+uv run forever pets ability Morsure --detail                        # rangs et bêtes qui enseignent chaque rang
+uv run forever pets tame --ability Morsure --rank 3 --zone "Les Tarides" --level 14   # guide d'apprivoisement
+uv run forever pets crosscheck --markdown docs/research/familiers-recoupement.md        # écarts client, addon, Questie
+uv run forever pets mine                                            # mes familiers et mes observations
+uv run forever pets measure --addon-sv <WTF>/SavedVariables/ForeverLogger.lua           # relevés de ForeverLogger
+```
+Forever Bestiary et Questie sont lus dans `FOREVER_WOW_DIR` (ou `--addon`, `--questie`, `--saved`). Les tables des
+familiers d'une nouvelle version se téléchargent avec `forever fetch --tables <pet_tables de decode_rules.json>`
+(`--locale enUS,frFR` pour les tables localisées, `--timeout` pour une table volumineuse), sur accord.
+
 ## Lire la réponse
 Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour les raisons, hypothèses et alternatives.
 - **Chiffres** : chacun vient d'un outil forever de la session (outil cité entre parenthèses).
