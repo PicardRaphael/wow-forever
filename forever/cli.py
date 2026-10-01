@@ -442,6 +442,34 @@ def build_parser() -> argparse.ArgumentParser:
     pvp_match.add_argument("--opponent-level", type=int, help="niveau adverse (défaut : le mien)")
     pvp_match.add_argument("--json", action="store_true", help="sortie JSON")
 
+    pets = sub.add_parser("pets", help="familiers du Chasseur : règles, familles, capacités, bêtes, guide (CH0)")
+    pets_sub = pets.add_subparsers(dest="pets_cmd", required=True)
+    pets_common = _Parser(add_help=False)
+    pets_common.add_argument("--addon", help="dossier de Forever Bestiary (défaut : dans FOREVER_WOW_DIR)")
+    pets_common.add_argument("--saved", help="sauvegarde ForeverBestiary.lua (défaut : dans FOREVER_WOW_DIR)")
+    pets_common.add_argument("--questie", help="dossier de Questie (défaut : dans FOREVER_WOW_DIR)")
+    pets_common.add_argument("--json", action="store_true", help="sortie JSON")
+    pets_sub.add_parser("rules", parents=[pets_common], help="règles du système de familiers, avec leurs sources")
+    pets_family = pets_sub.add_parser("family", parents=[pets_common], help="fiche d'une famille")
+    pets_family.add_argument("name", help="famille (nom français ou anglais)")
+    pets_ability = pets_sub.add_parser("ability", parents=[pets_common], help="fiche d'une capacité et de ses rangs")
+    pets_ability.add_argument("name", help="capacité (nom français ou anglais)")
+    pets_ability.add_argument("--rank", type=int, help="un seul rang")
+    pets_ability.add_argument("--detail", action="store_true", help="bêtes qui enseignent chaque rang")
+    pets_beast = pets_sub.add_parser("beast", parents=[pets_common], help="fiche d'une bête de Forever Bestiary")
+    pets_beast.add_argument("name", help="bête (nom ou identifiant de PNJ)")
+    pets_tame = pets_sub.add_parser("tame", parents=[pets_common], help="guide d'apprivoisement (zone et niveau)")
+    target = pets_tame.add_mutually_exclusive_group(required=True)
+    target.add_argument("--ability", help="capacité à apprendre")
+    target.add_argument("--family", help="famille cherchée")
+    target.add_argument("--beast", help="bête cherchée")
+    pets_tame.add_argument("--rank", type=int, help="rang de la capacité (défaut : le plus haut atteignable)")
+    pets_tame.add_argument("--zone", required=True, help="zone (nom français ou anglais)")
+    pets_tame.add_argument("--level", type=int, help="niveau du Chasseur (obligatoire, jamais deviné)")
+    pets_cross = pets_sub.add_parser("crosscheck", parents=[pets_common], help="écarts client ↔ addon ↔ Questie")
+    pets_cross.add_argument("--markdown", help="écrire aussi le rapport Markdown dans ce fichier")
+    pets_sub.add_parser("mine", parents=[pets_common], help="mes observations et mes familiers (ma sauvegarde)")
+
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     hook = sub.add_parser("hook", help="hooks du plugin Claude Code (entrée JSON sur stdin)")
     hook.add_argument(
@@ -706,7 +734,7 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         _emit(talent, render_talent(talent), talent["provenance"], args.json)
         return EXIT_OK
     if args.kind != "spell":
-        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones", "pvp"])
+        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones", "pvp", "pets"])
     if not args.name:
         raise InvalidArgumentError("Nom du sort manquant.", "écrire forever lookup spell <nom>")
     res = lookup_spell(deps, args.name, args.rank, detail=args.detail, limit=args.limit, offset=args.offset)
@@ -1060,6 +1088,44 @@ def _cmd_talents(deps: Deps, args: argparse.Namespace) -> int:
     lines += [f"  erreur : {e}" for e in report["errors"]]
     lines += [f"  {t['name']} {t['rank']}/{t['max_rank']} : {t['description_template']}" for t in report["talents"]]
     _emit(report, lines, report["provenance"], args.json)
+    return EXIT_OK
+
+
+def _cmd_pets(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.pets import render_crosscheck_markdown
+    from forever.pets_lookup import lookup_pets, pets_crosscheck, pets_mine, render_pets
+
+    addon = Path(args.addon) if args.addon else None
+    saved = Path(args.saved) if args.saved else None
+    questie = Path(args.questie) if args.questie else None
+    cmd = args.pets_cmd
+    if cmd == "crosscheck":
+        payload = pets_crosscheck(deps, addon_dir=addon, questie_dir=questie)
+        if args.markdown:
+            target = Path(args.markdown)
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(render_crosscheck_markdown(payload).encode("utf-8"))
+    elif cmd == "mine":
+        payload = pets_mine(deps, saved_path=saved)
+    else:
+        if cmd == "rules":
+            name = None
+        elif cmd == "tame":
+            name = args.ability or args.family or args.beast
+        else:
+            name = args.name
+        payload = lookup_pets(
+            deps,
+            name,
+            rank=getattr(args, "rank", None),
+            zone=getattr(args, "zone", None),
+            level=getattr(args, "level", None),
+            detail=getattr(args, "detail", False),
+            addon_dir=addon,
+            saved_path=saved,
+            questie_dir=questie,
+        )
+    _emit(payload, render_pets(payload), payload["provenance"], args.json)
     return EXIT_OK
 
 
@@ -2096,6 +2162,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "install": _cmd_install,
         "profile": _cmd_profile,
         "pvp": _cmd_pvp,
+        "pets": _cmd_pets,
         "talents": _cmd_talents,
         "diff": _cmd_diff,
         "verify": _cmd_verify,

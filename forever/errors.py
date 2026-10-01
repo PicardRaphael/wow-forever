@@ -40,8 +40,8 @@ class ForeverError(Exception):
 class InvalidArgumentError(ForeverError):
     exit_code = EXIT_USAGE
 
-    def __init__(self, message: str, action: str) -> None:
-        super().__init__("invalid_argument", message, action)
+    def __init__(self, message: str, action: str, *, suggestions: list[str] | None = None) -> None:
+        super().__init__("invalid_argument", message, action, suggestions=suggestions)
 
 
 class UsageError(ForeverError):

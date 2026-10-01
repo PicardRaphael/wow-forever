@@ -541,4 +541,11 @@ def read_completed_quests(sv: Path, guid: str) -> list[tuple[int, int]]:
 def npc_level_ranges(db: QuestieDB) -> dict[str, list[int]]:
     """Plage de niveau des PNJ normaux de chaque zone (nom anglais de Questie -> [10e, 90e percentile]), méthode de
     `zones_for_level`. Base Classic Era sans correction Forever (suppose)."""
-    raise NotImplementedError
+    names = db.zone_names()
+    levels: dict[int, list[int]] = {}
+    for npc in db.npcs().values():
+        if npc.rank == NORMAL_RANK and npc.zone_id in names:
+            levels.setdefault(npc.zone_id, []).extend((npc.min_level, npc.max_level))
+    return {
+        names[zone]: [_nearest_rank(values, q) for q in NPC_LEVEL_QUANTILES] for zone, values in sorted(levels.items())
+    }

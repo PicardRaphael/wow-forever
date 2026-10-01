@@ -1666,6 +1666,7 @@ mechanics:
       - "SpellTargetRestrictions du client : aucune borne de niveau pour Tame Beast (CH0, accès 6)"
     tests:
       - tests/unit/test_pet_rules.py::test_tame_margin_stays_suppose_after_reading_the_client
+      - tests/unit/test_pets_guide.py::test_tameable_now_or_level_where_it_becomes_tameable
     tolerance: null
     note: "marge relevée par des joueurs, absente du client ; bêtes apprivoisables lues dans Forever Bestiary (aucun drapeau d'apprivoisement lisible dans Creature ni CreatureDifficulty)"
   - id: L2

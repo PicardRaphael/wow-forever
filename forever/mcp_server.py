@@ -20,6 +20,7 @@ from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindEr
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.leveling import LevelingReport, parse_talents, simulate_leveling
 from forever.lookup import check_talents, lookup_class_talent, lookup_spell, lookup_talent, lookup_zones
+from forever.pets_lookup import lookup_pets
 from forever.profile import ProfileView, normalize_class, read_profile
 from forever.provenance import error_payload
 from forever.pvp import compact, pvp_report
@@ -81,6 +82,7 @@ def build_server(deps: Deps) -> MCPServer:
         talents: str | None = None,
         opponent_level: int | None = None,
         class_name: str | None = None,
+        zone: str | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -99,7 +101,13 @@ def build_server(deps: Deps) -> MCPServer:
         valeurs avec leur chemin dans les données si `detail=True`, `missing` à citer. Ne lit jamais le profil :
         passer la classe, le niveau, la race et les talents lus par forever_player_profile.
         PV1 : `kind="talent"` avec `class_name` (9 classes, défaut Mage) ; `kind="build_check"` avec `name` (classe),
-        `level` et `talents` (« clé=rang,… ») : légal ou liste des erreurs, description des talents du client."""
+        `level` et `talents` (« clé=rang,… ») : légal ou liste des erreurs, description des talents du client.
+        CH0 : `kind="pets"` (familiers du Chasseur) : sans `name`, règles du système (entraînement, loyauté,
+        apprivoisement, héritage…, chacune avec source et certitude) ; `name` = famille, capacité ou bête (nom
+        français ou anglais) : sa fiche (`rank`, `detail` pour les bêtes qui enseignent chaque rang) ; avec `zone`
+        (nom français ou anglais) et `level` (niveau du Chasseur, jamais deviné) : guide d'apprivoisement (bêtes de la
+        zone puis des zones voisines du même continent à son niveau, coordonnées datées, rang le plus haut
+        atteignable). Forever Bestiary lu sur disque ; sans lui, fiches du client seules."""
         try:
             if kind == "zones":
                 path = Path(questie) if questie else None
@@ -114,6 +122,8 @@ def build_server(deps: Deps) -> MCPServer:
                 if not name or level is None:
                     raise InvalidArgumentError("Classe ou niveau manquant.", "donner name (classe), level et talents")
                 return check_talents(deps, name, parse_talents(talents) if talents else {}, level)
+            if kind == "pets":
+                return lookup_pets(deps, name or None, rank=rank, zone=zone, level=level, detail=detail)
             if kind == "pvp":
                 if not name:
                     raise InvalidArgumentError("Classe manquante.", "donner name (classe, nom français ou anglais)")
@@ -128,7 +138,9 @@ def build_server(deps: Deps) -> MCPServer:
                 )
                 return compact(report, detail=detail, limit=limit, offset=offset)
             if kind != "spell":
-                raise UnsupportedKindError(f"type « {kind} »", ["spell", "talent", "zones", "pvp", "build_check"])
+                raise UnsupportedKindError(
+                    f"type « {kind} »", ["spell", "talent", "zones", "pvp", "build_check", "pets"]
+                )
             if not name:
                 raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")
             return dict(lookup_spell(deps, name, rank, detail=detail, limit=limit, offset=offset))
