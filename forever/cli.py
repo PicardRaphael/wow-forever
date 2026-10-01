@@ -59,7 +59,8 @@ from forever.origins import check_all as check_origins
 from forever.origins import inventory as origins_inventory
 from forever.origins import inventory_payload, render_inventory
 from forever.origins import render_report as render_origins_report
-from forever.pipeline import hotfixes
+from forever.pipeline import blizzard_api, hotfixes
+from forever.pipeline import notes as notes_mod
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
 from forever.pipeline.client_builds import (
@@ -296,6 +297,16 @@ def build_parser() -> argparse.ArgumentParser:
     info = questie_sub.add_parser("info", help="version et contenu de l'addon Questie installé")
     info.add_argument("--dir", help="dossier de l'addon (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)")
     info.add_argument("--json", action="store_true", help="sortie JSON")
+
+    notes = sub.add_parser("notes", help="notes officielles du forum de Blizzard (réseau, lancé à la main, D1)")
+    notes.add_argument("--state-from-issues", help="état lu dans les issues (gh issue list --json number,body)")
+    notes.add_argument("--json", action="store_true", help="sortie JSON")
+    api = sub.add_parser("api", help="API Blizzard (réseau)")
+    api_sub = api.add_subparsers(dest="api_command", required=True, parser_class=_Parser)
+    a_probe = api_sub.add_parser("probe", help="sonder les espaces de noms de Forever (point 10, décision 149)")
+    a_probe.add_argument("--region", default="eu,us", help="régions séparées par des virgules (défaut : eu,us)")
+    a_probe.add_argument("--env-file", default=".env", help="fichier des clés (défaut : .env ; variables d'abord)")
+    a_probe.add_argument("--json", action="store_true", help="sortie JSON")
 
     w = sub.add_parser("watch", help="veille locale : client, addons, correctifs, journaux (hors ligne, rien lancé)")
     w.add_argument("--report", action="store_true", help="écrire le résumé dans le cache (tâche planifiée)")
@@ -1646,6 +1657,49 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_notes(deps: Deps, args: argparse.Namespace) -> int:
+    state = None
+    if args.state_from_issues:
+        issues = json.loads(Path(args.state_from_issues).read_text(encoding="utf-8"))
+        state = notes_mod.state_from_issues(issues if isinstance(issues, list) else [])
+    result = notes_mod.read_notes(deps, state=state)
+    provenance = local_provenance(
+        deps,
+        certainty="suppose",
+        assumptions=[
+            "notes officielles : signal à vérifier, jamais une valeur (docs/DATA_SOURCES.md)",
+            "lecture lancée à la main (décision 148)",
+        ],
+    )
+    if result["skipped"]:
+        lines = [f"Notes officielles déjà lues le {result['last_run']} : une lecture par jour au plus."]
+    else:
+        lines = [f"Notes officielles : {len(result['notes'])} nouvelle(s) ou révisée(s)"]
+        for n in result["notes"]:
+            flag = " · problèmes connus (bugs reconnus)" if n["known_issues"] else ""
+            lines.append(f"  {n['change']} : {n['title']} ({n['updated_at'][:10]}, version {n['version']}){flag}")
+            lines.append(f"    {n['url']}")
+            if n["keywords"]:
+                lines.append("    registre : " + ", ".join(f"{k['registry']} ({k['keyword']})" for k in n["keywords"]))
+    _emit({**result, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _cmd_api(deps: Deps, args: argparse.Namespace) -> int:
+    keys = blizzard_api.load_keys(os.environ, Path(args.env_file))
+    regions = tuple(r.strip() for r in args.region.split(",") if r.strip())
+    result = blizzard_api.probe(deps, keys, regions=regions)
+    provenance = local_provenance(
+        deps, certainty="certain", assumptions=["sonde de l'API Blizzard : réponses HTTP seulement"]
+    )
+    lines = [f"API Blizzard : {len(result['responding'])} espace(s) de Forever répondent"]
+    lines += [f"  {r['region']} {r['namespace']} {r['route']} : {r['status']}" for r in result["results"]]
+    lines += [f"  couverture : {k} {v}" for k, v in result["coverage"].items()]
+    payload = {**result, "issue_body": blizzard_api.probe_issue_body(result), "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_watch(deps: Deps, args: argparse.Namespace) -> int:
     result = watch(deps, report=args.report)
     provenance = local_provenance(deps, assumptions=["veille locale : rien n'est lancé, actions proposées seulement"])
@@ -2035,6 +2089,8 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "hotfixes": _cmd_hotfixes,
         "addons": _cmd_addons,
         "watch": _cmd_watch,
+        "notes": _cmd_notes,
+        "api": _cmd_api,
         "monsters": _cmd_monsters_build,
         "measures": _cmd_measures_refresh,
         "sim": _cmd_sim,

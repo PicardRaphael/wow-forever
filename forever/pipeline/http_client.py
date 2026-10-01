@@ -18,3 +18,14 @@ def urllib_get(url: str, headers: Mapping[str, str], timeout: float) -> bytes:
             return body
     except http.client.HTTPException as exc:  # réponse tronquée ou mal formée : même traitement qu'une panne
         raise OSError(str(exc)) from exc
+
+
+def urllib_post(url: str, headers: Mapping[str, str], data: bytes, timeout: float) -> bytes:
+    """POST (jeton de l'API Blizzard, T08b) : (url, en-têtes, corps, délai) -> corps de la réponse ; OSError sinon."""
+    request = urllib.request.Request(url, data=data, headers=dict(headers), method="POST")
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            body: bytes = response.read()
+            return body
+    except http.client.HTTPException as exc:
+        raise OSError(str(exc)) from exc
