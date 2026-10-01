@@ -1,6 +1,6 @@
 """Rejeu des builds de fin de T05 (T06b, décision D9) : cinq contextes × trois niveaux, préréglage complet.
 
-    uv run python scripts/replay_builds.py run <étiquette> [--only contexte-niveau …]
+    uv run python scripts/replay_builds.py run <étiquette> [--only contexte-niveau …] [--ratios seed:<nom>,…]
     uv run python scripts/replay_builds.py table <étiquette>
     uv run python scripts/replay_builds.py compare <avant> <après>
 
@@ -19,6 +19,8 @@ from typing import Any
 
 from forever.build import build_report
 from forever.config import default_deps
+from forever.errors import InvalidArgumentError
+from forever.gamedata import ABLATABLE, ablated
 
 CONTEXTS = ("leveling", "dungeon", "raid", "pvp-bg", "pvp-world")
 LEVELS = (20, 40, 60)
@@ -138,7 +140,19 @@ def table(label: str) -> str:
     return "\n".join([head, "", HEADER, *rows]) + "\n"
 
 
-def run(label: str, only: list[str] | None) -> None:
+def parse_ratios(value: str) -> set[str]:
+    """« seed:<nom>[,<nom>] » -> valeurs du client remises à leur estimation (ablation, T08b, bloc I)."""
+    kind, _, names = value.partition(":")
+    chosen = {n.strip() for n in names.split(",") if n.strip()}
+    if kind != "seed" or not chosen:
+        raise InvalidArgumentError(f"--ratios mal formé : {value!r}.", "écrire --ratios seed:<nom>[,<nom>]")
+    unknown = sorted(chosen - set(ABLATABLE))
+    if unknown:
+        raise InvalidArgumentError(f"Valeur inconnue : {', '.join(unknown)}.", f"choisir parmi {', '.join(ABLATABLE)}")
+    return chosen
+
+
+def run(label: str, only: list[str] | None, ratios: set[str] | None = None) -> None:
     out = _dir(label)
     out.mkdir(parents=True, exist_ok=True)
     deps = default_deps()
@@ -147,8 +161,9 @@ def run(label: str, only: list[str] | None) -> None:
         if only and name not in only:
             continue
         start = time.perf_counter()
-        rep = build_report(deps, context, level, race=RACE, preset=PRESET, seed=SEED)
-        case = {"report": rep, "duration_s": time.perf_counter() - start}
+        with ablated(ratios or set()):
+            rep = build_report(deps, context, level, race=RACE, preset=PRESET, seed=SEED)
+        case = {"report": rep, "duration_s": time.perf_counter() - start, "ablated": sorted(ratios or ())}
         (out / f"{name}.json").write_bytes((json.dumps(case, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
         print(f"{name} : {case['duration_s']:.0f} s", flush=True)
     (out / "table.md").write_bytes(table(label).encode("utf-8"))
@@ -205,6 +220,7 @@ def main(argv: list[str]) -> int:
     r = sub.add_parser("run")
     r.add_argument("label")
     r.add_argument("--only", nargs="*")
+    r.add_argument("--ratios", help="ablation : seed:<nom>[,<nom>] (valeurs du client remises à leur estimation)")
     t = sub.add_parser("table")
     t.add_argument("label")
     c = sub.add_parser("compare")
@@ -212,7 +228,7 @@ def main(argv: list[str]) -> int:
     c.add_argument("after")
     args = parser.parse_args(argv)
     if args.cmd == "run":
-        run(args.label, args.only)
+        run(args.label, args.only, parse_ratios(args.ratios) if args.ratios else None)
     elif args.cmd == "table":
         sys.stdout.write(table(args.label))
     else:

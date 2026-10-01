@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterator, Mapping
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
@@ -963,13 +965,13 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
             raw_char = version.read_json(CHARACTER_FILE)
         except (OSError, ValueError) as exc:
             raise DataSchemaError(f"{CHARACTER_FILE} de {version.game_version} illisible ({exc}).") from exc
-        constants, leveling, xp_to_next = _client_ratios(raw_char, constants, leveling)
+        constants, leveling, xp_to_next = _client_ratios(raw_char, constants, leveling, xp_to_next)
         ratios = "client"
     utility, utility_source = _utility(raw[SPELLS_FILE], files[SPELLS_FILE]), files[SPELLS_FILE]
     if rules == "forever":
         constants, leveling = _client_mechanics(raw[SCALING_FILE], constants, leveling)
         mage = _mage_client_spells(version) if (version.path / CLASSES_FILE).is_file() else None
-        if mage:
+        if mage and _kept("utility"):
             utility, spells = _client_utility(mage, utility, spells, _spell_names(version))
             utility_source = CLASSES_FILE
     try:
@@ -1007,11 +1009,42 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
 
 
 MAGE_CLASS = "Mage"  # moteur du Mage : ses ratios dans character_scaling.json
-ABLATABLE: tuple[str, ...] = ()
+# T08b, bloc I : valeurs du client qu'un rejeu peut remettre à leur estimation, une à une (ablation), pour trouver la
+# raison d'une recommandation changée ; jamais utilisé hors de scripts/replay_builds.py et des tests.
+ABLATABLE: tuple[str, ...] = (
+    "int_per_crit",
+    "base_mana",
+    "xp_to_next",
+    "armor_constant",
+    "talents",
+    "utility",
+    "ignite",
+    "winters_chill",
+)
+_ABLATED: ContextVar[frozenset[str]] = ContextVar("ablated", default=frozenset())
 
 
-def ablated(names: set[str]) -> Any:
-    raise NotImplementedError
+@contextmanager
+def ablated(names: set[str]) -> Iterator[None]:
+    """Dans ce bloc, `build_game_data` (mode forever) garde l'estimation de `mechanics.json` ou la copie du seed pour
+    chaque valeur nommée au lieu de la valeur du client (InvalidArgumentError pour un nom inconnu)."""
+    unknown = sorted(set(names) - set(ABLATABLE))
+    if unknown:
+        raise InvalidArgumentError(
+            f"Valeur du client inconnue pour l'ablation : {', '.join(unknown)}.",
+            f"choisir parmi {', '.join(ABLATABLE)}",
+        )
+    token = _ABLATED.set(frozenset(names))
+    try:
+        yield
+    finally:
+        _ABLATED.reset(token)
+
+
+def _kept(name: str) -> bool:
+    return name not in _ABLATED.get()
+
+
 PERCENT = 100.0  # conversion d'unité : pourcentage du client -> fraction
 
 
@@ -1092,7 +1125,7 @@ def _client_mechanics(
     r = _Reader(SCALING_FILE)
     auras = raw_scaling.get("auras", {}) if isinstance(raw_scaling, dict) else {}
     ignite = auras.get("ignite")
-    if isinstance(ignite, dict):
+    if isinstance(ignite, dict) and _kept("ignite"):
         leveling = replace(
             leveling,
             ignite_aura_id=r.int_(ignite, "spell_id", "auras.ignite.spell_id"),
@@ -1101,7 +1134,7 @@ def _client_mechanics(
             ignite_cumulative=r.int_(ignite, "cumulative", "auras.ignite.cumulative"),
         )
     wc = auras.get("winters_chill")
-    if isinstance(wc, dict):
+    if isinstance(wc, dict) and _kept("winters_chill"):
         constants = replace(
             constants,
             crit_per_winters_chill_stack=r.num(wc, "pct_per_stack", "auras.winters_chill.pct_per_stack") / PERCENT,
@@ -1110,7 +1143,7 @@ def _client_mechanics(
 
 
 def _client_ratios(
-    raw: Any, constants: Constants, leveling: LevelingConstants
+    raw: Any, constants: Constants, leveling: LevelingConstants, xp_estimate: tuple[int, ...]
 ) -> tuple[Constants, LevelingConstants, tuple[int, ...]]:
     """Ratios du client (`character_scaling.json`, T08b, bloc A) à la place des estimations, mode forever : critique
     par Intelligence et mana de base du Mage par niveau, constante d'armure par niveau, XP par niveau."""
@@ -1123,17 +1156,20 @@ def _client_ratios(
             raise r.fail(where, "liste de nombres")
         return tuple(float(v) for v in values)
 
+    crit = numbers(mage, "spell_crit_per_intellect", "classes.Mage.spell_crit_per_intellect")
+    mana = numbers(mage, "base_mana", "classes.Mage.base_mana")
     character = replace(
         constants.character,
-        spell_crit_per_int_by_level=numbers(mage, "spell_crit_per_intellect", "classes.Mage.spell_crit_per_intellect"),
-        base_mana_by_level=numbers(mage, "base_mana", "classes.Mage.base_mana"),
+        spell_crit_per_int_by_level=crit if _kept("int_per_crit") else (),
+        base_mana_by_level=mana if _kept("base_mana") else (),
     )
-    xp = tuple(r.int_({"v": v}, "v", "xp_to_next") for v in r.list_(raw, "xp_to_next", "xp_to_next"))
-    armor = numbers(raw, "armor_constant", "armor_constant")
+    decoded_xp = tuple(r.int_({"v": v}, "v", "xp_to_next") for v in r.list_(raw, "xp_to_next", "xp_to_next"))
+    xp = decoded_xp if _kept("xp_to_next") else xp_estimate
+    armor = numbers(raw, "armor_constant", "armor_constant") if _kept("armor_constant") else ()
     talents = raw.get("talents") if isinstance(raw.get("talents"), dict) else {}
     first = talents.get("first_level")
     per_tier = (talents.get("points_per_tier") or {}).get(MAGE_CLASS)
-    if isinstance(first, int) and isinstance(per_tier, int):
+    if isinstance(first, int) and isinstance(per_tier, int) and _kept("talents"):
         constants = replace(constants, talents=TalentRules(first_level=first, points_per_tier=per_tier))
     return replace(constants, character=character), replace(leveling, armor_constant_by_level=armor), xp
 
