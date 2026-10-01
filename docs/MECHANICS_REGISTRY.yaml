@@ -1654,3 +1654,162 @@ mechanics:
       - tests/unit/test_pvp_sheets.py::test_windows_list_long_opponent_cooldowns
     tolerance: null
     note: "modificateurs de talents sur la recharge, la durée et la portée non appliqués ; raciaux passifs (Hardiness…) hors des fiches ; sorts non interruptibles non filtrés ; toucher et résistance des contrôles non modélisés"
+  - id: L1
+    categorie: familiers
+    description: "Apprivoisement : bêtes apprivoisables et marge de niveau au-dessus du Chasseur"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pet_rules.json (tame.level_margin)"
+      - "Forever Bestiary 0.5.0, Data/Guide.lua (relevés de joueurs de la bêta, 18 au 22 septembre 2026)"
+      - "SpellTargetRestrictions du client : aucune borne de niveau pour Tame Beast (CH0, accès 6)"
+    tests:
+      - tests/unit/test_pet_rules.py::test_tame_margin_stays_suppose_after_reading_the_client
+    tolerance: null
+    note: "marge relevée par des joueurs, absente du client ; bêtes apprivoisables lues dans Forever Bestiary (aucun drapeau d'apprivoisement lisible dans Creature ni CreatureDifficulty)"
+  - id: L2
+    categorie: familiers
+    description: "Apprentissage d'une capacité : bête apprivoisée qui la connaît, combat, puis Beast Training ; capacités générales chez l'entraîneur"
+    forever: modifie
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pet_rules.json (learning.method)"
+      - "Forever Bestiary 0.5.0, Data/Guide.lua (relevés de joueurs de la bêta, 18 au 22 septembre 2026)"
+      - "forever/data/1.60.1.70124/pets.json (sorts d'enseignement de Beast Training : teach_spell_id)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_trained_rank_points_to_its_beast_training_spell
+      - tests/unit/test_pet_rules.py::test_each_rule_has_text_source_date_certainty_and_registry
+    tolerance: null
+    note: "mode d'apprentissage relevé par des joueurs ; le lien sort d'enseignement -> sort du familier est lu dans le client"
+  - id: L3
+    categorie: familiers
+    description: "Capacités de chaque famille, chaîne des rangs et niveau requis"
+    forever: oui
+    statut: teste
+    certitude: certain
+    sources:
+      - "forever/data/1.60.1.70124/pets.json (SkillLineAbility, Spell, SpellLevels du client)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_families_are_the_hunter_lines_of_the_fixture
+      - tests/unit/test_decode_pets.py::test_ranks_follow_the_rank_subtext
+      - tests/unit/test_decode_pets.py::test_rank_level_is_the_spell_level
+      - tests/unit/test_verify_pets.py::test_rank_numbering_with_a_gap_or_a_duplicate_is_refused
+    tolerance: null
+    note: "rang : sous-titre « Rank N » ; niveau : SpellLevels.SpellLevel ; à qui s'applique le niveau requis (familier ou Chasseur) : règle de Classic supposée (pet_rules.json, training.rank_level_applies_to)"
+  - id: L4
+    categorie: familiers
+    description: "Coût d'un rang en points d'entraînement"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70124/pets.json (colonne sans nom de SkillLineAbility, training_costs par famille)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_training_cost_raw_per_family_and_common_value_per_rank
+    tolerance: null
+    note: "colonne sans nom lue comme coût (non nulle seulement sur les lignes de familier) ; valeurs nulles gardées telles quelles ; certain après un relevé de la fenêtre Beast Training (ForeverLogger, protocole de CH0)"
+  - id: L5
+    categorie: familiers
+    description: "Gain de points d'entraînement"
+    forever: inconnu
+    statut: absent
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pet_rules.json (training.points_gain : null)"
+    tests: []
+    tolerance: null
+    note: "aucune source ; le relevé de ForeverLogger donne les points totaux et dépensés par instantané"
+  - id: L6
+    categorie: familiers
+    description: "Loyauté : limite de l'entraînement"
+    forever: modifie
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pet_rules.json (loyalty.limits_training)"
+      - "Forever Bestiary 0.5.0, Data/Guide.lua (relevés de joueurs de la bêta, 18 au 22 septembre 2026)"
+    tests:
+      - tests/unit/test_pet_rules.py::test_each_rule_has_text_source_date_certainty_and_registry
+    tolerance: null
+    note: "relevé qualitatif de joueurs ; vitesse de la loyauté inconnue"
+  - id: L7
+    categorie: familiers
+    description: "Régime par famille"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70124/pets.json (CreatureFamily.PetFoodMask, ItemPetFood)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_diet_from_food_mask_bits
+    tolerance: null
+    note: "bit n du masque <-> ItemPetFood n+1 : sens probable, recoupé avec Forever Bestiary (forever pets crosscheck)"
+  - id: L8
+    categorie: familiers
+    description: "Beast Lore : niveau d'apprentissage et ce qu'il montre"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/classes.json (Beast Lore : niveau du client)"
+      - "forever/data/1.60.1.70124/pet_rules.json (beast_lore.effect)"
+      - "Spell.Description_lang du client (Beast Lore)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_hunter_spells_are_names_referring_to_classes_json
+    tolerance: null
+    note: "niveau certain (classes.json) ; ce que la fenêtre montre : texte du client et relevés de joueurs"
+  - id: L9
+    categorie: familiers
+    description: "Bonus de famille : dégâts, armure, PV"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70124/pets.json (aura passive « Tamed Pet Passive (DND) » propre à chaque ligne)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_family_bonus_from_the_line_passive
+      - tests/unit/test_pets_crosscheck.py::test_bonus_gap_listed_and_agreement_silent
+    tolerance: null
+    note: "valeurs lues dans le client ; sens des trois types d'aura probable (decode_rules.json pets.family_bonus)"
+  - id: L10
+    categorie: familiers
+    description: "Héritage des statistiques du Chasseur (PV, armure, puissance d'attaque, critique)"
+    forever: inconnu
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pet_rules.json (inheritance.*)"
+      - "Forever Bestiary 0.5.0, Data/Guide.lua (relevés de joueurs de la bêta, 18 au 22 septembre 2026)"
+      - "Hunter Pet Scaling du client : points de base presque tous nuls (pets.json pet_scaling, probable)"
+    tests:
+      - tests/unit/test_pet_rules.py::test_certainty_never_above_its_origin
+    tolerance: null
+    note: "relevé de joueurs (décision 127) ; mesure par paires d'instantanés de ForeverLogger (docs/research/familiers-protocole.md)"
+  - id: L11
+    categorie: familiers
+    description: "Vitesse d'attaque : base et passifs Faster Attack et Slower Attack"
+    forever: modifie
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pet_rules.json (attack_speed.base_s)"
+      - "forever/data/1.60.1.70124/pets.json (effets des passifs Faster Attack et Slower Attack)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_attack_speed_passives_ranked_by_roman_numeral
+    tolerance: null
+    note: "effet des passifs lu dans le client ; vitesse de base relevée par des joueurs"
+  - id: L12
+    categorie: familiers
+    description: "Focus et bonheur du familier : coût des capacités, régénération, baisse du bonheur"
+    forever: modifie
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70124/pets.json (coût en focus des rangs : SpellPower)"
+      - "forever/data/1.60.1.70124/pet_rules.json (focus.regen_per_s, happiness.decay)"
+    tests:
+      - tests/unit/test_decode_pets.py::test_focus_cost_and_cooldown
+    tolerance: null
+    note: "coût en focus certain ; régénération et bonheur relevés par des joueurs"

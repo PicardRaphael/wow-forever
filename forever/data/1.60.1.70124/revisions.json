@@ -4626,6 +4626,52 @@
      "rule": "manual"
     }
    ]
+  },
+  {
+   "revision": 5,
+   "date": "2026-10-01",
+   "motif": "CH0 : familiers du Chasseur décodés du client (pets.json) ; accord de l'utilisateur du 2026-10-01",
+   "command": "forever install <cache>/candidates/1.60.1.70124 --yes",
+   "candidate": {
+    "path": "<cache>/candidates/1.60.1.70124",
+    "data_sha": "3c7220a7cb76"
+   },
+   "report": "docs/research/data-1.60.1.70124-r5.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 0,
+    "added_file": 1,
+    "replaced_file": 0,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 0
+   },
+   "changes": [
+    {
+     "file": "pets.json",
+     "path": "*",
+     "before": null,
+     "after": "8fa536c74d27",
+     "source": "Client 1.60.1.70124 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "added_file"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 20,
+     "source": "plafond de niveau de la bêta de Forever (niveau 30 annoncé ensuite) : docs/research/community-builds-mage.md (recherche du 2026-09-28) ; tout build au-delà n'est pas vérifiable en jeu avant la sortie (décision 89)",
+     "certainty": "probable",
+     "carried": true,
+     "carried_from": "révision 4",
+     "date": "2026-10-01",
+     "revision": 4
+    }
+   }
   }
  ]
 }

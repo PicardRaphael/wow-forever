@@ -1,0 +1,5144 @@
+{
+ "schema_version": 1,
+ "build": "1.60.1.70124",
+ "source": "Client 1.60.1.70124 : SkillLine, SkillLineAbility, Spell*, CreatureFamily, ItemPetFood et UiMap (wago.tools) décodées par forever decode",
+ "families": {
+  "bat": {
+   "family_id": 24,
+   "name": {
+    "en": "Bat",
+    "fr": "Chauve-souris"
+   },
+   "skill_lines": [
+    653,
+    270
+   ],
+   "skill_line_name": "Pet - Bat",
+   "passive_spell": 17206,
+   "bonus": {
+    "damage_pct": 7.0,
+    "armor_pct": 0.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 48,
+   "diet": [
+    {
+     "id": 5,
+     "en": "Fungus",
+     "fr": "Champignon"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dive"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dive": [
+     20,
+     25
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "bear": {
+   "family_id": 4,
+   "name": {
+    "en": "Bear",
+    "fr": "Ours"
+   },
+   "skill_lines": [
+    210,
+    270
+   ],
+   "skill_line_name": "Pet - Bear",
+   "passive_spell": 17208,
+   "bonus": {
+    "damage_pct": -9.0,
+    "armor_pct": 5.0,
+    "health_pct": 8.0
+   },
+   "food_mask": 63,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    },
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    },
+    {
+     "id": 3,
+     "en": "Cheese",
+     "fr": "Fromage"
+    },
+    {
+     "id": 4,
+     "en": "Bread",
+     "fr": "Pain"
+    },
+    {
+     "id": 5,
+     "en": "Fungus",
+     "fr": "Champignon"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "claw",
+    "dash",
+    "swipe"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "claw": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "swipe": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "bird-of-prey": {
+   "family_id": 26,
+   "name": {
+    "en": "Bird of Prey",
+    "fr": "Oiseau de proie"
+   },
+   "skill_lines": [
+    655,
+    270
+   ],
+   "skill_line_name": "Pet - Bird of Prey",
+   "passive_spell": 17216,
+   "bonus": {
+    "damage_pct": 7.0,
+    "armor_pct": 0.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 1,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "claw",
+    "dive",
+    "mine"
+   ],
+   "training_costs": {
+    "claw": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dive": [
+     15,
+     20,
+     25
+    ],
+    "mine": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "boar": {
+   "family_id": 5,
+   "name": {
+    "en": "Boar",
+    "fr": "Sanglier"
+   },
+   "skill_lines": [
+    211,
+    270
+   ],
+   "skill_line_name": "Pet - Boar",
+   "passive_spell": 7000,
+   "bonus": {
+    "damage_pct": -10.0,
+    "armor_pct": 9.0,
+    "health_pct": 4.0
+   },
+   "food_mask": 63,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    },
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    },
+    {
+     "id": 3,
+     "en": "Cheese",
+     "fr": "Fromage"
+    },
+    {
+     "id": 4,
+     "en": "Bread",
+     "fr": "Pain"
+    },
+    {
+     "id": 5,
+     "en": "Fungus",
+     "fr": "Champignon"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "charge",
+    "dash"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "charge": [
+     5,
+     9,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     15,
+     20,
+     25
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "carrion-bird": {
+   "family_id": 7,
+   "name": {
+    "en": "Carrion Bird",
+    "fr": "Charognard"
+   },
+   "skill_lines": [
+    213,
+    270
+   ],
+   "skill_line_name": "Pet - Carrion Bird",
+   "passive_spell": 17209,
+   "bonus": {
+    "damage_pct": 0.0,
+    "armor_pct": 5.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 3,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    },
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "claw",
+    "demoralizing-screech",
+    "dive"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "claw": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "demoralizing-screech": [
+     10,
+     15,
+     20,
+     25
+    ],
+    "dive": [
+     15,
+     20,
+     25
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "cat": {
+   "family_id": 2,
+   "name": {
+    "en": "Cat",
+    "fr": "Félin"
+   },
+   "skill_lines": [
+    209,
+    270
+   ],
+   "skill_line_name": "Pet - Cat",
+   "passive_spell": 17210,
+   "bonus": {
+    "damage_pct": 10.0,
+    "armor_pct": 0.0,
+    "health_pct": -2.0
+   },
+   "food_mask": 3,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    },
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "claw",
+    "dash",
+    "prowl"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "claw": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     15,
+     20,
+     25
+    ],
+    "prowl": [
+     15,
+     20,
+     25
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "core-hound": {
+   "family_id": 312,
+   "name": {
+    "en": "Core Hound",
+    "fr": "Chien du Magma"
+   },
+   "skill_lines": [
+    2897,
+    270
+   ],
+   "skill_line_name": "Pet - Core Hound",
+   "passive_spell": 444831,
+   "bonus": {
+    "damage_pct": 1.0,
+    "armor_pct": 0.0,
+    "health_pct": 5.0
+   },
+   "food_mask": 1,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    }
+   ],
+   "pet_talent_type": 1,
+   "abilities": [
+    "bite",
+    "lava-breath"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "lava-breath": [
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "crab": {
+   "family_id": 8,
+   "name": {
+    "en": "Crab",
+    "fr": "Crabe"
+   },
+   "skill_lines": [
+    214,
+    270
+   ],
+   "skill_line_name": "Pet - Crab",
+   "passive_spell": 17211,
+   "bonus": {
+    "damage_pct": -5.0,
+    "armor_pct": 13.0,
+    "health_pct": -4.0
+   },
+   "food_mask": 58,
+   "diet": [
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    },
+    {
+     "id": 4,
+     "en": "Bread",
+     "fr": "Pain"
+    },
+    {
+     "id": 5,
+     "en": "Fungus",
+     "fr": "Champignon"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "claw",
+    "dash",
+    "pinch"
+   ],
+   "training_costs": {
+    "claw": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "pinch": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "crocolisk": {
+   "family_id": 6,
+   "name": {
+    "en": "Crocolisk",
+    "fr": "Crocilisque"
+   },
+   "skill_lines": [
+    212,
+    270
+   ],
+   "skill_line_name": "Pet - Crocilisk",
+   "passive_spell": 17212,
+   "bonus": {
+    "damage_pct": 0.0,
+    "armor_pct": 10.0,
+    "health_pct": -5.0
+   },
+   "food_mask": 3,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    },
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "dismember"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "dismember": [
+     1,
+     1,
+     1,
+     1,
+     1
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "fox": {
+   "family_id": 319,
+   "name": {
+    "en": "Fox",
+    "fr": "Renard"
+   },
+   "skill_lines": [
+    3016,
+    3016
+   ],
+   "skill_line_name": "Pet - Fox",
+   "passive_spell": 17223,
+   "bonus": {
+    "damage_pct": 0.0,
+    "armor_pct": 5.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 1,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "trickster-s-dance"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     15,
+     20,
+     25
+    ],
+    "trickster-s-dance": [
+     10
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "gorilla": {
+   "family_id": 9,
+   "name": {
+    "en": "Gorilla",
+    "fr": "Gorille"
+   },
+   "skill_lines": [
+    215,
+    270
+   ],
+   "skill_line_name": "Pet - Gorilla",
+   "passive_spell": 17214,
+   "bonus": {
+    "damage_pct": 2.0,
+    "armor_pct": 0.0,
+    "health_pct": 4.0
+   },
+   "food_mask": 48,
+   "diet": [
+    {
+     "id": 5,
+     "en": "Fungus",
+     "fr": "Champignon"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "thunderstomp"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "thunderstomp": [
+     15,
+     20,
+     25,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "hyena": {
+   "family_id": 25,
+   "name": {
+    "en": "Hyena",
+    "fr": "Hyène"
+   },
+   "skill_lines": [
+    654,
+    270
+   ],
+   "skill_line_name": "Pet - Hyena",
+   "passive_spell": 17215,
+   "bonus": {
+    "damage_pct": 0.0,
+    "armor_pct": 5.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 33,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "tendon-rip"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     15,
+     20,
+     25
+    ],
+    "tendon-rip": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "raptor": {
+   "family_id": 11,
+   "name": {
+    "en": "Raptor",
+    "fr": "Raptor"
+   },
+   "skill_lines": [
+    217,
+    270
+   ],
+   "skill_line_name": "Pet - Raptor",
+   "passive_spell": 17217,
+   "bonus": {
+    "damage_pct": 10.0,
+    "armor_pct": 3.0,
+    "health_pct": -5.0
+   },
+   "food_mask": 1,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "claw",
+    "dash",
+    "savage-rend"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "claw": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "savage-rend": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "scorpid": {
+   "family_id": 20,
+   "name": {
+    "en": "Scorpid",
+    "fr": "Scorpide"
+   },
+   "skill_lines": [
+    236,
+    270
+   ],
+   "skill_line_name": "Pet - Scorpid",
+   "passive_spell": 17218,
+   "bonus": {
+    "damage_pct": -6.0,
+    "armor_pct": 10.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 1,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "claw",
+    "dash",
+    "scorpid-poison"
+   ],
+   "training_costs": {
+    "claw": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "scorpid-poison": [
+     10,
+     15,
+     20,
+     25
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "spider": {
+   "family_id": 3,
+   "name": {
+    "en": "Spider",
+    "fr": "Araignée"
+   },
+   "skill_lines": [
+    203,
+    270
+   ],
+   "skill_line_name": "Pet - Spider",
+   "passive_spell": 17219,
+   "bonus": {
+    "damage_pct": 7.0,
+    "armor_pct": 0.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 1,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "web"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "web": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "tallstrider": {
+   "family_id": 12,
+   "name": {
+    "en": "Tallstrider",
+    "fr": "Haut-trotteur"
+   },
+   "skill_lines": [
+    218,
+    270
+   ],
+   "skill_line_name": "Pet - Tallstrider",
+   "passive_spell": 17220,
+   "bonus": {
+    "damage_pct": 0.0,
+    "armor_pct": 0.0,
+    "health_pct": 5.0
+   },
+   "food_mask": 52,
+   "diet": [
+    {
+     "id": 3,
+     "en": "Cheese",
+     "fr": "Fromage"
+    },
+    {
+     "id": 5,
+     "en": "Fungus",
+     "fr": "Champignon"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "dust-cloud"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     15,
+     20,
+     25
+    ],
+    "dust-cloud": [
+     0,
+     0,
+     0,
+     0,
+     0
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "turtle": {
+   "family_id": 21,
+   "name": {
+    "en": "Turtle",
+    "fr": "Tortue"
+   },
+   "skill_lines": [
+    251,
+    270
+   ],
+   "skill_line_name": "Pet - Turtle",
+   "passive_spell": 17221,
+   "bonus": {
+    "damage_pct": -10.0,
+    "armor_pct": 13.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 178,
+   "diet": [
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    },
+    {
+     "id": 5,
+     "en": "Fungus",
+     "fr": "Champignon"
+    },
+    {
+     "id": 6,
+     "en": "Fruit",
+     "fr": "Fruit"
+    },
+    {
+     "id": 8,
+     "en": "Raw Fish",
+     "fr": "Poisson cru"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "shell-shield"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     0,
+     0,
+     0
+    ],
+    "shell-shield": [
+     15
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "wind-serpent": {
+   "family_id": 27,
+   "name": {
+    "en": "Wind Serpent",
+    "fr": "Serpent des vents"
+   },
+   "skill_lines": [
+    656,
+    270
+   ],
+   "skill_line_name": "Pet - Wind Serpent",
+   "passive_spell": 17222,
+   "bonus": {
+    "damage_pct": 7.0,
+    "armor_pct": 0.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 14,
+   "diet": [
+    {
+     "id": 2,
+     "en": "Fish",
+     "fr": "Poisson"
+    },
+    {
+     "id": 3,
+     "en": "Cheese",
+     "fr": "Fromage"
+    },
+    {
+     "id": 4,
+     "en": "Bread",
+     "fr": "Pain"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dive",
+    "lightning-breath"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dive": [
+     15,
+     20,
+     25
+    ],
+    "lightning-breath": [
+     1,
+     5,
+     10,
+     15,
+     20,
+     25
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  },
+  "wolf": {
+   "family_id": 1,
+   "name": {
+    "en": "Wolf",
+    "fr": "Loup"
+   },
+   "skill_lines": [
+    208,
+    270
+   ],
+   "skill_line_name": "Pet - Wolf",
+   "passive_spell": 17223,
+   "bonus": {
+    "damage_pct": 0.0,
+    "armor_pct": 5.0,
+    "health_pct": 0.0
+   },
+   "food_mask": 1,
+   "diet": [
+    {
+     "id": 1,
+     "en": "Meat",
+     "fr": "Viande"
+    }
+   ],
+   "pet_talent_type": 0,
+   "abilities": [
+    "bite",
+    "dash",
+    "furious-howl"
+   ],
+   "training_costs": {
+    "bite": [
+     1,
+     4,
+     7,
+     10,
+     13,
+     17,
+     21,
+     25
+    ],
+    "dash": [
+     15,
+     20,
+     25
+    ],
+    "furious-howl": [
+     10,
+     15,
+     20,
+     25
+    ]
+   },
+   "certainty": {
+    "name": "certain",
+    "abilities": "certain",
+    "bonus": "probable",
+    "diet": "probable",
+    "training_costs": "probable"
+   }
+  }
+ },
+ "abilities": {
+  "arcane-resistance": {
+   "name": {
+    "en": "Arcane Resistance",
+    "fr": "Résistance aux Arcanes"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24493,
+     "level": 20,
+     "training_cost": 5,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Arcane resistance by $s1.",
+     "tooltip_values": [
+      30
+     ],
+     "teach_spell_id": 24495
+    },
+    {
+     "rank": 2,
+     "spell_id": 24497,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Arcane resistance by $s1.",
+     "tooltip_values": [
+      60
+     ],
+     "teach_spell_id": 24508
+    },
+    {
+     "rank": 3,
+     "spell_id": 24500,
+     "level": 40,
+     "training_cost": 45,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Arcane resistance by $s1.",
+     "tooltip_values": [
+      90
+     ],
+     "teach_spell_id": 24509
+    },
+    {
+     "rank": 4,
+     "spell_id": 24501,
+     "level": 50,
+     "training_cost": 90,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Arcane resistance by $s1.",
+     "tooltip_values": [
+      120
+     ],
+     "teach_spell_id": 24510
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "bite": {
+   "name": {
+    "en": "Bite",
+    "fr": "Morsure"
+   },
+   "kind": "family",
+   "skill_lines": [
+    203,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    215,
+    217,
+    218,
+    251,
+    653,
+    654,
+    656,
+    2897,
+    3015,
+    3016
+   ],
+   "families": [
+    "bat",
+    "bear",
+    "boar",
+    "carrion-bird",
+    "cat",
+    "core-hound",
+    "crocolisk",
+    "fox",
+    "gorilla",
+    "hyena",
+    "raptor",
+    "spider",
+    "tallstrider",
+    "turtle",
+    "wind-serpent",
+    "wolf"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 17253,
+     "level": 1,
+     "training_cost": 1,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      7,
+      9
+     ],
+     "teach_spell_id": 17254
+    },
+    {
+     "rank": 2,
+     "spell_id": 17255,
+     "level": 8,
+     "training_cost": 4,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      16,
+      18
+     ],
+     "teach_spell_id": 17262
+    },
+    {
+     "rank": 3,
+     "spell_id": 17256,
+     "level": 16,
+     "training_cost": 7,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      24,
+      28
+     ],
+     "teach_spell_id": 17263
+    },
+    {
+     "rank": 4,
+     "spell_id": 17257,
+     "level": 24,
+     "training_cost": 10,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      31,
+      37
+     ],
+     "teach_spell_id": 17264
+    },
+    {
+     "rank": 5,
+     "spell_id": 17258,
+     "level": 32,
+     "training_cost": 13,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      40,
+      48
+     ],
+     "teach_spell_id": 17265
+    },
+    {
+     "rank": 6,
+     "spell_id": 17259,
+     "level": 40,
+     "training_cost": 17,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      49,
+      59
+     ],
+     "teach_spell_id": 17266
+    },
+    {
+     "rank": 7,
+     "spell_id": 17260,
+     "level": 48,
+     "training_cost": 21,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      66,
+      80
+     ],
+     "teach_spell_id": 17267
+    },
+    {
+     "rank": 8,
+     "spell_id": 17261,
+     "level": 56,
+     "training_cost": 25,
+     "focus_cost": 35,
+     "cooldown_s": 10,
+     "description": "Bite the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      81,
+      99
+     ],
+     "teach_spell_id": 17268
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "charge": {
+   "name": {
+    "en": "Charge",
+    "fr": "Charge"
+   },
+   "kind": "family",
+   "skill_lines": [
+    211
+   ],
+   "families": [
+    "boar"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 7371,
+     "level": 1,
+     "training_cost": 5,
+     "focus_cost": 35,
+     "cooldown_s": 25,
+     "description": "Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
+     "tooltip_values": [
+      1,
+      44
+     ],
+     "teach_spell_id": 7370
+    },
+    {
+     "rank": 2,
+     "spell_id": 26177,
+     "level": 12,
+     "training_cost": 9,
+     "focus_cost": 35,
+     "cooldown_s": 25,
+     "description": "Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
+     "tooltip_values": [
+      1,
+      106
+     ],
+     "teach_spell_id": 26184
+    },
+    {
+     "rank": 3,
+     "spell_id": 26178,
+     "level": 24,
+     "training_cost": 13,
+     "focus_cost": 35,
+     "cooldown_s": 25,
+     "description": "Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
+     "tooltip_values": [
+      1,
+      168
+     ],
+     "teach_spell_id": 26185
+    },
+    {
+     "rank": 4,
+     "spell_id": 26179,
+     "level": 36,
+     "training_cost": 17,
+     "focus_cost": 35,
+     "cooldown_s": 25,
+     "description": "Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
+     "tooltip_values": [
+      1,
+      246
+     ],
+     "teach_spell_id": 26186
+    },
+    {
+     "rank": 5,
+     "spell_id": 26201,
+     "level": 48,
+     "training_cost": 21,
+     "focus_cost": 35,
+     "cooldown_s": 25,
+     "description": "Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
+     "tooltip_values": [
+      1,
+      370
+     ],
+     "teach_spell_id": 26202
+    },
+    {
+     "rank": 6,
+     "spell_id": 27685,
+     "level": 60,
+     "training_cost": 25,
+     "focus_cost": 35,
+     "cooldown_s": 25,
+     "description": "Charges an enemy, immobilizes it for $7922d, and adds $s2 melee attack power to the boar's next attack.",
+     "tooltip_values": [
+      1,
+      490
+     ],
+     "teach_spell_id": 28343
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "claw": {
+   "name": {
+    "en": "Claw",
+    "fr": "Griffe"
+   },
+   "kind": "family",
+   "skill_lines": [
+    209,
+    210,
+    213,
+    214,
+    217,
+    236,
+    655
+   ],
+   "families": [
+    "bear",
+    "bird-of-prey",
+    "carrion-bird",
+    "cat",
+    "crab",
+    "raptor",
+    "scorpid"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 16827,
+     "level": 1,
+     "training_cost": 1,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      4,
+      6
+     ],
+     "teach_spell_id": 2980
+    },
+    {
+     "rank": 2,
+     "spell_id": 16828,
+     "level": 8,
+     "training_cost": 4,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      8,
+      12
+     ],
+     "teach_spell_id": 2981
+    },
+    {
+     "rank": 3,
+     "spell_id": 16829,
+     "level": 16,
+     "training_cost": 7,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      12,
+      16
+     ],
+     "teach_spell_id": 2982
+    },
+    {
+     "rank": 4,
+     "spell_id": 16830,
+     "level": 24,
+     "training_cost": 10,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      16,
+      22
+     ],
+     "teach_spell_id": 3667
+    },
+    {
+     "rank": 5,
+     "spell_id": 16831,
+     "level": 32,
+     "training_cost": 13,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      21,
+      29
+     ],
+     "teach_spell_id": 2975
+    },
+    {
+     "rank": 6,
+     "spell_id": 16832,
+     "level": 40,
+     "training_cost": 17,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      26,
+      36
+     ],
+     "teach_spell_id": 2976
+    },
+    {
+     "rank": 7,
+     "spell_id": 3010,
+     "level": 48,
+     "training_cost": 21,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      35,
+      49
+     ],
+     "teach_spell_id": 2977
+    },
+    {
+     "rank": 8,
+     "spell_id": 3009,
+     "level": 56,
+     "training_cost": 25,
+     "focus_cost": 25,
+     "cooldown_s": null,
+     "description": "Claw the enemy, causing $s1 damage.",
+     "tooltip_values": [
+      43,
+      59
+     ],
+     "teach_spell_id": 3666
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "cower": {
+   "name": {
+    "en": "Cower",
+    "fr": "Dérobade"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1742,
+     "level": 5,
+     "training_cost": 8,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+     "tooltip_values": [],
+     "teach_spell_id": 1747
+    },
+    {
+     "rank": 2,
+     "spell_id": 1753,
+     "level": 15,
+     "training_cost": 10,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+     "tooltip_values": [],
+     "teach_spell_id": 1748
+    },
+    {
+     "rank": 3,
+     "spell_id": 1754,
+     "level": 25,
+     "training_cost": 12,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+     "tooltip_values": [],
+     "teach_spell_id": 1749
+    },
+    {
+     "rank": 4,
+     "spell_id": 1755,
+     "level": 35,
+     "training_cost": 14,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+     "tooltip_values": [],
+     "teach_spell_id": 1750
+    },
+    {
+     "rank": 5,
+     "spell_id": 1756,
+     "level": 45,
+     "training_cost": 16,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+     "tooltip_values": [],
+     "teach_spell_id": 1751
+    },
+    {
+     "rank": 6,
+     "spell_id": 16697,
+     "level": 55,
+     "training_cost": 18,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Cower, causing no damage but lowering your threat, making the enemy less likely to attack you.",
+     "tooltip_values": [],
+     "teach_spell_id": 16698
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "dash": {
+   "name": {
+    "en": "Dash",
+    "fr": "Célérité"
+   },
+   "kind": "family",
+   "skill_lines": [
+    203,
+    208,
+    209,
+    210,
+    211,
+    212,
+    214,
+    215,
+    217,
+    218,
+    236,
+    251,
+    654,
+    3016
+   ],
+   "families": [
+    "bear",
+    "boar",
+    "cat",
+    "crab",
+    "crocolisk",
+    "fox",
+    "gorilla",
+    "hyena",
+    "raptor",
+    "scorpid",
+    "spider",
+    "tallstrider",
+    "turtle",
+    "wolf"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 23099,
+     "level": 30,
+     "training_cost": null,
+     "focus_cost": 20,
+     "cooldown_s": 30,
+     "description": "Increases movement speed by $s1% for $d.",
+     "tooltip_values": [
+      40,
+      15
+     ],
+     "teach_spell_id": 23100
+    },
+    {
+     "rank": 2,
+     "spell_id": 23109,
+     "level": 40,
+     "training_cost": null,
+     "focus_cost": 20,
+     "cooldown_s": 30,
+     "description": "Increases movement speed by $s1% for $d.",
+     "tooltip_values": [
+      60,
+      15
+     ],
+     "teach_spell_id": 23111
+    },
+    {
+     "rank": 3,
+     "spell_id": 23110,
+     "level": 50,
+     "training_cost": null,
+     "focus_cost": 20,
+     "cooldown_s": 30,
+     "description": "Increases movement speed by $s1% for $d.",
+     "tooltip_values": [
+      80,
+      15
+     ],
+     "teach_spell_id": 23112
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "demoralizing-screech": {
+   "name": {
+    "en": "Demoralizing Screech",
+    "fr": "Hurlement démoralisant"
+   },
+   "kind": "family",
+   "skill_lines": [
+    213
+   ],
+   "families": [
+    "carrion-bird"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24423,
+     "level": 8,
+     "training_cost": 10,
+     "focus_cost": 20,
+     "cooldown_s": 10,
+     "description": "Blasts a single enemy for $s1 damage and lowers the melee attack power of all enemies in melee range by $s2 for $d.",
+     "tooltip_values": [
+      7,
+      9,
+      41,
+      30
+     ],
+     "teach_spell_id": 24424
+    },
+    {
+     "rank": 2,
+     "spell_id": 24577,
+     "level": 24,
+     "training_cost": 15,
+     "focus_cost": 20,
+     "cooldown_s": 10,
+     "description": "Blasts a single enemy for $s1 damage and lowers the attack power of all enemies in melee range by $s2 for $d.",
+     "tooltip_values": [
+      9,
+      13,
+      77,
+      30
+     ],
+     "teach_spell_id": 24580
+    },
+    {
+     "rank": 3,
+     "spell_id": 24578,
+     "level": 48,
+     "training_cost": 20,
+     "focus_cost": 20,
+     "cooldown_s": 10,
+     "description": "Blasts a single enemy for $s1 damage and lowers the melee attack power of all enemies in melee range by $s2 for $d.",
+     "tooltip_values": [
+      21,
+      27,
+      153,
+      30
+     ],
+     "teach_spell_id": 24581
+    },
+    {
+     "rank": 4,
+     "spell_id": 24579,
+     "level": 56,
+     "training_cost": 25,
+     "focus_cost": 20,
+     "cooldown_s": 10,
+     "description": "Blasts a single enemy for $s1 damage and lowers the melee attack power of all enemies in melee range by $s2 for $d.",
+     "tooltip_values": [
+      24,
+      42,
+      198,
+      30
+     ],
+     "teach_spell_id": 24582
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "dismember": {
+   "name": {
+    "en": "Dismember",
+    "fr": "Démembrer"
+   },
+   "kind": "family",
+   "skill_lines": [
+    212
+   ],
+   "families": [
+    "crocolisk"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1264758,
+     "level": 12,
+     "training_cost": 1,
+     "focus_cost": 35,
+     "cooldown_s": 6,
+     "description": "Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.",
+     "tooltip_values": [
+      11,
+      13,
+      50,
+      10
+     ],
+     "teach_spell_id": 1264937
+    },
+    {
+     "rank": 2,
+     "spell_id": 1264927,
+     "level": 24,
+     "training_cost": 1,
+     "focus_cost": 35,
+     "cooldown_s": 6,
+     "description": "Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.",
+     "tooltip_values": [
+      18,
+      20,
+      50,
+      10
+     ],
+     "teach_spell_id": 1264939
+    },
+    {
+     "rank": 3,
+     "spell_id": 1264929,
+     "level": 36,
+     "training_cost": 1,
+     "focus_cost": 35,
+     "cooldown_s": 6,
+     "description": "Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.",
+     "tooltip_values": [
+      26,
+      30,
+      50,
+      10
+     ],
+     "teach_spell_id": 1264970
+    },
+    {
+     "rank": 4,
+     "spell_id": 1264930,
+     "level": 48,
+     "training_cost": 1,
+     "focus_cost": 35,
+     "cooldown_s": 6,
+     "description": "Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.",
+     "tooltip_values": [
+      39,
+      45,
+      50,
+      10
+     ],
+     "teach_spell_id": 1264971
+    },
+    {
+     "rank": 5,
+     "spell_id": 1264933,
+     "level": 60,
+     "training_cost": 1,
+     "focus_cost": 35,
+     "cooldown_s": 6,
+     "description": "Viciously bites enemy appendages for $s1 damage and reduces the effectiveness of any healing by $s2% for $d.",
+     "tooltip_values": [
+      50,
+      58,
+      50,
+      10
+     ],
+     "teach_spell_id": 1264972
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "dive": {
+   "name": {
+    "en": "Dive",
+    "fr": "Plongeon"
+   },
+   "kind": "family",
+   "skill_lines": [
+    213,
+    653,
+    655,
+    656,
+    3015
+   ],
+   "families": [
+    "bat",
+    "bird-of-prey",
+    "carrion-bird",
+    "wind-serpent"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 23145,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": 20,
+     "cooldown_s": 30,
+     "description": "Increases movement speed by $s1% for $d.",
+     "tooltip_values": [
+      40,
+      15
+     ],
+     "teach_spell_id": 23146
+    },
+    {
+     "rank": 2,
+     "spell_id": 23147,
+     "level": 40,
+     "training_cost": 20,
+     "focus_cost": 20,
+     "cooldown_s": 30,
+     "description": "Increases movement speed by $s1% for $d.",
+     "tooltip_values": [
+      60,
+      15
+     ],
+     "teach_spell_id": 23149
+    },
+    {
+     "rank": 3,
+     "spell_id": 23148,
+     "level": 50,
+     "training_cost": 25,
+     "focus_cost": 20,
+     "cooldown_s": 30,
+     "description": "Increases movement speed by $s1% for $d.",
+     "tooltip_values": [
+      80,
+      15
+     ],
+     "teach_spell_id": 23150
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "dust-cloud": {
+   "name": {
+    "en": "Dust Cloud",
+    "fr": "Nuage de poussière"
+   },
+   "kind": "family",
+   "skill_lines": [
+    218
+   ],
+   "families": [
+    "tallstrider"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1265899,
+     "level": 12,
+     "training_cost": 0,
+     "focus_cost": 10,
+     "cooldown_s": null,
+     "description": "Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",
+     "tooltip_values": [
+      65,
+      30
+     ],
+     "teach_spell_id": 1265907
+    },
+    {
+     "rank": 2,
+     "spell_id": 1265901,
+     "level": 24,
+     "training_cost": 0,
+     "focus_cost": 10,
+     "cooldown_s": null,
+     "description": "Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",
+     "tooltip_values": [
+      175,
+      30
+     ],
+     "teach_spell_id": 1265908
+    },
+    {
+     "rank": 3,
+     "spell_id": 1265902,
+     "level": 36,
+     "training_cost": 0,
+     "focus_cost": 10,
+     "cooldown_s": null,
+     "description": "Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",
+     "tooltip_values": [
+      285,
+      30
+     ],
+     "teach_spell_id": 1265909
+    },
+    {
+     "rank": 4,
+     "spell_id": 1265903,
+     "level": 48,
+     "training_cost": 0,
+     "focus_cost": 10,
+     "cooldown_s": null,
+     "description": "Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",
+     "tooltip_values": [
+      395,
+      30
+     ],
+     "teach_spell_id": 1265913
+    },
+    {
+     "rank": 5,
+     "spell_id": 1265904,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 10,
+     "cooldown_s": null,
+     "description": "Your tallstrider kicks up an abrasive cloud of dust, reducing the target's Armor by $s1 for $d.",
+     "tooltip_values": [
+      505,
+      30
+     ],
+     "teach_spell_id": 1265911
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "faster-attack": {
+   "name": {
+    "en": "Faster Attack",
+    "fr": "Attaque rapide"
+   },
+   "kind": "attack_speed",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1263099,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases attack speed by $s1%.",
+     "tooltip_values": [
+      17
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": 17.0
+      }
+     ]
+    },
+    {
+     "rank": 2,
+     "spell_id": 1263100,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases attack speed by $s1%.",
+     "tooltip_values": [
+      25
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": 25.0
+      }
+     ]
+    },
+    {
+     "rank": 3,
+     "spell_id": 1263102,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases attack speed by $s1%.",
+     "tooltip_values": [
+      33
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": 33.0
+      }
+     ]
+    },
+    {
+     "rank": 4,
+     "spell_id": 1263104,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases attack speed by $s1%.",
+     "tooltip_values": [
+      43
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": 43.0
+      }
+     ]
+    },
+    {
+     "rank": 5,
+     "spell_id": 1263107,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases attack speed by $s1%.",
+     "tooltip_values": [
+      54
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": 54.0
+      }
+     ]
+    },
+    {
+     "rank": 6,
+     "spell_id": 1263109,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases attack speed by $s1%.",
+     "tooltip_values": [
+      67
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": 67.0
+      }
+     ]
+    },
+    {
+     "rank": 7,
+     "spell_id": 1263110,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases attack speed by $s1%.",
+     "tooltip_values": [
+      100
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": 100.0
+      }
+     ]
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "fire-resistance": {
+   "name": {
+    "en": "Fire Resistance",
+    "fr": "Résistance au Feu"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 23992,
+     "level": 20,
+     "training_cost": 5,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Fire resistance by $s1.",
+     "tooltip_values": [
+      30
+     ],
+     "teach_spell_id": 24440
+    },
+    {
+     "rank": 2,
+     "spell_id": 24439,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Fire resistance by $s1.",
+     "tooltip_values": [
+      60
+     ],
+     "teach_spell_id": 24441
+    },
+    {
+     "rank": 3,
+     "spell_id": 24444,
+     "level": 40,
+     "training_cost": 45,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Fire resistance by $s1.",
+     "tooltip_values": [
+      90
+     ],
+     "teach_spell_id": 24463
+    },
+    {
+     "rank": 4,
+     "spell_id": 24445,
+     "level": 50,
+     "training_cost": 90,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Fire resistance by $s1.",
+     "tooltip_values": [
+      120
+     ],
+     "teach_spell_id": 24464
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "frost-resistance": {
+   "name": {
+    "en": "Frost Resistance",
+    "fr": "Résistance au Givre"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24446,
+     "level": 20,
+     "training_cost": 5,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Frost resistance by $s1.",
+     "tooltip_values": [
+      30
+     ],
+     "teach_spell_id": 24475
+    },
+    {
+     "rank": 2,
+     "spell_id": 24447,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Frost resistance by $s1.",
+     "tooltip_values": [
+      60
+     ],
+     "teach_spell_id": 24476
+    },
+    {
+     "rank": 3,
+     "spell_id": 24448,
+     "level": 40,
+     "training_cost": 45,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Frost resistance by $s1.",
+     "tooltip_values": [
+      90
+     ],
+     "teach_spell_id": 24477
+    },
+    {
+     "rank": 4,
+     "spell_id": 24449,
+     "level": 50,
+     "training_cost": 90,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Frost resistance by $s1.",
+     "tooltip_values": [
+      120
+     ],
+     "teach_spell_id": 24478
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "furious-howl": {
+   "name": {
+    "en": "Furious Howl",
+    "fr": "Hurlement furieux"
+   },
+   "kind": "family",
+   "skill_lines": [
+    208
+   ],
+   "families": [
+    "wolf"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24604,
+     "level": 10,
+     "training_cost": 10,
+     "focus_cost": 60,
+     "cooldown_s": 30,
+     "description": "The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",
+     "tooltip_values": null,
+     "teach_spell_id": 24609,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    },
+    {
+     "rank": 2,
+     "spell_id": 24605,
+     "level": 24,
+     "training_cost": 15,
+     "focus_cost": 60,
+     "cooldown_s": 30,
+     "description": "The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",
+     "tooltip_values": null,
+     "teach_spell_id": 24608,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    },
+    {
+     "rank": 3,
+     "spell_id": 24603,
+     "level": 40,
+     "training_cost": 20,
+     "focus_cost": 60,
+     "cooldown_s": 30,
+     "description": "The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",
+     "tooltip_values": null,
+     "teach_spell_id": 24607,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    },
+    {
+     "rank": 4,
+     "spell_id": 24597,
+     "level": 56,
+     "training_cost": 25,
+     "focus_cost": 60,
+     "cooldown_s": 30,
+     "description": "The wolf howls, increasing the melee attack power of all party members within $a1 yards by $s1.  Lasts $d.",
+     "tooltip_values": null,
+     "teach_spell_id": 24599,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "great-stamina": {
+   "name": {
+    "en": "Great Stamina",
+    "fr": "Endurance supérieure"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 4187,
+     "level": 1,
+     "training_cost": 5,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      3
+     ],
+     "teach_spell_id": 4195
+    },
+    {
+     "rank": 2,
+     "spell_id": 4188,
+     "level": 12,
+     "training_cost": 10,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      5
+     ],
+     "teach_spell_id": 4196
+    },
+    {
+     "rank": 3,
+     "spell_id": 4189,
+     "level": 18,
+     "training_cost": 15,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      7
+     ],
+     "teach_spell_id": 4197
+    },
+    {
+     "rank": 4,
+     "spell_id": 4190,
+     "level": 24,
+     "training_cost": 25,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      10
+     ],
+     "teach_spell_id": 4198
+    },
+    {
+     "rank": 5,
+     "spell_id": 4191,
+     "level": 30,
+     "training_cost": 50,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      13
+     ],
+     "teach_spell_id": 4199
+    },
+    {
+     "rank": 6,
+     "spell_id": 4192,
+     "level": 36,
+     "training_cost": 75,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      17
+     ],
+     "teach_spell_id": 4200
+    },
+    {
+     "rank": 7,
+     "spell_id": 4193,
+     "level": 42,
+     "training_cost": 100,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      21
+     ],
+     "teach_spell_id": 4201
+    },
+    {
+     "rank": 8,
+     "spell_id": 4194,
+     "level": 48,
+     "training_cost": 125,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      26
+     ],
+     "teach_spell_id": 4202
+    },
+    {
+     "rank": 9,
+     "spell_id": 5041,
+     "level": 54,
+     "training_cost": 150,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      32
+     ],
+     "teach_spell_id": 5048
+    },
+    {
+     "rank": 10,
+     "spell_id": 5042,
+     "level": 60,
+     "training_cost": 185,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Stamina increased by $s1.",
+     "tooltip_values": [
+      40
+     ],
+     "teach_spell_id": 5049
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "growl": {
+   "name": {
+    "en": "Growl",
+    "fr": "Grondement"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 2649,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+     "tooltip_values": [],
+     "teach_spell_id": null
+    },
+    {
+     "rank": 2,
+     "spell_id": 14916,
+     "level": 10,
+     "training_cost": 0,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+     "tooltip_values": [],
+     "teach_spell_id": null
+    },
+    {
+     "rank": 3,
+     "spell_id": 14917,
+     "level": 20,
+     "training_cost": 0,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+     "tooltip_values": [],
+     "teach_spell_id": 14923
+    },
+    {
+     "rank": 4,
+     "spell_id": 14918,
+     "level": 30,
+     "training_cost": 0,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+     "tooltip_values": [],
+     "teach_spell_id": 14924
+    },
+    {
+     "rank": 5,
+     "spell_id": 14919,
+     "level": 40,
+     "training_cost": 0,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+     "tooltip_values": [],
+     "teach_spell_id": 14925
+    },
+    {
+     "rank": 6,
+     "spell_id": 14920,
+     "level": 50,
+     "training_cost": 0,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+     "tooltip_values": [],
+     "teach_spell_id": 14926
+    },
+    {
+     "rank": 7,
+     "spell_id": 14921,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 15,
+     "cooldown_s": 5,
+     "description": "Taunt the target, increasing the likelihood the creature will focus attacks on you.",
+     "tooltip_values": [],
+     "teach_spell_id": 14927
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "lava-breath": {
+   "name": {
+    "en": "Lava Breath",
+    "fr": "Souffle de lave"
+   },
+   "kind": "family",
+   "skill_lines": [
+    2897
+   ],
+   "families": [
+    "core-hound"
+   ],
+   "ranks": [
+    {
+     "rank": 2,
+     "spell_id": 444681,
+     "level": 48,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": null,
+     "description": "Breathes molten lava at $x1 nearby enemies, instantly dealing $s1 Fire damage and reducing the target's casting speed by $s2% for $d.",
+     "tooltip_values": null,
+     "teach_spell_id": 444682,
+     "tooltip_error": "variable d'infobulle non prise en charge : $x"
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "lightning-breath": {
+   "name": {
+    "en": "Lightning Breath",
+    "fr": "Souffle de foudre"
+   },
+   "kind": "family",
+   "skill_lines": [
+    656
+   ],
+   "families": [
+    "wind-serpent"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24844,
+     "level": 1,
+     "training_cost": 1,
+     "focus_cost": 50,
+     "cooldown_s": null,
+     "description": "Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+     "tooltip_values": [
+      8,
+      10
+     ],
+     "teach_spell_id": 24845
+    },
+    {
+     "rank": 2,
+     "spell_id": 25008,
+     "level": 12,
+     "training_cost": 5,
+     "focus_cost": 50,
+     "cooldown_s": null,
+     "description": "Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+     "tooltip_values": [
+      20,
+      22
+     ],
+     "teach_spell_id": 25013
+    },
+    {
+     "rank": 3,
+     "spell_id": 25009,
+     "level": 24,
+     "training_cost": 10,
+     "focus_cost": 50,
+     "cooldown_s": null,
+     "description": "Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+     "tooltip_values": [
+      32,
+      36
+     ],
+     "teach_spell_id": 25014
+    },
+    {
+     "rank": 4,
+     "spell_id": 25010,
+     "level": 36,
+     "training_cost": 15,
+     "focus_cost": 50,
+     "cooldown_s": null,
+     "description": "Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+     "tooltip_values": [
+      46,
+      54
+     ],
+     "teach_spell_id": 25015
+    },
+    {
+     "rank": 5,
+     "spell_id": 25011,
+     "level": 48,
+     "training_cost": 20,
+     "focus_cost": 50,
+     "cooldown_s": null,
+     "description": "Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+     "tooltip_values": [
+      71,
+      81
+     ],
+     "teach_spell_id": 25016
+    },
+    {
+     "rank": 6,
+     "spell_id": 25012,
+     "level": 60,
+     "training_cost": 25,
+     "focus_cost": 50,
+     "cooldown_s": null,
+     "description": "Breathes lightning, instantly dealing $s1 Nature damage to a single target.",
+     "tooltip_values": [
+      86,
+      98
+     ],
+     "teach_spell_id": 25017
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "mine": {
+   "name": {
+    "en": "Mine!",
+    "fr": "À moi !"
+   },
+   "kind": "family",
+   "skill_lines": [
+    655
+   ],
+   "families": [
+    "bird-of-prey"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1265054,
+     "level": 10,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 60,
+     "description": "Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",
+     "tooltip_values": [
+      10,
+      12,
+      4
+     ],
+     "teach_spell_id": 1265059
+    },
+    {
+     "rank": 2,
+     "spell_id": 1265055,
+     "level": 20,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 60,
+     "description": "Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",
+     "tooltip_values": [
+      14,
+      16,
+      4
+     ],
+     "teach_spell_id": 1265060
+    },
+    {
+     "rank": 3,
+     "spell_id": 1265056,
+     "level": 30,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 60,
+     "description": "Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",
+     "tooltip_values": [
+      20,
+      24,
+      4
+     ],
+     "teach_spell_id": 1265061
+    },
+    {
+     "rank": 4,
+     "spell_id": 1265057,
+     "level": 40,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 60,
+     "description": "Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",
+     "tooltip_values": [
+      33,
+      37,
+      4
+     ],
+     "teach_spell_id": 1265062
+    },
+    {
+     "rank": 5,
+     "spell_id": 1265058,
+     "level": 50,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 60,
+     "description": "Grabs an enemy's weapon with its talons, causing $s1 damage and disarming them for $d.",
+     "tooltip_values": [
+      41,
+      47,
+      4
+     ],
+     "teach_spell_id": 1265064
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "natural-armor": {
+   "name": {
+    "en": "Natural Armor",
+    "fr": "Armure naturelle"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24545,
+     "level": 1,
+     "training_cost": 1,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      50
+     ],
+     "teach_spell_id": 24547
+    },
+    {
+     "rank": 2,
+     "spell_id": 24549,
+     "level": 12,
+     "training_cost": 5,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      100
+     ],
+     "teach_spell_id": 24556
+    },
+    {
+     "rank": 3,
+     "spell_id": 24550,
+     "level": 18,
+     "training_cost": 10,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      160
+     ],
+     "teach_spell_id": 24557
+    },
+    {
+     "rank": 4,
+     "spell_id": 24551,
+     "level": 24,
+     "training_cost": 15,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      240
+     ],
+     "teach_spell_id": 24558
+    },
+    {
+     "rank": 5,
+     "spell_id": 24552,
+     "level": 30,
+     "training_cost": 25,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      330
+     ],
+     "teach_spell_id": 24559
+    },
+    {
+     "rank": 6,
+     "spell_id": 24553,
+     "level": 36,
+     "training_cost": 50,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      430
+     ],
+     "teach_spell_id": 24560
+    },
+    {
+     "rank": 7,
+     "spell_id": 24554,
+     "level": 42,
+     "training_cost": 75,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      550
+     ],
+     "teach_spell_id": 24561
+    },
+    {
+     "rank": 8,
+     "spell_id": 24555,
+     "level": 48,
+     "training_cost": 100,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      675
+     ],
+     "teach_spell_id": 24562
+    },
+    {
+     "rank": 9,
+     "spell_id": 24629,
+     "level": 54,
+     "training_cost": 125,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      810
+     ],
+     "teach_spell_id": 24631
+    },
+    {
+     "rank": 10,
+     "spell_id": 24630,
+     "level": 60,
+     "training_cost": 150,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Armor increased by $s1.",
+     "tooltip_values": [
+      1000
+     ],
+     "teach_spell_id": 24632
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "nature-resistance": {
+   "name": {
+    "en": "Nature Resistance",
+    "fr": "Résistance à la Nature"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24492,
+     "level": 20,
+     "training_cost": 5,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Nature resistance by $s1.",
+     "tooltip_values": [
+      30
+     ],
+     "teach_spell_id": 24494
+    },
+    {
+     "rank": 2,
+     "spell_id": 24502,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Nature resistance by $s1.",
+     "tooltip_values": [
+      60
+     ],
+     "teach_spell_id": 24511
+    },
+    {
+     "rank": 3,
+     "spell_id": 24503,
+     "level": 40,
+     "training_cost": 45,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Nature resistance by $s1.",
+     "tooltip_values": [
+      90
+     ],
+     "teach_spell_id": 24512
+    },
+    {
+     "rank": 4,
+     "spell_id": 24504,
+     "level": 50,
+     "training_cost": 90,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Nature resistance by $s1.",
+     "tooltip_values": [
+      120
+     ],
+     "teach_spell_id": 24513
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "pet-hardiness": {
+   "name": {
+    "en": "Pet Hardiness",
+    "fr": "Robustesse du familier"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 2,
+     "spell_id": 6281,
+     "level": 0,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases the health of the pet by $s1.",
+     "tooltip_values": [
+      40
+     ],
+     "teach_spell_id": null
+    },
+    {
+     "rank": 3,
+     "spell_id": 6282,
+     "level": 0,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases the health of the pet by $s1.",
+     "tooltip_values": [
+      80
+     ],
+     "teach_spell_id": null
+    },
+    {
+     "rank": 4,
+     "spell_id": 6283,
+     "level": 0,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases the health of the pet by $s1.",
+     "tooltip_values": [
+      120
+     ],
+     "teach_spell_id": null
+    },
+    {
+     "rank": 5,
+     "spell_id": 6286,
+     "level": 0,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases the health of the pet by $s1.",
+     "tooltip_values": [
+      180
+     ],
+     "teach_spell_id": null
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "pinch": {
+   "name": {
+    "en": "Pinch",
+    "fr": "Pincer"
+   },
+   "kind": "family",
+   "skill_lines": [
+    214
+   ],
+   "families": [
+    "crab"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1264735,
+     "level": 12,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 30,
+     "description": "Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      19,
+      21,
+      50,
+      9
+     ],
+     "teach_spell_id": 1264745
+    },
+    {
+     "rank": 2,
+     "spell_id": 1264736,
+     "level": 24,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 30,
+     "description": "Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      32,
+      36,
+      50,
+      9
+     ],
+     "teach_spell_id": 1264749
+    },
+    {
+     "rank": 3,
+     "spell_id": 1264739,
+     "level": 36,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 30,
+     "description": "Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      41,
+      47,
+      50,
+      9
+     ],
+     "teach_spell_id": 1264750
+    },
+    {
+     "rank": 4,
+     "spell_id": 1264741,
+     "level": 48,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 30,
+     "description": "Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      68,
+      78,
+      50,
+      9
+     ],
+     "teach_spell_id": 1264751
+    },
+    {
+     "rank": 5,
+     "spell_id": 1264742,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 30,
+     "description": "Pinches an enemy's legs for $s1 damage and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      88,
+      102,
+      50,
+      9
+     ],
+     "teach_spell_id": 1264752
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "prowl": {
+   "name": {
+    "en": "Prowl",
+    "fr": "Rôder"
+   },
+   "kind": "family",
+   "skill_lines": [
+    209
+   ],
+   "families": [
+    "cat"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24450,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": 40,
+     "cooldown_s": 10,
+     "description": "Puts your pet in stealth mode, but slows its movement speed by $s2%. The first attack from stealth receives a $s3% bonus to damage.  Lasts until cancelled.",
+     "tooltip_values": [
+      50,
+      20
+     ],
+     "teach_spell_id": 24451
+    },
+    {
+     "rank": 2,
+     "spell_id": 24452,
+     "level": 40,
+     "training_cost": 20,
+     "focus_cost": 40,
+     "cooldown_s": 10,
+     "description": "Puts your pet in stealth mode, but slows its movement speed by $s2%. The first attack from stealth receives a $s3% bonus to damage.  Lasts until cancelled.",
+     "tooltip_values": [
+      45,
+      35
+     ],
+     "teach_spell_id": 24454
+    },
+    {
+     "rank": 3,
+     "spell_id": 24453,
+     "level": 50,
+     "training_cost": 25,
+     "focus_cost": 40,
+     "cooldown_s": 10,
+     "description": "Puts your pet in stealth mode, but slows its movement speed by $s2%. The first attack from stealth receives a $s3% bonus to damage.  Lasts until cancelled.",
+     "tooltip_values": [
+      40,
+      50
+     ],
+     "teach_spell_id": 24455
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "savage-rend": {
+   "name": {
+    "en": "Savage Rend",
+    "fr": "Pourfendeur sauvage"
+   },
+   "kind": "family",
+   "skill_lines": [
+    217
+   ],
+   "families": [
+    "raptor"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1265065,
+     "level": 12,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 60,
+     "description": "Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",
+     "tooltip_values": [
+      30,
+      18
+     ],
+     "teach_spell_id": 1265831
+    },
+    {
+     "rank": 2,
+     "spell_id": 1265066,
+     "level": 24,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 60,
+     "description": "Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",
+     "tooltip_values": [
+      54,
+      18
+     ],
+     "teach_spell_id": 1265833
+    },
+    {
+     "rank": 3,
+     "spell_id": 1265067,
+     "level": 36,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 60,
+     "description": "Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",
+     "tooltip_values": [
+      72,
+      18
+     ],
+     "teach_spell_id": 1265834
+    },
+    {
+     "rank": 4,
+     "spell_id": 1265068,
+     "level": 48,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 60,
+     "description": "Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",
+     "tooltip_values": [
+      120,
+      18
+     ],
+     "teach_spell_id": 1265835
+    },
+    {
+     "rank": 5,
+     "spell_id": 1265069,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 50,
+     "cooldown_s": 60,
+     "description": "Slash an enemy with razor talons, causing the target to Bleed for $o1 damage over $d.",
+     "tooltip_values": [
+      156,
+      18
+     ],
+     "teach_spell_id": 1265836
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "scorpid-poison": {
+   "name": {
+    "en": "Scorpid Poison",
+    "fr": "Poison de scorpide"
+   },
+   "kind": "family",
+   "skill_lines": [
+    236
+   ],
+   "families": [
+    "scorpid"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24640,
+     "level": 8,
+     "training_cost": 10,
+     "focus_cost": 30,
+     "cooldown_s": 4,
+     "description": "Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.",
+     "tooltip_values": [
+      5,
+      10
+     ],
+     "teach_spell_id": 24641
+    },
+    {
+     "rank": 2,
+     "spell_id": 24583,
+     "level": 24,
+     "training_cost": 15,
+     "focus_cost": 30,
+     "cooldown_s": 4,
+     "description": "Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.",
+     "tooltip_values": [
+      10,
+      10
+     ],
+     "teach_spell_id": 24584
+    },
+    {
+     "rank": 3,
+     "spell_id": 24586,
+     "level": 40,
+     "training_cost": 20,
+     "focus_cost": 30,
+     "cooldown_s": 4,
+     "description": "Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.",
+     "tooltip_values": [
+      20,
+      10
+     ],
+     "teach_spell_id": 24588
+    },
+    {
+     "rank": 4,
+     "spell_id": 24587,
+     "level": 56,
+     "training_cost": 25,
+     "focus_cost": 30,
+     "cooldown_s": 4,
+     "description": "Inflicts $o2 Nature damage over $d. Effect can stack up to 5 times on a single target.",
+     "tooltip_values": [
+      25,
+      10
+     ],
+     "teach_spell_id": 24589
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "shadow-resistance": {
+   "name": {
+    "en": "Shadow Resistance",
+    "fr": "Résistance à l'Ombre"
+   },
+   "kind": "general",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 24488,
+     "level": 20,
+     "training_cost": 5,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Shadow resistance by $s1.",
+     "tooltip_values": [
+      30
+     ],
+     "teach_spell_id": 24490
+    },
+    {
+     "rank": 2,
+     "spell_id": 24505,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Shadow resistance by $s1.",
+     "tooltip_values": [
+      60
+     ],
+     "teach_spell_id": 24514
+    },
+    {
+     "rank": 3,
+     "spell_id": 24506,
+     "level": 40,
+     "training_cost": 45,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Shadow resistance by $s1.",
+     "tooltip_values": [
+      90
+     ],
+     "teach_spell_id": 24515
+    },
+    {
+     "rank": 4,
+     "spell_id": 24507,
+     "level": 40,
+     "training_cost": 90,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Increases Shadow resistance by $s1.",
+     "tooltip_values": [
+      120
+     ],
+     "teach_spell_id": 24516
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "shell-shield": {
+   "name": {
+    "en": "Shell Shield",
+    "fr": "Carapace bouclier"
+   },
+   "kind": "family",
+   "skill_lines": [
+    251
+   ],
+   "families": [
+    "turtle"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 26064,
+     "level": 20,
+     "training_cost": 15,
+     "focus_cost": 10,
+     "cooldown_s": 180,
+     "description": "Reduces all damage your pet takes by $s1% and increases the time between your pet's attacks by $s2%, but deals more damage with each attack. Lasts $d.",
+     "tooltip_values": [
+      50,
+      60,
+      12
+     ],
+     "teach_spell_id": 26065
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "slower-attack": {
+   "name": {
+    "en": "Slower Attack",
+    "fr": "Attaque lente"
+   },
+   "kind": "attack_speed",
+   "skill_lines": [
+    270
+   ],
+   "families": [],
+   "ranks": [
+    {
+     "rank": 2,
+     "spell_id": 1263113,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Decreases attack speed by $s1%.",
+     "tooltip_values": [
+      20
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": -20.0
+      }
+     ]
+    },
+    {
+     "rank": 3,
+     "spell_id": 1263114,
+     "level": 1,
+     "training_cost": 0,
+     "focus_cost": null,
+     "cooldown_s": null,
+     "description": "Decreases attack speed by $s1%.",
+     "tooltip_values": [
+      26
+     ],
+     "teach_spell_id": null,
+     "effects": [
+      {
+       "aura": 9,
+       "misc": 0,
+       "base_points": -26.0
+      }
+     ]
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "swipe": {
+   "name": {
+    "en": "Swipe",
+    "fr": "Balayage"
+   },
+   "kind": "family",
+   "skill_lines": [
+    210
+   ],
+   "families": [
+    "bear"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1264494,
+     "level": 12,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 5,
+     "description": "Swipe $x1 nearby enemies, inflicting $s1 damage.",
+     "tooltip_values": null,
+     "teach_spell_id": 1264727,
+     "tooltip_error": "variable d'infobulle non prise en charge : $x"
+    },
+    {
+     "rank": 2,
+     "spell_id": 1264497,
+     "level": 24,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 5,
+     "description": "Swipe $x1 nearby enemies, inflicting $s1 damage.",
+     "tooltip_values": null,
+     "teach_spell_id": 1264729,
+     "tooltip_error": "variable d'infobulle non prise en charge : $x"
+    },
+    {
+     "rank": 3,
+     "spell_id": 1264498,
+     "level": 36,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 5,
+     "description": "Swipe $x1 nearby enemies, inflicting $s1 damage.",
+     "tooltip_values": null,
+     "teach_spell_id": 1264730,
+     "tooltip_error": "variable d'infobulle non prise en charge : $x"
+    },
+    {
+     "rank": 4,
+     "spell_id": 1264501,
+     "level": 48,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 5,
+     "description": "Swipe $x1 nearby enemies, inflicting $s1 damage.",
+     "tooltip_values": null,
+     "teach_spell_id": 1264731,
+     "tooltip_error": "variable d'infobulle non prise en charge : $x"
+    },
+    {
+     "rank": 5,
+     "spell_id": 1264502,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 5,
+     "description": "Swipe $x1 nearby enemies, inflicting $s1 damage.",
+     "tooltip_values": null,
+     "teach_spell_id": 1264732,
+     "tooltip_error": "variable d'infobulle non prise en charge : $x"
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "tendon-rip": {
+   "name": {
+    "en": "Tendon Rip",
+    "fr": "Déchirure du tendon"
+   },
+   "kind": "family",
+   "skill_lines": [
+    654
+   ],
+   "families": [
+    "hyena"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1265038,
+     "level": 12,
+     "training_cost": 0,
+     "focus_cost": 25,
+     "cooldown_s": 30,
+     "description": "Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      12,
+      9,
+      50,
+      9
+     ],
+     "teach_spell_id": 1265043
+    },
+    {
+     "rank": 2,
+     "spell_id": 1265039,
+     "level": 24,
+     "training_cost": 0,
+     "focus_cost": 25,
+     "cooldown_s": 30,
+     "description": "Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      21,
+      9,
+      50,
+      9
+     ],
+     "teach_spell_id": 1265045
+    },
+    {
+     "rank": 3,
+     "spell_id": 1265040,
+     "level": 36,
+     "training_cost": 0,
+     "focus_cost": 25,
+     "cooldown_s": 30,
+     "description": "Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      27,
+      9,
+      50,
+      9
+     ],
+     "teach_spell_id": 1265046
+    },
+    {
+     "rank": 4,
+     "spell_id": 1265041,
+     "level": 48,
+     "training_cost": 0,
+     "focus_cost": 25,
+     "cooldown_s": 30,
+     "description": "Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      45,
+      9,
+      50,
+      9
+     ],
+     "teach_spell_id": 1265047
+    },
+    {
+     "rank": 5,
+     "spell_id": 1265042,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 25,
+     "cooldown_s": 30,
+     "description": "Tears at an enemy's legs for $o1 damage over $d and reduces movement speed by $s2% for $d.",
+     "tooltip_values": [
+      60,
+      9,
+      50,
+      9
+     ],
+     "teach_spell_id": 1265048
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "thunderstomp": {
+   "name": {
+    "en": "Thunderstomp",
+    "fr": "Grondeterre"
+   },
+   "kind": "family",
+   "skill_lines": [
+    215
+   ],
+   "families": [
+    "gorilla"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 26090,
+     "level": 30,
+     "training_cost": 15,
+     "focus_cost": 60,
+     "cooldown_s": 60,
+     "description": "Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
+     "tooltip_values": null,
+     "teach_spell_id": 26094,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    },
+    {
+     "rank": 2,
+     "spell_id": 26187,
+     "level": 40,
+     "training_cost": 20,
+     "focus_cost": 60,
+     "cooldown_s": 60,
+     "description": "Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
+     "tooltip_values": null,
+     "teach_spell_id": 26189,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    },
+    {
+     "rank": 3,
+     "spell_id": 26188,
+     "level": 50,
+     "training_cost": 25,
+     "focus_cost": 60,
+     "cooldown_s": 60,
+     "description": "Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
+     "tooltip_values": null,
+     "teach_spell_id": 26190,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    },
+    {
+     "rank": 4,
+     "spell_id": 1264455,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 60,
+     "cooldown_s": 60,
+     "description": "Shakes the ground with thundering force, doing $s1 Nature damage to all enemies within $a1 yards.",
+     "tooltip_values": null,
+     "teach_spell_id": 1264456,
+     "tooltip_error": "variable d'infobulle non prise en charge : $a"
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "trickster-s-dance": {
+   "name": {
+    "en": "Trickster's Dance",
+    "fr": "Danse d’entourloupeur"
+   },
+   "kind": "family",
+   "skill_lines": [
+    3016
+   ],
+   "families": [
+    "fox"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1310612,
+     "level": 20,
+     "training_cost": 10,
+     "focus_cost": 10,
+     "cooldown_s": 180,
+     "description": "Increases your pet's chance to Dodge by $s1% and decreases the time between your pet's attacks by $s2%. Lasts $d.",
+     "tooltip_values": [
+      50,
+      30,
+      12
+     ],
+     "teach_spell_id": 1310617
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  },
+  "web": {
+   "name": {
+    "en": "Web",
+    "fr": "Toile"
+   },
+   "kind": "family",
+   "skill_lines": [
+    203
+   ],
+   "families": [
+    "spider"
+   ],
+   "ranks": [
+    {
+     "rank": 1,
+     "spell_id": 1265843,
+     "level": 12,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 40,
+     "description": "Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",
+     "tooltip_values": [
+      12,
+      4
+     ],
+     "teach_spell_id": 1265887
+    },
+    {
+     "rank": 2,
+     "spell_id": 1265878,
+     "level": 24,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 40,
+     "description": "Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",
+     "tooltip_values": [
+      20,
+      4
+     ],
+     "teach_spell_id": 1265888
+    },
+    {
+     "rank": 3,
+     "spell_id": 1265880,
+     "level": 36,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 40,
+     "description": "Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",
+     "tooltip_values": [
+      28,
+      4
+     ],
+     "teach_spell_id": 1265890
+    },
+    {
+     "rank": 4,
+     "spell_id": 1265881,
+     "level": 48,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 40,
+     "description": "Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",
+     "tooltip_values": [
+      40,
+      4
+     ],
+     "teach_spell_id": 1265891
+    },
+    {
+     "rank": 5,
+     "spell_id": 1265883,
+     "level": 60,
+     "training_cost": 0,
+     "focus_cost": 20,
+     "cooldown_s": 40,
+     "description": "Entangles an enemy in a corrosive web, immobilizing them and dealing $o1 Nature damage over $d.",
+     "tooltip_values": [
+      52,
+      4
+     ],
+     "teach_spell_id": 1265892
+    }
+   ],
+   "certainty": {
+    "rank": "certain",
+    "level": "certain",
+    "training_cost": "probable",
+    "focus_cost": "certain",
+    "cooldown_s": "certain"
+   }
+  }
+ },
+ "aliases": {
+  "crocilisk": "crocolisk"
+ },
+ "orphan_skill_lines": [
+  {
+   "skill_line": 3015,
+   "name": "Pet - Bat",
+   "abilities": [
+    "bite",
+    "dive"
+   ]
+  }
+ ],
+ "pet_scaling": {
+  "spell_id": 415429,
+  "effects": [
+   {
+    "aura": 34,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 99,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 13,
+    "misc": 126,
+    "base_points": 0.0
+   },
+   {
+    "aura": 22,
+    "misc": 4,
+    "base_points": 0.0
+   },
+   {
+    "aura": 22,
+    "misc": 16,
+    "base_points": 0.0
+   },
+   {
+    "aura": 22,
+    "misc": 8,
+    "base_points": 0.0
+   },
+   {
+    "aura": 22,
+    "misc": 32,
+    "base_points": 0.0
+   },
+   {
+    "aura": 22,
+    "misc": 64,
+    "base_points": 0.0
+   },
+   {
+    "aura": 22,
+    "misc": 1,
+    "base_points": 0.0
+   },
+   {
+    "aura": 54,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 55,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 319,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 65,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 52,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 57,
+    "misc": 0,
+    "base_points": 0.0
+   },
+   {
+    "aura": 418,
+    "misc": 2,
+    "base_points": 50.0
+   },
+   {
+    "aura": 593,
+    "misc": 4,
+    "base_points": 0.0
+   },
+   {
+    "aura": 593,
+    "misc": 2,
+    "base_points": 0.0
+   },
+   {
+    "aura": 49,
+    "misc": 0,
+    "base_points": 0.0
+   }
+  ],
+  "certainty": "probable"
+ },
+ "diets": {
+  "1": {
+   "en": "Meat",
+   "fr": "Viande"
+  },
+  "2": {
+   "en": "Fish",
+   "fr": "Poisson"
+  },
+  "3": {
+   "en": "Cheese",
+   "fr": "Fromage"
+  },
+  "4": {
+   "en": "Bread",
+   "fr": "Pain"
+  },
+  "5": {
+   "en": "Fungus",
+   "fr": "Champignon"
+  },
+  "6": {
+   "en": "Fruit",
+   "fr": "Fruit"
+  },
+  "7": {
+   "en": "Raw Meat",
+   "fr": "Viande crue"
+  },
+  "8": {
+   "en": "Raw Fish",
+   "fr": "Poisson cru"
+  }
+ },
+ "maps": {
+  "947": {
+   "name": {
+    "en": "Azeroth",
+    "fr": "Azeroth"
+   },
+   "parent": 0,
+   "type": 1,
+   "continent": null
+  },
+  "1411": {
+   "name": {
+    "en": "Durotar",
+    "fr": "Durotar"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1412": {
+   "name": {
+    "en": "Mulgore",
+    "fr": "Mulgore"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1413": {
+   "name": {
+    "en": "The Barrens",
+    "fr": "Les Tarides"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1414": {
+   "name": {
+    "en": "Kalimdor",
+    "fr": "Kalimdor"
+   },
+   "parent": 947,
+   "type": 2,
+   "continent": null
+  },
+  "1415": {
+   "name": {
+    "en": "Eastern Kingdoms",
+    "fr": "Royaumes de l'est"
+   },
+   "parent": 947,
+   "type": 2,
+   "continent": null
+  },
+  "1416": {
+   "name": {
+    "en": "Alterac Mountains",
+    "fr": "Montagnes d'Alterac"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1417": {
+   "name": {
+    "en": "Arathi Highlands",
+    "fr": "Hautes-terres d'Arathi"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1418": {
+   "name": {
+    "en": "Badlands",
+    "fr": "Terres ingrates"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1419": {
+   "name": {
+    "en": "Blasted Lands",
+    "fr": "Terres foudroyées"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1420": {
+   "name": {
+    "en": "Tirisfal Glades",
+    "fr": "Clairières de Tirisfal"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1421": {
+   "name": {
+    "en": "Silverpine Forest",
+    "fr": "Forêt des Pins argentés"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1422": {
+   "name": {
+    "en": "Western Plaguelands",
+    "fr": "Maleterres de l’ouest"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1423": {
+   "name": {
+    "en": "Eastern Plaguelands",
+    "fr": "Maleterres de l'est"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1424": {
+   "name": {
+    "en": "Hillsbrad Foothills",
+    "fr": "Contreforts de Hautebrande"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1425": {
+   "name": {
+    "en": "The Hinterlands",
+    "fr": "Les Hinterlands"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1426": {
+   "name": {
+    "en": "Dun Morogh",
+    "fr": "Dun Morogh"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1427": {
+   "name": {
+    "en": "Searing Gorge",
+    "fr": "Gorge des Vents brûlants"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1428": {
+   "name": {
+    "en": "Burning Steppes",
+    "fr": "Steppes ardentes"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1429": {
+   "name": {
+    "en": "Elwynn Forest",
+    "fr": "Forêt d'Elwynn"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1430": {
+   "name": {
+    "en": "Deadwind Pass",
+    "fr": "Défilé de Deuillevent"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1431": {
+   "name": {
+    "en": "Duskwood",
+    "fr": "Bois de la Pénombre"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1432": {
+   "name": {
+    "en": "Loch Modan",
+    "fr": "Loch Modan"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1433": {
+   "name": {
+    "en": "Redridge Mountains",
+    "fr": "Les Carmines"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1434": {
+   "name": {
+    "en": "Stranglethorn Vale",
+    "fr": "Vallée de Strangleronce"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1435": {
+   "name": {
+    "en": "Swamp of Sorrows",
+    "fr": "Marais des Chagrins"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1436": {
+   "name": {
+    "en": "Westfall",
+    "fr": "Marche de l'Ouest"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1437": {
+   "name": {
+    "en": "Wetlands",
+    "fr": "Les Paluns"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1438": {
+   "name": {
+    "en": "Teldrassil",
+    "fr": "Teldrassil"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1439": {
+   "name": {
+    "en": "Darkshore",
+    "fr": "Sombrivage"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1440": {
+   "name": {
+    "en": "Ashenvale",
+    "fr": "Orneval"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1441": {
+   "name": {
+    "en": "Thousand Needles",
+    "fr": "Mille pointes"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1442": {
+   "name": {
+    "en": "Stonetalon Mountains",
+    "fr": "Les Serres-Rocheuses"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1443": {
+   "name": {
+    "en": "Desolace",
+    "fr": "Désolace"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1444": {
+   "name": {
+    "en": "Feralas",
+    "fr": "Féralas"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1445": {
+   "name": {
+    "en": "Dustwallow Marsh",
+    "fr": "Marécage d'Âprefange"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1446": {
+   "name": {
+    "en": "Tanaris",
+    "fr": "Tanaris"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1447": {
+   "name": {
+    "en": "Azshara",
+    "fr": "Azshara"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1448": {
+   "name": {
+    "en": "Felwood",
+    "fr": "Gangrebois"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1449": {
+   "name": {
+    "en": "Un'Goro Crater",
+    "fr": "Cratère d'Un'Goro"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1450": {
+   "name": {
+    "en": "Moonglade",
+    "fr": "Reflet-de-Lune"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1451": {
+   "name": {
+    "en": "Silithus",
+    "fr": "Silithus"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1452": {
+   "name": {
+    "en": "Winterspring",
+    "fr": "Berceau-de-l’Hiver"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1453": {
+   "name": {
+    "en": "Stormwind City",
+    "fr": "Cité de Stormwind"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1454": {
+   "name": {
+    "en": "Orgrimmar",
+    "fr": "Orgrimmar"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1455": {
+   "name": {
+    "en": "Ironforge",
+    "fr": "Ironforge"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1456": {
+   "name": {
+    "en": "Thunder Bluff",
+    "fr": "Thunder Bluff"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1457": {
+   "name": {
+    "en": "Darnassus",
+    "fr": "Darnassus"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "1458": {
+   "name": {
+    "en": "Undercity",
+    "fr": "Undercity"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "1459": {
+   "name": {
+    "en": "Alterac Valley",
+    "fr": "Vallée d'Alterac"
+   },
+   "parent": 1424,
+   "type": 6,
+   "continent": 1415
+  },
+  "1460": {
+   "name": {
+    "en": "Warsong Gulch",
+    "fr": "Goulet des Warsong"
+   },
+   "parent": 1413,
+   "type": 6,
+   "continent": 1414
+  },
+  "1461": {
+   "name": {
+    "en": "Arathi Basin",
+    "fr": "Bassin d'Arathi"
+   },
+   "parent": 1417,
+   "type": 6,
+   "continent": 1415
+  },
+  "1463": {
+   "name": {
+    "en": "Eastern Kingdoms",
+    "fr": "Royaumes de l'est"
+   },
+   "parent": 0,
+   "type": 2,
+   "continent": null
+  },
+  "1464": {
+   "name": {
+    "en": "Kalimdor",
+    "fr": "Kalimdor"
+   },
+   "parent": 0,
+   "type": 2,
+   "continent": null
+  },
+  "2482": {
+   "name": {
+    "en": "Mount Hyjal",
+    "fr": "Mont Hyjal"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "2521": {
+   "name": {
+    "en": "Zephras Isle",
+    "fr": "Île de Zéphras"
+   },
+   "parent": 947,
+   "type": 3,
+   "continent": null
+  },
+  "2524": {
+   "name": {
+    "en": "Darkspear Islands",
+    "fr": "Îles des Sombrelances"
+   },
+   "parent": 1414,
+   "type": 6,
+   "continent": 1414
+  },
+  "2548": {
+   "name": {
+    "en": "Riverglades",
+    "fr": "Rives Claires"
+   },
+   "parent": 1415,
+   "type": 3,
+   "continent": 1415
+  },
+  "2652": {
+   "name": {
+    "en": "Shen'dralas",
+    "fr": "Shen’dralas"
+   },
+   "parent": 1414,
+   "type": 3,
+   "continent": 1414
+  },
+  "2665": {
+   "name": {
+    "en": "Zephras Isle",
+    "fr": "Île de Zéphras"
+   },
+   "parent": 0,
+   "type": 3,
+   "continent": null
+  }
+ },
+ "hunter_spells": {
+  "file": "classes.json",
+  "class": "Hunter",
+  "names": [
+   "Tame Beast",
+   "Beast Lore",
+   "Beast Training",
+   "Feed Pet",
+   "Revive Pet",
+   "Call Pet",
+   "Dismiss Pet",
+   "Mend Pet"
+  ]
+ },
+ "observations": [
+  "crocolisk : la ligne de compétence 212 s'appelle « Pet - Crocilisk », CreatureFamily écrit « Crocolisk » (écart interne au client)",
+  "ligne 3015 « Pet - Bat » : aucune famille de CreatureFamily ne la vise (ligne orpheline, rendue à part)",
+  "sort 6280 « Pet Hardiness » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6311 « Pet Aggression » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6314 « Pet Aggression » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6315 « Pet Aggression » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6316 « Pet Aggression » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6317 « Pet Aggression » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6328 « Pet Recovery » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6331 « Pet Recovery » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6332 « Pet Recovery » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6333 « Pet Recovery » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6334 « Pet Recovery » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6443 « Pet Resistance » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6444 « Pet Resistance » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6445 « Pet Resistance » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6446 « Pet Resistance » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "sort 6447 « Pet Resistance » sans ligne SpellLevels (lignes [270]) : non rendu",
+  "lava-breath : premier rang du client 2 (aucun rang 1)",
+  "pet-hardiness : premier rang du client 2 (aucun rang 1)",
+  "slower-attack : premier rang du client 2 (aucun rang 1)",
+  "sort 19577 « Intimidation » sans rang dans les lignes [270] : non rendu",
+  "sort 24394 « Intimidation » sans rang dans les lignes [270] : non rendu",
+  "sort 1278934 « Summoning » sans rang dans les lignes [653, 3015] : non rendu"
+ ],
+ "notes": [
+  "Familles : CreatureFamily dont la ligne SkillLine_0 est une ligne « Pet - » de la catégorie 7 portant « Hunter Pet Scaling » (lignes de démons : « Warlock Pet Scaling »).",
+  "Passif de famille : le sort « Tamed Pet Passive (DND) » de la ligne qui porte les trois auras de family_bonus (sens des auras probable).",
+  "Rang : sous-titre « Rank N » du sort (spell_ranks.rank_subtext) ; SupercedesSpell seulement recoupé.",
+  "Niveau d'un rang : SpellLevels.SpellLevel (BaseLevel vaut 0 pour une partie des sorts de familier).",
+  "Coût en points d'entraînement : colonne sans nom training_cost_column, sens probable ; valeur 0 gardée telle quelle, jamais interprétée.",
+  "Régime : bit n du PetFoodMask <-> ItemPetFood.ID n+1 (sens probable).",
+  "Alias : la ligne de compétence écrit « Crocilisk », CreatureFamily « Crocolisk » (écart interne au client)."
+ ]
+}

@@ -9,7 +9,8 @@ Règles de fusion (seuls changements permis) :
   gardés (gabarit `{i}` et identifiants par rang), ceux du client rangés dans `source` ;
 - `duration_s` retiré (`removed_field`) quand la durée corrigée est la valeur du rang du client ;
 - fichiers des 9 classes (PV1, `CLASS_FILES`) ajoutés (`added_file`) ou remplacés (`replaced_file`), seulement s'ils
-  sont décodés des tables de cette version (jamais un fichier hérité, marqué `inherited_from`) ;
+  sont décodés des tables de cette version (jamais un fichier hérité, marqué `inherited_from`) ; de même pour
+  `pets.json` (CH0 : familiers du Chasseur), jamais retiré quand la candidate ne le porte pas ;
 - fichier retiré (`retired_file`) seulement s'il est déclaré dans `retired_files` de la candidate et que son
   remplaçant y est décodé ; sa copie figée (`frozen_copy`) est alors ajoutée. Aucun retrait n'est jamais déduit.
 Tout autre écart (structure d'un talent, rang en plus ou en moins, valeur non confirmée) refuse l'installation."""
@@ -59,6 +60,7 @@ FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
 CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json", "_seed_racials.json")
 CLASS_FILES = ("classes.json", "races.json", "pvp_items.json")
+PETS_FILE = "pets.json"  # CH0 : familiers du Chasseur, ajouté ou remplacé comme les fichiers des 9 classes
 # T08b, bloc C : fichiers décodés installés par une révision, avec la liste de leurs valeurs changées.
 VALUE_FILES = ("spell_scaling.json", "character_scaling.json")
 TALENT_TABLES = "tables Trait* et Spell* (wago.tools)"
@@ -321,7 +323,7 @@ def _file_changes(repo: Path, cand: Path, cand_sources: Mapping[str, Any], versi
             }
             for _, key, field, old, new in lines
         ]
-    for name in CLASS_FILES:
+    for name in (*CLASS_FILES, PETS_FILE):
         if not _decoded(cand / name):
             continue
         before, after = _short_sha(repo / name), _short_sha(cand / name)

@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-01)",
+      "source": "Client 1.60.1.70124 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-01)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-01)",
+      "source": "Client 1.60.1.70124 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-01)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -229,8 +229,26 @@
         "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
         "installé en révision 4 (forever install, 2026-10-01)"
       ]
+    },
+    "pets.json": {
+      "source": "Client 1.60.1.70124 : tables du client 1.60.1.70124 (wago.tools, 1.60.1.70124) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "familles du Chasseur, capacités et rangs, bonus de famille, régimes, cartes (decode_rules.json, pets) ; écarts internes au client dans observations",
+        "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits du masque) et effets de Hunter Pet Scaling : sens probable",
+        "installé en révision 5 (forever install, 2026-10-01)"
+      ]
+    },
+    "pet_rules.json": {
+      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel)",
+      "certainty": "suppose",
+      "notes": [
+        "ajouté à la main en révision 5 (CH0, accord de l'utilisateur du 2026-10-01) ; forever install ne l'écrit pas",
+        "chaque règle porte sa source, sa date, sa certitude et son entrée du registre (L1 à L12)",
+        "relecture à chaque changement de Forever Bestiary (forever addons status)"
+      ]
     }
   },
-  "revision": 4,
+  "revision": 5,
   "revised_at": "2026-10-01"
 }

@@ -39,6 +39,7 @@ DECODED_FILES = ("talents.json", "spells.json", "spell_scaling.json", *CLASS_FIL
 INHERITED_FILES = (
     "_seed_racials.json",  # PV1, D5 : copie figée du relevé communautaire (mode seed), racials.json retiré
     "pvp_rules.json",  # PV1 : règles du serveur des rendements décroissants (suppose)
+    "pet_rules.json",  # CH0 : règles des familiers absentes du client (suppose, Forever Bestiary)
     "leveling.json",
     "mechanics.json",
     "respec.json",

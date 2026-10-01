@@ -1001,6 +1001,62 @@
       "certainty": "probable",
       "reason": "fait d'installation (D2) : plafond de la bêta donné à l'installation avec sa source",
       "registry": "I5"
+    },
+    {
+      "file": "pets.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "SkillLine, SkillLineAbility, Spell*, CreatureFamily, ItemPetFood et UiMap du client (forever decode, decode_rules.json pets)",
+      "certainty": "certain"
+    },
+    {
+      "file": "pets.json",
+      "paths": [
+        "/families/*/training_costs",
+        "/abilities/*/ranks/*/training_cost"
+      ],
+      "origin": "client",
+      "source": "colonne sans nom de SkillLineAbility (decode_rules.json pets.training_cost_column)",
+      "certainty": "probable",
+      "reason": "sens de la colonne (coût en points d'entraînement) probable",
+      "registry": "L4"
+    },
+    {
+      "file": "pets.json",
+      "paths": [
+        "/families/*/bonus",
+        "/families/*/diet",
+        "/pet_scaling"
+      ],
+      "origin": "client",
+      "source": "aura passive de famille, masque de régime et Hunter Pet Scaling du client",
+      "certainty": "probable",
+      "reason": "sens des types d'aura et des bits du masque probable (decode_rules.json pets)"
+    },
+    {
+      "file": "pet_rules.json",
+      "paths": [
+        "/rules",
+        "/reported_bugs"
+      ],
+      "origin": "addon",
+      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua) : relevés de joueurs de la bêta cités par section",
+      "certainty": "suppose",
+      "reason": "règles du système de familiers absentes du client (décision 127)"
+    },
+    {
+      "file": "pet_rules.json",
+      "paths": [
+        "/rules/training.rank_level_applies_to",
+        "/rules/training.points_gain"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (niveau du familier) ; gain des points d'entraînement inconnu",
+      "certainty": "suppose",
+      "reason": "aucune source propre à Forever (CH0)",
+      "registry": "L3"
     }
   ],
   "pending": []

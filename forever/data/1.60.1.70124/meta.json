@@ -31,9 +31,10 @@
    "value": 20,
    "source": "plafond de niveau de la bêta de Forever (niveau 30 annoncé ensuite) : docs/research/community-builds-mage.md (recherche du 2026-09-28) ; tout build au-delà n'est pas vérifiable en jeu avant la sortie (décision 89)",
    "certainty": "probable",
-   "carried_from": "révision 3",
+   "carried_from": "révision 4",
    "date": "2026-10-01",
-   "revision": 4
+   "revision": 4,
+   "carried_to": 5
   }
  }
 }
