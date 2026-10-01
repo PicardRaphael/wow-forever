@@ -98,3 +98,28 @@ def test_cli_json_and_save(wow, make_deps, capsys):
     assert not (deps.cache_dir / "addons" / STATE_NAME).exists()
     assert main(["addons", "status", "--save"], deps) == 0
     assert (deps.cache_dir / "addons" / STATE_NAME).is_file()
+
+
+# --- CH0, bloc B : Forever Bestiary suivi ------------------------------------------------------------------
+
+BESTIARY = FIXTURES / "bestiary"
+
+
+def test_forever_bestiary_is_followed_with_its_reader():
+    spec = DATA_ADDONS["ForeverBestiary"]
+    assert spec.reader == "forever/pipeline/bestiary.py"
+    assert any("pets.json" in d for d in spec.depends) and any("pet_rules.json" in d for d in spec.depends)
+    assert "forever pets crosscheck" in spec.action
+
+
+def test_forever_bestiary_changed_at_same_version(wow, make_deps):
+    addons = wow / "Interface" / "AddOns"
+    shutil.copytree(BESTIARY / "ForeverBestiary", addons / "ForeverBestiary")
+    deps = make_deps(wow_dir=wow)
+    first = by_name(addons_status(deps, save=True))["ForeverBestiary"]
+    assert first["status"] == "nouveau" and first["version"] == "0.5.0"
+    shutil.rmtree(addons / "ForeverBestiary")
+    shutil.copytree(BESTIARY / "changed" / "ForeverBestiary", addons / "ForeverBestiary")
+    again = by_name(addons_status(deps))["ForeverBestiary"]
+    assert again["status"] == "changé" and again["version"] == first["version"]
+    assert again["files"]["modified"] == ["ForeverBestiary/Data/Data.lua"]

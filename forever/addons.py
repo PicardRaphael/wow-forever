@@ -192,3 +192,8 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
         doc = {"schema_version": SCHEMA_VERSION, "saved_at": format_utc(deps.now()), "addons": state}
         path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
     return {"addons_dir": str(root) if root else None, "saved": save, "addons": report}
+
+
+def fingerprint_folder(folder: Path) -> str:
+    """Empreinte d'un dossier d'addon (méthode de `fingerprint`), sans relevé précédent."""
+    raise NotImplementedError

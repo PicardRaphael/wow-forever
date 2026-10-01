@@ -156,3 +156,9 @@ def parse_lua_assignments(text: str) -> dict[str, object]:
         parser.pos = name.end()
         parser.expect("=")
         out[name[0]] = parser.value()
+
+
+def parse_lua_value_at(text: str, pos: int) -> tuple[object, int]:
+    """Valeur Lua littérale qui commence à `pos` (espaces et commentaires avant admis) ; renvoie la valeur et la
+    position juste après elle. Le texte qui suit n'est pas lu (fichiers d'addon : `ns.Data = {…}` puis du code)."""
+    raise NotImplementedError

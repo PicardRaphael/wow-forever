@@ -2,7 +2,7 @@
 
 import pytest
 
-from forever.pipeline.lua_table import parse_lua_assignments, parse_lua_value
+from forever.pipeline.lua_table import parse_lua_assignments, parse_lua_value, parse_lua_value_at
 
 
 def test_strings_single_and_double_quotes_with_escapes():
@@ -61,3 +61,26 @@ def test_saved_variables_file_assignments():
     assert parse_lua_assignments(text) == {"ForeverLoggerDB": {"schema": 1}, "Autre": "x"}
     with pytest.raises(ValueError, match="nom de variable"):
         parse_lua_assignments("= 1")
+
+
+# --- CH0, bloc B : littéral à une position (fichiers d'addon : `ns.Data = {…}` suivi de code) -------------------
+
+
+def test_value_at_a_position_returns_value_and_end():
+    text = 'local _, ns = ...\nns.Data = { date = "2026-09-25", n = {1, 2} } -- fin\nns.Data.beasts = { {id = 7} }\n'
+    start = text.index("=", text.index("ns.Data")) + 1
+    value, end = parse_lua_value_at(text, start)
+    assert value == {"date": "2026-09-25", "n": [1, 2]}
+    assert text[end - 1] == "}" and text[end:].lstrip().startswith("-- fin")
+
+
+def test_value_at_ignores_the_text_that_follows():
+    text = "x = {a = 1}\nfunction f() return 1 end\n"
+    value, end = parse_lua_value_at(text, text.index("{"))
+    assert value == {"a": 1} and text[end:].startswith("\nfunction")
+
+
+def test_value_at_reports_line_and_column_on_error():
+    text = "ns.Data = {\n  a = ,\n}\n"
+    with pytest.raises(ValueError, match="ligne 2"):
+        parse_lua_value_at(text, text.index("{"))
