@@ -1,6 +1,6 @@
 ---
 name: forever-router
-description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, PvP des 9 classes (contrôles, affrontements), builds de toutes les classes, fraîcheur des données, et ce que le projet ne couvre pas encore (champs de bataille, Legacy, métiers, réputations, hôtel des ventes, dégâts des autres classes). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
+description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, PvP des 9 classes (contrôles, affrontements), builds de toutes les classes, familiers du Chasseur (entraînement, capacités, où apprivoiser), fraîcheur des données, et ce que le projet ne couvre pas encore (champs de bataille, Legacy, métiers, réputations, hôtel des ventes, dégâts des autres classes). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
 ---
 
 # Routeur WoW Forever
@@ -48,10 +48,13 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Affrontement : mon Mage contre un Démoniste | `forever_lookup(kind="pvp", name, opponent, level, race, talents)` | `forever-pvp` |
 | Build d'une autre classe : légalité, effet des talents | `forever_lookup(kind="build_check", name=<classe>, level, talents)` | `forever-builds` |
 | Talent d'une autre classe | `forever_lookup(kind="talent", name, class_name=<classe>)` | `forever-builds` |
+| Familiers du Chasseur : entraînement, loyauté, apprivoisement (règles) | `forever_lookup(kind="pets")` | `forever-familiers` |
+| Capacités d'une famille de familier, rangs d'une capacité | `forever_lookup(kind="pets", name=<famille ou capacité>, rank)` | `forever-familiers` |
+| Où apprivoiser la bête qui enseigne un rang, près de ma zone | `forever_lookup(kind="pets", name, rank, zone, level)` | `forever-familiers` |
 | Données à jour ? version du jeu ? | `forever_status` | — |
 
-- Charge le skill du domaine (`forever-leveling`, `forever-mage`, `forever-pvp` ou `forever-builds`) dès que la
-  question en relève.
+- Charge le skill du domaine (`forever-leveling`, `forever-mage`, `forever-pvp`, `forever-builds` ou
+  `forever-familiers`) dès que la question en relève.
 - `forever_explain_mechanic` accepte un identifiant du registre (« A18 ») ou des mots de sa description (« Ignite ») ;
   plusieurs entrées : l'erreur liste « identifiant : description », choisis puis rappelle l'outil.
 - Calcul lourd (preset `complet`, plusieurs niveaux ou contextes à comparer) : sous-agent `forever-sim-runner`.
@@ -76,7 +79,8 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Consommables et préparation de raid | T11 |
 | Analyse de mes combats PvP (contrôles, recharges, morts, cibles) | AN1 |
 | Analyse de mes combats PvE (rotation réelle, écarts, perte chiffrée) | AN2 |
-| Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide : dégâts, rotations, leveling | PA1, DE1, PR1, CH1, CM1, GU1, VO1, DR1 |
+| Paladin, Démoniste, Prêtre, Chaman, Guerrier, Voleur, Druide : dégâts, rotations, leveling | PA1, DE1, PR1, CM1, GU1, VO1, DR1 |
+| Chasseur : dégâts, rotations, leveling, choix du familier par contexte (le savoir des familiers est couvert) | CH1 |
 
 Pour ces domaines : dis « je ne sais pas » (ou « le projet ne couvre pas encore … »), cite la tranche de
 `docs/ROADMAP.md`, et propose ce qui existe déjà (par exemple le niveau d'un donjon). Ne complète pas avec des

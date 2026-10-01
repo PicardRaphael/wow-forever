@@ -8,3 +8,7 @@ qui déclenche le plugin à tort). Les traces pointent vers `../transcripts/`.
 `aggregate_hook.json` et `trace_with_hook.jsonl` : un cas dont la trace porte le message du hook Stop (« Stop says:
 [forever:chiffres] … », forme relevée au bloc A) alors que la dernière réponse ne contient aucun chiffre : le rapport
 reprend le message du hook, qui a vu le transcript de la session, plutôt qu'un nouveau calcul sur la trace.
+
+`profile-chasseur.json` (CH0, D2) : profil de test à un seul personnage, un Chasseur Horde actif (nom et niveau
+inventés), passé par `env: EVAL_FOREVER_PROFILE` au seul cas `familiers-bite-rang-tarides` ; `profile-rempli.json`
+reste le profil des autres cas.

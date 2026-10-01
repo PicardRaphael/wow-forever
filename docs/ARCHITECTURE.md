@@ -114,7 +114,7 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
 - **Skills** : `forever-router` (aiguillage, carte des domaines couverts et non couverts avec leur tranche, classe pas
   encore calculée, format de réponse `format-reponse.md` avec la règle « question personnelle ou générale », règle
   « je ne sais pas », consignes « donnée manquante » et « pas encore construit », PV1), `forever-leveling`,
-  `forever-mage`, `forever-pvp` et `forever-builds` (PV1). Un skill par domaine et par usage : chaque tranche ajoute le
+  `forever-mage`, `forever-pvp` et `forever-builds` (PV1), `forever-familiers` (CH0). Un skill par domaine et par usage : chaque tranche ajoute le
   sien et met à jour la carte du routeur (décision 115). Chaque SKILL.md fait moins de 200 lignes, sans chiffre de jeu.
 - **Sous-agents** : `forever-web-researcher` (WebSearch, WebFetch ; sources étiquetées officielle, communautaire,
   simulateur ; rien n'entre dans `forever/data/`), `forever-sim-runner` (calculs lourds par les outils forever).
@@ -127,7 +127,7 @@ marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-f
   l'évaluation le justifie).
 - **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b, 0.3.0 le 2026-09-29 : décisions 116 et 117 ; 0.4.0 : décisions 118 à 121 ; 0.5.0 : PV1), relevée à chaque changement de `plugin/`, gardée par
   `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
-- **Évaluation** : `plugin/evals/` (41 questions réelles dont deux à profil vide, deux générales, deux personnelles, un personnage prévu et trois PvP, 21 voisines ; 62 cas depuis PV1 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`), contrôlée sans modèle en CI
+- **Évaluation** : `plugin/evals/` (44 questions réelles dont deux à profil vide, deux générales, deux personnelles, un personnage prévu, trois PvP et trois sur les familiers du Chasseur, 22 voisines ; 62 cas depuis PV1, 66 depuis CH0 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`, sauf le guide d'apprivoisement qui reçoit un profil de Chasseur `profile-chasseur.json`), contrôlée sans modèle en CI
   (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
   (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
 
@@ -142,6 +142,7 @@ Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la
 | Profil : import automatique (**fait, PV1**) | — | `forever profile import` (ForeverLogger, Questie, Auctionator, journaux ; changements listés avant accord) ; lecture par `forever_player_profile` | routeur (`format-reponse.md`) | PV1, T07 |
 | Builds de toutes les classes (**fait, PV1**) | `talent` avec `class_name` ; `build_check` (classe, niveau, talents) | `forever_build` (Mage) ; CLI `forever talents check` | `forever-builds` | PV1, puis chaque tranche de classe |
 | PvP (**fiches faites, PV1**) | `pvp` : fiche de classe (`name`, `level`) ou d'affrontement (`opponent`, `race`, `talents`, `opponent_level`), valeurs avec chemin `from` en `detail=true` ; CLI `forever pvp class`, `forever pvp matchup` ; à venir : champs de bataille, équipement PvP, rendements décroissants mesurés | Profil PvP du Mage : `forever_build`, contextes `pvp-bg` et `pvp-world` (rendements et bijou en PV2) | `forever-pvp` | PV1, PV2 (fiches en jeu : FA1p) |
+| Familiers du Chasseur (**savoir fait, CH0**) | `pets` : règles du système (sans `name`), fiche de famille, de capacité (`rank`, `detail`) ou de bête, guide d'apprivoisement (`zone`, `level`) ; CLI `forever pets rules / family / ability / beast / tame / crosscheck / mine` ; Forever Bestiary lu sur disque | Choix du familier par contexte, dégâts du familier : CH1 | `forever-familiers` | CH0, CH1 |
 | Analyse de mes combats PvP | — | `forever_analyze` (AN1) | `forever-analyse-pvp` | AN1, étendue par chaque tranche de classe |
 | Classes (Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide) | `spell`, `talent` de la classe | `forever_build` et `forever_sim_leveling` avec la classe (forme au plan) | `forever-<classe>` | PA1 à DR1, parties raid après T09 |
 | Analyse de mes combats PvE | — | `forever_analyze` (AN2) | `forever-analyse-pve` | AN2 |
