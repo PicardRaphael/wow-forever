@@ -66,9 +66,9 @@ from forever.pipeline.client_builds import (
     version_at,
 )
 from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
-from forever.pipeline.decode import Candidate, decode_version
+from forever.pipeline.decode import Candidate, decode_version, load_rules
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
-from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_tables
+from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_gametables, fetch_tables
 from forever.pipeline.install import InstallRefusedError, apply_install, plan_install, render_install_report
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
 from forever.pipeline.measure import (
@@ -174,6 +174,9 @@ def build_parser() -> argparse.ArgumentParser:
     fetch.add_argument("--tables", help="tables séparées par des virgules (défaut : decode_rules.json)")
     fetch.add_argument("--locale", help="locales séparées par des virgules (défaut : enUS)")
     fetch.add_argument("--refresh", action="store_true", help="retélécharger même si le cache est conforme")
+    fetch.add_argument(
+        "--gametables", action="store_true", help="GameTables de decode_rules.json (api/casc, T08b) au lieu des tables"
+    )
     fetch.add_argument("--offline", action="store_true", help="refuser tout appel réseau")
     fetch.add_argument("--json", action="store_true", help="sortie JSON")
 
@@ -760,6 +763,8 @@ def _fetch_defaults(deps: Deps) -> tuple[list[str], dict[str, list[str]]]:
 def _cmd_fetch(deps: Deps, args: argparse.Namespace) -> int:
     deps = replace(deps, offline=deps.offline or args.offline)
     results: list[TableFetch] = []
+    if args.gametables:
+        return _fetch_gametables(deps, args)
     if args.tables:
         locales = _split(args.locale) if args.locale else [DEFAULT_LOCALE]
         results = fetch_tables(deps, args.version, _split(args.tables), locales=locales, refresh=args.refresh)
@@ -778,6 +783,30 @@ def _cmd_fetch(deps: Deps, args: argparse.Namespace) -> int:
         for r in results
     ]
     payload = {"version": args.version, "tables": results, "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _fetch_gametables(deps: Deps, args: argparse.Namespace) -> int:
+    _, rules = load_rules(deps.data_dir)
+    gametables = rules.get("gametables")
+    if not isinstance(gametables, dict) or not gametables:
+        raise InvalidArgumentError(
+            "Aucune GameTable dans decode_rules.json.", "ajouter gametables (nom -> identifiant de fichier)"
+        )
+    results = fetch_gametables(
+        deps, args.version, {str(k): int(v) for k, v in gametables.items()}, refresh=args.refresh
+    )
+    provenance = local_provenance(deps)
+    downloaded = sum(1 for r in results if not r["from_cache"])
+    lines = [f"GameTables de {args.version} : {len(results)} ({downloaded} téléchargée(s))"]
+    lines += [
+        f"  {r['name']} ({r['file_id']}) · "
+        + ("absente du build (réponse vide)" if r["absent"] else f"{r['bytes']} octets")
+        + (" · cache" if r["from_cache"] else "")
+        for r in results
+    ]
+    payload = {"version": args.version, "gametables": results, "provenance": provenance}
     _emit(payload, lines, provenance, args.json)
     return EXIT_OK
 

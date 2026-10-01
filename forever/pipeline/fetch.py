@@ -50,21 +50,75 @@ class GameTableFetch(TypedDict):
 
 
 def gametable_url(file_id: int, version: str) -> str:
-    raise NotImplementedError
+    """Adresse d'une GameTable (fichier texte à tabulations) par son identifiant de fichier."""
+    return GAMETABLE_URL.format(file_id=file_id, version=version)
 
 
 def gametable_path(cache_dir: Path, version: str, name: str) -> Path:
-    raise NotImplementedError
+    return wago_dir(cache_dir, version) / GAMETABLES_DIR / f"{name}.txt"
 
 
 def looks_like_gametable(body: bytes) -> bool:
-    raise NotImplementedError
+    """Texte UTF-8 dont la première ligne est une entête à tabulations (refuse une page HTML ou un JSON)."""
+    try:
+        text = body.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return False
+    header = text.split("\n", 1)[0].rstrip("\r")
+    return "\t" in header and all(_HEADER_FIELD_RE.fullmatch(f) for f in header.split("\t"))
 
 
 def fetch_gametables(
     deps: Deps, version: str, gametables: Mapping[str, int], *, refresh: bool = False
 ) -> list[GameTableFetch]:
-    raise NotImplementedError
+    """Télécharge chaque GameTable (nom -> identifiant de fichier, `decode_rules.json` `gametables`), une requête
+    par fichier. Une réponse vide veut dire « absente du build » : elle est notée dans l'index (`absent`), jamais
+    remplacée par une autre table ni par une autre version. Cache et index partagés avec les tables DB2
+    (`gametables/<nom>` dans `fetch.json`)."""
+    _check_arguments(version, ["GameTables"], [DEFAULT_LOCALE])
+    if deps.offline:
+        raise OfflineError("le téléchargement des GameTables")
+    ipath = index_path(deps.cache_dir, version)
+    index = _read_index(ipath, version)
+    results: list[GameTableFetch] = []
+    failures: list[str] = []
+    headers = {"User-Agent": USER_AGENT, "Accept": "text/plain"}
+    for name, file_id in gametables.items():
+        key = f"{GAMETABLES_DIR}/{name}"
+        path = gametable_path(deps.cache_dir, version, name)
+        entry = index.get(key)
+        fresh = not refresh and entry is not None and entry.get("file_id") == file_id
+        if fresh and entry is not None and (entry.get("absent") or _cached(path, entry) is not None):
+            results.append({**entry, "from_cache": True})  # type: ignore[typeddict-item]
+            continue
+        url = gametable_url(file_id, version)
+        try:
+            body = deps.http_get(url, headers, FETCH_TIMEOUT)
+        except OSError as exc:
+            failures.append(f"{key} ({exc})")
+            continue
+        absent = len(body) == 0
+        if not absent and not looks_like_gametable(body):
+            failures.append(f"{key} (réponse qui n'est pas une GameTable)")
+            continue
+        if not absent:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(body)
+        entry = {
+            "name": name,
+            "file_id": file_id,
+            "url": url,
+            "sha256": hashlib.sha256(body).hexdigest(),
+            "bytes": len(body),
+            "fetched_at": format_utc(deps.now()),
+            "absent": absent,
+        }
+        index[key] = entry
+        _write_index(ipath, version, index)
+        results.append({**entry, "from_cache": False})  # type: ignore[typeddict-item]
+    if failures:
+        raise FetchFailedError(f"Téléchargement impossible pour {version} : {' ; '.join(failures)}.")
+    return results
 
 
 def table_url(table: str, version: str, locale: str | None) -> str:
