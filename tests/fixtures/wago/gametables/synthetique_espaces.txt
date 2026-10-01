@@ -1,0 +1,2 @@
+Level	Warrior	Death Knight	Demon Hunter
+1	0	0	0
