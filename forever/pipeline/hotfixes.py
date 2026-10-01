@@ -47,6 +47,10 @@ def parse_hotfix_log(text: str, year: int) -> list[HotfixLine]:
     return out
 
 
+def read_log(path: Path) -> list[HotfixLine]:
+    raise NotImplementedError
+
+
 def log_year(path: Path) -> int:
     return datetime.fromtimestamp(path.stat().st_mtime, tz=UTC).year
 
