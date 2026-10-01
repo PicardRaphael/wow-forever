@@ -1007,6 +1007,11 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
 
 
 MAGE_CLASS = "Mage"  # moteur du Mage : ses ratios dans character_scaling.json
+ABLATABLE: tuple[str, ...] = ()
+
+
+def ablated(names: set[str]) -> Any:
+    raise NotImplementedError
 PERCENT = 100.0  # conversion d'unité : pourcentage du client -> fraction
 
 
