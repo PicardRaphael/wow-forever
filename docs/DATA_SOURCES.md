@@ -123,5 +123,14 @@ Non conseillés pour l'instant : MobInfo2 (dernier fichier du 2026-09-20, antér
 
 Écartés : addons sans version Forever (Exalted, RepMatic, GrindPlus, HonorSpy, Rank Marshal, What's Crafting?, WhatItDrops…), ForeverQuest (base Classic, licence incohérente : « All Rights Reserved » sur des données de Questie en GPLv3), ForeverWisp (quêtes Classic-DB), AtlasLootClassic Continued (donjons Forever en attente).
 
+## Notes officielles de Blizzard (T08b, bloc F, décision 148)
+Forum de Blizzard (Discourse), catégories 349 (discussion de la bêta) et 347 (discussion générale de Forever), lu par
+`forever notes` **à la main seulement** (ou proposé par `forever watch` quand le build du client change) ; workflow
+`notes-watch` en `workflow_dispatch` seul. Rang de la source : **signal**, jamais une valeur. Une note ne change aucune
+donnée ; une règle du serveur sans autre source peut passer de `suppose` à `probable` par un texte officiel, seule la
+mesure (journaux, relevé en jeu) donne `certain`. Le sujet « Known Issues » liste des bugs reconnus : jamais modélisés.
+
 ## API Blizzard (décision 126, tranche EC1)
 Gardée par le lancement et la vérification de la couverture de Forever. Tout ce que l'API couvre pour Forever : prix de l'hôtel des ventes ; fiches de personnages (niveau, équipement, talents si disponibles) ; PvP (honneur, rang, classements). Clés dans `.env` (ignoré par git, jamais lu par les tests). Le client futur vivra dans `forever/pipeline/bnet.py` (via `Deps.http_get`) et sera ajouté à la liste réseau de CLAUDE.md et de `tests/unit/test_network_boundary.py` ce jour-là, **après accord de l'utilisateur** pour chaque nouvel accès réseau. Aucun code avant EC1.
+
+T08b (point 10, décision 149) : `forever api probe` sonde chaque jour (workflow `api-probe`, clés dans les secrets du dépôt) les espaces de noms candidats de Forever (`static-`/`dynamic-forever-<région>`, `static-`/`dynamic-classicforever-<région>`) sur l'index des royaumes, les classes jouables, un objet connu, les royaumes connectés et les saisons PvP ; jamais un espace de Retail, de Classic Era, de Classic ni de TBC. Premier passage du 2026-10-01 : jeton obtenu, aucun espace candidat ne répond (403). Une issue `api-blizzard` s'ouvre dès qu'un espace répond, pour décider du démarrage d'EC1.

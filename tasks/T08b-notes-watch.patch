@@ -1,0 +1,61 @@
+diff --git a/.github/workflows/notes-watch.yml b/.github/workflows/notes-watch.yml
+new file mode 100644
+--- /dev/null
++++ b/.github/workflows/notes-watch.yml
+@@ -0,0 +1,56 @@
++name: notes-watch
++# Veille des notes officielles du forum de Blizzard (T08b, bloc F). Lancée À LA MAIN SEULEMENT (décision 148) :
++# l'utilisateur a une clé d'API Blizzard, les conditions des API (§ 2.16) interdisent les requêtes automatisées vers
++# les sites de Blizzard hors des API autorisées : jamais de `schedule` ici. Réseau : forever notes seulement
++# (robots.txt relu à chaque passage, une requête par catégorie suivie puis une par sujet officiel).
++# Une issue `veille-notes` par note nouvelle ou révisée ; l'état vit dans le corps des issues (marqueur caché).
++on:
++  workflow_dispatch:
++permissions:
++  contents: read
++  issues: write
++concurrency:
++  group: notes-watch
++  cancel-in-progress: false
++jobs:
++  notes:
++    runs-on: ubuntu-24.04
++    timeout-minutes: 15
++    steps:
++      - uses: actions/checkout@v7
++      - uses: astral-sh/setup-uv@v10.2.0
++      - run: uv sync
++
++      - name: État lu dans les issues
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: |
++          set -euo pipefail
++          gh label create veille-notes --color 1d76db --description "Notes officielles de Blizzard (forever notes)" 2>/dev/null || true
++          gh issue list --label veille-notes --state all --limit 200 --json number,body > issues.json
++
++      - name: Notes nouvelles ou révisées
++        run: uv run forever notes --json --state-from-issues issues.json > notes.json
++
++      - name: Ouvrir ou mettre à jour une issue par note
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: |
++          set -euo pipefail
++          uv run python - <<'PY'
++          import json, subprocess
++          notes = json.load(open("notes.json", encoding="utf-8"))["notes"]
++          issues = json.load(open("issues.json", encoding="utf-8"))
++          for note in notes:
++              marker = f'"topic_id": {note["topic_id"]},'
++              existing = next((i for i in issues if marker in (i.get("body") or "")), None)
++              title = f"Note officielle : {note['title']}"
++              with open("body.md", "w", encoding="utf-8") as f:
++                  f.write(note["issue_body"])
++              if existing:
++                  subprocess.run(["gh", "issue", "edit", str(existing["number"]), "--body-file", "body.md"], check=True)
++                  subprocess.run(["gh", "issue", "reopen", str(existing["number"])], check=False)
++              else:
++                  subprocess.run(["gh", "issue", "create", "--title", title, "--label", "veille-notes", "--body-file", "body.md"], check=True)
++          print(f"{len(notes)} note(s) traitée(s)")
++          PY

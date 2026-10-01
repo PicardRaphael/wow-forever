@@ -1,0 +1,53 @@
+diff --git a/.github/workflows/api-probe.yml b/.github/workflows/api-probe.yml
+new file mode 100644
+--- /dev/null
++++ b/.github/workflows/api-probe.yml
+@@ -0,0 +1,48 @@
++name: api-probe
++# Sonde quotidienne de l'API Blizzard (T08b, point 10, décision 149) : usage autorisé des API (client credentials),
++# espaces de noms candidats de Forever seulement (jamais Retail, Classic Era, Classic ni TBC). Dès qu'un espace de
++# Forever répond, ouvre une issue `api-blizzard` (une seule) avec la couverture (Game Data, Profile, hôtel des ventes,
++# PvP), pour décider du démarrage d'EC1. Clés dans les secrets du dépôt BLIZZARD_CLIENT_ID et BLIZZARD_CLIENT_SECRET,
++# jamais dans le code ni les journaux (la commande ne les affiche pas). Réseau : forever api probe seulement.
++on:
++  schedule:
++    - cron: "41 6 * * *"
++  workflow_dispatch:
++permissions:
++  contents: read
++  issues: write
++concurrency:
++  group: api-probe
++  cancel-in-progress: false
++jobs:
++  probe:
++    runs-on: ubuntu-24.04
++    timeout-minutes: 10
++    steps:
++      - uses: actions/checkout@v7
++      - uses: astral-sh/setup-uv@v10.2.0
++      - run: uv sync
++
++      - name: Sonde
++        env:
++          BLIZZARD_CLIENT_ID: ${{ secrets.BLIZZARD_CLIENT_ID }}
++          BLIZZARD_CLIENT_SECRET: ${{ secrets.BLIZZARD_CLIENT_SECRET }}
++        run: uv run forever api probe --json --env-file /dev/null > probe.json
++
++      - name: Issue si un espace de Forever répond
++        env:
++          GH_TOKEN: ${{ github.token }}
++        run: |
++          set -euo pipefail
++          needed=$(uv run python -c "import json;print('oui' if json.load(open('probe.json', encoding='utf-8'))['issue_needed'] else 'non')")
++          echo "Espace de Forever qui répond : $needed"
++          if [ "$needed" = "oui" ]; then
++            gh label create api-blizzard --color 5319e7 --description "L'API Blizzard couvre Forever (EC1)" 2>/dev/null || true
++            open=$(gh issue list --label api-blizzard --state open --json number --jq 'length')
++            uv run python -c "import json;open('body.md','w',encoding='utf-8').write(json.load(open('probe.json',encoding='utf-8'))['issue_body'])"
++            if [ "$open" = "0" ]; then
++              gh issue create --title "L'API Blizzard répond pour Forever : décider d'EC1" --label api-blizzard --body-file body.md
++            else
++              gh issue comment "$(gh issue list --label api-blizzard --state open --json number --jq '.[0].number')" --body-file body.md
++            fi
++          fi

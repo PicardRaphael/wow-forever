@@ -17,7 +17,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - Chaque résultat d'outil (CLI, MCP) porte un bloc `provenance` : version du jeu, empreinte des données, date, certitude (`certain`, `probable`, `suppose`).
 - Toute mécanique ajoutée ou modifiée met à jour son entrée dans `docs/MECHANICS_REGISTRY.yaml` (statut, source, tests).
 - Règle de jeu incertaine : ne pas deviner. Marquer `suppose` avec une note et ajouter la question dans `docs/OPEN_QUESTIONS.md`. Un comportement que Blizzard a reconnu comme bug (message officiel ou correctif annoncé) n'est jamais modélisé.
-- Pas de réseau dans les tests (`tests/fixtures/` seulement). Les sources locales du client (journaux, addons, SavedVariables, dossier `FOREVER_WOW_DIR`) se lisent sur disque, jamais par le réseau, et jamais dans les tests. Seuls `forever status`, l'outil MCP `forever_status`, `forever builds` et `forever fetch` touchent Internet (via `forever/pipeline/`).
+- Pas de réseau dans les tests (`tests/fixtures/` seulement). Les sources locales du client (journaux, addons, SavedVariables, dossier `FOREVER_WOW_DIR`) se lisent sur disque, jamais par le réseau, et jamais dans les tests. Seuls `forever status`, l'outil MCP `forever_status`, `forever builds`, `forever fetch`, `forever notes` (lancé à la main seulement, décision 148) et `forever api probe` (API Blizzard, décision 149) touchent Internet (via `forever/pipeline/`).
 
 ## Addon (`addon/`, règles détaillées dans `docs/ADDON.md`)
 - SavedVariable initialisée dans le gestionnaire d'`ADDON_LOADED` ; jamais d'alias local au niveau du fichier.
