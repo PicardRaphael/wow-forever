@@ -121,6 +121,7 @@ from forever.sim.leveling_mc import KillResult
 from forever.status import StatusReport, status_report
 from forever.store import current_identity, ensure_integrity, load_version, read_sources
 from forever.timefmt import format_utc
+from forever.watch import watch
 
 SCHOOLS_FR = {"frost": "givre", "fire": "feu", "arcane": "arcane", "frostfire": "givrefeu"}
 FOREVER_FR = {"oui": "identique", "modifie": "modifié", "inconnu": "inconnu"}
@@ -295,6 +296,10 @@ def build_parser() -> argparse.ArgumentParser:
     info = questie_sub.add_parser("info", help="version et contenu de l'addon Questie installé")
     info.add_argument("--dir", help="dossier de l'addon (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)")
     info.add_argument("--json", action="store_true", help="sortie JSON")
+
+    w = sub.add_parser("watch", help="veille locale : client, addons, correctifs, journaux (hors ligne, rien lancé)")
+    w.add_argument("--report", action="store_true", help="écrire le résumé dans le cache (tâche planifiée)")
+    w.add_argument("--json", action="store_true", help="sortie JSON")
 
     addons = sub.add_parser("addons", help="addons de données installés (lecture locale)")
     addons_sub = addons.add_subparsers(dest="addons_command", required=True, parser_class=_Parser)
@@ -1641,6 +1646,19 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_watch(deps: Deps, args: argparse.Namespace) -> int:
+    result = watch(deps, report=args.report)
+    provenance = local_provenance(deps, assumptions=["veille locale : rien n'est lancé, actions proposées seulement"])
+    lines = [f"Veille locale ({result['wow_dir'] or 'client absent'}) : {len(result['events'])} changement(s)"]
+    for e in result["events"]:
+        lines.append(f"  {e['kind']} : {e['detail']}")
+        lines += [
+            f"    proposé : {a['command']}" + (" (réseau, sur accord)" if a["network"] else "") for a in e["actions"]
+        ]
+    _emit({**result, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
     report = addons_status(deps, save=args.save, addons_dir=Path(args.dir) if args.dir else None)
     provenance = local_provenance(
@@ -2016,6 +2034,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "origins": _cmd_origins,
         "hotfixes": _cmd_hotfixes,
         "addons": _cmd_addons,
+        "watch": _cmd_watch,
         "monsters": _cmd_monsters_build,
         "measures": _cmd_measures_refresh,
         "sim": _cmd_sim,

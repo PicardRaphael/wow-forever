@@ -38,6 +38,20 @@ powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1
 Le script refait `uv sync`, met à jour la marketplace et recopie le plugin (`claude plugin update`). Redémarrer
 Claude Code ensuite.
 
+## Veille locale (T08b)
+`uv run forever watch` (hors ligne) compare le poste au dernier passage : build du client (`.build.info`), addons de
+données (empreintes), correctifs du serveur (`Logs/Hotfix.log`), nouveaux journaux de combat et sauvegardes d'addons.
+Elle **ne lance rien** : chaque changement est suivi des commandes proposées, marquées « réseau, sur accord » quand
+elles touchent Internet (`forever notes` est proposé quand le build change, décision 148). Détail des briques :
+`forever addons status [--save]`, `forever hotfixes [--since-install]`.
+
+Tâche planifiée Windows (une fois par jour, résumé dans le cache, affiché par la ligne de démarrage de session) :
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1 -WhatIf   # voir ce qui serait créé
+powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1           # créer (08:00), -At 21:30 pour une autre heure
+powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1 -Remove   # retirer
+```
+
 ## Poser une question
 Lancer `claude` dans n'importe quel dossier et poser la question en français. Exemples :
 

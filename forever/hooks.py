@@ -365,6 +365,14 @@ def session_line(deps: Deps, environ: Mapping[str, str]) -> str:
                 parts.append(f"fraîcheur {state}{latest} ({checked} ; {todo})")
         parts.append(f"registre {rep['registry_coverage']}")
         line = " · ".join(parts)
+    try:
+        from forever.watch import watch_line
+
+        extra = watch_line(deps)  # T08b, bloc G : changement relevé par la veille locale, une seule ligne
+    except Exception:  # noqa: BLE001 : un hook ne doit jamais gêner la session
+        extra = None
+    if extra:
+        line += f" · {extra}"
     if not environ.get("FOREVER_HOME"):
         line += " · FOREVER_HOME absent : lancer scripts/install_plugin.ps1 (le plugin en a besoin hors du dépôt)"
     return line.replace("\n", " ")
