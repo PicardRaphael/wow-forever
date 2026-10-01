@@ -24,19 +24,36 @@ Priorités : PvP en champs de bataille, donjons et leveling d'abord ; raid ensui
 | P0 | Profil | Profil du personnage actif (plusieurs personnages, toutes classes) rempli et mis à jour automatiquement depuis plusieurs sources croisées : ForeverLogger (niveau, talents, observations), sauvegardes des autres addons (quêtes faites dans Questie, mes prix d'Auctionator), journaux, puis l'API Blizzard après le lancement ; source et date par champ, la plus récente l'emporte (à date égale la plus directe), écart signalé ; ce que le joueur dit dans sa question l'emporte pour la réponse en cours (décision 122) ; mise à jour proposée quand le joueur dit « j'ai … » (décision 125) | T06b, PV1 (import minimal, règle de fusion), T07 (import complet), EC1 (API) |
 | P0 | PvP | Savoir des 9 classes (sorts, recharges, contrôles et durées, défensifs, raciaux de toutes les races et des nouvelles combinaisons race et classe, décodés du client, bijoux, rendements décroissants), fiches par affrontement ; champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux ; fiche fixe de la classe adverse en jeu | PV1, PV2, FA1p |
 | P0 | Analyse de mes combats | PvP (contrôles donnés et subis avec rendements décroissants, recharges utilisées, gâchées ou tardives, burst, interruptions, morts et leur cause, cibles, comparés aux fiches de PV1) ; PvE (rotation réelle, écarts avec la rotation optimale, perte chiffrée par rejeu du même combat, chaque boss) ; taux réels comparés au modèle ; `forever analyze`, outil MCP, rapport avec graphique ; en local, autres joueurs anonymisés | AN1, AN2, FA3 |
-| P0 | Toutes les classes | Moteur de chacune des 8 autres classes (ressources, rotations, simulateurs, builds par contexte) pour le leveling, le donjon et le PvP ; raid avec T09 ou la partie raid de la classe ; avant son moteur, builds de la communauté vérifiés sur le client, certitude au mieux supposée | PA1, DE1, PR1, CH1, CM1, GU1, VO1, DR1 ; T09, PA1r à DR1r |
-| P0 | Donjons | Niveaux, boss, butin ; « où trouver tel objet » (boss et donjon) ; addons de données lus et suivis par version (`forever addons status`) ; observations de ForeverLogger (marchands, butin, réputation) | DJ1 |
+| P0 | Toutes les classes | Moteur de chacune des 8 autres classes (ressources, rotations, simulateurs, builds par contexte) pour le leveling, le donjon et le PvP, pour **toutes** les spécialisations et **tous** les rôles de la classe, chaque build jugé sur la mesure de son rôle (section « Classes, spécialisations et rôles ») ; raid avec T09 ou la partie raid de la classe ; avant son moteur, builds de la communauté vérifiés sur le client, certitude au mieux supposée | PA1, DE1, PR1, CH1, CM1, GU1, VO1, DR1 ; T09, PA1r à DR1r |
+| P0 | Donjons | Niveaux, boss, butin ; « où trouver tel objet » (boss et donjon) ; addons de données lus et suivis par version (`forever addons status`, fait en T08b) ; observations de ForeverLogger (marchands, butin, réputation) | DJ1 |
 | P1 | Legacy | Défis, points, arbres de bonus, conseil des bonus pour chacun de mes personnages, suivi de la progression | LG1, LG2 |
 | P1 | Raid | DPS analytique et Monte Carlo par build, comparaison au simulateur wowsims Forever ; toutes les classes | T09, PA1r à DR1r |
 | P1 | Graphiques | Images générées par outil : temps par niveau, comparaison de builds, gains d'équipement, écarts entre versions | T04b puis au fil des tranches |
 | P1 | Mémoire joueur | Fiches de personnages dans le vault, importées depuis l'addon d'export | T07 |
-| P1 | Veille | Détection de version toutes les 6 h, diff, compte rendu d'impact par personnage ; versions des addons de données (relecture et changements signalés) | T08 |
+| P1 | Veille | Détection de version toutes les 6 h, diff (valeurs de `spell_scaling.json` comprises), compte rendu d'impact par personnage ; ratios du personnage décodés du client ; versions des addons de données (relecture et changements signalés) ; correctifs du serveur listés ; notes officielles de Blizzard lues chaque jour ; veille locale au démarrage d'une session ; origine déclarée de chaque valeur des données | T08a, T08b, T08 |
 | P1 | Métiers | Recettes, plan de montée de compétence, points Legacy des métiers, répartition des métiers entre mes personnages | MT1 |
 | P2 | Réputations | Factions, paliers, gains, récompenses, plan et suivi ; « combien coûte telle réputation » (temps, objets remis) | RP1 |
 | P2 | API Blizzard | Tout ce que l'API couvre pour Forever, après le lancement du 4 novembre et la vérification de sa couverture : prix de l'hôtel des ventes, fiches de personnages (niveau, équipement, talents si disponibles), PvP (honneur, rang, classements) ; « où j'en suis en PvP » ; chaque accès réseau soumis à accord (décision 126) | EC1 |
 | P2 | Équipement | Base d'objets par formules du client, optimiseur sous contraintes ; plan d'équipement par personnage et par contexte (meilleur objet accessible par emplacement, où l'obtenir, coût, temps estimé) ; « quel objet viser à mon niveau » (décision 129) | T10 |
 | P2 | Consommables | Plan par zone, métier et budget (flacons conditionnés par zone, non-cumuls, recharges partagées) | T11 |
 | P3 | Autres surfaces | Serveur MCP distant pour Claude.ai et ChatGPT ; site statique par version | T13 |
+
+## Classes, spécialisations et rôles
+Chaque tranche de classe couvre toutes les spécialisations de sa classe et tous les rôles qu'elles tiennent (décision 146). Un build est jugé sur la mesure de son rôle : **dégâts** → dégâts par seconde ; **soins** → soins par seconde et efficacité de la mana (soins par point de mana dépensé) ; **tank** → dégâts encaissés (après mitigation) et menace générée. En leveling, la mesure reste le temps par monstre et l'XP par heure, quelle que soit la spécialisation ; le PvP reste un profil comparatif.
+
+| Classe | Spécialisations (rôle) |
+| --- | --- |
+| Paladin | Sacré (soins), Protection (tank), Vindicte (dégâts) |
+| Chasseur | Maîtrise des bêtes, Précision, Survie (dégâts) |
+| Démoniste | Affliction, Démonologie, Destruction (dégâts) |
+| Prêtre | Discipline (soins), Sacré (soins), Ombre (dégâts) |
+| Druide | Équilibre (dégâts), Farouche félin (dégâts) et ours (tank), Restauration (soins) |
+| Chaman | Élémentaire (dégâts), Amélioration (dégâts), Restauration (soins) |
+| Guerrier | Armes (dégâts), Fureur (dégâts), Protection (tank) |
+| Voleur | Assassinat, Combat, Finesse (dégâts) |
+| Mage | Arcanes, Feu, Givre (dégâts) |
+
+Les briques communes aux soigneurs et aux tanks (soins, mitigation, menace) sont construites dans la première tranche qui en a besoin, PA1 (Paladin Sacré et Protection), puis reprises par PR1, CM1, GU1 et DR1 (`docs/ROADMAP.md`, « Tranches de classe »).
 
 ## Domaines et sources
 Chaque valeur garde sa source et sa certitude. « — » : la source n'apporte rien à ce domaine. Les noms de tables du client non encore relevés sont à identifier à l'inventaire de la tranche, jamais présumés.
