@@ -549,5 +549,13 @@
     "certainty": "certain"
    }
   }
- }
+ },
+ "gametables": {
+  "armormitigationbylvl": 1385707,
+  "basemp": 1391664,
+  "hppersta": 1391642,
+  "npctotalhp": 1391652,
+  "xp": 1391661
+ },
+ "gametables_note": "T08b, bloc A : identifiants de fichier des GameTables du client (wago.tools/files?search=gametables/<nom>, relevé du 2026-10-01), lues par https://wago.tools/api/casc/<identifiant>?version=<build> ; réponse vide = absente du build, jamais remplacée par une autre"
 }

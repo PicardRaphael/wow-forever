@@ -8,7 +8,7 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -18,6 +18,8 @@ from forever.manifest import VERSION_DIR_RE
 from forever.timefmt import format_utc
 
 DB2_URL = "https://wago.tools/db2/{table}/csv?build={version}"
+GAMETABLE_URL = "https://wago.tools/api/casc/{file_id}?version={version}"  # T08b, bloc A : GameTables
+GAMETABLES_DIR = "gametables"
 DEFAULT_LOCALE = "enUS"
 INDEX_NAME = "fetch.json"
 INDEX_SCHEMA_VERSION = 1
@@ -34,6 +36,35 @@ class TableFetch(TypedDict):
     bytes: int
     fetched_at: str
     from_cache: bool
+
+
+class GameTableFetch(TypedDict):
+    name: str
+    file_id: int
+    url: str
+    sha256: str
+    bytes: int
+    fetched_at: str
+    from_cache: bool
+    absent: bool
+
+
+def gametable_url(file_id: int, version: str) -> str:
+    raise NotImplementedError
+
+
+def gametable_path(cache_dir: Path, version: str, name: str) -> Path:
+    raise NotImplementedError
+
+
+def looks_like_gametable(body: bytes) -> bool:
+    raise NotImplementedError
+
+
+def fetch_gametables(
+    deps: Deps, version: str, gametables: Mapping[str, int], *, refresh: bool = False
+) -> list[GameTableFetch]:
+    raise NotImplementedError
 
 
 def table_url(table: str, version: str, locale: str | None) -> str:

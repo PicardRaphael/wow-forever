@@ -78,7 +78,8 @@
       "file": "decode_rules.json",
       "paths": [
         "/classes_note",
-        "/races_note"
+        "/races_note",
+        "/gametables_note"
       ],
       "reason": "notes de lecture, texte"
     }
@@ -934,7 +935,8 @@
         "/racial_values",
         "/pvp_trinkets",
         "/pvp_classification",
-        "/retired_files"
+        "/retired_files",
+        "/gametables"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1)",
