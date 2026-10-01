@@ -28,6 +28,7 @@ from forever.pipeline.character_scaling import (
     load_gametables,
 )
 from forever.pipeline.fetch import DEFAULT_LOCALE, wago_dir
+from forever.pipeline.pets import PETS_FILE, decode_pets, load_pet_tables, own_pet_table_files, pet_table_files
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
 from forever.timefmt import format_utc
@@ -1582,6 +1583,21 @@ def decode_version(
             + (f" ({len(c['gaps'])} écart(s))" if c["gaps"] else "")
             for c in char_doc["crosscheck"]
         ]
+    # CH0, bloc A : familiers du Chasseur (pet_tables) : tables propres toutes présentes (décodé) ou toutes
+    # absentes (noté absent, jamais hérité) ; une partie est une erreur.
+    own_pet = own_pet_table_files(rules)
+    pet_missing = [rel for _, rel in own_pet if not (csv_dir / rel).is_file()]
+    if pet_missing and len(pet_missing) < len(own_pet):
+        raise CsvMissingError(version, pet_missing)
+    if own_pet and not pet_missing:
+        all_missing = [rel for _, rel in pet_table_files(rules) if not (csv_dir / rel).is_file()]
+        if all_missing:
+            raise CsvMissingError(version, all_missing)
+        pets_doc = decode_pets(load_pet_tables(csv_dir, rules), rules, version)
+        decoded_classes[PETS_FILE] = pets_doc
+        extra_notes += [f"{PETS_FILE} : {o}" for o in pets_doc["observations"]]
+    elif own_pet:
+        extra_notes.append(f"{PETS_FILE} absent : tables des familiers absentes de {csv_dir.name}")
     inherited = {}
     optional = (*CLASS_FILES, *CHARACTER_FILES)
     names = [*INHERITED_FILES, *(n for n in optional if n not in decoded_classes)]
@@ -1621,9 +1637,13 @@ def decode_version(
         "pvp_items.json": "bijoux dont le sort d'utilisation rompt un contrôle (decode_rules.json, pvp_trinkets)",
         CHARACTER_FILE: "ratios du personnage par classe et par niveau, XP, repos, constante d'armure, courbes de "
         "régénération (decode_rules.json, character_scaling) ; recoupement par les GameTables dans crosscheck",
+        PETS_FILE: "familles du Chasseur, capacités et rangs, bonus de famille, régimes, cartes (decode_rules.json, "
+        "pets) ; écarts internes au client dans observations",
     }
     class_certainty_note = {
         CHARACTER_FILE: "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
+        PETS_FILE: "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits "
+        "du masque) et effets de Hunter Pet Scaling : sens probable",
     }
     sources = {
         **{k: v for k, v in local_sources.items() if k != "files"},

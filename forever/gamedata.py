@@ -1183,6 +1183,20 @@ def load_game_data(deps: Deps) -> GameData:
 
 
 PVP_RULES_FILE = "pvp_rules.json"  # règles du serveur des rendements décroissants (PV1, suppose)
+PETS_FILE = "pets.json"  # familiers du Chasseur décodés du client (CH0)
+
+
+def read_pets(version: VersionData) -> dict[str, Any] | None:
+    """`pets.json` de la version (lecture seule, aucun calcul) ; None si la version n'en a pas."""
+    if not (version.path / PETS_FILE).is_file():
+        return None
+    try:
+        doc = version.read_json(PETS_FILE)
+    except (OSError, ValueError) as exc:
+        raise DataSchemaError(f"{PETS_FILE} de {version.game_version} illisible ({exc}).") from exc
+    if not isinstance(doc, dict) or not isinstance(doc.get("families"), dict):
+        raise _Reader(PETS_FILE).fail("families", "objet")
+    return doc
 
 
 def dr_rules(raw: Any) -> DrRules:

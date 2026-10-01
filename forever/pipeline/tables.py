@@ -105,6 +105,14 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
         "ID:int CondType:int TraitTreeID:int TraitNodeGroupID:int TraitNodeID:int TraitCurrencyID:int "
         "SpentAmountRequired:int RequiredLevel:int"
     ),
+    # CH0, bloc A : familiers du Chasseur (decode_rules.json, pet_tables). SkillLineAbility relue avec la chaîne des
+    # rangs et la colonne sans nom du coût en points d'entraînement (pets.training_cost_column, sens probable).
+    "PetSkillLineAbility": _cols(
+        "ID:int SkillLine:int Spell:int AcquireMethod:int SupercedesSpell:int Field_5_5_4_67090_014_1:int"
+    ),
+    "CreatureFamily": _cols("ID:int Name_lang:str PetFoodMask:int PetTalentType:int SkillLine_0:int SkillLine_1:int"),
+    "ItemPetFood": _cols("ID:int Name_lang:str"),
+    "UiMap": _cols("ID:int Name_lang:str ParentUiMapID:int Type:int"),
 }
 
 
