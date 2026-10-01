@@ -24,9 +24,10 @@ Les valeurs de jeu ne sont pas recopiées ici : chaque famille est désignée pa
   rendements décroissants, le profil PvP du Mage, les rencontres, et les champs de `spells.json` autres que les
   rangs (utilitaires, ralentis, portées, coût en pourcentage du mana de base).
 - **Aucune GameTable n'est lue aujourd'hui** : la liste des tables téléchargées (`decode_rules.json`, `tables` et
-  `class_tables`) ne contient aucune table `gt*`. Or le client en porte plusieurs (section 2) : l'Intelligence
-  par point de critique, la mana de base et l'XP par niveau sont décodables par la même adresse wago.tools que
-  les tables actuelles. Les deux premières **diffèrent nettement des estimations du moteur en début de leveling**
+  `class_tables`) ne contient aucune table `gt*`. Or le client porte plusieurs ratios dans des tables **DB2**
+  (section 2), décodables par la même adresse wago.tools que les tables actuelles : l'Intelligence par point de
+  critique (seulement dans `PlayerExpectedStat` : la GameTable `chancetospellcrit` est vide), la mana de base et
+  l'XP par niveau (aussi présentes en GameTables). Les deux premières **diffèrent nettement des estimations du moteur en début de leveling**
   et concordent au niveau 60. La régénération de mana par l'Esprit, la critique de base et les statistiques de
   base par race restent côté serveur.
 - **Trou principal** : les correctifs du serveur (hotfixes) arrivent sans nouveau build. `Logs/Hotfix.log` en montre
