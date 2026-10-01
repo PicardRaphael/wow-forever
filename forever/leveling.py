@@ -143,6 +143,10 @@ def damage_assumptions(options: Mapping[str, Any], low_level_default: bool) -> l
     ]
 
 
+def ratio_assumption(gd: GameData) -> str:
+    raise NotImplementedError
+
+
 def assumptions(
     options: Mapping[str, Any],
     hp: MonsterHp,

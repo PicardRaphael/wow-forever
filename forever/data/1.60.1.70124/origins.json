@@ -936,7 +936,9 @@
         "/pvp_trinkets",
         "/pvp_classification",
         "/retired_files",
-        "/gametables"
+        "/gametables",
+        "/character_tables",
+        "/character_scaling"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1)",

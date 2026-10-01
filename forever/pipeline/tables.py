@@ -91,6 +91,20 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
         "ID:int TriggerType:int CoolDownMSec:int CategoryCoolDownMSec:int SpellCategoryID:int SpellID:int"
     ),
     "ItemXItemEffect": _cols("ID:int ItemEffectID:int ItemID:int"),
+    # T08b, bloc A : ratios du personnage, XP, repos, constante d'armure, courbes (decode_rules.json, character_tables).
+    "PlayerExpectedStat": _cols(
+        "ID:int Level:int ClassID:int ContentSetID:int BaseMana:float Field_1_60_1_69876_005:float "
+        "CritPerAgility:float SpellCritPerIntellect:float"
+    ),
+    "LevelExperience": _cols("ID:int Level:int ContentSetID:int Experience:int"),
+    "Exhaustion": _cols("ID:int Name_lang:str Xp:int Factor:float OutdoorHours:float InnHours:float Threshold:float"),
+    "ExpectedStat": _cols("ID:int ExpansionID:int ContentSetID:int Lvl:int ArmorConstant:float CreatureHealth:float"),
+    "GlobalCurve": _cols("ID:int CurveID:int Type:int Subtype:int"),
+    "NumTalentsAtLevel": _cols("ID:int NumTalents:int"),
+    "TraitCond": _cols(
+        "ID:int CondType:int TraitTreeID:int TraitNodeGroupID:int TraitNodeID:int TraitCurrencyID:int "
+        "SpentAmountRequired:int RequiredLevel:int"
+    ),
 }
 
 

@@ -120,6 +120,15 @@ def main() -> int:
     defs = [r for r in rows["TraitDefinition"] if r["ID"] in def_ids]
     points = [r for r in rows["TraitDefinitionEffectPoints"] if r["TraitDefinitionID"] in def_ids]
     curves = {r["CurveID"] for r in points}
+    # T08b, bloc A : tables des ratios du personnage (character_tables), niveaux 1 au plafond ; courbes de
+    # régénération de PV (GlobalCurve, types de character_scaling) ajoutées aux courbes recopiées.
+    cap = int(rules["levels"]["level_cap"])
+    char_names = list(rules.get("character_tables", []))
+    tc = {name: read(src / "enUS" / f"{name}.csv") for name in char_names}
+    char_rows = {name: r for name, (_, r) in tc.items()}
+    regen_types = {str(v) for v in rules.get("character_scaling", {}).get("hp_regen_curve_types", {}).values()}
+    if "GlobalCurve" in char_rows:
+        curves |= {r["CurveID"] for r in char_rows["GlobalCurve"] if r["Type"] in regen_types}
 
     names = {r["ID"]: r["Name_lang"] for r in rows["SpellName"]}
     spells = {r["SpellID"] for r in defs}
@@ -188,6 +197,29 @@ def main() -> int:
     for name in names_all:
         n = write(dst / "enUS" / f"{name}.csv", t[name][0], out[name])
         print(f"enUS/{name} : {n} lignes")
+    level_col = {"PlayerExpectedStat": "Level", "LevelExperience": "Level", "ExpectedStat": "Lvl"}
+    for name in char_names:
+        col = level_col.get(name)
+        keep = char_rows[name]
+        if col is not None:
+            keep = [r for r in keep if 1 <= int(r[col]) <= cap]
+        elif name == "TraitCond":
+            keep = [r for r in keep if r["TraitTreeID"] in trees]
+        n = write(dst / "enUS" / f"{name}.csv", tc[name][0], keep)
+        print(f"enUS/{name} : {n} lignes")
+    for gt in rules.get("gametables", {}):
+        gt_src = src / "gametables" / f"{gt}.txt"
+        if not gt_src.is_file():
+            print(f"gametables/{gt} : absente du cache")
+            continue
+        lines_gt = gt_src.read_text(encoding="utf-8-sig").splitlines()
+        kept = [
+            lines_gt[0],
+            *(ln for ln in lines_gt[1:] if ln.split("\t", 1)[0].isdigit() and int(ln.split("\t", 1)[0]) <= cap),
+        ]
+        (dst / "gametables").mkdir(parents=True, exist_ok=True)
+        (dst / "gametables" / f"{gt}.txt").write_bytes(("\n".join(kept) + "\n").encode("utf-8"))
+        print(f"gametables/{gt} : {len(kept) - 1} lignes")
     localized: dict[str, list[str]] = {}
     for source in (rules.get("localized_tables", {}), rules.get("localized_class_tables", {})):
         for locale, tables in source.items():

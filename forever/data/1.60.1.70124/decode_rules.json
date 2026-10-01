@@ -557,5 +557,51 @@
   "npctotalhp": 1391652,
   "xp": 1391661
  },
- "gametables_note": "T08b, bloc A : identifiants de fichier des GameTables du client (wago.tools/files?search=gametables/<nom>, relevé du 2026-10-01), lues par https://wago.tools/api/casc/<identifiant>?version=<build> ; réponse vide = absente du build, jamais remplacée par une autre"
+ "gametables_note": "T08b, bloc A : identifiants de fichier des GameTables du client (wago.tools/files?search=gametables/<nom>, relevé du 2026-10-01), lues par https://wago.tools/api/casc/<identifiant>?version=<build> ; réponse vide = absente du build, jamais remplacée par une autre",
+ "character_tables": [
+  "PlayerExpectedStat",
+  "LevelExperience",
+  "Exhaustion",
+  "ExpectedStat",
+  "GlobalCurve",
+  "NumTalentsAtLevel",
+  "TraitCond"
+ ],
+ "character_scaling": {
+  "content_set_id": 0,
+  "expected_stat_expansion_id": -2,
+  "player_columns": {
+   "base_mana": "BaseMana",
+   "spell_crit_per_intellect": "SpellCritPerIntellect",
+   "crit_per_agility": "CritPerAgility",
+   "hp_per_stamina": "Field_1_60_1_69876_005"
+  },
+  "hp_regen_curve_types": {
+   "spirit_base": 27,
+   "spirit_extra": 28
+  },
+  "crosscheck": [
+   {
+    "value": "base_mana",
+    "gametable": "basemp",
+    "column": "class"
+   },
+   {
+    "value": "hp_per_stamina",
+    "gametable": "hppersta",
+    "column": "Health"
+   },
+   {
+    "value": "xp_to_next",
+    "gametable": "xp",
+    "column": "Total"
+   },
+   {
+    "value": "armor_constant",
+    "gametable": "armormitigationbylvl",
+    "column": "Constant"
+   }
+  ],
+  "note": "T08b, bloc A : ratios du personnage par classe et par niveau (PlayerExpectedStat, ContentSetID 0), XP par niveau (LevelExperience), repos (Exhaustion), constante d'armure (ExpectedStat, ExpansionID -2), courbes de régénération de PV par l'Esprit (GlobalCurve, sous-type = classe, points dans CurvePoint) ; colonne Field_1_60_1_69876_005 lue comme PV par Endurance (sens probable, recoupé par hppersta) ; recoupement par les GameTables, écart signalé, jamais tranché"
+ }
 }
