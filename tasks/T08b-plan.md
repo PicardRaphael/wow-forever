@@ -422,3 +422,31 @@ Valeurs attendues lues dans les fixtures (ligne et colonne nommées dans le test
 ## Validation
 
 Plan à valider par l'utilisateur (D1 à D5) avant l'exécution, dans une nouvelle session, sur la branche `t08b`.
+
+## Réponses de l'utilisateur (2026-10-01)
+
+Plan accepté avec ces réponses :
+
+- **D1 = (b)** : même code, lancé **à la main seulement** (à la demande de l'utilisateur, ou proposé par la veille
+  locale quand elle détecte un nouveau build), jamais en lecture automatique planifiée : l'utilisateur a déjà une clé
+  d'API Blizzard, les conditions des API (§ 2.16) le lient dès maintenant. Le workflow de veille des notes n'a donc
+  que `workflow_dispatch` ; `forever watch` propose `forever notes` quand le build du client change. Consigné dans
+  `docs/DECISIONS.md` (décision 148).
+- **D2** : d'accord (plafond de bêta en paramètre de `forever install` avec sa source, valeur actuelle gardée jusqu'aux
+  notes du nouveau build, valeurs décodées de `classes.json` lues en mode forever).
+- **D3** : d'accord (anciens tests passés sur la fixture du seed sans changer leurs valeurs attendues, certitudes
+  abaissées selon la règle du projet, premier niveau à points de talent lu dans `NumTalentsAtLevel`).
+- **D4** : d'accord (`origins.json` par version, six origines).
+- **D5** : d'accord, accord demandé au moment de chaque accès.
+- **Leveling** : la mesure reste le temps par monstre et l'XP par heure, quelle que soit la spécialisation.
+- **Point 10 (ajout) — sonde de l'API Blizzard** : avec les clés de l'utilisateur (`.env` en local, secrets du dépôt
+  en CI, flux *client credentials*), le workflow quotidien essaie quelques routes de Game Data (index des royaumes,
+  classes jouables, un objet connu) avec les espaces de noms possibles pour Forever, dans les limites de l'API. Jamais
+  d'espace de Retail, de Classic Era ou de TBC à la place : leur réponse n'est pas une donnée de Forever. Dès qu'un
+  espace de Forever répond, une issue GitHub est ouverte avec ce qui est couvert (Game Data, Profile, hôtel des
+  ventes, PvP), pour décider du démarrage d'EC1. Les clés ne figurent jamais dans le code ni dans les journaux.
+  Nouvel accès réseau : accord demandé au moment de l'exécution. Bloc J, placé après le bloc F.
+- Un test verrouillé faux : demandes de correction regroupées avant la fusion (`tasks/T08b-corrections.md`).
+- Avant le commit de la révision 4 : chaque recommandation de build qui change, avec sa raison, montrée à
+  l'utilisateur.
+- Contexte plein : arrêt après un bloc vert et committé.
