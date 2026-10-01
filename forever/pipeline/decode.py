@@ -1585,7 +1585,8 @@ def decode_version(
             for c in char_doc["crosscheck"]
         ]
     # CH0, bloc A : familiers du Chasseur (pet_tables) : tables propres toutes présentes (décodé) ou toutes
-    # absentes (noté absent, jamais hérité) ; une partie est une erreur.
+    # absentes (hérité de la base comme les fichiers des 9 classes, noté absent si la base ne l'a pas) ; une partie
+    # est une erreur.
     own_pet = own_pet_table_files(rules)
     pet_missing = [rel for _, rel in own_pet if not (csv_dir / rel).is_file()]
     if pet_missing and len(pet_missing) < len(own_pet):
@@ -1597,16 +1598,19 @@ def decode_version(
         pets_doc = decode_pets(load_pet_tables(csv_dir, rules), rules, version)
         decoded_classes[PETS_FILE] = pets_doc
         extra_notes += [f"{PETS_FILE} : {o}" for o in pets_doc["observations"]]
-    elif own_pet:
-        extra_notes.append(f"{PETS_FILE} absent : tables des familiers absentes de {csv_dir.name}")
     inherited = {}
-    optional = (*CLASS_FILES, *CHARACTER_FILES)
+    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE)
     names = [*INHERITED_FILES, *(n for n in optional if n not in decoded_classes)]
     for name in names:
         path = _inherited_source(base, name, rules)
         if path is None:
             if name in CHARACTER_FILES:
                 extra_notes.append(f"{name} absent : tables des ratios absentes de {csv_dir.name} et de {base_version}")
+                continue
+            if name == PETS_FILE:
+                extra_notes.append(
+                    f"{name} absent : tables des familiers absentes de {csv_dir.name} et de {base_version}"
+                )
                 continue
             if name in CLASS_FILES:
                 extra_notes.append(
@@ -1620,6 +1624,8 @@ def decode_version(
         inherited[name] = {**doc, "inherited_from": base_version}
         if name in CLASS_FILES:
             extra_notes.append(f"{name} hérité de {base_version} : tables des 9 classes absentes de {csv_dir.name}")
+        if name == PETS_FILE:
+            extra_notes.append(f"{name} hérité de {base_version} : tables des familiers absentes de {csv_dir.name}")
     local_sources = _read_json(base / SOURCES_NAME)
     files = local_sources.get("files", {})
     decoded_note = f"tables du client {version} (wago.tools, {csv_dir.name}) décodées par forever decode"

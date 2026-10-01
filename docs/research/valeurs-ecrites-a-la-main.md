@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70124 (ne
 de `forever/data/1.60.1.70124/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-145 chemins, 604 valeurs ; 81 `probable`, 64 `suppose`
+147 chemins, 612 valeurs ; 81 `probable`, 66 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -76,12 +76,14 @@ Aucun.
 | mechanics.json | `/values/spell.default_range_yd` | 1 | suppose | C2 | portée par défaut d'un sort sans portée publiée | repli de fm.py du seed |
 | mechanics.json | `/values/talents.first_level` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel) | fm.py du seed (points_available) |
 | mechanics.json | `/values/talents.points_per_tier` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (TraitCond) | fm.py du seed (check_build) |
-| meta.json | `/game_state` | 3 | probable | I5 | fait d'installation (D2) : plafond de la bêta donné à l'installation avec sa source | forever install --beta-level-cap (note officielle ou relevé en jeu), sinon valeur reportée |
+| meta.json | `/game_state` | 4 | probable | I5 | fait d'installation (D2) : plafond de la bêta donné à l'installation avec sa source | forever install --beta-level-cap (note officielle ou relevé en jeu), sinon valeur reportée |
 | overrides.json | `/Arcane~1Arcane Blast` | 6 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Blast Wave` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Pyroblast` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Frost~1Ice Barrier` | 2 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Frost~1Ice Lance` | 3 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
+| pet_rules.json | `/rules/training.points_gain` | 3 | suppose | L3 | aucune source propre à Forever (CH0) | règle de Classic (niveau du familier) ; gain des points d'entraînement inconnu |
+| pet_rules.json | `/rules/training.rank_level_applies_to` | 4 | suppose | L3 | aucune source propre à Forever (CH0) | règle de Classic (niveau du familier) ; gain des points d'entraînement inconnu |
 | pvp_rules.json | `/categories` | 9 | suppose | K1 | règles du serveur des rendements décroissants, absentes du client | règles de Classic (vmangos, forum de 2019) |
 | pvp_rules.json | `/diminishing_returns` | 6 | suppose | K1 | règles du serveur des rendements décroissants, absentes du client | règles de Classic (vmangos, forum de 2019) |
 | pvp_rules.json | `/sheets` | 1 | suppose | K1 | règles du serveur des rendements décroissants, absentes du client | règles de Classic (vmangos, forum de 2019) |
