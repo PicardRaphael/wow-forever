@@ -11,9 +11,10 @@ from forever.manifest import compute_manifest, verify
 from forever.pipeline.character_scaling import CHARACTER_FILES
 from forever.pipeline.decode import DECODED_FILES, INHERITED_FILES, decode_version
 from forever.pipeline.fetch import wago_dir
+from forever.pipeline.pets import PETS_FILES
 from forever.store import VersionData, current_identity, read_sources
 
-EXPECTED_FILES = {*DECODED_FILES, *INHERITED_FILES, *CHARACTER_FILES, "sources.json"}
+EXPECTED_FILES = {*DECODED_FILES, *INHERITED_FILES, *CHARACTER_FILES, *PETS_FILES, "sources.json"}
 
 
 def version_data(root):
@@ -30,8 +31,8 @@ def test_candidate_is_a_complete_data_dir(candidate):
     # T04 : monsters.json hérité, spell_scaling.json décodé ; PV1 : fichiers des 9 classes (hérités ici : la
     # fixture 70009 n'a pas leurs tables), _seed_racials.json hérité, racials.json retiré.
     assert (
-        names == EXPECTED_FILES and len(names) == 19
-    )  # PV1, bloc C : pvp_rules.json hérité ; T08b : origins.json, character_scaling.json ; CH0 : pet_rules.json
+        names == EXPECTED_FILES and len(names) == 20
+    )  # PV1, bloc C : pvp_rules.json hérité ; T08b : origins.json, character_scaling.json ; CH0 : pet_rules.json, pets.json
     assert "_source_gunba_mage_tree.json" not in names and "confirmed_changes.json" not in names
 
 

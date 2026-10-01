@@ -78,10 +78,11 @@ def test_carried_cap_keeps_its_original_date_and_revision(data_copy, make_deps, 
     cand = decode_version(isolated_deps(tmp_path), LOCAL_VERSION, csv_dir=WAGO_70124, out=tmp_path / "c")
     deps = make_deps(data_dir=data_copy)
     before = read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]
+    current = read_json(DATA_DIR / LOCAL_VERSION / "sources.json")["revision"]
     apply_install(deps, str(cand.root), motif="test")
     state = read_json(data_copy / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]
     assert (state["date"], state["revision"]) == (before["date"], before["revision"])
-    assert state["carried_to"] == before["revision"] + 1
+    assert state["carried_to"] == current + 1
 
 
 def test_inherited_ratios_are_named_as_inherited(data_copy, make_deps):

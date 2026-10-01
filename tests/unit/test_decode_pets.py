@@ -311,11 +311,11 @@ def test_candidate_from_pet_tables_carries_pets_json(tmp_path):
     assert report["ok"], report["errors"]
 
 
-def test_candidate_without_pet_tables_notes_the_absence(tmp_path):
+def test_candidate_without_pet_tables_inherits_pets_json(tmp_path):
     deps = isolated_deps(tmp_path)
     cand = decode_version(deps, PREVIOUS_VERSION, csv_dir=WAGO_70009, out=tmp_path / "cand")
-    assert not (cand.root / PREVIOUS_VERSION / PETS_FILE).exists()
-    assert any(o.startswith(f"{PETS_FILE} absent") for o in cand.observations)
+    assert read_json(cand.root / PREVIOUS_VERSION / PETS_FILE)["inherited_from"] == LOCAL_VERSION
+    assert any(o.startswith(f"{PETS_FILE} hérité de {LOCAL_VERSION}") for o in cand.observations)
 
 
 def test_read_pets_from_a_version(tmp_path):
