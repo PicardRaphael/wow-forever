@@ -5,7 +5,7 @@ Cause commune : la révision 5 (accord du 2026-10-01) a installé `pets.json` et
 alors **hériter** `pets.json` de la version de base, comme les fichiers des 9 classes (`CLASS_FILES`) : sinon une
 nouvelle version installée par `forever install --new-version` perdrait le savoir des familiers (c'est ce que
 signale `test_install_new_version.py`). Le décodeur fait désormais cela (`forever/pipeline/decode.py`, `optional`
-contient `pets.json`, note « hérité de … » ou « absent » si la base ne l'a pas). Quatre tests portent l'ancienne
+contient `pets.json`, note « hérité de … » ou « absent » si la base ne l'a pas). Cinq tests portent l'ancienne
 prémisse (« jamais hérité », comptes d'avant la révision 5).
 
 Preuve tirée des données : `forever/data/1.60.1.70124/pets.json` et `pet_rules.json` présents (manifeste, révision 5) ;
@@ -67,6 +67,18 @@ une nouvelle installation l'emporte à la révision 6 : `carried_to` vaut la ré
      assert (state["date"], state["revision"]) == (before["date"], before["revision"])
 -    assert state["carried_to"] == before["revision"] + 1
 +    assert state["carried_to"] == current + 1
+```
+
+## C5 — `tests/unit/test_verify_version.py::test_candidate_is_ok_and_lists_inherited_files` (T08b)
+
+Même cause : la candidate de la fixture 1.60.1.70009 hérite `pets.json`, que `forever verify` liste parmi les
+fichiers hérités (comme les fichiers des 9 classes et `character_scaling.json`).
+
+```diff
++from forever.pipeline.pets import PETS_FILES
+@@ test_candidate_is_ok_and_lists_inherited_files
+-    assert set(r["inherited"]) == set(INHERITED_FILES) | set(CLASS_FILES) | set(CHARACTER_FILES)  # PV1, T08b
++    assert set(r["inherited"]) == set(INHERITED_FILES) | set(CLASS_FILES) | set(CHARACTER_FILES) | set(PETS_FILES)  # PV1, T08b, CH0
 ```
 
 ## Hors demande
