@@ -372,10 +372,11 @@ version depuis le relevé du 2026-09-30). Les passages suivants rendent `inchang
 ## Forever Bestiary (relevé du 2026-10-01)
 
 Installé par l'utilisateur le 2026-10-01, inventorié en lecture seule, sans réseau, sous le client 1.60.1.70124.
-**Rien n'est ingéré** : aucun fichier de `forever/data/`, de `tests/fixtures/` ni du code n'a changé. L'addon
-**n'est pas dans `DATA_ADDONS`** (`forever/addons.py`) : il est absent du relevé de `forever addons status --save`,
-et l'empreinte ci-dessous, calculée à la main par la même méthode que la commande (SHA-256 de la liste triée des
-SHA-256 des fichiers `.lua` et `.json`), sert de ligne de base jusqu'à son inscription au suivi en CH0 (décision 154).
+**Rien n'est ingéré** : aucun fichier de `forever/data/`, de `tests/fixtures/` ni du code n'a changé.
+**Suivi depuis CH0 (bloc B, 2026-10-01)** : entrée `ForeverBestiary` de `DATA_ADDONS` (`forever/addons.py`, lecteur
+`forever/pipeline/bestiary.py`). Le relevé de `forever addons status --save` du 2026-10-01 (statut `nouveau`, 26
+fichiers `.lua`, version 0.5.0) rend l'empreinte `8bc6ff0419e9`, identique à celle calculée à la main ci-dessous :
+il remplace ce calcul comme ligne de base.
 
 | Addon | Version `.toc` | Fichiers | Taille | Empreinte (26 `.lua`) | Dernier fichier |
 | --- | --- | --- | --- | --- | --- |

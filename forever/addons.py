@@ -50,6 +50,12 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     "ZoneLevelForever": AddonSpec(("ZoneLevelForever",), "lecteur à venir (décision 133)"),
     "Auctionator": AddonSpec(("Auctionator",), "forever/pipeline/auctionator.py (SavedVariables)"),
     "ForeverLogger": AddonSpec(("ForeverLogger",), "forever/pipeline/addon_sv.py (SavedVariables)"),
+    "ForeverBestiary": AddonSpec(  # CH0 : bêtes, carte communautaire, guide de l'entraînement des familiers
+        ("ForeverBestiary",),
+        "forever/pipeline/bestiary.py",
+        ("forever/data/<version>/pets.json (recoupement)", "forever/data/<version>/pet_rules.json (Guide.lua)"),
+        "forever pets crosscheck, puis relire Data/Guide.lua et comparer pet_rules.json",
+    ),
 }
 _VERSION = re.compile(r"^## Version:\s*(.+?)\s*$", re.MULTILINE)
 
@@ -196,4 +202,4 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
 
 def fingerprint_folder(folder: Path) -> str:
     """Empreinte d'un dossier d'addon (méthode de `fingerprint`), sans relevé précédent."""
-    raise NotImplementedError
+    return fingerprint(_files(folder.parent, [folder], {}))
