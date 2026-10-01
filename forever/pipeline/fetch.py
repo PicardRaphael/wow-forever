@@ -26,6 +26,7 @@ INDEX_SCHEMA_VERSION = 1
 TABLE_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]*$")
 LOCALE_RE = re.compile(r"^[a-z]{2}[A-Z]{2}$")
 _HEADER_FIELD_RE = re.compile(r'^"?[A-Za-z_][A-Za-z0-9_\[\]]*"?$')
+_GAMETABLE_FIELD_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_ ]*$")  # colonnes de GameTable : « Death Knight »
 
 
 class TableFetch(TypedDict):
@@ -65,7 +66,7 @@ def looks_like_gametable(body: bytes) -> bool:
     except UnicodeDecodeError:
         return False
     header = text.split("\n", 1)[0].rstrip("\r")
-    return "\t" in header and all(_HEADER_FIELD_RE.fullmatch(f) for f in header.split("\t"))
+    return "\t" in header and all(_GAMETABLE_FIELD_RE.fullmatch(f) for f in header.split("\t"))
 
 
 def fetch_gametables(
