@@ -8,10 +8,10 @@ import shutil
 
 import pytest
 from conftest import FIXTURES, FakeHttp
-from forever.watch import watch, watch_line
 
 from forever.cli import main
 from forever.pipeline import hotfixes
+from forever.watch import watch, watch_line
 
 HEADER = "Branch!STRING:0|Active!DEC:1|Version!STRING:0|Product!STRING:0"
 

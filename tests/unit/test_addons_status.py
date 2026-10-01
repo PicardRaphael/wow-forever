@@ -11,8 +11,8 @@ import shutil
 
 import pytest
 from conftest import FIXTURES
-from forever.addons import DATA_ADDONS, STATE_NAME, addons_status
 
+from forever.addons import DATA_ADDONS, STATE_NAME, addons_status
 from forever.cli import main
 
 QUESTIE = FIXTURES / "questie" / "11.38.0"
