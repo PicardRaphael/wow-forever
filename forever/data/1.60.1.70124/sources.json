@@ -211,6 +211,14 @@
       "notes": [
         "PV1, bloc C : règles du serveur de Classic (paliers, fenêtre, plafond) et noms des catégories ; catégorie de chaque sort lue dans le client (classes.json) ; à mesurer en PV2 (docs/research/pvp-dr-protocole.md)"
       ]
+    },
+    "origins.json": {
+      "source": "Écrit à la main (T08b, bloc H, D4) : origine déclarée de chaque valeur des fichiers de la version",
+      "certainty": "certain",
+      "notes": [
+        "ne décrit pas le jeu : règles d'origine (client, journal, addon, manuel, copie_figee, parametre), contrôlées par uv run tasks.py verify (étape origins)",
+        "hérité d'une version à l'autre et complété par le décodage"
+      ]
     }
   },
   "revision": 3,

@@ -4,8 +4,8 @@
   "versions": {
     "1.60.1.70009": {
       "collected_at": "2026-09-26",
-      "data_sha": "5ec8369f724b",
-      "data_sha256": "5ec8369f724b4eb65b83faf49159351fb840fb2d83146d0afd0802cc4718415b",
+      "data_sha": "f1d4a8049022",
+      "data_sha256": "f1d4a8049022d51e3be1c43eacb73a6377a00efeebe9556466bf8a7d73d156b0",
       "files": {
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
         "_seed_talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb",
@@ -16,11 +16,12 @@
         "mechanics.json": "5b075daa43d0bf35face4fe524119924c890a3745c69470c5f3048ce1af26e92",
         "meta.json": "3ac4666f8dd47349d3b1e0f4f7e2936b17a2848071a5bc1dc7aa7e8634303095",
         "monsters.json": "4e46cbfb7ef3f2c5f01c8f55d59570f9f7974eb5cc2baaa16e3ead031c0d0f9f",
+        "origins.json": "5e6201b2bbd27dc3d0c3a1ceb861cf014904f8f7b7822f41e94b045867d4da5b",
         "overrides.json": "e251b04e9fe407a72380f99f4eaea5d141d4361f6167650e8ca09c26451ec9b9",
         "racials.json": "e4cba8c29d0800913a8bc48c6e3db569f64d71d65ea06abbbefffe2f173f7bdf",
         "respec.json": "d0728942f79f45fa2eeafe52ddc75b74608cde77f5a2dcc8d65e1d80e2ed1358",
         "revisions.json": "90b97134c5622972e5cd7536058451f764979c7c35c4b8c6bd990198a2b886f4",
-        "sources.json": "2cbdba7faba6bf292a0859fe09215a30d24a12e7f6b4f15dc7493d4214ac1676",
+        "sources.json": "8ca67f2bc40f4843a299f7a354120d3ed551ceb2e8f66ed87ca0fcb2e9a0ec16",
         "spell_scaling.json": "b904c66bdc250cf53a3fe862d1bd35b5ef8d777b3fa4120862ec565dd4a14a7d",
         "spells.json": "aaa34d723d35fac686bf936e77cc6194cdb7a0146b72ceb81f82607849573039",
         "talents.json": "2f3da74217c3c08b1e17c23229f00bb34ea10ef014ca1faa25f78ce7e24495d5"
@@ -33,8 +34,8 @@
     },
     "1.60.1.70124": {
       "collected_at": "2026-09-30",
-      "data_sha": "dbc7484d06b9",
-      "data_sha256": "dbc7484d06b9fe95a52b92f20e2bd92d3c656e5ab862f12ae095045d50dd39ed",
+      "data_sha": "c90fd7906b46",
+      "data_sha256": "c90fd7906b46dd996cf5486e5ac5fae65465d6ef6703be43be13f73f43e7d6aa",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -47,13 +48,14 @@
         "mechanics.json": "7df8be9b8a00f875cefadd981906dc7c0961c1c5b3e40120ec7dd3966609a19a",
         "meta.json": "8d1bc104db1c9a2dfb7a89a55f8f17ae27afaa3a5c18b49b5f5c8392d12c64d3",
         "monsters.json": "96eb70987df03cbfacd55cb6a194239af381e9b786b87897e3aba9fa8ba4381b",
+        "origins.json": "1ffb08e10b6ab8e9bbecde197fed1f0989bd3bf172d80776157b1ccdc8240e93",
         "overrides.json": "adf5b1ee4d94f5a06bb52eca375cdfb59df3b1b663dd77d25e6077282935cc10",
         "pvp_items.json": "489cfaae4ed9775a6214639a27828eb3e27bf5477c9e1972232464c5c35162c2",
         "pvp_rules.json": "52aff062b60be69305cd19f8002e761772324e57682f9dd0a8cc1588e4934525",
         "races.json": "b32091e64e83d42e5ceba6d93377cd413a8547a2e5131cd31fdc3ef0b5325c4d",
         "respec.json": "c8cf86150a00959aa0de2ace34c2dd91c03b0ea9b4c08975850f1e36b1338e24",
         "revisions.json": "b43bc5263ce939430732371c62e8a985ecb53c69c8b81d964dbed6f892d42b9f",
-        "sources.json": "37228a7bc659fdce682869cdd61907d38daf6eddb8a75259bc8ce562dfb9da3b",
+        "sources.json": "7ed9ae0b6de0d5cbd02a650eeed6017f9db7ffc2f26c0633f30cd560e7494ffb",
         "spell_scaling.json": "a34fc3c20c54711ac41731edb71088b4ed0cdb3fd6368a181d5c42557c428dd1",
         "spells.json": "d9365ef6124b02534ac8d2e59bb2465956a15378b0707aa9b5a459afabd1e1fa",
         "talents.json": "14403a6685d54517b818ebc6d6614f513f769c387243e5714154dd5fe0a48503"

@@ -161,6 +161,14 @@
       "notes": [
         "chaque valeur changée porte sa source et sa certitude (champs source et certainty)"
       ]
+    },
+    "origins.json": {
+      "source": "Écrit à la main (T08b, bloc H, D4) : origine déclarée de chaque valeur des fichiers de la version",
+      "certainty": "certain",
+      "notes": [
+        "ne décrit pas le jeu : règles d'origine (client, journal, addon, manuel, copie_figee, parametre), contrôlées par uv run tasks.py verify (étape origins)",
+        "hérité d'une version à l'autre et complété par le décodage"
+      ]
     }
   },
   "revision": 2,

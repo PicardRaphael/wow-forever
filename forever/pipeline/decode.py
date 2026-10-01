@@ -35,6 +35,7 @@ INHERITED_FILES = (
     "overrides.json",
     "meta.json",
     "monsters.json",
+    "origins.json",  # T08b, bloc H : origine déclarée de chaque valeur, complétée à chaque nouvelle version
     RULES_NAME,
 )
 

@@ -7,7 +7,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 
 ## Commandes
 - `uv run tasks.py test-fast` : tests unitaires rapides. `uv run tasks.py test` : tous les tests. Un seul test : `uv run pytest tests/<fichier>.py::<test> -q`.
-- `uv run tasks.py verify` : lint + typage + tests + registre + contrôle des chiffres. Une tâche n'est finie que si `uv run tasks.py verify` est vert (voir le skill `/verifier`).
+- `uv run tasks.py verify` : lint + typage + tests + registre + contrôle des chiffres + origine des valeurs (`origins.json`). Une tâche n'est finie que si `uv run tasks.py verify` est vert (voir le skill `/verifier`).
 - `uv run forever status` : fraîcheur des données.
 - Dépendances et exécution via `uv` uniquement (`uv add`, `uv run`), jamais `pip`.
 

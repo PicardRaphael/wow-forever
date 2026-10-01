@@ -54,6 +54,10 @@ from forever.lookup import (
 )
 from forever.lookup import check_talents as check_class_talents
 from forever.manifest import load_manifest, version_dirs, write_manifest
+from forever.origins import check_all as check_origins
+from forever.origins import inventory as origins_inventory
+from forever.origins import inventory_payload, render_inventory
+from forever.origins import render_report as render_origins_report
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
 from forever.pipeline.client_builds import (
@@ -281,6 +285,17 @@ def build_parser() -> argparse.ArgumentParser:
     info = questie_sub.add_parser("info", help="version et contenu de l'addon Questie installé")
     info.add_argument("--dir", help="dossier de l'addon (défaut : <FOREVER_WOW_DIR>/Interface/AddOns/Questie)")
     info.add_argument("--json", action="store_true", help="sortie JSON")
+
+    origins = sub.add_parser("origins", help="origine déclarée de chaque valeur des données (hors ligne)")
+    origins_sub = origins.add_subparsers(dest="origins_command", required=True, parser_class=_Parser)
+    o_check = origins_sub.add_parser("check", help="contrôler les origines de toutes les versions installées")
+    o_check.add_argument("--json", action="store_true", help="sortie JSON")
+    o_inv = origins_sub.add_parser("inventory", help="inventaire des valeurs écrites à la main")
+    o_inv.add_argument("--version", help="version du jeu (défaut : la plus récente)")
+    o_inv.add_argument(
+        "--markdown", action="store_true", help="rendu Markdown (docs/research/valeurs-ecrites-a-la-main.md)"
+    )
+    o_inv.add_argument("--json", action="store_true", help="sortie JSON")
 
     measures = sub.add_parser("measures", help="mesures tirées des journaux et SavedVariables")
     measures_sub = measures.add_subparsers(dest="measures_command", required=True, parser_class=_Parser)
@@ -1571,6 +1586,38 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_origins(deps: Deps, args: argparse.Namespace) -> int:
+    provenance = local_provenance(deps)
+    if args.origins_command == "check":
+        report = check_origins(deps.data_dir)
+        payload = {
+            "ok": report.ok,
+            "versions": report.versions,
+            "leaves": report.leaves,
+            "by_origin": report.by_origin,
+            "issues": [i.__dict__ for i in report.issues],
+            "provenance": provenance,
+        }
+        _emit(payload, render_origins_report(report), provenance, args.json)
+        return EXIT_OK if report.ok else EXIT_INTEGRITY
+    version = args.version or current_identity(deps.data_dir).game_version
+    rows, pending = origins_inventory(deps.data_dir, version)
+    if args.markdown and not args.json:
+        print(render_inventory(version, rows, pending), end="")
+        return EXIT_OK
+    payload = {**inventory_payload(version, rows, pending), "provenance": provenance}
+    lines = [
+        (
+            f"Valeurs écrites à la main ({version}) : {len(rows)} chemins, {payload['leaves']} valeurs, "
+            f"{len(pending)} abaissement(s) de certitude prévu(s)"
+        ),
+        *[f"  attente  {p.file} {p.path} : {p.declared} -> {p.target} ({p.until})" for p in pending],
+        *[f"  {r.certainty:<8} {r.file} {r.path} : {r.reason}" for r in rows],
+    ]
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _default_sv(deps: Deps) -> Path | None:
     """Premier dossier `WTF/Account/*/SavedVariables` du client, s'il existe."""
     if deps.wow_dir is None:
@@ -1834,6 +1881,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "report": _cmd_report,
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
+        "origins": _cmd_origins,
         "monsters": _cmd_monsters_build,
         "measures": _cmd_measures_refresh,
         "sim": _cmd_sim,

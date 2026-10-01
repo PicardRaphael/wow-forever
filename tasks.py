@@ -7,7 +7,8 @@ fmt         ruff format
 typecheck   mypy strict sur forever/
 registry    contrôle du registre des mécaniques
 numbers     contrôle des chiffres de jeu dans le plugin
-verify      lint + typecheck + test + registry + numbers (définition de « fini »)
+origins     contrôle de l'origine déclarée de chaque valeur des données (T08b)
+verify      lint + typecheck + test + registry + numbers + origins (définition de « fini »)
 status      fraîcheur des données (après T01)
 """
 
@@ -61,6 +62,10 @@ def numbers() -> bool:
     return run(PY + ["scripts/check_game_numbers.py"])
 
 
+def origins() -> bool:
+    return run(PY + ["scripts/check_origins.py"])
+
+
 def verify() -> bool:
     results = {
         name: step()
@@ -70,6 +75,7 @@ def verify() -> bool:
             ("test", test),
             ("registry", registry),
             ("numbers", numbers),
+            ("origins", origins),
         ]
     }
     print("\nVérification : " + " | ".join(f"{k} {'OK' if v else 'ÉCHEC'}" for k, v in results.items()))
@@ -88,6 +94,7 @@ COMMANDS = {
     "typecheck": typecheck,
     "registry": registry,
     "numbers": numbers,
+    "origins": origins,
     "verify": verify,
     "status": status,
 }
