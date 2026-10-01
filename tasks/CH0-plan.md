@@ -56,12 +56,16 @@ Trois réponses attendues, chacune devenue un cas du jeu d'évaluation (bloc E) 
   - **Niveau** : celui du personnage actif s'il est Chasseur ; sinon, si le profil a un seul Chasseur, celui-là,
     annoncé en une ligne ; sinon l'agent demande le personnage ou le niveau (règle « Données du joueur » de
     `format-reponse.md`). Le guide refuse un niveau absent, jamais de valeur par défaut muette.
-  - **Zones voisines de son niveau** : zones du même continent que la zone demandée (`UiMap`) dont la plage de niveau
+  - **Zones voisines de son niveau** : zones du même continent que la zone demandée (`UiMap`, continent trouvé en
+    remontant `ParentUiMapID` jusqu'à une carte de type continent, comme `Core/Maps.lua` de l'addon, et non en un
+    seul saut) dont la plage de niveau
     des PNJ normaux (Questie, `zones_for_level`) recoupe la bande de niveau du joueur (`level_band`). Sans `UiMap` :
     toutes les zones dont la plage recoupe la bande, signalé.
   - **Évaluation** : un profil d'évaluation à part, `tests/fixtures/plugin_eval/profile-chasseur.json` (Chasseur
     Horde actif, niveau écrit dans la fixture), passé par `env: EVAL_FOREVER_PROFILE` au seul cas « Bite rang 3 » ;
-    `profile-rempli.json` reste inchangé (les cas existants ne bougent pas).
+    `profile-rempli.json` reste inchangé (les cas existants ne bougent pas). Seuls les cas étiquetés « profil »
+    exigent un profil absent (`test_empty_profile_cases`) : un profil existant passé par `env` à un autre cas ne
+    casse aucun test.
   - **Proposition** : tout ce qui précède.
 - **D3 — Protocole de mesure : ForeverLogger relève-t-il le familier ?** La ROADMAP veut « les statistiques du
   Chasseur au même instant par ForeverLogger », mais ForeverLogger ne relève aujourd'hui ni l'Endurance, ni l'armure,
@@ -95,9 +99,11 @@ Trois réponses attendues, chacune devenue un cas du jeu d'évaluation (bloc E) 
   - Quatre cas : les trois questions ci-dessus (étiquette nouvelle `familiers`) et **un voisin négatif** (familier
     exotique en retail, étiquette `wow-autre`), comme PV1 (trois cas et un voisin) ; contrôlés sans modèle en CI ;
     passage avec le modèle des quatre cas à la main en fin de tranche, sur ton accord (coût d'un passage).
-  - `pets.json` (décodé) et `pet_rules.json` (hérité) entrent par une **révision 5** de 1.60.1.70124 : `forever decode`,
-    puis `forever install --dry-run` (liste des fichiers et des valeurs ajoutés), **arrêt pour ton accord**, puis
-    installation et commit. Si un build plus récent est publié d'ici là, je te demande s'il faut l'installer
+  - `pets.json` (décodé) entre par une **révision 5** de 1.60.1.70124 : `forever decode`, puis
+    `forever install --dry-run` (liste des fichiers et des valeurs ajoutés), **arrêt pour ton accord**, puis
+    installation et commit. `pet_rules.json`, fichier hérité nouveau, n'est pas écrit par `forever install` (comme
+    `pvp_rules.json` en PV1) : il entre à la main dans `forever/data/1.60.1.70124/` (écriture en octets, fins de ligne
+    LF, manifeste régénéré), dans le même commit de données, après le même accord. Si un build plus récent est publié d'ici là, je te demande s'il faut l'installer
     d'abord (T08a) ; le savoir des familiers ne l'attend pas.
   - **Proposition** : tout ce qui précède.
 
@@ -270,8 +276,9 @@ committé.
    Scaling », deux lignes « Pet - Bat » et « Pet - Core Hound » (apprivoisable ?), bug signalé par des joueurs.
 3. `forever pets crosscheck` et rapport généré `docs/research/familiers-recoupement.md` (écarts listés ; régénéré en
    fin de tranche sur l'addon installé).
-4. **Révision 5** (D5) : `forever decode`, `forever install --dry-run`, **arrêt pour ton accord**, installation,
-   commit des données et rapport `docs/research/data-1.60.1.70124-r5.md`.
+4. **Révision 5** (D5) : `forever decode`, `forever install --dry-run`, **arrêt pour ton accord**, installation de
+   `pets.json`, ajout à la main de `pet_rules.json` (D5), commit des données et rapport
+   `docs/research/data-1.60.1.70124-r5.md`.
 
 | Id | Description | Statut visé | Certitude (règle) |
 | --- | --- | --- | --- |
