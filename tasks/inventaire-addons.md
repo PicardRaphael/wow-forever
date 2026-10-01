@@ -368,3 +368,56 @@ pour les addons à modules. Versions relevées (premier relevé, statut `nouveau
 AtlasLootClassic `Forever 1.60.1`, ForeverDungeonJournal **1.3.3**, GearQuestForever 0.2.20-beta, ForeverGuide
 **1.17.0**, LegacyForever **v0.6.7**, ZoneLevelForever 1.4, Auctionator 339, ForeverLogger 0.2.0 (en gras : nouvelle
 version depuis le relevé du 2026-09-30). Les passages suivants rendent `inchangé` ou `changé`.
+
+## Forever Bestiary (relevé du 2026-10-01)
+
+Installé par l'utilisateur le 2026-10-01, inventorié en lecture seule, sans réseau, sous le client 1.60.1.70124.
+**Rien n'est ingéré** : aucun fichier de `forever/data/`, de `tests/fixtures/` ni du code n'a changé. L'addon
+**n'est pas dans `DATA_ADDONS`** (`forever/addons.py`) : il est absent du relevé de `forever addons status --save`,
+et l'empreinte ci-dessous, calculée à la main par la même méthode que la commande (SHA-256 de la liste triée des
+SHA-256 des fichiers `.lua` et `.json`), sert de ligne de base jusqu'à son inscription au suivi en CH0 (décision 154).
+
+| Addon | Version `.toc` | Fichiers | Taille | Empreinte (26 `.lua`) | Dernier fichier |
+| --- | --- | --- | --- | --- | --- |
+| ForeverBestiary | **0.5.0** | 28 | 0,8 Mo | `8bc6ff0419e9` | 2026-10-01 |
+
+### Provenance
+
+- `.toc` : `## Interface: 16001` seul (pas de `_Camelot.toc`), auteur Ricardo, CurseForge 1712376, SavedVariable
+  `ForeverBestiaryDB`. **Aucune licence** (ni `LICENSE` ni `X-License`) : lecture locale libre (décision 133), seuls
+  des agrégats entrent dans le dépôt.
+- `Data/Data.lua` : base générée le 2026-09-25 (`tools/build_data.py` de l'auteur, absent de l'addon) : bêtes,
+  identifiants de PNJ et noms espagnols de **beastmaster.io** ; familles et capacités de **foreverchanges.pro**, lues
+  sur le client **1.60.1.69913** (`clientBuild`). Comme Forever Guide, les fichiers sont récents mais les données
+  sont figées sur une version antérieure du jeu : le client installé fait foi.
+- `Data/Community.lua` : carte communautaire livrée avec l'addon, arrêtée au 2026-09-29, **61 joueurs** ; fusionnée
+  dans la sauvegarde une fois par version de l'addon.
+- `Data/Guide.lua` : guide de l'entraînement des familiers ; chaque section cite sa source (joueurs de la bêta sur
+  le forum Petopia et les forums officiels, 18 au 22 septembre 2026, via foreverchanges.pro) : relevés de joueurs.
+
+### Contenu (agrégats)
+
+- **18 familles** (`familyOrder`) : bonus de dégâts, d'armure et de PV, régime, capacités, vitesse d'attaque la plus
+  rapide relevée ; ancien nom quand la famille a été renommée.
+- **24 capacités** (`abilities`) : type, coût en focus, recharge, familles, rangs (niveau, texte de l'effet en anglais
+  et en espagnol), nombre de bêtes qui enseignent chaque rang ; dont les passifs de vitesse d'attaque (Faster Attack,
+  Slower Attack).
+- **606 bêtes** (`ns.Data.beasts`) : PNJ, famille, plage de niveau, rang, zones ; 215 bêtes portent des observations
+  dans la carte communautaire livrée.
+- Code : `Core/Observe.lua` (relevé des bêtes ciblées, apprivoisements), `Core/Comm.lua` et `Core/Share.lua`
+  (partage en jeu par canal d'addon), `Core/PvP.lua` (votes du meilleur familier contre chaque classe).
+  **Point d'attention** : à chaque chargement, l'addon remet le relevé et le partage en marche (`opts.record`,
+  `opts.share`, `opts.channel`) ; seule l'option « partager sans mon nom » (`opts.anon`) reste au choix du joueur.
+
+### Sauvegarde `ForeverBestiaryDB`
+
+`WTF/Account/<COMPTE>/SavedVariables/ForeverBestiary.lua` (358 Ko, et un `.bak`), schéma 2, lue sans erreur par
+`forever/pipeline/lua_table.py` : 404 observations (`obs`, les miennes et la carte fusionnée), 40 découvertes récentes
+(`feed`), familiers d'un personnage (`pets`, `history`), votes (`votes`), et **37 joueurs tiers** (`peers`, avec leur
+nom) : CH0 ne lit jamais `peers` ni les empreintes de joueurs (décision 49).
+
+### Ce que ce relevé ne dit pas
+
+- Aucun recoupement avec le client (familles, capacités, rangs) ni avec Questie (niveaux et zones des PNJ) : à faire en
+  CH0, dans cet ordre (client d'abord).
+- Le chargement en jeu et la relecture de la sauvegarde d'une session à l'autre n'ont pas été vérifiés.
