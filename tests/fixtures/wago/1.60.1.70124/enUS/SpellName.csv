@@ -46,6 +46,7 @@ ID,Name_lang
 2948,Scorch
 2983,Sprint
 3045,Rapid Fire
+3261,Ignite
 3355,Freezing Trap Effect
 4086,Evasion
 4511,Phase Shift
@@ -744,6 +745,8 @@ ID,Name_lang
 28755,Rapid Fire
 11119,Ignite
 412538,Ignite
+412545,Ignite
+1234540,Ignite
 14308,Freezing Trap Effect
 14309,Freezing Trap Effect
 25999,Boar Charge

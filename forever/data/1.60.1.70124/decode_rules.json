@@ -603,5 +603,12 @@
    }
   ],
   "note": "T08b, bloc A : ratios du personnage par classe et par niveau (PlayerExpectedStat, ContentSetID 0), XP par niveau (LevelExperience), repos (Exhaustion), constante d'armure (ExpectedStat, ExpansionID -2), courbes de régénération de PV par l'Esprit (GlobalCurve, sous-type = classe, points dans CurvePoint) ; colonne Field_1_60_1_69876_005 lue comme PV par Endurance (sens probable, recoupé par hppersta) ; recoupement par les GameTables, écart signalé, jamais tranché"
+ },
+ "mechanic_auras": {
+  "ignite": {
+   "aura_spell": "Ignite",
+   "periodic_aura": 226
+  },
+  "note": "T08b, bloc B : aura d'une mécanique lue par son nom et son effet périodique (Ignite : aura distincte du talent, posée par le serveur) ; durée par SpellMisc.DurationIndex, période par SpellEffect.EffectAuraPeriod, cumul par SpellAuraOptions.CumulativeAura"
  }
 }

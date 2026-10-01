@@ -938,7 +938,8 @@
         "/retired_files",
         "/gametables",
         "/character_tables",
-        "/character_scaling"
+        "/character_scaling",
+        "/mechanic_auras"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1)",

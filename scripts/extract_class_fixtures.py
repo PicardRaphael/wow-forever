@@ -145,6 +145,9 @@ def main() -> int:
         r["Spell"] for r in rows["SkillLineAbility"] if r["SkillLine"] in lines and names.get(r["Spell"]) in wanted
     }
     spells |= named
+    # T08b, bloc B : sorts d'aura des mécaniques lues par leur nom (decode_rules.json, mechanic_auras).
+    aura_names = {s["aura_spell"] for s in rules.get("mechanic_auras", {}).values() if isinstance(s, dict)}
+    spells |= {s for s, n in names.items() if n in aura_names}
     npc = []
     for name in sorted(wanted):
         homonyms = sorted((s for s, n in names.items() if n == name and s not in named), key=int)[:1]
