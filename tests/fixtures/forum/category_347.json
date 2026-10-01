@@ -1,0 +1,24 @@
+{
+ "users": [
+  {
+   "id": 1,
+   "username": "Gestionnaire",
+   "primary_group_name": "community-manager",
+   "flair_name": "community-manager",
+   "admin": true,
+   "moderator": true,
+   "trust_level": 4
+  },
+  {
+   "id": 2,
+   "username": "joueur-2",
+   "trust_level": 1
+  }
+ ],
+ "primary_groups": [],
+ "flair_groups": [],
+ "topic_list": {
+  "per_page": 30,
+  "topics": []
+ }
+}

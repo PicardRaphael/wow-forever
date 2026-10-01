@@ -1,0 +1,4 @@
+User-agent: *
+Disallow: /en/wow/g
+Disallow: /en/wow/t/*/*.rss
+Disallow: /en/wow/c/*.rss

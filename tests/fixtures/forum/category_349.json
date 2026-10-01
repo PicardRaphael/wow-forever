@@ -1,0 +1,79 @@
+{
+ "users": [
+  {
+   "id": 1,
+   "username": "Gestionnaire",
+   "primary_group_name": "community-manager",
+   "flair_name": "community-manager",
+   "admin": true,
+   "moderator": true,
+   "trust_level": 4
+  },
+  {
+   "id": 2,
+   "username": "joueur-2",
+   "trust_level": 1
+  }
+ ],
+ "primary_groups": [],
+ "flair_groups": [],
+ "topic_list": {
+  "per_page": 30,
+  "topics": [
+   {
+    "id": 9001,
+    "slug": "notes-de-test",
+    "title": "Notes de développement de test",
+    "fancy_title": "Notes de développement de test",
+    "created_at": "2026-10-01T10:00:00.000Z",
+    "last_posted_at": "2026-10-01T11:00:00.000Z",
+    "bumped_at": "2026-10-01T11:00:00.000Z",
+    "pinned": true,
+    "posts_count": 3,
+    "category_id": 349,
+    "posters": [
+     {
+      "description": "Original Poster",
+      "user_id": 1
+     }
+    ]
+   },
+   {
+    "id": 9002,
+    "slug": "known-issues-test",
+    "title": "WoW Forever Beta Known Issues",
+    "fancy_title": "WoW Forever Beta Known Issues",
+    "created_at": "2026-09-17T10:00:00.000Z",
+    "last_posted_at": "2026-10-01T09:00:00.000Z",
+    "bumped_at": "2026-10-01T09:00:00.000Z",
+    "pinned": true,
+    "posts_count": 3,
+    "category_id": 349,
+    "posters": [
+     {
+      "description": "Original Poster",
+      "user_id": 1
+     }
+    ]
+   },
+   {
+    "id": 9003,
+    "slug": "message-de-joueur",
+    "title": "Une question de joueur",
+    "fancy_title": "Une question de joueur",
+    "created_at": "2026-10-01T08:00:00.000Z",
+    "last_posted_at": "2026-10-01T12:00:00.000Z",
+    "bumped_at": "2026-10-01T12:00:00.000Z",
+    "pinned": false,
+    "posts_count": 3,
+    "category_id": 349,
+    "posters": [
+     {
+      "description": "Original Poster",
+      "user_id": 2
+     }
+    ]
+   }
+  ]
+ }
+}

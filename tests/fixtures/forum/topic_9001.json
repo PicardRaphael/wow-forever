@@ -1,0 +1,25 @@
+{
+ "id": 9001,
+ "title": "Notes de développement de test",
+ "created_at": "2026-10-01T10:00:00.000Z",
+ "category_id": 349,
+ "post_stream": {
+  "posts": [
+   {
+    "id": 90010,
+    "post_number": 1,
+    "username": "Gestionnaire",
+    "user_title": "Community Manager",
+    "staff": true,
+    "admin": true,
+    "moderator": true,
+    "primary_group_name": "community-manager",
+    "created_at": "2026-10-01T10:00:00.000Z",
+    "updated_at": "2026-10-01T10:30:00.000Z",
+    "version": 2,
+    "cooked": "<p>Texte inventé : Frostbolt et Ignite changent ; le level cap monte ; diminishing returns revus.</p>",
+    "topic_id": 9001
+   }
+  ]
+ }
+}
