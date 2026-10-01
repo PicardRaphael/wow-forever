@@ -3,7 +3,11 @@
 
 Contenu (addon/README.md) : par GUID de personnage, des instantanés (connexion, gain de niveau, changement de talents)
 et les gains d'expérience, horodatés en heure du serveur (`time`) et en heure locale (`localtime`, même format que
-les journaux de combat). La jointure avec un journal se fait par GUID et heure locale."""
+les journaux de combat). La jointure avec un journal se fait par GUID et heure locale.
+
+CH0 : instantanés du familier du Chasseur et des statistiques du Chasseur (`pet_snapshots`), relevés de la fenêtre
+Beast Training (`training`) ; les retours multiples d'une API sont gardés par position (`{1: …, 2: …}`), un trou
+pour une valeur secrète ou absente."""
 
 from __future__ import annotations
 
@@ -35,6 +39,24 @@ class XpGain(NamedTuple):
     text: str
 
 
+class PetSnapshot(NamedTuple):
+    reason: str
+    time: int | None
+    localtime: datetime | None
+    level: int | None  # niveau du Chasseur
+    pet: dict[str, Any]  # famille, niveau, PV maximaux, armure, vitesse, puissance d'attaque, loyauté, régime…
+    hunter: dict[str, Any]  # Endurance, armure, puissance d'attaque (mêlée, distance), critique
+
+
+class TrainingWindow(NamedTuple):
+    time: int | None
+    localtime: datetime | None
+    skill_line: str | None
+    family: str | None
+    pet_level: int | None
+    entries: list[dict[str, Any]]  # name, rank, type, cost, level
+
+
 class Character(NamedTuple):
     guid: str
     name: str | None
@@ -43,6 +65,8 @@ class Character(NamedTuple):
     race: str | None
     snapshots: list[Snapshot]
     xp: list[XpGain]
+    pet_snapshots: list[PetSnapshot] = []  # noqa: RUF012 : NamedTuple, jamais modifiée
+    training: list[TrainingWindow] = []  # noqa: RUF012
 
 
 class LoggerDB(NamedTuple):
@@ -81,6 +105,21 @@ def _numbers(value: Any) -> dict[str, float]:
     if not isinstance(value, dict):
         return {}
     return {str(k): float(v) for k, v in value.items() if isinstance(v, int | float) and not isinstance(v, bool)}
+
+
+def _returns(value: Any) -> Any:
+    """Retours multiples d'une API gardés par position : liste ou table à trous -> {position: valeur}."""
+    if isinstance(value, list):
+        return {i: v for i, v in enumerate(value, start=1) if v is not None}
+    if isinstance(value, dict) and all(isinstance(k, int) for k in value):
+        return dict(sorted(value.items()))
+    return value
+
+
+def _state(value: Any) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        return {}
+    return {str(k): _returns(v) for k, v in value.items()}
 
 
 def _localtime(value: Any, path: Path) -> datetime | None:
@@ -140,7 +179,39 @@ def read_logger_db(path: Path) -> LoggerDB:
             for x in _list(c.get("xp"))
             if isinstance(x, dict)
         ]
+        pets = [
+            PetSnapshot(
+                reason=_str(s.get("reason")) or "",
+                time=_opt_int(s.get("time")),
+                localtime=_localtime(s.get("localtime"), path),
+                level=_opt_int(s.get("level")),
+                pet=_state(s.get("pet")),
+                hunter=_state(s.get("hunter")),
+            )
+            for s in _list(c.get("pet_snapshots"))
+            if isinstance(s, dict)
+        ]
+        training = [
+            TrainingWindow(
+                time=_opt_int(t.get("time")),
+                localtime=_localtime(t.get("localtime"), path),
+                skill_line=_str(t.get("skill_line")),
+                family=_str(t.get("family")),
+                pet_level=_opt_int(t.get("pet_level")),
+                entries=[dict(e) for e in _list(t.get("entries")) if isinstance(e, dict)],
+            )
+            for t in _list(c.get("training"))
+            if isinstance(t, dict)
+        ]
         characters[guid] = Character(
-            guid, _str(c.get("name")), _str(c.get("realm")), _str(c.get("class")), _str(c.get("race")), snapshots, xp
+            guid,
+            _str(c.get("name")),
+            _str(c.get("realm")),
+            _str(c.get("class")),
+            _str(c.get("race")),
+            snapshots,
+            xp,
+            pets,
+            training,
         )
     return LoggerDB(_opt_int(raw.get("schema")), characters)

@@ -46,7 +46,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 | à éviter | Journal de discussion (écrit à la sortie, ignore les `print` d'addon) ; pixels et lecture d'écran | — | Non |
 
 ## 6. Contrat de données
-- **ForeverLoggerDB** (retour, schéma 1) : par GUID, instantanés `{reason, time, localtime, level, talents, spell_bonus, spell_crit}` à la connexion, au gain de niveau et au changement de talents ; gains d'expérience `{time, localtime, level, text}`. Détail : `addon/README.md`. Lecture : `forever/pipeline/addon_sv.py` ; jointure avec un journal par GUID et heure locale (`forever logs measure <journal> --addon-sv <fichier>`).
+- **ForeverLoggerDB** (retour, schéma 1) : par GUID, instantanés `{reason, time, localtime, level, talents, spell_bonus, spell_crit}` à la connexion, au gain de niveau et au changement de talents ; gains d'expérience `{time, localtime, level, text}` ; depuis CH0 (0.3.0), hors combat seulement, instantanés du familier et des statistiques du Chasseur au même instant (`pet_snapshots`, sur `UNIT_PET`, `PET_UI_UPDATE`, à la connexion, repris à `PLAYER_REGEN_ENABLED` s'ils tombaient en combat) et relevés de la fenêtre Beast Training (`training`, sur `CRAFT_SHOW` et `CRAFT_UPDATE`). [Supposé] API des familiers de Classic (`GetPetTrainingPoints`, `GetPetFoodTypes`, `GetPetLoyalty`, `GetCraftInfo`…) présentes sur Forever : toutes sous `pcall`, champ absent sinon. Détail : `addon/README.md`. Lecture : `forever/pipeline/addon_sv.py` ; jointure avec un journal par GUID et heure locale (`forever logs measure <journal> --addon-sv <fichier>`).
 - **Fichier généré pour ForeverAssist** (aller, V1) : variable `ForeverAssistData` avec `schema`, `build`, `generated_at`, puis les données ; schéma versionné et validé par pytest, `Generated.sample.lua` versionné, `Generated.lua` ignoré par git.
 
 ## 7. Installation et procédure de test en jeu
@@ -54,6 +54,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 2. En jeu : `/reload` ; le message « journal de combat activé » s'affiche à l'entrée dans le monde si le journal était arrêté.
 3. Jouer, puis `/reload` (ou se déconnecter) pour écrire `ForeverLoggerDB`.
 4. Hors du jeu : `uv run forever logs scan`, puis `uv run forever logs measure <journal> --addon-sv <SavedVariables>/ForeverLogger.lua`.
+5. Familier du Chasseur (CH0) : familier appelé, hors combat, ouvrir la fenêtre du familier puis Beast Training ; changer une seule pièce d'équipement du Chasseur, rouvrir la fenêtre du familier ; `/reload` ; hors du jeu : `uv run forever pets measure --addon-sv <SavedVariables>/ForeverLogger.lua` (protocole complet : `docs/research/familiers-protocole.md`).
 
 ### Protocole de collecte (mesures pour le registre)
 - **Prioritaires (sensibilité de T05, `docs/research/builds-T05.md`)** : deux hypothèses font basculer un build recommandé.

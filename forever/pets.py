@@ -7,6 +7,7 @@ tranché ; les fiches rendent la valeur du client."""
 from __future__ import annotations
 
 import difflib
+import itertools
 import re
 import unicodedata
 from collections.abc import Mapping, Sequence
@@ -687,4 +688,119 @@ def measure_pets(pets: Mapping[str, Any], rules: Mapping[str, Any], db: Any) -> 
     """Relevés de ForeverLogger comparés au client : coût et niveau requis observés dans la fenêtre Beast Training,
     régime observé, PV du familier par point d'Endurance du Chasseur par paire d'instantanés (même familier, même
     niveau), vitesse d'attaque par famille ; chaque mesure avec `n`. Rien n'est écrit dans les données."""
-    raise NotImplementedError
+    aliases: Mapping[str, str] = pets.get("aliases", {})
+    families: Mapping[str, Any] = pets.get("families", {})
+    abilities: Mapping[str, Any] = pets.get("abilities", {})
+    rank_re = re.compile(str(pets.get("rank_subtext") or r"(\d+)\s*$"))
+
+    def fam_key(name: Any) -> str | None:
+        key = _family_of(aliases, family_key(name)) if isinstance(name, str) and name else None
+        return key if key in families else None
+
+    def effective(values: Any) -> float | None:
+        """Valeur effective d'un retour multiple (deuxième position : UnitStat, UnitArmor ; sens probable)."""
+        if isinstance(values, dict):
+            v = values.get(2, values.get(1))
+            return float(v) if isinstance(v, int | float) and not isinstance(v, bool) else None
+        return float(values) if isinstance(values, int | float) and not isinstance(values, bool) else None
+
+    training: list[dict[str, Any]] = []
+    diet_seen: dict[str, set[str]] = {}
+    speeds: dict[str, list[float]] = {}
+    pairs: list[dict[str, Any]] = []
+    armor_pairs: list[dict[str, Any]] = []
+    for character in getattr(db, "characters", {}).values():
+        for window in character.training:
+            fam = fam_key(window.family)
+            for entry in window.entries:
+                key = family_key(str(entry.get("name") or ""))
+                m = rank_re.search(str(entry.get("rank") or ""))
+                if key not in abilities or m is None:
+                    continue
+                rank = int(m[1])
+                client_rank = next((r for r in abilities[key]["ranks"] if r["rank"] == rank), None)
+                costs = families[fam].get("training_costs", {}).get(key, []) if fam else []
+                index = [r["rank"] for r in abilities[key]["ranks"]].index(rank) if client_rank else None
+                client = {
+                    "cost": costs[index] if index is not None and index < len(costs) else None,
+                    "level": client_rank["level"] if client_rank else None,
+                }
+                observed = {"cost": entry.get("cost"), "level": entry.get("level")}
+                if observed["cost"] is None or observed["level"] is None:
+                    status = "incomplet"
+                else:
+                    status = "concorde" if observed == client else "ecart"
+                training.append(
+                    {
+                        "ability": key,
+                        "rank": rank,
+                        "family": fam,
+                        "observed": observed,
+                        "client": client,
+                        "status": status,
+                        "localtime": window.localtime.isoformat() if window.localtime else None,
+                    }
+                )
+        by_pet: dict[tuple[Any, ...], list[Any]] = {}
+        for snap in character.pet_snapshots:
+            fam = fam_key(snap.pet.get("family"))
+            if fam is None:
+                continue
+            diet = snap.pet.get("diet")
+            if isinstance(diet, dict):
+                diet_seen.setdefault(fam, set()).update(str(v) for v in diet.values())
+            speed = snap.pet.get("attack_speed")
+            if isinstance(speed, int | float) and not isinstance(speed, bool):
+                speeds.setdefault(fam, []).append(float(speed))
+            by_pet.setdefault((fam, snap.pet.get("name"), snap.pet.get("level")), []).append(snap)
+        for (fam, _, level), snaps in by_pet.items():
+            for a, b in itertools.pairwise(snaps):
+                d_sta = (effective(b.hunter.get("stamina")) or 0) - (effective(a.hunter.get("stamina")) or 0)
+                hp_a, hp_b = a.pet.get("health_max"), b.pet.get("health_max")
+                if d_sta and isinstance(hp_a, int | float) and isinstance(hp_b, int | float):
+                    pairs.append({"family": fam, "pet_level": level, "ratio": (hp_b - hp_a) / d_sta})
+                d_arm = (effective(b.hunter.get("armor")) or 0) - (effective(a.hunter.get("armor")) or 0)
+                arm_a, arm_b = effective(a.pet.get("armor")), effective(b.pet.get("armor"))
+                if d_arm and arm_a is not None and arm_b is not None:
+                    armor_pairs.append({"family": fam, "pet_level": level, "ratio": (arm_b - arm_a) / d_arm})
+
+    diet_rows = []
+    for fam in sorted(diet_seen):
+        client_diet = sorted(d["en"] for d in families[fam].get("diet") or [])
+        observed_diet = sorted(diet_seen[fam])
+        diet_status = "concorde" if observed_diet == client_diet else "ecart"
+        diet_rows.append({"family": fam, "observed": observed_diet, "client": client_diet, "status": diet_status})
+    rule = rules.get("rules", {})
+
+    def rule_value(key: str) -> Any:
+        return rule.get(key, {}).get("value")
+
+    return {
+        "training": training,
+        "diet": diet_rows,
+        "inheritance": {
+            "health_per_stamina": {
+                "values": [p["ratio"] for p in pairs],
+                "pairs": pairs,
+                "n": len(pairs),
+                "rule": rule_value("inheritance.health_per_stamina"),
+                "certainty": "probable",
+            },
+            "armor_ratio": {
+                "values": [p["ratio"] for p in armor_pairs],
+                "pairs": armor_pairs,
+                "n": len(armor_pairs),
+                "rule_pct": rule_value("inheritance.armor_pct"),
+                "certainty": "probable",
+            },
+        },
+        "attack_speed": {fam: {"values": sorted(set(v)), "n": len(v)} for fam, v in sorted(speeds.items())},
+        "rules": {"attack_speed.base_s": rule_value("attack_speed.base_s")},
+        "notes": [
+            "valeur effective lue en deuxième position des retours de UnitStat et UnitArmor (sens probable)",
+            (
+                "rapports formés sur des paires d'instantanés du même familier au même niveau ; écarts proposés au "
+                "registre seulement après accord, jamais écrits dans les données"
+            ),
+        ],
+    }

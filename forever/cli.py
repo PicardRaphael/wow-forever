@@ -469,6 +469,10 @@ def build_parser() -> argparse.ArgumentParser:
     pets_cross = pets_sub.add_parser("crosscheck", parents=[pets_common], help="écarts client ↔ addon ↔ Questie")
     pets_cross.add_argument("--markdown", help="écrire aussi le rapport Markdown dans ce fichier")
     pets_sub.add_parser("mine", parents=[pets_common], help="mes observations et mes familiers (ma sauvegarde)")
+    pets_measure = pets_sub.add_parser(
+        "measure", parents=[pets_common], help="relevés du familier de ForeverLogger comparés au client (hors ligne)"
+    )
+    pets_measure.add_argument("--addon-sv", required=True, help="SavedVariables ForeverLogger.lua")
 
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     hook = sub.add_parser("hook", help="hooks du plugin Claude Code (entrée JSON sur stdin)")
@@ -1093,7 +1097,7 @@ def _cmd_talents(deps: Deps, args: argparse.Namespace) -> int:
 
 def _cmd_pets(deps: Deps, args: argparse.Namespace) -> int:
     from forever.pets import render_crosscheck_markdown
-    from forever.pets_lookup import lookup_pets, pets_crosscheck, pets_mine, render_pets
+    from forever.pets_lookup import lookup_pets, pets_crosscheck, pets_measure, pets_mine, render_pets
 
     addon = Path(args.addon) if args.addon else None
     saved = Path(args.saved) if args.saved else None
@@ -1107,6 +1111,8 @@ def _cmd_pets(deps: Deps, args: argparse.Namespace) -> int:
             target.write_bytes(render_crosscheck_markdown(payload).encode("utf-8"))
     elif cmd == "mine":
         payload = pets_mine(deps, saved_path=saved)
+    elif cmd == "measure":
+        payload = pets_measure(deps, Path(args.addon_sv))
     else:
         if cmd == "rules":
             name = None

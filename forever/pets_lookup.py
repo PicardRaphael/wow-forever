@@ -231,6 +231,18 @@ def pets_mine(deps: Deps, *, saved_path: Path | None = None) -> dict[str, Any]:
     }
 
 
+def pets_measure(deps: Deps, addon_sv: Path) -> dict[str, Any]:
+    """Relevés du familier de ForeverLogger comparés à `pets.json` et `pet_rules.json` (hors ligne, rien n'est
+    écrit dans les données)."""
+    from forever.pets import measure_pets
+    from forever.pipeline.addon_sv import read_logger_db
+
+    src = _Sources(deps)
+    report = measure_pets(src.pets, src.rules, read_logger_db(addon_sv))
+    extra = [*report["notes"], f"relevé : {addon_sv.name} (lu sur disque) ; rien n'est écrit dans les données"]
+    return {"kind": "pets_measure", **report, "provenance": src.provenance("probable", extra)}
+
+
 def _value(value: Any) -> str:
     return "—" if value is None else str(value)
 
@@ -303,6 +315,20 @@ def render_pets(payload: dict[str, Any]) -> list[str]:
     elif kind == "pets_crosscheck":
         lines.append(f"Recoupement : {len(payload['gaps'])} écart(s)")
         lines += [f"- {g['kind']} {g['subject']} {g['field'] or ''} : {g['values']}" for g in payload["gaps"]]
+    elif kind == "pets_measure":
+        for r in payload["training"]:
+            lines.append(
+                f"- {r['ability']} rang {r['rank']} ({r['family']}) : observé {r['observed']}, client {r['client']}, "
+                f"{r['status']}"
+            )
+        lines += [
+            f"- régime {r['family']} : {r['observed']} contre {r['client']} ({r['status']})" for r in payload["diet"]
+        ]
+        inh = payload["inheritance"]["health_per_stamina"]
+        lines.append(
+            f"PV du familier par point d'Endurance : {inh['values']} (n = {inh['n']}, relevé de joueurs {inh['rule']})"
+        )
+        lines += [f"- vitesse {fam} : {v['values']} (n = {v['n']})" for fam, v in payload["attack_speed"].items()]
     elif kind == "pets_mine":
         for character, entry in payload["pets"].items():
             lines += [

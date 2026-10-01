@@ -1709,6 +1709,7 @@ mechanics:
       - "forever/data/1.60.1.70124/pets.json (colonne sans nom de SkillLineAbility, training_costs par famille)"
     tests:
       - tests/unit/test_decode_pets.py::test_training_cost_raw_per_family_and_common_value_per_rank
+      - tests/unit/test_pet_measure.py::test_training_cost_and_level_compared_to_pets_json
     tolerance: null
     note: "colonne sans nom lue comme coût (non nulle seulement sur les lignes de familier) ; valeurs nulles gardées telles quelles ; certain après un relevé de la fenêtre Beast Training (ForeverLogger, protocole de CH0)"
   - id: L5
@@ -1786,6 +1787,7 @@ mechanics:
       - "Hunter Pet Scaling du client : points de base presque tous nuls (pets.json pet_scaling, probable)"
     tests:
       - tests/unit/test_pet_rules.py::test_certainty_never_above_its_origin
+      - tests/unit/test_pet_measure.py::test_health_per_stamina_from_pairs_with_n
     tolerance: null
     note: "relevé de joueurs (décision 127) ; mesure par paires d'instantanés de ForeverLogger (docs/research/familiers-protocole.md)"
   - id: L11

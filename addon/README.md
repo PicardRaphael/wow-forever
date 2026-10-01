@@ -23,10 +23,19 @@ ForeverLoggerDB = {
       snapshots = { { reason = "connexion" | "niveau" | "talents", time, localtime, level,
                       talents = { [nodeID] = rang }, spell_bonus = { [école] = … }, spell_crit = { [école] = … } }, … },
       xp = { { time, localtime, level, text }, … },
+      -- CH0 (0.3.0), hors combat seulement :
+      pet_snapshots = { { reason = "connexion" | "familier" | "fenetre" | "apres-combat", time, localtime, level,
+                          pet = { family, name, level, health_max, armor = {…}, attack_speed, attack_power = {…},
+                                  loyalty, happiness = {…}, training_points = {…}, diet = {…} },
+                          hunter = { stamina = {…}, armor = {…}, attack_power = {…}, ranged_attack_power = {…},
+                                     crit, ranged_crit } }, … },
+      training = { { time, localtime, skill_line, family, pet_level,
+                     entries = { { name, rank, type, cost, level }, … } }, … },
     },
   },
 }
 ```
 - `time` : heure du serveur (`GetServerTime`) ; `localtime` : heure locale au format des journaux (`%m/%d/%Y %H:%M:%S`), pour la jointure avec `WoWCombatLog-*.txt`.
-- Un champ absent signifie une API indisponible, en erreur ou une valeur secrète.
+- Un champ absent signifie une API indisponible, en erreur ou une valeur secrète. `{…}` : retours multiples de l'API gardés par position (un trou pour une valeur secrète).
+- Familier (CH0) : `uv run forever pets measure --addon-sv <SavedVariables>/ForeverLogger.lua` compare la fenêtre Beast Training et le régime au client et forme les rapports d'héritage (protocole : `docs/research/familiers-protocole.md`).
 - Lecture : `uv run forever logs measure <journal> --addon-sv <SavedVariables>/ForeverLogger.lua` (niveau du lanceur pour les touchés et ratés).
