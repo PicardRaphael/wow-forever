@@ -3,7 +3,7 @@
 
 import json
 
-from conftest import DATA_DIR, LOCAL_VERSION, REPO_ROOT
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, REPO_ROOT
 
 from forever.cli import main
 from forever.origins import ORIGINS_NAME, inventory, inventory_payload, render_inventory
@@ -38,8 +38,8 @@ def test_inventory_is_sorted_and_deterministic():
 
 
 def test_pending_lowerings_come_first():
-    rows, pending = inventory(DATA_DIR, LOCAL_VERSION)
-    text = render_inventory(LOCAL_VERSION, rows, pending)
+    rows, pending = inventory(DATA_DIR, PREVIOUS_VERSION)
+    text = render_inventory(PREVIOUS_VERSION, rows, pending)
     assert pending
     first_pending = text.index(f"`{pending[0].path}`")
     first_row = text.index(f"`{rows[0].path}`")

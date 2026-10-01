@@ -27,7 +27,8 @@ def sha(path):
 def content(path):
     """Contenu du fichier, sa marque d'origine mise à part (`inherited_from`, écrite par forever decode)."""
     doc = json.loads(path.read_text(encoding="utf-8"))
-    return {k: v for k, v in doc.items() if k != "inherited_from"} if isinstance(doc, dict) else doc
+    # T08b : meta.json porte aussi game_state, fait d'installation (D2)
+    return {k: v for k, v in doc.items() if k not in ("inherited_from", "game_state")} if isinstance(doc, dict) else doc
 
 
 def test_seed_files_are_byte_identical_in_the_version_they_came_from():
@@ -70,4 +71,5 @@ def test_version_dir_contains_exactly_expected_files():
         "_seed_spells.json",
         "revisions.json",  # T06b : journal des révisions de la version (forever install)
         "origins.json",  # T08b, bloc H : origine déclarée de chaque valeur
+        "character_scaling.json",  # T08b, révision 4 : ratios du personnage décodés du client
     }

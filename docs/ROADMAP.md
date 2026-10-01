@@ -253,6 +253,7 @@ serveur ou d'un addon de données n'est plus manquée. Plan : `tasks/T08b-plan.m
     - **Rejeu des builds de T05** après le décodage des ratios : chaque recommandation qui change est montrée à l'utilisateur, avec sa raison, avant le commit.
 - **Hors périmètre** : `DBCache.bin` (T08) ; modèle d'XP de Forever (T04d) ; lecteurs d'AtlasLoot et de ForeverDungeonJournal pour leurs propres consultations (DJ1) ; lecture directe des fichiers du client sans wago.tools (documentée seulement).
 - **Critères de fin** : fixés au plan.
+- **Réalisé (2026-10-01)** : blocs H, A, B, C, D, E, F, G, I et J (sonde de l'API Blizzard, ajoutée par l'utilisateur) ; veille des notes **lancée à la main seulement** (D1, décision 148) ; révision 4 de 1.60.1.70124 installée après le rejeu (`docs/research/builds-T05.md`, section « Rejeu T08b ») ; workflows `notes-watch` et `api-probe` livrés en patch.
 
 ## FA1 — ForeverAssist V1 (affichage de données précalculées)
 Addon d'affichage seul (règles et canaux : `docs/ADDON.md`). Aucun calcul de combat dans l'addon : `forever` précalcule, l'addon affiche.

@@ -78,7 +78,8 @@ def test_seed_rules_read_the_frozen_copies(client_copy, seed_game_data):
     assert seed.spells == seed_game_data.spells and seed.talents == seed_game_data.talents
     assert seed.talent_at == seed_game_data.talent_at and seed.utility == seed_game_data.utility
     # Le reste des données est partagé entre les deux modes.
-    assert seed.scaling == forever.scaling and seed.constants == forever.constants
+    assert seed.scaling == forever.scaling and seed.constants.coefficients == forever.constants.coefficients
+    assert seed.constants.character.base_mana_by_level == ()  # T08b : ratios du client en mode forever seulement
 
 
 def test_seed_results_do_not_move_with_the_client_values(client_copy, seed_game_data):

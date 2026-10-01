@@ -8,11 +8,12 @@ from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, WAGO_70009, Fake
 from forever.errors import CandidateExistsError, CsvMissingError
 from forever.gamedata import build_game_data
 from forever.manifest import compute_manifest, verify
+from forever.pipeline.character_scaling import CHARACTER_FILES
 from forever.pipeline.decode import DECODED_FILES, INHERITED_FILES, decode_version
 from forever.pipeline.fetch import wago_dir
 from forever.store import VersionData, current_identity, read_sources
 
-EXPECTED_FILES = {*DECODED_FILES, *INHERITED_FILES, "sources.json"}
+EXPECTED_FILES = {*DECODED_FILES, *INHERITED_FILES, *CHARACTER_FILES, "sources.json"}
 
 
 def version_data(root):
@@ -28,7 +29,9 @@ def test_candidate_is_a_complete_data_dir(candidate):
     names = {p.name for p in (candidate.root / PREVIOUS_VERSION).iterdir()}
     # T04 : monsters.json hérité, spell_scaling.json décodé ; PV1 : fichiers des 9 classes (hérités ici : la
     # fixture 70009 n'a pas leurs tables), _seed_racials.json hérité, racials.json retiré.
-    assert names == EXPECTED_FILES and len(names) == 17  # PV1, bloc C : pvp_rules.json hérité ; T08b : origins.json
+    assert (
+        names == EXPECTED_FILES and len(names) == 18
+    )  # PV1, bloc C : pvp_rules.json hérité ; T08b : origins.json, character_scaling.json
     assert "_source_gunba_mage_tree.json" not in names and "confirmed_changes.json" not in names
 
 

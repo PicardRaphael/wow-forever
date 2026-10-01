@@ -62,7 +62,7 @@ def test_leaf_added_in_a_decoded_file_is_covered_by_its_pattern(data_copy):
     path = data_copy / LOCAL_VERSION / "spell_scaling.json"
     doc = load(path)
     first = next(iter(doc["spells"]))
-    doc["spells"][first]["t08b_champ_nouveau"] = 1
+    doc["spells"][first][0]["t08b_champ_nouveau"] = 1
     dump(path, doc)
     assert check_version(data_copy, LOCAL_VERSION).ok
 
@@ -122,14 +122,14 @@ def test_entry_more_certain_than_its_rule_fails(data_copy):
 
 
 def test_pending_lowering_is_tolerated_and_listed(data_copy):
-    path = data_copy / LOCAL_VERSION / ORIGINS_NAME
+    path = data_copy / PREVIOUS_VERSION / ORIGINS_NAME
     origins = load(path)
     assert origins["pending"], "abaissements prévus en révision 4 déclarés"
     for entry in origins["pending"]:
         assert entry["until"] and entry["reason"] and entry["declared"] == "certain"
     origins["pending"] = origins["pending"][1:]
     dump(path, origins)
-    assert "certitude_superieure" in kinds(check_version(data_copy, LOCAL_VERSION))
+    assert "certitude_superieure" in kinds(check_version(data_copy, PREVIOUS_VERSION))
 
 
 def test_pending_without_object_fails(data_copy):

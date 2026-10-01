@@ -51,6 +51,7 @@ INHERITED = (
 # PV1 : racials.json retiré (races.json décodé), fichiers des 9 classes et copie figée hérités de la version courante.
 PV1_RETIRED = {"racials.json"}
 PV1_ADDED = {"_seed_racials.json", "classes.json", "races.json", "pvp_items.json", "pvp_rules.json"}
+PV1_ADDED |= {"character_scaling.json"}  # T08b, révision 4 : hérité par la candidate de la fixture 1.60.1.70009
 
 
 def strip_provenance(doc):
@@ -183,8 +184,8 @@ def test_nothing_changed_is_installed_anyway(installed, newer):
     }
     # Seule la provenance bouge : les valeurs ont été relues dans la candidate, leur bloc `source` la nomme.
     # `metadata` : le bloc `source` existait déjà (révision 2) et nomme désormais le build relu.
-    assert {c["rule"] for c in plan["changes"]} <= {"added_field", "metadata", "certainty"}
-    assert all(c["path"].endswith(".source") or c["rule"] == "certainty" for c in plan["changes"])
+    assert {c["rule"] for c in plan["changes"]} <= {"added_field", "metadata", "certainty", "game_state"}
+    assert all(c["path"].endswith(".source") or c["rule"] in ("certainty", "game_state") for c in plan["changes"])
     apply_install(installed, newer, motif="T08a", new_version=True)
     assert (installed.data_dir / NEW_VERSION / "talents.json").is_file()
 

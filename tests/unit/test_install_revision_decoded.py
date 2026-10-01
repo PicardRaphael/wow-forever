@@ -37,6 +37,8 @@ def cand(decoded, tmp_path):
 
 
 def test_plan_lists_changed_values_of_decoded_files(data_copy, cand, make_deps):
+    (data_copy / LOCAL_VERSION / CHARACTER).unlink()  # dépôt d'avant la révision 4
+    write_manifest(data_copy)
     plan = plan_install(make_deps(data_dir=data_copy), str(cand))
     values = [c for c in plan["changes"] if c["rule"] == "value"]
     assert any(c["file"] == SCALING and "frostbolt" in c["path"] and "bonus_coefficient" in c["path"] for c in values)

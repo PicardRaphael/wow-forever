@@ -106,7 +106,8 @@ def test_plan_lists_exactly_the_allowed_changes(r1, candidate):
     assert costs == {f"{k}.ranks[1].mana": v for k, v in COSTS.items()}
     removed = [(c["path"], c["before"]) for c in plan["changes"] if c["rule"] == "removed_field"]
     assert removed == [("hotStreak.duration_s", 20)]
-    assert all(c["source"] and c["certainty"] == "certain" for c in plan["changes"])
+    assert all(c["source"] and c["certainty"] == "certain" for c in plan["changes"] if c["rule"] != "game_state")
+    assert {c["path"] for c in plan["changes"] if c["rule"] == "game_state"} == {"values.build.beta_level_cap"}
 
 
 def test_plan_writes_nothing(r1, candidate):
@@ -222,7 +223,7 @@ def test_repository_is_revision_two(make_deps):
         deps, game_version=LOCAL_VERSION, data_sha="0" * 12, freshness="fresh", certainty="certain", assumptions=[]
     )
     # T08a : la version installée est 1.60.1.70124 (une nouvelle version repart à 1) ; PV1 : révisions 2 et 3.
-    assert p["data_revision"] == 3
+    assert p["data_revision"] == 4  # T08b : révision 4 (ratios du personnage)
 
 
 def test_every_talent_is_certain(make_deps, game_data):
@@ -267,7 +268,9 @@ def test_forever_uses_client_costs_and_seed_keeps_its_estimate(game_data, seed_g
 
 def test_client_decode_matches_the_installed_data(make_deps, candidate):
     d = diff_versions(make_deps(), PREVIOUS_VERSION, cand(candidate))
-    assert [c for c in d["changes"] if c["kind"] != "file"] == []
+    assert [
+        c for c in d["changes"] if c["kind"] != "file" and not (c["kind"] == "scaling" and c["change"] == "added")
+    ] == []
 
 
 def test_client_decode_against_the_seed_copies_is_the_confirmed_list(tmp_path, candidate):
@@ -280,5 +283,5 @@ def test_client_decode_against_the_seed_copies_is_the_confirmed_list(tmp_path, c
 
 def test_status_shows_the_revision(make_deps):
     rep = status_report(make_deps(), allow_network=False)
-    assert rep["data_revision"] == 3  # PV1 : révisions 2 (9 classes, raciaux) et 3 (dissipations)
-    assert render_status(rep)[0].startswith(f"Données locales {LOCAL_VERSION} r3 ·")
+    assert rep["data_revision"] == 4  # PV1 : révisions 2 (9 classes, raciaux) et 3 (dissipations) ; T08b : 4
+    assert render_status(rep)[0].startswith(f"Données locales {LOCAL_VERSION} r4 ·")

@@ -20,7 +20,7 @@ from forever.pipeline.install import apply_install, plan_install, render_install
 from forever.store import load_version
 
 OLD_KEY = "build.beta_level_cap"
-CURRENT = read_json(DATA_DIR / LOCAL_VERSION / "mechanics.json")["values"][OLD_KEY]["value"]
+CURRENT = read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]["value"]
 TEST_CAP = CURRENT + 10  # valeur de test arbitraire
 NOTE = "https://us.forums.blizzard.com/en/wow/t/exemple/1"
 

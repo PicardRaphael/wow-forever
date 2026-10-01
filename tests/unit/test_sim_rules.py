@@ -30,8 +30,10 @@ def test_default_rules_are_forever_with_auto_armor(game_data):
     assert (o["rules"], o["armor"]) == ("forever", "auto")
 
 
-def test_seed_rules_keep_the_seed_value(game_data):
-    assert mc(game_data, 16, IF5, n=200, seed=1, **SEED_MODE)["total"] == pytest.approx(30.435373555182213, rel=1e-12)
+def test_seed_rules_keep_the_seed_value(seed_game_data):
+    assert mc(seed_game_data, 16, IF5, n=200, seed=1, **SEED_MODE)["total"] == pytest.approx(
+        30.435373555182213, rel=1e-12
+    )
 
 
 @pytest.mark.parametrize(

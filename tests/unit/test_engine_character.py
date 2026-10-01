@@ -12,8 +12,8 @@ def approx(x):
     return pytest.approx(x, rel=1e-12, abs=1e-15)
 
 
-def test_character_orc_60(game_data):
-    c = character(game_data, 60, "Orc")
+def test_character_orc_60(seed_game_data):
+    c = character(seed_game_data, 60, "Orc")
     assert (c.level, c.race) == (60, "Orc")
     assert c.intellect == approx(168.84)
     assert c.spirit == approx(147.44)
@@ -28,8 +28,8 @@ def test_character_orc_60(game_data):
     assert c.overrides == {}
 
 
-def test_character_gnome_mana(game_data):
-    assert character(game_data, 12, "Gnome").mana == approx(753.165)
+def test_character_gnome_mana(seed_game_data):
+    assert character(seed_game_data, 12, "Gnome").mana == approx(753.165)
 
 
 def test_spell_power_starts_at_level_10(game_data):
@@ -37,20 +37,20 @@ def test_spell_power_starts_at_level_10(game_data):
     assert character(game_data, 10).sp == approx(4.0)
 
 
-def test_int_per_crit(game_data):
-    assert int_per_crit(game_data, 1) == 6.0
-    assert int_per_crit(game_data, 30) == approx(32.29661016949153)
-    assert int_per_crit(game_data, 60) == 59.5
-    assert int_per_crit(game_data, 0) == 6.0
-    assert int_per_crit(game_data, 70) == 59.5
+def test_int_per_crit(seed_game_data):
+    assert int_per_crit(seed_game_data, 1) == 6.0
+    assert int_per_crit(seed_game_data, 30) == approx(32.29661016949153)
+    assert int_per_crit(seed_game_data, 60) == 59.5
+    assert int_per_crit(seed_game_data, 0) == 6.0
+    assert int_per_crit(seed_game_data, 70) == 59.5
 
 
 def test_spell_crit_override(game_data):
     assert character(game_data, 60, "Orc", {"spell_crit": 0.10}).crit == 0.10
 
 
-def test_overrides_replace_estimates(game_data):
-    c = character(game_data, 60, "Orc", {"intellect": 200, "sp": 500, "hit_gear": 0.02, "haste": 0.1})
+def test_overrides_replace_estimates(seed_game_data):
+    c = character(seed_game_data, 60, "Orc", {"intellect": 200, "sp": 500, "hit_gear": 0.02, "haste": 0.1})
     assert c.intellect == 200
     assert c.sp == 500
     assert (c.hit_gear, c.haste) == (0.02, 0.1)

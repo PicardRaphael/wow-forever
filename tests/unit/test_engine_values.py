@@ -18,6 +18,12 @@ def ch(game_data):
     return character(game_data, 60, "Orc", {"sp": 500, "spell_crit": 0.10})
 
 
+@pytest.fixture
+def seed_ch(seed_game_data):
+    """T08b (D3) : même fiche sur les données du seed (ratios estimés de fm.py)."""
+    return character(seed_game_data, 60, "Orc", {"sp": 500, "spell_crit": 0.10})
+
+
 def test_frostbolt_values(game_data, ch):
     """Mode seed (formule du seed, T04e) ; valeurs du mode forever : tests/unit/test_client_coefficients.py."""
     e = expected_cast(game_data, "frostbolt", 60, {}, ch, rules="seed")
@@ -44,10 +50,10 @@ def test_fireball_values(game_data, ch):
     assert e["range_yd"] == 35
 
 
-def test_arcane_blast_mana_pct(game_data, ch):
-    e = expected_cast(game_data, "arcane_blast", 60, {"arcaneBlast": 1}, ch)
+def test_arcane_blast_mana_pct(seed_game_data, seed_ch):
+    e = expected_cast(seed_game_data, "arcane_blast", 60, {"arcaneBlast": 1}, seed_ch)
     assert e["mana"] == approx(182.265)
-    assert e["mana"] == approx(0.15 * ch.base_mana)
+    assert e["mana"] == approx(0.15 * seed_ch.base_mana)
 
 
 def test_talent_rank_mana_estimate(seed_game_data, ch):

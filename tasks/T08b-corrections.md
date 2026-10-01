@@ -87,7 +87,7 @@ du seed).
 ### 6. Numéro de révision : `test_install.py::test_repository_is_revision_two` (l. 225), `test_install.py::test_status_shows_the_revision` (l. 283), `test_provenance.py::test_make_provenance` (l. 121), `test_manifest.py::test_manifest_content`
 
 - Preuve : `forever/data/1.60.1.70124/sources.json` `revision` vaut 4 après l'installation (accord du 2026-10-01).
-- Diff : `== 3` → `== 4` aux trois endroits (commentaire « T08b : révision 4 (ratios du personnage) ») ; dans
+- Diff : `== 3` → `== 4` aux trois endroits, et `r3` → `r4` dans la ligne de statut attendue de `test_status_shows_the_revision` (l. 287) (commentaire « T08b : révision 4 (ratios du personnage) ») ; dans
   `test_manifest.py` : `v["revision"] == 4 and v["revised_at"] == "2026-10-01"`, `len(v["files"]) == 23` et
   `"character_scaling.json"` ajouté au sous-ensemble.
 

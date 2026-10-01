@@ -83,7 +83,6 @@ def test_build_method_loaded(game_data):
 def test_build_keys_carry_certainty_and_source():
     values = read_json(DATA_DIR / LOCAL_VERSION / "mechanics.json")["values"]
     expected = {
-        "build.beta_level_cap": "probable",
         "build.confidence": "certain",
         "build.stability_seeds": "certain",
         "respec.gold_per_hour": "suppose",
@@ -94,10 +93,12 @@ def test_build_keys_carry_certainty_and_source():
         assert values[key]["certainty"] == certainty, key
         assert values[key]["source"], key
         assert values[key]["registry"] == "I5", key
+    # T08b (D2) : plafond de la bêta, fait d'installation dans meta.json game_state
+    assert read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]["certainty"] == "probable"
 
 
 def test_missing_build_key_is_schema_error(make_deps, data_copy):
-    edit_json(data_copy, "mechanics.json", lambda doc: doc["values"].pop("build.beta_level_cap"))
+    edit_json(data_copy, "meta.json", lambda doc: doc.pop("game_state"))  # T08b : plus de game_state ni de clé
     with pytest.raises(DataSchemaError) as exc:
         load_game_data(make_deps(data_dir=data_copy))
     assert "build.beta_level_cap" in exc.value.message

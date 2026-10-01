@@ -178,6 +178,29 @@ inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits 
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
 
+## Rejeu T08b (1.60.1.70124 révision 4)
+
+Rejoué le 2026-10-01 par `scripts/replay_builds.py run T08b` (préréglage complet, graine 12345, race Orc) sur la
+révision 4 : ratios du personnage lus dans le client en mode forever (`character_scaling.json`), utilitaires du Mage
+lus dans `classes.json`. Comparaison `compare PV1 T08b` ; raison de chaque changement par **ablation**
+(`--ratios seed:<nom>` : la valeur du client remise à son estimation, une à la fois, passages `T08b-sans-<nom>`).
+Seules trois valeurs du client diffèrent des estimations : critique par Intelligence (`int_per_crit`), mana de base
+(`base_mana`), utilitaires (`utility`) ; XP par niveau, constante d'armure, règles des talents, Ignite et Winter's
+Chill décodés sont identiques aux estimations (contrôlé avant le rejeu).
+
+**Onze cas inchangés, quatre changés** (montrés à l'utilisateur avant le commit de la révision 4, accord du même jour) :
+
+| Cas | Changement | Raison (ablation qui rend la recommandation de PV1) | Écart avec l'alternative (T08b) |
+| --- | --- | --- | --- |
+| leveling 40 | Elemental Precision 2 → 4, Winter's Chill 5 → 3 ; ordre des niveaux 21 à 31 | critique par Intelligence | égalité au seul niveau 40 (non significatif) ; le build suit le meilleur chemin cumulé de 10 à 40 |
+| leveling 60 | mêmes talents ; ordre des niveaux 21 à 31 | critique par Intelligence | inchangé (non significatif) |
+| donjon 20 | Arcane Focus 3 → 5, Arcane Blast 0 → 1, Wand Specialization 2 → 0, Elemental Precision 1 → 0 ; boss en rotation Arcanes (un cumul, Arcane Missiles), paquets en Blizzard ; dégâts par seconde plus bas | mana de base (plus basse au niveau 20 que la droite estimée) | significatif |
+| raid 20 | même build ; décision au Monte Carlo et stabilité sur 5 graines sur 5 | mana de base | l'alternative devient significativement moins bonne |
+
+Les chiffres de chaque cas sont dans `<cache>/builds/T08b/` et `<cache>/builds/T08b-sans-*/` (`table.md`). Les écarts
+des 55 builds de la communauté sont recalculés (fixture `tests/fixtures/community/mage_builds.json`) : ils
+concordent désormais avec notre référence pour 2 builds (8 avant la révision 4).
+
 ## Rejeu T08a (1.60.1.70124)
 
 Rejoué le 2026-09-30 par `scripts/replay_builds.py run T08a` (mêmes réglages : préréglage complet, graine 12345,

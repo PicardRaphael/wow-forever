@@ -11,10 +11,10 @@ SEED_MODE = {"mob_source": "seed", "spell_level": "rank", "rules": "seed"}
 IF5 = {"improvedFrostbolt": 5}
 
 
-def test_monte_carlo_reproducible_seed_mode(game_data):
+def test_monte_carlo_reproducible_seed_mode(seed_game_data):
     """Test du seed (monte_carlo_reproductible) porté à l'identique, valeur du seed en plus."""
-    a = mc(game_data, 16, IF5, n=200, seed=1, **SEED_MODE)["total"]
-    b = mc(game_data, 16, IF5, n=200, seed=1, **SEED_MODE)["total"]
+    a = mc(seed_game_data, 16, IF5, n=200, seed=1, **SEED_MODE)["total"]
+    b = mc(seed_game_data, 16, IF5, n=200, seed=1, **SEED_MODE)["total"]
     assert a == b == pytest.approx(30.435373555182213, rel=1e-12)
 
 

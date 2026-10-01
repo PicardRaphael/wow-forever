@@ -1,7 +1,7 @@
 {
  "source": "docs/research/community-builds-mage.md (bloc JSON, recherche du 2026-09-28)",
  "generated_by": "scripts/build_community_fixture.py",
- "game_version": "1.60.1.70009",
+ "game_version": "1.60.1.70124",
  "concord_threshold": 0.02,
  "preset": "rapide",
  "mc_n": 100,
@@ -11,10 +11,9 @@
    "context": "dungeon",
    "level": 20,
    "points": {
-    "wandSpecialization": 2,
-    "arcaneFocus": 3,
+    "arcaneFocus": 5,
     "arcaneConcentration": 5,
-    "elementalPrecision": 1
+    "arcaneBlast": 1
    },
    "preset": "rapide"
   },
@@ -61,8 +60,7 @@
    "points": {
     "improvedFrostbolt": 5,
     "elementalPrecision": 3,
-    "frostWarding": 1,
-    "frostbite": 1,
+    "frostbite": 2,
     "iceLance": 1
    },
    "preset": "rapide"
@@ -73,12 +71,11 @@
    "points": {
     "improvedFrostbolt": 5,
     "elementalPrecision": 3,
-    "frostWarding": 1,
     "frostbite": 3,
     "iceLance": 1,
     "piercingIce": 2,
+    "frostChanneling": 3,
     "shatter": 3,
-    "frostChanneling": 2,
     "fingersOfFrost": 1
    },
    "preset": "rapide"
@@ -89,14 +86,14 @@
    "points": {
     "improvedFrostbolt": 5,
     "elementalPrecision": 3,
-    "frostWarding": 1,
     "frostbite": 3,
     "iceLance": 1,
     "piercingIce": 3,
-    "shatter": 3,
     "frostChanneling": 3,
+    "shatter": 3,
     "fingersOfFrost": 1,
     "iceShards": 5,
+    "frostWarding": 1,
     "wintersChill": 3
    },
    "preset": "rapide"
@@ -107,14 +104,14 @@
    "points": {
     "improvedFrostbolt": 5,
     "elementalPrecision": 5,
-    "frostWarding": 2,
     "frostbite": 3,
     "iceLance": 1,
     "piercingIce": 3,
-    "shatter": 3,
     "frostChanneling": 3,
+    "shatter": 3,
     "fingersOfFrost": 2,
     "iceShards": 5,
+    "frostWarding": 2,
     "wintersChill": 5,
     "improvedFrostNova": 2,
     "improvedBlizzard": 3,
@@ -212,8 +209,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.04852689326768294,
-    "mc_rel": -0.13459309390670116,
+    "analytic_rel": -0.10000769411550903,
+    "mc_rel": -0.21205672527815786,
     "mc_significant": true
    },
    "explanation": {
@@ -266,14 +263,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.0027678605556457664,
-    "mc_rel": 0.007402699521455597,
-    "mc_significant": false
+    "analytic_rel": -0.050979195714457276,
+    "mc_rel": -0.06407129371665306,
+    "mc_significant": true
    },
    "explanation": {
-    "kind": "concorde",
+    "kind": "source_douteuse",
     "registry": null,
-    "motif": "écart -0,3% à l'analytique, sous le seuil de concordance"
+    "motif": "choix non chiffré par la source (antérieur aux notes de développement du 24/09 (sans effet direct sur les talents de givre))"
    }
   },
   {
@@ -320,14 +317,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.07255131637982679,
-    "mc_rel": 0.08265825589670102,
-    "mc_significant": true
+    "analytic_rel": 0.026362689387185487,
+    "mc_rel": 0.01678204820723825,
+    "mc_significant": false
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +7,3% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +2,6% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -386,8 +383,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.02901199462366433,
-    "mc_rel": -0.015269227183904202,
+    "analytic_rel": -0.044030223555490876,
+    "mc_rel": -0.031925993352324905,
     "mc_significant": false
    },
    "explanation": {
@@ -545,14 +542,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.021687142586824196,
-    "mc_rel": -0.02988387225920971,
-    "mc_significant": false
+    "analytic_rel": -0.023412763779102362,
+    "mc_rel": -0.1238104016104609,
+    "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
-    "registry": "I5",
-    "motif": "leur build fait mieux de +2,2% au seul niveau 20 ; le nôtre suit le meilleur chemin de 10 à 20 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "registry": "B19",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (wakeOfFire) : Procs et bonus de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort, Improved Flamestrike"
    }
   },
   {
@@ -586,14 +583,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.006655191435159721,
-    "mc_rel": -0.07622513416488051,
+    "analytic_rel": -0.05108135949625936,
+    "mc_rel": -0.15425604117301467,
     "mc_significant": true
    },
    "explanation": {
-    "kind": "concorde",
-    "registry": null,
-    "motif": "écart -0,7% à l'analytique, sous le seuil de concordance"
+    "kind": "mecanique_non_modelisee",
+    "registry": "B19",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (wakeOfFire) : Procs et bonus de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort, Improved Flamestrike"
    }
   },
   {
@@ -666,14 +663,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.2527994125916201,
-    "mc_rel": -0.28787211738705765,
+    "analytic_rel": -0.2505181828652635,
+    "mc_rel": -0.25967355442759116,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "B19",
-    "motif": "3 point(s) sur des talents dont l'effet n'est pas modélisé (impact) : Procs de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort"
+    "motif": "3 point(s) sur des talents dont l'effet n'est pas modélisé (impact) : Procs et bonus de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort, Improved Flamestrike"
    }
   },
   {
@@ -721,14 +718,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.00692187488112593,
-    "mc_rel": -0.009392711804930655,
-    "mc_significant": false
+    "analytic_rel": -0.04175051239115389,
+    "mc_rel": -0.07395832762771035,
+    "mc_significant": true
    },
    "explanation": {
-    "kind": "concorde",
-    "registry": null,
-    "motif": "écart +0,7% à l'analytique, sous le seuil de concordance"
+    "kind": "mecanique_non_modelisee",
+    "registry": "F6",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (wandSpecialization) : Armes de lanceur de sorts"
    }
   },
   {
@@ -787,14 +784,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.12506897636231068,
-    "mc_rel": 0.09632967805078005,
+    "analytic_rel": 0.11678895601915043,
+    "mc_rel": 0.08405324834643939,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +12,5% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +11,7% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -840,14 +837,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.13030756956539719,
-    "mc_rel": -0.14644769599444202,
+    "analytic_rel": -0.15972481513995,
+    "mc_rel": -0.05269943434761119,
     "mc_significant": true
    },
    "explanation": {
-    "kind": "source_douteuse",
-    "registry": null,
-    "motif": "choix non chiffré par la source (date au mois près)"
+    "kind": "mecanique_non_modelisee",
+    "registry": "H2",
+    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (arcaneSubtlety) : Armure et résistances de la cible"
    }
   },
   {
@@ -906,14 +903,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.0097466717058689,
-    "mc_rel": -0.01643253301383765,
+    "analytic_rel": -0.009388820049221255,
+    "mc_rel": -0.01674374400048504,
     "mc_significant": false
    },
    "explanation": {
     "kind": "concorde",
     "registry": null,
-    "motif": "écart -1,0% à l'analytique, sous le seuil de concordance"
+    "motif": "écart -0,9% à l'analytique, sous le seuil de concordance"
    }
   },
   {
@@ -1015,7 +1012,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.28267575808740975,
+    "analytic_rel": -0.28268598065240225,
     "mc_rel": -0.3512650717494819,
     "mc_significant": true
    },
@@ -1175,7 +1172,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.048383320326093174,
+    "analytic_rel": -0.0483833197358129,
     "mc_rel": -0.019146704662488828,
     "mc_significant": false
    },
@@ -1228,7 +1225,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.1151909816357293,
+    "analytic_rel": -0.11572591904354537,
     "mc_rel": -0.2354953477781523,
     "mc_significant": true
    },
@@ -1282,7 +1279,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.49940833014284924,
+    "analytic_rel": -0.49971104859512966,
     "mc_rel": -0.5483714443104281,
     "mc_significant": true
    },
@@ -1335,7 +1332,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.06251790759586862,
+    "analytic_rel": -0.06251804808699543,
     "mc_rel": -0.03692537587251631,
     "mc_significant": false
    },
@@ -1495,14 +1492,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.010941225272348623,
-    "mc_rel": -0.002174585372850942,
-    "mc_significant": false
+    "analytic_rel": -0.037536586584691604,
+    "mc_rel": -0.06241908083629882,
+    "mc_significant": true
    },
    "explanation": {
-    "kind": "concorde",
-    "registry": null,
-    "motif": "écart +1,1% à l'analytique, sous le seuil de concordance"
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "3 point(s) sur des talents dont l'effet n'est pas modélisé (improvedChanneling) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
    }
   },
   {
@@ -1560,8 +1557,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.07735278412320915,
-    "mc_rel": -0.15730537523081237,
+    "analytic_rel": -0.09132155578284894,
+    "mc_rel": -0.1568359284634004,
     "mc_significant": true
    },
    "explanation": {
@@ -1625,14 +1622,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.00618930206670058,
-    "mc_rel": 0.0013938477213001335,
+    "analytic_rel": -0.02087697392693431,
+    "mc_rel": -0.025005711855046495,
     "mc_significant": false
    },
    "explanation": {
-    "kind": "concorde",
-    "registry": null,
-    "motif": "écart -0,6% à l'analytique, sous le seuil de concordance"
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
    }
   },
   {
@@ -1689,8 +1686,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.16975355803515726,
-    "mc_rel": -0.18013044512980111,
+    "analytic_rel": -0.18585331707790645,
+    "mc_rel": -0.1821200159885462,
     "mc_significant": true
    },
    "explanation": {
@@ -1743,7 +1740,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.23125672678351528,
+    "analytic_rel": -0.23172547795754145,
     "mc_rel": -0.33109954281395254,
     "mc_significant": true
    },
@@ -1795,7 +1792,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.27169183032494587,
+    "analytic_rel": -0.2721356355443741,
     "mc_rel": -0.3617469340317839,
     "mc_significant": true
    },
@@ -1840,14 +1837,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.13158320573658747,
-    "mc_rel": 0.11165068865831117,
+    "analytic_rel": 0.12344681557110235,
+    "mc_rel": 0.09923664845040335,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +13,2% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +12,3% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -1885,8 +1882,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.16975355803515726,
-    "mc_rel": -0.18013044512980111,
+    "analytic_rel": -0.18585331707790645,
+    "mc_rel": -0.1821200159885462,
     "mc_significant": true
    },
    "explanation": {
@@ -1930,8 +1927,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.10061271835424453,
-    "mc_rel": -0.1855520768347203,
+    "analytic_rel": -0.11468823457729377,
+    "mc_rel": -0.19991722553096192,
     "mc_significant": true
    },
    "explanation": {
@@ -1983,7 +1980,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.09858869951860279,
+    "analytic_rel": -0.09858920004274387,
     "mc_rel": -0.0728666751221635,
     "mc_significant": true
    },
@@ -2085,7 +2082,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.4140713901186956,
+    "analytic_rel": -0.4144292887076625,
     "mc_rel": -0.47213902094578886,
     "mc_significant": true
    },
@@ -2137,7 +2134,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.27424475246716296,
+    "analytic_rel": -0.2746836043760086,
     "mc_rel": -0.3749787122261922,
     "mc_significant": true
    },
@@ -2187,7 +2184,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.02834848475483694,
+    "analytic_rel": 0.027726508278492382,
     "mc_rel": -0.10590878153664807,
     "mc_significant": true
    },
@@ -2241,7 +2238,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.048383320326093174,
+    "analytic_rel": -0.0483833197358129,
     "mc_rel": -0.019146704662488828,
     "mc_significant": false
    },
@@ -2293,7 +2290,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.4383898121659133,
+    "analytic_rel": -0.43872968299702414,
     "mc_rel": -0.5018260388447882,
     "mc_significant": true
    },
@@ -2345,7 +2342,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.17184677257838163,
+    "analytic_rel": -0.17234745705554766,
     "mc_rel": -0.2860569338759694,
     "mc_significant": true
    },
@@ -2397,7 +2394,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.048383320326093174,
+    "analytic_rel": -0.0483833197358129,
     "mc_rel": -0.019146704662488828,
     "mc_significant": false
    },
@@ -2448,7 +2445,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.014792009933485952,
+    "analytic_rel": -0.014792157576818928,
     "mc_rel": -0.01859418816601716,
     "mc_significant": true
    },
@@ -2501,7 +2498,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.4522057907641688,
+    "analytic_rel": -0.4525372400862606,
     "mc_rel": -0.5101361633011918,
     "mc_significant": true
    },
@@ -2555,14 +2552,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.048383320326093174,
+    "analytic_rel": -0.0483833197358129,
     "mc_rel": -0.019146704662488828,
     "mc_significant": false
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
-    "registry": "I8",
-    "motif": "2 point(s) sur des talents dont l'effet n'est pas modélisé (pyroblast, arcanePower) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
+    "registry": "B19",
+    "motif": "3 point(s) sur des talents dont l'effet n'est pas modélisé (improvedFlamestrike) : Procs et bonus de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort, Improved Flamestrike"
    }
   },
   {
@@ -2609,7 +2606,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.048383320326093174,
+    "analytic_rel": -0.0483833197358129,
     "mc_rel": -0.019146704662488828,
     "mc_significant": false
    },
@@ -2664,7 +2661,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.49940833014284924,
+    "analytic_rel": -0.49971104859512966,
     "mc_rel": -0.5483714443104281,
     "mc_significant": true
    },
@@ -2769,7 +2766,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.19911585204796195,
+    "analytic_rel": -0.19960013313072075,
     "mc_rel": -0.324477590059736,
     "mc_significant": true
    },
@@ -2811,14 +2808,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.11726162784215735,
-    "mc_rel": 0.08813164242423803,
+    "analytic_rel": 0.10860175590495108,
+    "mc_rel": 0.0819867135337357,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +11,7% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +10,9% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -3076,14 +3073,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.4612439128816601,
+    "analytic_rel": -0.46139561075733315,
     "mc_rel": -0.44788198064994716,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "B19",
-    "motif": "5 point(s) sur des talents dont l'effet n'est pas modélisé (impact, wakeOfFire) : Procs de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort"
+    "motif": "8 point(s) sur des talents dont l'effet n'est pas modélisé (impact, wakeOfFire, improvedFlamestrike) : Procs et bonus de talent non modélisés : Impact, bonus de critique de Wake of Fire après une mise à mort, Improved Flamestrike"
    }
   },
   {
@@ -3119,14 +3116,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.00618930206670058,
-    "mc_rel": 0.0013938477213001335,
+    "analytic_rel": -0.02087697392693431,
+    "mc_rel": -0.025005711855046495,
     "mc_significant": false
    },
    "explanation": {
-    "kind": "concorde",
-    "registry": null,
-    "motif": "écart -0,6% à l'analytique, sous le seuil de concordance"
+    "kind": "mecanique_non_modelisee",
+    "registry": "C9",
+    "motif": "1 point(s) sur des talents dont l'effet n'est pas modélisé (iceBlock) : Défensifs et utilitaires du Mage : Ice Block, Ice Barrier, Frost Warding, Arcane Resilience, Magic Absorption, Arcane Shielding, Improved Fire Ward, Improved Counterspell, Improved Channeling, Improved Blizzard"
    }
   },
   {
@@ -3162,8 +3159,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.19330239581022082,
-    "mc_rel": -0.29802949101828713,
+    "analytic_rel": -0.21202628426199951,
+    "mc_rel": -0.31927472433448656,
     "mc_significant": true
    },
    "explanation": {
@@ -3213,7 +3210,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.20311074540868476,
+    "analytic_rel": -0.2035926108470744,
     "mc_rel": -0.3138099500156899,
     "mc_significant": true
    },
@@ -3266,7 +3263,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.048383320326093174,
+    "analytic_rel": -0.0483833197358129,
     "mc_rel": -0.019146704662488828,
     "mc_significant": false
    },
@@ -3308,8 +3305,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.10300167069857012,
-    "mc_rel": -0.1563272668438554,
+    "analytic_rel": -0.11712322181599623,
+    "mc_rel": -0.17468508975987523,
     "mc_significant": true
    },
    "explanation": {
@@ -3358,7 +3355,7 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.49940833014284924,
+    "analytic_rel": -0.49971104859512966,
     "mc_rel": -0.5483714443104281,
     "mc_significant": true
    },
