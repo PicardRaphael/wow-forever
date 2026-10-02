@@ -178,6 +178,25 @@ inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits 
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
 
+## Rejeu 1.60.1.70170 (installation du 2026-10-02)
+
+Rejoué le 2026-10-02 par `scripts/replay_builds.py run 70170-r1` (préréglage complet, graine 12345, race Orc ; données
+1.60.1.70170 révision 1, empreinte f2d021a89e1f), comparé au passage `70124-r6` (empreinte ef5603c56de6) produit juste
+avant l'installation sur 1.60.1.70124 révision 6. Le plafond de la bêta passe à 30
+(observé en jeu par l'utilisateur le 2026-10-01) : le rejeu joue désormais aussi le leveling au niveau 30 (16 cas).
+
+**Aucune recommandation changée** (`compare 70124-r6 70170-r1`), métriques identiques dans les 16 cas. Raisons :
+Heating Up garde les valeurs de Hot Streak (20 s, 25 % par cumul, 3 cumuls, même aura 400625) ; Combustion (3 charges
+au lieu de 4) n'est pas modélisée hors de la borne de l'angle mort B18, et aucun build retenu ne la prend ; les sorts
+du Mage ne changent pas. Seul changement : `leveling-30` devient vérifiable en jeu (niveau ≤ plafond).
+
+| Cas | Arcanes/Feu/Givre | Monte Carlo | Analytique | Avantage sur l'alternative | Retenu | Stabilité | Sensibilité |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| leveling 30 (nouveau) | 0/0/21 | 46,44 | 46,66 | 1,71 [0,12 ; 3,30] | build (monte_carlo) | instable (1/5 build) | mob_hp, ice_lance_coef |
+
+Le build de leveling au niveau 30 est **instable** (une graine sur cinq le retient) et bascule avec les PV des monstres
+et le coefficient d'Ice Lance (E4) : deux hypothèses à mesurer en jeu avant de s'y fier.
+
 ## Rejeu T08b (1.60.1.70124 révision 4)
 
 Rejoué le 2026-10-01 par `scripts/replay_builds.py run T08b` (préréglage complet, graine 12345, race Orc) sur la

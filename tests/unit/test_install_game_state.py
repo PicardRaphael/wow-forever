@@ -9,7 +9,8 @@ installée plus un écart arbitraire, jamais un chiffre de jeu écrit ici."""
 import json
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, WAGO_70124, isolated_deps, read_json
+from conftest import CLASS_FIXTURE_VERSION as LOCAL_VERSION  # version des extraits, pas la version installée
+from conftest import DATA_DIR, WAGO_70124, isolated_deps, read_json
 
 from forever.cli import main
 from forever.errors import DataSchemaError
@@ -23,6 +24,13 @@ OLD_KEY = "build.beta_level_cap"
 CURRENT = read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]["value"]
 TEST_CAP = CURRENT + 10  # valeur de test arbitraire
 NOTE = "https://us.forums.blizzard.com/en/wow/t/exemple/1"
+
+
+@pytest.fixture
+def data_copy(data_at_class_fixture_version):
+    """Copie des données ramenée à la version des extraits (1.60.1.70124) : la candidate des fixtures la révise
+    (1.60.1.70170 installée le 2026-10-02 porte d'autres talents que ces extraits)."""
+    return data_at_class_fixture_version
 
 
 @pytest.fixture(scope="module")

@@ -125,11 +125,13 @@ def test_certainty_is_the_minimum_of_its_sources(leveling, dungeon):
     assert dungeon["certainty_sources"]["scénarios"] == "suppose"
 
 
-def test_beta_level_cap(game_data, leveling, dungeon):
+def test_beta_level_cap(game_data, deps, leveling, dungeon):
     cap = game_data.build.beta_level_cap
     assert leveling["verifiable_in_game"] is True  # niveau 14 ≤ plafond
-    assert dungeon["verifiable_in_game"] is False  # niveau 25 > plafond
-    assert any("non vérifiable en jeu avant la sortie" in a and str(cap) in a for a in dungeon["assumptions"])
+    # Au-delà du plafond (30 depuis 1.60.1.70170, le donjon de niveau 25 est en deçà) : niveau tiré du plafond.
+    beyond = build_report(deps, "dungeon", cap + 5, preset="rapide")
+    assert beyond["verifiable_in_game"] is False
+    assert any("non vérifiable en jeu avant la sortie" in a and str(cap) in a for a in beyond["assumptions"])
     assert not any("non vérifiable" in a for a in leveling["assumptions"])
 
 

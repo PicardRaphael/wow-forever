@@ -8,7 +8,16 @@ import os
 import shutil
 from datetime import UTC, datetime
 
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, WAGO_70124, FakeHttp, isolated_deps, read_json
+from conftest import (
+    CLASS_FIXTURE_VERSION,
+    DATA_DIR,
+    FIXTURES,
+    LOCAL_VERSION,
+    WAGO_70124,
+    FakeHttp,
+    isolated_deps,
+    read_json,
+)
 
 import forever.watch as watch_mod
 from forever.gamedata import build_game_data
@@ -62,25 +71,27 @@ def test_december_line_read_in_january_is_dated_last_year(tmp_path):
     assert line.at.startswith("2026-12-31")
 
 
-def test_observed_cap_is_certain_and_origins_stay_valid(data_copy, make_deps, tmp_path):
-    cand = decode_version(isolated_deps(tmp_path), LOCAL_VERSION, csv_dir=WAGO_70124, out=tmp_path / "c")
+def test_observed_cap_is_certain_and_origins_stay_valid(data_at_class_fixture_version, make_deps, tmp_path):
+    cand = decode_version(isolated_deps(tmp_path), CLASS_FIXTURE_VERSION, csv_dir=WAGO_70124, out=tmp_path / "c")
+    data_copy, version = data_at_class_fixture_version, CLASS_FIXTURE_VERSION  # version des extraits
     deps = make_deps(data_dir=data_copy)
-    cap = read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]["value"]
+    cap = read_json(DATA_DIR / version / "meta.json")["game_state"]["beta_level_cap"]["value"]
     apply_install(deps, str(cand.root), motif="test", beta_level_cap=cap + 10, beta_level_cap_source="observation")
-    state = read_json(data_copy / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]
+    state = read_json(data_copy / version / "meta.json")["game_state"]["beta_level_cap"]
     assert state["certainty"] == "certain"
-    rule = next(r for r in read_json(data_copy / LOCAL_VERSION / "origins.json")["rules"] if r["file"] == "meta.json")
+    rule = next(r for r in read_json(data_copy / version / "origins.json")["rules"] if r["file"] == "meta.json")
     assert rule["origin"] == "journal"
-    assert check_version(data_copy, LOCAL_VERSION).ok
+    assert check_version(data_copy, version).ok
 
 
-def test_carried_cap_keeps_its_original_date_and_revision(data_copy, make_deps, tmp_path):
-    cand = decode_version(isolated_deps(tmp_path), LOCAL_VERSION, csv_dir=WAGO_70124, out=tmp_path / "c")
+def test_carried_cap_keeps_its_original_date_and_revision(data_at_class_fixture_version, make_deps, tmp_path):
+    cand = decode_version(isolated_deps(tmp_path), CLASS_FIXTURE_VERSION, csv_dir=WAGO_70124, out=tmp_path / "c")
+    data_copy, version = data_at_class_fixture_version, CLASS_FIXTURE_VERSION  # version des extraits
     deps = make_deps(data_dir=data_copy)
-    before = read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]
-    current = read_json(DATA_DIR / LOCAL_VERSION / "sources.json")["revision"]
+    before = read_json(DATA_DIR / version / "meta.json")["game_state"]["beta_level_cap"]
+    current = read_json(DATA_DIR / version / "sources.json")["revision"]
     apply_install(deps, str(cand.root), motif="test")
-    state = read_json(data_copy / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]
+    state = read_json(data_copy / version / "meta.json")["game_state"]["beta_level_cap"]
     assert (state["date"], state["revision"]) == (before["date"], before["revision"])
     assert state["carried_to"] == current + 1
 

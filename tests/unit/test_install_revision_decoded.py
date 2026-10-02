@@ -8,13 +8,21 @@ import json
 import shutil
 
 import pytest
-from conftest import LOCAL_VERSION, WAGO_70124, isolated_deps, read_json
+from conftest import CLASS_FIXTURE_VERSION as LOCAL_VERSION  # version des extraits, pas la version installée
+from conftest import WAGO_70124, isolated_deps, read_json
 
 from forever.manifest import write_manifest
 from forever.pipeline.decode import decode_version
 from forever.pipeline.install import apply_install, plan_install, render_install_report
 
 SCALING, CHARACTER = "spell_scaling.json", "character_scaling.json"
+
+
+@pytest.fixture
+def data_copy(data_at_class_fixture_version):
+    """Copie des données ramenée à la version des extraits (1.60.1.70124) : la candidate des fixtures la révise
+    (1.60.1.70170 installée le 2026-10-02 porte d'autres talents que ces extraits)."""
+    return data_at_class_fixture_version
 
 
 @pytest.fixture(scope="module")

@@ -1,0 +1,1473 @@
+{
+ "build": "1.60.1.70170",
+ "source": "Client 1.60.1.70170 : tables ChrRaces, CharBaseInfo, SkillLineAbility et Spell* (wago.tools) décodées par forever decode",
+ "races": {
+  "Human": {
+   "id": 1,
+   "client_file": "Human",
+   "name": "Human",
+   "name_fr": "Humain",
+   "faction": "Alliance",
+   "classes": [
+    "Warrior",
+    "Paladin",
+    "Hunter",
+    "Rogue",
+    "Priest",
+    "Mage",
+    "Warlock"
+   ],
+   "racials": [
+    {
+     "spell_id": 20600,
+     "name": "Perception",
+     "name_fr": "Perception",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 180,
+     "duration_s": 20,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 17,
+       "base_points": 50,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20597,
+     "name": "Sword Specialization",
+     "name_fr": "Spécialisation Epée",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 290,
+       "base_points": 2,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20598,
+     "name": "The Human Spirit",
+     "name_fr": "L'esprit humain",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 137,
+       "base_points": 5,
+       "misc": 4,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259718,
+     "name": "Will to Survive",
+     "name_fr": "Volonté de survie",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 180,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 108,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 12,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {
+    "sword_crit": 0.02,
+    "spirit_pct": 0.05
+   }
+  },
+  "Orc": {
+   "id": 2,
+   "client_file": "Orc",
+   "name": "Orc",
+   "name_fr": "Orc",
+   "faction": "Horde",
+   "classes": [
+    "Warrior",
+    "Hunter",
+    "Rogue",
+    "Shaman",
+    "Mage",
+    "Warlock"
+   ],
+   "racials": [
+    {
+     "spell_id": 20572,
+     "name": "Blood Fury",
+     "name_fr": "Fureur sanguinaire",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 15,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 166,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 167,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 317,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20573,
+     "name": "Hardiness",
+     "name_fr": "Solidité",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 232,
+       "base_points": -20,
+       "misc": 12,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20574,
+     "name": "Axe Specialization",
+     "name_fr": "Spécialisation Hache",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 290,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1299026,
+     "name": "Shatter Curse",
+     "name_fr": "Bris de malédictions",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 180,
+     "duration_s": 8,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 87,
+       "base_points": -15,
+       "misc": 126,
+       "mechanic": 0
+      },
+      {
+       "effect": 38,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 2,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 41,
+       "base_points": 0,
+       "misc": 2,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  },
+  "Dwarf": {
+   "id": 3,
+   "client_file": "Dwarf",
+   "name": "Dwarf",
+   "name_fr": "Nain",
+   "faction": "Alliance",
+   "classes": [
+    "Warrior",
+    "Paladin",
+    "Hunter",
+    "Rogue",
+    "Priest",
+    "Shaman"
+   ],
+   "racials": [
+    {
+     "spell_id": 2481,
+     "name": "Find Treasure",
+     "name_fr": "Découverte de trésors",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 45,
+       "base_points": 0,
+       "misc": 6,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20594,
+     "name": "Stoneform",
+     "name_fr": "Forme de pierre",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 180,
+     "duration_s": 8,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 87,
+       "base_points": -10,
+       "misc": 1,
+       "mechanic": 0
+      },
+      {
+       "effect": 38,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 4,
+       "mechanic": 0
+      },
+      {
+       "effect": 38,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 3,
+       "mechanic": 0
+      },
+      {
+       "effect": 108,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 15,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 41,
+       "base_points": 0,
+       "misc": 3,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 41,
+       "base_points": 0,
+       "misc": 4,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 77,
+       "base_points": 0,
+       "misc": 15,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259719,
+     "name": "Mace Specialization",
+     "name_fr": "Spécialisation Masse",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 290,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259721,
+     "name": "Big Game Hunter",
+     "name_fr": "Chasseur de gros gibier",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 168,
+       "base_points": 5,
+       "misc": 1,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  },
+  "Night Elf": {
+   "id": 4,
+   "client_file": "NightElf",
+   "name": "Night Elf",
+   "name_fr": "Elfe de la nuit",
+   "faction": "Alliance",
+   "classes": [
+    "Warrior",
+    "Hunter",
+    "Rogue",
+    "Priest",
+    "Druid"
+   ],
+   "racials": [
+    {
+     "spell_id": 20580,
+     "name": "Shadowmeld",
+     "name_fr": "Camouflage dans l'ombre",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 10,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 16,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 103,
+       "base_points": -999999,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20582,
+     "name": "Quickness",
+     "name_fr": "Rapidité",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 49,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 31,
+       "base_points": 2,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20585,
+     "name": "Wisp Spirit",
+     "name_fr": "Esprit feu follet",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 3,
+       "aura": 0,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 21009,
+     "name": "Quickness Passive",
+     "name_fr": "Rapidité (passif)",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 154,
+       "base_points": 5,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259799,
+     "name": "Elune's Light",
+     "name_fr": "Lumière d’Élune",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 180,
+     "duration_s": 15,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 290,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  },
+  "Undead": {
+   "id": 5,
+   "client_file": "Scourge",
+   "name": "Undead",
+   "name_fr": "Mort-vivant",
+   "faction": "Horde",
+   "classes": [
+    "Warrior",
+    "Paladin",
+    "Rogue",
+    "Priest",
+    "Mage",
+    "Warlock"
+   ],
+   "racials": [
+    {
+     "spell_id": 5227,
+     "name": "Underwater Breathing",
+     "name_fr": "Respiration aquatique",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 155,
+       "base_points": 300,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 7744,
+     "name": "Will of the Forsaken",
+     "name_fr": "Volonté des Réprouvés",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 108,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 1,
+       "mechanic": 0
+      },
+      {
+       "effect": 108,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 5,
+       "mechanic": 0
+      },
+      {
+       "effect": 108,
+       "aura": 0,
+       "base_points": 99,
+       "misc": 10,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20577,
+     "name": "Cannibalize",
+     "name_fr": "Cannibalisme",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 3,
+       "aura": 0,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1260189,
+     "name": "Touch of the Grave",
+     "name_fr": "Toucher du tombeau",
+     "classes": [
+      "Paladin",
+      "Rogue",
+      "Warrior"
+     ],
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 5,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1260201,
+     "name": "Touch of the Grave",
+     "name_fr": "Toucher du tombeau",
+     "classes": [
+      "Mage",
+      "Priest",
+      "Warlock"
+     ],
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 5,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  },
+  "Tauren": {
+   "id": 6,
+   "client_file": "Tauren",
+   "name": "Tauren",
+   "name_fr": "Tauren",
+   "faction": "Horde",
+   "classes": [
+    "Warrior",
+    "Hunter",
+    "Shaman",
+    "Druid"
+   ],
+   "racials": [
+    {
+     "spell_id": 20549,
+     "name": "War Stomp",
+     "name_fr": "Choc martial",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 2,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 12,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20550,
+     "name": "Endurance",
+     "name_fr": "Endurance",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 133,
+       "base_points": 5,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 54,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 55,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20552,
+     "name": "Cultivation",
+     "name_fr": "Culture",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 3,
+       "aura": 0,
+       "base_points": 15,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259918,
+     "name": "Plainsrunning",
+     "name_fr": "Course dans les plaines",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 226,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 5,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 30,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  },
+  "Gnome": {
+   "id": 7,
+   "client_file": "Gnome",
+   "name": "Gnome",
+   "name_fr": "Gnome",
+   "faction": "Alliance",
+   "classes": [
+    "Warrior",
+    "Rogue",
+    "Priest",
+    "Mage",
+    "Warlock"
+   ],
+   "racials": [
+    {
+     "spell_id": 20589,
+     "name": "Escape Artist",
+     "name_fr": "Maître de l'évasion",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 3,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 77,
+       "base_points": 10,
+       "misc": 7,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 77,
+       "base_points": 10,
+       "misc": 11,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20591,
+     "name": "Expansive Mind",
+     "name_fr": "Pensée expansive",
+     "classes": [
+      "Mage",
+      "Priest",
+      "Warlock"
+     ],
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 178,
+       "base_points": 5,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20593,
+     "name": "Engineering Specialization",
+     "name_fr": "Spécialisation (Ingénierie)",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 20,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259803,
+     "name": "Expansive Mind",
+     "name_fr": "Pensée expansive",
+     "classes": [
+      "Rogue"
+     ],
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 178,
+       "base_points": 5,
+       "misc": 3,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259802,
+     "name": "Expansive Mind",
+     "name_fr": "Pensée expansive",
+     "classes": [
+      "Warrior"
+     ],
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 178,
+       "base_points": 5,
+       "misc": 1,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259812,
+     "name": "Eureka!",
+     "name_fr": "Eurêka !",
+     "classes": [
+      "Rogue"
+     ],
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 15,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": -10,
+       "misc": 14,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259821,
+     "name": "Eureka!",
+     "name_fr": "Eurêka !",
+     "classes": [
+      "Warlock"
+     ],
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 15,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": -10,
+       "misc": 14,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 22,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259823,
+     "name": "Eureka!",
+     "name_fr": "Eurêka !",
+     "classes": [
+      "Priest"
+     ],
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 15,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": -10,
+       "misc": 14,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 22,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259817,
+     "name": "Eureka!",
+     "name_fr": "Eurêka !",
+     "classes": [
+      "Mage"
+     ],
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 15,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": -10,
+       "misc": 14,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 22,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259813,
+     "name": "Eureka!",
+     "name_fr": "Eurêka !",
+     "classes": [
+      "Warrior"
+     ],
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 15,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": -10,
+       "misc": 14,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 108,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 4,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {
+    "mana_pct": 0.05
+   }
+  },
+  "Troll": {
+   "id": 8,
+   "client_file": "Troll",
+   "name": "Troll",
+   "name_fr": "Troll",
+   "faction": "Horde",
+   "classes": [
+    "Warrior",
+    "Hunter",
+    "Rogue",
+    "Priest",
+    "Shaman",
+    "Mage",
+    "Warlock"
+   ],
+   "racials": [
+    {
+     "spell_id": 20554,
+     "name": "Berserking",
+     "name_fr": "Berserker",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 180,
+     "duration_s": 10,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 319,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 140,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 65,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20555,
+     "name": "Regeneration",
+     "name_fr": "Régénération",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 88,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 116,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 20557,
+     "name": "Beast Slaying",
+     "name_fr": "Tueur de bêtes",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 168,
+       "base_points": 5,
+       "misc": 1,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1260270,
+     "name": "Rapid Regeneration",
+     "name_fr": "Régénération rapide",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 180,
+     "duration_s": 6,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 20,
+       "base_points": 10,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  },
+  "High Order Skyborne": {
+   "id": 95,
+   "client_file": "Skyborne",
+   "name": "High Order Skyborne",
+   "name_fr": "Éolide de l’Ordre suprême",
+   "faction": "Alliance",
+   "classes": [
+    "Warrior",
+    "Hunter",
+    "Rogue",
+    "Mage",
+    "Druid"
+   ],
+   "racials": [
+    {
+     "spell_id": 1259705,
+     "name": "Read Ley Line",
+     "name_fr": "Lecture des lignes telluriques",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 64,
+       "aura": 0,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259416,
+     "name": "Walk on Air",
+     "name_fr": "Marche sur l’air",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 10,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 105,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 64,
+       "aura": 0,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 409,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 139,
+       "base_points": 0,
+       "misc": 2402,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 139,
+       "base_points": 0,
+       "misc": 2403,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 139,
+       "base_points": 0,
+       "misc": 2754,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259707,
+     "name": "Elemental Insight",
+     "name_fr": "Connaissance élémentaire",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 168,
+       "base_points": 5,
+       "misc": 8,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259710,
+     "name": "Wind Blessed",
+     "name_fr": "Bénédiction du vent",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 342,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 65,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  },
+  "Windshaper Skyborne": {
+   "id": 96,
+   "client_file": "Skyborne",
+   "name": "Windshaper Skyborne",
+   "name_fr": "Éolide sculpte-vents",
+   "faction": "Horde",
+   "classes": [
+    "Warrior",
+    "Hunter",
+    "Rogue",
+    "Shaman",
+    "Druid"
+   ],
+   "racials": [
+    {
+     "spell_id": 1259416,
+     "name": "Walk on Air",
+     "name_fr": "Marche sur l’air",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": 10,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 105,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 64,
+       "aura": 0,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 409,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 139,
+       "base_points": 0,
+       "misc": 2402,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 139,
+       "base_points": 0,
+       "misc": 2403,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 139,
+       "base_points": 0,
+       "misc": 2754,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259707,
+     "name": "Elemental Insight",
+     "name_fr": "Connaissance élémentaire",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 168,
+       "base_points": 5,
+       "misc": 8,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259710,
+     "name": "Wind Blessed",
+     "name_fr": "Bénédiction du vent",
+     "classes": null,
+     "passive": true,
+     "cooldown_s": null,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 6,
+       "aura": 342,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      },
+      {
+       "effect": 6,
+       "aura": 65,
+       "base_points": 1,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    },
+    {
+     "spell_id": 1259686,
+     "name": "Skysight",
+     "name_fr": "Vue céleste",
+     "classes": null,
+     "passive": false,
+     "cooldown_s": 120,
+     "duration_s": null,
+     "effects": [
+      {
+       "effect": 64,
+       "aura": 0,
+       "base_points": 0,
+       "misc": 0,
+       "mechanic": 0
+      }
+     ],
+     "certainty": "FC-1.60.1.70170"
+    }
+   ],
+   "mage_values": {}
+  }
+ },
+ "notes": [
+  "Races jouables : celles de CharBaseInfo (combinaisons de Forever comprises), sans liste de Classic.",
+  "Raciaux : lignes racial_skill_lines de decode_rules.json ; classes null : toutes les classes.",
+  "mage_values : grandeurs lues par le moteur du Mage (racial_values de decode_rules.json), variantes de classe qui concernent le Mage seulement ; sword_crit exige une épée (arme hors des tables lues)."
+ ]
+}

@@ -1,0 +1,161 @@
+{
+ "schema_version": 1,
+ "game_version": "1.60.1.70124",
+ "source": "Règles du système de familiers absentes du client, relevées par des joueurs et rassemblées par l'addon Forever Bestiary (Data/Guide.lua, chaque section citant sa source) ; une règle de Classic marquée manuel ; depuis la révision 6, une règle tirée d'une note officielle de Blizzard (tame.level_margin). Relevé de joueurs au plus suppose (décision 127), note officielle sans mesure au plus probable (décision 162) ; le client l'emporte dès qu'il porte une règle (pets.json).",
+ "rules": {
+  "tame.level_margin": {
+   "text": "Écart de niveau maximal entre une bête apprivoisable et le Chasseur : 0 veut dire qu'aucune bête de niveau supérieur au sien ne s'apprivoise.",
+   "value": 0,
+   "unit": "niveau(x) au-dessus du Chasseur",
+   "source": "Notes de développement officielles de la bêta, 24 septembre 2026, révisées le 1er octobre (version 2 du message, lue le 2026-10-02), section Hunter > Pets : Tame Beast ne fonctionne plus sur une bête de niveau supérieur à celui du Chasseur (https://us.forums.blizzard.com/en/wow/t/2360696)",
+   "date": "2026-10-01",
+   "certainty": "probable",
+   "registry": "L13",
+   "origin": "manuel",
+   "note": "texte officiel, aucune mesure : probable (docs/DATA_SOURCES.md, notes officielles) ; SpellTargetRestrictions du client 1.60.1.70124 (accès 6 de CH0) : MaxTargetLevel nul pour Tame Beast, la règle reste au serveur ; remplace le relevé de joueurs de Forever Bestiary 0.5.0 (+2 niveaux, 18 au 22 septembre 2026), antérieur à la note ; à confirmer en jeu (bête d'un niveau au-dessus refusée)"
+  },
+  "learning.method": {
+   "text": "Pour apprendre une capacité : apprivoiser une bête qui la connaît, combattre avec elle jusqu'à l'apprendre (avis en texte jaune, sans le rang), reprendre son familier et la lui enseigner par Beast Training contre des points d'entraînement ; les capacités générales (Growl, résistances…) s'achètent chez le maître des familiers, aussi en points d'entraînement.",
+   "value": null,
+   "unit": null,
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « How pet training works » : joueurs de la bêta sur le forum Petopia et les forums officiels, 18 au 22 septembre 2026 (via foreverchanges.pro)",
+   "date": "2026-09-22",
+   "certainty": "suppose",
+   "registry": "L2",
+   "origin": "addon"
+  },
+  "training.rank_level_applies_to": {
+   "text": "Le niveau requis d'un rang s'applique au niveau du familier, comme dans Classic (non confirmé sur Forever).",
+   "value": "pet",
+   "unit": null,
+   "source": "Règle de Classic (Beast Training : le rang n'est proposé qu'au familier du niveau requis)",
+   "date": "2026-10-01",
+   "certainty": "suppose",
+   "registry": "L3",
+   "origin": "manuel",
+   "note": "aucune source propre à Forever ; à vérifier par le relevé de la fenêtre Beast Training (ForeverLogger)"
+  },
+  "training.points_gain": {
+   "text": "Gain des points d'entraînement : inconnu (aucune source ; le relevé de ForeverLogger donne les points totaux et dépensés).",
+   "value": null,
+   "unit": null,
+   "source": "aucune source (CH0)",
+   "date": "2026-10-01",
+   "certainty": "suppose",
+   "registry": "L5",
+   "origin": "manuel"
+  },
+  "loyalty.limits_training": {
+   "text": "La loyauté limite l'entraînement : le familier doit gagner un niveau de loyauté avant de pouvoir apprendre, et la loyauté monte très lentement.",
+   "value": null,
+   "unit": null,
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « How pet training works » : joueurs de la bêta sur le forum Petopia et les forums officiels, 18 au 22 septembre 2026 (via foreverchanges.pro)",
+   "date": "2026-09-22",
+   "certainty": "suppose",
+   "registry": "L6",
+   "origin": "addon"
+  },
+  "inheritance.health_per_stamina": {
+   "text": "Le familier gagne ce nombre de points de vie par point d'Endurance du Chasseur.",
+   "value": 2,
+   "unit": "PV par point d'Endurance",
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « What changes for every pet » : joueurs de la bêta, recueil du wiki Forever Hunter (via foreverchanges.pro) ; l'addon précise que le client ne le montre pas et que cela peut changer",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L10",
+   "origin": "addon"
+  },
+  "inheritance.armor_pct": {
+   "text": "Le familier reçoit cette part de l'armure du Chasseur.",
+   "value": 30,
+   "unit": "% de l'armure du Chasseur",
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « What changes for every pet » : joueurs de la bêta, recueil du wiki Forever Hunter (via foreverchanges.pro) ; l'addon précise que le client ne le montre pas et que cela peut changer",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L10",
+   "origin": "addon"
+  },
+  "inheritance.attack_power_pct": {
+   "text": "Le familier reçoit cette part de la plus haute puissance d'attaque du Chasseur (mêlée ou distance).",
+   "value": 10,
+   "unit": "% de la plus haute puissance d'attaque",
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « What changes for every pet » : joueurs de la bêta, recueil du wiki Forever Hunter (via foreverchanges.pro) ; l'addon précise que le client ne le montre pas et que cela peut changer",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L10",
+   "origin": "addon"
+  },
+  "inheritance.crit": {
+   "text": "Le familier reçoit cette part des chances de coup critique du Chasseur, bonus raciaux compris.",
+   "value": 100,
+   "unit": "% des chances de critique du Chasseur",
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « What changes for every pet » : joueurs de la bêta, recueil du wiki Forever Hunter (via foreverchanges.pro) ; l'addon précise que le client ne le montre pas et que cela peut changer",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L10",
+   "origin": "addon"
+  },
+  "attack_speed.base_s": {
+   "text": "Tout familier frappe à cet intervalle, sauf passif de vitesse apporté par la bête (Faster Attack, Slower Attack, dont l'effet est lu dans le client).",
+   "value": 2.0,
+   "unit": "s",
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « Attack speed » : client de bêta 1.60.1.69913 et joueurs de la bêta (via foreverchanges.pro), pourcentages par rang de beastmaster.io",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L11",
+   "origin": "addon",
+   "note": "selon des joueurs, un familier lent ne frappe pas plus fort pour compenser ; on ne sait pas si c'est voulu"
+  },
+  "focus.regen_per_s": {
+   "text": "Le focus du familier se régénère sans pause à ce rythme.",
+   "value": 10,
+   "unit": "focus par seconde",
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « What changes for every pet » : joueurs de la bêta, recueil du wiki Forever Hunter (via foreverchanges.pro) ; l'addon précise que le client ne le montre pas et que cela peut changer",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L12",
+   "origin": "addon"
+  },
+  "happiness.decay": {
+   "text": "Le bonheur du familier baisse très lentement (aucune valeur relevée).",
+   "value": null,
+   "unit": null,
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « What changes for every pet » : joueurs de la bêta, recueil du wiki Forever Hunter (via foreverchanges.pro) ; l'addon précise que le client ne le montre pas et que cela peut changer",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L12",
+   "origin": "addon"
+  },
+  "beast_lore.effect": {
+   "text": "Beast Lore montre les dégâts, la santé, l'armure, les résistances et le régime d'une bête avant de l'apprivoiser (le niveau d'apprentissage est lu dans le client : classes.json).",
+   "value": null,
+   "unit": null,
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « Pet spells from the hunter trainer » : client de bêta 1.60.1.69893 (via wowforevertalents.com)",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L8",
+   "origin": "addon"
+  },
+  "buffs.from_other_players": {
+   "text": "Le familier ne reçoit pas les effets bénéfiques des autres joueurs.",
+   "value": null,
+   "unit": null,
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « What changes for every pet » : joueurs de la bêta, recueil du wiki Forever Hunter (via foreverchanges.pro) ; l'addon précise que le client ne le montre pas et que cela peut changer",
+   "date": "2026-09-25",
+   "certainty": "suppose",
+   "registry": "L12",
+   "origin": "addon"
+  }
+ },
+ "reported_bugs": [
+  {
+   "text": "Bug de la bêta signalé par des joueurs : les familiers de la zone Skyborne (renards Vuldren, grues) perdent leurs capacités quand on les renvoie ou qu'on se déconnecte.",
+   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « How pet training works » : joueurs de la bêta sur le forum Petopia et les forums officiels, 18 au 22 septembre 2026 (via foreverchanges.pro)",
+   "date": "2026-09-22",
+   "certainty": "suppose",
+   "acknowledged_by_blizzard": false,
+   "note": "signalement de joueurs, rien de modélisé ; listé comme bug reconnu seulement s'il paraît dans les Known Issues officielles (forever notes)"
+  }
+ ],
+ "inherited_from": "1.60.1.70124"
+}

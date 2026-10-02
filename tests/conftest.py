@@ -50,10 +50,14 @@ SEED_DATA = REPO_ROOT / "seed" / "forever-mage" / "data"
 SEED_VERSION = max(d.name for d in SEED_DATA.iterdir() if d.is_dir() and d.name[0].isdigit())
 
 # Version installée du dépôt (dossier forever/data/<version>/ le plus récent). Passée à 1.60.1.70124 en T08a :
-# les 22 tables du client sont identiques à celles de 1.60.1.70009, aucune valeur de jeu ne change.
-LOCAL_VERSION = "1.60.1.70124"
+# les 22 tables du client sont identiques à celles de 1.60.1.70009, aucune valeur de jeu ne change. Passée à
+# 1.60.1.70170 le 2026-10-02 (Hot Streak renommé Heating Up, Combustion à 3 charges, plafond de la bêta 30).
+LOCAL_VERSION = "1.60.1.70170"
 # Version précédente, gardée dans le dépôt : sert aux comparaisons entre versions installées.
 PREVIOUS_VERSION = "1.60.1.70009"
+# Version des extraits des 9 classes, des ratios et des familiers (tests/fixtures/wago/1.60.1.70124) : les tests qui
+# installent leur candidate en révision travaillent sur une copie du dépôt ramenée à cette version (2026-10-02).
+CLASS_FIXTURE_VERSION = "1.60.1.70124"
 PRODUCT = "wow_classic_beta"
 PREFIX = "1.60."
 NOW = datetime(2026, 9, 27, 12, 0, tzinfo=UTC)
@@ -159,6 +163,26 @@ def data_copy(tmp_path: Path) -> Path:
     return dst
 
 
+def rewind_to(data: Path, version: str) -> Path:
+    """Copie des données ramenée à `version` : dossiers des versions plus récentes retirés, manifeste réécrit."""
+    from forever.manifest import write_manifest
+    from forever.pipeline.builds import version_key
+
+    for d in data.iterdir():
+        if d.is_dir() and d.name[0].isdigit() and version_key(d.name) > version_key(version):
+            shutil.rmtree(d)
+    write_manifest(data)
+    return data
+
+
+@pytest.fixture
+def data_at_class_fixture_version(tmp_path: Path) -> Path:
+    """Copie modifiable de forever/data ramenée à la version des extraits des 9 classes (CLASS_FIXTURE_VERSION)."""
+    dst = tmp_path / "data-fixture-version"
+    shutil.copytree(DATA_DIR, dst, ignore=shutil.ignore_patterns("__pycache__"))
+    return rewind_to(dst, CLASS_FIXTURE_VERSION)
+
+
 def tamper(path: Path) -> None:
     """Change le premier chiffre d'un fichier : même taille, JSON toujours valide, empreinte différente."""
     raw = bytearray(path.read_bytes())
@@ -201,7 +225,7 @@ def corrupt_manifest(data_dir: Path, kind: str = "tronque") -> None:
 
 # Extraits des tables du client (voir son README.md) : relevés sur 1.60.1.70009, identiques en 1.60.1.70124.
 WAGO_70009 = FIXTURES / "wago" / PREVIOUS_VERSION
-WAGO_70124 = FIXTURES / "wago" / LOCAL_VERSION  # 9 classes (PV1)
+WAGO_70124 = FIXTURES / "wago" / CLASS_FIXTURE_VERSION  # 9 classes (PV1) : extraits de ce client
 
 
 def read_json(path: Path) -> Any:
@@ -306,7 +330,7 @@ def client_vs_reference(candidate: Any, kind: str) -> tuple[list[Any], list[Any]
     gaps = [c for c in changes if c not in observations]
     confirmed = [
         c
-        for c in read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"]
+        for c in read_json(DATA_DIR / PREVIOUS_VERSION / "confirmed_changes.json")["changes"]
         if c["kind"] == kind and c["old"] is not None
     ]
     return gaps, observations, confirmed

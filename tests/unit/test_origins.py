@@ -34,7 +34,7 @@ def test_six_origins():
 
 def test_installed_versions_pass():
     report = check_all(DATA_DIR)
-    assert report.versions == [PREVIOUS_VERSION, LOCAL_VERSION]
+    assert report.versions == [PREVIOUS_VERSION, "1.60.1.70124", LOCAL_VERSION]  # 70170 installée le 2026-10-02
     assert report.issues == [], [f"{i.version} {i.file} {i.path} : {i.message}" for i in report.issues[:10]]
     assert report.leaves[LOCAL_VERSION] > 0 and report.leaves[PREVIOUS_VERSION] > 0
 

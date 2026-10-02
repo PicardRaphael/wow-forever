@@ -39,4 +39,5 @@ def test_mechanics_values_written_by_hand_are_at_most_probable():
 
 def test_beta_cap_is_an_installation_fact():
     state = read_json(V / "meta.json")["game_state"]["beta_level_cap"]
-    assert state["revision"] == 4 and state["source"] and state["certainty"] in ("probable", "certain")
+    # T08b : posé en révision 4 de 1.60.1.70124 ; 1.60.1.70170 (2026-10-02) : observé, installé en révision 1
+    assert state["revision"] == 1 and state["source"] and state["certainty"] in ("probable", "certain")

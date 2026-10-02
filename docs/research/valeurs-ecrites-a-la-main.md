@@ -1,11 +1,11 @@
 # Valeurs écrites à la main
 
-Généré par `uv run forever origins inventory` sur la version 1.60.1.70124 (ne pas éditer à la main : le test
+Généré par `uv run forever origins inventory` sur la version 1.60.1.70170 (ne pas éditer à la main : le test
 `tests/unit/test_origins_inventory.py` compare ce fichier au rendu de la commande). Chaque ligne est un chemin
-de `forever/data/1.60.1.70124/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
+de `forever/data/1.60.1.70170/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-148 chemins, 617 valeurs ; 82 `probable`, 66 `suppose`
+147 chemins, 613 valeurs ; 81 `probable`, 66 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -76,7 +76,6 @@ Aucun.
 | mechanics.json | `/values/spell.default_range_yd` | 1 | suppose | C2 | portée par défaut d'un sort sans portée publiée | repli de fm.py du seed |
 | mechanics.json | `/values/talents.first_level` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel) | fm.py du seed (points_available) |
 | mechanics.json | `/values/talents.points_per_tier` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (TraitCond) | fm.py du seed (check_build) |
-| meta.json | `/game_state` | 4 | probable | I5 | fait d'installation (D2) : plafond de la bêta donné à l'installation avec sa source | forever install --beta-level-cap (note officielle ou relevé en jeu), sinon valeur reportée |
 | overrides.json | `/Arcane~1Arcane Blast` | 6 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Blast Wave` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Pyroblast` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |

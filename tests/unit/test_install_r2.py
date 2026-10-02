@@ -10,7 +10,16 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, WAGO_70124, isolated_deps, read_json
+from conftest import (
+    CLASS_FIXTURE_VERSION,
+    DATA_DIR,
+    LOCAL_VERSION,
+    PREVIOUS_VERSION,
+    WAGO_70124,
+    isolated_deps,
+    read_json,
+    rewind_to,
+)
 
 from forever.cli import main
 from forever.errors import CsvMissingError, DataSchemaError, InvalidArgumentError
@@ -34,13 +43,15 @@ def content(path):
 @pytest.fixture(scope="module")
 def class_candidate(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("classes")
-    return decode_version(isolated_deps(tmp), LOCAL_VERSION, csv_dir=WAGO_70124, out=tmp / "candidate")
+    return decode_version(isolated_deps(tmp), CLASS_FIXTURE_VERSION, csv_dir=WAGO_70124, out=tmp / "candidate")
 
 
 def rewind_classes(data):
     """État d'avant la révision 2 sur une copie des données : fichiers des classes et copie figée retirés,
-    `racials.json` remis (contenu du relevé, hérité de 1.60.1.70009), leurs entrées de `sources.json` ajustées."""
-    v = data / LOCAL_VERSION
+    `racials.json` remis (contenu du relevé, hérité de 1.60.1.70009), leurs entrées de `sources.json` ajustées.
+    Copie ramenée d'abord à la version des extraits (1.60.1.70124), que la candidate révise."""
+    rewind_to(data, CLASS_FIXTURE_VERSION)
+    v = data / CLASS_FIXTURE_VERSION
     for name in (*CLASS_FILES, "_seed_racials.json"):
         (v / name).unlink(missing_ok=True)
     record = {**read_json(data / PREVIOUS_VERSION / "racials.json"), "inherited_from": PREVIOUS_VERSION}
@@ -65,7 +76,7 @@ def before_r2(tmp_path):
 
 
 def test_candidate_from_class_tables_decodes_the_nine_classes(class_candidate):
-    v = class_candidate.root / LOCAL_VERSION
+    v = class_candidate.root / CLASS_FIXTURE_VERSION
     for name in CLASS_FILES:
         assert "inherited_from" not in read_json(v / name), name
     assert set(read_json(v / "classes.json")["classes"]) == set(CLASSES)
@@ -77,7 +88,7 @@ def test_candidate_from_class_tables_decodes_the_nine_classes(class_candidate):
 
 
 def test_unresolved_spells_listed_in_report(class_candidate):
-    doc = read_json(class_candidate.root / LOCAL_VERSION / "classes.json")
+    doc = read_json(class_candidate.root / CLASS_FIXTURE_VERSION / "classes.json")
     text = "\n".join(class_candidate.observations)
     listed = 0
     for c in doc["classes"].values():
@@ -126,7 +137,7 @@ def test_install_adds_the_class_files_and_retires_racials(before_r2, class_candi
     assert ("racials.json", "retired_file") in rules
     rev = apply_install(before_r2, str(class_candidate.root), motif="test", date="2026-09-30")
     ensure_integrity(before_r2.data_dir)
-    v = before_r2.data_dir / LOCAL_VERSION
+    v = before_r2.data_dir / CLASS_FIXTURE_VERSION
     assert all((v / name).is_file() for name in CLASS_FILES)
     assert not (v / "racials.json").exists()
     assert content(v / "_seed_racials.json") == content(DATA_DIR / PREVIOUS_VERSION / "racials.json")
@@ -139,8 +150,7 @@ def test_install_adds_the_class_files_and_retires_racials(before_r2, class_candi
 def test_inherited_class_files_are_never_installed(tmp_path, candidate):
     data = tmp_path / "data"
     shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
-    shutil.rmtree(data / LOCAL_VERSION)  # 1.60.1.70009 redevient la version courante
-    write_manifest(data)
+    rewind_to(data, PREVIOUS_VERSION)  # 1.60.1.70009 redevient la version courante
     plan = plan_install(isolated_deps(tmp_path, data), str(candidate.root))
     files = {c["file"] for c in plan["changes"] if c["rule"] in ("added_file", "replaced_file", "retired_file")}
     assert not files  # fichiers des classes hérités d'une autre version : ni installés, ni racials.json retiré
@@ -200,7 +210,7 @@ def test_no_retirement_without_its_declaration(before_r2, class_candidate, tmp_p
     """Relecture de PV1 : sans `retired_files` dans la candidate, racials.json n'est jamais retiré."""
     copy = tmp_path / "cand"
     shutil.copytree(class_candidate.root, copy)
-    sources = copy / LOCAL_VERSION / "sources.json"
+    sources = copy / CLASS_FIXTURE_VERSION / "sources.json"
     doc = read_json(sources)
     doc.pop("retired_files")
     sources.write_bytes(json.dumps(doc, ensure_ascii=False, indent=2).encode("utf-8"))

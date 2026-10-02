@@ -7,11 +7,20 @@ et rien d'autre ne diffère. Les valeurs propres au client (identifiants, noms f
 import copy
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, change_key, client_vs_reference, format_changes, read_json
+from conftest import (
+    DATA_DIR,
+    LOCAL_VERSION,
+    PREVIOUS_VERSION,
+    change_key,
+    client_vs_reference,
+    format_changes,
+    read_json,
+)
 
 from forever.pipeline.decode import decode_talents, talent_key
 
-REFERENCE = [t for tree in read_json(DATA_DIR / LOCAL_VERSION / "talents.json")["trees"] for t in tree["talents"]]
+# Référence à la version des fixtures (70009) : 1.60.1.70170 renomme Hot Streak (installé le 2026-10-02).
+REFERENCE = [t for tree in read_json(DATA_DIR / PREVIOUS_VERSION / "talents.json")["trees"] for t in tree["talents"]]
 REF = {t["key"]: t for t in REFERENCE}
 STRUCTURE = ("key", "name", "tree", "tier", "col", "max", "prereq")
 
@@ -57,8 +66,8 @@ def test_structure_matches_reference(talents, key):
     ],
 )
 def test_client_rank_oracles(talents, key, ranks):
-    # La certitude nomme le build où la valeur a été lue : celui de la version installée (T08a).
-    assert REF[key]["certainty"] == "FC-" + LOCAL_VERSION.rsplit(".", 1)[-1]
+    # La certitude nomme le build où la valeur a été lue : celui de la version de référence (fixtures 70009).
+    assert REF[key]["certainty"] == "FC-" + PREVIOUS_VERSION.rsplit(".", 1)[-1]
     assert REF[key]["ranks"] == ranks
     assert talents[key]["ranks"] == ranks
 
@@ -162,8 +171,8 @@ def test_shared_spell_keeps_latest_node(client_tables, decode_rules):
 
 
 def test_confirmed_changes_are_well_formed():
-    doc = read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")
-    assert doc["version"] == LOCAL_VERSION
+    doc = read_json(DATA_DIR / PREVIOUS_VERSION / "confirmed_changes.json")
+    assert doc["version"] == PREVIOUS_VERSION
     assert len(doc["changes"]) == 18  # T03 : 15 écarts tranchés ; T06b : 3 coûts en mana installés en révision 2
     for c in doc["changes"]:
         assert {"kind", "key", "change", "field", "old", "new", "reference_certainty", "decision"} <= set(c)

@@ -75,7 +75,7 @@ def test_respec_without_schedule_is_refused(make_deps, data_copy):
 
 def test_build_method_loaded(game_data):
     b = game_data.build
-    assert b.beta_level_cap == 20
+    assert b.beta_level_cap == 30  # observé en jeu le 2026-10-01, installé avec 1.60.1.70170
     assert b.confidence == 0.95
     assert b.stability_seeds == 5
 
@@ -93,8 +93,8 @@ def test_build_keys_carry_certainty_and_source():
         assert values[key]["certainty"] == certainty, key
         assert values[key]["source"], key
         assert values[key]["registry"] == "I5", key
-    # T08b (D2) : plafond de la bêta, fait d'installation dans meta.json game_state
-    assert read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]["certainty"] == "probable"
+    # T08b (D2) : plafond de la bêta, fait d'installation dans meta.json game_state ; observation (certain) depuis 70170
+    assert read_json(DATA_DIR / LOCAL_VERSION / "meta.json")["game_state"]["beta_level_cap"]["certainty"] == "certain"
 
 
 def test_missing_build_key_is_schema_error(make_deps, data_copy):

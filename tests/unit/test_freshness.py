@@ -38,8 +38,8 @@ def test_fresh(make_deps):
 def test_stale(make_deps):
     r = check(make_deps(http=FakeHttp.fixture("builds_stale.json")))
     assert r["freshness"] == "stale"
-    assert r["latest_version"] == "1.60.1.70150"
-    assert any("1.60.1.70150" in a for a in r["assumptions"])
+    assert r["latest_version"] == "1.60.1.70250"
+    assert any("1.60.1.70250" in a for a in r["assumptions"])
 
 
 def test_unknown_when_network_fails_and_no_cache(make_deps):
@@ -65,7 +65,7 @@ def test_exactly_fourteen_days_is_fresh():
 
 
 def test_newer_version_wins_over_silence():
-    latest = Build("1.60.1.70150", NOW - timedelta(days=30))
+    latest = Build("1.60.1.70250", NOW - timedelta(days=30))  # plus récente que la version installée
     assert classify(LOCAL_VERSION, latest, NOW, timedelta(days=14)) == "stale"
 
 

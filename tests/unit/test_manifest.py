@@ -79,12 +79,12 @@ def test_manifest_content():
     v = m["versions"][LOCAL_VERSION]
     assert v["product"] == "wow_classic_beta"
     assert v["version_prefix"] == "1.60."
-    assert v["collected_at"] == "2026-09-30"  # T08a : collecte de 1.60.1.70124
+    assert v["collected_at"] == "2026-10-02"  # collecte de 1.60.1.70170 (installée le 2026-10-02)
     assert v["hotfixes"] == []
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert v["revision"] == 6 and v["revised_at"] == "2026-10-02"  # PV1 : r2, r3 ; T08b : r4 ; CH0 : r5 ; r6 (marge)
+    assert v["revision"] == 1 and v["revised_at"] == "2026-10-02"  # 1.60.1.70170 : nouvelle version, révision 1
     assert (
         len(v["files"])
         == 25  # PV1, bloc C : pvp_rules.json ; T08b : origins.json, character_scaling.json ; CH0 : pets.json, pet_rules.json
@@ -123,11 +123,11 @@ def test_data_sha_is_short_and_changes_with_content(data_copy):
 
 def test_game_version_is_highest_version_dir(data_copy):
     # Faux dossier de version plus récente (copie de 1.60.1.70009) et un dossier parasite.
-    shutil.copytree(data_copy / LOCAL_VERSION, data_copy / "1.60.1.70150")
+    shutil.copytree(data_copy / LOCAL_VERSION, data_copy / "1.60.1.70250")  # plus récente que la version installée
     (data_copy / "__pycache__").mkdir()
     m = compute_manifest(data_copy)
-    assert m["game_version"] == "1.60.1.70150"
-    assert set(m["versions"]) == {PREVIOUS_VERSION, LOCAL_VERSION, "1.60.1.70150"}
+    assert m["game_version"] == "1.60.1.70250"
+    assert set(m["versions"]) == {PREVIOUS_VERSION, "1.60.1.70124", LOCAL_VERSION, "1.60.1.70250"}
 
 
 def test_manifest_json_is_sorted_and_parsable():

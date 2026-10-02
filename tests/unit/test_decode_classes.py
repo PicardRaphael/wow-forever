@@ -8,7 +8,7 @@ import csv
 from functools import cache
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, WAGO_70124, read_json
+from conftest import CLASS_FIXTURE_VERSION, DATA_DIR, LOCAL_VERSION, WAGO_70124, read_json
 
 from forever.pipeline.decode import decode_classes, fetch_list
 
@@ -108,7 +108,8 @@ def test_every_talent_has_a_node_id(doc, decode_rules):
 
 
 def test_mage_part_matches_talents_json(doc):
-    reference = read_json(DATA_DIR / LOCAL_VERSION / "talents.json")
+    # Référence à la version des extraits (1.60.1.70124) : 1.60.1.70170 renomme Hot Streak (2026-10-02).
+    reference = read_json(DATA_DIR / CLASS_FIXTURE_VERSION / "talents.json")
     mage = doc["classes"]["Mage"]
     assert [t["name"] for t in mage["trees"]] == [t["name"] for t in reference["trees"]]
     for ref_tree, tree in zip(reference["trees"], mage["trees"], strict=True):

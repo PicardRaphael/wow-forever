@@ -1,0 +1,38 @@
+{
+ "build": "1.60.1.70009",
+ "collected": "2026-09-26",
+ "launch": "2026-11-04",
+ "certainty_legend": {
+  "FC": "lu dans le client Forever (build indiqué)",
+  "FS": "mesuré par un simulateur Forever open source",
+  "PC": "règle Classic supposée inchangée",
+  "EST": "estimation à calibrer"
+ },
+ "sources": {
+  "client_tables": "https://wago.tools/api/builds (produit wow_classic_beta, versions 1.60.x) ; https://wago.tools/db2/<Table>/csv?build=<build>",
+  "talents_trees": "https://raw.githubusercontent.com/gunba/wow-forever-sim/master/ui/core/talents/trees/mage.json (MIT)",
+  "confirmed_ranks": "https://raw.githubusercontent.com/ElliotWood/Forever/master/assets/confirmed_talents.json (MIT)",
+  "spells_70009": "https://wowforevertalents.com/abilities/mage/",
+  "talents_70009": "https://foreverchanges.pro/talents/mage",
+  "racials_70009": "https://foreverchanges.pro/fr/racials",
+  "sim_engines": [
+   "ElliotWood/Forever (wowsims/classic fork, MIT)",
+   "gunba/wow-forever-sim",
+   "sage3648/mythicsim-forever-engine",
+   "wowsims/forever",
+   "BGannon2/foreversims",
+   "laurencestokes/foreversim"
+  ],
+  "sim_ranking": "https://mythicsim.com/wow-forever/tier-list"
+ },
+ "inherited_from": "1.60.1.70124",
+ "game_state": {
+  "beta_level_cap": {
+   "value": 30,
+   "source": "observation",
+   "certainty": "certain",
+   "date": "2026-10-02",
+   "revision": 1
+  }
+ }
+}

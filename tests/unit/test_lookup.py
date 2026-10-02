@@ -171,4 +171,4 @@ def test_stale_cache_adds_assumption(make_deps, tmp_path):
     r = lookup_spell(make_deps(cache_dir=cache), "frostbolt", 2)
     assert r["provenance"]["freshness"] == "stale"
     assert r["provenance"]["certainty"] == "certain"  # T01 : stale ne dégrade pas la certitude
-    assert any("1.60.1.70150" in a for a in r["provenance"]["assumptions"])
+    assert any("1.60.1.70250" in a for a in r["provenance"]["assumptions"])

@@ -36,9 +36,9 @@ def test_prefix_filter_excludes_other_versions_and_products():
 
 def test_latest_follows_created_at_not_arrival_order():
     builds = parse_builds(load("builds_stale.json"), PRODUCT, PREFIX)
-    assert [b.version for b in builds][-1] != "1.60.1.70150"  # arrivée : 70150 n'est pas le dernier élément
+    assert [b.version for b in builds][-1] != "1.60.1.70250"  # arrivée : 70250 n'est pas le dernier élément
     latest = latest_build(builds)
-    assert latest == Build("1.60.1.70150", datetime(2026, 9, 26, 18, 45, tzinfo=UTC))
+    assert latest == Build("1.60.1.70250", datetime(2026, 9, 26, 18, 45, tzinfo=UTC))
 
 
 def test_latest_of_nothing_is_none():

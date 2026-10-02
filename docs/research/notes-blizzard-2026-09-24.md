@@ -33,3 +33,5 @@ Aucun écart entre les notes et le client : rien pour `docs/OPEN_QUESTIONS.md` h
 | Problèmes connus : fenêtre Legacy ouverte avant le niveau 25 | — | Signal pour LG1 (ROADMAP) |
 
 Le plafond de niveau à 30, Legacy (défis, rangs, perks), les règles de royaume, Darkspear Islands, la date de lancement et l'API ne figurent dans aucun des sujets officiels lus.
+
+Complément du 2026-10-02 (installation de 1.60.1.70170, tables de wago.tools) : Sonic Blast est rattaché à la ligne « Pet - Bat » (653) dans `SkillLineAbility` de 70170 ; les points de base de Furious Howl (`SpellEffect`, rangs 1 à 4) passent de 9, 56, 100, 136 en 70124 à 5, 34, 60, 82 en 70170. Les deux points de la note concordent avec le client 70170.
