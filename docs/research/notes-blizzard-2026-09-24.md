@@ -18,3 +18,18 @@ Relevé le 2026-09-28 (T05, bloc B), à la demande de l'utilisateur : lecture de
 | « Ignite no longer double dips on % damage increase modifiers. » | Règle du serveur ; aura 412538 (4 s, période 2 s, non cumulable) inchangée | Le moteur prend déjà Ignite sur le critique final, tics non remultipliés : calcul conforme, verrouillé par `tests/unit/test_variants.py::test_ignite_takes_percentage_bonuses_once` (registre A18) |
 
 Aucun écart entre les notes et le client : rien pour `docs/OPEN_QUESTIONS.md` hors la mention ajoutée à A18, rien pour T08.
+
+## Seconde lecture du 2026-10-02 (version 2 du message, « Updated October 1 »)
+`uv run forever notes` (lancé à la main, accord réseau de l'utilisateur du 2026-10-02) : le sujet 2360696 est révisé le 2026-10-01 (version 2). Le premier message a été relu en JSON (même hôte, `robots.txt` respecté). L'historique des révisions (`/posts/<id>/revisions/2.json`) est refusé (HTTP 403) : on ne sait pas quels points datent du 24 septembre et lesquels du 1er octobre. Sujets officiels lus aussi : problèmes connus (2352687, « Known Issues - October 1 », version 5), Guerrier du 2026-10-02 (2369360), annonce de la BlizzCon (2347170 : liens vers des vidéos seulement). Pistes du 2026-10-01 vérifiées : `tasks/pistes-open-questions-2026-10-01.md`.
+
+| Point (paraphrase du texte) | Client et données | Suite |
+| --- | --- | --- |
+| Hunter > Pets : Tame Beast refusé sur une bête de niveau supérieur au Chasseur | Absent du client (`SpellTargetRestrictions`) | `pet_rules.json` `tame.level_margin` à 0, `probable` (révision 6, `docs/research/data-1.60.1.70124-r6.md`) |
+| Furious Howl : bonus de puissance d'attaque réduit de 40 % | Points de base identiques en 70009 et 70124 ; aucune table antérieure | Non vérifiable |
+| Sonic Blast désormais disponible pour les chauves-souris | Sorts 1264478 à 1264488 présents, rattachés à aucune ligne de familier dans 70124 | Non reflété dans les tables lues, à revoir avec 1.60.1.70170 |
+| Mage : Arcane Missiles, Wake of Fire, Hot Streak, Ignite | Inchangés depuis la première lecture | Concordance (tableau ci-dessus) |
+| Classes : respec à coût réduit, temporaire, bêta seulement | `respec.json` `beta_observed.temporary_beta` | Non modélisé (`docs/modeling-decisions.md`) |
+| Problèmes connus : Arcane Missiles sous les coups tire un projectile à pleins dégâts au lieu d'un projectile tronqué | Règle du serveur | Bug reconnu, jamais modélisé (registre B6) |
+| Problèmes connus : fenêtre Legacy ouverte avant le niveau 25 | — | Signal pour LG1 (ROADMAP) |
+
+Le plafond de niveau à 30, Legacy (défis, rangs, perks), les règles de royaume, Darkspear Islands, la date de lancement et l'API ne figurent dans aucun des sujets officiels lus.
