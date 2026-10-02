@@ -68,7 +68,8 @@ de l'utilisateur**. La commande fait foi ; la section T08c de la ROADMAP est cor
       Blood Craze, Dual Wield Specialization, Enraged Regeneration, Echoes of Gladiator Stance, Raging Blows, Furious
       Precision, Lingering Rage ×3, Gore Drinker ×3, Serpentbloom Snake.
 - Géométrie : les nouvelles positions tombent sur la grille de `decode_rules.json` (`talent_geometry` : origines 1020,
-  5020, 9080, pas de 600, `row_base` 2130) : 113569 → rangée 6 de l'arbre du milieu, 113570 → rangée 1 du troisième.
+  5020, 9080, pas de 600, `row_base` 2130 ; formule recoupée sur Booming Voice, nœud 105938 en 5620, 2130 → rangée 1,
+  colonne 2) : 113569 → rangée 6, colonne 3 de Fureur ; 113570 → rangée 1, colonne 3 de Protection.
 - `Cache/ADB/frFR/DBCache.bin` : daté du 29/09 (avant la refonte) ; non lu (réponse 2).
 - `WTF/Config.wtf` : `SET textLocale "enUS"` (source locale de `game_locale`, bloc F).
 - Talents Forever 0.35.0 (`tasks/inventaire-addons.md`) : `Data.lua` du build 70170 généré le 2026-10-01 ; son
@@ -176,11 +177,17 @@ puis vert (« T08c: bloc X vert »), fichiers supprimés.
    `decode.py` quand `decode_version(..., hotfixes=...)` le demande.
 2. Champ `hotfix` sur chaque entité touchée (`classes.json`, `talents.json`, `spells.json`, `spell_scaling.json`,
    `pets.json`, `pvp_items.json`) ; bloc `hotfixes` de `sources.json` de la candidate.
-3. Fixture `tests/fixtures/wago/1.60.1.70170/enUS/` (nouvelle) : CSV réduits à l'arbre du Guerrier (arbre 1117, ses
-   nœuds, entrées, définitions, arêtes, points de courbe, sorts cités) et aux lignes touchées par la fixture
-   `DBCache.bin`, par `scripts/extract_class_fixtures.py` étendu (`--version`, `--classes`), écriture `newline="\n"`.
+3. Fixture `tests/fixtures/wago/1.60.1.70170/` (nouvelle) **de même portée que celle de 70124** (9 classes, Mage,
+   familiers, tables du personnage, GameTables), pour que `decode_version` tourne entier :
+   `scripts/extract_wago_fixtures.py` et `scripts/extract_class_fixtures.py` lancés avec `--version 1.60.1.70170`,
+   plus les lignes touchées par la fixture `DBCache.bin` et tout l'arbre 1117 du Guerrier ; écriture `newline="\n"`.
+   Constante `WAGO_70170` dans `tests/conftest.py` ; les tests existants gardent leurs chemins fixes (aucun ne
+   choisit le dossier le plus récent).
 4. `forever decode 1.60.1.70170 --hotfixes` ; garde de build ; refus si une table a une disposition non validée et
-   des entrées `VALID` qui toucheraient une entité (message : table, comptes, commande de diagnostic).
+   des entrées `VALID` dont l'**identifiant** est lu par un décodeur (sorts et nœuds des arbres, sorts des fiches,
+   bijoux PvP…), décidé par `rec_id` sans décoder : une table comme `ItemSparse` (4 479 `VALID`, beaucoup de
+   chaînes) ne bloque rien quand aucune de ses lignes corrigées n'est lue ; message : table, comptes, commande de
+   diagnostic.
 
 ### Bloc D — Valeurs corrigées dans `forever diff` et `forever hotfixes` (point 4)
 
@@ -205,6 +212,9 @@ puis vert (« T08c: bloc X vert »), fichiers supprimés.
 2. Ligne de démarrage de session (`forever/hooks.py`) : une ligne compacte quand ce compte est non nul.
 
 ### Bloc F — Langue du client et noms cités dans les skills (réponse 2)
+
+Ce bloc est dans la tranche parce que l'utilisateur l'a demandé en répondant à la question 2 (préférence durable).
+Ce n'est pas une extension du périmètre de T08c.
 
 1. Profil joueur (hors du dépôt) : champ `game_locale` au niveau du joueur, sourcé : `client` (lu dans
    `WTF/Config.wtf`, `textLocale`, lecture locale) ou `joueur` (`forever profile set --game-locale enUS`, qui
@@ -343,11 +353,16 @@ Bloc C (`test_hotfix_overlay.py`) :
 - `INVALID`, `NOTPUBLIC`, `DBReply` : valeurs du build gardées.
 - Garde de build : `DBCache.bin` de build 70124 appliqué à 1.60.1.70170 → `HotfixBuildMismatch`.
 - `decode_version` sur la fixture avec correctifs : `classes.json` Warrior contient les talents nommés Lingering
-  Rage, Furious Precision et Gore Drinker (noms venus de `SpellName` du correctif), le nœud 113569 en rangée 6 avec 2
-  rangs, aucun nœud Guerrier dans `unresolved_nodes` ; chaque talent touché porte `hotfix.pushes == [112347]` et
-  `first_logged_at` « 2026-10-02T08:00:23… » (extrait de `Hotfix.log`) ; `sources.json` `hotfixes` : build 70170,
+  Rage, Furious Precision et Gore Drinker (noms venus de `SpellName` du correctif), le nœud 113569 en **rangée 6,
+  colonne 3** avec 2 rangs (formule de `talent_geometry`, appliquée à toutes les classes, recoupée sur Booming Voice,
+  nœud 105938 : `PosX` 5620, `PosY` 2130 → rangée 1, colonne 2 dans `classes.json` de 70170), aucun nœud Guerrier
+  dans `unresolved_nodes` ; chaque talent touché porte `hotfix.pushes == [112347]` et `first_logged_at`
+  « 2026-10-02T08:00:23… », lu d'un journal `hotfixes.json` de fixture écrit directement ou de
+  `parse_hotfix_log(texte, 2026)` avec l'année explicite (jamais l'année tirée de la date du fichier, fausse sur une
+  copie de 2027) ; `sources.json` `hotfixes` : build 70170,
   sha256 de la fixture, `max_push` 112347 (ou la plus haute de la fixture), commit de WoWDBDefs.
-- Sans `--hotfixes` : candidate identique à celle d'aujourd'hui (non-régression).
+- Sans `--hotfixes` : aucun champ `hotfix`, aucune ligne du correctif ; avec et sans l'option, fichiers `_seed_*`
+  identiques et `classes.json` identique hors des entités touchées (non-régression).
 - Mode seed : octets des fichiers `_seed_*` identiques avant et après ; tests de parité inchangés.
 - `forever origins check` vert sur la candidate (champ `hotfix` en métadonnée).
 
