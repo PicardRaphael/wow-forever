@@ -406,7 +406,7 @@ mechanics:
       - tests/parity/test_sim_leveling_parity.py::test_mc_matches_the_seed
     tolerance: null
     formule: "recul par coup reçu pendant une incantation = pushback_s si le coup n'est pas résisté (Burning Soul, sorts de feu) ; nombre de reculs non limité (combat_rules.pushback_limit non lu)"
-    note: "T04b : porté du seed (forever/engine/casting.py : pushback_s, pushback_resist_chance, pushback_chance, pushback_rate, melee_cast_time) ; canalisations non modélisées ; analytique : incantation en mêlée allongée par le recul, plancher leveling.analytic.min_cast_fraction"
+    note: "T04b : porté du seed (forever/engine/casting.py : pushback_s, pushback_resist_chance, pushback_chance, pushback_rate, melee_cast_time) ; canalisations non modélisées ; analytique : incantation en mêlée allongée par le recul, plancher leveling.analytic.min_cast_fraction ; notes officielles (https://us.forums.blizzard.com/en/wow/t/2360696) : Arcane Missiles ne vérifie la ligne de vue qu'au début de la canalisation (ligne de vue non modélisée) ; problèmes connus officiels du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2352687) : sous les coups, Arcane Missiles tire un projectile à pleins dégâts au lieu d'un projectile tronqué : bug reconnu, jamais modélisé ; le projectile tronqué est le comportement voulu (signal, non mesuré)"
   - id: B7
     categorie: ressources
     description: "Régénération de mana en combat (part gardée pendant l'incantation : Arcane Meditation, Mage Armor), agrégée sur le combat"
@@ -564,6 +564,7 @@ mechanics:
       - "tests/fixtures/wago/1.60.1.70009 (aura 400573 : CumulativeAura 4, durée 8000 ms ; Arcane Power 12042 : DurationIndex 8, 15 000 ms, SpellCooldowns 180 000 ms)"
       - "forever/data/1.60.1.70009/spell_scaling.json (talent_cooldowns : recharges des talents actifs, T05)"
       - "forever/data/1.60.1.70009/talents.json (hotStreak : 20 s, 25 % par cumul, 3 cumuls, variables d'infobulle du client en révision 2, T06b ; duration_s seulement dans la copie du seed)"
+      - "notes de développement officielles du 24/09/2026 (https://us.forums.blizzard.com/en/wow/t/2360696) : Hot Streak passé de 15 à 20 s, concorde avec le client"
     tests:
       - tests/unit/test_engine_arcane_blast.py::test_max_stacks_come_from_the_talent
       - tests/unit/test_engine_arcane_blast.py::test_stacks_are_capped_and_expire
@@ -1656,19 +1657,18 @@ mechanics:
     note: "modificateurs de talents sur la recharge, la durée et la portée non appliqués ; raciaux passifs (Hardiness…) hors des fiches ; sorts non interruptibles non filtrés ; toucher et résistance des contrôles non modélisés"
   - id: L1
     categorie: familiers
-    description: "Apprivoisement : bêtes apprivoisables et marge de niveau au-dessus du Chasseur"
+    description: "Apprivoisement : bêtes apprivoisables (marge de niveau en L13)"
     forever: oui
     statut: teste
     certitude: suppose
     sources:
-      - "forever/data/1.60.1.70124/pet_rules.json (tame.level_margin)"
-      - "Forever Bestiary 0.5.0, Data/Guide.lua (relevés de joueurs de la bêta, 18 au 22 septembre 2026)"
-      - "SpellTargetRestrictions du client : aucune borne de niveau pour Tame Beast (CH0, accès 6)"
+      - "Forever Bestiary 0.5.0, Data/Guide.lua et base de l'addon (relevés de joueurs de la bêta)"
+      - "Creature et CreatureDifficulty du client 1.60.1.70124 : aucun drapeau d'apprivoisement lisible (CH0)"
     tests:
-      - tests/unit/test_pet_rules.py::test_tame_margin_stays_suppose_after_reading_the_client
+      - tests/unit/test_pets_guide.py::test_guide_lists_beasts_of_the_zone_teaching_the_rank
       - tests/unit/test_pets_guide.py::test_tameable_now_or_level_where_it_becomes_tameable
     tolerance: null
-    note: "marge relevée par des joueurs, absente du client ; bêtes apprivoisables lues dans Forever Bestiary (aucun drapeau d'apprivoisement lisible dans Creature ni CreatureDifficulty)"
+    note: "bêtes apprivoisables lues dans Forever Bestiary (aucun drapeau d'apprivoisement lisible dans Creature ni CreatureDifficulty) ; découpée le 2026-10-02 (choix de l'utilisateur) : la marge de niveau passe en L13"
   - id: L2
     categorie: familiers
     description: "Apprentissage d'une capacité : bête apprivoisée qui la connaît, combat, puis Beast Training ; capacités générales chez l'entraîneur"
@@ -1698,7 +1698,7 @@ mechanics:
       - tests/unit/test_decode_pets.py::test_rank_level_is_the_spell_level
       - tests/unit/test_verify_pets.py::test_rank_numbering_with_a_gap_or_a_duplicate_is_refused
     tolerance: null
-    note: "rang : sous-titre « Rank N » ; niveau : SpellLevels.SpellLevel ; à qui s'applique le niveau requis (familier ou Chasseur) : règle de Classic supposée (pet_rules.json, training.rank_level_applies_to)"
+    note: "rang : sous-titre « Rank N » ; niveau : SpellLevels.SpellLevel ; à qui s'applique le niveau requis (familier ou Chasseur) : règle de Classic supposée (pet_rules.json, training.rank_level_applies_to) ; notes officielles du 24/09/2026 révisées le 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696) : Sonic Blast annoncé pour les chauves-souris, absent des lignes de familier du client 70124 (sorts 1264478 à 1264488 sans SkillLineAbility) : non reflété dans les tables lues, à revoir avec 70170 ; Furious Howl réduit de 40 % : points de base identiques en 70009 et 70124, aucune table antérieure, non vérifiable"
   - id: L4
     categorie: familiers
     description: "Coût d'un rang en points d'entraînement"
@@ -1816,3 +1816,18 @@ mechanics:
       - tests/unit/test_decode_pets.py::test_focus_cost_and_cooldown
     tolerance: null
     note: "coût en focus certain ; régénération et bonheur relevés par des joueurs"
+  - id: L13
+    categorie: familiers
+    description: "Apprivoisement : marge de niveau d'une bête au-dessus du Chasseur"
+    forever: oui
+    statut: teste
+    certitude: probable
+    sources:
+      - "forever/data/1.60.1.70124/pet_rules.json (tame.level_margin, révision 6)"
+      - "notes de développement officielles de la bêta du 24/09/2026, révisées le 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696), Hunter > Pets : Tame Beast refusé sur une bête de niveau supérieur au Chasseur (lu le 2026-10-02)"
+      - "SpellTargetRestrictions du client : aucune borne de niveau pour Tame Beast (CH0, accès 6)"
+    tests:
+      - tests/unit/test_pet_rules.py::test_tame_margin_comes_from_the_official_notes_after_reading_the_client
+      - tests/unit/test_pets_guide.py::test_tameable_now_or_level_where_it_becomes_tameable
+    tolerance: null
+    note: "0 niveau par le texte officiel, sans mesure : probable (docs/DATA_SOURCES.md, décision 162) ; remplace le relevé de joueurs de Forever Bestiary (+2, 18 au 22 septembre 2026) ; règle du serveur, absente du client ; à mesurer en jeu (bête d'un niveau au-dessus du Chasseur refusée, puis une de son niveau acceptée) pour passer à certain"

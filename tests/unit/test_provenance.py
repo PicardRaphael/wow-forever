@@ -118,7 +118,7 @@ def test_make_provenance(make_deps):
     assert p["registry_coverage"] == coverage(REGISTRY_PATH)
     assert p["assumptions"] == ["a"]
     # Révision de la version installée, lue dans sources.json (via le manifeste) : 3 depuis PV1 (relecture).
-    assert p["data_revision"] == 5  # T08b : révision 4 (ratios du personnage) ; CH0 : 5 (familiers)
+    assert p["data_revision"] == 6  # T08b : révision 4 (ratios du personnage) ; CH0 : 5 (familiers) ; 6 (marge)
 
 
 def test_make_provenance_without_registry(make_deps, tmp_path):

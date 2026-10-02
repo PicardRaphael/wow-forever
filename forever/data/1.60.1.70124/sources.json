@@ -240,15 +240,16 @@
       ]
     },
     "pet_rules.json": {
-      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel)",
+      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel) ; une règle tirée des notes officielles de Blizzard (tame.level_margin, probable, révision 6)",
       "certainty": "suppose",
       "notes": [
         "ajouté à la main en révision 5 (CH0, accord de l'utilisateur du 2026-10-01) ; forever install ne l'écrit pas",
-        "chaque règle porte sa source, sa date, sa certitude et son entrée du registre (L1 à L12)",
-        "relecture à chaque changement de Forever Bestiary (forever addons status)"
+        "chaque règle porte sa source, sa date, sa certitude et son entrée du registre (L1 à L13)",
+        "relecture à chaque changement de Forever Bestiary (forever addons status)",
+        "révision 6 (2026-10-02) : tame.level_margin à 0, source la note officielle du 24 septembre 2026 révisée le 1er octobre (probable), à la main"
       ]
     }
   },
-  "revision": 5,
-  "revised_at": "2026-10-01"
+  "revision": 6,
+  "revised_at": "2026-10-02"
 }

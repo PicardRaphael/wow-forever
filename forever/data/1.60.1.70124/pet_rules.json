@@ -1,18 +1,18 @@
 {
  "schema_version": 1,
  "game_version": "1.60.1.70124",
- "source": "Règles du système de familiers absentes du client, relevées par des joueurs et rassemblées par l'addon Forever Bestiary (Data/Guide.lua, chaque section citant sa source) ; une règle de Classic marquée manuel. Certitude au plus suppose (décision 127) ; le client l'emporte dès qu'il porte une règle (pets.json).",
+ "source": "Règles du système de familiers absentes du client, relevées par des joueurs et rassemblées par l'addon Forever Bestiary (Data/Guide.lua, chaque section citant sa source) ; une règle de Classic marquée manuel ; depuis la révision 6, une règle tirée d'une note officielle de Blizzard (tame.level_margin). Relevé de joueurs au plus suppose (décision 127), note officielle sans mesure au plus probable (décision 162) ; le client l'emporte dès qu'il porte une règle (pets.json).",
  "rules": {
   "tame.level_margin": {
-   "text": "On peut apprivoiser une bête jusqu'à ce nombre de niveaux au-dessus du sien.",
-   "value": 2,
-   "unit": "niveaux",
-   "source": "Forever Bestiary 0.5.0 (Data/Guide.lua), section « How pet training works » : joueurs de la bêta sur le forum Petopia et les forums officiels, 18 au 22 septembre 2026 (via foreverchanges.pro)",
-   "date": "2026-09-22",
-   "certainty": "suppose",
-   "registry": "L1",
-   "origin": "addon",
-   "note": "SpellTargetRestrictions du client 1.60.1.70124 (accès 6 de CH0) : MaxTargetLevel nul pour Tame Beast, seul le type de cible (bête) est porté ; la marge reste un relevé de joueurs"
+   "text": "Écart de niveau maximal entre une bête apprivoisable et le Chasseur : 0 veut dire qu'aucune bête de niveau supérieur au sien ne s'apprivoise.",
+   "value": 0,
+   "unit": "niveau(x) au-dessus du Chasseur",
+   "source": "Notes de développement officielles de la bêta, 24 septembre 2026, révisées le 1er octobre (version 2 du message, lue le 2026-10-02), section Hunter > Pets : Tame Beast ne fonctionne plus sur une bête de niveau supérieur à celui du Chasseur (https://us.forums.blizzard.com/en/wow/t/2360696)",
+   "date": "2026-10-01",
+   "certainty": "probable",
+   "registry": "L13",
+   "origin": "manuel",
+   "note": "texte officiel, aucune mesure : probable (docs/DATA_SOURCES.md, notes officielles) ; SpellTargetRestrictions du client 1.60.1.70124 (accès 6 de CH0) : MaxTargetLevel nul pour Tame Beast, la règle reste au serveur ; remplace le relevé de joueurs de Forever Bestiary 0.5.0 (+2 niveaux, 18 au 22 septembre 2026), antérieur à la note ; à confirmer en jeu (bête d'un niveau au-dessus refusée)"
   },
   "learning.method": {
    "text": "Pour apprendre une capacité : apprivoiser une bête qui la connaît, combattre avec elle jusqu'à l'apprendre (avis en texte jaune, sans le rang), reprendre son familier et la lui enseigner par Beast Training contre des points d'entraînement ; les capacités générales (Growl, résistances…) s'achètent chez le maître des familiers, aussi en points d'entraînement.",

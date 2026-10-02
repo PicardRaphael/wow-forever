@@ -130,8 +130,10 @@ Non conseillés pour l'instant : MobInfo2 (dernier fichier du 2026-09-20, antér
 Forum de Blizzard (Discourse), catégories 349 (discussion de la bêta) et 347 (discussion générale de Forever), lu par
 `forever notes` **à la main seulement** (ou proposé par `forever watch` quand le build du client change) ; workflow
 `notes-watch` en `workflow_dispatch` seul. Rang de la source : **signal**, jamais une valeur. Une note ne change aucune
-donnée ; une règle du serveur sans autre source peut passer de `suppose` à `probable` par un texte officiel, seule la
-mesure (journaux, relevé en jeu) donne `certain`. Le sujet « Known Issues » liste des bugs reconnus : jamais modélisés.
+valeur du client ; une règle du serveur sans autre source peut passer de `suppose` à `probable` par un texte officiel, seule la
+mesure (journaux, relevé en jeu) donne `certain`. Une note peut remplacer une valeur dont la seule source était un relevé de
+joueurs (rangs 3 et 4 de la hiérarchie), écrite à la main (`manuel`, au plus `probable`) dans une révision des données
+(décision 162 : marge d'apprivoisement). Le sujet « Known Issues » liste des bugs reconnus : jamais modélisés.
 
 ## API Blizzard (décision 126, tranche EC1)
 Gardée par le lancement et la vérification de la couverture de Forever. Tout ce que l'API couvre pour Forever : prix de l'hôtel des ventes ; fiches de personnages (niveau, équipement, talents si disponibles) ; PvP (honneur, rang, classements). Clés dans `.env` (ignoré par git, jamais lu par les tests). Le client futur vivra dans `forever/pipeline/bnet.py` (via `Deps.http_get`) et sera ajouté à la liste réseau de CLAUDE.md et de `tests/unit/test_network_boundary.py` ce jour-là, **après accord de l'utilisateur** pour chaque nouvel accès réseau. Aucun code avant EC1.

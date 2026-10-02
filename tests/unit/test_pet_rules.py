@@ -15,6 +15,7 @@ from forever.registry import find_entry, load
 V = DATA_DIR / LOCAL_VERSION
 RANK = {"suppose": 0, "probable": 1, "certain": 2}
 MAX_BY_ORIGIN = {"addon": "suppose", "manuel": "suppose", "client": "certain"}
+OFFICIAL_FORUM = "us.forums.blizzard.com"  # note officielle : règle manuel au plus probable (décision 162)
 INTERFACE = (
     "tame.level_margin",
     "learning.method",
@@ -53,7 +54,9 @@ def test_each_rule_has_text_source_date_certainty_and_registry(doc):
 def test_certainty_never_above_its_origin(doc):
     for key, rule in doc["rules"].items():
         assert rule["origin"] in MAX_BY_ORIGIN, key
-        assert RANK[rule["certainty"]] <= RANK[MAX_BY_ORIGIN[rule["origin"]]], key
+        official = rule["origin"] == "manuel" and OFFICIAL_FORUM in rule["source"]
+        cap = "probable" if official else MAX_BY_ORIGIN[rule["origin"]]
+        assert RANK[rule["certainty"]] <= RANK[cap], key
 
 
 def test_training_points_gain_is_unknown(doc):
@@ -62,9 +65,11 @@ def test_training_points_gain_is_unknown(doc):
     assert find_entry(load(REGISTRY_PATH), rule["registry"]).status == "absent"
 
 
-def test_tame_margin_stays_suppose_after_reading_the_client(doc):
+def test_tame_margin_comes_from_the_official_notes_after_reading_the_client(doc):
     rule = doc["rules"]["tame.level_margin"]
-    assert rule["certainty"] == "suppose" and rule["origin"] == "addon"
+    assert rule["value"] == 0 and rule["certainty"] == "probable" and rule["origin"] == "manuel"
+    assert rule["registry"] == "L13"
+    assert "us.forums.blizzard.com/en/wow/t/2360696" in rule["source"]
     assert "SpellTargetRestrictions" in rule["note"]
 
 

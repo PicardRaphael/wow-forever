@@ -53,7 +53,7 @@ def check(name, *, strict=True, engine_dirs=()):
 def test_repository_registry_is_valid_strict():
     report = validate(REGISTRY_PATH, REPO_ROOT, strict=True)
     assert report.errors == []
-    assert report.total == 125  # T04b : H11 ; T04c : I7 ; T05 : B18, B19, C9, I8 ; PV1 : K1 à K5 ; CH0 : L1 à L12
+    assert report.total == 126  # T04b : H11 ; T04c : I7 ; T05 : B18, B19, C9, I8 ; PV1 : K1 à K5 ; CH0 : L1 à L12 ; L13
 
 
 def test_tested_entries_reference_existing_test_functions():
@@ -125,8 +125,8 @@ def test_find_entry_unknown_suggests():
 def test_repository_coverage():
     """Seul test qui fige la couverture du registre après T02."""
     assert (
-        coverage(REGISTRY_PATH) == "52/125"
-    )  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3 ; CH0 : L1 à L12 sauf L5
+        coverage(REGISTRY_PATH) == "53/126"
+    )  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3 ; CH0 : L1 à L12 sauf L5 ; L13
 
 
 def test_load_reads_optional_fields():
@@ -138,10 +138,10 @@ def test_load_reads_optional_fields():
 def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("Registre : 125 mécaniques")
+    assert out.startswith("Registre : 126 mécaniques")
     assert (
-        "teste 51" in out and "valide-journal 1" in out
-    )  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3
+        "teste 52" in out and "valide-journal 1" in out
+    )  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3 ; L13
 
 
 def test_main_reports_errors(capsys):

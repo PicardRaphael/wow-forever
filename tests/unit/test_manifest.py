@@ -84,7 +84,7 @@ def test_manifest_content():
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert v["revision"] == 5 and v["revised_at"] == "2026-10-01"  # PV1 : r2, r3 ; T08b : r4 ; CH0 : r5 (familiers)
+    assert v["revision"] == 6 and v["revised_at"] == "2026-10-02"  # PV1 : r2, r3 ; T08b : r4 ; CH0 : r5 ; r6 (marge)
     assert (
         len(v["files"])
         == 25  # PV1, bloc C : pvp_rules.json ; T08b : origins.json, character_scaling.json ; CH0 : pets.json, pet_rules.json
