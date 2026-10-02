@@ -1,99 +1,249 @@
 # Questions ouvertes
 
-Chaque règle de jeu incertaine, avec la façon de la vérifier (journal, test en jeu, source). Les choix du modèle (poids, paramètres, départage, plugin) sont dans [modeling-decisions.md](modeling-decisions.md).
+Inconnues du jeu de Forever, rangées par domaine. Pour chacune : la question, le test qui la tranche et sa priorité.
+Le détail technique (valeurs relevées, tables, historique) est dans les rapports de `docs/research/` cités en lien,
+en particulier [questions-ouvertes-detail.md](research/questions-ouvertes-detail.md) (texte d'origine de chaque
+question, par identifiant). **Questions résolues** : [RESOLVED_QUESTIONS.md](RESOLVED_QUESTIONS.md), avec leur date,
+leur réponse et leur source. Choix du modèle (poids, paramètres, départage, plugin) :
+[modeling-decisions.md](modeling-decisions.md).
 
-- Regroupement des actions serveur dans Forever : mesurer sur journaux (intervalles entre lancers). Test : 50 sorts instantanés enchaînés (protocole B1 de `docs/ADDON.md`) ; des intervalles groupés sur une grille fixe révéleraient un regroupement.
-- Recul d'incantation : 0,5 s sans limite ? Mesurer. Test : Frostbolt incanté sous les coups d'un monstre de mêlée (journal : écart entre `SPELL_CAST_START` et `SPELL_CAST_SUCCESS` selon le nombre de coups reçus pendant l'incantation).
-- Transfert (Blink) utilisable sous étourdissement ? Tester en jeu. Texte du client 1.60.1.70124 (sort 1953, 2026-10-02) : « libère des étourdissements et des immobilisations », concordance avec `spells.json` ; le texte ne dit pas si le sort se lance sous étourdissement.
-- Coût en mana des rangs issus de talents (Ice Lance r1, Pyroblast r1, Arcane Blast r1, Blast Wave r1) : relevé dans le client 1.60.1.70009 (T03, `SpellPower.ManaCost`) : Pyroblast r1 125, Ice Lance r1 45, Blast Wave r1 215 ; Arcane Blast coûte un pourcentage de la mana de base (pas de coût fixe). À substituer à l'estimation de `mechanics.json` lors de l'installation de la version (T08) ; confirmer en jeu. Revérifié le 2026-10-02 sur le décodage de 1.60.1.70124 : concordance (Pyroblast r1 125 et niveau 20, Ice Lance r1 45 et niveau 20, Blast Wave r1 215 et niveau 30, Arcane Blast 15 % de la mana de base, `SpellPower`, `SpellLevels`) ; valeurs installées dans `spells.json` ; reste la confirmation en jeu.
-- Produit TACT au lancement (wow_classic_forever ?). Le client installé est `wow_classic_beta` 1.60.1.70170 (`.build.info`, lu sur disque le 2026-10-02) ; le produit du lancement reste inconnu.
-- Talents : la plupart des rangs de `talents.json` sont lus sur le build 1.60.1.69893. Revérifiés en T03 sur les tables du client 70009 : écarts tranchés par l'utilisateur le 2026-09-27 (`tasks/T03-ecarts.md`, `forever/data/1.60.1.70009/confirmed_changes.json`) : Impact r2 et r3 (7 et 10 au lieu de 6 et 9), Improved Scorch r2 (67 au lieu de 66), Improved Blizzard r2 (25 au lieu de 30), Hot Streak r1 (durée 20 s au lieu de 15), nature `client` ; Presence of Mind (« 10 sec » écrit en clair dans l'infobulle du client, `ranks` vide), nature `format` ; rangs 1 de Pyroblast, Ice Lance, Arcane Blast et Blast Wave dans `spells.json` (lus au niveau de base, décodés au niveau min(MaxLevel, 60)), nature `convention` ; niveau appris de Blast Wave r1 (30 au lieu de 36), nature `client`. Valeurs installées en T08 ; restent à confirmer en jeu.
-- École Givre-feu (Frostfire Bolt) comptée à la fois en givre et en feu : double bénéfice des talents des deux écoles ; pour le multiplicateur de critique, la branche givre (Ice Shards) l'emporte (comportement de `fm.py`, conservé en T02). À vérifier en jeu. Texte du client 1.60.1.70124 (sort 401502, 2026-10-02) : résistance la plus basse entre Givre et Feu, compte comme les deux écoles : concordance avec le modèle ; le texte ne dit rien d'Ice Shards ni de Fire Vulnerability. Test : critiques de Frostfire Bolt avec Ice Shards pris (multiplicateur), et Frostfire Bolt sous cumuls de Fire Vulnerability (Improved Scorch) contre sans.
-- Winter's Chill : +2 % de critique par cumul dans Forever (Frostbolt et Ice Lance seulement) ; relevé dans le client 1.60.1.70009 (sort 12579, cité par l'infobulle du talent, `tooltip_values` du décodage). À confirmer en jeu. Revérifié le 2026-10-02 sur 1.60.1.70124 (infobulle du talent) : concordance.
-- ~~`int_per_crit` entre les niveaux 1 et 60 : interpolation linéaire estimée (EST)~~ — **close (T08b, bloc A)** : lue dans le client par niveau (`PlayerExpectedStat.SpellCritPerIntellect`, `character_scaling.json`) en mode forever dès la révision qui installe le fichier ; le mode seed garde l'interpolation de fm.py. Reste ouverte la critique de base (absente du client).
-- Modèle de personnage : `leveling.json.player_model` (texte) omet les termes `0,8 × max(0, niveau − 5)` (Intelligence) et `0,5 × max(0, niveau − 5)` (Esprit) que `fm.py` applique ; le code du seed fait foi pour la parité (`mechanics.json` : `late_bonus_per_level`). À trancher avec des fiches de personnage réelles.
-- Coût en mana des rangs issus de talents : repli estimé à 0,75 × premier coût publié du sort, sinon 50 (`mechanics.json` : `mana.talent_rank_cost`) ; à remplacer par les coûts relevés en jeu (voir la question sur Ice Lance r1, Pyroblast r1, Arcane Blast r1, Blast Wave r1).
-- Règles Classic supposées inchangées dans Forever (registre A3, B1, H1 : raté des sorts selon l'écart de niveau et son plancher, temps de recharge global, niveau de la cible d'un boss) : les observer dans Forever (journaux de combat sur mannequin et sur boss, intervalles entre lancers) avant de les repasser en `probable` ou `certain`.
-- Hotfixes du client (`DBCache.bin`) non appliqués par le pipeline (T03) : une valeur décodée des tables wago peut différer du jeu en ligne. Comparer au jeu les valeurs installées ; voie autonome `db2tool` si l'écart se confirme.
-- Rangs de sort au niveau du personnage : fait en T04a (`spell_scaling.json`, `rank_values_at_level`, registre G7) ; reste à confirmer en jeu que les dégâts d'un rang suivent le niveau du personnage jusqu'à `MaxLevel` (journal de leveling avec ForeverLogger).
-- Bloc avancé du journal (format 22 de Forever, 19 champs contre 17 en Retail) : sens des deux champs entre l'absorption et le type de ressource (toujours 0 relevé) ; sens du dernier champ pour un **joueur** (niveau d'objet ?) : il vaut 7 pour le Mage du 2026-09-27, qui lance Frostbolt rang 3 (niveau de base 14). À comparer au niveau de `ForeverLoggerDB` (`forever logs measure --addon-sv`, champ `player_level_field`).
-- Suffixe de dégâts : `amount` et `base_amount` diffèrent parfois d'une unité hors critique (53 / 52) ; ordre des trois derniers champs (critique, glancing, écrasant) supposé celui de Retail. Les rapports de critique du second journal vont de 1,51 à 1,6 (arrondis sur de petits montants ?).
-- Durées d'incantation mesurées sous la table (Frostbolt r3 : 1,92, 2,07 et 1,98 s dans le journal de la fixture, pour 2,2 s dans `spells.json`) : talents (Improved Frostbolt), file d'attente des sorts ou horodatage serveur. Les intervalles entre instantanés enchaînés descendent à 1,41 s dans le second journal : gigue d'horodatage ? (B1, n à augmenter).
-- Build absent de l'en-tête du journal (`BUILD_VERSION 1.60.1`, sans 70009) : la provenance retient la version locale de même préfixe (hypothèse affichée).
-- Hotfixes : `Hotfix.log` montre des lignes CurvePoint (144) et Curve (72) remplacées : les rangs de talent décodés en T03 peuvent différer du jeu en ligne ; CreatureDifficulty (3) : PV de créatures corrigés. Décodage de `DBCache.bin` en T08.
-- Hotfixes (2026-10-02) : les talents du Guerrier annoncés le 2026-10-02 (« Warrior Updates in Today's Beta Build », Lingering Rage, Furious Precision, Gore Drinker…) sont absents des tables de 1.60.1.70170 (wago) ; `Logs/Hotfix.log` du lancement de 08:00 compte 87 enregistrements `Trait*` corrigés par le serveur. Ils restent hors des données tant que `DBCache.bin` n'est pas décodé (T08) : les builds du Guerrier relus sur `classes.json` peuvent différer du jeu.
-- Questie : licence amont (aucun fichier de licence dans l'addon installé ; CurseForge 334372, lignée cmangos) à vérifier avant tout élargissement ; base Classic Era : le 2026-09-27, 29 écarts sur 21 PNJ mesurés (Forever plus haut dès le niveau 10 ; les PV mesurés semblent ne dépendre que du niveau pour les PNJ normaux : 208, 239, 272, 307 aux niveaux 10 à 13, sauf Sunscale Lashtail). Les niveaux de `hp_by_level` venus de Questie (`suppose`) sont donc probablement trop bas.
-- Addon ForeverLogger (modifiée le 2026-10-02) : chargé en jeu depuis le 2026-09-28 ; sa sauvegarde sur disque porte, hors combat, les rangs de talents par nœud (`C_ClassTalents.GetActiveConfigID`, `C_Traits.GetNodeInfo`), le bonus et la critique des sorts par école (`GetSpellBonusDamage`, `GetSpellCritChance`) ; reste à vérifier que ces API ne deviennent pas secrètes en combat ni en champ de bataille. Sondes `/dump` à faire avant toute conclusion : liste dans `docs/ADDON.md` (section 7, sondes).
-- Sarilus Foulborne (3986) mesuré à 927 PV au niveau 25 (Questie : 573, rang 0) : PNJ de quête peut-être renforcé dans Forever ; il pèse seul sur `hp_by_level` du niveau 25.
-- Mesures du journal, limites connues (relecture T04a) : un `SPELL_CAST_SUCCESS` sans START est compté comme instantané ; Presence of Mind, Arcane Power, une potion ou un sort hors recharge globale fausseraient les intervalles de B1 quand l'échantillon grossira (filtrer par la recharge globale des sorts, `SpellCooldowns.StartRecoveryTime`, avant de viser `valide-journal`) ; un START interrompu puis le même sort instantané reprend l'ancien START. `hit_tally` retient un seul niveau du lanceur par journal (début du journal) : l'écart est décalé d'un après un gain de niveau en cours de journal.
-- T04b, A3 (décision 4) : 0 raté de table sur 281 sorts directs du Mage (seconde fixture, niveau du lanceur par le carnet de Questie), cibles 2 à 8 niveaux plus bas : très improbable avec l'ancienne ligne « - » à 4 % (0,96^281 ≈ 1e-5), plausible avec la règle Classic désormais appliquée (4 % − 1 % par niveau d'écart, plancher 1 % : 0,99^281 ≈ 6 %) ; talents de toucher du Mage inconnus. Les écarts 0 à +3 restent à mesurer : campagne sur des cibles de niveau égal ou supérieur, avec ForeverLogger chargé.
-- T04b, B1 : validée par les journaux selon le critère de l'utilisateur (10e percentile ≥ 1,45 s et médiane à ±0,05 s de 1,5 s) : 50 intervalles, 10e percentile 1,4569 s, médiane 1,511 s. Les 3 intervalles sous 1,45 s (1,414, 1,418, 1,424 s) viennent probablement de la variation d'horodatage du journal (horodatage client à la milliseconde, file d'attente des sorts) ; à confirmer par une campagne dédiée (protocole de docs/ADDON.md) avant de viser `valide-jeu`.
-- T04b, H11 (décision 5) : correction PV Questie → Forever ajustée sur 7 niveaux (10 à 17) d'une seule zone (les Tarides) ; extrapolée jusqu'à × 2,29 au niveau 60 (`suppose`). Forever donne-t-il une valeur commune par niveau aux PNJ normaux ? Inversions de l'agrégat listées aux niveaux 25 (Sarilus Foulborne mesuré), 56 et 60 (médianes Questie). Le troisième journal réel (`WoWCombatLog-092726_174130.txt`, 17:41, 635 événements) est intégré à `monsters.json` mais n'apporte aucun relevé de PV : de nouveaux journaux de leveling hors des Tarides restent nécessaires. **Modifiée le 2026-10-02** (1.60.1.70170 révision 2, journal `WoWCombatLog-100226_080035`) : correction ajustée sur 13 niveaux (1 à 22) de trois zones (Dun Morogh, Sombrivage, Forêt des Pins-Argentés), pente 0,0238 au lieu de 0,0248 ; les PNJ normaux d'un même niveau gardent une valeur commune (18 à 20). Reste l'extrapolation au-delà du niveau 22.
-- H11 (2026-10-02) : **PNJ au-dessus des PNJ normaux de leur niveau** (`monsters.json` `curve_excluded`, écartés de la courbe sur décision de l'utilisateur) : Thistle Bear (299 PV au niveau 11 contre 239), Grizzled Thistle Bear (534 et 591 aux niveaux 16 et 17 contre 427 et 473), Dark Strand Enforcer et Wildthorn Stalker (642 au niveau 20 contre 629 ; Wildthorn Stalker seul mesuré au niveau 21, 691). Famille de créature (ours), rang caché ou PNJ renforcé ? Test : relever d'autres ours et d'autres PNJ de ces deux familles à niveau connu ; une règle commune (même facteur) justifierait un modèle par famille, sinon ils restent écartés un par un. Le niveau 22 ne repose que sur un PNJ (3774, 746 PV, `probable`) relevé pendant une session en cours.
-- T04b, carnet de Questie : heures Unix ramenées à l'heure locale du journal par le décalage d'un instantané ForeverLogger (+2 h le 2026-09-27), sinon par le fuseau du système ; Questie écrit parfois deux blocs `char` pour un même GUID (« Unknown ») : le lecteur les réunit par GUID.
-- B7 (T04c) : Arcane Meditation et Mage Armor **cumulées** (règle Classic, deux auras 134 du client, `suppose`) en `rules forever` ; le seed gardait le maximum (`rules seed`). Vérifier en jeu : mana régénérée en incantation avec les deux (ForeverLogger, protocole de collecte B7). Le bonus d'armure de Frost et Ice Armor (aura 22, lu dans le client) n'est pas ajouté à l'armure du personnage. Ice Armor reprend la durée et le ralenti des coups de Frost Armor (`spells.json.utility`), alors que son sort de ralenti est 7321 (Frost Armor : 6136) : lire ses valeurs dans le client ou les mesurer (C5, `suppose`).
-- A18 (T04c, demandée par l'utilisateur) : règle d'Ignite de Forever (aura 412538, non cumulable, **roulante supposée**) à vérifier par les journaux : montant de chaque tic (`SPELL_PERIODIC_DAMAGE` de 412538) contre la part du talent × dégâts du critique + reste non infligé, et intervalles des tics (2 s attendues ; le compteur repart-il au second critique ?) après deux critiques de feu rapprochés ; talents d'Ignite relevés par ForeverLogger. `forever measures refresh` compare chaque épisode à la règle des données et à la variante « compteur conservé ». T05 : l'assiette est tranchée par les notes de Blizzard du 24/09/2026 (<https://us.forums.blizzard.com/en/wow/t/2360696/1>, « Ignite no longer double dips on % damage increase modifiers », build 70009) : part du critique final, bonus en pourcentage pris une fois ; le même épisode de journal le confirme si le montant d'un tic égale part × critique / tics, sans multiplicateur de dégâts supplémentaire.
-- B6, I1 (T04c, relecture) : en décharge de la rotation arcane, Arcane Missiles (canalisé) n'est plus prolongé par le recul d'incantation ; en Classic, le recul raccourcit une canalisation (tics perdus), non modélisé : `suppose`, à mesurer (journal : fins de canalisation sous les coups). Notes officielles du 24/09/2026 révisées le 01/10 (<https://us.forums.blizzard.com/en/wow/t/2360696>) : la ligne de vue d'Arcane Missiles n'est plus vérifiée qu'au début de la canalisation (non modélisée). Problèmes connus officiels du 01/10/2026 (<https://us.forums.blizzard.com/en/wow/t/2352687>) : sous les coups, Arcane Missiles tire un projectile à pleins dégâts au lieu d'un projectile tronqué. C'est un bug reconnu, jamais modélisé ; le comportement voulu (projectile tronqué) reste à mesurer une fois le bug corrigé.
-- B11 (T04c) : coût d'Arcane Blast à `n` cumuls supposé additif (base × (1 + 1,75 n), `probable`) ; effet de Clearcasting sur le cumul (lancer gratuit, cumul pris : `suppose`) : relever les coûts par `SPELL_CAST_SUCCESS` et le bloc avancé. Client 1.60.1.70124 (2026-10-02) : aura 400573, coût +175 % par cumul, 4 cumuls, 8 s : concordance ; additif ou composé n'est pas dans le client (`suppose` pour la forme, test inchangé).
-- I7 (T04c) : couleurs de quête de Forever identiques à Classic ? La plage verte vient de `GetQuestGreenRange` (API du client, absente sur disque), remplacée par le niveau gris communautaire de Classic ; ForeverLogger pourrait relever `UnitQuestTrivialLevelRange("player")` à chaque niveau. Niveaux des quêtes : base Classic Era de Questie sans correction Forever.
-- T04d : source des quêtes propres à Forever (aucune dans Questie 11.38.0 ; piste locale : l'addon `GearQuestForever`, tables de quêtes du client) et modèle d'XP de Forever (XP des monstres et des quêtes).
-- PvP (PV1, PV2) : date d'ouverture des champs de bataille (« bientôt », aucune source dans le dépôt), liste des champs, système de récompenses (honneur, rangs, marques) et règles du monde ouvert (types de royaume, zones contestées) : attendre les annonces officielles. Sujets officiels du forum lus le 2026-10-02 (`forever notes` : notes de développement, problèmes connus, Guerrier du jour, annonce de la BlizzCon) : aucune date, aucune règle de royaume, aucun champ de bataille (Darkspear Islands compris). À chercher dans une autre source officielle (site d'actualités de Blizzard, non lu).
-- PvP : rendements décroissants de Forever supposés identiques à Classic (catégories, fenêtre, paliers) : mesurer dans les journaux de champs de bataille (PV2) avant de quitter `suppose`. Le classement des contrôles par catégorie depuis les champs du client est-il fiable pour toutes les classes ? Les sorts non résolus sont listés en PV1.
-- PvP, addon : la classe de la cible (et les autres informations nécessaires à une fiche fixe) reste-t-elle lisible, non secrète, en champ de bataille ? Sonder avant FA1.
-- Legacy (LG1, LG2) : noms des arbres (sources communautaires divergentes, `docs/research/architecture-agent.md`), état du système en bêta et au lancement (registre G5 : bonus « Talented » non actif en bêta), tables du client qui le décrivent, API d'addon qui expose la progression. Problèmes connus officiels (<https://us.forums.blizzard.com/en/wow/t/2352687>, lus le 2026-10-02) : le système Legacy s'ouvre par erreur avant le niveau 25 : signal d'un déblocage au niveau 25 (pas une valeur). Défis, rangs, réputations et perks : rien dans les sujets officiels lus.
-- Donjons, métiers, réputations, économie : tables du client à identifier à l'inventaire de chaque tranche (journal de rencontre et butin, recettes et composants, factions et paliers, prix de vente) ; ne rien présumer de leur présence.
-- API Blizzard (EC1, élargie par la décision 126) : couverture de Forever après le lancement du 4 novembre (produit, espace de noms, hôtel des ventes par royaume ou région, profils de personnages avec équipement et talents, honneur, rang et classements PvP). Auctionator sur Forever : fonctionnement et format de sa base de prix dans les SavedVariables (format relevé le 2026-09-28, `tasks/inventaire-addons.md`, `probable`).
-- SavedVariables (recherche du 2026-09-30, sources de joueurs, aucun message de Blizzard) : sur 1.60.1.69893 et 69913, le client écrivait les SavedVariables à la déconnexion sans les relire au lancement ; des joueurs le disent corrigé sur 70009. À vérifier en jeu sur la version courante (un réglage de ForeverLogger survit-il à un redémarrage ?) avant de compter sur un addon collecteur (MobInfo2, KillDex, Forever Journal) ou sur les relevés de ForeverLogger d'une session à l'autre ; dater chaque relevé par build du client. Pas un bug reconnu par Blizzard : rien n'est modélisé. Observation du 2026-10-02 (fichier du poste, source primaire) : la sauvegarde de ForeverLogger, écrite le 2026-10-02, garde des instantanés datés du 2026-09-28 au 2026-10-02 (builds 70009 à 70170) : les SavedVariables sont relues d'une session à l'autre (`probable` : à confirmer par un réglage qui survit à un redémarrage complet du client).
-- Addons collecteurs sur Forever (recherche du 2026-09-30) : MobInfo2 relève-t-il vraiment PV, XP et résistances, ou seulement les morts et le butin (son auteur dit les PV secrets) ? Les PV max d'un ennemi (`UnitHealthMax`) sont-ils secrets hors combat ? Test : une session avec MobInfo2 ou KillDex hors instance, puis lecture de leurs SavedVariables sur disque.
-- Addons de données (décision 123) : lecture locale libre de tout addon installé, quelle que soit sa licence (**résolue** le 2026-09-30, décision 133) ; la licence ne compte que pour une redistribution au-delà des agrégats (aucune prévue). Version d'AtlasLoot (**résolue** le 2026-09-30) : « 1.1.3 » est le nom de la version publiée sur CurseForge, absent des fichiers ; la détection de changement repose sur l'empreinte des fichiers (décision 124).
-- G4, E2 (T04e) : pénalité des sorts de bas niveau dans Forever. Absente de la table du client (Frostbolt r1 : `EffectBonusCoefficient` 0,407 = 1,5 / 3,5 × 0,95, sans pénalité) ; règle Classic supposée appliquée par le serveur, gardée par défaut (`mechanics.json` `coefficient.low_level_default`, `suppose`), désactivable (`--low-level-penalty off`, option `low_level_penalty`). Appliquée aussi au coefficient par tic des DoT (Flamestrike r1, niveau 16 : `suppose`). Sens des doublons de Fire Blast 400616-400623 (`AcquireMethod` 3) à éclaircir. À trancher par le test en jeu E2 (`docs/ADDON.md`, protocole de collecte) ; l'utilisateur change la clé des données. Le coefficient brut du client ne tranche pas : en Classic aussi, la pénalité est appliquée par le serveur sur un coefficient brut voisin. Le client ne dit rien de la pénalité du serveur, E2 reste ouverte. Test retenu : Frostbolt rang 1 à deux puissances des sorts éloignées, la pente des dégâts dit si la réduction est réappliquée (protocole E2 de `docs/ADDON.md`).
-- G4, E4 (T04e) : coefficient d'Ice Lance nul dans le client (six rangs), retenu en mode forever (`probable`) ; 0,1429 (estimation) en mode seed. À confirmer par le test en jeu E4. Revérifié le 2026-10-02 sur 1.60.1.70124 : `EffectBonusCoefficient` nul sur l'effet de dégâts des rangs 1 et 2 (1312002, 400640), concordance ; à mesurer (E4).
-- A17, E3 (T04e) : puissance des sorts par tic des DoT (Pyroblast 0,15, Flamestrike 0,032 ; Fireball et Frostfire Bolt 0) et période des tics du client (Pyroblast et Frostfire Bolt 3 s). Fireball r3 confirmé par le journal du 2026-09-27 (trois tics de 2 à 13 de puissance des sorts). Pyroblast à confirmer par le test en jeu E3.
-- A20, E6 (T04e) : bonus de dégâts en pourcentage de deux sources distinctes (Arcane Power et cumuls d'Arcane Blast, tous deux aura 108) multipliés en mode forever (`probable` : les exemples V13 et V18 de la vidéo BVSgeHp3sWU ne tombent juste qu'ainsi), additionnés en mode seed. À confirmer par les journaux (E6).
-- G7, E7 (T04e) : le jeu arrondit-il ou tronque-t-il les bornes de dégâts (min et max) ? Le moteur arrondit au demi supérieur (reproduit les rangs décodés, test G7) ; le tableur de la vidéo BVSgeHp3sWU tronque (Ice Lance r6 136-160, Arcane Explosion r6 238-258) : trois exemples de la vidéo exclus des tests pour cet écart (`tests/fixtures/community/BVSgeHp3sWU.json`, `exclu` E7). À trancher par les journaux de l'utilisateur : dégâts minimum et maximum observés pour un sort à puissance des sorts connue (protocole E7 de `docs/ADDON.md`).
-- G4 (T04e) : coefficient de Blizzard. Le moteur prend celui du sort déclenché (8 × 0,042, `probable`) ; l'effet factice du sort parent porte 0,03. À trancher par un tic de Blizzard (sans variance) à deux niveaux de puissance des sorts.
-- A20 (T04e, **résolue**, décision 77 du 2026-09-28) : Improved Cone of Cold à 12 / 23 / 35 % en mode forever, rangs de `talents.json` (courbe Trait 83066 du client 1.60.1.70009, opération 0 : remplace la valeur brute 15 de `SpellEffect` 11190). Forever diffère ici de Classic (15 / 25 / 35). La courbe ne fait pas partie des lignes corrigées par hotfix (`Hotfix.log` du 2026-09-27 : CurvePoint RecID 363264 à 363412, Curve RecID 124805 à 124878 ; la courbe porte les CurvePoint 241062 à 241064). Reste possible : un hotfix postérieur au 2026-09-27 (relecture de `Hotfix.log` en T08). Confirmation facultative en jeu : Cone of Cold avec le talent à 1/3, × 1,12 attendu (protocole de `docs/ADDON.md`).
-- A20 (T04e) : Fire Vulnerability (aura 22959, feu) appliquée à Frostfire Bolt, compté comme feu (même question que l'école double Givre-feu ci-dessus, `suppose`).
-- H3, H5 (T05, scénarios provisoires, `build.scenarios`, suppose) : boss de donjon et de raid **insensibles au gel** (règle Classic supposée : pas de Frostbite ni de gel, donc pas d'Ice Lance sur cible gelée ; Fingers of Frost reste utilisable) ; durées, écarts de niveau et nombre de cibles inventés pour comparer les builds, à remplacer par les rencontres réelles (DJ1, T09). À vérifier : un boss de donjon de Forever peut-il être gelé par Frostbite ? Test : journal de donjon avec Frost Nova et Frostbite sur un boss (aura de gel appliquée, ou absorbée par une immunité dans le journal).
-- B15 (T05, Arcane Power dans les rotations, suppose) : (1) la hausse de coût d'Arcane Power (+30 %) se multiplie-t-elle au coût croissant d'Arcane Blast (modèle) ou s'y ajoute-t-elle ? (2) l'aura s'applique-t-elle au lancer qui finit dans sa fenêtre (modèle) ou à celui qui commence dans sa fenêtre (coût payé au début de l'incantation) ? Test en jeu : relever le coût d'un Arcane Blast à 3 cumuls sous Arcane Power, et le coût d'un Frostbolt commencé 1 s avant la fin de l'aura.
-- B15 (T05, Hot Streak, suppose) : les cumuls de Hot Streak (20 s) sont remis à zéro entre deux combats du leveling (modèle) ; s'ils passent d'un combat au suivant (repos plus court que 20 s), le Feu est un peu sous-évalué. Un critique de Fire Blast compte-t-il bien (description du talent : oui) ?
-- G3 (T06, **résolue** en T06b, révision 2, décision 98) : 49 des 54 talents de `talents.json` portent des valeurs lues sur le build 1.60.1.69893 (`FC-69893`) ; `forever lookup talent` les rend à certitude `probable`. Un décodage des talents au build 1.60.1.70009 (pipeline de T03) lèverait cette réserve.
-- G3, B15 (T06, **résolue** en T06b : rangs du client, 20 s, `duration_s` retiré) : Hot Streak garde dans ses rangs la durée du build 69893 (15 s, reprise par la description rendue) alors que `duration_s` (20 s, lu dans le client 70009) est la valeur du moteur ; faut-il corriger la valeur du rang dans `talents.json`, ou garder les deux champs avec la note de provenance actuelle ?
-- H2, B19 (T06b) : Arcane Subtlety (réduction des résistances de la cible) et Improved Flamestrike (critique de Flamestrike) sont des angles morts non chiffrés ; leur effet dépend des résistances des monstres (inconnues) et de la part de Flamestrike dans les rotations de zone.
-- B19 (T06b, audit du registre) : Improved Flamestrike n'agit que dans les rotations de zone (donjon, raid) ; l'angle mort couvre les cinq contextes et reste non chiffré. Borne possible : critique du talent × part de Flamestrike dans les scénarios de paquet.
-- Données (T08a, 2026-09-30) : que change 1.60.1.70124 **hors** des 22 tables décodées ? Les tables téléchargées sont identiques à celles de 1.60.1.70009, mais `Logs/Hotfix.log` montre 4 386 enregistrements de la table `Item` surchargés par le serveur le 2026-09-30 (`Item` n'est pas téléchargée, base d'objets en T10). Deux publications sont concernées (70058 et 70124). À reprendre quand T10 lira les tables d'objets, ou par les notes de version si Blizzard en publie.
-- Outil (T08a, 2026-09-30, **résolue le même jour**) : `scripts/replay_builds.py compare` rendait « aucune recommandation changée » quand une étiquette était absente du cache. Elle est maintenant refusée, avec le dossier cherché, les passages disponibles et la commande pour produire celui qui manque (`tests/unit/test_replay_builds_labels.py`).
-- Rendements décroissants en PvP (PV1, registre K1, `pvp_rules.json`, suppose) : paliers, fenêtre de remise à zéro (fin de l'effet ou application ; fixe ou comprise entre deux bornes), immunité, plafond de durée sur un joueur, racines et silences (immunité dès la 2e application selon un wiki de fans de Forever), rendements contre les PNJ, catégorie 2 du client non identifiée : mesurer dans mes journaux de champ de bataille (PV2, `docs/research/pvp-dr-protocole.md`).
-- Recharge partagée entre un bijou PvP et un racial (Will of the Forsaken…) : non décidée par le client (registre K4, absent) ; tester en jeu. Test : Will of the Forsaken puis le bijou PvP (ou l'inverse) hors combat : le second sort est-il grisé, et pour combien de temps ?
-- Paliers d'Improved Life Tap et d'Amplify Curse (Démoniste, ordonnées hors grille) : deux calculateurs communautaires de la bêta 70124 (probable, `decode_rules.json`, `community_positions`) ; colonnes non établies : relever en jeu comme pour le Paladin.
-- Sens de `TraitEdge.Type` (2 suffisant, 3 requis, 0 visuel) repris de l'API du client (probable) : vérifier en jeu sur Intimidation (Chasseur, deux prérequis suffisants).
-- Mana rendue par Improved Seal of Fury : client 1.60.1.70124 (2026-10-02) : sort 1314103, `$m1` nul, `$m2` 15 (hausse par niveau de l'attaquant au-dessus du Paladin), `$m3` 3 (plafond `$m2 × $m3`) ; le sort 1314104 rend `$PL` de mana (variable non résolue par `forever/pipeline/tooltip.py`, effet d'énergie à 1 point de base). Le « 60 » d'un calculateur n'est pas dans le client : écart, rien n'est importé. Relever l'infobulle en jeu.
-- Époque des jours d'Auctionator (`DAY_EPOCH`, jours depuis le 2020-01-01, probable) : confirmer par une seconde date de relevé.
-- Pièges, totems et portails (sorts dont l'effet est porté par un objet ou une créature invoqués, absents des tables lues) : non classés en PvP ; tables `GameObjects` ou `Creature*` à identifier.
-- Conditions d'emploi des sorts (posture, forme, camouflage : SpellShapeshift, SpellAuraRestrictions téléchargées mais non décodées) et durées à points de combo (Kidney Shot : durée de base seule) : à décoder avant PV2.
-- Plafond de durée PvP (K3) appliqué aussi aux contrôles sans catégorie de rendement décroissant (choix supposé, `pvp_rules.json` : groupes concernés non établis) : mesurer sur un contrôle sans catégorie (Death Coil, Blind) en champ de bataille.
-- Fenêtre des rendements décroissants relancée par une application en immunité (K1, choix supposé dans `forever/engine/diminishing.py`, noté dans `pvp_rules.json`) : vérifier en champ de bataille si répéter un contrôle sur une cible immunisée prolonge l'immunité.
-- Audit des mises à jour (2026-10-01, `docs/research/audit-mises-a-jour.md`, section 2) : **sens de certaines courbes et colonnes du client**, à établir avant de les décoder en T08b :
-  - `GlobalCurve` types 29 à 32 (courbes constantes, sans documentation WoWDBDefs) : régénération de mana par l'Esprit ? Les GameTables qui la portent en Classic (`regenmpperspt`, `octregenmp`) sont vides sur Forever. Vérifier par une mesure en jeu (mana regagnée hors de la règle des 5 secondes, Esprit connu, ForeverLogger) ;
-  - `GlobalCurve` types 27 et 28 (régénération de PV par l'Esprit, sous-type = classe) : la courbe du Chasseur au type 27 ne concorde pas avec Classic ; la formule qui combine les deux courbes reste au serveur (`suppose`). Vérifier par la régénération hors combat d'un Chasseur et d'une autre classe à Esprit connu ;
-  - `PlayerExpectedStat` : colonnes sans nom (`Field_1_60_1_69876_005`, lue comme PV par point d'Endurance, sens probable recoupé par la GameTable `hppersta` ; `Field_1_60_1_69876_006`, sens inconnu). Vérifier par `UnitHealthMax` à deux valeurs d'Endurance (ForeverLogger) ;
-  - `ExpectedStat` porte aussi `PlayerHealth` et `PlayerMana` par niveau : servent-ils au joueur, ou seulement au calibrage des créatures ?
-- Audit des mises à jour (2026-10-01) : **table d'armure et table de PV des monstres réellement lues par le serveur**. Armure : `ExpectedStat.ArmorConstant` suit la formule Classic du moteur, la GameTable `armormitigationbylvl` donne une valeur de retail incompatible ; laquelle le serveur applique-t-il ? Vérifier par la réduction de dégâts d'un coup de monstre de niveau connu contre une armure connue (journal, bloc avancé). PV : `ExpectedStat.CreatureHealth` et la GameTable `npctotalhp` sont en désaccord, `CreatureDifficulty` ne porte pas de PV ; comparer les deux tables aux PV mesurés dans les journaux (Tarides, niveaux 10 à 17) avant d'en utiliser une au-delà de la plage mesurée (H11).
-- Audit des mises à jour (2026-10-01, **résolue** le 2026-10-02) : **niveau d'apprentissage d'Ice Barrier rang 1**. Client 1.60.1.70124 : `SpellLevels.BaseLevel` 40 (sort 11426, palier 7 du talent), comme `classes.json`. En mode forever, le moteur lit déjà les niveaux d'Ice Barrier dans `classes.json` (`forever/gamedata.py`, `_client_utility` : 40, 46, 52, 58) ; le 20 de `spells.json` `utility` (copie du seed) ne sert qu'au mode seed, pour la parité. Le client l'emporte, aucune donnée à changer.
-- Audit des mises à jour (2026-10-01) : **critique de base des sorts** absente des GameTables de Forever (`chancetospellcritbase` vide) : portée par une aura passive de classe (`SpellEffect`) ? Sinon, mesure par `GetSpellCritChance` de ForeverLogger à Intelligence connue. **Mana par point d'Intelligence** introuvable dans le client : mesurer par `UnitPowerMax` à Intelligence connue.
-- T08b, bloc A (2026-10-01) : **colonne `Field_1_60_1_69876_006` de `PlayerExpectedStat`** (croît avec le niveau, sens inconnu) non décodée ; **`Field_1_60_1_69876_005`** lue comme PV par Endurance (sens probable, concorde avec la GameTable `hppersta` à tous les niveaux et pour les 9 classes). À confirmer par ForeverLogger (`UnitHealthMax` à Endurance connue).
-- T08b, bloc A (2026-10-01) : **GameTable `npctotalhp`** (colonnes par classe, valeurs fractionnaires) téléchargée, sens non établi ; comparer à `ExpectedStat.CreatureHealth` et aux PV mesurés dans les journaux avant tout usage (question de l'audit ci-dessus).
-- T08b, bloc B (2026-10-01) : **multiplicateur de critique des sorts et tics de DoT critiques** (`leveling.json` `combat_rules.crit_mult_spell`, `dot_can_crit`) : règles du serveur, absentes des tables. Mesure sur les 8 journaux du poste (`forever logs measure`) : 174 coups critiques, presque tous d'un Chasseur ; un seul critique de sort du Mage (Frostbolt), aucun tic de DoT du Mage : effectif bien sous `tolerance.n_min`. Les deux restent `suppose` (règle Classic) ; à mesurer sur une session de Mage (critiques de Frostbolt et de Fireball, tics de Pyroblast et d'Ignite).
-- T08b, bloc E (2026-10-01) : **sens de `VALIDATION_RESULT_INVALID` dans `Logs/Hotfix.log`** (compté à part par `forever hotfixes`, jamais traité comme un correctif) ; et les enregistrements corrigés absents du cache (`CurvePoint` 363264 à 363412, `Curve` 124805 à 124878, relevés du 2026-10-01) sont probablement des **enregistrements ajoutés par le serveur** : ils ne se relient à aucune entité tant que `DBCache.bin` n'est pas lu (T08).
-- T08b (2026-10-01) : la fiche du personnage de Jen (interface EllesmereUI) affiche « Critical Strike » 4,9 % au niveau 19, alors que `GetSpellCritChance` (ForeverLogger) rend 4,62 % pour les sorts, valeur prédite par la révision 4 : la ligne de la fiche est probablement la critique générale (mêlée) ; à confirmer par l'infobulle du jeu de base.
-- CH0 (2026-10-01, modifiée le 2026-10-02) : **marge d'apprivoisement** (registre L13, découpée de L1 le 2026-10-02) : absente du client (`SpellTargetRestrictions` de Tame Beast sans borne de niveau). Notes de développement officielles du 24/09/2026 révisées le 01/10 (<https://us.forums.blizzard.com/en/wow/t/2360696>, Hunter > Pets) : Tame Beast refusé sur une bête de niveau supérieur au Chasseur. `pet_rules.json` passe à 0 niveau, `probable` (révision 6 ; remplace le relevé de joueurs, +2). Test : tenter d'apprivoiser une bête d'un niveau au-dessus du Chasseur (refus attendu), puis une de son niveau.
-- CH0 (2026-10-01) : **gain des points d'entraînement** (L5, `null`) : aucune source ; les instantanés de ForeverLogger (points totaux et dépensés) le mesureront niveau après niveau.
-- CH0 (2026-10-01) : **sens de la colonne `SkillLineAbility.Field_5_5_4_67090_014_1`** (L4, lue comme coût en points d'entraînement, `probable`) : non nulle seulement sur les lignes de familier, croissante pour Bite, mais constante pour Dismember et **nulle** pour 17 paires (famille, capacité) dont Dash chez le Crocilisk et les capacités nouvelles (Swipe, Pinch, Web…) ; 0 veut-il dire gratuit, inné ou non enseignable ? À trancher par le relevé de la fenêtre Beast Training.
-- CH0 (2026-10-01) : **bit d'apprivoisement des PNJ** : `Creature` et `CreatureDifficulty` du client ne portent que 179 PNJ (mascottes), aucun drapeau lisible ; les bêtes apprivoisables restent celles de Forever Bestiary.
-- CH0 (2026-10-01) : **marques `t` de Forever Bestiary** : `p` (« beta »), `b` (« ? », jamais expliqué par l'addon) ; sens supposé, à demander à l'auteur ou à vérifier en jeu.
-- CH0 (2026-10-01) : **effets de « Hunter Pet Scaling »** (`pets.json` `pet_scaling`) : types d'aura nommés, points de base presque tous nuls : valeurs calculées par le serveur ; l'héritage reste un relevé de joueurs (L10).
-- CH0 (2026-10-01) : **deux lignes « Pet - Bat »** (une seule visée par `CreatureFamily`) et **Core Hound** (ligne de familier du Chasseur, `PetTalentType` non nul, absente de Forever Bestiary) : la seconde ligne sert-elle, et le Core Hound est-il apprivoisable sur Forever ? Une entrée du client jamais vue en jeu reste marquée comme telle. Test : tenter d'apprivoiser un Core Hound au niveau requis ; tant que personne ne l'a vu en jeu, l'entrée reste marquée « jamais vue en jeu ».
-- Familiers (2026-10-02, **résolue** le même jour par l'installation de 1.60.1.70170) : **Sonic Blast**, annoncé pour les chauves-souris par les notes officielles (<https://us.forums.blizzard.com/en/wow/t/2360696>), absent des lignes de familier de 1.60.1.70124, est rattaché à « Pet - Bat » (653) dans 1.60.1.70170 (`SkillLineAbility`, `pets.json`). **Furious Howl** réduit de 40 % : points de base des rangs 1 à 4 (`SpellEffect`) 9, 56, 100, 136 en 70124 ; 5, 34, 60, 82 en 70170 : concordance. Reste à relever en jeu la fenêtre Beast Training d'une chauve-souris (coût de Sonic Blast, `training_costs` à 1 pour les cinq rangs, sens de la colonne : L4).
-- CH0 (2026-10-01) : **niveau requis d'un rang** appliqué au familier (règle de Classic, `pet_rules.json`, `manuel`) : à confirmer par le relevé de la fenêtre Beast Training.
-- CH0 (2026-10-01) : **bug signalé par des joueurs** (familiers de la zone Skyborne qui perdent leurs capacités) : rien de modélisé ; à lister comme bug reconnu seulement s'il paraît dans les « Known Issues » officielles (`forever notes`, lancé à la main). Problèmes connus officiels du 01/10/2026 (<https://us.forums.blizzard.com/en/wow/t/2352687>, lus le 2026-10-02) : absent ; reste un signalement de joueurs, non modélisé.
-- CH0 (2026-10-01) : **variables d'infobulle `$a` et `$x`** (rayon, nombre de cibles) non prises en charge par `forever/pipeline/tooltip.py` : textes de Furious Howl, Lava Breath, Swipe et Thunderstomp gardés bruts (`tooltip_error`).
+Priorité : **haute** = fausse aujourd'hui un résultat des outils ou bloque la prochaine tranche (T08c, FA1, PV2) ;
+**moyenne** = touche un résultat chiffré, avec une variante, une option ou une borne déjà en place ; **basse** =
+précision, outil ou après le lancement. Une question tranchée part dans `RESOLVED_QUESTIONS.md` avec sa source
+primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24.md) et
+[01/10](research/notes-blizzard-2026-10-01.md) (message n° 4, révision 4).
+
+## Temps, incantation et canalisation
+- **TPS1 — Forever regroupe-t-il les actions du serveur sur une grille de temps ?** Test : 50 sorts instantanés
+  enchaînés (protocole B1 de `docs/ADDON.md`), intervalles groupés ou non. Priorité : basse. Registre B5.
+  [Détail](research/questions-ouvertes-detail.md#tps1)
+- **TPS2 — Le recul d'incantation vaut-il 0,5 s par coup, sans limite de nombre ?** Test : Frostbolt incanté sous
+  les coups d'un monstre de mêlée, écart entre début et fin d'incantation selon le nombre de coups. Priorité :
+  moyenne. Registre B6. [Détail](research/questions-ouvertes-detail.md#tps2)
+- **TPS3 — Le recul raccourcit-il une canalisation (Arcane Missiles), comme en Classic ?** Test : fins de
+  canalisation sous les coups, une fois corrigé le bug reconnu du projectile à pleins dégâts. Priorité : basse.
+  Registre B6, I1. [Détail](research/questions-ouvertes-detail.md#tps3)
+- **TPS4 — Pourquoi des durées d'incantation et des intervalles plus courts que les tables (horodatage, file
+  d'attente des sorts) ?** Test : campagne B1 dédiée avec ForeverLogger. Priorité : basse. Registre B1, B3.
+  [Détail](research/questions-ouvertes-detail.md#tps4)
+
+## Sorts et dégâts du Mage
+- **MAG1 — E2 : quelle formule suit la pénalité des rangs très inférieurs au niveau ?** *Modifiée le 2026-10-02* :
+  l'existence de la pénalité est confirmée par la note officielle du 01/10 (fiche du personnage : un rang très
+  inférieur au niveau profite moins de la puissance des sorts ; <https://us.forums.blizzard.com/en/wow/t/2360696/4>,
+  révision 4), la formule n'y est pas ; le moteur garde la règle Classic par défaut. Test E2 : Frostbolt rang 1 à
+  deux puissances des sorts éloignées, la pente des dégâts donne la réduction (protocole E2 de `docs/ADDON.md`).
+  Priorité : haute. Registre G4. [Détail](research/questions-ouvertes-detail.md#mag1)
+- **MAG2 — Quelle loi réduit la chance de déclenchement des effets de classe et de talents pour un rang bas ?**
+  *Nouvelle le 2026-10-02* : même note officielle (exemples Frostbite et Omen of Clarity ; Frostbolt rang 1 au niveau
+  60 ne déclenche jamais Frostbite) ; aucune table du client ne la porte. Test : au même niveau, Frostbolt rang 1
+  contre le rang le plus haut, comptes de Frostbite, Winter's Chill et Fingers of Frost dans le journal. Priorité :
+  basse (le moteur prend toujours le rang le plus haut) ; moyenne dès qu'une rotation descend de rang (T05b, AN1).
+  Registre B20. [Note du 01/10](research/notes-blizzard-2026-10-01.md)
+- **MAG3 — Givre-feu (Frostfire Bolt) profite-t-il des talents des deux écoles (Ice Shards pour le critique, Fire
+  Vulnerability) ?** *Modifiée le 2026-10-02* : Fire Vulnerability ne fait plus de second jet de résistance (note du
+  01/10 ; bit « ne peut pas rater » ajouté au sort 22959 dans 1.60.1.70170) ; la question des écoles reste entière.
+  Test : critiques de Frostfire Bolt avec Ice Shards, puis Frostfire Bolt sous cumuls de Fire Vulnerability contre
+  sans. Priorité : moyenne. Registre A20. [Détail](research/questions-ouvertes-detail.md#mag3)
+- **MAG4 — E4 : Ice Lance a-t-il vraiment un coefficient de puissance des sorts nul ?** Test E4 de `docs/ADDON.md`.
+  Priorité : moyenne. Registre G4. [Détail](research/questions-ouvertes-detail.md#mag4)
+- **MAG5 — E3 : quelle puissance des sorts porte chaque tic des DoT (Pyroblast) ?** Test E3 de `docs/ADDON.md`.
+  Priorité : moyenne. Registre A17. [Détail](research/questions-ouvertes-detail.md#mag5)
+- **MAG6 — Quel est le multiplicateur de critique des sorts, et quels tics de DoT peuvent être critiques ?**
+  *Modifiée le 2026-10-02* : piste du client 1.60.1.70170, le bit « effets périodiques critiques » (`Attributes_8`,
+  sens communautaire, probable) que la note du 01/10 ajoute à Devouring Plague et Hellfire est posé sur Fireball,
+  Pyroblast et Frostfire Bolt, pas sur Flamestrike ni Ignite ; rien n'est changé dans les données. Test : session de
+  Mage, critiques de Frostbolt et de Fireball, tics de Pyroblast, de Flamestrike et d'Ignite. Priorité : moyenne.
+  Registre A5, A17. [Détail](research/questions-ouvertes-detail.md#mag6)
+- **MAG7 — E6 : deux bonus de dégâts en pourcentage se multiplient-ils ou s'additionnent-ils ?** Test : journaux
+  (E6). Priorité : moyenne. Registre A20. [Détail](research/questions-ouvertes-detail.md#mag7)
+- **MAG8 — E7 : le jeu arrondit-il ou tronque-t-il les bornes de dégâts ?** Test : dégâts minimum et maximum d'un
+  sort à puissance des sorts connue (protocole E7). Priorité : basse. Registre G7.
+  [Détail](research/questions-ouvertes-detail.md#mag8)
+- **MAG9 — Le coefficient de Blizzard est-il celui du sort déclenché ou celui de l'effet factice du parent ?** Test :
+  un tic de Blizzard à deux puissances des sorts. Priorité : basse. Registre G4.
+  [Détail](research/questions-ouvertes-detail.md#mag9)
+- **MAG10 — Ignite est-il roulant (reste reporté) dans Forever ?** Test : deux critiques de feu rapprochés, montant
+  et intervalle des tics de l'aura 412538 (`forever measures refresh`). Priorité : moyenne. Registre A18.
+  [Détail](research/questions-ouvertes-detail.md#mag10)
+- **MAG11 — Le coût d'Arcane Blast croît-il de façon additive, et Clearcasting garde-t-il le cumul ?** Test : coûts
+  relevés lancer par lancer (journal, bloc avancé). Priorité : moyenne. Registre B11.
+  [Détail](research/questions-ouvertes-detail.md#mag11)
+- **MAG12 — La hausse de coût d'Arcane Power se multiplie-t-elle au coût d'Arcane Blast, et vaut-elle au début ou à
+  la fin de l'incantation ?** Test : Arcane Blast à 3 cumuls sous Arcane Power ; Frostbolt commencé 1 s avant la fin
+  de l'aura. Priorité : basse. Registre B15. [Détail](research/questions-ouvertes-detail.md#mag12)
+- **MAG13 — Les cumuls de Heating Up (ex-Hot Streak) passent-ils d'un combat au suivant, et un critique de Fire
+  Blast compte-t-il ?** Test : journal de leveling Feu, cumuls relevés au début du combat suivant. Priorité : basse.
+  Registre B15. [Détail](research/questions-ouvertes-detail.md#mag13)
+- **MAG14 — Arcane Meditation et Mage Armor se cumulent-elles, et que valent la durée et le ralenti d'Ice Armor ?**
+  Test : mana regagnée en incantation avec les deux (protocole B7) ; valeurs d'Ice Armor lues dans le client ou
+  mesurées. Priorité : moyenne. Registre B7, C5. [Détail](research/questions-ouvertes-detail.md#mag14)
+- **MAG15 — Quelles résistances ont les monstres de Forever (effet d'Arcane Subtlety, part d'Improved
+  Flamestrike) ?** Test : résistances partielles relevées dans le journal. Priorité : basse. Registre H2, B19.
+  [Détail](research/questions-ouvertes-detail.md#mag15)
+- **MAG16 — Transfert (Blink) se lance-t-il sous étourdissement ?** Test en jeu. Priorité : basse.
+  [Détail](research/questions-ouvertes-detail.md#mag16)
+- **MAG17 — Que sont les doublons de Fire Blast 400616 à 400623 (`AcquireMethod` 3) ?** Test : lecture de
+  `SkillLineAbility` et du livre des sorts en jeu. Priorité : basse. Registre G4.
+  [Détail](research/questions-ouvertes-detail.md#mag1)
+- **MAG18 — Les dégâts d'un rang suivent-ils le niveau du personnage jusqu'à `MaxLevel` ?** Test : journal de
+  leveling avec ForeverLogger, même rang à plusieurs niveaux. Priorité : moyenne. Registre G7.
+  [Détail](research/questions-ouvertes-detail.md#mag18)
+
+## Personnage et ratios du client
+- **PER1 — Où sont la critique de base des sorts et la mana par point d'Intelligence ?** Test : `GetSpellCritChance`
+  et `UnitPowerMax` à Intelligence connue (ForeverLogger). Priorité : moyenne. Registre A5, B9.
+  [Détail](research/questions-ouvertes-detail.md#per1), [audit](research/audit-mises-a-jour.md)
+- **PER2 — Que portent les colonnes sans nom de `PlayerExpectedStat` (005 lue comme PV par Endurance, 006 ?) ?**
+  Test : `UnitHealthMax` à deux valeurs d'Endurance. Priorité : basse. Registre G2.
+  [Détail](research/questions-ouvertes-detail.md#per2)
+- **PER3 — Les courbes `GlobalCurve` 29 à 32 portent-elles la régénération de mana par l'Esprit ?** Test : mana
+  regagnée hors de la règle des 5 secondes, Esprit connu. Priorité : moyenne. Registre B7.
+  [Détail](research/questions-ouvertes-detail.md#per3)
+- **PER4 — Comment le serveur combine-t-il les courbes 27 et 28 de régénération de PV par l'Esprit ?** Test :
+  régénération hors combat d'un Chasseur et d'une autre classe. Priorité : basse.
+  [Détail](research/questions-ouvertes-detail.md#per4)
+- **PER5 — `ExpectedStat.PlayerHealth` et `PlayerMana` servent-ils au joueur ?** Test : comparaison à `UnitHealthMax`
+  et `UnitPowerMax` à plusieurs niveaux. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#per5)
+- **PER6 — Le modèle de personnage du seed doit-il garder les termes tardifs d'Intelligence et d'Esprit de `fm.py` ?**
+  Test : fiches de personnages réels (mode seed seulement). Priorité : basse. Registre G2.
+  [Détail](research/questions-ouvertes-detail.md#per6)
+- **PER7 — La « Critical Strike » de la fiche (EllesmereUI) est-elle la critique de mêlée ?** Test : infobulle de la
+  fiche du jeu de base. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#per7)
+
+## Monstres et rencontres
+- **MON1 — Que valent les PV des monstres normaux au-delà du niveau 22 ?** La correction Questie vers Forever repose
+  sur les niveaux 1 à 22 et le plafond de la bêta est 30. Test : journaux de leveling des niveaux 22 à 30 hors des
+  zones déjà mesurées. Priorité : haute. Registre H11. [Détail](research/questions-ouvertes-detail.md#mon1),
+  [révision 2](research/data-1.60.1.70170-r2.md)
+- **MON2 — Les PNJ au-dessus de la valeur de leur niveau (ours, PNJ renforcés, Sarilus Foulborne) suivent-ils une
+  règle commune ?** Test : d'autres ours et PNJ des mêmes familles à niveau connu. Priorité : moyenne. Registre H11.
+  [Détail](research/questions-ouvertes-detail.md#mon2)
+- **MON3 — Quelles tables d'armure et de PV des monstres le serveur applique-t-il ?** Test : réduction d'un coup de
+  monstre de niveau connu sur une armure connue ; PV mesurés comparés à `ExpectedStat` et `npctotalhp`. Priorité :
+  moyenne. Registre H2, H11. [Détail](research/questions-ouvertes-detail.md#mon3)
+- **MON4 — Le raté des sorts selon l'écart de niveau (A3) et le niveau d'un boss (H1) suivent-ils Classic ?** Test :
+  sorts sur des cibles de niveau égal ou supérieur ; boss lu dans le bloc avancé. Priorité : moyenne. Registre A3,
+  H1. [Détail](research/questions-ouvertes-detail.md#mon4)
+- **MON5 — Un boss de donjon de Forever peut-il être gelé (Frost Nova, Frostbite) ?** Test : journal de donjon,
+  aura de gel posée ou immunité. Priorité : moyenne (DJ1). Registre H3, H5.
+  [Détail](research/questions-ouvertes-detail.md#mon5)
+
+## Données du client et correctifs du serveur
+- **DON1 — Quelles valeurs les correctifs du serveur changent-ils ?** *Modifiée le 2026-10-02* : la note du 01/10
+  confirme une refonte du Guerrier (Fureur, Protection) absente des tables de 1.60.1.70170 et présente dans
+  `Hotfix.log` du 2026-10-02 ; s'y ajoutent les `CurvePoint`, `Curve` et `CreatureDifficulty` corrigés. Test : T08c
+  (décodage de `DBCache.bin`). Priorité : haute. [Détail](research/questions-ouvertes-detail.md#don1),
+  [note du 01/10](research/notes-blizzard-2026-10-01.md)
+- **DON2 — Que veut dire `VALIDATION_RESULT_INVALID` dans `Hotfix.log` ?** Test : T08c, comparer ces enregistrements
+  à `DBCache.bin`. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don1)
+- **DON3 — Que changent les milliers d'enregistrements `Item` corrigés par le serveur ?** Test : lecture des tables
+  d'objets (T10) ou T08c si la disposition d'`Item` est connue. Priorité : basse.
+  [Détail](research/questions-ouvertes-detail.md#don3)
+- **DON4 — Quel produit TACT au lancement (`wow_classic_forever` ?) ?** Test : `.build.info` après le lancement du
+  4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don4)
+- **DON5 — `TraitEdge.Type` veut-il bien dire 2 suffisant, 3 requis, 0 visuel ?** Test : Intimidation du Chasseur
+  (deux prérequis suffisants) en jeu ; recoupement des arbres avec Talents Forever (FA1). Priorité : basse. Registre
+  G3. [Détail](research/questions-ouvertes-detail.md#don5)
+- **DON6 — Quelles tables portent les pièges, totems et portails ?** Test : inventaire des tables `GameObjects` et
+  `Creature*`. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don6)
+- **DON7 — Que disent les conditions d'emploi des sorts (posture, forme, camouflage) et les durées à points de
+  combo ?** Test : décodage de `SpellShapeshift` et `SpellAuraRestrictions` avant PV2. Priorité : moyenne. Registre
+  K2, K3. [Détail](research/questions-ouvertes-detail.md#don7)
+- **DON8 — Que valent les variables d'infobulle `$a` et `$x` (rayon, nombre de cibles) ?** Test : prise en charge
+  dans `forever/pipeline/tooltip.py`, textes comparés au jeu. Priorité : basse.
+  [Détail](research/questions-ouvertes-detail.md#don8)
+- **DON9 — Quelles tables du client décrivent donjons, métiers, réputations et prix ?** *Modifiée le 2026-10-02* :
+  la note du 01/10 annonce les donjons ouverts et leurs niveaux d'accès (à reprendre en DJ1). Test : inventaire au
+  plan de chaque tranche (DJ1, MT1, RP1, T10). Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don9)
+
+## Journaux, addons et sauvegardes
+- **LOG1 — Que portent les champs inconnus du bloc avancé du journal (dont le dernier pour un joueur) ?** Test :
+  comparaison au niveau de `ForeverLoggerDB` (`forever logs measure --addon-sv`). Priorité : basse.
+  [Détail](research/questions-ouvertes-detail.md#log1)
+- **LOG2 — Pourquoi `amount` et `base_amount` diffèrent-ils parfois d'une unité, et dans quel ordre sont les trois
+  derniers champs des dégâts ?** Test : coups critiques, glancing et écrasants identifiés dans un journal. Priorité :
+  basse. [Détail](research/questions-ouvertes-detail.md#log2)
+- **LOG3 — Les mesures du journal restent-elles justes avec des sorts hors recharge globale, des incantations
+  interrompues ou un gain de niveau en cours de journal ?** Test : filtre par `SpellCooldowns.StartRecoveryTime`
+  avant de viser `valide-jeu`. Priorité : moyenne. Registre B1, A3. [Détail](research/questions-ouvertes-detail.md#log3)
+- **LOG4 — Les API lues par ForeverLogger (talents, bonus et critique des sorts) deviennent-elles secrètes en combat
+  ou en champ de bataille ?** Test : sondes `/dump` de `docs/ADDON.md` (section 7). Priorité : moyenne.
+  [Détail](research/questions-ouvertes-detail.md#log4)
+- **LOG5 — La classe de la cible reste-t-elle lisible, non secrète, en champ de bataille ?** Test : `/dump
+  UnitClass("target")` en champ de bataille. Priorité : moyenne (avant FA1p).
+  [Détail](research/questions-ouvertes-detail.md#log5)
+- **LOG6 — Les SavedVariables sont-elles relues d'une session à l'autre sur la version courante ?** Observation du
+  2026-10-02 : oui (probable). Test : un réglage de ForeverLogger qui survit à un redémarrage complet. Priorité :
+  basse. [Détail](research/questions-ouvertes-detail.md#log6)
+- **LOG7 — Les addons collecteurs (MobInfo2, KillDex) relèvent-ils PV, XP et résistances, et les PV max d'un ennemi
+  sont-ils secrets hors combat ?** Test : une session hors instance, puis lecture de leurs SavedVariables. Priorité :
+  basse. [Détail](research/questions-ouvertes-detail.md#log7)
+- **LOG8 — Quelle est la licence amont de Questie ?** Test : CurseForge 334372 et dépôt amont, avant tout
+  élargissement de la lecture. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#log8)
+- **LOG9 — L'époque des jours d'Auctionator (`DAY_EPOCH`) et son format de prix sont-ils bien ceux relevés ?** Test :
+  une seconde date de relevé. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#log9)
+
+## Leveling, quêtes et donjons
+- **LVL1 — Quel est le modèle d'XP de Forever (monstres, quêtes propres à Forever, quêtes de donjon) ?** *Modifiée le
+  2026-10-02* : la note du 01/10 réduit de 50 % le bonus d'XP des quêtes de donjon au-delà de la valeur normale
+  (règle du serveur, probable, registre I9). Test : XP relevée par quête (ForeverLogger) et sources de T04d
+  (ForeverDungeonJournal, GearQuestForever, tables de quêtes). Priorité : moyenne. Registre I6, I9.
+  [Détail](research/questions-ouvertes-detail.md#lvl1)
+- **LVL2 — Les couleurs de quête de Forever sont-elles celles de Classic ?** Test : `UnitQuestTrivialLevelRange`
+  relevé à chaque niveau par ForeverLogger. Priorité : basse. Registre I7.
+  [Détail](research/questions-ouvertes-detail.md#lvl2)
+
+## PvP
+- **PVP1 — Les rendements décroissants de Forever suivent-ils Classic (catégories, fenêtre, paliers, immunité,
+  racines et silences, PNJ) ?** Test : mes journaux de champs de bataille (PV2). Priorité : haute (PV2). Registre K1.
+  [Détail](research/questions-ouvertes-detail.md#pvp1), [protocole](research/pvp-dr-protocole.md)
+- **PVP2 — Le classement des contrôles par catégorie depuis les champs du client vaut-il pour toutes les classes ?**
+  Test : sorts non résolus de PV1 relevés en champ de bataille. Priorité : moyenne. Registre K2.
+  [Détail](research/questions-ouvertes-detail.md#pvp1)
+- **PVP3 — Le plafond de durée PvP s'applique-t-il aux contrôles sans catégorie (Death Coil, Blind) ?** Test : durée
+  observée en champ de bataille. Priorité : moyenne. Registre K3. [Détail](research/questions-ouvertes-detail.md#pvp3)
+- **PVP4 — Un bijou PvP et un racial (Will of the Forsaken) partagent-ils leur recharge ?** Test : l'un puis l'autre
+  hors combat, second sort grisé ou non. Priorité : moyenne. Registre K4.
+  [Détail](research/questions-ouvertes-detail.md#pvp4)
+- **PVP5 — Quels champs de bataille, récompenses et règles de monde ouvert à l'ouverture ?** *Modifiée le
+  2026-10-02* : la note du 01/10 relève d'environ 50 % les coûts en honneur de l'équipement PvP et des jetons et porte
+  le plafond d'honneur à 25 000 (règles du serveur, probable, registre K6) ; date, liste des champs et types de
+  royaume restent absents des sources officielles lues. Test : annonces officielles, puis relevé en jeu des coûts.
+  Priorité : moyenne. [Détail](research/questions-ouvertes-detail.md#pvp5)
+
+## Autres classes
+- **CLS1 — Où sont Improved Life Tap et Amplify Curse dans l'arbre du Démoniste (colonnes) ?** Test : recoupement des
+  arbres avec Talents Forever (FA1) ; relevé en jeu. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#cls1)
+- **CLS2 — Combien de mana rend Improved Seal of Fury (`$PL`) ?** Test : infobulle relevée en jeu. Priorité : basse.
+  [Détail](research/questions-ouvertes-detail.md#cls2)
+
+## Familiers du Chasseur
+- **FAM1 — Une bête d'un niveau au-dessus du Chasseur est-elle refusée ?** Règle de la note du 24/09 (probable,
+  révision 6 de 1.60.1.70124). Test : apprivoiser une bête d'un niveau au-dessus, puis une de son niveau. Priorité :
+  basse. Registre L13. [Détail](research/questions-ouvertes-detail.md#fam1)
+- **FAM2 — Combien de points d'entraînement le familier gagne-t-il par niveau ?** Test : instantanés de ForeverLogger
+  niveau après niveau. Priorité : moyenne. Registre L5. [Détail](research/questions-ouvertes-detail.md#fam2)
+- **FAM3 — La colonne de `SkillLineAbility` lue comme coût d'entraînement est-elle ce coût (et que veut dire 0) ?**
+  Test : fenêtre Beast Training relevée (dont Sonic Blast d'une chauve-souris). Priorité : moyenne. Registre L4.
+  [Détail](research/questions-ouvertes-detail.md#fam3), [recoupement](research/familiers-recoupement.md)
+- **FAM4 — Le niveau requis d'un rang s'applique-t-il au familier, et quelles bêtes enseignent quels rangs depuis
+  le correctif ?** *Modifiée le 2026-10-02* : la note du 01/10 dit corrigées les bêtes qui enseignaient des rangs trop
+  élevés pour leur niveau, après la base de Forever Bestiary installée (0.5.0, base du 2026-09-25) ; le guide le
+  signale. Test : fenêtre Beast Training et capacités d'une bête apprivoisée à niveau connu. Priorité : moyenne.
+  Registre L2, L3. [Détail](research/questions-ouvertes-detail.md#fam4)
+- **FAM5 — La seconde ligne « Pet - Bat » sert-elle, et le Core Hound est-il apprivoisable ?** Test : tenter
+  d'apprivoiser un Core Hound au niveau requis. Priorité : basse. Registre L3.
+  [Détail](research/questions-ouvertes-detail.md#fam5)
+- **FAM6 — Que veulent dire les marques `t` de Forever Bestiary (`p`, `b`) ?** Test : question à l'auteur ou relevé
+  en jeu. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#fam6)
+- **FAM7 — Que le familier hérite-t-il du Chasseur (« Hunter Pet Scaling », points de base calculés par le
+  serveur) ?** Test : protocole de `docs/research/familiers-protocole.md`. Priorité : moyenne. Registre L10.
+  [Détail](research/questions-ouvertes-detail.md#fam7)
+
+## Legacy et API
+- **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?** Test :
+  sources officielles, tables du client à l'inventaire de LG1. Priorité : moyenne. Registre G5.
+  [Détail](research/questions-ouvertes-detail.md#leg1)
+- **LEG2 — Que couvre l'API Blizzard pour Forever après le lancement ?** Test : `forever api probe` après le
+  4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#leg2)
