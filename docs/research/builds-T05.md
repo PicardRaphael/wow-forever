@@ -178,6 +178,26 @@ inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits 
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
 
+## Rejeu 1.60.1.70170 révision 2 (PV des monstres du premier journal, 2026-10-02)
+
+Rejoué le 2026-10-02 par `scripts/replay_builds.py run 70170-r2` (préréglage complet, graine 12345, race Orc),
+comparé à `70170-r1`. Seul changement des données : `monsters.json` (PV par niveau et correction Questie recalculés
+sur le journal `WoWCombatLog-100226_080035`, PNJ hors norme écartés de la courbe ; `docs/research/data-1.60.1.70170-r2.md`).
+Raison commune : les PV des monstres des niveaux 21 à 63 (correction moins pentue, niveau 22 mesuré à 746 au lieu de
+773 estimés).
+
+**Treize cas inchangés, trois changés** (montrés à l'utilisateur avant le commit) :
+
+| Cas | Changement | Avant (r1) | Après (r2) |
+| --- | --- | --- | --- |
+| leveling 30 | recommandation : Elemental Precision 2 → 1, Frost Channeling 2 → 3 | build retenu par le Monte Carlo, instable (1/5), sensible aux PV des monstres et au coefficient d'Ice Lance | alternative retenue par l'analytique (égalité, écart 0,37 s [-1,05 ; 1,80] sur 46 s par monstre), stable (5/5), aucune sensibilité |
+| leveling 40 | ordre des talents (niveaux 21 à 24), build final inchangé | Piercing Ice aux niveaux 21 et 22, Frost Channeling aux niveaux 23 et 24 | Frost Channeling aux niveaux 21 à 23, Piercing Ice au niveau 24 |
+| leveling 60 | même ordre que leveling 40, build final inchangé | idem | idem |
+
+Chaque choix des niveaux 21 à 24 est une égalité statistique (`non_departage` ou `anticipation`) : l'ordre bascule
+sur de petits écarts de PV. Le build de leveling au niveau 30 devient stable, mais il reste à une égalité près de
+l'ancienne recommandation.
+
 ## Rejeu 1.60.1.70170 (installation du 2026-10-02)
 
 Rejoué le 2026-10-02 par `scripts/replay_builds.py run 70170-r1` (préréglage complet, graine 12345, race Orc ; données

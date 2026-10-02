@@ -118,7 +118,7 @@ def test_make_provenance(make_deps):
     assert p["registry_coverage"] == coverage(REGISTRY_PATH)
     assert p["assumptions"] == ["a"]
     # Révision de la version installée, lue dans sources.json (via le manifeste) : 3 depuis PV1 (relecture).
-    assert p["data_revision"] == 1  # 1.60.1.70170 installée le 2026-10-02 (nouvelle version : révision 1)
+    assert p["data_revision"] == 2  # 1.60.1.70170 : r1 installation, r2 mesure du premier journal (2026-10-02)
 
 
 def test_make_provenance_without_registry(make_deps, tmp_path):

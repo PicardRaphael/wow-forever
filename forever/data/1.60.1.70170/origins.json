@@ -884,6 +884,15 @@
       "certainty": "probable"
     },
     {
+      "file": "monsters.json",
+      "paths": [
+        "/curve_excluded"
+      ],
+      "origin": "parametre",
+      "source": "PNJ hors norme écartés de la courbe des PV par niveau et de la correction Questie (forever measures refresh --curve-exclude)",
+      "reason": "choix de calcul de l'agrégat (décision de l'utilisateur du 2026-10-02, révision 2), pas une valeur de jeu ; les PV de ces PNJ restent dans /npcs"
+    },
+    {
       "file": "pvp_rules.json",
       "paths": [
         "/diminishing_returns",

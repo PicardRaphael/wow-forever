@@ -91,6 +91,7 @@ from forever.pipeline.refresh import (
     apply_refresh,
     collect_sources,
     compare,
+    curve_exclusions,
     read_snapshot,
     remeasure,
     snapshot_exists,
@@ -361,6 +362,16 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="NPC",
         help="PNJ écarté de l'ajustement de la correction Questie (défaut : ceux de monsters.json installé)",
     )
+    refresh.add_argument(
+        "--curve-exclude",
+        type=int,
+        action="append",
+        default=None,
+        metavar="NPC",
+        help="PNJ hors norme : mesuré, mais écarté des PV par niveau et de la correction (ajouté à ceux de "
+        "monsters.json installé)",
+    )
+    refresh.add_argument("--curve-exclude-reason", help="raison des PNJ de --curve-exclude (obligatoire avec eux)")
     mode = refresh.add_mutually_exclusive_group()
     mode.add_argument("--yes", action="store_true", help="écrire sans demander")
     mode.add_argument("--dry-run", action="store_true", help="afficher sans jamais écrire")
@@ -1987,8 +1998,16 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     gd = build_game_data(data)
     installed = data.read_json(MONSTERS_FILE)
     questie = read_questie(questie_dir) if questie_dir else None
+    try:
+        curve = curve_exclusions(installed, args.curve_exclude, args.curve_exclude_reason)
+    except ValueError as exc:
+        raise InvalidArgumentError(str(exc), "donner --curve-exclude-reason TEXTE") from exc
     excluded = (installed.get("questie_correction") or {}).get("excluded", [])
-    fit_exclude = args.fit_exclude if args.fit_exclude is not None else [int(e["npc_id"]) for e in excluded]
+    fit_exclude = (
+        args.fit_exclude
+        if args.fit_exclude is not None
+        else sorted({int(e["npc_id"]) for e in excluded} - set(curve))  # PNJ hors norme : liste à part
+    )
     offset = timedelta(hours=args.utc_offset) if args.utc_offset is not None else None
     # Une mesure n'est jamais attribuée à une autre version du jeu (T08a, décision 135) : seuls les journaux écrits
     # sous la version installée sont mesurés, les autres attendent son installation.
@@ -1999,7 +2018,14 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     )
     sources = sources._replace(logs=tuple(p for p in sources.logs if p.name in keep))
     new = remeasure(
-        gd, sources, questie, version=data.game_version, installed=installed, fit_exclude=fit_exclude, utc_offset=offset
+        gd,
+        sources,
+        questie,
+        version=data.game_version,
+        installed=installed,
+        fit_exclude=fit_exclude,
+        curve_exclude=curve,
+        utc_offset=offset,
     )
     if unknown:
         new["notes"].append(

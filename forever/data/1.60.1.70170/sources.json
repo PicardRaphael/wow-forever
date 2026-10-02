@@ -126,7 +126,7 @@
       ]
     },
     "monsters.json": {
-      "source": "Journaux de combat du client 1.60.1 (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt et WoWCombatLog-092726_174130.txt du 2026-09-27, PV max du bloc avancé ; le troisième, 635 événements, ne contient aucun relevé de PV de monstre) par forever monsters build ; valeurs en regard et agrégat des niveaux non observés : Questie 11.38.0 Forever-v27 (communautaire, Classic Era, aucune correction Forever), corrigé vers Forever par le rapport mesuré / Questie (schéma 2, T04b, forever monsters build --fit-exclude 3986 : Sarilus Foulborne hors de l'ajustement)",
+      "source": "Journaux de combat du client (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt, WoWCombatLog-092726_174130.txt, WoWCombatLog-100226_080035.txt, PV max du bloc avancé) ; valeurs en regard et agrégat des niveaux non observés : communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27 ; table écrite par forever measures refresh le 2026-10-02 (--fit-exclude 2163, 2165, 2165, 3727, 3819, 3819, 3986)",
       "certainty": "suppose",
       "field_certainty": {
         "npcs": "certain",
@@ -258,6 +258,6 @@
       "inherited_from": "1.60.1.70124"
     }
   },
-  "revision": 1,
+  "revision": 2,
   "revised_at": "2026-10-02"
 }

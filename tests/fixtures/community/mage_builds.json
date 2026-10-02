@@ -1,7 +1,7 @@
 {
  "source": "docs/research/community-builds-mage.md (bloc JSON, recherche du 2026-09-28)",
  "generated_by": "scripts/build_community_fixture.py",
- "game_version": "1.60.1.70124",
+ "game_version": "1.60.1.70170",
  "concord_threshold": 0.02,
  "preset": "rapide",
  "mc_n": 100,
@@ -21,14 +21,13 @@
    "context": "dungeon",
    "level": 30,
    "points": {
-    "wandSpecialization": 1,
-    "arcaneFocus": 5,
-    "arcaneConcentration": 5,
-    "arcaneBlast": 1,
-    "arcaneImpact": 3,
-    "missileBarrage": 1,
-    "arcaneMeditation": 3,
-    "elementalPrecision": 2
+    "elementalPrecision": 5,
+    "iceShards": 5,
+    "frostChanneling": 3,
+    "piercingIce": 3,
+    "iceLance": 1,
+    "shatter": 3,
+    "fingersOfFrost": 1
    },
    "preset": "rapide"
   },
@@ -73,8 +72,8 @@
     "elementalPrecision": 3,
     "frostbite": 3,
     "iceLance": 1,
-    "piercingIce": 2,
     "frostChanneling": 3,
+    "piercingIce": 2,
     "shatter": 3,
     "fingersOfFrost": 1
    },
@@ -88,8 +87,8 @@
     "elementalPrecision": 3,
     "frostbite": 3,
     "iceLance": 1,
-    "piercingIce": 3,
     "frostChanneling": 3,
+    "piercingIce": 3,
     "shatter": 3,
     "fingersOfFrost": 1,
     "iceShards": 5,
@@ -106,8 +105,8 @@
     "elementalPrecision": 5,
     "frostbite": 3,
     "iceLance": 1,
-    "piercingIce": 3,
     "frostChanneling": 3,
+    "piercingIce": 3,
     "shatter": 3,
     "fingersOfFrost": 2,
     "iceShards": 5,
@@ -117,9 +116,9 @@
     "improvedBlizzard": 3,
     "iceBlock": 1,
     "coldSnap": 1,
-    "improvedConeOfCold": 3,
+    "iceBarrier": 1,
     "permafrost": 3,
-    "iceBarrier": 1
+    "improvedConeOfCold": 3
    },
    "preset": "rapide"
   },
@@ -383,9 +382,9 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.044030223555490876,
-    "mc_rel": -0.031925993352324905,
-    "mc_significant": false
+    "analytic_rel": -0.044156466842383786,
+    "mc_rel": -0.05899062095042532,
+    "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
@@ -663,8 +662,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.2505181828652635,
-    "mc_rel": -0.25967355442759116,
+    "analytic_rel": -0.24951082931194404,
+    "mc_rel": -0.31416403322275044,
     "mc_significant": true
    },
    "explanation": {
@@ -784,14 +783,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.11678895601915043,
-    "mc_rel": 0.08405324834643939,
+    "analytic_rel": 0.1178105968340904,
+    "mc_rel": 0.07377212078584205,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +11,7% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +11,8% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -837,8 +836,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.15972481513995,
-    "mc_rel": -0.05269943434761119,
+    "analytic_rel": -0.15930243998989155,
+    "mc_rel": -0.05260131115811356,
     "mc_significant": true
    },
    "explanation": {
@@ -903,14 +902,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.009388820049221255,
-    "mc_rel": -0.01674374400048504,
-    "mc_significant": false
+    "analytic_rel": 0.10179624422376296,
+    "mc_rel": -0.04331433811158614,
+    "mc_significant": true
    },
    "explanation": {
-    "kind": "concorde",
-    "registry": null,
-    "motif": "écart -0,9% à l'analytique, sous le seuil de concordance"
+    "kind": "mecanique_non_modelisee",
+    "registry": "H5",
+    "motif": "l'analytique donne +10,2% mais le Monte Carlo -4,3% : notre build fait mieux au Monte Carlo (approximation de l'analytique)"
    }
   },
   {
@@ -1013,7 +1012,7 @@
    "legal_notes": null,
    "gap": {
     "analytic_rel": -0.28268598065240225,
-    "mc_rel": -0.3512650717494819,
+    "mc_rel": -0.35123596751898806,
     "mc_significant": true
    },
    "explanation": {
@@ -1557,8 +1556,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.09132155578284894,
-    "mc_rel": -0.1568359284634004,
+    "analytic_rel": -0.09079439626611084,
+    "mc_rel": -0.153668332234371,
     "mc_significant": true
    },
    "explanation": {
@@ -1622,8 +1621,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.02087697392693431,
-    "mc_rel": -0.025005711855046495,
+    "analytic_rel": -0.02101975677170871,
+    "mc_rel": -0.006167703714369749,
     "mc_significant": false
    },
    "explanation": {
@@ -1686,14 +1685,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.18585331707790645,
-    "mc_rel": -0.1821200159885462,
+    "analytic_rel": -0.18518854827063058,
+    "mc_rel": -0.16048133466490005,
     "mc_significant": true
    },
    "explanation": {
     "kind": "source_douteuse",
     "registry": null,
-    "motif": "théorie au-delà du plafond de la bêta (niveau 20), sans mesure en jeu"
+    "motif": "choix non chiffré par la source (ordre tiré d'un texte)"
    }
   },
   {
@@ -1837,14 +1836,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.12344681557110235,
-    "mc_rel": 0.09923664845040335,
+    "analytic_rel": 0.12404461616201508,
+    "mc_rel": 0.1093880914406774,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +12,3% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +12,4% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -1882,14 +1881,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.18585331707790645,
-    "mc_rel": -0.1821200159885462,
+    "analytic_rel": -0.18518854827063058,
+    "mc_rel": -0.16048133466490005,
     "mc_significant": true
    },
    "explanation": {
     "kind": "source_douteuse",
     "registry": null,
-    "motif": "théorie au-delà du plafond de la bêta (niveau 20), sans mesure en jeu"
+    "motif": "choix non chiffré par la source (non daté)"
    }
   },
   {
@@ -1927,8 +1926,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.11468823457729377,
-    "mc_rel": -0.19991722553096192,
+    "analytic_rel": -0.11404365471036339,
+    "mc_rel": -0.19028254082315002,
     "mc_significant": true
    },
    "explanation": {
@@ -2808,14 +2807,14 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": 0.10860175590495108,
-    "mc_rel": 0.0819867135337357,
+    "analytic_rel": 0.10954453121707854,
+    "mc_rel": 0.081120030715186,
     "mc_significant": true
    },
    "explanation": {
     "kind": "mecanique_non_modelisee",
     "registry": "I5",
-    "motif": "leur build fait mieux de +10,9% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
+    "motif": "leur build fait mieux de +11,0% au seul niveau 30 ; le nôtre suit le meilleur chemin de 10 à 30 (heures cumulées, préréglage rapide) : une respec peut valoir la peine (forever build leveling --current)"
    }
   },
   {
@@ -3074,7 +3073,7 @@
    "legal_notes": null,
    "gap": {
     "analytic_rel": -0.46139561075733315,
-    "mc_rel": -0.44788198064994716,
+    "mc_rel": -0.44785721094911074,
     "mc_significant": true
    },
    "explanation": {
@@ -3116,8 +3115,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.02087697392693431,
-    "mc_rel": -0.025005711855046495,
+    "analytic_rel": -0.02101975677170871,
+    "mc_rel": -0.006167703714369749,
     "mc_significant": false
    },
    "explanation": {
@@ -3159,8 +3158,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.21202628426199951,
-    "mc_rel": -0.31927472433448656,
+    "analytic_rel": -0.21123325853132877,
+    "mc_rel": -0.31920734141393486,
     "mc_significant": true
    },
    "explanation": {
@@ -3305,8 +3304,8 @@
    "legal": true,
    "legal_notes": null,
    "gap": {
-    "analytic_rel": -0.11712322181599623,
-    "mc_rel": -0.17468508975987523,
+    "analytic_rel": -0.11655642596383434,
+    "mc_rel": -0.170336257031064,
     "mc_significant": true
    },
    "explanation": {

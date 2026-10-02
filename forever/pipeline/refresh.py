@@ -168,6 +168,19 @@ def _ignite(gd: GameData, episodes: list[IgniteObservation]) -> list[dict[str, A
     return out
 
 
+def curve_exclusions(
+    installed: Mapping[str, Any], new_ids: Collection[int] | None, reason: str | None
+) -> dict[int, str]:
+    """PNJ écartés de la courbe des PV par niveau : ceux de `monsters.json` installé (avec leur raison), plus
+    `new_ids` avec `reason` (obligatoire : un écart sans raison n'est jamais écrit)."""
+    out = {int(e["npc_id"]): str(e["reason"]) for e in installed.get("curve_excluded", []) or []}
+    if new_ids:
+        if not reason:
+            raise ValueError("--curve-exclude demande une raison (--curve-exclude-reason)")
+        out |= {int(n): reason for n in new_ids}
+    return out
+
+
 def remeasure(
     gd: GameData,
     sources: RefreshSources,
@@ -176,6 +189,7 @@ def remeasure(
     version: str,
     installed: Mapping[str, Any] | None = None,
     fit_exclude: Collection[int] = (),
+    curve_exclude: Mapping[int, str] | None = None,
     utc_offset: timedelta | None = None,
 ) -> MeasureSnapshot:
     """Nouvelles mesures : table des monstres (PNJ des journaux disparus conservés), B1, A3, coûts, incantations,
@@ -241,6 +255,7 @@ def remeasure(
         conflicts=conflicts,
         logs=[*names, *gone],  # un journal disparu reste listé (jamais de suppression)
         fit_exclude=fit_exclude,
+        curve_exclude=curve_exclude,
     )
     snapshot = {
         "schema_version": 1,

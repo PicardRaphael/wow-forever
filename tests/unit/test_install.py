@@ -223,7 +223,7 @@ def test_repository_is_revision_two(make_deps):
         deps, game_version=LOCAL_VERSION, data_sha="0" * 12, freshness="fresh", certainty="certain", assumptions=[]
     )
     # T08a : la version installée est 1.60.1.70124 (une nouvelle version repart à 1) ; PV1 : révisions 2 et 3.
-    assert p["data_revision"] == 1  # 1.60.1.70170 installée le 2026-10-02 (nouvelle version : révision 1)
+    assert p["data_revision"] == 2  # 1.60.1.70170 : r1 installation, r2 mesure du premier journal (2026-10-02)
 
 
 def test_every_talent_is_certain(make_deps, game_data):
@@ -283,5 +283,5 @@ def test_client_decode_against_the_seed_copies_is_the_confirmed_list(tmp_path, c
 
 def test_status_shows_the_revision(make_deps):
     rep = status_report(make_deps(), allow_network=False)
-    assert rep["data_revision"] == 1  # 1.60.1.70170 installée le 2026-10-02 (nouvelle version : révision 1)
-    assert render_status(rep)[0].startswith(f"Données locales {LOCAL_VERSION} r1 ·")
+    assert rep["data_revision"] == 2  # 1.60.1.70170 : r1 installation, r2 mesure du premier journal (2026-10-02)
+    assert render_status(rep)[0].startswith(f"Données locales {LOCAL_VERSION} r2 ·")

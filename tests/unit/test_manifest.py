@@ -84,7 +84,7 @@ def test_manifest_content():
     assert re.fullmatch(r"[0-9a-f]{12}", v["data_sha"])
     assert re.fullmatch(r"[0-9a-f]{64}", v["data_sha256"])
     assert v["data_sha256"].startswith(v["data_sha"])
-    assert v["revision"] == 1 and v["revised_at"] == "2026-10-02"  # 1.60.1.70170 : nouvelle version, révision 1
+    assert v["revision"] == 2 and v["revised_at"] == "2026-10-02"  # 1.60.1.70170 : r1 installation, r2 mesures
     assert (
         len(v["files"])
         == 25  # PV1, bloc C : pvp_rules.json ; T08b : origins.json, character_scaling.json ; CH0 : pets.json, pet_rules.json

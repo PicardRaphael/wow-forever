@@ -2500,6 +2500,660 @@
      "key": "hotStreak"
     }
    ]
+  },
+  {
+   "revision": 2,
+   "date": "2026-10-02",
+   "motif": "Mesure du premier journal de 1.60.1.70170 (PV des monstres, correction Questie recalculée sur 13 niveaux) ; PNJ hors norme (ours, deux PNJ à 642 PV au niveau 20) mesurés mais écartés de la courbe des PV par niveau et de la correction ; accord de l'utilisateur du 2026-10-02",
+   "command": "forever measures refresh --yes --curve-exclude 2163 --curve-exclude 2165 --curve-exclude 3727 --curve-exclude 3819 --curve-exclude-reason <raison>",
+   "candidate": null,
+   "report": "docs/research/data-1.60.1.70170-r2.md",
+   "counts": {
+    "measured": 75,
+    "manual": 2
+   },
+   "sources": {
+    "logs": {
+     "WoWCombatLog-100226_080035.txt": "b17535498f0461b5e9cd76b6ca619ba59382a125dc276a1d7131ed54bcc611e6"
+    },
+    "saved_variables": {
+     "ForeverLogger.lua": "419b052e3b6b340f6e1d1b4d902915946155fcd132d0aa34791c98cad6870698",
+     "Questie.lua": "5f2e2da3f878d38df9af7f976cc7fe4b289af98750019f191e3c6e2319e2f287"
+    }
+   },
+   "changes": [
+    {
+     "file": "monsters.json",
+     "path": "npcs.704",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.705",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.706",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.707",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.708",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.721",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.724",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2071",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2163",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2165",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2185",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2231",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2237",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2321",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2324",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2338",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.2339",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3584",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3725",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3727",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3728",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3730",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3732",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3733",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3734",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3774",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3816",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3819",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3823",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.257446",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.8.value",
+     "before": 156,
+     "after": 158,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.9.value",
+     "before": 181,
+     "after": 180,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.21.value",
+     "before": 703,
+     "after": 702,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.22.value",
+     "before": 773,
+     "after": 746,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.23.value",
+     "before": 847,
+     "after": 846,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.24.value",
+     "before": 928,
+     "after": 926,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.26.value",
+     "before": 1139,
+     "after": 1135,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.27.value",
+     "before": 1237,
+     "after": 1231,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.28.value",
+     "before": 1342,
+     "after": 1335,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.29.value",
+     "before": 1446,
+     "after": 1438,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.30.value",
+     "before": 1550,
+     "after": 1540,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.31.value",
+     "before": 1738,
+     "after": 1726,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.32.value",
+     "before": 1855,
+     "after": 1841,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.33.value",
+     "before": 1980,
+     "after": 1964,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.34.value",
+     "before": 2105,
+     "after": 2088,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.35.value",
+     "before": 2242,
+     "after": 2222,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.36.value",
+     "before": 2491,
+     "after": 2468,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.37.value",
+     "before": 2643,
+     "after": 2617,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.38.value",
+     "before": 2799,
+     "after": 2771,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.39.value",
+     "before": 2970,
+     "after": 2939,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.40.value",
+     "before": 3145,
+     "after": 3110,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.41.value",
+     "before": 3461,
+     "after": 3422,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.42.value",
+     "before": 3654,
+     "after": 3611,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.43.value",
+     "before": 3849,
+     "after": 3802,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.44.value",
+     "before": 4049,
+     "after": 3999,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.45.value",
+     "before": 4254,
+     "after": 4199,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.46.value",
+     "before": 4661,
+     "after": 4599,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.47.value",
+     "before": 4897,
+     "after": 4831,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.48.value",
+     "before": 5137,
+     "after": 5065,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.49.value",
+     "before": 5392,
+     "after": 5316,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.50.value",
+     "before": 5655,
+     "after": 5572,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.51.value",
+     "before": 6159,
+     "after": 6068,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.52.value",
+     "before": 6449,
+     "after": 6351,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.53.value",
+     "before": 6750,
+     "after": 6646,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.54.value",
+     "before": 7052,
+     "after": 6941,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.55.value",
+     "before": 7363,
+     "after": 7245,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.56.value",
+     "before": 6505,
+     "after": 6399,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.57.value",
+     "before": 8329,
+     "after": 8192,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.58.value",
+     "before": 8364,
+     "after": 8224,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.59.value",
+     "before": 8722,
+     "after": 8573,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.60.value",
+     "before": 7550,
+     "after": 7420,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.61.value",
+     "before": 7861,
+     "after": 7724,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.62.value",
+     "before": 10228,
+     "after": 10046,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.63.value",
+     "before": 13590,
+     "after": 13346,
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé ; niveaux non mesurés : Questie corrigé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "questie_correction.fit",
+     "before": {
+      "slope": 0.02479762330307588,
+      "intercept": 0.8029465816401004,
+      "knee_level": 7.946463899040569,
+      "points": 7
+     },
+     "after": {
+      "slope": 0.023805491386132475,
+      "intercept": 0.8228887385415422,
+      "knee_level": 7.4399330215729655,
+      "points": 13
+     },
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 b17535498f04 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded",
+     "before": null,
+     "after": [
+      2163,
+      2165,
+      3727,
+      3819
+     ],
+     "source": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "rules[monsters.json /curve_excluded]",
+     "before": null,
+     "after": "parametre",
+     "source": "origine déclarée de la liste des PNJ hors norme (choix de calcul, pas une valeur de jeu)",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }

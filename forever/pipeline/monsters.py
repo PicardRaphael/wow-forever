@@ -14,6 +14,8 @@ Règles (décisions 2 et 3 du plan T04) :
   plage des niveaux mesurés, `suppose` au-delà. PNJ écartés de l'ajustement (`fit_exclude`) : listés. Les niveaux
   mesurés ne sont jamais modifiés ; les inversions de l'agrégat (niveau plus bas que le précédent) sont listées,
   jamais lissées.
+- PNJ hors norme (`curve_exclude`, PNJ -> raison ; demande de l'utilisateur du 2026-10-02) : toujours mesurés dans
+  `npcs`, mais écartés de `hp_by_level` et de l'ajustement de la correction, listés dans `curve_excluded`.
 Aucun chiffre de jeu : tout vient des journaux et de Questie."""
 
 from __future__ import annotations
@@ -99,8 +101,10 @@ def build_monsters(
     conflicts: Iterable[Conflict] = (),
     logs: Iterable[str] = (),
     fit_exclude: Collection[int] = (),
+    curve_exclude: Mapping[int, str] | None = None,
 ) -> dict[str, Any]:
     """Contenu de `monsters.json` pour la version `version`."""
+    curve = dict(curve_exclude or {})
     by_key: dict[tuple[int, int], list[MonsterObservation]] = defaultdict(list)
     for o in observations:
         by_key[(o["npc_id"], o["level"])].append(o)
@@ -136,7 +140,7 @@ def build_monsters(
         }
         if questie_hp is not None and questie_hp != o["max_hp"]:
             gaps.append({"npc_id": npc_id, "level": level, "measured": o["max_hp"], "questie": questie_hp})
-        if q is None or q.rank == NORMAL_RANK:
+        if (q is None or q.rank == NORMAL_RANK) and npc_id not in curve:
             normal_by_level[level].append(o["max_hp"])
 
     hp_by_level: dict[int, dict[str, Any]] = {}
@@ -150,7 +154,8 @@ def build_monsters(
             + " des PNJ normaux observés",
             "n_npcs": len(values),
         }
-    correction_table = fit_questie_correction(npcs, exclude=fit_exclude) if questie is not None else None
+    exclude = {*fit_exclude, *curve}
+    correction_table = fit_questie_correction(npcs, exclude=exclude) if questie is not None else None
     correction = _correction(correction_table)
     if questie is not None:
         community: dict[int, list[int]] = defaultdict(list)
@@ -194,6 +199,15 @@ def build_monsters(
         "questie_gaps": gaps,
         "questie_correction": correction_table,
         "inversions": inversions,
+        "curve_excluded": [
+            {
+                "npc_id": npc_id,
+                "name": (npcs.get(str(npc_id)) or {}).get("name"),
+                "levels": sorted(int(lv) for lv in (npcs.get(str(npc_id)) or {}).get("levels", {})),
+                "reason": reason,
+            }
+            for npc_id, reason in sorted(curve.items())
+        ],
         "notes": [
             "npcs : PNJ observés seulement (jamais la base Questie) ; questie_hp : valeur de Questie au même niveau",
             (
