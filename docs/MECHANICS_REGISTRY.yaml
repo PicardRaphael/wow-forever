@@ -302,7 +302,7 @@ mechanics:
       - tests/unit/test_variants.py::test_bonus_stacking_variant_adds_like_the_seed
     tolerance: null
     formule: "forever : mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts) × Π (1 + autre source) × (1 + Improved Cone of Cold, Cone of Cold seul) × (1 + cumuls × part de Fire Vulnerability, écoles de l'aura) ; seed : talents × (1 + buff + Σ sources + cumuls × part), Improved Cone of Cold ignoré ; Ice Lance contre cible gelée : × mult_gelé du sort"
-    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 12 / 23 / 35 %, rangs de talents.json (courbe Trait 83066 du client, absente des lignes hotfixées de Hotfix.log du 2026-09-27 ; décision 77 ; Classic : 15 / 25 / 35). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09). ; T05 : cumul lu dans les données (damage.bonus_stacking, multiplicative, probable ; variante additive du seed)"
+    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 12 / 23 / 35 %, rangs de talents.json (courbe Trait 83066 du client, absente des lignes hotfixées de Hotfix.log du 2026-09-27 ; décision 77 ; Classic : 15 / 25 / 35). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09). ; T05 : cumul lu dans les données (damage.bonus_stacking, multiplicative, probable ; variante additive du seed) ; note officielle du 01/10 (t/2360696/4, révision 4) : Fire Vulnerability (Improved Scorch) ne fait plus de second jet de résistance (client 1.60.1.70170 : Attributes_3 du sort 22959, bit 18 ajouté) ; sans effet tant que Fire Vulnerability n'est pas lancée par les rotations (I8)"
   - id: A21
     categorie: attaque
     description: "Multiplicateur de critique des sorts et talents qui l'augmentent"
@@ -654,6 +654,17 @@ mechanics:
       talents: [impact, wakeOfFire, improvedFlamestrike]
       contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
       estimation: wake_of_fire_crit
+  - id: B20
+    categorie: temps
+    description: "Chance de déclenchement réduite des effets de classe et de talents pour un rang de sort très inférieur au niveau du personnage"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources:
+      - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : infobulle de la fiche du personnage ; exemples Frostbite et Omen of Clarity ; Frostbolt rang 1 au niveau 60 ne déclenche jamais Frostbite"
+    tests: []
+    tolerance: null
+    note: "règle du serveur absente des tables lues de 1.60.1.70170 ; loi de la réduction inconnue (question MAG2 de docs/OPEN_QUESTIONS.md) ; sans effet sur les simulateurs actuels, qui prennent toujours le rang le plus haut (best_rank) ; à modéliser dans forever/engine/ à la première tranche dont une rotation descend de rang (T05b, AN1)"
   - id: C1
     categorie: physique
     description: "Temps de vol des projectiles"
@@ -815,6 +826,7 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02)"
       - "forever/data/1.60.1.70009/mechanics.json"
       - "forever/data/1.60.1.70124/decode_rules.json (target_auras.winters_chill : aura posée par le talent, EffectBasePointsF, CumulativeAura, T08b)"
+      - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : Winter's Chill ne fait pas de jet de résistance (le sort qui le pose a déjà dû toucher) ; client 1.60.1.70170 : SpellMisc.Attributes_3 du sort 12579, bit 18 ajouté (« ne peut pas rater », sens communautaire)"
     tests:
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
@@ -823,7 +835,7 @@ mechanics:
       - tests/unit/test_decode_mechanics.py::test_winters_chill_equals_client_rows
     tolerance: null
     formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance) ; cumuls ≤ 2e variable du rang du talent"
-    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json"
+    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact)"
   - id: D5
     categorie: environnement
     description: "Buffs de campement et de Legacy"
@@ -1126,6 +1138,7 @@ mechanics:
       - "seed/forever-mage/scripts/fm.py (porté en T02, mode seed)"
       - "forever/data/1.60.1.70009/spells.json"
       - "forever/data/1.60.1.70009/mechanics.json"
+      - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : un rang très inférieur au niveau profite moins de la puissance des sorts (existence, sans formule)"
     tests:
       - tests/unit/test_client_coefficients.py::test_coefficient_matches_client_table
       - tests/unit/test_client_coefficients.py::test_low_level_penalty_applies_to_client_coefficient
@@ -1150,7 +1163,7 @@ mechanics:
       - tests/unit/test_variants.py::test_low_level_penalty_variant_is_the_option
     tolerance: null
     formule: "forever : coefficient = Σ coefficient du client des coups directs + Σ coefficient par éclair × éclairs (canalisé), × pénalité ; seed : min(max, max(min, incantation)) / diviseur (× facteur si ralenti), canalisé min(durée, plafond) / diviseur, coefficient fixe pour les sorts listés, × pénalité ; pénalité = max(0, 1 − part × (seuil − niveau du sort)) sous le seuil"
-    note: "T04e : coefficients du client (certain) en mode forever, formule du seed en mode seed (parité à 1e-12). Pénalité des sorts de bas niveau : absente de la table du client (Frostbolt r1 0,407), règle Classic supposée gardée (suppose), appliquée par défaut (mechanics.json coefficient.low_level_default), option low_level_penalty ; test en jeu E2. Ice Lance : 0 dans le client (probable, test en jeu E4). Blizzard : coefficient du sort déclenché, 8 × 0,042 (probable ; l'effet factice du parent porte 0,03, question ouverte). ; T05 : coefficient d'Ice Lance du mode forever selon coefficient.ice_lance_source (client : 0 ; variante seed : coefficient.fixed.ice_lance) ; plage de coefficient.low_level_default pour la sensibilité"
+    note: "T04e : coefficients du client (certain) en mode forever, formule du seed en mode seed (parité à 1e-12). Pénalité des sorts de bas niveau : absente de la table du client (Frostbolt r1 0,407), règle Classic supposée gardée (suppose), appliquée par défaut (mechanics.json coefficient.low_level_default), option low_level_penalty ; test en jeu E2. Ice Lance : 0 dans le client (probable, test en jeu E4). Blizzard : coefficient du sort déclenché, 8 × 0,042 (probable ; l'effet factice du parent porte 0,03, question ouverte). ; T05 : coefficient d'Ice Lance du mode forever selon coefficient.ice_lance_source (client : 0 ; variante seed : coefficient.fixed.ice_lance) ; plage de coefficient.low_level_default pour la sensibilité ; note officielle du 01/10 (t/2360696/4, révision 4) : existence de la pénalité des rangs bas confirmée, formule non donnée ; coefficient.low_level_default passe à probable (révision 3 de 1.60.1.70170), coefficient.low_level (formule Classic) reste suppose jusqu'au test E2 ; la chance de déclenchement réduite des mêmes rangs est une mécanique à part (B20)"
   - id: G5
     categorie: personnage
     description: "Legacy (arbre de compte)"
@@ -1507,11 +1520,22 @@ mechanics:
       - "docs/OPEN_QUESTIONS.md (B15, T05)"
     tests: []
     tolerance: null
-    note: "T05 : Scorch et Fire Vulnerability dans les rotations en T09 ; Missile Barrage seulement sur la décharge de la rotation arcane ; Arcane Power au pull (décision 79) ; aucune rotation ne passe à un sort moins cher quand la mana manque ; non chiffré"
+    note: "T05 : Scorch et Fire Vulnerability dans les rotations en T09 ; Missile Barrage seulement sur la décharge de la rotation arcane ; Arcane Power au pull (décision 79) ; aucune rotation ne passe à un sort moins cher quand la mana manque ; non chiffré ; note officielle du 01/10 : Fire Vulnerability sans second jet de résistance ; à reprendre quand Scorch entrera dans les rotations (T09)"
     angle_mort:
       talents: [improvedScorch, missileBarrage, pyroblast, arcanePower]
       contextes: [leveling, dungeon, raid, pvp-bg, pvp-world]
       estimation: null
+  - id: I9
+    categorie: optimisation
+    description: "XP des quêtes de donjon : bonus au-delà de la valeur normale d'une quête"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources:
+      - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : bonus d'XP des quêtes de donjon au-delà de la valeur normale réduit de 50 % ; récompenses de certaines quêtes recalibrées"
+    tests: []
+    tolerance: null
+    note: "règle du serveur, absente des données ; le modèle d'XP des quêtes vient en T04d (question LVL1), les quêtes de donjon en DJ1 ; sans effet sur le classement des builds"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"
@@ -1659,6 +1683,17 @@ mechanics:
       - tests/unit/test_pvp_sheets.py::test_windows_list_long_opponent_cooldowns
     tolerance: null
     note: "modificateurs de talents sur la recharge, la durée et la portée non appliqués ; raciaux passifs (Hardiness…) hors des fiches ; sorts non interruptibles non filtrés ; toucher et résistance des contrôles non modélisés"
+  - id: K6
+    categorie: pvp
+    description: "Honneur : coûts de l'équipement PvP et des jetons, plafond d'honneur"
+    forever: modifie
+    statut: absent
+    certitude: probable
+    sources:
+      - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : coûts en honneur relevés d'environ 50 % pour la plupart des objets ; plafond d'honneur porté de 15 000 à 25 000"
+    tests: []
+    tolerance: null
+    note: "règles du serveur ; coûts et plafond portés par des tables non téléchargées (coûts étendus des objets, monnaies) ; à reprendre en PV2 (récompenses et équipement PvP), LG2 (suivi de l'honneur) et EC1 (question PVP5)"
   - id: L1
     categorie: familiers
     description: "Apprivoisement : bêtes apprivoisables (marge de niveau en L13)"
@@ -1696,13 +1731,14 @@ mechanics:
     certitude: certain
     sources:
       - "forever/data/1.60.1.70124/pets.json (SkillLineAbility, Spell, SpellLevels du client)"
+      - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md, Hunter > Pets : bêtes qui enseignaient des rangs trop élevés pour leur niveau, toutes corrigées"
     tests:
       - tests/unit/test_decode_pets.py::test_families_are_the_hunter_lines_of_the_fixture
       - tests/unit/test_decode_pets.py::test_ranks_follow_the_rank_subtext
       - tests/unit/test_decode_pets.py::test_rank_level_is_the_spell_level
       - tests/unit/test_verify_pets.py::test_rank_numbering_with_a_gap_or_a_duplicate_is_refused
     tolerance: null
-    note: "rang : sous-titre « Rank N » ; niveau : SpellLevels.SpellLevel ; à qui s'applique le niveau requis (familier ou Chasseur) : règle de Classic supposée (pet_rules.json, training.rank_level_applies_to) ; notes officielles du 24/09/2026 révisées le 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696) : Sonic Blast annoncé pour les chauves-souris : absent des lignes de familier de 70124, rattaché à la ligne « Pet - Bat » (653) dans 1.60.1.70170 (SkillLineAbility, pets.json) : concordance ; Furious Howl réduit de 40 % : points de base de SpellEffect des rangs 1 à 4 : 9, 56, 100, 136 en 70124 ; 5, 34, 60, 82 en 1.60.1.70170 : concordance"
+    note: "rang : sous-titre « Rank N » ; niveau : SpellLevels.SpellLevel ; à qui s'applique le niveau requis (familier ou Chasseur) : règle de Classic supposée (pet_rules.json, training.rank_level_applies_to) ; notes officielles du 24/09/2026 révisées le 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696) : Sonic Blast annoncé pour les chauves-souris : absent des lignes de familier de 70124, rattaché à la ligne « Pet - Bat » (653) dans 1.60.1.70170 (SkillLineAbility, pets.json) : concordance ; Furious Howl réduit de 40 % : points de base de SpellEffect des rangs 1 à 4 : 9, 56, 100, 136 en 70124 ; 5, 34, 60, 82 en 1.60.1.70170 : concordance ; note officielle du 01/10 : des bêtes enseignaient des rangs trop élevés pour leur niveau, corrigées par le serveur après la base de Forever Bestiary 0.5.0 (2026-09-25) ; pet_rules.json official_fixes (révision 3 de 1.60.1.70170, probable), signalé par le guide d'apprivoisement quand la base de l'addon est antérieure"
   - id: L4
     categorie: familiers
     description: "Coût d'un rang en points d'entraînement"
