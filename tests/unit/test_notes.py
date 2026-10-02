@@ -18,7 +18,9 @@ from forever.pipeline.notes import (
     ROBOTS_URL,
     category_url,
     issue_body,
+    post_page_url,
     read_notes,
+    read_post,
     state_from_issues,
     topic_url,
 )
@@ -118,3 +120,60 @@ def test_cli_notes_json(make_deps, capsys, tmp_path):
     assert {n["topic_id"] for n in data["notes"]} == {9001, 9002}
     assert all(n["issue_body"] for n in data["notes"])
     assert data["provenance"]["game_version"]
+
+
+# --- Lecture ciblée d'un message officiel (`forever notes --post SUJET/N`, demande de l'utilisateur du 2026-10-02) ---
+
+
+def post_routes(robots: str = "robots.txt"):
+    return {ROBOTS_URL: (F / robots).read_bytes(), topic_url(9004): (F / "topic_9004.json").read_bytes()}
+
+
+def test_targeted_post_is_read_with_its_revision(make_deps):
+    http = FakeHttp(routes=post_routes())
+    post = read_post(make_deps(http=http), 9004, 3)
+    assert post["post_number"] == 3 and post["version"] == 4
+    assert post["updated_at"] == "2026-10-01T12:00:00.000Z"
+    assert post["url"] == post_page_url(9004, 3)
+    assert "Frostbolt change de façon inventée." in post["lines"]
+    assert "Paragraphe inventé & final." in post["lines"]
+    assert "I5" in {k["registry"] for k in post["keywords"]}
+    assert [c[0] for c in http.calls] == [ROBOTS_URL, topic_url(9004)]
+
+
+def test_targeted_player_post_is_refused(make_deps):
+    with pytest.raises(FetchFailedError):
+        read_post(make_deps(http=FakeHttp(routes=post_routes())), 9004, 2)
+
+
+def test_targeted_missing_post_fails(make_deps):
+    with pytest.raises(FetchFailedError):
+        read_post(make_deps(http=FakeHttp(routes=post_routes())), 9004, 7)
+
+
+def test_targeted_read_respects_robots_and_offline(make_deps):
+    http = FakeHttp(routes={ROBOTS_URL: b"User-agent: *\nDisallow: /en/wow/t/\n"})
+    with pytest.raises(FetchFailedError):
+        read_post(make_deps(http=http), 9004, 3)
+    assert [c[0] for c in http.calls] == [ROBOTS_URL]
+    offline = FakeHttp(routes=post_routes())
+    with pytest.raises(OfflineError):
+        read_post(make_deps(http=offline, offline=True), 9004, 3)
+    assert offline.calls == []
+
+
+def test_targeted_read_leaves_the_watch_state_alone(make_deps):
+    deps = make_deps(http=FakeHttp(routes={**routes(), **post_routes()}))
+    read_notes(deps)
+    state = (deps.cache_dir / "notes" / "state.json").read_bytes()
+    read_post(deps, 9004, 3)
+    assert (deps.cache_dir / "notes" / "state.json").read_bytes() == state
+
+
+def test_cli_notes_post_json_carries_the_revision(make_deps, capsys):
+    code = main(["notes", "--post", "9004/3", "--json"], make_deps(http=FakeHttp(routes=post_routes())))
+    out, _ = capsys.readouterr()
+    assert code == 0
+    data = json.loads(out)
+    assert data["post"]["version"] == 4 and data["post"]["topic_id"] == 9004
+    assert any("révision 4" in a for a in data["provenance"]["assumptions"])

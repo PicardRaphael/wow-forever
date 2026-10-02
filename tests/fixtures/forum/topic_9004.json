@@ -1,0 +1,51 @@
+{
+ "id": 9004,
+ "title": "Notes de développement de test, mise à jour",
+ "created_at": "2026-09-20T10:00:00.000Z",
+ "category_id": 349,
+ "post_stream": {
+  "posts": [
+   {
+    "id": 90040,
+    "post_number": 1,
+    "username": "Gestionnaire",
+    "user_title": "Community Manager",
+    "staff": true,
+    "primary_group_name": "community-manager",
+    "created_at": "2026-09-20T10:00:00.000Z",
+    "updated_at": "2026-09-20T10:00:00.000Z",
+    "version": 1,
+    "cooked": "<p>Texte inventé du premier message.</p>",
+    "topic_id": 9004
+   },
+   {
+    "id": 90041,
+    "post_number": 2,
+    "username": "JoueurInvente",
+    "user_title": null,
+    "staff": false,
+    "admin": false,
+    "moderator": false,
+    "primary_group_name": null,
+    "created_at": "2026-09-21T10:00:00.000Z",
+    "updated_at": "2026-09-21T10:00:00.000Z",
+    "version": 1,
+    "cooked": "<p>Message de joueur inventé.</p>",
+    "topic_id": 9004
+   },
+   {
+    "id": 90042,
+    "post_number": 3,
+    "username": "Gestionnaire",
+    "user_title": "Community Manager",
+    "staff": true,
+    "primary_group_name": "community-manager",
+    "created_at": "2026-10-01T09:00:00.000Z",
+    "updated_at": "2026-10-01T12:00:00.000Z",
+    "version": 4,
+    "cooked": "<h3>Classe inventée</h3>\n<ul>\n<li>Frostbolt change de façon inventée.</li>\n<li>Le <strong>level cap</strong> bouge, texte inventé.</li>\n</ul>\n<p>Paragraphe inventé &amp; final.</p>",
+    "topic_id": 9004
+   }
+  ]
+ }
+}
