@@ -422,3 +422,49 @@ nom) : CH0 ne lit jamais `peers` ni les empreintes de joueurs (décision 49).
 - Aucun recoupement avec le client (familles, capacités, rangs) ni avec Questie (niveaux et zones des PNJ) : à faire en
   CH0, dans cet ordre (client d'abord).
 - Le chargement en jeu et la relecture de la sauvegarde d'une session à l'autre n'ont pas été vérifiés.
+
+## Talents Forever (relevé du 2026-10-02)
+
+Installé par l'utilisateur (fichiers datés du 2026-10-02), inventorié en lecture seule, sans réseau, sous le client
+1.60.1.70170. **Rien n'est ingéré** : aucun fichier de `forever/data/`, de `tests/fixtures/` ni du code n'a changé ;
+le suivi par `forever addons status` et les lecteurs viennent avec FA1 (décision 171).
+
+| Addon | Version `.toc` | Fichiers | Taille | Données | Dernier fichier |
+| --- | --- | --- | --- | --- | --- |
+| TalentsForeverBook (« Talents Forever ») | **0.35.0** | 75 | 2,8 Mo | `Data.lua` : build **1.60.1.70170**, généré le 2026-10-01 | 2026-10-02 |
+
+### Provenance
+
+- `.toc` : `## Interface: 16001`, auteur et site **talentsforever.com**, CurseForge 1700435, SavedVariable
+  `TalentsForeverBookDB`, commande `/tf`. **Aucune licence** (ni fichier de licence ni `X-License`) : lecture locale
+  libre (décision 133), seuls des agrégats entrent dans le dépôt, et le code de l'addon n'est jamais recopié.
+- `Data.lua` : généré par l'outil de l'auteur (absent de l'addon) depuis les données du site ; en-tête : build
+  1.60.1.70170, `generated` 2026-10-01, `codeVersion` 5. Structure seulement : les infobulles viennent du jeu.
+- Bloc `popular` (rafraîchi chaque jour depuis le site, `asOf` 2026-10-02 pour huit classes) : builds populaires par
+  classe.
+- `CHANGELOG.md` (0.35.0) : arbres de 70170 (Heating Up, Soul Harvest, Shifting Power du Druide, nouveaux chiffres de
+  Deflection, Redoubt, Holy Shield, Champion of the Light, Sniper Shot) ; liens en `-5` ; **la refonte du Guerrier
+  (Fureur, Protection) des notes officielles n'est pas dans les fichiers du build** : l'addon suit les fichiers. Cela
+  concorde avec le recoupement de la note du 01/10 (`docs/research/notes-blizzard-2026-10-01.md` : correctifs du
+  serveur du 2026-10-02, valeurs dans `DBCache.bin`, T08c).
+
+### Contenu (agrégats)
+
+- 9 classes, 3 arbres chacune ; **467 talents** (`node`, `spell`, `row`, `col`, `max`, icône, comparaison à Classic :
+  `classic = "same" | "changed" | …`).
+- Builds populaires : 9 classes, 5 codes chacune (45 codes au format v5, par exemple
+  `<classe>/<niveau>/<arbre 1>-<arbre 2>-<arbre 3>-5`) ; pour chaque classe : nombre de builds relevés, fenêtre (du
+  13 septembre au 2 octobre pour six classes, depuis le patch du 24 septembre pour trois), date `asOf`, **part de
+  chaque spécialisation**, et pour chaque code : spécialisation dominante, points par arbre, rang, score, partages,
+  sauvegardes, ouvertures, variantes. Aucune donnée personnelle de joueur.
+- Autres blocs : Legacy, renommages, raciaux, livre des sorts par niveau (`learn`), coefficients des sorts (`coef`,
+  texte) : non inventoriés en détail.
+
+### Usage proposé (FA1, décision 171)
+
+- **Export** : le build calculé par forever rendu en code et en lien Talents Forever (format v5), réimplémenté sans
+  recopier le code de l'addon ; tests de va-et-vient sur les codes de ses builds populaires.
+- **Builds populaires** : source communautaire datée (part, date), au mieux `suppose` ; nos builds comparés au plus
+  proche.
+- **Recoupement des arbres** : nœud, sort, rangée et colonne comparés à nos arbres décodés de 70170 ; tout écart
+  signalé, le client fait foi.
