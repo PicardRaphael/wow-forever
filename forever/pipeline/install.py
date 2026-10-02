@@ -60,6 +60,7 @@ FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
 CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json", "_seed_racials.json")
 CLASS_FILES = ("classes.json", "races.json", "pvp_items.json")
+MAGE_CLASS = "Mage"  # moteur du Mage : ses clés de talents sont celles de talents.json
 PETS_FILE = "pets.json"  # CH0 : familiers du Chasseur, ajouté ou remplacé comme les fichiers des 9 classes
 # T08b, bloc C : fichiers décodés installés par une révision, avec la liste de leurs valeurs changées.
 VALUE_FILES = ("spell_scaling.json", "character_scaling.json")
@@ -163,12 +164,18 @@ class _Merge:
                 key = t["key"]
                 seen.add(key)
                 c = by_key.get(key)
-                if c is None:
+                rename = self._renamed(key, by_key) if c is None else None
+                if c is None and rename is None:
                     self.add(TALENTS, key, t, None, source, "certain", "refused")
                     merged.append(t)
                     continue
+                if rename is not None:
+                    c = by_key[rename["new"]]
+                    seen.add(rename["new"])
+                    self.applied.append(rename)
+                assert c is not None
                 for f in TALENT_FIELDS:
-                    if t.get(f) != c.get(f):
+                    if t.get(f) != c.get(f) and not (rename is not None and f == "name"):
                         self.add(TALENTS, f"{key}.{f}", t.get(f), c.get(f), source, "certain", "refused")
                 for ch in _rows("talent", key, t.get("ranks", []), c.get("ranks", []), None):
                     self.value(TALENTS, ch, source)
@@ -176,13 +183,45 @@ class _Merge:
                     for ch in _rows(
                         "talent", key, t["tooltip_values"], c.get("tooltip_values", []), None, "tooltip_values"
                     ):
-                        self.add(TALENTS, f"{key}.{ch['field']}", ch["old"], ch["new"], source, "certain", "refused")
-                merged.append(self._talent(t, c, source))
+                        self.value(TALENTS, ch, source)
+                out = self._talent(t, c, source)
+                if rename is not None:
+                    self._rename(out, c, rename, source)
+                merged.append(out)
             tree["talents"] = merged
         for key, extra in by_key.items():
             if key not in seen:
                 self.add(TALENTS, key, None, extra, source, "certain", "refused")
         return doc
+
+    def _renamed(self, key: str, by_key: Mapping[str, Any]) -> Mapping[str, Any] | None:
+        """Renommage confirmé du talent `key` (`change` « renamed », champ `key`) vers une clé de la candidate."""
+        for entry in self.confirmed.values():
+            if (
+                entry["kind"] == "talent"
+                and entry.get("change") == "renamed"
+                and entry["key"] == key
+                and entry["field"] == "key"
+                and entry["old"] == key
+                and entry["new"] in by_key
+            ):
+                return entry
+        return None
+
+    def _rename(self, out: dict[str, Any], c: Mapping[str, Any], rename: Mapping[str, Any], source: str) -> None:
+        """Talent renommé par le client : la clé du dépôt reste, les noms du client et le gabarit d'infobulle de la
+        décision (`desc` de l'entrée confirmée) remplacent les anciens ; `source.client_key` garde la clé du client."""
+        key, why = out["key"], f"{source} ; {rename['decision']}"
+        old_name = out.get("name")
+        if c.get("name") and old_name and old_name != c["name"]:
+            former = [*out.get("former_names", []), old_name]
+            self.add(TALENTS, f"{key}.former_names", out.get("former_names"), former, why, "certain", "confirmed")
+            out["former_names"] = former
+        for f, new in (("name", c.get("name")), ("name_fr", c.get("name_fr", "")), ("desc", rename.get("desc"))):
+            if new is not None and out.get(f) != new:
+                self.add(TALENTS, f"{key}.{f}", out.get(f), new, why, "certain", "confirmed")
+                out[f] = new
+        out["source"] = {**out["source"], "client_key": rename["new"]}
 
     def _talent(self, t: Mapping[str, Any], c: Mapping[str, Any], source: str) -> dict[str, Any]:
         key = t["key"]
@@ -194,6 +233,9 @@ class _Merge:
                     self.add(TALENTS, f"{key}.duration_s", v, None, source, "certain", "removed_field")
                     continue
                 out[f] = v
+                continue
+            if f == "tooltip_values":  # un écart non confirmé est refusé plus haut : la valeur du client fait foi
+                out[f] = c.get("tooltip_values", v)
                 continue
             if f == "ranks":
                 out[f] = c["ranks"]
@@ -541,6 +583,7 @@ class Revision(TypedDict):
     counts: dict[str, int]
     changes: list[InstallChange]
     game_state: NotRequired[dict[str, Any]]
+    renamed_in_classes: NotRequired[list[dict[str, str]]]
 
 
 def _mana_note(spells: Mapping[str, Any]) -> str:
@@ -631,6 +674,25 @@ def _sources(doc: dict[str, Any], docs: Mapping[str, Any], n: int, version: str,
         "notes": ["chaque valeur changée porte sa source et sa certitude (champs source et certainty)"],
     }
     return doc
+
+
+def rename_class_talents(classes: dict[str, Any], confirmed: Sequence[Mapping[str, Any]]) -> list[tuple[str, str, str]]:
+    """Applique les renommages confirmés (`change` « renamed ») à l'arbre du Mage de `classes.json` : la clé du client
+    devient celle du dépôt, gardée dans `client_key`. L'import du profil traduit les nœuds par ce fichier ; le moteur
+    du Mage ne connaît que les clés de `talents.json`. Rend (classe, clé du client, clé du dépôt) par talent renommé."""
+    renames = {
+        e["new"]: e["old"]
+        for e in confirmed
+        if e["kind"] == "talent" and e.get("change") == "renamed" and e["field"] == "key"
+    }
+    done: list[tuple[str, str, str]] = []
+    for tree in (classes.get("classes", {}).get(MAGE_CLASS) or {}).get("trees", []):
+        for t in tree.get("talents", []):
+            if t.get("key") in renames:
+                new = t["key"]
+                t["key"], t["client_key"] = renames[new], new
+                done.append((MAGE_CLASS, new, t["key"]))
+    return done
 
 
 def _new_version_dir(deps: Deps, plan: InstallPlan, docs: Mapping[str, Any], day: str) -> Path:
@@ -763,6 +825,13 @@ def apply_install(
     _write(vdir / SPELLS, docs["spells"], 1)
     _write(vdir / CONFIRMED, confirmed, 2)
     _write(vdir / SOURCES_NAME, sources, 2)
+    classes_path = vdir / "classes.json"
+    if classes_path.is_file():
+        classes = _json(classes_path)
+        renamed = rename_class_talents(classes, confirmed["changes"])
+        if renamed:
+            _write(classes_path, classes, 1)
+            revision["renamed_in_classes"] = [{"class": c, "client_key": n, "key": o} for c, n, o in renamed]
     _write(path, history, 1)
     if plan["game_state"]:
         _write_game_state(vdir, plan["game_state"], n, day)

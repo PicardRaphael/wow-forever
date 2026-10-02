@@ -24,6 +24,8 @@ from forever.gamedata import ABLATABLE, ablated
 
 CONTEXTS = ("leveling", "dungeon", "raid", "pvp-bg", "pvp-world")
 LEVELS = (20, 40, 60)
+# Leveling joué aussi au plafond de la bêta (30, observé en jeu le 2026-10-01, installation de 1.60.1.70170).
+LEVELING_LEVELS = (20, 30, 40, 60)
 SEED = 12345
 RACE = "Orc"
 PRESET = "complet"
@@ -124,7 +126,7 @@ def _load(label: str) -> dict[str, dict[str, Any]]:
 
 
 def _cases() -> list[tuple[str, int]]:
-    return [(c, lv) for c in CONTEXTS for lv in LEVELS]
+    return [(c, lv) for c in CONTEXTS for lv in (LEVELING_LEVELS if c == "leveling" else LEVELS)]
 
 
 def table(label: str) -> str:

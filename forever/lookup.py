@@ -202,6 +202,8 @@ def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLooku
     for key, t in entries.items():
         index[_talent_key(key)] = key
         index[_talent_key(t["name"])] = key
+        for former in t.get("former_names", []):  # talent renommé par le client (forever install) : ancien nom
+            index.setdefault(_talent_key(former), key)
     wanted = _talent_key(name)
     if wanted not in index:
         names = {_talent_key(t["name"]): t["name"] for t in entries.values()}
