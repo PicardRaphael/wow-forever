@@ -13,6 +13,7 @@ from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, read_json
 
 from forever.cli import main
 from forever.errors import InvalidArgumentError
+from forever.pets import official_fixes_after
 from forever.pets_lookup import lookup_pets, pets_crosscheck, pets_mine
 from forever.pipeline.bestiary import read_bestiary
 from forever.provenance import validate_provenance
@@ -140,3 +141,23 @@ def test_unknown_kind_lists_pets(make_deps, capsys):
     capsys.readouterr()
     assert main(["lookup", "objet", "x", "--json"], make_deps()) != 0
     assert "pets" in json.loads(capsys.readouterr().out)["error"]["suggestions"]
+
+
+def test_official_fixes_after_keeps_only_later_fixes():
+    rules = {"official_fixes": [{"date": "2026-10-01", "text": "après"}, {"date": "2026-09-20", "text": "avant"}]}
+    assert [f["text"] for f in official_fixes_after(rules, "2026-09-25")] == ["après"]
+    assert official_fixes_after(rules, None) == rules["official_fixes"]
+    assert official_fixes_after({}, "2026-09-25") == []
+
+
+def test_guide_flags_an_official_fix_newer_than_the_bestiary_base(make_deps, wow, capsys):
+    later = official_fixes_after(PET_RULES, INFO["date"])
+    assert later, "données : un correctif officiel postérieur à la base de la fixture"
+    out = lookup_pets(make_deps(wow_dir=wow), "Bite", rank=3, zone="Les Tarides", level=10)
+    assert out["official_fixes"] == later
+    text = json.dumps(out["provenance"]["assumptions"], ensure_ascii=False)
+    assert all(f["date"] in text for f in later) and INFO["date"] in text
+    argv = ["pets", "tame", "--ability", "Bite", "--rank", "3", "--zone", "Les Tarides", "--level", "10"]
+    assert main(argv, make_deps(wow_dir=wow)) == 0
+    shown = capsys.readouterr().out
+    assert all(f"correctif officiel du {f['date']}" in shown for f in later)

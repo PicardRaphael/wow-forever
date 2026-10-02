@@ -90,3 +90,15 @@ def test_pet_rules_is_inherited_described_and_covered_by_origins():
     rules = read_json(V / "origins.json")["rules"]
     assert any(r["file"] == "pets.json" and r["origin"] == "client" for r in rules)
     assert any(r["file"] == "pet_rules.json" and r["origin"] == "addon" for r in rules)
+
+
+# --- Correctifs officiels postérieurs à la base de Forever Bestiary (note du 01/10, demande du 2026-10-02) ---
+
+
+def test_official_fix_of_taught_ranks_comes_from_the_forum(doc):
+    fixes = doc.get("official_fixes", [])
+    assert fixes, "révision 3 de 1.60.1.70170 : correctif des rangs enseignés par les bêtes"
+    for fix in fixes:
+        assert fix["text"] and re.fullmatch(r"\d{4}-\d{2}-\d{2}", fix["date"])
+        assert OFFICIAL_FORUM in fix["source"] and fix["certainty"] == "probable"
+        assert find_entry(load(REGISTRY_PATH), fix["registry"]) is not None
