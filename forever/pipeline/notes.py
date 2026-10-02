@@ -65,6 +65,10 @@ def page_url(topic_id: int) -> str:
     return f"{HOST}/en/wow/t/{topic_id}"
 
 
+def post_page_url(topic_id: int, post_number: int) -> str:
+    return f"{HOST}/en/wow/t/{topic_id}/{post_number}"
+
+
 def disallowed(robots: str, path: str) -> bool:
     """`path` interdit pour `User-agent: *` (règles `Disallow`, motifs `*` et `$` des moteurs de recherche)."""
     applies, rules = False, []
@@ -234,6 +238,49 @@ def read_notes(deps: Deps, state: Mapping[str, Any] | None = None) -> dict[str, 
     for note in notes:
         note["issue_body"] = issue_body(note)
     return {"skipped": False, "notes": notes, "checked_at": format_utc(now)}
+
+
+def _lines(cooked: str) -> list[str]:
+    """Texte d'un message, un élément par ligne (titres, paragraphes, éléments de liste)."""
+    blocks = re.split(r"</?(?:h[1-6]|p|li|ul|ol|br|blockquote|div)\b[^>]*>", cooked)
+    return [line for b in blocks if (line := re.sub(r"\s+", " ", _text(b)).strip())]
+
+
+def read_post(deps: Deps, topic_id: int, post_number: int) -> dict[str, Any]:
+    """Un message officiel désigné par l'utilisateur (`forever notes --post SUJET/N`), avec son numéro de révision.
+
+    Lecture ciblée, lancée à la main : `robots.txt` puis le JSON du sujet, deux requêtes ; ni limite quotidienne ni
+    état de la veille touchés. Un message de joueur est refusé. Le texte est rendu pour la lecture seulement : il
+    n'est écrit ni dans le cache ni dans le dépôt (licence CC BY-NC-SA 3.0)."""
+    if deps.offline:
+        raise OfflineError("la lecture d'un message officiel")
+    robots = _get(deps, ROBOTS_URL, None).decode("utf-8", errors="replace")
+    url = topic_url(topic_id)
+    doc = _json(_get(deps, url, robots), url)
+    post = next(
+        (p for p in doc.get("post_stream", {}).get("posts", []) if int(p.get("post_number") or 0) == post_number),
+        None,
+    )
+    if post is None:
+        raise FetchFailedError(f"Message n° {post_number} absent de {url} (premiers messages du sujet seulement).")
+    if not post.get("staff") and not _official(post):
+        raise FetchFailedError(f"Message n° {post_number} du sujet {topic_id} : message de joueur, jamais lu.")
+    cooked = str(post.get("cooked") or "")
+    entities, keywords = recognise(_text(cooked), _names(deps.data_dir))
+    return {
+        "topic_id": topic_id,
+        "post_number": post_number,
+        "title": str(doc.get("title", "")),
+        "url": post_page_url(topic_id, post_number),
+        "author": str(post.get("user_title") or post.get("username") or ""),
+        "created_at": str(post.get("created_at") or ""),
+        "updated_at": str(post.get("updated_at") or ""),
+        "version": int(post.get("version") or 1),
+        "lines": _lines(cooked),
+        "entities": entities,
+        "keywords": keywords,
+        "checked_at": format_utc(deps.now()),
+    }
 
 
 def issue_body(note: Mapping[str, Any]) -> str:

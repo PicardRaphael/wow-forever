@@ -10,6 +10,7 @@ import argparse
 import io
 import json
 import os
+import re
 import sys
 from collections.abc import Mapping
 from dataclasses import replace
@@ -304,6 +305,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     notes = sub.add_parser("notes", help="notes officielles du forum de Blizzard (réseau, lancé à la main, D1)")
     notes.add_argument("--state-from-issues", help="état lu dans les issues (gh issue list --json number,body)")
+    notes.add_argument("--post", help="lire un seul message officiel, SUJET/N (ex. 2360696/3), avec sa révision")
     notes.add_argument("--json", action="store_true", help="sortie JSON")
     api = sub.add_parser("api", help="API Blizzard (réseau)")
     api_sub = api.add_subparsers(dest="api_command", required=True, parser_class=_Parser)
@@ -1757,7 +1759,40 @@ def _cmd_questie_info(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_notes_post(deps: Deps, args: argparse.Namespace) -> int:
+    m = re.fullmatch(r"(\d+)/(\d+)", str(args.post).strip())
+    if not m:
+        raise InvalidArgumentError(f"--post attend SUJET/N (ex. 2360696/3), reçu : {args.post}", "Corriger l'argument.")
+    post = notes_mod.read_post(deps, int(m.group(1)), int(m.group(2)))
+    provenance = local_provenance(
+        deps,
+        certainty="suppose",
+        assumptions=[
+            (
+                f"message officiel n° {post['post_number']} du sujet {post['topic_id']}, révision {post['version']}"
+                f" du {post['updated_at'][:10]} ({post['url']})"
+            ),
+            "notes officielles : signal à vérifier, jamais une valeur (docs/DATA_SOURCES.md)",
+            "lecture lancée à la main (décision 148)",
+        ],
+    )
+    lines = [
+        (
+            f"{post['title']} : message n° {post['post_number']}, {post['author']}, créé le {post['created_at'][:10]},"
+            f" révision {post['version']} du {post['updated_at'][:10]}"
+        ),
+        f"  {post['url']}",
+        *[f"  {line}" for line in post["lines"]],
+    ]
+    if post["keywords"]:
+        lines.append("  registre : " + ", ".join(f"{k['registry']} ({k['keyword']})" for k in post["keywords"]))
+    _emit({"post": post, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_notes(deps: Deps, args: argparse.Namespace) -> int:
+    if args.post:
+        return _cmd_notes_post(deps, args)
     state = None
     if args.state_from_issues:
         issues = json.loads(Path(args.state_from_issues).read_text(encoding="utf-8"))

@@ -45,6 +45,10 @@ Elle **ne lance rien** : chaque changement est suivi des commandes proposées, m
 elles touchent Internet (`forever notes` est proposé quand le build change, décision 148). Détail des briques :
 `forever addons status [--save]`, `forever hotfixes [--since-install]`.
 
+`uv run forever notes --post 2360696/3` (réseau, sur accord) lit un seul message officiel désigné (sujet/numéro),
+avec son numéro de révision dans la provenance ; ni limite quotidienne ni état de la veille touchés, message de
+joueur refusé, texte rendu pour la lecture seulement.
+
 Tâche planifiée Windows (une fois par jour, résumé dans le cache, affiché par la ligne de démarrage de session) :
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1 -WhatIf   # voir ce qui serait créé
