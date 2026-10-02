@@ -340,8 +340,17 @@ def rules_sheet(rules: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "rules": [{"key": key, **rule} for key, rule in rules.get("rules", {}).items()],
         "reported_bugs": list(rules.get("reported_bugs", [])),
+        "official_fixes": list(rules.get("official_fixes", [])),
         "source": rules.get("source"),
     }
+
+
+def official_fixes_after(rules: Mapping[str, Any], base_date: str | None) -> list[dict[str, Any]]:
+    """Correctifs officiels (`pet_rules.json`, `official_fixes`) postérieurs à la date d'une base d'addon.
+
+    Date inconnue : tous les correctifs, la base ne peut pas être dite à jour."""
+    fixes = [dict(f) for f in rules.get("official_fixes", [])]
+    return [f for f in fixes if base_date is None or str(f.get("date", "")) > str(base_date)]
 
 
 def _rank_row(rank: Mapping[str, Any], training_cost: Any) -> dict[str, Any]:

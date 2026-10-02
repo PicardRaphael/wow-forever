@@ -19,6 +19,7 @@ from forever.pets import (
     beast_sheet,
     crosscheck,
     family_sheet,
+    official_fixes_after,
     resolve_name,
     rules_sheet,
     tame_guide,
@@ -52,6 +53,7 @@ class _Sources:
         rules_path = self.version.path / PET_RULES_FILE
         self.rules: dict[str, Any] = self.version.read_json(PET_RULES_FILE) if rules_path.is_file() else {"rules": {}}
         self.notes: list[str] = []
+        self.fixes_after_base: list[dict[str, Any]] = []
         wow = deps.wow_dir
         addon_dir = addon_dir or (wow / "Interface" / "AddOns" / ADDON_NAME if wow else None)
         self.bestiary: dict[str, Any] | None = None
@@ -69,6 +71,12 @@ class _Sources:
                 f"{info['date']} figée sur le client {info['client_build']}) ; carte communautaire du "
                 f"{info['community_date']} ({info['community_players']} joueurs) ; relevés de joueurs, suppose"
             )
+            self.fixes_after_base = official_fixes_after(self.rules, info.get("date"))
+            self.notes += [
+                f"correctif officiel du {f['date']} postérieur à la base de Forever Bestiary du {info.get('date')} : "
+                f"{f['text']} ({f['certainty']} ; {f['source']})"
+                for f in self.fixes_after_base
+            ]
         self.saved_path = saved_path or self._find_saved(wow)
         self.saved: dict[str, Any] | None = None
         if self.saved_path is not None and self.saved_path.is_file():
@@ -197,7 +205,13 @@ def _guide(src: _Sources, target: dict[str, Any], *, rank: int | None, zone: str
     if src.questie is None:
         extra.append("Questie absent : plages de niveau des zones inconnues, zones voisines non proposées")
     extra.append("bande de niveau du joueur : règle de Classic des couleurs de quête (leveling.quest_band, suppose)")
-    return {"kind": "pets_guide", **out, "addon": src.addon_info(), "provenance": src.provenance("suppose", extra)}
+    return {
+        "kind": "pets_guide",
+        **out,
+        "official_fixes": src.fixes_after_base,
+        "addon": src.addon_info(),
+        "provenance": src.provenance("suppose", extra),
+    }
 
 
 def pets_crosscheck(deps: Deps, *, addon_dir: Path | None = None, questie_dir: Path | None = None) -> dict[str, Any]:
@@ -258,6 +272,10 @@ def render_pets(payload: dict[str, Any]) -> list[str]:
             value = f" [{r['value']}{unit}]" if r.get("value") is not None else ""
             lines.append(f"- {r['text']}{value} ({r['certainty']}, {r['registry']}, {r['date']} ; {r['source']})")
         lines += [f"- Bug signalé : {b['text']} ({b['certainty']}, {b['date']})" for b in payload["reported_bugs"]]
+        lines += [
+            f"- Correctif officiel : {f['text']} ({f['certainty']}, {f['date']} ; {f['source']})"
+            for f in payload.get("official_fixes", [])
+        ]
     elif kind == "pets_family":
         b = payload["bonus"]
         lines.append(f"{payload['name']['fr']} ({payload['name']['en']}) · ligne « {payload['skill_line_name']} »")
@@ -305,6 +323,11 @@ def render_pets(payload: dict[str, Any]) -> list[str]:
             f"Guide d'apprivoisement : niveau {payload['level']}, zone {zone['name']['fr']} ({zone['name']['en']}), "
             f"rang le plus haut atteignable {_value(payload['highest_rank'])}"
         )
+        lines += [
+            f"Attention : correctif officiel du {f['date']}, postérieur à la base de Forever Bestiary : {f['text']}"
+            f" ({f['certainty']})"
+            for f in payload.get("official_fixes", [])
+        ]
         for z in payload["zones"]:
             tag = "zone demandée" if z["requested"] else f"zone voisine, PNJ niv. {z['levels']}"
             lines.append(f"{z['name']['fr'] or z['name']['en']} ({tag}) : {len(z['beasts'])} bête(s)")
