@@ -131,3 +131,12 @@ def test_unsupported_kind_lists_talent(capsys, make_deps):
     err = json.loads(out)["error"]
     assert err["code"] == "unsupported_kind"
     assert "talent" in err["suggestions"]
+
+
+def test_former_name_of_a_renamed_talent_still_resolves(make_deps):
+    """1.60.1.70170 renomme Hot Streak en Heating Up (clé du dépôt gardée, `former_names` écrit par forever install) :
+    l'ancien nom et le nouveau désignent le même talent."""
+    by_new = lookup_talent(make_deps(), "Heating Up")
+    by_old = lookup_talent(make_deps(), "Hot Streak")
+    assert by_new["id"] == by_old["id"] == "hotStreak"
+    assert by_new["name"] == "Heating Up"
