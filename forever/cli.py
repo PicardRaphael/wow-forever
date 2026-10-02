@@ -1897,7 +1897,7 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
     csv_dir = wago_dir(deps.cache_dir, version) / DEFAULT_LOCALE
     entities = hotfixes.touched_entities(kept, csv_dir, deps.data_dir / version)
     notes = [
-        "valeurs des correctifs non lues (DBCache.bin, T08)",
+        "valeurs des correctifs non lues (DBCache.bin, T08c)",
         "VALIDATION_RESULT_INVALID compté à part : sens non établi (docs/OPEN_QUESTIONS.md)",
     ]
     if log is None or not log.is_file():

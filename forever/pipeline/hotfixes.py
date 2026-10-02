@@ -5,7 +5,7 @@ Le client réécrit `Hotfix.log` à chaque démarrage : chaque ligne vue est gar
 Seules les tables que le projet décode ou lit sont retenues (`decode_rules.json` : `tables`, `class_tables`,
 `character_tables`, plus `hotfix_related_tables`), lignes de poussée et réponses `DBReply` ; une ligne répétée compte une fois ; `VALIDATION_RESULT_INVALID` est gardé et compté à part (sens non
 établi, `docs/OPEN_QUESTIONS.md`), `NOTPUBLIC` est ignoré. Les valeurs des correctifs (`DBCache.bin`) ne sont pas
-lues (T08). Aucun chiffre de jeu ici."""
+lues (T08c). Aucun chiffre de jeu ici."""
 
 from __future__ import annotations
 
