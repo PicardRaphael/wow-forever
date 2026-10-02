@@ -1,7 +1,7 @@
 {
  "schema_version": 1,
  "game_version": "1.60.1.70124",
- "source": "Règles du système de familiers absentes du client, relevées par des joueurs et rassemblées par l'addon Forever Bestiary (Data/Guide.lua, chaque section citant sa source) ; une règle de Classic marquée manuel ; depuis la révision 6, une règle tirée d'une note officielle de Blizzard (tame.level_margin). Relevé de joueurs au plus suppose (décision 127), note officielle sans mesure au plus probable (décision 162) ; le client l'emporte dès qu'il porte une règle (pets.json).",
+ "source": "Règles du système de familiers absentes du client, relevées par des joueurs et rassemblées par l'addon Forever Bestiary (Data/Guide.lua, chaque section citant sa source) ; une règle de Classic marquée manuel ; depuis la révision 6, une règle tirée d'une note officielle de Blizzard (tame.level_margin) ; depuis la révision 3 de 1.60.1.70170, un correctif officiel daté (official_fixes), signalé par le guide quand la base de Forever Bestiary lui est antérieure. Relevé de joueurs au plus suppose (décision 127), note officielle sans mesure au plus probable (décision 162) ; le client l'emporte dès qu'il porte une règle (pets.json).",
  "rules": {
   "tame.level_margin": {
    "text": "Écart de niveau maximal entre une bête apprivoisable et le Chasseur : 0 veut dire qu'aucune bête de niveau supérieur au sien ne s'apprivoise.",
@@ -157,5 +157,16 @@
    "note": "signalement de joueurs, rien de modélisé ; listé comme bug reconnu seulement s'il paraît dans les Known Issues officielles (forever notes)"
   }
  ],
- "inherited_from": "1.60.1.70124"
+ "inherited_from": "1.60.1.70124",
+ "official_fixes": [
+  {
+   "text": "Des bêtes apprivoisables enseignaient des rangs de capacités trop élevés pour leur niveau : Blizzard les a toutes corrigées. Une base de Forever Bestiary antérieure peut donner des rangs enseignés trop hauts : vérifier en jeu le rang qu'une bête enseigne.",
+   "date": "2026-10-01",
+   "source": "Notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (message n° 4, révision 4 du 2026-10-02, lue le 2026-10-02), section Hunter > Pets : https://us.forums.blizzard.com/en/wow/t/2360696/4",
+   "certainty": "probable",
+   "registry": "L3",
+   "affects": "rangs enseignés par les bêtes (Forever Bestiary, champ taught)",
+   "note": "règle du serveur (données des créatures), absente du client ; texte officiel sans mesure : probable (docs/DATA_SOURCES.md, notes officielles) ; la même note explique le bug signalé de familiers qui oublient une capacité, réputé corrigé"
+  }
+ ]
 }

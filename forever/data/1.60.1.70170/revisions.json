@@ -3154,6 +3154,124 @@
      "rule": "manual"
     }
    ]
+  },
+  {
+   "revision": 3,
+   "date": "2026-10-02",
+   "motif": "Note officielle du 1er octobre 2026 (message n° 4 du sujet 2360696, révision 4) : existence de la pénalité des sorts de bas niveau confirmée (coefficient.low_level_default : probable, formule toujours supposée, E2) ; correctif officiel des rangs enseignés par les bêtes ajouté à pet_rules.json (official_fixes), signalé par le guide d'apprivoisement ; écrite à la main, sans candidate",
+   "command": null,
+   "candidate": null,
+   "report": "docs/research/data-1.60.1.70170-r3.md",
+   "counts": {
+    "manual": 8
+   },
+   "changes": [],
+   "manual_changes": [
+    {
+     "file": "pet_rules.json",
+     "path": "official_fixes",
+     "before": null,
+     "after": [
+      {
+       "text": "Des bêtes apprivoisables enseignaient des rangs de capacités trop élevés pour leur niveau : Blizzard les a toutes corrigées. Une base de Forever Bestiary antérieure peut donner des rangs enseignés trop hauts : vérifier en jeu le rang qu'une bête enseigne.",
+       "date": "2026-10-01",
+       "source": "Notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (message n° 4, révision 4 du 2026-10-02, lue le 2026-10-02), section Hunter > Pets : https://us.forums.blizzard.com/en/wow/t/2360696/4",
+       "certainty": "probable",
+       "registry": "L3",
+       "affects": "rangs enseignés par les bêtes (Forever Bestiary, champ taught)",
+       "note": "règle du serveur (données des créatures), absente du client ; texte officiel sans mesure : probable (docs/DATA_SOURCES.md, notes officielles) ; la même note explique le bug signalé de familiers qui oublient une capacité, réputé corrigé"
+      }
+     ],
+     "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (message n° 4, révision 4 du 2026-10-02, https://us.forums.blizzard.com/en/wow/t/2360696/4)",
+     "rule": "manual"
+    },
+    {
+     "file": "pet_rules.json",
+     "path": "source",
+     "before": "Règles du système de familiers absentes du client, relevées par des joueurs et rassemblées par l'addon Forever Bestiary (Data/Guide.lua, chaque section citant sa source) ; une règle de Classic marquée manuel ; depuis la révision 6, une règle tirée d'une note officielle de Blizzard (tame.level_margin). Relevé de joueurs au plus suppose (décision 127), note officielle sans mesure au plus probable (décision 162) ; le client l'emporte dès qu'il porte une règle (pets.json).",
+     "after": "Règles du système de familiers absentes du client, relevées par des joueurs et rassemblées par l'addon Forever Bestiary (Data/Guide.lua, chaque section citant sa source) ; une règle de Classic marquée manuel ; depuis la révision 6, une règle tirée d'une note officielle de Blizzard (tame.level_margin) ; depuis la révision 3 de 1.60.1.70170, un correctif officiel daté (official_fixes), signalé par le guide quand la base de Forever Bestiary lui est antérieure. Relevé de joueurs au plus suppose (décision 127), note officielle sans mesure au plus probable (décision 162) ; le client l'emporte dès qu'il porte une règle (pets.json).",
+     "source": "correctif officiel daté (révision 3)",
+     "rule": "manual"
+    },
+    {
+     "file": "mechanics.json",
+     "path": "coefficient.low_level_default.certainty",
+     "before": "suppose",
+     "after": "probable",
+     "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (message n° 4, révision 4 du 2026-10-02, https://us.forums.blizzard.com/en/wow/t/2360696/4)",
+     "rule": "manual"
+    },
+    {
+     "file": "mechanics.json",
+     "path": "coefficient.low_level_default.source",
+     "before": "T04e (décision 2) : pénalité des sorts de bas niveau (coefficient.low_level) appliquée par défaut en mode forever, règle Classic supposée gardée par Forever jusqu'au test en jeu E2 (docs/ADDON.md) ; toujours appliquée en mode seed",
+     "after": "T04e (décision 2) : pénalité des sorts de bas niveau (coefficient.low_level) appliquée par défaut en mode forever ; existence de la pénalité confirmée par la note officielle du 1er octobre 2026 (fiche du personnage : un rang très inférieur au niveau profite moins de la puissance des sorts, https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4), probable sans mesure ; la formule (coefficient.low_level, règle Classic) reste supposée jusqu'au test en jeu E2 (docs/ADDON.md) ; toujours appliquée en mode seed",
+     "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (message n° 4, révision 4 du 2026-10-02, https://us.forums.blizzard.com/en/wow/t/2360696/4)",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "règle /values/coefficient.low_level_default",
+     "before": {
+      "file": "mechanics.json",
+      "paths": [
+       "/values/coefficient.low_level_default"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC), décision 72",
+      "certainty": "suppose",
+      "reason": "pénalité des sorts de bas niveau : absente du client (question E2)",
+      "registry": "G4"
+     },
+     "after": {
+      "file": "mechanics.json",
+      "paths": [
+       "/values/coefficient.low_level_default"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC), décision 72 ; existence confirmée par la note officielle du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4)",
+      "certainty": "probable",
+      "reason": "pénalité des sorts de bas niveau : absente du client, existence portée par un texte officiel sans mesure ; formule à mesurer (question E2)",
+      "registry": "G4"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (message n° 4, révision 4 du 2026-10-02, https://us.forums.blizzard.com/en/wow/t/2360696/4)",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "règle /official_fixes",
+     "before": null,
+     "after": {
+      "file": "pet_rules.json",
+      "paths": [
+       "/official_fixes"
+      ],
+      "origin": "manuel",
+      "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4)",
+      "certainty": "probable",
+      "reason": "correctif du serveur absent du client, porté par un texte officiel sans mesure (révision 3)",
+      "registry": "L3"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (message n° 4, révision 4 du 2026-10-02, https://us.forums.blizzard.com/en/wow/t/2360696/4)",
+     "rule": "manual"
+    },
+    {
+     "file": "sources.json",
+     "path": "files.pet_rules.json.source",
+     "before": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel) ; une règle tirée des notes officielles de Blizzard (tame.level_margin, probable, révision 6)",
+     "after": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel) ; une règle tirée des notes officielles de Blizzard (tame.level_margin, probable, révision 6) ; un correctif officiel daté (official_fixes : rangs enseignés par les bêtes, probable, révision 3 de 1.60.1.70170)",
+     "source": "révision 3",
+     "rule": "manual"
+    },
+    {
+     "file": "sources.json",
+     "path": "revision",
+     "before": 2,
+     "after": 3,
+     "source": "révision 3",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }

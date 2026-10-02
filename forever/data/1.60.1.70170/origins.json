@@ -314,9 +314,9 @@
         "/values/coefficient.low_level_default"
       ],
       "origin": "manuel",
-      "source": "règle Classic (PC), décision 72",
-      "certainty": "suppose",
-      "reason": "pénalité des sorts de bas niveau : absente du client (question E2)",
+      "source": "règle Classic (PC), décision 72 ; existence confirmée par la note officielle du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4)",
+      "certainty": "probable",
+      "reason": "pénalité des sorts de bas niveau : absente du client, existence portée par un texte officiel sans mesure ; formule à mesurer (question E2)",
       "registry": "G4"
     },
     {
@@ -1065,6 +1065,17 @@
       "certainty": "probable",
       "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 6)",
       "registry": "L13"
+    },
+    {
+      "file": "pet_rules.json",
+      "paths": [
+        "/official_fixes"
+      ],
+      "origin": "manuel",
+      "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4)",
+      "certainty": "probable",
+      "reason": "correctif du serveur absent du client, porté par un texte officiel sans mesure (révision 3)",
+      "registry": "L3"
     },
     {
       "file": "pet_rules.json",

@@ -41,9 +41,9 @@
   },
   "coefficient.low_level_default": {
    "value": true,
-   "certainty": "suppose",
+   "certainty": "probable",
    "registry": "G4",
-   "source": "T04e (décision 2) : pénalité des sorts de bas niveau (coefficient.low_level) appliquée par défaut en mode forever, règle Classic supposée gardée par Forever jusqu'au test en jeu E2 (docs/ADDON.md) ; toujours appliquée en mode seed",
+   "source": "T04e (décision 2) : pénalité des sorts de bas niveau (coefficient.low_level) appliquée par défaut en mode forever ; existence de la pénalité confirmée par la note officielle du 1er octobre 2026 (fiche du personnage : un rang très inférieur au niveau profite moins de la puissance des sorts, https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4), probable sans mesure ; la formule (coefficient.low_level, règle Classic) reste supposée jusqu'au test en jeu E2 (docs/ADDON.md) ; toujours appliquée en mode seed",
    "range": [
     {
      "value": true,

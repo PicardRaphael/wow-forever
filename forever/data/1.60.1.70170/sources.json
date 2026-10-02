@@ -65,7 +65,8 @@
       "notes": [
         "certitude par entrée dans le champ certainty ; identifiant du registre des mécaniques dans le champ registry",
         "hérité de 1.60.1.70009",
-        "hérité de 1.60.1.70124"
+        "hérité de 1.60.1.70124",
+        "révision 3 de 1.60.1.70170 (2026-10-02) : coefficient.low_level_default passe à probable (existence de la pénalité confirmée par la note officielle du 1er octobre 2026) ; la formule coefficient.low_level reste suppose"
       ],
       "inherited_from": "1.60.1.70124"
     },
@@ -246,18 +247,19 @@
       ]
     },
     "pet_rules.json": {
-      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel) ; une règle tirée des notes officielles de Blizzard (tame.level_margin, probable, révision 6)",
+      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel) ; une règle tirée des notes officielles de Blizzard (tame.level_margin, probable, révision 6) ; un correctif officiel daté (official_fixes : rangs enseignés par les bêtes, probable, révision 3 de 1.60.1.70170)",
       "certainty": "suppose",
       "notes": [
         "ajouté à la main en révision 5 (CH0, accord de l'utilisateur du 2026-10-01) ; forever install ne l'écrit pas",
         "chaque règle porte sa source, sa date, sa certitude et son entrée du registre (L1 à L13)",
         "relecture à chaque changement de Forever Bestiary (forever addons status)",
         "révision 6 (2026-10-02) : tame.level_margin à 0, source la note officielle du 24 septembre 2026 révisée le 1er octobre (probable), à la main",
-        "hérité de 1.60.1.70124"
+        "hérité de 1.60.1.70124",
+        "révision 3 de 1.60.1.70170 (2026-10-02) : correctif officiel des rangs enseignés par les bêtes (note du 1er octobre 2026, message n° 4, révision 4), à la main ; le guide le signale quand la base de Forever Bestiary est antérieure"
       ],
       "inherited_from": "1.60.1.70124"
     }
   },
-  "revision": 2,
+  "revision": 3,
   "revised_at": "2026-10-02"
 }

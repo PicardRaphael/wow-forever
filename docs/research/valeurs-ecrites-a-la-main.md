@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70170 (ne
 de `forever/data/1.60.1.70170/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-147 chemins, 613 valeurs ; 81 `probable`, 66 `suppose`
+148 chemins, 616 valeurs ; 83 `probable`, 65 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -49,7 +49,7 @@ Aucun.
 | mechanics.json | `/values/coefficient.channel_cap_s` | 1 | suppose | G4 | mode seed seulement : le mode forever lit les coefficients du client (spell_scaling.json) | règle Classic (fm.py du seed, PC) |
 | mechanics.json | `/values/coefficient.fixed` | 10 | suppose | G4 | mode seed seulement : le mode forever lit les coefficients du client (spell_scaling.json) | règle Classic (fm.py du seed, PC) |
 | mechanics.json | `/values/coefficient.low_level` | 2 | suppose | G4 | pénalité des sorts de bas niveau : absente du client (question E2) | règle Classic (PC) |
-| mechanics.json | `/values/coefficient.low_level_default` | 3 | suppose | G4 | pénalité des sorts de bas niveau : absente du client (question E2) | règle Classic (PC), décision 72 |
+| mechanics.json | `/values/coefficient.low_level_default` | 3 | probable | G4 | pénalité des sorts de bas niveau : absente du client, existence portée par un texte officiel sans mesure ; formule à mesurer (question E2) | règle Classic (PC), décision 72 ; existence confirmée par la note officielle du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4) |
 | mechanics.json | `/values/coefficient.slow_factor` | 1 | suppose | G4 | mode seed seulement : le mode forever lit les coefficients du client (spell_scaling.json) | règle Classic (fm.py du seed, PC) |
 | mechanics.json | `/values/crit.winters_chill_per_stack` | 1 | probable | D4 | mode seed seulement : le mode forever lit spell_scaling.json auras.winters_chill | relevé du client 1.60.1.70009 recopié à la main (references/mechanics.md) |
 | mechanics.json | `/values/damage.bonus_stacking` | 3 | probable | A20 | règle du serveur, test en jeu E6 | vidéo communautaire (décision 73) |
@@ -81,6 +81,7 @@ Aucun.
 | overrides.json | `/Fire~1Pyroblast` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Frost~1Ice Barrier` | 2 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Frost~1Ice Lance` | 3 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
+| pet_rules.json | `/official_fixes` | 3 | probable | L3 | correctif du serveur absent du client, porté par un texte officiel sans mesure (révision 3) | notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4) |
 | pet_rules.json | `/rules/tame.level_margin` | 5 | probable | L13 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 6) | notes de développement officielles de la bêta du 24 septembre 2026, révisées le 1er octobre (https://us.forums.blizzard.com/en/wow/t/2360696) |
 | pet_rules.json | `/rules/training.points_gain` | 3 | suppose | L3 | aucune source propre à Forever (CH0) | règle de Classic (niveau du familier) ; gain des points d'entraînement inconnu |
 | pet_rules.json | `/rules/training.rank_level_applies_to` | 4 | suppose | L3 | aucune source propre à Forever (CH0) | règle de Classic (niveau du familier) ; gain des points d'entraînement inconnu |
