@@ -39,5 +39,12 @@ def test_mechanics_values_written_by_hand_are_at_most_probable():
 
 def test_beta_cap_is_an_installation_fact():
     state = read_json(V / "meta.json")["game_state"]["beta_level_cap"]
-    # T08b : posé en révision 4 de 1.60.1.70124 ; 1.60.1.70170 (2026-10-02) : observé, installé en révision 1
-    assert state["revision"] == 1 and state["source"] and state["certainty"] in ("probable", "certain")
+    # Révision où le plafond a été posé (non reporté), lue dans revisions.json : indépendant des révisions suivantes.
+    revisions = read_json(V / "revisions.json")["revisions"]
+    posed = [
+        r["revision"]
+        for r in revisions
+        if not ((r.get("game_state") or {}).get("beta_level_cap") or {"carried": True}).get("carried")
+    ]
+    assert posed and state["revision"] == posed[-1]
+    assert state["source"] and state["certainty"] in ("probable", "certain")

@@ -3364,5 +3364,6 @@
     "motif": "4 point(s) sur des talents dont l'effet n'est pas modélisé (improvedScorch, pyroblast) : Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
    }
   }
- ]
+ ],
+ "monsters_sha256": "497bf48c4b1fedfcfbd21d9d4b22f061a0a54e2f38051c52ba3916f4f4aa0976"
 }

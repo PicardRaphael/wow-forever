@@ -1,41 +1,61 @@
-"""PV des monstres dans le moteur (décision 5 du plan T04b) : `monsters.json` installé (deux journaux réels du
-2026-09-27 et Questie 11.38.0 local, Sarilus Foulborne exclu de l'ajustement ; depuis 1.60.1.70170 révision 2, le
-journal du 2026-10-02 aussi, PNJ hors norme écartés de la courbe) ; modèle du seed
-(`leveling.json.mob_model.hp_anchors`, interpolé) pour la parité. Mêmes observations que les fixtures : mêmes
-rapports que tests/unit/test_monsters_correction.py."""
+"""PV des monstres dans le moteur (décision 5 du plan T04b) : `monsters.json` installé (journaux réels et Questie 11.38.0
+local, PNJ exclus de l'ajustement ou de la courbe) ; modèle du seed (`leveling.json.mob_model.hp_anchors`, interpolé)
+pour la parité. Depuis le 2026-10-02, les valeurs attendues sont lues dans `monsters.json` installé (droite, plage,
+niveaux mesurés) : une nouvelle mesure des journaux ne touche plus ces tests, qui vérifient la règle du moteur.
+Les rapports eux-mêmes sont vérifiés sur fixtures par tests/unit/test_monsters_correction.py."""
+
+import math
 
 import pytest
+from conftest import DATA_DIR, LOCAL_VERSION, read_json
 
 from forever.engine.monsters import corrected_questie_hp, mob_hp, questie_ratio
 
-SLOPE, INTERCEPT = 0.023805491386132475, 0.8228887385415422  # 1.60.1.70170 révision 2 (13 niveaux)
+MONSTERS = read_json(DATA_DIR / LOCAL_VERSION / "monsters.json")
+CORRECTION = MONSTERS["questie_correction"]
+SLOPE, INTERCEPT = CORRECTION["fit"]["slope"], CORRECTION["fit"]["intercept"]
+LOW, HIGH = CORRECTION["range"]
+MEASURED_RATIOS = {int(k): v["ratio"] for k, v in CORRECTION["levels"].items()}
+# Niveau de la plage sans rapport mesuré (la droite s'y applique), et niveau au-delà de la plage (suppose).
+UNMEASURED = next((lv for lv in range(LOW, HIGH + 1) if lv not in MEASURED_RATIOS), None)
+BEYOND = HIGH + 1
+HP = {int(k): v for k, v in MONSTERS["hp_by_level"].items()}
+JOURNAL = sorted(lv for lv, v in HP.items() if v["source"].startswith("journaux"))
 
 
 def test_installed_correction(game_data):
     corr = game_data.monsters.correction
-    assert corr is not None and (corr.level_min, corr.level_max) == (1, 22)
+    assert corr is not None and (corr.level_min, corr.level_max) == (LOW, HIGH)
     assert corr.slope == pytest.approx(SLOPE, rel=1e-12) and corr.intercept == pytest.approx(INTERCEPT, rel=1e-12)
-    assert corr.levels[12] == pytest.approx(1.1012145748987854, rel=1e-12)
+    for level, ratio in MEASURED_RATIOS.items():
+        assert corr.levels[level] == pytest.approx(ratio, rel=1e-12), level
 
 
 def test_questie_ratio(game_data):
-    # Niveau 8 : dans la plage mesurée sans mesure à ce niveau (16 est mesuré depuis la révision 2) : la droite.
-    assert questie_ratio(game_data, 8) == (pytest.approx(SLOPE * 8 + INTERCEPT, rel=1e-12), "probable")
-    assert questie_ratio(game_data, 30) == (pytest.approx(SLOPE * 30 + INTERCEPT, rel=1e-12), "suppose")
+    measured = max(MEASURED_RATIOS)
+    assert questie_ratio(game_data, measured) == (pytest.approx(MEASURED_RATIOS[measured], rel=1e-12), "probable")
+    if UNMEASURED is not None:
+        expected = max(1.0, SLOPE * UNMEASURED + INTERCEPT)
+        assert questie_ratio(game_data, UNMEASURED) == (pytest.approx(expected, rel=1e-12), "probable")
+    assert questie_ratio(game_data, BEYOND) == (pytest.approx(SLOPE * BEYOND + INTERCEPT, rel=1e-12), "suppose")
 
 
 def test_corrected_questie_hp(game_data):
-    hp = corrected_questie_hp(game_data, 356, 8)
-    assert (hp.value, hp.certainty) == (361, "probable") and "Questie corrigé" in hp.source
+    level = UNMEASURED if UNMEASURED is not None else BEYOND
+    ratio = max(1.0, SLOPE * level + INTERCEPT)
+    hp = corrected_questie_hp(game_data, 356, level)
+    assert hp.value == math.floor(356 * ratio + 0.5)  # arrondi au demi supérieur, comme les PV entiers du jeu
+    assert hp.certainty == ("probable" if level <= HIGH else "suppose") and "Questie corrigé" in hp.source
 
 
 def test_mob_hp_measured_first(game_data):
-    hp = mob_hp(game_data, 12)
-    assert (hp.value, hp.certainty) == (272, "certain")
-    hp16 = mob_hp(game_data, 16)
-    assert hp16.certainty == "probable" and 385 < hp16.value < 473
-    hp23 = mob_hp(game_data, 23)  # au-delà de la plage mesurée (1 à 22 depuis la révision 2)
-    assert hp23.certainty == "suppose" and "Questie corrigé" in hp23.source
+    assert JOURNAL, "aucun niveau mesuré dans monsters.json installé"
+    for level in JOURNAL:
+        hp = mob_hp(game_data, level)
+        assert (hp.value, hp.certainty) == (HP[level]["value"], HP[level]["certainty"]), level
+    beyond = next(lv for lv in sorted(HP) if lv > HIGH and lv not in JOURNAL)
+    hp = mob_hp(game_data, beyond)
+    assert hp.certainty == "suppose" and "Questie corrigé" in hp.source
 
 
 def test_mob_hp_seed_model(game_data):

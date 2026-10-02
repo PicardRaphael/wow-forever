@@ -53,6 +53,13 @@ SEED_VERSION = max(d.name for d in SEED_DATA.iterdir() if d.is_dir() and d.name[
 # les 22 tables du client sont identiques à celles de 1.60.1.70009, aucune valeur de jeu ne change. Passée à
 # 1.60.1.70170 le 2026-10-02 (Hot Streak renommé Heating Up, Combustion à 3 charges, plafond de la bêta 30).
 LOCAL_VERSION = "1.60.1.70170"
+# Révision et date de révision de la version installée, lues dans le manifeste installé (2026-10-02) : une mesure de
+# journaux (forever measures refresh) ou une révision des données ne touche plus aucun test, comme LOCAL_VERSION
+# depuis T08a. `test_revision_constants.py` vérifie qu'elles concordent avec sources.json et revisions.json.
+_INSTALLED = json.loads((DATA_DIR / "manifest.json").read_text(encoding="utf-8"))["versions"][LOCAL_VERSION]
+LOCAL_REVISION: int = _INSTALLED["revision"]
+LOCAL_REVISED_AT: str = _INSTALLED["revised_at"]
+LOCAL_COLLECTED_AT: str = _INSTALLED["collected_at"]
 # Version précédente, gardée dans le dépôt : sert aux comparaisons entre versions installées.
 PREVIOUS_VERSION = "1.60.1.70009"
 # Version des extraits des 9 classes, des ratios et des familiers (tests/fixtures/wago/1.60.1.70124) : les tests qui

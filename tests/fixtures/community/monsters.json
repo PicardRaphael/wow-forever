@@ -1,0 +1,1840 @@
+{
+ "schema_version": 2,
+ "game_version": "1.60.1.70170",
+ "source": "PV max lus dans le bloc avancé des journaux de combat du client ; Questie en regard",
+ "logs": [
+  "WoWCombatLog-092726_145346.txt",
+  "WoWCombatLog-092726_150346.txt",
+  "WoWCombatLog-092726_174130.txt",
+  "WoWCombatLog-100226_080035.txt"
+ ],
+ "questie_version": "11.38.0",
+ "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+ "npcs": {
+  "704": {
+   "name": "Ragged Timber Wolf",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 55
+    }
+   }
+  },
+  "705": {
+   "name": "Ragged Young Wolf",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 42,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 73 individu(s))",
+     "questie_hp": 42
+    }
+   }
+  },
+  "706": {
+   "name": "Frostmane Troll Whelp",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 71
+    },
+    "4": {
+     "max_hp": 86,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 20 individu(s))",
+     "questie_hp": 86
+    }
+   }
+  },
+  "707": {
+   "name": "Rockjaw Trogg",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 42,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 42
+    },
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 55
+    }
+   }
+  },
+  "708": {
+   "name": "Small Crag Boar",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 76 individu(s))",
+     "questie_hp": 71
+    }
+   }
+  },
+  "721": {
+   "name": "Rabbit",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 1,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 1
+    }
+   }
+  },
+  "724": {
+   "name": "Burly Rockjaw Trogg",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 55
+    }
+   }
+  },
+  "2071": {
+   "name": "Moonstalker Matriarch",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 484
+    }
+   }
+  },
+  "2163": {
+   "name": "Thistle Bear",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 299,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 278
+    }
+   }
+  },
+  "2165": {
+   "name": "Grizzled Thistle Bear",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "16": {
+     "max_hp": 534,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 445
+    },
+    "17": {
+     "max_hp": 591,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 482
+    }
+   }
+  },
+  "2185": {
+   "name": "Darkshore Thresher",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 247
+    }
+   }
+  },
+  "2231": {
+   "name": "Pygmy Tide Crawler",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 176
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 198
+    }
+   }
+  },
+  "2237": {
+   "name": "Moonstalker Sire",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 386
+    },
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 417
+    }
+   }
+  },
+  "2321": {
+   "name": "Foreststrider Fledgling",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 248
+    }
+   }
+  },
+  "2324": {
+   "name": "Blackwood Windtalker",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 300
+    }
+   }
+  },
+  "2338": {
+   "name": "Twilight Disciple",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "16": {
+     "max_hp": 427,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 325
+    }
+   }
+  },
+  "2339": {
+   "name": "Twilight Thug",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386
+    }
+   }
+  },
+  "3099": {
+   "name": "Dire Mottled Boar",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 120
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 137
+    }
+   }
+  },
+  "3242": {
+   "name": "Zhevra Runner",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 300
+    }
+   }
+  },
+  "3244": {
+   "name": "Greater Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 15 individu(s))",
+     "questie_hp": 222
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 17 individu(s))",
+     "questie_hp": 247
+    }
+   }
+  },
+  "3245": {
+   "name": "Ornery Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386
+    }
+   }
+  },
+  "3246": {
+   "name": "Fleeting Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 247
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 273
+    }
+   }
+  },
+  "3254": {
+   "name": "Sunscale Lashtail",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 246,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 218
+    }
+   }
+  },
+  "3265": {
+   "name": "Razormane Hunter",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 222
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 247
+    }
+   }
+  },
+  "3266": {
+   "name": "Razormane Defender",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 273
+    }
+   }
+  },
+  "3267": {
+   "name": "Razormane Water Seeker",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 22 individu(s))",
+     "questie_hp": 198
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 222
+    }
+   }
+  },
+  "3268": {
+   "name": "Razormane Thornweaver",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 186
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 18 individu(s))",
+     "questie_hp": 208
+    }
+   }
+  },
+  "3269": {
+   "name": "Razormane Geomancer",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 219
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 241
+    }
+   }
+  },
+  "3272": {
+   "name": "Kolkar Wrangler",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 248
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 273
+    }
+   }
+  },
+  "3379": {
+   "name": "Burning Blade Bruiser",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 198
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 222
+    }
+   }
+  },
+  "3380": {
+   "name": "Burning Blade Acolyte",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 199
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 219
+    }
+   }
+  },
+  "3415": {
+   "name": "Savannah Huntress",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 222
+    }
+   }
+  },
+  "3425": {
+   "name": "Savannah Prowler",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 300
+    },
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328
+    }
+   }
+  },
+  "3584": {
+   "name": "Therylune",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386
+    }
+   }
+  },
+  "3725": {
+   "name": "Dark Strand Cultist",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 354
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 379
+    }
+   }
+  },
+  "3727": {
+   "name": "Dark Strand Enforcer",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 642,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 494
+    }
+   }
+  },
+  "3728": {
+   "name": "Dark Strand Adept",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 379
+    }
+   }
+  },
+  "3730": {
+   "name": "Dark Strand Excavator",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 449
+    },
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 484
+    }
+   }
+  },
+  "3732": {
+   "name": "Forsaken Seeker",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 377
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 404
+    }
+   }
+  },
+  "3733": {
+   "name": "Forsaken Herbalist",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 417
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 449
+    }
+   }
+  },
+  "3734": {
+   "name": "Forsaken Thug",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 15 individu(s))",
+     "questie_hp": 484
+    }
+   }
+  },
+  "3774": {
+   "name": "Felslayer",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "22": {
+     "max_hp": 746,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 573
+    }
+   }
+  },
+  "3816": {
+   "name": "Wild Buck",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 417
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 449
+    }
+   }
+  },
+  "3819": {
+   "name": "Wildthorn Stalker",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 642,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 494
+    },
+    "21": {
+     "max_hp": 691,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 531
+    }
+   }
+  },
+  "3823": {
+   "name": "Ghostpaw Runner",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 449
+    },
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 484
+    }
+   }
+  },
+  "3986": {
+   "name": "Sarilus Foulborne",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "25": {
+     "max_hp": 927,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 573
+    }
+   }
+  },
+  "5951": {
+   "name": "Hare",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 8,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 8
+    }
+   }
+  },
+  "6466": {
+   "name": "Gamon",
+   "zone_id": 1637,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 247
+    }
+   }
+  },
+  "12319": {
+   "name": "Burning Blade Toxicologist",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 263
+    }
+   }
+  },
+  "12320": {
+   "name": "Burning Blade Crusher",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 273
+    }
+   }
+  },
+  "257446": {
+   "name": "Teo Hammerstorm",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null
+    }
+   }
+  }
+ },
+ "hp_by_level": {
+  "1": {
+   "value": 8,
+   "certainty": "probable",
+   "source": "journaux : médiane de [1, 8, 42, 42] des PNJ normaux observés",
+   "n_npcs": 4
+  },
+  "2": {
+   "value": 55,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 3
+  },
+  "3": {
+   "value": 71,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 2
+  },
+  "4": {
+   "value": 86,
+   "certainty": "probable",
+   "source": "journaux : médiane de [86] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "5": {
+   "value": 102,
+   "certainty": "probable",
+   "source": "journaux : médiane de [102] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "6": {
+   "value": 120,
+   "certainty": "probable",
+   "source": "journaux : médiane de [120] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "7": {
+   "value": 137,
+   "certainty": "probable",
+   "source": "journaux : médiane de [137] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "8": {
+   "value": 158,
+   "certainty": "probable",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 140,
+   "questie_hp": 156,
+   "ratio": 1.013332669630602
+  },
+  "9": {
+   "value": 180,
+   "certainty": "probable",
+   "source": "journaux : médiane de [180] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "10": {
+   "value": 208,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 4
+  },
+  "11": {
+   "value": 239,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 7
+  },
+  "12": {
+   "value": 272,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 9
+  },
+  "13": {
+   "value": 307,
+   "certainty": "probable",
+   "source": "journaux : médiane de [246, 307, 307, 307, 307, 307] des PNJ normaux observés",
+   "n_npcs": 6
+  },
+  "14": {
+   "value": 345,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 4
+  },
+  "15": {
+   "value": 385,
+   "certainty": "probable",
+   "source": "journaux : médiane de [385] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "16": {
+   "value": 427,
+   "certainty": "probable",
+   "source": "journaux : médiane de [427] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "17": {
+   "value": 473,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 4
+  },
+  "18": {
+   "value": 521,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 5
+  },
+  "19": {
+   "value": 572,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 7
+  },
+  "20": {
+   "value": 629,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 4
+  },
+  "21": {
+   "value": 702,
+   "certainty": "probable",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 104,
+   "questie_hp": 531,
+   "ratio": 1.3228040576503242
+  },
+  "22": {
+   "value": 746,
+   "certainty": "probable",
+   "source": "journaux : médiane de [746] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "23": {
+   "value": 846,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 115,
+   "questie_hp": 617,
+   "ratio": 1.3704150404225892
+  },
+  "24": {
+   "value": 926,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 163,
+   "questie_hp": 664,
+   "ratio": 1.3942205318087217
+  },
+  "25": {
+   "value": 927,
+   "certainty": "probable",
+   "source": "journaux : médiane de [927] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "26": {
+   "value": 1135,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 125,
+   "questie_hp": 787,
+   "ratio": 1.4418315145809866
+  },
+  "27": {
+   "value": 1231,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 99,
+   "questie_hp": 840,
+   "ratio": 1.4656370059671189
+  },
+  "28": {
+   "value": 1335,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 114,
+   "questie_hp": 896,
+   "ratio": 1.4894424973532514
+  },
+  "29": {
+   "value": 1438,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 104,
+   "questie_hp": 950,
+   "ratio": 1.513247988739384
+  },
+  "30": {
+   "value": 1540,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 627,
+   "questie_hp": 1002,
+   "ratio": 1.5370534801255165
+  },
+  "31": {
+   "value": 1726,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 102,
+   "questie_hp": 1106,
+   "ratio": 1.560858971511649
+  },
+  "32": {
+   "value": 1841,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 124,
+   "questie_hp": 1162,
+   "ratio": 1.5846644628977815
+  },
+  "33": {
+   "value": 1964,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 102,
+   "questie_hp": 1221,
+   "ratio": 1.608469954283914
+  },
+  "34": {
+   "value": 2088,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 100,
+   "questie_hp": 1279,
+   "ratio": 1.6322754456700463
+  },
+  "35": {
+   "value": 2222,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 315,
+   "questie_hp": 1342,
+   "ratio": 1.6560809370561789
+  },
+  "36": {
+   "value": 2468,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 124,
+   "questie_hp": 1469,
+   "ratio": 1.6798864284423112
+  },
+  "37": {
+   "value": 2617,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 140,
+   "questie_hp": 1536,
+   "ratio": 1.7036919198284437
+  },
+  "38": {
+   "value": 2771,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 125,
+   "questie_hp": 1604,
+   "ratio": 1.7274974112145762
+  },
+  "39": {
+   "value": 2939,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 96,
+   "questie_hp": 1678,
+   "ratio": 1.7513029026007088
+  },
+  "40": {
+   "value": 3110,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 326,
+   "questie_hp": 1752,
+   "ratio": 1.7751083939868413
+  },
+  "41": {
+   "value": 3422,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 111,
+   "questie_hp": 1902,
+   "ratio": 1.7989138853729738
+  },
+  "42": {
+   "value": 3611,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 135,
+   "questie_hp": 1981,
+   "ratio": 1.8227193767591061
+  },
+  "43": {
+   "value": 3802,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 136,
+   "questie_hp": 2059,
+   "ratio": 1.8465248681452386
+  },
+  "44": {
+   "value": 3999,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 132,
+   "questie_hp": 2138,
+   "ratio": 1.8703303595313712
+  },
+  "45": {
+   "value": 4199,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 258,
+   "questie_hp": 2217,
+   "ratio": 1.8941358509175035
+  },
+  "46": {
+   "value": 4599,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 121,
+   "questie_hp": 2398,
+   "ratio": 1.917941342303636
+  },
+  "47": {
+   "value": 4831,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 101,
+   "questie_hp": 2488,
+   "ratio": 1.9417468336897685
+  },
+  "48": {
+   "value": 5065,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 109,
+   "questie_hp": 2577,
+   "ratio": 1.965552325075901
+  },
+  "49": {
+   "value": 5316,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 95,
+   "questie_hp": 2672,
+   "ratio": 1.9893578164620336
+  },
+  "50": {
+   "value": 5572,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 327,
+   "questie_hp": 2768,
+   "ratio": 2.013163307848166
+  },
+  "51": {
+   "value": 6068,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 122,
+   "questie_hp": 2979,
+   "ratio": 2.036968799234298
+  },
+  "52": {
+   "value": 6351,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 154,
+   "questie_hp": 3082,
+   "ratio": 2.060774290620431
+  },
+  "53": {
+   "value": 6646,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 158,
+   "questie_hp": 3188,
+   "ratio": 2.0845797820065632
+  },
+  "54": {
+   "value": 6941,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 176,
+   "questie_hp": 3292,
+   "ratio": 2.1083852733926958
+  },
+  "55": {
+   "value": 7245,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 353,
+   "questie_hp": 3398,
+   "ratio": 2.1321907647788283
+  },
+  "56": {
+   "value": 6399,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 169,
+   "questie_hp": 2968,
+   "ratio": 2.155996256164961
+  },
+  "57": {
+   "value": 8192,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 183,
+   "questie_hp": 3758,
+   "ratio": 2.1798017475510933
+  },
+  "58": {
+   "value": 8224,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 151,
+   "questie_hp": 3732,
+   "ratio": 2.2036072389372254
+  },
+  "59": {
+   "value": 8573,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 123,
+   "questie_hp": 3849,
+   "ratio": 2.2274127303233584
+  },
+  "60": {
+   "value": 7420,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 475,
+   "questie_hp": 3296,
+   "ratio": 2.2512182217094905
+  },
+  "61": {
+   "value": 7724,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 33,
+   "questie_hp": 3395,
+   "ratio": 2.2750237130956235
+  },
+  "62": {
+   "value": 10046,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 73,
+   "questie_hp": 4370,
+   "ratio": 2.2988292044817555
+  },
+  "63": {
+   "value": 13346,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 27,
+   "questie_hp": 5746,
+   "ratio": 2.322634695867888
+  }
+ },
+ "conflicts": [],
+ "questie_gaps": [
+  {
+   "npc_id": 2071,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 2163,
+   "level": 11,
+   "measured": 299,
+   "questie": 278
+  },
+  {
+   "npc_id": 2165,
+   "level": 16,
+   "measured": 534,
+   "questie": 445
+  },
+  {
+   "npc_id": 2165,
+   "level": 17,
+   "measured": 591,
+   "questie": 482
+  },
+  {
+   "npc_id": 2185,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 2231,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 2231,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 2237,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 2237,
+   "level": 18,
+   "measured": 521,
+   "questie": 417
+  },
+  {
+   "npc_id": 2321,
+   "level": 12,
+   "measured": 272,
+   "questie": 248
+  },
+  {
+   "npc_id": 2324,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 2338,
+   "level": 16,
+   "measured": 427,
+   "questie": 325
+  },
+  {
+   "npc_id": 2339,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 3242,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 3244,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3244,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3245,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 3246,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3246,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3254,
+   "level": 13,
+   "measured": 246,
+   "questie": 218
+  },
+  {
+   "npc_id": 3265,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3265,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3266,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3267,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3267,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3268,
+   "level": 10,
+   "measured": 208,
+   "questie": 186
+  },
+  {
+   "npc_id": 3268,
+   "level": 11,
+   "measured": 239,
+   "questie": 208
+  },
+  {
+   "npc_id": 3269,
+   "level": 12,
+   "measured": 272,
+   "questie": 219
+  },
+  {
+   "npc_id": 3269,
+   "level": 13,
+   "measured": 307,
+   "questie": 241
+  },
+  {
+   "npc_id": 3272,
+   "level": 12,
+   "measured": 272,
+   "questie": 248
+  },
+  {
+   "npc_id": 3272,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3379,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3379,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3380,
+   "level": 11,
+   "measured": 239,
+   "questie": 199
+  },
+  {
+   "npc_id": 3380,
+   "level": 12,
+   "measured": 272,
+   "questie": 219
+  },
+  {
+   "npc_id": 3415,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3425,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 3425,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 3584,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 3725,
+   "level": 18,
+   "measured": 521,
+   "questie": 354
+  },
+  {
+   "npc_id": 3725,
+   "level": 19,
+   "measured": 572,
+   "questie": 379
+  },
+  {
+   "npc_id": 3727,
+   "level": 20,
+   "measured": 642,
+   "questie": 494
+  },
+  {
+   "npc_id": 3728,
+   "level": 19,
+   "measured": 572,
+   "questie": 379
+  },
+  {
+   "npc_id": 3730,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3730,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3732,
+   "level": 18,
+   "measured": 521,
+   "questie": 377
+  },
+  {
+   "npc_id": 3732,
+   "level": 19,
+   "measured": 572,
+   "questie": 404
+  },
+  {
+   "npc_id": 3733,
+   "level": 18,
+   "measured": 521,
+   "questie": 417
+  },
+  {
+   "npc_id": 3733,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3734,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3774,
+   "level": 22,
+   "measured": 746,
+   "questie": 573
+  },
+  {
+   "npc_id": 3816,
+   "level": 18,
+   "measured": 521,
+   "questie": 417
+  },
+  {
+   "npc_id": 3816,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3819,
+   "level": 20,
+   "measured": 642,
+   "questie": 494
+  },
+  {
+   "npc_id": 3819,
+   "level": 21,
+   "measured": 691,
+   "questie": 531
+  },
+  {
+   "npc_id": 3823,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3823,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3986,
+   "level": 25,
+   "measured": 927,
+   "questie": 573
+  },
+  {
+   "npc_id": 6466,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 12319,
+   "level": 14,
+   "measured": 345,
+   "questie": 263
+  },
+  {
+   "npc_id": 12320,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  }
+ ],
+ "questie_correction": {
+  "method": "médiane par niveau des rapports PV mesuré / PV Questie (PNJ normaux) ; droite des moindres carrés sur les médianes > 1 ; rapport hors mesure = max(1, droite)",
+  "levels": {
+   "1": {
+    "ratio": 1.0,
+    "n_pairs": 4
+   },
+   "2": {
+    "ratio": 1.0,
+    "n_pairs": 3
+   },
+   "3": {
+    "ratio": 1.0,
+    "n_pairs": 2
+   },
+   "4": {
+    "ratio": 1.0,
+    "n_pairs": 1
+   },
+   "6": {
+    "ratio": 1.0,
+    "n_pairs": 1
+   },
+   "7": {
+    "ratio": 1.0,
+    "n_pairs": 1
+   },
+   "9": {
+    "ratio": 1.0227272727272727,
+    "n_pairs": 1
+   },
+   "10": {
+    "ratio": 1.0505050505050506,
+    "n_pairs": 4
+   },
+   "11": {
+    "ratio": 1.0765765765765767,
+    "n_pairs": 7
+   },
+   "12": {
+    "ratio": 1.1012145748987854,
+    "n_pairs": 9
+   },
+   "13": {
+    "ratio": 1.1245421245421245,
+    "n_pairs": 6
+   },
+   "14": {
+    "ratio": 1.15,
+    "n_pairs": 4
+   },
+   "15": {
+    "ratio": 1.173780487804878,
+    "n_pairs": 1
+   },
+   "16": {
+    "ratio": 1.3138461538461539,
+    "n_pairs": 1
+   },
+   "17": {
+    "ratio": 1.2253886010362693,
+    "n_pairs": 4
+   },
+   "18": {
+    "ratio": 1.249400479616307,
+    "n_pairs": 5
+   },
+   "19": {
+    "ratio": 1.2739420935412027,
+    "n_pairs": 7
+   },
+   "20": {
+    "ratio": 1.2995867768595042,
+    "n_pairs": 4
+   },
+   "22": {
+    "ratio": 1.3019197207678883,
+    "n_pairs": 1
+   }
+  },
+  "fit": {
+   "slope": 0.023805491386132475,
+   "intercept": 0.8228887385415422,
+   "knee_level": 7.4399330215729655,
+   "points": 13
+  },
+  "range": [
+   1,
+   22
+  ],
+  "excluded": [
+   {
+    "npc_id": 2163,
+    "name": "Thistle Bear",
+    "level": 11,
+    "ratio": 1.0755395683453237
+   },
+   {
+    "npc_id": 2165,
+    "name": "Grizzled Thistle Bear",
+    "level": 16,
+    "ratio": 1.2
+   },
+   {
+    "npc_id": 2165,
+    "name": "Grizzled Thistle Bear",
+    "level": 17,
+    "ratio": 1.2261410788381744
+   },
+   {
+    "npc_id": 3727,
+    "name": "Dark Strand Enforcer",
+    "level": 20,
+    "ratio": 1.2995951417004048
+   },
+   {
+    "npc_id": 3819,
+    "name": "Wildthorn Stalker",
+    "level": 20,
+    "ratio": 1.2995951417004048
+   },
+   {
+    "npc_id": 3819,
+    "name": "Wildthorn Stalker",
+    "level": 21,
+    "ratio": 1.3013182674199624
+   },
+   {
+    "npc_id": 3986,
+    "name": "Sarilus Foulborne",
+    "level": 25,
+    "ratio": 1.617801047120419
+   }
+  ]
+ },
+ "inversions": [
+  {
+   "level": 56,
+   "value": 6399,
+   "previous_level": 55,
+   "previous": 7245
+  },
+  {
+   "level": 60,
+   "value": 7420,
+   "previous_level": 59,
+   "previous": 8573
+  }
+ ],
+ "curve_excluded": [
+  {
+   "npc_id": 2163,
+   "name": "Thistle Bear",
+   "levels": [
+    11
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 2165,
+   "name": "Grizzled Thistle Bear",
+   "levels": [
+    16,
+    17
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 3727,
+   "name": "Dark Strand Enforcer",
+   "levels": [
+    20
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 3819,
+   "name": "Wildthorn Stalker",
+   "levels": [
+    20,
+    21
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  }
+ ],
+ "notes": [
+  "npcs : PNJ observés seulement (jamais la base Questie) ; questie_hp : valeur de Questie au même niveau",
+  "hp_by_level : médiane des PNJ normaux (rang Questie 0 ou inconnu) ; journal d'abord, sinon Questie corrigé (questie_hp × ratio ; probable dans questie_correction.range, suppose au-delà)",
+  "inversions : niveaux dont la valeur est sous celle du niveau précédent (listées, jamais lissées)",
+  "créatures invoquées (propriétaire non nul dans le bloc avancé) exclues"
+ ]
+}

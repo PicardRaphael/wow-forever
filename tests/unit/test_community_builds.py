@@ -5,16 +5,21 @@ non modélisée avec son entrée du registre, source douteuse avec son motif). A
 `forever/data/`."""
 
 import datetime as dt
+import hashlib
 import json
+import shutil
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REGISTRY_PATH, read_json
+from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REGISTRY_PATH, isolated_deps, read_json
 
 from forever.engine.talents import check_build
+from forever.gamedata import load_game_data
+from forever.manifest import write_manifest
 from forever.registry import load
 from forever.sim.community import community_gap
 
 FIXTURE = FIXTURES / "community" / "mage_builds.json"
+MONSTERS_COPY = FIXTURES / "community" / "monsters.json"  # PV des monstres de la comparaison (gelés)
 KINDS = ("concorde", "mecanique_non_modelisee", "source_douteuse")
 CONTEXTS = ("leveling", "dungeon", "raid", "pvp")
 
@@ -76,7 +81,25 @@ def test_every_gap_is_explained(game_data, doc):
             assert e["kind"] == "source_douteuse" and "illégal" in e["motif"], b["id"]
 
 
-def test_gaps_are_computed_by_the_engine(game_data, doc):
+@pytest.fixture(scope="module")
+def frozen_game_data(tmp_path_factory):
+    """Données installées, PV des monstres remplacés par ceux de la comparaison (copie écrite par le script) : une
+    nouvelle mesure des journaux ne change pas les écarts attendus (2026-10-02)."""
+    tmp = tmp_path_factory.mktemp("community")
+    data = tmp / "data"
+    shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
+    shutil.copyfile(MONSTERS_COPY, data / LOCAL_VERSION / "monsters.json")
+    write_manifest(data)
+    return load_game_data(isolated_deps(tmp, data))
+
+
+def test_frozen_monsters_are_the_ones_of_the_comparison(doc):
+    assert hashlib.sha256(MONSTERS_COPY.read_bytes()).hexdigest() == doc["monsters_sha256"]
+    assert read_json(MONSTERS_COPY)["game_version"] == doc["game_version"]
+
+
+def test_gaps_are_computed_by_the_engine(frozen_game_data, doc):
+    game_data = frozen_game_data
     refs = {(r["context"], r["level"]): r for r in doc["references"]}
     for b in doc["builds"]:
         if not b["legal"]:

@@ -1,7 +1,8 @@
 """Fixture de comparaison avec les builds de la communauté (T05, bloc J) : lit le bloc JSON de
 docs/research/community-builds-mage.md, calcule nos builds de référence (optimiseur, préréglage rapide) pour chaque
 couple contexte-niveau, l'écart de chaque build (analytique et Monte Carlo apparié) et son explication, puis écrit
-tests/fixtures/community/mage_builds.json (LF) et le tableau « Comparaison avec nos builds » du document de recherche.
+tests/fixtures/community/mage_builds.json (LF) et le tableau « Comparaison avec nos builds » du document de recherche, avec la copie des PV des monstres utilisés
+(tests/fixtures/community/monsters.json).
 
 Hors ligne, déterministe (graine fixe). Aucune valeur communautaire n'entre dans forever/data/.
 
@@ -9,6 +10,7 @@ Usage : uv run python scripts/build_community_fixture.py"""
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import sys
@@ -31,6 +33,9 @@ from forever.sim.leveling_mc import mc_stats
 
 RESEARCH = ROOT / "docs" / "research" / "community-builds-mage.md"
 FIXTURE = ROOT / "tests" / "fixtures" / "community" / "mage_builds.json"
+# PV des monstres de la comparaison (copie de monsters.json installé) : le test recalcule les écarts sur ces PV-là,
+# une nouvelle mesure des journaux ne le touche pas (2026-10-02).
+MONSTERS_COPY = FIXTURE.parent / "monsters.json"
 SECTION = "## Comparaison avec nos builds (T05, bloc J)"
 PRESET = "rapide"
 MC_N = 100  # combats par Monte Carlo de la comparaison (paramètre de méthode)
@@ -198,7 +203,10 @@ def main() -> int:
         "references": [{"context": c, "level": lv, "points": refs[(c, lv)], "preset": PRESET} for c, lv in pairs],
         "builds": out,
     }
+    monsters = (deps.data_dir / gd.game_version / "monsters.json").read_bytes()
+    doc["monsters_sha256"] = hashlib.sha256(monsters).hexdigest()
     FIXTURE.parent.mkdir(parents=True, exist_ok=True)
+    MONSTERS_COPY.write_bytes(monsters)
     FIXTURE.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
     write_section(gd, doc)
     print(f"{len(out)} builds, {len(pairs)} références")
