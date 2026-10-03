@@ -1,0 +1,82 @@
+{
+  "a": "1.60.1.70170",
+  "b": "/home/runner/.cache/forever/candidates/1.60.1.70205",
+  "changes": [
+    {
+      "kind": "file",
+      "key": "_seed_spells.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "_seed_talents.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "_source_gunba_mage_tree.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "confirmed_changes.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "file",
+      "key": "revisions.json",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "talent",
+      "key": "hotStreak",
+      "change": "removed",
+      "field": null,
+      "old": null,
+      "new": null
+    },
+    {
+      "kind": "talent",
+      "key": "heatingUp",
+      "change": "added",
+      "field": null,
+      "old": null,
+      "new": null
+    }
+  ],
+  "counts": {
+    "talent": 2,
+    "spell": 0,
+    "file": 5
+  },
+  "provenance": {
+    "game_version": "1.60.1.70205",
+    "data_sha": "248befaa19b8",
+    "data_revision": 3,
+    "generated_at": "2026-10-03T11:38:33Z",
+    "freshness": "unknown",
+    "certainty": "suppose",
+    "assumptions": [
+      "fraîcheur jamais vérifiée (lancer `forever status`)",
+      "1.60.1.70205 : version candidate non installée (/home/runner/.cache/forever/candidates/1.60.1.70205)",
+      "1.60.1.70205 : fichiers hérités d'une version antérieure (_seed_racials.json, character_scaling.json, classes.json, decode_rules.json, leveling.json, mechanics.json, meta.json, monsters.json, origins.json, overrides.json, pet_rules.json, pets.json, pvp_items.json, pvp_rules.json, races.json, respec.json)",
+      "comparaison 1.60.1.70170 (données e7a5c1156df9) -> /home/runner/.cache/forever/candidates/1.60.1.70205 (données 248befaa19b8)"
+    ],
+    "registry_coverage": "53/129"
+  }
+}
