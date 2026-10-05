@@ -163,6 +163,7 @@ def effective(entries: Sequence[Entry], names: Mapping[int, str]) -> Resolved:
     dbreply: dict[str, int] = {}
     item_reply: dict[str, int] = {}
     unknown: dict[int, int] = {}
+    voided: dict[tuple[str, int], int] = {}  # poussée la plus haute d'une entrée sans valeur
     for e in entries:
         if e.table_hash == _TACT:
             continue
@@ -174,14 +175,17 @@ def effective(entries: Sequence[Entry], names: Mapping[int, str]) -> Resolved:
         table = names.get(e.table_hash)
         if table is None:
             unknown[e.table_hash] = unknown.get(e.table_hash, 0) + 1
-        elif e.status == Status.INVALID:
-            invalid.append(Listed(table, e.rec_id, e.push_id))
-        elif e.status == Status.NOTPUBLIC:
-            notpublic.append(Listed(table, e.rec_id, e.push_id))
+        elif e.status in (Status.INVALID, Status.NOTPUBLIC):
+            (invalid if e.status == Status.INVALID else notpublic).append(Listed(table, e.rec_id, e.push_id))
+            voided[(table, e.rec_id)] = max(voided.get((table, e.rec_id), e.push_id), e.push_id)
         else:
             key = (table, e.rec_id)
             if key not in applicable or e.push_id >= applicable[key].push_id:
                 applicable[key] = e
+    # une entrée sans valeur d'une poussée plus haute rend caduque la valeur plus ancienne : rien n'est appliqué
+    for key, push in voided.items():
+        if key in applicable and applicable[key].push_id < push:
+            del applicable[key]
     return Resolved(applicable, invalid, notpublic, dbreply, item_reply, unknown)
 
 

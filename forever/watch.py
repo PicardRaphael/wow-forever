@@ -192,8 +192,13 @@ def _dbcache_event(deps: Deps, path: Path, version: str | None, sources: dict[st
 
     try:
         cache = dbcache.read_dbcache(path)
-    except DataSchemaError:  # fichier en cours d'écriture par le client ou tronqué : relu au passage suivant
-        return None
+    except DataSchemaError as exc:  # format inconnu, ou fichier tronqué : signalé, relu quand il change
+        return {
+            "kind": "hotfixes_dbcache",
+            "pending": 0,
+            "detail": f"DBCache.bin illisible ({exc.message})",
+            "actions": [_action("forever hotfixes", False, "relire DBCache.bin et Hotfix.log")],
+        }
     if version is None or not version.endswith(f".{cache.build}"):
         return {
             "kind": "hotfixes_dbcache",
@@ -210,10 +215,16 @@ def _dbcache_event(deps: Deps, path: Path, version: str | None, sources: dict[st
     absent = {
         (d.get("push"), d.get("table"), d.get("rec_id")) for d in block.get("listed", {}).get("delete_absent", [])
     }
+    raw_listed = block.get("listed")
+    listed: dict[str, Any] = raw_listed if isinstance(raw_listed, dict) else {}
+    skipped = set(listed.get("unvalidated") or {}) | set(listed.get("not_loaded") or {})
     pending = [
         (t, r)
         for (t, r), e in applicable.items()
-        if t in TABLES and (e.push_id, t, r, e.unique_id) not in done and (e.push_id, t, r) not in absent
+        if t in TABLES
+        and t not in skipped
+        and (e.push_id, t, r, e.unique_id) not in done
+        and (e.push_id, t, r) not in absent
     ]
     if not pending:
         return None

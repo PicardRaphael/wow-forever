@@ -2115,6 +2115,11 @@ def _dbd_layouts(
     """Dispositions : fichier dérivé (`--dbd-layouts`) ou relevé de WoWDBDefs du cache (`forever fetch --dbd`)."""
     if option:
         doc = json.loads(Path(option).read_text(encoding="utf-8"))
+        if doc.get("build") != version:
+            raise InvalidArgumentError(
+                f"Dispositions du build {doc.get('build')}, version demandée {version} : jamais un build voisin.",
+                "donner les dispositions du même build, ou relever WoWDBDefs : forever fetch --dbd",
+            )
         return layouts_from_json(doc), {"repo": doc.get("repo"), "commit": doc.get("commit"), "files": {}}
     return load_dbd_layouts(deps.cache_dir, version, dbd_tables(rules))
 

@@ -1604,7 +1604,8 @@ class _Hotfixes:
         return (
             f"correctifs du serveur (DBCache.bin, build {source.cache.build}) : {len(applied)} enregistrement(s) "
             f"appliqué(s) dont {changed} qui change(nt) une valeur, poussée(s) {pushes}, {entities} entité(s) "
-            f"touchée(s) ; non lues par le pipeline : {', '.join(listed['not_loaded']) or 'aucune'}"
+            f"touchée(s) ; non lues par le pipeline : {', '.join(listed['not_loaded']) or 'aucune'} ; "
+            f"dispositions non validées (non appliquées) : {', '.join(listed['unvalidated']) or 'aucune'}"
         )
 
 
@@ -1746,7 +1747,9 @@ def decode_version(
         "du masque) et effets de Hunter Pet Scaling : sens probable",
     }
     sources = {
-        **{k: v for k, v in local_sources.items() if k != "files"},
+        **{
+            k: v for k, v in local_sources.items() if k not in ("files", "hotfixes")
+        },  # T08c : correctifs propres à chaque candidate
         "game_version": version,
         "collected_at": format_utc(deps.now())[:10],
         "candidate": True,
@@ -1795,6 +1798,10 @@ def decode_version(
     if hot.source is not None:
         docs = {"talents.json": talents, "spells.json": spells, "spell_scaling.json": scaling, **decoded_classes}
         extra_notes.append(hot.finish(docs, inherited, sources))
+    elif "origins.json" in inherited:
+        # sans correctifs, aucune valeur n'en vient : les règles `correctif_serveur` héritées ne sont jamais gardées
+        origins = inherited["origins.json"]
+        origins["rules"] = [r for r in origins.get("rules", []) if r.get("origin") != SERVER_ORIGIN]
     if out.exists():
         shutil.rmtree(out)
     vdir = out / version

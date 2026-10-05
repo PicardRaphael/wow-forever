@@ -364,6 +364,8 @@ def validate_layout(
     references_ok = None if checked == 0 else resolved / checked >= min_ratio
     if references_ok is False:
         reasons.append(f"références non résolues ({checked - resolved}/{checked})")
+    if rows and total == 0 and checked == 0:
+        reasons.append("aucune ligne du build comparable ni référence contrôlée : disposition non prouvée")
     summary = (
         f"disposition {layout.layout} validée : {len(rows)} entrée(s) décodée(s), {compared} comparée(s)"
         + (f", {ratio:.0%} des valeurs égales au build" if ratio is not None else "")
