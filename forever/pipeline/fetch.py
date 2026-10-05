@@ -248,3 +248,63 @@ def fetch_tables(
     if failures:
         raise FetchFailedError(f"Téléchargement impossible pour {version} : {' ; '.join(failures)}.")
     return results
+
+
+# --- Définitions de structure des tables (WoWDBDefs, T08c, bloc B) -----------------------------------------------
+
+DBD_REPO = "wowdev/WoWDBDefs"
+DBD_COMMIT_URL = "https://api.github.com/repos/wowdev/WoWDBDefs/commits/master"
+DBD_FILE_URL = "https://raw.githubusercontent.com/wowdev/WoWDBDefs/{commit}/definitions/{table}.dbd"
+DBD_LICENSE_URL = "https://raw.githubusercontent.com/wowdev/WoWDBDefs/{commit}/LICENSE"
+DBD_DIR = "dbd"
+DBD_INDEX = "dbd.json"
+DBD_EXTRA_TABLES = ("TraitNodeGroupXTraitNode",)  # corrigée par le serveur, listée sans être appliquée
+
+
+class DbdFetch(TypedDict):
+    table: str
+    url: str
+    sha256: str
+    bytes: int
+    from_cache: bool
+
+
+class DbdResult(TypedDict):
+    repo: str
+    commit: str
+    version: str
+    fetched_at: str
+    license: dict[str, Any] | None
+    files: list[DbdFetch]
+    index: str
+
+
+def dbd_url(commit: str, table: str) -> str:
+    raise NotImplementedError
+
+
+def dbd_dir(cache_dir: Path) -> Path:
+    raise NotImplementedError
+
+
+def dbd_tables(rules: Mapping[str, Any]) -> list[str]:
+    raise NotImplementedError
+
+
+def looks_like_dbd(body: bytes) -> bool:
+    raise NotImplementedError
+
+
+def read_dbd_index(cache_dir: Path) -> dict[str, Any] | None:
+    raise NotImplementedError
+
+
+def fetch_dbd(
+    deps: Deps,
+    version: str,
+    tables: Sequence[str],
+    *,
+    commit: str | None = None,
+    refresh: bool = False,
+) -> DbdResult:
+    raise NotImplementedError
