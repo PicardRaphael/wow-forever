@@ -73,7 +73,15 @@ from forever.pipeline.client_builds import (
 from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
 from forever.pipeline.decode import Candidate, decode_version, load_rules
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
-from forever.pipeline.fetch import DEFAULT_LOCALE, TableFetch, fetch_gametables, fetch_tables, wago_dir
+from forever.pipeline.fetch import (
+    DEFAULT_LOCALE,
+    TableFetch,
+    dbd_tables,
+    fetch_dbd,
+    fetch_gametables,
+    fetch_tables,
+    wago_dir,
+)
 from forever.pipeline.install import InstallRefusedError, apply_install, plan_install, render_install_report
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
 from forever.pipeline.measure import (
@@ -187,6 +195,10 @@ def build_parser() -> argparse.ArgumentParser:
     fetch.add_argument(
         "--gametables", action="store_true", help="GameTables de decode_rules.json (api/casc, T08b) au lieu des tables"
     )
+    fetch.add_argument(
+        "--dbd", action="store_true", help="définitions de structure des tables (WoWDBDefs, commit épinglé, T08c)"
+    )
+    fetch.add_argument("--dbd-commit", help="commit de WoWDBDefs à épingler (défaut : index du cache, sinon master)")
     fetch.add_argument("--offline", action="store_true", help="refuser tout appel réseau")
     fetch.add_argument("--json", action="store_true", help="sortie JSON")
 
@@ -859,6 +871,8 @@ def _cmd_fetch(deps: Deps, args: argparse.Namespace) -> int:
     results: list[TableFetch] = []
     if args.gametables:
         return _fetch_gametables(deps, args)
+    if args.dbd:
+        return _fetch_dbd(deps, args)
     if args.tables:
         locales = _split(args.locale) if args.locale else [DEFAULT_LOCALE]
         results = fetch_tables(
@@ -882,6 +896,27 @@ def _cmd_fetch(deps: Deps, args: argparse.Namespace) -> int:
     ]
     payload = {"version": args.version, "tables": results, "provenance": provenance}
     _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _fetch_dbd(deps: Deps, args: argparse.Namespace) -> int:
+    _, rules = load_rules(deps.data_dir)
+    tables = _split(args.tables) if args.tables else dbd_tables(rules)
+    res = fetch_dbd(deps, args.version, tables, commit=args.dbd_commit, refresh=args.refresh)
+    provenance = local_provenance(deps)
+    downloaded = sum(1 for f in res["files"] if not f["from_cache"])
+    licence = (res["license"] or {}).get("first_line", "non lue")
+    lines = [
+        (
+            f"Définitions {res['repo']} au commit {res['commit'][:12]} : {len(res['files'])} table(s), "
+            f"{downloaded} téléchargée(s) ; licence : {licence}"
+        ),
+        f"  index : {res['index']}",
+    ]
+    lines += [
+        f"  {f['table']} · {f['bytes']} octets · {'cache' if f['from_cache'] else 'téléchargée'}" for f in res["files"]
+    ]
+    _emit({**res, "provenance": provenance}, lines, provenance, args.json)
     return EXIT_OK
 
 

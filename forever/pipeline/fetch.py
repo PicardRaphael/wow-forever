@@ -258,6 +258,7 @@ DBD_FILE_URL = "https://raw.githubusercontent.com/wowdev/WoWDBDefs/{commit}/defi
 DBD_LICENSE_URL = "https://raw.githubusercontent.com/wowdev/WoWDBDefs/{commit}/LICENSE"
 DBD_DIR = "dbd"
 DBD_INDEX = "dbd.json"
+_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 DBD_EXTRA_TABLES = ("TraitNodeGroupXTraitNode",)  # corrigée par le serveur, listée sans être appliquée
 
 
@@ -280,23 +281,58 @@ class DbdResult(TypedDict):
 
 
 def dbd_url(commit: str, table: str) -> str:
-    raise NotImplementedError
+    return DBD_FILE_URL.format(commit=commit, table=table)
 
 
 def dbd_dir(cache_dir: Path) -> Path:
-    raise NotImplementedError
+    return cache_dir / DBD_DIR
 
 
 def dbd_tables(rules: Mapping[str, Any]) -> list[str]:
-    raise NotImplementedError
+    """Tables dont la structure est relevée : celles que le projet lit (`decode_rules.json`) et `DBD_EXTRA_TABLES`."""
+    from forever.pipeline.dbcache import known_tables
+
+    return sorted(known_tables(rules) | set(DBD_EXTRA_TABLES))
 
 
 def looks_like_dbd(body: bytes) -> bool:
-    raise NotImplementedError
+    """Texte UTF-8 dont la première ligne non vide est `COLUMNS` (refuse une page HTML, un JSON ou un « 404 »)."""
+    try:
+        text = body.decode("utf-8-sig")
+    except UnicodeDecodeError:
+        return False
+    first = next((line.strip() for line in text.splitlines() if line.strip()), "")
+    return first == "COLUMNS"
 
 
 def read_dbd_index(cache_dir: Path) -> dict[str, Any] | None:
-    raise NotImplementedError
+    try:
+        doc = json.loads((dbd_dir(cache_dir) / DBD_INDEX).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    if not isinstance(doc, dict) or not _COMMIT_RE.fullmatch(str(doc.get("commit", ""))):
+        return None
+    if not isinstance(doc.get("files"), dict):
+        return None
+    return doc
+
+
+def _write_dbd_index(cache_dir: Path, doc: Mapping[str, Any]) -> None:
+    path = dbd_dir(cache_dir) / DBD_INDEX
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes((json.dumps(doc, indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+
+
+def _pinned_commit(deps: Deps) -> str:
+    headers = {"User-Agent": USER_AGENT, "Accept": "application/vnd.github+json"}
+    try:
+        body = deps.http_get(DBD_COMMIT_URL, headers, FETCH_TIMEOUT)
+        sha = json.loads(body.decode("utf-8")).get("sha", "")
+    except (OSError, ValueError, AttributeError) as exc:
+        raise FetchFailedError(f"Commit de {DBD_REPO} illisible ({exc}).") from exc
+    if not isinstance(sha, str) or not _COMMIT_RE.fullmatch(sha):
+        raise FetchFailedError(f"Commit de {DBD_REPO} absent de la réponse de {DBD_COMMIT_URL}.")
+    return sha
 
 
 def fetch_dbd(
@@ -307,4 +343,67 @@ def fetch_dbd(
     commit: str | None = None,
     refresh: bool = False,
 ) -> DbdResult:
-    raise NotImplementedError
+    """Télécharge le `.dbd` de chaque table au commit épinglé de WoWDBDefs, et la licence du dépôt.
+
+    Commit : `commit` s'il est donné, sinon celui de l'index du cache (`<cache>/dbd/dbd.json`), sinon celui de
+    `master` lu par l'API GitHub (épinglé dans l'index) ; `refresh` relit `master`. Fichiers rangés dans
+    `<cache>/dbd/<commit>/<Table>.dbd` ; un fichier du cache conforme à son empreinte n'est pas retéléchargé. Les
+    tables réussies sont écrites même si d'autres échouent ; les échecs sont signalés ensemble (FetchFailedError)."""
+    _check_arguments(version, tables, [DEFAULT_LOCALE])
+    if commit is not None and not _COMMIT_RE.fullmatch(commit):
+        raise InvalidArgumentError(f"Commit mal formé : « {commit} ».", "donner l'empreinte complète (40 caractères)")
+    if deps.offline:
+        raise OfflineError("le téléchargement des définitions de WoWDBDefs")
+    index = read_dbd_index(deps.cache_dir)
+    pinned = commit or (None if refresh or index is None else str(index["commit"])) or _pinned_commit(deps)
+    if index is None or index.get("commit") != pinned:
+        index = {"schema_version": 1, "repo": DBD_REPO, "commit": pinned, "files": {}, "license": None}
+    index = {**index, "version": version, "fetched_at": index.get("fetched_at") or format_utc(deps.now())}
+    folder = dbd_dir(deps.cache_dir) / pinned
+    headers = {"User-Agent": USER_AGENT, "Accept": "text/plain"}
+    results: list[DbdFetch] = []
+    failures: list[str] = []
+    for table in tables:
+        path = folder / f"{table}.dbd"
+        url = dbd_url(pinned, table)
+        entry = index["files"].get(table)
+        if not refresh and _cached(path, entry) is not None:
+            results.append({"table": table, "url": url, **entry, "from_cache": True})  # type: ignore[typeddict-item]
+            continue
+        try:
+            body = deps.http_get(url, headers, FETCH_TIMEOUT)
+        except OSError as exc:
+            failures.append(f"{table} ({exc})")
+            continue
+        if not looks_like_dbd(body):
+            failures.append(f"{table} (réponse qui n'est pas un .dbd)")
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(body)
+        entry = {"sha256": hashlib.sha256(body).hexdigest(), "bytes": len(body)}
+        index["files"][table] = entry
+        _write_dbd_index(deps.cache_dir, index)
+        results.append({"table": table, "url": url, **entry, "from_cache": False})  # type: ignore[typeddict-item]
+    if index.get("license") is None:
+        try:
+            body = deps.http_get(DBD_LICENSE_URL.format(commit=pinned), headers, FETCH_TIMEOUT)
+        except OSError as exc:
+            failures.append(f"LICENSE ({exc})")
+        else:
+            (folder / "LICENSE").parent.mkdir(parents=True, exist_ok=True)
+            (folder / "LICENSE").write_bytes(body)
+            text = body.decode("utf-8", errors="replace")
+            first = next((line.strip() for line in text.splitlines() if line.strip()), "")
+            index["license"] = {"sha256": hashlib.sha256(body).hexdigest(), "first_line": first}
+    _write_dbd_index(deps.cache_dir, index)
+    if failures:
+        raise FetchFailedError(f"Définitions de {DBD_REPO} ({pinned[:12]}) impossibles : {' ; '.join(failures)}.")
+    return {
+        "repo": DBD_REPO,
+        "commit": pinned,
+        "version": version,
+        "fetched_at": str(index["fetched_at"]),
+        "license": index.get("license"),
+        "files": results,
+        "index": str(dbd_dir(deps.cache_dir) / DBD_INDEX),
+    }
