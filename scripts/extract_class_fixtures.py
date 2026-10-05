@@ -105,6 +105,9 @@ def write(path: Path, header: list[str], rows: Iterable[dict[str, str]]) -> int:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--version", default="1.60.1.70124")
+    parser.add_argument(
+        "--dbcache", type=Path, help="fixture DBCache.bin (T08c) : garder aussi les lignes des enregistrements corrigés"
+    )
     args = parser.parse_args()
     rules = json.loads((DATA_DIR / args.version / "decode_rules.json").read_text(encoding="utf-8"))
     src = wago_dir(default_cache_dir(), args.version)
@@ -141,6 +144,21 @@ def main() -> int:
 
     names = {r["ID"]: r["Name_lang"] for r in rows["SpellName"]}
     spells = {r["SpellID"] for r in defs}
+    # T08c, bloc B : enregistrements visés par les entrées de la fixture DBCache.bin (tous statuts), pour comparer la
+    # ligne du build à celle du correctif ; leurs sorts entrent dans la fermeture.
+    extra: dict[str, set[str]] = {}
+    if args.dbcache is not None:
+        from forever.pipeline.dbcache import read_dbcache, table_names
+
+        known = table_names([*names_all, *rules.get("character_tables", [])])
+        for e in read_dbcache(args.dbcache).entries:
+            if e.table_hash in known and e.push_id >= 0:
+                extra.setdefault(known[e.table_hash], set()).add(str(e.rec_id))
+        for table, ids in extra.items():
+            if table in ("Spell", "SpellName"):
+                spells |= ids & set(names)
+            elif table in rows and rows[table] and "SpellID" in rows[table][0]:
+                spells |= {r["SpellID"] for r in rows[table] if r["ID"] in ids and r["SpellID"] in names}
     mage_lines = {str(v) for v in rules["skill_lines"].values()}
     followed = set(rules["spells"].values()) | set(rules.get("utility_spells", {}).get("spells", {}).values())
     spells |= {
@@ -208,6 +226,10 @@ def main() -> int:
     for name in names_all:
         if name not in out:
             out[name] = by(name, "SpellID", spells)
+    for name, ids in extra.items():
+        if name in out:
+            kept = {r["ID"] for r in out[name]}
+            out[name] = [r for r in rows[name] if r["ID"] in kept or r["ID"] in ids]
     for name in names_all:
         n = write(dst / "enUS" / f"{name}.csv", t[name][0], out[name])
         print(f"enUS/{name} : {n} lignes")

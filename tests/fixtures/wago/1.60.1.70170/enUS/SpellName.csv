@@ -1,0 +1,1385 @@
+ID,Name_lang
+10,Blizzard
+17,Power Word: Shield
+100,Charge
+116,Frostbolt
+118,Polymorph
+120,Cone of Cold
+122,Frost Nova
+133,Fireball
+168,Frost Armor
+339,Entangling Roots
+370,Purge
+408,Kidney Shot
+475,Remove Lesser Curse
+519,Ghost Wolf
+526,Cure Poison
+527,Dispel Magic
+605,Mind Control
+642,Divine Shield
+663,Fear
+676,Disarm
+710,Banish
+853,Hammer of Justice
+871,Shield Wall
+1022,Blessing of Protection
+1044,Blessing of Freedom
+1098,Subjugate Demon
+1449,Arcane Explosion
+1499,Freezing Trap
+1680,Whirlwind
+1715,Hamstring
+1719,Recklessness
+1742,Cower
+1766,Kick
+1776,Gouge
+1833,Cheap Shot
+1850,Dash
+1853,Growl
+1953,Blink
+1988,Scatter Shot
+2070,Sap
+2094,Blind
+2120,Flamestrike
+2136,Fire Blast
+2139,Counterspell
+2481,Find Treasure
+2637,Hibernate
+2782,Remove Curse
+2948,Scorch
+2983,Sprint
+3045,Rapid Fire
+3261,Ignite
+3355,Freezing Trap Effect
+4086,Evasion
+4187,Great Stamina
+4511,Phase Shift
+4987,Cleanse
+5116,Concussive Shot
+5143,Arcane Missiles
+5149,Beast Training
+5211,Bash
+5227,Underwater Breathing
+5246,Intimidating Shout
+5302,Defensive State
+5484,Howl of Terror
+5570,Insect Swarm
+5579,Immune Root/Snare/Stun
+5923,Holy Power
+6057,Wand Specialization
+6117,Mage Armor
+6136,Chilled
+6150,Quick Shots
+6195,Serpentbloom Snake
+6280,Pet Hardiness
+6307,Blood Pact
+6311,Pet Aggression
+6328,Pet Recovery
+6346,Fear Ward
+6358,Seduction
+6443,Pet Resistance
+6552,Pummel
+6615,Free Action
+6726,Silence
+6788,Weakened Soul
+6789,Death Coil
+7268,Arcane Missile
+7744,Will of the Forsaken
+7922,Charge Stun
+8042,Earth Shock
+8056,Frost Shock
+8122,Psychic Scream
+8177,Grounding Totem
+8178,Grounding Totem Effect
+8179,Grounding Totem Passive
+9453,Unyielding Faith
+9799,Eye for an Eye
+10060,Power Infusion
+11069,Improved Fireball
+11070,Improved Frostbolt
+11071,Frostbite
+11078,Wake of Fire
+11083,Burning Soul
+11094,Improved Fire Ward
+11095,Improved Scorch
+11100,Flame Throwing
+11103,Impact
+11108,Improved Flamestrike
+11113,Blast Wave
+11115,Critical Mass
+11129,Combustion
+11151,Piercing Ice
+11160,Frost Channeling
+11165,Improved Frost Nova
+11170,Shatter
+11175,Permafrost
+11180,Winter's Chill
+11185,Improved Blizzard
+11189,Frost Warding
+11190,Improved Cone of Cold
+11207,Ice Shards
+11210,Arcane Subtlety
+11213,Arcane Concentration
+11222,Arcane Focus
+11232,Arcane Mind
+11237,Improved Channeling
+11242,Arcane Impact
+11247,Arcane Geometry
+11252,Arcane Shielding
+11255,Improved Counterspell
+11366,Pyroblast
+11426,Ice Barrier
+11958,Ice Block
+12042,Arcane Power
+12043,Presence of Mind
+12162,Deep Wounds
+12163,Two-Handed Weapon Specialization
+12282,Improved Heroic Strike
+12285,Improved Charge
+12286,Improved Rend
+12287,Improved Thunder Clap
+12289,Improved Hamstring
+12290,Improved Overpower
+12292,Sweeping Strikes
+12295,Improved Tactical Mastery
+12296,Anger Management
+12297,Anticipation
+12298,Shield Specialization
+12301,Improved Bloodrage
+12308,Improved Sunder Armor
+12311,Improved Shield Bash
+12312,Improved Shield Wall
+12313,Improved Disarm
+12319,Flurry
+12320,Cruelty
+12321,Booming Voice
+12322,Unbridled Wrath
+12328,Death Wish
+12329,Improved Cleave
+12472,Cold Snap
+12536,Clearcasting
+12792,Defiance
+12797,Improved Revenge
+12809,Concussion Blow
+12862,Improved Slam
+12962,Iron Will
+12975,Last Stand
+13705,Precision
+13713,Deflection
+13715,Dual Wield Specialization
+13732,Improved Sinister Strike
+13741,Improved Gouge
+13742,Endurance
+13743,Improved Sprint
+13750,Adrenaline Rush
+13754,Improved Kick
+13877,Blade Flurry
+13958,Master of Deception
+13975,Camouflage
+13976,Initiative
+13981,Elusiveness
+13983,Setup
+14057,Opportunity
+14079,Improved Ambush
+14082,Dirty Deeds
+14084,Improved Distract
+14113,Improved Poisons
+14128,Lethality
+14138,Malice
+14143,Remorseless
+14144,Remorseless Attacks
+14156,Ruthlessness
+14158,Murder
+14162,Improved Eviscerate
+14165,Improved Slice and Dice
+14168,Improved Expose Armor
+14171,Serrated Blades
+14174,Improved Kidney Shot
+14177,Cold Blood
+14179,Relentless Strikes
+14181,Relentless Strikes Effect
+14183,Premeditation
+14185,Preparation
+14186,Seal Fate
+14278,Ghostly Strike
+14520,Mental Agility
+14523,Silent Resolve
+14531,Martyrdom
+14747,Improved Inner Fire
+14748,Improved Power Word: Shield
+14750,Improved Mana Burn
+14751,Inner Focus
+14889,Holy Specialization
+14892,Inspiration
+14898,Spiritual Healing
+14901,Spiritual Guidance
+14908,Improved Renew
+14909,Searing Light
+14912,Improved Healing
+14913,Twilight Focus
+14983,Vigor
+15058,Arcane Instability
+15237,Holy Nova
+15257,Shadow Weaving
+15259,Darkness
+15260,Shadow Focus
+15270,Spirit Tap
+15273,Improved Mind Blast
+15274,Improved Fade
+15275,Improved Shadow Word: Pain
+15286,Vampiric Embrace
+15318,Shadow Affinity
+15392,Improved Psychic Scream
+15407,Mind Flay
+15473,Shadowform
+16035,Concussion
+16038,Call of Flame
+16039,Convection
+16040,Reverberation
+16043,Earth's Grasp
+16086,Improved Fire Nova
+16120,Call of Thunder
+16164,Elemental Focus
+16173,Totemic Focus
+16176,Ancestral Healing
+16177,Ancestral Fortitude
+16178,Purification
+16179,Tidal Focus
+16181,Healing Focus
+16182,Improved Healing Wave
+16184,Improved Reincarnation
+16187,Restorative Totems
+16188,Nature's Swiftness
+16190,Mana Tide Totem
+16191,Mana Tide
+16194,Tidal Mastery
+16255,Thundering Strikes
+16258,Guardian Totems
+16261,Improved Lightning Shield
+16262,Improved Ghost Wolf
+16266,Elemental Weapons
+16268,Spirit Weapons
+16487,Blood Craze
+16511,Hemorrhage
+16513,Vile Poisons
+16538,Bastion
+16578,Elemental Alacrity
+16757,Arctic Reach
+16814,Improved Wrath
+16819,Nature's Reach
+16821,Improved Moonfire
+16833,Natural Shapeshifter
+16845,Moonglow
+16850,Improved Starfire
+16880,Nature's Grace
+16896,Moonfury
+16918,Improved Entangling Roots
+16922,Starfire Stun
+16929,Thick Hide
+16940,Brutal Impact
+16942,Sharpened Claws
+16947,Feral Instinct
+16966,Shredding Attacks
+16972,Predatory Strikes
+16998,Savage Fury
+17002,Feral Swiftness
+17003,Heart of the Wild
+17007,Leader of the Pack
+17012,Devour Magic
+17056,Furor
+17063,Nature's Focus
+17069,Naturalist
+17074,Improved Regrowth
+17104,Gift of Nature
+17111,Improved Rejuvenation
+17118,Subtlety
+17123,Improved Tranquility
+17245,Overgrowth
+17253,Bite
+17322,Shadow Reach
+17364,Stormstrike
+17485,Ancestral Knowledge
+17778,Cataclysm
+17783,Fel Concentration
+17788,Bane
+17793,Improved Shadow Bolt
+17794,Shadow Vulnerability
+17810,Improved Corruption
+17877,Shadowburn
+17917,Destructive Reach
+17927,Agonizing Flames
+17941,Shadow Trance
+17959,Ruin
+18073,Pyroclasm
+18094,Nightfall
+18118,Aftermath
+18135,Intensity
+18182,Improved Life Tap
+18223,Curse of Exhaustion
+18265,Siphon Life
+18271,Shadow Mastery
+18288,Amplify Curse
+18425,Silenced - Kick
+18427,Aggression
+18462,Arcane Meditation
+18499,Berserker Rage
+18530,Divine Fury
+18551,Mental Strength
+18562,Swiftmend
+18694,Improved Imp
+18697,Demonic Embrace
+18703,Improved Health Funnel
+18705,Improved Voidwalker
+18708,Fel Domination
+18709,Master Summoner
+18731,Fel Vitality
+18754,Improved Sayaad
+18769,Unholy Power
+18788,Demonic Sacrifice
+18789,Burning Shadow
+18790,Fel Stamina
+18791,Touch of Fire
+18792,Fel Energy
+18814,OLDSoul Link Effect
+18827,Improved Bane of Agony
+19028,Soul Link
+19159,Savage Strikes
+19184,Entrapment
+19228,Improved Wing Clip
+19239,Clever Traps
+19244,Spell Lock
+19255,Survivalist
+19263,Deterrence
+19290,Surefooted
+19306,Counterattack
+19376,Survival Tactics
+19407,Improved Concussive Shot
+19416,Efficiency
+19426,Lethal Attacks
+19454,Improved Arcane Shot
+19461,Barrage
+19464,Improved Serpent Sting
+19485,Mortal Shots
+19498,Hawk Eye
+19507,Ranged Weapon Specialization
+19549,Improved Aspect of the Monkey
+19552,Deadly Aspects
+19572,Improved Mend Pet
+19574,Bestial Wrath
+19578,Spirit Bond
+19583,Endurance Training
+19590,Bestial Discipline
+19596,Bestial Swiftness
+19616,Unleashed Fury
+19658,Devour Magic Effect
+19675,Feral Charge
+19801,Tranquilizing Shot
+20066,Repentance
+20101,Benediction
+20117,Conviction
+20127,Redoubt
+20174,Guardian's Favor
+20177,Reckoning
+20196,One-Handed Weapon Specialization
+20205,Spiritual Focus
+20210,Illumination
+20216,Divine Favor
+20224,Improved Seals
+20237,Healing Light
+20257,Divine Intellect
+20262,Divine Strength
+20375,Seal of Command
+20468,Improved Righteous Fury
+20487,Improved Hammer of Justice
+20500,Improved Berserker Rage
+20502,Improved Execute
+20504,Improved Intercept
+20552,Cultivation
+20554,Berserking
+20557,Beast Slaying
+20572,Blood Fury
+20573,Hardiness
+20577,Cannibalize
+20580,Shadowmeld
+20585,Wisp Spirit
+20589,Escape Artist
+20591,Expansive Mind
+20593,Engineering Specialization
+20598,The Human Spirit
+20600,Perception
+20655,Barkskin
+20711,Spirit of Redemption
+21009,Quickness Passive
+22959,Fire Vulnerability
+23145,Dive
+23162,Harass
+23273,Immune Charm/Fear/Polymorph
+23602,Master of Defense
+23881,Bloodthirst
+24293,Improved Tracking
+24423,Demoralizing Screech
+24443,Improved Revive Pet
+24488,Shadow Resistance
+24493,Arcane Resistance
+24545,Natural Armor
+24858,Moonkin Form
+24905,Moonkin Form (Passive)
+24907,Moonkin Aura
+24968,Tranquil Spirit
+25076,Cobra Reflexes
+25771,Forbearance
+25891,Earthstrike
+25956,Improved Judgement
+26022,Pursuit of Justice
+26064,Shell Shield
+26090,Thunderstomp
+27789,Holy Reach
+27811,Blessed Recovery
+27828,Focused Casting
+27900,Spell Warding
+28574,Arcane Resilience
+28996,Elemental Warding
+28999,Elemental Reach
+29062,Eye of the Storm
+29074,Master of Elements
+29187,Natural Grace
+29206,Healing Way
+29438,Elemental Precision
+29441,Magic Absorption
+29787,Focused Rage
+30160,Elemental Devastation
+30812,Mental Quickness
+30919,Weapon Expertise
+400588,Missile Barrage
+400624,Heating Up
+400640,Ice Lance
+400647,Fingers of Frost
+401502,Frostfire Bolt
+401937,Binding Heal
+402000,Soul Warding
+402174,Penance
+402913,Enraged Regeneration
+403511,Improved Drains
+407995,Primal Bite
+408120,Wild Growth
+408248,Eclipse
+408438,Lightning Overload
+408498,Maelstrom Weapon
+408510,Water Shield
+412609,Deep Wound
+412732,Demonic Knowledge
+412751,Fire and Brimstone
+413479,Gladiator Stance Shield Passive
+414673,Gift of the Earthmother
+415140,Mental Dexterity
+415405,Rapid Killing
+415429,Hunter Pet Scaling
+416189,Warlock Pet Scaling
+417051,Natural Reaction
+425280,Renewed Hope
+425336,Rage of the Farseer
+425464,Demonic Pact
+426311,Flame
+426316,Shadow and Flame
+427712,Pandemic
+429144,Purifying Power
+431622,Divine Aegis
+435893,Gniodine Side Effect
+435895,Gniodine Dispel
+437032,Soul Harvest
+438273,PvP Trinket
+440529,Resourcefulness
+440870,Decimation
+457819,Echoes of Gladiator Stance
+1222988,Earthbound
+1223030,Shamanistic Focus
+1223031,Improved Stormstrike
+1223033,Mindfulness
+1223082,Nature's Majesty
+1223083,Nature's Splendor
+1223242,Predatory Instincts
+1223246,Rend and Tear
+1223755,Focused Fire
+1223984,Careful Aim
+1223987,Rapid Recuperation
+1224697,Sacred Duty
+1224716,Puncturing Wounds
+1224782,Dirty Tricks
+1225132,Twin Disciplines
+1225139,Improved Mind Flay
+1225177,Malediction
+1225214,Demonic Energies
+1225217,Improved Felhunter
+1225220,Molten Skin
+1225228,Bane of Havoc
+1227245,S03 - Item - Scarlet Enclave - Warrior - Protection 6P Bonus
+1234067,Gladiator's Cunning
+1237268,Holy Conduit
+1241057,Interrupted
+1259416,Walk on Air
+1259417,Walking on Air
+1259686,Skysight
+1259688,Elemental Blessing
+1259691,Energized
+1259705,Read Ley Line
+1259707,Elemental Insight
+1259710,Wind Blessed
+1259718,Will to Survive
+1259721,Big Game Hunter
+1259799,Elune's Light
+1259812,Eureka!
+1260189,Touch of the Grave
+1263099,Faster Attack I
+1263100,Faster Attack II
+1263102,Faster Attack III
+1263104,Faster Attack IV
+1263107,Faster Attack V
+1263109,Faster Attack VI
+1263110,Faster Attack VII
+1263113,Slower Attack II
+1263114,Slower Attack III
+1264478,Sonic Blast
+1264735,Pinch
+1265054,Mine!
+1265065,Savage Rend
+1284536,Holy Purpose
+1289681,Bloodthrill
+1293241,Summon Hawk
+1293695,Demonic Brand
+1299026,Shatter Curse
+1309631,Living Spirit
+1309950,Devouring Contagion
+1309957,Holy Precision
+1309969,Power in Light
+1310076,Early Demise
+1310222,Spearing Strike
+1310236,Boundless Rage
+1310315,Raging Blows
+1310317,Vanguard
+1310496,Survivalist's Discipline
+1310532,Expose Prey
+1310533,Lacerating Strikes
+1310612,Trickster's Dance
+1310627,Predator's Edge
+1310661,Improved Stings
+1310703,Venom
+1310710,Improved Backstab
+1310711,Flawless Execution
+1310721,Thousand Cuts
+1310735,Twist of Light
+1310897,Voice of Truth
+1310899,Reverence
+1310904,Divine Precision
+1310905,Consecrated Ground
+1310909,Light's Vigil
+1311015,Templar's Bulwark
+1311033,Iron Creed
+1311074,Sanctified Judgement
+1311084,Champion of the Light
+1311085,Instrument of Law
+1311087,Sacred Arbiter
+1314103,Improved Seal of Fury
+1316697,Wrack
+1317006,Litany of Light
+1317257,Strider Kick
+1322605,Shifting Power
+1322670,Improved Shifting Power
+6141,Blizzard
+8427,Blizzard
+10185,Blizzard
+10186,Blizzard
+10187,Blizzard
+1279949,Blizzard
+1279976,Blizzard
+1279977,Blizzard
+1279978,Blizzard
+1279979,Blizzard
+1279980,Blizzard
+592,Power Word: Shield
+600,Power Word: Shield
+3747,Power Word: Shield
+6065,Power Word: Shield
+6066,Power Word: Shield
+10898,Power Word: Shield
+10899,Power Word: Shield
+10900,Power Word: Shield
+10901,Power Word: Shield
+11647,Power Word: Shield
+20549,War Stomp
+9452,Vindication
+440667,Vindication
+1264758,Dismember
+1264927,Dismember
+1264929,Dismember
+1264930,Dismember
+1264933,Dismember
+1264937,Dismember
+1264939,Dismember
+1264970,Dismember
+1264971,Dismember
+1264972,Dismember
+6178,Charge
+7370,Charge
+7371,Charge
+11578,Charge
+20508,Charge
+26177,Charge
+26178,Charge
+26179,Charge
+26184,Charge
+26185,Charge
+26186,Charge
+26201,Charge
+26202,Charge
+27685,Charge
+28343,Charge
+205,Frostbolt
+837,Frostbolt
+7322,Frostbolt
+8406,Frostbolt
+8407,Frostbolt
+8408,Frostbolt
+10179,Frostbolt
+10180,Frostbolt
+10181,Frostbolt
+25304,Frostbolt
+12824,Polymorph
+12825,Polymorph
+12826,Polymorph
+13323,Polymorph
+28271,Polymorph
+28272,Polymorph
+8492,Cone of Cold
+10159,Cone of Cold
+10160,Cone of Cold
+10161,Cone of Cold
+865,Frost Nova
+6131,Frost Nova
+10230,Frost Nova
+143,Fireball
+145,Fireball
+3140,Fireball
+8400,Fireball
+8401,Fireball
+8402,Fireball
+10148,Fireball
+10149,Fireball
+10150,Fireball
+10151,Fireball
+25306,Fireball
+2947,Fire Shield
+8316,Fire Shield
+8317,Fire Shield
+11770,Fire Shield
+11771,Fire Shield
+7300,Frost Armor
+7301,Frost Armor
+1062,Entangling Roots
+5195,Entangling Roots
+5196,Entangling Roots
+9852,Entangling Roots
+9853,Entangling Roots
+11922,Entangling Roots
+8012,Purge
+25756,Purge
+8643,Kidney Shot
+8644,Kidney Shot
+1176,Remove Lesser Curse
+7302,Ice Armor
+7320,Ice Armor
+10219,Ice Armor
+10220,Ice Armor
+2645,Ghost Wolf
+8946,Cure Poison
+8947,Cure Poison
+615,Dispel Magic
+988,Dispel Magic
+23992,Fire Resistance
+24439,Fire Resistance
+24440,Fire Resistance
+24441,Fire Resistance
+24444,Fire Resistance
+24445,Fire Resistance
+24463,Fire Resistance
+24464,Fire Resistance
+627,Mind Control
+10911,Mind Control
+10912,Mind Control
+659,Divine Shield
+1020,Divine Shield
+5782,Fear
+6213,Fear
+6215,Fear
+6713,Disarm
+3110,Firebolt
+7799,Firebolt
+7800,Firebolt
+7801,Firebolt
+7802,Firebolt
+11762,Firebolt
+11763,Firebolt
+8994,Banish
+18647,Banish
+1265843,Web
+1265878,Web
+1265880,Web
+1265881,Web
+1265883,Web
+1265887,Web
+1265888,Web
+1265890,Web
+1265891,Web
+1265892,Web
+1264494,Swipe
+1264497,Swipe
+1264498,Swipe
+1264501,Swipe
+1264502,Swipe
+1264727,Swipe
+1264729,Swipe
+1264730,Swipe
+1264731,Swipe
+1264732,Swipe
+12299,Toughness
+16252,Toughness
+20143,Toughness
+20555,Regeneration
+14521,Meditation
+5588,Hammer of Justice
+5589,Hammer of Justice
+10308,Hammer of Justice
+13005,Hammer of Justice
+15062,Shield Wall
+16089,Elemental Fury
+5599,Blessing of Protection
+10278,Blessing of Protection
+442948,Blessing of Protection
+2975,Claw
+2976,Claw
+2977,Claw
+2980,Claw
+2981,Claw
+2982,Claw
+3009,Claw
+3010,Claw
+3666,Claw
+3667,Claw
+16827,Claw
+16828,Claw
+16829,Claw
+16830,Claw
+16831,Claw
+16832,Claw
+11725,Subjugate Demon
+11726,Subjugate Demon
+11727,Subjugate Demon
+1310705,Mutilate
+1310706,Mutilate
+1310707,Mutilate
+8437,Arcane Explosion
+8438,Arcane Explosion
+8439,Arcane Explosion
+10201,Arcane Explosion
+10202,Arcane Explosion
+14310,Freezing Trap
+14311,Freezing Trap
+27753,Freezing Trap
+12317,Enrage
+12880,Enrage
+462891,Whirlwind
+7372,Hamstring
+7373,Hamstring
+9080,Hamstring
+13847,Recklessness
+1747,Cower
+1748,Cower
+1749,Cower
+1750,Cower
+1751,Cower
+1753,Cower
+1754,Cower
+1755,Cower
+1756,Cower
+16697,Cower
+16698,Cower
+1767,Kick
+1768,Kick
+1769,Kick
+1775,Kick
+1777,Gouge
+8629,Gouge
+11285,Gouge
+11286,Gouge
+12540,Gouge
+6409,Cheap Shot
+9821,Dash
+23099,Dash
+23100,Dash
+23109,Dash
+23110,Dash
+23111,Dash
+23112,Dash
+18498,Silenced
+2649,Growl
+14916,Growl
+14917,Growl
+14918,Growl
+14919,Growl
+14920,Growl
+14921,Growl
+14922,Growl
+14923,Growl
+14924,Growl
+14925,Growl
+14926,Growl
+14927,Growl
+14514,Blink
+1310687,Sniper Shot
+19503,Scatter Shot
+6770,Sap
+11297,Sap
+21060,Blind
+2121,Flamestrike
+8422,Flamestrike
+8423,Flamestrike
+10215,Flamestrike
+10216,Flamestrike
+1279983,Flamestrike
+1279985,Flamestrike
+1279987,Flamestrike
+1279988,Flamestrike
+1279989,Flamestrike
+1279990,Flamestrike
+2137,Fire Blast
+2138,Fire Blast
+8412,Fire Blast
+8413,Fire Blast
+10197,Fire Blast
+10199,Fire Blast
+400616,Fire Blast
+400618,Fire Blast
+400619,Fire Blast
+400620,Fire Blast
+400621,Fire Blast
+400622,Fire Blast
+400623,Fire Blast
+3576,Counterspell
+18657,Hibernate
+18658,Hibernate
+29131,Bloodrage
+2786,Remove Curse
+8444,Scorch
+8445,Scorch
+8446,Scorch
+10205,Scorch
+10206,Scorch
+10207,Scorch
+8696,Sprint
+11305,Sprint
+26542,Sprint
+26543,Sprint
+28755,Rapid Fire
+24597,Furious Howl
+24599,Furious Howl
+24603,Furious Howl
+24604,Furious Howl
+24605,Furious Howl
+24607,Furious Howl
+24608,Furious Howl
+24609,Furious Howl
+11119,Ignite
+412538,Ignite
+412545,Ignite
+1234540,Ignite
+14308,Freezing Trap Effect
+14309,Freezing Trap Effect
+25999,Boar Charge
+1265038,Tendon Rip
+1265039,Tendon Rip
+1265040,Tendon Rip
+1265041,Tendon Rip
+1265042,Tendon Rip
+1265043,Tendon Rip
+1265045,Tendon Rip
+1265046,Tendon Rip
+1265047,Tendon Rip
+1265048,Tendon Rip
+24446,Frost Resistance
+24447,Frost Resistance
+24448,Frost Resistance
+24449,Frost Resistance
+24475,Frost Resistance
+24476,Frost Resistance
+24477,Frost Resistance
+24478,Frost Resistance
+5277,Evasion
+16934,Ferocity
+19598,Ferocity
+4188,Great Stamina
+4189,Great Stamina
+4190,Great Stamina
+4191,Great Stamina
+4192,Great Stamina
+4193,Great Stamina
+4194,Great Stamina
+4195,Great Stamina
+4196,Great Stamina
+4197,Great Stamina
+4198,Great Stamina
+4199,Great Stamina
+4200,Great Stamina
+4201,Great Stamina
+4202,Great Stamina
+5041,Great Stamina
+5042,Great Stamina
+5048,Great Stamina
+5049,Great Stamina
+20582,Quickness
+20574,Axe Specialization
+20597,Sword Specialization
+1259719,Mace Specialization
+4630,Phase Shift
+13712,Lightning Reflexes
+19168,Lightning Reflexes
+28787,Cleanse
+28788,Cleanse
+17174,Concussive Shot
+5144,Arcane Missiles
+5145,Arcane Missiles
+7269,Arcane Missiles
+7270,Arcane Missiles
+8416,Arcane Missiles
+8417,Arcane Missiles
+8418,Arcane Missiles
+8419,Arcane Missiles
+10211,Arcane Missiles
+10212,Arcane Missiles
+10273,Arcane Missiles
+10274,Arcane Missiles
+25345,Arcane Missiles
+25346,Arcane Missiles
+6798,Bash
+8983,Bash
+8984,Bash
+24450,Prowl
+24451,Prowl
+24452,Prowl
+24453,Prowl
+24454,Prowl
+24455,Prowl
+14251,Riposte
+19134,Intimidating Shout
+20511,Intimidating Shout
+29544,Intimidating Shout
+17928,Howl of Terror
+11124,Fire Power
+14524,Wand Specialization
+22782,Mage Armor
+22783,Mage Armor
+7321,Chilled
+12484,Chilled
+18459,Incineration
+6281,Pet Hardiness
+6282,Pet Hardiness
+6283,Pet Hardiness
+6286,Pet Hardiness
+7804,Blood Pact
+7805,Blood Pact
+11766,Blood Pact
+11767,Blood Pact
+6314,Pet Aggression
+6315,Pet Aggression
+6316,Pet Aggression
+6317,Pet Aggression
+6331,Pet Recovery
+6332,Pet Recovery
+6333,Pet Recovery
+6334,Pet Recovery
+459699,Fear Ward
+6359,Seduction
+24583,Scorpid Poison
+24584,Scorpid Poison
+24586,Scorpid Poison
+24587,Scorpid Poison
+24588,Scorpid Poison
+24589,Scorpid Poison
+24640,Scorpid Poison
+24641,Scorpid Poison
+6444,Pet Resistance
+6445,Pet Resistance
+6446,Pet Resistance
+6447,Pet Resistance
+6554,Pummel
+12555,Pummel
+19559,Pathfinding
+15487,Silence
+17925,Death Coil
+17926,Death Coil
+28412,Death Coil
+8875,Tamed Pet Passive (DND)
+17206,Tamed Pet Passive (DND)
+17212,Tamed Pet Passive (DND)
+17223,Tamed Pet Passive (DND)
+18728,Tamed Pet Passive (DND)
+18737,Tamed Pet Passive (DND)
+18740,Tamed Pet Passive (DND)
+19580,Tamed Pet Passive (DND)
+19581,Tamed Pet Passive (DND)
+19582,Tamed Pet Passive (DND)
+19589,Tamed Pet Passive (DND)
+19591,Tamed Pet Passive (DND)
+20782,Tamed Pet Passive (DND)
+20784,Tamed Pet Passive (DND)
+409365,Tamed Pet Passive (DND)
+412729,Tamed Pet Passive (DND)
+20594,Stoneform
+19577,Intimidation
+24394,Intimidation
+1265899,Dust Cloud
+1265901,Dust Cloud
+1265902,Dust Cloud
+1265903,Dust Cloud
+1265904,Dust Cloud
+1265907,Dust Cloud
+1265908,Dust Cloud
+1265909,Dust Cloud
+1265911,Dust Cloud
+1265913,Dust Cloud
+17804,Soul Siphon
+18805,Recombobulate
+1282733,Overpower
+8044,Earth Shock
+8045,Earth Shock
+8046,Earth Shock
+10412,Earth Shock
+10413,Earth Shock
+10414,Earth Shock
+13281,Earth Shock
+8058,Frost Shock
+10472,Frost Shock
+10473,Frost Shock
+12548,Frost Shock
+8124,Psychic Scream
+10888,Psychic Scream
+10890,Psychic Scream
+13704,Psychic Scream
+23922,Shield Slam
+20584,Ghost
+16909,Vengeance
+20049,Vengeance
+20050,Vengeance
+12294,Mortal Strike
+20925,Holy Shield
+17106,Reflection
+12323,Piercing Howl
+24492,Nature Resistance
+24494,Nature Resistance
+24502,Nature Resistance
+24503,Nature Resistance
+24504,Nature Resistance
+24511,Nature Resistance
+24512,Nature Resistance
+24513,Nature Resistance
+400573,Arcane Blast
+400574,Arcane Blast
+1239696,Arcane Blast
+1239697,Arcane Blast
+1239699,Arcane Blast
+1239700,Arcane Blast
+12494,Frostbite
+1312934,Wake of Fire
+12355,Impact
+13018,Blast Wave
+13019,Blast Wave
+13020,Blast Wave
+13021,Blast Wave
+28682,Combustion
+12579,Winter's Chill
+12505,Pyroblast
+12522,Pyroblast
+12523,Pyroblast
+12524,Pyroblast
+12525,Pyroblast
+12526,Pyroblast
+18809,Pyroblast
+27619,Ice Block
+430952,Arcane Power
+12834,Deep Wounds
+20111,Two-Handed Weapon Specialization
+1290261,Weaponmaster
+23694,Improved Hamstring
+16254,Anticipation
+20096,Anticipation
+20150,Shield Specialization
+1310318,Shield Specialization
+1310925,Shield Specialization
+12966,Flurry
+16256,Flurry
+16257,Flurry
+12964,Unbridled Wrath
+16246,Clearcasting
+1259918,Plainsrunning
+18174,Suppression
+12976,Last Stand
+18350,Dummy Trigger
+20189,Precision
+1225295,Precision
+13960,Hack and Slash
+16462,Deflection
+19295,Deflection
+20060,Deflection
+23584,Dual Wield Specialization
+20550,Endurance
+30918,Improved Sprint
+28752,Adrenaline Rush
+28753,Adrenaline Rush
+13977,Initiative
+15250,Setup
+14157,Ruthlessness
+1310697,Improved Expose Armor
+14893,Inspiration
+23455,Holy Nova
+15258,Shadow Weaving
+15269,Blackout
+15326,Blackout
+15271,Spirit Tap
+24844,Lightning Breath
+24845,Lightning Breath
+25008,Lightning Breath
+25009,Lightning Breath
+25010,Lightning Breath
+25011,Lightning Breath
+25012,Lightning Breath
+25013,Lightning Breath
+25014,Lightning Breath
+25015,Lightning Breath
+25016,Lightning Breath
+25017,Lightning Breath
+16493,Impale
+17116,Nature's Swiftness
+16488,Blood Craze
+16886,Nature's Grace
+16958,Blood Frenzy
+16959,Blood Frenzy
+24932,Leader of the Pack
+19505,Devour Magic
+19731,Devour Magic
+19734,Devour Magic
+19736,Devour Magic
+17254,Bite
+17255,Bite
+17256,Bite
+17257,Bite
+17258,Bite
+17259,Bite
+17260,Bite
+17261,Bite
+17262,Bite
+17263,Bite
+17264,Bite
+17265,Bite
+17266,Bite
+17267,Bite
+17268,Bite
+20527,Eruption
+1293817,Conflagrate
+18093,Pyroclasm
+18119,Aftermath
+25228,Soul Link
+19229,Improved Wing Clip
+19647,Spell Lock
+19648,Spell Lock
+24259,Spell Lock
+444678,Lava Breath
+444680,Lava Breath
+444681,Lava Breath
+444682,Lava Breath
+412758,Incinerate
+19410,Improved Concussive Shot
+19615,Frenzy
+19621,Frenzy
+1299346,Trueshot Aura
+24406,Improved Mend Pet
+19732,Devour Magic Effect
+19733,Devour Magic Effect
+19735,Devour Magic Effect
+1238122,Feral Charge
+1218134,Tranquilizing Shot
+20924,Consecration
+1280349,Consecration
+20128,Redoubt
+20178,Reckoning
+20424,Seal of Command
+20467,Judgement of Command
+1311604,Holy Shock
+1311605,Holy Shock
+1311606,Holy Shock
+20578,Cannibalize
+1259802,Expansive Mind
+1259803,Expansive Mind
+22812,Barkskin
+27827,Spirit of Redemption
+408490,Lava Burst
+408521,Riptide
+23146,Dive
+23147,Dive
+23148,Dive
+23149,Dive
+23150,Dive
+23163,Harass
+23164,Harass
+23165,Harass
+23166,Harass
+23167,Harass
+417141,Berserk
+1310316,Master of Defense
+23785,Master Demonologist
+23892,Bloodthirst
+23893,Bloodthirst
+23894,Bloodthirst
+24424,Demoralizing Screech
+24577,Demoralizing Screech
+24578,Demoralizing Screech
+24579,Demoralizing Screech
+24580,Demoralizing Screech
+24581,Demoralizing Screech
+24582,Demoralizing Screech
+24490,Shadow Resistance
+24505,Shadow Resistance
+24506,Shadow Resistance
+24507,Shadow Resistance
+24514,Shadow Resistance
+24515,Shadow Resistance
+24516,Shadow Resistance
+24495,Arcane Resistance
+24497,Arcane Resistance
+24500,Arcane Resistance
+24501,Arcane Resistance
+24508,Arcane Resistance
+24509,Arcane Resistance
+24510,Arcane Resistance
+24547,Natural Armor
+24549,Natural Armor
+24550,Natural Armor
+24551,Natural Armor
+24552,Natural Armor
+24553,Natural Armor
+24554,Natural Armor
+24555,Natural Armor
+24556,Natural Armor
+24557,Natural Armor
+24558,Natural Armor
+24559,Natural Armor
+24560,Natural Armor
+24561,Natural Armor
+24562,Natural Armor
+24629,Natural Armor
+24630,Natural Armor
+24631,Natural Armor
+24632,Natural Armor
+25077,Cobra Reflexes
+26065,Shell Shield
+26094,Thunderstomp
+26187,Thunderstomp
+26188,Thunderstomp
+26189,Thunderstomp
+26190,Thunderstomp
+1264455,Thunderstomp
+1264456,Thunderstomp
+27813,Blessed Recovery
+30165,Elemental Devastation
+30894,Heightened Senses
+401859,Prayer of Mending
+401877,Prayer of Mending
+401880,Prayer of Mending
+426065,Infusion of Light
+437063,Infusion of Light
+400589,Missile Barrage
+400625,Heating Up
+1240044,Ice Lance
+1240045,Ice Lance
+1240046,Ice Lance
+1240047,Ice Lance
+1312002,Ice Lance
+400669,Fingers of Frost
+1260270,Rapid Regeneration
+1237312,Frostfire Bolt
+1237313,Frostfire Bolt
+402261,Penance
+402277,Penance
+402284,Penance
+402289,Penance
+408255,Eclipse
+408505,Maelstrom Weapon
+408511,Water Shield
+415370,Lone Wolf
+415407,Rapid Killing
+417053,Natural Reaction
+462707,Cutthroat
+462708,Cutthroat
+431624,Divine Aegis
+1242853,Soul Harvest
+1242688,Resourcefulness
+440873,Decimation
+1310949,Malevolence
+1310994,Swift Judgement
+1278934,Summoning
+1299448,Quick Strikes
+1235316,Demonic Aegis
+1293816,Shadow
+1223081,Genesis
+1238289,Earthbound
+1238931,Improved Stormstrike
+1242512,Rapid Recuperation
+1310728,Quietus
+1270893,Elemental Blessing
+1270842,Energized
+1259813,Eureka!
+1259817,Eureka!
+1259821,Eureka!
+1259823,Eureka!
+1260201,Touch of the Grave
+1264479,Sonic Blast
+1264480,Sonic Blast
+1264481,Sonic Blast
+1264482,Sonic Blast
+1264736,Pinch
+1264739,Pinch
+1264741,Pinch
+1264742,Pinch
+1264745,Pinch
+1264749,Pinch
+1264750,Pinch
+1264751,Pinch
+1264752,Pinch
+1265055,Mine!
+1265056,Mine!
+1265057,Mine!
+1265058,Mine!
+1265059,Mine!
+1265060,Mine!
+1265061,Mine!
+1265062,Mine!
+1265064,Mine!
+1265066,Savage Rend
+1265067,Savage Rend
+1265068,Savage Rend
+1265069,Savage Rend
+1265831,Savage Rend
+1265833,Savage Rend
+1265834,Savage Rend
+1265835,Savage Rend
+1265836,Savage Rend
+1289682,Bloodthrill
+1293248,Summon Hawk
+1312639,Summon Hawk
+1293696,Demonic Brand
+1310726,Expose Prey
+1310536,Lacerating Strikes
+1310617,Trickster's Dance
+1310723,Thousand Cuts
+1310911,Light's Vigil
+1310912,Light's Vigil
+1310914,Light's Vigil
+1311034,Iron Creed
+1322574,Rule of Rage (DND)

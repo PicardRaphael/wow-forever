@@ -1,0 +1,2627 @@
+{
+ "schema_version": 1,
+ "repo": "wowdev/WoWDBDefs",
+ "commit": "1d356b44c798e89802928457b2854003098e28ab",
+ "build": "1.60.1.70170",
+ "layouts": {
+  "Curve": {
+   "layout": "D362535A",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Type",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Flags",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "CurvePoint": {
+   "layout": "7D4954A1",
+   "fields": [
+    {
+     "name": "Pos",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PosPreSquish",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "CurveID",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": true,
+     "ref": "Curve"
+    },
+    {
+     "name": "OrderIndex",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "Item": {
+   "layout": "9A2A4834",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ClassID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ItemClass"
+    },
+    {
+     "name": "SubclassID",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Material",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Material"
+    },
+    {
+     "name": "InventoryType",
+     "kind": "int",
+     "size": 8,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SheatheType",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ItemPetFoodID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ItemPetFood"
+    },
+    {
+     "name": "Sound_override_subclassID",
+     "kind": "int",
+     "size": 8,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "IconFileDataID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "FileData"
+    },
+    {
+     "name": "ItemGroupSoundsID",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ItemGroupSounds"
+    },
+    {
+     "name": "ContentTuningID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ContentTuning"
+    },
+    {
+     "name": "ModifiedCraftingReagentItemID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ModifiedCraftingReagentItem"
+    },
+    {
+     "name": "AmmunitionType",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "CraftingQualityID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "CraftingQuality"
+    },
+    {
+     "name": "ItemSquishEraID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ItemSquishEra"
+    },
+    {
+     "name": "RecraftReagentCountPercentage",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OrderSource",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "ItemSparse": {
+   "layout": "6FCC3191",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Description_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Display3_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Display2_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Display1_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Display_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ExpansionID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DmgVariance",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "LimitCategory",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DurationInInventory",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "QualityModifier",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "BagFamily",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "StartQuestID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "QuestV2"
+    },
+    {
+     "name": "LanguageID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Languages"
+    },
+    {
+     "name": "ItemRange",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "StatPercentageOfSocket",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": 10,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "StatPercentEditor",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 10,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "StatModifier_bonusStat",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 10,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Stackable",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "MaxCount",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "MinReputation",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "RequiredAbility",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "AllowableRace",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SellPrice",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "BuyPrice",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "VendorStackCount",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PriceVariance",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PriceRandomValue",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Flags",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 5,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OppositeFactionItemID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Item"
+    },
+    {
+     "name": "ModifiedCraftingReagentItemID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ModifiedCraftingReagentItem"
+    },
+    {
+     "name": "ContentTuningID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ContentTuning"
+    },
+    {
+     "name": "PlayerLevelToItemLevelCurveID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Curve"
+    },
+    {
+     "name": "ItemLevelOffsetCurveID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Curve"
+    },
+    {
+     "name": "ItemLevelOffsetItemLevel",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ItemSquishEraID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ItemSquishEra"
+    },
+    {
+     "name": "ItemNameDescriptionID",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ItemNameDescription"
+    },
+    {
+     "name": "RequiredTransmogHoliday",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Holidays"
+    },
+    {
+     "name": "RequiredHoliday",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Holidays"
+    },
+    {
+     "name": "Gem_properties",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "GemProperties"
+    },
+    {
+     "name": "Socket_match_enchantment_ID",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TotemCategoryID",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "TotemCategory"
+    },
+    {
+     "name": "InstanceBound",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Map"
+    },
+    {
+     "name": "ZoneBound",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "AreaTable"
+    },
+    {
+     "name": "ItemSet",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ItemSet"
+    },
+    {
+     "name": "LockID",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Lock"
+    },
+    {
+     "name": "PageID",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ItemDelay",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "MinFactionID",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Faction"
+    },
+    {
+     "name": "RequiredSkillRank",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "RequiredSkill",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "SkillLine"
+    },
+    {
+     "name": "ItemLevel",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "AllowableClass",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ArtifactID",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Artifact"
+    },
+    {
+     "name": "SpellWeight",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellWeightCategory",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SocketType",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": 3,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SheatheType",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Material",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Material"
+    },
+    {
+     "name": "PageMaterialID",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "PageTextMaterial"
+    },
+    {
+     "name": "Bonding",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DamageType",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ContainerSlots",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "RequiredPVPMedal",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "RequiredPVPRank",
+     "kind": "int",
+     "size": 8,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "RequiredLevel",
+     "kind": "int",
+     "size": 8,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "InventoryType",
+     "kind": "int",
+     "size": 8,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OverallQualityID",
+     "kind": "int",
+     "size": 8,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "AmmunitionType",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "Spell": {
+   "layout": "E3D134FB",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "NameSubtext_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Description_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "AuraDescription_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "SpellAuraOptions": {
+   "layout": "95F4D5E1",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DifficultyID",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Difficulty"
+    },
+    {
+     "name": "CumulativeAura",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ProcCategoryRecovery",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ProcChance",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ProcCharges",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellProcsPerMinuteID",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "SpellProcsPerMinute"
+    },
+    {
+     "name": "ProcTypeMask",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": false,
+     "relation": true,
+     "ref": "Spell"
+    }
+   ]
+  },
+  "SpellClassOptions": {
+   "layout": "1F8E4FD7",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Spell"
+    },
+    {
+     "name": "ModalNextSpell",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Spell"
+    },
+    {
+     "name": "SpellClassSet",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellClassMask",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 4,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "SpellEffect": {
+   "layout": "5362E3D4",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectAura",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DifficultyID",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Difficulty"
+    },
+    {
+     "name": "EffectIndex",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Effect",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectAmplitude",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectAttributes",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectAuraPeriod",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectBonusCoefficient",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectChainAmplitude",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectChainTargets",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectItemType",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectMechanic",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectPointsPerResource",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectPos_facing",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectRealPointsPerLevel",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectTriggerSpell",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Spell"
+    },
+    {
+     "name": "BonusCoefficientFromAP",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PvpMultiplier",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Coefficient",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Variance",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ResourceCoefficient",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "GroupSizeBasePointsCoefficient",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectBasePointsF",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ScalingClass",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Node__Field_12_0_0_63534_001",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectMiscValue",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "EffectRadiusIndex",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "SpellRadius"
+    },
+    {
+     "name": "EffectSpellClassMask",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 4,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ImplicitTarget",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": false,
+     "relation": true,
+     "ref": "Spell"
+    }
+   ]
+  },
+  "SpellInterrupts": {
+   "layout": "6FFC0306",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DifficultyID",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Difficulty"
+    },
+    {
+     "name": "InterruptFlags",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "AuraInterruptFlags",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ChannelInterruptFlags",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 2,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": false,
+     "relation": true,
+     "ref": "Spell"
+    }
+   ]
+  },
+  "SpellLevels": {
+   "layout": "7EB86FDC",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DifficultyID",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Difficulty"
+    },
+    {
+     "name": "MaxLevel",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "MaxPassiveAuraLevel",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "BaseLevel",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellLevel",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": false,
+     "relation": true,
+     "ref": "Spell"
+    }
+   ]
+  },
+  "SpellMisc": {
+   "layout": "434B3607",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Attributes",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": 17,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "DifficultyID",
+     "kind": "int",
+     "size": 16,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Difficulty"
+    },
+    {
+     "name": "CastingTimeIndex",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "SpellCastTimes"
+    },
+    {
+     "name": "DurationIndex",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "SpellDuration"
+    },
+    {
+     "name": "PvPDurationIndex",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "SpellDuration"
+    },
+    {
+     "name": "RangeIndex",
+     "kind": "int",
+     "size": 16,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "SpellRange"
+    },
+    {
+     "name": "SchoolMask",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Speed",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "LaunchDelay",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "MinDuration",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellIconFileDataID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "FileData"
+    },
+    {
+     "name": "ActiveIconFileDataID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "FileData"
+    },
+    {
+     "name": "ContentTuningID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "ContentTuning"
+    },
+    {
+     "name": "ShowFutureSpellPlayerConditionID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "PlayerCondition"
+    },
+    {
+     "name": "SpellVisualScript",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ActiveSpellVisualScript",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": false,
+     "relation": true,
+     "ref": "Spell"
+    }
+   ]
+  },
+  "SpellName": {
+   "layout": "782EE721",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Name_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "SpellPower": {
+   "layout": "61AD223F",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OrderIndex",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ManaCost",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ManaCostPerLevel",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ManaPerSecond",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PowerDisplayID",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "PowerDisplay"
+    },
+    {
+     "name": "AltPowerBarID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PowerCostPct",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PowerCostMaxPct",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OptionalCostPct",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PowerPctPerSecond",
+     "kind": "float",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PowerType",
+     "kind": "int",
+     "size": 8,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "PowerType"
+    },
+    {
+     "name": "RequiredAuraSpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Spell"
+    },
+    {
+     "name": "OptionalCost",
+     "kind": "int",
+     "size": 32,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": false,
+     "id": false,
+     "relation": true,
+     "ref": "Spell"
+    }
+   ]
+  },
+  "TraitDefinition": {
+   "layout": "060A9F4C",
+   "fields": [
+    {
+     "name": "OverrideName_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OverrideSubtext_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OverrideDescription_lang",
+     "kind": "locstring",
+     "size": null,
+     "signed": null,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "SpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Spell"
+    },
+    {
+     "name": "OverrideIcon",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "FileData"
+    },
+    {
+     "name": "OverridesSpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Spell"
+    },
+    {
+     "name": "VisibleSpellID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Spell"
+    }
+   ]
+  },
+  "TraitDefinitionEffectPoints": {
+   "layout": "7E18C372",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TraitDefinitionID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": true,
+     "ref": "TraitDefinition"
+    },
+    {
+     "name": "EffectIndex",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "OperationType",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "CurveID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "Curve"
+    }
+   ]
+  },
+  "TraitEdge": {
+   "layout": "907C9B77",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "VisualStyle",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "LeftTraitNodeID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": true,
+     "ref": "TraitNode"
+    },
+    {
+     "name": "RightTraitNodeID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "TraitNode"
+    },
+    {
+     "name": "Type",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "TraitNode": {
+   "layout": "A01A518A",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TraitTreeID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": true,
+     "ref": "TraitTree"
+    },
+    {
+     "name": "PosX",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "PosY",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Type",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "Flags",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TraitSubTreeID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "TraitSubTree"
+    }
+   ]
+  },
+  "TraitNodeEntry": {
+   "layout": "733B015D",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TraitDefinitionID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "TraitDefinition"
+    },
+    {
+     "name": "MaxRanks",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "NodeEntryType",
+     "kind": "int",
+     "size": 8,
+     "signed": false,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TraitSubTreeID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "TraitSubTree"
+    }
+   ]
+  },
+  "TraitNodeGroupXTraitNode": {
+   "layout": "B9288EB8",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TraitNodeGroupID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": true,
+     "ref": "TraitNodeGroup"
+    },
+    {
+     "name": "TraitNodeID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "TraitNode"
+    },
+    {
+     "name": "Index",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  },
+  "TraitNodeXTraitNodeEntry": {
+   "layout": "802ED455",
+   "fields": [
+    {
+     "name": "ID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": true,
+     "relation": false,
+     "ref": null
+    },
+    {
+     "name": "TraitNodeID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": true,
+     "ref": "TraitNode"
+    },
+    {
+     "name": "TraitNodeEntryID",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": "TraitNodeEntry"
+    },
+    {
+     "name": "Index",
+     "kind": "int",
+     "size": 32,
+     "signed": true,
+     "array": null,
+     "inline": true,
+     "id": false,
+     "relation": false,
+     "ref": null
+    }
+   ]
+  }
+ }
+}
