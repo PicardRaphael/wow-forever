@@ -8,21 +8,23 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping, Sequence
-from typing import Any, Literal, TypedDict, cast
+from typing import Any, Literal, NotRequired, TypedDict, cast
 
 from forever.config import Deps
 from forever.errors import DataSchemaError
 from forever.pipeline.sources import load_source, source_provenance
-from forever.pipeline.value_diff import character_lines, scaling_lines
+from forever.pipeline.value_diff import META, character_lines, scaling_lines
+from forever.pipeline.value_diff import _pairs as value_pairs
 from forever.provenance import Provenance
 from forever.store import VersionData
 
 TALENT_FIELDS = ("name", "tree", "tier", "col", "max", "prereq")
 SCALING = "spell_scaling.json"
 CHARACTER = "character_scaling.json"
-KINDS = ("talent", "spell", "file", "scaling", "character")
+CLASSES, PETS, PVP_ITEMS = "classes.json", "pets.json", "pvp_items.json"  # T08c, bloc D : valeurs comparées
+KINDS = ("talent", "spell", "file", "scaling", "character", "class", "pet", "pvp_item")
 
-Kind = Literal["talent", "spell", "file", "scaling", "character"]
+Kind = Literal["talent", "spell", "file", "scaling", "character", "class", "pet", "pvp_item"]
 ChangeType = Literal["added", "removed", "modified"]
 
 
@@ -33,6 +35,7 @@ class Change(TypedDict):
     field: str | None
     old: object
     new: object
+    hotfix: NotRequired[dict[str, Any]]  # T08c : poussées et première date vue du correctif qui porte la valeur
 
 
 class VersionDiff(TypedDict):
@@ -43,8 +46,102 @@ class VersionDiff(TypedDict):
     provenance: Provenance
 
 
-def _change(kind: Kind, key: str, change: ChangeType, field: str | None, old: object, new: object) -> Change:
-    return {"kind": kind, "key": key, "change": change, "field": field, "old": old, "new": new}
+def _change(
+    kind: Kind,
+    key: str,
+    change: ChangeType,
+    field: str | None,
+    old: object,
+    new: object,
+    hotfix: Mapping[str, Any] | None = None,
+) -> Change:
+    out: Change = {"kind": kind, "key": key, "change": change, "field": field, "old": old, "new": new}
+    if hotfix is not None:
+        out["hotfix"] = dict(hotfix)
+    return out
+
+
+def _attribution(entity: Any) -> dict[str, Any] | None:
+    """Correctif du serveur porté par une entité (champ `hotfix` posé par forever decode --hotfixes)."""
+    fix = entity.get("hotfix") if isinstance(entity, dict) else None
+    if not isinstance(fix, dict):
+        return None
+    return {"pushes": list(fix.get("pushes", [])), "first_logged_at": fix.get("first_logged_at")}
+
+
+def _deleted(sources: Any, table: str) -> dict[int, dict[str, Any]]:
+    """Enregistrements retirés par un correctif (`sources.json`, bloc `hotfixes`) : une entité disparue n'a plus de
+    champ `hotfix`, son attribution vient de là."""
+    block = sources.get("hotfixes") if isinstance(sources, dict) else None
+    if not isinstance(block, dict):
+        return {}
+    seen = block.get("seen_at", {})
+    return {
+        int(a["rec_id"]): {"pushes": [a["push"]], "first_logged_at": seen.get(str(a["push"]))}
+        for a in block.get("applied", [])
+        if a.get("table") == table and a.get("status") == "DELETE"
+    }
+
+
+def _entity_changes(
+    kind: Kind, key: str, old: Any, new: Any, removed_fix: Mapping[str, Any] | None = None
+) -> list[Change]:
+    if new is None:
+        return [_change(kind, key, "removed", None, None, None, removed_fix or _attribution(old))]
+    if old is None:
+        return [_change(kind, key, "added", None, None, None, _attribution(new))]
+    fix = _attribution(new)
+    return [_change(kind, key, cast(ChangeType, c), f, o, n, fix) for c, _, f, o, n in value_pairs(old, new)]
+
+
+def _class_changes(a: Any, b: Any, deleted_nodes: Mapping[int, Mapping[str, Any]]) -> list[Change]:
+    """`classes.json` : talents par nœud (« Warrior Fury Flurry »), sorts de classe, autres champs ; une ligne par
+    valeur."""
+    out: list[Change] = []
+    ca, cb = (a or {}).get("classes", {}), (b or {}).get("classes", {})
+    for cls in _keys(ca, cb):
+        xa, xb = ca.get(cls, {}), cb.get(cls, {})
+        ta = {t["node_id"]: (tree["name"], t) for tree in xa.get("trees", []) for t in tree.get("talents", [])}
+        tb = {t["node_id"]: (tree["name"], t) for tree in xb.get("trees", []) for t in tree.get("talents", [])}
+        for node in _keys(ta, tb):
+            tree, talent = tb.get(node) or ta[node]
+            old, new = ta.get(node, (None, None))[1], tb.get(node, (None, None))[1]
+            out += _entity_changes("class", f"{cls} {tree} {talent['name']}", old, new, deleted_nodes.get(int(node)))
+        sa, sb = xa.get("spells", {}), xb.get("spells", {})
+        for key in _keys(sa, sb):
+            name = (sb.get(key) or sa[key]).get("name", key)
+            out += _entity_changes("class", f"{cls} sort {name}", sa.get(key), sb.get(key))
+        for field in _keys(xa, xb):
+            if field in ("trees", "spells") or field in META:
+                continue
+            out += [
+                _change("class", f"{cls} {field}", cast(ChangeType, c), f, o, n)
+                for c, _, f, o, n in value_pairs(xa.get(field), xb.get(field))
+            ]
+    return out
+
+
+def _keyed_changes(kind: Kind, a: Any, b: Any, top: str, ident: str | None) -> list[Change]:
+    """Fichier à entités nommées sous `top` (dictionnaire, ou liste repérée par `ident`) ; autres champs en vrac."""
+    out: list[Change] = []
+    a, b = a or {}, b or {}
+    ea, eb = a.get(top, {}), b.get(top, {})
+    if ident is not None:
+        ea = {str(x.get(ident)): x for x in ea} if isinstance(ea, list) else {}
+        eb = {str(x.get(ident)): x for x in eb} if isinstance(eb, list) else {}
+    for key in _keys(ea, eb):
+        entity = eb.get(key) or ea[key]
+        name = entity.get("name") if isinstance(entity, dict) else None
+        label = name.get("en") if isinstance(name, dict) else name
+        out += _entity_changes(kind, f"{key} {label}" if label and ident else str(key), ea.get(key), eb.get(key))
+    for field in _keys(a, b):
+        if field == top or field in META:
+            continue
+        out += [
+            _change(kind, field, cast(ChangeType, c), f, o, n)
+            for c, _, f, o, n in value_pairs(a.get(field), b.get(field))
+        ]
+    return out
 
 
 def _read(v: VersionData, name: str) -> Any:
@@ -103,11 +200,11 @@ def compare_data(a: VersionData, b: VersionData) -> list[Change]:
         if key not in tb:
             changes.append(_change("talent", key, "removed", None, None, None))
         elif key not in ta:
-            changes.append(_change("talent", key, "added", None, None, None))
+            changes.append(_change("talent", key, "added", None, None, None, _attribution(tb[key])))
         else:
             old, new = ta[key], tb[key]
             changes += [
-                _change("talent", key, "modified", f, old.get(f), new.get(f))
+                _change("talent", key, "modified", f, old.get(f), new.get(f), _attribution(new))
                 for f in TALENT_FIELDS
                 if old.get(f) != new.get(f)
             ]
@@ -133,6 +230,14 @@ def compare_data(a: VersionData, b: VersionData) -> list[Change]:
                 _change(cast(Kind, kind), key, cast(ChangeType, change), field, old, new)
                 for change, key, field, old, new in lines(da, db)
             ]
+    # T08c, bloc D : valeurs des fichiers des classes, des familiers et des bijoux PvP, attribuées aux correctifs
+    deleted = _deleted(_read(b, "sources.json"), "TraitNode")
+    if isinstance(_read(a, CLASSES), dict) and isinstance(_read(b, CLASSES), dict):
+        changes += _class_changes(_read(a, CLASSES), _read(b, CLASSES), deleted)
+    for kind, name, top, ident in (("pet", PETS, "abilities", None), ("pvp_item", PVP_ITEMS, "trinkets", "item_id")):
+        da, db = _read(a, name), _read(b, name)
+        if isinstance(da, dict) and isinstance(db, dict):
+            changes += _keyed_changes(cast(Kind, kind), da, db, top, ident)
     return changes
 
 

@@ -221,6 +221,7 @@ def apply_hotfixes(
     csv_dir: Path,
     *,
     schemas: Mapping[str, str] | None = None,
+    strict: bool = True,
 ) -> Overlay:
     """Tables de la locale par défaut corrigées (les clés « frFR/… » sont rendues telles quelles), enregistrements
     appliqués (avant, après, poussée, date vue), listes à part et contrôle de chaque disposition. HotfixLayoutError
@@ -270,8 +271,9 @@ def apply_hotfixes(
                 rows[index[e.rec_id]] = row
             applied.append(Applied(table, e.rec_id, "VALID", e.push_id, e.unique_id, seen, before, row))
         out[table] = [r for r in rows if int(r["ID"]) not in removed] + added
-    if refused:
+    if refused and strict:
         raise HotfixLayoutError(refused)
+    listed["unvalidated"].update(refused)
     return Overlay(out, applied, listed, checks)
 
 
@@ -534,7 +536,118 @@ def sources_block(
     }
 
 
+CHAIN_TABLES = (
+    "TraitNode",
+    "TraitNodeXTraitNodeEntry",
+    "TraitNodeEntry",
+    "TraitDefinition",
+    "TraitDefinitionEffectPoints",
+    "TraitEdge",
+    "CurvePoint",
+    "SpellName",
+)  # tables qui relient un enregistrement à son talent ou à son sort
+
+
+def _label(file: str, doc: Mapping[str, Any], path: Sequence[str], entity: Mapping[str, Any]) -> str:
+    name = entity.get("name")
+    name = name.get("en") if isinstance(name, dict) else name
+    if file == "classes.json" and len(path) == 6:
+        return f"{path[1]} {doc['classes'][path[1]]['trees'][int(path[3])]['name']} {name}"
+    if file == "classes.json":
+        return f"{path[1]} sort {name}"
+    if file == "talents.json":
+        return f"Mage {entity.get('tree')} {name}"
+    if file == "spells.json":
+        return f"sort {path[1]}"
+    if file == "spell_scaling.json":
+        return f"sort {path[1]} rang {entity.get('rank')}"
+    if file == "pets.json":
+        return f"familier {path[1]}"
+    if file == "pvp_items.json":
+        return f"bijou {name}"
+    return f"{path[1]} racial {name}"
+
+
+def entity_labels(version_dir: Path, reached: Mapping[tuple[str, int], Reach]) -> dict[tuple[str, int], list[str]]:
+    """Entités de la version installée atteintes par chaque enregistrement (« Warrior Fury Flurry »…)."""
+    import json
+
+    out: dict[tuple[str, int], list[str]] = {}
+    for file, patterns in ENTITY_SPECS.items():
+        path = version_dir / file
+        if not path.is_file():
+            continue
+        doc = json.loads(path.read_text(encoding="utf-8"))
+        for pattern in patterns:
+            for where, entity in _walk(doc, pattern):
+                if not isinstance(entity, dict):
+                    continue
+                ids = entity_ids(entity)
+                for key, r in reached.items():
+                    if r.nodes & ids.nodes or r.spells & ids.spells or r.items & ids.items:
+                        out.setdefault(key, []).append(_label(file, doc, where, entity))
+    return {k: sorted(set(v)) for k, v in out.items()}
+
+
+def _build_value(raw: str, like: Value) -> Value:
+    try:
+        if isinstance(like, float):
+            return float(raw)
+        if isinstance(like, int):
+            return int(raw)
+    except ValueError:
+        return raw
+    return raw
+
+
 def hotfix_values(source: HotfixSource, csv_dir: Path, version_dir: Path) -> dict[str, Any]:
     """`forever hotfixes --values` : pour chaque enregistrement applicable, champ par champ, valeur du build (CSV) et
     valeur du correctif (DBCache.bin), entités de la version installée qu'il touche ; listes à part."""
-    raise NotImplementedError
+    from forever.pipeline.dbd import _same
+    from forever.pipeline.tables import read_table
+
+    app = source.resolved.applicable
+    wanted = dict.fromkeys([*sorted({t for t, _ in app}), *CHAIN_TABLES])
+    names = [t for t in wanted if t in TABLES and _csv_file(csv_dir, t).is_file()]
+    typed: dict[str, list[Row]] = {t: list(read_table(_csv_file(csv_dir, t), t)) for t in names}
+    ov = apply_hotfixes(typed, source, csv_dir, strict=False)
+    labels = entity_labels(version_dir, reach(ov.applied, typed, ov.tables))
+    raw_rows: dict[str, dict[int, dict[str, str]]] = {}
+    for table in {a.table for a in ov.applied}:
+        ids = {a.rec_id for a in ov.applied if a.table == table}
+        raw_rows[table] = _csv_header_and_rows(_csv_file(csv_dir, table), ids)[1]
+    records = []
+    for a in sorted(ov.applied, key=lambda x: (x.table, x.rec_id)):
+        fields: list[dict[str, Any]] = []
+        if a.status == "VALID":
+            full = decode_record(source.layouts[a.table], app[(a.table, a.rec_id)].data, a.rec_id)
+            raw = raw_rows[a.table].get(a.rec_id)
+            for name, value in full.items():
+                if name == "ID":
+                    continue
+                if raw is None:
+                    fields.append({"field": name, "build": None, "hotfix": value})
+                elif name in raw and not _same(value, raw[name]):
+                    fields.append({"field": name, "build": _build_value(raw[name], value), "hotfix": value})
+        records.append(
+            {
+                "table": a.table,
+                "rec_id": a.rec_id,
+                "status": a.status,
+                "push": a.push_id,
+                "seen_at": a.seen_at,
+                "new": a.before is None,
+                "identical": a.status == "VALID" and a.before is not None and not fields,
+                "fields": fields,
+                "entities": labels.get((a.table, a.rec_id), []),
+            }
+        )
+    listed = {**ov.listed, "not_loaded": {t: n for t, n in ov.listed["not_loaded"].items() if t not in TABLES}}
+    return {
+        "build": source.cache.build,
+        "sha256": source.cache.sha256,
+        "dbd": dict(source.dbd),
+        "records": records,
+        "listed": listed,
+        "checks": {t: {"ok": k.ok, "reason": k.reason} for t, k in sorted(ov.checks.items())},
+    }

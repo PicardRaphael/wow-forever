@@ -9,7 +9,9 @@ from __future__ import annotations
 from collections.abc import Iterator, Mapping
 from typing import Any
 
-META = frozenset({"source", "notes", "build", "schema_version", "inherited_from", "crosscheck", "certainty"})
+META = frozenset(
+    {"source", "notes", "build", "schema_version", "inherited_from", "crosscheck", "certainty", "hotfix"}
+)  # T08c : hotfix (provenance d'un correctif du serveur), pas une valeur
 Line = tuple[str, str, str | None, Any, Any]  # (changement, clé, champ, avant, après)
 
 

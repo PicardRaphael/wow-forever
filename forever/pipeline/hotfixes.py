@@ -5,7 +5,7 @@ Le client réécrit `Hotfix.log` à chaque démarrage : chaque ligne vue est gar
 Seules les tables que le projet décode ou lit sont retenues (`decode_rules.json` : `tables`, `class_tables`,
 `character_tables`, plus `hotfix_related_tables`), lignes de poussée et réponses `DBReply` ; une ligne répétée compte une fois ; `VALIDATION_RESULT_INVALID` est gardé et compté à part (sens non
 établi, `docs/OPEN_QUESTIONS.md`), `NOTPUBLIC` est ignoré. Les valeurs des correctifs (`DBCache.bin`) ne sont pas
-lues (T08c). Aucun chiffre de jeu ici."""
+lues ici : T08c les lit (`dbcache.py`) et les applique (`forever decode --hotfixes`). Aucun chiffre de jeu ici."""
 
 from __future__ import annotations
 
@@ -173,11 +173,13 @@ def touched_entities(entries: Sequence[Mapping[str, Any]], csv_dir: Path, versio
     (`SpellMisc`, `SpellName`, `SpellEffect`, `SpellLevels`… par `SpellID` ou `ID`), talent (`CurvePoint` -> courbe ->
     `TraitDefinitionEffectPoints` -> `TraitDefinition.SpellID`, ou `Curve`), bijou PvP (`Item*`)."""
     by_table: dict[str, dict[int, str]] = {}
+    pushes_of: dict[tuple[str, int], set[str]] = {}
     for e in entries:
         if e["result"] in ("VALID", "DELETE"):
             day = str(e["at"])[:10]
             prev = by_table.setdefault(str(e["table"]), {}).get(int(e["rec_id"]), "")
             by_table[str(e["table"])][int(e["rec_id"])] = max(prev, day)
+            pushes_of.setdefault((str(e["table"]), int(e["rec_id"])), set()).add(str(e["push"]))
     spells = _json(version_dir / "spells.json").get("spells", {})
     spell_of: dict[int, str] = {}
     for key, s in spells.items():
@@ -189,9 +191,12 @@ def touched_entities(entries: Sequence[Mapping[str, Any]], csv_dir: Path, versio
             for sid in t.get("spellIds", []) or []:
                 talent_of[int(sid)] = str(t["key"])
     found: dict[tuple[str, str], str] = {}
+    found_pushes: dict[tuple[str, str], set[str]] = {}
+    current: set[str] = set()
 
     def hit(kind: str, key: str, day: str) -> None:
         found[(kind, key)] = max(found.get((kind, key), ""), day)
+        found_pushes.setdefault((kind, key), set()).update(current)
 
     def spell_hit(spell_id: int, day: str) -> None:
         if spell_id in spell_of:
@@ -202,13 +207,16 @@ def touched_entities(entries: Sequence[Mapping[str, Any]], csv_dir: Path, versio
     for table, recs in by_table.items():
         if table in ("SpellName", "Spell"):
             for rec, day in recs.items():
+                current = pushes_of.get((table, rec), set())
                 spell_hit(rec, day)
         elif table.startswith("Spell"):
             for row in _csv(csv_dir / f"{table}.csv"):
                 rec = int(row.get("ID", 0) or 0)
                 if rec in recs and row.get("SpellID"):
+                    current = pushes_of.get((table, rec), set())
                     spell_hit(int(row["SpellID"]), recs[rec])
     curves: dict[int, str] = dict(by_table.get("Curve", {}))
+    current = {p for (t, _), ps in pushes_of.items() if t in ("Curve", "CurvePoint") for p in ps}
     if "CurvePoint" in by_table:
         for row in _csv(csv_dir / "CurvePoint.csv"):
             rec = int(row["ID"])
@@ -225,8 +233,12 @@ def touched_entities(entries: Sequence[Mapping[str, Any]], csv_dir: Path, versio
     for table in ("Item", "ItemSparse"):
         for rec, day in by_table.get(table, {}).items():
             if str(rec) in items:
+                current = pushes_of.get((table, rec), set())
                 hit("item", str(rec), day)
-    return [{"kind": k, "key": key, "date": day} for (k, key), day in sorted(found.items())]
+    return [
+        {"kind": k, "key": key, "date": day, "pushes": sorted(found_pushes.get((k, key), set()))}
+        for (k, key), day in sorted(found.items())
+    ]
 
 
 def entity_assumptions(cache_dir: Path, version: str, version_dir: Path, kind: str, key: str) -> list[str]:
@@ -240,10 +252,19 @@ def entity_assumptions(cache_dir: Path, version: str, version_dir: Path, kind: s
 
         csv_dir = wago_dir(cache_dir, version) / DEFAULT_LOCALE
         found = [e for e in touched_entities(entries, csv_dir, version_dir) if e["kind"] == kind and e["key"] == key]
+        sources = _json(version_dir / "sources.json")
     except (OSError, ValueError, KeyError, TypeError):
         return []
-    return [hotfix_assumption(e) for e in found]
+    block = sources.get("hotfixes") if isinstance(sources, dict) else None
+    applied = {str(p) for p in (block or {}).get("pushes", [])} if isinstance(block, dict) else set()
+    revision = sources.get("revision") if isinstance(sources, dict) else None
+    return [hotfix_assumption(e, applied, revision) for e in found]
 
 
-def hotfix_assumption(entity: Mapping[str, Any]) -> str:
-    return f"corrigé par le serveur le {entity['date']}, valeur du correctif non lue (T08)"
+def hotfix_assumption(entity: Mapping[str, Any], applied: set[str] | None = None, revision: Any = None) -> str:
+    """« Valeur appliquée » quand toutes les poussées de l'entité sont dans la révision installée (T08c), sinon
+    « valeur non appliquée » avec la commande qui montre la valeur."""
+    pushes = [str(p) for p in entity.get("pushes", [])]
+    if pushes and applied and set(pushes) <= applied:
+        return f"corrigé par le serveur (poussée {', '.join(pushes)}), valeur appliquée (révision {revision or '?'})"
+    return f"corrigé par le serveur le {entity['date']}, valeur non appliquée : forever hotfixes --values"

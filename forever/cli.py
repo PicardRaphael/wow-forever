@@ -83,7 +83,7 @@ from forever.pipeline.fetch import (
     fetch_tables,
     wago_dir,
 )
-from forever.pipeline.hotfix_overlay import HotfixSource, hotfix_source, load_dbd_layouts
+from forever.pipeline.hotfix_overlay import HotfixSource, hotfix_source, hotfix_values, load_dbd_layouts
 from forever.pipeline.install import InstallRefusedError, apply_install, plan_install, render_install_report
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
 from forever.pipeline.measure import (
@@ -353,6 +353,9 @@ def build_parser() -> argparse.ArgumentParser:
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
     hot.add_argument("--since-install", action="store_true", help="seulement depuis la révision installée")
     hot.add_argument("--dbcache", help="valeurs des correctifs (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin)")
+    hot.add_argument("--values", action="store_true", help="chaque valeur corrigée, avant et après (T08c)")
+    hot.add_argument("--dbd-layouts", help="dispositions dérivées (JSON) au lieu du relevé de WoWDBDefs du cache")
+    hot.add_argument("--csv-dir", help="dossier des CSV du build (défaut : cache de forever fetch)")
     hot.add_argument("--json", action="store_true", help="sortie JSON")
 
     origins = sub.add_parser("origins", help="origine déclarée de chaque valeur des données (hors ligne)")
@@ -966,14 +969,38 @@ def render_decode(c: Candidate) -> list[str]:
     return lines
 
 
+_CHANGE_WHAT = {
+    "talent": "talent",
+    "spell": "sort",
+    "file": "fichier",
+    "scaling": "valeur",
+    "character": "valeur",
+    "class": "entrée de classe",
+    "pet": "capacité de familier",
+    "pvp_item": "bijou PvP",
+}
+
+
+def _hotfix_note(c: Change) -> str:
+    """Attribution d'une ligne de `forever diff` au correctif du serveur qui porte la valeur (T08c)."""
+    fix = c.get("hotfix")
+    if not fix:
+        return ""
+    pushes = ", ".join(str(p) for p in fix.get("pushes", []))
+    seen = fix.get("first_logged_at")
+    when = f"vu par le client le {str(seen)[:10]} {str(seen)[11:16]}" if seen else "date inconnue"
+    return f" (correctif {pushes}, {when})"
+
+
 def _change_line(c: Change) -> str:
-    what = {"talent": "talent", "spell": "sort", "file": "fichier"}[c["kind"]]
+    what = _CHANGE_WHAT.get(c["kind"], c["kind"])
+    note = _hotfix_note(c)
     if c["change"] == "added":
-        return f"+ {what} ajouté : {c['key']}" + (f" ({c['field']})" if c["field"] else "")
+        return f"+ {what} ajouté : {c['key']}" + (f" ({c['field']})" if c["field"] else "") + note
     if c["change"] == "removed":
-        return f"- {what} retiré : {c['key']}" + (f" ({c['field']})" if c["field"] else "")
+        return f"- {what} retiré : {c['key']}" + (f" ({c['field']})" if c["field"] else "") + note
     old, new = json.dumps(c["old"], ensure_ascii=False), json.dumps(c["new"], ensure_ascii=False)
-    return f"~ {c['key']} : {c['field']} {old} -> {new}"
+    return f"~ {c['key']} : {c['field']} {old} -> {new}" + note
 
 
 def render_diff(d: VersionDiff) -> list[str]:
@@ -1322,12 +1349,7 @@ def _hotfix_source(deps: Deps, args: argparse.Namespace) -> HotfixSource | None:
             "donner --dbcache <chemin> ou définir FOREVER_WOW_DIR",
         )
     _, rules = load_rules(deps.data_dir)
-    if args.dbd_layouts:
-        doc = json.loads(Path(args.dbd_layouts).read_text(encoding="utf-8"))
-        layouts = layouts_from_json(doc)
-        dbd = {"repo": doc.get("repo"), "commit": doc.get("commit"), "files": {}}
-    else:
-        layouts, dbd = load_dbd_layouts(deps.cache_dir, args.version, dbd_tables(rules))
+    layouts, dbd = _dbd_layouts(deps, args.dbd_layouts, args.version, rules)
     journal = hotfixes.load_journal(deps.cache_dir)
     return hotfix_source(path, layouts, dbd, journal, args.version, rules, format_utc(deps.now()))
 
@@ -1987,6 +2009,11 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
         )
         if not version.endswith(f".{cache.build}"):
             notes.append(f"DBCache.bin du build {cache.build}, version installée {version} : non applicable")
+        elif args.values:
+            layouts, dbd = _dbd_layouts(deps, args.dbd_layouts, version, rules)
+            source = hotfix_source(cache_path, layouts, dbd, entries, version, rules, format_utc(deps.now()))
+            values_dir = Path(args.csv_dir) if args.csv_dir else wago_dir(deps.cache_dir, version)
+            cache_block["values"] = hotfix_values(source, values_dir, deps.data_dir / version)
     else:
         notes.append(f"DBCache.bin non lu ({cache_path or 'FOREVER_WOW_DIR absent'}) : valeurs des correctifs non lues")
     provenance = local_provenance(deps, certainty="probable", assumptions=notes)
@@ -1998,6 +2025,8 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
         "dbcache": cache_block,
         "provenance": provenance,
     }
+    if cache_block is not None and "values" in cache_block:
+        payload["values"] = cache_block.pop("values")
     head = f"Correctifs du serveur ({'depuis le ' + since if since else 'tous'}) : {summary['lines']} ligne(s), {len(new)} nouvelle(s)"
     lines_out = [head]
     lines_out += [
@@ -2029,8 +2058,45 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
             )
         if cache_block["unknown_hash"]:
             lines_out.append(f"  tables hors du projet (hachage inconnu) : {len(cache_block['unknown_hash'])}")
+    if "values" in payload:
+        lines_out += _values_lines(cast(dict[str, Any], payload["values"]))
     _emit(payload, lines_out, provenance, args.json)
     return EXIT_OK
+
+
+def _values_lines(values: Mapping[str, Any]) -> list[str]:
+    lines = [f"Valeurs des correctifs (build {values['build']}) : {len(values['records'])} enregistrement(s)"]
+    for r in values["records"]:
+        seen = f"vu le {str(r['seen_at'])[:10]} {str(r['seen_at'])[11:16]}" if r["seen_at"] else "date inconnue"
+        head = f"  {r['table']} {r['rec_id']} {r['status']} ({r['push']}, {seen})"
+        if r["status"] == "DELETE":
+            body = "ligne retirée"
+        elif r["identical"]:
+            body = "identique au build"
+        elif r["new"]:
+            body = "ligne ajoutée : " + ", ".join(f"{f['field']} {f['hotfix']}" for f in r["fields"][:6])
+        else:
+            body = ", ".join(f"{f['field']} {f['build']} → {f['hotfix']}" for f in r["fields"])
+        who = f" · {', '.join(r['entities'][:3])}" if r["entities"] else ""
+        lines.append(f"{head} : {body}{who}")
+    listed = values["listed"]
+    lines.append(
+        f"  non appliqués : INVALID {len(listed['invalid'])}, NOTPUBLIC {len(listed['notpublic'])}, "
+        f"DBReply {sum(listed['dbreply'].values())}, réponses d'objets {sum(listed['item_reply'].values())}, "
+        f"hachages inconnus {len(listed['unknown_hash'])}, dispositions non validées {len(listed['unvalidated'])}, "
+        f"tables non lues {', '.join(listed['not_loaded']) or 'aucune'}"
+    )
+    return lines
+
+
+def _dbd_layouts(
+    deps: Deps, option: str | None, version: str, rules: Mapping[str, Any]
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    """Dispositions : fichier dérivé (`--dbd-layouts`) ou relevé de WoWDBDefs du cache (`forever fetch --dbd`)."""
+    if option:
+        doc = json.loads(Path(option).read_text(encoding="utf-8"))
+        return layouts_from_json(doc), {"repo": doc.get("repo"), "commit": doc.get("commit"), "files": {}}
+    return load_dbd_layouts(deps.cache_dir, version, dbd_tables(rules))
 
 
 def _dbcache_path(deps: Deps, option: str | None) -> Path | None:
