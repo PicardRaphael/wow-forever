@@ -905,7 +905,8 @@ def _fetch_dbd(deps: Deps, args: argparse.Namespace) -> int:
     res = fetch_dbd(deps, args.version, tables, commit=args.dbd_commit, refresh=args.refresh)
     provenance = local_provenance(deps)
     downloaded = sum(1 for f in res["files"] if not f["from_cache"])
-    licence = (res["license"] or {}).get("first_line", "non lue")
+    lic = res["license"] or {}
+    licence = lic.get("first_line") or ("absente du dépôt" if lic.get("status") == "absent" else "non lue")
     lines = [
         (
             f"Définitions {res['repo']} au commit {res['commit'][:12]} : {len(res['files'])} table(s), "

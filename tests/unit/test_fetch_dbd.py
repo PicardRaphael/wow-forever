@@ -121,3 +121,15 @@ def test_cli_fetch_dbd(make_deps, capsys):
     data = json.loads(out)
     assert data["commit"] == SHA and len(data["files"]) == len(tables)
     assert data["provenance"]["game_version"] == LOCAL_VERSION
+
+
+def test_missing_license_is_noted_not_fatal(make_deps):
+    """Relevé réel du 2026-10-05 : LICENSE absent du dépôt (404) ; la licence est notée absente, rien n'échoue."""
+    answers = routes() | {DBD_LICENSE_URL.format(commit=SHA): OSError("HTTP Error 404: Not Found")}
+    http = FakeHttp(routes=answers)
+    deps = make_deps(http=http)
+    res = fetch_dbd(deps, LOCAL_VERSION, ["TraitNode"])
+    assert res["license"] is not None and res["license"]["status"] == "absent"
+    calls = len(http.calls)
+    fetch_dbd(deps, LOCAL_VERSION, ["TraitNode"])
+    assert len(http.calls) == calls  # la licence absente n'est pas redemandée

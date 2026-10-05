@@ -388,13 +388,14 @@ def fetch_dbd(
         try:
             body = deps.http_get(DBD_LICENSE_URL.format(commit=pinned), headers, FETCH_TIMEOUT)
         except OSError as exc:
-            failures.append(f"LICENSE ({exc})")
+            # licence introuvable (404 au relevé du 2026-10-05) : notée, rien n'est recopié du dépôt ailleurs
+            index["license"] = {"status": "absent", "url": DBD_LICENSE_URL.format(commit=pinned), "error": str(exc)}
         else:
             (folder / "LICENSE").parent.mkdir(parents=True, exist_ok=True)
             (folder / "LICENSE").write_bytes(body)
             text = body.decode("utf-8", errors="replace")
             first = next((line.strip() for line in text.splitlines() if line.strip()), "")
-            index["license"] = {"sha256": hashlib.sha256(body).hexdigest(), "first_line": first}
+            index["license"] = {"status": "found", "sha256": hashlib.sha256(body).hexdigest(), "first_line": first}
     _write_dbd_index(deps.cache_dir, index)
     if failures:
         raise FetchFailedError(f"Définitions de {DBD_REPO} ({pinned[:12]}) impossibles : {' ; '.join(failures)}.")

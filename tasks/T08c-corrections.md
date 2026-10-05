@@ -55,3 +55,26 @@ Regroupées pour être présentées en une fois avant la fusion (commande `/tran
 +    assert block["crosscheck"]["only_log"] == []
 +    assert {e["rec_id"] for e in block["crosscheck"]["only_cache"]} == {999901}
 ```
+
+## Bloc B
+
+### 3. `tests/unit/test_dbd.py::test_wrong_identifier_is_refused` : altération sans effet
+
+- Test faux par construction (pas par les données) : il échange les champs 0 et 1 de la disposition de `TraitNode`
+  **puis leur rend leurs noms et leurs annotations** ; le champ lu en premier s'appelle donc encore `ID` et porte
+  `$id$` : la disposition altérée est identique à la vraie, l'identifiant décodé égale `rec_id`, rien n'est refusé.
+- Preuve : sortie du test, `LayoutCheck(table='TraitNode', ok=True, … 14 entrée(s) décodée(s), 12 comparée(s), 79 %
+  des valeurs égales au build)`.
+- Diff proposé (échanger les champs sans les renommer : `TraitTreeID` est lu à la place de l'identifiant) :
+
+```diff
+     lay = layouts["TraitNode"]
+     fields = list(lay.fields)
+-    fields[0], fields[1] = (
+-        fields[1]._replace(name="ID", is_id=True),
+-        fields[0]._replace(name="TraitTreeID", is_id=False),
+-    )
++    fields[0], fields[1] = fields[1], fields[0]  # identifiant lu à la place de TraitTreeID
+```
+
+  Vérifié sur une copie hors verrou : 18 tests sur 18 passent avec ce diff.
