@@ -19,6 +19,7 @@ import copy
 import difflib
 import json
 import os
+import re
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any, TypedDict
@@ -73,7 +74,51 @@ class ProfileView(TypedDict):
     characters: list[str]
     stale: bool | None
     missing: list[str]
+    game_locale: dict[str, Any] | None  # T08c : langue du client (valeur, source `joueur` ou `client`)
     provenance: Provenance
+
+
+CLIENT_CONFIG = ("WTF", "Config.wtf")
+LOCALE_RE = re.compile(r"^[a-z]{2}[A-Z]{2}$")
+_TEXT_LOCALE = re.compile(r'^\s*SET\s+textLocale\s+"(?P<value>[^"]*)"', re.MULTILINE)
+
+
+def client_locale(wow_dir: Path | None) -> str | None:
+    """Langue du client lue dans `WTF/Config.wtf` (`SET textLocale "enUS"`), lecture locale ; None sans fichier."""
+    if wow_dir is None:
+        return None
+    path = wow_dir.joinpath(*CLIENT_CONFIG)
+    try:
+        m = _TEXT_LOCALE.search(path.read_text(encoding="utf-8", errors="replace"))
+    except OSError:
+        return None
+    return m["value"] if m and LOCALE_RE.fullmatch(m["value"]) else None
+
+
+def check_locale(value: str) -> str:
+    if not LOCALE_RE.fullmatch(value):
+        raise InvalidArgumentError(
+            f"Langue du client invalide : « {value} ».", "donner une locale du client de la forme enUS ou frFR"
+        )
+    return value
+
+
+def game_locale(deps: Deps, doc: Mapping[str, Any]) -> dict[str, Any] | None:
+    """Langue du client : celle donnée par le joueur l'emporte, sinon celle du client ; None si aucune."""
+    field = doc.get("game_locale")
+    if isinstance(field, dict) and field.get("value"):
+        return {"value": field["value"], "source": field.get("source", "joueur")}
+    value = client_locale(deps.wow_dir)
+    return {"value": value, "source": "client"} if value else None
+
+
+def set_game_locale(deps: Deps, value: str) -> None:
+    """Langue du client donnée par le joueur (`forever profile set --game-locale`), au niveau du joueur."""
+    check_locale(value)
+    path = resolve_path(deps)
+    doc = load_profile(path)
+    doc["game_locale"] = make_field(value, "joueur", format_utc(deps.now()))
+    save_profile(path, doc)
 
 
 def make_field(
@@ -420,5 +465,6 @@ def read_profile(deps: Deps, name: str | None = None) -> ProfileView:
         "characters": list(doc["characters"]),
         "stale": flat["game_version"] != version if flat is not None else None,
         "missing": missing,
+        "game_locale": game_locale(deps, doc),
         "provenance": local_provenance(deps, certainty="certain", assumptions=notes),
     }

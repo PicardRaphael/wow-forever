@@ -8,6 +8,13 @@ description: "Familiers du Chasseur dans WoW Forever : système d'entraînement 
 Lis d'abord `../forever-router/format-reponse.md` : section « Plugin mal installé », forme de la réponse, règle
 « je ne sais pas ». Aucun chiffre de mémoire : tout vient de `forever_lookup(kind="pets")`, recopié tel quel.
 
+## Noms du client
+
+Le joueur lit les noms dans son client : sa langue est `game_locale`, rendue par `forever_player_profile`. Cite
+chaque sort, talent, capacité, objet et zone **tel qu'il apparaît dans son client** (en anglais pour `enUS`), suivi du
+nom français entre parenthèses quand l'outil le rend (`name_fr`, `name.fr`) ; le reste de la réponse reste en
+français. Sans `game_locale` connue, cite le nom anglais du client et le nom français entre parenthèses.
+
 ## Outil
 - `forever_lookup(kind="pets")` sans `name` : règles du système (apprentissage, points d'entraînement, loyauté,
   marge d'apprivoisement, héritage des statistiques, vitesse d'attaque, focus, bonheur, Beast Lore), chacune avec

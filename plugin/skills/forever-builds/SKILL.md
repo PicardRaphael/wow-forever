@@ -8,6 +8,13 @@ description: "Builds de talents de WoW Forever pour les 9 classes : build calcul
 Lis d'abord `../forever-router/format-reponse.md` : section « Plugin mal installé », forme de la réponse, règle
 « je ne sais pas ». Aucun chiffre de mémoire : tout vient des outils forever.
 
+## Noms du client
+
+Le joueur lit les noms dans son client : sa langue est `game_locale`, rendue par `forever_player_profile`. Cite
+chaque sort, talent, capacité, objet et zone **tel qu'il apparaît dans son client** (en anglais pour `enUS`), suivi du
+nom français entre parenthèses quand l'outil le rend (`name_fr`, `name.fr`) ; le reste de la réponse reste en
+français. Sans `game_locale` connue, cite le nom anglais du client et le nom français entre parenthèses.
+
 ## Mage : build calculé
 - `forever_build(context, level, race, current, respecs)` : skill `forever-mage` pour le détail.
 

@@ -112,12 +112,14 @@ from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
 from forever.profile import (
     ProfileView,
+    check_locale,
     load_profile,
     normalize_class,
     read_profile,
     remove,
     resolve_path,
     set_character,
+    set_game_locale,
     use,
 )
 from forever.profile_import import ImportPlan, apply_import, plan_import
@@ -229,7 +231,8 @@ def build_parser() -> argparse.ArgumentParser:
     plist = psub.add_parser("list", help="personnages du profil")
     plist.add_argument("--json", action="store_true", help="sortie JSON")
     pset = psub.add_parser("set", help="créer ou mettre à jour un personnage (champs donnés seulement)")
-    pset.add_argument("name", help="nom du personnage")
+    pset.add_argument("name", nargs="?", help="nom du personnage (absent : seulement --game-locale)")
+    pset.add_argument("--game-locale", help="langue du client du joueur (enUS, frFR…), prioritaire sur Config.wtf")
     pset.add_argument("--class", dest="cls", help="classe (neuf classes, nom français ou anglais)")
     pset.add_argument("--race", help="race (Mage : races.json)")
     pset.add_argument("--faction", help="faction (jamais déduite)")
@@ -1020,10 +1023,21 @@ def render_verify(r: VerifyReport) -> list[str]:
     return lines
 
 
+def _locale_line(view: ProfileView) -> list[str]:
+    loc = view.get("game_locale")
+    if not loc:
+        return ["Langue du client : inconnue (forever profile set --game-locale enUS, ou FOREVER_WOW_DIR)"]
+    where = "WTF/Config.wtf" if loc["source"] == "client" else "donnée par le joueur"
+    return [f"Langue du client : {loc['value']} ({where})"]
+
+
 def render_profile(view: ProfileView) -> list[str]:
     c = view["character"]
     if c is None:
-        return [f"Profil joueur {view['path']} : aucun personnage (forever profile set <nom> --class Mage …)"]
+        return [
+            f"Profil joueur {view['path']} : aucun personnage (forever profile set <nom> --class Mage …)",
+            *_locale_line(view),
+        ]
     active = " (actif)" if c["name"] == view["active"] else ""
     head = f"Profil : {c['name']}{active}, {c['class']} {c['race'] or 'race ?'}, {c['faction'] or 'faction ?'}"
     if c.get("planned"):
@@ -1041,7 +1055,7 @@ def render_profile(view: ProfileView) -> list[str]:
         lines.append(f"Saisi sur {c['game_version']} : à revérifier sur les données actuelles")
     if not c["validated"]:
         lines.append("Classe non couverte par les calculs : valeurs gardées sans contrôle")
-    return lines
+    return [*lines, *_locale_line(view)]
 
 
 def _parse_professions(items: list[str]) -> dict[str, int] | None:
@@ -1248,7 +1262,13 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
         return _cmd_profile_import(deps, args)
     name: str | None = getattr(args, "name", None)
     target = name or ""
-    if cmd == "set":
+    if cmd == "set" and args.game_locale is not None:
+        check_locale(args.game_locale)
+    if cmd == "set" and not name and args.game_locale is None:
+        raise InvalidArgumentError("Nom du personnage manquant.", "donner un nom, ou --game-locale seulement")
+    if cmd == "set" and args.game_locale is not None:
+        set_game_locale(deps, args.game_locale)
+    if cmd == "set" and name:
         set_character(
             deps,
             target,
