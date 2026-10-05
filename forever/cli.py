@@ -60,7 +60,7 @@ from forever.origins import check_all as check_origins
 from forever.origins import inventory as origins_inventory
 from forever.origins import inventory_payload, render_inventory
 from forever.origins import render_report as render_origins_report
-from forever.pipeline import blizzard_api, hotfixes
+from forever.pipeline import blizzard_api, dbcache, hotfixes
 from forever.pipeline import notes as notes_mod
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
@@ -328,6 +328,7 @@ def build_parser() -> argparse.ArgumentParser:
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
     hot.add_argument("--since-install", action="store_true", help="seulement depuis la révision installée")
+    hot.add_argument("--dbcache", help="valeurs des correctifs (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin)")
     hot.add_argument("--json", action="store_true", help="sortie JSON")
 
     origins = sub.add_parser("origins", help="origine déclarée de chaque valeur des données (hors ligne)")
@@ -1896,18 +1897,35 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
     summary = hotfixes.summarize(entries, since=since)
     csv_dir = wago_dir(deps.cache_dir, version) / DEFAULT_LOCALE
     entities = hotfixes.touched_entities(kept, csv_dir, deps.data_dir / version)
-    notes = [
-        "valeurs des correctifs non lues (DBCache.bin, T08c)",
-        "VALIDATION_RESULT_INVALID compté à part : sens non établi (docs/OPEN_QUESTIONS.md)",
-    ]
+    notes = ["VALIDATION_RESULT_INVALID compté à part : sens non établi (docs/OPEN_QUESTIONS.md)"]
     if log is None or not log.is_file():
         notes.append(f"journal {log or 'Hotfix.log'} absent : journal du cache seulement")
+    cache_path = _dbcache_path(deps, args.dbcache)
+    cache_block: dict[str, Any] | None = None
+    if cache_path is not None and cache_path.is_file():
+        cache = dbcache.read_dbcache(cache_path)
+        log_tables = {ln.table for ln in lines} if log is not None and log.is_file() else set()
+        names = dbcache.table_names(dbcache.known_tables(rules) | log_tables)
+        check = dbcache.crosscheck(cache.entries, names, entries, cache.build, hotfixes.tracked_tables(rules))
+        cache_block = {
+            "path": str(cache_path),
+            **dbcache.summarize_cache(cache, names),
+            "crosscheck": check._asdict(),
+        }
+        notes.append(
+            f"valeurs de DBCache.bin lues (build {cache.build}), appliquées seulement par forever decode --hotfixes"
+        )
+        if not version.endswith(f".{cache.build}"):
+            notes.append(f"DBCache.bin du build {cache.build}, version installée {version} : non applicable")
+    else:
+        notes.append(f"DBCache.bin non lu ({cache_path or 'FOREVER_WOW_DIR absent'}) : valeurs des correctifs non lues")
     provenance = local_provenance(deps, certainty="probable", assumptions=notes)
     payload = {
         "log": str(log) if log else None,
         "new": len(new),
         "summary": summary,
         "entities": entities,
+        "dbcache": cache_block,
         "provenance": provenance,
     }
     head = f"Correctifs du serveur ({'depuis le ' + since if since else 'tous'}) : {summary['lines']} ligne(s), {len(new)} nouvelle(s)"
@@ -1921,8 +1939,37 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
             "  INVALID (sens non établi) : " + ", ".join(f"{t} {n}" for t, n in summary["invalid"].items())
         )
     lines_out += [f"  touché : {e['kind']} {e['key']} (le {e['date']})" for e in entities]
+    if cache_block is not None:
+        cc = cache_block["crosscheck"]
+        lines_out.append(
+            f"DBCache.bin (build {cache_block['build']}, {cache_block['entries']} entrées, "
+            f"sha256 {cache_block['sha256'][:12]}…) : poussées {cache_block['pushes']}"
+        )
+        lines_out += [
+            f"  {t} : " + ", ".join(f"{n} {s}" for s, n in row.items()) for t, row in cache_block["tables"].items()
+        ]
+        lines_out.append(
+            f"  recoupement avec le journal : {cc['matched']} ligne(s) concordante(s), "
+            f"{len(cc['only_log'])} seulement dans le journal, {len(cc['only_cache'])} seulement dans DBCache.bin"
+        )
+        if cache_block["dbreply"] or cache_block["item_reply"]:
+            lines_out.append(
+                f"  réponses à la demande (jamais appliquées) : DBReply {sum(cache_block['dbreply'].values())}, "
+                f"objets {sum(cache_block['item_reply'].values())}"
+            )
+        if cache_block["unknown_hash"]:
+            lines_out.append(f"  tables hors du projet (hachage inconnu) : {len(cache_block['unknown_hash'])}")
     _emit(payload, lines_out, provenance, args.json)
     return EXIT_OK
+
+
+def _dbcache_path(deps: Deps, option: str | None) -> Path | None:
+    """`--dbcache`, sinon `<FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin` ; None sans dossier du client."""
+    if option:
+        return Path(option)
+    if deps.wow_dir is None:
+        return None
+    return deps.wow_dir.joinpath(*(part.format(locale=DEFAULT_LOCALE) for part in dbcache.DBCACHE_PATH))
 
 
 def _cmd_origins(deps: Deps, args: argparse.Namespace) -> int:
