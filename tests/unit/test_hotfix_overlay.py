@@ -167,7 +167,7 @@ def test_touched_entities_carry_their_hotfix(decoded):
         assert fix["pushes"] == [112347]
         assert fix["first_logged_at"].startswith("2026-10-02T08:00:23")
         assert any(r.startswith("TraitNode ") for r in fix["rows"])
-    untouched = talents[105938]
+    untouched = talents[105958]  # Improved Heroic Strike (Armes) : aucune entrée de correctif ne l'atteint
     assert HOTFIX_KEY not in untouched
 
 
@@ -204,7 +204,12 @@ def test_origins_of_the_candidate(decoded):
     covered = {p for r in rules if r["file"] == "classes.json" for p in r["paths"]}
     assert any(p.startswith("/classes/Warrior/trees/") for p in covered)
     assert all("*" not in p for p in covered)
-    assert check_version(with_fix.parent, LOCAL_VERSION).issues == []
+    issues = {(i.kind, i.file, i.path) for i in check_version(with_fix.parent, LOCAL_VERSION).issues}
+    baseline = {(i.kind, i.file, i.path) for i in check_version(decoded[1].parent, LOCAL_VERSION).issues}
+    assert (
+        issues == baseline
+    )  # une candidate n'a pas les fichiers propres à l'installation ; les correctifs n'ajoutent rien
+    assert not any(f == "classes.json" for _, f, _ in issues)
 
 
 # --- Origine propre --------------------------------------------------------------------------------------------

@@ -270,10 +270,7 @@ def test_changed_size_is_refused(layouts, applicable):
 def test_wrong_identifier_is_refused(layouts, applicable):
     lay = layouts["TraitNode"]
     fields = list(lay.fields)
-    fields[0], fields[1] = (
-        fields[1]._replace(name="ID", is_id=True),
-        fields[0]._replace(name="TraitTreeID", is_id=False),
-    )
+    fields[0], fields[1] = fields[1], fields[0]  # identifiant lu à la place de TraitTreeID
     header, rows = csv_table("TraitNode")
     check = validate_layout(
         lay._replace(fields=tuple(fields)), entries_of(applicable, "TraitNode"), header, rows, known_ids(applicable)

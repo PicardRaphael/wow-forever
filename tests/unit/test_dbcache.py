@@ -175,7 +175,7 @@ def test_summary_counts_by_table_and_status(cache, names):
     assert s["tables"]["TraitNode"] == {"VALID": 14, "DELETE": 3}
     assert s["tables"]["SpellName"] == {"VALID": 20, "DELETE": 1}
     assert s["dbreply"] == {"Spell": 2}
-    assert s["max_push"] == 112349
+    assert s["max_push"] == 112350
     assert s["build"] == 70170 and s["entries"] == COUNTS["entries"]
     assert f"{table_hash('QuestV2CliTask'):#010x}" in s["unknown_hash"]
 
@@ -184,15 +184,17 @@ def test_crosscheck_matches_the_journal_of_the_same_build(cache, names):
     journal = read_json(JOURNAL)["entries"]
     tracked = tracked_tables(RULES)
     check = crosscheck(cache.entries, names, journal, cache.build, tracked)
-    assert check.only_log == [] and check.only_cache == []
+    synthetic = [("SpellLevels", 999901, "100001"), ("SpellLevels", 999901, "100002")]
+    assert check.only_log == []
+    assert [(e["table"], e["rec_id"], e["push"]) for e in check.only_cache] == synthetic
     assert check.matched == COUNTS["journal_lines"] == 192
     removed = next(e for e in journal if e["table"] == "TraitNode" and e["rec_id"] == 105928)
     fewer = [e for e in journal if e is not removed]
     check = crosscheck(cache.entries, names, fewer, cache.build, tracked)
-    assert [(e["table"], e["rec_id"]) for e in check.only_cache] == [("TraitNode", 105928)]
+    assert [(e["table"], e["rec_id"]) for e in check.only_cache if e["rec_id"] != 999901] == [("TraitNode", 105928)]
     other_build = [{**e, "client_build": "1.60.1.70124"} for e in journal]
     check = crosscheck(cache.entries, names, other_build, cache.build, tracked)
-    assert check.matched == 0 and len(check.only_cache) == 192
+    assert check.matched == 0 and len(check.only_cache) == 192 + len(COUNTS["synthetic"])
 
 
 def wow_with_cache(tmp_path):
@@ -215,7 +217,8 @@ def test_cli_hotfixes_reads_dbcache(tmp_path, make_deps, capsys):
     assert block["build"] == 70170 and block["sha256"] == COUNTS["sha256"]
     assert block["tables"]["TraitNode"] == {"VALID": 14, "DELETE": 3}
     assert block["crosscheck"]["matched"] == 192
-    assert block["crosscheck"]["only_log"] == [] and block["crosscheck"]["only_cache"] == []
+    assert block["crosscheck"]["only_log"] == []
+    assert {e["rec_id"] for e in block["crosscheck"]["only_cache"]} == {999901}
     assert not any("non lue" in a for a in data["provenance"]["assumptions"])
     assert data["provenance"]["game_version"] == LOCAL_VERSION
     assert "TactKey" not in out
