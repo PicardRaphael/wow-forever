@@ -1,0 +1,1733 @@
+{
+ "schema_version": 1,
+ "entries": [
+  {
+   "at": "2026-10-02T08:00:23.801",
+   "push": "112323",
+   "table": "TraitNode",
+   "rec_id": 110298,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.801",
+   "push": "112349",
+   "table": "SpellName",
+   "rec_id": 6195,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.801",
+   "push": "112349",
+   "table": "Spell",
+   "rec_id": 6195,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.801",
+   "push": "112349",
+   "table": "SpellAuraOptions",
+   "rec_id": 120576,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.801",
+   "push": "112349",
+   "table": "SpellEffect",
+   "rec_id": 684490,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.801",
+   "push": "112349",
+   "table": "SpellMisc",
+   "rec_id": 318981,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Curve",
+   "rec_id": 111755,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Curve",
+   "rec_id": 125258,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Curve",
+   "rec_id": 125259,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Curve",
+   "rec_id": 125260,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Curve",
+   "rec_id": 125261,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Curve",
+   "rec_id": 125264,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Curve",
+   "rec_id": 125265,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 334737,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 334738,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 334739,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 334740,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 334741,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364785,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364786,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364787,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364788,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364789,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364790,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364791,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364792,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364793,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364794,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364795,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364796,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364797,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364798,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364799,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364800,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364801,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364802,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364803,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364804,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364809,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364810,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364811,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364812,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364813,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364814,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364815,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364891,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364892,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "CurvePoint",
+   "rec_id": 364893,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1680,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1680,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 5246,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 5246,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 12321,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 12321,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 12322,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 12322,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 12323,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 12323,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 12880,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 12880,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 16487,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 16487,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 23584,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 23584,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 402913,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 402913,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 457819,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 457819,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 462891,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 462891,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1310236,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1310236,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1310315,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1310315,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1323963,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1323963,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1323964,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1323964,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1323965,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1323965,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1323966,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1323966,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1323967,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1323967,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1323968,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1323968,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellName",
+   "rec_id": 1323969,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "Spell",
+   "rec_id": 1323969,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellAuraOptions",
+   "rec_id": 127917,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellAuraOptions",
+   "rec_id": 247868,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellAuraOptions",
+   "rec_id": 248611,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellAuraOptions",
+   "rec_id": 248612,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellAuraOptions",
+   "rec_id": 248613,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 45955,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 47405,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 70541,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 78596,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 84956,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 84957,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 84958,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 84959,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 84960,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellClassOptions",
+   "rec_id": 84961,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 684364,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 684365,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 689425,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 690204,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1082129,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1163333,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1228253,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1315028,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1339731,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1339735,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1339738,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1339740,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1345676,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1345686,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1358385,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360666,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360676,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360677,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360678,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360679,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360680,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360681,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360682,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellEffect",
+   "rec_id": 1360683,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellInterrupts",
+   "rec_id": 250838,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellInterrupts",
+   "rec_id": 250839,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellInterrupts",
+   "rec_id": 250840,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellLevels",
+   "rec_id": 103013,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellLevels",
+   "rec_id": 153966,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellLevels",
+   "rec_id": 153967,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellLevels",
+   "rec_id": 153968,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellLevels",
+   "rec_id": 153969,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 856910,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 869646,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 869647,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 869648,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 869649,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 869650,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 869651,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellMisc",
+   "rec_id": 869652,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellPower",
+   "rec_id": 315008,
+   "result": "INVALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellPower",
+   "rec_id": 315009,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellPower",
+   "rec_id": 315010,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "SpellPower",
+   "rec_id": 315011,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinition",
+   "rec_id": 135484,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinition",
+   "rec_id": 142603,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinition",
+   "rec_id": 145860,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinition",
+   "rec_id": 145863,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinition",
+   "rec_id": 145864,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 23597,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 24568,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 24569,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25094,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25099,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25167,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25179,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25180,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25181,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25182,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25185,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitDefinitionEffectPoints",
+   "rec_id": 25186,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitEdge",
+   "rec_id": 124811,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitEdge",
+   "rec_id": 132568,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitEdge",
+   "rec_id": 136314,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitEdge",
+   "rec_id": 136735,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitEdge",
+   "rec_id": 136736,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105928,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105929,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105936,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105953,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105961,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105962,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105963,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105966,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105967,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105969,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105973,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105974,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105975,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 105978,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 113569,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNode",
+   "rec_id": 113570,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNodeEntry",
+   "rec_id": 141191,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNodeEntry",
+   "rec_id": 141192,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNodeXTraitNodeEntry",
+   "rec_id": 128126,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNodeXTraitNodeEntry",
+   "rec_id": 128133,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNodeXTraitNodeEntry",
+   "rec_id": 128170,
+   "result": "DELETE",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNodeXTraitNodeEntry",
+   "rec_id": 139873,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  },
+  {
+   "at": "2026-10-02T08:00:23.892",
+   "push": "112347",
+   "table": "TraitNodeXTraitNodeEntry",
+   "rec_id": 139874,
+   "result": "VALID",
+   "first_seen": "2026-10-02T06:13:15+00:00",
+   "client_build": "1.60.1.70170"
+  }
+ ]
+}
