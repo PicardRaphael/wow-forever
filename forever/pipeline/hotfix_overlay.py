@@ -532,3 +532,9 @@ def sources_block(
             for t, k in sorted(checks.items())
         },
     }
+
+
+def hotfix_values(source: HotfixSource, csv_dir: Path, version_dir: Path) -> dict[str, Any]:
+    """`forever hotfixes --values` : pour chaque enregistrement applicable, champ par champ, valeur du build (CSV) et
+    valeur du correctif (DBCache.bin), entités de la version installée qu'il touche ; listes à part."""
+    raise NotImplementedError
