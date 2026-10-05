@@ -174,7 +174,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   sur 113569 et Iron Will sur 113570 (nœuds ajoutés) ; Talents Forever 0.37.1 les place sur 113564 à 113566 et garde
   Iron Will sur 110857 (noms, rangées, colonnes, rangs et sorts identiques des deux côtés). Les codes de Talents
   Forever portent des nœuds : à trancher avant l'export de FA1. Test : talent appris en jeu puis code exporté par
-  l'addon ; tables du build 70205. Priorité : moyenne (FA1).
+  l'addon ; tables du build 70205. Talents Forever 0.37.1 a peut-être été construit sur 1.60.1.70205, version vers
+  laquelle le client de l'utilisateur est passé, qui pourrait intégrer la refonte avec d'autres identifiants de
+  nœuds : la question sera tranchée à l'installation de 70205 (note de l'utilisateur du 2026-10-05). Priorité :
+  moyenne (FA1).
 
 ## Journaux, addons et sauvegardes
 - **LOG1 — Que portent les champs inconnus du bloc avancé du journal (dont le dernier pour un joueur) ?** Test :

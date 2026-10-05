@@ -256,7 +256,16 @@
        "spell_id": 12862,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitDefinitionEffectPoints 25167"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "improvedHamstring",
@@ -314,11 +323,27 @@
        "tier": 1,
        "col": 2,
        "max": 5,
-       "desc": "Increases the radius of your Battle Shout and Demoralizing Shout abilities by $s1%.",
+       "desc": "Increases the area of effect of your Shouts by $s1% and reduces their Rage cost by $s2%.",
        "spell_id": 12321,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "CurvePoint 364800",
+         "CurvePoint 364801",
+         "CurvePoint 364891",
+         "CurvePoint 364892",
+         "CurvePoint 364893",
+         "Spell 12321",
+         "SpellEffect 1360666",
+         "TraitDefinitionEffectPoints 25182"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "cruelty",
@@ -336,19 +361,42 @@
        "certainty": "FC-1.60.1.70170"
       },
       {
-       "key": "ironWill",
-       "name": "Iron Will",
-       "name_fr": "Volonté de fer",
+       "key": "lingeringRage",
+       "name": "Lingering Rage",
+       "name_fr": "",
        "node_id": 110857,
        "tree": "Fury",
        "tier": 2,
        "col": 2,
        "max": 5,
-       "desc": "Reduces the duration of Stun and Fear effects inflicted on you by $s1%.",
-       "spell_id": 12962,
+       "desc": "Increases the time before your Rage begins to decay after leaving combat by ${$s1/1000} sec.",
+       "spell_id": 1323964,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "CurvePoint 364795",
+         "CurvePoint 364796",
+         "CurvePoint 364797",
+         "CurvePoint 364798",
+         "CurvePoint 364799",
+         "Spell 1323964",
+         "SpellAuraOptions 248611",
+         "SpellEffect 1360677",
+         "SpellLevels 153966",
+         "SpellMisc 869647",
+         "SpellName 1323964",
+         "TraitDefinition 142603",
+         "TraitDefinitionEffectPoints 24568",
+         "TraitDefinitionEffectPoints 24569",
+         "TraitDefinitionEffectPoints 25181"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "unbridledWrath",
@@ -359,26 +407,54 @@
        "tier": 2,
        "col": 3,
        "max": 5,
-       "desc": "Gives you a $m1% chance to generate ${$12964m1/10} additional Rage when you deal melee damage with a weapon. This effect is increased to ${($12964m1/10)*2} Rage for two-handed weapons.",
+       "desc": "Gives you a $m1% chance to generate ${$12964m1/10} additional Rage when you deal melee damage with a weapon.",
        "spell_id": 12322,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "Spell 12322"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
-       "key": "improvedCleave",
-       "name": "Improved Cleave",
-       "name_fr": "Enchaînement amélioré",
-       "node_id": 105936,
+       "key": "furiousPrecision",
+       "name": "Furious Precision",
+       "name_fr": "",
+       "node_id": 105953,
        "tree": "Fury",
        "tier": 3,
        "col": 1,
        "max": 3,
-       "desc": "Reduces the Rage cost of your Cleave ability by ${$m1/-10}.",
-       "spell_id": 12329,
+       "desc": "Increases your chance to hit with off-hand attacks by $m1%.",
+       "spell_id": 1323963,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "CurvePoint 364790",
+         "CurvePoint 364791",
+         "CurvePoint 364792",
+         "Spell 1323963",
+         "SpellEffect 1360676",
+         "SpellMisc 869646",
+         "SpellName 1323963",
+         "TraitDefinition 135484",
+         "TraitDefinitionEffectPoints 23597",
+         "TraitDefinitionEffectPoints 25180",
+         "TraitNode 105953"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "piercingHowl",
@@ -389,11 +465,20 @@
        "tier": 3,
        "col": 2,
        "max": 1,
-       "desc": "Causes all nearby enemies to be Dazed, reducing movement speed by $s1% for $d.",
+       "desc": "Causes all enemies within $a2 yds to be Dazed, reducing movement speed by $s1% for $d.",
        "spell_id": 12323,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "Spell 12323"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "bloodCraze",
@@ -404,26 +489,20 @@
        "tier": 3,
        "col": 3,
        "max": 3,
-       "desc": "Regenerates $m1% of your total Health over $16488d after being the victim of a critical strike, dealing damage with Bloodthirst, or suffering more than $m2% of your maximum Health from a single attack.",
+       "desc": "Regenerates $m1% of your total Health over $16488d after being the victim of a critical strike or suffering more than $m2% of your maximum Health from a single attack.",
        "spell_id": 16487,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
-      },
-      {
-       "key": "boundlessRage",
-       "name": "Boundless Rage",
-       "name_fr": "Rage infinie",
-       "node_id": 105953,
-       "tree": "Fury",
-       "tier": 3,
-       "col": 4,
-       "max": 3,
-       "desc": "Increases your maximum Rage by ${$m1/10}.",
-       "spell_id": 1310236,
-       "prereq": null,
-       "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "Spell 16487"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "dualWieldSpecialization",
@@ -434,11 +513,28 @@
        "tier": 4,
        "col": 1,
        "max": 5,
-       "desc": "Increases your off-hand weapon damage by $m1% and chance to hit with off-hand attacks by $m2%.",
+       "desc": "Increases the damage done by your off-hand weapon by $m1% and the Rage generated by your off-hand attacks by $m2%.",
        "spell_id": 23584,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "CurvePoint 334737",
+         "CurvePoint 334738",
+         "CurvePoint 334739",
+         "CurvePoint 334740",
+         "CurvePoint 334741",
+         "Spell 23584",
+         "SpellAuraOptions 247868",
+         "SpellEffect 1315028",
+         "TraitDefinitionEffectPoints 25094"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "ragingBlows",
@@ -449,11 +545,21 @@
        "tier": 4,
        "col": 2,
        "max": 1,
-       "desc": "Causes your Whirlwind to also strike with your Off Hand weapon, and reduces the Rage cost of your Cleave ability by ${$m2/-10}.\r\n",
+       "desc": "Reduces the Rage cost of your Cleave and Whirlwind abilities by ${$m2/-10}.",
        "spell_id": 1310315,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "Spell 1310315",
+         "SpellEffect 1345686"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "enrage",
@@ -468,7 +574,17 @@
        "spell_id": 12317,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitEdge 124811",
+         "TraitEdge 136735"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "improvedExecute",
@@ -486,19 +602,28 @@
        "certainty": "FC-1.60.1.70170"
       },
       {
-       "key": "precision",
-       "name": "Precision",
-       "name_fr": "Précision",
-       "node_id": 105929,
+       "key": "improvedBerserkerRage",
+       "name": "Improved Berserker Rage",
+       "name_fr": "Rage berserker améliorée",
+       "node_id": 105978,
        "tree": "Fury",
        "tier": 5,
        "col": 1,
-       "max": 3,
-       "desc": "Improves your chance to hit by $s1%.",
-       "spell_id": 1225295,
+       "max": 2,
+       "desc": "Your Berserker Rage ability will instantly generate $/10;m1 Rage and has a $m2% chance to remove all movement impairing effects when activated.",
+       "spell_id": 20500,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105978"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "deathWish",
@@ -513,7 +638,17 @@
        "spell_id": 12328,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitEdge 136314",
+         "TraitEdge 136736"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "improvedIntercept",
@@ -531,57 +666,16 @@
        "certainty": "FC-1.60.1.70170"
       },
       {
-       "key": "improvedBerserkerRage",
-       "name": "Improved Berserker Rage",
-       "name_fr": "Rage berserker améliorée",
-       "node_id": 105978,
-       "tree": "Fury",
-       "tier": 6,
-       "col": 1,
-       "max": 2,
-       "desc": "Your Berserker Rage ability will instantly generate $/10;m1 Rage and has a $m2% chance to remove all movement impairing effects when activated.",
-       "spell_id": 20500,
-       "prereq": null,
-       "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
-      },
-      {
        "key": "flurry",
        "name": "Flurry",
        "name_fr": "Rafale",
        "node_id": 105928,
        "tree": "Fury",
        "tier": 6,
-       "col": 3,
+       "col": 2,
        "max": 5,
        "desc": "Increases your melee attack speed by $m1% for your next $12966n swings after dealing a melee critical strike.",
        "spell_id": 12319,
-       "prereq": {
-        "node_id": 105931,
-        "tier": 4,
-        "col": 3
-       },
-       "prereqs": [
-        {
-         "node_id": 105931,
-         "tier": 4,
-         "col": 3,
-         "kind": "sufficient"
-        }
-       ],
-       "certainty": "FC-1.60.1.70170"
-      },
-      {
-       "key": "bloodthirst",
-       "name": "Bloodthirst",
-       "name_fr": "Sanguinaire",
-       "node_id": 105930,
-       "tree": "Fury",
-       "tier": 7,
-       "col": 2,
-       "max": 1,
-       "desc": "Instantly attack the target causing damage equal to $s2% of your Attack Power plus $s1 and increasing your movement speed by $s3% for $d.",
-       "spell_id": 23881,
        "prereq": {
         "node_id": 105927,
         "tier": 5,
@@ -595,7 +689,92 @@
          "kind": "sufficient"
         }
        ],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitEdge 124811",
+         "TraitEdge 136736",
+         "TraitNode 105928"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
+      },
+      {
+       "key": "goreDrinker",
+       "name": "Gore Drinker",
+       "name_fr": "",
+       "node_id": 113569,
+       "tree": "Fury",
+       "tier": 6,
+       "col": 3,
+       "max": 2,
+       "desc": "Your Enrage, Berserker Rage, Bloodrage, Death Wish, and Bloodthirst abilities cause your next $m1 melee attacks to restore ${$s2}.1% of your maximum Health.",
+       "spell_id": 1323967,
+       "prereq": {
+        "node_id": 105931,
+        "tier": 4,
+        "col": 3
+       },
+       "prereqs": [
+        {
+         "node_id": 105931,
+         "tier": 4,
+         "col": 3,
+         "kind": "sufficient"
+        }
+       ],
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "CurvePoint 364809",
+         "CurvePoint 364810",
+         "Spell 1323967",
+         "SpellAuraOptions 248612",
+         "SpellClassOptions 84958",
+         "SpellEffect 1360680",
+         "SpellEffect 1360681",
+         "SpellMisc 869650",
+         "SpellName 1323967",
+         "TraitDefinition 145863",
+         "TraitDefinitionEffectPoints 25185",
+         "TraitEdge 136735",
+         "TraitNode 113569",
+         "TraitNodeEntry 141191",
+         "TraitNodeXTraitNodeEntry 139873"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
+      },
+      {
+       "key": "bloodthirst",
+       "name": "Bloodthirst",
+       "name_fr": "Sanguinaire",
+       "node_id": 105930,
+       "tree": "Fury",
+       "tier": 7,
+       "col": 2,
+       "max": 1,
+       "desc": "Instantly attack the target causing damage equal to $s2% of your Attack Power plus $s1 and increasing your movement speed by $s3% for $d.",
+       "spell_id": 23881,
+       "prereq": null,
+       "prereqs": [],
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "SpellEffect 1339731",
+         "TraitEdge 136314"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       }
      ]
     },
@@ -603,6 +782,31 @@
      "name": "Protection",
      "skill_line": 257,
      "talents": [
+      {
+       "key": "improvedBloodrage",
+       "name": "Improved Bloodrage",
+       "name_fr": "Rage sanguinaire améliorée",
+       "node_id": 105974,
+       "tree": "Protection",
+       "tier": 1,
+       "col": 1,
+       "max": 2,
+       "desc": "Increases all the Rage generated by your Bloodrage ability by $m1%.",
+       "spell_id": 12301,
+       "prereq": null,
+       "prereqs": [],
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitEdge 132568",
+         "TraitNode 105974"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
+      },
       {
        "key": "shieldSpecialization",
        "name": "Shield Specialization",
@@ -619,49 +823,94 @@
        "certainty": "FC-1.60.1.70170"
       },
       {
+       "key": "ironWill",
+       "name": "Iron Will",
+       "name_fr": "Volonté de fer",
+       "node_id": 113570,
+       "tree": "Protection",
+       "tier": 1,
+       "col": 3,
+       "max": 5,
+       "desc": "Reduces the duration of Stun and Fear effects inflicted on you by $s1%.",
+       "spell_id": 12962,
+       "prereq": null,
+       "prereqs": [],
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "CurvePoint 364795",
+         "CurvePoint 364796",
+         "CurvePoint 364797",
+         "CurvePoint 364798",
+         "CurvePoint 364799",
+         "CurvePoint 364811",
+         "CurvePoint 364812",
+         "CurvePoint 364813",
+         "CurvePoint 364814",
+         "CurvePoint 364815",
+         "TraitDefinition 142603",
+         "TraitDefinition 145864",
+         "TraitDefinitionEffectPoints 24568",
+         "TraitDefinitionEffectPoints 24569",
+         "TraitDefinitionEffectPoints 25181",
+         "TraitDefinitionEffectPoints 25186",
+         "TraitNode 113570",
+         "TraitNodeEntry 141192",
+         "TraitNodeXTraitNodeEntry 139874"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
+      },
+      {
        "key": "anticipation",
        "name": "Anticipation",
        "name_fr": "Anticipation",
        "node_id": 105975,
        "tree": "Protection",
-       "tier": 1,
-       "col": 3,
+       "tier": 2,
+       "col": 1,
        "max": 5,
        "desc": "Increases your Defense Skill by $m1.",
        "spell_id": 12297,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105975"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
-       "key": "improvedBloodrage",
-       "name": "Improved Bloodrage",
-       "name_fr": "Rage sanguinaire améliorée",
-       "node_id": 105974,
-       "tree": "Protection",
-       "tier": 2,
-       "col": 1,
-       "max": 2,
-       "desc": "Increases all the Rage generated by your Bloodrage ability by $m1%.",
-       "spell_id": 12301,
-       "prereq": null,
-       "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
-      },
-      {
-       "key": "toughness",
-       "name": "Toughness",
-       "name_fr": "Résistance",
-       "node_id": 105973,
+       "key": "improvedRevenge",
+       "name": "Improved Revenge",
+       "name_fr": "Vengeance améliorée",
+       "node_id": 105969,
        "tree": "Protection",
        "tier": 2,
        "col": 3,
-       "max": 5,
-       "desc": "Increases your Armor value from items by $s1%.",
-       "spell_id": 12299,
+       "max": 3,
+       "desc": "Increases damage dealt by your Revenge ability by $m1%.",
+       "spell_id": 12797,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105969"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "improvedThunderClap",
@@ -689,20 +938,18 @@
        "max": 1,
        "desc": "When activated, this ability temporarily grants you $12976s1% of your maximum health for $12976d. After the effect expires, the health is lost.",
        "spell_id": 12975,
-       "prereq": {
-        "node_id": 105974,
-        "tier": 2,
-        "col": 1
-       },
-       "prereqs": [
-        {
-         "node_id": 105974,
-         "tier": 2,
-         "col": 1,
-         "kind": "sufficient"
-        }
-       ],
-       "certainty": "FC-1.60.1.70170"
+       "prereq": null,
+       "prereqs": [],
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitEdge 132568"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "masterOfDefense",
@@ -731,19 +978,28 @@
        "certainty": "FC-1.60.1.70170"
       },
       {
-       "key": "improvedRevenge",
-       "name": "Improved Revenge",
-       "name_fr": "Vengeance améliorée",
-       "node_id": 105969,
+       "key": "improvedDisarm",
+       "name": "Improved Disarm",
+       "name_fr": "Désarmement amélioré",
+       "node_id": 105967,
        "tree": "Protection",
        "tier": 3,
        "col": 3,
        "max": 3,
-       "desc": "Increases damage dealt by your Revenge ability by $m1%.",
-       "spell_id": 12797,
+       "desc": "Reduces the cooldown of your Disarm ability by $/1000;s1 secs.",
+       "spell_id": 12313,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105967"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "defiance",
@@ -776,34 +1032,52 @@
        "certainty": "FC-1.60.1.70170"
       },
       {
-       "key": "improvedDisarm",
-       "name": "Improved Disarm",
-       "name_fr": "Désarmement amélioré",
-       "node_id": 105967,
-       "tree": "Protection",
-       "tier": 4,
-       "col": 2,
-       "max": 3,
-       "desc": "Reduces the cooldown of your Disarm ability by $/1000;s1 secs.",
-       "spell_id": 12313,
-       "prereq": null,
-       "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
-      },
-      {
        "key": "vanguard",
        "name": "Vanguard",
        "name_fr": "Avant-garde",
        "node_id": 105966,
        "tree": "Protection",
        "tier": 4,
-       "col": 3,
+       "col": 2,
        "max": 1,
        "desc": "Your Charge ability is now usable while in Defensive Stance.",
        "spell_id": 1310317,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105966"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
+      },
+      {
+       "key": "improvedShieldBash",
+       "name": "Improved Shield Bash",
+       "name_fr": "Coup de bouclier amélioré",
+       "node_id": 105963,
+       "tree": "Protection",
+       "tier": 4,
+       "col": 3,
+       "max": 2,
+       "desc": "Gives your Shield Bash ability a $m1% chance to Silence the target for $18498d.",
+       "spell_id": 12311,
+       "prereq": null,
+       "prereqs": [],
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105963"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "improvedShieldWall",
@@ -836,19 +1110,28 @@
        "certainty": "FC-1.60.1.70170"
       },
       {
-       "key": "improvedShieldBash",
-       "name": "Improved Shield Bash",
-       "name_fr": "Coup de bouclier amélioré",
-       "node_id": 105963,
+       "key": "focusedRage",
+       "name": "Focused Rage",
+       "name_fr": "Rage focalisée",
+       "node_id": 105961,
        "tree": "Protection",
        "tier": 5,
        "col": 3,
-       "max": 2,
-       "desc": "Gives your Shield Bash ability a $m1% chance to Silence the target for $18498d.",
-       "spell_id": 12311,
+       "max": 3,
+       "desc": "Reduces the Rage cost of your offensive abilities by $/10;s1.",
+       "spell_id": 29787,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105961"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "bastion",
@@ -856,29 +1139,23 @@
        "name_fr": "Bastion",
        "node_id": 105962,
        "tree": "Protection",
-       "tier": 5,
-       "col": 4,
+       "tier": 6,
+       "col": 3,
        "max": 5,
        "desc": "Increases all damage you deal by $s1% while a shield is equipped.",
        "spell_id": 16538,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
-      },
-      {
-       "key": "focusedRage",
-       "name": "Focused Rage",
-       "name_fr": "Rage focalisée",
-       "node_id": 105961,
-       "tree": "Protection",
-       "tier": 6,
-       "col": 3,
-       "max": 3,
-       "desc": "Reduces the Rage cost of your offensive abilities by $/10;s1.",
-       "spell_id": 29787,
-       "prereq": null,
-       "prereqs": [],
-       "certainty": "FC-1.60.1.70170"
+       "certainty": "FC-1.60.1.70170",
+       "hotfix": {
+        "pushes": [
+         112347
+        ],
+        "rows": [
+         "TraitNode 105962"
+        ],
+        "first_logged_at": "2026-10-02T08:00:23.892"
+       }
       },
       {
        "key": "shieldSlam",
@@ -926,8 +1203,7 @@
      "skill_line": 256,
      "majority": 256,
      "counts": {
-      "256": 14,
-      "257": 1
+      "256": 13
      }
     },
     {
@@ -2268,7 +2544,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "Spell 1680"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "hamstring": {
      "name": "Hamstring",
@@ -2786,7 +3071,16 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "Spell 5246"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "execute": {
      "name": "Execute",
@@ -4357,7 +4651,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105975"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "shieldSpecialization": {
      "name": "Shield Specialization",
@@ -4399,10 +4702,7 @@
      "name": "Toughness",
      "name_fr": "Résistance",
      "skill_line": 257,
-     "talent": {
-      "node_id": 105973,
-      "key": "toughness"
-     },
+     "talent": null,
      "ranks": [
       {
        "spell_id": 12299,
@@ -4429,7 +4729,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105973",
+       "TraitNodeXTraitNodeEntry 128170"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort12300": {
      "name": "sort 12300",
@@ -4495,7 +4805,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitEdge 132568",
+       "TraitNode 105974"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "improvedTaunt": {
      "name": "Improved Taunt",
@@ -4736,7 +5056,16 @@
        "via": 18498
       }
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105963"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "improvedShieldWall": {
      "name": "Improved Shield Wall",
@@ -4808,7 +5137,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105967"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "enrage": {
      "name": "Enrage",
@@ -4844,7 +5182,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitEdge 124811",
+       "TraitEdge 136735"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "improvedBattleShout": {
      "name": "Improved Battle Shout",
@@ -4989,7 +5337,18 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitEdge 124811",
+       "TraitEdge 136736",
+       "TraitNode 105928"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "cruelty": {
      "name": "Cruelty",
@@ -5061,7 +5420,23 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "CurvePoint 364800",
+       "CurvePoint 364801",
+       "CurvePoint 364891",
+       "CurvePoint 364892",
+       "CurvePoint 364893",
+       "Spell 12321",
+       "SpellEffect 1360666",
+       "TraitDefinitionEffectPoints 25182"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "unbridledWrath": {
      "name": "Unbridled Wrath",
@@ -5116,7 +5491,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "Spell 12322"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "piercingHowl": {
      "name": "Piercing Howl",
@@ -5170,7 +5554,16 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "Spell 12323"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "improvedDemoralizingShout": {
      "name": "Improved Demoralizing Shout",
@@ -5393,16 +5786,23 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitEdge 136314",
+       "TraitEdge 136736"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "improvedCleave": {
      "name": "Improved Cleave",
      "name_fr": "Enchaînement amélioré",
      "skill_line": 256,
-     "talent": {
-      "node_id": 105936,
-      "key": "improvedCleave"
-     },
+     "talent": null,
      "ranks": [
       {
        "spell_id": 12329,
@@ -5429,7 +5829,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105936",
+       "TraitNodeXTraitNodeEntry 128133"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort12330": {
      "name": "sort 12330",
@@ -6748,7 +7158,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105969"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort12798": {
      "name": "sort 12798",
@@ -7654,7 +8073,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitDefinitionEffectPoints 25167"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort12867": {
      "name": "sort 12867",
@@ -7841,7 +8269,7 @@
      "name_fr": "Volonté de fer",
      "skill_line": 257,
      "talent": {
-      "node_id": 110857,
+      "node_id": 113570,
       "key": "ironWill"
      },
      "ranks": [
@@ -7870,7 +8298,34 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "CurvePoint 364795",
+       "CurvePoint 364796",
+       "CurvePoint 364797",
+       "CurvePoint 364798",
+       "CurvePoint 364799",
+       "CurvePoint 364811",
+       "CurvePoint 364812",
+       "CurvePoint 364813",
+       "CurvePoint 364814",
+       "CurvePoint 364815",
+       "TraitDefinition 142603",
+       "TraitDefinition 145864",
+       "TraitDefinitionEffectPoints 24568",
+       "TraitDefinitionEffectPoints 24569",
+       "TraitDefinitionEffectPoints 25181",
+       "TraitDefinitionEffectPoints 25186",
+       "TraitNode 113570",
+       "TraitNodeEntry 141192",
+       "TraitNodeXTraitNodeEntry 139874"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort12967": {
      "name": "sort 12967",
@@ -8146,7 +8601,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitEdge 132568"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort12999": {
      "name": "sort 12999",
@@ -8587,7 +9051,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "Spell 16487"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort16489": {
      "name": "sort 16489",
@@ -8749,7 +9222,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105962"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort16539": {
      "name": "sort 16539",
@@ -8880,7 +9362,7 @@
       {
        "spell_id": 18499,
        "rank": null,
-       "level": 32,
+       "level": 30,
        "cast_s": 0,
        "cooldown_s": 30,
        "gcd_s": 1.5,
@@ -8918,7 +9400,16 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "SpellLevels 103013"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "improvedIntimidatingShout": {
      "name": "Improved Intimidating Shout",
@@ -9265,7 +9756,16 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "TraitNode 105978"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort20501": {
      "name": "sort 20501",
@@ -9496,7 +9996,24 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "CurvePoint 334737",
+       "CurvePoint 334738",
+       "CurvePoint 334739",
+       "CurvePoint 334740",
+       "CurvePoint 334741",
+       "Spell 23584",
+       "SpellAuraOptions 247868",
+       "SpellEffect 1315028",
+       "TraitDefinitionEffectPoints 25094"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "sort23585": {
      "name": "sort 23585",
@@ -9763,7 +10280,20 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70170"
+     "certainty": "FC-1.60.1.70170",
+     "hotfix": {
+      "pushes": [
+       112347
+      ],
+      "rows": [
+       "SpellEffect 1339731",
+       "SpellEffect 1339735",
+       "SpellEffect 1339738",
+       "SpellEffect 1339740",
+       "TraitEdge 136314"
+      ],
+      "first_logged_at": "2026-10-02T08:00:23.892"
+     }
     },
     "shieldSlam": {
      "name": "Shield Slam",

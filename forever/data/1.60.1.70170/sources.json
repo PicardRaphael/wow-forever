@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70170 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-10-02)",
+      "source": "Client 1.60.1.70170 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-05)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70170 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-10-02)",
+      "source": "Client 1.60.1.70170 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-05)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -179,7 +179,8 @@
       "certainty": "certain",
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
-        "classement PvP : table de decode_rules.json, certitude probable"
+        "classement PvP : table de decode_rules.json, certitude probable",
+        "installé en révision 4 (forever install, 2026-10-05)"
       ]
     },
     "races.json": {
@@ -260,6 +261,1835 @@
       "inherited_from": "1.60.1.70124"
     }
   },
-  "revision": 3,
-  "revised_at": "2026-10-02"
+  "revision": 4,
+  "revised_at": "2026-10-05",
+  "hotfixes": {
+    "dbcache": {
+      "file": "Cache/ADB/enUS/DBCache.bin",
+      "locale": "enUS",
+      "format": 9,
+      "build": 70170,
+      "size": 7300286,
+      "sha256": "2f2a6ba10c8272c1a3041369f8780eeb2ba49486b3c263a9ebc0fbe9c38e1e75",
+      "file_date": "2026-10-02T15:54:43Z",
+      "read_at": "2026-10-05T15:10:22Z"
+    },
+    "dbd": {
+      "repo": "wowdev/WoWDBDefs",
+      "commit": "1d356b44c798e89802928457b2854003098e28ab",
+      "files": {
+        "CharBaseInfo": "55a9714328543b1bd400a335b6157dc10ccd0de8b7cc991bbd688a9e41dbd531",
+        "ChrClasses": "7278d501b056e521528b81ec78682d2c5345c1349f11a73d49148553a7c4f245",
+        "ChrRaces": "ac2c8c75d8a5bf53bf530b4177536c158e051822ab00081bd2c9b56cfc5055c3",
+        "CreatureFamily": "6150e27ee6355efbd9fda25b6400db6bc250913fb25f1fe1bacf89be39efef05",
+        "Curve": "cbc37d6d8eca5280b058267b881dd98ef899f55739114cd0e8ec7180cdf6f1c6",
+        "CurvePoint": "b9ec6f1ad4c35cd56bdc40d3f08e8fbc78e960138abae3d1ae76eedc3013989f",
+        "Exhaustion": "587b54a60a7139a5829632abad8da7d251667a165cc2a6d86592a6a7390c5e35",
+        "ExpectedStat": "d76ee35328293da57172bf5e4327484d33cdcfecbf249ba1df36474cbde56c9d",
+        "GlobalCurve": "652662738730e2da7c0c688b86d9f8b337c6862cc113013c8b4d27423417342c",
+        "Item": "27cd6b58e6dd5166266f0f8a69f420f700c8480b584952c8f4260bf651ae3209",
+        "ItemEffect": "da7d1b971a53e814b7c68b9ab13adc63d35377d1b09808a41edfc83ac2fa9b8b",
+        "ItemPetFood": "57ba39e68f42ab18c4df15c4dadd99bd8c4828dd1e8a1e726166a4fcb7c1e642",
+        "ItemSparse": "ff87dafe875376c0ee5b6951ef4668aaae53a862d190cd9d3e6b708a9deafe9b",
+        "ItemXItemEffect": "ba49e31174184dbfd42c654576fc7819e148260fed0c7c7b8f5154a54aedc337",
+        "LevelExperience": "18f95484d8570aadfed59e3554db6867fd399309efa800608dcc4201af73ff98",
+        "NumTalentsAtLevel": "238b780f76c1a390fff993bd1e1c12f6b7b58831ecec2701b6b016183dc0b3c0",
+        "PlayerExpectedStat": "6738f5907f20fd857a900065048fff909296376a71231f1188402a06c9fabebe",
+        "SkillLine": "1253559b2670dada97e857304278fcac7673fb7b1a6fe551539e86d910ab433c",
+        "SkillLineAbility": "63ca6e6989101c788912d20b005eb2dd33f634f69866eec999bda2f911c99a38",
+        "SkillLineXTraitTree": "c967426f4519f6bda54446fc69bc5328ebbf15685b452600df92e9b0a0dd87f5",
+        "SkillRaceClassInfo": "304f16c9316977590664b2fb18e1f32f38dd35eda02703cb3eea8bdc65048518",
+        "Spell": "0a46948da74397f66fcd0143f44a7e4a80812005e0fb64004c3450dbfc76235d",
+        "SpellAuraOptions": "d66d07fd6283c63f3ce708768248231440ca224f4442ec0b0c0c44ba3db09d3e",
+        "SpellAuraRestrictions": "d4bf466ca68aea8c9ceb41599be9ab02f4b15b8881cdd1a9eaf3e27b24290947",
+        "SpellCastTimes": "fe3747d89aa4cdd4a4c001970dd3161d64620148447f596b37ad567f2914ce5d",
+        "SpellCategories": "e39f11be315a977f6cce3c94157db16001c5326276075c1ebca3d49e31c00658",
+        "SpellCategory": "d10c0165e773cc8a5dcdaaad18dfc1e0593b4de1de6fcd929198df54feab3b05",
+        "SpellClassOptions": "3521f988b8c82573374adde8ba7db7dd2286d4a872093ca2828b2f63b0f33510",
+        "SpellCooldowns": "e3a61e0b89298db2eb583b54321f10b851e740f071ebefa5c954aa0332fb004c",
+        "SpellDispelType": "b03381b38174f8161442d46ca9ca1c0ab6730f7be31f40b15305eddcc4032cc5",
+        "SpellDuration": "9cb2cfbf62cf973117b72086e379622b33be3502c773b539ba9d59024c38dc5a",
+        "SpellEffect": "7fc5faacbc087b63028633eabe669162a8ffeee68d3b8d54340a8ebc4cb0e479",
+        "SpellInterrupts": "ae7f581ae6c06afea959c24182214b9fdb90abb54311cdbf675f4940326a5869",
+        "SpellLevels": "c4156694ee1fec68aef1da482b1c819c4bfc8b0344ec9c53f1c540f074f22194",
+        "SpellMechanic": "8d046d6f14bee41b1db939b330852c1fb33cacd505fc76b3c19dd0ea86c68bba",
+        "SpellMisc": "f70b8148f0ed9d1ed65c37e347222e84f5e9114738089d945f9d55a28d5aa053",
+        "SpellName": "f9cf7248b55784308365d89261ccab599554fae024f2d174ec6358045ca58ea1",
+        "SpellPower": "ce2ef0117a171c64e2ab349f28a6ba86bd09c8aa5d5bc9e00d977885e44f6ab6",
+        "SpellRange": "b75d8436a24dfb074e3345c759a203e10bb8a15730d439b1f9ea63f678890757",
+        "SpellShapeshift": "6d223455ebe1c34b18c05f4c0aa5b1b9913b721f67c5e604cc3030d0f6dc637a",
+        "TraitCond": "1ff7ad2fed4995605f2586f18ede6eb22326c1357a3766665405e70b212a77de",
+        "TraitDefinition": "12f9fb0fd355db7f155814eca85501a92516238bc8800da5e0f55c1dd288574b",
+        "TraitDefinitionEffectPoints": "d5e71dfc7cab6176d2d8fdd1d8070d4277cd2c9778b6e64438d61b1c7f1bb383",
+        "TraitEdge": "acc62573b0dd3c88fe9209bb88d74e58dc15708d2bb44b0954d8f82f0a830841",
+        "TraitNode": "43ee438006aff9a3129f8e6ae69753c3727a2fa770bed70085ae7690bcc37d6b",
+        "TraitNodeEntry": "6c747598c990f1bbfa72f0a34a36194f1edc1999900bb4229e99c38ef17d9d15",
+        "TraitNodeGroupXTraitNode": "4c33795d6187c963abf4960d036effd65f9f649eebba6eff578f950e2421950a",
+        "TraitNodeXTraitNodeEntry": "272c934a641443c1efb2b9ad2f9aa5c8e18d12dae414a455e19b0a6a846779a3",
+        "UiMap": "fa680e42d7f4051901498e23d4f50b5487ff3408ed2c54425cc218bfb4454fc7"
+      }
+    },
+    "pushes": [
+      112323,
+      112347,
+      112349
+    ],
+    "max_push": 112349,
+    "seen_at": {
+      "112323": "2026-10-02T08:00:23.801",
+      "112347": "2026-10-02T08:00:23.892",
+      "112349": "2026-10-02T08:00:23.801"
+    },
+    "counts": {
+      "CurvePoint": {
+        "VALID": 30,
+        "DELETE": 0,
+        "identical": 0
+      },
+      "Spell": {
+        "VALID": 20,
+        "DELETE": 1,
+        "identical": 5
+      },
+      "SpellAuraOptions": {
+        "VALID": 5,
+        "DELETE": 1,
+        "identical": 1
+      },
+      "SpellClassOptions": {
+        "VALID": 10,
+        "DELETE": 0,
+        "identical": 4
+      },
+      "SpellEffect": {
+        "VALID": 24,
+        "DELETE": 0,
+        "identical": 8
+      },
+      "SpellInterrupts": {
+        "VALID": 2,
+        "DELETE": 0,
+        "identical": 0
+      },
+      "SpellLevels": {
+        "VALID": 5,
+        "DELETE": 0,
+        "identical": 0
+      },
+      "SpellMisc": {
+        "VALID": 9,
+        "DELETE": 0,
+        "identical": 1
+      },
+      "SpellName": {
+        "VALID": 20,
+        "DELETE": 1,
+        "identical": 13
+      },
+      "SpellPower": {
+        "VALID": 3,
+        "DELETE": 0,
+        "identical": 0
+      },
+      "TraitDefinition": {
+        "VALID": 4,
+        "DELETE": 0,
+        "identical": 0
+      },
+      "TraitDefinitionEffectPoints": {
+        "VALID": 7,
+        "DELETE": 4,
+        "identical": 1
+      },
+      "TraitEdge": {
+        "VALID": 2,
+        "DELETE": 3,
+        "identical": 0
+      },
+      "TraitNode": {
+        "VALID": 14,
+        "DELETE": 3,
+        "identical": 1
+      },
+      "TraitNodeEntry": {
+        "VALID": 2,
+        "DELETE": 0,
+        "identical": 0
+      },
+      "TraitNodeXTraitNodeEntry": {
+        "VALID": 2,
+        "DELETE": 3,
+        "identical": 0
+      }
+    },
+    "applied": [
+      {
+        "table": "CurvePoint",
+        "rec_id": 334737,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 334738,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 334739,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 334740,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 334741,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364785,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364786,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364787,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364788,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364789,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364790,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364791,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364792,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364795,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364796,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364797,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364798,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364799,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364800,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364801,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364809,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364810,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364811,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364812,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364813,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364814,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364815,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364891,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364892,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "CurvePoint",
+        "rec_id": 364893,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1680,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 5246,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 6195,
+        "status": "VALID",
+        "push": 112349,
+        "unique_id": 2588065957,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 12321,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 12322,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 12323,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 12880,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 16487,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 23584,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 402913,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 457819,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 462891,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1310236,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1310315,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1323963,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1323964,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1323965,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1323966,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1323967,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1323968,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1323969,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 120576,
+        "status": "DELETE",
+        "push": 112349,
+        "unique_id": 2588065957,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 127917,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 247868,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 248611,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 248612,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 248613,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 45955,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 47405,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 70541,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 78596,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 84956,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 84957,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 84958,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 84959,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 84960,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellClassOptions",
+        "rec_id": 84961,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 684364,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 684365,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 684490,
+        "status": "VALID",
+        "push": 112349,
+        "unique_id": 2588065957,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 689425,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 690204,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1082129,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1163333,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1228253,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1315028,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1339731,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1339735,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1339738,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1339740,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1345686,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1358385,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360666,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360676,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360677,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360678,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360679,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360680,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360681,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360682,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1360683,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellInterrupts",
+        "rec_id": 250839,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellInterrupts",
+        "rec_id": 250840,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellLevels",
+        "rec_id": 103013,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellLevels",
+        "rec_id": 153966,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellLevels",
+        "rec_id": 153967,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellLevels",
+        "rec_id": 153968,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellLevels",
+        "rec_id": 153969,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 318981,
+        "status": "VALID",
+        "push": 112349,
+        "unique_id": 2588065957,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 856910,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 869646,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 869647,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 869648,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 869649,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 869650,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 869651,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 869652,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1680,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 5246,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 6195,
+        "status": "VALID",
+        "push": 112349,
+        "unique_id": 2588065957,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 12321,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 12322,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 12323,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 12880,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 16487,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 23584,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 402913,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 457819,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 462891,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1310236,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1310315,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1323963,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1323964,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1323965,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1323966,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1323967,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1323968,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1323969,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellPower",
+        "rec_id": 315009,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellPower",
+        "rec_id": 315010,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "SpellPower",
+        "rec_id": 315011,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinition",
+        "rec_id": 135484,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinition",
+        "rec_id": 142603,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinition",
+        "rec_id": 145863,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinition",
+        "rec_id": 145864,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 23597,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 24568,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 24569,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25094,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25099,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": true
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25167,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25180,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25181,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25182,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25185,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitDefinitionEffectPoints",
+        "rec_id": 25186,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitEdge",
+        "rec_id": 124811,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitEdge",
+        "rec_id": 132568,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitEdge",
+        "rec_id": 136314,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitEdge",
+        "rec_id": 136735,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitEdge",
+        "rec_id": 136736,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105928,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105929,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105936,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105953,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105961,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105962,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105963,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105966,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105967,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105969,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105973,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105974,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105975,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 105978,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 110298,
+        "status": "VALID",
+        "push": 112323,
+        "unique_id": 3109493964,
+        "identical": true
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 113569,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNode",
+        "rec_id": 113570,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNodeEntry",
+        "rec_id": 141191,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNodeEntry",
+        "rec_id": 141192,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNodeXTraitNodeEntry",
+        "rec_id": 128126,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNodeXTraitNodeEntry",
+        "rec_id": 128133,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNodeXTraitNodeEntry",
+        "rec_id": 128170,
+        "status": "DELETE",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNodeXTraitNodeEntry",
+        "rec_id": 139873,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      },
+      {
+        "table": "TraitNodeXTraitNodeEntry",
+        "rec_id": 139874,
+        "status": "VALID",
+        "push": 112347,
+        "unique_id": 2346235997,
+        "identical": false
+      }
+    ],
+    "entities": 49,
+    "unattributed": [
+      "CurvePoint 364785",
+      "CurvePoint 364786",
+      "CurvePoint 364787",
+      "CurvePoint 364788",
+      "CurvePoint 364789",
+      "Spell 1310236",
+      "Spell 1323965",
+      "Spell 1323966",
+      "Spell 1323968",
+      "Spell 1323969",
+      "SpellAuraOptions 120576",
+      "SpellAuraOptions 248613",
+      "SpellClassOptions 84956",
+      "SpellClassOptions 84957",
+      "SpellClassOptions 84959",
+      "SpellClassOptions 84960",
+      "SpellClassOptions 84961",
+      "SpellEffect 1358385",
+      "SpellEffect 1360678",
+      "SpellEffect 1360679",
+      "SpellEffect 1360682",
+      "SpellEffect 1360683",
+      "SpellInterrupts 250839",
+      "SpellInterrupts 250840",
+      "SpellLevels 153967",
+      "SpellLevels 153968",
+      "SpellLevels 153969",
+      "SpellMisc 318981",
+      "SpellMisc 869648",
+      "SpellMisc 869649",
+      "SpellMisc 869651",
+      "SpellMisc 869652",
+      "SpellName 1310236",
+      "SpellName 1323965",
+      "SpellName 1323966",
+      "SpellName 1323968",
+      "SpellName 1323969",
+      "SpellPower 315009",
+      "SpellPower 315010",
+      "SpellPower 315011",
+      "TraitNode 105929",
+      "TraitNodeXTraitNodeEntry 128126"
+    ],
+    "listed": {
+      "invalid": [
+        {
+          "table": "SpellPower",
+          "rec_id": 315008,
+          "push": 112347
+        }
+      ],
+      "notpublic": [
+        {
+          "table": "SpellClassOptions",
+          "rec_id": 73078,
+          "push": 112347
+        }
+      ],
+      "dbreply": {
+        "0x021826bb": 12,
+        "ItemSparse": 134277,
+        "Spell": 17
+      },
+      "item_reply": {
+        "0x198e28b5": 4508,
+        "0x5481af88": 4508,
+        "0xb50ca635": 4508,
+        "0xce88edca": 4508,
+        "Item": 4508,
+        "ItemSparse": 4508
+      },
+      "unknown_hash": {
+        "0x0f992211": 472,
+        "0x30769020": 4,
+        "0x3ac83109": 472,
+        "0x4553e9f7": 14,
+        "0x61025756": 1,
+        "0x7ea08450": 4,
+        "0xbf0bc27a": 1,
+        "0xe064a75c": 3,
+        "0xe44abbd4": 3
+      },
+      "delete_absent": [
+        {
+          "table": "CurvePoint",
+          "rec_id": 364793,
+          "push": 112347
+        },
+        {
+          "table": "CurvePoint",
+          "rec_id": 364794,
+          "push": 112347
+        },
+        {
+          "table": "CurvePoint",
+          "rec_id": 364802,
+          "push": 112347
+        },
+        {
+          "table": "CurvePoint",
+          "rec_id": 364803,
+          "push": 112347
+        },
+        {
+          "table": "CurvePoint",
+          "rec_id": 364804,
+          "push": 112347
+        },
+        {
+          "table": "SpellEffect",
+          "rec_id": 1345676,
+          "push": 112347
+        },
+        {
+          "table": "SpellInterrupts",
+          "rec_id": 250838,
+          "push": 112347
+        },
+        {
+          "table": "TraitDefinition",
+          "rec_id": 145860,
+          "push": 112347
+        },
+        {
+          "table": "TraitDefinitionEffectPoints",
+          "rec_id": 25179,
+          "push": 112347
+        }
+      ],
+      "unvalidated": {},
+      "not_loaded": {
+        "Curve": 7,
+        "TraitNodeGroupXTraitNode": 46
+      }
+    },
+    "checks": {
+      "CurvePoint": {
+        "ok": true,
+        "reason": "disposition 7D4954A1 validée : 30 entrée(s) décodée(s), 5 comparée(s), 83% des valeurs égales au build, 30/30 références résolues",
+        "decoded": 30,
+        "compared": 5,
+        "equal_ratio": 0.8333333333333334,
+        "references_ok": true
+      },
+      "Spell": {
+        "ok": true,
+        "reason": "disposition E3D134FB validée : 20 entrée(s) décodée(s), 13 comparée(s), 79% des valeurs égales au build",
+        "decoded": 20,
+        "compared": 13,
+        "equal_ratio": 0.7948717948717948,
+        "references_ok": null
+      },
+      "SpellAuraOptions": {
+        "ok": true,
+        "reason": "disposition 95F4D5E1 validée : 5 entrée(s) décodée(s), 1 comparée(s), 89% des valeurs égales au build, 5/5 références résolues",
+        "decoded": 5,
+        "compared": 1,
+        "equal_ratio": 0.8888888888888888,
+        "references_ok": true
+      },
+      "SpellClassOptions": {
+        "ok": true,
+        "reason": "disposition 1F8E4FD7 validée : 10 entrée(s) décodée(s), 4 comparée(s), 86% des valeurs égales au build, 10/10 références résolues",
+        "decoded": 10,
+        "compared": 4,
+        "equal_ratio": 0.8571428571428571,
+        "references_ok": true
+      },
+      "SpellEffect": {
+        "ok": true,
+        "reason": "disposition 5362E3D4 validée : 24 entrée(s) décodée(s), 15 comparée(s), 97% des valeurs égales au build, 26/26 références résolues",
+        "decoded": 24,
+        "compared": 15,
+        "equal_ratio": 0.9666666666666667,
+        "references_ok": true
+      },
+      "SpellInterrupts": {
+        "ok": true,
+        "reason": "disposition 6FFC0306 validée : 2 entrée(s) décodée(s), 0 comparée(s), 2/2 références résolues",
+        "decoded": 2,
+        "compared": 0,
+        "equal_ratio": null,
+        "references_ok": true
+      },
+      "SpellLevels": {
+        "ok": true,
+        "reason": "disposition 7EB86FDC validée : 5 entrée(s) décodée(s), 1 comparée(s), 67% des valeurs égales au build, 5/5 références résolues",
+        "decoded": 5,
+        "compared": 1,
+        "equal_ratio": 0.6666666666666666,
+        "references_ok": true
+      },
+      "SpellMisc": {
+        "ok": true,
+        "reason": "disposition 434B3607 validée : 9 entrée(s) décodée(s), 2 comparée(s), 97% des valeurs égales au build, 31/31 références résolues",
+        "decoded": 9,
+        "compared": 2,
+        "equal_ratio": 0.9696969696969697,
+        "references_ok": true
+      },
+      "SpellName": {
+        "ok": true,
+        "reason": "disposition 782EE721 validée : 20 entrée(s) décodée(s), 13 comparée(s), 100% des valeurs égales au build",
+        "decoded": 20,
+        "compared": 13,
+        "equal_ratio": 1.0,
+        "references_ok": null
+      },
+      "SpellPower": {
+        "ok": true,
+        "reason": "disposition 61AD223F validée : 3 entrée(s) décodée(s), 0 comparée(s), 3/3 références résolues",
+        "decoded": 3,
+        "compared": 0,
+        "equal_ratio": null,
+        "references_ok": true
+      },
+      "TraitDefinition": {
+        "ok": true,
+        "reason": "disposition 060A9F4C validée : 4 entrée(s) décodée(s), 2 comparée(s), 86% des valeurs égales au build, 4/4 références résolues",
+        "decoded": 4,
+        "compared": 2,
+        "equal_ratio": 0.8571428571428571,
+        "references_ok": true
+      },
+      "TraitDefinitionEffectPoints": {
+        "ok": true,
+        "reason": "disposition 7E18C372 validée : 7 entrée(s) décodée(s), 2 comparée(s), 88% des valeurs égales au build, 14/14 références résolues",
+        "decoded": 7,
+        "compared": 2,
+        "equal_ratio": 0.875,
+        "references_ok": true
+      },
+      "TraitEdge": {
+        "ok": true,
+        "reason": "disposition 907C9B77 validée : 2 entrée(s) décodée(s), 0 comparée(s), 4/4 références résolues",
+        "decoded": 2,
+        "compared": 0,
+        "equal_ratio": null,
+        "references_ok": true
+      },
+      "TraitNode": {
+        "ok": true,
+        "reason": "disposition A01A518A validée : 14 entrée(s) décodée(s), 12 comparée(s), 79% des valeurs égales au build",
+        "decoded": 14,
+        "compared": 12,
+        "equal_ratio": 0.7916666666666666,
+        "references_ok": null
+      },
+      "TraitNodeEntry": {
+        "ok": true,
+        "reason": "disposition 733B015D validée : 2 entrée(s) décodée(s), 0 comparée(s), 2/2 références résolues",
+        "decoded": 2,
+        "compared": 0,
+        "equal_ratio": null,
+        "references_ok": true
+      },
+      "TraitNodeXTraitNodeEntry": {
+        "ok": true,
+        "reason": "disposition 802ED455 validée : 2 entrée(s) décodée(s), 0 comparée(s), 4/4 références résolues",
+        "decoded": 2,
+        "compared": 0,
+        "equal_ratio": null,
+        "references_ok": true
+      }
+    }
+  }
 }

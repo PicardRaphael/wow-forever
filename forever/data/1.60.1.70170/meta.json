@@ -31,8 +31,10 @@
    "value": 30,
    "source": "observation",
    "certainty": "certain",
+   "carried_from": "révision 3",
    "date": "2026-10-02",
-   "revision": 1
+   "revision": 1,
+   "carried_to": 4
   }
  }
 }
