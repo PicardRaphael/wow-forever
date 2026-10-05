@@ -1,6 +1,7 @@
 """Rejeu des builds de fin de T05 (T06b, décision D9) : cinq contextes × trois niveaux, préréglage complet.
 
     uv run python scripts/replay_builds.py run <étiquette> [--only contexte-niveau …] [--ratios seed:<nom>,…]
+        [--data-dir <copie des données>]
     uv run python scripts/replay_builds.py table <étiquette>
     uv run python scripts/replay_builds.py compare <avant> <après>
 
@@ -11,6 +12,7 @@ alternative, verdicts de sensibilité et de stabilité). Tout calcul passe par `
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import sys
 import time
@@ -154,10 +156,12 @@ def parse_ratios(value: str) -> set[str]:
     return chosen
 
 
-def run(label: str, only: list[str] | None, ratios: set[str] | None = None) -> None:
+def run(label: str, only: list[str] | None, ratios: set[str] | None = None, data_dir: Path | None = None) -> None:
     out = _dir(label)
     out.mkdir(parents=True, exist_ok=True)
     deps = default_deps()
+    if data_dir is not None:  # T08c : copie des données hors du dépôt (révision simulée avant l'accord)
+        deps = dataclasses.replace(deps, data_dir=data_dir)
     for context, level in _cases():
         name = f"{context}-{level}"
         if only and name not in only:
@@ -223,6 +227,7 @@ def main(argv: list[str]) -> int:
     r.add_argument("label")
     r.add_argument("--only", nargs="*")
     r.add_argument("--ratios", help="ablation : seed:<nom>[,<nom>] (valeurs du client remises à leur estimation)")
+    r.add_argument("--data-dir", type=Path, help="dossier des données (défaut : forever/data)")
     t = sub.add_parser("table")
     t.add_argument("label")
     c = sub.add_parser("compare")
@@ -230,7 +235,7 @@ def main(argv: list[str]) -> int:
     c.add_argument("after")
     args = parser.parse_args(argv)
     if args.cmd == "run":
-        run(args.label, args.only, parse_ratios(args.ratios) if args.ratios else None)
+        run(args.label, args.only, parse_ratios(args.ratios) if args.ratios else None, args.data_dir)
     elif args.cmd == "table":
         sys.stdout.write(table(args.label))
     else:

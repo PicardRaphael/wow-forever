@@ -45,6 +45,8 @@ la ROADMAP est corrigée en fin de tranche sur ce seul point.
   dans la fixture. `Hotfix.log` du jour est un démarrage 70205 : le recoupement se fait avec `hotfixes.json` filtré
   sur `client_build` = build de l'en-tête, et l'extrait de fixture des lignes 112347 vient de ce journal (datées du
   02/10).
+- Constats du bloc B (2026-10-05) : les 49 tables utiles nomment 1.60.1.70170 dans WoWDBDefs (commit `1d356b44c798`) ; `LICENSE` introuvable (404) : fixtures en dispositions dérivées. Seuil de validation ramené de 90 % à 50 % dès 10 valeurs comparées, avec la structure (taille, identifiant) et les références : la refonte change 21 % des valeurs de `TraitNode` (décision 175). Valeur attendue corrigée avant verrouillage : `CurvePoint` 334737 `Pos_1` 10.0 (20 dans le CSV).
+- Constat du bloc G : Talents Forever 0.37.1 (05/10) contient la refonte du Guerrier ; l'écart attendu « nœuds de la refonte » devient un recoupement : mêmes talents, quatre identifiants de nœud différents (DON13).
 - Ordre du bloc B : accord réseau à la frontière A → B, prise unique des `.dbd` par script hors paquet, contrôle du
   bloc `BUILD` de 1.60.1.70170, puis fixtures et tests, puis `fetch --dbd` contre `http_get` simulé.
 

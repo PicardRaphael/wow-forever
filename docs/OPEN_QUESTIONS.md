@@ -130,15 +130,19 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   [Détail](research/questions-ouvertes-detail.md#mon5)
 
 ## Données du client et correctifs du serveur
-- **DON1 — Quelles valeurs les correctifs du serveur changent-ils ?** *Modifiée le 2026-10-02* : la note du 01/10
-  confirme une refonte du Guerrier (Fureur, Protection) absente des tables de 1.60.1.70170 et présente dans
-  `Hotfix.log` du 2026-10-02 ; s'y ajoutent les `CurvePoint`, `Curve` et `CreatureDifficulty` corrigés. Test : T08c
-  (décodage de `DBCache.bin`). Priorité : haute. [Détail](research/questions-ouvertes-detail.md#don1),
+- **DON1 — Quelles valeurs les correctifs du serveur changent-ils ?** *Répondue pour les tables décodées le
+  2026-10-05 (T08c)* : `forever hotfixes --values` montre chaque valeur, avant et après ; `forever decode --hotfixes`
+  les applique (poussées 112323, 112347, 112349 de 1.60.1.70170 : 175 enregistrements, refonte du Guerrier
+  comprise). Restent hors des données : tables non décodées (`Curve`, `TraitNodeGroupXTraitNode`, `SpellScript`…).
+  Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don1),
   [note du 01/10](research/notes-blizzard-2026-10-01.md)
-- **DON2 — Que veut dire `VALIDATION_RESULT_INVALID` dans `Hotfix.log` ?** Test : T08c, comparer ces enregistrements
-  à `DBCache.bin`. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don1)
-- **DON3 — Que changent les milliers d'enregistrements `Item` corrigés par le serveur ?** Test : lecture des tables
-  d'objets (T10) ou T08c si la disposition d'`Item` est connue. Priorité : basse.
+- **DON2 — Que veut dire `VALIDATION_RESULT_INVALID` dans `Hotfix.log` ?** *Répondue en partie le 2026-10-05
+  (T08c)* : les entrées `INVALID` de `DBCache.bin` n'ont aucune donnée (taille 0) ; la valeur du build est gardée.
+  Le sens de l'invalidation (refus du client, enregistrement absent) reste non établi. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don1)
+- **DON3 — Que changent les milliers d'enregistrements `Item` corrigés par le serveur ?** *Modifiée le 2026-10-05
+  (T08c)* : ce ne sont pas des poussées mais des réponses d'objets à la demande (DON12) et des réponses `DBReply`
+  « absent » ; aucune ne touche un bijou PvP de `pvp_items.json`. Test : lecture des tables d'objets (T10).
+  Priorité : basse.
   [Détail](research/questions-ouvertes-detail.md#don3)
 - **DON4 — Quel produit TACT au lancement (`wow_classic_forever` ?) ?** Test : `.build.info` après le lancement du
   4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don4)
@@ -156,6 +160,21 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **DON9 — Quelles tables du client décrivent donjons, métiers, réputations et prix ?** *Modifiée le 2026-10-02* :
   la note du 01/10 annonce les donjons ouverts et leurs niveaux d'accès (à reprendre en DJ1). Test : inventaire au
   plan de chaque tranche (DJ1, MT1, RP1, T10). Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don9)
+- **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
+  Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
+- **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**
+  Ajoutée le 2026-10-05 (T08c). `Spell` 15147 est absent du CSV de 70170 (cohérent) ; les `ItemSparse` concernés
+  restent à recouper. Test : réponses `DBReply` recoupées avec les CSV du build. Priorité : basse.
+- **DON12 — À quoi servent les réponses d'objets de `DBCache.bin` (poussée = identifiant unique ≥ 0x01000000) ?**
+  Ajoutée le 2026-10-05 (T08c) : 4 508 objets (`Item`, `ItemSparse`, `ItemSearchName` `VALID`, tables d'artisanat
+  `INVALID`), déjà journalisées sous le build 70124 : elles ne viennent pas forcément du build de l'en-tête. Jamais
+  appliquées. Test : comparaison des enregistrements `ItemSparse` envoyés avec le CSV du build (T10). Priorité : basse.
+- **DON13 — Quel nœud porte chaque nouveau talent du Guerrier ?** Ajoutée le 2026-10-05 (T08c) : le `DBCache.bin` du
+  poste place Lingering Rage sur le nœud 110857 et Furious Precision sur 105953 (définitions corrigées), Gore Drinker
+  sur 113569 et Iron Will sur 113570 (nœuds ajoutés) ; Talents Forever 0.37.1 les place sur 113564 à 113566 et garde
+  Iron Will sur 110857 (noms, rangées, colonnes, rangs et sorts identiques des deux côtés). Les codes de Talents
+  Forever portent des nœuds : à trancher avant l'export de FA1. Test : talent appris en jeu puis code exporté par
+  l'addon ; tables du build 70205. Priorité : moyenne (FA1).
 
 ## Journaux, addons et sauvegardes
 - **LOG1 — Que portent les champs inconnus du bloc avancé du journal (dont le dernier pour un joueur) ?** Test :

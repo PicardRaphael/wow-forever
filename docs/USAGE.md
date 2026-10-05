@@ -45,6 +45,16 @@ Elle **ne lance rien** : chaque changement est suivi des commandes proposées, m
 elles touchent Internet (`forever notes` est proposé quand le build change, décision 148). Détail des briques :
 `forever addons status [--save]`, `forever hotfixes [--since-install]`.
 
+### Correctifs du serveur (T08c)
+```powershell
+uv run forever hotfixes                                   # Hotfix.log et DBCache.bin : comptes, recoupement
+uv run forever hotfixes --values                          # chaque valeur corrigée, avant et après, entités touchées
+uv run forever fetch --version 1.60.1.70170 --dbd         # définitions de WoWDBDefs (réseau, sur accord)
+uv run forever decode --version 1.60.1.70170 --hotfixes   # candidate avec les valeurs des correctifs
+uv run forever diff 1.60.1.70170 <candidate>              # valeurs changées, attribuées à leur correctif
+```
+`--dbcache <chemin>` lit un autre `DBCache.bin` (copie gardée d'un build précédent) ; `--dbd-layouts <json>` des dispositions dérivées. `forever watch` signale les correctifs non appliqués à la révision installée.
+
 `uv run forever notes --post 2360696/3` (réseau, sur accord) lit un seul message officiel désigné (sujet/numéro),
 avec son numéro de révision dans la provenance ; ni limite quotidienne ni état de la veille touchés, message de
 joueur refusé, texte rendu pour la lecture seulement.
