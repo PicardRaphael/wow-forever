@@ -3,7 +3,9 @@
 Détecteurs, comparés au dernier passage (`<cache>/watch/state.json`) : build du client (`.build.info`), addons de
 données (empreintes, court-circuit par taille et date), correctifs du serveur (`Logs/Hotfix.log`, relu seulement si sa
 taille ou sa date change ; journal `hotfixes.json`), nouveaux journaux de combat (`WoWCombatLog-*.txt`) et sauvegardes
-modifiées (ForeverLogger, Questie, Auctionator). Chaque changement porte les **actions proposées** (commande exacte,
+modifiées (ForeverLogger, Questie, Auctionator), et (T08c) correctifs du serveur de `Cache/ADB/enUS/DBCache.bin` non
+appliqués à la révision installée (analysés seulement si le fichier ou la révision change). Chaque changement porte
+les **actions proposées** (commande exacte,
 réseau ou non) ; un nouveau build propose `forever notes` (décision 148 : lecture des notes à la main seulement).
 `--report` écrit le résumé dans `<cache>/watch/report.json` (tâche planifiée Windows) ; la ligne de démarrage de
 session en tire une ligne compacte."""
@@ -16,7 +18,8 @@ from typing import Any
 
 from forever.addons import DATA_ADDONS, _files, _folders, fingerprint
 from forever.config import Deps
-from forever.pipeline import hotfixes
+from forever.errors import DataSchemaError
+from forever.pipeline import dbcache, hotfixes
 from forever.pipeline.client_builds import read_build_info
 from forever.timefmt import format_utc
 
@@ -148,11 +151,87 @@ def watch(deps: Deps, *, report: bool = False) -> dict[str, Any]:
                 "actions": [_action("forever profile import --dry-run", False, "profil depuis les sauvegardes")],
             }
         )
+    cache_path = wow.joinpath(*(part.format(locale="enUS") for part in dbcache.DBCACHE_PATH))
+    if cache_path.is_file():
+        version, sources = _installed(deps)
+        st = cache_path.stat()
+        cache_stamp: dict[str, Any] = {
+            "size": st.st_size,
+            "mtime": st.st_mtime_ns,
+            "version": version,
+            "revision": sources.get("revision"),
+        }
+        previous = old.get("dbcache", {})
+        if {k: previous.get(k) for k in cache_stamp} == cache_stamp:
+            new["dbcache"] = previous
+        else:
+            event = _dbcache_event(deps, cache_path, version, sources)
+            new["dbcache"] = {**cache_stamp, "pending": event["pending"] if event else 0}
+            if event is not None:
+                events.append(event)
     _write(state_path, new)
     result = {"events": events, "wow_dir": str(wow), "checked_at": format_utc(deps.now())}
     if report:
         _write(deps.cache_dir.joinpath(*REPORT), result)
     return result
+
+
+def _installed(deps: Deps) -> tuple[str | None, dict[str, Any]]:
+    from forever.manifest import SOURCES_NAME, version_dirs
+
+    versions = version_dirs(deps.data_dir)
+    if not versions:
+        return None, {}
+    return versions[-1], _read(deps.data_dir / versions[-1] / SOURCES_NAME)
+
+
+def _dbcache_event(deps: Deps, path: Path, version: str | None, sources: dict[str, Any]) -> dict[str, Any] | None:
+    """Correctifs applicables de `DBCache.bin` (tables lues par le pipeline) absents de la révision installée
+    (`sources.json`, bloc `hotfixes`) ; un fichier d'un autre build est signalé non applicable."""
+    from forever.pipeline.tables import TABLES
+
+    try:
+        cache = dbcache.read_dbcache(path)
+    except DataSchemaError:  # fichier en cours d'écriture par le client ou tronqué : relu au passage suivant
+        return None
+    if version is None or not version.endswith(f".{cache.build}"):
+        return {
+            "kind": "hotfixes_dbcache",
+            "pending": 0,
+            "detail": f"DBCache.bin du build {cache.build} : correctifs d'un autre build, non applicables "
+            f"(version installée {version or 'aucune'})",
+            "actions": [_action("forever status", True, "fraîcheur des données et build publié")],
+        }
+    names = dbcache.table_names(dbcache.known_tables(_rules(deps)))
+    applicable = dbcache.effective(cache.entries, names).applicable
+    raw_block = sources.get("hotfixes")
+    block: dict[str, Any] = raw_block if isinstance(raw_block, dict) else {}
+    done = {(a.get("push"), a.get("table"), a.get("rec_id"), a.get("unique_id")) for a in block.get("applied", [])}
+    absent = {
+        (d.get("push"), d.get("table"), d.get("rec_id")) for d in block.get("listed", {}).get("delete_absent", [])
+    }
+    pending = [
+        (t, r)
+        for (t, r), e in applicable.items()
+        if t in TABLES and (e.push_id, t, r, e.unique_id) not in done and (e.push_id, t, r) not in absent
+    ]
+    if not pending:
+        return None
+    tables = sorted({t for t, _ in pending})
+    revision = sources.get("revision")
+    when = sources.get("revised_at") or sources.get("collected_at") or "?"
+    return {
+        "kind": "hotfixes_dbcache",
+        "pending": len(pending),
+        "detail": f"{len(pending)} correctif(s) du serveur non appliqué(s) depuis la révision {revision} du {when} "
+        f"(tables {', '.join(tables[:6])}{'…' if len(tables) > 6 else ''})",
+        "actions": [
+            _action("forever hotfixes --values", False, "valeurs corrigées, avant et après"),
+            _action(f"forever decode --version {version} --hotfixes", False, "candidate avec les correctifs"),
+            _action(f"forever diff {version} <candidate>", False, "valeurs changées, attribuées aux correctifs"),
+            _action("forever install <candidate>", False, "révision suivante, après accord de l'utilisateur"),
+        ],
+    }
 
 
 def watch_line(deps: Deps) -> str | None:
@@ -167,7 +246,17 @@ def watch_line(deps: Deps) -> str | None:
         build = read_build_info(wow)
         if build is not None and old and build.build != old.get("build"):
             parts.append(f"client {build.build} installé")
-        pending = _read(deps.cache_dir.joinpath(*REPORT)).get("events", [])
+        fixes = old.get("dbcache", {})
+        version, sources = _installed(deps)
+        if (
+            fixes.get("pending")
+            and fixes.get("version") == version
+            and fixes.get("revision") == sources.get("revision")
+        ):
+            parts.append(f"{fixes['pending']} correctif(s) du serveur non appliqué(s)")
+        pending = [
+            e for e in _read(deps.cache_dir.joinpath(*REPORT)).get("events", []) if e.get("kind") != "hotfixes_dbcache"
+        ]
         if pending and not parts:
             parts += [str(e.get("detail")) for e in pending[:3]]
         if not parts:
