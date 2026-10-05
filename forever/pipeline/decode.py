@@ -28,6 +28,7 @@ from forever.pipeline.character_scaling import (
     load_gametables,
 )
 from forever.pipeline.fetch import DEFAULT_LOCALE, wago_dir
+from forever.pipeline.hotfix_overlay import HotfixSource
 from forever.pipeline.pets import PETS_FILE, decode_pets, load_pet_tables, own_pet_table_files, pet_table_files
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
@@ -1526,7 +1527,13 @@ def _inherited_source(base: Path, name: str, rules: Mapping[str, Any]) -> Path |
 
 
 def decode_version(
-    deps: Deps, version: str, *, csv_dir: Path | None = None, out: Path | None = None, force: bool = False
+    deps: Deps,
+    version: str,
+    *,
+    csv_dir: Path | None = None,
+    out: Path | None = None,
+    force: bool = False,
+    hotfixes: HotfixSource | None = None,
 ) -> Candidate:
     """Écrit une version candidate complète dans `out` (défaut : `<cache>/candidates/<version>/`).
 
@@ -1536,6 +1543,8 @@ def decode_version(
         raise InvalidArgumentError(
             f"Version mal formée : « {version} ».", "donner une version complète, par exemple 1.60.1.70009"
         )
+    if hotfixes is not None:
+        raise NotImplementedError("T08c : correctifs du serveur")
     base_version, rules = load_rules(deps.data_dir)
     base = deps.data_dir / base_version
     csv_dir = csv_dir or wago_dir(deps.cache_dir, version)

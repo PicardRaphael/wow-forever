@@ -208,3 +208,30 @@ class PathNotFoundError(ForeverError):
 
     def __init__(self, what: str, path: str, action: str) -> None:
         super().__init__("path_not_found", f"{what} introuvable : {path}.", action)
+
+
+class HotfixBuildMismatchError(ForeverError):
+    """`DBCache.bin` d'un autre build que la version décodée (T08c) : ses valeurs ne valent que pour son build."""
+
+    exit_code = EXIT_USAGE
+
+    def __init__(self, cache_build: int, version: str) -> None:
+        super().__init__(
+            "hotfix_build_mismatch",
+            f"DBCache.bin du build {cache_build}, version demandée {version} : correctifs d'un autre build.",
+            "donner le DBCache.bin du même build (--dbcache) ou décoder la version de ce build",
+        )
+
+
+class HotfixLayoutError(ForeverError):
+    """Correctifs d'une table sans disposition validée qui visent des lignes lues par un décodeur (T08c)."""
+
+    exit_code = EXIT_INTEGRITY
+
+    def __init__(self, tables: dict[str, str]) -> None:
+        detail = " ; ".join(f"{t} : {reason}" for t, reason in sorted(tables.items()))
+        super().__init__(
+            "hotfix_layout",
+            f"Correctifs non applicables sans disposition validée : {detail}.",
+            "uv run forever hotfixes --values pour le détail ; relever les définitions : forever fetch --dbd",
+        )

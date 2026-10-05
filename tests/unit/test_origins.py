@@ -28,8 +28,9 @@ def manual_rule(origins: dict[str, Any], file: str = "mechanics.json") -> dict[s
     return next(r for r in origins["rules"] if r["origin"] == "manuel" and r["file"] == file)
 
 
-def test_six_origins():
-    assert ORIGINS == ("client", "journal", "addon", "manuel", "copie_figee", "parametre")
+def test_seven_origins():
+    """T08c : septième origine, `correctif_serveur` (valeur appliquée depuis DBCache.bin, poussée et date vue)."""
+    assert ORIGINS == ("client", "journal", "addon", "manuel", "copie_figee", "parametre", "correctif_serveur")
 
 
 def test_installed_versions_pass():

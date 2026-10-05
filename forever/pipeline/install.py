@@ -839,6 +839,13 @@ def apply_install(
     return revision
 
 
+def carry_hotfix_provenance(vdir: Path, cand_vdir: Path) -> bool:
+    """T08c : règles `correctif_serveur` d'`origins.json` et bloc `hotfixes` de `sources.json` de la candidate
+    reportés dans la version installée (celles d'une révision précédente remplacées) ; rend True si la candidate en
+    porte."""
+    raise NotImplementedError
+
+
 def _game_state_origin(vdir: Path, entries: Mapping[str, Any]) -> None:
     """Origine déclarée du plafond (`origins.json`) accordée à sa source : `journal` pour une observation en jeu
     (certain), `manuel` sinon (au plus probable)."""
