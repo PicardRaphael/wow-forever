@@ -133,14 +133,30 @@ def dbcache_event(result):
     return next((e for e in result["events"] if e["kind"] == "hotfixes_dbcache"), None)
 
 
-def test_pending_server_hotfixes_are_reported(wow, make_deps):
+def without_hotfixes(data_copy):
+    """Copie des données dont la révision installée n'a appliqué aucun correctif (indépendante de la révision du
+    dépôt : la révision 4 de 1.60.1.70170 en porte, T08c)."""
+    from conftest import LOCAL_VERSION, read_json
+
+    from forever.manifest import write_manifest
+
+    path = data_copy / LOCAL_VERSION / "sources.json"
+    sources = read_json(path)
+    sources.pop("hotfixes", None)
+    path.write_bytes((json.dumps(sources, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    write_manifest(data_copy)
+    return data_copy, sources.get("revision")
+
+
+def test_pending_server_hotfixes_are_reported(wow, make_deps, data_copy):
     with_dbcache(wow)
+    data, revision = without_hotfixes(data_copy)
     http = FakeHttp.failing()
-    deps = make_deps(wow_dir=wow, http=http)
+    deps = make_deps(wow_dir=wow, http=http, data_dir=data)
     event = dbcache_event(watch(deps))
     _, pending = expected_pending()
     assert event is not None and event["pending"] == len(pending) > 0
-    assert "non appliqué" in event["detail"] and "révision 3" in event["detail"]
+    assert "non appliqué" in event["detail"] and f"révision {revision}" in event["detail"]
     commands = [a["command"] for a in event["actions"]]
     assert "forever hotfixes --values" in commands
     assert any(c.startswith("forever decode --version 1.60.1.70170 --hotfixes") for c in commands)
@@ -199,9 +215,10 @@ def test_dbcache_of_another_build_is_not_applicable(wow, make_deps):
     assert event["pending"] == 0
 
 
-def test_session_line_counts_pending_hotfixes(wow, make_deps):
+def test_session_line_counts_pending_hotfixes(wow, make_deps, data_copy):
     with_dbcache(wow)
-    deps = make_deps(wow_dir=wow)
+    data, _ = without_hotfixes(data_copy)
+    deps = make_deps(wow_dir=wow, data_dir=data)
     watch(deps)
     watch(deps)  # second passage : plus d'événement, le compte reste dans l'état
     line = watch_line(deps)
