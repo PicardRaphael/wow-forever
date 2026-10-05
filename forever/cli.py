@@ -71,6 +71,7 @@ from forever.pipeline.client_builds import (
     version_at,
 )
 from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
+from forever.pipeline.dbd import layouts_from_json
 from forever.pipeline.decode import Candidate, decode_version, load_rules
 from forever.pipeline.diff import Change, VersionDiff, diff_versions
 from forever.pipeline.fetch import (
@@ -82,6 +83,7 @@ from forever.pipeline.fetch import (
     fetch_tables,
     wago_dir,
 )
+from forever.pipeline.hotfix_overlay import HotfixSource, hotfix_source, load_dbd_layouts
 from forever.pipeline.install import InstallRefusedError, apply_install, plan_install, render_install_report
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
 from forever.pipeline.measure import (
@@ -207,6 +209,16 @@ def build_parser() -> argparse.ArgumentParser:
     decode.add_argument("--csv-dir", help="dossier des CSV (défaut : cache de forever fetch)")
     decode.add_argument("--out", help="dossier de la candidate (défaut : <cache>/candidates/<version>)")
     decode.add_argument("--force", action="store_true", help="remplacer une candidate existante")
+    decode.add_argument(
+        "--hotfixes",
+        action="store_true",
+        help="appliquer les correctifs du serveur de DBCache.bin (T08c, mode forever)",
+    )
+    decode.add_argument("--dbcache", help="DBCache.bin (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin)")
+    decode.add_argument(
+        "--dbd-layouts",
+        help="dispositions dérivées (JSON) au lieu du relevé de WoWDBDefs du cache (forever fetch --dbd)",
+    )
     decode.add_argument("--json", action="store_true", help="sortie JSON")
 
     profile = sub.add_parser("profile", help="profil joueur hors du dépôt (FOREVER_PROFILE, ~/.forever)")
@@ -1299,6 +1311,27 @@ def _cmd_install(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _hotfix_source(deps: Deps, args: argparse.Namespace) -> HotfixSource | None:
+    """Correctifs du serveur demandés par `--hotfixes` : DBCache.bin, dispositions de WoWDBDefs, journal du cache."""
+    if not args.hotfixes:
+        return None
+    path = _dbcache_path(deps, args.dbcache)
+    if path is None or not path.is_file():
+        raise InvalidArgumentError(
+            f"DBCache.bin introuvable ({path or 'FOREVER_WOW_DIR absent'}).",
+            "donner --dbcache <chemin> ou définir FOREVER_WOW_DIR",
+        )
+    _, rules = load_rules(deps.data_dir)
+    if args.dbd_layouts:
+        doc = json.loads(Path(args.dbd_layouts).read_text(encoding="utf-8"))
+        layouts = layouts_from_json(doc)
+        dbd = {"repo": doc.get("repo"), "commit": doc.get("commit"), "files": {}}
+    else:
+        layouts, dbd = load_dbd_layouts(deps.cache_dir, args.version, dbd_tables(rules))
+    journal = hotfixes.load_journal(deps.cache_dir)
+    return hotfix_source(path, layouts, dbd, journal, args.version, rules, format_utc(deps.now()))
+
+
 def _cmd_decode(deps: Deps, args: argparse.Namespace) -> int:
     c = decode_version(
         deps,
@@ -1306,6 +1339,7 @@ def _cmd_decode(deps: Deps, args: argparse.Namespace) -> int:
         csv_dir=Path(args.csv_dir) if args.csv_dir else None,
         out=Path(args.out) if args.out else None,
         force=args.force,
+        hotfixes=_hotfix_source(deps, args),
     )
     src, v = load_source(deps, str(c.root))
     provenance = source_provenance(deps, src, v)

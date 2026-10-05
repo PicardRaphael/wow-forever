@@ -78,3 +78,42 @@ Regroupées pour être présentées en une fois avant la fusion (commande `/tran
 ```
 
   Vérifié sur une copie hors verrou : 18 tests sur 18 passent avec ce diff.
+
+## Bloc C
+
+### 4. `tests/unit/test_hotfix_overlay.py::test_touched_entities_carry_their_hotfix` : témoin intact mal choisi
+
+- Prémisse contredite par les données : le test prend Booming Voice (nœud 105938) comme talent intact, or la poussée
+  112347 le touche réellement : son sort 12321 change (`Spell` 12321, `SpellEffect` 1360666) et un nouveau point
+  d'effet (`TraitDefinitionEffectPoints` 25182, courbe 125261, `CurvePoint` 364800, 364801, 364891 à 364893) lui est
+  ajouté.
+- Preuve : champ `hotfix` de Booming Voice dans la candidate : `rows` = `CurvePoint 364800 … 364893`, `Spell 12321`,
+  `SpellEffect 1360666`, `TraitDefinitionEffectPoints 25182`.
+- Diff proposé (Improved Heroic Strike, nœud 105958, Armes : aucune entrée ne l'atteint) :
+
+```diff
+-    untouched = talents[105938]
++    untouched = talents[105958]  # Improved Heroic Strike (Armes) : aucune entrée de correctif ne l'atteint
+     assert HOTFIX_KEY not in untouched
+```
+
+### 5. `tests/unit/test_hotfix_overlay.py::test_origins_of_the_candidate` : contrôle complet impossible sur une candidate
+
+- Prémisse fausse (plan : « `forever origins check` vert sur la candidate ») : une candidate n'a pas les fichiers
+  propres à l'installation (`_seed_spells.json`, `_seed_talents.json`, `_source_gunba_mage_tree.json`,
+  `confirmed_changes.json`, `revisions.json`) et ses `spells.json` décodés des extraits portent des clés que la
+  version installée ne couvre pas : 134 écarts, **les mêmes avec et sans correctifs**. Le contrôle complet est fait
+  après l'installation (`test_install_carries_origins_and_sources`, vert).
+- Preuve : `check_version` sur les deux candidates : mêmes comptes (`non_couverte spells.json` 129, `fichier_absent`
+  ×5), aucun sur `classes.json`.
+- Diff proposé :
+
+```diff
+-    assert check_version(with_fix.parent, LOCAL_VERSION).issues == []
++    issues = {(i.kind, i.file, i.path) for i in check_version(with_fix.parent, LOCAL_VERSION).issues}
++    baseline = {(i.kind, i.file, i.path) for i in check_version(decoded[1].parent, LOCAL_VERSION).issues}
++    assert issues == baseline  # une candidate n'a pas les fichiers propres à l'installation ; les correctifs n'ajoutent rien
++    assert not any(f == "classes.json" for _, f, _ in issues)
+```
+
+  Vérifié sur une copie hors verrou : 19 tests sur 19 passent avec les diffs 4 et 5.

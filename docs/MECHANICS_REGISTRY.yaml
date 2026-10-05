@@ -1104,6 +1104,7 @@ mechanics:
       - "forever/data/1.60.1.70009/mechanics.json"
       - "forever/data/1.60.1.70124/classes.json (PV1 : arbres des 9 classes, prérequis typés d'après TraitEdge.Type, probable)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_tables : NumTalentsAtLevel, TraitCond.SpentAmountRequired, T08b)"
+      - "Cache/ADB/enUS/DBCache.bin du client 1.60.1.70170 (T08c : arbres corrigés par le serveur, poussée 112347 du 2026-10-02, appliqués en mode forever)"
     tests:
       - tests/unit/test_engine_talents.py::test_prerequisites
       - tests/unit/test_engine_talents.py::test_build_legality
@@ -1123,7 +1124,7 @@ mechanics:
       - tests/unit/test_decode_mechanics.py::test_points_per_tier_equals_trait_cond_step
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis requis : tous au maximum ; prérequis suffisants : un au maximum"
-    note: "T08b, bloc B : premier niveau à point de talent (NumTalentsAtLevel) et points par palier de chaque classe (TraitCond, suite k × pas, None sinon) décodés du client (character_scaling.json talents), lus en mode forever ; mode seed : mechanics.json (fm.py)"
+    note: "T08b, bloc B : premier niveau à point de talent (NumTalentsAtLevel) et points par palier de chaque classe (TraitCond, suite k × pas, None sinon) décodés du client (character_scaling.json talents), lus en mode forever ; mode seed : mechanics.json (fm.py) ; T08c : en mode forever, les arbres sont décodés des tables du build corrigées par les valeurs des correctifs du serveur (DBCache.bin, dispositions de WoWDBDefs validées), origine correctif_serveur ; le mode seed n'en lit aucune"
   - id: G4
     categorie: personnage
     description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"
@@ -1540,13 +1541,25 @@ mechanics:
     categorie: meta
     description: "Version du client et hotfixes"
     forever: oui
-    statut: modelise  # T01 : version du client, empreintes et fraîcheur testées ; hotfixes absents (T03)
+    statut: teste  # T01 : version du client, empreintes et fraîcheur ; T08b : Hotfix.log listé ; T08c : valeurs de DBCache.bin appliquées
     certitude: certain
-    sources: ["https://wago.tools/api/builds"]
+    sources:
+      - "https://wago.tools/api/builds"
+      - "Logs/Hotfix.log du client (T08b : lignes des correctifs, journal du cache)"
+      - "Cache/ADB/enUS/DBCache.bin du client (T08c : valeurs des correctifs, lecture locale)"
+      - "https://github.com/wowdev/WoWDBDefs (T08c : dispositions des tables par build, commit épinglé)"
     tests:
       - tests/unit/test_manifest.py
       - tests/unit/test_freshness.py
+      - tests/unit/test_dbcache.py::test_statuses_of_known_records
+      - tests/unit/test_dbcache.py::test_highest_push_wins_whatever_the_file_order
+      - tests/unit/test_dbd.py::test_decode_trait_records
+      - tests/unit/test_dbd.py::test_true_layout_is_validated
+      - tests/unit/test_hotfix_overlay.py::test_valid_rows_replace_or_add
+      - tests/unit/test_hotfix_overlay.py::test_other_build_is_refused
+      - tests/unit/test_hotfix_overlay.py::test_candidate_has_the_new_warrior_talents
     tolerance: null
+    note: "T08c : une valeur de correctif vaut pour le build du client qui l'a reçue ; poussée la plus haute ; INVALID, NOTPUBLIC, réponses DBReply et réponses d'objets jamais appliquées (sens non établi pour les deux derniers, docs/OPEN_QUESTIONS.md)"
   - id: J2
     categorie: meta
     description: "Graine et reproductibilité"

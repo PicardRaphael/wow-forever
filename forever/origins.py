@@ -2,14 +2,17 @@
 
 Chaque feuille d'un fichier de données (nombre, booléen, texte non vide) doit être couverte par une règle :
 `file`, `paths` (pointeurs JSON, RFC 6901), `origin`, `source`, `certainty`, et `reason` pour une valeur écrite à
-la main ou un paramètre. Six origines :
+la main ou un paramètre. Sept origines :
 
 - `client` : décodée d'une table du client ; `journal` : mesurée dans les journaux ou relevée en jeu ;
   `addon` : addon de données (nom et version) ; `manuel` : écrite à la main (raison et source) ;
 - `copie_figee` : copie figée du seed (`_seed_*.json`), lue en mode seed seulement, règle au niveau du fichier ;
-- `parametre` : réglage de l'outil (graines, seuils, préréglages, règles de lecture), pas une valeur de jeu.
+- `parametre` : réglage de l'outil (graines, seuils, préréglages, règles de lecture), pas une valeur de jeu ;
+- `correctif_serveur` (T08c) : valeur d'un correctif du serveur lue dans `DBCache.bin` du client et appliquée en mode
+  forever ; chemins exacts des entités touchées, champs `pushes` (poussées) et `seen_at` (première ligne de la poussée
+  dans le journal des correctifs, ou `null` avec `dbcache_date`).
 
-Plafond de certitude par origine : `client` et `journal` jusqu'à `certain`, `addon` et `manuel` au plus
+Plafond de certitude par origine : `client`, `journal` et `correctif_serveur` jusqu'à `certain`, `addon` et `manuel` au plus
 `probable` ; `copie_figee` et `parametre` sans certitude. Les motifs (`*` : un segment, `**` : zéro ou plus) ne
 sont permis que pour `client`, `journal`, `addon` et `copie_figee` : une valeur `manuel` est nommée par son chemin
 exact (le chemin couvre son sous-arbre), une clé nouvelle n'est donc jamais couverte en silence. La règle la plus
@@ -35,9 +38,16 @@ from typing import Any
 from forever.manifest import SOURCES_NAME, version_dirs
 
 ORIGINS_NAME = "origins.json"
-ORIGINS = ("client", "journal", "addon", "manuel", "copie_figee", "parametre")
+SERVER_ORIGIN = "correctif_serveur"
+ORIGINS = ("client", "journal", "addon", "manuel", "copie_figee", "parametre", SERVER_ORIGIN)
 CERTAINTY_RANK = {"suppose": 0, "probable": 1, "certain": 2}
-CERTAINTY_CAP = {"client": "certain", "journal": "certain", "addon": "probable", "manuel": "probable"}
+CERTAINTY_CAP = {
+    "client": "certain",
+    "journal": "certain",
+    "addon": "probable",
+    "manuel": "probable",
+    SERVER_ORIGIN: "certain",
+}
 PATTERN_ORIGINS = frozenset({"client", "journal", "addon", "copie_figee"})
 REASON_ORIGINS = frozenset({"manuel", "parametre"})
 MECHANICS = "mechanics.json"
@@ -229,6 +239,12 @@ class _Checker:
                 self.issue("schema", file, where, f"certitude inconnue : {certainty!r}")
             elif CERTAINTY_RANK[certainty] > CERTAINTY_RANK[cap]:
                 self.issue("certitude_plafond", file, where, f"{origin} : au plus {cap}, {certainty} déclaré")
+            if origin == SERVER_ORIGIN:
+                pushes = raw.get("pushes")
+                if not isinstance(pushes, list) or not pushes or not all(isinstance(x, int) for x in pushes):
+                    self.issue("schema", file, where, "correctif_serveur : poussées (pushes) absentes")
+                if "seen_at" not in raw or (raw.get("seen_at") is None and not raw.get("dbcache_date")):
+                    self.issue("schema", file, where, "correctif_serveur : date vue (seen_at ou dbcache_date) absente")
             if origin == "copie_figee" and paths != ["**"]:
                 self.issue("copie_figee_partielle", file, where, "copie figée : règle au niveau du fichier (**)")
             for p in paths:

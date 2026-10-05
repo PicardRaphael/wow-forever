@@ -12,6 +12,7 @@ import re
 import shutil
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -27,8 +28,18 @@ from forever.pipeline.character_scaling import (
     load_character_tables,
     load_gametables,
 )
+from forever.pipeline.dbd import LayoutCheck
 from forever.pipeline.fetch import DEFAULT_LOCALE, wago_dir
-from forever.pipeline.hotfix_overlay import HotfixSource
+from forever.pipeline.hotfix_overlay import (
+    HOTFIX_KEY,
+    SERVER_ORIGIN,
+    Applied,
+    HotfixSource,
+    annotate,
+    apply_hotfixes,
+    reach,
+    sources_block,
+)
 from forever.pipeline.pets import PETS_FILE, decode_pets, load_pet_tables, own_pet_table_files, pet_table_files
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
@@ -1526,6 +1537,77 @@ def _inherited_source(base: Path, name: str, rules: Mapping[str, Any]) -> Path |
     return None
 
 
+PET_SCHEMAS = {"SkillLineAbility": "PetSkillLineAbility"}  # même schéma que load_pet_tables
+
+
+class _Hotfixes:
+    """Correctifs du serveur superposés à chaque lot de tables lu (T08c) ; sans source, les tables passent telles
+    quelles."""
+
+    def __init__(self, source: HotfixSource | None, csv_dir: Path) -> None:
+        self.source = source
+        self.csv_dir = csv_dir
+        self.applied: dict[tuple[str, int], Applied] = {}
+        self.before: dict[str, list[Row]] = {}
+        self.after: dict[str, list[Row]] = {}
+        self.loaded: set[str] = set()
+        self.checks: dict[str, LayoutCheck] = {}
+        self.listed: dict[str, Any] = {}
+        self.absent: dict[tuple[str, int], dict[str, Any]] = {}
+
+    def apply(self, tables: dict[str, list[Row]], schemas: Mapping[str, str] | None = None) -> dict[str, list[Row]]:
+        if self.source is None:
+            return tables
+        ov = apply_hotfixes(tables, self.source, self.csv_dir, schemas=schemas)
+        for a in ov.applied:
+            self.applied[(a.table, a.rec_id)] = a
+        for key, rows in tables.items():
+            if "/" not in key:
+                self.before.setdefault(key, list(rows))
+                self.after[key] = list(ov.tables[key])
+                self.loaded.add(key)
+        self.checks.update(ov.checks)
+        for d in ov.listed["delete_absent"]:
+            self.absent[(d["table"], d["rec_id"])] = d
+        unvalidated = {**self.listed.get("unvalidated", {}), **ov.listed["unvalidated"]}
+        self.listed = {**ov.listed, "unvalidated": unvalidated}
+        return ov.tables
+
+    def finish(self, docs: Mapping[str, Any], inherited: dict[str, Any], sources: dict[str, Any]) -> str:
+        """Pose `hotfix` sur les entités touchées, les règles `correctif_serveur` dans `origins.json` et le bloc
+        `hotfixes` de `sources.json` ; rend la ligne du rapport de décodage."""
+        source = self.source
+        assert source is not None
+        applied = sorted(self.applied.values(), key=lambda a: (a.table, a.rec_id))
+        rules, unattributed = annotate(docs, applied, reach(applied, self.before, self.after), source)
+        origins = inherited.get("origins.json")
+        if origins is not None:
+            keys = list(origins.get("metadata_keys", []))
+            origins["metadata_keys"] = keys if HOTFIX_KEY in keys else [*keys, HOTFIX_KEY]
+            kept = [r for r in origins.get("rules", []) if r.get("origin") != SERVER_ORIGIN]
+            origins["rules"] = [*kept, *rules]
+        pending = {(t, r) for (t, r) in source.resolved.applicable}
+        listed = {
+            **self.listed,
+            "delete_absent": sorted(self.absent.values(), key=lambda d: (d["table"], d["rec_id"])),
+            "not_loaded": {
+                t: sum(1 for (tt, _) in pending if tt == t) for t in sorted({t for t, _ in pending} - self.loaded)
+            },
+        }
+        entities = sum(len(r["paths"]) for r in rules)
+        stamp = datetime.fromtimestamp(source.path.stat().st_mtime, tz=UTC)
+        sources["hotfixes"] = sources_block(
+            source, applied, listed, self.checks, entities, unattributed, format_utc(stamp)
+        )
+        pushes = sorted({a.push_id for a in applied})
+        changed = sum(1 for a in applied if not a.identical)
+        return (
+            f"correctifs du serveur (DBCache.bin, build {source.cache.build}) : {len(applied)} enregistrement(s) "
+            f"appliqué(s) dont {changed} qui change(nt) une valeur, poussée(s) {pushes}, {entities} entité(s) "
+            f"touchée(s) ; non lues par le pipeline : {', '.join(listed['not_loaded']) or 'aucune'}"
+        )
+
+
 def decode_version(
     deps: Deps,
     version: str,
@@ -1543,8 +1625,6 @@ def decode_version(
         raise InvalidArgumentError(
             f"Version mal formée : « {version} ».", "donner une version complète, par exemple 1.60.1.70009"
         )
-    if hotfixes is not None:
-        raise NotImplementedError("T08c : correctifs du serveur")
     base_version, rules = load_rules(deps.data_dir)
     base = deps.data_dir / base_version
     csv_dir = csv_dir or wago_dir(deps.cache_dir, version)
@@ -1564,14 +1644,15 @@ def decode_version(
         raise CsvMissingError(version, class_missing)
     if out.exists() and any(out.iterdir()) and (not force or not _is_candidate(out, version)):
         raise CandidateExistsError(str(out))
-    tables = load_tables(csv_dir, rules)
+    hot = _Hotfixes(hotfixes, csv_dir)
+    tables = hot.apply(load_tables(csv_dir, rules))
     talents = decode_talents(tables, rules, version)
     spells = decode_spells(tables, rules, _read_json(base / "spells.json"), version)
     scaling = decode_scaling(tables, rules, version)
     extra_notes: list[str] = []
     decoded_classes: dict[str, Any] = {}
     if class_files and not class_missing:
-        more = load_class_tables(csv_dir, rules)
+        more = hot.apply(load_class_tables(csv_dir, rules))
         decoded_classes = {
             "classes.json": decode_classes(more, rules, version),
             "races.json": decode_races(more, rules, version),
@@ -1585,7 +1666,10 @@ def decode_version(
         raise CsvMissingError(version, char_missing)
     if char_files and not char_missing:
         char_doc = decode_character_scaling(
-            load_character_tables(csv_dir, rules), rules, load_gametables(gametables_dir(csv_dir), rules), version
+            hot.apply(load_character_tables(csv_dir, rules)),
+            rules,
+            load_gametables(gametables_dir(csv_dir), rules),
+            version,
         )
         decoded_classes[CHARACTER_FILE] = char_doc
         extra_notes += [
@@ -1604,7 +1688,7 @@ def decode_version(
         all_missing = [rel for _, rel in pet_table_files(rules) if not (csv_dir / rel).is_file()]
         if all_missing:
             raise CsvMissingError(version, all_missing)
-        pets_doc = decode_pets(load_pet_tables(csv_dir, rules), rules, version)
+        pets_doc = decode_pets(hot.apply(load_pet_tables(csv_dir, rules), PET_SCHEMAS), rules, version)
         decoded_classes[PETS_FILE] = pets_doc
         extra_notes += [f"{PETS_FILE} : {o}" for o in pets_doc["observations"]]
     inherited = {}
@@ -1708,6 +1792,9 @@ def decode_version(
     }
     if rules.get("retired_files"):
         sources["retired_files"] = copy.deepcopy(rules["retired_files"])
+    if hot.source is not None:
+        docs = {"talents.json": talents, "spells.json": spells, "spell_scaling.json": scaling, **decoded_classes}
+        extra_notes.append(hot.finish(docs, inherited, sources))
     if out.exists():
         shutil.rmtree(out)
     vdir = out / version

@@ -584,6 +584,7 @@ class Revision(TypedDict):
     changes: list[InstallChange]
     game_state: NotRequired[dict[str, Any]]
     renamed_in_classes: NotRequired[list[dict[str, str]]]
+    hotfixes: NotRequired[list[int]]  # T08c : poussées des correctifs du serveur appliquées
 
 
 def _mana_note(spells: Mapping[str, Any]) -> str:
@@ -825,6 +826,8 @@ def apply_install(
     _write(vdir / SPELLS, docs["spells"], 1)
     _write(vdir / CONFIRMED, confirmed, 2)
     _write(vdir / SOURCES_NAME, sources, 2)
+    if carry_hotfix_provenance(vdir, Path(docs["candidate_path"])):
+        revision["hotfixes"] = _json(vdir / SOURCES_NAME).get("hotfixes", {}).get("pushes", [])
     classes_path = vdir / "classes.json"
     if classes_path.is_file():
         classes = _json(classes_path)
@@ -842,8 +845,32 @@ def apply_install(
 def carry_hotfix_provenance(vdir: Path, cand_vdir: Path) -> bool:
     """T08c : règles `correctif_serveur` d'`origins.json` et bloc `hotfixes` de `sources.json` de la candidate
     reportés dans la version installée (celles d'une révision précédente remplacées) ; rend True si la candidate en
-    porte."""
-    raise NotImplementedError
+    porte. Une candidate sans correctif retire ceux d'une révision précédente (ses fichiers les remplacent)."""
+    from forever.origins import ORIGINS_NAME, SERVER_ORIGIN
+
+    cand_origins = _json(cand_vdir / ORIGINS_NAME) if (cand_vdir / ORIGINS_NAME).is_file() else {}
+    cand_sources = _json(cand_vdir / SOURCES_NAME) if (cand_vdir / SOURCES_NAME).is_file() else {}
+    rules = [r for r in cand_origins.get("rules", []) if r.get("origin") == SERVER_ORIGIN]
+    block = cand_sources.get("hotfixes")
+    path = vdir / ORIGINS_NAME
+    if path.is_file():
+        doc = _json(path)
+        kept = [r for r in doc.get("rules", []) if r.get("origin") != SERVER_ORIGIN]
+        keys = list(doc.get("metadata_keys", []))
+        new = {**doc, "rules": [*kept, *rules]}
+        if rules and "hotfix" not in keys:
+            new["metadata_keys"] = [*keys, "hotfix"]
+        if new != doc:
+            _write(path, new, 2)
+    spath = vdir / SOURCES_NAME
+    if spath.is_file():
+        sources = _json(spath)
+        updated = {k: v for k, v in sources.items() if k != "hotfixes"}
+        if block is not None:
+            updated["hotfixes"] = block
+        if updated != sources:
+            _write(spath, updated, 2)
+    return bool(rules or block)
 
 
 def _game_state_origin(vdir: Path, entries: Mapping[str, Any]) -> None:
