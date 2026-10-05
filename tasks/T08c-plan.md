@@ -21,9 +21,32 @@ Demande de l'utilisateur du 2026-10-02 (décision 170), section T08c de `docs/RO
    un script hors du paquet qui lit `Data.lua` en local par `forever/pipeline/lua_table.py` ; agrégats seulement ; le
    lecteur durable reste à FA1.
 
-Écart avec la ROADMAP à reporter au bloc G : la ROADMAP prévoit une « origine propre dans `origins.json` » et une
-« fixture synthétique » ; la commande demande l'origine **« client »** et des fixtures **extraites du `DBCache.bin`
-de l'utilisateur**. La commande fait foi ; la section T08c de la ROADMAP est corrigée en fin de tranche.
+Écart avec la ROADMAP à reporter au bloc G : la ROADMAP prévoit une « fixture synthétique » ; la commande demande des
+fixtures **extraites du `DBCache.bin` de l'utilisateur** (sans `TactKey`). La commande fait foi ; la section T08c de
+la ROADMAP est corrigée en fin de tranche sur ce seul point.
+
+## Correction de l'utilisateur à l'acceptation (2026-10-05)
+
+- **Origine propre** (comme le prévoyait la ROADMAP), au lieu de l'origine « client » écrite plus bas : septième
+  origine `correctif_serveur` dans `forever/origins.py`, plafond `certain`, chemins exacts seulement (pas de motif),
+  champs obligatoires `pushes` (poussées) et `seen_at` (première ligne de la poussée dans `hotfixes.json`, ou `null`
+  avec `dbcache_date`). Granularité : l'entité entière touchée (talent, sort, capacité, bijou), dont le sous-arbre est
+  couvert. `decode --hotfixes` écrit ces règles dans l'`origins.json` de la candidate (chemins calculés à l'écriture
+  des fichiers décodés) et y ajoute `hotfix` aux `metadata_keys` ; `forever install` remplace les règles
+  `correctif_serveur` de la version par celles de la candidate. `hotfix` entre aussi dans `value_diff.META`.
+  Partout où ce plan dit « origine client » pour une valeur de correctif, lire `correctif_serveur`.
+- Réseau : seulement WoWDBDefs par `forever fetch --dbd`, commit épinglé, **accord demandé au moment de l'accès**.
+  Pas de bloc pour 1.60.1.70170 : arrêt et proposition de wago.tools, jamais la structure d'un build voisin.
+- Constats du 2026-10-05 : le client est passé en 70205 (cache vivant `DBCache.bin<pid>.tmp`, jamais lu) ; le
+  `DBCache.bin` de 70170 (7 300 286 octets, 165 908 entrées, daté du 02/10 17:54, sha256 `2f2a6ba1…`) est copié dans
+  `<cache>/dbcache/70170/DBCache.bin`, source du bloc G (`--dbcache`). En-tête de 44 octets. Familles nouvelles :
+  poussée 112350 (`QuestV2*`, hors projet, listée) et réponses d'objets `push_id == unique_id >= 0x01000000`
+  (`Item`, `ItemSparse`, `ItemSearchName`…, aucun bijou PvP touché) : jamais appliquées, comptées à part, une entrée
+  dans la fixture. `Hotfix.log` du jour est un démarrage 70205 : le recoupement se fait avec `hotfixes.json` filtré
+  sur `client_build` = build de l'en-tête, et l'extrait de fixture des lignes 112347 vient de ce journal (datées du
+  02/10).
+- Ordre du bloc B : accord réseau à la frontière A → B, prise unique des `.dbd` par script hors paquet, contrôle du
+  bloc `BUILD` de 1.60.1.70170, puis fixtures et tests, puis `fetch --dbd` contre `http_get` simulé.
 
 ## Contexte relevé pendant le plan (lecture locale seulement, aucun réseau)
 
