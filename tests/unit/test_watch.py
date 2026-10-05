@@ -104,3 +104,106 @@ def test_cli_watch_json(wow, make_deps, capsys):
     assert main(["watch", "--json"], make_deps(wow_dir=wow)) == 0
     data = json.loads(capsys.readouterr()[0])
     assert data["events"] and data["provenance"]["game_version"]
+
+
+# --- T08c, bloc E : correctifs du serveur de DBCache.bin non appliqués -----------------------------------------
+
+DBCACHE = FIXTURES / "hotfix" / "DBCache.bin"
+
+
+def with_dbcache(wow, raw=None):
+    target = wow / "Cache" / "ADB" / "enUS" / "DBCache.bin"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_bytes(raw if raw is not None else DBCACHE.read_bytes())
+    return target
+
+
+def expected_pending():
+    from conftest import DATA_DIR, LOCAL_VERSION, read_json
+
+    from forever.pipeline.dbcache import effective, known_tables, read_dbcache, table_names
+    from forever.pipeline.tables import TABLES
+
+    rules = read_json(DATA_DIR / LOCAL_VERSION / "decode_rules.json")
+    res = effective(read_dbcache(DBCACHE).entries, table_names(known_tables(rules)))
+    return res, [k for k in res.applicable if k[0] in TABLES]
+
+
+def dbcache_event(result):
+    return next((e for e in result["events"] if e["kind"] == "hotfixes_dbcache"), None)
+
+
+def test_pending_server_hotfixes_are_reported(wow, make_deps):
+    with_dbcache(wow)
+    http = FakeHttp.failing()
+    deps = make_deps(wow_dir=wow, http=http)
+    event = dbcache_event(watch(deps))
+    _, pending = expected_pending()
+    assert event is not None and event["pending"] == len(pending) > 0
+    assert "non appliqué" in event["detail"] and "révision 3" in event["detail"]
+    commands = [a["command"] for a in event["actions"]]
+    assert "forever hotfixes --values" in commands
+    assert any(c.startswith("forever decode --version 1.60.1.70170 --hotfixes") for c in commands)
+    assert any(c.startswith("forever install") for c in commands)
+    assert not any(a["network"] for a in event["actions"])
+    assert http.calls == []
+
+
+def test_unchanged_dbcache_is_not_analysed_again(wow, make_deps, monkeypatch):
+    from forever.pipeline import dbcache
+
+    with_dbcache(wow)
+    deps = make_deps(wow_dir=wow)
+    watch(deps)
+
+    def refuse(*_a, **_k):
+        raise AssertionError("DBCache.bin relu sans changement")
+
+    monkeypatch.setattr(dbcache, "read_dbcache", refuse)
+    assert dbcache_event(watch(deps)) is None
+
+
+def test_installed_hotfixes_leave_nothing_pending(wow, make_deps, data_copy):
+    from conftest import LOCAL_VERSION, read_json
+
+    from forever.manifest import write_manifest
+
+    res, _ = expected_pending()
+    path = data_copy / LOCAL_VERSION / "sources.json"
+    sources = read_json(path)
+    sources["hotfixes"] = {
+        "pushes": sorted({e.push_id for e in res.applicable.values()}),
+        "applied": [
+            {"table": t, "rec_id": r, "status": "VALID" if e.status == 1 else "DELETE", "push": e.push_id,
+             "unique_id": e.unique_id}
+            for (t, r), e in res.applicable.items()
+        ],
+    }  # fmt: skip
+    path.write_bytes((json.dumps(sources, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    write_manifest(data_copy)
+    with_dbcache(wow)
+    deps = make_deps(wow_dir=wow, data_dir=data_copy)
+    assert dbcache_event(watch(deps)) is None
+    line = watch_line(deps)
+    assert line is None or "correctif" not in line
+
+
+def test_dbcache_of_another_build_is_not_applicable(wow, make_deps):
+    import struct
+
+    raw = bytearray(DBCACHE.read_bytes())
+    struct.pack_into("<I", raw, 8, 70205)
+    with_dbcache(wow, bytes(raw))
+    event = dbcache_event(watch(make_deps(wow_dir=wow)))
+    assert event is not None and "non applicables" in event["detail"] and "70205" in event["detail"]
+    assert event["pending"] == 0
+
+
+def test_session_line_counts_pending_hotfixes(wow, make_deps):
+    with_dbcache(wow)
+    deps = make_deps(wow_dir=wow)
+    watch(deps)
+    watch(deps)  # second passage : plus d'événement, le compte reste dans l'état
+    line = watch_line(deps)
+    _, pending = expected_pending()
+    assert line and "\n" not in line and f"{len(pending)} correctif(s) du serveur non appliqué(s)" in line
