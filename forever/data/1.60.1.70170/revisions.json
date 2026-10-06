@@ -5226,6 +5226,565 @@
      "key": "hotStreak"
     }
    ]
+  },
+  {
+   "revision": 5,
+   "date": "2026-10-06",
+   "motif": "Mesure des journaux du 2026-10-02 sous 1.60.1.70170 : WoWCombatLog-100226_080035 relu entier (la révision 2 en avait mesuré les 21 372 premières lignes, le fichier grossissait pendant la session) et WoWCombatLog-100226_162842 (autre session du même jour) ; Ilkrud Magthrull, Ashenvale Bear et Wrathtail Priestess mesurés mais écartés de la courbe (même précédent que la révision 2) ; accord de l'utilisateur du 2026-10-06",
+   "command": "forever measures refresh --yes --curve-exclude 3664 --curve-exclude 3809 --curve-exclude 3944 --curve-exclude-reason <raison>",
+   "candidate": null,
+   "report": "docs/research/data-1.60.1.70170-r5.md",
+   "counts": {
+    "measured": 63,
+    "manual": 1
+   },
+   "sources": {
+    "logs": {
+     "WoWCombatLog-100226_080035.txt": "591d242306180388367a964eb8818d58b29026465d78c1d4869b1a2f70c2ad03",
+     "WoWCombatLog-100226_162842.txt": "e8b591a4ec3fa57ffb6023f47e43a0c86587d063eebbe41bcde29b2dbdea8403"
+    },
+    "saved_variables": {
+     "ForeverLogger.lua": "4b3ae11c7936bcd5eb78a8bdc00e2b89b9cd5d9e40686c7bb6ae0a89f59f7a6d",
+     "Questie.lua": "d00ae325bfe8cad190fb76129bd487c315ba9aba6769e96f01a384f328dcf2a9"
+    }
+   },
+   "changes": [
+    {
+     "file": "monsters.json",
+     "path": "npcs.2071",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journaux WoWCombatLog-100226_080035.txt et WoWCombatLog-100226_162842.txt (client 1.60.1.70170)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3664",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 591d24230618 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3711",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3712",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3713",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3715",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3717",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3721",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3772",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 591d24230618 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3774",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 591d24230618 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3781",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 591d24230618 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3783",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 591d24230618 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3809",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 591d24230618 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3812",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3816",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journaux WoWCombatLog-100226_080035.txt et WoWCombatLog-100226_162842.txt (client 1.60.1.70170)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3819",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_080035.txt (client 1.60.1.70170, attribué par session, sha256 591d24230618 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3823",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journaux WoWCombatLog-100226_080035.txt et WoWCombatLog-100226_162842.txt (client 1.60.1.70170)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3846",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3944",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.12717",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.12940",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100226_162842.txt (client 1.60.1.70170, attribué par session, sha256 e8b591a4ec3f à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.21.value",
+     "before": 702,
+     "after": 691,
+     "source": "journaux : médiane de [691] des PNJ normaux observés",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.23.value",
+     "before": 846,
+     "after": 803,
+     "source": "journaux : valeur commune des PNJ normaux observés",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.24.value",
+     "before": 926,
+     "after": 863,
+     "source": "journaux : médiane de [863] des PNJ normaux observés",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.26.value",
+     "before": 1135,
+     "after": 1153,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.27.value",
+     "before": 1231,
+     "after": 1252,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.28.value",
+     "before": 1335,
+     "after": 1358,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.29.value",
+     "before": 1438,
+     "after": 1463,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.30.value",
+     "before": 1540,
+     "after": 1569,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.31.value",
+     "before": 1726,
+     "after": 1759,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.32.value",
+     "before": 1841,
+     "after": 1877,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.33.value",
+     "before": 1964,
+     "after": 2003,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.34.value",
+     "before": 2088,
+     "after": 2131,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.35.value",
+     "before": 2222,
+     "after": 2269,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.36.value",
+     "before": 2468,
+     "after": 2521,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.37.value",
+     "before": 2617,
+     "after": 2674,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.38.value",
+     "before": 2771,
+     "after": 2833,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.39.value",
+     "before": 2939,
+     "after": 3006,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.40.value",
+     "before": 3110,
+     "after": 3182,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.41.value",
+     "before": 3422,
+     "after": 3502,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.42.value",
+     "before": 3611,
+     "after": 3698,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.43.value",
+     "before": 3802,
+     "after": 3895,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.44.value",
+     "before": 3999,
+     "after": 4098,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.45.value",
+     "before": 4199,
+     "after": 4305,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.46.value",
+     "before": 4599,
+     "after": 4717,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.47.value",
+     "before": 4831,
+     "after": 4956,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.48.value",
+     "before": 5065,
+     "after": 5198,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.49.value",
+     "before": 5316,
+     "after": 5457,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.50.value",
+     "before": 5572,
+     "after": 5722,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.51.value",
+     "before": 6068,
+     "after": 6233,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.52.value",
+     "before": 6351,
+     "after": 6526,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.53.value",
+     "before": 6646,
+     "after": 6830,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.54.value",
+     "before": 6941,
+     "after": 7136,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.55.value",
+     "before": 7245,
+     "after": 7451,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.56.value",
+     "before": 6399,
+     "after": 6582,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.57.value",
+     "before": 8192,
+     "after": 8429,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.58.value",
+     "before": 8224,
+     "after": 8464,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.59.value",
+     "before": 8573,
+     "after": 8826,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.60.value",
+     "before": 7420,
+     "after": 7640,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.61.value",
+     "before": 7724,
+     "after": 7955,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.62.value",
+     "before": 10046,
+     "after": 10349,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.63.value",
+     "before": 13346,
+     "after": 13752,
+     "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "questie_correction.fit",
+     "before": {
+      "slope": 0.023805491386132475,
+      "intercept": 0.8228887385415422,
+      "knee_level": 7.4399330215729655,
+      "points": 13
+     },
+     "after": {
+      "slope": 0.025089037316538578,
+      "intercept": 0.8127531170003912,
+      "knee_level": 7.463294850144629,
+      "points": 17
+     },
+     "source": "ajustement recalculé sur les niveaux mesurés (journaux WoWCombatLog-100226_080035.txt et WoWCombatLog-100226_162842.txt (client 1.60.1.70170))",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded",
+     "before": [
+      2163,
+      2165,
+      3727,
+      3819
+     ],
+     "after": [
+      2163,
+      2165,
+      3664,
+      3727,
+      3809,
+      3819,
+      3944
+     ],
+     "source": "PNJ hors norme des journaux du 2026-10-02 (Ilkrud Magthrull, Ashenvale Bear, Wrathtail Priestess) : même précédent que la révision 2, décision de l'utilisateur du 2026-10-06",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }

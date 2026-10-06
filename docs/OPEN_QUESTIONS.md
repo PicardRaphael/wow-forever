@@ -169,15 +169,17 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   Ajoutée le 2026-10-05 (T08c) : 4 508 objets (`Item`, `ItemSparse`, `ItemSearchName` `VALID`, tables d'artisanat
   `INVALID`), déjà journalisées sous le build 70124 : elles ne viennent pas forcément du build de l'en-tête. Jamais
   appliquées. Test : comparaison des enregistrements `ItemSparse` envoyés avec le CSV du build (T10). Priorité : basse.
-- **DON13 — Quel nœud porte chaque nouveau talent du Guerrier ?** Ajoutée le 2026-10-05 (T08c) : le `DBCache.bin` du
-  poste place Lingering Rage sur le nœud 110857 et Furious Precision sur 105953 (définitions corrigées), Gore Drinker
-  sur 113569 et Iron Will sur 113570 (nœuds ajoutés) ; Talents Forever 0.37.1 les place sur 113564 à 113566 et garde
-  Iron Will sur 110857 (noms, rangées, colonnes, rangs et sorts identiques des deux côtés). Les codes de Talents
-  Forever portent des nœuds : à trancher avant l'export de FA1. Test : talent appris en jeu puis code exporté par
-  l'addon ; tables du build 70205. Talents Forever 0.37.1 a peut-être été construit sur 1.60.1.70205, version vers
-  laquelle le client de l'utilisateur est passé, qui pourrait intégrer la refonte avec d'autres identifiants de
-  nœuds : la question sera tranchée à l'installation de 70205 (note de l'utilisateur du 2026-10-05). Priorité :
-  moyenne (FA1).
+- **DON14 — Quand le client écrit-il `DBCache.bin` ?** Ajoutée le 2026-10-06 (T08d) : à la connexion, à la
+  fermeture, à la réception d'une poussée ? Le fichier a été remplacé une minute après le lancement de 70235, puis de
+  nouveau à 08:16 UTC le même matin (29 283 puis 30 284 entrées). Test : dates de `DBCache.bin` et de
+  `DBCache.bin<pid>.tmp` relevées par l'archivage sur plusieurs sessions. Priorité : moyenne (archivage).
+- **DON15 — Les tables de wago de 1.60.1.70235 sont-elles un vrai export de ce build ?** Ajoutée le 2026-10-06
+  (T08d) : 46 des 47 CSV enUS sont identiques octet pour octet à ceux de 70170 ; seul l'en-tête de
+  `PlayerExpectedStat` change (`HPPerStamina`). Si le build 70235 du client diffère, rien ne le montre. Test :
+  comparer une table au `DBCache.bin` (enregistrements non poussés) ou au fichier CASC du client. Priorité : moyenne.
+- **DON16 — Quelle table porte le hachage `0xc842493a` (poussée 112426, `DBCache.bin` de 70235) ?** Ajoutée le
+  2026-10-06 (T08d) : aucun des noms Trait* essayés ; les autres tables de la poussée sont résolues. Test : hachage
+  de tous les noms de WoWDBDefs. Priorité : basse.
 
 ## Journaux, addons et sauvegardes
 - **LOG1 — Que portent les champs inconnus du bloc avancé du journal (dont le dernier pour un joueur) ?** Test :

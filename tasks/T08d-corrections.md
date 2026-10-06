@@ -27,3 +27,37 @@ qui est fausse, pas le code.
      deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
      assert main(["update", "--dry-run", "--json", "--only", "jeu"], deps) == EXIT_PENDING
 ```
+
+## 2. `tests/unit/test_monsters.py::test_installed_table_is_read_by_game_data` (révision 5 de 70170)
+
+**Constat.** Le test affirme `hp_by_level[25].certainty == "probable"` (« un seul PNJ nommé » : Sarilus Foulborne).
+La révision 5 (accord du 2026-10-06) mesure aussi Muglash (12717) au niveau 25, avec la même valeur.
+
+**Preuve.** `forever/data/1.60.1.70170/monsters.json` : `hp_by_level["25"]` = 927, `certain`, « valeur commune des
+PNJ normaux observés », `n_npcs` 2 ; `npcs["3986"]` (Sarilus Foulborne) et `npcs["12717"]` (Muglash) : 927 au niveau 25.
+
+**Diff proposé** (une assertion et son commentaire) :
+
+```diff
+-    assert monsters.hp_by_level[25].certainty == "probable"  # un seul PNJ nommé
++    assert monsters.hp_by_level[25].certainty == "certain"  # deux PNJ concordants (révision 5)
+```
+
+## 3. `tests/unit/test_update_publish.py` (4 tests, garde-fou de la décision 184)
+
+**Constat.** `test_same_tables_are_installed_through_the_clone`, `test_a_red_windows_job_merges_nothing_and_keeps_the_branch`,
+`test_a_red_verify_in_the_clone_leaves_it_clean` et `test_a_version_installed_by_the_other_pc_only_advances_the_clone`
+passent en `--auto` (`GAME = UpdateOptions(auto=True, …)`) et attendent une écriture. Le garde-fou demandé le
+2026-10-06 retient désormais la première écriture de `--auto` en attente : le verdict devient `attente`.
+
+**Preuve.** `forever/update.py`, `first_write_guard` (vrai sans `first_write_approved_at` dans
+`<cache>/update/state.json`) ; échec observé : `['attente'] == ['écrire']` (`test_update_publish.py:109`).
+
+**Diff proposé** (fixture `origin` seulement, aucune assertion changée : ces tests portent sur le chemin git) :
+
+```diff
+     config.write_text(json.dumps({"repo_url": str(bare)}), encoding="utf-8")
++    # garde-fou de la première écriture levé (décision 184) : ces tests portent sur le chemin git
++    (config.parent / "state.json").write_text(json.dumps({"first_write_approved_at": "2026-10-06T00:00:00Z"}), encoding="utf-8")
+     return montage, bare
+```
