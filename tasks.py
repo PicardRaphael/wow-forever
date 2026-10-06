@@ -9,9 +9,11 @@ registry    contrôle du registre des mécaniques
 numbers     contrôle des chiffres de jeu dans le plugin
 origins     contrôle de l'origine déclarée de chaque valeur des données (T08b)
 verify      lint + typecheck + test + registry + numbers + origins (définition de « fini »)
+e2e         bout en bout de forever update, verify du clone compris (long ; job e2e de la CI)
 status      fraîcheur des données (après T01)
 """
 
+import os
 import pathlib
 import subprocess
 import sys
@@ -82,6 +84,15 @@ def verify() -> bool:
     return all(results.values())
 
 
+def e2e() -> bool:
+    """Version fictive installée par `forever update`, `verify` réel du clone compris (décision 192) ; hors de
+    `test` : il tournerait aussi dans le `verify` du clone."""
+    env = {**os.environ, "FOREVER_E2E": "1"}
+    cmd = PY + ["-m", "pytest", "-q", "tests/e2e"]
+    print(f"$ FOREVER_E2E=1 {' '.join(cmd)}", flush=True)
+    return subprocess.run(cmd, cwd=ROOT, env=env, check=False).returncode == 0
+
+
 def status() -> bool:
     return run(PY + ["-m", "forever.cli", "status"])
 
@@ -96,6 +107,7 @@ COMMANDS = {
     "numbers": numbers,
     "origins": origins,
     "verify": verify,
+    "e2e": e2e,
     "status": status,
 }
 
