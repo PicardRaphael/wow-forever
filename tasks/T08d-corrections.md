@@ -64,3 +64,25 @@ passent en `--auto` (`GAME = UpdateOptions(auto=True, …)`) et attendent une é
 +    (config.parent / "state.json").write_text(json.dumps({"first_write_approved_at": "2026-10-06T00:00:00Z"}), encoding="utf-8")
      return montage, bare
 ```
+
+## 4. `tests/unit/test_monsters_correction.py` (méthode Theil-Sen pondéré, décision 190)
+
+**Constat.** `test_least_squares_line_on_ratios_above_one` fige la pente, l'ordonnée et le genou des moindres carrés ;
+`test_excluded_npc_is_listed_with_its_ratio` affirme que garder Sarilus Foulborne (un seul PNJ, niveau 25, rapport
+1,62) relève la pente. Avec Theil-Sen pondéré (décision de l'utilisateur du 2026-10-06), ce point isolé ne bouge plus
+la pente : c'est la robustesse demandée.
+
+**Preuve.** Mêmes fixtures (`REAL_LOG`, `WoWCombatLog-092726_150346.anon.txt.gz`, Questie 11.38.0), valeurs par
+`repr()` : pente 0.0246379983222087, ordonnée 0.8050680234890781, genou 7.911843079200558 ; avec Sarilus :
+0.0246379983222087 (identique). Niveau 16 inchangé (427, probable).
+
+**Diff proposé** (constantes, une assertion, docstring ; noms des tests inchangés) :
+
+```diff
+-sur les médianes supérieures à 1 ; rapport d'un niveau non mesuré = max(1, droite). Certitude `probable` entre le
++sur les médianes supérieures à 1 (Theil-Sen pondéré depuis la décision 190) ; rapport d'un niveau non mesuré = max(1, droite). Certitude `probable` entre le
+-SLOPE, INTERCEPT, KNEE = 0.02479762330307588, 0.8029465816401004, 7.946463899040569
++SLOPE, INTERCEPT, KNEE = 0.0246379983222087, 0.8050680234890781, 7.911843079200558
+-    assert kept is not None and kept["fit"]["slope"] > SLOPE and kept["excluded"] == []
++    assert kept is not None and kept["fit"]["slope"] == pytest.approx(SLOPE, rel=1e-12) and kept["excluded"] == []
+```

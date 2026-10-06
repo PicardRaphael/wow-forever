@@ -42,6 +42,23 @@ def _median(values: Sequence[int]) -> int:
     return int(statistics.median_low(values))
 
 
+def _weighted_theil_sen(points: Sequence[tuple[int, float]], weights: Mapping[int, int]) -> float:
+    """Médiane pondérée des pentes entre chaque paire de niveaux (poids : produit des nombres de PNJ) ; première pente
+    où le poids cumulé atteint la moitié du total (décision 190, MON6)."""
+    slopes = sorted(
+        ((y2 - y1) / (x2 - x1), weights[x1] * weights[x2])
+        for i, (x1, y1) in enumerate(points)
+        for x2, y2 in points[i + 1 :]
+    )
+    half = sum(w for _, w in slopes) / 2
+    total = 0
+    for slope, weight in slopes:
+        total += weight
+        if total >= half:
+            return slope
+    return slopes[-1][0]
+
+
 def fit_questie_correction(npcs: Mapping[str, Any], *, exclude: Collection[int] = ()) -> dict[str, Any] | None:
     """Correction PV Questie -> Forever tirée des PNJ normaux mesurés (section `npcs` de `monsters.json`) ; None sans
     aucune paire (mesure, Questie). `fit` vaut None s'il y a moins de deux niveaux au rapport médian supérieur à 1."""
@@ -64,15 +81,14 @@ def fit_questie_correction(npcs: Mapping[str, Any], *, exclude: Collection[int] 
     points = [(level, m) for level, m in medians.items() if m > 1]
     fit = None
     if len(points) >= 2:
-        mean_x = sum(x for x, _ in points) / len(points)
-        mean_y = sum(y for _, y in points) / len(points)
-        slope = sum((x - mean_x) * (y - mean_y) for x, y in points) / sum((x - mean_x) ** 2 for x, _ in points)
-        intercept = mean_y - slope * mean_x
+        slope = _weighted_theil_sen(points, {level: len(ratios[level]) for level, _ in points})
+        intercept = statistics.median(y - slope * x for x, y in points)
         knee = (1 - intercept) / slope if slope else None  # pente nulle : la droite ne coupe jamais 1
         fit = {"slope": slope, "intercept": intercept, "knee_level": knee, "points": len(points)}
     return {
-        "method": "médiane par niveau des rapports PV mesuré / PV Questie (PNJ normaux) ; droite des moindres carrés "
-        "sur les médianes > 1 ; rapport hors mesure = max(1, droite)",
+        "method": "médiane par niveau des rapports PV mesuré / PV Questie (PNJ normaux) ; droite de Theil-Sen pondéré "
+        "sur les médianes > 1 (médiane pondérée des pentes entre niveaux, poids n_i × n_j ; ordonnée : médiane des "
+        "écarts, décision 190) ; rapport hors mesure = max(1, droite)",
         "levels": {str(level): {"ratio": m, "n_pairs": len(ratios[level])} for level, m in medians.items()},
         "fit": fit,
         "range": [min(medians), max(medians)],
