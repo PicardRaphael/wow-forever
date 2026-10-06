@@ -178,6 +178,26 @@ inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits 
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
 
+## Rejeu T08d (1.60.1.70170 révision 5, PV des monstres des journaux du 2026-10-02)
+
+Rejoué le 2026-10-06 par `scripts/replay_builds.py run 70170-r5` (préréglage complet, graine 12345, race Orc),
+comparé à `70170-r3` (la r4 ne change que l'arbre du Guerrier et des métadonnées : entrées des moteurs du Mage
+identiques). Seul changement des données : `monsters.json` (`docs/research/data-1.60.1.70170-r5.md`). Raison commune :
+PV plus bas aux niveaux 21, 23 et 24 (691, 803, 863 mesurés), plus hauts de 25 à 63 (correction plus pentue après
+l'écartement des PNJ nommés, décision 189) ; le temps par monstre monte d'environ 3 à 5 s au-delà du niveau 25.
+
+**Treize cas inchangés, trois changés** (montrés à l'utilisateur avant la poussée) :
+
+| Cas | Changement | Avant (r3) | Après (r5) |
+| --- | --- | --- | --- |
+| leveling 30 | ordre des talents (niveaux 21 à 28), build final inchangé | Frost Channeling aux niveaux 21 à 23 | Piercing Ice aux niveaux 21 à 23, Frost Channeling aux niveaux 24, 26 et 27 |
+| leveling 40 | build : Elemental Precision 4 → 3, Winter's Chill 3 → 4 ; ordre des niveaux 21 à 40 | 50,14 s par monstre (analytique) | 53,30 s ; l'ancien build est maintenant à égalité statistique (écart 0,23 s [-1,36 ; 1,82]), stable 5/5 |
+| leveling 60 | ordre des talents (niveaux 21 à 60), build final inchangé | Ice Block au niveau 60, Frost Warding aux niveaux 50 et 51 | Ice Block au niveau 50, Frost Warding aux niveaux 56 et 57, Improved Blizzard au niveau 60 |
+
+Chaque choix changé est une égalité statistique (intervalle de confiance à 95 % qui contient 0) : l'ordre bascule
+sur de petits écarts de PV. Monstres plus résistants : les combats plus longs avantagent Winter's Chill, dont les
+cumuls servent davantage sur la durée.
+
 ## Rejeu 1.60.1.70170 révision 2 (PV des monstres du premier journal, 2026-10-02)
 
 Rejoué le 2026-10-02 par `scripts/replay_builds.py run 70170-r2` (préréglage complet, graine 12345, race Orc),
