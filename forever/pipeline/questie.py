@@ -40,6 +40,7 @@ _DUNGEON = re.compile(
 )
 NPC_LEVEL_QUANTILES = (0.1, 0.9)  # plage des niveaux des PNJ d'une zone : 10e et 90e percentiles (méthode)
 NORMAL_RANK = 0
+RANK_LABELS: dict[int, str] = {}  # T08d, bloc J (squelette)
 PLAYER_LEVEL = -1  # format de Questie : `questLevel` -1 = quête au niveau du joueur
 BATTLEGROUNDS = "Battlegrounds"  # catégorie de Questie (continentLookup) des champs de bataille
 
