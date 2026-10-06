@@ -56,9 +56,32 @@ def candidate_of(version: str, root: Path) -> Path:
         shutil.copyfile(path, vdir / path.name)
     sources = read_json(vdir / "sources.json")
     sources.update(game_version=version, candidate=True)
-    (vdir / "sources.json").write_bytes((json.dumps(sources, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
+    write(vdir / "sources.json", sources)
+    # Format de sortie de `forever decode` (relevé sur la candidate réelle de 1.60.1.70235) : identifiants des rangs
+    # au niveau du sort, sorts et description du client au niveau du talent ; l'installation les range sous `source`.
+    spells = read_json(vdir / "spells.json")
+    for spell in spells["spells"].values():
+        spell["spell_ids"] = (spell.get("source") or {}).get("rank_spell_ids", [])
+    write(vdir / "spells.json", spells)
+    talents = read_json(vdir / "talents.json")
+    for tree in talents["trees"]:
+        for talent in tree["talents"]:
+            source = talent.get("source") or {}
+            talent["spellIds"], talent["desc"] = source.get("client_spell_ids", []), source.get("client_desc", "")
+    write(vdir / "talents.json", talents)
+    for path in vdir.glob("*.json"):  # build lu par le décodage
+        doc = read_json(path)
+        if isinstance(doc, dict) and doc.get("build") == LOCAL_VERSION:
+            doc["build"] = version
+            if isinstance(doc.get("source"), str):
+                doc["source"] = doc["source"].replace(LOCAL_VERSION, version)
+            write(path, doc)
     write_manifest(root)
     return root
+
+
+def write(path: Path, doc: object) -> None:
+    path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
 
 
 def git(cwd: Path, *args: str) -> str:

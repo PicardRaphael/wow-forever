@@ -216,3 +216,17 @@ def test_a_red_ci_in_the_pass_returns_the_clone_to_main_and_blocks(origin):  # n
     again = Recorder()
     report = run_update(deps, GAME, runner=again, replay=Replay())
     assert verify_calls(again) == [] and report["written"] == []
+
+
+# --- Fichier dérivé de la version installée -------------------------------------------------------------------------
+
+
+def test_the_written_version_carries_its_manual_values_inventory(origin):  # noqa: F811
+    """`docs/research/valeurs-ecrites-a-la-main.md` est le rendu de `forever origins inventory` pour la version
+    courante : l'écriture d'une nouvelle version le rend de nouveau (relevé par le bout en bout, décision 192)."""
+    montage_, bare = origin
+    deps, _ = montage_()
+    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    assert [w["version"] for w in report["written"]] == [TARGET]
+    doc = git(bare, "show", "main:docs/research/valeurs-ecrites-a-la-main.md")
+    assert f"forever/data/{TARGET}/" in doc
