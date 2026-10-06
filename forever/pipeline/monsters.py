@@ -126,7 +126,7 @@ def build_monsters(
     for (npc_id, level), o in sorted(measured.items()):
         q = questie.npc(npc_id) if questie else None
         questie_hp = q.hp_at(level) if q else None
-        if q is not None and q.rank != NORMAL_RANK and npc_id not in curve:  # T08d : écartement automatique
+        if questie is not None and q is not None and q.rank != NORMAL_RANK and npc_id not in curve:  # T08d
             label = RANK_LABELS.get(q.rank, "hors du rang normal")
             curve[npc_id] = (
                 f"rang {q.rank} dans Questie ({label}) : écarté automatiquement de la courbe des PNJ normaux "
