@@ -14,3 +14,13 @@ jobs:
       - uses: astral-sh/setup-uv@v10.2.0
       - run: uv sync
       - run: uv run tasks.py verify
+  e2e:
+    # bout en bout de forever update, verify réel du clone compris (décision 192) ; en parallèle de verify
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: astral-sh/setup-uv@v10.2.0
+      - run: uv sync
+      - run: uv run tasks.py e2e
