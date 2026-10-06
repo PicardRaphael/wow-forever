@@ -1,7 +1,7 @@
 """Correction PV Questie -> Forever (décision 5 du plan T04b), sur les deux fixtures de journal et l'extrait Questie.
 
 Rapport par niveau : médiane des rapports PV mesuré / PV Questie des PNJ normaux mesurés ; droite des moindres carrés
-sur les médianes supérieures à 1 ; rapport d'un niveau non mesuré = max(1, droite). Certitude `probable` entre le
+sur les médianes supérieures à 1 (Theil-Sen pondéré depuis la décision 190) ; rapport d'un niveau non mesuré = max(1, droite). Certitude `probable` entre le
 plus bas et le plus haut niveau mesuré, `suppose` au-delà. Sarilus Foulborne (3986, PNJ de quête, rapport 1,62) est
 exclu de l'ajustement et listé. Valeurs relevées par `repr()` sur les fixtures."""
 
@@ -31,7 +31,7 @@ RATIOS = {
     17: 1.2253886010362693,
 }
 PAIRS = {1: 1, 6: 1, 7: 1, 10: 3, 11: 7, 12: 7, 13: 6, 14: 3, 15: 1, 17: 1}
-SLOPE, INTERCEPT, KNEE = 0.02479762330307588, 0.8029465816401004, 7.946463899040569
+SLOPE, INTERCEPT, KNEE = 0.0246379983222087, 0.8050680234890781, 7.911843079200558
 
 
 def observations(*paths):
@@ -72,7 +72,7 @@ def test_excluded_npc_is_listed_with_its_ratio(table):
     assert (excluded["npc_id"], excluded["name"], excluded["level"]) == (SARILUS, "Sarilus Foulborne", 25)
     assert excluded["ratio"] == pytest.approx(927 / 573, rel=1e-12)
     kept = fit_questie_correction(table["npcs"])
-    assert kept is not None and kept["fit"]["slope"] > SLOPE and kept["excluded"] == []
+    assert kept is not None and kept["fit"]["slope"] == pytest.approx(SLOPE, rel=1e-12) and kept["excluded"] == []
 
 
 def test_unmeasured_level_inside_the_range_is_corrected(table):
