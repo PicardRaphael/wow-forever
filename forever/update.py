@@ -432,6 +432,11 @@ def _inputs_doc(inputs: Mapping[str, InputsDiff]) -> dict[str, Any]:
     return {name: {"identical": d.identical, "items": d.items} for name, d in inputs.items()}
 
 
+def first_write_guard(cache_dir: Path) -> bool:
+    """Vrai tant qu'aucun passage réel n'a été approuvé : une écriture de `--auto` reste alors en attente."""
+    raise NotImplementedError
+
+
 def _approved(run: _Run, pending_id: str) -> bool:
     doc = _read(_pending_path(run.deps.cache_dir, pending_id))
     return isinstance(doc, dict) and doc.get("state") == "approuvée"
