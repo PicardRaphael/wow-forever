@@ -26,6 +26,7 @@ import hashlib
 import io
 import json
 import os
+import re
 import shutil
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime
@@ -61,6 +62,8 @@ KEPT_STATES = ("approuvée", "faite", "rejetée")  # un passage qui recalcule la
 HISTORY_KEPT = 30
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
 PASS_PATHS = ("forever/data/", "docs/research/data-")  # seuls chemins du clone que le passage écrit (`_publish`)
+DATA_BRANCH_RE = re.compile(r"data/(?P<version>\d+\.\d+\.\d+\.\d+)-r(?P<revision>\d+)")
+BLOCKED_BY = ("uv_sync", "verify", "ci")  # écriture arrêtée en route : pas de nouvel essai tant que main n'a pas bougé
 AUTO_COMMAND = "forever update --auto"
 CARRY_FR = ("gardé", "réappliqué", "remplacé", "perdu")
 
@@ -369,19 +372,79 @@ def _step_clone(run: _Run) -> Step:
     runner = run.runner or gitops.subprocess_runner
     clone = update_dir(run.deps.cache_dir) / "repo"
     gitops.ensure_clone(runner, _repo_url(run, runner), clone)
+    resumed = _resume_branch(run, runner, clone)
     sync = gitops.sync_main(runner, clone, PASS_PATHS)
     run.clone, run.origin_main = clone, sync.origin_main
     run.base_data = clone / "forever" / "data"
     data = {"origin_main": sync.origin_main, "discarded": list(sync.discarded), "dirty": list(sync.dirty)}
+    if resumed:
+        data["resumed"] = resumed
+    prefix = f"{resumed} ; " if resumed else ""
     if not sync.ok:
         shown = ", ".join(sync.dirty[:5]) + (f" et {len(sync.dirty) - 5} autre(s)" if len(sync.dirty) > 5 else "")
         paths = f" : {shown}" if sync.dirty else ""
-        return Step("clone", "arrêt", f"clone dédié refusé : {sync.reason}{paths} ({clone})", data)
+        return Step("clone", "arrêt", f"{prefix}clone dédié refusé : {sync.reason}{paths} ({clone})", data)
     run.writable = True
-    detail = "clone avancé sur origin/main" if sync.advanced else "clone à jour"
+    detail = prefix + ("clone avancé sur origin/main" if sync.advanced else "clone à jour")
     if sync.discarded:
         detail += f" ; reste d'un passage interrompu retiré ({len(sync.discarded)} chemin(s))"
     return Step("clone", "fait", detail, {**data, "advanced": sync.advanced})
+
+
+def _resume_branch(run: _Run, runner: Runner, clone: Path) -> str | None:
+    """Clone laissé sur une branche de données `data/<version>-r<N>` par un passage tué (réponse 3 de l'utilisateur
+    du 2026-10-06) : la branche déjà fusionnée est retirée ; poussée et en avance rapide sur `origin/main`, sa CI est
+    attendue puis elle est fusionnée ; sinon (jamais poussée, `main` a bougé, CI rouge), le clone revient sur `main`
+    (CI rouge : attente bloquée, branche distante gardée pour l'examen). Rend la phrase du détail de l'étape, None
+    si le clone n'est pas sur une branche de données."""
+    from forever.pipeline import gitops
+
+    branch = gitops.current_branch(runner, clone)
+    found = DATA_BRANCH_RE.fullmatch(branch)
+    if found is None:
+        return None
+    version, revision = found["version"], int(found["revision"])
+    gitops.fetch(runner, clone)
+    dirty = gitops.dirty_paths(runner, clone)
+    if any(not p.startswith(PASS_PATHS) for p in dirty):
+        return None  # sale hors des chemins du passage : `sync_main` refuse et nomme la branche
+    if dirty:
+        gitops.discard_changes(runner, clone, dirty)
+    head = gitops.head_sha(runner, clone)
+    origin_main = gitops.head_sha(runner, clone, "origin/main")
+    vdir = clone / "forever" / "data" / version
+    pending_id = f"{version}-r{revision}-{content_fingerprint(vdir)}" if vdir.is_dir() else None
+    info: dict[str, Any] = {"version": version, "revision": revision, "branch": branch, "sha": head, "resumed": True}
+    if gitops.is_ancestor(runner, clone, head, "origin/main"):
+        gitops.leave_branch(runner, clone, branch)
+        gitops.drop_stale_branch(runner, clone, branch)  # branche distante, si elle reste
+        run.written.append(info)
+        return f"reprise : {branch} déjà fusionnée dans main, branche retirée"
+    remote = gitops.remote_branch_sha(runner, clone, branch)
+    if remote == head and gitops.is_ancestor(runner, clone, "origin/main", head):
+        run.say(f"clone : reprise de {branch} ({head[:12]}), CI attendue")
+        ci = gitops.wait_ci(runner, clone, branch, head, UPDATE_CI_TIMEOUT.total_seconds())
+        info.update(ci=ci.url, jobs=ci.jobs)
+        if ci.ok:
+            merged = gitops.merge_ff_and_push(runner, clone, branch)
+            if merged.ok:
+                gitops.delete_branch(runner, clone, branch)
+                run.written.append(info)
+                return f"reprise de {branch} : CI verte, fusionnée dans main"
+            reason = "main distant a bougé pendant la reprise"
+        else:
+            reason = f"CI {ci.status} sur {branch} ({ci.url})"
+            if pending_id is not None:
+                _block(
+                    run, pending_id=pending_id, version=version, revision=revision, by="ci", origin_main=origin_main,
+                    reason=f"{reason} : rien fusionné, branche gardée à distance", extra={"ci": ci.url, "jobs": ci.jobs},
+                )  # fmt: skip
+    elif remote is None:
+        reason = "jamais poussée"
+    else:
+        reason = "main distant a bougé, ou branche distante différente"
+    gitops.leave_branch(runner, clone, branch)
+    return f"reprise : {branch} abandonnée ({reason}), clone revenu sur main"
 
 
 def _step_game(run: _Run) -> tuple[Step, str | None]:
@@ -597,6 +660,11 @@ def _evaluate(
             return Step(step, "fait", f"{version} r{revision} : écriture simulée (règle tenue)", {"id": pending_id})
         if not run.writable:
             return Step(step, "arrêt", f"{version} r{revision} : règle tenue, mais clone non disponible", {})
+        blocked = _blocked_before(run, pending_id)
+        if blocked is not None:
+            run.pending.append(blocked)
+            why = "; ".join(blocked.get("reasons", []))
+            return Step(step, "arrêt", f"{version} r{revision} : déjà bloquée sur ce main ({why})", {"id": pending_id})
         return _publish(run, step=step, version=version, revision=revision, stage=stage, plan=plan, verdict=doc)
     entry = {
         **{k: doc[k] for k in ("id", "kind", "version", "revision", "action", "clauses", "reasons")},
@@ -1018,23 +1086,38 @@ def _publish(
     synced = runner(["uv", "sync", "--frozen", "--offline"], clone, None)
     if synced.returncode != 0:
         gitops.discard_changes(runner, clone)
-        return Step(step, "arrêt", f"environnement du clone : lancer `uv sync --frozen` dans {clone}", {})
+        log = _save_output(run, f"uv-sync-{version}-r{revision}", ["uv", "sync", "--frozen", "--offline"], synced)
+        reason = f"environnement du clone : `uv sync --frozen` en échec dans {clone} (sortie : {log.name})"
+        _block(run, pending_id=str(verdict["id"]), version=version, revision=revision, by="uv_sync", reason=reason,
+               extra={"log": str(log)})  # fmt: skip
+        return Step(step, "arrêt", reason, {"id": verdict["id"], "log": str(log)})
     run.say(f"{step} : tasks.py verify dans le clone (plusieurs minutes)")
-    checked = runner(["uv", "run", "--frozen", "--offline", "tasks.py", "verify"], clone, None)
+    command = ["uv", "run", "--frozen", "--offline", "tasks.py", "verify"]
+    checked = runner(command, clone, None)
     if checked.returncode != 0:
         gitops.discard_changes(runner, clone)
-        return Step(step, "arrêt", f"{version} r{revision} : `tasks.py verify` rouge dans le clone (session)", {})
+        log = _save_output(run, f"verify-{version}-r{revision}", command, checked)
+        reason = f"`tasks.py verify` rouge dans le clone : session nécessaire (sortie : {log.name})"
+        _block(run, pending_id=str(verdict["id"]), version=version, revision=revision, by="verify", reason=reason,
+               extra={"log": str(log)})  # fmt: skip
+        return Step(step, "arrêt", f"{version} r{revision} : {reason}", {"id": verdict["id"], "log": str(log)})
     branch = f"data/{version}-r{revision}"
     motif = "approuvée" if verdict.get("approved") else "règle tenue"
     message = COMMIT_MESSAGE.format(version=version, revision=revision, motif=motif)
     run.say(f"{step} : verify vert ; commit et poussée de {branch}")
+    if gitops.drop_stale_branch(runner, clone, branch):
+        run.say(f"{step} : branche {branch} d'un essai abandonné retirée")
     sha = gitops.commit_branch(runner, clone, branch, ["forever/data", report_rel], message)
     gitops.push(runner, clone, branch)
     run.say(f"{step} : CI attendue sur {branch} ({sha[:12]}, jusqu'à {UPDATE_CI_TIMEOUT.total_seconds() / 60:.0f} min)")
     ci = gitops.wait_ci(runner, clone, branch, sha, UPDATE_CI_TIMEOUT.total_seconds())
     info = {"version": version, "revision": revision, "branch": branch, "sha": sha, "ci": ci.url, "jobs": ci.jobs}
     if not ci.ok:
-        return Step(step, "arrêt", f"CI {ci.status} sur {branch} : rien fusionné, branche gardée ({ci.url})", info)
+        gitops.leave_branch(runner, clone, branch)  # clone remis sur main ; branche distante gardée pour l'examen
+        reason = f"CI {ci.status} sur {branch} ({ci.url}) : rien fusionné, branche gardée à distance"
+        _block(run, pending_id=str(verdict["id"]), version=version, revision=revision, by="ci", reason=reason,
+               extra={"ci": ci.url, "jobs": ci.jobs})  # fmt: skip
+        return Step(step, "arrêt", reason, info)
     run.say(f"{step} : CI verte ; fusion de {branch} dans main en avance rapide")
     merged = gitops.merge_ff_and_push(runner, clone, branch)
     if not merged.ok:
@@ -1046,6 +1129,72 @@ def _publish(
     return Step(
         step, "fait", f"{version} r{revision} installée par le clone ({sha[:12]}) : `git pull` dans la session", info
     )
+
+
+def _save_output(run: _Run, name: str, command: Sequence[str], out: Any) -> Path:
+    """Sortie complète d'une commande du clone en échec, gardée dans `<cache>/update/<name>-<horodatage>.log`."""
+    stamp = "".join(c for c in run.now if c.isalnum())
+    path = update_dir(run.deps.cache_dir) / f"{name}-{stamp}.log"
+    lines = [
+        f"$ {' '.join(command)}",
+        f"code de sortie : {out.returncode}",
+        "",
+        "--- sortie standard ---",
+        out.stdout or "",
+        "--- sortie d'erreur ---",
+        out.stderr or "",
+    ]
+    text = "\n".join(lines)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(text.encode("utf-8"))
+    return path
+
+
+def _block(
+    run: _Run,
+    *,
+    pending_id: str,
+    version: str,
+    revision: int,
+    by: str,
+    reason: str,
+    origin_main: str | None = None,
+    extra: Mapping[str, Any] | None = None,
+) -> None:
+    """Attente bloquée d'une écriture arrêtée en route (`by` : uv_sync, verify ou ci) : jamais approuvable, une
+    session est nécessaire ; visible dans `forever update status` et la ligne de démarrage, code de sortie 6."""
+    run.pending.append(
+        {
+            "id": pending_id,
+            "kind": "install_version" if revision == 1 else "install_revision",
+            "version": version,
+            "revision": revision,
+            "action": "bloqué",
+            "blocked_by": by,
+            "clauses": {},
+            "reasons": [reason],
+            "created_at": run.now,
+            "base": {"origin_main": origin_main or run.origin_main, "version": _installed(run.base_data)},
+            "commands": ["session nécessaire : lire la sortie gardée, corriger sur main, puis `forever update`"],
+            **(extra or {}),
+        }
+    )
+
+
+def _blocked_before(run: _Run, pending_id: str) -> dict[str, Any] | None:
+    """Attente bloquée de la même écriture (même contenu) sur le même `origin/main` : la refaire rejouerait le même
+    échec (13 min de `verify`, ou la même CI) ; un nouvel essai attend que main bouge."""
+    found = [p for p in run.pending if p.get("id") == pending_id]
+    doc = found[-1] if found else _read(_pending_path(run.deps.cache_dir, pending_id))
+    if not isinstance(doc, dict) or doc.get("action") != "bloqué" or doc.get("blocked_by") not in BLOCKED_BY:
+        return None
+    if doc.get("state", "en_attente") != "en_attente":
+        return None
+    if (doc.get("base") or {}).get("origin_main") != run.origin_main:
+        return None
+    if found:
+        run.pending.remove(doc)
+    return {k: v for k, v in doc.items() if k != "state"}
 
 
 # --- Passage --------------------------------------------------------------------------------------------------

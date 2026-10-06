@@ -97,6 +97,54 @@ def _rev(runner: Runner, clone: Path, ref: str) -> str:
     return _run(runner, ["git", "rev-parse", ref], clone).stdout.strip()
 
 
+def current_branch(runner: Runner, clone: Path) -> str:
+    return _run(runner, ["git", "rev-parse", "--abbrev-ref", "HEAD"], clone).stdout.strip()
+
+
+def head_sha(runner: Runner, clone: Path, ref: str = "HEAD") -> str:
+    return _rev(runner, clone, ref)
+
+
+def fetch(runner: Runner, clone: Path) -> None:
+    _run(runner, ["git", "fetch", "--prune", "origin"], clone)
+
+
+def remote_branch_sha(runner: Runner, clone: Path, branch: str) -> str | None:
+    """Sha de `origin/<branch>` (après `fetch`), None si la branche n'existe pas à distance."""
+    out = _run(runner, ["git", "rev-parse", "--verify", "--quiet", f"refs/remotes/origin/{branch}"], clone, check=False)
+    sha = out.stdout.strip()
+    return sha if out.returncode == 0 and sha else None
+
+
+def is_ancestor(runner: Runner, clone: Path, ancestor: str, descendant: str) -> bool:
+    out = _run(runner, ["git", "merge-base", "--is-ancestor", ancestor, descendant], clone, check=False)
+    return out.returncode == 0
+
+
+def dirty_paths(runner: Runner, clone: Path) -> list[str]:
+    return _dirty(runner, clone)
+
+
+def leave_branch(runner: Runner, clone: Path, branch: str) -> None:
+    """Clone remis sur `main` et branche locale `branch` retirée (abandonnée ou déjà fusionnée) ; la branche distante
+    n'est pas touchée."""
+    _run(runner, ["git", "switch", "main"], clone)
+    _run(runner, ["git", "branch", "-D", branch], clone)
+
+
+def drop_stale_branch(runner: Runner, clone: Path, branch: str) -> bool:
+    """Retire une branche `branch` laissée par un essai abandonné (locale et distante) avant d'en pousser une
+    nouvelle du même nom : sans cela, la poussée serait refusée (jamais de poussée forcée). Vrai si une existait."""
+    found = False
+    if _run(runner, ["git", "branch", "--list", branch], clone).stdout.strip():
+        _run(runner, ["git", "branch", "-D", branch], clone)
+        found = True
+    if remote_branch_sha(runner, clone, branch) is not None:
+        _run(runner, ["git", "push", "origin", "--delete", branch], clone)
+        found = True
+    return found
+
+
 def ensure_clone(runner: Runner, url: str, path: Path) -> None:
     """Clone dédié créé au premier passage (chemins longs permis sous Windows) ; rien s'il existe."""
     if (path / ".git").exists():

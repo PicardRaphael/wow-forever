@@ -429,7 +429,11 @@ def update_line(deps: Deps, repo_root: Path, runner: Runner | None = None) -> st
         if written:
             w = written[-1]
             parts.append(f"mise à jour : {w.get('version')} r{w.get('revision')} installée")
-        n = len(summary["pending"])
+        blocked = sum(1 for p in summary["pending"] if p.get("action") == "bloqué")
+        n = len(summary["pending"]) - blocked
+        if blocked:
+            plural = "s" if blocked > 1 else ""
+            parts.append(f"{blocked} écriture{plural} bloquée{plural}, session nécessaire : `forever update status`")
         if n:
             parts.append(f"{n} attente{'s' if n > 1 else ''} : `forever update status`")
         origin = last.get("origin_main")
