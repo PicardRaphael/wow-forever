@@ -786,6 +786,28 @@ def _log_start(path: Path) -> datetime | None:
     return first.time if first is not None else None
 
 
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _written_logs(cache_dir: Path, data_dir: Path, version: str) -> dict[str, set[str]]:
+    """Journaux dont la mesure est écrite pour `version`, avec leurs empreintes : instantané de `forever measures
+    refresh` (écrit avec les données) et sources des révisions de la version (demande du 2026-10-06 : un journal
+    n'est noté comme mesuré qu'après l'écriture de sa mesure)."""
+    from forever.pipeline.refresh import read_snapshot
+
+    done: dict[str, set[str]] = {}
+    snapshot = read_snapshot(cache_dir) or {}
+    if snapshot.get("game_version") == version:
+        for name, sha in ((snapshot.get("sources") or {}).get("logs") or {}).items():
+            done.setdefault(str(name), set()).add(str(sha))
+    revisions = _read(data_dir / version / "revisions.json")
+    for rev in (revisions or {}).get("revisions", []) if isinstance(revisions, dict) else []:
+        for name, sha in (((rev.get("sources") or {}).get("logs")) or {}).items():
+            done.setdefault(str(name), set()).add(str(sha))
+    return done
+
+
 def _step_logs(run: _Run) -> Step:
     from forever.pipeline.client_builds import current_builds, split_by_version
     from forever.pipeline.combatlog import log_files
@@ -796,27 +818,24 @@ def _step_logs(run: _Run) -> Step:
     installed = _installed(run.base_data)
     if wow is None or not (wow / "Logs").is_dir() or installed is None:
         return Step("journaux", "rien", "aucun dossier de journaux", {})
-    state_path = update_dir(run.deps.cache_dir) / "state.json"
-    state = _read(state_path) or {}
-    seen = set(state.get("logs_measured", []))
-    fresh = [p for p in log_files(wow / "Logs") if p.name not in seen]
-    if not fresh:
-        return Step("journaux", "rien", "aucun nouveau journal", {})
     builds = current_builds(run.deps.cache_dir, wow)
-    keep, held, unknown = split_by_version([(p.name, _log_start(p)) for p in fresh], builds, installed)
+    files = log_files(wow / "Logs")
+    keep, held, unknown = split_by_version([(p.name, _log_start(p)) for p in files], builds, installed)
+    done = _written_logs(run.deps.cache_dir, run.base_data, installed)
+    shas = {p.name: _sha256(p) for p in files if p.name in keep}
+    fresh = [p for p in files if p.name in shas and shas[p.name] not in done.get(p.name, set())]
+    keep = [p.name for p in fresh]
     data: dict[str, Any] = {"held_back": [h._asdict() for h in held], "unknown": unknown, "measured": keep}
     if not keep:
-        return Step("journaux", "rien", f"{len(held)} journal(aux) d'une autre version, en attente", data)
+        return Step("journaux", "rien", f"aucun nouveau journal ({len(held)} d'une autre version, en attente)", data)
     measure = run.measure or _default_measure
-    result = measure(run.deps, run.base_data, [p for p in fresh if p.name in keep])
+    result = measure(run.deps, run.base_data, fresh)
     engine_files = _engine_files()
     touched = [c for c in result.get("changed", []) if c.get("file") in engine_files]
     data["changed"] = list(result.get("changed", []))
-    if not run.options.dry_run:
-        _write(state_path, {**state, "logs_measured": sorted(seen | set(keep))})
     if not touched:
         return Step("journaux", "fait", f"{len(keep)} journal(aux) mesuré(s), aucune entrée des moteurs changée", data)
-    digest = hashlib.sha256("\n".join(sorted(keep)).encode("utf-8")).hexdigest()[:12]
+    digest = hashlib.sha256("\n".join(f"{n}:{shas[n]}" for n in sorted(keep)).encode("utf-8")).hexdigest()[:12]
     pending_id = f"measures-{installed}-{digest}"
     run.pending.append(
         {
