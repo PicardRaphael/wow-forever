@@ -147,6 +147,11 @@ class QuestieDB:
     def npc(self, npc_id: int) -> QuestieNpc | None:
         return self._npcs.get(npc_id)
 
+    def spawn_points(self, npc_id: int) -> int | None:
+        """Nombre de points d'apparition du PNJ (champ `spawns`, toutes zones ; 0 sans apparition) ; None si le PNJ
+        est absent de la base."""
+        raise NotImplementedError
+
     @cached_property
     def _xp(self) -> dict[int, tuple[int, int]]:
         text = self._read(XP_DB)

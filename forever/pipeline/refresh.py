@@ -181,6 +181,12 @@ def curve_exclusions(
     return out
 
 
+def curve_candidates(table: Mapping[str, Any], questie: QuestieDB | None) -> list[dict[str, Any]]:
+    """PNJ mesurés proposés pour l'écartement de la courbe (jamais écartés sans accord) : au plus
+    `UNIQUE_SPAWN_POINTS` point d'apparition dans Questie, ou absents de Questie ; PV comparés à la courbe."""
+    raise NotImplementedError
+
+
 def remeasure(
     gd: GameData,
     sources: RefreshSources,
