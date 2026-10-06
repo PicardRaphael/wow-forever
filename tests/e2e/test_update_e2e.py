@@ -104,6 +104,17 @@ class Runner:
         raise AssertionError(f"gh inattendu : {args}")
 
 
+def failures(report) -> str:
+    """Lignes utiles de la sortie gardée du `verify` rouge (tests en échec, bilan), pour le journal de la CI."""
+    found = []
+    for entry in report["pending"]:
+        log = Path(str(entry.get("log") or ""))
+        if log.is_file():
+            text = log.read_text(encoding="utf-8", errors="replace").splitlines()
+            found += [ln for ln in text if ln.startswith(("FAILED", "ERROR", "E   ")) or "Vérification" in ln][:80]
+    return "\n".join(found) or str([p.get("reasons") for p in report["pending"]])
+
+
 @pytest.fixture
 def isolated_git(tmp_path, monkeypatch):
     config = tmp_path / "gitconfig"
@@ -149,7 +160,7 @@ def test_a_new_version_is_installed_end_to_end_with_the_clone_verify(tmp_path, m
     journal = "\n".join(lines)
     assert [v["action"] for v in report["verdicts"]] == ["écrire"], journal
     verify = [code for args, code in runner.calls if args[0] == "uv" and "verify" in args]
-    assert verify == [0], [p.get("log") for p in report["pending"]]  # verify réel du clone, vert
+    assert verify == [0], failures(report)  # verify réel du clone, vert
     assert [w["version"] for w in report["written"]] == [version], journal
     assert report["pending"] == [] and exit_code(report) == 0
     manifest = json.loads(git(bare, "show", "main:forever/data/manifest.json"))
