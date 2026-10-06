@@ -228,4 +228,8 @@ def discard_changes(runner: Runner, clone: Path) -> list[str]:
 def remote_ahead(runner: Runner, repo: Path, origin_main: str) -> bool:
     """Vrai si `origin_main` (sha relevé par le clone dédié) n'est pas déjà dans le `HEAD` du dépôt de la session :
     `git pull` y apporterait des données. Local, sans réseau ; un sha inconnu du dépôt compte comme en avance."""
-    raise NotImplementedError
+    head = _run(runner, ["git", "rev-parse", "HEAD"], repo).stdout.strip()
+    if head == origin_main:
+        return False
+    contained = runner(["git", "merge-base", "--is-ancestor", origin_main, head], repo, None)
+    return contained.returncode != 0

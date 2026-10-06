@@ -2523,7 +2523,12 @@ def _cmd_hook(deps: Deps, args: argparse.Namespace) -> int:
     if not isinstance(hook_input, dict):
         hook_input = {}
     if args.hook_name == "session-start":
-        out = session_start_output(hook_input, deps, os.environ)
+        from forever.spawn import spawn_detached
+        from forever.update import update_dir
+
+        stamp = "".join(c for c in format_utc(deps.now()) if c.isalnum())
+        log = update_dir(deps.cache_dir) / f"run-{stamp}.log"
+        out = session_start_output(hook_input, deps, os.environ, spawn=lambda args: spawn_detached(args, log))
     else:
         out = check_numbers_output(hook_input)
     if out is not None:

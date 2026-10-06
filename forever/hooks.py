@@ -395,13 +395,49 @@ def update_kickoff(deps: Deps, environ: Mapping[str, str], spawn: Spawn | None) 
     """Démarrage de session (T08d, bloc G) : archivage des fichiers du client, puis passage `forever update --auto`
     détaché si aucun verrou n'est vivant et que le dernier passage a plus de 6 h. Jamais sans dossier du client ni
     avec FOREVER_OFFLINE ; ne lève jamais."""
-    raise NotImplementedError
+    try:
+        wow = deps.wow_dir
+        if wow is None or not wow.is_dir():
+            return
+        from forever import archive
+
+        archive.archive_client_files(deps)
+        if environ.get("FOREVER_OFFLINE", "") not in ("", "0") or spawn is None:
+            return
+        from forever.spawn import update_command
+        from forever.update import due
+
+        if due(deps.cache_dir, deps.now()):
+            spawn(update_command())
+    except Exception:  # noqa: BLE001 : un hook ne doit jamais gêner la session
+        return
 
 
 def update_line(deps: Deps, repo_root: Path, runner: Runner | None = None) -> str | None:
     """Partie « mise à jour » de la ligne de démarrage, sans réseau : passage en cours, attentes, `git pull` à
     faire quand `main` distant (relevé par le clone dédié) a avancé ; None s'il n'y a rien. Ne lève jamais."""
-    raise NotImplementedError
+    try:
+        from forever.pipeline import gitops
+        from forever.update import update_summary
+
+        summary = update_summary(deps.cache_dir, deps.now())
+        parts: list[str] = []
+        if summary["running"]:
+            parts.append("mise à jour en cours")
+        last = summary["last"] or {}
+        written = last.get("written") or []
+        if written:
+            w = written[-1]
+            parts.append(f"mise à jour : {w.get('version')} r{w.get('revision')} installée")
+        n = len(summary["pending"])
+        if n:
+            parts.append(f"{n} attente{'s' if n > 1 else ''} : `forever update status`")
+        origin = last.get("origin_main")
+        if origin and gitops.remote_ahead(runner or gitops.subprocess_runner, repo_root, str(origin)):
+            parts.append("main distant a avancé : `git pull`")
+        return " · ".join(parts).replace("\n", " ") if parts else None
+    except Exception:  # noqa: BLE001 : un hook ne doit jamais gêner la session
+        return None
 
 
 def session_start_output(
@@ -418,7 +454,11 @@ def session_start_output(
     cwd = hook_input.get("cwd")
     if not cwd or not _inside(Path(str(cwd)), repo_root):
         return None
+    update_kickoff(deps, environ, spawn)
     line = session_line(deps, environ)
+    extra = update_line(deps, repo_root, runner)
+    if extra:
+        line = f"{line} · {extra}".replace("\n", " ")
     return {
         "systemMessage": line,
         "hookSpecificOutput": {"hookEventName": "SessionStart", "additionalContext": line},

@@ -66,6 +66,35 @@ powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1         
 powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1 -Remove   # retirer
 ```
 
+## Mise à jour automatique des données (T08d)
+`forever update` enchaîne, sans session manuelle : archivage de `DBCache.bin` et `Hotfix.log` par build, clone dédié
+du dépôt (`<cache>/update/repo`, jamais l'arbre de la session), nouvelle version du client publiée sur wago.tools,
+correctifs du serveur de l'archive, journaux de combat de la version installée, addons de données. Une écriture
+(branche `data/<version>-r<N>`, CI Ubuntu et Windows, avance rapide de `main`) ne se fait que si `verify` est vert,
+si aucune valeur faite à la main n'est perdue ni remplacée et si les entrées de chaque moteur sont identiques
+(décision 180) ; sinon une attente d'accord est enregistrée. Réseau accordé par la décision 179 (wago.tools,
+WoWDBDefs, git et `gh` du clone).
+```powershell
+uv run forever update --dry-run              # tout calculer, ne rien écrire (rejeu des builds listé, non calculé)
+uv run forever update                        # passage complet ; code 6 s'il reste une attente
+uv run forever update --only jeu,correctifs  # étapes : jeu, correctifs, journaux, addons ; --no-network : hors ligne
+uv run forever update status                 # attentes et dernier passage
+uv run forever update approve <id>           # approuver (base inchangée), passage lancé en arrière-plan ; --wait
+uv run forever update reject <id> --reason "…"
+uv run forever addons inventory <dossier>    # métadonnées et empreintes d'un addon, sans aucune valeur
+```
+Au démarrage d'une session dans le dépôt, le hook archive les fichiers du client et lance `forever update --auto`
+en arrière-plan (au plus toutes les 6 h, jamais si un passage tourne) ; la ligne de démarrage montre les attentes et
+propose `git pull` quand `main` distant a reçu des données. Une attente `bloqué` (verify rouge, installation refusée
+par les règles de fusion, valeur perdue) n'est pas approuvable : elle demande une session.
+
+Tâche planifiée Windows (une fois par jour, 2 h au plus ; remplace la tâche « veille locale ») :
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -WhatIf   # voir ce qui serait créé
+powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1           # créer (08:00), -At 21:30 pour une autre heure
+powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -Remove   # retirer
+```
+
 ## Poser une question
 Lancer `claude` dans n'importe quel dossier et poser la question en français. Exemples :
 
