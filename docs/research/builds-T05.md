@@ -195,8 +195,8 @@ l'écartement des PNJ nommés, décision 189) ; le temps par monstre monte d'env
 | leveling 60 | ordre des talents (niveaux 21 à 60), build final inchangé | Ice Block au niveau 60, Frost Warding aux niveaux 50 et 51 | Ice Block au niveau 50, Frost Warding aux niveaux 56 et 57, Improved Blizzard au niveau 60 |
 
 Chaque choix changé est une égalité statistique (intervalle de confiance à 95 % qui contient 0) : l'ordre bascule
-sur de petits écarts de PV. Monstres plus résistants : les combats plus longs avantagent Winter's Chill, dont les
-cumuls servent davantage sur la durée.
+sur de petits écarts de PV. Explication probable, non vérifiée par ablation : les combats plus longs avantagent
+Winter's Chill, dont les cumuls servent davantage sur la durée.
 
 ## Rejeu 1.60.1.70170 révision 2 (PV des monstres du premier journal, 2026-10-02)
 
