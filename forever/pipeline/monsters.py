@@ -31,7 +31,7 @@ from forever.engine.model import QuestieCorrection
 from forever.engine.monsters import corrected_questie_value, correction_ratio
 from forever.errors import CandidateExistsError, InvalidArgumentError
 from forever.pipeline.measure import Conflict, MonsterObservation
-from forever.pipeline.questie import QuestieDB
+from forever.pipeline.questie import RANK_LABELS, QuestieDB
 
 MONSTERS_FILE = "monsters.json"
 SCHEMA_VERSION = 2
@@ -126,6 +126,12 @@ def build_monsters(
     for (npc_id, level), o in sorted(measured.items()):
         q = questie.npc(npc_id) if questie else None
         questie_hp = q.hp_at(level) if q else None
+        if q is not None and q.rank != NORMAL_RANK and npc_id not in curve:  # T08d : écartement automatique
+            label = RANK_LABELS.get(q.rank, "hors du rang normal")
+            curve[npc_id] = (
+                f"rang {q.rank} dans Questie ({label}) : écarté automatiquement de la courbe des PNJ normaux "
+                f"({questie.source})"
+            )
         entry = npcs.setdefault(
             str(npc_id),
             {"name": o["name"], "zone_id": q.zone_id if q else None, "rank": q.rank if q else None, "levels": {}},
