@@ -111,7 +111,9 @@ def failures(report) -> str:
         log = Path(str(entry.get("log") or ""))
         if log.is_file():
             text = log.read_text(encoding="utf-8", errors="replace").splitlines()
-            found += [ln for ln in text if ln.startswith(("FAILED", "ERROR", "E   ")) or "Vérification" in ln][:80]
+            found += [
+                ln for ln in text if ln.startswith(("FAILED", "ERROR")) or " failed" in ln or "Vérification" in ln
+            ]
     return "\n".join(found) or str([p.get("reasons") for p in report["pending"]])
 
 
