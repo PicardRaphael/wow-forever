@@ -77,7 +77,7 @@ def test_installed_table_is_read_by_game_data(game_data):
     assert (
         monsters.hp_by_level[11].value == 239 and monsters.hp_by_level[11].certainty == "certain"
     )  # 7 PNJ concordants
-    assert monsters.hp_by_level[25].certainty == "probable"  # un seul PNJ nommé
+    assert monsters.hp_by_level[25].certainty == "suppose"  # PNJ nommés écartés : hors de la plage mesurée (r5)
     # T04b : niveau non mesuré dans la plage mesurée : Questie corrigé, probable ; au-delà : suppose
     assert monsters.hp_by_level[16].certainty == "probable" and monsters.hp_by_level[16].value == 427
     assert monsters.hp_by_level[30].certainty == "suppose"
