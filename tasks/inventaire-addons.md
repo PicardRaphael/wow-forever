@@ -468,3 +468,53 @@ le suivi par `forever addons status` et les lecteurs viennent avec FA1 (décisio
   proche.
 - **Recoupement des arbres** : nœud, sort, rangée et colonne comparés à nos arbres décodés de 70170 ; tout écart
   signalé, le client fait foi.
+
+## Relevé du 2026-10-06 (T08d)
+
+Relevé par `forever addons status` (lecture locale, sans `--save` : le relevé enregistré du 2026-10-01 est gardé
+comme base de comparaison) ; versions lues dans les `.toc`.
+
+| Addon (dossier) | Version | Statut au relevé | Classement |
+| --- | --- | --- | --- |
+| Questie | 11.38.0 Forever-v27 | inchangé | données (lecteur `forever/pipeline/questie.py`) |
+| AtlasLootClassic (+ modules) | Forever 1.60.1 | changé (1 fichier ajouté, 2 modifiés) | données (lecteur en DJ1) |
+| ForeverDungeonJournal | 1.5.2 | changé (10 ajoutés, 27 modifiés) | données (lecteur en DJ1) |
+| GearQuestForever (+ modules) | 0.3.5-beta | changé (4 ajoutés, 38 modifiés) | données (recoupement, DJ1) |
+| ForeverGuide | 1.25.3 | changé (22 ajoutés, 14 modifiés) | données (lecteur à venir) |
+| LegacyForever | v0.6.12 | changé (4 ajoutés, 12 modifiés) | données (LG1) |
+| ZoneLevelForever | 1.5 | changé (1 modifié) | données (lecteur à venir) |
+| Auctionator | 340 | changé (3 modifiés) | mes prix (SavedVariables) |
+| ForeverLogger | 0.3.0 | changé (1 modifié) | relevés (le nôtre) |
+| ForeverBestiary | 0.5.0 | inchangé | données (CH0) |
+| TalentsForeverBook | 0.37.1 | nouveau suivi (T08d) ; contenu : build 1.60.1.70170, généré le 2026-10-04, `codeVersion` 6 | données (FA1) |
+| ForeverCompanion | 1.0.0 | nouveau suivi (T08d) ; contenu : `dataVersion` 79, mis à jour le 2026-10-05 | données : inventaire ci-dessous |
+| NaowhForever (+ modules) | 0.5.22-beta | nouveau suivi (T08d) | données probables : **inventaire proposé**, non fait sans accord |
+| AtlasBIStooltips | 1.0.1 | non inventorié | données probables (BiS) : **inventaire proposé** |
+| RXPGuides | v4.11.15 | non inventorié | guides : inventaire proposé (basse priorité) |
+| RaphCompletionist | 0.2.1 | non inventorié | à classer par l'utilisateur |
+| EllesmereUI (+ 20 modules), Leatrix_Maps, ForeverMapFix | 9.3.8, 1.60.13, 0.2.0 | interface seule | aucun fichier lu hors du `.toc` |
+| ForeverCompletionist | — | pas un addon (aucun `.toc`) | non lu |
+| ForeverLogger.bak-* (2 dossiers) | — | copies de sauvegarde | non lues |
+
+Talents Forever est passé aux codes **v6** (`codeVersion` 6) : FA1 prévoit le format v5, à reprendre à son plan.
+
+### Forever Companion 1.0.0 (inventaire du 2026-10-06)
+
+Inventaire par `forever addons inventory ForeverCompanion` : métadonnées et empreintes, aucune valeur recopiée.
+
+- **`.toc`** : interface 16001, auteur « Forever Companion », SavedVariable `ForeverCompanionDB`. **Aucune licence**
+  (ni fichier ni `X-License`) : comme Talents Forever (décision 172 étendue), lecture locale et agrégats seulement,
+  rien n'est recopié dans le dépôt.
+- **Fichiers** : 35 fichiers `.lua`, 1 565 627 octets, empreinte `2d9529a683da`. Code de l'interface (BiS, rotations,
+  butin, métiers, hôtel des ventes, relevé des recettes et des sorts à la demande) et huit fichiers de données
+  générés par « Forever Companion Studio » (« ne pas modifier à la main ») : `Data/Bis.lua`, `Data/Consumes.lua`,
+  `Data/Dictionary.lua`, `Data/Loot.lua`, `Data/Meta.lua`, `Data/Professions.lua`, `Data/Rotations.lua`,
+  `Data/Talents.lua`.
+- **Version de contenu** : `Data/Meta.lua` (`dataVersion`, `updated`), suivie par `forever addons status`.
+- **Tables globales** (clés de premier niveau, comptes seulement) : `ForeverCompanionData.items` (895),
+  `.lootItems` (1 392), `.craftItems` (4 028), `.slots` (21), `.meta` (2), `.ui` (1).
+- **Talents** : décrits par sort, rangée, colonne et rangs, **sans identifiant de nœud** ; il porte la refonte du
+  Guerrier (Lingering Rage, Furious Precision, Gore Drinker, Iron Will déplacé). Pour DON13, il ne témoigne que du
+  sort, de la position et des rangs.
+- **Usage proposé** : second témoin des arbres (DON13, FA1) ; ses listes BiS, rotations, butin et métiers attendent un
+  lecteur (FA1, DJ1 ou les tranches de classe), au mieux `suppose` (choix de joueurs ou d'un outil tiers).
