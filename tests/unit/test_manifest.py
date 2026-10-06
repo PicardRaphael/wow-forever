@@ -7,6 +7,7 @@ import shutil
 import pytest
 from conftest import (
     DATA_DIR,
+    INSTALLED_VERSIONS,
     LOCAL_COLLECTED_AT,
     LOCAL_REVISED_AT,
     LOCAL_REVISION,
@@ -133,11 +134,12 @@ def test_data_sha_is_short_and_changes_with_content(data_copy):
 
 def test_game_version_is_highest_version_dir(data_copy):
     # Faux dossier de version plus récente (copie de 1.60.1.70009) et un dossier parasite.
-    shutil.copytree(data_copy / LOCAL_VERSION, data_copy / "1.60.1.70250")  # plus récente que la version installée
+    newer = "1.60.9.99999"  # plus récente que toute version installée (décision 192)
+    shutil.copytree(data_copy / LOCAL_VERSION, data_copy / newer)
     (data_copy / "__pycache__").mkdir()
     m = compute_manifest(data_copy)
-    assert m["game_version"] == "1.60.1.70250"
-    assert set(m["versions"]) == {PREVIOUS_VERSION, "1.60.1.70124", LOCAL_VERSION, "1.60.1.70250"}
+    assert m["game_version"] == newer
+    assert set(m["versions"]) == {*INSTALLED_VERSIONS, newer} and PREVIOUS_VERSION in m["versions"]
 
 
 def test_manifest_json_is_sorted_and_parsable():

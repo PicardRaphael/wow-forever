@@ -7,7 +7,7 @@ import json
 import shutil
 import struct
 
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, isolated_deps, read_json
+from conftest import DATA_DIR, FIXTURES, isolated_deps, read_json, rewind_to
 
 from forever.cli import main
 from forever.manifest import write_manifest
@@ -23,7 +23,8 @@ HOTFIX = FIXTURES / "hotfix"
 DBCACHE = HOTFIX / "DBCache.bin"
 LAYOUTS = FIXTURES / "dbd" / "layouts-1.60.1.70170.json"
 WAGO = FIXTURES / "wago" / "1.60.1.70170"
-RULES = read_json(DATA_DIR / LOCAL_VERSION / "decode_rules.json")
+FIXTURE_VERSION = "1.60.1.70170"  # build de DBCache.bin, des dispositions et des tables des fixtures (décision 192)
+RULES = read_json(DATA_DIR / FIXTURE_VERSION / "decode_rules.json")
 
 
 def source():
@@ -33,7 +34,7 @@ def source():
         layouts_from_json(doc),
         {"repo": doc["repo"], "commit": doc["commit"], "files": {}},
         read_json(HOTFIX / "hotfixes-70170.json")["entries"],
-        LOCAL_VERSION,
+        FIXTURE_VERSION,
         RULES,
         "2026-10-05T10:00:00Z",
     )
@@ -45,16 +46,16 @@ def server_rules(path):
 
 def test_decode_without_hotfixes_never_inherits_server_rules(data_copy, tmp_path):
     with_fix = decode_version(
-        isolated_deps(tmp_path), LOCAL_VERSION, csv_dir=WAGO, out=tmp_path / "avec", hotfixes=source()
+        isolated_deps(tmp_path), FIXTURE_VERSION, csv_dir=WAGO, out=tmp_path / "avec", hotfixes=source()
     )
-    vdir = data_copy / LOCAL_VERSION
-    shutil.copyfile(with_fix.root / LOCAL_VERSION / "classes.json", vdir / "classes.json")
-    carry_hotfix_provenance(vdir, with_fix.root / LOCAL_VERSION)
+    vdir = data_copy / FIXTURE_VERSION
+    shutil.copyfile(with_fix.root / FIXTURE_VERSION / "classes.json", vdir / "classes.json")
+    carry_hotfix_provenance(vdir, with_fix.root / FIXTURE_VERSION)
     write_manifest(data_copy)
     assert server_rules(vdir)
-    without = decode_version(isolated_deps(tmp_path, data_copy), LOCAL_VERSION, csv_dir=WAGO, out=tmp_path / "sans")
-    assert server_rules(without.root / LOCAL_VERSION) == []
-    assert carry_hotfix_provenance(vdir, without.root / LOCAL_VERSION) is False
+    without = decode_version(isolated_deps(tmp_path, data_copy), FIXTURE_VERSION, csv_dir=WAGO, out=tmp_path / "sans")
+    assert server_rules(without.root / FIXTURE_VERSION) == []
+    assert carry_hotfix_provenance(vdir, without.root / FIXTURE_VERSION) is False
     assert server_rules(vdir) == [] and "hotfixes" not in read_json(vdir / "sources.json")
 
 
@@ -73,7 +74,7 @@ def test_layouts_of_another_build_are_refused(tmp_path, make_deps, capsys):
     doc["build"] = "1.60.1.70124"
     other = tmp_path / "layouts.json"
     other.write_text(json.dumps(doc), encoding="utf-8")
-    args = ["decode", "--version", LOCAL_VERSION, "--csv-dir", str(WAGO), "--out", str(tmp_path / "c"), "--hotfixes"]
+    args = ["decode", "--version", FIXTURE_VERSION, "--csv-dir", str(WAGO), "--out", str(tmp_path / "c"), "--hotfixes"]
     code = main([*args, "--dbcache", str(DBCACHE), "--dbd-layouts", str(other)], make_deps())
     out, err = capsys.readouterr()
     assert code != 0 and "1.60.1.70124" in out + err
@@ -97,7 +98,8 @@ def test_unreadable_dbcache_is_reported_by_the_watch(tmp_path, make_deps):
 
 def test_unvalidated_tables_are_not_pending_forever(tmp_path, make_deps, data_copy):
     res = effective(read_dbcache(DBCACHE).entries, table_names(known_tables(RULES)))
-    path = data_copy / LOCAL_VERSION / "sources.json"
+    rewind_to(data_copy, FIXTURE_VERSION)  # la veille compare DBCache.bin à la version installée
+    path = data_copy / FIXTURE_VERSION / "sources.json"
     sources = read_json(path)
     applied = [
         {"table": t, "rec_id": r, "status": "VALID" if e.status == 1 else "DELETE", "push": e.push_id,

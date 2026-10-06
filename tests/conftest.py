@@ -49,14 +49,18 @@ SEED_DATA = REPO_ROOT / "seed" / "forever-mage" / "data"
 # versions du jeu, la parité se joue toujours sur la sienne.
 SEED_VERSION = max(d.name for d in SEED_DATA.iterdir() if d.is_dir() and d.name[0].isdigit())
 
-# Version installée du dépôt (dossier forever/data/<version>/ le plus récent). Passée à 1.60.1.70124 en T08a :
-# les 22 tables du client sont identiques à celles de 1.60.1.70009, aucune valeur de jeu ne change. Passée à
-# 1.60.1.70170 le 2026-10-02 (Hot Streak renommé Heating Up, Combustion à 3 charges, plafond de la bêta 30).
-LOCAL_VERSION = "1.60.1.70170"
+# Version installée du dépôt, lue dans le manifeste (`game_version`), comme la révision depuis le 2026-10-02
+# (décision 169) : l'installation d'une nouvelle version par `forever update` ne touche plus aucun test (décision 192,
+# 2026-10-06 ; figée, elle rendait rouge le `verify` du clone pour toute nouvelle version). Les tests liés à des
+# fixtures d'un build précis écrivent ce build en dur (DBCache.bin de 1.60.1.70170 : test_watch, test_hotfix_values,
+# test_review_t08c).
+_MANIFEST = json.loads((DATA_DIR / "manifest.json").read_text(encoding="utf-8"))
+LOCAL_VERSION: str = _MANIFEST["game_version"]
 # Révision et date de révision de la version installée, lues dans le manifeste installé (2026-10-02) : une mesure de
-# journaux (forever measures refresh) ou une révision des données ne touche plus aucun test, comme LOCAL_VERSION
-# depuis T08a. `test_revision_constants.py` vérifie qu'elles concordent avec sources.json et revisions.json.
-_INSTALLED = json.loads((DATA_DIR / "manifest.json").read_text(encoding="utf-8"))["versions"][LOCAL_VERSION]
+# journaux (forever measures refresh) ou une révision des données ne touche plus aucun test.
+# `test_revision_constants.py` vérifie qu'elles concordent avec sources.json et revisions.json.
+INSTALLED_VERSIONS: list[str] = list(_MANIFEST["versions"])  # ordre du manifeste (croissant)
+_INSTALLED = _MANIFEST["versions"][LOCAL_VERSION]
 LOCAL_REVISION: int = _INSTALLED["revision"]
 LOCAL_REVISED_AT: str = _INSTALLED["revised_at"]
 LOCAL_COLLECTED_AT: str = _INSTALLED["collected_at"]

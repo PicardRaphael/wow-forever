@@ -118,13 +118,16 @@ def with_dbcache(wow, raw=None):
     return target
 
 
+FIXTURE_VERSION = "1.60.1.70170"  # build du DBCache.bin de la fixture (décision 192)
+
+
 def expected_pending():
-    from conftest import DATA_DIR, LOCAL_VERSION, read_json
+    from conftest import DATA_DIR, read_json
 
     from forever.pipeline.dbcache import effective, known_tables, read_dbcache, table_names
     from forever.pipeline.tables import TABLES
 
-    rules = read_json(DATA_DIR / LOCAL_VERSION / "decode_rules.json")
+    rules = read_json(DATA_DIR / FIXTURE_VERSION / "decode_rules.json")
     res = effective(read_dbcache(DBCACHE).entries, table_names(known_tables(rules)))
     return res, [k for k in res.applicable if k[0] in TABLES]
 
@@ -135,12 +138,13 @@ def dbcache_event(result):
 
 def without_hotfixes(data_copy):
     """Copie des données dont la révision installée n'a appliqué aucun correctif (indépendante de la révision du
-    dépôt : la révision 4 de 1.60.1.70170 en porte, T08c)."""
-    from conftest import LOCAL_VERSION, read_json
+    dépôt : la révision 4 de 1.60.1.70170 en porte, T08c), ramenée au build de la fixture."""
+    from conftest import read_json, rewind_to
 
     from forever.manifest import write_manifest
 
-    path = data_copy / LOCAL_VERSION / "sources.json"
+    rewind_to(data_copy, FIXTURE_VERSION)
+    path = data_copy / FIXTURE_VERSION / "sources.json"
     sources = read_json(path)
     sources.pop("hotfixes", None)
     path.write_bytes((json.dumps(sources, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
@@ -180,12 +184,13 @@ def test_unchanged_dbcache_is_not_analysed_again(wow, make_deps, monkeypatch):
 
 
 def test_installed_hotfixes_leave_nothing_pending(wow, make_deps, data_copy):
-    from conftest import LOCAL_VERSION, read_json
+    from conftest import read_json, rewind_to
 
     from forever.manifest import write_manifest
 
     res, _ = expected_pending()
-    path = data_copy / LOCAL_VERSION / "sources.json"
+    rewind_to(data_copy, FIXTURE_VERSION)
+    path = data_copy / FIXTURE_VERSION / "sources.json"
     sources = read_json(path)
     sources["hotfixes"] = {
         "pushes": sorted({e.push_id for e in res.applicable.values()}),

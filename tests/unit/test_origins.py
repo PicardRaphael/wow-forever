@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION
+from conftest import DATA_DIR, INSTALLED_VERSIONS, LOCAL_VERSION, PREVIOUS_VERSION
 
 from forever.origins import ORIGINS, ORIGINS_NAME, check_all, check_version
 
@@ -35,7 +35,8 @@ def test_seven_origins():
 
 def test_installed_versions_pass():
     report = check_all(DATA_DIR)
-    assert report.versions == [PREVIOUS_VERSION, "1.60.1.70124", LOCAL_VERSION]  # 70170 installée le 2026-10-02
+    assert report.versions == INSTALLED_VERSIONS  # toutes les versions du manifeste (décision 192)
+    assert report.versions[0] == PREVIOUS_VERSION and report.versions[-1] == LOCAL_VERSION
     assert report.issues == [], [f"{i.version} {i.file} {i.path} : {i.message}" for i in report.issues[:10]]
     assert report.leaves[LOCAL_VERSION] > 0 and report.leaves[PREVIOUS_VERSION] > 0
 

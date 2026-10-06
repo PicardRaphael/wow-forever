@@ -8,7 +8,7 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, WAGO_70124, isolated_deps, read_json
+from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, WAGO_70124, isolated_deps, read_json, rewind_to
 
 from forever.cli import main
 from forever.pipeline.dbd import layouts_from_json
@@ -20,7 +20,8 @@ HOTFIX = FIXTURES / "hotfix"
 DBCACHE = HOTFIX / "DBCache.bin"
 LAYOUTS = FIXTURES / "dbd" / "layouts-1.60.1.70170.json"
 WAGO = FIXTURES / "wago" / "1.60.1.70170"
-RULES = read_json(DATA_DIR / LOCAL_VERSION / "decode_rules.json")
+FIXTURE_VERSION = "1.60.1.70170"  # build de DBCache.bin, des dispositions et des tables des fixtures (décision 192)
+RULES = read_json(DATA_DIR / FIXTURE_VERSION / "decode_rules.json")
 
 
 @pytest.fixture(scope="module")
@@ -32,12 +33,12 @@ def candidates(tmp_path_factory):
         layouts_from_json(doc),
         {"repo": doc["repo"], "commit": doc["commit"], "files": {}},
         read_json(HOTFIX / "hotfixes-70170.json")["entries"],
-        LOCAL_VERSION,
+        FIXTURE_VERSION,
         RULES,
         "2026-10-05T10:00:00Z",
     )
-    without = decode_version(isolated_deps(tmp), LOCAL_VERSION, csv_dir=WAGO, out=tmp / "sans")
-    with_fix = decode_version(isolated_deps(tmp), LOCAL_VERSION, csv_dir=WAGO, out=tmp / "avec", hotfixes=source)
+    without = decode_version(isolated_deps(tmp), FIXTURE_VERSION, csv_dir=WAGO, out=tmp / "sans")
+    with_fix = decode_version(isolated_deps(tmp), FIXTURE_VERSION, csv_dir=WAGO, out=tmp / "avec", hotfixes=source)
     return without.root, with_fix.root
 
 
@@ -75,8 +76,15 @@ def test_diff_without_hotfix_has_no_attribution(candidates, make_deps, capsys):
     assert data["changes"] == []
 
 
-def values_json(make_deps, capsys):
-    deps = make_deps()
+@pytest.fixture
+def data_70170(data_copy):
+    """Données ramenées au build des fixtures : `forever hotfixes --values` lit les correctifs de la version
+    installée."""
+    return rewind_to(data_copy, FIXTURE_VERSION)
+
+
+def values_json(make_deps, capsys, data):
+    deps = make_deps(data_dir=data)
     deps.cache_dir.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(HOTFIX / "hotfixes-70170.json", deps.cache_dir / "hotfixes.json")
     args = ["hotfixes", "--values", "--dbcache", str(DBCACHE), "--dbd-layouts", str(LAYOUTS), "--csv-dir", str(WAGO)]
@@ -90,8 +98,8 @@ def record(data, table, rec_id):
     return next(r for r in data["values"]["records"] if (r["table"], r["rec_id"]) == (table, rec_id))
 
 
-def test_values_show_build_and_hotfix_value(make_deps, capsys):
-    data, out = values_json(make_deps, capsys)
+def test_values_show_build_and_hotfix_value(make_deps, capsys, data_70170):
+    data, out = values_json(make_deps, capsys, data_70170)
     node = record(data, "TraitNode", 105928)
     assert node["status"] == "VALID" and node["push"] == 112347 and node["seen_at"].startswith("2026-10-02")
     assert {"field": "PosX", "build": 6220, "hotfix": 5620} in node["fields"]
@@ -101,11 +109,11 @@ def test_values_show_build_and_hotfix_value(make_deps, capsys):
     same = record(data, "TraitDefinitionEffectPoints", 25099)
     assert same["identical"] is True and same["fields"] == []
     assert "TactKey" not in out
-    assert data["provenance"]["game_version"] == LOCAL_VERSION
+    assert data["provenance"]["game_version"] == FIXTURE_VERSION
 
 
-def test_values_list_what_is_not_applied(make_deps, capsys):
-    data, _ = values_json(make_deps, capsys)
+def test_values_list_what_is_not_applied(make_deps, capsys, data_70170):
+    data, _ = values_json(make_deps, capsys, data_70170)
     listed = data["values"]["listed"]
     assert {"table": "SpellPower", "rec_id": 315008, "push": 112347} in listed["invalid"]
     assert listed["dbreply"] == {"Spell": 2}
@@ -114,8 +122,8 @@ def test_values_list_what_is_not_applied(make_deps, capsys):
     assert deleted["status"] == "DELETE" and deleted["fields"] == []
 
 
-def test_values_text(make_deps, capsys):
-    deps = make_deps()
+def test_values_text(make_deps, capsys, data_70170):
+    deps = make_deps(data_dir=data_70170)
     args = ["hotfixes", "--values", "--dbcache", str(DBCACHE), "--dbd-layouts", str(LAYOUTS), "--csv-dir", str(WAGO)]
     code = main(args, deps)
     out, _ = capsys.readouterr()
