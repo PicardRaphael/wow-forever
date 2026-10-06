@@ -50,6 +50,7 @@ TARGET = "1.60.1.79999"
 NEWER = "1.60.1.80000"
 HEADER = "Branch!STRING:0|Active!DEC:1|Version!STRING:0|Product!STRING:0"
 PRODUCT = "wow_classic_beta"
+FIXTURE_VERSION = "1.60.1.70170"  # build des fixtures DBCache.bin, dispositions et tables (décision 192)
 DRY = UpdateOptions(dry_run=True)
 MAGE = {"mage_build", "mage_leveling"}
 
@@ -308,7 +309,8 @@ DBCACHE = FIXTURES / "hotfix" / "DBCache.bin"
 
 
 def without_hotfixes(data):
-    path = data / LOCAL_VERSION / "sources.json"
+    rewind_to(data, FIXTURE_VERSION)  # DBCache.bin de la fixture : build 1.60.1.70170 (décision 192)
+    path = data / FIXTURE_VERSION / "sources.json"
     sources = read_json(path)
     sources.pop("hotfixes", None)
     path.write_bytes((json.dumps(sources, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
@@ -324,7 +326,7 @@ def client_70170(tmp_path, make_deps, data_copy):
     sources = without_hotfixes(data_copy)
     wow = tmp_path / "World of Warcraft" / "_classic_beta_"
     (wow / "Logs").mkdir(parents=True)
-    set_build_info(wow, LOCAL_VERSION)
+    set_build_info(wow, FIXTURE_VERSION)
     live = wow / "Cache" / "ADB" / "enUS" / "DBCache.bin"
     live.parent.mkdir(parents=True)
     live.write_bytes(DBCACHE.read_bytes())

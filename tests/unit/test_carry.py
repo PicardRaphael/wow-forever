@@ -8,21 +8,24 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, read_json
+from conftest import DATA_DIR, read_json
 
 from forever.carry import carry_apply, carry_check, manual_values
 from forever.manifest import verify, write_manifest
 
+HISTORY_VERSION = "1.60.1.70170"  # version dont l'historique porte la révision 3 (décision 192)
 FIXES = ("pet_rules.json", "/official_fixes")
 NPCS = ("monsters.json", "/npcs")
 
 
 @pytest.fixture
 def versions(tmp_path):
-    a = tmp_path / "a" / LOCAL_VERSION
-    shutil.copytree(DATA_DIR / LOCAL_VERSION, a)
+    """Deux copies de 1.60.1.70170, dont l'historique des révisions (révision 3 : correctifs officiels) porte les
+    valeurs faites à la main que les tests nomment (décision 192 : build écrit en dur)."""
+    a = tmp_path / "a" / HISTORY_VERSION
+    shutil.copytree(DATA_DIR / HISTORY_VERSION, a)
     b_data = tmp_path / "b"
-    b = b_data / LOCAL_VERSION
+    b = b_data / HISTORY_VERSION
     shutil.copytree(a, b)
     write_manifest(b_data)
     return a, b

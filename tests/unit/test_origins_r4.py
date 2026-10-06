@@ -38,6 +38,7 @@ def test_mechanics_values_written_by_hand_are_at_most_probable():
 
 
 def test_beta_cap_is_an_installation_fact():
+    V = DATA_DIR / "1.60.1.70170"  # plafond posé dans l'historique de 70170, reporté ensuite (décision 192)
     state = read_json(V / "meta.json")["game_state"]["beta_level_cap"]
     # Révision où le plafond a été posé (non reporté), lue dans revisions.json : indépendant des révisions suivantes.
     revisions = read_json(V / "revisions.json")["revisions"]

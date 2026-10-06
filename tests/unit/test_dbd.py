@@ -10,7 +10,7 @@ import csv
 import struct
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, read_json
+from conftest import DATA_DIR, FIXTURES, read_json
 
 from forever.errors import DataSchemaError
 from forever.pipeline.dbcache import Status, effective, known_tables, read_dbcache, table_names
@@ -26,7 +26,8 @@ from forever.pipeline.dbd import (
 
 LAYOUTS_PATH = FIXTURES / "dbd" / "layouts-1.60.1.70170.json"
 WAGO = FIXTURES / "wago" / "1.60.1.70170" / "enUS"
-RULES = read_json(DATA_DIR / LOCAL_VERSION / "decode_rules.json")
+FIXTURE_VERSION = "1.60.1.70170"  # build des fixtures DBCache.bin, dispositions et tables (décision 192)
+RULES = read_json(DATA_DIR / FIXTURE_VERSION / "decode_rules.json")
 
 SYNTHETIC = """COLUMNS
 int ID
@@ -176,10 +177,10 @@ def test_float32_reads_back_as_written_decimal(synthetic):
 
 def test_derived_layouts_roundtrip(layouts):
     doc = read_json(LAYOUTS_PATH)
-    assert doc["build"] == LOCAL_VERSION and len(doc["commit"]) == 40
+    assert doc["build"] == FIXTURE_VERSION and len(doc["commit"]) == 40
     assert layouts_to_json(layouts, doc["repo"], doc["commit"], doc["build"]) == doc
     assert {"TraitNode", "TraitEdge", "CurvePoint", "SpellName", "SpellLevels"} <= set(layouts)
-    assert all(lay.build == LOCAL_VERSION for lay in layouts.values())
+    assert all(lay.build == FIXTURE_VERSION for lay in layouts.values())
 
 
 def test_headers_match_the_csv_of_the_build(layouts):

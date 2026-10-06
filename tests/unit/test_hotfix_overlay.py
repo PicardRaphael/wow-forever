@@ -12,7 +12,7 @@ import shutil
 import struct
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, isolated_deps, read_json
+from conftest import DATA_DIR, FIXTURES, isolated_deps, read_json
 
 from forever.cli import main
 from forever.errors import HotfixBuildMismatchError, HotfixLayoutError
@@ -29,7 +29,8 @@ DBCACHE = HOTFIX / "DBCache.bin"
 JOURNAL = read_json(HOTFIX / "hotfixes-70170.json")["entries"]
 LAYOUTS_DOC = read_json(FIXTURES / "dbd" / "layouts-1.60.1.70170.json")
 WAGO = FIXTURES / "wago" / "1.60.1.70170"
-RULES = read_json(DATA_DIR / LOCAL_VERSION / "decode_rules.json")
+FIXTURE_VERSION = "1.60.1.70170"  # build des fixtures DBCache.bin, dispositions et tables (décision 192)
+RULES = read_json(DATA_DIR / FIXTURE_VERSION / "decode_rules.json")
 READ_AT = "2026-10-05T10:00:00Z"
 DBD = {"repo": LAYOUTS_DOC["repo"], "commit": LAYOUTS_DOC["commit"], "files": {}}
 
@@ -39,7 +40,7 @@ def readme_sha() -> str:
     return json.loads(re.search(r"```json\n(.*?)\n```", text, re.DOTALL).group(1))["sha256"]
 
 
-def source(layouts=None, version=LOCAL_VERSION, path=DBCACHE):
+def source(layouts=None, version=FIXTURE_VERSION, path=DBCACHE):
     lay = layouts_from_json(LAYOUTS_DOC) if layouts is None else layouts
     return hotfix_source(path, lay, DBD, JOURNAL, version, RULES, READ_AT)
 
@@ -56,9 +57,9 @@ def overlay():
 @pytest.fixture(scope="module")
 def decoded(tmp_path_factory):
     tmp = tmp_path_factory.mktemp("t08c")
-    with_fix = decode_version(isolated_deps(tmp), LOCAL_VERSION, csv_dir=WAGO, out=tmp / "avec", hotfixes=source())
-    without = decode_version(isolated_deps(tmp), LOCAL_VERSION, csv_dir=WAGO, out=tmp / "sans")
-    return with_fix.root / LOCAL_VERSION, without.root / LOCAL_VERSION
+    with_fix = decode_version(isolated_deps(tmp), FIXTURE_VERSION, csv_dir=WAGO, out=tmp / "avec", hotfixes=source())
+    without = decode_version(isolated_deps(tmp), FIXTURE_VERSION, csv_dir=WAGO, out=tmp / "sans")
+    return with_fix.root / FIXTURE_VERSION, without.root / FIXTURE_VERSION
 
 
 def warrior_talents(vdir):
@@ -204,8 +205,8 @@ def test_origins_of_the_candidate(decoded):
     covered = {p for r in rules if r["file"] == "classes.json" for p in r["paths"]}
     assert any(p.startswith("/classes/Warrior/trees/") for p in covered)
     assert all("*" not in p for p in covered)
-    issues = {(i.kind, i.file, i.path) for i in check_version(with_fix.parent, LOCAL_VERSION).issues}
-    baseline = {(i.kind, i.file, i.path) for i in check_version(decoded[1].parent, LOCAL_VERSION).issues}
+    issues = {(i.kind, i.file, i.path) for i in check_version(with_fix.parent, FIXTURE_VERSION).issues}
+    baseline = {(i.kind, i.file, i.path) for i in check_version(decoded[1].parent, FIXTURE_VERSION).issues}
     assert (
         issues == baseline
     )  # une candidate n'a pas les fichiers propres à l'installation ; les correctifs n'ajoutent rien
@@ -222,19 +223,19 @@ def test_server_origin_is_declared():
 def test_server_origin_needs_pushes_and_date_and_exact_paths(decoded, tmp_path):
     root = tmp_path / "copie"
     shutil.copytree(decoded[0].parent, root)
-    path = root / LOCAL_VERSION / ORIGINS_NAME
+    path = root / FIXTURE_VERSION / ORIGINS_NAME
     doc = read_json(path)
     rule = next(r for r in doc["rules"] if r["origin"] == SERVER_ORIGIN)
     rule.pop("pushes")
     rule.pop("seen_at")
     path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-    kinds = {i.kind for i in check_version(root, LOCAL_VERSION).issues}
+    kinds = {i.kind for i in check_version(root, FIXTURE_VERSION).issues}
     assert "schema" in kinds
     doc = read_json(path)
     rule = next(r for r in doc["rules"] if r["origin"] == SERVER_ORIGIN)
     rule["paths"] = ["/classes/*/trees"]
     path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
-    assert "motif_interdit" in {i.kind for i in check_version(root, LOCAL_VERSION).issues}
+    assert "motif_interdit" in {i.kind for i in check_version(root, FIXTURE_VERSION).issues}
 
 
 # --- Installation et commande ----------------------------------------------------------------------------------
@@ -242,7 +243,7 @@ def test_server_origin_needs_pushes_and_date_and_exact_paths(decoded, tmp_path):
 
 def test_install_carries_origins_and_sources(decoded, data_copy):
     with_fix, _ = decoded
-    vdir = data_copy / LOCAL_VERSION
+    vdir = data_copy / FIXTURE_VERSION
     shutil.copyfile(with_fix / "classes.json", vdir / "classes.json")  # fichier remplacé par l'installation
     assert carry_hotfix_provenance(vdir, with_fix) is True
     doc = read_json(vdir / ORIGINS_NAME)
@@ -250,7 +251,7 @@ def test_install_carries_origins_and_sources(decoded, data_copy):
     assert any(r["origin"] == SERVER_ORIGIN for r in doc["rules"])
     assert read_json(vdir / "sources.json")["hotfixes"]["max_push"] >= 112347
     write_manifest(data_copy)
-    assert check_version(data_copy, LOCAL_VERSION).issues == []
+    assert check_version(data_copy, FIXTURE_VERSION).issues == []
     assert carry_hotfix_provenance(vdir, with_fix) is True  # une seconde fois : règles remplacées, pas doublées
     again = read_json(vdir / ORIGINS_NAME)
     assert len([r for r in again["rules"] if r["origin"] == SERVER_ORIGIN]) == len(
@@ -267,7 +268,7 @@ def test_cli_decode_with_hotfixes(tmp_path, make_deps, capsys):
         [
             "decode",
             "--version",
-            LOCAL_VERSION,
+            FIXTURE_VERSION,
             "--csv-dir",
             str(WAGO),
             "--out",
@@ -283,4 +284,4 @@ def test_cli_decode_with_hotfixes(tmp_path, make_deps, capsys):
     text, _ = capsys.readouterr()
     assert code == 0, text
     assert "correctif" in text and "112347" in text
-    assert "hotfixes" in read_json(out / LOCAL_VERSION / "sources.json")
+    assert "hotfixes" in read_json(out / FIXTURE_VERSION / "sources.json")
