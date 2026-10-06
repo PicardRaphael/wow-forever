@@ -60,6 +60,7 @@ GUARD_REASON = (
 KEPT_STATES = ("approuvée", "faite", "rejetée")  # un passage qui recalcule la même attente ne les écrase pas
 HISTORY_KEPT = 30
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
+PASS_PATHS = ("forever/data/", "docs/research/data-")  # seuls chemins du clone que le passage écrit (`_publish`)
 AUTO_COMMAND = "forever update --auto"
 CARRY_FR = ("gardé", "réappliqué", "remplacé", "perdu")
 
@@ -69,6 +70,8 @@ Measure = Callable[[Deps, Path, Sequence[Path]], Mapping[str, Any]]
 """(deps, dossier des données, journaux) -> {"changed": [{"file", "pointer"}…], …} ; simulation, rien n'est écrit."""
 Spawn = Callable[[Sequence[str]], None]
 """Lance un passage détaché (arguments de la commande) ; peut lever OSError, attrapée par l'appelant."""
+Progress = Callable[[str], None]
+"""Reçoit chaque ligne du journal du passage dès qu'elle est connue (la CLI l'écrit sur la sortie d'erreur)."""
 
 
 class Step(NamedTuple):
@@ -183,17 +186,26 @@ def _lock_path(cache_dir: Path) -> Path:
     return update_dir(cache_dir) / "lock"
 
 
+def _lock_dead(doc: Any) -> bool:
+    """Vrai si le processus du verrou est mort (correctif du 2026-10-06 : un passage tué laisse son verrou) ; un
+    verrou sans `pid`, ou dont on ne peut pas savoir si le processus tourne, suit la seule règle de l'âge."""
+    from forever.spawn import pid_alive
+
+    return isinstance(doc, dict) and pid_alive(doc.get("pid")) is False
+
+
 def _lock_alive(doc: Any, now: datetime) -> bool:
     try:
         started = parse_utc(str(doc["started_at"]))
     except (KeyError, TypeError, ValueError):
         return False
-    return now - started < UPDATE_LOCK_STALE
+    return now - started < UPDATE_LOCK_STALE and not _lock_dead(doc)
 
 
 def acquire_lock(deps: Deps, command: str) -> Step | None:
     """Prend le verrou `<cache>/update/lock` ; rend l'étape `arrêt` « déjà en cours » si un verrou vivant existe
-    (un verrou plus vieux que `UPDATE_LOCK_STALE` est repris et signalé dans l'étape rendue avec le statut `fait`)."""
+    (un verrou plus vieux que `UPDATE_LOCK_STALE`, ou dont le processus est mort, est repris et signalé dans l'étape
+    rendue avec le statut `fait`)."""
     path = _lock_path(deps.cache_dir)
     now = deps.now()
     doc = {"pid": os.getpid(), "started_at": format_utc(now), "command": command}
@@ -214,7 +226,23 @@ def acquire_lock(deps: Deps, command: str) -> Step | None:
             {"lock": held},
         )
     _write(path, doc)
-    return Step("verrou", "fait", f"verrou périmé repris (posé le {(old or {}).get('started_at')})", {"stale": True})
+    held = old if isinstance(old, dict) else {}
+    if _lock_dead(old):
+        at = f" à l'étape {held['step']}" if held.get("step") else ""
+        detail = f"verrou repris : processus {held.get('pid')} mort{at} (verrou posé le {held.get('started_at')})"
+        return Step("verrou", "fait", detail, {"stale": True, "dead_pid": held.get("pid"), "lock": held})
+    return Step("verrou", "fait", f"verrou périmé repris (posé le {held.get('started_at')})", {"stale": True})
+
+
+def _note_step(cache_dir: Path, current: str | None, steps: Sequence[Step], at: str) -> None:
+    """Étape en cours et étapes finies, écrites dans le verrou au fil du passage : un passage tué laisse ainsi où il
+    en était (`forever update status`, reprise du verrou)."""
+    path = _lock_path(cache_dir)
+    doc = _read(path)
+    if not isinstance(doc, dict) or doc.get("pid") != os.getpid():
+        return
+    done = [{"name": s.name, "status": s.status, "detail": s.detail} for s in steps]
+    _write(path, {**doc, "step": current, "updated_at": at, "steps": done})
 
 
 def release_lock(cache_dir: Path) -> None:
@@ -239,6 +267,12 @@ class _Run:
     pending: list[dict[str, Any]] = dataclasses.field(default_factory=list)
     written: list[dict[str, Any]] = dataclasses.field(default_factory=list)
     client: Any = None  # ClientBuild du `.build.info`, lu à l'étape « jeu »
+    progress: Progress | None = None
+
+    def say(self, line: str) -> None:
+        """Ligne du journal du passage, écrite tout de suite (au fil de l'eau, pas à la fin)."""
+        if self.progress is not None:
+            self.progress(f"{self.now} {line}")
 
     def wants(self, group: str) -> bool:
         return not self.options.only or group in self.options.only
@@ -251,11 +285,29 @@ class _Run:
         return dataclasses.replace(self.deps, data_dir=data_dir, offline=self.deps.offline or not self.options.network)
 
 
-def _installed(data_dir: Path) -> str | None:
-    from forever.manifest import version_dirs
+def installed_versions(data_dir: Path) -> list[str]:
+    """Versions installées, lues dans le manifeste suivi par git (`manifest.json` : celui de `main` dans le clone
+    synchronisé), jamais d'après les dossiers présents : un dossier laissé par un passage interrompu n'installe rien
+    (correctif du 2026-10-06). Sans manifeste, les dossiers de version."""
+    from forever.manifest import load_manifest, version_dirs
+    from forever.pipeline.builds import version_key
 
-    versions = version_dirs(data_dir)
-    return versions[-1] if versions else None
+    manifest = load_manifest(data_dir)
+    if manifest is None:
+        return version_dirs(data_dir)
+    return sorted(manifest["versions"], key=version_key)
+
+
+def _installed(data_dir: Path) -> str | None:
+    """Version courante : `game_version` du manifeste (dernier dossier de version sans manifeste)."""
+    from forever.manifest import load_manifest
+
+    manifest = load_manifest(data_dir)
+    if manifest is None:
+        versions = installed_versions(data_dir)
+        return versions[-1] if versions else None
+    current = manifest.get("game_version")
+    return str(current) if current else None
 
 
 def _revision(data_dir: Path, version: str) -> int:
@@ -317,20 +369,22 @@ def _step_clone(run: _Run) -> Step:
     runner = run.runner or gitops.subprocess_runner
     clone = update_dir(run.deps.cache_dir) / "repo"
     gitops.ensure_clone(runner, _repo_url(run, runner), clone)
-    sync = gitops.sync_main(runner, clone)
+    sync = gitops.sync_main(runner, clone, PASS_PATHS)
     run.clone, run.origin_main = clone, sync.origin_main
     run.base_data = clone / "forever" / "data"
+    data = {"origin_main": sync.origin_main, "discarded": list(sync.discarded), "dirty": list(sync.dirty)}
     if not sync.ok:
-        return Step(
-            "clone", "arrêt", f"clone dédié refusé : {sync.reason} ({clone})", {"origin_main": sync.origin_main}
-        )
+        shown = ", ".join(sync.dirty[:5]) + (f" et {len(sync.dirty) - 5} autre(s)" if len(sync.dirty) > 5 else "")
+        paths = f" : {shown}" if sync.dirty else ""
+        return Step("clone", "arrêt", f"clone dédié refusé : {sync.reason}{paths} ({clone})", data)
     run.writable = True
     detail = "clone avancé sur origin/main" if sync.advanced else "clone à jour"
-    return Step("clone", "fait", detail, {"origin_main": sync.origin_main, "advanced": sync.advanced})
+    if sync.discarded:
+        detail += f" ; reste d'un passage interrompu retiré ({len(sync.discarded)} chemin(s))"
+    return Step("clone", "fait", detail, {**data, "advanced": sync.advanced})
 
 
 def _step_game(run: _Run) -> tuple[Step, str | None]:
-    from forever.manifest import version_dirs
     from forever.pipeline.builds import list_builds, version_key
     from forever.pipeline.client_builds import read_build_info
     from forever.store import read_sources
@@ -344,7 +398,7 @@ def _step_game(run: _Run) -> tuple[Step, str | None]:
     client = str(run.client.build)
     installed = _installed(run.base_data)
     data: dict[str, Any] = {"client": client, "installed": installed, "target": None, "newer_on_wago": None}
-    if client in version_dirs(run.base_data):
+    if client in installed_versions(run.base_data):
         return Step("jeu", "rien", f"version du client {client} déjà installée", data), None
     if installed is not None and version_key(client) < version_key(installed):
         return Step("jeu", "rien", f"client {client} plus ancien que la version installée {installed}", data), None
@@ -422,10 +476,18 @@ def _hotfix_source(run: _Run, version: str, archive: Path, rules: Mapping[str, A
 
 def _stage(run: _Run, version: str) -> Path:
     """Copie de préparation des données de base, dans le cache (jamais le clone ni la session)."""
+    from forever.manifest import VERSION_DIR_RE
+
     stage = update_dir(run.deps.cache_dir) / f"stage-{version}"
     if stage.exists():
         shutil.rmtree(stage)
-    shutil.copytree(run.base_data, stage / "data", ignore=shutil.ignore_patterns("__pycache__"))
+    installed = set(installed_versions(run.base_data))
+
+    def ignored(folder: str, names: list[str]) -> set[str]:
+        stray = {n for n in names if Path(folder) == run.base_data and VERSION_DIR_RE.match(n) and n not in installed}
+        return stray | {n for n in names if n == "__pycache__"}  # dossier de version hors du manifeste : non copié
+
+    shutil.copytree(run.base_data, stage / "data", ignore=ignored)
     return stage / "data"
 
 
@@ -670,7 +732,6 @@ def _column_wait(run: _Run, step: str, version: str, err: ColumnNamesError) -> S
 
 def _step_hotfixes(run: _Run) -> Step:
     from forever.archive import archived_dbcache
-    from forever.manifest import version_dirs
     from forever.pipeline import dbcache, hotfixes
     from forever.pipeline.client_builds import read_build_info
     from forever.pipeline.decode import decode_version
@@ -683,7 +744,7 @@ def _step_hotfixes(run: _Run) -> Step:
     if client is None:
         return Step("correctifs", "rien", "build du client inconnu", {})
     version = str(client.build)
-    if version not in version_dirs(run.base_data):
+    if version not in installed_versions(run.base_data):
         return Step("correctifs", "rien", f"version du client {version} non installée", {})
     archive = archived_dbcache(run.deps.cache_dir, _build_number(version))
     if archive is None:
@@ -946,16 +1007,19 @@ def _publish(
     runner = run.runner or gitops.subprocess_runner
     clone = run.clone
     data = clone / "forever" / "data"
+    run.say(f"{step} : copie de {version} r{revision} dans le clone")
     shutil.rmtree(data)
     shutil.copytree(stage, data)
     _annotate_revision(data / version, verdict, AUTO_COMMAND if run.options.auto else "forever update")
     report_rel = f"docs/research/data-{version}-r{revision}.md"
     (clone / report_rel).parent.mkdir(parents=True, exist_ok=True)
     (clone / report_rel).write_bytes(_research_report(plan, verdict).encode("utf-8"))
+    run.say(f"{step} : uv sync dans le clone")
     synced = runner(["uv", "sync", "--frozen", "--offline"], clone, None)
     if synced.returncode != 0:
         gitops.discard_changes(runner, clone)
         return Step(step, "arrêt", f"environnement du clone : lancer `uv sync --frozen` dans {clone}", {})
+    run.say(f"{step} : tasks.py verify dans le clone (plusieurs minutes)")
     checked = runner(["uv", "run", "--frozen", "--offline", "tasks.py", "verify"], clone, None)
     if checked.returncode != 0:
         gitops.discard_changes(runner, clone)
@@ -963,12 +1027,15 @@ def _publish(
     branch = f"data/{version}-r{revision}"
     motif = "approuvée" if verdict.get("approved") else "règle tenue"
     message = COMMIT_MESSAGE.format(version=version, revision=revision, motif=motif)
+    run.say(f"{step} : verify vert ; commit et poussée de {branch}")
     sha = gitops.commit_branch(runner, clone, branch, ["forever/data", report_rel], message)
     gitops.push(runner, clone, branch)
+    run.say(f"{step} : CI attendue sur {branch} ({sha[:12]}, jusqu'à {UPDATE_CI_TIMEOUT.total_seconds() / 60:.0f} min)")
     ci = gitops.wait_ci(runner, clone, branch, sha, UPDATE_CI_TIMEOUT.total_seconds())
     info = {"version": version, "revision": revision, "branch": branch, "sha": sha, "ci": ci.url, "jobs": ci.jobs}
     if not ci.ok:
         return Step(step, "arrêt", f"CI {ci.status} sur {branch} : rien fusionné, branche gardée ({ci.url})", info)
+    run.say(f"{step} : CI verte ; fusion de {branch} dans main en avance rapide")
     merged = gitops.merge_ff_and_push(runner, clone, branch)
     if not merged.ok:
         return Step(step, "arrêt", f"main distant a bougé : relancer `forever update` (branche {branch} poussée)", info)
@@ -1000,35 +1067,48 @@ def run_update(
     runner: Runner | None = None,
     replay: Replay | None = None,
     measure: Measure | None = None,
+    progress: Progress | None = None,
 ) -> UpdateReport:
     """Un passage complet (étapes `STEPS`) ; `dry_run` : tout est calculé, seul l'archivage écrit (et la préparation
-    dans le cache), les attentes sont rendues sans être enregistrées."""
+    dans le cache), les attentes sont rendues sans être enregistrées. `progress` reçoit le journal au fil de l'eau
+    (début et fin de chaque étape) ; le verrou garde aussi l'étape en cours et les étapes finies."""
     from forever.provenance import local_provenance
 
     started = format_utc(deps.now())
     command = AUTO_COMMAND if options.auto else "forever update"
     run = _Run(deps, options, runner, replay or _default_replay(deps, listing=options.dry_run), measure, deps.data_dir)
+    run.progress = progress
     lock = acquire_lock(deps, command)
     steps: list[Step] = []
+
+    def done(step: Step) -> None:
+        steps.append(step)
+        run.say(f"{step.name} : {step.status} · {step.detail}")
+
+    def advance(name: str, fn: Callable[[], Step]) -> None:
+        _note_step(deps.cache_dir, name, steps, run.now)
+        run.say(f"{name} : en cours")
+        done(_guard(name, fn))
+
     if lock is not None and lock.status == "arrêt":
-        steps.append(lock)
+        done(lock)
     else:
-        steps.append(lock or Step("verrou", "fait", "verrou pris", {"stale": False}))
+        done(lock or Step("verrou", "fait", "verrou pris", {"stale": False}))
         try:
-            steps.append(_guard("archivage", lambda: _step_archive(run)))
-            steps.append(_guard("clone", lambda: _step_clone(run)))
+            advance("archivage", lambda: _step_archive(run))
+            advance("clone", lambda: _step_clone(run))
             target: list[str | None] = [None]
 
             def game() -> Step:
                 found, target[0] = _step_game(run)
                 return found
 
-            steps.append(_guard("jeu", game))
-            steps.append(_guard("nouvelle_version", lambda: _step_new_version(run, target[0])))
-            steps.append(_guard("correctifs", lambda: _step_hotfixes(run)))
-            steps.append(_guard("journaux", lambda: _step_logs(run)))
-            steps.append(_guard("addons", lambda: _step_addons(run)))
-            steps.append(_end_step(run))
+            advance("jeu", game)
+            advance("nouvelle_version", lambda: _step_new_version(run, target[0]))
+            advance("correctifs", lambda: _step_hotfixes(run))
+            advance("journaux", lambda: _step_logs(run))
+            advance("addons", lambda: _step_addons(run))
+            done(_end_step(run))
         finally:
             release_lock(deps.cache_dir)
     report: UpdateReport = {
@@ -1169,6 +1249,7 @@ def approve(
     wait: bool = False,
     runner: Runner | None = None,
     spawn: Spawn | None = None,
+    progress: Progress | None = None,
 ) -> dict[str, Any]:
     """Approuve une attente si sa base n'a pas bougé (sinon `périmée`) et lance un passage (détaché, ou dans ce
     processus avec `wait`) ; une entrée `bloqué` n'est pas approuvable (refus, code 2)."""
@@ -1196,7 +1277,7 @@ def approve(
     if entry.get("kind") in INSTALL_KINDS:
         _lift_guard(deps.cache_dir, pending_id, format_utc(deps.now()))
     if wait:
-        report = run_update(deps, UpdateOptions(auto=True), runner=runner)
+        report = run_update(deps, UpdateOptions(auto=True), runner=runner, progress=progress)
         return {"id": pending_id, "state": _load(deps.cache_dir, pending_id)["state"], "detail": "passage fait",
                 "report": report}  # fmt: skip
     from forever.spawn import spawn_detached, update_command
@@ -1236,8 +1317,10 @@ def update_summary(cache_dir: Path, now: datetime | None = None) -> dict[str, An
         for e in list_pending(cache_dir)
         if e.get("state") in OPEN_STATES
     ]
-    running = _lock_alive(_read(_lock_path(cache_dir)), now or utc_now())
-    return {"last": summary_last, "pending": pending, "running": running}
+    lock = _read(_lock_path(cache_dir))
+    running = _lock_alive(lock, now or utc_now())
+    step = lock.get("step") if running and isinstance(lock, dict) else None
+    return {"last": summary_last, "pending": pending, "running": running, "running_step": step}
 
 
 def due(cache_dir: Path, now: datetime) -> bool:

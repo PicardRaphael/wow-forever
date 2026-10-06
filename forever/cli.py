@@ -1992,6 +1992,12 @@ def _cmd_watch(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _update_progress(line: str) -> None:
+    """Journal de `forever update` au fil de l'eau, sur la sortie d'erreur : la sortie standard garde le seul
+    rapport final (JSON intact) ; un passage détaché l'écrit dans son `run-<horodatage>.log`."""
+    print(line, file=sys.stderr, flush=True)
+
+
 def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
     from forever import update
 
@@ -2002,7 +2008,7 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
         last = summary["last"]
         lines = [
             f"Dernier passage : {last['finished_at'] if last else 'aucun'}"
-            + (" (en cours)" if summary["running"] else "")
+            + (f" (en cours : {summary['running_step'] or 'début'})" if summary["running"] else "")
         ]
         lines += [
             f"  {e['id']} · {e.get('kind')} · {e.get('action')} · {e.get('state')}"
@@ -2014,7 +2020,7 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
         _emit({**summary, "pending": entries, "provenance": provenance}, lines, provenance, args.json)
         return EXIT_OK
     if args.update_command == "approve":
-        out = update.approve(deps, args.id, wait=args.wait)
+        out = update.approve(deps, args.id, wait=args.wait, progress=_update_progress)
         _emit(
             {**out, "provenance": provenance},
             [f"{out['id']} : {out['state']} · {out['detail']}"],
@@ -2033,7 +2039,7 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
     options = update.UpdateOptions(
         auto=args.auto, dry_run=args.dry_run, network=not args.no_network and not deps.offline, only=only
     )
-    report = update.run_update(deps, options)
+    report = update.run_update(deps, options, progress=_update_progress)
     lines = [f"Mise à jour{' (simulation)' if args.dry_run else ''} : {report['started_at']} → {report['finished_at']}"]
     lines += [f"  {s['name']} : {s['status']} · {s['detail']}" for s in report["steps"]]
     lines += [f"  verdict {v['version']} r{v['revision']} : {v['action']}" for v in report["verdicts"]]

@@ -4,8 +4,10 @@ Le passage automatique ne touche jamais l'arbre de travail de la session : il tr
 dans le cache (`<cache>/update/repo`). Chemin d'une écriture : branche `data/<version>-r<N>`, commit, poussée, CI
 attendue sous Ubuntu **et** Windows, puis `main` avancé sur `origin` en avance rapide (`git push origin
 <branche>:main`, refusé par le serveur si `main` a bougé), clone local avancé, branche supprimée en local et à
-distance. Garde-fous : `origin/main` relu d'abord ; refus si l'arbre est sale ou hors de `main` ; **jamais de poussée
-forcée** (ni `--force`, ni `-f`, ni refspec en `+`).
+distance. Garde-fous : `origin/main` relu d'abord ; refus si l'arbre est sale hors des chemins que le passage écrit,
+ou hors de `main` ; **jamais de poussée forcée** (ni `--force`, ni `-f`, ni refspec en `+`). Un reste d'écriture
+interrompue (passage tué pendant `verify` ou la CI) dans les seuls chemins du passage est remis dans l'état de `HEAD`
+(correctif du 2026-10-06).
 
 C'est du réseau (fetch, push, API GitHub) : le module vit dans `pipeline/`. Les commandes passent par un `Runner`
 injectable (liste d'arguments, jamais de shell) ; les tests le remplacent (git réel sur un dépôt nu local, `gh`
@@ -47,6 +49,8 @@ class SyncResult(NamedTuple):
     reason: str | None
     origin_main: str
     advanced: bool
+    dirty: tuple[str, ...] = ()  # chemins modifiés hors des chemins du passage (refus)
+    discarded: tuple[str, ...] = ()  # reste d'un passage interrompu, retiré (dossier vide : chemin terminé par /)
 
 
 class CiResult(NamedTuple):
@@ -101,21 +105,65 @@ def ensure_clone(runner: Runner, url: str, path: Path) -> None:
     _run(runner, ["git", "clone", "-c", "core.longpaths=true", url, str(path)], path.parent)
 
 
-def sync_main(runner: Runner, clone: Path) -> SyncResult:
-    """`fetch`, contrôle de l'arbre (propre, sur `main`), puis avance rapide sur `origin/main`."""
+def _dirty(runner: Runner, clone: Path) -> list[str]:
+    """Chemins modifiés ou non suivis, fichier par fichier (`--untracked-files=all`)."""
+    listed = _run(runner, ["git", "status", "--porcelain", "-z", "--untracked-files=all"], clone).stdout
+    fields = [f for f in listed.split("\0") if f]
+    paths: list[str] = []
+    i = 0
+    while i < len(fields):
+        status, path = fields[i][:2], fields[i][3:]
+        paths.append(path)
+        i += 2 if status[0] in "RC" else 1  # renommage ou copie : le chemin d'origine suit
+    return sorted(paths)
+
+
+def _remove_empty_parents(clone: Path, rel: str) -> None:
+    parent = (clone / rel).parent
+    while parent != clone and parent.is_dir() and not any(parent.iterdir()):
+        parent.rmdir()
+        parent = parent.parent
+
+
+def prune_empty_dirs(clone: Path, owned: Sequence[str]) -> list[str]:
+    """Retire les dossiers vides sous les dossiers du passage (préfixes `owned` terminés par `/`) : `git status` ne
+    les voit pas ; rend leurs chemins, terminés par `/`."""
+    removed: list[str] = []
+    for prefix in owned:
+        root = clone / prefix.rstrip("/")
+        if not prefix.endswith("/") or not root.is_dir():
+            continue
+        for path in sorted((p for p in root.rglob("*") if p.is_dir()), key=lambda p: len(p.parts), reverse=True):
+            if not any(path.iterdir()):
+                path.rmdir()
+                removed.append(path.relative_to(clone).as_posix() + "/")
+    return sorted(removed)
+
+
+def sync_main(runner: Runner, clone: Path, owned: Sequence[str] = ()) -> SyncResult:
+    """`fetch`, contrôle de l'arbre (sur `main`, propre hors des chemins `owned` que le passage écrit ; leur reste
+    est remis dans l'état de `HEAD`), puis avance rapide sur `origin/main`."""
     _run(runner, ["git", "fetch", "--prune", "origin"], clone)
     origin_main = _rev(runner, clone, "origin/main")
     branch = _run(runner, ["git", "rev-parse", "--abbrev-ref", "HEAD"], clone).stdout.strip()
     if branch != "main":
         return SyncResult(False, f"branche courante {branch}, main attendue", origin_main, False)
-    if _run(runner, ["git", "status", "--porcelain"], clone).stdout.strip():
-        return SyncResult(False, "arbre de travail modifié", origin_main, False)
+    dirty = _dirty(runner, clone)
+    outside = tuple(p for p in dirty if not any(p.startswith(prefix) for prefix in owned))
+    if outside:
+        return SyncResult(False, "arbre de travail modifié", origin_main, False, dirty=outside)
+    discarded = discard_changes(runner, clone, dirty) if dirty else []
+    left = tuple(_dirty(runner, clone)) if dirty else ()
+    if left:
+        return SyncResult(False, "arbre de travail modifié", origin_main, False, dirty=left)
+    gone = tuple(sorted(set(discarded) | set(prune_empty_dirs(clone, owned))))
     if _rev(runner, clone, "HEAD") == origin_main:
-        return SyncResult(True, None, origin_main, False)
+        return SyncResult(True, None, origin_main, False, discarded=gone)
     merged = _run(runner, ["git", "merge", "--ff-only", "origin/main"], clone, check=False)
     if merged.returncode != 0:
-        return SyncResult(False, "main local diverge de origin/main (avance rapide impossible)", origin_main, False)
-    return SyncResult(True, None, origin_main, True)
+        reason = "main local diverge de origin/main (avance rapide impossible)"
+        return SyncResult(False, reason, origin_main, False, discarded=gone)
+    return SyncResult(True, None, origin_main, True, discarded=gone)
 
 
 def remote_has(runner: Runner, clone: Path, version: str, revision: int | None) -> bool:
@@ -214,15 +262,19 @@ def origin_url(runner: Runner, repo: Path) -> str:
     return _run(runner, ["git", "remote", "get-url", "origin"], repo).stdout.strip()
 
 
-def discard_changes(runner: Runner, clone: Path) -> list[str]:
-    """Remet le clone dans l'état de `HEAD` après une écriture abandonnée (verify rouge) : fichiers suivis restaurés,
-    fichiers non suivis retirés un par un (jamais `git clean -f`) ; rend les chemins retirés."""
-    _run(runner, ["git", "restore", "--staged", "--worktree", "--", "."], clone)
-    listed = _run(runner, ["git", "ls-files", "--others", "--exclude-standard", "-z"], clone).stdout
+def discard_changes(runner: Runner, clone: Path, paths: Sequence[str] = (".",)) -> list[str]:
+    """Remet `paths` du clone dans l'état de `HEAD` après une écriture abandonnée (verify rouge, passage interrompu) :
+    fichiers suivis restaurés, fichiers non suivis retirés un par un (jamais `git clean -f`), puis leurs dossiers
+    devenus vides ; rend les chemins non suivis retirés et les chemins suivis restaurés (hors `.`)."""
+    listed = _run(runner, ["git", "ls-files", "--others", "--exclude-standard", "-z", "--", *paths], clone).stdout
     removed = [p for p in listed.split("\0") if p]
+    tracked = [p for p in paths if p not in removed]
+    if tracked:
+        _run(runner, ["git", "restore", "--staged", "--worktree", "--", *tracked], clone)
     for rel in removed:
         (clone / rel).unlink(missing_ok=True)
-    return removed
+        _remove_empty_parents(clone, rel)
+    return sorted(set(removed) | {p for p in tracked if p != "."})
 
 
 def remote_ahead(runner: Runner, repo: Path, origin_main: str) -> bool:
