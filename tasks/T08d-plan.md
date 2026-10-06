@@ -212,6 +212,12 @@ session, sur la branche `t08d`, avec un cycle rouge → vert par bloc.
 
 ## Blocs et étapes
 
+**Première action de la session d'exécution**, avant tout test sur les données réelles, tout
+`forever measures refresh` et tout `forever update` : inscrire 70205 dans `client_builds.json`, avec la date de sa
+première ligne de `hotfixes.json` (source citée). Le journal saute aujourd'hui de 70170 (02/10) à 70235 (05/10,
+23:40 UTC) : `version_at` attribuerait donc à **70170** les deux journaux du 05/10, qui viennent de 70205, et une
+mesure les écrirait dans les données de 70170. Jusque-là, `forever measures refresh` ne doit pas être lancé.
+
 Ordre : 0, A, B, C, D, E, F, G, H. A, B, C et D sont indépendants ; E en dépend, F dépend de E, G de E et F, et H de
 tout. Chaque bloc testé suit le cycle : tests rouges committés (« T08d: tests (bloc X) »), `tasks/.rouge` et
 `tasks/.tests-verrouilles` réécrits, puis vert (« T08d: bloc X vert »), et ces fichiers supprimés.
@@ -244,8 +250,13 @@ tout. Chaque bloc testé suit le cycle : tests rouges committés (« T08d: tests
           `DBCache-<sha12>.bin`. Rien n'est jamais effacé ;
         - un index `<cache>/dbcache/<build>/index.json` liste chaque copie : sha256, taille, date du fichier, date de
           copie, nombre d'entrées, poussée maximale.
-    - `Logs/Hotfix.log` : il est réécrit à chaque démarrage du client, donc chaque contenu distinct est gardé :
-        - nommé `<cache>/dbcache/<build>/Hotfix-<date du fichier, UTC compacte>-<sha12>.log` ;
+    - `Logs/Hotfix.log` : il est réécrit à chaque démarrage du client, puis **grossit pendant la session** (les
+      poussées et les réponses `DBReply` arrivent en jeu). On garde donc une copie par session du client, et non une
+      par contenu :
+        - la session se reconnaît au début du fichier (empreinte des premières lignes, gardée dans l'index) ;
+        - un contenu dont la copie archivée est un **préfixe** remplace cette copie, au lieu de s'y ajouter ;
+        - seule une réécriture (nouveau démarrage du client, début différent) crée un nouveau fichier ;
+        - nommé `<cache>/dbcache/<build>/Hotfix-<date du début de session, UTC compacte>.log` ;
         - le build est celui du client à la date du fichier (`client_builds.version_at`), sinon celui de
           `.build.info` au moment de la copie, avec la source notée dans l'index ;
         - un contenu déjà archivé (même sha256) n'est pas recopié.
@@ -256,8 +267,9 @@ tout. Chaque bloc testé suit le cycle : tests rouges committés (« T08d: tests
     - Les écritures se font en octets (`write_bytes`), avec un fichier temporaire puis un renommage.
 2. `forever watch` montre « archivé : DBCache.bin 70235 (nouvelle copie) » quand une copie est faite. Aucune ligne de
    démarrage pour une copie (bruit) : seulement en cas d'échec répété (3 passages illisibles).
-3. Inscription rétroactive (bloc H, hors tests) : 70205 dans `client_builds.json`, avec la date de sa première ligne
-   de `hotfixes.json` (source citée, comme 70009 l'a été par `Errors/`).
+3. Inscription rétroactive de 70205 dans `client_builds.json` : faite **en première action de la session**, avant
+   les blocs (voir « Blocs et étapes »), avec la date de sa première ligne de `hotfixes.json` (source citée, comme
+   70009 l'a été par `Errors/`). Le bloc A n'ajoute que la fonction qui l'inscrit avec sa source.
 
 ### Bloc B — Preuve d'entrées identiques par moteur, et rejeu ciblé (point 1, fin)
 
@@ -394,7 +406,9 @@ tout. Chaque bloc testé suit le cycle : tests rouges committés (« T08d: tests
 1. `forever/hooks.py`, au `SessionStart` :
     - (1) archivage (bloc A), qui est rapide et local ;
     - (2) si aucun verrou n'est vivant et que le dernier passage a plus de 6 h, lancement **détaché** de
-      `uv run --project <clone> forever update --auto --json`. Sous Windows : `DETACHED_PROCESS |
+      `uv run forever update --auto --json` **depuis l'installation de la session** : au premier passage, le clone
+      n'existe pas encore. C'est l'orchestrateur qui crée le clone, puis y lance `install`, `verify`, le commit et
+      git ; il n'écrit jamais dans l'arbre de la session. Sous Windows : `DETACHED_PROCESS |
       CREATE_NEW_PROCESS_GROUP | CREATE_NO_WINDOW`, sortie dans `<cache>/update/run-<horodatage>.log`. Le lancement
       passe par un `spawn` injectable, et ne lève jamais d'exception ;
     - (3) la ligne affiche, sans réseau :
@@ -420,8 +434,8 @@ tout. Chaque bloc testé suit le cycle : tests rouges committés (« T08d: tests
 ### Bloc H — Cas réel 1.60.1.70235, DON13 et point d'arrêt (point 6)
 
 Hors tests, sur le poste :
-1. Archivage réel : `DBCache.bin` 70235 recopié après la fermeture du client, `Hotfix.log` archivés, 70205 inscrite
-   rétroactivement (bloc A, étape 3).
+1. Archivage réel : `DBCache.bin` 70235 recopié après la fermeture du client, `Hotfix.log` archivés ; contrôle que 70205
+   est inscrite (première action de la session) et que les journaux du 05/10 lui sont attribués.
 2. `forever update --dry-run --json` depuis la session, puis `forever update` (avec le clone). Pour 70235 :
     - `fetch` (accord permanent) ;
     - `decode --hotfixes` avec l'archive 70235 : il faut des dispositions pour 70235, donc une attente `network_dbd`
@@ -572,7 +586,9 @@ Bloc A (`test_archive.py`, `test_watch.py`), sur un dossier du client en `tmp_pa
   `DBCache-<sha12>.bin`, la nouvelle devient `DBCache.bin`, et l'index compte deux copies.
 - Fichier tronqué : rien n'est archivé, l'erreur est dans le résultat, aucune exception. Le passage suivant, avec le
   fichier entier, archive.
-- `Hotfix.log` réécrit avec un autre contenu : deux fichiers archivés. Le même contenu recopié n'est pas dupliqué.
+- `Hotfix.log` qui grossit (mêmes premières lignes, plus des lignes ajoutées par le test) : une seule archive, mise à
+  jour avec le contenu le plus long. `Hotfix.log` réécrit (début différent) : deux fichiers archivés. Le même contenu
+  recopié ne change rien.
 - `.build.info` d'un build absent du journal : `client_builds.json` le contient après le passage.
 - Aucune écriture hors de `<cache>` (le dossier du client est intact : empreinte avant et après).
 
