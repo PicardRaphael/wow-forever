@@ -2,7 +2,7 @@
 
 Demandes regroupées, à présenter avant la fusion (consigne de l'utilisateur du 2026-10-06).
 
-## 1. `tests/unit/test_update_chain.py::test_cli_json_exit_codes` (bloc E)
+## 1. `tests/unit/test_update_chain.py::test_cli_json_exit_codes` (bloc E) — accordée le 2026-10-06, appliquée
 
 **Constat.** La seconde moitié du test rappelle le montage (`montage(change=…)`) dans le **même cache** que la
 première. Le premier passage a déjà relevé les CSV de `1.60.1.79999` (`<cache>/wago/1.60.1.79999/` et son

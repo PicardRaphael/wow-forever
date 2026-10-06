@@ -289,6 +289,7 @@ def test_cli_json_exit_codes(montage, capsys):
     assert payload["provenance"]["game_version"] == BASE
     assert payload["provenance"]["certainty"] in ("certain", "probable", "suppose")
 
+    shutil.rmtree(deps.cache_dir / "wago" / TARGET)  # tables relevées au premier passage : jamais retéléchargées
     deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
     assert main(["update", "--dry-run", "--json", "--only", "jeu"], deps) == EXIT_PENDING
     assert json.loads(capsys.readouterr().out)["pending"]
