@@ -472,6 +472,43 @@ Hors tests, sur le poste :
     - `docs/research/data-1.60.1.70235-install.md` (généré) ;
     - `docs/research/builds-T05.md` (section « Rejeu T08d », seulement s'il y a eu un rejeu).
 
+### Blocs I et J — Reprise du 2026-10-06 (réponses de l'utilisateur aux points bloquants)
+
+Constats de la session précédente : la simulation sur 70235 s'arrêtait en erreur (`data_schema`) parce que la
+colonne `Field_1_60_1_69876_005` de `PlayerExpectedStat` s'appelle `HPPerStamina` dans les tables de wago de 70235
+(seule colonne déclarée absente, relevé de tous les en-têtes) ; deux journaux du 02/10 attendaient une mesure.
+
+**Bloc I — Noms de colonne multiples, arrêt propre (réponse 2).**
+1. `forever/pipeline/tables.py` : une colonne déclarée peut avoir plusieurs noms (`Nouveau|Ancien:type`, le nouveau
+   d'abord). `read_table` prend le premier nom présent dans l'en-tête et range la valeur sous **chacun** des noms de
+   la colonne (les lecteurs qui citent l'un ou l'autre nom lisent la même valeur).
+2. Les règles (`decode_rules.json`) acceptent pour une colonne un nom ou une liste de noms (`player_columns`,
+   `pets.training_cost_column`) ; `column_value(row, names)` rend la valeur du premier nom présent.
+3. Aucun nom trouvé : `ColumnNamesError` (sous-classe de `DataSchemaError`, avec la table, les noms essayés et
+   l'en-tête). `forever update` l'attrape à l'étape `nouvelle_version` (et `correctifs`) : étape `attente`, entrée
+   d'attente `column_names` (table, noms essayés, nom proposé par la position dans le CSV de la version installée,
+   commandes à faire en session), code 6. `approve` la refuse avec le message « à traiter en session » : rien ne
+   s'écrit sans édition du schéma.
+4. Révision de `forever/data/1.60.1.70170/decode_rules.json` (accord du 2026-10-06) : `hp_per_stamina` =
+   `["HPPerStamina", "Field_1_60_1_69876_005"]`. Le nom vient des définitions de la communauté (WoWDBDefs) : il
+   conforte le sens « PV par point d'Endurance », qui reste `probable` jusqu'à une mesure en jeu (notes mises à jour).
+
+Tests (`tests/unit/test_column_names.py`) : en-tête ancien ou nouveau lu pareil ; aucun nom → `ColumnNamesError`
+qui nomme les noms essayés ; liste de noms dans les règles ; proposition par position ; règles de 70170 et schéma
+alignés ; chaîne : attente `column_names` au lieu d'une erreur, code 6, `approve` refusé.
+
+**Bloc J — Mesures de 70170, révision suivante (réponse 3).**
+Vérification faite : l'empreinte du journal de la révision 2 (`WoWCombatLog-100226_080035.txt`) est celle des
+21 372 premières lignes (5 936 426 octets) du fichier actuel (28 335 lignes) : c'est le même journal, qui a grossi
+après la mesure de 13:11. `WoWCombatLog-100226_162842.txt` est une autre session du même jour, sous 70170.
+1. `build_monsters` écarte automatiquement de la courbe tout PNJ mesuré que Questie classe hors du rang normal
+   (`rank` de Questie, référence `creature_template` de cmangos citée par `npcDB.lua` : 1 élite, 2 élite rare,
+   3 boss, 4 rare), avec la raison écrite dans `curve_excluded` ; une raison donnée par l'utilisateur n'est jamais
+   remplacée. Un PNJ inconnu de Questie reste dans la courbe.
+2. La mesure est simulée (`forever measures refresh --dry-run`) et montrée ; rien n'est écrit sans accord.
+
+Tests (`tests/unit/test_monsters_rank_exclusion.py`, Questie de fixture : 5945 rang 1, 1531 rang 4).
+
 ## Fichiers
 
 - **Nouveaux** :

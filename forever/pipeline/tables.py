@@ -5,7 +5,7 @@ Les noms de colonnes sont ceux du format de fichier (WoWDBDefs), pas des chiffre
 from __future__ import annotations
 
 import csv
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import NamedTuple
 
@@ -13,6 +13,32 @@ from forever.errors import DataSchemaError
 
 Value = int | float | str
 Row = Mapping[str, Value]
+
+
+class ColumnNamesError(DataSchemaError):
+    """Aucun des noms d'une colonne déclarée n'est dans l'en-tête du CSV (colonne renommée par le client)."""
+
+    def __init__(self, table: str, missing: Sequence[tuple[str, ...]], header: Sequence[str], path: Path) -> None:
+        self.table = table
+        self.missing = tuple(tuple(names) for names in missing)
+        self.header = tuple(header)
+        self.path = path
+        tried = " ; ".join(" ou ".join(names) for names in self.missing)
+        super().__init__(
+            f"{table} : colonne(s) absente(s) {tried} ({path}).",
+            "ajouter le nouveau nom en tête de la liste de la colonne (forever/pipeline/tables.py et decode_rules.json)",
+        )
+
+
+def column_value(row: Row, names: str | Sequence[str]) -> Value:
+    """Valeur du premier nom de `names` présent dans la ligne."""
+    raise NotImplementedError
+
+
+def propose_names(old_header: Sequence[str], new_header: Sequence[str], names: Sequence[str]) -> str | None:
+    """Nom proposé pour une colonne absente : celui qui occupe, dans le nouvel en-tête, la place d'un de ses noms
+    dans l'ancien en-tête (en-têtes de même longueur seulement) ; None sinon."""
+    raise NotImplementedError
 
 
 class Column(NamedTuple):
