@@ -17,7 +17,7 @@ from typing import Any
 
 from forever.errors import CsvMissingError
 from forever.pipeline.fetch import DEFAULT_LOCALE
-from forever.pipeline.tables import Row, read_table
+from forever.pipeline.tables import Row, column_value, read_table
 from forever.pipeline.tooltip import normalize, tooltip_values
 
 PETS_FILE = "pets.json"
@@ -165,7 +165,7 @@ def decode_pets(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[
     """Contenu de `pets.json` : familles du Chasseur, capacités et rangs, mise à l'échelle, régimes, cartes."""
     c = _PetClient(tables, rules)
     p = rules["pets"]
-    cost_col = str(p["training_cost_column"])
+    cost_col = p["training_cost_column"]  # un nom de colonne, ou une liste de noms (le nouveau d'abord)
     learn = int(rules["pvp_classification"]["learn_spell_effect"])
     observations: list[str] = []
 
@@ -211,7 +211,7 @@ def decode_pets(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[
                 continue
             rank_spell[key][rank] = spell
             ability_lines[key].add(line)
-            line_costs[line][key][rank] = int(a[cost_col])
+            line_costs[line][key][rank] = int(column_value(a, cost_col))
             sup = int(a["SupercedesSpell"])
             if sup and c.rank_of(sup) != (key, rank - 1):
                 observations.append(

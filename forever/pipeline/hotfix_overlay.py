@@ -192,12 +192,17 @@ def _check(
 def _typed(table: str, schema: str, record: Mapping[str, Value], rec_id: int) -> dict[str, Value]:
     row: dict[str, Value] = {}
     for column in TABLES[schema]:
-        if column.name not in record:
-            raise DataSchemaError(f"{table} {rec_id} : colonne {column.name} absente de l'enregistrement du correctif.")
+        name = next((n for n in column.names if n in record), None)  # nom de la disposition du build (T08d)
+        if name is None:
+            raise DataSchemaError(
+                f"{table} {rec_id} : colonne {' ou '.join(column.names)} absente de l'enregistrement du correctif."
+            )
         try:
-            row[column.name] = column.kind(record[column.name])
+            value = column.kind(record[name])
         except (TypeError, ValueError) as exc:
-            raise DataSchemaError(f"{table} {rec_id} : valeur invalide pour {column.name} ({exc}).") from exc
+            raise DataSchemaError(f"{table} {rec_id} : valeur invalide pour {name} ({exc}).") from exc
+        for alias in column.names:
+            row[alias] = value
     return row
 
 

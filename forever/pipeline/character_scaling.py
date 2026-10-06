@@ -18,7 +18,7 @@ from typing import Any
 
 from forever.errors import CsvMissingError, DataSchemaError
 from forever.pipeline.fetch import DEFAULT_LOCALE, GAMETABLES_DIR
-from forever.pipeline.tables import Row, read_table
+from forever.pipeline.tables import Row, column_value, read_table
 
 CHARACTER_FILE = "character_scaling.json"
 CHARACTER_FILES = (CHARACTER_FILE,)
@@ -125,7 +125,7 @@ def decode_character_scaling(
     spec = rules["character_scaling"]
     cap = int(rules["levels"]["level_cap"])
     content = int(spec["content_set_id"])
-    columns = {k: str(v) for k, v in spec["player_columns"].items()}
+    columns = dict(spec["player_columns"])  # un nom de colonne, ou une liste de noms (le nouveau d'abord)
     class_ids = {str(r["Name_lang"]): int(r["ID"]) for r in tables["ChrClasses"]}
     pes = [r for r in tables["PlayerExpectedStat"] if int(r["ContentSetID"]) == content]
     curves = tables["GlobalCurve"]
@@ -138,7 +138,7 @@ def decode_character_scaling(
         rows = _by_level([r for r in pes if int(r["ClassID"]) == cid], "Level", cap, f"PlayerExpectedStat ({cls})")
         entry: dict[str, Any] = {"class_id": cid}
         for key in PLAYER_KEYS:
-            entry[key] = [float(rows[lv][columns[key]]) for lv in range(1, cap + 1)]
+            entry[key] = [float(column_value(rows[lv], columns[key])) for lv in range(1, cap + 1)]
         regen: dict[str, Any] = {}
         for key, curve_type in spec["hp_regen_curve_types"].items():
             curve = next(

@@ -31,25 +31,45 @@ class ColumnNamesError(DataSchemaError):
 
 
 def column_value(row: Row, names: str | Sequence[str]) -> Value:
-    """Valeur du premier nom de `names` présent dans la ligne."""
-    raise NotImplementedError
+    """Valeur du premier nom de `names` présent dans la ligne (`names` : un nom, ou une liste de noms de règles)."""
+    tried = (names,) if isinstance(names, str) else tuple(names)
+    for name in tried:
+        if name in row:
+            return row[name]
+    raise DataSchemaError(f"Colonne absente de la ligne : {' ou '.join(tried)}.")
 
 
 def propose_names(old_header: Sequence[str], new_header: Sequence[str], names: Sequence[str]) -> str | None:
     """Nom proposé pour une colonne absente : celui qui occupe, dans le nouvel en-tête, la place d'un de ses noms
     dans l'ancien en-tête (en-têtes de même longueur seulement) ; None sinon."""
-    raise NotImplementedError
+    if len(old_header) != len(new_header):
+        return None
+    for name in names:
+        if name in old_header:
+            proposed = new_header[list(old_header).index(name)]
+            return None if proposed in names or proposed in old_header else proposed
+    return None
 
 
 class Column(NamedTuple):
     name: str
     kind: type[int | float | str]
+    aliases: tuple[str, ...] = ()  # anciens noms de la colonne (renommée par le client), du plus récent au plus ancien
+
+    @property
+    def names(self) -> tuple[str, ...]:
+        return (self.name, *self.aliases)
 
 
 def _cols(spec: str) -> tuple[Column, ...]:
-    """« ID:int Name_lang:str » -> colonnes typées."""
+    """« ID:int Name_lang:str » -> colonnes typées ; « Nouveau|Ancien:float » : une colonne à plusieurs noms, le
+    nouveau d'abord."""
     kinds: dict[str, type[int | float | str]] = {"int": int, "float": float, "str": str}
-    return tuple(Column(name, kinds[kind]) for name, kind in (item.split(":") for item in spec.split()))
+    columns = []
+    for names, kind in (item.split(":") for item in spec.split()):
+        first, *aliases = names.split("|")
+        columns.append(Column(first, kinds[kind], tuple(aliases)))
+    return tuple(columns)
 
 
 TABLES: Mapping[str, tuple[Column, ...]] = {
@@ -118,8 +138,9 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     ),
     "ItemXItemEffect": _cols("ID:int ItemEffectID:int ItemID:int"),
     # T08b, bloc A : ratios du personnage, XP, repos, constante d'armure, courbes (decode_rules.json, character_tables).
+    # HPPerStamina : nom de la colonne Field_1_60_1_69876_005 dans les tables de 1.60.1.70235 (T08d).
     "PlayerExpectedStat": _cols(
-        "ID:int Level:int ClassID:int ContentSetID:int BaseMana:float Field_1_60_1_69876_005:float "
+        "ID:int Level:int ClassID:int ContentSetID:int BaseMana:float HPPerStamina|Field_1_60_1_69876_005:float "
         "CritPerAgility:float SpellCritPerIntellect:float"
     ),
     "LevelExperience": _cols("ID:int Level:int ContentSetID:int Experience:int"),
@@ -152,10 +173,11 @@ def read_table(path: Path, table: str) -> list[dict[str, Value]]:
         with path.open(encoding="utf-8-sig", newline="") as f:
             reader = csv.reader(f)
             header = next(reader, [])
-            missing = [c.name for c in columns if c.name not in header]
+            found = [(c, next((n for n in c.names if n in header), None)) for c in columns]
+            missing = [c.names for c, name in found if name is None]
             if missing:
-                raise DataSchemaError(f"{table} : colonne(s) absente(s) {', '.join(missing)} ({path}).")
-            index = [(c, header.index(c.name)) for c in columns]
+                raise ColumnNamesError(table, missing, header, path)
+            index = [(c, header.index(name)) for c, name in found if name is not None]
             rows: list[dict[str, Value]] = []
             for line, cells in enumerate(reader, start=2):
                 row: dict[str, Value] = {}
@@ -164,7 +186,9 @@ def read_table(path: Path, table: str) -> list[dict[str, Value]]:
                     try:
                         if raw is None:
                             raise ValueError("cellule absente")
-                        row[column.name] = column.kind(raw)
+                        value = column.kind(raw)
+                        for name in column.names:  # valeur rangée sous chacun des noms de la colonne
+                            row[name] = value
                     except ValueError as exc:
                         raise DataSchemaError(
                             f"{table} : valeur {raw!r} invalide pour la colonne {column.name}, ligne {line} "

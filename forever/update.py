@@ -36,6 +36,7 @@ from forever.carry import CarryReport, carry_apply, carry_check
 from forever.config import CACHE_TTL, REPO_ROOT, UPDATE_CI_TIMEOUT, UPDATE_LOCK_STALE, Deps, utc_now
 from forever.engine_inputs import ENGINES, InputsDiff, compare_inputs, targeted_replay
 from forever.errors import EXIT_OK, EXIT_PENDING, ForeverError, InvalidArgumentError, PathNotFoundError
+from forever.pipeline.tables import ColumnNamesError
 from forever.timefmt import format_utc, parse_utc
 
 if TYPE_CHECKING:
@@ -50,6 +51,7 @@ STATUSES = ("fait", "rien", "attente", "arrêt", "erreur")
 ACTIONS = ("écrire", "attente", "bloqué")
 STATES = ("en_attente", "approuvée", "rejetée", "périmée", "faite")
 OPEN_STATES = ("en_attente", "approuvée")
+SESSION_KINDS = ("column_names",)  # attentes qu'aucune approbation ne résout : une édition en session est nécessaire
 KEPT_STATES = ("approuvée", "faite", "rejetée")  # un passage qui recalcule la même attente ne les écrase pas
 HISTORY_KEPT = 30
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
@@ -549,7 +551,10 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
                 source = _hotfix_source(run, target, archive, rules, [t for t, _ in pending])
             except _NeedLayouts as need:
                 return _need_layouts(run, "nouvelle_version", target, need, len(pending))
-    candidate = decode_version(run.deps_on(run.base_data), target, force=True, hotfixes=source)
+    try:
+        candidate = decode_version(run.deps_on(run.base_data), target, force=True, hotfixes=source)
+    except ColumnNamesError as err:
+        return _column_wait(run, "nouvelle_version", target, err)
     motif = f"nouvelle version {target} (forever update)"
     return _evaluate(
         run,
@@ -585,6 +590,59 @@ def _need_layouts(run: _Run, step: str, version: str, need: _NeedLayouts, count:
     })  # fmt: skip
 
 
+def _column_wait(run: _Run, step: str, version: str, err: ColumnNamesError) -> Step:
+    """Colonne renommée par le client (aucun de ses noms dans l'en-tête) : attente `column_names` à traiter en
+    session, avec le nom proposé par la place de la colonne dans le CSV de la version installée (T08d, bloc I)."""
+    import csv
+
+    from forever.pipeline.fetch import DEFAULT_LOCALE
+    from forever.pipeline.tables import propose_names
+
+    installed = _installed(run.base_data)
+    old_csv = run.deps.cache_dir / "wago" / str(installed) / DEFAULT_LOCALE / f"{err.table}.csv"
+    proposals: dict[str, str | None] = {}
+    old_header: list[str] = []
+    if old_csv.is_file():
+        try:
+            with old_csv.open(encoding="utf-8-sig", newline="") as f:
+                old_header = next(csv.reader(f), [])
+        except (OSError, UnicodeDecodeError, csv.Error):
+            old_header = []
+    for names in err.missing:
+        proposals[names[0]] = propose_names(old_header, err.header, names) if old_header else None
+    tried = " ; ".join(" ou ".join(names) for names in err.missing)
+    found = [f"{n} → {p}" for n, p in proposals.items() if p]
+    reason = f"{err.table} : aucun des noms {tried} dans le CSV de {version}" + (
+        f" ; nom proposé par la place de la colonne dans le CSV de {installed} : {', '.join(found)}" if found else ""
+    )
+    digest = hashlib.sha256(f"{err.table}|{tried}|{','.join(err.header)}".encode()).hexdigest()[:12]
+    pending_id = f"columns-{version}-{digest}"
+    run.pending.append(
+        {
+            "id": pending_id,
+            "kind": "column_names",
+            "action": "attente",
+            "version": version,
+            "revision": None,
+            "clauses": {},
+            "reasons": [reason],
+            "table": err.table,
+            "missing": [list(names) for names in err.missing],
+            "proposed": proposals,
+            "header": list(err.header),
+            "created_at": run.now,
+            "base": {"origin_main": run.origin_main, "version": installed},
+            "commands": [
+                (
+                    "en session, après accord : ajouter le nouveau nom en tête de la liste de la colonne "
+                    "(forever/pipeline/tables.py et decode_rules.json), puis `forever update`"
+                )
+            ],
+        }
+    )
+    return Step(step, "attente", f"colonne renommée par le client : {reason}", {"id": pending_id, "table": err.table})
+
+
 def _step_hotfixes(run: _Run) -> Step:
     from forever.archive import archived_dbcache
     from forever.manifest import version_dirs
@@ -615,7 +673,10 @@ def _step_hotfixes(run: _Run) -> Step:
     except _NeedLayouts as need:
         return _need_layouts(run, "correctifs", version, need, len(pending))
     _fetch_version(run, version, rules)
-    candidate = decode_version(run.deps_on(run.base_data), version, force=True, hotfixes=source)
+    try:
+        candidate = decode_version(run.deps_on(run.base_data), version, force=True, hotfixes=source)
+    except ColumnNamesError as err:
+        return _column_wait(run, "correctifs", version, err)
     revision = _revision(run.base_data, version) + 1
     return _evaluate(
         run,
@@ -1068,6 +1129,11 @@ def approve(
     """Approuve une attente si sa base n'a pas bougé (sinon `périmée`) et lance un passage (détaché, ou dans ce
     processus avec `wait`) ; une entrée `bloqué` n'est pas approuvable (refus, code 2)."""
     entry = _load(deps.cache_dir, pending_id)
+    if entry.get("kind") in SESSION_KINDS:
+        raise InvalidArgumentError(
+            f"L'attente {pending_id} ({entry.get('kind')}) se traite en session : {'; '.join(entry.get('reasons', []))}.",
+            "; ".join(entry.get("commands", [])) or "traiter le cas en session",
+        )
     if entry.get("action") == "bloqué":
         raise InvalidArgumentError(
             f"L'attente {pending_id} est bloquée ({'; '.join(entry.get('reasons', []))}) : elle n'est pas approuvable.",

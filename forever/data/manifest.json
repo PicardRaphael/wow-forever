@@ -71,8 +71,8 @@
     },
     "1.60.1.70170": {
       "collected_at": "2026-10-02",
-      "data_sha": "832514618da2",
-      "data_sha256": "832514618da2340412cdfd987bfefca815f3099886b58c65eb90f12d8651a05d",
+      "data_sha": "b68d0a3fb907",
+      "data_sha256": "b68d0a3fb9075b282c6c018c1f9c68c84067c98f8eef40710cb370787bc93b54",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -81,7 +81,7 @@
         "character_scaling.json": "6344e821e1b88dc7627d6058921afe5b6c644d4ed7fc9cecf61e38fe74e7a81c",
         "classes.json": "13f5ff9cf1fa2019eeb2f41939ed4a69bf1d462c567c50c8243ee91fa57c0f2a",
         "confirmed_changes.json": "1f71cf691be7874b53aa16a76317918d4b0a843ffaa9a516e3b9d147153bad87",
-        "decode_rules.json": "a76fc0fdf642d836f2bfbf816dbac5afeed9b8c706290c69de5fbd5bef2b7430",
+        "decode_rules.json": "ba56b9ea09a61d5532489e57d6c38ef23b624296de0240bb3f2e9b4d11d2d0b6",
         "leveling.json": "a649d83137fb9dcf699c20c5d9541d9e0836a3ccee11207dfada411ae51c2c9c",
         "mechanics.json": "d714d34778fc004a12d8d780b0c44055d81f73aec3096b8238a5c68e3f31cd0d",
         "meta.json": "c0c1d64aa8a4111967aa6cb46517901fc2757cb86ced6bebac1d5da57f17b169",
