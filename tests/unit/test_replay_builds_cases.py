@@ -28,3 +28,26 @@ def test_other_contexts_keep_the_three_levels_of_t05():
     cases = replay_module()._cases()
     for context in ("dungeon", "raid", "pvp-bg", "pvp-world"):
         assert [lv for c, lv in cases if c == context] == [20, 40, 60]
+
+
+# --- T08d, bloc E : rejeu par fonction, appelé par `forever update` -------------------------------------------
+
+
+def test_run_cases_writes_in_the_given_cache_and_returns_the_cases(tmp_path, monkeypatch):
+    """`run_cases` rejoue les cas choisis sur un dossier de données et un cache donnés ; le calcul est simulé (aucun
+    Monte Carlo) : seul le chemin des fichiers et des arguments est contrôlé."""
+    mod = replay_module()
+    seen = []
+
+    def fake_build_report(deps, context, level, **kwargs):
+        seen.append((deps.data_dir, context, level, kwargs["seed"]))
+        return {"provenance": {"game_version": "x"}, "context": context, "level": level}
+
+    monkeypatch.setattr(mod, "build_report", fake_build_report)
+    data = tmp_path / "data"
+    out = mod.run_cases("update-x-avant", ["leveling-20", "raid-40"], data_dir=data, cache_dir=tmp_path / "cache")
+    assert sorted(out) == ["leveling-20", "raid-40"]
+    assert out["raid-40"]["report"]["level"] == 40
+    assert seen == [(data, "leveling", 20, mod.SEED), (data, "raid", 40, mod.SEED)]
+    folder = tmp_path / "cache" / "builds" / "update-x-avant"
+    assert sorted(p.name for p in folder.glob("*.json")) == ["leveling-20.json", "raid-40.json"]

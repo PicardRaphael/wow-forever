@@ -156,6 +156,15 @@ def parse_ratios(value: str) -> set[str]:
     return chosen
 
 
+def run_cases(
+    label: str, only: list[str] | None, data_dir: Path | None = None, cache_dir: Path | None = None
+) -> dict[str, dict[str, Any]]:
+    """Rejoue les cas (tous, ou ceux de `only`) sur `data_dir` et écrit un JSON par cas dans
+    `<cache_dir>/builds/<label>/` ; rend {cas: {"report", "duration_s", "ablated"}}. Appelé par `forever update`
+    (rejeu ciblé, T08d, bloc E) et par `run`."""
+    raise NotImplementedError
+
+
 def run(label: str, only: list[str] | None, ratios: set[str] | None = None, data_dir: Path | None = None) -> None:
     out = _dir(label)
     out.mkdir(parents=True, exist_ok=True)

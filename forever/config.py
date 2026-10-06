@@ -32,6 +32,10 @@ DEFAULT_WOW_DIR = Path(r"C:\Program Files (x86)\World of Warcraft\_classic_beta_
 # Mesure des journaux : au-delà de cet écart, deux sorts instantanés ne sont pas « enchaînés » (paramètre de
 # l'outil, modifiable par --max-gap ; ce n'est pas une règle du jeu).
 CHAIN_MAX_GAP_S = 3.0
+# Mise à jour automatique (T08d, décision 180) : passage au démarrage au plus toutes les 6 h (CACHE_TTL), verrou
+# déclaré périmé après 3 h, attente de la CI limitée à 60 min. Paramètres de l'outil, pas des chiffres de jeu.
+UPDATE_LOCK_STALE = timedelta(hours=3)
+UPDATE_CI_TIMEOUT = timedelta(minutes=60)
 
 
 @dataclass(frozen=True)

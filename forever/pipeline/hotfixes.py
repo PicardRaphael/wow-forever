@@ -15,7 +15,10 @@ import re
 from collections.abc import Iterable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, NamedTuple
+from typing import TYPE_CHECKING, Any, NamedTuple
+
+if TYPE_CHECKING:
+    from forever.pipeline.dbcache import DBCache
 
 JOURNAL_NAME = "hotfixes.json"
 SCHEMA_VERSION = 1
@@ -268,3 +271,10 @@ def hotfix_assumption(entity: Mapping[str, Any], applied: set[str] | None = None
     if pushes and applied and set(pushes) <= applied:
         return f"corrigé par le serveur (poussée {', '.join(pushes)}), valeur appliquée (révision {revision or '?'})"
     return f"corrigé par le serveur le {entity['date']}, valeur non appliquée : forever hotfixes --values"
+
+
+def pending_hotfixes(cache: DBCache, sources: Mapping[str, Any], rules: Mapping[str, Any]) -> list[tuple[str, int]]:
+    """Correctifs applicables de `cache` (tables lues par le pipeline) absents de la révision installée (bloc
+    `hotfixes` de `sources.json` : appliqués, suppressions absentes, tables sans disposition ou non chargées) ; rend
+    (table, enregistrement), triés. Partagé par la veille et par `forever update` (T08d, bloc E)."""
+    raise NotImplementedError
