@@ -61,7 +61,8 @@ GUARD_REASON = (
 KEPT_STATES = ("approuvée", "faite", "rejetée")  # un passage qui recalcule la même attente ne les écrase pas
 HISTORY_KEPT = 30
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
-PASS_PATHS = ("forever/data/", "docs/research/data-")  # seuls chemins du clone que le passage écrit (`_publish`)
+INVENTORY_DOC = "docs/research/valeurs-ecrites-a-la-main.md"  # rendu de `forever origins inventory` (version courante)
+PASS_PATHS = ("forever/data/", "docs/research/data-", INVENTORY_DOC)  # seuls chemins du clone écrits par `_publish`
 DATA_BRANCH_RE = re.compile(r"data/(?P<version>\d+\.\d+\.\d+\.\d+)-r(?P<revision>\d+)")
 BLOCKED_BY = ("uv_sync", "verify", "ci")  # écriture arrêtée en route : pas de nouvel essai tant que main n'a pas bougé
 AUTO_COMMAND = "forever update --auto"
@@ -1082,6 +1083,7 @@ def _publish(
     report_rel = f"docs/research/data-{version}-r{revision}.md"
     (clone / report_rel).parent.mkdir(parents=True, exist_ok=True)
     (clone / report_rel).write_bytes(_research_report(plan, verdict).encode("utf-8"))
+    _render_inventory(data, clone / INVENTORY_DOC)
     run.say(f"{step} : uv sync dans le clone")
     synced = runner(["uv", "sync", "--frozen", "--offline"], clone, None)
     if synced.returncode != 0:
@@ -1107,7 +1109,7 @@ def _publish(
     run.say(f"{step} : verify vert ; commit et poussée de {branch}")
     if gitops.drop_stale_branch(runner, clone, branch):
         run.say(f"{step} : branche {branch} d'un essai abandonné retirée")
-    sha = gitops.commit_branch(runner, clone, branch, ["forever/data", report_rel], message)
+    sha = gitops.commit_branch(runner, clone, branch, ["forever/data", report_rel, INVENTORY_DOC], message)
     gitops.push(runner, clone, branch)
     run.say(f"{step} : CI attendue sur {branch} ({sha[:12]}, jusqu'à {UPDATE_CI_TIMEOUT.total_seconds() / 60:.0f} min)")
     ci = gitops.wait_ci(runner, clone, branch, sha, UPDATE_CI_TIMEOUT.total_seconds())
@@ -1129,6 +1131,19 @@ def _publish(
     return Step(
         step, "fait", f"{version} r{revision} installée par le clone ({sha[:12]}) : `git pull` dans la session", info
     )
+
+
+def _render_inventory(data: Path, doc: Path) -> None:
+    """Inventaire committé des valeurs écrites à la main, rendu pour la version courante après l'installation
+    (fichier dérivé : `test_origins_inventory` le compare au rendu de la commande, décision 192)."""
+    from forever.origins import inventory, render_inventory
+
+    version = _installed(data)
+    if version is None:
+        return
+    rows, pending = inventory(data, version)
+    doc.parent.mkdir(parents=True, exist_ok=True)
+    doc.write_bytes(render_inventory(version, rows, pending).encode("utf-8"))
 
 
 def _save_output(run: _Run, name: str, command: Sequence[str], out: Any) -> Path:
