@@ -122,7 +122,8 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   0,0261 (Muglash gardé, seul point du niveau 25) à 0,0323 (Sarilus Foulborne gardé) autour de 0,0299 ; au niveau 60,
   les PV extrapolés (suppose) vont de 7 047 à 9 023 dans l'intervalle à 95 %. Une pondération par le nombre de PNJ ne
   stabilise pas la pente (amplitude au retrait d'un PNJ inchangée en r5, plus forte en r4) ; Theil-Sen pondéré la
-  stabilise (0,0248 en r4, 0,0251 en r5). Proposition non appliquée :
+  stabilise (0,0248 en r4, 0,0251 en r5) : **retenu le 2026-10-06 (décision 190, révision 6)**. Reste ouverte la
+  validité de l'extrapolation au-delà du niveau 24 (MON1) et la bande d'incertitude :
   [modeling-decisions.md](modeling-decisions.md#correction-questie). Test : comparaison des méthodes sur chaque
   nouvelle mesure, puis journaux des niveaux 25 à 30 (MON1). Priorité : haute. Registre H11.
 - **MON2 — Les PNJ au-dessus de la valeur de leur niveau (ours, PNJ renforcés, Sarilus Foulborne) suivent-ils une

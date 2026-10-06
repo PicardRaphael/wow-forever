@@ -39,7 +39,7 @@ entrées ci-dessous y sont déplacées sans changement de fond.
   corrigée (pente 0,0299) : garder Muglash, seul point du niveau 25, la ramène à 0,0261 ; Vorsha the Lasher, à
   0,0285 ; Ilkrud Magthrull, à 0,0312 ; Sarilus Foulborne, à 0,0323 ; Talen, Therylune, Gamon et Teo Hammerstorm
   n'y changent rien.
-- **Proposition, non appliquée** (sonde du 2026-10-06, mêmes paires que `fit_questie_correction`, intervalle à 95 %
+- **Retenue le 2026-10-06 : Theil-Sen pondéré** (décision 190, révision 6 de 1.60.1.70170). Comparaison faite avant le choix (sonde du 2026-10-06, mêmes paires que `fit_questie_correction`, intervalle à 95 %
   par rééchantillonnage des PNJ, 4 000 tirages, graine 12345 ; PV = médiane Questie des PNJ normaux × rapport) :
 
   | Méthode | Révision | Pente [IC 95 %] | Retrait d'un PNJ | PV 25 | PV 30 | PV 40 | PV 60 |
@@ -56,5 +56,5 @@ entrées ci-dessous y sont déplacées sans changement de fond.
   médiane des résidus) résiste à un point isolé : pente presque identique en r4 et en r5, amplitude au retrait d'un
   PNJ divisée par 2 (r5) à 10 (r4). Extrapolation bornée proposée : au-delà du dernier niveau mesuré, valeur centrale
   avec sa bande à 95 % dans `monsters.json`, certitude `suppose`, et le simulateur avertit quand le niveau joué est
-  hors de la plage mesurée. À décider avec l'utilisateur ; tout changement de méthode passe par une révision des
-  données et un rejeu des builds.
+  hors de la plage mesurée : **non retenue à ce jour** (seule la méthode d'ajustement a été choisie) ; les niveaux
+  au-delà de la plage mesurée restent `suppose`.
