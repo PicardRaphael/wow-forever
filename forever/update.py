@@ -400,8 +400,15 @@ def _hotfix_source(run: _Run, version: str, archive: Path, rules: Mapping[str, A
     except DataSchemaError as exc:
         raise _NeedLayouts(sorted(set(tables)), exc.message) from exc
     missing = sorted({t for t in tables if t not in layouts})
+    if missing and run.options.network:
+        # commit épinglé antérieur au build (relevé du 2026-10-06 : épinglé avant la sortie de 70235) : `master` est
+        # relu et épinglé de nouveau, puis les dispositions sont rechargées ; jamais celles d'un build voisin
+        fetch_dbd(run.deps_on(run.base_data), version, wanted, refresh=True)
+        layouts, dbd = load_dbd_layouts(run.deps.cache_dir, version, wanted)
+        missing = sorted({t for t in tables if t not in layouts})
     if missing:
-        raise _NeedLayouts(missing, f"WoWDBDefs sans disposition pour le build {version}")
+        commit = str(dbd.get("commit") or "?")[:12]
+        raise _NeedLayouts(missing, f"WoWDBDefs (commit {commit}) sans disposition pour le build {version}")
     journal = hotfixes.load_journal(run.deps.cache_dir)
     return hotfix_source(archive, layouts, dbd, journal, version, rules, run.now)
 
