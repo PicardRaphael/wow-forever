@@ -474,7 +474,7 @@ def _evaluate(
         )
     verdict = decide(bool(verify["ok"]), carry, inputs, kind, install_ok=install_ok)
     fingerprint = candidate_fingerprint(stage if install_ok else candidate)
-    pending_id = f"{version}-r{revision}-{fingerprint}"
+    pending_id = f"{version}-r{revision}-{content_fingerprint(after)}"
     approved = verdict.action == "attente" and _approved(run, pending_id)
     action = "écrire" if approved else verdict.action
     doc = {
@@ -803,7 +803,7 @@ def _annotate_revision(vdir: Path, verdict: Mapping[str, Any], command: str) -> 
     }}  # fmt: skip
     if verdict.get("approved"):
         last["approval"] = verdict["id"]
-    path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
     write_manifest(vdir.parent)
 
 
@@ -985,6 +985,21 @@ def candidate_fingerprint(root: Path) -> str:
     for path in sorted(p for p in root.rglob("*") if p.is_file() and "__pycache__" not in p.parts):
         digest.update(path.relative_to(root).as_posix().encode("utf-8") + b"\0")
         digest.update(hashlib.sha256(path.read_bytes()).digest())
+    return digest.hexdigest()[:12]
+
+
+def content_fingerprint(version_dir: Path) -> str:
+    """Empreinte courte du **contenu** d'une version (JSON triés, sans métadonnées ni fichiers de provenance) : elle
+    nomme une attente et reste la même d'un passage à l'autre si le client ne change rien (les dates de lecture et
+    de révision n'y entrent pas), pour qu'une approbation soit consommée par le passage suivant."""
+    from forever.engine_inputs import PROVENANCE_FILES, canonical_sha, metadata_keys
+
+    metadata = metadata_keys(version_dir)
+    digest = hashlib.sha256()
+    for path in sorted(version_dir.glob("*.json")):
+        if path.name in PROVENANCE_FILES:
+            continue
+        digest.update(path.name.encode("utf-8") + b"\0" + canonical_sha(_read(path), None, metadata).encode("ascii"))
     return digest.hexdigest()[:12]
 
 

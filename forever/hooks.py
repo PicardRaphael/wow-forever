@@ -10,12 +10,17 @@ from __future__ import annotations
 
 import json
 import re
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from forever.config import REPO_ROOT, Deps
+
+if TYPE_CHECKING:
+    from forever.pipeline.gitops import Runner
+
+Spawn = Callable[[Sequence[str]], None]
 
 _NUM = r"\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:[.,]\d+)?|\d+(?:[.,]\d+)?"
 _UNITS = (
@@ -386,8 +391,27 @@ def _inside(path: Path, root: Path) -> bool:
     return True
 
 
+def update_kickoff(deps: Deps, environ: Mapping[str, str], spawn: Spawn | None) -> None:
+    """Démarrage de session (T08d, bloc G) : archivage des fichiers du client, puis passage `forever update --auto`
+    détaché si aucun verrou n'est vivant et que le dernier passage a plus de 6 h. Jamais sans dossier du client ni
+    avec FOREVER_OFFLINE ; ne lève jamais."""
+    raise NotImplementedError
+
+
+def update_line(deps: Deps, repo_root: Path, runner: Runner | None = None) -> str | None:
+    """Partie « mise à jour » de la ligne de démarrage, sans réseau : passage en cours, attentes, `git pull` à
+    faire quand `main` distant (relevé par le clone dédié) a avancé ; None s'il n'y a rien. Ne lève jamais."""
+    raise NotImplementedError
+
+
 def session_start_output(
-    hook_input: Mapping[str, Any], deps: Deps, environ: Mapping[str, str], repo_root: Path = REPO_ROOT
+    hook_input: Mapping[str, Any],
+    deps: Deps,
+    environ: Mapping[str, str],
+    repo_root: Path = REPO_ROOT,
+    *,
+    spawn: Spawn | None = None,
+    runner: Runner | None = None,
 ) -> dict[str, Any] | None:
     """Sortie du hook SessionStart : la ligne (visible et ajoutée au contexte) si la session s'ouvre dans le dépôt ;
     None ailleurs."""

@@ -49,3 +49,35 @@ def test_measures_refresh_reads_the_disk_only():
     """T04c : `forever measures refresh` lit les journaux et SavedVariables sur disque, sans aucun module réseau."""
     assert network_uses(PACKAGE / "pipeline" / "refresh.py") == set()
     assert network_uses(PACKAGE / "pipeline" / "measure.py") == set()
+
+
+# --- T08d, bloc G : git et `gh` du clone dédié ----------------------------------------------------------------
+
+
+def imported_modules(path):
+    found = set()
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Import):
+            found |= {alias.name for alias in node.names}
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            found.add(node.module)
+    return found
+
+
+def test_subprocess_only_in_gitops_and_the_detached_launch():
+    """git et `gh` (réseau : fetch, push, API GitHub) ne passent que par `forever/pipeline/gitops.py` ; le seul autre
+    sous-processus est le lancement détaché de `forever update` (`forever/spawn.py`, interpréteur Python)."""
+    users = {
+        str(path.relative_to(PACKAGE).as_posix())
+        for path in PACKAGE.rglob("*.py")
+        if "subprocess" in imported_modules(path)
+    }
+    assert users == {"pipeline/gitops.py", "spawn.py"}
+    spawn = (PACKAGE / "spawn.py").read_text(encoding="utf-8")
+    assert '"git"' not in spawn and '"gh"' not in spawn
+
+
+def test_update_imports_no_network_module_nor_subprocess():
+    path = PACKAGE / "update.py"
+    assert network_uses(path) == set()
+    assert "subprocess" not in imported_modules(path)
