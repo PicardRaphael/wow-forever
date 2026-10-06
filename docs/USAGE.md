@@ -86,7 +86,12 @@ uv run forever addons inventory <dossier>    # métadonnées et empreintes d'un 
 Au démarrage d'une session dans le dépôt, le hook archive les fichiers du client et lance `forever update --auto`
 en arrière-plan (au plus toutes les 6 h, jamais si un passage tourne) ; la ligne de démarrage montre les attentes et
 propose `git pull` quand `main` distant a reçu des données. Une attente `bloqué` (verify rouge, installation refusée
-par les règles de fusion, valeur perdue) n'est pas approuvable : elle demande une session.
+par les règles de fusion, valeur perdue) n'est pas approuvable : elle demande une session. Une colonne renommée par
+le client (aucun de ses noms dans le CSV) donne une attente `column_names`, avec le nom proposé : elle se traite en
+session (ajouter le nouveau nom en tête de la liste, `forever/pipeline/tables.py` et `decode_rules.json`) et
+`approve` la refuse (décision 185). Garde-fou (décision 184) : tant qu'aucun passage réel n'a été approuvé, la
+première écriture de `forever update --auto` reste en attente de `forever update approve <id>`. Un journal de combat
+n'est noté comme mesuré qu'une fois sa mesure écrite par `forever measures refresh` (décision 187).
 
 Tâche planifiée Windows (une fois par jour, 2 h au plus ; remplace la tâche « veille locale ») :
 ```powershell
