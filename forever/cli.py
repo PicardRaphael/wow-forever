@@ -103,6 +103,7 @@ from forever.pipeline.refresh import (
     apply_refresh,
     collect_sources,
     compare,
+    curve_candidates,
     curve_exclusions,
     read_snapshot,
     remeasure,
@@ -2410,6 +2411,7 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
         new["notes"].append("instantané illisible (<cache>/measures/last.json) : traité comme un premier instantané")
     diff = compare(installed, registry.load(deps.registry_path), previous, new)
     diff["measures"]["held_back"] = [h._asdict() for h in held]
+    diff["curve_candidates"] = curve_candidates(new["monsters"], questie)  # proposés, jamais écartés sans accord
     written: list[Path] = []
     if not diff["changed"]:
         status = "rien à écrire"
@@ -2436,6 +2438,16 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     }
     lines = _refresh_lines(sources, diff, status)
     lines += [f"  {h.name} retenu · client {h.client_version} · {h.reason}" for h in held]
+    for c in diff["curve_candidates"]:
+        where = "absent de Questie" if c["spawn_points"] is None else f"{c['spawn_points']} point(s) d'apparition"
+        levels = ", ".join(
+            f"niveau {lv['level']} : {lv['max_hp']} PV (courbe {lv['curve'] if lv['curve'] is not None else '?'})"
+            for lv in c["levels"]
+        )
+        lines.append(
+            f"  candidat à l'écartement · {c['name']} ({c['npc_id']}) · {where} · {levels} · "
+            "--curve-exclude après accord"
+        )
     _emit(payload, lines, provenance, args.json)
     return EXIT_OK
 

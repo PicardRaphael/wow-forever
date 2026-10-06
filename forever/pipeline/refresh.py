@@ -46,6 +46,7 @@ from forever.registry import Mechanic
 
 SNAPSHOT_DIR = "measures"
 SNAPSHOT_NAME = "last.json"
+UNIQUE_SPAWN_POINTS = 1  # PNJ unique d'après Questie : au plus un point d'apparition (règle du 2026-10-06)
 LOGGER_SV, QUESTIE_SV = "ForeverLogger.lua", "Questie.lua"
 SV_NAMES = (LOGGER_SV, QUESTIE_SV)
 MEASURE_KEYS = ("sources", "b1", "a3", "costs", "cast_times", "crits", "ignite")
@@ -184,7 +185,24 @@ def curve_exclusions(
 def curve_candidates(table: Mapping[str, Any], questie: QuestieDB | None) -> list[dict[str, Any]]:
     """PNJ mesurés proposés pour l'écartement de la courbe (jamais écartés sans accord) : au plus
     `UNIQUE_SPAWN_POINTS` point d'apparition dans Questie, ou absents de Questie ; PV comparés à la courbe."""
-    raise NotImplementedError
+    if questie is None:
+        return []
+    excluded = {int(e["npc_id"]) for e in table.get("curve_excluded", []) or []}
+    curve = table.get("hp_by_level", {}) or {}
+    out: list[dict[str, Any]] = []
+    for npc_id, entry in sorted(((int(k), v) for k, v in (table.get("npcs") or {}).items())):
+        if npc_id in excluded:
+            continue
+        points = questie.spawn_points(npc_id)
+        if points is not None and points > UNIQUE_SPAWN_POINTS:
+            continue
+        levels = []
+        for level, measure in sorted(((int(k), v) for k, v in entry["levels"].items())):
+            value = (curve.get(str(level)) or {}).get("value")
+            hp = int(measure["max_hp"])
+            levels.append({"level": level, "max_hp": hp, "curve": value, "ratio": hp / value if value else None})
+        out.append({"npc_id": npc_id, "name": entry["name"], "spawn_points": points, "levels": levels})
+    return out
 
 
 def remeasure(

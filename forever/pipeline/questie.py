@@ -101,6 +101,7 @@ class QuestieDB:
     def __init__(self, addon_dir: Path, info: QuestieInfo) -> None:
         self.addon_dir = addon_dir
         self.info = info
+        self._spawns: dict[int, int] = {}  # points d'apparition, remplis avec les PNJ
 
     @property
     def source(self) -> str:
@@ -130,10 +131,13 @@ class QuestieDB:
         if not isinstance(raw, dict):
             raise DataSchemaError(f"Questie : {NPC_DB} : table de PNJ attendue.")
         out: dict[int, QuestieNpc] = {}
+        spawn_key = keys.get("spawns")
         for npc_id, row in raw.items():
             if not isinstance(npc_id, int) or not isinstance(row, list | dict):
                 continue
             fields = row if isinstance(row, dict) else dict(enumerate(row, start=1))
+            if spawn_key is not None:
+                self._spawns[npc_id] = _count_points(fields.get(spawn_key))
             values = [fields.get(keys[f]) for f in NPC_FIELDS]
             name, *numbers = values
             if not isinstance(name, str) or not all(isinstance(v, int) for v in numbers):
@@ -150,7 +154,9 @@ class QuestieDB:
     def spawn_points(self, npc_id: int) -> int | None:
         """Nombre de points d'apparition du PNJ (champ `spawns`, toutes zones ; 0 sans apparition) ; None si le PNJ
         est absent de la base."""
-        raise NotImplementedError
+        if npc_id not in self._npcs:
+            return None
+        return self._spawns.get(npc_id, 0)
 
     @cached_property
     def _xp(self) -> dict[int, tuple[int, int]]:
@@ -272,6 +278,17 @@ def _keys(text: str, data: str, fields: tuple[str, ...], name: str) -> dict[str,
     if missing:
         raise DataSchemaError(f"Questie : {name} sans {', '.join(missing)}.")
     return keys
+
+
+def _count_points(spawns: object) -> int:
+    """Points d'apparition d'un champ `spawns` ({zone = {{x, y}, …}}, ou nil)."""
+    if isinstance(spawns, dict):
+        zones: list[object] = list(spawns.values())
+    elif isinstance(spawns, list):
+        zones = list(spawns)
+    else:
+        return 0
+    return sum(len(points) for points in zones if isinstance(points, list | dict))
 
 
 def _npc_keys(text: str) -> dict[str, int]:

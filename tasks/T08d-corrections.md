@@ -28,19 +28,22 @@ qui est fausse, pas le code.
      assert main(["update", "--dry-run", "--json", "--only", "jeu"], deps) == EXIT_PENDING
 ```
 
-## 2. `tests/unit/test_monsters.py::test_installed_table_is_read_by_game_data` (révision 5 de 70170)
+## 2. `tests/unit/test_monsters.py::test_installed_table_is_read_by_game_data` (révision 5 de 70170) — révisée
 
-**Constat.** Le test affirme `hp_by_level[25].certainty == "probable"` (« un seul PNJ nommé » : Sarilus Foulborne).
-La révision 5 (accord du 2026-10-06) mesure aussi Muglash (12717) au niveau 25, avec la même valeur.
+Première version accordée le 2026-10-06 (`certain`, deux PNJ concordants), devenue fausse avant d'être appliquée :
+la règle des PNJ nommés de quête (décision 189) écarte de la courbe Sarilus Foulborne et Muglash, les deux seuls PNJ
+mesurés au niveau 25.
 
-**Preuve.** `forever/data/1.60.1.70170/monsters.json` : `hp_by_level["25"]` = 927, `certain`, « valeur commune des
-PNJ normaux observés », `n_npcs` 2 ; `npcs["3986"]` (Sarilus Foulborne) et `npcs["12717"]` (Muglash) : 927 au niveau 25.
+**Preuve.** `forever/data/1.60.1.70170/monsters.json` (r5 corrigée) : `hp_by_level["25"]` vient de Questie corrigé,
+certitude `suppose` ; `questie_correction.range` = [1, 24] (le niveau 25 est hors de la plage mesurée, d'où
+`suppose`, règle de T04b citée dans le test lui-même) ; Sarilus Foulborne (3986) et Muglash (12717) dans
+`curve_excluded`, raison « PNJ nommé de quête ».
 
 **Diff proposé** (une assertion et son commentaire) :
 
 ```diff
 -    assert monsters.hp_by_level[25].certainty == "probable"  # un seul PNJ nommé
-+    assert monsters.hp_by_level[25].certainty == "certain"  # deux PNJ concordants (révision 5)
++    assert monsters.hp_by_level[25].certainty == "suppose"  # PNJ nommés écartés : hors de la plage mesurée (r5)
 ```
 
 ## 3. `tests/unit/test_update_publish.py` (4 tests, garde-fou de la décision 184)
