@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Any
 
 from forever.addons import DATA_ADDONS, _files, _folders, fingerprint
+from forever.archive import archive_client_files, archive_line
 from forever.config import Deps
 from forever.errors import DataSchemaError
 from forever.pipeline import dbcache, hotfixes
@@ -62,7 +63,14 @@ def watch(deps: Deps, *, report: bool = False) -> dict[str, Any]:
     events: list[dict[str, Any]] = []
     wow = deps.wow_dir
     if wow is None or not wow.is_dir():
-        return {"events": [], "wow_dir": None, "checked_at": format_utc(deps.now())}
+        return {
+            "events": [],
+            "wow_dir": None,
+            "checked_at": format_utc(deps.now()),
+            "archived": [],
+            "archive_errors": [],
+        }
+    archived = archive_client_files(deps)  # T08d : copie par build de DBCache.bin et Hotfix.log (décision 182)
     build = read_build_info(wow)
     new["build"] = build.build if build else None
     if new["build"] != old.get("build"):
@@ -170,7 +178,17 @@ def watch(deps: Deps, *, report: bool = False) -> dict[str, Any]:
             if event is not None:
                 events.append(event)
     _write(state_path, new)
-    result = {"events": events, "wow_dir": str(wow), "checked_at": format_utc(deps.now())}
+    result = {
+        "events": events,
+        "wow_dir": str(wow),
+        "checked_at": format_utc(deps.now()),
+        "archived": [
+            {"kind": c.kind, "build": c.build, "file": c.path.name, "sha256": c.sha256, "new": c.new}
+            for c in archived.copies
+            if c.new
+        ],
+        "archive_errors": archived.errors,
+    }
     if report:
         _write(deps.cache_dir.joinpath(*REPORT), result)
     return result
@@ -270,6 +288,9 @@ def watch_line(deps: Deps) -> str | None:
         ]
         if pending and not parts:
             parts += [str(e.get("detail")) for e in pending[:3]]
+        failing = archive_line(deps.cache_dir)
+        if failing:
+            parts.append(failing)
         if not parts:
             return None
         return ("Veille : " + " ; ".join(parts) + " : `forever watch` pour le détail").replace("\n", " ")

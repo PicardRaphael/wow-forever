@@ -1957,6 +1957,11 @@ def _cmd_watch(deps: Deps, args: argparse.Namespace) -> int:
         lines += [
             f"    proposé : {a['command']}" + (" (réseau, sur accord)" if a["network"] else "") for a in e["actions"]
         ]
+    names = {"dbcache": "DBCache.bin", "hotfix_log": "Hotfix.log"}
+    lines += [
+        f"  archivé : {names.get(a['kind'], a['kind'])} {a['build']} (nouvelle copie)" for a in result["archived"]
+    ]
+    lines += [f"  archivage : {err}" for err in result["archive_errors"]]
     _emit({**result, "provenance": provenance}, lines, provenance, args.json)
     return EXIT_OK
 
