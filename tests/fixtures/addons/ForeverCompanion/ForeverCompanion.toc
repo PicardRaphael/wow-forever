@@ -1,0 +1,6 @@
+## Interface: 16001
+## Title: Forever Companion (fixture)
+## Version: 1.0.0
+## Author: Fixture Author
+## SavedVariables: ForeverCompanionDB
+## X-Website: https://example.invalid

@@ -1,0 +1,2 @@
+-- interface (fixture)
+local frame = {}

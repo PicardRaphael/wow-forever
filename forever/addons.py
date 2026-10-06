@@ -203,3 +203,24 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
 def fingerprint_folder(folder: Path) -> str:
     """Empreinte d'un dossier d'addon (méthode de `fingerprint`), sans relevé précédent."""
     return fingerprint(_files(folder.parent, [folder], {}))
+
+
+# --- T08d, bloc D : addons d'interface, addons non inventoriés, version de contenu, inventaire -----------------
+
+UI_ADDONS: tuple[str, ...] = ("EllesmereUI*", "Leatrix_Maps", "ForeverMapFix")  # notés sans lecture hors du .toc
+
+
+def content_version(name: str, folder: Path) -> dict[str, Any] | None:
+    """Version du contenu portée par les données de l'addon (Talents Forever, Forever Companion), sinon None."""
+    raise NotImplementedError
+
+
+def untracked_addons(addons_dir: Path) -> list[dict[str, Any]]:
+    """Dossiers ni suivis ni modules d'un addon suivi : `interface`, `pas_un_addon` ou `non_inventorié`."""
+    raise NotImplementedError
+
+
+def inventory(folder: Path) -> dict[str, Any]:
+    """Métadonnées du `.toc`, licence, fichiers et empreintes, en-têtes de génération, clés des tables globales ;
+    aucune valeur, rien n'est écrit."""
+    raise NotImplementedError

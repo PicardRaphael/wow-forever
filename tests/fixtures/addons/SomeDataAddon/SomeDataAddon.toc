@@ -1,0 +1,5 @@
+## Interface: 16001
+## Title: Some Data Addon
+## Version: 2.1
+## X-License: MIT
+## SavedVariables: SomeDataAddonDB
