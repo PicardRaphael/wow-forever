@@ -29,3 +29,32 @@ entrées ci-dessous y sont déplacées sans changement de fond.
 ## Données : copies du seed
 
 - Données (T06b, décision 98) : le mode seed d'une version future a besoin des copies `_seed_*.json` ; `forever decode` ne les hérite pas (comme `_source_gunba_mage_tree.json`). À reprendre par l'installation d'une nouvelle version (T08) : copier les copies du seed, ou limiter le mode seed à 1.60.1.70009.
+
+## Correction Questie
+
+- Correction Questie → Forever (T04b, registre H11 ; sensibilité relevée le 2026-10-06, T08d, question MON6) :
+  médiane des rapports « PV mesuré / PV Questie » par niveau, moindres carrés **non pondérés** sur les médianes
+  supérieures à 1, rapport hors mesure = max(1, droite). Chaque niveau pèse autant, qu'il compte 11 PNJ (niveau 19)
+  ou un seul (niveaux 21 et 24 en r5), et le haut de la plage décide de la pente. Décomposition sur la révision 5
+  corrigée (pente 0,0299) : garder Muglash, seul point du niveau 25, la ramène à 0,0261 ; Vorsha the Lasher, à
+  0,0285 ; Ilkrud Magthrull, à 0,0312 ; Sarilus Foulborne, à 0,0323 ; Talen, Therylune, Gamon et Teo Hammerstorm
+  n'y changent rien.
+- **Proposition, non appliquée** (sonde du 2026-10-06, mêmes paires que `fit_questie_correction`, intervalle à 95 %
+  par rééchantillonnage des PNJ, 4 000 tirages, graine 12345 ; PV = médiane Questie des PNJ normaux × rapport) :
+
+  | Méthode | Révision | Pente [IC 95 %] | Retrait d'un PNJ | PV 25 | PV 30 | PV 40 | PV 60 |
+  | --- | --- | --- | --- | --- | --- | --- | --- |
+  | actuelle | r4 | 0,0238 [0,0196 ; 0,0358] | 0,0232 à 0,0262 | 1 010 | 1 540 | 3 110 | 7 420 |
+  | actuelle | r5 | 0,0299 [0,0211 ; 0,0339] | 0,0285 à 0,0312 | 1 064 | 1 647 | 3 404 | 8 374 |
+  | pondérée par le nombre de PNJ | r4 | 0,0245 [0,0196 ; 0,0407] | 0,0243 à 0,0290 | 1 012 | 1 547 | 3 136 | 7 517 |
+  | pondérée par le nombre de PNJ | r5 | 0,0318 [0,0219 ; 0,0371] | 0,0298 à 0,0325 | 1 080 | 1 680 | 3 494 | 8 669 |
+  | Theil-Sen pondéré | r4 | 0,0248 [0,0240 ; 0,0340] | 0,0247 à 0,0250 | 1 013 | 1 550 | 3 144 | 7 547 |
+  | Theil-Sen pondéré | r5 | 0,0251 [0,0245 ; 0,0351] | 0,0250 à 0,0262 | 1 016 | 1 555 | 3 159 | 7 597 |
+
+  Les moindres carrés pondérés ne stabilisent pas : le niveau 19 (11 PNJ, rapport 1,42, au-dessus de ses voisins)
+  pèse alors le plus. Theil-Sen pondéré (médiane des pentes entre paires de niveaux, poids n_i × n_j ; ordonnée =
+  médiane des résidus) résiste à un point isolé : pente presque identique en r4 et en r5, amplitude au retrait d'un
+  PNJ divisée par 2 (r5) à 10 (r4). Extrapolation bornée proposée : au-delà du dernier niveau mesuré, valeur centrale
+  avec sa bande à 95 % dans `monsters.json`, certitude `suppose`, et le simulateur avertit quand le niveau joué est
+  hors de la plage mesurée. À décider avec l'utilisateur ; tout changement de méthode passe par une révision des
+  données et un rejeu des builds.

@@ -116,6 +116,15 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   sur les niveaux 1 à 22 et le plafond de la bêta est 30. Test : journaux de leveling des niveaux 22 à 30 hors des
   zones déjà mesurées. Priorité : haute. Registre H11. [Détail](research/questions-ouvertes-detail.md#mon1),
   [révision 2](research/data-1.60.1.70170-r2.md)
+- **MON6 — Quelle méthode d'ajustement pour la correction Questie → Forever ?** Ajoutée le 2026-10-06 (T08d,
+  révision 5 de 70170). La droite des moindres carrés donne le même poids à chaque niveau, qu'il compte 11 PNJ ou un
+  seul, et le haut de la plage décide de la pente : en r5, garder ou écarter un seul PNJ nommé la fait varier de
+  0,0261 (Muglash gardé, seul point du niveau 25) à 0,0323 (Sarilus Foulborne gardé) autour de 0,0299 ; au niveau 60,
+  les PV extrapolés (suppose) vont de 7 047 à 9 023 dans l'intervalle à 95 %. Une pondération par le nombre de PNJ ne
+  stabilise pas la pente (amplitude au retrait d'un PNJ inchangée en r5, plus forte en r4) ; Theil-Sen pondéré la
+  stabilise (0,0248 en r4, 0,0251 en r5). Proposition non appliquée :
+  [modeling-decisions.md](modeling-decisions.md#correction-questie). Test : comparaison des méthodes sur chaque
+  nouvelle mesure, puis journaux des niveaux 25 à 30 (MON1). Priorité : haute. Registre H11.
 - **MON2 — Les PNJ au-dessus de la valeur de leur niveau (ours, PNJ renforcés, Sarilus Foulborne) suivent-ils une
   règle commune ?** Test : d'autres ours et PNJ des mêmes familles à niveau connu. Priorité : moyenne. Registre H11.
   [Détail](research/questions-ouvertes-detail.md#mon2)
