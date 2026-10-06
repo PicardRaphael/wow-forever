@@ -20,6 +20,7 @@ from typing import Any, NoReturn, cast
 
 from forever import registry
 from forever.addons import addons_status
+from forever.addons import inventory as addons_inventory
 from forever.build import CONTEXTS, build_report
 from forever.chart import leveling_chart
 from forever.config import CHAIN_MAX_GAP_S, FETCH_TIMEOUT, Deps, default_deps
@@ -351,6 +352,10 @@ def build_parser() -> argparse.ArgumentParser:
     a_status.add_argument("--dir", help="dossier des addons (défaut : <FOREVER_WOW_DIR>/Interface/AddOns)")
     a_status.add_argument("--save", action="store_true", help="enregistrer le relevé dans le cache")
     a_status.add_argument("--json", action="store_true", help="sortie JSON")
+    a_inv = addons_sub.add_parser("inventory", help="métadonnées et empreintes d'un addon, sans aucune valeur (T08d)")
+    a_inv.add_argument("folder", help="dossier de l'addon (nom dans le dossier des addons, ou chemin)")
+    a_inv.add_argument("--dir", help="dossier des addons (défaut : <FOREVER_WOW_DIR>/Interface/AddOns)")
+    a_inv.add_argument("--json", action="store_true", help="sortie JSON")
 
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
@@ -1966,7 +1971,36 @@ def _cmd_watch(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_addons_inventory(deps: Deps, args: argparse.Namespace) -> int:
+    root = Path(args.dir) if args.dir else (deps.wow_dir / "Interface" / "AddOns" if deps.wow_dir else None)
+    folder = Path(args.folder)
+    if not folder.is_dir() and root is not None:
+        folder = root / args.folder
+    if not folder.is_dir():
+        raise InvalidArgumentError(
+            f"Dossier d'addon introuvable : {args.folder}.", "donner le nom du dossier et --dir, ou un chemin"
+        )
+    report = addons_inventory(folder)
+    provenance = local_provenance(
+        deps, certainty="suppose", assumptions=["inventaire d'un addon : métadonnées et empreintes, aucune valeur"]
+    )
+    lic = report["license"]
+    lines = [
+        f"Inventaire de {report['folder']} {report['toc'].get('Version', '?')} (empreinte {report['fingerprint']})",
+        f"  titre : {report['toc'].get('Title', '?')} ; interface : {report['toc'].get('Interface', '?')}",
+        f"  licence : {lic['source'] + (' ' + lic['name'] if lic.get('name') else '') if lic else 'aucune'}",
+        f"  SavedVariables : {', '.join(report['saved_variables']) or 'aucune'}",
+        f"  fichiers de données : {report['files']['count']} ({report['files']['total_size']} octets)",
+    ]
+    lines += [f"    {f['path']} : {' / '.join(f['header'])}" for f in report["files"]["list"] if f["header"]]
+    lines += [f"  table {name} : {len(keys)} clé(s)" for name, keys in report["globals"].items()]
+    _emit({**report, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
+    if args.addons_command == "inventory":
+        return _cmd_addons_inventory(deps, args)
     report = addons_status(deps, save=args.save, addons_dir=Path(args.dir) if args.dir else None)
     provenance = local_provenance(
         deps, certainty="suppose", assumptions=["addons communautaires : versions et empreintes, lecture locale"]
@@ -1989,8 +2023,24 @@ def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
             lines.append(
                 f"    agrégats changés : {len(a['aggregates_diff'])} ; dépendants : {', '.join(a.get('depends', []))}"
             )
+        if a.get("content_version"):
+            content = ", ".join(f"{k} {v}" for k, v in a["content_version"].items())
+            lines.append(f"    contenu : {content}")
+        if a.get("proposal"):
+            lines.append("    attente proposée (addon_data) : un agrégat du dépôt en dépend")
         if a["status"] == "changé" and a.get("action"):
             lines.append(f"    action proposée : {a['action']}")
+    labels = {
+        "interface": "interface seule",
+        "pas_un_addon": "pas un addon",
+        "non_inventorié": "non inventorié",
+        "sauvegarde": "copie de sauvegarde, non lue",
+    }
+    for u in report.get("untracked", []):
+        lines.append(
+            f"  {u['folder']} {u.get('version') or ''} : {labels.get(u['status'], u['status'])}".replace("  :", " :")
+            + (f" ({u['action']})" if u.get("action") else "")
+        )
     payload = {**report, "provenance": provenance}
     _emit(payload, lines, provenance, args.json)
     return EXIT_OK

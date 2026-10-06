@@ -8,12 +8,11 @@ TalentsForeverBook/Data.lua`) ; rien de l'addon n'est recopié : le rapport ne p
 écarts (nœud, champ, valeur de forever, valeur de Talents Forever). Champs comparés par nœud (`node`) : nom, arbre,
 rangée (`tier`/`row`), colonne, rangs (`max`), sort et prérequis (`req` : rang du talent requis dans la liste de son
 arbre, 1 pour le premier). `--classes-ref` : second fichier (version installée) comparé de même, pour mesurer ce que
-change la candidate. Lecteur durable : FA1."""
+change la candidate. Lecteur : `forever/pipeline/talents_forever.py` (T08d) ; lecteur durable : FA1."""
 
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import sys
 from collections import Counter
@@ -23,81 +22,12 @@ from typing import Any
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from forever.pipeline.lua_table import parse_lua_value_at
+from forever.pipeline.talents_forever import FIELDS, compare, our_trees, read_trees
 
-FIELDS = ("name", "tree", "tier", "col", "max", "spell", "prereq")
+__all__ = ["FIELDS", "compare", "main", "ours", "render", "tf_classes"]
 ADDON = ("Interface", "AddOns", "TalentsForeverBook", "Data.lua")
-
-
-def tf_classes(path: Path) -> tuple[dict[str, Any], dict[str, dict[int, dict[str, Any]]]]:
-    text = path.read_text(encoding="utf-8")
-    start = text.index("{", text.index("TalentsForeverBookData = "))  # première table seulement (structure des arbres)
-    doc, _ = parse_lua_value_at(text, start)
-    assert isinstance(doc, dict)
-    out: dict[str, dict[int, dict[str, Any]]] = {}
-    for file, cls in doc["classes"].items():
-        nodes: dict[int, dict[str, Any]] = {}
-        for tree in cls["trees"]:
-            talents = tree["talents"]
-            for t in talents:
-                if "node" not in t:
-                    continue
-                req = t.get("req")
-                prereq = talents[int(req) - 1].get("node") if isinstance(req, int) and 0 < req <= len(talents) else None
-                nodes[int(t["node"])] = {
-                    "name": t.get("name"),
-                    "tree": tree.get("name"),
-                    "tier": t.get("row"),
-                    "col": t.get("col"),
-                    "max": t.get("max"),
-                    "spell": t.get("spell"),
-                    "prereq": prereq,
-                }
-        out[str(file)] = nodes
-    head = {k: doc.get(k) for k in ("build", "generated", "codeVersion")}
-    return head, out
-
-
-def ours(path: Path) -> dict[str, dict[int, dict[str, Any]]]:
-    doc = json.loads(path.read_text(encoding="utf-8"))
-    out: dict[str, dict[int, dict[str, Any]]] = {}
-    for cls in doc["classes"].values():
-        nodes: dict[int, dict[str, Any]] = {}
-        for tree in cls["trees"]:
-            for t in tree["talents"]:
-                prereq = (t.get("prereq") or {}).get("node_id")
-                nodes[int(t["node_id"])] = {
-                    "name": t.get("name"),
-                    "tree": tree.get("name"),
-                    "tier": t.get("tier"),
-                    "col": t.get("col"),
-                    "max": t.get("max"),
-                    "spell": t.get("spell_id"),
-                    "prereq": prereq,
-                }
-        out[str(cls["file"])] = nodes
-    return out
-
-
-def compare(mine: dict[int, dict[str, Any]], theirs: dict[int, dict[str, Any]]) -> dict[str, Any]:
-    only_mine = sorted(set(mine) - set(theirs))
-    only_theirs = sorted(set(theirs) - set(mine))
-    gaps = []
-    for node in sorted(set(mine) & set(theirs)):
-        for f in FIELDS:
-            if mine[node][f] != theirs[node][f]:
-                gaps.append({"node": node, "field": f, "forever": mine[node][f], "tf": theirs[node][f]})
-    same = len(set(mine) & set(theirs)) - len({g["node"] for g in gaps})
-    # même talent (nom, arbre, rangée, colonne, rangs, sort) porté par un autre nœud des deux côtés
-    key = ("name", "tree", "tier", "col", "max", "spell")
-    by_value = {tuple(theirs[n][k] for k in key): n for n in theirs}
-    moved = []
-    for node in sorted(set(mine)):
-        other = by_value.get(tuple(mine[node][k] for k in key))
-        if other is not None and other != node:
-            moved.append({"name": mine[node]["name"], "forever": node, "tf": other})
-    return {"forever": len(mine), "tf": len(theirs), "same": same, "only_forever": only_mine,
-            "only_tf": only_theirs, "gaps": gaps, "moved": moved}  # fmt: skip
+tf_classes = read_trees  # lecteur déplacé dans forever/pipeline/talents_forever.py (T08d, bloc D)
+ours = our_trees
 
 
 def render(head: dict[str, Any], label: str, results: dict[str, dict[str, Any]], ref: dict[str, Any] | None) -> str:

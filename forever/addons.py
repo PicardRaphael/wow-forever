@@ -11,6 +11,7 @@ Lecture locale seulement ; aucune valeur de jeu dans ce module ni dans le dépô
 
 from __future__ import annotations
 
+import fnmatch
 import hashlib
 import json
 import re
@@ -56,6 +57,14 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         ("forever/data/<version>/pets.json (recoupement)", "forever/data/<version>/pet_rules.json (Guide.lua)"),
         "forever pets crosscheck, puis relire Data/Guide.lua et comparer pet_rules.json",
     ),
+    "TalentsForeverBook": AddonSpec(  # T08d : avancé de FA1 (décision 172), version de contenu dans Data.lua
+        ("TalentsForeverBook",),
+        "forever/pipeline/talents_forever.py",
+        ("recoupement des arbres de forever/data/<version>/classes.json (FA1, DON13)",),
+        "uv run python scripts/compare_talents_forever.py --classes forever/data/<version>/classes.json",
+    ),
+    "ForeverCompanion": AddonSpec(("ForeverCompanion",), "inventaire T08d, lecteur à venir"),
+    "NaowhForever": AddonSpec(("NaowhForever", "NaowhForever_*"), "lecteur à venir (inventaire proposé en T08d)"),
 }
 _VERSION = re.compile(r"^## Version:\s*(.+?)\s*$", re.MULTILINE)
 
@@ -186,6 +195,17 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
             )
             entry["aggregates_diff"] = _aggregate_diff(old.get("aggregates"), aggregates)
             record["aggregates"] = aggregates
+        if name in CONTENT_VERSIONS:
+            cached_cv = old.get("content_version")
+            cv = cached_cv if status == "inchangé" and cached_cv else content_version(name, folders[0])
+            entry["content_version"] = cv
+            entry["previous_content_version"] = old.get("content_version")
+            record["content_version"] = cv
+        if name == "TalentsForeverBook" and status != "inchangé":
+            entry["recheck"] = _talents_recheck(deps, folders[0])
+        if status == "changé" and spec.depends:
+            # un agrégat du dépôt en dépend : attente d'accord proposée (forever update, T08d)
+            entry["proposal"] = {"kind": "addon_data", "depends": list(spec.depends), "action": spec.action}
         if spec.depends:
             entry["depends"] = list(spec.depends)
         if spec.action:
@@ -197,7 +217,8 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
         path.parent.mkdir(parents=True, exist_ok=True)
         doc = {"schema_version": SCHEMA_VERSION, "saved_at": format_utc(deps.now()), "addons": state}
         path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
-    return {"addons_dir": str(root) if root else None, "saved": save, "addons": report}
+    untracked = untracked_addons(root) if root is not None and root.is_dir() else []
+    return {"addons_dir": str(root) if root else None, "saved": save, "addons": report, "untracked": untracked}
 
 
 def fingerprint_folder(folder: Path) -> str:
@@ -210,17 +231,151 @@ def fingerprint_folder(folder: Path) -> str:
 UI_ADDONS: tuple[str, ...] = ("EllesmereUI*", "Leatrix_Maps", "ForeverMapFix")  # notés sans lecture hors du .toc
 
 
+CONTENT_VERSIONS = ("TalentsForeverBook", "ForeverCompanion")
+_TOC_FIELD = re.compile(r"^##\s*([\w-]+)\s*:\s*(.*?)\s*$", re.MULTILINE)
+_GLOBAL_TABLE = re.compile(r"^([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)\s*=\s*\{", re.MULTILINE)
+_LICENSE_FILES = ("LICENSE*", "LICENCE*", "COPYING*")
+
+
 def content_version(name: str, folder: Path) -> dict[str, Any] | None:
-    """Version du contenu portée par les données de l'addon (Talents Forever, Forever Companion), sinon None."""
-    raise NotImplementedError
+    """Version du contenu portée par les données de l'addon (Talents Forever, Forever Companion), sinon None.
+
+    Lecture par `lua_table`, jamais par du Lua exécuté ; None si le fichier manque ou ne se lit pas."""
+    from forever.pipeline.lua_table import parse_lua_value_at
+
+    try:
+        if name == "TalentsForeverBook":
+            from forever.pipeline.talents_forever import read_head_and_doc
+
+            head, _ = read_head_and_doc(folder / "Data.lua")
+            return head
+        if name == "ForeverCompanion":
+            text = (folder / "Data" / "Meta.lua").read_text(encoding="utf-8")
+            meta, _ = parse_lua_value_at(text, text.index("{", text.index("ForeverCompanionData.meta =")))
+            return {k: meta.get(k) for k in ("dataVersion", "updated")} if isinstance(meta, dict) else None
+    except (OSError, ValueError, KeyError):
+        return None
+    return None
+
+
+def _talents_recheck(deps: Deps, folder: Path) -> dict[str, Any] | None:
+    """Recoupement des arbres de Talents Forever avec `classes.json` installé : comptes seulement."""
+    from forever.pipeline.talents_forever import crosscheck
+    from forever.store import current_identity
+
+    try:
+        version = current_identity(deps.data_dir).game_version
+        totals: dict[str, Any] = crosscheck(folder / "Data.lua", deps.data_dir / version / "classes.json")["totals"]
+    except Exception:  # noqa: BLE001 : la relecture ne doit jamais casser le relevé
+        return None
+    return totals
+
+
+def _matches(name: str, patterns: tuple[str, ...]) -> bool:
+    return any(fnmatch.fnmatchcase(name, p) for p in patterns)
 
 
 def untracked_addons(addons_dir: Path) -> list[dict[str, Any]]:
-    """Dossiers ni suivis ni modules d'un addon suivi : `interface`, `pas_un_addon` ou `non_inventorié`."""
-    raise NotImplementedError
+    """Dossiers ni suivis ni modules d'un addon suivi : `interface`, `pas_un_addon` ou `non_inventorié`.
+
+    Seul le `.toc` est lu (version) ; aucun autre fichier d'un addon d'interface n'est ouvert."""
+    tracked = tuple(p for spec in DATA_ADDONS.values() for p in spec.folders)
+    out: list[dict[str, Any]] = []
+    for folder in sorted(p for p in addons_dir.iterdir() if p.is_dir() and not p.name.startswith(".")):
+        if _matches(folder.name, tracked):
+            continue
+        if ".bak" in folder.name.lower():  # copie de sauvegarde d'un addon (ForeverLogger.bak-<date>) : jamais lue
+            out.append({"folder": folder.name, "status": "sauvegarde", "version": None})
+            continue
+        if not any(folder.glob("*.toc")):
+            out.append({"folder": folder.name, "status": "pas_un_addon", "version": None})
+        elif _matches(folder.name, UI_ADDONS):
+            out.append({"folder": folder.name, "status": "interface", "version": _version(folder)})
+        else:
+            out.append(
+                {
+                    "folder": folder.name,
+                    "status": "non_inventorié",
+                    "version": _version(folder),
+                    "action": f"forever addons inventory {folder.name}",
+                }
+            )
+    return out
+
+
+def _toc(folder: Path) -> dict[str, str]:
+    tocs = sorted(folder.glob(f"{folder.name}*.toc")) or sorted(folder.glob("*.toc"))
+    if not tocs:
+        return {}
+    text = tocs[0].read_text(encoding="utf-8", errors="replace")
+    return {m.group(1): m.group(2) for m in _TOC_FIELD.finditer(text)}
+
+
+def _header(text: str) -> list[str]:
+    """Commentaires de tête (en-tête de génération), cinq lignes au plus."""
+    out: list[str] = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            if out:
+                break
+            continue
+        if not stripped.startswith("--"):
+            break
+        comment = stripped.lstrip("-").strip()
+        if comment:
+            out.append(comment)
+    return out[:5]
+
+
+def _global_keys(text: str) -> dict[str, list[str]]:
+    """Clés de premier niveau des tables globales affectées en tête de ligne (aucune valeur)."""
+    from forever.pipeline.lua_table import parse_lua_value_at
+
+    out: dict[str, list[str]] = {}
+    for m in _GLOBAL_TABLE.finditer(text):
+        try:
+            value, _ = parse_lua_value_at(text, m.end() - 1)
+        except ValueError:
+            continue
+        if isinstance(value, dict):
+            out[m.group(1)] = sorted(str(k) for k in value)
+    return out
 
 
 def inventory(folder: Path) -> dict[str, Any]:
     """Métadonnées du `.toc`, licence, fichiers et empreintes, en-têtes de génération, clés des tables globales ;
     aucune valeur, rien n'est écrit."""
-    raise NotImplementedError
+    toc = _toc(folder)
+    license_files = sorted(p.name for pattern in _LICENSE_FILES for p in folder.glob(pattern) if p.is_file())
+    license: dict[str, Any] | None = None
+    if license_files:
+        license = {"source": license_files[0], "name": None}
+    elif toc.get("X-License"):
+        license = {"source": "X-License", "name": toc["X-License"]}
+    files = _files(folder.parent, [folder], {})
+    listed: list[dict[str, Any]] = []
+    globals_: dict[str, list[str]] = {}
+    for rel, meta in sorted(files.items()):
+        path = folder.parent / rel
+        text = path.read_text(encoding="utf-8", errors="replace")
+        listed.append(
+            {
+                "path": path.relative_to(folder).as_posix(),
+                "size": meta["size"],
+                "sha256": meta["sha256"],
+                "header": _header(text),
+            }
+        )
+        if path.suffix.lower() == ".lua":
+            globals_.update(_global_keys(text))
+    saved = [s.strip() for s in toc.get("SavedVariables", "").split(",") if s.strip()]
+    return {
+        "folder": folder.name,
+        "toc": toc,
+        "saved_variables": saved,
+        "license": license,
+        "files": {"count": len(listed), "total_size": sum(f["size"] for f in listed), "list": listed},
+        "fingerprint": fingerprint(files),
+        "globals": globals_,
+    }
