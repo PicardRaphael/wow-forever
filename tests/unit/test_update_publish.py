@@ -97,6 +97,10 @@ def origin(tmp_path, montage):  # noqa: F811
     config = update_dir(deps.cache_dir) / "config.json"
     config.parent.mkdir(parents=True, exist_ok=True)
     config.write_text(json.dumps({"repo_url": str(bare)}), encoding="utf-8")
+    # garde-fou de la première écriture levé (décision 184) : ces tests portent sur le chemin git
+    (config.parent / "state.json").write_text(
+        json.dumps({"first_write_approved_at": "2026-10-06T00:00:00Z"}), encoding="utf-8"
+    )
     return montage, bare
 
 
