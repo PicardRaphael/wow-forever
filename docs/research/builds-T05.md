@@ -178,6 +178,22 @@ inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits 
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
 
+## Rejeu T08d, révision 6 (correction Questie par Theil-Sen pondéré)
+
+Rejoué le 2026-10-06 par `scripts/replay_builds.py run 70170-r6` (préréglage complet, graine 12345, race Orc) sur la
+révision 6 préparée dans une copie des données avant l'écriture, comparé à `70170-r5`. Seul changement : la
+correction Questie (`docs/research/data-1.60.1.70170-r6.md`). Raison commune : PV plus bas au-delà du niveau 24
+(niveau 30 : 1 647 → 1 555 ; niveau 40 : 3 404 → 3 159 ; niveau 60 : 8 374 → 7 597), temps par monstre en baisse
+d'environ 2,5 à 3,7 s.
+
+**Treize cas inchangés, trois changés** (montrés à l'utilisateur et acceptés avant l'écriture) :
+
+| Cas | Changement | Avant (r5) | Après (r6) |
+| --- | --- | --- | --- |
+| leveling 30 | build : Ice Shards 1 → 0, Shatter 2 → 3 ; ordre des niveaux 27 à 29 | 49,3 s par monstre (analytique) | 46,7 s ; égalité avec l'alternative (écart −1,27 s [−2,91 ; 0,37]), stable 5/5 |
+| leveling 40 | build : Elemental Precision 3 → 4, Winter's Chill 4 → 3 (retour au build de la r3) ; ordre des niveaux 27 à 39 | 53,3 s | 50,8 s ; égalité (écart 0,39 s [−1,29 ; 2,06]), stable 5/5 |
+| leveling 60 | ordre des talents (niveaux 27 à 56), build final inchangé | 50,9 s, stable 5/5 | 47,2 s ; égalité (écart −0,36 s [−2,09 ; 1,37]), stable 4/5 |
+
 ## Rejeu T08d (1.60.1.70170 révision 5, PV des monstres des journaux du 2026-10-02)
 
 Rejoué le 2026-10-06 par `scripts/replay_builds.py run 70170-r5` (préréglage complet, graine 12345, race Orc),

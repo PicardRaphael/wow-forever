@@ -261,7 +261,7 @@
       "inherited_from": "1.60.1.70124"
     }
   },
-  "revision": 5,
+  "revision": 6,
   "revised_at": "2026-10-06",
   "hotfixes": {
     "dbcache": {

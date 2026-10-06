@@ -5808,6 +5808,402 @@
      "rule": "manual"
     }
    ]
+  },
+  {
+   "revision": 6,
+   "date": "2026-10-06",
+   "motif": "Correction Questie -> Forever recalculée par Theil-Sen pondéré (décision 190 ; MON6) sur les mêmes mesures que la révision 5 ; niveaux non mesurés recalculés ; accord de l'utilisateur du 2026-10-06 après le rejeu des builds de T05",
+   "command": "forever measures refresh --yes (méthode de fit_questie_correction changée)",
+   "candidate": null,
+   "report": "docs/research/data-1.60.1.70170-r6.md",
+   "counts": {
+    "measured": 0,
+    "manual": 42
+   },
+   "sources": {
+    "logs": {
+     "WoWCombatLog-100226_080035.txt": "591d242306180388367a964eb8818d58b29026465d78c1d4869b1a2f70c2ad03",
+     "WoWCombatLog-100226_162842.txt": "e8b591a4ec3fa57ffb6023f47e43a0c86587d063eebbe41bcde29b2dbdea8403"
+    },
+    "saved_variables": {
+     "ForeverLogger.lua": "4b3ae11c7936bcd5eb78a8bdc00e2b89b9cd5d9e40686c7bb6ae0a89f59f7a6d",
+     "Questie.lua": "d00ae325bfe8cad190fb76129bd487c315ba9aba6769e96f01a384f328dcf2a9"
+    }
+   },
+   "changes": [
+    {
+     "file": "monsters.json",
+     "path": "questie_correction.fit",
+     "before": {
+      "slope": 0.02988672859824936,
+      "intercept": 0.7474227649708518,
+      "knee_level": 8.451150288959465,
+      "points": 16
+     },
+     "after": {
+      "slope": 0.025093148621598615,
+      "intercept": 0.7991893193790787,
+      "knee_level": 8.002609941427439,
+      "points": 16
+     },
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "questie_correction.method",
+     "before": "médiane par niveau des rapports PV mesuré / PV Questie (PNJ normaux) ; droite des moindres carrés sur les médianes > 1 ; rapport hors mesure = max(1, droite)",
+     "after": "médiane par niveau des rapports PV mesuré / PV Questie (PNJ normaux) ; droite de Theil-Sen pondéré sur les médianes > 1 (médiane pondérée des pentes entre niveaux, poids n_i × n_j ; ordonnée : médiane des écarts, décision 190) ; rapport hors mesure = max(1, droite)",
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.25.value",
+     "before": 1064,
+     "after": 1016,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.26.value",
+     "before": 1200,
+     "after": 1142,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.27.value",
+     "before": 1306,
+     "after": 1240,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.28.value",
+     "before": 1419,
+     "after": 1346,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.29.value",
+     "before": 1533,
+     "after": 1451,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.30.value",
+     "before": 1647,
+     "after": 1555,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.31.value",
+     "before": 1851,
+     "after": 1744,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.32.value",
+     "before": 1980,
+     "after": 1862,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.33.value",
+     "before": 2117,
+     "after": 1987,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.34.value",
+     "before": 2256,
+     "after": 2113,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.35.value",
+     "before": 2407,
+     "after": 2251,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.36.value",
+     "before": 2678,
+     "after": 2501,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.37.value",
+     "before": 2847,
+     "after": 2654,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.38.value",
+     "before": 3021,
+     "after": 2811,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.39.value",
+     "before": 3210,
+     "after": 2983,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.40.value",
+     "before": 3404,
+     "after": 3159,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.41.value",
+     "before": 3752,
+     "after": 3477,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.42.value",
+     "before": 3967,
+     "after": 3671,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.43.value",
+     "before": 4185,
+     "after": 3867,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.44.value",
+     "before": 4409,
+     "after": 4069,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.45.value",
+     "before": 4639,
+     "after": 4275,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.46.value",
+     "before": 5089,
+     "after": 4684,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.47.value",
+     "before": 5354,
+     "after": 4923,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.48.value",
+     "before": 5623,
+     "after": 5163,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.49.value",
+     "before": 5910,
+     "after": 5421,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.50.value",
+     "before": 6205,
+     "after": 5685,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.51.value",
+     "before": 6767,
+     "after": 6193,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.52.value",
+     "before": 7093,
+     "after": 6485,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.53.value",
+     "before": 7433,
+     "after": 6788,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.54.value",
+     "before": 7773,
+     "after": 7092,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.55.value",
+     "before": 8125,
+     "after": 7405,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.56.value",
+     "before": 7186,
+     "after": 6543,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.57.value",
+     "before": 9211,
+     "after": 8378,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.58.value",
+     "before": 9259,
+     "after": 8414,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.59.value",
+     "before": 9664,
+     "after": 8775,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.60.value",
+     "before": 8374,
+     "after": 7597,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.61.value",
+     "before": 8727,
+     "after": 7910,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.62.value",
+     "before": 11364,
+     "after": 10291,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.63.value",
+     "before": 15114,
+     "after": 13676,
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "inversions",
+     "before": [
+      {
+       "level": 56,
+       "value": 7186,
+       "previous_level": 55,
+       "previous": 8125
+      },
+      {
+       "level": 60,
+       "value": 8374,
+       "previous_level": 59,
+       "previous": 9664
+      }
+     ],
+     "after": [
+      {
+       "level": 56,
+       "value": 6543,
+       "previous_level": 55,
+       "previous": 7405
+      },
+      {
+       "level": 60,
+       "value": 7597,
+       "previous_level": 59,
+       "previous": 8775
+      }
+     ],
+     "source": "correction Questie recalculée par Theil-Sen pondéré (décision 190, décision de l'utilisateur du 2026-10-06) ; listées depuis hp_by_level",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }
