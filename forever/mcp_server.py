@@ -24,7 +24,7 @@ from forever.pets_lookup import lookup_pets
 from forever.profile import ProfileView, normalize_class, read_profile
 from forever.provenance import error_payload
 from forever.pvp import compact, pvp_report
-from forever.status import StatusReport, status_report
+from forever.status import status_report
 
 INSTRUCTIONS = (
     "Données de World of Warcraft: Forever, versionnées par version du jeu. Chaque résultat porte un bloc "
@@ -60,11 +60,15 @@ def build_server(deps: Deps) -> MCPServer:
     server = MCPServer("forever", version=__version__, instructions=INSTRUCTIONS)
 
     @server.tool()
-    def forever_status(offline: bool = False) -> StatusReport:
-        """Fraîcheur des données (dernière version publiée du jeu), intégrité des empreintes, couverture du registre.
+    def forever_status(offline: bool = False) -> dict[str, Any]:
+        """Fraîcheur des données (dernière version publiée du jeu), intégrité des empreintes, couverture du registre,
+        et bloc `update` en lecture seule (dernier passage de `forever update`, attentes d'accord ; l'approbation se
+        fait dans la CLI, jamais par un outil MCP).
 
         `offline=True` : aucun appel réseau, dernier état connu seulement."""
-        return status_report(deps, allow_network=not offline)
+        from forever.update import update_summary
+
+        return {**status_report(deps, allow_network=not offline), "update": update_summary(deps.cache_dir, deps.now())}
 
     @server.tool()
     def forever_lookup(

@@ -206,8 +206,6 @@ def _installed(deps: Deps) -> tuple[str | None, dict[str, Any]]:
 def _dbcache_event(deps: Deps, path: Path, version: str | None, sources: dict[str, Any]) -> dict[str, Any] | None:
     """Correctifs applicables de `DBCache.bin` (tables lues par le pipeline) absents de la révision installée
     (`sources.json`, bloc `hotfixes`) ; un fichier d'un autre build est signalé non applicable."""
-    from forever.pipeline.tables import TABLES
-
     try:
         cache = dbcache.read_dbcache(path)
     except DataSchemaError as exc:  # format inconnu, ou fichier tronqué : signalé, relu quand il change
@@ -225,25 +223,7 @@ def _dbcache_event(deps: Deps, path: Path, version: str | None, sources: dict[st
             f"(version installée {version or 'aucune'})",
             "actions": [_action("forever status", True, "fraîcheur des données et build publié")],
         }
-    names = dbcache.table_names(dbcache.known_tables(_rules(deps)))
-    applicable = dbcache.effective(cache.entries, names).applicable
-    raw_block = sources.get("hotfixes")
-    block: dict[str, Any] = raw_block if isinstance(raw_block, dict) else {}
-    done = {(a.get("push"), a.get("table"), a.get("rec_id"), a.get("unique_id")) for a in block.get("applied", [])}
-    absent = {
-        (d.get("push"), d.get("table"), d.get("rec_id")) for d in block.get("listed", {}).get("delete_absent", [])
-    }
-    raw_listed = block.get("listed")
-    listed: dict[str, Any] = raw_listed if isinstance(raw_listed, dict) else {}
-    skipped = set(listed.get("unvalidated") or {}) | set(listed.get("not_loaded") or {})
-    pending = [
-        (t, r)
-        for (t, r), e in applicable.items()
-        if t in TABLES
-        and t not in skipped
-        and (e.push_id, t, r, e.unique_id) not in done
-        and (e.push_id, t, r) not in absent
-    ]
+    pending = hotfixes.pending_hotfixes(cache, sources, _rules(deps))  # T08d : partagé avec forever update
     if not pending:
         return None
     tables = sorted({t for t, _ in pending})

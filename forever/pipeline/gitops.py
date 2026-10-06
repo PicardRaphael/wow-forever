@@ -207,3 +207,19 @@ def merge_ff_and_push(runner: Runner, clone: Path, branch: str) -> MergeResult:
 def delete_branch(runner: Runner, clone: Path, branch: str) -> None:
     _run(runner, ["git", "push", "origin", "--delete", branch], clone)
     _run(runner, ["git", "branch", "-d", branch], clone)
+
+
+def origin_url(runner: Runner, repo: Path) -> str:
+    """URL d'`origin` du dépôt de la session (lue une fois, gardée dans `<cache>/update/config.json`)."""
+    return _run(runner, ["git", "remote", "get-url", "origin"], repo).stdout.strip()
+
+
+def discard_changes(runner: Runner, clone: Path) -> list[str]:
+    """Remet le clone dans l'état de `HEAD` après une écriture abandonnée (verify rouge) : fichiers suivis restaurés,
+    fichiers non suivis retirés un par un (jamais `git clean -f`) ; rend les chemins retirés."""
+    _run(runner, ["git", "restore", "--staged", "--worktree", "--", "."], clone)
+    listed = _run(runner, ["git", "ls-files", "--others", "--exclude-standard", "-z"], clone).stdout
+    removed = [p for p in listed.split("\0") if p]
+    for rel in removed:
+        (clone / rel).unlink(missing_ok=True)
+    return removed

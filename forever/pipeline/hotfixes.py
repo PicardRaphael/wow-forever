@@ -277,4 +277,23 @@ def pending_hotfixes(cache: DBCache, sources: Mapping[str, Any], rules: Mapping[
     """Correctifs applicables de `cache` (tables lues par le pipeline) absents de la révision installée (bloc
     `hotfixes` de `sources.json` : appliqués, suppressions absentes, tables sans disposition ou non chargées) ; rend
     (table, enregistrement), triés. Partagé par la veille et par `forever update` (T08d, bloc E)."""
-    raise NotImplementedError
+    from forever.pipeline import dbcache
+    from forever.pipeline.tables import TABLES
+
+    names = dbcache.table_names(dbcache.known_tables(rules))
+    applicable = dbcache.effective(cache.entries, names).applicable
+    raw_block = sources.get("hotfixes")
+    block: Mapping[str, Any] = raw_block if isinstance(raw_block, dict) else {}
+    done = {(a.get("push"), a.get("table"), a.get("rec_id"), a.get("unique_id")) for a in block.get("applied", [])}
+    raw_listed = block.get("listed")
+    listed: Mapping[str, Any] = raw_listed if isinstance(raw_listed, dict) else {}
+    absent = {(d.get("push"), d.get("table"), d.get("rec_id")) for d in listed.get("delete_absent", [])}
+    skipped = set(listed.get("unvalidated") or {}) | set(listed.get("not_loaded") or {})
+    return sorted(
+        (t, r)
+        for (t, r), e in applicable.items()
+        if t in TABLES
+        and t not in skipped
+        and (e.push_id, t, r, e.unique_id) not in done
+        and (e.push_id, t, r) not in absent
+    )

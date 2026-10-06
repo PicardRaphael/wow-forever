@@ -162,7 +162,22 @@ def run_cases(
     """Rejoue les cas (tous, ou ceux de `only`) sur `data_dir` et écrit un JSON par cas dans
     `<cache_dir>/builds/<label>/` ; rend {cas: {"report", "duration_s", "ablated"}}. Appelé par `forever update`
     (rejeu ciblé, T08d, bloc E) et par `run`."""
-    raise NotImplementedError
+    deps = default_deps()
+    if data_dir is not None:  # T08c : copie des données hors du dépôt (révision simulée avant l'accord)
+        deps = dataclasses.replace(deps, data_dir=data_dir)
+    out = (cache_dir if cache_dir is not None else deps.cache_dir) / "builds" / label
+    out.mkdir(parents=True, exist_ok=True)
+    results: dict[str, dict[str, Any]] = {}
+    for context, level in _cases():
+        name = f"{context}-{level}"
+        if only and name not in only:
+            continue
+        start = time.perf_counter()
+        rep = build_report(deps, context, level, race=RACE, preset=PRESET, seed=SEED)
+        case = {"report": rep, "duration_s": time.perf_counter() - start, "ablated": []}
+        (out / f"{name}.json").write_bytes((json.dumps(case, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
+        results[name] = case
+    return results
 
 
 def run(label: str, only: list[str] | None, ratios: set[str] | None = None, data_dir: Path | None = None) -> None:

@@ -346,6 +346,26 @@ def build_parser() -> argparse.ArgumentParser:
     w.add_argument("--report", action="store_true", help="écrire le résumé dans le cache (tâche planifiée)")
     w.add_argument("--json", action="store_true", help="sortie JSON")
 
+    up = sub.add_parser(
+        "update", help="mise à jour automatique des données : jeu, correctifs, journaux, addons (T08d, réseau accordé)"
+    )
+    up.add_argument("--auto", action="store_true", help="passage automatique (hook de démarrage, tâche planifiée)")
+    up.add_argument("--dry-run", action="store_true", help="tout calculer, ne rien écrire ni enregistrer")
+    up.add_argument("--no-network", action="store_true", help="aucun accès réseau (ni wago, ni WoWDBDefs, ni git)")
+    up.add_argument("--only", help="étapes : jeu,correctifs,journaux,addons (défaut : toutes)")
+    up.add_argument("--json", action="store_true", help="sortie JSON")
+    up_sub = up.add_subparsers(dest="update_command", required=False, parser_class=_Parser)
+    u_status = up_sub.add_parser("status", help="attentes d'accord et dernier passage")
+    u_status.add_argument("--json", action="store_true", help="sortie JSON")
+    u_approve = up_sub.add_parser("approve", help="approuver une attente (base inchangée) et lancer un passage")
+    u_approve.add_argument("id", help="identifiant de l'attente (forever update status)")
+    u_approve.add_argument("--wait", action="store_true", help="passage dans ce processus au lieu d'un passage détaché")
+    u_approve.add_argument("--json", action="store_true", help="sortie JSON")
+    u_reject = up_sub.add_parser("reject", help="rejeter une attente")
+    u_reject.add_argument("id", help="identifiant de l'attente")
+    u_reject.add_argument("--reason", help="raison du rejet")
+    u_reject.add_argument("--json", action="store_true", help="sortie JSON")
+
     addons = sub.add_parser("addons", help="addons de données installés (lecture locale)")
     addons_sub = addons.add_subparsers(dest="addons_command", required=True, parser_class=_Parser)
     a_status = addons_sub.add_parser("status", help="versions, empreintes et changements depuis le dernier relevé")
@@ -1971,6 +1991,58 @@ def _cmd_watch(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
+    from forever import update
+
+    provenance = local_provenance(deps, assumptions=["mise à jour automatique : attentes et passages (T08d)"])
+    if args.update_command == "status":
+        summary = update.update_summary(deps.cache_dir, deps.now())
+        entries = update.list_pending(deps.cache_dir)
+        last = summary["last"]
+        lines = [
+            f"Dernier passage : {last['finished_at'] if last else 'aucun'}"
+            + (" (en cours)" if summary["running"] else "")
+        ]
+        lines += [
+            f"  {e['id']} · {e.get('kind')} · {e.get('action')} · {e.get('state')}"
+            + (f" · {'; '.join(e.get('reasons') or [])}" if e.get("reasons") else "")
+            for e in entries
+        ]
+        if not entries:
+            lines.append("  aucune attente")
+        _emit({**summary, "pending": entries, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.update_command == "approve":
+        out = update.approve(deps, args.id, wait=args.wait)
+        _emit(
+            {**out, "provenance": provenance},
+            [f"{out['id']} : {out['state']} · {out['detail']}"],
+            provenance,
+            args.json,
+        )
+        return EXIT_OK
+    if args.update_command == "reject":
+        out = update.reject(deps.cache_dir, args.id, args.reason)
+        _emit({**out, "provenance": provenance}, [f"{out['id']} : {out['state']}"], provenance, args.json)
+        return EXIT_OK
+    only = frozenset(_split(args.only)) if args.only else frozenset()
+    unknown = sorted(only - set(update.ONLY))
+    if unknown:
+        raise InvalidArgumentError(f"Étape inconnue : {', '.join(unknown)}.", f"choisir parmi {', '.join(update.ONLY)}")
+    options = update.UpdateOptions(
+        auto=args.auto, dry_run=args.dry_run, network=not args.no_network and not deps.offline, only=only
+    )
+    report = update.run_update(deps, options)
+    lines = [f"Mise à jour{' (simulation)' if args.dry_run else ''} : {report['started_at']} → {report['finished_at']}"]
+    lines += [f"  {s['name']} : {s['status']} · {s['detail']}" for s in report["steps"]]
+    lines += [f"  verdict {v['version']} r{v['revision']} : {v['action']}" for v in report["verdicts"]]
+    lines += [f"  attente {p['id']} ({p['kind']}, {p['action']})" for p in report["pending"]]
+    if report["pending"]:
+        lines.append("  voir `forever update status`, puis `forever update approve <id>`")
+    _emit(report, lines, report["provenance"], args.json)  # type: ignore[arg-type]
+    return update.exit_code(report)
+
+
 def _cmd_addons_inventory(deps: Deps, args: argparse.Namespace) -> int:
     root = Path(args.dir) if args.dir else (deps.wow_dir / "Interface" / "AddOns" if deps.wow_dir else None)
     folder = Path(args.folder)
@@ -2503,6 +2575,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "hotfixes": _cmd_hotfixes,
         "addons": _cmd_addons,
         "watch": _cmd_watch,
+        "update": _cmd_update,
         "notes": _cmd_notes,
         "api": _cmd_api,
         "monsters": _cmd_monsters_build,
