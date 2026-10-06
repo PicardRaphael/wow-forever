@@ -51,7 +51,12 @@ STATUSES = ("fait", "rien", "attente", "arrêt", "erreur")
 ACTIONS = ("écrire", "attente", "bloqué")
 STATES = ("en_attente", "approuvée", "rejetée", "périmée", "faite")
 OPEN_STATES = ("en_attente", "approuvée")
-SESSION_KINDS = ("column_names",)  # attentes qu'aucune approbation ne résout : une édition en session est nécessaire
+SESSION_KINDS = ("column_names",)
+INSTALL_KINDS = ("install_version", "install_revision")
+GUARD_REASON = (
+    "garde-fou : première écriture git de `forever update --auto`, en attente de l'accord de l'utilisateur jusqu'à "
+    "l'approbation d'un premier passage réel"
+)  # attentes qu'aucune approbation ne résout : une édition en session est nécessaire
 KEPT_STATES = ("approuvée", "faite", "rejetée")  # un passage qui recalcule la même attente ne les écrase pas
 HISTORY_KEPT = 30
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
@@ -433,8 +438,18 @@ def _inputs_doc(inputs: Mapping[str, InputsDiff]) -> dict[str, Any]:
 
 
 def first_write_guard(cache_dir: Path) -> bool:
-    """Vrai tant qu'aucun passage réel n'a été approuvé : une écriture de `--auto` reste alors en attente."""
-    raise NotImplementedError
+    """Vrai tant qu'aucun passage réel n'a été approuvé : une écriture de `--auto` reste alors en attente
+    (demande de l'utilisateur du 2026-10-06)."""
+    state = _read(update_dir(cache_dir) / "state.json")
+    return not (isinstance(state, dict) and state.get("first_write_approved_at"))
+
+
+def _lift_guard(cache_dir: Path, pending_id: str, at: str) -> None:
+    path = update_dir(cache_dir) / "state.json"
+    state = _read(path)
+    state = state if isinstance(state, dict) else {}
+    if not state.get("first_write_approved_at"):
+        _write(path, {**state, "first_write_approved_at": at, "first_write_approved_id": pending_id})
 
 
 def _approved(run: _Run, pending_id: str) -> bool:
@@ -491,6 +506,11 @@ def _evaluate(
     pending_id = f"{version}-r{revision}-{content_fingerprint(after)}"
     approved = verdict.action == "attente" and _approved(run, pending_id)
     action = "écrire" if approved else verdict.action
+    reasons = list(verdict.reasons)
+    guarded = action == "écrire" and run.options.auto and first_write_guard(run.deps.cache_dir)
+    if guarded and not _approved(run, pending_id):
+        action = "attente"
+        reasons.append(GUARD_REASON)
     doc = {
         "id": pending_id,
         "kind": kind,
@@ -500,7 +520,7 @@ def _evaluate(
         "rule_action": verdict.action,
         "approved": approved,
         "clauses": dict(verdict.clauses),
-        "reasons": verdict.reasons,
+        "reasons": reasons,
         "verify": {"ok": verify["ok"], "errors": verify.get("errors", [])[:20]},
         "carry": _carry_counts(carry),
         "superseded": [{"file": v.file, "pointer": v.pointer, "after": now} for v, now in carry.superseded],
@@ -533,7 +553,7 @@ def _evaluate(
     }
     run.pending.append(entry)
     status = "attente" if action == "attente" else "arrêt"
-    return Step(step, status, f"{version} r{revision} : {action} ({'; '.join(verdict.reasons)})", {"id": pending_id})
+    return Step(step, status, f"{version} r{revision} : {action} ({'; '.join(reasons)})", {"id": pending_id})
 
 
 def _step_new_version(run: _Run, target: str | None) -> Step:
@@ -1154,6 +1174,8 @@ def approve(
         doc = _set_state(deps.cache_dir, pending_id, "périmée", stale_reason=moved)
         return {"id": pending_id, "state": doc["state"], "detail": f"{moved} : relancer `forever update`"}
     _set_state(deps.cache_dir, pending_id, "approuvée", approved_at=format_utc(deps.now()))
+    if entry.get("kind") in INSTALL_KINDS:
+        _lift_guard(deps.cache_dir, pending_id, format_utc(deps.now()))
     if wait:
         report = run_update(deps, UpdateOptions(auto=True), runner=runner)
         return {"id": pending_id, "state": _load(deps.cache_dir, pending_id)["state"], "detail": "passage fait",
