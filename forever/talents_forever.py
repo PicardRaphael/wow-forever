@@ -14,11 +14,13 @@ import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from forever.build import BuildReport
 from forever.config import Deps
-from forever.tf_code import CODE_VERSION, SYMBOLS, TREES
+from forever.errors import InvalidArgumentError
+from forever.provenance import Certainty, Provenance
+from forever.tf_code import CODE_VERSION, SYMBOLS, TREES, TfPlan, code_of, decode, encode, link
 
 ADDON_FOLDER = "TalentsForeverBook"
 DATA_FILE = "Data.lua"
@@ -48,10 +50,15 @@ class TfLayout:
     prereq_gaps: tuple[dict[str, Any], ...] = ()
     tree_name_gaps: tuple[dict[str, Any], ...] = ()
     blocked: str | None = None
+    forever_tree_names: tuple[str, ...] = ()
 
     @property
     def exportable(self) -> bool:
         return self.blocked is None
+
+    def unmatched_at(self, tree: int, index: int) -> dict[str, Any] | None:
+        """Écart de l'addon à une position de liste sans correspondance."""
+        return next((u for u in self.unmatched if u.get("position") == [tree, index]), None)
 
     def position(self, key: str) -> tuple[int, int] | None:
         """(arbre, position de liste) d'une de nos clés, None sans correspondance."""
@@ -183,6 +190,7 @@ def _layout(
                 "name": t.get("name"),
                 "tree": my_tree.get("name"),
                 "talents_forever": tf,
+                "position": [ti, len(keys) - 1],
             }
             if same:
                 entry["reason"] = "ambigu"
@@ -244,6 +252,7 @@ def _layout(
         prereq_gaps=tuple(prereq),
         tree_name_gaps=tuple(tree_names),
         blocked=blocked,
+        forever_tree_names=tuple(str(t.get("name")) for t in my_trees),
     )
 
 
@@ -392,6 +401,64 @@ def render_crosscheck(report: Mapping[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+MAGE = "Mage"  # seule classe dont forever calcule le build (T05)
+NO_ORDER_NOTE = (
+    "ordre non calculé pour ce contexte (l'optimiseur ne rend un ordre qu'en leveling) : Talents Forever place les "
+    "points arbre par arbre"
+)
+STATUS_LABELS = {
+    "ok": "code prêt",
+    "absent": "addon absent",
+    "bloque": "export bloqué",
+    "format_non_pris_en_charge": "format non pris en charge",
+    "ordre_incoherent": "ordre incohérent",
+}
+
+
+def tf_provenance(deps: Deps, addon: TfAddon | None, certainty: Certainty) -> Provenance:
+    """Provenance d'un résultat tiré de l'addon : données installées et identité de l'addon en hypothèse."""
+    from forever.provenance import local_provenance
+
+    if addon is None:
+        note = "Talents Forever absent du client"
+    else:
+        a = addon.describe()
+        note = (
+            f"Talents Forever {a['version']} (Data.lua build {a['build']}, généré le {a['generated']}, codes "
+            f"v{a['codeVersion']}, empreinte {a['fingerprint']}), lecture locale"
+        )
+    return local_provenance(deps, certainty=certainty, assumptions=[note])
+
+
+def _export_provenance(addon: TfAddon | None, talented_bonus: int) -> dict[str, Any]:
+    ident: dict[str, Any] = (
+        addon.describe()
+        if addon is not None
+        else {"addon": "Talents Forever", "version": None, "build": None, "generated": None, "codeVersion": None}
+    )
+    ident.setdefault("fingerprint", None)
+    note = None
+    if talented_bonus > 0:
+        note = (
+            f"bonus Legacy « Talented » de {talented_bonus} point(s) (hypothèse) : niveau du code = niveau du build ; "
+            "l'addon lit le rang de Talented en jeu et doit y trouver le même rang"
+        )
+    return {
+        "format": f"v{CODE_VERSION}",
+        **ident,
+        "verified_in_game": False,  # procédure de test en jeu : docs/ADDON.md, section 7
+        "talented_note": note,
+    }
+
+
+def _order_mismatch(talents: Mapping[str, int], order: Sequence[str]) -> list[str]:
+    counts: dict[str, int] = {}
+    for key in order:
+        counts[key] = counts.get(key, 0) + 1
+    keys = set(counts) | {k for k, r in talents.items() if r > 0}
+    return sorted(k for k in keys if counts.get(k, 0) != max(0, talents.get(k, 0)))
+
+
 def export_build(
     addon: TfAddon | None,
     class_name: str,
@@ -400,16 +467,169 @@ def export_build(
     order: Sequence[str] | None,
     talented_bonus: int = 0,
 ) -> dict[str, Any]:
-    raise NotImplementedError
+    """Bloc `export.talents_forever` d'un build : code v6, lien, commande d'import, ordre compris s'il est calculé ;
+    sinon le statut et sa raison (addon absent, export bloqué, génération non prise en charge, ordre incohérent),
+    jamais un code deviné. Certitude `probable` : format réimplémenté et recoupé par va-et-vient, pas encore relu en
+    jeu."""
+    block: dict[str, Any] = {
+        "status": "ok",
+        "reason": None,
+        "code": None,
+        "link": None,
+        "import": None,
+        "level": level,
+        "order_included": False,
+        "order_note": None,
+        "closest_popular": None,
+        "certainty": None,
+        "provenance": _export_provenance(addon, talented_bonus),
+    }
+
+    def refuse(status: str, reason: str) -> dict[str, Any]:
+        block.update(status=status, reason=reason)
+        return block
+
+    if addon is None:
+        return refuse(
+            "absent",
+            f"Talents Forever absent du client (dossier Interface/AddOns/{ADDON_FOLDER}) : aucun code, rien deviné",
+        )
+    if not addon.supported:
+        return refuse(
+            "format_non_pris_en_charge",
+            f"Talents Forever {addon.version} : codes de génération « {addon.head.get('codeVersion')} » "
+            f"({', '.join(addon.checks)}) ; forever écrit la génération {CODE_VERSION} seulement",
+        )
+    layout = addon.layouts.get(class_name)
+    if layout is None:
+        return refuse("bloque", f"classe {class_name} absente de Talents Forever {addon.version}")
+    if not layout.exportable:
+        return refuse("bloque", str(layout.blocked))
+    ranks = [[0] * len(tree) for tree in layout.trees]
+    for key, rank in talents.items():
+        if rank <= 0:
+            continue
+        pos = layout.position(key)
+        if pos is None:
+            return refuse("bloque", f"{key} sans correspondance chez Talents Forever {addon.version}")
+        ranks[pos[0]][pos[1]] = rank
+    steps: list[tuple[int, int]] = []
+    if order:
+        wrong = _order_mismatch(talents, order)
+        if wrong:
+            return refuse(
+                "ordre_incoherent",
+                "ordre incohérent : pas de l'ordre différents des rangs du build pour " + ", ".join(wrong),
+            )
+        for key in order:
+            pos = layout.position(key)
+            if pos is None:
+                return refuse("bloque", f"{key} sans correspondance chez Talents Forever {addon.version}")
+            steps.append(pos)
+    plan = TfPlan(layout.slug, level, tuple(tuple(t) for t in ranks), tuple(steps) or None)
+    try:
+        code = encode(plan)
+    except ValueError as err:
+        return refuse("bloque", str(err))
+    block.update(
+        code=code,
+        link=link(code),
+        order_included=bool(steps),
+        order_note=None if steps else NO_ORDER_NOTE,
+        certainty="probable",
+    )
+    block["import"] = f"/tf import {code}"
+    return block
 
 
 def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> BuildWithExport:
-    raise NotImplementedError
+    """Rapport de build augmenté du bloc `export` (appelé par la CLI et le MCP ; `build_report` n'en sait rien)."""
+    addon = load_addon(deps)
+    order = [str(s["talent"]) for s in report["order"] if s.get("talent")]
+    block = export_build(addon, MAGE, report["level"], report["talents"], order or None, talented_bonus)
+    return cast(BuildWithExport, {**report, "export": {"talents_forever": block}})
 
 
 def render_export(block: Mapping[str, Any]) -> list[str]:
-    raise NotImplementedError
+    """Lignes « Talents Forever » de la sortie texte de `forever build`."""
+    if block["status"] != "ok":
+        return [f"Talents Forever : {STATUS_LABELS.get(block['status'], block['status'])} : {block['reason']}"]
+    prov = block["provenance"]
+    lines = [
+        (
+            f"Talents Forever : {block['code']} · lien {block['link']} · import en jeu {block['import']} "
+            f"({block['certainty']}, format {prov['format']}, addon {prov['version']})"
+        )
+    ]
+    if block.get("order_note"):
+        lines.append(f"  {block['order_note']}")
+    if prov.get("talented_note"):
+        lines.append(f"  {prov['talented_note']}")
+    return lines
 
 
 def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
-    raise NotImplementedError
+    """Build d'un code ou d'un lien Talents Forever : classe, niveau, points en nos clés, ordre, légalité sur le
+    client ; une position sans correspondance rend le build « non vérifiable » (talent nommé), jamais deviné."""
+    from forever.lookup import check_talents
+
+    raw = code_of(code)
+    slug = raw.split("/", 1)[0]
+    layout = next((lay for lay in addon.layouts.values() if lay.slug == slug), None)
+    if layout is None:
+        known = sorted(lay.slug for lay in addon.layouts.values())
+        raise InvalidArgumentError(
+            f"Code Talents Forever d'une classe inconnue « {slug} ».", "classes : " + ", ".join(known)
+        )
+    try:
+        plan = decode(raw, layout.max_ranks, layout.slug)
+    except ValueError as err:
+        raise InvalidArgumentError(
+            f"Code Talents Forever illisible : {err}.", "coller le code ou le lien tel quel"
+        ) from err
+
+    def name_at(ti: int, i: int) -> str:
+        key = layout.trees[ti][i]
+        if key is not None:
+            return key
+        u = layout.unmatched_at(ti, i) or {}
+        return str(u.get("key") or u.get("name") or f"position {i + 1} de l'arbre {ti + 1}")
+
+    talents: dict[str, int] = {}
+    unverifiable: list[str] = []
+    by_tree: dict[str, int] = {}
+    for ti, tree in enumerate(plan.ranks):
+        tree_name = layout.forever_tree_names[ti] if ti < len(layout.forever_tree_names) else layout.tree_names[ti]
+        by_tree[tree_name] = sum(tree)
+        for i, rank in enumerate(tree):
+            if not rank:
+                continue
+            key = layout.trees[ti][i]
+            if key is None:
+                unverifiable.append(name_at(ti, i))
+            else:
+                talents[key] = rank
+    legal: bool | None = None
+    errors: list[str] = []
+    legality = "non vérifiable"
+    if not unverifiable:
+        check = check_talents(deps, layout.class_name, talents, plan.level)
+        legal, errors = bool(check["legal"]), list(check["errors"])
+        legality = "légal" if legal else "illégal"
+    return {
+        "kind": "tf_decode",
+        "class": layout.class_name,
+        "level": plan.level,
+        "code": raw,
+        "link": link(raw),
+        "talents": talents,
+        "points_by_tree": by_tree,
+        "order": [name_at(ti, i) for ti, i in plan.order] if plan.order else None,
+        "legacy": list(plan.legacy) if plan.legacy else None,
+        "legal": legal,
+        "legality": legality,
+        "errors": errors,
+        "unverifiable": unverifiable,
+        "certainty": "probable",
+        "provenance": tf_provenance(deps, addon, "probable"),
+    }

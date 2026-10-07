@@ -14,7 +14,7 @@ from mcp.server.mcpserver import MCPServer
 from mcp.types import CallToolResult, TextContent
 
 from forever import __version__
-from forever.build import BuildReport, build_report
+from forever.build import build_report
 from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
@@ -25,6 +25,7 @@ from forever.profile import ProfileView, normalize_class, read_profile
 from forever.provenance import error_payload
 from forever.pvp import compact, pvp_report
 from forever.status import status_report
+from forever.talents_forever import BuildWithExport, attach_export
 
 INSTRUCTIONS = (
     "Données de World of Warcraft: Forever, versionnées par version du jeu. Chaque résultat porte un bloc "
@@ -243,7 +244,7 @@ def build_server(deps: Deps) -> MCPServer:
         rules: str = "forever",
         sensitivity: bool = True,
         talented_bonus: int = 0,
-    ) -> BuildReport:
+    ) -> BuildWithExport:
         """Build du Mage par contexte (leveling, dungeon, raid, pvp-bg, pvp-world) à un niveau : talents et ordre
         d'apprentissage, choix du build (rotation, armure, cumuls d'Arcane Blast et de Hot Streak), raison de chaque
         talent (valeur marginale), alternative la plus proche avec écart apparié et intervalle de confiance, stabilité
@@ -256,9 +257,13 @@ def build_server(deps: Deps) -> MCPServer:
         bloc `respec.projected` donne le chemin conseillé depuis ce build jusqu'à `level`) ; `respecs` : réinitialisations déjà faites ;
         `sp`, `crit` : fiche remplacée (puissance des sorts, critique en fraction) ; `preset` : rapide (défaut) ou
         complet ; `rules` : forever, ou seed (leveling seulement, parité) ; `talented_bonus` : points du bonus Legacy
-        « Talented » (hypothèse)."""
+        « Talented » (hypothèse).
+
+        FA1 : bloc `export.talents_forever` : code et lien Talents Forever du build (ordre compris en leveling), commande
+        `/tf import <code>` à relayer telle quelle, build populaire le plus proche ; statut `absent`, `bloque`,
+        `format_non_pris_en_charge` ou `ordre_incoherent` avec sa raison, jamais un code deviné."""
         try:
-            return build_report(
+            report = build_report(
                 deps,
                 context,
                 level,
@@ -273,7 +278,8 @@ def build_server(deps: Deps) -> MCPServer:
                 sensitivity=sensitivity,
                 talented_bonus=talented_bonus,
             )
+            return attach_export(deps, report, talented_bonus)
         except ForeverError as err:
-            return cast(BuildReport, _error_result(deps, err))
+            return cast(BuildWithExport, _error_result(deps, err))
 
     return server

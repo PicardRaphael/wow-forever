@@ -500,6 +500,9 @@ def build_parser() -> argparse.ArgumentParser:
     tf_cross = tf_sub.add_parser("crosscheck", help="recoupement de nos arbres avec ceux de l'addon (écarts)")
     tf_cross.add_argument("--out", help="écrit aussi le rapport Markdown dans ce fichier")
     tf_cross.add_argument("--json", action="store_true", help="sortie JSON")
+    tf_decode = tf_sub.add_parser("decode", help="lit un code ou un lien Talents Forever : points, ordre, légalité")
+    tf_decode.add_argument("code", help="code ou lien talentsforever.com (génération 6)")
+    tf_decode.add_argument("--json", action="store_true", help="sortie JSON")
 
     pvp = sub.add_parser("pvp", help="fiches PvP fixes des 9 classes (savoir du client, sans calcul de combat)")
     pvp_sub = pvp.add_subparsers(dest="pvp_cmd", required=True)
@@ -1227,23 +1230,27 @@ def _tf_addon(deps: Deps) -> TfAddon:
     return addon
 
 
-def _tf_provenance(deps: Deps, addon: TfAddon, certainty: Certainty) -> Provenance:
-    a = addon.describe()
-    return local_provenance(
-        deps,
-        certainty=certainty,
-        assumptions=[
-            (
-                f"Talents Forever {a['version']} (Data.lua build {a['build']}, généré le {a['generated']}, codes "
-                f"v{a['codeVersion']}, empreinte {a['fingerprint']}), lecture locale"
-            )
-        ],
-    )
+def _cmd_tf_decode(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.talents_forever import decode_code
+
+    rep = decode_code(_tf_addon(deps), deps, args.code)
+    lines = [f"Build {rep['class']} niveau {rep['level']} (Talents Forever) : {rep['legality']}"]
+    lines.append("  Points par arbre : " + ", ".join(f"{k} {v}" for k, v in rep["points_by_tree"].items()))
+    lines += [f"  {k} {v}" for k, v in rep["talents"].items()]
+    if rep["unverifiable"]:
+        lines.append("  Sans correspondance (non vérifiable) : " + ", ".join(rep["unverifiable"]))
+    lines += [f"  erreur : {e}" for e in rep["errors"]]
+    lines.append("  Ordre : " + (", ".join(rep["order"]) if rep["order"] else "absent du code"))
+    lines.append(f"  Lien : {rep['link']}")
+    _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
 
 
 def _cmd_talents_tf(deps: Deps, args: argparse.Namespace) -> int:
-    from forever.talents_forever import crosscheck_report, render_crosscheck
+    from forever.talents_forever import crosscheck_report, render_crosscheck, tf_provenance
 
+    if args.tf_cmd == "decode":
+        return _cmd_tf_decode(deps, args)
     addon = _tf_addon(deps)
     report = crosscheck_report(addon)
     text = render_crosscheck(report)
@@ -1266,7 +1273,7 @@ def _cmd_talents_tf(deps: Deps, args: argparse.Namespace) -> int:
             lines.append(f"    {c['blocked']}")
     if args.out:
         lines.append(f"Rapport écrit : {args.out}")
-    payload = {**report, "provenance": _tf_provenance(deps, addon, "probable")}
+    payload = {**report, "provenance": tf_provenance(deps, addon, "probable")}
     _emit(payload, lines, payload["provenance"], args.json)
     return EXIT_OK
 
@@ -1813,7 +1820,9 @@ def render_build(rep: Mapping[str, Any]) -> list[str]:
 
 
 def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
-    rep = build_report(
+    from forever.talents_forever import attach_export, render_export
+
+    report = build_report(
         deps,
         args.context,
         args.level,
@@ -1828,7 +1837,9 @@ def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
         sensitivity=args.sensitivity == "on",
         talented_bonus=args.talented_bonus,
     )
-    _emit(rep, render_build(rep), rep["provenance"], args.json)
+    rep = attach_export(deps, report, args.talented_bonus)
+    lines = render_build(report) + render_export(rep["export"]["talents_forever"])
+    _emit(rep, lines, rep["provenance"], args.json)
     return EXIT_OK
 
 
