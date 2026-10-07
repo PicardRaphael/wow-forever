@@ -117,7 +117,7 @@ def test_link():
         ("mage/xx/--0555-6", "forme"),
         ("mage/60/9--0555-6", "rang"),
         ("mage/60/--0555-ZZ-6", "ordre"),
-        ("mage/60/" + "1" * 30 + "--6", "position"),
+        ("mage/60/" + "1" * 30 + "---6", "position"),
     ],
 )
 def test_refusals_in_french(code, words):
@@ -133,7 +133,7 @@ def test_class_mismatch_is_refused():
 def test_more_than_fifty_eight_positions_are_refused():
     big = ((1,) * 30, (1,) * 29, ())
     with pytest.raises(ValueError, match="58"):
-        decode("x/60/1--6", big)
+        decode("x/60/1---6", big)
     with pytest.raises(ValueError, match="58"):
         encode(TfPlan("x", 60, ((1,) + (0,) * 29, (0,) * 29, ()), ((0, 0),)))
 

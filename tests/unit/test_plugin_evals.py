@@ -10,6 +10,7 @@ import pytest
 import yaml
 from conftest import DATA_DIR, FIXTURES, NOW, REGISTRY_PATH, REPO_ROOT, FakeHttp
 from mcp import Client
+from talents_forever_data import load_fixture
 
 from forever.config import Deps
 from forever.hooks import GAME_NUMBER, NUMBERS_MARKER
@@ -235,7 +236,8 @@ def test_talents_forever_cases():
     assert front(EVALS / "build-lien-talents-forever" / "prompt.md")[0]["tags"] == ["positif", "build"]
     assert link["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
     assert re.search(link["outil"][0]["input_match"], '{"context": "leveling", "level": 20}')
-    assert re.search(link["lien"][0]["pattern"], "https://talentsforever.com/mage/20/--0530002001-klps-6")
+    code = load_fixture("mage_builds.json")["cases"]["leveling-20"]["expected_code"]
+    assert re.search(link["lien"][0]["pattern"], "https://talentsforever.com/" + code)
     assert "/tf import" in link["import"][0]["pattern"].replace("\\", "")
     popular = graders(EVALS / "builds-populaires-voleur")
     assert front(EVALS / "builds-populaires-voleur" / "prompt.md")[0]["tags"] == ["positif", "build"]
