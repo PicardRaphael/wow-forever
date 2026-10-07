@@ -24,6 +24,9 @@ SUPPORTED_VERSION = 22
 LOG_GLOBS = ("WoWCombatLog-*.txt", "WoWCombatLog-*.txt.gz")  # journal du client, ou fixture compressée
 NO_GUID = "0000000000000000"
 AFFILIATION_MINE = 0x1  # COMBATLOG_OBJECT_AFFILIATION_MINE
+CONTROL_PLAYER = 0x100  # COMBATLOG_OBJECT_CONTROL_PLAYER
+TYPE_PET = 0x1000  # COMBATLOG_OBJECT_TYPE_PET
+TYPE_GUARDIAN = 0x2000  # COMBATLOG_OBJECT_TYPE_GUARDIAN
 TIME_FORMAT = "%m/%d/%Y %H:%M:%S.%f"
 ADVANCED_FIELDS = 19
 UNIT_FIELDS = 8
@@ -131,6 +134,12 @@ class Unit(NamedTuple):
     def is_mine(self) -> bool:
         """Unité du joueur qui journalise (drapeau d'affiliation « à moi »)."""
         return bool(self.flags & AFFILIATION_MINE)
+
+    @property
+    def is_player_controlled(self) -> bool:
+        """Invocation d'un joueur d'après les drapeaux du journal : familier, gardien, ou unité contrôlée par un joueur
+        (décision 204)."""
+        return bool(self.flags & (CONTROL_PLAYER | TYPE_PET | TYPE_GUARDIAN))
 
 
 class Advanced(NamedTuple):

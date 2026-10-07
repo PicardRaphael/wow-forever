@@ -88,8 +88,10 @@ def monster_hp(events: Iterable[Event], *, log: str = "") -> tuple[list[MonsterO
         if adv is None:
             continue
         unit = next((u for u in (e.source, e.dest) if u is not None and u.guid == adv.guid), None)
-        if unit is None or unit.kind != "Creature" or unit.npc_id is None or adv.owner != NO_GUID:
-            continue  # créature invoquée (totem, gardien…) : propriétaire non nul
+        if unit is None or unit.kind != "Creature" or unit.npc_id is None:
+            continue
+        if adv.owner != NO_GUID or unit.is_player_controlled:
+            continue  # invocation d'un joueur (totem, gardien, familier) : propriétaire non nul ou drapeaux (décision 204)
         key = (unit.npc_id, adv.level)
         values[key].add(adv.max_hp)
         guids[key].add(adv.guid)
