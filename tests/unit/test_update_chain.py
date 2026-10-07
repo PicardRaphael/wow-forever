@@ -8,10 +8,14 @@ après coup ne diffère que par ses métadonnées. La preuve d'entrées et le re
 version **installée dans une copie de préparation**, jamais sur la candidate brute (qui porte la lecture du client
 avant la fusion des talents et des sorts).
 
-Deux changements de CSV, choisis par sonde : le coefficient de dégâts de Frostbolt (`SpellEffect`, sort 116) passe
+Trois changements de CSV, choisis par sonde : le coefficient de dégâts de Frostbolt (`SpellEffect`, sort 116) passe
 l'installation et ne touche que les deux moteurs du Mage (une feuille de `spell_scaling.json`) ; son coût de mana
-(`SpellPower`) est refusé par les règles de fusion de `forever install`. Aucune valeur de jeu n'est affirmée : les
-tests comparent des comptes et des statuts."""
+(`SpellPower`) est refusé par les règles de fusion de `forever install` ; la recharge de Shield Wall
+(`SpellCooldowns`, sort 871) ne touche que la fiche du Guerrier (`pvp_dr`, moteur qui recopie). Aucune valeur de jeu
+n'est affirmée : les tests comparent des comptes et des statuts.
+
+Correctifs d'une nouvelle version (T08e, décision 207) : le build cible est inscrit au journal des versions du client
+25 h avant `NOW` (aucune archive de `DBCache.bin` : installation sans correctifs, aucune perte) ; `seen` le change."""
 
 import csv
 import io
@@ -36,14 +40,25 @@ from conftest import (
 
 from forever.cli import main
 from forever.engine_inputs import ENGINES
-from forever.errors import EXIT_PENDING
+from forever.errors import EXIT_PENDING, InvalidArgumentError
 from forever.manifest import version_files, write_manifest
 from forever.pipeline.builds import BUILDS_URL
 from forever.pipeline.client_builds import ClientBuild, record_build
+from forever.pipeline.dbcache import HEADER_SIZE
 from forever.pipeline.decode import decode_version, load_rules
 from forever.pipeline.fetch import gametable_url, table_url
 from forever.pipeline.install import apply_install
-from forever.update import STEPS, UpdateOptions, UpdateReport, acquire_lock, run_update, update_dir
+from forever.update import (
+    STEPS,
+    UpdateOptions,
+    UpdateReport,
+    acquire_lock,
+    approve,
+    exit_code,
+    record_pending,
+    run_update,
+    update_dir,
+)
 
 BASE = "1.60.1.79998"
 TARGET = "1.60.1.79999"
@@ -53,6 +68,9 @@ PRODUCT = "wow_classic_beta"
 FIXTURE_VERSION = "1.60.1.70170"  # build des fixtures DBCache.bin, dispositions et tables (décision 192)
 DRY = UpdateOptions(dry_run=True)
 MAGE = {"mage_build", "mage_leveling"}
+CLAUSES = {"verify": True, "install": True, "manual": True, "inputs": True, "hotfixes": True}
+SHIELD_WALL = ("SpellCooldowns", "871", "RecoveryTime")
+DBCACHE = FIXTURES / "hotfix" / "DBCache.bin"
 
 
 def set_build_info(wow, version):
@@ -111,8 +129,9 @@ def montage(tmp_path, make_deps):
     wow = tmp_path / "World of Warcraft" / "_classic_beta_"
     (wow / "Logs").mkdir(parents=True)
 
-    def factory(client=TARGET, published=(BASE, TARGET), change=None, now=NOW):
+    def factory(client=TARGET, published=(BASE, TARGET), change=None, now=NOW, seen=timedelta(hours=25)):
         set_build_info(wow, client)
+        record_build(base_deps.cache_dir, ClientBuild(client, now - seen, PRODUCT, "test"))  # première vue gardée
         routes = {BUILDS_URL: builds_body(*published)}
         for version in published:
             if version != BASE:
@@ -165,7 +184,8 @@ def test_same_tables_give_identical_inputs_and_write(montage):
     verdict = only_verdict(report)
     assert verdict["kind"] == "install_version" and verdict["version"] == TARGET
     assert verdict["action"] == "écrire"
-    assert verdict["clauses"] == {"verify": True, "install": True, "manual": True, "inputs": True}
+    assert verdict["clauses"] == CLAUSES
+    assert verdict["hotfixes"]["gate"] == "sans_correctifs" and verdict["hotfixes"]["lost"] == []
     assert verdict["carry"]["perdu"] == 0 and verdict["carry"]["remplacé"] == 0 and verdict["carry"]["gardé"] > 0
     assert all(e["identical"] for e in verdict["inputs"].values())
     assert set(verdict["inputs"]) == set(ENGINES)
@@ -206,6 +226,62 @@ def test_a_mage_value_changed_by_the_client_waits_with_a_targeted_replay(montage
     (entry,) = report["pending"]
     assert entry["kind"] == "install_version" and entry["action"] == "attente"
     assert entry["id"].startswith(f"{TARGET}-r1-") and entry["clauses"] == verdict["clauses"]
+
+
+def test_a_warrior_value_changed_by_the_client_writes_alone(montage):
+    deps, _ = montage(change=SHIELD_WALL)
+    replay = Replay()
+    report = run_update(deps, DRY, replay=replay)
+    verdict = only_verdict(report)
+    assert {e for e, d in verdict["inputs"].items() if not d["identical"]} == {"pvp_dr"}
+    assert verdict["action"] == "écrire" and verdict["clauses"] == CLAUSES
+    assert "Warrior" in verdict["summary"]["pvp_dr"]["sentence"]
+    assert verdict["summary"]["pvp_dr"]["counts"]["Warrior"]["spells_modified"] >= 1
+    lines = verdict["values"]["pvp_dr"]["lines"]
+    assert lines and all(line[0] == "Warrior" for line in lines)
+    assert replay.calls == [] and report["pending"] == []
+    json.dumps(report)  # le rapport reste du JSON
+
+
+# --- Correctifs d'une nouvelle version (décision 207) -----------------------------------------------------------
+
+
+def test_a_new_version_waits_for_its_hotfixes(montage):
+    deps, http = montage(seen=timedelta(hours=1))
+    replay = Replay()
+    report = run_update(deps, DRY, replay=replay)
+    new = step(report, "nouvelle_version")
+    assert new["status"] == "attente" and new["data"]["gate"] == "attendre"
+    assert report["verdicts"] == []
+    (entry,) = report["pending"]
+    assert entry["kind"] == "hotfixes_unread" and entry["id"] == f"hotfixes-{TARGET}"
+    assert entry["version"] == TARGET and entry["action"] == "attente"
+    assert not any("approve" in c for c in entry["commands"])
+    assert entry["until"] == "2026-09-28T11:00:00Z"  # première vue (NOW - 1 h) + 24 h
+    assert [url for url, _, _ in http.calls if url != BUILDS_URL] == []  # aucune table relevée
+    assert exit_code(report) == EXIT_PENDING
+
+
+def test_the_hotfixes_wait_is_not_approvable(montage):
+    deps, _ = montage()
+    record_pending(
+        deps.cache_dir,
+        {"id": f"hotfixes-{TARGET}", "kind": "hotfixes_unread", "action": "attente", "version": TARGET},
+    )
+    with pytest.raises(InvalidArgumentError, match="se lève seule"):
+        approve(deps, f"hotfixes-{TARGET}", spawn=lambda args: None)
+
+
+def test_an_archived_dbcache_is_read(montage):
+    deps, _ = montage(seen=timedelta(hours=1))
+    archive = deps.cache_dir / "dbcache" / TARGET.rsplit(".", 1)[-1] / "DBCache.bin"
+    archive.parent.mkdir(parents=True)
+    archive.write_bytes(DBCACHE.read_bytes()[:HEADER_SIZE])  # en-tête seul : archive lue, aucun correctif
+    report = run_update(deps, DRY, replay=Replay())
+    assert step(report, "nouvelle_version")["data"]["gate"] == "lire"
+    verdict = only_verdict(report)
+    assert verdict["action"] == "écrire" and verdict["hotfixes"]["gate"] == "lire"
+    assert not any(e["kind"] == "hotfixes_unread" for e in report["pending"])
 
 
 def test_an_install_refused_by_the_merge_rules_is_blocked(montage):
@@ -304,8 +380,6 @@ def test_cli_text_names_the_verdict(montage, capsys):
 
 
 # --- Correctifs du serveur (révision suivante) ----------------------------------------------------------------
-
-DBCACHE = FIXTURES / "hotfix" / "DBCache.bin"
 
 
 def without_hotfixes(data):

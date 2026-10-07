@@ -171,6 +171,57 @@ def test_line_proposes_a_pull_when_remote_main_moved_ahead(make_deps, history):
         assert hooks.update_line(deps, repo) is None
 
 
+def written(approved, summary="fiches PvP : Warrior, 1 sort modifié"):
+    doc = report()
+    doc["written"] = [{"version": "1.60.1.79999", "revision": 1, "approved": approved, "summary": summary}]
+    return doc
+
+
+def test_line_names_an_install_alone_with_its_summary(make_deps, history):
+    repo, _ = history
+    deps = make_deps()
+    save_report(deps.cache_dir, written(False))
+    line = hooks.update_line(deps, repo)
+    assert line == "mise à jour : 1.60.1.79999 r1 installée seule (fiches PvP : Warrior, 1 sort modifié)"
+    save_report(deps.cache_dir, written(True, summary=""))
+    assert hooks.update_line(deps, repo) == "mise à jour : 1.60.1.79999 r1 installée"
+
+
+def test_line_names_the_hotfixes_to_read(make_deps, history):
+    repo, _ = history
+    deps = make_deps()
+    entry = {"id": "hotfixes-1.60.1.79999", "kind": "hotfixes_unread", "action": "attente", "version": "1.60.1.79999"}
+    record_pending(deps.cache_dir, entry)
+    line = hooks.update_line(deps, repo)
+    assert line == "1.60.1.79999 : correctifs du serveur à lire (lancer le jeu sur ce build)"
+
+
+def test_status_shows_the_summary_and_the_self_clearing_wait(make_deps, capsys):
+    from forever.cli import main
+
+    deps = make_deps()
+    record_pending(
+        deps.cache_dir,
+        {"id": "hotfixes-1.60.1.79999", "kind": "hotfixes_unread", "action": "attente", "version": "1.60.1.79999"},
+    )
+    record_pending(
+        deps.cache_dir,
+        {
+            "id": "1.60.1.79999-r1-aaaaaaaaaaaa",
+            "kind": "install_version",
+            "action": "attente",
+            "version": "1.60.1.79999",
+            "summary": {"pvp_dr": {"sentence": "fiches PvP : Warrior, 1 sort modifié", "counts": {}}},
+        },
+    )
+    save_report(deps.cache_dir, written(False, summary="fiches PvP : Druid, 2 sorts modifiés"))
+    assert main(["update", "status"], deps) == 0
+    out = capsys.readouterr().out
+    assert "fiches PvP : Warrior, 1 sort modifié" in out
+    assert "se lève seule" in out and "lancer le jeu sur ce build" in out
+    assert "1.60.1.79999 r1 installée seule (fiches PvP : Druid, 2 sorts modifiés)" in out
+
+
 def test_line_says_a_run_is_in_progress(make_deps, history):
     repo, _ = history
     deps = make_deps()

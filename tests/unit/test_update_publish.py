@@ -14,10 +14,11 @@ from test_update_chain import BASE, TARGET, Replay, montage  # noqa: F401 : fixt
 
 from forever.manifest import version_files
 from forever.pipeline.gitops import subprocess_runner
-from forever.update import UpdateOptions, approve, list_pending, run_update, update_dir
+from forever.update import UpdateOptions, approve, list_pending, record_pending, run_update, update_dir
 
 FORBIDDEN = {"--force", "-f", "--force-with-lease", "--force-if-includes"}
 COEFFICIENT = ("SpellEffect", "116", "EffectBonusCoefficient")
+SHIELD_WALL = ("SpellCooldowns", "871", "RecoveryTime")  # fiche du Guerrier seule (test_update_chain.py)
 GAME = UpdateOptions(auto=True, only=frozenset({"jeu"}))
 
 
@@ -127,6 +128,24 @@ def test_same_tables_are_installed_through_the_clone(origin):
     # la session n'est jamais touchée
     assert version_files(deps.data_dir / BASE) == session and not (deps.data_dir / TARGET).exists()
     assert report["origin_main"] and json.loads((update_dir(deps.cache_dir) / "last.json").read_text("utf-8"))
+
+
+@pytest.mark.slow
+def test_a_copied_value_is_installed_alone_with_its_summary(origin):
+    montage_, bare = origin
+    deps, _ = montage_(change=SHIELD_WALL)
+    record_pending(  # attente levée seule d'un passage précédent, close par l'installation de sa version
+        deps.cache_dir,
+        {"id": f"hotfixes-{TARGET}", "kind": "hotfixes_unread", "action": "attente", "version": TARGET},
+    )
+    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    assert [(v["action"], v["approved"]) for v in report["verdicts"]] == [("écrire", False)]
+    (written,) = report["written"]
+    assert written["approved"] is False and "Warrior" in written["summary"]
+    text = git(bare, "show", f"main:docs/research/data-{TARGET}-r1.md")
+    assert "## Valeurs changées" in text and "| Warrior | sort Shield Wall |" in text
+    assert "## Correctifs du serveur" in text and "sans_correctifs" in text
+    assert {e["id"]: e["state"] for e in list_pending(deps.cache_dir)} == {f"hotfixes-{TARGET}": "faite"}
 
 
 def test_a_changed_engine_input_is_recorded_and_nothing_is_pushed(origin):
