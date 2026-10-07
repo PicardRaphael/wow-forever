@@ -1,0 +1,81 @@
+{
+ "game_version": "1.60.1.70245",
+ "preset": "rapide",
+ "seed": 12345,
+ "sensitivity": false,
+ "cases": {
+  "leveling-20": {
+   "context": "leveling",
+   "level": 20,
+   "talents": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "frostbite": 2,
+    "iceLance": 1
+   },
+   "order": [
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "frostbite",
+    "frostbite",
+    "iceLance"
+   ],
+   "expected_code": "mage/20/--0530002001-klps-6"
+  },
+  "leveling-30": {
+   "context": "leveling",
+   "level": 30,
+   "talents": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 3,
+    "frostbite": 3,
+    "piercingIce": 3,
+    "frostChanneling": 2,
+    "iceLance": 1,
+    "shatter": 3,
+    "fingersOfFrost": 1
+   },
+   "order": [
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "elementalPrecision",
+    "elementalPrecision",
+    "elementalPrecision",
+    "frostbite",
+    "frostbite",
+    "iceLance",
+    "frostChanneling",
+    "frostbite",
+    "frostChanneling",
+    "piercingIce",
+    "shatter",
+    "shatter",
+    "piercingIce",
+    "shatter",
+    "piercingIce",
+    "fingersOfFrost"
+   ],
+   "expected_code": "mage/30/--05300033210003001-klp2sr1prq1w2q1wqz-6"
+  },
+  "dungeon-20": {
+   "context": "dungeon",
+   "level": 20,
+   "talents": {
+    "arcaneFocus": 5,
+    "arcaneConcentration": 5,
+    "arcaneBlast": 1
+   },
+   "order": [],
+   "expected_code": "mage/20/0500050001---6"
+  }
+ }
+}

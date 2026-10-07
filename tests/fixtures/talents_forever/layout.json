@@ -1,0 +1,1620 @@
+{
+ "game_version": "1.60.1.70245",
+ "classes": {
+  "WARRIOR": {
+   "name": "Warrior",
+   "trees": [
+    {
+     "name": "Arms",
+     "positions": [
+      {
+       "key": "improvedHeroicStrike"
+      },
+      {
+       "key": "deflection"
+      },
+      {
+       "key": "improvedRend"
+      },
+      {
+       "key": "improvedCharge"
+      },
+      {
+       "key": "improvedTacticalMastery"
+      },
+      {
+       "key": "improvedOverpower"
+      },
+      {
+       "key": "angerManagement"
+      },
+      {
+       "key": "deepWounds"
+      },
+      {
+       "key": "spearingStrike"
+      },
+      {
+       "key": "twoHandedWeaponSpecialization"
+      },
+      {
+       "key": "impale"
+      },
+      {
+       "key": "bloodthrill"
+      },
+      {
+       "key": "sweepingStrikes"
+      },
+      {
+       "key": "weaponmaster"
+      },
+      {
+       "key": "improvedSlam"
+      },
+      {
+       "key": "improvedHamstring"
+      },
+      {
+       "key": "mortalStrike"
+      }
+     ]
+    },
+    {
+     "name": "Fury",
+     "positions": [
+      {
+       "key": "boomingVoice"
+      },
+      {
+       "key": "cruelty"
+      },
+      {
+       "key": "lingeringRage",
+       "node": 113564
+      },
+      {
+       "key": "unbridledWrath"
+      },
+      {
+       "key": "furiousPrecision",
+       "node": 113565
+      },
+      {
+       "key": "piercingHowl"
+      },
+      {
+       "key": "bloodCraze"
+      },
+      {
+       "key": "dualWieldSpecialization"
+      },
+      {
+       "key": "ragingBlows"
+      },
+      {
+       "key": "enrage"
+      },
+      {
+       "key": "improvedExecute"
+      },
+      {
+       "key": "improvedBerserkerRage"
+      },
+      {
+       "key": "deathWish"
+      },
+      {
+       "key": "improvedIntercept"
+      },
+      {
+       "key": "flurry"
+      },
+      {
+       "key": "goreDrinker",
+       "node": 113566
+      },
+      {
+       "key": "bloodthirst"
+      }
+     ]
+    },
+    {
+     "name": "Protection",
+     "positions": [
+      {
+       "key": "improvedBloodrage"
+      },
+      {
+       "key": "shieldSpecialization"
+      },
+      {
+       "key": "ironWill",
+       "node": 110857
+      },
+      {
+       "key": "anticipation"
+      },
+      {
+       "key": "improvedRevenge"
+      },
+      {
+       "key": "improvedThunderClap"
+      },
+      {
+       "key": "lastStand"
+      },
+      {
+       "key": "masterOfDefense"
+      },
+      {
+       "key": "improvedDisarm"
+      },
+      {
+       "key": "defiance"
+      },
+      {
+       "key": "improvedSunderArmor"
+      },
+      {
+       "key": "vanguard"
+      },
+      {
+       "key": "improvedShieldBash"
+      },
+      {
+       "key": "improvedShieldWall"
+      },
+      {
+       "key": "concussionBlow"
+      },
+      {
+       "key": "focusedRage"
+      },
+      {
+       "key": "bastion"
+      },
+      {
+       "key": "shieldSlam"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  },
+  "PALADIN": {
+   "name": "Paladin",
+   "trees": [
+    {
+     "name": "Holy",
+     "positions": [
+      {
+       "key": "divineStrength"
+      },
+      {
+       "key": "divineIntellect"
+      },
+      {
+       "key": "healingLight"
+      },
+      {
+       "key": "spiritualFocus"
+      },
+      {
+       "key": "improvedSeals"
+      },
+      {
+       "key": "unyieldingFaith"
+      },
+      {
+       "key": "voiceOfTruth"
+      },
+      {
+       "key": "reverence"
+      },
+      {
+       "key": "purifyingPower"
+      },
+      {
+       "key": "infusionOfLight"
+      },
+      {
+       "key": "illumination"
+      },
+      {
+       "key": "divineFavor"
+      },
+      {
+       "key": "divinePrecision"
+      },
+      {
+       "key": "holyShock"
+      },
+      {
+       "key": "consecratedGround"
+      },
+      {
+       "key": "holyPower"
+      },
+      {
+       "key": "lightsVigil"
+      }
+     ]
+    },
+    {
+     "name": "Protection",
+     "positions": [
+      {
+       "key": "toughness"
+      },
+      {
+       "key": "redoubt"
+      },
+      {
+       "key": "precision"
+      },
+      {
+       "key": "guardiansFavor"
+      },
+      {
+       "key": "anticipation"
+      },
+      {
+       "key": "improvedSealOfFury"
+      },
+      {
+       "key": "improvedRighteousFury"
+      },
+      {
+       "key": "shieldSpecialization"
+      },
+      {
+       "key": "sacredDuty"
+      },
+      {
+       "key": "swiftJudgement"
+      },
+      {
+       "key": "oneHandedWeaponSpecialization"
+      },
+      {
+       "key": "improvedHammerOfJustice"
+      },
+      {
+       "key": "templarsBulwark"
+      },
+      {
+       "key": "reckoning"
+      },
+      {
+       "key": "ironCreed"
+      },
+      {
+       "key": "holyShield"
+      }
+     ]
+    },
+    {
+     "name": "Retribution",
+     "positions": [
+      {
+       "key": "deflection"
+      },
+      {
+       "key": "benediction"
+      },
+      {
+       "key": "improvedJudgement"
+      },
+      {
+       "key": "holyConduit"
+      },
+      {
+       "key": "conviction"
+      },
+      {
+       "key": "vindication"
+      },
+      {
+       "key": "sanctifiedJudgement"
+      },
+      {
+       "key": "sealOfCommand"
+      },
+      {
+       "key": "pursuitOfJustice"
+      },
+      {
+       "key": "eyeForAnEye"
+      },
+      {
+       "key": "sacredArbiter"
+      },
+      {
+       "key": "twoHandedWeaponSpecialization"
+      },
+      {
+       "key": "vengeance"
+      },
+      {
+       "key": "repentance"
+      },
+      {
+       "key": "championOfTheLight"
+      },
+      {
+       "key": "instrumentOfLaw"
+      },
+      {
+       "key": "twistOfLight"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  },
+  "HUNTER": {
+   "name": "Hunter",
+   "trees": [
+    {
+     "name": "Beast Mastery",
+     "positions": [
+      {
+       "key": "deadlyAspects"
+      },
+      {
+       "key": "enduranceTraining"
+      },
+      {
+       "key": "focusedFire"
+      },
+      {
+       "key": "improvedAspectOfTheMonkey"
+      },
+      {
+       "key": "pathfinding"
+      },
+      {
+       "key": "improvedRevivePet"
+      },
+      {
+       "key": "bestialSwiftness"
+      },
+      {
+       "key": "unleashedFury"
+      },
+      {
+       "key": "improvedMendPet"
+      },
+      {
+       "key": "ferocity"
+      },
+      {
+       "key": "summonHawk"
+      },
+      {
+       "key": "spiritBond"
+      },
+      {
+       "key": "intimidation",
+       "req": 7
+      },
+      {
+       "key": "bestialDiscipline"
+      },
+      {
+       "key": "frenzy"
+      },
+      {
+       "key": "bestialWrath"
+      }
+     ]
+    },
+    {
+     "name": "Marksmanship",
+     "positions": [
+      {
+       "key": "hawkEye"
+      },
+      {
+       "key": "improvedConcussiveShot"
+      },
+      {
+       "key": "lethalAttacks"
+      },
+      {
+       "key": "improvedStings"
+      },
+      {
+       "key": "efficiency"
+      },
+      {
+       "key": "carefulAim"
+      },
+      {
+       "key": "rapidKilling"
+      },
+      {
+       "key": "improvedArcaneShot"
+      },
+      {
+       "key": "loneWolf"
+      },
+      {
+       "key": "trueshotAura"
+      },
+      {
+       "key": "mortalShots"
+      },
+      {
+       "key": "rapidRecuperation"
+      },
+      {
+       "key": "barrage"
+      },
+      {
+       "key": "scatterShot"
+      },
+      {
+       "key": "rangedWeaponSpecialization"
+      },
+      {
+       "key": "sniperShot"
+      }
+     ]
+    },
+    {
+     "name": "Survival",
+     "positions": [
+      {
+       "key": "improvedTracking"
+      },
+      {
+       "key": "deflection"
+      },
+      {
+       "key": "entrapment"
+      },
+      {
+       "key": "savageStrikes"
+      },
+      {
+       "key": "survivalist"
+      },
+      {
+       "key": "improvedWingClip"
+      },
+      {
+       "key": "cleverTraps"
+      },
+      {
+       "key": "surefooted"
+      },
+      {
+       "key": "deterrence"
+      },
+      {
+       "key": "survivalTactics"
+      },
+      {
+       "key": "predatorsEdge"
+      },
+      {
+       "key": "counterattack"
+      },
+      {
+       "key": "resourcefulness"
+      },
+      {
+       "key": "exposePrey"
+      },
+      {
+       "key": "survivalistsDiscipline"
+      },
+      {
+       "key": "striderKick"
+      },
+      {
+       "key": "lightningReflexes"
+      },
+      {
+       "key": "laceratingStrikes"
+      }
+     ]
+    }
+   ],
+   "forever_only": [
+    {
+     "key": "improvedSerpentSting",
+     "reason": "seulement_forever"
+    }
+   ]
+  },
+  "ROGUE": {
+   "name": "Rogue",
+   "trees": [
+    {
+     "name": "Assassination",
+     "positions": [
+      {
+       "key": "improvedGouge"
+      },
+      {
+       "key": "remorselessAttacks"
+      },
+      {
+       "key": "malice"
+      },
+      {
+       "key": "ruthlessness"
+      },
+      {
+       "key": "murder"
+      },
+      {
+       "key": "improvedSliceAndDice"
+      },
+      {
+       "key": "relentlessStrikes"
+      },
+      {
+       "key": "improvedExposeArmor"
+      },
+      {
+       "key": "lethality"
+      },
+      {
+       "key": "vilePoisons"
+      },
+      {
+       "key": "coldBlood"
+      },
+      {
+       "key": "improvedPoisons"
+      },
+      {
+       "key": "vigor"
+      },
+      {
+       "key": "mutilate"
+      },
+      {
+       "key": "improvedKidneyShot"
+      },
+      {
+       "key": "sealFate"
+      },
+      {
+       "key": "venom"
+      }
+     ]
+    },
+    {
+     "name": "Combat",
+     "positions": [
+      {
+       "key": "improvedEviscerate"
+      },
+      {
+       "key": "improvedSinisterStrike"
+      },
+      {
+       "key": "lightningReflexes"
+      },
+      {
+       "key": "puncturingWounds"
+      },
+      {
+       "key": "deflection"
+      },
+      {
+       "key": "precision"
+      },
+      {
+       "key": "endurance"
+      },
+      {
+       "key": "riposte"
+      },
+      {
+       "key": "improvedSprint"
+      },
+      {
+       "key": "improvedKick"
+      },
+      {
+       "key": "flawlessExecution"
+      },
+      {
+       "key": "dualWieldSpecialization"
+      },
+      {
+       "key": "bladeFlurry"
+      },
+      {
+       "key": "hackAndSlash"
+      },
+      {
+       "key": "weaponExpertise"
+      },
+      {
+       "key": "aggression"
+      },
+      {
+       "key": "adrenalineRush"
+      }
+     ]
+    },
+    {
+     "name": "Subtlety",
+     "positions": [
+      {
+       "key": "camouflage"
+      },
+      {
+       "key": "masterOfDeception"
+      },
+      {
+       "key": "opportunity"
+      },
+      {
+       "key": "setup"
+      },
+      {
+       "key": "elusiveness"
+      },
+      {
+       "key": "dirtyTricks"
+      },
+      {
+       "key": "improvedAmbush"
+      },
+      {
+       "key": "initiative"
+      },
+      {
+       "key": "ghostlyStrike"
+      },
+      {
+       "key": "improvedDistract"
+      },
+      {
+       "key": "heightenedSenses"
+      },
+      {
+       "key": "premeditation"
+      },
+      {
+       "key": "serratedBlades"
+      },
+      {
+       "key": "dirtyDeeds"
+      },
+      {
+       "key": "preparation"
+      },
+      {
+       "key": "hemorrhage"
+      },
+      {
+       "key": "quietus"
+      },
+      {
+       "key": "cutthroat"
+      },
+      {
+       "key": "thousandCuts"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  },
+  "PRIEST": {
+   "name": "Priest",
+   "trees": [
+    {
+     "name": "Discipline",
+     "positions": [
+      {
+       "key": "powerInLight"
+      },
+      {
+       "key": "wandSpecialization"
+      },
+      {
+       "key": "twinDisciplines"
+      },
+      {
+       "key": "silentResolve"
+      },
+      {
+       "key": "holyPrecision"
+      },
+      {
+       "key": "improvedPowerWordShield"
+      },
+      {
+       "key": "martyrdom"
+      },
+      {
+       "key": "mentalAgility"
+      },
+      {
+       "key": "innerFocus"
+      },
+      {
+       "key": "meditation"
+      },
+      {
+       "key": "improvedInnerFire"
+      },
+      {
+       "key": "mentalStrength"
+      },
+      {
+       "key": "soulWarding"
+      },
+      {
+       "key": "improvedManaBurn"
+      },
+      {
+       "key": "penance"
+      },
+      {
+       "key": "renewedHope"
+      },
+      {
+       "key": "divineAegis"
+      },
+      {
+       "key": "powerInfusion"
+      }
+     ]
+    },
+    {
+     "name": "Holy",
+     "positions": [
+      {
+       "key": "twilightFocus"
+      },
+      {
+       "key": "improvedRenew"
+      },
+      {
+       "key": "holySpecialization"
+      },
+      {
+       "key": "spellWarding"
+      },
+      {
+       "key": "divineFury"
+      },
+      {
+       "key": "holyNova"
+      },
+      {
+       "key": "blessedRecovery"
+      },
+      {
+       "key": "inspiration"
+      },
+      {
+       "key": "holyReach"
+      },
+      {
+       "key": "improvedHealing"
+      },
+      {
+       "key": "searingLight"
+      },
+      {
+       "key": "bindingHeal"
+      },
+      {
+       "key": "litanyOfLight"
+      },
+      {
+       "key": "spiritOfRedemption"
+      },
+      {
+       "key": "spiritualGuidance"
+      },
+      {
+       "key": "spiritualHealing"
+      },
+      {
+       "key": "prayerOfMending"
+      }
+     ]
+    },
+    {
+     "name": "Shadow",
+     "positions": [
+      {
+       "key": "shadowFocus"
+      },
+      {
+       "key": "blackout"
+      },
+      {
+       "key": "spiritTap"
+      },
+      {
+       "key": "shadowAffinity"
+      },
+      {
+       "key": "improvedShadowWordPain"
+      },
+      {
+       "key": "shadowReach"
+      },
+      {
+       "key": "improvedMindBlast"
+      },
+      {
+       "key": "improvedPsychicScream"
+      },
+      {
+       "key": "mindFlay"
+      },
+      {
+       "key": "improvedMindFlay"
+      },
+      {
+       "key": "improvedFade"
+      },
+      {
+       "key": "vampiricEmbrace"
+      },
+      {
+       "key": "shadowWeaving"
+      },
+      {
+       "key": "silence"
+      },
+      {
+       "key": "devouringContagion"
+      },
+      {
+       "key": "earlyDemise"
+      },
+      {
+       "key": "darkness"
+      },
+      {
+       "key": "shadowform"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  },
+  "SHAMAN": {
+   "name": "Shaman",
+   "trees": [
+    {
+     "name": "Elemental",
+     "positions": [
+      {
+       "key": "convection"
+      },
+      {
+       "key": "concussion"
+      },
+      {
+       "key": "elementalWarding"
+      },
+      {
+       "key": "reverberation"
+      },
+      {
+       "key": "callOfFlame"
+      },
+      {
+       "key": "elementalDevastation"
+      },
+      {
+       "key": "elementalFocus"
+      },
+      {
+       "key": "elementalAlacrity"
+      },
+      {
+       "key": "improvedFireNova"
+      },
+      {
+       "key": "eyeOfTheStorm"
+      },
+      {
+       "key": "callOfThunder"
+      },
+      {
+       "key": "elementalReach"
+      },
+      {
+       "key": "lightningOverload"
+      },
+      {
+       "key": "earthbound"
+      },
+      {
+       "key": "elementalFury"
+      },
+      {
+       "key": "lavaBurst"
+      }
+     ]
+    },
+    {
+     "name": "Enhancement",
+     "positions": [
+      {
+       "key": "earthsGrasp"
+      },
+      {
+       "key": "thunderingStrikes"
+      },
+      {
+       "key": "ancestralKnowledge"
+      },
+      {
+       "key": "guardianTotems"
+      },
+      {
+       "key": "mentalDexterity"
+      },
+      {
+       "key": "improvedGhostWolf"
+      },
+      {
+       "key": "improvedLightningShield"
+      },
+      {
+       "key": "elementalWeapons"
+      },
+      {
+       "key": "shamanisticFocus"
+      },
+      {
+       "key": "anticipation"
+      },
+      {
+       "key": "toughness"
+      },
+      {
+       "key": "flurry"
+      },
+      {
+       "key": "stormstrike"
+      },
+      {
+       "key": "spiritWeapons"
+      },
+      {
+       "key": "mentalQuickness"
+      },
+      {
+       "key": "improvedStormstrike"
+      },
+      {
+       "key": "maelstromWeapon"
+      },
+      {
+       "key": "rageOfTheFarseer"
+      }
+     ]
+    },
+    {
+     "name": "Restoration",
+     "positions": [
+      {
+       "key": "improvedHealingWave"
+      },
+      {
+       "key": "totemicFocus"
+      },
+      {
+       "key": "mindfulness"
+      },
+      {
+       "key": "naturalGrace"
+      },
+      {
+       "key": "tidalFocus"
+      },
+      {
+       "key": "improvedReincarnation"
+      },
+      {
+       "key": "ancestralHealing"
+      },
+      {
+       "key": "healingFocus"
+      },
+      {
+       "key": "waterShield"
+      },
+      {
+       "key": "tidalMastery"
+      },
+      {
+       "key": "restorativeTotems"
+      },
+      {
+       "key": "manaTideTotem"
+      },
+      {
+       "key": "healingWay"
+      },
+      {
+       "key": "naturesSwiftness"
+      },
+      {
+       "key": "purification"
+      },
+      {
+       "key": "riptide"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  },
+  "MAGE": {
+   "name": "Mage",
+   "trees": [
+    {
+     "name": "Arcane",
+     "positions": [
+      {
+       "key": "wandSpecialization"
+      },
+      {
+       "key": "arcaneFocus"
+      },
+      {
+       "key": "improvedChanneling"
+      },
+      {
+       "key": "arcaneSubtlety"
+      },
+      {
+       "key": "magicAbsorption"
+      },
+      {
+       "key": "arcaneConcentration"
+      },
+      {
+       "key": "arcaneResilience"
+      },
+      {
+       "key": "arcaneGeometry"
+      },
+      {
+       "key": "arcaneImpact"
+      },
+      {
+       "key": "arcaneBlast"
+      },
+      {
+       "key": "arcaneShielding"
+      },
+      {
+       "key": "improvedCounterspell"
+      },
+      {
+       "key": "arcaneMeditation"
+      },
+      {
+       "key": "missileBarrage"
+      },
+      {
+       "key": "presenceOfMind"
+      },
+      {
+       "key": "arcaneMind"
+      },
+      {
+       "key": "arcaneInstability"
+      },
+      {
+       "key": "arcanePower"
+      }
+     ]
+    },
+    {
+     "name": "Fire",
+     "positions": [
+      {
+       "key": "wakeOfFire"
+      },
+      {
+       "key": "incineration"
+      },
+      {
+       "key": "improvedFireball"
+      },
+      {
+       "key": "ignite"
+      },
+      {
+       "key": "flameThrowing"
+      },
+      {
+       "key": "impact"
+      },
+      {
+       "key": "burningSoul"
+      },
+      {
+       "key": "improvedFlamestrike"
+      },
+      {
+       "key": "pyroblast"
+      },
+      {
+       "key": "improvedScorch"
+      },
+      {
+       "key": "improvedFireWard"
+      },
+      {
+       "key": "hotStreak"
+      },
+      {
+       "key": "masterOfElements"
+      },
+      {
+       "key": "criticalMass"
+      },
+      {
+       "key": "blastWave"
+      },
+      {
+       "key": "firePower"
+      },
+      {
+       "key": "combustion"
+      }
+     ]
+    },
+    {
+     "name": "Frost",
+     "positions": [
+      {
+       "key": "frostWarding"
+      },
+      {
+       "key": "improvedFrostbolt"
+      },
+      {
+       "key": "elementalPrecision"
+      },
+      {
+       "key": "iceShards"
+      },
+      {
+       "key": "permafrost"
+      },
+      {
+       "key": "improvedFrostNova"
+      },
+      {
+       "key": "frostbite"
+      },
+      {
+       "key": "piercingIce"
+      },
+      {
+       "key": "frostChanneling"
+      },
+      {
+       "key": "iceLance"
+      },
+      {
+       "key": "improvedBlizzard"
+      },
+      {
+       "key": "arcticReach"
+      },
+      {
+       "key": "iceBlock"
+      },
+      {
+       "key": "shatter"
+      },
+      {
+       "key": "improvedConeOfCold"
+      },
+      {
+       "key": "coldSnap"
+      },
+      {
+       "key": "fingersOfFrost"
+      },
+      {
+       "key": "wintersChill"
+      },
+      {
+       "key": "iceBarrier"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  },
+  "WARLOCK": {
+   "name": "Warlock",
+   "trees": [
+    {
+     "name": "Affliction",
+     "positions": [
+      {
+       "tf": {
+        "name": "Improved Life Tap",
+        "spell": 18182,
+        "row": 1,
+        "col": 1,
+        "max": 2,
+        "node": 105921
+       },
+       "reason": "position_inconnue",
+       "key": "improvedLifeTap"
+      },
+      {
+       "key": "suppression"
+      },
+      {
+       "key": "improvedCorruption"
+      },
+      {
+       "key": "malediction"
+      },
+      {
+       "key": "soulHarvest"
+      },
+      {
+       "key": "improvedDrains"
+      },
+      {
+       "key": "improvedBaneOfAgony"
+      },
+      {
+       "key": "felConcentration"
+      },
+      {
+       "tf": {
+        "name": "Amplify Curse",
+        "spell": 18288,
+        "row": 3,
+        "col": 3,
+        "max": 1,
+        "node": 105916
+       },
+       "reason": "position_inconnue",
+       "key": "amplifyCurse"
+      },
+      {
+       "key": "pandemic"
+      },
+      {
+       "key": "malevolence"
+      },
+      {
+       "key": "nightfall"
+      },
+      {
+       "key": "curseOfExhaustion"
+      },
+      {
+       "key": "siphonLife"
+      },
+      {
+       "key": "soulSiphon"
+      },
+      {
+       "key": "shadowMastery"
+      },
+      {
+       "key": "wrack"
+      }
+     ]
+    },
+    {
+     "name": "Demonology",
+     "positions": [
+      {
+       "key": "improvedHealthFunnel"
+      },
+      {
+       "key": "improvedImp"
+      },
+      {
+       "key": "demonicEmbrace"
+      },
+      {
+       "key": "unholyPower"
+      },
+      {
+       "key": "demonicAegis"
+      },
+      {
+       "key": "improvedVoidwalker"
+      },
+      {
+       "key": "felVitality"
+      },
+      {
+       "key": "demonicEnergies"
+      },
+      {
+       "key": "improvedSayaad"
+      },
+      {
+       "key": "demonicSacrifice"
+      },
+      {
+       "key": "masterSummoner"
+      },
+      {
+       "key": "decimation"
+      },
+      {
+       "key": "felDomination"
+      },
+      {
+       "key": "demonicBrand"
+      },
+      {
+       "key": "improvedFelhunter"
+      },
+      {
+       "key": "soulLink"
+      },
+      {
+       "key": "demonicKnowledge"
+      },
+      {
+       "key": "masterDemonologist"
+      },
+      {
+       "key": "demonicPact"
+      }
+     ]
+    },
+    {
+     "name": "Destruction",
+     "positions": [
+      {
+       "key": "destructiveReach"
+      },
+      {
+       "key": "improvedShadowBolt"
+      },
+      {
+       "key": "bane"
+      },
+      {
+       "key": "moltenSkin"
+      },
+      {
+       "key": "cataclysm"
+      },
+      {
+       "key": "aftermath"
+      },
+      {
+       "key": "ruin"
+      },
+      {
+       "key": "shadowburn"
+      },
+      {
+       "key": "intensity"
+      },
+      {
+       "key": "agonizingFlames"
+      },
+      {
+       "key": "conflagrate"
+      },
+      {
+       "key": "pyroclasm"
+      },
+      {
+       "key": "baneOfHavoc"
+      },
+      {
+       "key": "fireAndBrimstone"
+      },
+      {
+       "key": "shadowAndFlame"
+      },
+      {
+       "key": "incinerate"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  },
+  "DRUID": {
+   "name": "Druid",
+   "trees": [
+    {
+     "name": "Balance",
+     "positions": [
+      {
+       "key": "improvedWrath"
+      },
+      {
+       "key": "genesis"
+      },
+      {
+       "key": "moonglow"
+      },
+      {
+       "key": "improvedMoonfire"
+      },
+      {
+       "key": "naturesMajesty"
+      },
+      {
+       "key": "naturesReach"
+      },
+      {
+       "key": "improvedEntanglingRoots"
+      },
+      {
+       "key": "naturesSplendor"
+      },
+      {
+       "key": "insectSwarm"
+      },
+      {
+       "key": "vengeance"
+      },
+      {
+       "key": "improvedStarfire"
+      },
+      {
+       "key": "overgrowth"
+      },
+      {
+       "key": "naturesGrace"
+      },
+      {
+       "key": "eclipse"
+      },
+      {
+       "key": "moonfury"
+      },
+      {
+       "key": "moonkinForm"
+      }
+     ]
+    },
+    {
+     "name": "Feral Combat",
+     "positions": [
+      {
+       "key": "ferocity"
+      },
+      {
+       "key": "heartOfTheWild"
+      },
+      {
+       "key": "feralSwiftness"
+      },
+      {
+       "key": "feralInstinct"
+      },
+      {
+       "key": "brutalImpact"
+      },
+      {
+       "key": "thickHide"
+      },
+      {
+       "key": "shreddingAttacks"
+      },
+      {
+       "key": "savageFury"
+      },
+      {
+       "key": "feralCharge"
+      },
+      {
+       "key": "sharpenedClaws"
+      },
+      {
+       "key": "shiftingPower"
+      },
+      {
+       "key": "primalBite"
+      },
+      {
+       "key": "predatoryStrikes"
+      },
+      {
+       "key": "bloodFrenzy"
+      },
+      {
+       "key": "improvedShiftingPower"
+      },
+      {
+       "key": "leaderOfThePack"
+      },
+      {
+       "key": "predatoryInstincts"
+      },
+      {
+       "key": "naturalReaction"
+      },
+      {
+       "key": "rendAndTear"
+      },
+      {
+       "key": "berserk"
+      }
+     ]
+    },
+    {
+     "name": "Restoration",
+     "positions": [
+      {
+       "key": "naturesFocus"
+      },
+      {
+       "key": "furor"
+      },
+      {
+       "key": "naturalist"
+      },
+      {
+       "key": "subtlety"
+      },
+      {
+       "key": "naturalShapeshifter"
+      },
+      {
+       "key": "reflection"
+      },
+      {
+       "key": "giftOfNature"
+      },
+      {
+       "key": "giftOfTheEarthmother"
+      },
+      {
+       "key": "tranquilSpirit"
+      },
+      {
+       "key": "improvedRejuvenation"
+      },
+      {
+       "key": "swiftmend"
+      },
+      {
+       "key": "naturesSwiftness"
+      },
+      {
+       "key": "livingSpirit"
+      },
+      {
+       "key": "improvedTranquility"
+      },
+      {
+       "key": "improvedRegrowth"
+      },
+      {
+       "key": "wildGrowth"
+      }
+     ]
+    }
+   ],
+   "forever_only": []
+  }
+ }
+}

@@ -1,0 +1,658 @@
+{
+ "addon": {
+  "version": "0.37.1",
+  "build": "1.60.1.70170",
+  "generated": "2026-10-04",
+  "codeVersion": "6"
+ },
+ "classes": {
+  "WARRIOR": {
+   "builds": 54161,
+   "window": "since the Oct 2 hotfixes to build 70170",
+   "asOf": "2026-10-04",
+   "full": 8740,
+   "spec": [
+    [
+     "Protection",
+     39
+    ],
+    [
+     "Fury",
+     38
+    ],
+    [
+     "Arms",
+     23
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Arms",
+     "pts": [
+      37,
+      11,
+      0
+     ],
+     "code": "warrior/60/30305213132515201-050501--6"
+    },
+    {
+     "rank": 2,
+     "lead": "Protection",
+     "pts": [
+      5,
+      5,
+      36
+     ],
+     "code": "warrior/60/05-05-250530120321021351-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Protection",
+     "pts": [
+      7,
+      5,
+      39
+     ],
+     "code": "warrior/60/0502-05-250533120321021351-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Fury",
+     "pts": [
+      17,
+      32,
+      2
+     ],
+     "code": "warrior/60/30305013002-05253005102210501-2-6"
+    },
+    {
+     "rank": 5,
+     "lead": "Fury",
+     "pts": [
+      17,
+      34,
+      0
+     ],
+     "code": "warrior/60/30305013002-05253005151010501--6"
+    }
+   ]
+  },
+  "PALADIN": {
+   "builds": 61310,
+   "window": "since the Sep 24 patch (build 70009)",
+   "asOf": "2026-10-04",
+   "full": 18322,
+   "spec": [
+    [
+     "Retribution",
+     45
+    ],
+    [
+     "Protection",
+     33
+    ],
+    [
+     "Holy",
+     22
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Retribution",
+     "pts": [
+      8,
+      8,
+      35
+     ],
+     "code": "paladin/60/50003-503-05225131201331321-6"
+    },
+    {
+     "rank": 2,
+     "lead": "Protection",
+     "pts": [
+      0,
+      42,
+      7
+     ],
+     "code": "paladin/60/-4530513321301551-502-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Retribution",
+     "pts": [
+      13,
+      0,
+      34
+     ],
+     "code": "paladin/60/55003--05225331001330321-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Holy",
+     "pts": [
+      36,
+      10,
+      5
+     ],
+     "code": "paladin/60/05320213225131051-5032-05-6"
+    },
+    {
+     "rank": 5,
+     "lead": "Retribution",
+     "pts": [
+      9,
+      8,
+      34
+     ],
+     "code": "paladin/60/51003-503-05225331001330321-6"
+    }
+   ]
+  },
+  "HUNTER": {
+   "builds": 51832,
+   "window": "Sep 13 to Oct 4, 2026",
+   "asOf": "2026-10-04",
+   "full": 27352,
+   "spec": [
+    [
+     "Survival",
+     54
+    ],
+    [
+     "Marksmanship",
+     25
+    ],
+    [
+     "Beast Mastery",
+     21
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Survival",
+     "pts": [
+      5,
+      11,
+      35
+     ],
+     "code": "hunter/60/5-005005001-500230230250222151-6"
+    },
+    {
+     "rank": 2,
+     "lead": "Marksmanship",
+     "pts": [
+      5,
+      41,
+      5
+     ],
+     "code": "hunter/60/5-3053552011523051-5-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Survival",
+     "pts": [
+      5,
+      11,
+      35
+     ],
+     "code": "hunter/60/5-005005001-503200230250222151-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Beast Mastery",
+     "pts": [
+      31,
+      20,
+      0
+     ],
+     "code": "hunter/60/5120021505101251-00503520005--6"
+    },
+    {
+     "rank": 5,
+     "lead": "Survival",
+     "pts": [
+      5,
+      15,
+      31
+     ],
+     "code": "hunter/60/5-005045001-500230230050220151-6"
+    }
+   ]
+  },
+  "ROGUE": {
+   "builds": 45497,
+   "window": "Sep 13 to Oct 4, 2026",
+   "asOf": "2026-10-04",
+   "full": 22341,
+   "spec": [
+    [
+     "Subtlety",
+     43
+    ],
+    [
+     "Assassination",
+     29
+    ],
+    [
+     "Combat",
+     28
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Combat",
+     "pts": [
+      18,
+      32,
+      0
+     ],
+     "code": "rogue/60/00530310501-32300320200515231--6"
+    },
+    {
+     "rank": 2,
+     "lead": "Assassination",
+     "pts": [
+      38,
+      11,
+      2
+     ],
+     "code": "rogue/60/00531310551521051-302303-002-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Subtlety",
+     "pts": [
+      16,
+      12,
+      23
+     ],
+     "code": "rogue/60/30502010401-320302002-332002320021221-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Combat",
+     "pts": [
+      18,
+      33,
+      0
+     ],
+     "code": "rogue/60/00530310501-32003320201515231--6"
+    },
+    {
+     "rank": 5,
+     "lead": "Combat",
+     "pts": [
+      18,
+      32,
+      0
+     ],
+     "code": "rogue/60/00530310501-32030320200515231--6"
+    }
+   ]
+  },
+  "PRIEST": {
+   "builds": 57535,
+   "window": "Sep 13 to Oct 4, 2026",
+   "asOf": "2026-10-04",
+   "full": 28830,
+   "spec": [
+    [
+     "Discipline",
+     42
+    ],
+    [
+     "Shadow",
+     41
+    ],
+    [
+     "Holy",
+     17
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Shadow",
+     "pts": [
+      14,
+      3,
+      34
+     ],
+     "code": "priest/60/0250030013-3-500322501201302251-6"
+    },
+    {
+     "rank": 2,
+     "lead": "Discipline",
+     "pts": [
+      32,
+      19,
+      0
+     ],
+     "code": "priest/60/525330031305001001-30515100202--6"
+    },
+    {
+     "rank": 3,
+     "lead": "Discipline",
+     "pts": [
+      33,
+      18,
+      0
+     ],
+     "code": "priest/60/005203031305101531-0250500303--6"
+    },
+    {
+     "rank": 4,
+     "lead": "Holy",
+     "pts": [
+      19,
+      32,
+      0
+     ],
+     "code": "priest/60/0053030013031-03505103030021531--6"
+    },
+    {
+     "rank": 5,
+     "lead": "Discipline",
+     "pts": [
+      32,
+      19,
+      0
+     ],
+     "code": "priest/60/505330031305021001-31505100202--6"
+    }
+   ]
+  },
+  "SHAMAN": {
+   "builds": 60409,
+   "window": "since the Sep 24 patch (build 70009)",
+   "asOf": "2026-10-04",
+   "full": 32764,
+   "spec": [
+    [
+     "Enhancement",
+     58
+    ],
+    [
+     "Elemental",
+     24
+    ],
+    [
+     "Restoration",
+     18
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Enhancement",
+     "pts": [
+      18,
+      33,
+      0
+     ],
+     "code": "shaman/60/050533002-052032031005112251--6"
+    },
+    {
+     "rank": 2,
+     "lead": "Restoration",
+     "pts": [
+      0,
+      10,
+      41
+     ],
+     "code": "shaman/60/-055-5030503315513151-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Enhancement",
+     "pts": [
+      8,
+      33,
+      10
+     ],
+     "code": "shaman/60/050003-052032031005112251-05005-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Elemental",
+     "pts": [
+      38,
+      13,
+      0
+     ],
+     "code": "shaman/60/5505301303123151-055002001--6"
+    },
+    {
+     "rank": 5,
+     "lead": "Enhancement",
+     "pts": [
+      18,
+      33,
+      0
+     ],
+     "code": "shaman/60/05003313201-052032031005112251--6"
+    }
+   ]
+  },
+  "MAGE": {
+   "builds": 41203,
+   "window": "since the Oct 1 patch (build 70170)",
+   "asOf": "2026-10-04",
+   "full": 19386,
+   "spec": [
+    [
+     "Fire",
+     44
+    ],
+    [
+     "Frost",
+     34
+    ],
+    [
+     "Arcane",
+     22
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Fire",
+     "pts": [
+      0,
+      29,
+      22
+     ],
+     "code": "mage/60/-0055103013013304-00550003310003002-6"
+    },
+    {
+     "rank": 2,
+     "lead": "Fire",
+     "pts": [
+      11,
+      31,
+      9
+     ],
+     "code": "mage/60/0502030001-03550010130133051-0054-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Frost",
+     "pts": [
+      0,
+      0,
+      51
+     ],
+     "code": "mage/60/--0555323331321331251-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Arcane",
+     "pts": [
+      47,
+      4,
+      0
+     ],
+     "code": "mage/60/255225223122311531-13--6"
+    },
+    {
+     "rank": 5,
+     "lead": "Fire",
+     "pts": [
+      21,
+      28,
+      2
+     ],
+     "code": "mage/60/050205200102301-0055233013010311-002-6"
+    }
+   ]
+  },
+  "WARLOCK": {
+   "builds": 66003,
+   "window": "since the Oct 1 patch (build 70170)",
+   "asOf": "2026-10-04",
+   "full": 33016,
+   "spec": [
+    [
+     "Affliction",
+     40
+    ],
+    [
+     "Demonology",
+     36
+    ],
+    [
+     "Destruction",
+     24
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Affliction",
+     "pts": [
+      40,
+      11,
+      0
+     ],
+     "code": "warlock/60/05550320035201351-0050203001--6"
+    },
+    {
+     "rank": 2,
+     "lead": "Destruction",
+     "pts": [
+      5,
+      11,
+      35
+     ],
+     "code": "warlock/60/05-0050203001-2050355103101351-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Demonology",
+     "pts": [
+      5,
+      33,
+      13
+     ],
+     "code": "warlock/60/005-0050233201211031351-20550001-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Demonology",
+     "pts": [
+      21,
+      24,
+      6
+     ],
+     "code": "warlock/60/03500323100211-00551032012010013-204-6"
+    },
+    {
+     "rank": 5,
+     "lead": "Destruction",
+     "pts": [
+      0,
+      20,
+      31
+     ],
+     "code": "warlock/60/-03050032002203-2050315103101351-6"
+    }
+   ]
+  },
+  "DRUID": {
+   "builds": 45491,
+   "window": "since the Oct 1 patch (build 70170)",
+   "asOf": "2026-10-04",
+   "full": 15905,
+   "spec": [
+    [
+     "Feral Combat",
+     53
+    ],
+    [
+     "Balance",
+     24
+    ],
+    [
+     "Restoration",
+     23
+    ]
+   ],
+   "top": [
+    {
+     "rank": 1,
+     "lead": "Feral Combat",
+     "pts": [
+      9,
+      34,
+      5
+     ],
+     "code": "druid/60/050022-55200032120032012051-05-6"
+    },
+    {
+     "rank": 2,
+     "lead": "Restoration",
+     "pts": [
+      11,
+      5,
+      35
+     ],
+     "code": "druid/60/05302001-05-5050035103113251-6"
+    },
+    {
+     "rank": 3,
+     "lead": "Balance",
+     "pts": [
+      36,
+      0,
+      15
+     ],
+     "code": "druid/60/5032220115501351--505203-6"
+    },
+    {
+     "rank": 4,
+     "lead": "Feral Combat",
+     "pts": [
+      9,
+      42,
+      0
+     ],
+     "code": "druid/60/050022-55230202120132012551--6"
+    },
+    {
+     "rank": 5,
+     "lead": "Feral Combat",
+     "pts": [
+      9,
+      34,
+      8
+     ],
+     "code": "druid/60/050022-55000032021032212051-05003-6"
+    }
+   ]
+  }
+ }
+}
