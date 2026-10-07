@@ -1111,8 +1111,12 @@ def _publish(
         _block(run, pending_id=str(verdict["id"]), version=version, revision=revision, by="uv_sync", reason=reason,
                extra={"log": str(log)})  # fmt: skip
         return Step(step, "arrêt", reason, {"id": verdict["id"], "log": str(log)})
-    run.say(f"{step} : tasks.py verify dans le clone (plusieurs minutes)")
-    command = ["uv", "run", "--frozen", "--offline", "tasks.py", "verify"]
+    # Seules les données changent dans le clone : vérification des données (intégrité, origines, registre, chiffres,
+    # tests des données et des moteurs aux entrées changées) au lieu de la suite complète ; la CI complète de la
+    # branche reste le juge avant la fusion (décision 206).
+    engines = sorted(name for name, d in verdict["inputs"].items() if not d["identical"])
+    run.say(f"{step} : tasks.py verify --data dans le clone (moteurs : {', '.join(engines) or 'aucun'})")
+    command = ["uv", "run", "--frozen", "--offline", "tasks.py", "verify", "--data", f"--engines={','.join(engines)}"]
     checked = runner(command, clone, None)
     if checked.returncode != 0:
         gitops.discard_changes(runner, clone)

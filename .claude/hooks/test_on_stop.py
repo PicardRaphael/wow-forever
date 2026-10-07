@@ -1,4 +1,6 @@
-"""Stop : si du code a changé, lance les tests rapides avant que Claude ne s'arrête.
+"""Stop : si du code a changé, lance les tests rapides concernés avant que Claude ne s'arrête.
+- Sélection de `uv run tasks.py quick` (`scripts/select_tests.py`) : tests concernés par les fichiers modifiés depuis
+  main, hors `slow`, ou tous les tests rapides pour un fichier partagé ; aucun test concerné : rien n'est lancé.
 - Les tests listés dans tasks/.rouge (phase rouge d'une tranche) sont ignorés.
 - Anti-boucle : ne relance pas si l'arrêt a déjà été bloqué une fois (stop_hook_active)."""
 
@@ -29,7 +31,21 @@ elif importlib.util.find_spec("pytest"):
     runner = [sys.executable, "-m", "pytest"]
 else:
     sys.exit(0)  # impossible de lancer les tests ici : ne pas bloquer
-cmd = runner + ["-q", "-m", "not slow", "tests/unit"]
+cmd = runner + ["-q", "-m", "not slow"]
+selector = pathlib.Path(cwd, "scripts", "select_tests.py")
+if selector.is_file():
+    spec = importlib.util.spec_from_file_location("select_tests", selector)
+    assert spec and spec.loader
+    sel = importlib.util.module_from_spec(spec)
+    sys.modules["select_tests"] = sel
+    spec.loader.exec_module(sel)
+    root = pathlib.Path(cwd).resolve()
+    files = sel.select(sel.changed_since("main", root), sel.TestIndex(root)).files
+    if files == []:
+        sys.exit(0)  # aucun test concerné
+    cmd += ["-n", "auto"] + (files if files is not None else ["tests"])
+else:
+    cmd += ["tests/unit"]
 rouge = pathlib.Path(cwd, "tasks/.rouge")
 if rouge.exists():
     for test_id in (line.strip() for line in rouge.read_text(encoding="utf-8").splitlines()):
