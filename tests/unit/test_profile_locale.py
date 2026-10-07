@@ -92,5 +92,7 @@ def test_every_skill_names_spells_as_in_the_client():
         assert "game_locale" in text, skill.name
 
 
-def test_plugin_version_is_0_7_0():
-    assert read_json(REPO_ROOT / "plugin" / ".claude-plugin" / "plugin.json")["version"] == "0.7.0"
+def test_plugin_version_is_at_least_0_7_0():
+    """Noms du client dans les skills depuis 0.7.0 (T08c) ; la version exacte est épinglée par test_plugin_version.py."""
+    version = read_json(REPO_ROOT / "plugin" / ".claude-plugin" / "plugin.json")["version"]
+    assert tuple(int(n) for n in version.split(".")) >= (0, 7, 0)
