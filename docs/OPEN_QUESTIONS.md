@@ -190,6 +190,11 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **DON16 — Quelle table porte le hachage `0xc842493a` (poussée 112426, `DBCache.bin` de 70235) ?** Ajoutée le
   2026-10-06 (T08d) : aucun des noms Trait* essayés ; les autres tables de la poussée sont résolues. Test : hachage
   de tous les noms de WoWDBDefs. Priorité : basse.
+- **DON17 — Faut-il déclarer `correctif_serveur` les arbres de talents (`/classes/<classe>/trees/…`) reconstruits
+  depuis des tables `Trait*` corrigées par le serveur ?** Ajoutée le 2026-10-07 (plan T08e) : seules les fiches des
+  sorts (`/classes/<classe>/spells/<clé>`) portent cette origine ; la perte d'un correctif (décision 207) ne verrait
+  pas un correctif qui ne toucherait que les arbres. Test : relire les règles écrites par `decode --hotfixes` sur la
+  refonte du Guerrier (poussée 112347). Priorité : moyenne.
 
 ## Journaux, addons et sauvegardes
 - **LOG1 — Que portent les champs inconnus du bloc avancé du journal (dont le dernier pour un joueur) ?** Test :

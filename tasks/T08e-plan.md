@@ -119,7 +119,9 @@ LF, dans `tests/fixtures/update_origins/` :
 - `README.md` : origine de chaque fichier (commit, chemin, date, empreinte sha256 du sous-arbre canonique), et le
   contrôle « r3 = 70170 r5 hors métadonnées ».
 
-JSON compact (un sous-arbre fait environ 190 ko en indenté). Si la copie de préparation a disparu : la refaire par
+JSON compact (un sous-arbre fait environ 190 ko en indenté). Si r3 a été installée entre-temps (approbation de
+l'attente `1.60.1.70245-r3-f10e27912f08`), source la plus probable : `classes.json` et `origins.json` de
+`forever/data/1.60.1.70245/` au commit de r3, dans git. Sinon, copie de préparation disparue : la refaire par
 `forever update --dry-run --only correctifs` (archive de 70245 présente, aucun réseau si les tables sont en cache) ;
 sinon s'arrêter et le signaler.
 
@@ -128,16 +130,11 @@ Montage des cas dans les tests (sur le modèle de la fixture `pair` de `test_eng
 `correctif_serveur` remplacées par celles de la fixture, `origins.json` réécrit en LF. Les deux côtés viennent des
 fixtures : le test ne dépend pas du Guerrier de la version installée du moment.
 
-### Bloc 0 — Feuille de route et décisions (sans test)
+### Bloc 0 — Feuille de route et décisions (fait avec le plan)
 
-- `docs/DECISIONS.md` : décision **207** (amende 180 et 198) : attente des correctifs d'une nouvelle version
-  (`DBCache.bin` du build archivé et lu), délai de 24 h depuis la première vue du build, installation sans correctifs
-  seulement sans perte d'une valeur `correctif_serveur`, sinon attente « correctifs du serveur non relus »
-  (approuvable) ; origines permises `client` et `correctif_serveur`, jugées avant et après ; constat r1/r3 en raison ;
-  alternatives écartées : règle telle qu'écrite, perte seule sans délai.
-- `docs/ROADMAP.md`, section T08e : « Fait » et « Critères de fin » corrigés (attente des correctifs, délai, perte),
-  tests de la réponse ; ligne de la table de l'ordre inchangée sur le fond.
-- `docs/OPEN_QUESTIONS.md` : DON17 (ci-dessous).
+Commités sur `main` avec le plan, à la demande de l'utilisateur : décision **207** dans `docs/DECISIONS.md` (amende
+180 et 198), section T08e de `docs/ROADMAP.md` corrigée (« Fait », hors périmètre, critères de fin), DON17 dans
+`docs/OPEN_QUESTIONS.md`. Reste pour l'exécution : la ligne « Réalisé » de la section (bloc D).
 
 ### Bloc A — Déclaration des moteurs et origine de chaque feuille changée
 
