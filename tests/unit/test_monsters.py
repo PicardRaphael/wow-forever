@@ -72,6 +72,15 @@ def test_summoned_creatures_are_not_monsters():
     assert found == [] and conflicts == []
 
 
+def test_player_controlled_creatures_are_not_monsters():
+    """Décision 204 : toute invocation de joueur est écartée d'office, même sans propriétaire dans le bloc avancé
+    (drapeaux du journal : gardien, familier ou contrôle par un joueur) ; une créature contrôlée par le serveur reste
+    un monstre, même nommée « Summoned »."""
+    found, conflicts = observations(SYNTHETIC_LOGS / "player_controlled.txt")
+    assert conflicts == []
+    assert [(o["npc_id"], o["name"]) for o in found] == [(5676, "Summoned Voidwalker")]
+
+
 def test_installed_table_is_read_by_game_data(game_data):
     monsters = game_data.monsters
     assert (
