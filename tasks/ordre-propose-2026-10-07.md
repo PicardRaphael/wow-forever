@@ -1,7 +1,9 @@
-# Ordre des tranches proposé le 2026-10-07 (non appliqué)
+# Ordre des tranches proposé le 2026-10-07 (appliqué le même jour, décision 202)
 
-**Statut : proposition en attente de validation** (décision 201). L'ordre en vigueur reste celui de la table de
-`docs/ROADMAP.md`. Ce document propose un ordre qui sert d'abord les trois paris de `docs/VISION.md` : (1) chat et
+**Statut : validé et appliqué à `docs/ROADMAP.md` le 2026-10-07** (décision 202), avec une modification de
+l'utilisateur : P06 découpée en **P06a** (chat en jeu : question, réponse, état des données) puis **P06b** (boutons,
+validation et refus en jeu, liens d'export), pour avoir au moins le chat avant la fin de la bêta. Fusions et retrait
+ci-dessous acceptés. Le texte qui suit est la proposition d'origine (décision 201), gardée pour ses raisons. Ce document propose un ordre qui sert d'abord les trois paris de `docs/VISION.md` : (1) chat et
 boutons en jeu, (2) exports vers les addons, (3) boucle de mesure.
 
 ## Contraintes de calendrier

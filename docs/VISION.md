@@ -56,11 +56,11 @@ Pour chacun des personnages du joueur (profil multi-sources, décision 125) :
 ### 4. Agir en jeu
 forever-core ne joue jamais à la place du joueur : il **prépare** ce que le joueur ouvre ou importe lui-même.
 - **Lien Talents Forever** du build calculé (FA1) ;
-- **liste BiS** et poids des statistiques dans **Naowh Forever** (T10), quand son point d'import le permet ;
+- **liste BiS** et poids des statistiques dans **Naowh Forever** (T10a pour le Mage, puis T10), par ses points d'import ;
 - **profils EllesmereUI** par personnage et par rôle (tranche EX1) ;
 - **macros** par classe, en texte à importer (EX1, décision 195) ;
 - **chat et boutons en jeu** : poser une question à l'agent sans quitter le jeu, et lancer en un clic ce qu'il
-  sait faire (P06).
+  sait faire (P06a pour le chat, P06b pour les boutons).
 
 Règle commune (décision 196) : un export vers un addon se fait dans la tranche qui calcule la donnée, et
 seulement si l'addon a un point d'import ; sinon, notre addon affiche la donnée. Le code des addons de la
@@ -74,15 +74,15 @@ communauté n'est jamais modifié.
 
 ## Trois paris, par ordre de valeur
 
-1. **Chat et boutons en jeu** (P06) : la valeur du projet devient visible là où le joueur joue. Un bouton
+1. **Chat et boutons en jeu** (P06a, puis P06b) : la valeur du projet devient visible là où le joueur joue. Un bouton
    n'apparaît que si la tranche qui le calcule est faite.
 2. **Exports vers les addons** (FA1, T10, EX1) : chaque décision de forever-core arrive dans l'addon que le joueur
    utilise déjà, sans nouvelle interface à apprendre.
 3. **Boucle de mesure** : chaque session de jeu rend le modèle plus juste, et chaque chiffre affiché dit d'où il
    vient.
 
-L'ordre des tranches qui sert ces paris est proposé dans `tasks/ordre-propose-2026-10-07.md` (en attente de
-validation, non appliqué à `docs/ROADMAP.md`).
+L'ordre des tranches qui sert ces paris est appliqué à `docs/ROADMAP.md` depuis le 2026-10-07 (décision 202 ;
+raisons dans `tasks/ordre-propose-2026-10-07.md`).
 
 ## Ce qu'on refuse
 
@@ -104,6 +104,6 @@ la bande de pixels du pont (décision 194) et le texte des macros exportées (d�
 
 ## Crédits prévus
 
-Le pont de P06 reprend la technique de **wow-ai** (chelinho139 et ses forks, licence MIT d'après le joueur, à
-vérifier au plan de P06 sur le dépôt retenu) et, si utile, une partie de son code : mention de licence conservée
+Le pont de P06a reprend la technique de **wow-ai** (chelinho139 et ses forks, licence MIT d'après le joueur, à
+vérifier au plan de P06a sur le dépôt retenu) et, si utile, une partie de son code : mention de licence conservée
 dans chaque fichier repris, crédits dans `docs/ADDON.md` et dans ce document.

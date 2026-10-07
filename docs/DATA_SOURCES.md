@@ -84,12 +84,12 @@ Un export se fait dans la tranche qui calcule la donnée, seulement vers un addo
 | Donnée calculée | Addon cible | Point d'import | Tranche |
 | --- | --- | --- | --- |
 | Build de talents | Talents Forever | code et lien v6, nœuds de l'addon par correspondance par sort et par position | FA1 |
-| Liste BiS par personnage et par contexte | Naowh Forever | chaîne `!NBIS1!` (`/nfbis`) | T10 |
-| Poids des statistiques | Naowh Forever | ligne `NFSW1:` (ou format de type Pawn v1) | T10 |
+| Liste BiS par personnage et par contexte | Naowh Forever | chaîne `!NBIS1!` (`/nfbis`) | T10a (Mage), T10 |
+| Poids des statistiques | Naowh Forever | ligne `NFSW1:` (ou format de type Pawn v1) | T10a (Mage), T10 |
 | Macros par classe | Naowh Forever | chaîne `!NFM1!` (fenêtre Macros) | EX1 |
 | Profil d'interface par personnage et par rôle | EllesmereUI | chaîne `!EUI_` (import partiel), bascule par `SwitchProfile` | EX1 |
 | Fraîcheur, XP par heure, objectif suivant | EllesmereUI (DataBars) | objet LibDataBroker de notre addon | EX1 |
-| Conversation et boutons | notre addon | pont de P06 | P06 |
+| Conversation et boutons | notre addon | pont de P06a, boutons de P06b | P06a, P06b |
 
 ### Versions des addons (décision 124)
 Quand la version d'un addon de données change, le projet le détecte, relit ses données et signale ce qui a changé, comme pour une version du jeu. La chaîne `## Version` du `.toc` ne suffit pas : la version d'AtlasLoot (1.1.3) est le nom de la version publiée sur CurseForge, repris dans le nom du fichier téléchargé par le gestionnaire d'addons, et n'apparaît dans aucun fichier de l'addon (précision de l'utilisateur du 2026-09-30). CurseForge publie depuis le 2026-09-29 une AtlasLoot Classic Forever 1.1.4 (fichier `1.1.4-300926-11601-11509`, recherche du 2026-09-30) ; la version installée reste la 1.1.3. La détection compare donc l'**empreinte des fichiers de données** de l'addon à celle du dernier relevé ; la version affichée est celle du `.toc`, ou celle que le joueur donne quand le `.toc` ne la porte pas. **Fait en T08b (bloc D)** : `forever addons status [--save] [--json]` (lecture locale) rend pour chaque addon suivi (`forever/addons.py`, `DATA_ADDONS`) la version du `.toc`, l'empreinte des fichiers de données (court-circuit par taille et date), le statut `nouveau`, `inchangé`, `changé` ou `absent` par rapport au relevé du cache (`<cache>/addons/state.json`, écrit seulement avec `--save`), les fichiers ajoutés, retirés ou modifiés, et pour Questie les différences de ses agrégats (PNJ, quêtes, XP des quêtes) avec les données du dépôt qui en dépendent (`monsters.json` `questie_correction`) et l'action proposée (`forever measures refresh`) ; les autres addons attendent leur lecteur (DJ1, LG1). La veille locale `forever watch` (bloc G) signale un addon changé à chaque passage.
