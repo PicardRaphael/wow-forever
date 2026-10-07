@@ -11,6 +11,10 @@ import os
 from datetime import timedelta
 
 from conftest import LOCAL_VERSION
+from test_measures_refresh import QUESTIE, accept, never, world  # noqa: F401  (fixture importée)
+from test_update_chain import LOG, Measure, Replay, logs, step  # noqa: F401  (fixture importée)
+
+from forever.cli import main
 from forever.pipeline.live_logs import (
     DEFAULT_EXECUTABLES,
     LOG_QUIET_S,
@@ -18,10 +22,6 @@ from forever.pipeline.live_logs import (
     game_running_from,
     split_live,
 )
-from test_measures_refresh import QUESTIE, accept, never, world  # noqa: F401  (fixture importée)
-from test_update_chain import LOG, Measure, Replay, logs, step  # noqa: F401  (fixture importée)
-
-from forever.cli import main
 from forever.update import UpdateOptions, run_update
 
 QUIET = timedelta(seconds=LOG_QUIET_S)
