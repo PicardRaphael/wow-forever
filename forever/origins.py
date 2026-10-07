@@ -205,12 +205,10 @@ class _Checker:
                 self.issue("fichier_absent", name, "", f"règle pour {name}, absent de {self.version}")
         used: set[int] = set()
         used_pending: set[int] = set()
+        resolver = OriginResolver(rules, not_values, metadata)
         for name in present:
-            file_rules = sorted(
-                (r for r in rules if r.file == name), key=lambda r: (r.specificity, -r.index), reverse=True
-            )
             skipped = [p for f, p in not_values if f == name]
-            self._check_file(name, metadata, file_rules, skipped, pending, sources, used, used_pending)
+            self._check_file(name, metadata, resolver, skipped, pending, sources, used, used_pending)
         for r in rules:
             if r.file in present and r.index not in used:
                 self.issue("regle_sans_effet", r.file, r.raw_path, f"aucune valeur sous {r.raw_path}")
@@ -294,7 +292,7 @@ class _Checker:
         self,
         name: str,
         metadata: frozenset[str],
-        rules: Sequence[_Rule],
+        resolver: OriginResolver,
         skipped: Sequence[Segments],
         pending: Sequence[tuple[str, Segments, Mapping[str, Any]]],
         sources: Mapping[str, Any],
@@ -310,7 +308,7 @@ class _Checker:
             if any(_match_prefix(s, seg) for s in skipped):
                 continue
             self.leaf_count += 1
-            rule = next((r for r in rules if _match_prefix(r.pattern, seg)), None)
+            rule = resolver.rule(name, seg)
             pointer = format_pointer(seg)
             if rule is None:
                 self.issue("non_couverte", name, pointer, "valeur sans origine déclarée")
@@ -339,15 +337,36 @@ class _Checker:
 
 class OriginResolver:
     """Origine déclarée d'une feuille d'un dossier de version, par les règles de son `origins.json` (la plus précise
-    l'emporte, comme dans le contrôle) ; T08e, décision 207."""
+    l'emporte, comme dans le contrôle) ; T08e, décision 207. Règles mal formées ignorées (le contrôle les signale)."""
+
+    def __init__(
+        self, rules: Sequence[_Rule], not_values: Sequence[tuple[str, Segments]], metadata: frozenset[str]
+    ) -> None:
+        self.metadata = metadata
+        self._rules: dict[str, list[_Rule]] = {}
+        for rule in sorted(rules, key=lambda r: (r.specificity, -r.index), reverse=True):
+            self._rules.setdefault(rule.file, []).append(rule)
+        self._skipped: dict[str, list[Segments]] = {}
+        for file, seg in not_values:
+            self._skipped.setdefault(file, []).append(seg)
 
     @classmethod
     def load(cls, version_dir: Path) -> OriginResolver:
-        raise NotImplementedError
+        checker = _Checker(version_dir.parent, version_dir.name)
+        path = version_dir / ORIGINS_NAME
+        doc = _read(path) if path.is_file() else {}
+        return cls(checker._rules(doc), checker._not_values(doc), frozenset(doc.get("metadata_keys", [])))
 
     def origin(self, file: str, pointer: str) -> str | None:
         """Origine de la feuille `pointer` de `file` ; `NOT_A_VALUE` hors des valeurs ; None : sans règle."""
-        raise NotImplementedError
+        seg = parse_pointer(pointer) if pointer else ()
+        if any(s in self.metadata for s in seg) or any(_match_prefix(s, seg) for s in self._skipped.get(file, [])):
+            return NOT_A_VALUE
+        rule = self.rule(file, seg)
+        return rule.origin if rule is not None else None
+
+    def rule(self, file: str, seg: Segments) -> _Rule | None:
+        return next((r for r in self._rules.get(file, []) if _match_prefix(r.pattern, seg)), None)
 
 
 def check_version(data_dir: Path, version: str) -> OriginsReport:

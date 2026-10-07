@@ -118,7 +118,7 @@ ENGINES: Mapping[str, EngineSpec] = {
         "pvp_dr",
         ("pvp_items.json", "pvp_rules.json", "races.json"),
         {CLASSES_FILE: ("/classes/*",)},
-        ("matchup-Mage-Warlock-20",),
+        (),  # fiches recopiées du client : contrôle par `verify --data --engines=pvp_dr`, pas de rejeu
         "recopie",
     ),
 }
@@ -126,12 +126,15 @@ ENGINES: Mapping[str, EngineSpec] = {
 
 def check_engines(engines: Mapping[str, EngineSpec]) -> None:
     """Garde de complétude : chaque moteur déclare un mode connu (`ENGINE_MODES`)."""
-    raise NotImplementedError
+    for name, spec in engines.items():
+        mode = getattr(spec, "mode", None)
+        if mode not in ENGINE_MODES:
+            raise EngineDeclarationError(
+                f"Moteur {name} : mode {mode!r} inconnu ({' ou '.join(ENGINE_MODES)} attendu, décision 207)."
+            )
 
 
-def hotfix_losses(before: Path, after: Path) -> list[ValueChange]:
-    """Valeurs d'origine `correctif_serveur` de la version installée perdues dans la copie de préparation."""
-    raise NotImplementedError
+check_engines(ENGINES)
 
 
 class _TrackedClasses(dict[str, Any]):
@@ -286,8 +289,46 @@ def _leaves(doc: Any, path: str = "") -> Iterator[tuple[str, Any]]:
 
 
 def _changed_leaves(a: Any, b: Any) -> int:
+    return len(_changed(a, b))
+
+
+def _changed(a: Any, b: Any) -> list[tuple[str, Any, Any]]:
+    """(chemin relatif, avant, après) de chaque feuille changée, `ABSENT` pour une feuille ajoutée ou retirée."""
     la, lb = dict(_leaves(a)), dict(_leaves(b))
-    return sum(1 for k in set(la) | set(lb) if k not in la or k not in lb or la[k] != lb[k])
+    keys = [*la, *(k for k in lb if k not in la)]
+    return [(k, la.get(k, ABSENT), lb.get(k, ABSENT)) for k in keys if k not in la or k not in lb or la[k] != lb[k]]
+
+
+class _Origins:
+    """Résolveurs d'origine des deux dossiers comparés, chargés à la demande."""
+
+    def __init__(self, before: Path, after: Path) -> None:
+        self.dirs = (before, after)
+        self.loaded: list[Any] = []
+
+    def __call__(self, file: str, pointer: str) -> tuple[str | None, str | None]:
+        if not self.loaded:
+            from forever.origins import OriginResolver
+
+            self.loaded = [OriginResolver.load(d) for d in self.dirs]
+        return self.loaded[0].origin(file, pointer), self.loaded[1].origin(file, pointer)
+
+
+def _value_changes(file: str, pointer: str | None, a: Any, b: Any, origins: _Origins) -> list[ValueChange]:
+    out = []
+    for path, x, y in _changed(a, b):
+        full = f"{pointer or ''}{path}"
+        out.append(ValueChange(file, full, x, y, *origins(file, full)))
+    return out
+
+
+def _origin_counts(changes: Sequence[ValueChange]) -> dict[str, int]:
+    counts: dict[str, int] = {}
+    for c in changes:
+        origin = c.origin_after if c.after is not ABSENT else c.origin_before
+        key = origin or "sans_règle"
+        counts[key] = counts.get(key, 0) + 1
+    return dict(sorted(counts.items()))
 
 
 def _expand(pattern: str, docs: Sequence[Any]) -> list[str]:
@@ -310,8 +351,10 @@ def _expand(pattern: str, docs: Sequence[Any]) -> list[str]:
 
 
 def compare_inputs(before: Path, after: Path) -> dict[str, InputsDiff]:
-    """Entrées de chaque moteur comparées entre deux dossiers de version."""
+    """Entrées de chaque moteur comparées entre deux dossiers de version ; un item « différent » porte ses feuilles
+    changées (`changes`, `ValueChange` avec l'origine déclarée avant et après) et leurs comptes par origine."""
     metadata = metadata_keys(before, after)
+    origins = _Origins(before, after)
     loaded: dict[tuple[Path, str], Any] = {}
 
     def load(folder: Path, name: str) -> Any:
@@ -326,14 +369,18 @@ def compare_inputs(before: Path, after: Path) -> dict[str, InputsDiff]:
         sa, sb = _strip(a, metadata), _strip(b, metadata)
         ha = None if a is None else _sha(sa)
         hb = None if b is None else _sha(sb)
-        return {
+        out: dict[str, Any] = {
             "file": file,
             "pointer": pointer,
             "status": "identique" if ha == hb else "différent",
             "before": ha,
             "after": hb,
-            "leaves": 0 if ha == hb else _changed_leaves(sa, sb),
+            "leaves": 0,
         }
+        if ha != hb:
+            changes = _value_changes(file, pointer, sa, sb, origins)
+            out.update(leaves=len(changes), changes=changes, origins=_origin_counts(changes))
+        return out
 
     out: dict[str, InputsDiff] = {}
     for name, spec in ENGINES.items():
@@ -348,7 +395,8 @@ def compare_inputs(before: Path, after: Path) -> dict[str, InputsDiff]:
 
 
 def cases_to_replay(diffs: Mapping[str, InputsDiff]) -> list[tuple[str, str]]:
-    """(moteur, cas) à rejouer : seulement les moteurs dont une entrée change."""
+    """(moteur, cas) à rejouer : seulement les moteurs dont une entrée change (un moteur qui recopie n'a pas de
+    cas)."""
     return [
         (name, case)
         for name, spec in ENGINES.items()
@@ -362,4 +410,32 @@ def targeted_replay(diffs: Mapping[str, InputsDiff], replay: Callable[[str, str]
     out: dict[str, dict[str, Any]] = {}
     for engine, case in cases_to_replay(diffs):
         out.setdefault(engine, {})[case] = replay(engine, case)
+    return out
+
+
+def hotfix_losses(before: Path, after: Path) -> list[ValueChange]:
+    """Valeurs d'origine `correctif_serveur` de la version installée (`before`) perdues dans la copie de préparation
+    (`after`) : feuille changée, ajoutée ou retirée sous une règle `correctif_serveur` avant, dont l'origine après n'est
+    pas `correctif_serveur` (décision 207). Tous les fichiers portant une telle règle, pas seulement les entrées des
+    moteurs : une recherche lit aussi ces valeurs."""
+    from forever.origins import ORIGINS_NAME, SERVER_ORIGIN
+
+    try:
+        doc = json.loads((before / ORIGINS_NAME).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    files = sorted({str(r.get("file")) for r in doc.get("rules", []) if r.get("origin") == SERVER_ORIGIN})
+    metadata = metadata_keys(before, after)
+    origins = _Origins(before, after)
+    out: list[ValueChange] = []
+    for name in files:
+        docs = []
+        for folder in (before, after):
+            try:
+                docs.append(_strip(json.loads((folder / name).read_text(encoding="utf-8")), metadata))
+            except (OSError, ValueError):
+                docs.append(None)
+        for change in _value_changes(name, None, docs[0], docs[1], origins):
+            if change.origin_before == SERVER_ORIGIN and change.origin_after != SERVER_ORIGIN:
+                out.append(change)
     return out

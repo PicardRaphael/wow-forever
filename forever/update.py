@@ -35,7 +35,15 @@ from typing import TYPE_CHECKING, Any, NamedTuple, TypedDict
 
 from forever.carry import CarryReport, carry_apply, carry_check
 from forever.config import CACHE_TTL, REPO_ROOT, UPDATE_CI_TIMEOUT, UPDATE_LOCK_STALE, Deps, utc_now
-from forever.engine_inputs import ENGINES, InputsDiff, ValueChange, compare_inputs, targeted_replay
+from forever.engine_inputs import (
+    ABSENT,
+    ENGINES,
+    EngineDeclarationError,
+    InputsDiff,
+    ValueChange,
+    compare_inputs,
+    targeted_replay,
+)
 from forever.errors import EXIT_OK, EXIT_PENDING, ForeverError, InvalidArgumentError, PathNotFoundError
 from forever.pipeline.tables import ColumnNamesError
 from forever.timefmt import format_utc, parse_utc
@@ -148,6 +156,29 @@ def _pending_path(cache_dir: Path, pending_id: str) -> Path:
 # --- Règle d'automatisme --------------------------------------------------------------------------------------
 
 
+def _blocking_changes(diff: InputsDiff) -> list[Any] | None:
+    """Feuilles changées d'un moteur qui recopie dont une origine n'est pas permise (`AUTO_ORIGINS`) ; None : un item
+    différent sans le détail des feuilles (aucune installation seule sans les origines)."""
+    out = []
+    for item in diff.items:
+        if item.get("status") != "différent":
+            continue
+        if "changes" not in item:
+            return None
+        for c in item["changes"]:
+            sides = [o for o, v in ((c.origin_before, c.before), (c.origin_after, c.after)) if v is not ABSENT]
+            if any(o not in AUTO_ORIGINS for o in sides):
+                out.append(c)
+    return out
+
+
+def _first(changes: Sequence[ValueChange]) -> str:
+    c = changes[0]
+    origins = sorted({str(o) for o, v in ((c.origin_before, c.before), (c.origin_after, c.after)) if v is not ABSENT})
+    more = f" (et {len(changes) - 1} autre(s))" if len(changes) > 1 else ""
+    return f"{c.file} {c.pointer} ({' → '.join(origins) or 'sans règle'}){more}"
+
+
 def decide(
     verify_ok: bool,
     carry: CarryReport,
@@ -157,14 +188,26 @@ def decide(
     install_ok: bool = True,
     hotfix_losses: Sequence[ValueChange] = (),
 ) -> Verdict:
-    """Règle d'automatisme (décision 180), pure : `écrire`, `attente` (clauses non tenues) ou `bloqué` (`verify`
-    rouge, installation refusée, ou valeur faite à la main perdue)."""
-    changed = sorted(name for name, d in inputs.items() if not d.identical)
+    """Règle d'automatisme (décisions 180, 198 et 207), pure : `écrire`, `attente` (clauses non tenues) ou `bloqué`
+    (`verify` rouge, installation refusée, ou valeur faite à la main perdue).
+
+    Clause `inputs` : les entrées de chaque moteur qui calcule sont identiques ; celles d'un moteur qui recopie ne
+    changent que par des feuilles d'origine `client` ou `correctif_serveur`, avant comme après. Clause `hotfixes` :
+    aucune valeur d'un correctif du serveur n'est perdue."""
+    for name in inputs:
+        if name not in ENGINES:
+            raise EngineDeclarationError(f"Moteur {name} : absent de ENGINES, mode non déclaré (décision 207).")
+    computing = sorted(n for n, d in inputs.items() if not d.identical and ENGINES[n].mode == "calcule")
+    copying: dict[str, list[Any] | None] = {
+        n: _blocking_changes(d) for n, d in sorted(inputs.items()) if not d.identical and ENGINES[n].mode == "recopie"
+    }
+    blocked_copies = {n: c for n, c in copying.items() if c is None or c}
     clauses = {
         "verify": verify_ok,
         "install": install_ok,
         "manual": not carry.superseded and not carry.lost,
-        "inputs": not changed,
+        "inputs": not computing and not blocked_copies,
+        "hotfixes": not hotfix_losses,
     }
     reasons: list[str] = []
     if not verify_ok:
@@ -175,8 +218,18 @@ def decide(
         reasons.append(f"valeur faite à la main perdue : {value.file} {value.pointer} ({value.origin})")
     for value, now in carry.superseded:
         reasons.append(f"valeur faite à la main remplacée : {value.file} {value.pointer} ({value.origin}) → {now!r}")
-    if changed:
-        reasons.append(f"moteurs aux entrées changées : {', '.join(changed)}")
+    if computing:
+        reasons.append(f"moteurs aux entrées changées : {', '.join(computing)}")
+    for name, changes in blocked_copies.items():
+        if changes is None:
+            reasons.append(f"{name} : entrées changées sans l'origine des valeurs")
+        else:
+            reasons.append(f"{name} : entrée d'origine non permise changée : {_first(changes)}")
+    if hotfix_losses:
+        reasons.append(
+            f"correctifs du serveur non relus : {len(hotfix_losses)} valeur(s) correctif_serveur perdue(s) "
+            f"({_first(hotfix_losses)})"
+        )
     if not verify_ok or not install_ok or carry.lost:
         action = "bloqué"
     elif not all(clauses.values()):
@@ -187,8 +240,14 @@ def decide(
 
 
 def hotfix_gate(archived: bool, seen_at: datetime | None, now: datetime, wait: timedelta) -> str:
-    """Porte des correctifs d'une nouvelle version (décision 207), pure : `lire`, `attendre` ou `sans_correctifs`."""
-    raise NotImplementedError
+    """Porte des correctifs d'une nouvelle version (décision 207), pure : `lire` (archive de `DBCache.bin` du build
+    présente), `attendre` (pas d'archive, délai non écoulé ou première vue du build inconnue), `sans_correctifs`
+    (pas d'archive `wait` après la première vue : installation sans correctifs, si aucun n'est perdu)."""
+    if archived:
+        return "lire"
+    if seen_at is None or now - seen_at < wait:
+        return "attendre"
+    return "sans_correctifs"
 
 
 # --- Verrou ---------------------------------------------------------------------------------------------------
