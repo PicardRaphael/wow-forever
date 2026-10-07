@@ -20,7 +20,7 @@ MCP_PREFIX = "mcp__plugin_forever_forever__"
 POSITIVE_COUNTS = {
     "profil": 2,
     "talent": 6,
-    "build": 6,
+    "build": 9,  # FA1 : lien Talents Forever, builds populaires du Voleur, build proche d'un populaire
     "respec": 4,
     "zone": 4,
     "generale": 2,
@@ -84,8 +84,9 @@ def test_fifty_eight_cases_thirty_eight_positive_twenty_negative():
     # T06b : talent-niveau-22 et deux cas à profil vide ; 2026-09-29 : deux questions générales, deux personnelles,
     # un personnage prévu.
     # PV1 : trois cas PvP et un voisin (retail).
-    assert len(polarity) == 66  # CH0 : trois cas familiers et un voisin
-    assert polarity.count("positif") == 44 and polarity.count("negatif") == 22
+    # FA1 : trois cas Talents Forever et un voisin (chaîne d'import de talents de retail).
+    assert len(polarity) == 70  # CH0 : trois cas familiers et un voisin
+    assert polarity.count("positif") == 47 and polarity.count("negatif") == 23
 
 
 def test_empty_profile_cases():
@@ -227,6 +228,30 @@ def test_general_and_personal_cases():
     assert graders(EVALS / "personnelle-mage-temps")["outil"][0]["tool"] == MCP_PREFIX + "forever_sim_leveling"
 
 
+def test_talents_forever_cases():
+    """FA1 (décision 209) : lien Talents Forever du build calculé, builds populaires d'une autre classe, build proche
+    d'un populaire ; voisin négatif : chaîne d'import de talents de retail."""
+    link = graders(EVALS / "build-lien-talents-forever")
+    assert front(EVALS / "build-lien-talents-forever" / "prompt.md")[0]["tags"] == ["positif", "build"]
+    assert link["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
+    assert re.search(link["outil"][0]["input_match"], '{"context": "leveling", "level": 20}')
+    assert re.search(link["lien"][0]["pattern"], "https://talentsforever.com/mage/20/--0530002001-klps-6")
+    assert "/tf import" in link["import"][0]["pattern"].replace("\\", "")
+    popular = graders(EVALS / "builds-populaires-voleur")
+    assert front(EVALS / "builds-populaires-voleur" / "prompt.md")[0]["tags"] == ["positif", "build"]
+    assert popular["outil"][0]["tool"] == MCP_PREFIX + "forever_lookup"
+    assert re.search(popular["outil"][0]["input_match"], '{"kind": "tf_popular", "name": "Rogue"}')
+    assert re.search(popular["date"][0]["pattern"], "relevé du 2026-10-04")
+    assert re.search(popular["certitude"][0]["pattern"], "Certitude : supposé", re.IGNORECASE)
+    close = graders(EVALS / "build-proche-populaire")
+    assert front(EVALS / "build-proche-populaire" / "prompt.md")[0]["tags"] == ["positif", "build"]
+    assert close["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
+    assert re.search(close["outil"][0]["input_match"], '{"context": "dungeon", "level": 20}')
+    assert re.search(close["points"][0]["pattern"], "0 point absent")
+    meta, question = front(EVALS / "neg-retail-loadout-talents" / "prompt.md")
+    assert meta["tags"] == ["negatif", "wow-autre"] and "retail" in question
+
+
 def test_case_names_are_the_directories():
     for c in cases():
         meta, question = front(c / "prompt.md")
@@ -249,7 +274,7 @@ def test_negative_categories():
         tags = front(c / "prompt.md")[0]["tags"]
         if tags[0] == "negatif":
             counts[tags[1]] += 1
-    assert sum(counts.values()) == 22
+    assert sum(counts.values()) == 23
     assert all(n >= 4 for n in counts.values()), counts
 
 
@@ -342,8 +367,9 @@ def test_report_thresholds_of_d10():
 def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    assert len(loaded) == 66  # PV1 : trois cas PvP et un voisin ; CH0 : trois cas familiers et un voisin
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 44
+    # PV1 : trois cas PvP et un voisin ; CH0 : trois cas familiers et un voisin ; FA1 : trois cas et un voisin
+    assert len(loaded) == 70
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 47
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 
