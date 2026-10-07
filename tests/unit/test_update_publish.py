@@ -182,6 +182,33 @@ def test_a_red_verify_in_the_clone_leaves_it_clean(origin):
     assert git(clone, "status", "--porcelain") == ""
 
 
+def clone_checks(rec):
+    return [c for c in rec.calls if c[0] == "uv" and "verify" in c]
+
+
+def test_the_clone_runs_the_data_verify_without_engine_tests(origin):
+    """Seules les données changent dans le clone : vérification des données, pas la suite complète ; aucun moteur
+    aux entrées changées, aucun test de moteur. La CI complète de la branche reste le juge avant la fusion."""
+    montage_, _bare = origin
+    deps, _ = montage_()
+    rec = Recorder()
+    run_update(deps, GAME, runner=rec, replay=Replay())
+    assert clone_checks(rec) == [["uv", "run", "--frozen", "--offline", "tasks.py", "verify", "--data", "--engines="]]
+
+
+def test_the_clone_checks_the_engines_whose_inputs_changed(origin):
+    montage_, _bare = origin
+    deps, _ = montage_(change=COEFFICIENT)
+    rec = Recorder()
+    run_update(deps, GAME, runner=rec, replay=Replay())
+    (entry,) = list_pending(deps.cache_dir)
+    approve(deps, entry["id"], spawn=lambda *a: None)
+    run_update(deps, GAME, runner=rec, replay=Replay())
+    (check,) = clone_checks(rec)
+    engines = check[-1].removeprefix("--engines=").split(",")
+    assert check[-2:-1] == ["--data"] and "mage_build" in engines and "pvp_dr" not in engines
+
+
 def test_a_version_installed_by_the_other_pc_only_advances_the_clone(origin, tmp_path):
     montage_, _bare = origin
     deps, _ = montage_()

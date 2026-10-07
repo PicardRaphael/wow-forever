@@ -1,18 +1,20 @@
-"""Bout en bout de `forever update` : une version nouvelle fictive installée par le clone, `verify` du clone compris
-(demande de l'utilisateur du 2026-10-06, réponse 4 ; décision 192).
+"""Bout en bout de `forever update` : une version nouvelle fictive installée par le clone, vérification du clone et
+CI comprises (demande de l'utilisateur du 2026-10-06, réponse 4 ; décisions 192 et 206).
 
 Cas réel : le 2026-10-06, `tasks.py verify` était rouge dans le clone pour 1.60.1.70235 parce que 85 tests figeaient
 la version installée (`LOCAL_VERSION = "1.60.1.70170"`). Ce test installe une version fictive, plus récente que la
 version installée du dépôt et de même contenu (copie de la version installée sous un nouveau numéro, comme 70235
 dont les entrées des moteurs étaient identiques), par `run_update` : étape « jeu » sur un `.build.info` et une liste
 de builds simulés, installation dans la copie de préparation, report à la main, preuve d'entrées, règle, puis
-**`uv sync` et `uv run tasks.py verify` réels dans le clone**, commit, poussée et fusion dans un dépôt nu local
-(`gh` simulé : CI verte). Seuls le téléchargement et le décodage sont remplacés par la candidate copiée : ils sont
+**`uv sync` et `uv run tasks.py verify --data` réels dans le clone** (vérification des données, décision 206),
+commit, poussée et fusion dans un dépôt nu local. `gh` est simulé, mais sa CI lance **la suite complète réelle**
+(`uv run tasks.py verify`) dans le clone sur le commit poussé : c'est elle qui juge avant la fusion, comme la vraie CI
+de la branche de données. Seuls le téléchargement et le décodage sont remplacés par la candidate copiée : ils sont
 couverts par `tests/unit/test_update_chain.py` sur les extraits. Une version figée dans un test rend ce test rouge.
 
-Le dépôt nu est un clone du `HEAD` du dépôt (les changements non committés n'y sont pas). Long (le `verify` complet,
-une douzaine de minutes) : lancé par `uv run tasks.py e2e` et par le job `e2e` de la CI, jamais par la suite par
-défaut (sinon il tournerait aussi dans le `verify` du clone, sans fin). Aucun réseau : git local, `uv --offline`."""
+Le dépôt nu est un clone du `HEAD` du dépôt (les changements non committés n'y sont pas). Long (la suite complète du
+clone) : lancé par `uv run tasks.py e2e` et par le job `e2e` de la CI, jamais par la suite par défaut (sinon il
+tournerait aussi dans la CI simulée du clone, sans fin). Aucun réseau : git local, `uv --offline`."""
 
 import json
 import os
@@ -89,11 +91,20 @@ def git(cwd: Path, *args: str) -> str:
     return out.stdout.strip()
 
 
+CI_COMMAND = ["uv", "run", "--frozen", "--offline", "tasks.py", "verify"]
+
+
+def without_e2e() -> dict[str, str]:
+    return {k: v for k, v in os.environ.items() if k != E2E_ENV}
+
+
 class Runner:
-    """git et `uv` réels ; `uv` sans FOREVER_E2E (le `verify` du clone saute ce test) ; `gh` simulé (CI verte)."""
+    """git et `uv` réels ; `uv` sans FOREVER_E2E (le clone saute ce test) ; `gh` simulé, dont la CI lance la suite
+    complète réelle (`CI_COMMAND`) dans le clone, une fois par commit."""
 
     def __init__(self) -> None:
         self.calls: list[tuple[list[str], int]] = []
+        self.ci: dict[str, subprocess.CompletedProcess[str]] = {}
 
     def __call__(self, args, cwd, timeout=None):
         args = list(args)
@@ -101,9 +112,8 @@ class Runner:
         if args[0] == "gh":
             out = self._gh(args, cwd)
         elif args[0] == "uv":
-            env = {k: v for k, v in os.environ.items() if k != E2E_ENV}
             out = subprocess.run(
-                args, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", env=env,
+                args, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace", env=without_e2e(),
                 timeout=timeout, check=False,
             )  # fmt: skip
         else:
@@ -114,7 +124,13 @@ class Runner:
     def _gh(self, args, cwd):
         if args[1:3] == ["run", "list"]:
             sha = git(cwd, "rev-parse", args[args.index("--branch") + 1])
-            runs = [{"databaseId": 1, "headSha": sha, "status": "completed", "conclusion": "success", "url": "ci"}]
+            if sha not in self.ci:  # le clone est sur le commit poussé : suite complète réelle
+                self.ci[sha] = subprocess.run(
+                    CI_COMMAND, cwd=cwd, capture_output=True, text=True, encoding="utf-8", errors="replace",
+                    env=without_e2e(), check=False,
+                )  # fmt: skip
+            conclusion = "success" if self.ci[sha].returncode == 0 else "failure"
+            runs = [{"databaseId": 1, "headSha": sha, "status": "completed", "conclusion": conclusion, "url": "ci"}]
             return subprocess.CompletedProcess(args, 0, json.dumps(runs), "")
         if args[1:3] == ["run", "watch"]:
             return subprocess.CompletedProcess(args, 0, "", "")
@@ -138,6 +154,13 @@ def failures(report) -> str:
                 ln for ln in text if ln.startswith(("FAILED", "ERROR")) or " failed" in ln or "Vérification" in ln
             ]
     return "\n".join(found) or str([p.get("reasons") for p in report["pending"]])
+
+
+def ci_failures(out: subprocess.CompletedProcess[str]) -> str:
+    """Lignes utiles de la suite complète de la CI simulée (tests en échec, bilan)."""
+    text = (out.stdout + out.stderr).splitlines()
+    return "
+".join(ln for ln in text if ln.startswith(("FAILED", "ERROR")) or " failed" in ln or "Vérification" in ln)
 
 
 @pytest.fixture
@@ -184,8 +207,10 @@ def test_a_new_version_is_installed_end_to_end_with_the_clone_verify(tmp_path, m
     )
     journal = "\n".join(lines)
     assert [v["action"] for v in report["verdicts"]] == ["écrire"], journal
-    verify = [code for args, code in runner.calls if args[0] == "uv" and "verify" in args]
-    assert verify == [0], failures(report)  # verify réel du clone, vert
+    verify = [(args[5:], code) for args, code in runner.calls if args[0] == "uv" and "verify" in args]
+    assert verify == [(["verify", "--data", "--engines="], 0)], failures(report)  # vérification des données, verte
+    (ci,) = runner.ci.values()
+    assert ci.returncode == 0, ci_failures(ci)  # suite complète réelle de la CI simulée, verte
     assert [w["version"] for w in report["written"]] == [version], journal
     assert report["pending"] == [] and exit_code(report) == 0
     manifest = json.loads(git(bare, "show", "main:forever/data/manifest.json"))
