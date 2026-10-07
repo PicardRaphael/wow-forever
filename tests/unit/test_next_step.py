@@ -91,6 +91,7 @@ def test_higher_is_better_orientation():
     assert d["choice"] == "slow" and d["decided_by"] == "monte_carlo"
 
 
+@pytest.mark.slow
 def test_next_step_lists_every_legal_candidate(deps, game_data, modeled):
     assert check_build(game_data, FROST_21, 21) == []
     rep = build_report(deps, "leveling", 22, current=FROST_21, preset="rapide", sensitivity=False)
@@ -115,6 +116,7 @@ def test_next_step_lists_every_legal_candidate(deps, game_data, modeled):
         assert ns["choice"] in modeled  # jamais un non modélisé à la place d'un modélisé à égalité
 
 
+@pytest.mark.slow
 def test_next_step_needs_a_current_build_legal_one_level_below(deps):
     assert build_report(deps, "leveling", 22, preset="rapide", sensitivity=False)["next_step"] is None
     over = {**FROST_21, "iceShards": 2}  # 13 points : légal au niveau 22, pas au niveau 21

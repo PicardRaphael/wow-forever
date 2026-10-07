@@ -41,6 +41,7 @@ def game_data(deps):
 # --- Niveau par défaut -----------------------------------------------------------------------------------------------
 
 
+@pytest.mark.slow
 def test_build_without_level_uses_the_level_cap_of_the_data(deps, game_data):
     rep = build_report(deps, "pvp-bg", None, preset="rapide", sensitivity=False)
     cap = game_data.level_cap
@@ -63,6 +64,7 @@ def test_mcp_and_cli_level_is_optional(deps):
 # --- Chemin projeté depuis le build actuel ---------------------------------------------------------------------------
 
 
+@pytest.mark.slow
 def test_respec_projects_the_path_from_the_current_build(deps, game_data):
     rep = build_report(deps, "leveling", 16, preset="rapide", current=CURRENT_11, sensitivity=False)
     proj = rep["respec"]["projected"]

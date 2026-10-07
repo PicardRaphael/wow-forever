@@ -50,6 +50,7 @@ def check(name, *, strict=True, engine_dirs=()):
     return validate(REGISTRIES / name, REPO_ROOT, strict=strict, engine_dirs=engine_dirs)
 
 
+@pytest.mark.slow
 def test_repository_registry_is_valid_strict():
     report = validate(REGISTRY_PATH, REPO_ROOT, strict=True)
     assert report.errors == []
@@ -137,6 +138,7 @@ def test_load_reads_optional_fields():
     assert a5.sources
 
 
+@pytest.mark.slow
 def test_main_strict_on_repository(capsys):
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out

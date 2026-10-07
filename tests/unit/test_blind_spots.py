@@ -91,11 +91,13 @@ def _write(tmp_path, angle_mort):
         ({"talents": "[]", "contextes": "[raid]", "estimation": "guess"}, "estimation inconnue"),
     ],
 )
+@pytest.mark.slow
 def test_invalid_blind_spot_is_refused(tmp_path, angle_mort, message):
     report = validate(_write(tmp_path, angle_mort), REPO_ROOT, strict=True)
     assert any("B10" in e and message in e for e in report.errors), report.errors
 
 
+@pytest.mark.slow
 def test_repository_registry_blind_spots_are_valid():
     assert validate(REGISTRY_PATH, REPO_ROOT, strict=True).errors == []
 

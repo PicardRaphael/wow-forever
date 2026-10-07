@@ -4,6 +4,7 @@ provenance, rubriques du texte, erreurs d'argument, même résultat par la CLI e
 import asyncio
 import json
 
+import pytest
 from conftest import FakeHttp
 from mcp import Client
 
@@ -81,6 +82,7 @@ def test_argument_errors(capsys, make_deps):
     assert code == 2 and "illégal" in err
 
 
+@pytest.mark.slow
 def test_mcp_returns_the_cli_json(capsys, make_deps):
     deps = make_deps()
     code, out, _ = run(capsys, [*ARGV, "--json"], deps)

@@ -60,6 +60,7 @@ def test_advised_level_is_the_best_balance(game_data, bad):
     assert bad.gold_per_hour == gold_per_hour(game_data, bad.level)
 
 
+@pytest.mark.slow
 def test_optimal_build_is_kept(game_data, bad):
     """Le build du chemin libre au niveau actuel : rien à gagner (moins que le coût et le trajet)."""
     pts: dict[str, int] = {}
@@ -73,6 +74,7 @@ def test_optimal_build_is_kept(game_data, bad):
     assert good.balance_gold <= 0
 
 
+@pytest.mark.slow
 def test_more_resets_cost_more(game_data):
     a = advise_respec(game_data, 30, USELESS_30, 32, "Orc", preset=game_data.build.presets["rapide"], n_previous=5)
     assert a.cost_gold == respec_cost(game_data, 5) and a.cost_certainty == "suppose"

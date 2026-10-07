@@ -125,6 +125,7 @@ def test_certainty_is_the_minimum_of_its_sources(leveling, dungeon):
     assert dungeon["certainty_sources"]["scénarios"] == "suppose"
 
 
+@pytest.mark.slow
 def test_beta_level_cap(game_data, deps, leveling, dungeon):
     cap = game_data.build.beta_level_cap
     assert leveling["verifiable_in_game"] is True  # niveau 14 ≤ plafond
@@ -154,6 +155,7 @@ def test_talented_bonus(game_data, deps):
     assert rep["sensitivity"] == []
 
 
+@pytest.mark.slow
 def test_respec_advice(deps, leveling, dungeon):
     assert leveling["respec"]["verdict"] is None and leveling["respec"]["cost_gold"] > 0  # pas de --current
     rep = build_report(deps, "leveling", 16, preset="rapide", current={"wandSpecialization": 2}, sensitivity=False)

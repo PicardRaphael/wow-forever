@@ -104,6 +104,7 @@ def origin(tmp_path, montage):  # noqa: F811
     return montage, bare
 
 
+@pytest.mark.slow
 def test_same_tables_are_installed_through_the_clone(origin):
     montage_, bare = origin
     deps, _ = montage_()
@@ -141,6 +142,7 @@ def test_a_changed_engine_input_is_recorded_and_nothing_is_pushed(origin):
     assert entry["state"] == "en_attente" and entry["base"]["origin_main"] == head
 
 
+@pytest.mark.slow
 def test_an_approved_entry_is_written_by_the_next_run(origin):
     montage_, bare = origin
     deps, _ = montage_(change=COEFFICIENT)
@@ -186,6 +188,7 @@ def clone_checks(rec):
     return [c for c in rec.calls if c[0] == "uv" and "verify" in c]
 
 
+@pytest.mark.slow
 def test_the_clone_runs_the_data_verify_without_engine_tests(origin):
     """Seules les données changent dans le clone : vérification des données, pas la suite complète ; aucun moteur
     aux entrées changées, aucun test de moteur. La CI complète de la branche reste le juge avant la fusion."""
@@ -196,6 +199,7 @@ def test_the_clone_runs_the_data_verify_without_engine_tests(origin):
     assert clone_checks(rec) == [["uv", "run", "--frozen", "--offline", "tasks.py", "verify", "--data", "--engines="]]
 
 
+@pytest.mark.slow
 def test_the_clone_checks_the_engines_whose_inputs_changed(origin):
     montage_, _bare = origin
     deps, _ = montage_(change=COEFFICIENT)
@@ -209,6 +213,7 @@ def test_the_clone_checks_the_engines_whose_inputs_changed(origin):
     assert check[-2:-1] == ["--data"] and "mage_build" in engines and "pvp_dr" not in engines
 
 
+@pytest.mark.slow
 def test_a_version_installed_by_the_other_pc_only_advances_the_clone(origin, tmp_path):
     montage_, _bare = origin
     deps, _ = montage_()

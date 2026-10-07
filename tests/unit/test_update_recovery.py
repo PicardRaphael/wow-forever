@@ -112,6 +112,7 @@ def test_a_red_verify_in_the_clone_is_a_blocked_wait_with_its_output(origin, cap
     assert line is not None and "session nécessaire" in line
 
 
+@pytest.mark.slow
 def test_a_blocked_verify_is_not_run_again_until_main_moves(origin, tmp_path):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
@@ -131,6 +132,7 @@ def test_a_blocked_verify_is_not_run_again_until_main_moves(origin, tmp_path):  
 # --- Branche de données laissée par un passage tué ----------------------------------------------------------------
 
 
+@pytest.mark.slow
 def test_a_pass_killed_during_the_ci_wait_is_resumed_by_the_next_one(origin):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
@@ -151,6 +153,7 @@ def test_a_pass_killed_during_the_ci_wait_is_resumed_by_the_next_one(origin):  #
     assert step(report, "jeu")["status"] == "rien"  # installée : le passage continue sur main
 
 
+@pytest.mark.slow
 def test_a_pass_killed_after_the_merge_only_cleans_up(origin):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
@@ -167,6 +170,7 @@ def test_a_pass_killed_after_the_merge_only_cleans_up(origin):  # noqa: F811
     assert head_branch(clone) == "main" and git(bare, "branch", "--list", BRANCH) == ""
 
 
+@pytest.mark.slow
 def test_a_pass_killed_before_the_push_returns_to_main_and_writes_again(origin):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
@@ -183,6 +187,7 @@ def test_a_pass_killed_before_the_push_returns_to_main_and_writes_again(origin):
     assert head_branch(clone) == "main" and git(clone, "branch", "--list", BRANCH) == ""
 
 
+@pytest.mark.slow
 def test_a_red_ci_found_on_resume_returns_to_main_and_blocks(origin, tmp_path):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
@@ -205,6 +210,7 @@ def test_a_red_ci_found_on_resume_returns_to_main_and_blocks(origin, tmp_path): 
     assert git(bare, "branch", "--list", BRANCH) == ""
 
 
+@pytest.mark.slow
 def test_a_red_ci_in_the_pass_returns_the_clone_to_main_and_blocks(origin):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
@@ -221,6 +227,7 @@ def test_a_red_ci_in_the_pass_returns_the_clone_to_main_and_blocks(origin):  # n
 # --- Fichier dérivé de la version installée -------------------------------------------------------------------------
 
 
+@pytest.mark.slow
 def test_the_written_version_carries_its_manual_values_inventory(origin):  # noqa: F811
     """`docs/research/valeurs-ecrites-a-la-main.md` est le rendu de `forever origins inventory` pour la version
     courante : l'écriture d'une nouvelle version le rend de nouveau (relevé par le bout en bout, décision 192)."""

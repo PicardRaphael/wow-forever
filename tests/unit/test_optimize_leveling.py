@@ -85,6 +85,7 @@ def test_choices_are_legal(game_data, path):
         kill_analytic(game_data, s.level, pts, "Orc", c.rotation, **c.options())  # combinaison acceptée
 
 
+@pytest.mark.slow
 def test_optimizer_is_deterministic(game_data, path):
     assert _run(game_data) == path
 

@@ -60,6 +60,7 @@ def test_matchup_is_deterministic(data):
         assert a["threats"]["controls"] and a["answers"]["cc_breaks"] is not None
 
 
+@pytest.mark.slow
 def test_every_value_traces_to_the_data(data):
     sheet = matchup(data, {"class": "Mage", "level": 60, "race": "Orc", "talents": None}, {"class": "Warlock"})
     traced = list(values(sheet))

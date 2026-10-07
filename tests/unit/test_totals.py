@@ -20,6 +20,9 @@ from forever.explain import explain_mechanic
 from forever.leveling import simulate_leveling
 from forever.lookup import lookup_talent
 
+# Lent : la fixture `reports` calcule trois builds complets, dont le raid au niveau 60 (107 s mesurées le 2026-10-07).
+pytestmark = pytest.mark.slow
+
 AB_COST_PCT = [15.0, 41.25, 67.5, 93.75, 120.0]
 AB_DAMAGE_PCT = [0.0, 10.0, 20.0, 30.0, 40.0]
 HS_CAST_PCT = [0.0, 25.0, 50.0, 75.0]

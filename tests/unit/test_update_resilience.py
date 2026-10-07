@@ -174,6 +174,7 @@ def _clone(origin_):
     return deps, bare, clone
 
 
+@pytest.mark.slow
 def test_an_interrupted_publish_left_in_the_clone_is_discarded(origin):  # noqa: F811
     """Le passage tué pendant `tasks.py verify` laisse la préparation copiée dans `forever/data` (fichiers suivis
     modifiés, nouvelle version non suivie) et son rapport de recherche."""

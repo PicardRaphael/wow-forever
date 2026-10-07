@@ -96,6 +96,7 @@ def test_repository_trace_has_no_personal_path():
             assert form not in text, (path.name, form)
 
 
+@pytest.mark.slow
 def test_missing_next_step_is_explained(make_deps):
     over = {**FROST_21, "iceShards": 2}  # légal au niveau 22, pas au niveau 21
     rep = build_report(make_deps(), "leveling", 22, current=over, preset="rapide", sensitivity=False)

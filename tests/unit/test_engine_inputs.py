@@ -140,6 +140,7 @@ def assert_covered(name, reads):
     assert missing == [], f"{name} lit des entrées non déclarées : {missing}"
 
 
+@pytest.mark.slow
 def test_completeness_of_the_mage_build_engine(make_deps):
     from forever.build import build_report
 

@@ -227,6 +227,7 @@ def test_repository_is_revision_two(make_deps):
     assert p["data_revision"] == LOCAL_REVISION  # révision installée, lue dans le manifeste (conftest)
 
 
+@pytest.mark.slow
 def test_every_talent_is_certain(make_deps, game_data):
     # La certitude nomme le build où la valeur a été lue : relue en 1.60.1.70124 à l'installation (T08a).
     build = "FC-" + LOCAL_VERSION.rsplit(".", 1)[-1]
