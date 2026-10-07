@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70245 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-10-07)",
+      "source": "Client 1.60.1.70245 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-07)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70245 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-10-07)",
+      "source": "Client 1.60.1.70245 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-07)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -187,7 +187,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 3 (forever install, 2026-10-07)"
+        "installé en révision 4 (forever install, 2026-10-07)"
       ]
     },
     "races.json": {
@@ -272,7 +272,7 @@
       "inherited_from": "1.60.1.70170"
     }
   },
-  "revision": 3,
+  "revision": 4,
   "revised_at": "2026-10-07",
   "hotfixes": {
     "dbcache": {
@@ -283,7 +283,7 @@
       "size": 3407272,
       "sha256": "0a2ef77e28dd7639504a654d68b497df67566bf4dfca78d9c36c420acc907f2a",
       "file_date": "2026-10-07T11:14:24Z",
-      "read_at": "2026-10-07T13:44:07Z"
+      "read_at": "2026-10-07T16:16:23Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -1969,7 +1969,7 @@
         "identical": false
       }
     ],
-    "entities": 49,
+    "entities": 29,
     "unattributed": [
       "CurvePoint 364785",
       "CurvePoint 364786",
@@ -2018,9 +2018,7 @@
       "SpellName 1323969",
       "SpellPower 315009",
       "SpellPower 315010",
-      "SpellPower 315011",
-      "TraitNode 105929",
-      "TraitNodeXTraitNodeEntry 128126"
+      "SpellPower 315011"
     ],
     "listed": {
       "invalid": [

@@ -3420,6 +3420,95 @@
     }
    },
    "approval": "1.60.1.70245-r3-f10e27912f08"
+  },
+  {
+   "revision": 4,
+   "date": "2026-10-07",
+   "motif": "règles correctif_serveur des arbres de talents (DON17, décision 208), même DBCache.bin que r3",
+   "command": "forever decode --version 1.60.1.70245 --hotfixes --dbcache <cache>/dbcache/70245/DBCache.bin, puis forever install --yes (session T08e, après la décision 208)",
+   "candidate": {
+    "path": "candidate de la session T08e (non gardée)",
+    "data_sha": "e8928d12ee6a"
+   },
+   "report": "docs/research/data-1.60.1.70245-r4.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 1,
+    "added_file": 0,
+    "replaced_file": 1,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 0
+   },
+   "changes": [
+    {
+     "file": "talents.json",
+     "path": "hotStreak.source",
+     "before": {
+      "build": "1.60.1.70245",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-07",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times.",
+      "client_key": "heatingUp"
+     },
+     "after": {
+      "build": "1.60.1.70245",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-07",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times."
+     },
+     "source": "client 1.60.1.70245, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": "cfcce1db524e",
+     "after": "7faf38bdb92b",
+     "source": "Client 1.60.1.70245 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 30,
+     "source": "observation",
+     "certainty": "certain",
+     "carried": true,
+     "carried_from": "révision 3",
+     "date": "2026-10-02",
+     "revision": 1
+    }
+   },
+   "hotfixes": [
+    112323,
+    112347,
+    112349,
+    112399,
+    112402,
+    112425,
+    112436,
+    112457
+   ],
+   "renamed_in_classes": [
+    {
+     "class": "Mage",
+     "client_key": "heatingUp",
+     "key": "hotStreak"
+    }
+   ]
   }
  ]
 }
