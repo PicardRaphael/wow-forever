@@ -544,7 +544,7 @@ aucune vraie chaîne copiée). Liste de référence : le gestionnaire CurseForge
 | Zone Level: Forever | 1.6 | 1.6 | `e621a38eb4e3` | inchangé | aucune |
 | **Naowh Forever** (+ 14 modules) | 0.5.25-beta | 0.5.25-beta | `4ad2d7a49f78` (statut, addon et modules) ; `f5f5d4669246` (`inventory`, cœur seul) | inchangé | **tous droits réservés** (`LICENSE.md`) |
 | **EllesmereUI** (+ 21 modules) | 9.3.8 | 9.3.8 | — (interface seule, non empreinté) | interface seule | **propriétaire, tous droits réservés** (`license.txt`) |
-| **Forever Companion** | (absent de la liste) | 1.0.0 ; contenu `dataVersion` 79, `updated` 2026-10-05 | `2d9529a683da` | inchangé | aucune |
+| **Forever Companion** | (sans version dans ta liste) | 1.0.0 ; contenu `dataVersion` 79, `updated` 2026-10-05 | `2d9529a683da` | inchangé | aucune |
 | Leatrix Maps | 1.60.14 | 1.60.14 | — | interface seule | non lue |
 | ForeverBeta Map Fix (`ForeverMapFix`) | 0.2.0 | 0.2.0 | — | interface seule | MIT |
 | ForeverLogger (le nôtre) | — | 0.3.0 | `8025f8ced497` | inchangé | dépôt |
