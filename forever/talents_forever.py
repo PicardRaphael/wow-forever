@@ -633,3 +633,13 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
         "certainty": "probable",
         "provenance": tf_provenance(deps, addon, "probable"),
     }
+
+
+def popular_builds(addon: TfAddon, deps: Deps, class_name: str | None = None) -> dict[str, Any]:
+    raise NotImplementedError
+
+
+def closest_popular(
+    addon: TfAddon, popular: Mapping[str, Any], class_name: str, talents: Mapping[str, int]
+) -> dict[str, Any] | None:
+    raise NotImplementedError
