@@ -51,7 +51,10 @@ def edit(path, old, new):
 
 def test_new_addons_are_followed():
     tf = DATA_ADDONS["TalentsForeverBook"]
-    assert tf.reader == "forever/pipeline/talents_forever.py" and tf.depends
+    # FA1 (décision 209) : table de correspondance reconstruite à chaque appel, plus aucun agrégat du dépôt n'en
+    # dépend
+    assert tf.reader == "forever/talents_forever.py" and tf.depends == ()
+    assert tf.action == "forever talents tf crosscheck"
     assert DATA_ADDONS["ForeverCompanion"].depends == ()
     assert "NaowhForever_*" in DATA_ADDONS["NaowhForever"].folders
     assert {"EllesmereUI*", "Leatrix_Maps", "ForeverMapFix"} <= set(UI_ADDONS)
@@ -82,15 +85,15 @@ def test_changed_content_version_is_reported(deps, addons):
     assert "proposal" not in again  # aucun agrégat du dépôt n'en dépend : une liste seulement
 
 
-def test_change_of_an_addon_with_dependents_proposes_a_pending_entry(deps, addons):
+def test_change_of_talents_forever_is_rechecked_without_pending_entry(deps, addons):
     addons_status(deps, save=True)
     edit(addons / "TalentsForeverBook" / "Data.lua", 'generated = "2026-01-01"', 'generated = "2026-01-03"')
     tf = by_name(addons_status(deps))["TalentsForeverBook"]
     assert tf["status"] == "changé"
-    assert tf["proposal"]["kind"] == "addon_data"
-    assert tf["proposal"]["depends"] == list(DATA_ADDONS["TalentsForeverBook"].depends)
-    # relecture : recoupement des arbres avec classes.json installé (comptes seulement)
+    assert "proposal" not in tf  # FA1 (décision 209) : plus d'attente addon_data
+    # relecture : recoupement des arbres avec classes.json installé (comptes seulement) et génération des codes
     assert tf["recheck"]["tf"] == 1 and tf["recheck"]["only_tf"] == 1
+    assert tf["recheck"]["code_version"] == "9" and tf["recheck"]["code_version_supported"] is False
 
 
 def test_untracked_folders_are_classified(addons):

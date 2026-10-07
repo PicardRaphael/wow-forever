@@ -123,3 +123,28 @@ def test_forever_bestiary_changed_at_same_version(wow, make_deps):
     again = by_name(addons_status(deps))["ForeverBestiary"]
     assert again["status"] == "changé" and again["version"] == first["version"]
     assert again["files"]["modified"] == ["ForeverBestiary/Data/Data.lua"]
+
+
+# --- FA1, bloc B : Talents Forever relu, état de l'export par classe -----------------------------------------
+
+
+def test_talents_forever_change_rechecks_the_export_without_pending_entry(tmp_path, make_deps):
+    from conftest import DATA_DIR, LOCAL_VERSION
+    from talents_forever_data import write_addon
+
+    root = tmp_path / "wow"
+    folder = write_addon(root, DATA_DIR / LOCAL_VERSION / "classes.json")
+    deps = make_deps(wow_dir=root)
+    first = by_name(addons_status(deps, save=True))["TalentsForeverBook"]
+    assert first["status"] == "nouveau" and first["recheck"]["code_version_supported"] is True
+    data = folder / "Data.lua"
+    data.write_bytes(data.read_bytes() + b"\n-- changed by the test\n")
+    tf = by_name(addons_status(deps))["TalentsForeverBook"]
+    assert tf["status"] == "changé" and "proposal" not in tf and "depends" not in tf
+    assert tf["reader"] == "forever/talents_forever.py" and tf["action"] == "forever talents tf crosscheck"
+    recheck = tf["recheck"]
+    assert recheck["code_version"] == "6" and recheck["code_version_supported"] is True
+    assert recheck["export"]["Mage"] == {"status": "possible", "talents": []}
+    assert recheck["export"]["Hunter"] == {"status": "bloque", "talents": ["improvedSerpentSting"]}
+    assert recheck["export"]["Warlock"] == {"status": "bloque", "talents": ["amplifyCurse", "improvedLifeTap"]}
+    assert recheck["unmatched"] == 3 and recheck["renumbered"] == 4

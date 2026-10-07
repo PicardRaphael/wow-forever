@@ -516,16 +516,21 @@ def test_logs_of_another_version_are_listed_and_never_measured(logs):
 
 
 def test_a_changed_addon_with_depends_waits(tmp_path, make_deps):
+    """FA1 (décision 209) : Talents Forever n'a plus de `depends` (table reconstruite à chaque appel) ; Forever
+    Bestiary (pets.json, pet_rules.json) en a toujours."""
     from forever.addons import addons_status
 
     wow = tmp_path / "World of Warcraft" / "_classic_beta_"
     addons = wow / "Interface" / "AddOns"
     addons.mkdir(parents=True)
     shutil.copytree(FIXTURES / "addons" / "TalentsForeverBook", addons / "TalentsForeverBook")
+    shutil.copytree(FIXTURES / "bestiary" / "ForeverBestiary", addons / "ForeverBestiary")
     deps = make_deps(wow_dir=wow)
     addons_status(deps, save=True)
     data = addons / "TalentsForeverBook" / "Data.lua"
     data.write_bytes(data.read_bytes() + b"\n-- changed by the test\n")
+    shutil.rmtree(addons / "ForeverBestiary")
+    shutil.copytree(FIXTURES / "bestiary" / "changed" / "ForeverBestiary", addons / "ForeverBestiary")
     report = run_update(deps, UpdateOptions(dry_run=True, only=frozenset({"addons"})), replay=Replay())
     assert step(report, "addons")["status"] == "attente"
-    assert [(e["kind"], e["addon"]) for e in report["pending"]] == [("addon_data", "TalentsForeverBook")]
+    assert [(e["kind"], e["addon"]) for e in report["pending"]] == [("addon_data", "ForeverBestiary")]
