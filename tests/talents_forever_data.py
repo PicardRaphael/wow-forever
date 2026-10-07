@@ -102,6 +102,21 @@ def build_doc(classes_json: Path, layout: dict[str, Any], popular: dict[str, Any
     }
 
 
+def max_ranks(classes_json: Path, file: str) -> tuple[tuple[int, ...], ...]:
+    """Rangs maximaux par arbre et par position de liste d'une classe (`MAGE`…), tels que les lit l'addon."""
+    doc = build_doc(classes_json, load_fixture("layout.json"), load_fixture("popular.json"))
+    return tuple(tuple(int(t["max"]) for t in tree["talents"]) for tree in doc["classes"][file]["trees"])
+
+
+def position(file: str, key: str) -> tuple[int, int]:
+    """(arbre, position de liste) d'une de nos clés dans la disposition de l'addon."""
+    for ti, tree in enumerate(load_fixture("layout.json")["classes"][file]["trees"]):
+        for i, pos in enumerate(tree["positions"]):
+            if pos.get("key") == key and "tf" not in pos:
+                return ti, i
+    raise KeyError(key)
+
+
 def write_addon(
     wow_dir: Path,
     classes_json: Path,
