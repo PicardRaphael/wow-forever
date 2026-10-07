@@ -462,7 +462,8 @@ le suivi par `forever addons status` et les lecteurs viennent avec FA1 (décisio
 
 ### Usage proposé (FA1, décision 171)
 
-- **Export** : le build calculé par forever rendu en code et en lien Talents Forever (format v5), réimplémenté sans
+- **Export** : le build calculé par forever rendu en code et en lien Talents Forever (format v6 depuis FA1, décision
+  209 ; v5 en 0.35.0), réimplémenté sans
   recopier le code de l'addon ; tests de va-et-vient sur les codes de ses builds populaires.
 - **Builds populaires** : source communautaire datée (part, date), au mieux `suppose` ; nos builds comparés au plus
   proche.
@@ -496,7 +497,8 @@ comme base de comparaison) ; versions lues dans les `.toc`.
 | ForeverCompletionist | — | pas un addon (aucun `.toc`) | non lu |
 | ForeverLogger.bak-* (2 dossiers) | — | copies de sauvegarde | non lues |
 
-Talents Forever est passé aux codes **v6** (`codeVersion` 6) : FA1 prévoit le format v5, à reprendre à son plan.
+Talents Forever est passé aux codes **v6** (`codeVersion` 6) : FA1 lit et écrit le format v6 (plan `tasks/FA1-plan.md`,
+décision 209).
 
 ### Forever Companion 1.0.0 (inventaire du 2026-10-06)
 
@@ -631,7 +633,7 @@ passages de `forever update`).
 
 | Addon | Objet | Sens | Format | Commande ou accès | Fichier:ligne | Exemple synthétique |
 | --- | --- | --- | --- | --- | --- | --- |
-| Talents Forever | Build de talents | import (lien, `/tf`) | code v6 (`codeVersion` 6, à relire au plan de FA1 ; v5 : `classe/niveau/arbres[-Legacy][-ordre]-5`), nœuds de l'addon | lien talentsforever.com, `/tf` | `Data.lua` (en-tête) | v5 : `mage/<niveau>/<arbre 1>-<arbre 2>-<arbre 3>-5` |
+| Talents Forever | Build de talents | import (lien, `/tf`) | code v6 (`codeVersion` 6, `classe/niveau/arbres[-Legacy][-ordre]-6`, décrit au plan de FA1), positions des listes de l'addon | lien talentsforever.com, `/tf` | `Data.lua` (en-tête) | v6 : `mage/<niveau>/<arbre 1>-<arbre 2>-<arbre 3>[-<ordre>]-6` (FA1 fait) |
 | Naowh Forever | Liste BiS | les deux | `!NBIS1!` + chaîne encodée ; décodé `{v=4, name, spec, slots={[emplacement]=objet}, extra={[emplacement]={objets…}}}` ; liste rattachée à la classe, sans phase | `/nfbis`, « Export this list », « Paste a shared list » | `NaowhForever_BiS/BiS/Sharing.lua:19, 33, 78` | décodé : `{v=4,name="Mage - leveling",spec="fire-mage",slots={[1]=<objet>},extra={[1]={<objet>,<objet>}}}` |
 | Naowh Forever | Poids des statistiques | les deux | texte `NFSW1:<spécialisation>:<stat>=<poids>,…` (28 clés de spécialisation, 27 clés de statistiques, pourcentages « par 1 % ») | BiS List, page Stat Weights, Import/Export | `BiS/StatWeights/StatWeights.lua:449, 511` | `NFSW1:fire-mage:spell=<p>,fire=<p>,scrit=<p>` |
 | Naowh Forever | Poids des statistiques | import | texte de type Pawn v1 `( <outil>: v1: "Nom": Clé=valeur, … )` (export EP de WoWSims cité), `Class=` contrôlée, valeurs strictement entre 0 et 1000 | idem | `StatWeights.lua:459-497` | `( forever: v1: "Mage leveling": Class=Mage, SpellDamage=<p>, HitRating=<p> )` |
