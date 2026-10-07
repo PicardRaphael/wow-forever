@@ -148,6 +148,18 @@ uv run forever lookup talent Intimidation --class Chasseur
 Les fiches sont fixes (valeurs du client, classement probable, rendements décroissants supposés) : aucun suivi en
 direct des recharges adverses n'est possible dans un addon sur Forever.
 
+## Talents Forever (FA1)
+```powershell
+uv run forever build leveling --level 20 --preset rapide   # ligne « Talents Forever » : code, lien, /tf import
+uv run forever talents tf decode https://talentsforever.com/<code>   # points, ordre, légalité sur le client
+uv run forever talents tf popular --class Voleur              # builds populaires : part, date, lien, légalité
+uv run forever talents tf crosscheck --out docs/research/talents-forever-FA1.md   # écarts des arbres
+```
+L'addon installé est relu à chaque appel (table de correspondance jamais stockée) : absent, il est signalé ;
+une classe dont un talent n'a pas de correspondance (Chasseur, Démoniste au 2026-10-07) n'a pas de code. En jeu :
+`/tf import <code>` (procédure de test : `docs/ADDON.md`, section 7). Les builds populaires sont des choix de
+joueurs (certitude supposé), datés par `asOf`.
+
 ## Familiers du Chasseur (CH0)
 ```powershell
 uv run forever pets rules                                           # système : entraînement, loyauté, apprivoisement

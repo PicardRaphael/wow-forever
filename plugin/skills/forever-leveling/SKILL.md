@@ -37,6 +37,7 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 | Temps par monstre, XP/h, repos, dégâts subis | `forever_sim_leveling(level, race, rotation, talents)` : champs `monte_carlo` et `analytic` (`combat`, `downtime`, `total`, `xp_h`) et `mob_hp` |
 | Quel talent prendre au niveau N depuis mon build | `forever_build(context="leveling", level=N, race, current=<build actuel du niveau précédent>)` : bloc `next_step` (`choice`, `decided_by`, `candidates` avec écart et intervalle) |
 | Ordre des talents depuis le premier niveau de talent | `forever_build(context="leveling", level, race)` : `talents`, `order` (avec `decided_by`), `reasons` |
+| Suivre cet ordre en jeu avec Talents Forever | même appel : bloc `export.talents_forever` (`link`, `import` : `/tf import <code>`, ordre compris), recopié tel quel |
 | Faut-il respec, à quel niveau | `forever_build(context="leveling", level, current=<build actuel>, respecs=<nombre déjà fait>)` : bloc `respec` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` |
 | Pourquoi ce résultat (mécanique) | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` |

@@ -45,6 +45,14 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   profil PvP du Mage avec rendements décroissants et bijou : tranche PV2.
 - `sensitivity` et `stability` : seulement si le joueur demande le détail ou si une hypothèse retourne le choix.
 - Preset `complet` ou comparaison de plusieurs contextes : sous-agent `forever-sim-runner`.
+- Lien Talents Forever (bloc `export.talents_forever` de `forever_build`) : si `status` vaut `ok`, recopie tels quels
+  `code`, `link` et `import` (commande `/tf import <code>` à coller en jeu) ; ne recompose jamais un code. Sinon
+  dis la raison (`reason` : addon absent, export bloqué, format non pris en charge), jamais un code deviné. Cite
+  `order_note` quand l'ordre n'est pas compris, la certitude du bloc (`probable` : pas encore relu en jeu) et la
+  version de l'addon (`provenance.version`).
+- Build populaire le plus proche (`export.talents_forever.closest_popular`) : rang, spécialisation, points du nôtre
+  absents du sien (`missing_points`), points à ajouter, écart total, lien et date `asOf` ; certitude supposé
+  (choix de joueurs).
 
 ## Mécaniques
 - `forever_explain_mechanic(mechanic_id=<identifiant ou mots de la description>)` : description, statut, formule

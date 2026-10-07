@@ -58,6 +58,19 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 3. Jouer, puis `/reload` (ou se déconnecter) pour écrire `ForeverLoggerDB`.
 4. Hors du jeu : `uv run forever logs scan`, puis `uv run forever logs measure <journal> --addon-sv <SavedVariables>/ForeverLogger.lua`.
 5. Familier du Chasseur (CH0) : familier appelé, hors combat, ouvrir la fenêtre du familier puis Beast Training ; changer une seule pièce d'équipement du Chasseur, rouvrir la fenêtre du familier ; `/reload` ; hors du jeu : `uv run forever pets measure --addon-sv <SavedVariables>/ForeverLogger.lua` (protocole complet : `docs/research/familiers-protocole.md`).
+6. Code Talents Forever (FA1, à faire avant le 21 octobre, non bloquant pour la fusion) :
+   1. Hors du jeu : `uv run forever build leveling --level 30 --preset rapide` ; noter la ligne « Talents Forever »
+      (code avec ordre) et le build (talents, ordre).
+   2. En jeu : `/tf`, puis `/tf import <code>` (ou coller le code ou le lien dans la fenêtre de partage).
+   3. Vérifier dans Talents Forever : même classe, même niveau, mêmes rangs talent par talent, et le même ordre de
+      prise niveau par niveau que la sortie de `forever build`.
+   4. Refaire avec `uv run forever build dungeon --level 20 --preset rapide` (code sans ordre : points placés arbre
+      par arbre par l'addon).
+   5. Témoin indépendant : dans Talents Forever, construire un petit build en choisissant soi-même l'ordre, le
+      partager (`/tf`, lien), coller le code relevé ; il entre en fixture et doit se relire
+      (`uv run forever talents tf decode <code>`) sur les mêmes points et le même ordre.
+   6. Tout concorde : la certitude de l'export passe de `probable` à `certain` (champ `verified_in_game`). Un écart :
+      noter le code, ce que l'addon affiche et la sortie de `forever talents tf decode`.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

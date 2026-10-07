@@ -54,6 +54,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | PvP d'une classe : contrôles, défensifs, ruptures, recharges | `forever_lookup(kind="pvp", name=<classe>, level)` | `forever-pvp` |
 | Affrontement : mon Mage contre un Démoniste | `forever_lookup(kind="pvp", name, opponent, level, race, talents)` | `forever-pvp` |
 | Build d'une autre classe : légalité, effet des talents | `forever_lookup(kind="build_check", name=<classe>, level, talents)` | `forever-builds` |
+| Builds populaires de Talents Forever (toutes classes) | `forever_lookup(kind="tf_popular", name=<classe>)` | `forever-builds` |
 | Talent d'une autre classe | `forever_lookup(kind="talent", name, class_name=<classe>)` | `forever-builds` |
 | Familiers du Chasseur : entraînement, loyauté, apprivoisement (règles) | `forever_lookup(kind="pets")` | `forever-familiers` |
 | Capacités d'une famille de familier, rangs d'une capacité | `forever_lookup(kind="pets", name=<famille ou capacité>, rank)` | `forever-familiers` |
@@ -98,7 +99,9 @@ Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin »)
 - Dis d'abord que la classe n'est pas encore calculée par le moteur (tranche de la classe ci-dessus) et que la
   certitude est au mieux supposé.
 - Question générale : ne demande rien au joueur. Question personnelle : profil lu, rappelé en une ligne.
-- Donne des builds de la communauté trouvés par le sous-agent `forever-web-researcher`, lancé tout de suite sans
+- Donne d'abord les builds populaires de Talents Forever (`forever_lookup(kind="tf_popular", name=<classe>)`,
+  part, date, lien et légalité ; addon absent : dis-le), puis des builds de la communauté trouvés par le
+  sous-agent `forever-web-researcher`, lancé tout de suite sans
   demander ni accord ni contexte (contextes courants, ou celui de la question) ; sous-agent indisponible : dis que
   cette recherche est la suite prévue, sans poser de question. Chaque build avec sa source, son type et sa date, en
   noms de talents et en points par arbre,

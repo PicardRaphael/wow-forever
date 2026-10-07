@@ -92,16 +92,17 @@ forever-core/
 - `forever/optimize/` : `leveling.py` (faisceau du seed, parité exacte en mode seed ; en mode forever, choix du build cherchés avec les talents et départs multiples par arbre), `endgame.py` (donjon, raid, PvP : départs par arbre et par paire d'arbres, recherche locale, décision au Monte Carlo apparié ; glouton PvP du seed pour la parité), `decide.py` (écart apparié, intervalle, stabilité), `respec.py` (conseil du seed et conseil forever par niveau).
 - `forever/sim/encounter.py` : scénarios provisoires de donjon et de raid (`build.scenarios`), analytique et Monte Carlo ; règles dans `forever/engine/encounter.py`. `forever/sim/community.py` : écart d'un build de la communauté avec le nôtre (bloc J, `scripts/build_community_fixture.py`).
 - Moteur : `variants.py` (hypothèses incertaines, plages `range` de `mechanics.json`), `pvp.py` (profil PvP du seed), `respec.py`, `blind_spots.py` (angles morts : champ `angle_mort` du registre, estimations bornées).
+- Talents Forever (FA1, décision 209) : `forever/tf_code.py` (codec pur du code de build v6 sur une disposition abstraite, sans donnée de l'addon ; règle d'échange, hors de `forever/engine/`) ; `forever/talents_forever.py` (addon installé lu à chaque appel par `forever/pipeline/talents_forever.py` : disposition des listes, table de correspondance par arbre au même indice, sort, rangée et colonne, contrôles, recoupement ; `export_build` et `attach_export` ajoutent le bloc `export.talents_forever` au rapport de `forever build` et de `forever_build` sans toucher `build_report` ; `decode_code`, `popular_builds`, `closest_popular`). Rien de l'addon n'est stocké dans `forever/data/` ; addon absent ou classe bloquée : statut et raison, jamais un code deviné.
 
 ## Outils MCP (peu nombreux, à fort levier)
 | Outil | Rôle |
 | --- | --- |
 | `forever_status` | Fraîcheur et couverture du registre |
-| `forever_lookup` | Sort, talent (T06 ; 9 classes en PV1 avec `class_name`), zones (T04c), fiches PvP `pvp` et contrôle de build `build_check` (PV1) ; objet, consommable à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
+| `forever_lookup` | Sort, talent (T06 ; 9 classes en PV1 avec `class_name`), zones (T04c), fiches PvP `pvp` et contrôle de build `build_check` (PV1), builds populaires de Talents Forever `tf_popular` (FA1) ; objet, consommable à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
 | `forever_explain_mechanic` | Entrée du registre (par identifiant ou par mots de la description, T06), formule, certitude, paramètres de la version, implémentation, sources |
 | `forever_sim_leveling` | Temps par monstre, XP/h : Monte Carlo et analytique, PV du monstre (valeur, source, certitude) ; graphique par `forever chart leveling` (T04b) |
 | `forever_sim_raid` | DPS, intervalle de confiance, contributions |
-| `forever_build` | Build par contexte (leveling, donjon, raid, PvP) : talents, ordre, raisons, alternative, stabilité, sensibilité, respec, angles morts (T05, décision 86) |
+| `forever_build` | Build par contexte (leveling, donjon, raid, PvP) : talents, ordre, raisons, alternative, stabilité, sensibilité, respec, angles morts (T05, décision 86) ; bloc `export.talents_forever` : code, lien et import Talents Forever, build populaire le plus proche (FA1) |
 | `forever_optimize_gear` | Ensemble réel simulé sous contraintes |
 | `forever_consumables_plan` | Plan par zone, métier, budget |
 | `forever_diff_versions` | Ce qui change entre deux versions, par classe |
@@ -142,7 +143,7 @@ Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la
 | --- | --- | --- | --- | --- |
 | Leveling : zone ou donjon à mon niveau | `zones` (données de Questie lues localement) | — | `forever-leveling` | T04c |
 | Profil : import automatique (**fait, PV1**) | — | `forever profile import` (ForeverLogger, Questie, Auctionator, journaux ; changements listés avant accord) ; lecture par `forever_player_profile` | routeur (`format-reponse.md`) | PV1, T07 |
-| Builds de toutes les classes (**fait, PV1**) | `talent` avec `class_name` ; `build_check` (classe, niveau, talents) | `forever_build` (Mage) ; CLI `forever talents check` | `forever-builds` | PV1, puis chaque tranche de classe |
+| Builds de toutes les classes (**fait, PV1** ; Talents Forever **fait, FA1**) | `talent` avec `class_name` ; `build_check` (classe, niveau, talents) ; `tf_popular` (builds populaires de Talents Forever) | `forever_build` (Mage, lien Talents Forever) ; CLI `forever talents check`, `forever talents tf crosscheck / decode / popular` | `forever-builds` | PV1, FA1, puis chaque tranche de classe |
 | PvP (**fiches faites, PV1**) | `pvp` : fiche de classe (`name`, `level`) ou d'affrontement (`opponent`, `race`, `talents`, `opponent_level`), valeurs avec chemin `from` en `detail=true` ; CLI `forever pvp class`, `forever pvp matchup` ; à venir : champs de bataille, équipement PvP, rendements décroissants mesurés | Profil PvP du Mage : `forever_build`, contextes `pvp-bg` et `pvp-world` (rendements et bijou en PV2) | `forever-pvp` | PV1, PV2 (fiches en jeu : FA1p) |
 | Familiers du Chasseur (**savoir fait, CH0**) | `pets` : règles du système (sans `name`), fiche de famille, de capacité (`rank`, `detail`) ou de bête, guide d'apprivoisement (`zone`, `level`) ; CLI `forever pets rules / family / ability / beast / tame / crosscheck / mine` ; Forever Bestiary lu sur disque | Choix du familier par contexte, dégâts du familier : CH1 | `forever-familiers` | CH0, CH1 |
 | Analyse de mes combats PvP | — | `forever_analyze` (AN1) | `forever-analyse-pvp` | AN1, étendue par chaque tranche de classe |
