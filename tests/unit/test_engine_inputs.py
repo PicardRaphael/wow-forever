@@ -7,14 +7,17 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, mount_warrior, read_json
 
 from forever.engine_inputs import (
     ENGINES,
     PROVENANCE_FILES,
+    EngineDeclarationError,
+    EngineSpec,
     canonical_sha,
     capture_reads,
     cases_to_replay,
+    check_engines,
     compare_inputs,
     covered,
     metadata_keys,
@@ -47,8 +50,49 @@ def test_engines_are_declared():
     assert set(ENGINES) == {"mage_build", "mage_leveling", "pvp_dr"}
     for name, spec in ENGINES.items():
         assert spec.name == name
-        assert spec.files and spec.cases
+        assert spec.files
+        assert bool(spec.cases) == (spec.mode == "calcule")  # un moteur qui recopie n'a pas de cas de rejeu
         assert not set(spec.files) & PROVENANCE_FILES
+
+
+def test_engines_declare_their_mode():
+    assert {n: s.mode for n, s in ENGINES.items()} == {
+        "mage_build": "calcule",
+        "mage_leveling": "calcule",
+        "pvp_dr": "recopie",
+    }
+    assert ENGINES["pvp_dr"].cases == ()
+    check_engines(ENGINES)
+
+
+def test_an_engine_without_mode_cannot_be_built():
+    with pytest.raises(TypeError):
+        EngineSpec("sans_mode", ("spells.json",), {}, ())  # type: ignore[call-arg]
+
+
+def test_an_unknown_mode_is_refused():
+    spec = ENGINES["pvp_dr"]._replace(name="autre", mode="autre")
+    with pytest.raises(EngineDeclarationError, match="autre"):
+        check_engines({**ENGINES, "autre": spec})
+
+
+def test_changed_items_carry_their_leaves_and_origins(tmp_path):
+    """Cas réel : 70245 r1 (sans correctifs) puis r3 (refonte du Guerrier par les correctifs), fixtures de T08e."""
+    before = mount_warrior(tmp_path / "avant", "70245-r1", None)
+    after = mount_warrior(tmp_path / "après", "70245-r3", "70245-r3")
+    diffs = compare_inputs(before, after)
+    assert different(diffs) == {"pvp_dr"}
+    changed = [i for i in diffs["pvp_dr"].items if i["status"] == "différent"]
+    assert [(i["file"], i["pointer"]) for i in changed] == [("classes.json", "/classes/Warrior")]
+    item = changed[0]
+    assert len(item["changes"]) == item["leaves"] == 297
+    origins = {c.origin_before for c in item["changes"]} | {c.origin_after for c in item["changes"]}
+    assert origins <= {"client", "correctif_serveur"}
+    assert sum(item["origins"].values()) == 297 and set(item["origins"]) <= {"client", "correctif_serveur"}
+    hit = next(c for c in item["changes"] if c.pointer == "/classes/Warrior/spells/berserkerRage/ranks/0/level")
+    assert (hit.file, hit.before, hit.after) == ("classes.json", 32, 30)
+    assert (hit.origin_before, hit.origin_after) == ("client", "correctif_serveur")
+    assert all("changes" not in i for i in diffs["pvp_dr"].items if i["status"] == "identique")
 
 
 def test_same_data_is_identical(pair):
@@ -196,6 +240,20 @@ def test_targeted_replay_runs_only_touched_engines(pair):
     assert calls == chosen
     assert set(result) == {"mage_build"}
     assert not any(e == "pvp_dr" for e, _ in calls)
+
+
+def test_targeted_replay_skips_copying_engines(pair):
+    _, after = pair
+
+    def warrior(doc):
+        spell = next(iter(doc["classes"]["Warrior"]["spells"].values()))
+        spell["ranks"][0]["level"] += 1
+
+    edit(after / "classes.json", warrior)
+    diffs = compare_inputs(*pair)
+    assert different(diffs) == {"pvp_dr"}
+    assert cases_to_replay(diffs) == []
+    assert targeted_replay(diffs, lambda engine, case: pytest.fail(f"rejeu de {engine} {case}")) == {}
 
 
 def test_nothing_to_replay_when_identical(pair):

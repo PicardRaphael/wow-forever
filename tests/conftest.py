@@ -345,3 +345,27 @@ def client_vs_reference(candidate: Any, kind: str) -> tuple[list[Any], list[Any]
         if c["kind"] == kind and c["old"] is not None
     ]
     return gaps, observations, confirmed
+
+
+UPDATE_ORIGINS = FIXTURES / "update_origins"  # T08e : Guerrier de 70170 r5, 70245 r1 et r3, règles des correctifs
+
+
+def mount_warrior(root: Path, warrior: str, rules: str | None, change: Any = None) -> Path:
+    """Copie de la version installée sous `root`, Guerrier remplacé par `warrior-<warrior>.json` et règles
+    `correctif_serveur` de `classes.json` par `hotfix-rules-<rules>.json` (aucune si None) ; `change(classes)` modifie
+    ensuite `classes.json`. Rend le dossier de version (T08e)."""
+    import shutil
+
+    vdir = root / LOCAL_VERSION
+    shutil.copytree(DATA_DIR / LOCAL_VERSION, vdir)
+    classes = read_json(vdir / "classes.json")
+    classes["classes"]["Warrior"] = read_json(UPDATE_ORIGINS / f"warrior-{warrior}.json")
+    if change is not None:
+        change(classes)
+    (vdir / "classes.json").write_bytes((json.dumps(classes, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
+    origins = read_json(vdir / "origins.json")
+    kept = [r for r in origins["rules"] if not (r["file"] == "classes.json" and r["origin"] == "correctif_serveur")]
+    extra = read_json(UPDATE_ORIGINS / f"hotfix-rules-{rules}.json") if rules else []
+    origins["rules"] = [*kept, *extra]
+    (vdir / "origins.json").write_bytes((json.dumps(origins, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    return vdir

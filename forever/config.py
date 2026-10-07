@@ -37,6 +37,7 @@ CHAIN_MAX_GAP_S = 3.0
 # déclaré périmé après 3 h, attente de la CI limitée à 60 min. Paramètres de l'outil, pas des chiffres de jeu.
 UPDATE_LOCK_STALE = timedelta(hours=3)
 UPDATE_CI_TIMEOUT = timedelta(minutes=60)
+UPDATE_HOTFIX_WAIT = timedelta(hours=24)  # attente du DBCache.bin d'une nouvelle version (décision 207)
 
 
 def game_closed() -> bool | None:

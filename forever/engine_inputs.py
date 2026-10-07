@@ -20,6 +20,8 @@ from pathlib import Path
 from typing import Any, NamedTuple
 from unittest import mock
 
+from forever.errors import ForeverError
+
 PROVENANCE_FILES = frozenset({"sources.json", "manifest.json", "origins.json", "revisions.json"})
 CLASSES_FILE = "classes.json"
 # Champs de provenance absents de `metadata_keys` d'origins.json mais jamais lus par un moteur (rapport de la
@@ -27,13 +29,48 @@ CLASSES_FILE = "classes.json"
 EXTRA_METADATA = frozenset({"carried_from", "carried_to", "read_at"})
 
 
+ENGINE_MODES = ("calcule", "recopie")
+
+
 class EngineSpec(NamedTuple):
-    """Moteur calculé : fichiers lus en entier, pointeurs lus par fichier partagé (`*` : toute clé), cas de rejeu."""
+    """Moteur : fichiers lus en entier, pointeurs lus par fichier partagé (`*` : toute clé), cas de rejeu, et mode
+    (décision 207) : `calcule` (règles du modèle, rejeu des cas) ou `recopie` (fiches tirées du client, sans règle du
+    modèle, sans cas de rejeu)."""
 
     name: str
     files: tuple[str, ...]
     pointers: Mapping[str, tuple[str, ...]]
     cases: tuple[str, ...]
+    mode: str
+
+
+class EngineDeclarationError(ForeverError):
+    def __init__(self, message: str) -> None:
+        super().__init__(
+            "engine_declaration", message, "déclarer le mode du moteur dans ENGINES (forever/engine_inputs.py)"
+        )
+
+
+class _Absent:
+    """Marqueur d'une feuille ajoutée (absente avant) ou retirée (absente après)."""
+
+    def __repr__(self) -> str:
+        return "ABSENT"
+
+
+ABSENT: Any = _Absent()
+
+
+class ValueChange(NamedTuple):
+    """Feuille changée : pointeur complet dans le fichier, valeurs (`ABSENT` si ajoutée ou retirée), origine déclarée
+    avant (version installée) et après (copie de préparation) ; `None` : feuille sans règle."""
+
+    file: str
+    pointer: str
+    before: Any
+    after: Any
+    origin_before: str | None
+    origin_after: str | None
 
 
 class InputsDiff(NamedTuple):
@@ -67,17 +104,34 @@ _BUILD_CASES = tuple(
 )  # cas de scripts/replay_builds.py
 
 ENGINES: Mapping[str, EngineSpec] = {
-    "mage_build": EngineSpec("mage_build", _MAGE_FILES, {CLASSES_FILE: ("/classes/Mage/spells",)}, _BUILD_CASES),
+    "mage_build": EngineSpec(
+        "mage_build", _MAGE_FILES, {CLASSES_FILE: ("/classes/Mage/spells",)}, _BUILD_CASES, "calcule"
+    ),
     "mage_leveling": EngineSpec(
-        "mage_leveling", _MAGE_FILES, {CLASSES_FILE: ("/classes/Mage/spells",)}, ("sim-leveling-20", "sim-leveling-30")
+        "mage_leveling",
+        _MAGE_FILES,
+        {CLASSES_FILE: ("/classes/Mage/spells",)},
+        ("sim-leveling-20", "sim-leveling-30"),
+        "calcule",
     ),
     "pvp_dr": EngineSpec(
         "pvp_dr",
         ("pvp_items.json", "pvp_rules.json", "races.json"),
         {CLASSES_FILE: ("/classes/*",)},
         ("matchup-Mage-Warlock-20",),
+        "recopie",
     ),
 }
+
+
+def check_engines(engines: Mapping[str, EngineSpec]) -> None:
+    """Garde de complétude : chaque moteur déclare un mode connu (`ENGINE_MODES`)."""
+    raise NotImplementedError
+
+
+def hotfix_losses(before: Path, after: Path) -> list[ValueChange]:
+    """Valeurs d'origine `correctif_serveur` de la version installée perdues dans la copie de préparation."""
+    raise NotImplementedError
 
 
 class _TrackedClasses(dict[str, Any]):

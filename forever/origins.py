@@ -38,6 +38,7 @@ from typing import Any
 from forever.manifest import SOURCES_NAME, version_dirs
 
 ORIGINS_NAME = "origins.json"
+NOT_A_VALUE = "non_valeur"  # feuille de `not_game_values` ou clé de métadonnées : pas une valeur de jeu
 SERVER_ORIGIN = "correctif_serveur"
 ORIGINS = ("client", "journal", "addon", "manuel", "copie_figee", "parametre", SERVER_ORIGIN)
 CERTAINTY_RANK = {"suppose": 0, "probable": 1, "certain": 2}
@@ -334,6 +335,19 @@ class _Checker:
                 pointer,
                 f"certitude déclarée {declared}, origine {rule.origin} au plus {rule.certainty}",
             )
+
+
+class OriginResolver:
+    """Origine déclarée d'une feuille d'un dossier de version, par les règles de son `origins.json` (la plus précise
+    l'emporte, comme dans le contrôle) ; T08e, décision 207."""
+
+    @classmethod
+    def load(cls, version_dir: Path) -> OriginResolver:
+        raise NotImplementedError
+
+    def origin(self, file: str, pointer: str) -> str | None:
+        """Origine de la feuille `pointer` de `file` ; `NOT_A_VALUE` hors des valeurs ; None : sans règle."""
+        raise NotImplementedError
 
 
 def check_version(data_dir: Path, version: str) -> OriginsReport:

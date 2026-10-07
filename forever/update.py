@@ -29,13 +29,13 @@ import os
 import re
 import shutil
 from collections.abc import Callable, Mapping, Sequence
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple, TypedDict
 
 from forever.carry import CarryReport, carry_apply, carry_check
 from forever.config import CACHE_TTL, REPO_ROOT, UPDATE_CI_TIMEOUT, UPDATE_LOCK_STALE, Deps, utc_now
-from forever.engine_inputs import ENGINES, InputsDiff, compare_inputs, targeted_replay
+from forever.engine_inputs import ENGINES, InputsDiff, ValueChange, compare_inputs, targeted_replay
 from forever.errors import EXIT_OK, EXIT_PENDING, ForeverError, InvalidArgumentError, PathNotFoundError
 from forever.pipeline.tables import ColumnNamesError
 from forever.timefmt import format_utc, parse_utc
@@ -53,6 +53,8 @@ ACTIONS = ("écrire", "attente", "bloqué")
 STATES = ("en_attente", "approuvée", "rejetée", "périmée", "faite")
 OPEN_STATES = ("en_attente", "approuvée")
 SESSION_KINDS = ("column_names",)
+SELF_CLEARING_KINDS = ("hotfixes_unread",)  # attentes levées seules par un passage, jamais approuvables
+AUTO_ORIGINS = frozenset({"client", "correctif_serveur"})  # installation seule d'un moteur qui recopie (décision 207)
 INSTALL_KINDS = ("install_version", "install_revision")
 GUARD_REASON = (
     "garde-fou : première écriture git de `forever update --auto`, en attente de l'accord de l'utilisateur jusqu'à "
@@ -153,6 +155,7 @@ def decide(
     kind: str,
     *,
     install_ok: bool = True,
+    hotfix_losses: Sequence[ValueChange] = (),
 ) -> Verdict:
     """Règle d'automatisme (décision 180), pure : `écrire`, `attente` (clauses non tenues) ou `bloqué` (`verify`
     rouge, installation refusée, ou valeur faite à la main perdue)."""
@@ -181,6 +184,11 @@ def decide(
     else:
         action = "écrire"
     return Verdict(action, clauses, reasons)
+
+
+def hotfix_gate(archived: bool, seen_at: datetime | None, now: datetime, wait: timedelta) -> str:
+    """Porte des correctifs d'une nouvelle version (décision 207), pure : `lire`, `attendre` ou `sans_correctifs`."""
+    raise NotImplementedError
 
 
 # --- Verrou ---------------------------------------------------------------------------------------------------

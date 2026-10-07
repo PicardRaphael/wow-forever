@@ -6,8 +6,8 @@ recoupement) ne sont pas comparées."""
 
 from __future__ import annotations
 
-from collections.abc import Iterator, Mapping
-from typing import Any
+from collections.abc import Iterator, Mapping, Sequence
+from typing import Any, NamedTuple
 
 META = frozenset(
     {"source", "notes", "build", "schema_version", "inherited_from", "crosscheck", "certainty", "hotfix"}
@@ -108,3 +108,39 @@ def character_lines(a: Mapping[str, Any], b: Mapping[str, Any]) -> list[Line]:
     for top in sorted((set(a) | set(b)) - {"classes", "xp_to_next", "armor_constant"} - META):
         out += [(c, top, f, o, n) for c, _, f, o, n in _pairs(a.get(top), b.get(top))]
     return out
+
+
+# --- Fiches recopiées du client (T08e, décision 207) ---------------------------------------------------------------
+
+
+class CopiedLine(NamedTuple):
+    """Valeur changée d'une fiche recopiée : classe (ou fichier), entité nommée, champ, avant, après."""
+
+    cls: str
+    entity: str
+    field: str
+    before: Any
+    after: Any
+
+
+def copied_lines(file: str, before: Any, after: Any, pointer: str | None) -> list[CopiedLine]:
+    """Lignes des valeurs changées d'une entrée (`file`, `pointer`), éléments de liste alignés par clé stable."""
+    raise NotImplementedError
+
+
+def copied_summary(lines: Sequence[CopiedLine]) -> dict[str, dict[str, int]]:
+    """Comptes par classe : talents et sorts ajoutés, retirés, modifiés ; autres entités changées."""
+    raise NotImplementedError
+
+
+def summary_sentence(summary: Mapping[str, Mapping[str, int]], engine: str) -> str:
+    """Phrase courte du résumé (ligne de démarrage, `forever update status`)."""
+    raise NotImplementedError
+
+
+VALUES_CAP = 50  # lignes gardées dans un JSON (attente, rapport de passage) ; tableau complet dans le rapport
+
+
+def capped_lines(lines: Sequence[CopiedLine], limit: int = VALUES_CAP) -> dict[str, Any]:
+    """`{"lines": [...], "more": N, "note": "et N autres"}` : les `limit` premières lignes et le reste compté."""
+    raise NotImplementedError

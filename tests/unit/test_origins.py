@@ -7,9 +7,18 @@ import json
 from pathlib import Path
 from typing import Any
 
-from conftest import DATA_DIR, INSTALLED_VERSIONS, LOCAL_VERSION, PREVIOUS_VERSION
+from conftest import DATA_DIR, INSTALLED_VERSIONS, LOCAL_VERSION, PREVIOUS_VERSION, mount_warrior
 
-from forever.origins import ORIGINS, ORIGINS_NAME, check_all, check_version
+from forever.origins import (
+    NOT_A_VALUE,
+    ORIGINS,
+    ORIGINS_NAME,
+    OriginResolver,
+    _leaves,
+    check_all,
+    check_version,
+    format_pointer,
+)
 
 
 def load(path: Path) -> Any:
@@ -203,3 +212,45 @@ def test_missing_origins_file_fails(data_copy):
     (data_copy / PREVIOUS_VERSION / ORIGINS_NAME).unlink()
     report = check_all(data_copy)
     assert [(i.kind, i.version) for i in report.issues] == [("schema", PREVIOUS_VERSION)]
+
+
+# --- Résolveur public (T08e, décision 207) ----------------------------------------------------------------------
+
+
+def test_resolver_matches_the_checker():
+    vdir = DATA_DIR / LOCAL_VERSION
+    resolver = OriginResolver.load(vdir)
+    metadata = frozenset(load(vdir / ORIGINS_NAME)["metadata_keys"])
+    counts: dict[str, int] = {}
+    for path in sorted(vdir.glob("*.json")):
+        if path.name == ORIGINS_NAME:
+            continue
+        for seg, _ in _leaves(load(path), metadata):
+            origin = resolver.origin(path.name, format_pointer(seg))
+            assert origin is not None, (path.name, format_pointer(seg))
+            if origin != NOT_A_VALUE:
+                counts[origin] = counts.get(origin, 0) + 1
+    assert counts == check_version(DATA_DIR, LOCAL_VERSION).by_origin[LOCAL_VERSION]
+
+
+def test_resolver_examples(tmp_path):
+    resolver = OriginResolver.load(mount_warrior(tmp_path, "70245-r3", "70245-r3"))
+    assert resolver.origin("classes.json", "/classes/Warrior/spells/berserkerRage/ranks/0/level") == "correctif_serveur"
+    assert resolver.origin("classes.json", "/classes/Warrior/trees/0/talents/0/name") == "client"
+    rules = load(DATA_DIR / LOCAL_VERSION / "pvp_rules.json")["diminishing_returns"]
+    first = format_pointer(("diminishing_returns", *next(_first_leaf(rules))))
+    assert resolver.origin("pvp_rules.json", first) == "manuel"
+    assert resolver.origin("revisions.json", "/revisions/0/date") == NOT_A_VALUE
+    assert resolver.origin("classes.json", "/classes/Warrior/trees/1/talents/0/hotfix/pushes/0") == NOT_A_VALUE
+    assert resolver.origin("inconnu.json", "/x") is None
+
+
+def _first_leaf(doc, path=()):
+    if isinstance(doc, dict):
+        for k, v in doc.items():
+            yield from _first_leaf(v, (*path, str(k)))
+    elif isinstance(doc, list):
+        for i, v in enumerate(doc):
+            yield from _first_leaf(v, (*path, str(i)))
+    else:
+        yield path
