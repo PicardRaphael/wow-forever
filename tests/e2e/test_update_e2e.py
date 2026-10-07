@@ -159,8 +159,7 @@ def failures(report) -> str:
 def ci_failures(out: subprocess.CompletedProcess[str]) -> str:
     """Lignes utiles de la suite complète de la CI simulée (tests en échec, bilan)."""
     text = (out.stdout + out.stderr).splitlines()
-    return "
-".join(ln for ln in text if ln.startswith(("FAILED", "ERROR")) or " failed" in ln or "Vérification" in ln)
+    return "\n".join(ln for ln in text if ln.startswith(("FAILED", "ERROR")) or " failed" in ln or "Vérification" in ln)
 
 
 @pytest.fixture
