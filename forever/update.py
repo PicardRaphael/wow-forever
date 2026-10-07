@@ -5,8 +5,11 @@ Un passage enchaîne, sans calcul de combat, des fonctions existantes : archivag
 serveur (téléchargement, décodage, `verify`, installation dans une copie de préparation, report des valeurs faites à
 la main, preuve d'entrées par moteur, rejeu ciblé), journaux de combat de la version installée, addons de données.
 
-Règle d'automatisme (`decide`, décision 180) : une écriture se fait seulement si `verify` est vert, si aucune valeur
-faite à la main n'est perdue ni remplacée et si les entrées de chaque moteur calculé sont identiques. Sinon, attente
+Règle d'automatisme (`decide`, décision 180, amendée par 198 et 207) : une écriture se fait seulement si `verify` est
+vert, si aucune valeur faite à la main n'est perdue ni remplacée, si les entrées de chaque moteur qui calcule sont
+identiques et celles d'un moteur qui recopie ne changent que par des valeurs `client` ou `correctif_serveur`, et si
+aucune valeur d'un correctif du serveur n'est perdue. Une nouvelle version attend le `DBCache.bin` de son build
+(`hotfix_gate`, attente `hotfixes_unread` levée seule). Sinon, attente
 d'accord (`<cache>/update/pending/<id>.json`), approuvée par `forever update approve <id>` tant que sa base n'a pas
 bougé. L'écriture passe par le clone et le chemin git de `forever/pipeline/gitops.py` ; l'arbre de travail de la
 session n'est jamais touché.

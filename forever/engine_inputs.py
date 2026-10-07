@@ -1,4 +1,5 @@
-"""Preuve d'entrées identiques par moteur, et rejeu ciblé (T08d, bloc B, décision 180, clause c).
+"""Preuve d'entrées identiques par moteur, et rejeu ciblé (T08d, bloc B, décision 180, clause c, amendée par 198
+et 207).
 
 Un moteur calculé (build du Mage, leveling du Mage, rendements décroissants des fiches PvP) ne lit qu'une partie des
 données d'une version. Deux versions dont ces entrées sont identiques, hors métadonnées (source, dates de lecture,
@@ -8,7 +9,9 @@ une installation peut se faire sans accord. C'est la méthode du rapport `docs/r
 
 `ENGINES` déclare, pour chaque moteur, les fichiers lus en entier et les pointeurs lus dans un fichier partagé
 (`classes.json`) ; la garde de complétude des tests vérifie que les lectures relevées pendant un cas réel y sont
-incluses, pour que la preuve ne puisse pas devenir fausse en silence. Aucun chiffre de jeu ici."""
+incluses, pour que la preuve ne puisse pas devenir fausse en silence. Chaque moteur déclare son mode (`calcule` ou
+`recopie`, T08e) ; une entrée changée porte ses feuilles et leur origine déclarée avant et après (`ValueChange`),
+et `hotfix_losses` relève les valeurs d'un correctif du serveur perdues. Aucun chiffre de jeu ici."""
 
 from __future__ import annotations
 

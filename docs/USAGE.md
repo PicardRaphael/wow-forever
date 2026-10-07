@@ -71,8 +71,13 @@ powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1 -Remove 
 du dépôt (`<cache>/update/repo`, jamais l'arbre de la session), nouvelle version du client publiée sur wago.tools,
 correctifs du serveur de l'archive, journaux de combat de la version installée, addons de données. Une écriture
 (branche `data/<version>-r<N>`, CI Ubuntu et Windows, avance rapide de `main`) ne se fait que si `verify` est vert,
-si aucune valeur faite à la main n'est perdue ni remplacée et si les entrées de chaque moteur sont identiques
-(décision 180) ; sinon une attente d'accord est enregistrée. Réseau accordé par la décision 179 (wago.tools,
+si aucune valeur faite à la main n'est perdue ni remplacée et si les entrées de chaque moteur qui calcule (builds
+et leveling du Mage) sont identiques (décision 180) ; les fiches PvP, recopiées du client, s'installent seules quand
+seules changent des valeurs du client ou d'un correctif du serveur, avec un résumé (« fiches PvP : Warrior, … »)
+dans la ligne de démarrage, `forever update status` et le rapport (décisions 198 et 207) ; sinon une attente
+d'accord est enregistrée. Une nouvelle version attend que le jeu ait tourné sur son build (`DBCache.bin` archivé :
+attente « correctifs à lire », levée seule, non approuvable) ; 24 h après la première vue du build, elle s'installe
+sans ses correctifs seulement si aucune valeur d'un correctif du serveur n'est perdue (décision 207). Réseau accordé par la décision 179 (wago.tools,
 WoWDBDefs, git et `gh` du clone).
 ```powershell
 uv run forever update --dry-run              # tout calculer, ne rien écrire (rejeu des builds listé, non calculé)
