@@ -237,8 +237,10 @@ def build_monsters(
                 "corrigé (questie_hp × ratio ; probable dans questie_correction.range, suppose au-delà)"
             ),
             "inversions : niveaux dont la valeur est sous celle du niveau précédent (listées, jamais lissées)",
-            "créatures invoquées par un joueur (propriétaire non nul dans le bloc avancé, ou drapeaux familier, gardien ou "
-            "contrôle par un joueur, décision 204) exclues",
+            (
+                "créatures invoquées par un joueur (propriétaire non nul dans le bloc avancé, ou drapeaux familier, "
+                "gardien ou contrôle par un joueur, décision 204) exclues"
+            ),
         ],
     }
 
