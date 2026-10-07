@@ -30,6 +30,8 @@ def test_json_output(capsys, make_deps):
     validate_provenance(payload["provenance"])
     assert [s["level"] for s in payload["order"]] == list(range(10, 15))
     assert http.calls == []  # aucun réseau
+    # FA1 : bloc d'export ajouté par la CLI ; sans dossier du client, Talents Forever est signalé absent
+    assert payload["export"]["talents_forever"]["status"] == "absent"
 
 
 def test_text_output_has_every_section(capsys, make_deps):

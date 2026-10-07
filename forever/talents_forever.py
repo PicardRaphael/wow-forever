@@ -11,11 +11,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from forever.build import BuildReport
 from forever.config import Deps
 from forever.tf_code import CODE_VERSION, SYMBOLS, TREES
 
@@ -24,6 +25,12 @@ DATA_FILE = "Data.lua"
 REASONS = ("seulement_forever", "seulement_talents_forever", "position_inconnue", "ambigu")
 UNKNOWN_ROW_QUESTION = "CLS1"  # rangées du client inconnues (Démoniste), docs/OPEN_QUESTIONS.md
 FINGERPRINT_LEN = 12
+
+
+class BuildWithExport(BuildReport):
+    """Rapport de `forever build` augmenté du bloc `export` (CLI et MCP ; `build_report` inchangé)."""
+
+    export: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -383,3 +390,26 @@ def render_crosscheck(report: Mapping[str, Any]) -> str:
             lines.append(f"- Export : {c['blocked']}.")
         lines.append("")
     return "\n".join(lines).rstrip() + "\n"
+
+
+def export_build(
+    addon: TfAddon | None,
+    class_name: str,
+    level: int,
+    talents: Mapping[str, int],
+    order: Sequence[str] | None,
+    talented_bonus: int = 0,
+) -> dict[str, Any]:
+    raise NotImplementedError
+
+
+def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> BuildWithExport:
+    raise NotImplementedError
+
+
+def render_export(block: Mapping[str, Any]) -> list[str]:
+    raise NotImplementedError
+
+
+def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
+    raise NotImplementedError
