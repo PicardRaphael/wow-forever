@@ -2448,6 +2448,868 @@
     }
    },
    "approval": "1.60.1.70245-r1-11d4aa7336d4"
+  },
+  {
+   "revision": 2,
+   "date": "2026-10-07",
+   "motif": "Mesure du journal du 2026-10-07 sous 1.60.1.70245 (WoWCombatLog-100726_080346, écrit jeu fermé, décision 205) : 33 PNJ ajoutés et 3 changés ; élites de Ragefire Chasm écartés d'office (décision 186) ; deux Razormane absents de Questie, cinq PNJ nommés de quête et deux démons de quête mesurés mais écartés de la courbe (décisions 189 et 204) ; aucune valeur de la courbe ni de la correction changée ; accord de l'utilisateur du 2026-10-07 après la simulation et le rejeu des builds",
+   "command": "forever measures refresh --yes --curve-exclude 267308 --curve-exclude 267314 --curve-exclude-reason <Razormane, élites probables> ; puis forever measures refresh --yes --curve-exclude 7167 --curve-exclude 3292 --curve-exclude 6494 --curve-exclude 3438 --curve-exclude 3467 --curve-exclude-reason <PNJ nommé de quête> ; puis forever measures refresh --yes --curve-exclude 5676 --curve-exclude 5677 --curve-exclude-reason <démon de quête>",
+   "candidate": null,
+   "report": "docs/research/data-1.60.1.70245-r2.md",
+   "counts": {
+    "measured": 46,
+    "manual": 1
+   },
+   "sources": {
+    "logs": {
+     "WoWCombatLog-100726_080346.txt": "1c453c9ad1c10a5355a9f6794e59dc01413954d55a09a0a53865d693d735142e"
+    },
+    "saved_variables": {
+     "ForeverLogger.lua": "4ee2f6cea71b7e0417c64c7f3d86ebe13aa5f948fe33f85ae66778fb6506c337",
+     "Questie.lua": "d3240b8dcdbabaf21b9f6eb6304fdfc6c61b325bd3fd7b43737e9211ebe8d2f1"
+    }
+   },
+   "changes": [
+    {
+     "file": "monsters.json",
+     "path": "npcs.3100",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3122",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3123",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3127",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3131",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3225",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3242",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3246",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3254",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3255",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3265",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3266",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3269",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3270",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3271",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3284",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3292",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3381",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3382",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3425",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3438",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3467",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.4127",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.5676",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.5677",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.6494",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.7167",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11318",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11319",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11320",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11321",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11322",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11323",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11324",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11517",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11518",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11519",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.11520",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.267308",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.267314",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.6.certainty",
+     "before": "probable",
+     "after": "certain",
+     "source": "journaux : valeur commune des PNJ normaux observés",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.9.certainty",
+     "before": "probable",
+     "after": "certain",
+     "source": "journaux : valeur commune des PNJ normaux observés",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.12.certainty",
+     "before": "certain",
+     "after": "probable",
+     "source": "journaux : médiane de [218, 272, 272, 272, 272, 272, 272, 272, 272, 272, 272] des PNJ normaux observés",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "hp_by_level.15.certainty",
+     "before": "probable",
+     "after": "certain",
+     "source": "journaux : valeur commune des PNJ normaux observés",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "questie_correction.levels",
+     "before": {
+      "1": {
+       "ratio": 1.0,
+       "n_pairs": 4
+      },
+      "2": {
+       "ratio": 1.0,
+       "n_pairs": 3
+      },
+      "3": {
+       "ratio": 1.0,
+       "n_pairs": 2
+      },
+      "4": {
+       "ratio": 1.0,
+       "n_pairs": 1
+      },
+      "6": {
+       "ratio": 1.0,
+       "n_pairs": 1
+      },
+      "7": {
+       "ratio": 1.0,
+       "n_pairs": 1
+      },
+      "9": {
+       "ratio": 1.0227272727272727,
+       "n_pairs": 1
+      },
+      "10": {
+       "ratio": 1.0505050505050506,
+       "n_pairs": 4
+      },
+      "11": {
+       "ratio": 1.0765765765765767,
+       "n_pairs": 7
+      },
+      "12": {
+       "ratio": 1.1012145748987854,
+       "n_pairs": 8
+      },
+      "13": {
+       "ratio": 1.1245421245421245,
+       "n_pairs": 6
+      },
+      "14": {
+       "ratio": 1.15,
+       "n_pairs": 4
+      },
+      "15": {
+       "ratio": 1.173780487804878,
+       "n_pairs": 1
+      },
+      "16": {
+       "ratio": 1.3138461538461539,
+       "n_pairs": 1
+      },
+      "17": {
+       "ratio": 1.2253886010362693,
+       "n_pairs": 3
+      },
+      "18": {
+       "ratio": 1.249400479616307,
+       "n_pairs": 7
+      },
+      "19": {
+       "ratio": 1.4158415841584158,
+       "n_pairs": 11
+      },
+      "20": {
+       "ratio": 1.2995867768595042,
+       "n_pairs": 8
+      },
+      "21": {
+       "ratio": 1.3013182674199624,
+       "n_pairs": 1
+      },
+      "22": {
+       "ratio": 1.3852118288878812,
+       "n_pairs": 2
+      },
+      "23": {
+       "ratio": 1.4761029411764706,
+       "n_pairs": 4
+      },
+      "24": {
+       "ratio": 1.4828178694158076,
+       "n_pairs": 1
+      }
+     },
+     "after": {
+      "1": {
+       "ratio": 1.0,
+       "n_pairs": 4
+      },
+      "2": {
+       "ratio": 1.0,
+       "n_pairs": 3
+      },
+      "3": {
+       "ratio": 1.0,
+       "n_pairs": 2
+      },
+      "4": {
+       "ratio": 1.0,
+       "n_pairs": 1
+      },
+      "6": {
+       "ratio": 1.0,
+       "n_pairs": 2
+      },
+      "7": {
+       "ratio": 1.0,
+       "n_pairs": 1
+      },
+      "8": {
+       "ratio": 1.0,
+       "n_pairs": 1
+      },
+      "9": {
+       "ratio": 1.0227272727272727,
+       "n_pairs": 4
+      },
+      "10": {
+       "ratio": 1.0505050505050506,
+       "n_pairs": 7
+      },
+      "11": {
+       "ratio": 1.0765765765765767,
+       "n_pairs": 9
+      },
+      "12": {
+       "ratio": 1.1012145748987854,
+       "n_pairs": 11
+      },
+      "13": {
+       "ratio": 1.1245421245421245,
+       "n_pairs": 10
+      },
+      "14": {
+       "ratio": 1.15,
+       "n_pairs": 8
+      },
+      "15": {
+       "ratio": 1.173780487804878,
+       "n_pairs": 2
+      },
+      "16": {
+       "ratio": 1.3138461538461539,
+       "n_pairs": 1
+      },
+      "17": {
+       "ratio": 1.2253886010362693,
+       "n_pairs": 3
+      },
+      "18": {
+       "ratio": 1.249400479616307,
+       "n_pairs": 7
+      },
+      "19": {
+       "ratio": 1.4158415841584158,
+       "n_pairs": 11
+      },
+      "20": {
+       "ratio": 1.2995867768595042,
+       "n_pairs": 8
+      },
+      "21": {
+       "ratio": 1.3013182674199624,
+       "n_pairs": 1
+      },
+      "22": {
+       "ratio": 1.3852118288878812,
+       "n_pairs": 2
+      },
+      "23": {
+       "ratio": 1.4761029411764706,
+       "n_pairs": 4
+      },
+      "24": {
+       "ratio": 1.4828178694158076,
+       "n_pairs": 1
+      }
+     },
+     "source": "ajustement recalculé sur les niveaux mesurés (journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "questie_correction.excluded",
+     "before": [
+      {
+       "npc_id": 2163,
+       "name": "Thistle Bear",
+       "level": 11,
+       "ratio": 1.0755395683453237
+      },
+      {
+       "npc_id": 2165,
+       "name": "Grizzled Thistle Bear",
+       "level": 16,
+       "ratio": 1.2
+      },
+      {
+       "npc_id": 2165,
+       "name": "Grizzled Thistle Bear",
+       "level": 17,
+       "ratio": 1.2261410788381744
+      },
+      {
+       "npc_id": 3584,
+       "name": "Therylune",
+       "level": 17,
+       "ratio": 1.2253886010362693
+      },
+      {
+       "npc_id": 3664,
+       "name": "Ilkrud Magthrull",
+       "level": 24,
+       "ratio": 1.6022727272727273
+      },
+      {
+       "npc_id": 3727,
+       "name": "Dark Strand Enforcer",
+       "level": 20,
+       "ratio": 1.2995951417004048
+      },
+      {
+       "npc_id": 3809,
+       "name": "Ashenvale Bear",
+       "level": 21,
+       "ratio": 1.299093655589124
+      },
+      {
+       "npc_id": 3809,
+       "name": "Ashenvale Bear",
+       "level": 22,
+       "ratio": 1.2997198879551821
+      },
+      {
+       "npc_id": 3819,
+       "name": "Wildthorn Stalker",
+       "level": 20,
+       "ratio": 1.2995951417004048
+      },
+      {
+       "npc_id": 3819,
+       "name": "Wildthorn Stalker",
+       "level": 21,
+       "ratio": 1.3013182674199624
+      },
+      {
+       "npc_id": 3846,
+       "name": "Talen",
+       "level": 17,
+       "ratio": 1.2285714285714286
+      },
+      {
+       "npc_id": 3944,
+       "name": "Wrathtail Priestess",
+       "level": 20,
+       "ratio": 1.4524886877828054
+      },
+      {
+       "npc_id": 3986,
+       "name": "Sarilus Foulborne",
+       "level": 25,
+       "ratio": 1.617801047120419
+      },
+      {
+       "npc_id": 6466,
+       "name": "Gamon",
+       "level": 12,
+       "ratio": 1.1012145748987854
+      },
+      {
+       "npc_id": 12717,
+       "name": "Muglash",
+       "level": 25,
+       "ratio": 1.3019662921348314
+      },
+      {
+       "npc_id": 12940,
+       "name": "Vorsha the Lasher",
+       "level": 22,
+       "ratio": 1.300711743772242
+      }
+     ],
+     "after": [
+      {
+       "npc_id": 2163,
+       "name": "Thistle Bear",
+       "level": 11,
+       "ratio": 1.0755395683453237
+      },
+      {
+       "npc_id": 2165,
+       "name": "Grizzled Thistle Bear",
+       "level": 16,
+       "ratio": 1.2
+      },
+      {
+       "npc_id": 2165,
+       "name": "Grizzled Thistle Bear",
+       "level": 17,
+       "ratio": 1.2261410788381744
+      },
+      {
+       "npc_id": 3292,
+       "name": "Brewmaster Drohn",
+       "level": 9,
+       "ratio": 1.0227272727272727
+      },
+      {
+       "npc_id": 3438,
+       "name": "Kreenig Snarlsnout",
+       "level": 15,
+       "ratio": 1.173780487804878
+      },
+      {
+       "npc_id": 3467,
+       "name": "Baron Longshore",
+       "level": 16,
+       "ratio": 1.199438202247191
+      },
+      {
+       "npc_id": 3584,
+       "name": "Therylune",
+       "level": 17,
+       "ratio": 1.2253886010362693
+      },
+      {
+       "npc_id": 3664,
+       "name": "Ilkrud Magthrull",
+       "level": 24,
+       "ratio": 1.6022727272727273
+      },
+      {
+       "npc_id": 3727,
+       "name": "Dark Strand Enforcer",
+       "level": 20,
+       "ratio": 1.2995951417004048
+      },
+      {
+       "npc_id": 3809,
+       "name": "Ashenvale Bear",
+       "level": 21,
+       "ratio": 1.299093655589124
+      },
+      {
+       "npc_id": 3809,
+       "name": "Ashenvale Bear",
+       "level": 22,
+       "ratio": 1.2997198879551821
+      },
+      {
+       "npc_id": 3819,
+       "name": "Wildthorn Stalker",
+       "level": 20,
+       "ratio": 1.2995951417004048
+      },
+      {
+       "npc_id": 3819,
+       "name": "Wildthorn Stalker",
+       "level": 21,
+       "ratio": 1.3013182674199624
+      },
+      {
+       "npc_id": 3846,
+       "name": "Talen",
+       "level": 17,
+       "ratio": 1.2285714285714286
+      },
+      {
+       "npc_id": 3944,
+       "name": "Wrathtail Priestess",
+       "level": 20,
+       "ratio": 1.4524886877828054
+      },
+      {
+       "npc_id": 3986,
+       "name": "Sarilus Foulborne",
+       "level": 25,
+       "ratio": 1.617801047120419
+      },
+      {
+       "npc_id": 5676,
+       "name": "Summoned Voidwalker",
+       "level": 10,
+       "ratio": 1.0505050505050506
+      },
+      {
+       "npc_id": 5677,
+       "name": "Summoned Succubus",
+       "level": 20,
+       "ratio": 1.4526558891454966
+      },
+      {
+       "npc_id": 6466,
+       "name": "Gamon",
+       "level": 12,
+       "ratio": 1.1012145748987854
+      },
+      {
+       "npc_id": 6494,
+       "name": "Tazan",
+       "level": 13,
+       "ratio": 1.1245421245421245
+      },
+      {
+       "npc_id": 12717,
+       "name": "Muglash",
+       "level": 25,
+       "ratio": 1.3019662921348314
+      },
+      {
+       "npc_id": 12940,
+       "name": "Vorsha the Lasher",
+       "level": 22,
+       "ratio": 1.300711743772242
+      }
+     ],
+     "source": "ajustement recalculé sur les niveaux mesurés (journal WoWCombatLog-100726_080346.txt (client 1.60.1.70245, attribué par session, sha256 1c453c9ad1c1 à l'écriture), bloc avancé)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded",
+     "before": [
+      2163,
+      2165,
+      3584,
+      3664,
+      3727,
+      3809,
+      3819,
+      3846,
+      3944,
+      3986,
+      6466,
+      12717,
+      12940,
+      257446
+     ],
+     "after": [
+      2163,
+      2165,
+      3270,
+      3292,
+      3438,
+      3467,
+      3584,
+      3664,
+      3727,
+      3809,
+      3819,
+      3846,
+      3944,
+      3986,
+      5676,
+      5677,
+      6466,
+      6494,
+      7167,
+      11318,
+      11319,
+      11320,
+      11321,
+      11322,
+      11323,
+      11324,
+      11517,
+      11518,
+      11519,
+      11520,
+      12717,
+      12940,
+      257446,
+      267308,
+      267314
+     ],
+     "source": "élites et élite rare de Questie écartés automatiquement (décision 186 : Ragefire Chasm, Elder Mystic Razorsnout) ; Razormane Flesheater et Razormane Berserker (absents de Questie, PV doubles de la courbe) ; PNJ nommés de quête Polly, Brewmaster Drohn, Tazan, Kreenig Snarlsnout, Baron Longshore (décision 189) ; démons de quête Summoned Voidwalker et Summoned Succubus, contrôlés par le serveur (décisions 189 et 204) ; mesurés mais écartés de la courbe : accord de l'utilisateur du 2026-10-07",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }

@@ -133,7 +133,7 @@
       ]
     },
     "monsters.json": {
-      "source": "Journaux de combat du client (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt, WoWCombatLog-092726_174130.txt, WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt, PV max du bloc avancé) ; valeurs en regard et agrégat des niveaux non observés : communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27 ; table écrite par forever measures refresh le 2026-10-06 (--fit-exclude 2163, 2165, 2165, 3584, 3664, 3727, 3809, 3809, 3819, 3819, 3846, 3944, 3986, 6466, 12717, 12940)",
+      "source": "Journaux de combat du client (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt, WoWCombatLog-092726_174130.txt, WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt, WoWCombatLog-100726_080346.txt, PV max du bloc avancé) ; valeurs en regard et agrégat des niveaux non observés : communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27 ; table écrite par forever measures refresh le 2026-10-07 (--fit-exclude 2163, 2165, 2165, 3292, 3438, 3467, 3584, 3664, 3727, 3809, 3809, 3819, 3819, 3846, 3944, 3986, 5676, 5677, 6466, 6494, 12717, 12940)",
       "certainty": "suppose",
       "field_certainty": {
         "npcs": "certain",
@@ -271,6 +271,6 @@
       "inherited_from": "1.60.1.70170"
     }
   },
-  "revision": 1,
+  "revision": 2,
   "revised_at": "2026-10-07"
 }

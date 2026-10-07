@@ -178,6 +178,20 @@ inchangés (vérifié par le rejeu `r1` ci-dessous et par le calcul aux commits 
 - Angles morts : B18 ≤ 1,8 %, C9 non chiffré, I8 non chiffré
 - Certitude : suppose ; vérifiable en jeu : non (au-delà du plafond de la bêta)
 
+## Rejeu 1.60.1.70245 révision 2 (PV des monstres du journal du 2026-10-07)
+
+Rejoué le 2026-10-07 par `scripts/replay_builds.py run m70245-r2` (préréglage complet, graine 12345, race Orc),
+comparé à `m70245-avant` (données de la révision 1, même jour). Seul changement des données : `monsters.json`
+(`docs/research/data-1.60.1.70245-r2.md`) : 33 PNJ ajoutés et 7 changés, élites, PNJ nommés de quête et démons de
+quête écartés de la courbe ; **aucune valeur de la courbe des PV par niveau ni de la correction Questie ne change**.
+
+**Les 16 cas sont identiques** : talents, ordre des talents, alternative, stabilité, sensibilité et mesures (Monte
+Carlo et analytique) au chiffre près ; `compare` : « aucune recommandation changée ».
+
+Simulation montrée avant l'accord (première tentative, sans écartement, journal encore ouvert) : talents finaux
+identiques, ordre changé en leveling 40 (niveaux 31 à 37) et 60 (niveaux 31 à 37, 54 et 56), chaque fois entre
+talents non départagés ; l'écartement de Polly et des PNJ nommés ramène la courbe à celle de la révision 1.
+
 ## Rejeu T08d, révision 6 (correction Questie par Theil-Sen pondéré)
 
 Rejoué le 2026-10-06 par `scripts/replay_builds.py run 70170-r6` (préréglage complet, graine 12345, race Orc) sur la

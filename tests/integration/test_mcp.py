@@ -123,12 +123,13 @@ def test_explain_unknown_mechanic_is_structured_error(make_deps):
     assert validate_provenance(r.structured_content["provenance"]) == []
 
 
-def test_sim_leveling(make_deps):
+def test_sim_leveling(make_deps, game_data):
     args = {"level": 12, "talents": {"improvedFrostbolt": 3}, "n": 50}
     r = call(make_deps(), lambda c: c.call_tool("forever_sim_leveling", args))
     assert not r.is_error
     data = r.structured_content
-    assert data["mob_hp"]["value"] == 272 and data["mob_hp"]["certainty"] == "certain"
+    expected = game_data.monsters.hp_by_level[12]  # valeur et certitude des données installées (révision courante)
+    assert data["mob_hp"]["value"] == expected.value and data["mob_hp"]["certainty"] == expected.certainty
     assert data["monte_carlo"]["total"] > data["monte_carlo"]["combat"] > 0 and data["analytic"]["total"] > 0
     assert validate_provenance(data["provenance"]) == [] and data["provenance"]["certainty"] == "suppose"
 

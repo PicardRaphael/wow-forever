@@ -40,10 +40,11 @@ def test_sim_leveling_json(capsys, make_deps, data_copy, game_data):
     payload = json.loads(out)
     assert (payload["level"], payload["race"], payload["rotation"]) == (12, "Orc", "frost")
     assert payload["talents"] == {"improvedFrostbolt": 3}
+    expected = game_data.monsters.hp_by_level[12]  # valeur et certitude des données installées (révision courante)
     assert payload["mob_hp"] == {
         "level": 12,
-        "value": 272,
-        "certainty": "certain",
+        "value": expected.value,
+        "certainty": expected.certainty,
         "source": payload["mob_hp"]["source"],
     }
     assert payload["options"]["mob_source"] == "measured" and payload["options"]["spell_level"] == "character"

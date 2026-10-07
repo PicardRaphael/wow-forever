@@ -22,7 +22,9 @@ def test_points_and_omitted_levels(game_data, tmp_path):
     assert [o["level"] for o in result["omitted"]] == [10, 11]
     assert all("points" in o["reason"] or "talent" in o["reason"] for o in result["omitted"])
     by_level = {p["level"]: p for p in result["levels"]}
-    assert by_level[12]["mob_hp_certainty"] == "certain" and by_level[16]["mob_hp_certainty"] == "probable"
+    curve = game_data.monsters.hp_by_level  # certitudes des données installées (révision courante)
+    assert {lv: by_level[lv]["mob_hp_certainty"] for lv in by_level} == {lv: curve[lv].certainty for lv in by_level}
+    assert {by_level[lv]["mob_hp_certainty"] for lv in by_level} >= {"certain", "probable"}
     assert set(by_level[12]) >= {"mc_total", "mc_combat", "analytic_total", "xp_h", "mob_hp"}
 
 
