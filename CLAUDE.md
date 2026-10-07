@@ -6,9 +6,10 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 <!-- Mainteneurs : chaque ligne doit empêcher une erreur réelle de Claude. Ajouter une ligne quand l'erreur se répète ou qu'une revue l'attrape ; relire en PR comme du code. Propriétaire : Raphaël. Dernier élagage : 2026-09-26 (Opus 5.5). -->
 
 ## Commandes
-- `uv run tasks.py test-fast` : tests unitaires rapides. `uv run tasks.py test` : tous les tests. Un seul test : `uv run pytest tests/<fichier>.py::<test> -q`.
-- `uv run tasks.py verify` : lint + typage + tests + registre + contrôle des chiffres + origine des valeurs (`origins.json`). Une tâche n'est finie que si `uv run tasks.py verify` est vert (voir le skill `/verifier`).
-- `uv run tasks.py e2e` : bout en bout de `forever update`, `verify` du clone compris (long ; job `e2e` de la CI, hors de `verify`).
+- IMPORTANT : `uv run tasks.py quick` pendant le travail (lint, typage, tests rapides concernés par les fichiers modifiés depuis `main`, moins de 2 min) ; `uv run tasks.py verify` **une seule fois avant chaque push, jamais en boucle** ; la CI (Ubuntu et Windows) juge. Un seul test : `uv run pytest tests/<fichier>.py::<test> -q`.
+- `uv run tasks.py verify` : lint + typage + suite complète en parallèle (`-n auto`) + registre + contrôle des chiffres + origine des valeurs (`origins.json`). Une tâche n'est finie que s'il est vert (voir le skill `/verifier`).
+- Test long (Monte Carlo, rejeu, parité, bout en bout, plus de quelques secondes) : marqueur `slow` (hors de `quick`, toujours dans `verify` et la CI). Un test écrit dans `tmp_path`, jamais dans le dépôt ni un cache partagé (suite parallèle).
+- `uv run tasks.py e2e` : bout en bout de `forever update`, CI simulée du clone comprise (long ; job `e2e` de la CI, hors de `verify`).
 - `uv run forever status` : fraîcheur des données.
 - Dépendances et exécution via `uv` uniquement (`uv add`, `uv run`), jamais `pip`.
 
