@@ -173,6 +173,11 @@ def _layout(
                 m = same[0]
                 keys.append(m["key"])
                 used.add(m["key"])
+                if t.get("max") != m.get("max"):
+                    problems.append(
+                        f"{m['name']} ({m['key']}) : rang maximal {m.get('max')} chez nous, {t.get('max')} chez "
+                        "Talents Forever"
+                    )
                 if t.get("node") != m.get("node_id"):
                     renumbered.append(
                         {
@@ -512,6 +517,11 @@ def export_build(
         pos = layout.position(key)
         if pos is None:
             return refuse("bloque", f"{key} sans correspondance chez Talents Forever {addon.version}")
+        if rank > layout.max_ranks[pos[0]][pos[1]]:
+            return refuse(
+                "bloque",
+                f"{key} au rang {rank}, au-delà du maximum {layout.max_ranks[pos[0]][pos[1]]} chez Talents Forever",
+            )
         ranks[pos[0]][pos[1]] = rank
     steps: list[tuple[int, int]] = []
     if order:
@@ -609,7 +619,10 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
     legal: bool | None = None
     errors: list[str] = []
     legality = "non vérifiable"
-    if not unverifiable:
+    note = None
+    if plan.legacy:
+        note = "segments Legacy présents : points de bonus (Talented) inconnus, légalité non vérifiable"
+    elif not unverifiable:
         check = check_talents(deps, layout.class_name, talents, plan.level)
         legal, errors = bool(check["legal"]), list(check["errors"])
         legality = "légal" if legal else "illégal"
@@ -627,6 +640,7 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
         "legality": legality,
         "errors": errors,
         "unverifiable": unverifiable,
+        "note": note,
         "certainty": "probable",
         "provenance": tf_provenance(deps, addon, "probable"),
     }

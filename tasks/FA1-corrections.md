@@ -24,3 +24,20 @@ Regroupées pour une seule présentation avant la fusion (consigne de l'utilisat
 -        decode("x/60/1--6", big)
 +        decode("x/60/1---6", big)
 ```
+
+## 2. `tests/unit/test_plugin_evals.py` : code réel écrit en dur dans un test
+
+- **Test** : `test_talents_forever_cases` (vert ; signalé par la relecture).
+- **Preuve** : la ligne `re.search(link["lien"][0]["pattern"], "https://talentsforever.com/mage/20/--0530002001-klps-6")`
+  recopie des rangs de talents (chiffres de jeu) qui ne viennent pas d'une fixture citée ; la même valeur est le code
+  attendu du cas `leveling-20` de `tests/fixtures/talents_forever/mage_builds.json` (règle `CLAUDE.md` : un test prend
+  ses valeurs dans `tests/fixtures/` ou cite sa source).
+- **Diff proposé** :
+
+```diff
++from talents_forever_data import load_fixture
+@@
+-    assert re.search(link["lien"][0]["pattern"], "https://talentsforever.com/mage/20/--0530002001-klps-6")
++    code = load_fixture("mage_builds.json")["cases"]["leveling-20"]["expected_code"]
++    assert re.search(link["lien"][0]["pattern"], "https://talentsforever.com/" + code)
+```
