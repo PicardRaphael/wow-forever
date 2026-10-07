@@ -415,7 +415,7 @@ STATUS_LABELS = {
 }
 
 
-def tf_provenance(deps: Deps, addon: TfAddon | None, certainty: Certainty) -> Provenance:
+def tf_provenance(deps: Deps, addon: TfAddon | None, certainty: Certainty, notes: Sequence[str] = ()) -> Provenance:
     """Provenance d'un résultat tiré de l'addon : données installées et identité de l'addon en hypothèse."""
     from forever.provenance import local_provenance
 
@@ -427,7 +427,7 @@ def tf_provenance(deps: Deps, addon: TfAddon | None, certainty: Certainty) -> Pr
             f"Talents Forever {a['version']} (Data.lua build {a['build']}, généré le {a['generated']}, codes "
             f"v{a['codeVersion']}, empreinte {a['fingerprint']}), lecture locale"
         )
-    return local_provenance(deps, certainty=certainty, assumptions=[note])
+    return local_provenance(deps, certainty=certainty, assumptions=[note, *notes])
 
 
 def _export_provenance(addon: TfAddon | None, talented_bonus: int) -> dict[str, Any]:
@@ -547,6 +547,13 @@ def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> B
     addon = load_addon(deps)
     order = [str(s["talent"]) for s in report["order"] if s.get("talent")]
     block = export_build(addon, MAGE, report["level"], report["talents"], order or None, talented_bonus)
+    if addon is not None and addon.popular and MAGE in addon.layouts:
+        try:
+            popular = popular_builds(addon, deps, MAGE)
+        except InvalidArgumentError:
+            popular = None
+        if popular is not None:
+            block["closest_popular"] = closest_popular(addon, popular, MAGE, report["talents"])
     return cast(BuildWithExport, {**report, "export": {"talents_forever": block}})
 
 
@@ -565,6 +572,14 @@ def render_export(block: Mapping[str, Any]) -> list[str]:
         lines.append(f"  {block['order_note']}")
     if prov.get("talented_note"):
         lines.append(f"  {prov['talented_note']}")
+    c = block.get("closest_popular")
+    if c:
+        scope = "même spécialisation" if c["same_spec"] else "toutes spécialisations"
+        lines.append(
+            f"  Build populaire le plus proche ({scope}) : n° {c['rank']} {c['spec']}, {c['missing_points']} point(s) "
+            f"du nôtre absent(s), {c['points_to_add']} à ajouter (écart {c['total_gap']}), {c['link']} "
+            f"({c['certainty']}, relevé du {c['asOf']})"
+        )
     return lines
 
 
@@ -588,27 +603,9 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
             f"Code Talents Forever illisible : {err}.", "coller le code ou le lien tel quel"
         ) from err
 
-    def name_at(ti: int, i: int) -> str:
-        key = layout.trees[ti][i]
-        if key is not None:
-            return key
-        u = layout.unmatched_at(ti, i) or {}
-        return str(u.get("key") or u.get("name") or f"position {i + 1} de l'arbre {ti + 1}")
-
-    talents: dict[str, int] = {}
-    unverifiable: list[str] = []
-    by_tree: dict[str, int] = {}
-    for ti, tree in enumerate(plan.ranks):
-        tree_name = layout.forever_tree_names[ti] if ti < len(layout.forever_tree_names) else layout.tree_names[ti]
-        by_tree[tree_name] = sum(tree)
-        for i, rank in enumerate(tree):
-            if not rank:
-                continue
-            key = layout.trees[ti][i]
-            if key is None:
-                unverifiable.append(name_at(ti, i))
-            else:
-                talents[key] = rank
+    talents, unverifiable, split, order = _read_plan(layout, plan)
+    names = layout.forever_tree_names or layout.tree_names
+    by_tree = {str(names[ti]): n for ti, n in enumerate(split)}
     legal: bool | None = None
     errors: list[str] = []
     legality = "non vérifiable"
@@ -624,7 +621,7 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
         "link": link(raw),
         "talents": talents,
         "points_by_tree": by_tree,
-        "order": [name_at(ti, i) for ti, i in plan.order] if plan.order else None,
+        "order": order,
         "legacy": list(plan.legacy) if plan.legacy else None,
         "legal": legal,
         "legality": legality,
@@ -635,11 +632,187 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
     }
 
 
+POPULAR_NOTE = "builds populaires : choix de joueurs relevés par Talents Forever (décision 127), au mieux supposé"
+
+
+def require_addon(deps: Deps) -> TfAddon:
+    """Addon installé, ou erreur d'argument en français (CLI et MCP)."""
+    addon = load_addon(deps)
+    if addon is None:
+        where = deps.wow_dir / "Interface" / "AddOns" / ADDON_FOLDER if deps.wow_dir else "FOREVER_WOW_DIR non réglé"
+        raise InvalidArgumentError(
+            f"Talents Forever introuvable ({where}).", "installer l'addon Talents Forever ou régler FOREVER_WOW_DIR"
+        )
+    return addon
+
+
+def _read_plan(layout: TfLayout, plan: TfPlan) -> tuple[dict[str, int], list[str], list[int], list[str] | None]:
+    """Points en nos clés, positions sans correspondance (nommées), points par arbre, ordre en nos clés."""
+
+    def name_at(ti: int, i: int) -> str:
+        key = layout.trees[ti][i]
+        if key is not None:
+            return key
+        u = layout.unmatched_at(ti, i) or {}
+        return str(u.get("key") or u.get("name") or f"position {i + 1} de l'arbre {ti + 1}")
+
+    talents: dict[str, int] = {}
+    unverifiable: list[str] = []
+    for ti, tree in enumerate(plan.ranks):
+        for i, rank in enumerate(tree):
+            if not rank:
+                continue
+            key = layout.trees[ti][i]
+            if key is None:
+                unverifiable.append(name_at(ti, i))
+            else:
+                talents[key] = rank
+    order = [name_at(ti, i) for ti, i in plan.order] if plan.order else None
+    return talents, unverifiable, [sum(t) for t in plan.ranks], order
+
+
+def _tree_index(layout: TfLayout, name: Any) -> int | None:
+    """Indice de l'arbre nommé par l'addon (spécialisation `lead`), jamais apparié par nom à nos arbres."""
+    return layout.tree_names.index(name) if name in layout.tree_names else None
+
+
+def _popular_entry(layout: TfLayout, gd: Any, b: Mapping[str, Any]) -> dict[str, Any]:
+    from forever.engine.talents import check_class_build
+
+    code = str(b.get("code"))
+    idx = _tree_index(layout, b.get("lead"))
+    entry: dict[str, Any] = {
+        "rank": b.get("rank"),
+        "spec": b.get("lead"),
+        "tree_index": idx,
+        "tree": layout.forever_tree_names[idx] if idx is not None and idx < len(layout.forever_tree_names) else None,
+        "code": code,
+        "link": link(code),
+        "import": f"/tf import {code}",
+        "level": None,
+        "points_by_tree": None,
+        "talents": {},
+        "legality": "illisible",
+        "errors": [],
+        "unverifiable": [],
+    }
+    try:
+        plan = decode(code, layout.max_ranks, layout.slug)
+    except ValueError as err:
+        entry["errors"] = [str(err)]
+        return entry
+    talents, unverifiable, by_tree, _ = _read_plan(layout, plan)
+    entry.update(level=plan.level, points_by_tree=by_tree, talents=talents, unverifiable=unverifiable)
+    if unverifiable:
+        entry["legality"] = "non vérifiable"
+        return entry
+    errors = check_class_build(gd.classes[layout.class_name], gd.constants.talents, talents, plan.level)
+    entry.update(legality="illégal" if errors else "légal", errors=list(errors))
+    return entry
+
+
 def popular_builds(addon: TfAddon, deps: Deps, class_name: str | None = None) -> dict[str, Any]:
-    raise NotImplementedError
+    """Builds populaires de l'addon par classe (part de chaque spécialisation, date `asOf`, fenêtre, nombre de builds
+    relevés), chacun avec son lien, ses points en nos clés et sa légalité sur le client ; certitude `suppose`."""
+    from forever.gamedata import build_game_data
+    from forever.profile import normalize_class
+    from forever.store import load_version
+
+    if not addon.popular:
+        raise InvalidArgumentError(
+            f"Builds populaires absents de Talents Forever {addon.version} (bloc popular de Data.lua).",
+            "mettre à jour l'addon Talents Forever",
+        )
+    wanted = normalize_class(class_name) if class_name else None
+    if wanted is not None and wanted not in addon.layouts:
+        raise InvalidArgumentError(
+            f"Classe {wanted} absente de Talents Forever {addon.version}.", "choisir une autre classe"
+        )
+    gd = build_game_data(load_version(deps))
+    classes: dict[str, Any] = {}
+    for name, layout in addon.layouts.items():
+        block = addon.popular.get(layout.file)
+        if (wanted is not None and name != wanted) or not isinstance(block, dict):
+            continue
+        spec = [
+            {"name": s[0], "pct": s[1], "tree_index": _tree_index(layout, s[0])}
+            for s in block.get("spec") or []
+            if isinstance(s, list) and len(s) == 2
+        ]
+        classes[name] = {
+            "file": layout.file,
+            "builds": block.get("builds"),
+            "window": block.get("window"),
+            "asOf": block.get("asOf"),
+            "full": block.get("full"),
+            "spec": spec,
+            "top": [_popular_entry(layout, gd, b) for b in block.get("top") or [] if isinstance(b, dict)],
+        }
+    dates = sorted({str(c["asOf"]) for c in classes.values()})
+    notes = [POPULAR_NOTE, f"relevés du {', '.join(dates) or '?'} (fenêtre par classe : champ window)"]
+    return {
+        "kind": "tf_popular",
+        "addon": addon.describe(),
+        "classes": classes,
+        "certainty": "suppose",
+        "provenance": tf_provenance(deps, addon, "suppose", notes),
+    }
 
 
 def closest_popular(
     addon: TfAddon, popular: Mapping[str, Any], class_name: str, talents: Mapping[str, int]
 ) -> dict[str, Any] | None:
-    raise NotImplementedError
+    """Build populaire le plus proche du nôtre : même spécialisation (arbre le plus chargé du nôtre ; à défaut tous,
+    avec une note), classé par nos points absents du sien (Σ max(0, nous − lui)), puis l'écart total
+    (Σ |nous − lui|), puis son rang. Un build populaire non vérifiable (position sans correspondance) est écarté."""
+    block = (popular.get("classes") or {}).get(class_name)
+    layout = addon.layouts.get(class_name)
+    if not block or layout is None:
+        return None
+    ours = {k: v for k, v in talents.items() if v > 0}
+    split = [sum(ours.get(k, 0) for k in tree if k) for tree in layout.trees]
+    spec = max(range(len(split)), key=lambda i: (split[i], -i)) if any(split) else None
+    candidates = [b for b in block["top"] if not b["unverifiable"] and b["legality"] != "illisible"]
+    same = [b for b in candidates if spec is not None and b["tree_index"] == spec]
+    pool = same or candidates
+    if not pool:
+        return None
+    rows = []
+    for b in pool:
+        theirs = b["talents"]
+        keys = sorted(set(ours) | set(theirs))
+        diffs = [
+            {"key": k, "ours": ours.get(k, 0), "theirs": theirs.get(k, 0)}
+            for k in keys
+            if ours.get(k, 0) != theirs.get(k, 0)
+        ]
+        missing = sum(max(0, d["ours"] - d["theirs"]) for d in diffs)
+        to_add = sum(max(0, d["theirs"] - d["ours"]) for d in diffs)
+        rows.append((missing, missing + to_add, b["rank"], b, diffs, to_add))
+    missing, total, _, best, diffs, to_add = min(rows, key=lambda r: (r[0], r[1], r[2]))
+    note = (
+        None if same else "aucun build populaire de la même spécialisation : comparaison à tous les builds de la classe"
+    )
+    if all(b.get("level") == best.get("level") for b in pool) and best.get("level") is not None:
+        note = (note + " ; " if note else "") + (
+            f"builds populaires relevés au niveau {best['level']} : à un niveau plus bas, les points absents disent si "
+            "notre build est une étape de sa route"
+        )
+    return {
+        "rank": best["rank"],
+        "spec": best["spec"],
+        "tree_index": best["tree_index"],
+        "same_spec": bool(same),
+        "code": best["code"],
+        "link": best["link"],
+        "import": best["import"],
+        "legality": best["legality"],
+        "missing_points": missing,
+        "points_to_add": to_add,
+        "total_gap": total,
+        "differences": sorted(diffs, key=lambda d: (-abs(d["theirs"] - d["ours"]), d["key"])),
+        "note": note,
+        "asOf": block.get("asOf"),
+        "window": block.get("window"),
+        "certainty": "suppose",
+    }

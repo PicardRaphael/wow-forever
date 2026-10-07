@@ -112,7 +112,11 @@ def build_server(deps: Deps) -> MCPServer:
         français ou anglais) : sa fiche (`rank`, `detail` pour les bêtes qui enseignent chaque rang) ; avec `zone`
         (nom français ou anglais) et `level` (niveau du Chasseur, jamais deviné) : guide d'apprivoisement (bêtes de la
         zone puis des zones voisines du même continent à son niveau, coordonnées datées, rang le plus haut
-        atteignable). Forever Bestiary lu sur disque ; sans lui, fiches du client seules."""
+        atteignable). Forever Bestiary lu sur disque ; sans lui, fiches du client seules.
+        FA1 : `kind="tf_popular"` avec `name` (classe, nom français ou anglais ; vide : les 9 classes) : builds
+        populaires de Talents Forever (addon lu sur disque) : part de chaque spécialisation, date `asOf`, fenêtre,
+        lien et commande `/tf import` de chaque build, légalité sur le client ; certitude `suppose` (choix de
+        joueurs)."""
         try:
             if kind == "zones":
                 path = Path(questie) if questie else None
@@ -127,6 +131,10 @@ def build_server(deps: Deps) -> MCPServer:
                 if not name or level is None:
                     raise InvalidArgumentError("Classe ou niveau manquant.", "donner name (classe), level et talents")
                 return check_talents(deps, name, parse_talents(talents) if talents else {}, level)
+            if kind == "tf_popular":
+                from forever.talents_forever import popular_builds, require_addon
+
+                return popular_builds(require_addon(deps), deps, name or None)
             if kind == "pets":
                 return lookup_pets(deps, name or None, rank=rank, zone=zone, level=level, detail=detail)
             if kind == "pvp":
@@ -144,7 +152,7 @@ def build_server(deps: Deps) -> MCPServer:
                 return compact(report, detail=detail, limit=limit, offset=offset)
             if kind != "spell":
                 raise UnsupportedKindError(
-                    f"type « {kind} »", ["spell", "talent", "zones", "pvp", "build_check", "pets"]
+                    f"type « {kind} »", ["spell", "talent", "zones", "pvp", "build_check", "pets", "tf_popular"]
                 )
             if not name:
                 raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")

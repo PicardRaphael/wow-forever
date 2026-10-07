@@ -503,6 +503,9 @@ def build_parser() -> argparse.ArgumentParser:
     tf_decode = tf_sub.add_parser("decode", help="lit un code ou un lien Talents Forever : points, ordre, légalité")
     tf_decode.add_argument("code", help="code ou lien talentsforever.com (génération 6)")
     tf_decode.add_argument("--json", action="store_true", help="sortie JSON")
+    tf_pop = tf_sub.add_parser("popular", help="builds populaires de l'addon : part, date, lien, légalité")
+    tf_pop.add_argument("--class", dest="cls", help="classe (nom français ou anglais ; défaut : toutes)")
+    tf_pop.add_argument("--json", action="store_true", help="sortie JSON")
 
     pvp = sub.add_parser("pvp", help="fiches PvP fixes des 9 classes (savoir du client, sans calcul de combat)")
     pvp_sub = pvp.add_subparsers(dest="pvp_cmd", required=True)
@@ -1219,15 +1222,25 @@ def render_pvp(report: Mapping[str, Any]) -> list[str]:
 
 
 def _tf_addon(deps: Deps) -> TfAddon:
-    from forever.talents_forever import ADDON_FOLDER, load_addon
+    from forever.talents_forever import require_addon
 
-    addon = load_addon(deps)
-    if addon is None:
-        where = deps.wow_dir / "Interface" / "AddOns" / ADDON_FOLDER if deps.wow_dir else "FOREVER_WOW_DIR non réglé"
-        raise InvalidArgumentError(
-            f"Talents Forever introuvable ({where}).", "installer l'addon Talents Forever ou régler FOREVER_WOW_DIR"
-        )
-    return addon
+    return require_addon(deps)
+
+
+def _cmd_tf_popular(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.talents_forever import popular_builds
+
+    rep = popular_builds(_tf_addon(deps), deps, args.cls)
+    lines = [f"Builds populaires de Talents Forever {rep['addon']['version']} (certitude {rep['certainty']})"]
+    for name, c in rep["classes"].items():
+        shares = ", ".join(f"{s['name']} {s['pct']} %" for s in c["spec"])
+        lines.append(f"{name} : {c['builds']} builds relevés, au {c['asOf']} ({c['window']}) ; parts : {shares}")
+        for b in c["top"]:
+            pts = "/".join(str(n) for n in b["points_by_tree"] or [])
+            extra = f" ({', '.join(b['unverifiable'])})" if b["unverifiable"] else ""
+            lines.append(f"  n° {b['rank']} {b['spec']} {pts} : {b['legality']}{extra} · {b['link']}")
+    _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
 
 
 def _cmd_tf_decode(deps: Deps, args: argparse.Namespace) -> int:
@@ -1251,6 +1264,8 @@ def _cmd_talents_tf(deps: Deps, args: argparse.Namespace) -> int:
 
     if args.tf_cmd == "decode":
         return _cmd_tf_decode(deps, args)
+    if args.tf_cmd == "popular":
+        return _cmd_tf_popular(deps, args)
     addon = _tf_addon(deps)
     report = crosscheck_report(addon)
     text = render_crosscheck(report)
