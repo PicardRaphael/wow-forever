@@ -1416,20 +1416,19 @@ def _publish(
 
 
 def _close_installed(cache_dir: Path, version: str, revision: int, written_id: str, at: str) -> None:
-    """Attentes closes par une écriture : celle qui vient d'être écrite (approuvée ou non), et toute attente ouverte
-    d'installation ou levée seule de la même version jusqu'à cette révision (sa version est installée)."""
+    """Attentes closes par une écriture (sa version est installée) : celle qui vient d'être écrite (approuvée ou non) et
+    l'attente « correctifs à lire » de la version passent à `faite` ; une autre attente d'installation de la même
+    version jusqu'à cette révision, dont le contenu n'a pas été écrit, passe à `périmée`."""
+    done = f"{version} r{revision} installée"
     for entry in list_pending(cache_dir):
         if entry.get("state") not in OPEN_STATES:
             continue
-        same = entry.get("id") == written_id
         rev = entry.get("revision")
-        older = (
-            entry.get("version") == version
-            and entry.get("kind") in (*INSTALL_KINDS, *SELF_CLEARING_KINDS)
-            and (rev is None or (isinstance(rev, int) and rev <= revision))
-        )
-        if same or older:
-            _set_state(cache_dir, str(entry["id"]), "faite", done_at=at, done_by=f"{version} r{revision} installée")
+        same_version = entry.get("version") == version and (rev is None or (isinstance(rev, int) and rev <= revision))
+        if entry.get("id") == written_id or (same_version and entry.get("kind") in SELF_CLEARING_KINDS):
+            _set_state(cache_dir, str(entry["id"]), "faite", done_at=at, done_by=done)
+        elif same_version and entry.get("kind") in INSTALL_KINDS:
+            _set_state(cache_dir, str(entry["id"]), "périmée", stale_reason=f"remplacée : {done}")
 
 
 def _render_inventory(data: Path, doc: Path) -> None:

@@ -138,6 +138,10 @@ def test_a_copied_value_is_installed_alone_with_its_summary(origin):
         deps.cache_dir,
         {"id": f"hotfixes-{TARGET}", "kind": "hotfixes_unread", "action": "attente", "version": TARGET},
     )
+    other = f"{TARGET}-r1-aaaaaaaaaaaa"  # attente d'un autre contenu de la même version : remplacée, pas écrite
+    record_pending(
+        deps.cache_dir, {"id": other, "kind": "install_version", "action": "attente", "version": TARGET, "revision": 1}
+    )
     report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
     assert [(v["action"], v["approved"]) for v in report["verdicts"]] == [("écrire", False)]
     (written,) = report["written"]
@@ -145,7 +149,8 @@ def test_a_copied_value_is_installed_alone_with_its_summary(origin):
     text = git(bare, "show", f"main:docs/research/data-{TARGET}-r1.md")
     assert "## Valeurs changées" in text and "| Warrior | sort Shield Wall |" in text
     assert "## Correctifs du serveur" in text and "sans_correctifs" in text
-    assert {e["id"]: e["state"] for e in list_pending(deps.cache_dir)} == {f"hotfixes-{TARGET}": "faite"}
+    states = {e["id"]: e["state"] for e in list_pending(deps.cache_dir)}
+    assert states == {f"hotfixes-{TARGET}": "faite", other: "périmée"}
 
 
 def test_a_changed_engine_input_is_recorded_and_nothing_is_pushed(origin):
