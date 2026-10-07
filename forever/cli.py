@@ -87,6 +87,7 @@ from forever.pipeline.fetch import (
 from forever.pipeline.hotfix_overlay import HotfixSource, hotfix_source, hotfix_values, load_dbd_layouts
 from forever.pipeline.install import InstallRefusedError, apply_install, plan_install, render_install_report
 from forever.pipeline.levels import CasterLevels, from_logger_db, from_questie_journey, logger_utc_offset
+from forever.pipeline.live_logs import split_live, writing_note
 from forever.pipeline.measure import (
     Conflict,
     LogMeasures,
@@ -2371,6 +2372,9 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
         default = deps.wow_dir / "Interface" / "AddOns" / "Questie"
         questie_dir = default if default.is_dir() else None
     sources = collect_sources(logs_dir, sv_dir)
+    # Décision 205 : un journal que le jeu ouvert écrit encore n'est pas mesuré, il est reproposé au passage suivant.
+    ready, writing = split_live(sources.logs, now=deps.now(), running=deps.game_running())
+    sources = sources._replace(logs=tuple(ready))
     data = load_version(deps)
     gd = build_game_data(data)
     installed = data.read_json(MONSTERS_FILE)
@@ -2429,6 +2433,8 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     else:
         status = "refusé"
     notes = [*new["notes"], "PV des monstres : bloc avancé des journaux (mesure) ; preuves du registre jamais écrites"]
+    if writing:
+        notes.append(writing_note(writing))
     if questie is not None:
         notes.append(QUESTIE_NOTE)
     provenance = local_provenance(deps, certainty="suppose" if questie is not None else "probable", assumptions=notes)
@@ -2440,9 +2446,15 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
         },
         "diff": diff,
         "written": [str(p) for p in written],
+        "writing": writing,
         "provenance": provenance,
     }
     lines = _refresh_lines(sources, diff, status)
+    lines += [
+        f"  {w['name']} en cours d'écriture · modifié il y a {w['age_s'] // 60} min, jeu ouvert · reproposé au "
+        "passage suivant"
+        for w in writing
+    ]
     lines += [f"  {h.name} retenu · client {h.client_version} · {h.reason}" for h in held]
     for c in diff["curve_candidates"]:
         where = "absent de Questie" if c["spawn_points"] is None else f"{c['spawn_points']} point(s) d'apparition"

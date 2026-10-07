@@ -14,6 +14,7 @@ from pathlib import Path
 
 from forever import __version__
 from forever.pipeline.http_client import urllib_get
+from forever.pipeline.live_logs import detect_game_running
 
 HttpGet = Callable[[str, Mapping[str, str], float], bytes]
 """(url, en-têtes, délai en secondes) -> corps de la réponse ; lève OSError en cas d'échec."""
@@ -38,6 +39,11 @@ UPDATE_LOCK_STALE = timedelta(hours=3)
 UPDATE_CI_TIMEOUT = timedelta(minutes=60)
 
 
+def game_closed() -> bool | None:
+    """État du jeu par défaut des Deps construites à la main (tests) : fermé."""
+    return False
+
+
 @dataclass(frozen=True)
 class Deps:
     """Tout ce qui touche au monde extérieur, passé explicitement à la CLI et au serveur MCP."""
@@ -51,6 +57,7 @@ class Deps:
     wow_dir: Path | None = None  # dossier du client (journaux, addons, SavedVariables), lu sans réseau
     confirm: Callable[[str], bool] | None = None  # demande d'accord avant une écriture (None : refus)
     profile_path: Path | None = None  # profil joueur hors du dépôt (None : FOREVER_PROFILE ou ~/.forever, T06b)
+    game_running: Callable[[], bool | None] = game_closed  # client lancé ? None : inconnu (décision 205)
 
 
 def terminal_confirm(prompt: str) -> bool:
@@ -91,6 +98,7 @@ def default_wow_dir(environ: Mapping[str, str] = os.environ, exists: Callable[[P
 
 def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
     """Dépendances de production ; FOREVER_OFFLINE=1 interdit tout appel réseau."""
+    wow_dir = default_wow_dir(environ)
     return Deps(
         data_dir=DATA_DIR,
         registry_path=REGISTRY_PATH,
@@ -98,6 +106,7 @@ def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
         http_get=urllib_get,
         now=utc_now,
         offline=environ.get("FOREVER_OFFLINE", "") not in ("", "0"),
-        wow_dir=default_wow_dir(environ),
+        wow_dir=wow_dir,
         confirm=terminal_confirm,
+        game_running=lambda: detect_game_running(wow_dir),
     )

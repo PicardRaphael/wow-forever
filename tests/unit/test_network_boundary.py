@@ -65,16 +65,20 @@ def imported_modules(path):
 
 
 def test_subprocess_only_in_gitops_and_the_detached_launch():
-    """git et `gh` (réseau : fetch, push, API GitHub) ne passent que par `forever/pipeline/gitops.py` ; le seul autre
-    sous-processus est le lancement détaché de `forever update` (`forever/spawn.py`, interpréteur Python)."""
+    """git et `gh` (réseau : fetch, push, API GitHub) ne passent que par `forever/pipeline/gitops.py` ; les seuls
+    autres sous-processus sont le lancement détaché de `forever update` (`forever/spawn.py`, interpréteur Python) et
+    la liste des processus du système pour savoir si le jeu est ouvert (`forever/pipeline/live_logs.py`, `tasklist`
+    ou `ps`, local, décision 205)."""
     users = {
         str(path.relative_to(PACKAGE).as_posix())
         for path in PACKAGE.rglob("*.py")
         if "subprocess" in imported_modules(path)
     }
-    assert users == {"pipeline/gitops.py", "spawn.py"}
+    assert users == {"pipeline/gitops.py", "spawn.py", "pipeline/live_logs.py"}
     spawn = (PACKAGE / "spawn.py").read_text(encoding="utf-8")
     assert '"git"' not in spawn and '"gh"' not in spawn
+    live = (PACKAGE / "pipeline" / "live_logs.py").read_text(encoding="utf-8")
+    assert '"git"' not in live and '"gh"' not in live and network_uses(PACKAGE / "pipeline" / "live_logs.py") == set()
 
 
 def test_update_imports_no_network_module_nor_subprocess():

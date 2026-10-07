@@ -941,6 +941,7 @@ def _written_logs(cache_dir: Path, data_dir: Path, version: str) -> dict[str, se
 def _step_logs(run: _Run) -> Step:
     from forever.pipeline.client_builds import current_builds, split_by_version
     from forever.pipeline.combatlog import log_files
+    from forever.pipeline.live_logs import split_live
 
     if not run.wants("journaux"):
         return Step("journaux", "rien", "non demandé (--only)", {})
@@ -949,22 +950,37 @@ def _step_logs(run: _Run) -> Step:
     if wow is None or not (wow / "Logs").is_dir() or installed is None:
         return Step("journaux", "rien", "aucun dossier de journaux", {})
     builds = current_builds(run.deps.cache_dir, wow)
-    files = log_files(wow / "Logs")
+    # Décision 205 : un journal que le jeu ouvert écrit encore est tenu et reproposé au passage suivant.
+    files, writing = split_live(log_files(wow / "Logs"), now=run.deps.now(), running=run.deps.game_running())
     keep, held, unknown = split_by_version([(p.name, _log_start(p)) for p in files], builds, installed)
     done = _written_logs(run.deps.cache_dir, run.base_data, installed)
     shas = {p.name: _sha256(p) for p in files if p.name in keep}
     fresh = [p for p in files if p.name in shas and shas[p.name] not in done.get(p.name, set())]
     keep = [p.name for p in fresh]
-    data: dict[str, Any] = {"held_back": [h._asdict() for h in held], "unknown": unknown, "measured": keep}
+    data: dict[str, Any] = {
+        "held_back": [h._asdict() for h in held],
+        "unknown": unknown,
+        "measured": keep,
+        "writing": writing,
+    }
     if not keep:
-        return Step("journaux", "rien", f"aucun nouveau journal ({len(held)} d'une autre version, en attente)", data)
+        detail = f"aucun nouveau journal ({len(held)} d'une autre version, en attente)"
+        if writing:
+            detail += f" ; {len(writing)} en cours d'écriture, reproposé(s) au passage suivant"
+        return Step("journaux", "rien", detail, data)
     measure = run.measure or _default_measure
     result = measure(run.deps, run.base_data, fresh)
     engine_files = _engine_files()
     touched = [c for c in result.get("changed", []) if c.get("file") in engine_files]
     data["changed"] = list(result.get("changed", []))
+    held_note = f" ; {len(writing)} en cours d'écriture, reproposé(s) au passage suivant" if writing else ""
     if not touched:
-        return Step("journaux", "fait", f"{len(keep)} journal(aux) mesuré(s), aucune entrée des moteurs changée", data)
+        return Step(
+            "journaux",
+            "fait",
+            f"{len(keep)} journal(aux) mesuré(s), aucune entrée des moteurs changée{held_note}",
+            data,
+        )
     digest = hashlib.sha256("\n".join(f"{n}:{shas[n]}" for n in sorted(keep)).encode("utf-8")).hexdigest()[:12]
     pending_id = f"measures-{installed}-{digest}"
     run.pending.append(
@@ -982,7 +998,9 @@ def _step_logs(run: _Run) -> Step:
             "commands": ["forever measures refresh (session, après accord)"],
         }
     )
-    return Step("journaux", "attente", f"{len(keep)} journal(aux) mesuré(s) : une entrée des moteurs change", data)
+    return Step(
+        "journaux", "attente", f"{len(keep)} journal(aux) mesuré(s) : une entrée des moteurs change{held_note}", data
+    )
 
 
 def _step_addons(run: _Run) -> Step:
