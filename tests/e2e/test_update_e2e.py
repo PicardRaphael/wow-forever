@@ -30,6 +30,7 @@ from conftest import DATA_DIR, LOCAL_VERSION, REPO_ROOT, FakeHttp, read_json
 from forever.manifest import write_manifest
 from forever.pipeline import decode
 from forever.pipeline.builds import BUILDS_URL
+from forever.pipeline.client_builds import ClientBuild, record_build
 from forever.pipeline.gitops import subprocess_runner
 from forever.update import UpdateOptions, exit_code, run_update, update_dir
 
@@ -186,6 +187,8 @@ def test_a_new_version_is_installed_end_to_end_with_the_clone_verify(tmp_path, m
     wow.mkdir(parents=True)
     product = read_json(DATA_DIR / LOCAL_VERSION / "sources.json")["product"]
     (wow.parent / ".build.info").write_text(f"{HEADER}\nus|1|{version}|{product}\n", encoding="utf-8")
+    seen = datetime(2026, 10, 5, 11, 0, tzinfo=UTC)  # première vue 25 h avant le passage : sans_correctifs (déc. 207)
+    record_build(tmp_path / "cache", ClientBuild(version, seen, product, "test"))
     builds = {product: [{"version": v, "created_at": "2026-10-06T00:00:00Z"} for v in (LOCAL_VERSION, version)]}
     deps = make_deps(
         cache_dir=tmp_path / "cache",
