@@ -57,11 +57,13 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         ("forever/data/<version>/pets.json (recoupement)", "forever/data/<version>/pet_rules.json (Guide.lua)"),
         "forever pets crosscheck, puis relire Data/Guide.lua et comparer pet_rules.json",
     ),
-    "TalentsForeverBook": AddonSpec(  # T08d : avancé de FA1 (décision 172), version de contenu dans Data.lua
+    # T08d : avancé de FA1 (décision 172), version de contenu dans Data.lua ; FA1 (décision 209) : table de
+    # correspondance reconstruite à chaque appel, aucun agrégat du dépôt n'en dépend (plus d'attente addon_data)
+    "TalentsForeverBook": AddonSpec(
         ("TalentsForeverBook",),
-        "forever/pipeline/talents_forever.py",
-        ("recoupement des arbres de forever/data/<version>/classes.json (FA1, DON13)",),
-        "uv run python scripts/compare_talents_forever.py --classes forever/data/<version>/classes.json",
+        "forever/talents_forever.py",
+        (),
+        "forever talents tf crosscheck",
     ),
     "ForeverCompanion": AddonSpec(("ForeverCompanion",), "inventaire T08d, lecteur à venir"),
     "NaowhForever": AddonSpec(("NaowhForever", "NaowhForever_*"), "lecteur à venir (inventaire proposé en T08d)"),
@@ -259,13 +261,22 @@ def content_version(name: str, folder: Path) -> dict[str, Any] | None:
 
 
 def _talents_recheck(deps: Deps, folder: Path) -> dict[str, Any] | None:
-    """Recoupement des arbres de Talents Forever avec `classes.json` installé : comptes seulement."""
+    """Recoupement des arbres de Talents Forever avec `classes.json` installé (comptes par nœud) et, depuis FA1, écarts
+    de la table de correspondance, génération des codes et état de l'export par classe (possible ou bloqué, talents
+    en cause)."""
     from forever.pipeline.talents_forever import crosscheck
     from forever.store import current_identity
+    from forever.talents_forever import crosscheck_report, export_states, load_addon
 
     try:
         version = current_identity(deps.data_dir).game_version
         totals: dict[str, Any] = crosscheck(folder / "Data.lua", deps.data_dir / version / "classes.json")["totals"]
+        addon = load_addon(deps, folder=folder)
+        if addon is not None:
+            totals.update(crosscheck_report(addon)["totals"])
+            totals["code_version"] = addon.head.get("codeVersion")
+            totals["code_version_supported"] = addon.supported
+            totals["export"] = export_states(addon)
     except Exception:  # noqa: BLE001 : la relecture ne doit jamais casser le relevé
         return None
     return totals

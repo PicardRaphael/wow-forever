@@ -16,6 +16,7 @@ from forever.pipeline.lua_table import parse_lua_value_at
 FIELDS = ("name", "tree", "tier", "col", "max", "spell", "prereq")
 HEAD = ("build", "generated", "codeVersion")
 GLOBAL = "TalentsForeverBookData = "
+POPULAR = "TalentsForeverBookData.popular ="
 
 
 def read_head_and_doc(path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -26,6 +27,19 @@ def read_head_and_doc(path: Path) -> tuple[dict[str, Any], dict[str, Any]]:
     if not isinstance(doc, dict):
         raise ValueError(f"{path} : table {GLOBAL.strip(' =')} attendue")  # noqa: TRY004 : contenu illisible
     return {k: doc.get(k) for k in HEAD}, doc
+
+
+def read_popular(path: Path) -> dict[str, Any] | None:
+    """Bloc `popular` de `Data.lua` (affecté après la table principale, rafraîchi chaque jour par l'addon), None s'il
+    manque (FA1)."""
+    text = path.read_text(encoding="utf-8")
+    at = text.find(POPULAR)
+    if at < 0:
+        return None
+    value, _ = parse_lua_value_at(text, text.index("{", at))
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} : table {POPULAR.strip(' =')} attendue")  # noqa: TRY004 : contenu illisible
+    return value
 
 
 def read_trees(path: Path) -> tuple[dict[str, Any], dict[str, dict[int, dict[str, Any]]]]:

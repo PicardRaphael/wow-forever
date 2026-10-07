@@ -8,7 +8,8 @@ TalentsForeverBook/Data.lua`) ; rien de l'addon n'est recopié : le rapport ne p
 écarts (nœud, champ, valeur de forever, valeur de Talents Forever). Champs comparés par nœud (`node`) : nom, arbre,
 rangée (`tier`/`row`), colonne, rangs (`max`), sort et prérequis (`req` : rang du talent requis dans la liste de son
 arbre, 1 pour le premier). `--classes-ref` : second fichier (version installée) comparé de même, pour mesurer ce que
-change la candidate. Lecteur : `forever/pipeline/talents_forever.py` (T08d) ; lecteur durable : FA1."""
+change la candidate. Lecteur : `forever/pipeline/talents_forever.py` (T08d). Recoupement durable par position de liste (FA1) :
+`forever talents tf crosscheck` ; ce script garde la comparaison par nœud du rapport de T08c."""
 
 from __future__ import annotations
 

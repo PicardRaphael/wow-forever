@@ -138,6 +138,7 @@ from forever.pvp import pvp_report
 from forever.sim.leveling_mc import KillResult
 from forever.status import StatusReport, status_report
 from forever.store import current_identity, ensure_integrity, load_version, read_sources
+from forever.talents_forever import TfAddon
 from forever.timefmt import format_utc
 from forever.watch import watch
 
@@ -494,6 +495,11 @@ def build_parser() -> argparse.ArgumentParser:
     tal_check.add_argument("--level", type=int, required=True, help="niveau du personnage")
     tal_check.add_argument("points", nargs="*", help="talents « clé=rang » (clés de classes.json)")
     tal_check.add_argument("--json", action="store_true", help="sortie JSON")
+    tal_tf = tal_sub.add_parser("tf", help="Talents Forever installé : recoupement, code de build, builds populaires")
+    tf_sub = tal_tf.add_subparsers(dest="tf_cmd", required=True)
+    tf_cross = tf_sub.add_parser("crosscheck", help="recoupement de nos arbres avec ceux de l'addon (écarts)")
+    tf_cross.add_argument("--out", help="écrit aussi le rapport Markdown dans ce fichier")
+    tf_cross.add_argument("--json", action="store_true", help="sortie JSON")
 
     pvp = sub.add_parser("pvp", help="fiches PvP fixes des 9 classes (savoir du client, sans calcul de combat)")
     pvp_sub = pvp.add_subparsers(dest="pvp_cmd", required=True)
@@ -1209,7 +1215,65 @@ def render_pvp(report: Mapping[str, Any]) -> list[str]:
     return lines
 
 
+def _tf_addon(deps: Deps) -> TfAddon:
+    from forever.talents_forever import ADDON_FOLDER, load_addon
+
+    addon = load_addon(deps)
+    if addon is None:
+        where = deps.wow_dir / "Interface" / "AddOns" / ADDON_FOLDER if deps.wow_dir else "FOREVER_WOW_DIR non réglé"
+        raise InvalidArgumentError(
+            f"Talents Forever introuvable ({where}).", "installer l'addon Talents Forever ou régler FOREVER_WOW_DIR"
+        )
+    return addon
+
+
+def _tf_provenance(deps: Deps, addon: TfAddon, certainty: Certainty) -> Provenance:
+    a = addon.describe()
+    return local_provenance(
+        deps,
+        certainty=certainty,
+        assumptions=[
+            (
+                f"Talents Forever {a['version']} (Data.lua build {a['build']}, généré le {a['generated']}, codes "
+                f"v{a['codeVersion']}, empreinte {a['fingerprint']}), lecture locale"
+            )
+        ],
+    )
+
+
+def _cmd_talents_tf(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.talents_forever import crosscheck_report, render_crosscheck
+
+    addon = _tf_addon(deps)
+    report = crosscheck_report(addon)
+    text = render_crosscheck(report)
+    if args.out:
+        target = Path(args.out)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(text.encode("utf-8"))
+    t = report["totals"]
+    lines = [
+        (
+            f"Talents Forever {report['addon']['version']} face aux données {report['game_version']} : nœuds numérotés "
+            f"autrement {t['renumbered']}, sans correspondance {t['unmatched']}, prérequis {t['prereq']}, noms d'arbres "
+            f"{t['tree_names']}"
+        )
+    ]
+    for name, c in sorted(report["classes"].items()):
+        label = {"possible": "possible", "bloque": "bloqué"}.get(c["export"], "format non pris en charge")
+        lines.append(f"  {name} : {c['matched']}/{c['positions']} positions appariées, export {label}")
+        if c["blocked"]:
+            lines.append(f"    {c['blocked']}")
+    if args.out:
+        lines.append(f"Rapport écrit : {args.out}")
+    payload = {**report, "provenance": _tf_provenance(deps, addon, "probable")}
+    _emit(payload, lines, payload["provenance"], args.json)
+    return EXIT_OK
+
+
 def _cmd_talents(deps: Deps, args: argparse.Namespace) -> int:
+    if args.talents_cmd == "tf":
+        return _cmd_talents_tf(deps, args)
     points = parse_talents(",".join(args.points)) if args.points else {}
     report = check_class_talents(deps, args.cls, points, args.level)
     verdict = "légal" if report["legal"] else "illégal"
@@ -2118,6 +2182,16 @@ def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
         if a.get("content_version"):
             content = ", ".join(f"{k} {v}" for k, v in a["content_version"].items())
             lines.append(f"    contenu : {content}")
+        export = (a.get("recheck") or {}).get("export")
+        if export:
+            blocked = [
+                f"{n} ({', '.join(e['talents'])})" for n, e in sorted(export.items()) if e["status"] != "possible"
+            ]
+            possible = sum(1 for e in export.values() if e["status"] == "possible")
+            lines.append(
+                f"    export Talents Forever : possible pour {possible} classe(s)"
+                + (f" ; bloqué : {', '.join(blocked)}" if blocked else "")
+            )
         if a.get("proposal"):
             lines.append("    attente proposée (addon_data) : un agrégat du dépôt en dépend")
         if a["status"] == "changé" and a.get("action"):
