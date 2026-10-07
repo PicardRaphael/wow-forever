@@ -17,7 +17,14 @@ module-name = "forever"
 module-root = ""
 
 [dependency-groups]
-dev = ["pytest>=8", "pytest-socket>=0.7", "ruff>=0.6", "mypy>=1.11", "types-PyYAML"]
+dev = [
+    "pytest>=8",
+    "pytest-socket>=0.7",
+    "ruff>=0.6",
+    "mypy>=1.11",
+    "types-PyYAML",
+    "pytest-xdist>=3.8.0",
+]
 
 [tool.pytest.ini_options]
 addopts = "--disable-socket --allow-unix-socket"
