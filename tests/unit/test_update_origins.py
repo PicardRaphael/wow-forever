@@ -147,3 +147,22 @@ def test_summary_is_capped():
     assert len(capped["lines"]) == 50 and capped["more"] == 10 and capped["note"] == "et 10 autres"
     assert capped["lines"][0] == ["Warrior", "sort s0", "rang 1 level", 0, 1]
     assert capped_lines(lines[:3]) == {"lines": [list(line) for line in lines[:3]], "more": 0, "note": ""}
+
+
+def test_list_items_are_aligned_by_key_on_each_side():
+    """Un prérequis retiré s'affiche retiré, pas comme un autre prérequis à la même position (relecture de T08e)."""
+    before = {"trees": [{"name": "Fury", "talents": [{"key": "a", "prereqs": [{"node_id": 1}, {"node_id": 2}]}]}]}
+    after = {"trees": [{"name": "Fury", "talents": [{"key": "a", "prereqs": [{"node_id": 2}]}]}]}
+    lines = copied_lines("classes.json", before, after, "/classes/Warrior")
+    assert lines == [CopiedLine("Warrior", "talent Fury a", "prereqs 1", {"node_id": 1}, None)]
+
+
+def test_pointers_are_escaped(tmp_path):
+    """Clé contenant « / » : pointeur échappé (RFC 6901), origine résolue."""
+    from forever.engine_inputs import _value_changes
+
+    calls = []
+    changes = _value_changes(
+        "x.json", None, {"a/b": 1}, {"a/b": 2}, lambda f, p: calls.append(p) or ("client", "client")
+    )
+    assert [c.pointer for c in changes] == calls == ["/a~1b"]

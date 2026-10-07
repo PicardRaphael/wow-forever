@@ -176,7 +176,7 @@ def _blocking_changes(diff: InputsDiff) -> list[Any] | None:
     for item in diff.items:
         if item.get("status") != "différent":
             continue
-        if "changes" not in item:
+        if not item.get("changes"):  # détail absent, ou seulement des conteneurs vides changés
             return None
         for c in item["changes"]:
             sides = [o for o, v in ((c.origin_before, c.before), (c.origin_after, c.after)) if v is not ABSENT]
@@ -1592,8 +1592,24 @@ def run_update(
             doc = _read(_pending_path(deps.cache_dir, pending_id))
             if isinstance(doc, dict) and doc.get("state") in OPEN_STATES:
                 _set_state(deps.cache_dir, pending_id, "faite", done_at=run.now, done_by=why)
+        _close_stale_hotfix_waits(run)
         save_report(deps.cache_dir, report)
     return report
+
+
+def _close_stale_hotfix_waits(run: _Run) -> None:
+    """Attentes « correctifs à lire » sans objet : version installée par ailleurs (`faite`), ou client passé à un
+    autre build (`périmée`, le build attendu ne se lance plus)."""
+    installed = set(installed_versions(run.base_data))
+    client = str(run.client.build) if run.client is not None else None
+    for entry in list_pending(run.deps.cache_dir):
+        if entry.get("kind") not in SELF_CLEARING_KINDS or entry.get("state") not in OPEN_STATES:
+            continue
+        version = entry.get("version")
+        if version in installed:
+            _set_state(run.deps.cache_dir, str(entry["id"]), "faite", done_at=run.now, done_by=f"{version} installée")
+        elif client is not None and version != client:
+            _set_state(run.deps.cache_dir, str(entry["id"]), "périmée", stale_reason=f"client passé à {client}")
 
 
 def _assumptions(run: _Run) -> list[str]:

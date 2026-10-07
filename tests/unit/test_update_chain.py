@@ -55,6 +55,7 @@ from forever.update import (
     acquire_lock,
     approve,
     exit_code,
+    list_pending,
     record_pending,
     run_update,
     update_dir,
@@ -270,6 +271,18 @@ def test_the_hotfixes_wait_is_not_approvable(montage):
     )
     with pytest.raises(InvalidArgumentError, match="se lève seule"):
         approve(deps, f"hotfixes-{TARGET}", spawn=lambda args: None)
+
+
+def test_a_hotfixes_wait_closes_when_its_version_is_installed(montage):
+    deps, _ = montage()
+    for version in (BASE, NEWER):
+        record_pending(
+            deps.cache_dir,
+            {"id": f"hotfixes-{version}", "kind": "hotfixes_unread", "action": "attente", "version": version},
+        )
+    run_update(deps, UpdateOptions(network=False, only=frozenset({"addons"})), replay=Replay())
+    states = {e["id"]: e["state"] for e in list_pending(deps.cache_dir)}
+    assert states == {f"hotfixes-{BASE}": "faite", f"hotfixes-{NEWER}": "en_attente"}  # client inconnu : gardée
 
 
 def test_an_archived_dbcache_is_read(montage):

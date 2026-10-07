@@ -146,15 +146,10 @@ class _Missing:
 _MISSING: Any = _Missing()
 
 
-def _stable_key(items: Sequence[Any]) -> str | None:
-    """Clé stable commune aux éléments d'une liste (unique, jamais nulle), sinon None (alignement par indice)."""
-    if not items or not all(isinstance(x, dict) for x in items):
-        return None
-    for name in STABLE_KEYS:
-        values = [x.get(name) for x in items]
-        if all(v is not None for v in values) and len({str(v) for v in values}) == len(values):
-            return name
-    return None
+def _unique(items: Sequence[Any], key: str) -> bool:
+    """Vrai si `key` est présente, non nulle et unique dans chaque élément de la liste (vide : vrai)."""
+    values = [x.get(key) if isinstance(x, dict) else None for x in items]
+    return all(v is not None for v in values) and len({str(v) for v in values}) == len(values)
 
 
 def _diff(a: Any, b: Any, path: tuple[Segment, ...]) -> Iterator[tuple[tuple[Segment, ...], Any, Any]]:
@@ -165,8 +160,9 @@ def _diff(a: Any, b: Any, path: tuple[Segment, ...]) -> Iterator[tuple[tuple[Seg
                 yield from _diff(a.get(k, _MISSING), b.get(k, _MISSING), (*path, ("clé", str(k))))
         return
     if isinstance(a, list) and isinstance(b, list):
-        key = _stable_key([*a, *b])
-        if key is not None and (not a or _stable_key(a) == key) and (not b or _stable_key(b) == key):
+        ranked = bool(path) and path[-1] == ("clé", "ranks")  # rangs : par position (« rang N »)
+        key = next((k for k in STABLE_KEYS if not ranked and (a or b) and all(_unique(x, k) for x in (a, b))), None)
+        if key is not None:
             ia, ib = {str(x[key]): x for x in a}, {str(x[key]): x for x in b}
             for k in [*ia, *(k for k in ib if k not in ia)]:
                 yield from _diff(ia.get(k, _MISSING), ib.get(k, _MISSING), (*path, ("id", k)))
@@ -181,7 +177,8 @@ def _diff(a: Any, b: Any, path: tuple[Segment, ...]) -> Iterator[tuple[tuple[Seg
 
 
 def _field(path: Sequence[Segment]) -> str:
-    """« rang 1 level », « prereq tier », « prereqs 105927 », « n°2 counts 256 »."""
+    """« rang 1 level », « prereq tier », « prereqs <nœud> », « n°2 counts <ligne> » : rang compté depuis 1, élément
+    d'une liste nommé par sa clé stable, sinon par sa position."""
     out: list[str] = []
     for i, (kind, seg) in enumerate(path):
         if kind == "clé" and seg == "ranks" and i + 1 < len(path) and path[i + 1][0] == "indice":

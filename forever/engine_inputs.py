@@ -283,7 +283,7 @@ def covered(spec: EngineSpec, read: tuple[str, str | None]) -> bool:
 def _leaves(doc: Any, path: str = "") -> Iterator[tuple[str, Any]]:
     if isinstance(doc, dict):
         for k, v in doc.items():
-            yield from _leaves(v, f"{path}/{k}")
+            yield from _leaves(v, f"{path}/{str(k).replace('~', '~0').replace('/', '~1')}")  # RFC 6901
     elif isinstance(doc, list):
         for i, v in enumerate(doc):
             yield from _leaves(v, f"{path}/{i}")

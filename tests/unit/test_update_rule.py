@@ -144,3 +144,11 @@ def test_lost_value_is_never_approvable_even_when_everything_else_holds():
 def test_red_verify_wins_over_every_other_clause():
     verdict = decide(False, carry(), inputs(), "install_revision")
     assert verdict.action == "bloqué" and any("verify" in r for r in verdict.reasons)
+
+
+def test_a_copied_item_without_changed_leaves_waits():
+    """Item différent dont aucune feuille ne change (conteneur vide ajouté ou retiré) : origine inconnue, attente."""
+    diffs = copied(change("client", "client"))
+    diffs["pvp_dr"].items[0]["changes"] = []
+    verdict = decide(True, carry(), diffs, "install_version")
+    assert verdict.action == "attente" and {k for k, ok in verdict.clauses.items() if not ok} == {"inputs"}
