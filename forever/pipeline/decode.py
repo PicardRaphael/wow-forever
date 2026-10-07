@@ -424,6 +424,14 @@ def _region(x: int, origins: Sequence[int], divisor: int) -> int | None:
     return None
 
 
+def talent_tab(x: int, geometry: Mapping[str, Any]) -> int | None:
+    """Indice de l'onglet (arbre de `trees`) d'une abscisse de nœud, comme au décodage des classes ; None hors des
+    onglets (DON17 : arbre d'un nœud retiré par un correctif du serveur)."""
+    origins, div = [int(o) for o in geometry["tab_origins"]], int(geometry["extra_zero_divisor"])
+    at_x = _place(x, origins, int(geometry["col_step"]), div)
+    return at_x[0] if at_x is not None else _region(x, origins, div)
+
+
 def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cls: str, version: str) -> dict[str, Any]:
     spec = rules["classes"][cls]
     geo = rules["talent_geometry"]
@@ -1573,13 +1581,20 @@ class _Hotfixes:
         self.listed = {**ov.listed, "unvalidated": unvalidated}
         return ov.tables
 
-    def finish(self, docs: Mapping[str, Any], inherited: dict[str, Any], sources: dict[str, Any]) -> str:
+    def finish(
+        self,
+        docs: Mapping[str, Any],
+        inherited: dict[str, Any],
+        sources: dict[str, Any],
+        geometry: Mapping[str, Any] | None = None,
+    ) -> str:
         """Pose `hotfix` sur les entités touchées, les règles `correctif_serveur` dans `origins.json` et le bloc
         `hotfixes` de `sources.json` ; rend la ligne du rapport de décodage."""
         source = self.source
         assert source is not None
         applied = sorted(self.applied.values(), key=lambda a: (a.table, a.rec_id))
-        rules, unattributed = annotate(docs, applied, reach(applied, self.before, self.after), source)
+        tab_of = (lambda x: talent_tab(x, geometry)) if geometry else None
+        rules, unattributed = annotate(docs, applied, reach(applied, self.before, self.after), source, tab_of)
         origins = inherited.get("origins.json")
         if origins is not None:
             keys = list(origins.get("metadata_keys", []))
@@ -1797,7 +1812,7 @@ def decode_version(
         sources["retired_files"] = copy.deepcopy(rules["retired_files"])
     if hot.source is not None:
         docs = {"talents.json": talents, "spells.json": spells, "spell_scaling.json": scaling, **decoded_classes}
-        extra_notes.append(hot.finish(docs, inherited, sources))
+        extra_notes.append(hot.finish(docs, inherited, sources, rules.get("talent_geometry")))
     elif "origins.json" in inherited:
         # sans correctifs, aucune valeur n'en vient : les règles `correctif_serveur` héritées ne sont jamais gardées
         origins = inherited["origins.json"]

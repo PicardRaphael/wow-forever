@@ -12,7 +12,7 @@ client (journal des correctifs). Aucun chiffre de jeu ici."""
 from __future__ import annotations
 
 import csv
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -289,6 +289,14 @@ class Reach(NamedTuple):
     nodes: set[int]
     spells: set[int]
     items: set[int]
+    # (arbre de traits, abscisse) des nœuds dont la structure change (DON17) : nœud ajouté, retiré ou déplacé, arête,
+    # entrée du nœud ; la liste des talents de leur arbre (et son contrôle) est touchée
+    positions: frozenset[tuple[int, int]] = frozenset()
+
+
+STRUCTURE_TABLES = ("TraitNode", "TraitEdge", "TraitNodeXTraitNodeEntry")
+TabOf = Callable[[int], int | None]
+"""Abscisse d'un nœud -> indice de son arbre dans `trees` d'une classe (géométrie de `decode_rules.json`)."""
 
 
 # Entités annotées (pointeurs à motifs) et champs qui portent leurs identifiants.
@@ -365,6 +373,9 @@ def reach(
             int(r["TraitNodeID"]) for r in rows("TraitNodeXTraitNodeEntry") if int(r["TraitNodeEntryID"]) in entries
         }
 
+    def positions_of(nodes: set[int]) -> frozenset[tuple[int, int]]:
+        return frozenset((int(r["TraitTreeID"]), int(r["PosX"])) for r in rows("TraitNode") if int(r["ID"]) in nodes)
+
     def spells_of_nodes(nodes: set[int]) -> set[int]:
         entries = {
             int(r["TraitNodeEntryID"]) for r in rows("TraitNodeXTraitNodeEntry") if int(r["TraitNodeID"]) in nodes
@@ -414,21 +425,56 @@ def reach(
             items = field("ItemID")
         elif "SpellID" in (versions[0] if versions else {}):
             spells = field("SpellID")
+        positions = positions_of(nodes) if a.table in STRUCTURE_TABLES else frozenset()
         nodes |= nodes_of_defs(defs)
         spells |= spells_of_defs(defs) | spells_of_nodes(nodes)
-        out[(a.table, a.rec_id)] = Reach(nodes, spells, items)
+        out[(a.table, a.rec_id)] = Reach(nodes, spells, items, positions)
     return out
 
 
+def _tree_paths(
+    docs: Mapping[str, Any], reached: Mapping[tuple[str, int], Reach], tab_of: TabOf | None
+) -> dict[str, list[tuple[str, int]]]:
+    """DON17 : liste des talents et contrôle (`tree_checks`) de chaque arbre d'une classe dont un nœud change de
+    structure, avec les enregistrements qui le touchent ; arbre inconnu (géométrie absente ou abscisse hors des
+    onglets) : tous les arbres de la classe."""
+    out: dict[str, list[tuple[str, int]]] = {}
+    classes = (docs.get("classes.json") or {}).get("classes") or {}
+    for cls, entry in classes.items() if isinstance(classes, dict) else ():
+        if not isinstance(entry, dict) or not isinstance(entry.get("trait_tree"), int):
+            continue
+        count = len(entry.get("trees") or [])
+        for key, r in reached.items():
+            xs = [x for tree, x in r.positions if tree == entry["trait_tree"]]
+            if not xs:
+                continue
+            tabs = {tab_of(x) if tab_of is not None else None for x in xs}
+            known = {t for t in tabs if t is not None and t < count}
+            for tab in sorted(known) if len(known) == len(tabs) else range(count):
+                for path in (f"/classes/{cls}/trees/{tab}/talents", f"/classes/{cls}/tree_checks/{tab}"):
+                    out.setdefault(path, []).append(key)
+    return out
+
+
+def _inside(path: str, parent: str) -> bool:
+    return path.startswith(parent + "/")
+
+
 def annotate(
-    docs: Mapping[str, Any], applied: Sequence[Applied], reached: Mapping[tuple[str, int], Reach], source: HotfixSource
+    docs: Mapping[str, Any],
+    applied: Sequence[Applied],
+    reached: Mapping[tuple[str, int], Reach],
+    source: HotfixSource,
+    tab_of: TabOf | None = None,
 ) -> tuple[list[dict[str, Any]], list[str]]:
     """Pose `hotfix` (poussées, enregistrements, première date vue) sur chaque entité atteinte et rend les règles
     d'origine `correctif_serveur` (chemins exacts, groupés par fichier, poussées et date), plus les enregistrements
-    qui changent une valeur sans entité atteinte."""
+    qui changent une valeur sans entité atteinte. DON17 : un nœud ajouté, retiré ou déplacé, une arête ou l'entrée
+    d'un nœud touchent aussi la liste des talents de leur arbre et son contrôle (`tree_checks`) ; un chemin inclus dans
+    un autre chemin du correctif y est fondu (poussées réunies), pour qu'aucune règle ne reste sans effet."""
     by_rec = {(a.table, a.rec_id): a for a in applied}
     used: set[tuple[str, int]] = set()
-    groups: dict[tuple[str, tuple[int, ...], str | None], list[str]] = {}
+    touched: dict[tuple[str, str], set[tuple[str, int]]] = {}
     for file, patterns in ENTITY_SPECS.items():
         doc = docs.get(file)
         if doc is None:
@@ -446,9 +492,7 @@ def annotate(
                 if not recs:
                     continue
                 used |= set(recs)
-                pushes = tuple(sorted({by_rec[k].push_id for k in recs}))
-                dates = [d for d in (source.seen_at.get(p) for p in pushes) if d]
-                first = min(dates) if dates else None
+                pushes, first = _pushes(recs, by_rec, source)
                 info: dict[str, Any] = {
                     "pushes": list(pushes),
                     "rows": [f"{t} {r}" for t, r in recs],
@@ -457,7 +501,19 @@ def annotate(
                 if first is None:
                     info["dbcache_date"] = source.read_at
                 entity[HOTFIX_KEY] = info
-                groups.setdefault((file, pushes, first), []).append(pointer(path))
+                touched.setdefault((file, pointer(path)), set()).update(recs)
+    for path, recs in _tree_paths(docs, reached, tab_of).items():
+        used |= set(recs)
+        touched.setdefault(("classes.json", path), set()).update(recs)
+    for (file, path), recs in sorted(touched.items(), key=lambda kv: (kv[0][0], -len(kv[0][1]))):
+        parent = next((p for (f, p) in touched if f == file and _inside(path, p)), None)
+        if parent is not None:
+            touched[(file, parent)] |= recs
+    groups: dict[tuple[str, tuple[int, ...], str | None], list[str]] = {}
+    for (file, path), recs in touched.items():
+        if not any(f == file and _inside(path, p) for (f, p) in touched):
+            pushes, first = _pushes(sorted(recs), by_rec, source)
+            groups.setdefault((file, pushes, first), []).append(path)
     sha = source.cache.sha256[:12]
     commit = str(source.dbd.get("commit") or "")[:12]
     rules = []
@@ -477,6 +533,14 @@ def annotate(
         rules.append(rule)
     unattributed = sorted(f"{t} {r}" for (t, r) in reached if (t, r) not in used)
     return rules, unattributed
+
+
+def _pushes(
+    recs: Sequence[tuple[str, int]], by_rec: Mapping[tuple[str, int], Applied], source: HotfixSource
+) -> tuple[tuple[int, ...], str | None]:
+    pushes = tuple(sorted({by_rec[k].push_id for k in recs}))
+    dates = [d for d in (source.seen_at.get(p) for p in pushes) if d]
+    return pushes, min(dates) if dates else None
 
 
 def sources_block(
