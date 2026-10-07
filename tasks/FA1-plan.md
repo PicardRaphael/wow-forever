@@ -117,6 +117,14 @@ nous, présent chez Talents Forever : pièce pour DON5).
   `TalentsForeverBook` vidé (plus d'attente `addon_data` à chaque mise à jour de l'addon) ; la relecture
   (`_talents_recheck`) rend, en plus des comptes du recoupement, l'état de l'export par classe (possible ou bloqué,
   talents en cause) et `codeVersion` pris en charge ou non ; `action` pointe vers `forever talents tf crosscheck`.
+- **`build_report` inchangé** : l'addon n'est pas une entrée du moteur. Le bloc `export` est ajouté au rapport par
+  `attach_export(deps, report)`, appelé par la CLI (`forever build`) et par l'outil MCP `forever_build` ; le rejeu des
+  builds (`scripts/replay_builds.py`, chaîne de `forever update` dans le clone sans addon) et `engine_inputs.py` ne
+  voient rien de nouveau.
+- **Positions de liste brutes** : la disposition se lit dans les listes `talents` de chaque arbre de `Data.lua`, dans
+  leur ordre, jamais par `read_trees` (qui ré-indexe par nœud et perd la position, seule base de l'index plat).
+- **Spécialisation appariée par indice d'arbre** : le `lead` d'un build populaire (noms de l'addon : « Shadow »,
+  « Elemental ») donne l'indice de son arbre, apparié au nôtre ; jamais par nom.
 - **Modules** : le format est une règle d'échange, pas une formule de combat : il ne va pas dans `forever/engine/`.
   Codec pur dans `forever/tf_code.py` ; lecture de l'addon, table, export, builds populaires et comparaison dans
   `forever/talents_forever.py` ; `forever/pipeline/talents_forever.py` garde la lecture brute et le recoupement.
@@ -172,9 +180,10 @@ status` (choix ci-dessus). Tests : `tests/unit/test_talents_forever_layout.py`, 
 
 ### Bloc C — Export dans `forever build` et `forever_build`
 
-`export_build` ; champ `export` de `BuildReport` (CLI texte et JSON, MCP) ; décodage `forever talents tf decode
+`export_build`, `attach_export` (bloc `export` ajouté par la CLI texte et JSON et par le MCP, `build_report`
+inchangé) ; décodage `forever talents tf decode
 <code|lien> [--level]` (classe, niveau, points en nos clés, ordre, légalité). Tests :
-`tests/unit/test_talents_forever_export.py`, `tests/unit/test_build_report.py`, `tests/unit/test_build_cli.py`.
+`tests/unit/test_talents_forever_export.py`, `tests/unit/test_build_cli.py`, tests MCP.
 
 ### Bloc D — Builds populaires et comparaison
 
@@ -198,7 +207,7 @@ routeur si besoin. Quatre cas d'évaluation (ci-dessous). `docs/ADDON.md` § 7 (
 | `forever/tf_code.py` | nouveau : codec v6 pur |
 | `forever/talents_forever.py` | nouveau : disposition de l'addon, correspondance, export, builds populaires, plus proche |
 | `forever/pipeline/talents_forever.py` | lecture du bloc `popular` ; recoupement enrichi (classes d'écarts) |
-| `forever/build.py` | champ `export` de `BuildReport` (appel de `export_build`, aucun calcul) |
+| `forever/build.py` | inchangé (le bloc `export` est ajouté hors de `build_report`) |
 | `forever/cli.py` | `forever talents tf decode|popular|crosscheck` ; ligne « Talents Forever » de `forever build` |
 | `forever/mcp_server.py` | `forever_build` porte `export` ; `forever_lookup(kind="tf_popular")` |
 | `forever/addons.py` | `TalentsForeverBook` : `depends` vidé, relecture enrichie, `action` |
@@ -207,7 +216,7 @@ routeur si besoin. Quatre cas d'évaluation (ci-dessous). `docs/ADDON.md` § 7 (
 | `tests/fixtures/talents_forever/` | `popular.json`, `layout.json`, `mage_builds.json`, `README.md` |
 | `tests/talents_forever_data.py` | aide : `Data.lua` synthétique dans `tmp_path` |
 | `tests/unit/test_tf_code.py`, `test_talents_forever_layout.py`, `test_talents_forever_export.py`, `test_talents_forever_popular.py` | nouveaux |
-| `tests/unit/test_build_report.py`, `test_build_cli.py`, `test_addons_status.py`, `test_plugin_evals.py`, tests MCP | mis à jour |
+| `tests/unit/test_build_cli.py`, `test_addons_status.py`, `test_plugin_evals.py`, tests MCP | mis à jour |
 | `plugin/skills/forever-builds|forever-mage|forever-leveling/SKILL.md` | lien Talents Forever, builds populaires |
 | `plugin/evals/` | 4 cas |
 | `docs/…` | ROADMAP, DECISIONS (209), DATA_SOURCES, ADDON, ARCHITECTURE, USAGE, OPEN_QUESTIONS, rapport de recherche |
@@ -269,7 +278,7 @@ Bloc B (`test_talents_forever_layout.py`, `Data.lua` synthétique) :
   prérequis 1, noms d'arbres 2) ; rendu du rapport déterministe.
 - `forever addons status` : addon changé → relecture avec l'état de l'export par classe, sans proposition `addon_data`.
 
-Bloc C (`test_talents_forever_export.py`, `test_build_report.py`, `test_build_cli.py`) :
+Bloc C (`test_talents_forever_export.py`, `test_build_cli.py`, tests MCP) :
 - Les trois cas de `mage_builds.json` : `export_build` rend exactement `mage/20/--0530002001-klps-6`,
   `mage/30/--05300033210003001-klp2sr1prq1w2q1wqz-6`, `mage/20/0500050001---6` ; relus, mêmes points et même ordre
   (donjon : sans ordre, `order_note`).
@@ -324,7 +333,7 @@ réseau.
   `classes.json` ; relecture du diff avant commit.
 - **Fins de ligne** : fixtures écrites en `write_bytes` (LF) ; `git diff --stat` contrôlé.
 - **Tests MCP sous Windows** : importer `mcp` dans le module (piège T06b).
-- **Comptes** : `BuildReport` gagne `export` (tests de clés) ; évaluations (70/47/23).
+- **Comptes** : bloc `export` ajouté par la CLI et le MCP (tests de clés de leur sortie) ; évaluations (70/47/23).
 
 ## Angles morts attendus (à chiffrer en fin de tranche)
 
