@@ -2011,11 +2011,16 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
             f"Dernier passage : {last['finished_at'] if last else 'aucun'}"
             + (f" (en cours : {summary['running_step'] or 'début'})" if summary["running"] else "")
         ]
-        lines += [
-            f"  {e['id']} · {e.get('kind')} · {e.get('action')} · {e.get('state')}"
-            + (f" · {'; '.join(e.get('reasons') or [])}" if e.get("reasons") else "")
-            for e in entries
-        ]
+        lines += [f"  écrit : {update.written_text(w)}" for w in (last or {}).get("written") or []]
+        for e in entries:
+            lines.append(
+                f"  {e['id']} · {e.get('kind')} · {e.get('action')} · {e.get('state')}"
+                + (f" · {'; '.join(e.get('reasons') or [])}" if e.get("reasons") else "")
+            )
+            if update.summary_text(e.get("summary")):
+                lines.append(f"    résumé : {update.summary_text(e.get('summary'))}")
+            if e.get("kind") in update.SELF_CLEARING_KINDS:
+                lines.append(f"    se lève seule : {update.SELF_CLEARING_HINT}")
         if not entries:
             lines.append("  aucune attente")
         _emit({**summary, "pending": entries, "provenance": provenance}, lines, provenance, args.json)
@@ -2043,9 +2048,16 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
     report = update.run_update(deps, options, progress=_update_progress)
     lines = [f"Mise à jour{' (simulation)' if args.dry_run else ''} : {report['started_at']} → {report['finished_at']}"]
     lines += [f"  {s['name']} : {s['status']} · {s['detail']}" for s in report["steps"]]
-    lines += [f"  verdict {v['version']} r{v['revision']} : {v['action']}" for v in report["verdicts"]]
+    for v in report["verdicts"]:
+        sentence = update.summary_text(v.get("summary"))
+        lines.append(
+            f"  verdict {v['version']} r{v['revision']} : {v['action']}" + (f" ({sentence})" if sentence else "")
+        )
+    lines += [f"  écrit : {update.written_text(w)}" for w in report["written"]]
     lines += [f"  attente {p['id']} ({p['kind']}, {p['action']})" for p in report["pending"]]
-    if report["pending"]:
+    if any(p["kind"] in update.SELF_CLEARING_KINDS for p in report["pending"]):
+        lines.append(f"  correctifs du serveur à lire : {update.SELF_CLEARING_HINT}")
+    if any(p["kind"] not in update.SELF_CLEARING_KINDS for p in report["pending"]):
         lines.append("  voir `forever update status`, puis `forever update approve <id>`")
     _emit(report, lines, report["provenance"], args.json)  # type: ignore[arg-type]
     return update.exit_code(report)

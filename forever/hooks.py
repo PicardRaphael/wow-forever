@@ -418,7 +418,7 @@ def update_line(deps: Deps, repo_root: Path, runner: Runner | None = None) -> st
     faire quand `main` distant (relevé par le clone dédié) a avancé ; None s'il n'y a rien. Ne lève jamais."""
     try:
         from forever.pipeline import gitops
-        from forever.update import update_summary
+        from forever.update import SELF_CLEARING_KINDS, update_summary, written_text
 
         summary = update_summary(deps.cache_dir, deps.now())
         parts: list[str] = []
@@ -427,10 +427,11 @@ def update_line(deps: Deps, repo_root: Path, runner: Runner | None = None) -> st
         last = summary["last"] or {}
         written = last.get("written") or []
         if written:
-            w = written[-1]
-            parts.append(f"mise à jour : {w.get('version')} r{w.get('revision')} installée")
+            parts.append(f"mise à jour : {written_text(written[-1])}")
+        unread = [p for p in summary["pending"] if p.get("kind") in SELF_CLEARING_KINDS]
+        parts += [f"{p.get('version')} : correctifs du serveur à lire (lancer le jeu sur ce build)" for p in unread]
         blocked = sum(1 for p in summary["pending"] if p.get("action") == "bloqué")
-        n = len(summary["pending"]) - blocked
+        n = len(summary["pending"]) - blocked - len(unread)
         if blocked:
             plural = "s" if blocked > 1 else ""
             parts.append(f"{blocked} écriture{plural} bloquée{plural}, session nécessaire : `forever update status`")

@@ -34,7 +34,15 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple, TypedDict
 
 from forever.carry import CarryReport, carry_apply, carry_check
-from forever.config import CACHE_TTL, REPO_ROOT, UPDATE_CI_TIMEOUT, UPDATE_LOCK_STALE, Deps, utc_now
+from forever.config import (
+    CACHE_TTL,
+    REPO_ROOT,
+    UPDATE_CI_TIMEOUT,
+    UPDATE_HOTFIX_WAIT,
+    UPDATE_LOCK_STALE,
+    Deps,
+    utc_now,
+)
 from forever.engine_inputs import (
     ABSENT,
     ENGINES,
@@ -42,6 +50,8 @@ from forever.engine_inputs import (
     InputsDiff,
     ValueChange,
     compare_inputs,
+    hotfix_losses,
+    metadata_keys,
     targeted_replay,
 )
 from forever.errors import EXIT_OK, EXIT_PENDING, ForeverError, InvalidArgumentError, PathNotFoundError
@@ -339,6 +349,7 @@ class _Run:
     written: list[dict[str, Any]] = dataclasses.field(default_factory=list)
     client: Any = None  # ClientBuild du `.build.info`, lu à l'étape « jeu »
     progress: Progress | None = None
+    cleared: dict[str, str] = dataclasses.field(default_factory=dict)  # attente levée seule -> raison
 
     def say(self, line: str) -> None:
         """Ligne du journal du passage, écrite tout de suite (au fil de l'eau, pas à la fin)."""
@@ -627,7 +638,74 @@ def _carry_counts(report: CarryReport) -> dict[str, int]:
 
 
 def _inputs_doc(inputs: Mapping[str, InputsDiff]) -> dict[str, Any]:
-    return {name: {"identical": d.identical, "items": d.items} for name, d in inputs.items()}
+    """Entrées des moteurs pour le JSON : les feuilles changées (`changes`) restent hors du rapport, résumées par
+    `values` et `summary`."""
+    return {
+        name: {"identical": d.identical, "items": [{k: v for k, v in i.items() if k != "changes"} for i in d.items]}
+        for name, d in inputs.items()
+    }
+
+
+def _plain(value: Any) -> Any:
+    return None if value is ABSENT else value
+
+
+def _copied(base_vdir: Path, after: Path, inputs: Mapping[str, InputsDiff]) -> dict[str, list[Any]]:
+    """Lignes des valeurs changées (classe, entité, champ, avant, après) de chaque moteur dont une entrée change."""
+    from forever.engine_inputs import _resolve, _strip
+    from forever.pipeline.value_diff import copied_lines
+
+    metadata = metadata_keys(base_vdir, after)
+    docs: dict[tuple[Path, str], Any] = {}
+
+    def doc(folder: Path, name: str) -> Any:
+        if (folder, name) not in docs:
+            docs[folder, name] = _strip(_read(folder / name), metadata)
+        return docs[folder, name]
+
+    out: dict[str, list[Any]] = {}
+    for name, diff in inputs.items():
+        if diff.identical:
+            continue
+        lines: list[Any] = []
+        for item in diff.items:
+            if item.get("status") != "différent":
+                continue
+            file, pointer = str(item["file"]), item.get("pointer")
+            a, b = doc(base_vdir, file), doc(after, file)
+            if pointer:
+                a, b = _resolve(a, pointer), _resolve(b, pointer)
+            lines += copied_lines(file, a, b, pointer)
+        out[name] = lines
+    return out
+
+
+def _summary_doc(lines: Mapping[str, Sequence[Any]]) -> dict[str, Any]:
+    from forever.pipeline.value_diff import copied_summary, summary_sentence
+
+    out = {}
+    for name, found in lines.items():
+        counts = copied_summary(found)
+        out[name] = {"counts": counts, "sentence": summary_sentence(counts, name) if counts else ""}
+    return out
+
+
+def written_text(written: Mapping[str, Any]) -> str:
+    """« 1.60.1.70245 r3 installée seule (fiches PvP : Warrior, …) » : écriture par la règle, sans approbation."""
+    text = f"{written.get('version')} r{written.get('revision')} installée"
+    if written.get("approved") is False:
+        text += " seule"
+    return text + (f" ({written['summary']})" if written.get("summary") else "")
+
+
+SELF_CLEARING_HINT = "lancer le jeu sur ce build et se connecter au royaume, puis `forever update`"
+
+
+def summary_text(summary: Mapping[str, Any] | None) -> str:
+    """Phrases du résumé des valeurs changées, moteur par moteur (« fiches PvP : Warrior, … »)."""
+    if not isinstance(summary, Mapping):
+        return ""
+    return " ; ".join(str(s.get("sentence")) for s in summary.values() if isinstance(s, Mapping) and s.get("sentence"))
 
 
 def first_write_guard(cache_dir: Path) -> bool:
@@ -660,10 +738,14 @@ def _evaluate(
     candidate: Path,
     new_version: bool,
     motif: str,
+    gate: str = "lire",
+    hotfixes_read: bool = True,
 ) -> Step:
     """Vérifie la candidate, l'installe dans la copie de préparation, applique la règle, puis écrit (clone et chemin
-    git) ou rend une attente."""
+    git) ou rend une attente. `hotfixes_read` faux (candidate décodée sans correctifs du serveur) : les valeurs
+    `correctif_serveur` de la version installée perdues dans la préparation gardent l'attente (décision 207)."""
     from forever.pipeline.install import InstallRefusedError, apply_install, plan_install
+    from forever.pipeline.value_diff import capped_lines
     from forever.pipeline.verify import verify_version
 
     installed = _installed(run.base_data)
@@ -694,7 +776,10 @@ def _evaluate(
         replayed = targeted_replay(
             inputs, lambda e, c: {"avant": replay(e, c, run.base_data), "après": replay(e, c, stage)}
         )
-    verdict = decide(bool(verify["ok"]), carry, inputs, kind, install_ok=install_ok)
+    losses = [] if hotfixes_read else hotfix_losses(base_vdir, after)
+    verdict = decide(bool(verify["ok"]), carry, inputs, kind, install_ok=install_ok, hotfix_losses=losses)
+    lines = _copied(base_vdir, after, inputs)
+    summary = _summary_doc(lines)
     fingerprint = candidate_fingerprint(stage if install_ok else candidate)
     pending_id = f"{version}-r{revision}-{content_fingerprint(after)}"
     approved = verdict.action == "attente" and _approved(run, pending_id)
@@ -719,6 +804,17 @@ def _evaluate(
         "superseded": [{"file": v.file, "pointer": v.pointer, "after": now} for v, now in carry.superseded],
         "lost": [{"file": v.file, "pointer": v.pointer} for v in carry.lost],
         "inputs": _inputs_doc(inputs),
+        "values": {name: capped_lines(found) for name, found in lines.items()},
+        "summary": summary,
+        "hotfixes": {
+            "gate": gate,
+            "read": hotfixes_read,
+            "lost": [
+                {"file": c.file, "pointer": c.pointer, "before": _plain(c.before), "after": _plain(c.after)}
+                for c in losses[:50]
+            ],
+            "lost_count": len(losses),
+        },
         "replay": replayed,
         "refused": (plan or {}).get("refused", []) if plan else [],
     }
@@ -733,9 +829,13 @@ def _evaluate(
             run.pending.append(blocked)
             why = "; ".join(blocked.get("reasons", []))
             return Step(step, "arrêt", f"{version} r{revision} : déjà bloquée sur ce main ({why})", {"id": pending_id})
-        return _publish(run, step=step, version=version, revision=revision, stage=stage, plan=plan, verdict=doc)
+        return _publish(
+            run, step=step, version=version, revision=revision, stage=stage, plan=plan, verdict=doc, lines=lines
+        )
     entry = {
         **{k: doc[k] for k in ("id", "kind", "version", "revision", "action", "clauses", "reasons")},
+        "summary": summary,
+        "values": doc["values"],
         "created_at": run.now,
         "staged": str(stage if install_ok else candidate),
         "staged_sha": fingerprint,
@@ -763,10 +863,17 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
         return Step("nouvelle_version", "rien", "non demandé (--only)", {})
     if target is None:
         return Step("nouvelle_version", "rien", "aucune version à installer", {})
+    archive = archived_dbcache(run.deps.cache_dir, _build_number(target))
+    seen = _first_seen(run, target)
+    gate = hotfix_gate(archive is not None, seen, run.deps.now(), UPDATE_HOTFIX_WAIT)
+    if gate == "attendre":
+        return _hotfixes_wait(run, target, seen)
+    run.cleared[f"hotfixes-{target}"] = (
+        "DBCache.bin du build archivé et lu" if gate == "lire" else "délai écoulé sans DBCache.bin du build"
+    )
     rules = _rules(run.base_data)
     _fetch_version(run, target, rules)
     source = None
-    archive = archived_dbcache(run.deps.cache_dir, _build_number(target))
     if archive is not None:
         pending = hotfixes.pending_hotfixes(dbcache.read_dbcache(archive), {}, rules)
         if pending:
@@ -779,7 +886,7 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
     except ColumnNamesError as err:
         return _column_wait(run, "nouvelle_version", target, err)
     motif = f"nouvelle version {target} (forever update)"
-    return _evaluate(
+    result = _evaluate(
         run,
         step="nouvelle_version",
         kind="install_version",
@@ -788,7 +895,50 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
         candidate=candidate.root,
         new_version=True,
         motif=motif,
+        gate=gate,
+        hotfixes_read=source is not None,
     )
+    return result._replace(data={**result.data, "gate": gate})
+
+
+def _first_seen(run: _Run, version: str) -> datetime | None:
+    """Première vue du build sur ce poste (journal des versions du client), None si absent ou illisible."""
+    from forever.pipeline.client_builds import load_builds
+
+    try:
+        found = [b.installed_at for b in load_builds(run.deps.cache_dir) if b.build == version]
+    except ForeverError:
+        return None
+    return min(found) if found else None
+
+
+def _hotfixes_wait(run: _Run, version: str, seen: datetime | None) -> Step:
+    """Attente « correctifs à lire » (décision 207) : aucune archive de `DBCache.bin` du build, délai non écoulé.
+    Rien n'est relevé ni décodé ; l'attente n'est pas approuvable et se lève seule."""
+    until = format_utc(seen + UPDATE_HOTFIX_WAIT) if seen is not None else None
+    pending_id = f"hotfixes-{version}"
+    why = (
+        f"correctifs du serveur à lire : aucun DBCache.bin du build {_build_number(version)} archivé ; lancer le jeu "
+        "sur ce build et se connecter au royaume"
+        + (f", sinon installation sans correctifs à partir de {until} si aucun n'est perdu" if until else "")
+    )
+    run.pending.append(
+        {
+            "id": pending_id,
+            "kind": "hotfixes_unread",
+            "action": "attente",
+            "version": version,
+            "revision": None,
+            "clauses": {},
+            "reasons": [why],
+            "seen_at": format_utc(seen) if seen is not None else None,
+            "until": until,
+            "created_at": run.now,
+            "base": {"origin_main": run.origin_main, "version": _installed(run.base_data)},
+            "commands": [SELF_CLEARING_HINT],
+        }
+    )
+    return Step("nouvelle_version", "attente", why, {"id": pending_id, "gate": "attendre", "until": until})
 
 
 def _need_layouts(run: _Run, step: str, version: str, need: _NeedLayouts, count: int) -> Step:
@@ -1134,7 +1284,12 @@ def _annotate_revision(vdir: Path, verdict: Mapping[str, Any], command: str) -> 
     write_manifest(vdir.parent)
 
 
-def _research_report(plan: Any, verdict: Mapping[str, Any]) -> str:
+def _cell(value: Any) -> str:
+    text = value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+    return text.replace("|", "\\|").replace("\r", " ").replace("\n", " ")
+
+
+def _research_report(plan: Any, verdict: Mapping[str, Any], values: Mapping[str, Sequence[Any]] | None = None) -> str:
     from forever.pipeline.install import render_install_report
 
     lines = [render_install_report(plan).rstrip(), "", "## Report à la main", ""]
@@ -1144,6 +1299,25 @@ def _research_report(plan: Any, verdict: Mapping[str, Any]) -> str:
     for name, d in verdict["inputs"].items():
         state = "identiques" if d["identical"] else "différentes"
         lines.append(f"- {name} : {state}")
+    lines += ["", "## Valeurs changées", ""]
+    found = [(name, rows) for name, rows in (values or {}).items() if rows]
+    if not found:
+        lines.append("Aucune valeur changée dans les entrées des moteurs.")
+    for name, rows in found:
+        sentence = (verdict.get("summary") or {}).get(name, {}).get("sentence") or name
+        lines += [f"{sentence}.", "", "| Classe | Entité | Champ | Avant | Après |", "| --- | --- | --- | --- | --- |"]
+        lines += [f"| {' | '.join(_cell(v) for v in row)} |" for row in rows]
+        lines.append("")
+    fixes = verdict.get("hotfixes") or {}
+    lines += ["", "## Correctifs du serveur", ""]
+    if fixes.get("read", True):
+        lines.append(f"Porte : {fixes.get('gate', 'lire')} ; correctifs du serveur lus avec la candidate.")
+    else:
+        lines.append(
+            f"Porte : {fixes.get('gate')} ; candidate décodée sans correctifs du serveur, "
+            f"{fixes.get('lost_count', 0)} valeur(s) correctif_serveur perdue(s)."
+        )
+        lines += [f"- {c['file']} {c['pointer']} : {c['before']!r} → {c['after']!r}" for c in fixes.get("lost", [])]
     lines += [
         "",
         f"Règle d'automatisme : {verdict['action']} ({'approuvée' if verdict.get('approved') else 'tenue'}).",
@@ -1153,7 +1327,15 @@ def _research_report(plan: Any, verdict: Mapping[str, Any]) -> str:
 
 
 def _publish(
-    run: _Run, *, step: str, version: str, revision: int, stage: Path, plan: Any, verdict: Mapping[str, Any]
+    run: _Run,
+    *,
+    step: str,
+    version: str,
+    revision: int,
+    stage: Path,
+    plan: Any,
+    verdict: Mapping[str, Any],
+    lines: Mapping[str, Sequence[Any]] | None = None,
 ) -> Step:
     from forever.pipeline import gitops
 
@@ -1167,7 +1349,7 @@ def _publish(
     _annotate_revision(data / version, verdict, AUTO_COMMAND if run.options.auto else "forever update")
     report_rel = f"docs/research/data-{version}-r{revision}.md"
     (clone / report_rel).parent.mkdir(parents=True, exist_ok=True)
-    (clone / report_rel).write_bytes(_research_report(plan, verdict).encode("utf-8"))
+    (clone / report_rel).write_bytes(_research_report(plan, verdict, lines).encode("utf-8"))
     _render_inventory(data, clone / INVENTORY_DOC)
     run.say(f"{step} : uv sync dans le clone")
     synced = runner(["uv", "sync", "--frozen", "--offline"], clone, None)
@@ -1202,7 +1384,16 @@ def _publish(
     gitops.push(runner, clone, branch)
     run.say(f"{step} : CI attendue sur {branch} ({sha[:12]}, jusqu'à {UPDATE_CI_TIMEOUT.total_seconds() / 60:.0f} min)")
     ci = gitops.wait_ci(runner, clone, branch, sha, UPDATE_CI_TIMEOUT.total_seconds())
-    info = {"version": version, "revision": revision, "branch": branch, "sha": sha, "ci": ci.url, "jobs": ci.jobs}
+    info = {
+        "version": version,
+        "revision": revision,
+        "branch": branch,
+        "sha": sha,
+        "ci": ci.url,
+        "jobs": ci.jobs,
+        "approved": bool(verdict.get("approved")),
+        "summary": summary_text(verdict.get("summary")),
+    }
     if not ci.ok:
         gitops.leave_branch(runner, clone, branch)  # clone remis sur main ; branche distante gardée pour l'examen
         reason = f"CI {ci.status} sur {branch} ({ci.url}) : rien fusionné, branche gardée à distance"
@@ -1215,11 +1406,27 @@ def _publish(
         return Step(step, "arrêt", f"main distant a bougé : relancer `forever update` (branche {branch} poussée)", info)
     gitops.delete_branch(runner, clone, branch)
     run.written.append(info)
-    if verdict.get("approved"):
-        _set_state(run.deps.cache_dir, str(verdict["id"]), "faite")
+    _close_installed(run.deps.cache_dir, version, revision, str(verdict["id"]), run.now)
     return Step(
         step, "fait", f"{version} r{revision} installée par le clone ({sha[:12]}) : `git pull` dans la session", info
     )
+
+
+def _close_installed(cache_dir: Path, version: str, revision: int, written_id: str, at: str) -> None:
+    """Attentes closes par une écriture : celle qui vient d'être écrite (approuvée ou non), et toute attente ouverte
+    d'installation ou levée seule de la même version jusqu'à cette révision (sa version est installée)."""
+    for entry in list_pending(cache_dir):
+        if entry.get("state") not in OPEN_STATES:
+            continue
+        same = entry.get("id") == written_id
+        rev = entry.get("revision")
+        older = (
+            entry.get("version") == version
+            and entry.get("kind") in (*INSTALL_KINDS, *SELF_CLEARING_KINDS)
+            and (rev is None or (isinstance(rev, int) and rev <= revision))
+        )
+        if same or older:
+            _set_state(cache_dir, str(entry["id"]), "faite", done_at=at, done_by=f"{version} r{revision} installée")
 
 
 def _render_inventory(data: Path, doc: Path) -> None:
@@ -1378,6 +1585,10 @@ def run_update(
     if not options.dry_run and len(steps) > 1:
         for entry in run.pending:
             record_pending(deps.cache_dir, entry)
+        for pending_id, why in run.cleared.items():
+            doc = _read(_pending_path(deps.cache_dir, pending_id))
+            if isinstance(doc, dict) and doc.get("state") in OPEN_STATES:
+                _set_state(deps.cache_dir, pending_id, "faite", done_at=run.now, done_by=why)
         save_report(deps.cache_dir, report)
     return report
 
@@ -1507,6 +1718,11 @@ def approve(
     """Approuve une attente si sa base n'a pas bougé (sinon `périmée`) et lance un passage (détaché, ou dans ce
     processus avec `wait`) ; une entrée `bloqué` n'est pas approuvable (refus, code 2)."""
     entry = _load(deps.cache_dir, pending_id)
+    if entry.get("kind") in SELF_CLEARING_KINDS:
+        raise InvalidArgumentError(
+            f"L'attente {pending_id} ({entry.get('kind')}) se lève seule : elle n'est pas approuvable.",
+            SELF_CLEARING_HINT,
+        )
     if entry.get("kind") in SESSION_KINDS:
         raise InvalidArgumentError(
             f"L'attente {pending_id} ({entry.get('kind')}) se traite en session : {'; '.join(entry.get('reasons', []))}.",
@@ -1566,10 +1782,11 @@ def update_summary(cache_dir: Path, now: datetime | None = None) -> dict[str, An
             "verdicts": [{"id": v.get("id"), "action": v.get("action")} for v in last.get("verdicts", [])],
         }
     pending = [
-        {k: e.get(k) for k in ("id", "kind", "action", "version", "state", "created_at")}
+        {**{k: e.get(k) for k in ("id", "kind", "action", "version", "state", "created_at")},
+         "summary": summary_text(e.get("summary"))}
         for e in list_pending(cache_dir)
         if e.get("state") in OPEN_STATES
-    ]
+    ]  # fmt: skip
     lock = _read(_lock_path(cache_dir))
     running = _lock_alive(lock, now or utc_now())
     step = lock.get("step") if running and isinstance(lock, dict) else None

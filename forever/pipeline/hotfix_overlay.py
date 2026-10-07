@@ -502,18 +502,18 @@ def annotate(
                     info["dbcache_date"] = source.read_at
                 entity[HOTFIX_KEY] = info
                 touched.setdefault((file, pointer(path)), set()).update(recs)
-    for path, recs in _tree_paths(docs, reached, tab_of).items():
-        used |= set(recs)
-        touched.setdefault(("classes.json", path), set()).update(recs)
-    for (file, path), recs in sorted(touched.items(), key=lambda kv: (kv[0][0], -len(kv[0][1]))):
-        parent = next((p for (f, p) in touched if f == file and _inside(path, p)), None)
+    for where, keys in _tree_paths(docs, reached, tab_of).items():
+        used |= set(keys)
+        touched.setdefault(("classes.json", where), set()).update(keys)
+    for (name, where), found in sorted(touched.items(), key=lambda kv: (kv[0][0], -len(kv[0][1]))):
+        parent = next((p for (f, p) in touched if f == name and _inside(where, p)), None)
         if parent is not None:
-            touched[(file, parent)] |= recs
+            touched[(name, parent)] |= found
     groups: dict[tuple[str, tuple[int, ...], str | None], list[str]] = {}
-    for (file, path), recs in touched.items():
-        if not any(f == file and _inside(path, p) for (f, p) in touched):
-            pushes, first = _pushes(sorted(recs), by_rec, source)
-            groups.setdefault((file, pushes, first), []).append(path)
+    for (name, where), found in touched.items():
+        if not any(f == name and _inside(where, p) for (f, p) in touched):
+            pushes, first = _pushes(sorted(found), by_rec, source)
+            groups.setdefault((name, pushes, first), []).append(where)
     sha = source.cache.sha256[:12]
     commit = str(source.dbd.get("commit") or "")[:12]
     rules = []
