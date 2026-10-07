@@ -227,6 +227,12 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **LVL2 — Les couleurs de quête de Forever sont-elles celles de Classic ?** Test : `UnitQuestTrivialLevelRange`
   relevé à chaque niveau par ForeverLogger. Priorité : basse. Registre I7.
   [Détail](research/questions-ouvertes-detail.md#lvl2)
+- **LVL3 — Combien de temps dure le Well-Rested du Cozy Sleeping Bag, et comment les bonus d'XP se cumulent-ils ?**
+  Ajoutée le 2026-10-07 (décision 199) : 2 h selon le client d'après foreverchanges.pro, 1 h selon des guides ; rien
+  n'entre dans les données sans lecture du client. Test : `SpellDuration` du sort de l'aura dans les tables du client
+  (wago), puis temps restant de l'aura relevé hors combat par ForeverLogger ; cumul : gain d'XP d'un même monstre avec
+  et sans chaque bonus. Priorité : moyenne (T04f). Registre D5, D7.
+  [Détail](research/questions-ouvertes-detail.md#lvl3)
 
 ## PvP
 - **PVP1 — Les rendements décroissants de Forever suivent-ils Classic (catégories, fenêtre, paliers, immunité,

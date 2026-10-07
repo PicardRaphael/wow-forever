@@ -845,6 +845,7 @@ mechanics:
     sources: []
     tests: []
     tolerance: null
+    note: "Bonus d'XP des camps et des perks Legacy : T04f (décision 199, question LVL3) ; catalogue Legacy complet : LG1"
   - id: D6
     categorie: environnement
     description: "Effets de biome et de type de créature"
@@ -865,7 +866,7 @@ mechanics:
     tests:
       - tests/unit/test_decode_character.py::test_rested_equals_exhaustion
     tolerance: null
-    note: "T08b, bloc A : paliers du repos décodés du client (Exhaustion, character_scaling.json), non modélisés dans le leveling (T04d)"
+    note: "T08b, bloc A : paliers du repos décodés du client (Exhaustion, character_scaling.json), non modélisés dans le leveling ; T04f (décision 199) : Well-Rested du Cozy Sleeping Bag, nourriture et cumul des bonus d'XP, durée du Well-Rested à lire dans le client (question LVL3)"
   - id: E1
     categorie: consommables
     description: "Flacons : un seul actif, conservé à la mort, conditions de zone"

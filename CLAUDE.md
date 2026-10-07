@@ -1,7 +1,7 @@
 # forever-core
 
 Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`), CLI, serveur MCP, données versionnées par version du jeu (`forever/data/`), plugin Claude Code léger (`plugin/`, sans logique de calcul).
-À lire selon la tâche : spécification `docs/SPEC.md`, architecture `docs/ARCHITECTURE.md`, tranches `docs/ROADMAP.md`, mécaniques `docs/MECHANICS_REGISTRY.yaml`.
+À lire selon la tâche : vision `docs/VISION.md`, spécification `docs/SPEC.md`, architecture `docs/ARCHITECTURE.md`, tranches `docs/ROADMAP.md`, mécaniques `docs/MECHANICS_REGISTRY.yaml`.
 
 <!-- Mainteneurs : chaque ligne doit empêcher une erreur réelle de Claude. Ajouter une ligne quand l'erreur se répète ou qu'une revue l'attrape ; relire en PR comme du code. Propriétaire : Raphaël. Dernier élagage : 2026-09-26 (Opus 5.5). -->
 
@@ -23,7 +23,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 ## Addon (`addon/`, règles détaillées dans `docs/ADDON.md`)
 - SavedVariable initialisée dans le gestionnaire d'`ADDON_LOADED` ; jamais d'alias local au niveau du fichier.
 - `pcall` autour de chaque `RegisterEvent` et de chaque API incertaine (talents, bonus des sorts, valeurs secrètes).
-- Aucune fonction d'action (`CastSpell*`, `UseAction`, `RunMacro*`, `SendChatMessage` automatique) ; ni pixels, ni lecture d'écran, ni entrées simulées.
+- Aucune fonction d'action (`CastSpell*`, `UseAction`, `RunMacro*`, `CreateMacro`, `SendChatMessage` automatique) ; ni pixels, ni lecture d'écran, ni entrées simulées, sauf la bande du pont de P06 (décision 194). Macros : texte à importer par le joueur seulement (décision 195).
 - Aucun abonnement au journal de combat (`COMBAT_LOG_EVENT*`) : l'analyse des combats se fait toujours hors du jeu, sur `WoWCombatLog-*.txt`.
 - Contrôle : `uv run python scripts/check_addon.py` (et `tests/unit/test_addon_rules.py`).
 

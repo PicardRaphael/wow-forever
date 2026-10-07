@@ -1,6 +1,8 @@
 # Spécification — forever-core
 
 ## Objectif
+Direction du projet : `docs/VISION.md` (forever-core pilote les addons de Forever au lieu de refaire leur interface, décision 193).
+
 Répondre à toute question sur WoW Forever avec des chiffres exacts pour la version en cours du jeu, adaptés aux personnages du joueur, et dire à chaque réponse sur quelle version et avec quelle certitude. L'agent couvre tout le jeu : combat et mécaniques, leveling et quêtes, talents, PvP (champs de bataille et monde ouvert), donjons, raids, équipement, consommables, Legacy, métiers, réputations et économie.
 
 ## Vocabulaire
@@ -20,7 +22,7 @@ Priorités : PvP en champs de bataille, donjons et leveling d'abord ; raid ensui
 | P0 | Fraîcheur | `forever status` : version locale, dernière version publiée, statut `fresh`, `stale`, `unknown` ou `silent` | T01 |
 | P0 | Consultation | Sorts, talents, objets, consommables, raciaux, avec provenance | T01 à T03 |
 | P0 | Mécaniques | Registre d'environ 120 mécaniques, couvert par des tests | T02 |
-| P0 | Leveling | Temps par monstre, XP par heure, quêtes et XP de Forever, zone ou donjon adapté au niveau (données de Questie), ordre de talents optimal, conseil de respec ; build suivi en jeu par Talents Forever (export de nos builds en code v5) et comparaison d'équipement en jeu | T04b, T04c, T05, FA1 |
+| P0 | Leveling | Temps par monstre, XP par heure, quêtes et XP de Forever, zone ou donjon adapté au niveau (données de Questie), ordre de talents optimal, conseil de respec ; build suivi en jeu par Talents Forever (export de nos builds en code v6), bonus d'XP cumulés (T04f) et comparaison d'équipement en jeu | T04b, T04c, T05, FA1 |
 | P0 | Profil | Profil du personnage actif (plusieurs personnages, toutes classes) rempli et mis à jour automatiquement depuis plusieurs sources croisées : ForeverLogger (niveau, talents, observations), sauvegardes des autres addons (quêtes faites dans Questie, mes prix d'Auctionator), journaux, puis l'API Blizzard après le lancement ; source et date par champ, la plus récente l'emporte (à date égale la plus directe), écart signalé ; ce que le joueur dit dans sa question l'emporte pour la réponse en cours (décision 122) ; mise à jour proposée quand le joueur dit « j'ai … » (décision 125) | T06b, PV1 (import minimal, règle de fusion), T07 (import complet), EC1 (API) |
 | P0 | PvP | Savoir des 9 classes (sorts, recharges, contrôles et durées, défensifs, raciaux de toutes les races et des nouvelles combinaisons race et classe, décodés du client, bijoux, rendements décroissants), fiches par affrontement ; champs de bataille (objectifs, récompenses, équipement PvP) et monde ouvert ; rendements décroissants mesurés dans les journaux ; fiche fixe de la classe adverse en jeu | PV1, PV2, FA1p |
 | P0 | Analyse de mes combats | PvP (contrôles donnés et subis avec rendements décroissants, recharges utilisées, gâchées ou tardives, burst, interruptions, morts et leur cause, cibles, comparés aux fiches de PV1) ; PvE (rotation réelle, écarts avec la rotation optimale, perte chiffrée par rejeu du même combat, chaque boss) ; taux réels comparés au modèle ; `forever analyze`, outil MCP, rapport avec graphique ; en local, autres joueurs anonymisés | AN1, AN2, FA3 |
@@ -36,6 +38,7 @@ Priorités : PvP en champs de bataille, donjons et leveling d'abord ; raid ensui
 | P2 | API Blizzard | Tout ce que l'API couvre pour Forever, après le lancement du 4 novembre et la vérification de sa couverture : prix de l'hôtel des ventes, fiches de personnages (niveau, équipement, talents si disponibles), PvP (honneur, rang, classements) ; « où j'en suis en PvP » ; chaque accès réseau soumis à accord (décision 126) | EC1 |
 | P2 | Équipement | Base d'objets par formules du client, optimiseur sous contraintes ; plan d'équipement par personnage et par contexte (meilleur objet accessible par emplacement, où l'obtenir, coût, temps estimé) ; « quel objet viser à mon niveau » (décision 129) | T10 |
 | P2 | Consommables | Plan par zone, métier et budget (flacons conditionnés par zone, non-cumuls, recharges partagées) | T11 |
+| P0 | En jeu | Pont de conversation et boutons en jeu (une question prédéfinie par bouton, visible quand sa tranche est faite) ; exports vers les addons installés : Talents Forever (talents), Naowh Forever (BiS, poids, macros), EllesmereUI (profils par personnage et par rôle) ; décisions 194 à 197 | P06, FA1, T10, EX1 |
 | P3 | Autres surfaces | Serveur MCP distant pour Claude.ai et ChatGPT ; site statique par version | T13 |
 
 ## Classes, spécialisations et rôles
@@ -85,10 +88,11 @@ Chaque valeur garde sa source et sa certitude. « — » : la source n'apporte r
 - Donnée manquante (décision 131) : quand une réponse bute sur une donnée absente (angle mort, valeur supposée, domaine pas encore couvert, taux de Classic au lieu de Forever), l'agent cherche un addon qui l'embarque ou la collecte (CurseForge, Wago, liste des addons Forever de foreverchanges.pro) et propose de l'installer, avec ce qu'il apporterait, lien, version, date, licence, compatibilité Forever et stabilité ; il n'installe jamais rien lui-même. Liste des données manquantes : `docs/DATA_SOURCES.md`.
 
 ## Hors périmètre
-- Automatiser le jeu ou capturer le trafic réseau.
+- Automatiser le jeu ou capturer le trafic réseau ; agir à la place du joueur (aucune fonction d'action, aucune entrée simulée, aucune lecture de la mémoire du jeu ; seule la bande de pixels du pont de P06 est lue, décision 194).
+- Modifier le code des addons de la communauté (décision 196).
 - Recopier le contenu protégé des guides (seulement des faits sourcés).
 - Prédire un duel PvP : le PvP reste un profil comparatif, marqué `suppose`.
-- Routes de leveling détaillées : le joueur suit RestedXP en jeu (exclu comme source de données) ; l'agent répond seulement « quelle zone ou quel donjon à mon niveau ».
+- Guide de leveling pas à pas (Questie et Forever Guide le font en jeu ; RestedXP reste exclu comme source de données) : l'agent répond « quelle zone ou quel donjon à mon niveau » et, avec T04d et T04f, quel objectif suivant et quels bonus d'XP prendre.
 - Suivre en direct les temps de recharge adverses dans un addon : impossible sur Forever (abonnement au journal de combat refusé aux addons, valeurs de combat secrètes, `docs/research/addon-forever.md`). En jeu, seules des fiches fixes s'affichent ; l'analyse des combats se fait après coup sur les journaux.
 - Acheter ou vendre à l'hôtel des ventes à la place du joueur.
 - Aspirer automatiquement Wowhead (ses conditions l'interdisent) : consultation ponctuelle par le sous-agent de recherche seulement.

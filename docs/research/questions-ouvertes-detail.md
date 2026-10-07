@@ -293,6 +293,11 @@ domaine qu'il cite.
 
 - I7 (T04c) : couleurs de quête de Forever identiques à Classic ? La plage verte vient de `GetQuestGreenRange` (API du client, absente sur disque), remplacée par le niveau gris communautaire de Classic ; ForeverLogger pourrait relever `UnitQuestTrivialLevelRange("player")` à chaque niveau. Niveaux des quêtes : base Classic Era de Questie sans correction Forever.
 
+<a id="lvl3"></a>
+### LVL3
+
+- D7 et D5 (T04f, décision 199) : durée du Well-Rested donnée à 2 h par foreverchanges.pro (lecture du client revendiquée par le site) et à 1 h par des guides ; les deux sont des sources communautaires (`suppose`). La valeur se lit dans `SpellDuration` du sort de l'aura (index de durée de `SpellMisc`), décodée comme les durées des autres sorts ; la règle de cumul (repos, sac de couchage, nourriture, perks Legacy, camps) n'est écrite nulle part dans le client à notre connaissance et se mesure par le gain d'XP relevé hors combat. Chaîne de quêtes du sac : Naowh Forever (`SleepingBagData.lua`, Wowhead Forever, 4 octobre), `suppose`.
+
 ## PvP
 
 <a id="pvp1"></a>

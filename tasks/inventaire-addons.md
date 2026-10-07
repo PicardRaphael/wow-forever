@@ -518,3 +518,162 @@ Inventaire par `forever addons inventory ForeverCompanion` : métadonnées et em
   sort, de la position et des rangs.
 - **Usage proposé** : second témoin des arbres (DON13, FA1) ; ses listes BiS, rotations, butin et métiers attendent un
   lecteur (FA1, DJ1 ou les tranches de classe), au mieux `suppose` (choix de joueurs ou d'un outil tiers).
+
+## Relevé du 2026-10-07 (vision « cerveau qui pilote les addons », décision 193)
+
+Relevé en lecture seule, sans réseau, sous le client 1.60.1.70245 : `forever addons status` (sans `--save`) et
+`forever addons inventory` pour les versions et les empreintes, lecture des fichiers pour Naowh Forever, EllesmereUI
+et Forever Companion. **Rien n'est ingéré** : aucun fichier de `forever/data/`, de `tests/fixtures/` ni du code n'a
+changé, aucun fichier d'addon ni de sauvegarde n'a été modifié. Seuls des noms, des comptes, des formats et des
+chemins `fichier:ligne` sont repris ; les exemples de chaînes sont **synthétiques** (construits d'après le format,
+aucune vraie chaîne copiée). Liste de référence : le gestionnaire CurseForge de l'utilisateur, plus ForeverLogger.
+
+### Versions
+
+| Addon (dossier) | Version du gestionnaire | Version lue | Empreinte | Statut | Licence |
+| --- | --- | --- | --- | --- | --- |
+| AtlasLoot Classic Forever (`AtlasLootClassic` + modules) | 1.2.0 | `.toc` : `Forever 1.60.1` (« 1.2.0 » absent des fichiers, comme 1.1.3 : décision 124) | `fda8a3f7046d` | inchangé | GPL-2 |
+| Auctionator | 340 | 340 | `045fc9510a46` | inchangé | All Rights Reserved |
+| ForeverDungeonJournal | 1.5.2 | 1.5.2 | `ca21fde00e36` | inchangé | aucune |
+| Forever Bestiary | 0.5.0 | 0.5.0 | `8bc6ff0419e9` | inchangé | aucune |
+| Forever Guide | 1.25.7 | 1.25.7 | `ff474766a898` | inchangé | aucune |
+| GearQuest Forever (+ modules) | 0.3.6-beta | 0.3.6-beta | `62ac39a1f4dd` | inchangé | aucune |
+| Legacy Forever | 0.6.13 | v0.6.13 | `c4210fc6898d` | inchangé | GPL-3.0-or-later |
+| Questie Forever | v27 | 11.38.0 Forever-v27 | `79dd5186dc66` | inchangé | à vérifier (LOG8) |
+| Talents Forever (`TalentsForeverBook`) | 0.37.1 | 0.37.1 ; contenu : build 1.60.1.70170, généré le 2026-10-04, `codeVersion` 6 | `a63bb5df2b86` | inchangé | aucune |
+| Zone Level: Forever | 1.6 | 1.6 | `e621a38eb4e3` | inchangé | aucune |
+| **Naowh Forever** (+ 14 modules) | 0.5.25-beta | 0.5.25-beta | `4ad2d7a49f78` (statut, addon et modules) ; `f5f5d4669246` (`inventory`, cœur seul) | inchangé | **tous droits réservés** (`LICENSE.md`) |
+| **EllesmereUI** (+ 21 modules) | 9.3.8 | 9.3.8 | — (interface seule, non empreinté) | interface seule | **propriétaire, tous droits réservés** (`license.txt`) |
+| **Forever Companion** | (absent de la liste) | 1.0.0 ; contenu `dataVersion` 79, `updated` 2026-10-05 | `2d9529a683da` | inchangé | aucune |
+| Leatrix Maps | 1.60.14 | 1.60.14 | — | interface seule | non lue |
+| ForeverBeta Map Fix (`ForeverMapFix`) | 0.2.0 | 0.2.0 | — | interface seule | MIT |
+| ForeverLogger (le nôtre) | — | 0.3.0 | `8025f8ced497` | inchangé | dépôt |
+
+« Inchangé » : par rapport au relevé enregistré dans le cache (`forever addons status --save`, mis à jour par les
+passages de `forever update`).
+
+### Naowh Forever 0.5.25-beta
+
+- **Identité** : 15 dossiers (cœur et modules ActionBars, AuraBuffs, BiS, Blessings, Discovery, DungeonJournal,
+  GearSets, GroupInspect, Macros, Professions, SmartReminders, SwingTimer, ThreatMeter, Training), même version et
+  même auteur (Naowh) ; un seul `.toc` par dossier, `## Interface: 120000, 120001, 120005, 120007, 120100, 16001`
+  (vise aussi le retail), sans `_Camelot.toc`. SavedVariables : `NaowhForeverDB` (compte : `dbVersion`,
+  `specProfile`, `account`, `charActive`, `observed`, `profiles`) et `NaowhUI_SmartRemindersDB` (inutilisée).
+  Licence : `NaowhForever/LICENSE.md`, « copyrighted to their authors with all rights reserved », source
+  <https://github.com/nwh-gaming-ab/NaowhForever> ; bibliothèques sous leurs licences (LibSerialize, LibDeflate…).
+- **Compatibilité Forever** : addon présenté comme compagnon de Forever ; aucun test de `WOW_PROJECT_ID` ; données
+  datées des builds 1.60.1.69913 à 1.60.1.70205 (`DungeonJournal/Data/Build.lua:8` : 70205, 3 octobre), alors que le
+  client est en 70245 : à relire à chaque version.
+- **Format commun des chaînes** : `PRÉFIXE` + `LibDeflate:EncodeForPrint(CompressDeflate(LibSerialize:Serialize(table)))`
+  (alphabet `[A-Za-z0-9()]`, ni base64 standard, ni AceSerializer, ni JSON), décodé comme une donnée, jamais
+  exécuté (`NaowhForever/Shared/Decode.lua:227`).
+- **Sources communautaires embarquées** (toutes au mieux `suppose`) : classement BiS de 28 spécialisations
+  (`BiS/Data/BiS.lua`, wowsrc.com « used with permission », mis à jour le 3 octobre, sans phase) ; poids des
+  statistiques par défaut de 28 spécialisations (`StatWeights/Data/Defaults.lua`, sans source citée, niveau 60,
+  5 octobre) ; journal des donjons (35 donjons et raids, 311 boss, 1 349 butins ; Wowhead Forever, Wowhead Classic à
+  défaut, wowsrc.com ; build 70205 ; 193 butins à chance nulle : objets nouveaux vus deux fois) ; conseils de boss
+  (`Data/Tips.lua`, 208, écrits à la main d'après des sources **Classic**, Wowhead Forever pour les donjons propres à
+  Forever) ; capacités et fiches de boss (Wowhead Forever) ; quêtes de donjon (236, guide Wowhead Forever du
+  23 septembre) ; livres de bibliothèque (foreverchanges.pro, build 70009) ; **chaîne de quêtes du sac de couchage**
+  (`SleepingBagData.lua`, Wowhead Forever, 4 octobre : source pour T04f) ; sorts et prix des entraîneurs (build
+  70178) ; recettes de 10 métiers (Wowhead Forever, 27 septembre) ; rappels de buffs (« not yet confirmed in the
+  client »). Aucune rotation. Les scripts qui produisent ces données (`Tools/build_*.py`) ne sont pas livrés.
+  `SmartReminders/Abilities.lua` vient d'une feuille de donjons **retail**.
+- **Points d'attention** : `COMBAT_LOG_EVENT_UNFILTERED` enregistré par SmartReminders mais inactif sur Forever
+  (fonction absente) ; émote automatique optionnelle (désactivée par défaut, `QoL/NaowhForever_SummonEmote.lua:30`) ;
+  sept préfixes de canal d'addon ; `CreateMacro`, `PickupAction`, `PlaceAction`, `SetBinding` hors combat ; options
+  qui agissent pour le joueur (confirmation des jets de butin, acceptation des quêtes). Rien de cela n'entre dans
+  notre code (`docs/ADDON.md`).
+
+### EllesmereUI 9.3.8
+
+- **Identité** : 22 dossiers, `## Interface: 120000, 120001, 120005, 120007, 120100, 16001` ; ForeverEssentials
+  seulement 16001 (`_Camelot.toc`, `## AllowLoadGameType: camelot` : Uprank, Flight Timer, Threat Meter par
+  `UnitDetailedThreatSituation`, Loot Feed) ; auteur Ellesmere (dépôt EllesmereGaming/EllesmereUI). SavedVariables :
+  `EllesmereUIDB` (profils et réglages), une par module (vidée au chargement), deux par personnage. Bibliothèques :
+  LibDeflate, LibDataBroker, LibSharedMedia… ; ni AceDB, ni LibDualSpec, ni LibSerialize (sérialiseur maison).
+  Licence (`license.txt`) propriétaire : « copyrighted to their authors with all rights reserved », aucun droit de
+  redistribution ni de modification.
+- **Compatibilité Forever** : détection par la version d'interface (`EllesmereUI_ClientGate.lua`,
+  `EllesmereUI.IS_FOREVER`), jamais par `WOW_PROJECT_ID` ; une spécialisation par classe sur Forever
+  (`EllesmereUI_Presets.lua:181`).
+- **Profils** : du **compte** (`EllesmereUIDB.profiles`, `activeProfile`), affectés **par spécialisation**
+  (`specProfiles[specID]`, bascule maison sur `PLAYER_SPECIALIZATION_CHANGED` et `PLAYER_ENTERING_WORLD`,
+  `Profiles.lua:3951`) : sur Forever, **un profil par classe** ; **ni par personnage ni par rôle** (les surcharges par
+  spécialisation et les conditions — donjon, raid, champ de bataille, solo — changent des réglages dans un profil,
+  sans changer de profil). Aucun profil livré.
+- **Affichages qui pourraient recevoir des données de forever-core** : DataBars, bloc Broker (tout objet
+  LibDataBroker, `DataBars/Blocks/LDB.lua:30`) ; rappels de buffs (sorts suivis, camp) ; liste de sorts du
+  gestionnaire de recharges ; Quest Tracker.
+- **Points d'attention** : aucun abonnement au journal de combat ; compteur de dégâts par `C_DamageMeter` (inerte
+  sans elle) ; Uprank déplace des sorts sur les barres (`PickupSpell`, `PlaceAction`) ; boutons de rappel sécurisés
+  (sort lancé au clic du joueur) ; sauvegarde orpheline `EllesmereUIForeverFixDB` (sans dossier d'addon).
+
+### Forever Companion 1.0.0 (mise à jour de l'inventaire du 2026-10-06)
+
+- **Inchangé depuis le 2026-10-06** : 42 fichiers datés du 2026-10-06, `dataVersion` 79, mêmes comptes. Seule sa
+  sauvegarde a changé (2026-10-07). `TrainerScan.lua` est présent mais absent du `.toc` (jamais chargé).
+- **Licence** : aucune (seul `lib/Ace3/LICENSE.txt`, pour Ace3). Code d'origines diverses signalé par ses propres
+  commentaires (chargement d'icônes « copié d'AtlasLoot », positions de talents de wowtbc.gg).
+- **Compatibilité Forever** : aucun build du client cité ; couche `Compat.lua` (API 12.x, `C_Traits`) ; données
+  marquées « Beta: data may change drastically », figées au niveau 30 de la bêta.
+- **Sources communautaires embarquées** (toutes au mieux `suppose`, aucune origine déclarée dans les fichiers de
+  données) : listes BiS de 28 spécialisations, phase `BETA` seule (`Data/Bis.lua`, 538 objets distincts) ; butin de
+  34 donjons, 302 boss, 1 557 butins dont 1 180 avec un taux (un taux supérieur à 1 : anomalie) et quêtes
+  (`Data/Loot.lua`) ; rotations en **texte de guide** (`Data/Rotations.lua`, 28 spécialisations, « Single Target —
+  Level 30 », pas une liste de priorités) ; 466 talents et 92 builds (`Data/Talents.lua`, sans nœud) ; 12 métiers,
+  2 348 recettes (`Data/Professions.lua`, codage de source incohérent) ; consommables vides ; **aucun poids de
+  statistiques** (seuils de Classic codés en dur, `Bislist.lua:512-550`) ; aucun journal ni conseil de boss.
+- **Points d'attention** : aucun abonnement au journal de combat ni fonction d'action ; annonce de version sur le
+  canal d'addon (usurpable) ; scan de l'hôtel des ventes à l'ouverture par défaut ; suivi de l'or par le courrier.
+
+### Points d'import et d'export
+
+| Addon | Objet | Sens | Format | Commande ou accès | Fichier:ligne | Exemple synthétique |
+| --- | --- | --- | --- | --- | --- | --- |
+| Talents Forever | Build de talents | import (lien, `/tf`) | code v6 (`codeVersion` 6, à relire au plan de FA1 ; v5 : `classe/niveau/arbres[-Legacy][-ordre]-5`), nœuds de l'addon | lien talentsforever.com, `/tf` | `Data.lua` (en-tête) | v5 : `mage/<niveau>/<arbre 1>-<arbre 2>-<arbre 3>-5` |
+| Naowh Forever | Liste BiS | les deux | `!NBIS1!` + chaîne encodée ; décodé `{v=4, name, spec, slots={[emplacement]=objet}, extra={[emplacement]={objets…}}}` ; liste rattachée à la classe, sans phase | `/nfbis`, « Export this list », « Paste a shared list » | `NaowhForever_BiS/BiS/Sharing.lua:19, 33, 78` | décodé : `{v=4,name="Mage - leveling",spec="fire-mage",slots={[1]=<objet>},extra={[1]={<objet>,<objet>}}}` |
+| Naowh Forever | Poids des statistiques | les deux | texte `NFSW1:<spécialisation>:<stat>=<poids>,…` (28 clés de spécialisation, 27 clés de statistiques, pourcentages « par 1 % ») | BiS List, page Stat Weights, Import/Export | `BiS/StatWeights/StatWeights.lua:449, 511` | `NFSW1:fire-mage:spell=<p>,fire=<p>,scrit=<p>` |
+| Naowh Forever | Poids des statistiques | import | texte de type Pawn v1 `( <outil>: v1: "Nom": Clé=valeur, … )` (export EP de WoWSims cité), `Class=` contrôlée, valeurs strictement entre 0 et 1000 | idem | `StatWeights.lua:459-497` | `( forever: v1: "Mage leveling": Class=Mage, SpellDamage=<p>, HitRating=<p> )` |
+| Naowh Forever | Macros | les deux | `!NFM1!` + chaîne encodée ; `{v=1, macros={{name, body}…}}` (nom et corps bornés par le jeu) ; créées comme macros de personnage, hors combat, après confirmation ; alerte sur `/run`, `/script` | fenêtre Macros, Import/Export | `Macros/NaowhForever_MacroWindow.lua:354, 365, 428` | décodé : `{v=1,macros={{name="Nova",body="#showtooltip Frost Nova"}}}` |
+| Naowh Forever | Build de talents | les deux | `!NFB1!` + chaîne encodée ; `{v=1, class, name, spec, points={nœud…}}` (nœuds du client dans l'ordre de prise), contrôlé à l'import (rangs, paliers, prérequis) | `/nftraining`, onglet Builds | `Training/NaowhForever_Training.lua:474, 502` | décodé : `{v=1,class=<classe>,name="Givre",spec="Frost",points={<nœud>,…}}` |
+| Naowh Forever | Profil complet | les deux | `NFPROFILE1:` + chaîne encodée ; `{format=1, name, author, made, build, parts={settings, macros, library, smartReminders, builds, bisLists, look}}`, zéros transmis comme `"\0"` | `/nf`, page Profiles | `Core/NaowhForever_ProfileShare.lua:193, 480` | décodé : `{format=1,parts={bisLists=…,macros=…}}` |
+| Naowh Forever | Pack de rappels | les deux | `NSRPACK2:` + chaîne encodée [+ `:LIC1:<signature>`] | export `/nutank share`, import page Profiles | `Core/NaowhForever_Packs.lua:298, 519` | — |
+| Naowh Forever | Liste de rebut | les deux | texte `NFSCRAP:1:<objets>` | `/nf scrap` | `QoL/NaowhForever_ScrapList.lua:172, 240` | `NFSCRAP:1:<objet>,<objet>` |
+| Naowh Forever | API Lua | entrée | `NaowhForever_API:ImportProfile(chaîne, nom)` (seule entrée publique documentée) ; fonctions internes non garanties (`ImportBisList(texte, true)` sans confirmation, `StatWeights.Import/Set`) | autre addon | `Core/NaowhForever_Packs.lua:493-497` | — |
+| Naowh Forever | Barres d'action, sets d'équipement | aucun échange | sets locaux (`account.barSets`), gestionnaire d'équipement du client | `/nf bars`, `/nfgear` | `ActionBars.lua:603` | — |
+| EllesmereUI | Profil (complet ou partiel par module) | les deux | `!EUI_` + `EncodeForPrint(CompressDeflate(sérialiseur maison))` ; enveloppe `{version=3, type="full", data=profil, meta, client="forever"}` ; import refusé si version différente ; import **fusionné** dans le profil actif, rechargement demandé | `/eui`, Global Settings, Profiles (Import Profile, Export Profile) | `EllesmereUI/EllesmereUI_Profiles.lua:1884, 2156, 2333, 2800, 3198` ; options `:1337, :2427` | décodé : `{version=3,type="full",client="forever",data={addons={…},cdmSpells={…}}}` |
+| EllesmereUI | Profil du compte | les deux | même enveloppe, `type="fullaccount"` (remplace les réglages du compte) | General, « Export All Data with Profile » | `Profiles.lua:2397, 2460` | — |
+| EllesmereUI | API publique (contrat Wago LibAddonProfiles) | entrée | `ImportProfileSilent{importString, profileName, autoAssignSpecs…}`, `ImportProfileInteractive{…}`, `SwitchProfile`, `SaveCurrentAsProfile`, `GetProfileList`, `GetActiveProfileName` ; aucune fonction publique d'affectation spécialisation → profil | autre addon | `Profiles.lua:3828, 4745, 4810, 4924` | `EllesmereUI.SwitchProfile("<personnage> - <rôle>")` |
+| EllesmereUI | Données affichées | entrée | objet LibDataBroker (bloc Broker des DataBars) | autre addon | `DataBars/Blocks/LDB.lua:30` | `{type="data source", text="…"}` |
+| Forever Companion | — | **aucun import** | — | — | — | — |
+| Forever Companion | Recettes relevées | export | JSON `fc-recipe-scan` v2 | `/fc recipes scan`, `/fc recipes` | `RecipeScan.lua:405, 445` | `{"format":"fc-recipe-scan","v":2,"profs":[…]}` |
+| Forever Companion | Identifiants de sorts | export | texte `Nom=ID`, lignes `#` | `/fc scan` | `SpellScan.lua:77, 104` | `Frostbolt=<id>` |
+| Forever Companion | Tables Lua globales | lecture par un autre addon | `ForeverCompanion` (BisData, RotationData, TalentBuilds, Dungeons, LootItems…), `ForeverCompanionData`, `ForeverCompanionAPI` ; aucun rappel ; prix poussables par `Auction.Commit` | autre addon | `DataLoader.lua:1-232`, `Auction.lua:74` | — |
+
+**Conséquences pour la feuille de route** (décision 196) : talents vers Talents Forever (FA1, v6) ; BiS et poids
+vers Naowh Forever (`!NBIS1!`, `NFSW1:`, T10) ; macros par classe vers Naowh Forever (`!NFM1!`, EX1) ; profils
+EllesmereUI par personnage et par rôle par chaîne `!EUI_` et bascule par son API (EX1) ; Forever Companion n'a
+aucun point d'import : rien n'y est exporté, ses données servent au recoupement (`suppose`).
+
+### Addons d'interface seulement
+
+Leatrix Maps 1.60.14 et ForeverBeta Map Fix (`ForeverMapFix`) 0.2.0 : `.toc` seul lu, aucune donnée de jeu, rien
+d'utile à forever-core. EllesmereUI est aussi rangé « interface seule » par `forever addons status`, mais ses profils
+sont une cible d'export (EX1).
+
+### Dossiers présents hors du gestionnaire : à toi de décider (je ne supprime rien)
+
+Non lus (en-tête du `.toc` seulement, ou rien pour ce qui n'est pas un addon) ; ignorés comme sources à partir
+d'aujourd'hui.
+
+| Dossier ou fichier | Ce que c'est | Remarque |
+| --- | --- | --- |
+| `Interface/AddOns/AtlasBIStooltips` | addon 1.0.1, lignes BiS dans l'infobulle (titre « AtlasLoot Forever [BiS ToolTip] ») | absent du gestionnaire |
+| `Interface/AddOns/RXPGuides` | addon RestedXP v4.11.15 | absent du gestionnaire ; RestedXP était déjà exclu comme source |
+| `Interface/AddOns/RaphCompletionist` | ton addon 0.2.1 (« Raph + ChatGPT ») | absent du gestionnaire |
+| `Interface/AddOns/ForeverCompletionist` | pas un addon (aucun `.toc`) : dossier de projet du 2026-09-21 | le client ne le charge pas |
+| `Interface/AddOns/AppelSwingsForever` | addon 1.5.0 (minuteur d'attaque, auteur Appel), fichiers du 2026-10-07 à 08:39 | **absent de ta liste** : à classer (interface seule probable) |
+| `Interface/AddOns/ForeverLogger.bak-20261002-073506` et `-073519` | copies de sauvegarde de ForeverLogger | à supprimer à ta convenance |
+| `SavedVariables/AllTheThings.lua` | sauvegarde sans addon | reste d'une désinstallation |
+| `EllesmereUIForeverFixDB` | sauvegarde orpheline signalée par l'inventaire d'EllesmereUI | sans dossier d'addon |
