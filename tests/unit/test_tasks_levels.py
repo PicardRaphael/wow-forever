@@ -26,7 +26,7 @@ def test_verify_runs_the_whole_suite_in_parallel(tasks):
     assert tasks.verify()
     (call,) = pytest_calls(tasks)
     assert call[call.index("-n") + 1] == "auto"
-    assert "-m" not in call  # tests lents compris
+    assert "not slow" not in call  # tests lents compris
     for script in ("scripts/check_registry.py", "scripts/check_game_numbers.py", "scripts/check_origins.py"):
         assert any(script in c for c in tasks.seen), script
 
@@ -86,7 +86,7 @@ def test_data_verify_falls_back_to_the_full_verify_when_code_changed(tasks, monk
     monkeypatch.setattr(tasks, "uncommitted_paths", lambda: ["forever/data/x.json", "forever/update.py"])
     assert tasks.verify(data=True, engines=[])
     (call,) = pytest_calls(tasks)
-    assert "tests/unit/test_manifest.py" not in call and "-n" in call and "-m" not in call
+    assert "tests/unit/test_manifest.py" not in call and "-n" in call and "not slow" not in call
 
 
 def test_command_line_parsing(tasks, monkeypatch):
