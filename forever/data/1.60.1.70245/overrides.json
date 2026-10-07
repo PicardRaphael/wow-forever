@@ -1,0 +1,67 @@
+{
+ "Fire/Pyroblast": {
+  "build": "1.60.1.70009",
+  "source_build": "1.60.1.69977",
+  "ranks": [
+   [
+    95,
+    125,
+    44,
+    12
+   ]
+  ],
+  "source": "foreverchanges.pro/talents/mage"
+ },
+ "Fire/Blast Wave": {
+  "build": "1.60.1.70009",
+  "source_build": "1.60.1.69977",
+  "ranks": [
+   [
+    148,
+    178,
+    50,
+    6
+   ]
+  ],
+  "source": "foreverchanges.pro/talents/mage"
+ },
+ "Arcane/Arcane Blast": {
+  "build": "1.60.1.70009",
+  "source_build": "1.60.1.69977",
+  "ranks": [
+   [
+    50,
+    58,
+    10,
+    175,
+    4,
+    8
+   ]
+  ],
+  "source": "foreverchanges.pro/talents/mage"
+ },
+ "Frost/Ice Lance": {
+  "build": "1.60.1.70009",
+  "source_build": "1.60.1.69977",
+  "ranks": [
+   [
+    26,
+    30,
+    300
+   ]
+  ],
+  "source": "foreverchanges.pro/talents/mage"
+ },
+ "Frost/Ice Barrier": {
+  "build": "1.60.1.70009",
+  "source_build": "1.60.1.69977",
+  "ranks": [
+   [
+    431,
+    1
+   ]
+  ],
+  "source": "foreverchanges.pro/talents/mage"
+ },
+ "inherited_from": "1.60.1.70170"
+}

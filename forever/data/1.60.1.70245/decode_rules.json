@@ -1,0 +1,715 @@
+{
+ "schema_version": 1,
+ "class": "Mage",
+ "tables": [
+  "SkillLineXTraitTree",
+  "TraitNode",
+  "TraitNodeXTraitNodeEntry",
+  "TraitNodeEntry",
+  "TraitDefinition",
+  "TraitDefinitionEffectPoints",
+  "TraitEdge",
+  "CurvePoint",
+  "SkillLineAbility",
+  "Spell",
+  "SpellName",
+  "SpellEffect",
+  "SpellLevels",
+  "SpellMisc",
+  "SpellCastTimes",
+  "SpellDuration",
+  "SpellPower",
+  "SpellCooldowns",
+  "SpellAuraOptions"
+ ],
+ "localized_tables": {
+  "frFR": [
+   "SpellName"
+  ]
+ },
+ "skill_lines": {
+  "Arcane": 237,
+  "Fire": 8,
+  "Frost": 6
+ },
+ "talent_geometry": {
+  "tabs": {
+   "Arcane": 1020,
+   "Fire": 5020,
+   "Frost": 9080
+  },
+  "row_base": 2130,
+  "row_step": 600,
+  "col_step": 600,
+  "extra_zero_divisor": 10,
+  "tab_origins": [
+   1020,
+   5020,
+   9080
+  ]
+ },
+ "shared_spell": "latest_node",
+ "rank_variables": {
+  "arcaneConcentration": [
+   0
+  ],
+  "ignite": [
+   0
+  ],
+  "impact": [
+   0
+  ],
+  "improvedScorch": [
+   0
+  ],
+  "frostbite": [
+   0
+  ],
+  "improvedBlizzard": [
+   0
+  ],
+  "wintersChill": [
+   0,
+   3
+  ]
+ },
+ "curve_operations": {
+  "0": "set"
+ },
+ "levels": {
+  "level_cap": 60,
+  "talent_tooltip": "base",
+  "spell_rank": "max_capped"
+ },
+ "tooltip": {
+  "duration_units": [
+   {
+    "ms": 60000,
+    "unit": "min"
+   },
+   {
+    "ms": 1000,
+    "unit": "sec"
+   }
+  ]
+ },
+ "effects": {
+  "school_damage": 2,
+  "apply_aura": 6,
+  "aura_periodic_damage": 3,
+  "aura_periodic_trigger_spell": 23,
+  "aura_periodic_dummy": 226
+ },
+ "spell_ranks": {
+  "acquire_methods": [
+   0,
+   2
+  ],
+  "rank_subtext": "^Rank (\\d+)$",
+  "channel_attributes_1_mask": 68,
+  "mana_power_type": 0
+ },
+ "spells": {
+  "frostbolt": "Frostbolt",
+  "fireball": "Fireball",
+  "fire_blast": "Fire Blast",
+  "scorch": "Scorch",
+  "pyroblast": "Pyroblast",
+  "frostfire_bolt": "Frostfire Bolt",
+  "ice_lance": "Ice Lance",
+  "arcane_blast": "Arcane Blast",
+  "arcane_missiles": "Arcane Missiles",
+  "frost_nova": "Frost Nova",
+  "cone_of_cold": "Cone of Cold",
+  "arcane_explosion": "Arcane Explosion",
+  "blizzard": "Blizzard",
+  "flamestrike": "Flamestrike",
+  "blast_wave": "Blast Wave"
+ },
+ "utility_spells": {
+  "spells": {
+   "frost_armor": "Frost Armor",
+   "ice_armor": "Ice Armor",
+   "mage_armor": "Mage Armor"
+  },
+  "effects": {
+   "armor": {
+    "aura": 22,
+    "misc_value": 1,
+    "field": "EffectBasePointsF"
+   },
+   "frost_resistance": {
+    "aura": 22,
+    "misc_value": 16,
+    "field": "EffectBasePointsF"
+   },
+   "magic_resistance": {
+    "aura": 22,
+    "misc_value": 126,
+    "field": "EffectBasePointsF"
+   },
+   "regen_while_casting_pct": {
+    "aura": 134,
+    "field": "EffectBasePointsF"
+   },
+   "chill_on_hit_spell": {
+    "aura": 42,
+    "field": "EffectTriggerSpell"
+   }
+  }
+ },
+ "target_auras": {
+  "fire_vulnerability": {
+   "talent": "Improved Scorch",
+   "trigger_aura": 109,
+   "aura": 270,
+   "field": "EffectBasePointsF"
+  },
+  "winters_chill": {
+   "talent": "Winter's Chill",
+   "trigger_aura": 42,
+   "aura": 308,
+   "field": "EffectBasePointsF"
+  }
+ },
+ "talent_cooldowns": {
+  "talents": [
+   "Arcane Power",
+   "Presence of Mind",
+   "Combustion",
+   "Cold Snap",
+   "Ice Block",
+   "Ice Barrier",
+   "Blast Wave"
+  ]
+ },
+ "school_masks": {
+  "fire": 4,
+  "frost": 16,
+  "arcane": 64
+ },
+ "rank_format": [
+  "level",
+  "min",
+  "max",
+  "dot_total",
+  "dot_duration",
+  "cast_s",
+  "mana",
+  "cooldown_s"
+ ],
+ "notes": [
+  "Règles de lecture des tables du client (wago.tools) pour le Mage ; héritées par les versions suivantes tant qu'elles restent valides.",
+  "tables : téléchargées en enUS ; localized_tables : tables de noms téléchargées en plus dans la locale indiquée.",
+  "skill_lines : lignes de compétence du Mage ; l'arbre de talents est celui que SkillLineXTraitTree associe à ces lignes.",
+  "talent_geometry : colonne = (PosX - onglet) / col_step + 1, palier = (PosY - row_base) / row_step + 1 ; une position qui ne tombe pas sur la grille est divisée par extra_zero_divisor (zéro en trop).",
+  "rank_variables : pour ces talents, ranks ne garde que les variables d'infobulle d'indice donné (à partir de 0), pour la forme de talents.json (positions lues par le moteur) ; tooltip_values garde toujours toutes les variables (décision T03, tasks/T03-ecarts.md).",
+  "shared_spell latest_node : si deux nœuds de l'arbre portent le même sort, le nœud d'identifiant le plus grand est retenu.",
+  "curve_operations : TraitDefinitionEffectPoints.OperationType pris en charge ; 0 remplace les points de l'effet par la valeur de la courbe au rang.",
+  "levels : infobulles de talent évaluées au niveau de base du sort (valeurs affichées dans l'arbre) ; rangs de sort évalués au niveau min(MaxLevel, level_cap), MaxLevel 0 valant level_cap.",
+  "tooltip.duration_units : unité d'affichage d'une durée, la plus grande dont la durée atteint le seuil.",
+  "effects : identifiants d'effet et d'aura du client (SpellEffect.Effect, SpellEffect.EffectAura).",
+  "spell_ranks : rangs lus dans SkillLineAbility (lignes du Mage, méthodes d'acquisition retenues), numérotés par Spell.NameSubtext ; canalisé si Attributes_1 & channel_attributes_1_mask.",
+  "utility_spells : armures lues comme les rangs de sort (SkillLineAbility, Spell.NameSubtext) ; niveau d'apprentissage = SpellLevels.BaseLevel ; effets retenus : aura (et EffectMiscValue_0 si donné) -> valeur du champ indiqué (aura 22 : armure si 1, résistance au givre si 16, à toute la magie si 126 ; aura 134 : part de la régénération gardée en incantation, en % ; aura 42 : sort de ralenti déclenché sur un coup reçu).",
+  "target_auras : auras posées sur la cible par un talent (spell_scaling.json.auras) ; talent désigné par son nom (TraitDefinition) ; aura = EffectTriggerSpell de l'effet d'aura trigger_aura du talent (109 : sort déclenché sur la cible) ; part par cumul = champ field de l'effet d'aura aura (270 : dégâts subis des écoles du masque EffectMiscValue_0, en %) ; cumuls maximum = SpellAuraOptions.CumulativeAura ; durée = SpellMisc.DurationIndex -> SpellDuration.",
+  "school_masks : bits d'école du client (EffectMiscValue_0 des auras d'école) -> école de spells.json."
+ ],
+ "inherited_from": "1.60.1.70170",
+ "class_tables": [
+  "ChrClasses",
+  "SkillLine",
+  "SpellRange",
+  "SpellCategories",
+  "SpellCategory",
+  "SpellMechanic",
+  "SpellDispelType",
+  "SpellInterrupts",
+  "SpellClassOptions",
+  "SpellAuraRestrictions",
+  "SpellShapeshift",
+  "ChrRaces",
+  "CharBaseInfo",
+  "SkillRaceClassInfo",
+  "Item",
+  "ItemSparse",
+  "ItemEffect",
+  "ItemXItemEffect"
+ ],
+ "localized_class_tables": {
+  "frFR": [
+   "ChrRaces"
+  ]
+ },
+ "classes": {
+  "Warrior": {
+   "skill_lines": [
+    26,
+    256,
+    257
+   ]
+  },
+  "Paladin": {
+   "skill_lines": [
+    594,
+    267,
+    184
+   ]
+  },
+  "Hunter": {
+   "skill_lines": [
+    50,
+    163,
+    51
+   ],
+   "pet_skill_lines": [
+    203,
+    208,
+    209,
+    210,
+    211,
+    212,
+    213,
+    214,
+    215,
+    217,
+    218,
+    236,
+    251,
+    261,
+    270,
+    653,
+    654,
+    655,
+    656,
+    2897,
+    3015,
+    3016
+   ]
+  },
+  "Rogue": {
+   "skill_lines": [
+    253,
+    38,
+    39
+   ]
+  },
+  "Priest": {
+   "skill_lines": [
+    613,
+    56,
+    78
+   ]
+  },
+  "Shaman": {
+   "skill_lines": [
+    375,
+    373,
+    374
+   ]
+  },
+  "Mage": {
+   "skill_lines": [
+    237,
+    8,
+    6
+   ]
+  },
+  "Warlock": {
+   "skill_lines": [
+    355,
+    354,
+    593
+   ],
+   "pet_skill_lines": [
+    188,
+    189,
+    204,
+    205,
+    206,
+    207,
+    2887
+   ]
+  },
+  "Druid": {
+   "skill_lines": [
+    574,
+    134,
+    573
+   ]
+  }
+ },
+ "classes_note": "PV1 : lignes de compétence de chaque classe dans l'ordre des onglets (onglet i : abscisse tab_origins[i]), vérifié par la ligne majoritaire des sorts des talents de l'onglet ; lignes des familiers (Chasseur, Démoniste) : SkillLine « Pet - … » et Beast Training. Nœud hors grille : zéro en trop corrigé (extra_zero_divisor), tout autre écart listé non résolu, jamais arrondi.",
+ "trait_edge_types": {
+  "visual": [
+   0
+  ],
+  "sufficient": [
+   2
+  ],
+  "required": [
+   3
+  ],
+  "note": "TraitEdge.Type (PV1) : 0 visuel seulement (jamais un prérequis), 2 suffisant (un seul des prérequis suffisants suffit), 3 requis ; sens tiré de l'énumération Enum.TraitEdgeType de l'API du client (VisualOnly, DeprecatedRankConnection, SufficientForAvailability, RequiredForAvailability), certitude probable ; relevé dans les arbres de 1.60.1.70124 : l'arête visuelle et l'arête requise entre Nature's Splendor et Nature's Majesty (Druide), deux arêtes suffisantes vers Intimidation (Chasseur)"
+ },
+ "racial_skill_lines": [
+  101,
+  124,
+  125,
+  126,
+  220,
+  733,
+  753,
+  754,
+  2980
+ ],
+ "race_factions": {
+  "0": "Alliance",
+  "1": "Horde"
+ },
+ "passive_attributes_0_mask": 64,
+ "racial_values": {
+  "spirit_pct": {
+   "aura": 137,
+   "misc": 4,
+   "scale": 0.01
+  },
+  "mana_pct": {
+   "aura": 178,
+   "misc": 0,
+   "scale": 0.01
+  },
+  "sword_crit": {
+   "aura": 290,
+   "spell_name": "Sword Specialization",
+   "scale": 0.01
+  }
+ },
+ "pvp_trinkets": {
+  "inventory_type": 12,
+  "use_trigger": 0,
+  "apply_aura_effect": 6,
+  "dispel_mechanic_effect": 108,
+  "mechanic_immunity_aura": 77
+ },
+ "races_note": "PV1 (décision 106) : races jouables = présentes dans CharBaseInfo ; faction lue dans ChrRaces.Alliance (race_factions) ; raciaux = sorts des lignes racial_skill_lines de SkillLineAbility, race par RaceMasks_0 | RaceMasks_1 << 32 et PlayableRaceBit, classes par ClassMask (bit = 1 << (ID de ChrClasses - 1), 0 ou -1 : toutes) ; passif : Attributes_0 & passive_attributes_0_mask. racial_values : grandeurs lues par le moteur du Mage (aura, valeur annexe de l'effet, échelle ; sword_crit : sort nommé, arme exigée hors des tables lues). pvp_trinkets : bijou (InventoryType) dont le sort d'utilisation (TriggerType) dissipe par mécanique (effet) ou donne une immunité de mécanique (aura).",
+ "pvp_classification": {
+  "note": "PV1 : classement PvP des sorts de classe par les champs du client. Sens des identifiants d'aura, d'effet et de cible tiré des énumérations AuraType, SpellEffectName et Targets des émulateurs de Classic (CMaNGOS, TrinityCore) : certitude probable. Les valeurs du client (mécanique, catégorie de rendement décroissant, durées, recharges) restent certaines. Un sort qui porte un marqueur PvP (mécanique, catégorie de rendement, mécanique d'effet, invocation) sans classement possible est listé non résolu, jamais deviné.",
+  "aura_effects": [
+   6,
+   27,
+   35,
+   65,
+   119
+  ],
+  "self_targets": [
+   1
+  ],
+  "hostile_targets": [
+   6,
+   15,
+   16,
+   24,
+   53,
+   54
+  ],
+  "friendly_targets": [
+   1,
+   20,
+   21,
+   30,
+   31,
+   57
+  ],
+  "control_auras": {
+   "2": "possession",
+   "5": "confusion",
+   "6": "charme",
+   "7": "peur",
+   "12": "étourdissement",
+   "25": "pacification",
+   "26": "immobilisation",
+   "27": "silence",
+   "33": "ralentissement",
+   "56": "métamorphose",
+   "60": "pacification et silence",
+   "67": "désarmement"
+  },
+  "defensive_auras": {
+   "39": "immunité d'école",
+   "40": "immunité aux dégâts",
+   "47": "parade",
+   "49": "esquive",
+   "69": "absorption",
+   "87": "dégâts subis réduits",
+   "93": "inattaquable",
+   "97": "bouclier de mana"
+  },
+  "negative_only_auras": [
+   87
+  ],
+  "mechanic_immunity_aura": 77,
+  "cc_mechanics": [
+   1,
+   2,
+   5,
+   7,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   17,
+   20,
+   24,
+   30
+  ],
+  "dispel_effect": 38,
+  "dispel_mechanic_effect": 108,
+  "interrupt_effect": 68,
+  "mobility_effects": {
+   "29": "bond",
+   "96": "charge"
+  },
+  "mobility_auras": {
+   "31": "vitesse accrue"
+  },
+  "burst_auras": {
+   "65": "hâte des sorts",
+   "79": "dégâts infligés",
+   "107": "modificateur de sort",
+   "108": "modificateur de sort",
+   "110": "régénération de ressource",
+   "138": "hâte de mêlée",
+   "140": "hâte à distance",
+   "216": "hâte des sorts",
+   "290": "chances de critique",
+   "319": "hâte de mêlée"
+  },
+  "positive_only_auras": [
+   79
+  ],
+  "burst_min_cooldown_s": 60,
+  "summon_effects": {
+   "28": "créature invoquée (totem, familier) : effet porté par la créature, absente des tables lues",
+   "50": "objet invoqué : effet porté par l'objet, absent des tables lues",
+   "104": "objet invoqué (piège) : effet porté par l'objet, absent des tables lues"
+  },
+  "learn_spell_effect": 36,
+  "damage_break_aura_interrupt_mask": 2,
+  "neutral_mechanics": [
+   15,
+   16,
+   21,
+   31,
+   32,
+   33,
+   34,
+   35
+  ],
+  "neutral_mechanics_note": "mécaniques sans rôle PvP retenu (saignement, soin, monture, enragé, blessé, infecté) : ne font pas d'un sort un sort à classer"
+ },
+ "community_positions": {
+  "note": "PV1 (D3, recherche autorisée par l'utilisateur le 2026-09-30) : palier de talents hors grille lu dans deux calculateurs communautaires de la bêta 1.60.1.70124, concordants entre eux et avec l'ordonnée du client ; certitude probable (consigne de l'utilisateur). Rangé à part (tier_community) : le palier décodé reste null. Colonnes du Paladin (Improved Seal of Fury, Swift Judgement) : aucune source communautaire ; relevées en jeu (observed_positions).",
+  "Warlock": {
+   "improvedLifeTap": {
+    "tier": 1,
+    "sources": [
+     "https://wowforevertalents.com/warlock/talents/improved-life-tap/",
+     "https://foreverchanges.pro/talents/warlock"
+    ],
+    "read_at": "2026-09-30",
+    "build": "1.60.1.70124"
+   },
+   "amplifyCurse": {
+    "tier": 3,
+    "sources": [
+     "https://wowforevertalents.com/warlock/talents/amplify-curse/",
+     "https://foreverchanges.pro/talents/warlock"
+    ],
+    "read_at": "2026-09-30",
+    "build": "1.60.1.70124"
+   }
+  }
+ },
+ "retired_files": {
+  "racials.json": {
+   "replaced_by": "races.json",
+   "frozen_copy": "_seed_racials.json",
+   "reason": "PV1, D5 (accord de l'utilisateur du 2026-09-30) : raciaux décodés du client (décision 106) ; copie figée du relevé communautaire pour le mode seed ; retiré seulement quand races.json est décodé de la version installée"
+  }
+ },
+ "observed_positions": {
+  "note": "PV1 : positions relevées en jeu par l'utilisateur (colonnes 1 à 4 depuis la gauche, paliers depuis le haut), certitude certain ; appliquées aux nœuds hors grille seulement, après contrôle : un palier ou une colonne décodés du client qui diffèrent du relevé arrêtent le décodage.",
+  "Paladin": {
+   "improvedSealOfFury": {
+    "tier": 3,
+    "col": 1,
+    "source": "relevé en jeu (fenêtre des talents du Paladin de l'utilisateur, recherche par nom), 2026-09-30",
+    "certainty": "certain"
+   },
+   "swiftJudgement": {
+    "tier": 4,
+    "col": 1,
+    "source": "relevé en jeu (fenêtre des talents du Paladin de l'utilisateur, recherche par nom), 2026-09-30",
+    "certainty": "certain"
+   }
+  }
+ },
+ "gametables": {
+  "armormitigationbylvl": 1385707,
+  "basemp": 1391664,
+  "hppersta": 1391642,
+  "npctotalhp": 1391652,
+  "xp": 1391661
+ },
+ "gametables_note": "T08b, bloc A : identifiants de fichier des GameTables du client (wago.tools/files?search=gametables/<nom>, relevé du 2026-10-01), lues par https://wago.tools/api/casc/<identifiant>?version=<build> ; réponse vide = absente du build, jamais remplacée par une autre",
+ "character_tables": [
+  "PlayerExpectedStat",
+  "LevelExperience",
+  "Exhaustion",
+  "ExpectedStat",
+  "GlobalCurve",
+  "NumTalentsAtLevel",
+  "TraitCond"
+ ],
+ "character_scaling": {
+  "content_set_id": 0,
+  "expected_stat_expansion_id": -2,
+  "player_columns": {
+   "base_mana": "BaseMana",
+   "spell_crit_per_intellect": "SpellCritPerIntellect",
+   "crit_per_agility": "CritPerAgility",
+   "hp_per_stamina": [
+    "HPPerStamina",
+    "Field_1_60_1_69876_005"
+   ]
+  },
+  "hp_regen_curve_types": {
+   "spirit_base": 27,
+   "spirit_extra": 28
+  },
+  "crosscheck": [
+   {
+    "value": "base_mana",
+    "gametable": "basemp",
+    "column": "class"
+   },
+   {
+    "value": "hp_per_stamina",
+    "gametable": "hppersta",
+    "column": "Health"
+   },
+   {
+    "value": "xp_to_next",
+    "gametable": "xp",
+    "column": "Total"
+   },
+   {
+    "value": "armor_constant",
+    "gametable": "armormitigationbylvl",
+    "column": "Constant"
+   }
+  ],
+  "note": "T08b, bloc A : ratios du personnage par classe et par niveau (PlayerExpectedStat, ContentSetID 0), XP par niveau (LevelExperience), repos (Exhaustion), constante d'armure (ExpectedStat, ExpansionID -2), courbes de régénération de PV par l'Esprit (GlobalCurve, sous-type = classe, points dans CurvePoint) ; colonne Field_1_60_1_69876_005 lue comme PV par Endurance (sens probable, recoupé par hppersta) ; T08d (accord du 2026-10-06) : nom HPPerStamina dans les tables de 1.60.1.70235, d'après les définitions de la communauté (WoWDBDefs) ; il conforte ce sens, qui reste probable jusqu'à une mesure en jeu ; une colonne peut avoir une liste de noms, le nouveau d'abord ; recoupement par les GameTables, écart signalé, jamais tranché"
+ },
+ "mechanic_auras": {
+  "ignite": {
+   "aura_spell": "Ignite",
+   "periodic_aura": 226
+  },
+  "note": "T08b, bloc B : aura d'une mécanique lue par son nom et son effet périodique (Ignite : aura distincte du talent, posée par le serveur) ; durée par SpellMisc.DurationIndex, période par SpellEffect.EffectAuraPeriod, cumul par SpellAuraOptions.CumulativeAura"
+ },
+ "hotfix_related_tables": [
+  "Curve"
+ ],
+ "hotfix_related_tables_note": "T08b, bloc E : tables du client non téléchargées mais reliées à une table suivie (Curve : courbes des rangs de talent, points dans CurvePoint) ; un correctif sur elles est listé par forever hotfixes",
+ "pet_tables": [
+  "SkillLine",
+  "SkillLineAbility",
+  "SpellName",
+  "Spell",
+  "SpellLevels",
+  "SpellPower",
+  "SpellCooldowns",
+  "SpellEffect",
+  "SpellMisc",
+  "SpellDuration",
+  "SpellCastTimes",
+  "SpellAuraOptions",
+  "CurvePoint",
+  "CreatureFamily",
+  "ItemPetFood",
+  "UiMap"
+ ],
+ "localized_pet_tables": {
+  "frFR": [
+   "SpellName",
+   "CreatureFamily",
+   "ItemPetFood",
+   "UiMap"
+  ]
+ },
+ "pets": {
+  "skill_line_category": 7,
+  "skill_line_prefix": "Pet - ",
+  "hunter_marker": "Hunter Pet Scaling",
+  "family_passive": "Tamed Pet Passive (DND)",
+  "trained_line": "Beast Training",
+  "generic_line": "Pet - Generic",
+  "acquire_methods": [
+   0
+  ],
+  "rank_level_field": "SpellLevel",
+  "training_cost_column": "Field_5_5_4_67090_014_1",
+  "focus_power_type": 2,
+  "family_bonus": {
+   "damage_pct": {
+    "aura": 79,
+    "misc_value": 1
+   },
+   "armor_pct": {
+    "aura": 142,
+    "misc_value": 1
+   },
+   "health_pct": {
+    "aura": 133
+   }
+  },
+  "attack_speed": {
+   "faster-attack": "^Faster Attack ([IVX]+)$",
+   "slower-attack": "^Slower Attack ([IVX]+)$"
+  },
+  "map_types": {
+   "continent": 2
+  },
+  "family_aliases": {
+   "crocilisk": "crocolisk"
+  },
+  "hunter_spells": [
+   "Tame Beast",
+   "Beast Lore",
+   "Beast Training",
+   "Feed Pet",
+   "Revive Pet",
+   "Call Pet",
+   "Dismiss Pet",
+   "Mend Pet"
+  ],
+  "certainty": {
+   "training_cost": "probable",
+   "bonus": "probable",
+   "diet": "probable",
+   "pet_scaling": "probable"
+  },
+  "notes": [
+   "Familles : CreatureFamily dont la ligne SkillLine_0 est une ligne « Pet - » de la catégorie 7 portant « Hunter Pet Scaling » (lignes de démons : « Warlock Pet Scaling »).",
+   "Passif de famille : le sort « Tamed Pet Passive (DND) » de la ligne qui porte les trois auras de family_bonus (sens des auras probable).",
+   "Rang : sous-titre « Rank N » du sort (spell_ranks.rank_subtext) ; SupercedesSpell seulement recoupé.",
+   "Niveau d'un rang : SpellLevels.SpellLevel (BaseLevel vaut 0 pour une partie des sorts de familier).",
+   "Coût en points d'entraînement : colonne sans nom training_cost_column, sens probable ; valeur 0 gardée telle quelle, jamais interprétée.",
+   "Régime : bit n du PetFoodMask <-> ItemPetFood.ID n+1 (sens probable).",
+   "Alias : la ligne de compétence écrit « Crocilisk », CreatureFamily « Crocolisk » (écart interne au client)."
+  ]
+ }
+}

@@ -1,5 +1,5 @@
 {
-  "game_version": "1.60.1.70170",
+  "game_version": "1.60.1.70245",
   "schema_version": 1,
   "versions": {
     "1.60.1.70009": {
@@ -104,6 +104,43 @@
       "product": "wow_classic_beta",
       "revised_at": "2026-10-06",
       "revision": 6,
+      "version_prefix": "1.60."
+    },
+    "1.60.1.70245": {
+      "collected_at": "2026-10-07",
+      "data_sha": "6c50a060c5d6",
+      "data_sha256": "6c50a060c5d67a6e86d472eef3daf1751af779f011eddde13866727871986e1e",
+      "files": {
+        "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
+        "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
+        "_seed_talents.json": "b1dcf6e696ea5783aa12693466014afe6a05e2ac1c7a82c30c50cf2ed71785eb",
+        "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
+        "character_scaling.json": "0447c2260a56d1e94b8e6bfec5bea698947f6e9d032fb743b5e4ff7185a46320",
+        "classes.json": "b34d43393601637cd87050a89f48ed4edefde7ecc9b97e4c9127a432a325496c",
+        "confirmed_changes.json": "caa0d5a05572293c4efce1099a55b1306dda213120210f64dd692f90de53fae9",
+        "decode_rules.json": "6d372dcf1bf327235ad33d0ab10ce5ee235a3b38ab6c619aed82523a1b33bd08",
+        "leveling.json": "4a910ef06c681d87dac2269a9f82f3e383ae0cc99d978e39f49320f616e4bee4",
+        "mechanics.json": "aa64b055186219cda5d48f01bdc595cadf7de3a4b64daa5bdc8eddc4c86195c5",
+        "meta.json": "a0bd78d3d813cf37f438f9e27142324120378b02b5128035cb903a9fdf6500d6",
+        "monsters.json": "cddfbc4da5cf1c52ae2c78f9d6b21dfbc3156d0f6238992f5c919c8a26988eaf",
+        "origins.json": "6da43516dec6c9829e89d35e7ab188c93b3e817be1efe863700dcd2ff62cf463",
+        "overrides.json": "88c107b2af7c57b02b24a60279284b23db5c2ce62d75f7783945c16d5b80f2fb",
+        "pet_rules.json": "9585373a9cdb812dc4ebd602d37f267543ebd44f8ec568248166279a074ef0c7",
+        "pets.json": "2c9200523319e0a1ac7be472f72e1ccd6a5dfe2e797772c14f4e002a62f043d8",
+        "pvp_items.json": "6f528af66d7f2e72833287f3078d4212127bd4e711b10de3be11824c7c2ef8e9",
+        "pvp_rules.json": "13fba9af931ae347c4566a9ac7ddca25dffaf8154139e3081f6090423b19abf2",
+        "races.json": "a1ba73f82cdedc72ea7e3c1d348c1e4c7f3723a57305be70a0cab2fcd7b258f6",
+        "respec.json": "ebb8590cfde8b6f890fe92c419ef4687c8f8d2fb0a980064c766b1f6d25303c1",
+        "revisions.json": "54d223d6cd8cae19ad42d1607a20a4b7d4c6732e501175ee7d7fc430c0bb576d",
+        "sources.json": "66d6d0f5302e6eb1b040cf09682ecb52cac1122facfa7789f22f7a22ebe51bdf",
+        "spell_scaling.json": "4c14c43b3915bccc0d2f4f3654e90c382476aea4dca663e536643c217443acdb",
+        "spells.json": "53f1f9e92841d0adb827216f9254caa2f1642f7ed8b9b8af022d47b724363919",
+        "talents.json": "72072e04c89d043238f7163e3885fb5336cb2e64315ebf2e8ddfc525161f10b4"
+      },
+      "hotfixes": [],
+      "product": "wow_classic_beta",
+      "revised_at": "2026-10-07",
+      "revision": 1,
       "version_prefix": "1.60."
     }
   }

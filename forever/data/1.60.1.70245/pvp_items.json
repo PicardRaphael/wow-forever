@@ -1,0 +1,1079 @@
+{
+ "build": "1.60.1.70245",
+ "source": "Client 1.60.1.70245 : tables Item, ItemSparse, ItemEffect, ItemXItemEffect et Spell* décodées",
+ "trinkets": [
+  {
+   "item_id": 4381,
+   "name": "Minor Recombobulator",
+   "classes": null,
+   "spell_id": 18805,
+   "spell_name": "Recombobulate",
+   "cooldown_s": 300,
+   "category_cooldown_s": 120,
+   "spell_category": 1153,
+   "breaks": [
+    {
+     "kind": "dispel",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 10418,
+   "name": "Glimmering Mithril Insignia",
+   "classes": null,
+   "spell_id": 12733,
+   "spell_name": "Fearless",
+   "cooldown_s": 600,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18637,
+   "name": "Major Recombobulator",
+   "classes": null,
+   "spell_id": 23064,
+   "spell_name": "Recombobulate",
+   "cooldown_s": 300,
+   "category_cooldown_s": 120,
+   "spell_category": 1153,
+   "breaks": [
+    {
+     "kind": "dispel",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18834,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Warrior"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18845,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Shaman"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18846,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Hunter"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18849,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Rogue"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18850,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Mage"
+   ],
+   "spell_id": 23274,
+   "spell_name": "Immune Fear/Polymorph/Snare",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18851,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Priest"
+   ],
+   "spell_id": 23276,
+   "spell_name": "Immune Fear/Polymorph/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18852,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Warlock"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18853,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Druid"
+   ],
+   "spell_id": 23277,
+   "spell_name": "Immune Charm/Fear/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18854,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Warrior"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18856,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Hunter"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18857,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Rogue"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18858,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Warlock"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18859,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Mage"
+   ],
+   "spell_id": 23274,
+   "spell_name": "Immune Fear/Polymorph/Snare",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18862,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Priest"
+   ],
+   "spell_id": 23276,
+   "spell_name": "Immune Fear/Polymorph/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18863,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Druid"
+   ],
+   "spell_id": 23277,
+   "spell_name": "Immune Charm/Fear/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 18864,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Paladin"
+   ],
+   "spell_id": 23276,
+   "spell_name": "Immune Fear/Polymorph/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 19141,
+   "name": "Luffa",
+   "classes": null,
+   "spell_id": 23595,
+   "spell_name": "Luffa",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "dispel",
+     "mechanic": 15,
+     "mechanic_name": "bleeding"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209611,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Hunter"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209612,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Rogue"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209613,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Priest"
+   ],
+   "spell_id": 23276,
+   "spell_name": "Immune Fear/Polymorph/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209614,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Paladin"
+   ],
+   "spell_id": 23276,
+   "spell_name": "Immune Fear/Polymorph/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209615,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Warlock"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209616,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Warrior"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209617,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Druid"
+   ],
+   "spell_id": 23277,
+   "spell_name": "Immune Charm/Fear/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209618,
+   "name": "Insignia of the Alliance",
+   "classes": [
+    "Mage"
+   ],
+   "spell_id": 23274,
+   "spell_name": "Immune Fear/Polymorph/Snare",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209619,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Warrior"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209620,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Warlock"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209621,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Priest"
+   ],
+   "spell_id": 23276,
+   "spell_name": "Immune Fear/Polymorph/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209622,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Rogue"
+   ],
+   "spell_id": 23273,
+   "spell_name": "Immune Charm/Fear/Polymorph",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209623,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Mage"
+   ],
+   "spell_id": 23274,
+   "spell_name": "Immune Fear/Polymorph/Snare",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 17,
+     "mechanic_name": "polymorphed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209624,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Druid"
+   ],
+   "spell_id": 23277,
+   "spell_name": "Immune Charm/Fear/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 5,
+     "mechanic_name": "fleeing"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209625,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Shaman"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 209626,
+   "name": "Insignia of the Horde",
+   "classes": [
+    "Hunter"
+   ],
+   "spell_id": 5579,
+   "spell_name": "Immune Root/Snare/Stun",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 7,
+     "mechanic_name": "rooted"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 11,
+     "mechanic_name": "ensnared"
+    },
+    {
+     "kind": "immunity",
+     "mechanic": 12,
+     "mechanic_name": "stunned"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 274444,
+   "name": "Greater Insignia of the Horde",
+   "classes": null,
+   "spell_id": 438273,
+   "spell_name": "PvP Trinket",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  },
+  {
+   "item_id": 274445,
+   "name": "Greater Insignia of the Alliance",
+   "classes": null,
+   "spell_id": 438273,
+   "spell_name": "PvP Trinket",
+   "cooldown_s": 300,
+   "category_cooldown_s": null,
+   "spell_category": 0,
+   "breaks": [
+    {
+     "kind": "immunity",
+     "mechanic": 1,
+     "mechanic_name": "charmed"
+    }
+   ],
+   "certainty": "FC-1.60.1.70245"
+  }
+ ],
+ "shared_cooldown_with_racials": null,
+ "notes": [
+  "Recharge partagée entre un bijou PvP et un racial (Will of the Forsaken…) : non décidée par le client (registre K4, absent ; docs/OPEN_QUESTIONS.md).",
+  "Faction d'un Insigne : absente des tables lues (nom seulement)."
+ ]
+}

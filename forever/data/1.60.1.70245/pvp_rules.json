@@ -1,0 +1,123 @@
+{
+ "build": "1.60.1.70124",
+ "source": "Règles serveur des rendements décroissants de WoW Classic (1.12) : émulateur vmangos, forum Blizzard (2019), liste « Not a Bug » de Classic, wiki communautaire ; aucune annonce de WoW Forever à ce sujet au 2026-09-30 (notes de la bêta du 2026-09-24). Recherche du sous-agent forever-web-researcher du 2026-09-30, autorisée par l'utilisateur (PV1, D3).",
+ "certainty": "suppose",
+ "note": "La catégorie d'un contrôle vient du client (SpellCategories.DiminishType, certain, classes.json) ; ce fichier ne porte que les règles du serveur (paliers, fenêtre, plafond) et les noms usuels des catégories, toutes supposées, à mesurer dans les journaux de champ de bataille en PV2 (docs/research/pvp-dr-protocole.md).",
+ "diminishing_returns": {
+  "steps": {
+   "value": [
+    1,
+    0.5,
+    0.25
+   ],
+   "certainty": "suppose",
+   "sources": [
+    "https://raw.githubusercontent.com/vmangos/core/development/src/game/SharedDefines.h",
+    "https://us.forums.blizzard.com/en/wow/t/classic-pvp-cc-duration-and-diminishing-returns/200700"
+   ],
+   "note": "multiplicateur de la durée des applications successives d'une même catégorie ; au-delà du dernier palier, immunité (vmangos : DiminishingLevels LEVEL_1 à LEVEL_IMMUNE ; forum 2019 : « 1st cast is full, 2nd is 50%, 3rd is 75%, 4th is immune ») ; un wiki de fans de Forever (2026-09-14) donne l'immunité dès la 2e application pour les racines et les silences, sans source officielle"
+  },
+  "window_s": {
+   "value": 15,
+   "certainty": "suppose",
+   "sources": [
+    "https://raw.githubusercontent.com/vmangos/core/development/src/game/Objects/Unit.h",
+    "https://us.forums.blizzard.com/en/wow/t/classic-pvp-cc-duration-and-diminishing-returns/200700",
+    "https://warcraft.wiki.gg/wiki/Diminishing_returns"
+   ],
+   "note": "remise à zéro de la catégorie sans nouvelle application pendant cette durée (vmangos : 15000 ms ; forum 2019 : 15 s ; wiki : entre 15 et 20 s en Classic, sans source)"
+  },
+  "window_from": {
+   "value": "fin",
+   "certainty": "suppose",
+   "sources": [
+    "https://us.forums.blizzard.com/en/wow/t/classic-pvp-cc-duration-and-diminishing-returns/200700",
+    "https://www.warcrafttavern.com/tbc/guides/diminishing-returns/"
+   ],
+   "note": "point de départ de la fenêtre : fin de l'effet précédent (forum 2019, warcraftTavern) ; le commentaire de vmangos parle de l'instant du dernier coup (application) : question ouverte ; une application en immunité relance aussi la fenêtre (choix supposé : répéter le contrôle prolonge l'immunité ; question ouverte)"
+  },
+  "pvp_duration_cap_s": {
+   "value": 10,
+   "certainty": "suppose",
+   "sources": [
+    "https://raw.githubusercontent.com/vmangos/core/development/src/game/SharedDefines.h",
+    "https://raw.githubusercontent.com/vmangos/core/development/src/game/Spells/SpellEntry.cpp",
+    "https://us.forums.blizzard.com/en/wow/t/classic-pvp-cc-duration-and-diminishing-returns/200700"
+   ],
+   "note": "plafond de durée d'un contrôle sur un joueur (vmangos : « duration limited to 10s » ; forum 2019 : Sap d'une minute ramené à environ 10 s) ; groupes concernés et ordre avec les paliers non établis"
+  }
+ },
+ "categories": {
+  "1": {
+   "name": "racines",
+   "certainty": "suppose",
+   "note": "Frost Nova, Entangling Roots ; vmangos : CONTROL_ROOT"
+  },
+  "2": {
+   "name": null,
+   "certainty": "suppose",
+   "note": "catégorie rare (Desert Winds, Theka's Last Breath), non identifiée"
+  },
+  "4": {
+   "name": "étourdissements contrôlés",
+   "certainty": "suppose",
+   "note": "Bash, Cheap Shot, Charge Stun, Hammer of Justice ; vmangos : CONTROL_STUN"
+  },
+  "8": {
+   "name": "charme et contrôle mental",
+   "certainty": "suppose",
+   "note": "Mind Control, Subjugate Demon ; vmangos : CHARM"
+  },
+  "16": {
+   "name": "incapacités",
+   "certainty": "suppose",
+   "note": "Polymorph, Sap, Gouge, Freezing Trap Effect, Hibernate, Banish, Scatter Shot, Repentance ; vmangos : POLYMORPH, SLEEP, FREEZE, KNOCKOUT, BANISH réunis"
+  },
+  "32": {
+   "name": "peurs",
+   "certainty": "suppose",
+   "note": "Fear, Psychic Scream, Howl of Terror, Intimidating Shout, Seduction ; vmangos sépare FEAR et WARLOCK_FEAR"
+  },
+  "64": {
+   "name": "silences",
+   "certainty": "suppose",
+   "note": "Silence, Spell Lock, Counterspell - Silenced ; vmangos : SILENCE (warcraftTavern : aucun rendement sur les silences en TBC)"
+  },
+  "128": {
+   "name": "Kidney Shot",
+   "certainty": "suppose",
+   "note": "Kidney Shot, Between the Eyes ; vmangos : KIDNEYSHOT"
+  },
+  "256": {
+   "name": "Distract",
+   "certainty": "suppose",
+   "note": "Distract"
+  },
+  "512": {
+   "name": "étourdissements déclenchés",
+   "certainty": "suppose",
+   "note": "Impact, Blackout, Improved Concussive Shot, Pyroclasm ; vmangos : TRIGGER_STUN ; liste « Not a Bug » : ne partagent pas les rendements des étourdissements contrôlés"
+  }
+ },
+ "sources": [
+  "https://raw.githubusercontent.com/vmangos/core/development/src/game/SharedDefines.h",
+  "https://raw.githubusercontent.com/vmangos/core/development/src/game/Objects/Unit.h",
+  "https://raw.githubusercontent.com/vmangos/core/development/src/game/Spells/SpellEntry.cpp",
+  "https://us.forums.blizzard.com/en/wow/t/classic-pvp-cc-duration-and-diminishing-returns/200700",
+  "https://us.forums.blizzard.com/en/wow/t/wow-classic-%E2%80%9Cnot-a-bug%E2%80%9D-list-updated-12132019/175887",
+  "https://warcraft.wiki.gg/wiki/Diminishing_returns",
+  "https://www.warcrafttavern.com/tbc/guides/diminishing-returns/",
+  "https://world-of-warcraft-forever.wiki/en/pvp/world-of-warcraft-forever-crowd-control/",
+  "https://us.forums.blizzard.com/en/wow/t/wow-forever-beta-development-notes-%E2%80%93-updated-september-24/2360696/1"
+ ],
+ "open_question": "Point de départ de la fenêtre (fin de l'effet ou application), fenêtre fixe ou aléatoire (15 à 20 s), paliers des racines et des silences (wiki de fans de Forever : immunité à la 2e application), plafond de 10 s (groupes, ordre avec les paliers), rendements contre les PNJ : à mesurer dans mes journaux de champ de bataille (PV2).",
+ "sheets": {
+  "long_cooldown_s": {
+   "value": 60,
+   "certainty": "certain",
+   "sources": [],
+   "note": "paramètre d'affichage des fiches PvP (fenêtres à surveiller : recharges adverses au moins aussi longues), pas une règle du jeu"
+  }
+ },
+ "inherited_from": "1.60.1.70170"
+}

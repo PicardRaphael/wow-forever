@@ -1,0 +1,2865 @@
+{
+ "schema_version": 2,
+ "build": "1.60.1.70245",
+ "source": "Client 1.60.1.70245 : tables SpellEffect, SpellLevels, SpellMisc, SpellCooldowns, SkillLineAbility (wago.tools) décodées par forever decode",
+ "level_cap": 60,
+ "spells": {
+  "frostbolt": [
+   {
+    "rank": 1,
+    "spell_id": 116,
+    "base_level": 4,
+    "spell_level": 4,
+    "max_level": 8,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 116,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 4,
+      "max_level": 8,
+      "base_points": 19.0,
+      "points_per_level": 0.5,
+      "variance": 0.10526315868,
+      "bonus_coefficient": 0.40700000525,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 205,
+    "base_level": 8,
+    "spell_level": 8,
+    "max_level": 12,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 205,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 8,
+      "max_level": 12,
+      "base_points": 33.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.12121211737,
+      "bonus_coefficient": 0.48899999261,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 837,
+    "base_level": 14,
+    "spell_level": 14,
+    "max_level": 18,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 837,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 14,
+      "max_level": 18,
+      "base_points": 46.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.11111111194,
+      "bonus_coefficient": 0.59700000286,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 7322,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 24,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 7322,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 24,
+      "base_points": 60.0,
+      "points_per_level": 1.10000002384,
+      "variance": 0.10256409645,
+      "bonus_coefficient": 0.70599997044,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8406,
+    "base_level": 26,
+    "spell_level": 26,
+    "max_level": 30,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8406,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 26,
+      "max_level": 30,
+      "base_points": 95.0,
+      "points_per_level": 1.5,
+      "variance": 0.09090909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 8407,
+    "base_level": 32,
+    "spell_level": 32,
+    "max_level": 36,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8407,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 32,
+      "max_level": 36,
+      "base_points": 134.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.08791209012,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 8408,
+    "base_level": 38,
+    "spell_level": 38,
+    "max_level": 42,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8408,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 38,
+      "max_level": 42,
+      "base_points": 181.0,
+      "points_per_level": 2.0,
+      "variance": 0.08438818902,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 10179,
+    "base_level": 44,
+    "spell_level": 44,
+    "max_level": 48,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10179,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 44,
+      "max_level": 48,
+      "base_points": 244.0,
+      "points_per_level": 2.29999995232,
+      "variance": 0.07894736528,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 9,
+    "spell_id": 10180,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 54,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10180,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 54,
+      "base_points": 308.0,
+      "points_per_level": 2.59999990463,
+      "variance": 0.08152174205,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 10,
+    "spell_id": 10181,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10181,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 386.0,
+      "points_per_level": 2.90000009537,
+      "variance": 0.07623318583,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 11,
+    "spell_id": 25304,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 25304,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 475.0,
+      "points_per_level": 3.20000004768,
+      "variance": 0.07476635277,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "fireball": [
+   {
+    "rank": 1,
+    "spell_id": 133,
+    "base_level": 1,
+    "spell_level": 1,
+    "max_level": 5,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 133,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 1,
+      "max_level": 5,
+      "base_points": 18.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.44444444776,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 133,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 2,
+      "base_level": 1,
+      "max_level": 5,
+      "base_points": 1.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 143,
+    "base_level": 6,
+    "spell_level": 6,
+    "max_level": 10,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 143,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 6,
+      "max_level": 10,
+      "base_points": 37.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.36842104793,
+      "bonus_coefficient": 0.57099997997,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 143,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 6,
+      "max_level": 10,
+      "base_points": 1.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 145,
+    "base_level": 12,
+    "spell_level": 12,
+    "max_level": 16,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 145,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 12,
+      "max_level": 16,
+      "base_points": 53.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.31746032834,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 145,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 12,
+      "max_level": 16,
+      "base_points": 2.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 3140,
+    "base_level": 18,
+    "spell_level": 18,
+    "max_level": 22,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 3140,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 18,
+      "max_level": 22,
+      "base_points": 74.0,
+      "points_per_level": 1.10000002384,
+      "variance": 0.31999999285,
+      "bonus_coefficient": 0.85699999332,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 3140,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 18,
+      "max_level": 22,
+      "base_points": 3.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8400,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 28,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8400,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 24,
+      "max_level": 28,
+      "base_points": 108.0,
+      "points_per_level": 1.5,
+      "variance": 0.29447853565,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 8400,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 24,
+      "max_level": 28,
+      "base_points": 4.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 8401,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 34,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8401,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 34,
+      "base_points": 153.0,
+      "points_per_level": 1.79999995232,
+      "variance": 0.28448274732,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 8401,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 30,
+      "max_level": 34,
+      "base_points": 6.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 8402,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 40,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8402,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 36,
+      "max_level": 40,
+      "base_points": 187.0,
+      "points_per_level": 2.29999995232,
+      "variance": 0.27118644118,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 8402,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 36,
+      "max_level": 40,
+      "base_points": 6.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 10148,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 46,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10148,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 46,
+      "base_points": 235.0,
+      "points_per_level": 2.20000004768,
+      "variance": 0.26229506731,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 10148,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 42,
+      "max_level": 46,
+      "base_points": 8.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 9,
+    "spell_id": 10149,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 52,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10149,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 52,
+      "base_points": 300.0,
+      "points_per_level": 2.40000009537,
+      "variance": 0.25389754772,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 10149,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 48,
+      "max_level": 52,
+      "base_points": 10.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 10,
+    "spell_id": 10150,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 58,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10150,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 58,
+      "base_points": 374.0,
+      "points_per_level": 2.70000004768,
+      "variance": 0.24723246694,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 10150,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 54,
+      "max_level": 58,
+      "base_points": 12.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 11,
+    "spell_id": 10151,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10151,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 451.0,
+      "points_per_level": 3.0,
+      "variance": 0.24137930572,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 10151,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 14.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 12,
+    "spell_id": 25306,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 25306,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 483.0,
+      "points_per_level": 3.0,
+      "variance": 0.24188791215,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 25306,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 15.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 2000
+     }
+    ]
+   }
+  ],
+  "fire_blast": [
+   {
+    "rank": 1,
+    "spell_id": 2136,
+    "base_level": 6,
+    "spell_level": 6,
+    "max_level": 11,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 2136,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 6,
+      "max_level": 11,
+      "base_points": 28.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.28571429849,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 2137,
+    "base_level": 14,
+    "spell_level": 14,
+    "max_level": 19,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 2137,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 14,
+      "max_level": 19,
+      "base_points": 58.0,
+      "points_per_level": 1.0,
+      "variance": 0.21875,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 2138,
+    "base_level": 22,
+    "spell_level": 22,
+    "max_level": 27,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 2138,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 22,
+      "max_level": 27,
+      "base_points": 100.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.2086956501,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8412,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 35,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8412,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 35,
+      "base_points": 163.0,
+      "points_per_level": 1.79999995232,
+      "variance": 0.18378378451,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8413,
+    "base_level": 38,
+    "spell_level": 38,
+    "max_level": 43,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8413,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 38,
+      "max_level": 43,
+      "base_points": 236.0,
+      "points_per_level": 2.20000004768,
+      "variance": 0.18045112491,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10197,
+    "base_level": 46,
+    "spell_level": 46,
+    "max_level": 51,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10197,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 46,
+      "max_level": 51,
+      "base_points": 331.0,
+      "points_per_level": 2.59999990463,
+      "variance": 0.17079889774,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 10199,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 59,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10199,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 59,
+      "base_points": 438.0,
+      "points_per_level": 3.0,
+      "variance": 0.16595745087,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "scorch": [
+   {
+    "rank": 1,
+    "spell_id": 2948,
+    "base_level": 22,
+    "spell_level": 22,
+    "max_level": 26,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 2948,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 22,
+      "max_level": 26,
+      "base_points": 39.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.20338982344,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 8444,
+    "base_level": 28,
+    "spell_level": 28,
+    "max_level": 32,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8444,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 28,
+      "max_level": 32,
+      "base_points": 55.0,
+      "points_per_level": 1.0,
+      "variance": 0.1882352978,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8445,
+    "base_level": 34,
+    "spell_level": 34,
+    "max_level": 38,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8445,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 34,
+      "max_level": 38,
+      "base_points": 69.0,
+      "points_per_level": 1.0,
+      "variance": 0.18181818724,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8446,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 44,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8446,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 44,
+      "base_points": 93.0,
+      "points_per_level": 1.20000004768,
+      "variance": 0.1780821979,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10205,
+    "base_level": 46,
+    "spell_level": 46,
+    "max_level": 50,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10205,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 46,
+      "max_level": 50,
+      "base_points": 116.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.16949152946,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10206,
+    "base_level": 52,
+    "spell_level": 52,
+    "max_level": 56,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10206,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 52,
+      "max_level": 56,
+      "base_points": 150.0,
+      "points_per_level": 1.5,
+      "variance": 0.1780821979,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 10207,
+    "base_level": 58,
+    "spell_level": 58,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10207,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 58,
+      "max_level": 60,
+      "base_points": 178.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.16535432637,
+      "bonus_coefficient": 0.42899999022,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "pyroblast": [
+   {
+    "rank": 1,
+    "spell_id": 11366,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 24,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 11366,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 24,
+      "base_points": 110.0,
+      "points_per_level": 1.5,
+      "variance": 0.2804878056,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 11366,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 20,
+      "max_level": 24,
+      "base_points": 11.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 12505,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 30,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 12505,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 24,
+      "max_level": 30,
+      "base_points": 134.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.26923078299,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 12505,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 24,
+      "max_level": 30,
+      "base_points": 14.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 12522,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 36,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 12522,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 36,
+      "base_points": 191.0,
+      "points_per_level": 2.09999990463,
+      "variance": 0.24742268026,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 12522,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 30,
+      "max_level": 36,
+      "base_points": 19.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 12523,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 42,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 12523,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 36,
+      "max_level": 42,
+      "base_points": 245.0,
+      "points_per_level": 2.40000009537,
+      "variance": 0.24064171314,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 12523,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 36,
+      "max_level": 42,
+      "base_points": 25.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 12524,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 48,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 12524,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 48,
+      "base_points": 311.0,
+      "points_per_level": 2.70000004768,
+      "variance": 0.23427331448,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 12524,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 42,
+      "max_level": 48,
+      "base_points": 31.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 12525,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 54,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 12525,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 54,
+      "base_points": 394.0,
+      "points_per_level": 3.0,
+      "variance": 0.22574955225,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 12525,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 48,
+      "max_level": 54,
+      "base_points": 38.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 12526,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 12526,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 60,
+      "base_points": 481.0,
+      "points_per_level": 3.40000009537,
+      "variance": 0.22222222388,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 12526,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 54,
+      "max_level": 60,
+      "base_points": 46.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 18809,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 18809,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 583.0,
+      "points_per_level": 4.59999990463,
+      "variance": 0.21668742597,
+      "bonus_coefficient": 1.0,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 18809,
+      "index": 1,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 53.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.15000000596,
+      "period_ms": 3000
+     }
+    ]
+   }
+  ],
+  "frostfire_bolt": [
+   {
+    "rank": 1,
+    "spell_id": 401502,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 48,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 401502,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 48,
+      "base_points": 100.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.15340909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 401502,
+      "index": 2,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 40,
+      "max_level": 48,
+      "base_points": 9.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 1237312,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 58,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1237312,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 58,
+      "base_points": 182.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.15340909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1237312,
+      "index": 2,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 50,
+      "max_level": 58,
+      "base_points": 13.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 3000
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 1237313,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1237313,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 292.0,
+      "points_per_level": 2.09999990463,
+      "variance": 0.15340909362,
+      "bonus_coefficient": 0.81400001049,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1237313,
+      "index": 2,
+      "kind": "dot",
+      "ticks": 3,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 19.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.0,
+      "period_ms": 3000
+     }
+    ]
+   }
+  ],
+  "ice_lance": [
+   {
+    "rank": 1,
+    "spell_id": 1312002,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 26,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1312002,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 26,
+      "base_points": 28.0,
+      "points_per_level": 0.34999999404,
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 400640,
+    "base_level": 28,
+    "spell_level": 28,
+    "max_level": 32,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 400640,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 28,
+      "max_level": 32,
+      "base_points": 36.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 1240044,
+    "base_level": 34,
+    "spell_level": 34,
+    "max_level": 40,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1240044,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 34,
+      "max_level": 40,
+      "base_points": 45.0,
+      "points_per_level": 0.5,
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 1240045,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 48,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1240045,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 48,
+      "base_points": 79.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 1240046,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 56,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1240046,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 56,
+      "base_points": 98.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 1240047,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1240047,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 145.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.16666667163,
+      "bonus_coefficient": 0.0,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "arcane_blast": [
+   {
+    "rank": 1,
+    "spell_id": 400574,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 28,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 400574,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 20,
+      "max_level": 28,
+      "base_points": 54.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 1239696,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 38,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1239696,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 38,
+      "base_points": 130.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 1239697,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 48,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1239697,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 48,
+      "base_points": 169.0,
+      "points_per_level": 1.60000002384,
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 1239699,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 58,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1239699,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 58,
+      "base_points": 274.0,
+      "points_per_level": 2.09999990463,
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 1239700,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1239700,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 394.0,
+      "points_per_level": 2.59999990463,
+      "variance": 0.15102040768,
+      "bonus_coefficient": 0.71399998665,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "arcane_missiles": [
+   {
+    "rank": 1,
+    "spell_id": 5143,
+    "base_level": 8,
+    "spell_level": 8,
+    "max_level": 12,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 7268,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 3,
+      "base_level": 8,
+      "max_level": 12,
+      "base_points": 24.0,
+      "points_per_level": 0.30000001192,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 5144,
+    "base_level": 16,
+    "spell_level": 16,
+    "max_level": 20,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 7269,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 4,
+      "base_level": 16,
+      "max_level": 20,
+      "base_points": 31.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 5145,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 28,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 7270,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 24,
+      "max_level": 28,
+      "base_points": 44.0,
+      "points_per_level": 0.5,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8416,
+    "base_level": 32,
+    "spell_level": 32,
+    "max_level": 36,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8419,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 32,
+      "max_level": 36,
+      "base_points": 66.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 8417,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 44,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8418,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 40,
+      "max_level": 44,
+      "base_points": 95.0,
+      "points_per_level": 0.69999998808,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10211,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 52,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10273,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 48,
+      "max_level": 52,
+      "base_points": 130.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 7,
+    "spell_id": 10212,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10274,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 171.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 8,
+    "spell_id": 25345,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 25346,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 5,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 209.0,
+      "points_per_level": 1.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.28600001335,
+      "period_ms": 1000
+     }
+    ]
+   }
+  ],
+  "frost_nova": [
+   {
+    "rank": 1,
+    "spell_id": 122,
+    "base_level": 10,
+    "spell_level": 10,
+    "max_level": 15,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 122,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 10,
+      "max_level": 15,
+      "base_points": 20.0,
+      "points_per_level": 0.5,
+      "variance": 0.10000000149,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 865,
+    "base_level": 26,
+    "spell_level": 26,
+    "max_level": 31,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 865,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 26,
+      "max_level": 31,
+      "base_points": 34.0,
+      "points_per_level": 0.5,
+      "variance": 0.11428570747,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 6131,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 45,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 6131,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 45,
+      "base_points": 53.0,
+      "points_per_level": 0.5,
+      "variance": 0.10909090936,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 10230,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 59,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10230,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 59,
+      "base_points": 73.0,
+      "points_per_level": 0.5,
+      "variance": 0.10666666925,
+      "bonus_coefficient": 0.02899999917,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "cone_of_cold": [
+   {
+    "rank": 1,
+    "spell_id": 120,
+    "base_level": 26,
+    "spell_level": 26,
+    "max_level": 31,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 120,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 26,
+      "max_level": 31,
+      "base_points": 97.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.09708737582,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 8492,
+    "base_level": 34,
+    "spell_level": 34,
+    "max_level": 39,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8492,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 34,
+      "max_level": 39,
+      "base_points": 144.0,
+      "points_per_level": 1.0,
+      "variance": 0.09150326997,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 10159,
+    "base_level": 42,
+    "spell_level": 42,
+    "max_level": 47,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10159,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 42,
+      "max_level": 47,
+      "base_points": 204.0,
+      "points_per_level": 1.20000004768,
+      "variance": 0.09389671683,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 10160,
+    "base_level": 50,
+    "spell_level": 50,
+    "max_level": 55,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10160,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 50,
+      "max_level": 55,
+      "base_points": 267.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.09386281669,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10161,
+    "base_level": 58,
+    "spell_level": 58,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10161,
+      "index": 1,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 58,
+      "max_level": 60,
+      "base_points": 340.0,
+      "points_per_level": 1.5,
+      "variance": 0.08571428806,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "arcane_explosion": [
+   {
+    "rank": 1,
+    "spell_id": 1449,
+    "base_level": 14,
+    "spell_level": 14,
+    "max_level": 19,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1449,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 14,
+      "max_level": 19,
+      "base_points": 32.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.11764705926,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 8437,
+    "base_level": 22,
+    "spell_level": 22,
+    "max_level": 27,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8437,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 22,
+      "max_level": 27,
+      "base_points": 55.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.10000000149,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8438,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 35,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8438,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 35,
+      "base_points": 94.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.07920791954,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8439,
+    "base_level": 38,
+    "spell_level": 38,
+    "max_level": 43,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8439,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 38,
+      "max_level": 43,
+      "base_points": 135.0,
+      "points_per_level": 0.89999997616,
+      "variance": 0.08275862038,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10201,
+    "base_level": 46,
+    "spell_level": 46,
+    "max_level": 51,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10201,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 46,
+      "max_level": 51,
+      "base_points": 183.0,
+      "points_per_level": 1.10000002384,
+      "variance": 0.08247422427,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10202,
+    "base_level": 54,
+    "spell_level": 54,
+    "max_level": 59,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10202,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 54,
+      "max_level": 59,
+      "base_points": 242.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.07905138284,
+      "bonus_coefficient": 0.14300000668,
+      "period_ms": 0
+     }
+    ]
+   }
+  ],
+  "blizzard": [
+   {
+    "rank": 1,
+    "spell_id": 10,
+    "base_level": 20,
+    "spell_level": 20,
+    "max_level": 25,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1279976,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 20,
+      "max_level": 25,
+      "base_points": 24.0,
+      "points_per_level": 0.10000000149,
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 6141,
+    "base_level": 28,
+    "spell_level": 28,
+    "max_level": 33,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1279977,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 28,
+      "max_level": 33,
+      "base_points": 42.0,
+      "points_per_level": 0.20000000298,
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8427,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 41,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1279978,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 36,
+      "max_level": 41,
+      "base_points": 62.0,
+      "points_per_level": 0.20000000298,
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 10185,
+    "base_level": 44,
+    "spell_level": 44,
+    "max_level": 49,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1279979,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 44,
+      "max_level": 49,
+      "base_points": 87.0,
+      "points_per_level": 0.30000001192,
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10186,
+    "base_level": 52,
+    "spell_level": 52,
+    "max_level": 57,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1279980,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 52,
+      "max_level": 57,
+      "base_points": 114.0,
+      "points_per_level": 0.30000001192,
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10187,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 1279949,
+      "index": 0,
+      "kind": "channel",
+      "ticks": 8,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 146.0,
+      "points_per_level": 0.40000000596,
+      "variance": 0.0,
+      "bonus_coefficient": 0.04199999943,
+      "period_ms": 1000
+     }
+    ]
+   }
+  ],
+  "flamestrike": [
+   {
+    "rank": 1,
+    "spell_id": 2120,
+    "base_level": 16,
+    "spell_level": 16,
+    "max_level": 21,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 2120,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 16,
+      "max_level": 21,
+      "base_points": 60.0,
+      "points_per_level": 0.60000002384,
+      "variance": 0.26666668057,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1279983,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 16,
+      "max_level": 21,
+      "base_points": 11.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 2121,
+    "base_level": 24,
+    "spell_level": 24,
+    "max_level": 29,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 2121,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 24,
+      "max_level": 29,
+      "base_points": 109.0,
+      "points_per_level": 0.80000001192,
+      "variance": 0.23853211105,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1279985,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 24,
+      "max_level": 29,
+      "base_points": 21.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 8422,
+    "base_level": 32,
+    "spell_level": 32,
+    "max_level": 37,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8422,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 32,
+      "max_level": 37,
+      "base_points": 173.0,
+      "points_per_level": 1.0,
+      "variance": 0.21965317428,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1279987,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 32,
+      "max_level": 37,
+      "base_points": 33.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 8423,
+    "base_level": 40,
+    "spell_level": 40,
+    "max_level": 45,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 8423,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 40,
+      "max_level": 45,
+      "base_points": 246.0,
+      "points_per_level": 1.29999995232,
+      "variance": 0.21138212085,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1279988,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 40,
+      "max_level": 45,
+      "base_points": 47.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 10215,
+    "base_level": 48,
+    "spell_level": 48,
+    "max_level": 53,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10215,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 48,
+      "max_level": 53,
+      "base_points": 325.0,
+      "points_per_level": 1.5,
+      "variance": 0.2092307657,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1279989,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 48,
+      "max_level": 53,
+      "base_points": 64.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
+     }
+    ]
+   },
+   {
+    "rank": 6,
+    "spell_id": 10216,
+    "base_level": 56,
+    "spell_level": 56,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 10216,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 417.0,
+      "points_per_level": 1.70000004768,
+      "variance": 0.2014388442,
+      "bonus_coefficient": 0.15700000525,
+      "period_ms": 0
+     },
+     {
+      "spell_id": 1279990,
+      "index": 0,
+      "kind": "dot",
+      "ticks": 4,
+      "base_level": 56,
+      "max_level": 60,
+      "base_points": 83.0,
+      "points_per_level": 0.0,
+      "variance": 0.0,
+      "bonus_coefficient": 0.03200000152,
+      "period_ms": 2000
+     }
+    ]
+   }
+  ],
+  "blast_wave": [
+   {
+    "rank": 1,
+    "spell_id": 11113,
+    "base_level": 30,
+    "spell_level": 30,
+    "max_level": 36,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 11113,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 30,
+      "max_level": 36,
+      "base_points": 163.0,
+      "points_per_level": 1.0,
+      "variance": 0.1882352978,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 2,
+    "spell_id": 13018,
+    "base_level": 36,
+    "spell_level": 36,
+    "max_level": 42,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 13018,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 36,
+      "max_level": 42,
+      "base_points": 212.0,
+      "points_per_level": 1.20000004768,
+      "variance": 0.18099547923,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 3,
+    "spell_id": 13019,
+    "base_level": 44,
+    "spell_level": 44,
+    "max_level": 50,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 13019,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 44,
+      "max_level": 50,
+      "base_points": 293.0,
+      "points_per_level": 1.39999997616,
+      "variance": 0.17161716521,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 4,
+    "spell_id": 13020,
+    "base_level": 52,
+    "spell_level": 52,
+    "max_level": 58,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 13020,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 52,
+      "max_level": 58,
+      "base_points": 389.0,
+      "points_per_level": 1.60000002384,
+      "variance": 0.17042607069,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   },
+   {
+    "rank": 5,
+    "spell_id": 13021,
+    "base_level": 60,
+    "spell_level": 60,
+    "max_level": 60,
+    "start_recovery_ms": 1500,
+    "components": [
+     {
+      "spell_id": 13021,
+      "index": 0,
+      "kind": "direct",
+      "ticks": 1,
+      "base_level": 60,
+      "max_level": 60,
+      "base_points": 493.0,
+      "points_per_level": 1.89999997616,
+      "variance": 0.16302186251,
+      "bonus_coefficient": 0.12899999321,
+      "period_ms": 0
+     }
+    ]
+   }
+  ]
+ },
+ "notes": [
+  "points au niveau L : base_points + points_per_level × (min(max(L, base_level), max_level) - base_level)",
+  "min et max : points × (1 ∓ variance / 2), arrondis au demi supérieur ; channel et dot : × ticks",
+  "max_level : MaxLevel du client (0 = plafond de niveau), borné au plafond",
+  "start_recovery_ms : StartRecoveryTime de SpellCooldowns (recharge globale déclenchée par le rang)",
+  "bonus_coefficient : EffectBonusCoefficient de l'effet de dégâts (par coup, par tic ou par éclair canalisé)",
+  "period_ms : EffectAuraPeriod de l'aura qui porte l'effet (celle du sort parent pour un sort déclenché), 0 pour un coup direct",
+  "utility : armures du Mage, niveau d'apprentissage (SpellLevels.BaseLevel) et effets retenus par decode_rules.json.utility_spells",
+  "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), cumuls maximum, durée, écoles touchées",
+  "talent_cooldowns : recharge des sorts de talent actifs (decode_rules.json.talent_cooldowns), maximum de RecoveryTime et CategoryRecoveryTime de SpellCooldowns, en millisecondes"
+ ],
+ "utility": {
+  "frost_armor": [
+   {
+    "rank": 1,
+    "spell_id": 168,
+    "learned_level": 1,
+    "effects": {
+     "armor": 30,
+     "chill_on_hit_spell": 6136
+    }
+   },
+   {
+    "rank": 2,
+    "spell_id": 7300,
+    "learned_level": 10,
+    "effects": {
+     "armor": 110,
+     "chill_on_hit_spell": 6136
+    }
+   },
+   {
+    "rank": 3,
+    "spell_id": 7301,
+    "learned_level": 20,
+    "effects": {
+     "armor": 200,
+     "chill_on_hit_spell": 6136
+    }
+   }
+  ],
+  "ice_armor": [
+   {
+    "rank": 1,
+    "spell_id": 7302,
+    "learned_level": 30,
+    "effects": {
+     "armor": 290,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 6
+    }
+   },
+   {
+    "rank": 2,
+    "spell_id": 7320,
+    "learned_level": 40,
+    "effects": {
+     "armor": 380,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 9
+    }
+   },
+   {
+    "rank": 3,
+    "spell_id": 10219,
+    "learned_level": 50,
+    "effects": {
+     "armor": 470,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 12
+    }
+   },
+   {
+    "rank": 4,
+    "spell_id": 10220,
+    "learned_level": 60,
+    "effects": {
+     "armor": 560,
+     "chill_on_hit_spell": 7321,
+     "frost_resistance": 15
+    }
+   }
+  ],
+  "mage_armor": [
+   {
+    "rank": 1,
+    "spell_id": 6117,
+    "learned_level": 34,
+    "effects": {
+     "magic_resistance": 5,
+     "regen_while_casting_pct": 50
+    }
+   },
+   {
+    "rank": 2,
+    "spell_id": 22782,
+    "learned_level": 46,
+    "effects": {
+     "magic_resistance": 10,
+     "regen_while_casting_pct": 50
+    }
+   },
+   {
+    "rank": 3,
+    "spell_id": 22783,
+    "learned_level": 58,
+    "effects": {
+     "magic_resistance": 15,
+     "regen_while_casting_pct": 50
+    }
+   }
+  ]
+ },
+ "auras": {
+  "fire_vulnerability": {
+   "spell_id": 22959,
+   "source_spell_id": 11095,
+   "talent": "improvedScorch",
+   "pct_per_stack": 3,
+   "max_stacks": 5,
+   "duration_ms": 30000,
+   "schools": [
+    "fire"
+   ]
+  },
+  "winters_chill": {
+   "spell_id": 12579,
+   "source_spell_id": 11180,
+   "talent": "wintersChill",
+   "pct_per_stack": 2,
+   "max_stacks": 5,
+   "duration_ms": 15000,
+   "schools": [
+    "frost"
+   ]
+  },
+  "ignite": {
+   "spell_id": 412538,
+   "duration_ms": 4000,
+   "period_ms": 2000,
+   "cumulative": 1
+  }
+ },
+ "talent_cooldowns": {
+  "arcanePower": {
+   "spell_id": 12042,
+   "cooldown_ms": 180000
+  },
+  "presenceOfMind": {
+   "spell_id": 12043,
+   "cooldown_ms": 180000
+  },
+  "combustion": {
+   "spell_id": 11129,
+   "cooldown_ms": 180000
+  },
+  "coldSnap": {
+   "spell_id": 12472,
+   "cooldown_ms": 600000
+  },
+  "iceBlock": {
+   "spell_id": 11958,
+   "cooldown_ms": 300000
+  },
+  "iceBarrier": {
+   "spell_id": 11426,
+   "cooldown_ms": 30000
+  },
+  "blastWave": {
+   "spell_id": 11113,
+   "cooldown_ms": 45000
+  }
+ }
+}
