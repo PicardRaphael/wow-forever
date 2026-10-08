@@ -13,7 +13,10 @@
   1.60.1.70245) ; seuls les écarts de l'addon sont écrits : `node` (nœud numéroté autrement, DON13), `req`
   (prérequis différent du nôtre, DON5), `tf` (position sans correspondance : nom, sort, rangée, colonne, rangs, nœud,
   avec sa raison) ; `forever_only` : nos talents absents de l'addon.
-- `mage_builds.json` : trois builds du Mage (`build_report`, préréglage `rapide`, graine 12345, sans sensibilité) sur
-  1.60.1.70245 : points, ordre de prise, code attendu (relevé du plan `tasks/FA1-plan.md`).
+- `mage_builds.json` : builds fixes du Mage pour les tests du format v6 (points, ordre de prise, code attendu, source,
+  `verified_in_game`), écrits à la main et jamais recalculés : `leveling-20`, témoin relevé en jeu le 2026-10-08
+  (importé dans Talents Forever 0.37.1 et réexporté à l'identique) ; `leveling-20-current`, importé en jeu le même jour
+  (préréglage complet) ; `leveling-30` et `dungeon-20`, points et ordre du plan `tasks/FA1-plan.md` figés. Un build
+  calculé par l'outil se compare au code que l'outil rend au moment du test, jamais à un code stocké.
 - Non recopié : `Core.lua`, `UI.lua`, `Game.lua` (aucune licence, décisions 172 et 196), les textes, icônes,
   descriptions et tables `legacy`, `learn`, `coef`, `racials`, `renames`, `orderV1` à `orderV5` de `Data.lua`.

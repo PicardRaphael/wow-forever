@@ -401,6 +401,60 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
     }
 
 
+def _mandatory(talents: Mapping[int, dict[str, Any]]) -> dict[int, set[int]]:
+    """Nœuds exigés par chaque nœud, directement ou par une chaîne : prérequis requis, et prérequis suffisant quand il
+    est seul (point fixe)."""
+    need: dict[int, set[int]] = {n: set() for n in talents}
+    changed = True
+    while changed:
+        changed = False
+        for n, t in talents.items():
+            sufficient = [p["node_id"] for p in t["prereqs"] if p["kind"] == "sufficient"]
+            direct = [p["node_id"] for p in t["prereqs"] if p["kind"] == "required"]
+            direct += sufficient if len(sufficient) == 1 else []
+            grown = need[n].union(*({d} | need[d] for d in direct)) if direct else need[n]
+            if grown != need[n]:
+                need[n], changed = grown, True
+    return need
+
+
+def _drop_circular_edges(cls: str, talents: Mapping[int, dict[str, Any]]) -> list[dict[str, Any]]:
+    """Écarte les arêtes suffisantes circulaires (`circular_sufficient_edges` de decode_rules.json) : une source qui
+    exige déjà sa cible ne la rend jamais disponible. Rend les arêtes écartées ; un talent qui n'aurait plus aucune
+    voie, ou une arête requise circulaire, arrête le décodage (jamais deviné)."""
+    dropped: list[dict[str, Any]] = []
+    while True:
+        need = _mandatory(talents)
+        for n, t in talents.items():
+            for p in t["prereqs"]:
+                if n not in need[p["node_id"]]:
+                    continue
+                source = talents[p["node_id"]]
+                if p["kind"] != "sufficient":
+                    raise DataSchemaError(
+                        f"{cls} : arête {p['kind']} circulaire de {source['key']} vers {t['key']} (cycle fermé)."
+                    )
+                t["prereqs"] = [q for q in t["prereqs"] if q is not p]
+                if not any(q["kind"] == "sufficient" for q in t["prereqs"]):
+                    raise DataSchemaError(f"{cls} : {t['key']} n'a plus de prérequis atteignable (cycle fermé).")
+                dropped.append(
+                    {
+                        "from_node": source["node_id"],
+                        "to_node": n,
+                        "reason": (
+                            f"arête suffisante circulaire : {source['key']} exige déjà {t['key']} "
+                            "(decode_rules.json, circular_sufficient_edges)"
+                        ),
+                    }
+                )
+                break
+            else:
+                continue
+            break
+        else:
+            return sorted(dropped, key=lambda e: (e["to_node"], e["from_node"]))
+
+
 def _place(value: int, origins: Sequence[int], step: int, divisor: int) -> tuple[int, int] | None:
     """(indice de l'origine, position à partir de 1) d'une coordonnée sur la grille, directement ou après la règle
     du zéro en trop ; None si elle tombe hors de la grille (jamais arrondie)."""
@@ -505,6 +559,21 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
             )
         talents[int(node["ID"])] = talent
 
+    for key, seen in (rules.get("observed_absent", {}).get(cls) or {}).items():
+        found = [t for t in talents.values() if t["key"] == key]
+        if not found:
+            raise DataSchemaError(f"{cls} : absence relevée pour un talent inconnu « {key} ».")
+        if found[0]["node_id"] != int(seen["node_id"]):
+            raise DataSchemaError(
+                f"{cls}, {key} : nœud décodé du client ({found[0]['node_id']}) différent du relevé ({seen['node_id']})."
+            )
+        node_id = found[0]["node_id"]
+        del talents[node_id]
+        unresolved = [u for u in unresolved if u["node_id"] != node_id]
+        dropped.append(
+            {"node_id": node_id, "kept_node": None, "reason": f"absent de l'arbre en jeu : {seen['source']}"}
+        )
+
     observed_nodes = []
     for key, pos in (rules.get("observed_positions", {}).get(cls) or {}).items():
         found = [t for t in talents.values() if t["key"] == key]
@@ -538,6 +607,7 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
                     "kind": kind_of.get(edge_type, f"type {edge_type}"),
                 }
             )
+    dropped_edges = _drop_circular_edges(cls, talents) if rules.get("circular_sufficient_edges") == "drop" else []
     for t in talents.values():
         if len(t["prereqs"]) == 1:
             first = t["prereqs"][0]
@@ -579,6 +649,7 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
         "trees": trees_out,
         "unresolved_nodes": sorted(unresolved, key=lambda u: u["node_id"]),
         "dropped_nodes": sorted(dropped, key=lambda d: d["node_id"]),
+        "dropped_edges": dropped_edges,
         "tree_checks": checks,
         "observed_nodes": observed_nodes,
     }

@@ -1,6 +1,6 @@
 """Extrait hors ligne, de l'addon Talents Forever installé, les fixtures de FA1 (`tests/fixtures/talents_forever/`).
 
-    uv run python scripts/extract_talents_forever_fixture.py [--addon <dossier TalentsForeverBook>] [--no-builds]
+    uv run python scripts/extract_talents_forever_fixture.py [--addon <dossier TalentsForeverBook>]
 
 Lecture locale de `Data.lua` par `forever/pipeline/lua_table.py`, jamais par du Lua exécuté ; rien du code de l'addon
 ni de ses textes n'est recopié. Écrit (octets, fins de ligne LF) :
@@ -11,9 +11,10 @@ ni de ses textes n'est recopié. Écrit (octets, fins de ligne LF) :
 - `layout.json` : par classe, arbres de l'addon dans son ordre, et pour chaque position de liste notre clé
   (`classes.json` de la version installée), plus ses seuls écarts : nœud numéroté autrement (`node`), prérequis
   différent du nôtre (`req`), position sans correspondance (`tf` : nom, sort, rangée, colonne, rangs, nœud) ; nos
-  talents sans correspondance avec leur raison ;
-- `mage_builds.json` : trois builds du Mage calculés par `build_report` (préréglage `rapide`, graine 12345, sans
-  sensibilité) et leur code attendu (relevé du plan `tasks/FA1-plan.md`).
+  talents sans correspondance avec leur raison.
+
+`mage_builds.json` n'est pas écrit ici : builds fixes sourcés (témoins relevés en jeu), jamais recalculés par
+l'optimiseur, pour qu'un changement des données ne casse pas les tests du format.
 
 Contrôle avant écriture : le `Data.lua` synthétique de `tests/talents_forever_data.py`, rebâti depuis `classes.json`
 et ces fixtures, rend exactement les champs lus de l'addon (nom, rangs, rangée, colonne, nœud, sort, prérequis par
@@ -45,14 +46,6 @@ POPULAR = "TalentsForeverBookData.popular ="
 POPULAR_FIELDS = ("builds", "window", "asOf", "full", "spec")
 BUILD_FIELDS = ("rank", "lead", "pts", "code")
 POSITION_FIELDS = ("name", "max", "row", "col", "node", "spell", "req")
-# Builds du Mage de FA1 : (cas, contexte, niveau) et code attendu relevé par le plan (format v6 décrit au plan).
-MAGE_CASES = (
-    ("leveling-20", "leveling", 20, "mage/20/--0530002001-klps-6"),
-    ("leveling-30", "leveling", 30, "mage/30/--05300033210003001-klp2sr1prq1w2q1wqz-6"),
-    ("dungeon-20", "dungeon", 20, "mage/20/0500050001---6"),
-)
-SEED = 12345
-PRESET = "rapide"
 
 
 def read_addon(folder: Path) -> tuple[str, dict[str, Any], dict[str, Any], dict[str, Any]]:
@@ -155,24 +148,6 @@ def check(doc: dict[str, Any], popular: dict[str, Any], classes_json: Path, lay:
                 raise SystemExit(f"{file} build {a['rank']} : différent")
 
 
-def mage_builds(game_version: str) -> dict[str, Any]:
-    from forever.build import build_report
-    from forever.config import default_deps
-
-    deps = default_deps()
-    cases = {}
-    for name, context, level, code in MAGE_CASES:
-        rep = build_report(deps, context, level, preset=PRESET, seed=SEED, sensitivity=False)
-        cases[name] = {
-            "context": context,
-            "level": level,
-            "talents": rep["talents"],
-            "order": [s["talent"] for s in rep["order"] if s["talent"]],
-            "expected_code": code,
-        }
-    return {"game_version": game_version, "preset": PRESET, "seed": SEED, "sensitivity": False, "cases": cases}
-
-
 def write(path: Path, doc: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
@@ -182,7 +157,6 @@ def write(path: Path, doc: dict[str, Any]) -> None:
 def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--addon", type=Path)
-    parser.add_argument("--no-builds", action="store_true", help="ne recalcule pas mage_builds.json")
     args = parser.parse_args(argv)
     folder = args.addon or default_wow_dir() / "Interface" / "AddOns" / "TalentsForeverBook"
     game_version = current_identity(DATA_DIR).game_version
@@ -193,8 +167,6 @@ def main(argv: list[str]) -> int:
     check(doc, popular, classes_json, lay, pop)
     write(OUT / "popular.json", pop)
     write(OUT / "layout.json", lay)
-    if not args.no_builds:
-        write(OUT / "mage_builds.json", mage_builds(game_version))
     return 0
 
 

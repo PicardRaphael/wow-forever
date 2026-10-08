@@ -27,6 +27,15 @@ DATA_FILE = "Data.lua"
 REASONS = ("seulement_forever", "seulement_talents_forever", "position_inconnue", "ambigu")
 UNKNOWN_ROW_QUESTION = "CLS1"  # rangées du client inconnues (Démoniste), docs/OPEN_QUESTIONS.md
 FINGERPRINT_LEN = 12
+# Générations de code relues en jeu (procédure de docs/ADDON.md, section 7) : certitude `certain` du format (rangs,
+# positions, ordre) ; une autre génération est refusée à la lecture de l'addon.
+VERIFIED_IN_GAME = {
+    "6": (
+        "format v6 relu en jeu le 2026-10-08 (relevé de l'utilisateur, Talents Forever 0.37.1) : code d'un build du "
+        "Mage importé (rangs et positions conformes), réexporté par l'addon à l'identique, ordre compris ; témoin "
+        "tests/fixtures/talents_forever/mage_builds.json (leveling-20)"
+    )
+}
 
 
 class BuildWithExport(BuildReport):
@@ -442,6 +451,7 @@ def _export_provenance(addon: TfAddon | None, talented_bonus: int) -> dict[str, 
         else {"addon": "Talents Forever", "version": None, "build": None, "generated": None, "codeVersion": None}
     )
     ident.setdefault("fingerprint", None)
+    verified = VERIFIED_IN_GAME.get(str(ident.get("codeVersion"))) if addon is not None and addon.supported else None
     note = None
     if talented_bonus > 0:
         note = (
@@ -451,7 +461,8 @@ def _export_provenance(addon: TfAddon | None, talented_bonus: int) -> dict[str, 
     return {
         "format": f"v{CODE_VERSION}",
         **ident,
-        "verified_in_game": False,  # procédure de test en jeu : docs/ADDON.md, section 7
+        "verified_in_game": verified is not None,
+        "verified_in_game_source": verified,
         "talented_note": note,
     }
 
@@ -474,8 +485,7 @@ def export_build(
 ) -> dict[str, Any]:
     """Bloc `export.talents_forever` d'un build : code v6, lien, commande d'import, ordre compris s'il est calculé ;
     sinon le statut et sa raison (addon absent, export bloqué, génération non prise en charge, ordre incohérent),
-    jamais un code deviné. Certitude `probable` : format réimplémenté et recoupé par va-et-vient, pas encore relu en
-    jeu."""
+    jamais un code deviné. Certitude `certain` : format v6 relu en jeu (`VERIFIED_IN_GAME`)."""
     block: dict[str, Any] = {
         "status": "ok",
         "reason": None,
@@ -546,7 +556,7 @@ def export_build(
         link=link(code),
         order_included=bool(steps),
         order_note=None if steps else NO_ORDER_NOTE,
-        certainty="probable",
+        certainty="certain",
     )
     block["import"] = f"/tf import {code}"
     return block
@@ -641,8 +651,8 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
         "errors": errors,
         "unverifiable": unverifiable,
         "note": note,
-        "certainty": "probable",
-        "provenance": tf_provenance(deps, addon, "probable"),
+        "certainty": "certain",
+        "provenance": tf_provenance(deps, addon, "certain"),
     }
 
 

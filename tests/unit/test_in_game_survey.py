@@ -106,49 +106,52 @@ def test_no_talent_keeps_a_sufficient_prerequisite_that_requires_it(doc):
                 assert t["node_id"] not in back, (cls, t["key"])
 
 
-def _rogue_with_edges(class_tables, decode_rules, *pairs):
-    """Rogue décodé avec des arêtes suffisantes ajoutées (gauche, droite)."""
+def _with_edges(class_tables, decode_rules, cls, *pairs):
+    """Classe décodée avec des arêtes suffisantes ajoutées (gauche, droite)."""
     tables = {name: list(rows) for name, rows in class_tables.items()}
     model = next(e for e in tables["TraitEdge"] if int(e["Type"]) == 2)
     top = max(int(e["ID"]) for e in tables["TraitEdge"])
     added = [dict(model, ID=top + i + 1, LeftTraitNodeID=a, RightTraitNodeID=b) for i, (a, b) in enumerate(pairs)]
     tables["TraitEdge"] = [*tables["TraitEdge"], *added]
-    rogue = decode_classes(tables, decode_rules, LOCAL_VERSION)["classes"]["Rogue"]
-    return {x["node_id"]: x for x in talents_of(rogue).values()}, rogue
+    c = decode_classes(tables, decode_rules, LOCAL_VERSION)["classes"][cls]
+    return {x["node_id"]: x for x in talents_of(c).values()}, c
 
 
-def _rogue_pair(class_tables, decode_rules):
-    base = decode_classes(class_tables, decode_rules, LOCAL_VERSION)["classes"]["Rogue"]
-    t = next(x for x in talents_of(base).values() if len(x["prereqs"]) == 1)
-    source = t["prereqs"][0]["node_id"]
-    other = next(
-        x
-        for x in talents_of(base).values()
-        if x["node_id"] not in (t["node_id"], source) and not x["prereqs"] and x["tree"] == t["tree"]
-    )
-    return t, source, other
+def _chain(doc):
+    """(classe, t, source) : t n'a que source pour prérequis, et source a elle-même un seul prérequis (comme Bestial
+    Wrath, Intimidation et Bestial Swiftness)."""
+    for cls, c in doc["classes"].items():
+        by_node = {x["node_id"]: x for x in talents_of(c).values()}
+        for t in by_node.values():
+            if len(t["prereqs"]) == 1 and len(by_node[t["prereqs"][0]["node_id"]]["prereqs"]) == 1:
+                return cls, t, t["prereqs"][0]["node_id"]
+    raise AssertionError("aucune chaîne de deux prérequis")
 
 
-def test_synthetic_back_edge_is_dropped(class_tables, decode_rules):
-    t, source, _ = _rogue_pair(class_tables, decode_rules)
-    by_node, rogue = _rogue_with_edges(class_tables, decode_rules, (t["node_id"], source))  # retour : circulaire
+def test_synthetic_back_edge_is_dropped(doc, class_tables, decode_rules):
+    cls, t, source = _chain(doc)
+    by_node, c = _with_edges(class_tables, decode_rules, cls, (t["node_id"], source))  # retour : circulaire
     assert t["node_id"] not in [p["node_id"] for p in by_node[source]["prereqs"]]
     assert [p["node_id"] for p in by_node[t["node_id"]]["prereqs"]] == [source]
-    assert (t["node_id"], source) in {(e["from_node"], e["to_node"]) for e in rogue["dropped_edges"]}
+    assert (t["node_id"], source) in {(e["from_node"], e["to_node"]) for e in c["dropped_edges"]}
 
 
-def test_synthetic_real_alternative_is_kept(class_tables, decode_rules):
-    t, source, other = _rogue_pair(class_tables, decode_rules)
-    by_node, rogue = _rogue_with_edges(class_tables, decode_rules, (other["node_id"], t["node_id"]))  # vraie voie
+def test_synthetic_real_alternative_is_kept(doc, class_tables, decode_rules):
+    cls, t, source = _chain(doc)
+    other = next(
+        x
+        for x in talents_of(doc["classes"][cls]).values()
+        if x["node_id"] not in (t["node_id"], source) and not x["prereqs"] and x["tree"] == t["tree"]
+    )
+    by_node, c = _with_edges(class_tables, decode_rules, cls, (other["node_id"], t["node_id"]))  # vraie voie
     assert {p["node_id"] for p in by_node[t["node_id"]]["prereqs"]} == {source, other["node_id"]}
-    assert rogue["dropped_edges"] == []
+    assert [e for e in c["dropped_edges"] if e["to_node"] == t["node_id"]] == []
 
 
-def test_synthetic_closed_cycle_stops_the_decode(class_tables, decode_rules):
-    base = decode_classes(class_tables, decode_rules, LOCAL_VERSION)["classes"]["Rogue"]
-    a, b = [x for x in talents_of(base).values() if not x["prereqs"]][:2]
+def test_synthetic_closed_cycle_stops_the_decode(doc, class_tables, decode_rules):
+    a, b = [x for x in talents_of(doc["classes"]["Rogue"]).values() if not x["prereqs"]][:2]
     with pytest.raises(DataSchemaError):  # deux talents qui n'ont que l'autre pour prérequis : jamais deviné
-        _rogue_with_edges(class_tables, decode_rules, (a["node_id"], b["node_id"]), (b["node_id"], a["node_id"]))
+        _with_edges(class_tables, decode_rules, "Rogue", (a["node_id"], b["node_id"]), (b["node_id"], a["node_id"]))
 
 
 # --- Décodage : positions du Démoniste relevées en jeu (CLS1) ----------------------------------------------------
