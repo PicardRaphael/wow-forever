@@ -1124,13 +1124,13 @@
         "/classes/Warrior/trees/2/talents"
       ],
       "origin": "correctif_serveur",
-      "source": "DBCache.bin du client (build 70245, enUS, sha256 0a2ef77e28dd…), dispositions WoWDBDefs f8418844f53b ; poussée(s) 112347",
+      "source": "DBCache.bin du client (build 70245, enUS, sha256 6bf9bc559c0c…), dispositions WoWDBDefs f8418844f53b ; poussée(s) 112347",
       "certainty": "certain",
       "pushes": [
         112347
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-07T16:16:23Z"
+      "dbcache_date": "2026-10-08T06:17:33Z"
     }
   ],
   "pending": [],

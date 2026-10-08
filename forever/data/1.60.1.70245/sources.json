@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70245 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-07)",
+      "source": "Client 1.60.1.70245 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-08)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70245 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-07)",
+      "source": "Client 1.60.1.70245 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-08)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -187,7 +187,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 4 (forever install, 2026-10-07)"
+        "installé en révision 5 (forever install, 2026-10-08)"
       ]
     },
     "races.json": {
@@ -272,18 +272,18 @@
       "inherited_from": "1.60.1.70170"
     }
   },
-  "revision": 4,
-  "revised_at": "2026-10-07",
+  "revision": 5,
+  "revised_at": "2026-10-08",
   "hotfixes": {
     "dbcache": {
       "file": "Cache/ADB/enUS/DBCache.bin",
       "locale": "enUS",
       "format": 9,
       "build": 70245,
-      "size": 3407272,
-      "sha256": "0a2ef77e28dd7639504a654d68b497df67566bf4dfca78d9c36c420acc907f2a",
-      "file_date": "2026-10-07T11:14:24Z",
-      "read_at": "2026-10-07T16:16:23Z"
+      "size": 3649975,
+      "sha256": "6bf9bc559c0ccf4b04cd782660679efc7feb05dbb6a845be1cca742f1e74f09c",
+      "file_date": "2026-10-08T06:17:28Z",
+      "read_at": "2026-10-08T06:17:33Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -348,9 +348,10 @@
       112402,
       112425,
       112436,
-      112457
+      112457,
+      112486
     ],
-    "max_push": 112457,
+    "max_push": 112486,
     "seen_at": {
       "112323": null,
       "112347": null,
@@ -359,7 +360,8 @@
       "112402": null,
       "112425": null,
       "112436": null,
-      "112457": null
+      "112457": null,
+      "112486": null
     },
     "counts": {
       "CurvePoint": {
@@ -388,13 +390,13 @@
         "identical": 0
       },
       "Spell": {
-        "VALID": 20,
+        "VALID": 21,
         "DELETE": 1,
-        "identical": 5
+        "identical": 6
       },
       "SpellAuraOptions": {
         "VALID": 5,
-        "DELETE": 1,
+        "DELETE": 2,
         "identical": 1
       },
       "SpellClassOptions": {
@@ -403,9 +405,9 @@
         "identical": 4
       },
       "SpellEffect": {
-        "VALID": 25,
+        "VALID": 28,
         "DELETE": 0,
-        "identical": 8
+        "identical": 11
       },
       "SpellInterrupts": {
         "VALID": 2,
@@ -423,9 +425,9 @@
         "identical": 2
       },
       "SpellName": {
-        "VALID": 20,
+        "VALID": 21,
         "DELETE": 1,
-        "identical": 13
+        "identical": 14
       },
       "SpellPower": {
         "VALID": 3,
@@ -810,6 +812,14 @@
       },
       {
         "table": "Spell",
+        "rec_id": 8913,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      },
+      {
+        "table": "Spell",
         "rec_id": 12321,
         "status": "VALID",
         "push": 112347,
@@ -962,6 +972,14 @@
       },
       {
         "table": "SpellAuraOptions",
+        "rec_id": 122049,
+        "status": "DELETE",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
         "rec_id": 127917,
         "status": "VALID",
         "push": 112347,
@@ -1102,6 +1120,30 @@
         "status": "VALID",
         "push": 112349,
         "unique_id": 2588065957,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 686181,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 686182,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 686183,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
         "identical": true
       },
       {
@@ -1446,6 +1488,14 @@
         "status": "VALID",
         "push": 112349,
         "unique_id": 2588065957,
+        "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 8913,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
         "identical": true
       },
       {
@@ -1988,6 +2038,7 @@
       "Spell 1323968",
       "Spell 1323969",
       "SpellAuraOptions 120576",
+      "SpellAuraOptions 122049",
       "SpellAuraOptions 248613",
       "SpellClassOptions 84956",
       "SpellClassOptions 84957",
@@ -2036,17 +2087,17 @@
         }
       ],
       "dbreply": {
-        "0x021826bb": 15,
-        "ItemSparse": 10481,
-        "Spell": 68
+        "0x021826bb": 42,
+        "ItemSparse": 12753,
+        "Spell": 71
       },
       "item_reply": {
-        "0x198e28b5": 4655,
-        "0x5481af88": 4655,
-        "0xb50ca635": 4655,
-        "0xce88edca": 4655,
-        "Item": 4655,
-        "ItemSparse": 4655
+        "0x198e28b5": 4667,
+        "0x5481af88": 4667,
+        "0xb50ca635": 4667,
+        "0xce88edca": 4667,
+        "Item": 4667,
+        "ItemSparse": 4667
       },
       "unknown_hash": {
         "0x01325ca0": 5,
@@ -2058,7 +2109,7 @@
         "0x3ac83109": 485,
         "0x4553e9f7": 24,
         "0x5481af88": 4,
-        "0x61025756": 1,
+        "0x61025756": 2,
         "0x6f771411": 1,
         "0x7e692d56": 1,
         "0x7ea08450": 4,
@@ -2073,8 +2124,8 @@
         "0xc9e0a749": 12,
         "0xce88edca": 4,
         "0xd5a4e33a": 20,
-        "0xe064a75c": 3,
-        "0xe44abbd4": 3,
+        "0xe064a75c": 4,
+        "0xe44abbd4": 4,
         "0xf6bc85df": 1,
         "0xfb6e72fc": 9,
         "0xffd9d676": 1
@@ -2175,10 +2226,10 @@
       },
       "Spell": {
         "ok": true,
-        "reason": "disposition E3D134FB validée : 20 entrée(s) décodée(s), 13 comparée(s), 79% des valeurs égales au build",
-        "decoded": 20,
-        "compared": 13,
-        "equal_ratio": 0.7948717948717948,
+        "reason": "disposition E3D134FB validée : 21 entrée(s) décodée(s), 14 comparée(s), 81% des valeurs égales au build",
+        "decoded": 21,
+        "compared": 14,
+        "equal_ratio": 0.8095238095238095,
         "references_ok": null
       },
       "SpellAuraOptions": {
@@ -2199,10 +2250,10 @@
       },
       "SpellEffect": {
         "ok": true,
-        "reason": "disposition 5362E3D4 validée : 25 entrée(s) décodée(s), 16 comparée(s), 97% des valeurs égales au build, 27/27 références résolues",
-        "decoded": 25,
-        "compared": 16,
-        "equal_ratio": 0.9670138888888888,
+        "reason": "disposition 5362E3D4 validée : 28 entrée(s) décodée(s), 19 comparée(s), 97% des valeurs égales au build, 30/30 références résolues",
+        "decoded": 28,
+        "compared": 19,
+        "equal_ratio": 0.966374269005848,
         "references_ok": true
       },
       "SpellInterrupts": {
@@ -2231,9 +2282,9 @@
       },
       "SpellName": {
         "ok": true,
-        "reason": "disposition 782EE721 validée : 20 entrée(s) décodée(s), 13 comparée(s), 100% des valeurs égales au build",
-        "decoded": 20,
-        "compared": 13,
+        "reason": "disposition 782EE721 validée : 21 entrée(s) décodée(s), 14 comparée(s), 100% des valeurs égales au build",
+        "decoded": 21,
+        "compared": 14,
         "equal_ratio": 1.0,
         "references_ok": null
       },

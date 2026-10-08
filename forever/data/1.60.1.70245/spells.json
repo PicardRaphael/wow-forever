@@ -147,7 +147,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      116,
      205,
@@ -293,7 +293,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      133,
      143,
@@ -389,7 +389,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      2136,
      2137,
@@ -480,7 +480,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      2948,
      8444,
@@ -583,7 +583,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      11366,
      12505,
@@ -642,7 +642,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      401502,
      1237312,
@@ -722,7 +722,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      1312002,
      400640,
@@ -794,7 +794,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      400574,
      1239696,
@@ -895,7 +895,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      5143,
      5144,
@@ -959,7 +959,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      122,
      865,
@@ -1035,7 +1035,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      120,
      8492,
@@ -1115,7 +1115,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      1449,
      8437,
@@ -1196,7 +1196,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      10,
      6141,
@@ -1276,7 +1276,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      2120,
      2121,
@@ -1348,7 +1348,7 @@
    "source": {
     "build": "1.60.1.70245",
     "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
-    "read_at": "2026-10-07",
+    "read_at": "2026-10-08",
     "rank_spell_ids": [
      11113,
      13018,

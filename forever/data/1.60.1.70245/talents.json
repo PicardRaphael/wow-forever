@@ -40,7 +40,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        6057
       ],
@@ -103,7 +103,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11222
       ],
@@ -176,7 +176,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11237
       ],
@@ -222,7 +222,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11210
       ],
@@ -268,7 +268,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        29441
       ],
@@ -336,7 +336,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11213
       ],
@@ -378,7 +378,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        28574
       ],
@@ -420,7 +420,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11247
       ],
@@ -469,7 +469,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11242
       ],
@@ -514,7 +514,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        400574
       ],
@@ -560,7 +560,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11252
       ],
@@ -602,7 +602,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11255
       ],
@@ -654,7 +654,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        18462
       ],
@@ -697,7 +697,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        400588
       ],
@@ -728,7 +728,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        12043
       ],
@@ -801,7 +801,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11232
       ],
@@ -856,7 +856,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        15058
       ],
@@ -898,7 +898,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        12042
       ],
@@ -953,7 +953,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11078
       ],
@@ -1002,7 +1002,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        18459
       ],
@@ -1065,7 +1065,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11069
       ],
@@ -1133,7 +1133,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11119
       ],
@@ -1175,7 +1175,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11100
       ],
@@ -1227,7 +1227,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11103
       ],
@@ -1282,7 +1282,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11083
       ],
@@ -1331,7 +1331,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11108
       ],
@@ -1372,7 +1372,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11366
       ],
@@ -1430,7 +1430,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11095
       ],
@@ -1472,7 +1472,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11094
       ],
@@ -1514,7 +1514,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        400624
       ],
@@ -1567,7 +1567,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        29074
       ],
@@ -1616,7 +1616,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11115
       ],
@@ -1657,7 +1657,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11113
       ],
@@ -1720,7 +1720,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11124
       ],
@@ -1760,7 +1760,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11129
       ],
@@ -1811,7 +1811,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11189
       ],
@@ -1874,7 +1874,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11070
       ],
@@ -1937,7 +1937,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        29438
       ],
@@ -2000,7 +2000,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11207
       ],
@@ -2055,7 +2055,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11175
       ],
@@ -2097,7 +2097,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11165
       ],
@@ -2149,7 +2149,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11071
       ],
@@ -2198,7 +2198,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11151
       ],
@@ -2253,7 +2253,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11160
       ],
@@ -2292,7 +2292,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        1312002
       ],
@@ -2344,7 +2344,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11185
       ],
@@ -2386,7 +2386,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        16757
       ],
@@ -2421,7 +2421,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11958
       ],
@@ -2470,7 +2470,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11170
       ],
@@ -2519,7 +2519,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11190
       ],
@@ -2550,7 +2550,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        12472
       ],
@@ -2603,7 +2603,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        400647
       ],
@@ -2686,7 +2686,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11180
       ],
@@ -2726,7 +2726,7 @@
      "source": {
       "build": "1.60.1.70245",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-07",
+      "read_at": "2026-10-08",
       "client_spell_ids": [
        11426
       ],
