@@ -30,3 +30,22 @@ def test_class_witness_is_legal_encoded_and_read_back(deps, name):
     assert block["status"] == "ok" and block["code"] == case["expected_code"]
     back = decode_code(addon, deps, case["expected_code"])
     assert back["class"] == case["class"] and back["talents"] == case["talents"] and back["legal"] is True
+
+
+def test_class_witnesses_verified_in_game():
+    """Relevé de l'utilisateur du 2026-10-08 : les deux codes s'affichent en jeu exactement comme prévu."""
+    for case in CASES.values():
+        assert case["verified_in_game"] == "import"
+        assert "relevé en jeu du 2026-10-08" in case["source"]
+
+
+@pytest.mark.parametrize(
+    ("class_name", "verified"), [("Mage", True), ("Hunter", True), ("Warlock", True), ("Rogue", False)]
+)
+def test_export_says_which_classes_were_read_back_in_game(deps, class_name, verified):
+    block = export_build(load_addon(deps), class_name, 20, {}, None)
+    assert block["status"] == "ok" and block["certainty"] == "certain"  # format v6 relu en jeu (décision 210)
+    prov = block["provenance"]
+    assert prov["class_verified_in_game"] is verified
+    source = prov["class_verified_in_game_source"]
+    assert (source is not None and "2026-10-08" in source) if verified else source is None
