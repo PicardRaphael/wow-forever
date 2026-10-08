@@ -22,4 +22,5 @@
   descriptions et tables `legacy`, `learn`, `coef`, `racials`, `renames`, `orderV1` à `orderV5` de `Data.lua`.
 - `class_witnesses.json` : codes de test du Chasseur (`hunter-40`, par Improved Stings et Intimidation) et du
   Démoniste (`warlock-30`, par Improved Life Tap et Amplify Curse), builds légaux construits le 2026-10-08 sur
-  1.60.1.70245 r6 et encodés par `export_build` ; écrits à la main, `verified_in_game` nul jusqu'à l'import en jeu.
+  1.60.1.70245 r6 et encodés par `export_build` ; écrits à la main ; importés en jeu le 2026-10-08, affichés comme prévu (`verified_in_game` :
+  `import`).

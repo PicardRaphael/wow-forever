@@ -1,5 +1,5 @@
 {
- "note": "Codes de test du Chasseur et du Démoniste (relevés du 2026-10-08) : builds fixes, légaux sur nos données, qui passent par Improved Stings (Chasseur), Improved Life Tap et Amplify Curse (Démoniste) ; rangs partiels voulus pour lire le rang en jeu. verified_in_game : null jusqu'à l'import en jeu par l'utilisateur.",
+ "note": "Codes de test du Chasseur et du Démoniste (relevés du 2026-10-08) : builds fixes, légaux sur nos données, qui passent par Improved Stings (Chasseur), Improved Life Tap et Amplify Curse (Démoniste) ; rangs partiels voulus pour lire le rang en jeu. verified_in_game : import, relevé en jeu de l'utilisateur du 2026-10-08.",
  "cases": {
   "hunter-40": {
    "class": "Hunter",
@@ -21,8 +21,8 @@
     "improvedStings",
     "intimidation"
    ],
-   "source": "build de test construit le 2026-10-08 sur 1.60.1.70245 r6 (légal selon forever talents check), encodé par export_build avec Talents Forever 0.37.1 (empreinte de Data.lua 4f5f53571fb7) ; à importer en jeu",
-   "verified_in_game": null
+   "source": "build de test construit le 2026-10-08 sur 1.60.1.70245 r6 (légal selon forever talents check), encodé par export_build avec Talents Forever 0.37.1 (empreinte de Data.lua 4f5f53571fb7) ; à importer en jeu ; relevé en jeu du 2026-10-08 (utilisateur) : code importé dans Talents Forever 0.37.1, affiché exactement comme prévu (talents, rangs, rangées et colonnes, arbres vides, points totaux)",
+   "verified_in_game": "import"
   },
   "warlock-30": {
    "class": "Warlock",
@@ -42,8 +42,8 @@
     "improvedLifeTap",
     "amplifyCurse"
    ],
-   "source": "build de test construit le 2026-10-08 sur 1.60.1.70245 r6 (légal selon forever talents check), encodé par export_build avec Talents Forever 0.37.1 (empreinte de Data.lua 4f5f53571fb7) ; à importer en jeu",
-   "verified_in_game": null
+   "source": "build de test construit le 2026-10-08 sur 1.60.1.70245 r6 (légal selon forever talents check), encodé par export_build avec Talents Forever 0.37.1 (empreinte de Data.lua 4f5f53571fb7) ; à importer en jeu ; relevé en jeu du 2026-10-08 (utilisateur) : code importé dans Talents Forever 0.37.1, affiché exactement comme prévu (talents, rangs, rangées et colonnes, arbres vides, points totaux)",
+   "verified_in_game": "import"
   }
  }
 }

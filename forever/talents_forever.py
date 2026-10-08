@@ -35,6 +35,13 @@ VERIFIED_IN_GAME = {
         "tests/fixtures/talents_forever/mage_builds.json (leveling-20)"
     )
 }
+# Classes dont un code v6 a été importé en jeu et affiché comme prévu (talents, rangs, rangées, colonnes, arbres vides,
+# points) : preuve par classe de la table de correspondance, en plus de la certitude du format.
+CLASSES_VERIFIED_IN_GAME = {
+    "Mage": "relevé en jeu de l'utilisateur du 2026-10-08 (témoins leveling-20 et leveling-20-current de mage_builds.json)",
+    "Hunter": "relevé en jeu de l'utilisateur du 2026-10-08 (témoin hunter-40 de class_witnesses.json)",
+    "Warlock": "relevé en jeu de l'utilisateur du 2026-10-08 (témoin warlock-30 de class_witnesses.json)",
+}
 
 
 class BuildWithExport(BuildReport):
@@ -444,7 +451,7 @@ def tf_provenance(deps: Deps, addon: TfAddon | None, certainty: Certainty, notes
     return local_provenance(deps, certainty=certainty, assumptions=[note, *notes])
 
 
-def _export_provenance(addon: TfAddon | None, talented_bonus: int) -> dict[str, Any]:
+def _export_provenance(addon: TfAddon | None, talented_bonus: int, class_name: str) -> dict[str, Any]:
     ident: dict[str, Any] = (
         addon.describe()
         if addon is not None
@@ -452,6 +459,7 @@ def _export_provenance(addon: TfAddon | None, talented_bonus: int) -> dict[str, 
     )
     ident.setdefault("fingerprint", None)
     verified = VERIFIED_IN_GAME.get(str(ident.get("codeVersion"))) if addon is not None and addon.supported else None
+    class_source = CLASSES_VERIFIED_IN_GAME.get(class_name) if verified is not None else None
     note = None
     if talented_bonus > 0:
         note = (
@@ -463,6 +471,8 @@ def _export_provenance(addon: TfAddon | None, talented_bonus: int) -> dict[str, 
         **ident,
         "verified_in_game": verified is not None,
         "verified_in_game_source": verified,
+        "class_verified_in_game": class_source is not None,
+        "class_verified_in_game_source": class_source,
         "talented_note": note,
     }
 
@@ -497,7 +507,7 @@ def export_build(
         "order_note": None,
         "closest_popular": None,
         "certainty": None,
-        "provenance": _export_provenance(addon, talented_bonus),
+        "provenance": _export_provenance(addon, talented_bonus, class_name),
     }
 
     def refuse(status: str, reason: str) -> dict[str, Any]:
