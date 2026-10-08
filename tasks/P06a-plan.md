@@ -584,6 +584,28 @@ de Forever absent, etc.).
    9.9 ForeverLogger toujours actif. **À jouer avant le 2026-10-21**, non bloquant pour la fusion (comme FA1).
 7. `uv run tasks.py verify` vert ; CI verte sous Ubuntu et Windows.
 
+## Exécution : sonde 0.4 de `claude` (2026-10-08, accord de l'utilisateur)
+Validation du plan avec une modification : l'outil `Skill` est autorisé dans la conversation « jeu » (choix 10
+remplacé). Relevés sur `claude` 2.1.294 (question « Quelle est la version des données ? » puis reprise) :
+1. Ligne du choix 9 telle quelle, lancée dans le dépôt : **le hook `Stop` du projet** (`.claude/hooks/test_on_stop.py`,
+   tests rapides) se déclenche et **remplace la réponse finale** par un commentaire sur les tests ; 134 outils exposés
+   (connecteurs claude.ai : Gmail, Drive, Jira…, refusés par `dontAsk` mais visibles) ; coût d'environ 0,8 $.
+2. `--strict-mcp-config` seul retire aussi le serveur du plugin (aucun outil forever : le routeur répond « plugin mal
+   installé »). `--restricted` seul ignore les réglages (hooks du projet, plugins de l'utilisateur) mais garde les
+   connecteurs claude.ai.
+3. **Ligne retenue** : `--tools Skill`, `--restricted`, `--strict-mcp-config`, `--mcp-config` avec le seul serveur
+   `forever` (`uv run --no-sync --quiet --project <dépôt> forever mcp`), `--plugin-dir <dépôt>/plugin` (skills et
+   hooks du plugin), `--allowedTools` = `Skill` et les six outils au préfixe **`mcp__forever__`**, `dontAsk`,
+   `--permission-prompts none` ; **dossier de travail dédié hors du dépôt** (`<cache>/bridge/conversation/` : ni
+   `CLAUDE.md` du dépôt, ni skills de développement, ni hooks du projet). Relevé : 7 outils exactement, un seul serveur
+   MCP, skills du plugin présents (`Skill` → `forever:forever-router` ou `forever:forever-mage` selon la question),
+   reprise par `--resume` sur la même session, 6 à 15 s par message, quelques centimes.
+4. Événements : `system/hook_started`, `system/hook_response`, `system/init` (`tools`, `mcp_servers`, `skills`,
+   `session_id`), `assistant` (`thinking`, `tool_use`, `text`), `user` (`tool_result` en texte JSON), `rate_limit_event`,
+   `result` (`result`, `session_id`, `is_error`, `permission_denials`, `num_turns`). Fixtures
+   `tests/fixtures/bridge/claude_stream_status.jsonl` et `claude_stream_resume.jsonl` (identifiants et chemins
+   remplacés).
+
 ## Validation
 Plan à valider par l'utilisateur. Exécution dans une nouvelle session (`/tranche P06a`), branche `p06a`, un cycle
 rouge → vert par bloc.

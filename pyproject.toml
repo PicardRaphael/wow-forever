@@ -24,6 +24,7 @@ dev = [
     "mypy>=1.11",
     "types-PyYAML",
     "pytest-xdist>=3.8.0",
+    "lupa>=2.8",
 ]
 
 [tool.pytest.ini_options]
