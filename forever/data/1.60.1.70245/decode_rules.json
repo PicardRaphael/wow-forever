@@ -554,8 +554,34 @@
     "source": "relevé en jeu (fenêtre des talents du Paladin de l'utilisateur, recherche par nom), 2026-09-30",
     "certainty": "certain"
    }
+  },
+  "Warlock": {
+   "improvedLifeTap": {
+    "tier": 1,
+    "col": 1,
+    "source": "relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Démoniste, arbre Affliction)",
+    "certainty": "certain"
+   },
+   "amplifyCurse": {
+    "tier": 3,
+    "col": 3,
+    "source": "relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Démoniste, arbre Affliction)",
+    "certainty": "certain"
+   }
   }
  },
+ "observed_absent": {
+  "note": "FA1, relevés du 2026-10-08 : talent du client absent de l'arbre en jeu (relevé de l'utilisateur, certitude certain) ; le nœud est écarté (dropped_nodes, raison et source) après contrôle : une clé inconnue ou un autre nœud sous cette clé arrêtent le décodage. Improved Serpent Sting : nœud gardé dans le client à une ordonnée dix fois la grille (PosY 39300), replacé à tort en rangée 4 par la règle extra_zero_divisor ; en jeu, Marksmanship porte Improved Stings (nœud 110870), et pas lui (CLS3).",
+  "Hunter": {
+   "improvedSerpentSting": {
+    "node_id": 105003,
+    "source": "relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Chasseur, arbre Marksmanship : Improved Stings affiché, Improved Serpent Sting absent)",
+    "certainty": "certain"
+   }
+  }
+ },
+ "circular_sufficient_edges": "drop",
+ "circular_sufficient_edges_note": "FA1, relevé du 2026-10-08 (DON5) : une arête suffisante dont la source exige déjà la cible (prérequis requis, ou suffisant quand il est seul, directement ou par une chaîne) ne rend jamais la cible disponible : écartée (dropped_edges). Cas du client : Bestial Wrath vers Intimidation (Chasseur), retour de l'arête Intimidation vers Bestial Wrath ; en jeu, Intimidation exige Bestial Swiftness. Une arête requise circulaire, ou un talent qui n'a plus de voie, arrêtent le décodage.",
  "gametables": {
   "armormitigationbylvl": 1385707,
   "basemp": 1391664,

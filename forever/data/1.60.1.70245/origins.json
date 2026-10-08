@@ -74,7 +74,8 @@
         "/classes_note",
         "/races_note",
         "/gametables_note",
-        "/hotfix_related_tables_note"
+        "/hotfix_related_tables_note",
+        "/circular_sufficient_edges_note"
       ],
       "reason": "notes de lecture, texte"
     },
@@ -946,7 +947,8 @@
         "/hotfix_related_tables",
         "/pet_tables",
         "/localized_pet_tables",
-        "/pets"
+        "/pets",
+        "/circular_sufficient_edges"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1, CH0)",
@@ -980,6 +982,15 @@
       ],
       "origin": "journal",
       "source": "positions relevées en jeu par l'utilisateur (décision 144)",
+      "certainty": "certain"
+    },
+    {
+      "file": "decode_rules.json",
+      "paths": [
+        "/observed_absent"
+      ],
+      "origin": "journal",
+      "source": "talents absents de l'arbre en jeu, relevé de l'utilisateur du 2026-10-08 (décision 210)",
       "certainty": "certain"
     },
     {
