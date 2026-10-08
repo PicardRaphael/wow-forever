@@ -141,7 +141,9 @@ parfois daté) ; **wow-ai** = mesuré par wow-ai sur Forever, non revérifié ; 
    `faction`, `zone`, `subzone`, `map` (uiMapID), `talents` (`nœud:rang` séparés par des virgules, rangs achetés
    seulement), `gear` (`emplacement:objet:nom` séparés par `;`), `client` (version du client). Question limitée à
    255 caractères (zone de saisie). Contexte envoyé à chaque message (pas seulement quand il change : plus simple, il
-   tient dans la bande).
+   tient dans la bande). **Dépassement** (contexte + question au-delà de 1 792 octets) : l'addon allège le contexte
+   dans cet ordre, en s'arrêtant dès que le message tient : noms d'objets coupés à 20 caractères, puis noms d'objets
+   retirés (numéros gardés), puis `subzone`, puis `gear` ; la question n'est jamais coupée.
 7. **Signaux** : `sig/NN.wav` (réponse prête), `ack/NN.wav` (message reçu), `NN = ((id − 1) mod 64) + 1` ; avant
    d'envoyer le message `id`, l'addon vérifie que `sig/NN` et `ack/NN` ne jouent pas déjà (sinon signaux « non
    fiables » pour ce message : relevé de la réserve à horaire fixe, comme wow-ai : 5, 10, 16, 24, 34, 46, 60 s puis
@@ -219,7 +221,10 @@ Ordre fixé par la date : le **transport d'abord**, avec une première sonde en 
    question fixe (« Quelle est la version des données ? ») lancée avec la ligne de commande du choix 9, puis reprise
    par `--resume`. Elle fixe : le préfixe des outils sous `--plugin-dir` (attendu `mcp__plugin_forever_forever__`) ;
    si `--strict-mcp-config` garde le serveur du plugin (sinon il n'est pas utilisé : la liste d'autorisations et
-   `dontAsk` suffisent à refuser tout autre outil) ; la forme des événements `system`, `assistant`, `user`
+   `dontAsk` suffisent à refuser tout autre outil) ; si `--plugin-dir` sur le plugin `forever`, déjà installé au
+   niveau de l'utilisateur, crée un second serveur MCP du même nom ; le temps de démarrage avec et sans
+   `--strict-mcp-config` et `--setting-sources project` (les serveurs MCP de l'utilisateur, context7, Serena…, se
+   chargeraient sinon à chaque message) ; la forme des événements `system`, `assistant`, `user`
    (`tool_result`) et `result` (`session_id`, `permission_denials`, `is_error`). Sa sortie, identifiants remplacés,
    devient la fixture `tests/fixtures/bridge/claude_stream_status.jsonl` et `claude_stream_resume.jsonl` ; une
    troisième, écrite à la main d'après la forme relevée, porte un refus d'outil (`claude_stream_denied.jsonl`).
@@ -287,7 +292,7 @@ Ordre fixé par la date : le **transport d'abord**, avec une première sonde en 
 | `addon/ForeverBridge/Inbox.lua`, `Status.lua` | fichiers d'attente écrasés par le pont dans l'addon installé | non |
 | `scripts/check_addon.py` | SavedVariable lue dans le `.toc`, nouvelles interdictions, dessin réservé à ForeverBridge | non |
 | `.claude/skills/addon-forever/SKILL.md` | skill de développement (étape 0.3) | non |
-| `tests/fixtures/bridge/` | flux `claude`, SavedVariables avec boîte d'envoi, client simulé Lua, bandes BMP | `wow_stub.lua` inspiré (réécrit) |
+| `tests/fixtures/bridge/` | flux `claude`, SavedVariables avec boîte d'envoi, client simulé Lua (`wow_stub.lua`, **écrit de zéro** pour nos seules API, sans recopier celui de wow-ai), bandes BMP | non |
 | `tests/fixtures/addon/bad/` | nouveaux cas négatifs | non |
 
 **Licence** : chaque fichier marqué « oui » porte en tête, en commentaire, la mention « Contient du code adapté de
@@ -450,6 +455,8 @@ Tous sans réseau, sans jeu ni écran ; écrits dans `tmp_path`. Valeurs calcul�
   faux `Popen` qui rend le flux de la fixture → même résultat que `parse_stream`.
 - Le prompt système ne contient aucun champ de contexte ; le message (entrée standard) commence par le bloc de contexte
   puis la question.
+- Entrée standard en octets UTF-8 explicites : une question accentuée (« Quel talent prendre à Westfall ? ») arrive
+  intacte au faux `Popen`.
 
 ### `tests/unit/test_bridge_loop.py` (bloc D)
 - Capture simulée qui rend une bande valide (message 3, question) : un `message` et un `command` journalisés ;
@@ -493,10 +500,12 @@ Tous sans réseau, sans jeu ni écran ; écrits dans `tmp_path`. Valeurs calcul�
    un seul emplacement chargé, message plus en attente.
 9. 64 emplacements chargés → statut contenant `/reload` ; au `PLAYER_LOGIN` suivant, `Inbox.lua` simulé appliqué.
 10. `sig/02.wav` déjà valide avant l'envoi du message 2 → signaux marqués non fiables, emplacement chargé à 5 s.
-11. API en erreur ou valeur secrète (talents, équipement simulés en erreur) → contexte sans ces clés, aucune erreur
+11. Contexte trop gros (question de 255 caractères, 51 nœuds, 19 pièces aux noms de 60 caractères) : message envoyé
+    quand même, sous 1 792 octets, question entière, clés allégées dans l'ordre du choix 6.
+12. API en erreur ou valeur secrète (talents, équipement simulés en erreur) → contexte sans ces clés, aucune erreur
     Lua.
-12. `Status.lua` simulé lu à la connexion → ligne d'état affichée ; état remplacé par celui de l'emplacement chargé.
-13. Fonctions interdites définies dans le client simulé comme pièges (`CastSpellByName`, `UseAction`,
+13. `Status.lua` simulé lu à la connexion → ligne d'état affichée ; état remplacé par celui de l'emplacement chargé.
+14. Fonctions interdites définies dans le client simulé comme pièges (`CastSpellByName`, `UseAction`,
     `SendChatMessage`, `RunMacroText`, `CreateMacro`, `ReloadUI`) : aucun appel sur tous les scénarios ; aucun
     `RegisterEvent` hors `pcall` ; aucun abonnement à `COMBAT_LOG_EVENT*`.
 
