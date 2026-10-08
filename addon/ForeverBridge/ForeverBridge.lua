@@ -1,0 +1,1 @@
+-- ForeverBridge (squelette du bloc A, P06a).

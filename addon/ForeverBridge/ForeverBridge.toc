@@ -1,0 +1,9 @@
+## Interface: 16001
+## Title: ForeverBridge
+## Notes: Pont de conversation de forever-core : question en jeu, réponse de l'agent, état des données (P06a).
+## Author: forever-core
+## Version: 0.1.0
+## SavedVariables: ForeverBridgeDB
+
+Codec.lua
+ForeverBridge.lua
