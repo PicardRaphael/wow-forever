@@ -208,11 +208,6 @@ domaine qu'il cite.
 
 - Produit TACT au lancement (wow_classic_forever ?). Le client installé est `wow_classic_beta` 1.60.1.70170 (`.build.info`, lu sur disque le 2026-10-02) ; le produit du lancement reste inconnu.
 
-<a id="don5"></a>
-### DON5
-
-- Sens de `TraitEdge.Type` (2 suffisant, 3 requis, 0 visuel) repris de l'API du client (probable) : vérifier en jeu sur Intimidation (Chasseur, deux prérequis suffisants).
-
 <a id="don6"></a>
 ### DON6
 
@@ -324,21 +319,10 @@ domaine qu'il cite.
 
 ## Autres classes
 
-<a id="cls1"></a>
-### CLS1
-
-- Paliers d'Improved Life Tap et d'Amplify Curse (Démoniste, ordonnées hors grille) : deux calculateurs communautaires de la bêta 70124 (probable, `decode_rules.json`, `community_positions`) ; colonnes non établies : relever en jeu comme pour le Paladin.
-- FA1 (2026-10-07, `docs/research/talents-forever-FA1.md`) : Talents Forever 0.37.1 place Improved Life Tap en rangée 1, colonne 1 et Amplify Curse en rangée 3, colonne 3 de sa liste d'Affliction (indice, `suppose`), en accord avec les paliers communautaires de `classes.json` ; l'appariement strict (même rangée) les laisse sans correspondance : l'export du Démoniste reste bloqué jusqu'au relevé en jeu.
-
 <a id="cls2"></a>
 ### CLS2
 
 - Mana rendue par Improved Seal of Fury : client 1.60.1.70124 (2026-10-02) : sort 1314103, `$m1` nul, `$m2` 15 (hausse par niveau de l'attaquant au-dessus du Paladin), `$m3` 3 (plafond `$m2 × $m3`) ; le sort 1314104 rend `$PL` de mana (variable non résolue par `forever/pipeline/tooltip.py`, effet d'énergie à 1 point de base). Le « 60 » d'un calculateur n'est pas dans le client : écart, rien n'est importé. Relever l'infobulle en jeu.
-
-<a id="cls3"></a>
-### CLS3
-
-- Improved Serpent Sting (nœud 105003, sort 19464, Marksmanship, rangée 4, colonne 4 dans `classes.json` de 1.60.1.70245) n'apparaît pas dans la liste de Marksmanship de Talents Forever 0.37.1 (16 positions contre 17 chez nous). Le client fait foi tant que le jeu ne dit pas le contraire ; l'export du Chasseur est bloqué avec ce talent nommé, et la table de correspondance, reconstruite à chaque appel, le revérifie à chaque mise à jour de l'addon.
 
 ## Familiers du Chasseur
 

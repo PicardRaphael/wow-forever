@@ -1106,6 +1106,7 @@ mechanics:
       - "forever/data/1.60.1.70124/classes.json (PV1 : arbres des 9 classes, prérequis typés d'après TraitEdge.Type, probable)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_tables : NumTalentsAtLevel, TraitCond.SpentAmountRequired, T08b)"
       - "Cache/ADB/enUS/DBCache.bin du client 1.60.1.70170 (T08c : arbres corrigés par le serveur, poussée 112347 du 2026-10-02, appliqués en mode forever)"
+      - "relevés en jeu de l'utilisateur du 2026-10-08 : Intimidation exige Bestial Swiftness (DON5, arête circulaire écartée), Improved Serpent Sting absent (CLS3), Improved Life Tap et Amplify Curse placés (CLS1) ; forever/data/1.60.1.70245 révision 5"
     tests:
       - tests/unit/test_engine_talents.py::test_prerequisites
       - tests/unit/test_engine_talents.py::test_build_legality
@@ -1121,11 +1122,14 @@ mechanics:
       - tests/unit/test_class_build_legality.py::test_rejects_missing_prerequisite
       - tests/unit/test_class_build_legality.py::test_mage_check_is_unchanged
       - tests/unit/test_class_build_legality.py::test_unresolved_tier_uses_community_tier_else_is_undecidable
+      - tests/unit/test_in_game_survey.py::test_intimidation_without_bestial_swiftness_is_illegal
+      - tests/unit/test_in_game_survey.py::test_circular_sufficient_edge_is_dropped
+      - tests/unit/test_in_game_survey.py::test_observed_absent_node_is_dropped_with_its_source
       - tests/unit/test_decode_mechanics.py::test_first_talent_level_equals_num_talents_at_level
       - tests/unit/test_decode_mechanics.py::test_points_per_tier_equals_trait_cond_step
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis requis : tous au maximum ; prérequis suffisants : un au maximum"
-    note: "T08b, bloc B : premier niveau à point de talent (NumTalentsAtLevel) et points par palier de chaque classe (TraitCond, suite k × pas, None sinon) décodés du client (character_scaling.json talents), lus en mode forever ; mode seed : mechanics.json (fm.py) ; T08c : en mode forever, les arbres sont décodés des tables du build corrigées par les valeurs des correctifs du serveur (DBCache.bin, dispositions de WoWDBDefs validées), origine correctif_serveur ; le mode seed n'en lit aucune"
+    note: "T08b, bloc B : premier niveau à point de talent (NumTalentsAtLevel) et points par palier de chaque classe (TraitCond, suite k × pas, None sinon) décodés du client (character_scaling.json talents), lus en mode forever ; mode seed : mechanics.json (fm.py) ; T08c : en mode forever, les arbres sont décodés des tables du build corrigées par les valeurs des correctifs du serveur (DBCache.bin, dispositions de WoWDBDefs validées), origine correctif_serveur ; le mode seed n'en lit aucune ; 2026-10-08 (décision 210) : arêtes suffisantes circulaires écartées au décodage (dropped_edges), talents absents de l'arbre en jeu écartés (observed_absent), positions relevées du Démoniste ; le moteur de légalité est inchangé"
   - id: G4
     categorie: personnage
     description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"

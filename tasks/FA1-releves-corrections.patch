@@ -1,0 +1,251 @@
+diff --git a/tests/unit/test_addons_status.py b/tests/unit/test_addons_status.py
+index 8067a25..b6ad9ae 100644
+--- a/tests/unit/test_addons_status.py
++++ b/tests/unit/test_addons_status.py
+@@ -145,6 +145,6 @@ def test_talents_forever_change_rechecks_the_export_without_pending_entry(tmp_pa
+     recheck = tf["recheck"]
+     assert recheck["code_version"] == "6" and recheck["code_version_supported"] is True
+     assert recheck["export"]["Mage"] == {"status": "possible", "talents": []}
+-    assert recheck["export"]["Hunter"] == {"status": "bloque", "talents": ["improvedSerpentSting"]}
+-    assert recheck["export"]["Warlock"] == {"status": "bloque", "talents": ["amplifyCurse", "improvedLifeTap"]}
+-    assert recheck["unmatched"] == 3 and recheck["renumbered"] == 4
++    assert recheck["export"]["Hunter"] == {"status": "possible", "talents": []}
++    assert recheck["export"]["Warlock"] == {"status": "possible", "talents": []}
++    assert recheck["unmatched"] == 0 and recheck["renumbered"] == 4
+diff --git a/tests/unit/test_class_build_legality.py b/tests/unit/test_class_build_legality.py
+index 1aa591a..e51f181 100644
+--- a/tests/unit/test_class_build_legality.py
++++ b/tests/unit/test_class_build_legality.py
+@@ -97,10 +97,15 @@ def test_mage_check_is_unchanged(gd):
+ 
+ 
+ def test_unresolved_tier_uses_community_tier_else_is_undecidable(gd):
+-    warlock = gd.classes["Warlock"]
+-    placed = [t for t in talents(gd, "Warlock").values() if t["tier"] is None]
+-    assert placed and all(t.get("tier_community") for t in placed)  # prémisse : paliers communautaires
+-    t = placed[0]
++    from dataclasses import replace
++
++    # Plus aucun palier inconnu depuis le relevé du 2026-10-08 (CLS1) : palier retiré sur une copie, palier
++    # communautaire égal au palier relevé.
++    trees = copy.deepcopy(gd.classes["Warlock"].trees)
++    t = next(x for tree in trees for x in tree["talents"] if x["key"] == "amplifyCurse")
++    t["tier_community"] = {"tier": t["tier"], "sources": ["copie de test"], "certainty": "probable"}
++    t["tier"] = None
++    warlock = replace(gd.classes["Warlock"], trees=trees)
+     pts = (
+         filler(gd, "Warlock", t["tree"], t["tier_community"]["tier"], {t["key"]})
+         if t["tier_community"]["tier"] > 1
+@@ -112,8 +117,6 @@ def test_unresolved_tier_uses_community_tier_else_is_undecidable(gd):
+     for tree in blind:
+         for x in tree["talents"]:
+             x.pop("tier_community", None)
+-    from dataclasses import replace
+-
+     errors = check_class_build(replace(warlock, trees=blind), gd.constants.talents, pts, 60)
+     assert any("non décidable" in e and t["name"] in e for e in errors)
+ 
+diff --git a/tests/unit/test_decode_classes.py b/tests/unit/test_decode_classes.py
+index 6defeab..7316689 100644
+--- a/tests/unit/test_decode_classes.py
++++ b/tests/unit/test_decode_classes.py
+@@ -142,7 +142,9 @@ def test_extra_zero_node_is_placed(doc, decode_rules):
+             if not on_grid(y, rows, geo["row_step"]) and y % div == 0 and on_grid(y // div, rows, geo["row_step"]):
+                 assert t["tier"] == (y // div - geo["row_base"]) // geo["row_step"] + 1
+                 corrected += 1
+-    assert corrected >= 1  # prémisse : la fixture porte un nœud au zéro en trop
++    # Aucun talent gardé au zéro en trop : le seul cas, Improved Serpent Sting, est absent de l'arbre en jeu
++    # (relevé du 2026-10-08, observed_absent) ; mécanisme testé dans test_decode_talents.py.
++    assert corrected == 0
+ 
+ 
+ def test_off_grid_nodes_are_listed_unresolved(doc, decode_rules):
+@@ -172,7 +174,7 @@ def test_off_grid_nodes_are_listed_unresolved(doc, decode_rules):
+             assert u["reason"]
+         if expected:
+             with_unresolved.add(cls)
+-    assert "Warlock" in with_unresolved  # paliers du Démoniste : sources communautaires seulement
++    assert with_unresolved == set()  # Paladin et Démoniste placés par les relevés en jeu (observed_positions)
+ 
+ 
+ def test_stale_duplicate_nodes_are_dropped_for_the_newer_node(doc, decode_rules):
+@@ -189,6 +191,8 @@ def test_stale_duplicate_nodes_are_dropped_for_the_newer_node(doc, decode_rules)
+     for cls, c in doc["classes"].items():
+         kept = {t["node_id"]: t for t in talents_of(c)}
+         for d in c["dropped_nodes"]:
++            if d["kept_node"] is None:
++                continue  # absence relevée en jeu (observed_absent), pas un doublon
+             assert d["kept_node"] in kept and d["kept_node"] > d["node_id"]  # le nœud le plus récent l'emporte
+             assert spell_of(d["node_id"]) == spell_of(d["kept_node"]) == kept[d["kept_node"]]["spell_id"]
+             x, y = int(nodes[d["node_id"]]["PosX"]), int(nodes[d["node_id"]]["PosY"])
+diff --git a/tests/unit/test_talents_forever_export.py b/tests/unit/test_talents_forever_export.py
+index 60b60b0..69693a6 100644
+--- a/tests/unit/test_talents_forever_export.py
++++ b/tests/unit/test_talents_forever_export.py
+@@ -81,9 +81,10 @@ def test_order_flags(addon):
+ 
+ def test_provenance_and_certainty(addon):
+     block = export_case(addon, "leveling-20")
+-    assert block["certainty"] == "probable"
++    assert block["certainty"] == "certain"
+     prov = block["provenance"]
+     assert prov["format"] == "v6"
++    assert prov["verified_in_game"] is True
+     assert prov["version"] == "0.37.1"
+     assert prov["build"] == "1.60.1.70170" and prov["generated"] == "2026-10-04" and prov["codeVersion"] == "6"
+     assert len(prov["fingerprint"]) == 12
+@@ -132,9 +133,9 @@ def test_other_generation_is_not_supported(tmp_path, make_deps):
+     assert block["status"] == "format_non_pris_en_charge" and block["code"] is None
+ 
+ 
+-def test_hunter_export_is_blocked_with_the_missing_talent(addon):
++def test_hunter_export_is_no_longer_blocked(addon):
+     block = export_build(addon, "Hunter", 20, {}, None)
+-    assert block["status"] == "bloque" and "improvedSerpentSting" in block["reason"]
++    assert block["status"] == "ok" and block["reason"] is None
+ 
+ 
+ def test_decode_refusals(addon, deps):
+@@ -186,7 +187,7 @@ def test_mcp_build_carries_the_export(addon, deps):
+     assert not r.is_error
+     data = r.structured_content
+     block = data["export"]["talents_forever"]
+-    assert block["status"] == "ok" and block["certainty"] == "probable"
++    assert block["status"] == "ok" and block["certainty"] == "certain"
+     talents, order = read_back(addon, deps, block)
+     assert talents == {k: v for k, v in data["talents"].items() if v}
+     assert order == [s["talent"] for s in data["order"] if s["talent"]]
+diff --git a/tests/unit/test_talents_forever_layout.py b/tests/unit/test_talents_forever_layout.py
+index 497c4f5..8a09345 100644
+--- a/tests/unit/test_talents_forever_layout.py
++++ b/tests/unit/test_talents_forever_layout.py
+@@ -74,25 +74,15 @@ def test_warrior_matched_despite_renumbered_nodes(addon):
+     ]
+ 
+ 
+-def test_hunter_blocked_by_a_talent_missing_from_talents_forever(addon):
++def test_hunter_all_matched_after_the_in_game_survey(addon):
+     hunter = addon.layouts["Hunter"]
+-    assert matched(hunter) == 50 and not hunter.exportable
+-    assert [(u["key"], u["reason"]) for u in hunter.unmatched] == [("improvedSerpentSting", "seulement_forever")]
+-    reason = hunter.blocked
+-    assert "Improved Serpent Sting" in reason and "improvedSerpentSting" in reason
+-    assert "absent de Talents Forever" in reason and "0.37.1" in reason
+-    assert "à chaque mise à jour de l'addon" in reason
++    assert matched(hunter) == 50 and hunter.exportable and hunter.unmatched == ()
++    assert hunter.prereq_gaps == ()
+ 
+ 
+-def test_warlock_blocked_by_unknown_rows(addon):
++def test_warlock_all_matched_after_the_in_game_survey(addon):
+     warlock = addon.layouts["Warlock"]
+-    assert matched(warlock) == 50 and not warlock.exportable
+-    assert sorted((u["key"], u["reason"]) for u in warlock.unmatched) == [
+-        ("amplifyCurse", "position_inconnue"),
+-        ("improvedLifeTap", "position_inconnue"),
+-    ]
+-    assert "Improved Life Tap" in warlock.blocked and "Amplify Curse" in warlock.blocked
+-    assert "CLS1" in warlock.blocked
++    assert matched(warlock) == 52 and warlock.exportable and warlock.unmatched == ()
+ 
+ 
+ def test_trees_matched_by_index_tree_names_are_cosmetic(addon):
+@@ -101,7 +91,7 @@ def test_trees_matched_by_index_tree_names_are_cosmetic(addon):
+         assert layout.exportable, name
+         assert len(layout.tree_name_gaps) == 1, name
+     assert addon.layouts["Priest"].tree_names[2] == "Shadow"
+-    assert {"Paladin", "Rogue", "Druid", "Priest", "Shaman", "Mage", "Warrior"} == {
++    assert {"Paladin", "Rogue", "Druid", "Priest", "Shaman", "Mage", "Warrior", "Hunter", "Warlock"} == {
+         n for n, lay in addon.layouts.items() if lay.exportable
+     }
+ 
+@@ -135,12 +125,12 @@ def test_absent_addon_is_none(tmp_path, make_deps):
+ 
+ def test_crosscheck_of_the_installed_version(addon):
+     report = crosscheck_report(addon)
+-    assert report["totals"] == {"renumbered": 4, "unmatched": 3, "prereq": 1, "tree_names": 2}
++    assert report["totals"] == {"renumbered": 4, "unmatched": 0, "prereq": 0, "tree_names": 2}
+     assert report["game_version"] == LOCAL_VERSION
+     assert report["addon"]["version"] == "0.37.1" and report["addon"]["build"] == "1.60.1.70170"
+     hunter = report["classes"]["Hunter"]
+-    assert hunter["matched"] == 50 and hunter["export"] == "bloque"
+-    assert [g["key"] for g in hunter["prereq"]] == ["intimidation"]
++    assert hunter["matched"] == 50 and hunter["export"] == "possible"
++    assert hunter["prereq"] == []
+     assert report["classes"]["Mage"]["export"] == "possible"
+ 
+ 
+@@ -151,10 +141,6 @@ def test_crosscheck_render_is_deterministic(addon):
+         "0.37.1",
+         LOCAL_VERSION,
+         "lingeringRage",
+-        "improvedSerpentSting",
+-        "improvedLifeTap",
+-        "amplifyCurse",
+-        "intimidation",
+         "Shadow Magic",
+         "Elemental Combat",
+     ):
+@@ -166,9 +152,9 @@ def test_cli_crosscheck(wow, make_deps, tmp_path, capsys):
+     out = tmp_path / "rapport.md"
+     assert main(["talents", "tf", "crosscheck", "--out", str(out), "--json"], make_deps(wow_dir=wow)) == 0
+     data = json.loads(capsys.readouterr().out)
+-    assert data["totals"]["unmatched"] == 3
++    assert data["totals"]["unmatched"] == 0
+     assert data["provenance"]["game_version"] == LOCAL_VERSION
+-    assert "improvedSerpentSting" in out.read_text(encoding="utf-8")
++    assert "lingeringRage" in out.read_text(encoding="utf-8")
+ 
+ 
+ def test_cli_crosscheck_without_addon(make_deps, tmp_path, capsys):
+diff --git a/tests/unit/test_talents_forever_popular.py b/tests/unit/test_talents_forever_popular.py
+index 3ac253d..fe00b2e 100644
+--- a/tests/unit/test_talents_forever_popular.py
++++ b/tests/unit/test_talents_forever_popular.py
+@@ -73,11 +73,9 @@ def test_certainty_and_provenance(popular):
+ 
+ def test_legality_on_the_client(popular):
+     builds = [b for c in popular["classes"].values() for b in c["top"]]
+-    assert sum(1 for b in builds if b["legality"] == "légal") == 44
++    assert sum(1 for b in builds if b["legality"] == "légal") == 45
+     odd = [(name, b["rank"]) for name, c in popular["classes"].items() for b in c["top"] if b["legality"] != "légal"]
+-    assert odd == [("Warlock", 4)]
+-    warlock = popular["classes"]["Warlock"]["top"][3]
+-    assert warlock["legality"] == "non vérifiable" and warlock["unverifiable"] == ["amplifyCurse"]
++    assert odd == []
+ 
+ 
+ def test_shadow_and_elemental_leads_matched_by_tree_index(popular):
+diff --git a/tests/unit/test_decode_class_spells.py b/tests/unit/test_decode_class_spells.py
+index 11ca115..493e9a0 100644
+--- a/tests/unit/test_decode_class_spells.py
++++ b/tests/unit/test_decode_class_spells.py
+@@ -236,9 +236,11 @@ def test_known_roles_of_sample_spells(doc):
+ 
+ def test_community_positions_are_separate_and_probable(doc, decode_rules):
+     positions = decode_rules["community_positions"]
++    observed = decode_rules["observed_positions"]
+     for cls, c in doc["classes"].items():
+         talents = {t["key"]: t for tree in c["trees"] for t in tree["talents"]}
+-        wanted = {k: v for k, v in positions.get(cls, {}).items() if isinstance(v, dict)}
++        seen = observed.get(cls, {})  # palier relevé en jeu : le palier communautaire ne sert plus
++        wanted = {k: v for k, v in positions.get(cls, {}).items() if isinstance(v, dict) and k not in seen}
+         for key, t in talents.items():
+             if key in wanted:
+                 assert t["tier"] is None and t["unresolved"]  # le palier décodé reste inconnu
+diff --git a/tests/unit/test_plugin_version.py b/tests/unit/test_plugin_version.py
+index 368eb8a..b67d981 100644
+--- a/tests/unit/test_plugin_version.py
++++ b/tests/unit/test_plugin_version.py
+@@ -33,8 +33,9 @@ def test_plugin_json_has_a_semver_version():
+     # 0.4.3 : proposition d'analyser la nouvelle version quand la fraîcheur est en retard (T08a, décision 134) ;
+     # 0.5.0 : skills forever-pvp et forever-builds, routeur (PV1) ; 0.6.0 : skill forever-familiers (CH0) ;
+     # 0.7.0 : noms tels que dans le client du joueur (game_locale), T08c ; 0.8.0 : Talents Forever (lien du build
+-    # calculé, builds populaires), FA1.
+-    assert version == "0.8.0"
++    # calculé, builds populaires), FA1 ; 0.8.1 : cas d'évaluation comparé au code rendu par l'outil (relevés du
++    # 2026-10-08, décision 210).
++    assert version == "0.8.1"
+ 
+ 
+ def test_fingerprint_is_up_to_date():

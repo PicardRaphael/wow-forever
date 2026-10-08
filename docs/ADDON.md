@@ -71,6 +71,10 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
       (`uv run forever talents tf decode <code>`) sur les mêmes points et le même ordre.
    6. Tout concorde : la certitude de l'export passe de `probable` à `certain` (champ `verified_in_game`). Un écart :
       noter le code, ce que l'addon affiche et la sortie de `forever talents tf decode`.
+   7. **Fait le 2026-10-08** (relevé de l'utilisateur) : `mage/20/--0530002001-klps-6` importé (rangs et positions
+      conformes) et réexporté à l'identique, ordre compris (le `?a` ajouté par l'addon n'est pas dans le code) ;
+      code du build au préréglage complet importé et conforme. Certitude du format v6 : `certain` (décision
+      210) ; témoins dans `tests/fixtures/talents_forever/mage_builds.json`.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

@@ -156,10 +156,6 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   [Détail](research/questions-ouvertes-detail.md#don3)
 - **DON4 — Quel produit TACT au lancement (`wow_classic_forever` ?) ?** Test : `.build.info` après le lancement du
   4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don4)
-- **DON5 — `TraitEdge.Type` veut-il bien dire 2 suffisant, 3 requis, 0 visuel ?** Test : Intimidation du Chasseur
-  (deux prérequis suffisants) en jeu ; recoupement FA1 (2026-10-07) : Talents Forever donne à Intimidation un
-  prérequis (Bestial Swiftness) que notre décodage n'a pas. Priorité : basse. Registre G3.
-  [Détail](research/questions-ouvertes-detail.md#don5)
 - **DON6 — Quelles tables portent les pièges, totems et portails ?** Test : inventaire des tables `GameObjects` et
   `Creature*`. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don6)
 - **DON7 — Que disent les conditions d'emploi des sorts (posture, forme, camouflage) et les durées à points de
@@ -254,16 +250,8 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   Priorité : moyenne. [Détail](research/questions-ouvertes-detail.md#pvp5)
 
 ## Autres classes
-- **CLS1 — Où sont Improved Life Tap et Amplify Curse dans l'arbre du Démoniste (colonnes) ?** Test : recoupement des
-  arbres avec Talents Forever (FA1, 2026-10-07 : rangées 1 et 3 chez l'addon, indice `suppose`) ; relevé en jeu (l'utilisateur
-  le fera peut-être, comme pour le Paladin). Bloque l'export du Démoniste vers Talents Forever. Priorité : basse.
-  [Détail](research/questions-ouvertes-detail.md#cls1)
 - **CLS2 — Combien de mana rend Improved Seal of Fury (`$PL`) ?** Test : infobulle relevée en jeu. Priorité : basse.
   [Détail](research/questions-ouvertes-detail.md#cls2)
-- **CLS3 — Improved Serpent Sting (Chasseur, Marksmanship) est-il dans l'arbre en jeu ?** Absent de Talents Forever
-  0.37.1, présent dans le client 1.60.1.70245. Test : arbre du Chasseur en jeu ; revérifié à chaque mise à jour de
-  l'addon (table reconstruite à chaque appel). Bloque l'export du Chasseur. Priorité : basse (pas de build calculé du
-  Chasseur). [Détail](research/questions-ouvertes-detail.md#cls3)
 
 ## Familiers du Chasseur
 - **FAM1 — Une bête d'un niveau au-dessus du Chasseur est-elle refusée ?** Règle de la note du 24/09 (probable,
