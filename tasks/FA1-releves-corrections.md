@@ -2,7 +2,7 @@
 
 Regroupées pour une seule présentation (consigne de l'utilisateur du 2026-10-08). Diff complet, vérifié (les tests
 corrigés passent, test lent du MCP compris) : `tasks/FA1-releves-corrections.patch`. Branche `fa1-releves` ; tests
-nouveaux : `tests/unit/test_in_game_survey.py` (commit `82868a8`, verts après l'implémentation et la révision 5 de
+nouveaux : `tests/unit/test_in_game_survey.py` (commit `5905a8e` après rebase, verts après l'implémentation et la révision 6 de
 1.60.1.70245). Chaque test ci-dessous est devenu faux parce que le relevé en jeu contredit sa prémisse, jamais
 parce que l'implémentation s'en écarte.
 
@@ -38,7 +38,7 @@ parce que l'implémentation s'en écarte.
 
 ### C3. `tests/unit/test_talents_forever_export.py::test_hunter_export_is_blocked_with_the_missing_talent` (ligne 135)
 
-- **Preuve** : Improved Serpent Sting est absent de l'arbre en jeu (relevé du 2026-10-08) ; la révision 5 l'écarte
+- **Preuve** : Improved Serpent Sting est absent de l'arbre en jeu (relevé du 2026-10-08) ; la révision 6 l'écarte
   (`observed_absent`) ; plus aucun talent du Chasseur sans correspondance.
 - **Diff proposé** :
 
@@ -52,7 +52,7 @@ parce que l'implémentation s'en écarte.
 
 ### C4. `tests/unit/test_talents_forever_layout.py` : cinq tests
 
-- **Preuve** : `layout.json` régénéré depuis l'addon installé (0.37.1, inchangé) après la révision 5 : Chasseur 50 sur
+- **Preuve** : `layout.json` régénéré depuis l'addon installé (0.37.1, inchangé) après la révision 6 : Chasseur 50 sur
   50, Démoniste 52 sur 52, prérequis d'Intimidation identique au nôtre ; recoupement `renumbered 4, unmatched 0,
   prereq 0, tree_names 2` ; le rendu ne cite plus `improvedSerpentSting`, `improvedLifeTap`, `amplifyCurse` ni
   `intimidation`.
@@ -266,7 +266,7 @@ parce que l'implémentation s'en écarte.
 
 ### C11. `tests/unit/test_in_game_survey.py::test_synthetic_back_edge_is_dropped` (et son voisin)
 
-- **Preuve** : la version du commit `82868a8` ajoutait le retour d'une arête dont la source était un talent de
+- **Preuve** : la version du commit `5905a8e` ajoutait le retour d'une arête dont la source était un talent de
   rangée 1 sans prérequis : la source n'avait alors plus que la cible pour prérequis, ce qui fait un **cycle fermé**,
   que le décodage refuse à juste titre (comme `test_synthetic_closed_cycle_stops_the_decode`). Le cas de DON5 est
   une chaîne : Bestial Wrath n'a qu'Intimidation, qui a aussi Bestial Swiftness.

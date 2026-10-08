@@ -5490,6 +5490,96 @@
      "pvp_dr": true
     }
    }
+  },
+  {
+   "revision": 6,
+   "date": "2026-10-08",
+   "motif": "relevés en jeu du 2026-10-08 (décisions 210 et 211) : Improved Serpent Sting garé hors du canevas et absent de l'arbre en jeu (CLS3, parked_nodes et observed_absent), arête suffisante circulaire Bestial Wrath vers Intimidation écartée (DON5, circular_sufficient_edges), Improved Life Tap et Amplify Curse placés (CLS1, observed_positions) ; même DBCache.bin que r5 (6bf9bc559c0c)",
+   "command": "forever install <cache>/candidates/1.60.1.70245-fa1-r6 --yes",
+   "candidate": {
+    "path": "<cache>/candidates/1.60.1.70245-fa1-r6",
+    "data_sha": "52eb13a6b993"
+   },
+   "report": "docs/research/data-1.60.1.70245-r6.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 1,
+    "added_file": 0,
+    "replaced_file": 1,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 0
+   },
+   "changes": [
+    {
+     "file": "talents.json",
+     "path": "hotStreak.source",
+     "before": {
+      "build": "1.60.1.70245",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-08",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times.",
+      "client_key": "heatingUp"
+     },
+     "after": {
+      "build": "1.60.1.70245",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-08",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times."
+     },
+     "source": "client 1.60.1.70245, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": "36cc712408dc",
+     "after": "fbeb64903546",
+     "source": "Client 1.60.1.70245 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 30,
+     "source": "observation",
+     "certainty": "certain",
+     "carried": true,
+     "carried_from": "révision 5",
+     "date": "2026-10-02",
+     "revision": 1
+    }
+   },
+   "hotfixes": [
+    112323,
+    112347,
+    112349,
+    112399,
+    112402,
+    112425,
+    112436,
+    112457,
+    112486
+   ],
+   "renamed_in_classes": [
+    {
+     "class": "Mage",
+     "client_key": "heatingUp",
+     "key": "hotStreak"
+    }
+   ]
   }
  ]
 }

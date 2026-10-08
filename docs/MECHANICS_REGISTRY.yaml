@@ -1106,7 +1106,7 @@ mechanics:
       - "forever/data/1.60.1.70124/classes.json (PV1 : arbres des 9 classes, prérequis typés d'après TraitEdge.Type, probable)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_tables : NumTalentsAtLevel, TraitCond.SpentAmountRequired, T08b)"
       - "Cache/ADB/enUS/DBCache.bin du client 1.60.1.70170 (T08c : arbres corrigés par le serveur, poussée 112347 du 2026-10-02, appliqués en mode forever)"
-      - "relevés en jeu de l'utilisateur du 2026-10-08 : Intimidation exige Bestial Swiftness (DON5, arête circulaire écartée), Improved Serpent Sting absent (CLS3), Improved Life Tap et Amplify Curse placés (CLS1) ; forever/data/1.60.1.70245 révision 5"
+      - "relevés en jeu de l'utilisateur du 2026-10-08 : Intimidation exige Bestial Swiftness (DON5, arête circulaire écartée), Improved Serpent Sting absent (CLS3), Improved Life Tap et Amplify Curse placés (CLS1) ; forever/data/1.60.1.70245 révision 6"
     tests:
       - tests/unit/test_engine_talents.py::test_prerequisites
       - tests/unit/test_engine_talents.py::test_build_legality
