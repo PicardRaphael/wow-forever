@@ -455,6 +455,81 @@ def _drop_circular_edges(cls: str, talents: Mapping[int, dict[str, Any]]) -> lis
             return sorted(dropped, key=lambda e: (e["to_node"], e["from_node"]))
 
 
+def _parked_axes(x: int, y: int, origins: Sequence[int], geo: Mapping[str, Any], div: int) -> list[str]:
+    """Coordonnées d'un nœud garé hors du canevas : hors de la grille, mais dessus une fois divisées par
+    `extra_zero_divisor` (zéro en trop)."""
+    out = []
+    axes = (("PosX", x, origins, int(geo["col_step"])), ("PosY", y, [int(geo["row_base"])], int(geo["row_step"])))
+    for axis, value, base, step in axes:
+        if _place(value, base, step, 0) is None and _place(value, base, step, div) is not None:
+            out.append(f"{axis} {value}")
+    return out
+
+
+def _park(
+    cls: str,
+    file: str | None,
+    talent: Mapping[str, Any],
+    tab: int,
+    x: int,
+    y: int,
+    axes: Sequence[str],
+    tf: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Nœud garé (`parked_nodes` de decode_rules.json, décision 211) : replacé seulement si Talents Forever le porte
+    au même arbre, même sort, même rangée et même colonne ; sinon garé, avec la question à ouvrir."""
+    label = str(tf["label"]) if tf is not None else "Talents Forever absent du client"
+    where = (tf or {}).get("classes", {}).get(file) or []
+    spot = [talent["spell_id"], talent["tier"], talent["col"]]
+    confirmed = talent["tier"] is not None and talent["col"] is not None and tab < len(where) and spot in where[tab]
+    shown = f"rangée {talent['tier']}, colonne {talent['col']}"
+    out: dict[str, Any] = {
+        "node_id": talent["node_id"],
+        "key": talent["key"],
+        "name": talent["name"],
+        "spell_id": talent["spell_id"],
+        "tree": talent["tree"],
+        "pos_x": x,
+        "pos_y": y,
+        "tier": talent["tier"],
+        "col": talent["col"],
+        "talents_forever": label,
+        "status": "confirmé" if confirmed else "garé",
+        "answered": None,
+        "reason": None,
+        "question": None,
+    }
+    if not confirmed:
+        out["reason"] = (
+            f"garé hors du canevas ({', '.join(axes)} : dix fois la grille), non confirmé par {label} à la {shown} : "
+            "question ouverte à créer"
+        )
+        out["question"] = (
+            f"{cls} : {talent['name']} ({talent['key']}, nœud {talent['node_id']}) est-il dans l'arbre en jeu ? Le "
+            f"client le garde hors du canevas ({', '.join(axes)}, dix fois la grille ; {shown} une fois corrigé) et "
+            f"{label} ne le confirme pas. Test : arbre de la classe en jeu ; réponse dans decode_rules.json "
+            "(observed_absent ou observed_positions)."
+        )
+    return out
+
+
+def check_mage_not_parked(talents: Mapping[str, Any], classes: Mapping[str, Any]) -> None:
+    """Arrête le décodage si `talents.json` (moteurs du Mage, règle du zéro en trop d'avant la décision 211) garde un
+    talent que `classes.json` a garé : jamais replacé en silence."""
+    mage = classes.get("classes", {}).get("Mage") or {}
+    kept = {t["key"] for tree in mage.get("trees", []) for t in tree["talents"]}
+    parked = {
+        int(p["spell_id"]): p["key"]
+        for p in mage.get("parked_nodes", [])
+        if p["status"] == "garé" and p["key"] not in kept
+    }
+    for tree in talents.get("trees", []):
+        for t in tree["talents"]:
+            hit = [parked[s] for s in t.get("spellIds", []) if s in parked]
+            if hit:
+                raise DataSchemaError(f"Mage : talent {t['key']} sur un nœud garé hors du canevas ({hit[0]}).")
+
+
 def _place(value: int, origins: Sequence[int], step: int, divisor: int) -> tuple[int, int] | None:
     """(indice de l'origine, position à partir de 1) d'une coordonnée sur la grille, directement ou après la règle
     du zéro en trop ; None si elle tombe hors de la grille (jamais arrondie)."""
@@ -486,7 +561,14 @@ def talent_tab(x: int, geometry: Mapping[str, Any]) -> int | None:
     return at_x[0] if at_x is not None else _region(x, origins, div)
 
 
-def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cls: str, version: str) -> dict[str, Any]:
+def _class_talents(
+    tables: Tables,
+    rules: Mapping[str, Any],
+    client: _Client,
+    cls: str,
+    version: str,
+    tf: Mapping[str, Any] | None = None,
+) -> dict[str, Any]:
     spec = rules["classes"][cls]
     geo = rules["talent_geometry"]
     origins, div = [int(o) for o in geo["tab_origins"]], int(geo["extra_zero_divisor"])
@@ -503,6 +585,10 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
     definitions = {int(r["ID"]): r for r in tables["TraitDefinition"]}
     by_spell: dict[int, tuple[Row, Row, Row]] = {}
     dropped: list[dict[str, Any]] = []
+    file = next((str(r["Filename"]) for r in tables["ChrClasses"] if str(r["Name_lang"]) == cls), None)
+    parking = rules.get("parked_nodes") == "talents_forever"
+    parked: list[dict[str, Any]] = []
+    parked_talents: dict[int, dict[str, Any]] = {}
     for node in sorted((n for n in tables["TraitNode"] if int(n["TraitTreeID"]) == tree_id), key=lambda n: n["ID"]):
         node_links = links.get(int(node["ID"]), [])
         if len(node_links) != 1:
@@ -552,6 +638,18 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
             "prereqs": [],
             "certainty": f"FC-{version}",
         }
+        axes = _parked_axes(x, y, origins, geo, div) if parking else []
+        if axes:
+            entry_p = _park(cls, file, talent, tab, x, y, axes, tf)
+            parked.append(entry_p)
+            if entry_p["status"] != "confirmé":
+                parked_talents[talent["node_id"]] = talent
+                dropped.append({"node_id": talent["node_id"], "kept_node": None, "reason": entry_p["reason"]})
+                continue
+            talent["position"] = {
+                "source": f"zéro en trop confirmé par {entry_p['talents_forever']} (même arbre, sort, rangée et colonne)",
+                "certainty": "probable",
+            }
         if reasons:
             talent["unresolved"] = reasons
             unresolved.append(
@@ -559,8 +657,13 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
             )
         talents[int(node["ID"])] = talent
 
+    def answer(node_id: int, source: str) -> None:
+        for entry_p in parked:
+            if entry_p["node_id"] == node_id:
+                entry_p["answered"] = source
+
     for key, seen in (rules.get("observed_absent", {}).get(cls) or {}).items():
-        found = [t for t in talents.values() if t["key"] == key]
+        found = [t for t in [*talents.values(), *parked_talents.values()] if t["key"] == key]
         if not found:
             raise DataSchemaError(f"{cls} : absence relevée pour un talent inconnu « {key} ».")
         if found[0]["node_id"] != int(seen["node_id"]):
@@ -568,20 +671,30 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
                 f"{cls}, {key} : nœud décodé du client ({found[0]['node_id']}) différent du relevé ({seen['node_id']})."
             )
         node_id = found[0]["node_id"]
+        absent = f"absent de l'arbre en jeu : {seen['source']}"
+        answer(node_id, str(seen["source"]))
+        if node_id in parked_talents:  # garé et déjà écarté : la réponse du relevé complète la raison
+            for d in dropped:
+                if d["node_id"] == node_id:
+                    d["reason"] = f"{d['reason'].removesuffix(' : question ouverte à créer')} ; {absent}"
+            continue
         del talents[node_id]
         unresolved = [u for u in unresolved if u["node_id"] != node_id]
-        dropped.append(
-            {"node_id": node_id, "kept_node": None, "reason": f"absent de l'arbre en jeu : {seen['source']}"}
-        )
+        dropped.append({"node_id": node_id, "kept_node": None, "reason": absent})
 
     observed_nodes = []
     for key, pos in (rules.get("observed_positions", {}).get(cls) or {}).items():
-        found = [t for t in talents.values() if t["key"] == key]
+        found = [t for t in [*talents.values(), *parked_talents.values()] if t["key"] == key]
         if not found:
             raise DataSchemaError(f"{cls} : position relevée pour un talent inconnu « {key} ».")
         t = found[0]
+        was_parked = parked_talents.pop(t["node_id"], None) is not None
+        if was_parked:  # garé : la position corrigée n'est qu'une hypothèse, le relevé la remplace
+            talents[t["node_id"]] = t
+            dropped = [d for d in dropped if d["node_id"] != t["node_id"]]
+            answer(t["node_id"], str(pos["source"]))
         for field in ("tier", "col"):
-            if t[field] is not None and t[field] != pos[field]:
+            if not was_parked and t[field] is not None and t[field] != pos[field]:
                 raise DataSchemaError(
                     f"{cls}, {key} : {field} décodé du client ({t[field]}) différent du relevé en jeu ({pos[field]})."
                 )
@@ -650,6 +763,7 @@ def _class_talents(tables: Tables, rules: Mapping[str, Any], client: _Client, cl
         "unresolved_nodes": sorted(unresolved, key=lambda u: u["node_id"]),
         "dropped_nodes": sorted(dropped, key=lambda d: d["node_id"]),
         "dropped_edges": dropped_edges,
+        "parked_nodes": sorted(parked, key=lambda e: e["node_id"]),
         "tree_checks": checks,
         "observed_nodes": observed_nodes,
     }
@@ -951,15 +1065,19 @@ def _class_spells(
     c["unresolved_spells"] = unresolved
 
 
-def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
+def decode_classes(
+    tables: Tables, rules: Mapping[str, Any], version: str, tf: Mapping[str, Any] | None = None
+) -> dict[str, Any]:
     """Contenu de `classes.json` (PV1) : pour chacune des 9 classes (`classes` des règles), identifiant et jeton du
     client, arbre de traits, trois arbres de talents (nom de la ligne de compétence de l'onglet), talents avec leur
     nœud (`node_id`), palier, colonne, rangs, prérequis (nœud), sort et description du client ; nœuds hors grille
     listés non résolus (`unresolved_nodes`, jamais arrondis), doublons périmés écartés (`dropped_nodes`, règle
-    `shared_spell`), contrôle de l'ordre des onglets (`tree_checks`)."""
+    `shared_spell`), contrôle de l'ordre des onglets (`tree_checks`). `tf` :
+    positions de Talents Forever (`tf_positions`), seule confirmation d'un nœud garé hors du canevas (`parked_nodes`,
+    décision 211)."""
     client = _Client(tables, rules)
     index = _ClassIndex(tables)
-    classes = {cls: _class_talents(tables, rules, client, cls, version) for cls in rules["classes"]}
+    classes = {cls: _class_talents(tables, rules, client, cls, version, tf) for cls in rules["classes"]}
     for cls, c in classes.items():
         _class_spells(tables, rules, client, index, cls, c, version)
     return {
@@ -971,8 +1089,9 @@ def decode_classes(tables: Tables, rules: Mapping[str, Any], version: str) -> di
         "notes": [
             "Onglet i : lignes de compétence classes.<Classe>.skill_lines[i] (decode_rules.json), abscisse tab_origins[i].",
             (
-                "Position hors grille : zéro en trop corrigé (extra_zero_divisor) ; tout autre écart laissé à null "
-                "et listé dans unresolved_nodes, jamais arrondi."
+                "Position hors grille : zéro en trop (extra_zero_divisor) corrigé seulement si Talents Forever "
+                "confirme le nœud à la position corrigée (parked_nodes, décision 211), sinon nœud garé et écarté ; "
+                "tout autre écart laissé à null et listé dans unresolved_nodes, jamais arrondi."
             ),
             (
                 "prereqs : arêtes non visuelles du client, sens tiré de TraitEdge.Type (decode_rules.json, "
@@ -1596,8 +1715,20 @@ def _class_observations(doc: Mapping[str, Any]) -> list[str]:
         if c.get("unresolved_nodes"):
             keys = ", ".join(u["key"] for u in c["unresolved_nodes"])
             notes.append(f"{cls} : {len(c['unresolved_nodes'])} nœud(s) hors grille non résolu(s) ({keys})")
-        if c.get("dropped_nodes"):
-            notes.append(f"{cls} : {len(c['dropped_nodes'])} nœud(s) en double écarté(s) (même sort, nœud plus récent)")
+        doubles = [d for d in c.get("dropped_nodes", []) if d.get("kept_node") is not None]
+        if doubles:
+            notes.append(f"{cls} : {len(doubles)} nœud(s) en double écarté(s) (même sort, nœud plus récent)")
+        for e in c.get("parked_nodes", []):
+            if e["status"] == "confirmé":
+                notes.append(f"{cls} : {e['key']} garé hors du canevas, replacé ({e['talents_forever']} le confirme)")
+            elif e["answered"]:
+                notes.append(
+                    f"{cls} : {e['key']} garé hors du canevas, écarté ; réponse relevée en jeu : {e['answered']}"
+                )
+            else:
+                notes.append(
+                    f"{cls} : {e['key']} garé hors du canevas, écarté ; QUESTION OUVERTE À CRÉER : {e['question']}"
+                )
         if c.get("unresolved_spells"):
             names = ", ".join(u["name"] for u in c["unresolved_spells"])
             notes.append(f"{cls} : {len(c['unresolved_spells'])} sort(s) marqué(s) non classé(s) ({names})")
@@ -1695,6 +1826,17 @@ class _Hotfixes:
         )
 
 
+def _installed_tf(deps: Deps) -> dict[str, Any] | None:
+    """Positions de Talents Forever installé (`<FOREVER_WOW_DIR>/Interface/AddOns/TalentsForeverBook/Data.lua`),
+    lecture locale ; None si l'addon est absent (nœud garé jamais confirmé)."""
+    from forever.pipeline.talents_forever import tf_positions
+
+    if deps.wow_dir is None:
+        return None
+    path = deps.wow_dir / "Interface" / "AddOns" / "TalentsForeverBook" / "Data.lua"
+    return tf_positions(path) if path.is_file() else None
+
+
 def decode_version(
     deps: Deps,
     version: str,
@@ -1741,11 +1883,12 @@ def decode_version(
     if class_files and not class_missing:
         more = hot.apply(load_class_tables(csv_dir, rules))
         decoded_classes = {
-            "classes.json": decode_classes(more, rules, version),
+            "classes.json": decode_classes(more, rules, version, _installed_tf(deps)),
             "races.json": decode_races(more, rules, version),
             "pvp_items.json": decode_pvp_items(more, rules, version),
         }
         extra_notes += _class_observations(decoded_classes["classes.json"])
+        check_mage_not_parked(talents, decoded_classes["classes.json"])
     # T08b, bloc A : ratios du personnage (character_tables) : toutes les tables (décodées) ou aucune (héritées).
     char_files = [(n, rel) for n, rel in character_table_files(rules) if n in rules.get("character_tables", [])]
     char_missing = [rel for _, rel in char_files if not (csv_dir / rel).is_file()]

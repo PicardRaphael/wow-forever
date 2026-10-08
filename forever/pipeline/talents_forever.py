@@ -133,3 +133,29 @@ def crosscheck(data_lua: Path, classes_json: Path) -> dict[str, Any]:
         for k in ("forever", "tf", "same", "gap_nodes", "only_forever", "only_tf", "moved")
     }
     return {"head": head, "classes": classes, "totals": totals}
+
+
+def tf_positions(path: Path) -> dict[str, Any]:
+    """Positions de Talents Forever pour confirmer un nœud garé (décision 211) : `label` (version du `.toc`, en-tête
+    et empreinte de `Data.lua`) et, par fichier de classe, une liste par arbre (même indice que nos onglets) de
+    `[sort, rangée, colonne]`."""
+    import hashlib
+
+    head, doc = read_head_and_doc(path)
+    version = "?"
+    for toc in sorted(path.parent.glob("*.toc")):
+        for line in toc.read_text(encoding="utf-8", errors="replace").splitlines():
+            if line.startswith("## Version:"):
+                version = line.split(":", 1)[1].strip()
+    sha = hashlib.sha256(path.read_bytes()).hexdigest()[:12]
+    label = (
+        f"Talents Forever {version} (Data.lua build {head.get('build')}, généré le {head.get('generated')}, "
+        f"empreinte {sha})"
+    )
+    classes: dict[str, list[list[list[int]]]] = {}
+    for file, cls in doc["classes"].items():
+        classes[str(file)] = [
+            [[int(t["spell"]), int(t["row"]), int(t["col"])] for t in tree["talents"] if "spell" in t]
+            for tree in cls["trees"]
+        ]
+    return {"label": label, "classes": classes}
