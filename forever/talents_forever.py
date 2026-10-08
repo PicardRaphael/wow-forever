@@ -25,7 +25,6 @@ from forever.tf_code import CODE_VERSION, SYMBOLS, TREES, TfPlan, code_of, decod
 ADDON_FOLDER = "TalentsForeverBook"
 DATA_FILE = "Data.lua"
 REASONS = ("seulement_forever", "seulement_talents_forever", "position_inconnue", "ambigu")
-UNKNOWN_ROW_QUESTION = "CLS1"  # rangées du client inconnues (Démoniste), docs/OPEN_QUESTIONS.md
 FINGERPRINT_LEN = 12
 # Générations de code relues en jeu (procédure de docs/ADDON.md, section 7) : certitude `certain` du format (rangs,
 # positions, ordre) ; une autre génération est refusée à la lecture de l'addon.
@@ -129,7 +128,8 @@ def _unmatched_text(u: Mapping[str, Any], version: str | None) -> str:
         )
     if u["reason"] == "position_inconnue":
         return (
-            f"{u['name']} ({u['key']}, {u['tree']}) : rangée inconnue dans nos données (question {UNKNOWN_ROW_QUESTION}), "
+            f"{u['name']} ({u['key']}, {u['tree']}) : rangée inconnue dans nos données (relevé en jeu à faire, "
+            "comme pour le Démoniste le 2026-10-08), "
             f"rangée {tf.get('row')} chez Talents Forever"
         )
     if u["reason"] == "ambigu":
