@@ -26,6 +26,7 @@ from forever.chart import leveling_chart
 from forever.config import CHAIN_MAX_GAP_S, FETCH_TIMEOUT, Deps, default_deps
 from forever.errors import (
     EXIT_INTEGRITY,
+    EXIT_NOT_FOUND,
     EXIT_OK,
     ForeverError,
     InvalidArgumentError,
@@ -379,6 +380,26 @@ def build_parser() -> argparse.ArgumentParser:
     a_inv.add_argument("folder", help="dossier de l'addon (nom dans le dossier des addons, ou chemin)")
     a_inv.add_argument("--dir", help="dossier des addons (défaut : <FOREVER_WOW_DIR>/Interface/AddOns)")
     a_inv.add_argument("--json", action="store_true", help="sortie JSON")
+
+    bridge = sub.add_parser("bridge", help="pont de conversation en jeu (P06a) : installation, autotest de la bande")
+    bridge_sub = bridge.add_subparsers(dest="bridge_command", required=True, parser_class=_Parser)
+    b_install = bridge_sub.add_parser(
+        "install", help="installer ForeverBridge et sa sonde dans le client (jeu fermé, puis le relancer)"
+    )
+    b_install.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
+    b_install.add_argument("--dry-run", action="store_true", help="afficher les opérations sans rien écrire")
+    b_install.add_argument("--json", action="store_true", help="sortie JSON")
+    b_self = bridge_sub.add_parser(
+        "selftest", help="autotest de la bande : hors jeu, ou en jeu avec --live (bande de /fv test)"
+    )
+    b_self.add_argument("--live", action="store_true", help="capturer la bande de /fv test dans la fenêtre du jeu")
+    b_self.add_argument("--wait", type=float, default=60.0, help="attente maximale du jeu au premier plan (--live)")
+    b_self.add_argument("--save", type=Path, help="enregistrer la bande capturée en BMP (--live)")
+    b_self.add_argument(
+        "--touch", action="store_true", help="modifier les fichiers de la sonde pendant que le jeu tourne (/fv diag)"
+    )
+    b_self.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
+    b_self.add_argument("--json", action="store_true", help="sortie JSON")
 
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
@@ -2180,6 +2201,57 @@ def _cmd_addons_inventory(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _bridge_wow_dir(deps: Deps, args: argparse.Namespace) -> Path:
+    wow_dir = args.wow_dir or deps.wow_dir
+    if wow_dir is None:
+        raise InvalidArgumentError("Dossier du client inconnu.", "donner --wow-dir ou poser FOREVER_WOW_DIR")
+    return Path(wow_dir)
+
+
+def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever bridge` (P06a, bloc A) : installation de ForeverBridge et autotest de la bande."""
+    from forever.bridge import install, selftest
+
+    provenance = local_provenance(deps, assumptions=["pont de conversation (P06a) : aucune donnée de jeu"])
+    if args.bridge_command == "install":
+        report = install.install_bridge(_bridge_wow_dir(deps, args), dry_run=args.dry_run)
+        lines = [f"Installation de ForeverBridge ({len(report.actions)} opération(s)) :"]
+        lines += [f"  {a}" for a in report.actions]
+        lines.append(
+            "Le client ne voit que les fichiers présents à son lancement : installer jeu fermé, sinon le fermer "
+            "complètement puis relancer le jeu."
+        )
+        payload = {"actions": report.actions, "ogg_source": str(report.ogg_source) if report.ogg_source else None}
+        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.touch:
+        actions = install.touch_probe(_bridge_wow_dir(deps, args), deps.now().astimezone())
+        lines = ["Fichiers de la sonde modifiés pendant que le jeu tourne :", *[f"  {a}" for a in actions]]
+        lines.append("En jeu : taper /fv diag (flip et late doivent jouer si le client voit ces fichiers), puis /reload "
+                     "et /fv diag à nouveau.")  # fmt: skip
+        _emit({"actions": actions, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.live:
+        from forever.bridge.capture import WindowsCapture, win32_api
+        from forever.pipeline.live_logs import client_executables
+
+        try:
+            api = win32_api()
+        except RuntimeError as err:
+            raise InvalidArgumentError(str(err), "lancer la commande sous Windows, sur le poste du jeu") from err
+        executables = client_executables(args.wow_dir or deps.wow_dir)
+        print(
+            f"Attente du jeu au premier plan avec la bande de /fv test ({args.wait:g} s au plus) : passer au jeu.",
+            file=sys.stderr,
+            flush=True,
+        )
+        result = selftest.selftest_live(WindowsCapture(executables, api), wait_s=args.wait, save=args.save)
+    else:
+        result = selftest.selftest_offline()
+    _emit({**result.to_json(), "provenance": provenance}, list(result.lines), provenance, args.json)
+    return EXIT_OK if result.ok else EXIT_NOT_FOUND
+
+
 def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
     if args.addons_command == "inventory":
         return _cmd_addons_inventory(deps, args)
@@ -2721,6 +2793,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "origins": _cmd_origins,
         "hotfixes": _cmd_hotfixes,
         "addons": _cmd_addons,
+        "bridge": _cmd_bridge,
         "watch": _cmd_watch,
         "update": _cmd_update,
         "notes": _cmd_notes,

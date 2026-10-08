@@ -30,5 +30,14 @@ SOFTWARE."""
 
 from __future__ import annotations
 
+import struct
+
+
+def _silent_wav(rate: int = 8000, samples: int = 80) -> bytes:
+    fmt = struct.pack("<HHIIHH", 1, 1, rate, rate, 1, 8)  # PCM, mono, octets par seconde, bloc, bits
+    body = b"WAVE" + b"fmt " + struct.pack("<I", len(fmt)) + fmt + b"data" + struct.pack("<I", samples)
+    return b"RIFF" + struct.pack("<I", len(body) + samples) + body + bytes([128]) * samples
+
+
 # WAV PCM valide et silencieux : 8 bits, mono, 8 000 Hz, 80 échantillons à 128 (10 ms), 124 octets.
-SILENT_WAV: bytes = b""
+SILENT_WAV: bytes = _silent_wav()
