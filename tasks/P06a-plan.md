@@ -606,6 +606,18 @@ remplacé). Relevés sur `claude` 2.1.294 (question « Quelle est la version des
    `tests/fixtures/bridge/claude_stream_status.jsonl` et `claude_stream_resume.jsonl` (identifiants et chemins
    remplacés).
 
+## Exécution : bloc A (2026-10-08)
+- Séquences de cellules et sommes du plan recalculées par le `Codec.lua` de wow-ai sous `lupa.lua51` : conformes.
+- Ajouts pour que la sonde en jeu A tranche tout en une session (jalon de l'utilisateur) : addon de sonde
+  `ForeverBridge_Probe` (chargé à la demande, `Probe.lua` réécrit en cours de jeu), fichiers de contrôle `flip` (vide
+  puis rempli) et `late` (absent puis créé) en `.wav` et `.ogg` (`.ogg` copié d'un addon installé, aucun encodeur),
+  `forever bridge selftest --touch`, `/fv diag` étendu ; bande de test pleine (1 792 octets, 24 rangées) affichée deux
+  minutes ; `selftest --live --wait --save` détaillé (fenêtre, zone client, premier plan, sonde, cellules fausses).
+- Tests Lua du bloc E avancés au bloc A (codec Lua = codec Python, `/fv test` au pixel près à trois résolutions,
+  `/fv diag`, pièges) ; capture réelle par l'API de Windows vérifiée sur une fenêtre Tk (vecteur reconnu).
+- `install_bridge(wow_dir, slots=0)` : la réserve d'emplacements arrive au bloc B.
+- Procédure : `docs/ADDON.md` §7, étape 9.
+
 ## Validation
 Plan à valider par l'utilisateur. Exécution dans une nouvelle session (`/tranche P06a`), branche `p06a`, un cycle
 rouge → vert par bloc.

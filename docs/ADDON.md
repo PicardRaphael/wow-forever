@@ -83,6 +83,35 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
       les donne), Improved Stings du Chasseur à 2/3 en Marksmanship, rangée 2, colonne 1 ; Improved Life Tap à 2/2
       (Affliction, rangée 1, colonne 1) et Amplify Curse à 1/1 (rangée 3, colonne 3) du Démoniste. Tout concorde :
       `verified_in_game` du cas passe à `import`.
+9. **Sonde en jeu A du pont ForeverBridge** (P06a, bloc A ; **avant le 2026-10-14**). Elle dit si la bande de pixels
+   est lue par le pont, quel format de son sert de drapeau (`.wav` ou `.ogg`), si le client voit un fichier son modifié
+   ou ajouté pendant qu'il tourne, et si un addon chargé à la demande relit son fichier après `/reload`. Commandes
+   lancées dans un terminal à la racine du dépôt. Après chaque `/fv diag`, une capture d'écran (touche Impr. écran,
+   rangée dans `Screenshots/` du client) suffit comme relevé.
+   1. **Jeu fermé.** Réglages du client (System > Graphics) : Display Mode `Windowed` ou `Windowed (Fullscreen)`, pas
+      `Fullscreen` ; Render Scale à 100 % ; HDR coupé. La mise à l'échelle de Windows peut rester telle quelle.
+   2. `uv run forever bridge install` : installe `ForeverBridge`, ses fichiers de contrôle (`ctl/`) et l'addon de sonde
+      `ForeverBridge_Probe` ; la sortie nomme le `.ogg` copié d'un autre addon pour l'autotest `.ogg`.
+   3. Lancer le jeu, entrer avec un personnage ; dans la liste des addons, `ForeverBridge` et `ForeverBridge_Probe`
+      sont activés. `/fv` affiche l'aide de ForeverBridge.
+   4. **Bande** : `/fv test` (carrés de couleur en haut à gauche, retirés au bout de deux minutes ou par un second
+      `/fv test`). Dans le terminal : `uv run forever bridge selftest --live --save tests/fixtures/bridge/band_live.bmp`,
+      puis **cliquer dans la fenêtre du jeu** dans la minute et y rester quelques secondes ; revenir au terminal.
+      Attendu : « vecteur reconnu (1792 octets, 24 rangées, 4800 cellules) ». Sinon : garder toute la sortie (fenêtre,
+      zone client, sonde lue, cellules différentes) et le fichier enregistré.
+   5. **Fichiers son, avant modification** : `/fv diag`, capture d'écran. Attendu : `empty` ne joue pas, `valid` joue,
+      `flip` et `late` ne jouent pas, en `.wav` comme en `.ogg` ; `ForeverBridge_Probe : chargé, valeur
+      « installation »`.
+   6. Jeu toujours lancé, dans le terminal : `uv run forever bridge selftest --touch` (remplit `flip`, crée `late`,
+      réécrit `Probe.lua`).
+   7. `/fv diag`, capture d'écran : `flip` joue-t-il (fichier modifié vu sans `/reload`) ? `late` joue-t-il (fichier
+      ajouté vu) ? La valeur de la sonde reste « installation » (déjà chargée dans cette session).
+   8. `/reload`, puis `/fv diag`, capture d'écran : valeur de la sonde « modifié à HH:MM:SS » attendue (un addon chargé
+      à la demande relit son fichier modifié) ; `flip` et `late` après `/reload`.
+   9. Fermer complètement le jeu, le relancer, `/fv diag`, capture d'écran (témoin : `late` doit jouer après un
+      redémarrage).
+   10. Relevé : la sortie de l'étape 4, les captures des étapes 5, 7, 8 et 9 (ou les lignes recopiées). Rien d'autre
+       ne change : ForeverLogger continue ses relevés.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
@@ -118,7 +147,7 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
 - Produit TACT : `.build.info` du client installé indique `wow_classic_beta` (1.60.1.70170, lu sur disque le 2026-10-02) ; le produit du lancement reste inconnu.
 
 ## 8. Checklist à chaque build
-Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
+Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live`, puis `/fv diag` (section 7, étape 9). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 
 ## 9. Feuille de route des addons de forever-core
 Ordre revu le 2026-10-07 (décisions 193 et 202, `docs/VISION.md`) : nos addons n'affichent que ce qu'aucun addon installé ne sait recevoir ; le reste passe par les points d'import des addons de la communauté (décision 196).
