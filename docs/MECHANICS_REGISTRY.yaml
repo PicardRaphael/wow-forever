@@ -1125,11 +1125,14 @@ mechanics:
       - tests/unit/test_in_game_survey.py::test_intimidation_without_bestial_swiftness_is_illegal
       - tests/unit/test_in_game_survey.py::test_circular_sufficient_edge_is_dropped
       - tests/unit/test_in_game_survey.py::test_observed_absent_node_is_dropped_with_its_source
+      - tests/unit/test_parked_nodes.py::test_real_case_not_in_talents_forever_is_parked
+      - tests/unit/test_parked_nodes.py::test_confirmed_by_talents_forever_is_placed
+      - tests/unit/test_parked_nodes.py::test_every_parked_node_has_an_open_question_or_an_in_game_answer
       - tests/unit/test_decode_mechanics.py::test_first_talent_level_equals_num_talents_at_level
       - tests/unit/test_decode_mechanics.py::test_points_per_tier_equals_trait_cond_step
     tolerance: null
     formule: "points = max(0, niveau − (premier_niveau − 1) + bonus) ; palier p : points_par_palier × (p − 1) points avant dans l'arbre ; prérequis requis : tous au maximum ; prérequis suffisants : un au maximum"
-    note: "T08b, bloc B : premier niveau à point de talent (NumTalentsAtLevel) et points par palier de chaque classe (TraitCond, suite k × pas, None sinon) décodés du client (character_scaling.json talents), lus en mode forever ; mode seed : mechanics.json (fm.py) ; T08c : en mode forever, les arbres sont décodés des tables du build corrigées par les valeurs des correctifs du serveur (DBCache.bin, dispositions de WoWDBDefs validées), origine correctif_serveur ; le mode seed n'en lit aucune ; 2026-10-08 (décision 210) : arêtes suffisantes circulaires écartées au décodage (dropped_edges), talents absents de l'arbre en jeu écartés (observed_absent), positions relevées du Démoniste ; le moteur de légalité est inchangé"
+    note: "T08b, bloc B : premier niveau à point de talent (NumTalentsAtLevel) et points par palier de chaque classe (TraitCond, suite k × pas, None sinon) décodés du client (character_scaling.json talents), lus en mode forever ; mode seed : mechanics.json (fm.py) ; T08c : en mode forever, les arbres sont décodés des tables du build corrigées par les valeurs des correctifs du serveur (DBCache.bin, dispositions de WoWDBDefs validées), origine correctif_serveur ; le mode seed n'en lit aucune ; 2026-10-08 (décision 210) : arêtes suffisantes circulaires écartées au décodage (dropped_edges), talents absents de l'arbre en jeu écartés (observed_absent), positions relevées du Démoniste ; le moteur de légalité est inchangé ; décision 211 : nœud garé hors du canevas (zéro en trop) replacé seulement si Talents Forever le confirme, sinon écarté (parked_nodes) avec une question ouverte ou un relevé en jeu"
   - id: G4
     categorie: personnage
     description: "Sorts par rang, coefficients, pénalité des sorts de bas niveau"

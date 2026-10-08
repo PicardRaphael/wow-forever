@@ -582,6 +582,8 @@
  },
  "circular_sufficient_edges": "drop",
  "circular_sufficient_edges_note": "FA1, relevé du 2026-10-08 (DON5) : une arête suffisante dont la source exige déjà la cible (prérequis requis, ou suffisant quand il est seul, directement ou par une chaîne) ne rend jamais la cible disponible : écartée (dropped_edges). Cas du client : Bestial Wrath vers Intimidation (Chasseur), retour de l'arête Intimidation vers Bestial Wrath ; en jeu, Intimidation exige Bestial Swiftness. Une arête requise circulaire, ou un talent qui n'a plus de voie, arrêtent le décodage.",
+ "parked_nodes": "talents_forever",
+ "parked_nodes_note": "Décision 211 (demande de l'utilisateur du 2026-10-08) : un nœud dont une coordonnée vaut dix fois une valeur de la grille (zéro en trop, extra_zero_divisor) est garé hors du canevas ; il n'est replacé à la position corrigée que si Talents Forever installé le porte au même arbre, même sort, même rangée et même colonne (position probable). Sinon il est écarté (dropped_nodes), listé dans parked_nodes avec la question à ouvrir dans docs/OPEN_QUESTIONS.md, jusqu'à un relevé en jeu (observed_absent, observed_positions). Sans cette clé (règles d'une version antérieure), la règle du zéro en trop replace le nœud comme avant.",
  "gametables": {
   "armormitigationbylvl": 1385707,
   "basemp": 1391664,

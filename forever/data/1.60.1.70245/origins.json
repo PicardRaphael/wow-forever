@@ -75,7 +75,8 @@
         "/races_note",
         "/gametables_note",
         "/hotfix_related_tables_note",
-        "/circular_sufficient_edges_note"
+        "/circular_sufficient_edges_note",
+        "/parked_nodes_note"
       ],
       "reason": "notes de lecture, texte"
     },
@@ -948,7 +949,8 @@
         "/pet_tables",
         "/localized_pet_tables",
         "/pets",
-        "/circular_sufficient_edges"
+        "/circular_sufficient_edges",
+        "/parked_nodes"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1, CH0)",
