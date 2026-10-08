@@ -74,25 +74,15 @@ def test_warrior_matched_despite_renumbered_nodes(addon):
     ]
 
 
-def test_hunter_blocked_by_a_talent_missing_from_talents_forever(addon):
+def test_hunter_all_matched_after_the_in_game_survey(addon):
     hunter = addon.layouts["Hunter"]
-    assert matched(hunter) == 50 and not hunter.exportable
-    assert [(u["key"], u["reason"]) for u in hunter.unmatched] == [("improvedSerpentSting", "seulement_forever")]
-    reason = hunter.blocked
-    assert "Improved Serpent Sting" in reason and "improvedSerpentSting" in reason
-    assert "absent de Talents Forever" in reason and "0.37.1" in reason
-    assert "à chaque mise à jour de l'addon" in reason
+    assert matched(hunter) == 50 and hunter.exportable and hunter.unmatched == ()
+    assert hunter.prereq_gaps == ()
 
 
-def test_warlock_blocked_by_unknown_rows(addon):
+def test_warlock_all_matched_after_the_in_game_survey(addon):
     warlock = addon.layouts["Warlock"]
-    assert matched(warlock) == 50 and not warlock.exportable
-    assert sorted((u["key"], u["reason"]) for u in warlock.unmatched) == [
-        ("amplifyCurse", "position_inconnue"),
-        ("improvedLifeTap", "position_inconnue"),
-    ]
-    assert "Improved Life Tap" in warlock.blocked and "Amplify Curse" in warlock.blocked
-    assert "CLS1" in warlock.blocked
+    assert matched(warlock) == 52 and warlock.exportable and warlock.unmatched == ()
 
 
 def test_trees_matched_by_index_tree_names_are_cosmetic(addon):
@@ -101,7 +91,7 @@ def test_trees_matched_by_index_tree_names_are_cosmetic(addon):
         assert layout.exportable, name
         assert len(layout.tree_name_gaps) == 1, name
     assert addon.layouts["Priest"].tree_names[2] == "Shadow"
-    assert {"Paladin", "Rogue", "Druid", "Priest", "Shaman", "Mage", "Warrior"} == {
+    assert {"Paladin", "Rogue", "Druid", "Priest", "Shaman", "Mage", "Warrior", "Hunter", "Warlock"} == {
         n for n, lay in addon.layouts.items() if lay.exportable
     }
 
@@ -135,12 +125,12 @@ def test_absent_addon_is_none(tmp_path, make_deps):
 
 def test_crosscheck_of_the_installed_version(addon):
     report = crosscheck_report(addon)
-    assert report["totals"] == {"renumbered": 4, "unmatched": 3, "prereq": 1, "tree_names": 2}
+    assert report["totals"] == {"renumbered": 4, "unmatched": 0, "prereq": 0, "tree_names": 2}
     assert report["game_version"] == LOCAL_VERSION
     assert report["addon"]["version"] == "0.37.1" and report["addon"]["build"] == "1.60.1.70170"
     hunter = report["classes"]["Hunter"]
-    assert hunter["matched"] == 50 and hunter["export"] == "bloque"
-    assert [g["key"] for g in hunter["prereq"]] == ["intimidation"]
+    assert hunter["matched"] == 50 and hunter["export"] == "possible"
+    assert hunter["prereq"] == []
     assert report["classes"]["Mage"]["export"] == "possible"
 
 
@@ -151,10 +141,6 @@ def test_crosscheck_render_is_deterministic(addon):
         "0.37.1",
         LOCAL_VERSION,
         "lingeringRage",
-        "improvedSerpentSting",
-        "improvedLifeTap",
-        "amplifyCurse",
-        "intimidation",
         "Shadow Magic",
         "Elemental Combat",
     ):
@@ -166,9 +152,9 @@ def test_cli_crosscheck(wow, make_deps, tmp_path, capsys):
     out = tmp_path / "rapport.md"
     assert main(["talents", "tf", "crosscheck", "--out", str(out), "--json"], make_deps(wow_dir=wow)) == 0
     data = json.loads(capsys.readouterr().out)
-    assert data["totals"]["unmatched"] == 3
+    assert data["totals"]["unmatched"] == 0
     assert data["provenance"]["game_version"] == LOCAL_VERSION
-    assert "improvedSerpentSting" in out.read_text(encoding="utf-8")
+    assert "lingeringRage" in out.read_text(encoding="utf-8")
 
 
 def test_cli_crosscheck_without_addon(make_deps, tmp_path, capsys):

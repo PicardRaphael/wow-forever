@@ -145,6 +145,6 @@ def test_talents_forever_change_rechecks_the_export_without_pending_entry(tmp_pa
     recheck = tf["recheck"]
     assert recheck["code_version"] == "6" and recheck["code_version_supported"] is True
     assert recheck["export"]["Mage"] == {"status": "possible", "talents": []}
-    assert recheck["export"]["Hunter"] == {"status": "bloque", "talents": ["improvedSerpentSting"]}
-    assert recheck["export"]["Warlock"] == {"status": "bloque", "talents": ["amplifyCurse", "improvedLifeTap"]}
-    assert recheck["unmatched"] == 3 and recheck["renumbered"] == 4
+    assert recheck["export"]["Hunter"] == {"status": "possible", "talents": []}
+    assert recheck["export"]["Warlock"] == {"status": "possible", "talents": []}
+    assert recheck["unmatched"] == 0 and recheck["renumbered"] == 4

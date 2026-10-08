@@ -236,9 +236,11 @@ def test_known_roles_of_sample_spells(doc):
 
 def test_community_positions_are_separate_and_probable(doc, decode_rules):
     positions = decode_rules["community_positions"]
+    observed = decode_rules["observed_positions"]
     for cls, c in doc["classes"].items():
         talents = {t["key"]: t for tree in c["trees"] for t in tree["talents"]}
-        wanted = {k: v for k, v in positions.get(cls, {}).items() if isinstance(v, dict)}
+        seen = observed.get(cls, {})  # palier relevé en jeu : le palier communautaire ne sert plus
+        wanted = {k: v for k, v in positions.get(cls, {}).items() if isinstance(v, dict) and k not in seen}
         for key, t in talents.items():
             if key in wanted:
                 assert t["tier"] is None and t["unresolved"]  # le palier décodé reste inconnu

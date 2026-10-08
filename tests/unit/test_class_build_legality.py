@@ -97,10 +97,15 @@ def test_mage_check_is_unchanged(gd):
 
 
 def test_unresolved_tier_uses_community_tier_else_is_undecidable(gd):
-    warlock = gd.classes["Warlock"]
-    placed = [t for t in talents(gd, "Warlock").values() if t["tier"] is None]
-    assert placed and all(t.get("tier_community") for t in placed)  # prémisse : paliers communautaires
-    t = placed[0]
+    from dataclasses import replace
+
+    # Plus aucun palier inconnu depuis le relevé du 2026-10-08 (CLS1) : palier retiré sur une copie, palier
+    # communautaire égal au palier relevé.
+    trees = copy.deepcopy(gd.classes["Warlock"].trees)
+    t = next(x for tree in trees for x in tree["talents"] if x["key"] == "amplifyCurse")
+    t["tier_community"] = {"tier": t["tier"], "sources": ["copie de test"], "certainty": "probable"}
+    t["tier"] = None
+    warlock = replace(gd.classes["Warlock"], trees=trees)
     pts = (
         filler(gd, "Warlock", t["tree"], t["tier_community"]["tier"], {t["key"]})
         if t["tier_community"]["tier"] > 1
@@ -112,8 +117,6 @@ def test_unresolved_tier_uses_community_tier_else_is_undecidable(gd):
     for tree in blind:
         for x in tree["talents"]:
             x.pop("tier_community", None)
-    from dataclasses import replace
-
     errors = check_class_build(replace(warlock, trees=blind), gd.constants.talents, pts, 60)
     assert any("non décidable" in e and t["name"] in e for e in errors)
 

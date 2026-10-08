@@ -73,11 +73,9 @@ def test_certainty_and_provenance(popular):
 
 def test_legality_on_the_client(popular):
     builds = [b for c in popular["classes"].values() for b in c["top"]]
-    assert sum(1 for b in builds if b["legality"] == "légal") == 44
+    assert sum(1 for b in builds if b["legality"] == "légal") == 45
     odd = [(name, b["rank"]) for name, c in popular["classes"].items() for b in c["top"] if b["legality"] != "légal"]
-    assert odd == [("Warlock", 4)]
-    warlock = popular["classes"]["Warlock"]["top"][3]
-    assert warlock["legality"] == "non vérifiable" and warlock["unverifiable"] == ["amplifyCurse"]
+    assert odd == []
 
 
 def test_shadow_and_elemental_leads_matched_by_tree_index(popular):

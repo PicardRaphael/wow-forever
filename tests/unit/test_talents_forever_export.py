@@ -81,9 +81,10 @@ def test_order_flags(addon):
 
 def test_provenance_and_certainty(addon):
     block = export_case(addon, "leveling-20")
-    assert block["certainty"] == "probable"
+    assert block["certainty"] == "certain"
     prov = block["provenance"]
     assert prov["format"] == "v6"
+    assert prov["verified_in_game"] is True
     assert prov["version"] == "0.37.1"
     assert prov["build"] == "1.60.1.70170" and prov["generated"] == "2026-10-04" and prov["codeVersion"] == "6"
     assert len(prov["fingerprint"]) == 12
@@ -132,9 +133,9 @@ def test_other_generation_is_not_supported(tmp_path, make_deps):
     assert block["status"] == "format_non_pris_en_charge" and block["code"] is None
 
 
-def test_hunter_export_is_blocked_with_the_missing_talent(addon):
+def test_hunter_export_is_no_longer_blocked(addon):
     block = export_build(addon, "Hunter", 20, {}, None)
-    assert block["status"] == "bloque" and "improvedSerpentSting" in block["reason"]
+    assert block["status"] == "ok" and block["reason"] is None
 
 
 def test_decode_refusals(addon, deps):
@@ -186,7 +187,7 @@ def test_mcp_build_carries_the_export(addon, deps):
     assert not r.is_error
     data = r.structured_content
     block = data["export"]["talents_forever"]
-    assert block["status"] == "ok" and block["certainty"] == "probable"
+    assert block["status"] == "ok" and block["certainty"] == "certain"
     talents, order = read_back(addon, deps, block)
     assert talents == {k: v for k, v in data["talents"].items() if v}
     assert order == [s["talent"] for s in data["order"] if s["talent"]]

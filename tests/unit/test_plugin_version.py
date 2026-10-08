@@ -33,8 +33,9 @@ def test_plugin_json_has_a_semver_version():
     # 0.4.3 : proposition d'analyser la nouvelle version quand la fraîcheur est en retard (T08a, décision 134) ;
     # 0.5.0 : skills forever-pvp et forever-builds, routeur (PV1) ; 0.6.0 : skill forever-familiers (CH0) ;
     # 0.7.0 : noms tels que dans le client du joueur (game_locale), T08c ; 0.8.0 : Talents Forever (lien du build
-    # calculé, builds populaires), FA1.
-    assert version == "0.8.0"
+    # calculé, builds populaires), FA1 ; 0.8.1 : cas d'évaluation comparé au code rendu par l'outil (relevés du
+    # 2026-10-08, décision 210).
+    assert version == "0.8.1"
 
 
 def test_fingerprint_is_up_to_date():

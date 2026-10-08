@@ -142,7 +142,9 @@ def test_extra_zero_node_is_placed(doc, decode_rules):
             if not on_grid(y, rows, geo["row_step"]) and y % div == 0 and on_grid(y // div, rows, geo["row_step"]):
                 assert t["tier"] == (y // div - geo["row_base"]) // geo["row_step"] + 1
                 corrected += 1
-    assert corrected >= 1  # prémisse : la fixture porte un nœud au zéro en trop
+    # Aucun talent gardé au zéro en trop : le seul cas, Improved Serpent Sting, est absent de l'arbre en jeu
+    # (relevé du 2026-10-08, observed_absent) ; mécanisme testé dans test_decode_talents.py.
+    assert corrected == 0
 
 
 def test_off_grid_nodes_are_listed_unresolved(doc, decode_rules):
@@ -172,7 +174,7 @@ def test_off_grid_nodes_are_listed_unresolved(doc, decode_rules):
             assert u["reason"]
         if expected:
             with_unresolved.add(cls)
-    assert "Warlock" in with_unresolved  # paliers du Démoniste : sources communautaires seulement
+    assert with_unresolved == set()  # Paladin et Démoniste placés par les relevés en jeu (observed_positions)
 
 
 def test_stale_duplicate_nodes_are_dropped_for_the_newer_node(doc, decode_rules):
@@ -189,6 +191,8 @@ def test_stale_duplicate_nodes_are_dropped_for_the_newer_node(doc, decode_rules)
     for cls, c in doc["classes"].items():
         kept = {t["node_id"]: t for t in talents_of(c)}
         for d in c["dropped_nodes"]:
+            if d["kept_node"] is None:
+                continue  # absence relevée en jeu (observed_absent), pas un doublon
             assert d["kept_node"] in kept and d["kept_node"] > d["node_id"]  # le nœud le plus récent l'emporte
             assert spell_of(d["node_id"]) == spell_of(d["kept_node"]) == kept[d["kept_node"]]["spell_id"]
             x, y = int(nodes[d["node_id"]]["PosX"]), int(nodes[d["node_id"]]["PosY"])
