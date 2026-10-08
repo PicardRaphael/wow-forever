@@ -75,6 +75,11 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
       conformes) et réexporté à l'identique, ordre compris (le `?a` ajouté par l'addon n'est pas dans le code) ;
       code du build au préréglage complet importé et conforme. Certitude du format v6 : `certain` (décision
       210) ; témoins dans `tests/fixtures/talents_forever/mage_builds.json`.
+   8. **À faire** : Chasseur et Démoniste, codes de `tests/fixtures/talents_forever/class_witnesses.json` (`/tf import
+      <code>`) ; vérifier chaque rang à sa rangée et sa colonne (la sortie de `uv run forever talents tf decode <code>`
+      les donne), Improved Stings du Chasseur à 2/3 en Marksmanship, rangée 2, colonne 1 ; Improved Life Tap à 2/2
+      (Affliction, rangée 1, colonne 1) et Amplify Curse à 1/1 (rangée 3, colonne 3) du Démoniste. Tout concorde :
+      `verified_in_game` du cas passe à `import`.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

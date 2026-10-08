@@ -20,3 +20,6 @@
   calculé par l'outil se compare au code que l'outil rend au moment du test, jamais à un code stocké.
 - Non recopié : `Core.lua`, `UI.lua`, `Game.lua` (aucune licence, décisions 172 et 196), les textes, icônes,
   descriptions et tables `legacy`, `learn`, `coef`, `racials`, `renames`, `orderV1` à `orderV5` de `Data.lua`.
+- `class_witnesses.json` : codes de test du Chasseur (`hunter-40`, par Improved Stings et Intimidation) et du
+  Démoniste (`warlock-30`, par Improved Life Tap et Amplify Curse), builds légaux construits le 2026-10-08 sur
+  1.60.1.70245 r6 et encodés par `export_build` ; écrits à la main, `verified_in_game` nul jusqu'à l'import en jeu.
