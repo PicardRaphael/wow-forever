@@ -20,6 +20,11 @@ def test_forever_logger_respects_every_rule():
     assert check_addon.check_addon(ADDON) == []
 
 
+def test_forever_bridge_respects_every_rule():
+    """P06a, bloc A : l'addon du pont passe les mêmes contrôles statiques (généralisés au bloc E)."""
+    assert check_addon.check_addon(REPO_ROOT / "addon" / "ForeverBridge") == []
+
+
 def test_forever_logger_toc_is_repaired():
     toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
     assert "## Interface: 16001" in toc.splitlines()

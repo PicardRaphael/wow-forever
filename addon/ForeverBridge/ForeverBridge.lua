@@ -74,6 +74,7 @@ local function EnsureBand()
 	band:SetFrameLevel(10000)
 	if band.SetIgnoreParentScale then
 		band:SetIgnoreParentScale(true)
+		run.ignoresParentScale = true
 	end
 	band:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
 	band:SetSize(Codec.CELLS_PER_ROW * CELL, Codec.MAX_ROWS * CELL)
@@ -94,8 +95,14 @@ function FB.ShowBand(id, payload)
 		return false, why
 	end
 	local b = EnsureBand()
+	-- échelle recalculée à chaque affichage (la résolution a pu changer) ; sans SetIgnoreParentScale, celle de
+	-- l'interface est compensée
 	local _, height = PhysicalSize()
-	b:SetScale(768 / height) -- échelle recalculée à chaque affichage (la résolution a pu changer)
+	local scale = 768 / height
+	if not run.ignoresParentScale then
+		scale = scale / UIParent:GetEffectiveScale()
+	end
+	b:SetScale(scale)
 	local perRow = Codec.CELLS_PER_ROW
 	local total = math.ceil(#cells / perRow) * perRow
 	for i = 1, total do

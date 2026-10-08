@@ -88,8 +88,14 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
    ou ajouté pendant qu'il tourne, et si un addon chargé à la demande relit son fichier après `/reload`. Commandes
    lancées dans un terminal à la racine du dépôt. Après chaque `/fv diag`, une capture d'écran (touche Impr. écran,
    rangée dans `Screenshots/` du client) suffit comme relevé.
+   0. **Une fois, après la mise à jour de la branche** (`lupa` ajouté) : fermer toute session Claude Code qui charge le
+      plugin forever (son serveur MCP verrouille `.venv/Scripts/forever.exe`), puis `uv sync`. Symptôme si on l'oublie :
+      « failed to remove file … forever.exe » à chaque `uv run`.
    1. **Jeu fermé.** Réglages du client (System > Graphics) : Display Mode `Windowed` ou `Windowed (Fullscreen)`, pas
-      `Fullscreen` ; Render Scale à 100 % ; HDR coupé. La mise à l'échelle de Windows peut rester telle quelle.
+      `Fullscreen` ; Render Scale à 100 % ; HDR coupé. La mise à l'échelle de Windows peut rester telle quelle. Son
+      activé (System > Audio : Enable Sound coché, volume Master non nul, même bas) : sans son, `PlaySoundFile` répond
+      « ne jouera pas » pour tout et l'autotest échoue à tort. L'autotest `.ogg` fait entendre un bref son (copie d'un
+      son d'un autre addon).
    2. `uv run forever bridge install` : installe `ForeverBridge`, ses fichiers de contrôle (`ctl/`) et l'addon de sonde
       `ForeverBridge_Probe` ; la sortie nomme le `.ogg` copié d'un autre addon pour l'autotest `.ogg`.
    3. Lancer le jeu, entrer avec un personnage ; dans la liste des addons, `ForeverBridge` et `ForeverBridge_Probe`

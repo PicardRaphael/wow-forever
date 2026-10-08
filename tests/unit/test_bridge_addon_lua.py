@@ -41,9 +41,11 @@ class Game:
     """Un client simulé avec ForeverBridge chargé comme le jeu le fait : fichiers du .toc, SavedVariables, puis
     ADDON_LOADED et PLAYER_LOGIN."""
 
-    def __init__(self, *, screen=(1920, 1080), files=None, saved=None, unknown_events=(), probe=None):
+    def __init__(self, *, screen=(1920, 1080), files=None, saved=None, unknown_events=(), probe=None, prelude=None):
         self.lua = lua51.LuaRuntime(unpack_returned_tuples=True)
         self.lua.execute(STUB.read_bytes())
+        if prelude:
+            self.lua.execute(prelude)
         self.stub = self.lua.globals().Stub
         self.stub.screen = self.lua.table(*screen)
         for path, state in (files or {}).items():
@@ -159,6 +161,27 @@ def test_fv_test_draws_the_selftest_band_pixel_perfect(screen):
     image = game.screen_image()
     assert decode_band(image) == Decoded(SELFTEST_ID, selftest_payload())
     assert cell_mismatches(image, encode_cells(SELFTEST_ID, selftest_payload())) == []
+
+
+WITHOUT_IGNORE_PARENT_SCALE = """
+UIParent.scale = 0.8
+local create = CreateFrame
+function CreateFrame(...)
+    local frame = create(...)
+    frame.SetIgnoreParentScale = nil
+    return frame
+end
+"""
+
+
+def test_band_compensates_the_ui_scale_without_set_ignore_parent_scale():
+    game = Game(screen=(2560, 1440), prelude=WITHOUT_IGNORE_PARENT_SCALE)
+    game.slash("/fv test")
+    band = game.band()
+    assert not band.ignoreParentScale
+    assert band.GetEffectiveScale(band) == pytest.approx(768 / 1440)
+    image = game.screen_image()
+    assert decode_band(image) == Decoded(SELFTEST_ID, selftest_payload())
 
 
 def test_fv_test_hides_after_two_minutes_or_when_typed_again():
