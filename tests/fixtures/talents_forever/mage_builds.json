@@ -1,8 +1,5 @@
 {
- "game_version": "1.60.1.70245",
- "preset": "rapide",
- "seed": 12345,
- "sensitivity": false,
+ "note": "Builds fixes du Mage pour les tests du format v6 (code de Talents Forever) : points, ordre et code ne dépendent pas des données installées ni de l'optimiseur ; jamais recalculés. Un build calculé par l'outil se compare au code que l'outil rend au moment du test.",
  "cases": {
   "leveling-20": {
    "context": "leveling",
@@ -26,7 +23,35 @@
     "frostbite",
     "iceLance"
    ],
-   "expected_code": "mage/20/--0530002001-klps-6"
+   "expected_code": "mage/20/--0530002001-klps-6",
+   "source": "relevé en jeu du 2026-10-08 (utilisateur) : code importé dans Talents Forever 0.37.1, 11 points en Frost aux rangs et positions du build, Arcane et Fire vides ; réexporté par l'addon à l'identique, ordre « klps » compris (« ?a » ajouté par l'addon, hors du code)",
+   "verified_in_game": "import_export"
+  },
+  "leveling-20-current": {
+   "context": "leveling",
+   "level": 20,
+   "talents": {
+    "improvedFrostbolt": 5,
+    "elementalPrecision": 2,
+    "frostbite": 3,
+    "iceLance": 1
+   },
+   "order": [
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "improvedFrostbolt",
+    "elementalPrecision",
+    "frostbite",
+    "frostbite",
+    "elementalPrecision",
+    "frostbite",
+    "iceLance"
+   ],
+   "expected_code": "mage/20/--0520003001-kl1p2lps-6",
+   "source": "relevé en jeu du 2026-10-08 (utilisateur) : code de `forever build leveling --level 20` (préréglage complet) importé dans Talents Forever 0.37.1, affiché conforme (Elemental Precision 2, Frostbite 3)",
+   "verified_in_game": "import"
   },
   "leveling-30": {
    "context": "leveling",
@@ -64,7 +89,9 @@
     "piercingIce",
     "fingersOfFrost"
    ],
-   "expected_code": "mage/30/--05300033210003001-klp2sr1prq1w2q1wqz-6"
+   "expected_code": "mage/30/--05300033210003001-klp2sr1prq1w2q1wqz-6",
+   "source": "build fixe : points et ordre du build de leveling calculé pour le plan de FA1 (tasks/FA1-plan.md, 1.60.1.70245, préréglage rapide, graine 12345), figés ; le code découle du seul format v6",
+   "verified_in_game": null
   },
   "dungeon-20": {
    "context": "dungeon",
@@ -75,7 +102,9 @@
     "arcaneBlast": 1
    },
    "order": [],
-   "expected_code": "mage/20/0500050001---6"
+   "expected_code": "mage/20/0500050001---6",
+   "source": "build fixe : points et ordre du build de donjon calculé pour le plan de FA1 (tasks/FA1-plan.md, 1.60.1.70245, préréglage rapide, graine 12345), figés ; le code découle du seul format v6",
+   "verified_in_game": null
   }
  }
 }
