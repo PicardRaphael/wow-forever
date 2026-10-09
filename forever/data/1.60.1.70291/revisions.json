@@ -3331,6 +3331,104 @@
      "rule": "manual"
     }
    ]
+  },
+  {
+   "revision": 5,
+   "date": "2026-10-09",
+   "motif": "Règle automatique des PNJ hors norme (décision 223) : paramètres dans mechanics.json (seuil, nombre minimal de PNJ, concordance), mesure relancée sur les mêmes journaux qu'en révision 4 : Young Black Bear, Ice Claw Bear, Elder Black Bear, Sunscale Lashtail et les bestioles du niveau 1 (Rabbit, Hare) écartés de la courbe, toujours mesurés ; niveau 1 : 8 -> 42 PV ; niveaux 5 à 13 : même valeur, certitude probable -> certain ; correction Questie inchangée ; état de combat gardé ligne par ligne ; rejeu des cas de leveling 20 et 30 identique ; accord de l'utilisateur du 2026-10-09",
+   "command": "mechanics.json (monsters.curve_outlier) à la main, puis forever measures refresh --yes --logs <trois journaux de 1.60.1.70245> --accept-version 1.60.1.70245 --accept-reason <note du 08/10>",
+   "candidate": null,
+   "report": "docs/research/data-1.60.1.70291-r5.md",
+   "counts": {
+    "manual": 9
+   },
+   "changes": [],
+   "manual_changes": [
+    {
+     "file": "mechanics.json",
+     "path": "monsters.curve_outlier",
+     "before": null,
+     "after": {
+      "value": {
+       "threshold": 0.15,
+       "min_npcs": 3,
+       "concordance": [
+        2,
+        3
+       ]
+      },
+      "certainty": "suppose",
+      "registry": "H11",
+      "source": "décision 223 : PNJ hors norme écartés de la courbe des PV ; seuil choisi par l'utilisateur le 2026-10-09 d'après les mesures de 1.60.1.70291 r4 (122 PNJ sur 137 exactement à la médiane des autres, écarts des ours et de Sunscale Lashtail de 19,6 à 20,1 %, faux écarts de 8,9 % au plus), au moins 3 PNJ au niveau, référence concordante (deux tiers des autres PNJ à moins du seuil de leur médiane) ; paramètre de mesure, pas une valeur du jeu"
+     },
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "règle /values/monsters.curve_outlier",
+     "before": null,
+     "after": "parametre",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded.721",
+     "before": null,
+     "after": "hors norme : 1 PV au niveau 1, -97,6 % de la médiane des autres PNJ du niveau (42) ; mesuré, écarté de la courbe (décision 223)",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded.1128",
+     "before": null,
+     "after": "hors norme : 122 PV au niveau 5, +19,6 % de la médiane des autres PNJ du niveau (102) ; mesuré, écarté de la courbe (décision 223)",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded.1186",
+     "before": null,
+     "after": "hors norme : 287 PV au niveau 11, +20,1 % de la médiane des autres PNJ du niveau (239) ; mesuré, écarté de la courbe (décision 223)",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded.1196",
+     "before": null,
+     "after": "hors norme : 164 PV au niveau 7, +19,7 % de la médiane des autres PNJ du niveau (137) ; mesuré, écarté de la courbe (décision 223)",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded.3254",
+     "before": null,
+     "after": "hors norme : 191 PV au niveau 11, -20,1 % de la médiane des autres PNJ du niveau (239) ; mesuré, écarté de la courbe (décision 223)",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded.5951",
+     "before": null,
+     "after": "hors norme : 8 PV au niveau 1, -81,0 % de la médiane des autres PNJ du niveau (42) ; mesuré, écarté de la courbe (décision 223)",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.*.levels.*.fought",
+     "before": null,
+     "after": "état de combat par ligne (vrai, faux, inconnu)",
+     "source": "décision 223, accord de l'utilisateur du 2026-10-09 (seuil et condition de concordance)",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }

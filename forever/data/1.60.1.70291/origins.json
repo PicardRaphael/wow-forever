@@ -1146,6 +1146,16 @@
       "certainty": "probable",
       "reason": "état de la bêta absent du client, porté par un texte officiel sans mesure (révision 2)",
       "registry": "G5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/monsters.curve_outlier"
+      ],
+      "origin": "parametre",
+      "source": "décision 223 (choix de l'utilisateur du 2026-10-09 d'après les mesures)",
+      "reason": "paramètre de la mesure des PV (règle hors norme de la courbe), pas une valeur du jeu (révision 5)",
+      "registry": "H11"
     }
   ],
   "pending": [],

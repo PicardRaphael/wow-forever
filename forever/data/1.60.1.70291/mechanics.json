@@ -667,6 +667,19 @@
    "certainty": "probable",
    "registry": "G5",
    "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : défi Legacy accordé à tous les joueurs de la bêta (16 points Legacy) ; respécialisation Legacy la moins chère à 1 pièce d'argent, le coût baissant d'une respécialisation par heure, comme les talents de classe ; pendant la bêta seulement (état de la bêta, pas une règle du lancement) ; aucun moteur ne la lit encore (LG1, LG2)"
+  },
+  "monsters.curve_outlier": {
+   "value": {
+    "threshold": 0.15,
+    "min_npcs": 3,
+    "concordance": [
+     2,
+     3
+    ]
+   },
+   "certainty": "suppose",
+   "registry": "H11",
+   "source": "décision 223 : PNJ hors norme écartés de la courbe des PV ; seuil choisi par l'utilisateur le 2026-10-09 d'après les mesures de 1.60.1.70291 r4 (122 PNJ sur 137 exactement à la médiane des autres, écarts des ours et de Sunscale Lashtail de 19,6 à 20,1 %, faux écarts de 8,9 % au plus), au moins 3 PNJ au niveau, référence concordante (deux tiers des autres PNJ à moins du seuil de leur médiane) ; paramètre de mesure, pas une valeur du jeu"
   }
  },
  "inherited_from": "1.60.1.70245"
