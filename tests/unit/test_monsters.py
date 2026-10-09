@@ -149,3 +149,29 @@ def test_an_npc_measured_before_in_a_vanished_log_keeps_an_unknown_fight():
     assert [e["npc_id"] for e in build_monsters([seen_only], None, LOCAL_VERSION)["curve_excluded"]] == [3244]
     table = build_monsters([seen_only], None, LOCAL_VERSION, unknown_fight={3244})
     assert table["curve_excluded"] == [] and table["hp_by_level"]["13"]["value"] == 307
+
+
+def test_each_level_row_keeps_its_fight_status():
+    """L'état de combat est gardé ligne par ligne (vrai, faux, inconnu) : une remesure suivante ne perd pas qu'un PNJ a
+    pu être combattu dans un journal disparu (Rabbit, Greater Plainstrider, 2026-10-09)."""
+    fought = {**obs(1001, 8, 156), "fought": True, "reaction": "hostile"}
+    seen = {**obs(1003, 10, 208), "fought": False, "reaction": "hostile"}
+    unknown_seen = {**obs(3244, 12, 272), "fought": False, "reaction": "hostile"}
+    table = build_monsters([fought, seen, unknown_seen, obs(3099, 6, 120)], None, LOCAL_VERSION, unknown_fight={3244})
+    status = {n: next(iter(e["levels"].values()))["fought"] for n, e in table["npcs"].items()}
+    assert status == {"1001": True, "1003": False, "3244": None, "3099": None}
+
+
+def test_unknown_fight_comes_from_rows_not_established_as_unfought():
+    from forever.pipeline.refresh import unknown_fight
+
+    installed = {
+        "logs": ["a.txt", "b.txt"],
+        "npcs": {
+            "1": {"levels": {"5": {"source": "journal a.txt (bloc avancé, 1 individu(s))", "fought": False}}},
+            "2": {"levels": {"5": {"source": "journal a.txt (bloc avancé, 1 individu(s))", "fought": True}}},
+            "3": {"levels": {"5": {"source": "journal a.txt (bloc avancé, 1 individu(s))"}}},  # avant la règle
+            "4": {"levels": {"5": {"source": "journal b.txt (bloc avancé, 1 individu(s))", "fought": False}}},
+        },
+    }
+    assert unknown_fight(installed, gone={"b.txt"}) == {2, 3, 4}
