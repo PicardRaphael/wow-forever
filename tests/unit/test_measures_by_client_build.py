@@ -124,3 +124,64 @@ def test_the_journal_lives_in_the_cache_not_in_the_data(tmp_path, make_deps, cap
     scan(deps, wow_dir, capsys)
     assert (deps.cache_dir / JOURNAL_NAME).is_file()
     assert not any(deps.data_dir.rglob(JOURNAL_NAME))
+
+
+# --- Mesures d'une version antérieure acceptées, explicitement et avec trace (2026-10-09) ------------------------
+# Demande de l'utilisateur : les journaux de 1.60.1.70245 (PNJ de Dun Morogh, Coldridge et Ragefire Chasm) passent dans
+# 1.60.1.70291, la note du 08/10 ne touchant pas ces monstres. Option explicite, raison obligatoire, trace écrite.
+
+REASON = "note officielle sans changement de ces monstres (test)"
+
+
+def earlier_deps(tmp_path, make_deps, data_copy):
+    wow_dir = wow_dir_with(tmp_path, LOCAL_VERSION)
+    deps = make_deps(wow_dir=wow_dir, data_dir=data_copy)
+    record_build(deps.cache_dir, ClientBuild(PREVIOUS_VERSION, datetime(2026, 9, 1, tzinfo=UTC), "wow_classic_beta"))
+    record_build(deps.cache_dir, ClientBuild(LOCAL_VERSION, datetime(2026, 9, 30, tzinfo=UTC), "wow_classic_beta"))
+    return deps, wow_dir
+
+
+def test_accepting_an_earlier_version_needs_a_reason(tmp_path, make_deps, capsys, data_copy):
+    deps, wow_dir = earlier_deps(tmp_path, make_deps, data_copy)
+    args = ["measures", "refresh", "--logs", str(wow_dir / "Logs"), "--dry-run", "--accept-version", PREVIOUS_VERSION]
+    assert main(args, deps) != 0
+    assert "--accept-reason" in capsys.readouterr().err
+
+
+def test_logs_of_the_accepted_earlier_version_are_measured_and_traced(tmp_path, make_deps, capsys, data_copy):
+    deps, wow_dir = earlier_deps(tmp_path, make_deps, data_copy)
+    code = main(
+        [
+            "measures",
+            "refresh",
+            "--logs",
+            str(wow_dir / "Logs"),
+            "--accept-version",
+            PREVIOUS_VERSION,
+            "--accept-reason",
+            REASON,
+            "--yes",
+            "--json",
+        ],
+        deps,
+    )
+    payload = json.loads(capsys.readouterr().out)
+    assert code == 0
+    assert payload["diff"]["measures"]["held_back"] == []
+    accepted = payload["diff"]["measures"]["accepted_earlier"]
+    assert accepted and {a["client_version"] for a in accepted} == {PREVIOUS_VERSION}
+    assert all(a["reason"] == REASON for a in accepted)
+    assert set(payload["sources"]["logs"]) >= {a["name"] for a in accepted}
+    if payload["status"] == "écrit":
+        monsters = read_json(data_copy / LOCAL_VERSION / "monsters.json")
+        assert any(PREVIOUS_VERSION in n and REASON in n for n in monsters["notes"])
+        source = read_json(data_copy / LOCAL_VERSION / "sources.json")["files"]["monsters.json"]["source"]
+        assert PREVIOUS_VERSION in source and REASON in source
+
+
+def test_a_later_version_is_never_accepted(tmp_path, make_deps, capsys, data_copy):
+    deps, wow_dir = earlier_deps(tmp_path, make_deps, data_copy)
+    later = "1.60.1.99250"
+    args = ["measures", "refresh", "--logs", str(wow_dir / "Logs"), "--dry-run", "--accept-version", later]
+    assert main([*args, "--accept-reason", REASON], deps) != 0
+    assert "antérieure" in capsys.readouterr().err
