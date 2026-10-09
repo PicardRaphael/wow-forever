@@ -39,7 +39,7 @@ from collections.abc import Collection
 from dataclasses import dataclass
 from typing import Protocol
 
-from forever.bridge.codec import BAND_HEIGHT, BAND_WIDTH, PROBE_HEIGHT, PROBE_WIDTH
+from forever.bridge.codec import BAND_HEIGHT, BAND_WIDTH, CELL_PX, PROBE_HEIGHT, PROBE_WIDTH
 from forever.bridge.image import Image
 
 _PER_MONITOR_AWARE_V2 = -4
@@ -83,11 +83,13 @@ def probe_rect(client: Rect) -> Rect | None:
     return Rect(client.left, client.top, PROBE_WIDTH, PROBE_HEIGHT)
 
 
-def band_rect(client: Rect) -> Rect | None:
-    """Rectangle de la bande entière, borné à la zone client ; None si la sonde n'y tient pas."""
+def band_rect(client: Rect, cell_px: int = CELL_PX) -> Rect | None:
+    """Rectangle de la bande entière à cette taille de case, borné à la zone client ; None si la sonde n'y tient
+    pas."""
     if probe_rect(client) is None:
         return None
-    return Rect(client.left, client.top, min(BAND_WIDTH, client.width), min(BAND_HEIGHT, client.height))
+    width, height = BAND_WIDTH * cell_px // CELL_PX, BAND_HEIGHT * cell_px // CELL_PX
+    return Rect(client.left, client.top, min(width, client.width), min(height, client.height))
 
 
 def may_capture(game_hwnd: int | None, foreground_hwnd: int | None, iconic: bool) -> bool:

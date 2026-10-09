@@ -396,7 +396,7 @@ def build_parser() -> argparse.ArgumentParser:
     b_self.add_argument("--wait", type=float, default=60.0, help="attente maximale du jeu au premier plan (--live)")
     b_self.add_argument("--save", type=Path, help="enregistrer la bande capturée en BMP (--live)")
     b_self.add_argument(
-        "--touch", action="store_true", help="modifier les fichiers de la sonde pendant que le jeu tourne (/fv diag)"
+        "--touch", action="store_true", help="modifier les fichiers de la sonde pendant que le jeu tourne (/fv poll, /fv diag)"
     )
     b_self.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
     b_self.add_argument("--json", action="store_true", help="sortie JSON")
@@ -2227,8 +2227,8 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     if args.touch:
         actions = install.touch_probe(_bridge_wow_dir(deps, args), deps.now().astimezone())
         lines = ["Fichiers de la sonde modifiés pendant que le jeu tourne :", *[f"  {a}" for a in actions]]
-        lines.append("En jeu : taper /fv diag (flip et late doivent jouer si le client voit ces fichiers), puis /reload "
-                     "et /fv diag à nouveau.")  # fmt: skip
+        lines.append("En jeu : taper /fv poll (premier chargement de ForeverBridge_Probe2 sans /reload : valeur "
+                     "« modifié à … » attendue), puis /fv diag.")  # fmt: skip
         _emit({"actions": actions, "provenance": provenance}, lines, provenance, args.json)
         return EXIT_OK
     if args.live:

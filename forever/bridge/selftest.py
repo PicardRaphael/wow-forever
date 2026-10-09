@@ -12,6 +12,7 @@ from typing import Any
 
 from forever.bridge.capture import GameWindow, Rect, WindowsCapture, band_rect, probe_rect
 from forever.bridge.codec import (
+    CELL_PX,
     CELLS_PER_ROW,
     MARKER_CELLS,
     SELFTEST_ID,
@@ -20,8 +21,8 @@ from forever.bridge.codec import (
     cell_mismatches,
     cell_values,
     decode_band,
+    detect_cell_px,
     encode_cells,
-    marker_present,
     render_band,
     selftest_payload,
 )
@@ -37,6 +38,7 @@ class SelftestReport:
     foreground_seen: bool = False
     marker_seen: bool = False
     probe_cells: list[int] | None = None
+    cell_px: int | None = None
     decoded: Decoded | BandError | None = None
     mismatches: list[tuple[int, int, int, int]] | None = None
     saved: Path | None = None
@@ -57,6 +59,7 @@ class SelftestReport:
             "foreground_seen": self.foreground_seen,
             "marker_seen": self.marker_seen,
             "probe_cells": self.probe_cells,
+            "cell_px": self.cell_px,
             "decoded": decoded,
             "mismatches": len(self.mismatches) if self.mismatches is not None else None,
             "first_mismatches": [
@@ -81,6 +84,9 @@ def _verdict(report: SelftestReport, payload: bytes, cells: list[int]) -> None:
     if decoded == Decoded(SELFTEST_ID, payload) and not report.mismatches:
         report.ok = True
         report.lines.append(f"vecteur reconnu ({len(payload)} octets, {rows} rangées, {len(cells)} cellules)")
+        if report.cell_px is not None:
+            unit = "pixel" if report.cell_px == 1 else "pixels"
+            report.lines.append(f"case de {report.cell_px} {unit}")
         return
     if isinstance(decoded, Decoded):
         report.lines.append(
@@ -142,23 +148,25 @@ def selftest_live(
         if not report.foreground_seen:
             report.foreground_seen = True
             report.lines.append("Jeu au premier plan : lecture de la sonde du marqueur")
-        probe_r, band_r = probe_rect(client), band_rect(client)
-        if probe_r is None or band_r is None:
+        probe_r = probe_rect(client)
+        if probe_r is None:
             report.lines.append("zone client plus petite que la sonde : agrandir la fenêtre du jeu")
             return report
         probe = capture.grab(probe_r)
         if probe is not None:
-            report.probe_cells = cell_values(probe, 1)[: len(MARKER_CELLS)]
-            if marker_present(probe):
-                band = capture.grab(band_r)
-                if band is not None:
-                    report.marker_seen = True
-                    report.decoded = decode_band(band)
-                    report.mismatches = cell_mismatches(band, cells)
-                    if save is not None:
-                        write_bmp(band, save)
-                        report.saved = save
-                    break
+            cell_px = detect_cell_px(probe)
+            report.probe_cells = cell_values(probe, 1, cell_px or CELL_PX)[: len(MARKER_CELLS)]
+            band_r = band_rect(client, cell_px) if cell_px is not None else None
+            band = capture.grab(band_r) if band_r is not None else None
+            if band is not None:
+                report.marker_seen = True
+                report.cell_px = cell_px
+                report.decoded = decode_band(band, cell_px)
+                report.mismatches = cell_mismatches(band, cells, cell_px)
+                if save is not None:
+                    write_bmp(band, save)
+                    report.saved = save
+                break
         if late:
             break
         sleep(interval_s)

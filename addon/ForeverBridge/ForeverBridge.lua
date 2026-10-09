@@ -1,11 +1,12 @@
 -- ForeverBridge : pont de conversation de forever-core (P06a, décisions 194 et 212).
--- Bloc A : bande de test (/fv test) lue par « forever bridge selftest --live », et autotest des fichiers de contrôle
--- (/fv diag) : sons vides ou valides, fichier modifié ou ajouté pendant que le jeu tourne, addon chargé à la demande.
+-- Blocs A et A2 : fenêtre dédiée (/fv, raccourci, Échap), bande de test (/fv test, une case par pixel par défaut) lue
+-- par « forever bridge selftest --live », consultation d'un emplacement de sonde (/fv poll) et autotest des fichiers
+-- de contrôle (/fv diag, seule commande qui écrit dans la discussion générale).
 -- Seul addon de forever-core qui dessine (décision 194) : la bande n'apparaît que sur demande. Aucune fonction
--- d'action, aucun rechargement de l'interface, aucun abonnement au journal de combat.
+-- d'action, aucun rechargement de l'interface, aucun abonnement au journal de combat, aucune ouverture automatique.
 --
--- Contient du code adapté de wow-ai (https://github.com/chelinho139/wow-ai, commit 3756eb5a : dessin de la bande et
--- autotest des signaux, addon/WoWAI/WoWAI.lua), sous la licence suivante :
+-- Contient du code adapté de wow-ai (https://github.com/chelinho139/wow-ai, commit 3756eb5a : dessin de la bande,
+-- autotest des signaux et fenêtre, addon/WoWAI/WoWAI.lua), sous la licence suivante :
 --
 -- MIT License
 --
@@ -35,18 +36,27 @@ ForeverBridge = {}
 local FB = ForeverBridge
 local Codec = ForeverBridge_Codec
 
-local CELL = 4 -- côté d'une cellule, en pixels physiques
+local DEFAULT_CELL = 1 -- côté d'une case de la bande, en pixels physiques (repli de 2 à 4 par /fv test N)
+local MAX_CELL = 4
 local TEST_DURATION = 120 -- la bande de test se retire seule au bout de deux minutes
 local CTL = "Interface\\AddOns\\ForeverBridge\\ctl\\"
 local PROBE_ADDON = "ForeverBridge_Probe"
+local PROBE2_ADDON = "ForeverBridge_Probe2"
 local PREFIX = "|cff33ff99ForeverBridge|r : "
+local WINDOW_W, WINDOW_H = 520, 360
+local MIN_W, MIN_H = 360, 240
+
+BINDING_HEADER_FOREVERBRIDGE = "ForeverBridge"
+BINDING_NAME_FOREVERBRIDGE_TOGGLE = "Ouvrir ou fermer la fenêtre"
 
 local driver = CreateFrame("Frame", "ForeverBridgeDriver", UIParent)
 local band
 local textures = {}
 local run = {}
+local ui = {}
 
-local function Say(text)
+-- Diagnostic demandé par le joueur (/fv diag) : seule écriture dans la discussion générale.
+local function ChatSay(text)
 	DEFAULT_CHAT_FRAME:AddMessage(PREFIX .. text)
 end
 
@@ -58,6 +68,161 @@ local function PhysicalSize()
 		end
 	end
 	return 1920, 1080
+end
+
+---------------------------------------------------------------------------
+-- Fenêtre dédiée (cadre adapté de wow-ai : glisser, poignée, Échap)
+---------------------------------------------------------------------------
+
+local BACKDROP = {
+	bgFile = "Interface\\ChatFrame\\ChatFrameBackground",
+	edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+	tile = true,
+	tileSize = 16,
+	edgeSize = 12,
+	insets = { left = 3, right = 3, top = 3, bottom = 3 },
+}
+
+local function WindowState()
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" then
+		return nil
+	end
+	if type(db.window) ~= "table" then
+		db.window = {}
+	end
+	return db.window
+end
+
+function FB.SaveGeometry()
+	local f, state = ui.frame, WindowState()
+	if not f or not state then
+		return
+	end
+	local point, _, relPoint, x, y = f:GetPoint(1)
+	state.point, state.relPoint, state.x, state.y = point, relPoint, x, y
+	state.width, state.height = f:GetWidth(), f:GetHeight()
+end
+
+local function RestoreGeometry(f)
+	local state = WindowState() or {}
+	local width = tonumber(state.width) or WINDOW_W
+	local height = tonumber(state.height) or WINDOW_H
+	f:SetSize(math.max(width, MIN_W), math.max(height, MIN_H))
+	f:ClearAllPoints()
+	if type(state.point) == "string" then
+		f:SetPoint(state.point, UIParent, state.relPoint or state.point, tonumber(state.x) or 0, tonumber(state.y) or 0)
+	else
+		f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	end
+end
+
+local function BuildWindow()
+	if ui.frame then
+		return ui.frame
+	end
+	local f = CreateFrame("Frame", "ForeverBridgeWindow", UIParent, "BackdropTemplate")
+	ui.frame = f
+	f:SetFrameStrata("DIALOG")
+	f:SetMovable(true)
+	f:SetResizable(true)
+	f:SetClampedToScreen(true)
+	if not (f.SetResizeBounds and pcall(f.SetResizeBounds, f, MIN_W, MIN_H)) and f.SetMinResize then
+		pcall(f.SetMinResize, f, MIN_W, MIN_H)
+	end
+	f:EnableMouse(true)
+	f:RegisterForDrag("LeftButton")
+	f:SetScript("OnDragStart", function(self)
+		self:StartMoving()
+	end)
+	f:SetScript("OnDragStop", function(self)
+		self:StopMovingOrSizing()
+		FB.SaveGeometry()
+	end)
+	if f.SetBackdrop then
+		f:SetBackdrop(BACKDROP)
+		f:SetBackdropColor(0.05, 0.05, 0.07, 0.92)
+		f:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
+	end
+	RestoreGeometry(f)
+	f:Hide()
+	tinsert(UISpecialFrames, "ForeverBridgeWindow")
+
+	local dot = f:CreateTexture(nil, "OVERLAY")
+	dot:SetSize(14, 14)
+	dot:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -14)
+	dot:SetTexture("Interface\\FriendsFrame\\StatusIcon-Offline")
+	ui.dot = dot
+
+	local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
+	title:SetPoint("LEFT", dot, "RIGHT", 6, 0)
+	title:SetText("ForeverBridge")
+
+	local status = f:CreateFontString("ForeverBridgeStatus", "OVERLAY", "GameFontHighlightSmall")
+	status:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -34)
+	status:SetPoint("RIGHT", f, "RIGHT", -34, 0)
+	status:SetJustifyH("LEFT")
+	status:SetText("Pont : pas encore vu · état des données inconnu")
+	ui.status = status
+
+	local close = CreateFrame("Button", nil, f, "UIPanelCloseButton")
+	close:SetPoint("TOPRIGHT", f, "TOPRIGHT", -4, -4)
+	close:SetScript("OnClick", function()
+		f:Hide()
+	end)
+
+	local history = CreateFrame("ScrollingMessageFrame", "ForeverBridgeHistory", f)
+	history:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -52)
+	history:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14, 22)
+	history:SetFontObject(ChatFontNormal)
+	history:SetJustifyH("LEFT")
+	history:SetFading(false)
+	history:SetMaxLines(500)
+	history:SetHyperlinksEnabled(true)
+	history:EnableMouseWheel(true)
+	history:SetScript("OnMouseWheel", function(self, delta)
+		if delta > 0 then
+			self:ScrollUp()
+		else
+			self:ScrollDown()
+		end
+	end)
+	ui.history = history
+
+	local grip = CreateFrame("Button", nil, f)
+	grip:SetSize(16, 16)
+	grip:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -5, 5)
+	grip:SetNormalTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Up")
+	grip:SetHighlightTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Highlight")
+	grip:SetPushedTexture("Interface\\ChatFrame\\UI-ChatIM-SizeGrabber-Down")
+	grip:SetScript("OnMouseDown", function()
+		f:StartSizing("BOTTOMRIGHT")
+	end)
+	grip:SetScript("OnMouseUp", function()
+		f:StopMovingOrSizing()
+		FB.SaveGeometry()
+	end)
+	return f
+end
+
+-- Ligne ajoutée à l'historique de la fenêtre, jamais à la discussion générale.
+function FB.Print(text)
+	BuildWindow()
+	ui.history:AddMessage(text)
+end
+
+-- Ouverture à la demande du joueur seulement (commande ou raccourci), jamais automatique.
+function FB.Open()
+	BuildWindow():Show()
+end
+
+function FB.Toggle()
+	local f = BuildWindow()
+	if f:IsShown() then
+		f:Hide()
+	else
+		f:Show()
+	end
 end
 
 ---------------------------------------------------------------------------
@@ -77,7 +242,6 @@ local function EnsureBand()
 		run.ignoresParentScale = true
 	end
 	band:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0, 0)
-	band:SetSize(Codec.CELLS_PER_ROW * CELL, Codec.MAX_ROWS * CELL)
 	band:Hide()
 	return band
 end
@@ -88,8 +252,10 @@ function FB.HideBand()
 	end
 end
 
--- Dessine le message (numéro, charge) ; faux et la raison si la charge dépasse la bande.
-function FB.ShowBand(id, payload)
+-- Dessine le message (numéro, charge) avec des cases de `cell` pixels ; faux et la raison si la charge dépasse la
+-- bande.
+function FB.ShowBand(id, payload, cell)
+	cell = cell or DEFAULT_CELL
 	local cells, why = Codec.Encode(id % 65536, payload)
 	if not cells then
 		return false, why
@@ -104,17 +270,20 @@ function FB.ShowBand(id, payload)
 	end
 	b:SetScale(scale)
 	local perRow = Codec.CELLS_PER_ROW
-	local total = math.ceil(#cells / perRow) * perRow
+	local rows = math.ceil(#cells / perRow)
+	b:SetSize(perRow * cell, rows * cell)
+	local total = rows * perRow
 	for i = 1, total do
 		local t = textures[i]
 		if not t then
 			t = b:CreateTexture(nil, "OVERLAY")
-			t:SetSize(CELL, CELL)
-			local col = (i - 1) % perRow
-			local row = math.floor((i - 1) / perRow)
-			t:SetPoint("TOPLEFT", b, "TOPLEFT", col * CELL, -row * CELL)
 			textures[i] = t
 		end
+		local col = (i - 1) % perRow
+		local row = math.floor((i - 1) / perRow)
+		t:SetSize(cell, cell)
+		t:ClearAllPoints()
+		t:SetPoint("TOPLEFT", b, "TOPLEFT", col * cell, -row * cell)
 		local r, g, bl = Codec.CellColor(cells[i] or 0)
 		t:SetColorTexture(r, g, bl, 1)
 		t:Show()
@@ -127,7 +296,7 @@ function FB.ShowBand(id, payload)
 end
 
 ---------------------------------------------------------------------------
--- Bande de test (/fv test)
+-- Bande de test (/fv test [taille de case])
 ---------------------------------------------------------------------------
 
 function FB.StopTest()
@@ -135,20 +304,28 @@ function FB.StopTest()
 	FB.HideBand()
 end
 
-function FB.ToggleTest()
-	if run.testLeft then
-		FB.StopTest()
-		Say("bande de test retirée.")
+function FB.Test(size)
+	local cell = tonumber(size)
+	if size and size ~= "" and not (cell and cell == math.floor(cell) and cell >= 1 and cell <= MAX_CELL) then
+		FB.Open()
+		FB.Print("taille de case invalide : /fv test suivi de 1, 2, 3 ou 4.")
 		return
 	end
-	local ok, why = FB.ShowBand(Codec.SELFTEST_ID, Codec.SelftestPayload())
+	if run.testLeft and not cell then
+		FB.StopTest()
+		FB.Print("bande de test retirée.")
+		return
+	end
+	cell = cell or DEFAULT_CELL
+	local ok, why = FB.ShowBand(Codec.SELFTEST_ID, Codec.SelftestPayload(), cell)
+	FB.Open()
 	if not ok then
-		Say("bande de test impossible : " .. tostring(why))
+		FB.Print("bande de test impossible : " .. tostring(why))
 		return
 	end
 	run.testLeft = TEST_DURATION
-	Say("bande de test affichée en haut à gauche (retirée dans deux minutes, ou par /fv test). "
-		.. "Dans un terminal : uv run forever bridge selftest --live, puis revenir au jeu.")
+	FB.Print("bande de test affichée en haut à gauche, case de " .. cell .. " pixel(s) (retirée dans deux minutes, "
+		.. "ou par /fv test). Dans un terminal : uv run forever bridge selftest --live, puis revenir au jeu.")
 end
 
 -- Minuterie : le cadre pilote reste visible (OnUpdate ne tourne que sur un cadre visible).
@@ -158,6 +335,37 @@ function FB.Tick(elapsed)
 		if run.testLeft <= 0 then
 			FB.StopTest()
 		end
+	end
+end
+
+---------------------------------------------------------------------------
+-- Consultation d'un emplacement de sonde (/fv poll)
+---------------------------------------------------------------------------
+
+local function LoadOnDemand(name)
+	if not (C_AddOns and type(C_AddOns.LoadAddOn) == "function") then
+		return false, "C_AddOns.LoadAddOn absente"
+	end
+	local ok, loaded, reason = pcall(C_AddOns.LoadAddOn, name)
+	if not ok then
+		return false, "erreur"
+	end
+	return loaded, reason
+end
+
+function FB.Poll()
+	FB.Open()
+	if run.probe2Loaded then
+		FB.Print(PROBE2_ADDON .. " : déjà chargé dans cette session (valeur « " .. tostring(ForeverBridge_Probe2Value)
+			.. " ») ; un nouvel essai demande /reload")
+		return
+	end
+	local loaded, reason = LoadOnDemand(PROBE2_ADDON)
+	if loaded then
+		run.probe2Loaded = true
+		FB.Print(PROBE2_ADDON .. " : chargé, valeur « " .. tostring(ForeverBridge_Probe2Value) .. " »")
+	else
+		FB.Print(PROBE2_ADDON .. " : non chargé (" .. tostring(reason) .. ")")
 	end
 end
 
@@ -194,36 +402,33 @@ local function DiagSounds(ext)
 		local plays, why = Plays(CTL .. name .. "." .. ext)
 		results[name] = plays
 		local state = why or (plays and "joue" or "ne joue pas")
-		Say("ctl/" .. name .. "." .. ext .. " : " .. state .. " (" .. control[2] .. ")")
+		ChatSay("ctl/" .. name .. "." .. ext .. " : " .. state .. " (" .. control[2] .. ")")
 	end
 	local passed = results.empty == false and results.valid == true
-	Say("autotest ." .. ext .. " : " .. (passed and "réussi" or "échoué"))
+	ChatSay("autotest ." .. ext .. " : " .. (passed and "réussi" or "échoué"))
+	return passed
 end
 
 local function DiagProbe()
-	local loaded, reason = false, "C_AddOns.LoadAddOn absente"
-	if C_AddOns and type(C_AddOns.LoadAddOn) == "function" then
-		local ok, result, why = pcall(C_AddOns.LoadAddOn, PROBE_ADDON)
-		if ok then
-			loaded, reason = result, why
-		else
-			loaded, reason = false, "erreur"
-		end
-	end
+	local loaded, reason = LoadOnDemand(PROBE_ADDON)
 	if loaded then
-		Say(PROBE_ADDON .. " : chargé, valeur « " .. tostring(ForeverBridge_ProbeValue) .. " »")
+		ChatSay(PROBE_ADDON .. " : chargé, valeur « " .. tostring(ForeverBridge_ProbeValue) .. " »")
 	else
-		Say(PROBE_ADDON .. " : non chargé (" .. tostring(reason) .. ")")
+		ChatSay(PROBE_ADDON .. " : non chargé (" .. tostring(reason) .. ")")
 	end
 end
 
 function FB.Diag()
 	local width, height = PhysicalSize()
 	local uiScale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale() or 1
-	Say(string.format("écran %d × %d, échelle de la bande %.4f, échelle de l'interface %.4f", width, height,
+	ChatSay(string.format("écran %d × %d, échelle de la bande %.4f, échelle de l'interface %.4f", width, height,
 		768 / height, uiScale))
-	DiagSounds("wav")
-	DiagSounds("ogg")
+	local wav = DiagSounds("wav")
+	local ogg = DiagSounds("ogg")
+	if not (wav or ogg) then
+		ChatSay("canal son inutilisable sur ce client : les réponses passent par la consultation de la réserve "
+			.. "(aucun son dans le chemin du pont)")
+	end
 	DiagProbe()
 end
 
@@ -248,6 +453,9 @@ function handlers.ADDON_LOADED(name)
 	if type(db.next_id) ~= "number" then
 		db.next_id = 1
 	end
+	if type(db.window) ~= "table" then
+		db.window = {}
+	end
 end
 
 driver:SetScript("OnEvent", function(_, event, ...)
@@ -263,18 +471,38 @@ for event in pairs(handlers) do
 	pcall(driver.RegisterEvent, driver, event)
 end
 
-local HELP = "/fv test : bande de test (lue par forever bridge selftest --live) ; /fv diag : autotest des fichiers "
-	.. "de contrôle et de l'addon chargé à la demande."
+local HELP = {
+	"/fv : ouvrir ou fermer cette fenêtre (raccourci : Options > Raccourcis > AddOns > ForeverBridge ; Échap ferme).",
+	"/fv test [1-4] : bande de test, lue par uv run forever bridge selftest --live (une case par pixel par défaut).",
+	"/fv poll : chargement d'un emplacement de sonde sans /reload (sonde en jeu B).",
+	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
+}
+
+local function Help()
+	ui.helped = true
+	FB.Open()
+	for _, line in ipairs(HELP) do
+		FB.Print(line)
+	end
+end
 
 SLASH_FOREVERBRIDGE1 = "/fv"
 SLASH_FOREVERBRIDGE2 = "/forever"
 SlashCmdList.FOREVERBRIDGE = function(message)
-	local command = string.lower((message or ""):match("^%s*(%S*)") or "")
-	if command == "test" then
-		FB.ToggleTest()
+	local command, rest = (message or ""):match("^%s*(%S*)%s*(.-)%s*$")
+	command = string.lower(command or "")
+	if command == "" then
+		FB.Toggle()
+		if ui.frame:IsShown() and not ui.helped then
+			Help()
+		end
+	elseif command == "test" then
+		FB.Test(rest)
+	elseif command == "poll" then
+		FB.Poll()
 	elseif command == "diag" then
 		FB.Diag()
 	else
-		Say(HELP)
+		Help()
 	end
 end

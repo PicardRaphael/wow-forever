@@ -40,7 +40,11 @@ from typing import Literal
 
 from forever.bridge.image import Image
 
-CELL_PX = 4
+# Taille de case en pixels physiques : l'addon dessine une case par pixel par défaut (décision 212 amendée le
+# 2026-10-09), 2 à 4 en repli ; le pont reconnaît la taille sur le marqueur. CELL_PX, la plus grande, fixe la sonde
+# (20 × 4) et le plus grand rectangle de bande lu.
+CELL_SIZES = (1, 2, 3, 4)
+CELL_PX = max(CELL_SIZES)
 CELLS_PER_ROW = 200
 MAX_ROWS = 24
 MAGIC = (0xC7, 0x1A)
@@ -101,7 +105,7 @@ def cell_color(value: int) -> tuple[int, int, int]:
     return (255 if value & 4 else 0, 255 if value & 2 else 0, 255 if value & 1 else 0)
 
 
-def render_band(cells: Sequence[int]) -> Image:
+def render_band(cells: Sequence[int], cell_px: int = CELL_PX) -> Image:
     """Image de la bande telle que l'addon la dessine : rangées complètes, cellules manquantes à 0 (noir)."""
     rows = max(1, -(-len(cells) // CELLS_PER_ROW))
     out = bytearray()
@@ -110,52 +114,66 @@ def render_band(cells: Sequence[int]) -> Image:
         for col in range(CELLS_PER_ROW):
             i = row * CELLS_PER_ROW + col
             r, g, b = cell_color(cells[i] if i < len(cells) else 0)
-            line += bytes((b, g, r, 255)) * CELL_PX
-        out += bytes(line) * CELL_PX
-    return Image(BAND_WIDTH, rows * CELL_PX, bytes(out))
+            line += bytes((b, g, r, 255)) * cell_px
+        out += bytes(line) * cell_px
+    return Image(CELLS_PER_ROW * cell_px, rows * cell_px, bytes(out))
 
 
-def _value(image: Image, col: int, row: int) -> int:
-    r, g, b = image.pixel(col * CELL_PX + CELL_PX // 2, row * CELL_PX + CELL_PX // 2)
+def _value(image: Image, col: int, row: int, cell_px: int) -> int:
+    r, g, b = image.pixel(col * cell_px + cell_px // 2, row * cell_px + cell_px // 2)
     return (4 if r >= 128 else 0) | (2 if g >= 128 else 0) | (1 if b >= 128 else 0)
 
 
-def _shape(image: Image) -> tuple[int, int]:
+def _shape(image: Image, cell_px: int) -> tuple[int, int]:
     """(rangées, colonnes) de cellules entièrement lisibles dans l'image."""
-    return image.height // CELL_PX, min(CELLS_PER_ROW, image.width // CELL_PX)
+    return image.height // cell_px, min(CELLS_PER_ROW, image.width // cell_px)
 
 
-def _stream(image: Image) -> Iterator[int]:
+def _stream(image: Image, cell_px: int) -> Iterator[int]:
     """Cellules dans l'ordre du message ; s'arrête à la première cellule hors de l'image."""
-    rows, cols = _shape(image)
+    rows, cols = _shape(image, cell_px)
     for row in range(rows):
         for col in range(CELLS_PER_ROW):
             if col >= cols:
                 return
-            yield _value(image, col, row)
+            yield _value(image, col, row, cell_px)
 
 
-def cell_values(image: Image, rows: int) -> list[int]:
+def cell_values(image: Image, rows: int, cell_px: int = CELL_PX) -> list[int]:
     """Valeurs lues au centre de chaque cellule (seuil 128 par canal), rangée par rangée, dans la limite de l'image."""
-    max_rows, cols = _shape(image)
-    return [_value(image, col, row) for row in range(min(rows, max_rows)) for col in range(cols)]
+    max_rows, cols = _shape(image, cell_px)
+    return [_value(image, col, row, cell_px) for row in range(min(rows, max_rows)) for col in range(cols)]
+
+
+def _marker_at(image: Image, cell_px: int) -> bool:
+    rows, cols = _shape(image, cell_px)
+    if rows < 1 or cols < len(MARKER_CELLS):
+        return False
+    return tuple(_value(image, col, 0, cell_px) for col in range(len(MARKER_CELLS))) == MARKER_CELLS
+
+
+def detect_cell_px(image: Image) -> int | None:
+    """Plus petite taille de case de CELL_SIZES à laquelle le marqueur `C7 1A` se lit en tête de l'image."""
+    return next((size for size in CELL_SIZES if _marker_at(image, size)), None)
 
 
 def marker_present(probe: Image) -> bool:
-    """Les cinq cellules de la sonde portent-elles le marqueur `C7 1A` ?"""
-    rows, cols = _shape(probe)
-    if rows < 1 or cols < len(MARKER_CELLS):
-        return False
-    return tuple(_value(probe, col, 0) for col in range(len(MARKER_CELLS))) == MARKER_CELLS
+    """Les cinq cellules de la sonde portent-elles le marqueur `C7 1A`, à l'une des tailles de case ?"""
+    return detect_cell_px(probe) is not None
 
 
-def decode_band(image: Image) -> Decoded | BandError | None:
+def decode_band(image: Image, cell_px: int | None = None) -> Decoded | BandError | None:
     """Message lu dans l'image de la bande ; None sans marqueur ; BandError si le marqueur est là mais que la longueur,
-    la taille de l'image ou la somme de contrôle ne vont pas (vérifiées dans cet ordre)."""
+    la taille de l'image ou la somme de contrôle ne vont pas (vérifiées dans cet ordre). Taille de case reconnue sur
+    le marqueur si elle n'est pas donnée."""
+    if cell_px is None:
+        cell_px = detect_cell_px(image)
+        if cell_px is None:
+            return None
     data = bytearray()
     acc = nbits = 0
     needed = HEADER_BYTES
-    for value in _stream(image):
+    for value in _stream(image, cell_px):
         acc = (acc << 3) | value
         nbits += 3
         if nbits < 8:
@@ -183,14 +201,18 @@ def decode_band(image: Image) -> Decoded | BandError | None:
     return Decoded(int.from_bytes(data[2:4], "big"), body[4:])
 
 
-def cell_mismatches(image: Image, expected: Sequence[int]) -> list[tuple[int, int, int, int]]:
+def cell_mismatches(
+    image: Image, expected: Sequence[int], cell_px: int | None = None
+) -> list[tuple[int, int, int, int]]:
     """Cellules lues différentes des cellules attendues : (rangée, colonne, attendue, lue) ; diagnostic de selftest.
-    Une cellule hors de l'image est lue -1."""
-    rows, cols = _shape(image)
+    Une cellule hors de l'image est lue -1. Taille de case reconnue sur le marqueur, CELL_PX à défaut."""
+    if cell_px is None:
+        cell_px = detect_cell_px(image) or CELL_PX
+    rows, cols = _shape(image, cell_px)
     out = []
     for i, want in enumerate(expected):
         row, col = divmod(i, CELLS_PER_ROW)
-        got = _value(image, col, row) if row < rows and col < cols else -1
+        got = _value(image, col, row, cell_px) if row < rows and col < cols else -1
         if got != want:
             out.append((row, col, want, got))
     return out

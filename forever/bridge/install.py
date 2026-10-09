@@ -6,7 +6,9 @@ Fichiers de contrôle (autotest `/fv diag`) : `empty` (vide, ne doit pas jouer),
 `flip` (vide à l'installation, rempli par `touch_probe` pendant que le jeu tourne), `late` (absent à l'installation,
 créé par `touch_probe`) ; chacun en `.wav` (WAV silencieux) et en `.ogg` (copie d'un `.ogg` trouvé dans un autre addon
 installé, aucun encodeur ici). `ForeverBridge_Probe/Probe.lua`, réécrit par `touch_probe`, dit si un addon chargé à
-la demande relit son fichier modifié après le lancement.
+la demande relit son fichier modifié après le lancement ; `ForeverBridge_Probe2`, chargé seulement par `/fv poll`, dit
+si le premier chargement sans `/reload` d'un fichier modifié après le lancement lit le nouveau contenu (chemin des
+réponses, décision 212 amendée le 2026-10-09).
 
 Contient du code adapté de wow-ai (https://github.com/chelinho139/wow-ai, commit 3756eb5a : `bridge/install-slots.js`),
 sous la licence suivante :
@@ -46,6 +48,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 SOURCE = REPO_ROOT / "addon" / "ForeverBridge"
 ADDON = "ForeverBridge"
 PROBE_ADDON = "ForeverBridge_Probe"
+PROBE2_ADDON = "ForeverBridge_Probe2"
 INTERFACE = "16001"
 
 
@@ -84,23 +87,27 @@ def find_ogg(addons: Path) -> Path | None:
     return min(found, key=lambda p: (p.stat().st_size, str(p))) if found else None
 
 
-def _probe_toc() -> str:
+def _probe_toc(title: str = "sonde", command: str = "/fv diag", lua: str = "Probe.lua") -> str:
     return "\n".join(
         [
             f"## Interface: {INTERFACE}",
-            "## Title: ForeverBridge (sonde)",
-            "## Notes: Sonde du pont de forever-core, chargée à la demande par /fv diag (P06a).",
+            f"## Title: ForeverBridge ({title})",
+            f"## Notes: Sonde du pont de forever-core, chargée à la demande par {command} (P06a).",
             "## LoadOnDemand: 1",
             f"## Dependencies: {ADDON}",
             "",
-            "Probe.lua",
+            lua,
             "",
         ]
     )
 
 
-def _probe_lua(value: str) -> str:
-    return f'ForeverBridge_ProbeValue = "{value}"\n'
+def _probe_lua(value: str, variable: str = "ForeverBridge_ProbeValue") -> str:
+    return f'{variable} = "{value}"\n'
+
+
+def _probe2_lua(value: str) -> str:
+    return _probe_lua(value, "ForeverBridge_Probe2Value")
 
 
 class _Writer:
@@ -155,6 +162,10 @@ def install_bridge(wow_dir: Path, slots: int = 0, *, dry_run: bool = False, sour
     probe = addons / PROBE_ADDON
     out.write(probe / f"{PROBE_ADDON}.toc", _probe_toc().encode("utf-8"), "sonde")
     out.write(probe / "Probe.lua", _probe_lua("installation").encode("utf-8"), "sonde")
+    probe2 = addons / PROBE2_ADDON
+    toc2 = _probe_toc("sonde de consultation", "/fv poll", "Probe2.lua")
+    out.write(probe2 / f"{PROBE2_ADDON}.toc", toc2.encode("utf-8"), "sonde")
+    out.write(probe2 / "Probe2.lua", _probe2_lua("installation").encode("utf-8"), "sonde")
     return report
 
 
@@ -176,4 +187,9 @@ def touch_probe(wow_dir: Path, now: datetime) -> list[str]:
     else:
         out.note("pas de ctl/valid.ogg : flip.ogg et late.ogg inchangés")
     out.write(probe / "Probe.lua", _probe_lua(f"modifié à {now:%H:%M:%S}").encode("utf-8"), "sonde réécrite")
+    probe2 = addons / PROBE2_ADDON
+    if probe2.is_dir():
+        out.write(probe2 / "Probe2.lua", _probe2_lua(f"modifié à {now:%H:%M:%S}").encode("utf-8"), "sonde réécrite")
+    else:
+        out.note(f"{PROBE2_ADDON} absent : relancer `forever bridge install`, jeu fermé")
     return report.actions
