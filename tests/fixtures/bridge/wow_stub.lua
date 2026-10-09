@@ -105,7 +105,7 @@ local function newRegion(kind, name, parent)
 	function r:StartSizing() self.sizing = true end
 	function r:StopMovingOrSizing() self.moving, self.sizing = false, false end
 	function r:SetBackdrop(b) self.backdrop = b end
-	function r:SetBackdropColor() end
+	function r:SetBackdropColor(cr, cg, cb, ca) self.backdropColor = { cr, cg, cb, ca or 1 } end
 	function r:SetBackdropBorderColor() end
 	function r:SetNormalTexture(t) self.normal = t end
 	function r:SetHighlightTexture(t) self.highlight = t end
