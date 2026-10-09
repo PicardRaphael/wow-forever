@@ -44,13 +44,22 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 | addon → forever | SavedVariables (`WTF/Account/<COMPTE>/SavedVariables/<Addon>.lua`), lues par `forever` sans exécuter de Lua | au `/reload`, à la déconnexion, à la sortie | **Recommandé** ([Certain] bug de 69913 corrigé en 70009) |
 | jeu → forever | Journal de combat `Logs/WoWCombatLog-*.txt` (format 22 avancé, activé par ForeverLogger) | écrit par paquets : secondes à minutes ([À vérifier] latence) | Analyse **après** le combat |
 | appoint | Chaîne copiée dans une zone de saisie | action humaine | Format simple, jamais `loadstring` |
-| jeu ↔ forever (P06a) | Pont : bande de pixels lue par `forever bridge` (aller), réserve d'addons chargés à la demande signalée par fichier son (retour), secours `/reload` | quasi direct | **Prévu** (P06a, décisions 194 et 197) |
+| jeu ↔ forever (P06a) | Pont : bande de pixels lue par `forever bridge` (aller, de l'envoi à l'accusé), réserve d'addons chargés à la demande consultée à intervalles (retour ; aucun son : un fichier son vide « joue » sur Forever), secours `/reload` | quelques secondes | **Livré** (P06a, décisions 194, 197 et 212) |
 | forever → addons tiers | Chaînes d'import collées par le joueur (Talents Forever, Naowh Forever, EllesmereUI) | action humaine | **Prévu** (FA1, T10a, EX1, T10 ; décision 196) |
 | à éviter | Journal de discussion (écrit à la sortie, ignore les `print` d'addon) ; pixels et lecture d'écran hors du pont de P06a | — | Non |
 
 ## 6. Contrat de données
 - **ForeverLoggerDB** (retour, schéma 1) : par GUID, instantanés `{reason, time, localtime, level, talents, spell_bonus, spell_crit}` à la connexion, au gain de niveau et au changement de talents ; gains d'expérience `{time, localtime, level, text}` ; depuis CH0 (0.3.0), hors combat seulement, instantanés du familier et des statistiques du Chasseur au même instant (`pet_snapshots`, sur `UNIT_PET`, `PET_UI_UPDATE`, à la connexion, repris à `PLAYER_REGEN_ENABLED` s'ils tombaient en combat) et relevés de la fenêtre Beast Training (`training`, sur `CRAFT_SHOW` et `CRAFT_UPDATE`). [Supposé] API des familiers de Classic (`GetPetTrainingPoints`, `GetPetFoodTypes`, `GetPetLoyalty`, `GetCraftInfo`…) présentes sur Forever : toutes sous `pcall`, champ absent sinon. Détail : `addon/README.md`. Lecture : `forever/pipeline/addon_sv.py` ; jointure avec un journal par GUID et heure locale (`forever logs measure <journal> --addon-sv <fichier>`).
 - **Fichier généré pour ForeverAssist** (aller, V1) : variable `ForeverAssistData` avec `schema`, `build`, `generated_at`, puis les données ; schéma versionné et validé par pytest, `Generated.sample.lua` versionné, `Generated.lua` ignoré par git.
+
+- **ForeverBridgeDB** (retour, schéma 1, ForeverBridge) : `session` (jeton de l'addon), `next_id`, `history` (50
+  derniers messages `{role, text, status, provenance, link}`), `waiting` (numéros accusés sans réponse), `outbox`
+  (messages sans accusé, `{id, text, flags, slot, context}`, lus par le pont au `/reload`), `window` (position, taille,
+  opacité), `cell` (taille de case de la bande).
+- **ForeverBridgeSlot** (aller, P06a) : `Inbox.lua` de chaque emplacement `ForeverBridge_S001`… et de `ForeverBridge`,
+  écrit par le pont : `{v, now, status = {line, version, freshness, pending, slots, …}, buttons, replies = {{session,
+  id, status = "working" | "done" | "error", text, provenance, link}}}` ; `ForeverBridgeStatus` (`Status.lua`) : état
+  des données et boutons, relu à la connexion et au `/reload`.
 
 ## 7. Installation et procédure de test en jeu
 1. `uv run python scripts/install_addon.py --dry-run`, puis sans `--dry-run` (terminal administrateur si l'écriture dans `Program Files (x86)` est refusée).
@@ -152,27 +161,41 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     8. Relevé : la ligne de l'étape 4, la sortie de l'étape 5 et le fichier `.bmp` enregistré, ce qui ne va pas à
        l'étape 6, la capture de l'étape 7.
     9. **Fait le 2026-10-09** (relevés de l'utilisateur) : `/fv poll` rend « modifié à 09:01:46 » (BR1 résolue) ; bande d'une case par pixel lue (« vecteur reconnu », « case de 1 pixel », 2 560 × 1 440, `tests/fixtures/bridge/band_live_1px.bmp`) ; fenêtre : ouverture, fermeture, déplacement, redimensionnement, Échap, position et taille gardées après `/reload` ; raccourci pas encore essayé. Défauts corrigés le même jour : aide affichée deux fois, fond trop transparent (opaque par défaut, `/fv fond N`), `/fv diag` sans rien de visible (la fenêtre couvrait sans doute la discussion : il confirme désormais son passage dans la fenêtre et y montre une erreur Lua ; `/console scriptErrors 1` affiche les erreurs Lua du jeu).
-11. **Procédure du chat** (P06a, fin de tranche, **à jouer avant le 2026-10-21**, non bloquante pour la fusion) :
-    1. Jeu fermé : `uv run forever bridge install` (réserve de 200 emplacements `ForeverBridge_S001`…`S200`, liste
-       des addons plus longue : c'est attendu) ; relancer le jeu.
-    2. `uv run forever bridge start` ; `/fv` : voyant vert après le premier relevé, ligne d'état des données
-       (version, fraîcheur, attentes), boutons visibles selon la classe (Mage : Talents, Leveling, PvP ; Chasseur : Talents,
-       Familiers, PvP).
-    3. Question tapée (« Which talent should I take next? » ou en français), Entrée : bande visible quelques secondes
-       en haut à gauche, retirée dès l'accusé ; « en cours » animé ; réponse courte mise en forme avec sa ligne de
-       provenance ; journal du pont relu (`<cache>/bridge/journal/`).
-    4. Maj+Entrée passe à la ligne ; question de suite : même session (journal) ; « Nouvelle conversation » puis
-       une question : nouvelle session.
-    5. Bouton Talents (Mage) : réponse avec `[Talents Forever]` ; clic : zone copiable, Ctrl+C, collé dans Talents
-       Forever (`/tf`). Bouton Talents sur un personnage d'une autre classe : build populaire le plus proche, son lien,
-       et la ligne « pas encore calculé par le moteur de forever ». Bouton PvP avec un joueur en cible ; Familiers sur
-       un Chasseur si possible.
-    6. Fenêtre fermée pendant une réponse : elle ne s'ouvre pas seule (voyant et compteur) ; rien dans la discussion
-       générale.
-    7. `uv run forever bridge stop`, question : après trois relevés, « pont injoignable », bande retirée ; `uv run
-       forever bridge start`, `/reload` : réponse récupérée par la boîte d'envoi.
-    8. Réserve : la ligne d'état donne les emplacements restants ; à 10, `/reload` est proposé (jamais fait seul).
-    9. ForeverLogger toujours actif (`/reload` puis `forever logs scan`).
+11. **Sonde en jeu E : le chat complet** (P06a, blocs C, D et E ; **à jouer avant le 2026-10-21**). Une vraie
+    question, une vraie réponse de l'agent dans la fenêtre, puis le secours `/reload`. Commandes lancées dans un
+    terminal à la racine du dépôt, branche `p06a` à jour. Chaque question coûte quelques centimes d'API (Claude Code).
+    0. **Avant le jeu** : `uv run forever bridge ask "Quelle est la version des données ?"` (10 à 30 s) : une réponse
+       courte suivie de « Données 1.60.1.… · certain ». Une erreur ici (`claude` introuvable, outil refusé, délai) :
+       s'arrêter et me donner la sortie.
+    1. **Jeu fermé** : `uv run forever bridge install` (met ForeverBridge à jour ; la réserve et ses fichiers déjà
+       publiés sont gardés).
+    2. **Pont lancé avant le jeu** : `uv run forever bridge start`, puis `uv run forever bridge status` → « Pont : en
+       marche », la ligne des données et l'événement `start`. Le pont écrit `Status.lua` à son démarrage : lancé avant
+       le jeu, la fenêtre a d'emblée l'état des données et les boutons (sinon, `/reload` une fois le pont lancé).
+    3. Lancer le jeu, `/fv` : ligne d'état « Données 1.60.1.… · à jour · pont vu … », voyant vert, boutons selon la
+       classe (Mage : Talents, Leveling, PvP ; Chasseur : Talents, Familiers, PvP ; autres : Talents, PvP).
+    4. **Première question** (en français), Entrée : petite bande en haut à gauche pendant trois secondes environ,
+       puis « réponse en cours… N s » ; la réponse arrive en 10 à 40 s (la première est la plus lente), mise en forme
+       (titres en or, puces), suivie de sa ligne de provenance en gris. `uv run forever bridge status` : événements
+       `message`, `agent`, `reply`.
+    5. **Question de suite** : réponse qui tient compte de la précédente (journal : `"resumed": true`) ; « Nouvelle
+       conversation » puis une question : `"resumed": false`.
+    6. **Boutons** : Talents sur le Mage → réponse avec `[Talents Forever]` ; clic : zone copiable, Ctrl+C, coller dans
+       Talents Forever (`/tf`) ; Leveling ; PvP avec un joueur en cible (sans cible : « prenez un joueur en cible »).
+       Talents sur un personnage d'une autre classe, si possible : build populaire de Talents Forever avec son lien et
+       la mention « pas encore calculé par le moteur de forever ».
+    7. **Fenêtre fermée pendant une réponse** (`/fv` juste après l'envoi) : elle ne se rouvre pas seule ; `/fv` : la
+       réponse est là. Rien dans la discussion générale.
+    8. **Secours** : `uv run forever bridge stop`, puis une question : au bout d'une dizaine de secondes « Non reçu :
+       pont injoignable … gardé pour le prochain /reload », bande retirée. `uv run forever bridge start`, puis
+       `/reload` : la réponse arrive dans la fenêtre sans second `/reload` (le pont lit la sauvegarde écrite au
+       rechargement, l'addon consulte la réserve).
+    9. **Réserve** : la ligne d'état n'en parle qu'à partir de 10 emplacements restants (`/reload` proposé, jamais
+       fait seul) ; il en faut environ 3 ou 4 par question.
+    10. ForeverLogger toujours actif (`/reload`, puis `uv run forever logs scan`).
+    11. **Relevé** : la sortie de l'étape 0 ; pour chaque question, le délai observé et ce qui ne va pas (texte,
+        mise en forme, provenance, lien) ; les lignes `uv run forever bridge status` ou le journal du jour
+        (`<cache>/bridge/journal/AAAA-MM-JJ.jsonl`, sans aucun pixel) en cas d'erreur.
 
 12. **Sonde en jeu C du pont** (P06a, fin du bloc B, **avant l'étape 11**). Elle dit si une question tapée dans la
     fenêtre part avec le bon contexte du personnage et si le pont la lit. Aucune réponse en jeu avant le bloc E.
@@ -193,6 +216,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     7. `/fv diag` : la fenêtre confirme « résultats écrits dans la discussion générale » ; sinon noter la ligne
        « /fv diag en erreur » (`/console scriptErrors 1` montre aussi les erreurs Lua du jeu).
     8. Relevé : la sortie du terminal des étapes 5 et 6, ce qui ne va pas aux étapes 2 et 7.
+    9. **Fait le 2026-10-09** (relevés de l'utilisateur) : fenêtre complète, `/fv fond` ; « message n° 1 lu (576 octets) », « case de 1 pixel », emplacement annoncé 1, contexte attendu (sans `subzone` ni `target` à cet endroit), texte exact ; chargement du jeu pas plus long avec 200 emplacements (BR3) ; `/fv diag` confirmé dans la fenêtre et lignes présentes dans la discussion. Drapeau « n » non rejoué en jeu, couvert par `test_new_conversation_flags_only_the_next_message`.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
@@ -233,8 +257,18 @@ Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case
 ## 9. Feuille de route des addons de forever-core
 Ordre revu le 2026-10-07 (décisions 193 et 202, `docs/VISION.md`) : nos addons n'affichent que ce qu'aucun addon installé ne sait recevoir ; le reste passe par les points d'import des addons de la communauté (décision 196).
 - **ForeverLogger** : relevés hors combat (profil, familier, observations de DJ1, auras de bonus d'XP de T04f).
-- **ForeverBridge**, pont de conversation (**P06a**, juste après FA1, à jouer avant la fin de la bêta ; décisions 194, 197 et 212) : addon dédié, seul à dessiner (ForeverLogger ne dessine jamais rien), avec sa réserve d'emplacements `ForeverBridge_S01`… ; recodé dans ce dépôt en reprenant la technique de wow-ai (rapport section 3.5 ; licence MIT vérifiée au plan, mention de licence gardée dans chaque fichier repris et crédits ici), sans faire tourner wow-ai ni NeverQuestAlone. Bande de pixels seulement quand un message attend, réponses par une réserve d'addons chargés à la demande, secours `/reload` ; Claude Code non interactif, conversation « jeu » limitée aux outils forever ; contexte du personnage envoyé à chaque message (reprend l'ancienne V2) ; état des données visible. Aucune action de jeu ; fragile à chaque build (checklist de la section 8 à étendre au plan).
+- **ForeverBridge**, pont de conversation (**P06a**, juste après FA1, à jouer avant la fin de la bêta ; décisions 194, 197 et 212) : addon dédié, seul à dessiner (ForeverLogger ne dessine jamais rien), avec sa réserve de 200 emplacements `ForeverBridge_S001`… consultée à intervalles (décision 212 amendée le 2026-10-09) ; recodé dans ce dépôt en reprenant la technique de wow-ai (rapport section 3.5 ; licence MIT vérifiée au plan, mention de licence gardée dans chaque fichier repris et crédits ici), sans faire tourner wow-ai ni NeverQuestAlone. Bande de pixels seulement quand un message attend, réponses par une réserve d'addons chargés à la demande, secours `/reload` ; Claude Code non interactif, conversation « jeu » limitée aux outils forever ; contexte du personnage envoyé à chaque message (reprend l'ancienne V2) ; état des données visible. Aucune action de jeu ; fragile à chaque build (checklist de la section 8 à étendre au plan).
 - **Boutons en jeu** (**P06b**) : une question prédéfinie par bouton, visible seulement quand sa tranche est faite ; Valider et Refuser des attentes de `forever update` (commandes fixées lancées par le pont) ; fiche PvP fixe de la cible (reprend FA1p) ; analyse du dernier combat après AN1 et AN2 (reprend V3, FA3) ; liens d'export.
 - **Exports** (décision 196) : Talents Forever (FA1), Naowh Forever (BiS et poids en T10a, macros en EX1), EllesmereUI (profils et objet LibDataBroker en EX1).
 - **Retiré** : la comparaison de l'équipement dans l'infobulle (ancienne V1 de ForeverAssist), que Naowh Forever et GearQuest Forever font déjà ; l'équipement passe par l'export vers Naowh Forever (T10a).
 
+## 10. Crédits
+
+Le pont de P06a reprend la technique de **wow-ai** (https://github.com/chelinho139/wow-ai, chelinho139/wow-ai, commit
+3756eb5a du 2026-09-27, **licence MIT** vérifiée le 2026-10-08) et une partie de son code : codec de la bande, dessin
+à l'échelle physique, capture de la zone client, format des messages, réserve d'emplacements chargés à la demande et
+leur installation, cadre de la fenêtre. Chaque fichier repris porte la notice MIT complète en tête (liste fermée,
+contrôlée par `tests/unit/test_bridge_license.py`) : `forever/bridge/codec.py`, `capture.py`, `record.py`,
+`slots.py`, `install.py`, `addon/ForeverBridge/Codec.lua`, `ForeverBridge.lua`. Mesures du client citées sans reprise
+de code : wow-forever-codex (0xinuarashi, dépôt sans licence, lu le 2026-10-09 : fichiers vus au lancement seulement,
+canal par mesures de polices, piste de P06b).

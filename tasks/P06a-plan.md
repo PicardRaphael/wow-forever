@@ -889,6 +889,32 @@ Le bloc B porte le message **des deux côtés**, pour qu'une question tapée en 
 - `/fv case N` livré (R2). À faire au bloc E : `run.nextSlot` mis à 1 à la connexion et augmenté à chaque
   `LoadAddOn` d'un emplacement ; d'ici là, `FB.Send` annonce toujours l'emplacement 1.
 
+### Exécution : sonde en jeu C et blocs C à F (2026-10-09)
+- Sonde C (relevés de l'utilisateur) : message lu (576 octets, case d'un pixel, emplacement 1, contexte attendu, texte
+  exact) ; BR3 résolue (démarrage pas plus long) ; `/fv diag` visible.
+- Corrections de tests accordées le 2026-10-09 : `test_band_is_provisional_until_block_e` remplacé par
+  `test_band_is_removed_at_the_acknowledgement` ; `test_subprocess_only_in_gitops_and_the_detached_launch` gagne
+  `bridge/agent.py`, avec les assertions demandées (aucun shell, un seul exécutable, options de restriction). Deux
+  commits de lint seulement sur des tests (annotation `ClassVar`, variable inutilisée, ordre des imports).
+- Bloc C : `agent.py` (ligne de la sonde 0.4, liste d'arguments, question sur l'entrée standard, objet de tâche Windows
+  pour arrêter l'arbre au-delà du délai, reprise refusée relancée en nouvelle session), `prompt.py`, hook muet sous
+  `FOREVER_BRIDGE` ; `claude` 2.1.295 accepte toutes les options (aide relue hors réseau). Fixtures écrites à la main :
+  refus d'outil, `forever_build` avec lien.
+- Bloc D : `loop.py` (conversation sur un fil à part, un message à la fois ; publication à partir de l'emplacement du
+  message le plus récent, toute la réserve et `Status.lua` toutes les 10 min ; boîte d'envoi relue au changement de la
+  sauvegarde, emplacements depuis 1 pour elle), `journal.py`, `state.py` (un seul `state.json` au lieu de
+  `sessions.json`), `status.py`, `forever bridge start | run | stop | status | ask` (`ask` : la conversation sans le
+  jeu, étape 0 de la sonde E).
+- Bloc E : calendrier R1, accusé, rendu des réponses (texte du pont ramené au brut puis neutralisé une seule fois),
+  zone copiable, boîte d'envoi, réserve, consultation relancée après `/reload`, historique gardé, état publié avec la
+  taille de la réserve. Plusieurs envois rapprochés : chaque message sans accusé garde sa bande à tour de rôle.
+- Bloc F : `docs/ARCHITECTURE.md`, `docs/USAGE.md` (« Chat en jeu »), `addon/README.md`, `docs/ADDON.md` (§5, §6,
+  §9, §10 Crédits), `docs/VISION.md` (Crédits), `CLAUDE.md` (le pont lance `claude`), `test_bridge_license.py`.
+- **Reste à faire** (après la sonde E, avant la fusion) : `forever_lookup(kind="tf_popular", current=…)` et son champ
+  `closest` pour le bouton Talents hors Mage (R4) ; d'ici là, l'agent choisit parmi les builds populaires et le pont
+  ajoute la mention fixe.
+- Sonde E : `docs/ADDON.md` §7, étape 11.
+
 ### Questions ouvertes ajoutées (`docs/OPEN_QUESTIONS.md`, section « Pont en jeu »)
 BR1 premier chargement d'un emplacement sans `/reload` ; BR2 bande d'une case par pixel à toutes les échelles ; BR3
 effet de 200 addons chargés à la demande sur le démarrage et la liste des addons ; BR4 canal par polices.

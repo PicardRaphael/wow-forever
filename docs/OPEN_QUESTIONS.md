@@ -281,8 +281,6 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   Lue au pixel près à 2 560 × 1 440, échelle d'interface 0,7111, en cases de 4 pixels (sonde A) puis d'un pixel
   (sonde B du 2026-10-09). Test : une autre résolution ou échelle d'interface. Priorité : moyenne (repli à 2
   pixels prévu, reconnu par le pont).
-- **BR3 — 200 addons chargés à la demande ralentissent-ils le démarrage du client ou gênent-ils la liste des
-  addons ?** wow-ai en installe 200. Test : étape 11.1 (durée du chargement, liste des addons). Priorité : moyenne.
 - **BR4 — Le canal de retour par mesures de polices (wow-forever-codex) peut-il servir de vérification rapide « est-ce
   prêt ? » ?** Mesuré par eux sur Forever 1.60.1.69913 (police jamais chargée relue, déjà chargée gardée en cache
   jusqu'au redémarrage) ; dépôt sans licence, polices TrueType à générer sans dépendance. Test : sonde dédiée en

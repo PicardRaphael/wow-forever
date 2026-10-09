@@ -102,8 +102,13 @@ Les invariants de `CLAUDE.md` restent : chiffres de jeu dans `forever/data/` seu
 Deux lignes rouges de l'addon sont levées **partiellement**, à la demande du joueur et dans un périmètre strict :
 la bande de pixels du pont (décision 194) et le texte des macros exportées (décision 195).
 
-## Crédits prévus
+## Crédits
 
-Le pont de P06a reprend la technique de **wow-ai** (chelinho139 et ses forks, licence MIT d'après le joueur, à
-vérifier au plan de P06a sur le dépôt retenu) et, si utile, une partie de son code : mention de licence conservée
-dans chaque fichier repris, crédits dans `docs/ADDON.md` et dans ce document.
+Le pont de P06a reprend la technique de **wow-ai** (https://github.com/chelinho139/wow-ai, chelinho139/wow-ai, commit
+3756eb5a du 2026-09-27, **licence MIT** vérifiée le 2026-10-08) et une partie de son code : codec de la bande, dessin
+à l'échelle physique, capture de la zone client, format des messages, réserve d'emplacements chargés à la demande et
+leur installation, cadre de la fenêtre. Chaque fichier repris porte la notice MIT complète en tête (liste fermée,
+contrôlée par `tests/unit/test_bridge_license.py`) : `forever/bridge/codec.py`, `capture.py`, `record.py`,
+`slots.py`, `install.py`, `addon/ForeverBridge/Codec.lua`, `ForeverBridge.lua`. Mesures du client citées sans reprise
+de code : wow-forever-codex (0xinuarashi, dépôt sans licence, lu le 2026-10-09 : fichiers vus au lancement seulement,
+canal par mesures de polices, piste de P06b).

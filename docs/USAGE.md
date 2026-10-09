@@ -120,6 +120,24 @@ Lancer `claude` dans n'importe quel dossier et poser la question en français. E
 Dans le dépôt, une ligne de fraîcheur des données s'affiche au démarrage de la session. Ailleurs, rien au démarrage :
 le routeur vérifie la fraîcheur (`forever_status`) à la première question sur WoW.
 
+## Chat en jeu (P06a)
+Une fenêtre dans le jeu (`/fv`) pour poser la question sans quitter WoW ; la réponse arrive en quelques secondes,
+avec sa ligne de provenance. Sous Windows, jeu en fenêtré ou plein écran fenêtré.
+
+| Commande | Effet |
+|---|---|
+| `uv run forever bridge install` | installe ForeverBridge et sa réserve de 200 emplacements (jeu fermé, puis le relancer) |
+| `uv run forever bridge ask "question"` | même conversation que dans le jeu, sans le jeu : vérifie `claude` et les outils |
+| `uv run forever bridge start` | lance le pont en arrière-plan (un seul à la fois) |
+| `uv run forever bridge status` | pont en marche ou non, état des données, dernières lignes du journal |
+| `uv run forever bridge stop` | arrête le pont |
+| `uv run forever bridge selftest --live` | lit la bande de test de `/fv test` (diagnostic) |
+
+En jeu : `/fv` ouvre la fenêtre (raccourci dans Options > Raccourcis > AddOns), Entrée envoie, Maj+Entrée passe à la
+ligne ; boutons Talents, Leveling, Familiers, PvP selon la classe ; `/fv fond N` règle l'opacité. Pont arrêté ou
+réserve vide : tapez `/reload` après `forever bridge start`, la réponse arrive par la sauvegarde. Procédure complète :
+`docs/ADDON.md`, section 7, étape 11.
+
 ## Mon personnage (profil)
 Le profil vit hors du dépôt (`%USERPROFILE%\.forever\profile.json`, ou le fichier désigné par `FOREVER_PROFILE`) ;
 plusieurs personnages, un actif. Les réponses le lisent avant tout calcul et le rappellent en une ligne ; une donnée

@@ -20,6 +20,7 @@ forever-core/
 │   ├── pipeline/              # builds, fetch, tables, tooltip, decode, sources, diff, verify, report ;
 │   │                          # combatlog, measure, lua_table, questie, monsters, addon_sv, refresh (sources locales)
 │   ├── memory/                # fiches joueur (lecture/écriture dans le vault), import de l'addon
+│   ├── bridge/                # pont du chat en jeu (P06a) : bande, capture, message, réserve, conversation, boucle
 │   ├── provenance.py          # bloc provenance commun
 │   ├── cli.py                 # commandes forever …
 │   └── mcp_server.py          # outils MCP
@@ -28,6 +29,21 @@ forever-core/
 ├── tests/{unit,golden,parity,fixtures}/
 └── .github/workflows/{ci.yml,build-watch.yml}
 ```
+
+## Pont du chat en jeu (P06a, décisions 194 et 212)
+`forever/bridge/` relie la fenêtre de l'addon ForeverBridge à une conversation Claude Code, sans réseau dans forever :
+- **Jeu → pont** : l'addon dessine le message (`Message.lua` : contexte du personnage, question) en bande de pixels,
+  une case par pixel, dans le coin haut gauche ; `capture.py` lit la sonde du marqueur dans la seule zone client de la
+  fenêtre du jeu au premier plan, puis la bande (`codec.py`, `record.py`). Secours : boîte d'envoi des SavedVariables,
+  lue au `/reload`.
+- **Conversation** (`agent.py`, `prompt.py`) : `claude -p` en `stream-json`, liste d'arguments sans shell, outils
+  réduits à `Skill` et aux six outils forever, seul serveur MCP `forever`, réglages ignorés, dossier de travail hors du
+  dépôt ; question sur l'entrée standard ; ligne de provenance tirée des blocs `provenance` des outils.
+- **Pont → jeu** (`slots.py`, `loop.py`) : le même `Inbox.lua` écrit dans les emplacements `ForeverBridge_S001`… que
+  le jeu peut encore charger ; l'addon en charge un à intervalles après chaque envoi (accusé `working`, puis `done` ou
+  `error`). `Status.lua` porte l'état des données (`status.py`) et les boutons des tranches faites (`buttons.py`).
+- **Exploitation** : `forever bridge install | start | run | stop | status | ask | selftest`, journal JSONL sans pixel
+  (`journal.py`), état gardé (`state.py`), un pont à la fois (verrou), arrêt par fichier.
 
 ## Bloc provenance (dans chaque réponse d'outil)
 ```json
