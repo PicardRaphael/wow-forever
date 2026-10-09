@@ -1061,10 +1061,11 @@ mechanics:
     description: "Bonus de soins : un tiers en dégâts"
     forever: modifie
     statut: absent
-    certitude: certain
+    certitude: suppose
     sources: []
     tests: []
     tolerance: null
+    note: "2026-10-09 : passée de certain à suppose (règle sans source ni test) ; le simulateur ElliotWood/Forever a abandonné ce ratio au profit des statistiques des objets du client, voir PER9 (docs/OPEN_QUESTIONS.md) et docs/research/wowsims-forever.md"
   - id: F8
     categorie: equipement
     description: "Liste des effets non modélisés"

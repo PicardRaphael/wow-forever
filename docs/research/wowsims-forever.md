@@ -232,6 +232,41 @@ Proposée le 2026-10-09 (décision 224), placée dans la fenêtre sans jeu du 21
   - temps de réponse mesuré en bout de chaîne ;
   - `uv run tasks.py verify` vert.
 
+## Suites décidées le 2026-10-09 (décision 225)
+
+- **F7** passe de `certain` à `suppose`, avec renvoi à PER9 : une règle sans source ni test ne peut pas être certaine.
+- **SIM1** : place confirmée, du 21 octobre au 4 novembre, après DJ1 et avant T10a. L'accord sur la dépendance et le binaire `wowsimcli` viendra au plan.
+- **PER8** : le décodage de la conversion des notations en pourcentage, depuis la table `CombatRatings` du client, se fait en SIM1. C'est la première tranche qui en a besoin, pour le contrôle croisé du Mage avec un équipement réel, et un prérequis de T10a. Les paires notation et bonus de l'export SimulationCraft en donnent la preuve en jeu.
+- **P06b** :
+  - lit l'export SimulationCraft collé dans la fenêtre du chat (talents, objets, fiche du personnage) et propose la mise à jour du profil en signalant les écarts ;
+  - garde le lien d'objet complet et l'équipement jamais retiré du message.
+  - Contrainte à régler au plan : le texte dépasse la zone de saisie et probablement un message de la bande. Il faudra une zone de collage multiligne et un envoi en plusieurs messages.
+
+### Entrées du registre encore `certain` sans source ni test (listées, non modifiées)
+
+Relevé du registre au 2026-10-09 : 16 entrées en plus de F7, toutes au statut `absent`. Aucune entrée `certain` n'a des sources sans tests, ni des tests sans sources.
+
+| Id | Catégorie | Description | Nature |
+| --- | --- | --- | --- |
+| A1 | attaque | Table d'attaque des coups blancs (ordre, tirage unique) | règle de jeu |
+| A2 | attaque | Deux jets pour les sorts (raté puis résistance) | règle de jeu |
+| A6 | attaque | Éraflures (taux et pénalité selon la compétence d'arme) | règle de jeu |
+| A9 | attaque | Esquive, parade, blocage selon la position | règle de jeu |
+| A10 | attaque | Pénalité de raté en double arme | règle de jeu |
+| A11 | attaque | Écrasements (monstres) | règle de jeu |
+| A15 | attaque | Pénétration des sorts | règle de jeu |
+| B8 | ressources | MP5 | règle de jeu |
+| C4 | physique | Vitesse de déplacement du joueur | règle de jeu |
+| F5 | equipement | Bijoux uniques | règle de jeu |
+| H8 | rencontre | Taille de raid (10, 20, 40) | règle de jeu |
+| F8 | equipement | Liste des effets non modélisés | outil du projet |
+| I3 | optimisation | Poids de stats avec erreur standard | outil du projet |
+| I4 | optimisation | Simulation de l'ensemble réel | outil du projet |
+| J3 | meta | Erreur statistique cible | outil du projet |
+| J6 | meta | Hypothèses datées avec date de péremption | outil du projet |
+
+Pour les cinq outils du projet, la certitude ne décrit pas une règle du jeu. Pour les onze règles de jeu, elle reste à étayer ou à baisser, au cas par cas, quand leur tranche les modélise. Les tables d'attaque A1, A6, A9, A10 et A11 sont celles que wowsims Forever code (`spell_outcome.go` d'ElliotWood) : source communautaire, au mieux `suppose`.
+
 ## Questions ouvertes ajoutées ou modifiées
 
 - **PER8** (ajoutée) : conversion des notations en pourcentage.

@@ -120,10 +120,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   fractions ; ElliotWood/Forever lit la table `CombatRatings` du client (constante à tous les niveaux, ce que relevait
   déjà `audit-mises-a-jour.md`) et en tire une conversion par statistique (`suppose` tant qu'elle n'est pas décodée
   chez nous). Test : décodage de la table du client, puis `GetCombatRatingBonus` à notation connue (export
-  SimulationCraft ou ForeverLogger). Priorité : moyenne (bloque l'équipement de T10a et SIM1). Registre A4, A5, A7,
+  SimulationCraft ou ForeverLogger). Priorité : moyenne (prérequis de T10a : décodage prévu en SIM1, décision 225 ; preuve en jeu par l'export SimulationCraft collé de P06b). Registre A4, A5, A7,
   A8, B2. [Étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)
 - **PER9 — Le bonus de soins donne-t-il un tiers en dégâts (registre F7) ?** Ajoutée le 2026-10-09 (étude wowsims) :
-  F7 est marqué `certain` sans source ni test ; le moteur ElliotWood/Forever a abandonné ce ratio au profit des
+  F7 était marqué `certain` sans source ni test (passé à `suppose` le 2026-10-09, décision 225) ; le moteur ElliotWood/Forever a abandonné ce ratio au profit des
   statistiques des objets du client (une statistique pour dégâts et soins, une autre pour les soins seuls), le fork
   de MythicSim l'applique encore sur sa branche `master`. Test : infobulles et fiche (`GetSpellBonusDamage`,
   `GetSpellBonusHealing`) avec un objet à bonus de soins seul ; décodage des statistiques d'objet en T10a. Priorité :
