@@ -1,5 +1,5 @@
 """Commandes du pont (P06a, bloc D) : `forever bridge start` lance la boucle détachée par le relais de `forever.spawn`
-(jamais deux ponts), `stop` pose le fichier d'arrêt, `status` dit si le pont tourne, avec sa provenance."""
+(jamais deux ponts), `stop` pose le fichier d'arrêt (seulement si un pont tourne, voir test_bridge_stop_start.py), `status` dit si le pont tourne, avec sa provenance."""
 
 import json
 import sys
@@ -40,12 +40,6 @@ def test_start_refuses_when_a_bridge_runs(capsys, make_deps, tmp_path, monkeypat
     monkeypatch.setattr("forever.spawn.pid_alive", lambda p: True)
     code, _, err = run(capsys, ["bridge", "start"], deps)
     assert code != 0 and calls == [] and "4242" in err
-
-
-def test_stop_writes_the_stop_file(capsys, make_deps, tmp_path):
-    deps = make_deps(wow_dir=wow_dir(tmp_path))
-    code, _, _ = run(capsys, ["bridge", "stop"], deps)
-    assert code == 0 and (deps.cache_dir / "bridge" / "stop").is_file()
 
 
 def test_status_json_has_provenance(capsys, make_deps, tmp_path):

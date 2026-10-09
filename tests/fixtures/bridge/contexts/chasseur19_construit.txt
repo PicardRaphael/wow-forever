@@ -1,0 +1,9 @@
+name=Jen
+realm=Classic Beta PvE 2
+level=19
+class=HUNTER
+race=Orc
+faction=Horde
+zone=The Barrens
+map=1413
+client=1.60.1.70291

@@ -20,7 +20,7 @@ EVALS = REPO_ROOT / "plugin" / "evals"
 MCP_PREFIX = "mcp__plugin_forever_forever__"
 POSITIVE_COUNTS = {
     "profil": 2,
-    "talent": 6,
+    "talent": 7,  # sonde F : bouton Talents de la fenêtre du jeu
     "build": 9,  # FA1 : lien Talents Forever, builds populaires du Voleur, build proche d'un populaire
     "respec": 4,
     "zone": 4,
@@ -28,10 +28,10 @@ POSITIVE_COUNTS = {
     "personnelle": 2,
     "planification": 1,
     "mecanique": 5,
-    "leveling": 3,
+    "leveling": 4,  # sonde F : bouton Leveling
     "hors-perimetre": 3,
-    "pvp": 3,  # PV1 : contrôles du Voleur, Mage contre Démoniste, défensif du Paladin
-    "familiers": 3,  # CH0 : guide d'apprivoisement, capacités du loup, entraînement des familiers
+    "pvp": 4,  # PV1 : contrôles du Voleur, Mage contre Démoniste, défensif du Paladin ; sonde F : bouton PvP
+    "familiers": 4,  # CH0 : guide d'apprivoisement, capacités du loup, entraînement des familiers ; sonde F
 }
 NEGATIVE_CATEGORIES = ("wow-autre", "autre-jeu", "programmation")
 POSITIVE_GRADERS = {"skill", "outil", "chiffres", "certitude", "provenance"}
@@ -86,8 +86,8 @@ def test_fifty_eight_cases_thirty_eight_positive_twenty_negative():
     # un personnage prévu.
     # PV1 : trois cas PvP et un voisin (retail).
     # FA1 : trois cas Talents Forever et un voisin (chaîne d'import de talents de retail).
-    assert len(polarity) == 70  # CH0 : trois cas familiers et un voisin
-    assert polarity.count("positif") == 47 and polarity.count("negatif") == 23
+    assert len(polarity) == 74  # CH0 : trois cas familiers et un voisin ; sonde F : un cas par bouton du pont
+    assert polarity.count("positif") == 51 and polarity.count("negatif") == 23
 
 
 def test_empty_profile_cases():
@@ -458,3 +458,35 @@ def test_guide_case_runs_with_a_hunter_profile():
 def test_retail_exotic_pet_neighbour_is_negative():
     meta, question = front(EVALS / "neg-retail-familier-exotique" / "prompt.md")
     assert meta["tags"] == ["negatif", "wow-autre"] and "retail" in question.lower()
+
+
+# Sonde en jeu F du 2026-10-09 : un cas par bouton de la fenêtre du jeu, dont la question est le message exact que le
+# pont envoie à la conversation « jeu » pour un contexte relevé en jeu (tests/fixtures/bridge/contexts/), consigne
+# du bouton comprise ; le correcteur `outil` attend l'appel fixé par le pont (forever/bridge/plans.py).
+BUTTON_CASES = {
+    "bouton-talents": ("talents", "mage19", "talent"),
+    "bouton-leveling": ("leveling", "mage19", "leveling"),
+    "bouton-pvp": ("pvp", "mage19_cible_chaman21_tauren", "pvp"),
+    "bouton-familiers": ("pets", "chasseur19_construit", "familiers"),
+}
+
+
+def test_button_cases_are_the_messages_of_the_bridge(make_deps):
+    from forever.bridge.context import load_context_data
+    from forever.bridge.plans import button_message
+
+    data = load_context_data(make_deps())
+    for name, (key, ctx_name, tag) in BUTTON_CASES.items():
+        meta, question = front(EVALS / name / "prompt.md")
+        assert meta["tags"] == ["positif", tag], name
+        text = (FIXTURES / "bridge" / "contexts" / f"{ctx_name}.txt").read_text(encoding="utf-8")
+        ctx = dict(line.split("=", 1) for line in text.splitlines() if "=" in line)
+        message, plan = button_message(data, key, ctx)
+        assert question == message.strip(), name
+        g = graders(EVALS / name)
+        outil = g["outil"][0]
+        first = plan.calls[0]
+        assert outil["tool"] == MCP_PREFIX + first.tool, name
+        assert re.search(outil["input_match"], json.dumps(first.args, ensure_ascii=False)), name
+        judge_meta, judge = g["consigne-du-bouton"]
+        assert judge_meta["type"] == "llm" and "je ne reconnais pas" in judge, name

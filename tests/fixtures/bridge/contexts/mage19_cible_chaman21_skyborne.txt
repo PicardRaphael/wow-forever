@@ -1,0 +1,15 @@
+name=Jen
+realm=Classic Beta PvE 2
+level=19
+class=MAGE
+race=Orc
+faction=Horde
+zone=The Barrens
+subzone=Camp Taurajo
+map=1413
+talents=105778:5,105779:5
+gear=3:1769:Canvas Shoulderpads;4:5107:Deckhand's Shirt;5:2582:Green Woolen Vest;6:253885:Novice Arcanist's Sash;7:3309:Barbaric Loincloth;8:14364:Mystic's Slippers;9:15452:Featherbead Bracers;10:10637:Brewer's Gloves;11:281268:Depleted Ritual Band;12:5351:Bounty Hunter's Ring;15:2580:Reinforced Linen Cape;16:15444:Staff of Orgrimmar;18:11288:Greater Magic Wand
+target=SHAMAN
+target_level=21
+target_race=Skyborne
+client=1.60.1.70291
