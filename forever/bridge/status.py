@@ -25,7 +25,15 @@ def status_payload(deps: Deps) -> dict[str, Any]:
         "pending": 0,
         "pending_labels": [],
         "running": False,
+        "client": None,
     }
+    try:
+        from forever.pipeline.client_builds import read_build_info
+
+        info = read_build_info(deps.wow_dir) if deps.wow_dir else None
+        payload["client"] = info.build if info else None
+    except Exception:  # noqa: BLE001 : version du client inconnue, rien d'autre ne change
+        payload["client"] = None
     try:
         from forever.status import status_report
 
@@ -54,16 +62,31 @@ def status_payload(deps: Deps) -> dict[str, Any]:
     return payload
 
 
+def _newer(client: Any, data: Any) -> bool:
+    """Vrai si la version du client est plus récente que celle des données (comparaison par nombres)."""
+    try:
+        return tuple(int(x) for x in str(client).split(".")) > tuple(int(x) for x in str(data).split("."))
+    except ValueError:
+        return False
+
+
 def status_line(payload: Mapping[str, Any]) -> str:
-    """« Données <version> · <fraîcheur> · <n> attente(s) : forever update status »."""
+    """« Données <version> · <fraîcheur> · <n> mise(s) à jour à valider sur le PC » ; client plus récent que les
+    données : « client <version> : mise à jour en attente » au lieu de la fraîcheur (« à jour » serait trompeur)."""
     if not payload.get("version"):
         return "Données : état illisible (lancer uv run forever status)"
-    parts = [f"Données {payload['version']}", FRESHNESS_FR.get(str(payload.get("freshness")), "fraîcheur inconnue")]
+    client = payload.get("client")
+    if client and _newer(client, payload["version"]):
+        state = f"client {client} : mise à jour en attente"
+    else:
+        state = FRESHNESS_FR.get(str(payload.get("freshness")), "fraîcheur inconnue")
+    parts = [f"Données {payload['version']}", state]
     if payload.get("integrity_ok") is False:
         parts.append("données altérées")
     if payload.get("running"):
         parts.append("mise à jour en cours")
     pending = int(payload.get("pending") or 0)
     if pending:
-        parts.append(f"{pending} attente{'s' if pending > 1 else ''} : forever update status")
+        plural = "s" if pending > 1 else ""
+        parts.append(f"{pending} mise{plural} à jour à valider sur le PC")
     return " · ".join(parts)

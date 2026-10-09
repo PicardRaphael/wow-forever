@@ -52,6 +52,7 @@ local GIVE_UP_POLLS = 3 -- relevés sans accusé avant la boîte d'envoi /reload
 local LOW_RESERVE = 10 -- emplacements restants à partir desquels /reload est proposé
 local IDLE_POLL = 600 -- relevé au repos, fenêtre ouverte (secondes)
 local HISTORY_KEPT = 50
+local ARCHIVE_KEPT = 5 -- conversations archivées par « Nouvelle conversation »
 -- Calendrier des relevés après un envoi (secondes) : 3, puis toutes les 4 jusqu'à 30, puis toutes les 10 jusqu'au
 -- plafond (190, au-delà du délai de la conversation du pont).
 local SCHEDULE = { 3, 7, 11, 15, 19, 23, 27, 30 }
@@ -314,8 +315,17 @@ function FB.ShowCopy(text)
 	if not box then
 		local frame = CreateFrame("Frame", "ForeverBridgeCopy", UIParent, "BackdropTemplate")
 		frame:SetSize(420, 60)
-		frame:SetPoint("CENTER", UIParent, "CENTER", 0, 120)
 		frame:SetFrameStrata("DIALOG")
+		frame:SetMovable(true)
+		frame:SetClampedToScreen(true)
+		frame:EnableMouse(true)
+		frame:RegisterForDrag("LeftButton")
+		frame:SetScript("OnDragStart", function(self)
+			self:StartMoving()
+		end)
+		frame:SetScript("OnDragStop", function(self)
+			self:StopMovingOrSizing()
+		end)
 		if frame.SetBackdrop then
 			frame:SetBackdrop(BACKDROP)
 			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
@@ -336,6 +346,9 @@ function FB.ShowCopy(text)
 		ui.copyFrame, ui.copyBox = frame, box
 	end
 	box:SetText(text)
+	-- à côté de la fenêtre, à droite (gardé à l'écran) ; déplaçable ensuite
+	ui.copyFrame:ClearAllPoints()
+	ui.copyFrame:SetPoint("TOPLEFT", ui.frame or UIParent, ui.frame and "TOPRIGHT" or "CENTER", 8, 0)
 	ui.copyFrame:Show()
 	box:SetFocus()
 	box:HighlightText()
@@ -673,8 +686,24 @@ function FB.SendFromInput()
 	end
 end
 
+-- Nouvelle conversation : la fenêtre est vidée, l'historique part dans l'archive (cinq dernières conversations).
 function FB.NewConversation()
 	run.newConversation = true
+	local db = ForeverBridgeDB
+	if type(db) == "table" and type(db.history) == "table" and #db.history > 0 then
+		if type(db.archive) ~= "table" then
+			db.archive = {}
+		end
+		table.insert(db.archive, 1, db.history)
+		while #db.archive > ARCHIVE_KEPT do
+			table.remove(db.archive)
+		end
+		db.history = {}
+	end
+	run.links = {}
+	if ui.history then
+		ui.history:Clear()
+	end
 	FB.Print("|cff888888— Nouvelle conversation : le prochain message repart de zéro —|r")
 end
 

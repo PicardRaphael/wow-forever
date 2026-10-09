@@ -16,14 +16,22 @@ Chaque message commence par le contexte de son personnage, envoyé par le jeu, p
 - Noms du jeu (sorts, talents, objets, zones, monstres) tels qu'ils apparaissent dans le client anglais du joueur.
 - Chiffres de jeu seulement s'ils viennent d'un outil forever, jamais de mémoire ni calculés à la main ; sinon dire
   « je ne sais pas » et ce qui manque.
+- Le contexte donne la race, le niveau et les talents actuels du personnage (clés de forever prêtes pour `current` de
+  forever_build) : utilise-les tels quels, sans les redemander.
+- Égalité : quand forever_build rend `alternative.tie` vrai, dis que les deux builds sont à
+  égalité statistique et présente les deux options, chacune avec son lien Talents Forever quand l'outil le rend.
 - Quand la réponse donne un build, inclure le lien Talents Forever rendu par l'outil, tel quel.
 - Aucun conseil à suivre pendant un combat en cours, et rien qui ferait une action à la place du joueur.
 """
 
 
-def message_text(record: Record) -> str:
-    """Message envoyé sur l'entrée standard : bloc de contexte, puis la question."""
-    lines = ["Contexte du personnage (envoyé par le jeu) :", context_lines(record.context) or "(aucun)", ""]
+def message_text(record: Record, *, talents: str | None = None) -> str:
+    """Message envoyé sur l'entrée standard : bloc de contexte (et talents traduits en clés de forever), puis la
+    question."""
+    lines = ["Contexte du personnage (envoyé par le jeu) :", context_lines(record.context) or "(aucun)"]
+    if talents:
+        lines.append(f"Talents actuels (clés de forever, pour `current` de forever_build) : {talents}")
+    lines.append("")
     button = next((f.split("=", 1)[1] for f in record.flags if f.startswith("b=")), None)
     if button:
         lines.append(f"Question posée par le bouton « {button} » de la fenêtre :")

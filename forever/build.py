@@ -26,6 +26,7 @@ from forever.gamedata import RULES, build_game_data
 from forever.leveling import (
     DEFAULT_RACE,
     DEFAULT_RACE_NOTE,
+    canonical_race,
     check_level,
     check_race,
     check_talents,
@@ -452,8 +453,8 @@ def build_report(
     Legacy « Talented » (hypothèse affichée) ; `race` absente : Orc, signalé dans `inputs` et les hypothèses ;
     `level` absent : niveau maximal des données (`level_cap`), signalé de même (question générale sans niveau)."""
     race_given = race
-    race = race if race is not None else DEFAULT_RACE
     data = load_version(deps)
+    race = canonical_race(data, race) if race is not None else DEFAULT_RACE
     if rules not in RULES:
         raise InvalidArgumentError(f"rules inconnu « {rules} ».", "choisir forever ou seed")
     gd = build_game_data(data, rules=rules)
@@ -543,6 +544,7 @@ def build_report(
         "gap": None,
         "decided_by": None,
         "better": None,
+        "tie": False,
         **_mc_fields(None),
     }
     winners: list[str] = []
@@ -561,6 +563,8 @@ def build_report(
             "gap": _gap_dict(gap),
             "decided_by": by,
             "better": "build" if better else "alternative",
+            # égalité statistique : écart au Monte Carlo non significatif, les deux options se valent
+            "tie": not gap.significant,
         }
         winners = ["build" if m.compare(build, alt, s)[2] else "alternative" for s in seeds]
     rows: list[dict[str, Any]] = []

@@ -109,6 +109,11 @@ def check_level(level: int, cap: int, what: str = "Niveau") -> None:
         raise InvalidArgumentError(f"{what} {level} hors de 1-{cap}.", f"donner un niveau de 1 à {cap}")
 
 
+def canonical_race(data: VersionData, race: str) -> str:
+    """Race écrite comme dans les données, sans souci de casse (« orc » → « Orc ») ; inchangée si inconnue."""
+    return next((r for r in mage_races(data) if r.lower() == race.strip().lower()), race)
+
+
 def check_race(data: VersionData, race: str) -> None:
     races = mage_races(data)
     if race not in races:

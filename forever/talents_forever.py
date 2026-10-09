@@ -584,6 +584,11 @@ def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> B
             popular = None
         if popular is not None:
             block["closest_popular"] = closest_popular(addon, popular, MAGE, report["talents"])
+    alt = report.get("alternative") or {}
+    if alt.get("talents"):
+        other = export_build(addon, MAGE, report["level"], alt["talents"], None, talented_bonus)
+        alt = {**alt, "export": {k: other.get(k) for k in ("status", "reason", "code", "link", "import")}}
+        report = cast(BuildReport, {**report, "alternative": alt})
     return cast(BuildWithExport, {**report, "export": {"talents_forever": block}})
 
 

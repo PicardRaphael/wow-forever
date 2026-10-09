@@ -13,7 +13,7 @@ M.FIELD_SEP = string.char(31)
 M.RECORD_SEP = string.char(30)
 M.ITEM_NAME_CHARS = 20 -- longueur des noms d'objets au premier allègement
 M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "talents", "gear",
-	"target", "client" }
+	"target", "target_level", "target_race", "client" }
 local GEAR_SLOTS = 19
 
 local function isSecret(value)
@@ -149,6 +149,11 @@ function M.Context()
 	end
 	if safe(UnitExists, "target") and safe(UnitIsPlayer, "target") then
 		put("target", safe(UnitClassBase, "target"))
+		local level = safe(UnitLevel, "target")
+		if type(level) == "number" then
+			put("target_level", level > 0 and level or "??") -- -1 : niveau caché (crâne)
+		end
+		put("target_race", second(UnitRace, "target"))
 	end
 	local version, build = safe(GetBuildInfo), second(GetBuildInfo)
 	if version then

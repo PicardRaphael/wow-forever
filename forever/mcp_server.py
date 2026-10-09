@@ -255,7 +255,9 @@ def build_server(deps: Deps) -> MCPServer:
     ) -> BuildWithExport:
         """Build du Mage par contexte (leveling, dungeon, raid, pvp-bg, pvp-world) à un niveau : talents et ordre
         d'apprentissage, choix du build (rotation, armure, cumuls d'Arcane Blast et de Hot Streak), raison de chaque
-        talent (valeur marginale), alternative la plus proche avec écart apparié et intervalle de confiance, stabilité
+        talent (valeur marginale), alternative la plus proche avec écart apparié et intervalle de confiance
+        (`alternative.tie` vrai : égalité statistique, présenter les deux options ; `alternative.export` : son lien
+        Talents Forever, sans ordre), stabilité
         sur plusieurs graines, sensibilité aux sept hypothèses incertaines, respec (coût, gain, niveau conseillé),
         angles morts (borne haute ou non chiffré), certitude, hypothèses et provenance. Donjon et raid : scénarios
         provisoires. Au-delà du plafond de la bêta, le build n'est pas vérifiable en jeu avant la sortie.
@@ -263,7 +265,7 @@ def build_server(deps: Deps) -> MCPServer:
         `level` absent : niveau maximal des données (question générale sans niveau, `inputs.level.origin` vaut
         `default`). `current` : build actuel {clé: rang} (conseil de respec ; à un niveau plus bas que `level`, le
         bloc `respec.projected` donne le chemin conseillé depuis ce build jusqu'à `level`) ; `respecs` : réinitialisations déjà faites ;
-        `sp`, `crit` : fiche remplacée (puissance des sorts, critique en fraction) ; `preset` : rapide (défaut) ou
+        `sp`, `crit` : fiche remplacée (puissance des sorts, critique en fraction) ; `preset` : rapide (défaut, le même que la CLI) ou
         complet ; `rules` : forever, ou seed (leveling seulement, parité) ; `talented_bonus` : points du bonus Legacy
         « Talented » (hypothèse).
 

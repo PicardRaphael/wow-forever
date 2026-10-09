@@ -96,6 +96,7 @@ class Bridge:
         clock: Callable[[], float] = time.monotonic,
         epoch: Callable[[], int] = lambda: int(time.time()),
         executor: Callable[[Callable[[], None]], None] | None = None,
+        describe: Callable[[Record], str | None] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -108,6 +109,7 @@ class Bridge:
         self.clock = clock
         self.epoch = epoch
         self.executor = executor or self._thread
+        self.describe = describe
         self.queue: deque[Record] = deque()
         self.busy = False
         self.first_slot = 1
@@ -128,13 +130,15 @@ class Bridge:
     def _publish(self, first: int, reason: str) -> None:
         with self._lock:
             inbox = inbox_lua(self.epoch(), self.status_cache, self.state.replies, self.buttons)
+            started = time.perf_counter()
             try:
                 count = publish(self.addons_dir, inbox, self.slots, first)
             except OSError as exc:  # le jeu lit peut-être un fichier à cet instant : nouvel essai au pas suivant
                 self.journal.write("error", where="publication", error=str(exc))
                 self.last_refresh = None
                 return
-            self.journal.write("published", reason=reason, first=first, files=count)
+            ms = round((time.perf_counter() - started) * 1000, 1)
+            self.journal.write("published", reason=reason, first=first, files=count, ms=ms)
 
     def refresh(self) -> None:
         """État des données relu ; `Status.lua` et toute la réserve réécrits."""
@@ -175,6 +179,7 @@ class Bridge:
         cell = detect_cell_px(probe) if probe is not None else None
         if cell is None:
             return
+        started = time.perf_counter()
         band_r = band_rect(client, cell)
         band = cap.grab(band_r) if band_r is not None else None
         if band is None:
@@ -190,7 +195,7 @@ class Bridge:
         except RecordError:
             self._rejected(now, "message")
             return
-        self._accept(record, "pixels")
+        self._accept(record, "pixels", capture_ms=round((time.perf_counter() - started) * 1000, 1))
 
     def _read_outboxes(self) -> None:
         for path in self.outbox_files():
@@ -209,7 +214,7 @@ class Bridge:
             for record in records:
                 self._accept(record, "reload")
 
-    def _accept(self, record: Record, via: str) -> None:
+    def _accept(self, record: Record, via: str, capture_ms: float | None = None) -> None:
         with self._lock:
             if self.state.seen(record.session, record.message_id):
                 return
@@ -223,6 +228,7 @@ class Bridge:
                 slot=record.slot,
                 context_keys=list(record.context),
                 text=record.text,
+                capture_ms=capture_ms,
             )
             # après un /reload (boîte d'envoi), le compteur d'emplacements de l'addon est revenu à 1
             self.first_slot = record.slot if via == "pixels" and record.slot else 1
@@ -253,7 +259,8 @@ class Bridge:
             started = self.clock()
             self.journal.write("agent", id=record.message_id, resumed=session is not None)
             try:
-                result = self.agent(message_text(record), session)
+                talents = self.describe(record) if self.describe and record.context.get("talents") else None
+                result = self.agent(message_text(record, talents=talents), session)
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
                 result = AgentResult(text="", session_id=None, is_error=True, error=f"{type(exc).__name__}: {exc}")
             if result.denied:
@@ -279,6 +286,8 @@ class Bridge:
                     length=len(text),
                     provenance=reply["provenance"],
                     tools=result.tools,
+                    timings=result.timings,
+                    cost_usd=result.cost_usd,
                 )
             self.state.put_reply(reply)
             self._publish(self.first_slot, "réponse")

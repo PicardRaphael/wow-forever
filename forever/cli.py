@@ -415,14 +415,17 @@ def build_parser() -> argparse.ArgumentParser:
     ):
         b_run = bridge_sub.add_parser(name, help=text)
         b_run.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
-        b_run.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de Claude Code)")
+        b_run.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de forever bridge config, sonnet)")
         b_run.add_argument("--json", action="store_true", help="sortie JSON")
     b_ask = bridge_sub.add_parser(
         "ask", help="poser une question à la conversation « jeu » sans le jeu (vérifie claude et le serveur MCP)"
     )
     b_ask.add_argument("question", help="texte de la question")
-    b_ask.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de Claude Code)")
+    b_ask.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de forever bridge config, sonnet)")
     b_ask.add_argument("--json", action="store_true", help="sortie JSON")
+    b_cfg = bridge_sub.add_parser("config", help="configuration du pont : modèle de la conversation « jeu »")
+    b_cfg.add_argument("--model", help="modèle (sonnet par défaut, haiku, opus, ou un identifiant complet)")
+    b_cfg.add_argument("--json", action="store_true", help="sortie JSON")
     b_stop = bridge_sub.add_parser("stop", help="arrêter le pont (fichier d'arrêt lu au pas suivant)")
     b_stop.add_argument("--json", action="store_true", help="sortie JSON")
     b_status = bridge_sub.add_parser("status", help="le pont tourne-t-il ? dernières lignes du journal, état des données")
@@ -525,7 +528,11 @@ def build_parser() -> argparse.ArgumentParser:
     b.add_argument("--respecs", type=int, default=0, help="réinitialisations déjà faites (barème de respec)")
     b.add_argument("--sp", type=float, help="puissance des sorts de la fiche (remplace l'estimation)")
     b.add_argument("--crit", type=float, help="critique des sorts de la fiche, en fraction (0.1 = 10 %%)")
-    b.add_argument("--preset", default="complet", help="préréglage de l'optimiseur : rapide ou complet (défaut)")
+    b.add_argument(
+        "--preset",
+        default="rapide",
+        help="préréglage de l'optimiseur : rapide (défaut, comme le MCP et le chat en jeu) ou complet (dix fois plus long)",
+    )
     b.add_argument("--seed", type=int, default=12345, help="graine du Monte Carlo (défaut : 12345)")
     b.add_argument("--rules", default="forever", choices=["forever", "seed"], help="règles (seed : leveling seulement)")
     b.add_argument(
@@ -1842,10 +1849,20 @@ def render_build(rep: Mapping[str, Any]) -> list[str]:
     alt = rep["alternative"]
     diff = ", ".join(f"{k} {a}→{b}" for k, (a, b) in alt["diff"].items()) if alt["diff"] else "aucune"
     who = "le build" if alt.get("better") == "build" else "l'alternative"
-    lines.append(
-        f"Alternative la plus proche : {diff} ; avantage du build : {_advantage(alt['gap'], unit, up)} ; "
-        f"retenu : {who} ({alt['decided_by']})"
-    )
+    if alt.get("tie"):
+        lines.append(
+            f"Alternative la plus proche : {diff} ; à égalité statistique avec le build (écart "
+            f"{_advantage(alt['gap'], unit, up)}, non significatif) : les deux options se valent ; "
+            f"l'analytique penche pour {who}"
+        )
+        tf = alt.get("export") or {}
+        if tf.get("status") == "ok":
+            lines.append(f"  Talents Forever de l'alternative : {tf['code']} · lien {tf['link']} · {tf['import']}")
+    else:
+        lines.append(
+            f"Alternative la plus proche : {diff} ; avantage du build : {_advantage(alt['gap'], unit, up)} ; "
+            f"retenu : {who} ({alt['decided_by']})"
+        )
     st = rep["stability"]
     names = sorted(set(st["winners"]))
     if st["stable"] and names:
@@ -1901,7 +1918,7 @@ def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
         talented_bonus=args.talented_bonus,
     )
     rep = attach_export(deps, report, args.talented_bonus)
-    lines = render_build(report) + render_export(rep["export"]["talents_forever"])
+    lines = render_build(rep) + render_export(rep["export"]["talents_forever"])
     _emit(rep, lines, rep["provenance"], args.json)
     return EXIT_OK
 
@@ -2255,6 +2272,12 @@ def _installed_slots(addons: Path) -> int:
     return count
 
 
+def load_config(cache_dir: Path) -> dict[str, Any]:
+    from forever.bridge.config import load_config as load
+
+    return load(cache_dir)
+
+
 def _cmd_bridge_loop(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
     """`forever bridge start | run | stop | status` (P06a, bloc D)."""
     from forever.bridge import loop
@@ -2313,7 +2336,9 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
 
     from forever.bridge import agent, loop
     from forever.bridge.capture import WindowsCapture, win32_api
+    from forever.bridge.context import describe_talents, talent_table, talents_line
     from forever.bridge.install import REPO_ROOT
+    from forever.bridge.record import Record
     from forever.bridge.state import BridgeState
     from forever.bridge.status import status_payload
     from forever.pipeline.live_logs import client_executables
@@ -2331,6 +2356,11 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
         folder = agent.conversation_dir(deps.cache_dir)
         mcp_path = agent.write_mcp_config(folder, REPO_ROOT)
         env = agent.claude_env(os.environ, REPO_ROOT)
+        model = args.model or load_config(deps.cache_dir)["model"]
+        table = talent_table(deps)
+
+        def describe(record: Record) -> str:
+            return talents_line(describe_talents(table, record.context.get("class", ""), record.context.get("talents", "")))
 
         def converse(prompt: str, session: str | None) -> agent.AgentResult:
             return agent.ask(
@@ -2341,7 +2371,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
                 mcp_path=mcp_path,
                 cwd=folder,
                 env=env,
-                model=args.model,
+                model=model,
             )
 
         bridge = loop.Bridge(
@@ -2353,7 +2383,9 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             status=lambda: status_payload(deps),
             outbox_files=lambda: sorted((wow / "WTF" / "Account").glob("*/SavedVariables/ForeverBridge.lua")),
             slots=_installed_slots(addons) or 8,
+            describe=describe,
         )
+        journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
         return bridge.run(deps.cache_dir / "bridge" / "stop")
     finally:
@@ -2383,7 +2415,7 @@ def _bridge_ask(deps: Deps, args: argparse.Namespace, provenance: Provenance) ->
         mcp_path=mcp_path,
         cwd=folder,
         env=agent.claude_env(os.environ, REPO_ROOT),
-        model=args.model,
+        model=args.model or load_config(deps.cache_dir)["model"],
     )
     if result.is_error:
         lines = [f"Erreur : {result.error}"]
@@ -2407,6 +2439,13 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     provenance = local_provenance(deps, assumptions=["pont de conversation (P06a) : aucune donnée de jeu"])
     if args.bridge_command in ("start", "run", "stop", "status"):
         return _cmd_bridge_loop(deps, args, provenance)
+    if args.bridge_command == "config":
+        from forever.bridge.config import save_config
+
+        config = save_config(deps.cache_dir, {"model": args.model}) if args.model else load_config(deps.cache_dir)
+        lines = [f"Pont : modèle de la conversation « jeu » : {config['model']}"]
+        _emit({**config, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
     if args.bridge_command == "ask":
         return _bridge_ask(deps, args, provenance)
     if args.bridge_command == "install":

@@ -53,6 +53,8 @@ CONTEXT_KEYS = (
     "talents",
     "gear",
     "target",
+    "target_level",
+    "target_race",
     "client",
 )
 

@@ -13,6 +13,7 @@ import shutil
 import subprocess
 import sys
 import threading
+import time
 from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -57,6 +58,8 @@ class AgentResult:
     is_error: bool = False
     error: str | None = None
     tools: list[str] = field(default_factory=list)
+    timings: dict[str, Any] = field(default_factory=dict, compare=False)  # durées des étapes (s), stream_timings
+    cost_usd: float | None = None
 
 
 def find_claude(which: Callable[[str], str | None] = shutil.which) -> str:
@@ -215,6 +218,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
             tools=tools,
         )
     denied = [str(d.get("tool_name")) for d in final.get("permission_denials") or [] if isinstance(d, dict)]
+    cost = final.get("total_cost_usd")
     text = final.get("result") if isinstance(final.get("result"), str) else last_text
     is_error = bool(final.get("is_error"))
     return AgentResult(
@@ -226,7 +230,42 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
         is_error=is_error,
         error=str(text or "erreur de claude") if is_error else None,
         tools=tools,
+        cost_usd=float(cost) if isinstance(cost, int | float) else None,
     )
+
+
+def stream_timings(timed: Sequence[tuple[float, str]], started: float) -> dict[str, Any]:
+    """Durées d'une conversation d'après l'heure d'arrivée de chaque événement du flux, depuis le lancement de
+    `claude` : `init_s` (claude et serveur MCP prêts), chaque appel d'outil (`tools`, de la demande au résultat),
+    `tools_s` (leur somme), `first_text_s`, `result_s` (réponse complète) ; le reste est le temps du modèle."""
+    out: dict[str, Any] = {"init_s": None, "first_text_s": None, "result_s": None, "tools": [], "tools_s": 0.0}
+    asked: dict[str, tuple[str, float]] = {}
+    for when, raw in timed:
+        try:
+            event = json.loads(raw)
+        except (json.JSONDecodeError, TypeError):
+            continue
+        if not isinstance(event, dict):
+            continue
+        at = round(when - started, 3)
+        kind = event.get("type")
+        if kind == "system" and event.get("subtype") == "init" and out["init_s"] is None:
+            out["init_s"] = at
+        content = (event.get("message") or {}).get("content") if kind in ("assistant", "user") else None
+        for block in content if isinstance(content, list) else []:
+            if not isinstance(block, dict):
+                continue
+            if block.get("type") == "tool_use":
+                asked[str(block.get("id"))] = (str(block.get("name")), at)
+            elif block.get("type") == "tool_result" and str(block.get("tool_use_id")) in asked:
+                name, start = asked.pop(str(block.get("tool_use_id")))
+                out["tools"].append({"tool": name, "start_s": start, "seconds": round(at - start, 3)})
+            elif block.get("type") == "text" and out["first_text_s"] is None:
+                out["first_text_s"] = at
+        if kind == "result":
+            out["result_s"] = at
+    out["tools_s"] = round(sum(x["seconds"] for x in out["tools"]), 3)
+    return out
 
 
 def provenance_line(provenances: Sequence[Mapping[str, Any]]) -> str:
@@ -313,6 +352,7 @@ def run_claude(
     """Lance `claude` (liste d'arguments, sans shell), lui passe la question sur l'entrée standard et lit son flux ;
     au-delà de `timeout_s`, arrête le processus et ses enfants et rend une erreur."""
     flags = _CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    started = time.monotonic()
     proc = popen(
         argv,
         cwd=cwd,
@@ -324,10 +364,12 @@ def run_claude(
     )
     job = _Job(proc)
     out: list[str] = []
+    arrivals: list[float] = []
     err: list[bytes] = []
 
     def read_out() -> None:
         for line in proc.stdout:
+            arrivals.append(time.monotonic())
             out.append(line.decode("utf-8", errors="replace"))
 
     def read_err() -> None:
@@ -355,7 +397,7 @@ def run_claude(
     except subprocess.TimeoutExpired:
         proc.kill()
     job.close()
-    result = parse_stream(out)
+    result = replace(parse_stream(out), timings=stream_timings(list(zip(arrivals, out, strict=False)), started))
     if result.is_error and not result.text and err and err[0]:
         tail = err[0].decode("utf-8", errors="replace").strip()[-300:]
         return replace(result, error=f"{result.error} : {tail}")
