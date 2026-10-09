@@ -42,8 +42,13 @@ forever-core/
 - **Pont → jeu** (`slots.py`, `loop.py`) : le même `Inbox.lua` écrit dans les emplacements `ForeverBridge_S001`… que
   le jeu peut encore charger ; l'addon en charge un à intervalles après chaque envoi (accusé `working`, puis `done` ou
   `error`). `Status.lua` porte l'état des données (`status.py`) et les boutons des tranches faites (`buttons.py`).
+- **Contexte vérifié et boutons** (sonde en jeu F) : `context.py` relie le contexte du jeu à nos données (talents
+  par nœud, races par nom de fichier du client, cible) et en retire tout élément non relié, journalisé comme
+  défaut ; `plans.py` fixe l'appel d'outil de chaque bouton et sa lecture, placés dans le message (banc d'essai
+  sans modèle : `tests/unit/test_bridge_bench.py`).
 - **Exploitation** : `forever bridge install | start | run | stop | status | ask | selftest`, journal JSONL sans pixel
-  (`journal.py`), état gardé (`state.py`), un pont à la fois (verrou), arrêt par fichier.
+  (`journal.py`), état gardé (`state.py`), un pont à la fois (verrou, dernier signe de vie), arrêt par fichier
+  posé seulement pour un pont vivant ; addon tenu à jour par le pont, jeu fermé (`keeper.py`).
 
 ## Bloc provenance (dans chaque réponse d'outil)
 ```json

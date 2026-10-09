@@ -131,11 +131,11 @@ avec sa ligne de provenance. Sous Windows, jeu en fenêtré ou plein écran fen�
 
 | Commande | Effet |
 |---|---|
-| `uv run forever bridge install` | installe ForeverBridge et sa réserve de 200 emplacements (jeu fermé, puis le relancer) |
+| `uv run forever bridge install` | installe ForeverBridge et sa réserve de 200 emplacements (jeu fermé, puis le relancer) ; ensuite, le pont le tient à jour seul |
 | `uv run forever bridge ask "question"` | même conversation que dans le jeu, sans le jeu : vérifie `claude` et les outils |
 | `uv run forever bridge start` | lance le pont en arrière-plan (un seul à la fois) |
-| `uv run forever bridge status` | pont en marche ou non, état des données, dernières lignes du journal |
-| `uv run forever bridge stop` | arrête le pont |
+| `uv run forever bridge status` | pont en marche ou non (arrêt sans `stop` signalé), état des données et de l'addon, défauts de contexte, dernières lignes du journal |
+| `uv run forever bridge stop` | arrête le pont (sans effet si aucun ne tourne) |
 | `uv run forever bridge config --model haiku` | modèle de la conversation « jeu » (Sonnet par défaut) |
 | `uv run forever bridge selftest --live` | lit la bande de test de `/fv test` (diagnostic) |
 
@@ -143,6 +143,13 @@ En jeu : `/fv` ouvre la fenêtre (raccourci dans Options > Raccourcis > AddOns),
 ligne ; boutons Talents, Leveling, Familiers, PvP selon la classe ; `/fv fond N` règle l'opacité. Pont arrêté ou
 réserve vide : tapez `/reload` après `forever bridge start`, la réponse arrive par la sauvegarde. Procédure complète :
 `docs/ADDON.md`, section 7, étape 11.
+
+Addon tenu à jour : le pont compare l'addon installé à celui du dépôt ; s'il diffère (après une mise à jour du
+dépôt), il le réinstalle dès que le jeu est fermé, jamais pendant qu'il tourne, et la ligne d'état de la fenêtre
+l'annonce pendant la partie suivante. Jeu ouvert, elle dit « addon mis à jour à la prochaine fermeture du jeu ».
+Chaque bouton envoie un appel d'outil fixé par le pont (Talents : prochain point au niveau suivant depuis le build
+actuel) ; un élément du contexte que le pont ne relie pas à nos données est noté comme défaut dans
+`forever bridge status`, jamais transmis à la conversation.
 
 ## Mon personnage (profil)
 Le profil vit hors du dépôt (`%USERPROFILE%\.forever\profile.json`, ou le fichier désigné par `FOREVER_PROFILE`) ;
