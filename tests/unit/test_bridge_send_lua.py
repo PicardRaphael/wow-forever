@@ -4,12 +4,12 @@ pcall et issecretvalue), allègement du message, bande décodée par le pont. Pe
 synthétiques (aucune règle de jeu)."""
 
 import pytest
-from forever.bridge.buttons import button_payload, visible_buttons
-from forever.bridge.record import Record, build_payload, parse_payload
 from test_bridge_addon_lua import Game
 from test_bridge_window_lua import history
 
+from forever.bridge.buttons import button_payload, visible_buttons
 from forever.bridge.codec import MAX_PAYLOAD, Decoded, decode_band
+from forever.bridge.record import Record, build_payload, parse_payload
 from forever.bridge.slots import status_lua
 
 pytest.importorskip("lupa")

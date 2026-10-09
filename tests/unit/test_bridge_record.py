@@ -2,9 +2,9 @@
 emplacement annoncé, contexte en lignes `clé=valeur`, texte). Valeurs du contexte synthétiques (aucune règle de jeu)."""
 
 import pytest
-from forever.bridge.record import PROTOCOL, Record, RecordError, build_payload, context_lines, parse_payload
 
 from forever.bridge.codec import MAX_PAYLOAD
+from forever.bridge.record import PROTOCOL, Record, RecordError, build_payload, context_lines, parse_payload
 
 CONTEXT = {
     "name": "Jen",
