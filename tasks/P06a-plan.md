@@ -874,6 +874,19 @@ Le bloc B porte le message **des deux côtés**, pour qu'une question tapée en 
   retirée au bout de 30 s ou par l'envoi suivant, et la fenêtre dit « réponse au bloc E ».
 - Bloc E : consultation (R1), accusé, réponses mises en forme, lien copiable, voyant et état des données.
 
+### Exécution : bloc B (2026-10-09)
+- Tests : `test_bridge_record.py`, `test_bridge_slots_b.py`, `test_bridge_install_slots.py`, `test_bridge_buttons.py`,
+  `test_bridge_format.py`, `test_bridge_selftest_message.py`, `test_bridge_send_lua.py` ; retours de la sonde B dans
+  `test_bridge_window_fixes_lua.py`.
+- Allègement : les talents sont retirés en dernier recours, après l'équipement (la question n'est jamais coupée) ;
+  ajout au choix 6, sans effet sur un message type.
+- Défaut trouvé par les tests : la ligne d'état de la fenêtre portait le nom global `ForeverBridgeStatus`, celui de
+  l'état écrit par le pont (renommée `ForeverBridgeStatusLine`).
+- Correction de test accordée par l'utilisateur le 2026-10-09 : message type avec une question de 255 caractères sans
+  accent (comme le plan) ; tests ajoutés à sa demande : question réaliste en français, accents compris, qui tient
+  avec le contexte complet (pont et addon).
+- Sonde en jeu C : `docs/ADDON.md` §7, étape 12 (avant l'étape 11).
+
 ### Questions ouvertes ajoutées (`docs/OPEN_QUESTIONS.md`, section « Pont en jeu »)
 BR1 premier chargement d'un emplacement sans `/reload` ; BR2 bande d'une case par pixel à toutes les échelles ; BR3
 effet de 200 addons chargés à la demande sur le démarrage et la liste des addons ; BR4 canal par polices.

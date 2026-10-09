@@ -174,6 +174,26 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     8. Réserve : la ligne d'état donne les emplacements restants ; à 10, `/reload` est proposé (jamais fait seul).
     9. ForeverLogger toujours actif (`/reload` puis `forever logs scan`).
 
+12. **Sonde en jeu C du pont** (P06a, fin du bloc B, **avant l'étape 11**). Elle dit si une question tapée dans la
+    fenêtre part avec le bon contexte du personnage et si le pont la lit. Aucune réponse en jeu avant le bloc E.
+    1. **Jeu fermé.** `uv run forever bridge install` : ForeverBridge à jour et réserve de 200 emplacements
+       (`ForeverBridge_S001`…`S200`, liste des addons plus longue : c'est attendu). Relancer le jeu ; noter si le
+       chargement paraît plus long qu'avant (question BR3).
+    2. `/fv` : la fenêtre a sa zone de saisie, « Envoyer » et « Nouvelle conversation » ; fond opaque (`/fv fond 80`
+       pour l'essayer, `/fv fond 100` pour revenir) ; aucun bouton de la barre tant que le pont n'a rien écrit
+       (attendu). Assigner le raccourci (Options > Raccourcis > AddOns > ForeverBridge) et l'essayer.
+    3. Dans le terminal : `uv run forever bridge selftest --live --message`, puis revenir au jeu dans la minute.
+    4. Taper une question en français (par exemple « Quel talent dois-je prendre après Improved Frostbolt ? ») ;
+       Maj+Entrée passe à la ligne, Entrée envoie. Petite bande en haut à gauche pendant au plus 30 s ; la fenêtre
+       affiche « Vous : … » et « message n° … envoyé ».
+    5. Sortie attendue du terminal : « message n° … lu », « case de 1 pixel », « emplacement annoncé : 1 »,
+       « contexte : name, realm, level, class, race, faction, zone, subzone, map, talents, gear, client » (`target`
+       en plus avec un joueur en cible) et le texte exact, accents compris.
+    6. « Nouvelle conversation », puis une autre question avec `selftest --live --message` relancé : drapeaux « n ».
+    7. `/fv diag` : la fenêtre confirme « résultats écrits dans la discussion générale » ; sinon noter la ligne
+       « /fv diag en erreur » (`/console scriptErrors 1` montre aussi les erreurs Lua du jeu).
+    8. Relevé : la sortie du terminal des étapes 5 et 6, ce qui ne va pas aux étapes 2 et 7.
+
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
     1. **E2, pénalité des sorts de bas niveau (G4, T04e)** : Frostbolt **rang 1** sur un monstre gris, sans talent de dégâts, personnage de niveau 8 ou plus, base 20-22. **Deux séries d'une dizaine de coups non critiques à deux puissances des sorts éloignées** (S1 et S2, au moins 30 d'écart, lues dans le bloc avancé de `SPELL_CAST_SUCCESS`) : la pente (moyenne à S2 − moyenne à S1) / (S2 − S1) vaut 0,407 sans pénalité et 0,163 si le serveur la réapplique. Le coefficient du client (0,407) ne tranche pas : il est brut, la pénalité de Classic est appliquée par le serveur. Contrôle à une seule puissance : à 14 de puissance des sorts, 25,6-27,8 contre 22,2-24,4 (sans recouvrement).
