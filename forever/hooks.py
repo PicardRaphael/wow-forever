@@ -396,6 +396,8 @@ def update_kickoff(deps: Deps, environ: Mapping[str, str], spawn: Spawn | None) 
     détaché si aucun verrou n'est vivant et que le dernier passage a plus de 6 h. Jamais sans dossier du client ni
     avec FOREVER_OFFLINE ; ne lève jamais."""
     try:
+        if environ.get("FOREVER_BRIDGE", "") not in ("", "0"):
+            return  # conversation « jeu » du pont (P06a) : ni archivage ni passage, à chaque message repris
         wow = deps.wow_dir
         if wow is None or not wow.is_dir():
             return
