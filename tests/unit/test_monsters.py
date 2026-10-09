@@ -1,7 +1,7 @@
 """Table des monstres : PV mesurés dans les journaux (`certain`), Questie en regard (`suppose`), agrégat par niveau
 sur les PNJ normaux ; écarts journal ↔ Questie et conflits listés, jamais moyennés."""
 
-from conftest import FIXTURES, LOCAL_VERSION, REAL_LOG, SYNTHETIC_LOGS
+from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REAL_LOG, SYNTHETIC_LOGS, read_json
 
 from forever.pipeline.combatlog import read_log
 from forever.pipeline.measure import monster_hp
@@ -82,15 +82,17 @@ def test_player_controlled_creatures_are_not_monsters():
 
 
 def test_installed_table_is_read_by_game_data(game_data):
+    """Les données typées reprennent `monsters.json` installé, niveau par niveau et PNJ par PNJ (décision 215 : aucune
+    valeur ni certitude de la version installée écrite en dur ; une mesure ne touche plus ce test)."""
+    table = read_json(DATA_DIR / LOCAL_VERSION / "monsters.json")
     monsters = game_data.monsters
-    assert (
-        monsters.hp_by_level[11].value == 239 and monsters.hp_by_level[11].certainty == "certain"
-    )  # 7 PNJ concordants
-    assert monsters.hp_by_level[25].certainty == "suppose"  # PNJ nommés écartés : hors de la plage mesurée (r5)
-    # T04b : niveau non mesuré dans la plage mesurée : Questie corrigé, probable ; au-delà : suppose
-    assert monsters.hp_by_level[16].certainty == "probable" and monsters.hp_by_level[16].value == 427
-    assert monsters.hp_by_level[30].certainty == "suppose"
-    assert monsters.npcs[3099][7].value == 137 and monsters.npcs[3099][7].certainty == "certain"
+    for level, row in table["hp_by_level"].items():
+        got = monsters.hp_by_level[int(level)]
+        assert (got.value, got.certainty) == (row["value"], row["certainty"]), level
+    for npc_id, entry in table["npcs"].items():
+        for level, row in entry["levels"].items():
+            got = monsters.npcs[int(npc_id)][int(level)]
+            assert (got.value, got.certainty) == (row["max_hp"], row["certainty"]), (npc_id, level)
 
 
 # --- Courbe des PV : seuls les PNJ combattus par le joueur et non amis (décision 222, 2026-10-09) -------------------
