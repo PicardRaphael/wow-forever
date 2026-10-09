@@ -34,8 +34,9 @@ def test_plugin_json_has_a_semver_version():
     # 0.5.0 : skills forever-pvp et forever-builds, routeur (PV1) ; 0.6.0 : skill forever-familiers (CH0) ;
     # 0.7.0 : noms tels que dans le client du joueur (game_locale), T08c ; 0.8.0 : Talents Forever (lien du build
     # calculé, builds populaires), FA1 ; 0.8.1 : cas d'évaluation comparé au code rendu par l'outil (relevés du
-    # 2026-10-08, décision 210).
-    assert version == "0.8.1"
+    # 2026-10-08, décision 210) ; 0.8.2 : serveur MCP et hooks lancés par `python -m forever` avec `--no-sync`,
+    # jamais par forever.exe (verrou de uv sync, demande de l'utilisateur du 2026-10-09).
+    assert version == "0.8.2"
 
 
 def test_fingerprint_is_up_to_date():
