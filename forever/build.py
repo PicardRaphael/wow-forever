@@ -37,7 +37,7 @@ from forever.leveling import (
 )
 from forever.optimize.decide import Gap, departage, gap_dict, paired_gap, tie_break
 from forever.optimize.endgame import PVP_CONTEXTS, context_analytic, context_mc, neighbors, optimize_context
-from forever.optimize.leveling import BuildChoice, best_choice, optimize_leveling
+from forever.optimize.leveling import BuildChoice, LevelingPath, best_choice, leveling_paths, optimize_leveling
 from forever.optimize.respec import RespecAdvice, advise_respec
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.registry import blind_spot_rules
@@ -305,6 +305,27 @@ def _validate(
             raise InvalidArgumentError(f"Build actuel illégal au niveau {level} : {detail}.", "corriger --current")
 
 
+def _order_of(gd: GameData, path: LevelingPath) -> list[dict[str, Any]]:
+    """Ordre des talents d'un chemin de leveling, avec les points cumulés par arbre."""
+    order = [
+        {
+            "level": s.level,
+            "talent": s.talent,
+            "time_s": s.time_s,
+            "rotation": s.rotation,
+            "choice": dict(s.choice._asdict()),
+            "runner_up": s.runner_up,
+            "gap": s.gap,
+            "significant": s.significant,
+            "modeled": s.modeled,
+            "decided_by": s.decided_by,
+        }
+        for s in path.steps
+    ]
+    _order_points(gd, order)
+    return order
+
+
 def _departage_candidates(
     m: _Metric,
     build: dict[str, int],
@@ -312,14 +333,16 @@ def _departage_candidates(
     bonus: int,
     shortlist: int,
     alternative: Mapping[str, int] | None = None,
+    ends: list[dict[str, int]] | None = None,
 ) -> list[dict[str, int]]:
     """Candidats du départage final (décision 219), dans l'ordre : build de l'optimiseur, alternative de l'optimiseur
-    (contextes de fin de jeu), meilleurs voisins analytiques (`shortlist` du préréglage), build actuel (projeté au
-    niveau en leveling) s'il est légal au niveau."""
+    (contextes de fin de jeu), fins des autres faisceaux (leveling : un par arbre), meilleurs voisins analytiques
+    (`shortlist` du préréglage), build actuel (projeté au niveau en leveling) s'il est légal au niveau."""
     gd = m.gd
     out = [dict(build)]
     if alternative:
         out.append(dict(alternative))
+    out += [dict(e) for e in ends or []]
     ranked = sorted(neighbors(gd, build, m.level, bonus), key=lambda n: -m.oriented(m.analytic(n)[0]))
     out += [dict(n) for n in ranked[:shortlist]]
     if current and not check_build(gd, current, m.level, bonus):
@@ -332,9 +355,12 @@ def _label(
     build: Mapping[str, int],
     current: Mapping[str, int] | None,
     alternative: Mapping[str, int] | None,
+    ends: list[dict[str, int]] | None = None,
 ) -> str:
     if dict(cand) == dict(build):
         return "optimiseur"
+    if ends and dict(cand) in ends:
+        return "autre faisceau"
     if current is not None and dict(cand) == {k: v for k, v in current.items() if v > 0}:
         return "build actuel"
     if alternative is not None and dict(cand) == dict(alternative):
@@ -654,10 +680,11 @@ def build_report(
     rules_bs = blind_spot_rules(load_registry(deps.registry_path))
     modeled = modeled_talents(gd, rules_bs) if rules == "forever" else None
     next_step: dict[str, Any] | None = None
+    path_ends: list[tuple[dict[str, int], LevelingPath]] = []  # fins des autres faisceaux (leveling)
     try:
         if context == "leveling":
             next_step = _next_step(gd, level, race, current, over, rules, p.mc_n, seed, talented_bonus, modeled)
-            path = optimize_leveling(
+            paths = leveling_paths(
                 gd,
                 race,
                 first,
@@ -668,28 +695,16 @@ def build_report(
                 mc_n=p.mc_n,
                 seed=seed,
                 rules=rules,
+                start={},
                 over=over,
                 talented_bonus=talented_bonus,
                 modeled=modeled,
                 **m.sim,
             )
+            path = min(paths, key=lambda q: q.hours_equiv)
             build = dict(path.points)
-            order = [
-                {
-                    "level": s.level,
-                    "talent": s.talent,
-                    "time_s": s.time_s,
-                    "rotation": s.rotation,
-                    "choice": dict(s.choice._asdict()),
-                    "runner_up": s.runner_up,
-                    "gap": s.gap,
-                    "significant": s.significant,
-                    "modeled": s.modeled,
-                    "decided_by": s.decided_by,
-                }
-                for s in path.steps
-            ]
-            _order_points(gd, order)
+            order = _order_of(gd, path)
+            path_ends = [({k: v for k, v in q.points.items() if v > 0}, q) for q in paths if q is not path]
             alt = _best_neighbor(m, build, talented_bonus)
         else:
             cands = optimize_context(
@@ -723,7 +738,8 @@ def build_report(
         _projected(gd, advice) if advice is not None else (dict(current) if current and context != "leveling" else None)
     )
     path_build, endgame_alt = dict(build), (dict(alt) if alt is not None and context != "leveling" else None)
-    pool = _departage_candidates(m, build, mine, talented_bonus, p.shortlist, endgame_alt)
+    ends = [e for e, _ in path_ends]
+    pool = _departage_candidates(m, build, mine, talented_bonus, p.shortlist, endgame_alt, ends)
 
     def duel(a: dict[str, int], b: dict[str, int]) -> tuple[Gap, str, bool]:
         return m.compare(a, b, seed)
@@ -748,7 +764,10 @@ def build_report(
         )
         if alt is not None:
             alt = {k: alt[k] for k in gd.talents if alt.get(k, 0) > 0}
-        if context == "leveling" and order:
+        own = next((q for e, q in path_ends if {k: e[k] for k in gd.talents if e.get(k, 0) > 0} == build), None)
+        if context == "leveling" and own is not None:
+            order = _order_of(gd, own)  # fin d'un autre faisceau : son propre ordre
+        elif context == "leveling" and order:
             rebuilt = _rebuild_order(gd, m, order, build, talented_bonus, modeled)
             if rebuilt is not None:
                 order = rebuilt
@@ -758,7 +777,7 @@ def build_report(
         st = m.mc(c, ch, seed)
         duel_row = next((d for d in duels if d["candidate"] == c), None)
         row: dict[str, Any] = {
-            "label": _label(c, path_build, mine, endgame_alt),
+            "label": _label(c, path_build, mine, endgame_alt, ends),
             "talents": c,
             "analytic": v,
             "monte_carlo": st.mean if st else None,
@@ -776,7 +795,7 @@ def build_report(
             f"Carlo apparié (graine {seed}, {p.mc_n} combats) ; bascule seulement sur un écart significatif"
         ),
         "candidates": [candidate_row(c) for c in pool],
-        "chosen": _label(build, path_build, mine, endgame_alt),
+        "chosen": _label(build, path_build, mine, endgame_alt, ends),
         "switched": switched,
         "mc_runs": m.mc_runs - runs,
     }

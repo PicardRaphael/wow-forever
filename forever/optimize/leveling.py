@@ -403,9 +403,17 @@ def optimize_leveling(
         "modeled": modeled,
         **options,
     }
-    focuses: list[str | None] = [None] if rules == "seed" else [None, *gd.trees]
-    paths = [_beam_search(gd, race, lfrom, lto, focus=f, **common) for f in focuses]
-    return min(paths, key=lambda path: path.hours_equiv)
+    return min(leveling_paths(gd, race, lfrom, lto, **common), key=lambda path: path.hours_equiv)
+
+
+def leveling_paths(gd: GameData, race: str, lfrom: int, lto: int, **common: Any) -> list[LevelingPath]:
+    """Chemins de chaque départ (faisceau libre, puis un par arbre en mode forever ; libre seul en mode seed), dans
+    cet ordre ; `optimize_leveling` retient le plus court, le départage final (décision 219) compare leurs fins au
+    niveau demandé.
+
+    Registre : I5"""
+    focuses: list[str | None] = [None] if common.get("rules", "forever") == "seed" else [None, *gd.trees]
+    return [_beam_search(gd, race, lfrom, lto, focus=f, **common) for f in focuses]
 
 
 def _beam_search(

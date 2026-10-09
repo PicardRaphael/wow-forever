@@ -56,6 +56,13 @@ def deps(tmp_path_factory):
     return isolated_deps(tmp_path_factory.mktemp("departage"))
 
 
+def first_neighbor(cands):
+    """Premier candidat voisin du build de l'optimiseur (un point déplacé)."""
+    base = cands[0]
+    keys = set(base) | {k for c in cands for k in c}
+    return next(c for c in cands[1:] if sum(abs(c.get(k, 0) - base.get(k, 0)) for k in keys) == 2)
+
+
 def rigged(monkeypatch, pick):
     """Comparaison truquée : le candidat désigné par `pick(candidats)` bat tous les autres, les autres sont à égalité."""
     chosen = {}
@@ -90,7 +97,7 @@ def assert_order_is_legal(gd, rep):
 
 
 def test_a_neighbor_that_wins_at_monte_carlo_is_recommended_with_a_legal_order(deps, monkeypatch, game_data):
-    chosen = rigged(monkeypatch, lambda cands: cands[1])
+    chosen = rigged(monkeypatch, first_neighbor)
     rep = build_report(deps, "leveling", 14, preset="rapide", sensitivity=False)
     assert rep["talents"] == chosen["target"]
     assert rep["departage"]["switched"] is True and rep["departage"]["chosen"] == "voisin"
