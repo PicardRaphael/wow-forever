@@ -592,8 +592,10 @@ local function Outbox()
 	return db.outbox
 end
 
+-- Messages qui justifient de consulter la réserve ; la boîte d'envoi ne compte qu'après un /reload (le pont la lit
+-- alors), pas juste après l'abandon d'un message sans accusé.
 local function AnyWaiting()
-	return next(Waiting()) ~= nil or #run.unacked > 0
+	return next(Waiting()) ~= nil or #run.unacked > 0 or (run.afterReload and #Outbox() > 0) or false
 end
 
 -- Bande du plus récent message sans accusé (ou rien).
@@ -638,6 +640,7 @@ function FB.Send(text, buttonKey)
 	end
 	run.testLeft = nil
 	run.newConversation = nil
+	run.afterReload = nil
 	db.next_id = id + 1
 	run.unacked[#run.unacked + 1] = {
 		id = id,
@@ -1086,6 +1089,11 @@ function handlers.PLAYER_ENTERING_WORLD()
 		end
 	end
 	FB.ApplySlot(ForeverBridgeSlot)
+	-- secours /reload : la boîte d'envoi vient d'être écrite, le pont la lit ; consultation relancée
+	if (next(Waiting()) ~= nil or #Outbox() > 0) and not run.scheduleStart then
+		run.afterReload = true
+		StartSchedule()
+	end
 end
 
 driver:SetScript("OnEvent", function(_, event, ...)
