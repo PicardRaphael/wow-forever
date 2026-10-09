@@ -28,6 +28,7 @@ from forever.errors import (
     EXIT_INTEGRITY,
     EXIT_NOT_FOUND,
     EXIT_OK,
+    EXIT_USAGE,
     ForeverError,
     InvalidArgumentError,
     PathNotFoundError,
@@ -408,6 +409,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     b_self.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
     b_self.add_argument("--json", action="store_true", help="sortie JSON")
+    for name, text in (
+        ("start", "lancer le pont détaché (capture de la bande, conversation « jeu », réponses dans la réserve)"),
+        ("run", "faire tourner le pont dans ce terminal (lancé par start ; Ctrl+C ou forever bridge stop)"),
+    ):
+        b_run = bridge_sub.add_parser(name, help=text)
+        b_run.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
+        b_run.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de Claude Code)")
+        b_run.add_argument("--json", action="store_true", help="sortie JSON")
+    b_stop = bridge_sub.add_parser("stop", help="arrêter le pont (fichier d'arrêt lu au pas suivant)")
+    b_stop.add_argument("--json", action="store_true", help="sortie JSON")
+    b_status = bridge_sub.add_parser("status", help="le pont tourne-t-il ? dernières lignes du journal, état des données")
+    b_status.add_argument("--json", action="store_true", help="sortie JSON")
 
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
@@ -2216,12 +2229,139 @@ def _bridge_wow_dir(deps: Deps, args: argparse.Namespace) -> Path:
     return Path(wow_dir)
 
 
+class BridgeRunningError(ForeverError):
+    """Un pont tourne déjà (verrou vivant)."""
+
+    exit_code = EXIT_USAGE
+
+    def __init__(self, pid: int) -> None:
+        super().__init__(
+            "bridge_running", f"un pont tourne déjà (pid {pid})", "uv run forever bridge stop, ou le laisser tourner"
+        )
+
+
+def _installed_slots(addons: Path) -> int:
+    from forever.bridge.slots import SLOTS, slot_name
+
+    count = 0
+    while count < SLOTS and (addons / slot_name(count + 1)).is_dir():
+        count += 1
+    return count
+
+
+def _cmd_bridge_loop(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
+    """`forever bridge start | run | stop | status` (P06a, bloc D)."""
+    from forever.bridge import loop
+    from forever.bridge.journal import Journal
+    from forever.bridge.status import status_payload
+
+    home = deps.cache_dir / "bridge"
+    journal = Journal(home / "journal", deps.now)
+    if args.bridge_command == "stop":
+        home.mkdir(parents=True, exist_ok=True)
+        (home / "stop").write_text("", encoding="utf-8")
+        holder = loop.lock_holder(deps.cache_dir)
+        line = (
+            f"Arrêt demandé : le pont (pid {holder}) s'arrête au pas suivant."
+            if holder
+            else "Aucun pont ne tourne ; le fichier d'arrêt est posé."
+        )
+        _emit({"stop": True, "pid": holder, "provenance": provenance}, [line], provenance, args.json)
+        return EXIT_OK
+    if args.bridge_command == "status":
+        holder = loop.lock_holder(deps.cache_dir)
+        data = status_payload(deps)
+        last = journal.tail(5)
+        lines = [f"Pont : {'en marche (pid ' + str(holder) + ')' if holder else 'arrêté'}", data["line"]]
+        lines += [f"  {e.get('at')} {e.get('event')}" for e in last]
+        payload = {"running": holder is not None, "pid": holder, "data": data, "journal": last}
+        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    wow = _bridge_wow_dir(deps, args)
+    from forever.bridge.install import addons_dir
+
+    addons = addons_dir(wow)
+    if args.bridge_command == "start":
+        from forever import spawn
+
+        holder = loop.lock_holder(deps.cache_dir)
+        if holder is not None:
+            raise BridgeRunningError(holder)
+        command = [sys.executable, "-u", "-m", "forever", "bridge", "run", "--wow-dir", str(wow)]
+        if args.model:
+            command += ["--model", args.model]
+        log = home / f"run-{deps.now():%Y%m%d-%H%M%S}.log"
+        spawn.spawn_detached(command, log)
+        lines = [
+            f"Pont lancé en arrière-plan (journal du lancement : {log}).",
+            "En jeu : /fv, puis une question ; uv run forever bridge status pour le suivre, stop pour l'arrêter.",
+        ]
+        _emit({"started": True, "log": str(log), "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    return _bridge_run(deps, args, wow, addons, journal)
+
+
+def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, journal: Any) -> int:
+    """Boucle du pont au premier plan : verrou, capture, conversation « jeu », publication."""
+    import os
+
+    from forever.bridge import agent, loop
+    from forever.bridge.capture import WindowsCapture, win32_api
+    from forever.bridge.install import REPO_ROOT
+    from forever.bridge.state import BridgeState
+    from forever.bridge.status import status_payload
+    from forever.pipeline.live_logs import client_executables
+
+    pid = os.getpid()
+    if not loop.acquire_lock(deps.cache_dir, deps.now(), pid=pid):
+        holder = loop.lock_holder(deps.cache_dir)
+        raise BridgeRunningError(holder or 0)
+    try:
+        try:
+            api = win32_api()
+        except RuntimeError as err:
+            raise InvalidArgumentError(str(err), "lancer le pont sous Windows, sur le poste du jeu") from err
+        claude = agent.find_claude()
+        folder = agent.conversation_dir(deps.cache_dir)
+        mcp_path = agent.write_mcp_config(folder, REPO_ROOT)
+        env = agent.claude_env(os.environ, REPO_ROOT)
+
+        def converse(prompt: str, session: str | None) -> agent.AgentResult:
+            return agent.ask(
+                prompt,
+                session_id=session,
+                claude=claude,
+                plugin_dir=REPO_ROOT / "plugin",
+                mcp_path=mcp_path,
+                cwd=folder,
+                env=env,
+                model=args.model,
+            )
+
+        bridge = loop.Bridge(
+            addons_dir=addons,
+            capture=WindowsCapture(client_executables(wow), api),
+            agent=converse,
+            journal=journal,
+            state=BridgeState.load(deps.cache_dir / "bridge" / "state.json"),
+            status=lambda: status_payload(deps),
+            outbox_files=lambda: sorted((wow / "WTF" / "Account").glob("*/SavedVariables/ForeverBridge.lua")),
+            slots=_installed_slots(addons) or 8,
+        )
+        print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
+        return bridge.run(deps.cache_dir / "bridge" / "stop")
+    finally:
+        loop.release_lock(deps.cache_dir, pid=pid)
+
+
 def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     """`forever bridge` (P06a, blocs A et B) : installation de ForeverBridge et de sa réserve, autotest de la bande,
     lecture d'un message tapé en jeu."""
     from forever.bridge import install, selftest
 
     provenance = local_provenance(deps, assumptions=["pont de conversation (P06a) : aucune donnée de jeu"])
+    if args.bridge_command in ("start", "run", "stop", "status"):
+        return _cmd_bridge_loop(deps, args, provenance)
     if args.bridge_command == "install":
         report = install.install_bridge(_bridge_wow_dir(deps, args), slots=args.slots, dry_run=args.dry_run)
         lines = [f"Installation de ForeverBridge ({len(report.actions)} opération(s)) :"]
