@@ -10,8 +10,9 @@ leur réponse et leur source. Choix du modèle (poids, paramètres, départage, 
 Priorité : **haute** = fausse aujourd'hui un résultat des outils ou bloque la prochaine tranche (T08c, FA1, PV2) ;
 **moyenne** = touche un résultat chiffré, avec une variante, une option ou une borne déjà en place ; **basse** =
 précision, outil ou après le lancement. Une question tranchée part dans `RESOLVED_QUESTIONS.md` avec sa source
-primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24.md) et
-[01/10](research/notes-blizzard-2026-10-01.md) (message n° 4, révision 4).
+primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24.md),
+[01/10](research/notes-blizzard-2026-10-01.md) (message n° 4, révision 4) et
+[08/10](research/notes-blizzard-2026-10-08.md) (message n° 5, révision 1).
 
 ## Temps, incantation et canalisation
 - **TPS1 — Forever regroupe-t-il les actions du serveur sur une grille de temps ?** Test : 50 sorts instantanés
@@ -218,9 +219,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 ## Leveling, quêtes et donjons
 - **LVL1 — Quel est le modèle d'XP de Forever (monstres, quêtes propres à Forever, quêtes de donjon) ?** *Modifiée le
   2026-10-02* : la note du 01/10 réduit de 50 % le bonus d'XP des quêtes de donjon au-delà de la valeur normale
-  (règle du serveur, probable, registre I9). Test : XP relevée par quête (ForeverLogger) et sources de T04d
-  (ForeverDungeonJournal, GearQuestForever, tables de quêtes). Priorité : moyenne. Registre I6, I9.
-  [Détail](research/questions-ouvertes-detail.md#lvl1)
+  (règle du serveur, probable, registre I9). *Modifiée le 2026-10-09* : la note du 08/10 (t/2360696/5, révision 1)
+  relève d'environ 20 % l'XP des monstres tués en donjon (registre I10) et calcule l'XP en groupe sur le niveau de
+  chaque joueur (registre I11), règles écrites en `probable` dans `mechanics.json` de 1.60.1.70291 ; elle retouche
+  aussi l'XP et le niveau de quelques quêtes (Elixir of Pain, Shadowvale et Bandarion Keep, Gelkis et Magram). Le
+  modèle d'XP des monstres reste la règle Classic (`suppose`). Test : XP relevée par quête et par monstre
+  (ForeverLogger) et sources de T04d (ForeverDungeonJournal, GearQuestForever, tables de quêtes). Priorité :
+  moyenne. Registre I6, I9, I10, I11. [Détail](research/questions-ouvertes-detail.md#lvl1)
 - **LVL2 — Les couleurs de quête de Forever sont-elles celles de Classic ?** Test : `UnitQuestTrivialLevelRange`
   relevé à chaque niveau par ForeverLogger. Priorité : basse. Registre I7.
   [Détail](research/questions-ouvertes-detail.md#lvl2)
@@ -230,14 +235,25 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   (wago), puis temps restant de l'aura relevé hors combat par ForeverLogger ; cumul : gain d'XP d'un même monstre avec
   et sans chaque bonus. Priorité : moyenne (T04f). Registre D5, D7.
   [Détail](research/questions-ouvertes-detail.md#lvl3)
+- **LVL4 — Comment l'XP en groupe est-elle ajustée pour chaque joueur, et à partir de quel écart un membre de niveau
+  très supérieur au monstre coupe-t-il l'XP de tout le groupe ?** Ajoutée le 2026-10-09 : la note du 08/10
+  (t/2360696/5, révision 1) revient au calcul de Classic Era (niveau de chaque joueur) et garde la coupure, sans en
+  donner la formule ni le seuil. Test : XP d'un même monstre relevée par ForeverLogger en groupe, écarts de niveau
+  connus, puis seul. Priorité : basse (T04d). Registre I11.
+- **LVL5 — Sur quelle XP s'applique la hausse d'environ 20 % des monstres de donjon (élites, boss, avant ou après le
+  repos et le groupe), et quelle est sa valeur exacte ?** Ajoutée le 2026-10-09 (note du 08/10, « environ 20 % »).
+  Test : XP d'un monstre de donjon relevée seul, sans repos, comparée à l'XP de base de son niveau. Priorité :
+  moyenne (T04d, DJ1). Registre I10.
 
 ## PvP
 - **PVP1 — Les rendements décroissants de Forever suivent-ils Classic (catégories, fenêtre, paliers, immunité,
   racines et silences, PNJ) ?** Test : mes journaux de champs de bataille (PV2). Priorité : haute (PV2). Registre K1.
   [Détail](research/questions-ouvertes-detail.md#pvp1), [protocole](research/pvp-dr-protocole.md)
 - **PVP2 — Le classement des contrôles par catégorie depuis les champs du client vaut-il pour toutes les classes ?**
-  Test : sorts non résolus de PV1 relevés en champ de bataille. Priorité : moyenne. Registre K2.
-  [Détail](research/questions-ouvertes-detail.md#pvp1)
+  *Modifiée le 2026-10-09* : la note du 08/10 donne des rendements décroissants à Entrapment, et le client 1.60.1.70291
+  lui pose une catégorie (`DiminishType` 0 → 1, recopiée dans les fiches PvP) : concordance du classement par les
+  champs du client sur ce sort. Test : sorts non résolus de PV1 relevés en champ de bataille. Priorité : moyenne.
+  Registre K1, K2. [Détail](research/questions-ouvertes-detail.md#pvp1)
 - **PVP3 — Le plafond de durée PvP s'applique-t-il aux contrôles sans catégorie (Death Coil, Blind) ?** Test : durée
   observée en champ de bataille. Priorité : moyenne. Registre K3. [Détail](research/questions-ouvertes-detail.md#pvp3)
 - **PVP4 — Un bijou PvP et un racial (Will of the Forsaken) partagent-ils leur recharge ?** Test : l'un puis l'autre
@@ -247,11 +263,25 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   2026-10-02* : la note du 01/10 relève d'environ 50 % les coûts en honneur de l'équipement PvP et des jetons et porte
   le plafond d'honneur à 25 000 (règles du serveur, probable, registre K6) ; date, liste des champs et types de
   royaume restent absents des sources officielles lues. Test : annonces officielles, puis relevé en jeu des coûts.
-  Priorité : moyenne. [Détail](research/questions-ouvertes-detail.md#pvp5)
+  *Modifiée le 2026-10-09* : la note du 08/10 corrige l'emplacement d'un point de capture à Shipwreck Cove (signal
+  d'un objectif PvP, sans règle) et retire la réduction des critiques en PvP (PVP6). Priorité : moyenne.
+  [Détail](research/questions-ouvertes-detail.md#pvp5)
+- **PVP6 — Quel multiplicateur de critique s'applique désormais en PvP ?** Ajoutée le 2026-10-09 : la note du 08/10
+  (t/2360696/5, révision 1) dit que les critiques en PvP n'ont plus d'efficacité réduite, sans donner l'ancienne
+  réduction ; règle du serveur, absente des tables. Test : critiques d'un même sort sur un joueur et sur un monstre
+  dans mes journaux de champ de bataille. Priorité : moyenne (PV2). Registre K7, A21.
 
 ## Autres classes
-- **CLS2 — Combien de mana rend Improved Seal of Fury (`$PL`) ?** Test : infobulle relevée en jeu. Priorité : basse.
-  [Détail](research/questions-ouvertes-detail.md#cls2)
+- **CLS2 — Combien de mana rend Improved Seal of Fury (`$PL`) ?** *Modifiée le 2026-10-09* : la note du 08/10
+  corrige Seal of Fury, qui rendait de la mana sans le talent, et retire la menace de cette mana (bit d'attribut
+  ajouté sur 1314104 dans 1.60.1.70291) ; le montant reste inconnu. Test : infobulle relevée en jeu. Priorité :
+  basse. [Détail](research/questions-ouvertes-detail.md#cls2)
+- **CLS4 — Quelle formule de rage des dégâts subis Forever applique-t-il ?** Ajoutée le 2026-10-09 : la note du 08/10
+  (t/2360696/5, révision 1) la recalcule sur les PV attendus d'une créature (plus sur ceux du joueur), avec les
+  multiplicateurs de dégâts subis (critiques, coups écrasants), sans les absorptions, équilibrée sur une armure de
+  20 à 40 % selon le niveau ; ni les PV attendus ni la courbe d'armure ne sont donnés (`ExpectedStat` du client est
+  une piste). Test : rage gagnée par coup subi dans un journal de Guerrier ou de Druide ours, dégâts et niveau
+  connus. Priorité : basse (GU1, DR1). Registre B21.
 
 ## Familiers du Chasseur
 - **FAM1 — Une bête d'un niveau au-dessus du Chasseur est-elle refusée ?** Règle de la note du 24/09 (probable,
@@ -287,8 +317,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   P06b. Priorité : basse.
 
 ## Legacy et API
-- **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?** Test :
-  sources officielles, tables du client à l'inventaire de LG1. Priorité : moyenne. Registre G5.
+- **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?**
+  *Modifiée le 2026-10-09* : la note du 08/10 (t/2360696/5, révision 1) accorde à tous les joueurs de la bêta le défi
+  Legacy (16 points) et fixe, pendant la bêta seulement, la respécialisation Legacy la moins chère à 1 pièce
+  d'argent, le coût baissant d'une respécialisation par heure (comme les talents de classe) ; écrit en `probable`
+  dans `mechanics.json` de 1.60.1.70291 (`legacy.beta_grant`). Le client 70291 ajoute un sort « Legacy Reputation
+  Reward » (1324722) : signal, sens non établi. Test : sources officielles, tables du client à l'inventaire de LG1.
+  Priorité : moyenne. Registre G5.
   [Détail](research/questions-ouvertes-detail.md#leg1)
 - **LEG2 — Que couvre l'API Blizzard pour Forever après le lancement ?** Test : `forever api probe` après le
   4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#leg2)
