@@ -68,25 +68,52 @@ def test_a_measurable_gain_keeps_the_advice(deps, monkeypatch):
     assert rep["respec"]["verdict"] == "réinitialiser"
 
 
+MAGE19 = Resolved(
+    class_token="MAGE",
+    class_name="Mage",
+    level=19,
+    race=None,
+    faction=None,
+    zone=None,
+    reading=TalentReading(),
+    current={"frostbite": 3},
+    target_class=None,
+    target_level=None,
+    target_races=(),
+    gear=[],
+    defects=[],
+)
+
+
 @pytest.mark.parametrize("key", ["talents", "leveling"])
 def test_buttons_read_the_tie_and_the_stability(key):
-    mage = Resolved(
-        class_token="MAGE",
-        class_name="Mage",
-        level=19,
-        race=None,
-        faction=None,
-        zone=None,
-        reading=TalentReading(),
-        current={"frostbite": 3},
-        target_class=None,
-        target_level=None,
-        target_races=(),
-        gear=[],
-        defects=[],
-    )
-    plan = button_plan(key, mage, 30)
+    plan = button_plan(key, MAGE19, 30)
     assert plan is not None
     text = " ".join(plan.read)
     assert "respec.versus_optimal.tie" in text and "stability.stable" in text
     assert "garde" in text
+
+
+def test_a_current_build_measurably_better_than_the_optimizer_choice_is_kept(deps, monkeypatch):
+    """Relevé sur 1.60.1.70291 (leveling 20, préréglage rapide) : le build retenu par l'analytique est plus lent que
+    le build actuel projeté au Monte Carlo ; le rapport le dit et garde le build actuel."""
+    real = build_module.advise_respec
+
+    def reset_advised(*args, **kwargs):
+        return real(*args, **kwargs)._replace(verdict="réinitialiser")
+
+    def current_better(self, a, b, seed):
+        return Gap(2.0, 1.0, 3.0, self.gd.build.confidence, True), "monte_carlo", False
+
+    monkeypatch.setattr(build_module, "advise_respec", reset_advised)
+    monkeypatch.setattr(build_module._Metric, "compare", current_better)
+    rep = build_report(deps, "leveling", 12, preset="rapide", current={"improvedFrostbolt": 2}, sensitivity=False)
+    versus = rep["respec"]["versus_optimal"]
+    assert versus["tie"] is False and versus["optimal_better"] is False and versus["current_better"] is True
+    assert rep["respec"]["verdict"] == "garder"
+    assert "meilleur" in rep["respec"]["reason"]
+
+
+def test_buttons_name_the_case_of_a_better_current_build():
+    plan = button_plan("talents", MAGE19, 30)
+    assert "respec.versus_optimal.current_better" in " ".join(plan.read)
