@@ -248,3 +248,18 @@ def test_realistic_french_question_is_sent_with_the_full_context():
     names = [piece.split(":", 2)[2] for piece in record.context["gear"].split(";")]
     assert len(names) == 17 and all(len(n) == 30 for n in names)
     assert record.context["subzone"] == "Sentinel Hill" and len(record.context["talents"].split(",")) == 51
+
+
+def test_cell_size_of_messages_is_set_by_fv_case():
+    """Plan, R2 : `/fv case N` règle la taille de case des messages (1 à 4), gardée dans ForeverBridgeDB.cell."""
+    from forever.bridge.codec import detect_cell_px
+
+    game = Game()
+    game.slash("/fv case 2")
+    assert game.lua.globals().ForeverBridgeDB.cell == 2
+    type_and_enter(game, "Question")
+    assert detect_cell_px(game.screen_image()) == 2
+    game.slash("/fv case 9")
+    assert game.lua.globals().ForeverBridgeDB.cell == 2
+    assert any("case" in line and "1, 2, 3 ou 4" in line for line in history(game))
+    assert list(game.stub.printed.values()) == []
