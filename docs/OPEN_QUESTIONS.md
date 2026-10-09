@@ -90,14 +90,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **MAG18 — Les dégâts d'un rang suivent-ils le niveau du personnage jusqu'à `MaxLevel` ?** Test : journal de
   leveling avec ForeverLogger, même rang à plusieurs niveaux. Priorité : moyenne. Registre G7.
   [Détail](research/questions-ouvertes-detail.md#mag18)
-- **MAG19 — Pourquoi l'optimiseur analytique retient-il au leveling 20 (1.60.1.70291) un build Feu que le Monte Carlo bat ?** Ajoutée le 2026-10-09 : au préréglage rapide du pont, depuis un Mage Givre de niveau 19, le build Feu retenu est plus lent que le build Givre projeté au Monte Carlo apparié (`respec.versus_optimal`, décision 217) ; au préréglage complet du rejeu, Feu et alternative sont à égalité et le build est instable. Écart analytique / Monte Carlo propre aux rangs bas lissés ? Test : comparer analytique et Monte Carlo cas par cas au niveau 20 (I6), puis un relevé en jeu de temps par monstre. Priorité : moyenne. Registre I5, I6. *Modifiée le 2026-10-09* : cause établie :
-  le chemin analytique minimise les heures cumulées des niveaux 10 à N, alors que la recommandation porte sur le niveau
-  N ; le faisceau Givre finit sur un build meilleur au niveau 20 (analytique et Monte Carlo), mais perd au cumul des
-  niveaux 10 à 19 où les rangs bas de Frostbolt ont baissé. Le départage final au Monte Carlo (décision 219 : fins de
-  chaque faisceau, voisins analytiques, build actuel) recommande désormais le Givre au leveling 20, avec ou sans build
-  actuel. Reste ouvert : faut-il que le chemin optimise le niveau demandé plutôt que le cumul (l'ordre des talents en
-  dépend), et l'écart analytique / Monte Carlo du build Feu (35,6 contre 38,7 s par monstre) reste à expliquer.
-
+- **MAG19 — Pourquoi le build Feu du leveling 20 (1.60.1.70291) est-il bien plus lent au Monte Carlo qu'en analytique (35,6 contre 38,7 s par monstre) ?** Ajoutée le 2026-10-09, réduite le même jour : la partie « quel build recommander » est tranchée par l'utilisateur (décision 220 : chemin au temps cumulé depuis le niveau et le build actuels ; meilleur build au niveau N pour le donjon, le raid et le PvP, départage au Monte Carlo de la décision 219) et déplacée dans `RESOLVED_QUESTIONS.md`. Reste l'écart entre l'analytique et le Monte Carlo du build Feu (Improved Fireball 5, Ignite, Elemental Precision 3), plus grand que celui du Givre (32,55 contre 32,41 s). Test : recoupement avec le simulateur de MythicSim, puis comparaison cas par cas de l'analytique et du Monte Carlo (Ignite, critiques, temps de vol). Priorité : moyenne. Registre I1, I6, A18.
 ## Personnage et ratios du client
 - **PER1 — Où sont la critique de base des sorts et la mana par point d'Intelligence ?** Test : `GetSpellCritChance`
   et `UnitPowerMax` à Intelligence connue (ForeverLogger). Priorité : moyenne. Registre A5, B9.

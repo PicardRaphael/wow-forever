@@ -1488,7 +1488,9 @@ mechanics:
       - tests/unit/test_build_respec_tie.py::test_a_gain_that_is_not_measurable_keeps_the_current_build
       - tests/unit/test_build_respec_tie.py::test_a_current_build_measurably_better_than_the_optimizer_choice_is_kept
       - tests/unit/test_departage.py::test_no_candidate_beats_the_champion_significantly
-      - tests/unit/test_departage.py::test_real_data_never_recommend_a_build_slower_than_a_candidate
+      - tests/unit/test_departage.py::test_real_data_never_recommend_a_dungeon_build_slower_than_a_candidate
+      - tests/unit/test_leveling_from_current.py::test_the_path_starts_from_the_current_level_and_build
+      - tests/unit/test_leveling_from_current.py::test_respec_compares_the_current_build_to_a_free_path
       - tests/unit/test_build_report.py::test_reasons_cover_every_talent
       - tests/unit/test_build_report.py::test_stability_and_sensitivity
       - tests/unit/test_build_report.py::test_certainty_is_the_minimum_of_its_sources
@@ -1499,7 +1501,7 @@ mechanics:
       - tests/unit/test_install_game_state.py::test_option_writes_cap_source_and_certainty
       - tests/unit/test_install_game_state.py::test_without_option_the_value_is_carried_and_said
     tolerance: null
-    note: "T08b, bloc B (D2) : plafond de la bêta, fait d'installation (valeur, source, certitude probable pour une note, certain pour une observation ; reporté sinon, report signalé) ; l'ancienne clé de mechanics.json est retirée par l'installation puis refusée ; 2026-10-09 (décision 217) : en leveling, le conseil de respec compare aussi le build actuel projeté au build retenu par Monte Carlo apparié (respec.versus_optimal) ; égalité statistique ou build actuel meilleur : garder ; décision 219 : départage final au Monte Carlo apparié (build de l'optimiseur, alternative, meilleurs voisins analytiques, build actuel) avant toute recommandation, jamais plus lente au Monte Carlo qu'un candidat"
+    note: "T08b, bloc B (D2) : plafond de la bêta, fait d'installation (valeur, source, certitude probable pour une note, certain pour une observation ; reporté sinon, report signalé) ; l'ancienne clé de mechanics.json est retirée par l'installation puis refusée ; 2026-10-09 (décision 217) : en leveling, le conseil de respec compare aussi le build actuel projeté au build retenu par Monte Carlo apparié (respec.versus_optimal) ; égalité statistique ou build actuel meilleur : garder ; décision 219 : départage final au Monte Carlo apparié (build de l'optimiseur, alternative, meilleurs voisins analytiques, build actuel) avant toute recommandation, jamais plus lente au Monte Carlo qu'un candidat ; décision 220 : en leveling, chemin au temps cumulé depuis le niveau et le build actuels (niveau 10 pour un personnage neuf), départage au niveau N réservé au donjon, au raid et au PvP ; respec comparée au chemin libre"
     formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide) ; T06b : à égalité statistique (intervalle apparié qui contient 0), talent modélisé d'abord ; next_step : toutes les additions légales au niveau N depuis un build légal au niveau N − 1"
   - id: I6
     categorie: optimisation

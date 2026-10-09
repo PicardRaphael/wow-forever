@@ -25,7 +25,7 @@ Consigne du bouton « leveling » : appelle exactement, dans cet ordre :
 - forever_lookup {"kind": "zones", "level": 19, "faction": "horde", "limit": 5}
 - forever_build {"context": "leveling", "level": 20, "race": "Orc", "current": {"elementalPrecision": 5, "improvedFrostbolt": 5}, "sensitivity": false}
 Puis :
-- Objectif : les trois premières zones ou donjons du résultat de zones, dans l'ordre rendu ; puis le prochain point de talent, lu comme pour le bouton Talents (`respec.projected.steps`) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, tu gardes ton build (égalité statistique avec le build optimal, instable si `stability.stable` est faux).
+- Objectif : les trois premières zones ou donjons du résultat de zones, dans l'ordre rendu ; puis le prochain point de talent, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton niveau et ton build actuels) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun gain mesurable ; instable si `stability.stable` est faux).
 
 Question posée par le bouton « leveling » de la fenêtre :
 Quel est mon prochain objectif de leveling ?
