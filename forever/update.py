@@ -59,6 +59,7 @@ from forever.engine_inputs import (
 )
 from forever.errors import EXIT_OK, EXIT_PENDING, ForeverError, InvalidArgumentError, PathNotFoundError
 from forever.pipeline.tables import ColumnNamesError
+from forever.store import current_identity
 from forever.timefmt import format_utc, parse_utc
 
 if TYPE_CHECKING:
@@ -92,6 +93,34 @@ AUTO_COMMAND = "forever update --auto"
 CARRY_FR = ("gardé", "réappliqué", "remplacé", "perdu")
 
 Replay = Callable[[str, str, Path], Any]
+
+
+class SameDataReplayError(ForeverError):
+    """Rejeu dont « avant » et « après » désignent les mêmes données (même version, même empreinte) : la comparaison
+    ne prouverait rien (défaut relevé à l'installation de 1.60.1.70291, 2026-10-09)."""
+
+    def __init__(self, label: str) -> None:
+        super().__init__(
+            "same_data_replay",
+            f"Rejeu refusé : « avant » et « après » désignent les mêmes données ({label}).",
+            "rejouer « après » sur la version candidate installée dans la copie de préparation",
+        )
+
+
+def replay_label(data_dir: Path) -> str:
+    """Étiquette du cache des rejeux (`<cache>/builds/`) : version et empreinte réelle des données rejouées, jamais
+    l'emplacement du dossier (« avant » et « après » se déduisaient du chemin, 2026-10-09)."""
+    identity = current_identity(data_dir)
+    return f"update-{identity.game_version}-{identity.data_sha}"
+
+
+def check_replay_sides(before: Path, after: Path) -> None:
+    """Refuse un rejeu dont les deux côtés portent la même version et la même empreinte de données."""
+    a, b = current_identity(before), current_identity(after)
+    if (a.game_version, a.data_sha) == (b.game_version, b.data_sha):
+        raise SameDataReplayError(f"{a.game_version}, données {a.data_sha}")
+
+
 """(moteur, cas, dossier des données) -> résultat du cas ; appelé avant puis après, pour les seuls moteurs touchés."""
 Measure = Callable[[Deps, Path, Sequence[Path]], Mapping[str, Any]]
 """(deps, dossier des données, journaux) -> {"changed": [{"file", "pointer"}…], …} ; simulation, rien n'est écrit."""
@@ -774,20 +803,34 @@ def _evaluate(
         carry_apply(base_vdir, after, carry)
     inputs = compare_inputs(base_vdir, after)
     replayed: dict[str, Any] = {}
+    replay_error = None
     if run.replay is not None and any(not d.identical for d in inputs.values()):
         replay = run.replay
-        replayed = targeted_replay(
-            inputs, lambda e, c: {"avant": replay(e, c, run.base_data), "après": replay(e, c, stage)}
-        )
+        after_data = _replay_after_data(run, stage, candidate, install_ok, plan)
+        if after_data is None:
+            replayed = {"rejoué": False, "raison": "aperçu de la version candidate impossible : rejeu non fait"}
+        else:
+            try:
+                check_replay_sides(run.base_data, after_data)
+            except SameDataReplayError as exc:
+                replay_error = exc.message
+                replayed = {"rejoué": False, "raison": exc.message}
+            else:
+                replayed = targeted_replay(
+                    inputs, lambda e, c: {"avant": replay(e, c, run.base_data), "après": replay(e, c, after_data)}
+                )
     losses = [] if hotfixes_read else hotfix_losses(base_vdir, after)
     verdict = decide(bool(verify["ok"]), carry, inputs, kind, install_ok=install_ok, hotfix_losses=losses)
     lines = _copied(base_vdir, after, inputs)
     summary = _summary_doc(lines)
     fingerprint = candidate_fingerprint(stage if install_ok else candidate)
     pending_id = f"{version}-r{revision}-{content_fingerprint(after)}"
-    approved = verdict.action == "attente" and _approved(run, pending_id)
+    approved = verdict.action == "attente" and _approved(run, pending_id) and replay_error is None
     action = "écrire" if approved else verdict.action
     reasons = list(verdict.reasons)
+    if replay_error is not None:  # rien n'a été comparé : le passage ne conclut rien
+        action = "bloqué"
+        reasons.append(replay_error)
     guarded = action == "écrire" and run.options.auto and first_write_guard(run.deps.cache_dir)
     if guarded and not _approved(run, pending_id):
         action = "attente"
@@ -855,6 +898,61 @@ def _evaluate(
     run.pending.append(entry)
     status = "attente" if action == "attente" else "arrêt"
     return Step(step, status, f"{version} r{revision} : {action} ({'; '.join(reasons)})", {"id": pending_id})
+
+
+def _replay_after_data(
+    run: _Run, stage: Path, candidate: Path, install_ok: bool, plan: Mapping[str, Any] | None
+) -> Path | None:
+    """Données du côté « après » du rejeu : la copie de préparation où la candidate est installée ; si les règles de
+    fusion l'ont refusée, un aperçu à côté, où les écarts refusés sont acceptés comme ils le seraient après l'accord de
+    l'utilisateur (`confirmed_changes.json` de la copie seulement). None si l'aperçu est impossible (talent ou sort
+    ajouté ou retiré)."""
+    if install_ok:
+        return stage
+    if not plan or not plan.get("refused"):
+        return None
+    from forever.manifest import write_manifest
+    from forever.pipeline.install import SPELLS, TALENTS, InstallRefusedError, apply_install
+
+    kinds = {TALENTS: "talent", SPELLS: "spell"}
+    changes = []
+    for r in plan["refused"]:
+        if r["file"] not in kinds or "." not in r["path"]:
+            return None
+        key, field = r["path"].split(".", 1)
+        changes.append(
+            {
+                "kind": kinds[r["file"]],
+                "key": key,
+                "change": "modified",
+                "field": field,
+                "old": r["before"],
+                "new": r["after"],
+                "nature": "client",
+                "decision": "aperçu du rejeu de forever update (écart refusé, accepté dans l'aperçu seulement)",
+            }
+        )
+    preview = stage.parent / "apercu"
+    if preview.exists():
+        shutil.rmtree(preview)
+    shutil.copytree(stage, preview)
+    confirmed_path = preview / str(plan["version_from"]) / "confirmed_changes.json"
+    confirmed = _read(confirmed_path)
+    if not isinstance(confirmed, dict):
+        return None
+    _write(confirmed_path, {**confirmed, "changes": [*confirmed.get("changes", []), *changes]})
+    write_manifest(preview)
+    try:
+        apply_install(
+            run.deps_on(preview),
+            str(candidate),
+            motif="aperçu du rejeu",
+            new_version=bool(plan.get("new_version")),
+            date=run.now[:10],
+        )
+    except (InstallRefusedError, InvalidArgumentError):
+        return None
+    return preview
 
 
 def _step_new_version(run: _Run, target: str | None) -> Step:
@@ -1074,7 +1172,7 @@ def _engine_files() -> set[str]:
 
 def _default_replay(deps: Deps, *, listing: bool = False) -> Replay:
     """Rejeu ciblé de production : les cas des builds du Mage passent par `scripts/replay_builds.py` (`run_cases`,
-    passages `update-<version>-avant|après` dans `<cache>/builds/`) ; les autres cas (simulation de leveling, fiche
+    passages `update-<version>-<empreinte>` dans `<cache>/builds/`, `replay_label`) ; les autres cas (simulation de leveling, fiche
     PvP) ne sont pas rejoués automatiquement et le disent. `listing` (simulation) : les cas sont nommés sans être
     calculés (Monte Carlo de plusieurs minutes par cas)."""
     import importlib.util
@@ -1096,9 +1194,9 @@ def _default_replay(deps: Deps, *, listing: bool = False) -> Replay:
             return {"rejoué": False, "raison": "simulation : cas à rejouer, non calculé"}
         if engine != "mage_build":
             return {"rejoué": False, "raison": "cas sans rejeu automatique (replay_builds : builds du Mage seulement)"}
-        stage = update_dir(deps.cache_dir) in data_dir.parents
-        label = f"update-{data_dir.parent.name if stage else _installed(data_dir)}-{'après' if stage else 'avant'}"
-        rep = module().run_cases(label, [case], data_dir=data_dir, cache_dir=deps.cache_dir)[case]["report"]
+        rep = module().run_cases(replay_label(data_dir), [case], data_dir=data_dir, cache_dir=deps.cache_dir)[case][
+            "report"
+        ]
         alternative = rep.get("alternative") or {}
         return {
             "talents": rep.get("talents"),

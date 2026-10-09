@@ -80,7 +80,7 @@ si aucune valeur faite à la main n'est perdue ni remplacée et si les entrées 
 et leveling du Mage) sont identiques (décision 180) ; les fiches PvP, recopiées du client, s'installent seules quand
 seules changent des valeurs du client ou d'un correctif du serveur, avec un résumé (« fiches PvP : Warrior, … »)
 dans la ligne de démarrage, `forever update status` et le rapport (décisions 198 et 207) ; sinon une attente
-d'accord est enregistrée. Une nouvelle version attend que le jeu ait tourné sur son build (`DBCache.bin` archivé :
+d'accord est enregistrée. Quand les entrées d'un moteur changent, l'attente porte le rejeu des builds du Mage : « avant » sur la version installée, « après » sur la candidate installée dans la copie de préparation (ou, si les règles de fusion la refusent, dans un aperçu où les écarts refusés sont acceptés) ; un rejeu dont les deux côtés portent les mêmes données est refusé et bloque l'attente (décision 216). Une nouvelle version attend que le jeu ait tourné sur son build (`DBCache.bin` archivé :
 attente « correctifs à lire », levée seule, non approuvable) ; 24 h après la première vue du build, elle s'installe
 sans ses correctifs seulement si aucune valeur d'un correctif du serveur n'est perdue (décision 207). Réseau accordé par la décision 179 (wago.tools,
 WoWDBDefs, git et `gh` du clone).
