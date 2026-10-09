@@ -2,6 +2,7 @@
 `## titre`, `- élément` et les passages `**en évidence**` restent ; le reste est converti ou retiré."""
 
 import pytest
+
 from forever.bridge.format import normalize_reply
 
 

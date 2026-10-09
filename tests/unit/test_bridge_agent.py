@@ -11,6 +11,7 @@ from typing import ClassVar
 
 import pytest
 from conftest import FIXTURES, REPO_ROOT
+
 from forever.bridge.agent import (
     ALLOWED_TOOLS,
     FOREVER_TOOLS,
@@ -26,7 +27,6 @@ from forever.bridge.agent import (
     write_mcp_config,
 )
 from forever.bridge.prompt import SYSTEM_PROMPT, message_text
-
 from forever.bridge.record import Record
 
 STREAMS = FIXTURES / "bridge"

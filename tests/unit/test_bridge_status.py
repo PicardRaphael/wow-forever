@@ -4,7 +4,6 @@
 import json
 
 from forever.bridge.status import status_line, status_payload
-
 from forever.update import update_dir
 
 

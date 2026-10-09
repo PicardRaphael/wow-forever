@@ -1,11 +1,11 @@
 """`forever bridge selftest --live --message` (P06a, bloc B, sonde C) : lit un message quelconque de la bande, à
 n'importe quelle taille de case, et l'affiche (numéro, drapeaux, emplacement, clés du contexte, texte)."""
 
-from forever.bridge.record import Record, build_payload
 from test_bridge_selftest import Clock, ScreenApi, run_live
 
 from forever.bridge.capture import WindowsCapture
 from forever.bridge.codec import encode_cells, render_band
+from forever.bridge.record import Record, build_payload
 from forever.bridge.selftest import selftest_message
 
 
