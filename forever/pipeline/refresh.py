@@ -87,6 +87,18 @@ def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
+def _measured_in_gone_logs(installed: Mapping[str, Any], gone: set[str]) -> set[int]:
+    """PNJ dont une mesure installée vient d'un journal disparu : leur combat avec le joueur n'est pas connu (décision
+    222), même s'ils sont remesurés dans un journal présent."""
+    out: set[int] = set()
+    for npc_id, entry in installed.get("npcs", {}).items():
+        for row in entry.get("levels", {}).values():
+            match = SOURCE_RE.match(str(row.get("source", "")))
+            if match is not None and set(match["logs"].split(", ")) & gone:
+                out.add(int(npc_id))
+    return out
+
+
 def _kept_observations(
     installed: Mapping[str, Any], present: set[str], measured: set[tuple[int, int]]
 ) -> tuple[list[MonsterObservation], list[str], list[str]]:
@@ -280,6 +292,7 @@ def remeasure(
         logs=[*names, *gone],  # un journal disparu reste listé (jamais de suppression)
         fit_exclude=fit_exclude,
         curve_exclude=curve_exclude,
+        unknown_fight=_measured_in_gone_logs(installed or {}, set(gone)),
     )
     snapshot = {
         "schema_version": 1,

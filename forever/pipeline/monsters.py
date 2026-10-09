@@ -118,8 +118,10 @@ def build_monsters(
     logs: Iterable[str] = (),
     fit_exclude: Collection[int] = (),
     curve_exclude: Mapping[int, str] | None = None,
+    unknown_fight: Collection[int] = (),
 ) -> dict[str, Any]:
-    """Contenu de `monsters.json` pour la version `version`."""
+    """Contenu de `monsters.json` pour la version `version`. `unknown_fight` : PNJ dont une mesure vient d'un journal
+    disparu (combat avec le joueur inconnu) : jamais écartés pour n'être que vus (décision 222)."""
     curve = dict(curve_exclude or {})
     by_key: dict[tuple[int, int], list[MonsterObservation]] = defaultdict(list)
     for o in observations:
@@ -146,7 +148,7 @@ def build_monsters(
         mine = [x for (nid, _), found in by_key.items() if nid == npc_id for x in found]
         flagged = [x for x in mine if "fought" in x]
         # sans indicateur (mesure reportée d'un journal disparu), « jamais combattu » n'est pas établi
-        all_flagged = len(flagged) == len(mine)
+        all_flagged = len(flagged) == len(mine) and npc_id not in unknown_fight
         if flagged and npc_id not in curve:  # décision 222 : seuls les PNJ combattus par le joueur et non amis
             if any(x.get("reaction") == "amie" for x in flagged):
                 curve[npc_id] = (
