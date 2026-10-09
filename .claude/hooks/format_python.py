@@ -18,5 +18,7 @@ if shutil.which("uv") is None:
     sys.exit(0)
 cwd = data.get("cwd") or os.getcwd()
 subprocess.run(["uv", "run", "--no-sync", "ruff", "format", path], capture_output=True, cwd=cwd, check=False)
-subprocess.run(["uv", "run", "--no-sync", "ruff", "check", "--fix", "--quiet", path], capture_output=True, cwd=cwd, check=False)
+subprocess.run(
+    ["uv", "run", "--no-sync", "ruff", "check", "--fix", "--quiet", path], capture_output=True, cwd=cwd, check=False
+)
 sys.exit(0)
