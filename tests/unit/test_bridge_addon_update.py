@@ -7,9 +7,8 @@ du jeu ». Sans pont, `forever bridge status` dit « addon à réinstaller : for
 
 import json
 
-from forever.bridge.keeper import AddonKeeper
-
 from forever.bridge.install import ADDON, addon_outdated, install_bridge
+from forever.bridge.keeper import AddonKeeper
 from forever.bridge.state import BridgeState
 from forever.bridge.status import ADDON_LINES, status_line
 from forever.cli import main

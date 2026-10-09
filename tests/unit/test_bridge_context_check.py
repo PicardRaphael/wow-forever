@@ -7,10 +7,10 @@ données (T10a) : ses objets sont transmis par leur nom du client, annoncés non
 import json
 
 from conftest import FIXTURES
-from forever.bridge.plans import prepare_record
 
 from forever.bridge.context import load_context_data, resolve
 from forever.bridge.journal import Journal
+from forever.bridge.plans import prepare_record
 from forever.bridge.prompt import message_text
 from forever.bridge.record import Record
 from forever.cli import main

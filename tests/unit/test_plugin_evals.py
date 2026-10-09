@@ -370,8 +370,8 @@ def test_report_loads_the_real_suite():
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
     # PV1 : trois cas PvP et un voisin ; CH0 : trois cas familiers et un voisin ; FA1 : trois cas et un voisin
-    assert len(loaded) == 70
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 47
+    assert len(loaded) == 74  # sonde F : un cas par bouton du pont
+    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 51
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
 
@@ -433,7 +433,7 @@ FAMILIERS = ("familiers-bite-rang-tarides", "familiers-capacites-loup", "familie
 def test_familiers_cases_expect_the_pets_lookup_and_a_judge():
     """CH0 : les trois questions de la demande attendent `forever_lookup` avec `"kind": "pets"` et un juge."""
     named = [c.name for c in cases() if front(c / "prompt.md")[0]["tags"] == ["positif", "familiers"]]
-    assert named == sorted(FAMILIERS)
+    assert named == sorted([*FAMILIERS, "bouton-familiers"])  # sonde F : bouton Familiers du pont
     for name in FAMILIERS:
         g = graders(EVALS / name)
         outil = g["outil"][0]

@@ -13,12 +13,12 @@ import shutil
 
 import pytest
 from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION
-from forever.bridge.plans import button_plan, plan_text, prepare_record
 from mcp import Client
 from talents_forever_data import write_addon
 
 from forever.bridge.buttons import BUTTONS, visible_buttons
 from forever.bridge.context import load_context_data, resolve
+from forever.bridge.plans import button_plan, plan_text, prepare_record
 from forever.bridge.prompt import message_text
 from forever.bridge.record import Record
 from forever.mcp_server import build_server
