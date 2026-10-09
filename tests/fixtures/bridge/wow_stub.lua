@@ -118,6 +118,18 @@ local function newRegion(kind, name, parent)
 	function r:SetTextColor() end
 	function r:SetWordWrap(v) self.wrap = v end
 	function r:SetVertexColor(...) self.vertex = { ... } end
+	-- EditBox
+	function r:SetMultiLine(v) self.multiLine = v end
+	function r:SetAutoFocus(v) self.autoFocus = v end
+	function r:SetMaxLetters(n) self.maxLetters = n end
+	function r:SetTextInsets() end
+	function r:Insert(s) self.text = (self.text or "") .. s end
+	function r:SetFocus() self.focus = true end
+	function r:ClearFocus() self.focus = false end
+	function r:HasFocus() return self.focus and true or false end
+	function r:SetScrollChild(c) self.child = c end
+	function r:Enable() self.enabled = true end
+	function r:Disable() self.enabled = false end
 	-- ScrollingMessageFrame
 	function r:AddMessage(text) self.messages = self.messages or {}; table.insert(self.messages, text) end
 	function r:Clear() self.messages = {} end
@@ -168,7 +180,63 @@ function GetPhysicalScreenSize() return Stub.screen[1], Stub.screen[2] end
 function GetTime() return Stub.time end
 function time() return Stub.epoch + math.floor(Stub.time) end
 function InCombatLockdown() return Stub.combat end
-function issecretvalue() return false end
+-- Valeur secrète simulée : une API listée dans Stub.secret la rend ; une API de Stub.failing lève une erreur.
+Stub.SECRET = setmetatable({}, { __tostring = function() return "<secret>" end })
+Stub.secret = {}
+Stub.failing = {}
+Stub.shift = false
+function issecretvalue(v) return rawequal(v, Stub.SECRET) end
+function IsShiftKeyDown() return Stub.shift end
+
+-- Personnage simulé (valeurs synthétiques, aucune règle de jeu).
+Stub.player = {
+	name = "Jen", realm = "Forever", level = 19, class = "MAGE", race = "Human", faction = "Alliance",
+	zone = "Westfall", subzone = "Sentinel Hill", map = 1436, config = 7, trees = { 1 },
+	nodes = { [1] = { 101, 102, 140, 150 } }, ranks = { [101] = 2, [102] = 3, [140] = 1, [150] = 0 },
+	gear = {
+		[1] = "|cffffffff|Hitem:12345::::::::19:::::|h[Hat of Testing]|h|r",
+		[5] = "|cff1eff00|Hitem:23456::::::::19:::::|h[Robe of Testing]|h|r",
+	},
+	target = nil, -- jeton de classe d'un joueur en cible
+	version = "1.60.1", build = "70291",
+}
+
+local function api(name, fn)
+	return function(...)
+		if Stub.failing[name] then error("panne simulée de " .. name) end
+		if Stub.secret[name] then return Stub.SECRET end
+		return fn(...)
+	end
+end
+
+UnitName = api("UnitName", function(unit) if unit == "player" then return Stub.player.name end end)
+GetRealmName = api("GetRealmName", function() return Stub.player.realm end)
+UnitLevel = api("UnitLevel", function(unit) if unit == "player" then return Stub.player.level end end)
+UnitClassBase = api("UnitClassBase", function(unit)
+	if unit == "player" then return Stub.player.class end
+	if unit == "target" then return Stub.player.target end
+end)
+UnitClass = api("UnitClass", function(unit)
+	local token = UnitClassBase(unit)
+	if token then return token:sub(1, 1) .. token:sub(2):lower(), token end
+end)
+UnitRace = api("UnitRace", function(unit) if unit == "player" then return Stub.player.race, Stub.player.race end end)
+UnitFactionGroup = api("UnitFactionGroup", function(unit) return Stub.player.faction, Stub.player.faction end)
+GetRealZoneText = api("GetRealZoneText", function() return Stub.player.zone end)
+GetSubZoneText = api("GetSubZoneText", function() return Stub.player.subzone end)
+UnitExists = api("UnitExists", function(unit) return unit == "player" or (unit == "target" and Stub.player.target ~= nil) end)
+UnitIsPlayer = api("UnitIsPlayer", function(unit) return unit == "player" or (unit == "target" and Stub.player.target ~= nil) end)
+GetBuildInfo = api("GetBuildInfo", function() return Stub.player.version, Stub.player.build, "Oct 1 2026", 16001 end)
+GetInventoryItemLink = api("GetInventoryItemLink", function(unit, slot) return Stub.player.gear[slot] end)
+C_Map = { GetBestMapForUnit = api("C_Map.GetBestMapForUnit", function() return Stub.player.map end) }
+C_ClassTalents = { GetActiveConfigID = api("C_ClassTalents.GetActiveConfigID", function() return Stub.player.config end) }
+C_Traits = {
+	GetConfigInfo = api("C_Traits.GetConfigInfo", function(config) return { treeIDs = Stub.player.trees } end),
+	GetTreeNodes = api("C_Traits.GetTreeNodes", function(tree) return Stub.player.nodes[tree] end),
+	GetNodeInfo = api("C_Traits.GetNodeInfo", function(config, node)
+		return { ID = node, ranksPurchased = Stub.player.ranks[node] or 0 }
+	end),
+}
 
 function PlaySoundFile(path, channel)
 	if Stub.sound_error then error("PlaySoundFile simulé en erreur") end
