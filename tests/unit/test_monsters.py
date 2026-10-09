@@ -126,3 +126,15 @@ def test_an_observation_without_the_fight_flag_stays_in_the_curve():
     """Mesure reportée d'un journal disparu (sans les indicateurs) : la règle ne s'applique pas, rien n'est deviné."""
     table = build_monsters([obs(3099, 6, 120)], None, LOCAL_VERSION)
     assert table["curve_excluded"] == [] and table["hp_by_level"]["6"]["value"] == 120
+
+
+def test_an_npc_fought_in_a_vanished_log_is_not_excluded_for_being_only_seen_later():
+    """Relevé du 2026-10-09 (Sunscale Lashtail, Savannah Huntress) : combattus dans des journaux disparus (mesure
+    reportée, sans indicateur), seulement vus dans les nouveaux : rien ne prouve qu'ils n'ont jamais été combattus."""
+    seen_only = {**obs(3254, 14, 345, "Sunscale Lashtail"), "fought": False, "reaction": "hostile"}
+    carried = {**obs(3254, 13, 307, "Sunscale Lashtail")}
+    table = build_monsters([seen_only, carried], None, LOCAL_VERSION)
+    assert table["curve_excluded"] == []
+    friendly = {**obs(13076, 30, 2484, "Dun Morogh Mountaineer"), "fought": False, "reaction": "amie"}
+    table = build_monsters([friendly, obs(13076, 29, 2400)], None, LOCAL_VERSION)
+    assert [e["npc_id"] for e in table["curve_excluded"]] == [13076]  # ami : écarté d'office, même mêlé à un report
