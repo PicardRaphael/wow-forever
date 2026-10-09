@@ -38,6 +38,7 @@ from conftest import (
     rewind_to,
 )
 
+import forever.update as update_module
 from forever.cli import main
 from forever.engine_inputs import ENGINES
 from forever.errors import EXIT_PENDING, InvalidArgumentError
@@ -48,15 +49,19 @@ from forever.pipeline.dbcache import HEADER_SIZE
 from forever.pipeline.decode import decode_version, load_rules
 from forever.pipeline.fetch import gametable_url, table_url
 from forever.pipeline.install import apply_install
+from forever.store import current_identity
 from forever.update import (
     STEPS,
+    SameDataReplayError,
     UpdateOptions,
     UpdateReport,
     acquire_lock,
     approve,
+    check_replay_sides,
     exit_code,
     list_pending,
     record_pending,
+    replay_label,
     run_update,
     update_dir,
 )
@@ -305,6 +310,75 @@ def test_an_install_refused_by_the_merge_rules_is_blocked(montage):
     assert verdict["clauses"]["install"] is False
     assert step(report, "nouvelle_version")["status"] == "arrêt"
     assert [e["action"] for e in report["pending"]] == ["bloqué"]
+
+
+# --- Rejeu : « avant » sur la version installée, « après » sur la version candidate (2026-10-09) -------------------
+# Défaut relevé à l'installation de 1.60.1.70291 : refusée par les règles de fusion, la nouvelle version manquait à la
+# copie de préparation et le rejeu « après » tournait sur la version installée (étiquette « après » de provenance
+# 1.60.1.70245 r6) : « aucune recommandation ne change » sans rien comparer.
+
+REFUSED_MANA = ("SpellPower", "116", "ManaCost")
+
+
+def replay_sides(replay):
+    """Versions des données de chaque appel, par côté (le rejeu ciblé appelle « avant » puis « après » par cas)."""
+    versions = [current_identity(d).game_version for _, _, d in replay.calls]
+    return versions[0::2], versions[1::2]
+
+
+def test_replay_after_runs_on_the_candidate_version_when_the_install_is_refused(montage):
+    deps, _ = montage(change=REFUSED_MANA)
+    replay = Replay()
+    report = run_update(deps, DRY, replay=replay)
+    verdict = only_verdict(report)
+    assert verdict["clauses"]["install"] is False and verdict["refused"]
+    before, after = replay_sides(replay)
+    assert before and set(before) == {BASE}
+    assert set(after) == {TARGET} and len(after) == len(before)
+
+
+def test_replay_after_runs_on_the_candidate_version_when_the_install_passes(montage):
+    deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
+    replay = Replay()
+    run_update(deps, DRY, replay=replay)
+    before, after = replay_sides(replay)
+    assert before and set(before) == {BASE} and set(after) == {TARGET}
+
+
+def test_replay_labels_name_two_different_data(montage):
+    """Les étiquettes du cache des rejeux nomment la version et l'empreinte des données, jamais un emplacement."""
+    deps, _ = montage(change=REFUSED_MANA)
+    replay = Replay()
+    run_update(deps, DRY, replay=replay)
+    (_, _, before), (_, _, after) = replay.calls[:2]
+    label_before, label_after = replay_label(before), replay_label(after)
+    assert label_before != label_after
+    assert BASE in label_before and TARGET in label_after
+    assert current_identity(before).data_sha in label_before
+
+
+def test_replay_refuses_to_compare_data_with_themselves(montage):
+    deps, _ = montage()
+    with pytest.raises(SameDataReplayError):
+        check_replay_sides(deps.data_dir, deps.data_dir)
+    copy = deps.data_dir.parent / "copie"
+    shutil.copytree(deps.data_dir, copy)
+    with pytest.raises(SameDataReplayError):  # même version, même empreinte : mêmes données ailleurs
+        check_replay_sides(deps.data_dir, copy)
+
+
+def test_a_replay_on_the_same_data_blocks_the_verdict(montage, monkeypatch):
+    """Si les deux côtés désignent les mêmes données, le passage ne conclut rien : attente bloquée, raison dite."""
+    deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
+    monkeypatch.setattr(
+        update_module, "_replay_after_data", lambda run, stage, candidate, install_ok, plan: run.base_data
+    )
+    replay = Replay()
+    report = run_update(deps, DRY, replay=replay)
+    verdict = only_verdict(report)
+    assert verdict["action"] == "bloqué"
+    assert any("mêmes données" in r for r in verdict["reasons"])
+    assert replay.calls == []
 
 
 def test_client_build_missing_from_wago_waits_without_fetching(montage):
