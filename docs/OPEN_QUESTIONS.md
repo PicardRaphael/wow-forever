@@ -276,6 +276,20 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   serveur) ?** Test : protocole de `docs/research/familiers-protocole.md`. Priorité : moyenne. Registre L10.
   [Détail](research/questions-ouvertes-detail.md#fam7)
 
+## Pont en jeu (P06a)
+- **BR1 — Le premier chargement d'un emplacement modifié après le lancement du jeu, sans `/reload`, lit-il le
+  nouveau contenu ?** Acquis après `/reload` (sonde en jeu A du 2026-10-09). Test : sonde en jeu B
+  (`docs/ADDON.md` §7, étape 10.4). Priorité : haute (chemin des réponses de P06a, décision 212).
+- **BR2 — La bande d'une case par pixel est-elle lue sans erreur à toutes les échelles d'interface et résolutions ?**
+  Une case de 4 pixels est lue au pixel près à 2 560 × 1 440 (sonde A). Test : étape 10.5, puis à une autre
+  résolution ou échelle. Priorité : haute (repli à 2 pixels prévu).
+- **BR3 — 200 addons chargés à la demande ralentissent-ils le démarrage du client ou gênent-ils la liste des
+  addons ?** wow-ai en installe 200. Test : étape 11.1 (durée du chargement, liste des addons). Priorité : moyenne.
+- **BR4 — Le canal de retour par mesures de polices (wow-forever-codex) peut-il servir de vérification rapide « est-ce
+  prêt ? » ?** Mesuré par eux sur Forever 1.60.1.69913 (police jamais chargée relue, déjà chargée gardée en cache
+  jusqu'au redémarrage) ; dépôt sans licence, polices TrueType à générer sans dépendance. Test : sonde dédiée en
+  P06b. Priorité : basse.
+
 ## Legacy et API
 - **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?** Test :
   sources officielles, tables du client à l'inventaire de LG1. Priorité : moyenne. Registre G5.

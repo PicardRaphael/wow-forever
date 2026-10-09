@@ -34,12 +34,14 @@ priment : `CLAUDE.md` (section « Addon »), `docs/ADDON.md`, décisions 194 à 
   combat (`InCombatLockdown()`).
 - **API retirées** : `GetSpellInfo`, `GetItemInfo`, `GetTalentInfo`… : utiliser `C_Spell`, `C_Item`,
   `C_Traits`, `C_ClassTalents`, `C_AddOns`.
-- **Fichiers vus au lancement seulement** : un fichier ajouté pendant que le client tourne n'est pas vu (addons, sons)
-  avant un redémarrage complet (à reconfirmer à la sonde en jeu de P06a) ; le code Lua d'un addon est relu au
-  `/reload` et au `LoadAddOn` ; un son déjà lu reste en cache pour tout le processus.
-- **`PlaySoundFile`** rend `willPlay, handle` ; un fichier vide « ne jouera pas », un fichier valide « jouera »
-  (mesuré par wow-ai sur `.wav`) : **autotest obligatoire** (`ctl/empty`, `ctl/valid`) avant de s'y fier ;
-  `StopSound(handle)` aussitôt.
+- **Fichiers vus au lancement seulement** (sonde en jeu A du 2026-10-09) : un fichier ajouté pendant que le client
+  tourne n'est pas vu (addons, sons) avant un redémarrage complet ; le code Lua d'un addon est relu au `/reload` et au
+  `LoadAddOn` (un addon chargé à la demande lit son fichier modifié) ; sons, polices et textures déjà chargés restent
+  en cache pour tout le processus.
+- **`PlaySoundFile`** rend `willPlay, handle` ; **sur Forever, un fichier vide présent au lancement « jouera »** :
+  le drapeau son de wow-ai ne marche pas ; seul un fichier absent au lancement « ne jouera pas ». Le retour du pont
+  passe par la consultation de la réserve à intervalles (décision 212) ; les sons ne servent qu'au diagnostic
+  `/fv diag`.
 - **`LoadOnDemand`** : un addon se charge une fois par session d'interface (`/reload` les décharge tous) ;
   `C_AddOns.LoadAddOn` rend `loaded, reason` ; ne jamais l'appeler dans le gestionnaire d'`ADDON_LOADED`.
 - **Pixel parfait** : `GetPhysicalScreenSize()` ; échelle `768 / hauteur physique` sur un cadre qui ignore l'échelle

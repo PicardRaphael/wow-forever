@@ -119,6 +119,58 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
    10. Relevé : la sortie de l'étape 4, les captures des étapes 5, 7, 8 et 9 (ou les lignes recopiées). Rien d'autre
        ne change : ForeverLogger continue ses relevés.
 
+   11. **Fait le 2026-10-09** (relevés de l'utilisateur) : bande lue (« vecteur reconnu », écran 2 560 × 1 440,
+       échelle de la bande 0,5333, de l'interface 0,7111) ; un fichier son vide « joue » sur Forever (autotests
+       `.wav` et `.ogg` en échec) et un fichier ajouté pendant que le jeu tourne n'est pas vu ; un addon chargé à la
+       demande relit son fichier modifié. Conséquence (décision 212 amendée) : retour par consultation de la réserve,
+       sans son.
+10. **Sonde en jeu B du pont** (P06a, bloc A2 ; **avant le bloc B**, idéalement avant le 2026-10-12). Elle dit si le
+    premier chargement d'un emplacement modifié après le lancement du jeu, **sans `/reload`**, lit le nouveau contenu
+    (le chemin exact des réponses), si la bande d'**une case par pixel** est lue, et vérifie la fenêtre dédiée.
+    Commandes lancées dans un terminal à la racine du dépôt, branche `p06a` à jour.
+    1. **Jeu fermé.** Fermer toute session Claude Code qui charge le plugin forever si `uv sync` est nécessaire
+       (étape 9.0). Réglages inchangés depuis l'étape 9.1 (fenêtré, Render Scale 100 %, HDR coupé).
+    2. `uv run forever bridge install` : réinstalle `ForeverBridge` (avec `Bindings.xml`), ses fichiers de contrôle,
+       `ForeverBridge_Probe` et le nouvel emplacement de sonde `ForeverBridge_Probe2`.
+    3. Lancer le jeu, entrer avec un personnage. **Ne rien taper de `/fv` encore.** Dans le terminal : `uv run forever
+       bridge selftest --touch` (réécrit `Probe2.lua` après le lancement, avant tout chargement).
+    4. **Premier chargement sans `/reload`** : `/fv poll`. La fenêtre ForeverBridge s'ouvre et affiche
+       `ForeverBridge_Probe2 : chargé, valeur « modifié à HH:MM:SS »` : la consultation de la réserve marche.
+       « installation » : le jeu a gardé le contenu du lancement (noter et s'arrêter là) ; « non chargé (…) » :
+       noter la raison.
+    5. **Bande d'une case par pixel** : `/fv test` (petit rectangle de couleurs de 200 × 24 pixels en haut à gauche ;
+       les messages s'affichent dans la fenêtre, pas dans la discussion). Dans le terminal : `uv run forever bridge
+       selftest --live --save tests/fixtures/bridge/band_live_1px.bmp`, puis cliquer dans la fenêtre du jeu dans la
+       minute et y rester quelques secondes. Attendu : « vecteur reconnu (1792 octets, 24 rangées, 4800 cellules) »
+       et « case de 1 pixel ». Sinon : `/fv test` (retire), `/fv test 2`, relancer avec `--save
+       tests/fixtures/bridge/band_live_2px.bmp` ; garder les deux sorties.
+    6. **Fenêtre** : `/fv` la ferme puis la rouvre ; la déplacer (glisser le titre), l'agrandir (coin bas droit),
+       Échap la ferme. Options > Raccourcis > AddOns > ForeverBridge : assigner une touche, l'essayer deux fois.
+       `/reload`, puis `/fv` : même position, même taille. Aucune ligne de ForeverBridge dans la discussion générale.
+    7. `/fv diag` (seule commande qui écrit dans la discussion, diagnostic demandé) : capture d'écran ; attendu sur
+       Forever : autotests `.wav` et `.ogg` en échec (rien n'en dépend désormais).
+    8. Relevé : la ligne de l'étape 4, la sortie de l'étape 5 et le fichier `.bmp` enregistré, ce qui ne va pas à
+       l'étape 6, la capture de l'étape 7.
+11. **Procédure du chat** (P06a, fin de tranche, **à jouer avant le 2026-10-21**, non bloquante pour la fusion) :
+    1. Jeu fermé : `uv run forever bridge install` (réserve de 200 emplacements `ForeverBridge_S001`…`S200`, liste
+       des addons plus longue : c'est attendu) ; relancer le jeu.
+    2. `uv run forever bridge start` ; `/fv` : voyant vert après le premier relevé, ligne d'état des données
+       (version, fraîcheur, attentes), boutons visibles selon la classe (Mage : Talents, Leveling, PvP ; Chasseur :
+       Familiers, PvP).
+    3. Question tapée (« Which talent should I take next? » ou en français), Entrée : bande visible quelques secondes
+       en haut à gauche, retirée dès l'accusé ; « en cours » animé ; réponse courte mise en forme avec sa ligne de
+       provenance ; journal du pont relu (`<cache>/bridge/journal/`).
+    4. Maj+Entrée passe à la ligne ; question de suite : même session (journal) ; « Nouvelle conversation » puis
+       une question : nouvelle session.
+    5. Bouton Talents (Mage) : réponse avec `[Talents Forever]` ; clic : zone copiable, Ctrl+C, collé dans Talents
+       Forever (`/tf`). Bouton PvP avec un joueur en cible ; Familiers sur un Chasseur si possible.
+    6. Fenêtre fermée pendant une réponse : elle ne s'ouvre pas seule (voyant et compteur) ; rien dans la discussion
+       générale.
+    7. `uv run forever bridge stop`, question : après trois relevés, « pont injoignable », bande retirée ; `uv run
+       forever bridge start`, `/reload` : réponse récupérée par la boîte d'envoi.
+    8. Réserve : la ligne d'état donne les emplacements restants ; à 10, `/reload` est proposé (jamais fait seul).
+    9. ForeverLogger toujours actif (`/reload` puis `forever logs scan`).
+
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
     1. **E2, pénalité des sorts de bas niveau (G4, T04e)** : Frostbolt **rang 1** sur un monstre gris, sans talent de dégâts, personnage de niveau 8 ou plus, base 20-22. **Deux séries d'une dizaine de coups non critiques à deux puissances des sorts éloignées** (S1 et S2, au moins 30 d'écart, lues dans le bloc avancé de `SPELL_CAST_SUCCESS`) : la pente (moyenne à S2 − moyenne à S1) / (S2 − S1) vaut 0,407 sans pénalité et 0,163 si le serveur la réapplique. Le coefficient du client (0,407) ne tranche pas : il est brut, la pénalité de Classic est appliquée par le serveur. Contrôle à une seule puissance : à 14 de puissance des sorts, 25,6-27,8 contre 22,2-24,4 (sans recouvrement).
@@ -153,7 +205,7 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
 - Produit TACT : `.build.info` du client installé indique `wow_classic_beta` (1.60.1.70170, lu sur disque le 2026-10-02) ; le produit du lancement reste inconnu.
 
 ## 8. Checklist à chaque build
-Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live`, puis `/fv diag` (section 7, étape 9). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
+Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 
 ## 9. Feuille de route des addons de forever-core
 Ordre revu le 2026-10-07 (décisions 193 et 202, `docs/VISION.md`) : nos addons n'affichent que ce qu'aucun addon installé ne sait recevoir ; le reste passe par les points d'import des addons de la communauté (décision 196).

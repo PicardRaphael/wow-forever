@@ -116,7 +116,7 @@ parfois daté) ; **wow-ai** = mesuré par wow-ai sur Forever, non revérifié ; 
 
 ## Choix proposés (sans question, à confirmer à la validation)
 
-1. **Réserve de 64 emplacements** (`ForeverBridge_S01` … `ForeverBridge_S64`), réglable à l'installation
+1. *(Remplacé le 2026-10-09 : 200 emplacements, voir « Amendement du 2026-10-09 ».)* **Réserve de 64 emplacements** (`ForeverBridge_S01` … `ForeverBridge_S64`), réglable à l'installation
    (`--slots`, 8 à 200). wow-ai en installe 200, lourds dans la liste des addons du jeu et du gestionnaire. Une réponse
    coûte un emplacement quand le drapeau marche (environ quatre sinon), l'ouverture de la fenêtre un ; 64 couvrent une
    longue session de jeu, puis `/reload` rend toute la réserve.
@@ -128,11 +128,11 @@ parfois daté) ; **wow-ai** = mesuré par wow-ai sur Forever, non revérifié ; 
    jeu est au premier plan et non réduite** (sinon une fenêtre posée par-dessus serait lue : capture hors du jeu).
    Processus marqué « DPI aware » pour des coordonnées physiques. Mode fenêtré ou plein écran fenêtré requis (le plein
    écran exclusif rend une capture noire, wow-ai).
-4. **Sonde** : cinq premières cellules de la rangée 0 (20 × 4 px, les 15 premiers bits du marqueur `C7 1A` : cellules
+4. *(Taille de case reconnue de 1 à 4 pixels depuis le 2026-10-09, voir l'amendement.)* **Sonde** : cinq premières cellules de la rangée 0 (20 × 4 px, les 15 premiers bits du marqueur `C7 1A` : cellules
    `6, 1, 6, 1, 5`) toutes les 250 ms ; bande entière (200 × 24 cellules au plus, 800 × 96 px) lue seulement si la
    sonde reconnaît le marqueur ; la somme de contrôle écarte un faux marqueur. Fenêtre absente : recherche toutes les
    3 s, aucune capture.
-5. **Bande** : 200 cellules par rangée, 24 rangées au plus, soit 1 792 octets de charge (1 800 − 8 d'en-tête et de
+5. *(Remplacé le 2026-10-09 : une case par pixel, bande montrée jusqu'à l'accusé seulement.)* **Bande** : 200 cellules par rangée, 24 rangées au plus, soit 1 792 octets de charge (1 800 − 8 d'en-tête et de
    somme). Montrée tant que le message n'a pas d'accusé de réception, 30 s au plus, trois fois au plus ; ensuite
    boîte d'envoi pour `/reload` et bande retirée.
 6. **Message** (charge de la bande) : champs séparés par `0x1F` : version du protocole `1`, jeton de session de
@@ -144,12 +144,12 @@ parfois daté) ; **wow-ai** = mesuré par wow-ai sur Forever, non revérifié ; 
    tient dans la bande). **Dépassement** (contexte + question au-delà de 1 792 octets) : l'addon allège le contexte
    dans cet ordre, en s'arrêtant dès que le message tient : noms d'objets coupés à 20 caractères, puis noms d'objets
    retirés (numéros gardés), puis `subzone`, puis `gear` ; la question n'est jamais coupée.
-7. **Signaux** : `sig/NN.wav` (réponse prête), `ack/NN.wav` (message reçu), `NN = ((id − 1) mod 64) + 1` ; avant
+7. *(Remplacé le 2026-10-09 : aucun son ; consultation de la réserve à intervalles.)* **Signaux** : `sig/NN.wav` (réponse prête), `ack/NN.wav` (message reçu), `NN = ((id − 1) mod 64) + 1` ; avant
    d'envoyer le message `id`, l'addon vérifie que `sig/NN` et `ack/NN` ne jouent pas déjà (sinon signaux « non
    fiables » pour ce message : relevé de la réserve à horaire fixe, comme wow-ai : 5, 10, 16, 24, 34, 46, 60 s puis
    toutes les 30 s) ; le pont vide les drapeaux des 8 numéros suivants à chaque message reçu et tous les drapeaux à
    son démarrage quand le jeu est fermé.
-8. **Retour** : à chaque publication, le pont écrit le même `Inbox.lua` dans les 64 emplacements (écriture atomique),
+8. *(Remplacé le 2026-10-09 : écriture à partir de l'emplacement annoncé.)* **Retour** : à chaque publication, le pont écrit le même `Inbox.lua` dans les 64 emplacements (écriture atomique),
    puis dans `ForeverBridge/Inbox.lua` (lu au `/reload`), puis lève `sig/NN`. Contenu : `ForeverBridgeSlot = {
    now, status = {…}, replies = { { id, session, status = "done" | "error" | "working", text, provenance, link } } }`
    (dix dernières réponses).
@@ -171,7 +171,7 @@ parfois daté) ; **wow-ai** = mesuré par wow-ai sur Forever, non revérifié ; 
     d'outils forever et ajoute à la réponse une ligne normalisée `Données <version> · <certitudes>` (la plus faible
     d'abord) ou `Aucun outil forever appelé : réponse sans chiffre de jeu.` Le lien Talents Forever d'un résultat de
     `forever_build` (champ du lien) est rendu à part (`link`) pour la zone copiable.
-13. **Consignes fixes** (prompt système ajouté, en français) : réponse de 600 caractères au plus, texte brut sans
+13. *(Mise en forme restreinte depuis le 2026-10-09, voir l'amendement.)* **Consignes fixes** (prompt système ajouté, en français) : réponse de 600 caractères au plus, texte brut sans
     Markdown, noms du jeu tels qu'ils apparaissent dans le client anglais de l'utilisateur (décision 177), lien Talents
     Forever quand la réponse donne un build, aucun conseil en combat, rien sur les actions à la place du joueur.
 14. **Session reprise** : `<cache>/bridge/sessions.json` garde l'identifiant de session de la conversation « jeu »
@@ -418,7 +418,7 @@ Tous sans réseau, sans jeu ni écran ; écrits dans `tmp_path`. Valeurs calcul�
 - Un message type (question de 255 caractères, 51 nœuds de talents, 17 pièces d'équipement aux noms de 40
   caractères) tient dans `MAX_PAYLOAD`.
 
-### `tests/unit/test_bridge_slots.py` (bloc B)
+### `tests/unit/test_bridge_slots.py` (bloc B ; remplacé le 2026-10-09, voir l'amendement)
 - `SILENT_WAV` : 124 octets, commence par `RIFF`, `WAVE` à l'octet 8, 80 échantillons à 128 (si la sonde A retient
   `.ogg`, ce test vise à la place un `.ogg` silencieux versionné dans `addon/ForeverBridge/ctl/`, écrit avant le
   commit rouge du bloc B).
@@ -431,7 +431,7 @@ Tous sans réseau, sans jeu ni écran ; écrits dans `tmp_path`. Valeurs calcul�
 - `raise_signal("sig", 65, 64)` écrit `SILENT_WAV` dans `ForeverBridge/sig/01.wav` ; `lower_ahead(10, 64)` vide
   `sig` et `ack` de 11 à 18 (0 octet) ; `lower_all` vide tout.
 
-### `tests/unit/test_bridge_install.py` (bloc B)
+### `tests/unit/test_bridge_install.py` (bloc B ; remplacé le 2026-10-09, voir l'amendement)
 - `install_bridge(tmp, slots=4)` crée `ForeverBridge/` (copie de `addon/ForeverBridge`), `ForeverBridge_S01` à
   `S04` (`.toc` avec `## Interface: 16001`, `## LoadOnDemand: 1`, `## Dependencies: ForeverBridge`, `Inbox.lua`),
   `sig/01..04.wav` et `ack/01..04.wav` vides, `ctl/empty.wav` vide et `ctl/valid.wav` = `SILENT_WAV`.
@@ -484,7 +484,7 @@ Tous sans réseau, sans jeu ni écran ; écrits dans `tmp_path`. Valeurs calcul�
   update status`. Sans attente : pas de partie « attente ». `status_payload` n'appelle pas le réseau (`http_get`
   qui lève).
 
-### `tests/unit/test_bridge_addon_lua.py` (bloc E, `lupa.lua51`, client simulé `tests/fixtures/bridge/wow_stub.lua`)
+### `tests/unit/test_bridge_addon_lua.py` (bloc E, `lupa.lua51`, client simulé `tests/fixtures/bridge/wow_stub.lua` ; cas 6, 8, 10 remplacés le 2026-10-09)
 1. `_VERSION == "Lua 5.1"` ; le client simulé n'expose pas `bit` (le codec n'en dépend pas).
 2. `ADDON_LOADED` : `ForeverBridgeDB` créée (`schema = 1`, jeton de session, `next_id = 1`), bande cachée, autotest
    des drapeaux réussi (vide : ne joue pas ; valide : joue).
@@ -617,6 +617,216 @@ remplacé). Relevés sur `claude` 2.1.294 (question « Quelle est la version des
   `/fv diag`, pièges) ; capture réelle par l'API de Windows vérifiée sur une fenêtre Tk (vecteur reconnu).
 - `install_bridge(wow_dir, slots=0)` : la réserve d'emplacements arrive au bloc B.
 - Procédure : `docs/ADDON.md` §7, étape 9.
+
+## Exécution : sonde en jeu A (2026-10-09, relevés de l'utilisateur, captures prises)
+1. **Bande lue** : « vecteur reconnu (1792 octets, 24 rangées, 4800 cellules) » ; écran 2 560 × 1 440, échelle de la
+   bande 0,5333, échelle de l'interface 0,7111. La capture enregistrée (`tests/fixtures/bridge/band_live.bmp`) ne porte
+   que les huit couleurs pures et chaque pixel est égal au centre de sa case : le rendu est au pixel près.
+2. **Sons** : `PlaySoundFile` « joue » aussi les fichiers vides (`empty`, `flip`, en `.wav` comme en `.ogg`) ; seul un
+   fichier absent au lancement ne joue pas. Autotests `.wav` et `.ogg` en échec : le drapeau vide ou valide de wow-ai
+   ne marche pas sur Forever.
+3. Après `selftest --touch`, jeu lancé : `late.wav` et `late.ogg` ne jouent pas (un fichier ajouté pendant que le jeu
+   tourne n'est pas vu) ; `flip` joue, mais il jouait déjà vide : rien n'est prouvé.
+4. `ForeverBridge_Probe` chargé après la modification affiche « modifié à 08:13:00 » : un addon chargé à la demande
+   lit bien un fichier modifié pendant que le jeu tourne (chargement après `/reload`).
+5. Après redémarrage complet : `late` joue (un fichier présent au lancement est vu) ; la sonde garde « modifié à
+   08:13:00 ».
+
+Conclusion : le chemin des réponses par la réserve marche ; seul le signal « réponse prête » manque. Reste à vérifier
+en jeu (sonde B) : le **premier** chargement d'un emplacement modifié après le lancement, **sans `/reload`** (le cas
+exact de la consultation), et la bande d'une case par pixel.
+
+## Amendement du 2026-10-09 (sonde en jeu A et demandes de l'utilisateur)
+
+Demandes de l'utilisateur du 2026-10-09 : retour par consultation de la réserve comme wow-ai quand son canal son est
+inutilisable (lecture de son `docs/ARCHITECTURE.md`, accord réseau du 2026-10-09), 200 emplacements, fenêtre dédiée
+reprise de wow-ai, boutons dès P06a, bande d'une case par pixel retirée dès l'accusé, rien dans la discussion
+générale. Décision 212 amendée le même jour. Les choix 1, 5, 7, 8 et 13 et les tests marqués plus haut sont remplacés
+par ce qui suit ; le reste du plan tient.
+
+### Ce que fait wow-ai sans son (lu le 2026-10-09, `docs/ARCHITECTURE.md` au commit 3756eb5a)
+- 200 emplacements `WoWAI_S001`…`S200`, même contenu écrit dans les 200 à chaque publication ; le jeu charge un
+  emplacement neuf à 5, 10, 16, 24, 34, 46, 60, 80, 100, 130, 160, 200, 240, 300 s après un envoi, puis toutes les
+  60 s ; au repos, un emplacement toutes les 10 min pour le voyant du pont (fenêtres « vu » de 12 et 22 min).
+- Les sons ne servent qu'aux raccourcis (« prêt », « reçu », progression, présence) ; un client qui dit « jouera »
+  pour un fichier vide fait passer l'addon en consultation seule pour la session : **c'est notre cas sur Forever**.
+
+### R1. Retour par consultation de la réserve (remplace les choix 7 et 8)
+- **Après un envoi**, l'addon charge l'emplacement suivant (`C_AddOns.LoadAddOn`) à **3 s**, puis **toutes les 4 s
+  jusqu'à 30 s**, puis **toutes les 10 s**, **plafond à 190 s** (délai de la conversation : 180 s ; le pont publie
+  alors une erreur). Au plus 24 consultations par message ; une réponse de 6 à 15 s en coûte 3 ou 4.
+- **Marqueur « pas encore prêt »** : dès qu'il lit la bande, le pont publie une entrée `{ session, id, status =
+  "working", since }` ; puis `done` (texte, provenance, lien) ou `error` (raison). L'addon vide la globale
+  `ForeverBridgeSlot` avant chaque chargement et ignore une entrée d'une autre session.
+- **Accusé de réception** = premier relevé qui porte le message (`working`, `done` ou `error`) : la bande est retirée
+  aussitôt. **Trois relevés sans accusé** (3, 7, 11 s) : bande retirée, message mis dans la boîte d'envoi, erreur
+  expliquée (« pont injoignable : lancez `uv run forever bridge start`, puis tapez /reload »), plus aucune
+  consultation pour ce message.
+- **Un seul message en vol** : un envoi suivant attend l'accusé du précédent (file locale, montrée « en attente »).
+- **Emplacement annoncé** : chaque message porte le numéro du prochain emplacement que le jeu chargera (`slot`) ; le
+  pont écrit à chaque publication dans les emplacements `slot` à 200 et dans `ForeverBridge/Inbox.lua` ; numéro
+  inconnu (démarrage du pont, boîte d'envoi) : toute la réserve. Le compteur de l'addon repart à 1 à chaque `/reload`
+  (non sauvegardé), comme la réserve.
+- **Publication** : au démarrage du pont, à chaque changement d'état d'un message, et toutes les 10 min (état des
+  données, `now`), toujours atomique fichier par fichier.
+- **Au repos** : un relevé toutes les 10 min, **fenêtre ouverte seulement**, et un à l'ouverture de la fenêtre si le
+  dernier date de plus de 2 min ; « pont vu il y a N min » vient du champ `now` du dernier relevé (même horloge).
+- **Réserve** : **200 emplacements** `ForeverBridge_S001`…`S200` (`--slots` de 8 à 200). À **10 restants**, la ligne
+  d'état propose `/reload` (jamais automatique) ; **réserve vide** pendant une attente : « réponse au prochain
+  /reload », lue dans `ForeverBridge/Inbox.lua` au `/reload` (chemin de secours) ; un emplacement qui ne se charge
+  pas (`MISSING`, `DISABLED`…) est sauté et compté.
+- **Aucun son dans le chemin de P06a** : ni `sig/` ni `ack/` ; `ctl/` et `/fv diag` restent comme diagnostic. Contenu
+  d'un emplacement : `ForeverBridgeSlot = { v = 1, now, status = {…}, buttons = {…}, replies = { … dix dernières … } }`.
+
+### R2. Bande (remplace le choix 5 ; choix 4 précisé)
+- **Une case par pixel physique** par défaut : bande de test de 200 × 24 pixels, message de 200 × N. Repli `/fv test
+  N` (N de 1 à 4) pour la bande de test, réglage `/fv case N` gardé dans `ForeverBridgeDB.cell` pour les messages.
+  Capture : 8 couleurs exactes et pixels égaux au centre de leur case (sonde A), d'où le pari d'une case par pixel.
+- Le pont reconnaît la taille de case sur la sonde (20 × 4 pixels inchangée : marqueur cherché pour une case de 1, 2,
+  3 puis 4 pixels), puis ne lit que le rectangle de la bande à cette taille (`band_rect(client, cell_px)`, 200 × 24 à
+  une case par pixel) ; la somme de contrôle écarte une fausse détection.
+- **Coin haut gauche** de la zone client (seul coin prouvé, à l'abri de la barre de titre de la fenêtre).
+- **Montrée de l'envoi à l'accusé** (R1), jamais plus ; `/fv test` reste deux minutes (diagnostic demandé).
+
+### R3. Fenêtre dédiée (bloc E ; squelette avancé au bloc A2)
+- **Reprise de wow-ai** (`BuildUI`, cadre `BackdropTemplate`, glisser, poignée de redimensionnement, ligne d'état,
+  saisie avec « Envoyer » accolé, zone copiable), adaptée : une seule conversation (ni liste de conversations, ni
+  agents, ni Allow, ni macros, ni barre réduite), notice MIT déjà en tête de `ForeverBridge.lua`. Historique dans un
+  `ScrollingMessageFrame` de Blizzard (défilement à la molette, retour à la ligne au redimensionnement, liens
+  cliquables) plutôt que les bulles de wow-ai : plus court, plus sûr.
+- Déplaçable, redimensionnable (bornes 360 × 240), **position et taille dans `ForeverBridgeDB.window`** ; ouverte et
+  fermée par `/fv` (et `/forever`) et par un **raccourci configurable** (`Bindings.xml`, Options > Raccourcis >
+  AddOns > ForeverBridge) ; **Échap ferme** (`UISpecialFrames`) ; strate `DIALOG`, cadres et polices de Blizzard
+  (style sobre, compatible EllesmereUI qui habille les cadres standard) ; rien de protégé.
+- **Historique** : questions (« Vous », bleu) et réponses (« Forever », or) distinguées, une ligne vide entre deux
+  messages, 50 derniers messages gardés dans `ForeverBridgeDB.history`.
+- **Mise en forme restreinte** (remplace « texte brut » du choix 13) : la réponse peut contenir des lignes `## titre`,
+  `- élément` et des passages `**en évidence**`, rien d'autre ; le pont normalise toute autre syntaxe (`#`, `###`,
+  `* `, `__…__`, accents graves, tableaux) avant publication ; l'addon rend les titres en or, les éléments avec une
+  puce, la mise en évidence en blanc vif. 600 caractères au plus, hors mise en forme.
+- **Lien Talents Forever** : ligne `[Talents Forever]` cliquable (lien `|Hforeverbridge:copy:N|h`, géré par le
+  `OnHyperlinkClick` de l'historique, jamais `SetItemRef`) qui ouvre la zone copiable, texte présélectionné (Ctrl+C).
+- **Saisie** : Entrée envoie, **Maj+Entrée passe à la ligne** (`IsShiftKeyDown`), Échap ôte le focus ; 255
+  caractères ; bouton « Envoyer » ; bouton **« Nouvelle conversation »** (drapeau `n` sur le message suivant, trait
+  de séparation dans l'historique).
+- **Indicateur d'état toujours visible** : voyant (vert : pont vu depuis moins de 12 min ; jaune : 12 à 22 min ;
+  rouge : jamais vu ou injoignable), « réponse en cours » animé (points qui tournent, secondes écoulées), erreur
+  expliquée (pont injoignable, délai dépassé, réserve vide, bande refusée), réserve restante ; **ligne d'état des
+  données** (version, fraîcheur, attentes de `forever update`).
+- **Rien dans la discussion générale** : aide, bande de test, réponses et erreurs vont dans la fenêtre ; seul `/fv
+  diag`, demandé par le joueur, écrit ses lignes dans la discussion (diagnostic seulement, comme le demande
+  l'utilisateur). Test : aucune ligne écrite dans `DEFAULT_CHAT_FRAME` sur tous les scénarios hors `/fv diag`.
+- **Aucune ouverture automatique** : une réponse qui arrive fenêtre fermée allume un compteur sur le voyant et ne
+  l'ouvre pas, en combat comme hors combat.
+
+### R4. Boutons dès P06a (déplacés de P06b)
+- Barre au-dessus de la saisie ; chaque bouton envoie sa **question fixe** par le même chemin que le chat (même
+  bande, même conversation, réponse dans l'historique). Liste écrite par le pont dans chaque publication et dans
+  `Status.lua` (`buttons`) : **l'addon n'affiche que ce que le pont envoie** (aucun bouton avant le premier état lu).
+- Table `forever/bridge/buttons.py` ; tranches faites **fixées au plan** : T04b, T04c, T05, FA1, CH0, PV1 (ROADMAP du
+  2026-10-09). Filtre de classe proposé (à valider) : la tranche ne calcule que pour cette classe.
+
+  | Bouton | Question envoyée | Tranches | Classes |
+  | --- | --- | --- | --- |
+  | Talents | « Quel est mon prochain talent, avec le lien Talents Forever ? » | FA1, T05 | Mage |
+  | Leveling | « Quel est mon prochain objectif de leveling ? » | T04b, T04c | Mage |
+  | Familiers | « Où apprivoiser le prochain rang utile près de moi ? » | CH0 | Chasseur |
+  | PvP | « Fiche de la classe de ma cible » | PV1 | toutes (cible joueur requise) |
+
+- Absents en P06a : « Mettre à jour », Valider, Refuser (P06b) ; Équipement (T10a) ; Analyse du dernier combat (AN1,
+  AN2). Le contexte gagne `target` (jeton de classe de la cible si c'est un joueur, sous `pcall` et `issecretvalue`).
+
+### R5. Piste des polices (wow-forever-codex, lue le 2026-10-09 : README et `docs/`, commit 85953db)
+- Principe : un fichier de police par emplacement, présent au lancement ; le pont réécrit le fichier que le jeu lira
+  ensuite ; l'addon l'affecte par `SetFont`, mesure des largeurs de glyphes (`GetStringWidth`) et en tire 512 octets
+  (somme de contrôle). Mesuré par eux sur Forever 1.60.1.69913 : un nom de police jamais chargé lit le fichier
+  modifié ; un nom déjà chargé garde l'ancien contenu jusqu'au redémarrage complet (même après `/reload`) ; un fichier
+  créé en cours de jeu n'est pas vu ; banque de 65 535 noms par liens physiques (NTFS).
+- **Utilisable sur Forever** d'après leurs mesures (non revérifié ici) : chaque vérification « est-ce prêt ? » brûle
+  un nom de police au lieu d'un emplacement d'addon, donc une consultation par seconde deviendrait possible sans
+  toucher la réserve. **Pas pour P06a** : le dépôt n'a **aucune licence** (rien ne peut être repris, réécriture
+  complète), il faut écrire des polices TrueType valides sans dépendance (ou en ajouter une, accord requis), mesurer
+  sous toutes les échelles d'interface, et le compteur de noms doit survivre aux redémarrages. Piste notée pour P06b
+  (question ouverte BR4).
+
+### Blocs revus
+- **Bloc A2 (avant la sonde B)** : taille de case reconnue par le pont (1 à 4), `/fv test N` (1 par défaut), squelette
+  de la fenêtre (cadre, titre, voyant, ligne d'état, historique, fermeture, Échap, glisser, redimensionner, position
+  gardée, `Bindings.xml`), aide et messages de `/fv test` dans la fenêtre, `ForeverBridge_Probe2` et `/fv poll`
+  (premier chargement sans `/reload`), test de non-régression sur `band_live.bmp`, client simulé fidèle à Forever.
+- **Bloc B** : `record.py` (champ `slot`), `slots.py` (200 emplacements, `publish` à partir de l'emplacement annoncé,
+  sans drapeaux), `install.py` (réserve, `Inbox.lua` d'attente), `buttons.py`, `format.py` (mise en forme
+  restreinte).
+- **Bloc C** : inchangé (consignes : mise en forme restreinte).
+- **Bloc D** : publication des états `working`, `done`, `error` ; rafraîchissement toutes les 10 min ; boîte d'envoi.
+- **Bloc E** : consultation (R1), fenêtre complète (R3), boutons (R4), contexte (`target`).
+
+### Interfaces modifiées
+```python
+# forever/bridge/codec.py
+CELL_PX = 4                      # plus grande case lue (rectangle de la sonde : 20 × 4)
+CELL_SIZES = (1, 2, 3, 4)        # tailles reconnues, dans cet ordre
+def render_band(cells, cell_px: int = CELL_PX) -> Image: ...
+def detect_cell_px(image: Image) -> int | None: ...    # marqueur reconnu à cette taille, sinon None
+def marker_present(probe: Image) -> bool: ...           # à n'importe quelle taille de CELL_SIZES
+def decode_band(image: Image, cell_px: int | None = None) -> Decoded | BandError | None: ...
+def cell_values(image: Image, rows: int, cell_px: int = CELL_PX) -> list[int]: ...
+def cell_mismatches(image: Image, expected, cell_px: int | None = None) -> list[...]: ...
+# forever/bridge/capture.py
+def band_rect(client: Rect, cell_px: int = CELL_PX) -> Rect | None: ...
+# forever/bridge/slots.py
+SLOTS = 200
+def slot_name(index: int) -> str: ...            # 1 -> "ForeverBridge_S001"
+def publish(addons_dir: Path, inbox: str, slots: int = SLOTS, first: int = 1) -> int: ...
+# forever/bridge/buttons.py
+DONE_SLICES: frozenset[str]
+@dataclass(frozen=True)
+class Button: key: str; label: str; question: str; requires: tuple[str, ...]; classes: tuple[str, ...] | None
+def visible_buttons(done: AbstractSet[str] = DONE_SLICES) -> list[Button]: ...
+# forever/bridge/format.py
+def normalize_reply(text: str) -> str: ...      # garde ## , - , **…** ; convertit ou retire le reste
+```
+Côté Lua : `FB.Toggle()`, `FB.Poll(why)`, `FB.Schedule()`, `FB.Render()`, `FB.Format(text)`; `ForeverBridgeDB = {
+schema = 1, session, next_id, history, outbox, window = { point, relPoint, x, y, width, height }, cell }`.
+
+### Tests remplacés ou ajoutés
+- `test_bridge_codec.py` : détection de la taille (une bande dessinée à 1, 2, 3 et 4 pixels se relit, `detect_cell_px`
+  rend la taille, une image noire rend `None`) ; aller-retour à une case par pixel ; `band_live.bmp` se relit en
+  vecteur de test, taille 4 détectée (non-régression de la sonde A).
+- `test_bridge_capture.py` : `band_rect(Rect(100, 50, 1920, 1080), 1) == Rect(100, 50, 200, 24)`.
+- `test_bridge_selftest.py` : bande vivante à une case par pixel reconnue, ligne « case de 1 pixel ».
+- `test_bridge_slots.py` (remplace la section du plan) : `slot_name(1) == "ForeverBridge_S001"`, `slot_name(200) ==
+  "ForeverBridge_S200"` ; `publish(…, slots=200, first=37)` écrit `S037` à `S200` et `ForeverBridge/Inbox.lua` (165
+  fichiers), sans `.tmp` restant ; `first` absent : 201 fichiers ; plus de `raise_signal`, `lower_ahead`, `lower_all`.
+- `test_bridge_install.py` (bloc B) : `install_bridge(tmp, slots=8)` crée `ForeverBridge_S001` à `S008` (`.toc` avec
+  `## LoadOnDemand: 1`, `## Dependencies: ForeverBridge`, `Inbox.lua` d'attente `ForeverBridgeSlot = { v = 1, now =
+  0, replies = {} }`) et aucun `sig/` ni `ack/` ; `slots=7` ou `201` → erreur nommée ; par défaut 200.
+- `test_bridge_record.py` : champ `slot` lu et écrit ; absent → `None`.
+- `test_bridge_buttons.py` : les quatre boutons visibles avec `DONE_SLICES` ; un bouton dont une tranche manque
+  (Équipement T10a, Analyse AN1) absent ; « Mettre à jour » absent ; classes du tableau.
+- `test_bridge_format.py` : `# T` et `### T` → `## T` ; `* x` → `- x` ; `__x__` → `**x**` ; accents graves retirés ;
+  tableau → lignes ; texte déjà conforme inchangé.
+- `test_bridge_addon_lua.py`, cas remplacés : (6) premier relevé à 3 s portant `working` → bande cachée, « en cours »
+  affiché ; (8) relevé portant `done` → réponse affichée, une seule réponse, plus de consultation ; (10) calendrier
+  exact des chargements (3, 7, 11, 15, 19, 23, 27, 30, 40 … 190 s) et rien après 190 s ; ajoutés : trois relevés sans
+  accusé → bande cachée, boîte d'envoi, erreur ; 10 emplacements restants → `/reload` proposé ; réserve vide →
+  « réponse au prochain /reload », puis `Inbox.lua` appliqué au chargement suivant ; entrée d'une autre session
+  ignorée ; aucune ligne dans la discussion générale hors `/fv diag` ; fenêtre (`/fv` bascule, `UISpecialFrames`,
+  position et taille restaurées, `BINDING_NAME_FOREVERBRIDGE_TOGGLE` défini, Entrée envoie, Maj+Entrée insère un
+  saut de ligne, « Nouvelle conversation » pose `n`) ; boutons : seuls ceux du pont et de la classe, un clic envoie la
+  question fixe ; réponse arrivée fenêtre fermée (en combat ou non) : fenêtre non ouverte ; rendu de `##`, `-`,
+  `**` ; lien copiable ; bande d'un pixel par case (`/fv test`) et de deux (`/fv test 2`).
+- Client simulé (accord de l'utilisateur du 2026-10-09, sonde A) : un fichier son présent au lancement « joue », vide
+  ou non ; un fichier ajouté ensuite n'est jamais vu ; `test_fv_diag_reports_each_control_file` et
+  `test_fv_diag_sees_files_changed_while_the_game_runs` corrigés en conséquence.
+
+### Procédures en jeu
+- **Sonde B** (avant le bloc B) : `docs/ADDON.md` §7, étape 10.
+- **Procédure du chat** (fin de tranche) : `docs/ADDON.md` §7, étape 11 (remplace le critère de fin 6).
+
+### Questions ouvertes ajoutées (`docs/OPEN_QUESTIONS.md`, section « Pont en jeu »)
+BR1 premier chargement d'un emplacement sans `/reload` ; BR2 bande d'une case par pixel à toutes les échelles ; BR3
+effet de 200 addons chargés à la demande sur le démarrage et la liste des addons ; BR4 canal par polices.
 
 ## Validation
 Plan à valider par l'utilisateur. Exécution dans une nouvelle session (`/tranche P06a`), branche `p06a`, un cycle
