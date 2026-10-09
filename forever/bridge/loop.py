@@ -10,6 +10,7 @@ Chaque publication écrit le même `Inbox.lua` dans les emplacements que le jeu 
 from __future__ import annotations
 
 import json
+import os
 import threading
 import time
 from collections import deque
@@ -34,6 +35,7 @@ from forever.timefmt import format_utc
 REFRESH_S = 600.0
 FIND_EVERY_S = 3.0
 REJECT_LOG_S = 5.0
+HEARTBEAT_S = 30.0  # dernier signe de vie écrit dans le verrou (sonde F : ponts tués sans trace)
 _SELFTEST = Decoded(SELFTEST_ID, selftest_payload())
 
 Agent = Callable[[str, str | None], AgentResult]
@@ -97,6 +99,9 @@ class Bridge:
         epoch: Callable[[], int] = lambda: int(time.time()),
         executor: Callable[[Callable[[], None]], None] | None = None,
         describe: Callable[[Record], str | None] | None = None,
+        prepare: Callable[[Record], Any] | None = None,
+        keeper: Any | None = None,
+        heartbeat: Callable[[], None] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -110,6 +115,10 @@ class Bridge:
         self.epoch = epoch
         self.executor = executor or self._thread
         self.describe = describe
+        self.prepare = prepare  # plans.prepare_record : notes, consigne du bouton, défauts, lien (prime sur describe)
+        self.keeper = keeper  # keeper.AddonKeeper : addon tenu à jour, jeu fermé
+        self.heartbeat = heartbeat
+        self.last_beat: float | None = None
         self.queue: deque[Record] = deque()
         self.busy = False
         self.first_slot = 1
@@ -143,6 +152,12 @@ class Bridge:
     def refresh(self) -> None:
         """État des données relu ; `Status.lua` et toute la réserve réécrits."""
         self.status_cache = {**self.status(), "slots": self.slots}  # l'addon en tire les emplacements restants
+        if self.keeper is not None:
+            from forever.bridge.status import status_line
+
+            self.status_cache["addon"] = self.keeper.addon_state()
+            if self.status_cache.get("version"):
+                self.status_cache["line"] = status_line(self.status_cache)
         path = self.addons_dir / ADDON / "Status.lua"
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -258,9 +273,19 @@ class Bridge:
             session = None if "n" in record.flags else self.state.session
             started = self.clock()
             self.journal.write("agent", id=record.message_id, resumed=session is not None)
+            prefer: str | None = None
             try:
-                talents = self.describe(record) if self.describe and record.context.get("talents") else None
-                result = self.agent(message_text(record, talents=talents), session)
+                guide = None
+                if self.prepare is not None:
+                    prepared = self.prepare(record)
+                    talents, guide, prefer = prepared.notes, prepared.guide, prepared.link
+                    for d in prepared.defects:
+                        self.journal.write(
+                            "context_defect", id=record.message_id, kind=d.kind, value=d.value, reason=d.reason
+                        )
+                else:
+                    talents = self.describe(record) if self.describe and record.context.get("talents") else None
+                result = self.agent(message_text(record, talents=talents, guide=guide), session)
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
                 result = AgentResult(text="", session_id=None, is_error=True, error=f"{type(exc).__name__}: {exc}")
             if result.denied:
@@ -275,8 +300,9 @@ class Bridge:
                 if notice:
                     text = f"{text}\n\n{notice}"
                 reply.update(status="done", text=text, provenance=provenance_line(result.provenances))
-                if result.link:
-                    reply["link"] = result.link
+                link = result.links.get(prefer) if prefer else None
+                if link or result.link:
+                    reply["link"] = link or result.link
                 if result.session_id:
                     self.state.set_session(result.session_id)
                 self.journal.write(
@@ -299,6 +325,14 @@ class Bridge:
 
     def step(self) -> None:
         now = self.clock()
+        if self.heartbeat is not None and (self.last_beat is None or now - self.last_beat >= HEARTBEAT_S):
+            self.last_beat = now
+            try:
+                self.heartbeat()
+            except OSError as exc:
+                self.journal.write("error", where="signe de vie", error=str(exc))
+        if self.keeper is not None and self.keeper.tick():
+            self.last_refresh = None  # état de l'addon changé : Status.lua réécrit tout de suite
         if self.last_refresh is None or now - self.last_refresh >= REFRESH_S:
             self.refresh()
         self._capture(now)
@@ -306,8 +340,18 @@ class Bridge:
         self._dispatch()
 
     def run(self, stop_file: Path, *, sleep: Callable[[float], None] = time.sleep, interval_s: float = 0.25) -> int:
-        """Boucle jusqu'au fichier d'arrêt (`forever bridge stop`) ; rend 0."""
-        self.journal.write("start", slots=self.slots)
+        """Boucle jusqu'au fichier d'arrêt (`forever bridge stop`) ; rend 0. Un fichier d'arrêt plus ancien que le
+        lancement (posé quand aucun pont ne tournait) est effacé, jamais obéi."""
+        started = time.time()
+        stale = False
+        try:
+            stale = stop_file.stat().st_mtime < started
+        except OSError:
+            pass
+        if stale:
+            stop_file.unlink(missing_ok=True)
+        self.journal.write("start", slots=self.slots, pid=os.getpid(), stale_stop_file=stale)
+        reason = "fichier d'arrêt"
         try:
             while True:
                 if stop_file.exists():
@@ -316,8 +360,8 @@ class Bridge:
                 self.step()
                 sleep(interval_s)
         except KeyboardInterrupt:
-            pass
-        self.journal.write("stop")
+            reason = "interruption (Ctrl+C)"
+        self.journal.write("stop", reason=reason)
         return 0
 
 
@@ -353,8 +397,33 @@ def acquire_lock(
         return False
     path = lock_path(cache_dir)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps({"pid": pid, "started_at": format_utc(now)}), encoding="utf-8")
+    stamp = format_utc(now)
+    path.write_text(json.dumps({"pid": pid, "started_at": stamp, "seen_at": stamp}), encoding="utf-8")
     return True
+
+
+def touch_lock(cache_dir: Path, now: datetime, *, pid: int) -> None:
+    """Dernier signe de vie (`seen_at`) du pont `pid` dans son verrou ; verrou d'un autre pont ou absent : rien."""
+    path = lock_path(cache_dir)
+    try:
+        doc = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    if not isinstance(doc, dict) or doc.get("pid") != pid:
+        return
+    doc["seen_at"] = format_utc(now)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(doc), encoding="utf-8")
+    os.replace(tmp, path)
+
+
+def lock_info(cache_dir: Path) -> dict[str, Any] | None:
+    """Contenu du verrou (pid, started_at, seen_at), ou None."""
+    try:
+        doc = json.loads(lock_path(cache_dir).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return doc if isinstance(doc, dict) else None
 
 
 def release_lock(cache_dir: Path, *, pid: int) -> None:

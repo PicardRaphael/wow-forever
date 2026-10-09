@@ -209,6 +209,26 @@ def install_bridge(wow_dir: Path, slots: int = SLOTS, *, dry_run: bool = False, 
     return report
 
 
+def addon_outdated(addons: Path, *, source: Path = SOURCE) -> list[str]:
+    """Fichiers de l'addon du dépôt absents ou différents dans l'addon installé (chemins relatifs, triés) ; les
+    fichiers écrits par le pont (`Inbox.lua`, `Status.lua`) et `ctl/` ne comptent pas. Le `## Version:` du .toc n'est
+    jamais changé : seule la comparaison des contenus dit si l'addon est à jour (sonde en jeu F)."""
+    dest = addons / ADDON
+    out = []
+    for path in sorted(p for p in source.rglob("*") if p.is_file()):
+        rel = path.relative_to(source)
+        if (rel.parent == Path(".") and path.name in BRIDGE_WRITTEN) or rel.parts[0] == "ctl":
+            continue
+        target = dest / rel
+        try:
+            same = target.read_bytes() == path.read_bytes()
+        except OSError:
+            same = False
+        if not same:
+            out.append(rel.as_posix())
+    return out
+
+
 def touch_probe(wow_dir: Path, now: datetime) -> list[str]:
     """Fichiers de la sonde modifiés pendant que le jeu tourne : `flip` rempli, `late` créé, `Probe.lua` réécrit."""
     addons = addons_dir(wow_dir)

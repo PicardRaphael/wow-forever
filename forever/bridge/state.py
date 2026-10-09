@@ -20,6 +20,8 @@ class BridgeState:
     handled: dict[str, list[int]] = field(default_factory=dict)
     session: str | None = None
     replies: list[dict[str, Any]] = field(default_factory=list)
+    addon_updated_at: str | None = None  # réinstallation de l'addon par le pont, annoncée jusqu'à la partie suivante
+    addon_seen_running: bool = False
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False, compare=False)
 
     @classmethod
@@ -37,7 +39,15 @@ class BridgeState:
         }
         replies = [r for r in doc.get("replies") or [] if isinstance(r, dict)]
         session = doc.get("session") if isinstance(doc.get("session"), str) else None
-        return cls(path=path, handled=handled, session=session, replies=replies[-REPLIES_KEPT:])
+        updated = doc.get("addon_updated_at") if isinstance(doc.get("addon_updated_at"), str) else None
+        return cls(
+            path=path,
+            handled=handled,
+            session=session,
+            replies=replies[-REPLIES_KEPT:],
+            addon_updated_at=updated,
+            addon_seen_running=bool(doc.get("addon_seen_running")) and updated is not None,
+        )
 
     def seen(self, session: str, message_id: int) -> bool:
         return message_id in self.handled.get(session, [])
@@ -62,9 +72,18 @@ class BridgeState:
             self.session = session
             self.save()
 
+    def set_addon_notice(self, updated_at: str | None, *, seen_running: bool = False) -> None:
+        with self._lock:
+            self.addon_updated_at = updated_at
+            self.addon_seen_running = seen_running and updated_at is not None
+            self.save()
+
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        doc = {"handled": self.handled, "session": self.session, "replies": self.replies}
+        doc: dict[str, Any] = {"handled": self.handled, "session": self.session, "replies": self.replies}
+        if self.addon_updated_at:
+            doc["addon_updated_at"] = self.addon_updated_at
+            doc["addon_seen_running"] = self.addon_seen_running
         tmp = self.path.with_name(self.path.name + ".tmp")
         tmp.write_bytes(json.dumps(doc, ensure_ascii=False, indent=1).encode("utf-8"))
         os.replace(tmp, self.path)

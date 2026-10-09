@@ -56,6 +56,10 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 - **Prochain talent** (`next_step`) : donne `choice` et sa raison (`decided_by` : `monte_carlo`, écart significatif ;
   `modelise`, égalité départagée en faveur du talent modélisé ; `non_departage`, choix non départagé par le calcul :
   cite les candidats à égalité). Pas de `current` : `next_step` est vide, demande le build actuel.
+- **Prochain point quand tous les points sont placés** (« je suis niveau N », build actuel complet) : le prochain
+  point arrive au niveau N+1 ; appelle `forever_build` au niveau N+1 avec `current` = le build actuel, jamais au
+  niveau N (`next_step` y est vide). Donne d'abord le talent du premier pas de `respec.projected.steps`, l'égalité
+  de `next_step` s'il y en a une, le lien `respec.projected.export`, et le conseil de respec seulement en complément.
 - **Monte Carlo** et **analytique** : donne le Monte Carlo ; si `analytic_gap` est grand, signale l'écart.
 - **PV du monstre** (`mob_hp`) : sa source et sa certitude comptent ; une valeur `suppose` fait baisser la certitude
   de la réponse.

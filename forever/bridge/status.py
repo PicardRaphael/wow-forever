@@ -10,12 +10,19 @@ from typing import Any
 from forever.config import Deps
 
 FRESHNESS_FR = {"fresh": "à jour", "stale": "en retard", "silent": "incertaine", "unknown": "inconnue"}
+# État de l'addon ForeverBridge installé (sonde en jeu F) : clé `addon` du bloc d'état.
+ADDON_LINES = {
+    "a_reinstaller": "addon à réinstaller : forever bridge install, jeu fermé",
+    "en_attente": "addon mis à jour à la prochaine fermeture du jeu",
+    "mis_a_jour": "addon mis à jour par le pont pendant que le jeu était fermé",
+}
 _LABELS = 3
 
 
-def status_payload(deps: Deps) -> dict[str, Any]:
+def status_payload(deps: Deps, *, addon: str | None = None, addon_files: list[str] | None = None) -> dict[str, Any]:
     """Version, fraîcheur et âge, couverture du registre, intégrité, attentes (nombre et trois premiers libellés),
-    passage en cours ; `line` : la ligne affichée en tête de la fenêtre."""
+    passage en cours, état de l'addon installé (`addon`, clé de ADDON_LINES, et ses fichiers à remplacer) ; `line` :
+    la ligne affichée en tête de la fenêtre."""
     payload: dict[str, Any] = {
         "version": None,
         "freshness": "unknown",
@@ -26,6 +33,8 @@ def status_payload(deps: Deps) -> dict[str, Any]:
         "pending_labels": [],
         "running": False,
         "client": None,
+        "addon": addon,
+        "addon_files": list(addon_files or []),
     }
     try:
         from forever.pipeline.client_builds import read_build_info
@@ -89,4 +98,7 @@ def status_line(payload: Mapping[str, Any]) -> str:
     if pending:
         plural = "s" if pending > 1 else ""
         parts.append(f"{pending} mise{plural} à jour à valider sur le PC")
+    addon = ADDON_LINES.get(str(payload.get("addon")))
+    if addon:
+        parts.append(addon)
     return " · ".join(parts)

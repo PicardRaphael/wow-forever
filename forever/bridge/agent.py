@@ -60,6 +60,7 @@ class AgentResult:
     tools: list[str] = field(default_factory=list)
     timings: dict[str, Any] = field(default_factory=dict, compare=False)  # durées des étapes (s), stream_timings
     cost_usd: float | None = None
+    links: dict[str, str] = field(default_factory=dict)  # « build » (export) et « projected » (chemin du joueur)
 
 
 def find_claude(which: Callable[[str], str | None] = shutil.which) -> str:
@@ -163,6 +164,16 @@ def _find_link(value: Any) -> str | None:
     return None
 
 
+def _projected_link(value: Any) -> str | None:
+    """Lien Talents Forever du chemin conseillé depuis le build actuel (`respec.projected.export`)."""
+    respec = value.get("respec") if isinstance(value, dict) else None
+    projected = respec.get("projected") if isinstance(respec, dict) else None
+    export = projected.get("export") if isinstance(projected, dict) else None
+    if isinstance(export, dict) and export.get("status") == "ok" and isinstance(export.get("link"), str):
+        return str(export["link"])
+    return None
+
+
 def parse_stream(lines: Iterable[str]) -> AgentResult:
     """Résultat d'une conversation lu dans le flux `stream-json` : texte final, session, refus, blocs `provenance`
     des outils forever, lien Talents Forever d'un résultat de `forever_build`."""
@@ -170,6 +181,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
     provenances: list[dict[str, Any]] = []
     tools: list[str] = []
     link: str | None = None
+    links: dict[str, str] = {}
     last_text = ""
     final: dict[str, Any] | None = None
     session_id: str | None = None
@@ -208,6 +220,10 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
                 if isinstance(value, dict) and isinstance(value.get("provenance"), dict):
                     provenances.append(value["provenance"])
                 link = _find_link(value) or link
+                if _find_link(value):
+                    links["build"] = str(_find_link(value))
+                if _projected_link(value):
+                    links["projected"] = str(_projected_link(value))
         elif kind == "result":
             final = event
     if final is None:
@@ -219,6 +235,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
             is_error=True,
             error="claude s'est arrêté sans résultat",
             tools=tools,
+            links=links,
         )
     denied = [str(d.get("tool_name")) for d in final.get("permission_denials") or [] if isinstance(d, dict)]
     cost = final.get("total_cost_usd")
@@ -234,6 +251,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
         error=str(text or "erreur de claude") if is_error else None,
         tools=tools,
         cost_usd=float(cost) if isinstance(cost, int | float) else None,
+        links=links,
     )
 
 

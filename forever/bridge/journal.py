@@ -31,6 +31,20 @@ class Journal:
             with path.open("a", encoding="utf-8", newline="\n") as handle:
                 handle.write(json.dumps(line, ensure_ascii=False) + "\n")
 
+    def recent(self, event: str, days: int = 7) -> list[dict[str, Any]]:
+        """Lignes `event` des `days` derniers fichiers du journal, de la plus ancienne à la plus récente."""
+        files = sorted(self.directory.glob("*.jsonl"))[-days:] if self.directory.is_dir() else []
+        out = []
+        for path in files:
+            for line in path.read_text(encoding="utf-8").splitlines():
+                try:
+                    entry = json.loads(line)
+                except ValueError:
+                    continue
+                if isinstance(entry, dict) and entry.get("event") == event:
+                    out.append(entry)
+        return out
+
     def tail(self, count: int = 5) -> list[dict[str, Any]]:
         """Dernières lignes du journal le plus récent."""
         files = sorted(self.directory.glob("*.jsonl")) if self.directory.is_dir() else []

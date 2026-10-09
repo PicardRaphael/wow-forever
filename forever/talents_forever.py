@@ -589,6 +589,14 @@ def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> B
         other = export_build(addon, MAGE, report["level"], alt["talents"], None, talented_bonus)
         alt = {**alt, "export": {k: other.get(k) for k in ("status", "reason", "code", "link", "import")}}
         report = cast(BuildReport, {**report, "alternative": alt})
+    # chemin conseillé depuis le build actuel (sonde en jeu F) : lien du build actuel plus les points du chemin
+    respec = report.get("respec") or {}
+    projected = respec.get("projected") if isinstance(respec, dict) else None
+    if isinstance(projected, dict) and projected.get("talents"):
+        own = export_build(addon, MAGE, int(projected["to_level"]), projected["talents"], None, talented_bonus)
+        export = {k: own.get(k) for k in ("status", "reason", "code", "link", "import")}
+        respec = {**respec, "projected": {**projected, "export": export}}
+        report = cast(BuildReport, {**report, "respec": respec})
     return cast(BuildWithExport, {**report, "export": {"talents_forever": block}})
 
 

@@ -21,16 +21,25 @@ Chaque message commence par le contexte de son personnage, envoyé par le jeu, p
 - Égalité : quand forever_build rend `alternative.tie` vrai, dis que les deux builds sont à
   égalité statistique et présente les deux options, chacune avec son lien Talents Forever quand l'outil le rend.
 - Quand la réponse donne un build, inclure le lien Talents Forever rendu par l'outil, tel quel.
+- Message avec une « Consigne du bouton » : fais exactement les appels indiqués, avec ces arguments, puis lis le
+  résultat comme indiqué ; n'ajoute un autre appel que si l'un d'eux échoue.
+- Tout ce que le contexte nomme est déjà relié aux données par le pont : ne dis jamais que tu ne reconnais pas un
+  talent, un objet, une race ou une classe du contexte.
 - Aucun conseil à suivre pendant un combat en cours, et rien qui ferait une action à la place du joueur.
 """
 
 
-def message_text(record: Record, *, talents: str | None = None) -> str:
-    """Message envoyé sur l'entrée standard : bloc de contexte (et talents traduits en clés de forever), puis la
-    question."""
+def message_text(record: Record, *, talents: str | None = None, guide: str | None = None) -> str:
+    """Message envoyé sur l'entrée standard : bloc de contexte, puis ce que le pont en a relié à nos données
+    (`talents` : lignes de `context.context_notes`, ou la seule liste des talents en clés de forever), la consigne du
+    bouton (`plans.plan_text`), puis la question."""
     lines = ["Contexte du personnage (envoyé par le jeu) :", context_lines(record.context) or "(aucun)"]
-    if talents:
+    if talents and talents.startswith(("Talents actuels", "Cible", "Équipement")):
+        lines.append(talents)
+    elif talents:
         lines.append(f"Talents actuels (clés de forever, pour `current` de forever_build) : {talents}")
+    if guide:
+        lines += ["", guide]
     lines.append("")
     button = next((f.split("=", 1)[1] for f in record.flags if f.startswith("b=")), None)
     if button:

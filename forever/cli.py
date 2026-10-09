@@ -415,20 +415,26 @@ def build_parser() -> argparse.ArgumentParser:
     ):
         b_run = bridge_sub.add_parser(name, help=text)
         b_run.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
-        b_run.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de forever bridge config, sonnet)")
+        b_run.add_argument(
+            "--model", help="modèle de la conversation « jeu » (défaut : celui de forever bridge config, sonnet)"
+        )
         b_run.add_argument("--json", action="store_true", help="sortie JSON")
     b_ask = bridge_sub.add_parser(
         "ask", help="poser une question à la conversation « jeu » sans le jeu (vérifie claude et le serveur MCP)"
     )
     b_ask.add_argument("question", help="texte de la question")
-    b_ask.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de forever bridge config, sonnet)")
+    b_ask.add_argument(
+        "--model", help="modèle de la conversation « jeu » (défaut : celui de forever bridge config, sonnet)"
+    )
     b_ask.add_argument("--json", action="store_true", help="sortie JSON")
     b_cfg = bridge_sub.add_parser("config", help="configuration du pont : modèle de la conversation « jeu »")
     b_cfg.add_argument("--model", help="modèle (sonnet par défaut, haiku, opus, ou un identifiant complet)")
     b_cfg.add_argument("--json", action="store_true", help="sortie JSON")
     b_stop = bridge_sub.add_parser("stop", help="arrêter le pont (fichier d'arrêt lu au pas suivant)")
     b_stop.add_argument("--json", action="store_true", help="sortie JSON")
-    b_status = bridge_sub.add_parser("status", help="le pont tourne-t-il ? dernières lignes du journal, état des données")
+    b_status = bridge_sub.add_parser(
+        "status", help="le pont tourne-t-il ? dernières lignes du journal, état des données"
+    )
     b_status.add_argument("--json", action="store_true", help="sortie JSON")
 
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
@@ -2282,30 +2288,22 @@ def _cmd_bridge_loop(deps: Deps, args: argparse.Namespace, provenance: Provenanc
     """`forever bridge start | run | stop | status` (P06a, bloc D)."""
     from forever.bridge import loop
     from forever.bridge.journal import Journal
-    from forever.bridge.status import status_payload
 
     home = deps.cache_dir / "bridge"
     journal = Journal(home / "journal", deps.now)
     if args.bridge_command == "stop":
-        home.mkdir(parents=True, exist_ok=True)
-        (home / "stop").write_text("", encoding="utf-8")
+        # sonde F : un fichier posé sans pont vivant arrêtait le pont lancé ensuite ; il n'est posé que pour un pont
         holder = loop.lock_holder(deps.cache_dir)
-        line = (
-            f"Arrêt demandé : le pont (pid {holder}) s'arrête au pas suivant."
-            if holder
-            else "Aucun pont ne tourne ; le fichier d'arrêt est posé."
-        )
-        _emit({"stop": True, "pid": holder, "provenance": provenance}, [line], provenance, args.json)
+        if holder:
+            home.mkdir(parents=True, exist_ok=True)
+            (home / "stop").write_text("", encoding="utf-8")
+            line = f"Arrêt demandé : le pont (pid {holder}) s'arrête au pas suivant."
+        else:
+            line = "Aucun pont ne tourne : rien à arrêter (aucun fichier d'arrêt posé)."
+        _emit({"stop": holder is not None, "pid": holder, "provenance": provenance}, [line], provenance, args.json)
         return EXIT_OK
     if args.bridge_command == "status":
-        holder = loop.lock_holder(deps.cache_dir)
-        data = status_payload(deps)
-        last = journal.tail(5)
-        lines = [f"Pont : {'en marche (pid ' + str(holder) + ')' if holder else 'arrêté'}", data["line"]]
-        lines += [f"  {e.get('at')} {e.get('event')}" for e in last]
-        payload = {"running": holder is not None, "pid": holder, "data": data, "journal": last}
-        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
-        return EXIT_OK
+        return _bridge_status(deps, args, provenance, journal)
     wow = _bridge_wow_dir(deps, args)
     from forever.bridge.install import addons_dir
 
@@ -2330,19 +2328,90 @@ def _cmd_bridge_loop(deps: Deps, args: argparse.Namespace, provenance: Provenanc
     return _bridge_run(deps, args, wow, addons, journal)
 
 
+def _bridge_addon_state(deps: Deps, running: bool) -> tuple[str | None, list[str]]:
+    """État de l'addon installé pour `forever bridge status` : à réinstaller (sans pont), mis à jour à la fermeture
+    du jeu (pont en marche), ou à jour ; jamais d'erreur (dossier du client absent : rien)."""
+    from forever.bridge.install import addon_outdated
+
+    addons = deps.wow_dir / "Interface" / "AddOns" if deps.wow_dir else None
+    if addons is None or not addons.is_dir():
+        return None, []
+    try:
+        files = addon_outdated(addons)
+    except OSError:
+        return None, []
+    if not files:
+        return None, []
+    return ("en_attente" if running else "a_reinstaller"), files
+
+
+def _bridge_status(deps: Deps, args: argparse.Namespace, provenance: Provenance, journal: Any) -> int:
+    """`forever bridge status` : pont en marche ou arrêté (arrêt sans `stop` signalé avec son dernier signe de vie),
+    état des données et de l'addon, défauts de contexte des sept derniers jours, dernières lignes du journal."""
+    from forever.bridge import loop
+    from forever.bridge.status import status_payload
+
+    holder = loop.lock_holder(deps.cache_dir)
+    info = loop.lock_info(deps.cache_dir)
+    abnormal = None
+    if holder is None and info is not None and isinstance(info.get("pid"), int):  # verrou d'un pont mort
+        abnormal = {"pid": info["pid"], "started_at": info.get("started_at"), "seen_at": info.get("seen_at")}
+    addon, files = _bridge_addon_state(deps, holder is not None)
+    data = status_payload(deps, addon=addon, addon_files=files)
+    defects = journal.recent("context_defect")
+    summary = {"count": len(defects), "last": defects[-1] if defects else None}
+    last = journal.tail(5)
+    if holder:
+        state = f"en marche (pid {holder})"
+    elif abnormal:
+        state = (
+            f"arrêté sans passer par stop (pid {abnormal['pid']}, lancé {abnormal['started_at']}, dernier signe de "
+            f"vie {abnormal['seen_at'] or 'inconnu'}) : processus tué de l'extérieur ; journaux du lancement dans "
+            f"{deps.cache_dir / 'bridge'}"
+        )
+    else:
+        state = "arrêté"
+    lines = [f"Pont : {state}", data["line"]]
+    if defects:
+        d = defects[-1]
+        plural = "s" if len(defects) > 1 else ""
+        lines.append(
+            f"Contexte : {len(defects)} défaut{plural} de contexte en 7 jours (dernier : {d.get('kind')} "
+            f"{d.get('value')}, {d.get('reason')}, {d.get('at')})"
+        )
+    if files:
+        lines.append(f"  fichiers de l'addon à remplacer : {', '.join(files)}")
+    lines += [f"  {e.get('at')} {e.get('event')}" for e in last]
+    payload = {
+        "running": holder is not None,
+        "pid": holder,
+        "abnormal_end": abnormal,
+        "data": data,
+        "context_defects": summary,
+        "journal": last,
+    }
+    _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, journal: Any) -> int:
-    """Boucle du pont au premier plan : verrou, capture, conversation « jeu », publication."""
+    """Boucle du pont au premier plan : verrou, capture, conversation « jeu », publication, addon tenu à jour."""
+    import faulthandler
     import os
+    import time
 
     from forever.bridge import agent, loop
     from forever.bridge.capture import WindowsCapture, win32_api
-    from forever.bridge.context import describe_talents, talent_table, talents_line
+    from forever.bridge.context import load_context_data
     from forever.bridge.install import REPO_ROOT
+    from forever.bridge.keeper import AddonKeeper
+    from forever.bridge.plans import Prepared, prepare_record
     from forever.bridge.record import Record
     from forever.bridge.state import BridgeState
     from forever.bridge.status import status_payload
     from forever.pipeline.live_logs import client_executables
 
+    faulthandler.enable()  # erreur fatale de l'interpréteur écrite dans le journal du lancement (sonde F)
     pid = os.getpid()
     if not loop.acquire_lock(deps.cache_dir, deps.now(), pid=pid):
         holder = loop.lock_holder(deps.cache_dir)
@@ -2358,16 +2427,15 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
         env = agent.claude_env(os.environ, REPO_ROOT)
         model = args.model or load_config(deps.cache_dir)["model"]
         try:
-            table = talent_table(deps)
-        except ForeverError as err:  # données illisibles : le pont tourne quand même, talents non traduits
-            journal.write("error", where="talents", error=err.message)
-            table = {}
+            context_data = load_context_data(deps)
+        except ForeverError as err:  # données illisibles : le pont tourne quand même, contexte non relié
+            journal.write("error", where="contexte", error=err.message)
+            context_data = None
 
-        def describe(record: Record) -> str | None:
-            if not table:
-                return None
-            reading = describe_talents(table, record.context.get("class", ""), record.context.get("talents", ""))
-            return talents_line(reading)
+        def prepare(record: Record) -> Prepared:
+            if context_data is None:
+                return Prepared(notes=None, guide=None)
+            return prepare_record(context_data, record)
 
         def converse(prompt: str, session: str | None) -> agent.AgentResult:
             return agent.ask(
@@ -2381,16 +2449,36 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
                 model=model,
             )
 
+        state = BridgeState.load(deps.cache_dir / "bridge" / "state.json")
+        slots = _installed_slots(addons) or 8
+        executables = client_executables(wow)
+        keeper = AddonKeeper(
+            wow_dir=wow,
+            addons_dir=addons,
+            game_running=lambda: api.process_running(executables),
+            journal=journal,
+            state=state,
+            clock=time.monotonic,
+            slots=slots,
+        )
+        keeper.check()
+
+        def status() -> dict[str, Any]:
+            keeper.check()
+            return status_payload(deps, addon_files=keeper.outdated)
+
         bridge = loop.Bridge(
             addons_dir=addons,
-            capture=WindowsCapture(client_executables(wow), api),
+            capture=WindowsCapture(executables, api),
             agent=converse,
             journal=journal,
-            state=BridgeState.load(deps.cache_dir / "bridge" / "state.json"),
-            status=lambda: status_payload(deps),
+            state=state,
+            status=status,
             outbox_files=lambda: sorted((wow / "WTF" / "Account").glob("*/SavedVariables/ForeverBridge.lua")),
-            slots=_installed_slots(addons) or 8,
-            describe=describe,
+            slots=slots,
+            prepare=prepare,
+            keeper=keeper,
+            heartbeat=lambda: loop.touch_lock(deps.cache_dir, deps.now(), pid=pid),
         )
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)

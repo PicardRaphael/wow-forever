@@ -74,6 +74,7 @@ class WinApi(Protocol):
     def is_iconic(self, hwnd: int) -> bool: ...
     def client_rect(self, hwnd: int) -> Rect | None: ...
     def blit(self, rect: Rect) -> Image | None: ...
+    def process_running(self, executables: Collection[str]) -> bool: ...
 
 
 def probe_rect(client: Rect) -> Rect | None:
@@ -253,6 +254,24 @@ class _Win32Api:
 
         self._user32.EnumWindows(self._enum_proc(visit), 0)
         return found
+
+    def process_running(self, executables: Collection[str]) -> bool:
+        """Vrai si un processus d'un des exécutables du client tourne (fenêtre ou non : chargement, écran de
+        connexion) ; OSError si la liste des processus est illisible (le pont ne touche alors à rien)."""
+        ctypes, wintypes = self._ctypes, self._wintypes
+        psapi = getattr(ctypes, "WinDLL")("psapi", use_last_error=True)  # noqa: B009 : absent hors de Windows
+        size = 4096
+        while True:
+            pids = (wintypes.DWORD * size)()
+            used = wintypes.DWORD()
+            if not psapi.EnumProcesses(ctypes.byref(pids), ctypes.sizeof(pids), ctypes.byref(used)):
+                raise OSError("EnumProcesses en échec")
+            if used.value < ctypes.sizeof(pids):
+                break
+            size *= 2
+        wanted = {name.lower() for name in executables}
+        count = used.value // ctypes.sizeof(wintypes.DWORD)
+        return any((self._executable(int(pid)) or "").lower() in wanted for pid in pids[:count] if pid)
 
     def foreground(self) -> int | None:
         hwnd = self._user32.GetForegroundWindow()
