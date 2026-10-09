@@ -35,6 +35,10 @@ markers = ["slow: tests longs (Monte Carlo complet, parité)"]
 line-length = 120
 extend-exclude = ["seed"]
 
+[tool.ruff.format]
+# Python seulement : ruff format formate aussi les blocs de code des fichiers Markdown (plans, docs).
+exclude = ["*.md"]
+
 [tool.mypy]
 python_version = "3.13"
 strict = true
