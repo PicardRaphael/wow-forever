@@ -79,7 +79,14 @@ def _next_point(r: Resolved, level_cap: int | None) -> tuple[Call, tuple[str, ..
             "l'écart (`next_step.candidates[].gap.significant`) n'est pas significatif."
         ),
         "Lien Talents Forever : celui de `respec.projected.export` (build actuel plus ce point), tel quel.",
-        "Conseil de respec (`respec.verdict`) seulement en complément, après le prochain point.",
+        (
+            "Build, en complément, après le prochain point : si `respec.versus_optimal.tie` est vrai, dis que ton build actuel et le build optimal "
+            "(`choices.leveling.rotation`) sont à égalité statistique et que tu gardes ton build (aucun gain mesurable) ; "
+            "si `stability.stable` est faux, ajoute que le build optimal lui-même est instable (il change avec la "
+            "graine). Si `respec.versus_optimal.current_better` est vrai, dis que ton build actuel est meilleur que le build "
+            "retenu par l'optimiseur (écart mesuré, `respec.versus_optimal`) et que tu le gardes. Sinon, donne l'écart "
+            "(`respec.versus_optimal`) et le conseil de respec (`respec.verdict`)."
+        ),
     )
     return Call("forever_build", args), read
 
@@ -121,7 +128,9 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
         read = (
             (
                 "Objectif : les trois premières zones ou donjons du résultat de zones, dans l'ordre rendu ; puis le "
-                "prochain point de talent, lu comme pour le bouton Talents (`respec.projected.steps`)."
+                "prochain point de talent, lu comme pour le bouton Talents (`respec.projected.steps`) ; si "
+                "`respec.versus_optimal.tie` est vrai, tu gardes ton build (égalité statistique avec le build optimal, "
+                "instable si `stability.stable` est faux)."
             ),
         )
         return Plan(key, tuple(calls), read)

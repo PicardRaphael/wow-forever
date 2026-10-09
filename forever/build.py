@@ -383,9 +383,31 @@ def _respec(
             **m.sim,
         )
         projected = {k: a.keep.points[k] for k in gd.talents if a.keep.points.get(k, 0) > 0}
+        # Build actuel projeté contre build optimal, Monte Carlo apparié : un gain non mesurable (écart non
+        # significatif) garde le build actuel, quel que soit le bilan en or (demande de l'utilisateur du 2026-10-09).
+        gap, by, optimal_better = m.compare(build, projected, seed)
+        tie = not gap.significant
+        current_better = gap.significant and not optimal_better
+        verdict, reason = a.verdict, None
+        if tie and projected != build:
+            verdict = "garder"
+            reason = "égalité statistique entre le build actuel projeté et le build optimal : aucun gain mesurable"
+        elif current_better:
+            verdict = "garder"
+            reason = "build actuel projeté meilleur que le build retenu par l'optimiseur (Monte Carlo apparié)"
         return {
-            "verdict": a.verdict,
-            "level": a.level,
+            "verdict": verdict,
+            "reason": reason,
+            "versus_optimal": {
+                **_gap_dict(gap),
+                "decided_by": by,
+                "tie": tie,
+                "optimal_better": optimal_better and not tie,
+                "current_better": current_better,
+                "optimal": dict(build),
+                "current": projected,
+            },
+            "level": a.level if verdict == a.verdict else None,
             "current_level": now,
             # chemin conseillé depuis le build actuel jusqu'au niveau demandé (chemin gardé du conseil) : planification
             "projected": {
