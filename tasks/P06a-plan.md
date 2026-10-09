@@ -886,6 +886,8 @@ Le bloc B porte le message **des deux côtés**, pour qu'une question tapée en 
   accent (comme le plan) ; tests ajoutés à sa demande : question réaliste en français, accents compris, qui tient
   avec le contexte complet (pont et addon).
 - Sonde en jeu C : `docs/ADDON.md` §7, étape 12 (avant l'étape 11).
+- `/fv case N` livré (R2). À faire au bloc E : `run.nextSlot` mis à 1 à la connexion et augmenté à chaque
+  `LoadAddOn` d'un emplacement ; d'ici là, `FB.Send` annonce toujours l'emplacement 1.
 
 ### Questions ouvertes ajoutées (`docs/OPEN_QUESTIONS.md`, section « Pont en jeu »)
 BR1 premier chargement d'un emplacement sans `/reload` ; BR2 bande d'une case par pixel à toutes les échelles ; BR3
