@@ -25,7 +25,7 @@ Une source plus haute l'emporte sur une plus basse ; un écart entre deux source
 
 ## Données dérivées et simulateurs (MIT, garder le lien vers wowsims/classic)
 - Arbres de talents au format wowsims : `gunba/wow-forever-sim` (`ui/core/talents/trees/mage.json`), rangs confirmés : `ElliotWood/Forever` (`assets/confirmed_talents.json`).
-- Simulateur de référence : fork `ElliotWood/Forever` ; `SimOptions.ruleset` vaut `RulesetClassic` par défaut : toujours passer la règle Forever. Le dépôt amont `wowsims/forever` a été injoignable (404) : **épingler les commits et copier les arbres utilisés**.
+- Simulateur de référence : fork `ElliotWood/Forever` (Go, MIT, module `github.com/wowsims/forever`, données au build du client, `wowsimcli` Windows publié chaque semaine) ; depuis sa refonte, il ne connaît plus que Forever (plus d'enum `SimOptions.ruleset`, que gardent le `master` de `sage3648/mythicsim-forever-engine-go` et `gunba/wow-forever-sim` : y passer la règle Forever). MythicSim fait tourner les branches `mythicsim/*` de `sage3648/mythicsim-forever-engine-go` et prépare un moteur Rust (`sage3648/mythicsim-forever-engine`). Tous fixent le joueur au niveau 60. Étude du 2026-10-09 : `docs/research/wowsims-forever.md` (décision 224, tranche SIM1). Le dépôt amont `wowsims/forever` a été injoignable (404) : **épingler les commits et copier les arbres utilisés**.
 - Base d'objets de référence : `alcaras/forever-ref` (calcul des stats par formules du client).
 - Recoupements lisibles : ForeverChanges, WoW Forever Talents, Wowhead Forever.
 

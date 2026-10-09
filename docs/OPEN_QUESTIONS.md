@@ -55,7 +55,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   sens communautaire, probable) que la note du 01/10 ajoute à Devouring Plague et Hellfire est posé sur Fireball,
   Pyroblast et Frostfire Bolt, pas sur Flamestrike ni Ignite ; rien n'est changé dans les données. Test : session de
   Mage, critiques de Frostbolt et de Fireball, tics de Pyroblast, de Flamestrike et d'Ignite. Priorité : moyenne.
-  Registre A5, A17. [Détail](research/questions-ouvertes-detail.md#mag6)
+  Registre A5, A17. *Modifiée le 2026-10-09* : les simulateurs ElliotWood/Forever et MythicSim lisent le même bit
+  (`ATTR_EX_8_PERIODIC_CAN_CRIT`) et tirent le critique au tic : même source que nous, pas une preuve indépendante
+  ([étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)).
+  [Détail](research/questions-ouvertes-detail.md#mag6)
 - **MAG7 — E6 : deux bonus de dégâts en pourcentage se multiplient-ils ou s'additionnent-ils ?** Test : journaux
   (E6). Priorité : moyenne. Registre A20. [Détail](research/questions-ouvertes-detail.md#mag7)
 - **MAG8 — E7 : le jeu arrondit-il ou tronque-t-il les bornes de dégâts ?** Test : dégâts minimum et maximum d'un
@@ -90,7 +93,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **MAG18 — Les dégâts d'un rang suivent-ils le niveau du personnage jusqu'à `MaxLevel` ?** Test : journal de
   leveling avec ForeverLogger, même rang à plusieurs niveaux. Priorité : moyenne. Registre G7.
   [Détail](research/questions-ouvertes-detail.md#mag18)
-- **MAG19 — Pourquoi le build Feu du leveling 20 (1.60.1.70291) est-il bien plus lent au Monte Carlo qu'en analytique (35,6 contre 38,7 s par monstre) ?** Ajoutée le 2026-10-09, réduite le même jour : la partie « quel build recommander » est tranchée par l'utilisateur (décision 220 : chemin au temps cumulé depuis le niveau et le build actuels ; meilleur build au niveau N pour le donjon, le raid et le PvP, départage au Monte Carlo de la décision 219) et déplacée dans `RESOLVED_QUESTIONS.md`. Reste l'écart entre l'analytique et le Monte Carlo du build Feu (Improved Fireball 5, Ignite, Elemental Precision 3), plus grand que celui du Givre (32,55 contre 32,41 s). Test : recoupement avec le simulateur de MythicSim, puis comparaison cas par cas de l'analytique et du Monte Carlo (Ignite, critiques, temps de vol). Priorité : moyenne. Registre I1, I6, A18.
+- **MAG19 — Pourquoi le build Feu du leveling 20 (1.60.1.70291) est-il bien plus lent au Monte Carlo qu'en analytique (35,6 contre 38,7 s par monstre) ?** Ajoutée le 2026-10-09, réduite le même jour : la partie « quel build recommander » est tranchée par l'utilisateur (décision 220 : chemin au temps cumulé depuis le niveau et le build actuels ; meilleur build au niveau N pour le donjon, le raid et le PvP, départage au Monte Carlo de la décision 219) et déplacée dans `RESOLVED_QUESTIONS.md`. Reste l'écart entre l'analytique et le Monte Carlo du build Feu (Improved Fireball 5, Ignite, Elemental Precision 3), plus grand que celui du Givre (32,55 contre 32,41 s). Test : comparaison cas par cas de l'analytique et du Monte Carlo (Ignite, critiques, temps de vol). *Modifiée le 2026-10-09* : le recoupement avec le simulateur de MythicSim prévu ici est impossible au niveau 20, car les simulateurs wowsims Forever et MythicSim fixent le joueur au niveau 60 ([étude](research/wowsims-forever.md#6-autres-usages-et-leurs-risques)) ; la même comparaison pourra se faire au niveau 60 en raid en SIM1. Priorité : moyenne. Registre I1, I6, A18.
 
 ## Personnage et ratios du client
 - **PER1 — Où sont la critique de base des sorts et la mana par point d'Intelligence ?** Test : `GetSpellCritChance`
@@ -112,6 +115,20 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   [Détail](research/questions-ouvertes-detail.md#per6)
 - **PER7 — La « Critical Strike » de la fiche (EllesmereUI) est-elle la critique de mêlée ?** Test : infobulle de la
   fiche du jeu de base. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#per7)
+- **PER8 — Combien de points de notation font 1 % de toucher, de critique et d'expertise ?** Ajoutée le 2026-10-09
+  (étude wowsims) : `leveling.json` laisse le toucher et la critique à `null` et notre moteur ne prend que des
+  fractions ; ElliotWood/Forever lit la table `CombatRatings` du client (constante à tous les niveaux, ce que relevait
+  déjà `audit-mises-a-jour.md`) et en tire une conversion par statistique (`suppose` tant qu'elle n'est pas décodée
+  chez nous). Test : décodage de la table du client, puis `GetCombatRatingBonus` à notation connue (export
+  SimulationCraft ou ForeverLogger). Priorité : moyenne (bloque l'équipement de T10a et SIM1). Registre A4, A5, A7,
+  A8, B2. [Étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)
+- **PER9 — Le bonus de soins donne-t-il un tiers en dégâts (registre F7) ?** Ajoutée le 2026-10-09 (étude wowsims) :
+  F7 est marqué `certain` sans source ni test ; le moteur ElliotWood/Forever a abandonné ce ratio au profit des
+  statistiques des objets du client (une statistique pour dégâts et soins, une autre pour les soins seuls), le fork
+  de MythicSim l'applique encore sur sa branche `master`. Test : infobulles et fiche (`GetSpellBonusDamage`,
+  `GetSpellBonusHealing`) avec un objet à bonus de soins seul ; décodage des statistiques d'objet en T10a. Priorité :
+  basse pour le Mage, haute pour les soigneurs (PA1, PR1, CM1, DR1). Registre F7.
+  [Étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)
 
 ## Monstres et rencontres
 - **MON1 — Que valent les PV des monstres normaux au-delà du niveau 22 ?** La correction Questie vers Forever repose
@@ -142,7 +159,9 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   rien ne le lit encore dans le client. Test : PV d'autres membres des mêmes familles (ours, raptors) à niveau connu,
   puis recherche d'un champ de multiplicateur dans les tables de créatures du client (`CreatureDifficulty`, à
   télécharger sur accord). Priorité : moyenne (le simulateur prend la valeur commune du niveau : un combat contre un ours
-  est sous-estimé d'environ 20 à 25 %). Registre H11.
+  est sous-estimé d'environ 20 à 25 %). Registre H11. *Modifiée le 2026-10-09* : aucune réponse dans les simulateurs
+  wowsims Forever et MythicSim (cible de raid fixe, pas de multiplicateur par famille,
+  [étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)).
 - **MON3 — Quelles tables d'armure et de PV des monstres le serveur applique-t-il ?** Test : réduction d'un coup de
   monstre de niveau connu sur une armure connue ; PV mesurés comparés à `ExpectedStat` et `npctotalhp`. Priorité :
   moyenne. Registre H2, H11. [Détail](research/questions-ouvertes-detail.md#mon3)
