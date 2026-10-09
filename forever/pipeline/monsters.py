@@ -143,14 +143,17 @@ def build_monsters(
         q = questie.npc(npc_id) if questie else None
         questie_hp = q.hp_at(level) if q else None
         # tous les niveaux du PNJ : un PNJ combattu à un niveau reste dans la courbe à tous ses niveaux
-        flagged = [x for (nid, _), found in by_key.items() if nid == npc_id for x in found if "fought" in x]
+        mine = [x for (nid, _), found in by_key.items() if nid == npc_id for x in found]
+        flagged = [x for x in mine if "fought" in x]
+        # sans indicateur (mesure reportée d'un journal disparu), « jamais combattu » n'est pas établi
+        all_flagged = len(flagged) == len(mine)
         if flagged and npc_id not in curve:  # décision 222 : seuls les PNJ combattus par le joueur et non amis
             if any(x.get("reaction") == "amie" for x in flagged):
                 curve[npc_id] = (
                     "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, "
                     "écarté d'office de la courbe (décision 222)"
                 )
-            elif not any(x["fought"] for x in flagged):
+            elif all_flagged and not any(x["fought"] for x in flagged):
                 curve[npc_id] = (
                     "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, "
                     "écarté d'office de la courbe (décision 222)"
