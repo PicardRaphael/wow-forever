@@ -30,7 +30,7 @@ def test_payload_and_line_with_one_pending(make_deps):
     assert payload["pending"] == 1 and payload["pending_labels"] == ["fiches PvP : Warrior"]
     line = status_line(payload)
     assert line.startswith(f"Données {payload['version']} · ")
-    assert line.endswith("1 attente : forever update status")
+    assert line.endswith("1 mise à jour à valider sur le PC")  # texte demandé par l'utilisateur, sonde E (point 6)
     assert payload["line"] == line
 
 
