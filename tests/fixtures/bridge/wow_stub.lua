@@ -3,6 +3,8 @@
 -- Les fonctions d'action et ReloadUI sont des pièges qui enregistrent tout appel (Stub.forbidden).
 -- Pilotage depuis Python : Stub.Fire(event, ...), Stub.Advance(secondes, pas), Stub.Slash(ligne),
 -- Stub.files[chemin] = "valid" | "empty" (absent : nil), Stub.addons[nom] = source Lua d'un addon à la demande.
+-- Sons comme sur Forever (sonde en jeu A du 2026-10-09) : un fichier présent au lancement (au premier ADDON_LOADED)
+-- « jouera », vide ou non ; un fichier ajouté ensuite n'est jamais vu.
 
 bit = nil -- absent de Lua 5.1 nu ; le jeu le fournit, nos addons n'en dépendent pas
 
@@ -18,6 +20,7 @@ Stub = {
 	registered = {},
 	unknown_events = {},
 	files = {},
+	launched = nil,
 	addons = {},
 	loaded = {},
 	sound_error = false,
@@ -78,6 +81,54 @@ local function newRegion(kind, name, parent)
 	function r:SetColorTexture(cr, cg, cb, ca) self.color = { cr, cg, cb, ca or 1 } end
 	function r:SetTexture(t) self.texture = t end
 	function r:SetScript(what, fn) self.scripts[what] = fn end
+	function r:HookScript(what, fn)
+		local before = self.scripts[what]
+		self.scripts[what] = function(...)
+			if before then before(...) end
+			fn(...)
+		end
+	end
+	function r:GetPoint(i)
+		local p = self.points[i or 1]
+		if not p then return nil end
+		return p.point, p.rel, p.relPoint, p.x, p.y
+	end
+	function r:GetSize() return self.width, self.height end
+	function r:SetMovable(v) self.movable = v and true or false end
+	function r:SetResizable(v) self.resizable = v and true or false end
+	function r:SetClampedToScreen(v) self.clamped = v and true or false end
+	function r:SetResizeBounds(w, h) self.minWidth, self.minHeight = w, h end
+	function r:EnableMouse(v) self.mouse = v and true or false end
+	function r:EnableMouseWheel(v) self.wheel = v and true or false end
+	function r:RegisterForDrag(...) self.drag = { ... } end
+	function r:StartMoving() self.moving = true end
+	function r:StartSizing() self.sizing = true end
+	function r:StopMovingOrSizing() self.moving, self.sizing = false, false end
+	function r:SetBackdrop(b) self.backdrop = b end
+	function r:SetBackdropColor() end
+	function r:SetBackdropBorderColor() end
+	function r:SetNormalTexture(t) self.normal = t end
+	function r:SetHighlightTexture(t) self.highlight = t end
+	function r:SetPushedTexture(t) self.pushed = t end
+	function r:SetText(text) self.text = text end
+	function r:GetText() return self.text end
+	function r:SetFontObject(o) self.font = o end
+	function r:SetJustifyH(j) self.justify = j end
+	function r:SetJustifyV(j) self.justifyV = j end
+	function r:SetTextColor() end
+	function r:SetWordWrap(v) self.wrap = v end
+	function r:SetVertexColor(...) self.vertex = { ... } end
+	-- ScrollingMessageFrame
+	function r:AddMessage(text) self.messages = self.messages or {}; table.insert(self.messages, text) end
+	function r:Clear() self.messages = {} end
+	function r:SetMaxLines(n) self.maxLines = n end
+	function r:SetFading(v) self.fading = v end
+	function r:SetInsertMode(m) self.insertMode = m end
+	function r:SetHyperlinksEnabled(v) self.hyperlinks = v end
+	function r:ScrollUp() end
+	function r:ScrollDown() end
+	function r:ScrollToBottom() end
+	function r:SetSpacing() end
 	function r:GetScript(what) return self.scripts[what] end
 	function r:RegisterEvent(event)
 		if Stub.unknown_events[event] then error("Attempt to register unknown event \"" .. event .. "\"") end
@@ -93,11 +144,8 @@ local function newRegion(kind, name, parent)
 	end
 	function r:CreateFontString(fname, layer)
 		local fs = newRegion("FontString", fname, self)
-		function fs:SetText(text) self.text = text end
-		function fs:GetText() return self.text end
-		function fs:SetFontObject(o) self.font = o end
-		function fs:SetJustifyH(j) self.justify = j end
-		function fs:SetTextColor() end
+		fs.layer = layer
+		if fname then _G[fname] = fs end
 		return fs
 	end
 	return r
@@ -108,8 +156,9 @@ UIParent = newRegion("Frame", "UIParent", nil)
 UIParent.width, UIParent.height = 1024, 768
 WorldFrame = UIParent
 
-function CreateFrame(kind, name, parent)
+function CreateFrame(kind, name, parent, template)
 	local f = newRegion(kind, name, parent or UIParent)
+	f.template = template
 	table.insert(Stub.frames, f)
 	if name then _G[name] = f end
 	return f
@@ -124,7 +173,7 @@ function issecretvalue() return false end
 function PlaySoundFile(path, channel)
 	if Stub.sound_error then error("PlaySoundFile simulé en erreur") end
 	table.insert(Stub.played, path)
-	if Stub.files[path] == "valid" then
+	if Stub.launched and Stub.launched[path] then
 		Stub.next_handle = Stub.next_handle + 1
 		return true, Stub.next_handle
 	end
@@ -141,6 +190,10 @@ function print(...)
 end
 
 SlashCmdList = {}
+UISpecialFrames = {}
+tinsert = table.insert
+GameFontNormal, GameFontNormalLarge, GameFontHighlight, GameFontHighlightSmall, GameFontDisableSmall, ChatFontNormal =
+	{}, {}, {}, {}, {}, {}
 
 C_AddOns = {}
 function C_AddOns.IsAddOnLoaded(name) return Stub.loaded[name] and true or false end
@@ -165,6 +218,10 @@ end
 C_UI = { Reload = trap("C_UI.Reload") }
 
 function Stub.Fire(event, ...)
+	if not Stub.launched then
+		Stub.launched = {}
+		for path in pairs(Stub.files) do Stub.launched[path] = true end
+	end
 	for _, f in ipairs(Stub.frames) do
 		local handler = f.scripts.OnEvent
 		if f.events[event] and handler then handler(f, event, ...) end

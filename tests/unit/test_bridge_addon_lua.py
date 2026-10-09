@@ -211,23 +211,24 @@ def test_fv_diag_reports_each_control_file():
     game = Game(files={**ALL_FILES, "valid.ogg": "valid", "flip.ogg": "empty"}, probe="installation")
     text = diag_lines(game)
     assert "1920 × 1080" in text
-    assert "ctl/empty.wav : ne joue pas" in text and "ctl/valid.wav : joue" in text
-    assert "ctl/flip.wav : ne joue pas" in text and "ctl/late.wav : ne joue pas" in text
+    # Forever (sonde en jeu A du 2026-10-09) : tout fichier présent au lancement « joue », même vide
+    assert "ctl/empty.wav : joue" in text and "ctl/valid.wav : joue" in text
+    assert "ctl/flip.wav : joue" in text and "ctl/late.wav : ne joue pas" in text
     assert "ctl/valid.ogg : joue" in text and "ctl/late.ogg : ne joue pas" in text
-    assert "autotest .wav : réussi" in text and "autotest .ogg : réussi" in text
+    assert "autotest .wav : échoué" in text and "autotest .ogg : échoué" in text
     assert "ForeverBridge_Probe : chargé" in text and "« installation »" in text
     played = list(game.stub.played.values())
     assert CTL + "late.wav" in played and CTL + "flip.ogg" in played
-    assert len(game.stub.stopped) == 2  # chaque son valide est arrêté aussitôt
+    assert len(game.stub.stopped) == 6  # chaque son qui « jouera » est arrêté aussitôt
 
 
-def test_fv_diag_sees_files_changed_while_the_game_runs():
+def test_fv_diag_does_not_see_files_added_while_the_game_runs():
     game = Game(files=ALL_FILES)
-    assert "ctl/flip.wav : ne joue pas" in diag_lines(game)
+    assert "ctl/flip.wav : joue" in diag_lines(game)
     game.stub.files[CTL + "flip.wav"] = "valid"
     game.stub.files[CTL + "late.wav"] = "valid"
     text = diag_lines(game)
-    assert "ctl/flip.wav : joue" in text and "ctl/late.wav : joue" in text
+    assert "ctl/flip.wav : joue" in text and "ctl/late.wav : ne joue pas" in text
     assert "autotest .ogg : échoué" in text  # aucun .ogg valide installé
     assert "ForeverBridge_Probe : non chargé (MISSING)" in text
 
