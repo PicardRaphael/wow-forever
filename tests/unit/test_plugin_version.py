@@ -36,8 +36,9 @@ def test_plugin_json_has_a_semver_version():
     # calculé, builds populaires), FA1 ; 0.8.1 : cas d'évaluation comparé au code rendu par l'outil (relevés du
     # 2026-10-08, décision 210) ; 0.8.2 : serveur MCP et hooks lancés par `python -m forever` avec `--no-sync`,
     # jamais par forever.exe (verrou de uv sync, demande de l'utilisateur du 2026-10-09) ; 0.8.3 : prochain point au
-    # niveau suivant quand tous les points sont placés, un cas d'évaluation par bouton du pont (sonde en jeu F).
-    assert version == "0.8.3"
+    # niveau suivant quand tous les points sont placés, un cas d'évaluation par bouton du pont (sonde en jeu F) ;
+    # 0.8.4 : cas des boutons Talents et Leveling régénérés (égalité avec le build retenu, build actuel gardé, décision 217).
+    assert version == "0.8.4"
 
 
 def test_fingerprint_is_up_to_date():
