@@ -138,3 +138,12 @@ def test_an_npc_fought_in_a_vanished_log_is_not_excluded_for_being_only_seen_lat
     friendly = {**obs(13076, 30, 2484, "Dun Morogh Mountaineer"), "fought": False, "reaction": "amie"}
     table = build_monsters([friendly, obs(13076, 29, 2400)], None, LOCAL_VERSION)
     assert [e["npc_id"] for e in table["curve_excluded"]] == [13076]  # ami : écarté d'office, même mêlé à un report
+
+
+def test_an_npc_measured_before_in_a_vanished_log_keeps_an_unknown_fight():
+    """Greater Plainstrider (2026-10-09) : mesuré jadis dans un journal disparu, remesuré au même niveau en n'étant que
+    vu : l'observation reportée est remplacée, mais « jamais combattu » reste non établi (`unknown_fight`)."""
+    seen_only = {**obs(3244, 13, 307, "Greater Plainstrider"), "fought": False, "reaction": "hostile"}
+    assert [e["npc_id"] for e in build_monsters([seen_only], None, LOCAL_VERSION)["curve_excluded"]] == [3244]
+    table = build_monsters([seen_only], None, LOCAL_VERSION, unknown_fight={3244})
+    assert table["curve_excluded"] == [] and table["hp_by_level"]["13"]["value"] == 307
