@@ -824,6 +824,19 @@ schema = 1, session, next_id, history, outbox, window = { point, relPoint, x, y,
 - **Sonde B** (avant le bloc B) : `docs/ADDON.md` §7, étape 10.
 - **Procédure du chat** (fin de tranche) : `docs/ADDON.md` §7, étape 11 (remplace le critère de fin 6).
 
+### Exécution : bloc A2 (2026-10-09)
+- Tests dans `tests/unit/test_bridge_cells.py` (taille de case, `band_live.bmp`, bande vivante à 1 et 2 pixels :
+  ce dernier point était prévu dans `test_bridge_selftest.py`), `test_bridge_window_lua.py` (fenêtre, `/fv test N`,
+  `/fv poll`, rien dans la discussion générale) et `test_bridge_install_a2.py` (`ForeverBridge_Probe2`,
+  `Bindings.xml`).
+- Sonde du premier chargement sans `/reload` : `ForeverBridge_Probe2`, chargé seulement par `/fv poll`, réécrit par
+  `selftest --touch` après le lancement (`docs/ADDON.md` §7, étape 10).
+- `/fv diag` est la seule commande qui écrit dans la discussion générale (lecture de « les diagnostics seulement sur
+  /fv diag ») ; le basculer dans la fenêtre tient en une ligne (`ChatSay` → `FB.Print`) et une assertion.
+- Corrections de tests accordées par l'utilisateur le 2026-10-09 : client simulé fidèle à Forever pour les sons (deux
+  tests du diagnostic) ; harnais `Game` qui convertissait `saved` sans récursion (`table_from(saved,
+  recursive=True)`), une table imbriquée arrivant sinon en `userdata`.
+
 ### Questions ouvertes ajoutées (`docs/OPEN_QUESTIONS.md`, section « Pont en jeu »)
 BR1 premier chargement d'un emplacement sans `/reload` ; BR2 bande d'une case par pixel à toutes les échelles ; BR3
 effet de 200 addons chargés à la demande sur le démarrage et la liste des addons ; BR4 canal par polices.

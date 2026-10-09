@@ -57,7 +57,7 @@ class Game:
         for name in toc_files():
             self.lua.execute((ADDON / name).read_bytes(), "ForeverBridge", self.lua.table())
         if saved is not None:
-            self.lua.globals().ForeverBridgeDB = self.lua.table_from(saved)
+            self.lua.globals().ForeverBridgeDB = self.lua.table_from(saved, recursive=True)
         self.stub.Fire("ADDON_LOADED", "ForeverBridge")
         self.stub.Fire("PLAYER_LOGIN")
 
