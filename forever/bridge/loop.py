@@ -331,8 +331,12 @@ class Bridge:
                 self.heartbeat()
             except OSError as exc:
                 self.journal.write("error", where="signe de vie", error=str(exc))
-        if self.keeper is not None and self.keeper.tick():
-            self.last_refresh = None  # état de l'addon changé : Status.lua réécrit tout de suite
+        if self.keeper is not None:
+            try:
+                if self.keeper.tick():
+                    self.last_refresh = None  # état de l'addon changé : Status.lua réécrit tout de suite
+            except Exception as exc:  # noqa: BLE001 : l'addon tenu à jour ne doit jamais arrêter le pont
+                self.journal.write("error", where="addon tenu à jour", error=f"{type(exc).__name__}: {exc}")
         if self.last_refresh is None or now - self.last_refresh >= REFRESH_S:
             self.refresh()
         self._capture(now)
