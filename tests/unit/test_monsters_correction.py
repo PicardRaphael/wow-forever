@@ -35,10 +35,12 @@ SLOPE, INTERCEPT, KNEE = 0.0246379983222087, 0.8050680234890781, 7.9118430792005
 
 
 def observations(*paths):
+    """Observations des fixtures sans les indicateurs de combat (décision 222) : ces tests portent sur la correction
+    Questie seule ; la règle de la courbe (PNJ combattus par le joueur et non amis) a ses tests dans test_monsters.py."""
     out = []
     for path in paths:
         found, _ = monster_hp(list(read_log(path)[1]), log=path.name)
-        out += found
+        out += [{k: v for k, v in o.items() if k not in ("fought", "reaction")} for o in found]
     return out
 
 

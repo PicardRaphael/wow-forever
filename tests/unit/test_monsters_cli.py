@@ -54,7 +54,8 @@ def test_monsters_build(capsys, make_deps, data_copy, tmp_path):
     assert table["npcs"]["3099"]["levels"]["6"]["certainty"] == "certain"
     assert table["npcs"]["3099"]["levels"]["7"]["max_hp"] == table["npcs"]["3099"]["levels"]["7"]["questie_hp"]
     assert table["npcs"]["5951"]["levels"]["1"]["max_hp"] == 8
-    assert table["schema_version"] == 2 and table["questie_correction"]["excluded"][0]["npc_id"] == 3986
+    excluded = [e["npc_id"] for e in table["questie_correction"]["excluded"]]
+    assert table["schema_version"] == 2 and 3986 in excluded  # décision 222 : PNJ vus seulement aussi écartés
     code, out, _ = run(capsys, [*argv, "--json"], deps)
     assert code == 2 and json.loads(out)["error"]["code"] == "candidate_exists"
     code, out, _ = run(capsys, [*argv, "--force"], deps)
