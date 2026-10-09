@@ -91,3 +91,38 @@ def test_installed_table_is_read_by_game_data(game_data):
     assert monsters.hp_by_level[16].certainty == "probable" and monsters.hp_by_level[16].value == 427
     assert monsters.hp_by_level[30].certainty == "suppose"
     assert monsters.npcs[3099][7].value == 137 and monsters.npcs[3099][7].certainty == "certain"
+
+
+# --- Courbe des PV : seuls les PNJ combattus par le joueur et non amis (décision 222, 2026-10-09) -------------------
+# Journal synthétique : un PNJ hostile et un neutre combattus par le joueur, un hostile seulement vu (combattu par un
+# autre joueur), un garde ami vu à côté des combats (comme Dun Morogh Mountaineer, niveau 30), un PNJ ami combattu.
+
+
+def test_observations_carry_the_fight_and_the_reaction():
+    found, _ = observations(SYNTHETIC_LOGS / "reactions.txt")
+    seen = {o["npc_id"]: (o["fought"], o["reaction"]) for o in found}
+    assert seen == {
+        1001: (True, "hostile"),
+        1002: (True, "neutre"),
+        1003: (False, "hostile"),
+        1004: (False, "amie"),
+        1005: (True, "amie"),
+    }
+
+
+def test_only_fought_non_friendly_npcs_enter_the_curve():
+    found, conflicts = observations(SYNTHETIC_LOGS / "reactions.txt")
+    table = build_monsters(found, None, LOCAL_VERSION, conflicts=conflicts)
+    assert set(table["npcs"]) == {"1001", "1002", "1003", "1004", "1005"}  # tous mesurés un par un
+    reasons = {e["npc_id"]: e["reason"] for e in table["curve_excluded"]}
+    assert set(reasons) == {1003, 1004, 1005}
+    assert "ami" in reasons[1004] and "ami" in reasons[1005]
+    assert "jamais combattu" in reasons[1003]
+    assert all("décision 222" in r for r in reasons.values())
+    assert set(table["hp_by_level"]) == {"8", "9"}  # niveaux de 1001 et 1002 seulement
+
+
+def test_an_observation_without_the_fight_flag_stays_in_the_curve():
+    """Mesure reportée d'un journal disparu (sans les indicateurs) : la règle ne s'applique pas, rien n'est deviné."""
+    table = build_monsters([obs(3099, 6, 120)], None, LOCAL_VERSION)
+    assert table["curve_excluded"] == [] and table["hp_by_level"]["6"]["value"] == 120
