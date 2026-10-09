@@ -138,7 +138,7 @@ class Bridge:
 
     def refresh(self) -> None:
         """État des données relu ; `Status.lua` et toute la réserve réécrits."""
-        self.status_cache = self.status()
+        self.status_cache = {**self.status(), "slots": self.slots}  # l'addon en tire les emplacements restants
         path = self.addons_dir / ADDON / "Status.lua"
         try:
             path.parent.mkdir(parents=True, exist_ok=True)

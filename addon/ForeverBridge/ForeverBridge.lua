@@ -47,7 +47,17 @@ local PREFIX = "|cff33ff99ForeverBridge|r : "
 local WINDOW_W, WINDOW_H = 520, 360
 local MIN_W, MIN_H = 360, 240
 local MAX_LETTERS = 255 -- question tapée, en caractères (zone de saisie)
-local PROVISIONAL_BAND = 30 -- bloc B : bande retirée au bout de ce délai, faute d'accusé (bloc E)
+local SLOT_PREFIX = "ForeverBridge_S"
+local GIVE_UP_POLLS = 3 -- relevés sans accusé avant la boîte d'envoi /reload
+local LOW_RESERVE = 10 -- emplacements restants à partir desquels /reload est proposé
+local IDLE_POLL = 600 -- relevé au repos, fenêtre ouverte (secondes)
+local HISTORY_KEPT = 50
+-- Calendrier des relevés après un envoi (secondes) : 3, puis toutes les 4 jusqu'à 30, puis toutes les 10 jusqu'au
+-- plafond (190, au-delà du délai de la conversation du pont).
+local SCHEDULE = { 3, 7, 11, 15, 19, 23, 27, 30 }
+for t = 40, 190, 10 do
+	SCHEDULE[#SCHEDULE + 1] = t
+end
 local SEND_W, BAR_H, INPUT_H = 90, 22, 54
 local MIN_ALPHA = 0.3 -- fond réglable par /fv fond, de 30 à 100 (opaque par défaut)
 
@@ -57,7 +67,7 @@ BINDING_NAME_FOREVERBRIDGE_TOGGLE = "Ouvrir ou fermer la fenêtre"
 local driver = CreateFrame("Frame", "ForeverBridgeDriver", UIParent)
 local band
 local textures = {}
-local run = {}
+local run = { nextSlot = 1, unacked = {}, links = {}, unread = 0 }
 local ui = {}
 
 -- Diagnostic demandé par le joueur (/fv diag) : seule écriture dans la discussion générale.
@@ -73,6 +83,17 @@ local function PhysicalSize()
 		end
 	end
 	return 1920, 1080
+end
+
+local function LoadOnDemand(name)
+	if not (C_AddOns and type(C_AddOns.LoadAddOn) == "function") then
+		return false, "C_AddOns.LoadAddOn absente"
+	end
+	local ok, loaded, reason = pcall(C_AddOns.LoadAddOn, name)
+	if not ok then
+		return false, "erreur"
+	end
+	return loaded, reason
 end
 
 ---------------------------------------------------------------------------
@@ -203,6 +224,12 @@ local function BuildWindow()
 			self:ScrollDown()
 		end
 	end)
+	history:SetScript("OnHyperlinkClick", function(_, link)
+		local n = type(link) == "string" and link:match("^foreverbridge:copy:(%d+)$")
+		if n and run.links[tonumber(n)] then
+			FB.ShowCopy(run.links[tonumber(n)])
+		end
+	end)
 	ui.history = history
 
 	local grip = CreateFrame("Button", nil, f)
@@ -276,20 +303,60 @@ local function BuildWindow()
 	ui.newButton = new
 	ui.buttons = {}
 	FB.RefreshButtons()
+	FB.RenderHistory()
+	FB.UpdateStatus()
 	return f
 end
 
+-- Zone copiable (lien Talents Forever) : texte sélectionné, Ctrl+C, Échap ferme.
+function FB.ShowCopy(text)
+	local box = ui.copyBox
+	if not box then
+		local frame = CreateFrame("Frame", "ForeverBridgeCopy", UIParent, "BackdropTemplate")
+		frame:SetSize(420, 60)
+		frame:SetPoint("CENTER", UIParent, "CENTER", 0, 120)
+		frame:SetFrameStrata("DIALOG")
+		if frame.SetBackdrop then
+			frame:SetBackdrop(BACKDROP)
+			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
+		end
+		tinsert(UISpecialFrames, "ForeverBridgeCopy")
+		local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -8)
+		label:SetText("Ctrl+C pour copier, Échap pour fermer")
+		box = CreateFrame("EditBox", "ForeverBridgeCopyBox", frame)
+		box:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 12, 10)
+		box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 10)
+		box:SetHeight(20)
+		box:SetAutoFocus(false)
+		box:SetFontObject(ChatFontNormal)
+		box:SetScript("OnEscapePressed", function()
+			frame:Hide()
+		end)
+		ui.copyFrame, ui.copyBox = frame, box
+	end
+	box:SetText(text)
+	ui.copyFrame:Show()
+	box:SetFocus()
+	box:HighlightText()
+end
+
 -- Ligne ajoutée à l'historique de la fenêtre, jamais à la discussion générale.
-function FB.Print(text)
+function FB.Print(text, r, g, b)
 	BuildWindow()
-	ui.history:AddMessage(text)
+	ui.history:AddMessage(text, r, g, b)
 	ui.count = (ui.count or 0) + 1
 end
 
 -- Ouverture à la demande du joueur seulement (commande ou raccourci), jamais automatique.
 function FB.Open()
-	BuildWindow():Show()
+	local f = BuildWindow()
+	if not f:IsShown() then
+		run.openedAt = GetTime()
+	end
+	f:Show()
 	FB.RefreshButtons()
+	FB.UpdateStatus()
 end
 
 function FB.Toggle()
@@ -297,14 +364,19 @@ function FB.Toggle()
 	if f:IsShown() then
 		f:Hide()
 	else
-		f:Show()
-		FB.RefreshButtons()
+		FB.Open()
 	end
 end
 
 -- Texte venu du joueur ou du pont : « | » doublé, les séquences d'interface restent du texte.
 local function Escape(text)
 	return (tostring(text):gsub("|", "||"))
+end
+
+-- Texte écrit par le pont : déjà neutralisé une fois (lua_string) ; ramené au texte brut avant d'être neutralisé ici,
+-- pour qu'un « | » s'affiche une seule fois, sans jamais ouvrir de séquence d'interface.
+local function Plain(text)
+	return (tostring(text or ""):gsub("||", "|"))
 end
 
 local function PlayerClass()
@@ -331,7 +403,7 @@ function FB.RefreshButtons()
 		button:Hide()
 	end
 	local state = type(ForeverBridgeStatus) == "table" and ForeverBridgeStatus or {}
-	local entries = type(state.buttons) == "table" and state.buttons or {}
+	local entries = run.buttons or (type(state.buttons) == "table" and state.buttons) or {}
 	local class = PlayerClass()
 	local previous = ui.newButton
 	for _, entry in ipairs(entries) do
@@ -434,8 +506,111 @@ function FB.ShowBand(id, payload, cell)
 end
 
 ---------------------------------------------------------------------------
--- Envoi (bloc B : bande provisoire, réponses par la réserve au bloc E)
+-- Historique, mise en forme des réponses
 ---------------------------------------------------------------------------
+
+local function History()
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" then
+		return {}
+	end
+	if type(db.history) ~= "table" then
+		db.history = {}
+	end
+	return db.history
+end
+
+local function Remember(entry)
+	local history = History()
+	history[#history + 1] = entry
+	while #history > HISTORY_KEPT do
+		table.remove(history, 1)
+	end
+end
+
+-- Une ligne de réponse : « | » neutralisé d'abord, puis « ## titre », « - élément », « **en évidence** ».
+function FB.FormatLine(line)
+	local s = Escape(line)
+	if s:match("^## ") then
+		s = "|cffffd100" .. s:sub(4) .. "|r"
+	elseif s:match("^%- ") then
+		s = "  • " .. s:sub(3)
+	end
+	return (s:gsub("%*%*(.-)%*%*", "|cffffffff%1|r"))
+end
+
+local function PrintUser(text)
+	FB.Print("|cff4fa3ffVous|r : " .. Escape(text))
+end
+
+local function PrintReply(entry)
+	if entry.status == "error" then
+		FB.Print("|cffff6060Forever|r : " .. Escape(Plain(entry.text or "erreur")))
+		return
+	end
+	FB.Print("|cffffd100Forever|r :")
+	for line in (Plain(entry.text) .. "\n"):gmatch("(.-)\n") do
+		FB.Print(FB.FormatLine(line), 0.85, 0.85, 0.85)
+	end
+	if type(entry.provenance) == "string" and entry.provenance ~= "" then
+		FB.Print("|cff888888" .. Escape(Plain(entry.provenance)) .. "|r")
+	end
+	if type(entry.link) == "string" and entry.link ~= "" then
+		run.links[#run.links + 1] = entry.link
+		FB.Print("|Hforeverbridge:copy:" .. #run.links .. "|h|cff66ccff[Talents Forever]|r|h  (cliquer pour copier le lien)")
+	end
+end
+
+-- Historique gardé dans ForeverBridgeDB, rendu à la construction de la fenêtre.
+function FB.RenderHistory()
+	for _, entry in ipairs(History()) do
+		if entry.role == "user" then
+			PrintUser(entry.text or "")
+		elseif entry.role == "assistant" then
+			PrintReply(entry)
+		end
+	end
+end
+
+---------------------------------------------------------------------------
+-- Envoi : bande jusqu'à l'accusé, puis consultation de la réserve
+---------------------------------------------------------------------------
+
+local function Waiting()
+	local db = ForeverBridgeDB
+	if type(db.waiting) ~= "table" then
+		db.waiting = {}
+	end
+	return db.waiting
+end
+
+local function Outbox()
+	local db = ForeverBridgeDB
+	if type(db.outbox) ~= "table" then
+		db.outbox = {}
+	end
+	return db.outbox
+end
+
+local function AnyWaiting()
+	return next(Waiting()) ~= nil or #run.unacked > 0
+end
+
+-- Bande du plus récent message sans accusé (ou rien).
+local function ShowCurrent()
+	local current = run.unacked[#run.unacked]
+	if not current then
+		FB.HideBand()
+		return
+	end
+	local db = ForeverBridgeDB
+	FB.ShowBand(current.id, current.payload, tonumber(db.cell) or DEFAULT_CELL)
+end
+
+local function StartSchedule()
+	run.scheduleStart = GetTime()
+	run.pollIndex = 1
+end
 
 function FB.Send(text, buttonKey)
 	local db = ForeverBridgeDB
@@ -450,23 +625,34 @@ function FB.Send(text, buttonKey)
 	if buttonKey then
 		flags[#flags + 1] = "b=" .. buttonKey
 	end
-	local payload, why = Message.Build(db.session, id, flags, run.nextSlot or 1, text)
+	local payload, contextText = Message.Build(db.session, id, flags, run.nextSlot, text)
 	FB.Open()
 	if not payload then
-		FB.Print("envoi impossible : " .. tostring(why))
+		FB.Print("envoi impossible : " .. tostring(contextText))
 		return false
 	end
-	local ok, reason = FB.ShowBand(id, payload, tonumber(db.cell) or DEFAULT_CELL)
-	if not ok then
-		FB.Print("envoi impossible : " .. tostring(reason))
+	local cells = Codec.Encode(id % 65536, payload)
+	if not cells then
+		FB.Print("envoi impossible : message trop long pour la bande")
 		return false
 	end
 	run.testLeft = nil
-	run.bandLeft = PROVISIONAL_BAND
 	run.newConversation = nil
 	db.next_id = id + 1
-	FB.Print("|cff4fa3ffVous|r : " .. Escape(text))
-	FB.Print("|cff888888message n° " .. id .. " envoyé ; réponses en jeu au bloc E du pont (pas encore livré).|r")
+	run.unacked[#run.unacked + 1] = {
+		id = id,
+		text = text,
+		payload = payload,
+		flags = table.concat(flags, ","),
+		slot = run.nextSlot,
+		context = contextText,
+		polls = 0,
+	}
+	ShowCurrent()
+	StartSchedule()
+	PrintUser(text)
+	Remember({ role = "user", text = text, id = id })
+	FB.UpdateStatus()
 	return true
 end
 
@@ -489,6 +675,201 @@ function FB.NewConversation()
 	FB.Print("|cff888888— Nouvelle conversation : le prochain message repart de zéro —|r")
 end
 
+-- Message sans accusé après trois relevés : boîte d'envoi, lue par le pont au prochain /reload.
+local function GiveUp(message)
+	local outbox = Outbox()
+	outbox[#outbox + 1] = {
+		id = message.id,
+		text = message.text,
+		flags = message.flags,
+		slot = message.slot,
+		context = message.context,
+	}
+	FB.Print("|cffff6060Non reçu|r : pont injoignable, message n° " .. message.id .. " gardé pour le prochain /reload "
+		.. "(lancez uv run forever bridge start, puis tapez /reload).")
+end
+
+local function RemoveFromOutbox(id)
+	local outbox = Outbox()
+	for i = #outbox, 1, -1 do
+		if type(outbox[i]) == "table" and outbox[i].id == id then
+			table.remove(outbox, i)
+		end
+	end
+end
+
+local function Remaining()
+	if not run.slots then
+		return nil
+	end
+	return run.slots - (run.nextSlot - 1)
+end
+
+-- Ligne d'état et voyant : données, pont vu, réponse en cours, réserve.
+function FB.UpdateStatus()
+	if not ui.status then
+		return
+	end
+	local parts = {}
+	local status = type(run.status) == "table" and run.status or nil
+	parts[#parts + 1] = status and type(status.line) == "string" and Escape(Plain(status.line)) or "état des données inconnu"
+	local seen = tonumber(run.bridgeSeen)
+	local icon = "Offline"
+	if seen and seen > 0 then
+		local minutes = math.max(0, math.floor((time() - seen) / 60))
+		parts[#parts + 1] = minutes == 0 and "pont vu à l'instant" or ("pont vu il y a " .. minutes .. " min")
+		icon = minutes < 12 and "Online" or (minutes < 22 and "Away" or "Offline")
+	else
+		parts[#parts + 1] = "pont pas encore vu"
+	end
+	if #run.unacked > 0 then
+		parts[#parts + 1] = "envoi du message n° " .. run.unacked[#run.unacked].id
+	elseif next(Waiting()) ~= nil and run.scheduleStart then
+		local seconds = math.floor(GetTime() - run.scheduleStart)
+		local dots = string.rep(".", math.floor(GetTime() * 2) % 3 + 1)
+		parts[#parts + 1] = "réponse en cours" .. dots .. " " .. seconds .. " s"
+	end
+	if run.exhausted then
+		parts[#parts + 1] = "réserve vide : tapez /reload"
+	else
+		local remaining = Remaining()
+		if remaining and remaining <= LOW_RESERVE then
+			parts[#parts + 1] = "réserve : " .. remaining .. " emplacements restants, tapez /reload quand vous voulez"
+		end
+	end
+	if run.unread > 0 and ui.frame and ui.frame:IsShown() then
+		run.unread = 0
+	end
+	ui.status:SetText(table.concat(parts, " · "))
+	if ui.dot then
+		ui.dot:SetTexture("Interface\\FriendsFrame\\StatusIcon-" .. icon)
+	end
+end
+
+-- Contenu d'un emplacement ou d'Inbox.lua : état, boutons, accusés et réponses de cette session.
+function FB.ApplySlot(slot)
+	if type(slot) ~= "table" then
+		return
+	end
+	local db = ForeverBridgeDB
+	if tonumber(slot.now) and tonumber(slot.now) > 0 then
+		run.bridgeSeen = tonumber(slot.now)
+	end
+	if type(slot.status) == "table" then
+		run.status = slot.status
+		run.slots = tonumber(slot.status.slots) or run.slots
+	end
+	if type(slot.buttons) == "table" then
+		run.buttons = slot.buttons
+		FB.RefreshButtons()
+	end
+	local waiting = Waiting()
+	for _, reply in ipairs(type(slot.replies) == "table" and slot.replies or {}) do
+		if type(reply) == "table" and reply.session == db.session and type(reply.id) == "number" then
+			for i = #run.unacked, 1, -1 do
+				if run.unacked[i].id == reply.id then
+					table.remove(run.unacked, i)
+					waiting[reply.id] = true
+				end
+			end
+			for _, entry in ipairs(Outbox()) do
+				if type(entry) == "table" and entry.id == reply.id then
+					waiting[reply.id] = true
+				end
+			end
+			if waiting[reply.id] and (reply.status == "done" or reply.status == "error") then
+				waiting[reply.id] = nil
+				RemoveFromOutbox(reply.id)
+				local entry = {
+					role = "assistant",
+					id = reply.id,
+					status = reply.status,
+					text = reply.text,
+					provenance = reply.provenance,
+					link = reply.link,
+				}
+				PrintReply(entry)
+				Remember(entry)
+				if not (ui.frame and ui.frame:IsShown()) then
+					run.unread = run.unread + 1
+				end
+			end
+		end
+	end
+	ShowCurrent()
+	if not AnyWaiting() then
+		run.scheduleStart = nil
+	end
+	FB.UpdateStatus()
+end
+
+-- Charge l'emplacement suivant de la réserve (une fois par session d'interface) et applique son contenu.
+function FB.PollSlot()
+	if run.exhausted then
+		return
+	end
+	local index = run.nextSlot
+	run.nextSlot = index + 1
+	run.lastPoll = GetTime()
+	ForeverBridgeSlot = nil
+	local loaded, reason = LoadOnDemand(string.format("%s%03d", SLOT_PREFIX, index))
+	if not loaded and (reason == "MISSING" or (run.slots and index > run.slots)) then
+		run.exhausted = true
+		run.scheduleStart = nil
+		for _, message in ipairs(run.unacked) do
+			GiveUp(message)
+		end
+		run.unacked = {}
+		FB.HideBand()
+		if next(Waiting()) ~= nil then
+			FB.Print("|cffffd100Plus d'emplacement libre|r : réserve vide, la réponse arrivera au prochain /reload "
+				.. "(tapez /reload quand vous voulez).")
+		end
+		FB.UpdateStatus()
+		return
+	end
+	if loaded then
+		FB.ApplySlot(ForeverBridgeSlot)
+	end
+	local current = run.unacked[#run.unacked]
+	if current then
+		current.polls = current.polls + 1
+		if current.polls >= GIVE_UP_POLLS then
+			table.remove(run.unacked)
+			GiveUp(current)
+			ShowCurrent()
+			if not AnyWaiting() then
+				run.scheduleStart = nil
+			end
+		end
+	end
+	FB.UpdateStatus()
+end
+
+-- Relevés au calendrier après un envoi ; au repos, un relevé toutes les dix minutes fenêtre ouverte.
+local function TickPolls()
+	local now = GetTime()
+	if run.scheduleStart then
+		local elapsed = now - run.scheduleStart
+		while run.scheduleStart and SCHEDULE[run.pollIndex] and elapsed >= SCHEDULE[run.pollIndex] - 1e-6 do
+			run.pollIndex = run.pollIndex + 1
+			FB.PollSlot()
+		end
+		if run.scheduleStart and not SCHEDULE[run.pollIndex] then
+			run.scheduleStart = nil
+			if next(Waiting()) ~= nil then
+				FB.Print("Réponse toujours en cours : tapez /reload plus tard pour la récupérer.")
+			end
+			FB.UpdateStatus()
+		end
+	elseif ui.frame and ui.frame:IsShown() and not run.exhausted then
+		local since = math.max(run.lastPoll or 0, run.openedAt or now)
+		if now - since >= IDLE_POLL then
+			FB.PollSlot()
+		end
+	end
+end
+
 function FB.ClickButton(entry)
 	if entry.target and not HasPlayerTarget() then
 		FB.Print(tostring(entry.label or "PvP") .. " : prenez un joueur en cible, puis cliquez à nouveau.")
@@ -507,7 +888,7 @@ end
 
 function FB.StopTest()
 	run.testLeft = nil
-	FB.HideBand()
+	ShowCurrent()
 end
 
 function FB.Test(size)
@@ -530,18 +911,18 @@ function FB.Test(size)
 		return
 	end
 	run.testLeft = TEST_DURATION
-	run.bandLeft = nil
 	FB.Print("bande de test affichée en haut à gauche, case de " .. cell .. " pixel(s) (retirée dans deux minutes, "
 		.. "ou par /fv test). Dans un terminal : uv run forever bridge selftest --live, puis revenir au jeu.")
 end
 
 -- Minuterie : le cadre pilote reste visible (OnUpdate ne tourne que sur un cadre visible).
 function FB.Tick(elapsed)
-	if run.bandLeft then
-		run.bandLeft = run.bandLeft - elapsed
-		if run.bandLeft <= 0 then
-			run.bandLeft = nil
-			FB.HideBand()
+	TickPolls()
+	run.statusClock = (run.statusClock or 0) + elapsed
+	if run.statusClock >= 0.5 then
+		run.statusClock = 0
+		if run.scheduleStart then
+			FB.UpdateStatus()
 		end
 	end
 	if run.testLeft then
@@ -555,17 +936,6 @@ end
 ---------------------------------------------------------------------------
 -- Consultation d'un emplacement de sonde (/fv poll)
 ---------------------------------------------------------------------------
-
-local function LoadOnDemand(name)
-	if not (C_AddOns and type(C_AddOns.LoadAddOn) == "function") then
-		return false, "C_AddOns.LoadAddOn absente"
-	end
-	local ok, loaded, reason = pcall(C_AddOns.LoadAddOn, name)
-	if not ok then
-		return false, "erreur"
-	end
-	return loaded, reason
-end
 
 function FB.Poll()
 	FB.Open()
@@ -699,6 +1069,23 @@ function handlers.ADDON_LOADED(name)
 	if type(db.window) ~= "table" then
 		db.window = {}
 	end
+end
+
+-- Connexion et /reload : état et boutons de Status.lua, réponses arrivées dans Inbox.lua (chemin de secours).
+function handlers.PLAYER_ENTERING_WORLD()
+	if type(ForeverBridgeDB) ~= "table" then
+		return
+	end
+	if type(ForeverBridgeStatus) == "table" then
+		if type(ForeverBridgeStatus.status) == "table" and next(ForeverBridgeStatus.status) ~= nil then
+			run.status = ForeverBridgeStatus.status
+			run.slots = tonumber(ForeverBridgeStatus.status.slots) or run.slots
+		end
+		if tonumber(ForeverBridgeStatus.now) and tonumber(ForeverBridgeStatus.now) > 0 then
+			run.bridgeSeen = tonumber(ForeverBridgeStatus.now)
+		end
+	end
+	FB.ApplySlot(ForeverBridgeSlot)
 end
 
 driver:SetScript("OnEvent", function(_, event, ...)

@@ -185,7 +185,8 @@ function M.Payload(session, id, flags, slot, ctx, text)
 	}, M.FIELD_SEP)
 end
 
--- Message complet, allégé si besoin : charge, ou nil et la raison si même la question seule ne tient pas.
+-- Message complet, allégé si besoin : charge et texte du contexte envoyé (boîte d'envoi), ou nil et la raison si
+-- même la question seule ne tient pas.
 function M.Build(session, id, flags, slot, text)
 	local ctx, pieces = M.Context()
 	local steps = {
@@ -212,13 +213,13 @@ function M.Build(session, id, flags, slot, text)
 	local payload = M.Payload(session, id, flags, slot, ctx, text)
 	for _, step in ipairs(steps) do
 		if #payload <= Codec.MAX_PAYLOAD then
-			return payload
+			return payload, M.ContextText(ctx)
 		end
 		step()
 		payload = M.Payload(session, id, flags, slot, ctx, text)
 	end
 	if #payload <= Codec.MAX_PAYLOAD then
-		return payload
+		return payload, M.ContextText(ctx)
 	end
 	return nil, "message trop long pour la bande, même sans contexte"
 end
