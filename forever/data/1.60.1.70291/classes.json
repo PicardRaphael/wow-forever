@@ -96605,7 +96605,7 @@
        "certainty": "FC-1.60.1.70291"
       },
       {
-       "key": "naturalInstinct",
+       "key": "predatoryInstincts",
        "name": "Natural Instinct",
        "name_fr": "Natural Instinct",
        "node_id": 104950,
@@ -96617,7 +96617,11 @@
        "spell_id": 1223242,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70291"
+       "certainty": "FC-1.60.1.70291",
+       "former_names": [
+        "Predatory Instincts"
+       ],
+       "client_key": "naturalInstinct"
       },
       {
        "key": "naturalReaction",

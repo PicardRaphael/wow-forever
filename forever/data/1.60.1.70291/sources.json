@@ -194,7 +194,8 @@
       "certainty": "certain",
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
-        "classement PvP : table de decode_rules.json, certitude probable"
+        "classement PvP : table de decode_rules.json, certitude probable",
+        "révision 3 de 1.60.1.70291 (2026-10-09) : clés de talent stables pour les 9 classes (décision 218) : predatoryInstincts gardée pour Natural Instinct (même nœud 104950, même sort 1223242), ancien nom en former_names, clé du client en client_key"
       ]
     },
     "races.json": {
@@ -283,7 +284,7 @@
       "inherited_from": "1.60.1.70245"
     }
   },
-  "revision": 2,
+  "revision": 3,
   "revised_at": "2026-10-09",
   "hotfixes": {
     "dbcache": {

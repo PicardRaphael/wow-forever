@@ -2813,6 +2813,35 @@
      "rule": "manual"
     }
    ]
+  },
+  {
+   "revision": 3,
+   "date": "2026-10-09",
+   "motif": "Clés de talent stables pour les 9 classes (décision 218, demande de l'utilisateur du 2026-10-09) : un talent renommé par le client (même nœud, même sort) garde sa clé, nouveau nom affiché, ancien en former_names ; appliqué à classes.json par stable_talent_keys contre 1.60.1.70245 ; écrite à la main, sans candidate",
+   "command": null,
+   "candidate": null,
+   "report": "docs/DECISIONS.md (décision 218)",
+   "counts": {
+    "manual": 1
+   },
+   "changes": [],
+   "renamed_in_classes": [
+    {
+     "class": "Druid",
+     "client_key": "naturalInstinct",
+     "key": "predatoryInstincts"
+    }
+   ],
+   "manual_changes": [
+    {
+     "file": "classes.json",
+     "path": "Druid : talent naturalInstinct (nœud) → clé predatoryInstincts",
+     "before": "naturalInstinct",
+     "after": "predatoryInstincts",
+     "source": "décision 218 (clés stables : même nœud et même sort que dans 1.60.1.70245)",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }
