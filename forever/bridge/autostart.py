@@ -63,8 +63,15 @@ class AutostartError(ForeverError):
 # --- Contenu de la tâche ---------------------------------------------------------------------------------------
 
 
+def _quoted(path: Path) -> str:
+    """Chemin entre guillemets pour la ligne de commande Windows : une barre oblique inverse finale (`D:\\`) est
+    doublée, sinon elle échapperait le guillemet."""
+    text = str(path)
+    return f'"{text}\\"' if text.endswith("\\") else f'"{text}"'
+
+
 def task_arguments(wow_dir: Path, cache_dir: Path) -> str:
-    return f'-m forever.bridge.autostart --wow-dir "{wow_dir}" --cache-dir "{cache_dir}"'
+    return f"-m forever.bridge.autostart --wow-dir {_quoted(wow_dir)} --cache-dir {_quoted(cache_dir)}"
 
 
 def task_xml(*, user: str, pythonw: Path, repo: Path, wow_dir: Path, cache_dir: Path) -> str:
@@ -247,6 +254,22 @@ def request_stop(cache_dir: Path) -> None:
     path.write_text(format_utc(datetime.now(UTC)), encoding="utf-8")
 
 
+def stop_supervisor(
+    cache_dir: Path, *, sleep: Callable[[float], None] = time.sleep, timeout_s: float = CHECK_S + 10
+) -> bool:
+    """Arrête la surveillance en marche (marqueur) et attend sa sortie ; vrai si plus aucune ne tourne."""
+    if supervisor_pid(cache_dir) is None:
+        return True
+    request_stop(cache_dir)
+    waited = 0.0
+    while waited < timeout_s:
+        sleep(0.5)
+        waited += 0.5
+        if supervisor_pid(cache_dir) is None:
+            return True
+    return False
+
+
 def launch_bridge(wow_dir: Path, cache_dir: Path, now: datetime, model: str | None = None) -> Path:
     """Lance le pont détaché avec le vrai interpréteur (`forever bridge start` et la surveillance) ; rend le journal
     du lancement. Lève OSError si le lancement échoue."""
@@ -274,14 +297,21 @@ def supervise(
     pid = os.getpid() if pid is None else pid
     home = cache_dir / "bridge"
     home.mkdir(parents=True, exist_ok=True)
-    other = supervisor_pid(cache_dir, alive)
-    if other is not None and other != pid:
-        return 0
     marker, state = home / STOP_MARKER, home / STATE
+    other = supervisor_pid(cache_dir, alive)
+    waited = 0.0
+    while other is not None and other != pid and marker.exists() and waited < CHECK_S + 5:
+        sleep(1.0)  # surveillance précédente en train de s'arrêter (`remove` ou `stop` juste avant)
+        waited += 1.0
+        other = supervisor_pid(cache_dir, alive)
+    if other is not None and other != pid:
+        journal.write("autostart_skip", reason=f"surveillance déjà en marche (pid {other})")
+        return 0
     marker.unlink(missing_ok=True)  # demande laissée par la session précédente
     state.write_text(json.dumps({"pid": pid, "started_at": format_utc(journal.now())}), encoding="utf-8")
     journal.write("autostart_start", pid=pid)
     last_launch: float | None = None
+    watching_lock = False
     since: float | None = None  # pont vu en marche depuis
     watching = False  # un pont tourne (ou vient d'être lancé) : sa mort sera notée
     failures = 0
@@ -290,10 +320,13 @@ def supervise(
         while True:
             if marker.exists():
                 marker.unlink(missing_ok=True)
+                if not watching_lock and last_launch is not None and clock() - last_launch < FAST_DEATH_S:
+                    _stop_starting_bridge(cache_dir, alive, sleep)  # lancé juste avant le `stop`, sans verrou encore
                 journal.write("autostart_stop", reason="arrêt demandé (forever bridge stop ou autostart remove)")
                 return 0
             now = clock()
-            if _bridge_running(cache_dir, alive):
+            watching_lock = _bridge_running(cache_dir, alive)
+            if watching_lock:
                 since = now if since is None else since
                 if now - since >= FAST_DEATH_S:
                     failures = 0
@@ -321,6 +354,18 @@ def supervise(
         doc = _read_json(state)
         if isinstance(doc, dict) and doc.get("pid") == pid:
             state.unlink(missing_ok=True)
+
+
+def _stop_starting_bridge(
+    cache_dir: Path, alive: Callable[[object], bool | None] | None, sleep: Callable[[float], None]
+) -> None:
+    """Pont lancé par la surveillance mais pas encore en possession du verrou quand l'arrêt arrive : on attend qu'il
+    le prenne (30 s au plus), puis on pose son fichier d'arrêt (obéi : posé après la prise du verrou)."""
+    for _ in range(30):
+        if _bridge_running(cache_dir, alive):
+            (cache_dir / "bridge" / "stop").write_text("", encoding="utf-8")
+            return
+        sleep(1.0)
 
 
 def main(argv: list[str] | None = None) -> int:

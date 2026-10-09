@@ -354,10 +354,18 @@ class Bridge:
         self._read_outboxes()
         self._dispatch()
 
-    def run(self, stop_file: Path, *, sleep: Callable[[float], None] = time.sleep, interval_s: float = 0.25) -> int:
+    def run(
+        self,
+        stop_file: Path,
+        *,
+        sleep: Callable[[float], None] = time.sleep,
+        interval_s: float = 0.25,
+        started: float | None = None,
+    ) -> int:
         """Boucle jusqu'au fichier d'arrêt (`forever bridge stop`) ; rend 0. Un fichier d'arrêt plus ancien que le
-        lancement (posé quand aucun pont ne tournait) est effacé, jamais obéi."""
-        started = time.time()
+        lancement (`started`, défaut : maintenant ; la CLI donne l'heure d'avant la prise du verrou : un `stop` posé
+        pendant la préparation est obéi) est effacé, jamais obéi."""
+        started = time.time() if started is None else started
         stale = False
         try:
             stale = stop_file.stat().st_mtime < started

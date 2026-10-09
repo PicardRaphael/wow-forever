@@ -438,3 +438,95 @@ def test_supervisor_ignores_a_lock_whose_pid_was_reused(tmp_path, monkeypatch):
     autostart.supervise(tmp_path, lambda: launches.append(1), journal=journal, sleep=sleep, pid=999)
     assert launches == [1]
     assert loop.acquire_lock(tmp_path, datetime(2026, 10, 10, 8, 1, tzinfo=UTC), pid=777)  # le pont le reprend
+
+
+# --- Retours de la relecture ---------------------------------------------------------------------------------------
+
+
+def test_an_inaccessible_pid_is_not_ours():
+    """Après un redémarrage, l'ancien pid peut appartenir à un processus du système, qu'on ne peut pas ouvrir : ce
+    n'est ni le pont ni la surveillance (lancés sous l'utilisateur, toujours lisibles)."""
+    from forever.bridge.lock import pid_reused
+
+    def denied(pid):
+        raise PermissionError(pid)
+
+    assert pid_reused({"pid": 4, "started_at": "2026-10-09T18:00:00Z"}, created=denied) is True
+
+
+def test_a_dead_lock_is_taken_by_one_bridge_only(tmp_path):
+    from datetime import UTC, datetime
+
+    now = datetime(2026, 10, 9, 18, 0, tzinfo=UTC)
+    hold_lock(tmp_path, 4242)  # pont mort
+    assert loop.acquire_lock(tmp_path, now, pid=1, alive=lambda pid: pid == 1)
+    assert not loop.acquire_lock(tmp_path, now, pid=2, alive=lambda pid: pid in (1, 2))
+    assert json.loads(loop.lock_path(tmp_path).read_text(encoding="utf-8"))["pid"] == 1
+    assert loop.acquire_lock(tmp_path, now, pid=1, alive=lambda pid: True)  # le même pont : gardé
+
+
+def test_a_new_supervisor_waits_for_the_one_being_stopped(tmp_path):
+    """`autostart remove` ou `bridge stop`, puis `autostart install` dans les 15 s : la nouvelle surveillance attend
+    que l'ancienne sorte, au lieu de sortir elle-même et de laisser la session sans pont."""
+    state = tmp_path / "bridge" / autostart.STATE
+    state.parent.mkdir(parents=True)
+    state.write_text(json.dumps({"pid": 4242}), encoding="utf-8")
+    autostart.request_stop(tmp_path)
+    gone = []
+
+    def world(n, clock):
+        if n == 3:
+            gone.append(1)  # l'ancienne surveillance est sortie
+        if n == 6:
+            autostart.request_stop(tmp_path)
+
+    code, launches = supervise(tmp_path, world, alive=lambda pid: pid == 999 or (pid == 4242 and not gone))
+    assert code == 0 and len(launches) == 1
+
+
+def test_a_second_supervisor_says_why_it_exits(tmp_path):
+    state = tmp_path / "bridge" / autostart.STATE
+    state.parent.mkdir(parents=True)
+    state.write_text(json.dumps({"pid": 4242}), encoding="utf-8")
+    supervise(tmp_path, lambda n, c: None)
+    assert [e["event"] for e in events(tmp_path)] == ["autostart_skip"]
+
+
+def test_stop_while_a_bridge_is_starting_stops_it_too(tmp_path):
+    """`bridge stop` entre le lancement d'un pont par la surveillance et sa prise du verrou : la surveillance attend
+    le verrou et pose le fichier d'arrêt du pont qu'elle vient de lancer."""
+
+    def world(n, clock):
+        if n == 1:
+            autostart.request_stop(tmp_path)  # « aucun pont ne tourne » : le pont lancé n'a pas encore le verrou
+        if n == 3:
+            hold_lock(tmp_path, 4242)
+
+    _, launches = supervise(tmp_path, world)
+    assert launches == [0.0] and (tmp_path / "bridge" / "stop").exists()
+
+
+def test_a_drive_root_is_quoted_without_escaping_the_quote():
+    args = autostart.task_arguments(Path("D:\\"), CACHE)
+    assert args.startswith('-m forever.bridge.autostart --wow-dir "D:\\\\" --cache-dir')
+
+
+def test_a_stop_file_written_after_the_lock_is_obeyed(tmp_path):
+    """Le fichier d'arrêt posé pendant la préparation du pont (verrou pris, boucle pas encore démarrée) est obéi."""
+    import time
+
+    from test_bridge_loop import FakeAgent, FakeCapture, make
+
+    bridge, _, _ = make(tmp_path, FakeCapture(), FakeAgent())
+    launched = time.time() - 5
+    stop = tmp_path / "stop"
+    stop.write_text("", encoding="utf-8")
+    assert bridge.run(stop, sleep=lambda s: None, started=launched) == 0
+    assert not stop.exists() and [e["event"] for e in events_of(tmp_path)][-1] == "stop"
+
+
+def events_of(folder):
+    out = []
+    for path in sorted((folder / "journal").glob("*.jsonl")):
+        out += [json.loads(line) for line in path.read_text(encoding="utf-8").splitlines()]
+    return out

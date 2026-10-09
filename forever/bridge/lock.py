@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import json
 import os
+import time
 from collections.abc import Callable
 from datetime import datetime
 from pathlib import Path
@@ -37,9 +38,10 @@ def lock_holder(cache_dir: Path, alive: Callable[[object], bool | None] | None =
 
 
 def pid_reused(doc: Any, created: Callable[[object], float | None] | None = None) -> bool:
-    """Vrai si le processus qui porte aujourd'hui le pid de `doc` a été créé après `doc["started_at"]` : le
-    propriétaire est mort (PC arrêté brutalement) et Windows a donné son pid à un autre processus. Faux si on ne peut
-    pas le savoir (heure absente ou illisible)."""
+    """Vrai si le pid de `doc` appartient aujourd'hui à un autre processus : créé après `doc["started_at"]`, ou
+    inaccessible (processus du système ou d'un autre compte ; le pont et la surveillance tournent sous l'utilisateur
+    et s'ouvrent toujours en lecture limitée). Cas : PC arrêté pendant que le pont tournait, verrou resté sur le
+    disque, pid redonné à la session suivante. Faux si on ne peut pas le savoir (heure absente ou illisible)."""
     if not isinstance(doc, dict):
         return False
     try:
@@ -50,7 +52,10 @@ def pid_reused(doc: Any, created: Callable[[object], float | None] | None = None
         from forever import spawn
 
         created = spawn.process_created
-    born = created(doc.get("pid"))
+    try:
+        born = created(doc.get("pid"))
+    except PermissionError:
+        return True
     return born is not None and born > started + REUSE_SLACK_S
 
 
@@ -64,20 +69,44 @@ def acquire_lock(
     path.parent.mkdir(parents=True, exist_ok=True)
     stamp = format_utc(now)
     text = json.dumps({"pid": pid, "started_at": stamp, "seen_at": stamp})
+    for _ in range(5):
+        try:
+            with path.open("x", encoding="utf-8") as f:
+                f.write(text)
+            return True
+        except FileExistsError:
+            pass
+        doc = lock_info(cache_dir)
+        if doc is None and _fresh(path):
+            return False  # verrou en cours d'écriture par un autre pont
+        holder = lock_holder(cache_dir, alive)
+        reused = alive is None and pid_reused(doc)  # vérifié seulement avec les vrais processus
+        if holder == pid:
+            _write_atomic(path, text)
+            return True
+        if holder is not None and not reused:
+            return False
+        # verrou mort : renommé (un seul des ponts qui le reprennent y parvient), puis nouvelle création exclusive
+        try:
+            stale = path.with_name(f"{path.name}.{pid}.stale")
+            os.replace(path, stale)
+            stale.unlink(missing_ok=True)
+        except OSError:
+            pass
+    return False
+
+
+def _fresh(path: Path, seconds: float = 5.0) -> bool:
     try:
-        with path.open("x", encoding="utf-8") as f:
-            f.write(text)
-        return True
-    except FileExistsError:
-        pass
-    holder = lock_holder(cache_dir, alive)
-    reused = alive is None and pid_reused(lock_info(cache_dir))  # vérifié seulement avec les vrais processus
-    if holder is not None and holder != pid and not reused:
+        return time.time() - path.stat().st_mtime < seconds
+    except OSError:
         return False
-    tmp = path.with_name(f"{path.name}.{pid}.tmp")
+
+
+def _write_atomic(path: Path, text: str) -> None:
+    tmp = path.with_name(f"{path.name}.{os.getpid()}.tmp")
     tmp.write_text(text, encoding="utf-8")
     os.replace(tmp, path)
-    return True
 
 
 def touch_lock(cache_dir: Path, now: datetime, *, pid: int) -> None:

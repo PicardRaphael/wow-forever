@@ -151,8 +151,9 @@ def pid_alive(pid: object) -> bool | None:
 
 def process_created(pid: object) -> float | None:
     """Heure de création du processus `pid` (secondes depuis 1970), ou None si on ne peut pas la lire (hors de
-    Windows, processus mort ou inaccessible). Sert à reconnaître un pid repris par un autre processus après un
-    redémarrage du PC (verrou du pont et surveillance, décision 226)."""
+    Windows, processus mort) ; PermissionError si le processus existe mais refuse même la lecture limitée (processus
+    d'un autre compte ou du système : jamais le pont ni la surveillance, qui tournent sous l'utilisateur). Sert à
+    reconnaître un pid repris par un autre processus après un redémarrage du PC (décision 226)."""
     if sys.platform != "win32" or not isinstance(pid, int) or isinstance(pid, bool) or pid <= 0:
         return None
     import ctypes
@@ -165,6 +166,8 @@ def process_created(pid: object) -> float | None:
     kernel32.CloseHandle.argtypes = (wintypes.HANDLE,)
     handle = kernel32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
     if not handle:
+        if ctypes.get_last_error() == _ERROR_ACCESS_DENIED:
+            raise PermissionError(f"processus {pid} inaccessible")
         return None
     try:
         times = [wintypes.FILETIME() for _ in range(4)]

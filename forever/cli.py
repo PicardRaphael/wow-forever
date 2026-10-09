@@ -2465,6 +2465,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
 
     faulthandler.enable()  # erreur fatale de l'interpréteur écrite dans le journal du lancement (sonde F)
     pid = os.getpid()
+    launched = time.time()  # avant le verrou : un `stop` posé dès que le verrou est pris sera obéi
     if not loop.acquire_lock(deps.cache_dir, deps.now(), pid=pid):
         holder = loop.lock_holder(deps.cache_dir)
         raise BridgeRunningError(holder or 0)
@@ -2534,7 +2535,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
         )
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
-        return bridge.run(deps.cache_dir / "bridge" / "stop")
+        return bridge.run(deps.cache_dir / "bridge" / "stop", started=launched)
     finally:
         loop.release_lock(deps.cache_dir, pid=pid)
 
@@ -2591,21 +2592,26 @@ def _bridge_autostart(deps: Deps, args: argparse.Namespace, provenance: Provenan
         )
     name = autostart.TASK_NAME
     if args.autostart_command == "install":
-        wow = _bridge_wow_dir(deps, args)
+        wow = Path(os.path.abspath(_bridge_wow_dir(deps, args)))
+        cache = Path(os.path.abspath(deps.cache_dir))
         pythonw = autostart.base_pythonw()
         if not pythonw.is_file():
             raise InvalidArgumentError(
                 f"Interpréteur sans fenêtre introuvable : {pythonw}.", "réinstaller Python avec pythonw.exe"
             )
         user = autostart.current_user()
-        xml = autostart.task_xml(user=user, pythonw=pythonw, repo=REPO_ROOT, wow_dir=wow, cache_dir=deps.cache_dir)
+        xml = autostart.task_xml(user=user, pythonw=pythonw, repo=REPO_ROOT, wow_dir=wow, cache_dir=cache)
         path = deps.cache_dir / "bridge" / "autostart-task.xml"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(xml, encoding="utf-16")  # schtasks /XML : UTF-16 avec BOM
+        if not args.no_start and not autostart.stop_supervisor(deps.cache_dir):
+            raise InvalidArgumentError(
+                "La surveillance en marche ne s'est pas arrêtée.", "relancer forever bridge autostart install"
+            )  # sinon `/Run` serait ignoré (une seule instance) et la nouvelle tâche ne servirait qu'à la session suivante
         autostart.install(path, start=not args.no_start)
         lines = [
             f"Tâche « {name} » créée : à chaque ouverture de session de {user}, sans droits administrateur.",
-            f"  surveillance : {pythonw} {autostart.task_arguments(wow, deps.cache_dir)}",
+            f"  surveillance : {pythonw} {autostart.task_arguments(wow, cache)}",
             "  le pont est relancé s'il s'arrête ; forever bridge stop l'arrête jusqu'à la prochaine session.",
         ]
         if args.no_start:
