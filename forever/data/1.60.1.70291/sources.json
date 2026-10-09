@@ -1,0 +1,870 @@
+{
+  "schema_version": 1,
+  "game_version": "1.60.1.70291",
+  "product": "wow_classic_beta",
+  "version_prefix": "1.60.",
+  "collected_at": "2026-10-09",
+  "certainty_mapping": {
+    "FC": "certain",
+    "FS": "probable",
+    "PC": "suppose",
+    "EST": "suppose"
+  },
+  "files": {
+    "spells.json": {
+      "source": "Client 1.60.1.70291 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-10-09)",
+      "certainty": "certain",
+      "field_certainty": {
+        "projectile_speed": "suppose"
+      },
+      "field_notes": {
+        "mana": "mana : SpellPower.ManaCost du client ; null pour arcane_blast : coût en part du mana de base (mana_pct_base, SpellPower.PowerCostPct)",
+        "projectile_speed": "vitesse de projectile estimée (EST), à calibrer"
+      },
+      "notes": [
+        "min et max des rangs issus d'un talent lus au niveau de base du sort (convention de la décision 39)",
+        "copie figée du seed : _seed_spells.json"
+      ]
+    },
+    "talents.json": {
+      "source": "Client 1.60.1.70291 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-10-09)",
+      "certainty": "certain",
+      "notes": [
+        "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
+        "desc : gabarit du dépôt ({i}) ; gabarit brut et identifiants de sort du client dans source",
+        "certitude par talent FC-70291 ; copie figée du seed : _seed_talents.json"
+      ]
+    },
+    "leveling.json": {
+      "source": "Tables d'XP Classic et modèles de monstres et de joueur (voir les champs du fichier)",
+      "certainty": "suppose",
+      "field_certainty": {
+        "combat_rules.gcd": "suppose",
+        "combat_rules.spell_miss_by_level_diff": "suppose",
+        "combat_rules.min_miss": "suppose",
+        "combat_rules.crit_mult_spell": "suppose",
+        "combat_rules.dot_can_crit": "suppose"
+      },
+      "field_notes": {
+        "combat_rules.gcd": "temps de recharge global, règle Classic (PC) : seed/forever-mage/references/mechanics.md",
+        "combat_rules.spell_miss_by_level_diff": "raté des sorts selon l'écart de niveau, règle Classic (PC) : references/mechanics.md",
+        "combat_rules.min_miss": "plancher de raté des sorts, règle Classic (PC) : references/mechanics.md",
+        "combat_rules.crit_mult_spell": "multiplicateur de critique des sorts (FC) : references/mechanics.md",
+        "combat_rules.dot_can_crit": "les effets sur la durée critiquent dans Forever (FS/FC) : references/mechanics.md"
+      },
+      "notes": [
+        "certitude mixte (FC, PC, EST) : la plus basse est retenue ; modèles à calibrer",
+        "hérité de 1.60.1.70009",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "mechanics.json": {
+      "source": "Constantes de seed/forever-mage/scripts/fm.py absentes des tables (portage T02) ; statuts FC/FS/PC/EST de fm.py et de references/mechanics.md",
+      "certainty": "suppose",
+      "notes": [
+        "certitude par entrée dans le champ certainty ; identifiant du registre des mécaniques dans le champ registry",
+        "hérité de 1.60.1.70009",
+        "hérité de 1.60.1.70124",
+        "révision 3 de 1.60.1.70170 (2026-10-02) : coefficient.low_level_default passe à probable (existence de la pénalité confirmée par la note officielle du 1er octobre 2026) ; la formule coefficient.low_level reste suppose",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "respec.json": {
+      "source": "Observations de la bêta et barème Classic (voir le champ sources du fichier)",
+      "certainty": "suppose",
+      "notes": [
+        "règle Classic supposée inchangée (PC)",
+        "lu par forever/gamedata.py depuis T05 (barème classic_schedule_gold) ; certitude du vocabulaire du seed PC traduite : deux premiers paliers observés (probable, respec.beta_observed_resets), suivants supposés",
+        "hérité de 1.60.1.70009",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "meta.json": {
+      "source": "Métadonnées de collecte du seed forever-mage",
+      "certainty": "certain",
+      "notes": [
+        "ne décrit pas le jeu : liste des sources et légende des certitudes",
+        "hérité de 1.60.1.70009",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "_source_gunba_mage_tree.json": {
+      "source": "https://raw.githubusercontent.com/gunba/wow-forever-sim/master/ui/core/talents/trees/mage.json (MIT)",
+      "certainty": "probable",
+      "notes": [
+        "copie brute de l'arbre open source ayant servi à construire talents.json"
+      ]
+    },
+    "overrides.json": {
+      "source": "Corrections manuelles relevées sur https://foreverchanges.pro/talents/mage",
+      "certainty": "certain",
+      "notes": [
+        "corrections de rangs lues sur le build 1.60.1.70009 (FC)",
+        "hérité de 1.60.1.70009",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "decode_rules.json": {
+      "source": "Inventaire des tables du client 1.60.1.70009 (https://wago.tools/db2/<Table>/csv?build=1.60.1.70009, collecte du 2026-09-27) et docs/DATA_SOURCES.md ; voir tasks/T03-inventaire.md",
+      "certainty": "certain",
+      "notes": [
+        "règles de lecture des tables (géométrie, lignes de compétence, identifiants d'effet) ; ne décrit pas une règle de combat",
+        "levels : convention d'évaluation des infobulles (niveau de base pour les talents, min(MaxLevel, 60) pour les rangs de sort), à ratifier (docs/OPEN_QUESTIONS.md)",
+        "hérité de 1.60.1.70009",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "confirmed_changes.json": {
+      "source": "Écarts entre le décodage du client 1.60.1.70009 et talents.json / spells.json, tranchés par l'utilisateur (T03)",
+      "certainty": "certain",
+      "notes": [
+        "15 écarts tranchés le 2026-09-27 (tasks/T03-ecarts.md), avec leur nature (client, format, convention) ; appliqués aux données par l'installation (T08)"
+      ]
+    },
+    "monsters.json": {
+      "source": "Journaux de combat du client (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt, WoWCombatLog-092726_174130.txt, WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt, WoWCombatLog-100726_080346.txt, PV max du bloc avancé) ; valeurs en regard et agrégat des niveaux non observés : communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27 ; table écrite par forever measures refresh le 2026-10-07 (--fit-exclude 2163, 2165, 2165, 3292, 3438, 3467, 3584, 3664, 3727, 3809, 3809, 3819, 3819, 3846, 3944, 3986, 5676, 5677, 6466, 6494, 12717, 12940)",
+      "certainty": "suppose",
+      "field_certainty": {
+        "npcs": "certain",
+        "hp_by_level": "suppose",
+        "questie_correction": "probable"
+      },
+      "notes": [
+        "certitude par entrée dans le champ certainty (journal certain, Questie suppose) : la plus basse est retenue pour le fichier",
+        "collecté le 2026-09-27 ; les données communautaires ne remplacent jamais une mesure",
+        "hérité de 1.60.1.70009",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "spell_scaling.json": {
+      "source": "Client 1.60.1.70291 : points de base par niveau, tables du client 1.60.1.70291 (wago.tools, 1.60.1.70291) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "MaxLevel 0 résolu au plafond de niveau (decode_rules.json)",
+        "utility : armures du Mage, niveau d'apprentissage et effets (decode_rules.json.utility_spells)",
+        "talent_cooldowns : recharges des talents actifs (decode_rules.json.talent_cooldowns)"
+      ]
+    },
+    "_seed_talents.json": {
+      "source": "seed/forever-mage/data/1.60.1.70009/talents.json (copie octet pour octet, T06b)",
+      "certainty": "probable",
+      "notes": [
+        "copie figée du seed, lue par le mode seed seulement (build_game_data(rules=\"seed\"), décision D2 du plan T06b)",
+        "le mode forever lit talents.json"
+      ]
+    },
+    "_seed_spells.json": {
+      "source": "seed/forever-mage/data/1.60.1.70009/spells.json (copie octet pour octet, T06b)",
+      "certainty": "certain",
+      "notes": [
+        "copie figée du seed, lue par le mode seed seulement (build_game_data(rules=\"seed\"), décision D2 du plan T06b)",
+        "le mode forever lit spells.json"
+      ]
+    },
+    "revisions.json": {
+      "source": "forever install : journal des révisions de la version (motif, commande, rapport, valeurs changées)",
+      "certainty": "certain",
+      "notes": [
+        "chaque valeur changée porte sa source et sa certitude (champs source et certainty)"
+      ]
+    },
+    "classes.json": {
+      "source": "Client 1.60.1.70291 : tables du client 1.60.1.70291 (wago.tools, 1.60.1.70291) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
+        "classement PvP : table de decode_rules.json, certitude probable"
+      ]
+    },
+    "races.json": {
+      "source": "Client 1.60.1.70291 : tables du client 1.60.1.70291 (wago.tools, 1.60.1.70291) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "races jouables, classes permises et raciaux (decode_rules.json, racial_skill_lines)",
+        "classement PvP : table de decode_rules.json, certitude probable"
+      ]
+    },
+    "pvp_items.json": {
+      "source": "Client 1.60.1.70291 : tables du client 1.60.1.70291 (wago.tools, 1.60.1.70291) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "bijoux dont le sort d'utilisation rompt un contrôle (decode_rules.json, pvp_trinkets)",
+        "classement PvP : table de decode_rules.json, certitude probable"
+      ]
+    },
+    "_seed_racials.json": {
+      "source": "https://foreverchanges.pro/fr/racials (client 1.60.1.70009) + Icy Veins / AOEAH pour les recharges",
+      "certainty": "suppose",
+      "notes": [
+        "certitude mixte (FC et PC) : la plus basse est retenue ; détail par entrée dans le fichier",
+        "hérité de 1.60.1.70009",
+        "copie figée de racials.json (retired_files de decode_rules.json)",
+        "installé en révision 2 (forever install, 2026-09-30)",
+        "copie figée du relevé communautaire de 1.60.1.70009 (racials.json), reportée à la révision 2",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "pvp_rules.json": {
+      "source": "Règles serveur des rendements décroissants de WoW Classic (1.12) : émulateur vmangos, forum Blizzard (2019), liste « Not a Bug » de Classic, wiki communautaire ; aucune annonce de WoW Forever à ce sujet au 2026-09-30 (notes de la bêta du 2026-09-24). Recherche du sous-agent forever-web-researcher du 2026-09-30, autorisée par l'utilisateur (PV1, D3).",
+      "certainty": "suppose",
+      "notes": [
+        "PV1, bloc C : règles du serveur de Classic (paliers, fenêtre, plafond) et noms des catégories ; catégorie de chaque sort lue dans le client (classes.json) ; à mesurer en PV2 (docs/research/pvp-dr-protocole.md)",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "origins.json": {
+      "source": "Écrit à la main (T08b, bloc H, D4) : origine déclarée de chaque valeur des fichiers de la version",
+      "certainty": "certain",
+      "notes": [
+        "ne décrit pas le jeu : règles d'origine (client, journal, addon, manuel, copie_figee, parametre), contrôlées par uv run tasks.py verify (étape origins)",
+        "hérité d'une version à l'autre et complété par le décodage",
+        "hérité de 1.60.1.70124",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    },
+    "character_scaling.json": {
+      "source": "Client 1.60.1.70291 : tables du client 1.60.1.70291 (wago.tools, 1.60.1.70291) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "ratios du personnage par classe et par niveau, XP, repos, constante d'armure, courbes de régénération (decode_rules.json, character_scaling) ; recoupement par les GameTables dans crosscheck",
+        "PV par Endurance et constante d'armure : sens ou usage par le serveur probable"
+      ]
+    },
+    "pets.json": {
+      "source": "Client 1.60.1.70291 : tables du client 1.60.1.70291 (wago.tools, 1.60.1.70291) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "familles du Chasseur, capacités et rangs, bonus de famille, régimes, cartes (decode_rules.json, pets) ; écarts internes au client dans observations",
+        "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits du masque) et effets de Hunter Pet Scaling : sens probable"
+      ]
+    },
+    "pet_rules.json": {
+      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua, base du 2026-09-25) : relevés de joueurs de la bêta, une source par section ; une règle de Classic (manuel) ; une règle tirée des notes officielles de Blizzard (tame.level_margin, probable, révision 6) ; un correctif officiel daté (official_fixes : rangs enseignés par les bêtes, probable, révision 3 de 1.60.1.70170)",
+      "certainty": "suppose",
+      "notes": [
+        "ajouté à la main en révision 5 (CH0, accord de l'utilisateur du 2026-10-01) ; forever install ne l'écrit pas",
+        "chaque règle porte sa source, sa date, sa certitude et son entrée du registre (L1 à L13)",
+        "relecture à chaque changement de Forever Bestiary (forever addons status)",
+        "révision 6 (2026-10-02) : tame.level_margin à 0, source la note officielle du 24 septembre 2026 révisée le 1er octobre (probable), à la main",
+        "hérité de 1.60.1.70124",
+        "révision 3 de 1.60.1.70170 (2026-10-02) : correctif officiel des rangs enseignés par les bêtes (note du 1er octobre 2026, message n° 4, révision 4), à la main ; le guide le signale quand la base de Forever Bestiary est antérieure",
+        "hérité de 1.60.1.70170",
+        "hérité de 1.60.1.70245"
+      ],
+      "inherited_from": "1.60.1.70245"
+    }
+  },
+  "revision": 1,
+  "revised_at": "2026-10-09",
+  "hotfixes": {
+    "dbcache": {
+      "file": "Cache/ADB/enUS/DBCache.bin",
+      "locale": "enUS",
+      "format": 9,
+      "build": 70291,
+      "size": 3061653,
+      "sha256": "b9117391532f1776c18378c94aa279ba8c225c40ea12ba472461bf6b32306a2f",
+      "file_date": "2026-10-09T10:16:24Z",
+      "read_at": "2026-10-09T11:17:30Z"
+    },
+    "dbd": {
+      "repo": "wowdev/WoWDBDefs",
+      "commit": "9073201543de7fd0af41ed42042b8d32c3f52938",
+      "files": {
+        "CharBaseInfo": "33b057e7e1c04f5f65da22db9f01f056ab55a991c085c4d95ed2a7b8bd34d22c",
+        "ChrClasses": "d58ae40862a0d09239c08b88229ae7887ced547df15e45729d3fd5e6a5cbb9f3",
+        "ChrRaces": "12c218157104fb49d49bc1a98bdd732fc9cfb1c6b1cce0e657a268a1235f8d2a",
+        "CreatureFamily": "dce96103f6e824f512996385f7412c077b8c578eb73bdb9d640784123170967b",
+        "Curve": "ebed9ccfc289559d3ce01a044387abc6902bb81303ecdd585fa5b4f73739a103",
+        "CurvePoint": "c69b6d3da50f15b09a7961f5affacf856c6d9073319721c4bf0c1cabc0f49b18",
+        "Exhaustion": "7f2c17a4da03d0326bc0bb07d14647d3f9e1ea3d181b27fa694ed381bde8efaa",
+        "ExpectedStat": "e79deebb7a5c3826abbda74cd6358b56a85dd08fd9d1ab38f7e4e87feb750119",
+        "GlobalCurve": "a813b49305da02185becfd351861d393470cbfb7dabe0ee14054d06d35c9c8d1",
+        "Item": "87ac1dbf8d87ab39f51fb1b700e33ea8eb91efdd55c45c44ef5393456c508319",
+        "ItemEffect": "0dbe09e0f6b75d236e980bf44db82f263b416fc1ca7acf69ea965665f19db20d",
+        "ItemPetFood": "7cde6e5e5bb7459eff9d79a0548be7e1c5f26da69a107fdd6a6fdfb5badc5e21",
+        "ItemSparse": "62aa3cfa6a7738bd7a6dc0281fced9e99e0dec5b2deffb2bc664ffc6762bf5f5",
+        "ItemXItemEffect": "5ab96ab0086938a9f71dde77b35366de7b7c13f8535a03c002fe0b2993a909c6",
+        "LevelExperience": "d9b32d33f90badfee006108daa90a237d14b36f70820f592106ecc3f2c4c4bf6",
+        "NumTalentsAtLevel": "2e372b3d161636e1e4b6c31591ba9f77febcb84cde5736abf983866aa83897ae",
+        "PlayerExpectedStat": "a0705b7e91d20411e101906d2094f1c75b130bdf0e6fba888adf6cee31478b58",
+        "SkillLine": "524654de6f51b44ac18462e8fd93a0902e6c8ef83209d18e57b378eca94c6c3f",
+        "SkillLineAbility": "a756a777f05c660790cde7511935a93c802dc9837a450c4a3ef16db4431f9be0",
+        "SkillLineXTraitTree": "82a54c5595b7c83795fef179310cacdf52fddce810ae1110e0c930f4765a8149",
+        "SkillRaceClassInfo": "15cdb7d776ef2cc642834ff6c1db6cc2279abd1d41a3362b35a817308ae27a37",
+        "Spell": "f193097420f0af4425e985fc43e7fbea41a27cce1d8c16cee5d2189f5c55a7e3",
+        "SpellAuraOptions": "a8c2933e11fb264e1ceb65d3dab235b4f92efc5daf05d5d138c1a6b432edec79",
+        "SpellAuraRestrictions": "3495dd83f75b8f294c437ebbe1ca9cf5a657e767301603220cbfa96e7fdcfd27",
+        "SpellCastTimes": "28b7ab63134174dcf47ec0ac019ed7ece2b996ee5e59b215c086f6ec954be41b",
+        "SpellCategories": "0d62e41017c1afa16c7c1e50eeb3c7f6a8c7b16672384451c9c47e9f60e0bd65",
+        "SpellCategory": "98df0e5139699d7dbf7fcad68e1dd41ff68265e04a2d352a2a423859e0628e04",
+        "SpellClassOptions": "5ad58d4947b80efabeab806d0ce775297696dcdef2f4f39d1b1e8283c23f1890",
+        "SpellCooldowns": "c7d0fa4e415ff192719c1be5e1a89c01499e970f1102a9d51ba0c8366dc6d392",
+        "SpellDispelType": "2d67f8aea7935167f4d69399ae627785e439d90d03aa1a3c5561db84b1ce486d",
+        "SpellDuration": "f40027fe0ccfd01a56229bf31a216ef645b0a328faa1800937da51d851272677",
+        "SpellEffect": "3dae4e2aa30348b91b0dfb585695aa92eecbcfa439d75704ad5dc318866c3f5a",
+        "SpellInterrupts": "a66dee2e3fdbef2ac461c1e818888d728f57c6d2a9b72142a2a34543b7c9e509",
+        "SpellLevels": "8b16890313d310ec969cb1499d44f542461893d4acbf79c6674e90dd923a1c99",
+        "SpellMechanic": "4a6a91a524089e6f74130bd42e61015c98cf97754eaa8f4814237d8da191e64d",
+        "SpellMisc": "02d36da7a2c15d56f3d35bd070be9acdcf15f882404e72f8b8dddf66bb28bc97",
+        "SpellName": "f5950be714ac8005066ecf5cc0e0a2b5178961228079b74a622fba332aa0f19d",
+        "SpellPower": "51ac2d27af97245886110cfc082272b0dc65b91b02877b4d60386b646fa564ac",
+        "SpellRange": "b06f5d2d5172b39ea66022be9f33bb101d6edca76e177130e2b13e21daae1e02",
+        "SpellShapeshift": "01c0329e6dffd1535891b49ee46c1c49feef5ee896fe763e2dea996426197cdb",
+        "TraitCond": "5f3aadd7434b4dfd9f963d1fd92ea0a43559dedf4cca2889b4b0b1841f6d3474",
+        "TraitDefinition": "ad7491c076513869dbfc70943a1249254447ad171ada3d53a955a2f65b7058c5",
+        "TraitDefinitionEffectPoints": "44bbaad441b6af095ce9407db5bc6d6e5eb82279d843ba08c8a623666c1ec880",
+        "TraitEdge": "f2d437ed89089cb37d66225c99bb8298323960de23d53001f8dbd406a1827403",
+        "TraitNode": "9349955258fff434773ad3aa1e57f16db028c58201f29ce3db1b2429a683a319",
+        "TraitNodeEntry": "9aa3606aa5e95fe34cdb5f7d91226b54a2549ae69a335e8a456f40e9dceaea95",
+        "TraitNodeGroupXTraitNode": "58ce6fcef04842584b2b1ad1e56c5cdf91729c1cffda5d08d196bb07f70dbbe2",
+        "TraitNodeXTraitNodeEntry": "9b3cfc7c698a410b09fa2d064135bf409f022e2a283395d4ed868ec97420cfe0",
+        "UiMap": "606505836526e68087d081a73448394276c7311f594294df6d2bf76cec5a4924"
+      }
+    },
+    "pushes": [
+      112444,
+      112469,
+      112486,
+      112504,
+      112513
+    ],
+    "max_push": 112513,
+    "seen_at": {
+      "112444": "2026-10-09T12:13:15.678",
+      "112469": "2026-10-09T12:13:15.678",
+      "112486": null,
+      "112504": "2026-10-09T12:13:15.678",
+      "112513": "2026-10-09T12:13:15.678"
+    },
+    "counts": {
+      "Item": {
+        "VALID": 15,
+        "DELETE": 0,
+        "identical": 15
+      },
+      "ItemSparse": {
+        "VALID": 15,
+        "DELETE": 0,
+        "identical": 15
+      },
+      "Spell": {
+        "VALID": 1,
+        "DELETE": 0,
+        "identical": 1
+      },
+      "SpellAuraOptions": {
+        "VALID": 1,
+        "DELETE": 1,
+        "identical": 1
+      },
+      "SpellEffect": {
+        "VALID": 5,
+        "DELETE": 0,
+        "identical": 3
+      },
+      "SpellMisc": {
+        "VALID": 3,
+        "DELETE": 0,
+        "identical": 2
+      },
+      "SpellName": {
+        "VALID": 1,
+        "DELETE": 0,
+        "identical": 1
+      }
+    },
+    "applied": [
+      {
+        "table": "Item",
+        "rec_id": 3463,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 6774,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 6789,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271794,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271795,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271796,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271797,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271798,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271799,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271800,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271801,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271802,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271803,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271804,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 271805,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 3463,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 6774,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 6789,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271794,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271795,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271796,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271797,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271798,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271799,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271800,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271801,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271802,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271803,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271804,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 271805,
+        "status": "VALID",
+        "push": 112504,
+        "unique_id": 2904880043,
+        "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 8913,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 122049,
+        "status": "DELETE",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": false
+      },
+      {
+        "table": "SpellAuraOptions",
+        "rec_id": 126928,
+        "status": "VALID",
+        "push": 112444,
+        "unique_id": 1077514211,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 686181,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 686182,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 686183,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1337938,
+        "status": "VALID",
+        "push": 112469,
+        "unique_id": 3464074444,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1349232,
+        "status": "VALID",
+        "push": 112469,
+        "unique_id": 3464074444,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 786136,
+        "status": "VALID",
+        "push": 112513,
+        "unique_id": 2935299656,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 786137,
+        "status": "VALID",
+        "push": 112513,
+        "unique_id": 2935299656,
+        "identical": true
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 862534,
+        "status": "VALID",
+        "push": 112469,
+        "unique_id": 3464074444,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 8913,
+        "status": "VALID",
+        "push": 112486,
+        "unique_id": 1014734777,
+        "identical": true
+      }
+    ],
+    "entities": 0,
+    "unattributed": [
+      "SpellAuraOptions 122049",
+      "SpellEffect 1337938",
+      "SpellEffect 1349232",
+      "SpellMisc 862534"
+    ],
+    "listed": {
+      "invalid": [],
+      "notpublic": [],
+      "dbreply": {
+        "ItemSparse": 997
+      },
+      "item_reply": {
+        "0x198e28b5": 4700,
+        "0x5481af88": 4700,
+        "0xb50ca635": 4700,
+        "0xce88edca": 4700,
+        "Item": 4700,
+        "ItemSparse": 4700
+      },
+      "unknown_hash": {
+        "0x01325ca0": 2,
+        "0x0f992211": 25,
+        "0x198e28b5": 15,
+        "0x3ac83109": 25,
+        "0x4553e9f7": 3,
+        "0x45952e6e": 1,
+        "0x5481af88": 15,
+        "0x61025756": 1,
+        "0xb50ca635": 15,
+        "0xb94c2807": 2,
+        "0xc9d6b6b3": 1,
+        "0xce88edca": 15,
+        "0xe064a75c": 1,
+        "0xe44abbd4": 1
+      },
+      "delete_absent": [
+        {
+          "table": "ItemEffect",
+          "rec_id": 231875,
+          "push": 112504
+        },
+        {
+          "table": "ItemXItemEffect",
+          "rec_id": 164057,
+          "push": 112504
+        }
+      ],
+      "unvalidated": {},
+      "not_loaded": {}
+    },
+    "checks": {
+      "Item": {
+        "ok": true,
+        "reason": "disposition 9A2A4834 validée : 15 entrée(s) décodée(s), 15 comparée(s), 100% des valeurs égales au build",
+        "decoded": 15,
+        "compared": 15,
+        "equal_ratio": 1.0,
+        "references_ok": null
+      },
+      "ItemEffect": {
+        "ok": true,
+        "reason": "disposition 4CA77678 validée : 0 entrée(s) décodée(s), 0 comparée(s)",
+        "decoded": 0,
+        "compared": 0,
+        "equal_ratio": null,
+        "references_ok": null
+      },
+      "ItemSparse": {
+        "ok": true,
+        "reason": "disposition 6FCC3191 validée : 15 entrée(s) décodée(s), 15 comparée(s), 99% des valeurs égales au build",
+        "decoded": 15,
+        "compared": 15,
+        "equal_ratio": 0.9851132686084142,
+        "references_ok": null
+      },
+      "ItemXItemEffect": {
+        "ok": true,
+        "reason": "disposition 96F083AD validée : 0 entrée(s) décodée(s), 0 comparée(s)",
+        "decoded": 0,
+        "compared": 0,
+        "equal_ratio": null,
+        "references_ok": null
+      },
+      "Spell": {
+        "ok": true,
+        "reason": "disposition E3D134FB validée : 1 entrée(s) décodée(s), 1 comparée(s), 100% des valeurs égales au build",
+        "decoded": 1,
+        "compared": 1,
+        "equal_ratio": 1.0,
+        "references_ok": null
+      },
+      "SpellAuraOptions": {
+        "ok": true,
+        "reason": "disposition 95F4D5E1 validée : 1 entrée(s) décodée(s), 1 comparée(s), 100% des valeurs égales au build, 1/1 références résolues",
+        "decoded": 1,
+        "compared": 1,
+        "equal_ratio": 1.0,
+        "references_ok": true
+      },
+      "SpellEffect": {
+        "ok": true,
+        "reason": "disposition 5362E3D4 validée : 5 entrée(s) décodée(s), 5 comparée(s), 97% des valeurs égales au build, 5/5 références résolues",
+        "decoded": 5,
+        "compared": 5,
+        "equal_ratio": 0.9666666666666667,
+        "references_ok": true
+      },
+      "SpellMisc": {
+        "ok": true,
+        "reason": "disposition 434B3607 validée : 3 entrée(s) décodée(s), 3 comparée(s), 97% des valeurs égales au build, 12/12 références résolues",
+        "decoded": 3,
+        "compared": 3,
+        "equal_ratio": 0.9696969696969697,
+        "references_ok": true
+      },
+      "SpellName": {
+        "ok": true,
+        "reason": "disposition 782EE721 validée : 1 entrée(s) décodée(s), 1 comparée(s), 100% des valeurs égales au build",
+        "decoded": 1,
+        "compared": 1,
+        "equal_ratio": 1.0,
+        "references_ok": null
+      }
+    }
+  }
+}

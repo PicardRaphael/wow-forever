@@ -1,0 +1,1727 @@
+{
+ "build": "1.60.1.70009",
+ "source": "Client Forever 1.60.1.70009 via wowforevertalents.com/abilities/mage (lu le 26/09/2026)",
+ "rank_format": [
+  "level",
+  "min",
+  "max",
+  "dot_total",
+  "dot_duration",
+  "cast_s",
+  "mana",
+  "cooldown_s"
+ ],
+ "note": "mana None = coût non publié pour le rang issu d'un talent (à relever en jeu). Vitesses de projectile : EST.",
+ "spells": {
+  "frostbolt": {
+   "school": "frost",
+   "range": 30,
+   "slow": 0.4,
+   "slow_dur": [
+    5,
+    6,
+    6,
+    7,
+    7,
+    8,
+    8,
+    9,
+    9,
+    9,
+    9
+   ],
+   "binary": true,
+   "projectile_speed": 28,
+   "ranks": [
+    [
+     4,
+     19,
+     21,
+     0,
+     0,
+     1.5,
+     25,
+     0
+    ],
+    [
+     8,
+     28,
+     32,
+     0,
+     0,
+     1.8,
+     35,
+     0
+    ],
+    [
+     14,
+     45,
+     51,
+     0,
+     0,
+     2.2,
+     50,
+     0
+    ],
+    [
+     20,
+     69,
+     77,
+     0,
+     0,
+     2.6,
+     65,
+     0
+    ],
+    [
+     26,
+     104,
+     114,
+     0,
+     0,
+     3.0,
+     100,
+     0
+    ],
+    [
+     32,
+     135,
+     147,
+     0,
+     0,
+     3.0,
+     130,
+     0
+    ],
+    [
+     38,
+     181,
+     197,
+     0,
+     0,
+     3.0,
+     160,
+     0
+    ],
+    [
+     44,
+     243,
+     263,
+     0,
+     0,
+     3.0,
+     195,
+     0
+    ],
+    [
+     50,
+     305,
+     331,
+     0,
+     0,
+     3.0,
+     225,
+     0
+    ],
+    [
+     56,
+     382,
+     413,
+     0,
+     0,
+     3.0,
+     260,
+     0
+    ],
+    [
+     60,
+     457,
+     493,
+     0,
+     0,
+     3.0,
+     290,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     116,
+     205,
+     837,
+     7322,
+     8406,
+     8407,
+     8408,
+     10179,
+     10180,
+     10181,
+     25304
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "fireball": {
+   "school": "fire",
+   "range": 35,
+   "projectile_speed": 24,
+   "ranks": [
+    [
+     1,
+     15,
+     23,
+     2,
+     4,
+     1.5,
+     30,
+     0
+    ],
+    [
+     6,
+     27,
+     39,
+     3,
+     6,
+     2.0,
+     45,
+     0
+    ],
+    [
+     12,
+     45,
+     62,
+     6,
+     6,
+     2.5,
+     65,
+     0
+    ],
+    [
+     18,
+     68,
+     93,
+     12,
+     8,
+     3.0,
+     95,
+     0
+    ],
+    [
+     24,
+     107,
+     144,
+     16,
+     8,
+     3.5,
+     140,
+     0
+    ],
+    [
+     30,
+     137,
+     183,
+     24,
+     8,
+     3.5,
+     185,
+     0
+    ],
+    [
+     36,
+     170,
+     223,
+     24,
+     8,
+     3.5,
+     220,
+     0
+    ],
+    [
+     42,
+     212,
+     276,
+     32,
+     8,
+     3.5,
+     260,
+     0
+    ],
+    [
+     48,
+     270,
+     349,
+     40,
+     8,
+     3.5,
+     305,
+     0
+    ],
+    [
+     54,
+     337,
+     432,
+     48,
+     8,
+     3.5,
+     350,
+     0
+    ],
+    [
+     60,
+     397,
+     505,
+     56,
+     8,
+     3.5,
+     395,
+     0
+    ],
+    [
+     60,
+     425,
+     541,
+     60,
+     8,
+     3.5,
+     410,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     133,
+     143,
+     145,
+     3140,
+     8400,
+     8401,
+     8402,
+     10148,
+     10149,
+     10150,
+     10151,
+     25306
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "fire_blast": {
+   "school": "fire",
+   "range": 20,
+   "ranks": [
+    [
+     6,
+     27,
+     35,
+     0,
+     0,
+     0,
+     40,
+     8
+    ],
+    [
+     14,
+     56,
+     70,
+     0,
+     0,
+     0,
+     75,
+     8
+    ],
+    [
+     22,
+     96,
+     118,
+     0,
+     0,
+     0,
+     115,
+     8
+    ],
+    [
+     30,
+     156,
+     188,
+     0,
+     0,
+     0,
+     165,
+     8
+    ],
+    [
+     38,
+     225,
+     269,
+     0,
+     0,
+     0,
+     220,
+     8
+    ],
+    [
+     46,
+     315,
+     373,
+     0,
+     0,
+     0,
+     280,
+     8
+    ],
+    [
+     54,
+     415,
+     491,
+     0,
+     0,
+     0,
+     340,
+     8
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     2136,
+     2137,
+     2138,
+     8412,
+     8413,
+     10197,
+     10199
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "scorch": {
+   "school": "fire",
+   "range": 30,
+   "ranks": [
+    [
+     22,
+     38,
+     46,
+     0,
+     0,
+     1.5,
+     50,
+     0
+    ],
+    [
+     28,
+     53,
+     65,
+     0,
+     0,
+     1.5,
+     65,
+     0
+    ],
+    [
+     34,
+     66,
+     80,
+     0,
+     0,
+     1.5,
+     80,
+     0
+    ],
+    [
+     40,
+     89,
+     107,
+     0,
+     0,
+     1.5,
+     100,
+     0
+    ],
+    [
+     46,
+     111,
+     132,
+     0,
+     0,
+     1.5,
+     115,
+     0
+    ],
+    [
+     52,
+     142,
+     170,
+     0,
+     0,
+     1.5,
+     135,
+     0
+    ],
+    [
+     58,
+     166,
+     196,
+     0,
+     0,
+     1.5,
+     150,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     2948,
+     8444,
+     8445,
+     8446,
+     10205,
+     10206,
+     10207
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "pyroblast": {
+   "school": "fire",
+   "range": 35,
+   "talent": "pyroblast",
+   "projectile_speed": 24,
+   "ranks": [
+    [
+     20,
+     100,
+     132,
+     44,
+     12,
+     6.0,
+     125,
+     0
+    ],
+    [
+     24,
+     125,
+     164,
+     56,
+     12,
+     6.0,
+     150,
+     0
+    ],
+    [
+     30,
+     178,
+     229,
+     76,
+     12,
+     6.0,
+     195,
+     0
+    ],
+    [
+     36,
+     228,
+     291,
+     100,
+     12,
+     6.0,
+     240,
+     0
+    ],
+    [
+     42,
+     289,
+     366,
+     124,
+     12,
+     6.0,
+     285,
+     0
+    ],
+    [
+     48,
+     365,
+     459,
+     152,
+     12,
+     6.0,
+     335,
+     0
+    ],
+    [
+     54,
+     446,
+     557,
+     184,
+     12,
+     6.0,
+     385,
+     0
+    ],
+    [
+     60,
+     520,
+     646,
+     212,
+     12,
+     6.0,
+     440,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     11366,
+     12505,
+     12522,
+     12523,
+     12524,
+     12525,
+     12526,
+     18809
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "frostfire_bolt": {
+   "school": "frostfire",
+   "range": 35,
+   "slow": 0.4,
+   "slow_dur": [
+    9,
+    9,
+    9
+   ],
+   "projectile_speed": 28,
+   "ranks": [
+    [
+     40,
+     102,
+     119,
+     27,
+     9,
+     3.0,
+     205,
+     0
+    ],
+    [
+     50,
+     181,
+     211,
+     39,
+     9,
+     3.0,
+     285,
+     0
+    ],
+    [
+     60,
+     270,
+     314,
+     57,
+     9,
+     3.0,
+     370,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     401502,
+     1237312,
+     1237313
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "ice_lance": {
+   "school": "frost",
+   "range": 30,
+   "talent": "iceLance",
+   "frozen_mult": 4.0,
+   "projectile_speed": 38,
+   "ranks": [
+    [
+     20,
+     28,
+     33,
+     0,
+     0,
+     0,
+     45,
+     0
+    ],
+    [
+     28,
+     34,
+     41,
+     0,
+     0,
+     0,
+     55,
+     0
+    ],
+    [
+     34,
+     44,
+     52,
+     0,
+     0,
+     0,
+     70,
+     0
+    ],
+    [
+     42,
+     76,
+     90,
+     0,
+     0,
+     0,
+     105,
+     0
+    ],
+    [
+     48,
+     95,
+     112,
+     0,
+     0,
+     0,
+     120,
+     0
+    ],
+    [
+     56,
+     136,
+     161,
+     0,
+     0,
+     0,
+     160,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     1312002,
+     400640,
+     1240044,
+     1240045,
+     1240046,
+     1240047
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "arcane_blast": {
+   "school": "arcane",
+   "range": 30,
+   "talent": "arcaneBlast",
+   "mana_pct_base": 0.15,
+   "ranks": [
+    [
+     20,
+     57,
+     66,
+     0,
+     0,
+     2.5,
+     null,
+     0
+    ],
+    [
+     30,
+     131,
+     152,
+     0,
+     0,
+     2.5,
+     null,
+     0
+    ],
+    [
+     40,
+     168,
+     196,
+     0,
+     0,
+     2.5,
+     null,
+     0
+    ],
+    [
+     50,
+     269,
+     313,
+     0,
+     0,
+     2.5,
+     null,
+     0
+    ],
+    [
+     60,
+     364,
+     424,
+     0,
+     0,
+     2.5,
+     null,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     400574,
+     1239696,
+     1239697,
+     1239699,
+     1239700
+    ],
+    "mana": "SpellPower.ManaCost",
+    "mana_pct_base": "SpellPower.PowerCostPct"
+   }
+  },
+  "arcane_missiles": {
+   "school": "arcane",
+   "range": 30,
+   "channel": true,
+   "ranks": [
+    [
+     8,
+     75,
+     75,
+     0,
+     0,
+     3.0,
+     85,
+     0
+    ],
+    [
+     16,
+     140,
+     140,
+     0,
+     0,
+     4.0,
+     140,
+     0
+    ],
+    [
+     24,
+     245,
+     245,
+     0,
+     0,
+     5.0,
+     235,
+     0
+    ],
+    [
+     32,
+     340,
+     340,
+     0,
+     0,
+     5.0,
+     320,
+     0
+    ],
+    [
+     40,
+     490,
+     490,
+     0,
+     0,
+     5.0,
+     410,
+     0
+    ],
+    [
+     48,
+     665,
+     665,
+     0,
+     0,
+     5.0,
+     500,
+     0
+    ],
+    [
+     56,
+     875,
+     875,
+     0,
+     0,
+     5.0,
+     595,
+     0
+    ],
+    [
+     56,
+     1045,
+     1045,
+     0,
+     0,
+     5.0,
+     655,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     5143,
+     5144,
+     5145,
+     8416,
+     8417,
+     10211,
+     10212,
+     25345
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "frost_nova": {
+   "school": "frost",
+   "aoe": true,
+   "freeze": 8,
+   "breaks_on_damage": "chance",
+   "ranks": [
+    [
+     10,
+     21,
+     24,
+     0,
+     0,
+     0,
+     55,
+     25
+    ],
+    [
+     26,
+     34,
+     39,
+     0,
+     0,
+     0,
+     85,
+     25
+    ],
+    [
+     40,
+     52,
+     59,
+     0,
+     0,
+     0,
+     115,
+     25
+    ],
+    [
+     54,
+     71,
+     80,
+     0,
+     0,
+     0,
+     145,
+     25
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     122,
+     865,
+     6131,
+     10230
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "cone_of_cold": {
+   "school": "frost",
+   "aoe": true,
+   "slow": 0.4,
+   "slow_dur": [
+    6,
+    6,
+    6,
+    6,
+    6
+   ],
+   "ranks": [
+    [
+     26,
+     96,
+     106,
+     0,
+     0,
+     0,
+     210,
+     10
+    ],
+    [
+     34,
+     142,
+     156,
+     0,
+     0,
+     0,
+     290,
+     10
+    ],
+    [
+     42,
+     200,
+     220,
+     0,
+     0,
+     0,
+     380,
+     10
+    ],
+    [
+     50,
+     261,
+     286,
+     0,
+     0,
+     0,
+     465,
+     10
+    ],
+    [
+     58,
+     328,
+     358,
+     0,
+     0,
+     0,
+     555,
+     10
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     120,
+     8492,
+     10159,
+     10160,
+     10161
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "arcane_explosion": {
+   "school": "arcane",
+   "aoe": true,
+   "radius": 10,
+   "ranks": [
+    [
+     14,
+     32,
+     36,
+     0,
+     0,
+     0,
+     75,
+     0
+    ],
+    [
+     22,
+     55,
+     61,
+     0,
+     0,
+     0,
+     120,
+     0
+    ],
+    [
+     30,
+     95,
+     102,
+     0,
+     0,
+     0,
+     185,
+     0
+    ],
+    [
+     38,
+     134,
+     145,
+     0,
+     0,
+     0,
+     250,
+     0
+    ],
+    [
+     46,
+     181,
+     196,
+     0,
+     0,
+     0,
+     315,
+     0
+    ],
+    [
+     54,
+     239,
+     258,
+     0,
+     0,
+     0,
+     390,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     1449,
+     8437,
+     8438,
+     8439,
+     10201,
+     10202
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "blizzard": {
+   "school": "frost",
+   "aoe": true,
+   "channel": true,
+   "ranks": [
+    [
+     20,
+     200,
+     200,
+     0,
+     0,
+     8.0,
+     320,
+     0
+    ],
+    [
+     28,
+     344,
+     344,
+     0,
+     0,
+     8.0,
+     520,
+     0
+    ],
+    [
+     36,
+     504,
+     504,
+     0,
+     0,
+     8.0,
+     720,
+     0
+    ],
+    [
+     44,
+     712,
+     712,
+     0,
+     0,
+     8.0,
+     935,
+     0
+    ],
+    [
+     52,
+     928,
+     928,
+     0,
+     0,
+     8.0,
+     1160,
+     0
+    ],
+    [
+     60,
+     1168,
+     1168,
+     0,
+     0,
+     8.0,
+     1400,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     10,
+     6141,
+     8427,
+     10185,
+     10186,
+     10187
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "flamestrike": {
+   "school": "fire",
+   "aoe": true,
+   "ranks": [
+    [
+     16,
+     55,
+     71,
+     44,
+     8,
+     3.0,
+     195,
+     0
+    ],
+    [
+     24,
+     100,
+     126,
+     84,
+     8,
+     3.0,
+     330,
+     0
+    ],
+    [
+     32,
+     158,
+     198,
+     132,
+     8,
+     3.0,
+     490,
+     0
+    ],
+    [
+     40,
+     226,
+     279,
+     188,
+     8,
+     3.0,
+     650,
+     0
+    ],
+    [
+     48,
+     298,
+     367,
+     256,
+     8,
+     3.0,
+     815,
+     0
+    ],
+    [
+     56,
+     381,
+     466,
+     332,
+     8,
+     3.0,
+     990,
+     0
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     2120,
+     2121,
+     8422,
+     8423,
+     10215,
+     10216
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  },
+  "blast_wave": {
+   "school": "fire",
+   "aoe": true,
+   "talent": "blastWave",
+   "daze": 0.5,
+   "ranks": [
+    [
+     30,
+     153,
+     185,
+     0,
+     0,
+     0,
+     215,
+     45
+    ],
+    [
+     36,
+     199,
+     239,
+     0,
+     0,
+     0,
+     270,
+     45
+    ],
+    [
+     44,
+     276,
+     327,
+     0,
+     0,
+     0,
+     355,
+     45
+    ],
+    [
+     52,
+     365,
+     433,
+     0,
+     0,
+     0,
+     450,
+     45
+    ],
+    [
+     60,
+     453,
+     533,
+     0,
+     0,
+     0,
+     545,
+     45
+    ]
+   ],
+   "source": {
+    "build": "1.60.1.70291",
+    "tables": "tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools)",
+    "read_at": "2026-10-09",
+    "rank_spell_ids": [
+     11113,
+     13018,
+     13019,
+     13020,
+     13021
+    ],
+    "mana": "SpellPower.ManaCost"
+   }
+  }
+ },
+ "utility": {
+  "blink": {
+   "level": 20,
+   "mana_pct_base": 0.35,
+   "cooldown": 15,
+   "note": "Libère des étourdissements et immobilisations (infobulle 70009). Lançable sous étourdissement : NON en Classic, à vérifier en jeu."
+  },
+  "evocation": {
+   "level": 20,
+   "cooldown": 480,
+   "duration": 8,
+   "regen_mult": 15.0
+  },
+  "counterspell": {
+   "level": 24,
+   "mana": 100,
+   "cooldown": 30,
+   "lockout": 10
+  },
+  "polymorph": {
+   "ranks": [
+    [
+     8,
+     20,
+     60
+    ],
+    [
+     20,
+     30,
+     90
+    ],
+    [
+     40,
+     40,
+     120
+    ],
+    [
+     60,
+     50,
+     150
+    ]
+   ],
+   "cast": 1.5
+  },
+  "frost_armor": {
+   "ranks": [
+    [
+     1,
+     30,
+     60
+    ],
+    [
+     10,
+     110,
+     110
+    ],
+    [
+     20,
+     200,
+     170
+    ]
+   ],
+   "attacker_slow": 0.3,
+   "attacker_swing_slow": 0.25,
+   "dur": 5
+  },
+  "ice_armor": {
+   "ranks": [
+    [
+     30,
+     290,
+     240
+    ],
+    [
+     40,
+     380,
+     320
+    ],
+    [
+     50,
+     470,
+     410
+    ],
+    [
+     60,
+     560,
+     500
+    ]
+   ],
+   "attacker_slow": 0.3,
+   "attacker_swing_slow": 0.25
+  },
+  "mage_armor": {
+   "ranks": [
+    [
+     34,
+     5,
+     270
+    ],
+    [
+     46,
+     10,
+     380
+    ],
+    [
+     58,
+     15,
+     490
+    ]
+   ],
+   "regen_while_casting": 0.5
+  },
+  "mana_shield": {
+   "ranks": [
+    [
+     20,
+     120,
+     40
+    ],
+    [
+     28,
+     210,
+     60
+    ],
+    [
+     36,
+     300,
+     80
+    ],
+    [
+     44,
+     390,
+     100
+    ],
+    [
+     52,
+     480,
+     120
+    ],
+    [
+     60,
+     570,
+     140
+    ]
+   ],
+   "mana_per_dmg": 2
+  },
+  "ice_barrier": {
+   "ranks": [
+    [
+     20,
+     431,
+     null
+    ],
+    [
+     46,
+     561,
+     360
+    ],
+    [
+     52,
+     693,
+     420
+    ],
+    [
+     58,
+     819,
+     480
+    ]
+   ],
+   "cooldown": 30,
+   "no_pushback": true
+  },
+  "frost_ward": {
+   "ranks": [
+    [
+     22,
+     162,
+     85
+    ],
+    [
+     32,
+     284,
+     135
+    ],
+    [
+     42,
+     463,
+     195
+    ],
+    [
+     52,
+     668,
+     255
+    ],
+    [
+     60,
+     913,
+     320
+    ]
+   ],
+   "cooldown": 30
+  },
+  "fire_ward": {
+   "ranks": [
+    [
+     20,
+     162,
+     85
+    ],
+    [
+     30,
+     285,
+     135
+    ],
+    [
+     40,
+     463,
+     195
+    ],
+    [
+     50,
+     668,
+     255
+    ],
+    [
+     60,
+     913,
+     320
+    ]
+   ],
+   "cooldown": 30
+  },
+  "mana_gems": {
+   "agate": [
+    28,
+    375,
+    425
+   ],
+   "jade": [
+    38,
+    550,
+    650
+   ],
+   "citrine": [
+    48,
+    775,
+    925
+   ],
+   "ruby": [
+    58,
+    1000,
+    1200
+   ]
+  },
+  "arcane_intellect": {
+   "ranks": [
+    [
+     1,
+     2
+    ],
+    [
+     14,
+     7
+    ],
+    [
+     28,
+     15
+    ],
+    [
+     42,
+     22
+    ],
+    [
+     56,
+     31
+    ]
+   ]
+  },
+  "conjure_water": {
+   "spell_levels": [
+    4,
+    10,
+    20,
+    30,
+    40,
+    50,
+    60
+   ],
+   "restore": [
+    [
+     151,
+     18
+    ],
+    [
+     436,
+     21
+    ],
+    [
+     835,
+     24
+    ],
+    [
+     1344,
+     27
+    ],
+    [
+     1992,
+     30
+    ],
+    [
+     2934,
+     30
+    ],
+    [
+     4200,
+     30
+    ]
+   ],
+   "certainty": "PC (valeurs Classic, non exposées par la source Forever)"
+  },
+  "conjure_food": {
+   "spell_levels": [
+    6,
+    12,
+    22,
+    32,
+    42,
+    52,
+    60
+   ],
+   "restore": [
+    [
+     61,
+     18
+    ],
+    [
+     243,
+     21
+    ],
+    [
+     552,
+     24
+    ],
+    [
+     874,
+     27
+    ],
+    [
+     1392,
+     30
+    ],
+    [
+     2148,
+     30
+    ],
+    [
+     3180,
+     30
+    ]
+   ],
+   "certainty": "EST"
+  }
+ }
+}
