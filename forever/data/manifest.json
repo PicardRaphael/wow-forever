@@ -145,8 +145,8 @@
     },
     "1.60.1.70291": {
       "collected_at": "2026-10-09",
-      "data_sha": "30ed62184304",
-      "data_sha256": "30ed621843049c9056f286a5a328292b1208c6d067f1381923d3dddc913ca948",
+      "data_sha": "043e911e4c94",
+      "data_sha256": "043e911e4c94af439e6eaa4e4ae2d0b5b0ecafe72d13e9a4849c1c6c47f11e27",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -154,7 +154,7 @@
         "_source_gunba_mage_tree.json": "88ce0b5f2d5e8964ab2d849d356fa87c8d9bcc38586b51e4066aac819e6fd3f0",
         "character_scaling.json": "7164c07c85c1d0ee4483675fb5bd07809678ed9cb4cd0b748e89d8f7de4ad6da",
         "classes.json": "9c167c6c9cbf940e12c57c81e50dac54c0fed8f7a3965d9213e6c56670bfaa76",
-        "confirmed_changes.json": "1c5c76213057146c30881595cb41e069948d10cdafab2a12484ca9e5aad09762",
+        "confirmed_changes.json": "7c2721b0a33d366d71faa36e6eca21a3f0d71d3cc591f93ba74fdd1c06df4f53",
         "decode_rules.json": "be7c6d18f9dcb5d6b52d9907800420b8664a7e7829106acb5d9bffafa77348ae",
         "leveling.json": "edb461b12426919523b00f17b332e24ff9a771a42556e72f369a066458774dfa",
         "mechanics.json": "d5596019adc345bedacadef4ab3316ccc5729fa07c9d64b8575090546c5826c3",
@@ -168,7 +168,7 @@
         "pvp_rules.json": "f5b534b5e89835a67dd4f85095800321127e1ced291ff7680721875936ef61cb",
         "races.json": "16012eebae65b0c6a877fe01c685da7d65f71d6e8b0b04e8077835f7d4284396",
         "respec.json": "5e357a2462a4e6e343de81cbd030f6cd65c120da9ce96096cc08b1ec1bd4d506",
-        "revisions.json": "5041354ae30511b015728cc781300c4d13b6a9d22e56696e41f4cb8445e21000",
+        "revisions.json": "5785ef5561c0c9cff4f6fc08577d0ca8289b3adac79a7375c161edb99e8f9351",
         "sources.json": "e92016c211a1aa4631fcb38a36250ba405d57c3f548539e29ec4707148755486",
         "spell_scaling.json": "6f8588ebb2d35fd8581dd27e08fb0a675e5e0fadf75cd6e75bf4871ef8845a94",
         "spells.json": "cd3cb66517fa2335e04f15433901106f16b7f35c004ec1cc5a25b2d323d6737c",

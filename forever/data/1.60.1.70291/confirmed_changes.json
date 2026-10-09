@@ -326,7 +326,7 @@
       "new": 19,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -338,7 +338,7 @@
       "new": 21,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -350,7 +350,7 @@
       "new": 28,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -362,7 +362,7 @@
       "new": 32,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -374,7 +374,7 @@
       "new": 45,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -386,7 +386,7 @@
       "new": 51,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -398,7 +398,7 @@
       "new": 69,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -410,7 +410,7 @@
       "new": 77,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -422,7 +422,7 @@
       "new": 104,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -434,7 +434,7 @@
       "new": 114,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -446,7 +446,7 @@
       "new": 15,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -458,7 +458,7 @@
       "new": 23,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -470,7 +470,7 @@
       "new": 27,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -482,7 +482,7 @@
       "new": 39,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -494,7 +494,7 @@
       "new": 45,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -506,7 +506,7 @@
       "new": 62,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -518,7 +518,7 @@
       "new": 68,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -530,7 +530,7 @@
       "new": 93,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -542,7 +542,7 @@
       "new": 107,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -554,7 +554,7 @@
       "new": 144,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -566,7 +566,7 @@
       "new": 140,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -578,7 +578,7 @@
       "new": 140,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -590,7 +590,7 @@
       "new": 245,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     },
     {
@@ -602,7 +602,7 @@
       "new": 245,
       "reference_certainty": "certain (spells.json de 1.60.1.70245)",
       "nature": "client",
-      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
     }
   ],

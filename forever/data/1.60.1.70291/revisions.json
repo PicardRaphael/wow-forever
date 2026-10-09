@@ -1868,7 +1868,7 @@
      "path": "frostbolt.ranks[1].min",
      "before": 20,
      "after": 19,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1877,7 +1877,7 @@
      "path": "frostbolt.ranks[1].max",
      "before": 22,
      "after": 21,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1886,7 +1886,7 @@
      "path": "frostbolt.ranks[2].min",
      "before": 34,
      "after": 28,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1895,7 +1895,7 @@
      "path": "frostbolt.ranks[2].max",
      "before": 38,
      "after": 32,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1904,7 +1904,7 @@
      "path": "frostbolt.ranks[3].min",
      "before": 47,
      "after": 45,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1913,7 +1913,7 @@
      "path": "frostbolt.ranks[3].max",
      "before": 52,
      "after": 51,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1922,7 +1922,7 @@
      "path": "frostbolt.ranks[4].min",
      "before": 61,
      "after": 69,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1931,7 +1931,7 @@
      "path": "frostbolt.ranks[4].max",
      "before": 68,
      "after": 77,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1940,7 +1940,7 @@
      "path": "frostbolt.ranks[5].min",
      "before": 96,
      "after": 104,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -1949,7 +1949,7 @@
      "path": "frostbolt.ranks[5].max",
      "before": 106,
      "after": 114,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2003,7 +2003,7 @@
      "path": "fireball.ranks[1].min",
      "before": 16,
      "after": 15,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2012,7 +2012,7 @@
      "path": "fireball.ranks[1].max",
      "before": 25,
      "after": 23,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2021,7 +2021,7 @@
      "path": "fireball.ranks[2].min",
      "before": 32,
      "after": 27,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2030,7 +2030,7 @@
      "path": "fireball.ranks[2].max",
      "before": 47,
      "after": 39,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2039,7 +2039,7 @@
      "path": "fireball.ranks[3].min",
      "before": 48,
      "after": 45,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2048,7 +2048,7 @@
      "path": "fireball.ranks[3].max",
      "before": 66,
      "after": 62,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2057,7 +2057,7 @@
      "path": "fireball.ranks[4].min",
      "before": 66,
      "after": 68,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2066,7 +2066,7 @@
      "path": "fireball.ranks[4].max",
      "before": 91,
      "after": 93,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2075,7 +2075,7 @@
      "path": "fireball.ranks[5].min",
      "before": 97,
      "after": 107,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2084,7 +2084,7 @@
      "path": "fireball.ranks[5].max",
      "before": 131,
      "after": 144,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2352,7 +2352,7 @@
      "path": "arcane_missiles.ranks[2].min",
      "before": 132,
      "after": 140,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2361,7 +2361,7 @@
      "path": "arcane_missiles.ranks[2].max",
      "before": 132,
      "after": 140,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2370,7 +2370,7 @@
      "path": "arcane_missiles.ranks[3].min",
      "before": 230,
      "after": 245,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
@@ -2379,7 +2379,7 @@
      "path": "arcane_missiles.ranks[3].max",
      "before": 230,
      "after": 245,
-     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; aucune recommandation de build changée au rejeu (docs/research/data-1.60.1.70291-r1.md) ; décision de l'utilisateur du 2026-10-09",
+     "source": "client 1.60.1.70291, tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) ; rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
      "certainty": "certain",
      "rule": "confirmed"
     },
