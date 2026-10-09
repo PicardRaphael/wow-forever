@@ -115,15 +115,22 @@ def test_new_conversation_flags_only_the_next_message():
     assert sent(game)[1].flags == frozenset()
 
 
-def test_band_is_provisional_until_block_e():
+def test_band_is_removed_at_the_acknowledgement():
+    """Remplace le test de la bande provisoire du bloc B (accord de l'utilisateur du 2026-10-09) : la bande reste
+    jusqu'au premier relevé qui porte le message (accusé), puis disparaît."""
+    from forever.bridge.slots import inbox_lua
+
     game = Game()
     game.slash("/fv")
+    session = game.lua.globals().ForeverBridgeDB.session
+    working = inbox_lua(0, {}, [{"session": session, "id": 1, "status": "working", "since": 0}], [])
+    game.stub.addons["ForeverBridge_S001"] = working
     type_and_enter(game, "Question")
-    game.stub.Advance(29)
+    game.stub.Advance(2.9)
     assert decode_band(game.screen_image()) is not None
-    game.stub.Advance(2)
+    game.stub.Advance(0.2)
     assert decode_band(game.screen_image()) is None
-    assert any("bloc E" in line for line in history(game))
+    assert not any("bloc E" in line for line in history(game))
 
 
 def test_no_buttons_before_the_bridge_writes_its_state():

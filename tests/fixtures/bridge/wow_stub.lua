@@ -127,6 +127,7 @@ local function newRegion(kind, name, parent)
 	function r:SetFocus() self.focus = true end
 	function r:ClearFocus() self.focus = false end
 	function r:HasFocus() return self.focus and true or false end
+	function r:HighlightText() self.highlighted = true end
 	function r:SetScrollChild(c) self.child = c end
 	function r:Enable() self.enabled = true end
 	function r:Disable() self.enabled = false end
@@ -265,7 +266,9 @@ GameFontNormal, GameFontNormalLarge, GameFontHighlight, GameFontHighlightSmall, 
 
 C_AddOns = {}
 function C_AddOns.IsAddOnLoaded(name) return Stub.loaded[name] and true or false end
+Stub.loadlog = {} -- { nom, instant } de chaque appel à LoadAddOn
 function C_AddOns.LoadAddOn(name)
+	table.insert(Stub.loadlog, { name, Stub.time })
 	if Stub.loaded[name] then return true, nil end
 	local source = Stub.addons[name]
 	if not source then return false, "MISSING" end

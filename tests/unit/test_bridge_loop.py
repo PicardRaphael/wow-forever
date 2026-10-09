@@ -9,9 +9,6 @@ import shutil
 from datetime import UTC, datetime
 
 from conftest import FIXTURES
-from forever.bridge.journal import Journal
-from forever.bridge.loop import Bridge, acquire_lock, release_lock
-from forever.bridge.state import BridgeState
 from lupa import lua51
 
 from forever.bridge.agent import AgentResult
@@ -19,7 +16,10 @@ from forever.bridge.buttons import TALENTS_NOTICE
 from forever.bridge.capture import GameWindow, Rect
 from forever.bridge.codec import SELFTEST_ID, encode_cells, render_band, selftest_payload
 from forever.bridge.image import Image, solid
+from forever.bridge.journal import Journal
+from forever.bridge.loop import Bridge, acquire_lock, release_lock
 from forever.bridge.record import Record, build_payload
+from forever.bridge.state import BridgeState
 
 CLIENT = Rect(100, 50, 1280, 720)
 NOW = datetime(2026, 10, 9, 12, 0, tzinfo=UTC)
@@ -288,3 +288,10 @@ def test_run_stops_on_the_stop_file(tmp_path):
     assert not stop.exists()
     kinds = [e["event"] for e in events(tmp_path)]
     assert kinds[0] == "start" and kinds[-1] == "stop"
+
+
+def test_published_status_tells_the_size_of_the_reserve(tmp_path):
+    """Bloc E : l'addon compte les emplacements restants d'après la taille de la réserve écrite par le pont."""
+    bridge, addons, _ = make(tmp_path, FakeCapture(None), FakeAgent(), slots=8)
+    bridge.step()
+    assert slot_table(addons, 1).status.slots == 8
