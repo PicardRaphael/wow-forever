@@ -30,6 +30,7 @@ FIELDS = (
     "metric",
     "reasons",
     "alternative",
+    "departage",  # décision 219 : départage final au Monte Carlo (build du chemin, voisins, build actuel)
     "stability",
     "sensitivity",
     "respec",

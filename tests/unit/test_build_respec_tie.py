@@ -26,6 +26,12 @@ def report(deps):
     return build_report(deps, "leveling", 16, preset="rapide", current={"wandSpecialization": 2}, sensitivity=False)
 
 
+def only_the_path_build(monkeypatch):
+    """Départage final réduit au build du chemin : ces tests ne portent que sur le conseil de respec (décision 217) ;
+    le départage a ses tests (`test_departage.py`)."""
+    monkeypatch.setattr(build_module, "_departage_candidates", lambda m, build, *args, **kwargs: [build])
+
+
 def test_versus_optimal_is_a_paired_gap_with_its_decision(report):
     versus = report["respec"]["versus_optimal"]
     assert {"mean", "low", "high", "confidence", "significant", "decided_by", "tie"} <= set(versus)
@@ -45,6 +51,7 @@ def test_a_gain_that_is_not_measurable_keeps_the_current_build(deps, monkeypatch
         return Gap(0.0, -1.0, 1.0, self.gd.build.confidence, False), "analytique", True
 
     monkeypatch.setattr(build_module, "advise_respec", reset_advised)
+    only_the_path_build(monkeypatch)
     monkeypatch.setattr(build_module._Metric, "compare", tie)
     rep = build_report(deps, "leveling", 12, preset="rapide", current={"improvedFrostbolt": 2}, sensitivity=False)
     assert rep["respec"]["versus_optimal"]["tie"] is True
@@ -62,6 +69,7 @@ def test_a_measurable_gain_keeps_the_advice(deps, monkeypatch):
         return Gap(-2.0, -3.0, -1.0, self.gd.build.confidence, True), "monte_carlo", True
 
     monkeypatch.setattr(build_module, "advise_respec", reset_advised)
+    only_the_path_build(monkeypatch)
     monkeypatch.setattr(build_module._Metric, "compare", clear)
     rep = build_report(deps, "leveling", 12, preset="rapide", current={"improvedFrostbolt": 2}, sensitivity=False)
     assert rep["respec"]["versus_optimal"]["tie"] is False
@@ -106,6 +114,7 @@ def test_a_current_build_measurably_better_than_the_optimizer_choice_is_kept(dep
         return Gap(2.0, 1.0, 3.0, self.gd.build.confidence, True), "monte_carlo", False
 
     monkeypatch.setattr(build_module, "advise_respec", reset_advised)
+    only_the_path_build(monkeypatch)
     monkeypatch.setattr(build_module._Metric, "compare", current_better)
     rep = build_report(deps, "leveling", 12, preset="rapide", current={"improvedFrostbolt": 2}, sensitivity=False)
     versus = rep["respec"]["versus_optimal"]
