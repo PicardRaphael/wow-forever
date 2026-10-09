@@ -719,8 +719,22 @@ local HELP = {
 	"/fv test [1-4] : bande de test, lue par uv run forever bridge selftest --live (une case par pixel par défaut).",
 	"/fv poll : chargement d'un emplacement de sonde sans /reload (sonde en jeu B).",
 	"/fv fond N : opacité du fond de la fenêtre, de 30 à 100 (opaque).",
+	"/fv case N : taille de case de la bande des messages, 1 (défaut) à 4 pixels, si le pont ne la lit pas.",
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
 }
+
+-- Taille de case de la bande des messages, gardée dans ForeverBridgeDB.cell.
+function FB.SetCell(value)
+	local cell = tonumber(value)
+	if not (cell and cell == math.floor(cell) and cell >= 1 and cell <= MAX_CELL) then
+		FB.Print("case : /fv case suivi de 1, 2, 3 ou 4.")
+		return
+	end
+	if type(ForeverBridgeDB) == "table" then
+		ForeverBridgeDB.cell = cell
+	end
+	FB.Print("case de la bande des messages : " .. cell .. " pixel(s).")
+end
 
 -- Aide dans la fenêtre ; jamais deux fois de suite (rien d'autre écrit depuis la dernière).
 local function Help()
@@ -752,6 +766,9 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 	elseif command == "fond" then
 		FB.Open()
 		FB.SetBackground(rest)
+	elseif command == "case" then
+		FB.Open()
+		FB.SetCell(rest)
 	elseif command == "diag" then
 		FB.Diag()
 	else
