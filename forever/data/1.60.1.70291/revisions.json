@@ -2842,6 +2842,495 @@
      "rule": "manual"
     }
    ]
+  },
+  {
+   "revision": 4,
+   "date": "2026-10-09",
+   "motif": "Mesure des trois journaux de 1.60.1.70245 (2026-10-07 et 2026-10-08 : Dun Morogh, Coldridge, Ragefire Chasm) reportée dans 1.60.1.70291 sur accord explicite et tracé (--accept-version, décision 221 ; la note officielle du 08/10 ne touche pas ces monstres) : 52 PNJ ajoutés et 5 changés ; 16 PNJ nommés écartés de la courbe (Mountaineer Naarh, Ironforge Protector et 14 PNJ de quête ou de zone de départ) ; PNJ amis (Dun Morogh Mountaineer, Lazy Peon) et PNJ seulement vus à côté des combats écartés d'office (décision 222) ; accord de l'utilisateur du 2026-10-09 après la simulation et le rejeu (variante B)",
+   "command": "forever measures refresh --yes --logs <trois journaux de 1.60.1.70245> --accept-version 1.60.1.70245 --accept-reason <note du 08/10 sans changement de ces monstres> --curve-exclude 1266 1329 1961 5612 6119 6124 6328 10803 10804 12319 12320 12427 260157 271486 271530 274935 --curve-exclude-reason <PNJ nommés ou hors norme>",
+   "candidate": null,
+   "report": "docs/research/data-1.60.1.70291-r4.md",
+   "counts": {
+    "measured": 57,
+    "manual": 1
+   },
+   "sources": {
+    "logs": {
+     "WoWCombatLog-100726_130833.txt": "2912f0481af886f5d964b9681c68d751e18c5592b413f32b1f3d252da2dd7411",
+     "WoWCombatLog-100826_081058.txt": "de62a396f3c48fc67ad7a3ad067cbdd290e576bee1a0638392e706404627467c",
+     "WoWCombatLog-100826_153741.txt": "f71cbe66298d3a2b2a5544b938ed89ce07c44c3b53a7091eed4cd6c51b2cd1d6"
+    },
+    "saved_variables": [
+     "ForeverLogger.lua",
+     "Questie.lua"
+    ]
+   },
+   "changes": [
+    {
+     "file": "monsters.json",
+     "path": "npcs.721",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1115",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 17 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1116",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 21 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1117",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 24 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1120",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1121",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1122",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1123",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 10 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1124",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1125",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1126",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1127",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 27 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1128",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1131",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1134",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1135",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1138",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1161",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1162",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1172",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1173",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1176",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1186",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1190",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1195",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 7 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1196",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 11 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1199",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1201",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 23 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1202",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1211",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1260",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1266",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1271",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1329",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1388",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1397",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1412",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1689",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.1961",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3244",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3254",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3415",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.3467",
+     "before": "mesuré",
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.5612",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.6119",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.6123",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 12 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.6124",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.6328",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.10556",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.10803",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.10804",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.12427",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.13076",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.260157",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 7 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.271486",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.271530",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "npcs.274935",
+     "before": null,
+     "after": "mesuré",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s)) (client 1.60.1.70245, accepté par --accept-version, décision 221)",
+     "rule": "measured"
+    },
+    {
+     "file": "monsters.json",
+     "path": "curve_excluded",
+     "before": 35,
+     "after": 67,
+     "source": "16 PNJ nommés écartés sur accord de l'utilisateur du 2026-10-09 (raison écrite) ; 13 PNJ amis ou seulement vus écartés d'office (décision 222)",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }
