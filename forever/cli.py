@@ -417,6 +417,12 @@ def build_parser() -> argparse.ArgumentParser:
         b_run.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
         b_run.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de Claude Code)")
         b_run.add_argument("--json", action="store_true", help="sortie JSON")
+    b_ask = bridge_sub.add_parser(
+        "ask", help="poser une question à la conversation « jeu » sans le jeu (vérifie claude et le serveur MCP)"
+    )
+    b_ask.add_argument("question", help="texte de la question")
+    b_ask.add_argument("--model", help="modèle de la conversation « jeu » (défaut : celui de Claude Code)")
+    b_ask.add_argument("--json", action="store_true", help="sortie JSON")
     b_stop = bridge_sub.add_parser("stop", help="arrêter le pont (fichier d'arrêt lu au pas suivant)")
     b_stop.add_argument("--json", action="store_true", help="sortie JSON")
     b_status = bridge_sub.add_parser("status", help="le pont tourne-t-il ? dernières lignes du journal, état des données")
@@ -2354,6 +2360,45 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
         loop.release_lock(deps.cache_dir, pid=pid)
 
 
+def _bridge_ask(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
+    """Une question à la conversation « jeu », nouvelle session, sans le jeu : la réponse telle que le pont la
+    publierait (mise en forme restreinte, ligne de provenance, lien)."""
+    import os
+
+    from forever.bridge import agent
+    from forever.bridge.format import normalize_reply
+    from forever.bridge.install import REPO_ROOT
+    from forever.bridge.prompt import message_text
+    from forever.bridge.record import Record
+
+    folder = agent.conversation_dir(deps.cache_dir)
+    mcp_path = agent.write_mcp_config(folder, REPO_ROOT)
+    prompt = message_text(Record("cli", 0, frozenset(), {}, args.question))
+    print("Question envoyée à la conversation « jeu » (10 à 20 s la première fois)…", file=sys.stderr, flush=True)
+    result = agent.ask(
+        prompt,
+        session_id=None,
+        claude=agent.find_claude(),
+        plugin_dir=REPO_ROOT / "plugin",
+        mcp_path=mcp_path,
+        cwd=folder,
+        env=agent.claude_env(os.environ, REPO_ROOT),
+        model=args.model,
+    )
+    if result.is_error:
+        lines = [f"Erreur : {result.error}"]
+        payload: dict[str, Any] = {"error": result.error}
+    else:
+        text = normalize_reply(result.text)
+        line = agent.provenance_line(result.provenances)
+        lines = [text, "", line] + ([f"Lien Talents Forever : {result.link}"] if result.link else [])
+        payload = {"text": text, "provenance_line": line, "link": result.link, "tools": result.tools}
+        if result.denied:
+            lines.append(f"Outils refusés : {', '.join(result.denied)}")
+    _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_NOT_FOUND if result.is_error else EXIT_OK
+
+
 def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     """`forever bridge` (P06a, blocs A et B) : installation de ForeverBridge et de sa réserve, autotest de la bande,
     lecture d'un message tapé en jeu."""
@@ -2362,6 +2407,8 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     provenance = local_provenance(deps, assumptions=["pont de conversation (P06a) : aucune donnée de jeu"])
     if args.bridge_command in ("start", "run", "stop", "status"):
         return _cmd_bridge_loop(deps, args, provenance)
+    if args.bridge_command == "ask":
+        return _bridge_ask(deps, args, provenance)
     if args.bridge_command == "install":
         report = install.install_bridge(_bridge_wow_dir(deps, args), slots=args.slots, dry_run=args.dry_run)
         lines = [f"Installation de ForeverBridge ({len(report.actions)} opération(s)) :"]
