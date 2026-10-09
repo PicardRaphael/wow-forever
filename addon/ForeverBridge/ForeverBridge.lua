@@ -755,16 +755,18 @@ function FB.ApplySlot(slot)
 		return
 	end
 	local db = ForeverBridgeDB
-	if tonumber(slot.now) and tonumber(slot.now) > 0 then
+	-- un fichier d'attente (jamais publié par le pont : now = 0) n'apporte ni état ni boutons
+	local published = tonumber(slot.now) and tonumber(slot.now) > 0
+	if published then
 		run.bridgeSeen = tonumber(slot.now)
-	end
-	if type(slot.status) == "table" then
-		run.status = slot.status
-		run.slots = tonumber(slot.status.slots) or run.slots
-	end
-	if type(slot.buttons) == "table" then
-		run.buttons = slot.buttons
-		FB.RefreshButtons()
+		if type(slot.status) == "table" then
+			run.status = slot.status
+			run.slots = tonumber(slot.status.slots) or run.slots
+		end
+		if type(slot.buttons) == "table" then
+			run.buttons = slot.buttons
+			FB.RefreshButtons()
+		end
 	end
 	local waiting = Waiting()
 	for _, reply in ipairs(type(slot.replies) == "table" and slot.replies or {}) do
