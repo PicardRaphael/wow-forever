@@ -216,3 +216,19 @@ def test_history_is_kept_across_sessions():
     again.slash("/fv")
     lines = history(again)
     assert any("Question gardée" in line for line in lines) and any("Réponse gardée" in line for line in lines)
+
+
+def test_after_reload_pending_messages_are_polled_again():
+    """Secours /reload : la boîte d'envoi est lue par le pont au rechargement ; l'addon relance la consultation et
+    récupère la réponse dans la réserve, sans second /reload."""
+    game = Game(saved={"schema": 1, "session": "6ac884ce31ab", "next_id": 6,
+                       "outbox": [{"id": 5, "text": "Question gardée", "flags": "", "slot": 4, "context": ""}]})  # fmt: skip
+    game.stub.addons["ForeverBridge_S001"] = inbox_lua(1791547200, STATUS, [
+        {"session": "6ac884ce31ab", "id": 5, "status": "done", "text": "Réponse après /reload", "provenance": "p"}
+    ], [])  # fmt: skip
+    game.stub.Fire("PLAYER_ENTERING_WORLD", False, True)
+    game.stub.Advance(4)
+    assert [name for name, _ in loads(game)] == ["ForeverBridge_S001"]
+    assert len(game.lua.globals().ForeverBridgeDB.outbox) == 0
+    game.slash("/fv")
+    assert any("Réponse après /reload" in line for line in history(game))
