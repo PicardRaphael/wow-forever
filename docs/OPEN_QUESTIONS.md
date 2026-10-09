@@ -130,7 +130,19 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   nouvelle mesure, puis journaux des niveaux 25 à 30 (MON1). Priorité : haute. Registre H11.
 - **MON2 — Les PNJ au-dessus de la valeur de leur niveau (ours, PNJ renforcés, Sarilus Foulborne) suivent-ils une
   règle commune ?** Test : d'autres ours et PNJ des mêmes familles à niveau connu. Priorité : moyenne. Registre H11.
-  [Détail](research/questions-ouvertes-detail.md#mon2)
+  *Modifiée le 2026-10-09* : la piste d'une règle par famille est suivie par MON7. [Détail](research/questions-ouvertes-detail.md#mon2)
+- **MON7 — Forever applique-t-il un multiplicateur de PV par famille de monstres (ours plus forts, Sunscale Lashtail
+  plus faible) ?** Ajoutée le 2026-10-09 (décision 223 : ces PNJ sont désormais écartés d'office de la courbe comme
+  hors norme). Cas mesurés dans `monsters.json` de 1.60.1.70291 (r5), PV mesurés contre la valeur commune du niveau :
+  Young Black Bear (niveaux 5 et 6 : +19,6 et +20,0 %), Ice Claw Bear (7 et 8 : +19,7 et +19,9 %), Elder Black Bear
+  (11 et 12 : +20,1 et +19,9 %) ; Thistle Bear (11 : +25,1 %), Grizzled Thistle Bear (16 et 17 : +25,1 et +24,9 %),
+  Ashenvale Bear (21 et 22 : +24,5 et +24,4 %) ; Sunscale Lashtail (11 à 13 : −20,1 à −19,9 %) ; à la marge, Dark Strand
+  Enforcer et Wildthorn Stalker (20 : +2,1 %, 21 : 0 %). Deux paliers d'ours (+20 % et +25 %) et un raptor à −20 %, très
+  réguliers d'un niveau à l'autre : la piste d'un multiplicateur par famille (ou par modèle de créature) est probable,
+  rien ne le lit encore dans le client. Test : PV d'autres membres des mêmes familles (ours, raptors) à niveau connu,
+  puis recherche d'un champ de multiplicateur dans les tables de créatures du client (`CreatureDifficulty`, à
+  télécharger sur accord). Priorité : moyenne (le simulateur prend la valeur commune du niveau : un combat contre un ours
+  est sous-estimé d'environ 20 à 25 %). Registre H11.
 - **MON3 — Quelles tables d'armure et de PV des monstres le serveur applique-t-il ?** Test : réduction d'un coup de
   monstre de niveau connu sur une armure connue ; PV mesurés comparés à `ExpectedStat` et `npctotalhp`. Priorité :
   moyenne. Registre H2, H11. [Détail](research/questions-ouvertes-detail.md#mon3)
