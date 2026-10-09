@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "H=\"${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}\"; [ -f \"$H/pyproject.toml\" ] && uv run --no-sync --quiet --project \"$H\" forever hook session-start; exit 0",
+            "command": "H=\"${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}\"; [ -f \"$H/pyproject.toml\" ] && uv run --no-sync --quiet --project \"$H\" python -m forever hook session-start; exit 0",
             "timeout": 10
           }
         ]
@@ -16,7 +16,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "H=\"${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}\"; [ -f \"$H/pyproject.toml\" ] && uv run --no-sync --quiet --project \"$H\" forever hook check-numbers; exit 0",
+            "command": "H=\"${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}\"; [ -f \"$H/pyproject.toml\" ] && uv run --no-sync --quiet --project \"$H\" python -m forever hook check-numbers; exit 0",
             "timeout": 10
           }
         ]

@@ -38,6 +38,11 @@ powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1
 Le script refait `uv sync`, met à jour la marketplace et recopie le plugin (`claude plugin update`). Redémarrer
 Claude Code ensuite.
 
+L'environnement ne se synchronise que par un `uv sync` explicite (ce script, ou à la main) : le serveur MCP du
+plugin, celui du chat en jeu et les hooks tournent avec `uv run --no-sync … python -m forever …` (plugin 0.8.2), sans
+jamais tenir `.venv\Scripts\forever.exe`. Un `uv sync` passe donc même avec Claude Code ouvert ou le pont lancé. Une
+seule fois, pour passer du plugin 0.8.1 à 0.8.2 : fermer les sessions Claude Code, puis lancer le script ci-dessus.
+
 ## Veille locale (T08b)
 `uv run forever watch` (hors ligne) compare le poste au dernier passage : build du client (`.build.info`), addons de
 données (empreintes), correctifs du serveur (`Logs/Hotfix.log`), nouveaux journaux de combat et sauvegardes d'addons.

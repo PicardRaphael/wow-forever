@@ -75,12 +75,15 @@ def conversation_dir(cache_dir: Path) -> Path:
 
 
 def mcp_config(repo_root: Path) -> dict[str, Any]:
-    """Configuration MCP de la conversation : le seul serveur `forever` du dépôt."""
+    """Configuration MCP de la conversation : le seul serveur `forever` du dépôt, lancé par l'interpréteur du projet
+    en module (`python -m forever`) et sans synchroniser l'environnement ; jamais par le lanceur de la commande
+    `forever` (dossier Scripts de l'environnement), qu'un serveur en cours verrouillerait contre `uv sync` (chaque
+    question posée en jeu lance ce serveur)."""
     return {
         "mcpServers": {
             "forever": {
                 "command": "uv",
-                "args": ["run", "--no-sync", "--quiet", "--project", str(repo_root), "forever", "mcp"],
+                "args": ["run", "--no-sync", "--quiet", "--project", str(repo_root), "python", "-m", "forever", "mcp"],
             }
         }
     }

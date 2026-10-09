@@ -8,6 +8,8 @@
         "--quiet",
         "--project",
         "${FOREVER_HOME:-${CLAUDE_PLUGIN_ROOT}/..}",
+        "python",
+        "-m",
         "forever",
         "mcp"
       ]

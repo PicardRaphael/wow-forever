@@ -26,7 +26,7 @@ if not any(p.endswith((".py", ".yaml", ".json")) for p in (line[3:] for line in 
 if not pathlib.Path(cwd, "tests/unit").is_dir():
     sys.exit(0)
 if shutil.which("uv"):
-    runner = ["uv", "run", "pytest"]
+    runner = ["uv", "run", "--no-sync", "pytest"]  # jamais de sync : uv sync explicite seulement
 elif importlib.util.find_spec("pytest"):
     runner = [sys.executable, "-m", "pytest"]
 else:

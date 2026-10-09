@@ -1,7 +1,7 @@
 {
   "name": "forever",
   "description": "Système expert World of Warcraft: Forever : skills d'aiguillage, de leveling, du Mage, du PvP des 9 classes, des builds et des familiers du Chasseur, serveur MCP forever, contrôle des chiffres de jeu en fin de réponse (skills de jeu seulement). Aucun calcul dans le plugin : tout vient du dépôt pointé par FOREVER_HOME.",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "author": {
     "name": "Raphael PICARD"
   },
