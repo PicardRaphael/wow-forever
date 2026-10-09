@@ -26,6 +26,8 @@ def command(exe: str) -> list[str]:
 def _kill_on_close_job() -> int | None:
     """Objet de tâche Windows qui tue ses processus quand son dernier descripteur se ferme (mort du relais) ; les
     processus que le passage lance en sortent (`SILENT_BREAKAWAY_OK`, comme le lanceur de l'environnement)."""
+    if sys.platform != "win32":
+        return None
     import ctypes
     from ctypes import wintypes
 
@@ -77,7 +79,7 @@ def run_held(args: Sequence[str], env: Mapping[str, str]) -> int:
         stderr=subprocess.DEVNULL,
         creationflags=_NO_WINDOW if sys.platform == "win32" else 0,
     )
-    if job is not None:
+    if sys.platform == "win32" and job is not None:
         import ctypes
         from ctypes import wintypes
 

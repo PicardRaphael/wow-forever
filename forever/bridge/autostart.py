@@ -170,7 +170,7 @@ def schtasks(args: Sequence[str]) -> subprocess.CompletedProcess[bytes]:
 def _decode(raw: bytes) -> str:
     if raw.startswith((b"\xff\xfe", b"\xfe\xff")):
         return raw.decode("utf-16", errors="replace")
-    return raw.decode("oem" if SUPPORTED else "utf-8", errors="replace")
+    return raw.decode("oem" if sys.platform == "win32" else "utf-8", errors="replace")
 
 
 def install(xml_path: Path, *, start: bool) -> None:

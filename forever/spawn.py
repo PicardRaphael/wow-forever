@@ -23,7 +23,7 @@ import os
 import subprocess
 import sys
 from collections.abc import Mapping, Sequence
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 
 # Drapeaux de Windows : processus détaché, nouveau groupe (Ctrl+C de la session ne le tue pas), sans fenêtre.
 _DETACHED = 0x00000008 | 0x00000200 | 0x08000000
@@ -46,7 +46,7 @@ def real_interpreter(
     if not windows:
         return launcher, env
     env[VENV_LAUNCHER] = launcher
-    return str(Path(base_executable).with_name("python.exe")), env
+    return str(PureWindowsPath(base_executable).with_name("python.exe")), env
 
 
 def current_interpreter() -> tuple[str, dict[str, str]]:

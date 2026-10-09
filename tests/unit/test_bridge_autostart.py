@@ -103,7 +103,7 @@ def test_real_interpreter_on_windows_is_the_base_python_in_the_environment():
         environ={"PATH": "x"},
         windows=True,
     )
-    assert exe == str(Path(r"C:\Program Files\Python313") / "python.exe")
+    assert exe == r"C:\Program Files\Python313\python.exe"
     assert env == {"PATH": "x", "__PYVENV_LAUNCHER__": r"C:\r\.venv\Scripts\python.exe"}
 
 
