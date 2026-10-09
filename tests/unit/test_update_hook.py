@@ -242,3 +242,11 @@ def test_session_start_stays_on_one_line(make_deps, wow, archived, history):
     line = out["systemMessage"]
     assert "\n" not in line and "1 attente" in line and "git pull" in line
     assert out["hookSpecificOutput"]["additionalContext"] == line
+
+
+def test_nothing_runs_in_the_bridge_conversation(make_deps, wow, archived):
+    """P06a, bloc C : dans la conversation « jeu » lancée par le pont (FOREVER_BRIDGE=1), le hook de démarrage
+    n'archive rien et ne lance pas `forever update`, même sans FOREVER_OFFLINE."""
+    spawn = Spawn()
+    hooks.update_kickoff(make_deps(wow_dir=wow), {**HOME, "FOREVER_BRIDGE": "1"}, spawn)
+    assert archived == [] and spawn.calls == []
