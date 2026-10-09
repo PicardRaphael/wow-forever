@@ -44,7 +44,7 @@ def test_start_refuses_when_a_bridge_runs(capsys, make_deps, tmp_path, monkeypat
 
 def test_stop_writes_the_stop_file(capsys, make_deps, tmp_path):
     deps = make_deps(wow_dir=wow_dir(tmp_path))
-    code, out, _ = run(capsys, ["bridge", "stop"], deps)
+    code, _, _ = run(capsys, ["bridge", "stop"], deps)
     assert code == 0 and (deps.cache_dir / "bridge" / "stop").is_file()
 
 
