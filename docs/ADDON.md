@@ -196,6 +196,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     11. **Relevé** : la sortie de l'étape 0 ; pour chaque question, le délai observé et ce qui ne va pas (texte,
         mise en forme, provenance, lien) ; les lignes `uv run forever bridge status` ou le journal du jour
         (`<cache>/bridge/journal/AAAA-MM-JJ.jsonl`, sans aucun pixel) en cas d'erreur.
+    12. **Fait le 2026-10-09** (relevés de l'utilisateur) : le chat marche de bout en bout (question, réponse mise en forme, boutons Talents, Leveling et PvP, voyant vert, lien copiable) ; défauts relevés et corrigés le même jour (talents non reconnus, égalités de build, zone copiable, cible, nouvelle conversation, ligne d'état, durée), à rejouer à l'étape 13.
 
 12. **Sonde en jeu C du pont** (P06a, fin du bloc B, **avant l'étape 11**). Elle dit si une question tapée dans la
     fenêtre part avec le bon contexte du personnage et si le pont la lit. Aucune réponse en jeu avant le bloc E.

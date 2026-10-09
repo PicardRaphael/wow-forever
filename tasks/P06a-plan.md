@@ -910,7 +910,7 @@ Le bloc B porte le message **des deux côtés**, pour qu'une question tapée en 
   taille de la réserve. Plusieurs envois rapprochés : chaque message sans accusé garde sa bande à tour de rôle.
 - Bloc F : `docs/ARCHITECTURE.md`, `docs/USAGE.md` (« Chat en jeu »), `addon/README.md`, `docs/ADDON.md` (§5, §6,
   §9, §10 Crédits), `docs/VISION.md` (Crédits), `CLAUDE.md` (le pont lance `claude`), `test_bridge_license.py`.
-- **Reste à faire** (après la sonde E, avant la fusion) : `forever_lookup(kind="tf_popular", current=…)` et son champ
+- **Reporté après la fusion** (première suite de P06a, décision de l'utilisateur du 2026-10-09 : fusion après les corrections de la sonde E) : `forever_lookup(kind="tf_popular", current=…)` et son champ
   `closest` pour le bouton Talents hors Mage (R4) ; d'ici là, l'agent choisit parmi les builds populaires et le pont
   ajoute la mention fixe.
 - Sonde E : `docs/ADDON.md` §7, étape 11.

@@ -2357,10 +2357,17 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
         mcp_path = agent.write_mcp_config(folder, REPO_ROOT)
         env = agent.claude_env(os.environ, REPO_ROOT)
         model = args.model or load_config(deps.cache_dir)["model"]
-        table = talent_table(deps)
+        try:
+            table = talent_table(deps)
+        except ForeverError as err:  # données illisibles : le pont tourne quand même, talents non traduits
+            journal.write("error", where="talents", error=err.message)
+            table = {}
 
-        def describe(record: Record) -> str:
-            return talents_line(describe_talents(table, record.context.get("class", ""), record.context.get("talents", "")))
+        def describe(record: Record) -> str | None:
+            if not table:
+                return None
+            reading = describe_talents(table, record.context.get("class", ""), record.context.get("talents", ""))
+            return talents_line(reading)
 
         def converse(prompt: str, session: str | None) -> agent.AgentResult:
             return agent.ask(
