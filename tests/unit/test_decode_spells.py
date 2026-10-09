@@ -55,7 +55,9 @@ def test_fifteen_spells_ninety_nine_ranks(spells):
     ],
 )
 def test_rank_values(spells, key, rank, row):
-    assert REFERENCE["spells"][key]["ranks"][rank - 1] == row
+    # Référence du build des fixtures (1.60.1.70009, docstring) : la version installée peut avoir changé ces rangs
+    # (1.60.1.70291 : rangs bas de Frostbolt, Fireball et Arcane Missiles lissés).
+    assert read_json(DATA_DIR / PREVIOUS_VERSION / "spells.json")["spells"][key]["ranks"][rank - 1] == row
     assert spells[key]["ranks"][rank - 1] == row
 
 

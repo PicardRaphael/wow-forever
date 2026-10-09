@@ -4,13 +4,14 @@ Valeurs des fixtures wago 1.60.1.70009 : Frostbolt rang 3 (837) a 46 points au n
 18, variance 0,111 ; Arcane Explosion rang 1 (1449) 32 points +0,4 par niveau de 14 à 19."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, RANK_VALUES_VERSION, read_json
 
 from forever.engine.spells import RankValues, rank_values_at_level
 from forever.pipeline.decode import decode_scaling
 
 
-def test_frostbolt_rank3_by_level(game_data):
+def test_frostbolt_rank3_by_level(game_data_at_rank_values_version):
+    game_data = game_data_at_rank_values_version  # dégâts des fixtures wago (RANK_VALUES_VERSION)
     assert rank_values_at_level(game_data, "frostbolt", 3, 14) == RankValues(43, 49, 0)
     assert rank_values_at_level(game_data, "frostbolt", 3, 18) == RankValues(47, 52, 0)
     assert rank_values_at_level(game_data, "frostbolt", 3, 40) == RankValues(47, 52, 0)  # plafond MaxLevel
@@ -21,9 +22,10 @@ def test_arcane_explosion_rank1_at_19(game_data):
     assert rank_values_at_level(game_data, "arcane_explosion", 1, 19) == RankValues(32, 36, 0)
 
 
-def test_reproduces_decoded_ranks_at_capped_max_level(game_data, candidate, decode_rules):
+def test_reproduces_decoded_ranks_at_capped_max_level(game_data_at_rank_values_version, candidate, decode_rules):
     """Au plafond de niveau, chaque sort (et chaque sort déclenché) est évalué à min(MaxLevel, plafond) : les 99
-    rangs décodés du client (min, max, dot_total) sont reproduits."""
+    rangs décodés du client (min, max, dot_total) sont reproduits (version aux dégâts des fixtures wago)."""
+    game_data = game_data_at_rank_values_version
     decoded = read_json(candidate.root / PREVIOUS_VERSION / "spells.json")["spells"]
     cap = decode_rules["levels"]["level_cap"]
     checked = 0
@@ -69,9 +71,9 @@ def test_decode_reproduces_installed_spell_scaling(candidate):
     """Le décodage reproduit les valeurs installées ; seuls `build` et `source` diffèrent, qui nomment le build
     décodé (les tables de 1.60.1.70009 et de 1.60.1.70124 sont identiques, T08a)."""
     decoded = read_json(candidate.root / PREVIOUS_VERSION / "spell_scaling.json")
-    installed = read_json(DATA_DIR / LOCAL_VERSION / "spell_scaling.json")
-    assert decoded["build"] == PREVIOUS_VERSION and installed["build"] == LOCAL_VERSION
-    assert PREVIOUS_VERSION in decoded["source"] and LOCAL_VERSION in installed["source"]
+    installed = read_json(DATA_DIR / RANK_VALUES_VERSION / "spell_scaling.json")  # tables des fixtures wago
+    assert decoded["build"] == PREVIOUS_VERSION and installed["build"] == RANK_VALUES_VERSION
+    assert PREVIOUS_VERSION in decoded["source"] and RANK_VALUES_VERSION in installed["source"]
     ignored = ("build", "source")
     assert {k: v for k, v in decoded.items() if k not in ignored} == {
         k: v for k, v in installed.items() if k not in ignored

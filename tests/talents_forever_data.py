@@ -18,6 +18,16 @@ FIXTURE_DIR = Path(__file__).resolve().parent / "fixtures" / "talents_forever"
 ADDON_FOLDER = "TalentsForeverBook"
 
 
+# Talents renommés par le client, même nœud : hors du Mage, `classes.json` prend la clé du client (le Mage garde la
+# sienne, décision 165). La fixture garde la clé de son relevé ; selon la version des données lue, c'est l'ancienne ou
+# la nouvelle qui existe.
+RENAMED_KEYS = {"predatoryInstincts": "naturalInstinct"}  # Druide, Natural Instinct dans 1.60.1.70291
+
+
+def _ours(by_key: dict[str, Any], key: str) -> Any:
+    return by_key[key] if key in by_key else by_key[RENAMED_KEYS[key]]
+
+
 def load_fixture(name: str) -> dict[str, Any]:
     return json.loads((FIXTURE_DIR / name).read_text(encoding="utf-8"))
 
@@ -64,7 +74,7 @@ def build_doc(classes_json: Path, layout: dict[str, Any], popular: dict[str, Any
                     tf = pos["tf"]
                     talents.append({k: tf[k] for k in ("name", "max", "row", "col", "node", "spell")})
                 else:
-                    t = by_key[pos["key"]]
+                    t = _ours(by_key, pos["key"])
                     talents.append(
                         {
                             "name": t["name"],
@@ -77,7 +87,7 @@ def build_doc(classes_json: Path, layout: dict[str, Any], popular: dict[str, Any
                     )
             index_by_node = {}
             for i, pos in enumerate(tree_lay["positions"]):
-                node = pos["tf"]["node"] if "tf" in pos else by_key[pos["key"]]["node_id"]
+                node = pos["tf"]["node"] if "tf" in pos else _ours(by_key, pos["key"])["node_id"]
                 index_by_node[node] = i + 1
             for i, pos in enumerate(tree_lay["positions"]):
                 if "req" in pos:
@@ -85,7 +95,7 @@ def build_doc(classes_json: Path, layout: dict[str, Any], popular: dict[str, Any
                 elif "tf" in pos:
                     req = None
                 else:
-                    pre = (by_key[pos["key"]].get("prereq") or {}).get("node_id")
+                    pre = (_ours(by_key, pos["key"]).get("prereq") or {}).get("node_id")
                     req = index_by_node.get(pre) if pre in by_node else None
                 if req is not None:
                     talents[i]["req"] = req

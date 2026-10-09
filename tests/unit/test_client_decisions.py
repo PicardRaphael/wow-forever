@@ -6,7 +6,7 @@
 Valeurs : talents.json pour `ranks`, fixtures wago 1.60.1.70009 pour les variables propres au client."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, read_json
 
 from forever.pipeline.decode import decode_talents
 
@@ -78,5 +78,8 @@ def test_presence_of_mind_is_a_format_change():
 
 
 def test_talent_rank_one_spells_are_conventions():
-    rows = [c for c in CONFIRMED if c["kind"] == "spell" and c["field"].endswith((".min", ".max"))]
+    # Écarts de T03, tranchés sur 1.60.1.70009 : les versions suivantes ajoutent leurs propres écarts de rangs
+    # (1.60.1.70291 : 24 écarts « client », rangs bas lissés).
+    t03 = read_json(DATA_DIR / PREVIOUS_VERSION / "confirmed_changes.json")["changes"]
+    rows = [c for c in t03 if c["kind"] == "spell" and c["field"].endswith((".min", ".max"))]
     assert len(rows) == 8 and {c["nature"] for c in rows} == {"convention"}

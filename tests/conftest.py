@@ -69,6 +69,10 @@ PREVIOUS_VERSION = "1.60.1.70009"
 # Version des extraits des 9 classes, des ratios et des familiers (tests/fixtures/wago/1.60.1.70124) : les tests qui
 # installent leur candidate en révision travaillent sur une copie du dépôt ramenée à cette version (2026-10-02).
 CLASS_FIXTURE_VERSION = "1.60.1.70124"
+# Dernière version installée dont les dégâts des rangs du Mage sont ceux des fixtures wago (1.60.1.70009) :
+# 1.60.1.70291 lisse les rangs bas de Frostbolt, Fireball et Arcane Missiles (note officielle du 08/10). Les tests qui
+# écrivent ces dégâts en dur lisent cette version (copie du dépôt ramenée à elle), jamais la version installée.
+RANK_VALUES_VERSION = "1.60.1.70245"
 PRODUCT = "wow_classic_beta"
 PREFIX = "1.60."
 NOW = datetime(2026, 9, 27, 12, 0, tzinfo=UTC)
@@ -192,6 +196,24 @@ def data_at_class_fixture_version(tmp_path: Path) -> Path:
     dst = tmp_path / "data-fixture-version"
     shutil.copytree(DATA_DIR, dst, ignore=shutil.ignore_patterns("__pycache__"))
     return rewind_to(dst, CLASS_FIXTURE_VERSION)
+
+
+@pytest.fixture(scope="session")
+def data_at_rank_values_version(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Copie de forever/data ramenée à RANK_VALUES_VERSION, en lecture seule pour les tests de dégâts des rangs."""
+    dst = tmp_path_factory.mktemp("data-rank-values") / "data"
+    shutil.copytree(DATA_DIR, dst, ignore=shutil.ignore_patterns("__pycache__"))
+    return rewind_to(dst, RANK_VALUES_VERSION)
+
+
+@pytest.fixture(scope="session")
+def game_data_at_rank_values_version(
+    data_at_rank_values_version: Path, tmp_path_factory: pytest.TempPathFactory
+) -> Any:
+    """Données typées du moteur à RANK_VALUES_VERSION (dégâts des rangs des fixtures wago)."""
+    from forever.gamedata import load_game_data
+
+    return load_game_data(isolated_deps(tmp_path_factory.mktemp("deps-rank-values"), data_at_rank_values_version))
 
 
 def tamper(path: Path) -> None:

@@ -10,7 +10,16 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REGISTRY_PATH, isolated_deps, read_json
+from conftest import (
+    DATA_DIR,
+    FIXTURES,
+    LOCAL_VERSION,
+    RANK_VALUES_VERSION,
+    REGISTRY_PATH,
+    isolated_deps,
+    read_json,
+    rewind_to,
+)
 
 from forever.engine.talents import check_build
 from forever.gamedata import load_game_data
@@ -83,12 +92,14 @@ def test_every_gap_is_explained(game_data, doc):
 
 @pytest.fixture(scope="module")
 def frozen_game_data(tmp_path_factory):
-    """Données installées, PV des monstres remplacés par ceux de la comparaison (copie écrite par le script) : une
-    nouvelle mesure des journaux ne change pas les écarts attendus (2026-10-02)."""
+    """Données ramenées à RANK_VALUES_VERSION (version de la comparaison), PV des monstres remplacés par ceux de la
+    comparaison (copie écrite par le script) : une nouvelle mesure des journaux (2026-10-02) ou une nouvelle version
+    qui change les dégâts des rangs (1.60.1.70291) ne change pas les écarts attendus."""
     tmp = tmp_path_factory.mktemp("community")
     data = tmp / "data"
     shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
-    shutil.copyfile(MONSTERS_COPY, data / LOCAL_VERSION / "monsters.json")
+    rewind_to(data, RANK_VALUES_VERSION)
+    shutil.copyfile(MONSTERS_COPY, data / RANK_VALUES_VERSION / "monsters.json")
     write_manifest(data)
     return load_game_data(isolated_deps(tmp, data))
 

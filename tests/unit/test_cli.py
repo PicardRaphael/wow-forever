@@ -5,7 +5,15 @@ Valeurs de sort attendues (frostbolt) : seed/forever-mage/data/1.60.1.70009/spel
 import json
 
 import pytest
-from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, REGISTRY_PATH, FakeHttp, corrupt_manifest, tamper
+from conftest import (
+    LOCAL_VERSION,
+    MANIFEST_CORRUPTIONS,
+    RANK_VALUES_VERSION,
+    REGISTRY_PATH,
+    FakeHttp,
+    corrupt_manifest,
+    tamper,
+)
 
 from forever.cli import main
 from forever.manifest import compute_manifest
@@ -18,8 +26,9 @@ def run(capsys, argv, deps):
     return code, out, err
 
 
-def test_lookup_text(capsys, make_deps):
-    code, out, _ = run(capsys, ["lookup", "spell", "frostbolt", "--rank", "2"], make_deps())
+def test_lookup_text(capsys, make_deps, data_at_rank_values_version):
+    deps = make_deps(data_dir=data_at_rank_values_version)  # dégâts des rangs de RANK_VALUES_VERSION
+    code, out, _ = run(capsys, ["lookup", "spell", "frostbolt", "--rank", "2"], deps)
     assert code == 0
     for fragment in [
         "Frostbolt",
@@ -29,25 +38,27 @@ def test_lookup_text(capsys, make_deps):
         "1,8 s",
         "35 mana",
         "portée 30 m",
-        LOCAL_VERSION,
+        RANK_VALUES_VERSION,
         "certitude certain",
     ]:
         assert fragment in out, fragment
     assert out.rstrip("\n").splitlines()[-1].startswith("Provenance")
 
 
-def test_lookup_json(capsys, make_deps):
-    code, out, _ = run(capsys, ["lookup", "spell", "frostbolt", "--rank", "2", "--json"], make_deps())
+def test_lookup_json(capsys, make_deps, data_at_rank_values_version):
+    deps = make_deps(data_dir=data_at_rank_values_version)  # dégâts des rangs de RANK_VALUES_VERSION
+    code, out, _ = run(capsys, ["lookup", "spell", "frostbolt", "--rank", "2", "--json"], deps)
     assert code == 0
     data = json.loads(out)
     rank = data["ranks"][0]
     assert (rank["damage_min"], rank["damage_max"], rank["cast_time_s"], rank["mana"]) == (34, 38, 1.8, 35)
-    assert data["provenance"]["game_version"] == LOCAL_VERSION
+    assert data["provenance"]["game_version"] == RANK_VALUES_VERSION
     assert data["provenance"]["certainty"] == "certain"
 
 
-def test_lookup_all_ranks_text(capsys, make_deps):
-    code, out, _ = run(capsys, ["lookup", "spell", "frostbolt", "--limit", "3"], make_deps())
+def test_lookup_all_ranks_text(capsys, make_deps, data_at_rank_values_version):
+    deps = make_deps(data_dir=data_at_rank_values_version)  # dégâts des rangs de RANK_VALUES_VERSION
+    code, out, _ = run(capsys, ["lookup", "spell", "frostbolt", "--limit", "3"], deps)
     assert code == 0
     assert "20-22 dégâts" in out and "47-52 dégâts" in out
     assert "--offset 3" in out

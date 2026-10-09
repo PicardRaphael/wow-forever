@@ -5,7 +5,7 @@ mécanique A5 : docs/MECHANICS_REGISTRY.yaml."""
 
 import asyncio
 
-from conftest import FIXTURES, LOCAL_VERSION, FakeHttp, corrupt_manifest, tamper
+from conftest import FIXTURES, LOCAL_VERSION, RANK_VALUES_VERSION, FakeHttp, corrupt_manifest, tamper
 from mcp import Client
 
 from forever.manifest import compute_manifest
@@ -36,14 +36,15 @@ def test_list_tools(make_deps):
         assert t.description
 
 
-def test_lookup_frostbolt_rank_2(make_deps):
-    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", {"kind": "spell", "name": "frostbolt", "rank": 2}))
+def test_lookup_frostbolt_rank_2(make_deps, data_at_rank_values_version):
+    deps = make_deps(data_dir=data_at_rank_values_version)  # dégâts des rangs de RANK_VALUES_VERSION
+    r = call(deps, lambda c: c.call_tool("forever_lookup", {"kind": "spell", "name": "frostbolt", "rank": 2}))
     assert not r.is_error
     data = r.structured_content
     rank = data["ranks"][0]
     assert (rank["damage_min"], rank["damage_max"], rank["cast_time_s"], rank["mana"]) == (34, 38, 1.8, 35)
     assert validate_provenance(data["provenance"]) == []
-    assert data["provenance"]["game_version"] == LOCAL_VERSION
+    assert data["provenance"]["game_version"] == RANK_VALUES_VERSION
 
 
 def test_status(make_deps):

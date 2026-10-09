@@ -152,7 +152,8 @@ def test_dot_and_ignite_ticks(game_data):
     assert ignite_tick_times(game_data) == [2.0, 4.0]
 
 
-def test_rank_damage_at_the_character_level(game_data):
+def test_rank_damage_at_the_character_level(game_data_at_rank_values_version):
+    game_data = game_data_at_rank_values_version  # dégâts des rangs de RANK_VALUES_VERSION
     rank2 = game_data.spells["frostbolt"].ranks[1]
     assert rank_damage(game_data, "frostbolt", rank2, 12, "rank") == RankValues(34, 38, 0)
     assert rank_damage(game_data, "frostbolt", rank2, 12, "character") == rank_values_at_level(
@@ -162,8 +163,10 @@ def test_rank_damage_at_the_character_level(game_data):
         rank_damage(game_data, "frostbolt", rank2, 12, "table")  # type: ignore[arg-type]
 
 
-def test_expected_cast_at_the_character_level(game_data):
-    """Frostbolt rang 2 (appris au niveau 8, plafond MaxLevel 12) au niveau 10 : dégâts du rang au niveau 10."""
+def test_expected_cast_at_the_character_level(game_data_at_rank_values_version):
+    """Frostbolt rang 2 (appris au niveau 8, plafond MaxLevel 12) au niveau 10 : dégâts du rang au niveau 10
+    (dégâts des rangs de RANK_VALUES_VERSION)."""
+    game_data = game_data_at_rank_values_version
     ch = character(game_data, 10)
     rank = expected_cast(game_data, "frostbolt", 10, {}, ch)
     level = expected_cast(game_data, "frostbolt", 10, {}, ch, spell_level="character")

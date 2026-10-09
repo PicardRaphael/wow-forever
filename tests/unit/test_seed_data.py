@@ -9,7 +9,16 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, SEED_DATA, SEED_VERSION, isolated_deps
+from conftest import (
+    DATA_DIR,
+    LOCAL_VERSION,
+    PREVIOUS_VERSION,
+    RANK_VALUES_VERSION,
+    SEED_DATA,
+    SEED_VERSION,
+    isolated_deps,
+    rewind_to,
+)
 
 import forever.build as build_module
 from forever.build import build_report
@@ -39,12 +48,14 @@ def sha(path):
 
 @pytest.fixture(scope="module")
 def client_copy(tmp_path_factory, candidate):
-    """Copie des données dont `talents.json` et `spells.json` sont ceux de la candidate du client."""
+    """Copie des données, ramenée à RANK_VALUES_VERSION (dégâts des rangs des fixtures wago), dont `talents.json` et
+    `spells.json` sont ceux de la candidate du client."""
     tmp = tmp_path_factory.mktemp("client-copy")
     data = tmp / "data"
     shutil.copytree(DATA_DIR, data, ignore=shutil.ignore_patterns("__pycache__"))
+    rewind_to(data, RANK_VALUES_VERSION)
     for name in ("talents.json", "spells.json"):
-        shutil.copyfile(candidate.root / PREVIOUS_VERSION / name, data / LOCAL_VERSION / name)
+        shutil.copyfile(candidate.root / PREVIOUS_VERSION / name, data / RANK_VALUES_VERSION / name)
     write_manifest(data)
     return isolated_deps(tmp, data)
 
@@ -96,8 +107,8 @@ def test_seed_results_do_not_move_with_the_client_values(client_copy, seed_game_
     assert seed_pvp_greedy(seed, 20, "Orc", beam=2) == seed_pvp_greedy(seed_game_data, 20, "Orc", beam=2)
 
 
-def test_simulate_leveling_passes_rules_to_the_loader(client_copy, make_deps):
-    repo = make_deps()
+def test_simulate_leveling_passes_rules_to_the_loader(client_copy, make_deps, data_at_rank_values_version):
+    repo = make_deps(data_dir=data_at_rank_values_version)  # même version que client_copy
     args = {"talents": L24, "n": 60, "mob_source": "seed", "spell_level": "rank"}
     seed_here = simulate_leveling(client_copy, 24, rules="seed", **args)
     seed_repo = simulate_leveling(repo, 24, rules="seed", **args)

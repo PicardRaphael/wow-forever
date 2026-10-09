@@ -1,15 +1,16 @@
 """Consultation des sorts (critère 1). Valeurs attendues : seed/forever-mage/data/1.60.1.70009/spells.json."""
 
 import pytest
-from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, corrupt_manifest, tamper
+from conftest import LOCAL_VERSION, MANIFEST_CORRUPTIONS, RANK_VALUES_VERSION, corrupt_manifest, tamper
 
 from forever.errors import DataIntegrityError, ForeverError
 from forever.lookup import lookup_spell
 from forever.provenance import validate_provenance
 
 
-def test_frostbolt_rank_2(make_deps):
-    r = lookup_spell(make_deps(), "frostbolt", 2)
+def test_frostbolt_rank_2(make_deps, data_at_rank_values_version):
+    # dégâts des rangs de RANK_VALUES_VERSION (copie du dépôt ramenée à cette version)
+    r = lookup_spell(make_deps(data_dir=data_at_rank_values_version), "frostbolt", 2)
     assert r["kind"] == "spell"
     assert r["id"] == "frostbolt"
     assert r["school"] == "frost"
@@ -32,7 +33,7 @@ def test_frostbolt_rank_2(make_deps):
     assert r["details"] is None
     p = r["provenance"]
     assert validate_provenance(p) == []
-    assert p["game_version"] == LOCAL_VERSION
+    assert p["game_version"] == RANK_VALUES_VERSION
     assert p["certainty"] == "certain"
 
 
@@ -171,4 +172,4 @@ def test_stale_cache_adds_assumption(make_deps, tmp_path):
     r = lookup_spell(make_deps(cache_dir=cache), "frostbolt", 2)
     assert r["provenance"]["freshness"] == "stale"
     assert r["provenance"]["certainty"] == "certain"  # T01 : stale ne dégrade pas la certitude
-    assert any("1.60.1.70250" in a for a in r["provenance"]["assumptions"])
+    assert any("1.60.1.99250" in a for a in r["provenance"]["assumptions"])

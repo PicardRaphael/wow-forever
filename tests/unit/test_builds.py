@@ -36,9 +36,16 @@ def test_prefix_filter_excludes_other_versions_and_products():
 
 def test_latest_follows_created_at_not_arrival_order():
     builds = parse_builds(load("builds_stale.json"), PRODUCT, PREFIX)
-    assert [b.version for b in builds][-1] != "1.60.1.70250"  # arrivée : 70250 n'est pas le dernier élément
+    assert [b.version for b in builds][-1] != "1.60.1.99250"  # arrivée : 99250 n'est pas le dernier élément
     latest = latest_build(builds)
-    assert latest == Build("1.60.1.70250", datetime(2026, 9, 26, 18, 45, tzinfo=UTC))
+    assert latest == Build("1.60.1.99250", datetime(2026, 9, 26, 18, 45, tzinfo=UTC))
+
+
+def test_stale_fixture_is_newer_than_the_installed_version():
+    """La version fictive de `builds_stale.json` reste plus récente que toute version installée : une nouvelle version
+    du jeu ne rend pas les tests de fraîcheur faux (installation de 1.60.1.70291, après 70150 puis 70250)."""
+    newest = latest_build(parse_builds(load("builds_stale.json"), PRODUCT, PREFIX))
+    assert newest is not None and version_key(newest.version) > version_key(LOCAL_VERSION)
 
 
 def test_latest_of_nothing_is_none():

@@ -31,10 +31,16 @@ def test_trees(game_data):
     assert game_data.game_version == LOCAL_VERSION
 
 
-def test_spell_ranks(game_data):
+def test_spell_ranks(game_data, seed_game_data):
     assert len(game_data.spells) >= 15
-    assert game_data.spells["frostbolt"].ranks[1] == Rank(2, 8, 34, 38, 0, 0, 1.8, 35, 0)
-    assert game_data.spells["fireball"].ranks[2] == Rank(3, 12, 48, 66, 6, 6, 2.5, 65, 0)
+    # Valeurs du seed (seed/forever-mage/data/1.60.1.70009/spells.json), lues dans ses copies figées : une nouvelle
+    # version du jeu qui change ces rangs (1.60.1.70291 : rangs bas lissés) ne touche pas ce test.
+    assert seed_game_data.spells["frostbolt"].ranks[1] == Rank(2, 8, 34, 38, 0, 0, 1.8, 35, 0)
+    assert seed_game_data.spells["fireball"].ranks[2] == Rank(3, 12, 48, 66, 6, 6, 2.5, 65, 0)
+    for key in ("frostbolt", "fireball"):
+        assert [r.position for r in game_data.spells[key].ranks] == [
+            r.position for r in seed_game_data.spells[key].ranks
+        ]
     ice_lance = game_data.spells["ice_lance"]
     assert (ice_lance.talent, ice_lance.frozen_mult, ice_lance.range_yd) == ("iceLance", 4.0, 30)
     assert game_data.spells["arcane_blast"].mana_pct_base == 0.15
