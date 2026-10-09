@@ -69,13 +69,25 @@ def test_subprocess_only_in_gitops_and_the_detached_launch():
     autres sous-processus sont le lancement détaché de `forever update` (`forever/spawn.py`, interpréteur Python) et
     la liste des processus du système pour savoir si le jeu est ouvert (`forever/pipeline/live_logs.py`, `tasklist`
     ou `ps`, local, décision 205) et la conversation « jeu » du pont (`forever/bridge/agent.py`, exécutable `claude`
-    seulement, P06a, décision 212)."""
+    seulement, P06a, décision 212), et les tâches planifiées de la décision 226 : `schtasks` local
+    (`forever/bridge/autostart.py`) et le passage `forever update` attendu par le relais de la tâche de mise à jour
+    (`forever/update_task.py`, interpréteur Python)."""
     users = {
         str(path.relative_to(PACKAGE).as_posix())
         for path in PACKAGE.rglob("*.py")
         if "subprocess" in imported_modules(path)
     }
-    assert users == {"pipeline/gitops.py", "spawn.py", "pipeline/live_logs.py", "bridge/agent.py"}
+    assert users == {
+        "pipeline/gitops.py",
+        "spawn.py",
+        "pipeline/live_logs.py",
+        "bridge/agent.py",
+        "bridge/autostart.py",
+        "update_task.py",
+    }
+    for name in ("bridge/autostart.py", "update_task.py"):
+        text = (PACKAGE / name).read_text(encoding="utf-8")
+        assert '"git"' not in text and '"gh"' not in text and network_uses(PACKAGE / name) == set(), name
     agent = (PACKAGE / "bridge" / "agent.py").read_text(encoding="utf-8")
     assert '"git"' not in agent and '"gh"' not in agent and network_uses(PACKAGE / "bridge" / "agent.py") == set()
     # Un texte tapé en jeu ne devient jamais une commande (demande de l'utilisateur du 2026-10-09) : aucun shell,
