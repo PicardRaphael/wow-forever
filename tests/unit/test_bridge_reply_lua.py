@@ -232,3 +232,24 @@ def test_after_reload_pending_messages_are_polled_again():
     assert len(game.lua.globals().ForeverBridgeDB.outbox) == 0
     game.slash("/fv")
     assert any("Réponse après /reload" in line for line in history(game))
+
+
+def test_waiting_files_never_erase_the_bridge_state():
+    """À la connexion, Status.lua écrit par le pont donne l'état et les boutons ; un Inbox.lua ou un emplacement
+    d'attente (jamais publié, `now = 0`) ne les efface pas."""
+    from forever.bridge.slots import status_lua
+
+    game = Game()
+    game.lua.execute(status_lua(STATUS, button_payload(visible_buttons()), 1791547200))
+    game.lua.execute(inbox_lua(0, {}, [], []))
+    game.stub.Fire("PLAYER_ENTERING_WORLD", True, False)
+    game.slash("/fv")
+    assert "Données 1.60.1.70245 · à jour" in status_text(game) and "pont vu" in status_text(game)
+    talents = game.lua.globals()["ForeverBridgeButton_talents"]
+    assert talents is not None and talents.IsShown(talents)
+    put(game, 1, [], status={})
+    game.stub.addons["ForeverBridge_S001"] = inbox_lua(0, {}, [], [])
+    type_and_enter(game, "Question")
+    game.stub.Advance(3.1)
+    assert "Données 1.60.1.70245 · à jour" in status_text(game)
+    assert talents.IsShown(talents)
