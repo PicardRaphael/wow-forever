@@ -90,6 +90,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **MAG18 — Les dégâts d'un rang suivent-ils le niveau du personnage jusqu'à `MaxLevel` ?** Test : journal de
   leveling avec ForeverLogger, même rang à plusieurs niveaux. Priorité : moyenne. Registre G7.
   [Détail](research/questions-ouvertes-detail.md#mag18)
+- **MAG9 — Pourquoi l'optimiseur analytique retient-il au leveling 20 (1.60.1.70291) un build Feu que le Monte Carlo bat ?** Ajoutée le 2026-10-09 : au préréglage rapide du pont, depuis un Mage Givre de niveau 19, le build Feu retenu est plus lent que le build Givre projeté au Monte Carlo apparié (`respec.versus_optimal`, décision 217) ; au préréglage complet du rejeu, Feu et alternative sont à égalité et le build est instable. Écart analytique / Monte Carlo propre aux rangs bas lissés ? Test : comparer analytique et Monte Carlo cas par cas au niveau 20 (I6), puis un relevé en jeu de temps par monstre. Priorité : moyenne. Registre I5, I6.
 
 ## Personnage et ratios du client
 - **PER1 — Où sont la critique de base des sorts et la mana par point d'Intelligence ?** Test : `GetSpellCritChance`
