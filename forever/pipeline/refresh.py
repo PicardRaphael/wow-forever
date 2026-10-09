@@ -40,7 +40,7 @@ from forever.pipeline.measure import (
     monster_hp,
     spell_costs,
 )
-from forever.pipeline.monsters import MONSTERS_FILE, build_monsters
+from forever.pipeline.monsters import MONSTERS_FILE, OutlierRule, build_monsters
 from forever.pipeline.questie import QuestieDB
 from forever.registry import Mechanic
 
@@ -87,14 +87,16 @@ def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def _measured_in_gone_logs(installed: Mapping[str, Any], gone: set[str]) -> set[int]:
-    """PNJ dont une mesure installée vient d'un journal disparu : leur combat avec le joueur n'est pas connu (décision
-    222), même s'ils sont remesurés dans un journal présent."""
+def unknown_fight(installed: Mapping[str, Any], gone: set[str]) -> set[int]:
+    """PNJ dont le combat avec le joueur n'est pas établi (décision 222) : une ligne installée sans indicateur (mesure
+    antérieure à la règle, ou inconnue) ou venue d'un journal disparu. Ils ne sont jamais écartés pour n'être que vus à
+    la remesure ; une ligne établie (combattu ou non) se recalcule à l'identique."""
     out: set[int] = set()
     for npc_id, entry in installed.get("npcs", {}).items():
         for row in entry.get("levels", {}).values():
             match = SOURCE_RE.match(str(row.get("source", "")))
-            if match is not None and set(match["logs"].split(", ")) & gone:
+            from_gone = match is not None and bool(set(match["logs"].split(", ")) & gone)
+            if row.get("fought") is None or from_gone:
                 out.add(int(npc_id))
     return out
 
@@ -227,6 +229,7 @@ def remeasure(
     fit_exclude: Collection[int] = (),
     curve_exclude: Mapping[int, str] | None = None,
     utc_offset: timedelta | None = None,
+    outlier: OutlierRule | None = None,
 ) -> MeasureSnapshot:
     """Nouvelles mesures : table des monstres (PNJ des journaux disparus conservés), B1, A3, coûts, incantations,
     critiques, épisodes d'Ignite. Rendu sous forme JSON (clés en texte), comparable à un instantané relu."""
@@ -292,7 +295,8 @@ def remeasure(
         logs=[*names, *gone],  # un journal disparu reste listé (jamais de suppression)
         fit_exclude=fit_exclude,
         curve_exclude=curve_exclude,
-        unknown_fight=_measured_in_gone_logs(installed or {}, set(gone)),
+        unknown_fight=unknown_fight(installed or {}, set(gone)),
+        outlier=outlier,
     )
     snapshot = {
         "schema_version": 1,

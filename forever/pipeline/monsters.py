@@ -25,7 +25,7 @@ import statistics
 from collections import defaultdict
 from collections.abc import Collection, Iterable, Mapping, Sequence
 from pathlib import Path
-from typing import Any
+from typing import Any, NamedTuple
 
 from forever.engine.model import QuestieCorrection
 from forever.engine.monsters import corrected_questie_value, correction_ratio
@@ -109,6 +109,54 @@ def _correction(raw: Mapping[str, Any] | None) -> QuestieCorrection | None:
     )
 
 
+class OutlierRule(NamedTuple):
+    """Règle « hors norme » de la courbe des PV (décision 223), paramètres lus dans `mechanics.json`
+    (`monsters.curve_outlier`) : écart relatif à la médiane des autres PNJ du niveau, nombre minimal de PNJ du niveau,
+    part (numérateur, dénominateur) des autres PNJ qui doivent concorder pour que la référence soit fiable."""
+
+    threshold: float
+    min_npcs: int
+    concordance: tuple[int, int]
+
+
+def outlier_rule(mechanics_values: Mapping[str, Any]) -> OutlierRule | None:
+    """Règle « hors norme » des valeurs de `mechanics.json` (None si la version ne la porte pas)."""
+    entry = mechanics_values.get("monsters.curve_outlier")
+    if not entry:
+        return None
+    v = entry["value"]
+    return OutlierRule(float(v["threshold"]), int(v["min_npcs"]), (int(v["concordance"][0]), int(v["concordance"][1])))
+
+
+def curve_outliers(by_level: Mapping[int, Sequence[tuple[int, int]]], rule: OutlierRule) -> dict[int, str]:
+    """PNJ hors norme (décision 223) : sur un niveau d'au moins `rule.min_npcs` PNJ de la courbe, un PNJ dont les PV
+    s'écartent de plus de `rule.threshold` de la médiane des autres PNJ du niveau, quand au moins la part
+    `rule.concordance` de ces autres PNJ est à moins du seuil de leur médiane (référence concordante). Rend
+    PNJ -> raison ; un PNJ hors norme à un niveau l'est à tous les siens."""
+    num, den = rule.concordance
+    out: dict[int, str] = {}
+    for level in sorted(by_level):
+        members = by_level[level]
+        if len(members) < rule.min_npcs:
+            continue
+        for npc_id, hp in members:
+            others = [h for n, h in members if n != npc_id]
+            reference = statistics.median(others)
+            if reference <= 0:
+                continue
+            close = sum(1 for h in others if abs(h / reference - 1) <= rule.threshold)
+            if close * den < num * len(others):
+                continue  # référence non concordante : rien n'est jugé
+            gap = hp / reference - 1
+            if abs(gap) > rule.threshold and npc_id not in out:
+                shown = f"{gap * 100:+.1f}".replace(".", ",")
+                out[npc_id] = (
+                    f"hors norme : {hp} PV au niveau {level}, {shown} % de la médiane des autres PNJ du niveau "
+                    f"({_median(others)}) ; mesuré, écarté de la courbe (décision 223)"
+                )
+    return out
+
+
 def build_monsters(
     observations: Iterable[MonsterObservation],
     questie: QuestieDB | None,
@@ -119,6 +167,7 @@ def build_monsters(
     fit_exclude: Collection[int] = (),
     curve_exclude: Mapping[int, str] | None = None,
     unknown_fight: Collection[int] = (),
+    outlier: OutlierRule | None = None,
 ) -> dict[str, Any]:
     """Contenu de `monsters.json` pour la version `version`. `unknown_fight` : PNJ dont une mesure vient d'un journal
     disparu (combat avec le joueur inconnu) : jamais écartés pour n'être que vus (décision 222)."""
@@ -141,6 +190,7 @@ def build_monsters(
     npcs: dict[str, Any] = {}
     gaps: list[dict[str, int]] = []
     normal_by_level: dict[int, list[int]] = defaultdict(list)
+    members: dict[int, list[tuple[int, int]]] = defaultdict(list)
     for (npc_id, level), o in sorted(measured.items()):
         q = questie.npc(npc_id) if questie else None
         questie_hp = q.hp_at(level) if q else None
@@ -171,17 +221,33 @@ def build_monsters(
             {"name": o["name"], "zone_id": q.zone_id if q else None, "rank": q.rank if q else None, "levels": {}},
         )
         sources = sorted({x["log"] for x in by_key[(npc_id, level)]})
+        here = by_key[(npc_id, level)]
+        marked = [x for x in here if "fought" in x]
+        if any(x["fought"] for x in marked):
+            fight: bool | None = True
+        elif marked and len(marked) == len(here) and npc_id not in unknown_fight:
+            fight = False
+        else:
+            fight = None  # inconnu : mesure reportée ou combat possible dans un journal disparu (décision 222)
         entry["levels"][str(level)] = {
             "max_hp": o["max_hp"],
             "certainty": "certain",
             "source": f"journal {', '.join(sources)} (bloc avancé, {sum(x['guids'] for x in by_key[(npc_id, level)])} "
             "individu(s))",
             "questie_hp": questie_hp,
+            "fought": fight,
         }
         if questie_hp is not None and questie_hp != o["max_hp"]:
             gaps.append({"npc_id": npc_id, "level": level, "measured": o["max_hp"], "questie": questie_hp})
         if (q is None or q.rank == NORMAL_RANK) and npc_id not in curve:
-            normal_by_level[level].append(o["max_hp"])
+            members[level].append((npc_id, o["max_hp"]))
+    if outlier is not None:  # décision 223 : PNJ hors norme écartés de la courbe, à tous leurs niveaux
+        for npc_id, reason in curve_outliers(members, outlier).items():
+            curve.setdefault(npc_id, reason)
+    for level, found_members in members.items():
+        for npc_id, member_hp in found_members:
+            if npc_id not in curve:
+                normal_by_level[level].append(member_hp)
 
     hp_by_level: dict[int, dict[str, Any]] = {}
     for level, values in normal_by_level.items():

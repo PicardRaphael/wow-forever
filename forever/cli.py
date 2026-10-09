@@ -101,7 +101,7 @@ from forever.pipeline.measure import (
     measure_log,
     monster_hp,
 )
-from forever.pipeline.monsters import MONSTERS_FILE, build_monsters, write_monsters
+from forever.pipeline.monsters import MONSTERS_FILE, build_monsters, outlier_rule, write_monsters
 from forever.pipeline.questie import read_questie
 from forever.pipeline.refresh import (
     ACCEPTED_MARK,
@@ -2946,6 +2946,7 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
         fit_exclude=fit_exclude,
         curve_exclude=curve,
         utc_offset=offset,
+        outlier=outlier_rule(data.read_json("mechanics.json")["values"]),  # décision 223
     )
     if unknown:
         new["notes"].append(
@@ -3042,8 +3043,10 @@ def _cmd_monsters_build(deps: Deps, args: argparse.Namespace) -> int:
         observations += found
         conflicts += clash
     version = current_identity(deps.data_dir).game_version
+    mechanics = deps.data_dir / version / "mechanics.json"
+    rule = outlier_rule(json.loads(mechanics.read_text(encoding="utf-8"))["values"]) if mechanics.is_file() else None
     table = build_monsters(
-        observations, questie, version, conflicts=conflicts, logs=names, fit_exclude=args.fit_exclude
+        observations, questie, version, conflicts=conflicts, logs=names, fit_exclude=args.fit_exclude, outlier=rule
     )
     written = write_monsters(table, out, deps.data_dir, force=args.force)
     levels = table["hp_by_level"].values()

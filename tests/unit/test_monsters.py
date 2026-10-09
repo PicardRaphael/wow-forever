@@ -174,4 +174,6 @@ def test_unknown_fight_comes_from_rows_not_established_as_unfought():
             "4": {"levels": {"5": {"source": "journal b.txt (bloc avancé, 1 individu(s))", "fought": False}}},
         },
     }
-    assert unknown_fight(installed, gone={"b.txt"}) == {2, 3, 4}
+    # 2 combattu (journal présent) : établi, pas inconnu ; sinon la ligne « vu seulement » d'un autre niveau du même PNJ
+    # passerait de faux à inconnu d'une mesure à la suivante (Burning Blade Acolyte, 2026-10-09)
+    assert unknown_fight(installed, gone={"b.txt"}) == {3, 4}
