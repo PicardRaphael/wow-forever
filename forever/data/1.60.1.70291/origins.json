@@ -1102,6 +1102,50 @@
       "certainty": "suppose",
       "reason": "aucune source propre à Forever (CH0)",
       "registry": "L3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.dungeon_kill_bonus"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "I10"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.group_level_basis"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "I11"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/rage.damage_taken_rule"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "B21"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/legacy.beta_grant"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "état de la bêta absent du client, porté par un texte officiel sans mesure (révision 2)",
+      "registry": "G5"
     }
   ],
   "pending": [],

@@ -2650,6 +2650,169 @@
      "key": "hotStreak"
     }
    ]
+  },
+  {
+   "revision": 2,
+   "date": "2026-10-09",
+   "motif": "Note officielle du 8 octobre 2026 (message n° 5 du sujet 2360696, révision 1) : règles du serveur absentes du client écrites à la main, probable (XP des monstres de donjon, XP en groupe au niveau de chaque joueur, rage des dégâts subis, état Legacy de la bêta) ; aucun moteur ne les lit encore ; écrite à la main, sans candidate ; accord de l'utilisateur du 2026-10-09",
+   "command": null,
+   "candidate": null,
+   "report": "docs/research/notes-blizzard-2026-10-08.md",
+   "counts": {
+    "manual": 8
+   },
+   "changes": [],
+   "manual_changes": [
+    {
+     "file": "mechanics.json",
+     "path": "xp.dungeon_kill_bonus",
+     "before": null,
+     "after": {
+      "value": 0.2,
+      "certainty": "probable",
+      "registry": "I10",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : XP des monstres tués en donjon augmentée d'environ 20 % (« approximately »), règle du serveur absente des tables ; assiette (élites, boss, repos, groupe) et valeur exacte à mesurer (question LVL5) ; aucun moteur ne la lit encore (T04d, DJ1)",
+      "approximate": true
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    },
+    {
+     "file": "mechanics.json",
+     "path": "xp.group_level_basis",
+     "before": null,
+     "after": {
+      "value": "individual",
+      "certainty": "probable",
+      "registry": "I11",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : l'XP d'un monstre tué en groupe est ajustée sur le niveau de chaque joueur (règle de Classic Era, individual), plus sur le plus haut niveau du groupe (highest_member, avant ce build) ; aucune XP pour le groupe si un membre est d'un niveau très supérieur au monstre (seuil non donné, question LVL4) ; aucun moteur ne la lit encore (T04d)",
+      "range": [
+       {
+        "value": "highest_member",
+        "source": "comportement de Forever avant 1.60.1.70291, corrigé comme un bug"
+       },
+       {
+        "value": "individual",
+        "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)"
+       }
+      ]
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    },
+    {
+     "file": "mechanics.json",
+     "path": "rage.damage_taken_rule",
+     "before": null,
+     "after": {
+      "value": {
+       "health_basis": "expected_creature",
+       "damage_taken_multipliers": true,
+       "absorbs_ignored": true,
+       "armor_assumption_range": [
+        0.2,
+        0.4
+       ],
+       "previous_armor_assumption": 0.5
+      },
+      "certainty": "probable",
+      "registry": "B21",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : rage des dégâts subis calculée sur les PV attendus d'une créature (plus sur ceux du joueur), avec les multiplicateurs de dégâts subis (critiques, coups écrasants), sans les absorptions ; équilibrage sur une armure de 20 à 40 % selon le niveau (au lieu de 50 %) ; PV attendus et courbe d'armure par niveau non donnés (question CLS4) ; aucun moteur ne la lit encore (GU1, DR1)"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    },
+    {
+     "file": "mechanics.json",
+     "path": "legacy.beta_grant",
+     "before": null,
+     "after": {
+      "value": {
+       "challenge_points": 16,
+       "respec_min_cost_copper": 100,
+       "respec_cost_decay": "une respécialisation de moins par heure",
+       "beta_only": true
+      },
+      "certainty": "probable",
+      "registry": "G5",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : défi Legacy accordé à tous les joueurs de la bêta (16 points Legacy) ; respécialisation Legacy la moins chère à 1 pièce d'argent, le coût baissant d'une respécialisation par heure, comme les talents de classe ; pendant la bêta seulement (état de la bêta, pas une règle du lancement) ; aucun moteur ne la lit encore (LG1, LG2)"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "règle /values/xp.dungeon_kill_bonus",
+     "before": null,
+     "after": {
+      "file": "mechanics.json",
+      "paths": [
+       "/values/xp.dungeon_kill_bonus"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "I10"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "règle /values/xp.group_level_basis",
+     "before": null,
+     "after": {
+      "file": "mechanics.json",
+      "paths": [
+       "/values/xp.group_level_basis"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "I11"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "règle /values/rage.damage_taken_rule",
+     "before": null,
+     "after": {
+      "file": "mechanics.json",
+      "paths": [
+       "/values/rage.damage_taken_rule"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "B21"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    },
+    {
+     "file": "origins.json",
+     "path": "règle /values/legacy.beta_grant",
+     "before": null,
+     "after": {
+      "file": "mechanics.json",
+      "paths": [
+       "/values/legacy.beta_grant"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "état de la bêta absent du client, porté par un texte officiel sans mesure (révision 2)",
+      "registry": "G5"
+     },
+     "source": "notes de développement officielles de la bêta, mise à jour du 8 octobre 2026 (message n° 5, révision 1 du 2026-10-08, https://us.forums.blizzard.com/en/wow/t/2360696/5)",
+     "rule": "manual"
+    }
+   ]
   }
  ]
 }

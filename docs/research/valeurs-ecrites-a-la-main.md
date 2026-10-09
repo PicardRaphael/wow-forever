@@ -1,11 +1,11 @@
 # Valeurs écrites à la main
 
-Généré par `uv run forever origins inventory` sur la version 1.60.1.70245 (ne pas éditer à la main : le test
+Généré par `uv run forever origins inventory` sur la version 1.60.1.70291 (ne pas éditer à la main : le test
 `tests/unit/test_origins_inventory.py` compare ce fichier au rendu de la commande). Chaque ligne est un chemin
-de `forever/data/1.60.1.70245/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
+de `forever/data/1.60.1.70291/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-148 chemins, 616 valeurs ; 83 `probable`, 65 `suppose`
+152 chemins, 631 valeurs ; 87 `probable`, 65 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -54,6 +54,7 @@ Aucun.
 | mechanics.json | `/values/crit.winters_chill_per_stack` | 1 | probable | D4 | mode seed seulement : le mode forever lit spell_scaling.json auras.winters_chill | relevé du client 1.60.1.70009 recopié à la main (references/mechanics.md) |
 | mechanics.json | `/values/damage.bonus_stacking` | 3 | probable | A20 | règle du serveur, test en jeu E6 | vidéo communautaire (décision 73) |
 | mechanics.json | `/values/hit.miss_per_level_below` | 3 | suppose | A3 | règle du serveur, absente du client | règle Classic (PC) |
+| mechanics.json | `/values/legacy.beta_grant` | 4 | probable | G5 | état de la bêta absent du client, porté par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
 | mechanics.json | `/values/leveling.analytic` | 3 | suppose | I6 | hypothèses du modèle analytique | sim_leveling.py du seed (EST) |
 | mechanics.json | `/values/leveling.armor_reduction` | 2 | suppose | I6 | mode seed seulement : le mode forever lit character_scaling.json armor_constant | règle Classic (PC) |
 | mechanics.json | `/values/leveling.defaults` | 3 | suppose | I6 | hypothèses par défaut du simulateur (monstre, course entre deux monstres) | sim_leveling.py du seed (EST) |
@@ -70,12 +71,15 @@ Aucun.
 | mechanics.json | `/values/mana.talent_rank_cost` | 2 | suppose | B11 | mode seed seulement : coût non publié | estimation du seed (EST) |
 | mechanics.json | `/values/pvp.profile` | 41 | suppose | I5 | modèle de scénarios du seed, sans simulation de duel | pvp.py du seed (EST) |
 | mechanics.json | `/values/pvp.weights` | 8 | suppose | I5 | modèle de scénarios du seed, sans simulation de duel | pvp.py du seed (EST) |
+| mechanics.json | `/values/rage.damage_taken_rule` | 6 | probable | B21 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
 | mechanics.json | `/values/respec.beta_observed_resets` | 1 | probable | I5 | relevé communautaire, pas de mesure du projet | observations de la bêta (respec.json) |
 | mechanics.json | `/values/respec.gold_per_hour` | 6 | suppose | I5 | rythme de gain d'or du joueur estimé | respec.py du seed (EST) |
 | mechanics.json | `/values/respec.trip_minutes` | 1 | suppose | I5 | trajet chez le maître de classe estimé | respec.py du seed (EST) |
 | mechanics.json | `/values/spell.default_range_yd` | 1 | suppose | C2 | portée par défaut d'un sort sans portée publiée | repli de fm.py du seed |
 | mechanics.json | `/values/talents.first_level` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel) | fm.py du seed (points_available) |
 | mechanics.json | `/values/talents.points_per_tier` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (TraitCond) | fm.py du seed (check_build) |
+| mechanics.json | `/values/xp.dungeon_kill_bonus` | 2 | probable | I10 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
+| mechanics.json | `/values/xp.group_level_basis` | 3 | probable | I11 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
 | overrides.json | `/Arcane~1Arcane Blast` | 6 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Blast Wave` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Pyroblast` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |

@@ -70,7 +70,8 @@
         "hérité de 1.60.1.70124",
         "révision 3 de 1.60.1.70170 (2026-10-02) : coefficient.low_level_default passe à probable (existence de la pénalité confirmée par la note officielle du 1er octobre 2026) ; la formule coefficient.low_level reste suppose",
         "hérité de 1.60.1.70170",
-        "hérité de 1.60.1.70245"
+        "hérité de 1.60.1.70245",
+        "révision 2 de 1.60.1.70291 (2026-10-09) : règles du serveur de la note officielle du 8 octobre 2026 (message n° 5, révision 1) écrites à la main, probable : xp.dungeon_kill_bonus (I10), xp.group_level_basis (I11), rage.damage_taken_rule (B21), legacy.beta_grant (G5, bêta seulement) ; aucun moteur ne les lit encore"
       ],
       "inherited_from": "1.60.1.70245"
     },
@@ -282,7 +283,7 @@
       "inherited_from": "1.60.1.70245"
     }
   },
-  "revision": 1,
+  "revision": 2,
   "revised_at": "2026-10-09",
   "hotfixes": {
     "dbcache": {
