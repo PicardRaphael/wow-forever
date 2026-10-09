@@ -199,6 +199,8 @@ Stub.player = {
 		[5] = "|cff1eff00|Hitem:23456::::::::19:::::|h[Robe of Testing]|h|r",
 	},
 	target = nil, -- jeton de classe d'un joueur en cible
+	target_level = nil, -- niveau de la cible (-1 : crâne, niveau caché)
+	target_race = nil, -- race de la cible (nom de fichier)
 	version = "1.60.1", build = "70291",
 }
 
@@ -212,7 +214,10 @@ end
 
 UnitName = api("UnitName", function(unit) if unit == "player" then return Stub.player.name end end)
 GetRealmName = api("GetRealmName", function() return Stub.player.realm end)
-UnitLevel = api("UnitLevel", function(unit) if unit == "player" then return Stub.player.level end end)
+UnitLevel = api("UnitLevel", function(unit)
+	if unit == "player" then return Stub.player.level end
+	if unit == "target" then return Stub.player.target_level end
+end)
 UnitClassBase = api("UnitClassBase", function(unit)
 	if unit == "player" then return Stub.player.class end
 	if unit == "target" then return Stub.player.target end
@@ -221,7 +226,10 @@ UnitClass = api("UnitClass", function(unit)
 	local token = UnitClassBase(unit)
 	if token then return token:sub(1, 1) .. token:sub(2):lower(), token end
 end)
-UnitRace = api("UnitRace", function(unit) if unit == "player" then return Stub.player.race, Stub.player.race end end)
+UnitRace = api("UnitRace", function(unit)
+	if unit == "player" then return Stub.player.race, Stub.player.race end
+	if unit == "target" and Stub.player.target_race then return Stub.player.target_race, Stub.player.target_race end
+end)
 UnitFactionGroup = api("UnitFactionGroup", function(unit) return Stub.player.faction, Stub.player.faction end)
 GetRealZoneText = api("GetRealZoneText", function() return Stub.player.zone end)
 GetSubZoneText = api("GetSubZoneText", function() return Stub.player.subzone end)
