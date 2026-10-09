@@ -64,12 +64,9 @@ uv run forever diff 1.60.1.70170 <candidate>              # valeurs changées, a
 avec son numéro de révision dans la provenance ; ni limite quotidienne ni état de la veille touchés, message de
 joueur refusé, texte rendu pour la lecture seulement.
 
-Tâche planifiée Windows (une fois par jour, résumé dans le cache, affiché par la ligne de démarrage de session) :
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1 -WhatIf   # voir ce qui serait créé
-powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1           # créer (08:00), -At 21:30 pour une autre heure
-powershell -ExecutionPolicy Bypass -File scripts\install_watch_task.ps1 -Remove   # retirer
-```
+La veille quotidienne planifiée fait partie du passage de la tâche « WoW Forever - mise à jour » (section
+suivante) ; l'ancienne tâche « WoW Forever - veille locale » (`forever watch --report`, qui ne faisait que regarder)
+est retirée par son script.
 
 ## Mise à jour automatique des données (T08d)
 `forever update` enchaîne, sans session manuelle : archivage de `DBCache.bin` et `Hotfix.log` par build, clone dédié
@@ -103,12 +100,21 @@ session (ajouter le nouveau nom en tête de la liste, `forever/pipeline/tables.p
 première écriture de `forever update --auto` reste en attente de `forever update approve <id>`. Un journal de combat
 n'est noté comme mesuré qu'une fois sa mesure écrite par `forever measures refresh` (décision 187). Un journal écrit sous une version antérieure n'est jamais mesuré dans la version installée, sauf accord explicite et tracé : `forever measures refresh --accept-version <version> --accept-reason "…"` (raison obligatoire, par exemple la note officielle qui ne touche pas ces monstres ; trace dans les notes de `monsters.json` et sa source dans `sources.json`, décision 221).
 
-Tâche planifiée Windows (une fois par jour, 2 h au plus ; remplace la tâche « veille locale ») :
+Tâche planifiée Windows « WoW Forever - mise à jour » (décision 226) : `forever update --auto`, comme le hook
+de démarrage (même verrou `<cache>/update/lock`, même journal `<cache>/update/run-<horodatage>.log`), chaque jour à
+08:00 en heure locale, lancée dès que possible si l'heure est passée (PC éteint à 08:00), seulement si le réseau est
+disponible, 2 h au plus, une seule à la fois ; sans fenêtre (le `pythonw.exe` de Python lance `forever.update_task`,
+qui démarre le passage avec l'interpréteur réel de l'environnement et l'attend) et sans droits administrateur. Le
+script retire l'ancienne tâche « WoW Forever - veille locale ». Il est en UTF-8 avec BOM : Windows PowerShell 5.1 en
+lit les accents correctement.
 ```powershell
-powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -WhatIf   # voir ce qui serait créé
+powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -Print    # contenu de la tâche (JSON), sans rien créer
+powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -WhatIf   # voir ce qui serait fait
 powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1           # créer (08:00), -At 21:30 pour une autre heure
 powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -Remove   # retirer
 ```
+Suivi : `uv run forever update status`, et le dernier `run-*.log`. Après une recréation de `.venv` sur une autre
+version de Python, relancer le script (l'action désigne le `pythonw.exe` de la version installée).
 
 ## Poser une question
 Lancer `claude` dans n'importe quel dossier et poser la question en français. Exemples :
@@ -133,9 +139,12 @@ avec sa ligne de provenance. Sous Windows, jeu en fenêtré ou plein écran fen�
 |---|---|
 | `uv run forever bridge install` | installe ForeverBridge et sa réserve de 200 emplacements (jeu fermé, puis le relancer) ; ensuite, le pont le tient à jour seul |
 | `uv run forever bridge ask "question"` | même conversation que dans le jeu, sans le jeu : vérifie `claude` et les outils |
-| `uv run forever bridge start` | lance le pont en arrière-plan (un seul à la fois) |
+| `uv run forever bridge autostart install` | tâche planifiée « WoW Forever - pont » : le pont démarre à chaque ouverture de session Windows et est relancé s'il s'arrête (sans droits administrateur) ; lancée tout de suite, sauf `--no-start` |
+| `uv run forever bridge autostart status` | tâche installée, surveillance et pont en marche, problèmes (interpréteur ou dépôt disparus) |
+| `uv run forever bridge autostart remove` | retire la tâche (le pont en marche continue : `stop` pour l'arrêter) |
+| `uv run forever bridge start` | lance le pont en arrière-plan avec l'interpréteur réel : il survit au terminal fermé (un seul à la fois) |
 | `uv run forever bridge status` | pont en marche ou non (arrêt sans `stop` signalé), état des données et de l'addon, défauts de contexte, dernières lignes du journal |
-| `uv run forever bridge stop` | arrête le pont (sans effet si aucun ne tourne) |
+| `uv run forever bridge stop` | arrête le pont, et la surveillance du démarrage automatique jusqu'à la prochaine ouverture de session (sans effet si rien ne tourne) |
 | `uv run forever bridge config --model haiku` | modèle de la conversation « jeu » (Sonnet par défaut) |
 | `uv run forever bridge selftest --live` | lit la bande de test de `/fv test` (diagnostic) |
 
@@ -143,6 +152,21 @@ En jeu : `/fv` ouvre la fenêtre (raccourci dans Options > Raccourcis > AddOns),
 ligne ; boutons Talents, Leveling, Familiers, PvP selon la classe ; `/fv fond N` règle l'opacité. Pont arrêté ou
 réserve vide : tapez `/reload` après `forever bridge start`, la réponse arrive par la sauvegarde. Procédure complète :
 `docs/ADDON.md`, section 7, étape 11.
+
+Démarrage automatique (décision 226) : la tâche « WoW Forever - pont » lance, à l'ouverture de la session, une
+surveillance (`pythonw.exe` de Python, sans fenêtre, `python -m forever.bridge.autostart`) qui lit le verrou du pont
+toutes les 15 secondes et lance le pont s'il ne tourne pas, toujours avec l'interpréteur réel (`C:\Program
+Files\Python313\python.exe` dans l'environnement du dépôt), jamais avec le lanceur `.venv\Scripts\python.exe` :
+ce lanceur retient l'interpréteur dans un objet de tâche et l'emporte quand on le tue (c'est ainsi que les ponts
+lancés d'un terminal mouraient avec lui). Un pont mort est relancé aussitôt ; s'il meurt dans la minute, l'attente
+double à chaque essai (30 s, 1 min, 2 min…, 30 min au plus). Journal du pont : `autostart_start`, `autostart_launch`,
+`autostart_bridge_down`, `autostart_stop`. Au repos, jeu fermé ou en arrière-plan, le pont ne capture rien : jeu
+fermé, il cherche la fenêtre du jeu toutes les 3 secondes et ne se réveille qu'une fois par seconde ; il relit la
+liste des sauvegardes toutes les 30 secondes et réécrit la réserve toutes les 10 minutes. Mesure du 2026-10-09
+(jeu fermé, 11 min, un rafraîchissement compris) : pont 0,61 s de processeur, soit 0,09 % d'un cœur (0,22 % avant ces
+réglages), 43 Mo (33 Mo privés) ; surveillance sous la résolution de la mesure (moins de 0,02 s), 24 Mo (14 Mo
+privés) ; journal : aucune fenêtre trouvée, aucune bande lue. Jeu ouvert en arrière-plan : non mesuré (il faut le jeu) ;
+la capture y est refusée à chaque pas (`may_capture`, test `test_nothing_is_read_when_the_game_is_not_in_front`).
 
 Addon tenu à jour : le pont compare l'addon installé à celui du dépôt ; s'il diffère (après une mise à jour du
 dépôt), il le réinstalle dès que le jeu est fermé, jamais pendant qu'il tourne, et la ligne d'état de la fenêtre

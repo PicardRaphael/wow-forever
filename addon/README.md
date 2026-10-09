@@ -6,8 +6,9 @@ Règles, canaux de données et feuille de route : [`docs/ADDON.md`](../docs/ADDO
 Fenêtre de chat de forever dans le jeu (`/fv`) : question, réponse courte avec sa provenance, état des données,
 boutons des tranches faites. Seul addon de forever-core qui dessine : une petite bande de couleurs en haut à gauche,
 le temps d'un envoi. Aucune action de jeu, rien dans la discussion générale (sauf `/fv diag`), aucune ouverture
-automatique. Installation et pont : `uv run forever bridge install`, puis `uv run forever bridge start`
-(`docs/USAGE.md`, « Chat en jeu »). Contient du code adapté de wow-ai (licence MIT, crédits dans `docs/ADDON.md`).
+automatique. Installation et pont : `uv run forever bridge install`, puis `uv run forever bridge start`, ou une
+fois pour toutes `uv run forever bridge autostart install` (pont lancé à chaque ouverture de session Windows ;
+`docs/USAGE.md`, « Chat en jeu »). Contient du code adapté de wow-ai (licence MIT, crédits dans `docs/ADDON.md`).
 
 ## ForeverLogger (0.2.0)
 Active le journal de combat avancé à chaque connexion et note le contexte du personnage pour `forever`. N'agit jamais dans le jeu et ne lit pas le journal de combat (interdit sur Forever) : l'analyse se fait hors du jeu, sur `Logs/WoWCombatLog-*.txt`.

@@ -238,6 +238,20 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        `/reload` : la réponse arrive sans second `/reload`.
     9. `uv run forever bridge status` : les lignes `reply` portent `timings` (démarrage, chaque outil, fin) et
        `cost_usd` ; me donner ces lignes et le temps ressenti.
+14. **Démarrage automatique du pont** (décision 226 ; plus de `forever bridge start` à la main). Sans droits
+    administrateur, dans un terminal à la racine du dépôt.
+    1. `uv run forever bridge autostart install` : crée la tâche « WoW Forever - pont » (ouverture de ta session
+       Windows seulement) et la lance ; `uv run forever bridge autostart status` → « surveillance : en marche »,
+       « pont : en marche », aucun problème.
+    2. Fermer le terminal, en rouvrir un : `uv run forever bridge status` → « Pont : en marche » (le pont tourne avec
+       l'interpréteur réel, plus avec le lanceur de l'environnement qui mourait avec le terminal).
+    3. Fermer puis rouvrir la session Windows (ou redémarrer) : `uv run forever bridge autostart status` → pont en
+       marche sans rien lancer ; jeu lancé, `/fv` répond.
+    4. `uv run forever bridge stop` : le pont s'arrête et n'est pas relancé (« surveillance arrêtée jusqu'à la
+       prochaine ouverture de session ») ; `uv run forever bridge start` le relance d'ici là.
+    5. Retrait : `uv run forever bridge autostart remove` (le pont en marche continue jusqu'à `stop`).
+    Au repos (jeu fermé, ou jeu en arrière-plan ou réduit), le pont ne capture rien ; voir `docs/USAGE.md`, « Chat en
+    jeu », pour la mesure de sa consommation.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

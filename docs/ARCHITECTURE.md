@@ -49,6 +49,12 @@ forever-core/
 - **Exploitation** : `forever bridge install | start | run | stop | status | ask | selftest`, journal JSONL sans pixel
   (`journal.py`), état gardé (`state.py`), un pont à la fois (verrou, dernier signe de vie), arrêt par fichier
   posé seulement pour un pont vivant ; addon tenu à jour par le pont, jeu fermé (`keeper.py`).
+- **Démarrage automatique** (décision 226) : `forever bridge autostart install | remove | status` gère la tâche
+  planifiée « WoW Forever - pont » (`autostart.py`, XML pour `schtasks`, ouverture de session, sans droits
+  administrateur) ; la tâche lance la surveillance avec le `pythonw.exe` de base (bibliothèque standard seulement :
+  `autostart.py`, `lock.py`, `journal.py`, `forever/spawn.py`), qui lance et relance le pont avec l'interpréteur réel
+  (`spawn.current_interpreter` : interpréteur de base et `__PYVENV_LAUNCHER__`, jamais le lanceur de `.venv`, qui
+  retient l'interpréteur dans un objet de tâche). `forever bridge start` passe par le même lancement.
 
 ## Bloc provenance (dans chaque réponse d'outil)
 ```json
