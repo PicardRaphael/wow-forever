@@ -73,5 +73,23 @@ def test_typical_message_fits_the_band():
     talents = ",".join(f"{1000 + i}:3" for i in range(51))
     gear = ";".join(f"{slot}:{20000 + slot}:{'N' * 40}" for slot in range(1, 18))
     context = {**CONTEXT, "talents": talents, "gear": gear}
-    record = Record("abcd1234", 65535, frozenset({"n", "b=talents"}), context, "é" * 255, slot=200)
+    record = Record("abcd1234", 65535, frozenset({"n", "b=talents"}), context, "q" * 255, slot=200)
     assert len(build_payload(record)) <= MAX_PAYLOAD
+
+
+FRENCH_QUESTION = (
+    "Je suis à Westfall avec mon mage de niveau 19 : quel talent dois-je prendre après Improved Frostbolt, "
+    "et est-ce que ça vaut le coup de garder le même équipement pour la suite ?"
+)
+
+
+def test_realistic_french_question_with_full_context_fits():
+    """Demande de l'utilisateur du 2026-10-09 : question en français de longueur typique, accents compris, avec le
+    contexte complet (talents et équipement d'un personnage type), sans allègement."""
+    assert {"é", "è", "à", "ç"} <= set(FRENCH_QUESTION)
+    talents = ",".join(f"{1000 + i}:3" for i in range(51))
+    gear = ";".join(f"{slot}:{20000 + slot}:{'Pièce équipée n° ' + str(slot):<40}" for slot in range(1, 18))
+    context = {**CONTEXT, "talents": talents, "gear": gear}
+    record = Record("abcd1234", 42, frozenset(), context, FRENCH_QUESTION, slot=12)
+    assert len(build_payload(record)) <= MAX_PAYLOAD
+    assert parse_payload(build_payload(record)) == record

@@ -232,3 +232,19 @@ def test_no_forbidden_call_while_sending():
     game.stub.Advance(40)
     assert list(game.stub.forbidden.values()) == []
     assert list(game.stub.printed.values()) == []
+
+
+def test_realistic_french_question_is_sent_with_the_full_context():
+    """Demande de l'utilisateur du 2026-10-09 : question en français, accents compris, contexte complet sans
+    allègement (51 rangs de talents, 17 pièces d'équipement aux noms de longueur courante)."""
+    from test_bridge_record import FRENCH_QUESTION
+
+    game = Game()
+    heavy_player(game, nodes=51, name_len=30, pieces=17)
+    game.slash("/fv")
+    type_and_enter(game, FRENCH_QUESTION)
+    _, record = sent(game)
+    assert record.text == FRENCH_QUESTION
+    names = [piece.split(":", 2)[2] for piece in record.context["gear"].split(";")]
+    assert len(names) == 17 and all(len(n) == 30 for n in names)
+    assert record.context["subzone"] == "Sentinel Hill" and len(record.context["talents"].split(",")) == 51
