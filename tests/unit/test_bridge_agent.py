@@ -92,7 +92,17 @@ def test_only_the_forever_mcp_server(tmp_path):
     server = config["mcpServers"]["forever"]
     assert server["command"] == "uv"
     # module plutôt que le lanceur forever.exe (verrou de uv sync, demande de l'utilisateur du 2026-10-09)
-    assert server["args"] == ["run", "--no-sync", "--quiet", "--project", str(REPO_ROOT), "python", "-m", "forever", "mcp"]
+    assert server["args"] == [
+        "run",
+        "--no-sync",
+        "--quiet",
+        "--project",
+        str(REPO_ROOT),
+        "python",
+        "-m",
+        "forever",
+        "mcp",
+    ]
     path = write_mcp_config(tmp_path, REPO_ROOT)
     assert json.loads(path.read_text(encoding="utf-8")) == config
 

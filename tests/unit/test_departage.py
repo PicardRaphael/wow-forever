@@ -96,31 +96,22 @@ def assert_order_is_legal(gd, rep):
     assert acc == rep["talents"]
 
 
-def test_a_neighbor_that_wins_at_monte_carlo_is_recommended_with_a_legal_order(deps, monkeypatch, game_data):
+def test_a_neighbor_that_wins_at_monte_carlo_is_recommended(deps, monkeypatch):
     chosen = rigged(monkeypatch, first_neighbor)
-    rep = build_report(deps, "leveling", 14, preset="rapide", sensitivity=False)
+    rep = build_report(deps, "dungeon", 20, preset="rapide", sensitivity=False)
     assert rep["talents"] == chosen["target"]
     assert rep["departage"]["switched"] is True and rep["departage"]["chosen"] == "voisin"
-    assert_order_is_legal(game_data, rep)
     assert not (rep["alternative"]["better"] == "alternative" and not rep["alternative"]["tie"])
 
 
-def test_the_current_build_that_wins_is_recommended_and_kept(deps, monkeypatch, game_data):
+CURRENT_20 = {"arcaneFocus": 5, "arcaneConcentration": 5, "arcaneBlast": 1}
+
+
+def test_the_current_build_that_wins_a_dungeon_is_recommended(deps, monkeypatch):
     chosen = rigged(monkeypatch, lambda cands: cands[-1])
-    rep = build_report(
-        deps,
-        "leveling",
-        14,
-        preset="rapide",
-        current={"improvedFrostbolt": 3, "elementalPrecision": 1},
-        sensitivity=False,
-    )
+    rep = build_report(deps, "dungeon", 20, preset="rapide", current=CURRENT_20, sensitivity=False)
     assert rep["departage"]["chosen"] == "build actuel"
-    assert rep["talents"] == chosen["target"] == rep["respec"]["projected"]["talents"]
-    assert rep["respec"]["verdict"] == "garder"
-    assert rep["respec"]["versus_optimal"]["current_better"] is False
-    assert "retenu" in rep["respec"]["reason"]
-    assert_order_is_legal(game_data, rep)
+    assert rep["talents"] == chosen["target"] == CURRENT_20
 
 
 def test_the_current_build_enters_the_departage_of_a_dungeon(deps, monkeypatch):
@@ -133,46 +124,37 @@ def test_the_current_build_enters_the_departage_of_a_dungeon(deps, monkeypatch):
         return cands
 
     monkeypatch.setattr(build_module, "_departage_candidates", capture)
-    current = {"arcaneFocus": 5, "arcaneConcentration": 5, "arcaneBlast": 1}
-    rep = build_report(deps, "dungeon", 20, preset="rapide", current=current, sensitivity=False)
-    assert current in seen["cands"]
-    assert rep["departage"]["criterion"]
+    rep = build_report(deps, "dungeon", 20, preset="rapide", current=CURRENT_20, sensitivity=False)
+    assert CURRENT_20 in seen["cands"]
+    assert "niveau 20" in rep["departage"]["criterion"]
 
 
-def test_real_data_never_recommend_a_build_slower_than_a_candidate(deps):
-    rep = build_report(
-        deps,
-        "leveling",
-        12,
-        preset="rapide",
-        current={"improvedFrostbolt": 2, "elementalPrecision": 1},
-        sensitivity=False,
-    )
+def test_real_data_never_recommend_a_dungeon_build_slower_than_a_candidate(deps):
+    rep = build_report(deps, "dungeon", 20, preset="rapide", current=CURRENT_20, sensitivity=False)
     dep = rep["departage"]
     assert {"criterion", "candidates", "chosen", "switched", "mc_runs"} <= set(dep)
     assert all(not (c["significant"] and c["better"]) for c in dep["candidates"] if not c["champion"])
     assert not (rep["alternative"]["better"] == "alternative" and not rep["alternative"]["tie"])
-    assert rep["respec"]["versus_optimal"]["current_better"] is False
     assert dep["mc_runs"] >= 1  # nombre de Monte Carlo lancés (le temps se mesure hors du rapport, déterministe)
 
 
-def test_the_end_of_every_tree_path_enters_the_departage(deps, monkeypatch, game_data):
-    """Relevé au leveling 20 de 1.60.1.70291 : le chemin Givre finit sur un build meilleur au niveau demandé, même en
-    analytique, mais perd au cumul d'heures des niveaux précédents ; non voisin du build retenu, il n'entrait pas au
-    départage. La fin de chaque faisceau (libre et par arbre) est candidate ; gagnante, son ordre est le sien."""
+def test_leveling_path_ends_are_ranked_by_cumulative_time(deps, monkeypatch, game_data):
+    """Décision 220 : en leveling, les fins de faisceau se départagent au temps cumulé du chemin (heures
+    équivalentes), pas au niveau demandé seul ; le chemin le plus court est retenu, avec son ordre."""
     seen = {}
     real_paths = build_module.leveling_paths
 
     def capture(*args, **kwargs):
         paths = real_paths(*args, **kwargs)
-        seen["ends"] = [{k: v for k, v in p.points.items() if v > 0} for p in paths]
+        seen["paths"] = paths
         return paths
 
     monkeypatch.setattr(build_module, "leveling_paths", capture)
     rep = build_report(deps, "leveling", 14, preset="rapide", sensitivity=False)
-    talents = [c["talents"] for c in rep["departage"]["candidates"]]
-    assert len(seen["ends"]) > 1
-    for end in seen["ends"]:
-        assert {k: end[k] for k in game_data.talents if end.get(k, 0) > 0} in talents
-    assert all(not (c["significant"] and c["better"]) for c in rep["departage"]["candidates"] if not c["champion"])
+    dep = rep["departage"]
+    assert "cumulé" in dep["criterion"]
+    best = min(seen["paths"], key=lambda q: q.hours_equiv)
+    assert rep["talents"] == {k: best.points[k] for k in game_data.talents if best.points.get(k, 0) > 0}
+    hours = [c["hours"] for c in dep["candidates"]]
+    assert min(hours) == next(c["hours"] for c in dep["candidates"] if c["champion"])
     assert_order_is_legal(game_data, rep)

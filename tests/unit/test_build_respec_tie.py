@@ -35,9 +35,9 @@ def only_the_path_build(monkeypatch):
 def test_versus_optimal_is_a_paired_gap_with_its_decision(report):
     versus = report["respec"]["versus_optimal"]
     assert {"mean", "low", "high", "confidence", "significant", "decided_by", "tie"} <= set(versus)
-    assert versus["tie"] is (not versus["significant"])
+    assert versus["tie"] is (not versus["significant"] and versus["optimal"] != versus["current"])
     assert versus["low"] <= versus["mean"] <= versus["high"]
-    assert versus["optimal"] == report["talents"]
+    assert versus["optimal"] == report["respec"]["free"]["talents"]  # décision 220 : build d'une respec
     assert versus["current"] == report["respec"]["projected"]["talents"]
 
 
