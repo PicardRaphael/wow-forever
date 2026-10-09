@@ -155,7 +155,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     1. Jeu fermé : `uv run forever bridge install` (réserve de 200 emplacements `ForeverBridge_S001`…`S200`, liste
        des addons plus longue : c'est attendu) ; relancer le jeu.
     2. `uv run forever bridge start` ; `/fv` : voyant vert après le premier relevé, ligne d'état des données
-       (version, fraîcheur, attentes), boutons visibles selon la classe (Mage : Talents, Leveling, PvP ; Chasseur :
+       (version, fraîcheur, attentes), boutons visibles selon la classe (Mage : Talents, Leveling, PvP ; Chasseur : Talents,
        Familiers, PvP).
     3. Question tapée (« Which talent should I take next? » ou en français), Entrée : bande visible quelques secondes
        en haut à gauche, retirée dès l'accusé ; « en cours » animé ; réponse courte mise en forme avec sa ligne de
@@ -163,7 +163,9 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     4. Maj+Entrée passe à la ligne ; question de suite : même session (journal) ; « Nouvelle conversation » puis
        une question : nouvelle session.
     5. Bouton Talents (Mage) : réponse avec `[Talents Forever]` ; clic : zone copiable, Ctrl+C, collé dans Talents
-       Forever (`/tf`). Bouton PvP avec un joueur en cible ; Familiers sur un Chasseur si possible.
+       Forever (`/tf`). Bouton Talents sur un personnage d'une autre classe : build populaire le plus proche, son lien,
+       et la ligne « pas encore calculé par le moteur de forever ». Bouton PvP avec un joueur en cible ; Familiers sur
+       un Chasseur si possible.
     6. Fenêtre fermée pendant une réponse : elle ne s'ouvre pas seule (voyant et compteur) ; rien dans la discussion
        générale.
     7. `uv run forever bridge stop`, question : après trois relevés, « pont injoignable », bande retirée ; `uv run
