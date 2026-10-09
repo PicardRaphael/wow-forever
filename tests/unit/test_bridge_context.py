@@ -3,8 +3,8 @@ les identifiants de nœud (`C_Traits`), que `classes.json` relie aux talents (ta
 client) ; contexte réel de la sonde."""
 
 from conftest import FIXTURES
-from forever.bridge.context import describe_talents, talent_table, talents_line
 
+from forever.bridge.context import describe_talents, talent_table, talents_line
 from forever.bridge.prompt import message_text
 from forever.bridge.record import Record, parse_payload
 

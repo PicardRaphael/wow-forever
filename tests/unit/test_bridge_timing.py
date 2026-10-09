@@ -7,11 +7,11 @@ import json
 import time
 
 from conftest import FIXTURES
-from forever.bridge.config import DEFAULT_MODEL, load_config, save_config
 from test_bridge_loop import RECORD as LOOP_RECORD
 from test_bridge_loop import FakeAgent, FakeCapture, band_of, events, make
 
 from forever.bridge.agent import AgentResult, run_claude, stream_timings
+from forever.bridge.config import DEFAULT_MODEL, load_config, save_config
 from forever.cli import main
 
 LINES = (FIXTURES / "bridge" / "claude_stream_status.jsonl").read_text(encoding="utf-8").splitlines()
