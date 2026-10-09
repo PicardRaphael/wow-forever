@@ -151,6 +151,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        Forever : autotests `.wav` et `.ogg` en échec (rien n'en dépend désormais).
     8. Relevé : la ligne de l'étape 4, la sortie de l'étape 5 et le fichier `.bmp` enregistré, ce qui ne va pas à
        l'étape 6, la capture de l'étape 7.
+    9. **Fait le 2026-10-09** (relevés de l'utilisateur) : `/fv poll` rend « modifié à 09:01:46 » (BR1 résolue) ; bande d'une case par pixel lue (« vecteur reconnu », « case de 1 pixel », 2 560 × 1 440, `tests/fixtures/bridge/band_live_1px.bmp`) ; fenêtre : ouverture, fermeture, déplacement, redimensionnement, Échap, position et taille gardées après `/reload` ; raccourci pas encore essayé. Défauts corrigés le même jour : aide affichée deux fois, fond trop transparent (opaque par défaut, `/fv fond N`), `/fv diag` sans rien de visible (la fenêtre couvrait sans doute la discussion : il confirme désormais son passage dans la fenêtre et y montre une erreur Lua ; `/console scriptErrors 1` affiche les erreurs Lua du jeu).
 11. **Procédure du chat** (P06a, fin de tranche, **à jouer avant le 2026-10-21**, non bloquante pour la fusion) :
     1. Jeu fermé : `uv run forever bridge install` (réserve de 200 emplacements `ForeverBridge_S001`…`S200`, liste
        des addons plus longue : c'est attendu) ; relancer le jeu.

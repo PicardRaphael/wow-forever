@@ -277,12 +277,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   [Détail](research/questions-ouvertes-detail.md#fam7)
 
 ## Pont en jeu (P06a)
-- **BR1 — Le premier chargement d'un emplacement modifié après le lancement du jeu, sans `/reload`, lit-il le
-  nouveau contenu ?** Acquis après `/reload` (sonde en jeu A du 2026-10-09). Test : sonde en jeu B
-  (`docs/ADDON.md` §7, étape 10.4). Priorité : haute (chemin des réponses de P06a, décision 212).
 - **BR2 — La bande d'une case par pixel est-elle lue sans erreur à toutes les échelles d'interface et résolutions ?**
-  Une case de 4 pixels est lue au pixel près à 2 560 × 1 440 (sonde A). Test : étape 10.5, puis à une autre
-  résolution ou échelle. Priorité : haute (repli à 2 pixels prévu).
+  Lue au pixel près à 2 560 × 1 440, échelle d'interface 0,7111, en cases de 4 pixels (sonde A) puis d'un pixel
+  (sonde B du 2026-10-09). Test : une autre résolution ou échelle d'interface. Priorité : moyenne (repli à 2
+  pixels prévu, reconnu par le pont).
 - **BR3 — 200 addons chargés à la demande ralentissent-ils le démarrage du client ou gênent-ils la liste des
   addons ?** wow-ai en installe 200. Test : étape 11.1 (durée du chargement, liste des addons). Priorité : moyenne.
 - **BR4 — Le canal de retour par mesures de polices (wow-forever-codex) peut-il servir de vérification rapide « est-ce

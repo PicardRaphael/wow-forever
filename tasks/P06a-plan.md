@@ -850,6 +850,30 @@ schema = 1, session, next_id, history, outbox, window = { point, relPoint, x, y,
   tests du diagnostic) ; harnais `Game` qui convertissait `saved` sans récursion (`table_from(saved,
   recursive=True)`), une table imbriquée arrivant sinon en `userdata`.
 
+### Exécution : sonde en jeu B (2026-10-09, relevés de l'utilisateur)
+- `/fv poll` : « modifié à 09:01:46 » : **BR1 résolue** (premier chargement sans `/reload` relu ; consignée dans
+  `docs/RESOLVED_QUESTIONS.md`). Bande d'une case par pixel lue (« case de 1 pixel », 2 560 × 1 440), capture en
+  non-régression (`band_live_1px.bmp`). Fenêtre : tout marche sauf le raccourci, pas encore essayé.
+- Corrigé le même jour : aide affichée deux fois (jamais répétée désormais), fond trop transparent (opaque par défaut,
+  `/fv fond N` de 30 à 100, gardé dans `ForeverBridgeDB.window.alpha`), `/fv diag` sans rien de visible (même code
+  qu'à la sonde A ; la fenêtre couvrait sans doute la discussion : confirmation dans la fenêtre et erreur Lua montrée).
+
+### Bloc B revu (2026-10-09, demande de l'utilisateur : la saisie et la barre de boutons dans P06a)
+Le bloc B porte le message **des deux côtés**, pour qu'une question tapée en jeu soit lue par le pont dès sa fin
+(sonde C) :
+- Python : `record.py` (champs `1`, session, numéro, drapeaux `n`, `h`, `b=<bouton>`, `slot`, contexte, texte),
+  `slots.py` (200 emplacements, `publish` à partir de `first`, `lua_string`, `inbox_lua`, `status_lua`),
+  `install.py` (réserve `ForeverBridge_S001`…, `Inbox.lua` d'attente écrit seulement s'il manque ; `--slots`),
+  `buttons.py`, `format.py`, `forever bridge selftest --live --message` (décode n'importe quel message de la bande et
+  l'affiche : numéro, drapeaux, emplacement, clés du contexte, texte ; rien n'est gardé).
+- Lua : `Message.lua` (contexte du personnage sous `pcall` et `issecretvalue`, charge, allègement dans l'ordre du
+  choix 6), **zone de saisie** (Entrée envoie, Maj+Entrée passe à la ligne, Échap ôte le focus, 255 caractères),
+  boutons « Envoyer » et « Nouvelle conversation », **barre de boutons** d'après `ForeverBridgeStatus.buttons`
+  (`Status.lua`, écrit par le pont au bloc D ; fichier d'attente sans bouton d'ici là), envoi par la bande avec le
+  numéro du prochain emplacement. **Provisoire jusqu'au bloc E** : sans consultation de la réserve, la bande est
+  retirée au bout de 30 s ou par l'envoi suivant, et la fenêtre dit « réponse au bloc E ».
+- Bloc E : consultation (R1), accusé, réponses mises en forme, lien copiable, voyant et état des données.
+
 ### Questions ouvertes ajoutées (`docs/OPEN_QUESTIONS.md`, section « Pont en jeu »)
 BR1 premier chargement d'un emplacement sans `/reload` ; BR2 bande d'une case par pixel à toutes les échelles ; BR3
 effet de 200 addons chargés à la demande sur le démarrage et la liste des addons ; BR4 canal par polices.
