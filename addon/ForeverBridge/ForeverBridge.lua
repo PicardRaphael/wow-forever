@@ -45,6 +45,7 @@ local PROBE2_ADDON = "ForeverBridge_Probe2"
 local PREFIX = "|cff33ff99ForeverBridge|r : "
 local WINDOW_W, WINDOW_H = 520, 360
 local MIN_W, MIN_H = 360, 240
+local MIN_ALPHA = 0.3 -- fond réglable par /fv fond, de 30 à 100 (opaque par défaut)
 
 BINDING_HEADER_FOREVERBRIDGE = "ForeverBridge"
 BINDING_NAME_FOREVERBRIDGE_TOGGLE = "Ouvrir ou fermer la fenêtre"
@@ -117,6 +118,17 @@ local function RestoreGeometry(f)
 	end
 end
 
+-- Opacité du fond : celle gardée dans ForeverBridgeDB.window, opaque à défaut.
+function FB.ApplyBackground()
+	local f = ui.frame
+	if not (f and f.SetBackdropColor) then
+		return
+	end
+	local alpha = tonumber((WindowState() or {}).alpha) or 1
+	alpha = math.min(1, math.max(MIN_ALPHA, alpha))
+	f:SetBackdropColor(0.05, 0.05, 0.07, alpha)
+end
+
 local function BuildWindow()
 	if ui.frame then
 		return ui.frame
@@ -141,10 +153,10 @@ local function BuildWindow()
 	end)
 	if f.SetBackdrop then
 		f:SetBackdrop(BACKDROP)
-		f:SetBackdropColor(0.05, 0.05, 0.07, 0.92)
 		f:SetBackdropBorderColor(0.6, 0.6, 0.6, 1)
 	end
 	RestoreGeometry(f)
+	FB.ApplyBackground()
 	f:Hide()
 	tinsert(UISpecialFrames, "ForeverBridgeWindow")
 
@@ -209,6 +221,7 @@ end
 function FB.Print(text)
 	BuildWindow()
 	ui.history:AddMessage(text)
+	ui.count = (ui.count or 0) + 1
 end
 
 -- Ouverture à la demande du joueur seulement (commande ou raccourci), jamais automatique.
@@ -418,7 +431,7 @@ local function DiagProbe()
 	end
 end
 
-function FB.Diag()
+local function RunDiag()
 	local width, height = PhysicalSize()
 	local uiScale = UIParent.GetEffectiveScale and UIParent:GetEffectiveScale() or 1
 	ChatSay(string.format("écran %d × %d, échelle de la bande %.4f, échelle de l'interface %.4f", width, height,
@@ -430,6 +443,35 @@ function FB.Diag()
 			.. "(aucun son dans le chemin du pont)")
 	end
 	DiagProbe()
+end
+
+-- Diagnostic dans la discussion générale ; la fenêtre confirme son passage (elle peut couvrir la discussion) et une
+-- erreur Lua y est montrée au lieu d'un silence.
+function FB.Diag()
+	local ok, err = pcall(RunDiag)
+	if ok then
+		FB.Print("/fv diag : résultats écrits dans la discussion générale (onglet principal), sous cette fenêtre si "
+			.. "elle la couvre.")
+	else
+		local text = "/fv diag en erreur : " .. tostring(err)
+		ChatSay(text)
+		FB.Open()
+		FB.Print(text)
+	end
+end
+
+function FB.SetBackground(value)
+	local percent = tonumber(value)
+	if not (percent and percent >= MIN_ALPHA * 100 and percent <= 100) then
+		FB.Print("fond : /fv fond suivi d'un nombre de 30 (transparent) à 100 (opaque).")
+		return
+	end
+	local state = WindowState()
+	if state then
+		state.alpha = percent / 100
+	end
+	FB.ApplyBackground()
+	FB.Print("fond : " .. percent .. " sur 100.")
 end
 
 ---------------------------------------------------------------------------
@@ -475,15 +517,21 @@ local HELP = {
 	"/fv : ouvrir ou fermer cette fenêtre (raccourci : Options > Raccourcis > AddOns > ForeverBridge ; Échap ferme).",
 	"/fv test [1-4] : bande de test, lue par uv run forever bridge selftest --live (une case par pixel par défaut).",
 	"/fv poll : chargement d'un emplacement de sonde sans /reload (sonde en jeu B).",
+	"/fv fond N : opacité du fond de la fenêtre, de 30 à 100 (opaque).",
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
 }
 
+-- Aide dans la fenêtre ; jamais deux fois de suite (rien d'autre écrit depuis la dernière).
 local function Help()
 	ui.helped = true
 	FB.Open()
+	if ui.helpAt and ui.helpAt == ui.count then
+		return
+	end
 	for _, line in ipairs(HELP) do
 		FB.Print(line)
 	end
+	ui.helpAt = ui.count
 end
 
 SLASH_FOREVERBRIDGE1 = "/fv"
@@ -500,6 +548,9 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.Test(rest)
 	elseif command == "poll" then
 		FB.Poll()
+	elseif command == "fond" then
+		FB.Open()
+		FB.SetBackground(rest)
 	elseif command == "diag" then
 		FB.Diag()
 	else
