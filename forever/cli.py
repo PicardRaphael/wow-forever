@@ -68,6 +68,8 @@ from forever.pipeline import notes as notes_mod
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
 from forever.pipeline.client_builds import (
+    Accepted,
+    accept_earlier,
     current_builds,
     read_build_info,
     split_by_version,
@@ -102,6 +104,7 @@ from forever.pipeline.measure import (
 from forever.pipeline.monsters import MONSTERS_FILE, build_monsters, write_monsters
 from forever.pipeline.questie import read_questie
 from forever.pipeline.refresh import (
+    ACCEPTED_MARK,
     RefreshSources,
     apply_refresh,
     collect_sources,
@@ -490,6 +493,15 @@ def build_parser() -> argparse.ArgumentParser:
         "monsters.json installé)",
     )
     refresh.add_argument("--curve-exclude-reason", help="raison des PNJ de --curve-exclude (obligatoire avec eux)")
+    refresh.add_argument(
+        "--accept-version",
+        metavar="VERSION",
+        help="mesurer aussi les journaux de cette version antérieure dans la version installée (tracé ; "
+        "--accept-reason obligatoire)",
+    )
+    refresh.add_argument(
+        "--accept-reason", help="raison de --accept-version (par exemple la note qui ne touche pas ces monstres)"
+    )
     mode = refresh.add_mutually_exclusive_group()
     mode.add_argument("--yes", action="store_true", help="écrire sans demander")
     mode.add_argument("--dry-run", action="store_true", help="afficher sans jamais écrire")
@@ -2917,6 +2929,13 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     keep, held, unknown = split_by_version(
         [(p.name, starts.get(p.name)) for p in sources.logs], builds, data.game_version, utc_offset=offset
     )
+    accepted: list[Accepted] = []
+    if args.accept_version:
+        try:
+            accepted, held = accept_earlier(held, args.accept_version, args.accept_reason or "", data.game_version)
+        except ValueError as exc:
+            raise InvalidArgumentError(str(exc), "donner --accept-reason TEXTE et une version antérieure") from exc
+        keep = [*keep, *(a.name for a in accepted)]
     sources = sources._replace(logs=tuple(p for p in sources.logs if p.name in keep))
     new = remeasure(
         gd,
@@ -2936,11 +2955,19 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
         )
     for h in held:
         new["notes"].append(f"{h.name} retenu : {h.reason}")
+    if accepted:
+        trace = (
+            f"journaux écrits sous le client {args.accept_version}, mesurés dans {data.game_version} {ACCEPTED_MARK} : "
+            f"{', '.join(a.name for a in accepted)} ; raison : {args.accept_reason}"
+        )
+        new["notes"].append(trace)
+        new["monsters"].setdefault("notes", []).append(trace)
     previous = read_snapshot(deps.cache_dir)
     if previous is None and snapshot_exists(deps.cache_dir):
         new["notes"].append("instantané illisible (<cache>/measures/last.json) : traité comme un premier instantané")
     diff = compare(installed, registry.load(deps.registry_path), previous, new)
     diff["measures"]["held_back"] = [h._asdict() for h in held]
+    diff["measures"]["accepted_earlier"] = [a._asdict() for a in accepted]
     diff["curve_candidates"] = curve_candidates(new["monsters"], questie)  # proposés, jamais écartés sans accord
     written: list[Path] = []
     if not diff["changed"]:

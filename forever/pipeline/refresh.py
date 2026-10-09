@@ -427,14 +427,21 @@ def read_snapshot(cache_dir: Path) -> MeasureSnapshot | None:
     return doc if isinstance(doc, dict) else None
 
 
+# Marque des notes de `monsters.json` qui tracent des journaux d'une version antérieure mesurés sur accord explicite
+# (`forever measures refresh --accept-version`, 2026-10-09) ; reprises dans la source de `sources.json`.
+ACCEPTED_MARK = "sur accord explicite (--accept-version)"
+
+
 def monsters_source(table: Mapping[str, Any], date: str) -> str:
     """Texte `source` de `monsters.json` dans `sources.json` après un rafraîchissement écrit."""
     excluded = [str(e["npc_id"]) for e in (table.get("questie_correction") or {}).get("excluded", [])]
     questie = table.get("questie_source") or "sans Questie"
+    accepted = [n for n in table.get("notes", []) if ACCEPTED_MARK in str(n)]
     return (
         f"Journaux de combat du client ({', '.join(table.get('logs', []))}, PV max du bloc avancé) ; valeurs en "
         f"regard et agrégat des niveaux non observés : {questie} ; table écrite par forever measures refresh le {date}"
         + (f" (--fit-exclude {', '.join(excluded)})" if excluded else "")
+        + "".join(f" ; {n}" for n in accepted)
     )
 
 

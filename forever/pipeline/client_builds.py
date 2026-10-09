@@ -201,3 +201,25 @@ def current_builds(cache_dir: Path, wow_dir: Path | None) -> list[ClientBuild]:
         if found is not None:
             return record_build(cache_dir, found)
     return load_builds(cache_dir)
+
+
+class Accepted(NamedTuple):
+    """Journal d'une version antérieure mesuré dans la version installée, sur accord explicite et tracé."""
+
+    name: str
+    client_version: str
+    reason: str
+
+
+def accept_earlier(
+    held: list[HeldBack], version: str, reason: str, installed: str
+) -> tuple[list[Accepted], list[HeldBack]]:
+    """Journaux retenus écrits sous `version` acceptés dans la mesure de `installed` (`forever measures refresh
+    --accept-version --accept-reason`, 2026-10-09) : seulement une version antérieure à la version installée, avec sa
+    raison ; ValueError sinon. Rend (acceptés, toujours retenus)."""
+    if not reason.strip():
+        raise ValueError("raison obligatoire (--accept-reason) pour mesurer les journaux d'une version antérieure")
+    if version_key(version) >= version_key(installed):
+        raise ValueError(f"{version} n'est pas antérieure à la version installée {installed}")
+    accepted = [Accepted(h.name, version, reason) for h in held if h.client_version == version]
+    return accepted, [h for h in held if h.client_version != version]

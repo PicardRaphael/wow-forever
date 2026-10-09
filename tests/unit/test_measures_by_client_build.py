@@ -172,6 +172,7 @@ def test_logs_of_the_accepted_earlier_version_are_measured_and_traced(tmp_path, 
     assert accepted and {a["client_version"] for a in accepted} == {PREVIOUS_VERSION}
     assert all(a["reason"] == REASON for a in accepted)
     assert set(payload["sources"]["logs"]) >= {a["name"] for a in accepted}
+    assert payload["status"] == "écrit", payload["status"]
     if payload["status"] == "écrit":
         monsters = read_json(data_copy / LOCAL_VERSION / "monsters.json")
         assert any(PREVIOUS_VERSION in n and REASON in n for n in monsters["notes"])

@@ -101,7 +101,7 @@ le client (aucun de ses noms dans le CSV) donne une attente `column_names`, avec
 session (ajouter le nouveau nom en tête de la liste, `forever/pipeline/tables.py` et `decode_rules.json`) et
 `approve` la refuse (décision 185). Garde-fou (décision 184) : tant qu'aucun passage réel n'a été approuvé, la
 première écriture de `forever update --auto` reste en attente de `forever update approve <id>`. Un journal de combat
-n'est noté comme mesuré qu'une fois sa mesure écrite par `forever measures refresh` (décision 187).
+n'est noté comme mesuré qu'une fois sa mesure écrite par `forever measures refresh` (décision 187). Un journal écrit sous une version antérieure n'est jamais mesuré dans la version installée, sauf accord explicite et tracé : `forever measures refresh --accept-version <version> --accept-reason "…"` (raison obligatoire, par exemple la note officielle qui ne touche pas ces monstres ; trace dans les notes de `monsters.json` et sa source dans `sources.json`, décision 221).
 
 Tâche planifiée Windows (une fois par jour, 2 h au plus ; remplace la tâche « veille locale ») :
 ```powershell
