@@ -91,6 +91,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   leveling avec ForeverLogger, même rang à plusieurs niveaux. Priorité : moyenne. Registre G7.
   [Détail](research/questions-ouvertes-detail.md#mag18)
 - **MAG19 — Pourquoi le build Feu du leveling 20 (1.60.1.70291) est-il bien plus lent au Monte Carlo qu'en analytique (35,6 contre 38,7 s par monstre) ?** Ajoutée le 2026-10-09, réduite le même jour : la partie « quel build recommander » est tranchée par l'utilisateur (décision 220 : chemin au temps cumulé depuis le niveau et le build actuels ; meilleur build au niveau N pour le donjon, le raid et le PvP, départage au Monte Carlo de la décision 219) et déplacée dans `RESOLVED_QUESTIONS.md`. Reste l'écart entre l'analytique et le Monte Carlo du build Feu (Improved Fireball 5, Ignite, Elemental Precision 3), plus grand que celui du Givre (32,55 contre 32,41 s). Test : recoupement avec le simulateur de MythicSim, puis comparaison cas par cas de l'analytique et du Monte Carlo (Ignite, critiques, temps de vol). Priorité : moyenne. Registre I1, I6, A18.
+
 ## Personnage et ratios du client
 - **PER1 — Où sont la critique de base des sorts et la mana par point d'Intelligence ?** Test : `GetSpellCritChance`
   et `UnitPowerMax` à Intelligence connue (ForeverLogger). Priorité : moyenne. Registre A5, B9.
