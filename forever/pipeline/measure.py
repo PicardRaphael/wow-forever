@@ -10,7 +10,7 @@ from __future__ import annotations
 from collections import defaultdict
 from collections.abc import Iterable
 from itertools import pairwise
-from typing import NamedTuple, TypedDict
+from typing import NamedTuple, NotRequired, TypedDict
 
 from forever.engine.model import GameData
 from forever.pipeline.combatlog import NO_GUID, Event, LogHeader, is_known
@@ -34,6 +34,8 @@ class MonsterObservation(TypedDict):
     guids: int
     ui_map_id: int
     log: str
+    fought: NotRequired[bool]  # au moins un individu combattu par le joueur qui journalise (décision 222)
+    reaction: NotRequired[str | None]  # « amie » si un individu l'est, sinon « hostile », sinon « neutre »
 
 
 class Conflict(TypedDict):
@@ -78,7 +80,22 @@ def unit_name(events: Iterable[Event], guid: str) -> str | None:
 
 def monster_hp(events: Iterable[Event], *, log: str = "") -> tuple[list[MonsterObservation], list[Conflict]]:
     """PV max par (PNJ, niveau), lus dans le bloc avancé qui décrit une créature. Une seule valeur observée :
-    observation ; plusieurs valeurs au même niveau : conflit listé, jamais moyenné."""
+    observation ; plusieurs valeurs au même niveau : conflit listé, jamais moyenné. Chaque observation dit si un de
+    ses individus a été combattu par le joueur qui journalise (dégâts, soins ou sorts entre eux) et sa réaction d'après
+    les drapeaux du journal (décision 222)."""
+    events = list(events)
+    me = find_mine(events)
+    engaged: set[str] = set()
+    reactions: dict[str, set[str]] = defaultdict(set)
+    for e in events:
+        if e.source is not None and e.dest is not None and me is not None:
+            if e.source.guid == me:
+                engaged.add(e.dest.guid)
+            if e.dest.guid == me:
+                engaged.add(e.source.guid)
+        for u in (e.source, e.dest):
+            if u is not None and u.kind == "Creature" and u.reaction is not None:
+                reactions[u.guid].add(u.reaction)
     values: dict[tuple[int, int], set[int]] = defaultdict(set)
     guids: dict[tuple[int, int], set[str]] = defaultdict(set)
     names: dict[tuple[int, int], str] = {}
@@ -104,6 +121,7 @@ def monster_hp(events: Iterable[Event], *, log: str = "") -> tuple[list[MonsterO
         if len(values[key]) > 1:
             conflicts.append({"npc_id": npc_id, "level": level, "values": sorted(values[key]), "log": log})
             continue
+        seen = set().union(*(reactions[g] for g in guids[key]))
         observations.append(
             {
                 "npc_id": npc_id,
@@ -113,6 +131,8 @@ def monster_hp(events: Iterable[Event], *, log: str = "") -> tuple[list[MonsterO
                 "guids": len(guids[key]),
                 "ui_map_id": maps[key],
                 "log": log,
+                "fought": bool(guids[key] & engaged),
+                "reaction": next((r for r in ("amie", "hostile", "neutre") if r in seen), None),
             }
         )
     return observations, conflicts

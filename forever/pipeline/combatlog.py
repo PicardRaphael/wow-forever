@@ -27,6 +27,9 @@ AFFILIATION_MINE = 0x1  # COMBATLOG_OBJECT_AFFILIATION_MINE
 CONTROL_PLAYER = 0x100  # COMBATLOG_OBJECT_CONTROL_PLAYER
 TYPE_PET = 0x1000  # COMBATLOG_OBJECT_TYPE_PET
 TYPE_GUARDIAN = 0x2000  # COMBATLOG_OBJECT_TYPE_GUARDIAN
+REACTION_FRIENDLY = 0x10  # COMBATLOG_OBJECT_REACTION_FRIENDLY
+REACTION_NEUTRAL = 0x20  # COMBATLOG_OBJECT_REACTION_NEUTRAL
+REACTION_HOSTILE = 0x40  # COMBATLOG_OBJECT_REACTION_HOSTILE
 TIME_FORMAT = "%m/%d/%Y %H:%M:%S.%f"
 ADVANCED_FIELDS = 19
 UNIT_FIELDS = 8
@@ -134,6 +137,18 @@ class Unit(NamedTuple):
     def is_mine(self) -> bool:
         """Unité du joueur qui journalise (drapeau d'affiliation « à moi »)."""
         return bool(self.flags & AFFILIATION_MINE)
+
+    @property
+    def reaction(self) -> str | None:
+        """Réaction de l'unité envers le joueur qui journalise, d'après les drapeaux : « amie », « neutre » ou
+        « hostile » (None si aucun drapeau de réaction). Décision 222."""
+        if self.flags & REACTION_FRIENDLY:
+            return "amie"
+        if self.flags & REACTION_HOSTILE:
+            return "hostile"
+        if self.flags & REACTION_NEUTRAL:
+            return "neutre"
+        return None
 
     @property
     def is_player_controlled(self) -> bool:
