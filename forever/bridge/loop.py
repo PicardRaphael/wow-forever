@@ -5,20 +5,24 @@ sauvegarde change ; un message à la fois confié à la conversation « jeu », 
 les accusés continuent ; réponse publiée (texte mis en forme, mention Talents hors Mage, ligne de provenance, lien).
 Chaque publication écrit le même `Inbox.lua` dans les emplacements que le jeu peut encore charger ; toutes les
 10 minutes, toute la réserve et `Status.lua` (rattrape un `/reload` que le pont ne voit pas). Un pont à la fois
-(verrou), arrêt par fichier. Rien de la sonde n'est gardé ni journalisé."""
+(verrou), arrêt par fichier. Rien de la sonde n'est gardé ni journalisé.
+
+Au repos (décision 226 : le pont démarre avec la session Windows) : jeu fermé, la fenêtre est cherchée toutes les
+`FIND_EVERY_S` secondes et le pont ne se réveille que toutes les `IDLE_INTERVAL_S` secondes ; jeu en arrière-plan ou
+réduit, rien n'est capturé ; la liste des sauvegardes de ForeverBridge est relue toutes les `OUTBOX_LIST_S` secondes
+(leur date, à chaque pas)."""
 
 from __future__ import annotations
 
-import json
 import os
 import threading
 import time
 from collections import deque
 from collections.abc import Callable, Iterable
-from datetime import datetime
 from pathlib import Path
 from typing import Any, Protocol
 
+from forever.bridge import lock as _lock
 from forever.bridge.agent import AgentResult, provenance_line
 from forever.bridge.buttons import BUTTONS, button_payload, visible_buttons
 from forever.bridge.capture import GameWindow, Rect, band_rect, probe_rect
@@ -30,10 +34,11 @@ from forever.bridge.prompt import message_text
 from forever.bridge.record import CONTEXT_KEYS, Record, RecordError, parse_payload
 from forever.bridge.slots import ADDON, SLOTS, inbox_lua, publish, status_lua
 from forever.bridge.state import BridgeState
-from forever.timefmt import format_utc
 
 REFRESH_S = 600.0
 FIND_EVERY_S = 3.0
+IDLE_INTERVAL_S = 1.0  # pas du pont tant qu'aucune fenêtre du jeu n'est connue
+OUTBOX_LIST_S = 30.0  # liste des sauvegardes relue (une nouvelle n'apparaît qu'au premier /reload d'un compte)
 REJECT_LOG_S = 5.0
 HEARTBEAT_S = 30.0  # dernier signe de vie écrit dans le verrou (sonde F : ponts tués sans trace)
 _SELFTEST = Decoded(SELFTEST_ID, selftest_payload())
@@ -128,6 +133,8 @@ class Bridge:
         self.last_find: float | None = None
         self.last_reject: float | None = None
         self.outbox_mtimes: dict[Path, float] = {}
+        self.outbox_paths: list[Path] = []
+        self.last_outbox_list: float | None = None
         self._lock = threading.RLock()
 
     @staticmethod
@@ -213,7 +220,11 @@ class Bridge:
         self._accept(record, "pixels", capture_ms=round((time.perf_counter() - started) * 1000, 1))
 
     def _read_outboxes(self) -> None:
-        for path in self.outbox_files():
+        now = self.clock()
+        if self.last_outbox_list is None or now - self.last_outbox_list >= OUTBOX_LIST_S:
+            self.last_outbox_list = now
+            self.outbox_paths = list(self.outbox_files())
+        for path in self.outbox_paths:
             try:
                 mtime = path.stat().st_mtime
             except OSError:
@@ -362,7 +373,7 @@ class Bridge:
                     stop_file.unlink(missing_ok=True)
                     break
                 self.step()
-                sleep(interval_s)
+                sleep(interval_s if self.capture.window is not None else max(interval_s, IDLE_INTERVAL_S))
         except KeyboardInterrupt:
             reason = "interruption (Ctrl+C)"
         self.journal.write("stop", reason=reason)
@@ -371,70 +382,11 @@ class Bridge:
 
 # --- verrou ------------------------------------------------------------------------------------------------------
 
-
-def lock_path(cache_dir: Path) -> Path:
-    return cache_dir / "bridge" / "bridge.lock"
-
-
-def lock_holder(cache_dir: Path, alive: Callable[[object], bool | None] | None = None) -> int | None:
-    """pid du pont qui tient le verrou s'il tourne (ou si on ne peut pas savoir) ; None si libre ou mort."""
-    if alive is None:
-        from forever import spawn
-
-        alive = spawn.pid_alive
-    try:
-        doc = json.loads(lock_path(cache_dir).read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-    pid = doc.get("pid") if isinstance(doc, dict) else None
-    if not isinstance(pid, int):
-        return None
-    return None if alive(pid) is False else pid
-
-
-def acquire_lock(
-    cache_dir: Path, now: datetime, *, pid: int, alive: Callable[[object], bool | None] | None = None
-) -> bool:
-    """Prend le verrou du pont ; faux si un autre pont vivant le tient (un verrou mort est repris)."""
-    holder = lock_holder(cache_dir, alive)
-    if holder is not None and holder != pid:
-        return False
-    path = lock_path(cache_dir)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    stamp = format_utc(now)
-    path.write_text(json.dumps({"pid": pid, "started_at": stamp, "seen_at": stamp}), encoding="utf-8")
-    return True
-
-
-def touch_lock(cache_dir: Path, now: datetime, *, pid: int) -> None:
-    """Dernier signe de vie (`seen_at`) du pont `pid` dans son verrou ; verrou d'un autre pont ou absent : rien."""
-    path = lock_path(cache_dir)
-    try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return
-    if not isinstance(doc, dict) or doc.get("pid") != pid:
-        return
-    doc["seen_at"] = format_utc(now)
-    tmp = path.with_name(path.name + ".tmp")
-    tmp.write_text(json.dumps(doc), encoding="utf-8")
-    os.replace(tmp, path)
-
-
-def lock_info(cache_dir: Path) -> dict[str, Any] | None:
-    """Contenu du verrou (pid, started_at, seen_at), ou None."""
-    try:
-        doc = json.loads(lock_path(cache_dir).read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return None
-    return doc if isinstance(doc, dict) else None
-
-
-def release_lock(cache_dir: Path, *, pid: int) -> None:
-    path = lock_path(cache_dir)
-    try:
-        doc = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return
-    if isinstance(doc, dict) and doc.get("pid") == pid:
-        path.unlink(missing_ok=True)
+# Le verrou vit dans `forever.bridge.lock` (bibliothèque standard seulement, lu par la surveillance du démarrage
+# automatique) ; ses fonctions restent accessibles ici.
+lock_path = _lock.lock_path
+lock_holder = _lock.lock_holder
+acquire_lock = _lock.acquire_lock
+touch_lock = _lock.touch_lock
+lock_info = _lock.lock_info
+release_lock = _lock.release_lock

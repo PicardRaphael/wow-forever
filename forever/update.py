@@ -175,6 +175,13 @@ def update_dir(cache_dir: Path) -> Path:
     return cache_dir / UPDATE_DIR
 
 
+def run_log_path(cache_dir: Path, now: datetime) -> Path:
+    """Journal d'un passage, `<cache>/update/run-<horodatage>.log` : passage détaché (hook de démarrage, `approve`)
+    ou tâche planifiée (`--log`, décision 226)."""
+    stamp = "".join(c for c in format_utc(now) if c.isalnum())
+    return update_dir(cache_dir) / f"run-{stamp}.log"
+
+
 def _read(path: Path) -> Any:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -1867,8 +1874,8 @@ def approve(
                 "report": report}  # fmt: skip
     from forever.spawn import spawn_detached, update_command
 
-    stamp = "".join(c for c in format_utc(deps.now()) if c.isalnum())
-    launch = spawn or (lambda args: spawn_detached(args, update_dir(deps.cache_dir) / f"run-{stamp}.log"))
+    log = run_log_path(deps.cache_dir, deps.now())
+    launch = spawn or (lambda args: spawn_detached(args, log))
     try:
         launch(update_command())
     except OSError as exc:

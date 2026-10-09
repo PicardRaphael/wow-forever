@@ -13,6 +13,7 @@ import os
 import re
 import sys
 from collections.abc import Mapping
+from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import replace
 from datetime import timedelta
 from pathlib import Path
@@ -362,6 +363,9 @@ def build_parser() -> argparse.ArgumentParser:
     up.add_argument("--no-network", action="store_true", help="aucun accès réseau (ni wago, ni WoWDBDefs, ni git)")
     up.add_argument("--only", help="étapes : jeu,correctifs,journaux,addons (défaut : toutes)")
     up.add_argument("--json", action="store_true", help="sortie JSON")
+    up.add_argument(
+        "--log", action="store_true", help="sortie dans <cache>/update/run-<horodatage>.log (tâche planifiée)"
+    )
     up_sub = up.add_subparsers(dest="update_command", required=False, parser_class=_Parser)
     u_status = up_sub.add_parser("status", help="attentes d'accord et dernier passage")
     u_status.add_argument("--json", action="store_true", help="sortie JSON")
@@ -439,6 +443,22 @@ def build_parser() -> argparse.ArgumentParser:
         "status", help="le pont tourne-t-il ? dernières lignes du journal, état des données"
     )
     b_status.add_argument("--json", action="store_true", help="sortie JSON")
+    b_auto = bridge_sub.add_parser(
+        "autostart", help="démarrage automatique du pont à l'ouverture de la session Windows (tâche planifiée)"
+    )
+    auto_sub = b_auto.add_subparsers(dest="autostart_command", required=True, parser_class=_Parser)
+    a_install = auto_sub.add_parser(
+        "install", help="créer ou remplacer la tâche « WoW Forever - pont » (sans droits administrateur) et la lancer"
+    )
+    a_install.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
+    a_install.add_argument("--no-start", action="store_true", help="ne pas la lancer maintenant")
+    a_install.add_argument("--json", action="store_true", help="sortie JSON")
+    for name, text in (
+        ("remove", "retirer la tâche (le pont en marche continue : forever bridge stop pour l'arrêter)"),
+        ("status", "tâche installée ? surveillance et pont en marche ?"),
+    ):
+        a_cmd = auto_sub.add_parser(name, help=text)
+        a_cmd.add_argument("--json", action="store_true", help="sortie JSON")
 
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
@@ -2218,6 +2238,18 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
     options = update.UpdateOptions(
         auto=args.auto, dry_run=args.dry_run, network=not args.no_network and not deps.offline, only=only
     )
+    if args.log:
+        # tâche planifiée (décision 226) : même journal qu'un passage lancé par le hook de démarrage
+        log = update.run_log_path(deps.cache_dir, deps.now())
+        log.parent.mkdir(parents=True, exist_ok=True)
+        with log.open("a", encoding="utf-8", buffering=1) as sink, redirect_stdout(sink), redirect_stderr(sink):
+            return _run_update(deps, args, options)
+    return _run_update(deps, args, options)
+
+
+def _run_update(deps: Deps, args: argparse.Namespace, options: Any) -> int:
+    from forever import update
+
     report = update.run_update(deps, options, progress=_update_progress)
     lines = [f"Mise à jour{' (simulation)' if args.dry_run else ''} : {report['started_at']} → {report['finished_at']}"]
     lines += [f"  {s['name']} : {s['status']} · {s['detail']}" for s in report["steps"]]
@@ -2305,14 +2337,25 @@ def _cmd_bridge_loop(deps: Deps, args: argparse.Namespace, provenance: Provenanc
     journal = Journal(home / "journal", deps.now)
     if args.bridge_command == "stop":
         # sonde F : un fichier posé sans pont vivant arrêtait le pont lancé ensuite ; il n'est posé que pour un pont
+        from forever.bridge import autostart
+
         holder = loop.lock_holder(deps.cache_dir)
+        supervisor = autostart.supervisor_pid(deps.cache_dir)
+        if supervisor:  # décision 226 : sinon la surveillance relancerait le pont arrêté
+            autostart.request_stop(deps.cache_dir)
         if holder:
             home.mkdir(parents=True, exist_ok=True)
             (home / "stop").write_text("", encoding="utf-8")
-            line = f"Arrêt demandé : le pont (pid {holder}) s'arrête au pas suivant."
+            lines = [f"Arrêt demandé : le pont (pid {holder}) s'arrête au pas suivant."]
         else:
-            line = "Aucun pont ne tourne : rien à arrêter (aucun fichier d'arrêt posé)."
-        _emit({"stop": holder is not None, "pid": holder, "provenance": provenance}, [line], provenance, args.json)
+            lines = ["Aucun pont ne tourne : rien à arrêter (aucun fichier d'arrêt posé)."]
+        if supervisor:
+            lines.append(
+                "Démarrage automatique : surveillance arrêtée jusqu'à la prochaine ouverture de session "
+                "(forever bridge start pour relancer le pont d'ici là)."
+            )
+        payload = {"stop": holder is not None, "pid": holder, "autostart_stopped": bool(supervisor)}
+        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
         return EXIT_OK
     if args.bridge_command == "status":
         return _bridge_status(deps, args, provenance, journal)
@@ -2321,16 +2364,13 @@ def _cmd_bridge_loop(deps: Deps, args: argparse.Namespace, provenance: Provenanc
 
     addons = addons_dir(wow)
     if args.bridge_command == "start":
-        from forever import spawn
+        from forever.bridge.autostart import launch_bridge
 
         holder = loop.lock_holder(deps.cache_dir)
         if holder is not None:
             raise BridgeRunningError(holder)
-        command = [sys.executable, "-u", "-m", "forever", "bridge", "run", "--wow-dir", str(wow)]
-        if args.model:
-            command += ["--model", args.model]
-        log = home / f"run-{deps.now():%Y%m%d-%H%M%S}.log"
-        spawn.spawn_detached(command, log)
+        # vrai interpréteur (décision 226) : le pont survit au terminal et au lanceur qui l'ont démarré
+        log = launch_bridge(wow, deps.cache_dir, deps.now(), args.model)
         lines = [
             f"Pont lancé en arrière-plan (journal du lancement : {log}).",
             "En jeu : /fv, puis une question ; uv run forever bridge status pour le suivre, stop pour l'arrêter.",
@@ -2538,6 +2578,69 @@ def _bridge_ask(deps: Deps, args: argparse.Namespace, provenance: Provenance) ->
     return EXIT_NOT_FOUND if result.is_error else EXIT_OK
 
 
+def _bridge_autostart(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
+    """`forever bridge autostart install | remove | status` (décision 226) : tâche planifiée « WoW Forever - pont »."""
+    import shutil
+
+    from forever.bridge import autostart
+    from forever.bridge.install import REPO_ROOT
+
+    if not autostart.SUPPORTED:
+        raise InvalidArgumentError(
+            "Démarrage automatique du pont : Windows seulement (tâche planifiée).", "lancer la commande sous Windows"
+        )
+    name = autostart.TASK_NAME
+    if args.autostart_command == "install":
+        wow = _bridge_wow_dir(deps, args)
+        pythonw = autostart.base_pythonw()
+        if not pythonw.is_file():
+            raise InvalidArgumentError(
+                f"Interpréteur sans fenêtre introuvable : {pythonw}.", "réinstaller Python avec pythonw.exe"
+            )
+        user = autostart.current_user()
+        xml = autostart.task_xml(user=user, pythonw=pythonw, repo=REPO_ROOT, wow_dir=wow, cache_dir=deps.cache_dir)
+        path = deps.cache_dir / "bridge" / "autostart-task.xml"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(xml, encoding="utf-16")  # schtasks /XML : UTF-16 avec BOM
+        autostart.install(path, start=not args.no_start)
+        lines = [
+            f"Tâche « {name} » créée : à chaque ouverture de session de {user}, sans droits administrateur.",
+            f"  surveillance : {pythonw} {autostart.task_arguments(wow, deps.cache_dir)}",
+            "  le pont est relancé s'il s'arrête ; forever bridge stop l'arrête jusqu'à la prochaine session.",
+        ]
+        if args.no_start:
+            lines.append("  Elle démarrera à la prochaine ouverture de session.")
+        else:
+            lines.append("  Lancée maintenant : forever bridge autostart status pour la suivre.")
+        if shutil.which("claude") is None:
+            lines.append("  Attention : commande claude introuvable dans le PATH, le pont ne pourra pas répondre.")
+        payload = {"installed": True, "started": not args.no_start, "task": name, "xml": str(path)}
+        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.autostart_command == "remove":
+        removed = autostart.remove()
+        supervisor = autostart.supervisor_pid(deps.cache_dir)
+        if supervisor:
+            autostart.request_stop(deps.cache_dir)
+        lines = [f"Tâche « {name} » retirée." if removed else f"Aucune tâche « {name} »."]
+        if supervisor:
+            lines.append("Surveillance arrêtée ; le pont en marche continue : forever bridge stop pour l'arrêter.")
+        payload = {"removed": removed, "supervisor_stopped": bool(supervisor)}
+        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    report = autostart.status(deps.cache_dir)
+    task = report["task"]
+    lines = [f"Tâche « {name} » : " + ("installée" if report["installed"] else "non installée")]
+    if task:
+        lines.append(f"  action : {task['command']} {task['arguments']}")
+    sup, pid = report["supervisor_pid"], report["bridge_pid"]
+    lines.append("  surveillance : " + (f"en marche (pid {sup})" if sup else "arrêtée"))
+    lines.append("  pont : " + (f"en marche (pid {pid})" if pid else "arrêté"))
+    lines += [f"  problème : {p}" for p in report["problems"]]
+    _emit({**report, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     """`forever bridge` (P06a, blocs A et B) : installation de ForeverBridge et de sa réserve, autotest de la bande,
     lecture d'un message tapé en jeu."""
@@ -2546,6 +2649,8 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     provenance = local_provenance(deps, assumptions=["pont de conversation (P06a) : aucune donnée de jeu"])
     if args.bridge_command in ("start", "run", "stop", "status"):
         return _cmd_bridge_loop(deps, args, provenance)
+    if args.bridge_command == "autostart":
+        return _bridge_autostart(deps, args, provenance)
     if args.bridge_command == "config":
         from forever.bridge.config import save_config
 
@@ -3104,10 +3209,9 @@ def _cmd_hook(deps: Deps, args: argparse.Namespace) -> int:
         hook_input = {}
     if args.hook_name == "session-start":
         from forever.spawn import spawn_detached
-        from forever.update import update_dir
+        from forever.update import run_log_path
 
-        stamp = "".join(c for c in format_utc(deps.now()) if c.isalnum())
-        log = update_dir(deps.cache_dir) / f"run-{stamp}.log"
+        log = run_log_path(deps.cache_dir, deps.now())
         out = session_start_output(hook_input, deps, os.environ, spawn=lambda args: spawn_detached(args, log))
     else:
         out = check_numbers_output(hook_input)

@@ -8,14 +8,21 @@ Un relais coupe la filiation (correctif du 2026-10-06) : la commande qui lance (
 démarre un relais, qui démarre le passage puis se termine aussitôt, avant que la commande reprenne la main. Le
 passage n'a plus alors de parent vivant : la fin de l'arbre de processus qui l'a lancé (session fermée,
 `taskkill /T`, groupe de processus tué) ne l'atteint plus. Sonde du 2026-10-06 : sans relais, `taskkill /T` sur la
-commande tuait aussi le passage, malgré `DETACHED_PROCESS`."""
+commande tuait aussi le passage, malgré `DETACHED_PROCESS`.
+
+Vrai interpréteur (décision 226) : sous Windows, `.venv/Scripts/python.exe` n'est qu'un lanceur, qui démarre
+l'interpréteur de base et le retient dans un objet de tâche fermé à sa mort (`KILL_ON_JOB_CLOSE`) ; tuer le lanceur
+tue l'interpréteur. Un processus qui doit durer (le pont) est donc lancé directement avec l'interpréteur de base,
+`__PYVENV_LAUNCHER__` désignant le lanceur : l'interpréteur se place alors lui-même dans l'environnement (paquets
+compris), comme quand le lanceur le démarre. Ce module n'importe que la bibliothèque standard : la tâche planifiée
+l'utilise depuis l'interpréteur de base, hors de l'environnement."""
 
 from __future__ import annotations
 
 import os
 import subprocess
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 # Drapeaux de Windows : processus détaché, nouveau groupe (Ctrl+C de la session ne le tue pas), sans fenêtre.
@@ -25,6 +32,35 @@ _NO_WINDOW = 0x08000000
 _RELAY_TIMEOUT_S = 60.0
 _STILL_ACTIVE = 259
 _ERROR_ACCESS_DENIED = 5
+VENV_LAUNCHER = "__PYVENV_LAUNCHER__"
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def real_interpreter(
+    *, launcher: str, base_executable: str, environ: Mapping[str, str], windows: bool
+) -> tuple[str, dict[str, str]]:
+    """Interpréteur réel et variables qui le font tourner dans l'environnement du lanceur `launcher` : sous Windows,
+    `python.exe` (console) à côté de l'interpréteur de base, avec `__PYVENV_LAUNCHER__` ; ailleurs, `launcher`
+    lui-même (pas de lanceur qui retienne l'interpréteur)."""
+    env = dict(environ)
+    if not windows:
+        return launcher, env
+    env[VENV_LAUNCHER] = launcher
+    return str(Path(base_executable).with_name("python.exe")), env
+
+
+def current_interpreter() -> tuple[str, dict[str, str]]:
+    """`real_interpreter` pour l'environnement du dépôt, depuis l'environnement (lanceur : `sys.executable`) ou
+    depuis l'interpréteur de base (tâche planifiée : lanceur `.venv/Scripts/python.exe` du dépôt)."""
+    in_venv = sys.prefix != sys.base_prefix
+    windows = sys.platform == "win32"
+    default = REPO_ROOT / ".venv" / ("Scripts/python.exe" if windows else "bin/python")
+    return real_interpreter(
+        launcher=sys.executable if in_venv else str(default),
+        base_executable=getattr(sys, "_base_executable", sys.executable),
+        environ=os.environ,
+        windows=windows,
+    )
 
 
 def update_command(*extra: str) -> list[str]:
@@ -33,9 +69,10 @@ def update_command(*extra: str) -> list[str]:
     return [sys.executable, "-u", "-m", "forever", "update", "--auto", "--json", *extra]
 
 
-def spawn_detached(args: Sequence[str], log_path: Path) -> None:
-    """Lance `args` détaché par un relais (voir le module), sortie dans `log_path` ; rend la main une fois le relais
-    terminé. Lève OSError si le lancement échoue (l'appelant l'attrape)."""
+def spawn_detached(args: Sequence[str], log_path: Path, env: Mapping[str, str] | None = None) -> None:
+    """Lance `args` détaché par un relais (voir le module), sortie dans `log_path`, avec les variables `env` (défaut :
+    celles du processus) ; rend la main une fois le relais terminé. Lève OSError si le lancement échoue (l'appelant
+    l'attrape)."""
     log_path.parent.mkdir(parents=True, exist_ok=True)
     relay = [sys.executable, "-m", "forever.spawn", str(log_path), *args]
     flags = _NO_WINDOW if sys.platform == "win32" else 0
@@ -48,6 +85,7 @@ def spawn_detached(args: Sequence[str], log_path: Path) -> None:
             timeout=_RELAY_TIMEOUT_S,
             check=False,
             creationflags=flags,
+            env=dict(env) if env is not None else None,
         )
     except subprocess.TimeoutExpired as exc:
         raise OSError(f"relais du lancement détaché sans réponse après {_RELAY_TIMEOUT_S:.0f} s") from exc
@@ -109,6 +147,33 @@ def pid_alive(pid: object) -> bool | None:
     except OSError:
         return None
     return True
+
+
+def process_created(pid: object) -> float | None:
+    """Heure de création du processus `pid` (secondes depuis 1970), ou None si on ne peut pas la lire (hors de
+    Windows, processus mort ou inaccessible). Sert à reconnaître un pid repris par un autre processus après un
+    redémarrage du PC (verrou du pont et surveillance, décision 226)."""
+    if sys.platform != "win32" or not isinstance(pid, int) or isinstance(pid, bool) or pid <= 0:
+        return None
+    import ctypes
+    from ctypes import wintypes
+
+    kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    kernel32.OpenProcess.restype = wintypes.HANDLE
+    kernel32.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+    kernel32.GetProcessTimes.argtypes = (wintypes.HANDLE, *(ctypes.POINTER(wintypes.FILETIME),) * 4)
+    kernel32.CloseHandle.argtypes = (wintypes.HANDLE,)
+    handle = kernel32.OpenProcess(0x1000, False, pid)  # PROCESS_QUERY_LIMITED_INFORMATION
+    if not handle:
+        return None
+    try:
+        times = [wintypes.FILETIME() for _ in range(4)]
+        if not kernel32.GetProcessTimes(handle, *(ctypes.byref(t) for t in times)):
+            return None
+        ticks = (times[0].dwHighDateTime << 32) | times[0].dwLowDateTime  # centaines de ns depuis 1601
+        return (ticks - 116444736000000000) / 1e7
+    finally:
+        kernel32.CloseHandle(handle)
 
 
 if __name__ == "__main__":  # relais : `python -m forever.spawn <journal> <commande…>`

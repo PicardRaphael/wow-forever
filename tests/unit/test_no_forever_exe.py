@@ -75,7 +75,10 @@ def test_project_hooks_never_sync():
 
 def test_bridge_and_update_launches_use_the_interpreter():
     assert update_command()[:4] == [sys.executable, "-u", "-m", "forever"]
-    cli = (REPO_ROOT / "forever" / "cli.py").read_text(encoding="utf-8")
-    assert '[sys.executable, "-u", "-m", "forever", "bridge", "run"' in cli
+    # pont : vrai interpréteur en module (décision 226), par `autostart.launch_bridge` (`bridge start`, surveillance)
+    autostart = (REPO_ROOT / "forever" / "bridge" / "autostart.py").read_text(encoding="utf-8")
+    assert "exe, env = spawn.current_interpreter()" in autostart
+    assert '[exe, "-u", "-m", "forever", "bridge", "run"' in autostart
+    assert "launch_bridge(" in (REPO_ROOT / "forever" / "cli.py").read_text(encoding="utf-8")
     for path in [*sorted((REPO_ROOT / "forever" / "bridge").glob("*.py")), PLUGIN / ".mcp.json"]:
         assert "forever.exe" not in path.read_text(encoding="utf-8"), path

@@ -9,6 +9,7 @@ import json
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
+from itertools import pairwise
 from pathlib import Path
 
 import pytest
@@ -237,10 +238,12 @@ def test_supervisor_relaunches_a_bridge_that_died(tmp_path):
             hold_lock(tmp_path, 4242)
         if n == 200:  # le pont meurt après une longue partie : relancé tout de suite
             hold_lock(tmp_path, 5555)
+        if n == 201:  # le pont relancé a pris le verrou
+            hold_lock(tmp_path, 4242)
         if n == 202:
             autostart.request_stop(tmp_path)
 
-    code, launches = supervise(tmp_path, world)
+    _, launches = supervise(tmp_path, world)
     assert len(launches) == 2 and launches[1] == 200 * autostart.CHECK_S
     down = [e for e in events(tmp_path) if e["event"] == "autostart_bridge_down"]
     assert len(down) == 1 and down[0]["next_in_s"] == 0
@@ -252,9 +255,9 @@ def test_supervisor_backs_off_when_the_bridge_dies_at_once(tmp_path):
             autostart.request_stop(tmp_path)
 
     _, launches = supervise(tmp_path, world)
-    gaps = [b - a for a, b in zip(launches, launches[1:], strict=False)]
+    gaps = [b - a for a, b in pairwise(launches)]
     assert len(launches) >= 6
-    assert all(b > a for a, b in zip(gaps[:5], gaps[1:6], strict=False))  # attente croissante
+    assert all(b > a for a, b in pairwise(gaps[:6]))  # attente croissante
     assert max(gaps) <= autostart.MAX_DELAY_S + 2 * autostart.CHECK_S  # plafonnée
 
 
@@ -400,3 +403,38 @@ def test_stop_also_stops_the_supervisor(make_deps, tmp_path, monkeypatch, capsys
     assert (deps.cache_dir / "bridge" / autostart.STOP_MARKER).exists()
     assert main(["bridge", "stop"], deps) == 0
     assert "prochaine ouverture de session" in capsys.readouterr()[0]
+
+
+# --- pid repris après un arrêt brutal du PC ------------------------------------------------------------------------
+
+
+def test_pid_reused():
+    from datetime import UTC, datetime
+
+    from forever.bridge.lock import pid_reused
+
+    started = datetime(2026, 10, 9, 18, 0, tzinfo=UTC).timestamp()
+    doc = {"pid": 4242, "started_at": "2026-10-09T18:00:00Z"}
+    assert pid_reused(doc, created=lambda pid: started - 5) is False  # le propriétaire du verrou
+    assert pid_reused(doc, created=lambda pid: started + 3600) is True  # créé après le verrou : autre processus
+    assert pid_reused(doc, created=lambda pid: None) is False  # inconnu
+    assert pid_reused({"pid": 4242}, created=lambda pid: started + 3600) is False  # heure absente
+
+
+def test_supervisor_ignores_a_lock_whose_pid_was_reused(tmp_path, monkeypatch):
+    """PC arrêté pendant que le pont tournait : le verrou reste ; à la session suivante, son pid appartient à un autre
+    processus, plus récent que le verrou. La surveillance lance le pont, qui reprend le verrou."""
+    from datetime import UTC, datetime
+
+    hold_lock(tmp_path, 4242)
+    monkeypatch.setattr(spawn, "pid_alive", lambda pid: True)
+    monkeypatch.setattr(spawn, "process_created", lambda pid: datetime(2026, 10, 10, 8, 0, tzinfo=UTC).timestamp())
+    launches = []
+
+    def sleep(_):
+        autostart.request_stop(tmp_path)
+
+    journal = Journal(tmp_path / "bridge" / "journal", lambda: datetime(2026, 10, 10, 8, 1, tzinfo=UTC))
+    autostart.supervise(tmp_path, lambda: launches.append(1), journal=journal, sleep=sleep, pid=999)
+    assert launches == [1]
+    assert loop.acquire_lock(tmp_path, datetime(2026, 10, 10, 8, 1, tzinfo=UTC), pid=777)  # le pont le reprend

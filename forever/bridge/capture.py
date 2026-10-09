@@ -129,8 +129,14 @@ class WindowsCapture:
         return self.window
 
     def client(self) -> Rect | None:
-        """Zone client de la fenêtre trouvée (coordonnées de l'écran)."""
-        return self._api.client_rect(self.window.hwnd) if self.window is not None else None
+        """Zone client de la fenêtre trouvée (coordonnées de l'écran) ; fenêtre disparue (jeu fermé) : oubliée, pour
+        que la suivante soit cherchée."""
+        if self.window is None:
+            return None
+        rect = self._api.client_rect(self.window.hwnd)
+        if rect is None:
+            self.window = None
+        return rect
 
     def allowed(self) -> bool:
         if self.window is None:

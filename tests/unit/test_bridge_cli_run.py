@@ -2,8 +2,8 @@
 (jamais deux ponts), `stop` pose le fichier d'arrêt (seulement si un pont tourne, voir test_bridge_stop_start.py), `status` dit si le pont tourne, avec sa provenance."""
 
 import json
-import sys
 
+from forever import spawn
 from forever.bridge import loop
 from forever.cli import main
 
@@ -22,19 +22,20 @@ def wow_dir(tmp_path):
 
 def test_start_spawns_the_loop_detached(capsys, make_deps, tmp_path, monkeypatch):
     calls = []
-    monkeypatch.setattr("forever.spawn.spawn_detached", lambda args, log: calls.append((args, log)))
+    monkeypatch.setattr("forever.spawn.spawn_detached", lambda args, log, env=None: calls.append((args, log)))
     deps = make_deps(wow_dir=wow_dir(tmp_path))
     code, out, _ = run(capsys, ["bridge", "start"], deps)
     assert code == 0 and len(calls) == 1
     args, log = calls[0]
-    assert args[:6] == [sys.executable, "-u", "-m", "forever", "bridge", "run"]
+    # vrai interpréteur (décision 226), jamais le lanceur de l'environnement
+    assert args[:6] == [spawn.current_interpreter()[0], "-u", "-m", "forever", "bridge", "run"]
     assert log.parent == deps.cache_dir / "bridge" and log.name.startswith("run-") and log.suffix == ".log"
     assert "pont" in out
 
 
 def test_start_refuses_when_a_bridge_runs(capsys, make_deps, tmp_path, monkeypatch):
     calls = []
-    monkeypatch.setattr("forever.spawn.spawn_detached", lambda args, log: calls.append(args))
+    monkeypatch.setattr("forever.spawn.spawn_detached", lambda args, log, env=None: calls.append(args))
     deps = make_deps(wow_dir=wow_dir(tmp_path))
     assert loop.acquire_lock(deps.cache_dir, deps.now(), pid=4242, alive=lambda p: True)
     monkeypatch.setattr("forever.spawn.pid_alive", lambda p: True)
