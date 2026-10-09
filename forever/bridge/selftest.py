@@ -27,6 +27,7 @@ from forever.bridge.codec import (
     selftest_payload,
 )
 from forever.bridge.image import write_bmp
+from forever.bridge.record import Record, RecordError, parse_payload
 
 
 @dataclass
@@ -84,9 +85,9 @@ def _verdict(report: SelftestReport, payload: bytes, cells: list[int]) -> None:
     if decoded == Decoded(SELFTEST_ID, payload) and not report.mismatches:
         report.ok = True
         report.lines.append(f"vecteur reconnu ({len(payload)} octets, {rows} rangées, {len(cells)} cellules)")
-        if report.cell_px is not None:
-            unit = "pixel" if report.cell_px == 1 else "pixels"
-            report.lines.append(f"case de {report.cell_px} {unit}")
+        cell = _cell_line(report.cell_px)
+        if cell:
+            report.lines.append(cell)
         return
     if isinstance(decoded, Decoded):
         report.lines.append(
@@ -112,18 +113,19 @@ def selftest_offline() -> SelftestReport:
     return report
 
 
-def selftest_live(
+def _watch(
+    report: SelftestReport,
     capture: WindowsCapture,
     *,
-    wait_s: float = 60.0,
-    interval_s: float = 0.25,
-    save: Path | None = None,
-    clock: Callable[[], float] = time.monotonic,
-    sleep: Callable[[float], None] = time.sleep,
-) -> SelftestReport:
-    """Attend jusqu'à `wait_s` que le jeu soit au premier plan avec la bande de test, puis la lit et la compare."""
-    payload, cells = _expected()
-    report = SelftestReport()
+    expected: list[int] | None,
+    wait_s: float,
+    interval_s: float,
+    save: Path | None,
+    clock: Callable[[], float],
+    sleep: Callable[[float], None],
+) -> bool:
+    """Attend jusqu'à `wait_s` que le jeu soit au premier plan avec une bande, puis la lit ; vrai si une bande a été
+    lue. Les lignes du rapport disent chaque étape, et pourquoi rien n'a été lu."""
     deadline = clock() + wait_s
     while True:
         late = clock() >= deadline
@@ -151,7 +153,7 @@ def selftest_live(
         probe_r = probe_rect(client)
         if probe_r is None:
             report.lines.append("zone client plus petite que la sonde : agrandir la fenêtre du jeu")
-            return report
+            return False
         probe = capture.grab(probe_r)
         if probe is not None:
             cell_px = detect_cell_px(probe)
@@ -162,7 +164,8 @@ def selftest_live(
                 report.marker_seen = True
                 report.cell_px = cell_px
                 report.decoded = decode_band(band, cell_px)
-                report.mismatches = cell_mismatches(band, cells, cell_px)
+                if expected is not None:
+                    report.mismatches = cell_mismatches(band, expected, cell_px)
                 if save is not None:
                     write_bmp(band, save)
                     report.saved = save
@@ -179,9 +182,97 @@ def selftest_live(
         )
     elif not report.marker_seen:
         read = ", ".join(str(v) for v in report.probe_cells or [])
-        report.lines.append(f"marqueur absent : sonde lue [{read}], attendu [6, 1, 6, 1, 5] ; taper /fv test en jeu")
-    else:
-        _verdict(report, payload, cells)
+        hint = "taper /fv test en jeu" if expected is not None else "envoyer une question depuis la fenêtre /fv"
+        report.lines.append(f"marqueur absent : sonde lue [{read}], attendu [6, 1, 6, 1, 5] ; {hint}")
+    return report.marker_seen
+
+
+def _saved_line(report: SelftestReport) -> None:
     if report.saved is not None:
         report.lines.append(f"bande enregistrée : {report.saved}")
+
+
+def _cell_line(cell_px: int | None) -> str | None:
+    if cell_px is None:
+        return None
+    return f"case de {cell_px} {'pixel' if cell_px == 1 else 'pixels'}"
+
+
+def selftest_live(
+    capture: WindowsCapture,
+    *,
+    wait_s: float = 60.0,
+    interval_s: float = 0.25,
+    save: Path | None = None,
+    clock: Callable[[], float] = time.monotonic,
+    sleep: Callable[[float], None] = time.sleep,
+) -> SelftestReport:
+    """Attend jusqu'à `wait_s` que le jeu soit au premier plan avec la bande de test, puis la lit et la compare."""
+    payload, cells = _expected()
+    report = SelftestReport()
+    if _watch(report, capture, expected=cells, wait_s=wait_s, interval_s=interval_s, save=save, clock=clock,
+              sleep=sleep):  # fmt: skip
+        _verdict(report, payload, cells)
+    _saved_line(report)
+    return report
+
+
+@dataclass
+class MessageReport(SelftestReport):
+    record: Record | None = None
+
+    def to_json(self) -> dict[str, Any]:
+        out = super().to_json()
+        record = self.record
+        out["record"] = (
+            None
+            if record is None
+            else {
+                "message_id": record.message_id,
+                "session": record.session,
+                "flags": sorted(record.flags),
+                "slot": record.slot,
+                "context_keys": list(record.context),
+                "text": record.text,
+            }
+        )
+        return out
+
+
+def selftest_message(
+    capture: WindowsCapture,
+    *,
+    wait_s: float = 60.0,
+    interval_s: float = 0.25,
+    save: Path | None = None,
+    clock: Callable[[], float] = time.monotonic,
+    sleep: Callable[[float], None] = time.sleep,
+) -> MessageReport:
+    """Lit un message envoyé depuis la fenêtre du jeu et le décrit (sonde C) ; rien n'est gardé ni journalisé."""
+    report = MessageReport()
+    if _watch(report, capture, expected=None, wait_s=wait_s, interval_s=interval_s, save=save, clock=clock,
+              sleep=sleep):  # fmt: skip
+        decoded = report.decoded
+        if isinstance(decoded, BandError):
+            report.lines.append(f"bande rejetée ({decoded.reason})")
+        elif isinstance(decoded, Decoded) and decoded == Decoded(SELFTEST_ID, selftest_payload()):
+            report.lines.append("c'est la bande de test (/fv test) : envoyer une question depuis la fenêtre /fv")
+        elif isinstance(decoded, Decoded):
+            try:
+                record = parse_payload(decoded.payload)
+            except RecordError as err:
+                report.lines.append(f"message illisible : {err.message}")
+            else:
+                report.ok = True
+                report.record = record
+                cell = _cell_line(report.cell_px)
+                report.lines.append(f"message n° {record.message_id} lu ({len(decoded.payload)} octets)")
+                if cell:
+                    report.lines.append(cell)
+                flags = ", ".join(sorted(record.flags)) or "aucun"
+                slot = record.slot if record.slot is not None else "inconnu"
+                report.lines.append(f"session {record.session}, drapeaux : {flags}, emplacement annoncé : {slot}")
+                report.lines.append(f"contexte : {', '.join(record.context) or 'vide'}")
+                report.lines.append(f"texte : « {record.text} »")
+    _saved_line(report)
     return report

@@ -6,4 +6,7 @@
 ## SavedVariables: ForeverBridgeDB
 
 Codec.lua
+Status.lua
+Inbox.lua
+Message.lua
 ForeverBridge.lua

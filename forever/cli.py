@@ -387,6 +387,9 @@ def build_parser() -> argparse.ArgumentParser:
         "install", help="installer ForeverBridge et sa sonde dans le client (jeu fermé, puis le relancer)"
     )
     b_install.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
+    b_install.add_argument(
+        "--slots", type=int, default=200, help="emplacements de la réserve des réponses (8 à 200, défaut 200)"
+    )
     b_install.add_argument("--dry-run", action="store_true", help="afficher les opérations sans rien écrire")
     b_install.add_argument("--json", action="store_true", help="sortie JSON")
     b_self = bridge_sub.add_parser(
@@ -396,7 +399,12 @@ def build_parser() -> argparse.ArgumentParser:
     b_self.add_argument("--wait", type=float, default=60.0, help="attente maximale du jeu au premier plan (--live)")
     b_self.add_argument("--save", type=Path, help="enregistrer la bande capturée en BMP (--live)")
     b_self.add_argument(
-        "--touch", action="store_true", help="modifier les fichiers de la sonde pendant que le jeu tourne (/fv poll, /fv diag)"
+        "--message", action="store_true", help="lire un message tapé en jeu au lieu de la bande de test (--live)"
+    )
+    b_self.add_argument(
+        "--touch",
+        action="store_true",
+        help="modifier les fichiers de la sonde pendant que le jeu tourne (/fv poll, /fv diag)",
     )
     b_self.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
     b_self.add_argument("--json", action="store_true", help="sortie JSON")
@@ -2209,12 +2217,13 @@ def _bridge_wow_dir(deps: Deps, args: argparse.Namespace) -> Path:
 
 
 def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
-    """`forever bridge` (P06a, bloc A) : installation de ForeverBridge et autotest de la bande."""
+    """`forever bridge` (P06a, blocs A et B) : installation de ForeverBridge et de sa réserve, autotest de la bande,
+    lecture d'un message tapé en jeu."""
     from forever.bridge import install, selftest
 
     provenance = local_provenance(deps, assumptions=["pont de conversation (P06a) : aucune donnée de jeu"])
     if args.bridge_command == "install":
-        report = install.install_bridge(_bridge_wow_dir(deps, args), dry_run=args.dry_run)
+        report = install.install_bridge(_bridge_wow_dir(deps, args), slots=args.slots, dry_run=args.dry_run)
         lines = [f"Installation de ForeverBridge ({len(report.actions)} opération(s)) :"]
         lines += [f"  {a}" for a in report.actions]
         lines.append(
@@ -2241,11 +2250,17 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
             raise InvalidArgumentError(str(err), "lancer la commande sous Windows, sur le poste du jeu") from err
         executables = client_executables(args.wow_dir or deps.wow_dir)
         print(
-            f"Attente du jeu au premier plan avec la bande de /fv test ({args.wait:g} s au plus) : passer au jeu.",
+            f"Attente du jeu au premier plan avec {'un message envoyé' if args.message else 'la bande de /fv test'} "
+            f"({args.wait:g} s au plus) : passer au jeu.",
             file=sys.stderr,
             flush=True,
         )
-        result = selftest.selftest_live(WindowsCapture(executables, api), wait_s=args.wait, save=args.save)
+        capture = WindowsCapture(executables, api)
+        result: selftest.SelftestReport
+        if args.message:
+            result = selftest.selftest_message(capture, wait_s=args.wait, save=args.save)
+        else:
+            result = selftest.selftest_live(capture, wait_s=args.wait, save=args.save)
     else:
         result = selftest.selftest_offline()
     _emit({**result.to_json(), "provenance": provenance}, list(result.lines), provenance, args.json)

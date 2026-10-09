@@ -41,7 +41,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
-from forever.bridge.slots import SILENT_WAV
+from forever.bridge.slots import SILENT_WAV, SLOTS, inbox_lua, slot_name
 from forever.errors import EXIT_USAGE, ForeverError
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -50,6 +50,9 @@ ADDON = "ForeverBridge"
 PROBE_ADDON = "ForeverBridge_Probe"
 PROBE2_ADDON = "ForeverBridge_Probe2"
 INTERFACE = "16001"
+MIN_SLOTS = 8
+# Fichiers d'attente de l'addon, réécrits par le pont : jamais remplacés par une réinstallation.
+BRIDGE_WRITTEN = ("Inbox.lua", "Status.lua")
 
 
 class InstallError(ForeverError):
@@ -120,8 +123,9 @@ class _Writer:
     def _name(self, path: Path) -> str:
         return path.relative_to(self.wow_dir).as_posix()
 
-    def write(self, path: Path, content: bytes, what: str) -> None:
-        self.report.actions.append(f"{self.prefix}{what} : {self._name(path)} ({len(content)} octets)")
+    def write(self, path: Path, content: bytes, what: str, *, quiet: bool = False) -> None:
+        if not quiet:
+            self.report.actions.append(f"{self.prefix}{what} : {self._name(path)} ({len(content)} octets)")
         if not self.dry_run:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(content)
@@ -136,18 +140,54 @@ class _Writer:
         self.report.actions.append(f"{self.prefix}{text}")
 
 
-def install_bridge(wow_dir: Path, slots: int = 0, *, dry_run: bool = False, source: Path = SOURCE) -> InstallReport:
-    """Installe l'addon, `ctl/` et l'addon de sonde ; `dry_run` n'écrit rien et rend les opérations prévues."""
+def _slot_toc(index: int) -> str:
+    return "\n".join(
+        [
+            f"## Interface: {INTERFACE}",
+            f"## Title: ForeverBridge (emplacement {index:03d})",
+            "## Notes: Réponses du pont de forever-core, chargées à la demande (P06a).",
+            "## LoadOnDemand: 1",
+            f"## Dependencies: {ADDON}",
+            "",
+            "Inbox.lua",
+            "",
+        ]
+    )
+
+
+def _install_reserve(addons: Path, slots: int, out: _Writer) -> None:
+    """Emplacements `ForeverBridge_S001`… : `.toc` réécrit, `Inbox.lua` d'attente seulement s'il manque."""
+    waiting = inbox_lua(0, {}, [], []).encode("utf-8")
+    inboxes = 0
+    for index in range(1, slots + 1):
+        folder = addons / slot_name(index)
+        out.write(folder / f"{slot_name(index)}.toc", _slot_toc(index).encode("utf-8"), "emplacement", quiet=True)
+        if not (folder / "Inbox.lua").is_file():
+            out.write(folder / "Inbox.lua", waiting, "emplacement", quiet=True)
+            inboxes += 1
+    out.note(
+        f"réserve : {slot_name(1)} à {slot_name(slots)} ({slots} .toc, {inboxes} Inbox.lua d'attente écrits, "
+        "les autres gardés)"
+    )
+
+
+def install_bridge(wow_dir: Path, slots: int = SLOTS, *, dry_run: bool = False, source: Path = SOURCE) -> InstallReport:
+    """Installe l'addon, sa réserve d'emplacements, `ctl/` et les addons de sonde ; `dry_run` n'écrit rien et rend
+    les opérations prévues."""
+    if not MIN_SLOTS <= slots <= SLOTS:
+        raise InstallError(f"réserve de {slots} emplacements : de {MIN_SLOTS} à {SLOTS} (8 à 200)")
     addons = addons_dir(wow_dir)
     if not (source / f"{ADDON}.toc").is_file():
         raise InstallError(f"source invalide : {source / (ADDON + '.toc')} absent")
-    if slots != 0:
-        raise InstallError("réserve d'emplacements : pas encore livrée (P06a, bloc B)")
     report = InstallReport(ogg_source=find_ogg(addons))
     out = _Writer(report, wow_dir, dry_run)
     dest = addons / ADDON
     for path in sorted(p for p in source.rglob("*") if p.is_file()):
-        out.write(dest / path.relative_to(source), path.read_bytes(), "addon")
+        target = dest / path.relative_to(source)
+        if path.name in BRIDGE_WRITTEN and path.parent == source and target.is_file():
+            continue
+        out.write(target, path.read_bytes(), "addon")
+    _install_reserve(addons, slots, out)
     ctl = dest / "ctl"
     for name, content in (("empty", b""), ("valid", SILENT_WAV), ("flip", b"")):
         out.write(ctl / f"{name}.wav", content, "contrôle")

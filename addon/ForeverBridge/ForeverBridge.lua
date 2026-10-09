@@ -35,6 +35,7 @@ local ADDON = ... or "ForeverBridge"
 ForeverBridge = {}
 local FB = ForeverBridge
 local Codec = ForeverBridge_Codec
+local Message = ForeverBridge_Message
 
 local DEFAULT_CELL = 1 -- côté d'une case de la bande, en pixels physiques (repli de 2 à 4 par /fv test N)
 local MAX_CELL = 4
@@ -45,6 +46,9 @@ local PROBE2_ADDON = "ForeverBridge_Probe2"
 local PREFIX = "|cff33ff99ForeverBridge|r : "
 local WINDOW_W, WINDOW_H = 520, 360
 local MIN_W, MIN_H = 360, 240
+local MAX_LETTERS = 255 -- question tapée, en caractères (zone de saisie)
+local PROVISIONAL_BAND = 30 -- bloc B : bande retirée au bout de ce délai, faute d'accusé (bloc E)
+local SEND_W, BAR_H, INPUT_H = 90, 22, 54
 local MIN_ALPHA = 0.3 -- fond réglable par /fv fond, de 30 à 100 (opaque par défaut)
 
 BINDING_HEADER_FOREVERBRIDGE = "ForeverBridge"
@@ -170,7 +174,7 @@ local function BuildWindow()
 	title:SetPoint("LEFT", dot, "RIGHT", 6, 0)
 	title:SetText("ForeverBridge")
 
-	local status = f:CreateFontString("ForeverBridgeStatus", "OVERLAY", "GameFontHighlightSmall")
+	local status = f:CreateFontString("ForeverBridgeStatusLine", "OVERLAY", "GameFontHighlightSmall")
 	status:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -34)
 	status:SetPoint("RIGHT", f, "RIGHT", -34, 0)
 	status:SetJustifyH("LEFT")
@@ -185,7 +189,7 @@ local function BuildWindow()
 
 	local history = CreateFrame("ScrollingMessageFrame", "ForeverBridgeHistory", f)
 	history:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -52)
-	history:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14, 22)
+	history:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14, 16 + INPUT_H + 8 + BAR_H + 8)
 	history:SetFontObject(ChatFontNormal)
 	history:SetJustifyH("LEFT")
 	history:SetFading(false)
@@ -214,6 +218,64 @@ local function BuildWindow()
 		f:StopMovingOrSizing()
 		FB.SaveGeometry()
 	end)
+
+	-- Zone de saisie avec « Envoyer » accolé (disposition de wow-ai) : Entrée envoie, Maj+Entrée passe à la ligne.
+	local inputBg = CreateFrame("Frame", nil, f, "BackdropTemplate")
+	inputBg:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 14, 16)
+	inputBg:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14 - SEND_W - 6, 16)
+	inputBg:SetHeight(INPUT_H)
+	if inputBg.SetBackdrop then
+		inputBg:SetBackdrop(BACKDROP)
+		inputBg:SetBackdropColor(0, 0, 0, 1)
+		inputBg:SetBackdropBorderColor(0.5, 0.5, 0.5, 1)
+	end
+	local scroll = CreateFrame("ScrollFrame", "ForeverBridgeInputScroll", inputBg, "UIPanelScrollFrameTemplate")
+	scroll:SetPoint("TOPLEFT", inputBg, "TOPLEFT", 8, -6)
+	scroll:SetPoint("BOTTOMRIGHT", inputBg, "BOTTOMRIGHT", -24, 6)
+	local input = CreateFrame("EditBox", "ForeverBridgeInput", scroll)
+	input:SetMultiLine(true)
+	input:SetAutoFocus(false)
+	input:SetFontObject(ChatFontNormal)
+	input:SetMaxLetters(MAX_LETTERS)
+	input:SetSize(400, INPUT_H - 12)
+	input:SetScript("OnEnterPressed", function(self)
+		if IsShiftKeyDown() then
+			self:Insert("\n")
+		else
+			FB.SendFromInput()
+		end
+	end)
+	input:SetScript("OnEscapePressed", function(self)
+		self:ClearFocus()
+	end)
+	scroll:SetScrollChild(input)
+	scroll:HookScript("OnSizeChanged", function(_, width)
+		input:SetWidth(width)
+	end)
+	inputBg:EnableMouse(true)
+	inputBg:SetScript("OnMouseDown", function()
+		input:SetFocus()
+	end)
+	ui.input = input
+
+	local send = CreateFrame("Button", "ForeverBridgeSendButton", f, "UIPanelButtonTemplate")
+	send:SetSize(SEND_W, 30)
+	send:SetPoint("LEFT", inputBg, "RIGHT", 6, 0)
+	send:SetText("Envoyer")
+	send:SetScript("OnClick", function()
+		FB.SendFromInput()
+	end)
+
+	local new = CreateFrame("Button", "ForeverBridgeNewButton", f, "UIPanelButtonTemplate")
+	new:SetSize(160, BAR_H)
+	new:SetPoint("BOTTOMLEFT", inputBg, "TOPLEFT", 0, 8)
+	new:SetText("Nouvelle conversation")
+	new:SetScript("OnClick", function()
+		FB.NewConversation()
+	end)
+	ui.newButton = new
+	ui.buttons = {}
+	FB.RefreshButtons()
 	return f
 end
 
@@ -227,6 +289,7 @@ end
 -- Ouverture à la demande du joueur seulement (commande ou raccourci), jamais automatique.
 function FB.Open()
 	BuildWindow():Show()
+	FB.RefreshButtons()
 end
 
 function FB.Toggle()
@@ -235,6 +298,68 @@ function FB.Toggle()
 		f:Hide()
 	else
 		f:Show()
+		FB.RefreshButtons()
+	end
+end
+
+-- Texte venu du joueur ou du pont : « | » doublé, les séquences d'interface restent du texte.
+local function Escape(text)
+	return (tostring(text):gsub("|", "||"))
+end
+
+local function PlayerClass()
+	local ok, class = pcall(UnitClassBase, "player")
+	if ok and type(class) == "string" then
+		return class
+	end
+	return nil
+end
+
+local function HasPlayerTarget()
+	local ok1, exists = pcall(UnitExists, "target")
+	local ok2, isPlayer = pcall(UnitIsPlayer, "target")
+	return ok1 and ok2 and exists == true and isPlayer == true
+end
+
+-- Barre de boutons : seulement ceux que le pont a écrits (Status.lua, puis emplacements au bloc E), pour la classe
+-- du personnage ; aucun bouton tant que le pont n'a rien écrit.
+function FB.RefreshButtons()
+	if not ui.buttons then
+		return
+	end
+	for _, button in pairs(ui.buttons) do
+		button:Hide()
+	end
+	local state = type(ForeverBridgeStatus) == "table" and ForeverBridgeStatus or {}
+	local entries = type(state.buttons) == "table" and state.buttons or {}
+	local class = PlayerClass()
+	local previous = ui.newButton
+	for _, entry in ipairs(entries) do
+		local allowed = type(entry) == "table" and type(entry.key) == "string"
+		if allowed and type(entry.classes) == "table" then
+			allowed = false
+			for _, token in ipairs(entry.classes) do
+				if token == class then
+					allowed = true
+				end
+			end
+		end
+		if allowed then
+			local button = ui.buttons[entry.key]
+			if not button then
+				button = CreateFrame("Button", "ForeverBridgeButton_" .. entry.key, ui.frame, "UIPanelButtonTemplate")
+				button:SetSize(100, BAR_H)
+				ui.buttons[entry.key] = button
+			end
+			button:SetText(tostring(entry.label or entry.key))
+			button:ClearAllPoints()
+			button:SetPoint("LEFT", previous, "RIGHT", 6, 0)
+			button:SetScript("OnClick", function()
+				FB.ClickButton(entry)
+			end)
+			button:Show()
+			previous = button
+		end
 	end
 end
 
@@ -309,6 +434,74 @@ function FB.ShowBand(id, payload, cell)
 end
 
 ---------------------------------------------------------------------------
+-- Envoi (bloc B : bande provisoire, réponses par la réserve au bloc E)
+---------------------------------------------------------------------------
+
+function FB.Send(text, buttonKey)
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" then
+		return false
+	end
+	local id = tonumber(db.next_id) or 1
+	local flags = {}
+	if run.newConversation then
+		flags[#flags + 1] = "n"
+	end
+	if buttonKey then
+		flags[#flags + 1] = "b=" .. buttonKey
+	end
+	local payload, why = Message.Build(db.session, id, flags, run.nextSlot or 1, text)
+	FB.Open()
+	if not payload then
+		FB.Print("envoi impossible : " .. tostring(why))
+		return false
+	end
+	local ok, reason = FB.ShowBand(id, payload, tonumber(db.cell) or DEFAULT_CELL)
+	if not ok then
+		FB.Print("envoi impossible : " .. tostring(reason))
+		return false
+	end
+	run.testLeft = nil
+	run.bandLeft = PROVISIONAL_BAND
+	run.newConversation = nil
+	db.next_id = id + 1
+	FB.Print("|cff4fa3ffVous|r : " .. Escape(text))
+	FB.Print("|cff888888message n° " .. id .. " envoyé ; réponses en jeu au bloc E du pont (pas encore livré).|r")
+	return true
+end
+
+function FB.SendFromInput()
+	local input = ui.input
+	if not input then
+		return
+	end
+	local text = (input:GetText() or ""):gsub("^%s+", ""):gsub("%s+$", "")
+	if text == "" then
+		return
+	end
+	if FB.Send(text) then
+		input:SetText("")
+	end
+end
+
+function FB.NewConversation()
+	run.newConversation = true
+	FB.Print("|cff888888— Nouvelle conversation : le prochain message repart de zéro —|r")
+end
+
+function FB.ClickButton(entry)
+	if entry.target and not HasPlayerTarget() then
+		FB.Print(tostring(entry.label or "PvP") .. " : prenez un joueur en cible, puis cliquez à nouveau.")
+		return
+	end
+	local class = PlayerClass()
+	local question = type(entry.questions) == "table" and class and entry.questions[class] or entry.question
+	if type(question) == "string" and question ~= "" then
+		FB.Send(question, entry.key)
+	end
+end
+
+---------------------------------------------------------------------------
 -- Bande de test (/fv test [taille de case])
 ---------------------------------------------------------------------------
 
@@ -337,12 +530,20 @@ function FB.Test(size)
 		return
 	end
 	run.testLeft = TEST_DURATION
+	run.bandLeft = nil
 	FB.Print("bande de test affichée en haut à gauche, case de " .. cell .. " pixel(s) (retirée dans deux minutes, "
 		.. "ou par /fv test). Dans un terminal : uv run forever bridge selftest --live, puis revenir au jeu.")
 end
 
 -- Minuterie : le cadre pilote reste visible (OnUpdate ne tourne que sur un cadre visible).
 function FB.Tick(elapsed)
+	if run.bandLeft then
+		run.bandLeft = run.bandLeft - elapsed
+		if run.bandLeft <= 0 then
+			run.bandLeft = nil
+			FB.HideBand()
+		end
+	end
 	if run.testLeft then
 		run.testLeft = run.testLeft - elapsed
 		if run.testLeft <= 0 then
