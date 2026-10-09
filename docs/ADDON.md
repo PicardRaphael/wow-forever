@@ -218,6 +218,22 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     8. Relevé : la sortie du terminal des étapes 5 et 6, ce qui ne va pas aux étapes 2 et 7.
     9. **Fait le 2026-10-09** (relevés de l'utilisateur) : fenêtre complète, `/fv fond` ; « message n° 1 lu (576 octets) », « case de 1 pixel », emplacement annoncé 1, contexte attendu (sans `subzone` ni `target` à cet endroit), texte exact ; chargement du jeu pas plus long avec 200 emplacements (BR3) ; `/fv diag` confirmé dans la fenêtre et lignes présentes dans la discussion. Drapeau « n » non rejoué en jeu, couvert par `test_new_conversation_flags_only_the_next_message`.
 
+13. **Sonde en jeu F : retours de la sonde E** (P06a, avant la fusion si possible, sinon non bloquante).
+    1. Jeu fermé : `uv run forever bridge install` (Message.lua et ForeverBridge.lua à jour), puis
+       `uv run forever bridge config` (attendu : modèle `sonnet`) et `uv run forever bridge start`, avant le jeu.
+    2. `/fv` : ligne d'état « Données 1.60.1.70245 · client 1.60.1.70291 : mise à jour en attente · N mises à jour à
+       valider sur le PC » tant que les données ne sont pas mises à jour.
+    3. Bouton Talents : la réponse cite tes talents actuels (Improved Frostbolt 5/5, Elemental Precision 5/5) ; quand
+       le calcul trouve deux builds à égalité statistique, la réponse le dit et donne les deux liens.
+    4. Clic sur `[Talents Forever]` : la zone copiable s'ouvre à droite de la fenêtre et se déplace à la souris.
+    5. PvP avec un joueur en cible : la réponse reprend son niveau réel (et sa race si le jeu la donne).
+    6. « Nouvelle conversation » : la fenêtre se vide, puis une question repart de zéro.
+    7. Fenêtre fermée juste après un envoi (`/fv`) : elle ne se rouvre pas ; `/fv` : la réponse est là.
+    8. Secours : `uv run forever bridge stop`, question, « Non reçu : pont injoignable » ; `uv run forever bridge start`,
+       `/reload` : la réponse arrive sans second `/reload`.
+    9. `uv run forever bridge status` : les lignes `reply` portent `timings` (démarrage, chaque outil, fin) et
+       `cost_usd` ; me donner ces lignes et le temps ressenti.
+
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
     1. **E2, pénalité des sorts de bas niveau (G4, T04e)** : Frostbolt **rang 1** sur un monstre gris, sans talent de dégâts, personnage de niveau 8 ou plus, base 20-22. **Deux séries d'une dizaine de coups non critiques à deux puissances des sorts éloignées** (S1 et S2, au moins 30 d'écart, lues dans le bloc avancé de `SPELL_CAST_SUCCESS`) : la pente (moyenne à S2 − moyenne à S1) / (S2 − S1) vaut 0,407 sans pénalité et 0,163 si le serveur la réapplique. Le coefficient du client (0,407) ne tranche pas : il est brut, la pénalité de Classic est appliquée par le serveur. Contrôle à une seule puissance : à 14 de puissance des sorts, 25,6-27,8 contre 22,2-24,4 (sans recouvrement).

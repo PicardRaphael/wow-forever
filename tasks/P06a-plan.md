@@ -915,6 +915,34 @@ Le bloc B porte le message **des deux côtés**, pour qu'une question tapée en 
   ajoute la mention fixe.
 - Sonde E : `docs/ADDON.md` §7, étape 11.
 
+### Exécution : sonde en jeu E et ses retours (2026-10-09)
+- Sonde E (relevés de l'utilisateur) : le chat marche de bout en bout (question, réponse mise en forme, boutons
+  Talents, Leveling, PvP, voyant vert, lien copiable). Défauts corrigés le même jour (décision 213) :
+  1. talents du jeu (`105778:5,105779:5`) reliés aux clés de forever par `classes.json` (Elemental Precision 5/5 et
+     Improved Frostbolt 5/5 : 5 rangs chacun sur Forever) et donnés à la conversation (`forever/bridge/context.py`),
+     testé sur le contexte réel (`tests/fixtures/bridge/context_sonde_e.txt`) ;
+  2. égalités : `forever build` affichait un build que sa propre comparaison départageait en faveur de l'alternative
+     (écart non significatif) ; la CLI partait du préréglage complet, le MCP du rapide. Même défaut (rapide),
+     `alternative.tie` et lien de l'alternative, consigne « présenter les deux options » ;
+  3. zone copiable déplaçable, ouverte à droite de la fenêtre ; 4. cible : niveau (`??` si caché) et race en plus de
+     la classe ; 5. « Nouvelle conversation » vide la fenêtre, l'historique part dans `ForeverBridgeDB.archive` (cinq
+     conversations) ; 6. ligne d'état « Données 1.60.1.70245 · client 1.60.1.70291 : mise à jour en attente · 3 mises à
+     jour à valider sur le PC » ; 7. durées et coût dans le journal, modèle réglable (Sonnet par défaut).
+- Mesures (journal de la sonde E, modèle par défaut de Claude Code) : 14 à 31 s de la lecture de la bande à la
+  réponse. Comparaison du 2026-10-09 (contexte réel, six questions, ligne du pont) : Sonnet 10 à 20 s, 0,03 à 0,10 $
+  par réponse ; Haiku 11 à 30 s, 0,002 à 0,01 $. Décomposition (Sonnet) : démarrage de `claude` et du serveur MCP
+  2,2 s (6 s à froid), outils 0,3 à 12 s (`forever_build` 5 à 6 s, `forever_lookup` des builds populaires 6,5 s),
+  modèle 7 à 9 s ; lecture de la bande et écriture de la réserve négligeables (0,1 s pour 200 emplacements) ; attente
+  du relevé suivant : au plus 4 s avant 30 s, au plus 10 s ensuite.
+- Recommandation : **Sonnet** (défaut). Haiku n'est pas plus rapide ici, et sa réponse au bouton Talents était
+  confuse (lien refusé) ; il suffit pour PvP et les questions simples, pas pour Talents. Aucun chiffre hors outils
+  relevé chez l'un ou l'autre (Purge, Earth Shock et War Stomp de Haiku viennent bien de la fiche du Chaman).
+- Accélérations proposées, non faites : relevés toutes les 4 s jusqu'à 60 s (au lieu de 10 s après 30 s : jusqu'à
+  6 s gagnées, environ 4 emplacements de plus par réponse longue) ; réflexion du modèle coupée
+  (`MAX_THINKING_TOKENS=0`, à mesurer) ; boutons qui nomment l'outil à appeler (moins d'appels, pas de `Skill`) ;
+  conversation `claude` gardée ouverte (`--input-format stream-json`, environ 2 s par message, P06b).
+- Sonde F (rejouer les corrections, fenêtre fermée après un envoi, secours) : `docs/ADDON.md` §7, étape 13.
+
 ### Questions ouvertes ajoutées (`docs/OPEN_QUESTIONS.md`, section « Pont en jeu »)
 BR1 premier chargement d'un emplacement sans `/reload` ; BR2 bande d'une case par pixel à toutes les échelles ; BR3
 effet de 200 addons chargés à la demande sur le démarrage et la liste des addons ; BR4 canal par polices.

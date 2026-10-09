@@ -131,6 +131,7 @@ avec sa ligne de provenance. Sous Windows, jeu en fenêtré ou plein écran fen�
 | `uv run forever bridge start` | lance le pont en arrière-plan (un seul à la fois) |
 | `uv run forever bridge status` | pont en marche ou non, état des données, dernières lignes du journal |
 | `uv run forever bridge stop` | arrête le pont |
+| `uv run forever bridge config --model haiku` | modèle de la conversation « jeu » (Sonnet par défaut) |
 | `uv run forever bridge selftest --live` | lit la bande de test de `/fv test` (diagnostic) |
 
 En jeu : `/fv` ouvre la fenêtre (raccourci dans Options > Raccourcis > AddOns), Entrée envoie, Maj+Entrée passe à la
