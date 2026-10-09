@@ -147,3 +147,25 @@ def test_real_data_never_recommend_a_build_slower_than_a_candidate(deps):
     assert not (rep["alternative"]["better"] == "alternative" and not rep["alternative"]["tie"])
     assert rep["respec"]["versus_optimal"]["current_better"] is False
     assert dep["mc_runs"] >= 1  # nombre de Monte Carlo lancés (le temps se mesure hors du rapport, déterministe)
+
+
+def test_the_end_of_every_tree_path_enters_the_departage(deps, monkeypatch, game_data):
+    """Relevé au leveling 20 de 1.60.1.70291 : le chemin Givre finit sur un build meilleur au niveau demandé, même en
+    analytique, mais perd au cumul d'heures des niveaux précédents ; non voisin du build retenu, il n'entrait pas au
+    départage. La fin de chaque faisceau (libre et par arbre) est candidate ; gagnante, son ordre est le sien."""
+    seen = {}
+    real_paths = build_module.leveling_paths
+
+    def capture(*args, **kwargs):
+        paths = real_paths(*args, **kwargs)
+        seen["ends"] = [{k: v for k, v in p.points.items() if v > 0} for p in paths]
+        return paths
+
+    monkeypatch.setattr(build_module, "leveling_paths", capture)
+    rep = build_report(deps, "leveling", 14, preset="rapide", sensitivity=False)
+    talents = [c["talents"] for c in rep["departage"]["candidates"]]
+    assert len(seen["ends"]) > 1
+    for end in seen["ends"]:
+        assert {k: end[k] for k in game_data.talents if end.get(k, 0) > 0} in talents
+    assert all(not (c["significant"] and c["better"]) for c in rep["departage"]["candidates"] if not c["champion"])
+    assert_order_is_legal(game_data, rep)
