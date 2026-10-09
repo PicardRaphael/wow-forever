@@ -9,7 +9,19 @@ import yaml
 from conftest import FIXTURES, REGISTRY_PATH, REPO_ROOT
 
 from forever.errors import UnknownMechanicError
-from forever.registry import ENGINE_DIR, NUMBER_RE, coverage, find_entry, implementations, load, main, validate
+from forever.registry import (
+    CERTAINTIES,
+    COVERED_STATUSES,
+    ENGINE_DIR,
+    NUMBER_RE,
+    STATUSES,
+    coverage,
+    find_entry,
+    implementations,
+    load,
+    main,
+    validate,
+)
 
 REGISTRIES = FIXTURES / "registry"
 NUMBER = NUMBER_RE
@@ -52,11 +64,26 @@ def check(name, *, strict=True, engine_dirs=()):
 
 @pytest.mark.slow
 def test_repository_registry_is_valid_strict():
+    """Décision 214 : aucun total figé ; le registre valide compte autant d'entrées que le fichier, par statut."""
     report = validate(REGISTRY_PATH, REPO_ROOT, strict=True)
     assert report.errors == []
-    assert (
-        report.total == 129
-    )  # T04b : H11 ; T04c : I7 ; T05 : B18, B19, C9, I8 ; PV1 : K1 à K5 ; CH0 : L1 à L12 ; L13 ; notes du 01/10 : B20, I9, K6
+    entries = load(REGISTRY_PATH)
+    assert report.total == len(entries) > 0
+    assert report.counts == {s: sum(1 for m in entries if m.status == s) for s in STATUSES}
+
+
+def test_every_entry_is_complete():
+    """Décision 214 : chaque entrée a ses champs, un statut et une certitude connus ; une entrée couverte (`teste` ou
+    mieux) cite une source et au moins une fonction de test."""
+    entries = load(REGISTRY_PATH)
+    assert len({m.id for m in entries}) == len(entries)
+    for m in entries:
+        assert m.id and m.category and m.description and m.forever, m.id
+        assert m.status in STATUSES, (m.id, m.status)
+        assert m.certainty in CERTAINTIES, (m.id, m.certainty)
+        if m.status in COVERED_STATUSES:
+            assert m.sources, m.id
+            assert any("::" in t for t in m.tests), m.id
 
 
 def test_tested_entries_reference_existing_test_functions():
@@ -126,10 +153,12 @@ def test_find_entry_unknown_suggests():
 
 
 def test_repository_coverage():
-    """Seul test qui fige la couverture du registre après T02."""
-    assert (
-        coverage(REGISTRY_PATH) == "54/129"
-    )  # T04b : H11 ; T04c : I7 ajoutée et testée, B15 testée ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3 ; CH0 : L1 à L12 sauf L5 ; L13 ; T08c : J1
+    """Décision 214 : la couverture affichée (provenance, `forever status`) est calculée sur le registre lui-même :
+    entrées `teste` ou mieux sur le nombre d'entrées, sans total figé."""
+    entries = load(REGISTRY_PATH)
+    covered = sum(1 for m in entries if m.status in COVERED_STATUSES)
+    assert coverage(REGISTRY_PATH) == f"{covered}/{len(entries)}"
+    assert 0 < covered <= len(entries)
 
 
 def test_load_reads_optional_fields():
@@ -140,12 +169,12 @@ def test_load_reads_optional_fields():
 
 @pytest.mark.slow
 def test_main_strict_on_repository(capsys):
+    """Décision 214 : la ligne de `check_registry.py` reprend les comptes du registre, sans total figé."""
     assert main(["--strict"]) == 0
     out = capsys.readouterr().out
-    assert out.startswith("Registre : 129 mécaniques")
-    assert (
-        "teste 53" in out and "valide-journal 1" in out
-    )  # B1 validée par les journaux (T04b) ; T04c : I7, B15 ; T05 : B14, H3, H5, I5 ; PV1 : K1, K2, K3 ; L13 ; T08c : J1
+    entries = load(REGISTRY_PATH)
+    counts = " | ".join(f"{s} {sum(1 for m in entries if m.status == s)}" for s in STATUSES)
+    assert out.startswith(f"Registre : {len(entries)} mécaniques | {counts}")
 
 
 def test_main_reports_errors(capsys):
