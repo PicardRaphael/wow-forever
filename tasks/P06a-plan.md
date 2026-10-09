@@ -724,14 +724,27 @@ par ce qui suit ; le reste du plan tient.
   bande, même conversation, réponse dans l'historique). Liste écrite par le pont dans chaque publication et dans
   `Status.lua` (`buttons`) : **l'addon n'affiche que ce que le pont envoie** (aucun bouton avant le premier état lu).
 - Table `forever/bridge/buttons.py` ; tranches faites **fixées au plan** : T04b, T04c, T05, FA1, CH0, PV1 (ROADMAP du
-  2026-10-09). Filtre de classe proposé (à valider) : la tranche ne calcule que pour cette classe.
+  2026-10-09). Filtre de classe **validé par l'utilisateur le 2026-10-09** : un bouton n'apparaît que pour les classes
+  que sa tranche sert.
 
   | Bouton | Question envoyée | Tranches | Classes |
   | --- | --- | --- | --- |
-  | Talents | « Quel est mon prochain talent, avec le lien Talents Forever ? » | FA1, T05 | Mage |
+  | Talents | Mage : « Quel est mon prochain talent, avec le lien Talents Forever ? » ; autres classes : « Quel build populaire de Talents Forever est le plus proche de mes talents actuels ? Donne son lien Talents Forever. » | FA1, T05 | toutes |
   | Leveling | « Quel est mon prochain objectif de leveling ? » | T04b, T04c | Mage |
   | Familiers | « Où apprivoiser le prochain rang utile près de moi ? » | CH0 | Chasseur |
   | PvP | « Fiche de la classe de ma cible » | PV1 | toutes (cible joueur requise) |
+
+- **Talents hors Mage** (demande de l'utilisateur du 2026-10-09) : build populaire le plus proche, avec son lien
+  Talents Forever, **en disant clairement qu'il n'est pas encore calculé par le moteur**. Garanti sans dépendre du
+  modèle : le message porte le bouton d'origine (drapeau `b=talents`) et, pour une classe autre que le Mage, le pont
+  ajoute à la réponse la ligne fixe « Build populaire de Talents Forever (choix de joueurs), pas encore calculé par
+  le moteur de forever. » (certitude `suppose`, celle de `tf_popular`). Outil : `forever_lookup(kind="tf_popular",
+  name=<classe>, current=<talents du contexte>)` gagne au bloc C un champ `closest` calculé par `closest_popular`
+  (`forever/talents_forever.py`, déjà utilisé pour le Mage) ; conversion des nœuds du contexte (`nœud:rang` de
+  `C_Traits`) en talents de la classe à vérifier au bloc C ; à défaut, build le plus populaire de la spécialisation
+  la plus chargée, avec une note. Tests : `test_bridge_buttons.py` (Talents visible pour les neuf classes, question
+  du Mage et des autres), `test_bridge_loop.py` (ligne fixe ajoutée hors Mage, absente pour le Mage),
+  `test_mcp_*` (`closest` rendu avec `current`).
 
 - Absents en P06a : « Mettre à jour », Valider, Refuser (P06b) ; Équipement (T10a) ; Analyse du dernier combat (AN1,
   AN2). Le contexte gagne `target` (jeton de classe de la cible si c'est un joueur, sous `pcall` et `issecretvalue`).
