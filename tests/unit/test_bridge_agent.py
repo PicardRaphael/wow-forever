@@ -7,6 +7,7 @@ commande ni par un shell (demande de l'utilisateur du 2026-10-09)."""
 import io
 import json
 import threading
+from typing import ClassVar
 
 import pytest
 from conftest import FIXTURES, REPO_ROOT
@@ -160,7 +161,7 @@ class FakeStdin(io.BytesIO):
 class FakePopen:
     """Faux processus : rend les lignes d'une fixture, ou bloque jusqu'à `kill` (`hang`)."""
 
-    calls: list = []
+    calls: ClassVar[list] = []
 
     def __init__(self, stream_lines=(), *, hang=False):
         self.stream_lines = list(stream_lines)
