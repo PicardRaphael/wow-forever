@@ -34,10 +34,9 @@ installée ; portée à 1.60.1.99250 (`test_builds.py`, `test_freshness.py`, `te
 `test_builds.py::test_stale_fixture_is_newer_than_the_installed_version`.
 
 ## Talent renommé par le client hors du Mage
-`tests/talents_forever_data.py` : `RENAMED_KEYS` (`predatoryInstincts` → `naturalInstinct`, même nœud) ; la fixture
-`layout.json` garde la clé de son relevé et se lit avec les données anciennes comme nouvelles. Hors du Mage,
-`classes.json` prend la clé du client ; seul le Mage garde la sienne (décision 165) : étendre cette règle aux autres
-classes est une décision ouverte pour l'utilisateur.
+D'abord résolu par `RENAMED_KEYS` dans `tests/talents_forever_data.py` ; remplacé le jour même par la décision 218 :
+les clés de talent sont stables d'une version à l'autre pour les 9 classes (même nœud, même sort), et
+1.60.1.70291 révision 3 garde `predatoryInstincts` pour Natural Instinct. `RENAMED_KEYS` est retiré.
 
 ## Registre
 `test_registry.py` : plus aucun total figé (décision 214).

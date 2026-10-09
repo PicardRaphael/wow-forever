@@ -677,6 +677,53 @@ def _sources(doc: dict[str, Any], docs: Mapping[str, Any], n: int, version: str,
     return doc
 
 
+def _rekey(node: Any, node_id: int, client_key: str, key: str) -> None:
+    """Remplace `client_key` par `key` dans chaque objet qui désigne le nœud `node_id` (arbre, liens des sorts,
+    nœuds relevés ou écartés)."""
+    if isinstance(node, dict):
+        if node.get("node_id") == node_id and node.get("key") == client_key:
+            node["key"] = key
+        for value in node.values():
+            _rekey(value, node_id, client_key, key)
+    elif isinstance(node, list):
+        for value in node:
+            _rekey(value, node_id, client_key, key)
+
+
+def stable_talent_keys(previous: Mapping[str, Any], classes: dict[str, Any]) -> list[tuple[str, str, str]]:
+    """Clés de talent stables d'une version à l'autre, pour toutes les classes de `classes.json` (règle du Mage,
+    décision 165, étendue le 2026-10-09, décision 218) : un talent du même nœud et du même sort que dans la version
+    précédente garde sa clé ; le nom du client est affiché, l'ancien nom va dans `former_names`, la clé du client dans
+    `client_key`. Un nœud qui porte un autre sort est un autre talent ; une clé déjà prise par un autre nœud de la classe
+    n'est pas reprise. Rend (classe, clé du client, clé gardée) par talent dont la clé a été gardée."""
+    done: list[tuple[str, str, str]] = []
+    before = previous.get("classes", {})
+    for name, cls in classes.get("classes", {}).items():
+        old = {t["node_id"]: t for tree in (before.get(name) or {}).get("trees", []) for t in tree.get("talents", [])}
+        talents = [t for tree in cls.get("trees", []) for t in tree.get("talents", [])]
+        taken = {t["key"]: t["node_id"] for t in talents}
+        for t in talents:
+            p = old.get(t.get("node_id"))
+            if p is None or p.get("spell_id") != t.get("spell_id"):
+                continue
+            key, client_key = p["key"], t["key"]
+            if taken.get(key, t["node_id"]) != t["node_id"]:
+                continue
+            former = list(p.get("former_names") or [])
+            if p.get("name") and p["name"] != t.get("name") and p["name"] not in former:
+                former.append(p["name"])
+            if former:
+                t["former_names"] = former
+            if client_key != key:
+                _rekey(cls, t["node_id"], client_key, key)
+                t["client_key"] = client_key
+                taken[key] = t["node_id"]
+                done.append((name, client_key, key))
+            elif p.get("client_key") and "client_key" not in t:
+                t["client_key"] = p["client_key"]
+    return done
+
+
 def rename_class_talents(classes: dict[str, Any], confirmed: Sequence[Mapping[str, Any]]) -> list[tuple[str, str, str]]:
     """Applique les renommages confirmés (`change` « renamed ») à l'arbre du Mage de `classes.json` : la clé du client
     devient celle du dépôt, gardée dans `client_key`. L'import du profil traduit les nœuds par ce fichier ; le moteur
@@ -775,6 +822,8 @@ def apply_install(
         )
     day = date or format_utc(deps.now())[:10]
     n, version = plan["revision_to"], plan["version"]
+    previous_path = Path(docs["path"]) / "classes.json"  # lu avant tout remplacement (révision : même dossier)
+    previous_classes = _json(previous_path) if previous_path.is_file() else None
     vdir: Path = _new_version_dir(deps, plan, docs, day) if new_version else docs["path"]
     docs = {
         **docs,
@@ -832,6 +881,8 @@ def apply_install(
     if classes_path.is_file():
         classes = _json(classes_path)
         renamed = rename_class_talents(classes, confirmed["changes"])
+        if previous_classes is not None:
+            renamed += stable_talent_keys(previous_classes, classes)
         if renamed:
             _write(classes_path, classes, 1)
             revision["renamed_in_classes"] = [{"class": c, "client_key": n, "key": o} for c, n, o in renamed]
