@@ -80,7 +80,8 @@ def _next_point(r: Resolved, level_cap: int | None) -> tuple[Call, tuple[str, ..
         ),
         "Lien Talents Forever : celui de `respec.projected.export` (build actuel plus ce point), tel quel.",
         (
-            "Build, en complément, après le prochain point : si `respec.versus_optimal.tie` est vrai, dis que ton build actuel et le build optimal "
+            "Build, en complément, après le prochain point : si `respec.versus_optimal.same` est vrai, dis que ton build "
+            "actuel est la recommandation (départage final au Monte Carlo) et que tu le gardes ; si `respec.versus_optimal.tie` est vrai, dis que ton build actuel et le build optimal "
             "(`choices.leveling.rotation`) sont à égalité statistique et que tu gardes ton build (aucun gain mesurable) ; "
             "si `stability.stable` est faux, ajoute que le build optimal lui-même est instable (il change avec la "
             "graine). Si `respec.versus_optimal.current_better` est vrai, dis que ton build actuel est meilleur que le build "
@@ -129,7 +130,7 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
             (
                 "Objectif : les trois premières zones ou donjons du résultat de zones, dans l'ordre rendu ; puis le "
                 "prochain point de talent, lu comme pour le bouton Talents (`respec.projected.steps`) ; si "
-                "`respec.versus_optimal.tie` est vrai, tu gardes ton build (égalité statistique avec le build optimal, "
+                "`respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, tu gardes ton build (égalité statistique avec le build optimal, "
                 "instable si `stability.stable` est faux)."
             ),
         )

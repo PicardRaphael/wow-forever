@@ -142,8 +142,8 @@ def test_real_data_never_recommend_a_build_slower_than_a_candidate(deps):
         sensitivity=False,
     )
     dep = rep["departage"]
-    assert {"criterion", "candidates", "chosen", "switched", "duration_s", "mc_runs"} <= set(dep)
+    assert {"criterion", "candidates", "chosen", "switched", "mc_runs"} <= set(dep)
     assert all(not (c["significant"] and c["better"]) for c in dep["candidates"] if not c["champion"])
     assert not (rep["alternative"]["better"] == "alternative" and not rep["alternative"]["tie"])
     assert rep["respec"]["versus_optimal"]["current_better"] is False
-    assert dep["duration_s"] >= 0 and dep["mc_runs"] >= 1
+    assert dep["mc_runs"] >= 1  # nombre de Monte Carlo lancés (le temps se mesure hors du rapport, déterministe)

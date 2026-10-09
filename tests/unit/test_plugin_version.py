@@ -38,7 +38,8 @@ def test_plugin_json_has_a_semver_version():
     # jamais par forever.exe (verrou de uv sync, demande de l'utilisateur du 2026-10-09) ; 0.8.3 : prochain point au
     # niveau suivant quand tous les points sont placés, un cas d'évaluation par bouton du pont (sonde en jeu F) ;
     # 0.8.4 : cas des boutons Talents et Leveling régénérés (égalité avec le build retenu, build actuel gardé, décision 217).
-    assert version == "0.8.4"
+    # 0.8.5 : cas des boutons régénérés (build actuel retenu par le départage final au Monte Carlo, décision 219).
+    assert version == "0.8.5"
 
 
 def test_fingerprint_is_up_to_date():

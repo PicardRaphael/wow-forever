@@ -35,10 +35,10 @@ from forever.leveling import (
     given,
     ratio_assumption,
 )
-from forever.optimize.decide import Gap, gap_dict, paired_gap, tie_break
+from forever.optimize.decide import Gap, departage, gap_dict, paired_gap, tie_break
 from forever.optimize.endgame import PVP_CONTEXTS, context_analytic, context_mc, neighbors, optimize_context
 from forever.optimize.leveling import BuildChoice, best_choice, optimize_leveling
-from forever.optimize.respec import advise_respec
+from forever.optimize.respec import RespecAdvice, advise_respec
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.registry import blind_spot_rules
 from forever.registry import load as load_registry
@@ -66,6 +66,7 @@ class BuildReport(TypedDict):
     metric: dict[str, Any]
     reasons: list[dict[str, Any]]
     alternative: dict[str, Any]
+    departage: dict[str, Any]
     stability: dict[str, Any]
     sensitivity: list[dict[str, Any]]
     respec: dict[str, Any]
@@ -192,6 +193,9 @@ class _Metric:
         self.pvp = context in PVP_CONTEXTS
         self.lower_is_better = context == "leveling"
         self._cache: dict[tuple[tuple[str, int], ...], tuple[float, Choices]] = {}
+        # Monte Carlo déjà simulés (points, graine, choix) : le départage final ne paie qu'un tirage par candidat
+        self._mc_cache: dict[tuple[Any, ...], McStats | None] = {}
+        self.mc_runs = 0
 
     def analytic(self, pts: Mapping[str, int]) -> tuple[float, Choices]:
         sig = tuple(sorted((k, v) for k, v in pts.items() if v > 0))
@@ -216,6 +220,13 @@ class _Metric:
     def mc(self, pts: Mapping[str, int], choices: Choices, seed: int) -> McStats | None:
         if self.pvp:
             return None
+        key = (tuple(sorted((k, v) for k, v in pts.items() if v > 0)), seed, tuple(sorted(choices.items())))
+        if key not in self._mc_cache:
+            self.mc_runs += 1
+            self._mc_cache[key] = self._mc(pts, choices, seed)
+        return self._mc_cache[key]
+
+    def _mc(self, pts: Mapping[str, int], choices: Choices, seed: int) -> McStats | None:
         if self.context == "leveling":
             c = choices["leveling"]
             return mc_stats(
@@ -294,6 +305,116 @@ def _validate(
             raise InvalidArgumentError(f"Build actuel illégal au niveau {level} : {detail}.", "corriger --current")
 
 
+def _departage_candidates(
+    m: _Metric,
+    build: dict[str, int],
+    current: Mapping[str, int] | None,
+    bonus: int,
+    shortlist: int,
+    alternative: Mapping[str, int] | None = None,
+) -> list[dict[str, int]]:
+    """Candidats du départage final (décision 219), dans l'ordre : build de l'optimiseur, alternative de l'optimiseur
+    (contextes de fin de jeu), meilleurs voisins analytiques (`shortlist` du préréglage), build actuel (projeté au
+    niveau en leveling) s'il est légal au niveau."""
+    gd = m.gd
+    out = [dict(build)]
+    if alternative:
+        out.append(dict(alternative))
+    ranked = sorted(neighbors(gd, build, m.level, bonus), key=lambda n: -m.oriented(m.analytic(n)[0]))
+    out += [dict(n) for n in ranked[:shortlist]]
+    if current and not check_build(gd, current, m.level, bonus):
+        out.append({k: v for k, v in current.items() if v > 0})
+    return [{k: c[k] for k in gd.talents if c.get(k, 0) > 0} for c in out]
+
+
+def _label(
+    cand: Mapping[str, int],
+    build: Mapping[str, int],
+    current: Mapping[str, int] | None,
+    alternative: Mapping[str, int] | None,
+) -> str:
+    if dict(cand) == dict(build):
+        return "optimiseur"
+    if current is not None and dict(cand) == {k: v for k, v in current.items() if v > 0}:
+        return "build actuel"
+    if alternative is not None and dict(cand) == dict(alternative):
+        return "alternative"
+    return "voisin"
+
+
+def _rebuild_order(
+    gd: GameData,
+    m: _Metric,
+    order: list[dict[str, Any]],
+    target: Mapping[str, int],
+    bonus: int,
+    modeled: frozenset[str] | None,
+) -> list[dict[str, Any]] | None:
+    """Ordre des talents qui mène au build retenu par le départage, aux niveaux de l'ordre du chemin : à chaque étape,
+    le talent du chemin s'il reste à placer et reste légal, sinon le premier talent légal dans l'ordre du chemin puis de
+    `talents.json` (retour arrière borné). Les étapes inchangées gardent leur décision ; les autres sont recalculées en
+    analytique à leur niveau (`decided_by` « départage »). None si aucun ordre légal n'est trouvé."""
+    slots = [i for i, s in enumerate(order) if s["talent"]]
+    priority = list(dict.fromkeys([order[i]["talent"] for i in slots] + list(gd.talents)))
+    remaining = {k: v for k, v in target.items() if v > 0}
+    if sum(remaining.values()) != len(slots):
+        return None
+    picks: list[str] = []
+    acc: dict[str, int] = {}
+    budget = [20000]
+
+    def place(j: int) -> bool:
+        if j == len(slots):
+            return True
+        level = order[slots[j]]["level"]
+        first = order[slots[j]]["talent"]
+        for t in [first, *priority]:
+            budget[0] -= 1
+            if budget[0] < 0:
+                return False
+            if remaining.get(t, 0) <= 0:
+                continue
+            acc[t] = acc.get(t, 0) + 1
+            remaining[t] -= 1
+            if not check_build(gd, acc, level, bonus):
+                picks.append(t)
+                if place(j + 1):
+                    return True
+                picks.pop()
+            acc[t] -= 1
+            remaining[t] += 1
+            if not acc[t]:
+                del acc[t]
+        return False
+
+    if not place(0):
+        return None
+    out = [dict(s) for s in order]
+    built: dict[str, int] = {}
+    for j, i in enumerate(slots):
+        t = picks[j]
+        built[t] = built.get(t, 0) + 1
+        if out[i]["talent"] == t and all(out[k]["talent"] == picks[n] for n, k in enumerate(slots[: j + 1])):
+            continue
+        level = out[i]["level"]
+        time_s, choices = _Metric(gd, "leveling", level, m.race, m.over, m.rules, m.mc_n).analytic(dict(built))
+        choice = choices["leveling"]
+        out[i] = {
+            **out[i],
+            "talent": t,
+            "time_s": round(time_s, 2),
+            "rotation": choice.rotation,
+            "choice": dict(choice._asdict()),
+            "runner_up": None,
+            "gap": None,
+            "significant": None,
+            "modeled": None if modeled is None else t in modeled,
+            "decided_by": "départage",
+        }
+    _order_points(gd, out)
+    return out
+
+
 def _best_neighbor(m: _Metric, pts: Mapping[str, int], bonus: int) -> dict[str, int] | None:
     ns = neighbors(m.gd, pts, m.level, bonus)
     if not ns:
@@ -356,6 +477,7 @@ def _respec(
     rules: str,
     bonus: int,
     seed: int,
+    advice: RespecAdvice | None = None,
 ) -> dict[str, Any]:
     cost, cert = respec_cost(gd, respecs), respec_cost_certainty(gd, respecs)
     first = gd.constants.talents.first_level
@@ -368,28 +490,21 @@ def _respec(
                 "cost_certainty": cert,
                 "note": "donner le build actuel (--current) pour un conseil de respec",
             }
-        now = max(first, sum(current.values()) + first - 1 - bonus)
-        a = advise_respec(
-            gd,
-            now,
-            dict(current),
-            level,
-            race,
-            preset=preset,
-            n_previous=respecs,
-            over=over,
-            talented_bonus=bonus,
-            rules=rules,
-            **m.sim,
-        )
-        projected = {k: a.keep.points[k] for k in gd.talents if a.keep.points.get(k, 0) > 0}
+        now = _current_level(gd, current, bonus)
+        a = advice or _advice(gd, m, level, race, current, respecs, preset, over, rules, bonus)
+        projected = _projected(gd, a)
         # Build actuel projeté contre build optimal, Monte Carlo apparié : un gain non mesurable (écart non
         # significatif) garde le build actuel, quel que soit le bilan en or (demande de l'utilisateur du 2026-10-09).
         gap, by, optimal_better = m.compare(build, projected, seed)
-        tie = not gap.significant
+        same = projected == build
+        tie = not gap.significant and not same
         current_better = gap.significant and not optimal_better
         verdict, reason = a.verdict, None
-        if tie and projected != build:
+        if same:  # départage final : le build actuel projeté est la recommandation (décision 219)
+            verdict = "garder"
+            reason = "build actuel projeté retenu comme recommandation par le départage final au Monte Carlo"
+            optimal_better = False
+        elif tie:
             verdict = "garder"
             reason = "égalité statistique entre le build actuel projeté et le build optimal : aucun gain mesurable"
         elif current_better:
@@ -403,6 +518,7 @@ def _respec(
                 "decided_by": by,
                 "tie": tie,
                 "optimal_better": optimal_better and not tie,
+                "same": same,
                 "current_better": current_better,
                 "optimal": dict(build),
                 "current": projected,
@@ -450,6 +566,44 @@ def _respec(
         "cost_certainty": cert,
         "gap": {**_gap_dict(gap), "decided_by": by},
     }
+
+
+def _current_level(gd: GameData, current: Mapping[str, int], bonus: int) -> int:
+    first = gd.constants.talents.first_level
+    return max(first, sum(current.values()) + first - 1 - bonus)
+
+
+def _advice(
+    gd: GameData,
+    m: _Metric,
+    level: int,
+    race: str,
+    current: Mapping[str, int],
+    respecs: int,
+    preset: Preset,
+    over: CharacterOverrides | None,
+    rules: str,
+    bonus: int,
+) -> RespecAdvice:
+    """Conseil de respec du leveling depuis le build actuel (chemin gardé et chemin libre)."""
+    return advise_respec(
+        gd,
+        _current_level(gd, current, bonus),
+        dict(current),
+        level,
+        race,
+        preset=preset,
+        n_previous=respecs,
+        over=over,
+        talented_bonus=bonus,
+        rules=rules,
+        **m.sim,
+    )
+
+
+def _projected(gd: GameData, a: RespecAdvice) -> dict[str, int]:
+    """Build actuel projeté au niveau demandé : build actuel plus le chemin conseillé (chemin gardé)."""
+    return {k: a.keep.points[k] for k in gd.talents if a.keep.points.get(k, 0) > 0}
 
 
 def build_report(
@@ -557,6 +711,75 @@ def build_report(
     build = {k: build[k] for k in gd.talents if build.get(k, 0) > 0}  # ordre de talents.json
     if alt is not None:
         alt = {k: alt[k] for k in gd.talents if alt.get(k, 0) > 0}
+    # Départage final au Monte Carlo apparié (MAG19, décision 219) : la recommandation n'est jamais plus lente qu'un
+    # de ses meilleurs voisins analytiques ni que le build actuel (projeté au niveau en leveling).
+    runs = m.mc_runs
+    advice = (
+        _advice(gd, m, level, race, current, respecs, p, over, rules, talented_bonus)
+        if (context == "leveling" and current and next_step is not None)
+        else None
+    )
+    mine = (
+        _projected(gd, advice) if advice is not None else (dict(current) if current and context != "leveling" else None)
+    )
+    path_build, endgame_alt = dict(build), (dict(alt) if alt is not None and context != "leveling" else None)
+    pool = _departage_candidates(m, build, mine, talented_bonus, p.shortlist, endgame_alt)
+
+    def duel(a: dict[str, int], b: dict[str, int]) -> tuple[Gap, str, bool]:
+        return m.compare(a, b, seed)
+
+    champion, duels = departage(pool, duel)
+    for _ in range(len(gd.talents)):  # le meilleur voisin du nouveau champion entre à son tour s'il le bat
+        near = _best_neighbor(m, champion, talented_bonus)
+        if near is None or near in pool:
+            break
+        g, _, near_better = duel(near, champion)
+        if not (g.significant and near_better):
+            break
+        pool.append(near)
+        champion, duels = departage([champion, *[c for c in pool if c != champion]], duel)
+    switched = champion != path_build
+    if switched:
+        build = champion
+        alt = (
+            endgame_alt
+            if endgame_alt is not None and endgame_alt != build
+            else _best_neighbor(m, build, talented_bonus)
+        )
+        if alt is not None:
+            alt = {k: alt[k] for k in gd.talents if alt.get(k, 0) > 0}
+        if context == "leveling" and order:
+            rebuilt = _rebuild_order(gd, m, order, build, talented_bonus, modeled)
+            if rebuilt is not None:
+                order = rebuilt
+
+    def candidate_row(c: dict[str, int]) -> dict[str, Any]:
+        v, ch = m.analytic(c)
+        st = m.mc(c, ch, seed)
+        duel_row = next((d for d in duels if d["candidate"] == c), None)
+        row: dict[str, Any] = {
+            "label": _label(c, path_build, mine, endgame_alt),
+            "talents": c,
+            "analytic": v,
+            "monte_carlo": st.mean if st else None,
+            "champion": c == build,
+            "significant": False,
+            "better": False,
+        }
+        if duel_row is not None:
+            row.update({k: duel_row[k] for k in ("mean", "low", "high", "significant", "better", "decided_by")})
+        return row
+
+    departage_doc: dict[str, Any] = {
+        "criterion": (
+            f"{'temps par monstre' if context == 'leveling' else 'métrique du contexte'} au niveau {level}, Monte "
+            f"Carlo apparié (graine {seed}, {p.mc_n} combats) ; bascule seulement sur un écart significatif"
+        ),
+        "candidates": [candidate_row(c) for c in pool],
+        "chosen": _label(build, path_build, mine, endgame_alt),
+        "switched": switched,
+        "mc_runs": m.mc_runs - runs,
+    }
     value, choices = m.analytic(build)
     stats = m.mc(build, choices, seed)
     alternative: dict[str, Any] = {
@@ -669,9 +892,12 @@ def build_report(
         },
         "reasons": _reasons(m, build, talented_bonus, seed),
         "alternative": alternative,
+        "departage": departage_doc,
         "stability": {"seeds": seeds, "stable": len(set(winners)) <= 1, "winners": winners},
         "sensitivity": rows,
-        "respec": _respec(gd, m, context, level, race, build, current, respecs, p, over, rules, talented_bonus, seed),
+        "respec": _respec(
+            gd, m, context, level, race, build, current, respecs, p, over, rules, talented_bonus, seed, advice=advice
+        ),
         "blind_spots": [
             {
                 "id": b.id,

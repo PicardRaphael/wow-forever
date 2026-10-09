@@ -180,3 +180,34 @@ def tie_break(
         "gap": gap_dict(g),
         "rows": rows,
     }
+
+
+def departage[C](
+    candidates: Sequence[C], compare: Callable[[C, C], tuple[Gap, str, bool]]
+) -> tuple[C, list[dict[str, Any]]]:
+    """Départage final d'une recommandation (décision 219) : le premier candidat est champion ; un candidat qui le bat
+    significativement (`compare(candidat, champion)` : écart, mode, candidat meilleur) prend sa place. Les comparaisons
+    appariées ne sont pas transitives : les passes se répètent jusqu'à une passe sans changement (au plus une par
+    candidat). Rend le champion et, pour chaque autre candidat, sa comparaison au champion final (dernière passe).
+
+    Registre : I5"""
+    unique: list[C] = []
+    for c in candidates:
+        if c not in unique:
+            unique.append(c)
+    champion = unique[0]
+    rows: list[dict[str, Any]] = []
+    for _ in range(len(unique)):
+        rows = []
+        switched = False
+        for c in unique:
+            if c == champion:
+                continue
+            gap, by, better = compare(c, champion)
+            if gap.significant and better:
+                champion, switched = c, True
+                break
+            rows.append({"candidate": c, **gap_dict(gap), "decided_by": by, "better": better})
+        if not switched:
+            break
+    return champion, rows
