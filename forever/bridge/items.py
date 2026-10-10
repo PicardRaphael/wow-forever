@@ -49,29 +49,37 @@ class GameLink:
 
 def parse_item_string(text: str) -> ItemString:
     """Champs d'une chaîne d'objet (« 7909:1883:0:0:0:0:-12:1234567:19 », avec ou sans `item:`) ; champs vides lus 0 ;
-    ValueError si l'objet manque ou si un champ n'est pas un entier."""
+    ValueError si l'objet manque ou si un des champs lus (objet à nombre de bonus, bonus) n'est pas un entier. Les
+    champs suivants (modificateurs, reliques) ne sont pas lus, sauf le GUID de l'artisan d'un objet fabriqué
+    (`Player-…`, relevé à la sonde en jeu G)."""
     body = text.strip()
     body = body.removeprefix("item:")
     fields = body.split(":")
     if not fields[0]:
         raise ValueError(f"chaîne d'objet sans objet : {text!r}")
-    values = [int(f) if f else 0 for f in fields]  # ValueError si un champ n'est pas un entier
-    if values[0] <= 0:
-        raise ValueError(f"identifiant d'objet invalide : {text!r}")
 
     def at(i: int) -> int:
-        return values[i] if i < len(values) else 0
+        return int(fields[i]) if i < len(fields) and fields[i] else 0  # ValueError si ce n'est pas un entier
 
-    count = max(0, at(12))
+    head = [at(i) for i in range(min(len(fields), _BONUS_COUNT + 1))]
+    if head[0] <= 0:
+        raise ValueError(f"identifiant d'objet invalide : {text!r}")
+    count = max(0, at(_BONUS_COUNT))
+    bonus = tuple(at(i) for i in range(_BONUS_COUNT + 1, _BONUS_COUNT + 1 + count) if i < len(fields))
+    crafter = next((f for f in fields[_BONUS_COUNT + 1 :] if f.startswith("Player-")), None)
     return ItemString(
-        item=values[0],
+        item=head[0],
         enchant=at(1),
-        gems=tuple(g for g in values[2:6] if g),
+        gems=tuple(g for g in (at(i) for i in range(2, 6)) if g),
         suffix=at(6),
         unique=at(7),
         link_level=at(8) or None,
-        bonus=tuple(values[13 : 13 + count]),
+        bonus=bonus,
+        crafter=crafter,
     )
+
+
+_BONUS_COUNT = 12  # rang du nombre de bonus dans la chaîne d'objet
 
 
 _PIECE = re.compile(r"(\d+)([=:])(.*)", re.DOTALL)

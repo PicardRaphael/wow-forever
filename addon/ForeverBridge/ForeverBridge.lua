@@ -581,8 +581,9 @@ function FB.FormatLine(line)
 	return (s:gsub("%*%*(.-)%*%*", "|cffffffff%1|r"))
 end
 
-local function PrintUser(text)
-	FB.Print("|cff4fa3ffVous|r : " .. Escape(text))
+-- `shown` : texte déjà prêt à l'affichage (liens de la question gardés en liens, Message.Links), sinon neutralisé.
+local function PrintUser(text, shown)
+	FB.Print("|cff4fa3ffVous|r : " .. (shown or Escape(text)))
 end
 
 local function PrintReply(entry)
@@ -607,7 +608,7 @@ end
 function FB.RenderHistory()
 	for _, entry in ipairs(History()) do
 		if entry.role == "user" then
-			PrintUser(entry.text or "")
+			PrintUser(entry.text or "", type(entry.shown) == "string" and entry.shown or nil)
 		elseif entry.role == "assistant" then
 			PrintReply(entry)
 		end
@@ -736,9 +737,9 @@ function FB.Send(text, buttonKey, opts)
 	run.carousel = 0
 	ShowCurrent()
 	StartSchedule()
-	local shown = opts.label or text
-	PrintUser(shown)
-	Remember({ role = "user", text = shown, id = id })
+	local label = opts.label or text
+	PrintUser(label, opts.shown)
+	Remember({ role = "user", text = label, shown = opts.shown, id = id })
 	FB.UpdateStatus()
 	return true
 end
@@ -752,8 +753,8 @@ function FB.SendFromInput()
 	if text == "" then
 		return
 	end
-	local question, links = Message.Links(text)
-	if FB.Send(question, nil, { extra = { links = links } }) then
+	local question, links, shown = Message.Links(text)
+	if FB.Send(question, nil, { extra = { links = links }, shown = links and shown or nil }) then
 		input:SetText("")
 	end
 end
@@ -798,23 +799,34 @@ function FB.OpenPaste()
 		frame:SetMovable(true)
 		frame:SetClampedToScreen(true)
 		frame:EnableMouse(true)
-		frame:RegisterForDrag("LeftButton")
-		frame:SetScript("OnDragStart", function(self)
-			self:StartMoving()
-		end)
-		frame:SetScript("OnDragStop", function(self)
-			self:StopMovingOrSizing()
-		end)
 		if frame.SetBackdrop then
 			frame:SetBackdrop(BACKDROP)
 			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
 		end
 		tinsert(UISpecialFrames, "ForeverBridgePaste")
-		local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		-- barre de titre : on y glisse la fenêtre (la zone de texte prend la souris partout ailleurs, sonde G)
+		local title = CreateFrame("Frame", "ForeverBridgePasteTitle", frame)
+		title:SetPoint("TOPLEFT", frame, "TOPLEFT", 4, -4)
+		title:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -4, -4)
+		title:SetHeight(22)
+		title:EnableMouse(true)
+		title:RegisterForDrag("LeftButton")
+		title:SetScript("OnDragStart", function()
+			frame:StartMoving()
+		end)
+		title:SetScript("OnDragStop", function()
+			frame:StopMovingOrSizing()
+			local db = ForeverBridgeDB
+			if type(db) == "table" then
+				local point, _, relPoint, x, y = frame:GetPoint(1)
+				db.paste = { point = point, relPoint = relPoint, x = x, y = y }
+			end
+		end)
+		local label = title:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
 		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -10)
 		label:SetPoint("RIGHT", frame, "RIGHT", -12, 0)
 		label:SetJustifyH("LEFT")
-		label:SetText("Export SimulationCraft : /simc en jeu, Ctrl+C, puis Ctrl+V ici (/simc nobags s'il est trop long).")
+		label:SetText("Export SimulationCraft (glisser ce titre pour déplacer) : /simc, Ctrl+C, puis Ctrl+V ici.")
 		local scroll = CreateFrame("ScrollFrame", "ForeverBridgePasteScroll", frame, "UIPanelScrollFrameTemplate")
 		scroll:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -30)
 		scroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 44)
@@ -845,7 +857,12 @@ function FB.OpenPaste()
 		ui.pasteFrame, ui.pasteBox = frame, box
 	end
 	frame:ClearAllPoints()
-	frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	local saved = type(ForeverBridgeDB) == "table" and ForeverBridgeDB.paste
+	if type(saved) == "table" and type(saved.point) == "string" then
+		frame:SetPoint(saved.point, UIParent, saved.relPoint or saved.point, tonumber(saved.x) or 0, tonumber(saved.y) or 0)
+	else
+		frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	end
 	frame:Show()
 	ui.pasteBox:SetFocus()
 end
@@ -1568,6 +1585,9 @@ end
 -- Aide dans la fenêtre ; jamais deux fois de suite (rien d'autre écrit depuis la dernière).
 local function Help()
 	ui.helped = true
+	if type(ForeverBridgeDB) == "table" then
+		ForeverBridgeDB.help_shown = true -- aide montrée une fois, puis seulement par /fv aide
+	end
 	FB.Open()
 	if ui.helpAt and ui.helpAt == ui.count then
 		return
@@ -1585,7 +1605,8 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 	command = string.lower(command or "")
 	if command == "" then
 		FB.Toggle()
-		if ui.frame:IsShown() and not ui.helped then
+		local db = ForeverBridgeDB
+		if ui.frame:IsShown() and not ui.helped and not (type(db) == "table" and db.help_shown) then
 			Help()
 		end
 	elseif command == "test" then

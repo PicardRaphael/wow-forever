@@ -172,6 +172,7 @@ WorldFrame = UIParent
 function CreateFrame(kind, name, parent, template)
 	local f = newRegion(kind, name, parent or UIParent)
 	f.template = template
+	if kind == "ScrollingMessageFrame" then f.messages = {} end -- historique vide lisible avant la première ligne
 	table.insert(Stub.frames, f)
 	if name then _G[name] = f end
 	return f

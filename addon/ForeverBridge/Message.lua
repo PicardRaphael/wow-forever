@@ -189,28 +189,65 @@ local function Tooltip(link)
 	return out
 end
 
--- Liens d'une question : texte où chaque lien devient « [Nom] », et valeur de la clé links (nil sans lien). Objets,
--- sorts, quêtes et talents ; au plus MAX_LINKS liens envoyés, les suivants seulement nommés.
+-- Formes d'un lien dans une zone de saisie : couleur « |cffRRGGBB » (Classic), couleur nommée « |cnIQ2: » (Forever,
+-- sonde en jeu G), ou lien sans couleur.
+local LINK_FORMS = {
+	"^|c%x%x%x%x%x%x%x%x|H([^|]+)|h(.-)|h|r",
+	"^|cn[^:|]*:|H([^|]+)|h(.-)|h|r",
+	"^|H([^|]+)|h(.-)|h",
+}
+
+-- Liens d'une question : texte où chaque lien devient « [Nom] », valeur de la clé links (nil sans lien), et texte à
+-- montrer dans l'historique (liens gardés tels quels, tout autre « | » neutralisé). Objets, sorts, quêtes et
+-- talents ; au plus MAX_LINKS liens envoyés, les suivants seulement nommés.
 function M.Links(text)
+	text = tostring(text)
 	local links, count = {}, 0
-	local function take(full, body, display)
-		local name = display:match("^%[(.*)%]$") or display
-		local kind = body:match("^(%a+):")
-		if kind and M.LINK_KINDS[kind] then
-			count = count + 1
-			if count <= M.MAX_LINKS then
-				local fields = { kind .. ":" .. trimFields(body:sub(#kind + 2)), clean(name) }
-				for _, line in ipairs(Tooltip(full)) do
-					fields[#fields + 1] = line
-				end
-				links[#links + 1] = table.concat(fields, M.LINE_SEP)
+	local out, shown = {}, {}
+	local i, n = 1, #text
+	while i <= n do
+		local bar = text:find("|", i, true)
+		if not bar then
+			out[#out + 1] = text:sub(i)
+			shown[#shown + 1] = text:sub(i)
+			break
+		end
+		out[#out + 1] = text:sub(i, bar - 1)
+		shown[#shown + 1] = text:sub(i, bar - 1)
+		local last, body, display
+		for _, form in ipairs(LINK_FORMS) do
+			local first
+			first, last, body, display = text:find(form, bar)
+			if first then
+				break
 			end
 		end
-		return "[" .. name .. "]"
+		if body then
+			local full = text:sub(bar, last)
+			local name = display:match("^%[(.*)%]$") or display
+			local kind = body:match("^(%a+):")
+			if kind and M.LINK_KINDS[kind] then
+				count = count + 1
+				if count <= M.MAX_LINKS then
+					local fields = { kind .. ":" .. trimFields(body:sub(#kind + 2)), clean(name) }
+					for _, line in ipairs(Tooltip(full)) do
+						fields[#fields + 1] = line
+					end
+					links[#links + 1] = table.concat(fields, M.LINE_SEP)
+				end
+				shown[#shown + 1] = full
+			else
+				shown[#shown + 1] = "[" .. name:gsub("|", "||") .. "]"
+			end
+			out[#out + 1] = "[" .. name .. "]"
+			i = last + 1
+		else
+			out[#out + 1] = "|"
+			shown[#shown + 1] = "||"
+			i = bar + 1
+		end
 	end
-	local out = tostring(text):gsub("(|c%x%x%x%x%x%x%x%x|H([^|]+)|h(.-)|h|r)", take)
-	out = out:gsub("(|H([^|]+)|h(.-)|h)", take)
-	return out, (#links > 0) and table.concat(links, M.LINK_SEP) or nil
+	return table.concat(out), (#links > 0) and table.concat(links, M.LINK_SEP) or nil, table.concat(shown)
 end
 
 -- Contexte du personnage : table clé → texte, et l'équipement en morceaux pour l'allègement.
