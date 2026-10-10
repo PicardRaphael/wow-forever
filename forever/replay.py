@@ -42,6 +42,7 @@ MAX_BEAM_WORKERS = 4  # départs du leveling en mode forever : le faisceau libre
 # raid, le PvP est le plus court) : seul l'ordre compte, pour lancer les cas les plus longs d'abord.
 _CONTEXT_WEIGHT = {"leveling": 4, "dungeon": 2, "raid": 2, "pvp-bg": 1, "pvp-world": 1}
 
+
 class ReplayFailedError(ForeverError):
     """Le sous-processus du rejeu parallèle a échoué (sortie d'erreur rendue)."""
 
@@ -185,7 +186,9 @@ def replay_cases(
     plan = beam_plan([c for c, _, _ in todo], cpus)
     if log is not None:
         cached = len(out)
-        log(f"rejeu : {len(todo)} cas à calculer ({cached} repris du cache), {outer} processus, faisceaux du leveling sur {beams} au plus")
+        log(
+            f"rejeu : {len(todo)} cas à calculer ({cached} repris du cache), {outer} processus, faisceaux du leveling sur {beams} au plus"
+        )
     if compute is not None or outer == 1:
         for case, data_dir, path in todo:
             start = time.perf_counter()

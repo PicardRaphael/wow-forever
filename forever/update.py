@@ -1422,6 +1422,7 @@ def _step_logs(run: _Run) -> Step:
     installed = _installed(run.base_data)
     if wow is None or not (wow / "Logs").is_dir() or installed is None:
         return Step("journaux", "rien", "aucun dossier de journaux", {})
+    _close_stale_measures(run, installed)
     builds = current_builds(run.deps.cache_dir, wow)
     # Décision 205 : un journal que le jeu ouvert écrit encore est tenu et reproposé au passage suivant.
     files, writing = split_live(log_files(wow / "Logs"), now=run.deps.now(), running=run.deps.game_running())
@@ -1441,7 +1442,6 @@ def _step_logs(run: _Run) -> Step:
         if writing:
             detail += f" ; {len(writing)} en cours d'écriture, reproposé(s) au passage suivant"
         return Step("journaux", "rien", detail, data)
-    _close_stale_measures(run, installed)
     measure = run.measure or _default_measure
     result = measure(run.deps, run.base_data, fresh)
     engine_files = _engine_files()

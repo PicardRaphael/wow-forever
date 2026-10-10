@@ -109,7 +109,7 @@ def test_decode_still_needs_the_calculation_tables(montage):  # noqa: F811
 
 
 def test_a_later_pass_adds_the_french_names_as_a_revision_written_alone(montage):  # noqa: F811
-    deps, http = montage()
+    deps, _ = montage()
     csv = deps.cache_dir / "wago" / TARGET
     shutil.copytree(WAGO_70124, csv)
     (csv / "frFR" / "SpellName.csv").unlink()
