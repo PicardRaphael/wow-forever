@@ -2598,7 +2598,16 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
 
         from forever.bridge.actions import ActionHandler
         from forever.bridge.cards import CardSource
+        from forever.bridge.profile_gap import ProfileWatch
         from forever.bridge.updater import UpdateWatch
+
+        profile_watch = (
+            ProfileWatch(
+                data=context_data, deps=deps, store=deps.cache_dir / "bridge" / "profile_gaps.json", now=deps.now
+            )
+            if context_data is not None
+            else None
+        )
 
         bridge = loop.Bridge(
             addons_dir=addons,
@@ -2613,9 +2622,10 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             keeper=keeper,
             updater=updater,
             heartbeat=lambda: loop.touch_lock(deps.cache_dir, deps.now(), pid=pid),
-            cards=CardSource(deps.cache_dir),
+            cards=CardSource(deps.cache_dir, profile=profile_watch),
             actions=ActionHandler(cache_dir=deps.cache_dir, now=deps.now, offline=deps.offline),
             update_watch=UpdateWatch(deps.cache_dir),
+            profile=profile_watch,
         )
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
