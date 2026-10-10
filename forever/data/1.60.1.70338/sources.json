@@ -147,7 +147,7 @@
       ]
     },
     "monsters.json": {
-      "source": "Journaux de combat du client (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt, WoWCombatLog-092726_174130.txt, WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt, WoWCombatLog-100726_080346.txt, WoWCombatLog-100726_130833.txt, WoWCombatLog-100826_081058.txt, WoWCombatLog-100826_153741.txt, PV max du bloc avancé) ; valeurs en regard et agrégat des niveaux non observés : communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27 ; table écrite par forever measures refresh le 2026-10-09 (--fit-exclude 721, 1128, 1128, 1131, 1131, 1134, 1134, 1135, 1135, 1138, 1161, 1161, 1162, 1162, 1176, 1176, 1186, 1186, 1190, 1190, 1196, 1196, 1202, 1211, 1211, 1211, 1266, 1329, 1412, 1961, 2163, 2165, 2165, 3254, 3254, 3254, 3292, 3438, 3467, 3584, 3664, 3727, 3809, 3809, 3819, 3819, 3846, 3944, 3986, 5612, 5676, 5677, 5951, 6119, 6124, 6328, 6466, 6494, 10556, 12319, 12320, 12427, 12717, 12940, 13076) ; journaux écrits sous le client 1.60.1.70245, mesurés dans 1.60.1.70291 sur accord explicite (--accept-version) : WoWCombatLog-100726_130833.txt, WoWCombatLog-100826_081058.txt, WoWCombatLog-100826_153741.txt ; raison : note officielle du 08/10 (t/2360696/5, révision 1) sans changement des monstres de Dun Morogh, Coldridge et Ragefire Chasm ; accord de l'utilisateur du 2026-10-09",
+      "source": "Journaux de combat du client (WoWCombatLog-092726_145346.txt, WoWCombatLog-092726_150346.txt, WoWCombatLog-092726_174130.txt, WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt, WoWCombatLog-100726_080346.txt, WoWCombatLog-100726_130833.txt, WoWCombatLog-100826_081058.txt, WoWCombatLog-100826_153741.txt, WoWCombatLog-101026_083233.txt, WoWCombatLog-101026_143510.txt, PV max du bloc avancé) ; valeurs en regard et agrégat des niveaux non observés : communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27 ; table écrite par forever measures refresh le 2026-10-10 (--fit-exclude 721, 1128, 1128, 1131, 1131, 1134, 1134, 1135, 1135, 1138, 1161, 1161, 1162, 1162, 1176, 1176, 1186, 1186, 1190, 1190, 1196, 1196, 1202, 1211, 1211, 1211, 1266, 1329, 1412, 1961, 2163, 2165, 2165, 3240, 3254, 3254, 3254, 3292, 3430, 3438, 3467, 3584, 3664, 3727, 3809, 3809, 3819, 3819, 3846, 3944, 3986, 5612, 5676, 5677, 5951, 6119, 6124, 6328, 6466, 6494, 10556, 12319, 12320, 12427, 12717, 12940, 13076)",
       "certainty": "suppose",
       "field_certainty": {
         "npcs": "certain",
@@ -295,7 +295,7 @@
       "inherited_from": "1.60.1.70291"
     }
   },
-  "revision": 1,
+  "revision": 2,
   "revised_at": "2026-10-10",
   "hotfixes": {
     "dbcache": {
