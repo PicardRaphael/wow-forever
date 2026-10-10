@@ -468,3 +468,19 @@ def read_profile(deps: Deps, name: str | None = None) -> ProfileView:
         "game_locale": game_locale(deps, doc),
         "provenance": local_provenance(deps, certainty="certain", assumptions=notes),
     }
+
+
+def apply_game_fields(
+    path: Path,
+    name: str,
+    realm: str | None,
+    fields: Mapping[str, Any],
+    *,
+    source: str,
+    at: str,
+    client_build: str | None,
+    deps: Deps | None = None,
+) -> dict[str, Any]:
+    """Écrit des champs lus dans le jeu (source `jeu` ou `simulationcraft`, P06b) ; crée le personnage au besoin.
+    Appelé par le pont seulement, au clic du joueur. Rend le profil."""
+    raise NotImplementedError

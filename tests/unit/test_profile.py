@@ -64,7 +64,7 @@ def test_profile_under_the_repository_is_refused(make_deps):
 def test_three_characters_and_the_active_one(deps):
     three(deps)
     p = load_profile(deps.profile_path)
-    assert p["schema_version"] == 2
+    assert p["schema_version"] == 3  # schéma 3 depuis P06b (équipement et fiche, décision 235)
     assert list(p["characters"]) == ["Givrelame", "Lumière", "Ombre"]
     assert p["active"] == "Givrelame"  # premier personnage créé
     assert character_values(p["characters"]["Ombre"])["class"] == "Warlock"

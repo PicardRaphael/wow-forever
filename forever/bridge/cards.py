@@ -75,9 +75,10 @@ def clear_selftest_card(cache_dir: Path) -> None:
 class CardSource:
     """Cartes que le pont publie (bloc A : la carte de test) ; `done` retire la carte après une action."""
 
-    def __init__(self, cache_dir: Path, now: Callable[[], float] | None = None) -> None:
+    def __init__(self, cache_dir: Path, now: Callable[[], float] | None = None, profile: Any = None) -> None:
         self.cache_dir = cache_dir
         self.now = now or time.time
+        self.profile = profile  # profile_gap.ProfileWatch : propositions de mise à jour du profil (bloc C)
 
     def current(self) -> list[dict[str, Any]]:
         """Carte de test, puis cartes des attentes ouvertes de `forever update`."""

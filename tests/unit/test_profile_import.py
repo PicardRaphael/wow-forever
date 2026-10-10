@@ -138,7 +138,8 @@ def test_older_value_never_replaces_newer(make_deps, sv):
 
 
 def test_equal_dates_follow_source_order():
-    assert sorted(SOURCE_RANK, key=SOURCE_RANK.__getitem__)[:2] == ["joueur", "ForeverLogger"]
+    # P06b (décision 235) : le contexte du jeu (`jeu`) et l'export collé (`simulationcraft`) passent avant ForeverLogger
+    assert sorted(SOURCE_RANK, key=SOURCE_RANK.__getitem__)[:4] == ["joueur", "jeu", "simulationcraft", "ForeverLogger"]
     assert SOURCE_RANK["ForeverLogger"] < SOURCE_RANK["Questie"] == SOURCE_RANK["Auctionator"] < SOURCE_RANK["journal"]
     at = "2026-09-27T12:00:00Z"
     player, logger, log = (
@@ -364,8 +365,8 @@ def test_schema_1_profile_is_migrated_on_read(make_deps, tmp_path):
         "certainty": "certain",
     }
     assert c["conflicts"] == []
-    assert load_profile(path)["schema_version"] == 2
+    assert load_profile(path)["schema_version"] == 3  # schéma 3 en mémoire (P06b)
     assert path.read_bytes() == before  # migré à la lecture seulement
-    set_character(deps, "Givrelame", level=24)  # une commande qui écrit réécrit en schéma 2
-    assert json.loads(path.read_text(encoding="utf-8"))["schema_version"] == 2
+    set_character(deps, "Givrelame", level=24)  # une commande qui écrit réécrit au schéma courant (3 depuis P06b)
+    assert json.loads(path.read_text(encoding="utf-8"))["schema_version"] == 3
     assert read_profile(deps)["character"]["race"] == "Orc"
