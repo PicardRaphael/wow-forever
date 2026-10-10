@@ -223,7 +223,8 @@ def test_bridge_config_thinking_and_persistent(make_deps, capsys):
     from forever.cli import main
 
     deps = make_deps()
-    assert load_config(deps.cache_dir)["thinking"] == "on" and load_config(deps.cache_dir)["persistent"] == "off"
+    # session gardée ouverte par défaut depuis le choix de l'utilisateur du 2026-10-10 (variante C, décision 237)
+    assert load_config(deps.cache_dir)["thinking"] == "on" and load_config(deps.cache_dir)["persistent"] == "on"
     assert main(["bridge", "config", "--thinking", "off", "--persistent", "on", "--json"], deps) == 0
     payload = json.loads(capsys.readouterr()[0])
     assert (payload["thinking"], payload["persistent"], payload["model"]) == ("off", "on", "sonnet")
