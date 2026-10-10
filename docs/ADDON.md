@@ -258,6 +258,20 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        `update_launched` dans le journal ; `uv run forever update status` → « en cours » puis le nouveau passage.
     3. Nouveau build du client : après la fermeture, l'attente « correctifs du serveur à lire » se lève seule (le
        passage lit le `DBCache.bin` archivé).
+16. **Liste des addons rangée** (décision 228). Les emplacements `ForeverBridge_S001`… et les sondes
+    `ForeverBridge_Probe` et `ForeverBridge_Probe2` portent `## Group: ForeverBridge`, comme les modules d'AtlasLoot ou
+    de Naowh Forever ; leur chargement à la demande ne change pas.
+    1. Jeu fermé : `uv run forever bridge install` (réécrit les `.toc` de la réserve et des sondes, garde les
+       `Inbox.lua`), puis `uv run python scripts/install_addon.py --backups-only` → « aucune sauvegarde dans le
+       dossier des addons » (les `ForeverLogger.bak-*` sont dans `<cache>/addons/backups/`). Fait sur ce poste le
+       2026-10-10.
+    2. Lancer le jeu ; à l'écran de sélection des personnages, bouton AddOns : une seule ligne « ForeverBridge »
+       repliable à la place de la réserve et des sondes ; dépliée, elle montre les emplacements et les deux sondes
+       (chargés à la demande). Aucune ligne `ForeverLogger.bak-…`. Laisser la ligne du groupe cochée.
+    3. En jeu : `/fv`, poser une question : la réponse arrive comme avant ; la ligne d'état donne toujours la réserve
+       restante. `/fv poll` charge encore la sonde de consultation.
+    4. Relevé : capture de la liste des addons (repliée et dépliée) et, si une réponse n'arrive pas, la sortie de
+       `uv run forever bridge status`.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

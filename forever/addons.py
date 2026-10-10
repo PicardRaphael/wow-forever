@@ -48,7 +48,8 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     "GearQuestForever": AddonSpec(("GearQuestForever", "GearQuestForever_*"), "lecteur en DJ1 (recoupement)"),
     "ForeverGuide": AddonSpec(("ForeverGuide",), "lecteur à venir (décision 133)"),
     "LegacyForever": AddonSpec(("LegacyForever",), "lecteur en LG1"),
-    "ZoneLevelForever": AddonSpec(("ZoneLevelForever",), "lecteur à venir (décision 133)"),
+    # Décision 228 : ZoneLevelForever renommé par son auteur (« Formerly Zone Level »), même table de zones
+    "ZoneInfoForever": AddonSpec(("ZoneInfoForever",), "lecteur à venir (décision 133)"),
     "Auctionator": AddonSpec(("Auctionator",), "forever/pipeline/auctionator.py (SavedVariables)"),
     "ForeverBestiary": AddonSpec(  # CH0 : bêtes, carte communautaire, guide de l'entraînement des familiers
         ("ForeverBestiary",),
@@ -69,6 +70,14 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     # Décision 227 : module d'AtlasLoot Classic Forever (« AtlasLoot Forever [BiS ToolTip] »), base ClassDataBase de
     # listes BiS par classe ; source communautaire, au mieux suppose
     "AtlasBIStooltips": AddonSpec(("AtlasBIStooltips",), "lecteur en T10a (listes BiS de la communauté, suppose)"),
+    # Décision 228 (inventaire du 2026-10-10) : origine des données non déclarée pour FojjiCore ; tables générées depuis
+    # wago.tools et CMaNGOS pour les deux addons de cjber
+    "FojjiCore": AddonSpec(
+        ("FojjiCore", "FojjiCore_*"),
+        "lecteur à venir (DungeonJournal, SpellRanks : recoupement, au mieux suppose)",
+    ),
+    "ShortestPathForever": AddonSpec(("ShortestPathForever",), "lecteur à venir (trajets et transports, suppose)"),
+    "SkillUpForever": AddonSpec(("SkillUpForever",), "lecteur à venir (paliers des métiers, recoupement du client)"),
 }
 _VERSION = re.compile(r"^## Version:\s*(.+?)\s*$", re.MULTILINE)
 
@@ -240,7 +249,19 @@ def fingerprint_folder(folder: Path) -> str:
 
 # --- T08d, bloc D : addons d'interface, addons non inventoriés, version de contenu, inventaire -----------------
 
-UI_ADDONS: tuple[str, ...] = ("EllesmereUI*", "Leatrix_Maps", "ForeverMapFix")  # notés sans lecture hors du .toc
+# Notés sans lecture hors du .toc ; décision 228 : addons d'interface seule de l'inventaire du 2026-10-10
+UI_ADDONS: tuple[str, ...] = (
+    "EllesmereUI*",
+    "Leatrix_Maps",
+    "ForeverMapFix",
+    "AppelSwingsForever",
+    "BetterForeverChat",
+    "DeleteCheapestItem",
+    "ExtendedVendorForever",
+    "FontMagic",
+    "ForeverMove",
+    "Simulationcraft",
+)
 
 # Décision 227 : addons du projet et de l'utilisateur, jamais « à inventorier » ni lus comme sources (un seul relevé
 # de version par groupe) ; la réserve d'emplacements et les sondes vont avec ForeverBridge.
@@ -260,6 +281,11 @@ BRIDGE_PROBES = "ForeverBridge_Probe*"  # sondes (forever/bridge/install.py)
 # Addons connus et exclus des données du projet : signalés comme tels, jamais « à inventorier ».
 EXCLUDED_ADDONS: Mapping[str, str] = {
     "RXPGuides": "RestedXP : guides payants, licence non commerciale, exclu des données du projet (décision 227)",
+    "Tamed": "données de Classic seulement (tables de Forever vides), pas pour Forever (décision 228)",
+    "AlexAtlasLoot": (
+        "butin de Forever relevé par les joueurs, mais sa licence interdit d'en copier les tables dans une base de "
+        "données : exclu jusqu'à la décision de l'utilisateur (décision 228)"
+    ),
 }
 # Dossiers qui ne sont pas des addons, jamais lus comme tels, même avec un .toc.
 NOT_ADDONS: Mapping[str, str] = {
