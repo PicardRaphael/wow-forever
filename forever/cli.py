@@ -424,6 +424,23 @@ def build_parser() -> argparse.ArgumentParser:
     )
     b_self.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
     b_self.add_argument("--json", action="store_true", help="sortie JSON")
+    b_add = bridge_sub.add_parser(
+        "addons", help="conversation « addons » (P06b) : dossier de l'addon, sauvegardes, restauration, historique"
+    )
+    add_sub = b_add.add_subparsers(dest="addons_cmd", required=True, parser_class=_Parser)
+    ad_cfg = add_sub.add_parser("config", help="régler le dossier de l'addon (RaphCompletionist, ou un projet)")
+    ad_cfg.add_argument("--source", type=Path, required=True, help="dossier où travaille la conversation")
+    ad_cfg.add_argument("--deploy", type=Path, help="dossier installé où copier les fichiers changés après chaque tour")
+    ad_cfg.add_argument("--json", action="store_true", help="sortie JSON")
+    ad_status = add_sub.add_parser("status", help="dossier réglé et sauvegardes")
+    ad_status.add_argument("--json", action="store_true", help="sortie JSON")
+    ad_restore = add_sub.add_parser(
+        "restore", help="remettre une sauvegarde (la plus récente par défaut) ; fichiers créés depuis mis de côté"
+    )
+    ad_restore.add_argument("stamp", nargs="?", help="horodatage de la sauvegarde (forever bridge addons status)")
+    ad_restore.add_argument("--json", action="store_true", help="sortie JSON")
+    ad_log = add_sub.add_parser("log", help="commits locaux de la conversation (git log)")
+    ad_log.add_argument("--json", action="store_true", help="sortie JSON")
     b_ctx = bridge_sub.add_parser(
         "contexts", help="contextes réels gardés par le pont (P06b) : le dernier, ou l'export en fixtures"
     )
@@ -2559,6 +2576,33 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
                 return Prepared(notes=None, guide=None)
             return prepare_record(context_data, record)
 
+        from forever.bridge import addons as addons_mod
+        from forever.bridge.prompt import ADDONS_PROMPT
+
+        addons_config = addons_mod.load_config(deps.cache_dir)
+        addons_turn = None
+        if addons_config is not None:
+            try:
+                addons_mod.check_folder(addons_config.source, addons)
+            except ForeverError as err:
+                journal.write("error", where="conversation addons", error=err.message)
+            else:
+                empty_mcp = agent.write_empty_mcp_config(addons_mod.addons_home(deps.cache_dir))
+
+                def converse_addons(prompt: str, session: str | None) -> agent.AgentResult:
+                    argv = agent.addons_argv(
+                        claude=claude, folder=addons_config.source, mcp_config=empty_mcp, system_prompt=ADDONS_PROMPT,
+                        session_id=session, model=model,
+                    )  # fmt: skip
+                    return agent.run_claude(
+                        argv, prompt, cwd=addons_config.source, env=env, timeout_s=addons_mod.ADDONS_TIMEOUT_S
+                    )
+
+                addons_turn = addons_mod.AddonsTurn(
+                    config=addons_config, cache_dir=deps.cache_dir, agent=converse_addons,
+                    now=lambda: f"{deps.now():%Y%m%dT%H%M%SZ}",
+                )  # fmt: skip
+
         def converse(prompt: str, session: str | None) -> agent.AgentResult:
             return agent.ask(
                 prompt,
@@ -2638,6 +2682,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             actions=ActionHandler(cache_dir=deps.cache_dir, now=deps.now, offline=deps.offline),
             update_watch=UpdateWatch(deps.cache_dir),
             profile=profile_watch,
+            addons=addons_turn,
         )
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
@@ -2774,6 +2819,8 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
         return _bridge_ask(deps, args, provenance)
     if args.bridge_command == "contexts":
         return _bridge_contexts(deps, args, provenance)
+    if args.bridge_command == "addons":
+        return _bridge_addons(deps, args, provenance)
     if args.bridge_command == "selftest" and args.card:
         from forever.bridge.cards import SELFTEST_TTL_S, write_selftest_card
 
@@ -2835,6 +2882,56 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
         result = selftest.selftest_offline()
     _emit({**result.to_json(), "provenance": provenance}, list(result.lines), provenance, args.json)
     return EXIT_OK if result.ok else EXIT_NOT_FOUND
+
+
+def _bridge_addons(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
+    """`forever bridge addons config | status | restore | log` (P06b, bloc F)."""
+    from forever.bridge import addons as ad
+
+    if args.addons_cmd == "config":
+        addons_dir = (deps.wow_dir / "Interface" / "AddOns") if deps.wow_dir else args.source.parent
+        ad.check_folder(args.source, addons_dir)
+        if args.deploy is not None:
+            ad.check_folder(args.deploy, addons_dir)
+        wanted = ad.AddonsConfig(args.source.absolute(), args.deploy.absolute() if args.deploy else None)
+        ad.save_config(deps.cache_dir, wanted)
+        lines = [f"Conversation « addons » : dossier {wanted.source}"]
+        if wanted.deploy:
+            lines.append(f"  déploiement après chaque tour vers {wanted.deploy} (copie seulement, rien de supprimé)")
+        lines.append("Relancer le pont pour l'activer ; l'onglet « Addons » apparaît alors dans la fenêtre /fv.")
+        saved: dict[str, Any] = {"source": str(wanted.source), "deploy": str(wanted.deploy) if wanted.deploy else None}
+        _emit({**saved, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    config = ad.load_config(deps.cache_dir)
+    if config is None:
+        lines = ["Conversation « addons » non configurée : forever bridge addons config --source <dossier>."]
+        _emit({"configured": False, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK if args.addons_cmd == "status" else EXIT_NOT_FOUND
+    if args.addons_cmd == "status":
+        stamps = ad.backups(deps.cache_dir)
+        lines = [f"Conversation « addons » : {config.name} ({config.source})"]
+        if config.deploy:
+            lines.append(f"  déploiement vers {config.deploy}")
+        lines.append(f"  sauvegardes ({len(stamps)}) : {', '.join(stamps[-5:]) or 'aucune'}")
+        payload: dict[str, Any] = {"configured": True, "source": str(config.source), "deploy": str(config.deploy or "") or None,
+                   "backups": stamps}  # fmt: skip
+        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.addons_cmd == "restore":
+        report = ad.restore(config, deps.cache_dir, args.stamp, f"{deps.now():%Y%m%dT%H%M%SZ}")
+        lines = [f"Sauvegarde {report.stamp} remise dans {config.source} : {len(report.restored)} fichier(s)"]
+        if report.set_aside:
+            aside = ad.addons_home(deps.cache_dir) / "set-aside"
+            lines.append(f"  créés depuis, mis de côté dans {aside} : {', '.join(report.set_aside)}")
+        lines.append("En jeu : /reload.")
+        restored: dict[str, Any] = {"stamp": report.stamp, "restored": report.restored, "set_aside": report.set_aside}
+        _emit({**restored, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    done = ad.git(config.source, "log", "--oneline", "-n", "20")
+    entries = [line for line in (done.stdout or "").splitlines() if line.strip()]
+    lines = [f"Commits locaux de {config.name} :", *[f"  {e}" for e in entries]] if entries else ["Aucun commit."]
+    _emit({"commits": entries, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
 
 
 def _bridge_contexts(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
