@@ -32,9 +32,12 @@ def test_copy_box_is_movable_and_opens_next_to_the_window():
     frame = game.lua.globals().ForeverBridgeHistory
     link = next(line for line in history(game) if "[Talents Forever]" in line).split("|H", 1)[1].split("|h", 1)[0]
     frame.scripts.OnHyperlinkClick(frame, link, "[Talents Forever]", "LeftButton")
-    copy = game.lua.globals().ForeverBridgeCopy
-    assert copy.movable and copy.clamped and "OnDragStart" in list(copy.scripts.keys())
-    point = copy.points[1]
+    # Sonde H (décision 238) : la copie du lien est dans le panneau d'action unique, collé à droite de la fenêtre
+    # (qui, elle, se déplace) ; plus de petite fenêtre séparée.
+    panel = game.lua.globals().ForeverBridgePanel
+    box = game.lua.globals().ForeverBridgeCopyBox
+    assert panel.IsVisible(panel) and box.IsVisible(box) and box.GetText(box) == LINK
+    point = panel.points[1]
     assert game.lua.eval("rawequal")(point.rel, window(game))
     assert (point.point, point.relPoint) == ("TOPLEFT", "TOPRIGHT")
 

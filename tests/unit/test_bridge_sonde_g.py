@@ -113,30 +113,23 @@ def test_a_typed_pipe_stays_escaped_next_to_a_link():
 
 
 def test_paste_window_moves_by_its_title_and_keeps_its_place():
+    """Remplacé à la sonde H (décision 238) : la zone de collage n'est plus une fenêtre à part ; elle est dans le
+    panneau d'action unique, collé à droite de la fenêtre principale, qui se déplace et garde sa place."""
     from test_bridge_addon_lua import Game
+    from test_bridge_window_lua import window
 
     game = Game()
+    game.slash("/fv")
     lua = game.lua.globals()
     lua.ForeverBridge.OpenPaste()
-    frame, handle = lua.ForeverBridgePaste, lua.ForeverBridgePasteTitle
-    assert frame.movable and handle is not None and handle.mouse
-    handle.scripts.OnDragStart(handle)
-    assert frame.moving
-    frame.ClearAllPoints(frame)
-    frame.SetPoint(frame, "TOPLEFT", lua.UIParent, "TOPLEFT", 120, -80)
-    handle.scripts.OnDragStop(handle)
-    assert not frame.moving
-    saved = lua.ForeverBridgeDB.paste
-    assert (saved.point, saved.relPoint, saved.x, saved.y) == ("TOPLEFT", "TOPLEFT", 120, -80)
-    frame.Hide(frame)
-    lua.ForeverBridge.OpenPaste()
-    assert frame.GetPoint(frame)[3:] == (120, -80)
-    again = Game(saved={"schema": 1, "session": "abc", "next_id": 1,
-                        "paste": {"point": "TOPLEFT", "relPoint": "TOPLEFT", "x": 120, "y": -80}})  # fmt: skip
-    again.lua.globals().ForeverBridge.OpenPaste()
-    moved = again.lua.globals().ForeverBridgePaste
-    point = moved.GetPoint(moved)
-    assert (point[0], point[2], point[3], point[4]) == ("TOPLEFT", "TOPLEFT", 120, -80)
+    panel, box = lua.ForeverBridgePanel, lua.ForeverBridgePasteBox
+    assert panel.IsVisible(panel) and box.IsVisible(box)
+    point = panel.points[1]
+    assert game.lua.eval("rawequal")(point.rel, window(game)) and (point.point, point.relPoint) == (
+        "TOPLEFT",
+        "TOPRIGHT",
+    )
+    assert window(game).movable
 
 
 # --- 8. Aide de /fv -----------------------------------------------------------------------------------------------------

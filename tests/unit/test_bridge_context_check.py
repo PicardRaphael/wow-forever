@@ -58,7 +58,8 @@ def test_items_are_passed_by_name_without_defect(make_deps):
     assert r.defects == []
     assert ("16", 15444, "Staff of Orgrimmar") in r.gear
     notes = prepare_record(data, Record("s", 1, frozenset(), real(), "Q ?")).notes
-    assert "Staff of Orgrimmar" in notes and "T10a" in notes
+    # sonde H (décision 238) : la note parle au joueur, sans nom de tranche (« T10a » citée par la conversation)
+    assert "Staff of Orgrimmar" in notes and "pas encore reliés" in notes and "T10a" not in notes
 
 
 def test_hidden_target_level_is_not_a_defect(make_deps):
