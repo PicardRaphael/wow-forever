@@ -701,3 +701,78 @@ dossiers « à inventorier » à 20.
 Remarques pour T10a : la base d'AtlasBIStooltips ne couvre pas toutes les spécialisations (pas de Mage Givre, de
 Chasseur Précision ni de Voleur Assassinat ou Finesse dans les noms de fichiers) ; ses listes sont des choix de
 joueurs, à recouper avec celles de Naowh Forever (`!NBIS1!`) et de Forever Companion (`BisData`).
+
+## Relevé du 2026-10-10 : addons hors de l'inventaire (décision 228)
+
+En lecture seule, sans réseau, sous le client 1.60.1.70338 : tous les `.toc` de chaque dossier (le client Forever lit
+`<Addon>_Camelot.toc` avant le `.toc` sans suffixe), fichiers de licence, README et CHANGELOG, `forever addons
+inventory <dossier> --json` (empreinte, clés des tables globales) et des comptes d'entrées par un script jetable qui
+lit la structure des tables sans exécuter de Lua. **Rien n'est ingéré**, aucune valeur de jeu n'est recopiée ici
+(comptes et noms de clés seulement), **le code des addons n'est jamais modifié**. Dans `WTF`, seuls les noms des
+fichiers de SavedVariables ont été listés. Les dates des fichiers sont des dates d'installation ; les dates de
+publication viennent des CHANGELOG. « Se charge » : déduit des `.toc` et du code, **jamais vérifié en jeu**.
+
+Ces 18 dossiers étaient les derniers « à inventorier » de `forever addons status` ; ils sont classés dans
+`forever/addons.py` (décision 228) : plus aucun dossier « à inventorier » sur le poste après ce relevé. Les deux
+copies `ForeverLogger.bak-*` du 2026-10-02 ont quitté le dossier des addons pour `<cache>/addons/backups/`
+(`scripts/install_addon.py --backups-only`), où l'installation range désormais chaque sauvegarde.
+
+### Synthèse
+
+| Addon | Version | Forever (`.toc`) | Données de jeu embarquées | Origine déclarée | Licence | Classement |
+| --- | --- | --- | --- | --- | --- | --- |
+| FojjiCore (cœur) | 3.1.5 | `_Camelot.toc` 16001, `AllowLoadGameType: camelot`, **`RequiredDeps: ForeverAuras`** | marqueurs de spécialisation (sorts de talents par classe) | aucune | tous droits réservés (`LICENSE.txt`, usage personnel) | suivi avec ses modules (`FojjiCore`, `FojjiCore_*`) |
+| FojjiCore_BiS | 3.1.5 | 16001, `camelot`, `Group: FojjiCore` | **aucune liste BiS** : pondérations par défaut pour 7 rôles ; export `FCBIS1:` | aucune | aucune | module de FojjiCore |
+| FojjiCore_DungeonJournal | 3.1.5 | 16001, `camelot` | 29 donjons, 250 boss (niveau, butin, probabilités), 1 098 objets, 262 quêtes, objets « ajoutés » et « retravaillés » par Forever | aucune | aucune | module de FojjiCore, **source possible** (`suppose`) |
+| FojjiCore_RaidTools | 3.1.5 | 16001, `camelot` | aucune (packs de raid lus à l'exécution depuis ForeverAuras) | — | aucune | module de FojjiCore |
+| FojjiCore_Speedrun | 3.1.5 | `_Camelot.toc` 16001 | **pas d'itinéraire de leveling** : chronomètre de donjons et raids, listes de boss | aucune | aucune | module de FojjiCore |
+| FojjiCore_SpellRanks | 3.1.5 | 16001, `camelot` | **rangs de sorts par niveau** : `FDJ.SpellBase`, 1 324 lignes pour 9 classes (sort, niveau d'apprentissage, coût, faction, talent, races) ; 154 positions de maîtres | aucune | aucune | module de FojjiCore, **source possible** (`suppose`) |
+| ShortestPathForever | v1.14.0 (2026-10-09) | 16001 | graphe de déplacements : 65 points de vol, 286 trajets avec durées, transports, portails, téléportations, coûts de marche, maillage de navigation | **générées** : wago.tools build 1.60.1.70291, CMaNGOS, InFlight | GPL-3.0-or-later | suivi, **source possible** (`suppose`) |
+| SkillUpForever | v0.9.2 (2026-10-09) | 16001 | paliers de couleur de 2 346 recettes, recettes, frais des maîtres, sources des recettes, prix de vente | **générées** : wago.tools `SkillLineAbility` 1.60.1.70291, CMaNGOS, LibPeriodicTable | GPL-3.0-or-later | suivi, **source possible** (paliers recoupables avec le client) |
+| ZoneInfoForever | 1.7.1 | 16001 | 50 zones par carte : niveaux, pêche, herbes, mines, donjons, transports | aucune (table écrite à la main) | aucune | suivi **à la place de ZoneLevelForever** (renommage) |
+| Tamed | 2.0.1 (2026-10-05) | 16001 dans le `.toc` commun | **tables Forever vides** ; 302 bêtes et 13 capacités de Vanilla chargées sans garde de version | `generate.py` (base non installée) | MIT | **exclu** : pas pour Forever |
+| Simulationcraft | 12.1.5-alpha-01 (retail) | 16001 dans le `.toc` retail | aucune pour Forever ; `/simc` exporte la fiche du personnage (talents par la chaîne native du client, équipement, statistiques, compétences, buffs) | — | Unlicense | interface seule |
+| ExtendedVendorForever | 1.4 | 16001 (« checked against Blizzard UI build 70009 ») | **pas de catalogue de vendeurs** ; journal des achats et ventes du joueur dans `ExtendedVendorForeverDB` | — | aucune | interface seule |
+| AlexAtlasLoot | 1.5.0 | `.toc` et `_Camelot.toc` 16001 | butin de donjons et raids de Forever relevé par les joueurs (`LootDB.lua`, `Finds.lua`), sorts de boss, factions | joueurs | tous droits réservés, **copie des tables dans une base de données interdite** | **exclu** jusqu'à ta décision |
+| AppelSwingsForever | 1.6.2 | 16001 | — (minuteurs d'attaque) | — | aucune | interface seule |
+| BetterForeverChat | 0.13.1 | 16001 | — (discussion) | — | GPL-3.0-or-later | interface seule |
+| DeleteCheapestItem | v1.2.1 | 16001 | — (vente ou destruction des piles les moins chères) | — | All Rights Reserved | interface seule |
+| FontMagic | 4.1.3 | 16001 parmi 65 interfaces | — (polices du texte de combat) | — | tous droits réservés | interface seule |
+| ForeverMove | 1.3.3 | 16001 | — (fenêtres déplaçables) | — | MIT | interface seule |
+
+### Points d'attention
+
+- **FojjiCore ne se charge probablement pas ici** : `FojjiCore_Camelot.toc` exige `ForeverAuras` (`RequiredDeps`) et
+  `Forever/Backend.lua` vérifie sa présence ; ni ForeverAuras ni WeakAuras n'est installé. Les cinq modules
+  dépendent du cœur. Aucun `FojjiCoreDB` dans `WTF` (fichiers installés le jour même : jeu peut-être pas relancé).
+- **ZoneInfoForever est ZoneLevelForever renommé** : texte d'accueil « Formerly Zone Level », version suivante (1.7 →
+  1.7.1), mêmes deux fichiers Lua (`Locales.lua` de même taille), même table de zones avec herbes et mines en plus ;
+  SavedVariable renommée (`ZoneInfoForeverDB`). L'auteur de l'ancien nom n'était pas consigné : non comparé.
+- **ShortestPathForever et SkillUpForever** (auteur cjber) sont les seules sources dont l'origine est déclarée :
+  leurs données sont générées depuis le client (wago.tools, build 1.60.1.70291, une version derrière celle du
+  projet) et complétées par CMaNGOS (Classic). Le projet sait déjà lire ces tables du client par wago.tools : ces
+  addons servent de recoupement, et les parts héritées de CMaNGOS (frais des maîtres, butin des recettes, vitesses)
+  restent `suppose`.
+- **FojjiCore_SpellRanks** est le témoin le plus utile au cœur de calcul : niveaux d'apprentissage et coûts
+  d'entraînement par rang, à recouper avec ce que le projet lit du client ; origine non déclarée, colonnes déduites
+  du code qui les lit (`SpellRanks.lua`, fonction `baseline`), donc `suppose`.
+- **Tamed** détecte Forever par `WOW_PROJECT_ID == WOW_PROJECT_CAMELOT` (`src/_init.lua`), alors que
+  `WOW_PROJECT_ID` vaut `WOW_PROJECT_MAINLINE` sur Forever (section 3 de `docs/ADDON.md`) : sa branche Forever ne
+  s'active probablement jamais. Le projet a déjà `pets.json` (lu au client) et Forever Bestiary.
+- **AlexAtlasLoot** : sa licence interdit de copier ses tables de butin ou sa sonde « into another addon, a website,
+  a database, a spreadsheet ». La décision 133 permet la lecture locale de tout addon et ne fait entrer que des
+  agrégats dans le dépôt ; rester dans cette règle face à cette licence est à trancher par toi. En attendant, il est
+  connu et exclu (jamais lu), son contenu n'a pas été compté.
+- **ForeverMove** affirme dans `Setup/ForeverData-setup.sh` que la bêta écrit les SavedVariables sur le disque sans
+  les relire au lancement : affirmation de l'auteur, contredite chez nous par le journal du pont du 2026-10-09
+  (`ForeverBridgeDB` relue : même session et numéros de message qui se suivent sur trois lancements du jeu).
+- **Simulationcraft** : l'addon retail avec une branche Forever ; SimulationCraft lui-même ne simule pas Forever
+  (`docs/research/wowsims-forever.md`). Son export ne sert qu'à relever la fiche du personnage.
+- **ExtendedVendorForever** : son journal des transactions (prix payés et reçus, nom du marchand) serait une
+  observation du joueur, comme les relevés de ForeverLogger ; non lu.
+
+### Limites de `forever addons inventory` relevées au passage
+
+Il ne lit que le premier `.toc` trié (pour FojjiCore : `RequiredDeps: WeakAuras` du `.toc` générique au lieu de
+`ForeverAuras` du `_Camelot.toc`), omet `SavedVariablesPerCharacter` et ne nomme pas la licence d'un fichier
+`LICENSE` (seulement `X-License`). Les licences de ce relevé viennent de la lecture des fichiers.
