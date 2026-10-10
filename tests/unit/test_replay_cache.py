@@ -115,3 +115,11 @@ def test_parallel_cases_give_the_sequential_advice(tmp_path):
     for job in jobs:
         assert parallel[job]["cached"] is False
         assert parallel[job]["advice"] == sequential[job]["advice"]
+
+
+def test_the_package_entry_point_is_guarded():
+    """Un processus de calcul réimporte le module principal sous un autre nom (Windows) : `python -m forever` ne doit
+    alors rien lancer."""
+    import runpy
+
+    runpy.run_module("forever.__main__", run_name="__mp_main__")  # aucune sortie de la CLI, aucun SystemExit

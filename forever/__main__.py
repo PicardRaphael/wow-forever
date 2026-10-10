@@ -4,4 +4,5 @@ import sys
 
 from forever.cli import main
 
-sys.exit(main())
+if __name__ == "__main__":  # garde : un processus de calcul réimporte le module principal (Windows, décision 230)
+    sys.exit(main())
