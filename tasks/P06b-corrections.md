@@ -42,7 +42,9 @@ test, pas sur le comportement voulu ; le code n'est pas changé pour les contour
   +        assert not {"pixels", "image", "bgra"} & set(event)
   ```
 
-## Bloc C (commit « P06b: tests (bloc C) », fda590b) — en attente d'accord
+## Bloc C (commit « P06b: tests (bloc C) », fda590b)
+
+**Acceptée le 2026-10-10 (profil d'origine daté du 1er septembre).**
 
 ### 4. `tests/unit/test_profile_schema3.py::test_schema_2_is_read_then_written_as_3` — date du profil d'origine
 - **Preuve** : le profil de schéma 2 du test porte des champs datés `AT` = 2026-10-10T12:00:00Z, alors que l'horloge

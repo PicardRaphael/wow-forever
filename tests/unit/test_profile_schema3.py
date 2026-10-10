@@ -36,7 +36,8 @@ def test_schema_and_source_order():
 def test_schema_2_is_read_then_written_as_3(tmp_path, make_deps):
     path = tmp_path / "profile.json"
     doc = {"schema_version": 2, "active": "Jen", "realms": {},
-           "characters": {"Jen": {"class": make_field("Mage", "joueur", AT), "level": make_field(18, "joueur", AT)}}}  # fmt: skip
+           "characters": {"Jen": {"class": make_field("Mage", "joueur", "2026-09-01T00:00:00Z"),
+                                  "level": make_field(18, "joueur", "2026-09-01T00:00:00Z")}}}  # fmt: skip
     path.write_text(json.dumps(doc), encoding="utf-8")
     before = path.read_bytes()
     loaded = load_profile(path)
