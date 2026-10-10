@@ -12,6 +12,7 @@ import json
 import os
 import re
 import sys
+import time
 from collections.abc import Mapping
 from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import replace
@@ -416,8 +417,24 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="modifier les fichiers de la sonde pendant que le jeu tourne (/fv poll, /fv diag)",
     )
+    b_self.add_argument(
+        "--card",
+        action="store_true",
+        help="publier une carte « À valider » de test (Valider, Confirmer : le pont note l'action sans rien lancer)",
+    )
     b_self.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
     b_self.add_argument("--json", action="store_true", help="sortie JSON")
+    b_ctx = bridge_sub.add_parser(
+        "contexts", help="contextes réels gardés par le pont (P06b) : le dernier, ou l'export en fixtures"
+    )
+    ctx_sub = b_ctx.add_subparsers(dest="contexts_command", required=True, parser_class=_Parser)
+    c_last = ctx_sub.add_parser("last", help="dernier contexte reçu du jeu (équipement complet, liens et infobulles)")
+    c_last.add_argument("--json", action="store_true", help="sortie JSON")
+    c_export = ctx_sub.add_parser(
+        "export", help="écrire chaque contexte distinct et chaque export SimulationCraft du journal (format fixture)"
+    )
+    c_export.add_argument("folder", type=Path, help="dossier de sortie (hors du dépôt, ou tests/fixtures/... à relire)")
+    c_export.add_argument("--json", action="store_true", help="sortie JSON")
     for name, text in (
         ("start", "lancer le pont détaché (capture de la bande, conversation « jeu », réponses dans la réserve)"),
         ("run", "faire tourner le pont dans ce terminal (lancé par start ; Ctrl+C ou forever bridge stop)"),
@@ -2553,6 +2570,8 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             keeper.check()
             return status_payload(deps, addon_files=keeper.outdated)
 
+        from forever.bridge.cards import CardSource
+
         bridge = loop.Bridge(
             addons_dir=addons,
             capture=WindowsCapture(executables, api),
@@ -2566,6 +2585,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             keeper=keeper,
             updater=updater,
             heartbeat=lambda: loop.touch_lock(deps.cache_dir, deps.now(), pid=pid),
+            cards=CardSource(deps.cache_dir),
         )
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
@@ -2700,6 +2720,26 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
         return EXIT_OK
     if args.bridge_command == "ask":
         return _bridge_ask(deps, args, provenance)
+    if args.bridge_command == "contexts":
+        return _bridge_contexts(deps, args, provenance)
+    if args.bridge_command == "selftest" and args.card:
+        from forever.bridge.cards import SELFTEST_TTL_S, write_selftest_card
+
+        # durée de vie comptée à l'horloge murale, comme le pont qui relit la carte (cards.CardSource)
+        card = write_selftest_card(deps.cache_dir, stamp=f"{deps.now():%Y%m%dT%H%M%SZ}", now=time.time())
+        lines = [
+            (
+                f"Carte de test publiée : {card['id']} (pont en marche : elle apparaît en jeu dans « À valider » au "
+                f"prochain relevé ; retirée seule au bout de {SELFTEST_TTL_S // 60} min)."
+            ),
+            (
+                "En jeu : /fv, « À valider (1) », Valider, puis Confirmer dans les 5 secondes : la réponse « Carte de "
+                "test : « Valider » reçu par le pont ; rien n'est lancé » arrive, et uv run forever bridge status "
+                "montre la ligne action."
+            ),
+        ]
+        _emit({"card": card, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
     if args.bridge_command == "install":
         report = install.install_bridge(_bridge_wow_dir(deps, args), slots=args.slots, dry_run=args.dry_run)
         lines = [f"Installation de ForeverBridge ({len(report.actions)} opération(s)) :"]
@@ -2743,6 +2783,42 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
         result = selftest.selftest_offline()
     _emit({**result.to_json(), "provenance": provenance}, list(result.lines), provenance, args.json)
     return EXIT_OK if result.ok else EXIT_NOT_FOUND
+
+
+def _bridge_contexts(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
+    """`forever bridge contexts last | export <dossier>` (P06b, bloc A) : contextes réels du journal du pont."""
+    from forever.bridge.contexts import describe_context, export_contexts, last_context
+    from forever.bridge.journal import Journal
+
+    journal = Journal(deps.cache_dir / "bridge" / "journal", deps.now)
+    if args.contexts_command == "export":
+        report = export_contexts(journal, args.folder)
+        lines = [
+            (
+                f"{report['contexts']} contexte(s) distinct(s) et {report['exports']} export(s) SimulationCraft "
+                f"écrits dans {report['folder']}"
+            ),
+            *[f"  {name}" for name in report["files"]],
+        ]
+        _emit({**report, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    event = last_context(journal)
+    if event is None:
+        lines = ["Aucun contexte dans le journal du pont : envoyer une question depuis la fenêtre /fv."]
+        _emit({"message": None, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_NOT_FOUND
+    context = event["context"]
+    flags = ", ".join(event.get("flags") or []) or "aucun"
+    lines = [
+        (
+            f"Dernier message n° {event.get('id')} ({event.get('at')}, {event.get('parts', 1)} partie(s), "
+            f"drapeaux : {flags}) :"
+        ),
+        *describe_context(context),
+    ]
+    payload = {"message": {k: event.get(k) for k in ("at", "id", "session", "flags", "parts", "context")}}
+    _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
 
 
 def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:

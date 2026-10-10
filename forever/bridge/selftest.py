@@ -26,6 +26,7 @@ from forever.bridge.codec import (
     render_band,
     selftest_payload,
 )
+from forever.bridge.fragments import Fragment, parse_fragment
 from forever.bridge.image import write_bmp
 from forever.bridge.record import Record, RecordError, parse_payload
 
@@ -220,9 +221,16 @@ def selftest_live(
 @dataclass
 class MessageReport(SelftestReport):
     record: Record | None = None
+    part: Fragment | None = None  # partie d'un message trop long pour une bande (P06b)
 
     def to_json(self) -> dict[str, Any]:
         out = super().to_json()
+        part = self.part
+        out["part"] = (
+            None
+            if part is None
+            else {"message_id": part.message_id, "index": part.index, "total": part.total, "session": part.session}
+        )
         record = self.record
         out["record"] = (
             None
@@ -257,6 +265,23 @@ def selftest_message(
             report.lines.append(f"bande rejetée ({decoded.reason})")
         elif isinstance(decoded, Decoded) and decoded == Decoded(SELFTEST_ID, selftest_payload()):
             report.lines.append("c'est la bande de test (/fv test) : envoyer une question depuis la fenêtre /fv")
+        elif isinstance(decoded, Decoded) and decoded.payload.startswith(b"F\x1f"):
+            try:
+                part = parse_fragment(decoded.payload)
+            except RecordError as err:
+                report.lines.append(f"partie illisible : {err.message}")
+            else:
+                assert part is not None
+                report.ok = True
+                report.part = part
+                report.lines.append(
+                    f"partie {part.index}/{part.total} du message n° {part.message_id} lue ({len(decoded.payload)} "
+                    "octets) : message trop long pour une bande, montré en carrousel et réassemblé par le pont ; "
+                    "message complet : uv run forever bridge contexts last"
+                )
+                cell = _cell_line(report.cell_px)
+                if cell:
+                    report.lines.append(cell)
         elif isinstance(decoded, Decoded):
             try:
                 record = parse_payload(decoded.payload)

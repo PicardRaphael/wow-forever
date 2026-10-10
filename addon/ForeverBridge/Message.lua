@@ -1,19 +1,32 @@
--- ForeverBridge : message porté par la bande (P06a, bloc B, décision 212). Champs séparés par l'octet 31 : version du
--- protocole, jeton de session, numéro, drapeaux, prochain emplacement, contexte en lignes « clé=valeur », texte ; lu
--- par forever/bridge/record.py. Contexte du personnage lu sous pcall, une valeur secrète laissant la clé absente.
--- Trop long pour la bande : noms d'objets coupés, puis retirés, puis sous-zone, puis équipement, puis talents ; la
--- question n'est jamais coupée.
+-- ForeverBridge : message porté par la bande (P06a, bloc B, décision 212 ; P06b, décision 235). Champs séparés par
+-- l'octet 31 : version du protocole, jeton de session, numéro, drapeaux, prochain emplacement, contexte en lignes
+-- « clé=valeur », texte ; lu par forever/bridge/record.py. Contexte du personnage lu sous pcall, une valeur secrète
+-- laissant la clé absente.
+-- Équipement complet (P06b) : « emplacement=chaîne d'objet=nom », la chaîne étant le corps du lien sans « item: » ni
+-- les champs vides ou nuls de fin (enchantement, gemmes, suffixe aléatoire et identifiant unique gardés). Liens cités
+-- (clé links) : par lien (octet 29), corps, nom et lignes de l'infobulle (octet 28).
+-- Trop long pour une bande : noms d'objets coupés, puis retirés, puis sous-zone ; ensuite le message part en
+-- plusieurs parties (Message.Fragments, lues par forever/bridge/fragments.py). Équipement, talents, liens et question
+-- ne sont jamais retirés.
 
 ForeverBridge_Message = {}
 local M = ForeverBridge_Message
 local Codec = ForeverBridge_Codec
 
 M.PROTOCOL = "1"
+M.FRAGMENT_TAG = "F"
 M.FIELD_SEP = string.char(31)
 M.RECORD_SEP = string.char(30)
+M.LINK_SEP = string.char(29)
+M.LINE_SEP = string.char(28)
+M.MAX_MESSAGE = 32768 -- octets d'un message complet, toutes parties comprises
 M.ITEM_NAME_CHARS = 20 -- longueur des noms d'objets au premier allègement
+M.MAX_LINKS = 8
+M.TOOLTIP_LINES = 30
+M.TOOLTIP_CHARS = 120
+M.LINK_KINDS = { item = true, spell = true, quest = true, talent = true }
 M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "talents", "gear",
-	"target", "target_level", "target_race", "client" }
+	"target", "target_level", "target_race", "client", "links" }
 local GEAR_SLOTS = 19
 
 local function isSecret(value)
@@ -44,10 +57,35 @@ local function second(fn, ...)
 	return value
 end
 
+-- Séparateurs du protocole et des liens, sauts de ligne : remplacés par une espace.
 local function clean(text)
 	text = tostring(text)
-	text = text:gsub(M.FIELD_SEP, " "):gsub(M.RECORD_SEP, " "):gsub("[\r\n]", " ")
+	text = text:gsub("[%z\28-\31\r\n]", " ")
 	return text
+end
+
+-- Champs vides ou nuls de fin d'un corps de lien retirés (« 12345::::::::19::::: » → « 12345::::::::19 »).
+local function trimFields(rest)
+	local previous
+	repeat
+		previous = rest
+		rest = rest:gsub(":0*$", "")
+	until rest == previous
+	return rest
+end
+M.TrimFields = trimFields
+
+-- Coupe un texte UTF-8 à `count` caractères.
+local function cutChars(text, count)
+	local out, n = {}, 0
+	for char in text:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
+		n = n + 1
+		if n > count then
+			break
+		end
+		out[n] = char
+	end
+	return table.concat(out)
 end
 
 -- Rangs achetés, « nœud:rang » triés par nœud ; nil si l'API manque.
@@ -83,46 +121,96 @@ local function Talents()
 	return table.concat(parts, ",")
 end
 
--- Équipement : liste de { slot, id, name } lue dans les liens d'objets.
+-- Équipement : liste de { slot, chain, name } lue dans les liens d'objets (chaîne complète du lien).
 local function Gear()
 	local pieces = {}
 	for slot = 1, GEAR_SLOTS do
 		local link = safe(GetInventoryItemLink, "player", slot)
 		if type(link) == "string" then
-			local id = link:match("|Hitem:(%d+)")
-			if id then
-				local name = (link:match("|h%[(.-)%]|h") or ""):gsub("[;:]", " ")
-				pieces[#pieces + 1] = { slot = slot, id = id, name = name }
+			local body = link:match("|Hitem:([^|]+)")
+			if body and body:match("^%d+") then
+				local name = clean(link:match("|h%[(.-)%]|h") or ""):gsub("[;=]", " ")
+				pieces[#pieces + 1] = { slot = slot, chain = trimFields(body), name = name }
 			end
 		end
 	end
 	return pieces
 end
 
--- Coupe un texte UTF-8 à `count` caractères.
-local function cutChars(text, count)
-	local out, n = {}, 0
-	for char in text:gmatch("[%z\1-\127\194-\244][\128-\191]*") do
-		n = n + 1
-		if n > count then
-			break
-		end
-		out[n] = char
-	end
-	return table.concat(out)
-end
-
 function M.GearText(pieces, mode)
 	local parts = {}
 	for _, piece in ipairs(pieces) do
 		if mode == "ids" then
-			parts[#parts + 1] = piece.slot .. ":" .. piece.id
+			parts[#parts + 1] = piece.slot .. "=" .. piece.chain
 		else
 			local name = mode == "cut" and cutChars(piece.name, M.ITEM_NAME_CHARS) or piece.name
-			parts[#parts + 1] = piece.slot .. ":" .. piece.id .. ":" .. name
+			parts[#parts + 1] = piece.slot .. "=" .. piece.chain .. "=" .. name
 		end
 	end
 	return table.concat(parts, ";")
+end
+
+-- Texte d'une ligne d'infobulle sans séquences d'interface (couleurs, textures, liens), coupé.
+local function plainLine(text)
+	local s = tostring(text)
+	s = s:gsub("|c%x%x%x%x%x%x%x%x", ""):gsub("|r", ""):gsub("|T.-|t", ""):gsub("|A.-|a", ""):gsub("|n", " ")
+	s = s:gsub("|H.-|h(.-)|h", "%1")
+	s = s:gsub("%c", " "):gsub("^%s+", ""):gsub("%s+$", "")
+	return cutChars(s, M.TOOLTIP_CHARS)
+end
+
+-- Lignes de l'infobulle d'un lien (C_TooltipInfo.GetHyperlink), sous pcall ; aucune ligne si l'API manque, lève une
+-- erreur ou rend une valeur secrète.
+local function Tooltip(link)
+	if type(C_TooltipInfo) ~= "table" or type(C_TooltipInfo.GetHyperlink) ~= "function" then
+		return {}
+	end
+	local ok, data = pcall(C_TooltipInfo.GetHyperlink, link)
+	if not ok or isSecret(data) or type(data) ~= "table" or type(data.lines) ~= "table" then
+		return {}
+	end
+	local out = {}
+	for _, line in ipairs(data.lines) do
+		if #out >= M.TOOLTIP_LINES then
+			break
+		end
+		if type(line) == "table" then
+			local left, right = line.leftText, line.rightText
+			local text = (type(left) == "string" and not isSecret(left)) and left or ""
+			if type(right) == "string" and not isSecret(right) and right ~= "" then
+				text = text .. "  " .. right
+			end
+			text = plainLine(text)
+			if text ~= "" then
+				out[#out + 1] = text
+			end
+		end
+	end
+	return out
+end
+
+-- Liens d'une question : texte où chaque lien devient « [Nom] », et valeur de la clé links (nil sans lien). Objets,
+-- sorts, quêtes et talents ; au plus MAX_LINKS liens envoyés, les suivants seulement nommés.
+function M.Links(text)
+	local links, count = {}, 0
+	local function take(full, body, display)
+		local name = display:match("^%[(.*)%]$") or display
+		local kind = body:match("^(%a+):")
+		if kind and M.LINK_KINDS[kind] then
+			count = count + 1
+			if count <= M.MAX_LINKS then
+				local fields = { kind .. ":" .. trimFields(body:sub(#kind + 2)), clean(name) }
+				for _, line in ipairs(Tooltip(full)) do
+					fields[#fields + 1] = line
+				end
+				links[#links + 1] = table.concat(fields, M.LINE_SEP)
+			end
+		end
+		return "[" .. name .. "]"
+	end
+	local out = tostring(text):gsub("(|c%x%x%x%x%x%x%x%x|H([^|]+)|h(.-)|h|r)", take)
+	out = out:gsub("(|H([^|]+)|h(.-)|h)", take)
+	return out, (#links > 0) and table.concat(links, M.LINK_SEP) or nil
 end
 
 -- Contexte du personnage : table clé → texte, et l'équipement en morceaux pour l'allègement.
@@ -172,7 +260,7 @@ function M.ContextText(ctx)
 	return table.concat(lines, "\n")
 end
 
--- Charge de la bande ; `flags` est une liste de drapeaux (« n », « h », « b=clé »).
+-- Charge de la bande ; `flags` est une liste de drapeaux (« n », « h », « b=clé », « a=action », « k=simc »).
 function M.Payload(session, id, flags, slot, ctx, text)
 	local sorted = {}
 	for _, flag in ipairs(flags or {}) do
@@ -190,10 +278,24 @@ function M.Payload(session, id, flags, slot, ctx, text)
 	}, M.FIELD_SEP)
 end
 
--- Message complet, allégé si besoin : charge et texte du contexte envoyé (boîte d'envoi), ou nil et la raison si
--- même la question seule ne tient pas.
-function M.Build(session, id, flags, slot, text)
+-- Infobulles retirées des liens (corps et nom gardés) : dernier recours avant le refus d'un message trop long.
+local function linksWithoutTooltips(value)
+	local out = {}
+	for link in (value .. M.LINK_SEP):gmatch("(.-)" .. M.LINK_SEP) do
+		local body, name = link:match("^([^\28]*)\28?([^\28]*)")
+		out[#out + 1] = (body or "") .. M.LINE_SEP .. (name or "")
+	end
+	return table.concat(out, M.LINK_SEP)
+end
+
+-- Message complet, allégé si besoin : charge et texte du contexte envoyé (boîte d'envoi), ou nil et la raison s'il
+-- dépasse MAX_MESSAGE même allégé. `extra` complète le contexte (clé links). Au-delà d'une bande, la charge part en
+-- parties (M.Fragments).
+function M.Build(session, id, flags, slot, text, extra)
 	local ctx, pieces = M.Context()
+	for key, value in pairs(extra or {}) do
+		ctx[key] = value
+	end
 	local steps = {
 		function()
 			if ctx.gear then
@@ -208,23 +310,48 @@ function M.Build(session, id, flags, slot, text)
 		function()
 			ctx.subzone = nil
 		end,
-		function()
-			ctx.gear = nil
-		end,
-		function()
-			ctx.talents = nil
-		end,
 	}
 	local payload = M.Payload(session, id, flags, slot, ctx, text)
 	for _, step in ipairs(steps) do
 		if #payload <= Codec.MAX_PAYLOAD then
-			return payload, M.ContextText(ctx)
+			break
 		end
 		step()
 		payload = M.Payload(session, id, flags, slot, ctx, text)
 	end
-	if #payload <= Codec.MAX_PAYLOAD then
-		return payload, M.ContextText(ctx)
+	if #payload > M.MAX_MESSAGE and ctx.links then
+		ctx.links = linksWithoutTooltips(ctx.links)
+		payload = M.Payload(session, id, flags, slot, ctx, text)
 	end
-	return nil, "message trop long pour la bande, même sans contexte"
+	if #payload > M.MAX_MESSAGE then
+		return nil, "message trop long (" .. #payload .. " octets, " .. M.MAX_MESSAGE .. " au plus)"
+	end
+	return payload, M.ContextText(ctx)
+end
+
+-- Parties d'une charge trop longue pour une bande : « F », session, numéro, rang, total, puis un morceau brut de la
+-- charge ; la taille des morceaux suit l'en-tête le plus long. Une seule partie (la charge) si elle tient.
+function M.Fragments(payload, session, id)
+	local max = Codec.MAX_PAYLOAD
+	if #payload <= max then
+		return { payload }
+	end
+	local function header(i, n)
+		return table.concat({ M.FRAGMENT_TAG, clean(session), tostring(id), tostring(i), tostring(n), "" }, M.FIELD_SEP)
+	end
+	local digits, chunk, total = 1, nil, nil
+	while true do
+		local widest = math.floor(10 ^ digits) - 1
+		chunk = max - #header(widest, widest)
+		total = math.ceil(#payload / chunk)
+		if total <= widest then
+			break
+		end
+		digits = digits + 1
+	end
+	local parts = {}
+	for i = 1, total do
+		parts[i] = header(i, total) .. payload:sub((i - 1) * chunk + 1, i * chunk)
+	end
+	return parts
 end

@@ -15,3 +15,9 @@
   `mage19_cible_chaman21_skyborne.txt` (bouton PvP, 10:15:31Z ; le client envoie le nom de fichier de la race,
   « Skyborne », commun à deux races). Aucun contexte de Chasseur n'a été relevé : `chasseur19_construit.txt` est
   construit à la main (contexte du Mage, classe changée, sans talents ni équipement) pour le seul bouton Familiers.
+- `links_constructed.txt` (P06b, bloc A) : valeur de la clé de contexte `links` **construite à la main** d'après le
+  format de `forever/bridge/items.py` (un lien d'objet avec suffixe aléatoire, un lien de sort ; corps, nom et lignes
+  d'infobulle séparés par 0x1C, liens par 0x1D) ; lignes d'infobulle synthétiques. Remplacée ou complétée par les
+  relevés de la sonde en jeu G (`forever bridge contexts export`).
+- `reply_seconds.json` (P06b, bloc A) : les neuf durées de réponse (`reply.seconds`) du journal du pont du 2026-10-09,
+  relevées le 2026-10-10 pour chiffrer le calendrier des relevés (`forever/bridge/polls.py`).

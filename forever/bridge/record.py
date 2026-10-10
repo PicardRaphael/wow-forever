@@ -56,6 +56,7 @@ CONTEXT_KEYS = (
     "target_level",
     "target_race",
     "client",
+    "links",  # liens cités dans la question, avec leur infobulle (P06b, `items.parse_links`)
 )
 
 

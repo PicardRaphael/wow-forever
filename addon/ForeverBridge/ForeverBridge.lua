@@ -4,6 +4,9 @@
 -- de contrôle (/fv diag, seule commande qui écrit dans la discussion générale).
 -- Seul addon de forever-core qui dessine (décision 194) : la bande n'apparaît que sur demande. Aucune fonction
 -- d'action, aucun rechargement de l'interface, aucun abonnement au journal de combat, aucune ouverture automatique.
+-- P06b (décision 235) : liens insérés par Maj+clic (accroches hooksecurefunc, jamais de fonction de Blizzard
+-- remplacée), messages trop longs montrés en carrousel de parties, zone de collage de l'export SimulationCraft,
+-- cartes « À valider » dont les actions demandent un second clic de confirmation.
 --
 -- Contient du code adapté de wow-ai (https://github.com/chelinho139/wow-ai, commit 3756eb5a : dessin de la bande,
 -- autotest des signaux et fenêtre, addon/WoWAI/WoWAI.lua), sous la licence suivante :
@@ -34,6 +37,7 @@ local ADDON = ... or "ForeverBridge"
 
 ForeverBridge = {}
 local FB = ForeverBridge
+FB.SCHEDULE = nil -- posé après le calendrier, pour les tests
 local Codec = ForeverBridge_Codec
 local Message = ForeverBridge_Message
 
@@ -46,29 +50,39 @@ local PROBE2_ADDON = "ForeverBridge_Probe2"
 local PREFIX = "|cff33ff99ForeverBridge|r : "
 local WINDOW_W, WINDOW_H = 520, 360
 local MIN_W, MIN_H = 360, 240
-local MAX_LETTERS = 255 -- question tapée, en caractères (zone de saisie)
+local MAX_LETTERS = 1000 -- question tapée, en caractères (zone de saisie), séquences des liens comprises
 local SLOT_PREFIX = "ForeverBridge_S"
 local GIVE_UP_POLLS = 3 -- relevés sans accusé avant la boîte d'envoi /reload
 local LOW_RESERVE = 10 -- emplacements restants à partir desquels /reload est proposé
 local IDLE_POLL = 600 -- relevé au repos, fenêtre ouverte (secondes)
 local HISTORY_KEPT = 50
 local ARCHIVE_KEPT = 5 -- conversations archivées par « Nouvelle conversation »
--- Calendrier des relevés après un envoi (secondes) : 3, puis toutes les 4 jusqu'à 30, puis toutes les 10 jusqu'au
--- plafond (190, au-delà du délai de la conversation du pont).
-local SCHEDULE = { 3, 7, 11, 15, 19, 23, 27, 30 }
-for t = 40, 190, 10 do
+-- Calendrier des relevés après un envoi (P06b, forever/bridge/polls.py) : 2, puis de 4 en 4 jusqu'à 60, puis de
+-- 10 en 10 jusqu'au plafond (190, au-delà du délai de la conversation du pont).
+local SCHEDULE = { 2 }
+for t = 4, 60, 4 do
 	SCHEDULE[#SCHEDULE + 1] = t
 end
+for t = 70, 190, 10 do
+	SCHEDULE[#SCHEDULE + 1] = t
+end
+local CAROUSEL = 0.5 -- durée d'affichage d'une partie d'un message trop long
+local CONFIRM = 5 -- délai du second clic qui confirme une action d'une carte
+local CARDS_W = 360
+local EXPLAIN_QUESTION = "Explique cette mise à jour en attente, simplement."
+local EXPORT_TOO_LONG = "export trop long : utilisez /simc nobags"
 local SEND_W, BAR_H, INPUT_H = 90, 22, 54
 local MIN_ALPHA = 0.3 -- fond réglable par /fv fond, de 30 à 100 (opaque par défaut)
 
 BINDING_HEADER_FOREVERBRIDGE = "ForeverBridge"
 BINDING_NAME_FOREVERBRIDGE_TOGGLE = "Ouvrir ou fermer la fenêtre"
 
+FB.SCHEDULE = SCHEDULE
+
 local driver = CreateFrame("Frame", "ForeverBridgeDriver", UIParent)
 local band
 local textures = {}
-local run = { nextSlot = 1, unacked = {}, links = {}, unread = 0 }
+local run = { nextSlot = 1, unacked = {}, links = {}, unread = 0, cards = {}, carousel = 0 }
 local ui = {}
 
 -- Diagnostic demandé par le joueur (/fv diag) : seule écriture dans la discussion générale.
@@ -209,6 +223,21 @@ local function BuildWindow()
 		f:Hide()
 	end)
 
+	local pasteButton = CreateFrame("Button", "ForeverBridgePasteButton", f, "UIPanelButtonTemplate")
+	pasteButton:SetSize(96, 20)
+	pasteButton:SetPoint("TOPRIGHT", f, "TOPRIGHT", -32, -8)
+	pasteButton:SetText("Coller /simc")
+	pasteButton:SetScript("OnClick", function()
+		FB.OpenPaste()
+	end)
+	local cardsButton = CreateFrame("Button", "ForeverBridgeCardsButton", f, "UIPanelButtonTemplate")
+	cardsButton:SetSize(110, 20)
+	cardsButton:SetPoint("RIGHT", pasteButton, "LEFT", -6, 0)
+	cardsButton:SetScript("OnClick", function()
+		FB.ToggleCards()
+	end)
+	ui.cardsButton = cardsButton
+
 	local history = CreateFrame("ScrollingMessageFrame", "ForeverBridgeHistory", f)
 	history:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -52)
 	history:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14, 16 + INPUT_H + 8 + BAR_H + 8)
@@ -306,6 +335,7 @@ local function BuildWindow()
 	FB.RefreshButtons()
 	FB.RenderHistory()
 	FB.UpdateStatus()
+	FB.RefreshCards()
 	return f
 end
 
@@ -611,7 +641,18 @@ local function AnyWaiting()
 	return next(Waiting()) ~= nil or #run.unacked > 0 or (run.afterReload and #Outbox() > 0) or false
 end
 
--- Bande du plus récent message sans accusé (ou rien).
+-- Parties pas encore reçues par le pont, dans l'ordre.
+local function Missing(message)
+	local missing = {}
+	for i = 1, #message.parts do
+		if not message.got[i] then
+			missing[#missing + 1] = i
+		end
+	end
+	return missing
+end
+
+-- Bande du plus récent message sans accusé (ou rien) ; message en parties : celle du carrousel, parmi les manquantes.
 local function ShowCurrent()
 	local current = run.unacked[#run.unacked]
 	if not current then
@@ -619,7 +660,30 @@ local function ShowCurrent()
 		return
 	end
 	local db = ForeverBridgeDB
-	FB.ShowBand(current.id, current.payload, tonumber(db.cell) or DEFAULT_CELL)
+	local missing = Missing(current)
+	if #missing == 0 then
+		FB.HideBand()
+		return
+	end
+	if current.cursor > #missing then
+		current.cursor = 1
+	end
+	local index = missing[current.cursor]
+	current.shown[index] = true
+	FB.ShowBand(current.id, current.parts[index], tonumber(db.cell) or DEFAULT_CELL)
+end
+
+-- Partie suivante du carrousel.
+local function TurnCarousel()
+	local current = run.unacked[#run.unacked]
+	if not current or #current.parts < 2 then
+		return
+	end
+	local missing = Missing(current)
+	if #missing > 1 then
+		current.cursor = current.cursor % #missing + 1
+		ShowCurrent()
+	end
 end
 
 local function StartSchedule()
@@ -627,7 +691,10 @@ local function StartSchedule()
 	run.pollIndex = 1
 end
 
-function FB.Send(text, buttonKey)
+-- Envoi d'un message : `opts.flags` (drapeaux en plus), `opts.extra` (contexte en plus : liens), `opts.label` (texte
+-- montré dans l'historique à la place du texte envoyé), `opts.tooLong` (message si la charge dépasse la limite).
+function FB.Send(text, buttonKey, opts)
+	opts = opts or {}
 	local db = ForeverBridgeDB
 	if type(db) ~= "table" then
 		return false
@@ -640,17 +707,16 @@ function FB.Send(text, buttonKey)
 	if buttonKey then
 		flags[#flags + 1] = "b=" .. buttonKey
 	end
-	local payload, contextText = Message.Build(db.session, id, flags, run.nextSlot, text)
+	for _, flag in ipairs(opts.flags or {}) do
+		flags[#flags + 1] = flag
+	end
+	local payload, contextText = Message.Build(db.session, id, flags, run.nextSlot, text, opts.extra)
 	FB.Open()
 	if not payload then
-		FB.Print("envoi impossible : " .. tostring(contextText))
+		FB.Print("envoi impossible : " .. tostring(opts.tooLong or contextText))
 		return false
 	end
-	local cells = Codec.Encode(id % 65536, payload)
-	if not cells then
-		FB.Print("envoi impossible : message trop long pour la bande")
-		return false
-	end
+	local parts = Message.Fragments(payload, db.session, id)
 	run.testLeft = nil
 	run.newConversation = nil
 	run.afterReload = nil
@@ -659,15 +725,21 @@ function FB.Send(text, buttonKey)
 		id = id,
 		text = text,
 		payload = payload,
+		parts = parts,
+		got = {},
+		shown = {},
+		cursor = 1,
 		flags = table.concat(flags, ","),
 		slot = run.nextSlot,
 		context = contextText,
 		polls = 0,
 	}
+	run.carousel = 0
 	ShowCurrent()
 	StartSchedule()
-	PrintUser(text)
-	Remember({ role = "user", text = text, id = id })
+	local shown = opts.label or text
+	PrintUser(shown)
+	Remember({ role = "user", text = shown, id = id })
 	FB.UpdateStatus()
 	return true
 end
@@ -681,8 +753,277 @@ function FB.SendFromInput()
 	if text == "" then
 		return
 	end
-	if FB.Send(text) then
+	local question, links = Message.Links(text)
+	if FB.Send(question, nil, { extra = { links = links } }) then
 		input:SetText("")
+	end
+end
+
+-- Lien inséré par Maj+clic (accroche de ChatEdit_InsertLink et de ChatFrameUtil.InsertLink) : dans notre saisie
+-- seulement si elle a le focus ; un même clic vu par les deux accroches n'insère qu'une fois.
+function FB.InsertLink(link)
+	local input = ui.input
+	if type(link) ~= "string" or not input or not input:HasFocus() then
+		return
+	end
+	local now = GetTime()
+	if run.lastLink == link and run.lastLinkAt == now then
+		return
+	end
+	run.lastLink, run.lastLinkAt = link, now
+	input:Insert(link)
+end
+
+local function HookLinks()
+	if type(hooksecurefunc) ~= "function" then
+		return
+	end
+	if type(ChatEdit_InsertLink) == "function" then
+		pcall(hooksecurefunc, "ChatEdit_InsertLink", FB.InsertLink)
+	end
+	if type(ChatFrameUtil) == "table" and type(ChatFrameUtil.InsertLink) == "function" then
+		pcall(hooksecurefunc, ChatFrameUtil, "InsertLink", FB.InsertLink)
+	end
+end
+
+---------------------------------------------------------------------------
+-- Zone de collage de l'export SimulationCraft (texte de /simc, Ctrl+V)
+---------------------------------------------------------------------------
+
+function FB.OpenPaste()
+	local frame = ui.pasteFrame
+	if not frame then
+		frame = CreateFrame("Frame", "ForeverBridgePaste", UIParent, "BackdropTemplate")
+		frame:SetSize(460, 320)
+		frame:SetFrameStrata("DIALOG")
+		frame:SetMovable(true)
+		frame:SetClampedToScreen(true)
+		frame:EnableMouse(true)
+		frame:RegisterForDrag("LeftButton")
+		frame:SetScript("OnDragStart", function(self)
+			self:StartMoving()
+		end)
+		frame:SetScript("OnDragStop", function(self)
+			self:StopMovingOrSizing()
+		end)
+		if frame.SetBackdrop then
+			frame:SetBackdrop(BACKDROP)
+			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
+		end
+		tinsert(UISpecialFrames, "ForeverBridgePaste")
+		local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
+		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -10)
+		label:SetPoint("RIGHT", frame, "RIGHT", -12, 0)
+		label:SetJustifyH("LEFT")
+		label:SetText("Export SimulationCraft : /simc en jeu, Ctrl+C, puis Ctrl+V ici (/simc nobags s'il est trop long).")
+		local scroll = CreateFrame("ScrollFrame", "ForeverBridgePasteScroll", frame, "UIPanelScrollFrameTemplate")
+		scroll:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -30)
+		scroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 44)
+		local box = CreateFrame("EditBox", "ForeverBridgePasteBox", scroll)
+		box:SetMultiLine(true)
+		box:SetAutoFocus(false)
+		box:SetFontObject(ChatFontNormal)
+		box:SetMaxLetters(0)
+		box:SetSize(410, 240)
+		box:SetScript("OnEscapePressed", function()
+			frame:Hide()
+		end)
+		scroll:SetScrollChild(box)
+		local send = CreateFrame("Button", "ForeverBridgePasteSend", frame, "UIPanelButtonTemplate")
+		send:SetSize(140, 24)
+		send:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 12)
+		send:SetText("Envoyer l'export")
+		send:SetScript("OnClick", function()
+			FB.SendPaste()
+		end)
+		local cancel = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
+		cancel:SetSize(90, 24)
+		cancel:SetPoint("RIGHT", send, "LEFT", -8, 0)
+		cancel:SetText("Fermer")
+		cancel:SetScript("OnClick", function()
+			frame:Hide()
+		end)
+		ui.pasteFrame, ui.pasteBox = frame, box
+	end
+	frame:ClearAllPoints()
+	frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	frame:Show()
+	ui.pasteBox:SetFocus()
+end
+
+-- Envoi de l'export collé : drapeau k=simc, sans question ; refusé au-delà de la taille d'un message.
+function FB.SendPaste()
+	local box = ui.pasteBox
+	if not box then
+		return
+	end
+	local text = (box:GetText() or ""):gsub("^%s+", ""):gsub("%s+$", "")
+	if text == "" then
+		FB.Open()
+		FB.Print("export vide : collez le texte de /simc (Ctrl+V), puis Envoyer l'export.")
+		return
+	end
+	if #text > Message.MAX_MESSAGE then
+		FB.Open()
+		FB.Print(EXPORT_TOO_LONG)
+		return
+	end
+	local lines = select(2, text:gsub("\n", "")) + 1
+	local label = "export SimulationCraft (" .. lines .. " lignes)"
+	if FB.Send(text, nil, { flags = { "k=simc" }, label = label, tooLong = EXPORT_TOO_LONG }) then
+		box:SetText("")
+		ui.pasteFrame:Hide()
+	end
+end
+
+---------------------------------------------------------------------------
+-- Cartes « À valider » (écrites par le pont : attentes, propositions de profil, carte de test)
+---------------------------------------------------------------------------
+
+function FB.RefreshCards()
+	local button = ui.cardsButton
+	if not button then
+		return
+	end
+	local count = #run.cards
+	button:SetText("À valider (" .. count .. ")")
+	if count > 0 then
+		button:Show()
+	else
+		button:Hide()
+		if ui.cardsFrame then
+			ui.cardsFrame:Hide()
+		end
+	end
+	if ui.cardsFrame and ui.cardsFrame:IsShown() then
+		FB.RenderCards()
+	end
+end
+
+function FB.ToggleCards()
+	BuildWindow()
+	local frame = ui.cardsFrame
+	if frame and frame:IsShown() then
+		frame:Hide()
+		return
+	end
+	FB.RenderCards()
+end
+
+local function CardText(card)
+	local lines = { "|cffffd100" .. Escape(Plain(card.title or card.id or "")) .. "|r" }
+	for _, line in ipairs(type(card.lines) == "table" and card.lines or {}) do
+		lines[#lines + 1] = Escape(Plain(line))
+	end
+	return table.concat(lines, "\n")
+end
+
+local function CardPlain(card)
+	local lines = { Plain(card.title or card.id or "") }
+	for _, line in ipairs(type(card.lines) == "table" and card.lines or {}) do
+		lines[#lines + 1] = Plain(line)
+	end
+	return table.concat(lines, "\n")
+end
+
+function FB.RenderCards()
+	BuildWindow()
+	local frame = ui.cardsFrame
+	if not frame then
+		frame = CreateFrame("Frame", "ForeverBridgeCards", UIParent, "BackdropTemplate")
+		frame:SetFrameStrata("DIALOG")
+		frame:SetClampedToScreen(true)
+		frame:EnableMouse(true)
+		if frame.SetBackdrop then
+			frame:SetBackdrop(BACKDROP)
+			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
+		end
+		tinsert(UISpecialFrames, "ForeverBridgeCards")
+		ui.cardsFrame, ui.cardTexts, ui.cardButtons = frame, {}, {}
+	end
+	for _, widget in pairs(ui.cardButtons) do
+		widget:Hide()
+	end
+	for _, text in pairs(ui.cardTexts) do
+		text:Hide()
+	end
+	local y = -10
+	for i, card in ipairs(run.cards) do
+		local text = ui.cardTexts[i]
+		if not text then
+			text = frame:CreateFontString("ForeverBridgeCard" .. i .. "Text", "OVERLAY", "GameFontHighlightSmall")
+			text:SetJustifyH("LEFT")
+			ui.cardTexts[i] = text
+		end
+		text:ClearAllPoints()
+		text:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, y)
+		text:SetWidth(CARDS_W - 24)
+		text:SetText(CardText(card))
+		text:Show()
+		local count = 1 + (type(card.lines) == "table" and #card.lines or 0)
+		y = y - count * 14 - 4
+		local previous
+		for _, entry in ipairs(type(card.buttons) == "table" and card.buttons or {}) do
+			if type(entry) == "table" and type(entry.key) == "string" then
+				local name = "ForeverBridgeCard" .. i .. "_" .. entry.key
+				local widget = ui.cardButtons[name]
+				if not widget then
+					widget = CreateFrame("Button", name, frame, "UIPanelButtonTemplate")
+					widget:SetSize(96, BAR_H)
+					ui.cardButtons[name] = widget
+				end
+				widget:ClearAllPoints()
+				if previous then
+					widget:SetPoint("LEFT", previous, "RIGHT", 6, 0)
+				else
+					widget:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, y)
+				end
+				widget:SetText(tostring(entry.label or entry.key))
+				widget:SetScript("OnClick", function()
+					FB.ClickCard(card, entry, widget)
+				end)
+				widget:Show()
+				previous = widget
+			end
+		end
+		y = y - BAR_H - 12
+	end
+	frame:SetSize(CARDS_W, -y + 4)
+	frame:ClearAllPoints()
+	frame:SetPoint("TOPLEFT", ui.frame, "TOPRIGHT", 8, 0)
+	frame:Show()
+end
+
+-- Clic sur un bouton de carte : une action demande un second clic dans le délai (« Confirmer »), puis part en
+-- a=<action> sans texte ; « Expliquer » pose la question fixe avec le texte de la carte (b=explain).
+function FB.ClickCard(card, entry, widget)
+	if entry.explain then
+		FB.Send(EXPLAIN_QUESTION .. "\n" .. CardPlain(card), "explain", { label = "Expliquer : " .. Plain(card.title or "") })
+		return
+	end
+	if type(entry.action) ~= "string" or entry.action == "" then
+		return
+	end
+	local pending = run.confirm
+	if entry.confirm and not (pending and pending.widget == widget and GetTime() - pending.at < CONFIRM) then
+		if pending and pending.widget ~= widget then
+			pending.widget:SetText(pending.label)
+		end
+		run.confirm = { widget = widget, label = tostring(entry.label or entry.key), at = GetTime() }
+		widget:SetText("Confirmer")
+		return
+	end
+	run.confirm = nil
+	widget:SetText(tostring(entry.label or entry.key))
+	FB.Send("", nil, { flags = { "a=" .. entry.action }, label = tostring(entry.label or entry.key) .. " : "
+		.. Plain(card.title or card.id or "") })
+end
+
+local function TickConfirm()
+	local pending = run.confirm
+	if pending and GetTime() - pending.at >= CONFIRM then
+		pending.widget:SetText(pending.label)
+		run.confirm = nil
 	end
 end
 
@@ -755,7 +1096,16 @@ function FB.UpdateStatus()
 		parts[#parts + 1] = "pont pas encore vu"
 	end
 	if #run.unacked > 0 then
-		parts[#parts + 1] = "envoi du message n° " .. run.unacked[#run.unacked].id
+		local current = run.unacked[#run.unacked]
+		local sending = "envoi du message n° " .. current.id
+		if #current.parts > 1 then
+			local got = 0
+			for _ in pairs(current.got) do
+				got = got + 1
+			end
+			sending = sending .. " (" .. #current.parts .. " parties, " .. got .. " reçue(s) par le pont)"
+		end
+		parts[#parts + 1] = sending
 	elseif next(Waiting()) ~= nil and run.scheduleStart then
 		local seconds = math.floor(GetTime() - run.scheduleStart)
 		local dots = string.rep(".", math.floor(GetTime() * 2) % 3 + 1)
@@ -797,9 +1147,37 @@ function FB.ApplySlot(slot)
 			FB.RefreshButtons()
 		end
 	end
+	if published and type(slot.cards) == "table" then
+		run.cards = slot.cards
+		FB.RefreshCards()
+	end
 	local waiting = Waiting()
 	for _, reply in ipairs(type(slot.replies) == "table" and slot.replies or {}) do
-		if type(reply) == "table" and reply.session == db.session and type(reply.id) == "number" then
+		if type(reply) == "table" and reply.session == db.session and type(reply.id) == "number"
+			and reply.status == "parts" then
+			-- parties reçues par le pont : le carrousel ne montre plus que les manquantes ; ce n'est pas un accusé
+			for _, message in ipairs(run.unacked) do
+				if message.id == reply.id and type(reply.got) == "table" then
+					local before = 0
+					for _ in pairs(message.got) do
+						before = before + 1
+					end
+					local got = {}
+					local count = 0
+					for _, index in ipairs(reply.got) do
+						if type(index) == "number" and not got[index] then
+							got[index] = true
+							count = count + 1
+						end
+					end
+					if count > before then
+						message.got = got
+						message.cursor = 1
+						message.progressed = true
+					end
+				end
+			end
+		elseif type(reply) == "table" and reply.session == db.session and type(reply.id) == "number" then
 			for i = #run.unacked, 1, -1 do
 				if run.unacked[i].id == reply.id then
 					table.remove(run.unacked, i)
@@ -867,7 +1245,20 @@ function FB.PollSlot()
 	end
 	local current = run.unacked[#run.unacked]
 	if current then
-		current.polls = current.polls + 1
+		-- un relevé qui apporte une partie nouvelle ne compte pas pour l'abandon, ni un relevé fait avant que le
+		-- carrousel ait montré chaque partie au moins une fois (message long)
+		local shownAll = true
+		for i = 1, #current.parts do
+			shownAll = shownAll and (current.shown[i] or current.got[i]) and true
+		end
+		if current.progressed then
+			current.progressed = nil
+			current.polls = 0
+		elseif not shownAll then
+			current.polls = 0
+		else
+			current.polls = current.polls + 1
+		end
 		if current.polls >= GIVE_UP_POLLS then
 			table.remove(run.unacked)
 			GiveUp(current)
@@ -952,6 +1343,12 @@ end
 -- Minuterie : le cadre pilote reste visible (OnUpdate ne tourne que sur un cadre visible).
 function FB.Tick(elapsed)
 	TickPolls()
+	TickConfirm()
+	run.carousel = (run.carousel or 0) + elapsed
+	if run.carousel >= CAROUSEL - 1e-6 then
+		run.carousel = 0
+		TurnCarousel()
+	end
 	run.statusClock = (run.statusClock or 0) + elapsed
 	if run.statusClock >= 0.5 then
 		run.statusClock = 0
@@ -1117,6 +1514,10 @@ function handlers.PLAYER_ENTERING_WORLD()
 		end
 		if tonumber(ForeverBridgeStatus.now) and tonumber(ForeverBridgeStatus.now) > 0 then
 			run.bridgeSeen = tonumber(ForeverBridgeStatus.now)
+			if type(ForeverBridgeStatus.cards) == "table" then
+				run.cards = ForeverBridgeStatus.cards
+				FB.RefreshCards()
+			end
 		end
 	end
 	FB.ApplySlot(ForeverBridgeSlot)
@@ -1139,12 +1540,15 @@ end)
 for event in pairs(handlers) do
 	pcall(driver.RegisterEvent, driver, event)
 end
+HookLinks()
 
 local HELP = {
 	"/fv : ouvrir ou fermer cette fenêtre (raccourci : Options > Raccourcis > AddOns > ForeverBridge ; Échap ferme).",
 	"/fv test [1-4] : bande de test, lue par uv run forever bridge selftest --live (une case par pixel par défaut).",
 	"/fv poll : chargement d'un emplacement de sonde sans /reload (sonde en jeu B).",
 	"/fv fond N : opacité du fond de la fenêtre, de 30 à 100 (opaque).",
+	"Maj+clic sur un objet, un sort ou une quête pendant la saisie : le lien et son infobulle partent avec la question.",
+	"Coller /simc : colle l'export de l'addon SimulationCraft (/simc, Ctrl+C, Ctrl+V), envoyé au pont sans question.",
 	"/fv case N : taille de case de la bande des messages, 1 (défaut) à 4 pixels, si le pont ne la lit pas.",
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
 }

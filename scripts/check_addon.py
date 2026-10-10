@@ -20,6 +20,15 @@ FORBIDDEN = frozenset(
     {"CastSpell", "CastSpellByName", "CastSpellByID", "UseAction", "SendChatMessage", "RunMacro", "RunMacroText"}
 )
 COMBAT_LOG = frozenset({"COMBAT_LOG_EVENT", "COMBAT_LOG_EVENT_UNFILTERED"})
+# Fonctions de Blizzard qu'un addon accroche (hooksecurefunc) sans jamais les remplacer (P06b, Maj+clic).
+BLIZZARD_HOOKED = (
+    "ChatEdit_InsertLink",
+    "ChatFrameUtil.InsertLink",
+    "HandleModifiedItemClick",
+    "SetItemRef",
+    "ChatFrame_OnHyperlinkShow",
+)
+_REPLACED = re.compile(r"^\s*(" + "|".join(re.escape(n) for n in BLIZZARD_HOOKED) + r")\s*=(?!=)", re.MULTILINE)
 OPENERS = frozenset({"function", "if", "do", "repeat"})
 CLOSERS = frozenset({"end", "until"})
 _WORD = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
@@ -109,6 +118,10 @@ def check_lua(path: Path) -> list[str]:
             errors.append(f"{name}:{line} : fonction interdite {word} (aucune action de jeu)")
         if word in COMBAT_LOG:
             errors.append(f"{name}:{line} : abonnement au journal de combat interdit ({word})")
+    for m in _REPLACED.finditer(code):
+        errors.append(
+            f"{name}:{_line(code, m.start(1))} : fonction de Blizzard remplacée (utiliser hooksecurefunc) : {m[1]}"
+        )
     for pos, value in strings:
         if value in COMBAT_LOG:
             errors.append(f"{name}:{_line(text, pos)} : abonnement au journal de combat interdit ({value})")

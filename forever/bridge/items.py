@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 LINK_SEP = "\x1d"
@@ -48,19 +49,81 @@ class GameLink:
 def parse_item_string(text: str) -> ItemString:
     """Champs d'une chaîne d'objet (« 7909:1883:0:0:0:0:-12:1234567:19 », avec ou sans `item:`) ; champs vides lus 0 ;
     ValueError si l'objet manque ou si un champ n'est pas un entier."""
-    raise NotImplementedError
+    body = text.strip()
+    body = body.removeprefix("item:")
+    fields = body.split(":")
+    if not fields[0]:
+        raise ValueError(f"chaîne d'objet sans objet : {text!r}")
+    values = [int(f) if f else 0 for f in fields]  # ValueError si un champ n'est pas un entier
+    if values[0] <= 0:
+        raise ValueError(f"identifiant d'objet invalide : {text!r}")
+
+    def at(i: int) -> int:
+        return values[i] if i < len(values) else 0
+
+    count = max(0, at(12))
+    return ItemString(
+        item=values[0],
+        enchant=at(1),
+        gems=tuple(g for g in values[2:6] if g),
+        suffix=at(6),
+        unique=at(7),
+        link_level=at(8) or None,
+        bonus=tuple(values[13 : 13 + count]),
+    )
+
+
+_PIECE = re.compile(r"(\d+)([=:])(.*)", re.DOTALL)
 
 
 def parse_gear(value: str) -> tuple[list[GearPiece], list[str]]:
     """Pièces d'équipement (nouvelle et ancienne forme) et morceaux mal formés, dans l'ordre reçu."""
-    raise NotImplementedError
+    pieces: list[GearPiece] = []
+    bad: list[str] = []
+    for part in (p.strip() for p in str(value or "").split(";")):
+        if not part:
+            continue
+        match = _PIECE.fullmatch(part)
+        if match is None:
+            bad.append(part)
+            continue
+        slot, sep, rest = int(match[1]), match[2], match[3]
+        if sep == "=":
+            chain, _, name = rest.partition("=")
+        else:
+            chain, _, name = rest.partition(":")
+            if not chain.isdigit():
+                bad.append(part)
+                continue
+        try:
+            item = parse_item_string(chain)
+        except ValueError:
+            bad.append(part)
+            continue
+        pieces.append(GearPiece(slot=slot, item=item, name=name, chain=chain))
+    return pieces, bad
 
 
 def parse_links(value: str) -> list[GameLink]:
     """Liens cités dans la question ; un lien sans corps ni nom est ignoré."""
-    raise NotImplementedError
+    links = []
+    for part in str(value or "").split(LINK_SEP):
+        fields = part.split(LINE_SEP)
+        body = fields[0].strip()
+        name = fields[1].strip() if len(fields) > 1 else ""
+        if not body and not name:
+            continue
+        tooltip = tuple(line for line in fields[2:] if line.strip())
+        links.append(GameLink(kind=body.split(":", 1)[0], body=body, name=name, tooltip=tooltip))
+    return links
 
 
 def links_lines(links: list[GameLink]) -> list[str]:
     """Lignes du message à la conversation : « [Nom] (objet item:…) : ligne 1 / ligne 2 … »."""
-    raise NotImplementedError
+    lines = []
+    for link in links:
+        line = f"[{link.name}] ({LINK_KINDS.get(link.kind, link.kind)} {link.body})"
+        if link.tooltip:
+            line += " : " + " / ".join(link.tooltip)
+        lines.append(line)
+    return lines

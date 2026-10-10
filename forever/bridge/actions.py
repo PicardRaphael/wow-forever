@@ -8,19 +8,41 @@ rien. Bloc B : attentes de `forever update` et commandes fixées."""
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from typing import Any
 
 ACTIONS = ("update", "approve", "reject", "profile_apply", "profile_dismiss")
 WITH_ID = frozenset({"approve", "reject", "profile_apply", "profile_dismiss"})
+_ID = re.compile(r"[A-Za-z0-9._-]{1,120}")
 
 
 def parse_action(flag: str) -> tuple[str, str | None] | None:
     """(action, identifiant) d'un drapeau `a=…` ; None si l'action n'est pas de la liste fermée, si l'identifiant
     manque, est en trop ou porte un caractère hors de `[A-Za-z0-9._-]`."""
-    raise NotImplementedError
+    if not flag.startswith("a="):
+        return None
+    name, sep, target = flag[2:].partition(":")
+    if name not in ACTIONS:
+        return None
+    if name in WITH_ID:
+        return (name, target) if sep and _ID.fullmatch(target) else None
+    return None if sep else (name, None)
+
+
+def action_flag(flags: frozenset[str]) -> str | None:
+    """Drapeau `a=…` du message, s'il en porte un."""
+    return next((f for f in sorted(flags) if f.startswith("a=")), None)
 
 
 def card_for(cards: Sequence[Mapping[str, Any]], action: str, target: str | None) -> Mapping[str, Any] | None:
     """Carte publiée dont l'identifiant est exactement `target` et qui offre le bouton de cette action."""
-    raise NotImplementedError
+    if target is None:
+        return None
+    wanted = f"{action}:{target}"
+    for card in cards:
+        if card.get("id") != target:
+            continue
+        if any(isinstance(b, Mapping) and b.get("action") == wanted for b in card.get("buttons") or ()):
+            return card
+    return None

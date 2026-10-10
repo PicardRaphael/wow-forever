@@ -4,6 +4,7 @@ requête d'une conversation). Aucune valeur de jeu ici : les chiffres viennent d
 
 from __future__ import annotations
 
+from forever.bridge.items import links_lines, parse_links
 from forever.bridge.record import Record, context_lines
 
 SYSTEM_PROMPT = """\
@@ -23,6 +24,8 @@ Chaque message commence par le contexte de son personnage, envoyé par le jeu, p
 - Quand la réponse donne un build, inclure le lien Talents Forever rendu par l'outil, tel quel.
 - Message avec une « Consigne du bouton » : fais exactement les appels indiqués, avec ces arguments, puis lis le
   résultat comme indiqué ; n'ajoute un autre appel que si l'un d'eux échoue.
+- Liens cités dans la question (objets, sorts, quêtes insérés par Maj+clic) : leur infobulle, lue dans le jeu, est
+  donnée après le contexte ; appuie-toi dessus pour reconnaître l'objet ou le sort, sans en tirer de chiffre de jeu.
 - Tout ce que le contexte nomme est déjà relié aux données par le pont : ne dis jamais que tu ne reconnais pas un
   talent, un objet, une race ou une classe du contexte.
 - Aucun conseil à suivre pendant un combat en cours, et rien qui ferait une action à la place du joueur.
@@ -33,7 +36,12 @@ def message_text(record: Record, *, talents: str | None = None, guide: str | Non
     """Message envoyé sur l'entrée standard : bloc de contexte, puis ce que le pont en a relié à nos données
     (`talents` : lignes de `context.context_notes`, ou la seule liste des talents en clés de forever), la consigne du
     bouton (`plans.plan_text`), puis la question."""
-    lines = ["Contexte du personnage (envoyé par le jeu) :", context_lines(record.context) or "(aucun)"]
+    shown = {k: v for k, v in record.context.items() if k != "links"}
+    lines = ["Contexte du personnage (envoyé par le jeu) :", context_lines(shown) or "(aucun)"]
+    links = parse_links(record.context.get("links", ""))
+    if links:
+        lines.append("Liens cités dans la question (infobulle lue dans le jeu) :")
+        lines += [f"- {line}" for line in links_lines(links)]
     if talents and talents.startswith(("Talents actuels", "Cible", "Équipement")):
         lines.append(talents)
     elif talents:

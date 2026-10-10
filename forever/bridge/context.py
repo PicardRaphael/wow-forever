@@ -8,6 +8,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
+from forever.bridge.items import GearPiece, parse_gear
 from forever.config import Deps
 
 # Jeton de classe du jeu (`UnitClassBase`) → nom de la classe dans `classes.json`.
@@ -124,6 +125,7 @@ class Resolved:
     target_races: tuple[str, ...]
     gear: list[tuple[str, int, str]]
     defects: list[Defect]
+    pieces: list[GearPiece] = field(default_factory=list)  # pièces complètes (enchantement, suffixe ; P06b)
 
 
 def load_context_data(deps: Deps) -> ContextData:
@@ -161,19 +163,14 @@ def _races(data: ContextData, text: str | None, defects: list[Defect]) -> tuple[
     return found
 
 
-def _gear(text: str | None, defects: list[Defect]) -> list[tuple[str, int, str]]:
-    """Équipement `emplacement:id[:nom]` séparé par `;` (formes « full », « cut » et « ids » de Message.lua)."""
-    out: list[tuple[str, int, str]] = []
-    for part in (p.strip() for p in str(text or "").split(";")):
-        if not part:
-            continue
-        slot, _, rest = part.partition(":")
-        item, _, name = rest.partition(":")
-        if not slot.isdigit() or not item.isdigit():
-            defects.append(Defect("objet", part, "objet mal formé : « emplacement:identifiant:nom » attendu"))
-            continue
-        out.append((slot, int(item), name))
-    return out
+def _gear(text: str | None, defects: list[Defect]) -> list[GearPiece]:
+    """Équipement `emplacement=chaîne=nom` séparé par `;` (P06b, `items.parse_gear`), ancienne forme
+    `emplacement:id[:nom]` de P06a encore lue."""
+    pieces, bad = parse_gear(str(text or ""))
+    for part in bad:
+        reason = "objet mal formé : « emplacement=chaîne=nom » ou « emplacement:identifiant:nom » attendu"
+        defects.append(Defect("objet", part, reason))
+    return pieces
 
 
 def resolve(data: ContextData, context: Mapping[str, str]) -> Resolved:
@@ -193,6 +190,7 @@ def resolve(data: ContextData, context: Mapping[str, str]) -> Resolved:
     if target_token and target_class is None:
         defects.append(Defect("classe", target_token, "jeton de classe de la cible inconnu (UnitClassBase)"))
     target_races = _races(data, context.get("target_race"), defects)
+    pieces = _gear(context.get("gear"), defects)
     faction = (context.get("faction") or "").lower() or None
     race = own[0] if len(own) == 1 else None
     if len(own) > 1 and faction:  # même fichier du client pour deux races : la faction tranche
@@ -210,8 +208,9 @@ def resolve(data: ContextData, context: Mapping[str, str]) -> Resolved:
         target_class=target_class,
         target_level=_int(context.get("target_level")),
         target_races=target_races,
-        gear=_gear(context.get("gear"), defects),
+        gear=[(str(p.slot), p.item.item, p.name) for p in pieces],
         defects=defects,
+        pieces=pieces,
     )
 
 
@@ -228,7 +227,19 @@ def context_notes(resolved: Resolved) -> str:
         level = resolved.target_level if resolved.target_level is not None else "inconnu (caché)"
         races = " ou ".join(resolved.target_races) or "inconnue"
         lines.append(f"Cible (joueur) : {resolved.target_class}, niveau {level}, race {races}")
-    if resolved.gear:
-        names = ", ".join(name or f"objet {item}" for _, item, name in resolved.gear)
+    if resolved.pieces:
+        names = ", ".join(_piece_text(p) for p in resolved.pieces)
         lines.append(f"Équipement ({EQUIPMENT_NOTE}) : {names}")
     return "\n".join(lines)
+
+
+def _piece_text(piece: GearPiece) -> str:
+    """« Nom (enchantement 1883, suffixe aléatoire -12) » : identifiants lus dans le lien, sans interprétation."""
+    item = piece.item
+    extras = [f"enchantement {item.enchant}"] if item.enchant else []
+    if item.gems:
+        extras.append("gemmes " + "/".join(str(g) for g in item.gems))
+    if item.suffix:
+        extras.append(f"suffixe aléatoire {item.suffix}")
+    name = piece.name or f"objet {item.item}"
+    return f"{name} ({', '.join(extras)})" if extras else name

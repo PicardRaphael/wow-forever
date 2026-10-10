@@ -23,11 +23,13 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from forever.bridge import lock as _lock
+from forever.bridge.actions import action_flag, card_for, parse_action
 from forever.bridge.agent import AgentResult, provenance_line
 from forever.bridge.buttons import BUTTONS, button_payload, visible_buttons
 from forever.bridge.capture import GameWindow, Rect, band_rect, probe_rect
 from forever.bridge.codec import SELFTEST_ID, BandError, Decoded, decode_band, detect_cell_px, selftest_payload
 from forever.bridge.format import normalize_reply
+from forever.bridge.fragments import Fragment, FragmentBuffer, parse_fragment
 from forever.bridge.image import Image
 from forever.bridge.journal import Journal
 from forever.bridge.prompt import message_text
@@ -41,6 +43,9 @@ IDLE_INTERVAL_S = 1.0  # pas du pont tant qu'aucune fenêtre du jeu n'est connue
 OUTBOX_LIST_S = 30.0  # liste des sauvegardes relue (une nouvelle n'apparaît qu'au premier /reload d'un compte)
 REJECT_LOG_S = 5.0
 HEARTBEAT_S = 30.0  # dernier signe de vie écrit dans le verrou (sonde F : ponts tués sans trace)
+CARDS_CHECK_S = 1.0  # cartes « À valider » relues (carte de test de selftest --card, attentes au bloc B)
+SIMC_FLAG = "k=simc"
+ACTION_LABELS = {"approve": "Valider", "reject": "Refuser"}
 _SELFTEST = Decoded(SELFTEST_ID, selftest_payload())
 
 Agent = Callable[[str, str | None], AgentResult]
@@ -108,6 +113,7 @@ class Bridge:
         keeper: Any | None = None,
         updater: Any | None = None,
         heartbeat: Callable[[], None] | None = None,
+        cards: Any | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -125,6 +131,10 @@ class Bridge:
         self.keeper = keeper  # keeper.AddonKeeper : addon tenu à jour, jeu fermé
         self.updater = updater  # updater.UpdateOnClose : passage de forever update à la fermeture du jeu (décision 227)
         self.heartbeat = heartbeat
+        self.cards = cards  # cards.CardSource : cartes « À valider » publiées (P06b)
+        self.card_list: list[dict[str, Any]] = []
+        self.last_cards_check: float | None = None
+        self.fragments = FragmentBuffer()
         self.last_beat: float | None = None
         self.queue: deque[Record] = deque()
         self.busy = False
@@ -147,7 +157,7 @@ class Bridge:
 
     def _publish(self, first: int, reason: str) -> None:
         with self._lock:
-            inbox = inbox_lua(self.epoch(), self.status_cache, self.state.replies, self.buttons)
+            inbox = inbox_lua(self.epoch(), self.status_cache, self.state.replies, self.buttons, self.card_list)
             started = time.perf_counter()
             try:
                 count = publish(self.addons_dir, inbox, self.slots, first)
@@ -171,7 +181,8 @@ class Bridge:
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
             tmp = path.with_name(path.name + ".tmp")
-            tmp.write_bytes(status_lua(self.status_cache, self.buttons, self.epoch()).encode("utf-8"))
+            content = status_lua(self.status_cache, self.buttons, self.epoch(), self.card_list)
+            tmp.write_bytes(content.encode("utf-8"))
             tmp.replace(path)
         except OSError as exc:
             self.journal.write("error", where="Status.lua", error=str(exc))
@@ -215,6 +226,14 @@ class Bridge:
         if decoded is None or decoded == _SELFTEST:
             return
         try:
+            fragment = parse_fragment(decoded.payload)
+        except RecordError:
+            self._rejected(now, "partie")
+            return
+        if fragment is not None:
+            self._fragment(fragment, now)
+            return
+        try:
             record = parse_payload(decoded.payload)
         except RecordError:
             self._rejected(now, "message")
@@ -242,7 +261,43 @@ class Bridge:
             for record in records:
                 self._accept(record, "reload")
 
-    def _accept(self, record: Record, via: str, capture_ms: float | None = None) -> None:
+    def _fragment(self, fragment: Fragment, now: float) -> None:
+        """Partie d'un message trop long pour une bande (P06b) : gardée, parties reçues publiées pour que l'addon ne
+        montre plus que les manquantes ; message complet lu comme un message ordinaire."""
+        key = (fragment.session, fragment.message_id)
+        with self._lock:
+            if self.state.seen(*key):
+                return
+            before = self.fragments.received(*key)
+            try:
+                full = self.fragments.add(fragment)
+            except RecordError:
+                self._rejected(now, "partie")
+                return
+            if full is None and fragment.index in before:
+                return  # partie déjà reçue : le carrousel la remontre, rien de nouveau
+        if full is not None:
+            try:
+                record = parse_payload(full)
+            except RecordError:
+                self._rejected(now, "message")
+                return
+            self._accept(record, "pixels", parts=fragment.total)
+            return
+        got = self.fragments.received(*key)
+        self.journal.write(
+            "parts", session=fragment.session, id=fragment.message_id, index=fragment.index, total=fragment.total,
+            got=got,
+        )  # fmt: skip
+        self.state.put_reply(
+            {"session": fragment.session, "id": fragment.message_id, "status": "parts", "got": got,
+             "total": fragment.total, "since": self.epoch()}
+        )  # fmt: skip
+        self._publish(self.first_slot, "parties")
+
+    def _accept(self, record: Record, via: str, capture_ms: float | None = None, parts: int | None = None) -> None:
+        simc = SIMC_FLAG in record.flags
+        action = action_flag(record.flags)
         with self._lock:
             if self.state.seen(record.session, record.message_id):
                 return
@@ -255,16 +310,90 @@ class Bridge:
                 flags=sorted(record.flags),
                 slot=record.slot,
                 context_keys=list(record.context),
-                text=record.text,
+                context=dict(record.context),
+                text=f"(export SimulationCraft, {len(record.text)} caractères)" if simc else record.text,
                 capture_ms=capture_ms,
+                parts=parts or 1,
             )
             # après un /reload (boîte d'envoi), le compteur d'emplacements de l'addon est revenu à 1
             self.first_slot = record.slot if via == "pixels" and record.slot else 1
-            self.state.put_reply(
-                {"session": record.session, "id": record.message_id, "status": "working", "since": self.epoch()}
+            if action is None and not simc:
+                self.state.put_reply(
+                    {"session": record.session, "id": record.message_id, "status": "working", "since": self.epoch()}
+                )
+                self.queue.append(record)
+        if action is not None:
+            self._action(record, action)
+        elif simc:
+            self._simc(record, parts or 1)
+        else:
+            self._publish(self.first_slot, "accusé")
+
+    # --- actions et export, sans le modèle (P06b) ---------------------------------------------------------------
+
+    def _done(self, record: Record, text: str, reason: str) -> None:
+        self.state.put_reply({"session": record.session, "id": record.message_id, "status": "done", "text": text})
+        self._publish(self.first_slot, reason)
+
+    def _action(self, record: Record, flag: str) -> None:
+        """Action `a=…` : jamais confiée à l'agent. Bloc A : seule la carte de test est connue ; rien n'est lancé."""
+        parsed = parse_action(flag)
+        action, target = parsed if parsed else (None, None)
+        card = card_for(self.card_list, action, target) if action else None
+        if card is not None and self.cards is not None and str(card.get("id", "")).startswith("selftest-"):
+            result = "carte de test"
+            label = ACTION_LABELS.get(str(action), str(action))
+            text = f"Carte de test : « {label} » reçu par le pont ; rien n'est lancé."
+            self.cards.done(str(card["id"]))
+            self._check_cards(self.clock(), force=True)
+        else:
+            result = "refusée"
+            if parsed is None:
+                why = "action inconnue"
+            elif card is None:
+                why = "carte inconnue ou déjà traitée"
+            else:
+                why = "action pas encore prise en charge par ce pont"
+            text = f"Action refusée : {why}."
+        self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
+        self._done(record, text, "action")
+
+    def _simc(self, record: Record, parts: int) -> None:
+        """Export SimulationCraft collé : gardé anonymisé dans le journal (fixture réelle, décision 235), sans le
+        modèle ; sa lecture arrive au bloc D."""
+        from forever.simc import anonymize_simc
+
+        text, original = anonymize_simc(record.text)
+        lines = len(record.text.splitlines())
+        self.journal.write(
+            "simc_export", session=record.session, id=record.message_id, text=text, checksum_ok=original,
+            anonymized=True, lines=lines, parts=parts,
+        )  # fmt: skip
+        if original is True:
+            reply = (
+                f"Export SimulationCraft reçu ({lines} lignes, somme de contrôle juste). Gardé, anonymisé, dans le "
+                "journal du pont ; sa lecture (écarts avec le profil) arrive dans une prochaine version du pont."
             )
-            self.queue.append(record)
-        self._publish(self.first_slot, "accusé")
+        elif original is False:
+            reply = "Export SimulationCraft reçu, mais export incomplet ou modifié : recopiez /simc."
+        else:
+            reply = "Export SimulationCraft reçu sans somme de contrôle : export incomplet ou modifié : recopiez /simc."
+        self._done(record, reply, "export")
+
+    def _check_cards(self, now: float, *, force: bool = False) -> None:
+        if self.cards is None:
+            return
+        if not force and self.last_cards_check is not None and now - self.last_cards_check < CARDS_CHECK_S:
+            return
+        self.last_cards_check = now
+        try:
+            cards = list(self.cards.current())
+        except Exception as exc:  # noqa: BLE001 : une carte illisible ne doit pas arrêter le pont
+            self.journal.write("error", where="cartes", error=f"{type(exc).__name__}: {exc}")
+            return
+        if cards != self.card_list:
+            self.card_list = cards
+            self.last_refresh = None  # Status.lua et toute la réserve réécrits au pas courant
 
     # --- conversation ----------------------------------------------------------------------------------------------
 
@@ -355,6 +484,7 @@ class Bridge:
                 self.updater.tick()
             except Exception as exc:  # noqa: BLE001 : le lancement de la mise à jour ne doit jamais arrêter le pont
                 self.journal.write("error", where="mise à jour à la fermeture", error=f"{type(exc).__name__}: {exc}")
+        self._check_cards(now)
         if self.last_refresh is None or now - self.last_refresh >= REFRESH_S:
             self.refresh()
         self._capture(now)

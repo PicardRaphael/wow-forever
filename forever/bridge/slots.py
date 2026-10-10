@@ -100,18 +100,38 @@ def _assign(name: str, table: Mapping[str, Any]) -> str:
 
 
 def inbox_lua(
-    now: int, status: Mapping[str, Any], replies: Sequence[Mapping[str, Any]], buttons: Sequence[Mapping[str, Any]]
+    now: int,
+    status: Mapping[str, Any],
+    replies: Sequence[Mapping[str, Any]],
+    buttons: Sequence[Mapping[str, Any]],
+    cards: Sequence[Mapping[str, Any]] = (),
 ) -> str:
-    """Contenu d'un emplacement : `ForeverBridgeSlot = { v, now, status, buttons, replies }`."""
+    """Contenu d'un emplacement : `ForeverBridgeSlot = { v, now, status, buttons, replies, cards }` (cartes « À
+    valider » depuis P06b)."""
     return _assign(
         "ForeverBridgeSlot",
-        {"v": 1, "now": now, "status": dict(status), "buttons": list(buttons), "replies": list(replies)},
+        {
+            "v": 1,
+            "now": now,
+            "status": dict(status),
+            "buttons": list(buttons),
+            "replies": list(replies),
+            "cards": list(cards),
+        },
     )
 
 
-def status_lua(status: Mapping[str, Any], buttons: Sequence[Mapping[str, Any]], now: int = 0) -> str:
-    """Contenu de `ForeverBridge/Status.lua` : `ForeverBridgeStatus = { v, now, status, buttons }`."""
-    return _assign("ForeverBridgeStatus", {"v": 1, "now": now, "status": dict(status), "buttons": list(buttons)})
+def status_lua(
+    status: Mapping[str, Any],
+    buttons: Sequence[Mapping[str, Any]],
+    now: int = 0,
+    cards: Sequence[Mapping[str, Any]] = (),
+) -> str:
+    """Contenu de `ForeverBridge/Status.lua` : `ForeverBridgeStatus = { v, now, status, buttons, cards }`."""
+    return _assign(
+        "ForeverBridgeStatus",
+        {"v": 1, "now": now, "status": dict(status), "buttons": list(buttons), "cards": list(cards)},
+    )
 
 
 def _write_atomic(path: Path, content: str) -> None:

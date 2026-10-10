@@ -14,9 +14,17 @@ PROPOSED: tuple[float, ...] = (2, *range(4, 61, 4), *range(70, 191, 10))
 
 def poll_wait(schedule: Sequence[float], ready_s: float) -> float:
     """Secondes entre la réponse prête et le relevé qui la rapporte ; ValueError après le dernier relevé."""
-    raise NotImplementedError
+    return next(t for t in _after(schedule, ready_s)) - ready_s
 
 
 def polls_used(schedule: Sequence[float], ready_s: float) -> int:
     """Relevés faits jusqu'à celui qui rapporte la réponse, compris."""
-    raise NotImplementedError
+    later = len(_after(schedule, ready_s))
+    return len(schedule) - later + 1
+
+
+def _after(schedule: Sequence[float], ready_s: float) -> list[float]:
+    later = [t for t in schedule if t >= ready_s]
+    if not later:
+        raise ValueError(f"réponse prête à {ready_s} s, après le dernier relevé ({schedule[-1]} s)")
+    return later
