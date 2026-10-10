@@ -44,7 +44,7 @@ class PreviewMeasure:
         self.root = root
         self.calls = 0
 
-    def __call__(self, deps, data_dir, logs):
+    def __call__(self, deps, data_dir, files):
         self.calls += 1
         preview = self.root / f"apercu-{self.calls}"
         shutil.copytree(data_dir, preview)
@@ -105,7 +105,7 @@ def test_replay_is_done_once_per_pending(logs, tmp_path):  # noqa: F811
 def test_measure_without_preview_says_why_builds_are_not_replayed(logs):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
 
-    def measure(deps, data_dir, logs):
+    def measure(deps, data_dir, files):
         return {"changed": [{"file": "monsters.json", "pointer": "/npcs"}]}
 
     replay = SplitReplay(deps.data_dir)
