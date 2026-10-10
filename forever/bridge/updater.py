@@ -103,10 +103,26 @@ class UpdateOnClose:
 
 class UpdateWatch:
     """Verrou et dernier passage de `forever update` surveillés par le pont (P06b) : leur changement fait republier
-    l'état sans attendre le rafraîchissement de dix minutes."""
+    l'état sans attendre le rafraîchissement de dix minutes. `changed` est relu par la boucle toutes les `CHECK_S`
+    secondes ; le premier relevé ne compte pas comme un changement."""
 
     def __init__(self, cache_dir: Path) -> None:
-        raise NotImplementedError
+        from forever.update import update_dir
+
+        folder = update_dir(cache_dir)
+        self.paths = (folder / "lock", folder / "last.json")
+        self.signature: tuple[tuple[int, int] | None, ...] | None = None
+
+    def _stamp(self, path: Path) -> tuple[int, int] | None:
+        try:
+            st = path.stat()
+        except OSError:
+            return None
+        return (st.st_mtime_ns, st.st_size)
 
     def changed(self) -> bool:
-        raise NotImplementedError
+        signature = tuple(self._stamp(path) for path in self.paths)
+        first = self.signature is None
+        moved = signature != self.signature
+        self.signature = signature
+        return moved and not first

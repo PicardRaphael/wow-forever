@@ -10,8 +10,8 @@ from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field
 from typing import Any
 
-# Tranches faites qui calculent un bouton (feuille de route du 2026-10-09).
-DONE_SLICES: frozenset[str] = frozenset({"T04b", "T04c", "T05", "FA1", "CH0", "PV1"})
+# Tranches faites qui calculent un bouton (feuille de route du 2026-10-09 ; T08d, T08e et P06b : « Mettre à jour »).
+DONE_SLICES: frozenset[str] = frozenset({"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b"})
 
 TALENTS_NOTICE = "Build populaire de Talents Forever (choix de joueurs), pas encore calculé par le moteur de forever."
 
@@ -27,6 +27,7 @@ class Button:
     computed_for: tuple[str, ...] | None = None  # classes calculées par le moteur ; ailleurs, la mention
     notice: str | None = None
     needs_player_target: bool = False
+    action: str | None = None  # bouton d'action (P06b) : `a=<action>` traité par le pont, sans conversation
 
     def question_for(self, class_token: str) -> str:
         return self.questions.get(class_token, self.question)
@@ -53,7 +54,7 @@ BUTTONS: tuple[Button, ...] = (
     Button("pvp", "PvP", "Fiche de la classe de ma cible", ("PV1",), needs_player_target=True),
     Button("gear", "Équipement", "Quel est mon prochain objet à viser, et où le trouver ?", ("T10a",)),
     Button("last_fight", "Dernier combat", "Résume mon dernier combat analysé.", ("AN1", "AN2")),
-    Button("update", "Mettre à jour", "", ("P06b",)),
+    Button("update", "Mettre à jour", "", ("T08d", "T08e", "P06b"), action="update"),
 )
 
 
@@ -73,5 +74,7 @@ def button_payload(buttons: Sequence[Button]) -> list[dict[str, Any]]:
             entry["classes"] = list(b.classes)
         if b.needs_player_target:
             entry["target"] = True
+        if b.action:
+            entry["action"] = b.action
         out.append(entry)
     return out

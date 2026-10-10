@@ -2570,7 +2570,9 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             keeper.check()
             return status_payload(deps, addon_files=keeper.outdated)
 
+        from forever.bridge.actions import ActionHandler
         from forever.bridge.cards import CardSource
+        from forever.bridge.updater import UpdateWatch
 
         bridge = loop.Bridge(
             addons_dir=addons,
@@ -2586,6 +2588,8 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             updater=updater,
             heartbeat=lambda: loop.touch_lock(deps.cache_dir, deps.now(), pid=pid),
             cards=CardSource(deps.cache_dir),
+            actions=ActionHandler(cache_dir=deps.cache_dir, now=deps.now, offline=deps.offline),
+            update_watch=UpdateWatch(deps.cache_dir),
         )
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)

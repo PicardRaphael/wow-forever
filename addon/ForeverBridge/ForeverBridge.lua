@@ -54,6 +54,8 @@ local SLOT_PREFIX = "ForeverBridge_S"
 local GIVE_UP_POLLS = 3 -- relevés sans accusé avant la boîte d'envoi /reload
 local LOW_RESERVE = 10 -- emplacements restants à partir desquels /reload est proposé
 local IDLE_POLL = 600 -- relevé au repos, fenêtre ouverte (secondes)
+local UPDATE_POLL = 30 -- relevé pendant un passage de forever update, fenêtre ouverte
+local UPDATE_POLLS = 20 -- relevés rapprochés au plus par passage
 local HISTORY_KEPT = 50
 local ARCHIVE_KEPT = 5 -- conversations archivées par « Nouvelle conversation »
 -- Calendrier des relevés après un envoi (P06b, forever/bridge/polls.py) : 2, puis de 4 en 4 jusqu'à 60, puis de
@@ -1156,6 +1158,7 @@ function FB.ApplySlot(slot)
 		run.bridgeSeen = tonumber(slot.now)
 		if type(slot.status) == "table" then
 			run.status = slot.status
+			FB.CheckUpdate(slot.status)
 			run.slots = tonumber(slot.status.slots) or run.slots
 		end
 		if type(slot.buttons) == "table" then
@@ -1305,15 +1308,54 @@ local function TickPolls()
 		end
 	elseif ui.frame and ui.frame:IsShown() and not run.exhausted then
 		local since = math.max(run.lastPoll or 0, run.openedAt or now)
-		if now - since >= IDLE_POLL then
+		local update = type(run.status) == "table" and type(run.status.update) == "table" and run.status.update or {}
+		if update.running and (run.updatePolls or 0) < UPDATE_POLLS then
+			-- passage de forever update en cours : relevés rapprochés pour montrer sa fin
+			if now - since >= UPDATE_POLL then
+				run.updatePolls = (run.updatePolls or 0) + 1
+				FB.PollSlot()
+			end
+		elseif now - since >= IDLE_POLL then
 			FB.PollSlot()
 		end
+	end
+end
+
+-- Fin d'un passage de forever update : une ligne dans l'historique, une seule fois par passage terminé ; un passage
+-- déjà fini à la connexion n'est pas annoncé (aucun passage vu en cours, aucun passage déjà noté).
+function FB.CheckUpdate(status)
+	local update = type(status) == "table" and type(status.update) == "table" and status.update or nil
+	if not update then
+		return
+	end
+	local db = ForeverBridgeDB
+	if update.running then
+		run.sawRunning = true
+		return
+	end
+	run.updatePolls = 0
+	local last = type(update.last) == "table" and update.last or nil
+	local finished = last and last.finished_at
+	if type(finished) ~= "string" or type(db) ~= "table" or db.update_seen == finished then
+		return
+	end
+	local announce = run.sawRunning or db.update_seen ~= nil
+	db.update_seen = finished
+	run.sawRunning = nil
+	if announce then
+		FB.Print("Mise à jour terminée : " .. tostring(tonumber(last.written) or 0) .. " écrit(s), "
+			.. tostring(tonumber(last.approvable) or 0) .. " à valider")
 	end
 end
 
 function FB.ClickButton(entry)
 	if entry.target and not HasPlayerTarget() then
 		FB.Print(tostring(entry.label or "PvP") .. " : prenez un joueur en cible, puis cliquez à nouveau.")
+		return
+	end
+	if type(entry.action) == "string" and entry.action ~= "" then
+		-- bouton d'action (Mettre à jour) : a=<action> sans texte, traité par le pont sans conversation
+		FB.Send("", nil, { flags = { "a=" .. entry.action }, label = tostring(entry.label or entry.key) })
 		return
 	end
 	local class = PlayerClass()
@@ -1526,6 +1568,7 @@ function handlers.PLAYER_ENTERING_WORLD()
 	if type(ForeverBridgeStatus) == "table" then
 		if type(ForeverBridgeStatus.status) == "table" and next(ForeverBridgeStatus.status) ~= nil then
 			run.status = ForeverBridgeStatus.status
+			FB.CheckUpdate(ForeverBridgeStatus.status)
 			run.slots = tonumber(ForeverBridgeStatus.status.slots) or run.slots
 		end
 		if tonumber(ForeverBridgeStatus.now) and tonumber(ForeverBridgeStatus.now) > 0 then

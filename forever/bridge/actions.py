@@ -1,15 +1,19 @@
 """Actions du jeu traitées par le pont sans le modèle (P06b, décision 235). Un message porte le drapeau
 `a=<action>[:<identifiant>]` ; le pont l'intercepte avant la file : l'agent n'est jamais appelé pour une action.
-Liste fermée ; l'identifiant venu de la bande est apparié exactement à une entrée connue (carte publiée), jamais passé
-tel quel à une commande.
+Liste fermée ; l'identifiant venu de la bande est apparié exactement à une entrée connue (carte de test publiée,
+attente approuvable de `list_pending`, proposition de profil), jamais passé tel quel à une commande.
 
-Bloc A : seules les cartes de test (`forever bridge selftest --card`) sont connues ; le pont note l'action et ne lance
-rien. Bloc B : attentes de `forever update` et commandes fixées."""
+- Carte de test (`forever bridge selftest --card`, bloc A) : le pont note l'action et ne lance rien.
+- Mise à jour (bloc B) : `update`, `approve:<id>`, `reject:<id>` lancent une commande fixée (`update_argv`) par
+  `spawn` détaché, journal du passage dans `<cache>/update/` ; hors ligne, `update` est refusé ; un passage déjà en
+  cours n'en relance pas un autre."""
 
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
+from datetime import datetime
+from pathlib import Path
 from typing import Any
 
 ACTIONS = ("update", "approve", "reject", "profile_apply", "profile_dismiss")
@@ -48,23 +52,96 @@ def card_for(cards: Sequence[Mapping[str, Any]], action: str, target: str | None
     return None
 
 
+APPROVABLE_KINDS = ("install_version", "install_revision", "measures")
+REJECT_REASON = "refusé en jeu"
+
+
 def approvable(entry: Mapping[str, Any]) -> bool:
     """Attente que Valider et Refuser peuvent traiter : installation d'action `attente` ou mesure, à l'état
     `en_attente`."""
-    raise NotImplementedError
+    return (
+        entry.get("kind") in APPROVABLE_KINDS
+        and entry.get("action") == "attente"
+        and entry.get("state") == "en_attente"
+    )
 
 
 def update_argv(kind: str, pending_id: str | None = None) -> list[str]:
     """Commande fixée d'une action : passage, approbation ou rejet d'une attente."""
-    raise NotImplementedError
+    from forever.spawn import update_command
+
+    if kind == "update":
+        return update_command()
+    base = update_command()[:4]  # interpréteur, -u, -m, forever
+    if kind == "approve" and pending_id:
+        return [*base, "update", "approve", pending_id, "--json"]
+    if kind == "reject" and pending_id:
+        return [*base, "update", "reject", pending_id, "--reason", REJECT_REASON, "--json"]
+    raise ValueError(f"action sans commande fixée : {kind}")
 
 
 class ActionHandler:
     """Actions de mise à jour du jeu (bloc B) : commandes fixées lancées par `spawn(argv, journal_du_passage)`."""
 
-    def __init__(self, *, cache_dir: Any, now: Any, offline: bool = False, spawn: Any = None) -> None:
-        raise NotImplementedError
+    def __init__(
+        self,
+        *,
+        cache_dir: Path,
+        now: Callable[[], datetime],
+        offline: bool = False,
+        spawn: Callable[[Sequence[str], Path], None] | None = None,
+    ) -> None:
+        self.cache_dir = cache_dir
+        self.now = now
+        self.offline = offline
+        self.spawn = spawn or _spawn_detached
 
     def handle(self, action: str, target: str | None) -> tuple[str, str]:
         """(résultat noté au journal, texte de la réponse)."""
-        raise NotImplementedError
+        from forever.update import list_pending, run_log_path, update_summary
+
+        now = self.now()
+        summary = update_summary(self.cache_dir, now)
+        step = summary.get("running_step") or "inconnue"
+        if action == "update":
+            if self.offline:
+                return "refusée", "Action refusée : mise à jour impossible hors ligne (FOREVER_OFFLINE)."
+            if summary.get("running"):
+                return (
+                    "passage en cours",
+                    f"Rien de lancé : passage en cours (étape {step}) ; l'état se met à jour à sa fin.",
+                )
+            return self._launch(update_argv("update"), run_log_path(self.cache_dir, now), (
+                "Mise à jour lancée (forever update --auto) : l'état des données se met à jour à la fin du passage."
+            ))  # fmt: skip
+        if action not in ("approve", "reject") or target is None:
+            return "refusée", "Action refusée : action inconnue."
+        entry = next((e for e in list_pending(self.cache_dir) if e.get("id") == target), None)
+        if entry is None:
+            return "refusée", "Action refusée : attente inconnue."
+        if not approvable(entry):
+            return "refusée", f"Action refusée : attente non approuvable ({entry.get('kind')}, {entry.get('state')})."
+        pending_id = str(entry["id"])  # identifiant relu dans l'attente, jamais celui de la bande
+        later = (
+            f" ; passage en cours (étape {step}) : approbation prise au prochain passage"
+            if summary.get("running")
+            else ""
+        )
+        if action == "approve":
+            text = f"Validée : {pending_id}{later or ' ; passage lancé'}."
+        else:
+            text = f"Refusée : {pending_id} (raison notée : {REJECT_REASON})."
+        return self._launch(update_argv(action, pending_id), run_log_path(self.cache_dir, now), text)
+
+    def _launch(self, argv: list[str], log: Path, text: str) -> tuple[str, str]:
+        try:
+            self.spawn(argv, log)
+        except OSError as exc:
+            return "erreur", f"Commande non lancée ({exc}) : la lancer sur le PC ({' '.join(argv[2:])})."
+        return "lancée", text
+
+
+def _spawn_detached(argv: Sequence[str], log: Path) -> None:
+    from forever.spawn import spawn_detached
+
+    spawn_detached(argv, log)

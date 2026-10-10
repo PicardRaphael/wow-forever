@@ -43,6 +43,7 @@ IDLE_INTERVAL_S = 1.0  # pas du pont tant qu'aucune fenêtre du jeu n'est connue
 OUTBOX_LIST_S = 30.0  # liste des sauvegardes relue (une nouvelle n'apparaît qu'au premier /reload d'un compte)
 REJECT_LOG_S = 5.0
 HEARTBEAT_S = 30.0  # dernier signe de vie écrit dans le verrou (sonde F : ponts tués sans trace)
+UPDATE_CHECK_S = 5.0  # verrou et dernier passage de forever update relus (fin d'un passage publiée aussitôt)
 CARDS_CHECK_S = 1.0  # cartes « À valider » relues (carte de test de selftest --card, attentes au bloc B)
 SIMC_FLAG = "k=simc"
 ACTION_LABELS = {"approve": "Valider", "reject": "Refuser"}
@@ -114,6 +115,8 @@ class Bridge:
         updater: Any | None = None,
         heartbeat: Callable[[], None] | None = None,
         cards: Any | None = None,
+        actions: Any | None = None,
+        update_watch: Any | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -132,6 +135,9 @@ class Bridge:
         self.updater = updater  # updater.UpdateOnClose : passage de forever update à la fermeture du jeu (décision 227)
         self.heartbeat = heartbeat
         self.cards = cards  # cards.CardSource : cartes « À valider » publiées (P06b)
+        self.actions = actions  # actions.ActionHandler : Mettre à jour, Valider, Refuser (bloc B)
+        self.update_watch = update_watch  # updater.UpdateWatch : fin d'un passage publiée aussitôt
+        self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
         self.last_cards_check: float | None = None
         self.fragments = FragmentBuffer()
@@ -336,7 +342,8 @@ class Bridge:
         self._publish(self.first_slot, reason)
 
     def _action(self, record: Record, flag: str) -> None:
-        """Action `a=…` : jamais confiée à l'agent. Bloc A : seule la carte de test est connue ; rien n'est lancé."""
+        """Action `a=…` : jamais confiée à l'agent. Carte de test : notée, rien de lancé ; Mettre à jour, Valider et
+        Refuser : commande fixée de `actions.ActionHandler` ; tout le reste est refusé."""
         parsed = parse_action(flag)
         action, target = parsed if parsed else (None, None)
         card = card_for(self.card_list, action, target) if action else None
@@ -346,6 +353,12 @@ class Bridge:
             text = f"Carte de test : « {label} » reçu par le pont ; rien n'est lancé."
             self.cards.done(str(card["id"]))
             self._check_cards(self.clock(), force=True)
+        elif action in ("update", "approve", "reject") and self.actions is not None:
+            try:
+                result, text = self.actions.handle(str(action), target)
+            except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
+                result, text = "erreur", f"Action non traitée : {type(exc).__name__}: {exc}"
+            self.last_refresh = None  # attentes et passage relus au pas suivant
         else:
             result = "refusée"
             if parsed is None:
@@ -485,6 +498,17 @@ class Bridge:
             except Exception as exc:  # noqa: BLE001 : le lancement de la mise à jour ne doit jamais arrêter le pont
                 self.journal.write("error", where="mise à jour à la fermeture", error=f"{type(exc).__name__}: {exc}")
         self._check_cards(now)
+        if self.update_watch is not None and (
+            self.last_update_check is None or now - self.last_update_check >= UPDATE_CHECK_S
+        ):
+            self.last_update_check = now
+            try:
+                if self.update_watch.changed():
+                    self.last_refresh = None  # passage commencé ou fini : état et cartes republiés aussitôt
+            except Exception as exc:  # noqa: BLE001 : la surveillance ne doit jamais arrêter le pont
+                self.journal.write(
+                    "error", where="surveillance de forever update", error=f"{type(exc).__name__}: {exc}"
+                )
         if self.last_refresh is None or now - self.last_refresh >= REFRESH_S:
             self.refresh()
         self._capture(now)

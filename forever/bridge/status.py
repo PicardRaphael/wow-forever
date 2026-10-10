@@ -20,9 +20,10 @@ _LABELS = 3
 
 
 def status_payload(deps: Deps, *, addon: str | None = None, addon_files: list[str] | None = None) -> dict[str, Any]:
-    """Version, fraîcheur et âge, couverture du registre, intégrité, attentes (nombre et trois premiers libellés),
-    passage en cours, état de l'addon installé (`addon`, clé de ADDON_LINES, et ses fichiers à remplacer) ; `line` :
-    la ligne affichée en tête de la fenêtre."""
+    """Version, fraîcheur et âge, couverture du registre, intégrité, attentes (nombre et trois premiers libellés ;
+    P06b : `approvable`, attentes que Valider et Refuser traitent, et `waiting`, les autres attentes ouvertes),
+    passage en cours et dernier passage (`update`), état de l'addon installé (`addon`, clé de ADDON_LINES, et ses
+    fichiers à remplacer) ; `line` : la ligne affichée en tête de la fenêtre."""
     payload: dict[str, Any] = {
         "version": None,
         "freshness": "unknown",
@@ -31,7 +32,10 @@ def status_payload(deps: Deps, *, addon: str | None = None, addon_files: list[st
         "integrity_ok": None,
         "pending": 0,
         "pending_labels": [],
+        "approvable": 0,
+        "waiting": 0,
         "running": False,
+        "update": {"running": False, "step": None, "last": None},
         "client": None,
         "addon": addon,
         "addon_files": list(addon_files or []),
@@ -58,13 +62,28 @@ def status_payload(deps: Deps, *, addon: str | None = None, addon_files: list[st
     except Exception:  # noqa: BLE001 : l'état affiché ne doit jamais arrêter le pont
         payload["version"] = None
     try:
+        from forever.bridge.actions import approvable
         from forever.update import update_summary
 
         summary = update_summary(deps.cache_dir, deps.now())
         pending = summary["pending"]
         payload["pending"] = len(pending)
         payload["pending_labels"] = [str(p.get("summary") or p.get("kind") or p.get("id")) for p in pending[:_LABELS]]
+        payload["approvable"] = sum(1 for p in pending if approvable(p))
+        payload["waiting"] = len(pending) - payload["approvable"]
         payload["running"] = bool(summary["running"])
+        last = summary.get("last")
+        payload["update"] = {
+            "running": bool(summary["running"]),
+            "step": summary.get("running_step"),
+            "last": None
+            if not last or not last.get("finished_at")
+            else {
+                "finished_at": last.get("finished_at"),
+                "written": len(last.get("written") or []),
+                "approvable": payload["approvable"],
+            },
+        }
     except Exception:  # noqa: BLE001 : attentes inconnues, l'état des données reste affiché
         payload["pending_labels"] = []
     payload["line"] = status_line(payload)
@@ -80,24 +99,31 @@ def _newer(client: Any, data: Any) -> bool:
 
 
 def status_line(payload: Mapping[str, Any]) -> str:
-    """« Données <version> · <fraîcheur> · <n> mise(s) à jour à valider sur le PC » ; client plus récent que les
-    données : « client <version> : mise à jour en attente » au lieu de la fraîcheur (« à jour » serait trompeur)."""
+    """« Données <version> · client <version> · <fraîcheur> · <n> à valider · <m> en attente » (P06b, décision 235) :
+    client toujours affiché quand il est connu ; plus récent que les données : « client <version> : mise à jour en
+    attente » au lieu de la fraîcheur (« à jour » serait trompeur) ; « à valider » ne compte que les attentes
+    approuvables (Valider, Refuser), « en attente » les autres attentes ouvertes."""
     if not payload.get("version"):
         return "Données : état illisible (lancer uv run forever status)"
     client = payload.get("client")
+    parts = [f"Données {payload['version']}"]
     if client and _newer(client, payload["version"]):
-        state = f"client {client} : mise à jour en attente"
+        parts.append(f"client {client} : mise à jour en attente")
     else:
-        state = FRESHNESS_FR.get(str(payload.get("freshness")), "fraîcheur inconnue")
-    parts = [f"Données {payload['version']}", state]
+        if client:
+            parts.append(f"client {client}")
+        parts.append(FRESHNESS_FR.get(str(payload.get("freshness")), "fraîcheur inconnue"))
     if payload.get("integrity_ok") is False:
         parts.append("données altérées")
     if payload.get("running"):
-        parts.append("mise à jour en cours")
-    pending = int(payload.get("pending") or 0)
-    if pending:
-        plural = "s" if pending > 1 else ""
-        parts.append(f"{pending} mise{plural} à jour à valider sur le PC")
+        step = (payload.get("update") or {}).get("step")
+        parts.append(f"mise à jour en cours ({step})" if step else "mise à jour en cours")
+    approvable = int(payload.get("approvable") or 0)
+    waiting = int(payload.get("waiting") or 0)
+    if approvable:
+        parts.append(f"{approvable} à valider")
+    if waiting:
+        parts.append(f"{waiting} en attente")
     addon = ADDON_LINES.get(str(payload.get("addon")))
     if addon:
         parts.append(addon)
