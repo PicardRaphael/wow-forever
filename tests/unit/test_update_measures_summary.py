@@ -174,3 +174,30 @@ def test_status_renders_the_measure_summary(make_deps, capsys):
     assert "PV par niveau : niv. 7 : 100 → 111" in out
     assert f"builds qui changeraient après rejeu : mage_build {CHANGED_CASE} (15 inchangé(s))" in out
     assert "non rejoué(s) : mage_leveling sim-leveling-20 (sans rejeu automatique)" in out
+
+
+def test_only_newly_excluded_npcs_are_listed(make_deps, capsys):
+    details = {
+        **DETAILS,
+        "excluded": [*DETAILS["excluded"], {"npc_id": 900004, "name": "Old Outlier", "reason": "déjà", "new": False}],
+    }
+    builds = {"replayed": False, "base": "update-x-y", "reason": "simulation : cas à rejouer, non calculé"}
+    summary = measure_summary(details, HP_LEVELS, builds)
+    assert "1 nouvellement écarté(s) (2 écarté(s) en tout)" in summary["measures"]["sentence"]
+    deps = make_deps()
+    record_pending(deps.cache_dir, entry("measures-open", summary))
+    assert main(["update", "status"], deps) == 0
+    out = capsys.readouterr().out
+    assert "Old Outlier" not in out and "1 déjà écarté(s), non listé(s)" in out
+    assert "builds : non rejoués (simulation : cas à rejouer, non calculé)" in out
+
+
+def test_a_listing_replay_says_why_nothing_was_compared(logs, tmp_path):  # noqa: F811
+    deps = logs([(LOCAL_VERSION, 1)])
+
+    def listing(engine, case, data_dir):
+        return {"rejoué": False, "raison": "simulation : cas à rejouer, non calculé"}
+
+    report = run_update(deps, JOURNALS, replay=listing, measure=PreviewMeasure(tmp_path))
+    builds = report["pending"][0]["summary"]["measures"]["builds"]
+    assert builds["replayed"] is False and builds["reason"] == "simulation : cas à rejouer, non calculé"

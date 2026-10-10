@@ -1397,13 +1397,10 @@ def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[
                 changed.append({"engine": engine, "case": case})
             else:
                 unchanged += 1
-    return {
-        "replayed": bool(changed) or unchanged > 0,
-        "base": base,
-        "changed": changed,
-        "unchanged": unchanged,
-        "not_replayed": skipped,
-    }
+    if not changed and not unchanged:  # aucun cas comparé (simulation, moteurs sans rejeu automatique)
+        reason = str(skipped[0]["reason"]) if skipped else "aucun cas à rejouer"
+        return {"replayed": False, "base": base, "reason": reason, "not_replayed": skipped}
+    return {"replayed": True, "base": base, "changed": changed, "unchanged": unchanged, "not_replayed": skipped}
 
 
 def measure_summary(
@@ -1415,14 +1412,10 @@ def measure_summary(
     npcs = {k: list(details.get(k) or []) for k in ("added", "changed", "removed", "excluded")}
     counts = ", ".join(
         f"{len(npcs[key])} {label}"
-        for key, label in (
-            ("added", "ajouté(s)"),
-            ("changed", "changé(s)"),
-            ("removed", "retiré(s)"),
-            ("excluded", "écarté(s)"),
-        )
+        for key, label in (("added", "ajouté(s)"), ("changed", "changé(s)"), ("removed", "retiré(s)"))
     )
-    parts = [f"PNJ : {counts}"]
+    fresh = sum(1 for n in npcs["excluded"] if n.get("new"))
+    parts = [f"PNJ : {counts}, {fresh} nouvellement écarté(s) ({len(npcs['excluded'])} écarté(s) en tout)"]
     if hp_by_level:
         parts.append(f"PV par niveau : {len(hp_by_level)} niveau(x)")
     if builds.get("replayed"):
@@ -1473,12 +1466,15 @@ def measure_summary_lines(summary: Mapping[str, Any] | None) -> list[str]:
     removed = [f"{n.get('name')} ({n.get('npc_id')})" for n in npcs.get("removed", [])]
     if removed:
         lines.append(f"PNJ retirés : {_listed(removed)}")
+    # écartés de la courbe : les nouveaux seulement, avec leur raison (les autres sont déjà dans monsters.json)
     excluded = [
-        f"{n.get('name')} ({n.get('npc_id')}) : {n.get('reason')}" + (" (nouveau)" if n.get("new") else "")
+        f"{n.get('name')} ({n.get('npc_id')}) : {n.get('reason')} (nouveau)"
         for n in npcs.get("excluded", [])
+        if n.get("new")
     ]
+    kept = sum(1 for n in npcs.get("excluded", []) if not n.get("new"))
     if excluded:
-        lines.append(f"PNJ écartés : {_listed(excluded)}")
+        lines.append(f"PNJ écartés : {_listed(excluded)}" + (f" ; {kept} déjà écarté(s), non listé(s)" if kept else ""))
     levels = doc.get("hp_by_level") or {}
     if levels:
         shown = [
