@@ -1441,6 +1441,7 @@ def _step_logs(run: _Run) -> Step:
         if writing:
             detail += f" ; {len(writing)} en cours d'écriture, reproposé(s) au passage suivant"
         return Step("journaux", "rien", detail, data)
+    _close_stale_measures(run, installed)
     measure = run.measure or _default_measure
     result = measure(run.deps, run.base_data, fresh)
     engine_files = _engine_files()
@@ -1458,25 +1459,208 @@ def _step_logs(run: _Run) -> Step:
     pending_id = f"measures-{installed}-{digest}"
     rebuilt = _measure_builds(run, pending_id, installed, result)
     summary = measure_summary(result.get("details") or {}, result.get("hp_by_level") or {}, rebuilt)
-    run.pending.append(
+    no_change = _no_advice_change(rebuilt)
+    approved = _approved(run, pending_id)
+    approved_from = None if approved or no_change else _carried_approval(run, installed, keep, rebuilt)
+    entry = {
+        "id": pending_id,
+        "kind": "measures",
+        "action": "attente",
+        "version": installed,
+        "revision": None,
+        "clauses": {"inputs": False, "advice": no_change},
+        "reasons": [f"mesure des journaux qui change une entrée des moteurs : {touched}", _advice_reason(rebuilt)],
+        "summary": summary,
+        "logs": keep,
+        "log_shas": {n: shas[n] for n in keep},
+        "created_at": run.now,
+        "base": {"origin_main": run.origin_main, "version": installed},
+        "commands": [f"forever update approve {pending_id}"],
+    }
+    _replace_measures(run, installed, pending_id)
+    if no_change and not approved and run.options.auto and first_write_guard(run.deps.cache_dir):
+        no_change = False  # garde-fou de la décision 184 : première écriture de --auto sur accord
+        entry["reasons"].append(GUARD_REASON)
+    if no_change or approved or approved_from is not None:
+        if approved_from is not None and not run.options.dry_run:
+            _record_carried(run, entry, approved_from)
+        written = _write_measure(
+            run, entry, result, approved=approved or approved_from is not None, approved_from=approved_from
+        )
+        return written._replace(data={**data, **written.data})
+    run.pending.append(entry)
+    return Step(
+        "journaux",
+        "attente",
+        f"{len(keep)} journal(aux) mesuré(s) : {_advice_reason(rebuilt)}{held_note}",
+        data,
+    )
+
+
+def _no_advice_change(builds: Mapping[str, Any]) -> bool:
+    """Vrai si le rejeu a comparé les cas des builds du Mage et qu'aucun conseil ne change (décision 230) ; les cas de
+    la simulation du leveling (`mage_leveling`) n'ont pas de rejeu automatique et ne comptent pas."""
+    skipped_build = any(s.get("engine") == "mage_build" for s in builds.get("not_replayed") or [])
+    return bool(builds.get("replayed")) and not builds.get("changed") and not skipped_build
+
+
+def _advice_reason(builds: Mapping[str, Any]) -> str:
+    if not builds.get("replayed"):
+        return f"rejeu non fait ({builds.get('reason')}) : aucun conseil n'a pu être comparé"
+    changed = [f"{c['engine']} {c['case']}" for c in builds.get("changed") or []]
+    if changed:
+        return f"conseil changé après rejeu : {', '.join(changed)}"
+    return "aucun conseil ne change après rejeu"
+
+
+def _advice_signature(builds: Mapping[str, Any]) -> tuple[Any, ...]:
+    changed = sorted(f"{c['engine']}:{c['case']}" for c in builds.get("changed") or [])
+    after = builds.get("after") or {}
+    return tuple((key, json.dumps(after.get(key), sort_keys=True, ensure_ascii=False)) for key in changed)
+
+
+def _carried_approval(run: _Run, installed: str, logs: Sequence[str], builds: Mapping[str, Any]) -> str | None:
+    """Attente de mesure approuvée de la même version que celle-ci remplace sans changer aucun conseil (décision 230) :
+    ses journaux sont tous repris, les mêmes cas changent vers le même conseil. Rend son identifiant, sinon None."""
+    if not builds.get("replayed"):
+        return None
+    mine = _advice_signature(builds)
+    for old in list_pending(run.deps.cache_dir):
+        if old.get("kind") != "measures" or old.get("state") != "approuvée" or old.get("version") != installed:
+            continue
+        kept = ((old.get("summary") or {}).get("measures") or {}).get("builds") or {}
+        if set(old.get("logs") or []) <= set(logs) and kept.get("replayed") and _advice_signature(kept) == mine:
+            return str(old["id"])
+    return None
+
+
+def _replace_measures(run: _Run, installed: str, pending_id: str) -> None:
+    """Attentes de mesure ouvertes de la même version, autres que `pending_id` : remplacées par celle-ci, `périmée`
+    (une approbation remplacée ne reste jamais « approuvée », décision 230)."""
+    if run.options.dry_run:
+        return
+    for old in list_pending(run.deps.cache_dir):
+        same = old.get("kind") == "measures" and old.get("version") == installed and old.get("id") != pending_id
+        if same and old.get("state") in OPEN_STATES:
+            _set_state(run.deps.cache_dir, str(old["id"]), "périmée", stale_reason=f"remplacée par {pending_id}")
+
+
+def _close_stale_measures(run: _Run, installed: str) -> None:
+    """Attentes de mesure ouvertes d'une autre version que la version installée : `périmée` (leurs journaux sont
+    tenus pour leur version, la table mesurée n'est plus celle de la version installée)."""
+    if run.options.dry_run:
+        return
+    for old in list_pending(run.deps.cache_dir):
+        if old.get("kind") == "measures" and old.get("state") in OPEN_STATES and old.get("version") != installed:
+            _set_state(run.deps.cache_dir, str(old["id"]), "périmée", stale_reason=f"version installée : {installed}")
+
+
+def _record_carried(run: _Run, entry: Mapping[str, Any], approved_from: str) -> None:
+    """Attente qui reprend l'approbation d'une attente remplacée sans changement de conseil : enregistrée
+    `approuvée` (écrite à ce passage, ou au suivant si l'écriture n'aboutit pas)."""
+    _write(
+        _pending_path(run.deps.cache_dir, str(entry["id"])),
+        {**entry, "state": "approuvée", "approved_at": run.now, "approved_from": approved_from},
+    )
+
+
+def _measure_revision(data: Path, version: str, logs: Mapping[str, str], *, date: str, command: str) -> int:
+    """Révision de `version` dans la copie `data` où la mesure est écrite (décision 230) : `sources.json` (révision,
+    date) et une entrée de `revisions.json` qui garde les journaux mesurés et leurs empreintes (`_written_logs` les
+    reconnaît au passage suivant) ; manifeste réécrit. Rend le numéro de la révision."""
+    from forever.manifest import write_manifest
+
+    vdir = data / version
+    n = _revision(data, version) + 1
+    sources = _read(vdir / "sources.json")
+    if isinstance(sources, dict):
+        sources.update(revision=n, revised_at=date)
+        (vdir / "sources.json").write_bytes((json.dumps(sources, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    history = _read(vdir / "revisions.json")
+    if not isinstance(history, dict):
+        history = {"schema_version": 1, "version": version, "revisions": []}
+    history.setdefault("revisions", []).append(
         {
-            "id": pending_id,
-            "kind": "measures",
-            "action": "attente",
-            "version": installed,
-            "revision": None,
-            "clauses": {"inputs": False},
-            "reasons": [f"mesure des journaux qui change une entrée des moteurs : {touched}"],
-            "summary": summary,
-            "logs": keep,
-            "created_at": run.now,
-            "base": {"origin_main": run.origin_main, "version": installed},
-            "commands": ["forever measures refresh (session, après accord)"],
+            "revision": n,
+            "date": date,
+            "motif": "mesure des journaux de combat (table des monstres, forever update)",
+            "command": command,
+            "sources": {"logs": dict(logs)},
+            "changes": [{"file": "monsters.json", "rule": "measure"}],
         }
     )
-    return Step(
-        "journaux", "attente", f"{len(keep)} journal(aux) mesuré(s) : une entrée des moteurs change{held_note}", data
-    )
+    (vdir / "revisions.json").write_bytes((json.dumps(history, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
+    write_manifest(data)
+    return n
+
+
+def _measure_report(verdict: Mapping[str, Any]) -> str:
+    builds = ((verdict.get("summary") or {}).get("measures") or {}).get("builds") or {}
+    lines = [
+        f"# Mesure des journaux : {verdict['version']} r{verdict['revision']}",
+        "",
+        summary_text(verdict.get("summary")) + ".",
+        "",
+        f"Journaux mesurés : {', '.join(verdict.get('logs') or [])}.",
+        "",
+        (
+            f"Rejeu : {builds.get('unchanged', 0)} cas inchangé(s), {len(builds.get('changed') or [])} changé(s) ; "
+            f"{_advice_reason(builds)}."
+        ),
+        "",
+        "Règle d'automatisme : "
+        + (f"approuvée ({verdict.get('approved_from') or verdict['id']})." if verdict.get("approved") else "tenue."),
+        "",
+    ]
+    return "\n".join(lines)
+
+
+def _write_measure(
+    run: _Run, entry: Mapping[str, Any], result: Mapping[str, Any], *, approved: bool, approved_from: str | None
+) -> Step:
+    """Écrit la mesure (décision 230) : la copie où elle est écrite (`preview`) devient une révision de la version
+    installée, publiée comme une version par le clone (vérification des données, CI, fusion)."""
+    version = str(entry["version"])
+    revision = _revision(run.base_data, version) + 1
+    preview = Path(result["preview"])
+    inputs = compare_inputs(run.base_data / version, preview / version)
+    doc = {
+        **{k: entry[k] for k in ("id", "kind", "version", "logs", "summary")},
+        "revision": revision,
+        "action": "écrire",
+        "rule_action": "écrire" if not approved else "attente",
+        "approved": approved,
+        "approved_from": approved_from,
+        "clauses": dict(entry["clauses"]),
+        "reasons": list(entry["reasons"]),
+        "carry": {},
+        "superseded": [],
+        "inputs": _inputs_doc(inputs),
+        "hotfixes": {"gate": "lire", "read": True, "lost": [], "lost_count": 0},
+    }
+    run.verdicts.append(doc)
+    pending_id = str(entry["id"])
+    if run.options.dry_run:
+        return Step("journaux", "fait", f"mesure {pending_id} : écriture simulée ({_rule(doc)})", {"id": pending_id})
+    if not run.writable:
+        return Step("journaux", "arrêt", f"mesure {pending_id} : {_rule(doc)}, mais clone non disponible", {})
+    blocked = _blocked_before(run, pending_id)
+    if blocked is not None:
+        run.pending.append(blocked)
+        why = "; ".join(blocked.get("reasons", []))
+        return Step("journaux", "arrêt", f"mesure {pending_id} : déjà bloquée sur ce main ({why})", {"id": pending_id})
+    command = AUTO_COMMAND if run.options.auto else "forever update"
+    _measure_revision(preview, version, entry["log_shas"], date=run.now[:10], command=command)
+    return _publish(
+        run, step="journaux", version=version, revision=revision, stage=preview, plan=None, verdict=doc,
+        report=_measure_report(doc),
+    )  # fmt: skip
+
+
+def _rule(doc: Mapping[str, Any]) -> str:
+    if doc.get("approved"):
+        return f"approuvée ({doc.get('approved_from') or doc['id']})"
+    return "aucun conseil ne change, règle tenue"
 
 
 def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[str, Any]) -> dict[str, Any]:
@@ -1501,6 +1685,7 @@ def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[
     except Exception as exc:  # noqa: BLE001 : un rejeu en échec ne doit pas perdre l'attente de mesure
         return {"replayed": False, "base": base, "reason": f"rejeu en échec : {type(exc).__name__}: {exc}"}
     changed: list[dict[str, str]] = []
+    after_advice: dict[str, Any] = {}
     skipped: list[dict[str, Any]] = []
     unchanged = 0
     for engine, cases in replayed.items():
@@ -1513,12 +1698,20 @@ def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[
                 skipped.append({"engine": engine, "case": case, "reason": not_run.get("raison")})
             elif sides["avant"] != sides["après"]:
                 changed.append({"engine": engine, "case": case})
+                after_advice[f"{engine}:{case}"] = _plain(sides["après"])
             else:
                 unchanged += 1
     if not changed and not unchanged:  # aucun cas comparé (simulation, moteurs sans rejeu automatique)
         reason = str(skipped[0]["reason"]) if skipped else "aucun cas à rejouer"
         return {"replayed": False, "base": base, "reason": reason, "not_replayed": skipped}
-    return {"replayed": True, "base": base, "changed": changed, "unchanged": unchanged, "not_replayed": skipped}
+    return {
+        "replayed": True,
+        "base": base,
+        "changed": changed,
+        "after": after_advice,  # conseil après de chaque cas changé : approbation reprise (décision 230)
+        "unchanged": unchanged,
+        "not_replayed": skipped,
+    }
 
 
 def measure_summary(
@@ -1732,6 +1925,7 @@ def _publish(
     plan: Any,
     verdict: Mapping[str, Any],
     lines: Mapping[str, Sequence[Any]] | None = None,
+    report: str | None = None,
 ) -> Step:
     from forever.pipeline import gitops
 
@@ -1745,7 +1939,8 @@ def _publish(
     _annotate_revision(data / version, verdict, AUTO_COMMAND if run.options.auto else "forever update")
     report_rel = f"docs/research/data-{version}-r{revision}.md"
     (clone / report_rel).parent.mkdir(parents=True, exist_ok=True)
-    (clone / report_rel).write_bytes(_research_report(plan, verdict, lines).encode("utf-8"))
+    text = report if report is not None else _research_report(plan, verdict, lines)
+    (clone / report_rel).write_bytes(text.encode("utf-8"))
     _render_inventory(data, clone / INVENTORY_DOC)
     run.say(f"{step} : uv sync dans le clone")
     synced = runner(["uv", "sync", "--frozen", "--offline"], clone, None)

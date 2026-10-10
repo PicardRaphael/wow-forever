@@ -135,15 +135,25 @@ def longest_first(cases: Sequence[str]) -> list[str]:
     return sorted(cases, key=lambda c: (_CONTEXT_WEIGHT.get(split_case(c)[0], 1), split_case(c)[1]), reverse=True)
 
 
+def beam_plan(cases: Sequence[str], cpus: int) -> list[int]:
+    """Processus des faisceaux de chaque cas (dans l'ordre de `cases`, déjà trié du plus long au plus court) : un
+    processus par cas, puis les cœurs restants aux cas de leveling, les plus longs d'abord (chemin critique du rejeu),
+    jusqu'à `MAX_BEAM_WORKERS` chacun."""
+    plan = [1] * len(cases)
+    spare = max(0, cpus - min(len(cases), cpus))
+    for i, case in enumerate(cases):
+        if split_case(case)[0] != "leveling" or spare <= 0:
+            continue
+        extra = min(MAX_BEAM_WORKERS - 1, spare)
+        plan[i] += extra
+        spare -= extra
+    return plan
+
+
 def worker_budget(cases: Sequence[str], cpus: int) -> tuple[int, int]:
-    """(processus pour les cas, processus par cas de leveling pour ses faisceaux) : un processus par cas tant qu'il
-    y a des cœurs ; les cœurs restants vont aux faisceaux des cas de leveling, sans dépasser `MAX_BEAM_WORKERS`."""
+    """(processus pour les cas, plus grand nombre de processus de faisceaux d'un cas) : `beam_plan` résumé."""
     outer = max(1, min(len(cases), cpus))
-    leveling = sum(1 for c in cases if split_case(c)[0] == "leveling")
-    if not leveling:
-        return outer, 1
-    spare = max(0, cpus - outer)
-    return outer, max(1, min(MAX_BEAM_WORKERS, 1 + spare // leveling))
+    return outer, max(beam_plan(longest_first(cases), cpus), default=1)
 
 
 def replay_cases(
@@ -172,9 +182,10 @@ def replay_cases(
     order = longest_first([c for c, _, _ in todo])
     todo.sort(key=lambda job: order.index(job[0]))
     outer, beams = worker_budget([c for c, _, _ in todo], cpus)
+    plan = beam_plan([c for c, _, _ in todo], cpus)
     if log is not None:
         cached = len(out)
-        log(f"rejeu : {len(todo)} cas à calculer ({cached} repris du cache), {outer} processus, faisceaux sur {beams}")
+        log(f"rejeu : {len(todo)} cas à calculer ({cached} repris du cache), {outer} processus, faisceaux du leveling sur {beams} au plus")
     if compute is not None or outer == 1:
         for case, data_dir, path in todo:
             start = time.perf_counter()
@@ -185,7 +196,7 @@ def replay_cases(
         return out
     request = {
         "workers": outer,
-        "jobs": [[case, str(d), str(path), beams if split_case(case)[0] == "leveling" else 1] for case, d, path in todo],
+        "jobs": [[case, str(d), str(path), n] for (case, d, path), n in zip(todo, plan, strict=True)],
     }
     for line in _run_child(request, cache_dir):
         if log is not None:

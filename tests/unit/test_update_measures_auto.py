@@ -29,7 +29,8 @@ from forever.update import (
 )
 
 JOURNALS = UpdateOptions(dry_run=True, only=frozenset({"journaux"}))
-RECORDED = UpdateOptions(only=frozenset({"journaux"}))  # attentes enregistrées (sans clone : rien n'est poussé)
+# attentes enregistrées, hors réseau : aucun clone, rien n'est poussé
+RECORDED = UpdateOptions(only=frozenset({"journaux"}), network=False)
 
 
 class SameReplay:

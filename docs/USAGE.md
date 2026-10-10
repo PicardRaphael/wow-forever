@@ -105,8 +105,22 @@ première écriture de `forever update --auto` reste en attente de `forever upda
 mesure (`measures`) porte son résumé dans `forever update status` : PNJ ajoutés et changés (PV par niveau), retirés,
 nouvellement écartés de la courbe avec leur raison, niveaux dont les PV changent, et cas des builds du Mage qui
 changeraient après rejeu (« après » : la mesure écrite dans une copie des données par `forever measures refresh
---into`, sans instantané ; rejoué une fois par attente, une quinzaine de minutes par côté ; décision 227). Un journal
-de combat n'est noté comme mesuré qu'une fois sa mesure écrite par `forever measures refresh` (décision 187). Un journal écrit sous une version antérieure n'est jamais mesuré dans la version installée, sauf accord explicite et tracé : `forever measures refresh --accept-version <version> --accept-reason "…"` (raison obligatoire, par exemple la note officielle qui ne touche pas ces monstres ; trace dans les notes de `monsters.json` et sa source dans `sources.json`, décision 221).
+--into`, sans instantané ; décision 227). **Décision 230** : une mesure dont le rejeu ne change aucun conseil des
+builds du Mage (talents, choix, alternative) **s'écrit seule**, en révision de la version installée publiée par le
+clone (`revisions.json` garde ses journaux) ; elle n'attend un accord que si un conseil change ou si le rejeu n'a rien
+pu comparer. Une attente approuvée s'écrit au passage suivant ; remplacée par une mesure qui ajoute des journaux sans
+changer aucun conseil (mêmes cas, même conseil après), elle passe son approbation à la nouvelle et devient
+`périmée` ; toute attente de mesure remplacée, ou d'une version qui n'est plus installée, devient `périmée`. Rejeu
+(décision 230) : seuls les cas concernés par ce qui change sont rejoués (un changement de la seule table des monstres :
+leveling et donjon, dont le scénario de paquet lit les PV des monstres ; ni le raid ni le PvP) ; chaque cas est gardé
+en cache (`<cache>/builds/update-<version>-<empreinte>/`, avec l'empreinte du code du calcul), si bien que le côté
+« avant » n'est presque jamais recalculé ; les cas sont répartis sur les cœurs (`python -m forever.replay`) et les
+départs du leveling calculés en parallèle. Téléchargements (décision 230) : chaque table est essayée trois fois
+(délai doublé à chaque essai, attente croissante entre deux essais, chaque essai au journal du passage) ; les tables
+de noms français (frFR) sont facultatives : la version s'installe sans elles, `sources.json` note `missing_names`, et
+un passage suivant les ajoute en révision, écrite seule (les noms affichés ne sont pas une entrée des moteurs) ; une
+table de calcul encore en échec crée une attente `network`, non approuvable, retentée et levée seule au passage
+suivant. Un journal de combat n'est noté comme mesuré qu'une fois sa mesure écrite (décision 187). Un journal écrit sous une version antérieure n'est jamais mesuré dans la version installée, sauf accord explicite et tracé : `forever measures refresh --accept-version <version> --accept-reason "…"` (raison obligatoire, par exemple la note officielle qui ne touche pas ces monstres ; trace dans les notes de `monsters.json` et sa source dans `sources.json`, décision 221).
 
 Tâche planifiée Windows « WoW Forever - mise à jour » (décision 226) : `forever update --auto`, comme le hook
 de démarrage (même verrou `<cache>/update/lock`, même journal `<cache>/update/run-<horodatage>.log`), chaque jour à
