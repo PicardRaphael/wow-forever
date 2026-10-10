@@ -1,6 +1,8 @@
 """Installation de ForeverBridge dans le client (P06a) : copie de `addon/ForeverBridge`, fichiers de contrôle des
 drapeaux (`ctl/`) et addon de sonde chargé à la demande (`ForeverBridge_Probe`). Le client ne voit que les fichiers
-présents à son lancement : installer jeu fermé, puis le relancer.
+présents à son lancement : installer jeu fermé, puis le relancer. Emplacements et sondes portent `## Group:
+ForeverBridge` (décision 228) : une seule ligne repliable « ForeverBridge » dans la liste des addons du jeu, comme les
+modules d'AtlasLoot ou de Naowh Forever ; leur chargement à la demande ne change pas.
 
 Fichiers de contrôle (autotest `/fv diag`) : `empty` (vide, ne doit pas jouer), `valid` (son valide, doit jouer),
 `flip` (vide à l'installation, rempli par `touch_probe` pendant que le jeu tourne), `late` (absent à l'installation,
@@ -98,6 +100,7 @@ def _probe_toc(title: str = "sonde", command: str = "/fv diag", lua: str = "Prob
             f"## Notes: Sonde du pont de forever-core, chargée à la demande par {command} (P06a).",
             "## LoadOnDemand: 1",
             f"## Dependencies: {ADDON}",
+            f"## Group: {ADDON}",
             "",
             lua,
             "",
@@ -148,6 +151,7 @@ def _slot_toc(index: int) -> str:
             "## Notes: Réponses du pont de forever-core, chargées à la demande (P06a).",
             "## LoadOnDemand: 1",
             f"## Dependencies: {ADDON}",
+            f"## Group: {ADDON}",
             "",
             "Inbox.lua",
             "",

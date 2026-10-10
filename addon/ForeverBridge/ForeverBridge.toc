@@ -4,6 +4,7 @@
 ## Author: forever-core
 ## Version: 0.1.0
 ## SavedVariables: ForeverBridgeDB
+## Group: ForeverBridge
 
 Codec.lua
 Status.lua
