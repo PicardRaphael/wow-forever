@@ -20,6 +20,7 @@ class BridgeState:
     handled: dict[str, list[int]] = field(default_factory=dict)
     session: str | None = None
     replies: list[dict[str, Any]] = field(default_factory=list)
+    sessions: dict[str, str] = field(default_factory=dict)  # autres conversations (« addons », P06b)
     addon_updated_at: str | None = None  # réinstallation de l'addon par le pont, annoncée jusqu'à la partie suivante
     addon_seen_running: bool = False
     _lock: threading.Lock = field(default_factory=threading.Lock, repr=False, compare=False)
@@ -40,7 +41,9 @@ class BridgeState:
         replies = [r for r in doc.get("replies") or [] if isinstance(r, dict)]
         session = doc.get("session") if isinstance(doc.get("session"), str) else None
         updated = doc.get("addon_updated_at") if isinstance(doc.get("addon_updated_at"), str) else None
+        sessions = {str(k): str(v) for k, v in (doc.get("sessions") or {}).items() if isinstance(v, str)}
         return cls(
+            sessions=sessions,
             path=path,
             handled=handled,
             session=session,
@@ -72,6 +75,14 @@ class BridgeState:
             self.session = session
             self.save()
 
+    def set_conversation_session(self, name: str, session: str | None) -> None:
+        with self._lock:
+            if session:
+                self.sessions[name] = session
+            else:
+                self.sessions.pop(name, None)
+            self.save()
+
     def set_addon_notice(self, updated_at: str | None, *, seen_running: bool = False) -> None:
         with self._lock:
             self.addon_updated_at = updated_at
@@ -80,7 +91,12 @@ class BridgeState:
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        doc: dict[str, Any] = {"handled": self.handled, "session": self.session, "replies": self.replies}
+        doc: dict[str, Any] = {
+            "handled": self.handled,
+            "session": self.session,
+            "sessions": self.sessions,
+            "replies": self.replies,
+        }
         if self.addon_updated_at:
             doc["addon_updated_at"] = self.addon_updated_at
             doc["addon_seen_running"] = self.addon_seen_running

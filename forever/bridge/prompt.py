@@ -32,6 +32,23 @@ Chaque message commence par le contexte de son personnage, envoyé par le jeu, p
 """
 
 
+ADDONS_PROMPT = """\
+Tu modifies un addon World of Warcraft: Forever de l'utilisateur, dans le dossier de travail seulement (Lua 5.1 du
+client de WoW, fichiers .toc). Règles de l'addon :
+- chaque `RegisterEvent` et chaque API incertaine sous `pcall` ; SavedVariable initialisée dans le gestionnaire
+  d'`ADDON_LOADED`, jamais d'alias local au niveau du fichier ;
+- aucune fonction d'action (`CastSpell*`, `UseAction`, `RunMacro*`, `CreateMacro`, `SendChatMessage`), aucun
+  `ReloadUI`, aucun abonnement au journal de combat ;
+- ne supprime aucun fichier ; ne touche à rien hors du dossier de travail.
+Réponse courte en français : résumé des fichiers changés, puis « tapez /reload pour essayer ».
+"""
+
+
+def addons_message(name: str, question: str) -> str:
+    """Message de la conversation « addons » : le dossier de l'addon, puis la demande du joueur."""
+    return f"Conversation « addons » (dossier {name}) :\n{question}"
+
+
 def message_text(
     record: Record, *, talents: str | None = None, guide: str | None = None, profile: str | None = None
 ) -> str:

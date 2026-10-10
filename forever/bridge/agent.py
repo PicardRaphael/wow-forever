@@ -479,5 +479,45 @@ def addons_argv(
     session_id: str | None = None,
     model: str | None = None,
 ) -> list[str]:
-    """Ligne de `claude` de la conversation « addons » (P06b, bloc F)."""
-    raise NotImplementedError
+    """Ligne de `claude` de la conversation « addons » (P06b, bloc F, décision 235) : outils de fichiers seulement
+    (aucun shell, aucun outil web, aucun serveur MCP : configuration vide), limités au dossier de travail (`folder`, le
+    dossier de l'addon) par des règles relatives et `--restricted` ; sonde 0.2 du 2026-10-10 : une écriture, une
+    lecture, un Grep et un Glob hors du dossier sont refusés."""
+    del folder  # le dossier est le dossier de travail du processus (cwd), les règles lui sont relatives
+    args = [
+        claude,
+        "-p",
+        "--output-format",
+        "stream-json",
+        "--verbose",
+        "--tools",
+        ",".join(ADDONS_TOOLS),
+        "--restricted",
+        "--strict-mcp-config",
+        "--mcp-config",
+        str(mcp_config),
+        "--allowedTools",
+        ",".join(ADDONS_RULES),
+        "--permission-mode",
+        "dontAsk",
+        "--permission-prompts",
+        "none",
+        "--append-system-prompt",
+        system_prompt,
+    ]
+    if session_id:
+        args += ["--resume", session_id]
+    if model:
+        args += ["--model", model]
+    return args
+
+
+ADDONS_RULES: tuple[str, ...] = ("Read(./**)", "Edit(./**)", "Write(./**)", "Glob(./**)", "Grep(./**)")
+
+
+def write_empty_mcp_config(directory: Path) -> Path:
+    """Configuration MCP vide de la conversation « addons » (`--strict-mcp-config`)."""
+    directory.mkdir(parents=True, exist_ok=True)
+    path = directory / "mcp-vide.json"
+    path.write_bytes(b'{"mcpServers": {}}\n')
+    return path

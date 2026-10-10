@@ -48,6 +48,7 @@ HEARTBEAT_S = 30.0  # dernier signe de vie écrit dans le verrou (sonde F : pont
 UPDATE_CHECK_S = 5.0  # verrou et dernier passage de forever update relus (fin d'un passage publiée aussitôt)
 CARDS_CHECK_S = 1.0  # cartes « À valider » relues (carte de test de selftest --card, attentes au bloc B)
 SIMC_FLAG = "k=simc"
+ADDONS_FLAG = "c=addons"  # message de l'onglet « Addons » (bloc F)
 ACTION_LABELS = {"approve": "Valider", "reject": "Refuser"}
 _SELFTEST = Decoded(SELFTEST_ID, selftest_payload())
 
@@ -120,6 +121,7 @@ class Bridge:
         actions: Any | None = None,
         update_watch: Any | None = None,
         profile: Any | None = None,
+        addons: Any | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -141,6 +143,7 @@ class Bridge:
         self.actions = actions  # actions.ActionHandler : Mettre à jour, Valider, Refuser (bloc B)
         self.update_watch = update_watch  # updater.UpdateWatch : fin d'un passage publiée aussitôt
         self.profile = profile  # profile_gap.ProfileWatch : écart entre le jeu et le profil (bloc C)
+        self.addons = addons  # addons.AddonsTurn : conversation « addons » (bloc F)
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
         self.last_cards_check: float | None = None
@@ -181,6 +184,8 @@ class Bridge:
     def refresh(self) -> None:
         """État des données relu ; `Status.lua` et toute la réserve réécrits."""
         self.status_cache = {**self.status(), "slots": self.slots}  # l'addon en tire les emplacements restants
+        if self.addons is not None:
+            self.status_cache["addons"] = self.addons.status()
         if self.keeper is not None:
             from forever.bridge.status import status_line
 
@@ -474,7 +479,48 @@ class Bridge:
             return None, False
         return f"Écart avec le profil : {gaps_text(gaps)}. {GAP_NOTE}", proposed
 
+    def _work_addons(self, record: Record) -> None:
+        """Tour de la conversation « addons » (`c=addons`) : sauvegarde, agent limité au dossier, commit local."""
+        reply: dict[str, Any] = {"session": record.session, "id": record.message_id}
+        started = self.clock()
+        if self.addons is None:
+            reply.update(status="error", text="Erreur : conversation « addons » non configurée (forever bridge addons "
+                                              "config --source <dossier>).")  # fmt: skip
+        else:
+            session = None if "n" in record.flags else self.state.sessions.get("addons")
+            self.journal.write("agent", id=record.message_id, resumed=session is not None, conversation="addons")
+            try:
+                result, tail = self.addons(record.text, session)
+            except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
+                result, tail = (
+                    AgentResult(text="", session_id=None, is_error=True, error=f"{type(exc).__name__}: {exc}"),
+                    "",
+                )
+            if result.denied:
+                self.journal.write("denied", id=record.message_id, tools=result.denied, conversation="addons")
+            if result.is_error:
+                reply.update(status="error", text=f"Erreur : {result.error or 'réponse impossible'}")
+                self.journal.write("error", id=record.message_id, where="conversation addons", error=result.error)
+            else:
+                text = normalize_reply(result.text)
+                reply.update(status="done", text=f"{text}\n\n{tail}" if tail else text)
+                if result.session_id:
+                    self.state.set_conversation_session("addons", result.session_id)
+                self.journal.write(
+                    "reply", id=record.message_id, conversation="addons", seconds=round(self.clock() - started, 1),
+                    length=len(text), tools=result.tools, cost_usd=result.cost_usd, commit=tail,
+                )  # fmt: skip
+        self.state.put_reply(reply)
+        self._publish(self.first_slot, "réponse")
+
     def _work(self, record: Record) -> None:
+        if ADDONS_FLAG in record.flags:
+            try:
+                self._work_addons(record)
+            finally:
+                with self._lock:
+                    self.busy = False
+            return
         try:
             session = None if "n" in record.flags else self.state.session
             started = self.clock()

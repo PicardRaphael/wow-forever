@@ -67,6 +67,14 @@ end
 for t = 70, 190, 10 do
 	SCHEDULE[#SCHEDULE + 1] = t
 end
+-- Conversation « addons » (délai de 600 au pont) : le même calendrier, puis de 30 en 30 jusqu'à 610.
+local SCHEDULE_ADDONS = {}
+for i, t in ipairs(SCHEDULE) do
+	SCHEDULE_ADDONS[i] = t
+end
+for t = 220, 610, 30 do
+	SCHEDULE_ADDONS[#SCHEDULE_ADDONS + 1] = t
+end
 local CAROUSEL = 0.5 -- durée d'affichage d'une partie d'un message trop long
 local CONFIRM = 5 -- délai du second clic qui confirme une action d'une carte
 local CARDS_W = 360
@@ -83,7 +91,7 @@ FB.SCHEDULE = SCHEDULE -- lu par les tests (forever/bridge/polls.py)
 local driver = CreateFrame("Frame", "ForeverBridgeDriver", UIParent)
 local band
 local textures = {}
-local run = { nextSlot = 1, unacked = {}, links = {}, unread = 0, cards = {}, carousel = 0 }
+local run = { nextSlot = 1, unacked = {}, links = {}, unread = 0, cards = {}, carousel = 0, conv = "game" }
 local ui = {}
 
 -- Diagnostic demandé par le joueur (/fv diag) : seule écriture dans la discussion générale.
@@ -224,6 +232,22 @@ local function BuildWindow()
 		f:Hide()
 	end)
 
+	-- Onglets « Jeu » et « Addons » (P06b) : Addons seulement quand le pont publie une conversation configurée.
+	local tabGame = CreateFrame("Button", "ForeverBridgeTabGame", f, "UIPanelButtonTemplate")
+	tabGame:SetSize(60, 20)
+	tabGame:SetPoint("LEFT", title, "RIGHT", 12, 0)
+	tabGame:SetText("Jeu")
+	tabGame:SetScript("OnClick", function()
+		FB.SwitchConversation("game")
+	end)
+	local tabAddons = CreateFrame("Button", "ForeverBridgeTabAddons", f, "UIPanelButtonTemplate")
+	tabAddons:SetSize(150, 20)
+	tabAddons:SetPoint("LEFT", tabGame, "RIGHT", 4, 0)
+	tabAddons:SetScript("OnClick", function()
+		FB.SwitchConversation("addons")
+	end)
+	ui.tabGame, ui.tabAddons = tabGame, tabAddons
+
 	local pasteButton = CreateFrame("Button", "ForeverBridgePasteButton", f, "UIPanelButtonTemplate")
 	pasteButton:SetSize(96, 20)
 	pasteButton:SetPoint("TOPRIGHT", f, "TOPRIGHT", -32, -8)
@@ -337,7 +361,48 @@ local function BuildWindow()
 	FB.RenderHistory()
 	FB.UpdateStatus()
 	FB.RefreshCards()
+	FB.RefreshTabs()
 	return f
+end
+
+-- Onglets visibles selon l'état publié par le pont ; l'onglet courant est grisé.
+function FB.RefreshTabs()
+	if not ui.tabAddons then
+		return
+	end
+	local addons = type(run.status) == "table" and type(run.status.addons) == "table" and run.status.addons or nil
+	if addons and addons.configured then
+		local label = tostring(addons.name or "?"):gsub("||", "|"):gsub("|", "||")
+		ui.tabAddons:SetText("Addons (" .. label .. ")")
+		ui.tabGame:Show()
+		ui.tabAddons:Show()
+	else
+		ui.tabGame:Hide()
+		ui.tabAddons:Hide()
+		if run.conv == "addons" then
+			FB.SwitchConversation("game")
+		end
+	end
+	if ui.tabGame.Enable then
+		if run.conv == "addons" then
+			ui.tabGame:Enable()
+			ui.tabAddons:Disable()
+		else
+			ui.tabGame:Disable()
+			ui.tabAddons:Enable()
+		end
+	end
+end
+
+-- Changement de conversation : la fenêtre montre l'historique de la conversation choisie.
+function FB.SwitchConversation(name)
+	run.conv = name == "addons" and "addons" or "game"
+	run.links = {}
+	if ui.history then
+		ui.history:Clear()
+		FB.RenderHistory()
+	end
+	FB.RefreshTabs()
 end
 
 -- Zone copiable (lien Talents Forever) : texte sélectionné, Ctrl+C, Échap ferme.
@@ -553,19 +618,25 @@ end
 -- Historique, mise en forme des réponses
 ---------------------------------------------------------------------------
 
-local function History()
+-- Historique d'une conversation : « game » (db.history) ou « addons » (db.history_addons, P06b).
+local function HistoryKey(conv)
+	return (conv or run.conv) == "addons" and "history_addons" or "history"
+end
+
+local function History(conv)
 	local db = ForeverBridgeDB
 	if type(db) ~= "table" then
 		return {}
 	end
-	if type(db.history) ~= "table" then
-		db.history = {}
+	local key = HistoryKey(conv)
+	if type(db[key]) ~= "table" then
+		db[key] = {}
 	end
-	return db.history
+	return db[key]
 end
 
-local function Remember(entry)
-	local history = History()
+local function Remember(entry, conv)
+	local history = History(conv)
 	history[#history + 1] = entry
 	while #history > HISTORY_KEPT do
 		table.remove(history, 1)
@@ -688,7 +759,16 @@ local function TurnCarousel()
 	end
 end
 
-local function StartSchedule()
+-- Calendrier des relevés ; la conversation « addons » attend plus longtemps.
+local function StartSchedule(conv)
+	if conv == nil then
+		for _, waitingConv in pairs(Waiting()) do
+			if waitingConv == "addons" then
+				conv = "addons"
+			end
+		end
+	end
+	run.schedule = conv == "addons" and SCHEDULE_ADDONS or SCHEDULE
 	run.scheduleStart = GetTime()
 	run.pollIndex = 1
 end
@@ -711,6 +791,10 @@ function FB.Send(text, buttonKey, opts)
 	end
 	for _, flag in ipairs(opts.flags or {}) do
 		flags[#flags + 1] = flag
+	end
+	local conv = run.conv
+	if conv == "addons" then
+		flags[#flags + 1] = "c=addons"
 	end
 	local payload, contextText = Message.Build(db.session, id, flags, run.nextSlot, text, opts.extra)
 	FB.Open()
@@ -735,13 +819,14 @@ function FB.Send(text, buttonKey, opts)
 		slot = run.nextSlot,
 		context = contextText,
 		polls = 0,
+		conv = conv,
 	}
 	run.carousel = 0
 	ShowCurrent()
-	StartSchedule()
+	StartSchedule(conv)
 	local label = opts.label or text
 	PrintUser(label, opts.shown)
-	Remember({ role = "user", text = label, shown = opts.shown, id = id })
+	Remember({ role = "user", text = label, shown = opts.shown, id = id }, conv)
 	FB.UpdateStatus()
 	return true
 end
@@ -1049,15 +1134,16 @@ end
 function FB.NewConversation()
 	run.newConversation = true
 	local db = ForeverBridgeDB
-	if type(db) == "table" and type(db.history) == "table" and #db.history > 0 then
+	local key = HistoryKey()
+	if type(db) == "table" and type(db[key]) == "table" and #db[key] > 0 then
 		if type(db.archive) ~= "table" then
 			db.archive = {}
 		end
-		table.insert(db.archive, 1, db.history)
+		table.insert(db.archive, 1, db[key])
 		while #db.archive > ARCHIVE_KEPT do
 			table.remove(db.archive)
 		end
-		db.history = {}
+		db[key] = {}
 	end
 	run.links = {}
 	if ui.history then
@@ -1075,6 +1161,7 @@ local function GiveUp(message)
 		flags = message.flags,
 		slot = message.slot,
 		context = message.context,
+		conv = message.conv,
 	}
 	FB.Print("|cffff6060Non reçu|r : pont injoignable, message n° " .. message.id .. " gardé pour le prochain /reload "
 		.. "(lancez uv run forever bridge start, puis tapez /reload).")
@@ -1159,6 +1246,7 @@ function FB.ApplySlot(slot)
 		if type(slot.status) == "table" then
 			run.status = slot.status
 			FB.CheckUpdate(slot.status)
+			FB.RefreshTabs()
 			run.slots = tonumber(slot.status.slots) or run.slots
 		end
 		if type(slot.buttons) == "table" then
@@ -1199,16 +1287,17 @@ function FB.ApplySlot(slot)
 		elseif type(reply) == "table" and reply.session == db.session and type(reply.id) == "number" then
 			for i = #run.unacked, 1, -1 do
 				if run.unacked[i].id == reply.id then
+					waiting[reply.id] = run.unacked[i].conv or "game"
 					table.remove(run.unacked, i)
-					waiting[reply.id] = true
 				end
 			end
 			for _, entry in ipairs(Outbox()) do
-				if type(entry) == "table" and entry.id == reply.id then
-					waiting[reply.id] = true
+				if type(entry) == "table" and entry.id == reply.id and not waiting[reply.id] then
+					waiting[reply.id] = entry.conv or "game"
 				end
 			end
 			if waiting[reply.id] and (reply.status == "done" or reply.status == "error") then
+				local conv = waiting[reply.id] == "addons" and "addons" or "game"
 				waiting[reply.id] = nil
 				RemoveFromOutbox(reply.id)
 				local entry = {
@@ -1219,9 +1308,11 @@ function FB.ApplySlot(slot)
 					provenance = reply.provenance,
 					link = reply.link,
 				}
-				PrintReply(entry)
-				Remember(entry)
-				if not (ui.frame and ui.frame:IsShown()) then
+				if conv == run.conv then
+					PrintReply(entry)
+				end
+				Remember(entry, conv)
+				if not (ui.frame and ui.frame:IsShown()) or conv ~= run.conv then
 					run.unread = run.unread + 1
 				end
 			end
@@ -1295,11 +1386,12 @@ local function TickPolls()
 	local now = GetTime()
 	if run.scheduleStart then
 		local elapsed = now - run.scheduleStart
-		while run.scheduleStart and SCHEDULE[run.pollIndex] and elapsed >= SCHEDULE[run.pollIndex] - 1e-6 do
+		local schedule = run.schedule or SCHEDULE
+		while run.scheduleStart and schedule[run.pollIndex] and elapsed >= schedule[run.pollIndex] - 1e-6 do
 			run.pollIndex = run.pollIndex + 1
 			FB.PollSlot()
 		end
-		if run.scheduleStart and not SCHEDULE[run.pollIndex] then
+		if run.scheduleStart and not schedule[run.pollIndex] then
 			run.scheduleStart = nil
 			if next(Waiting()) ~= nil then
 				FB.Print("Réponse toujours en cours : tapez /reload plus tard pour la récupérer.")
@@ -1569,6 +1661,7 @@ function handlers.PLAYER_ENTERING_WORLD()
 		if type(ForeverBridgeStatus.status) == "table" and next(ForeverBridgeStatus.status) ~= nil then
 			run.status = ForeverBridgeStatus.status
 			FB.CheckUpdate(ForeverBridgeStatus.status)
+			FB.RefreshTabs()
 			run.slots = tonumber(ForeverBridgeStatus.status.slots) or run.slots
 		end
 		if tonumber(ForeverBridgeStatus.now) and tonumber(ForeverBridgeStatus.now) > 0 then
