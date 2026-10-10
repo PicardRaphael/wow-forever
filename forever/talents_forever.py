@@ -758,9 +758,13 @@ def _popular_entry(layout: TfLayout, gd: Any, b: Mapping[str, Any]) -> dict[str,
     return entry
 
 
-def popular_builds(addon: TfAddon, deps: Deps, class_name: str | None = None) -> dict[str, Any]:
+def popular_builds(
+    addon: TfAddon, deps: Deps, class_name: str | None = None, current: Mapping[str, int] | None = None
+) -> dict[str, Any]:
     """Builds populaires de l'addon par classe (part de chaque spécialisation, date `asOf`, fenêtre, nombre de builds
-    relevés), chacun avec son lien, ses points en nos clés et sa légalité sur le client ; certitude `suppose`."""
+    relevés), chacun avec son lien, ses points en nos clés et sa légalité sur le client ; certitude `suppose`.
+    `current` (P06b, décision 235 ; avec une classe) : talents actuels du joueur ; le résultat gagne `closest`, le build
+    le plus proche calculé par `closest_popular` (None sans aucun point placé)."""
     from forever.gamedata import build_game_data
     from forever.profile import normalize_class
     from forever.store import load_version
@@ -797,13 +801,17 @@ def popular_builds(addon: TfAddon, deps: Deps, class_name: str | None = None) ->
         }
     dates = sorted({str(c["asOf"]) for c in classes.values()})
     notes = [POPULAR_NOTE, f"relevés du {', '.join(dates) or '?'} (fenêtre par classe : champ window)"]
-    return {
+    out: dict[str, Any] = {
         "kind": "tf_popular",
         "addon": addon.describe(),
         "classes": classes,
         "certainty": "suppose",
         "provenance": tf_provenance(deps, addon, "suppose", notes),
     }
+    if current is not None and wanted is not None:
+        placed = {k: v for k, v in current.items() if v > 0}
+        out["closest"] = closest_popular(addon, out, wanted, placed) if placed else None
+    return out
 
 
 def closest_popular(

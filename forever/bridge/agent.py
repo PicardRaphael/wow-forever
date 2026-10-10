@@ -60,7 +60,8 @@ class AgentResult:
     tools: list[str] = field(default_factory=list)
     timings: dict[str, Any] = field(default_factory=dict, compare=False)  # durées des étapes (s), stream_timings
     cost_usd: float | None = None
-    links: dict[str, str] = field(default_factory=dict)  # « build » (export) et « projected » (chemin du joueur)
+    # « build » (export), « projected » (chemin du joueur), « closest » (build populaire le plus proche, P06b)
+    links: dict[str, str] = field(default_factory=dict)
 
 
 def find_claude(which: Callable[[str], str | None] = shutil.which) -> str:
@@ -224,6 +225,9 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
                     links["build"] = str(_find_link(value))
                 if _projected_link(value):
                     links["projected"] = str(_projected_link(value))
+                closest = value.get("closest") if isinstance(value, dict) else None
+                if isinstance(closest, dict) and closest.get("link"):
+                    links["closest"] = str(closest["link"])  # build populaire le plus proche (P06b)
         elif kind == "result":
             final = event
     if final is None:

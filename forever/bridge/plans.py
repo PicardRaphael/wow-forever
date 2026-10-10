@@ -104,21 +104,28 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
                 return None
             call, read = point
             return Plan(key, (call,), read, link="projected")
-        calls = [Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name})]
-        if r.current:
-            calls.append(
-                Call(
-                    "forever_lookup",
-                    {"kind": "build_check", "name": r.class_name, "level": r.level, "talents": _talents_arg(r.current)},
-                )
+        if not r.current:
+            calls = [Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name})]
+            read = (
+                (
+                    "aucun talent placé : build le plus joué de la classe (rang 1) ; donne son lien et sa commande "
+                    "`/tf import` tels quels, sa date (`asOf`) et sa certitude."
+                ),
             )
+            return Plan(key, tuple(calls), read)
+        current = ",".join(f"{k}={v}" for k, v in r.current.items())
+        calls = [
+            Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name, "current": current}),
+            Call("forever_lookup", {"kind": "build_check", "name": r.class_name, "level": r.level, "talents": current}),
+        ]
         read = (
             (
-                "Donne le build populaire de la même spécialisation que les talents actuels (arbre où ils sont placés), "
-                "avec son lien et sa commande `/tf import` tels quels, sa date (`asOf`) et sa certitude."
+                "Donne `closest` tel quel (spécialisation, lien, commande `/tf import`, points absents "
+                "`missing_points`, écarts `differences`), avec sa date (`asOf`) et sa certitude ; n'en choisis pas un "
+                "autre."
             ),
         )
-        return Plan(key, tuple(calls), read)
+        return Plan(key, tuple(calls), read, link="closest")
     if key == "leveling" and r.class_token == "MAGE":
         zones: dict[str, Any] = {"kind": "zones", "level": r.level}
         if r.faction in ("horde", "alliance"):

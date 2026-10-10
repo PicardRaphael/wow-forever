@@ -88,6 +88,7 @@ def build_server(deps: Deps) -> MCPServer:
         opponent_level: int | None = None,
         class_name: str | None = None,
         zone: str | None = None,
+        current: str | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -116,7 +117,9 @@ def build_server(deps: Deps) -> MCPServer:
         FA1 : `kind="tf_popular"` avec `name` (classe, nom français ou anglais ; vide : les 9 classes) : builds
         populaires de Talents Forever (addon lu sur disque) : part de chaque spécialisation, date `asOf`, fenêtre,
         lien et commande `/tf import` de chaque build, légalité sur le client ; certitude `suppose` (choix de
-        joueurs)."""
+        joueurs). P06b : avec `current` (talents actuels, « clé=rang,… »), `closest` : le build populaire le plus
+        proche, calculé par l'outil (même spécialisation, points absents, écarts) ; à donner tel quel, sans en choisir
+        un autre ; `null` si aucun point n'est placé."""
         try:
             if kind == "zones":
                 path = Path(questie) if questie else None
@@ -134,7 +137,8 @@ def build_server(deps: Deps) -> MCPServer:
             if kind == "tf_popular":
                 from forever.talents_forever import popular_builds, require_addon
 
-                return popular_builds(require_addon(deps), deps, name or None)
+                placed = parse_talents(current) if current else None
+                return popular_builds(require_addon(deps), deps, name or None, current=placed)
             if kind == "pets":
                 return lookup_pets(deps, name or None, rank=rank, zone=zone, level=level, detail=detail)
             if kind == "pvp":

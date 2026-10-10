@@ -623,6 +623,9 @@ def build_parser() -> argparse.ArgumentParser:
     tf_decode.add_argument("--json", action="store_true", help="sortie JSON")
     tf_pop = tf_sub.add_parser("popular", help="builds populaires de l'addon : part, date, lien, légalité")
     tf_pop.add_argument("--class", dest="cls", help="classe (nom français ou anglais ; défaut : toutes)")
+    tf_pop.add_argument(
+        "--current", help="talents actuels « clé=rang,… » (avec --class) : build populaire le plus proche (closest)"
+    )
     tf_pop.add_argument("--json", action="store_true", help="sortie JSON")
 
     pvp = sub.add_parser("pvp", help="fiches PvP fixes des 9 classes (savoir du client, sans calcul de combat)")
@@ -1374,8 +1377,17 @@ def _tf_addon(deps: Deps) -> TfAddon:
 def _cmd_tf_popular(deps: Deps, args: argparse.Namespace) -> int:
     from forever.talents_forever import popular_builds
 
-    rep = popular_builds(_tf_addon(deps), deps, args.cls)
+    current = parse_talents(args.current) if args.current else None
+    rep = popular_builds(_tf_addon(deps), deps, args.cls, current=current)
     lines = [f"Builds populaires de Talents Forever {rep['addon']['version']} (certitude {rep['certainty']})"]
+    if "closest" in rep:
+        best = rep["closest"]
+        lines.append(
+            "Build populaire le plus proche : aucun point placé"
+            if best is None
+            else f"Build populaire le plus proche : n° {best['rank']} {best['spec']}, {best['missing_points']} point(s) "
+            f"absent(s), {best['points_to_add']} à ajouter · {best['link']} · {best['import']}"
+        )
     for name, c in rep["classes"].items():
         shares = ", ".join(f"{s['name']} {s['pct']} %" for s in c["spec"])
         lines.append(f"{name} : {c['builds']} builds relevés, au {c['asOf']} ({c['window']}) ; parts : {shares}")
