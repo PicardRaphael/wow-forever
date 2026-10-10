@@ -357,11 +357,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 
 - **BR5 — Quelle fonction appelle un Maj+clic sur Forever (sacs, livre des sorts, journal des quêtes) quand une zone
   de saisie d'addon a le focus ?** ForeverBridge accroche `ChatFrameUtil.InsertLink` et `ChatEdit_InsertLink` (celles
-  qui existent, `hooksecurefunc`). Test : sonde en jeu G de P06b (Maj+clic d'un objet, d'un sort, d'une quête).
-  Repli : Ctrl+V d'un lien. Priorité : haute (avant le 2026-10-14).
-- **BR6 — L'export SimulationCraft omet-il vraiment l'emplacement à distance (18) sur Forever ?** Lu dans le code de
-  l'addon (12.1.5-alpha-01 : `slotNames` sans `RangedSlot`), pas encore vu dans un export réel. La chaîne `talents=`
-  n'est pas décodée (décision 235). Test : premier export collé à la sonde G. Priorité : moyenne.
+  qui existent, `hooksecurefunc`). Sonde G du 2026-10-10 : un objet d'un sac et un objet équipé sont insérés, avec
+  les couleurs nommées de Forever (`|cnIQ0:` … `|r`) ; sort, quête et partage de pile non essayés. Test : sonde H.
+  Priorité : moyenne.
+- **BR6 — L'export SimulationCraft omet-il vraiment l'emplacement à distance (18) sur Forever ?** Oui pour la
+  baguette : le premier export réel (sonde G, `tests/fixtures/simc/mage19_sonde_g.txt`) n'a pas de ligne `ranged=`
+  alors que le contexte du même instant porte l'emplacement 18 (Greater Magic Wand). Reste à voir avec une arme à
+  distance de Chasseur. La chaîne `talents=` n'est pas décodée (décision 235). Priorité : basse.
 - **BR7 — Combien de tours de carrousel faut-il pour un export de 9 parties à une case par pixel ?** Une capture faite
   pendant le changement de partie est rejetée par la somme de contrôle de la bande. Test : sonde G (journal du pont,
   événements `parts`). Priorité : moyenne.

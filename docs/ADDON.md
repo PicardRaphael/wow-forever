@@ -331,6 +331,15 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        6 ; puis `uv run forever bridge contexts export "$env:TEMP\sonde-g"` et me donner le dossier : les contextes
        et l'export (anonymisé) deviennent les fixtures réelles et les tests de non-régression ajoutés après la
        sonde.
+    10. **Fait le 2026-10-10** (relevés de l'utilisateur) : Maj+clic d'un objet d'un sac et d'un objet équipé insérés
+        avec leur infobulle complète ; réponse qui lit les infobulles ; export `/simc` « reçu (73 lignes, somme de
+        contrôle juste) », gardé anonymisé ; carte de test validée sans rien lancer. Défauts corrigés le même jour :
+        objets fabriqués (champ de l'artisan `Player-…` dans le lien) lus comme mal formés ; liens aux couleurs
+        nommées de Forever (`|cnIQ2:`) affichés en code brut dans l'historique ; fenêtre de collage non déplaçable
+        (barre de titre, position gardée) ; aide de `/fv` à chaque ouverture (une seule fois, puis `/fv aide`).
+        Relevés en fixtures : `tests/fixtures/bridge/contexts/mage19_sonde_g*.txt`, `tests/fixtures/simc/
+        mage19_sonde_g.txt`. Non vérifiés, repris à la sonde H : Maj+clic d'un sort et d'une quête, partage de pile,
+        délai de l'export.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
