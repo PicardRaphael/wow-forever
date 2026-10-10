@@ -1,0 +1,5509 @@
+{
+ "schema_version": 2,
+ "game_version": "1.60.1.70291",
+ "source": "PV max lus dans le bloc avancé des journaux de combat du client ; Questie en regard",
+ "logs": [
+  "WoWCombatLog-092726_145346.txt",
+  "WoWCombatLog-092726_150346.txt",
+  "WoWCombatLog-092726_174130.txt",
+  "WoWCombatLog-100226_080035.txt",
+  "WoWCombatLog-100226_162842.txt",
+  "WoWCombatLog-100726_080346.txt",
+  "WoWCombatLog-100726_130833.txt",
+  "WoWCombatLog-100826_081058.txt",
+  "WoWCombatLog-100826_153741.txt"
+ ],
+ "questie_version": "11.38.0",
+ "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+ "npcs": {
+  "704": {
+   "name": "Ragged Timber Wolf",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 55,
+     "fought": null
+    }
+   }
+  },
+  "705": {
+   "name": "Ragged Young Wolf",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 42,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 73 individu(s))",
+     "questie_hp": 42,
+     "fought": null
+    }
+   }
+  },
+  "706": {
+   "name": "Frostmane Troll Whelp",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 71,
+     "fought": null
+    },
+    "4": {
+     "max_hp": 86,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 20 individu(s))",
+     "questie_hp": 86,
+     "fought": null
+    }
+   }
+  },
+  "707": {
+   "name": "Rockjaw Trogg",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 42,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 42,
+     "fought": null
+    },
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 55,
+     "fought": null
+    }
+   }
+  },
+  "708": {
+   "name": "Small Crag Boar",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "3": {
+     "max_hp": 71,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 76 individu(s))",
+     "questie_hp": 71,
+     "fought": null
+    }
+   }
+  },
+  "721": {
+   "name": "Rabbit",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 1,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 1,
+     "fought": null
+    }
+   }
+  },
+  "724": {
+   "name": "Burly Rockjaw Trogg",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "2": {
+     "max_hp": 55,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 55,
+     "fought": null
+    }
+   }
+  },
+  "1115": {
+   "name": "Rockjaw Skullthumper",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 17 individu(s))",
+     "questie_hp": 156,
+     "fought": true
+    },
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 21 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    }
+   }
+  },
+  "1116": {
+   "name": "Rockjaw Ambusher",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 21 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 16 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    }
+   }
+  },
+  "1117": {
+   "name": "Rockjaw Bonesnapper",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 24 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 23 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    }
+   }
+  },
+  "1120": {
+   "name": "Frostmane Troll",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 137,
+     "fought": true
+    },
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 156,
+     "fought": null
+    }
+   }
+  },
+  "1121": {
+   "name": "Frostmane Snowstrider",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 148,
+     "fought": true
+    },
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 166,
+     "fought": true
+    }
+   }
+  },
+  "1122": {
+   "name": "Frostmane Hideskinner",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    }
+   }
+  },
+  "1123": {
+   "name": "Frostmane Headhunter",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 10 individu(s))",
+     "questie_hp": 156,
+     "fought": true
+    },
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    }
+   }
+  },
+  "1124": {
+   "name": "Frostmane Shadowcaster",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 160,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 178,
+     "fought": true
+    }
+   }
+  },
+  "1125": {
+   "name": "Crag Boar",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 102,
+     "fought": true
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 120,
+     "fought": null
+    }
+   }
+  },
+  "1126": {
+   "name": "Large Crag Boar",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 120,
+     "fought": true
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 137,
+     "fought": true
+    }
+   }
+  },
+  "1127": {
+   "name": "Elder Crag Boar",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 27 individu(s))",
+     "questie_hp": 137,
+     "fought": true
+    },
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 16 individu(s))",
+     "questie_hp": 156,
+     "fought": true
+    }
+   }
+  },
+  "1128": {
+   "name": "Young Black Bear",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 122,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 122,
+     "fought": null
+    },
+    "6": {
+     "max_hp": 144,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 144,
+     "fought": true
+    }
+   }
+  },
+  "1131": {
+   "name": "Winter Wolf",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 137,
+     "fought": null
+    },
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 156,
+     "fought": null
+    }
+   }
+  },
+  "1134": {
+   "name": "Young Wendigo",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 102,
+     "fought": null
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 120,
+     "fought": null
+    }
+   }
+  },
+  "1135": {
+   "name": "Wendigo",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 120,
+     "fought": null
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 137,
+     "fought": null
+    }
+   }
+  },
+  "1138": {
+   "name": "Snow Tracker Wolf",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 120,
+     "fought": null
+    }
+   }
+  },
+  "1161": {
+   "name": "Stonesplinter Trogg",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "1162": {
+   "name": "Stonesplinter Scout",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "1172": {
+   "name": "Tunnel Rat Vermin",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    }
+   }
+  },
+  "1173": {
+   "name": "Tunnel Rat Scout",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    }
+   }
+  },
+  "1176": {
+   "name": "Tunnel Rat Forager",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "1186": {
+   "name": "Elder Black Bear",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 287,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 266,
+     "fought": true
+    },
+    "12": {
+     "max_hp": 326,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 296,
+     "fought": true
+    }
+   }
+  },
+  "1190": {
+   "name": "Mountain Boar",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    }
+   }
+  },
+  "1195": {
+   "name": "Forest Lurker",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    }
+   }
+  },
+  "1196": {
+   "name": "Ice Claw Bear",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 164,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 164,
+     "fought": true
+    },
+    "8": {
+     "max_hp": 187,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 16 individu(s))",
+     "questie_hp": 187,
+     "fought": true
+    }
+   }
+  },
+  "1199": {
+   "name": "Juvenile Snow Leopard",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 102,
+     "fought": null
+    },
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 120,
+     "fought": true
+    }
+   }
+  },
+  "1201": {
+   "name": "Snow Leopard",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 23 individu(s))",
+     "questie_hp": 137,
+     "fought": true
+    },
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 156,
+     "fought": true
+    }
+   }
+  },
+  "1202": {
+   "name": "Tunnel Rat Kobold",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "1211": {
+   "name": "Leper Gnome",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 156,
+     "fought": null
+    },
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 177,
+     "fought": null
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    }
+   }
+  },
+  "1260": {
+   "name": "Great Father Arctikus",
+   "zone_id": 1,
+   "rank": 4,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 208,
+     "fought": true
+    }
+   }
+  },
+  "1266": {
+   "name": "Tundra MacGrann",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 484,
+     "fought": true
+    }
+   }
+  },
+  "1271": {
+   "name": "Old Icebeard",
+   "zone_id": 1,
+   "rank": 1,
+   "levels": {
+    "11": {
+     "max_hp": 717,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 666,
+     "fought": true
+    }
+   }
+  },
+  "1329": {
+   "name": "Mountaineer Naarh",
+   "zone_id": 38,
+   "rank": 0,
+   "levels": {
+    "30": {
+     "max_hp": 2484,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 1910,
+     "fought": null
+    }
+   }
+  },
+  "1388": {
+   "name": "Vagash",
+   "zone_id": 1,
+   "rank": 1,
+   "levels": {
+    "11": {
+     "max_hp": 717,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 666,
+     "fought": true
+    }
+   }
+  },
+  "1397": {
+   "name": "Frostmane Seer",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 148,
+     "fought": null
+    },
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 166,
+     "fought": true
+    }
+   }
+  },
+  "1412": {
+   "name": "Squirrel",
+   "zone_id": 493,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 8,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 8,
+     "fought": null
+    }
+   }
+  },
+  "1689": {
+   "name": "Scarred Crag Boar",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    }
+   }
+  },
+  "1961": {
+   "name": "Mangeclaw",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    }
+   }
+  },
+  "2071": {
+   "name": "Moonstalker Matriarch",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 484,
+     "fought": null
+    }
+   }
+  },
+  "2163": {
+   "name": "Thistle Bear",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 299,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 278,
+     "fought": null
+    }
+   }
+  },
+  "2165": {
+   "name": "Grizzled Thistle Bear",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "16": {
+     "max_hp": 534,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 445,
+     "fought": null
+    },
+    "17": {
+     "max_hp": 591,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 482,
+     "fought": null
+    }
+   }
+  },
+  "2185": {
+   "name": "Darkshore Thresher",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "2231": {
+   "name": "Pygmy Tide Crawler",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 176,
+     "fought": null
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    }
+   }
+  },
+  "2237": {
+   "name": "Moonstalker Sire",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 386,
+     "fought": null
+    },
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 417,
+     "fought": null
+    }
+   }
+  },
+  "2321": {
+   "name": "Foreststrider Fledgling",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 248,
+     "fought": null
+    }
+   }
+  },
+  "2324": {
+   "name": "Blackwood Windtalker",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 300,
+     "fought": null
+    }
+   }
+  },
+  "2338": {
+   "name": "Twilight Disciple",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "16": {
+     "max_hp": 427,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 325,
+     "fought": null
+    }
+   }
+  },
+  "2339": {
+   "name": "Twilight Thug",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386,
+     "fought": null
+    }
+   }
+  },
+  "3099": {
+   "name": "Dire Mottled Boar",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 120,
+     "fought": null
+    },
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 137,
+     "fought": null
+    }
+   }
+  },
+  "3100": {
+   "name": "Elder Mottled Boar",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 156,
+     "fought": null
+    },
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 12 individu(s))",
+     "questie_hp": 176,
+     "fought": null
+    }
+   }
+  },
+  "3122": {
+   "name": "Bloodtalon Taillasher",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "6": {
+     "max_hp": 120,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 120,
+     "fought": null
+    }
+   }
+  },
+  "3123": {
+   "name": "Bloodtalon Scythemaw",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 177,
+     "fought": null
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    }
+   }
+  },
+  "3127": {
+   "name": "Venomtail Scorpid",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 176,
+     "fought": null
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    }
+   }
+  },
+  "3131": {
+   "name": "Lightning Hide",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    }
+   }
+  },
+  "3225": {
+   "name": "Corrupted Mottled Boar",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    }
+   }
+  },
+  "3242": {
+   "name": "Zhevra Runner",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 300,
+     "fought": null
+    }
+   }
+  },
+  "3244": {
+   "name": "Greater Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "3245": {
+   "name": "Ornery Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386,
+     "fought": null
+    }
+   }
+  },
+  "3246": {
+   "name": "Fleeting Plainstrider",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    }
+   }
+  },
+  "3254": {
+   "name": "Sunscale Lashtail",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 191,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 178,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 218,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    },
+    "13": {
+     "max_hp": 246,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 218,
+     "fought": null
+    }
+   }
+  },
+  "3255": {
+   "name": "Sunscale Screecher",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 301,
+     "fought": null
+    }
+   }
+  },
+  "3265": {
+   "name": "Razormane Hunter",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "3266": {
+   "name": "Razormane Defender",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 10 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    }
+   }
+  },
+  "3267": {
+   "name": "Razormane Water Seeker",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 22 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    }
+   }
+  },
+  "3268": {
+   "name": "Razormane Thornweaver",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 186,
+     "fought": null
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 18 individu(s))",
+     "questie_hp": 208,
+     "fought": null
+    }
+   }
+  },
+  "3269": {
+   "name": "Razormane Geomancer",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 219,
+     "fought": null
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 241,
+     "fought": null
+    }
+   }
+  },
+  "3270": {
+   "name": "Elder Mystic Razorsnout",
+   "zone_id": 17,
+   "rank": 2,
+   "levels": {
+    "15": {
+     "max_hp": 1155,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 903,
+     "fought": null
+    }
+   }
+  },
+  "3271": {
+   "name": "Razormane Mystic",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 253,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 276,
+     "fought": null
+    }
+   }
+  },
+  "3272": {
+   "name": "Kolkar Wrangler",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 248,
+     "fought": null
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    }
+   }
+  },
+  "3284": {
+   "name": "Venture Co. Drudger",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 300,
+     "fought": null
+    }
+   }
+  },
+  "3292": {
+   "name": "Brewmaster Drohn",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 176,
+     "fought": null
+    }
+   }
+  },
+  "3379": {
+   "name": "Burning Blade Bruiser",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    }
+   }
+  },
+  "3380": {
+   "name": "Burning Blade Acolyte",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 199,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 219,
+     "fought": null
+    }
+   }
+  },
+  "3381": {
+   "name": "Southsea Brigand",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 10 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    }
+   }
+  },
+  "3382": {
+   "name": "Southsea Cannoneer",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 300,
+     "fought": null
+    }
+   }
+  },
+  "3415": {
+   "name": "Savannah Huntress",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 222,
+     "fought": null
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100826_153741.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "3425": {
+   "name": "Savannah Prowler",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 300,
+     "fought": null
+    },
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328,
+     "fought": null
+    }
+   }
+  },
+  "3438": {
+   "name": "Kreenig Snarlsnout",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328,
+     "fought": null
+    }
+   }
+  },
+  "3467": {
+   "name": "Baron Longshore",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "16": {
+     "max_hp": 427,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 356,
+     "fought": null
+    }
+   }
+  },
+  "3584": {
+   "name": "Therylune",
+   "zone_id": 148,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386,
+     "fought": null
+    }
+   }
+  },
+  "3664": {
+   "name": "Ilkrud Magthrull",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "24": {
+     "max_hp": 1269,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 792,
+     "fought": null
+    }
+   }
+  },
+  "3711": {
+   "name": "Wrathtail Myrmidon",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "21": {
+     "max_hp": 691,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 531,
+     "fought": null
+    }
+   }
+  },
+  "3712": {
+   "name": "Wrathtail Razortail",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 404,
+     "fought": null
+    },
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 433,
+     "fought": null
+    }
+   }
+  },
+  "3713": {
+   "name": "Wrathtail Wave Rider",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 17 individu(s))",
+     "questie_hp": 417,
+     "fought": null
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 449,
+     "fought": null
+    }
+   }
+  },
+  "3715": {
+   "name": "Wrathtail Sea Witch",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 404,
+     "fought": null
+    },
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 433,
+     "fought": null
+    }
+   }
+  },
+  "3717": {
+   "name": "Wrathtail Sorceress",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 354,
+     "fought": null
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 379,
+     "fought": null
+    }
+   }
+  },
+  "3721": {
+   "name": "Mystlash Hydra",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 484,
+     "fought": null
+    }
+   }
+  },
+  "3725": {
+   "name": "Dark Strand Cultist",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 354,
+     "fought": null
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 379,
+     "fought": null
+    }
+   }
+  },
+  "3727": {
+   "name": "Dark Strand Enforcer",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 642,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 494,
+     "fought": null
+    }
+   }
+  },
+  "3728": {
+   "name": "Dark Strand Adept",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 379,
+     "fought": null
+    }
+   }
+  },
+  "3730": {
+   "name": "Dark Strand Excavator",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 449,
+     "fought": null
+    },
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 484,
+     "fought": null
+    }
+   }
+  },
+  "3732": {
+   "name": "Forsaken Seeker",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 377,
+     "fought": null
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 404,
+     "fought": null
+    }
+   }
+  },
+  "3733": {
+   "name": "Forsaken Herbalist",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 417,
+     "fought": null
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 449,
+     "fought": null
+    }
+   }
+  },
+  "3734": {
+   "name": "Forsaken Thug",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 15 individu(s))",
+     "questie_hp": 484,
+     "fought": null
+    }
+   }
+  },
+  "3772": {
+   "name": "Lesser Felguard",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "23": {
+     "max_hp": 803,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 544,
+     "fought": null
+    },
+    "24": {
+     "max_hp": 863,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 582,
+     "fought": null
+    }
+   }
+  },
+  "3774": {
+   "name": "Felslayer",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "22": {
+     "max_hp": 746,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 573,
+     "fought": null
+    },
+    "23": {
+     "max_hp": 803,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 617,
+     "fought": null
+    }
+   }
+  },
+  "3781": {
+   "name": "Shadethicket Wood Shaper",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "23": {
+     "max_hp": 803,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 544,
+     "fought": null
+    }
+   }
+  },
+  "3783": {
+   "name": "Shadethicket Raincaller",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "22": {
+     "max_hp": 746,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 508,
+     "fought": null
+    },
+    "23": {
+     "max_hp": 803,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 544,
+     "fought": null
+    }
+   }
+  },
+  "3809": {
+   "name": "Ashenvale Bear",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "21": {
+     "max_hp": 860,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 662,
+     "fought": null
+    },
+    "22": {
+     "max_hp": 928,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 714,
+     "fought": null
+    }
+   }
+  },
+  "3812": {
+   "name": "Clattering Crawler",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 484,
+     "fought": null
+    }
+   }
+  },
+  "3816": {
+   "name": "Wild Buck",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "18": {
+     "max_hp": 521,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 417,
+     "fought": null
+    },
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 449,
+     "fought": null
+    }
+   }
+  },
+  "3819": {
+   "name": "Wildthorn Stalker",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 642,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 494,
+     "fought": null
+    },
+    "21": {
+     "max_hp": 691,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 531,
+     "fought": null
+    }
+   }
+  },
+  "3823": {
+   "name": "Ghostpaw Runner",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "19": {
+     "max_hp": 572,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt (bloc avancé, 10 individu(s))",
+     "questie_hp": 449,
+     "fought": null
+    },
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt, WoWCombatLog-100226_162842.txt (bloc avancé, 10 individu(s))",
+     "questie_hp": 484,
+     "fought": null
+    }
+   }
+  },
+  "3846": {
+   "name": "Talen",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 385,
+     "fought": null
+    }
+   }
+  },
+  "3944": {
+   "name": "Wrathtail Priestess",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 642,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 442,
+     "fought": null
+    }
+   }
+  },
+  "3986": {
+   "name": "Sarilus Foulborne",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "25": {
+     "max_hp": 927,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 573,
+     "fought": null
+    }
+   }
+  },
+  "4127": {
+   "name": "Hecklefang Hyena",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328,
+     "fought": null
+    }
+   }
+  },
+  "5612": {
+   "name": "Gimrizz Shadowcog",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328,
+     "fought": null
+    }
+   }
+  },
+  "5676": {
+   "name": "Summoned Voidwalker",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 198,
+     "fought": null
+    }
+   }
+  },
+  "5677": {
+   "name": "Summoned Succubus",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "20": {
+     "max_hp": 629,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 433,
+     "fought": null
+    }
+   }
+  },
+  "5951": {
+   "name": "Hare",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 8,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_145346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 8,
+     "fought": null
+    }
+   }
+  },
+  "6119": {
+   "name": "Tog Rustsprocket",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 178,
+     "fought": null
+    }
+   }
+  },
+  "6123": {
+   "name": "Dark Iron Spy",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 12 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 24 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    }
+   }
+  },
+  "6124": {
+   "name": "Captain Beld",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    }
+   }
+  },
+  "6328": {
+   "name": "Dannie Fizzwizzle",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 263,
+     "fought": null
+    }
+   }
+  },
+  "6466": {
+   "name": "Gamon",
+   "zone_id": 1637,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 247,
+     "fought": null
+    }
+   }
+  },
+  "6494": {
+   "name": "Tazan",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    }
+   }
+  },
+  "7167": {
+   "name": "Polly",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "50": {
+     "max_hp": 3600,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "10556": {
+   "name": "Lazy Peon",
+   "zone_id": 14,
+   "rank": 0,
+   "levels": {
+    "4": {
+     "max_hp": 86,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100826_081058.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 86,
+     "fought": null
+    }
+   }
+  },
+  "10803": {
+   "name": "Rifleman Wheeler",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "10804": {
+   "name": "Rifleman Middlecamp",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "11318": {
+   "name": "Ragefire Trogg",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "13": {
+     "max_hp": 921,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 819,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 1035,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 902,
+     "fought": null
+    },
+    "15": {
+     "max_hp": 1155,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 984,
+     "fought": null
+    }
+   }
+  },
+  "11319": {
+   "name": "Ragefire Shaman",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "13": {
+     "max_hp": 921,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 759,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 1035,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 831,
+     "fought": null
+    },
+    "15": {
+     "max_hp": 1155,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 903,
+     "fought": null
+    }
+   }
+  },
+  "11320": {
+   "name": "Earthborer",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "13": {
+     "max_hp": 921,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 819,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 1035,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 900,
+     "fought": null
+    }
+   }
+  },
+  "11321": {
+   "name": "Molten Elemental",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "13": {
+     "max_hp": 921,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 819,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 1035,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 902,
+     "fought": null
+    },
+    "15": {
+     "max_hp": 1155,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 984,
+     "fought": null
+    }
+   }
+  },
+  "11322": {
+   "name": "Searing Blade Cultist",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "13": {
+     "max_hp": 921,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 8 individu(s))",
+     "questie_hp": 759,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 1035,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 831,
+     "fought": null
+    },
+    "15": {
+     "max_hp": 1155,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 903,
+     "fought": null
+    }
+   }
+  },
+  "11323": {
+   "name": "Searing Blade Enforcer",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "13": {
+     "max_hp": 921,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 819,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 1035,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 902,
+     "fought": null
+    },
+    "15": {
+     "max_hp": 1155,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": 984,
+     "fought": null
+    }
+   }
+  },
+  "11324": {
+   "name": "Searing Blade Warlock",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "13": {
+     "max_hp": 921,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 723,
+     "fought": null
+    },
+    "14": {
+     "max_hp": 1035,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 789,
+     "fought": null
+    },
+    "15": {
+     "max_hp": 1155,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 855,
+     "fought": null
+    }
+   }
+  },
+  "11517": {
+   "name": "Oggleflint",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "16": {
+     "max_hp": 1708,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 1424,
+     "fought": null
+    }
+   }
+  },
+  "11518": {
+   "name": "Jergosh the Invoker",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "16": {
+     "max_hp": 1922,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 1382,
+     "fought": null
+    }
+   }
+  },
+  "11519": {
+   "name": "Bazzalan",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "16": {
+     "max_hp": 1815,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 1513,
+     "fought": null
+    }
+   }
+  },
+  "11520": {
+   "name": "Taragaman the Hungerer",
+   "zone_id": 2437,
+   "rank": 1,
+   "levels": {
+    "16": {
+     "max_hp": 2242,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 1869,
+     "fought": null
+    }
+   }
+  },
+  "12319": {
+   "name": "Burning Blade Toxicologist",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 263,
+     "fought": null
+    }
+   }
+  },
+  "12320": {
+   "name": "Burning Blade Crusher",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-092726_150346.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": 273,
+     "fought": null
+    }
+   }
+  },
+  "12427": {
+   "name": "Mountaineer Dolf",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 137,
+     "fought": null
+    }
+   }
+  },
+  "12717": {
+   "name": "Muglash",
+   "zone_id": 331,
+   "rank": 0,
+   "levels": {
+    "25": {
+     "max_hp": 927,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 712,
+     "fought": null
+    }
+   }
+  },
+  "12940": {
+   "name": "Vorsha the Lasher",
+   "zone_id": 0,
+   "rank": 0,
+   "levels": {
+    "22": {
+     "max_hp": 1462,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_162842.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 1124,
+     "fought": null
+    }
+   }
+  },
+  "13076": {
+   "name": "Dun Morogh Mountaineer",
+   "zone_id": 1,
+   "rank": 0,
+   "levels": {
+    "30": {
+     "max_hp": 2484,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 1910,
+     "fought": null
+    }
+   }
+  },
+  "257446": {
+   "name": "Teo Hammerstorm",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "5": {
+     "max_hp": 102,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "260157": {
+   "name": "Elder Snow Leopard",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 7 individu(s))",
+     "questie_hp": null,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "267308": {
+   "name": "Razormane Flesheater",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "18": {
+     "max_hp": 1042,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    },
+    "19": {
+     "max_hp": 1144,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "267314": {
+   "name": "Razormane Berserker",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "19": {
+     "max_hp": 1144,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "271486": {
+   "name": "Wendigo Shaman",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "7": {
+     "max_hp": 110,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    },
+    "8": {
+     "max_hp": 125,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "271530": {
+   "name": "Elder Wendigo",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "7": {
+     "max_hp": 137,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    },
+    "8": {
+     "max_hp": 156,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  },
+  "274935": {
+   "name": "Ironforge Protector",
+   "zone_id": null,
+   "rank": null,
+   "levels": {
+    "55": {
+     "max_hp": 6796,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": null,
+     "fought": null
+    }
+   }
+  }
+ },
+ "hp_by_level": {
+  "1": {
+   "value": 42,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 2
+  },
+  "2": {
+   "value": 55,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 3
+  },
+  "3": {
+   "value": 71,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 2
+  },
+  "4": {
+   "value": 86,
+   "certainty": "probable",
+   "source": "journaux : médiane de [86] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "5": {
+   "value": 102,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 2
+  },
+  "6": {
+   "value": 120,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 5
+  },
+  "7": {
+   "value": 137,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 5
+  },
+  "8": {
+   "value": 156,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 8
+  },
+  "9": {
+   "value": 180,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 13
+  },
+  "10": {
+   "value": 208,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 16
+  },
+  "11": {
+   "value": 239,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 13
+  },
+  "12": {
+   "value": 272,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 11
+  },
+  "13": {
+   "value": 307,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 8
+  },
+  "14": {
+   "value": 345,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 7
+  },
+  "15": {
+   "value": 385,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 2
+  },
+  "16": {
+   "value": 427,
+   "certainty": "probable",
+   "source": "journaux : médiane de [427] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "17": {
+   "value": 473,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 3
+  },
+  "18": {
+   "value": 521,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 7
+  },
+  "19": {
+   "value": 572,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 11
+  },
+  "20": {
+   "value": 629,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 8
+  },
+  "21": {
+   "value": 691,
+   "certainty": "probable",
+   "source": "journaux : médiane de [691] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "22": {
+   "value": 746,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 2
+  },
+  "23": {
+   "value": 803,
+   "certainty": "certain",
+   "source": "journaux : valeur commune des PNJ normaux observés",
+   "n_npcs": 4
+  },
+  "24": {
+   "value": 863,
+   "certainty": "probable",
+   "source": "journaux : médiane de [863] des PNJ normaux observés",
+   "n_npcs": 1
+  },
+  "25": {
+   "value": 1018,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 243,
+   "questie_hp": 712,
+   "ratio": 1.4298644338118014
+  },
+  "26": {
+   "value": 1145,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 125,
+   "questie_hp": 787,
+   "ratio": 1.4552191960086687
+  },
+  "27": {
+   "value": 1244,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 99,
+   "questie_hp": 840,
+   "ratio": 1.480573958205536
+  },
+  "28": {
+   "value": 1349,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 114,
+   "questie_hp": 896,
+   "ratio": 1.5059287204024034
+  },
+  "29": {
+   "value": 1455,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 104,
+   "questie_hp": 950,
+   "ratio": 1.531283482599271
+  },
+  "30": {
+   "value": 1560,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 627,
+   "questie_hp": 1002,
+   "ratio": 1.5566382447961382
+  },
+  "31": {
+   "value": 1750,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 102,
+   "questie_hp": 1106,
+   "ratio": 1.5819930069930055
+  },
+  "32": {
+   "value": 1868,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 124,
+   "questie_hp": 1162,
+   "ratio": 1.607347769189873
+  },
+  "33": {
+   "value": 1994,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 102,
+   "questie_hp": 1221,
+   "ratio": 1.6327025313867405
+  },
+  "34": {
+   "value": 2121,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 100,
+   "questie_hp": 1279,
+   "ratio": 1.6580572935836078
+  },
+  "35": {
+   "value": 2259,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 315,
+   "questie_hp": 1342,
+   "ratio": 1.683412055780475
+  },
+  "36": {
+   "value": 2510,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 124,
+   "questie_hp": 1469,
+   "ratio": 1.7087668179773425
+  },
+  "37": {
+   "value": 2664,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 140,
+   "questie_hp": 1536,
+   "ratio": 1.73412158017421
+  },
+  "38": {
+   "value": 2822,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 125,
+   "questie_hp": 1604,
+   "ratio": 1.7594763423710773
+  },
+  "39": {
+   "value": 2995,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 96,
+   "questie_hp": 1678,
+   "ratio": 1.7848311045679446
+  },
+  "40": {
+   "value": 3171,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 326,
+   "questie_hp": 1752,
+   "ratio": 1.810185866764812
+  },
+  "41": {
+   "value": 3491,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 111,
+   "questie_hp": 1902,
+   "ratio": 1.8355406289616796
+  },
+  "42": {
+   "value": 3686,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 135,
+   "questie_hp": 1981,
+   "ratio": 1.8608953911585469
+  },
+  "43": {
+   "value": 3884,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 136,
+   "questie_hp": 2059,
+   "ratio": 1.8862501533554141
+  },
+  "44": {
+   "value": 4087,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 132,
+   "questie_hp": 2138,
+   "ratio": 1.9116049155522816
+  },
+  "45": {
+   "value": 4294,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 258,
+   "questie_hp": 2217,
+   "ratio": 1.9369596777491491
+  },
+  "46": {
+   "value": 4706,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 121,
+   "questie_hp": 2398,
+   "ratio": 1.9623144399460164
+  },
+  "47": {
+   "value": 4945,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 101,
+   "questie_hp": 2488,
+   "ratio": 1.9876692021428837
+  },
+  "48": {
+   "value": 5188,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 109,
+   "questie_hp": 2577,
+   "ratio": 2.013023964339751
+  },
+  "49": {
+   "value": 5447,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 95,
+   "questie_hp": 2672,
+   "ratio": 2.0383787265366187
+  },
+  "50": {
+   "value": 5712,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 327,
+   "questie_hp": 2768,
+   "ratio": 2.0637334887334857
+  },
+  "51": {
+   "value": 6223,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 122,
+   "questie_hp": 2979,
+   "ratio": 2.089088250930353
+  },
+  "52": {
+   "value": 6517,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 154,
+   "questie_hp": 3082,
+   "ratio": 2.1144430131272207
+  },
+  "53": {
+   "value": 6822,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 158,
+   "questie_hp": 3188,
+   "ratio": 2.139797775324088
+  },
+  "54": {
+   "value": 7128,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 176,
+   "questie_hp": 3292,
+   "ratio": 2.1651525375209557
+  },
+  "55": {
+   "value": 7443,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 353,
+   "questie_hp": 3398,
+   "ratio": 2.1905072997178228
+  },
+  "56": {
+   "value": 6577,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 169,
+   "questie_hp": 2968,
+   "ratio": 2.2158620619146903
+  },
+  "57": {
+   "value": 8422,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 183,
+   "questie_hp": 3758,
+   "ratio": 2.2412168241115578
+  },
+  "58": {
+   "value": 8459,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 151,
+   "questie_hp": 3732,
+   "ratio": 2.266571586308425
+  },
+  "59": {
+   "value": 8822,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 123,
+   "questie_hp": 3849,
+   "ratio": 2.2919263485052923
+  },
+  "60": {
+   "value": 7638,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 475,
+   "questie_hp": 3296,
+   "ratio": 2.31728111070216
+  },
+  "61": {
+   "value": 7953,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 33,
+   "questie_hp": 3395,
+   "ratio": 2.3426358728990273
+  },
+  "62": {
+   "value": 10348,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 73,
+   "questie_hp": 4370,
+   "ratio": 2.367990635095895
+  },
+  "63": {
+   "value": 13752,
+   "certainty": "suppose",
+   "source": "médiane des PNJ normaux de Questie × rapport de correction (Questie corrigé) ; communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
+   "n_npcs": 27,
+   "questie_hp": 5746,
+   "ratio": 2.393345397292762
+  }
+ },
+ "conflicts": [],
+ "questie_gaps": [
+  {
+   "npc_id": 1115,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 1116,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 1116,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1117,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 1117,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1121,
+   "level": 8,
+   "measured": 156,
+   "questie": 148
+  },
+  {
+   "npc_id": 1121,
+   "level": 9,
+   "measured": 180,
+   "questie": 166
+  },
+  {
+   "npc_id": 1122,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 1122,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1123,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 1124,
+   "level": 9,
+   "measured": 180,
+   "questie": 160
+  },
+  {
+   "npc_id": 1124,
+   "level": 10,
+   "measured": 208,
+   "questie": 178
+  },
+  {
+   "npc_id": 1161,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1161,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 1162,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1162,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 1172,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1172,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1173,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1173,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1176,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1176,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 1186,
+   "level": 11,
+   "measured": 287,
+   "questie": 266
+  },
+  {
+   "npc_id": 1186,
+   "level": 12,
+   "measured": 326,
+   "questie": 296
+  },
+  {
+   "npc_id": 1190,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1190,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1195,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1195,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1202,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1211,
+   "level": 9,
+   "measured": 180,
+   "questie": 177
+  },
+  {
+   "npc_id": 1211,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1260,
+   "level": 11,
+   "measured": 239,
+   "questie": 208
+  },
+  {
+   "npc_id": 1266,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 1271,
+   "level": 11,
+   "measured": 717,
+   "questie": 666
+  },
+  {
+   "npc_id": 1329,
+   "level": 30,
+   "measured": 2484,
+   "questie": 1910
+  },
+  {
+   "npc_id": 1388,
+   "level": 11,
+   "measured": 717,
+   "questie": 666
+  },
+  {
+   "npc_id": 1397,
+   "level": 8,
+   "measured": 156,
+   "questie": 148
+  },
+  {
+   "npc_id": 1397,
+   "level": 9,
+   "measured": 180,
+   "questie": 166
+  },
+  {
+   "npc_id": 1689,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 1689,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 1961,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 2071,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 2163,
+   "level": 11,
+   "measured": 299,
+   "questie": 278
+  },
+  {
+   "npc_id": 2165,
+   "level": 16,
+   "measured": 534,
+   "questie": 445
+  },
+  {
+   "npc_id": 2165,
+   "level": 17,
+   "measured": 591,
+   "questie": 482
+  },
+  {
+   "npc_id": 2185,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 2231,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 2231,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 2237,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 2237,
+   "level": 18,
+   "measured": 521,
+   "questie": 417
+  },
+  {
+   "npc_id": 2321,
+   "level": 12,
+   "measured": 272,
+   "questie": 248
+  },
+  {
+   "npc_id": 2324,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 2338,
+   "level": 16,
+   "measured": 427,
+   "questie": 325
+  },
+  {
+   "npc_id": 2339,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 3100,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 3123,
+   "level": 9,
+   "measured": 180,
+   "questie": 177
+  },
+  {
+   "npc_id": 3123,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3127,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 3127,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3131,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3131,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3225,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3242,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3242,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 3244,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3244,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3245,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 3246,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3246,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3254,
+   "level": 11,
+   "measured": 191,
+   "questie": 178
+  },
+  {
+   "npc_id": 3254,
+   "level": 12,
+   "measured": 218,
+   "questie": 198
+  },
+  {
+   "npc_id": 3254,
+   "level": 13,
+   "measured": 246,
+   "questie": 218
+  },
+  {
+   "npc_id": 3255,
+   "level": 14,
+   "measured": 345,
+   "questie": 301
+  },
+  {
+   "npc_id": 3265,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3265,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3266,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3266,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3267,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3267,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3268,
+   "level": 10,
+   "measured": 208,
+   "questie": 186
+  },
+  {
+   "npc_id": 3268,
+   "level": 11,
+   "measured": 239,
+   "questie": 208
+  },
+  {
+   "npc_id": 3269,
+   "level": 12,
+   "measured": 272,
+   "questie": 219
+  },
+  {
+   "npc_id": 3269,
+   "level": 13,
+   "measured": 307,
+   "questie": 241
+  },
+  {
+   "npc_id": 3270,
+   "level": 15,
+   "measured": 1155,
+   "questie": 903
+  },
+  {
+   "npc_id": 3271,
+   "level": 13,
+   "measured": 307,
+   "questie": 253
+  },
+  {
+   "npc_id": 3271,
+   "level": 14,
+   "measured": 345,
+   "questie": 276
+  },
+  {
+   "npc_id": 3272,
+   "level": 12,
+   "measured": 272,
+   "questie": 248
+  },
+  {
+   "npc_id": 3272,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3284,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 3292,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 3379,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 3379,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3380,
+   "level": 11,
+   "measured": 239,
+   "questie": 199
+  },
+  {
+   "npc_id": 3380,
+   "level": 12,
+   "measured": 272,
+   "questie": 219
+  },
+  {
+   "npc_id": 3381,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3381,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3382,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 3382,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 3415,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 3415,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 3425,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 3425,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 3438,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 3467,
+   "level": 16,
+   "measured": 427,
+   "questie": 356
+  },
+  {
+   "npc_id": 3584,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 3664,
+   "level": 24,
+   "measured": 1269,
+   "questie": 792
+  },
+  {
+   "npc_id": 3711,
+   "level": 21,
+   "measured": 691,
+   "questie": 531
+  },
+  {
+   "npc_id": 3712,
+   "level": 19,
+   "measured": 572,
+   "questie": 404
+  },
+  {
+   "npc_id": 3712,
+   "level": 20,
+   "measured": 629,
+   "questie": 433
+  },
+  {
+   "npc_id": 3713,
+   "level": 18,
+   "measured": 521,
+   "questie": 417
+  },
+  {
+   "npc_id": 3713,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3715,
+   "level": 19,
+   "measured": 572,
+   "questie": 404
+  },
+  {
+   "npc_id": 3715,
+   "level": 20,
+   "measured": 629,
+   "questie": 433
+  },
+  {
+   "npc_id": 3717,
+   "level": 18,
+   "measured": 521,
+   "questie": 354
+  },
+  {
+   "npc_id": 3717,
+   "level": 19,
+   "measured": 572,
+   "questie": 379
+  },
+  {
+   "npc_id": 3721,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3725,
+   "level": 18,
+   "measured": 521,
+   "questie": 354
+  },
+  {
+   "npc_id": 3725,
+   "level": 19,
+   "measured": 572,
+   "questie": 379
+  },
+  {
+   "npc_id": 3727,
+   "level": 20,
+   "measured": 642,
+   "questie": 494
+  },
+  {
+   "npc_id": 3728,
+   "level": 19,
+   "measured": 572,
+   "questie": 379
+  },
+  {
+   "npc_id": 3730,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3730,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3732,
+   "level": 18,
+   "measured": 521,
+   "questie": 377
+  },
+  {
+   "npc_id": 3732,
+   "level": 19,
+   "measured": 572,
+   "questie": 404
+  },
+  {
+   "npc_id": 3733,
+   "level": 18,
+   "measured": 521,
+   "questie": 417
+  },
+  {
+   "npc_id": 3733,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3734,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3772,
+   "level": 23,
+   "measured": 803,
+   "questie": 544
+  },
+  {
+   "npc_id": 3772,
+   "level": 24,
+   "measured": 863,
+   "questie": 582
+  },
+  {
+   "npc_id": 3774,
+   "level": 22,
+   "measured": 746,
+   "questie": 573
+  },
+  {
+   "npc_id": 3774,
+   "level": 23,
+   "measured": 803,
+   "questie": 617
+  },
+  {
+   "npc_id": 3781,
+   "level": 23,
+   "measured": 803,
+   "questie": 544
+  },
+  {
+   "npc_id": 3783,
+   "level": 22,
+   "measured": 746,
+   "questie": 508
+  },
+  {
+   "npc_id": 3783,
+   "level": 23,
+   "measured": 803,
+   "questie": 544
+  },
+  {
+   "npc_id": 3809,
+   "level": 21,
+   "measured": 860,
+   "questie": 662
+  },
+  {
+   "npc_id": 3809,
+   "level": 22,
+   "measured": 928,
+   "questie": 714
+  },
+  {
+   "npc_id": 3812,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3816,
+   "level": 18,
+   "measured": 521,
+   "questie": 417
+  },
+  {
+   "npc_id": 3816,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3819,
+   "level": 20,
+   "measured": 642,
+   "questie": 494
+  },
+  {
+   "npc_id": 3819,
+   "level": 21,
+   "measured": 691,
+   "questie": 531
+  },
+  {
+   "npc_id": 3823,
+   "level": 19,
+   "measured": 572,
+   "questie": 449
+  },
+  {
+   "npc_id": 3823,
+   "level": 20,
+   "measured": 629,
+   "questie": 484
+  },
+  {
+   "npc_id": 3846,
+   "level": 17,
+   "measured": 473,
+   "questie": 385
+  },
+  {
+   "npc_id": 3944,
+   "level": 20,
+   "measured": 642,
+   "questie": 442
+  },
+  {
+   "npc_id": 3986,
+   "level": 25,
+   "measured": 927,
+   "questie": 573
+  },
+  {
+   "npc_id": 4127,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 5612,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 5676,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 5677,
+   "level": 20,
+   "measured": 629,
+   "questie": 433
+  },
+  {
+   "npc_id": 6119,
+   "level": 10,
+   "measured": 208,
+   "questie": 178
+  },
+  {
+   "npc_id": 6123,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 6124,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 6328,
+   "level": 14,
+   "measured": 345,
+   "questie": 263
+  },
+  {
+   "npc_id": 6466,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 6494,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 11318,
+   "level": 13,
+   "measured": 921,
+   "questie": 819
+  },
+  {
+   "npc_id": 11318,
+   "level": 14,
+   "measured": 1035,
+   "questie": 902
+  },
+  {
+   "npc_id": 11318,
+   "level": 15,
+   "measured": 1155,
+   "questie": 984
+  },
+  {
+   "npc_id": 11319,
+   "level": 13,
+   "measured": 921,
+   "questie": 759
+  },
+  {
+   "npc_id": 11319,
+   "level": 14,
+   "measured": 1035,
+   "questie": 831
+  },
+  {
+   "npc_id": 11319,
+   "level": 15,
+   "measured": 1155,
+   "questie": 903
+  },
+  {
+   "npc_id": 11320,
+   "level": 13,
+   "measured": 921,
+   "questie": 819
+  },
+  {
+   "npc_id": 11320,
+   "level": 14,
+   "measured": 1035,
+   "questie": 900
+  },
+  {
+   "npc_id": 11321,
+   "level": 13,
+   "measured": 921,
+   "questie": 819
+  },
+  {
+   "npc_id": 11321,
+   "level": 14,
+   "measured": 1035,
+   "questie": 902
+  },
+  {
+   "npc_id": 11321,
+   "level": 15,
+   "measured": 1155,
+   "questie": 984
+  },
+  {
+   "npc_id": 11322,
+   "level": 13,
+   "measured": 921,
+   "questie": 759
+  },
+  {
+   "npc_id": 11322,
+   "level": 14,
+   "measured": 1035,
+   "questie": 831
+  },
+  {
+   "npc_id": 11322,
+   "level": 15,
+   "measured": 1155,
+   "questie": 903
+  },
+  {
+   "npc_id": 11323,
+   "level": 13,
+   "measured": 921,
+   "questie": 819
+  },
+  {
+   "npc_id": 11323,
+   "level": 14,
+   "measured": 1035,
+   "questie": 902
+  },
+  {
+   "npc_id": 11323,
+   "level": 15,
+   "measured": 1155,
+   "questie": 984
+  },
+  {
+   "npc_id": 11324,
+   "level": 13,
+   "measured": 921,
+   "questie": 723
+  },
+  {
+   "npc_id": 11324,
+   "level": 14,
+   "measured": 1035,
+   "questie": 789
+  },
+  {
+   "npc_id": 11324,
+   "level": 15,
+   "measured": 1155,
+   "questie": 855
+  },
+  {
+   "npc_id": 11517,
+   "level": 16,
+   "measured": 1708,
+   "questie": 1424
+  },
+  {
+   "npc_id": 11518,
+   "level": 16,
+   "measured": 1922,
+   "questie": 1382
+  },
+  {
+   "npc_id": 11519,
+   "level": 16,
+   "measured": 1815,
+   "questie": 1513
+  },
+  {
+   "npc_id": 11520,
+   "level": 16,
+   "measured": 2242,
+   "questie": 1869
+  },
+  {
+   "npc_id": 12319,
+   "level": 14,
+   "measured": 345,
+   "questie": 263
+  },
+  {
+   "npc_id": 12320,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 12717,
+   "level": 25,
+   "measured": 927,
+   "questie": 712
+  },
+  {
+   "npc_id": 12940,
+   "level": 22,
+   "measured": 1462,
+   "questie": 1124
+  },
+  {
+   "npc_id": 13076,
+   "level": 30,
+   "measured": 2484,
+   "questie": 1910
+  }
+ ],
+ "questie_correction": {
+  "method": "médiane par niveau des rapports PV mesuré / PV Questie (PNJ normaux) ; droite de Theil-Sen pondéré sur les médianes > 1 (médiane pondérée des pentes entre niveaux, poids n_i × n_j ; ordonnée : médiane des écarts, décision 190) ; rapport hors mesure = max(1, droite)",
+  "levels": {
+   "1": {
+    "ratio": 1.0,
+    "n_pairs": 2
+   },
+   "2": {
+    "ratio": 1.0,
+    "n_pairs": 3
+   },
+   "3": {
+    "ratio": 1.0,
+    "n_pairs": 2
+   },
+   "4": {
+    "ratio": 1.0,
+    "n_pairs": 1
+   },
+   "5": {
+    "ratio": 1.0,
+    "n_pairs": 2
+   },
+   "6": {
+    "ratio": 1.0,
+    "n_pairs": 5
+   },
+   "7": {
+    "ratio": 1.0,
+    "n_pairs": 5
+   },
+   "8": {
+    "ratio": 1.0,
+    "n_pairs": 8
+   },
+   "9": {
+    "ratio": 1.0227272727272727,
+    "n_pairs": 13
+   },
+   "10": {
+    "ratio": 1.0505050505050506,
+    "n_pairs": 16
+   },
+   "11": {
+    "ratio": 1.0765765765765767,
+    "n_pairs": 12
+   },
+   "12": {
+    "ratio": 1.1012145748987854,
+    "n_pairs": 11
+   },
+   "13": {
+    "ratio": 1.1245421245421245,
+    "n_pairs": 8
+   },
+   "14": {
+    "ratio": 1.15,
+    "n_pairs": 7
+   },
+   "15": {
+    "ratio": 1.173780487804878,
+    "n_pairs": 2
+   },
+   "16": {
+    "ratio": 1.3138461538461539,
+    "n_pairs": 1
+   },
+   "17": {
+    "ratio": 1.2253886010362693,
+    "n_pairs": 3
+   },
+   "18": {
+    "ratio": 1.249400479616307,
+    "n_pairs": 7
+   },
+   "19": {
+    "ratio": 1.4158415841584158,
+    "n_pairs": 11
+   },
+   "20": {
+    "ratio": 1.2995867768595042,
+    "n_pairs": 8
+   },
+   "21": {
+    "ratio": 1.3013182674199624,
+    "n_pairs": 1
+   },
+   "22": {
+    "ratio": 1.3852118288878812,
+    "n_pairs": 2
+   },
+   "23": {
+    "ratio": 1.4761029411764706,
+    "n_pairs": 4
+   },
+   "24": {
+    "ratio": 1.4828178694158076,
+    "n_pairs": 1
+   }
+  },
+  "fit": {
+   "slope": 0.025354762196867386,
+   "intercept": 0.7959953788901166,
+   "knee_level": 8.046008064516117,
+   "points": 16
+  },
+  "range": [
+   1,
+   24
+  ],
+  "excluded": [
+   {
+    "npc_id": 721,
+    "name": "Rabbit",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1128,
+    "name": "Young Black Bear",
+    "level": 5,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1128,
+    "name": "Young Black Bear",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1131,
+    "name": "Winter Wolf",
+    "level": 7,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1131,
+    "name": "Winter Wolf",
+    "level": 8,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1134,
+    "name": "Young Wendigo",
+    "level": 5,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1134,
+    "name": "Young Wendigo",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1135,
+    "name": "Wendigo",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1135,
+    "name": "Wendigo",
+    "level": 7,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1138,
+    "name": "Snow Tracker Wolf",
+    "level": 6,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1161,
+    "name": "Stonesplinter Trogg",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 1161,
+    "name": "Stonesplinter Trogg",
+    "level": 12,
+    "ratio": 1.1012145748987854
+   },
+   {
+    "npc_id": 1162,
+    "name": "Stonesplinter Scout",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 1162,
+    "name": "Stonesplinter Scout",
+    "level": 12,
+    "ratio": 1.1012145748987854
+   },
+   {
+    "npc_id": 1176,
+    "name": "Tunnel Rat Forager",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 1176,
+    "name": "Tunnel Rat Forager",
+    "level": 12,
+    "ratio": 1.1012145748987854
+   },
+   {
+    "npc_id": 1186,
+    "name": "Elder Black Bear",
+    "level": 11,
+    "ratio": 1.0789473684210527
+   },
+   {
+    "npc_id": 1186,
+    "name": "Elder Black Bear",
+    "level": 12,
+    "ratio": 1.1013513513513513
+   },
+   {
+    "npc_id": 1190,
+    "name": "Mountain Boar",
+    "level": 10,
+    "ratio": 1.0505050505050506
+   },
+   {
+    "npc_id": 1190,
+    "name": "Mountain Boar",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 1196,
+    "name": "Ice Claw Bear",
+    "level": 7,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1196,
+    "name": "Ice Claw Bear",
+    "level": 8,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1202,
+    "name": "Tunnel Rat Kobold",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 1211,
+    "name": "Leper Gnome",
+    "level": 8,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1211,
+    "name": "Leper Gnome",
+    "level": 9,
+    "ratio": 1.0169491525423728
+   },
+   {
+    "npc_id": 1211,
+    "name": "Leper Gnome",
+    "level": 10,
+    "ratio": 1.0505050505050506
+   },
+   {
+    "npc_id": 1266,
+    "name": "Tundra MacGrann",
+    "level": 20,
+    "ratio": 1.2995867768595042
+   },
+   {
+    "npc_id": 1329,
+    "name": "Mountaineer Naarh",
+    "level": 30,
+    "ratio": 1.300523560209424
+   },
+   {
+    "npc_id": 1412,
+    "name": "Squirrel",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 1961,
+    "name": "Mangeclaw",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 2163,
+    "name": "Thistle Bear",
+    "level": 11,
+    "ratio": 1.0755395683453237
+   },
+   {
+    "npc_id": 2165,
+    "name": "Grizzled Thistle Bear",
+    "level": 16,
+    "ratio": 1.2
+   },
+   {
+    "npc_id": 2165,
+    "name": "Grizzled Thistle Bear",
+    "level": 17,
+    "ratio": 1.2261410788381744
+   },
+   {
+    "npc_id": 3254,
+    "name": "Sunscale Lashtail",
+    "level": 11,
+    "ratio": 1.0730337078651686
+   },
+   {
+    "npc_id": 3254,
+    "name": "Sunscale Lashtail",
+    "level": 12,
+    "ratio": 1.101010101010101
+   },
+   {
+    "npc_id": 3254,
+    "name": "Sunscale Lashtail",
+    "level": 13,
+    "ratio": 1.128440366972477
+   },
+   {
+    "npc_id": 3292,
+    "name": "Brewmaster Drohn",
+    "level": 9,
+    "ratio": 1.0227272727272727
+   },
+   {
+    "npc_id": 3438,
+    "name": "Kreenig Snarlsnout",
+    "level": 15,
+    "ratio": 1.173780487804878
+   },
+   {
+    "npc_id": 3467,
+    "name": "Baron Longshore",
+    "level": 16,
+    "ratio": 1.199438202247191
+   },
+   {
+    "npc_id": 3584,
+    "name": "Therylune",
+    "level": 17,
+    "ratio": 1.2253886010362693
+   },
+   {
+    "npc_id": 3664,
+    "name": "Ilkrud Magthrull",
+    "level": 24,
+    "ratio": 1.6022727272727273
+   },
+   {
+    "npc_id": 3727,
+    "name": "Dark Strand Enforcer",
+    "level": 20,
+    "ratio": 1.2995951417004048
+   },
+   {
+    "npc_id": 3809,
+    "name": "Ashenvale Bear",
+    "level": 21,
+    "ratio": 1.299093655589124
+   },
+   {
+    "npc_id": 3809,
+    "name": "Ashenvale Bear",
+    "level": 22,
+    "ratio": 1.2997198879551821
+   },
+   {
+    "npc_id": 3819,
+    "name": "Wildthorn Stalker",
+    "level": 20,
+    "ratio": 1.2995951417004048
+   },
+   {
+    "npc_id": 3819,
+    "name": "Wildthorn Stalker",
+    "level": 21,
+    "ratio": 1.3013182674199624
+   },
+   {
+    "npc_id": 3846,
+    "name": "Talen",
+    "level": 17,
+    "ratio": 1.2285714285714286
+   },
+   {
+    "npc_id": 3944,
+    "name": "Wrathtail Priestess",
+    "level": 20,
+    "ratio": 1.4524886877828054
+   },
+   {
+    "npc_id": 3986,
+    "name": "Sarilus Foulborne",
+    "level": 25,
+    "ratio": 1.617801047120419
+   },
+   {
+    "npc_id": 5612,
+    "name": "Gimrizz Shadowcog",
+    "level": 15,
+    "ratio": 1.173780487804878
+   },
+   {
+    "npc_id": 5676,
+    "name": "Summoned Voidwalker",
+    "level": 10,
+    "ratio": 1.0505050505050506
+   },
+   {
+    "npc_id": 5677,
+    "name": "Summoned Succubus",
+    "level": 20,
+    "ratio": 1.4526558891454966
+   },
+   {
+    "npc_id": 5951,
+    "name": "Hare",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 6119,
+    "name": "Tog Rustsprocket",
+    "level": 10,
+    "ratio": 1.1685393258426966
+   },
+   {
+    "npc_id": 6124,
+    "name": "Captain Beld",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 6328,
+    "name": "Dannie Fizzwizzle",
+    "level": 14,
+    "ratio": 1.311787072243346
+   },
+   {
+    "npc_id": 6466,
+    "name": "Gamon",
+    "level": 12,
+    "ratio": 1.1012145748987854
+   },
+   {
+    "npc_id": 6494,
+    "name": "Tazan",
+    "level": 13,
+    "ratio": 1.1245421245421245
+   },
+   {
+    "npc_id": 10556,
+    "name": "Lazy Peon",
+    "level": 4,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 12319,
+    "name": "Burning Blade Toxicologist",
+    "level": 14,
+    "ratio": 1.311787072243346
+   },
+   {
+    "npc_id": 12320,
+    "name": "Burning Blade Crusher",
+    "level": 13,
+    "ratio": 1.1245421245421245
+   },
+   {
+    "npc_id": 12427,
+    "name": "Mountaineer Dolf",
+    "level": 7,
+    "ratio": 1.0
+   },
+   {
+    "npc_id": 12717,
+    "name": "Muglash",
+    "level": 25,
+    "ratio": 1.3019662921348314
+   },
+   {
+    "npc_id": 12940,
+    "name": "Vorsha the Lasher",
+    "level": 22,
+    "ratio": 1.300711743772242
+   },
+   {
+    "npc_id": 13076,
+    "name": "Dun Morogh Mountaineer",
+    "level": 30,
+    "ratio": 1.300523560209424
+   }
+  ]
+ },
+ "inversions": [
+  {
+   "level": 56,
+   "value": 6577,
+   "previous_level": 55,
+   "previous": 7443
+  },
+  {
+   "level": 60,
+   "value": 7638,
+   "previous_level": 59,
+   "previous": 8822
+  }
+ ],
+ "curve_excluded": [
+  {
+   "npc_id": 721,
+   "name": "Rabbit",
+   "levels": [
+    1
+   ],
+   "reason": "hors norme : 1 PV au niveau 1, -97,6 % de la médiane des autres PNJ du niveau (42) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 1128,
+   "name": "Young Black Bear",
+   "levels": [
+    5,
+    6
+   ],
+   "reason": "hors norme : 122 PV au niveau 5, +19,6 % de la médiane des autres PNJ du niveau (102) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 1131,
+   "name": "Winter Wolf",
+   "levels": [
+    7,
+    8
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1134,
+   "name": "Young Wendigo",
+   "levels": [
+    5,
+    6
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1135,
+   "name": "Wendigo",
+   "levels": [
+    6,
+    7
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1138,
+   "name": "Snow Tracker Wolf",
+   "levels": [
+    6
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1161,
+   "name": "Stonesplinter Trogg",
+   "levels": [
+    11,
+    12
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1162,
+   "name": "Stonesplinter Scout",
+   "levels": [
+    11,
+    12
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1176,
+   "name": "Tunnel Rat Forager",
+   "levels": [
+    11,
+    12
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1186,
+   "name": "Elder Black Bear",
+   "levels": [
+    11,
+    12
+   ],
+   "reason": "hors norme : 287 PV au niveau 11, +20,1 % de la médiane des autres PNJ du niveau (239) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 1190,
+   "name": "Mountain Boar",
+   "levels": [
+    10,
+    11
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1196,
+   "name": "Ice Claw Bear",
+   "levels": [
+    7,
+    8
+   ],
+   "reason": "hors norme : 164 PV au niveau 7, +19,7 % de la médiane des autres PNJ du niveau (137) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 1202,
+   "name": "Tunnel Rat Kobold",
+   "levels": [
+    11,
+    12
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1211,
+   "name": "Leper Gnome",
+   "levels": [
+    8,
+    9,
+    10
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1260,
+   "name": "Great Father Arctikus",
+   "levels": [
+    11
+   ],
+   "reason": "rang 4 dans Questie (rare) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 1266,
+   "name": "Tundra MacGrann",
+   "levels": [
+    20
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 1271,
+   "name": "Old Icebeard",
+   "levels": [
+    11
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 1329,
+   "name": "Mountaineer Naarh",
+   "levels": [
+    30
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 1388,
+   "name": "Vagash",
+   "levels": [
+    11
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 1412,
+   "name": "Squirrel",
+   "levels": [
+    1
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 1961,
+   "name": "Mangeclaw",
+   "levels": [
+    11
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 2163,
+   "name": "Thistle Bear",
+   "levels": [
+    11
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 2165,
+   "name": "Grizzled Thistle Bear",
+   "levels": [
+    16,
+    17
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 3254,
+   "name": "Sunscale Lashtail",
+   "levels": [
+    11,
+    12,
+    13
+   ],
+   "reason": "hors norme : 191 PV au niveau 11, -20,1 % de la médiane des autres PNJ du niveau (239) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 3270,
+   "name": "Elder Mystic Razorsnout",
+   "levels": [
+    15
+   ],
+   "reason": "rang 2 dans Questie (élite rare) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 3292,
+   "name": "Brewmaster Drohn",
+   "levels": [
+    9
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : toujours mesuré, écarté de la courbe des PV par niveau et de la correction (décision 189) ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 3438,
+   "name": "Kreenig Snarlsnout",
+   "levels": [
+    15
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : toujours mesuré, écarté de la courbe des PV par niveau et de la correction (décision 189) ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 3467,
+   "name": "Baron Longshore",
+   "levels": [
+    16
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : toujours mesuré, écarté de la courbe des PV par niveau et de la correction (décision 189) ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 3584,
+   "name": "Therylune",
+   "levels": [
+    17
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 3664,
+   "name": "Ilkrud Magthrull",
+   "levels": [
+    24
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 3727,
+   "name": "Dark Strand Enforcer",
+   "levels": [
+    20
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 3809,
+   "name": "Ashenvale Bear",
+   "levels": [
+    21,
+    22
+   ],
+   "reason": "PNJ hors norme (même précédent que la révision 2) : PV mesurés au-dessus des PNJ normaux de leur niveau (Ashenvale Bear : famille des ours ; Wrathtail Priestess : 642 PV au niveau 20) ; rang normal dans Questie ; décision de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 3819,
+   "name": "Wildthorn Stalker",
+   "levels": [
+    20,
+    21
+   ],
+   "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 3846,
+   "name": "Talen",
+   "levels": [
+    17
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 3944,
+   "name": "Wrathtail Priestess",
+   "levels": [
+    20
+   ],
+   "reason": "PNJ hors norme (même précédent que la révision 2) : PV mesurés au-dessus des PNJ normaux de leur niveau (Ashenvale Bear : famille des ours ; Wrathtail Priestess : 642 PV au niveau 20) ; rang normal dans Questie ; décision de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 3986,
+   "name": "Sarilus Foulborne",
+   "levels": [
+    25
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 5612,
+   "name": "Gimrizz Shadowcog",
+   "levels": [
+    15
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 5676,
+   "name": "Summoned Voidwalker",
+   "levels": [
+    10
+   ],
+   "reason": "démon de quête unique, contrôlé par le serveur (PNJ hostile sans propriétaire dans le journal du 2026-10-07) : écarté comme les PNJ nommés de quête (décision 189) ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 5677,
+   "name": "Summoned Succubus",
+   "levels": [
+    20
+   ],
+   "reason": "démon de quête unique, contrôlé par le serveur (PNJ hostile sans propriétaire dans le journal du 2026-10-07) : écarté comme les PNJ nommés de quête (décision 189) ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 5951,
+   "name": "Hare",
+   "levels": [
+    1
+   ],
+   "reason": "hors norme : 8 PV au niveau 1, -81,0 % de la médiane des autres PNJ du niveau (42) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 6119,
+   "name": "Tog Rustsprocket",
+   "levels": [
+    10
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 6124,
+   "name": "Captain Beld",
+   "levels": [
+    11
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 6328,
+   "name": "Dannie Fizzwizzle",
+   "levels": [
+    14
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 6466,
+   "name": "Gamon",
+   "levels": [
+    12
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 6494,
+   "name": "Tazan",
+   "levels": [
+    13
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : toujours mesuré, écarté de la courbe des PV par niveau et de la correction (décision 189) ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 7167,
+   "name": "Polly",
+   "levels": [
+    50
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : toujours mesuré, écarté de la courbe des PV par niveau et de la correction (décision 189) ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 10556,
+   "name": "Lazy Peon",
+   "levels": [
+    4
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 10803,
+   "name": "Rifleman Wheeler",
+   "levels": [
+    8
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 10804,
+   "name": "Rifleman Middlecamp",
+   "levels": [
+    8
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 11318,
+   "name": "Ragefire Trogg",
+   "levels": [
+    13,
+    14,
+    15
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11319,
+   "name": "Ragefire Shaman",
+   "levels": [
+    13,
+    14,
+    15
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11320,
+   "name": "Earthborer",
+   "levels": [
+    13,
+    14
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11321,
+   "name": "Molten Elemental",
+   "levels": [
+    13,
+    14,
+    15
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11322,
+   "name": "Searing Blade Cultist",
+   "levels": [
+    13,
+    14,
+    15
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11323,
+   "name": "Searing Blade Enforcer",
+   "levels": [
+    13,
+    14,
+    15
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11324,
+   "name": "Searing Blade Warlock",
+   "levels": [
+    13,
+    14,
+    15
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11517,
+   "name": "Oggleflint",
+   "levels": [
+    16
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11518,
+   "name": "Jergosh the Invoker",
+   "levels": [
+    16
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11519,
+   "name": "Bazzalan",
+   "levels": [
+    16
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 11520,
+   "name": "Taragaman the Hungerer",
+   "levels": [
+    16
+   ],
+   "reason": "rang 1 dans Questie (élite) : écarté automatiquement de la courbe des PNJ normaux (communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27)"
+  },
+  {
+   "npc_id": 12319,
+   "name": "Burning Blade Toxicologist",
+   "levels": [
+    14
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 12320,
+   "name": "Burning Blade Crusher",
+   "levels": [
+    13
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 12427,
+   "name": "Mountaineer Dolf",
+   "levels": [
+    7
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 12717,
+   "name": "Muglash",
+   "levels": [
+    25
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 12940,
+   "name": "Vorsha the Lasher",
+   "levels": [
+    22
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 13076,
+   "name": "Dun Morogh Mountaineer",
+   "levels": [
+    30
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 257446,
+   "name": "Teo Hammerstorm",
+   "levels": [
+    5
+   ],
+   "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
+  },
+  {
+   "npc_id": 260157,
+   "name": "Elder Snow Leopard",
+   "levels": [
+    9,
+    10
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 267308,
+   "name": "Razormane Flesheater",
+   "levels": [
+    18,
+    19
+   ],
+   "reason": "absents de Questie, PV doubles de la courbe à leur niveau (Razormane Flesheater 1042 et 1144 aux niveaux 18 et 19, Razormane Berserker 1144 au niveau 19, contre 521 et 572) : probablement des élites de Forever ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 267314,
+   "name": "Razormane Berserker",
+   "levels": [
+    19
+   ],
+   "reason": "absents de Questie, PV doubles de la courbe à leur niveau (Razormane Flesheater 1042 et 1144 aux niveaux 18 et 19, Razormane Berserker 1144 au niveau 19, contre 521 et 572) : probablement des élites de Forever ; accord de l'utilisateur du 2026-10-07"
+  },
+  {
+   "npc_id": 271486,
+   "name": "Wendigo Shaman",
+   "levels": [
+    7,
+    8
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 271530,
+   "name": "Elder Wendigo",
+   "levels": [
+    7,
+    8
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  },
+  {
+   "npc_id": 274935,
+   "name": "Ironforge Protector",
+   "levels": [
+    55
+   ],
+   "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
+  }
+ ],
+ "notes": [
+  "npcs : PNJ observés seulement (jamais la base Questie) ; questie_hp : valeur de Questie au même niveau",
+  "hp_by_level : médiane des PNJ normaux (rang Questie 0 ou inconnu) ; journal d'abord, sinon Questie corrigé (questie_hp × ratio ; probable dans questie_correction.range, suppose au-delà)",
+  "inversions : niveaux dont la valeur est sous celle du niveau précédent (listées, jamais lissées)",
+  "créatures invoquées par un joueur (propriétaire non nul dans le bloc avancé, ou drapeaux familier, gardien ou contrôle par un joueur, décision 204) exclues",
+  "journaux écrits sous le client 1.60.1.70245, mesurés dans 1.60.1.70291 sur accord explicite (--accept-version) : WoWCombatLog-100726_130833.txt, WoWCombatLog-100826_081058.txt, WoWCombatLog-100826_153741.txt ; raison : note officielle du 08/10 (t/2360696/5, révision 1) sans changement des monstres de Dun Morogh, Coldridge et Ragefire Chasm ; accord de l'utilisateur du 2026-10-09"
+ ],
+ "inherited_from": "1.60.1.70291"
+}

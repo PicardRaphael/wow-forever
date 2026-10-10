@@ -1,0 +1,686 @@
+{
+ "schema_version": 1,
+ "game_version": "1.60.1.70009",
+ "source": "Portage de seed/forever-mage/scripts/fm.py (T02) ; règles détaillées dans seed/forever-mage/references/mechanics.md",
+ "values": {
+  "coefficient.cast_divisor": {
+   "value": 3.5,
+   "certainty": "suppose",
+   "registry": "G4",
+   "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic supposée inchangée (PC) : coefficient direct = incantation / 3,5 (fm.py, references/mechanics.md)"
+  },
+  "coefficient.cast_bounds_s": {
+   "value": [
+    1.5,
+    3.5
+   ],
+   "certainty": "suppose",
+   "registry": "G4",
+   "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic (PC) : incantation bornée à 1,5..3,5 s dans le coefficient direct (fm.py)"
+  },
+  "coefficient.slow_factor": {
+   "value": 0.95,
+   "certainty": "suppose",
+   "registry": "G4",
+   "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic (PC) : ×0,95 pour un sort qui ralentit (fm.py)"
+  },
+  "coefficient.channel_cap_s": {
+   "value": 5.0,
+   "certainty": "suppose",
+   "registry": "G4",
+   "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; règle Classic (PC) : canalisé = durée (plafonnée à 5 s) / 3,5 (fm.py)"
+  },
+  "coefficient.low_level": {
+   "value": {
+    "threshold": 20,
+    "penalty_per_level": 0.0375
+   },
+   "certainty": "suppose",
+   "registry": "G4",
+   "source": "deux modes (T04e : en forever, appliquée au coefficient du client si coefficient.low_level_default ou l'option low_level_penalty le demande) ; règle Classic (PC) : ×(1 - 0,0375 × (20 - niveau du sort)) pour un sort de niveau < 20 (fm.py)"
+  },
+  "coefficient.low_level_default": {
+   "value": true,
+   "certainty": "probable",
+   "registry": "G4",
+   "source": "T04e (décision 2) : pénalité des sorts de bas niveau (coefficient.low_level) appliquée par défaut en mode forever ; existence de la pénalité confirmée par la note officielle du 1er octobre 2026 (fiche du personnage : un rang très inférieur au niveau profite moins de la puissance des sorts, https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4), probable sans mesure ; la formule (coefficient.low_level, règle Classic) reste supposée jusqu'au test en jeu E2 (docs/ADDON.md) ; toujours appliquée en mode seed",
+   "range": [
+    {
+     "value": true,
+     "source": "règle Classic supposée gardée par Forever (T04e, décision 72)"
+    },
+    {
+     "value": false,
+     "source": "coefficients du client sans pénalité des sorts de bas niveau (question E2)"
+    }
+   ]
+  },
+  "coefficient.fixed": {
+   "value": {
+    "fire_blast": {
+     "cast_s": 1.5
+    },
+    "scorch": {
+     "cast_s": 1.5
+    },
+    "ice_lance": {
+     "value": 0.1429
+    },
+    "arcane_explosion": {
+     "value": 0.143
+    },
+    "frost_nova": {
+     "value": 0.043
+    },
+    "cone_of_cold": {
+     "value": 0.143,
+     "slowed": true
+    },
+    "blast_wave": {
+     "value": 0.143
+    },
+    "blizzard": {
+     "value": 0.333
+    },
+    "flamestrike": {
+     "value": 0.157
+    }
+   },
+   "certainty": "suppose",
+   "registry": "G4",
+   "source": "mode seed seulement (T04e : le mode forever lit les coefficients du client, spell_scaling.json) ; valeurs Classic des sorts de zone et instantanés (PC) ; Ice Lance estimée (EST) ; COEF_FIXED de fm.py"
+  },
+  "talents.first_level": {
+   "value": 10,
+   "certainty": "probable",
+   "registry": "G3",
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json talents.first_level (NumTalentsAtLevel)) ; premier point de talent au niveau 10 : points = niveau - 9 (fm.py points_available)"
+  },
+  "talents.points_per_tier": {
+   "value": 5,
+   "certainty": "probable",
+   "registry": "G3",
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json talents.points_per_tier (TraitCond)) ; 5 points dans l'arbre par palier précédent (fm.py check_build)"
+  },
+  "character.crit_base": {
+   "value": 0.002,
+   "certainty": "suppose",
+   "registry": "A5",
+   "source": "critique de base du Mage 0,2 % (Warcraft Tavern / PC ; references/mechanics.md)"
+  },
+  "character.int_per_crit": {
+   "value": {
+    "level_min": 1,
+    "at_min": 6.0,
+    "level_max": 60,
+    "at_max": 59.5
+   },
+   "certainty": "suppose",
+   "registry": "A5",
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json (PlayerExpectedStat.SpellCritPerIntellect)) ; Int pour 1 % de critique : 59,5 au niveau 60 (Mage Classic) ; interpolation linéaire depuis 6 au niveau 1 (EST, fm.py)"
+  },
+  "character.intellect": {
+   "value": {
+    "base": 21,
+    "per_level": 1.76,
+    "late_bonus_per_level": 0.8,
+    "late_from_level": 5
+   },
+   "certainty": "suppose",
+   "registry": "G2",
+   "source": "modèle d'Intelligence estimé (EST) de fm.py character"
+  },
+  "character.spirit": {
+   "value": {
+    "base": 22,
+    "per_level": 1.66,
+    "late_bonus_per_level": 0.5,
+    "late_from_level": 5
+   },
+   "certainty": "suppose",
+   "registry": "G2",
+   "source": "modèle d'Esprit estimé (EST) de fm.py character"
+  },
+  "character.spell_power": {
+   "value": {
+    "per_level": 0.4,
+    "from_level": 10
+   },
+   "certainty": "suppose",
+   "registry": "G2",
+   "source": "puissance des sorts d'équipement estimée : 0,4 × niveau à partir du niveau 10 (EST, fm.py)"
+  },
+  "character.base_mana": {
+   "value": {
+    "base": 100,
+    "per_level": 18.9
+   },
+   "certainty": "suppose",
+   "registry": "B9",
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json (PlayerExpectedStat.BaseMana)) ; mana de base 100 + 18,9 × (niveau - 1) (PC, leveling.json player_model)"
+  },
+  "character.mana_from_intellect": {
+   "value": {
+    "first_points": 20,
+    "per_point_after": 15
+   },
+   "certainty": "suppose",
+   "registry": "B9",
+   "source": "mana = base + min(Int, 20) + 15 × max(0, Int - 20) (PC, leveling.json player_model)"
+  },
+  "character.hp": {
+   "value": {
+    "base": 40,
+    "per_level": 12,
+    "per_level_squared": 0.25
+   },
+   "certainty": "suppose",
+   "registry": "G2",
+   "source": "points de vie estimés (EST) de fm.py character"
+  },
+  "character.armor": {
+   "value": {
+    "agility_base": 20,
+    "agility_per_level": 0.5,
+    "armor_per_agility": 2,
+    "per_level": 4
+   },
+   "certainty": "suppose",
+   "registry": "G2",
+   "source": "armure = 2 × Agilité + 4 × niveau (tissu), Agilité estimée (EST, fm.py)"
+  },
+  "character.spirit_regen": {
+   "value": {
+    "base": 13,
+    "spirit_divisor": 4,
+    "tick_s": 2
+   },
+   "certainty": "suppose",
+   "registry": "G2",
+   "source": "régénération d'Esprit (13 + Esprit / 4) par tick de 2 s hors règle des 5 s (PC, fm.py)"
+  },
+  "crit.winters_chill_per_stack": {
+   "value": 0.02,
+   "certainty": "probable",
+   "registry": "D4",
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit spell_scaling.json auras.winters_chill (aura posée par le talent)) ; Winter's Chill +2 % de critique par cumul, Frostbolt et Ice Lance seulement dans Forever (FC, references/mechanics.md)"
+  },
+  "mana.talent_rank_cost": {
+   "value": {
+    "ratio_of_next_rank": 0.75,
+    "default": 50.0
+   },
+   "certainty": "suppose",
+   "registry": "B11",
+   "source": "estimation du seed (EST) pour un rang de talent sans coût publié ; voir docs/OPEN_QUESTIONS.md",
+   "note": "mode seed seulement depuis la révision 2 (T06b) : le mode forever lit SpellPower.ManaCost du client (spells.json) ; seul le seed garde mana null et cette estimation"
+  },
+  "hit.miss_per_level_below": {
+   "value": 0.01,
+   "certainty": "suppose",
+   "registry": "A3",
+   "source": "règle Classic (PC) supposée dans Forever : cible plus basse, raté = raté à écart 0 - 1 % par niveau d'écart, plancher min_miss (décision 4 du plan T04b) ; journal du 2026-09-27 : 0 raté sur 281 sorts directs, cibles 2 à 8 niveaux plus bas (très improbable avec 4 % : 0,96^281 ≈ 1e-5)",
+   "range": [
+    {
+     "value": 0.01,
+     "source": "règle Classic (décision 56) : 1 % de raté en moins par niveau d'écart sous la cible"
+    },
+    {
+     "value": 0.0,
+     "source": "raté à écart 0 contre toute cible plus basse (lecture du seed : ligne « - » égale à l'écart 0)"
+    }
+   ]
+  },
+  "leveling.mob_hit_damage": {
+   "value": {
+    "per_level": 0.8,
+    "per_level_squared": 0.02
+   },
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "sim_leveling.py du seed (EST) : dégâts bruts d'un coup de monstre normal = 0,8 × niveau + 0,02 × niveau², avant armure (leveling.json mob_model.hit_damage)"
+  },
+  "leveling.armor_reduction": {
+   "value": {
+    "base": 400,
+    "per_attacker_level": 85
+   },
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit character_scaling.json armor_constant (ExpectedStat.ArmorConstant)) ; règle Classic (PC) reprise par sim_leveling.py du seed : réduction = armure / (armure + 400 + 85 × niveau de l'attaquant), attaquant < 60 (leveling.json combat_rules.armor_dr)"
+  },
+  "leveling.mob_xp": {
+   "value": {
+    "base": 45,
+    "per_level": 5
+   },
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "règle Classic (PC) reprise par sim_leveling.py du seed : XP d'un monstre normal de même niveau = 45 + 5 × niveau (leveling.json mob_xp.formula) ; XP de Forever à modéliser en T04c"
+  },
+  "leveling.frostbite_freeze_s": {
+   "value": 5.0,
+   "certainty": "suppose",
+   "registry": "C5",
+   "source": "sim_leveling.py du seed (EST) : gel de Frostbite de 5 s"
+  },
+  "leveling.dot_tick_s": {
+   "value": 2.0,
+   "certainty": "suppose",
+   "registry": "A17",
+   "source": "sim_leveling.py du seed (EST) : un tic de DoT toutes les 2 s, au moins un tic"
+  },
+  "leveling.ignite": {
+   "value": {
+    "aura_spell_id": 412538,
+    "duration_s": 4.0,
+    "tick_s": 2.0,
+    "cumulative": 1
+   },
+   "certainty": "probable",
+   "registry": "A18",
+   "source": "mode seed seulement (T08b, révision 4 : le mode forever lit spell_scaling.json auras.ignite (SpellEffect, SpellMisc, SpellDuration, SpellAuraOptions)) ; Client 1.60.1.70009 (tables wago, extraits tests/fixtures/wago/1.60.1.70009) : aura 412538 « Ignite », SpellMisc.DurationIndex 35 -> SpellDuration 4000 ms, SpellEffect aura 226 période 2000 ms, SpellAuraOptions.CumulativeAura 1 (T04c) ; rules seed : durée / période = 2 tics de 2 s par critique, comme sim_leveling.py du seed"
+  },
+  "leveling.ignite_rule": {
+   "value": "rolling",
+   "certainty": "suppose",
+   "registry": "A18",
+   "source": "T04c, décision 2 : Ignite roulant (aura non cumulable) ; à chaque critique de feu, montant = part du talent × critique + reste non infligé, l'aura repart pour sa durée et le compteur de tics repart du critique ; reste perdu à la mort du monstre. Règle côté serveur, à vérifier par les journaux (docs/OPEN_QUESTIONS.md) ; assiette : part du talent × critique final, bonus en pourcentage pris une seule fois (notes de développement de Blizzard du 24/09/2026, https://us.forums.blizzard.com/en/wow/t/2360696/1 : « Ignite no longer double dips on % damage increase modifiers », build 1.60.1.70009 publié le même jour, probable)",
+   "range": [
+    {
+     "value": "rolling",
+     "source": "T04c, décision 65 : Ignite roulant, une seule aura non cumulable (client)"
+    },
+    {
+     "value": "independent",
+     "source": "seed sim_leveling.py : un Ignite par critique, tics fixes, sans cumul ni reste"
+    }
+   ]
+  },
+  "leveling.quest_band": {
+   "value": {
+    "red_min_diff": 5,
+    "orange_min_diff": 3,
+    "yellow_min_diff": -2,
+    "gray_rows": [
+     [
+      5,
+      null,
+      0
+     ],
+     [
+      39,
+      5,
+      10
+     ],
+     [
+      59,
+      1,
+      5
+     ],
+     [
+      60,
+      9,
+      0
+     ]
+    ]
+   },
+   "certainty": "suppose",
+   "registry": "I7",
+   "source": "Couleurs de quête (T04c) : rouge dès +5, orange dès +3, jaune dès -2 niveaux, relevés dans Questie 11.38.0 (Modules/Libs/QuestieLib.lua, GetDifficultyColorPercent, copie de la règle de l'interface Classic) ; plus bas, verte jusqu'au niveau gris exclu, grise au-delà. Plage verte : GetQuestGreenRange est une API du client, absente sur disque ; remplacée par le niveau gris de Classic (formule communautaire des émulateurs, non vérifiée pour Forever) : gray_rows [niveau max, retrait, diviseur] -> niveau gris = niveau - retrait - niveau // diviseur (0 si retrait null, sans division si diviseur 0), soit 0 jusqu'au niveau 5, niveau - 5 - niveau/10 jusqu'à 39, niveau - 1 - niveau/5 jusqu'à 59, niveau - 9 au niveau 60 ; quête grise si son niveau est au plus le niveau gris"
+  },
+  "leveling.frost_nova_retreat_yd": {
+   "value": 10.0,
+   "certainty": "suppose",
+   "registry": "I1",
+   "source": "sim_leveling.py du seed (EST) : le Mage recule à 10 m du monstre gelé par Frost Nova"
+  },
+  "leveling.rest_hp_regen_fraction": {
+   "value": 0.02,
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "sim_leveling.py du seed (EST) : régénération de vie au repos de 2 % des PV par seconde, en plus de la nourriture"
+  },
+  "leveling.projectile_speed": {
+   "value": {
+    "default": 28,
+    "instant": 1000000000.0
+   },
+   "certainty": "suppose",
+   "registry": "C1",
+   "source": "sim_leveling.py du seed (EST) : vitesse d'un sort sans projectile_speed publié, 28 m/s dans l'analytique, « infinie » (1e9 m/s) dans le Monte Carlo"
+  },
+  "leveling.analytic": {
+   "value": {
+    "min_cast_fraction": 0.2,
+    "freeze_cap": 0.95,
+    "winters_chill_casts": 3
+   },
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "sim_leveling.py du seed (EST), modèle analytique : incantation en mêlée au plus allongée de 1 / 0,2 par le recul, part de temps gelé plafonnée à 95 %, empilements moyens de Winter's Chill sur 3 lancers"
+  },
+  "leveling.defaults": {
+   "value": {
+    "level_diff": 0,
+    "nova_break": 1.0,
+    "run_between_s": 6.0
+   },
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "sim_leveling.py du seed (DEFAULTS) : monstre de même niveau, Frost Nova rompu par tout dégât, 6 s de course entre deux monstres"
+  },
+  "spell.default_range_yd": {
+   "value": 30,
+   "certainty": "suppose",
+   "registry": "C2",
+   "source": "portée par défaut d'un sort sans portée publiée (zone autour du lanceur), repli de fm.py"
+  },
+  "build.confidence": {
+   "value": 0.95,
+   "certainty": "certain",
+   "registry": "I5",
+   "source": "paramètre de méthode (T05, décision 85) : niveau de confiance de l'intervalle de la différence appariée au Monte Carlo ; pas un chiffre de jeu"
+  },
+  "build.stability_seeds": {
+   "value": 5,
+   "certainty": "certain",
+   "registry": "I5",
+   "source": "paramètre de méthode (T05, décision 85) : nombre de graines sur lesquelles la décision finale est rejouée ; pas un chiffre de jeu"
+  },
+  "respec.gold_per_hour": {
+   "value": {
+    "10": 1.0,
+    "20": 4.0,
+    "30": 9.0,
+    "40": 16.0,
+    "50": 25.0,
+    "60": 40.0
+   },
+   "certainty": "suppose",
+   "registry": "I5",
+   "source": "seed/forever-mage/scripts/respec.py GOLD_PER_HOUR (EST, « à remplacer par ton propre rythme ») : or gagné par heure selon le niveau (palier le plus proche en dessous)"
+  },
+  "respec.trip_minutes": {
+   "value": 6.0,
+   "certainty": "suppose",
+   "registry": "I5",
+   "source": "seed/forever-mage/scripts/respec.py advise_leveling (trip_minutes = 6, EST) : aller-retour chez le maître de classe"
+  },
+  "respec.beta_observed_resets": {
+   "value": 2,
+   "certainty": "probable",
+   "registry": "I5",
+   "source": "respec.json beta_observed (1 po puis 5 po observés sur la bêta) : les deux premiers paliers du barème sont observés (probable), les suivants suivent la règle Classic (suppose)"
+  },
+  "leveling.mob_source": {
+   "value": "measured",
+   "certainty": "probable",
+   "registry": "H11",
+   "source": "T04c : PV des monstres mesurés et corrigés Questie -> Forever (monsters.json, décision 57), défaut des simulateurs (option mob_source)",
+   "range": [
+    {
+     "value": "measured",
+     "source": "monsters.json : PV mesurés dans les journaux, correction Questie -> Forever"
+    },
+    {
+     "value": "seed",
+     "source": "leveling.json mob_model.hp_anchors : PV d'ancrage interpolés du seed"
+    }
+   ]
+  },
+  "mana.regen_stacking": {
+   "value": "sum",
+   "certainty": "suppose",
+   "registry": "B7",
+   "source": "T04c, décision 66 : régénération en incantation d'Arcane Meditation et de Mage Armor additionnée (règle Classic : deux auras du même type s'additionnent), bornée à 100 %",
+   "range": [
+    {
+     "value": "sum",
+     "source": "règle Classic (T04c) : somme des parts, bornée à 1"
+    },
+    {
+     "value": "max",
+     "source": "seed fm.py : la plus grande des deux parts seulement"
+    }
+   ]
+  },
+  "damage.bonus_stacking": {
+   "value": "multiplicative",
+   "certainty": "probable",
+   "registry": "A20",
+   "source": "T04e, décision 73 : bonus de dégâts en pourcentage de sources distinctes multipliés (vidéo BVSgeHp3sWU, exemples V13 et V18) ; test en jeu E6",
+   "range": [
+    {
+     "value": "multiplicative",
+     "source": "vidéo BVSgeHp3sWU (V13, V18) : chaîne multiplicative"
+    },
+    {
+     "value": "additive",
+     "source": "seed fm.py : bonus des buffs additionnés dans un seul facteur"
+    }
+   ]
+  },
+  "coefficient.ice_lance_source": {
+   "value": "client",
+   "certainty": "suppose",
+   "registry": "G4",
+   "source": "T04e : coefficient d'Ice Lance lu dans le client (SpellEffect.EffectBonusCoefficient 0) en mode forever ; question E4",
+   "range": [
+    {
+     "value": "client",
+     "source": "client 1.60.1.70009 : EffectBonusCoefficient 0 (spell_scaling.json)"
+    },
+    {
+     "value": "seed",
+     "source": "coefficient.fixed.ice_lance de mechanics.json (estimation du seed)"
+    }
+   ]
+  },
+  "build.scenarios": {
+   "value": {
+    "dungeon_boss": {
+     "targets": 1,
+     "level_offset": 2,
+     "duration_s": 60,
+     "freeze_immune": true,
+     "hp": "boss"
+    },
+    "dungeon_pack": {
+     "targets": 4,
+     "level_offset": 1,
+     "duration_s": 40,
+     "freeze_immune": false,
+     "hp": "mob"
+    },
+    "raid_boss": {
+     "targets": 1,
+     "level_offset": 3,
+     "duration_s": 180,
+     "freeze_immune": true,
+     "hp": "boss"
+    }
+   },
+   "certainty": "suppose",
+   "registry": "H3",
+   "source": "scénario provisoire T05 (décision 82), affiné en DJ1 (donjons) et T09 (raid) : boss de donjon niveau + 2 pendant 60 s, paquet de 4 monstres normaux niveau + 1 (PV du monstre normal du niveau, au plus 40 s), boss de raid niveau + 3 pendant 180 s (durée du seed pve_raid.py) ; tank présent (aucun coup reçu, aucun recul) ; boss insensibles au gel (règle Classic supposée, voir OPEN_QUESTIONS) ; hp boss : PV sans limite (durée fixe), mob : PV du monstre normal ; valeurs inventées pour comparer les builds, pas des chiffres de jeu"
+  },
+  "build.presets": {
+   "value": {
+    "rapide": {
+     "beam": 2,
+     "depth": 2,
+     "shortlist": 2,
+     "mc_n": 40
+    },
+    "complet": {
+     "beam": 3,
+     "depth": 4,
+     "shortlist": 4,
+     "mc_n": 200
+    }
+   },
+   "certainty": "certain",
+   "registry": "I5",
+   "source": "paramètres de méthode (T05, décision 84) : faisceau, profondeur d'anticipation, finalistes au Monte Carlo, combats par Monte Carlo ; rapide pour les tests et le MCP, complet pour le CLI (complet = paramètres par défaut du seed optimize.py) ; pas des chiffres de jeu"
+  },
+  "build.contexts": {
+   "value": {
+    "dungeon": [
+     "dungeon_boss",
+     "dungeon_pack"
+    ],
+    "raid": [
+     "raid_boss"
+    ]
+   },
+   "certainty": "certain",
+   "registry": "I5",
+   "source": "paramètre de méthode (T05) : scénarios provisoires de chaque contexte de fin de partie (build.scenarios) ; métrique d'un contexte = dégâts totaux / durée totale retenue"
+  },
+  "pvp.profile": {
+   "value": {
+    "ref": {
+     "burst": 2500.0,
+     "control": 30.0,
+     "survival": 30.0,
+     "sustain": 350.0
+    },
+    "cap": 1.5,
+    "scale": 100,
+    "burst_window_s": 6,
+    "ice_lance_repeat_factor": 0.6,
+    "combustion_factor": 1.12,
+    "arcane_blasts": 2,
+    "arcane_missiles_factor": 1.2,
+    "arcane_without_pom_factor": 0.8,
+    "freeze_s": 5.0,
+    "slow_weight": 0.5,
+    "average_cast_s": 2.5,
+    "frost_share": 0.5,
+    "frostbolt_slow_s_per_min": 40,
+    "cone_slow_s": 6,
+    "cone_per_min": 6,
+    "impact_stun_s": 2.0,
+    "blast_wave_slow_s": 6,
+    "school_lock_weight": 0.3,
+    "ice_block_s": 10,
+    "cold_snap_factor": 1.6,
+    "barrier_divisor": 300.0,
+    "barrier_factor": 3,
+    "blink_melee_avoided_s": 1.2,
+    "frost_warding_factor": 2,
+    "arcane_resilience_factor": 3,
+    "improved_frost_nova_s": 0.5,
+    "permafrost_factor": 0.1,
+    "racial_s": {
+     "Human": 6.0,
+     "Undead": 3.0,
+     "Orc": 3.5,
+     "Gnome": 3.0,
+     "Troll": 1.5
+    },
+    "racial_default_s": 1.0,
+    "moving_share": 0.4,
+    "ice_lance_sustain_factor": 0.3,
+    "sheets": {
+     "60": {
+      "sp": 400,
+      "spell_crit": 0.12
+     }
+    }
+   },
+   "certainty": "suppose",
+   "registry": "I5",
+   "source": "seed/forever-mage/scripts/pvp.py (EST : modèle de scénarios qui compare des builds, sans simulation de duel) : références de normalisation, plafond et échelle du score, fenêtre d'ouverture, facteurs des séquences, durées de contrôle et de survie par minute, bonus raciaux de survie, part du temps en mouvement, fiche de base du niveau 60 ; recharges lues dans le client (spell_scaling.json.talent_cooldowns) et sorts utilitaires dans spells.json"
+  },
+  "pvp.weights": {
+   "value": {
+    "bg": {
+     "burst": 0.35,
+     "control": 0.25,
+     "survival": 0.25,
+     "sustain": 0.15
+    },
+    "world": {
+     "burst": 0.45,
+     "control": 0.2,
+     "survival": 0.2,
+     "sustain": 0.15
+    }
+   },
+   "certainty": "suppose",
+   "registry": "I5",
+   "source": "bg : poids par défaut du seed (seed/forever-mage/scripts/pvp.py (EST : modèle de scénarios qui compare des builds, sans simulation de duel), DEFAULT_W) ; world : supposé (T05), plus de burst pour l'embuscade en monde ouvert, à régler avec l'utilisateur (voir OPEN_QUESTIONS) ; affinés en PV2"
+  },
+  "build.concord_threshold": {
+   "value": 0.02,
+   "certainty": "certain",
+   "registry": "I5",
+   "source": "paramètre de méthode (T05, bloc J) : écart relatif analytique en deçà duquel un build de la communauté concorde avec le nôtre (à peu près le bruit du Monte Carlo à n = 100) ; pas un chiffre de jeu"
+  },
+  "xp.dungeon_kill_bonus": {
+   "value": 0.2,
+   "certainty": "probable",
+   "registry": "I10",
+   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : XP des monstres tués en donjon augmentée d'environ 20 % (« approximately »), règle du serveur absente des tables ; assiette (élites, boss, repos, groupe) et valeur exacte à mesurer (question LVL5) ; aucun moteur ne la lit encore (T04d, DJ1)",
+   "approximate": true
+  },
+  "xp.group_level_basis": {
+   "value": "individual",
+   "certainty": "probable",
+   "registry": "I11",
+   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : l'XP d'un monstre tué en groupe est ajustée sur le niveau de chaque joueur (règle de Classic Era, individual), plus sur le plus haut niveau du groupe (highest_member, avant ce build) ; aucune XP pour le groupe si un membre est d'un niveau très supérieur au monstre (seuil non donné, question LVL4) ; aucun moteur ne la lit encore (T04d)",
+   "range": [
+    {
+     "value": "highest_member",
+     "source": "comportement de Forever avant 1.60.1.70291, corrigé comme un bug"
+    },
+    {
+     "value": "individual",
+     "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)"
+    }
+   ]
+  },
+  "rage.damage_taken_rule": {
+   "value": {
+    "health_basis": "expected_creature",
+    "damage_taken_multipliers": true,
+    "absorbs_ignored": true,
+    "armor_assumption_range": [
+     0.2,
+     0.4
+    ],
+    "previous_armor_assumption": 0.5
+   },
+   "certainty": "probable",
+   "registry": "B21",
+   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : rage des dégâts subis calculée sur les PV attendus d'une créature (plus sur ceux du joueur), avec les multiplicateurs de dégâts subis (critiques, coups écrasants), sans les absorptions ; équilibrage sur une armure de 20 à 40 % selon le niveau (au lieu de 50 %) ; PV attendus et courbe d'armure par niveau non donnés (question CLS4) ; aucun moteur ne la lit encore (GU1, DR1)"
+  },
+  "legacy.beta_grant": {
+   "value": {
+    "challenge_points": 16,
+    "respec_min_cost_copper": 100,
+    "respec_cost_decay": "une respécialisation de moins par heure",
+    "beta_only": true
+   },
+   "certainty": "probable",
+   "registry": "G5",
+   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : défi Legacy accordé à tous les joueurs de la bêta (16 points Legacy) ; respécialisation Legacy la moins chère à 1 pièce d'argent, le coût baissant d'une respécialisation par heure, comme les talents de classe ; pendant la bêta seulement (état de la bêta, pas une règle du lancement) ; aucun moteur ne la lit encore (LG1, LG2)"
+  },
+  "monsters.curve_outlier": {
+   "value": {
+    "threshold": 0.15,
+    "min_npcs": 3,
+    "concordance": [
+     2,
+     3
+    ]
+   },
+   "certainty": "suppose",
+   "registry": "H11",
+   "source": "décision 223 : PNJ hors norme écartés de la courbe des PV ; seuil choisi par l'utilisateur le 2026-10-09 d'après les mesures de 1.60.1.70291 r4 (122 PNJ sur 137 exactement à la médiane des autres, écarts des ours et de Sunscale Lashtail de 19,6 à 20,1 %, faux écarts de 8,9 % au plus), au moins 3 PNJ au niveau, référence concordante (deux tiers des autres PNJ à moins du seuil de leur médiane) ; paramètre de mesure, pas une valeur du jeu"
+  }
+ },
+ "inherited_from": "1.60.1.70291"
+}

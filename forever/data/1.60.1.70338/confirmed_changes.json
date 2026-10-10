@@ -1,0 +1,612 @@
+{
+  "schema_version": 1,
+  "version": "1.60.1.70338",
+  "reference": "talents.json et spells.json de cette version",
+  "notes": [
+    "Écarts entre le décodage du client 1.60.1.70009 et les fichiers de référence de cette version, tranchés par l'utilisateur le 2026-09-27 (tasks/T03-ecarts.md).",
+    "Chaque entrée reprend un changement de `forever diff 1.60.1.70009 <candidate>` : kind, key, change, field, old (référence), new (client), avec la certitude de la référence, la nature et la décision.",
+    "nature : client (vrai changement du jeu), format (représentation différente), convention (règle de lecture).",
+    "Changements installés dans 1.60.1.70009 en révision 2 (forever install, 2026-09-29) : champ applied_in_revision.",
+    "Repris de 1.60.1.70009 à l'installation de 1.60.1.70124 (forever install --new-version, 2026-09-30) : applied_in_revision garde la révision d'origine.",
+    "Changements installés dans 1.60.1.70124 en révision 1 (forever install, 2026-09-30) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70124 en révision 2 (forever install, 2026-09-30) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70124 en révision 3 (forever install, 2026-09-30) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70124 en révision 4 (forever install, 2026-10-01) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70124 en révision 5 (forever install, 2026-10-01) : champ applied_in_revision.",
+    "Repris de 1.60.1.70124 à l'installation de 1.60.1.70170 (forever install --new-version, 2026-10-02) : applied_in_revision garde la révision d'origine.",
+    "Changements installés dans 1.60.1.70170 en révision 1 (forever install, 2026-10-02) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70170 en révision 4 (forever install, 2026-10-05) : champ applied_in_revision.",
+    "Repris de 1.60.1.70170 à l'installation de 1.60.1.70245 (forever install --new-version, 2026-10-07) : applied_in_revision garde la révision d'origine.",
+    "Changements installés dans 1.60.1.70245 en révision 1 (forever install, 2026-10-07) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70245 en révision 3 (forever install, 2026-10-07) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70245 en révision 4 (forever install, 2026-10-07) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70245 en révision 5 (forever install, 2026-10-08) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70245 en révision 6 (forever install, 2026-10-08) : champ applied_in_revision.",
+    "Repris de 1.60.1.70245 à l'installation de 1.60.1.70291 (forever install --new-version, 2026-10-09) : applied_in_revision garde la révision d'origine.",
+    "Changements installés dans 1.60.1.70291 en révision 1 (forever install, 2026-10-09) : champ applied_in_revision.",
+    "Repris de 1.60.1.70291 à l'installation de 1.60.1.70338 (forever install --new-version, 2026-10-10) : applied_in_revision garde la révision d'origine.",
+    "Changements installés dans 1.60.1.70338 en révision 1 (forever install, 2026-10-10) : champ applied_in_revision."
+  ],
+  "changes": [
+    {
+      "kind": "talent",
+      "key": "presenceOfMind",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        10
+      ],
+      "new": [],
+      "reference_certainty": "FC-69893",
+      "nature": "format",
+      "decision": "l'infobulle du client écrit « 10 sec » en clair, sans variable",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "talent",
+      "key": "impact",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        6
+      ],
+      "new": [
+        7
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 3 / 7 / 10 (arrondi de 10 × rang / 3) ; aucun décalage de lecture ailleurs (tasks/T03-ecarts.md)",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "talent",
+      "key": "impact",
+      "change": "modified",
+      "field": "ranks[3]",
+      "old": [
+        9
+      ],
+      "new": [
+        10
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 3 / 7 / 10 (arrondi de 10 × rang / 3)",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "talent",
+      "key": "improvedScorch",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        66
+      ],
+      "new": [
+        67
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 33 / 67 / 100",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "talent",
+      "key": "hotStreak",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        15,
+        25,
+        3
+      ],
+      "new": [
+        20,
+        25,
+        3
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "durée de Hot Streak 20 s, déjà notée dans talents.json (duration_s, notes)",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "talent",
+      "key": "improvedBlizzard",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        30
+      ],
+      "new": [
+        25
+      ],
+      "reference_certainty": "FC-69893",
+      "nature": "client",
+      "decision": "courbe du client 15 / 25 / 40",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "pyroblast",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 95,
+      "new": 100,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "pyroblast",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 125,
+      "new": 132,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "ice_lance",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 26,
+      "new": 28,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "ice_lance",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 30,
+      "new": 33,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 50,
+      "new": 57,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 58,
+      "new": 66,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "blast_wave",
+      "change": "modified",
+      "field": "ranks[1].level",
+      "old": 36,
+      "new": 30,
+      "reference_certainty": "certain (spells.json, wowforevertalents.com)",
+      "nature": "client",
+      "decision": "niveau appris : SpellLevels.BaseLevel 30 (MaxLevel 36) ; la référence donne 36 aux rangs 1 et 2",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "blast_wave",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 148,
+      "new": 153,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "blast_wave",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 178,
+      "new": 185,
+      "reference_certainty": "certain (spells.json ; rang 1 relevé dans une infobulle de talent)",
+      "nature": "convention",
+      "decision": "rang 1 issu d'un talent : référence lue au niveau de base du sort ; décodage au niveau min(MaxLevel, 60) comme les 95 autres rangs",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "pyroblast",
+      "change": "modified",
+      "field": "ranks[1].mana",
+      "old": null,
+      "new": 125,
+      "reference_certainty": "certain (spells.json : null, valeur non publiée)",
+      "nature": "client",
+      "decision": "valeur du client là où la référence avait null (observation), installée par forever install",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "ice_lance",
+      "change": "modified",
+      "field": "ranks[1].mana",
+      "old": null,
+      "new": 45,
+      "reference_certainty": "certain (spells.json : null, valeur non publiée)",
+      "nature": "client",
+      "decision": "valeur du client là où la référence avait null (observation), installée par forever install",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "spell",
+      "key": "blast_wave",
+      "change": "modified",
+      "field": "ranks[1].mana",
+      "old": null,
+      "new": 215,
+      "reference_certainty": "certain (spells.json : null, valeur non publiée)",
+      "nature": "client",
+      "decision": "valeur du client là où la référence avait null (observation), installée par forever install",
+      "applied_in_revision": 2
+    },
+    {
+      "kind": "talent",
+      "key": "hotStreak",
+      "change": "renamed",
+      "field": "key",
+      "old": "hotStreak",
+      "new": "heatingUp",
+      "desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within {0} sec by {1}%, stacking up to {2} times.",
+      "reference_certainty": "certain (talents.json de 1.60.1.70124, FC-70124)",
+      "nature": "client",
+      "decision": "E1, renommage du client 1.60.1.70170 (même nœud 105786, sort 400624, aura 400625 aux effets identiques) ; clé du dépôt hotStreak gardée (tasks/70170-ecarts.md, décision de l'utilisateur du 2026-10-02)",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "talent",
+      "key": "combustion",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        10,
+        4
+      ],
+      "new": [
+        10,
+        3
+      ],
+      "reference_certainty": "certain (talents.json de 1.60.1.70124, FC-70124)",
+      "nature": "client",
+      "decision": "E2, SpellAuraOptions.ProcCharges du sort 11129 : 4 -> 3 dans le client 1.60.1.70170 (tasks/70170-ecarts.md, décision de l'utilisateur du 2026-10-02)",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "talent",
+      "key": "combustion",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        10,
+        4
+      ],
+      "new": [
+        10,
+        3
+      ],
+      "reference_certainty": "certain (talents.json de 1.60.1.70124, FC-70124)",
+      "nature": "client",
+      "decision": "E3, même variable de l'infobulle que E2 (tasks/70170-ecarts.md, décision de l'utilisateur du 2026-10-02)",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 20,
+      "new": 19,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 22,
+      "new": 21,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[2].min",
+      "old": 34,
+      "new": 28,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[2].max",
+      "old": 38,
+      "new": 32,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[3].min",
+      "old": 47,
+      "new": 45,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[3].max",
+      "old": 52,
+      "new": 51,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[4].min",
+      "old": 61,
+      "new": 69,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[4].max",
+      "old": 68,
+      "new": 77,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[5].min",
+      "old": 96,
+      "new": 104,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "frostbolt",
+      "change": "modified",
+      "field": "ranks[5].max",
+      "old": 106,
+      "new": 114,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Frostbolt (116, 205, 837, 7322, 8406) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 16,
+      "new": 15,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 25,
+      "new": 23,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[2].min",
+      "old": 32,
+      "new": 27,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[2].max",
+      "old": 47,
+      "new": 39,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[3].min",
+      "old": 48,
+      "new": 45,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[3].max",
+      "old": 66,
+      "new": 62,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[4].min",
+      "old": 66,
+      "new": 68,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[4].max",
+      "old": 91,
+      "new": 93,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[5].min",
+      "old": 97,
+      "new": 107,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "fireball",
+      "change": "modified",
+      "field": "ranks[5].max",
+      "old": 131,
+      "new": 144,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Fireball (133, 143, 145, 3140, 8400) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_missiles",
+      "change": "modified",
+      "field": "ranks[2].min",
+      "old": 132,
+      "new": 140,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_missiles",
+      "change": "modified",
+      "field": "ranks[2].max",
+      "old": 132,
+      "new": 140,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_missiles",
+      "change": "modified",
+      "field": "ranks[3].min",
+      "old": 230,
+      "new": 245,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_missiles",
+      "change": "modified",
+      "field": "ranks[3].max",
+      "old": 230,
+      "new": 245,
+      "reference_certainty": "certain (spells.json de 1.60.1.70245)",
+      "nature": "client",
+      "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
+      "applied_in_revision": 1
+    }
+  ],
+  "carried_from": "1.60.1.70291"
+}

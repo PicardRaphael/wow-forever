@@ -1,8 +1,8 @@
 # Valeurs écrites à la main
 
-Généré par `uv run forever origins inventory` sur la version 1.60.1.70291 (ne pas éditer à la main : le test
+Généré par `uv run forever origins inventory` sur la version 1.60.1.70338 (ne pas éditer à la main : le test
 `tests/unit/test_origins_inventory.py` compare ce fichier au rendu de la commande). Chaque ligne est un chemin
-de `forever/data/1.60.1.70291/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
+de `forever/data/1.60.1.70338/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
 152 chemins, 631 valeurs ; 87 `probable`, 65 `suppose`
