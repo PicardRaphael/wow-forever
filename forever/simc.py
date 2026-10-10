@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import re
 import zlib
+from typing import Any
 
 ANON_NAME = "Personnage"
 ANON_REALM = "Royaume"
@@ -64,3 +65,13 @@ def anonymize_simc(text: str) -> tuple[str, bool | None]:
     if value is not None:
         anonymized += CHECKSUM_PREFIX + simc_checksum(anonymized)
     return anonymized, original
+
+
+def parse_simc(text: str) -> Any:
+    """Export lu (bloc D) : en-tête, objets, fiche, notations, compétences, buffs, somme de contrôle."""
+    raise NotImplementedError
+
+
+def simc_gaps(export: Any, profile: Any, context_gear: Any) -> tuple[list[Any], list[str]]:
+    """(écarts avec le profil, avertissements) : fiche lue par l'export ; objets recoupés avec le contexte."""
+    raise NotImplementedError
