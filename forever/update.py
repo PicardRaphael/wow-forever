@@ -1462,7 +1462,7 @@ def _step_logs(run: _Run) -> Step:
     no_change = _no_advice_change(rebuilt)
     approved = _approved(run, pending_id)
     approved_from = None if approved or no_change else _carried_approval(run, installed, keep, rebuilt)
-    entry = {
+    entry: dict[str, Any] = {
         "id": pending_id,
         "kind": "measures",
         "action": "attente",
