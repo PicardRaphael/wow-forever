@@ -163,7 +163,12 @@ def current_user() -> str:
 def schtasks(args: Sequence[str]) -> subprocess.CompletedProcess[bytes]:
     """`schtasks <args>` (liste d'arguments, sans shell, sans fenêtre)."""
     return subprocess.run(  # liste d'arguments, sans shell
-        ["schtasks", *args], capture_output=True, timeout=60, check=False, creationflags=0x08000000 if SUPPORTED else 0
+        ["schtasks", *args],
+        capture_output=True,
+        timeout=60,
+        check=False,
+        stdin=subprocess.DEVNULL,
+        creationflags=0x08000000 if SUPPORTED else 0,
     )
 
 

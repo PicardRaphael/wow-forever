@@ -2293,10 +2293,17 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
         # Décision 227 : attentes ouvertes seulement par défaut, l'historique complet avec --all
         entries = every if args.all else [e for e in every if e.get("state") in update.OPEN_STATES]
         last = summary["last"]
-        lines = [
-            f"Dernier passage : {last['finished_at'] if last else 'aucun'}"
-            + (f" (en cours : {summary['running_step'] or 'début'})" if summary["running"] else "")
-        ]
+        running = ""
+        if summary["running"]:
+            running = f" (en cours : {summary['running_step'] or 'début'}"
+            if summary.get("running_activity"):
+                running += f" · {summary['running_activity']}"
+            if summary.get("running_minutes") is not None:
+                running += f" depuis {summary['running_minutes']} min"
+            running += ")"
+        lines = [f"Dernier passage : {last['finished_at'] if last else 'aucun'}" + running]
+        if summary["running"] and summary.get("running_detail"):
+            lines.append(f"  dernière ligne : {summary['running_detail']}")
         lines += [f"  écrit : {update.written_text(w)}" for w in (last or {}).get("written") or []]
         for e in entries:
             lines.append(

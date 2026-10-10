@@ -37,6 +37,8 @@ PACKAGE = Path(__file__).resolve().parent
 SEED = 12345
 RACE = "Orc"
 PRESET = "complet"
+CODE_CHANGED_EXIT = 3  # le code de forever a changé entre le début du passage et le processus du rejeu
+NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)  # aucune fenêtre de console sous Windows
 MAX_BEAM_WORKERS = 4  # départs du leveling en mode forever : le faisceau libre et un par arbre
 # Ordre de durée des contextes (relevé des passages des 2026-10-09 et 10 : le leveling domine, puis le donjon et le
 # raid, le PvP est le plus court) : seul l'ordre compte, pour lancer les cas les plus longs d'abord.
@@ -103,9 +105,12 @@ def _cached(path: Path) -> dict[str, Any] | None:
     return doc
 
 
-def _write(path: Path, report: Mapping[str, Any], duration: float) -> None:
+def _write(path: Path, report: Mapping[str, Any], duration: float, *, code: str | None = None) -> None:
+    """Cas écrit dans le cache avec l'empreinte du code qui l'a calculé (`code` : celle fixée par le passage, transmise
+    au processus du rejeu ; à défaut, celle de ce processus)."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    doc = {"report": report, "duration_s": duration, "ablated": [], "code": code_fingerprint(), "params": params()}
+    doc = {"report": report, "duration_s": duration, "ablated": [], "code": code or code_fingerprint(),
+           "params": params()}  # fmt: skip
     path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
 
 
@@ -119,15 +124,17 @@ def build_case(case: str, data_dir: Path) -> Mapping[str, Any]:
     return build_report(deps, context, level, race=RACE, preset=PRESET, seed=SEED)
 
 
-def _worker(case: str, data_dir: str, path: str, beams: int) -> tuple[dict[str, Any], float]:
-    """Calcul d'un cas dans un processus du rejeu : faisceaux du leveling sur `beams` processus, résultat écrit."""
+def _worker(case: str, data_dir: str, path: str, beams: int, code: str | None = None) -> tuple[dict[str, Any], float]:
+    """Calcul d'un cas dans un processus du rejeu : faisceaux du leveling sur `beams` processus, résultat écrit avec
+    l'empreinte `code` du passage (sonde H : empreinte recalculée tard dans chaque processus, différente quand le code
+    changeait pendant le passage, d'où « absent du cache après le calcul »)."""
     from forever.optimize.leveling import set_beam_workers
 
     set_beam_workers(beams)
     start = time.perf_counter()
     report = build_case(case, Path(data_dir))
     duration = time.perf_counter() - start
-    _write(Path(path), report, duration)
+    _write(Path(path), report, duration, code=code)
     return advice(report), duration
 
 
@@ -199,6 +206,7 @@ def replay_cases(
         return out
     request = {
         "workers": outer,
+        "code": code_fingerprint(),  # empreinte du passage : le processus du rejeu refuse un code changé depuis
         "jobs": [[case, str(d), str(path), n] for (case, d, path), n in zip(todo, plan, strict=True)],
     }
     for line in _run_child(request, cache_dir):
@@ -226,19 +234,25 @@ def _run_child(request: Mapping[str, Any], cache_dir: Path) -> list[str]:
             encoding="utf-8",
             errors="replace",
             check=False,
+            stdin=subprocess.DEVNULL,
+            creationflags=NO_WINDOW,
         )
     finally:
         request_path.unlink(missing_ok=True)
+    if done.returncode == CODE_CHANGED_EXIT:
+        raise ReplayFailedError(
+            "le code de forever a changé pendant le passage (fichiers de forever/ modifiés) : relancer le passage"
+        )
     if done.returncode != 0:
         tail = (done.stderr or done.stdout).strip().splitlines()[-5:]
         raise ReplayFailedError(" | ".join(tail) or f"code {done.returncode}")
     return [line for line in done.stdout.splitlines() if line.strip()]
 
 
-def _pool(jobs: Sequence[Sequence[Any]], workers: int) -> None:
+def _pool(jobs: Sequence[Sequence[Any]], workers: int, code: str | None = None) -> None:
     """Calcule les cas de `jobs` ([cas, données, chemin, faisceaux]) sur `workers` processus ; une ligne par cas."""
     with ProcessPoolExecutor(max_workers=workers) as pool:
-        futures = {str(job[0]) + " " + str(job[1]): pool.submit(_worker, *job) for job in jobs}
+        futures = {str(job[0]) + " " + str(job[1]): pool.submit(_worker, *[*job, code]) for job in jobs}
         for name, future in futures.items():
             _, duration = future.result()
             case, data_dir = name.split(" ", 1)
@@ -247,7 +261,15 @@ def _pool(jobs: Sequence[Sequence[Any]], workers: int) -> None:
 
 def main(argv: Sequence[str]) -> int:
     request = json.loads(Path(argv[0]).read_text(encoding="utf-8"))
-    _pool(request["jobs"], int(request["workers"]))
+    wanted = request.get("code")
+    if wanted is not None and wanted != code_fingerprint():
+        print(
+            f"le code de forever a changé pendant le passage (empreinte {wanted} au début, {code_fingerprint()} "
+            "maintenant) : rien de calculé",
+            file=sys.stderr,
+        )
+        return CODE_CHANGED_EXIT
+    _pool(request["jobs"], int(request["workers"]), wanted)
     return 0
 
 

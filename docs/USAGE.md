@@ -135,7 +135,11 @@ powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -WhatIf
 powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1           # créer (08:00), -At 21:30 pour une autre heure
 powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1 -Remove   # retirer
 ```
-Suivi : `uv run forever update status`, et le dernier `run-*.log`. Après une recréation de `.venv` sur une autre
+Chaque étape a un délai maximal (attente de la CI comprise) : au-delà, le passage s'arrête proprement, rend le
+verrou et laisse une attente « erreur » ; aucun sous-processus n'ouvre de fenêtre ni ne pose de question (une
+authentification de `gh` expirée devient une erreur : « lancer `gh auth login` dans un terminal ») ; décision 238.
+Suivi : `uv run forever update status` (étape en cours, activité, durée et dernière ligne du journal), et le
+dernier `run-*.log`. Après une recréation de `.venv` sur une autre
 version de Python, relancer le script (l'action désigne le `pythonw.exe` de la version installée).
 
 ## Poser une question
@@ -214,7 +218,9 @@ P06b ajoute à la fenêtre `/fv` (décision 235) :
   talents, liens et question ne sont jamais retirés ; seuls les noms d'objets sont coupés, puis retirés.
 - **Mettre à jour** (bouton) : le pont lance `forever update --auto` lui-même (jamais le modèle) ; refusé hors ligne
   (`FOREVER_OFFLINE`). Ligne d'état : `Données <version> · client <version> · <fraîcheur> · <n> à valider · <m> en
-  attente` ; pendant un passage, « mise à jour en cours (étape) », relevée toutes les 30 s fenêtre ouverte ; à la fin,
+  attente` ; pendant un passage, « mise à jour en cours (étape : activité, N min) », par exemple « (journaux :
+  attente de la CI, 9 min) », relevée toutes les 30 s fenêtre ouverte ; « dernier passage en erreur (voir À
+  valider) » après un passage arrêté ou en échec (décision 238) ; à la fin,
   « Mise à jour terminée : n écrit(s), m à valider ».
 - **À valider (n)** : une carte par attente de `forever update` (texte rédigé par le pont : PNJ, niveaux, builds,
   version), avec Valider et Refuser pour une attente approuvable (second clic « Confirmer » dans les cinq secondes,
@@ -224,6 +230,9 @@ P06b ajoute à la fenêtre `/fv` (décision 235) :
   équipement) au profil ; la réponse le signale, le jeu l'emporte, et une carte « Mettre à jour le profil » écrit le
   profil au clic seulement (source `jeu`, profil au schéma 3) ; « Ignorer » fait taire cet écart tant qu'il ne
   change pas. Personnage absent : carte « Créer le personnage … au profil ».
+- **Panneau de droite** (décision 238) : un seul panneau, collé à droite de la fenêtre, regroupe la copie d'un lien
+  (clic sur `[Talents Forever]`, Ctrl+C), la zone de collage de l'export et les cartes « À valider » ; il défile
+  à la molette et par sa barre ; Échap ou un second clic sur « Coller /simc » ou « À valider » le ferme.
 - **Coller /simc** : `/simc` en jeu, Ctrl+C, puis « Coller /simc », Ctrl+V, « Envoyer l'export ». Le pont le lit sans
   le modèle (objets, fiche du personnage, notations, buffs ; somme de contrôle vérifiée), liste les écarts avec le
   profil et propose d'écrire la fiche (source `simulationcraft`) ; la chaîne `talents=` n'est pas décodée (les

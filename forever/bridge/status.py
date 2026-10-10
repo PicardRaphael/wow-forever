@@ -36,6 +36,7 @@ def status_payload(deps: Deps, *, addon: str | None = None, addon_files: list[st
         "waiting": 0,
         "running": False,
         "update": {"running": False, "step": None, "last": None},
+        "pass_error": False,
         "client": None,
         "addon": addon,
         "addon_files": list(addon_files or []),
@@ -72,10 +73,14 @@ def status_payload(deps: Deps, *, addon: str | None = None, addon_files: list[st
         payload["approvable"] = sum(1 for p in pending if approvable(p))
         payload["waiting"] = len(pending) - payload["approvable"]
         payload["running"] = bool(summary["running"])
+        payload["pass_error"] = any(p.get("kind") == "pass_error" for p in pending)
         last = summary.get("last")
         payload["update"] = {
             "running": bool(summary["running"]),
             "step": summary.get("running_step"),
+            "activity": summary.get("running_activity"),
+            "minutes": summary.get("running_minutes"),
+            "detail": summary.get("running_detail"),
             "last": None
             if not last or not last.get("finished_at")
             else {
@@ -116,8 +121,16 @@ def status_line(payload: Mapping[str, Any]) -> str:
     if payload.get("integrity_ok") is False:
         parts.append("données altérées")
     if payload.get("running"):
-        step = (payload.get("update") or {}).get("step")
-        parts.append(f"mise à jour en cours ({step})" if step else "mise à jour en cours")
+        update = payload.get("update") or {}
+        step, activity, minutes = update.get("step"), update.get("activity"), update.get("minutes")
+        inside = str(step) if step else ""
+        if activity:
+            inside += f" : {activity}" if inside else str(activity)
+        if minutes is not None:
+            inside += f", {minutes} min"
+        parts.append(f"mise à jour en cours ({inside})" if inside else "mise à jour en cours")
+    if payload.get("pass_error"):
+        parts.append("dernier passage en erreur (voir À valider)")
     approvable = int(payload.get("approvable") or 0)
     waiting = int(payload.get("waiting") or 0)
     if approvable:

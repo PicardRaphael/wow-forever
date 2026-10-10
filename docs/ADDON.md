@@ -390,6 +390,25 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     11. **Relevé** : ce qui s'est passé à chaque étape, les durées des étapes 3, 6, 8 et 10, la sortie de
         `uv run forever bridge status`, et `uv run forever bridge contexts export "$env:TEMP\sonde-h"` (dossier à me
         donner).
+    12. **Fait le 2026-10-10** (relevé de l'utilisateur) : ligne d'état, cartes, Expliquer, Valider, Mettre à jour
+        pendant un passage, création du profil et fiche, export lu (emplacement 18 pris du contexte), onglet Addons
+        (commit, journal, restauration), Maj+clic d'un sort et d'une quête, question de suite en 4 s, défilement de
+        l'historique. Défauts corrigés (décision 238) : passage bloqué sans fin (rejeu parallèle, délai par étape,
+        attente « erreur »), fenêtre de console de `gh`, étape affichée trompeuse, réponse en jargon interne et faute
+        de frappe mal lue, petites fenêtres séparées (panneau unique), accents du journal des commits, version observée
+        plus ancienne annoncée « plus récente ». Second export en fixture : `tests/fixtures/simc/mage19_sonde_h.txt`.
+        Non vérifiés : Talents d'une autre classe, partage de pile (BR5).
+
+19. **Panneau de droite** (P06b, décision 238). Relancer le pont après la fusion (`uv run forever bridge stop`,
+    `uv run forever bridge autostart status` jusqu'à « surveillance : arrêtée », `schtasks /Run /TN "WoW Forever -
+    pont"`), puis `/reload` en jeu.
+    1. `/fv`, « Coller /simc » : le panneau s'ouvre collé à droite de la fenêtre, zone de collage en tête ; second clic
+       sur « Coller /simc » : il se ferme.
+    2. Bouton Talents, puis clic sur `[Talents Forever]` : la copie du lien apparaît en haut du panneau, texte
+       sélectionné ; Ctrl+C, coller dans le navigateur.
+    3. « À valider (n) » : les cartes sous les sections ouvertes ; avec plusieurs cartes, molette et barre de
+       défilement ; Valider ou Expliquer marchent comme avant.
+    4. Déplacer la fenêtre `/fv` : le panneau la suit. Échap : le panneau se ferme, la fenêtre reste.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

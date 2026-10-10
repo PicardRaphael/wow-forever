@@ -43,7 +43,9 @@ def test_plugin_json_has_a_semver_version():
     # 0.8.7 : tranches de classe dans l'ordre de la décision 232 (CM1, CH1, DE1, PA1, GU1, VO1, PR1, DR1).
     # 0.8.8 : build populaire le plus proche calculé par l'outil (`tf_popular` avec `current`, `closest`), P06b.
     # 0.8.9 : cas du bouton PvP régénéré (consigne resserrée sous 600 caractères, décision 237).
-    assert version == "0.8.9"
+    # 0.9.0 : cas des boutons régénérés (note d'équipement sans nom de tranche), cas « pont-question-de-suite-faute »,
+    # règle « mots de joueur » du format des réponses venues du jeu (sonde H, décision 238).
+    assert version == "0.9.0"
 
 
 def test_fingerprint_is_up_to_date():

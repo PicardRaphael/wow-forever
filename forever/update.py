@@ -31,6 +31,7 @@ import json
 import os
 import re
 import shutil
+import threading
 import time
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta
@@ -96,6 +97,19 @@ GUARD_REASON = (
 )  # attentes qu'aucune approbation ne résout : une édition en session est nécessaire
 KEPT_STATES = ("approuvée", "faite", "rejetée")  # un passage qui recalcule la même attente ne les écrase pas
 HISTORY_KEPT = 30
+# Délai maximal de chaque étape (sonde en jeu H du 2026-10-10) : au-delà, le passage s'arrête proprement (verrou
+# rendu, attente « erreur » `pass_error`). Les étapes qui attendent la CI (jusqu'à 60 min) gardent une marge.
+STEP_LIMITS_S: dict[str, float] = {
+    "archivage": 15 * 60,
+    "clone": 75 * 60,
+    "jeu": 10 * 60,
+    "nouvelle_version": 150 * 60,
+    "correctifs": 30 * 60,
+    "journaux": 120 * 60,
+    "addons": 75 * 60,
+}
+PASS_TIMEOUT_EXIT = 7
+PASS_ERROR_KIND = "pass_error"  # passage arrêté (délai) ou étape en erreur : attente visible, levée au passage réussi
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
 INVENTORY_DOC = "docs/research/valeurs-ecrites-a-la-main.md"  # rendu de `forever origins inventory` (version courante)
 PASS_PATHS = ("forever/data/", "docs/research/data-", INVENTORY_DOC)  # seuls chemins du clone écrits par `_publish`
@@ -376,7 +390,35 @@ def _note_step(cache_dir: Path, current: str | None, steps: Sequence[Step], at: 
     if not isinstance(doc, dict) or doc.get("pid") != os.getpid():
         return
     done = [{"name": s.name, "status": s.status, "detail": s.detail} for s in steps]
-    _write(path, {**doc, "step": current, "updated_at": at, "steps": done})
+    fresh = {"step_at": at, "detail": "", "detail_at": at} if doc.get("step") != current else {}
+    _write(path, {**doc, "step": current, "updated_at": at, "steps": done, **fresh})
+
+
+def note_detail(cache_dir: Path, detail: str, at: str) -> None:
+    """Dernière ligne utile du journal du passage, gardée dans le verrou avec son heure : l'étape réelle (« CI
+    attendue … ») et sa durée se lisent ainsi pendant le passage (`update_summary`, ligne d'état du jeu)."""
+    path = _lock_path(cache_dir)
+    doc = _read(path)
+    if not isinstance(doc, dict) or doc.get("pid") != os.getpid():
+        return
+    _write(path, {**doc, "detail": detail, "detail_at": at})
+
+
+def activity_of(detail: str | None) -> str | None:
+    """Activité réelle lue dans la dernière ligne du journal : « attente de la CI », « rejeu des builds »…"""
+    text = (detail or "").strip()
+    low = text.lower()
+    if not text:
+        return None
+    if "ci attendue" in low:
+        return "attente de la CI"
+    if low.startswith("rejeu"):
+        return "rejeu des builds"
+    if "verify" in low:
+        return "contrôle (verify)"
+    if "uv sync" in low:
+        return "synchronisation de l'environnement"
+    return text.split(" (")[0][:60]
 
 
 def release_lock(cache_dir: Path) -> None:
@@ -405,9 +447,13 @@ class _Run:
     cleared: dict[str, str] = dataclasses.field(default_factory=dict)  # attente levée seule -> raison
 
     def say(self, line: str) -> None:
-        """Ligne du journal du passage, écrite tout de suite (au fil de l'eau, pas à la fin)."""
+        """Ligne du journal du passage, écrite tout de suite (au fil de l'eau, pas à la fin) ; une ligne d'avancement
+        d'étape (« journaux : CI attendue … ») devient le détail de l'étape dans le verrou."""
         if self.progress is not None:
             self.progress(f"{self.now} {line}")
+        step, sep, rest = line.partition(" : ")
+        if sep and step in STEPS and rest != "en cours" and not rest.startswith(tuple(f"{s} ·" for s in STATUSES)):
+            note_detail(self.deps.cache_dir, rest, self.now)
 
     def wants(self, group: str) -> bool:
         return not self.options.only or group in self.options.only
@@ -2110,6 +2156,33 @@ def _guard(name: str, fn: Callable[[], Step]) -> Step:
         return Step(name, "erreur", f"{type(exc).__name__} : {exc}", {})
 
 
+def close_pass_errors(cache_dir: Path, at: str) -> None:
+    """Attentes « erreur » levées par un passage réussi."""
+    for entry in list_pending(cache_dir):
+        if entry.get("kind") == PASS_ERROR_KIND and entry.get("state") in OPEN_STATES:
+            _set_state(cache_dir, str(entry["id"]), "faite", done_at=at, done_by="passage suivant réussi")
+
+
+def _record_pass_error(cache_dir: Path, started: str, at: str, reasons: list[str], commands: list[str]) -> None:
+    for entry in list_pending(cache_dir):
+        if entry.get("kind") == PASS_ERROR_KIND and entry.get("state") in OPEN_STATES:
+            _set_state(cache_dir, str(entry["id"]), "périmée", stale_reason="remplacée par un passage plus récent")
+    record_pending(
+        cache_dir,
+        {
+            "id": "pass-error-" + "".join(c for c in started if c.isdigit()),
+            "kind": PASS_ERROR_KIND,
+            "action": "bloqué",
+            "version": None,
+            "revision": None,
+            "clauses": {},
+            "reasons": reasons,
+            "commands": commands or ["forever update status", "forever update --auto"],
+            "created_at": at,
+        },
+    )
+
+
 def run_update(
     deps: Deps,
     options: UpdateOptions,
@@ -2118,6 +2191,8 @@ def run_update(
     replay: Replay | None = None,
     measure: Measure | None = None,
     progress: Progress | None = None,
+    max_seconds: float | None = None,
+    on_timeout: Callable[[int], None] | None = None,
 ) -> UpdateReport:
     """Un passage complet (étapes `STEPS`) ; `dry_run` : tout est calculé, seul l'archivage écrit (et la préparation
     dans le cache), les attentes sont rendues sans être enregistrées. `progress` reçoit le journal au fil de l'eau
@@ -2135,15 +2210,42 @@ def run_update(
         steps.append(step)
         run.say(f"{step.name} : {step.status} · {step.detail}")
 
+    current: dict[str, Any] = {"step": "verrou", "at": time.monotonic()}
+    expired = threading.Event()
+    stop = threading.Event()
+
     def advance(name: str, fn: Callable[[], Step]) -> None:
+        current.update(step=name, at=time.monotonic())
         _note_step(deps.cache_dir, name, steps, run.now)
         run.say(f"{name} : en cours")
         done(_guard(name, fn))
+
+    def watch() -> None:
+        """Délai maximal de l'étape en cours : au-delà, attente « erreur », verrou rendu, arrêt du passage."""
+        interval = 0.05 if max_seconds is not None and max_seconds < 5 else 5.0
+        while not stop.wait(interval):
+            limit = max_seconds if max_seconds is not None else STEP_LIMITS_S.get(str(current["step"]))
+            elapsed = time.monotonic() - float(current["at"])
+            if limit is None or elapsed <= limit:
+                continue
+            expired.set()
+            reason = (
+                f"passage arrêté au bout de {round(elapsed / 60)} min, à l'étape {current['step']} (délai maximal "
+                f"de l'étape : {round(limit / 60)} min) : bloqué ou trop long ; journal du passage dans "
+                f"{update_dir(deps.cache_dir)}"
+            )
+            run.say(f"arrêt : {reason}")
+            _record_pass_error(deps.cache_dir, started, run.now, [reason], [])
+            release_lock(deps.cache_dir)
+            (on_timeout or os._exit)(PASS_TIMEOUT_EXIT)
+            return
 
     if lock is not None and lock.status == "arrêt":
         done(lock)
     else:
         done(lock or Step("verrou", "fait", "verrou pris", {"stale": False}))
+        watchdog = threading.Thread(target=watch, daemon=True)
+        watchdog.start()
         try:
             advance("archivage", lambda: _step_archive(run))
             advance("clone", lambda: _step_clone(run))
@@ -2160,7 +2262,9 @@ def run_update(
             advance("addons", lambda: _step_addons(run))
             done(_end_step(run))
         finally:
-            release_lock(deps.cache_dir)
+            stop.set()
+            if not expired.is_set():
+                release_lock(deps.cache_dir)
     report: UpdateReport = {
         "schema_version": SCHEMA_VERSION,
         "started_at": started,
@@ -2172,7 +2276,16 @@ def run_update(
         "origin_main": run.origin_main,
         "provenance": dict(local_provenance(deps, certainty="probable", assumptions=_assumptions(run))),
     }
+    if expired.is_set():
+        return report  # arrêté par son délai : l'attente « erreur » est écrite, rien d'autre
     if not options.dry_run and len(steps) > 1:
+        errors = [s for s in steps if s.status == "erreur"]
+        if errors:
+            reasons = [f"étape {s.name} : {s.detail}" for s in errors]
+            commands = [str(s.data["action"]) for s in errors if isinstance(s.data, dict) and s.data.get("action")]
+            _record_pass_error(deps.cache_dir, started, run.now, reasons, commands)
+        else:
+            close_pass_errors(deps.cache_dir, run.now)
         for entry in run.pending:
             record_pending(deps.cache_dir, entry)
         for pending_id, why in run.cleared.items():
@@ -2394,9 +2507,24 @@ def update_summary(cache_dir: Path, now: datetime | None = None) -> dict[str, An
         if e.get("state") in OPEN_STATES
     ]  # fmt: skip
     lock = _read(_lock_path(cache_dir))
-    running = _lock_alive(lock, now or utc_now())
-    step = lock.get("step") if running and isinstance(lock, dict) else None
-    return {"last": summary_last, "pending": pending, "running": running, "running_step": step}
+    when = now or utc_now()
+    running = _lock_alive(lock, when)
+    doc = lock if running and isinstance(lock, dict) else {}
+    detail = str(doc.get("detail") or "") or None
+    since = doc.get("detail_at") if detail else doc.get("step_at")
+    try:
+        minutes: int | None = int((when - parse_utc(str(since))).total_seconds() // 60) if since else None
+    except ValueError:
+        minutes = None
+    return {
+        "last": summary_last,
+        "pending": pending,
+        "running": running,
+        "running_step": doc.get("step"),
+        "running_detail": detail,
+        "running_activity": activity_of(detail),
+        "running_minutes": minutes,
+    }
 
 
 def due(cache_dir: Path, now: datetime) -> bool:

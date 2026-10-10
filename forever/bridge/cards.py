@@ -104,6 +104,7 @@ TITLES = {
     "addon_data": "Données d'addon : {addon}",
     "network_dbd": "Dispositions des tables à télécharger ({version})",
     "column_names": "Noms de colonnes à traiter ({version})",
+    "pass_error": "Passage de forever update en erreur",
 }
 SELF_CLEARING = {
     "network": "attente réseau : se lève seule au prochain passage réussi",
@@ -163,6 +164,9 @@ def card_lines(entry: dict[str, Any]) -> list[str]:
         lines += [part for part in text.split(" ; ") if part] if text else []
     elif kind == "measures":
         lines += _measure_lines(entry.get("summary"))
+    if kind == "pass_error":
+        reasons = [str(r) for r in entry.get("reasons") or []] or ["passage en erreur"]
+        return [*reasons, f"à traiter sur le PC : {commands[0] if commands else 'forever update status'}"]
     if entry.get("action") == "bloqué" or kind in ("column_names", "addon_data", "network_dbd"):
         reasons = [str(r) for r in entry.get("reasons") or []]
         if reasons and not lines:

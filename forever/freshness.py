@@ -23,6 +23,7 @@ CACHE_SCHEMA_VERSION = 1
 
 class FreshnessResult(TypedDict):
     freshness: Freshness
+    newer_available: bool  # une version publiée plus récente que les données locales (comparaison des numéros)
     checked_at: str | None
     age_hours: float | None
     latest_version: str | None
@@ -92,11 +93,23 @@ def _result(
     now: datetime,
     source: Literal["network", "cache", "none"],
     assumptions: list[str],
+    local_version: str | None = None,
 ) -> FreshnessResult:
     age = round((now - obs.fetched_at).total_seconds() / 3600, 1) if obs else None
     latest = obs.latest if obs else None
+    newer = bool(latest and local_version and version_key(latest.version) > version_key(local_version))
+    if latest and local_version and version_key(latest.version) < version_key(local_version):
+        # sonde H : observation plus ancienne que les données installées, jamais présentée comme plus récente
+        assumptions = [
+            *assumptions,
+            (
+                f"dernière version observée {latest.version}, antérieure aux données locales {local_version} : "
+                "aucune version plus récente connue"
+            ),
+        ]
     return {
         "freshness": freshness,
+        "newer_available": newer,
         "checked_at": format_utc(obs.fetched_at) if obs else None,
         "age_hours": age,
         "latest_version": latest.version if latest else None,
@@ -130,30 +143,53 @@ def check_freshness(
     if allow_network and not deps.offline:
         if cached and now - cached.fetched_at < CACHE_TTL:
             freshness = classify(local_version, cached.latest, now, SILENT_AFTER)
-            return _result(freshness, cached, now, "cache", _status_assumptions(freshness, cached, prefix))
+            return _result(
+                freshness,
+                cached,
+                now,
+                "cache",
+                _status_assumptions(freshness, cached, prefix),
+                local_version=local_version,
+            )
         try:
             payload = fetch_builds(deps.http_get)
         except BuildsUnavailable as exc:
             if cached is None:
-                return _result("unknown", None, now, "none", [*ignored, f"fraîcheur inconnue : {exc.message}"])
+                return _result(
+                    "unknown",
+                    None,
+                    now,
+                    "none",
+                    [*ignored, f"fraîcheur inconnue : {exc.message}"],
+                    local_version=local_version,
+                )
             last = classify(local_version, cached.latest, now, SILENT_AFTER)
             age = format_age((now - cached.fetched_at).total_seconds() / 3600)
             note = f"réseau indisponible : dernier état connu {last}, vérifié il y a {age}"
-            return _result("unknown", cached, now, "cache", [note])
+            return _result("unknown", cached, now, "cache", [note], local_version=local_version)
         obs = Observation(now, latest_build(parse_builds(payload, product, prefix)))
         freshness = classify(local_version, obs.latest, now, SILENT_AFTER)
         _write_cache(deps.cache_dir, product, local_version, obs, freshness)
-        return _result(freshness, obs, now, "network", [*ignored, *_status_assumptions(freshness, obs, prefix)])
+        return _result(
+            freshness,
+            obs,
+            now,
+            "network",
+            [*ignored, *_status_assumptions(freshness, obs, prefix)],
+            local_version=local_version,
+        )
 
     if cached is None:
         never = "fraîcheur non vérifiée" if ignored else "fraîcheur jamais vérifiée"
-        return _result("unknown", None, now, "none", [*ignored, f"{never} (lancer `forever status`)"])
+        return _result(
+            "unknown", None, now, "none", [*ignored, f"{never} (lancer `forever status`)"], local_version=local_version
+        )
     freshness = classify(local_version, cached.latest, now, SILENT_AFTER)
     assumptions = _status_assumptions(freshness, cached, prefix)
     age_h = (now - cached.fetched_at).total_seconds() / 3600
     if now - cached.fetched_at > CACHE_TTL:
         assumptions.append(f"fraîcheur vérifiée il y a {format_age(age_h)} (lancer `forever status`)")
-    return _result(freshness, cached, now, "cache", assumptions)
+    return _result(freshness, cached, now, "cache", assumptions, local_version=local_version)
 
 
 def freshness_for_version(deps: Deps, version: str, *, allow_network: bool) -> FreshnessResult:

@@ -87,7 +87,8 @@ def talents_line(reading: TalentReading) -> str:
 
 # --- Contexte vérifié (sonde en jeu F du 2026-10-09) ---------------------------------------------------------------
 
-EQUIPMENT_NOTE = "noms du client ; objets pas encore reliés aux données, table d'objets prévue en T10a"
+# Note lue par la conversation « jeu » : en mots de joueur, sans nom de tranche (sonde en jeu H du 2026-10-10).
+EQUIPMENT_NOTE = "noms du client ; objets pas encore reliés aux données de forever, comparaison d'objets à venir"
 
 
 @dataclass(frozen=True)

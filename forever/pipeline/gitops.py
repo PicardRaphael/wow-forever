@@ -26,6 +26,9 @@ from typing import Any, NamedTuple, Protocol
 from forever.errors import EXIT_NETWORK, ForeverError
 
 CI_WORKFLOW = "ci.yml"
+NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)  # passage en arrière-plan : aucune fenêtre de console
+# Sortie de `gh` quand son authentification manque ou a expiré (`gh auth login` demandé).
+_AUTH_HINTS = ("gh auth login", "authentication required", "HTTP 401", "Bad credentials")
 CI_JOBS = ("ubuntu", "windows")  # sous-chaînes des noms des jobs exigés en succès
 
 
@@ -66,8 +69,16 @@ class MergeResult(NamedTuple):
 
 
 def subprocess_runner(args: Sequence[str], cwd: Path, timeout: float | None = None) -> subprocess.CompletedProcess[str]:
-    """Exécuteur de production : liste d'arguments, sans shell ni saisie (aucune invite d'authentification)."""
-    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0", "GH_PROMPT_DISABLED": "1", "GCM_INTERACTIVE": "never"}
+    """Exécuteur de production : liste d'arguments, sans shell ni saisie (aucune invite d'authentification, entrée
+    standard fermée), sans fenêtre de console sous Windows ; la sortie va au journal du passage."""
+    env = {
+        **os.environ,
+        "GIT_TERMINAL_PROMPT": "0",
+        "GH_PROMPT_DISABLED": "1",
+        "GCM_INTERACTIVE": "never",
+        "GIT_ASKPASS": "",
+        "SSH_ASKPASS": "",
+    }
     return subprocess.run(
         list(args),
         cwd=cwd,
@@ -78,6 +89,8 @@ def subprocess_runner(args: Sequence[str], cwd: Path, timeout: float | None = No
         timeout=timeout,
         check=False,
         env=env,
+        stdin=subprocess.DEVNULL,
+        creationflags=NO_WINDOW,
     )
 
 
@@ -87,6 +100,12 @@ def _run(
     out = runner(args, cwd, timeout)
     if check and out.returncode != 0:
         detail = (out.stderr or out.stdout or "").strip().splitlines()
+        text = " ".join(detail)
+        if args and args[0] == "gh" and any(h.lower() in text.lower() for h in _AUTH_HINTS):
+            raise GitOpsError(
+                f"`{' '.join(args)}` a échoué : authentification de gh expirée ou absente",
+                "lancer `gh auth login` dans un terminal, puis relancer `forever update --auto`",
+            )
         raise GitOpsError(
             f"`{' '.join(args)}` a échoué ({out.returncode}) : {detail[-1] if detail else 'sans message'}"
         )

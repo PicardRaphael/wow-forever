@@ -358,8 +358,9 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **BR5 — Quelle fonction appelle un Maj+clic sur Forever (sacs, livre des sorts, journal des quêtes) quand une zone
   de saisie d'addon a le focus ?** ForeverBridge accroche `ChatFrameUtil.InsertLink` et `ChatEdit_InsertLink` (celles
   qui existent, `hooksecurefunc`). Sonde G du 2026-10-10 : un objet d'un sac et un objet équipé sont insérés, avec
-  les couleurs nommées de Forever (`|cnIQ0:` … `|r`) ; sort, quête et partage de pile non essayés. Test : sonde H.
-  Priorité : moyenne.
+  les couleurs nommées de Forever (`|cnIQ0:` … `|r`) ; sort, quête et partage de pile non essayés. *Modifiée le
+  2026-10-10* : sonde H, Maj+clic d'un sort du grimoire et d'une quête du journal insérés ; reste le partage de
+  pile d'un objet empilé. Test : prochaine sonde en jeu. Priorité : basse.
 - **BR6 — L'export SimulationCraft omet-il vraiment l'emplacement à distance (18) sur Forever ?** Oui pour la
   baguette : le premier export réel (sonde G, `tests/fixtures/simc/mage19_sonde_g.txt`) n'a pas de ligne `ranged=`
   alors que le contexte du même instant porte l'emplacement 18 (Greater Magic Wand). Reste à voir avec une arme à
@@ -367,13 +368,6 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **BR7 — Combien de tours de carrousel faut-il pour un export de 9 parties à une case par pixel ?** Une capture faite
   pendant le changement de partie est rejetée par la somme de contrôle de la bande. Test : sonde G (journal du pont,
   événements `parts`). Priorité : moyenne.
-
-- **BR8 — Le hook de démarrage du plugin coûte-t-il plusieurs secondes à chaque conversation du pont ?** Sonde 0.3
-  du 2026-10-10 : entre `hook_started` et `hook_response`, 6,3 s avant le premier `init` (`uv run … python -m forever
-  hook session-start`, muet sous `FOREVER_BRIDGE` mais lancé quand même) ; le journal du pont relève des `init_s` de
-  2 à 15 s. **Répondue le 2026-10-10 (décision 237)** : les conversations du pont démarrent sans les hooks du plugin
-  (`--settings {"disableAllHooks": true}`) ; médiane 8,37 s avec, 6,02 s sans (trois conversations de chaque), 17,08 s
-  au premier lancement avec les hooks. À reporter dans `docs/RESOLVED_QUESTIONS.md` à la fin de la tranche.
 
 ## Legacy et API
 - **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?**

@@ -129,6 +129,12 @@ local function newRegion(kind, name, parent)
 	function r:HasFocus() return self.focus and true or false end
 	function r:HighlightText() self.highlighted = true end
 	function r:SetScrollChild(c) self.child = c end
+	function r:GetScrollChild() return self.child end
+	function r:SetVerticalScroll(y) self.vscroll = y end
+	function r:GetVerticalScroll() return self.vscroll or 0 end
+	function r:GetVerticalScrollRange()
+		return math.max(0, (self.child and self.child.height or 0) - self.height)
+	end
 	function r:Enable() self.enabled = true end
 	function r:Disable() self.enabled = false end
 	-- ScrollingMessageFrame

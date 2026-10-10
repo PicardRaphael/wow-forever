@@ -253,7 +253,7 @@ local function BuildWindow()
 	pasteButton:SetPoint("TOPRIGHT", f, "TOPRIGHT", -32, -8)
 	pasteButton:SetText("Coller /simc")
 	pasteButton:SetScript("OnClick", function()
-		FB.OpenPaste()
+		FB.TogglePaste()
 	end)
 	local cardsButton = CreateFrame("Button", "ForeverBridgeCardsButton", f, "UIPanelButtonTemplate")
 	cardsButton:SetSize(110, 20)
@@ -403,51 +403,6 @@ function FB.SwitchConversation(name)
 		FB.RenderHistory()
 	end
 	FB.RefreshTabs()
-end
-
--- Zone copiable (lien Talents Forever) : texte sélectionné, Ctrl+C, Échap ferme.
-function FB.ShowCopy(text)
-	local box = ui.copyBox
-	if not box then
-		local frame = CreateFrame("Frame", "ForeverBridgeCopy", UIParent, "BackdropTemplate")
-		frame:SetSize(420, 60)
-		frame:SetFrameStrata("DIALOG")
-		frame:SetMovable(true)
-		frame:SetClampedToScreen(true)
-		frame:EnableMouse(true)
-		frame:RegisterForDrag("LeftButton")
-		frame:SetScript("OnDragStart", function(self)
-			self:StartMoving()
-		end)
-		frame:SetScript("OnDragStop", function(self)
-			self:StopMovingOrSizing()
-		end)
-		if frame.SetBackdrop then
-			frame:SetBackdrop(BACKDROP)
-			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
-		end
-		tinsert(UISpecialFrames, "ForeverBridgeCopy")
-		local label = frame:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -8)
-		label:SetText("Ctrl+C pour copier, Échap pour fermer")
-		box = CreateFrame("EditBox", "ForeverBridgeCopyBox", frame)
-		box:SetPoint("BOTTOMLEFT", frame, "BOTTOMLEFT", 12, 10)
-		box:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 10)
-		box:SetHeight(20)
-		box:SetAutoFocus(false)
-		box:SetFontObject(ChatFontNormal)
-		box:SetScript("OnEscapePressed", function()
-			frame:Hide()
-		end)
-		ui.copyFrame, ui.copyBox = frame, box
-	end
-	box:SetText(text)
-	-- à côté de la fenêtre, à droite (gardé à l'écran) ; déplaçable ensuite
-	ui.copyFrame:ClearAllPoints()
-	ui.copyFrame:SetPoint("TOPLEFT", ui.frame or UIParent, ui.frame and "TOPRIGHT" or "CENTER", 8, 0)
-	ui.copyFrame:Show()
-	box:SetFocus()
-	box:HighlightText()
 end
 
 -- Ligne ajoutée à l'historique de la fenêtre, jamais à la discussion générale.
@@ -874,84 +829,248 @@ local function HookLinks()
 end
 
 ---------------------------------------------------------------------------
--- Zone de collage de l'export SimulationCraft (texte de /simc, Ctrl+V)
+-- Panneau d'action unique, collé à droite de la fenêtre (sonde en jeu H, décision 238) : copie d'un lien (Talents
+-- Forever), zone de collage de l'export SimulationCraft (/simc, Ctrl+V) et cartes « À valider », l'un sous l'autre ;
+-- le panneau défile (molette, barre du modèle UIPanelScrollFrameTemplate). Échap le ferme.
 ---------------------------------------------------------------------------
 
-function FB.OpenPaste()
-	local frame = ui.pasteFrame
-	if not frame then
-		frame = CreateFrame("Frame", "ForeverBridgePaste", UIParent, "BackdropTemplate")
-		frame:SetSize(460, 320)
-		frame:SetFrameStrata("DIALOG")
-		frame:SetMovable(true)
-		frame:SetClampedToScreen(true)
-		frame:EnableMouse(true)
-		if frame.SetBackdrop then
-			frame:SetBackdrop(BACKDROP)
-			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
+local PANEL_STEP = 40 -- défilement d'un cran de molette
+local PASTE_H = 140 -- hauteur de la zone de collage (elle défile seule au-delà)
+
+local function SectionLabel(parent, name, text)
+	local label = parent:CreateFontString(name, "OVERLAY", "GameFontHighlightSmall")
+	label:SetJustifyH("LEFT")
+	label:SetWidth(CARDS_W - 52)
+	label:SetText(text)
+	return label
+end
+
+local function BuildPanel()
+	if ui.panel then
+		return ui.panel
+	end
+	BuildWindow()
+	local panel = CreateFrame("Frame", "ForeverBridgePanel", UIParent, "BackdropTemplate")
+	panel:SetFrameStrata("DIALOG")
+	panel:SetClampedToScreen(true)
+	panel:EnableMouse(true)
+	panel:SetWidth(CARDS_W)
+	if panel.SetBackdrop then
+		panel:SetBackdrop(BACKDROP)
+		panel:SetBackdropColor(0.05, 0.05, 0.07, 1)
+	end
+	tinsert(UISpecialFrames, "ForeverBridgePanel")
+	-- fermé (Échap, boutons) : la copie et le collage se referment avec lui, les cartes restent
+	panel:SetScript("OnHide", function()
+		ui.copyText, ui.pasteOpen = nil, false
+	end)
+	local scroll = CreateFrame("ScrollFrame", "ForeverBridgePanelScroll", panel, "UIPanelScrollFrameTemplate")
+	scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, -10)
+	scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -30, 10)
+	scroll:EnableMouseWheel(true)
+	scroll:SetScript("OnMouseWheel", function(self, delta)
+		local top = self:GetVerticalScrollRange() or 0
+		local y = (self:GetVerticalScroll() or 0) - delta * PANEL_STEP
+		self:SetVerticalScroll(math.max(0, math.min(top, y)))
+	end)
+	local content = CreateFrame("Frame", "ForeverBridgePanelContent", scroll)
+	content:SetWidth(CARDS_W - 40)
+	scroll:SetScrollChild(content)
+
+	-- copie d'un lien : texte sélectionné, Ctrl+C
+	local copyLabel = SectionLabel(content, nil, "Lien : Ctrl+C pour copier, Échap pour fermer")
+	local copyBox = CreateFrame("EditBox", "ForeverBridgeCopyBox", content)
+	copyBox:SetSize(CARDS_W - 52, 20)
+	copyBox:SetAutoFocus(false)
+	copyBox:SetFontObject(ChatFontNormal)
+	copyBox:SetScript("OnEscapePressed", function()
+		panel:Hide()
+	end)
+
+	-- collage de l'export : zone de texte qui défile seule, puis Envoyer l'export
+	local pasteLabel = SectionLabel(content, nil, "Export SimulationCraft : /simc, Ctrl+C, puis Ctrl+V ici.")
+	local pasteScroll = CreateFrame("ScrollFrame", "ForeverBridgePasteScroll", content, "UIPanelScrollFrameTemplate")
+	pasteScroll:SetSize(CARDS_W - 70, PASTE_H)
+	local pasteBox = CreateFrame("EditBox", "ForeverBridgePasteBox", pasteScroll)
+	pasteBox:SetMultiLine(true)
+	pasteBox:SetAutoFocus(false)
+	pasteBox:SetFontObject(ChatFontNormal)
+	pasteBox:SetMaxLetters(0)
+	pasteBox:SetSize(CARDS_W - 70, PASTE_H)
+	pasteBox:SetScript("OnEscapePressed", function()
+		panel:Hide()
+	end)
+	pasteScroll:SetScrollChild(pasteBox)
+	local send = CreateFrame("Button", "ForeverBridgePasteSend", content, "UIPanelButtonTemplate")
+	send:SetSize(140, BAR_H)
+	send:SetText("Envoyer l'export")
+	send:SetScript("OnClick", function()
+		FB.SendPaste()
+	end)
+	local cancel = CreateFrame("Button", "ForeverBridgePasteClose", content, "UIPanelButtonTemplate")
+	cancel:SetSize(90, BAR_H)
+	cancel:SetPoint("LEFT", send, "RIGHT", 8, 0)
+	cancel:SetText("Fermer")
+	cancel:SetScript("OnClick", function()
+		ui.pasteOpen = false
+		FB.LayoutPanel()
+	end)
+
+	local cardsLabel = SectionLabel(content, nil, "À valider")
+	ui.panel, ui.panelScroll, ui.panelContent = panel, scroll, content
+	ui.copyParts = { copyLabel, copyBox }
+	ui.copyLabel, ui.copyBox = copyLabel, copyBox
+	ui.pasteParts = { pasteLabel, pasteScroll, send, cancel }
+	ui.pasteLabel, ui.pasteScroll, ui.pasteBox, ui.pasteSend = pasteLabel, pasteScroll, pasteBox, send
+	ui.cardsLabel, ui.cardTexts, ui.cardButtons = cardsLabel, {}, {}
+	return panel
+end
+
+local function CardText(card)
+	local lines = { "|cffffd100" .. Escape(Plain(card.title or card.id or "")) .. "|r" }
+	for _, line in ipairs(type(card.lines) == "table" and card.lines or {}) do
+		lines[#lines + 1] = Escape(Plain(line))
+	end
+	return table.concat(lines, "\n")
+end
+
+local function CardPlain(card)
+	local lines = { Plain(card.title or card.id or "") }
+	for _, line in ipairs(type(card.lines) == "table" and card.lines or {}) do
+		lines[#lines + 1] = Plain(line)
+	end
+	return table.concat(lines, "\n")
+end
+
+-- Cartes placées à partir de y (négatif, haut du contenu) ; rend le y sous la dernière carte.
+local function LayoutCards(content, y)
+	for _, widget in pairs(ui.cardButtons) do
+		widget:Hide()
+	end
+	for _, text in pairs(ui.cardTexts) do
+		text:Hide()
+	end
+	if #run.cards == 0 then
+		ui.cardsLabel:Hide()
+		return y
+	end
+	ui.cardsLabel:ClearAllPoints()
+	ui.cardsLabel:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y)
+	ui.cardsLabel:SetText("À valider (" .. #run.cards .. ")")
+	ui.cardsLabel:Show()
+	y = y - 18
+	for i, card in ipairs(run.cards) do
+		local text = ui.cardTexts[i]
+		if not text then
+			text = content:CreateFontString("ForeverBridgeCard" .. i .. "Text", "OVERLAY", "GameFontHighlightSmall")
+			text:SetJustifyH("LEFT")
+			ui.cardTexts[i] = text
 		end
-		tinsert(UISpecialFrames, "ForeverBridgePaste")
-		-- barre de titre : on y glisse la fenêtre (la zone de texte prend la souris partout ailleurs, sonde G)
-		local title = CreateFrame("Frame", "ForeverBridgePasteTitle", frame)
-		title:SetPoint("TOPLEFT", frame, "TOPLEFT", 4, -4)
-		title:SetPoint("TOPRIGHT", frame, "TOPRIGHT", -4, -4)
-		title:SetHeight(22)
-		title:EnableMouse(true)
-		title:RegisterForDrag("LeftButton")
-		title:SetScript("OnDragStart", function()
-			frame:StartMoving()
-		end)
-		title:SetScript("OnDragStop", function()
-			frame:StopMovingOrSizing()
-			local db = ForeverBridgeDB
-			if type(db) == "table" then
-				local point, _, relPoint, x, y = frame:GetPoint(1)
-				db.paste = { point = point, relPoint = relPoint, x = x, y = y }
+		text:ClearAllPoints()
+		text:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y)
+		text:SetWidth(CARDS_W - 52)
+		text:SetText(CardText(card))
+		text:Show()
+		local count = 1 + (type(card.lines) == "table" and #card.lines or 0)
+		y = y - count * 14 - 4
+		local previous
+		for _, entry in ipairs(type(card.buttons) == "table" and card.buttons or {}) do
+			if type(entry) == "table" and type(entry.key) == "string" then
+				local name = "ForeverBridgeCard" .. i .. "_" .. entry.key
+				local widget = ui.cardButtons[name]
+				if not widget then
+					widget = CreateFrame("Button", name, content, "UIPanelButtonTemplate")
+					widget:SetSize(96, BAR_H)
+					ui.cardButtons[name] = widget
+				end
+				widget:ClearAllPoints()
+				if previous then
+					widget:SetPoint("LEFT", previous, "RIGHT", 6, 0)
+				else
+					widget:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y)
+				end
+				widget:SetText(tostring(entry.label or entry.key))
+				widget:SetScript("OnClick", function()
+					FB.ClickCard(card, entry, widget)
+				end)
+				widget:Show()
+				previous = widget
 			end
-		end)
-		local label = title:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
-		label:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -10)
-		label:SetPoint("RIGHT", frame, "RIGHT", -12, 0)
-		label:SetJustifyH("LEFT")
-		label:SetText("Export SimulationCraft (glisser ce titre pour déplacer) : /simc, Ctrl+C, puis Ctrl+V ici.")
-		local scroll = CreateFrame("ScrollFrame", "ForeverBridgePasteScroll", frame, "UIPanelScrollFrameTemplate")
-		scroll:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, -30)
-		scroll:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -30, 44)
-		local box = CreateFrame("EditBox", "ForeverBridgePasteBox", scroll)
-		box:SetMultiLine(true)
-		box:SetAutoFocus(false)
-		box:SetFontObject(ChatFontNormal)
-		box:SetMaxLetters(0)
-		box:SetSize(410, 240)
-		box:SetScript("OnEscapePressed", function()
-			frame:Hide()
-		end)
-		scroll:SetScrollChild(box)
-		local send = CreateFrame("Button", "ForeverBridgePasteSend", frame, "UIPanelButtonTemplate")
-		send:SetSize(140, 24)
-		send:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -12, 12)
-		send:SetText("Envoyer l'export")
-		send:SetScript("OnClick", function()
-			FB.SendPaste()
-		end)
-		local cancel = CreateFrame("Button", nil, frame, "UIPanelButtonTemplate")
-		cancel:SetSize(90, 24)
-		cancel:SetPoint("RIGHT", send, "LEFT", -8, 0)
-		cancel:SetText("Fermer")
-		cancel:SetScript("OnClick", function()
-			frame:Hide()
-		end)
-		ui.pasteFrame, ui.pasteBox = frame, box
+		end
+		y = y - BAR_H - 12
 	end
-	frame:ClearAllPoints()
-	local saved = type(ForeverBridgeDB) == "table" and ForeverBridgeDB.paste
-	if type(saved) == "table" and type(saved.point) == "string" then
-		frame:SetPoint(saved.point, UIParent, saved.relPoint or saved.point, tonumber(saved.x) or 0, tonumber(saved.y) or 0)
-	else
-		frame:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	return y
+end
+
+-- Sections ouvertes l'une sous l'autre (copie, collage, cartes) ; le panneau se cache quand aucune ne reste.
+function FB.LayoutPanel()
+	local panel = BuildPanel()
+	local content = ui.panelContent
+	local y = -4
+	for _, part in ipairs(ui.copyParts) do
+		part:SetShown(ui.copyText ~= nil)
 	end
-	frame:Show()
+	if ui.copyText then
+		ui.copyLabel:ClearAllPoints()
+		ui.copyLabel:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y)
+		ui.copyBox:ClearAllPoints()
+		ui.copyBox:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y - 16)
+		y = y - 16 - 20 - 12
+	end
+	for _, part in ipairs(ui.pasteParts) do
+		part:SetShown(ui.pasteOpen)
+	end
+	if ui.pasteOpen then
+		ui.pasteLabel:ClearAllPoints()
+		ui.pasteLabel:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y)
+		ui.pasteScroll:ClearAllPoints()
+		ui.pasteScroll:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y - 16)
+		ui.pasteSend:ClearAllPoints()
+		ui.pasteSend:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y - 16 - PASTE_H - 6)
+		y = y - 16 - PASTE_H - 6 - BAR_H - 12
+	end
+	y = LayoutCards(content, y)
+	content:SetHeight(-y + 4)
+	if not ui.copyText and not ui.pasteOpen and #run.cards == 0 then
+		panel:Hide()
+		return
+	end
+	-- même hauteur que la fenêtre, collé à sa droite : il suit la fenêtre quand on la déplace
+	panel:SetHeight(math.max(MIN_H, ui.frame:GetHeight() or 0))
+	panel:ClearAllPoints()
+	panel:SetPoint("TOPLEFT", ui.frame, "TOPRIGHT", 8, 0)
+	panel:Show()
+end
+
+local function PanelShown()
+	return ui.panel ~= nil and ui.panel:IsShown()
+end
+
+-- Copie d'un lien (Talents Forever) : en tête du panneau, texte sélectionné.
+function FB.ShowCopy(text)
+	BuildPanel()
+	ui.copyText = tostring(text or "")
+	ui.copyBox:SetText(ui.copyText)
+	FB.LayoutPanel()
+	ui.panelScroll:SetVerticalScroll(0)
+	ui.copyBox:SetFocus()
+	ui.copyBox:HighlightText()
+end
+
+function FB.OpenPaste()
+	BuildPanel()
+	ui.pasteOpen = true
+	FB.LayoutPanel()
 	ui.pasteBox:SetFocus()
+end
+
+-- Bouton « Coller /simc » : ferme le panneau s'il montre déjà la zone de collage, sinon l'y ouvre.
+function FB.TogglePaste()
+	if PanelShown() and ui.pasteOpen then
+		ui.panel:Hide()
+		return
+	end
+	FB.OpenPaste()
 end
 
 -- Envoi de l'export collé : drapeau k=simc, sans question ; refusé au-delà de la taille d'un message.
@@ -975,7 +1094,8 @@ function FB.SendPaste()
 	local label = "export SimulationCraft (" .. lines .. " lignes)"
 	if FB.Send(text, nil, { flags = { "k=simc" }, label = label, tooLong = EXPORT_TOO_LONG }) then
 		box:SetText("")
-		ui.pasteFrame:Hide()
+		ui.pasteOpen = false
+		FB.LayoutPanel()
 	end
 end
 
@@ -990,111 +1110,22 @@ function FB.RefreshCards()
 	end
 	local count = #run.cards
 	button:SetText("À valider (" .. count .. ")")
-	if count > 0 then
-		button:Show()
-	else
-		button:Hide()
-		if ui.cardsFrame then
-			ui.cardsFrame:Hide()
-		end
-	end
-	if ui.cardsFrame and ui.cardsFrame:IsShown() then
-		FB.RenderCards()
+	button:SetShown(count > 0)
+	if PanelShown() then
+		FB.LayoutPanel()
 	end
 end
 
 function FB.ToggleCards()
-	BuildWindow()
-	local frame = ui.cardsFrame
-	if frame and frame:IsShown() then
-		frame:Hide()
+	if PanelShown() then
+		ui.panel:Hide()
 		return
 	end
 	FB.RenderCards()
 end
 
-local function CardText(card)
-	local lines = { "|cffffd100" .. Escape(Plain(card.title or card.id or "")) .. "|r" }
-	for _, line in ipairs(type(card.lines) == "table" and card.lines or {}) do
-		lines[#lines + 1] = Escape(Plain(line))
-	end
-	return table.concat(lines, "\n")
-end
-
-local function CardPlain(card)
-	local lines = { Plain(card.title or card.id or "") }
-	for _, line in ipairs(type(card.lines) == "table" and card.lines or {}) do
-		lines[#lines + 1] = Plain(line)
-	end
-	return table.concat(lines, "\n")
-end
-
 function FB.RenderCards()
-	BuildWindow()
-	local frame = ui.cardsFrame
-	if not frame then
-		frame = CreateFrame("Frame", "ForeverBridgeCards", UIParent, "BackdropTemplate")
-		frame:SetFrameStrata("DIALOG")
-		frame:SetClampedToScreen(true)
-		frame:EnableMouse(true)
-		if frame.SetBackdrop then
-			frame:SetBackdrop(BACKDROP)
-			frame:SetBackdropColor(0.05, 0.05, 0.07, 1)
-		end
-		tinsert(UISpecialFrames, "ForeverBridgeCards")
-		ui.cardsFrame, ui.cardTexts, ui.cardButtons = frame, {}, {}
-	end
-	for _, widget in pairs(ui.cardButtons) do
-		widget:Hide()
-	end
-	for _, text in pairs(ui.cardTexts) do
-		text:Hide()
-	end
-	local y = -10
-	for i, card in ipairs(run.cards) do
-		local text = ui.cardTexts[i]
-		if not text then
-			text = frame:CreateFontString("ForeverBridgeCard" .. i .. "Text", "OVERLAY", "GameFontHighlightSmall")
-			text:SetJustifyH("LEFT")
-			ui.cardTexts[i] = text
-		end
-		text:ClearAllPoints()
-		text:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, y)
-		text:SetWidth(CARDS_W - 24)
-		text:SetText(CardText(card))
-		text:Show()
-		local count = 1 + (type(card.lines) == "table" and #card.lines or 0)
-		y = y - count * 14 - 4
-		local previous
-		for _, entry in ipairs(type(card.buttons) == "table" and card.buttons or {}) do
-			if type(entry) == "table" and type(entry.key) == "string" then
-				local name = "ForeverBridgeCard" .. i .. "_" .. entry.key
-				local widget = ui.cardButtons[name]
-				if not widget then
-					widget = CreateFrame("Button", name, frame, "UIPanelButtonTemplate")
-					widget:SetSize(96, BAR_H)
-					ui.cardButtons[name] = widget
-				end
-				widget:ClearAllPoints()
-				if previous then
-					widget:SetPoint("LEFT", previous, "RIGHT", 6, 0)
-				else
-					widget:SetPoint("TOPLEFT", frame, "TOPLEFT", 12, y)
-				end
-				widget:SetText(tostring(entry.label or entry.key))
-				widget:SetScript("OnClick", function()
-					FB.ClickCard(card, entry, widget)
-				end)
-				widget:Show()
-				previous = widget
-			end
-		end
-		y = y - BAR_H - 12
-	end
-	frame:SetSize(CARDS_W, -y + 4)
-	frame:ClearAllPoints()
-	frame:SetPoint("TOPLEFT", ui.frame, "TOPRIGHT", 8, 0)
-	frame:Show()
+	FB.LayoutPanel()
 end
 
 -- Clic sur un bouton de carte : une action demande un second clic dans le délai (« Confirmer »), puis part en

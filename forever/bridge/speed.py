@@ -77,6 +77,10 @@ def quality_failures(
         failures.append("réponse trop longue")
     if unsourced(result, earlier):
         failures.append("chiffre hors des résultats d'outil")
+    from forever.bridge.jargon import internal_jargon
+
+    if internal_jargon(getattr(result, "text", "") or ""):
+        failures.append("jargon interne")
     return failures
 
 
@@ -161,6 +165,7 @@ def run_bench(
 BENCH_QUESTIONS: tuple[tuple[str, str, str, str | None], ...] = (
     # (clé, contexte réel de tests/fixtures/bridge/contexts, question, bouton)
     ("talents", "mage19", "Quel est mon prochain talent, avec le lien Talents Forever ?", "talents"),
+    ("suite-faute", "mage19", "Pour toi le projet step c'est quoi ?", None),  # sonde H : suite à faute de frappe
     ("leveling", "mage19", "Quel est mon prochain objectif de leveling ?", "leveling"),
     ("pvp", "mage19_cible_chaman21_tauren", "Fiche de la classe de ma cible", "pvp"),
     ("libre-talents", "mage19", "Quelles est les talent opti pour mage givre level 20", None),  # journal, 2026-10-09

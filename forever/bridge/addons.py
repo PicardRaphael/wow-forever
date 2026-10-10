@@ -149,7 +149,18 @@ def git(folder: Path, *args: str, run: Run = subprocess.run) -> subprocess.Compl
     if sub not in GIT_SUBCOMMANDS:
         raise ValueError(f"sous-commande git refusée : {sub}")
     flags = getattr(subprocess, "CREATE_NO_WINDOW", 0)  # pas de fenêtre de console sous Windows
-    return run(["git", "-C", str(folder), *args], capture_output=True, text=True, check=False, creationflags=flags)
+    # sortie de git en UTF-8 (sonde H : « tÃªte » pour « tête » lu dans la page de codes de Windows), sans invite
+    env = {**os.environ, "GIT_TERMINAL_PROMPT": "0", "LC_ALL": "C.UTF-8"}
+    return run(
+        ["git", "-C", str(folder), "-c", "i18n.logOutputEncoding=utf-8", *args],
+        capture_output=True,
+        encoding="utf-8",
+        errors="replace",
+        check=False,
+        creationflags=flags,
+        stdin=subprocess.DEVNULL,
+        env=env,
+    )
 
 
 def commit(config: AddonsConfig, message: str, *, run: Run = subprocess.run) -> CommitInfo | None:

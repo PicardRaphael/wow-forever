@@ -47,7 +47,15 @@ def detect_game_running(wow_dir: Path | None) -> bool | None:
     """État du jeu sur ce poste ; None si la liste des processus est illisible."""
     command = ["tasklist", "/FO", "CSV", "/NH"] if sys.platform == "win32" else ["ps", "-A", "-o", "comm="]
     try:
-        done = subprocess.run(command, capture_output=True, text=True, timeout=_TIMEOUT_S, check=False)
+        done = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=_TIMEOUT_S,
+            check=False,
+            stdin=subprocess.DEVNULL,
+            creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),  # relevé du pont : aucune fenêtre
+        )
     except (OSError, subprocess.SubprocessError):
         return None
     if done.returncode != 0:

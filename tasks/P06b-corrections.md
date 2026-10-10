@@ -58,3 +58,33 @@ test, pas sur le comportement voulu ; le code n'est pas changé pour les contour
   +           "characters": {"Jen": {"class": make_field("Mage", "joueur", "2026-09-01T00:00:00Z"),
   +                                  "level": make_field(18, "joueur", "2026-09-01T00:00:00Z")}}}  # fmt: skip
   ```
+
+## Retours de la sonde H (commit « P06b: tests des retours de la sonde H … », 9da81ca) — en attente d'accord
+
+### 5. `tests/unit/test_sonde_h.py` (`quiet_steps` et `test_a_pass_over_its_limit_stops_and_leaves_an_error`) — `Step` sans `data`
+- **Preuve** : `forever.update.Step` est un `NamedTuple` à quatre champs, `name`, `status`, `detail`, `data`
+  (`forever/update.py`, classe `Step`) ; l'assistant du test construit `Step(step, "rien", "simulé")` et
+  `Step("clone", "fait", "débloqué")` sans `data` : `TypeError` dans le fil du passage, qui ne va jamais jusqu'à
+  l'étape bloquée (`stuck.wait(5)` faux) ni jusqu'à l'erreur simulée. Le code passe sur la copie corrigée (les 2 tests, vérifié le 2026-10-10).
+- **Diff proposé** :
+  ```diff
+  -        monkeypatch.setattr(update, fn, overrides.get(step) or (lambda *a, step=step: update.Step(step, "rien", "simulé")))
+  -    monkeypatch.setattr(update, "_step_game", overrides.get("jeu") or (lambda run: (update.Step("jeu", "rien", "simulé"), None)))
+  +        monkeypatch.setattr(update, fn, overrides.get(step) or (lambda *a, step=step: update.Step(step, "rien", "simulé", {})))
+  +    monkeypatch.setattr(update, "_step_game", overrides.get("jeu") or (lambda run: (update.Step("jeu", "rien", "simulé", {}), None)))
+  …
+  -        return update.Step("clone", "fait", "débloqué")
+  +        return update.Step("clone", "fait", "débloqué", {})
+  ```
+
+### 6. `tests/unit/test_plugin_evals.py::test_report_loads_the_real_suite` — compte des cas
+- **Preuve** : le cas `plugin/evals/pont-question-de-suite-faute` (demandé par l'utilisateur, point 10 de la sonde H)
+  porte la suite à 75 cas dont 52 positifs ; le commit « tests » a mis à jour le compte de
+  `test_fifty_eight_cases_thirty_eight_positive_twenty_negative` mais pas celui-ci, resté à 74 et 51.
+- **Diff proposé** :
+  ```diff
+  -    assert len(loaded) == 74  # sonde F : un cas par bouton du pont
+  -    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 51
+  +    assert len(loaded) == 75  # sonde F : un cas par bouton du pont ; sonde H : question de suite à faute de frappe
+  +    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 52
+  ```
