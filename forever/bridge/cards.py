@@ -85,3 +85,13 @@ class CardSource:
     def done(self, card_id: str) -> None:
         if card_id.startswith(SELFTEST_PREFIX):
             clear_selftest_card(self.cache_dir)
+
+
+def card_lines(entry: dict[str, Any]) -> list[str]:
+    """Lignes d'une carte, rédigées par le pont depuis les champs de l'attente."""
+    raise NotImplementedError
+
+
+def update_cards(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Cartes des attentes ouvertes (`en_attente`, `approuvée`), dans l'ordre reçu."""
+    raise NotImplementedError

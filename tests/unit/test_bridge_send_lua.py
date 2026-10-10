@@ -142,7 +142,7 @@ def test_no_buttons_before_the_bridge_writes_its_state():
 def test_buttons_for_a_mage():
     game = with_buttons(Game())
     game.slash("/fv")
-    assert bar(game) == ["talents", "leveling", "pvp"]
+    assert bar(game) == ["talents", "leveling", "pvp", "update"]  # Mettre à jour : P06b, décision 235
     click(game, "ForeverBridgeButton_talents")
     _, record = sent(game)
     assert record.text == MAGE_TALENTS and record.flags == frozenset({"b=talents"})
@@ -153,7 +153,7 @@ def test_buttons_for_a_hunter():
     game.stub.player.__setitem__("class", "HUNTER")
     with_buttons(game)
     game.slash("/fv")
-    assert bar(game) == ["talents", "pets", "pvp"]
+    assert bar(game) == ["talents", "pets", "pvp", "update"]
     click(game, "ForeverBridgeButton_talents")
     _, record = sent(game)
     assert "build populaire" in record.text and record.context["class"] == "HUNTER"

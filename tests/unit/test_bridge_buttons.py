@@ -10,17 +10,23 @@ def keys(buttons):
     return [b.key for b in buttons]
 
 
-def test_four_buttons_in_p06a():
-    assert keys(visible_buttons()) == ["talents", "leveling", "pets", "pvp"]
-    assert {"T04b", "T04c", "T05", "FA1", "CH0", "PV1"} <= DONE_SLICES
+def test_buttons_since_p06b():
+    """P06b (décision 235) : « Mettre à jour » visible (T08d, T08e et P06b faites)."""
+    assert keys(visible_buttons()) == ["talents", "leveling", "pets", "pvp", "update"]
+    assert {"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b"} <= DONE_SLICES
 
 
 def test_buttons_of_unfinished_slices_are_hidden():
     all_keys = keys(BUTTONS)
     assert {"update", "gear", "last_fight"} <= set(all_keys)
     visible = keys(visible_buttons())
-    assert "update" not in visible and "gear" not in visible and "last_fight" not in visible
-    assert keys(visible_buttons(DONE_SLICES - {"CH0"})) == ["talents", "leveling", "pvp"]
+    assert "gear" not in visible and "last_fight" not in visible
+    assert keys(visible_buttons(DONE_SLICES - {"CH0", "P06b"})) == ["talents", "leveling", "pvp"]
+
+
+def test_update_button_is_an_action_without_question():
+    (entry,) = [e for e in button_payload(visible_buttons()) if e["key"] == "update"]
+    assert entry["action"] == "update" and entry["question"] == "" and entry["label"] == "Mettre à jour"
 
 
 def test_classes_and_questions():

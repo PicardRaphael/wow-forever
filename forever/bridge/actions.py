@@ -46,3 +46,25 @@ def card_for(cards: Sequence[Mapping[str, Any]], action: str, target: str | None
         if any(isinstance(b, Mapping) and b.get("action") == wanted for b in card.get("buttons") or ()):
             return card
     return None
+
+
+def approvable(entry: Mapping[str, Any]) -> bool:
+    """Attente que Valider et Refuser peuvent traiter : installation d'action `attente` ou mesure, à l'état
+    `en_attente`."""
+    raise NotImplementedError
+
+
+def update_argv(kind: str, pending_id: str | None = None) -> list[str]:
+    """Commande fixée d'une action : passage, approbation ou rejet d'une attente."""
+    raise NotImplementedError
+
+
+class ActionHandler:
+    """Actions de mise à jour du jeu (bloc B) : commandes fixées lancées par `spawn(argv, journal_du_passage)`."""
+
+    def __init__(self, *, cache_dir: Any, now: Any, offline: bool = False, spawn: Any = None) -> None:
+        raise NotImplementedError
+
+    def handle(self, action: str, target: str | None) -> tuple[str, str]:
+        """(résultat noté au journal, texte de la réponse)."""
+        raise NotImplementedError

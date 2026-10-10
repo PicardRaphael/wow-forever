@@ -99,3 +99,14 @@ class UpdateOnClose:
         self.reasons = set()
         self.event_at = None
         self.deferred = False
+
+
+class UpdateWatch:
+    """Verrou et dernier passage de `forever update` surveillés par le pont (P06b) : leur changement fait republier
+    l'état sans attendre le rafraîchissement de dix minutes."""
+
+    def __init__(self, cache_dir: Path) -> None:
+        raise NotImplementedError
+
+    def changed(self) -> bool:
+        raise NotImplementedError

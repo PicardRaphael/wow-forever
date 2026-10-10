@@ -234,6 +234,8 @@ def test_every_visible_button_has_a_plan_for_the_classes_it_serves(bench):
     _, data = bench
     hunter = {**context("mage19_cible_chaman21_tauren"), "class": "HUNTER", "talents": ""}
     for button in visible_buttons():
+        if button.action:  # bouton d'action (Mettre à jour, P06b) : traité par le pont, sans conversation
+            continue
         for ctx in (context("mage19_cible_chaman21_tauren"), hunter):
             token = ctx["class"]
             if button.classes is not None and token not in button.classes:
