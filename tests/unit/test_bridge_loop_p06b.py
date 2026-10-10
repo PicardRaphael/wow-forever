@@ -64,7 +64,7 @@ def test_parts_in_any_order_make_one_message(tmp_path):
     assert len(messages) == 1 and messages[0]["parts"] == 3
     capture.band = bands[0]
     bridge.step()
-    assert len(agent.calls) == 1 and replies(addons)[-1].status == "done"
+    assert len(agent.calls) == 1 and replies(addons, 2)[-1].status == "done"
 
 
 def test_a_missing_part_never_reaches_the_agent(tmp_path):
@@ -96,9 +96,8 @@ def test_message_event_keeps_the_whole_context(tmp_path):
     bridge.step()
     (message,) = [e for e in events(tmp_path) if e["event"] == "message"]
     assert message["context"] == context and message["context_keys"] == list(context)
-    for line in (tmp_path / "journal").glob("*.jsonl"):
-        for key in ("pixels", "image", "bgra"):
-            assert f'"{key}"' not in line.read_text(encoding="utf-8")
+    for event in events(tmp_path):
+        assert not {"pixels", "image", "bgra"} & set(event)
 
 
 # --- Actions --------------------------------------------------------------------------------------------------------
@@ -115,7 +114,7 @@ def action(tmp_path, flag, *, card=True, message_id=7):
     flag = flag.replace("<carte>", stamp or "")
     capture.band = band_of(Record(SESSION, message_id, frozenset({flag}), CONTEXT, "", slot=2))
     bridge.step()
-    return bridge, addons, replies(addons)[-1], [e for e in events(tmp_path) if e["event"] == "action"]
+    return bridge, addons, replies(addons, 2)[-1], [e for e in events(tmp_path) if e["event"] == "action"]
 
 
 def test_selftest_card_is_published(tmp_path):
