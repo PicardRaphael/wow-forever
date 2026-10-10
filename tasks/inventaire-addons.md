@@ -679,3 +679,25 @@ d'aujourd'hui.
 | `Interface/AddOns/ForeverLogger.bak-20261002-073506` et `-073519` | copies de sauvegarde de ForeverLogger | à supprimer à ta convenance |
 | `SavedVariables/AllTheThings.lua` | sauvegarde sans addon | reste d'une désinstallation |
 | `EllesmereUIForeverFixDB` | sauvegarde orpheline signalée par l'inventaire d'EllesmereUI | sans dossier d'addon |
+
+## Corrections de l'utilisateur du 2026-10-10 (décision 227)
+
+En lecture seule, sans réseau : `.toc` et liste des fichiers seulement (`forever addons inventory AtlasBIStooltips`,
+métadonnées et empreintes, aucune valeur). Rien n'est ingéré. Ces corrections remplacent le classement des
+« Dossiers présents hors du gestionnaire » du 2026-10-07 pour les quatre dossiers ci-dessous.
+
+| Dossier | Classement corrigé | Ce que fait `forever addons status` |
+| --- | --- | --- |
+| `AtlasBIStooltips` | **Module d'AtlasLoot Classic Forever**, installé avec lui, pas un reste : titre « AtlasLoot Forever [BiS ToolTip] », version 1.0.1, `## Dependencies: AtlasLootClassic`, `## Group: AtlasLootClassic`, `## OptionalDeps: LibExtraTip`, SavedVariables `slcDB`, **aucune licence** ; base `ClassDataBase/` de listes BiS : 22 fichiers `<Classe>_<Spé>.lua` (Druide 4, Chasseur 2 : BM et SV, Démoniste 2, Mage 2 : Arcane et Feu, Paladin 3, Prêtre 2, Voleur 1 : Combat, Chaman 3, Guerrier 3) ; 32 fichiers de données, empreinte `7e251dd30ce9` | suivi (`DATA_ADDONS`) : **source communautaire de listes BiS**, au mieux `suppose`, lecteur en T10a |
+| `ForeverCompletionist` | **Pas un addon** : projet de développement de l'utilisateur (outil d'inventaire « completionist » : `baseline.json`, `inventory.json`, `tests/`, `source_importers/`), qu'il déplacera hors du dossier des addons | jamais lu comme un addon, même avec un `.toc` (« pas un addon : projet de développement de l'utilisateur ») |
+| `RaphCompletionist` | **Addon de l'utilisateur** (0.2.1, « Raph + ChatGPT ») : dossier de la conversation « addons » prévue en P06b | rangé avec les addons du projet (une ligne « Addons du projet (ignorés) »), jamais « à inventorier » |
+| `RXPGuides` | **Supprimé pour la fin de la bêta** ; réinstallé à la sortie avec le guide payant de RestedXP. Reste **exclu** des données du projet (contenu payant, licence non commerciale CC BY-NC-SA 4.0) | addon connu et exclu (« connu, exclu »), jamais « à inventorier » |
+
+Addons du projet, ignorés par `forever addons status` et `forever update` (une seule ligne, version du `.toc`
+principal) : ForeverLogger, ForeverBridge avec sa réserve de 200 emplacements `ForeverBridge_S001`… et ses deux
+sondes `ForeverBridge_Probe` et `ForeverBridge_Probe2`, RaphCompletionist. Effet sur le poste le 2026-10-10 : de 224
+dossiers « à inventorier » à 20.
+
+Remarques pour T10a : la base d'AtlasBIStooltips ne couvre pas toutes les spécialisations (pas de Mage Givre, de
+Chasseur Précision ni de Voleur Assassinat ou Finesse dans les noms de fichiers) ; ses listes sont des choix de
+joueurs, à recouper avec celles de Naowh Forever (`!NBIS1!`) et de Forever Companion (`BisData`).

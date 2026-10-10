@@ -747,8 +747,8 @@ def written_text(written: Mapping[str, Any]) -> str:
 
 
 SELF_CLEARING_HINT = (
-    "lancer le jeu sur ce build, se connecter au royaume puis revenir à la sélection ou quitter le jeu : le client "
-    "écrit DBCache.bin à la déconnexion (DON14) et le pont lance alors `forever update`"
+    "lancer le jeu sur ce build, se connecter au royaume puis quitter le jeu : le client écrit DBCache.bin à la "
+    "déconnexion (DON14) et le pont lance alors `forever update`"
 )
 
 
@@ -1039,7 +1039,7 @@ def _hotfixes_wait(run: _Run, version: str, seen: datetime | None) -> Step:
     pending_id = f"hotfixes-{version}"
     why = (
         f"correctifs du serveur à lire : aucun DBCache.bin du build {_build_number(version)} archivé ; lancer le jeu "
-        "sur ce build, se connecter au royaume puis se déconnecter (le client écrit DBCache.bin à la déconnexion)"
+        "sur ce build, se connecter au royaume puis quitter le jeu (le client écrit DBCache.bin à la déconnexion)"
         + (f", sinon installation sans correctifs à partir de {until} si aucun n'est perdu" if until else "")
     )
     run.pending.append(

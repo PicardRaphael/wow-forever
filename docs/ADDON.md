@@ -252,6 +252,12 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     5. Retrait : `uv run forever bridge autostart remove` (le pont en marche continue jusqu'à `stop`).
     Au repos (jeu fermé, ou jeu en arrière-plan ou réduit), le pont ne capture rien ; voir `docs/USAGE.md`, « Chat en
     jeu », pour la mesure de sa consommation.
+15. **Mise à jour à la fermeture du jeu** (décision 227 ; plus de `forever update` à la main). Pont en marche.
+    1. Lancer le jeu, se connecter, jouer un combat, quitter le jeu.
+    2. Une vingtaine de secondes après : `uv run forever bridge status` → lignes `game_closed`, `dbcache_written` et
+       `update_launched` dans le journal ; `uv run forever update status` → « en cours » puis le nouveau passage.
+    3. Nouveau build du client : après la fermeture, l'attente « correctifs du serveur à lire » se lève seule (le
+       passage lit le `DBCache.bin` archivé).
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

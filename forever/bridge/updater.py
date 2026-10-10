@@ -5,11 +5,12 @@ aucun passage n'était dû avant 6 h.
 
 Le pont tourne en permanence (décision 226). Toutes les `CHECK_S` secondes, il relit l'état du jeu (processus du
 client) et la date de `DBCache.bin`. Deux événements déclenchent un passage : le jeu qui se ferme (journal de combat
-terminé) et `DBCache.bin` réécrit (le client l'écrit à la déconnexion du royaume, retour à la sélection ou fermeture,
-DON14). Le passage part une fois l'ensemble stable depuis `SETTLE_S` secondes (un événement de plus relance
-l'attente) ; il prend lui-même le verrou de la tâche de 08:00 et du hook de démarrage. Verrou vivant (`launch` rend
-faux) : nouvel essai au relevé suivant, jusqu'au lancement. Au premier relevé, rien n'est lancé : l'état d'avant le
-pont est inconnu. État du jeu illisible : rien ne change. Aucun réseau ici : c'est le passage lancé qui y accède."""
+terminé) et `DBCache.bin` réécrit (le client l'écrit à la déconnexion du royaume en fin de session, et parfois en
+début de partie, DON14). Le passage part une fois l'ensemble stable depuis `SETTLE_S` secondes (un événement de plus
+relance l'attente) ; il prend lui-même le verrou de la tâche de 08:00 et du hook de démarrage. Verrou vivant (`launch`
+rend faux) : nouvel essai au relevé suivant, jusqu'au lancement. Au premier relevé, rien n'est lancé : l'état d'avant
+le pont est inconnu. État du jeu illisible : rien ne change. Aucun réseau ici : c'est le passage lancé qui y
+accède."""
 
 from __future__ import annotations
 

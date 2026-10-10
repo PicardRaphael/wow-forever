@@ -209,10 +209,17 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   Ajoutée le 2026-10-05 (T08c) : 4 508 objets (`Item`, `ItemSparse`, `ItemSearchName` `VALID`, tables d'artisanat
   `INVALID`), déjà journalisées sous le build 70124 : elles ne viennent pas forcément du build de l'en-tête. Jamais
   appliquées. Test : comparaison des enregistrements `ItemSparse` envoyés avec le CSV du build (T10). Priorité : basse.
-- **DON14 — Quand le client écrit-il `DBCache.bin` ?** Ajoutée le 2026-10-06 (T08d) : à la connexion, à la
-  fermeture, à la réception d'une poussée ? Le fichier a été remplacé une minute après le lancement de 70235, puis de
-  nouveau à 08:16 UTC le même matin (29 283 puis 30 284 entrées). Test : dates de `DBCache.bin` et de
-  `DBCache.bin<pid>.tmp` relevées par l'archivage sur plusieurs sessions. Priorité : moyenne (archivage).
+- **DON14 — Quand le client écrit-il `DBCache.bin` ?** Ajoutée le 2026-10-06 (T08d). *Répondue en partie le
+  2026-10-10 (`probable`, décision 227)* : à la **déconnexion du royaume** en fin de session (fermeture du jeu), et en
+  général ni au lancement ni en cours de jeu (retour à la sélection des personnages seul : non observé). Session du 2026-10-10
+  sur 70338 : client lancé à 06:31:46 UTC, trois archivages à 06:31:35, 06:32:49 et 06:34:03 (joueur connecté)
+  voient le fichier inchangé ; « Logout completed » à 06:33:55, puis le fichier est écrit à 06:34:04,04, à l'instant
+  de « Client connection destroyed » de `Logs/Connection.log`. Sur 70235, 70245 et 70291, il suit de 5 à 7 s la
+  dernière écriture de `Hotfix.log` à chaque fin de session observée ; sur 70291, deux sessions n'ont rien écrit dans
+  leurs 4 et 9 premières minutes. Exception non expliquée : deux sessions de 70245 l'ont aussi écrit 27 et 48 s
+  après leur lancement (2026-10-07 à 11:08:05, 2026-10-08 à 06:10:11 UTC), reconnexion possible. Archivage adapté :
+  le pont lance un passage dès que le fichier change (à toute heure) ou que le jeu se ferme, le hook dès qu'une copie
+  est faite. Test : `Connection.log` d'une session où le fichier change en début de partie. Priorité : basse.
 - **DON15 — Les tables de wago de 1.60.1.70235 sont-elles un vrai export de ce build ?** Ajoutée le 2026-10-06
   (T08d) : 46 des 47 CSV enUS sont identiques octet pour octet à ceux de 70170 ; seul l'en-tête de
   `PlayerExpectedStat` change (`HPPerStamina`). Si le build 70235 du client diffère, rien ne le montre. Test :

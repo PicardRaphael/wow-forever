@@ -48,7 +48,10 @@ seule fois, pour passer du plugin 0.8.1 à 0.8.2 : fermer les sessions Claude Co
 données (empreintes), correctifs du serveur (`Logs/Hotfix.log`), nouveaux journaux de combat et sauvegardes d'addons.
 Elle **ne lance rien** : chaque changement est suivi des commandes proposées, marquées « réseau, sur accord » quand
 elles touchent Internet (`forever notes` est proposé quand le build change, décision 148). Détail des briques :
-`forever addons status [--save]`, `forever hotfixes [--since-install]`.
+`forever addons status [--save]`, `forever hotfixes [--since-install]`. `forever addons status` et `forever update`
+ne comptent jamais nos propres addons (ForeverLogger, ForeverBridge, ses emplacements et ses sondes,
+RaphCompletionist : une ligne « Addons du projet (ignorés) ») ni RXPGuides (connu, exclu) parmi les addons à
+inventorier ; ForeverCompletionist n'est jamais lu comme un addon (décision 227).
 
 ### Correctifs du serveur (T08c)
 ```powershell
@@ -85,20 +88,25 @@ WoWDBDefs, git et `gh` du clone).
 uv run forever update --dry-run              # tout calculer, ne rien écrire (rejeu des builds listé, non calculé)
 uv run forever update                        # passage complet ; code 6 s'il reste une attente
 uv run forever update --only jeu,correctifs  # étapes : jeu, correctifs, journaux, addons ; --no-network : hors ligne
-uv run forever update status                 # attentes et dernier passage
+uv run forever update status                 # attentes ouvertes et dernier passage ; --all : historique complet
 uv run forever update approve <id>           # approuver (base inchangée), passage lancé en arrière-plan ; --wait
 uv run forever update reject <id> --reason "…"
 uv run forever addons inventory <dossier>    # métadonnées et empreintes d'un addon, sans aucune valeur
 ```
 Au démarrage d'une session dans le dépôt, le hook archive les fichiers du client et lance `forever update --auto`
-en arrière-plan (au plus toutes les 6 h, jamais si un passage tourne) ; la ligne de démarrage montre les attentes et
+en arrière-plan (au plus toutes les 6 h, ou tout de suite si l'archivage vient de copier un `DBCache.bin`, jamais si un
+passage tourne, décision 227) ; la ligne de démarrage montre les attentes et
 propose `git pull` quand `main` distant a reçu des données. Une attente `bloqué` (verify rouge, installation refusée
 par les règles de fusion, valeur perdue) n'est pas approuvable : elle demande une session. Une colonne renommée par
 le client (aucun de ses noms dans le CSV) donne une attente `column_names`, avec le nom proposé : elle se traite en
 session (ajouter le nouveau nom en tête de la liste, `forever/pipeline/tables.py` et `decode_rules.json`) et
 `approve` la refuse (décision 185). Garde-fou (décision 184) : tant qu'aucun passage réel n'a été approuvé, la
-première écriture de `forever update --auto` reste en attente de `forever update approve <id>`. Un journal de combat
-n'est noté comme mesuré qu'une fois sa mesure écrite par `forever measures refresh` (décision 187). Un journal écrit sous une version antérieure n'est jamais mesuré dans la version installée, sauf accord explicite et tracé : `forever measures refresh --accept-version <version> --accept-reason "…"` (raison obligatoire, par exemple la note officielle qui ne touche pas ces monstres ; trace dans les notes de `monsters.json` et sa source dans `sources.json`, décision 221).
+première écriture de `forever update --auto` reste en attente de `forever update approve <id>`. Une attente de
+mesure (`measures`) porte son résumé dans `forever update status` : PNJ ajoutés et changés (PV par niveau), retirés,
+nouvellement écartés de la courbe avec leur raison, niveaux dont les PV changent, et cas des builds du Mage qui
+changeraient après rejeu (« après » : la mesure écrite dans une copie des données par `forever measures refresh
+--into`, sans instantané ; rejoué une fois par attente, une quinzaine de minutes par côté ; décision 227). Un journal
+de combat n'est noté comme mesuré qu'une fois sa mesure écrite par `forever measures refresh` (décision 187). Un journal écrit sous une version antérieure n'est jamais mesuré dans la version installée, sauf accord explicite et tracé : `forever measures refresh --accept-version <version> --accept-reason "…"` (raison obligatoire, par exemple la note officielle qui ne touche pas ces monstres ; trace dans les notes de `monsters.json` et sa source dans `sources.json`, décision 221).
 
 Tâche planifiée Windows « WoW Forever - mise à jour » (décision 226) : `forever update --auto`, comme le hook
 de démarrage (même verrou `<cache>/update/lock`, même journal `<cache>/update/run-<horodatage>.log`), chaque jour à
@@ -167,6 +175,13 @@ liste des sauvegardes toutes les 30 secondes et réécrit la réserve toutes les
 réglages), 43 Mo (33 Mo privés) ; surveillance sous la résolution de la mesure (moins de 0,02 s), 24 Mo (14 Mo
 privés) ; journal : aucune fenêtre trouvée, aucune bande lue. Jeu ouvert en arrière-plan : non mesuré (il faut le jeu) ;
 la capture y est refusée à chaque pas (`may_capture`, test `test_nothing_is_read_when_the_game_is_not_in_front`).
+
+Mise à jour à la fermeture du jeu (décision 227) : le pont relit toutes les 5 secondes l'état du jeu et la date de
+`Cache/ADB/enUS/DBCache.bin`. Le jeu qui se ferme (journal de combat terminé) ou un `DBCache.bin` réécrit (le client
+l'écrit à la déconnexion du royaume, DON14) lance `forever update --auto`, une fois l'ensemble stable depuis 15
+secondes, sans attendre les 6 h ; le passage prend le même verrou que la tâche de 08:00 et le hook (un passage en
+cours : le pont réessaie jusqu'au lancement). Journal du pont : `game_closed`, `dbcache_written`, `update_launched`,
+`update_deferred`. Rien au démarrage du pont, ni avec `FOREVER_OFFLINE`.
 
 Addon tenu à jour : le pont compare l'addon installé à celui du dépôt ; s'il diffère (après une mise à jour du
 dépôt), il le réinstalle dès que le jeu est fermé, jamais pendant qu'il tourne, et la ligne d'état de la fenêtre

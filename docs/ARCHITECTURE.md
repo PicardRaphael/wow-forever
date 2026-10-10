@@ -48,7 +48,9 @@ forever-core/
   sans modèle : `tests/unit/test_bridge_bench.py`).
 - **Exploitation** : `forever bridge install | start | run | stop | status | ask | selftest`, journal JSONL sans pixel
   (`journal.py`), état gardé (`state.py`), un pont à la fois (verrou, dernier signe de vie), arrêt par fichier
-  posé seulement pour un pont vivant ; addon tenu à jour par le pont, jeu fermé (`keeper.py`).
+  posé seulement pour un pont vivant ; addon tenu à jour par le pont, jeu fermé (`keeper.py`) ; passage
+  `forever update --auto` lancé à la fermeture du jeu ou à l'écriture de `DBCache.bin` (`updater.py`,
+  `update.launch_pass` : même verrou que la tâche de 08:00 et le hook, hors de la règle des 6 h, décision 227).
 - **Démarrage automatique** (décision 226) : `forever bridge autostart install | remove | status` gère la tâche
   planifiée « WoW Forever - pont » (`autostart.py`, XML pour `schtasks`, ouverture de session, sans droits
   administrateur) ; la tâche lance la surveillance avec le `pythonw.exe` de base (bibliothèque standard seulement :
