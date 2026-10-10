@@ -41,3 +41,18 @@ test, pas sur le comportement voulu ; le code n'est pas changé pour les contour
   +    for event in events(tmp_path):
   +        assert not {"pixels", "image", "bgra"} & set(event)
   ```
+
+## Bloc C (commit « P06b: tests (bloc C) », fda590b) — en attente d'accord
+
+### 4. `tests/unit/test_profile_schema3.py::test_schema_2_is_read_then_written_as_3` — date du profil d'origine
+- **Preuve** : le profil de schéma 2 du test porte des champs datés `AT` = 2026-10-10T12:00:00Z, alors que l'horloge
+  des tests (`conftest.NOW`) est le 2026-09-27T12:00:00Z. `set_character(deps, "Jen", level=19)` écrit donc une valeur
+  **plus ancienne** que celle du profil, et `merge_field` garde la plus récente (règle du schéma 2, inchangée, testée
+  par `test_profile_import.py::test_equal_dates_follow_source_order`) : le niveau reste 18. Le test voulait vérifier
+  la réécriture en schéma 3 sans perte, pas l'ordre des dates.
+- **Diff proposé** (le profil d'origine daté avant l'horloge des tests) :
+  ```diff
+  -           "characters": {"Jen": {"class": make_field("Mage", "joueur", AT), "level": make_field(18, "joueur", AT)}}}  # fmt: skip
+  +           "characters": {"Jen": {"class": make_field("Mage", "joueur", "2026-09-01T00:00:00Z"),
+  +                                  "level": make_field(18, "joueur", "2026-09-01T00:00:00Z")}}}  # fmt: skip
+  ```

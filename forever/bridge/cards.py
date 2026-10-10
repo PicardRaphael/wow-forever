@@ -84,7 +84,10 @@ class CardSource:
         """Carte de test, puis cartes des attentes ouvertes de `forever update`."""
         from forever.update import list_pending
 
-        return read_selftest_cards(self.cache_dir, now=self.now()) + update_cards(list_pending(self.cache_dir))
+        cards = read_selftest_cards(self.cache_dir, now=self.now()) + update_cards(list_pending(self.cache_dir))
+        if self.profile is not None:
+            cards += self.profile.cards()
+        return cards
 
     def done(self, card_id: str) -> None:
         if card_id.startswith(SELFTEST_PREFIX):

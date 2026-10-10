@@ -32,6 +32,8 @@ from forever.bridge.format import normalize_reply
 from forever.bridge.fragments import Fragment, FragmentBuffer, parse_fragment
 from forever.bridge.image import Image
 from forever.bridge.journal import Journal
+from forever.bridge.profile_gap import GAP_NOTE, gaps_text
+from forever.bridge.profile_gap import MENTION as GAP_MENTION
 from forever.bridge.prompt import message_text
 from forever.bridge.record import CONTEXT_KEYS, Record, RecordError, parse_payload
 from forever.bridge.slots import ADDON, SLOTS, inbox_lua, publish, status_lua
@@ -117,6 +119,7 @@ class Bridge:
         cards: Any | None = None,
         actions: Any | None = None,
         update_watch: Any | None = None,
+        profile: Any | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -137,6 +140,7 @@ class Bridge:
         self.cards = cards  # cards.CardSource : cartes « À valider » publiées (P06b)
         self.actions = actions  # actions.ActionHandler : Mettre à jour, Valider, Refuser (bloc B)
         self.update_watch = update_watch  # updater.UpdateWatch : fin d'un passage publiée aussitôt
+        self.profile = profile  # profile_gap.ProfileWatch : écart entre le jeu et le profil (bloc C)
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
         self.last_cards_check: float | None = None
@@ -353,6 +357,13 @@ class Bridge:
             text = f"Carte de test : « {label} » reçu par le pont ; rien n'est lancé."
             self.cards.done(str(card["id"]))
             self._check_cards(self.clock(), force=True)
+        elif action in ("profile_apply", "profile_dismiss") and self.profile is not None and target:
+            try:
+                handle = self.profile.apply if action == "profile_apply" else self.profile.dismiss
+                result, text = handle(target)
+            except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
+                result, text = "erreur", f"Profil non écrit : {type(exc).__name__}: {exc}"
+            self._check_cards(self.clock(), force=True)
         elif action in ("update", "approve", "reject") and self.actions is not None:
             try:
                 result, text = self.actions.handle(str(action), target)
@@ -423,12 +434,29 @@ class Bridge:
         button = next((b for b in BUTTONS if b.key == key), None)
         return button.notice_for(record.context.get("class", "")) if button else None
 
+    def _profile_gap(self, record: Record) -> tuple[str | None, bool]:
+        """(ligne d'écart pour le message, carte proposée) ; jamais d'erreur vers le joueur."""
+        if self.profile is None:
+            return None, False
+        try:
+            gaps, proposed = self.profile.check(record.context)
+        except Exception as exc:  # noqa: BLE001 : le profil ne doit jamais empêcher la réponse
+            self.journal.write("error", where="écart avec le profil", error=f"{type(exc).__name__}: {exc}")
+            return None, False
+        if proposed:
+            self._check_cards(self.clock(), force=True)
+            self.journal.write("profile_gap", id=record.message_id, fields=[g.field for g in gaps])
+        if not gaps:
+            return None, False
+        return f"Écart avec le profil : {gaps_text(gaps)}. {GAP_NOTE}", proposed
+
     def _work(self, record: Record) -> None:
         try:
             session = None if "n" in record.flags else self.state.session
             started = self.clock()
             self.journal.write("agent", id=record.message_id, resumed=session is not None)
             prefer: str | None = None
+            proposed = False
             try:
                 guide = None
                 if self.prepare is not None:
@@ -440,7 +468,8 @@ class Bridge:
                         )
                 else:
                     talents = self.describe(record) if self.describe and record.context.get("talents") else None
-                result = self.agent(message_text(record, talents=talents, guide=guide), session)
+                gap_note, proposed = self._profile_gap(record)
+                result = self.agent(message_text(record, talents=talents, guide=guide, profile=gap_note), session)
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
                 result = AgentResult(text="", session_id=None, is_error=True, error=f"{type(exc).__name__}: {exc}")
             if result.denied:
@@ -454,6 +483,8 @@ class Bridge:
                 notice = self._notice(record)
                 if notice:
                     text = f"{text}\n\n{notice}"
+                if proposed:
+                    text = f"{text}\n\n{GAP_MENTION}"
                 reply.update(status="done", text=text, provenance=provenance_line(result.provenances))
                 link = result.links.get(prefer) if prefer else None
                 if link or result.link:

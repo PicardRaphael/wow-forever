@@ -32,7 +32,9 @@ Chaque message commence par le contexte de son personnage, envoyé par le jeu, p
 """
 
 
-def message_text(record: Record, *, talents: str | None = None, guide: str | None = None) -> str:
+def message_text(
+    record: Record, *, talents: str | None = None, guide: str | None = None, profile: str | None = None
+) -> str:
     """Message envoyé sur l'entrée standard : bloc de contexte, puis ce que le pont en a relié à nos données
     (`talents` : lignes de `context.context_notes`, ou la seule liste des talents en clés de forever), la consigne du
     bouton (`plans.plan_text`), puis la question."""
@@ -46,6 +48,8 @@ def message_text(record: Record, *, talents: str | None = None, guide: str | Non
         lines.append(talents)
     elif talents:
         lines.append(f"Talents actuels (clés de forever, pour `current` de forever_build) : {talents}")
+    if profile:  # écart entre le jeu et le profil (P06b, décision 122) : ligne fixe du pont
+        lines.append(profile)
     if guide:
         lines += ["", guide]
     lines.append("")

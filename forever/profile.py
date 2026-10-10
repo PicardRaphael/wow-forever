@@ -1,4 +1,5 @@
-"""Profil joueur hors du dépôt (T06b, décision D5 ; schéma 2 en PV1, décision 125) : plusieurs personnages, un actif.
+"""Profil joueur hors du dépôt (T06b, décision D5 ; schéma 2 en PV1, décision 125 ; schéma 3 en P06b, décision 235) :
+plusieurs personnages, un actif.
 
 Fichier : `Deps.profile_path`, sinon `FOREVER_PROFILE`, sinon `~/.forever/profile.json` ; jamais sous le dépôt (les
 données personnelles ne se committent pas, décision 99). Lu explicitement par l'agent (`forever_player_profile`) :
@@ -11,7 +12,14 @@ désaccords dans `conflicts`, jamais effacés. Un profil de schéma 1 est migré
 `updated_at`) et réécrit seulement par une commande qui écrit. `read_profile` rend les valeurs à plat, plus `fields`
 et `conflicts`. Neuf classes (noms anglais du client, noms français acceptés). Mage : race (races.json), niveau et
 talents (check_build) validés ; autres classes : gardées telles quelles, `validated: false`. Faction donnée par le
-joueur, jamais déduite ni importée. `planned` : personnage prévu, pas encore créé ; absent : `false`."""
+joueur ou lue en jeu (source `jeu`, P06b), jamais déduite. `planned` : personnage prévu, pas encore créé ; absent :
+`false`.
+
+Schéma 3 (P06b) : champs sourcés `gear` (équipement complet par emplacement : objet, enchantement, gemmes, suffixe
+aléatoire, identifiant unique, nom) et `sheet` (fiche du personnage lue par l'export SimulationCraft, note « lue avec
+les buffs actifs ») ; sources `jeu` (contexte envoyé par le jeu au pont) et `simulationcraft` (export collé), écrites
+par le pont seulement (`apply_game_fields`, au clic du joueur). Un profil de schéma 2 se lit tel quel et passe au
+schéma 3 à la première écriture."""
 
 from __future__ import annotations
 
@@ -32,7 +40,7 @@ from forever.provenance import Provenance, local_provenance
 from forever.store import current_identity, load_version
 from forever.timefmt import format_utc
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CLASSES = ("Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid")
 CLASS_NAMES = {
@@ -59,12 +67,26 @@ WRAPPED: dict[str, Any] = {
     "professions": {},
     "talent_nodes": {},
     "quests_completed": {},
+    "gear": {},
+    "sheet": {},
 }
 _SCHEMA_1_FIELDS = ("class", *FIELDS)
 _META = ("source", "at", "client_build", "certainty")
 
 # Ordre des sources à date égale, de la plus directe à la moins directe (PV1, D2 ; décision 125) : rang croissant.
-SOURCE_RANK = {"joueur": 0, "ForeverLogger": 1, "Questie": 2, "Auctionator": 2, "journal": 3, "api": 4}
+# P06b : le contexte du jeu (`jeu`) et l'export collé (`simulationcraft`) sont des lectures directes du client.
+SOURCE_RANK = {
+    "joueur": 0,
+    "jeu": 1,
+    "simulationcraft": 2,
+    "ForeverLogger": 3,
+    "Questie": 4,
+    "Auctionator": 4,
+    "journal": 5,
+    "api": 6,
+}
+GAME_SOURCES = ("jeu", "simulationcraft")
+SHEET_NOTE = "lue avec les buffs actifs"
 
 
 class ProfileView(TypedDict):
@@ -174,6 +196,8 @@ def character_values(raw: Mapping[str, Any]) -> dict[str, Any]:
         if isinstance(f, dict) and "source" in f:
             out[key] = copy.deepcopy(f.get("value"))
             fields[key] = {m: f.get(m) for m in _META}
+            if f.get("note"):
+                fields[key]["note"] = f["note"]
         else:
             out[key] = copy.deepcopy(default)
     out["guid"] = raw.get("guid")
@@ -222,7 +246,7 @@ def _migrate_character(c: Mapping[str, Any]) -> dict[str, Any]:
 
 def _schema_error(path: Path) -> DataSchemaError:
     return DataSchemaError(
-        f"Profil joueur {path} : schéma 1 ou {SCHEMA_VERSION} attendu.", "corriger ou supprimer le fichier"
+        f"Profil joueur {path} : schéma 1 à {SCHEMA_VERSION} attendu.", "corriger ou supprimer le fichier"
     )
 
 
@@ -240,8 +264,9 @@ def load_profile(path: Path) -> dict[str, Any]:
     if doc.get("schema_version") == 1:
         chars = {name: _migrate_character(c) for name, c in doc["characters"].items() if isinstance(c, dict)}
         return {"schema_version": SCHEMA_VERSION, "active": doc.get("active"), "characters": chars, "realms": {}}
-    if doc.get("schema_version") != SCHEMA_VERSION:
+    if doc.get("schema_version") not in (2, SCHEMA_VERSION):
         raise _schema_error(path)
+    doc["schema_version"] = SCHEMA_VERSION  # schéma 2 : mêmes champs, `gear` et `sheet` en plus ; réécrit en 3
     doc.setdefault("realms", {})
     return doc
 
@@ -482,5 +507,39 @@ def apply_game_fields(
     deps: Deps | None = None,
 ) -> dict[str, Any]:
     """Écrit des champs lus dans le jeu (source `jeu` ou `simulationcraft`, P06b) ; crée le personnage au besoin.
-    Appelé par le pont seulement, au clic du joueur. Rend le profil."""
-    raise NotImplementedError
+    Appelé par le pont seulement, au clic du joueur. Certitude `certain` (valeur lue au client) ; la fiche porte la
+    note « lue avec les buffs actifs ». Rend le profil."""
+    if source not in GAME_SOURCES:
+        raise InvalidArgumentError(f"Source du jeu inconnue : {source}.", f"choisir parmi {', '.join(GAME_SOURCES)}")
+    if not name.strip():
+        raise InvalidArgumentError("Nom de personnage vide.", "donner un nom")
+    doc = load_profile(path)
+    chars: dict[str, Any] = doc["characters"]
+    raw = dict(chars.get(name, {}))
+    conflicts = list(raw.get("conflicts") or [])
+    for key, value in fields.items():
+        if key not in WRAPPED or value is None:
+            continue
+        new = make_field(copy.deepcopy(value), source, at, client_build)
+        if key == "sheet":
+            new["note"] = SHEET_NOTE
+        kept, conflict = merge_field(raw.get(key), new)
+        raw[key] = kept
+        if conflict is not None and (record := {"field": key, **conflict}) not in conflicts:
+            conflicts.append(record)
+    if conflicts:
+        raw["conflicts"] = conflicts
+    if realm:
+        raw["realm"] = realm
+    raw["planned"] = bool(raw.get("planned", False))
+    if deps is not None:
+        flat = character_values(raw)
+        raw["validated"] = flat["class"] is not None and is_valid(deps, flat)
+        raw["game_version"] = current_identity(deps.data_dir).game_version
+    raw["updated_at"] = at
+    chars[name] = raw
+    if doc.get("active") is None:
+        doc["active"] = name
+    doc["schema_version"] = SCHEMA_VERSION
+    save_profile(path, doc)
+    return doc

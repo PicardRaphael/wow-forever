@@ -1206,6 +1206,7 @@ def render_profile(view: ProfileView) -> list[str]:
         lines.append("Talents : " + ", ".join(f"{k} {v}" for k, v in c["talents"].items()))
     if c["professions"]:
         lines.append("Métiers : " + ", ".join(f"{k} {v}" for k, v in c["professions"].items()))
+    lines += _game_lines(c)
     if view["missing"]:
         lines.append("Manquant : " + ", ".join(view["missing"]))
     if view["stale"]:
@@ -1213,6 +1214,31 @@ def render_profile(view: ProfileView) -> list[str]:
     if not c["validated"]:
         lines.append("Classe non couverte par les calculs : valeurs gardées sans contrôle")
     return [*lines, *_locale_line(view)]
+
+
+def _game_lines(c: Mapping[str, Any]) -> list[str]:
+    """Équipement et fiche du personnage lus en jeu (profil au schéma 3, P06b)."""
+    lines = []
+    gear = c.get("gear") or {}
+    if gear:
+        source = (c["fields"].get("gear") or {}).get("source")
+        pieces = []
+        for slot, piece in sorted(gear.items(), key=lambda kv: int(kv[0]) if str(kv[0]).isdigit() else 0):
+            extras = [f"objet {piece.get('item')}"]
+            if piece.get("enchant"):
+                extras.append(f"enchantement {piece['enchant']}")
+            if piece.get("suffix"):
+                extras.append(f"suffixe aléatoire {piece['suffix']}")
+            pieces.append(f"{slot} {piece.get('name') or '?'} ({', '.join(extras)})")
+        plural = "s" if len(gear) > 1 else ""
+        lines.append(f"Équipement ({len(gear)} pièce{plural}, {source}) : " + " ; ".join(pieces))
+    sheet = c.get("sheet") or {}
+    if sheet:
+        meta = c["fields"].get("sheet") or {}
+        head = ", ".join(str(x) for x in (meta.get("source"), meta.get("note"), meta.get("at")) if x)
+        values = " ; ".join(f"{k} {v}" for k, v in sheet.items() if k != "read_at")
+        lines.append(f"Fiche ({head}) : {values}")
+    return lines
 
 
 def _parse_professions(items: list[str]) -> dict[str, int] | None:
