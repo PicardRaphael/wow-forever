@@ -250,3 +250,52 @@ def test_nothing_runs_in_the_bridge_conversation(make_deps, wow, archived):
     spawn = Spawn()
     hooks.update_kickoff(make_deps(wow_dir=wow), {**HOME, "FOREVER_BRIDGE": "1"}, spawn)
     assert archived == [] and spawn.calls == []
+
+
+# --- DBCache.bin d'un nouveau build archivé (DON14, décision 227) ------------------------------------------------
+
+
+@pytest.fixture
+def archived_dbcache(monkeypatch, tmp_path):
+    def fake(deps, **_kwargs):
+        from forever.archive import ArchivedCopy, ArchiveResult
+
+        copy = ArchivedCopy("dbcache", "79999", tmp_path / "DBCache.bin", "0" * 64, 1, "", "", True)
+        return ArchiveResult([copy], [], None)
+
+    monkeypatch.setattr("forever.archive.archive_client_files", fake)
+
+
+def test_a_new_dbcache_copy_spawns_a_pass_even_within_six_hours(make_deps, wow, archived_dbcache):
+    deps = make_deps(wow_dir=wow)
+    save_report(deps.cache_dir, report(finished_at="2026-09-27T11:00:00Z"))  # 1 h avant NOW
+    spawn = Spawn()
+    hooks.update_kickoff(deps, HOME, spawn)
+    assert len(spawn.calls) == 1 and "--auto" in spawn.calls[0]
+
+
+def test_a_new_dbcache_copy_never_spawns_over_a_live_lock(make_deps, wow, archived_dbcache):
+    deps = make_deps(wow_dir=wow)
+    assert acquire_lock(deps, "forever update --auto") is None
+    spawn = Spawn()
+    hooks.update_kickoff(deps, HOME, spawn)
+    assert spawn.calls == []
+
+
+def test_launch_pass_ignores_the_six_hours_but_not_the_lock(make_deps):
+    from forever.update import launch_pass
+
+    deps = make_deps()
+    save_report(deps.cache_dir, report(finished_at="2026-09-27T11:00:00Z"))
+    spawn = Spawn()
+    assert launch_pass(deps.cache_dir, deps.now(), spawn) is True
+    assert len(spawn.calls) == 1 and spawn.calls[0][-4:] == ["forever", "update", "--auto", "--json"]
+    assert acquire_lock(deps, "forever update --auto") is None
+    assert launch_pass(deps.cache_dir, deps.now(), spawn) is False
+    assert len(spawn.calls) == 1
+
+
+def test_the_self_clearing_hint_says_when_the_client_writes_dbcache():
+    from forever.update import SELF_CLEARING_HINT
+
+    assert "lancer le jeu sur ce build" in SELF_CLEARING_HINT and "déconnexion" in SELF_CLEARING_HINT

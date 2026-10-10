@@ -200,3 +200,41 @@ def test_real_frost_logs_have_no_ignite(capsys, make_deps, world):
     code, out, _ = refresh(capsys, make_deps, world, "--dry-run")
     assert code == 0 and out["diff"]["ignite"]["episodes"] == []
     assert "aucune mesure" in out["diff"]["ignite"]["note"]
+
+
+# --- Détail des PNJ et aperçu dans une copie (décision 227) ------------------------------------------------------
+
+
+def test_dry_run_details_added_npcs_with_their_names_and_levels(capsys, make_deps, world):
+    code, out, _ = refresh(capsys, make_deps, world, "--dry-run", confirm=never)
+    assert code == 0
+    detail = out["diff"]["npcs_detail"]
+    expected = table_for(REAL_LOG, SECOND_LOG)["npcs"]
+    assert [str(d["npc_id"]) for d in detail["added"]] == out["diff"]["npcs"]["added"]
+    first = detail["added"][0]
+    entry = expected[str(first["npc_id"])]
+    assert first["name"] == entry["name"]
+    assert first["levels"] == {lv: row["max_hp"] for lv, row in entry["levels"].items()}
+    assert detail["changed"] == [] and detail["removed"] == []
+    assert isinstance(detail["excluded"], list)
+    for e in detail["excluded"]:
+        assert e["reason"] and isinstance(e["new"], bool)
+
+
+def test_into_writes_monsters_in_the_copy_only(capsys, make_deps, world, tmp_path):
+    copy = tmp_path / "apercu"
+    shutil.copytree(world["data"], copy)
+    before = tree_sha(world["data"])
+    code, out, deps = refresh(capsys, make_deps, world, "--into", str(copy), confirm=never)
+    assert code == 0 and out["status"] == "aperçu"
+    assert tree_sha(world["data"]) == before
+    assert read_json(copy / LOCAL_VERSION / "monsters.json") == table_for(REAL_LOG, SECOND_LOG)
+    assert not (deps.cache_dir / "measures" / "last.json").exists()  # l'instantané n'est jamais écrit
+    assert main(["manifest", "--check"], dataclasses.replace(deps, data_dir=copy)) == 0
+
+
+def test_into_refuses_the_installed_data(capsys, make_deps, world):
+    before = tree_sha(world["data"])
+    code, out, _ = refresh(capsys, make_deps, world, "--into", str(world["data"]), confirm=never)
+    assert code == 2 and out["error"]["code"] == "invalid_argument"
+    assert tree_sha(world["data"]) == before
