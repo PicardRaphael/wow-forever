@@ -72,7 +72,8 @@ def test_subprocess_only_in_gitops_and_the_detached_launch():
     seulement, P06a, décision 212), et les tâches planifiées de la décision 226 : `schtasks` local
     (`forever/bridge/autostart.py`) et le passage `forever update` attendu par le relais de la tâche de mise à jour
     (`forever/update_task.py`, interpréteur Python), et le rejeu parallèle des builds (`forever/replay.py`,
-    `python -m forever.replay`, local, décision 230)."""
+    `python -m forever.replay`, local, décision 230), et le git local de la conversation « addons » du pont
+    (`forever/bridge/addons.py`, sous-commandes fermées, jamais de réseau, P06b, décision 235)."""
     users = {
         str(path.relative_to(PACKAGE).as_posix())
         for path in PACKAGE.rglob("*.py")
@@ -83,6 +84,7 @@ def test_subprocess_only_in_gitops_and_the_detached_launch():
         "spawn.py",
         "pipeline/live_logs.py",
         "bridge/agent.py",
+        "bridge/addons.py",
         "bridge/autostart.py",
         "update_task.py",
         "replay.py",

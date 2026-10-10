@@ -465,3 +465,19 @@ def ask(
     if session_id and result.is_error and not result.tools and "délai" not in (result.error or ""):
         result = once(None)
     return result
+
+
+ADDONS_TOOLS: tuple[str, ...] = ("Read", "Glob", "Grep", "Edit", "Write")
+
+
+def addons_argv(
+    *,
+    claude: str,
+    folder: Path,
+    mcp_config: Path,
+    system_prompt: str,
+    session_id: str | None = None,
+    model: str | None = None,
+) -> list[str]:
+    """Ligne de `claude` de la conversation « addons » (P06b, bloc F)."""
+    raise NotImplementedError

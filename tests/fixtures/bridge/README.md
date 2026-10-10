@@ -26,3 +26,10 @@
   Maj+clic et leur infobulle, envoi de l'export `/simc`), **anonymisés** : `name` et `realm` remplacés
   (`Personnage`, `Royaume`), GUID des artisans des objets fabriqués remplacés par `Player-0000-0000000N` ; le reste tel
   quel (chaînes d'objet complètes, avec le champ de l'artisan).
+- `claude_stream_addons.jsonl`, `claude_stream_addons_denied.jsonl` (P06b, sonde 0.2 du 2026-10-10, accord de
+  l'utilisateur) : flux `stream-json` réels de `claude` 2.1.296 dans une **copie** de RaphCompletionist placée dans le
+  cache, avec la ligne de la conversation « addons » (`--tools Read,Glob,Grep,Edit,Write`, `--restricted`, règles
+  `Read(./**)`, `Edit(./**)`, `Write(./**)`, `Glob(./**)`, `Grep(./**)`, `dontAsk`) : travail dans le dossier
+  (lecture, Glob, Grep, écriture d'un fichier), puis quatre opérations hors du dossier (écriture, lecture, Grep,
+  Glob) **toutes refusées** (`permission_denials`). Une troisième conversation a vérifié qu'aucun shell n'est exposé.
+  Identifiants remplacés, chemin de l'utilisateur remplacé (`C:\Users\joueur`), signatures retirées.
