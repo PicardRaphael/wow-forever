@@ -812,3 +812,11 @@ nouvelle session (`/tranche P06b`), branche `p06b`, un cycle rouge → vert par 
   - durée de vie de la carte de test comptée à l'horloge murale (comme le pont qui la relit).
   - Trois corrections de tests verrouillés acceptées le 2026-10-10 et appliquées (7b5a264) : **bloc A vert**.
 - Arrêt au jalon de la sonde G (demande de l'utilisateur) : procédure dans `docs/ADDON.md` §7, étape 17.
+- **2026-10-10, blocs B à G** : verts sauf une correction de test en attente (bloc C, `tasks/P06b-corrections.md`).
+  Sonde 0.2 faite (écriture, lecture, Grep et Glob hors du dossier refusés ; aucun shell), sonde 0.3 faite (un
+  `result` par message dans un processus gardé ouvert). Mesure du bloc G faite : 48 conversations, environ 4 $
+  (`tasks/P06b-vitesse.md`) ; aucune variante gardée par la règle stricte, C recommandée (deux échecs dus au critère,
+  analyse dans le rapport) : choix laissé à l'utilisateur. Écarts au plan : banc en conversation suivie (une par
+  passage, comme un joueur qui enchaîne) ; échecs comptés seulement quand A ne les a pas sur la même question
+  (`speed.own_failures`) ; observation BR8 (hook de démarrage d'environ 6 s par conversation).
+- Arrêt au jalon de la sonde H (demande de l'utilisateur) : procédure dans `docs/ADDON.md` §7, étape 18.

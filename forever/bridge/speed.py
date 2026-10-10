@@ -181,8 +181,19 @@ def bench_messages(data: Any, contexts_dir: Any) -> list[tuple[str, str, Any]]:
     return out
 
 
+def own_failures(measures: Sequence[Measure]) -> dict[int, list[str]]:
+    """Échecs propres à chaque mesure : ceux que la variante A n'a pas sur la même question du même passage. Un échec
+    déjà présent dans A est un défaut de la ligne actuelle, rapporté à part, pas une régression de la variante."""
+    base = {(m.round, m.question): set(m.failures) for m in measures if m.variant == "A"}
+    return {
+        id(m): ([] if m.variant == "A" else [f for f in m.failures if f not in base.get((m.round, m.question), set())])
+        for m in measures
+    }
+
+
 def summary(measures: Sequence[Measure]) -> dict[str, Any]:
-    """Par variante : médiane, moyenne, échecs, coût, et décision `keep` face à A."""
+    """Par variante : médiane, moyenne, échecs propres (et échecs déjà présents dans A), coût, et décision `keep`."""
+    own = own_failures(measures)
     by: dict[str, list[Measure]] = {}
     for m in measures:
         by.setdefault(m.variant, []).append(m)
@@ -190,11 +201,12 @@ def summary(measures: Sequence[Measure]) -> dict[str, Any]:
     out: dict[str, Any] = {}
     for name, items in by.items():
         seconds = [m.seconds for m in items]
-        failures = sum(len(m.failures) for m in items)
+        failures = sum(len(own[id(m)]) for m in items)
         out[name] = {
             "median_s": round(statistics.median(seconds), 2),
             "mean_s": round(statistics.mean(seconds), 2),
             "failures": failures,
+            "shared_failures": sum(len(m.failures) for m in items) - failures,
             "cost_usd": round(sum(m.cost_usd or 0 for m in items), 4),
             "keep": name != "A" and keep(base, seconds, failures),
         }
@@ -213,15 +225,15 @@ def report_markdown(measures: Sequence[Measure], meta: Mapping[str, Any]) -> str
             "15 %, sans échec de qualité (`forever/bridge/speed.py`)."
         ),
         "",
-        "| Variante | Médiane (s) | Moyenne (s) | Échecs de qualité | Coût ($) | Gardée |",
-        "| --- | --- | --- | --- | --- | --- |",
+        "| Variante | Médiane (s) | Moyenne (s) | Échecs propres | Échecs aussi dans A | Coût ($) | Gardée |",
+        "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for name in sorted(s):
         v = s[name]
         label = VARIANTS[name].label if name in VARIANTS else name
         kept = "référence" if name == "A" else ("oui" if v["keep"] else "non")
         lines.append(
-            f"| {name} ({label}) | {v['median_s']} | {v['mean_s']} | {v['failures']} | {v['cost_usd']} | {kept} |"
+            f"| {name} ({label}) | {v['median_s']} | {v['mean_s']} | {v['failures']} | {v['shared_failures']} | {v['cost_usd']} | {kept} |"
         )
     lines += ["", "## Durées par question (s)", "", "| Question | " + " | ".join(sorted(s)) + " |",
               "| --- |" + " --- |" * len(s)]  # fmt: skip

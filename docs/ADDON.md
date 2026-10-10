@@ -45,6 +45,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 | jeu → forever | Journal de combat `Logs/WoWCombatLog-*.txt` (format 22 avancé, activé par ForeverLogger) | écrit par paquets : secondes à minutes ([À vérifier] latence) | Analyse **après** le combat |
 | appoint | Chaîne copiée dans une zone de saisie | action humaine | Format simple, jamais `loadstring` |
 | jeu ↔ forever (P06a) | Pont : bande de pixels lue par `forever bridge` (aller, de l'envoi à l'accusé), réserve d'addons chargés à la demande consultée à intervalles (retour ; aucun son : un fichier son vide « joue » sur Forever), secours `/reload` | quelques secondes | **Livré** (P06a, décisions 194, 197 et 212) |
+| jeu ↔ forever (P06b) | Même pont : messages en parties (carrousel), liens Maj+clic et infobulles, export `/simc` collé, actions `a=` (Mettre à jour, Valider, Refuser, profil) traitées par le pont sans le modèle, cartes « À valider », conversation « addons » | quelques secondes (export : une dizaine) | **Livré** (P06b, décision 235) |
 | forever → addons tiers | Chaînes d'import collées par le joueur (Talents Forever, Naowh Forever, EllesmereUI) | action humaine | **Prévu** (FA1, T10a, EX1, T10 ; décision 196) |
 | à éviter | Journal de discussion (écrit à la sortie, ignore les `print` d'addon) ; pixels et lecture d'écran hors du pont de P06a | — | Non |
 
@@ -341,6 +342,53 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
         mage19_sonde_g.txt`. Non vérifiés, repris à la sonde H : Maj+clic d'un sort et d'une quête, partage de pile,
         délai de l'export.
 
+18. **Sonde en jeu H : Mettre à jour, cartes, profil, export lu, Talents d'une autre classe, onglet Addons**
+    (P06b, blocs B à G, **avant le 2026-10-19**). Dans un terminal PowerShell à la racine du dépôt.
+    1. **Jeu fermé.** `git status -sb` : `## p06b` (ou `## main` après la fusion). Régler la conversation « addons » :
+       `uv run forever bridge addons config --source "$env:FOREVER_WOW_DIR\Interface\AddOns\RaphCompletionist"`
+       (réponse : « Conversation « addons » : dossier … ») ; `uv run forever bridge config` : vérifier la réflexion et
+       la session gardée ouverte retenues par la mesure (`tasks/P06b-vitesse.md`).
+    2. Relancer le pont : `uv run forever bridge stop`, `uv run forever bridge autostart status` jusqu'à
+       « surveillance : arrêtée », `schtasks /Run /TN "WoW Forever - pont"`, puis `uv run forever bridge status` :
+       « Pont : en marche », aucune ligne « fichiers de l'addon à remplacer ». Lancer le jeu.
+    3. **Ligne d'état et Mettre à jour** : `/fv` ; la ligne dit `Données … · client … · … · n à valider · m en attente` ;
+       l'aide n'apparaît plus d'elle-même (`/fv aide` la montre). Clic sur « Mettre à jour » : réponse « Mise à jour
+       lancée » ; la ligne passe à « mise à jour en cours (étape) », puis, une à quelques minutes plus tard, l'historique
+       gagne « Mise à jour terminée : n écrit(s), m à valider ». Noter la durée. Pendant un passage, un second clic
+       répond « Rien de lancé : passage en cours ».
+    4. **Carte d'une vraie attente** : « À valider (n) » ; lire la carte des mesures (PNJ, niveaux de PV, builds) ;
+       « Expliquer » : réponse de la conversation « jeu » qui explique la carte. Puis, au choix : Valider (vraie
+       approbation : `forever update approve` lance un passage qui peut installer une révision des données) ou Refuser
+       (rejet noté « refusé en jeu ») ; chaque bouton demande « Confirmer » dans les cinq secondes. Dans le terminal,
+       `uv run forever update status` montre l'état changé. Une attente « réseau » ou « correctifs à lire » n'a que
+       « Expliquer ».
+    5. **Écart avec le profil** : poser une question quelconque. Profil absent ou différent du jeu : la réponse finit
+       par « Écart avec ton profil : voir À valider » et une carte « Créer le personnage … au profil » (ou « Écart avec
+       ton profil ») apparaît. Clic sur « Mettre à jour le profil », puis « Confirmer » : « Profil mis à jour … ».
+       `uv run forever profile show` : niveau, talents et équipement (source jeu). Une nouvelle question ne signale
+       plus d'écart.
+    6. **Export lu** : `/simc`, Ctrl+C, « Coller /simc », Ctrl+V, « Envoyer l'export » : « Export SimulationCraft reçu
+       (… lignes, somme de contrôle juste) et lu : … objet(s), fiche … », écarts listés (la fiche, au premier envoi),
+       note sur l'emplacement 18 ; carte « Mettre à jour le profil » ; après le clic, `uv run forever profile show`
+       montre la fiche (source simulationcraft, lue avec les buffs actifs). Noter le délai entre l'envoi et la réponse
+       (BR7) et la lenteur éventuelle du collage.
+    7. **Talents d'une autre classe** (si un second personnage existe, de préférence avec des talents placés) : bouton
+       Talents : la réponse cite le build populaire le plus proche (spécialisation, points absents, commande
+       `/tf import`) et le lien `[Talents Forever]` publié est le sien ; sans talent placé : le build le plus joué.
+    8. **Onglet « Addons »** : l'onglet « Addons (RaphCompletionist) » est visible ; une petite demande, par exemple
+       « Ajoute un commentaire en tête de Core.lua qui dit ce que fait l'addon » ; réponse en une à trois minutes,
+       suivie d'une ligne `<commit> · 1 fichier(s)` ; `/reload` : l'addon se charge comme avant (ou ne se charge pas,
+       comme avant : `RequiredDeps: RXPGuides`). Dans le terminal : `uv run forever bridge addons log` (le commit),
+       puis `uv run forever bridge addons restore` : le fichier revient à la sauvegarde ; `/reload`. L'onglet « Jeu »
+       garde son historique à part.
+    9. **Repris de la sonde G** : Maj+clic d'un sort du grimoire (`P`) et d'une quête du journal (`L`) dans la
+       saisie ; Maj+clic d'un objet empilé d'un sac : la fenêtre de partage de la pile s'ouvre-t-elle aussi (BR5) ?
+       Glisser la fenêtre « Coller /simc » par son titre, la fermer, la rouvrir : même place.
+    10. **Durée ressentie** des réponses avec la variante retenue, comparée à celle d'avant.
+    11. **Relevé** : ce qui s'est passé à chaque étape, les durées des étapes 3, 6, 8 et 10, la sortie de
+        `uv run forever bridge status`, et `uv run forever bridge contexts export "$env:TEMP\sonde-h"` (dossier à me
+        donner).
+
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
     1. **E2, pénalité des sorts de bas niveau (G4, T04e)** : Frostbolt **rang 1** sur un monstre gris, sans talent de dégâts, personnage de niveau 8 ou plus, base 20-22. **Deux séries d'une dizaine de coups non critiques à deux puissances des sorts éloignées** (S1 et S2, au moins 30 d'écart, lues dans le bloc avancé de `SPELL_CAST_SUCCESS`) : la pente (moyenne à S2 − moyenne à S1) / (S2 − S1) vaut 0,407 sans pénalité et 0,163 si le serveur la réapplique. Le coefficient du client (0,407) ne tranche pas : il est brut, la pénalité de Classic est appliquée par le serveur. Contrôle à une seule puissance : à 14 de puissance des sorts, 25,6-27,8 contre 22,2-24,4 (sans recouvrement).
@@ -375,7 +423,7 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
 - Produit TACT : `.build.info` du client installé indique `wow_classic_beta` (1.60.1.70170, lu sur disque le 2026-10-02) ; le produit du lancement reste inconnu.
 
 ## 8. Checklist à chaque build
-Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
+Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 
 ## 9. Feuille de route des addons de forever-core
 Ordre revu le 2026-10-07 (décisions 193 et 202, `docs/VISION.md`) : nos addons n'affichent que ce qu'aucun addon installé ne sait recevoir ; le reste passe par les points d'import des addons de la communauté (décision 196).

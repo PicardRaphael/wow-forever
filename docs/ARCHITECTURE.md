@@ -57,6 +57,21 @@ forever-core/
   `autostart.py`, `lock.py`, `journal.py`, `forever/spawn.py`), qui lance et relance le pont avec l'interpréteur réel
   (`spawn.current_interpreter` : interpréteur de base et `__PYVENV_LAUNCHER__`, jamais le lanceur de `.venv`, qui
   retient l'interpréteur dans un objet de tâche). `forever bridge start` passe par le même lancement.
+- **P06b** (décision 235) :
+  - *transport* : messages longs en parties (`fragments.py`, carrousel côté addon), équipement complet et liens Maj+clic
+    avec leur infobulle (`items.py`), calendrier des relevés (`polls.py`, miroir du Lua) ;
+  - *actions sans le modèle* : drapeaux `a=` interceptés avant la file (`actions.py` : liste fermée, identifiant apparié
+    à une carte ou à une attente, commandes fixées `forever update` par `spawn`), cartes « À valider » au texte rédigé
+    par le pont (`cards.py`), surveillance du verrou et du dernier passage (`updater.UpdateWatch`) ;
+  - *profil* : écart entre le jeu et le profil (`profile_gap.py`), écrit au clic seulement par
+    `profile.apply_game_fields` (schéma 3 : `gear`, `sheet`, sources `jeu` et `simulationcraft`) ;
+  - *export SimulationCraft* : collé dans la fenêtre, lu par `forever/simc.py` (somme de contrôle, anonymisation pour
+    le journal, objets, fiche) sans le modèle ;
+  - *conversation « addons »* (`addons.py`, `agent.addons_argv`) : agent sans shell limité au dossier de l'addon de
+    l'utilisateur, sauvegarde avant et commit git local après chaque tour, restauration sans suppression ;
+  - *vitesse* : `agent.PersistentSession` (session gardée ouverte, `--input-format stream-json`), banc des variantes
+    et critères de qualité (`speed.py`, `forever bridge bench`) ;
+  - *contextes réels* au journal (`contexts.py`, `forever bridge contexts last | export`).
 
 ## Bloc provenance (dans chaque réponse d'outil)
 ```json

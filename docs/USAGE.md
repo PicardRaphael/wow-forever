@@ -204,6 +204,49 @@ Chaque bouton envoie un appel d'outil fixé par le pont (Talents : prochain poin
 actuel) ; un élément du contexte que le pont ne relie pas à nos données est noté comme défaut dans
 `forever bridge status`, jamais transmis à la conversation.
 
+## Chat en jeu, suite (P06b)
+P06b ajoute à la fenêtre `/fv` (décision 235) :
+- **Liens Maj+clic** : pendant la saisie, Maj+clic sur un objet, un sort, une quête ou un talent insère son lien ;
+  la question part avec le nom du lien et son infobulle lue dans le jeu (8 liens au plus). La zone de saisie prend
+  1 000 caractères.
+- **Messages longs** : un message trop long pour une bande (équipement complet, liens, export) part en plusieurs
+  parties montrées tour à tour en haut à gauche ; la ligne d'état compte les parties reçues par le pont. Équipement,
+  talents, liens et question ne sont jamais retirés ; seuls les noms d'objets sont coupés, puis retirés.
+- **Mettre à jour** (bouton) : le pont lance `forever update --auto` lui-même (jamais le modèle) ; refusé hors ligne
+  (`FOREVER_OFFLINE`). Ligne d'état : `Données <version> · client <version> · <fraîcheur> · <n> à valider · <m> en
+  attente` ; pendant un passage, « mise à jour en cours (étape) », relevée toutes les 30 s fenêtre ouverte ; à la fin,
+  « Mise à jour terminée : n écrit(s), m à valider ».
+- **À valider (n)** : une carte par attente de `forever update` (texte rédigé par le pont : PNJ, niveaux, builds,
+  version), avec Valider et Refuser pour une attente approuvable (second clic « Confirmer » dans les cinq secondes,
+  commande fixée lancée par le pont) et « Expliquer » (question à la conversation « jeu ») ; les autres attentes
+  (réseau, correctifs à lire, à traiter sur le PC) n'ont que « Expliquer ».
+- **Écart avec le profil** : à chaque message, le pont compare le jeu (classe, race, faction, niveau, talents,
+  équipement) au profil ; la réponse le signale, le jeu l'emporte, et une carte « Mettre à jour le profil » écrit le
+  profil au clic seulement (source `jeu`, profil au schéma 3) ; « Ignorer » fait taire cet écart tant qu'il ne
+  change pas. Personnage absent : carte « Créer le personnage … au profil ».
+- **Coller /simc** : `/simc` en jeu, Ctrl+C, puis « Coller /simc », Ctrl+V, « Envoyer l'export ». Le pont le lit sans
+  le modèle (objets, fiche du personnage, notations, buffs ; somme de contrôle vérifiée), liste les écarts avec le
+  profil et propose d'écrire la fiche (source `simulationcraft`) ; la chaîne `talents=` n'est pas décodée (les
+  talents du jeu font foi) ; l'arme à distance, absente de l'export, est prise du jeu. Trop long : `/simc nobags`.
+- **Onglet « Addons »** : visible quand la conversation « addons » est réglée ; un agent sans shell, limité au dossier
+  de RaphCompletionist, modifie l'addon ; le pont sauvegarde le dossier avant le tour et committe en local après
+  (ligne `<commit> · n fichier(s)` sous la réponse) ; `/reload` pour essayer.
+
+| Commande | Effet |
+|---|---|
+| `uv run forever bridge contexts last` | dernier contexte reçu du jeu : équipement pièce par pièce (enchantement, suffixe), liens et infobulles |
+| `uv run forever bridge contexts export <dossier>` | chaque contexte distinct et chaque export SimulationCraft (anonymisé) du journal, au format des fixtures |
+| `uv run forever bridge selftest --card` | carte « À valider » de test : Valider puis Confirmer, le pont note l'action sans rien lancer |
+| `uv run forever bridge addons config --source <dossier> [--deploy <dossier installé>]` | dossier de la conversation « addons » (refusé pour un addon de la communauté) ; avec `--deploy`, copie des fichiers changés après chaque tour, sans rien supprimer |
+| `uv run forever bridge addons status` | dossier réglé et sauvegardes (`<cache>/bridge/addons/backups/`) |
+| `uv run forever bridge addons restore [<horodatage>]` | remet une sauvegarde ; les fichiers créés depuis sont déplacés dans `<cache>/bridge/addons/set-aside/`, jamais supprimés |
+| `uv run forever bridge addons log` | commits locaux de la conversation |
+| `uv run forever bridge config --thinking on\|off --persistent on\|off` | réflexion du modèle et session `claude` gardée ouverte entre les messages (réglages retenus par la mesure, `tasks/P06b-vitesse.md`) |
+| `uv run forever bridge bench --variants A,B,C,D --rounds 2` | mesure des accélérations sur six questions réelles (vraies conversations `claude`, coût : sur demande seulement) |
+
+Relancer le pont après un changement de réglage (`forever bridge stop`, puis la tâche planifiée). Procédure en jeu :
+`docs/ADDON.md`, section 7, étapes 17 (sonde G) et 18 (sonde H).
+
 ## Mon personnage (profil)
 Le profil vit hors du dépôt (`%USERPROFILE%\.forever\profile.json`, ou le fichier désigné par `FOREVER_PROFILE`) ;
 plusieurs personnages, un actif. Les réponses le lisent avant tout calcul et le rappellent en une ligne ; une donnée

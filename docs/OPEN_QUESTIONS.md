@@ -368,6 +368,12 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   pendant le changement de partie est rejetée par la somme de contrôle de la bande. Test : sonde G (journal du pont,
   événements `parts`). Priorité : moyenne.
 
+- **BR8 — Le hook de démarrage du plugin coûte-t-il plusieurs secondes à chaque conversation du pont ?** Sonde 0.3
+  du 2026-10-10 : entre `hook_started` et `hook_response`, 6,3 s avant le premier `init` (`uv run … python -m forever
+  hook session-start`, muet sous `FOREVER_BRIDGE` mais lancé quand même) ; le journal du pont relève des `init_s` de
+  2 à 15 s. La session gardée ouverte (variante C) ne le paie qu'une fois. Test : mesurer le hook seul, et sauter son
+  lancement quand `FOREVER_BRIDGE` est posé. Priorité : moyenne.
+
 ## Legacy et API
 - **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?**
   *Modifiée le 2026-10-09* : la note du 08/10 (t/2360696/5, révision 1) accorde à tous les joueurs de la bêta le défi

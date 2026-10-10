@@ -35,6 +35,10 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   disque) : part de chaque spécialisation, date `asOf` et fenêtre, puis chaque build avec son lien, sa commande
   `import` et sa légalité déjà contrôlée sur le client (`légal`, `illégal`, ou `non vérifiable` avec le talent
   sans correspondance nommé). Certitude supposé (choix de joueurs) ; cite la date. Addon absent : dis-le.
+- Question personnelle avec les talents actuels connus (profil, ou contexte du jeu) : ajoute
+  `current=<clé=rang,…>` ; l'outil rend `closest`, le build populaire le plus proche (même spécialisation, points
+  absents `missing_points`, écarts `differences`) : donne-le tel quel, n'en choisis pas un autre ; `closest` vide :
+  aucun point placé, prends le build le plus joué (rang 1).
 - Builds de la communauté en plus (ou addon absent) : sous-agent `forever-web-researcher`, chaque build avec sa
   source, son type et sa date, présenté comme l'avis de cette source (section « Sources extérieures » de
   `format-reponse.md`).

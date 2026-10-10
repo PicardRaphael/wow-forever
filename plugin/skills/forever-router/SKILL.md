@@ -54,7 +54,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | PvP d'une classe : contrôles, défensifs, ruptures, recharges | `forever_lookup(kind="pvp", name=<classe>, level)` | `forever-pvp` |
 | Affrontement : mon Mage contre un Démoniste | `forever_lookup(kind="pvp", name, opponent, level, race, talents)` | `forever-pvp` |
 | Build d'une autre classe : légalité, effet des talents | `forever_lookup(kind="build_check", name=<classe>, level, talents)` | `forever-builds` |
-| Builds populaires de Talents Forever (toutes classes) | `forever_lookup(kind="tf_popular", name=<classe>)` | `forever-builds` |
+| Builds populaires de Talents Forever (toutes classes) ; le plus proche des talents actuels | `forever_lookup(kind="tf_popular", name=<classe>[, current=<clé=rang,…>])` (`closest`) | `forever-builds` |
 | Talent d'une autre classe | `forever_lookup(kind="talent", name, class_name=<classe>)` | `forever-builds` |
 | Familiers du Chasseur : entraînement, loyauté, apprivoisement (règles) | `forever_lookup(kind="pets")` | `forever-familiers` |
 | Capacités d'une famille de familier, rangs d'une capacité | `forever_lookup(kind="pets", name=<famille ou capacité>, rank)` | `forever-familiers` |
