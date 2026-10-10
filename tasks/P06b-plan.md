@@ -810,5 +810,5 @@ nouvelle session (`/tranche P06b`), branche `p06b`, un cycle rouge → vert par 
     `forever bridge contexts last` : le pont en marche publie les parties reçues et l'addon cesse de les montrer,
     l'autotest ne verrait pas tout le message ; `selftest --message` décrit seulement la partie lue ;
   - durée de vie de la carte de test comptée à l'horloge murale (comme le pont qui la relit).
-  - Bloc A pas encore « vert » : trois demandes de correction de tests verrouillés (`tasks/P06b-corrections.md`).
+  - Trois corrections de tests verrouillés acceptées le 2026-10-10 et appliquées (7b5a264) : **bloc A vert**.
 - Arrêt au jalon de la sonde G (demande de l'utilisateur) : procédure dans `docs/ADDON.md` §7, étape 17.

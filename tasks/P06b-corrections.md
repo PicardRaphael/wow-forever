@@ -5,6 +5,8 @@ test, pas sur le comportement voulu ; le code n'est pas changé pour les contour
 
 ## Bloc A (commit « P06b: tests (bloc A) », e7fcbc1)
 
+**Acceptées le 2026-10-10, appliquées dans 7b5a264.**
+
 ### 1. `tests/unit/test_bridge_loop_p06b.py::test_parts_in_any_order_make_one_message` — emplacement relu
 - **Preuve** : le message porte `slot=2` (prochain emplacement que le jeu chargera). Comme en P06a
   (`Bridge._accept` : `self.first_slot = record.slot`), le pont publie la réponse à partir de l'emplacement 2 : le jeu
