@@ -394,15 +394,39 @@ class Bridge:
             anonymized=True, lines=lines, parts=parts,
         )  # fmt: skip
         if original is True:
-            reply = (
-                f"Export SimulationCraft reçu ({lines} lignes, somme de contrôle juste). Gardé, anonymisé, dans le "
-                "journal du pont ; sa lecture (écarts avec le profil) arrive dans une prochaine version du pont."
-            )
+            reply = f"Export SimulationCraft reçu ({lines} lignes, somme de contrôle juste)" + self._read_simc(record)
         elif original is False:
             reply = "Export SimulationCraft reçu, mais export incomplet ou modifié : recopiez /simc."
         else:
             reply = "Export SimulationCraft reçu sans somme de contrôle : export incomplet ou modifié : recopiez /simc."
         self._done(record, reply, "export")
+
+    def _read_simc(self, record: Record) -> str:
+        """Suite de la réponse à un export juste : lecture (bloc D), écarts avec le profil, carte proposée."""
+        from forever.simc import parse_simc
+
+        if self.profile is None:
+            return ". Gardé, anonymisé, dans le journal du pont."
+        try:
+            export = parse_simc(record.text)
+            gaps, warnings, proposed = self.profile.check_simc(record.context, export)
+        except Exception as exc:  # noqa: BLE001 : un export illisible ne doit pas arrêter le pont
+            self.journal.write("error", where="lecture de l'export", error=f"{type(exc).__name__}: {exc}")
+            return f", mais illisible ({type(exc).__name__}) : recopiez /simc."
+        self.journal.write(
+            "simc_read", id=record.message_id, gaps=[g.field for g in gaps], warnings=warnings, proposed=proposed,
+            items=len(export.items),
+        )  # fmt: skip
+        if proposed:
+            self._check_cards(self.clock(), force=True)
+        parts = [f" et lu : {len(export.items)} objet(s), fiche de {len(export.sheet)} rubrique(s)."]
+        if gaps:
+            parts.append(f"Écarts avec ton profil : {gaps_text(gaps)}.")
+            parts.append("Mettre à jour le profil : voir À valider." if proposed else "Écart déjà ignoré.")
+        else:
+            parts.append("Aucun écart avec ton profil.")
+        parts += [f"Note : {w}." for w in warnings]
+        return "\n".join(parts)
 
     def _check_cards(self, now: float, *, force: bool = False) -> None:
         if self.cards is None:

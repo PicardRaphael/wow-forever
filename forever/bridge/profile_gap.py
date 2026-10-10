@@ -20,6 +20,7 @@ from forever.timefmt import format_utc
 
 FIELDS = ("class", "race", "faction", "level", "talents", "gear")
 LABELS = {
+    "sheet": "fiche",
     "class": "classe",
     "race": "race",
     "faction": "faction",
@@ -99,7 +100,9 @@ def gap_fingerprint(gaps: Sequence[Gap]) -> str:
 
 def _text(field: str, value: Any) -> str:
     if value in (None, "", {}):
-        return "aucun" if field in ("talents", "gear") else "?"
+        return "aucun" if field in ("talents", "gear") else ("aucune" if field == "sheet" else "?")
+    if field == "sheet":
+        return f"{len(value)} rubrique(s)"
     if field == "talents":
         return f"{len(value)} talent(s)"
     if field == "gear":
@@ -203,15 +206,42 @@ class ProfileWatch:
         resolved = resolve(self.data, context)
         key, raw = find_character(load_profile(resolve_path(self.deps)), name, realm)
         gaps = profile_gaps(resolved, character_values(raw) if raw is not None else None)
+        return gaps, self._propose(context, key, raw, gaps, {})
+
+    def check_simc(self, context: Mapping[str, str], export: Any) -> tuple[list[Gap], list[str], bool]:
+        """(écarts, avertissements, carte proposée) pour un export SimulationCraft collé et le contexte du même
+        message : fiche de l'export (source `simulationcraft`), le reste du contexte (source `jeu`)."""
+        from forever.bridge.context import resolve
+        from forever.profile import character_values, load_profile, resolve_path
+        from forever.simc import simc_gaps
+
+        name = context.get("name") or export.name
+        if not name:
+            return [], ["nom du personnage inconnu : profil non comparé"], False
+        realm = context.get("realm") or None
+        key, raw = find_character(load_profile(resolve_path(self.deps)), name, realm)
+        flat = character_values(raw) if raw is not None else None
+        gaps = profile_gaps(resolve(self.data, context), flat) if context.get("class") else []
+        resolved = resolve(self.data, context)
+        sheet_gaps, warnings = simc_gaps(export, flat, resolved.pieces)
+        gaps += sheet_gaps
+        merged = {**context, "name": name}
+        return gaps, warnings, self._propose(merged, key, raw, gaps, {"sheet": "simulationcraft"})
+
+    def _propose(
+        self, context: Mapping[str, str], key: str, raw: Any, gaps: Sequence[Gap], sources: Mapping[str, str]
+    ) -> bool:
+        name = str(context.get("name"))
+        realm = context.get("realm") or None
         doc = self._load()
         doc["proposals"] = {i: p for i, p in doc["proposals"].items() if p.get("key") != key}
         if not gaps:
             self._save(doc)
-            return [], False
+            return False
         fingerprint = gap_fingerprint(gaps)
         if fingerprint in doc["dismissed"]:
             self._save(doc)
-            return gaps, False
+            return False
         card = gap_card(name, realm, gaps, create=raw is None)
         doc["proposals"][card["id"]] = {
             "key": key,
@@ -219,11 +249,12 @@ class ProfileWatch:
             "realm": realm,
             "fingerprint": fingerprint,
             "fields": {g.field: g.game for g in gaps},
+            "sources": {g.field: sources.get(g.field, "jeu") for g in gaps},
             "client_build": context.get("client"),
             "card": card,
         }
         self._save(doc)
-        return gaps, True
+        return True
 
     def cards(self) -> list[dict[str, Any]]:
         return [p["card"] for p in self._load()["proposals"].values() if isinstance(p.get("card"), dict)]
@@ -240,14 +271,21 @@ class ProfileWatch:
         proposal = doc["proposals"].get(card_id)  # identifiant apparié exactement à une proposition du pont
         if proposal is None:
             return "refusée", "Action refusée : proposition de profil inconnue ou déjà traitée."
-        apply_game_fields(
-            resolve_path(self.deps), str(proposal["key"]), proposal.get("realm"), proposal["fields"], source="jeu",
-            at=format_utc(self.now()), client_build=proposal.get("client_build"), deps=self.deps,
-        )  # fmt: skip
+        sources = proposal.get("sources") or {}
+        by_source: dict[str, dict[str, Any]] = {}
+        for name, value in proposal["fields"].items():
+            by_source.setdefault(str(sources.get(name, "jeu")), {})[name] = value
+        at = format_utc(self.now())
+        for source in sorted(by_source, key=lambda s: s != "jeu"):  # jeu d'abord : il crée le personnage
+            apply_game_fields(
+                resolve_path(self.deps), str(proposal["key"]), proposal.get("realm"), by_source[source],
+                source=source, at=at, client_build=proposal.get("client_build"), deps=self.deps,
+            )  # fmt: skip
         del doc["proposals"][card_id]
         self._save(doc)
         fields = ", ".join(LABELS.get(f, f) for f in proposal["fields"])
-        return "profil mis à jour", f"Profil mis à jour pour {proposal['key']} ({fields}, source jeu)."
+        used = ", ".join(sorted(by_source))
+        return "profil mis à jour", f"Profil mis à jour pour {proposal['key']} ({fields} ; source {used})."
 
     def dismiss(self, card_id: str) -> tuple[str, str]:
         doc = self._load()
