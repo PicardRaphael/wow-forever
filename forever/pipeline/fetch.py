@@ -8,11 +8,11 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any, TypedDict
 
-from forever.config import FETCH_TIMEOUT, USER_AGENT, Deps
+from forever.config import FETCH_ATTEMPTS, FETCH_BACKOFF, FETCH_TIMEOUT, USER_AGENT, Deps
 from forever.errors import FetchFailedError, InvalidArgumentError, OfflineError
 from forever.manifest import VERSION_DIR_RE
 from forever.timefmt import format_utc
@@ -50,6 +50,61 @@ class GameTableFetch(TypedDict):
     absent: bool
 
 
+Log = Callable[[str], None]
+"""Reçoit une ligne par essai de téléchargement en échec ou réussi après un échec (journal du passage)."""
+
+
+class _Failed(Exception):
+    """Table en échec après tous ses essais ; `reason` : cause du dernier essai."""
+
+    def __init__(self, reason: str) -> None:
+        super().__init__(reason)
+        self.reason = reason
+
+
+def _get(
+    deps: Deps,
+    key: str,
+    url: str,
+    headers: Mapping[str, str],
+    timeout: float,
+    accept: Callable[[bytes], str | None],
+    *,
+    sleep: Callable[[float], None] | None,
+    log: Log | None,
+) -> bytes:
+    """Corps de `url`, en `FETCH_ATTEMPTS` essais au plus (décision 230) : délai de la requête doublé à chaque essai,
+    attente `FETCH_BACKOFF` entre deux essais ; `accept` rend la raison d'un refus du corps (None : accepté). Chaque
+    essai en échec est noté par `log` ; _Failed après le dernier."""
+    wait = sleep if sleep is not None else deps.sleep
+    reason = ""
+    for attempt in range(1, FETCH_ATTEMPTS + 1):
+        limit = timeout * 2 ** (attempt - 1)
+        try:
+            body = deps.http_get(url, headers, limit)
+        except OSError as exc:
+            reason = str(exc) or type(exc).__name__
+        else:
+            refused = accept(body)
+            if refused is None:
+                if attempt > 1 and log is not None:
+                    log(f"{key} : téléchargée à l'essai {attempt}/{FETCH_ATTEMPTS}")
+                return body
+            reason = refused
+        if attempt == FETCH_ATTEMPTS:
+            if log is not None:
+                log(f"{key} : essai {attempt}/{FETCH_ATTEMPTS} en échec ({reason}) : abandon")
+            break
+        pause = FETCH_BACKOFF[min(attempt - 1, len(FETCH_BACKOFF) - 1)]
+        if log is not None:
+            log(
+                f"{key} : essai {attempt}/{FETCH_ATTEMPTS} en échec ({reason}) ; nouvel essai dans {pause:g} s, "
+                f"délai de {limit * 2:g} s"
+            )
+        wait(pause)
+    raise _Failed(reason)
+
+
 def gametable_url(file_id: int, version: str) -> str:
     """Adresse d'une GameTable (fichier texte à tabulations) par son identifiant de fichier."""
     return GAMETABLE_URL.format(file_id=file_id, version=version)
@@ -70,12 +125,18 @@ def looks_like_gametable(body: bytes) -> bool:
 
 
 def fetch_gametables(
-    deps: Deps, version: str, gametables: Mapping[str, int], *, refresh: bool = False
+    deps: Deps,
+    version: str,
+    gametables: Mapping[str, int],
+    *,
+    refresh: bool = False,
+    sleep: Callable[[float], None] | None = None,
+    log: Log | None = None,
 ) -> list[GameTableFetch]:
     """Télécharge chaque GameTable (nom -> identifiant de fichier, `decode_rules.json` `gametables`), une requête
     par fichier. Une réponse vide veut dire « absente du build » : elle est notée dans l'index (`absent`), jamais
     remplacée par une autre table ni par une autre version. Cache et index partagés avec les tables DB2
-    (`gametables/<nom>` dans `fetch.json`)."""
+    (`gametables/<nom>` dans `fetch.json`). Chaque fichier est retenté (`_get`, décision 230)."""
     _check_arguments(version, ["GameTables"], [DEFAULT_LOCALE])
     if deps.offline:
         raise OfflineError("le téléchargement des GameTables")
@@ -94,14 +155,11 @@ def fetch_gametables(
             continue
         url = gametable_url(file_id, version)
         try:
-            body = deps.http_get(url, headers, FETCH_TIMEOUT)
-        except OSError as exc:
-            failures.append(f"{key} ({exc})")
+            body = _get(deps, key, url, headers, FETCH_TIMEOUT, _gametable_refusal, sleep=sleep, log=log)
+        except _Failed as exc:
+            failures.append(f"{key} ({exc.reason})")
             continue
         absent = len(body) == 0
-        if not absent and not looks_like_gametable(body):
-            failures.append(f"{key} (réponse qui n'est pas une GameTable)")
-            continue
         if not absent:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(body)
@@ -120,6 +178,12 @@ def fetch_gametables(
     if failures:
         raise FetchFailedError(f"Téléchargement impossible pour {version} : {' ; '.join(failures)}.")
     return results
+
+
+def optional_table(rel: str) -> bool:
+    """Table de noms d'une autre locale que la locale par défaut (`frFR/SpellName.csv`) : facultative pour décoder
+    une version (décision 230) ; seules les tables de la locale par défaut portent des valeurs de calcul."""
+    return not rel.startswith(f"{DEFAULT_LOCALE}/")
 
 
 def table_url(table: str, version: str, locale: str | None) -> str:
@@ -170,6 +234,15 @@ def looks_like_csv(body: bytes) -> bool:
     return bool(header) and all(_HEADER_FIELD_RE.fullmatch(f) for f in fields)
 
 
+def _csv_refusal(body: bytes) -> str | None:
+    return None if looks_like_csv(body) else "réponse qui n'est pas un CSV"
+
+
+def _gametable_refusal(body: bytes) -> str | None:
+    """Une réponse vide est acceptée : GameTable absente du build."""
+    return None if len(body) == 0 or looks_like_gametable(body) else "réponse qui n'est pas une GameTable"
+
+
 def _read_index(path: Path, version: str) -> dict[str, dict[str, Any]]:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
@@ -201,11 +274,13 @@ def fetch_tables(
     locales: Sequence[str] = (DEFAULT_LOCALE,),
     refresh: bool = False,
     timeout: float = FETCH_TIMEOUT,
+    sleep: Callable[[float], None] | None = None,
+    log: Log | None = None,
 ) -> list[TableFetch]:
     """Télécharge chaque table pour chaque locale (dans l'ordre donné) ; un fichier du cache conforme à son
     empreinte n'est pas retéléchargé, sauf `refresh`. `timeout` : délai d'une requête (CH0 : Creature dépasse le
-    délai par défaut). Les tables réussies sont écrites même si d'autres
-    échouent ; les échecs sont signalés ensemble à la fin (FetchFailedError)."""
+    délai par défaut), doublé à chaque nouvel essai (`_get`, trois essais, décision 230). Les tables réussies sont écrites
+    même si d'autres échouent ; les échecs sont signalés ensemble à la fin (FetchFailedError)."""
     _check_arguments(version, tables, locales)
     if deps.offline:
         raise OfflineError("le téléchargement des tables")
@@ -225,12 +300,9 @@ def fetch_tables(
                 results.append({**entry, "from_cache": True})  # type: ignore[typeddict-item]
                 continue
             try:
-                body = deps.http_get(url, headers, timeout)
-            except OSError as exc:
-                failures.append(f"{key} ({exc})")
-                continue
-            if not looks_like_csv(body):
-                failures.append(f"{key} (réponse qui n'est pas un CSV)")
+                body = _get(deps, key, url, headers, timeout, _csv_refusal, sleep=sleep, log=log)
+            except _Failed as exc:
+                failures.append(f"{key} ({exc.reason})")
                 continue
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(body)

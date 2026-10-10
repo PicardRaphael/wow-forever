@@ -30,6 +30,9 @@ CLASSES_FILE = "classes.json"
 # Champs de provenance absents de `metadata_keys` d'origins.json mais jamais lus par un moteur (rapport de la
 # révision 4 : `read_at` sous `source`, `carried_to` du plafond reporté).
 EXTRA_METADATA = frozenset({"carried_from", "carried_to", "read_at"})
+# Décision 230 : noms affichés, jamais lus par un moteur qui calcule (garde : `test_no_engine_reads_the_french_names`) ;
+# une révision qui n'ajoute que des noms français laisse les entrées des moteurs identiques.
+DISPLAY_KEYS = frozenset({"name_fr"})
 
 
 ENGINE_MODES = ("calcule", "recopie")
@@ -355,8 +358,9 @@ def _expand(pattern: str, docs: Sequence[Any]) -> list[str]:
 
 def compare_inputs(before: Path, after: Path) -> dict[str, InputsDiff]:
     """Entrées de chaque moteur comparées entre deux dossiers de version ; un item « différent » porte ses feuilles
-    changées (`changes`, `ValueChange` avec l'origine déclarée avant et après) et leurs comptes par origine."""
-    metadata = metadata_keys(before, after)
+    changées (`changes`, `ValueChange` avec l'origine déclarée avant et après) et leurs comptes par origine. Les noms
+    affichés (`DISPLAY_KEYS`) ne comptent pas."""
+    metadata = metadata_keys(before, after) | DISPLAY_KEYS
     origins = _Origins(before, after)
     loaded: dict[tuple[Path, str], Any] = {}
 

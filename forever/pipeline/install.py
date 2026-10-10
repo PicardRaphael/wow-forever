@@ -874,6 +874,7 @@ def apply_install(
     _write(vdir / TALENTS, docs["talents"], 1)
     _write(vdir / SPELLS, docs["spells"], 1)
     _write(vdir / CONFIRMED, confirmed, 2)
+    _carry_missing_names(sources, Path(docs["candidate_path"]))
     _write(vdir / SOURCES_NAME, sources, 2)
     if carry_hotfix_provenance(vdir, Path(docs["candidate_path"])):
         revision["hotfixes"] = _json(vdir / SOURCES_NAME).get("hotfixes", {}).get("pushes", [])
@@ -891,6 +892,17 @@ def apply_install(
         _write_game_state(vdir, plan["game_state"], n, day)
     write_manifest(deps.data_dir)
     return revision
+
+
+def _carry_missing_names(sources: dict[str, Any], cand_vdir: Path) -> None:
+    """Décision 230 : les noms d'une autre locale manquants de la candidate (`missing_names`) suivent la version
+    installée ; une candidate qui les a tous retire la marque d'une révision précédente."""
+    path = cand_vdir / SOURCES_NAME
+    missing = (_json(path) if path.is_file() else {}).get("missing_names")
+    if missing:
+        sources["missing_names"] = list(missing)
+    else:
+        sources.pop("missing_names", None)
 
 
 def carry_hotfix_provenance(vdir: Path, cand_vdir: Path) -> bool:

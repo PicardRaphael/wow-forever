@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any
 
 from forever.errors import CsvMissingError
-from forever.pipeline.fetch import DEFAULT_LOCALE
+from forever.pipeline.fetch import DEFAULT_LOCALE, optional_table
 from forever.pipeline.tables import Row, column_value, read_table
 from forever.pipeline.tooltip import normalize, tooltip_values
 
@@ -46,8 +46,9 @@ def own_pet_table_files(rules: Mapping[str, Any]) -> list[tuple[str, str]]:
 
 
 def load_pet_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]:
-    """Tables des familiers lues dans `csv_dir/<locale>/<Table>.csv` (CsvMissingError si un fichier manque)."""
-    files = pet_table_files(rules)
+    """Tables des familiers lues dans `csv_dir/<locale>/<Table>.csv` (CsvMissingError si un fichier manque) ; une
+    table de noms d'une autre locale absente est omise (décision 230)."""
+    files = [(k, rel) for k, rel in pet_table_files(rules) if not optional_table(rel) or (csv_dir / rel).is_file()]
     missing = [rel for _, rel in files if not (csv_dir / rel).is_file()]
     if missing:
         raise CsvMissingError(csv_dir.name, missing)

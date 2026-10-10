@@ -29,7 +29,7 @@ from forever.pipeline.character_scaling import (
     load_gametables,
 )
 from forever.pipeline.dbd import LayoutCheck
-from forever.pipeline.fetch import DEFAULT_LOCALE, wago_dir
+from forever.pipeline.fetch import DEFAULT_LOCALE, optional_table, wago_dir
 from forever.pipeline.hotfix_overlay import (
     HOTFIX_KEY,
     SERVER_ORIGIN,
@@ -105,12 +105,25 @@ def table_files(rules: Mapping[str, Any]) -> list[tuple[str, str]]:
 
 def load_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]:
     """Tables des règles lues dans `csv_dir/<locale>/<Table>.csv` (DataSchemaError si une colonne manque,
-    CsvMissingError si un fichier manque)."""
-    files = table_files(rules)
+    CsvMissingError si un fichier manque ; une table de noms d'une autre locale absente est omise, décision 230)."""
+    files = _present_or_required(csv_dir, table_files(rules))
     missing = [rel for _, rel in files if not (csv_dir / rel).is_file()]
     if missing:
         raise CsvMissingError(csv_dir.name, missing)
     return {key: list(read_table(csv_dir / rel, key.rsplit("/", 1)[-1])) for key, rel in files}
+
+
+def _present_or_required(csv_dir: Path, files: list[tuple[str, str]]) -> list[tuple[str, str]]:
+    """Fichiers à lire : ceux de la locale par défaut (requis), et ceux d'une autre locale présents."""
+    return [(key, rel) for key, rel in files if not optional_table(rel) or (csv_dir / rel).is_file()]
+
+
+def missing_names(csv_dir: Path, rules: Mapping[str, Any]) -> list[str]:
+    """Tables de noms d'une autre locale absentes de `csv_dir` (« frFR/SpellName »), triées (décision 230)."""
+    from forever.pipeline.pets import pet_table_files
+
+    files = [*table_files(rules), *class_table_files(rules), *pet_table_files(rules)]
+    return sorted({key for key, rel in files if optional_table(rel) and not (csv_dir / rel).is_file()})
 
 
 def fetch_list(rules: Mapping[str, Any]) -> tuple[list[str], dict[str, list[str]]]:
@@ -135,7 +148,7 @@ def class_table_files(rules: Mapping[str, Any]) -> list[tuple[str, str]]:
 def load_class_tables(csv_dir: Path, rules: Mapping[str, Any]) -> dict[str, list[Row]]:
     """Tables du Mage et des 9 classes lues dans `csv_dir/<locale>/<Table>.csv` (CsvMissingError si un fichier
     manque, DataSchemaError si une colonne manque)."""
-    files = [*table_files(rules), *class_table_files(rules)]
+    files = _present_or_required(csv_dir, [*table_files(rules), *class_table_files(rules)])
     missing = [rel for _, rel in files if not (csv_dir / rel).is_file()]
     if missing:
         raise CsvMissingError(csv_dir.name, missing)
@@ -151,7 +164,8 @@ class _Client:
         self.names_fr: dict[int, str] = {}
         for locale, names in rules.get("localized_tables", {}).items():
             if "SpellName" in names and locale == "frFR":
-                self.names_fr = {int(r["ID"]): str(r["Name_lang"]) for r in tables[f"{locale}/SpellName"]}
+                rows = tables.get(f"{locale}/SpellName", [])  # absente : noms manquants (décision 230)
+                self.names_fr = {int(r["ID"]): str(r["Name_lang"]) for r in rows}
         self.spell = {int(r["ID"]): r for r in tables["Spell"]}
         self.effects: dict[int, dict[int, Row]] = defaultdict(dict)
         for r in tables["SpellEffect"]:
@@ -1863,11 +1877,14 @@ def decode_version(
             f"Une version candidate ne s'écrit jamais dans {deps.data_dir}.",
             "choisir un dossier --out hors des données",
         )
-    missing = [rel for _, rel in table_files(rules) if not (csv_dir / rel).is_file()]
+    # Décision 230 : les tables de noms d'une autre locale (frFR) sont facultatives ; leur absence est notée
+    # (`missing_names` de sources.json) et un passage suivant de `forever update` les ajoute en révision.
+    absent_names = missing_names(csv_dir, rules)
+    missing = [rel for _, rel in table_files(rules) if not optional_table(rel) and not (csv_dir / rel).is_file()]
     if missing:
         raise CsvMissingError(version, missing)
     # Tables des 9 classes : toutes (décodées) ou aucune (fichiers hérités de la base) ; une partie est une erreur.
-    class_files = class_table_files(rules)
+    class_files = [(k, rel) for k, rel in class_table_files(rules) if not optional_table(rel)]
     class_missing = [rel for _, rel in class_files if not (csv_dir / rel).is_file()]
     if class_missing and len(class_missing) < len(class_files):
         raise CsvMissingError(version, class_missing)
@@ -1910,12 +1927,14 @@ def decode_version(
     # CH0, bloc A : familiers du Chasseur (pet_tables) : tables propres toutes présentes (décodé) ou toutes
     # absentes (hérité de la base comme les fichiers des 9 classes, noté absent si la base ne l'a pas) ; une partie
     # est une erreur.
-    own_pet = own_pet_table_files(rules)
+    own_pet = [(k, rel) for k, rel in own_pet_table_files(rules) if not optional_table(rel)]
     pet_missing = [rel for _, rel in own_pet if not (csv_dir / rel).is_file()]
     if pet_missing and len(pet_missing) < len(own_pet):
         raise CsvMissingError(version, pet_missing)
     if own_pet and not pet_missing:
-        all_missing = [rel for _, rel in pet_table_files(rules) if not (csv_dir / rel).is_file()]
+        all_missing = [
+            rel for _, rel in pet_table_files(rules) if not optional_table(rel) and not (csv_dir / rel).is_file()
+        ]
         if all_missing:
             raise CsvMissingError(version, all_missing)
         pets_doc = decode_pets(hot.apply(load_pet_tables(csv_dir, rules), PET_SCHEMAS), rules, version)
@@ -1977,8 +1996,8 @@ def decode_version(
     }
     sources = {
         **{
-            k: v for k, v in local_sources.items() if k not in ("files", "hotfixes")
-        },  # T08c : correctifs propres à chaque candidate
+            k: v for k, v in local_sources.items() if k not in ("files", "hotfixes", "missing_names")
+        },  # T08c : correctifs propres à chaque candidate ; noms manquants propres à chaque candidate (décision 230)
         "game_version": version,
         "collected_at": format_utc(deps.now())[:10],
         "candidate": True,
@@ -2024,6 +2043,9 @@ def decode_version(
     }
     if rules.get("retired_files"):
         sources["retired_files"] = copy.deepcopy(rules["retired_files"])
+    if absent_names:
+        sources["missing_names"] = absent_names
+        extra_notes.append(f"noms manquants (tables d'une autre locale absentes) : {', '.join(absent_names)}")
     if hot.source is not None:
         docs = {"talents.json": talents, "spells.json": spells, "spell_scaling.json": scaling, **decoded_classes}
         extra_notes.append(hot.finish(docs, inherited, sources, rules.get("talent_geometry")))

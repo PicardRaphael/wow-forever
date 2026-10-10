@@ -141,6 +141,7 @@ def make_deps(tmp_path: Path) -> MakeDeps:
             offline=offline,
             wow_dir=wow_dir,
             profile_path=tmp_path / "profil" / "profile.json",  # jamais ~/.forever dans les tests (T06b)
+            sleep=lambda _seconds: None,  # essais d'un téléchargement : aucune pause réelle (décision 230)
         )
 
     return factory
@@ -274,6 +275,7 @@ def isolated_deps(tmp: Path, data_dir: Path = DATA_DIR) -> Deps:
         http_get=FakeHttp.failing(),
         now=lambda: NOW,
         profile_path=tmp / "profil" / "profile.json",
+        sleep=lambda _seconds: None,
     )
 
 

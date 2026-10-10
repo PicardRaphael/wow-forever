@@ -85,10 +85,12 @@ def test_changed_items_carry_their_leaves_and_origins(tmp_path):
     changed = [i for i in diffs["pvp_dr"].items if i["status"] == "différent"]
     assert [(i["file"], i["pointer"]) for i in changed] == [("classes.json", "/classes/Warrior")]
     item = changed[0]
-    assert len(item["changes"]) == item["leaves"] == 297
+    # 297 feuilles, dont 29 noms français (`name_fr`) : noms affichés, hors des entrées des moteurs (décision 230)
+    assert len(item["changes"]) == item["leaves"] == 268
+    assert not any(c.pointer.endswith("/name_fr") for c in item["changes"])
     origins = {c.origin_before for c in item["changes"]} | {c.origin_after for c in item["changes"]}
     assert origins <= {"client", "correctif_serveur"}
-    assert sum(item["origins"].values()) == 297 and set(item["origins"]) <= {"client", "correctif_serveur"}
+    assert sum(item["origins"].values()) == 268 and set(item["origins"]) <= {"client", "correctif_serveur"}
     hit = next(c for c in item["changes"] if c.pointer == "/classes/Warrior/spells/berserkerRage/ranks/0/level")
     assert (hit.file, hit.before, hit.after) == ("classes.json", 32, 30)
     assert (hit.origin_before, hit.origin_after) == ("client", "correctif_serveur")

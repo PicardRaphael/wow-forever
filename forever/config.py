@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import os
 import sys
+import time
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
@@ -28,6 +29,10 @@ CACHE_TTL = timedelta(hours=6)
 SILENT_AFTER = timedelta(days=14)
 HTTP_TIMEOUT = 2.0
 FETCH_TIMEOUT = 30.0  # téléchargement d'une table CSV (plusieurs Mo)
+# Décision 230 : chaque table est essayée au plus FETCH_ATTEMPTS fois ; le délai de la requête double à chaque essai
+# (FETCH_TIMEOUT, puis 2 et 4 fois), avec une attente croissante entre deux essais (secondes).
+FETCH_ATTEMPTS = 3
+FETCH_BACKOFF = (5.0, 15.0)
 USER_AGENT = f"forever-core/{__version__}"
 DEFAULT_WOW_DIR = Path(r"C:\Program Files (x86)\World of Warcraft\_classic_beta_")
 # Mesure des journaux : au-delà de cet écart, deux sorts instantanés ne sont pas « enchaînés » (paramètre de
@@ -59,6 +64,7 @@ class Deps:
     confirm: Callable[[str], bool] | None = None  # demande d'accord avant une écriture (None : refus)
     profile_path: Path | None = None  # profil joueur hors du dépôt (None : FOREVER_PROFILE ou ~/.forever, T06b)
     game_running: Callable[[], bool | None] = game_closed  # client lancé ? None : inconnu (décision 205)
+    sleep: Callable[[float], None] = time.sleep  # attente entre deux essais d'un téléchargement (décision 230)
 
 
 def terminal_confirm(prompt: str) -> bool:

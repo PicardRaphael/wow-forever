@@ -57,7 +57,14 @@ from forever.engine_inputs import (
     metadata_keys,
     targeted_replay,
 )
-from forever.errors import EXIT_OK, EXIT_PENDING, ForeverError, InvalidArgumentError, PathNotFoundError
+from forever.errors import (
+    EXIT_OK,
+    EXIT_PENDING,
+    FetchFailedError,
+    ForeverError,
+    InvalidArgumentError,
+    PathNotFoundError,
+)
 from forever.pipeline.tables import ColumnNamesError
 from forever.store import current_identity
 from forever.timefmt import format_utc, parse_utc
@@ -69,13 +76,15 @@ SCHEMA_VERSION = 1
 UPDATE_DIR = "update"
 STEPS = ("verrou", "archivage", "clone", "jeu", "nouvelle_version", "correctifs", "journaux", "addons", "fin")
 ONLY = ("jeu", "correctifs", "journaux", "addons")
-KINDS = ("install_version", "install_revision", "measures", "addon_data", "network_dbd")
+KINDS = ("install_version", "install_revision", "measures", "addon_data", "network_dbd", "network")
 STATUSES = ("fait", "rien", "attente", "arrêt", "erreur")
 ACTIONS = ("écrire", "attente", "bloqué")
 STATES = ("en_attente", "approuvée", "rejetée", "périmée", "faite")
 OPEN_STATES = ("en_attente", "approuvée")
 SESSION_KINDS = ("column_names",)
-SELF_CLEARING_KINDS = ("hotfixes_unread",)  # attentes levées seules par un passage, jamais approuvables
+# Attentes levées seules par un passage, jamais approuvables ; « network » : téléchargement en échec après ses essais,
+# retenté au passage suivant (décision 230).
+SELF_CLEARING_KINDS = ("hotfixes_unread", "network")
 AUTO_ORIGINS = frozenset({"client", "correctif_serveur"})  # installation seule d'un moteur qui recopie (décision 207)
 INSTALL_KINDS = ("install_version", "install_revision")
 GUARD_REASON = (
@@ -601,8 +610,13 @@ def _step_game(run: _Run) -> tuple[Step, str | None]:
     return Step("jeu", "fait", f"cible : {client} (build du client, publié){note}", data), client
 
 
-def _fetch_version(run: _Run, version: str, rules: Mapping[str, Any]) -> None:
-    from forever.pipeline.fetch import fetch_gametables, fetch_tables
+def _fetch_version(run: _Run, version: str, rules: Mapping[str, Any]) -> list[str]:
+    """Télécharge les tables de `version` (trois essais par table, chacun noté au journal du passage, décision 230) ;
+    rend les tables de noms d'une autre locale restées en échec (« frFR/ItemPetFood ») : facultatives, la version se
+    décode sans elles. FetchFailedError si une table qui porte des valeurs de calcul (locale par défaut, GameTables)
+    reste en échec."""
+    from forever.pipeline.decode import missing_names
+    from forever.pipeline.fetch import fetch_gametables, fetch_tables, wago_dir
 
     deps = run.deps_on(run.base_data)
     enus: list[str] = []
@@ -613,11 +627,37 @@ def _fetch_version(run: _Run, version: str, rules: Mapping[str, Any]) -> None:
         for locale, names in (rules.get(key) or {}).items():
             localized.setdefault(locale, [])
             localized[locale] += [t for t in names if t not in localized[locale]]
-    fetch_tables(deps, version, enus)
+    fetch_tables(deps, version, enus, log=run.say)
     for locale, names in localized.items():
-        fetch_tables(deps, version, names, locales=[locale])
+        try:
+            fetch_tables(deps, version, names, locales=[locale], log=run.say)
+        except FetchFailedError as exc:  # noms d'une autre locale : facultatifs (décision 230)
+            run.say(f"noms {locale} facultatifs : {exc.message}")
     if rules.get("gametables"):
-        fetch_gametables(deps, version, rules["gametables"])
+        fetch_gametables(deps, version, rules["gametables"], log=run.say)
+    run.cleared[f"network-{version}"] = "téléchargement réussi"
+    return missing_names(wago_dir(deps.cache_dir, version), rules)
+
+
+def _network_wait(run: _Run, step: str, version: str, err: ForeverError) -> Step:
+    """Attente « réseau » (décision 230) : une table qui porte des valeurs de calcul reste en échec après ses essais.
+    Non approuvable, retentée et levée seule au passage suivant."""
+    pending_id = f"network-{version}"
+    run.pending.append(
+        {
+            "id": pending_id,
+            "kind": "network",
+            "action": "attente",
+            "version": version,
+            "revision": None,
+            "clauses": {},
+            "reasons": [err.message],
+            "created_at": run.now,
+            "base": {"origin_main": run.origin_main, "version": _installed(run.base_data)},
+            "commands": [NETWORK_HINT],
+        }
+    )
+    return Step(step, "attente", f"réseau : {err.message} (nouvel essai au passage suivant)", {"id": pending_id})
 
 
 class _NeedLayouts(Exception):
@@ -750,6 +790,7 @@ SELF_CLEARING_HINT = (
     "lancer le jeu sur ce build, se connecter au royaume puis quitter le jeu : le client écrit DBCache.bin à la "
     "déconnexion (DON14) et le pont lance alors `forever update`"
 )
+NETWORK_HINT = "rien à faire : le passage suivant de `forever update` retente le téléchargement"
 
 
 def summary_text(summary: Mapping[str, Any] | None) -> str:
@@ -992,7 +1033,10 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
         "DBCache.bin du build archivé et lu" if gate == "lire" else "délai écoulé sans DBCache.bin du build"
     )
     rules = _rules(run.base_data)
-    _fetch_version(run, target, rules)
+    try:
+        absent_names = _fetch_version(run, target, rules)
+    except FetchFailedError as err:
+        return _network_wait(run, "nouvelle_version", target, err)
     source = None
     if archive is not None:
         pending = hotfixes.pending_hotfixes(dbcache.read_dbcache(archive), {}, rules)
@@ -1018,7 +1062,13 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
         gate=gate,
         hotfixes_read=source is not None,
     )
-    return result._replace(data={**result.data, "gate": gate})
+    data = {**result.data, "gate": gate}
+    if absent_names:
+        data["missing_names"] = absent_names
+        result = result._replace(
+            detail=f"{result.detail} ; noms manquants ({', '.join(absent_names)}), ajoutés par un passage suivant"
+        )
+    return result._replace(data=data)
 
 
 def _first_seen(run: _Run, version: str) -> datetime | None:
@@ -1059,6 +1109,48 @@ def _hotfixes_wait(run: _Run, version: str, seen: datetime | None) -> Step:
         }
     )
     return Step("nouvelle_version", "attente", why, {"id": pending_id, "gate": "attendre", "until": until})
+
+
+def _names_revision(
+    run: _Run, version: str, rules: Mapping[str, Any], archive: Path | None, absent: Sequence[str]
+) -> Step:
+    """Révision qui ajoute à la version installée les noms d'une autre locale manquants (décision 230) : tables
+    retéléchargées ; toutes présentes, la version est redécodée avec tous les correctifs de l'archive (jamais sans :
+    les valeurs `correctif_serveur` seraient perdues) et passe par la règle d'automatisme ; les noms affichés ne sont
+    pas une entrée des moteurs, la révision s'écrit seule."""
+    from forever.pipeline import dbcache, hotfixes
+    from forever.pipeline.decode import decode_version
+
+    try:
+        still = _fetch_version(run, version, rules)
+    except FetchFailedError as err:
+        return _network_wait(run, "correctifs", version, err)
+    if still:
+        detail = f"noms toujours manquants ({', '.join(still)}) : nouvel essai au passage suivant"
+        return Step("correctifs", "rien", detail, {"missing_names": still})
+    source = None
+    if archive is not None:
+        every = hotfixes.pending_hotfixes(dbcache.read_dbcache(archive), {}, rules)
+        if every:
+            try:
+                source = _hotfix_source(run, version, archive, rules, [t for t, _ in every])
+            except _NeedLayouts as need:
+                return _need_layouts(run, "correctifs", version, need, len(every))
+    try:
+        candidate = decode_version(run.deps_on(run.base_data), version, force=True, hotfixes=source)
+    except ColumnNamesError as err:
+        return _column_wait(run, "correctifs", version, err)
+    return _evaluate(
+        run,
+        step="correctifs",
+        kind="install_revision",
+        version=version,
+        revision=_revision(run.base_data, version) + 1,
+        candidate=candidate.root,
+        new_version=False,
+        motif=f"noms ajoutés ({', '.join(absent)}) (forever update)",
+        hotfixes_read=source is not None,
+    )
 
 
 def _need_layouts(run: _Run, step: str, version: str, need: _NeedLayouts, count: int) -> Step:
@@ -1153,18 +1245,26 @@ def _step_hotfixes(run: _Run) -> Step:
     if version not in installed_versions(run.base_data):
         return Step("correctifs", "rien", f"version du client {version} non installée", {})
     archive = archived_dbcache(run.deps.cache_dir, _build_number(version))
-    if archive is None:
-        return Step("correctifs", "rien", f"aucune archive de DBCache.bin pour {version}", {})
     rules = _rules(run.base_data)
     sources = read_sources(run.base_data, version) or {}
+    absent = [str(n) for n in sources.get("missing_names") or []]
+    if archive is None:
+        if absent:
+            return _names_revision(run, version, rules, None, absent)
+        return Step("correctifs", "rien", f"aucune archive de DBCache.bin pour {version}", {})
     pending = hotfixes.pending_hotfixes(dbcache.read_dbcache(archive), sources, rules)
     if not pending:
+        if absent:
+            return _names_revision(run, version, rules, archive, absent)
         return Step("correctifs", "rien", "aucun correctif du serveur en attente", {"pending": 0})
     try:
         source = _hotfix_source(run, version, archive, rules, [t for t, _ in pending])
     except _NeedLayouts as need:
         return _need_layouts(run, "correctifs", version, need, len(pending))
-    _fetch_version(run, version, rules)
+    try:
+        _fetch_version(run, version, rules)
+    except FetchFailedError as err:
+        return _network_wait(run, "correctifs", version, err)
     try:
         candidate = decode_version(run.deps_on(run.base_data), version, force=True, hotfixes=source)
     except ColumnNamesError as err:
@@ -1877,8 +1977,8 @@ def _close_stale_hotfix_waits(run: _Run) -> None:
     installed = set(installed_versions(run.base_data))
     client = str(run.client.build) if run.client is not None else None
     for entry in list_pending(run.deps.cache_dir):
-        if entry.get("kind") not in SELF_CLEARING_KINDS or entry.get("state") not in OPEN_STATES:
-            continue
+        if entry.get("kind") != "hotfixes_unread" or entry.get("state") not in OPEN_STATES:
+            continue  # attente « réseau » : levée par le téléchargement réussi (`run.cleared`), jamais ici
         version = entry.get("version")
         if version in installed:
             _set_state(run.deps.cache_dir, str(entry["id"]), "faite", done_at=run.now, done_by=f"{version} installée")
@@ -2014,7 +2114,7 @@ def approve(
     if entry.get("kind") in SELF_CLEARING_KINDS:
         raise InvalidArgumentError(
             f"L'attente {pending_id} ({entry.get('kind')}) se lève seule : elle n'est pas approuvable.",
-            SELF_CLEARING_HINT,
+            NETWORK_HINT if entry.get("kind") == "network" else SELF_CLEARING_HINT,
         )
     if entry.get("kind") in SESSION_KINDS:
         raise InvalidArgumentError(
