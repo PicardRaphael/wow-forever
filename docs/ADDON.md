@@ -304,8 +304,8 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        Coller /simc. `/console scriptErrors 1` pour voir une éventuelle erreur Lua.
     4. **Maj+clic (BR5)** : cliquer dans la zone de saisie de la fenêtre (curseur visible), puis Maj+clic sur : un
        objet d'un sac, un objet équipé (fenêtre du personnage, `C`), un sort du grimoire (`P`), une quête du journal
-       (`L`). Pour chacun, noter : lien inséré dans la saisie, rien, ou inséré deux fois. Vider la saisie entre deux
-       essais si besoin.
+       (`L`). Pour chacun, noter : lien inséré dans la saisie, rien, ou inséré deux fois, et si une autre fenêtre
+       s'ouvre en même temps (partage d'une pile pour un objet empilé). Vider la saisie entre deux essais si besoin.
     5. **Question avec deux liens** : dans la saisie, Maj+clic sur deux objets (un équipé, un d'un sac), puis taper
        autour, par exemple « Lequel de [objet 1] et [objet 2] est le mieux pour moi ? », Entrée. Attendu : « Vous : »
        avec les noms entre crochets ; ligne d'état « envoi du message n° … », éventuellement « (2 parties, … reçue(s)

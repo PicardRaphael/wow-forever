@@ -37,7 +37,6 @@ local ADDON = ... or "ForeverBridge"
 
 ForeverBridge = {}
 local FB = ForeverBridge
-FB.SCHEDULE = nil -- posé après le calendrier, pour les tests
 local Codec = ForeverBridge_Codec
 local Message = ForeverBridge_Message
 
@@ -77,7 +76,7 @@ local MIN_ALPHA = 0.3 -- fond réglable par /fv fond, de 30 à 100 (opaque par d
 BINDING_HEADER_FOREVERBRIDGE = "ForeverBridge"
 BINDING_NAME_FOREVERBRIDGE_TOGGLE = "Ouvrir ou fermer la fenêtre"
 
-FB.SCHEDULE = SCHEDULE
+FB.SCHEDULE = SCHEDULE -- lu par les tests (forever/bridge/polls.py)
 
 local driver = CreateFrame("Frame", "ForeverBridgeDriver", UIParent)
 local band
