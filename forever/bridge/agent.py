@@ -62,6 +62,7 @@ class AgentResult:
     cost_usd: float | None = None
     # « build » (export), « projected » (chemin du joueur), « closest » (build populaire le plus proche, P06b)
     links: dict[str, str] = field(default_factory=dict)
+    calls: list[tuple[str, dict[str, Any]]] = field(default_factory=list, compare=False)  # outil et arguments (P06b)
 
 
 def find_claude(which: Callable[[str], str | None] = shutil.which) -> str:
@@ -521,3 +522,10 @@ def write_empty_mcp_config(directory: Path) -> Path:
     path = directory / "mcp-vide.json"
     path.write_bytes(b'{"mcpServers": {}}\n')
     return path
+
+
+class PersistentSession:
+    """Session `claude` gardée ouverte (variante C, P06b, bloc G)."""
+
+    def __init__(self, argv: Any, **kwargs: Any) -> None:
+        raise NotImplementedError

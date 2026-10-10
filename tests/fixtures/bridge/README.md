@@ -33,3 +33,9 @@
   (lecture, Glob, Grep, écriture d'un fichier), puis quatre opérations hors du dossier (écriture, lecture, Grep,
   Glob) **toutes refusées** (`permission_denials`). Une troisième conversation a vérifié qu'aucun shell n'est exposé.
   Identifiants remplacés, chemin de l'utilisateur remplacé (`C:\Users\joueur`), signatures retirées.
+- `claude_stream_persistent.jsonl` (P06b, sonde 0.3 du 2026-10-10, dans l'accord des 48 conversations de mesure) :
+  flux réel de `claude` 2.1.296 lancé une fois avec `--input-format stream-json` (ligne de la conversation « jeu »),
+  deux messages écrits sur son entrée (« Quelle est la version des données ? Une ligne. », puis « Et la fraîcheur, en
+  un mot ? ») : un événement `result` par message, même session ; premier résultat à 13,9 s (dont environ 6 s de hook
+  de démarrage du plugin), second 1,4 s après son envoi ; `total_cost_usd` cumulé sur le processus. Identifiants
+  remplacés.
