@@ -1,0 +1,58 @@
+# Jen - 2026-10-10 14:02 - EU/Classic Beta PvE 2
+# SimC Addon 12.1.5-alpha-01
+# WoW 1.60.1.70338, TOC 16001
+# Requires SimulationCraft 1201-01 or newer
+
+mage="Jen"
+level=19
+race=orc
+region=eu
+server=classic_beta_pve_2
+role=
+
+spec=unknown
+
+talents=BAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+# Canvas Shoulderpads (12)
+shoulder=,id=1769
+# Deckhand's Shirt (1)
+shirt=,id=5107
+# Green Woolen Vest (14)
+chest=,id=2582
+# Novice Arcanist's Sash (15)
+waist=,id=253885
+# Barbaric Loincloth (13)
+legs=,id=3309
+# Mystic's Slippers (18)
+feet=,id=14364
+# Featherbead Bracers (18)
+wrist=,id=15452
+# Brewer's Gloves (16)
+hands=,id=10637
+# Depleted Ritual Band (15)
+finger1=,id=281268
+# Bounty Hunter's Ring (17)
+finger2=,id=5351
+# Reinforced Linen Cape (12)
+back=,id=2580
+# Staff of Orgrimmar (20)
+main_hand=,id=15444,enchant_id=1883
+
+### Additional Character Info
+#
+# character_stats=strength:21/agility:23/stamina:30/intellect:52/spirit:48/armor:118
+#
+# spell_power=holy:6/fire:6/nature:6/frost:6/shadow:6/arcane:6
+#
+# hit=
+#
+# crit=spell:3.25/melee:4.1/ranged:4.1
+#
+# combat_ratings=hit_spell:0:0/crit_spell:0:0/haste_spell:0:0
+#
+# skills=6:95:0:100/8:95:0:100
+#
+# buffs=1459:0/10157:0
+
+# Checksum: 96226405

@@ -1,5 +1,5 @@
 """Réponses dans la fenêtre (P06a, bloc E, décision 212 amendée le 2026-10-09), sous lupa.lua51 : consultation de
-la réserve à intervalles après un envoi (3, 7, 11 … 27, 30, 40 … 190 s), accusé (`working`) qui retire la bande,
+la réserve à intervalles après un envoi (2, 4, 8 … 60, 70 … 190 s depuis P06b, décision 235), accusé (`working`) qui retire la bande,
 réponse mise en forme avec sa provenance et son lien copiable, trois relevés sans accusé → boîte d'envoi, réserve
 presque vide → /reload proposé, réserve vide → réponse au /reload, entrée d'une autre session ignorée, aucune
 ouverture automatique, historique gardé. Les emplacements simulés sont écrits par `inbox_lua` du pont : ce que le pont
@@ -17,7 +17,7 @@ from forever.bridge.slots import inbox_lua
 pytest.importorskip("lupa")
 
 STATUS = {"version": "1.60.1.70245", "freshness": "fresh", "line": "Données 1.60.1.70245 · à jour", "slots": 30}
-SCHEDULE = [3, 7, 11, 15, 19, 23, 27, 30, *range(40, 191, 10)]
+SCHEDULE = [2, *range(4, 61, 4), *range(70, 191, 10)]
 LINK = "https://talents-forever.example/mage/20/x"
 
 

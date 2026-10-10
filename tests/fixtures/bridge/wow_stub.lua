@@ -247,6 +247,47 @@ C_Traits = {
 	end),
 }
 
+-- Infobulles (P06b) : Stub.tooltips[corps du lien] = { lignes } ; C_TooltipInfo.GetHyperlink rend { lines = {
+-- { leftText = … } } } d'après le corps lu entre |H et |h (ou le texte donné tel quel).
+Stub.tooltips = {}
+C_TooltipInfo = {
+	GetHyperlink = api("C_TooltipInfo.GetHyperlink", function(link)
+		local body = tostring(link):match("|H(.-)|h") or tostring(link)
+		local lines = Stub.tooltips[body]
+		if not lines then return nil end
+		local data = { lines = {} }
+		for i, text in ipairs(lines) do data.lines[i] = { leftText = text } end
+		return data
+	end),
+}
+
+-- Insertion de liens par Maj+clic (P06b) : fonctions de Blizzard simulées, sans effet propre ; avec
+-- Stub.chained_insert, ChatFrameUtil.InsertLink appelle aussi ChatEdit_InsertLink (un clic, deux accroches).
+Stub.inserted = {}
+function ChatEdit_InsertLink(link)
+	table.insert(Stub.inserted, link)
+	return false
+end
+ChatFrameUtil = {}
+function ChatFrameUtil.InsertLink(link)
+	if Stub.chained_insert then return ChatEdit_InsertLink(link) end
+	table.insert(Stub.inserted, link)
+	return false
+end
+
+-- hooksecurefunc([table,] nom, fonction) : la fonction d'origine, puis l'accroche, avec les mêmes arguments.
+function hooksecurefunc(a, b, c)
+	local tbl, name, hook = a, b, c
+	if type(a) == "string" then tbl, name, hook = _G, a, b end
+	local original = tbl[name]
+	if type(original) ~= "function" then error("hooksecurefunc : " .. tostring(name) .. " absente") end
+	tbl[name] = function(...)
+		local r1, r2, r3 = original(...)
+		hook(...)
+		return r1, r2, r3
+	end
+end
+
 function PlaySoundFile(path, channel)
 	if Stub.sound_error then error("PlaySoundFile simulé en erreur") end
 	table.insert(Stub.played, path)

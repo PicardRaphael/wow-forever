@@ -1,0 +1,1 @@
+item:7909:1883:0:0:0:0:-12:1234567:19Sword of the BearSword of the BearBinds when equippedMain Hand  SwordRequires Level 19spell:116FrostboltFrostboltLaunches a bolt of frost at the enemy.

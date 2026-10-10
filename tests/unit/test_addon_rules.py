@@ -80,3 +80,14 @@ def test_forever_logger_records_the_pet_out_of_combat():
     assert check_addon.check_addon(ADDON) == []
     toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
     assert "## Version: 0.3.0" in toc.splitlines()
+
+
+def test_blizzard_functions_are_hooked_never_replaced():
+    """P06b, bloc A : les accroches de Maj+clic passent par hooksecurefunc ; remplacer la fonction est refusé."""
+    errors = check_addon.check_lua(BAD / "replace_blizzard.lua")
+    assert any(
+        e.startswith("replace_blizzard.lua:3 :") and "fonction de Blizzard remplacée (utiliser hooksecurefunc)" in e
+        for e in errors
+    ), errors
+    source = (REPO_ROOT / "addon" / "ForeverBridge" / "ForeverBridge.lua").read_text(encoding="utf-8")
+    assert "hooksecurefunc" in source

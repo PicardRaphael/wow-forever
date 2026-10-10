@@ -50,3 +50,17 @@ def test_live_selftest_still_reads_the_vector():
 
     report, _ = run_live(ScreenApi(render_band(selftest_cells(), 1)))
     assert report.ok
+
+
+def test_a_part_of_a_long_message_is_described():
+    """P06b, bloc A : un message trop long part en parties ; l'autotest décrit la partie lue et renvoie au journal du
+    pont pour le message complet."""
+    from forever.bridge.fragments import split_payload
+
+    record = Record("abcd1234", 6, frozenset(), {"level": "19"}, "é" * 2500, slot=3)
+    parts = split_payload(build_payload(record), session="abcd1234", message_id=6)
+    report = run_message(ScreenApi(render_band(encode_cells(6, parts[1]), 1)))
+    assert report.ok and report.record is None
+    text = "\n".join(report.lines)
+    assert "partie 2/3 du message n° 6" in text and "forever bridge contexts last" in text
+    assert report.to_json()["part"] == {"message_id": 6, "index": 2, "total": 3, "session": "abcd1234"}

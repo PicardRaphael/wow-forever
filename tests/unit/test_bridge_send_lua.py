@@ -72,7 +72,7 @@ def test_enter_sends_the_question_with_its_context():
         "Alliance", "Westfall", "Sentinel Hill", "1436",
     )  # fmt: skip
     assert ctx["talents"] == "101:2,102:3,140:1"
-    assert ctx["gear"] == "1:12345:Hat of Testing;5:23456:Robe of Testing"
+    assert ctx["gear"] == "1=12345::::::::19=Hat of Testing;5=23456::::::::19=Robe of Testing"
     assert ctx["client"] == "1.60.1.70291" and "target" not in ctx
     assert any("Vous" in line and "Quel talent au niveau 20 ?" in line for line in history(game))
     assert list(game.stub.printed.values()) == []
@@ -87,7 +87,7 @@ def test_shift_enter_adds_a_line_and_escape_clears_focus():
     box.SetFocus(box)
     box.scripts.OnEscapePressed(box)
     assert not box.HasFocus(box)
-    assert box.maxLetters == 255 and box.multiLine
+    assert box.maxLetters == 1000 and box.multiLine
     type_and_enter(game, "   ")
     assert decode_band(game.screen_image()) is None
 
@@ -126,7 +126,7 @@ def test_band_is_removed_at_the_acknowledgement():
     working = inbox_lua(0, {}, [{"session": session, "id": 1, "status": "working", "since": 0}], [])
     game.stub.addons["ForeverBridge_S001"] = working
     type_and_enter(game, "Question")
-    game.stub.Advance(2.9)
+    game.stub.Advance(1.9)
     assert decode_band(game.screen_image()) is not None
     game.stub.Advance(0.2)
     assert decode_band(game.screen_image()) is None
@@ -201,33 +201,34 @@ def heavy_player(game, nodes, name_len, pieces=19):
 
 def test_long_item_names_are_cut_first():
     game = Game()
-    heavy_player(game, nodes=51, name_len=60)
+    heavy_player(game, nodes=40, name_len=60)
     game.slash("/fv")
     question = "é" * 255
     type_and_enter(game, question)
     _, record = sent(game)
     assert record.text == question
     assert len(build_payload(record)) <= MAX_PAYLOAD
-    names = [piece.split(":", 2)[2] for piece in record.context["gear"].split(";")]
+    names = [piece.split("=", 2)[2] for piece in record.context["gear"].split(";")]
     assert len(names) == 19 and all(0 < len(n) <= 20 for n in names)
     assert record.context["subzone"] == "Sentinel Hill"
 
 
-def test_gear_goes_last_and_the_question_is_never_cut():
+def test_gear_and_talents_are_never_removed():
+    """Remplace « l'équipement part en dernier » de P06a (décisions 224 et 235) : noms d'objets retirés, puis
+    sous-zone, puis le message part en plusieurs parties ; équipement, talents et question jamais retirés."""
+    from test_bridge_p06b_lua import collect, waiting_slots
+
     game = Game()
+    waiting_slots(game)
     heavy_player(game, nodes=130, name_len=60)
     game.slash("/fv")
     question = "é" * 255
     type_and_enter(game, question)
-    _, record = sent(game)
-    assert record.text == question and len(build_payload(record)) <= MAX_PAYLOAD
+    record, shown = collect(game)
+    assert record.text == question and len(shown) == 2
     ctx = record.context
-    assert "talents" in ctx and "gear" not in ctx and "subzone" not in ctx
-    ids_only = ";".join(f"{slot}:{20000 + slot}" for slot in range(1, 20))
-    with_ids = Record(
-        record.session, record.message_id, record.flags, {**ctx, "gear": ids_only}, record.text, record.slot
-    )
-    assert len(build_payload(with_ids)) > MAX_PAYLOAD  # précondition : il fallait bien retirer l'équipement
+    assert len(ctx["talents"].split(",")) == 130 and "subzone" not in ctx
+    assert ctx["gear"] == ";".join(f"{slot}={20000 + slot}::::::::19" for slot in range(1, 20))
 
 
 def test_no_forbidden_call_while_sending():
@@ -252,7 +253,7 @@ def test_realistic_french_question_is_sent_with_the_full_context():
     type_and_enter(game, FRENCH_QUESTION)
     _, record = sent(game)
     assert record.text == FRENCH_QUESTION
-    names = [piece.split(":", 2)[2] for piece in record.context["gear"].split(";")]
+    names = [piece.split("=", 2)[2] for piece in record.context["gear"].split(";")]
     assert len(names) == 17 and all(len(n) == 30 for n in names)
     assert record.context["subzone"] == "Sentinel Hill" and len(record.context["talents"].split(",")) == 51
 
