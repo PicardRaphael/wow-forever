@@ -13,7 +13,7 @@ import os
 import re
 import sys
 import time
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import replace
 from datetime import timedelta
@@ -441,6 +441,15 @@ def build_parser() -> argparse.ArgumentParser:
     ad_restore.add_argument("--json", action="store_true", help="sortie JSON")
     ad_log = add_sub.add_parser("log", help="commits locaux de la conversation (git log)")
     ad_log.add_argument("--json", action="store_true", help="sortie JSON")
+    b_bench = bridge_sub.add_parser(
+        "bench",
+        help="mesure des accélérations de la conversation « jeu » (P06b, bloc G ; conversations claude réelles)",
+    )
+    b_bench.add_argument("--variants", default="A,B,C,D", help="variantes (A ligne actuelle, B, C, D)")
+    b_bench.add_argument("--rounds", type=int, default=2, help="passages (défaut 2)")
+    b_bench.add_argument("--out", type=Path, help="rapport Markdown (défaut : tasks/P06b-vitesse.md du dépôt)")
+    b_bench.add_argument("--model", help="modèle (défaut : celui de forever bridge config)")
+    b_bench.add_argument("--json", action="store_true", help="sortie JSON")
     b_ctx = bridge_sub.add_parser(
         "contexts", help="contextes réels gardés par le pont (P06b) : le dernier, ou l'export en fixtures"
     )
@@ -472,6 +481,8 @@ def build_parser() -> argparse.ArgumentParser:
     b_ask.add_argument("--json", action="store_true", help="sortie JSON")
     b_cfg = bridge_sub.add_parser("config", help="configuration du pont : modèle de la conversation « jeu »")
     b_cfg.add_argument("--model", help="modèle (sonnet par défaut, haiku, opus, ou un identifiant complet)")
+    b_cfg.add_argument("--thinking", choices=("on", "off"), help="réflexion du modèle (off : MAX_THINKING_TOKENS=0)")
+    b_cfg.add_argument("--persistent", choices=("on", "off"), help="session claude gardée ouverte entre les messages")
     b_cfg.add_argument("--json", action="store_true", help="sortie JSON")
     b_stop = bridge_sub.add_parser("stop", help="arrêter le pont (fichier d'arrêt lu au pas suivant)")
     b_stop.add_argument("--json", action="store_true", help="sortie JSON")
@@ -2603,7 +2614,22 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
                     now=lambda: f"{deps.now():%Y%m%dT%H%M%SZ}",
                 )  # fmt: skip
 
+        bridge_config = load_config(deps.cache_dir)
+        if bridge_config.get("thinking") == "off":
+            env = {**env, "MAX_THINKING_TOKENS": "0"}  # réglage retenu par la mesure de P06b (bloc G)
+        persistent = None
+        if bridge_config.get("persistent") == "on":
+            persistent = agent.PersistentSession(
+                lambda resume: agent.claude_argv(
+                    claude=claude, plugin_dir=REPO_ROOT / "plugin", mcp_config=mcp_path,
+                    system_prompt=agent.default_system_prompt(), session_id=resume, model=model, input_stream=True,
+                ),
+                cwd=folder, env=env,
+            )  # fmt: skip
+
         def converse(prompt: str, session: str | None) -> agent.AgentResult:
+            if persistent is not None:
+                return persistent.ask(prompt, new=session is None)
             return agent.ask(
                 prompt,
                 session_id=session,
@@ -2811,8 +2837,13 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
     if args.bridge_command == "config":
         from forever.bridge.config import save_config
 
-        config = save_config(deps.cache_dir, {"model": args.model}) if args.model else load_config(deps.cache_dir)
-        lines = [f"Pont : modèle de la conversation « jeu » : {config['model']}"]
+        wanted = {"model": args.model, "thinking": args.thinking, "persistent": args.persistent}
+        changed = {k: v for k, v in wanted.items() if v is not None}
+        config = save_config(deps.cache_dir, changed) if changed else load_config(deps.cache_dir)
+        lines = [
+            f"Pont : modèle de la conversation « jeu » : {config['model']}",
+            f"  réflexion : {config['thinking']} · session gardée ouverte : {config['persistent']}",
+        ]
         _emit({**config, "provenance": provenance}, lines, provenance, args.json)
         return EXIT_OK
     if args.bridge_command == "ask":
@@ -2821,6 +2852,8 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
         return _bridge_contexts(deps, args, provenance)
     if args.bridge_command == "addons":
         return _bridge_addons(deps, args, provenance)
+    if args.bridge_command == "bench":
+        return _bridge_bench(deps, args, provenance)
     if args.bridge_command == "selftest" and args.card:
         from forever.bridge.cards import SELFTEST_TTL_S, write_selftest_card
 
@@ -2882,6 +2915,83 @@ def _cmd_bridge(deps: Deps, args: argparse.Namespace) -> int:
         result = selftest.selftest_offline()
     _emit({**result.to_json(), "provenance": provenance}, list(result.lines), provenance, args.json)
     return EXIT_OK if result.ok else EXIT_NOT_FOUND
+
+
+def _bridge_bench(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:
+    """`forever bridge bench` (P06b, bloc G) : six questions sur contextes réels, variantes A à D, rapport côte à côte.
+    Lance de vraies conversations `claude` (coût) : seulement sur demande."""
+    import os
+
+    from forever.bridge import agent, speed
+    from forever.bridge.context import load_context_data
+    from forever.bridge.install import REPO_ROOT
+    from forever.timefmt import format_utc
+
+    names = [v.strip().upper() for v in args.variants.split(",") if v.strip()]
+    unknown = [n for n in names if n not in speed.VARIANTS]
+    if unknown:
+        raise InvalidArgumentError(f"Variante inconnue : {', '.join(unknown)}.", "choisir parmi A, B, C, D")
+    if "A" not in names:
+        names.insert(0, "A")  # référence de la règle de décision et des liens
+    claude = agent.find_claude()
+    folder = agent.conversation_dir(deps.cache_dir)
+    mcp_path = agent.write_mcp_config(folder, REPO_ROOT)
+    env = agent.claude_env(os.environ, REPO_ROOT)
+    model = args.model or load_config(deps.cache_dir)["model"]
+    messages = speed.bench_messages(load_context_data(deps), REPO_ROOT / "tests" / "fixtures" / "bridge" / "contexts")
+
+    def factory(variant: speed.Variant) -> Callable[[], Any]:
+        venv = speed.variant_env(env, variant)
+        if variant.persistent:
+
+            def make_persistent() -> Any:
+                session = agent.PersistentSession(
+                    lambda resume: agent.claude_argv(
+                        claude=claude, plugin_dir=REPO_ROOT / "plugin", mcp_config=mcp_path,
+                        system_prompt=agent.default_system_prompt(), session_id=resume, model=model, input_stream=True,
+                    ),
+                    cwd=folder, env=venv,
+                )  # fmt: skip
+
+                def ask(message: str, new: bool) -> Any:
+                    return session.ask(message, new=new)
+
+                ask.close = session.close  # type: ignore[attr-defined]
+                return ask
+
+            return make_persistent
+
+        def make_plain() -> Any:
+            state: dict[str, str | None] = {"session": None}
+
+            def ask(message: str, new: bool) -> Any:
+                result = agent.ask(
+                    message, session_id=None if new else state["session"], claude=claude,
+                    plugin_dir=REPO_ROOT / "plugin", mcp_path=mcp_path, cwd=folder, env=venv, model=model,
+                )  # fmt: skip
+                state["session"] = result.session_id or state["session"]
+                return result
+
+            return ask
+
+        return make_plain
+
+    runners = {name: factory(speed.VARIANTS[name]) for name in names}
+
+    def progress(line: str) -> None:
+        print(line, file=sys.stderr, flush=True)
+
+    measures = speed.run_bench(messages, runners, rounds=args.rounds, progress=progress)
+    meta = {"date": format_utc(deps.now()), "model": model, "rounds": args.rounds}
+    out = args.out or REPO_ROOT / "tasks" / "P06b-vitesse.md"
+    out.write_bytes(speed.report_markdown(measures, meta).encode("utf-8"))
+    summary = speed.summary(measures)
+    lines = [f"Rapport : {out}"] + [
+        f"  {n} : médiane {v['median_s']} s, échecs {v['failures']}, coût {v['cost_usd']} $, gardée : {v['keep']}"
+        for n, v in sorted(summary.items())
+    ]
+    _emit({"summary": summary, "report": str(out), "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
 
 
 def _bridge_addons(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:

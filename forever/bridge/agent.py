@@ -9,6 +9,7 @@ le seul processus que le pont arrête est le sien (et ses enfants, par un objet 
 from __future__ import annotations
 
 import json
+import queue
 import shutil
 import subprocess
 import sys
@@ -63,6 +64,9 @@ class AgentResult:
     # « build » (export), « projected » (chemin du joueur), « closest » (build populaire le plus proche, P06b)
     links: dict[str, str] = field(default_factory=dict)
     calls: list[tuple[str, dict[str, Any]]] = field(default_factory=list, compare=False)  # outil et arguments (P06b)
+    events: list[dict[str, Any]] = field(
+        default_factory=list, compare=False, repr=False
+    )  # flux lu (contrôle des chiffres)
 
 
 def find_claude(which: Callable[[str], str | None] = shutil.which) -> str:
@@ -107,11 +111,14 @@ def claude_argv(
     system_prompt: str,
     session_id: str | None = None,
     model: str | None = None,
+    input_stream: bool = False,
 ) -> list[str]:
-    """Liste d'arguments de `claude` (jamais une chaîne) ; la question n'y figure pas."""
+    """Liste d'arguments de `claude` (jamais une chaîne) ; la question n'y figure pas. `input_stream` (variante C,
+    P06b) : messages lus en JSON sur l'entrée, un processus gardé ouvert entre deux messages."""
     args = [
         claude,
         "-p",
+        *(["--input-format", "stream-json"] if input_stream else []),
         "--output-format",
         "stream-json",
         "--verbose",
@@ -182,6 +189,8 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
     names: dict[str, str] = {}
     provenances: list[dict[str, Any]] = []
     tools: list[str] = []
+    calls: list[tuple[str, dict[str, Any]]] = []
+    events: list[dict[str, Any]] = []
     link: str | None = None
     links: dict[str, str] = {}
     last_text = ""
@@ -197,6 +206,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
             continue
         if not isinstance(event, dict):
             continue
+        events.append(event)
         session_id = event.get("session_id") or session_id
         kind = event.get("type")
         content = (event.get("message") or {}).get("content") if kind in ("assistant", "user") else None
@@ -207,6 +217,8 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
                 if block.get("type") == "tool_use":
                     names[str(block.get("id"))] = str(block.get("name"))
                     tools.append(str(block.get("name")))
+                    args = block.get("input")
+                    calls.append((str(block.get("name")), dict(args) if isinstance(args, dict) else {}))
                 elif block.get("type") == "text":
                     last_text = str(block.get("text", ""))
         elif kind == "user" and isinstance(content, list):
@@ -241,6 +253,8 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
             error="claude s'est arrêté sans résultat",
             tools=tools,
             links=links,
+            calls=calls,
+            events=events,
         )
     denied = [str(d.get("tool_name")) for d in final.get("permission_denials") or [] if isinstance(d, dict)]
     cost = final.get("total_cost_usd")
@@ -257,6 +271,8 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
         tools=tools,
         cost_usd=float(cost) if isinstance(cost, int | float) else None,
         links=links,
+        calls=calls,
+        events=events,
     )
 
 
@@ -366,6 +382,20 @@ class _Job:
             self.handle = None
 
 
+def _spawn(popen: Popen, argv: list[str], cwd: Path, env: Mapping[str, str]) -> Any:
+    """Seul lancement de `claude` du module : liste d'arguments, jamais de shell, entrée et sorties en tubes."""
+    flags = _CREATE_NO_WINDOW if sys.platform == "win32" else 0
+    return popen(
+        argv,
+        cwd=cwd,
+        env=dict(env),
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        creationflags=flags,
+    )
+
+
 def run_claude(
     argv: list[str],
     prompt: str,
@@ -377,17 +407,8 @@ def run_claude(
 ) -> AgentResult:
     """Lance `claude` (liste d'arguments, sans shell), lui passe la question sur l'entrée standard et lit son flux ;
     au-delà de `timeout_s`, arrête le processus et ses enfants et rend une erreur."""
-    flags = _CREATE_NO_WINDOW if sys.platform == "win32" else 0
     started = time.monotonic()
-    proc = popen(
-        argv,
-        cwd=cwd,
-        env=dict(env),
-        stdin=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        creationflags=flags,
-    )
+    proc = _spawn(popen, argv, cwd, env)
     job = _Job(proc)
     out: list[str] = []
     arrivals: list[float] = []
@@ -428,6 +449,12 @@ def run_claude(
         tail = err[0].decode("utf-8", errors="replace").strip()[-300:]
         return replace(result, error=f"{result.error} : {tail}")
     return result
+
+
+def default_system_prompt() -> str:
+    from forever.bridge.prompt import SYSTEM_PROMPT
+
+    return SYSTEM_PROMPT
 
 
 def ask(
@@ -524,8 +551,118 @@ def write_empty_mcp_config(directory: Path) -> Path:
     return path
 
 
-class PersistentSession:
-    """Session `claude` gardée ouverte (variante C, P06b, bloc G)."""
+IDLE_S = 15 * 60.0  # session gardée ouverte arrêtée après ce silence
 
-    def __init__(self, argv: Any, **kwargs: Any) -> None:
-        raise NotImplementedError
+
+class PersistentSession:
+    """Session `claude` gardée ouverte (variante C de P06b, bloc G, sonde 0.3) : un processus lancé avec
+    `--input-format stream-json` ; chaque message est écrit en JSON sur son entrée et lu jusqu'à son événement
+    `result`. Relancé pour une nouvelle conversation, après `idle_s` secondes sans message, quand il s'est arrêté ou
+    après un délai dépassé (arrêté avec ses enfants) ; relancé avec `--resume` quand la session est connue.
+    `argv(resume)` rend la ligne de commande."""
+
+    def __init__(
+        self,
+        argv: Callable[[str | None], list[str]],
+        *,
+        cwd: Path | str,
+        env: Mapping[str, str],
+        popen: Popen = subprocess.Popen,
+        clock: Callable[[], float] = time.monotonic,
+        idle_s: float = IDLE_S,
+        timeout_s: float = DEFAULT_TIMEOUT_S,
+    ) -> None:
+        self.argv = argv
+        self.cwd = Path(cwd)
+        self.env = env
+        self.popen = popen
+        self.clock = clock
+        self.idle_s = idle_s
+        self.timeout_s = timeout_s
+        self.proc: Any = None
+        self.job: _Job | None = None
+        self.lines: queue.Queue[tuple[float, str] | None] = queue.Queue()
+        self.session_id: str | None = None
+        self.last: float | None = None
+        self.cost_total = 0.0
+
+    def _start(self, resume: str | None) -> None:
+        self.proc = _spawn(self.popen, self.argv(resume), self.cwd, self.env)
+        self.job = _Job(self.proc)
+        self.lines = queue.Queue()
+        self.cost_total = 0.0
+        lines, out = self.lines, self.proc.stdout
+
+        def read() -> None:
+            for raw in out:
+                text = raw.decode("utf-8", errors="replace") if isinstance(raw, bytes) else str(raw)
+                lines.put((time.monotonic(), text))
+            lines.put(None)
+
+        threading.Thread(target=read, daemon=True).start()
+
+    def _stop(self) -> None:
+        proc, self.proc = self.proc, None
+        if proc is None:
+            return
+        try:
+            proc.stdin.close()
+        except OSError:
+            pass
+        try:
+            proc.kill()
+            proc.wait(timeout=5)
+        except (OSError, subprocess.TimeoutExpired):
+            pass
+        if self.job is not None:
+            self.job.close()
+            self.job = None
+
+    def close(self) -> None:
+        self._stop()
+
+    def ask(self, prompt: str, *, new: bool = False) -> AgentResult:
+        now = self.clock()
+        if new:
+            self._stop()
+            self.session_id = None
+        elif self.proc is not None and (
+            self.proc.poll() is not None or (self.last is not None and now - self.last > self.idle_s)
+        ):
+            self._stop()
+        if self.proc is None:
+            self._start(None if new else self.session_id)
+        message = {"type": "user", "message": {"role": "user", "content": prompt}}
+        sent = time.monotonic()
+        try:
+            self.proc.stdin.write((json.dumps(message, ensure_ascii=False) + "\n").encode("utf-8"))
+            self.proc.stdin.flush()
+        except OSError as exc:
+            self._stop()
+            return AgentResult(text="", session_id=None, is_error=True, error=f"session arrêtée : {exc}")
+        timed: list[tuple[float, str]] = []
+        deadline = sent + self.timeout_s
+        while True:
+            try:
+                item = self.lines.get(timeout=max(0.0, deadline - time.monotonic()))
+            except queue.Empty:
+                self._stop()
+                return AgentResult(text="", session_id=None, is_error=True,
+                                   error=f"délai dépassé ({self.timeout_s:g} s)")  # fmt: skip
+            if item is None:
+                self._stop()
+                break
+            timed.append(item)
+            try:
+                if json.loads(item[1]).get("type") == "result":
+                    break
+            except (ValueError, AttributeError):
+                continue
+        result = replace(parse_stream([text for _, text in timed]), timings=stream_timings(timed, sent))
+        if result.cost_usd is not None:  # coût cumulé sur le processus : celui du seul tour
+            turn = round(result.cost_usd - self.cost_total, 7)
+            self.cost_total = result.cost_usd
+            result = replace(result, cost_usd=turn)
+        self.session_id = result.session_id or self.session_id
+        self.last = self.clock()
+        return result
