@@ -2758,12 +2758,24 @@ def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
         "pas_un_addon": "pas un addon",
         "non_inventorié": "non inventorié",
         "sauvegarde": "copie de sauvegarde, non lue",
+        "exclu": "connu, exclu",
     }
     for u in report.get("untracked", []):
         lines.append(
             f"  {u['folder']} {u.get('version') or ''} : {labels.get(u['status'], u['status'])}".replace("  :", " :")
             + (f" ({u['action']})" if u.get("action") else "")
+            + (f" : {u['note']}" if u.get("note") else "")
         )
+    own = report.get("own") or []
+    if own:
+        parts = []
+        for g in own:
+            extra = [f"{g['slots']} emplacement(s)"] if g.get("slots") else []
+            extra += [f"{g['probes']} sonde(s)"] if g.get("probes") else []
+            parts.append(
+                f"{g['folder']} {g.get('version') or ''}".strip() + (f" ({', '.join(extra)})" if extra else "")
+            )
+        lines.append(f"  Addons du projet (ignorés) : {', '.join(parts)}")
     payload = {**report, "provenance": provenance}
     _emit(payload, lines, provenance, args.json)
     return EXIT_OK

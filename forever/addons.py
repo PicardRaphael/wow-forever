@@ -50,7 +50,6 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     "LegacyForever": AddonSpec(("LegacyForever",), "lecteur en LG1"),
     "ZoneLevelForever": AddonSpec(("ZoneLevelForever",), "lecteur à venir (décision 133)"),
     "Auctionator": AddonSpec(("Auctionator",), "forever/pipeline/auctionator.py (SavedVariables)"),
-    "ForeverLogger": AddonSpec(("ForeverLogger",), "forever/pipeline/addon_sv.py (SavedVariables)"),
     "ForeverBestiary": AddonSpec(  # CH0 : bêtes, carte communautaire, guide de l'entraînement des familiers
         ("ForeverBestiary",),
         "forever/pipeline/bestiary.py",
@@ -67,6 +66,9 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     ),
     "ForeverCompanion": AddonSpec(("ForeverCompanion",), "inventaire T08d, lecteur à venir"),
     "NaowhForever": AddonSpec(("NaowhForever", "NaowhForever_*"), "lecteur à venir (inventaire proposé en T08d)"),
+    # Décision 227 : module d'AtlasLoot Classic Forever (« AtlasLoot Forever [BiS ToolTip] »), base ClassDataBase de
+    # listes BiS par classe ; source communautaire, au mieux suppose
+    "AtlasBIStooltips": AddonSpec(("AtlasBIStooltips",), "lecteur en T10a (listes BiS de la communauté, suppose)"),
 }
 _VERSION = re.compile(r"^## Version:\s*(.+?)\s*$", re.MULTILINE)
 
@@ -219,8 +221,16 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
         path.parent.mkdir(parents=True, exist_ok=True)
         doc = {"schema_version": SCHEMA_VERSION, "saved_at": format_utc(deps.now()), "addons": state}
         path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
-    untracked = untracked_addons(root) if root is not None and root.is_dir() else []
-    return {"addons_dir": str(root) if root else None, "saved": save, "addons": report, "untracked": untracked}
+    present = root is not None and root.is_dir()
+    untracked = untracked_addons(root) if present and root is not None else []
+    own = own_addons(root) if present and root is not None else []
+    return {
+        "addons_dir": str(root) if root else None,
+        "saved": save,
+        "addons": report,
+        "untracked": untracked,
+        "own": own,
+    }
 
 
 def fingerprint_folder(folder: Path) -> str:
@@ -231,6 +241,30 @@ def fingerprint_folder(folder: Path) -> str:
 # --- T08d, bloc D : addons d'interface, addons non inventoriés, version de contenu, inventaire -----------------
 
 UI_ADDONS: tuple[str, ...] = ("EllesmereUI*", "Leatrix_Maps", "ForeverMapFix")  # notés sans lecture hors du .toc
+
+# Décision 227 : addons du projet et de l'utilisateur, jamais « à inventorier » ni lus comme sources (un seul relevé
+# de version par groupe) ; la réserve d'emplacements et les sondes vont avec ForeverBridge.
+OWN_ADDONS: Mapping[str, tuple[tuple[str, ...], str]] = {
+    "ForeverLogger": (
+        ("ForeverLogger",),
+        "addon du dépôt (addon/), SavedVariables lues par forever/pipeline/addon_sv.py",
+    ),
+    "ForeverBridge": (("ForeverBridge",), "pont de P06a, installé par forever bridge install"),
+    "RaphCompletionist": (
+        ("RaphCompletionist",),
+        "addon de l'utilisateur, dossier de la conversation « addons » prévue en P06b",
+    ),
+}
+BRIDGE_SLOTS = "ForeverBridge_S[0-9][0-9][0-9]"  # réserve d'emplacements (forever/bridge/slots.py)
+BRIDGE_PROBES = "ForeverBridge_Probe*"  # sondes (forever/bridge/install.py)
+# Addons connus et exclus des données du projet : signalés comme tels, jamais « à inventorier ».
+EXCLUDED_ADDONS: Mapping[str, str] = {
+    "RXPGuides": "RestedXP : guides payants, licence non commerciale, exclu des données du projet (décision 227)",
+}
+# Dossiers qui ne sont pas des addons, jamais lus comme tels, même avec un .toc.
+NOT_ADDONS: Mapping[str, str] = {
+    "ForeverCompletionist": "projet de développement de l'utilisateur (outil d'inventaire), à déplacer hors des addons",
+}
 
 
 CONTENT_VERSIONS = ("TalentsForeverBook", "ForeverCompanion")
@@ -293,7 +327,16 @@ def untracked_addons(addons_dir: Path) -> list[dict[str, Any]]:
     tracked = tuple(p for spec in DATA_ADDONS.values() for p in spec.folders)
     out: list[dict[str, Any]] = []
     for folder in sorted(p for p in addons_dir.iterdir() if p.is_dir() and not p.name.startswith(".")):
-        if _matches(folder.name, tracked):
+        if _matches(folder.name, tracked) or _own(folder.name) is not None:
+            continue
+        if folder.name in NOT_ADDONS:
+            out.append(
+                {"folder": folder.name, "status": "pas_un_addon", "version": None, "note": NOT_ADDONS[folder.name]}
+            )
+            continue
+        if folder.name in EXCLUDED_ADDONS:
+            note = EXCLUDED_ADDONS[folder.name]
+            out.append({"folder": folder.name, "status": "exclu", "version": _version(folder), "note": note})
             continue
         if ".bak" in folder.name.lower():  # copie de sauvegarde d'un addon (ForeverLogger.bak-<date>) : jamais lue
             out.append({"folder": folder.name, "status": "sauvegarde", "version": None})
@@ -312,6 +355,30 @@ def untracked_addons(addons_dir: Path) -> list[dict[str, Any]]:
                 }
             )
     return out
+
+
+def _own(name: str) -> str | None:
+    """Groupe de l'addon du projet auquel appartient le dossier (`ForeverBridge` pour un emplacement ou une sonde)."""
+    if _matches(name, (BRIDGE_SLOTS, BRIDGE_PROBES)):
+        return "ForeverBridge"
+    return next((group for group, (folders, _) in OWN_ADDONS.items() if _matches(name, folders)), None)
+
+
+def own_addons(addons_dir: Path) -> list[dict[str, Any]]:
+    """Addons du projet présents, un par groupe : version du `.toc` principal, emplacements et sondes du pont."""
+    groups: dict[str, dict[str, Any]] = {}
+    for folder in sorted(p for p in addons_dir.iterdir() if p.is_dir() and not p.name.startswith(".")):
+        group = _own(folder.name)
+        if group is None:
+            continue
+        entry = groups.setdefault(group, {"folder": group, "version": None, "note": OWN_ADDONS[group][1]})
+        if folder.name == group:
+            entry["version"] = _version(folder)
+        elif _matches(folder.name, (BRIDGE_SLOTS,)):
+            entry["slots"] = entry.get("slots", 0) + 1
+        elif _matches(folder.name, (BRIDGE_PROBES,)):
+            entry["probes"] = entry.get("probes", 0) + 1
+    return [groups[g] for g in sorted(groups)]
 
 
 def _toc(folder: Path) -> dict[str, str]:
