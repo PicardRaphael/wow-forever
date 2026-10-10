@@ -62,5 +62,5 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 
 ## Hors de ce skill
 - Temps par monstre, XP/h, zone à mon niveau : skill `forever-leveling`.
-- Autres classes : section « Classe pas encore calculée » du routeur (tranches de classe PA1 à DR1).
+- Autres classes : section « Classe pas encore calculée » du routeur (tranches de classe CM1, CH1, DE1, PA1, GU1, VO1, PR1, DR1).
 - Équipement (T10), consommables (T11) : « je ne sais pas » + tranche.

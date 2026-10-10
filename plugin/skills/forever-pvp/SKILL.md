@@ -45,7 +45,7 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 - Aucun suivi en direct des recharges adverses dans un addon sur Forever : le journal de combat est refusé aux
   addons et les valeurs de combat y sont secrètes (`docs/research/addon-forever.md`). Seules des fiches fixes,
   consultées hors combat ou affichées en jeu par l'addon (tranche FA1p).
-- Pas de dégâts ni de soins des autres classes (tranches de classe PA1 à DR1), pas de simulation de duel, pas de
+- Pas de dégâts ni de soins des autres classes (tranches de classe CM1, CH1, DE1, PA1, GU1, VO1, PR1, DR1), pas de simulation de duel, pas de
   mesure des rendements décroissants dans mes journaux (PV2), pas d'analyse de mes combats (AN1).
 
 ## Hors de ce skill

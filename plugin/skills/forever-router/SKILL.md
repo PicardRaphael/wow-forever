@@ -87,8 +87,9 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Consommables et préparation de raid | T11 |
 | Analyse de mes combats PvP (contrôles, recharges, morts, cibles) | AN1 |
 | Analyse de mes combats PvE (rotation réelle, écarts, perte chiffrée) | AN2 |
-| Paladin, Démoniste, Prêtre, Chaman, Guerrier, Voleur, Druide : dégâts, rotations, leveling | PA1, DE1, PR1, CM1, GU1, VO1, DR1 |
+| Chaman : dégâts, rotations, leveling (première tranche de classe) | CM1 |
 | Chasseur : dégâts, rotations, leveling, choix du familier par contexte (le savoir des familiers est couvert) | CH1 |
+| Démoniste, Paladin, Guerrier, Voleur, Prêtre, Druide : dégâts, rotations, leveling (dans cet ordre) | DE1, PA1, GU1, VO1, PR1, DR1 |
 
 Pour ces domaines : dis « je ne sais pas » (ou « le projet ne couvre pas encore … »), cite la tranche de
 `docs/ROADMAP.md`, et propose ce qui existe déjà (par exemple le niveau d'un donjon). Ne complète pas avec des

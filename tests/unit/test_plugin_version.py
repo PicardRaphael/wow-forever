@@ -40,7 +40,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.8.4 : cas des boutons Talents et Leveling régénérés (égalité avec le build retenu, build actuel gardé, décision 217).
     # 0.8.5 : cas des boutons régénérés (build actuel retenu par le départage final au Monte Carlo, décision 219).
     # 0.8.6 : cas des boutons régénérés (chemin depuis le build actuel, respec contre le chemin libre, décision 220).
-    assert version == "0.8.6"
+    # 0.8.7 : tranches de classe dans l'ordre de la décision 232 (CM1, CH1, DE1, PA1, GU1, VO1, PR1, DR1).
+    assert version == "0.8.7"
 
 
 def test_fingerprint_is_up_to_date():
