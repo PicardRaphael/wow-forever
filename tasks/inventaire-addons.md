@@ -733,7 +733,7 @@ copies `ForeverLogger.bak-*` du 2026-10-02 ont quitté le dossier des addons pou
 | Tamed | 2.0.1 (2026-10-05) | 16001 dans le `.toc` commun | **tables Forever vides** ; 302 bêtes et 13 capacités de Vanilla chargées sans garde de version | `generate.py` (base non installée) | MIT | **exclu** : pas pour Forever |
 | Simulationcraft | 12.1.5-alpha-01 (retail) | 16001 dans le `.toc` retail | aucune pour Forever ; `/simc` exporte la fiche du personnage (talents par la chaîne native du client, équipement, statistiques, compétences, buffs) | — | Unlicense | interface seule |
 | ExtendedVendorForever | 1.4 | 16001 (« checked against Blizzard UI build 70009 ») | **pas de catalogue de vendeurs** ; journal des achats et ventes du joueur dans `ExtendedVendorForeverDB` | — | aucune | interface seule |
-| AlexAtlasLoot | 1.5.0 | `.toc` et `_Camelot.toc` 16001 | butin de donjons et raids de Forever relevé par les joueurs (`LootDB.lua`, `Finds.lua`), sorts de boss, factions | joueurs | tous droits réservés, **copie des tables dans une base de données interdite** | **exclu** jusqu'à ta décision |
+| AlexAtlasLoot | 1.5.0 | `.toc` et `_Camelot.toc` 16001 | butin de donjons et raids de Forever relevé par les joueurs (`LootDB.lua`, `Finds.lua`), sorts de boss, factions | joueurs | tous droits réservés, **copie des tables dans une base de données interdite** | **exclu**, jamais lu (décision 229) |
 | AppelSwingsForever | 1.6.2 | 16001 | — (minuteurs d'attaque) | — | aucune | interface seule |
 | BetterForeverChat | 0.13.1 | 16001 | — (discussion) | — | GPL-3.0-or-later | interface seule |
 | DeleteCheapestItem | v1.2.1 | 16001 | — (vente ou destruction des piles les moins chères) | — | All Rights Reserved | interface seule |
@@ -745,6 +745,8 @@ copies `ForeverLogger.bak-*` du 2026-10-02 ont quitté le dossier des addons pou
 - **FojjiCore ne se charge probablement pas ici** : `FojjiCore_Camelot.toc` exige `ForeverAuras` (`RequiredDeps`) et
   `Forever/Backend.lua` vérifie sa présence ; ni ForeverAuras ni WeakAuras n'est installé. Les cinq modules
   dépendent du cœur. Aucun `FojjiCoreDB` dans `WTF` (fichiers installés le jour même : jeu peut-être pas relancé).
+  **Décision de l'utilisateur du 2026-10-10 (décision 229)** : FojjiCore reste lu en local comme source, sans
+  installer ForeverAuras (la lecture des fichiers ne demande pas que l'addon se charge en jeu).
 - **ZoneInfoForever est ZoneLevelForever renommé** : texte d'accueil « Formerly Zone Level », version suivante (1.7 →
   1.7.1), mêmes deux fichiers Lua (`Locales.lua` de même taille), même table de zones avec herbes et mines en plus ;
   SavedVariable renommée (`ZoneInfoForeverDB`). L'auteur de l'ancien nom n'était pas consigné : non comparé.
@@ -761,8 +763,8 @@ copies `ForeverLogger.bak-*` du 2026-10-02 ont quitté le dossier des addons pou
   s'active probablement jamais. Le projet a déjà `pets.json` (lu au client) et Forever Bestiary.
 - **AlexAtlasLoot** : sa licence interdit de copier ses tables de butin ou sa sonde « into another addon, a website,
   a database, a spreadsheet ». La décision 133 permet la lecture locale de tout addon et ne fait entrer que des
-  agrégats dans le dépôt ; rester dans cette règle face à cette licence est à trancher par toi. En attendant, il est
-  connu et exclu (jamais lu), son contenu n'a pas été compté.
+  agrégats dans le dépôt. **Décision de l'utilisateur du 2026-10-10 (décision 229)** : il reste exclu et n'est
+  jamais lu ; son contenu n'a pas été compté.
 - **ForeverMove** affirme dans `Setup/ForeverData-setup.sh` que la bêta écrit les SavedVariables sur le disque sans
   les relire au lancement : affirmation de l'auteur, contredite chez nous par le journal du pont du 2026-10-09
   (`ForeverBridgeDB` relue : même session et numéros de message qui se suivent sur trois lancements du jeu).

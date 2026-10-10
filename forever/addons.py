@@ -74,7 +74,8 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     # wago.tools et CMaNGOS pour les deux addons de cjber
     "FojjiCore": AddonSpec(
         ("FojjiCore", "FojjiCore_*"),
-        "lecteur à venir (DungeonJournal, SpellRanks : recoupement, au mieux suppose)",
+        "lecteur à venir (DungeonJournal, SpellRanks : recoupement, au mieux suppose ; lu en local sans ForeverAuras, "
+        "décision 229)",
     ),
     "ShortestPathForever": AddonSpec(("ShortestPathForever",), "lecteur à venir (trajets et transports, suppose)"),
     "SkillUpForever": AddonSpec(("SkillUpForever",), "lecteur à venir (paliers des métiers, recoupement du client)"),
@@ -284,7 +285,7 @@ EXCLUDED_ADDONS: Mapping[str, str] = {
     "Tamed": "données de Classic seulement (tables de Forever vides), pas pour Forever (décision 228)",
     "AlexAtlasLoot": (
         "butin de Forever relevé par les joueurs, mais sa licence interdit d'en copier les tables dans une base de "
-        "données : exclu jusqu'à la décision de l'utilisateur (décision 228)"
+        "données : exclu et jamais lu (décision 229)"
     ),
 }
 # Dossiers qui ne sont pas des addons, jamais lus comme tels, même avec un .toc.
