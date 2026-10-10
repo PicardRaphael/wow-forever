@@ -123,7 +123,9 @@ appuyés sur une vraie simulation, restent dans SIM1.
   en P06a).
 
 ### Calendrier des relevés, sur les durées réelles du journal (9 réponses du 2026-10-09 et du 2026-10-10)
-Durées de réponse relevées : 23,4 · 14,8 · 31,0 · 15,5 · 14,3 · 29,6 · 18,5 · 19,2 · 9,5 s.
+Durées de réponse relevées (`reply.seconds`, comptées depuis le lancement de l'agent, pas depuis l'envoi en jeu :
+environ une demi-seconde de moins que le bout en bout) : 23,4 · 14,8 · 31,0 · 15,5 · 14,3 · 29,6 · 18,5 · 19,2 ·
+9,5 s.
 
 | Calendrier | Attente moyenne après la réponse prête | Pire attente | Relevés moyens (emplacements) |
 | --- | --- | --- | --- |
@@ -164,9 +166,10 @@ premier relevé à 2 s retire aussi la bande une seconde plus tôt.
    - l'infobulle est lue par `C_TooltipInfo.GetHyperlink`, sous `pcall` et `issecretvalue`, avec au plus 8 liens
      par message, 30 lignes et 120 caractères par ligne.
 5. **Actions du jeu sans le modèle** : drapeau `a=<action>` intercepté par le pont **avant la file**. Le pont répond
-   lui-même ; l'agent n'est jamais appelé.
-   - Actions fermées : `update`, `approve:<id>`, `reject:<id>`, `explain:<id>`, `profile_apply:<id>`,
-     `profile_dismiss:<id>`.
+   lui-même ; l'agent n'est **jamais** appelé pour un `a=`, sans exception.
+   - Actions fermées : `update`, `approve:<id>`, `reject:<id>`, `profile_apply:<id>`, `profile_dismiss:<id>`.
+   - Sous `FOREVER_OFFLINE`, `a=update` est refusé (« mise à jour impossible hors ligne »), comme le lancement à la
+     fermeture du jeu (`UpdateOnClose`).
    - L'identifiant venu de la bande est **apparié exactement** à une entrée connue (attente approuvable de
      `list_pending`, proposition de profil du pont). Il n'est jamais passé tel quel à une commande.
    - Commandes fixées lancées par `spawn_detached` :
@@ -185,8 +188,9 @@ premier relevé à 2 s retire aussi la bande une seconde plus tôt.
      - `network` : « attente réseau : se lève seule au prochain passage réussi » ;
      - `hotfixes_unread` : « correctifs du serveur à lire jusqu'au <date> » ;
      - `bloqué`, `column_names`, `addon_data` et `network_dbd` : « à traiter sur le PC : <commande> ».
-   - Valider et Refuser seulement pour une attente approuvable à l'état `en_attente`. « Expliquer » sur toutes : il
-     envoie le texte de la carte à la conversation « jeu » (question fixe « Explique cette mise à jour en attente,
+   - Valider et Refuser seulement pour une attente approuvable à l'état `en_attente`. « Expliquer » sur toutes : c'est une
+     question de bouton (`b=explain`, pas une action), passée par la file comme les autres, qui envoie le texte de
+     la carte à la conversation « jeu » (question fixe « Explique cette mise à jour en attente,
      simplement »).
    - Les propositions de profil (choix 9) utilisent les mêmes cartes, avec « Mettre à jour le profil » et « Ignorer ».
 7. **Bouton « Mettre à jour » et état des données** :
@@ -437,7 +441,7 @@ def parse_links(value: str) -> list[GameLink]: ...            # GameLink(kind, b
 def parse_gear(value: str) -> tuple[list[GearPiece], list[Defect]]: ...  # nouvelle et ancienne forme
 
 # forever/bridge/actions.py
-ACTIONS = ("update", "approve", "reject", "explain", "profile_apply", "profile_dismiss")
+ACTIONS = ("update", "approve", "reject", "profile_apply", "profile_dismiss")
 def parse_action(flag: str) -> tuple[str, str | None] | None: ...
 def approvable(entry: Mapping[str, Any]) -> bool: ...
 def update_argv(kind: str, pending_id: str | None = None) -> list[str]: ...
@@ -537,9 +541,10 @@ d'écrire le test (script hors du dépôt, `repr()`), jamais écrites de mémoir
   - `a=approve:network-1.60.1.70338` → refus « attente non approuvable », aucune commande ;
   - `a=approve:../x`, `a=approve:inconnu` et `a=reject:<id d'une attente faite>` → refus, aucune commande ;
   - `a=reject:<id>` → `[…, "reject", <id>, "--reason", "refusé en jeu", "--json"]` ;
-  - `a=explain:<id>` → **un** appel de l'agent dont le message contient le texte de la carte ;
-  - `a=autre` → refus.
-  - L'agent n'est jamais appelé pour `update`, `approve`, `reject`, `profile_*`.
+  - `a=explain:<id>` et `a=autre` → refus, aucune commande, aucun agent ;
+  - `FOREVER_OFFLINE=1` et `a=update` → refus, aucune commande ;
+  - `b=explain` avec le texte d'une carte → **un** appel de l'agent dont le message contient ce texte.
+  - L'agent n'est jamais appelé pour un `a=`.
 - **Fin de passage** : `last.json` réécrit avec un nouveau `finished_at` et verrou absent → publication aussitôt
   (sans attendre 10 min), `update.last` dans le statut.
 - **`k=simc`** : export construit en trois parties → aucune conversation, réponse « export lu » avec les écarts,
@@ -673,7 +678,7 @@ d'écrire le test (script hors du dépôt, `repr()`), jamais écrites de mémoir
    - un clic sur Valider montre « Confirmer », un second clic dans les 5 s envoie `a=approve:<id>`, un second clic
      après 6 s n'envoie rien ;
    - carte sans bouton Valider pour une attente non approuvable ;
-   - « Expliquer » envoie `a=explain:<id>`.
+   - « Expliquer » envoie la question fixe avec `b=explain` et le texte de la carte.
 9. Bouton « Mettre à jour » → message `a=update` sans texte ; ligne « Mise à jour terminée » écrite une seule fois par
    `finished_at`.
 10. Onglets : l'onglet « Addons » est absent sans configuration publiée et présent avec. Les historiques sont séparés.
@@ -685,6 +690,23 @@ d'écrire le test (script hors du dépôt, `repr()`), jamais écrites de mémoir
 - `check_addon(addon/ForeverBridge) == []` avec les accroches `hooksecurefunc`. Cas négatif : remplacer
   `ChatEdit_InsertLink` par une affectation (`ChatEdit_InsertLink = …`) → « fonction de Blizzard remplacée (utiliser
   hooksecurefunc) ».
+
+### Tests existants de P06a modifiés (raison)
+Ces tests changent dans les commits « tests » des blocs concernés, chaque fois avec la raison dans le message de
+commit, comme les tests remplacés de P06a :
+- `test_bridge_buttons.py` : « Mettre à jour » était absent ; il devient visible (T08d, T08e, P06b faites), avec
+  `action = "update"`.
+- `test_bridge_addon_lua.py`, cas 10 : calendrier 3, 7, 11, …, 190 remplacé par 2, 4, 8, …, 60, 70, …, 190 (choix 14).
+  Cas 11 : l'allègement retirait `gear` puis `talents` ; ils ne sont plus jamais retirés et le message part en parties
+  (choix 1 et 2, décision 224).
+- `test_bridge_send_lua.py` et `test_bridge_record.py` : « un message type tient dans `MAX_PAYLOAD` » (une bande,
+  `slot:id:nom`) devient « deux parties au plus », avec la forme `slot=chaîne=nom` ; saisie de 255 à 1 000 caractères.
+- `test_bridge_status.py` : la ligne « n mise(s) à jour à valider sur le PC » devient la ligne du choix 7 (client
+  toujours affiché, seules les attentes approuvables comptées « à valider »).
+- `test_bridge_context.py` et `test_bridge_context_check.py` : le défaut « emplacement:identifiant:nom attendu »
+  accepte les deux formes de `gear`.
+- `test_bridge_loop.py` : l'événement `message` gagne `context` ; les autres assertions du journal tiennent.
+- `test_bridge_bench.py` : consigne du bouton Talents hors Mage (`tf_popular` avec `current`, lien `closest`).
 
 ### Registre
 **Aucune entrée** : aucune mécanique de jeu n'est ajoutée ni modifiée. La fiche de l'export est rangée au profil, pas
