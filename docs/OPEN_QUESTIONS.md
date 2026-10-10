@@ -355,6 +355,17 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   jusqu'au redémarrage) ; dépôt sans licence, polices TrueType à générer sans dépendance. Test : sonde dédiée en
   P06b. Priorité : basse.
 
+- **BR5 — Quelle fonction appelle un Maj+clic sur Forever (sacs, livre des sorts, journal des quêtes) quand une zone
+  de saisie d'addon a le focus ?** ForeverBridge accroche `ChatFrameUtil.InsertLink` et `ChatEdit_InsertLink` (celles
+  qui existent, `hooksecurefunc`). Test : sonde en jeu G de P06b (Maj+clic d'un objet, d'un sort, d'une quête).
+  Repli : Ctrl+V d'un lien. Priorité : haute (avant le 2026-10-14).
+- **BR6 — L'export SimulationCraft omet-il vraiment l'emplacement à distance (18) sur Forever ?** Lu dans le code de
+  l'addon (12.1.5-alpha-01 : `slotNames` sans `RangedSlot`), pas encore vu dans un export réel. La chaîne `talents=`
+  n'est pas décodée (décision 235). Test : premier export collé à la sonde G. Priorité : moyenne.
+- **BR7 — Combien de tours de carrousel faut-il pour un export de 9 parties à une case par pixel ?** Une capture faite
+  pendant le changement de partie est rejetée par la somme de contrôle de la bande. Test : sonde G (journal du pont,
+  événements `parts`). Priorité : moyenne.
+
 ## Legacy et API
 - **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?**
   *Modifiée le 2026-10-09* : la note du 08/10 (t/2360696/5, révision 1) accorde à tous les joueurs de la bêta le défi

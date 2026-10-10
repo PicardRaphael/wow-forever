@@ -42,6 +42,21 @@ appuyés sur une vraie simulation, restent dans SIM1.
 4. **Mesure des accélérations** : accord pour environ 48 conversations `claude` (6 questions × 4 variantes × 2
    passages, environ 2 à 5 $), à l'exécution.
 
+## Réponses de l'utilisateur au lancement de l'exécution (2026-10-10, décision 235)
+1. **Choix 16 refusé** : pas d'accès au code de l'interface de Blizzard (`Gethe/wow-ui-source`). La chaîne
+   `talents=` de l'export est gardée brute et ignorée ; les talents du contexte du jeu font foi.
+2. **Choix 17 accepté** : deux ou trois conversations de sécurité (sonde 0.2) en plus des 48 de la mesure ; elles
+   vérifient qu'une écriture hors du dossier de RaphCompletionist est refusée.
+3. **Export par collage seulement**, jamais par un fichier : en jeu, `/simc`, copie, collage dans la fenêtre du chat,
+   envoi. Développement sur des exports construits à la main ; le premier export réel arrive par ce collage pendant
+   la sonde G. Le pont le garde dans son journal **anonymisé** (nom et royaume remplacés sur l'en-tête, la ligne de la
+   classe et `server=` ; somme de contrôle vérifiée sur le texte reçu, puis recalculée sur le texte anonymisé) ;
+   `forever bridge contexts export` l'écrit en fixture. **L'étape 0.4 disparaît** : la réception (`k=simc`, réponse
+   « export reçu », sans le modèle) passe au bloc A, la lecture reste au bloc D.
+4. Calendrier : sonde G avant le 2026-10-14, sonde H avant le 2026-10-19 ; arrêt de l'exécution au jalon de la sonde
+   G avec sa procédure exacte. Les sondes 0.2 et 0.3 (`claude`) passent au début des blocs F et G, seuls à s'en
+   servir.
+
 ## Constat du plan
 
 ### RaphCompletionist et ForeverCompletionist (lu sur disque le 2026-10-10)
