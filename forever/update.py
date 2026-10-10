@@ -31,6 +31,7 @@ import json
 import os
 import re
 import shutil
+import time
 from collections.abc import Callable, Mapping, Sequence
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -52,9 +53,11 @@ from forever.engine_inputs import (
     EngineDeclarationError,
     InputsDiff,
     ValueChange,
+    cases_to_replay,
     compare_inputs,
     hotfix_losses,
     metadata_keys,
+    monster_contexts,
     targeted_replay,
 )
 from forever.errors import (
@@ -865,7 +868,6 @@ def _evaluate(
     replayed: dict[str, Any] = {}
     replay_error = None
     if run.replay is not None and any(not d.identical for d in inputs.values()):
-        replay = run.replay
         after_data = _replay_after_data(run, stage, candidate, install_ok, plan)
         if after_data is None:
             replayed = {"rejoué": False, "raison": "aperçu de la version candidate impossible : rejeu non fait"}
@@ -876,9 +878,7 @@ def _evaluate(
                 replay_error = exc.message
                 replayed = {"rejoué": False, "raison": exc.message}
             else:
-                replayed = targeted_replay(
-                    inputs, lambda e, c: {"avant": replay(e, c, run.base_data), "après": replay(e, c, after_data)}
-                )
+                replayed = _replay_sides(run, inputs, run.base_data, after_data, version)
     losses = [] if hotfixes_read else hotfix_losses(base_vdir, after)
     verdict = decide(bool(verify["ok"]), carry, inputs, kind, install_ok=install_ok, hotfix_losses=losses)
     lines = _copied(base_vdir, after, inputs)
@@ -1289,41 +1289,62 @@ def _engine_files() -> set[str]:
     return files
 
 
-def _default_replay(deps: Deps, *, listing: bool = False) -> Replay:
-    """Rejeu ciblé de production : les cas des builds du Mage passent par `scripts/replay_builds.py` (`run_cases`,
-    passages `update-<version>-<empreinte>` dans `<cache>/builds/`, `replay_label`) ; les autres cas (simulation de leveling, fiche
-    PvP) ne sont pas rejoués automatiquement et le disent. `listing` (simulation) : les cas sont nommés sans être
-    calculés (Monte Carlo de plusieurs minutes par cas)."""
-    import importlib.util
+class _ProductionReplay:
+    """Rejeu ciblé de production (décision 230) : les cas des builds du Mage passent par `forever/replay.py` (cache
+    `<cache>/builds/update-<version>-<empreinte>/`, `replay_label`, par code du calcul ; cas répartis sur les cœurs par
+    `prefetch`) ; les autres cas (simulation de leveling, fiche PvP) ne sont pas rejoués automatiquement et le disent.
+    `listing` (simulation) : les cas sont nommés sans être calculés."""
 
-    loaded: list[Any] = []
+    def __init__(self, deps: Deps, listing: bool) -> None:
+        self.deps, self.listing = deps, listing
+        self.log: Progress | None = None
 
-    def module() -> Any:
-        if not loaded:
-            spec = importlib.util.spec_from_file_location("replay_builds", REPO_ROOT / "scripts" / "replay_builds.py")
-            if spec is None or spec.loader is None:
-                raise OSError("scripts/replay_builds.py introuvable")
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)
-            loaded.append(mod)
-        return loaded[0]
+    def prefetch(self, jobs: Sequence[tuple[str, str, Path]]) -> int:
+        """Calcule d'un coup (en parallèle) les cas des builds du Mage de `jobs` (moteur, cas, données) absents du
+        cache ; rend le nombre de cas demandés."""
+        if self.listing:
+            return 0
+        from forever.replay import replay_cases
 
-    def replay(engine: str, case: str, data_dir: Path) -> Any:
-        if listing:
+        cases = [(case, data_dir) for engine, case, data_dir in jobs if engine == "mage_build"]
+        if cases:
+            replay_cases(cases, self.deps.cache_dir, log=self.log)
+        return len(cases)
+
+    def __call__(self, engine: str, case: str, data_dir: Path) -> Any:
+        if self.listing:
             return {"rejoué": False, "raison": "simulation : cas à rejouer, non calculé"}
         if engine != "mage_build":
-            return {"rejoué": False, "raison": "cas sans rejeu automatique (replay_builds : builds du Mage seulement)"}
-        rep = module().run_cases(replay_label(data_dir), [case], data_dir=data_dir, cache_dir=deps.cache_dir)[case][
-            "report"
-        ]
-        alternative = rep.get("alternative") or {}
-        return {
-            "talents": rep.get("talents"),
-            "choices": rep.get("choices"),
-            "alternative": {k: alternative.get(k) for k in ("better", "decided_by", "diff")},
-        }
+            return {"rejoué": False, "raison": "cas sans rejeu automatique (builds du Mage seulement)"}
+        from forever.replay import replay_cases
 
-    return replay
+        return replay_cases([(case, data_dir)], self.deps.cache_dir, log=self.log)[case, data_dir]["advice"]
+
+
+def _default_replay(deps: Deps, *, listing: bool = False) -> _ProductionReplay:
+    return _ProductionReplay(deps, listing)
+
+
+def _replay_sides(run: _Run, inputs: Mapping[str, InputsDiff], before: Path, after: Path, version: str) -> Any:
+    """Rejeu des cas touchés, « avant » sur `before` et « après » sur `after` (dossiers des données) : seulement les
+    cas concernés par ce qui change (`monster_contexts` des deux côtés), calculés d'un coup en parallèle quand le
+    rejeu le permet (`prefetch`), durée notée au journal du passage (décision 230)."""
+    replay = run.replay
+    assert replay is not None
+    installed = _installed(before) or version
+    scope = monster_contexts(before / installed) | monster_contexts(after / version)
+    cases = cases_to_replay(inputs, monster_scope=scope)
+    start = time.monotonic()
+    prefetch = getattr(replay, "prefetch", None)
+    if callable(prefetch):
+        if hasattr(replay, "log"):
+            replay.log = run.say
+        prefetch([(e, c, side) for e, c in cases for side in (before, after)])
+    out = targeted_replay(
+        inputs, lambda e, c: {"avant": replay(e, c, before), "après": replay(e, c, after)}, monster_scope=scope
+    )
+    run.say(f"rejeu : {len(cases)} cas comparés en {time.monotonic() - start:.0f} s")
+    return out
 
 
 def _default_measure(deps: Deps, data_dir: Path, logs: Sequence[Path]) -> Mapping[str, Any]:
@@ -1471,13 +1492,10 @@ def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[
     if preview is None or run.replay is None:
         return {"replayed": False, "base": base, "reason": "aperçu des données mesurées absent : rejeu non fait"}
     after = Path(preview)
-    replay = run.replay
     try:
         check_replay_sides(run.base_data, after)
         inputs = compare_inputs(run.base_data / installed, after / installed)
-        replayed = targeted_replay(
-            inputs, lambda e, c: {"avant": replay(e, c, run.base_data), "après": replay(e, c, after)}
-        )
+        replayed = _replay_sides(run, inputs, run.base_data, after, installed)
     except SameDataReplayError as exc:
         return {"replayed": False, "base": base, "reason": exc.message}
     except Exception as exc:  # noqa: BLE001 : un rejeu en échec ne doit pas perdre l'attente de mesure

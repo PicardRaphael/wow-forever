@@ -401,21 +401,64 @@ def compare_inputs(before: Path, after: Path) -> dict[str, InputsDiff]:
     return out
 
 
-def cases_to_replay(diffs: Mapping[str, InputsDiff]) -> list[tuple[str, str]]:
-    """(moteur, cas) à rejouer : seulement les moteurs dont une entrée change (un moteur qui recopie n'a pas de
-    cas)."""
+MONSTERS_FILE = "monsters.json"
+# Décision 230 : contextes qui lisent toujours les PV des monstres (simulation et build du leveling) ; ceux de fin de
+# partie s'y ajoutent selon leurs scénarios (`monster_contexts`).
+LEVELING_CONTEXTS = frozenset({"leveling", "sim-leveling"})
+
+
+def case_context(case: str) -> str:
+    """Contexte d'un cas de rejeu : « leveling-20 » → « leveling », « pvp-bg-40 » → « pvp-bg »."""
+    return case.rsplit("-", 1)[0]
+
+
+def monster_contexts(version_dir: Path) -> frozenset[str]:
+    """Contextes dont le conseil lit les PV des monstres (`monsters.json`), tirés des données de la version : le
+    leveling, et chaque contexte de fin de partie dont un scénario n'est pas un boss (`build.scenarios`, `hp` autre que
+    `boss` : PV du monstre normal du niveau, `forever/engine/encounter.py`). Un fichier illisible : aucun contexte de
+    fin de partie retiré (tous gardés, prudence)."""
+    try:
+        values = json.loads((version_dir / "mechanics.json").read_text(encoding="utf-8"))["values"]
+        scenarios = values["build.scenarios"]["value"]
+        contexts = values["build.contexts"]["value"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return frozenset({"*"})
+    mob = {name for name, sc in scenarios.items() if isinstance(sc, Mapping) and sc.get("hp") != "boss"}
+    return LEVELING_CONTEXTS | {ctx for ctx, names in contexts.items() if set(names) & mob}
+
+
+def _scoped(diff: InputsDiff, cases: Sequence[str], monster_scope: frozenset[str] | None) -> list[str]:
+    """Cas d'un moteur touché : tous, sauf si seule la table des monstres change et que la portée est connue ; alors
+    ceux des contextes de `monster_scope` (décision 230)."""
+    changed = {i["file"] for i in diff.items if i["status"] == "différent"}
+    if monster_scope is None or "*" in monster_scope or changed != {MONSTERS_FILE}:
+        return list(cases)
+    return [c for c in cases if case_context(c) in monster_scope]
+
+
+def cases_to_replay(
+    diffs: Mapping[str, InputsDiff], *, monster_scope: frozenset[str] | None = None
+) -> list[tuple[str, str]]:
+    """(moteur, cas) à rejouer : seulement les moteurs dont une entrée change (un moteur qui recopie n'a pas de cas) ;
+    avec `monster_scope` (`monster_contexts` des deux côtés), un changement de la seule table des monstres ne rejoue
+    que les cas qui la lisent."""
     return [
         (name, case)
         for name, spec in ENGINES.items()
         if name in diffs and not diffs[name].identical
-        for case in spec.cases
+        for case in _scoped(diffs[name], spec.cases, monster_scope)
     ]
 
 
-def targeted_replay(diffs: Mapping[str, InputsDiff], replay: Callable[[str, str], Any]) -> dict[str, dict[str, Any]]:
+def targeted_replay(
+    diffs: Mapping[str, InputsDiff],
+    replay: Callable[[str, str], Any],
+    *,
+    monster_scope: frozenset[str] | None = None,
+) -> dict[str, dict[str, Any]]:
     """Rejoue les seuls cas des moteurs touchés par `replay(moteur, cas)` ; rend {moteur: {cas: résultat}}."""
     out: dict[str, dict[str, Any]] = {}
-    for engine, case in cases_to_replay(diffs):
+    for engine, case in cases_to_replay(diffs, monster_scope=monster_scope):
         out.setdefault(engine, {})[case] = replay(engine, case)
     return out
 

@@ -28,6 +28,21 @@ from forever.sim.leveling_mc import AB_DUMPS, ROTATIONS, McStats, arcane_plan, m
 # dans la présélection, poids de l'anticipation dans le tri du faisceau.
 NOW_WEIGHT, LOOK_WEIGHT, BEAM_LOOK_WEIGHT = 0.5, 0.5, 0.25
 SECONDS_PER_HOUR = 3600.0
+# Décision 230 : processus pour les départs indépendants de `leveling_paths` (1 : séquentiel, défaut) ; seul le rejeu
+# de `forever update` en demande plusieurs (`forever/replay.py`). Chaque départ a sa graine : mêmes chemins.
+_beam_workers = 1
+
+
+def set_beam_workers(count: int) -> None:
+    """Nombre de processus pour les départs de `leveling_paths` (au moins 1)."""
+    global _beam_workers
+    _beam_workers = max(1, int(count))
+
+
+def beam_workers() -> int:
+    return _beam_workers
+
+
 SEED_ROTATIONS = ("frost", "fire")
 
 
@@ -413,7 +428,14 @@ def leveling_paths(gd: GameData, race: str, lfrom: int, lto: int, **common: Any)
 
     Registre : I5"""
     focuses: list[str | None] = [None] if common.get("rules", "forever") == "seed" else [None, *gd.trees]
-    return [_beam_search(gd, race, lfrom, lto, focus=f, **common) for f in focuses]
+    workers = min(_beam_workers, len(focuses))
+    if workers <= 1:
+        return [_beam_search(gd, race, lfrom, lto, focus=f, **common) for f in focuses]
+    from concurrent.futures import ProcessPoolExecutor  # décision 230 : départs indépendants, mêmes graines
+
+    with ProcessPoolExecutor(max_workers=workers) as pool:
+        futures = [pool.submit(_beam_search, gd, race, lfrom, lto, focus=f, **common) for f in focuses]
+        return [f.result() for f in futures]
 
 
 def _beam_search(
