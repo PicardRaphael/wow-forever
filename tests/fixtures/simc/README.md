@@ -7,3 +7,6 @@
   texte qui précède sa ligne).
 - Exports réels : ajoutés après la sonde en jeu G (collage de `/simc` dans la fenêtre du chat, gardé anonymisé dans
   le journal du pont, puis `forever bridge contexts export`), décision 235.
+- `mage19_sonde_g.txt` : premier export **réel** (sonde en jeu G du 2026-10-10, `/simc` collé dans la fenêtre du chat),
+  tel que le pont l'a gardé dans son journal : anonymisé par le pont (en-tête, `mage=`, `server=`), somme de contrôle
+  d'origine juste puis recalculée (décision 235). Région vide et chaîne `talents=` du client gardées telles quelles.

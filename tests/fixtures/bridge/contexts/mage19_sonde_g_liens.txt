@@ -1,0 +1,13 @@
+name=Personnage
+realm=Royaume
+level=19
+class=MAGE
+race=Orc
+faction=Horde
+zone=The Barrens
+subzone=Camp Taurajo
+map=1413
+talents=105778:5,105779:5
+gear=3=1769::::::::19:1482::1::1:28:5249=Canvas Shoulderpads;4=5107::::::::19:1482=Deckhand's Shirt;5=2582:41:::::::19:1482::::::::Player-0000-00000001=Green Woolen Vest;6=253885::::::::19:1482::::::::Player-0000-00000002=Novice Arcanist's Sash;7=3309::::::::19:1482=Barbaric Loincloth;8=14364::::::::19:1482=Mystic's Slippers;9=15452::::::::19:1482::11=Featherbead Bracers;10=10637::::::::19:1482::11=Brewer's Gloves;11=281268::::::::19:1482::11=Depleted Ritual Band;12=5351::::::::19:1482::11=Bounty Hunter's Ring;15=2580:65:::::::19:1482::::::::Player-0000-00000002=Reinforced Linen Cape;16=15444::::::::19:1482::11=Staff of Orgrimmar;18=11288::::::::19:1482::::::::Player-0000-00000003=Greater Magic Wand
+client=1.60.1.70338
+links=item:3301::::::::19:1482Sharp CanineSharp Canineitem:14364::::::::19:1482Mystic's SlippersMystic's SlippersBinds when equippedFeet  Cloth22 Armor+2 Intellect+2 StaminaRequires Level 13

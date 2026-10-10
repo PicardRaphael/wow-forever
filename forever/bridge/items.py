@@ -28,6 +28,7 @@ class ItemString:
     unique: int = 0
     link_level: int | None = None
     bonus: tuple[int, ...] = ()
+    crafter: str | None = None  # GUID de l'artisan d'un objet fabriqué (sonde G)
 
 
 @dataclass(frozen=True)

@@ -21,3 +21,8 @@
   relevés de la sonde en jeu G (`forever bridge contexts export`).
 - `reply_seconds.json` (P06b, bloc A) : les neuf durées de réponse (`reply.seconds`) du journal du pont du 2026-10-09,
   relevées le 2026-10-10 pour chiffrer le calendrier des relevés (`forever/bridge/polls.py`).
+- `contexts/mage19_sonde_g.txt`, `mage19_sonde_g_liens.txt`, `mage19_sonde_g_simc.txt` (P06b, sonde en jeu G du
+  2026-10-10) : contextes **réels** relevés par `forever bridge contexts export` (question, question avec deux liens
+  Maj+clic et leur infobulle, envoi de l'export `/simc`), **anonymisés** : `name` et `realm` remplacés
+  (`Personnage`, `Royaume`), GUID des artisans des objets fabriqués remplacés par `Player-0000-0000000N` ; le reste tel
+  quel (chaînes d'objet complètes, avec le champ de l'artisan).
