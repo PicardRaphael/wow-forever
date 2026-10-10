@@ -52,8 +52,11 @@ def _plain_length(text: str) -> int:
     return len(_MARKUP.sub("", normalize_reply(text)))
 
 
-def quality_failures(result: Any, plan: Any, baseline_link: str | None) -> list[str]:
-    """Échecs de qualité d'une réponse (liste vide : réponse acceptable)."""
+def quality_failures(
+    result: Any, plan: Any, baseline_link: str | None, *, earlier: Sequence[Mapping[str, Any]] = ()
+) -> list[str]:
+    """Échecs de qualité d'une réponse (liste vide : réponse acceptable). `earlier` : événements des tours précédents
+    de la même conversation, dont les résultats d'outils sourcent aussi un chiffre (décision 237)."""
     failures: list[str] = []
     if getattr(result, "is_error", False):
         return ["erreur"]
@@ -72,16 +75,17 @@ def quality_failures(result: Any, plan: Any, baseline_link: str | None) -> list[
         failures.append("provenance absente")
     if _plain_length(getattr(result, "text", "") or "") > MAX_REPLY_CHARS:
         failures.append("réponse trop longue")
-    if unsourced(result):
+    if unsourced(result, earlier):
         failures.append("chiffre hors des résultats d'outil")
     return failures
 
 
-def unsourced(result: Any) -> list[str]:
-    """Chiffres de jeu de la réponse absents des résultats des outils (hook `check-numbers` du plugin)."""
+def unsourced(result: Any, earlier: Sequence[Mapping[str, Any]] = ()) -> list[str]:
+    """Chiffres de jeu de la réponse absents des résultats des outils de la conversation, ce tour et les précédents
+    (même règle que le hook `check-numbers` du plugin)."""
     from forever.hooks import unsourced_numbers
 
-    events = getattr(result, "events", None) or []
+    events = [*earlier, *(getattr(result, "events", None) or [])]
     return unsourced_numbers(events, getattr(result, "text", "") or "")
 
 
@@ -130,6 +134,7 @@ def run_bench(
     for rnd in range(1, rounds + 1):
         for name, factory in runners.items():
             ask = factory()
+            history: list[Mapping[str, Any]] = []  # événements des tours précédents de la conversation du passage
             try:
                 for index, (key, message, plan) in enumerate(questions):
                     started = clock()
@@ -138,7 +143,8 @@ def run_bench(
                     link = (result.links or {}).get(plan.link) if plan is not None and plan.link else result.link
                     if name == "A":
                         baseline[(rnd, key)] = link
-                    failures = quality_failures(result, plan, baseline.get((rnd, key), link))
+                    failures = quality_failures(result, plan, baseline.get((rnd, key), link), earlier=history)
+                    history += list(getattr(result, "events", None) or [])
                     out.append(Measure(name, rnd, key, seconds, dict(result.timings or {}), result.cost_usd,
                                        result.text, link, failures, list(result.tools)))  # fmt: skip
                     if progress:

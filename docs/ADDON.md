@@ -346,8 +346,8 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     (P06b, blocs B à G, **avant le 2026-10-19**). Dans un terminal PowerShell à la racine du dépôt.
     1. **Jeu fermé.** `git status -sb` : `## p06b` (ou `## main` après la fusion). Régler la conversation « addons » :
        `uv run forever bridge addons config --source "$env:FOREVER_WOW_DIR\Interface\AddOns\RaphCompletionist"`
-       (réponse : « Conversation « addons » : dossier … ») ; `uv run forever bridge config` : vérifier la réflexion et
-       la session gardée ouverte retenues par la mesure (`tasks/P06b-vitesse.md`).
+       (réponse : « Conversation « addons » : dossier … ») ; `uv run forever bridge config` : « réflexion : on ·
+       session gardée ouverte : on » (variante C retenue, décision 237).
     2. Relancer le pont : `uv run forever bridge stop`, `uv run forever bridge autostart status` jusqu'à
        « surveillance : arrêtée », `schtasks /Run /TN "WoW Forever - pont"`, puis `uv run forever bridge status` :
        « Pont : en marche », aucune ligne « fichiers de l'addon à remplacer ». Lancer le jeu.
@@ -384,7 +384,9 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     9. **Repris de la sonde G** : Maj+clic d'un sort du grimoire (`P`) et d'une quête du journal (`L`) dans la
        saisie ; Maj+clic d'un objet empilé d'un sac : la fenêtre de partage de la pile s'ouvre-t-elle aussi (BR5) ?
        Glisser la fenêtre « Coller /simc » par son titre, la fermer, la rouvrir : même place.
-    10. **Durée ressentie** des réponses avec la variante retenue, comparée à celle d'avant.
+    10. **Durée ressentie** des réponses (session gardée ouverte, conversations sans hooks du plugin), comparée à
+        celle d'avant : la première question d'une conversation reste la plus lente, les suivantes doivent arriver en
+        quelques secondes ; bouton PvP : réponse courte (5 lignes au plus).
     11. **Relevé** : ce qui s'est passé à chaque étape, les durées des étapes 3, 6, 8 et 10, la sortie de
         `uv run forever bridge status`, et `uv run forever bridge contexts export "$env:TEMP\sonde-h"` (dossier à me
         donner).

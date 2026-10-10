@@ -12,7 +12,8 @@ from pathlib import Path
 from typing import Any
 
 DEFAULT_MODEL = "sonnet"
-DEFAULTS: dict[str, Any] = {"model": DEFAULT_MODEL, "thinking": "on", "persistent": "off"}
+# Session gardée ouverte par défaut : variante C retenue par l'utilisateur le 2026-10-10 (décision 237).
+DEFAULTS: dict[str, Any] = {"model": DEFAULT_MODEL, "thinking": "on", "persistent": "on"}
 SWITCHES = ("on", "off")
 
 

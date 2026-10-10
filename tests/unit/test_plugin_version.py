@@ -42,7 +42,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.8.6 : cas des boutons régénérés (chemin depuis le build actuel, respec contre le chemin libre, décision 220).
     # 0.8.7 : tranches de classe dans l'ordre de la décision 232 (CM1, CH1, DE1, PA1, GU1, VO1, PR1, DR1).
     # 0.8.8 : build populaire le plus proche calculé par l'outil (`tf_popular` avec `current`, `closest`), P06b.
-    assert version == "0.8.8"
+    # 0.8.9 : cas du bouton PvP régénéré (consigne resserrée sous 600 caractères, décision 237).
+    assert version == "0.8.9"
 
 
 def test_fingerprint_is_up_to_date():

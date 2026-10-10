@@ -1439,3 +1439,11 @@ Mesuré le 2026-10-10T14:16:14Z (sonnet, 2 passages, 6 questions). Règle : méd
   passage (consigne du bouton PvP à resserrer) ; des réponses libres aussi.
 - **Recommandation** : garder C (`forever bridge config --persistent on`), réflexion inchangée. À valider par
   l'utilisateur : le choix reste le sien (règle du plan).
+
+## Décision de l'utilisateur (2026-10-10, décision 237)
+- **Variante C retenue** (session gardée ouverte par défaut) ; B non gardée.
+- Critère « chiffre hors des résultats d'outil » corrigé : un chiffre donné par un outil dans un tour précédent de la
+  même conversation est sourcé. Avec ce critère, l'échec n° 1 de C (« 38,21 s par monstre », tour Talents) disparaît ;
+  l'échec n° 2 (lien là où A n'en donnait aucun) reste compté par la règle, analysé plus haut.
+- Conversations sans les hooks du plugin (BR8) : médiane 8,37 s avec, 6,02 s sans, trois conversations de chaque.
+- Consigne du bouton PvP resserrée : trois réponses réelles de 556, 443 et 391 caractères, aucun échec.

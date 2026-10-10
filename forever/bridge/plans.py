@@ -163,8 +163,11 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
             args["opponent_level"] = r.target_level
         read = (
             (
-                f"Fiche de {r.target_class} face à ton personnage : menaces (`threats`), tes réponses (`answers`), leurs "
-                "réponses (`their_answers`), fenêtres (`windows`) ; cite ce qui manque (`missing`)."
+                f"Fiche de {r.target_class} face à ton personnage, en 600 caractères au plus, mise en forme comprise, et "
+                "en 5 lignes « - » au plus, sans titre : ses deux menaces principales (`threats`, catégorie de "
+                "rendement décroissant), tes deux meilleures réponses (`answers`), ses réponses (`their_answers`), la "
+                "fenêtre à saisir (`windows`) ; une seule ligne pour ce qui manque (`missing`), s'il manque quelque "
+                "chose. Noms des sorts seulement : ni rang, ni durée, ni recharge."
             ),
         )
         return Plan(key, (Call("forever_lookup", args),), read)

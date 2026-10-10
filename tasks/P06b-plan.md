@@ -820,3 +820,6 @@ nouvelle session (`/tranche P06b`), branche `p06b`, un cycle rouge → vert par 
   passage, comme un joueur qui enchaîne) ; échecs comptés seulement quand A ne les a pas sur la même question
   (`speed.own_failures`) ; observation BR8 (hook de démarrage d'environ 6 s par conversation).
 - Arrêt au jalon de la sonde H (demande de l'utilisateur) : procédure dans `docs/ADDON.md` §7, étape 18.
+- **2026-10-10, réponses de l'utilisateur à la mesure (décision 237)** : correction n° 4 appliquée (bloc C vert) ;
+  variante C par défaut, critère des chiffres corrigé (tours précédents de la conversation) ; conversations du pont
+  sans les hooks du plugin (gain mesuré : 2,3 s de médiane) ; consigne PvP resserrée (plugin 0.8.9).

@@ -241,10 +241,12 @@ P06b ajoute à la fenêtre `/fv` (décision 235) :
 | `uv run forever bridge addons status` | dossier réglé et sauvegardes (`<cache>/bridge/addons/backups/`) |
 | `uv run forever bridge addons restore [<horodatage>]` | remet une sauvegarde ; les fichiers créés depuis sont déplacés dans `<cache>/bridge/addons/set-aside/`, jamais supprimés |
 | `uv run forever bridge addons log` | commits locaux de la conversation |
-| `uv run forever bridge config --thinking on\|off --persistent on\|off` | réflexion du modèle et session `claude` gardée ouverte entre les messages (réglages retenus par la mesure, `tasks/P06b-vitesse.md`) |
+| `uv run forever bridge config --thinking on\|off --persistent on\|off` | réflexion du modèle et session `claude` gardée ouverte entre les messages ; par défaut, réflexion `on` et session gardée ouverte `on` (variante C retenue, `tasks/P06b-vitesse.md`, décision 237) |
 | `uv run forever bridge bench --variants A,B,C,D --rounds 2` | mesure des accélérations sur six questions réelles (vraies conversations `claude`, coût : sur demande seulement) |
 
-Relancer le pont après un changement de réglage (`forever bridge stop`, puis la tâche planifiée). Procédure en jeu :
+Les conversations du pont démarrent sans les hooks du plugin (décision 237 : environ 2 s de moins par conversation,
+le pont publie lui-même l'état des données et la provenance). Relancer le pont après un changement de réglage
+(`forever bridge stop`, puis la tâche planifiée). Procédure en jeu :
 `docs/ADDON.md`, section 7, étapes 17 (sonde G) et 18 (sonde H).
 
 ## Mon personnage (profil)

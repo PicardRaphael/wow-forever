@@ -28,7 +28,7 @@ Cible (joueur) : Shaman, niveau 21, race Tauren
 Consigne du bouton « pvp » : appelle exactement, dans cet ordre :
 - forever_lookup {"kind": "pvp", "name": "Mage", "level": 19, "race": "Orc", "talents": "elementalPrecision=5,improvedFrostbolt=5", "opponent": "Shaman", "opponent_level": 21}
 Puis :
-- Fiche de Shaman face à ton personnage : menaces (`threats`), tes réponses (`answers`), leurs réponses (`their_answers`), fenêtres (`windows`) ; cite ce qui manque (`missing`).
+- Fiche de Shaman face à ton personnage, en 600 caractères au plus, mise en forme comprise, et en 5 lignes « - » au plus, sans titre : ses deux menaces principales (`threats`, catégorie de rendement décroissant), tes deux meilleures réponses (`answers`), ses réponses (`their_answers`), la fenêtre à saisir (`windows`) ; une seule ligne pour ce qui manque (`missing`), s'il manque quelque chose. Noms des sorts seulement : ni rang, ni durée, ni recharge.
 
 Question posée par le bouton « pvp » de la fenêtre :
 Fiche de la classe de ma cible

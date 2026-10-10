@@ -31,6 +31,9 @@ FOREVER_TOOLS: tuple[str, ...] = (
     "mcp__forever__forever_build",
 )
 ALLOWED_TOOLS: tuple[str, ...] = ("Skill", *FOREVER_TOOLS)
+# Conversations du pont sans les hooks du plugin (démarrage, contrôle de fin) : le pont publie lui-même l'état des
+# données et la provenance (BR8, décision 237 ; mesure du 2026-10-10 : médiane 8,37 s avec, 6,02 s sans).
+NO_HOOKS_SETTINGS = json.dumps({"disableAllHooks": True})
 DEFAULT_TIMEOUT_S = 180.0
 # Variables d'une session Claude Code parente, retirées : la conversation « jeu » est une session à part.
 _PARENT_SESSION_VARS = ("CLAUDECODE", "CLAUDE_CODE_ENTRYPOINT", "CLAUDE_CODE_SSE_PORT")
@@ -136,6 +139,8 @@ def claude_argv(
         "dontAsk",
         "--permission-prompts",
         "none",
+        "--settings",
+        NO_HOOKS_SETTINGS,
         "--append-system-prompt",
         system_prompt,
     ]
@@ -530,6 +535,8 @@ def addons_argv(
         "dontAsk",
         "--permission-prompts",
         "none",
+        "--settings",
+        NO_HOOKS_SETTINGS,
         "--append-system-prompt",
         system_prompt,
     ]

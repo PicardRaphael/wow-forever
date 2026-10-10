@@ -371,8 +371,9 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **BR8 — Le hook de démarrage du plugin coûte-t-il plusieurs secondes à chaque conversation du pont ?** Sonde 0.3
   du 2026-10-10 : entre `hook_started` et `hook_response`, 6,3 s avant le premier `init` (`uv run … python -m forever
   hook session-start`, muet sous `FOREVER_BRIDGE` mais lancé quand même) ; le journal du pont relève des `init_s` de
-  2 à 15 s. La session gardée ouverte (variante C) ne le paie qu'une fois. Test : mesurer le hook seul, et sauter son
-  lancement quand `FOREVER_BRIDGE` est posé. Priorité : moyenne.
+  2 à 15 s. **Répondue le 2026-10-10 (décision 237)** : les conversations du pont démarrent sans les hooks du plugin
+  (`--settings {"disableAllHooks": true}`) ; médiane 8,37 s avec, 6,02 s sans (trois conversations de chaque), 17,08 s
+  au premier lancement avec les hooks. À reporter dans `docs/RESOLVED_QUESTIONS.md` à la fin de la tranche.
 
 ## Legacy et API
 - **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?**
