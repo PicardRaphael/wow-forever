@@ -123,7 +123,9 @@ def check_replay_sides(before: Path, after: Path) -> None:
 
 """(moteur, cas, dossier des données) -> résultat du cas ; appelé avant puis après, pour les seuls moteurs touchés."""
 Measure = Callable[[Deps, Path, Sequence[Path]], Mapping[str, Any]]
-"""(deps, dossier des données, journaux) -> {"changed": [{"file", "pointer"}…], …} ; simulation, rien n'est écrit."""
+"""(deps, dossier des données, journaux) -> {"changed": [{"file", "pointer"}…], "details", "hp_by_level",
+"preview"} ; simulation : rien n'est écrit dans les données (`preview` : copie des données où la mesure est écrite,
+côté « après » du rejeu ; `details` : `refresh.npc_details` ; `hp_by_level` : niveaux dont les PV changent)."""
 Spawn = Callable[[Sequence[str]], None]
 """Lance un passage détaché (arguments de la commande) ; peut lever OSError, attrapée par l'appelant."""
 Progress = Callable[[str], None]
@@ -655,20 +657,27 @@ def _hotfix_source(run: _Run, version: str, archive: Path, rules: Mapping[str, A
     return hotfix_source(archive, layouts, dbd, journal, version, rules, run.now)
 
 
-def _stage(run: _Run, version: str) -> Path:
-    """Copie de préparation des données de base, dans le cache (jamais le clone ni la session)."""
+def _copy_data(base: Path, dest: Path) -> None:
+    """Copie des données `base` dans `dest` (remplacée), sans les dossiers de version hors du manifeste."""
     from forever.manifest import VERSION_DIR_RE
 
+    if dest.exists():
+        shutil.rmtree(dest)
+    installed = set(installed_versions(base))
+
+    def ignored(folder: str, names: list[str]) -> set[str]:
+        stray = {n for n in names if Path(folder) == base and VERSION_DIR_RE.match(n) and n not in installed}
+        return stray | {n for n in names if n == "__pycache__"}  # dossier de version hors du manifeste : non copié
+
+    shutil.copytree(base, dest, ignore=ignored)
+
+
+def _stage(run: _Run, version: str) -> Path:
+    """Copie de préparation des données de base, dans le cache (jamais le clone ni la session)."""
     stage = update_dir(run.deps.cache_dir) / f"stage-{version}"
     if stage.exists():
         shutil.rmtree(stage)
-    installed = set(installed_versions(run.base_data))
-
-    def ignored(folder: str, names: list[str]) -> set[str]:
-        stray = {n for n in names if Path(folder) == run.base_data and VERSION_DIR_RE.match(n) and n not in installed}
-        return stray | {n for n in names if n == "__pycache__"}  # dossier de version hors du manifeste : non copié
-
-    shutil.copytree(run.base_data, stage / "data", ignore=ignored)
+    _copy_data(run.base_data, stage / "data")
     return stage / "data"
 
 
@@ -737,7 +746,10 @@ def written_text(written: Mapping[str, Any]) -> str:
     return text + (f" ({written['summary']})" if written.get("summary") else "")
 
 
-SELF_CLEARING_HINT = "lancer le jeu sur ce build et se connecter au royaume, puis `forever update`"
+SELF_CLEARING_HINT = (
+    "lancer le jeu sur ce build, se connecter au royaume puis revenir à la sélection ou quitter le jeu : le client "
+    "écrit DBCache.bin à la déconnexion (DON14) et le pont lance alors `forever update`"
+)
 
 
 def summary_text(summary: Mapping[str, Any] | None) -> str:
@@ -1027,7 +1039,7 @@ def _hotfixes_wait(run: _Run, version: str, seen: datetime | None) -> Step:
     pending_id = f"hotfixes-{version}"
     why = (
         f"correctifs du serveur à lire : aucun DBCache.bin du build {_build_number(version)} archivé ; lancer le jeu "
-        "sur ce build et se connecter au royaume"
+        "sur ce build, se connecter au royaume puis se déconnecter (le client écrit DBCache.bin à la déconnexion)"
         + (f", sinon installation sans correctifs à partir de {until} si aucun n'est perdu" if until else "")
     )
     run.pending.append(
@@ -1219,15 +1231,30 @@ def _default_measure(deps: Deps, data_dir: Path, logs: Sequence[Path]) -> Mappin
     une entrée des moteurs du Mage (`monsters.json`)."""
     from forever.cli import main
 
+    # Décision 227 : la mesure est écrite dans une copie des données (côté « après » du rejeu), jamais dans les
+    # données de base ni dans l'instantané du cache.
+    preview = update_dir(deps.cache_dir) / "measures-preview"
+    _copy_data(data_dir, preview)
     out = io.StringIO()
     with contextlib.redirect_stdout(out):
-        code = main(["measures", "refresh", "--dry-run", "--json"], dataclasses.replace(deps, data_dir=data_dir))
+        code = main(
+            ["measures", "refresh", "--into", str(preview), "--json"], dataclasses.replace(deps, data_dir=data_dir)
+        )
     payload = json.loads(out.getvalue() or "{}")
     diff = payload.get("diff") or {}
     npcs = diff.get("npcs") or {}
     monsters = any(npcs.get(k) for k in ("added", "changed", "removed")) or bool(diff.get("hp_by_level"))
     changed = [{"file": "monsters.json", "pointer": "/npcs"}] if code == EXIT_OK and monsters else []
-    return {"changed": changed, "status": payload.get("status"), "logs": [p.name for p in logs]}
+    result: dict[str, Any] = {
+        "changed": changed,
+        "status": payload.get("status"),
+        "logs": [p.name for p in logs],
+        "details": diff.get("npcs_detail"),
+        "hp_by_level": diff.get("hp_by_level") or {},
+    }
+    if changed and payload.get("status") == "aperçu":
+        result["preview"] = preview
+    return result
 
 
 def _log_start(path: Path) -> datetime | None:
@@ -1308,6 +1335,8 @@ def _step_logs(run: _Run) -> Step:
         )
     digest = hashlib.sha256("\n".join(f"{n}:{shas[n]}" for n in sorted(keep)).encode("utf-8")).hexdigest()[:12]
     pending_id = f"measures-{installed}-{digest}"
+    rebuilt = _measure_builds(run, pending_id, installed, result)
+    summary = measure_summary(result.get("details") or {}, result.get("hp_by_level") or {}, rebuilt)
     run.pending.append(
         {
             "id": pending_id,
@@ -1317,6 +1346,7 @@ def _step_logs(run: _Run) -> Step:
             "revision": None,
             "clauses": {"inputs": False},
             "reasons": [f"mesure des journaux qui change une entrée des moteurs : {touched}"],
+            "summary": summary,
             "logs": keep,
             "created_at": run.now,
             "base": {"origin_main": run.origin_main, "version": installed},
@@ -1326,6 +1356,150 @@ def _step_logs(run: _Run) -> Step:
     return Step(
         "journaux", "attente", f"{len(keep)} journal(aux) mesuré(s) : une entrée des moteurs change{held_note}", data
     )
+
+
+def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[str, Any]) -> dict[str, Any]:
+    """Cas des moteurs qui changeraient après rejeu d'une mesure (décision 227) : « avant » sur les données de base,
+    « après » sur la copie où la mesure est écrite (`preview`). Fait une fois par attente : un rejeu déjà fait pour
+    la même attente sur la même base est repris (plusieurs minutes par cas du build du Mage)."""
+    base = replay_label(run.base_data)
+    old = _read(_pending_path(run.deps.cache_dir, pending_id))
+    kept = ((old.get("summary") or {}).get("measures") or {}).get("builds") if isinstance(old, dict) else None
+    if isinstance(kept, dict) and kept.get("replayed") and kept.get("base") == base:
+        return kept
+    preview = result.get("preview")
+    if preview is None or run.replay is None:
+        return {"replayed": False, "base": base, "reason": "aperçu des données mesurées absent : rejeu non fait"}
+    after = Path(preview)
+    replay = run.replay
+    try:
+        check_replay_sides(run.base_data, after)
+        inputs = compare_inputs(run.base_data / installed, after / installed)
+        replayed = targeted_replay(
+            inputs, lambda e, c: {"avant": replay(e, c, run.base_data), "après": replay(e, c, after)}
+        )
+    except SameDataReplayError as exc:
+        return {"replayed": False, "base": base, "reason": exc.message}
+    except Exception as exc:  # noqa: BLE001 : un rejeu en échec ne doit pas perdre l'attente de mesure
+        return {"replayed": False, "base": base, "reason": f"rejeu en échec : {type(exc).__name__}: {exc}"}
+    changed: list[dict[str, str]] = []
+    skipped: list[dict[str, Any]] = []
+    unchanged = 0
+    for engine, cases in replayed.items():
+        for case, sides in cases.items():
+            not_run = next(
+                (s for s in (sides["avant"], sides["après"]) if isinstance(s, Mapping) and s.get("rejoué") is False),
+                None,
+            )
+            if not_run is not None:
+                skipped.append({"engine": engine, "case": case, "reason": not_run.get("raison")})
+            elif sides["avant"] != sides["après"]:
+                changed.append({"engine": engine, "case": case})
+            else:
+                unchanged += 1
+    return {
+        "replayed": bool(changed) or unchanged > 0,
+        "base": base,
+        "changed": changed,
+        "unchanged": unchanged,
+        "not_replayed": skipped,
+    }
+
+
+def measure_summary(
+    details: Mapping[str, Any], hp_by_level: Mapping[str, Any], builds: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Résumé d'une attente de mesure (décision 227), au format de `summary_text` (phrase par moteur) : PNJ ajoutés,
+    changés, retirés et écartés de la courbe (avec la raison), niveaux dont les PV changent, cas des builds qui
+    changeraient après rejeu."""
+    npcs = {k: list(details.get(k) or []) for k in ("added", "changed", "removed", "excluded")}
+    counts = ", ".join(
+        f"{len(npcs[key])} {label}"
+        for key, label in (
+            ("added", "ajouté(s)"),
+            ("changed", "changé(s)"),
+            ("removed", "retiré(s)"),
+            ("excluded", "écarté(s)"),
+        )
+    )
+    parts = [f"PNJ : {counts}"]
+    if hp_by_level:
+        parts.append(f"PV par niveau : {len(hp_by_level)} niveau(x)")
+    if builds.get("replayed"):
+        parts.append(f"builds : {len(builds.get('changed') or [])} cas changerai(en)t après rejeu")
+    else:
+        parts.append(f"builds : non rejoués ({builds.get('reason')})")
+    return {
+        "measures": {
+            "sentence": " ; ".join(parts),
+            "npcs": npcs,
+            "hp_by_level": dict(hp_by_level),
+            "builds": dict(builds),
+        }
+    }
+
+
+MEASURE_LIST_MAX = 20  # PNJ nommés par ligne du résumé (au-delà : « … et N autre(s) »)
+
+
+def _listed(items: Sequence[str]) -> str:
+    shown = " ; ".join(items[:MEASURE_LIST_MAX])
+    return shown + (f" ; … et {len(items) - MEASURE_LIST_MAX} autre(s)" if len(items) > MEASURE_LIST_MAX else "")
+
+
+def _levels_text(levels: Mapping[str, Any]) -> str:
+    out = []
+    for level, value in sorted(levels.items(), key=lambda kv: int(kv[0])):
+        if isinstance(value, Mapping):
+            out.append(f"niv. {level} : {value.get('before')} → {value.get('after')} PV")
+        else:
+            out.append(f"niv. {level} : {value} PV")
+    return ", ".join(out)
+
+
+def measure_summary_lines(summary: Mapping[str, Any] | None) -> list[str]:
+    """Lignes du résumé d'une attente de mesure pour `forever update status` ; [] sans résumé de mesure."""
+    doc = (summary or {}).get("measures") if isinstance(summary, Mapping) else None
+    if not isinstance(doc, Mapping):
+        return []
+    npcs = doc.get("npcs") or {}
+    lines = []
+    for key, label in (("added", "PNJ ajoutés"), ("changed", "PNJ changés")):
+        found = [
+            f"{n.get('name')} ({n.get('npc_id')}) {_levels_text(n.get('levels') or {})}" for n in npcs.get(key, [])
+        ]
+        if found:
+            lines.append(f"{label} : {_listed(found)}")
+    removed = [f"{n.get('name')} ({n.get('npc_id')})" for n in npcs.get("removed", [])]
+    if removed:
+        lines.append(f"PNJ retirés : {_listed(removed)}")
+    excluded = [
+        f"{n.get('name')} ({n.get('npc_id')}) : {n.get('reason')}" + (" (nouveau)" if n.get("new") else "")
+        for n in npcs.get("excluded", [])
+    ]
+    if excluded:
+        lines.append(f"PNJ écartés : {_listed(excluded)}")
+    levels = doc.get("hp_by_level") or {}
+    if levels:
+        shown = [
+            f"niv. {lv} : {v.get('before')} → {v.get('after')}"
+            for lv, v in sorted(levels.items(), key=lambda kv: int(kv[0]))
+        ]
+        lines.append(f"PV par niveau : {_listed(shown)}")
+    builds = doc.get("builds") or {}
+    if builds.get("replayed"):
+        changed = [f"{c['engine']} {c['case']}" for c in builds.get("changed") or []]
+        tail = f" ({builds.get('unchanged', 0)} inchangé(s))"
+        if changed:
+            lines.append(f"builds qui changeraient après rejeu : {', '.join(changed)}{tail}")
+        else:
+            lines.append(f"builds : aucun ne changerait après rejeu{tail}")
+        skipped = [f"{s['engine']} {s['case']} ({s.get('reason')})" for s in builds.get("not_replayed") or []]
+        if skipped:
+            lines.append(f"non rejoué(s) : {', '.join(skipped)}")
+    elif builds:
+        lines.append(f"builds : non rejoués ({builds.get('reason')})")
+    return lines
 
 
 def _step_addons(run: _Run) -> Step:
@@ -1926,3 +2100,15 @@ def due(cache_dir: Path, now: datetime) -> bool:
     except (KeyError, TypeError, ValueError):
         return True
     return now - finished >= CACHE_TTL
+
+
+def launch_pass(cache_dir: Path, now: datetime, spawn: Spawn) -> bool:
+    """Passage `forever update --auto` détaché, sans la règle des 6 h, lancé quand le client vient d'écrire ses
+    fichiers (fermeture du jeu, `DBCache.bin` d'un build archivé : décision 227). Rien si un verrou est vivant (le
+    passage prendrait le même verrou et s'arrêterait) ; vrai si lancé. OSError du lancement : à l'appelant."""
+    if _lock_alive(_read(_lock_path(cache_dir)), now):
+        return False
+    from forever.spawn import update_command
+
+    spawn(update_command())
+    return True

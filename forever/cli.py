@@ -112,6 +112,7 @@ from forever.pipeline.refresh import (
     compare,
     curve_candidates,
     curve_exclusions,
+    npc_details,
     read_snapshot,
     remeasure,
     snapshot_exists,
@@ -367,7 +368,8 @@ def build_parser() -> argparse.ArgumentParser:
         "--log", action="store_true", help="sortie dans <cache>/update/run-<horodatage>.log (tâche planifiée)"
     )
     up_sub = up.add_subparsers(dest="update_command", required=False, parser_class=_Parser)
-    u_status = up_sub.add_parser("status", help="attentes d'accord et dernier passage")
+    u_status = up_sub.add_parser("status", help="attentes d'accord ouvertes et dernier passage")
+    u_status.add_argument("--all", action="store_true", help="toutes les attentes (closes et rejetées comprises)")
     u_status.add_argument("--json", action="store_true", help="sortie JSON")
     u_approve = up_sub.add_parser("approve", help="approuver une attente (base inchangée) et lancer un passage")
     u_approve.add_argument("id", help="identifiant de l'attente (forever update status)")
@@ -525,6 +527,12 @@ def build_parser() -> argparse.ArgumentParser:
     mode = refresh.add_mutually_exclusive_group()
     mode.add_argument("--yes", action="store_true", help="écrire sans demander")
     mode.add_argument("--dry-run", action="store_true", help="afficher sans jamais écrire")
+    mode.add_argument(
+        "--into",
+        metavar="DONNEES",
+        help="aperçu de forever update : écrire monsters.json dans cette copie des données (jamais les données "
+        "installées), sans instantané ni accord",
+    )
     refresh.add_argument("--json", action="store_true", help="sortie JSON")
 
     monsters = sub.add_parser("monsters", help="table des monstres (PV mesurés, Questie en regard)")
@@ -2198,7 +2206,9 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
     provenance = local_provenance(deps, assumptions=["mise à jour automatique : attentes et passages (T08d)"])
     if args.update_command == "status":
         summary = update.update_summary(deps.cache_dir, deps.now())
-        entries = update.list_pending(deps.cache_dir)
+        every = update.list_pending(deps.cache_dir)
+        # Décision 227 : attentes ouvertes seulement par défaut, l'historique complet avec --all
+        entries = every if args.all else [e for e in every if e.get("state") in update.OPEN_STATES]
         last = summary["last"]
         lines = [
             f"Dernier passage : {last['finished_at'] if last else 'aucun'}"
@@ -2212,10 +2222,14 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
             )
             if update.summary_text(e.get("summary")):
                 lines.append(f"    résumé : {update.summary_text(e.get('summary'))}")
+            lines += [f"    {line}" for line in update.measure_summary_lines(e.get("summary"))]
             if e.get("kind") in update.SELF_CLEARING_KINDS:
                 lines.append(f"    se lève seule : {update.SELF_CLEARING_HINT}")
         if not entries:
-            lines.append("  aucune attente")
+            lines.append("  aucune attente ouverte" if not args.all else "  aucune attente")
+        hidden = len(every) - len(entries)
+        if hidden:
+            lines.append(f"  {hidden} attente(s) close(s) ou rejetée(s) : `forever update status --all`")
         _emit({**summary, "pending": entries, "provenance": provenance}, lines, provenance, args.json)
         return EXIT_OK
     if args.update_command == "approve":
@@ -2515,6 +2529,25 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             slots=slots,
         )
         keeper.check()
+        updater = None
+        if not deps.offline:  # décision 227 : passage de forever update quand le jeu se ferme ou écrit DBCache.bin
+            from forever.bridge.updater import UpdateOnClose
+            from forever.pipeline.dbcache import DBCACHE_PATH
+            from forever.spawn import spawn_detached
+            from forever.update import launch_pass, run_log_path
+
+            def launch_update() -> bool:
+                now = deps.now()
+                log = run_log_path(deps.cache_dir, now)
+                return launch_pass(deps.cache_dir, now, lambda command: spawn_detached(command, log))
+
+            updater = UpdateOnClose(
+                game_running=lambda: api.process_running(executables),
+                dbcache=wow.joinpath(*(part.format(locale="enUS") for part in DBCACHE_PATH)),
+                journal=journal,
+                clock=time.monotonic,
+                launch=launch_update,
+            )
 
         def status() -> dict[str, Any]:
             keeper.check()
@@ -2531,6 +2564,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             slots=slots,
             prepare=prepare,
             keeper=keeper,
+            updater=updater,
             heartbeat=lambda: loop.touch_lock(deps.cache_dir, deps.now(), pid=pid),
         )
         journal.write("config", model=model)
@@ -3020,6 +3054,12 @@ def _refresh_lines(sources: RefreshSources, diff: Mapping[str, Any], status: str
 
 
 def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
+    into = Path(args.into).resolve() if args.into else None
+    if into is not None and (into == deps.data_dir.resolve() or not (into / "manifest.json").is_file()):
+        raise InvalidArgumentError(
+            f"--into {args.into} : il faut une copie des données, jamais les données installées.",
+            "donner une copie du dossier des données (forever update la prépare dans <cache>/update/)",
+        )
     logs_dir = _wow_path(deps, args.logs, "Logs")
     sv_dir = Path(args.sv) if args.sv else _default_sv(deps)
     questie_dir = Path(args.questie) if args.questie else None
@@ -3093,9 +3133,13 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     diff["measures"]["held_back"] = [h._asdict() for h in held]
     diff["measures"]["accepted_earlier"] = [a._asdict() for a in accepted]
     diff["curve_candidates"] = curve_candidates(new["monsters"], questie)  # proposés, jamais écartés sans accord
+    diff["npcs_detail"] = npc_details(installed, new["monsters"], diff["npcs"])  # résumé des attentes (décision 227)
     written: list[Path] = []
     if not diff["changed"]:
         status = "rien à écrire"
+    elif into is not None:
+        written = apply_refresh(new, into, deps.cache_dir, date=format_utc(deps.now())[:10], snapshot=False)
+        status = "aperçu"
     elif args.dry_run:
         status = "simulation"
     elif args.yes or (deps.confirm is not None and deps.confirm("Écrire ces changements ? [o/N] ")):

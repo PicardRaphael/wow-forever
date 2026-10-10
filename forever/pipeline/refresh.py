@@ -473,17 +473,59 @@ def _update_sources(path: Path, source: str) -> None:
     path.write_bytes((text[: match.start(1)] + new + text[match.end(1) :]).encode("utf-8"))
 
 
-def apply_refresh(new: MeasureSnapshot, data_dir: Path, cache_dir: Path, *, date: str) -> list[Path]:
+def apply_refresh(
+    new: MeasureSnapshot, data_dir: Path, cache_dir: Path, *, date: str, snapshot: bool = True
+) -> list[Path]:
     """Écrit `monsters.json` de la version installée, sa source dans `sources.json`, le manifeste et l'instantané
-    (sans la table des monstres) ; rend les chemins écrits. Octets LF (chemins -text : empreintes du manifeste)."""
+    (sans la table des monstres) ; rend les chemins écrits. Octets LF (chemins -text : empreintes du manifeste).
+    `snapshot` faux (aperçu de `forever update` dans une copie des données) : l'instantané n'est pas écrit."""
     version_dir = data_dir / new["game_version"]
     monsters = version_dir / MONSTERS_FILE
     monsters.write_bytes((json.dumps(new["monsters"], ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
     sources = version_dir / SOURCES_NAME
     _update_sources(sources, monsters_source(new["monsters"], date))
     manifest = write_manifest(data_dir)
-    snapshot = cache_dir / SNAPSHOT_DIR / SNAPSHOT_NAME
-    snapshot.parent.mkdir(parents=True, exist_ok=True)
+    if not snapshot:
+        return [monsters, sources, manifest]
+    last = cache_dir / SNAPSHOT_DIR / SNAPSHOT_NAME
+    last.parent.mkdir(parents=True, exist_ok=True)
     rest = {k: v for k, v in new.items() if k != "monsters"}
-    snapshot.write_bytes((json.dumps(rest, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
-    return [monsters, sources, manifest, snapshot]
+    last.write_bytes((json.dumps(rest, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
+    return [monsters, sources, manifest, last]
+
+
+def npc_details(
+    installed: Mapping[str, Any], table: Mapping[str, Any], npcs: Mapping[str, Sequence[str]]
+) -> dict[str, list[dict[str, Any]]]:
+    """Détail des PNJ pour le résumé d'une attente de mesure (décision 227) : nom et PV max par niveau des ajoutés,
+    PV avant et après des niveaux changés, PNJ retirés, PNJ écartés de la courbe des PV par niveau avec leur raison
+    (`new` : absent des écartés installés)."""
+    old, now = installed.get("npcs", {}) or {}, table.get("npcs", {}) or {}
+
+    def hp(entry: Mapping[str, Any]) -> dict[str, Any]:
+        return {level: row.get("max_hp") for level, row in (entry.get("levels") or {}).items()}
+
+    changed = []
+    for npc_id in npcs.get("changed", []):
+        a, b = hp(old[npc_id]), hp(now[npc_id])
+        levels = {
+            level: {"before": a.get(level), "after": b.get(level)}
+            for level in sorted({*a, *b}, key=int)
+            if a.get(level) != b.get(level)
+        }
+        changed.append({"npc_id": int(npc_id), "name": now[npc_id].get("name"), "levels": levels})
+    was = {int(e["npc_id"]) for e in installed.get("curve_excluded", []) or []}
+    return {
+        "added": [{"npc_id": int(n), "name": now[n].get("name"), "levels": hp(now[n])} for n in npcs.get("added", [])],
+        "changed": changed,
+        "removed": [{"npc_id": int(n), "name": old[n].get("name")} for n in npcs.get("removed", [])],
+        "excluded": [
+            {
+                "npc_id": int(e["npc_id"]),
+                "name": e.get("name"),
+                "reason": e.get("reason"),
+                "new": int(e["npc_id"]) not in was,
+            }
+            for e in table.get("curve_excluded", []) or []
+        ],
+    }

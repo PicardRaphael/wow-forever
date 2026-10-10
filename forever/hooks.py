@@ -393,8 +393,9 @@ def _inside(path: Path, root: Path) -> bool:
 
 def update_kickoff(deps: Deps, environ: Mapping[str, str], spawn: Spawn | None) -> None:
     """Démarrage de session (T08d, bloc G) : archivage des fichiers du client, puis passage `forever update --auto`
-    détaché si aucun verrou n'est vivant et que le dernier passage a plus de 6 h. Jamais sans dossier du client ni
-    avec FOREVER_OFFLINE ; ne lève jamais."""
+    détaché si aucun verrou n'est vivant et que le dernier passage a plus de 6 h, ou sans attendre les 6 h si
+    l'archivage vient de copier un `DBCache.bin` (décision 227). Jamais sans dossier du client ni avec FOREVER_OFFLINE ;
+    ne lève jamais."""
     try:
         if environ.get("FOREVER_BRIDGE", "") not in ("", "0"):
             return  # conversation « jeu » du pont (P06a) : ni archivage ni passage, à chaque message repris
@@ -403,13 +404,17 @@ def update_kickoff(deps: Deps, environ: Mapping[str, str], spawn: Spawn | None) 
             return
         from forever import archive
 
-        archive.archive_client_files(deps)
+        result = archive.archive_client_files(deps)
         if environ.get("FOREVER_OFFLINE", "") not in ("", "0") or spawn is None:
             return
         from forever.spawn import update_command
-        from forever.update import due
+        from forever.update import due, launch_pass
 
-        if due(deps.cache_dir, deps.now()):
+        if any(c.new and c.kind == "dbcache" for c in result.copies):
+            # Décision 227 : un DBCache.bin vient d'être archivé (écrit à la déconnexion, DON14) : passage sans
+            # attendre les 6 h, pour lire ses correctifs tout de suite
+            launch_pass(deps.cache_dir, deps.now(), spawn)
+        elif due(deps.cache_dir, deps.now()):
             spawn(update_command())
     except Exception:  # noqa: BLE001 : un hook ne doit jamais gêner la session
         return

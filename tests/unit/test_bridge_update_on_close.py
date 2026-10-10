@@ -8,10 +8,10 @@ premier relevé (pont lancé jeu ouvert ou fermé), rien n'est lancé."""
 
 import os
 
-from forever.bridge.updater import CHECK_S, SETTLE_S, UpdateOnClose
 from test_bridge_loop import NOW, Clock, FakeCapture, events, make
 
 from forever.bridge.journal import Journal
+from forever.bridge.updater import CHECK_S, SETTLE_S, UpdateOnClose
 
 
 class Game:

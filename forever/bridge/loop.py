@@ -106,6 +106,7 @@ class Bridge:
         describe: Callable[[Record], str | None] | None = None,
         prepare: Callable[[Record], Any] | None = None,
         keeper: Any | None = None,
+        updater: Any | None = None,
         heartbeat: Callable[[], None] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
@@ -122,6 +123,7 @@ class Bridge:
         self.describe = describe
         self.prepare = prepare  # plans.prepare_record : notes, consigne du bouton, défauts, lien (prime sur describe)
         self.keeper = keeper  # keeper.AddonKeeper : addon tenu à jour, jeu fermé
+        self.updater = updater  # updater.UpdateOnClose : passage de forever update à la fermeture du jeu (décision 227)
         self.heartbeat = heartbeat
         self.last_beat: float | None = None
         self.queue: deque[Record] = deque()
@@ -348,6 +350,11 @@ class Bridge:
                     self.last_refresh = None  # état de l'addon changé : Status.lua réécrit tout de suite
             except Exception as exc:  # noqa: BLE001 : l'addon tenu à jour ne doit jamais arrêter le pont
                 self.journal.write("error", where="addon tenu à jour", error=f"{type(exc).__name__}: {exc}")
+        if self.updater is not None:
+            try:
+                self.updater.tick()
+            except Exception as exc:  # noqa: BLE001 : le lancement de la mise à jour ne doit jamais arrêter le pont
+                self.journal.write("error", where="mise à jour à la fermeture", error=f"{type(exc).__name__}: {exc}")
         if self.last_refresh is None or now - self.last_refresh >= REFRESH_S:
             self.refresh()
         self._capture(now)
