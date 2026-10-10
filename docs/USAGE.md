@@ -273,7 +273,7 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
 PvP de champ de bataille et rendements décroissants mesurés (PV2), boss et butin des donjons (DJ1), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
 ventes (EC1), quêtes et XP propres à Forever (T04d), mana des combats longs (T05b), mémoire du joueur (T07), raid
 complet (T09), équipement (T10), consommables (T11), analyse de mes combats (AN1, AN2), autres classes que le Mage
-(dégâts et rotations : tranches PA1 à DR1 ; leur PvP et la légalité de leurs builds sont couverts depuis PV1). Sur ces sujets, il répond « je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les
+(dégâts et rotations : tranches de classe CM1 à DR1 ; leur PvP et la légalité de leurs builds sont couverts depuis PV1). Sur ces sujets, il répond « je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les
 couvrira ; pour une classe pas encore calculée, il propose des builds de la communauté trouvés par le sous-agent de
 recherche, avec source et date, certitude au mieux supposée.
 
