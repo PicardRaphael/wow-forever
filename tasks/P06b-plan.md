@@ -800,3 +800,15 @@ moteur ; l'écart est exploité par SIM1 et T10a.
 Plan à valider par l'utilisateur, avec les accords des choix 16 (lecture du Lua de Blizzard pour `talents=`) et 17
 (sonde « addons » dans l'accord des conversations de mesure), et l'export `/simc` de l'étape 0.4. Exécution dans une
 nouvelle session (`/tranche P06b`), branche `p06b`, un cycle rouge → vert par bloc.
+
+## Exécution (journal)
+- **2026-10-10, bloc A** : tests rouges (e7fcbc1), implémentation (d420c83). Écarts au plan, décidés à l'exécution :
+  - abandon d'un message en parties compté seulement une fois chaque partie montrée au moins une fois par le
+    carrousel (sinon un message de 17 parties, 8,5 s de carrousel, était abandonné au troisième relevé, à 8 s, sans
+    que le pont ait pu tout voir) ;
+  - « équipement complet relu par `selftest --live --message` » remplacé à la sonde G par
+    `forever bridge contexts last` : le pont en marche publie les parties reçues et l'addon cesse de les montrer,
+    l'autotest ne verrait pas tout le message ; `selftest --message` décrit seulement la partie lue ;
+  - durée de vie de la carte de test comptée à l'horloge murale (comme le pont qui la relit).
+  - Bloc A pas encore « vert » : trois demandes de correction de tests verrouillés (`tasks/P06b-corrections.md`).
+- Arrêt au jalon de la sonde G (demande de l'utilisateur) : procédure dans `docs/ADDON.md` §7, étape 17.

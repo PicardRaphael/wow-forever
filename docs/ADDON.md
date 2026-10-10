@@ -60,6 +60,24 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
   écrit par le pont : `{v, now, status = {line, version, freshness, pending, slots, …}, buttons, replies = {{session,
   id, status = "working" | "done" | "error", text, provenance, link}}}` ; `ForeverBridgeStatus` (`Status.lua`) : état
   des données et boutons, relu à la connexion et au `/reload`.
+- **P06b, bloc A (décision 235)** :
+  - **Message** : drapeaux `a=<action>[:<id>]` (action du jeu, traitée par le pont sans le modèle : liste fermée,
+    identifiant apparié exactement à une carte publiée) et `k=simc` (export SimulationCraft collé, sans question) ;
+    clé de contexte `links` (par lien, séparés par 0x1D : corps, nom, lignes de l'infobulle séparées par 0x1C ; 8 liens,
+    30 lignes, 120 caractères au plus) ; `gear` en `emplacement=chaîne=nom` (`;` entre les pièces), la chaîne étant le
+    corps du lien sans `item:` ni champs vides ou nuls de fin (enchantement, gemmes, suffixe aléatoire, identifiant
+    unique) ; l'ancienne forme `emplacement:id:nom` reste lue.
+  - **Parties** : un message plus long qu'une bande (1 792 octets) part en parties `F␟session␟numéro␟i␟n␟octets`
+    (32 768 octets au plus par message), montrées en carrousel ; le pont publie `{session, id, status = "parts", got,
+    total}` et l'addon ne montre plus que les parties manquantes ; abandon (boîte d'envoi) après trois relevés sans
+    partie nouvelle, comptés une fois chaque partie montrée au moins une fois. Allègement : noms d'objets coupés, puis
+    retirés, puis sous-zone, puis parties ; équipement, talents, liens et question jamais retirés.
+  - **Cartes** : `cards = {{id, kind, title, lines, buttons = {{key, label, action, confirm} | {key, label,
+    explain}}}}` dans chaque emplacement et dans `Status.lua` ; une action demande un second clic (« Confirmer ») dans
+    les cinq secondes, puis part en `a=<action>` ; « Expliquer » pose une question fixe (`b=explain`).
+  - **Journal du pont** : l'événement `message` porte le contexte complet (`context`) ; `parts`, `action` et
+    `simc_export` (export anonymisé : nom et royaume remplacés sur l'en-tête, la ligne de la classe et `server=`,
+    somme de contrôle vérifiée puis recalculée) ; lus par `forever bridge contexts last | export <dossier>`.
 
 ## 7. Installation et procédure de test en jeu
 1. `uv run python scripts/install_addon.py --dry-run`, puis sans `--dry-run` (terminal administrateur si l'écriture dans `Program Files (x86)` est refusée).
@@ -272,6 +290,47 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        restante. `/fv poll` charge encore la sonde de consultation.
     4. Relevé : capture de la liste des addons (repliée et dépliée) et, si une réponse n'arrive pas, la sortie de
        `uv run forever bridge status`.
+
+17. **Sonde en jeu G : liens, équipement complet, parties, export collé, carte de test** (P06b, bloc A, **avant le
+    2026-10-14**). Elle répond à BR5, BR6 et BR7 et fournit les premiers contextes réels avec liens et le premier
+    export SimulationCraft réel (fixtures). Dans un terminal PowerShell à la racine du dépôt.
+    1. **Jeu fermé.** `git status -sb` : première ligne `## p06b` (le pont tourne sur le code de la branche de la
+       tranche). Relancer le pont sur ce code : `uv run forever bridge stop`, puis `uv run forever bridge autostart
+       status` jusqu'à « surveillance : arrêtée », puis `schtasks /Run /TN "WoW Forever - pont"`.
+    2. `uv run forever bridge status` : « Pont : en marche », une ligne `start` récente, et **aucune** ligne
+       « fichiers de l'addon à remplacer » (le pont réinstalle ForeverBridge seul, jeu fermé, en quelques secondes ;
+       sinon `uv run forever bridge install`). Puis lancer le jeu et se connecter avec le personnage habituel.
+    3. `/fv` : en haut à droite de la fenêtre, le bouton « Coller /simc » ; l'aide (`/fv aide`) cite Maj+clic et
+       Coller /simc. `/console scriptErrors 1` pour voir une éventuelle erreur Lua.
+    4. **Maj+clic (BR5)** : cliquer dans la zone de saisie de la fenêtre (curseur visible), puis Maj+clic sur : un
+       objet d'un sac, un objet équipé (fenêtre du personnage, `C`), un sort du grimoire (`P`), une quête du journal
+       (`L`). Pour chacun, noter : lien inséré dans la saisie, rien, ou inséré deux fois. Vider la saisie entre deux
+       essais si besoin.
+    5. **Question avec deux liens** : dans la saisie, Maj+clic sur deux objets (un équipé, un d'un sac), puis taper
+       autour, par exemple « Lequel de [objet 1] et [objet 2] est le mieux pour moi ? », Entrée. Attendu : « Vous : »
+       avec les noms entre crochets ; ligne d'état « envoi du message n° … », éventuellement « (2 parties, … reçue(s)
+       par le pont) » ; réponse en une vingtaine de secondes qui s'appuie sur les infobulles.
+    6. Dans le terminal : `uv run forever bridge contexts last`. Attendu : « liens cités (2) » avec, sous chaque lien,
+       les lignes de son infobulle ; « équipement (N pièce(s)) » avec, par pièce, l'objet, l'enchantement s'il y en a
+       un et, pour un objet « of the … » équipé, la ligne « suffixe aléatoire ». Si aucun objet équipé n'a de suffixe,
+       le noter (le suffixe sera vérifié plus tard).
+    7. **Export SimulationCraft (BR6, BR7)** : `/simc`, le texte de la fenêtre de SimulationCraft est sélectionné :
+       Ctrl+C, fermer cette fenêtre. Dans `/fv` : « Coller /simc », clic dans la zone, Ctrl+V (noter si le collage est
+       lent), « Envoyer l'export ». Attendu : « Vous : export SimulationCraft (N lignes) », la ligne d'état compte les
+       parties reçues par le pont, puis la réponse « Export SimulationCraft reçu (N lignes, somme de contrôle
+       juste)… ». Noter le temps entre l'envoi et la réponse. « export trop long : utilisez /simc nobags » ou une
+       réponse « export incomplet ou modifié » : recommencer avec `/simc nobags` et le noter.
+    8. **Carte de test** : dans le terminal, `uv run forever bridge selftest --card`. En jeu : `/reload`, puis `/fv` :
+       bouton « À valider (1) » ; clic : le panneau s'ouvre à droite (« Carte de test du pont », Valider, Refuser).
+       Clic sur Valider : il devient « Confirmer » ; attendre une dizaine de secondes : il redevient « Valider ».
+       Clic sur Valider puis, dans les cinq secondes, sur Confirmer : « Vous : Valider : Carte de test du pont », puis
+       la réponse « Carte de test : « Valider » reçu par le pont ; rien n'est lancé. ». Dans le terminal,
+       `uv run forever bridge status --json` : une ligne `action` au résultat « carte de test » ; rien d'autre n'est
+       lancé (aucune ligne `update_launched`).
+    9. **Relevé** : ce qui s'est passé à chaque étape (4 : par type de lien ; 5 et 7 : délais) ; la sortie de l'étape
+       6 ; puis `uv run forever bridge contexts export "$env:TEMP\sonde-g"` et me donner le dossier : les contextes
+       et l'export (anonymisé) deviennent les fixtures réelles et les tests de non-régression ajoutés après la
+       sonde.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :
