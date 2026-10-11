@@ -18,21 +18,23 @@ from forever.mcp_server import build_server
 
 EVALS = REPO_ROOT / "plugin" / "evals"
 MCP_PREFIX = "mcp__plugin_forever_forever__"
-POSITIVE_COUNTS = {
-    "profil": 2,
-    "talent": 8,  # sonde F : bouton Talents de la fenêtre du jeu ; sonde H : question de suite à faute de frappe
-    "build": 9,  # FA1 : lien Talents Forever, builds populaires du Voleur, build proche d'un populaire
-    "respec": 4,
-    "zone": 4,
-    "generale": 2,
-    "personnelle": 2,
-    "planification": 1,
-    "mecanique": 5,
-    "leveling": 4,  # sonde F : bouton Leveling
-    "hors-perimetre": 3,
-    "pvp": 4,  # PV1 : contrôles du Voleur, Mage contre Démoniste, défensif du Paladin ; sonde F : bouton PvP
-    "familiers": 4,  # CH0 : guide d'apprivoisement, capacités du loup, entraînement des familiers ; sonde F
-}
+# Catégories connues des cas positifs (décision 239 : sans compte figé ; un nouveau cas ne casse aucun test, une
+# nouvelle catégorie s'ajoute ici comme un nouveau statut au registre).
+POSITIVE_CATEGORIES = (
+    "profil",
+    "talent",
+    "build",
+    "respec",
+    "zone",
+    "generale",
+    "personnelle",
+    "planification",
+    "mecanique",
+    "leveling",
+    "hors-perimetre",
+    "pvp",
+    "familiers",
+)
 NEGATIVE_CATEGORIES = ("wow-autre", "autre-jeu", "programmation")
 POSITIVE_GRADERS = {"skill", "outil", "chiffres", "certitude", "provenance"}
 
@@ -80,15 +82,17 @@ def tool_names(tmp_path_factory):
 # --- Suite ---------------------------------------------------------------------------------------------------------
 
 
-def test_fifty_eight_cases_thirty_eight_positive_twenty_negative():
-    polarity = [front(c / "prompt.md")[0]["tags"][0] for c in cases()]
-    # T06b : talent-niveau-22 et deux cas à profil vide ; 2026-09-29 : deux questions générales, deux personnelles,
-    # un personnage prévu.
-    # PV1 : trois cas PvP et un voisin (retail).
-    # FA1 : trois cas Talents Forever et un voisin (chaîne d'import de talents de retail).
-    # sonde H (décision 238) : question de suite à faute de frappe dans la conversation « jeu ».
-    assert len(polarity) == 75  # CH0 : trois cas familiers et un voisin ; sonde F : un cas par bouton du pont
-    assert polarity.count("positif") == 52 and polarity.count("negatif") == 23
+def test_every_case_has_a_known_polarity_and_category():
+    """Décision 239 (comme la décision 214 pour le registre) : aucun total figé ; chaque cas est positif ou négatif,
+    dans une catégorie connue, et les deux polarités sont présentes."""
+    tags = [front(c / "prompt.md")[0]["tags"] for c in cases()]
+    assert tags and all(len(t) >= 2 for t in tags)
+    for polarity, category, *_ in tags:
+        assert polarity in ("positif", "negatif"), polarity
+        assert category in (POSITIVE_CATEGORIES if polarity == "positif" else NEGATIVE_CATEGORIES), category
+    polarities = [t[0] for t in tags]
+    assert polarities.count("positif") + polarities.count("negatif") == len(cases())
+    assert polarities.count("positif") > 0 and polarities.count("negatif") > 0
 
 
 def test_empty_profile_cases():
@@ -268,7 +272,7 @@ def test_positive_categories():
         tags = front(c / "prompt.md")[0]["tags"]
         if tags[0] == "positif":
             counts[tags[1]] = counts.get(tags[1], 0) + 1
-    assert counts == POSITIVE_COUNTS
+    assert set(counts) == set(POSITIVE_CATEGORIES)  # chaque catégorie a au moins un cas, aucune inconnue
 
 
 def test_negative_categories():
@@ -277,7 +281,6 @@ def test_negative_categories():
         tags = front(c / "prompt.md")[0]["tags"]
         if tags[0] == "negatif":
             counts[tags[1]] += 1
-    assert sum(counts.values()) == 23
     assert all(n >= 4 for n in counts.values()), counts
 
 
@@ -368,13 +371,25 @@ def test_report_thresholds_of_d10():
 
 
 def test_report_loads_the_real_suite():
+    """Décision 239 : le rapport lit chaque cas de la suite, complet et valide, et ses comptes viennent de la suite
+    elle-même (aucun total figé)."""
     report = load_module("plugin_eval_report")
     loaded = report.load_cases(EVALS)
-    # PV1 : trois cas PvP et un voisin ; CH0 : trois cas familiers et un voisin ; FA1 : trois cas et un voisin
-    assert len(loaded) == 74  # sonde F : un cas par bouton du pont
-    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 51
+    assert set(loaded) == {c.name for c in cases()}  # aucun cas perdu (tags incomplets)
+    for name, case in loaded.items():
+        assert case["polarity"] in ("positif", "negatif"), name
+        known = POSITIVE_CATEGORIES if case["polarity"] == "positif" else NEGATIVE_CATEGORIES
+        assert case["category"] in known, name
     assert not any(ch.isdigit() for label in report.LABELS.values() for ch in label)  # compte tiré de la suite
     assert loaded["talent-improved-frostbolt"] == {"polarity": "positif", "category": "talent"}
+    # un passage réussi de chaque cas : les totaux du rapport sont les comptes de la suite
+    passed = [{"name": g, "passed": True} for g in ("skill", "aucun-skill-forever", *POSITIVE_GRADERS)]
+    result = {"cases": [{"name": n, "arms": {"with": [{"graders": passed}]}} for n in loaded]}
+    m = report.metrics(result, loaded)
+    positive = sum(1 for v in loaded.values() if v["polarity"] == "positif")
+    assert m["aiguillage"]["total"] == len(loaded)
+    assert all(m[k]["total"] == positive for k in ("outil", "chiffres", "certitude", "provenance"))
+    assert m["je_ne_sais_pas"]["total"] == sum(1 for v in loaded.values() if v["category"] == "hors-perimetre")
 
 
 def test_report_metrics():

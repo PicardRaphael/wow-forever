@@ -5,7 +5,7 @@ La tâche lance ce module avec le `pythonw.exe` de l'interpréteur de base (aucu
 que la bibliothèque standard. Il lance `forever update --auto --json --log`, la commande du hook de démarrage, avec le
 vrai interpréteur dans l'environnement du dépôt et sans console : même verrou (`<cache>/update/lock`, pris par le
 passage) et même journal (`<cache>/update/run-<horodatage>.log`, ouvert par `--log`). Il attend la fin du passage et
-rend son code ; le passage est retenu dans un objet de tâche fermé à la mort du relais, pour que la limite de 2 h de la
+rend son code ; le passage est retenu dans un objet de tâche fermé à la mort du relais, pour que la limite de 3 h de la
 tâche (qui tue le relais) l'atteigne aussi."""
 
 from __future__ import annotations

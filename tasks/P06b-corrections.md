@@ -59,7 +59,7 @@ test, pas sur le comportement voulu ; le code n'est pas changé pour les contour
   +                                  "level": make_field(18, "joueur", "2026-09-01T00:00:00Z")}}}  # fmt: skip
   ```
 
-## Retours de la sonde H (commit « P06b: tests des retours de la sonde H … », 9da81ca) — en attente d'accord
+## Retours de la sonde H (commit « P06b: tests des retours de la sonde H … », 9da81ca) — acceptées le 2026-10-11, appliquées
 
 ### 5. `tests/unit/test_sonde_h.py` (`quiet_steps` et `test_a_pass_over_its_limit_stops_and_leaves_an_error`) — `Step` sans `data`
 - **Preuve** : `forever.update.Step` est un `NamedTuple` à quatre champs, `name`, `status`, `detail`, `data`
@@ -88,3 +88,6 @@ test, pas sur le comportement voulu ; le code n'est pas changé pour les contour
   +    assert len(loaded) == 75  # sonde F : un cas par bouton du pont ; sonde H : question de suite à faute de frappe
   +    assert sum(1 for v in loaded.values() if v["polarity"] == "positif") == 52
   ```
+- **Accord du 2026-10-11** : n° 5 appliquée telle quelle ; n° 6 élargie à la demande de l'utilisateur (décision 239) :
+  plus aucun total figé dans `tests/unit/test_plugin_evals.py` (cas complets et valides, catégories connues, comptes du
+  rapport calculés sur la suite elle-même) ; un nouveau cas d'évaluation ne casse plus aucun test verrouillé.

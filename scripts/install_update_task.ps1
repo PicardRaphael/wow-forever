@@ -1,14 +1,14 @@
 ﻿# Tâche planifiée Windows de la mise à jour automatique (T08d, bloc G, décisions 179 à 181 et 226) :
 # `forever update --auto`, comme le hook de démarrage (même verrou `<cache>\update\lock`, même journal
 # `<cache>\update\run-<horodatage>.log`), chaque jour à 08:00, lancée dès que possible si l'heure est passée, seulement
-# si le réseau est disponible, 2 h au plus. Lancée par l'utilisateur, jamais par l'agent ; sans droits administrateur.
+# si le réseau est disponible, 3 h au plus (au-dessus du plus long délai d'étape de forever update, décision 239). Lancée par l'utilisateur, jamais par l'agent ; sans droits administrateur.
 # Le passage travaille dans le clone dédié du cache (<cache>\update\repo), jamais dans l'arbre de travail de la
 # session ; réseau accordé par la décision 179 (wago.tools, WoWDBDefs, git et gh du clone). Remplace l'ancienne tâche
 # « WoW Forever - veille locale » (`forever watch --report`, qui ne faisait que regarder) : la retire si elle existe.
 #
 # L'action est le `pythonw.exe` de l'interpréteur de base (aucune fenêtre : l'environnement n'en a pas, et une tâche
 # qui lance une console l'ouvre sur le bureau) ; il lance `python -m forever.update_task`, qui démarre le passage avec
-# le vrai interpréteur dans l'environnement du dépôt et l'attend (la limite de 2 h l'atteint).
+# le vrai interpréteur dans l'environnement du dépôt et l'attend (la limite de 3 h l'atteint).
 #
 #   powershell -File scripts\install_update_task.ps1            # créer ou remplacer la tâche (08:00 chaque jour)
 #   powershell -File scripts\install_update_task.ps1 -Print     # contenu de la tâche en JSON, sans rien créer
@@ -55,7 +55,7 @@ $trigger = New-ScheduledTaskTrigger -Daily -At $At
 # Heure locale, sans « Z » : sinon la tâche suit l'UTC et glisse d'une heure au changement d'heure.
 $trigger.StartBoundary = (Get-Date $At).ToString("yyyy-MM-dd'T'HH:mm:ss")
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -RunOnlyIfNetworkAvailable `
-    -ExecutionTimeLimit (New-TimeSpan -Hours 2) -MultipleInstances IgnoreNew `
+    -ExecutionTimeLimit (New-TimeSpan -Hours 3) -MultipleInstances IgnoreNew `
     -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
 $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
 $description = "Mise à jour automatique de forever-core (T08d, décision 226) : forever update --auto, comme le hook " +
@@ -95,10 +95,10 @@ if (Get-ScheduledTask -TaskName $OldTaskName -ErrorAction SilentlyContinue) {
     }
 }
 
-if ($PSCmdlet.ShouldProcess($TaskName, "Créer ou remplacer la tâche planifiée (chaque jour à $At, 2 h au plus)")) {
+if ($PSCmdlet.ShouldProcess($TaskName, "Créer ou remplacer la tâche planifiée (chaque jour à $At, 3 h au plus)")) {
     Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings `
         -Principal $principal -Description $description -Force | Out-Null
-    Write-Output "Tâche « $TaskName » créée : chaque jour à $At (ou dès que possible), réseau requis, 2 h au plus."
+    Write-Output "Tâche « $TaskName » créée : chaque jour à $At (ou dès que possible), réseau requis, 3 h au plus."
     Write-Output "  action : $pythonw -m forever.update_task (forever update --auto --json --log) dans $repo"
     Write-Output "  journal de chaque passage : <cache>\update\run-<horodatage>.log ; suivi : uv run forever update status"
 }

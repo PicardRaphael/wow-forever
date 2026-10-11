@@ -1,6 +1,6 @@
 """Tâche planifiée de mise à jour (décision 226) : « WoW Forever - mise à jour » lance `forever update --auto` comme
 le hook de démarrage (même verrou, même journal `<cache>/update/run-<horodatage>.log`), chaque jour à 08:00, dès que
-possible si l'heure est passée, seulement avec le réseau, 2 h au plus ; elle remplace l'ancienne tâche « veille
+possible si l'heure est passée, seulement avec le réseau, 3 h au plus (décision 239) ; elle remplace l'ancienne tâche « veille
 locale » (`forever watch --report`, qui ne faisait que regarder).
 
 Le contenu de la tâche est vérifié sans l'installer (`-Print`) ; les scripts PowerShell sont en UTF-8 avec BOM, sans
@@ -72,10 +72,35 @@ def test_update_task_content_without_installing_it():
     assert "T08:00:00" in task["Trigger"]["StartBoundary"]
     assert task["StartWhenAvailable"] is True  # lancée dès que possible si 08:00 est passée
     assert task["RunOnlyIfNetworkAvailable"] is True
-    assert task["ExecutionTimeLimit"] == "PT2H"
+    assert task["ExecutionTimeLimit"] == "PT3H"
     assert task["MultipleInstances"] == "IgnoreNew"
     assert task["LogonType"] == "Interactive" and task["RunLevel"] == "Limited"  # sans droits administrateur
     assert task["OldTaskName"] == "WoW Forever - veille locale"
+
+
+# --- Durée maximale de la tâche et délais des étapes (décision 239) ------------------------------------------------
+
+TASK_MARGIN_S = 20 * 60  # arrêt propre du passage (veille de 5 s, attente « erreur », verrou rendu) avant la tâche
+
+
+def task_limit_s() -> int:
+    """Durée maximale de la tâche, lue dans le script (`-ExecutionTimeLimit (New-TimeSpan -Hours N)`)."""
+    import re
+
+    text = UPDATE_SCRIPT.read_text(encoding="utf-8-sig")
+    found = re.findall(r"-ExecutionTimeLimit \(New-TimeSpan -Hours (\d+)\)", text)
+    assert len(found) == 1, found
+    return int(found[0]) * 3600
+
+
+def test_task_limit_stays_above_the_longest_step_limit():
+    """La tâche planifiée tue le passage à sa limite, sans libérer le verrou : le délai de chaque étape de
+    `forever update` doit tomber avant, avec une marge, pour que l'arrêt propre (attente « erreur ») ait lieu."""
+    from forever.update import STEP_LIMITS_S
+
+    longest = max(STEP_LIMITS_S.values())
+    assert task_limit_s() >= longest + TASK_MARGIN_S, (task_limit_s(), longest)
+    assert task_limit_s() == 3 * 3600  # demande de l'utilisateur du 2026-10-11
 
 
 # --- Relais de la tâche (interpréteur de base, sans fenêtre) -------------------------------------------------------

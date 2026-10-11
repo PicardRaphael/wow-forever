@@ -74,10 +74,10 @@ def quiet_steps(monkeypatch, update, **overrides):
              "correctifs": "_step_hotfixes", "journaux": "_step_logs", "addons": "_step_addons"}  # fmt: skip
     for step, fn in names.items():
         monkeypatch.setattr(
-            update, fn, overrides.get(step) or (lambda *a, step=step: update.Step(step, "rien", "simulé"))
+            update, fn, overrides.get(step) or (lambda *a, step=step: update.Step(step, "rien", "simulé", {}))
         )
     monkeypatch.setattr(
-        update, "_step_game", overrides.get("jeu") or (lambda run: (update.Step("jeu", "rien", "simulé"), None))
+        update, "_step_game", overrides.get("jeu") or (lambda run: (update.Step("jeu", "rien", "simulé", {}), None))
     )
 
 
@@ -95,7 +95,7 @@ def test_a_pass_over_its_limit_stops_and_leaves_an_error(make_deps, monkeypatch)
     def blocking_clone(run):
         stuck.set()
         released.wait(5)
-        return update.Step("clone", "fait", "débloqué")
+        return update.Step("clone", "fait", "débloqué", {})
 
     quiet_steps(monkeypatch, update, clone=blocking_clone)
 

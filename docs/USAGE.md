@@ -125,7 +125,7 @@ suivant. Un journal de combat n'est noté comme mesuré qu'une fois sa mesure é
 Tâche planifiée Windows « WoW Forever - mise à jour » (décision 226) : `forever update --auto`, comme le hook
 de démarrage (même verrou `<cache>/update/lock`, même journal `<cache>/update/run-<horodatage>.log`), chaque jour à
 08:00 en heure locale, lancée dès que possible si l'heure est passée (PC éteint à 08:00), seulement si le réseau est
-disponible, 2 h au plus, une seule à la fois ; sans fenêtre (le `pythonw.exe` de Python lance `forever.update_task`,
+disponible, 3 h au plus (au-dessus du plus long délai d'étape, décision 239), une seule à la fois ; sans fenêtre (le `pythonw.exe` de Python lance `forever.update_task`,
 qui démarre le passage avec l'interpréteur réel de l'environnement et l'attend) et sans droits administrateur. Le
 script retire l'ancienne tâche « WoW Forever - veille locale ». Il est en UTF-8 avec BOM : Windows PowerShell 5.1 en
 lit les accents correctement.
