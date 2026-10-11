@@ -138,10 +138,10 @@ def test_error_card_and_status_line():
     entry = {"id": "pass-error-x", "kind": "pass_error", "action": "bloqué", "state": "en_attente", "version": None,
              "reasons": ["passage arrêté au bout de 120 min, à l'étape journaux"], "commands": ["forever update status"]}  # fmt: skip
     (card,) = update_cards([entry])
-    assert card["title"] == "Passage de forever update en erreur" and not approvable(entry)
-    assert card["lines"][0].startswith("passage arrêté") and [b["key"] for b in card["buttons"]] == ["explain"]
+    assert card["title"] == "La dernière mise à jour s'est arrêtée" and not approvable(entry)
+    assert "passage arrêté" in card["detail"] and [b["key"] for b in card["buttons"]] == ["explain"]
     line = status_line({"version": "1.60.1.70338", "freshness": "fresh", "pass_error": True})
-    assert "dernier passage en erreur" in line
+    assert "dernière mise à jour en erreur" in line
 
 
 def lock_with(cache_dir, **fields):
@@ -165,7 +165,7 @@ def test_running_step_shows_the_real_activity_and_its_duration(make_deps):
     assert summary["running_detail"].startswith("CI attendue sur data/1.60.1.70338-r2")
     update = {"running": True, "step": "journaux", "activity": "attente de la CI", "minutes": 9}
     line = status_line({"version": "1.60.1.70338", "freshness": "fresh", "running": True, "update": update})
-    assert "mise à jour en cours (journaux : attente de la CI, 9 min)" in line
+    assert "mise à jour en cours (attente de la validation sur GitHub, 9 min)" in line
 
 
 def test_update_status_shows_the_activity_and_the_last_line(make_deps, capsys):

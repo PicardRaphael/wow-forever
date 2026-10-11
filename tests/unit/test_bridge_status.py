@@ -90,7 +90,7 @@ def test_running_pass_and_its_step(make_deps):
                                 "heartbeat": started, "step": "correctifs"}), encoding="utf-8")  # fmt: skip
     payload = status_payload(deps)
     assert payload["update"]["running"] is True and payload["update"]["step"] == "correctifs"
-    assert "mise à jour en cours (correctifs)" in status_line({**base(), "running": True, "update": payload["update"]})
+    assert "mise à jour en cours (lecture des correctifs du serveur)" in status_line({**base(), "running": True, "update": payload["update"]})
 
 
 def test_last_pass_is_carried(make_deps):

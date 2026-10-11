@@ -46,7 +46,7 @@ def test_polls_every_thirty_seconds_during_a_pass():
     game.slash("/fv")
     game.stub.Advance(30 * 25, 1.0)
     times = loads(game)
-    assert len(times) == 20
+    assert len(times) == 22  # 20 relevés à 30 s, puis toutes les 60 s (décision 240)
     assert times[:3] == pytest.approx([30, 60, 90], abs=1.1)
 
 

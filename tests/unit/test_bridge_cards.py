@@ -72,11 +72,11 @@ def test_names_are_listed_ten_at_most():
 
 
 def test_simple_card_lines():
-    assert card_lines(entry("network")) == ["attente réseau : se lève seule au prochain passage réussi"]
+    assert card_lines(entry("network")) == ["En attente du réseau : la mise à jour reprendra seule."]
     hotfix = entry("hotfixes_unread", until="2026-10-11T05:07:29Z")
-    assert card_lines(hotfix) == ["correctifs du serveur à lire jusqu'au 2026-10-11T05:07:29Z"]
+    assert card_lines(hotfix) == ["Correctifs du serveur à lire jusqu'au 11/10/2026."]
     blocked = entry("install_version", action="bloqué", revision=1, commands=["uv run tasks.py verify"])
-    assert card_lines(blocked)[-1] == "à traiter sur le PC : uv run tasks.py verify"
+    assert card_lines(blocked)[-1] == "Une mise à jour attend une correction sur ton PC : ouvre une session Claude"
     install = entry("install_revision", revision=2, summary={"pvp": {"sentence": "fiches PvP : Warrior"}})
     assert card_lines(install)[:2] == [f"version {VERSION}, révision 2", "fiches PvP : Warrior"]
 
@@ -84,11 +84,11 @@ def test_simple_card_lines():
 def test_update_cards_buttons_and_closed_entries():
     cards = update_cards([measures(), entry("network"), measures("faite"), measures("rejetée")])
     assert [c["id"] for c in cards] == [f"measures-{VERSION}", f"network-{VERSION}"]
-    keys = [[b["key"] for b in c["buttons"]] for c in cards]
+    keys = [[b["key"] for b in c["buttons"]] for c in cards]  # « Masquer » : ajouté à la publication (CardSource)
     assert keys == [["approve", "reject", "explain"], ["explain"]]
     approve = cards[0]["buttons"][0]
     assert approve == {"key": "approve", "label": "Valider", "action": f"approve:measures-{VERSION}", "confirm": True}
     assert all(c["kind"] == "update" and c["title"] and c["lines"] for c in cards)
     approved = update_cards([measures("approuvée")])
     assert [b["key"] for b in approved[0]["buttons"]] == ["explain"]
-    assert approved[0]["lines"][-1] == "approuvée : prise au prochain passage de forever update"
+    assert approved[0]["lines"][-1] == "Validée : sera installée à la prochaine mise à jour."
