@@ -75,7 +75,7 @@ def cards_label(lua):
 
 
 def test_the_cross_closes_the_panel():
-    game, _, lua = opened([card("a", "s1")])
+    _, _, lua = opened([card("a", "s1")])
     cross = lua.ForeverBridgePanelClose
     assert cross is not None and cross.template == "UIPanelCloseButton" and shown(cross)
     point = cross.points[1]
@@ -85,7 +85,7 @@ def test_the_cross_closes_the_panel():
 
 
 def test_a_second_click_on_the_cards_button_closes_the_panel():
-    game, _, lua = opened([card("a", "s1")])
+    _, _, lua = opened([card("a", "s1")])
     assert shown(lua.ForeverBridgePanel)
     click(lua.ForeverBridgeCardsButton)
     assert not shown(lua.ForeverBridgePanel)
@@ -132,7 +132,7 @@ def test_hidden_cards_survive_a_reload():
 
 
 def test_status_counts_leave_out_hidden_cards():
-    game, _, lua = opened([card("a", "s1"), card("b", "s2", count="waiting")])
+    game, _, _ = opened([card("a", "s1"), card("b", "s2", count="waiting")])
     assert "1 à valider · 1 en attente" in status_text(game)
     click(card_button(game, 1, "hide"))
     text = status_text(game)
