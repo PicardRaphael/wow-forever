@@ -21,6 +21,7 @@ from test_update_measures_summary import CHANGED_CASE, PreviewMeasure, SplitRepl
 from forever.update import (
     UpdateOptions,
     _measure_revision,
+    _revision,
     _written_logs,
     approve,
     list_pending,
@@ -68,6 +69,8 @@ def add_log(deps, name):
 
 def test_a_measure_that_changes_no_advice_is_written_alone(logs, tmp_path):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
+    # révision installée lue avant le passage : 1 sur main, 2 sur une branche de données qui porte déjà la r2
+    installed = _revision(deps.data_dir, LOCAL_VERSION)
     report = run_update(deps, JOURNALS, replay=SameReplay(), measure=PreviewMeasure(tmp_path))
     found = step(report, "journaux")
     assert found["status"] == "fait", found
@@ -75,7 +78,7 @@ def test_a_measure_that_changes_no_advice_is_written_alone(logs, tmp_path):  # n
     assert report["pending"] == []
     (verdict,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
     assert verdict["action"] == "écrire" and verdict["approved"] is False
-    assert verdict["revision"] == 2
+    assert verdict["revision"] == installed + 1
 
 
 def test_a_measure_that_changes_an_advice_waits(logs, tmp_path):  # noqa: F811
