@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: Forever Guide
+## Title-ruRU: Путеводитель Forever
+## Title-zhCN: Forever指南
+## Title-zhTW: Forever指南
+## Title-koKR: Forever 가이드
+## Version: 1.33.0
+## SavedVariables: ForeverGuideDB
+## OptionalDeps: TomTom, Questie, ForeverLFG
+## IconTexture: Interface\AddOns\ForeverGuide\Media\icon

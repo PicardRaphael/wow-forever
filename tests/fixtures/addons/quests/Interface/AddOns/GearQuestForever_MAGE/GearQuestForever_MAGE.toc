@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: GearQuest Forever: Mage
+## Author: Henrik8210
+## Version: 0.3.6-beta
+## LoadOnDemand: 1
+## Dependencies: GearQuestForever
+## RequiredDeps: GearQuestForever

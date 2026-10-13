@@ -1,0 +1,7 @@
+## Interface: 16001
+## Title: GearQuest Forever
+## Author: Henrik8210
+## Version: 0.5.4-beta
+## X-Curse-Project-ID: 1698950
+## SavedVariables: GearQuestForeverDB
+## SavedVariablesPerCharacter: GearQuestForeverCharDB

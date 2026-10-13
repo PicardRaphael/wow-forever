@@ -1,0 +1,10 @@
+## Interface: 16001
+## Title: DungeonJournal
+## Author: Exehn
+## Version: 1.6.2
+## IconTexture: Interface\Icons\INV_Misc_Book_09
+## AddonCompartmentFunc: ForeverDungeonJournal_OnAddonCompartmentClick
+## AddonCompartmentFuncOnEnter: ForeverDungeonJournal_OnAddonCompartmentEnter
+## AddonCompartmentFuncOnLeave: ForeverDungeonJournal_OnAddonCompartmentLeave
+## SavedVariables: ForeverDungeonJournalDB
+## SavedVariablesPerCharacter: ForeverDungeonJournalCharacterDB
