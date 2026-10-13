@@ -283,6 +283,11 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   repos et le groupe), et quelle est sa valeur exacte ?** Ajoutée le 2026-10-09 (note du 08/10, « environ 20 % »).
   Test : XP d'un monstre de donjon relevée seul, sans repos, comparée à l'XP de base de son niveau. Priorité :
   moyenne (T04d, DJ1). Registre I10.
+- **LVL10 — Pourquoi aucun bonus de repos dans les 2 714 gains d'XP relevés par ForeverLogger 0.3.0 ?** Ajoutée le
+  2026-10-13 (T04d) : aucun texte ne porte la forme de Classic « (+N exp Rested bonus) » : pas de repos pendant ces
+  séances, ou texte (ou règle) du repos différent sur Forever. Test : sonde en jeu I (`docs/ADDON.md`, section 7,
+  étape 21) : monstres tués reposé puis non reposé, `GetXPExhaustion` et `UnitXP` relevés avant et après chaque gain
+  par ForeverLogger 0.4.0 (`xp_states`). Priorité : moyenne (T04d, T04f). Registre D7.
 
 ## PvP
 - **PVP1 — Les rendements décroissants de Forever suivent-ils Classic (catégories, fenêtre, paliers, immunité,

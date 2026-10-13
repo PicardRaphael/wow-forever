@@ -50,7 +50,7 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 | à éviter | Journal de discussion (écrit à la sortie, ignore les `print` d'addon) ; pixels et lecture d'écran hors du pont de P06a | — | Non |
 
 ## 6. Contrat de données
-- **ForeverLoggerDB** (retour, schéma 1) : par GUID, instantanés `{reason, time, localtime, level, talents, spell_bonus, spell_crit}` à la connexion, au gain de niveau et au changement de talents ; gains d'expérience `{time, localtime, level, text}` ; depuis CH0 (0.3.0), hors combat seulement, instantanés du familier et des statistiques du Chasseur au même instant (`pet_snapshots`, sur `UNIT_PET`, `PET_UI_UPDATE`, à la connexion, repris à `PLAYER_REGEN_ENABLED` s'ils tombaient en combat) et relevés de la fenêtre Beast Training (`training`, sur `CRAFT_SHOW` et `CRAFT_UPDATE`). [Supposé] API des familiers de Classic (`GetPetTrainingPoints`, `GetPetFoodTypes`, `GetPetLoyalty`, `GetCraftInfo`…) présentes sur Forever : toutes sous `pcall`, champ absent sinon. Détail : `addon/README.md`. Lecture : `forever/pipeline/addon_sv.py` ; jointure avec un journal par GUID et heure locale (`forever logs measure <journal> --addon-sv <fichier>`).
+- **ForeverLoggerDB** (retour, schéma 1) : par GUID, instantanés `{reason, time, localtime, level, talents, spell_bonus, spell_crit}` à la connexion, au gain de niveau et au changement de talents ; gains d'expérience `{time, localtime, level, text}` ; depuis CH0 (0.3.0), hors combat seulement, instantanés du familier et des statistiques du Chasseur au même instant (`pet_snapshots`, sur `UNIT_PET`, `PET_UI_UPDATE`, à la connexion, repris à `PLAYER_REGEN_ENABLED` s'ils tombaient en combat) et relevés de la fenêtre Beast Training (`training`, sur `CRAFT_SHOW` et `CRAFT_UPDATE`). [Supposé] API des familiers de Classic (`GetPetTrainingPoints`, `GetPetFoodTypes`, `GetPetLoyalty`, `GetCraftInfo`…) présentes sur Forever : toutes sous `pcall`, champ absent sinon. **T04d (0.4.0, schéma 2)** : chaque gain d'XP garde `seq`, montant, type (`monster`, `other`), monstre, cible (`target` : nom, niveau, classification, PNJ, type, source `target` | `nameplate` | `recent`) ou niveaux vus (`seen_levels`), état de l'XP et du repos au moment du message (`state` : `xp`, `max`, `rested`, `rest_state`), `resting`, `instance`, `group` (taille, raid, niveaux des membres), `map` ; `xp_states` (connexion, niveau, `PLAYER_XP_UPDATE`, changements du repos) ; `quests` (`accepted` et `turned_in` : ID, titre, niveau de la quête, `xp_reward`, `money_reward`, état, carte) ; instantanés avec `trivial_range` (`UnitQuestTrivialLevelRange`) et état ; `errors` (erreurs des gestionnaires comptées par événement) ; `/flog` affiche le résumé de la session. Détail : `addon/README.md`. Lecture : `forever/pipeline/addon_sv.py` ; jointure avec un journal par GUID et heure locale (`forever logs measure <journal> --addon-sv <fichier>`).
 - **Fichier généré pour ForeverAssist** (aller, V1) : variable `ForeverAssistData` avec `schema`, `build`, `generated_at`, puis les données ; schéma versionné et validé par pytest, `Generated.sample.lua` versionné, `Generated.lua` ignoré par git.
 
 - **ForeverBridgeDB** (retour, schéma 1, ForeverBridge) : `session` (jeton de l'addon), `next_id`, `history` (50
@@ -424,6 +424,58 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        revient seule quand l'attente change.
     4. Deux attentes de la même branche (écriture bloquée) : une seule carte, textes sans jargon (« Une mise à jour
        attend une correction sur ton PC : ouvre une session Claude »).
+
+21. **Sonde en jeu I : XP des monstres, des quêtes et du repos** (T04d, bloc A, décisions 245 et 246 ; **à jouer
+    du 2026-10-14 au 2026-10-16**, puis une seconde fois avant le 2026-10-21 si la première laisse des trous). Elle
+    dit l'XP réelle de chaque monstre selon son niveau (I6), l'XP réelle des quêtes rendues (`xpReward`, I9, LVL1),
+    le bonus des monstres de donjon (LVL5), l'effet du repos (LVL10, D7) et la couleur des quêtes (LVL2).
+    Personnages : le Mage orc (niveau 19) et le Chasseur orc (niveau 15). Durée : 1 h 15 à 1 h 30 en tout.
+    0. **La veille** : déconnecter le Chasseur dans l'auberge d'Orgrimmar (Valley of Strength) et le Mage dans une
+       auberge : le repos s'accumule hors ligne, la barre d'XP sera bleue à la connexion.
+    1. **Jeu fermé** : `uv run python scripts/install_addon.py` (ForeverLogger 0.4.0 ; terminal administrateur si
+       l'écriture est refusée).
+    2. **À la connexion de chaque personnage** : dans la liste des addons, ForeverLogger en 0.4.0 ; taper `/flog` :
+       une ligne « XP … / …, repos : … » s'affiche. Noter la couleur de la barre d'XP (bleue : reposé). Si `/flog` ne
+       répond pas, s'arrêter et me le dire.
+    3. **Règle pour chaque monstre** : le cibler avant de l'attaquer et **garder la cible jusqu'à sa mort** (c'est la
+       cible morte qui donne son niveau à l'addon ; à défaut, la plaque de nom). Familier : il peut taper, le
+       monstre reste en cible. Après chaque série, `/flog` : « Dernier gain : +N XP (monstre), niveau du monstre L
+       (target) ». « niveau du monstre inconnu » : continuer, me le dire.
+    4. **Mage, 20 à 30 min, seul, dehors, dans sa zone actuelle** :
+       1. Reposé : 5 monstres normaux de son niveau, 5 de 2 à 3 niveaux en dessous, 3 de 1 à 2 niveaux au-dessus.
+       2. Tuer des monstres de son niveau jusqu'à ce que `/flog` affiche « repos : aucun » (barre redevenue
+          violette) ; au-delà de 15 min, passer à la suite sans attendre.
+       3. Non reposé : 5 monstres de son niveau, et 2 monstres gris (5 niveaux ou plus en dessous) si le trajet en
+          croise.
+       4. Rendre au moins 3 quêtes de couleurs différentes : une jaune, une verte, une grise s'il en reste une.
+          Avant chaque rendu, capture d'écran du journal de quêtes (couleur) ; après, `/flog` : « Dernière quête
+          rendue : <ID> …, N XP ».
+    5. **Chasseur, 20 à 30 min, seul, The Barrens** (autour du Crossroads et sur la côte) : même déroulé que le Mage
+       (étapes 4.1 à 4.3), sur des monstres normaux de **niveau 13 et 14** (les niveaux des monstres de Ragefire
+       Chasm) : Zhevra Runner, Razormane Mystic, Sunscale Screecher, Venture Co. Drudger, Southsea Cannoneer ; au
+       moins 5 de niveau 13 et 5 de niveau 14 **non reposé** ; gris : monstres de Durotar sur le chemin d'Orgrimmar.
+    6. **Chasseur, Ragefire Chasm** (non reposé de préférence : faire l'étape 5.2 avant ; entrée dans Orgrimmar,
+       Cleft of Shadow) :
+       1. Avant d'entrer : prendre **Slaying the Beast** (5761) chez Neeru Fireblade (Orgrimmar, The Drag, 49.5,
+          50.6) ; si Thunder Bluff est sur le chemin (vol depuis Orgrimmar ou le Crossroads) : **Testing an Enemy's
+          Strength** (5723 : 8 Ragefire Troggs et 8 Ragefire Shamans) et **Searching for the Lost Satchel** (5722 :
+          fouiller le corps de Maur Grimtotem dans le donjon, puis 5724 au retour) chez Rahauro (Thunder Bluff, Elder
+          Rise, 70.1, 29.5). **Hidden Enemies** (Thrall, Valley of Wisdom) seulement s'il la propose déjà (chaîne de
+          trois quêtes). **The Power to Destroy...** (5725, Varimathras, Undercity) : non, trop loin.
+       2. Dans le donjon, seul et prudemment (élites dans Questie Classic ; la classification de Forever est relevée
+          par l'addon) : Ragefire Troggs et Ragefire Shamans un à un, cible gardée, au moins 5 de niveau 13 et 5 de
+          niveau 14, 8 et 8 si possible (objectif de 5723). Noter si le portrait porte le dragon doré (élite). Boss
+          (Taragaman, Bazzalan, Jergosh, Oggleflint) seulement en groupe. Fouiller Maur Grimtotem si 5722 est prise.
+       3. Sortir et rendre ce qui est fini (5723 et 5724 chez Rahauro, 5761 chez Neeru si Taragaman est mort).
+       4. Temps court : faire au moins l'étape 6.2 et les 5 + 5 monstres de même niveau dehors (étape 5).
+    7. **Groupe, seulement si l'occasion se présente** (LVL4) : quelques monstres tués en groupe ; l'addon relève la
+       taille du groupe et le niveau des membres.
+    8. **Fin** : `/reload` (ou déconnexion), fermer le jeu, puis `uv run forever logs scan`. Me donner : date et heures
+       de début et de fin de chaque partie (Mage, Chasseur dehors, Ragefire Chasm), les captures du journal de quêtes,
+       les monstres vus élites, et tout `/flog` qui a montré « Erreurs relevées » ou « niveau du monstre inconnu ».
+       Je lis moi-même `WTF/Account/<COMPTE>/SavedVariables/ForeverLogger.lua` et le journal de combat (lecture
+       locale) et en tire des fixtures sans nom ni GUID ; `forever xp check` (bloc G) les compare au modèle.
+    9. « Fait le AAAA-MM-JJ (relevés de l'utilisateur) » : règles confirmées, écarts, questions mises à jour.
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

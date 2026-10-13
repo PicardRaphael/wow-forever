@@ -3,6 +3,9 @@
 -- par forever (forever/pipeline/addon_sv.py) et jointe aux journaux de combat par GUID et par heure.
 -- CH0 : hors combat, instantané du familier du Chasseur et des statistiques du Chasseur au même instant, et relevé
 -- de la fenêtre Beast Training (capacités offertes, rang, coût en points d'entraînement, niveau requis).
+-- T04d (0.4.0) : montant de chaque gain d'XP, monstre tué (niveau, classification, PNJ) quand la cible ou une plaque
+-- de nom le montre, état de l'XP et du repos (xp_states), instance, groupe, carte ; quêtes acceptées et rendues
+-- (ID, xpReward) ; erreurs des gestionnaires comptées dans ForeverLoggerDB.errors ; résumé par /flog.
 --
 -- Règles (docs/ADDON.md) :
 -- * ForeverLoggerDB est initialisée dans ADDON_LOADED, jamais d'alias local au niveau du fichier ;
@@ -11,8 +14,11 @@
 -- * aucun abonnement au journal de combat : l'analyse se fait hors du jeu, sur WoWCombatLog-*.txt.
 
 local ADDON_NAME = ...
-local SCHEMA = 1
+local SCHEMA = 2
 local MAX_ENTRIES = 5000 -- entrées gardées par liste (instantanés, gains d'expérience)
+local MAX_NAMEPLATES = 40 -- jetons nameplate1… parcourus pour trouver le monstre tué
+local MAX_SEEN = 200 -- noms de monstres vus gardés avant remise à zéro
+local RECENT_WINDOW = 3 -- écart maximal (horloge GetTime) entre plaque retirée sur une unité morte et gain d'XP
 local SCHOOLS = { holy = 2, fire = 3, nature = 4, frost = 5, shadow = 6, arcane = 7 } -- indices d'école de l'API
 
 local frame = CreateFrame("Frame")
@@ -134,6 +140,77 @@ local function stamp(entry)
   return entry
 end
 
+local function nextSeq()
+  ForeverLoggerDB.seq = (ForeverLoggerDB.seq or 0) + 1
+  return ForeverLoggerDB.seq
+end
+
+-- XP du personnage et réserve de repos (GetXPExhaustion : nil sans repos).
+local function readState()
+  return {
+    xp = safe(UnitXP, "player"),
+    max = safe(UnitXPMax, "player"),
+    rested = safe(GetXPExhaustion),
+    rest_state = safe(GetRestState),
+  }
+end
+
+local function pushState(reason, level)
+  local entry = character()
+  if not entry then
+    return
+  end
+  local state = readState()
+  entry.xp_states = entry.xp_states or {}
+  push(entry.xp_states, stamp({
+    seq = nextSeq(),
+    reason = reason,
+    level = level or safe(UnitLevel, "player"),
+    xp = state.xp,
+    max = state.max,
+    rested = state.rested,
+    rest_state = state.rest_state,
+    resting = safe(IsResting),
+  }))
+end
+
+local function currentMap()
+  return safe(C_Map and C_Map.GetBestMapForUnit, "player")
+end
+
+local function instanceInfo()
+  local where = returns(IsInInstance)
+  if not where then
+    return nil
+  end
+  local info = { inside = where[1], type = where[2] }
+  if where[1] then
+    local details = returns(GetInstanceInfo)
+    if details then
+      info.name = details[1]
+      info.id = details[8]
+    end
+  end
+  return info
+end
+
+local function groupInfo()
+  local group = { size = safe(GetNumGroupMembers), raid = safe(IsInRaid) }
+  if type(group.size) == "number" and group.size > 0 then
+    local levels = {}
+    for i = 1, 4 do
+      local level = safe(UnitLevel, "party" .. i)
+      if type(level) == "number" then
+        table.insert(levels, level)
+      end
+    end
+    if #levels > 0 then
+      group.levels = levels
+    end
+  end
+  return group
+end
+
 local function snapshot(reason, level)
   local entry = character()
   if not entry then
@@ -145,7 +222,140 @@ local function snapshot(reason, level)
     talents = readTalents(),
     spell_bonus = readSchools(GetSpellBonusDamage),
     spell_crit = readSchools(GetSpellCritChance),
+    trivial_range = safe(UnitQuestTrivialLevelRange, "player"),
+    state = readState(),
+    resting = safe(IsResting),
   }))
+end
+
+-- Monstre tué : cible morte du même nom, sinon plaque de nom morte, sinon plaque retirée sur une unité morte juste
+-- avant le gain, sinon niveaux vus pour ce nom (cible, plaques) depuis l'entrée dans la zone.
+local seen, seenCount, recentDead = {}, 0, {}
+
+local function npcFromGUID(guid)
+  if type(guid) ~= "string" then
+    return nil
+  end
+  local id = guid:match("^%a+%-%d+%-%d+%-%d+%-%d+%-(%d+)%-")
+  return id and tonumber(id)
+end
+
+local function unitInfo(unit, source)
+  return {
+    name = safe(UnitName, unit),
+    level = safe(UnitLevel, unit),
+    classification = safe(UnitClassification, unit),
+    npc = npcFromGUID(safe(UnitGUID, unit)),
+    creature_type = safe(UnitCreatureType, unit),
+    source = source,
+  }
+end
+
+local function isDeadNamed(unit, name)
+  return safe(UnitExists, unit) and safe(UnitName, unit) == name and safe(UnitIsDead, unit) == true
+end
+
+local function remember(unit)
+  if not safe(UnitExists, unit) or safe(UnitIsPlayer, unit) then
+    return
+  end
+  local name, level = safe(UnitName, unit), safe(UnitLevel, unit)
+  if type(name) ~= "string" or type(level) ~= "number" then
+    return
+  end
+  if not seen[name] then
+    seenCount = seenCount + 1
+    if seenCount > MAX_SEEN then
+      seen, seenCount = {}, 1
+    end
+    seen[name] = {}
+  end
+  seen[name][level] = true
+end
+
+local function forgetSeen()
+  seen, seenCount, recentDead = {}, 0, {}
+end
+
+local function findKilled(name)
+  if isDeadNamed("target", name) then
+    return unitInfo("target", "target")
+  end
+  for i = 1, MAX_NAMEPLATES do
+    local unit = "nameplate" .. i
+    if isDeadNamed(unit, name) then
+      return unitInfo(unit, "nameplate")
+    end
+  end
+  local recent, now = recentDead[name], safe(GetTime)
+  if recent then
+    recentDead[name] = nil
+    if type(now) == "number" and type(recent.at) == "number" and now - recent.at <= RECENT_WINDOW then
+      return recent.info
+    end
+  end
+  return nil
+end
+
+local function seenLevels(name)
+  local levels = {}
+  for level in pairs(seen[name] or {}) do
+    table.insert(levels, level)
+  end
+  table.sort(levels)
+  return #levels > 0 and levels or nil
+end
+
+-- Résumé de la session pour /flog (vérification en jeu pendant une sonde).
+local session = { gains = 0, last = nil, quest = nil }
+
+local function questLevel(id)
+  local index = safe(C_QuestLog and C_QuestLog.GetLogIndexForQuestID, id)
+  if index then
+    local info = safe(C_QuestLog.GetInfo, index)
+    if type(info) == "table" and type(info.level) == "number" then
+      return info.level
+    end
+    local row = returns(GetQuestLogTitle, index)
+    return row and row[2]
+  end
+  local count = safe(GetNumQuestLogEntries)
+  if type(count) == "number" then
+    for i = 1, count do
+      local row = returns(GetQuestLogTitle, i)
+      if row and row[8] == id then
+        return row[2]
+      end
+    end
+  end
+  return nil
+end
+
+local function questEvent(event, id, xpReward, moneyReward)
+  local entry = character()
+  if not entry or type(id) ~= "number" then
+    return
+  end
+  entry.quests = entry.quests or {}
+  local record = stamp({
+    event = event,
+    seq = nextSeq(),
+    quest_id = id,
+    title = safe(C_QuestLog and C_QuestLog.GetTitleForQuestID, id),
+    quest_level = questLevel(id),
+    xp_reward = xpReward,
+    money_reward = moneyReward,
+    level = safe(UnitLevel, "player"),
+    state = readState(),
+    resting = safe(IsResting),
+    map = currentMap(),
+    instance = instanceInfo(),
+    group = groupInfo(),
+  })
+  push(entry.quests, record)
+  if event == "turned_in" then
+    session.quest = record
+  end
 end
 
 -- CH0 : familier du Chasseur et statistiques du Chasseur au même instant, hors combat seulement.
@@ -257,14 +467,61 @@ end
 function handlers.PLAYER_LOGIN()
   snapshot("connexion")
   snapshotPet("connexion")
+  pushState("connexion")
 end
 
 function handlers.PLAYER_ENTERING_WORLD()
   enableCombatLog()
+  forgetSeen()
+end
+
+function handlers.ZONE_CHANGED_NEW_AREA()
+  forgetSeen()
 end
 
 function handlers.PLAYER_LEVEL_UP(level)
   snapshot("niveau", level) -- UnitLevel peut encore renvoyer l'ancien niveau
+  pushState("niveau", level)
+end
+
+function handlers.PLAYER_XP_UPDATE(unit)
+  if unit == nil or unit == "player" then
+    pushState("xp")
+  end
+end
+
+function handlers.UPDATE_EXHAUSTION()
+  pushState("repos")
+end
+
+function handlers.PLAYER_UPDATE_RESTING()
+  pushState("repos")
+end
+
+function handlers.PLAYER_TARGET_CHANGED()
+  remember("target")
+end
+
+function handlers.NAME_PLATE_UNIT_ADDED(unit)
+  remember(unit)
+end
+
+function handlers.NAME_PLATE_UNIT_REMOVED(unit)
+  if safe(UnitIsDead, unit) == true then
+    local name = safe(UnitName, unit)
+    if type(name) == "string" then
+      recentDead[name] = { info = unitInfo(unit, "recent"), at = safe(GetTime) }
+    end
+  end
+end
+
+-- QUEST_ACCEPTED : (questID) sur le moteur Mainline, (index du journal, questID) sur Classic.
+function handlers.QUEST_ACCEPTED(first, second)
+  questEvent("accepted", second or first)
+end
+
+function handlers.QUEST_TURNED_IN(id, xpReward, moneyReward)
+  questEvent("turned_in", id, xpReward, moneyReward)
 end
 
 function handlers.TRAIT_CONFIG_UPDATED()
@@ -295,19 +552,107 @@ function handlers.CRAFT_UPDATE()
   readTraining()
 end
 
+-- Montant lu dans le texte (anglais et français) ; le texte brut reste la référence (relu hors du jeu).
+local function amountOf(text)
+  local raw = text:match("gain ([%d,]+)") or text:match("gagnez ([%d,]+)")
+  return raw and tonumber((raw:gsub(",", "")))
+end
+
 function handlers.CHAT_MSG_COMBAT_XP_GAIN(text)
   local entry = character()
-  if entry then
-    push(entry.xp, stamp({ level = safe(UnitLevel, "player"), text = text }))
+  if not entry then
+    return
   end
+  if type(text) ~= "string" or isSecret(text) then
+    text = nil
+  end
+  local monster = text and (text:match("^(.-) dies, ") or text:match("^(.-) meurt, "))
+  local amount = text and amountOf(text)
+  local gain = stamp({
+    seq = nextSeq(),
+    level = safe(UnitLevel, "player"),
+    text = text,
+    amount = amount,
+    kind = monster and "monster" or (amount and "other" or "unknown"),
+    monster = monster,
+    state = readState(),
+    resting = safe(IsResting),
+    instance = instanceInfo(),
+    group = groupInfo(),
+    map = currentMap(),
+  })
+  if monster then
+    gain.target = findKilled(monster)
+    if not gain.target then
+      gain.seen_levels = seenLevels(monster)
+    end
+  end
+  push(entry.xp, gain)
+  session.gains = session.gains + 1
+  session.last = gain
+end
+
+local function report()
+  local lines = { "|cff69ccf0ForeverLogger|r : " .. session.gains .. " gain(s) d'XP relevé(s) pendant cette session" }
+  local state = readState()
+  table.insert(lines, "XP " .. tostring(state.xp) .. " / " .. tostring(state.max) .. ", repos : "
+    .. (state.rested and tostring(state.rested) or "aucun") .. (safe(IsResting) and " (au repos)" or ""))
+  local last = session.last
+  if last then
+    local line = "Dernier gain : +" .. tostring(last.amount) .. " XP (" .. (last.monster or "hors monstre") .. ")"
+    if last.target then
+      line = line .. ", niveau du monstre " .. tostring(last.target.level) .. " (" .. last.target.source .. ")"
+    elseif last.seen_levels then
+      line = line .. ", niveaux vus " .. table.concat(last.seen_levels, ", ")
+    elseif last.monster then
+      line = line .. ", niveau du monstre inconnu"
+    end
+    table.insert(lines, line)
+  end
+  local quest = session.quest
+  if quest then
+    table.insert(lines, "Dernière quête rendue : " .. quest.quest_id .. " " .. (quest.title or "") .. ", "
+      .. tostring(quest.xp_reward) .. " XP")
+  end
+  local errors = 0
+  for _, e in pairs(ForeverLoggerDB.errors or {}) do
+    errors = errors + (e.count or 0)
+  end
+  if errors > 0 then
+    table.insert(lines, "Erreurs relevées : " .. errors)
+  end
+  for _, line in ipairs(lines) do
+    print(line)
+  end
+end
+
+-- Erreur d'un gestionnaire : comptée par événement (dernier message gardé), jamais remontée au joueur.
+local function recordError(event, err)
+  pcall(function()
+    ForeverLoggerDB.errors = ForeverLoggerDB.errors or {}
+    local e = ForeverLoggerDB.errors[event] or { count = 0 }
+    e.count = e.count + 1
+    e.last = tostring(err):sub(1, 200)
+    ForeverLoggerDB.errors[event] = e
+  end)
 end
 
 frame:SetScript("OnEvent", function(_, event, ...)
   local handler = handlers[event]
   if handler and (event == "ADDON_LOADED" or ForeverLoggerDB ~= nil) then
-    pcall(handler, ...)
+    local ok, err = pcall(handler, ...)
+    if not ok and ForeverLoggerDB ~= nil then
+      recordError(event, err)
+    end
   end
 end)
+
+SLASH_FOREVERLOGGER1 = "/flog"
+SlashCmdList.FOREVERLOGGER = function()
+  if ForeverLoggerDB ~= nil then
+    pcall(report)
+  end
+end
 
 -- Un événement inconnu du client lève une erreur : chaque abonnement est protégé.
 for event in pairs(handlers) do
