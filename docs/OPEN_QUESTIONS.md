@@ -201,6 +201,15 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **DON9 — Quelles tables du client décrivent donjons, métiers, réputations et prix ?** *Modifiée le 2026-10-02* :
   la note du 01/10 annonce les donjons ouverts et leurs niveaux d'accès (à reprendre en DJ1). Test : inventaire au
   plan de chaque tranche (DJ1, MT1, RP1, T10). Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don9)
+  *Inventaire des donjons fait le 2026-10-13 (DJ1, bloc A, révision 6 de 1.60.1.70338)* : `Map` (instances,
+  `InstanceType`), `LFGDungeons` (entrées de recherche de groupe, `MapID` vide : lien par le nom),
+  `ContentTuning` (un seul niveau par donjon, `MinLevelSquish` = `MaxLevelSquish`, sens probable ; Ruins of Lordaeron
+  porte aussi `LfgMinLevel`/`LfgMaxLevel`), `DungeonEncounter` (rencontres et leur ordre) et `AreaTable` sont
+  présentes et décodées (`dungeons.json`, 23 donjons à 5 dont les 4 nouveaux) ; `JournalInstance`,
+  `JournalEncounter` et `JournalEncounterItem` **absentes** de la version sur wago.tools (HTTP 400) : ni butin ni PNJ
+  des boss dans le client. Le client tranche les rencontres : Excavation Site 4 (Highland Horror comprise),
+  City of Dalaran 9 (Mana Wraith comprise), Hall of Thanes 4, Ruins of Lordaeron 7. Reste ouvert : le sens du niveau de
+  `ContentTuning` (cible ou plancher) et les tables des métiers, réputations et prix.
 - **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
   Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
 - **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**

@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-13)",
+      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 6 (forever install, 2026-10-13)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-13)",
+      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 6 (forever install, 2026-10-13)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -203,7 +203,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 5 (forever install, 2026-10-13)"
+        "installé en révision 6 (forever install, 2026-10-13)"
       ]
     },
     "races.json": {
@@ -313,9 +313,18 @@
         "sens des codes d'aura déduit des descriptions (probable) ; lien du sac de couchage à son aura déclaré (probable) ; condition 142418 évaluée par le serveur (LVL13)",
         "installé en révision 5 (forever install, 2026-10-13)"
       ]
+    },
+    "dungeons.json": {
+      "source": "Client 1.60.1.70338 : tables du client 1.60.1.70338 (wago.tools, 1.60.1.70338) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "donjons du client : instances de groupe, entrées de recherche de groupe et leur niveau, rencontres, zones (decode_rules.json, dungeons)",
+        "lien d'une entrée de recherche de groupe à sa carte par le nom (alias de decode_rules.json) ; sens du niveau de ContentTuning et des codes de faction probable (DON9)",
+        "installé en révision 6 (forever install, 2026-10-13)"
+      ]
     }
   },
-  "revision": 5,
+  "revision": 6,
   "revised_at": "2026-10-13",
   "hotfixes": {
     "dbcache": {
@@ -326,7 +335,7 @@
       "size": 3033586,
       "sha256": "7d67e37dd11c7ca1a67d063213afa4296d9fcb606bf05b17d4415a8c942e5352",
       "file_date": "2026-10-13T07:51:40Z",
-      "read_at": "2026-10-13T14:19:18Z"
+      "read_at": "2026-10-13T17:41:53Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",

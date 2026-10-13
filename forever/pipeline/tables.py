@@ -169,6 +169,12 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
         "ID:int MinLevel:int MaxLevel:int ClassMask:int WorldStateExpressionID:int Flags:int PrevQuestID_0:int "
         "SpellID_0:int AuraSpellID_0:int ItemID_0:int"
     ),
+    # DJ1, bloc A : donjons (decode_rules.json, dungeons).
+    "Map": _cols("ID:int MapName_lang:str InstanceType:int AreaTableID:int"),
+    "LFGDungeons": _cols("ID:int Name_lang:str TypeID:int Faction:int ContentTuningID:int"),
+    "ContentTuning": _cols("ID:int MinLevelSquish:int MaxLevelSquish:int LfgMinLevel:int LfgMaxLevel:int"),
+    "DungeonEncounter": _cols("ID:int Name_lang:str MapID:int DifficultyID:int OrderIndex:int Flags:int"),
+    "AreaTable": _cols("ID:int AreaName_lang:str ContinentID:int ParentAreaID:int"),
 }
 
 

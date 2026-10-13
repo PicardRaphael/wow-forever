@@ -17,6 +17,7 @@ from forever.errors import DataSchemaError
 from forever.gamedata import SEED_FILES, build_game_data
 from forever.manifest import SOURCES_NAME
 from forever.pipeline.character_scaling import CHARACTER_FILE, character_errors
+from forever.pipeline.dungeons_client import DUNGEON_FILE, dungeons_errors
 from forever.pipeline.pets import PETS_FILE, pets_errors
 from forever.pipeline.quest_rewards import QUEST_FILE, quest_rewards_errors
 from forever.pipeline.sources import CERTAINTIES, inherited_files, load_source, source_provenance
@@ -136,6 +137,11 @@ def check_version(v: VersionData) -> tuple[list[str], list[str], list[str]]:
             errors += xp_bonuses_errors(_json(v, XP_BONUS_FILE))
         except (OSError, ValueError) as exc:
             errors.append(f"{XP_BONUS_FILE} illisible ({exc})")
+    if (v.path / DUNGEON_FILE).is_file():  # DJ1, bloc A : donjons du client
+        try:
+            errors += dungeons_errors(_json(v, DUNGEON_FILE))
+        except (OSError, ValueError) as exc:
+            errors.append(f"{DUNGEON_FILE} illisible ({exc})")
     inherited = inherited_files(v)
     if inherited:
         warnings.append(f"{len(inherited)} fichier(s) hérité(s) d'une version antérieure, à revérifier")

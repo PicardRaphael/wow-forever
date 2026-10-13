@@ -1294,7 +1294,9 @@ def _fetch_defaults(deps: Deps) -> tuple[list[str], dict[str, list[str]]]:
         if path.is_file():
             rules = json.loads(path.read_text(encoding="utf-8"))
             localized = rules.get("localized_tables", {})
-            return list(rules["tables"]), {k: list(v) for k, v in localized.items()}
+            tables = list(rules["tables"])
+            tables += [t for t in rules.get("dungeon_tables", []) if t not in tables]  # DJ1 : donjons
+            return tables, {k: list(v) for k, v in localized.items()}
     raise InvalidArgumentError(
         "Aucune liste de tables : --tables est obligatoire tant qu'aucune version locale n'a de decode_rules.json.",
         "donner --tables T1,T2,…",

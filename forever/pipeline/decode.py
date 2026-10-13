@@ -29,6 +29,7 @@ from forever.pipeline.character_scaling import (
     load_gametables,
 )
 from forever.pipeline.dbd import LayoutCheck
+from forever.pipeline.dungeons_client import DUNGEON_FILE, decode_dungeons, dungeon_table_files, load_dungeon_tables
 from forever.pipeline.fetch import DEFAULT_LOCALE, optional_table, wago_dir
 from forever.pipeline.hotfix_overlay import (
     HOTFIX_KEY,
@@ -1991,8 +1992,14 @@ def decode_version(
         decoded_classes[XP_BONUS_FILE] = xp_doc
         access = sorted({a["access"] for a in xp_doc["auras"]})
         extra_notes.append(f"{XP_BONUS_FILE} : {len(xp_doc['auras'])} aura(s) d'XP (accès : {', '.join(access)})")
+    # DJ1, bloc A : donjons (dungeon_tables) : tables présentes (décodé) ou absentes (hérité de la base).
+    dungeon_files = dungeon_table_files(rules)
+    if dungeon_files and all((csv_dir / rel).is_file() for _, rel in dungeon_files):
+        dungeon_doc = decode_dungeons(load_dungeon_tables(csv_dir, rules), rules, version)
+        decoded_classes[DUNGEON_FILE] = dungeon_doc
+        extra_notes.append(f"{DUNGEON_FILE} : {dungeon_doc['notes'][0]}")
     inherited = {}
-    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE, QUEST_FILE, XP_BONUS_FILE)
+    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE, QUEST_FILE, XP_BONUS_FILE, DUNGEON_FILE)
     names = [*INHERITED_FILES, *(n for n in optional if n not in decoded_classes)]
     for name in names:
         path = _inherited_source(base, name, rules)
@@ -2011,6 +2018,11 @@ def decode_version(
             if name == XP_BONUS_FILE:
                 extra_notes.append(
                     f"{name} absent : table PlayerCondition absente de {csv_dir.name} et de {base_version}"
+                )
+                continue
+            if name == DUNGEON_FILE:
+                extra_notes.append(
+                    f"{name} absent : tables des donjons absentes de {csv_dir.name} et de {base_version}"
                 )
                 continue
             if name in CLASS_FILES:
@@ -2051,6 +2063,8 @@ def decode_version(
         "(questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         XP_BONUS_FILE: "bonus d'XP du client : auras d'XP, durée, cumul, accès (objet, perk Legacy, nourriture, aucun), "
         "sac de couchage, nourritures nutritives, camp, conditions de joueur (decode_rules.json, xp_bonuses)",
+        DUNGEON_FILE: "donjons du client : instances de groupe, entrées de recherche de groupe et leur niveau, "
+        "rencontres, zones (decode_rules.json, dungeons)",
     }
     class_certainty_note = {
         CHARACTER_FILE: "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
@@ -2059,6 +2073,8 @@ def decode_version(
         QUEST_FILE: "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
         XP_BONUS_FILE: "sens des codes d'aura déduit des descriptions (probable) ; lien du sac de couchage à son aura "
         "déclaré (probable) ; condition 142418 évaluée par le serveur (LVL13)",
+        DUNGEON_FILE: "lien d'une entrée de recherche de groupe à sa carte par le nom (alias de decode_rules.json) ; "
+        "sens du niveau de ContentTuning et des codes de faction probable (DON9)",
     }
     sources = {
         **{

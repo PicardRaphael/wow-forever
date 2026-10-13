@@ -848,5 +848,37 @@
    "WorldStateExpressionID"
   ],
   "note": "T04f, bloc A : bonus d'XP du client décodés dans xp_bonuses.json ; accès : perk Legacy (TraitDefinition rattachée à un nœud), objet (effet d'objet puis sorts déclenchés, chaîne du sac déclarée), nourriture (sort d'utilisation d'un objet dont la description cite l'aura par $@spelldesc), sinon aucun (listé, jamais appliqué, décision 262)"
+ },
+ "dungeon_tables": [
+  "Map",
+  "LFGDungeons",
+  "ContentTuning",
+  "DungeonEncounter",
+  "AreaTable"
+ ],
+ "dungeons": {
+  "party_instance_type": 1,
+  "lfg_dungeon_type": 0,
+  "difficulties": [
+   0,
+   1
+  ],
+  "factions": {
+   "0": "Horde",
+   "1": "Alliance"
+  },
+  "strip_prefixes": [
+   "the "
+  ],
+  "lfg_names": {
+   "Stormwind Stockades": "Stormwind Stockade",
+   "Zul'Farak": "Zul'Farrak",
+   "Lower Blackrock Spire": "Blackrock Spire",
+   "Upper Blackrock Spire": "Blackrock Spire",
+   "Dire Maul - East": "Dire Maul",
+   "Dire Maul - West": "Dire Maul",
+   "Dire Maul - North": "Dire Maul"
+  },
+  "note": "DJ1, bloc A : instances de groupe (Map.InstanceType), entrées de recherche de groupe (LFGDungeons.TypeID) reliées par le nom (MapID vide dans le client ; alias déclarés ici, entrée non reliée listée), niveau de ContentTuning, rencontres de DungeonEncounter (difficultés normale et 5 joueurs), zones d'AreaTable ; faction : sens des codes déduit (Ragefire Chasm Horde, Stormwind Stockade Alliance), probable"
  }
 }

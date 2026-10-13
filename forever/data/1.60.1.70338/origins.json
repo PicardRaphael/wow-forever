@@ -962,10 +962,12 @@
         "/quest_tables",
         "/quest_rewards",
         "/xp_bonus_tables",
-        "/xp_bonuses"
+        "/xp_bonuses",
+        "/dungeon_tables",
+        "/dungeons"
       ],
       "origin": "parametre",
-      "source": "règles de lecture du client (T03, PV1, CH0, T04f)",
+      "source": "règles de lecture du client (T03, PV1, CH0, T04f, DJ1)",
       "reason": "règle de lecture des tables, pas une valeur de jeu"
     },
     {
@@ -1228,6 +1230,30 @@
       "certainty": "probable",
       "reason": "lien déclaré, pas lu dans une table",
       "registry": "D9"
+    },
+    {
+      "file": "dungeons.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables Map, LFGDungeons, ContentTuning, DungeonEncounter et AreaTable du client (forever decode, decode_rules.json dungeons)",
+      "certainty": "certain"
+    },
+    {
+      "file": "dungeons.json",
+      "paths": [
+        "/instances/*/lfg",
+        "/instances/*/lfg/*/level",
+        "/instances/*/lfg/*/level_min",
+        "/instances/*/lfg/*/level_max",
+        "/instances/*/lfg/*/faction",
+        "/unmatched_lfg"
+      ],
+      "origin": "client",
+      "source": "lien d'une entrée de recherche de groupe à sa carte par le nom (alias de decode_rules.json dungeons) ; sens du niveau de ContentTuning et des codes de faction déduits",
+      "certainty": "probable",
+      "reason": "lien et sens déduits, pas lus (DON9)"
     },
     {
       "file": "mechanics.json",
