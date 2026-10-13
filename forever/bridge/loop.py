@@ -18,7 +18,7 @@ import os
 import threading
 import time
 from collections import deque
-from collections.abc import Callable, Iterable
+from collections.abc import Callable, Iterable, Mapping
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -38,6 +38,7 @@ from forever.bridge.prompt import message_text
 from forever.bridge.record import CONTEXT_KEYS, Record, RecordError, parse_payload
 from forever.bridge.slots import ADDON, SLOTS, inbox_lua, publish, status_lua
 from forever.bridge.state import BridgeState
+from forever.errors import ForeverError
 
 REFRESH_S = 600.0
 FIND_EVERY_S = 3.0
@@ -122,6 +123,7 @@ class Bridge:
         update_watch: Any | None = None,
         profile: Any | None = None,
         addons: Any | None = None,
+        xp_watch: Callable[[], Mapping[str, Any] | None] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -144,6 +146,7 @@ class Bridge:
         self.update_watch = update_watch  # updater.UpdateWatch : fin d'un passage publiée aussitôt
         self.profile = profile  # profile_gap.ProfileWatch : écart entre le jeu et le profil (bloc C)
         self.addons = addons  # addons.AddonsTurn : conversation « addons » (bloc F)
+        self.xp_watch = xp_watch  # T04f : identifiants surveillés par les addons (xp_bonuses.xp_watch)
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
         self.last_cards_check: float | None = None
@@ -181,6 +184,15 @@ class Bridge:
             ms = round((time.perf_counter() - started) * 1000, 1)
             self.journal.write("published", reason=reason, first=first, files=count, ms=ms)
 
+    def _xp(self) -> Mapping[str, Any] | None:
+        if self.xp_watch is None:
+            return None
+        try:
+            return self.xp_watch()
+        except ForeverError as exc:  # données sans bonus d'XP : aucune surveillance
+            self.journal.write("error", where="xp_watch", error=exc.message)
+            return None
+
     def refresh(self) -> None:
         """État des données relu ; `Status.lua` et toute la réserve réécrits."""
         self.status_cache = {**self.status(), "slots": self.slots}  # l'addon en tire les emplacements restants
@@ -197,7 +209,7 @@ class Bridge:
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
             tmp = path.with_name(path.name + ".tmp")
-            content = status_lua(self.status_cache, self.buttons, self.epoch(), self.card_list)
+            content = status_lua(self.status_cache, self.buttons, self.epoch(), self.card_list, self._xp())
             tmp.write_bytes(content.encode("utf-8"))
             tmp.replace(path)
         except OSError as exc:

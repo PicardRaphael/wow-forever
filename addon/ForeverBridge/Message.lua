@@ -26,7 +26,11 @@ M.TOOLTIP_LINES = 30
 M.TOOLTIP_CHARS = 120
 M.LINK_KINDS = { item = true, spell = true, quest = true, talent = true }
 M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "talents", "gear",
-	"target", "target_level", "target_race", "client", "links" }
+	"target", "target_level", "target_race", "client", "links", "rested", "resting", "xp_auras", "xp_items" }
+-- T04f (0.2.0) : auras du joueur relevées (au plus MAX_AURAS, parmi les AURA_SCAN premières), filtrées par la liste
+-- que le pont écrit dans Status.lua (ForeverBridgeStatus.xp, identifiants lus dans les données, jamais écrits ici).
+M.MAX_AURAS = 16
+M.AURA_SCAN = 40
 local GEAR_SLOTS = 19
 
 local function isSecret(value)
@@ -251,6 +255,79 @@ function M.Links(text)
 end
 
 -- Contexte du personnage : table clé → texte, et l'équipement en morceaux pour l'allègement.
+-- Liste de surveillance des bonus d'XP écrite par le pont (auras, objets, arbres Legacy) ; nil sans elle.
+local function xpWatch()
+	local status = ForeverBridgeStatus
+	if type(status) ~= "table" or type(status.xp) ~= "table" then
+		return nil
+	end
+	return status.xp
+end
+
+-- Auras utiles du joueur « sort:cumuls:secondes restantes » (vide : sans fin), séparées par des virgules ; filtrées
+-- par la liste du pont quand il l'a écrite ; nil si l'API manque, échoue ou ne rend rien.
+function M.XpAuras(watch)
+	if type(C_UnitAuras) ~= "table" or type(C_UnitAuras.GetAuraDataByIndex) ~= "function" then
+		return nil
+	end
+	local wanted = nil
+	if watch and type(watch.auras) == "table" then
+		wanted = {}
+		for _, id in ipairs(watch.auras) do
+			wanted[id] = true
+		end
+	end
+	local now = safe(GetTime)
+	local out = {}
+	for index = 1, M.AURA_SCAN do
+		local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, "player", index, "HELPFUL")
+		if not ok then
+			return nil
+		end
+		if type(aura) ~= "table" or isSecret(aura) then
+			break
+		end
+		local id = aura.spellId
+		if type(id) == "number" and not isSecret(id) and (wanted == nil or wanted[id]) then
+			local stacks = aura.applications
+			if type(stacks) ~= "number" or isSecret(stacks) or stacks < 1 then
+				stacks = 1
+			end
+			local remaining = ""
+			local expires = aura.expirationTime
+			if type(expires) == "number" and not isSecret(expires) and expires > 0 and type(now) == "number" then
+				remaining = tostring(math.floor(expires - now + 0.5))
+			end
+			out[#out + 1] = id .. ":" .. stacks .. ":" .. remaining
+			if #out >= M.MAX_AURAS then
+				break
+			end
+		end
+	end
+	if #out == 0 then
+		return nil
+	end
+	return table.concat(out, ",")
+end
+
+-- Objets de la liste du pont portés « objet:nombre » ; nil sans liste ou si l'API échoue.
+function M.XpItems(watch)
+	if not watch or type(watch.items) ~= "table" or type(C_Item) ~= "table" then
+		return nil
+	end
+	local out = {}
+	for _, id in ipairs(watch.items) do
+		local count = safe(C_Item.GetItemCount, id)
+		if type(count) == "number" then
+			out[#out + 1] = id .. ":" .. count
+		end
+	end
+	if #out == 0 then
+		return nil
+	end
+	return table.concat(out, ",")
+end
+
 function M.Context()
 	local ctx = {}
 	local function put(key, value)
@@ -284,6 +361,17 @@ function M.Context()
 	if version then
 		put("client", build and (version .. "." .. build) or version)
 	end
+	-- T04f : repos, zone de repos, auras d'XP et objets surveillés (bouton Leveling).
+	put("rested", safe(GetXPExhaustion))
+	if type(IsResting) == "function" then
+		local ok, resting = pcall(IsResting)
+		if ok and not isSecret(resting) then
+			put("resting", resting and "1" or "0")
+		end
+	end
+	local watch = xpWatch()
+	put("xp_auras", M.XpAuras(watch))
+	put("xp_items", M.XpItems(watch))
 	return ctx, pieces
 end
 

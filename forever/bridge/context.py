@@ -258,5 +258,25 @@ class XpContext:
     items: Mapping[int, int] = field(default_factory=dict)
 
 
+def _float(text: str | None) -> float | None:
+    try:
+        return float(text) if text not in (None, "") else None
+    except ValueError:
+        return None
+
+
 def xp_context(context: Mapping[str, str]) -> XpContext:
-    raise NotImplementedError
+    """État des bonus d'XP lu dans le contexte du jeu ; une valeur illisible est ignorée, jamais devinée."""
+    auras = []
+    for item in (context.get("xp_auras") or "").split(","):
+        spell, _, rest = item.partition(":")
+        stacks, _, remaining = rest.partition(":")
+        if spell.isdigit() and stacks.isdigit():
+            auras.append(ActiveAura(int(spell), int(stacks), _float(remaining)))
+    items = {}
+    for item in (context.get("xp_items") or "").split(","):
+        key, _, count = item.partition(":")
+        if key.isdigit() and count.isdigit():
+            items[int(key)] = int(count)
+    resting = {"1": True, "0": False}.get(context.get("resting") or "")
+    return XpContext(rested=_float(context.get("rested")), resting=resting, auras=tuple(auras), items=items)

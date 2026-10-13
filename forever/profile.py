@@ -69,6 +69,7 @@ WRAPPED: dict[str, Any] = {
     "quests_completed": {},
     "gear": {},
     "sheet": {},
+    "legacy_ranks": {},  # T04f : rangs des perks Legacy (sort du perk -> rang), ForeverLogger 0.5.0 ou joueur
 }
 _SCHEMA_1_FIELDS = ("class", *FIELDS)
 _META = ("source", "at", "client_build", "certainty")
@@ -376,6 +377,7 @@ def set_character(
     talents: Mapping[str, int] | None = None,
     professions: Mapping[str, int] | None = None,
     planned: bool | None = None,
+    legacy_ranks: Mapping[int, int] | None = None,
 ) -> dict[str, Any]:
     """Crée ou met à jour un personnage (champs donnés seulement, source `joueur`) ; le premier créé devient actif.
     Rend le profil. `planned` vrai : personnage prévu (pas encore créé) ; faux : créé en jeu."""
@@ -403,6 +405,13 @@ def set_character(
                 raise InvalidArgumentError(f"Compétence de métier invalide : {skill} = {value}.", "donner un entier")
             merged[skill] = value
         given["professions"] = merged
+    if legacy_ranks is not None:
+        ranks = dict(flat.get("legacy_ranks") or {})
+        for spell, rank in legacy_ranks.items():
+            if isinstance(rank, bool) or not isinstance(rank, int) or rank < 0:
+                raise InvalidArgumentError(f"Rang Legacy invalide : {spell} = {rank}.", "donner un entier positif")
+            ranks[str(spell)] = rank
+        given["legacy_ranks"] = ranks
     flat.update(given)
     if planned is not None:
         raw["planned"] = planned

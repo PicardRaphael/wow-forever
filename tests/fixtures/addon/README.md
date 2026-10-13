@@ -14,3 +14,4 @@
   niveau 13 (faux exprès : écart attendu), un gain de 240 XP dont 120 de repos, un ancien gain sans cible sur un
   monstre absent de la fixture de Questie ; rendu de la quête 5725 à 2936 XP (`QuestXP[16][6]` × 2,025 du cache des
   quêtes, arrondi) ; Mage de niveau 1 : ancien gain de 50 XP sur « Hare » (niveau fixe 1 dans la fixture de Questie).
+- `ForeverLoggerDB_auras.lua` (T04f, bloc D, synthétique) : schéma 3 de ForeverLogger 0.5.0, Chasseur `Player-0000-0000BEEF` : un gain d'XP et un état de l'XP avec une aura relevée (Well-Rested, 429959, deux cumuls), rangs Legacy (arbre 1188, nœud 110301 du perk Well Rested, rang 2) ; valeurs inventées : ce n'est pas une mesure.

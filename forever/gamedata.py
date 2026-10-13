@@ -670,6 +670,8 @@ def _xp_bonuses(version: VersionData, values: Mapping[str, Any]) -> XpBonusData 
             access=str(a["access"]),
             meaning_certainty=str(certainty.get("meaning", "suppose")),
             access_certainty=str(certainty.get("access", "suppose")),
+            legacy_tree=int(a["legacy"]["tree"]) if a.get("legacy") else None,
+            legacy_node=int(a["legacy"]["node"]) if a.get("legacy") else None,
         )
     bag_raw = raw.get("sleeping_bag")
     bag = (

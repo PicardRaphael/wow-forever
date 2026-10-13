@@ -152,7 +152,7 @@ def best_bonus(
     data = xp_bonus_data(gd)
     if base_xp_h <= 0:
         return []
-    common = {"level": level, "base_xp_h": base_xp_h, "kill_share": kill_share, "hours": hours}
+    common: dict[str, Any] = {"level": level, "base_xp_h": base_xp_h, "kill_share": kill_share, "hours": hours}
     active_ids = {a.spell_id for a in state.auras}
     out: list[BonusAdvice] = []
     bag = data.sleeping_bag
@@ -281,12 +281,32 @@ def lookup_xp_bonuses(deps: Deps, *, access: str | None = None) -> dict[str, Any
 
 
 def xp_watch(gd: GameData) -> dict[str, list[int]]:
-    raise NotImplementedError
+    """Identifiants que les addons surveillent (décision 262 : jamais écrits en dur dans le Lua) : auras d'XP qu'un
+    joueur peut avoir (objet, nourriture), objet du sac de couchage, arbres des perks Legacy."""
+    data = xp_bonus_data(gd)
+    auras = sorted(a.spell_id for a in data.auras.values() if a.access not in ("none", "legacy"))
+    trees = sorted({a.legacy_tree for a in data.auras.values() if a.legacy_tree is not None})
+    items = [data.sleeping_bag.item] if data.sleeping_bag is not None else []
+    return {"auras": auras, "items": items, "legacy_trees": trees}
 
 
 def legacy_rested_spell(gd: GameData) -> int | None:
-    raise NotImplementedError
+    """Sort du perk Legacy qui accélère le repos (effet rested_gain), None s'il n'existe pas."""
+    for a in xp_bonus_data(gd).auras.values():
+        if a.access == "legacy" and any(e.applies_to == "rested_gain" for e in a.effects):
+            return a.spell_id
+    return None
 
 
 def legacy_ranks_from_logger(gd: GameData, legacy: Mapping[str, Any] | None) -> dict[int, int]:
-    raise NotImplementedError
+    """Rangs des perks Legacy relevés par ForeverLogger 0.5.0 (`legacy.trees` : arbre -> nœud -> rang), reliés au
+    sort de chaque perk par son nœud (`xp_bonuses.json`) ; {} sans relevé."""
+    trees = (legacy or {}).get("trees") or {}
+    out = {}
+    for a in xp_bonus_data(gd).auras.values():
+        if a.legacy_tree is None or a.legacy_node is None:
+            continue
+        rank = (trees.get(a.legacy_tree) or {}).get(a.legacy_node)
+        if isinstance(rank, int) and rank > 0:
+            out[a.spell_id] = rank
+    return out

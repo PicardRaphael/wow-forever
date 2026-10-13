@@ -57,6 +57,11 @@ CONTEXT_KEYS = (
     "target_race",
     "client",
     "links",  # liens cités dans la question, avec leur infobulle (P06b, `items.parse_links`)
+    # T04f (ForeverBridge 0.2.0) : repos, zone de repos, auras d'XP actives, objets surveillés (`context.xp_context`)
+    "rested",
+    "resting",
+    "xp_auras",
+    "xp_items",
 )
 
 

@@ -6,6 +6,9 @@
 -- T04d (0.4.0) : montant de chaque gain d'XP, monstre tué (niveau, classification, PNJ) quand la cible ou une plaque
 -- de nom le montre, état de l'XP et du repos (xp_states), instance, groupe, carte ; quêtes acceptées et rendues
 -- (ID, xpReward) ; erreurs des gestionnaires comptées dans ForeverLoggerDB.errors ; résumé par /flog.
+-- T04f (0.5.0, schéma 3) : auras actives du joueur (sort, cumuls, temps restant) dans chaque état de l'XP et chaque
+-- gain ; rangs des perks Legacy lus hors combat (arbres donnés par ForeverBridge depuis les données, jamais écrits
+-- ici), gardés dans legacy.
 --
 -- Règles (docs/ADDON.md) :
 -- * ForeverLoggerDB est initialisée dans ADDON_LOADED, jamais d'alias local au niveau du fichier ;
@@ -14,7 +17,9 @@
 -- * aucun abonnement au journal de combat : l'analyse se fait hors du jeu, sur WoWCombatLog-*.txt.
 
 local ADDON_NAME = ...
-local SCHEMA = 2
+local SCHEMA = 3
+local MAX_AURAS = 16 -- auras gardées par relevé
+local AURA_SCAN = 40 -- auras parcourues au plus
 local MAX_ENTRIES = 5000 -- entrées gardées par liste (instantanés, gains d'expérience)
 local MAX_NAMEPLATES = 40 -- jetons nameplate1… parcourus pour trouver le monstre tué
 local MAX_SEEN = 200 -- noms de monstres vus gardés avant remise à zéro
@@ -155,6 +160,41 @@ local function readState()
   }
 end
 
+-- Auras utiles du joueur : { spell, stacks, remaining } (remaining absent : sans fin) ; nil si l'API manque ou échoue.
+local function readAuras()
+  if type(C_UnitAuras) ~= "table" or type(C_UnitAuras.GetAuraDataByIndex) ~= "function" then
+    return nil
+  end
+  local now = safe(GetTime)
+  local out = {}
+  for index = 1, AURA_SCAN do
+    local ok, aura = pcall(C_UnitAuras.GetAuraDataByIndex, "player", index, "HELPFUL")
+    if not ok then
+      return nil
+    end
+    if type(aura) ~= "table" or isSecret(aura) then
+      break
+    end
+    local id = aura.spellId
+    if type(id) == "number" and not isSecret(id) then
+      local stacks = aura.applications
+      if type(stacks) ~= "number" or isSecret(stacks) or stacks < 1 then
+        stacks = 1
+      end
+      local remaining = nil
+      local expires = aura.expirationTime
+      if type(expires) == "number" and not isSecret(expires) and expires > 0 and type(now) == "number" then
+        remaining = math.floor(expires - now + 0.5)
+      end
+      out[#out + 1] = { spell = id, stacks = stacks, remaining = remaining }
+      if #out >= MAX_AURAS then
+        break
+      end
+    end
+  end
+  return out
+end
+
 local function pushState(reason, level)
   local entry = character()
   if not entry then
@@ -171,7 +211,48 @@ local function pushState(reason, level)
     rested = state.rested,
     rest_state = state.rest_state,
     resting = safe(IsResting),
+    auras = readAuras(),
   }))
+end
+
+-- Rangs des perks Legacy (compte) : { trees = { [arbre] = { [nœud] = rang } } }, hors combat seulement ; arbres lus
+-- dans la liste écrite par ForeverBridge (ForeverBridgeStatus.xp.legacy_trees) ; rien si l'API échoue.
+local pendingLegacy = false
+
+local function readLegacy()
+  local entry = character()
+  local status = ForeverBridgeStatus
+  if not entry or type(status) ~= "table" or type(status.xp) ~= "table" or type(status.xp.legacy_trees) ~= "table" then
+    return
+  end
+  if safe(InCombatLockdown) then
+    pendingLegacy = true
+    return
+  end
+  pendingLegacy = false
+  if type(C_Traits) ~= "table" then
+    return
+  end
+  local trees = {}
+  local found = false
+  for _, tree in ipairs(status.xp.legacy_trees) do
+    local config = safe(C_Traits.GetConfigIDByTreeID, tree)
+    local nodes = config and safe(C_Traits.GetTreeNodes, tree)
+    if type(nodes) == "table" then
+      local ranks = {}
+      for _, node in ipairs(nodes) do
+        local info = safe(C_Traits.GetNodeInfo, config, node)
+        if type(info) == "table" and type(info.ranksPurchased) == "number" then
+          ranks[node] = info.ranksPurchased
+        end
+      end
+      trees[tree] = ranks
+      found = true
+    end
+  end
+  if found then
+    entry.legacy = stamp({ trees = trees })
+  end
 end
 
 local function currentMap()
@@ -468,6 +549,7 @@ function handlers.PLAYER_LOGIN()
   snapshot("connexion")
   snapshotPet("connexion")
   pushState("connexion")
+  readLegacy()
 end
 
 function handlers.PLAYER_ENTERING_WORLD()
@@ -526,6 +608,7 @@ end
 
 function handlers.TRAIT_CONFIG_UPDATED()
   snapshot("talents")
+  readLegacy()
 end
 
 function handlers.UNIT_PET(unit)
@@ -541,6 +624,9 @@ end
 function handlers.PLAYER_REGEN_ENABLED()
   if pendingPet then
     snapshotPet("apres-combat")
+  end
+  if pendingLegacy then
+    readLegacy()
   end
 end
 
@@ -577,6 +663,7 @@ function handlers.CHAT_MSG_COMBAT_XP_GAIN(text)
     monster = monster,
     state = readState(),
     resting = safe(IsResting),
+    auras = readAuras(),
     instance = instanceInfo(),
     group = groupInfo(),
     map = currentMap(),

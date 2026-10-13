@@ -264,6 +264,7 @@ def build_parser() -> argparse.ArgumentParser:
     pset.add_argument("--level", type=int, help="niveau")
     pset.add_argument("--talents", help="talents « clé=rang,… » (remplacent les précédents)")
     pset.add_argument("--profession", action="append", default=[], help="métier « Nom=compétence » (répétable)")
+    pset.add_argument("--legacy-rested-rank", type=int, help="rang du perk Legacy Well Rested (T04f)")
     pstate = pset.add_mutually_exclusive_group()
     pstate.add_argument(
         "--planned", dest="planned", action="store_const", const=True, help="personnage prévu, pas encore créé"
@@ -1804,6 +1805,7 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
             talents=parse_talents(args.talents) if args.talents is not None else None,
             professions=_parse_professions(args.profession),
             planned=args.planned,
+            legacy_ranks=_legacy_rested_rank(deps, args.legacy_rested_rank),
         )
     elif cmd == "use":
         use(deps, target)
@@ -3023,12 +3025,32 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             update_watch=UpdateWatch(deps.cache_dir),
             profile=profile_watch,
             addons=addons_turn,
+            xp_watch=lambda: _bridge_xp_watch(deps),
         )
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
         return bridge.run(deps.cache_dir / "bridge" / "stop", started=launched)
     finally:
         loop.release_lock(deps.cache_dir, pid=pid)
+
+
+def _legacy_rested_rank(deps: Deps, rank: int | None) -> dict[int, int] | None:
+    """Rang du perk Legacy Well Rested donné par le joueur, rangé sous le sort du perk lu dans les données."""
+    if rank is None:
+        return None
+    from forever.xp_bonuses import legacy_rested_spell
+
+    spell = legacy_rested_spell(load_game_data(deps))
+    if spell is None:
+        raise InvalidArgumentError("Perk Legacy Well Rested absent des données.", "installer les données de T04f")
+    return {spell: rank}
+
+
+def _bridge_xp_watch(deps: Deps) -> dict[str, list[int]]:
+    """Identifiants surveillés par les addons (T04f), lus dans les données installées."""
+    from forever.xp_bonuses import xp_watch
+
+    return xp_watch(load_game_data(deps))
 
 
 def _bridge_ask(deps: Deps, args: argparse.Namespace, provenance: Provenance) -> int:

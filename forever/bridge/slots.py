@@ -126,12 +126,14 @@ def status_lua(
     buttons: Sequence[Mapping[str, Any]],
     now: int = 0,
     cards: Sequence[Mapping[str, Any]] = (),
+    xp: Mapping[str, Any] | None = None,
 ) -> str:
-    """Contenu de `ForeverBridge/Status.lua` : `ForeverBridgeStatus = { v, now, status, buttons, cards }`."""
-    return _assign(
-        "ForeverBridgeStatus",
-        {"v": 1, "now": now, "status": dict(status), "buttons": list(buttons), "cards": list(cards)},
-    )
+    """Contenu de `ForeverBridge/Status.lua` : `ForeverBridgeStatus = { v, now, status, buttons, cards, xp }` ; `xp`
+    (T04f) : identifiants surveillés par les addons (auras d'XP, objets, arbres Legacy), lus dans les données."""
+    doc: dict[str, Any] = {"v": 1, "now": now, "status": dict(status), "buttons": list(buttons), "cards": list(cards)}
+    if xp:
+        doc["xp"] = {k: list(v) for k, v in xp.items()}
+    return _assign("ForeverBridgeStatus", doc)
 
 
 def _write_atomic(path: Path, content: str) -> None:

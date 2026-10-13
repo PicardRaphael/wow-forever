@@ -109,6 +109,7 @@ class XpGain(NamedTuple):
     instance: dict[str, Any] = {}  # noqa: RUF012 : inside, type, name, id
     group: dict[str, Any] = {}  # noqa: RUF012 : size, raid, levels
     map: int | None = None
+    auras: list[dict[str, Any]] | None = None  # T04f (0.5.0) : spell, stacks, remaining ; None : non relevées
 
 
 class XpState(NamedTuple):
@@ -125,6 +126,7 @@ class XpState(NamedTuple):
     rested: int | None
     rest_state: int | None
     resting: bool | None
+    auras: list[dict[str, Any]] | None = None  # T04f (0.5.0)
 
 
 class QuestEvent(NamedTuple):
@@ -178,6 +180,7 @@ class Character(NamedTuple):
     xp_states: list[XpState] = []  # noqa: RUF012
     quest_accepts: list[QuestEvent] = []  # noqa: RUF012
     quest_turnins: list[QuestEvent] = []  # noqa: RUF012
+    legacy: dict[str, Any] | None = None  # T04f (0.5.0) : trees (arbre -> nœud -> rang), time
 
 
 class LoggerDB(NamedTuple):
@@ -257,6 +260,36 @@ def _state(value: Any) -> dict[str, Any]:
     return {str(k): _returns(v) for k, v in value.items()}
 
 
+def _auras(value: Any) -> list[dict[str, Any]] | None:
+    """Auras relevées par ForeverLogger 0.5.0 : spell, stacks, remaining (secondes, None : sans fin)."""
+    if value is None:
+        return None
+    out = []
+    for a in _list(value):
+        if isinstance(a, dict) and isinstance(a.get("spell"), int):
+            remaining = a.get("remaining")
+            out.append(
+                {
+                    "spell": int(a["spell"]),
+                    "stacks": _opt_int(a.get("stacks")) or 1,
+                    "remaining": float(remaining) if isinstance(remaining, int | float) else None,
+                }
+            )
+    return out
+
+
+def _legacy(value: Any) -> dict[str, Any] | None:
+    """Rangs des perks Legacy relevés hors combat : {trees: {arbre: {nœud: rang}}, time}."""
+    if not isinstance(value, dict) or not isinstance(value.get("trees"), dict):
+        return None
+    trees = {
+        int(tree): {int(n): int(r) for n, r in nodes.items() if isinstance(n, int) and isinstance(r, int)}
+        for tree, nodes in value["trees"].items()
+        if isinstance(tree, int) and isinstance(nodes, dict)
+    }
+    return {"trees": trees, "time": _opt_int(value.get("time"))}
+
+
 def _localtime(value: Any, path: Path) -> datetime | None:
     if value is None:
         return None
@@ -289,6 +322,7 @@ def _xp_gain(x: dict[str, Any], path: Path) -> XpGain:
         instance=_table(x.get("instance")),
         group=_table(x.get("group")),
         map=_opt_int(x.get("map")),
+        auras=_auras(x.get("auras")),
     )
 
 
@@ -304,6 +338,7 @@ def _xp_state(s: dict[str, Any], path: Path) -> XpState:
         rested=_opt_int(s.get("rested")),
         rest_state=_opt_int(s.get("rest_state")),
         resting=_bool(s.get("resting")),
+        auras=_auras(s.get("auras")),
     )
 
 
@@ -412,5 +447,6 @@ def read_logger_db(path: Path) -> LoggerDB:
             states,
             [q for q in quests if q.event == "accepted"],
             [q for q in quests if q.event == "turned_in"],
+            _legacy(c.get("legacy")),
         )
     return LoggerDB(_opt_int(raw.get("schema")), characters)

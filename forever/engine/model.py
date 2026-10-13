@@ -488,6 +488,8 @@ class XpBonusAura:
     access: str  # item, legacy, food, camp, none (none : jamais appliquée)
     meaning_certainty: str  # certitude du sens des codes d'aura
     access_certainty: str
+    legacy_tree: int | None = None  # perk Legacy : arbre et nœud du client (relevé de ForeverLogger)
+    legacy_node: int | None = None
 
 
 @dataclass(frozen=True)

@@ -239,13 +239,13 @@ def test_missing_apis_and_handler_errors_are_counted_not_raised():
     assert count == 1 and isinstance(last, str) and last
 
 
-def test_old_saved_entries_are_kept_and_schema_is_two():
+def test_old_saved_entries_are_kept_and_schema_is_current():
     saved = {
         "schema": 1,
         "characters": {GUID: {"snapshots": {}, "xp": {1: {"level": 14, "text": "Boar dies, you gain 23 experience."}}}},
     }
     game = Logger(saved=saved)
-    assert game.db().schema == 2
+    assert game.db().schema == 3  # T04f : schéma 3 (auras, Legacy)
     gains = game.entries("xp")
     assert gains[0].text == "Boar dies, you gain 23 experience."
 
