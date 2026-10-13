@@ -89,8 +89,8 @@ def test_unchanged_classic_quest(book):
 def test_quest_learned_in_game_is_a_player_record(book):
     q = book.quests[96607]  # QuestieForeverDB de la fixture
     assert q["status"] == "nouvelle"
-    assert q["fields"]["level"]["source"] == "questie_forever"
-    assert q["fields"]["level"]["certainty"] == "probable"
+    assert q["fields"]["name"]["source"] == "questie_forever"
+    assert q["fields"]["name"]["certainty"] == "probable"
 
 
 def test_gearquest_rewards_attached_by_unique_name_only(book):

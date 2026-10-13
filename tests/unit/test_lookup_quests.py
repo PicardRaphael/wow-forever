@@ -23,8 +23,9 @@ def test_lookup_by_level_and_faction(tmp_path):
 
 def test_lookup_by_status_and_dungeon(tmp_path):
     deps = isolated_deps(tmp_path)
-    new = lookup_quests(deps, status="nouvelle", wow_dir=WOW)
-    assert {92432, 96403, 96607} <= {q["id"] for q in new["quests"]}
+    for quest_id in (92432, 96403, 96607):  # filtre sur la quête visée : indépendant du nombre de quêtes connues
+        found = lookup_quests(deps, status="nouvelle", quest_id=quest_id, wow_dir=WOW)
+        assert [q["id"] for q in found["quests"]] == [quest_id]
     rfc = lookup_quests(deps, dungeon="Ragefire Chasm", faction="horde", wow_dir=WOW, limit=50)
     assert {5761, 5723, 5725, 5722} <= {q["id"] for q in rfc["quests"]}
     assert rfc["total"] == len(rfc["quests"])
