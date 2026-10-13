@@ -219,6 +219,19 @@ La mémoire de Claude ne garde que des pointeurs et des décisions, jamais de ch
 ## Veille
 `build-watch.yml` (cron 6 h) : `forever builds` ; si nouvelle version, `fetch`, `decode`, `diff`, `verify`, puis PR « data: A → B » avec le résumé du diff et une note pour le vault. Alerte si `silent`.
 
+## DJ1 (donjons)
+- `forever/pipeline/dungeons_client.py` : `dungeons.json` décodé du client (`Map`, `LFGDungeons` reliées par le nom
+  avec les alias de `decode_rules.json`, `ContentTuning`, `DungeonEncounter`, `AreaTable`), installé par
+  `forever install` ; tables du journal absentes du build (DON9).
+- `forever/pipeline/dungeon_sources.py` : lecteurs locaux des addons (forme commune, clé = instance, aile ou nom),
+  SavedVariables de Naowh Forever sans noms de joueurs ; `forever/pipeline/addon_sv.py` lit les passages et le butin
+  de ForeverLogger 0.6.0 (schéma 4).
+- `forever/dungeons.py` : livre fusionné champ par champ (ordre déclaré, écarts listés), cache `<cache>/dungeons/`,
+  consultation (`dungeons_payload`, `dungeon_payload`, `item_payload`), agrégats (`render_report`).
+- `forever/engine/dungeon.py` : passage (`run_model` : relevé, compte d'un addon, formule de Factoruide),
+  `first_pass`, `repeat_pass`, `placement_level`, `boss_level` (registre H12, I16, I17) ;
+  `forever/sim/objectives.py` s'en sert ; `forever/route.py` : `dungeon_steps`, `dungeon_placements` pour RX1.
+
 ## T04c
 - Moteur : `forever/engine/armor.py` (armure portée selon le niveau d'apprentissage lu dans le client, `worn_armor`), `buffs.py` (aura d'Arcane Blast), `leveling.py` (couleurs de quête, bande de niveaux), `damage.py` (Ignite roulant : `roll_ignite`, `ignite_ticks_due`, `predict_ignite_ticks`), `mana.py` (`arcane_blast_cost`, régénération selon `rules`).
 - Simulateurs : options `rules` (`forever` ou `seed`), `armor`, `ab_stacks`, `ab_dump` ; rotation `arcane` ; journal des lancers `kill_mc(log=…)` pour les tests.

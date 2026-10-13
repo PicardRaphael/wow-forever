@@ -339,8 +339,23 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
 - T04f : `uv run forever lookup xp_bonuses [--access item|legacy|food|camp|none]` (bonus d'XP du client, chaîne du sac de couchage lue dans les addons) ; `uv run forever sim objectives … [--rested XP] [--sleeping-bag [N]] [--food] [--legacy-rested-rank R] [--hours H]` (XP par heure sans bonus, avec repos, avec le sac, avec les bonus actifs, bonus à prendre) ; `uv run forever sim leveling --level N --bonus sleeping_bag,food [--rested XP]` ; `uv run forever profile set <nom> --legacy-rested-rank R` ; `forever xp check` compare aussi les gains relevés avec leurs auras (ForeverLogger 0.5.0).
   (vérifié, écart, à vérifier) ; rien n'est écrit, aucune sonde n'est exigée (décision 247).
 
+## Donjons (DJ1)
+- `uv run forever dungeon list [--level 15] [--faction horde] [--rebuild]` : donjons du livre fusionné (client,
+  note officielle, Naowh Forever, FojjiCore en recoupement, ForeverDungeonJournal, Forever Guide, Forever Companion,
+  AtlasLoot, Zone Info: Forever, relevés du joueur), dans le cache local seulement ; plage retenue et sa source,
+  niveau de contenu du client, nouveau ou fermé, nombre d'écarts entre sources.
+- `uv run forever dungeon info "Ragefire Chasm" [--class mage --level 14]` : entrée, boss et leur niveau (journal
+  de combat d'abord), butin avec taux et source (« taux inconnu » sinon, étiquette Classic), objets utilisables
+  (classes permises et niveau requis, `ItemSparse` du cache de `forever fetch`), quêtes avec XP et sa source,
+  prérequis « à faire d'abord », passages relevés, écarts ; `forever dungeon item 14149` : où trouver un objet.
+- `uv run forever dungeon report > docs/research/donjons-forever.md` : agrégats seulement (décision 133).
+- `forever sim objectives` : un donjon par instance, durée d'un passage relevée (ForeverLogger 0.6.0, Naowh Forever)
+  ou formule de Factoruide (`suppose`), niveau de placement et `dungeon_advice`.
+- Relevés facultatifs (décision 247) : ForeverLogger 0.6.0 relève passages et butin ; activer InstanceTracker dans
+  Naowh Forever ajoute ses passages (durée, XP), lus en local.
+
 ## Ce que le plugin ne sait pas encore
-PvP de champ de bataille et rendements décroissants mesurés (PV2), boss et butin des donjons (DJ1), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
+PvP de champ de bataille et rendements décroissants mesurés (PV2), raids (T09 à T11), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
 ventes (EC1), mana des combats longs (T05b), mémoire du joueur (T07), raid
 complet (T09), équipement (T10), consommables (T11), analyse de mes combats (AN1, AN2), autres classes que le Mage
 (dégâts et rotations : tranches de classe CM1 à DR1 ; leur PvP et la légalité de leurs builds sont couverts depuis PV1). Sur ces sujets, il répond « je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les
