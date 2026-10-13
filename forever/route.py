@@ -89,3 +89,13 @@ def bonus_reminders(gd: GameData, state: XpBonusState, *, hours: float, level: i
             )
         )
     return sorted(out, key=lambda s: s.at_s or 0.0)
+
+
+def dungeon_steps(book: Any, key: str, *, faction: str | None, level: int, quests: Any = None) -> list[RouteStep]:
+    """Étapes d'un donjon pour RX1. Squelette (phase rouge)."""
+    raise NotImplementedError
+
+
+def dungeon_placements(deps: Any, *, class_name: str, faction: str | None, wow_dir: Any = None) -> list[dict[str, Any]]:
+    """Niveau de placement et étapes de chaque donjon ouvert. Squelette (phase rouge)."""
+    raise NotImplementedError
