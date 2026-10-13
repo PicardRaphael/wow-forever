@@ -60,7 +60,9 @@ def _engine_kill_time(deps: Deps, level: int) -> dict[str, Any]:
     }
 
 
-def _eligible(quest: dict[str, Any], cls: str, faction: str | None, level: int, gray: int) -> bool:
+def _eligible(quest: dict[str, Any], cls: str, faction: str | None, level: int, gray: int, red: int) -> bool:
+    """Quête prise en compte : camp et classe permis, niveau requis atteint, ni grise ni rouge (couleurs de
+    `leveling.quest_band`), XP connue."""
     side = value(quest, "faction")
     if faction is not None and side not in (faction, "both", None):
         return False
@@ -69,6 +71,8 @@ def _eligible(quest: dict[str, Any], cls: str, faction: str | None, level: int, 
         return False
     lvl, min_level = value(quest, "level"), value(quest, "min_level")
     if not isinstance(lvl, int) or not isinstance(min_level, int) or min_level > level or lvl <= gray:
+        return False
+    if lvl >= level + red:
         return False
     return isinstance(value(quest, "xp"), int | float)
 
@@ -152,7 +156,8 @@ def objectives(
         kt = {**k._asdict()}
     book: QuestBook = build_quests(deps, wow_dir=wow_dir)
     gray = gray_level(gd, level)
-    available = [q for q in book.quests.values() if _eligible(q, cls, faction, level, gray)]
+    red = gd.leveling.quest_band.red_min_diff
+    available = [q for q in book.quests.values() if _eligible(q, cls, faction, level, gray, red)]
     solo = Party(tuple([level] * party)) if party > 1 else None
     zones: dict[str, list[dict[str, Any]]] = {}
     dungeons: dict[str, list[dict[str, Any]]] = {}
