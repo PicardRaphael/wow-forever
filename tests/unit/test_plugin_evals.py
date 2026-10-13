@@ -486,6 +486,9 @@ BUTTON_CASES = {
     "bouton-familiers": ("pets", "chasseur15", "familiers"),  # contexte réel du Chasseur (décision 242)
     "bouton-leveling-chasseur": ("leveling", "chasseur15", "leveling"),
     "bouton-talents-chasseur": ("talents", "chasseur15", "talent"),
+    # T04f : bonus d'XP du contexte (repos, auras, sac porté ou non)
+    "bouton-leveling-chasseur-sans-sac": ("leveling", "chasseur15_sans_sac", "leveling"),
+    "bouton-leveling-mage-repose": ("leveling", "mage19_repose", "leveling"),
 }
 
 

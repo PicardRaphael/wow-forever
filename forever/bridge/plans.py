@@ -99,6 +99,16 @@ def _objectives_call(r: Resolved) -> Call:
         args["faction"] = r.faction
     if r.race:
         args["race"] = r.race
+    xp = r.xp
+    if xp is not None:  # T04f : état du jeu transmis tel quel, jamais deviné
+        if xp.rested is not None:
+            args["rested"] = xp.rested
+        if xp.auras:
+            args["auras"] = ",".join(
+                f"{a.spell_id}:{a.stacks}:{'' if a.remaining_s is None else round(a.remaining_s)}" for a in xp.auras
+            )
+        if xp.items:
+            args["has_sleeping_bag"] = any(count > 0 for count in xp.items.values())
     return Call("forever_sim_leveling", args)
 
 
@@ -106,7 +116,10 @@ OBJECTIVES_READ = (
     "Objectifs (résultat de forever_sim_leveling, kind objectives) : rends `advice` tel quel, puis le meilleur "
     "objectif (`best` : nom, XP, minutes, XP par heure) et, s'il y a un donjon, son premier passage avec ses quêtes "
     "et ses passages suivants ; dis d'où vient le temps par monstre (`kill_time.source` : engine calculé, measured "
-    "mesuré sur tes relevés, estimated estimé) et que les temps de trajet et de quête sont des hypothèses."
+    "mesuré sur tes relevés, estimated estimé) et que les temps de trajet et de quête sont des hypothèses. "
+    "Bonus d'XP : les bonus actifs (`bonuses.active` : nom, cumuls, temps restant `remaining_s`), puis `bonus_advice` "
+    "tel quel ; si `sleeping_bag_chain` est rendu, sa phrase `sentence` telle quelle (étape suivante, lieu et position) "
+    "et ses écarts entre sources (`discrepancies`) en une ligne."
 )
 
 

@@ -128,6 +128,7 @@ class Resolved:
     gear: list[tuple[str, int, str]]
     defects: list[Defect]
     pieces: list[GearPiece] = field(default_factory=list)  # pièces complètes (enchantement, suffixe ; P06b)
+    xp: XpContext | None = None  # T04f : repos, auras d'XP, objets surveillés (ForeverBridge 0.2.0)
 
 
 def load_context_data(deps: Deps) -> ContextData:
@@ -213,6 +214,7 @@ def resolve(data: ContextData, context: Mapping[str, str]) -> Resolved:
         gear=[(str(p.slot), p.item.item, p.name) for p in pieces],
         defects=defects,
         pieces=pieces,
+        xp=xp_context(context),
     )
 
 

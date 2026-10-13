@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
+from pathlib import Path
 from typing import Any
 
 from forever.config import Deps
@@ -231,7 +232,7 @@ def catalog(gd: GameData) -> list[dict[str, Any]]:
     ]
 
 
-def lookup_xp_bonuses(deps: Deps, *, access: str | None = None) -> dict[str, Any]:
+def lookup_xp_bonuses(deps: Deps, *, access: str | None = None, faction: str | None = None) -> dict[str, Any]:
     """Consultation des bonus d'XP de la version installée, avec la provenance.
 
     Registre : D5, D7, D9, D10, E3"""
@@ -276,6 +277,7 @@ def lookup_xp_bonuses(deps: Deps, *, access: str | None = None) -> dict[str, Any
         "camp": raw.get("camp"),
         "conditions": raw.get("conditions"),
         "stacking": {"mode": xp.stacking, "rested_after": xp.rested_after},
+        "sleeping_bag_chain": chain_payload(sleeping_bag_chain(deps, faction=faction)),
         "provenance": provenance,
     }
 
@@ -327,7 +329,163 @@ class Chain:
     notes: list[str]
 
 
+SIDES = {"horde": ("H", "Horde"), "alliance": ("A", "Alliance")}
+
+
+def _map_names(deps: Deps) -> dict[int, str]:
+    """Noms anglais des cartes (`pets.json` maps, client) ; {} sans ce fichier."""
+    from forever.store import load_version
+
+    data = load_version(deps)
+    if not (data.path / "pets.json").is_file():
+        return {}
+    maps = data.read_json("pets.json").get("maps") or {}
+    return {int(k): str((v.get("name") or {}).get("en") or "") for k, v in maps.items()}
+
+
+def _zone(maps: Mapping[int, str], value: Any) -> str | None:
+    return maps.get(value) or None if isinstance(value, int) else None
+
+
+def _zones(steps: Sequence[Any]) -> list[str]:
+    out: list[str] = []
+    for s in steps:
+        if s.zone and s.zone not in out:
+            out.append(s.zone)
+    return out
+
+
 def sleeping_bag_chain(
     deps: Deps, *, faction: str | None, done_quests: Sequence[int] = (), addons_dir: Any = None
 ) -> Chain:
-    raise NotImplementedError
+    """Chaîne du Cozy Sleeping Bag pour un personnage : étapes de Naowh Forever Discovery dans l'ordre de son camp
+    (sinon celles de FojjiCore, `suppose`), étape suivante d'après `done_quests`, écarts entre les deux addons,
+    sources manquantes nommées. Lue dans les addons installés, gardée dans le cache (jamais dans le dépôt).
+
+    Registre : D9"""
+    import json
+
+    from forever.pipeline.sleeping_bag import FOJJI, NAOWH, read_fojji_chain, read_naowh_chain
+    from forever.route import RouteStep
+
+    addons = (
+        Path(addons_dir)
+        if addons_dir is not None
+        else (deps.wow_dir / "Interface" / "AddOns" if deps.wow_dir else None)
+    )
+    naowh = read_naowh_chain(addons) if addons is not None else None
+    fojji = read_fojji_chain(addons) if addons is not None else None
+    side, side_name = SIDES.get(faction or "", ("H", "Horde"))
+    maps = _map_names(deps)
+    missing = [f"{a} (Interface/AddOns/{a}/{f})" for (a, f), chain in ((NAOWH, naowh), (FOJJI, fojji)) if chain is None]
+    notes = [] if faction in SIDES else ["camp inconnu : ordre de la Horde retenu"]
+    steps: list[RouteStep] = []
+    if naowh is not None:
+        source = f"{naowh.addon} {naowh.version or '?'}"
+        raw = naowh.steps.get(side) or []
+        for i, s in enumerate(raw):
+            quest = s.get("done") if isinstance(s.get("done"), int) else s.get("started")
+            steps.append(
+                RouteStep(
+                    "click",
+                    f"{s.get('object')} ({s.get('place')})",
+                    quest_id=quest if isinstance(quest, int) else None,
+                    item_id=naowh.item if i == len(raw) - 1 else None,
+                    map=s.get("map") if isinstance(s.get("map"), int) else None,
+                    zone=_zone(maps, s.get("map")),
+                    x=float(s["x"]) if isinstance(s.get("x"), int | float) else None,
+                    y=float(s["y"]) if isinstance(s.get("y"), int | float) else None,
+                    level=naowh.level,
+                    source=source,
+                    certainty="probable",
+                )
+            )
+        notes.append(f"niveau conseillé {naowh.level} : celui de {naowh.addon} (suppose)")
+    elif fojji is not None:
+        source = f"{fojji.addon} {fojji.version or '?'}"
+        steps = [
+            RouteStep(
+                "goto",
+                str(s.get("title") or s.get("zone")),
+                zone=str(s.get("zone")) if s.get("zone") else None,
+                x=float(s["x"]) if isinstance(s.get("x"), int | float) else None,
+                y=float(s["y"]) if isinstance(s.get("y"), int | float) else None,
+                level=fojji.level,
+                source=source,
+                certainty="suppose",
+            )
+            for s in fojji.steps.get("*", [])
+            if s.get("side") in (None, side_name)
+        ]
+    discrepancies: list[str] = []
+    if naowh is not None and fojji is not None:
+        theirs: list[str] = []
+        for s in fojji.steps.get("*", []):
+            if s.get("zone") and s["zone"] not in theirs:
+                theirs.append(str(s["zone"]))
+        ours = _zones(
+            [RouteStep("note", "", zone=_zone(maps, s.get("map"))) for steps_ in naowh.steps.values() for s in steps_]
+        )
+        only_ours = [z for z in ours if z not in theirs]
+        only_theirs = [z for z in theirs if z not in ours]
+        if only_ours or only_theirs:
+            discrepancies.append(
+                f"zones de la chaîne : {', '.join(only_ours) or 'aucune'} chez {naowh.addon}, "
+                f"{', '.join(only_theirs) or 'aucune'} chez {fojji.addon}"
+            )
+        if naowh.level != fojji.level:
+            discrepancies.append(f"niveau conseillé : {naowh.level} ({naowh.addon}), {fojji.level} ({fojji.addon})")
+        if naowh.item != fojji.item:
+            discrepancies.append(f"objet : {naowh.item} ({naowh.addon}), {fojji.item} ({fojji.addon})")
+    done = set(done_quests)
+    next_step = next((s for s in steps if s.quest_id is None or s.quest_id not in done), None)
+    if steps and steps[-1].quest_id is not None and steps[-1].quest_id in done:
+        next_step = None
+    chain = Chain(
+        steps=steps,
+        next_step=next_step,
+        level=naowh.level if naowh else (fojji.level if fojji else None),
+        item=naowh.item if naowh else (fojji.item if fojji else None),
+        sources=[f"{c.addon} {c.version or '?'}" for c in (naowh, fojji) if c is not None],
+        discrepancies=discrepancies,
+        missing=missing,
+        notes=notes,
+    )
+    cache = deps.cache_dir / "xp_bonuses" / f"sleeping_bag_chain_{faction or 'inconnu'}.json"
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    cache.write_bytes(json.dumps(chain_payload(chain), ensure_ascii=False, indent=1).encode("utf-8"))
+    return chain
+
+
+def chain_payload(chain: Chain) -> dict[str, Any]:
+    """Chaîne en JSON (sorties des outils, cache)."""
+    from dataclasses import asdict
+
+    return {
+        "steps": [asdict(s) for s in chain.steps],
+        "next_step": asdict(chain.next_step) if chain.next_step is not None else None,
+        "level": chain.level,
+        "item": chain.item,
+        "sources": chain.sources,
+        "discrepancies": chain.discrepancies,
+        "missing": chain.missing,
+        "notes": chain.notes,
+    }
+
+
+def chain_sentence(chain: Chain) -> str:
+    """Phrase du bouton Leveling, construite par l'outil."""
+    step = chain.next_step
+    if not chain.steps:
+        return "prends le sac de couchage (chaîne de quêtes) : étapes inconnues, source manquante : " + ", ".join(
+            chain.missing
+        )
+    if step is None:
+        return "chaîne du sac de couchage finie : le sac est dans tes sacs"
+    where = f"{step.zone or '?'} {step.x}, {step.y}" if step.x is not None else (step.zone or "?")
+    head = (
+        "prends le sac de couchage : la chaîne commence ici"
+        if step == chain.steps[0]
+        else ("reprends la chaîne du sac de couchage, étape suivante")
+    )
+    return f"{head} : {step.text}, {where}"

@@ -41,6 +41,8 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 | Faut-il respec, à quel niveau | `forever_build(context="leveling", level, current=<build actuel>, respecs=<nombre déjà fait>)` : bloc `respec` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` |
 | Où gagner le plus d'XP par heure, faut-il faire tel donjon (toutes les classes) | `forever_sim_leveling(kind="objectives", level, class_name, faction)` : `advice` rendu tel quel, `best`, `zones`, `dungeons` (`first_pass` avec ses quêtes, `repeat`), `kill_time.source` (`engine`, `measured`, `estimated`) |
+| Bonus d'XP : sac de couchage, nourriture nutritive, repos, perk Legacy, tente ; lequel prendre maintenant | `forever_sim_leveling(kind="objectives", level, class_name, faction, rested, food, sleeping_bag, legacy_rested_rank, auras, has_sleeping_bag)` : `xp_h`, `xp_h_rested`, `xp_h_sleeping_bag`, `xp_h_all` par objectif, `bonuses.active`, `bonuses.advice`, `bonus_advice` et `sleeping_bag_chain.sentence` rendus tels quels ; catalogue : `forever_lookup(kind="xp_bonuses")` (bonus sans source joueur : listés, jamais appliqués) |
+| Temps par monstre et XP/h avec un bonus actif (Mage) | `forever_sim_leveling(level, bonus=["sleeping_bag"|"food"], rested, hours)` : bloc `bonuses` |
 | Quêtes de Forever (nouvelles, retouchées, écarts entre addons) | `forever_lookup(kind="quests", level, faction, zone, status, dungeon)` |
 | Pourquoi ce résultat (mécanique) | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` |
 

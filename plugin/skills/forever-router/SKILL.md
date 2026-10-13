@@ -52,6 +52,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
 | XP par heure par zone et par donjon, toutes les classes | `forever_sim_leveling(kind="objectives", level, class_name, faction)` | `forever-leveling` |
 | Quêtes de Forever : nouvelles, retouchées, écarts entre sources | `forever_lookup(kind="quests", …)` | `forever-leveling` |
+| Bonus d'XP (sac de couchage, nourriture, repos, Legacy, tente), lequel prendre | `forever_lookup(kind="xp_bonuses")`, `forever_sim_leveling(kind="objectives", …)` : `bonus_advice` | `forever-leveling` |
 | Comment marche une mécanique | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` | selon le sujet |
 | PvP d'une classe : contrôles, défensifs, ruptures, recharges | `forever_lookup(kind="pvp", name=<classe>, level)` | `forever-pvp` |
 | Affrontement : mon Mage contre un Démoniste | `forever_lookup(kind="pvp", name, opponent, level, race, talents)` | `forever-pvp` |

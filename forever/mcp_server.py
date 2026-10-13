@@ -249,6 +249,8 @@ def build_server(deps: Deps) -> MCPServer:
         sleeping_bag: int | None = None,
         food: bool = False,
         legacy_rested_rank: int | None = None,
+        auras: str | None = None,
+        has_sleeping_bag: bool | None = None,
     ) -> dict[str, Any]:
         """Leveling du Mage : temps par monstre (combat, repos, total), mana, dégâts subis et XP par heure, par Monte
         Carlo (moyenne de `n` combats, graine fixe) et par le modèle analytique, avec les PV du monstre (valeur,
@@ -271,8 +273,12 @@ def build_server(deps: Deps) -> MCPServer:
         `xp_h` multiplié par le facteur de la séance, `bonuses` les liste ; sans bonus, sortie inchangée.
         `kind="objectives"` : `rested`, `sleeping_bag` (cumuls, 0 : le maximum), `food`, `legacy_rested_rank`,
         `hours` : chaque objectif rend `xp_h`, `xp_h_rested`, `xp_h_sleeping_bag`, `xp_h_all` ; `bonuses.advice`
-        (bonus à prendre, rangés par gain) et `bonus_advice` (phrase de l'outil, à rendre telle quelle)."""
+        (bonus à prendre, rangés par gain) et `bonus_advice` (phrase de l'outil, à rendre telle quelle) ; `auras`
+        (« sort:cumuls:secondes restantes,… », contexte du jeu) et `has_sleeping_bag` : bonus actifs du moment ;
+        `sleeping_bag_chain` (sans sac, au niveau de la chaîne) : étapes, étape suivante et `sentence` à rendre telle
+        quelle."""
         if kind == "objectives":
+            from forever.bridge.context import xp_context
             from forever.sim.objectives import objectives
 
             try:
@@ -289,6 +295,8 @@ def build_server(deps: Deps) -> MCPServer:
                     food=food,
                     legacy_rested_rank=legacy_rested_rank,
                     hours=hours,
+                    auras=xp_context({"xp_auras": auras or ""}).auras,
+                    has_sleeping_bag=has_sleeping_bag,
                 )
             except ForeverError as err:
                 return cast(dict[str, Any], _error_result(deps, err))

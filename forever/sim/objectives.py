@@ -34,6 +34,9 @@ from forever.xp_bonuses import (
     best_bonus,
     bonus_advice_sentence,
     bonus_state,
+    chain_payload,
+    chain_sentence,
+    sleeping_bag_chain,
 )
 
 KINDS = ("zone", "dungeon_first", "dungeon_repeat")
@@ -205,6 +208,38 @@ def _bonus_rates(
     }
 
 
+def _chain(
+    deps: Deps,
+    gd: Any,
+    *,
+    level: int,
+    faction: str | None,
+    has_bag: bool | None,
+    auras: Sequence[ActiveAura],
+    wow_dir: Path | None,
+    chain_dir: Path | None,
+) -> dict[str, Any] | None:
+    """T04f : chaîne du sac de couchage quand le personnage ne l'a pas (sac non porté ou inconnu, Well-Rested inactif)
+    et a le niveau conseillé ; None sinon.
+
+    Registre : D9"""
+    data = gd.xp_bonuses
+    if data is None or data.sleeping_bag is None or has_bag is True:
+        return None
+    if any(a.spell_id == data.sleeping_bag.aura for a in auras):
+        return None
+    addons = chain_dir or (wow_dir / "Interface" / "AddOns" if wow_dir else None)
+    chain = sleeping_bag_chain(deps, faction=faction, addons_dir=addons)
+    if chain.level is not None and level < chain.level:
+        return None
+    payload = chain_payload(chain)
+    payload["sentence"] = chain_sentence(chain)
+    if has_bag is None:
+        payload["notes"] = [*payload["notes"], "possession du sac inconnue (contexte du jeu sans objets surveillés)"]
+    payload["notes"] = [*payload["notes"], "quêtes de la chaîne déjà faites : inconnues, chaîne supposée non commencée"]
+    return payload
+
+
 def objectives(
     deps: Deps,
     *,
@@ -354,5 +389,15 @@ def objectives(
         "advice": _advice(best),
         "bonuses": {k: v for k, v in bonuses.items() if k != "assumptions"} if bonuses else None,
         "bonus_advice": bonuses["sentence"] if bonuses else None,
+        "sleeping_bag_chain": _chain(
+            deps,
+            gd,
+            level=level,
+            faction=faction,
+            has_bag=has_sleeping_bag,
+            auras=auras,
+            wow_dir=wow_dir,
+            chain_dir=chain_dir,
+        ),
         "provenance": provenance,
     }
