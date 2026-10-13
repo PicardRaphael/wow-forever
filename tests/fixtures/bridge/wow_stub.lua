@@ -397,3 +397,73 @@ function Stub.ShownTextures(frame)
 	end
 	return out
 end
+
+-- ForeverLogger (T04d, bloc A) : unités simulées (cible, plaques de nom, groupe), expérience et repos du personnage,
+-- instance, groupe, journal des quêtes. Valeurs synthétiques posées par les tests, aucune règle de jeu.
+-- Stub.units[unité] = { name, level, classification, dead, guid, creature_type } ; une unité absente garde le
+-- comportement précédent (cible joueur de ForeverBridge).
+Stub.units = {}
+Stub.player.guid = "Player-0000-00000001"
+Stub.player.xp = 0
+Stub.player.xp_max = 1000
+Stub.player.rested = nil -- GetXPExhaustion : nil sans repos
+Stub.player.resting = false
+Stub.player.rest_state = 2 -- GetRestState : identifiant d'état (valeur synthétique)
+Stub.player.trivial_range = 5
+Stub.instance = { inside = false, type = "none", name = nil, id = nil }
+Stub.group = { size = 0, raid = false }
+Stub.quests = {} -- [questID] = { title, level, index } : quêtes présentes dans le journal
+Stub.cvars = {}
+Stub.logging = false
+
+local baseUnitName, baseUnitLevel, baseUnitExists = UnitName, UnitLevel, UnitExists
+UnitName = api("UnitName", function(unit)
+	local u = Stub.units[unit]
+	if u then return u.name end
+	return baseUnitName(unit)
+end)
+UnitLevel = api("UnitLevel", function(unit)
+	local u = Stub.units[unit]
+	if u then return u.level end
+	return baseUnitLevel(unit)
+end)
+UnitExists = api("UnitExists", function(unit)
+	if Stub.units[unit] then return true end
+	return baseUnitExists(unit)
+end)
+UnitGUID = api("UnitGUID", function(unit)
+	if unit == "player" then return Stub.player.guid end
+	local u = Stub.units[unit]
+	if u then return u.guid end
+end)
+UnitIsDead = api("UnitIsDead", function(unit) local u = Stub.units[unit]; return u ~= nil and u.dead == true end)
+UnitClassification = api("UnitClassification", function(unit) local u = Stub.units[unit]; return u and u.classification end)
+UnitCreatureType = api("UnitCreatureType", function(unit) local u = Stub.units[unit]; return u and u.creature_type end)
+UnitXP = api("UnitXP", function(unit) if unit == "player" then return Stub.player.xp end end)
+UnitXPMax = api("UnitXPMax", function(unit) if unit == "player" then return Stub.player.xp_max end end)
+GetXPExhaustion = api("GetXPExhaustion", function() return Stub.player.rested end)
+IsResting = api("IsResting", function() return Stub.player.resting end)
+GetRestState = api("GetRestState", function() return Stub.player.rest_state, "State" .. Stub.player.rest_state, 1 end)
+UnitQuestTrivialLevelRange = api("UnitQuestTrivialLevelRange", function() return Stub.player.trivial_range end)
+IsInInstance = api("IsInInstance", function() return Stub.instance.inside, Stub.instance.type end)
+GetInstanceInfo = api("GetInstanceInfo", function()
+	return Stub.instance.name, Stub.instance.type, 1, "Normal", 5, 0, false, Stub.instance.id
+end)
+GetNumGroupMembers = api("GetNumGroupMembers", function() return Stub.group.size end)
+IsInRaid = api("IsInRaid", function() return Stub.group.raid end)
+GetServerTime = api("GetServerTime", function() return Stub.epoch + math.floor(Stub.time) end)
+date = function(fmt) return os.date(fmt, Stub.epoch + math.floor(Stub.time)) end
+SetCVar = function(name, value) Stub.cvars[name] = value end
+LoggingCombat = function(value)
+	if value ~= nil then Stub.logging = value end
+	return Stub.logging
+end
+C_QuestLog = {
+	GetTitleForQuestID = api("C_QuestLog.GetTitleForQuestID", function(id) local q = Stub.quests[id]; return q and q.title end),
+	GetLogIndexForQuestID = api("C_QuestLog.GetLogIndexForQuestID", function(id) local q = Stub.quests[id]; return q and q.index end),
+	GetInfo = api("C_QuestLog.GetInfo", function(index)
+		for id, q in pairs(Stub.quests) do
+			if q.index == index then return { questID = id, title = q.title, level = q.level } end
+		end
+	end),
+}

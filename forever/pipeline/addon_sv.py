@@ -32,6 +32,19 @@ class Snapshot(NamedTuple):
     spell_crit: dict[str, float]
 
 
+class ParsedXp(NamedTuple):
+    amount: int | None
+    kind: str  # "monster", "other" ou "unknown"
+    monster: str | None
+    group_bonus: int | None
+    rested_bonus: int | None
+    extra: str
+
+
+def parse_xp_text(text: str) -> ParsedXp:
+    raise NotImplementedError
+
+
 class XpGain(NamedTuple):
     time: int | None
     localtime: datetime | None

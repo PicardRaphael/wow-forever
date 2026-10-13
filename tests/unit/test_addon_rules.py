@@ -79,7 +79,7 @@ def test_forever_logger_records_the_pet_out_of_combat():
     assert "InCombatLockdown" in text and "pet_snapshots" in text and "training" in text
     assert check_addon.check_addon(ADDON) == []
     toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
-    assert "## Version: 0.3.0" in toc.splitlines()
+    assert "## Version: 0.4.0" in toc.splitlines()  # T04d : 0.4.0
 
 
 def test_blizzard_functions_are_hooked_never_replaced():
@@ -91,3 +91,21 @@ def test_blizzard_functions_are_hooked_never_replaced():
     ), errors
     source = (REPO_ROOT / "addon" / "ForeverBridge" / "ForeverBridge.lua").read_text(encoding="utf-8")
     assert "hooksecurefunc" in source
+
+
+def test_forever_logger_records_xp_and_quests():
+    """T04d, bloc A : 0.4.0 relève l'XP de chaque monstre et de chaque quête rendue ; toujours aucune fonction d'action
+    ni aucun abonnement au journal de combat (règles ci-dessus) ; un gestionnaire en erreur est compté, jamais levé."""
+    text = (ADDON / "ForeverLogger.lua").read_text(encoding="utf-8")
+    for event in (
+        "QUEST_ACCEPTED",
+        "QUEST_TURNED_IN",
+        "PLAYER_XP_UPDATE",
+        "UPDATE_EXHAUSTION",
+        "PLAYER_UPDATE_RESTING",
+    ):
+        assert f"function handlers.{event}(" in text, event
+    assert "xp_states" in text and "quests" in text and "ForeverLoggerDB.errors" in text
+    assert check_addon.check_addon(ADDON) == []
+    toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
+    assert "## Version: 0.4.0" in toc.splitlines()
