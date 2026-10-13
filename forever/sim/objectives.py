@@ -22,6 +22,8 @@ from pathlib import Path
 from typing import Any
 
 from forever.config import Deps
+from forever.dungeons import build_dungeons
+from forever.engine.dungeon import first_pass, placement_level, repeat_pass, run_defaults, run_model
 from forever.engine.leveling import gray_level
 from forever.engine.xp import ActiveAura, Party, QuestXpInput, mob_kill_xp, quest_xp, session_xp, sleeping_bag_state
 from forever.errors import InvalidArgumentError
@@ -135,6 +137,32 @@ def _advice(best: dict[str, Any] | None) -> str:
     if best["kind"] == "dungeon_repeat":
         return f"refais {best['name']} : environ {round(best['xp_h'])} XP par heure"
     return f"continue dehors : {best['name']} (environ {round(best['xp_h'])} XP par heure)"
+
+
+def _dungeon_advice(
+    level: int, dungeons: Sequence[dict[str, Any]], zone: dict[str, Any] | None
+) -> tuple[dict[str, Any] | None, str]:
+    """Donjon à faire maintenant (son niveau de placement ou sa fenêtre contient le niveau du joueur) ou prochain
+    donjon à viser ; phrase construite à partir des chiffres. Registre : I17"""
+    with_place = [d for d in dungeons if d["first_pass"] and d["placement"]]
+    now = [d for d in with_place if level in d["placement"]["window"]]
+    zone_text = f"{zone['name']} : environ {round(zone['xp_h'])} XP par heure" if zone else "aucune zone chiffrée"
+    if now:
+        d = max(now, key=lambda x: x["first_pass"]["xp_h"])
+        f = d["first_pass"]
+        return d, (
+            f"fais {d['name']} une fois avec ses {f['quests']} quêtes maintenant (meilleur niveau "
+            f"{d['placement']['level']}) : environ {round(f['xp'])} XP en {round(f['minutes'])} minutes, soit "
+            f"{round(f['xp_h'])} XP par heure, contre {zone_text} dehors"
+        )
+    upcoming = [d for d in with_place if d["placement"]["level"] > level]
+    if upcoming:
+        d = min(upcoming, key=lambda x: (x["placement"]["level"], -x["first_pass"]["xp_h"]))
+        return d, (
+            f"continue dehors ({zone_text}) ; {d['name']} rapportera le plus avec ses quêtes au niveau "
+            f"{d['placement']['level']}"
+        )
+    return None, f"continue dehors ({zone_text}) : aucun donjon ouvert ne bat les quêtes du dehors à ton niveau"
 
 
 def _bonus_rates(
@@ -292,59 +320,148 @@ def objectives(
             kt = engine
     book: QuestBook = build_quests(deps, wow_dir=wow_dir)
     gray = gray_level(gd, level)
-    red = gd.leveling.quest_band.red_min_diff
-    available = [q for q in book.quests.values() if _eligible(q, cls, faction, level, gray, red)]
+    available = [
+        q for q in book.quests.values() if _eligible(q, cls, faction, level, gray, gd.leveling.quest_band.red_min_diff)
+    ]
     solo = Party(tuple([level] * party)) if party > 1 else None
-    zones: dict[str, list[dict[str, Any]]] = {}
-    dungeons: dict[str, list[dict[str, Any]]] = {}
-    for quest in available:
-        dungeon = value(quest, "dungeon")
-        if dungeon:
-            dungeons.setdefault(dungeon, []).append(quest)
-            continue
-        zone = book.zone_names.get(value(quest, "map")) if isinstance(value(quest, "map"), int) else None
-        if zone:
-            zones.setdefault(zone, []).append(quest)
-    rows: list[dict[str, Any]] = []
-    for zone, quests in zones.items():
-        quest_total = sum(_quest_xp(gd, level, q) for q in quests)
-        kills = p["kills_per_quest"] * len(quests)
-        mob_level = round(statistics.median(value(q, "level") for q in quests))
-        kill_xp = mob_kill_xp(gd, level, mob_level, party=solo).xp
-        seconds = kills * kt["seconds"] + p["quest_overhead_s"] * len(quests)
-        rows.append(_objective("zone", zone, len(quests), quest_total, kills, kill_xp, seconds, mob_level=mob_level))
+    dbook = build_dungeons(deps, wow_dir=wow_dir)
+    run_p = run_defaults(values)
+    red = gd.leveling.quest_band.red_min_diff
+    eligible_at: dict[int, list[dict[str, Any]]] = {}
+
+    def eligible(lv: int) -> list[dict[str, Any]]:
+        if lv not in eligible_at:
+            g = gray_level(gd, lv)
+            eligible_at[lv] = [q for q in book.quests.values() if _eligible(q, cls, faction, lv, g, red)]
+        return eligible_at[lv]
+
+    zone_rows_at: dict[int, list[dict[str, Any]]] = {}
+
+    def zone_rows(lv: int) -> list[dict[str, Any]]:
+        """Zones à un niveau (temps par monstre du niveau du joueur : approximation pour le placement)."""
+        if lv in zone_rows_at:
+            return zone_rows_at[lv]
+        zones: dict[str, list[dict[str, Any]]] = {}
+        for quest in eligible(lv):
+            if value(quest, "dungeon"):
+                continue
+            zone = book.zone_names.get(value(quest, "map")) if isinstance(value(quest, "map"), int) else None
+            if zone:
+                zones.setdefault(zone, []).append(quest)
+        out = []
+        for zone, quests in zones.items():
+            quest_total = sum(_quest_xp(gd, lv, q) for q in quests)
+            kills = p["kills_per_quest"] * len(quests)
+            mob_level = round(statistics.median(value(q, "level") for q in quests))
+            kill_xp = mob_kill_xp(gd, lv, mob_level, party=solo).xp
+            seconds = kills * kt["seconds"] + p["quest_overhead_s"] * len(quests)
+            out.append(_objective("zone", zone, len(quests), quest_total, kills, kill_xp, seconds, mob_level=mob_level))
+        zone_rows_at[lv] = out
+        return out
+
+    def dungeon_pass(d: dict[str, Any], lv: int) -> tuple[dict[str, Any] | None, dict[str, Any], dict[str, Any]]:
+        """(premier passage ou None, passage suivant, modèle du passage) d'un donjon du livre à un niveau."""
+        ids = [q["id"] for q in d["quests"]]
+        pool = {q["id"]: q for q in eligible(lv)}
+        quests = [pool[i] for i in ids if i in pool]
+        rng = (d["fields"].get("levels") or {}).get("value")
+        client_level = (d["fields"].get("client_level") or {}).get("value")
+        if quests:
+            mob_level = max(lv, round(statistics.median(value(q, "level") for q in quests)))
+        else:
+            middle = round(statistics.median([rng["min"], rng["max"]])) if rng is not None else lv
+            mob_level = max(lv, client_level or middle)
+        run = run_model(run_p, mob_level, measured=[float(r["seconds"]) for r in d["runs"] if r.get("seconds")])
+        kill_xp = mob_kill_xp(gd, lv, mob_level, elite=True, dungeon=True, party=Party(tuple([lv] * group))).xp
+        repeat_p = repeat_pass(run=run, kill_xp=kill_xp)
+        repeat = _objective(
+            "dungeon_repeat", d["name"], 0, 0.0, run.kills, kill_xp, repeat_p.seconds, mob_level=mob_level, id=d["id"]
+        )
+        first = None
+        if quests:
+            inside = set(ids)
+            missing = sorted(
+                {
+                    pre
+                    for q in quests
+                    for pre in [*(value(q, "prereq_all") or []), *(value(q, "prereq_any") or [])]
+                    if pre not in inside
+                }
+                | set(d["first_steps"])
+            )
+            quest_total = sum(_quest_xp(gd, lv, q) for q in quests)
+            fp = first_pass(
+                run=run,
+                kill_xp=kill_xp,
+                quests_xp=quest_total,
+                quests=len(quests),
+                travel_s=p["dungeon_travel_s"],
+                quest_overhead_s=p["quest_overhead_s"],
+            )
+            first = _objective(
+                "dungeon_first",
+                d["name"],
+                len(quests),
+                quest_total,
+                run.kills,
+                kill_xp,
+                fp.seconds,
+                missing_prereqs=missing,
+                mob_level=mob_level,
+                id=d["id"],
+            )
+        return first, repeat, {**run._asdict(), "mob_level": mob_level}
+
+    rows: list[dict[str, Any]] = list(zone_rows(level))
     out_dungeons = []
-    for name, quests in sorted(dungeons.items()):
-        ids = {q["id"] for q in quests}
-        missing = sorted(
+    for key, d in sorted(dbook.dungeons.items()):
+        if d["closed"]:
+            continue
+        own_faction = (d["fields"].get("faction") or {}).get("value")
+        if faction is not None and own_faction and own_faction != faction:
+            continue
+        rng = (d["fields"].get("levels") or {}).get("value")
+        in_range = rng is not None and rng["min"] <= level <= rng["max"]
+        pool = {q["id"] for q in available}
+        if not in_range and not any(q["id"] in pool for q in d["quests"]):
+            continue
+        first, repeat, run = dungeon_pass(d, level)
+        placement = None
+        if rng:
+
+            def first_xp_h(lv: int, d: dict[str, Any] = d) -> float | None:
+                f = dungeon_pass(d, lv)[0]
+                return f["xp_h"] if f else None
+
+            def zone_best(lv: int) -> float | None:
+                return max((z["xp_h"] for z in zone_rows(lv)), default=None)
+
+            found = placement_level(
+                range(rng["min"], min(rng["max"], level_cap(data)) + 1),
+                first_xp_h,
+                lambda lv: float(gd.xp_to_next[min(lv, len(gd.xp_to_next)) - 1]),
+                zone_best,
+            )
+            placement = found._asdict() if found else None
+        out_dungeons.append(
             {
-                pre
-                for q in quests
-                for pre in [*(value(q, "prereq_all") or []), *(value(q, "prereq_any") or [])]
-                if pre not in ids
+                "id": key,
+                "name": d["name"],
+                "levels": rng,
+                "run": run,
+                "first_pass": first,
+                "repeat": repeat,
+                "placement": placement,
+                "missing_prereqs": first["missing_prereqs"] if first else [],
+                "sources": d["sources"],
             }
         )
-        quest_total = sum(_quest_xp(gd, level, q) for q in quests)
-        mob_level = max(level, round(statistics.median(value(q, "level") for q in quests)))
-        kill_xp = mob_kill_xp(gd, level, mob_level, elite=True, dungeon=True, party=Party(tuple([level] * group))).xp
-        kills = p["dungeon_kills"]
-        inside = kills * kt["seconds"] / p["dungeon_group_speedup"]
-        first = _objective(
-            "dungeon_first",
-            name,
-            len(quests),
-            quest_total,
-            kills,
-            kill_xp,
-            inside + 2 * p["dungeon_travel_s"] + p["quest_overhead_s"] * len(quests),
-            missing_prereqs=missing,
-            mob_level=mob_level,
-        )
-        repeat = _objective("dungeon_repeat", name, 0, 0.0, kills, kill_xp, inside, mob_level=mob_level)
-        out_dungeons.append({"name": name, "first_pass": first, "repeat": repeat})
-        rows += [first, repeat]
+        rows += [r for r in (first, repeat) if r is not None]
     rows.sort(key=lambda r: -r["xp_h"])
     best = rows[0] if rows else None
+    target, target_advice = _dungeon_advice(
+        level, out_dungeons, max(zone_rows(level), key=lambda z: z["xp_h"], default=None)
+    )
     session_h = check_hours(hours)
     bonuses = _bonus_rates(
         gd,
@@ -387,6 +504,8 @@ def objectives(
         "dungeons": out_dungeons,
         "best": best,
         "advice": _advice(best),
+        "dungeon_advice": target_advice,
+        "dungeon_target": target,
         "bonuses": {k: v for k, v in bonuses.items() if k != "assumptions"} if bonuses else None,
         "bonus_advice": bonuses["sentence"] if bonuses else None,
         "sleeping_bag_chain": _chain(

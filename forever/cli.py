@@ -2324,10 +2324,19 @@ def _cmd_sim_objectives(deps: Deps, args: argparse.Namespace) -> int:
         "Donjons :",
     ]
     for d in rep["dungeons"]:
-        lines += [_objective_line(d["first_pass"]), _objective_line(d["repeat"])]
-        if d["first_pass"]["missing_prereqs"]:
-            lines.append(f"    prérequis hors du donjon : {', '.join(map(str, d['first_pass']['missing_prereqs']))}")
+        run = d["run"]
+        place = d.get("placement")
+        lines.append(
+            f"  {d['name']} : passage de {run['minutes']:.0f} min ({run['source']}, {run['certainty']}"
+            + (f", {run['samples']} relevé(s)" if run["samples"] else "")
+            + ")"
+            + (f", meilleur niveau {place['level']}" if place else "")
+        )
+        lines += [_objective_line(o) for o in (d["first_pass"], d["repeat"]) if o is not None]
+        if d["missing_prereqs"]:
+            lines.append(f"    prérequis hors du donjon : {', '.join(map(str, d['missing_prereqs']))}")
     lines.append(f"Conseil : {rep['advice']}")
+    lines.append(f"Donjon : {rep['dungeon_advice']}")
     bonuses = rep.get("bonuses")
     if bonuses:
         active = ", ".join(f"{b['name']} ×{b['stacks']}" for b in bonuses["active"]) or "aucun"

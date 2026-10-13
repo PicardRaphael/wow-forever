@@ -210,6 +210,23 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   des boss dans le client. Le client tranche les rencontres : Excavation Site 4 (Highland Horror comprise),
   City of Dalaran 9 (Mana Wraith comprise), Hall of Thanes 4, Ruins of Lordaeron 7. Reste ouvert : le sens du niveau de
   `ContentTuning` (cible ou plancher) et les tables des métiers, réputations et prix.
+- **DON17 — Taux de butin de Forever : Naowh Forever et FojjiCore divergent ; lequel est juste ?** Ajoutée le
+  2026-10-13 (DJ1). Les deux donnent des taux pour les nouveaux boss, d'origine déclarée (Naowh : Wowhead Forever et
+  wowsrc) ou non (FojjiCore). Test : butin relevé par ForeverLogger 0.6.0 et Naowh Forever sur assez de passages
+  (taux = lâchés ÷ victoires). Priorité : basse. Registre H12.
+- **DON18 — Plages, boss et entrées des nouveaux donjons divergents entre addons : le client les tranche-t-il ?**
+  Ajoutée le 2026-10-13 (DJ1). Le client tranche les rencontres (Excavation Site 4 avec Highland Horror, City of
+  Dalaran 9 avec Mana Wraith) ; il ne donne qu'un niveau de contenu par donjon (ContentTuning), pas de plage ni
+  d'entrée ; Excavation Site : 24-29 (Naowh, Companion, AtlasLoot, Zone Info) contre 26-31 (note officielle, FojjiCore,
+  Forever Guide) et 26-33 (ForeverDungeonJournal) ; Razorfen Downs et Uldaman dits fermés par Naowh, ouverts par la
+  note du 01/10. Test : plage affichée en jeu ou passage. Priorité : moyenne. Registre H12, I17.
+- **LVL15 — Durée réelle d'un passage de donjon à Forever (groupe ordinaire), et écart à la formule de
+  Factoruide ?** Ajoutée le 2026-10-13 (DJ1). Un seul passage relevé (Ragefire Chasm, Naowh `journalRun`).
+  Test : passages relevés par ForeverLogger 0.6.0 ou InstanceTracker de Naowh Forever (à activer). Priorité :
+  moyenne. Registre I16.
+- **LVL16 — L'XP d'une quête de donjon lue dans le client (`questcache.wdb`) inclut-elle le bonus de donjon réduit
+  de moitié ?** Ajoutée le 2026-10-13 (DJ1). Test : `xpReward` d'une quête de donjon rendue, comparé par
+  `forever xp check`. Priorité : moyenne. Registre I9.
 - **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
   Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
 - **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**

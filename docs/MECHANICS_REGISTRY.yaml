@@ -904,7 +904,7 @@ mechanics:
       - "note officielle du 08/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1 du 2026-10-08), recoupée dans docs/research/notes-blizzard-2026-10-08.md : retour au comportement de butin de Classic"
     tests: []
     tolerance: null
-    note: "règle d'interaction du serveur, sans valeur ni effet sur les calculs ; à relever avec le butin des boss en DJ1"
+    note: "DJ1 : butin ramassé relevé par ForeverLogger 0.6.0 (objet, PNJ source) et par Naowh Forever, taux relevé = lâchés ÷ victoires dans le livre des donjons, aucun effet sur un calcul de combat ; règle d'interaction du serveur, sans valeur ni effet sur les calculs ; à relever avec le butin des boss en DJ1"
   - id: D9
     categorie: environnement
     description: "Cozy Sleeping Bag : Well-Rested (bonus d'XP par cumul, durée, cumuls, pose)"
@@ -1758,8 +1758,12 @@ mechanics:
       - tests/unit/test_sim_objectives.py::test_advice_repeats_the_numbers_of_the_objective
       - tests/unit/test_sim_objectives.py::test_mage_kill_time_comes_from_the_engine
       - tests/unit/test_objectives_eligibility.py::test_gray_and_red_quests_are_left_out
+      - tests/unit/test_sim_objectives_dungeons.py::test_objectives_group_by_instance
+      - tests/unit/test_sim_objectives_dungeons.py::test_first_pass_beats_repeat
+      - tests/unit/test_sim_objectives_dungeons.py::test_dungeon_without_quests_has_repeat_only
+      - tests/unit/test_engine_dungeon.py::test_first_pass_beats_repeat
     tolerance: null
-    formule: "XP par heure = (XP des quêtes accessibles non grises + monstres × XP d'un monstre) / temps ; zone : monstres × temps par monstre + surcoût par quête ; donjon, premier passage : trajet aller et retour + surcoût par quête + monstres × temps par monstre / gain du groupe ; passages suivants : monstres seuls"
+    formule: "XP par heure = (XP des quêtes accessibles non grises + monstres × XP d'un monstre) / temps ; zone : monstres × temps par monstre + surcoût par quête ; donjon (DJ1, une entrée par instance du livre des donjons), premier passage : trajet aller et retour + surcoût par quête + durée du passage (I16) ; passages suivants : monstres seuls sur la durée du passage ; donjon sans quête accessible : passages suivants seulement"
     note: "hypothèses de temps suppose, à mesurer par ForeverLogger (acceptation -> rendu, durée d'un passage) ; le classement peut en dépendre plus que de l'XP et la sortie le dit ; conseil construit par l'outil à partir de ses chiffres ; repos non appliqué au classement ; hypothèses du code (suppose) : tous les monstres de donjon élites, boss non distingués, niveau des monstres = médiane des niveaux des quêtes (au moins celui du joueur en donjon), groupe de donjon au niveau du joueur, aucune coupure de l'XP de groupe par un membre très au-dessus (LVL4) ; angle mort : XP des boss et part de monstres normaux d'un donjon (le facteur élite sur tous les monstres surestime les passages de donjon) ; temps par monstre : combat, repos et trajet compris (cadence de ForeverLogger, total du moteur du Mage), la durée des combats des journaux en dernier recours"
     angle_mort:
       talents: []
@@ -1785,6 +1789,46 @@ mechanics:
       - tests/unit/test_objectives_kill_time.py::test_journal_combat_time_is_marked_as_combat_only
     tolerance: null
     note: "mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), comme le moteur du Mage, et passe avant la durée des combats des journaux, qui n'en compte pas (champ scope : total ou combat) ; même règle pour le Mage (décision 249) : la mesure passe avant le moteur, dont le temps reste rendu à côté ; écart moteur et mesure : question LVL11 ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
+  - id: I16
+    categorie: optimisation
+    description: "Durée et monstres d'un passage de donjon (relevés du joueur, compte d'un addon, formule de Factoruide)"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "passages relevés : ForeverLogger 0.6.0 (runs, entrée et sortie d'instance), Naowh Forever (journalRun, InstanceTracker), lus en local ; médiane, certain"
+      - "forever/data/1.60.1.70338/mechanics.json (dungeon.run_defaults : formule par défaut de Factoruide, code MIT, crates/fg-route/src/model/dungeons.rs, lu le 2026-10-13 ; suppose)"
+    tests:
+      - tests/unit/test_engine_dungeon.py::test_measured_run_wins
+      - tests/unit/test_engine_dungeon.py::test_addon_kill_count_used_when_no_run
+      - tests/unit/test_engine_dungeon.py::test_factoruide_formula_bounds
+      - tests/unit/test_engine_dungeon.py::test_formula_is_the_last_resort
+      - tests/unit/test_sim_objectives_dungeons.py::test_measured_runs_drive_the_dungeon_time
+      - tests/unit/test_logger_runs.py::test_run_entry_and_exit_recorded
+    tolerance: null
+    formule: "minutes = médiane des passages relevés, sinon borne(base + pente × niveau des monstres, min, max) ; monstres = médiane relevée, sinon compte d'un addon, sinon base + pente × niveau des monstres"
+    note: "aucun addon ne donne un compte de monstres tués (TRASH_NPC de Forever Guide compte des types de monstres, non utilisé) ; la formule de Factoruide n'est pas sourcée par son auteur ; le temps par monstre de T04d n'est plus utilisé pour un passage en groupe ; question LVL15"
+    angle_mort:
+      talents: []
+      contextes: [dungeon]
+      estimation: null
+  - id: I17
+    categorie: optimisation
+    description: "Niveau de placement d'un donjon dans une route (part de niveau gagnée par heure au premier passage)"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "livre des donjons (H12), objectifs de leveling (I14), passage (I16), courbe d'XP par niveau (leveling.json)"
+      - "forever/data/1.60.1.70338/mechanics.json (dungeon.official : niveaux et ouverture de la note officielle du 01/10, probable)"
+    tests:
+      - tests/unit/test_engine_dungeon.py::test_placement_maximises_level_share
+      - tests/unit/test_engine_dungeon.py::test_placement_tie_takes_lowest
+      - tests/unit/test_sim_objectives_dungeons.py::test_placement_level_is_reported
+      - tests/unit/test_sim_objectives_dungeons.py::test_dungeon_advice_repeats_the_numbers
+    tolerance: null
+    formule: "niveau retenu = argmax sur la plage du donjon de (XP par heure du premier passage ÷ XP du niveau), à égalité le plus bas ; fenêtre = niveaux où le premier passage bat la meilleure zone"
+    note: "zones des autres niveaux chiffrées avec le temps par monstre du niveau du joueur (approximation) ; quêtes grises ou hors de portée exclues à chaque niveau ; donjons fermés exclus"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

@@ -47,7 +47,9 @@ def test_plugin_json_has_a_semver_version():
     # règle « mots de joueur » du format des réponses venues du jeu (sonde H, décision 238).
     # 0.10.0 : objectifs de leveling pour toutes les classes et quêtes de Forever (forever-leveling, routeur), cas des
     # boutons Leveling régénérés (T04d, bloc F).
-    assert version == "0.10.0"
+    # 0.11.0 : donjons (skill forever-donjons, routeur), cas des boutons Leveling régénérés (conseil de donjon et
+    # niveau de placement, DJ1).
+    assert version == "0.11.0"
 
 
 def test_fingerprint_is_up_to_date():

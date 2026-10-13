@@ -121,3 +121,33 @@ def placement_level(
         return None
     share, level = best
     return Placement(level, share, window)
+
+
+class BossLevel(NamedTuple):
+    value: Any  # niveau, ou {"min", "max"} quand le journal en relève plusieurs
+    source: str
+    agree: list[str]  # sources qui donnent la même valeur
+    independent: int  # sources indépendantes parmi elles (une famille de copies compte pour une)
+    others: list[tuple[str, Any]]
+
+
+def boss_level(
+    logged: Sequence[int],
+    candidates: Sequence[tuple[str, Any]],
+    *,
+    logged_source: str,
+    copy_family: frozenset[str] = frozenset(),
+) -> BossLevel | None:
+    """Niveau d'un boss : relevé dans un journal de combat d'abord, sinon première source (ordre déclaré) ; les
+    sources d'une famille de copies (valeurs recopiées l'une de l'autre) comptent pour une seule. Registre : H12"""
+    ranked: list[tuple[str, Any]] = []
+    if logged:
+        low, high = min(logged), max(logged)
+        ranked.append((logged_source, low if low == high else {"min": low, "max": high}))
+    ranked += [(s, v) for s, v in candidates if v is not None]
+    if not ranked:
+        return None
+    (source, value), *rest = ranked
+    agree = [source, *(s for s, v in rest if v == value)]
+    families = {"copy" if s in copy_family else s for s in agree}
+    return BossLevel(value, source, agree, len(families), rest)

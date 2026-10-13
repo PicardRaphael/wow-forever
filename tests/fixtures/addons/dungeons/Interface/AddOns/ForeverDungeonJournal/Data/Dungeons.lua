@@ -29,6 +29,14 @@ DB["Ragefire Chasm"] = {
         level = 15,
         requires = 9,
         faction = "Horde",
+        liveXPFallback = 1200,
+    }, {
+        id = 5728,
+        name = "Hidden Enemies",
+        level = 16,
+        requires = 12,
+        faction = "Horde",
+        liveXPFallback = 1400,
     }},
     bosses = {
         { name = "Taragaman the Hungerer", npcID = 11520 },

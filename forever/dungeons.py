@@ -29,6 +29,7 @@ from pathlib import Path
 from typing import Any, NamedTuple
 
 from forever.config import Deps
+from forever.engine.dungeon import boss_level
 from forever.pipeline.dungeon_sources import DUNGEON_SOURCE_LABELS, SourceDungeons
 from forever.pipeline.questie import CLASS_MASKS
 
@@ -167,17 +168,22 @@ def _ranked(contribs: Sequence[tuple[str, Mapping[str, Any]]]) -> list[tuple[str
 def _boss_level(
     npc: int | None, matched: Sequence[tuple[str, Mapping[str, Any]]], logged: Mapping[int, Sequence[int]]
 ) -> dict[str, Any] | None:
-    candidates: list[tuple[str, Any]] = []
-    if npc is not None and npc in logged:
-        levels = sorted(set(logged[npc]))
-        candidates.append((LOGGED_SOURCE, levels[0] if len(levels) == 1 else {"min": levels[0], "max": levels[-1]}))
-    candidates += [(s, b.get("level")) for s, b in matched]
-    entry = _field(candidates)
-    if entry is None:
+    found = boss_level(
+        logged.get(npc, ()) if npc is not None else (),
+        [(s, b.get("level")) for s, b in matched],
+        logged_source=LOGGED_SOURCE,
+        copy_family=COPY_FAMILY,
+    )
+    if found is None:
         return None
-    agree = [entry["source"], *(o["source"] for o in entry["others"] if o["value"] == entry["value"])]
-    families = {("copy" if s in COPY_FAMILY else s) for s in agree}
-    return {**entry, "sources": agree, "independent": len(families)}
+    return {
+        "value": found.value,
+        "source": found.source,
+        "certainty": _certainty(found.source),
+        "others": [{"source": s, "value": v} for s, v in found.others],
+        "sources": found.agree,
+        "independent": found.independent,
+    }
 
 
 def _loot(

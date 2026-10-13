@@ -115,7 +115,9 @@ def _objectives_call(r: Resolved) -> Call:
 OBJECTIVES_READ = (
     "Objectifs (résultat de forever_sim_leveling, kind objectives) : rends `advice` tel quel, puis le meilleur "
     "objectif (`best` : nom, XP, minutes, XP par heure) et, s'il y a un donjon, son premier passage avec ses quêtes "
-    "et ses passages suivants ; dis d'où vient le temps par monstre (`kill_time.source` : engine calculé, measured "
+    "et ses passages suivants ; puis `dungeon_advice` tel quel (donjon à faire maintenant ou à viser, avec son "
+    "niveau de placement `placement.level` : niveau où son premier passage rapporte la plus grande part de niveau "
+    "par heure) et la durée d'un passage (`run.source` : measured relevé, formula estimée) ; dis d'où vient le temps par monstre (`kill_time.source` : engine calculé, measured "
     "mesuré sur tes relevés, estimated estimé) et que les temps de trajet et de quête sont des hypothèses. "
     "Bonus d'XP : les bonus actifs (`bonuses.active` : nom, cumuls, temps restant `remaining_s`), puis `bonus_advice` "
     "tel quel ; si `sleeping_bag_chain` est rendu, sa phrase `sentence` telle quelle (étape suivante, lieu et position) "
