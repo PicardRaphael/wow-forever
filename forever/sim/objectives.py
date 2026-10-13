@@ -16,12 +16,13 @@ ici à partir des chiffres de l'objectif, jamais par un modèle de langage. Aucu
 from __future__ import annotations
 
 import statistics
+from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
 from forever.config import Deps
 from forever.engine.leveling import gray_level
-from forever.engine.xp import Party, QuestXpInput, mob_kill_xp, quest_xp
+from forever.engine.xp import ActiveAura, Party, QuestXpInput, mob_kill_xp, quest_xp
 from forever.errors import InvalidArgumentError
 from forever.kill_time import kill_params, kill_time, load_kill_times
 from forever.pipeline.questie import CLASS_MASKS
@@ -137,6 +138,11 @@ def objectives(
     dungeon_party: int | None = None,
     limit: int = 5,
     wow_dir: Path | None = None,
+    sleeping_bag: int | None = None,
+    food: bool = False,
+    legacy_rested_rank: int | None = None,
+    hours: float | None = None,
+    auras: Sequence[ActiveAura] = (),
 ) -> dict[str, Any]:
     """Objectifs classés par XP par heure, temps par monstre et sa source, conseil, provenance.
 

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import difflib
 import statistics
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any, TypedDict, cast
 
 from forever.config import Deps
@@ -226,10 +226,15 @@ def simulate_leveling(
     ab_stacks: int | None = None,
     ab_dump: str | None = None,
     low_level_penalty: bool | None = None,
+    bonus: Sequence[str] = (),
+    rested: float = 0.0,
+    hours: float | None = None,
 ) -> LevelingReport:
     """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance.
 
     `low_level_penalty` : pénalité des sorts de bas niveau (None : `coefficient.low_level_default` des données)."""
+    if bonus or rested:
+        raise NotImplementedError
     inputs = {
         "race": given(race, DEFAULT_RACE),
         "level": given(level, None),
