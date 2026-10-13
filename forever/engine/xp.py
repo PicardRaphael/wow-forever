@@ -7,10 +7,11 @@ Aucun chiffre de jeu ici. Unités : points d'XP (nombres à virgule, arrondis à
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from forever.engine import leveling
-from forever.engine.model import GameData, XpRules
+from forever.engine.model import GameData, XpBonusData, XpRules
 from forever.errors import DataSchemaError
 
 
@@ -109,10 +110,14 @@ def mob_kill_xp(
     dungeon: bool = False,
     party: Party | None = None,
     rested_pool: float = 0.0,
+    bonuses: XpBonusState | None = None,
+    creature_type: int | None = None,
 ) -> XpResult:
     """XP d'un monstre tué : base, écart de niveau, élite, donjon, groupe, puis repos (dans la limite du réservoir).
 
     Registre : I6, I10, I11, I13, D7"""
+    if bonuses is not None:
+        raise NotImplementedError
     if gd.xp is None and mob_level == player_level and not (elite or dungeon or party or rested_pool):
         base, base_term = base_kill_xp(gd, player_level)
         return XpResult(base, 0.0, (base_term,))  # version sans règles d'XP : monstre de même niveau seulement
@@ -152,10 +157,14 @@ def mob_kill_xp(
     return XpResult(xp, used, tuple(terms))
 
 
-def quest_xp(gd: GameData, player_level: int, quest: QuestXpInput) -> XpResult:
+def quest_xp(
+    gd: GameData, player_level: int, quest: QuestXpInput, *, bonuses: XpBonusState | None = None
+) -> XpResult:
     """XP d'une quête rendue : XP de base réduite selon l'écart de niveau ; jamais de repos.
 
     Registre : I12"""
+    if bonuses is not None:
+        raise NotImplementedError
     rules = xp_rules(gd)
     terms = [Term("quest_base_xp", quest.base_xp, quest.certainty, quest.source)]
     beyond = player_level - quest.level - rules.quest_full_diff
@@ -166,12 +175,93 @@ def quest_xp(gd: GameData, player_level: int, quest: QuestXpInput) -> XpResult:
     return XpResult(quest.base_xp * factor, 0.0, tuple(terms))
 
 
-def rested_gain(gd: GameData, level: int, hours: float, *, inn: bool, pool: float = 0.0) -> float:
+def rested_gain(
+    gd: GameData, level: int, hours: float, *, inn: bool, pool: float = 0.0, legacy_rank: int = 0
+) -> float:
     """Réservoir de repos après `hours` heures hors ligne (auberge ou dehors), plafonné.
 
     Registre : D7"""
+    if legacy_rank:
+        raise NotImplementedError
     rules = xp_rules(gd)
     level_xp = gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1]
     per_period = rules.rested_gain_per_period * level_xp * (1.0 if inn else rules.rested_outdoor_ratio)
     gained = per_period * hours / rules.rested_period_h
     return min(pool + gained, rules.rested_cap_levels * level_xp)
+
+
+# --- T04f : bonus d'XP (registre : D5, D7, D9, D10, E3) ---------------------------------------------------------
+
+
+@dataclass(frozen=True)
+class ActiveAura:
+    """Aura d'XP active : sort du client, cumuls, temps restant (None : sans fin connue)."""
+
+    spell_id: int
+    stacks: int = 1
+    remaining_s: float | None = None
+
+
+@dataclass(frozen=True)
+class XpBonusState:
+    """Bonus d'XP du personnage à un instant : auras actives, nourriture nutritive (renouvelée), rangs des perks
+    Legacy (sort du perk -> rang), tente disponible."""
+
+    auras: tuple[ActiveAura, ...] = ()
+    food: bool = False
+    legacy_ranks: Mapping[int, int] = field(default_factory=dict)
+    tent_ready: bool = False
+
+
+@dataclass(frozen=True)
+class SessionXp:
+    """Séance de jeu déroulée pas à pas : XP par heure moyenne, XP totale, repos consommé, part de chaque bonus."""
+
+    xp_h: float
+    base_xp_h: float
+    hours: float
+    total_xp: float
+    rested_used: float
+    by_bonus: Mapping[str, float]  # XP gagnée grâce à chaque bonus (clé : xp_bonus.<sort> ou xp.rested)
+    terms: tuple[Term, ...]
+
+
+def xp_bonus_data(gd: GameData) -> XpBonusData:
+    raise NotImplementedError
+
+
+def xp_multiplier(
+    gd: GameData,
+    state: XpBonusState | None,
+    *,
+    source: str,
+    mode: str | None = None,
+    creature_type: int | None = None,
+) -> tuple[float, tuple[Term, ...]]:
+    raise NotImplementedError
+
+
+def rested_cap(gd: GameData, level: int, legacy_rank: int = 0) -> float:
+    raise NotImplementedError
+
+
+def tent_rested(gd: GameData, level: int, pool: float) -> float:
+    raise NotImplementedError
+
+
+def sleeping_bag_state(gd: GameData, stacks: int | None = None) -> XpBonusState:
+    raise NotImplementedError
+
+
+def session_xp(
+    gd: GameData,
+    *,
+    base_xp_h: float,
+    kill_share: float,
+    hours: float,
+    state: XpBonusState | None,
+    rested_pool: float,
+    level: int,
+    step_s: float = 60.0,
+) -> SessionXp:
+    raise NotImplementedError

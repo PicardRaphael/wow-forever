@@ -466,6 +466,70 @@ class XpRules:
 
 
 @dataclass(frozen=True)
+class XpBonusEffect:
+    """Effet d'une aura d'XP du client (T04f) : clé (sens du code d'aura), cible, pourcentage par cumul."""
+
+    key: str  # kill_xp_pct, quest_xp_pct, rested_rate_pct, rested_cap_pct, creature_type_kill_xp_pct
+    applies_to: str  # kill, quest, rested_gain, rested_cap
+    value: float  # pourcentage lu, par cumul (valeur de base du sort)
+    misc: int  # valeur diverse (type de créature pour creature_type_kill_xp_pct)
+    ranks: tuple[float, ...] = ()  # perk Legacy : pourcentage à chaque rang (courbes du client)
+
+
+@dataclass(frozen=True)
+class XpBonusAura:
+    """Aura d'XP du client (`xp_bonuses.json`, T04f)."""
+
+    spell_id: int
+    name: str
+    effects: tuple[XpBonusEffect, ...]
+    duration_s: float | None  # None : sans durée (permanente ou passive)
+    max_stacks: int
+    access: str  # item, legacy, food, camp, none (none : jamais appliquée)
+    meaning_certainty: str  # certitude du sens des codes d'aura
+    access_certainty: str
+
+
+@dataclass(frozen=True)
+class SleepingBag:
+    """Cozy Sleeping Bag et son aura (`xp_bonuses.json` sleeping_bag)."""
+
+    item: int
+    name: str
+    required_level: int
+    aura: int  # Well-Rested
+    stack_period_s: float  # repos dans le sac pour un cumul
+    bag_duration_s: float  # durée du sac posé
+    cooldown_s: float  # recharge de l'objet
+    max_stacks: int
+
+
+@dataclass(frozen=True)
+class FoodItem:
+    """Nourriture nutritive dont le buff porte le bonus d'XP (`xp_bonuses.json` food)."""
+
+    item: int
+    name: str
+    required_level: int
+    buff_duration_s: float | None
+    xp_aura: int
+
+
+@dataclass(frozen=True)
+class XpBonusData:
+    """Bonus d'XP de la version (T04f) : auras du client et règles de cumul (`mechanics.json` xp.bonus_*)."""
+
+    auras: Mapping[int, XpBonusAura]
+    sleeping_bag: SleepingBag | None
+    food: tuple[FoodItem, ...]
+    tent_threshold_pct: float | None  # tente : repos remonté à ce pourcentage d'un niveau
+    tent_cooldown_s: float | None  # recharge partagée des éléments de camp
+    stacking: str  # additive (défaut) ou multiplicative (variante)
+    rested_after: bool  # le repos s'applique sur l'XP majorée
+    sources: Mapping[str, XpRuleSource] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu : données des 9 classes en PV1, moteurs dans les tranches de classe)."""
 
@@ -500,6 +564,7 @@ class GameData:
     # T08b, bloc B (D2) : fichier dont viennent les utilitaires du Mage (classes.json en mode forever s'il les porte)
     utility_source: str = "spells.json"
     xp: XpRules | None = None  # T04d, bloc C : modèle d'XP (mechanics.json xp.*) ; None : version sans ces règles
+    xp_bonuses: XpBonusData | None = None  # T04f : bonus d'XP (xp_bonuses.json, mechanics.json xp.bonus_*)
 
 
 class CharacterOverrides(TypedDict, total=False):
