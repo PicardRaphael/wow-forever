@@ -162,6 +162,13 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "CreatureFamily": _cols("ID:int Name_lang:str PetFoodMask:int PetTalentType:int SkillLine_0:int SkillLine_1:int"),
     "ItemPetFood": _cols("ID:int Name_lang:str"),
     "UiMap": _cols("ID:int Name_lang:str ParentUiMapID:int Type:int"),
+    # T04f, bloc A : bonus d'XP (decode_rules.json, xp_bonuses). ItemSparse relue avec le niveau requis ; conditions
+    # de joueur citées par les descriptions des sorts (champs utiles seulement).
+    "XpItemSparse": _cols("ID:int Display_lang:str RequiredLevel:int"),
+    "PlayerCondition": _cols(
+        "ID:int MinLevel:int MaxLevel:int ClassMask:int WorldStateExpressionID:int Flags:int PrevQuestID_0:int "
+        "SpellID_0:int AuraSpellID_0:int ItemID_0:int"
+    ),
 }
 
 

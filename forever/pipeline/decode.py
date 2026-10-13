@@ -45,6 +45,13 @@ from forever.pipeline.quest_rewards import QUEST_FILE, decode_quest_rewards, loa
 from forever.pipeline.questcache import QuestCache, read_questcache
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
+from forever.pipeline.xp_bonuses import (
+    XP_BONUS_FILE,
+    XP_BONUS_SCHEMAS,
+    decode_xp_bonuses,
+    load_xp_bonus_tables,
+    xp_bonus_gate_files,
+)
 from forever.timefmt import format_utc
 
 RULES_NAME = "decode_rules.json"
@@ -1976,8 +1983,16 @@ def decode_version(
         )
         decoded_classes[QUEST_FILE] = quest_doc
         extra_notes.append(f"{QUEST_FILE} : {len(quest_doc['seen_quests'])} quête(s) vue(s) ; {cache_note}")
+    # T04f, bloc A : bonus d'XP (xp_bonus_tables) : table PlayerCondition présente (décodé, avec les tables Spell*,
+    # Item* et Trait* déjà lues) ou absente (hérité de la base).
+    gate = xp_bonus_gate_files(rules)
+    if gate and all((csv_dir / rel).is_file() for _, rel in gate):
+        xp_doc = decode_xp_bonuses(hot.apply(load_xp_bonus_tables(csv_dir, rules), XP_BONUS_SCHEMAS), rules, version)
+        decoded_classes[XP_BONUS_FILE] = xp_doc
+        access = sorted({a["access"] for a in xp_doc["auras"]})
+        extra_notes.append(f"{XP_BONUS_FILE} : {len(xp_doc['auras'])} aura(s) d'XP (accès : {', '.join(access)})")
     inherited = {}
-    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE, QUEST_FILE)
+    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE, QUEST_FILE, XP_BONUS_FILE)
     names = [*INHERITED_FILES, *(n for n in optional if n not in decoded_classes)]
     for name in names:
         path = _inherited_source(base, name, rules)
@@ -1992,6 +2007,11 @@ def decode_version(
                 continue
             if name == QUEST_FILE:
                 extra_notes.append(f"{name} absent : table QuestXP absente de {csv_dir.name} et de {base_version}")
+                continue
+            if name == XP_BONUS_FILE:
+                extra_notes.append(
+                    f"{name} absent : table PlayerCondition absente de {csv_dir.name} et de {base_version}"
+                )
                 continue
             if name in CLASS_FILES:
                 extra_notes.append(
@@ -2029,12 +2049,16 @@ def decode_version(
         "pets) ; écarts internes au client dans observations",
         QUEST_FILE: "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client "
         "(questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
+        XP_BONUS_FILE: "bonus d'XP du client : auras d'XP, durée, cumul, accès (objet, perk Legacy, nourriture, aucun), "
+        "sac de couchage, nourritures nutritives, camp, conditions de joueur (decode_rules.json, xp_bonuses)",
     }
     class_certainty_note = {
         CHARACTER_FILE: "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
         PETS_FILE: "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits "
         "du masque) et effets de Hunter Pet Scaling : sens probable",
         QUEST_FILE: "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
+        XP_BONUS_FILE: "sens des codes d'aura déduit des descriptions (probable) ; lien du sac de couchage à son aura "
+        "déclaré (probable) ; condition 142418 évaluée par le serveur (LVL13)",
     }
     sources = {
         **{

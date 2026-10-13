@@ -20,6 +20,7 @@ from forever.pipeline.character_scaling import CHARACTER_FILE, character_errors
 from forever.pipeline.pets import PETS_FILE, pets_errors
 from forever.pipeline.quest_rewards import QUEST_FILE, quest_rewards_errors
 from forever.pipeline.sources import CERTAINTIES, inherited_files, load_source, source_provenance
+from forever.pipeline.xp_bonuses import XP_BONUS_FILE, xp_bonuses_errors
 from forever.provenance import Provenance
 from forever.store import VersionData, current_identity
 
@@ -130,6 +131,11 @@ def check_version(v: VersionData) -> tuple[list[str], list[str], list[str]]:
             errors += quest_rewards_errors(_json(v, QUEST_FILE))
         except (OSError, ValueError) as exc:
             errors.append(f"{QUEST_FILE} illisible ({exc})")
+    if (v.path / XP_BONUS_FILE).is_file():  # T04f, bloc A : bonus d'XP du client
+        try:
+            errors += xp_bonuses_errors(_json(v, XP_BONUS_FILE))
+        except (OSError, ValueError) as exc:
+            errors.append(f"{XP_BONUS_FILE} illisible ({exc})")
     inherited = inherited_files(v)
     if inherited:
         warnings.append(f"{len(inherited)} fichier(s) hérité(s) d'une version antérieure, à revérifier")

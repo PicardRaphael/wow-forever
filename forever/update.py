@@ -694,6 +694,12 @@ def _fetch_version(run: _Run, version: str, rules: Mapping[str, Any]) -> list[st
             fetch_tables(deps, version, quest_tables, log=run.say)
         except FetchFailedError as exc:  # T04d : sans QuestXP, quest_rewards.json est hérité de la base
             run.say(f"tables des quêtes facultatives : {exc.message}")
+    xp_tables = [t for t in rules.get("xp_bonus_tables", []) if t not in enus]
+    if xp_tables:
+        try:
+            fetch_tables(deps, version, xp_tables, log=run.say)
+        except FetchFailedError as exc:  # T04f : sans PlayerCondition, xp_bonuses.json est hérité de la base
+            run.say(f"tables des bonus d'XP facultatives : {exc.message}")
     if rules.get("gametables"):
         fetch_gametables(deps, version, rules["gametables"], log=run.say)
     run.cleared[f"network-{version}"] = "téléchargement réussi"
