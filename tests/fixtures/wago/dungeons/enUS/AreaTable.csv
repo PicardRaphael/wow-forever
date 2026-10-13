@@ -1,0 +1,18 @@
+ID,ZoneName,AreaName_lang,ContinentID,ParentAreaID,AreaBit,SoundProviderPref,SoundProviderPrefUnderwater,AmbienceID,UwAmbience,ZoneMusic,UwZoneMusic,ExplorationLevel,IntroSound,UwIntroSound,FactionGroupMask,Ambient_multiplier,MountFlags,PvpCombatWorldStateID,WildBattlePetLevelMin,WildBattlePetLevelMax,WindSettingsID,ContentTuningID,Flags_0,Flags_1,LiquidTypeID_0,LiquidTypeID_1,LiquidTypeID_2,LiquidTypeID_3
+206,Westfall,Westfall,36,0,263,0,11,47,2172,9,0,0,0,0,0,0,1,-1,0,0,0,0,65600,0,0,0,0,0
+207,TheGreatSea,The Great Sea,36,0,264,0,11,3228,2172,9,0,0,0,0,0,0,1,-1,0,0,0,0,64,0,0,0,0,0
+208,UnusedIroncladcove,Unused Ironcladcove,36,0,265,76,11,34,2172,0,0,0,0,0,0,0,1,-1,0,0,0,0,64,0,0,0,0,0
+210,***On Map Dungeon***,***On Map Dungeon***,36,0,267,0,11,0,2172,0,0,0,0,0,0,0,1,-1,0,0,0,0,68,0,0,0,0,0
+721,Gnomeregan,Gnomeregan,90,0,305,0,11,42,2172,0,0,0,0,0,2,0,1,-1,0,0,0,5242,0,0,0,0,0,0
+796,ScarletMonastery,Scarlet Monastery,189,0,646,0,11,0,2172,205,0,0,0,0,4,0,1,-1,0,0,0,5247,0,0,0,0,0,0
+1581,TheDeadmines,The Deadmines,36,0,695,76,0,53,2172,204,0,0,0,0,2,0,1,-1,0,0,0,5240,0,0,0,0,0,0
+2437,Ragefire,Ragefire Chasm,389,0,927,0,0,0,2172,0,0,0,0,0,4,0,1,-1,0,0,0,5244,0,0,0,0,0,0
+2717,MoltenCore,Molten Core,409,0,970,0,0,0,2172,0,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,0,0,0
+3277,WarsongGulch,Warsong Gulch,489,0,1025,67,0,3456,2172,243,0,0,0,0,0,0,1,-1,0,0,0,0,0,0,0,0,0,0
+16074,KarazhanCrypts,Karazhan Crypts,2875,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,128,0,0,0,0
+16544,RuinsofDalaran,City of Dalaran,2959,0,0,86,0,3410,2172,3170,0,0,1657,0,6,0,0,-1,0,0,0,0,0,128,0,0,0,0
+16560,CityofDalaran,City of Dalaran,2959,0,0,86,0,3427,2172,3170,0,0,1657,0,0,0,0,-1,0,0,0,0,2048,128,0,0,0,0
+16562,HillsbradFoothills,Hillsbrad Foothills,2959,0,0,0,0,0,0,0,0,0,0,0,0,0,1,-1,0,0,0,0,64,128,0,0,0,0
+16611,RuinsofLordaeron,Ruins of Lordaeron,2999,0,0,203,0,3231,2172,3657,0,0,0,0,0,0,0,-1,0,0,0,0,0,128,0,0,0,0
+16732,ExcavationSiteWetlands,Excavation Site: Wetlands,2998,0,0,0,0,44,2172,3659,0,0,0,0,0,0,13,-1,0,0,0,0,0,128,0,0,0,0
+16919,TheHallofThanes,The Hall of Thanes,3065,0,0,72,0,0,0,3662,0,0,0,0,0,0,0,-1,0,0,0,7000,0,128,0,0,0,0

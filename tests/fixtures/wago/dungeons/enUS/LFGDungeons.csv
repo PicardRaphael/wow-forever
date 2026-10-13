@@ -1,0 +1,11 @@
+ID,Name_lang,Description_lang,TypeID,Subtype,Faction,IconTextureFileID,RewardsBgTextureFileID,PopupBgTextureFileID,ExpansionLevel,MapID,DifficultyID,MinGear,Group_ID,Order_index,Required_player_condition_ID,Random_ID,ScenarioID,FinalEncounterID,Count_tank,Count_healer,Count_damage,Min_count_tank,Min_count_healer,Min_count_damage,Max_premade_count_tank,Max_premade_count_healer,Max_premade_count_damage,Bonus_reputation_amount,MentorItemLevel,MentorCharLevel,MaxPremadeGroupSize,ContentTuningID,Flags_0,Flags_1
+3,Ragefire Chasm,,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5244,0,0
+5,Deadmines,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5240,0,0
+13,Gnomeregan,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5242,0,0
+17,Scarlet Monastery,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5247,0,0
+47,Molten Core,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4509,0,0
+53,Warsong Gulch,,5,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5146,0,0
+3271,City of Dalaran,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4512,0,0
+3272,Ruins of Lordaeron,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,5256,0,0
+3273,Hall of Thanes,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,7000,0,0
+3274,Excavation Site: Wetlands,,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6874,0,0

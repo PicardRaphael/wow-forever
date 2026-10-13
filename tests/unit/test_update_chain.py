@@ -122,6 +122,10 @@ def wago_routes(version, change=None):
         routes[table_url(name, version, "enUS")] = (
             FIXTURES / "wago" / "xp_bonuses" / "enUS" / f"{name}.csv"
         ).read_bytes()
+    for name in rules.get("dungeon_tables", []):  # DJ1 : tables des donjons, extraits de 1.60.1.70338
+        routes[table_url(name, version, "enUS")] = (
+            FIXTURES / "wago" / "dungeons" / "enUS" / f"{name}.csv"
+        ).read_bytes()
     for name, file_id in rules["gametables"].items():
         routes[gametable_url(file_id, version)] = (WAGO_70124 / "gametables" / f"{name}.txt").read_bytes()
     return routes

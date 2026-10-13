@@ -98,7 +98,7 @@ def test_manifest_content():
     assert v["revision"] == LOCAL_REVISION and v["revised_at"] == LOCAL_REVISED_AT  # recalculé = manifeste installé
     assert (
         len(v["files"])
-        == 27  # T04f : xp_bonuses.json ; T04d : quest_rewards.json ; PV1, bloc C : pvp_rules.json ; T08b : origins.json, character_scaling.json ; CH0 : pets.json, pet_rules.json
+        == 28  # DJ1 : dungeons.json ; T04f : xp_bonuses.json ; T04d : quest_rewards.json ; PV1, bloc C : pvp_rules.json ; T08b : origins.json, character_scaling.json ; CH0 : pets.json, pet_rules.json
         and "racials.json" not in v["files"]
         and {
             "pvp_rules.json",
@@ -120,6 +120,7 @@ def test_manifest_content():
             "pet_rules.json",
             "quest_rewards.json",
             "xp_bonuses.json",
+            "dungeons.json",
         }
         <= set(v["files"])
     )

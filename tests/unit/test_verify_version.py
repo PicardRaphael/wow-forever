@@ -9,6 +9,7 @@ from forever.errors import DataIntegrityError
 from forever.manifest import write_manifest
 from forever.pipeline.character_scaling import CHARACTER_FILES
 from forever.pipeline.decode import CLASS_FILES, INHERITED_FILES
+from forever.pipeline.dungeons_client import DUNGEON_FILES
 from forever.pipeline.pets import PETS_FILES
 from forever.pipeline.quest_rewards import QUEST_FILES
 from forever.pipeline.verify import verify_version
@@ -43,7 +44,7 @@ def test_candidate_is_ok_and_lists_inherited_files(make_deps, candidate):
     assert r["ok"], r["errors"]
     assert set(r["inherited"]) == set(INHERITED_FILES) | set(CLASS_FILES) | set(CHARACTER_FILES) | set(
         PETS_FILES
-    ) | set(QUEST_FILES) | set(XP_BONUS_FILES)  # PV1, T08b, CH0, T04d, T04f
+    ) | set(QUEST_FILES) | set(XP_BONUS_FILES) | set(DUNGEON_FILES)  # PV1, T08b, CH0, T04d, T04f, DJ1
     assert any("hérité" in a for a in r["provenance"]["assumptions"])
 
 
