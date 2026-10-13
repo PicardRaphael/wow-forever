@@ -57,7 +57,8 @@ RULES = (
     "value",
     "rules",
 )
-RULES_FILE = "decode_rules.json"  # T04f, décision 263 : règles de lecture de la tranche, installées avec la révision
+# T04f, décision 263 : fichiers de règles d'une tranche (lecture, origines), installés avec la révision.
+RULE_FILES = ("decode_rules.json", "origins.json")
 FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
 CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json", "_seed_racials.json")
@@ -418,37 +419,55 @@ def _file_changes(repo: Path, cand: Path, cand_sources: Mapping[str, Any], versi
     return changes
 
 
+def _tranche_rules(name: str, doc: Any) -> Any:
+    """Partie d'un fichier de règles écrite par une tranche : sans la marque `inherited_from` (posée par
+    `forever decode`), ni, pour `origins.json`, les règles des correctifs du serveur (propres à chaque candidate)."""
+    from forever.origins import ORIGINS_NAME, SERVER_ORIGIN
+
+    if not isinstance(doc, dict):
+        return doc
+    out = {k: v for k, v in doc.items() if k != "inherited_from"}
+    if name == ORIGINS_NAME:
+        out["rules"] = [r for r in out.get("rules", []) if r.get("origin") != SERVER_ORIGIN]
+        out["metadata_keys"] = [k for k in out.get("metadata_keys", []) if k != "hotfix"]
+    return out
+
+
 def _pending_rules(data_dir: Path, version: str, cand_vdir: Path) -> tuple[list[str], list[InstallChange]]:
-    """Règles de lecture en attente (décision 263) : `decode_rules.json` du dépôt modifié depuis le manifeste (règles
-    nouvelles d'une tranche) et identique aux règles portées par la candidate (lues par `forever decode`, marque
-    `inherited_from` mise à part). Rend (écart admis, changement `rules`) ; rien si les règles n'ont pas changé.
+    """Règles en attente (décision 263) : fichier de règles (`RULE_FILES` : lecture, origines) du dépôt modifié depuis
+    le manifeste (règles nouvelles d'une tranche) et identique à celui que porte la candidate (lu par `forever decode`,
+    voir `_tranche_rules`). Rend (écarts admis, changements `rules`) ; rien si aucune règle n'a changé.
     DataIntegrityError si elles diffèrent de celles de la candidate (règles modifiées après le décodage)."""
-    rel = f"{version}/{RULES_FILE}"
-    if rel not in verify(data_dir).mismatched:
-        return [], []
-    repo = data_dir / version / RULES_FILE
-    cand = cand_vdir / RULES_FILE
-
-    def rules(doc: Any) -> Any:
-        return {k: v for k, v in doc.items() if k != "inherited_from"} if isinstance(doc, dict) else doc
-
-    if rules(_json(cand) if cand.is_file() else None) != rules(_json(repo)):
-        raise DataIntegrityError(
-            f"{rel} modifié dans le dépôt et différent des règles de lecture de la candidate.",
-            "redécoder la candidate avec les règles du dépôt (`forever decode --force`), puis relancer l'installation",
-        )
+    mismatched = set(verify(data_dir).mismatched)
     manifest = load_manifest(data_dir) or {}
-    before = ((manifest.get("versions") or {}).get(version) or {}).get("files", {}).get(RULES_FILE)
-    change: InstallChange = {
-        "file": RULES_FILE,
-        "path": "*",
-        "before": before[:12] if isinstance(before, str) else None,
-        "after": _short_sha(repo),
-        "source": "règles de lecture de la tranche (decode_rules.json du dépôt, lues par forever decode)",
-        "certainty": "certain",
-        "rule": "rules",
-    }
-    return [rel], [change]
+    files = ((manifest.get("versions") or {}).get(version) or {}).get("files", {})
+    pending: list[str] = []
+    changes: list[InstallChange] = []
+    for name in RULE_FILES:
+        rel = f"{version}/{name}"
+        if rel not in mismatched:
+            continue
+        repo, cand = data_dir / version / name, cand_vdir / name
+        if _tranche_rules(name, _json(cand) if cand.is_file() else None) != _tranche_rules(name, _json(repo)):
+            raise DataIntegrityError(
+                f"{rel} modifié dans le dépôt et différent des règles de la candidate.",
+                "redécoder la candidate avec les règles du dépôt (`forever decode --force`), puis relancer "
+                "l'installation",
+            )
+        before = files.get(name)
+        pending.append(rel)
+        changes.append(
+            {
+                "file": name,
+                "path": "*",
+                "before": before[:12] if isinstance(before, str) else None,
+                "after": _short_sha(repo),
+                "source": f"règles de la tranche ({name} du dépôt, lu par forever decode)",
+                "certainty": "certain",
+                "rule": "rules",
+            }
+        )
+    return pending, changes
 
 
 def _game_state(
@@ -1033,7 +1052,7 @@ LABELS = {
     "retired_file": "fichier retiré (retired_files)",
     "game_state": "état du jeu (plafond de la bêta, meta.json game_state)",
     "value": "valeur d'un fichier décodé (spell_scaling.json, character_scaling.json)",
-    "rules": "règles de lecture nouvelles (decode_rules.json du dépôt, lues par forever decode)",
+    "rules": "règles de lecture ou d'origine nouvelles (decode_rules.json, origins.json du dépôt, lues par forever decode)",
     "refused": "hors règles (refusé)",
 }
 CELL_MAX = 80
