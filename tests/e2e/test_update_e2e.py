@@ -123,6 +123,8 @@ class Runner:
         return out
 
     def _gh(self, args, cwd):
+        if args[1:] == ["--version"]:  # présence de GitHub CLI vérifiée avant l'écriture (décision 244)
+            return subprocess.CompletedProcess(args, 0, "gh version test", "")
         if args[1:3] == ["run", "list"]:
             sha = git(cwd, "rev-parse", args[args.index("--branch") + 1])
             if sha not in self.ci:  # le clone est sur le commit poussé : suite complète réelle
