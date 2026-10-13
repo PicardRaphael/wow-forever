@@ -153,12 +153,12 @@ def test_buttons_for_a_hunter():
     game.stub.player.__setitem__("class", "HUNTER")
     with_buttons(game)
     game.slash("/fv")
-    assert bar(game) == ["talents", "pets", "pvp", "update"]
+    assert bar(game) == ["talents", "leveling", "pets", "pvp", "update"]  # Leveling pour toutes les classes
     click(game, "ForeverBridgeButton_talents")
     _, record = sent(game)
     assert "build populaire" in record.text and record.context["class"] == "HUNTER"
     click(game, "ForeverBridgeButton_pets")
-    assert sent(game)[1].text == "Où apprivoiser le prochain rang utile près de moi ?"
+    assert sent(game)[1].text == "Quelles bêtes apprivoiser près de moi, et quels rangs enseignent-elles ?"
 
 
 def test_pvp_needs_a_player_target():

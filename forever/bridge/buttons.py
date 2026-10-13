@@ -14,6 +14,9 @@ from typing import Any
 DONE_SLICES: frozenset[str] = frozenset({"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b"})
 
 TALENTS_NOTICE = "Build populaire de Talents Forever (choix de joueurs), pas encore calculé par le moteur de forever."
+LEVELING_NOTICE = (
+    "Zones, quêtes et build populaire ; prochain talent et XP par heure pas encore calculés pour cette classe."
+)
 
 
 @dataclass(frozen=True)
@@ -49,8 +52,23 @@ BUTTONS: tuple[Button, ...] = (
         computed_for=("MAGE",),
         notice=TALENTS_NOTICE,
     ),
-    Button("leveling", "Leveling", "Quel est mon prochain objectif de leveling ?", ("T04b", "T04c"), ("MAGE",)),
-    Button("pets", "Familiers", "Où apprivoiser le prochain rang utile près de moi ?", ("CH0",), ("HUNTER",)),
+    # Leveling pour toutes les classes (décision 242) : zones, quêtes et donjon ne dépendent pas de la classe ; le
+    # prochain talent calculé et l'XP par heure, seulement pour les classes calculées (`computed_for`).
+    Button(
+        "leveling",
+        "Leveling",
+        "Quel est mon prochain objectif de leveling ?",
+        ("T04b", "T04c"),
+        computed_for=("MAGE",),
+        notice=LEVELING_NOTICE,
+    ),
+    Button(
+        "pets",
+        "Familiers",
+        "Quelles bêtes apprivoiser près de moi, et quels rangs enseignent-elles ?",
+        ("CH0",),
+        ("HUNTER",),
+    ),
     Button("pvp", "PvP", "Fiche de la classe de ma cible", ("PV1",), needs_player_target=True),
     Button("gear", "Équipement", "Quel est mon prochain objet à viser, et où le trouver ?", ("T10a",)),
     Button("last_fight", "Dernier combat", "Résume mon dernier combat analysé.", ("AN1", "AN2")),

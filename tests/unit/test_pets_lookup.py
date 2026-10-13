@@ -93,15 +93,14 @@ def test_guide_refuses_a_missing_level(make_deps, wow):
         lookup_pets(make_deps(wow_dir=wow), "Bite", rank=3, zone="Les Tarides")
 
 
-def test_without_addon_client_sheets_still_rendered_and_guide_refused(make_deps, tmp_path):
+def test_without_addon_client_sheets_still_rendered_and_guide_says_what_is_missing(make_deps, tmp_path):
     deps = make_deps(wow_dir=tmp_path / "vide")
     fam = lookup_pets(deps, "Wolf")
     assert fam["kind"] == "pets_family" and any(
         "Forever Bestiary absent" in a for a in fam["provenance"]["assumptions"]
     )
-    with pytest.raises(InvalidArgumentError) as exc:
-        lookup_pets(deps, "Bite", rank=3, zone="Les Tarides", level=10)
-    assert "Forever Bestiary" in exc.value.message
+    guide = lookup_pets(deps, "Bite", rank=3, zone="Les Tarides", level=10)  # décision 242 : plus de refus
+    assert guide["missing"]["source"] == "Forever Bestiary" and guide["client_only"]["abilities"]
 
 
 def test_crosscheck_and_mine_with_provenance(make_deps, wow):

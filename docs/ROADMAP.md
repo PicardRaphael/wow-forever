@@ -363,9 +363,9 @@ Découpée de P06 le 2026-10-07 (décision 202), après P06a et FA1. Reprend la 
         | Mettre à jour | `forever update`, avec l'état des données (version, fraîcheur, attentes) ; si un résultat change, résumé en jeu avec **Valider** et **Refuser** (approbation différée) | T08d (fait), T08e |
         | Talents | lien Talents Forever du build calculé | FA1 (Mage) ; tranches de classe |
         | Équipement | BiS et prochain objet à viser, où le looter | T10a (Mage), puis T10 |
-        | Familiers | où apprivoiser tel rang près de moi | CH0 (fait) |
+        | Familiers | bêtes apprivoisables près de moi (zone actuelle, puis zones voisines), de niveau au plus le mien, avec les capacités et les rangs qu'elles enseignent (rang corrigé supposé quand il dépasse le niveau de la bête, décision 242) et leurs positions ; source manquante dite en clair, avec quoi faire | CH0 (fait) |
         | PvP | fiche fixe de la classe de ma cible (contrôles et leur catégorie de rendement décroissant, défensifs et immunités, ruptures et interruptions, recharges nominales ; jamais un état de combat) : reprend FA1p | PV1 (fait) |
-        | Leveling | prochain objectif et bonus d'XP actifs | T04b et T04c (faits, Mage), T04d, T04f |
+        | Leveling | **toutes les classes** (décision 242) : zones, quêtes et prochain donjon à mon niveau, build populaire de ma classe et son lien ; pour une classe calculée (Mage), prochain talent calculé et XP par heure ; la réponse dit ce qui n'est pas encore calculé ; plus tard, bonus d'XP actifs | T04b et T04c (faits, Mage), tranches de classe, T04d, T04f |
         | Analyse du dernier combat | résumé de mon dernier combat analysé hors du jeu : reprend FA3 | AN1, AN2 |
 
     2. **Mettre à jour, Valider et Refuser** (décision 197) : le pont lance lui-même la commande fixée (`forever update --auto`, `forever update status`, `forever update approve|reject <id>`, par `forever.spawn`), jamais le modèle ; le **résumé d'une attente est rédigé par le pont** (texte fixe tiré des champs de l'attente, décision 235), Valider et Refuser seulement pour une attente approuvable, et un bouton **« Expliquer »** envoie ce résumé à la conversation « jeu », qui reste en lecture seule.

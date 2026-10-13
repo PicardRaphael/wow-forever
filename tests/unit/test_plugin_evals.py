@@ -483,7 +483,9 @@ BUTTON_CASES = {
     "bouton-talents": ("talents", "mage19", "talent"),
     "bouton-leveling": ("leveling", "mage19", "leveling"),
     "bouton-pvp": ("pvp", "mage19_cible_chaman21_tauren", "pvp"),
-    "bouton-familiers": ("pets", "chasseur19_construit", "familiers"),
+    "bouton-familiers": ("pets", "chasseur15", "familiers"),  # contexte réel du Chasseur (décision 242)
+    "bouton-leveling-chasseur": ("leveling", "chasseur15", "leveling"),
+    "bouton-talents-chasseur": ("talents", "chasseur15", "talent"),
 }
 
 

@@ -17,6 +17,7 @@ from forever.gamedata import read_pets
 from forever.pets import (
     ability_sheet,
     beast_sheet,
+    client_reachable,
     crosscheck,
     family_sheet,
     official_fixes_after,
@@ -30,6 +31,7 @@ from forever.provenance import Certainty, Provenance, make_provenance
 from forever.store import VersionData, load_version
 
 PET_RULES_FILE = "pet_rules.json"
+ADDON_NAME_FR = "Forever Bestiary"
 SAVED_NAME = "ForeverBestiary.lua"
 
 
@@ -56,6 +58,7 @@ class _Sources:
         self.fixes_after_base: list[dict[str, Any]] = []
         wow = deps.wow_dir
         addon_dir = addon_dir or (wow / "Interface" / "AddOns" / ADDON_NAME if wow else None)
+        self.addon_dir = addon_dir
         self.bestiary: dict[str, Any] | None = None
         if addon_dir is not None and addon_dir.is_dir():
             try:
@@ -72,9 +75,11 @@ class _Sources:
                 f"{info['community_date']} ({info['community_players']} joueurs) ; relevés de joueurs, suppose"
             )
             self.fixes_after_base = official_fixes_after(self.rules, info.get("date"))
+            # décision 242 : le correctif est appliqué rang par rang (pets.corrected_taught), plus un simple avertissement
             self.notes += [
-                f"correctif officiel du {f['date']} postérieur à la base de Forever Bestiary du {info.get('date')} : "
-                f"{f['text']} ({f['certainty']} ; {f['source']})"
+                f"base de Forever Bestiary du {info.get('date')} antérieure au correctif officiel du {f['date']} "
+                f"(rangs enseignés trop hauts pour le niveau de la bête) : chaque rang enseigné est relu et marqué "
+                f"s'il dépasse le niveau de sa bête ({f['certainty']} ; {f['source']})"
                 for f in self.fixes_after_base
             ]
         self.saved_path = saved_path or self._find_saved(wow)
@@ -141,6 +146,8 @@ def lookup_pets(
 ) -> dict[str, Any]:
     """`name` absent : règles ; famille, capacité ou bête : sa fiche ; avec `zone` et `level` : guide."""
     src = _Sources(deps, addon_dir=addon_dir, saved_path=saved_path, questie_dir=questie_dir)
+    if not name and zone is not None:  # bêtes apprivoisables près de moi (bouton Familiers, décision 242)
+        return _guide(src, {"kind": "all", "key": None}, rank=None, zone=zone, level=level)
     if not name:
         return {"kind": "pets_rules", **rules_sheet(src.rules), "provenance": src.provenance("suppose")}
     target = resolve_name(src.pets, src.bestiary, name)
@@ -172,17 +179,14 @@ def _guide(src: _Sources, target: dict[str, Any], *, rank: int | None, zone: str
     from forever.gamedata import build_game_data
     from forever.leveling import check_level, level_cap
 
-    if src.bestiary is None:
-        raise InvalidArgumentError(
-            "Guide d'apprivoisement impossible : Forever Bestiary absent (aucune bête ni coordonnée).",
-            "installer l'addon Forever Bestiary ou définir FOREVER_WOW_DIR ; les fiches du client restent disponibles",
-        )
     if level is None:
         raise InvalidArgumentError(
             "Niveau manquant pour le guide d'apprivoisement.",
             "donner le niveau du Chasseur (profil ou question), jamais une valeur par défaut",
         )
     check_level(level, level_cap(src.version))
+    if src.bestiary is None:
+        return _guide_without_bestiary(src, target, zone=zone, level=level)
     band = level_band(build_game_data(src.version), level)
     ranges = npc_level_ranges(src.questie) if src.questie is not None else {}
     kind = target["kind"]
@@ -211,6 +215,34 @@ def _guide(src: _Sources, target: dict[str, Any], *, rank: int | None, zone: str
         "official_fixes": src.fixes_after_base,
         "addon": src.addon_info(),
         "provenance": src.provenance("suppose", extra),
+    }
+
+
+def _guide_without_bestiary(src: _Sources, target: dict[str, Any], *, zone: str, level: int) -> dict[str, Any]:
+    """Guide sans Forever Bestiary (décision 242) : la source qui manque, où elle est attendue et quoi faire, puis ce
+    que les données du jeu savent (capacités et rangs atteignables à ce niveau, familles qui les apprennent)."""
+    from forever.pets import resolve_zone
+
+    where = str(src.addon_dir) if src.addon_dir is not None else "Interface/AddOns/ForeverBestiary du dossier du jeu"
+    missing = {
+        "source": ADDON_NAME_FR,
+        "where": where,
+        "what": "bêtes apprivoisables, leurs niveaux, les rangs qu'elles enseignent et leurs positions",
+        "action": (
+            "Installer l'addon Forever Bestiary dans Interface/AddOns du jeu (puis /reload), ou définir "
+            "FOREVER_WOW_DIR vers le dossier du jeu où il est installé"
+        ),
+    }
+    return {
+        "kind": "pets_guide",
+        "level": level,
+        "zone": resolve_zone(src.pets, zone),
+        "target": target,
+        "zones": [],
+        "missing": missing,
+        "client_only": client_reachable(src.pets, level),
+        "addon": None,
+        "provenance": src.provenance("certain", [f"{ADDON_NAME_FR} absent de {where}"]),
     }
 
 

@@ -514,6 +514,65 @@ def _overlaps(levels: Sequence[int] | None, band: tuple[int, int]) -> bool:
     return bool(levels) and levels is not None and levels[0] <= band[1] and levels[1] >= band[0]
 
 
+NEIGHBOURS_ALL = 4  # zones voisines du guide de toutes les bêtes (les plus proches du niveau du Chasseur)
+
+
+def _ability_by_name(pets: Mapping[str, Any], name: Any) -> Mapping[str, Any] | None:
+    wanted = normalize_text(str(name or ""))
+    return next((a for a in pets.get("abilities", {}).values() if normalize_text(a["name"]["en"]) == wanted), None)
+
+
+def corrected_taught(
+    taught: Mapping[str, Any],
+    beast_levels: Sequence[int] | None,
+    pets: Mapping[str, Any],
+    fix: Mapping[str, Any] | None,
+) -> dict[str, Any]:
+    """Rang enseigné par une bête (Forever Bestiary) relu à la lumière du correctif officiel des rangs trop hauts
+    pour le niveau de la bête (`pet_rules.json`, `official_fixes`, décision 242) : `rank_level`, niveau requis du rang
+    lu dans le client ; `above_beast_level`, vrai si ce niveau dépasse le niveau le plus haut de la bête ; alors
+    `expected_rank`, le plus haut rang dont le niveau requis ne dépasse pas celui de la bête (None : aucun), règle
+    supposée (`certainty`), et la source du correctif (`fix`)."""
+    out: dict[str, Any] = dict(taught)
+    ability = _ability_by_name(pets, taught.get("ability"))
+    top = beast_levels[-1] if beast_levels else None
+    if ability is None or not isinstance(top, int):
+        return out
+    levels = {r["rank"]: r["level"] for r in ability["ranks"]}
+    out["rank_level"] = levels.get(taught.get("rank"))
+    above = isinstance(out["rank_level"], int) and out["rank_level"] > top
+    out["above_beast_level"] = above
+    if above:
+        fitting = [r for r, lv in levels.items() if lv <= top]
+        out["expected_rank"] = max(fitting) if fitting else None
+        out["certainty"] = "suppose"
+        if fix is not None:
+            out["fix"] = {"date": fix.get("date"), "source": fix.get("source"), "certainty": fix.get("certainty")}
+    return out
+
+
+def client_reachable(pets: Mapping[str, Any], level: int) -> dict[str, Any]:
+    """Ce que les données du jeu savent sans Forever Bestiary : pour chaque capacité, le rang le plus haut atteignable
+    à ce niveau (niveau requis lu dans le client) et les familles qui l'apprennent."""
+    families = pets.get("families", {})
+    abilities = []
+    for key, a in sorted(pets.get("abilities", {}).items()):
+        reachable = [r for r in a.get("ranks", []) if isinstance(r.get("level"), int) and r["level"] <= level]
+        if not reachable:
+            continue
+        best = max(reachable, key=lambda r: r["rank"])
+        abilities.append(
+            {
+                "key": key,
+                "name": a["name"],
+                "highest_rank": best["rank"],
+                "rank_level": best["level"],
+                "families": [families[f]["name"] for f in a.get("families", []) if f in families],
+            }
+        )
+    return {"level": level, "abilities": abilities, "certainty": "certain", "source": "client (pets.json)"}
+
+
 def tame_guide(
     pets: Mapping[str, Any],
     rules: Mapping[str, Any],
@@ -539,8 +598,10 @@ def tame_guide(
             "Niveau manquant pour le guide d'apprivoisement.",
             "donner le niveau du Chasseur (profil ou question), jamais une valeur par défaut",
         )
-    if sum(x is not None for x in (ability, family, beast)) != 1:
-        raise InvalidArgumentError("Cible du guide manquante.", "donner une capacité, une famille ou une bête")
+    if sum(x is not None for x in (ability, family, beast)) > 1:
+        raise InvalidArgumentError("Cible du guide ambiguë.", "donner une seule capacité, famille ou bête")
+    every = ability is None and family is None and beast is None  # bêtes apprivoisables près de moi (décision 242)
+    fix = next(iter(rules.get("official_fixes") or []), None)
     margin_rule = rules["rules"]["tame.level_margin"]
     margin = int(margin_rule["value"])
     requested = resolve_zone(pets, zone)
@@ -595,11 +656,19 @@ def tame_guide(
         def matches(b: Mapping[str, Any]) -> bool:
             return _family_of(aliases, b.get("family")) == fam_key
 
-    else:
+    elif beast is not None:
         target = {"kind": "beast", "key": beast}
 
         def matches(b: Mapping[str, Any]) -> bool:
             return b.get("id") == beast
+
+    else:
+        target = {"kind": "all", "key": None}
+
+        def matches(b: Mapping[str, Any]) -> bool:
+            # apprivoisable maintenant (niveau au plus celui du Chasseur, marge comprise) et rangs enseignés connus
+            low = (b.get("level") or [None])[0]
+            return isinstance(low, int) and low <= level + margin and bool(b.get("taught"))
 
     # bêtes candidates : base de l'addon, puis découvertes de la carte absentes de la base
     pool: list[dict[str, Any]] = [dict(b) for b in bestiary.get("beasts", [])]
@@ -657,7 +726,9 @@ def tame_guide(
             )
         names_fr = obs.get("names", {}).get("frFR") or saved_obs.get(str(b["id"]), {}).get("names", {}).get("frFR")
         taught = [
-            t for t in b.get("taught", []) if target["kind"] != "ability" or _teaches({"taught": [t]}, english, None)
+            corrected_taught(t, b.get("level"), pets, fix)
+            for t in b.get("taught", [])
+            if target["kind"] != "ability" or _teaches({"taught": [t]}, english, None)
         ]
         return {
             "id": b["id"],
@@ -677,7 +748,15 @@ def tame_guide(
     def zone_entry(zone_en: str, is_requested: bool) -> dict[str, Any]:
         map_id, m = map_by_name.get(zone_en, (None, None))
         beasts = [entry_for(b, zone_en, map_id) for b in selected if zone_en in b.get("zones", [])]
-        beasts.sort(key=lambda e: (not e["tameable_now"], (e["level"] or [0])[0] or 0, e["id"]))
+        if every:
+            # rangs les plus utiles d'abord : niveau requis le plus haut parmi les rangs enseignés, positions connues
+            def useful(e: Mapping[str, Any]) -> tuple[Any, ...]:
+                top = max((t.get("rank_level") or 0 for t in e["taught"]), default=0)
+                return (not e["coords"], -top, -((e["level"] or [0])[-1] or 0), e["id"])
+
+            beasts.sort(key=useful)
+        else:
+            beasts.sort(key=lambda e: (not e["tameable_now"], (e["level"] or [0])[0] or 0, e["id"]))
         return {
             "name": {"en": zone_en, "fr": m["name"]["fr"] if m else None},
             "map_id": map_id,
@@ -701,7 +780,21 @@ def tame_guide(
             and _overlaps(zone_levels.get(z), band)
         }
     )
+    if every:
+        # toutes les bêtes : les zones voisines les plus proches du niveau du Chasseur d'abord, NEIGHBOURS_ALL au plus
+        def distance(z: str) -> float:
+            lv = zone_levels.get(z)
+            return abs((lv[0] + lv[1]) / 2 - level) if lv else float("inf")
+
+        neighbours = sorted(neighbours, key=lambda z: (distance(z), z))[:NEIGHBOURS_ALL]
     zones += [zone_entry(z, False) for z in neighbours]
+    marked = sum(1 for z in zones for b in z["beasts"] for t in b["taught"] if t.get("above_beast_level"))
+    if fix is not None and marked:
+        assumptions.append(
+            f"correctif officiel du {fix['date']} appliqué : {marked} rang(s) enseigné(s) au-dessus du niveau de leur "
+            "bête marqué(s), avec le rang corrigé supposé (le plus haut dont le niveau requis ne dépasse pas celui "
+            "de la bête) ; les autres rangs sont cohérents avec le correctif"
+        )
     return {
         "level": level,
         "band": list(band),

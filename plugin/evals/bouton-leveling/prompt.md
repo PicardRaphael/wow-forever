@@ -24,8 +24,11 @@ Talents actuels (clés de forever, pour `current` de forever_build) : elementalP
 Consigne du bouton « leveling » : appelle exactement, dans cet ordre :
 - forever_lookup {"kind": "zones", "level": 19, "faction": "horde", "limit": 5}
 - forever_build {"context": "leveling", "level": 20, "race": "Orc", "current": {"elementalPrecision": 5, "improvedFrostbolt": 5}, "sensitivity": false}
+- forever_sim_leveling {"level": 19, "race": "Orc"}
 Puis :
-- Objectif : les trois premières zones ou donjons du résultat de zones, dans l'ordre rendu ; puis le prochain point de talent, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton niveau et ton build actuels) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun gain mesurable ; instable si `stability.stable` est faux).
+- Zones et quêtes : les trois premières zones du résultat de zones, dans l'ordre rendu, avec leur nombre de quêtes utiles ; prochain donjon : le premier donjon rendu (`dungeons`).
+- Prochain talent calculé, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton niveau et ton build actuels) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun gain mesurable ; instable si `stability.stable` est faux).
+- XP par heure calculée à ton niveau (résultat de forever_sim_leveling), avec sa certitude.
 
 Question posée par le bouton « leveling » de la fenêtre :
 Quel est mon prochain objectif de leveling ?

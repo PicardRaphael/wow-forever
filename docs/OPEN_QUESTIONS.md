@@ -380,3 +380,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   [Détail](research/questions-ouvertes-detail.md#leg1)
 - **LEG2 — Que couvre l'API Blizzard pour Forever après le lancement ?** Test : `forever api probe` après le
   4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#leg2)
+- **PET1 — Quel rang enseigne une bête dont Forever Bestiary donne un rang au-dessus de son niveau ?** Le correctif
+  officiel du 2026-10-01 dit que ces rangs ont été abaissés, sans dire jusqu'où ; forever suppose le plus haut rang
+  dont le niveau requis ne dépasse pas celui de la bête (décision 242, `pets.corrected_taught`). Test : Beast Lore sur
+  une des 11 bêtes marquées (par exemple Ukorsbane, Durotar). Priorité : moyenne. Registre L3.

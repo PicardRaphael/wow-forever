@@ -227,9 +227,9 @@ def test_no_bridge_reply_text_names_an_internal_command():
             and isinstance(n.body[0].value, ast.Constant)
         }
         for node in ast.walk(tree):
-            if isinstance(node, ast.Constant) and isinstance(node.value, str) and id(node) not in docstrings:
-                if "(forever update" in node.value or "update --auto)" in node.value:
-                    found.append(f"{path.name}:{node.lineno}")
+            text = node.value if isinstance(node, ast.Constant) and isinstance(node.value, str) else ""
+            if id(node) not in docstrings and ("(forever update" in text or "update --auto)" in text):
+                found.append(f"{path.name}:{node.lineno}")
     assert found == []
 
 

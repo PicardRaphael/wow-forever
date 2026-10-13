@@ -92,6 +92,53 @@ def _next_point(r: Resolved, level_cap: int | None) -> tuple[Call, tuple[str, ..
     return Call("forever_build", args), read
 
 
+def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
+    """Bouton Leveling, toutes les classes (décision 242) : zones, quêtes et donjon (indépendants de la classe), puis
+    pour le Mage, seule classe calculée, le prochain talent et l'XP par heure ; ailleurs, le build populaire de la
+    classe et son lien, et la mention de ce qui n'est pas encore calculé."""
+    zones: dict[str, Any] = {"kind": "zones", "level": r.level}
+    if r.faction in ("horde", "alliance"):
+        zones["faction"] = r.faction
+    zones["limit"] = 5
+    head = (
+        "Zones et quêtes : les trois premières zones du résultat de zones, dans l'ordre rendu, avec leur nombre de "
+        "quêtes utiles ; prochain donjon : le premier donjon rendu (`dungeons`)."
+    )
+    if r.class_token == "MAGE":
+        point = _next_point(r, level_cap)
+        sim: dict[str, Any] = {"level": r.level}
+        if r.race:
+            sim["race"] = r.race
+        calls = [Call("forever_lookup", zones)] + ([point[0]] if point else []) + [Call("forever_sim_leveling", sim)]
+        read = (
+            head,
+            (
+                "Prochain talent calculé, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton "
+                "niveau et ton build actuels) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, "
+                "tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun "
+                "gain mesurable ; instable si `stability.stable` est faux)."
+            ),
+            "XP par heure calculée à ton niveau (résultat de forever_sim_leveling), avec sa certitude.",
+        )
+        return Plan("leveling", tuple(calls), read)
+    popular: dict[str, Any] = {"kind": "tf_popular", "name": r.class_name}
+    if r.current:
+        popular["current"] = ",".join(f"{k}={v}" for k, v in r.current.items())
+    read = (
+        head,
+        (
+            "Build populaire de ta classe : `closest` s'il est rendu (le plus proche de tes talents), sinon le build le "
+            "plus joué ; son lien et sa commande `/tf import` tels quels, sa date (`asOf`)."
+        ),
+        (
+            "Dis clairement ce qui est calculé et ce qui ne l'est pas encore : zones, quêtes et donjon viennent des "
+            "données ; le build est un choix de joueurs ; le prochain talent et l'XP par heure ne sont pas encore "
+            "calculés pour ta classe."
+        ),
+    )
+    return Plan("leveling", (Call("forever_lookup", zones), Call("forever_lookup", popular)), read)
+
+
 def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
     """Appels et lecture du bouton `key` pour ce contexte ; None si le contexte ne suffit pas (niveau inconnu, pas de
     cible joueur pour PvP, classe que le bouton ne sert pas)."""
@@ -126,29 +173,27 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
             ),
         )
         return Plan(key, tuple(calls), read, link="closest")
-    if key == "leveling" and r.class_token == "MAGE":
-        zones: dict[str, Any] = {"kind": "zones", "level": r.level}
-        if r.faction in ("horde", "alliance"):
-            zones["faction"] = r.faction
-        zones["limit"] = 5
-        point = _next_point(r, level_cap)
-        calls = [Call("forever_lookup", zones)] + ([point[0]] if point else [])
-        read = (
-            (
-                "Objectif : les trois premières zones ou donjons du résultat de zones, dans l'ordre rendu ; puis le "
-                "prochain point de talent, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton "
-                "niveau et ton build actuels) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, "
-                "tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun "
-                "gain mesurable ; instable si `stability.stable` est faux)."
-            ),
-        )
-        return Plan(key, tuple(calls), read)
+    if key == "leveling":
+        return _leveling_plan(r, level_cap)
     if key == "pets" and r.class_token == "HUNTER" and r.zone:
         call = Call("forever_lookup", {"kind": "pets", "zone": r.zone, "level": r.level})
         read = (
             (
-                "Donne le rang le plus haut atteignable et la bête qui l'enseigne la plus proche (zone, coordonnées et "
-                "date tels que rendus)."
+                "Bêtes apprivoisables maintenant (niveau inférieur ou égal au tien), la zone actuelle d'abord puis les "
+                "zones voisines dans l'ordre rendu : pour chacune, son nom, son niveau, les capacités et les rangs "
+                "qu'elle enseigne et ses positions (coordonnées et date, telles que rendues) ; cinq bêtes au plus, "
+                "celles qui enseignent les rangs les plus hauts d'abord."
+            ),
+            (
+                "Rang marqué au-dessus du niveau de sa bête (`above_beast_level`) : donne le rang corrigé supposé "
+                "(`expected_rank`) en disant qu'un correctif de Blizzard l'a abaissé, à vérifier en jeu avec Beast Lore ; "
+                "ne parle d'aucun correctif pour les autres rangs."
+            ),
+            (
+                "Si le résultat porte `missing` : dis en clair la source qui manque, où elle est attendue et quoi faire "
+                "(`missing.action`), puis donne ce que les données du jeu savent (`client_only` : rang le plus haut "
+                "atteignable de chaque capacité et familles qui l'apprennent). Jamais « je n'ai pas de réponse » quand "
+                "des bêtes ou des données sont rendues."
             ),
         )
         return Plan(key, (call,), read)

@@ -31,7 +31,7 @@ def test_update_button_is_an_action_without_question():
 
 def test_classes_and_questions():
     by_key = {b.key: b for b in visible_buttons()}
-    assert by_key["leveling"].classes == ("MAGE",)
+    assert by_key["leveling"].classes is None and by_key["leveling"].computed_for == ("MAGE",)  # décision 242
     assert by_key["pets"].classes == ("HUNTER",)
     assert by_key["pvp"].classes is None and by_key["pvp"].needs_player_target
     talents = by_key["talents"]
@@ -44,7 +44,10 @@ def test_classes_and_questions():
         )
     assert talents.notice_for("MAGE") is None
     assert by_key["leveling"].question_for("MAGE") == "Quel est mon prochain objectif de leveling ?"
-    assert by_key["pets"].question_for("HUNTER") == "Où apprivoiser le prochain rang utile près de moi ?"
+    assert (
+        by_key["pets"].question_for("HUNTER")
+        == "Quelles bêtes apprivoiser près de moi, et quels rangs enseignent-elles ?"
+    )
     assert by_key["pvp"].question_for("ROGUE") == "Fiche de la classe de ma cible"
 
 
