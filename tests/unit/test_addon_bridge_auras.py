@@ -42,7 +42,7 @@ def game(*, watch=True, auras=(), items=None, rested=None, resting=None, failing
 
 
 def context(g):
-    ctx = g.lua.globals().ForeverBridge_Message.Context()
+    ctx = g.lua.globals().ForeverBridge_Message.Context()[0]
     return {k: ctx[k] for k in XP_KEYS if ctx[k] is not None}
 
 

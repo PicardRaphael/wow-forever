@@ -11,8 +11,8 @@ from forever.pipeline.character_scaling import CHARACTER_FILES
 from forever.pipeline.decode import CLASS_FILES, INHERITED_FILES
 from forever.pipeline.pets import PETS_FILES
 from forever.pipeline.quest_rewards import QUEST_FILES
-from forever.pipeline.xp_bonuses import XP_BONUS_FILES
 from forever.pipeline.verify import verify_version
+from forever.pipeline.xp_bonuses import XP_BONUS_FILES
 from forever.provenance import validate_provenance
 
 

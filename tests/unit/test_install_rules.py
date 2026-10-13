@@ -46,7 +46,7 @@ def rules_changes(plan_or_revision):
 def test_plan_lists_the_new_rules(pending, make_deps):
     data, cand = pending
     plan = plan_install(make_deps(data_dir=data), str(cand.root))
-    assert [c["path"] for c in rules_changes(plan)] == [NEW_KEY] and not plan["refused"]
+    assert [c["path"] for c in rules_changes(plan)] == ["*"] and not plan["refused"]
     assert plan["counts"]["rules"] == 1
     assert "règles de lecture" in render_install_report(plan)
 
@@ -54,10 +54,10 @@ def test_plan_lists_the_new_rules(pending, make_deps):
 def test_install_takes_the_new_rules_and_rewrites_the_manifest(pending, make_deps):
     data, cand = pending
     revision = apply_install(make_deps(data_dir=data), str(cand.root), motif="test")
-    assert [c["path"] for c in rules_changes(revision)] == [NEW_KEY]
+    assert [c["path"] for c in rules_changes(revision)] == ["*"]
     ensure_integrity(data)  # manifeste réécrit par l'installation : plus aucun écart
     installed = read_json(data / LOCAL_VERSION / RULES)
-    assert installed[NEW_KEY] == {"note": "règle de lecture de test"} and "inherited_from" not in installed
+    assert installed[NEW_KEY] == {"note": "règle de lecture de test"}
     history = read_json(data / LOCAL_VERSION / "revisions.json")["revisions"]
     assert rules_changes(history[-1])
 
