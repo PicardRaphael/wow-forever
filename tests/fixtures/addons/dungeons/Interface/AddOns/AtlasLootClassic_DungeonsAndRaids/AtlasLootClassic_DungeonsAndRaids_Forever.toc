@@ -1,0 +1,4 @@
+## Interface: 16001
+## Version: Forever 1.60.1
+data.lua
+droprate.lua
