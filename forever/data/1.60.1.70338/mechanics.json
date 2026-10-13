@@ -890,6 +890,19 @@
    "certainty": "probable",
    "registry": "D5",
    "source": "description du sort Camp Tent du client : repos remonté à un seuil en pourcentage d'un niveau (xp_bonuses.json camp.tent), sans effet au-dessus"
+  },
+  "dungeon.run_defaults": {
+   "value": {
+    "base_minutes": 40,
+    "minutes_per_mob_level": 1,
+    "min_minutes": 50,
+    "max_minutes": 120,
+    "base_kills": 60,
+    "kills_per_mob_level": 2
+   },
+   "certainty": "suppose",
+   "registry": "I16",
+   "source": "formule par défaut d'un passage de donjon de Factoruide (code MIT, crates/fg-route/src/model/dungeons.rs et params.rs, lus le 2026-10-13, décision 265) : minutes = borne(base + pente × niveau des monstres, min, max), monstres = base + pente × niveau des monstres ; non sourcée par son auteur ; repli quand aucun passage n'est relevé (ForeverLogger 0.6.0, InstanceTracker de Naowh Forever) ni aucun compte de monstres d'un addon (question LVL15)"
   }
  },
  "inherited_from": "1.60.1.70291"

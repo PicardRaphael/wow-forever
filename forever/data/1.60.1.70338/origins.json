@@ -1345,6 +1345,17 @@
     {
       "file": "mechanics.json",
       "paths": [
+        "/values/dungeon.run_defaults"
+      ],
+      "origin": "manuel",
+      "source": "formule par défaut d'un passage de donjon de Factoruide (MIT, crates/fg-route/src/model/dungeons.rs, 2026-10-13), DJ1 bloc E",
+      "certainty": "suppose",
+      "reason": "durée d'un passage non mesurée sur Forever (LVL15) ; remplacée par les passages relevés",
+      "registry": "I16"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
         "/values/measures.xp_check"
       ],
       "origin": "parametre",
