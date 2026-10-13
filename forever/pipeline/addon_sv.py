@@ -167,6 +167,43 @@ class TrainingWindow(NamedTuple):
     entries: list[dict[str, Any]]  # name, rank, type, cost, level
 
 
+class Encounter(NamedTuple):
+    """Fin d'une rencontre (`ENCOUNTER_END`, DJ1, schéma 4)."""
+
+    id: int | None
+    name: str | None
+    success: bool | None
+    time: int | None
+
+
+class Run(NamedTuple):
+    """Passage en instance relevé par ForeverLogger 0.6.0 : entrée et sortie (heure du serveur), rencontres."""
+
+    instance_id: int | None
+    name: str | None
+    type: str | None
+    difficulty: int | None
+    level: int | None
+    group_size: int | None
+    entered: int | None
+    left: int | None  # None : passage encore ouvert à l'écriture des SavedVariables
+    encounters: list[Encounter]
+
+    @property
+    def seconds(self) -> int | None:
+        if self.entered is None or self.left is None:
+            return None
+        return self.left - self.entered
+
+
+class LootEvent(NamedTuple):
+    """Fenêtre de butin ouverte (`LOOT_OPENED`) : objets, quantité, PNJ source (GUID et identifiant)."""
+
+    time: int | None
+    instance_id: int | None
+    items: list[dict[str, Any]]
+
+
 class Character(NamedTuple):
     guid: str
     name: str | None
@@ -181,6 +218,8 @@ class Character(NamedTuple):
     quest_accepts: list[QuestEvent] = []  # noqa: RUF012
     quest_turnins: list[QuestEvent] = []  # noqa: RUF012
     legacy: dict[str, Any] | None = None  # T04f (0.5.0) : trees (arbre -> nœud -> rang), time
+    runs: list[Run] = []  # noqa: RUF012 : DJ1 (0.6.0, schéma 4)
+    loot: list[LootEvent] = []  # noqa: RUF012
 
 
 class LoggerDB(NamedTuple):

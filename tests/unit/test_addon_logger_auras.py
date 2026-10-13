@@ -91,10 +91,10 @@ def test_failing_traits_api_leaves_legacy_absent():
     assert game.me().legacy is None and game.errors() == {}
 
 
-def test_schema_three_and_version():
-    assert Logger().db().schema == 3
+def test_schema_and_version():
+    assert Logger().db().schema == 4  # DJ1 : schéma 4 (passages, butin)
     toc = (REPO_ROOT / "addon" / "ForeverLogger" / "ForeverLogger.toc").read_text(encoding="utf-8")
-    assert "## Version: 0.5.0" in toc.splitlines()
+    assert "## Version: 0.6.0" in toc.splitlines()  # DJ1 : 0.6.0
 
 
 def test_python_reads_auras_and_legacy(game_data):

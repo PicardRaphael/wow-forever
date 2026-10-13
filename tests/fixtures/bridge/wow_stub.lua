@@ -484,3 +484,17 @@ C_UnitAuras = {
 C_Item = C_Item or {}
 C_Item.GetItemCount = api("C_Item.GetItemCount", function(item) return Stub.player.items[item] or 0 end)
 C_Traits.GetConfigIDByTreeID = api("C_Traits.GetConfigIDByTreeID", function(tree) return Stub.player.tree_configs[tree] end)
+
+-- DJ1, bloc D : fenêtre de butin (GetNumLootItems, GetLootSlotLink, GetLootSlotInfo, GetLootSourceInfo).
+-- Stub.loot = { { link, name, quantity, sources = { guid, quantité, guid, quantité… } } } ; valeurs synthétiques.
+Stub.loot = {}
+GetNumLootItems = api("GetNumLootItems", function() return #Stub.loot end)
+GetLootSlotLink = api("GetLootSlotLink", function(slot) local l = Stub.loot[slot]; return l and l.link end)
+GetLootSlotInfo = api("GetLootSlotInfo", function(slot)
+	local l = Stub.loot[slot]
+	if l then return nil, l.name, l.quantity end
+end)
+GetLootSourceInfo = api("GetLootSourceInfo", function(slot)
+	local l = Stub.loot[slot]
+	if l and l.sources then return unpack(l.sources) end
+end)

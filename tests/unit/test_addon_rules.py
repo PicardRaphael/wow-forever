@@ -79,7 +79,7 @@ def test_forever_logger_records_the_pet_out_of_combat():
     assert "InCombatLockdown" in text and "pet_snapshots" in text and "training" in text
     assert check_addon.check_addon(ADDON) == []
     toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
-    assert "## Version: 0.5.0" in toc.splitlines()  # T04d : 0.4.0 ; T04f : 0.5.0
+    assert "## Version: 0.6.0" in toc.splitlines()  # T04d : 0.4.0 ; T04f : 0.5.0 ; DJ1 : 0.6.0
 
 
 def test_blizzard_functions_are_hooked_never_replaced():
@@ -108,4 +108,4 @@ def test_forever_logger_records_xp_and_quests():
     assert "xp_states" in text and "quests" in text and "ForeverLoggerDB.errors" in text
     assert check_addon.check_addon(ADDON) == []
     toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
-    assert "## Version: 0.5.0" in toc.splitlines()  # T04f : 0.5.0
+    assert "## Version: 0.6.0" in toc.splitlines()  # T04f : 0.5.0 ; DJ1 : 0.6.0
