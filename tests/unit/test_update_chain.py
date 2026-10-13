@@ -118,6 +118,10 @@ def wago_routes(version, change=None):
     rules = load_rules(DATA_DIR)[1]
     for name in rules.get("quest_tables", []):  # T04d : table des quêtes, extrait de 1.60.1.70338
         routes[table_url(name, version, "enUS")] = (FIXTURES / "client" / f"{name}.csv").read_bytes()
+    for name in rules.get("xp_bonus_tables", []):  # T04f : table des conditions de joueur, extrait de 1.60.1.70338
+        routes[table_url(name, version, "enUS")] = (
+            FIXTURES / "wago" / "xp_bonuses" / "enUS" / f"{name}.csv"
+        ).read_bytes()
     for name, file_id in rules["gametables"].items():
         routes[gametable_url(file_id, version)] = (WAGO_70124 / "gametables" / f"{name}.txt").read_bytes()
     return routes
