@@ -15,7 +15,10 @@
   "WoWCombatLog-101026_083233.txt",
   "WoWCombatLog-101026_143510.txt",
   "WoWCombatLog-101026_175920.txt",
-  "WoWCombatLog-101126_090516.txt"
+  "WoWCombatLog-101126_090516.txt",
+  "WoWCombatLog-101226_120722.txt",
+  "WoWCombatLog-101326_083533.txt",
+  "WoWCombatLog-101326_095016.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
@@ -1180,12 +1183,19 @@
    "zone_id": 17,
    "rank": 0,
    "levels": {
+    "20": {
+     "max_hp": 642,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-101326_083533.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 493,
+     "fought": null
+    },
     "21": {
      "max_hp": 691,
      "certainty": "certain",
      "source": "journal WoWCombatLog-101026_175920.txt, WoWCombatLog-101126_090516.txt (bloc avancé, 4 individu(s))",
      "questie_hp": 531,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1199,7 +1209,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-101026_083233.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 449,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1568,7 +1578,7 @@
     "13": {
      "max_hp": 307,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 14 individu(s))",
+     "source": "journal WoWCombatLog-101326_095016.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 273,
      "fought": null
     }
@@ -1582,7 +1592,7 @@
     "13": {
      "max_hp": 307,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_080346.txt (bloc avancé, 9 individu(s))",
+     "source": "journal WoWCombatLog-101326_095016.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 273,
      "fought": null
     },
@@ -1645,9 +1655,9 @@
     "17": {
      "max_hp": 473,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-101026_083233.txt, WoWCombatLog-101026_143510.txt, WoWCombatLog-101026_175920.txt, WoWCombatLog-101126_090516.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-101326_083533.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 386,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -1675,13 +1685,27 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-101126_090516.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 417,
-     "fought": false
+     "fought": null
     },
     "19": {
      "max_hp": 572,
      "certainty": "certain",
      "source": "journal WoWCombatLog-101126_090516.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 449,
+     "fought": null
+    }
+   }
+  },
+  "3465": {
+   "name": "Gilthares Firebough",
+   "zone_id": 17,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-101326_095016.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386,
      "fought": false
     }
    }
@@ -3690,6 +3714,12 @@
   },
   {
    "npc_id": 3239,
+   "level": 20,
+   "measured": 642,
+   "questie": 493
+  },
+  {
+   "npc_id": 3239,
    "level": 21,
    "measured": 691,
    "questie": 531
@@ -3963,6 +3993,12 @@
    "level": 19,
    "measured": 572,
    "questie": 449
+  },
+  {
+   "npc_id": 3465,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
   },
   {
    "npc_id": 3467,
@@ -4769,6 +4805,12 @@
    {
     "npc_id": 3239,
     "name": "Thunderhead",
+    "level": 20,
+    "ratio": 1.3022312373225151
+   },
+   {
+    "npc_id": 3239,
+    "name": "Thunderhead",
     "level": 21,
     "ratio": 1.3013182674199624
    },
@@ -4825,6 +4867,12 @@
     "name": "Wandering Barrens Giraffe",
     "level": 19,
     "ratio": 1.2739420935412027
+   },
+   {
+    "npc_id": 3465,
+    "name": "Gilthares Firebough",
+    "level": 17,
+    "ratio": 1.2253886010362693
    },
    {
     "npc_id": 3467,
@@ -5207,6 +5255,7 @@
    "npc_id": 3239,
    "name": "Thunderhead",
    "levels": [
+    20,
     21
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
@@ -5269,6 +5318,14 @@
     19
    ],
    "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 3465,
+   "name": "Gilthares Firebough",
+   "levels": [
+    17
+   ],
+   "reason": "PNJ ami d'après la réaction du journal de combat (garde, PNJ de ville ou de quête) : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 3467,
