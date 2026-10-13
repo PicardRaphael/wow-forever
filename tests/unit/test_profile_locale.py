@@ -85,7 +85,7 @@ def test_mcp_tool_returns_the_locale(make_deps):
 
 def test_every_skill_names_spells_as_in_the_client():
     skills = sorted(p for p in SKILLS.iterdir() if (p / "SKILL.md").is_file())
-    assert len(skills) == 6
+    assert len(skills) == 7  # DJ1 : forever-donjons
     for skill in skills:
         text = (skill / "SKILL.md").read_text(encoding="utf-8")
         assert RULE in text, skill.name
