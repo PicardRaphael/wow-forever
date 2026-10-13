@@ -1,3 +1,3 @@
 local _, ns = ...
 ns.TRASH_NPC = {[11318]="rfc",[11319]="rfc",[11320]="rfc",[900050]="excavation"}
-ns.TRASH_MAP = {[389]="rfc",[2998]="excavation",[2959]="dalaran"}
+ns.TRASH_MAP = {[389]="rfc",[2998]="excavation",[2959]="dalaran",[189]={"smgy","smlib"}}

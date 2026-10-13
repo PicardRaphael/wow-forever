@@ -3,6 +3,8 @@ ns.DUNGEONS = {
 {key="rfc",slug="ragefire-chasm",en="Ragefire Chasm",min=13,max=18,loce="Orgrimmar",q={5723,5728},map=1454,x=52.6,y=49},
 {key="excavation",slug="excavation-site",en="Excavation Site: Wetlands",min=26,max=31,new=true,q={96500,"n:excavation-site:A:Highland Hides"}},
 {key="thanes",slug="hall-of-thanes",en="Hall of Thanes",min=13,max=18,new=true,q={96395}},
+{key="smgy",slug="sm-graveyard",en="Scarlet Monastery: Graveyard",min=26,max=36,q={90001,90002}},
+{key="smlib",slug="sm-library",en="Scarlet Monastery: Library",min=29,max=39,q={90001,90002}},
 {key="dalaran",slug="city-of-dalaran",en="City of Dalaran",min=28,max=33,new=true},
 }
 ns.DQ = {
