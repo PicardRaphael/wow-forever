@@ -296,3 +296,8 @@ def archive_line(cache_dir: Path) -> str | None:
     if failures < FAILURE_ALERT:
         return None
     return f"Archivage : DBCache.bin illisible depuis {failures} passages (`forever watch` pour le détail)"
+
+
+def archived_questcache(cache_dir: Path, build: str) -> Path | None:
+    """Copie la plus récente du `questcache.wdb` d'un build (`70338`), ou None (T04d, bloc B)."""
+    raise NotImplementedError
