@@ -9,6 +9,8 @@ J.QuestData = {
     { name = "Excavation Site: Wetlands", map = 2998, levels = { 24, 29 }, quests = {
         { 96500, "Deep Dig", 27, "B", true, "Menethil - Foreman", 1437, 10.0, 60.0 },
     } },
+    { name = "Scarlet Monastery - Graveyard", map = 189, levels = { 26, 36 }, quests = {} },
+    { name = "Scarlet Monastery - Library", map = 189, levels = { 29, 39 }, quests = {} },
     { name = "Alcaz Prison", map = nil, levels = { 35, 40 }, quests = {} },
 }
 
