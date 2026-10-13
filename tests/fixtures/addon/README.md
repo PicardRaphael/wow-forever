@@ -9,3 +9,8 @@
 - `ForeverLoggerDB_killtime.lua` (T04d, bloc E, synthétique) : Chasseur `Player-0000-00000000` de niveau 15 ; cinq
   gains d'XP de monstre (10:00:12, 10:00:40, 10:01:02, puis une heure plus tard 11:01:02 et 11:01:20) et un gain
   d'une autre source : intervalles attendus 28, 22 et 18 s, la pause d'une heure écartée.
+- `ForeverLoggerDB_xpcheck.lua` (T04d, bloc G, synthétique) : Chasseur de niveau 15 : trois gains de même niveau de
+  120 XP (`kill_xp` du niveau 15 dans `character_scaling.json` de 1.60.1.70338), un gain de 999 XP sur un monstre de
+  niveau 13 (faux exprès : écart attendu), un gain de 240 XP dont 120 de repos, un ancien gain sans cible sur un
+  monstre absent de la fixture de Questie ; rendu de la quête 5725 à 2936 XP (`QuestXP[16][6]` × 2,025 du cache des
+  quêtes, arrondi) ; Mage de niveau 1 : ancien gain de 50 XP sur « Hare » (niveau fixe 1 dans la fixture de Questie).
