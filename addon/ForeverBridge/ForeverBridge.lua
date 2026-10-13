@@ -54,8 +54,8 @@ local SLOT_PREFIX = "ForeverBridge_S"
 local GIVE_UP_POLLS = 3 -- relevés sans accusé avant la boîte d'envoi /reload
 local LOW_RESERVE = 10 -- emplacements restants à partir desquels /reload est proposé
 local IDLE_POLL = 600 -- relevé au repos, fenêtre ouverte (secondes)
--- Relevés pendant une mise à jour, fenêtre ouverte (décision 240) : toutes les 30 secondes pour les vingt premiers,
--- puis toutes les 60 jusqu'à soixante-dix (une heure de passage), puis le relevé au repos.
+-- Relevés pendant une mise à jour, fenêtre ouverte (décision 240) : rapprochés (UPDATE_POLL) pour les premiers,
+-- puis espacés (UPDATE_POLL_SLOW) jusqu'au plafond (une heure de passage), puis le relevé au repos.
 local UPDATE_POLL = 30
 local UPDATE_POLLS = 20
 local UPDATE_POLL_SLOW = 60
