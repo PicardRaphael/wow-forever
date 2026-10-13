@@ -467,3 +467,20 @@ C_QuestLog = {
 		end
 	end),
 }
+
+-- T04f, bloc D : auras du joueur (C_UnitAuras), objets portés (C_Item.GetItemCount), configuration d'un arbre de
+-- traits du compte (C_Traits.GetConfigIDByTreeID). Valeurs synthétiques posées par les tests, aucune règle de jeu.
+-- Stub.player.auras = { { spellId, applications, expirationTime, duration } } (expirationTime 0 : sans fin) ;
+-- Stub.player.items[objet] = nombre ; Stub.player.tree_configs[arbre] = configuration.
+Stub.player.auras = {}
+Stub.player.items = {}
+Stub.player.tree_configs = {}
+C_UnitAuras = {
+	GetAuraDataByIndex = api("C_UnitAuras.GetAuraDataByIndex", function(unit, index, filter)
+		if unit ~= "player" or filter ~= "HELPFUL" then return nil end
+		return Stub.player.auras[index]
+	end),
+}
+C_Item = C_Item or {}
+C_Item.GetItemCount = api("C_Item.GetItemCount", function(item) return Stub.player.items[item] or 0 end)
+C_Traits.GetConfigIDByTreeID = api("C_Traits.GetConfigIDByTreeID", function(tree) return Stub.player.tree_configs[tree] end)

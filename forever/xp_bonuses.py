@@ -278,3 +278,15 @@ def lookup_xp_bonuses(deps: Deps, *, access: str | None = None) -> dict[str, Any
         "stacking": {"mode": xp.stacking, "rested_after": xp.rested_after},
         "provenance": provenance,
     }
+
+
+def xp_watch(gd: GameData) -> dict[str, list[int]]:
+    raise NotImplementedError
+
+
+def legacy_rested_spell(gd: GameData) -> int | None:
+    raise NotImplementedError
+
+
+def legacy_ranks_from_logger(gd: GameData, legacy: Mapping[str, Any] | None) -> dict[int, int]:
+    raise NotImplementedError

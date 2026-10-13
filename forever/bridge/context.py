@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 
 from forever.bridge.items import GearPiece, parse_gear
 from forever.config import Deps
+from forever.engine.xp import ActiveAura
 
 # Jeton de classe du jeu (`UnitClassBase`) → nom de la classe dans `classes.json`.
 CLASS_NAMES = {
@@ -244,3 +245,18 @@ def _piece_text(piece: GearPiece) -> str:
         extras.append(f"suffixe aléatoire {item.suffix}")
     name = piece.name or f"objet {item.item}"
     return f"{name} ({', '.join(extras)})" if extras else name
+
+
+@dataclass(frozen=True)
+class XpContext:
+    """T04f : état des bonus d'XP envoyé par ForeverBridge 0.2.0 (repos, zone de repos, auras d'XP actives, objets
+    surveillés portés)."""
+
+    rested: float | None = None
+    resting: bool | None = None
+    auras: tuple[ActiveAura, ...] = ()
+    items: Mapping[int, int] = field(default_factory=dict)
+
+
+def xp_context(context: Mapping[str, str]) -> XpContext:
+    raise NotImplementedError
