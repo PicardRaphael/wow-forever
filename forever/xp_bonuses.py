@@ -310,3 +310,24 @@ def legacy_ranks_from_logger(gd: GameData, legacy: Mapping[str, Any] | None) -> 
         if isinstance(rank, int) and rank > 0:
             out[a.spell_id] = rank
     return out
+
+
+@dataclass(frozen=True)
+class Chain:
+    """Chaîne du sac de couchage pour un personnage : étapes (route), étape suivante, sources lues, écarts entre
+    sources, sources manquantes."""
+
+    steps: list[Any]
+    next_step: Any | None
+    level: int | None
+    item: int | None
+    sources: list[str]
+    discrepancies: list[str]
+    missing: list[str]
+    notes: list[str]
+
+
+def sleeping_bag_chain(
+    deps: Deps, *, faction: str | None, done_quests: Sequence[int] = (), addons_dir: Any = None
+) -> Chain:
+    raise NotImplementedError

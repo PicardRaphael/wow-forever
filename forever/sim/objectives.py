@@ -222,6 +222,8 @@ def objectives(
     legacy_rested_rank: int | None = None,
     hours: float | None = None,
     auras: Sequence[ActiveAura] = (),
+    has_sleeping_bag: bool | None = None,
+    chain_dir: Path | None = None,
 ) -> dict[str, Any]:
     """Objectifs classés par XP par heure, temps par monstre et sa source, conseil, provenance.
 
