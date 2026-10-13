@@ -10,6 +10,8 @@ dans `<cache>/dbcache/<build>/` dès qu'ils changent, sans jamais écrire dans l
 - `Hotfix.log` grossit pendant une session du client et il est réécrit au démarrage suivant : une copie par session,
   reconnue à sa première ligne, remplacée tant que le fichier ne fait que grossir ; le build est celui du client au
   début de la session (journal des versions), sinon celui de `.build.info` au moment de la copie ;
+- `questcache.wdb` (T04d, bloc B) : cache des quêtes vues par le client, contrôlé par `questcache.parse_questcache`
+  avant la copie et rangé par le build de son en-tête comme `DBCache.bin` (l'ancien contenu est gardé) ;
 - `index.json` de chaque build liste les copies (sha256, taille, dates, entrées, poussée maximale, source du build).
 
 L'état du dernier passage (taille et date des fichiers vivants, échecs de lecture) est gardé dans
@@ -29,19 +31,21 @@ from forever.config import Deps
 from forever.errors import DataSchemaError
 from forever.pipeline import dbcache, hotfixes
 from forever.pipeline.client_builds import JOURNAL_NAME, load_builds, read_build_info, record_build, version_at
+from forever.pipeline.questcache import QuestCache, parse_questcache, questcache_path
 from forever.timefmt import format_utc
 
 ARCHIVE_DIR = "dbcache"
 STATE_NAME = "state.json"
 INDEX_NAME = "index.json"
 CURRENT = "DBCache.bin"
+QUESTCACHE = "questcache.wdb"  # T04d, bloc B : cache des quêtes vues par le client
 FAILURE_ALERT = 3  # passages illisibles d'affilée avant une ligne de démarrage (paramètre de l'outil)
 
 
 class ArchivedCopy(NamedTuple):
     """Une copie faite (ou déjà présente) d'un fichier du client."""
 
-    kind: str  # "dbcache" | "hotfix_log"
+    kind: str  # "dbcache" | "hotfix_log" | "questcache"
     build: str  # "70235" : en-tête de DBCache.bin, ou build du client au début de la session du journal
     path: Path
     sha256: str
@@ -169,6 +173,38 @@ def _archive_dbcache(live: Path, root: Path, raw: bytes, cache: dbcache.DBCache,
     return _copy("dbcache", build, current, entry, True)
 
 
+def _archive_questcache(live: Path, root: Path, raw: bytes, cache: QuestCache, now: str) -> ArchivedCopy:
+    """Copie de `questcache.wdb` rangée par le build de son en-tête ; un contenu différent pour le même build garde
+    l'ancien sous `questcache-<sha12>.wdb` (un cache vidé par le client ne fait jamais perdre une quête vue)."""
+    build = str(cache.build)
+    folder = root / build
+    index = _Index(folder, now)
+    sha = _sha(raw)
+    for entry in index.of("questcache"):
+        if entry["sha256"] == sha:
+            return _copy("questcache", build, folder / entry["file"], entry, False)
+    current = folder / QUESTCACHE
+    if current.is_file():
+        old = next((c for c in index.of("questcache") if c["file"] == QUESTCACHE), None)
+        kept = folder / f"questcache-{(old or {}).get('sha256', _sha(current.read_bytes()))[:12]}.wdb"
+        os.replace(current, kept)
+        if old is not None:
+            old["file"] = kept.name
+    _write_atomic(current, raw)
+    entry = {
+        "kind": "questcache",
+        "file": QUESTCACHE,
+        "sha256": sha,
+        "size": len(raw),
+        "file_mtime": _mtime(live),
+        "copied_at": now,
+        "records": len(cache.records),
+    }
+    index.copies.append(entry)
+    index.save()
+    return _copy("questcache", build, current, entry, True)
+
+
 def _session_start(raw: bytes, live: Path) -> datetime:
     """Début de la session du client : première ligne datée du journal (heure locale), sinon la date du fichier."""
     first = raw.split(b"\n", 1)[0].decode("utf-8", errors="replace")
@@ -262,6 +298,22 @@ def archive_client_files(
     except Exception as exc:  # noqa: BLE001
         errors.append(f"DBCache.bin : {_message(exc)}")
 
+    quests = questcache_path(wow, locale)
+    try:
+        if quests.is_file():
+            stamp = _stamp(quests)
+            if state.get("questcache") != stamp:
+                try:
+                    raw = read_bytes(quests)
+                    parsed_quests = parse_questcache(raw)
+                except (OSError, DataSchemaError) as exc:
+                    errors.append(f"questcache.wdb non archivé, relu au prochain passage : {_message(exc)}")
+                else:
+                    copies.append(_archive_questcache(quests, root, raw, parsed_quests, now))
+                    state["questcache"] = stamp
+    except Exception as exc:  # noqa: BLE001
+        errors.append(f"questcache.wdb : {_message(exc)}")
+
     log = wow.joinpath(*hotfixes.HOTFIX_LOG)
     try:
         if log.is_file():
@@ -300,4 +352,5 @@ def archive_line(cache_dir: Path) -> str | None:
 
 def archived_questcache(cache_dir: Path, build: str) -> Path | None:
     """Copie la plus récente du `questcache.wdb` d'un build (`70338`), ou None (T04d, bloc B)."""
-    raise NotImplementedError
+    path = cache_dir / ARCHIVE_DIR / build / QUESTCACHE
+    return path if path.is_file() else None

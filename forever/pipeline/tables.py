@@ -74,6 +74,8 @@ def _cols(spec: str) -> tuple[Column, ...]:
 
 TABLES: Mapping[str, tuple[Column, ...]] = {
     "SkillLineXTraitTree": _cols("ID:int SkillLineID:int TraitTreeID:int"),
+    # T04d, bloc B : XP des quêtes par niveau (ID) et par difficulté (colonnes Difficulty_0 à Difficulty_9).
+    "QuestXP": _cols("ID:int " + " ".join(f"Difficulty_{i}:int" for i in range(10))),
     "TraitNode": _cols("ID:int TraitTreeID:int PosX:int PosY:int"),
     "TraitNodeXTraitNodeEntry": _cols("ID:int TraitNodeID:int TraitNodeEntryID:int _Index:int"),
     "TraitNodeEntry": _cols("ID:int TraitDefinitionID:int MaxRanks:int"),

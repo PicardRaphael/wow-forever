@@ -4,7 +4,7 @@ Par classe et par niveau (1 au plafond de `decode_rules.json`) : mana de base, c
 d'Intelligence et critique par point d'Agilité (fractions), PV par point d'Endurance (`PlayerExpectedStat`, colonne
 au sens probable) ; courbes de régénération de PV par l'Esprit (`GlobalCurve`, sous-type = classe, points dans
 `CurvePoint`). Pour tous : XP pour passer chaque niveau (`LevelExperience`), paliers du repos (`Exhaustion`),
-constante d'armure par niveau (`ExpectedStat`).
+constante d'armure par niveau (`ExpectedStat`), XP d'un monstre par niveau (GameTable `xp`, colonne `PerKill`, T04d).
 
 Recoupement par les GameTables (`decode_rules.json` `character_scaling.crosscheck`) : `concorde`, `ecart` (chaque
 écart listé, la valeur DB2 reste celle du fichier : jamais tranché en silence) ou `absente`. Toutes les constantes de
@@ -182,6 +182,7 @@ def decode_character_scaling(
             for r in sorted(tables["Exhaustion"], key=lambda r: int(r["ID"]))
         ],
         "armor_constant": [float(armor_rows[lv]["ArmorConstant"]) for lv in range(1, cap + 1)],
+        "kill_xp": _kill_xp(spec.get("kill_xp"), gametables, cap),
         "notes": [
             (
                 "hp_per_stamina : colonne sans nom de PlayerExpectedStat lue comme PV par Endurance (sens probable, "
@@ -189,12 +190,31 @@ def decode_character_scaling(
             ),
             "armor_constant : table lue par le serveur inconnue (probable) ; armormitigationbylvl en écart",
             "hp_regen : courbes de régénération de PV par l'Esprit ; formule qui les combine au serveur, non utilisée",
-            "rested : paliers du repos, non modélisés (D7)",
+            "rested : paliers du repos (D7), lus par le modèle d'XP (forever/engine/xp.py)",
+            "kill_xp : XP d'un monstre normal de même niveau (GameTable xp, colonne PerKill) ; None sans la GameTable",
         ],
     }
     doc["talents"] = _talent_rules(tables, rules)
     doc["crosscheck"] = [_crosscheck(c, doc, gametables, cap) for c in spec.get("crosscheck", [])]
     return doc
+
+
+def _kill_xp(
+    spec: Mapping[str, Any] | None, gametables: Mapping[str, GameTable | None], cap: int
+) -> list[float] | None:
+    """XP d'un monstre normal de même niveau, du niveau 1 au plafond (GameTable et colonne de `kill_xp` dans
+    `decode_rules.json`) ; None si la règle ou la GameTable manque (T04d, bloc B)."""
+    if not spec:
+        return None
+    table = gametables.get(str(spec["gametable"]))
+    if table is None:
+        return None
+    column = str(spec["column"])
+    by_level = {int(r["Level"]): r for r in table if "Level" in r}
+    missing = [lv for lv in range(1, cap + 1) if column not in by_level.get(lv, {})]
+    if missing:
+        raise DataSchemaError(f"GameTable {spec['gametable']} : colonne {column} absente aux niveaux {missing[:5]}.")
+    return [by_level[lv][column] for lv in range(1, cap + 1)]
 
 
 def _talent_rules(tables: Mapping[str, Sequence[Row]], rules: Mapping[str, Any]) -> dict[str, Any]:

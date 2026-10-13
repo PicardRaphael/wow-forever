@@ -62,6 +62,7 @@ CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.j
 CLASS_FILES = ("classes.json", "races.json", "pvp_items.json")
 MAGE_CLASS = "Mage"  # moteur du Mage : ses clés de talents sont celles de talents.json
 PETS_FILE = "pets.json"  # CH0 : familiers du Chasseur, ajouté ou remplacé comme les fichiers des 9 classes
+QUEST_FILE = "quest_rewards.json"  # T04d : récompenses des quêtes, ajouté ou remplacé de même
 # T08b, bloc C : fichiers décodés installés par une révision, avec la liste de leurs valeurs changées.
 VALUE_FILES = ("spell_scaling.json", "character_scaling.json")
 TALENT_TABLES = "tables Trait* et Spell* (wago.tools)"
@@ -365,7 +366,7 @@ def _file_changes(repo: Path, cand: Path, cand_sources: Mapping[str, Any], versi
             }
             for _, key, field, old, new in lines
         ]
-    for name in (*CLASS_FILES, PETS_FILE):
+    for name in (*CLASS_FILES, PETS_FILE, QUEST_FILE):
         if not _decoded(cand / name):
             continue
         before, after = _short_sha(repo / name), _short_sha(cand / name)

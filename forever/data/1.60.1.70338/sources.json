@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-10-10)",
+      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-13)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 1 (forever install, 2026-10-10)",
+      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-13)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -202,7 +202,8 @@
       "certainty": "certain",
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
-        "classement PvP : table de decode_rules.json, certitude probable"
+        "classement PvP : table de decode_rules.json, certitude probable",
+        "installé en révision 4 (forever install, 2026-10-13)"
       ]
     },
     "races.json": {
@@ -267,7 +268,8 @@
       "certainty": "certain",
       "notes": [
         "ratios du personnage par classe et par niveau, XP, repos, constante d'armure, courbes de régénération (decode_rules.json, character_scaling) ; recoupement par les GameTables dans crosscheck",
-        "PV par Endurance et constante d'armure : sens ou usage par le serveur probable"
+        "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
+        "installé en révision 4 (forever install, 2026-10-13)"
       ]
     },
     "pets.json": {
@@ -293,9 +295,18 @@
         "hérité de 1.60.1.70291"
       ],
       "inherited_from": "1.60.1.70291"
+    },
+    "quest_rewards.json": {
+      "source": "Client 1.60.1.70338 : tables du client 1.60.1.70338 (wago.tools, 1.60.1.70338) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
+        "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
+        "installé en révision 4 (forever install, 2026-10-13)"
+      ]
     }
   },
-  "revision": 3,
+  "revision": 4,
   "revised_at": "2026-10-13",
   "hotfixes": {
     "dbcache": {
@@ -303,10 +314,10 @@
       "locale": "enUS",
       "format": 9,
       "build": 70338,
-      "size": 2988966,
-      "sha256": "c796091b0dd754d800882988c37c65524b40139f4c58ad9790de136c2b147d19",
-      "file_date": "2026-10-10T06:35:24Z",
-      "read_at": "2026-10-10T08:26:41Z"
+      "size": 3033586,
+      "sha256": "7d67e37dd11c7ca1a67d063213afa4296d9fcb606bf05b17d4415a8c942e5352",
+      "file_date": "2026-10-13T07:52:02Z",
+      "read_at": "2026-10-13T10:06:49Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -885,15 +896,16 @@
       "invalid": [],
       "notpublic": [],
       "dbreply": {
-        "ItemSparse": 26
+        "ItemSparse": 115,
+        "Spell": 12
       },
       "item_reply": {
-        "0x198e28b5": 4703,
-        "0x5481af88": 4703,
-        "0xb50ca635": 4703,
-        "0xce88edca": 4703,
-        "Item": 4703,
-        "ItemSparse": 4703
+        "0x198e28b5": 4737,
+        "0x5481af88": 4737,
+        "0xb50ca635": 4737,
+        "0xce88edca": 4737,
+        "Item": 4737,
+        "ItemSparse": 4737
       },
       "unknown_hash": {
         "0x01325ca0": 2,

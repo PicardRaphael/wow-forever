@@ -18,6 +18,8 @@ import struct
 from pathlib import Path
 from typing import NamedTuple
 
+from forever.errors import DataSchemaError
+
 QUESTCACHE_PATH = ("Cache", "WDB", "{locale}", "questcache.wdb")
 MAGIC = b"TSQW"  # « WQST » écrit à l'envers (entier de 4 octets en petit-boutiste)
 HEADER = struct.Struct("<4sI4sIII")  # signature, build, locale à l'envers, taille et version du format, réservé
@@ -60,14 +62,48 @@ class QuestCache(NamedTuple):
     records: dict[int, QuestRecord]
 
 
+def _record(quest: int, data: bytes) -> QuestRecord:
+    if len(data) < MIN_RECORD:
+        raise DataSchemaError(f"questcache.wdb : enregistrement de la quête {quest} trop court ({len(data)} octets).")
+    values: dict[str, int | float] = {}
+    for name, (index, kind) in FIELDS.items():
+        (value,) = struct.unpack_from(f"<{kind}", data, 4 * index)
+        values[name] = round(value, FLOAT_DIGITS) if kind == "f" else value
+    if values["id"] != quest:
+        raise DataSchemaError(
+            f"questcache.wdb : l'enregistrement de la quête {quest} porte l'identifiant {values['id']}."
+        )
+    return QuestRecord(**values)  # type: ignore[arg-type]
+
+
 def parse_questcache(raw: bytes) -> QuestCache:
     """Cache des quêtes lu depuis ses octets ; DataSchemaError si la signature, un enregistrement ou la fin manque."""
-    raise NotImplementedError
+    if len(raw) < HEADER.size or raw[:4] != MAGIC:
+        raise DataSchemaError("questcache.wdb : signature WQST absente.")
+    _, build, locale, _, _, _ = HEADER.unpack_from(raw)
+    records: dict[int, QuestRecord] = {}
+    offset = HEADER.size
+    while True:
+        if offset + ENTRY.size > len(raw):
+            raise DataSchemaError("questcache.wdb : fin du fichier sans le couple de fin (0, 0) : fichier tronqué.")
+        quest, length = ENTRY.unpack_from(raw, offset)
+        if quest == 0 and length == 0:
+            break
+        start = offset + ENTRY.size
+        if start + length > len(raw):
+            raise DataSchemaError(f"questcache.wdb : enregistrement de la quête {quest} tronqué.")
+        records[quest] = _record(quest, raw[start : start + length])
+        offset = start + length
+    return QuestCache(build, locale[::-1].decode("ascii", errors="replace"), records)
 
 
 def read_questcache(path: Path) -> QuestCache:
     """Cache des quêtes du fichier `path` (DataSchemaError s'il est illisible ou mal formé)."""
-    raise NotImplementedError
+    try:
+        raw = path.read_bytes()
+    except OSError as exc:
+        raise DataSchemaError(f"questcache.wdb illisible : {path} ({exc.strerror or exc}).") from exc
+    return parse_questcache(raw)
 
 
 def questcache_path(wow_dir: Path, locale: str = "enUS") -> Path:

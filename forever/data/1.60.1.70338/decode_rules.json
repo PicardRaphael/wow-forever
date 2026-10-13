@@ -639,7 +639,12 @@
     "column": "Constant"
    }
   ],
-  "note": "T08b, bloc A : ratios du personnage par classe et par niveau (PlayerExpectedStat, ContentSetID 0), XP par niveau (LevelExperience), repos (Exhaustion), constante d'armure (ExpectedStat, ExpansionID -2), courbes de régénération de PV par l'Esprit (GlobalCurve, sous-type = classe, points dans CurvePoint) ; colonne Field_1_60_1_69876_005 lue comme PV par Endurance (sens probable, recoupé par hppersta) ; T08d (accord du 2026-10-06) : nom HPPerStamina dans les tables de 1.60.1.70235, d'après les définitions de la communauté (WoWDBDefs) ; il conforte ce sens, qui reste probable jusqu'à une mesure en jeu ; une colonne peut avoir une liste de noms, le nouveau d'abord ; recoupement par les GameTables, écart signalé, jamais tranché"
+  "note": "T08b, bloc A : ratios du personnage par classe et par niveau (PlayerExpectedStat, ContentSetID 0), XP par niveau (LevelExperience), repos (Exhaustion), constante d'armure (ExpectedStat, ExpansionID -2), courbes de régénération de PV par l'Esprit (GlobalCurve, sous-type = classe, points dans CurvePoint) ; colonne Field_1_60_1_69876_005 lue comme PV par Endurance (sens probable, recoupé par hppersta) ; T08d (accord du 2026-10-06) : nom HPPerStamina dans les tables de 1.60.1.70235, d'après les définitions de la communauté (WoWDBDefs) ; il conforte ce sens, qui reste probable jusqu'à une mesure en jeu ; une colonne peut avoir une liste de noms, le nouveau d'abord ; recoupement par les GameTables, écart signalé, jamais tranché",
+  "kill_xp": {
+   "gametable": "xp",
+   "column": "PerKill",
+   "note": "T04d, bloc B : XP d'un monstre normal de même niveau par niveau (colonne PerKill de la GameTable xp), comparée à la règle leveling.mob_xp (concorde en 1.60.1.70338)"
+  }
  },
  "mechanic_auras": {
   "ignite": {
@@ -739,5 +744,13 @@
    "Régime : bit n du PetFoodMask <-> ItemPetFood.ID n+1 (sens probable).",
    "Alias : la ligne de compétence écrit « Crocilisk », CreatureFamily « Crocolisk » (écart interne au client)."
   ]
+ },
+ "quest_tables": [
+  "QuestXP"
+ ],
+ "quest_rewards": {
+  "difficulty_prefix": "Difficulty_",
+  "difficulty_columns": 10,
+  "note": "T04d, bloc B : table QuestXP (XP d'une quête par niveau et par difficulté) décodée dans quest_rewards.json ; quêtes vues lues dans questcache.wdb du client (lecture locale, disposition probable, question LVL6)"
  }
 }

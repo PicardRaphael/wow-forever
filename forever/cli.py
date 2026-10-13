@@ -230,6 +230,10 @@ def build_parser() -> argparse.ArgumentParser:
     )
     decode.add_argument("--dbcache", help="DBCache.bin (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin)")
     decode.add_argument(
+        "--questcache",
+        help="cache des quêtes du client (défaut : copie archivée du build, <cache>/dbcache/<build>/questcache.wdb)",
+    )
+    decode.add_argument(
         "--dbd-layouts",
         help="dispositions dérivées (JSON) au lieu du relevé de WoWDBDefs du cache (forever fetch --dbd)",
     )
@@ -1683,6 +1687,7 @@ def _cmd_decode(deps: Deps, args: argparse.Namespace) -> int:
         out=Path(args.out) if args.out else None,
         force=args.force,
         hotfixes=_hotfix_source(deps, args),
+        questcache=Path(args.questcache) if args.questcache else None,
     )
     src, v = load_source(deps, str(c.root))
     provenance = source_provenance(deps, src, v)

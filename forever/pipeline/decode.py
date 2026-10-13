@@ -41,6 +41,8 @@ from forever.pipeline.hotfix_overlay import (
     sources_block,
 )
 from forever.pipeline.pets import PETS_FILE, decode_pets, load_pet_tables, own_pet_table_files, pet_table_files
+from forever.pipeline.quest_rewards import QUEST_FILE, decode_quest_rewards, load_quest_tables, quest_table_files
+from forever.pipeline.questcache import QuestCache, read_questcache
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
 from forever.timefmt import format_utc
@@ -1682,6 +1684,21 @@ def _read_json(path: Path) -> Any:
         raise DataSchemaError(f"{path} illisible ({exc}).") from exc
 
 
+def _questcache_for(deps: Deps, version: str, path: Path | None) -> tuple[QuestCache | None, str]:
+    """Cache des quêtes à lire pour `version` : `path` s'il est donné, sinon la copie archivée du build ; un cache
+    d'un autre build est écarté (ses quêtes peuvent avoir changé)."""
+    from forever.archive import archived_questcache
+
+    build = version.rsplit(".", 1)[-1]
+    path = path or archived_questcache(deps.cache_dir, build)
+    if path is None:
+        return None, f"aucun cache des quêtes du build {build} : quêtes vues de la base reprises"
+    cache = read_questcache(path)
+    if str(cache.build) != build:
+        return None, f"cache des quêtes du build {cache.build} écarté (version {version})"
+    return cache, f"cache des quêtes du build {build} lu ({len(cache.records)} quête(s))"
+
+
 def _write_json(path: Path, doc: Any) -> None:
     path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
 
@@ -1859,8 +1876,12 @@ def decode_version(
     out: Path | None = None,
     force: bool = False,
     hotfixes: HotfixSource | None = None,
+    questcache: Path | None = None,
 ) -> Candidate:
     """Écrit une version candidate complète dans `out` (défaut : `<cache>/candidates/<version>/`).
+
+    `questcache` : cache des quêtes du client (T04d) ; défaut : copie archivée du build de la version
+    (`<cache>/dbcache/<build>/questcache.wdb`), sinon aucune (les quêtes vues de la base sont reprises).
 
     `csv_dir` : dossier des CSV (défaut : cache de `forever fetch`). Règles et fichiers hérités : version locale la
     plus récente. Refuse d'écraser une candidate existante sans `force`. Aucun accès réseau."""
@@ -1940,8 +1961,23 @@ def decode_version(
         pets_doc = decode_pets(hot.apply(load_pet_tables(csv_dir, rules), PET_SCHEMAS), rules, version)
         decoded_classes[PETS_FILE] = pets_doc
         extra_notes += [f"{PETS_FILE} : {o}" for o in pets_doc["observations"]]
+    # T04d, bloc B : récompenses des quêtes (quest_tables) : table présente (décodée, quêtes vues de la base et du
+    # cache du client) ou absente (héritée de la base).
+    quest_files = quest_table_files(rules)
+    if quest_files and all((csv_dir / rel).is_file() for _, rel in quest_files):
+        cache, cache_note = _questcache_for(deps, version, questcache)
+        base_quests = base / QUEST_FILE
+        quest_doc = decode_quest_rewards(
+            load_quest_tables(csv_dir, rules),
+            rules,
+            version,
+            cache=cache,
+            base=_read_json(base_quests) if base_quests.is_file() else None,
+        )
+        decoded_classes[QUEST_FILE] = quest_doc
+        extra_notes.append(f"{QUEST_FILE} : {len(quest_doc['seen_quests'])} quête(s) vue(s) ; {cache_note}")
     inherited = {}
-    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE)
+    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE, QUEST_FILE)
     names = [*INHERITED_FILES, *(n for n in optional if n not in decoded_classes)]
     for name in names:
         path = _inherited_source(base, name, rules)
@@ -1953,6 +1989,9 @@ def decode_version(
                 extra_notes.append(
                     f"{name} absent : tables des familiers absentes de {csv_dir.name} et de {base_version}"
                 )
+                continue
+            if name == QUEST_FILE:
+                extra_notes.append(f"{name} absent : table QuestXP absente de {csv_dir.name} et de {base_version}")
                 continue
             if name in CLASS_FILES:
                 extra_notes.append(
@@ -1988,11 +2027,14 @@ def decode_version(
         "régénération (decode_rules.json, character_scaling) ; recoupement par les GameTables dans crosscheck",
         PETS_FILE: "familles du Chasseur, capacités et rangs, bonus de famille, régimes, cartes (decode_rules.json, "
         "pets) ; écarts internes au client dans observations",
+        QUEST_FILE: "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client "
+        "(questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
     }
     class_certainty_note = {
         CHARACTER_FILE: "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
         PETS_FILE: "coût en points d'entraînement (colonne sans nom), bonus de famille (types d'aura), régime (bits "
         "du masque) et effets de Hunter Pet Scaling : sens probable",
+        QUEST_FILE: "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
     }
     sources = {
         **{

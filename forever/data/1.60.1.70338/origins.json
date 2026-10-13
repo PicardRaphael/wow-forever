@@ -89,6 +89,14 @@
         "/sources"
       ],
       "reason": "ne décrit pas le jeu : collecte, légende des certitudes, sources"
+    },
+    {
+      "file": "quest_rewards.json",
+      "paths": [
+        "/questcache",
+        "/difficulty_columns"
+      ],
+      "reason": "provenance de la lecture du cache et format de la table, pas une valeur du jeu"
     }
   ],
   "rules": [
@@ -950,7 +958,9 @@
         "/localized_pet_tables",
         "/pets",
         "/circular_sufficient_edges",
-        "/parked_nodes"
+        "/parked_nodes",
+        "/quest_tables",
+        "/quest_rewards"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1, CH0)",
@@ -1156,6 +1166,26 @@
       "source": "décision 223 (choix de l'utilisateur du 2026-10-09 d'après les mesures)",
       "reason": "paramètre de la mesure des PV (règle hors norme de la courbe), pas une valeur du jeu (révision 5)",
       "registry": "H11"
+    },
+    {
+      "file": "quest_rewards.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "table QuestXP du client (forever decode, decode_rules.json quest_rewards)",
+      "certainty": "certain"
+    },
+    {
+      "file": "quest_rewards.json",
+      "paths": [
+        "/seen_quests/**"
+      ],
+      "origin": "client",
+      "source": "Cache/WDB/enUS/questcache.wdb du client, lu en local par forever decode (forever/pipeline/questcache.py)",
+      "certainty": "probable",
+      "reason": "disposition des champs du cache établie sur les quêtes vues et recoupée par Questie, à recouper par xpReward en jeu (question LVL6)",
+      "registry": "I12"
     }
   ],
   "pending": [],

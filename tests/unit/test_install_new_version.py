@@ -53,6 +53,7 @@ PV1_RETIRED = {"racials.json"}
 PV1_ADDED = {"_seed_racials.json", "classes.json", "races.json", "pvp_items.json", "pvp_rules.json"}
 PV1_ADDED |= {"character_scaling.json"}  # T08b, révision 4 : hérité par la candidate de la fixture 1.60.1.70009
 PV1_ADDED |= {"pets.json", "pet_rules.json"}  # CH0, révision 5 : hérités par la candidate de la fixture 1.60.1.70009
+PV1_ADDED |= {"quest_rewards.json"}  # T04d, révision 4 de 1.60.1.70338 : hérité de même
 
 
 def strip_provenance(doc):

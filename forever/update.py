@@ -64,6 +64,7 @@ from forever.engine_inputs import (
 from forever.errors import (
     EXIT_OK,
     EXIT_PENDING,
+    DataSchemaError,
     FetchFailedError,
     ForeverError,
     InvalidArgumentError,
@@ -687,6 +688,12 @@ def _fetch_version(run: _Run, version: str, rules: Mapping[str, Any]) -> list[st
             fetch_tables(deps, version, names, locales=[locale], log=run.say)
         except FetchFailedError as exc:  # noms d'une autre locale : facultatifs (décision 230)
             run.say(f"noms {locale} facultatifs : {exc.message}")
+    quest_tables = [t for t in rules.get("quest_tables", []) if t not in enus]
+    if quest_tables:
+        try:
+            fetch_tables(deps, version, quest_tables, log=run.say)
+        except FetchFailedError as exc:  # T04d : sans QuestXP, quest_rewards.json est hérité de la base
+            run.say(f"tables des quêtes facultatives : {exc.message}")
     if rules.get("gametables"):
         fetch_gametables(deps, version, rules["gametables"], log=run.say)
     run.cleared[f"network-{version}"] = "téléchargement réussi"
@@ -1218,6 +1225,63 @@ def _names_revision(
     )
 
 
+def seen_quest_gap(cache_dir: Path, data_dir: Path, version: str) -> list[int]:
+    """Quêtes du `questcache.wdb` archivé du build de `version` absentes de `quest_rewards.json` installé (ou dont la
+    ligne a changé) ; vide sans archive ou si le cache est illisible (T04d, bloc B)."""
+    from forever.archive import archived_questcache
+    from forever.pipeline.quest_rewards import QUEST_FILE, new_seen_quests
+    from forever.pipeline.questcache import read_questcache
+
+    archive = archived_questcache(cache_dir, _build_number(version))
+    if archive is None:
+        return []
+    try:
+        cache = read_questcache(archive)
+    except DataSchemaError:
+        return []
+    installed = data_dir / version / QUEST_FILE
+    doc = _read(installed) if installed.is_file() else None
+    return new_seen_quests(cache, doc if isinstance(doc, dict) else None)
+
+
+def _quests_revision(
+    run: _Run, version: str, rules: Mapping[str, Any], archive: Path | None, gap: Sequence[int]
+) -> Step:
+    """Révision qui ajoute à `quest_rewards.json` les quêtes nouvellement vues par le client (T04d, bloc B) : la
+    version est redécodée avec tous les correctifs de l'archive (jamais sans) et le cache des quêtes archivé, puis
+    passe par la règle d'automatisme ; les quêtes vues ne changent aucun build."""
+    from forever.pipeline import dbcache, hotfixes
+    from forever.pipeline.decode import decode_version
+
+    try:
+        _fetch_version(run, version, rules)
+    except FetchFailedError as err:
+        return _network_wait(run, "correctifs", version, err)
+    source = None
+    if archive is not None:
+        every = hotfixes.pending_hotfixes(dbcache.read_dbcache(archive), {}, rules)
+        if every:
+            try:
+                source = _hotfix_source(run, version, archive, rules, [t for t, _ in every])
+            except _NeedLayouts as need:
+                return _need_layouts(run, "correctifs", version, need, len(every))
+    try:
+        candidate = decode_version(run.deps_on(run.base_data), version, force=True, hotfixes=source)
+    except ColumnNamesError as err:
+        return _column_wait(run, "correctifs", version, err)
+    return _evaluate(
+        run,
+        step="correctifs",
+        kind="install_revision",
+        version=version,
+        revision=_revision(run.base_data, version) + 1,
+        candidate=candidate.root,
+        new_version=False,
+        motif=f"{len(gap)} quête(s) vue(s) par le client (questcache.wdb, forever update)",
+        hotfixes_read=source is not None,
+    )
+
+
 def _need_layouts(run: _Run, step: str, version: str, need: _NeedLayouts, count: int) -> Step:
     pending_id = f"dbd-{version}-{len(need.tables)}t"
     run.pending.append(
@@ -1313,14 +1377,19 @@ def _step_hotfixes(run: _Run) -> Step:
     rules = _rules(run.base_data)
     sources = read_sources(run.base_data, version) or {}
     absent = [str(n) for n in sources.get("missing_names") or []]
+    quest_gap = seen_quest_gap(run.deps.cache_dir, run.base_data, version)
     if archive is None:
         if absent:
             return _names_revision(run, version, rules, None, absent)
+        if quest_gap:
+            return _quests_revision(run, version, rules, None, quest_gap)
         return Step("correctifs", "rien", f"aucune archive de DBCache.bin pour {version}", {})
     pending = hotfixes.pending_hotfixes(dbcache.read_dbcache(archive), sources, rules)
     if not pending:
         if absent:
             return _names_revision(run, version, rules, archive, absent)
+        if quest_gap:
+            return _quests_revision(run, version, rules, archive, quest_gap)
         return Step("correctifs", "rien", "aucun correctif du serveur en attente", {"pending": 0})
     try:
         source = _hotfix_source(run, version, archive, rules, [t for t, _ in pending])

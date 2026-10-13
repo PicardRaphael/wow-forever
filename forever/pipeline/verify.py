@@ -18,6 +18,7 @@ from forever.gamedata import SEED_FILES, build_game_data
 from forever.manifest import SOURCES_NAME
 from forever.pipeline.character_scaling import CHARACTER_FILE, character_errors
 from forever.pipeline.pets import PETS_FILE, pets_errors
+from forever.pipeline.quest_rewards import QUEST_FILE, quest_rewards_errors
 from forever.pipeline.sources import CERTAINTIES, inherited_files, load_source, source_provenance
 from forever.provenance import Provenance
 from forever.store import VersionData, current_identity
@@ -124,6 +125,11 @@ def check_version(v: VersionData) -> tuple[list[str], list[str], list[str]]:
             errors += pets_errors(_json(v, PETS_FILE))
         except (OSError, ValueError) as exc:
             errors.append(f"{PETS_FILE} illisible ({exc})")
+    if (v.path / QUEST_FILE).is_file():  # T04d, bloc B : table QuestXP, quêtes vues
+        try:
+            errors += quest_rewards_errors(_json(v, QUEST_FILE))
+        except (OSError, ValueError) as exc:
+            errors.append(f"{QUEST_FILE} illisible ({exc})")
     inherited = inherited_files(v)
     if inherited:
         warnings.append(f"{len(inherited)} fichier(s) hérité(s) d'une version antérieure, à revérifier")

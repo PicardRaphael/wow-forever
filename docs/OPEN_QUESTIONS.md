@@ -283,10 +283,17 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   repos et le groupe), et quelle est sa valeur exacte ?** Ajoutée le 2026-10-09 (note du 08/10, « environ 20 % »).
   Test : XP d'un monstre de donjon relevée seul, sans repos, comparée à l'XP de base de son niveau. Priorité :
   moyenne (T04d, DJ1). Registre I10.
+- **LVL6 — La disposition des champs de `questcache.wdb` lue par forever est-elle la bonne ?** Ajoutée le 2026-10-13
+  (T04d, bloc B) : niveau, niveau requis, zone et suite établis sur les 203 quêtes vues du cache de 1.60.1.70338,
+  égaux à la base Classic de Questie pour toutes les quêtes Classic sauf une quête retouchée (421, niveau requis), et
+  XP = `QuestXP` × multiplicateur égale à l'XP Classic de Questie sauf pour une quête de donjon au multiplicateur
+  relevé (5725) ; certitude `probable` (`quest_rewards.json`, `seen_quests`). Test : `xpReward` de chaque quête rendue,
+  relevé par ForeverLogger 0.4.0 pendant le jeu ordinaire, comparé par `forever xp check` (décision 247). Priorité :
+  basse. Registre I12.
 - **LVL10 — Pourquoi aucun bonus de repos dans les 2 714 gains d'XP relevés par ForeverLogger 0.3.0 ?** Ajoutée le
   2026-10-13 (T04d) : aucun texte ne porte la forme de Classic « (+N exp Rested bonus) » : pas de repos pendant ces
-  séances, ou texte (ou règle) du repos différent sur Forever. Test : sonde en jeu I (`docs/ADDON.md`, section 7,
-  étape 21) : monstres tués reposé puis non reposé, `GetXPExhaustion` et `UnitXP` relevés avant et après chaque gain
+  séances, ou texte (ou règle) du repos différent sur Forever. Test (décision 247 : sans sonde exigée) : en jouant
+  normalement, monstres tués reposé puis non reposé, `GetXPExhaustion` et `UnitXP` relevés avant et après chaque gain
   par ForeverLogger 0.4.0 (`xp_states`). Priorité : moyenne (T04d, T04f). Registre D7.
 
 ## PvP

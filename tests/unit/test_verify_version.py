@@ -10,6 +10,7 @@ from forever.manifest import write_manifest
 from forever.pipeline.character_scaling import CHARACTER_FILES
 from forever.pipeline.decode import CLASS_FILES, INHERITED_FILES
 from forever.pipeline.pets import PETS_FILES
+from forever.pipeline.quest_rewards import QUEST_FILES
 from forever.pipeline.verify import verify_version
 from forever.provenance import validate_provenance
 
@@ -41,7 +42,7 @@ def test_candidate_is_ok_and_lists_inherited_files(make_deps, candidate):
     assert r["ok"], r["errors"]
     assert set(r["inherited"]) == set(INHERITED_FILES) | set(CLASS_FILES) | set(CHARACTER_FILES) | set(
         PETS_FILES
-    )  # PV1, T08b, CH0
+    ) | set(QUEST_FILES)  # PV1, T08b, CH0, T04d
     assert any("hérité" in a for a in r["provenance"]["assumptions"])
 
 
