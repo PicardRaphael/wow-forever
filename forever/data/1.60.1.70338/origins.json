@@ -1336,6 +1336,59 @@
       "certainty": "probable",
       "reason": "règle ajustée sur 87 gains sur 92 ; niveau des monstres tiré du niveau fixe de Questie",
       "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.bonus_stacking"
+      ],
+      "origin": "manuel",
+      "source": "règle de l'émulateur TrinityCore et réponse de l'utilisateur au plan de T04f",
+      "certainty": "suppose",
+      "reason": "règle du serveur non observée (LVL12)",
+      "registry": "D10"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.sleeping_bag"
+      ],
+      "origin": "client",
+      "source": "description d'Unroll Bag et période de l'aura de suivi (client 1.60.1.70338)",
+      "certainty": "probable",
+      "registry": "D9"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.food_bonus"
+      ],
+      "origin": "manuel",
+      "source": "descriptions des nourritures nutritives du client, condition du serveur",
+      "certainty": "suppose",
+      "reason": "condition évaluée par le serveur (LVL13)",
+      "registry": "E3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.legacy_rested"
+      ],
+      "origin": "manuel",
+      "source": "description du perk Legacy Well Rested du client",
+      "certainty": "suppose",
+      "reason": "application au gain et au plafond supposée (LVL10)",
+      "registry": "D5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.camp_tent"
+      ],
+      "origin": "client",
+      "source": "description du sort Camp Tent du client",
+      "certainty": "probable",
+      "registry": "D5"
     }
   ],
   "pending": [],

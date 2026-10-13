@@ -25,6 +25,7 @@ from forever.engine.model import (
     Constants,
     FireVulnerability,
     FixedCoefficient,
+    FoodItem,
     GameData,
     IntPerCrit,
     LevelingConstants,
@@ -42,12 +43,16 @@ from forever.engine.model import (
     Restore,
     ScalingComponent,
     Scenario,
+    SleepingBag,
     Spell,
     StatGrowth,
     Talent,
     TalentRules,
     Utility,
     Variant,
+    XpBonusAura,
+    XpBonusData,
+    XpBonusEffect,
     XpRules,
     XpRuleSource,
 )
@@ -624,6 +629,97 @@ def _xp_rules(values: Mapping[str, Any], raw_char: Any) -> XpRules | None:
     )
 
 
+XP_BONUS_FILE = "xp_bonuses.json"  # T04f : bonus d'XP décodés du client
+XP_BONUS_KEYS = ("xp.bonus_stacking", "xp.sleeping_bag", "xp.food_bonus", "xp.legacy_rested", "xp.camp_tent")
+
+
+def _seconds(ms: Any) -> float | None:
+    return None if ms is None else float(ms) / MS_PER_S
+
+
+def _xp_bonuses(version: VersionData, values: Mapping[str, Any]) -> XpBonusData | None:
+    """Bonus d'XP (T04f) : `xp_bonuses.json` décodé du client et règles `xp.bonus_*` de `mechanics.json` ; None si la
+    version ne porte pas l'un ou l'autre."""
+    if not (version.path / XP_BONUS_FILE).is_file() or any(k not in values for k in XP_BONUS_KEYS):
+        return None
+    try:
+        raw = version.read_json(XP_BONUS_FILE)
+    except (OSError, ValueError) as exc:
+        raise DataSchemaError(f"{XP_BONUS_FILE} de {version.game_version} illisible ({exc}).") from exc
+    r = _Reader(XP_BONUS_FILE)
+    auras: dict[int, XpBonusAura] = {}
+    for a in r.list_(raw, "auras", "auras"):
+        ranks = (a.get("legacy") or {}).get("ranks") or {}
+        effects = tuple(
+            XpBonusEffect(
+                key=str(e["key"]),
+                applies_to=str(e["applies_to"]),
+                value=float(e["base_points"]),
+                misc=int(e["misc_value"]),
+                ranks=tuple(float(x) for x in ranks.get(str(e["index"]), [])),
+            )
+            for e in a["effects"]
+        )
+        certainty = a.get("certainty") or {}
+        auras[int(a["spell_id"])] = XpBonusAura(
+            spell_id=int(a["spell_id"]),
+            name=str(a.get("name") or a["spell_id"]),
+            effects=effects,
+            duration_s=_seconds(a.get("duration_ms")),
+            max_stacks=int(a["max_stacks"]),
+            access=str(a["access"]),
+            meaning_certainty=str(certainty.get("meaning", "suppose")),
+            access_certainty=str(certainty.get("access", "suppose")),
+        )
+    bag_raw = raw.get("sleeping_bag")
+    bag = (
+        SleepingBag(
+            item=int(bag_raw["item"]),
+            name=str(bag_raw.get("name") or bag_raw["item"]),
+            required_level=int(bag_raw.get("required_level") or 1),
+            aura=int(bag_raw["aura"]),
+            stack_period_s=float(bag_raw["stack_period_ms"]) / MS_PER_S,
+            bag_duration_s=float(bag_raw["bag_duration_ms"]) / MS_PER_S,
+            cooldown_s=float(bag_raw["item_cooldown_ms"]) / MS_PER_S,
+            max_stacks=int(bag_raw["max_stacks"]),
+        )
+        if isinstance(bag_raw, dict)
+        else None
+    )
+    food = tuple(
+        FoodItem(
+            item=int(f["item"]),
+            name=str(f.get("name") or f["item"]),
+            required_level=int(f.get("required_level") or 1),
+            buff_duration_s=_seconds(f.get("buff_duration_ms")),
+            xp_aura=int(f["xp_aura"]),
+        )
+        for f in raw.get("food") or []
+    )
+    camp = raw.get("camp") or {}
+    stacking = r.obj(r.obj(values, "xp.bonus_stacking", "xp.bonus_stacking"), "value", "xp.bonus_stacking")
+    mode = str(stacking.get("mode"))
+    if mode not in stacking.get("variants", []):
+        raise _Reader(MECHANICS_FILE).fail("xp.bonus_stacking.mode", " ou ".join(stacking.get("variants", [])))
+    return XpBonusData(
+        auras=auras,
+        sleeping_bag=bag,
+        food=food,
+        tent_threshold_pct=float(camp["tent"]["threshold_pct_of_level"]) if camp.get("tent") else None,
+        tent_cooldown_s=_seconds((camp.get("shared_cooldown") or {}).get("duration_ms")),
+        stacking=mode,
+        rested_after=bool(stacking.get("rested_after", True)),
+        sources={
+            key: XpRuleSource(
+                certainty=str(values[key].get("certainty", "suppose")),
+                source=str(values[key].get("source", "")),
+                registry=str(values[key].get("registry", "")),
+            )
+            for key in XP_BONUS_KEYS
+        },
+    )
+
+
 def _mob_model(raw: Any) -> MobModel:
     """`leveling.json.mob_model` (copie du seed) ; certitude « EST » du seed : `suppose`."""
     r = _Reader(LEVELING_FILE)
@@ -1083,6 +1179,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         character_ratios_from=str(ratios_from) if ratios_from else None,
         utility_source=utility_source,
         xp=_xp_rules(values, raw_char),
+        xp_bonuses=_xp_bonuses(version, values),
     )
 
 

@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70338 (ne
 de `forever/data/1.60.1.70338/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-159 chemins, 682 valeurs ; 87 `probable`, 72 `suppose`
+162 chemins, 690 valeurs ; 87 `probable`, 75 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -80,10 +80,13 @@ Aucun.
 | mechanics.json | `/values/spell.default_range_yd` | 1 | suppose | C2 | portée par défaut d'un sort sans portée publiée | repli de fm.py du seed |
 | mechanics.json | `/values/talents.first_level` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel) | fm.py du seed (points_available) |
 | mechanics.json | `/values/talents.points_per_tier` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (TraitCond) | fm.py du seed (check_build) |
+| mechanics.json | `/values/xp.bonus_stacking` | 4 | suppose | D10 | règle du serveur non observée (LVL12) | règle de l'émulateur TrinityCore et réponse de l'utilisateur au plan de T04f |
 | mechanics.json | `/values/xp.dungeon_kill_bonus` | 2 | probable | I10 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
 | mechanics.json | `/values/xp.elite_factor` | 1 | suppose | I13 | règle du serveur absente du client ; facteur de Classic, non vérifié pour Forever (LVL8) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
+| mechanics.json | `/values/xp.food_bonus` | 2 | suppose | E3 | condition évaluée par le serveur (LVL13) | descriptions des nourritures nutritives du client, condition du serveur |
 | mechanics.json | `/values/xp.group` | 5 | suppose | I11 | règle du serveur absente du client ; multiplicateurs de groupe de Classic, non vérifiés pour Forever (LVL4) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
 | mechanics.json | `/values/xp.group_level_basis` | 3 | probable | I11 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
+| mechanics.json | `/values/xp.legacy_rested` | 2 | suppose | D5 | application au gain et au plafond supposée (LVL10) | description du perk Legacy Well Rested du client |
 | mechanics.json | `/values/xp.mob_level_difference` | 26 | suppose | I6 | règle du serveur absente du client ; écart de niveau de Classic, non vérifié pour Forever | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
 | mechanics.json | `/values/xp.quest_level_difference` | 6 | suppose | I12 | règle du serveur absente du client ; réduction de Classic, non vérifiée pour Forever (LVL7) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
 | mechanics.json | `/values/xp.rested` | 5 | suppose | D7 | règle du serveur ; multiplicateur et période relus dans le client en mode forever, gain et plafond de Classic (LVL10) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |

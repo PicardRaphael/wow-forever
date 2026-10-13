@@ -102,6 +102,7 @@ _MAGE_FILES = (
     "spell_scaling.json",
     "spells.json",
     "talents.json",
+    "xp_bonuses.json",  # T04f : bonus d'XP, lus par build_game_data
 )
 _BUILD_CASES = tuple(
     f"{context}-{level}"

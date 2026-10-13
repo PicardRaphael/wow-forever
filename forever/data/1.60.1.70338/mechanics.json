@@ -843,6 +843,53 @@
      "source": "règle de Classic (vMangos, MaNGOS::XP::BaseGain) : XP de base au niveau du joueur"
     }
    ]
+  },
+  "xp.bonus_stacking": {
+   "value": {
+    "mode": "additive",
+    "variants": [
+     "additive",
+     "multiplicative"
+    ],
+    "rested_after": true
+   },
+   "certainty": "suppose",
+   "registry": "D10",
+   "source": "règle de l'émulateur TrinityCore (Unit::GetTotalAuraModifier : somme des auras d'un même type ; KillRewarder et Player::GiveXP : repos ajouté après les bonus), réponse de l'utilisateur au plan de T04f (2026-10-13) : les pourcentages d'XP des auras s'additionnent, puis le repos s'applique sur l'XP majorée ; variante multiplicative gardée (question LVL12)"
+  },
+  "xp.sleeping_bag": {
+   "value": {
+    "stacks_per_period": 1
+   },
+   "certainty": "probable",
+   "registry": "D9",
+   "source": "description du sort Unroll Bag du client (repos d'au moins une minute dans le sac, cumul jusqu'au maximum) et période de l'aura de suivi Well-Rested Tracking Aura (xp_bonuses.json sleeping_bag.stack_period_ms) : un cumul de Well-Rested par période de repos dans le sac posé"
+  },
+  "xp.food_bonus": {
+   "value": {
+    "requires": "well_fed_nutritious",
+    "renewed": true
+   },
+   "certainty": "suppose",
+   "registry": "E3",
+   "source": "descriptions des sorts Nutritious Food et Nutritious Drink du client (citent Well Fed XP Boost) ; condition de joueur 142418 évaluée par le serveur (expression d'état du monde, question LVL13) ; une séance suppose la nourriture renouvelée à chaque fin de buff"
+  },
+  "xp.legacy_rested": {
+   "value": {
+    "gain": "multiply",
+    "cap": "multiply"
+   },
+   "certainty": "suppose",
+   "registry": "D5",
+   "source": "description du perk Legacy Well Rested du client (repos accumulé plus vite, plafond relevé) : gain et plafond multipliés par (1 + valeur du rang), valeurs par rang lues dans les courbes (xp_bonuses.json) ; sens des codes d'aura 386 et 656 probable, application au gain et au plafond de Classic supposée (LVL10)"
+  },
+  "xp.camp_tent": {
+   "value": {
+    "mode": "raise_to_threshold"
+   },
+   "certainty": "probable",
+   "registry": "D5",
+   "source": "description du sort Camp Tent du client : repos remonté à un seuil en pourcentage d'un niveau (xp_bonuses.json camp.tent), sans effet au-dessus"
   }
  },
  "inherited_from": "1.60.1.70291"

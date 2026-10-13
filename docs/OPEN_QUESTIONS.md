@@ -278,12 +278,17 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **LVL2 — Les couleurs de quête de Forever sont-elles celles de Classic ?** Test : `UnitQuestTrivialLevelRange`
   relevé à chaque niveau par ForeverLogger. Priorité : basse. Registre I7.
   [Détail](research/questions-ouvertes-detail.md#lvl2)
-- **LVL3 — Combien de temps dure le Well-Rested du Cozy Sleeping Bag, et comment les bonus d'XP se cumulent-ils ?**
-  Ajoutée le 2026-10-07 (décision 199) : 2 h selon le client d'après foreverchanges.pro, 1 h selon des guides ; rien
-  n'entre dans les données sans lecture du client. Test : `SpellDuration` du sort de l'aura dans les tables du client
-  (wago), puis temps restant de l'aura relevé hors combat par ForeverLogger ; cumul : gain d'XP d'un même monstre avec
-  et sans chaque bonus. Priorité : moyenne (T04f). Registre D5, D7.
-  [Détail](research/questions-ouvertes-detail.md#lvl3)
+- **LVL12 — Les pourcentages d'XP des auras s'additionnent-ils, et le repos s'applique-t-il sur l'XP majorée ?**
+  Ajoutée le 2026-10-13 (T04f, reprend la partie « cumul » de LVL3) : règle de TrinityCore écrite en `suppose`
+  (`xp.bonus_stacking`, addition puis repos), variante multiplicative gardée. Test (sans sonde exigée) : gains d'un
+  même monstre relevés par ForeverLogger 0.5.0 avec et sans Well-Rested, avec et sans nourriture nutritive, comparés
+  par `forever xp check`. Priorité : moyenne. Registre D10.
+- **LVL13 — Que demande la condition de joueur 142418 du bonus d'XP de la nourriture, et vaut-il pour toute
+  nourriture nutritive ?** Ajoutée le 2026-10-13 (T04f, bloc A) : la condition ne porte qu'une expression d'état du
+  monde (47054, évaluée par le serveur) et un drapeau de sens inconnu ; rien dans le client ne dit quand elle est
+  vraie (un événement, une période de lancement ?). Test : ligne « experience gained from kills is increased » dans
+  l'infobulle du buff Well Fed, et gain d'un monstre avec et sans ce buff (ForeverLogger 0.5.0). Priorité : moyenne.
+  Registre E3.
 - **LVL4 — Comment l'XP en groupe est-elle ajustée pour chaque joueur, et à partir de quel écart un membre de niveau
   très supérieur au monstre coupe-t-il l'XP de tout le groupe ?** Ajoutée le 2026-10-09 : la note du 08/10
   (t/2360696/5, révision 1) revient au calcul de Classic Era (niveau de chaque joueur) et garde la coupure, sans en

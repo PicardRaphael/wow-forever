@@ -7,11 +7,13 @@ Aucun chiffre de jeu ici. Unités : points d'XP (nombres à virgule, arrondis à
 
 from __future__ import annotations
 
+import math
+from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 
 from forever.engine import leveling
-from forever.engine.model import GameData, XpBonusData, XpRules
+from forever.engine.model import GameData, XpBonusAura, XpBonusData, XpRules
 from forever.errors import DataSchemaError
 
 
@@ -116,9 +118,7 @@ def mob_kill_xp(
     """XP d'un monstre tué : base, écart de niveau, élite, donjon, groupe, puis repos (dans la limite du réservoir).
 
     Registre : I6, I10, I11, I13, D7"""
-    if bonuses is not None:
-        raise NotImplementedError
-    if gd.xp is None and mob_level == player_level and not (elite or dungeon or party or rested_pool):
+    if gd.xp is None and mob_level == player_level and not (elite or dungeon or party or rested_pool or bonuses):
         base, base_term = base_kill_xp(gd, player_level)
         return XpResult(base, 0.0, (base_term,))  # version sans règles d'XP : monstre de même niveau seulement
     rules = xp_rules(gd)
@@ -149,22 +149,25 @@ def mob_kill_xp(
         share = rate * player_level / sum(party.levels)
         terms.append(_term(rules, "xp.group", share))
         xp *= share
+    before_bonus = xp
+    if bonuses is not None:  # T04f : bonus d'XP des auras, après groupe et donjon (D10)
+        factor, bonus_terms = xp_multiplier(gd, bonuses, source="kill", creature_type=creature_type)
+        if factor != 1.0:
+            terms += bonus_terms
+            xp *= factor
     used = 0.0
     if rested_pool > 0 and xp > 0:
-        used = min(xp * (rules.rested_factor - 1), rested_pool)
+        rested_after = gd.xp_bonuses.rested_after if gd.xp_bonuses is not None else True
+        used = min((xp if rested_after else before_bonus) * (rules.rested_factor - 1), rested_pool)
         terms.append(_term(rules, "xp.rested", (xp + used) / xp))
         xp += used
     return XpResult(xp, used, tuple(terms))
 
 
-def quest_xp(
-    gd: GameData, player_level: int, quest: QuestXpInput, *, bonuses: XpBonusState | None = None
-) -> XpResult:
+def quest_xp(gd: GameData, player_level: int, quest: QuestXpInput, *, bonuses: XpBonusState | None = None) -> XpResult:
     """XP d'une quête rendue : XP de base réduite selon l'écart de niveau ; jamais de repos.
 
     Registre : I12"""
-    if bonuses is not None:
-        raise NotImplementedError
     rules = xp_rules(gd)
     terms = [Term("quest_base_xp", quest.base_xp, quest.certainty, quest.source)]
     beyond = player_level - quest.level - rules.quest_full_diff
@@ -172,22 +175,29 @@ def quest_xp(
     if beyond > 0:
         factor = rules.quest_reduction[min(beyond, len(rules.quest_reduction)) - 1]
         terms.append(_term(rules, "xp.quest_level_difference", factor))
-    return XpResult(quest.base_xp * factor, 0.0, tuple(terms))
+    xp = quest.base_xp * factor
+    if bonuses is not None:  # T04f : bonus d'XP des quêtes (D10)
+        bonus, bonus_terms = xp_multiplier(gd, bonuses, source="quest")
+        if bonus != 1.0:
+            terms += bonus_terms
+            xp *= bonus
+    return XpResult(xp, 0.0, tuple(terms))
 
 
-def rested_gain(
-    gd: GameData, level: int, hours: float, *, inn: bool, pool: float = 0.0, legacy_rank: int = 0
-) -> float:
+def rested_gain(gd: GameData, level: int, hours: float, *, inn: bool, pool: float = 0.0, legacy_rank: int = 0) -> float:
     """Réservoir de repos après `hours` heures hors ligne (auberge ou dehors), plafonné.
 
-    Registre : D7"""
-    if legacy_rank:
-        raise NotImplementedError
+    `legacy_rank` : rang du perk Legacy Well Rested (T04f) : gain multiplié par (1 + valeur du rang).
+
+    Registre : D7, D5"""
     rules = xp_rules(gd)
-    level_xp = gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1]
-    per_period = rules.rested_gain_per_period * level_xp * (1.0 if inn else rules.rested_outdoor_ratio)
-    gained = per_period * hours / rules.rested_period_h
-    return min(pool + gained, rules.rested_cap_levels * level_xp)
+    per_period = rules.rested_gain_per_period * _level_xp(gd, level) * (1.0 if inn else rules.rested_outdoor_ratio)
+    gained = per_period * hours / rules.rested_period_h * (1 + _legacy_rested(gd, legacy_rank, "rested_gain"))
+    return min(pool + gained, rested_cap(gd, level, legacy_rank))
+
+
+def _level_xp(gd: GameData, level: int) -> float:
+    return float(gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1])
 
 
 # --- T04f : bonus d'XP (registre : D5, D7, D9, D10, E3) ---------------------------------------------------------
@@ -226,8 +236,75 @@ class SessionXp:
     terms: tuple[Term, ...]
 
 
+PERCENT = 100.0  # conversion d'unité : pourcentage du client -> fraction
+_RANK = {"certain": 2, "probable": 1, "suppose": 0}
+STACKING_RULE = "xp.bonus_stacking"
+
+
+def _min_certainty(*values: str) -> str:
+    return min(values, key=lambda c: _RANK.get(c, 0))
+
+
 def xp_bonus_data(gd: GameData) -> XpBonusData:
-    raise NotImplementedError
+    """Bonus d'XP de la version ; DataSchemaError si elle ne les porte pas (`xp_bonuses.json`, `xp.bonus_*`)."""
+    if gd.xp_bonuses is None:
+        raise DataSchemaError(
+            f"Bonus d'XP absents des données de {gd.game_version} (xp_bonuses.json, mechanics.json xp.bonus_*).",
+            "installer une version de données de T04f ou plus récente",
+        )
+    return gd.xp_bonuses
+
+
+def _active(state: XpBonusState, data: XpBonusData) -> list[ActiveAura]:
+    """Auras actives de l'état, avec l'aura de nourriture quand `food` (bonus permanent tant que la nourriture
+    nutritive est renouvelée, xp.food_bonus)."""
+    active = list(state.auras)
+    if state.food:
+        for a in data.auras.values():
+            if a.access == "food" and all(x.spell_id != a.spell_id for x in active):
+                active.append(ActiveAura(a.spell_id))
+    return active
+
+
+def _applied(
+    data: XpBonusData, auras: list[ActiveAura], source: str, creature_type: int | None
+) -> list[tuple[XpBonusAura, float]]:
+    """(aura, part ajoutée) de chaque aura applicable à `source` ; une aura sans source joueur (`none`) ou épuisée
+    n'entre jamais ; cumuls bornés au maximum du client."""
+    out: dict[int, tuple[XpBonusAura, float]] = {}
+    for active in auras:
+        a = data.auras.get(active.spell_id)
+        if a is None or a.access == "none" or (active.remaining_s is not None and active.remaining_s <= 0):
+            continue
+        stacks = max(0, min(active.stacks, a.max_stacks))
+        for e in a.effects:
+            if e.applies_to != source or not e.value:
+                continue
+            if e.key == "creature_type_kill_xp_pct" and e.misc != creature_type:
+                continue
+            prev = out.get(a.spell_id, (a, 0.0))[1]
+            out[a.spell_id] = (a, prev + e.value * stacks / PERCENT)
+    return [v for v in out.values() if v[1]]
+
+
+def _bonus_term(a: XpBonusAura, part: float) -> Term:
+    return Term(
+        f"xp_bonus.{a.spell_id}",
+        1 + part,
+        _min_certainty(a.meaning_certainty, a.access_certainty),
+        f"client : {a.name} (sort {a.spell_id}, xp_bonuses.json)",
+    )
+
+
+def _stacking_term(data: XpBonusData, factor: float) -> Term:
+    src = data.sources.get(STACKING_RULE)
+    return Term(STACKING_RULE, factor, src.certainty if src else "suppose", src.source if src else STACKING_RULE)
+
+
+def _combine(parts: list[float], mode: str) -> float:
+    if mode == "multiplicative":
+        return math.prod(1 + p for p in parts)
+    return 1 + sum(parts)
 
 
 def xp_multiplier(
@@ -238,19 +315,76 @@ def xp_multiplier(
     mode: str | None = None,
     creature_type: int | None = None,
 ) -> tuple[float, tuple[Term, ...]]:
-    raise NotImplementedError
+    """Facteur des bonus d'XP actifs pour `source` (`kill` ou `quest`) : somme des pourcentages (règle
+    xp.bonus_stacking ; `mode` « multiplicative » : variante) ; un terme par bonus, plus la règle de cumul quand
+    plusieurs bonus se cumulent.
+
+    Registre : D9, D10, E3"""
+    if state is None:
+        return 1.0, ()
+    data = xp_bonus_data(gd)
+    applied = _applied(data, _active(state, data), source, creature_type)
+    if not applied:
+        return 1.0, ()
+    factor = _combine([p for _, p in applied], mode or data.stacking)
+    terms = [_bonus_term(a, p) for a, p in applied]
+    if len(applied) > 1:
+        terms.append(_stacking_term(data, factor))
+    return factor, tuple(terms)
+
+
+def _legacy_rested(gd: GameData, rank: int, applies_to: str) -> float:
+    """Part ajoutée par le perk Legacy de repos au rang `rank` (0 : aucun) au gain ou au plafond du repos."""
+    if rank <= 0:
+        return 0.0
+    for a in xp_bonus_data(gd).auras.values():
+        if a.access != "legacy":
+            continue
+        for e in a.effects:
+            if e.applies_to == applies_to and e.ranks:
+                return e.ranks[min(rank, len(e.ranks)) - 1] / PERCENT
+    return 0.0
 
 
 def rested_cap(gd: GameData, level: int, legacy_rank: int = 0) -> float:
-    raise NotImplementedError
+    """Plafond du réservoir de repos, relevé par le perk Legacy Well Rested (xp.legacy_rested).
+
+    Registre : D7, D5"""
+    rules = xp_rules(gd)
+    return rules.rested_cap_levels * _level_xp(gd, level) * (1 + _legacy_rested(gd, legacy_rank, "rested_cap"))
 
 
 def tent_rested(gd: GameData, level: int, pool: float) -> float:
-    raise NotImplementedError
+    """Réservoir après la tente du camp : remonté au seuil lu (pourcentage d'un niveau), inchangé au-dessus
+    (xp.camp_tent).
+
+    Registre : D5"""
+    data = xp_bonus_data(gd)
+    if data.tent_threshold_pct is None:
+        return pool
+    return max(pool, data.tent_threshold_pct / PERCENT * _level_xp(gd, level))
 
 
 def sleeping_bag_state(gd: GameData, stacks: int | None = None) -> XpBonusState:
-    raise NotImplementedError
+    """État juste après le sac de couchage : Well-Rested à `stacks` cumuls (défaut : le maximum du client), durée
+    entière.
+
+    Registre : D9"""
+    data = xp_bonus_data(gd)
+    bag = data.sleeping_bag
+    if bag is None:
+        raise DataSchemaError(f"Sac de couchage absent des données de {gd.game_version} (xp_bonuses.json).")
+    return XpBonusState(auras=(ActiveAura(bag.aura, stacks or bag.max_stacks, data.auras[bag.aura].duration_s),))
+
+
+def _covered(active: list[ActiveAura], elapsed: float, dt_s: float) -> list[tuple[ActiveAura, float]]:
+    """Part du pas couverte par chaque aura encore active."""
+    out = []
+    for a in active:
+        share = 1.0 if a.remaining_s is None else min(max((a.remaining_s - elapsed) / dt_s, 0.0), 1.0)
+        if share > 0:
+            out.append((a, share))
+    return out
 
 
 def session_xp(
@@ -264,4 +398,59 @@ def session_xp(
     level: int,
     step_s: float = 60.0,
 ) -> SessionXp:
-    raise NotImplementedError
+    """Séance de `hours` heures à `base_xp_h` d'XP par heure sans bonus (part `kill_share` venue des monstres, le
+    reste des quêtes), déroulée par pas de `step_s` secondes : chaque aura compte sur son temps restant, le repos
+    s'applique aux monstres jusqu'à épuisement du réservoir. Rend l'XP par heure moyenne et la part de chaque bonus
+    (`level` : niveau du personnage, gardé pour les règles qui en dépendent).
+
+    Registre : D7, D9, D10, E3"""
+    if hours <= 0:
+        raise ValueError("durée de séance positive attendue")
+    steps = max(1, math.ceil(hours * 3600 / step_s))
+    dt_s = hours * 3600 / steps
+    data = xp_bonus_data(gd) if state is not None else None
+    rules = xp_rules(gd) if rested_pool > 0 else None
+    pool, used_total, total = rested_pool, 0.0, 0.0
+    by: dict[str, float] = defaultdict(float)
+    terms: dict[str, Term] = {}
+    active = _active(state, data) if state is not None and data is not None else []
+    for i in range(steps):
+        kill = base_xp_h * dt_s / 3600 * kill_share
+        quest = base_xp_h * dt_s / 3600 * (1 - kill_share)
+        gained, kill_after = kill + quest, kill
+        if data is not None:
+            now = _covered(active, i * dt_s, dt_s)
+            weights = {a.spell_id: w for a, w in now}
+            for amount, source in ((kill, "kill"), (quest, "quest")):
+                applied = [(a, p * weights[a.spell_id]) for a, p in _applied(data, [a for a, _ in now], source, None)]
+                if not amount or not applied:
+                    continue
+                factor = _combine([p for _, p in applied], data.stacking)
+                extra = amount * (factor - 1)
+                weight = sum(p for _, p in applied)
+                for a, p in applied:
+                    by[f"xp_bonus.{a.spell_id}"] += extra * p / weight
+                    terms.setdefault(f"xp_bonus.{a.spell_id}", _bonus_term(a, p))
+                if len(applied) > 1:
+                    terms.setdefault(STACKING_RULE, _stacking_term(data, factor))
+                gained += extra
+                if source == "kill":
+                    kill_after = kill * factor
+        if rules is not None and pool > 0 and kill > 0:
+            rested_after = data.rested_after if data is not None else True
+            used = min((kill_after if rested_after else kill) * (rules.rested_factor - 1), pool)
+            pool -= used
+            used_total += used
+            gained += used
+            by["xp.rested"] += used
+            terms.setdefault("xp.rested", _term(rules, "xp.rested", rules.rested_factor))
+        total += gained
+    return SessionXp(
+        xp_h=total / hours,
+        base_xp_h=base_xp_h,
+        hours=hours,
+        total_xp=total,
+        rested_used=used_total,
+        by_bonus={k: v for k, v in by.items() if v},
+        terms=tuple(terms.values()),
+    )
