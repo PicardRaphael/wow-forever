@@ -367,6 +367,19 @@ def build_parser() -> argparse.ArgumentParser:
     q_show.add_argument("--offset", type=int, default=0, help="première quête de la page")
     q_show.add_argument("--json", action="store_true", help="sortie JSON")
 
+    xp = sub.add_parser("xp", help="modèle d'XP de Forever (T04d)")
+    xp_sub = xp.add_subparsers(dest="xp_command", required=True, parser_class=_Parser)
+    xp_check_p = xp_sub.add_parser(
+        "check", help="vérification passive du modèle sur les gains relevés par ForeverLogger (rien n'est écrit)"
+    )
+    xp_check_p.add_argument(
+        "--sv", help="dossier SavedVariables contenant ForeverLogger.lua (défaut : tous les comptes)"
+    )
+    xp_check_p.add_argument(
+        "--questie", help="dossier de l'addon Questie (niveau fixe des monstres sans cible relevée)"
+    )
+    xp_check_p.add_argument("--json", action="store_true", help="sortie JSON")
+
     questie = sub.add_parser("questie", help="base locale de l'addon Questie (communautaire, sans réseau)")
     questie_sub = questie.add_subparsers(dest="questie_command", required=True, parser_class=_Parser)
     info = questie_sub.add_parser("info", help="version et contenu de l'addon Questie installé")
@@ -1009,6 +1022,25 @@ def render_quests(res: Mapping[str, Any]) -> list[str]:
     lines = [f"Quêtes : {res['total']} (affichées {len(res['quests'])} à partir de {res['offset']})"]
     lines += [_quest_line(q) for q in res["quests"]] or ["  aucune"]
     return lines
+
+
+def _cmd_xp(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.xp_check import xp_check
+
+    rep = xp_check(
+        deps, sv_dir=Path(args.sv) if args.sv else None, questie_dir=Path(args.questie) if args.questie else None
+    )
+    lines = [f"Vérification passive du modèle d'XP ({rep['loggers']} relevé(s) ForeverLogger, rien n'est écrit)"]
+    for r in rep["rules"]:
+        gap = f", écart médian {r['median_gap']:+.1%}" if r["median_gap"] is not None else ""
+        outside = f", {r['outside']} hors tolérance" if r["outside"] else ""
+        question = f" (question {r['question']})" if r["verdict"] != "vérifié" else ""
+        lines.append(f"  {r['label']} : {r['verdict']} · {r['cases']} cas{gap}{outside}{question}")
+    skipped = ", ".join(f"{k} {n}" for k, n in rep["skipped"].items() if n)
+    if skipped:
+        lines.append(f"  écartés : {skipped}")
+    _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
 
 
 def _cmd_quests(deps: Deps, args: argparse.Namespace) -> int:
@@ -3915,6 +3947,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
         "quests": _cmd_quests,
+        "xp": _cmd_xp,
         "origins": _cmd_origins,
         "hotfixes": _cmd_hotfixes,
         "addons": _cmd_addons,

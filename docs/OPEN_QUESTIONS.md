@@ -264,7 +264,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   aussi l'XP et le niveau de quelques quêtes (Elixir of Pain, Shadowvale et Bandarion Keep, Gelkis et Magram). Le
   modèle d'XP des monstres reste la règle Classic (`suppose`). Test : XP relevée par quête et par monstre
   (ForeverLogger) et sources de T04d (ForeverDungeonJournal, GearQuestForever, tables de quêtes). Priorité :
-  moyenne. Registre I6, I9, I10, I11. [Détail](research/questions-ouvertes-detail.md#lvl1)
+  moyenne. Registre I6, I9, I10, I11. *Modifiée le 2026-10-13 (T04d, `forever xp check` sur les 2 714 gains de
+  ForeverLogger 0.3.0, niveau du monstre pris au niveau fixe de Questie)* : XP d'un monstre de même niveau égale à
+  `PerKill` du client dans 94 cas sur 98 (vérifiée) ; monstre plus bas : la règle écrite (XP de base au niveau du
+  joueur × (1 - écart / écart nul)) surestime l'XP d'environ 8 % (106 cas sur 145 hors tolérance), alors que la même
+  formule avec l'XP de base au **niveau du monstre** retrouve presque tous les gains relevés (par exemple niveau 2
+  contre un monstre de niveau 1 : 40 ; niveau 10 contre 5 : 20 ; niveau 16 contre 15 : 107). Règle non changée sans
+  accord (règle de jeu) ; à trancher : adopter la base au niveau du monstre. [Détail](research/questions-ouvertes-detail.md#lvl1)
 - **LVL2 — Les couleurs de quête de Forever sont-elles celles de Classic ?** Test : `UnitQuestTrivialLevelRange`
   relevé à chaque niveau par ForeverLogger. Priorité : basse. Registre I7.
   [Détail](research/questions-ouvertes-detail.md#lvl2)

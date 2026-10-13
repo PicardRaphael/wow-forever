@@ -1273,6 +1273,16 @@
       "certainty": "suppose",
       "reason": "temps de trajet, de quête et de donjon non mesurés (ForeverLogger les mesurera)",
       "registry": "I14"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/measures.xp_check"
+      ],
+      "origin": "parametre",
+      "source": "paramètres de la vérification passive du modèle d'XP (T04d, bloc G)",
+      "reason": "réglage de l'outil de vérification, pas une valeur du jeu",
+      "registry": "I6"
     }
   ],
   "pending": [],

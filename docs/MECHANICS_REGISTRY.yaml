@@ -1547,6 +1547,8 @@ mechanics:
       - tests/unit/test_engine_xp.py::test_higher_level_mob_gains_per_level_up_to_the_cap
       - tests/unit/test_engine_xp.py::test_lower_level_mob_follows_zero_difference
       - tests/unit/test_engine_xp.py::test_gray_mob_gives_nothing
+      - tests/unit/test_xp_check.py::test_same_level_gains_verify_the_client_per_kill
+      - tests/unit/test_xp_check.py::test_level_difference_gap_is_reported
     tolerance: null
     formule: "temps par monstre = combat + repos + course entre monstres ; repos = max(mana dépensée / (boisson + Esprit), dégâts subis / (nourriture + régénération de repos × PV)) ; XP par heure = XP du monstre × secondes par heure / temps par monstre"
     note: "T08b, bloc A : en mode forever, XP par niveau (LevelExperience, concorde avec la GameTable xp) et constante d'armure par niveau (ExpectedStat, probable : table lue par le serveur inconnue, armormitigationbylvl en écart) lues dans le client ; T04d, bloc C : XP d'un monstre de même niveau lue dans le client (GameTable xp, colonne PerKill, character_scaling.json kill_xp ; égale à 45 + 5 × niveau, la règle leveling.mob_xp, à chaque niveau), modulation par l'écart de niveau et monstres gris (xp.mob_level_difference) règle de Classic (suppose), modèle dans forever/engine/xp.py ; note officielle du 08/10 (t/2360696/5, révision 1) : XP des monstres de donjon (I10) et XP en groupe (I11) changées par le serveur, sans effet sur ce simulateur (monstres du monde, joueur seul)"

@@ -818,6 +818,15 @@
    "certainty": "suppose",
    "registry": "I14",
    "source": "hypothèses de temps des objectifs de leveling (T04d, bloc F), à mesurer par ForeverLogger (acceptation -> rendu d'une quête, durée d'un passage en donjon) : monstres tués par quête, surcoût par quête (prise, trajet, rendu), trajet aller et retour d'un donjon, monstres tués dans un donjon, taille du groupe de donjon, gain de vitesse d'un groupe sur le temps par monstre seul ; le classement des objectifs peut en dépendre plus que de l'XP"
+  },
+  "measures.xp_check": {
+   "value": {
+    "tolerance": 0.02,
+    "min_cases": 3
+   },
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "paramètres de forever xp check (T04d, bloc G) : écart relatif toléré entre un gain relevé et le modèle (arrondis du serveur), cas minimaux pour dire une règle vérifiée"
   }
  },
  "inherited_from": "1.60.1.70291"
