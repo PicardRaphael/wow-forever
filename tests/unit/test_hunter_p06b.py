@@ -180,11 +180,12 @@ def test_hunter_leveling_gives_zones_dungeon_and_popular_build(hunter_bench):
     deps, data = hunter_bench
     plan = button_plan("leveling", resolve(data, context("chasseur15")), data.level_cap)
     assert plan is not None
-    assert [c.tool for c in plan.calls] == ["forever_lookup", "forever_lookup"]
-    assert [c.args["kind"] for c in plan.calls] == ["zones", "tf_popular"]
+    # T04d, bloc F : objectifs de leveling (XP par heure par zone et donjon) pour toutes les classes
+    assert [c.tool for c in plan.calls] == ["forever_lookup", "forever_lookup", "forever_sim_leveling"]
+    assert [c.args["kind"] for c in plan.calls] == ["zones", "tf_popular", "objectives"]
     text = plan_text(plan)
     assert "pas encore calculé" in text and "donjon" in text
-    zones, popular = run_calls(deps, plan)
+    zones, popular, _objectives = run_calls(deps, plan)
     assert zones["zones"] and zones["provenance"]
     assert popular.get("closest") or popular.get("builds")
 
