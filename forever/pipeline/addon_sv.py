@@ -401,6 +401,39 @@ def _quest_event(q: dict[str, Any], path: Path) -> QuestEvent:
     )
 
 
+def _run(r: dict[str, Any]) -> Run:
+    encounters = [
+        Encounter(_opt_int(e.get("id")), _str(e.get("name")), _bool(e.get("success")), _opt_int(e.get("time")))
+        for e in _list(r.get("encounters"))
+        if isinstance(e, dict)
+    ]
+    return Run(
+        _opt_int(r.get("id")),
+        _str(r.get("instance")),
+        _str(r.get("type")),
+        _opt_int(r.get("difficulty")),
+        _opt_int(r.get("level")),
+        _opt_int(r.get("group")),
+        _opt_int(r.get("entered")),
+        _opt_int(r.get("left")),
+        encounters,
+    )
+
+
+def _loot(entry: dict[str, Any]) -> LootEvent:
+    items = [
+        {
+            "item": _opt_int(i.get("item")),
+            "quantity": _opt_int(i.get("quantity")),
+            "npc": _opt_int(i.get("npc")),
+            "source": _str(i.get("source")),
+        }
+        for i in _list(entry.get("items"))
+        if isinstance(i, dict) and _opt_int(i.get("item")) is not None
+    ]
+    return LootEvent(_opt_int(entry.get("time")), _opt_int(entry.get("instance")), items)
+
+
 def read_logger_db(path: Path) -> LoggerDB:
     """`ForeverLoggerDB` lue dans un fichier de SavedVariables (PathNotFoundError, DataSchemaError)."""
     if not path.is_file():
@@ -487,5 +520,7 @@ def read_logger_db(path: Path) -> LoggerDB:
             [q for q in quests if q.event == "accepted"],
             [q for q in quests if q.event == "turned_in"],
             _legacy(c.get("legacy")),
+            [_run(r) for r in _list(c.get("runs")) if isinstance(r, dict)],
+            [_loot(x) for x in _list(c.get("loot")) if isinstance(x, dict)],
         )
     return LoggerDB(_opt_int(raw.get("schema")), characters)

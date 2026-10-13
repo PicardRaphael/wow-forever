@@ -9,6 +9,8 @@
 -- T04f (0.5.0, schéma 3) : auras actives du joueur (sort, cumuls, temps restant) dans chaque état de l'XP et chaque
 -- gain ; rangs des perks Legacy lus hors combat (arbres donnés par ForeverBridge depuis les données, jamais écrits
 -- ici), gardés dans legacy.
+-- DJ1 (0.6.0, schéma 4) : passages en instance (entrée, sortie, rencontres de ENCOUNTER_END) dans runs, butin
+-- ramassé (objet, quantité, PNJ source par GetLootSourceInfo) dans loot.
 --
 -- Règles (docs/ADDON.md) :
 -- * ForeverLoggerDB est initialisée dans ADDON_LOADED, jamais d'alias local au niveau du fichier ;
@@ -17,7 +19,7 @@
 -- * aucun abonnement au journal de combat : l'analyse se fait hors du jeu, sur WoWCombatLog-*.txt.
 
 local ADDON_NAME = ...
-local SCHEMA = 3
+local SCHEMA = 4
 local MAX_AURAS = 16 -- auras gardées par relevé
 local AURA_SCAN = 40 -- auras parcourues au plus
 local MAX_ENTRIES = 5000 -- entrées gardées par liste (instantanés, gains d'expérience)
@@ -292,6 +294,66 @@ local function groupInfo()
   return group
 end
 
+-- DJ1 : identifiant du PNJ d'un GUID de créature (« Creature-0-serveur-instance-zone-PNJ-apparition »).
+local function npcOf(guid)
+  if type(guid) ~= "string" then
+    return nil
+  end
+  local kind, npc = guid:match("^(%a+)%-%d+%-%d+%-%d+%-%d+%-(%d+)%-")
+  if kind == "Creature" or kind == "Vehicle" then
+    return tonumber(npc)
+  end
+  return nil
+end
+
+local RUN_TYPES = { party = true, raid = true } -- instances dont le passage est relevé
+
+-- Passage ouvert (dernier passage sans heure de sortie) ou nil.
+local function openRun(entry)
+  local last = entry.runs and entry.runs[#entry.runs]
+  if last and last.left == nil then
+    return last
+  end
+  return nil
+end
+
+-- DJ1 : entrée ou sortie d'instance, vue à chaque changement de zone ; une instance illisible ne change rien.
+local function updateRun()
+  local entry = character()
+  if not entry then
+    return
+  end
+  local info = instanceInfo()
+  if not info then
+    return
+  end
+  entry.runs = entry.runs or {}
+  local open = openRun(entry)
+  local now = safe(GetServerTime)
+  if info.inside and RUN_TYPES[info.type] and info.id then
+    if open and open.id == info.id then
+      return
+    end
+    if open then
+      open.left = now
+    end
+    local details = returns(GetInstanceInfo)
+    push(entry.runs, {
+      seq = nextSeq(),
+      instance = info.name,
+      id = info.id,
+      type = info.type,
+      difficulty = details and details[3],
+      level = safe(UnitLevel, "player"),
+      group = safe(GetNumGroupMembers),
+      entered = now,
+      encounters = {},
+    })
+  elseif open then
+    open.left = now
+  end
+end
+
 local function snapshot(reason, level)
   local entry = character()
   if not entry then
@@ -555,10 +617,57 @@ end
 function handlers.PLAYER_ENTERING_WORLD()
   enableCombatLog()
   forgetSeen()
+  updateRun()
 end
 
 function handlers.ZONE_CHANGED_NEW_AREA()
   forgetSeen()
+  updateRun()
+end
+
+-- ENCOUNTER_END : (rencontre, nom, difficulté, taille du groupe, succès 1 ou 0).
+function handlers.ENCOUNTER_END(id, name, _, _, success)
+  local entry = character()
+  local run = entry and openRun(entry)
+  if not run then
+    return
+  end
+  run.encounters = run.encounters or {}
+  table.insert(run.encounters, { id = id, name = name, success = success == 1, time = safe(GetServerTime) })
+end
+
+-- LOOT_OPENED : objets de la fenêtre de butin, quantité, GUID et PNJ de la source (monnaie sans lien : ignorée).
+function handlers.LOOT_OPENED()
+  local entry = character()
+  if not entry then
+    return
+  end
+  local items = {}
+  for slot = 1, safe(GetNumLootItems) or 0 do
+    local link = safe(GetLootSlotLink, slot)
+    local item = type(link) == "string" and tonumber(link:match("item:(%d+)")) or nil
+    if item then
+      local info = returns(GetLootSlotInfo, slot)
+      local sources = returns(GetLootSourceInfo, slot)
+      local guid = sources and sources[1]
+      table.insert(items, {
+        item = item,
+        quantity = info and info[3],
+        source = type(guid) == "string" and guid or nil,
+        npc = npcOf(guid),
+      })
+    end
+  end
+  if #items == 0 then
+    return
+  end
+  local info = instanceInfo()
+  entry.loot = entry.loot or {}
+  push(entry.loot, stamp({
+    seq = nextSeq(),
+    instance = info and info.inside and info.id or nil,
+    items = items,
+  }))
 end
 
 function handlers.PLAYER_LEVEL_UP(level)
