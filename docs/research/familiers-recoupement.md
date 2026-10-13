@@ -3,11 +3,11 @@
 Rapport généré par `forever pets crosscheck --markdown` : ne pas éditer à la main. Le client fait foi ;
 chaque écart est listé avec ses deux valeurs et leurs sources, jamais tranché.
 
-- Client : client 1.60.1.70124 (pets.json)
+- Client : client 1.60.1.70338 (pets.json)
 - Addon : Forever Bestiary 0.5.0 (base du 2026-09-25, client 1.60.1.69913 ; carte communautaire du 2026-09-29)
 - Questie : Questie 11.38.0 (base Classic Era)
 - Familles : 19 dans le client, 18 dans l'addon, 18 comparées ; capacités de l'addon : 25 ; bêtes de l'addon : 606 (dont 552 dans Questie)
-- Écarts : 29 ; PNJ dont Questie ne donne que le continent (non comptés) : 32
+- Écarts : 30 ; PNJ dont Questie ne donne que le continent (non comptés) : 32
 
 ## Entrées du client jamais vues en jeu
 
@@ -45,6 +45,12 @@ chaque écart est listé avec ses deux valeurs et leurs sources, jamais tranché
 | Sujet | Champ | client | addon |
 | --- | --- | --- | --- |
 | core-hound | — | Core Hound | — |
+
+## Capacités d'une famille différentes (1)
+
+| Sujet | Champ | client | addon |
+| --- | --- | --- | --- |
+| bat | — | bite, dive, sonic-blast | bite, dive |
 
 ## Plage de niveau d'un PNJ différente de Questie (20)
 

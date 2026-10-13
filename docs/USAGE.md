@@ -91,6 +91,7 @@ uv run forever update --only jeu,correctifs  # étapes : jeu, correctifs, journa
 uv run forever update status                 # attentes ouvertes et dernier passage ; --all : historique complet
 uv run forever update approve <id>           # approuver (base inchangée), passage lancé en arrière-plan ; --wait
 uv run forever update reject <id> --reason "…"
+uv run forever update done <id> --note "…"      # clore une relecture faite en session (données d'addon, colonnes ; décision 244)
 uv run forever addons inventory <dossier>    # métadonnées et empreintes d'un addon, sans aucune valeur
 ```
 Au démarrage d'une session dans le dépôt, le hook archive les fichiers du client et lance `forever update --auto`

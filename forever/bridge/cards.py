@@ -124,6 +124,7 @@ BLOCKED_WHY = {
     "ci": "La validation sur GitHub a échoué : rien n'a été installé.",
     "verify": "La vérification des données sur ton PC a échoué : rien n'a été installé.",
     "uv_sync": "La préparation de la vérification sur ton PC a échoué : rien n'a été installé.",
+    "gh": "GitHub CLI n'est pas installé sur ton PC : rien n'a été installé.",
 }
 BLOCKED_DEFAULT = "La mise à jour s'est arrêtée en route : rien n'a été installé."
 SESSION_WHY = {
@@ -181,6 +182,33 @@ def _day(stamp: Any) -> str:
     return text
 
 
+def _addon_lines(entry: dict[str, Any]) -> list[str]:
+    """Carte « Données d'addon » (décision 244) : ce qui a changé dans l'addon, les données du dépôt qui en dépendent
+    et pourquoi une session est nécessaire."""
+    addon, version, before = entry.get("addon"), entry.get("version"), entry.get("previous_version")
+    if entry.get("first"):
+        lines = [f"Aucun relevé précédent de {addon} sur ce PC (version {version}) : relecture complète."]
+    elif before and before != version:
+        lines = [f"{addon} : {before} → {version}."]
+    else:
+        lines = [f"{addon} {version} : même version, contenu changé."]
+    raw = entry.get("files")
+    files: dict[str, Any] = raw if isinstance(raw, dict) else {}
+    parts = [
+        f"{len(files.get(key) or [])} {label}"
+        for key, label in (("added", "ajouté(s)"), ("modified", "modifié(s)"), ("removed", "retiré(s)"))
+        if files.get(key)
+    ]
+    if parts:
+        lines.append(f"Fichiers : {parts[0].replace(' ', ' fichier(s) ', 1)}{''.join(', ' + x for x in parts[1:])}.")
+    uses = [str(u) for u in entry.get("uses") or []]
+    if uses:
+        lines.append(f"Nos données qui en dépendent : {', '.join(uses)}.")
+    lines.append("Une session est nécessaire : relire l'addon et comparer avec nos données avant de les mettre à jour.")
+    lines.append(PC_LOOK)
+    return lines
+
+
 def card_lines(entry: dict[str, Any]) -> list[str]:
     """Lignes d'une carte, rédigées par le pont depuis les champs de l'attente, en mots de joueur."""
     from forever.update import summary_text
@@ -194,6 +222,8 @@ def card_lines(entry: dict[str, Any]) -> list[str]:
         return [PC_FIX]
     if entry.get("action") == "bloqué" and kind in WRITE_KINDS:
         return [BLOCKED_WHY.get(str(entry.get("blocked_by")), BLOCKED_DEFAULT), PC_FIX]
+    if kind == "addon_data":
+        return _addon_lines(entry)
     if kind in SESSION_WHY:
         return [SESSION_WHY[str(kind)], PC_LOOK]
     if entry.get("action") == "bloqué":

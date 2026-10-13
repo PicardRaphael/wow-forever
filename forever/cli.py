@@ -380,6 +380,10 @@ def build_parser() -> argparse.ArgumentParser:
     u_reject.add_argument("id", help="identifiant de l'attente")
     u_reject.add_argument("--reason", help="raison du rejet")
     u_reject.add_argument("--json", action="store_true", help="sortie JSON")
+    u_done = up_sub.add_parser("done", help="clore une relecture faite en session (données d'addon, colonnes)")
+    u_done.add_argument("id", help="identifiant de l'attente")
+    u_done.add_argument("--note", required=True, help="résultat de la relecture (gardé dans l'attente)")
+    u_done.add_argument("--json", action="store_true", help="sortie JSON")
 
     addons = sub.add_parser("addons", help="addons de données installés (lecture locale)")
     addons_sub = addons.add_subparsers(dest="addons_command", required=True, parser_class=_Parser)
@@ -2334,6 +2338,11 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
             provenance,
             args.json,
         )
+        return EXIT_OK
+    if args.update_command == "done":
+        out = update.mark_done(deps.cache_dir, args.id, args.note, format_utc(deps.now()))
+        _emit({**out, "provenance": provenance}, [f"{out['id']} : {out['state']} · {out['note']}"], provenance,
+              args.json)  # fmt: skip
         return EXIT_OK
     if args.update_command == "reject":
         out = update.reject(deps.cache_dir, args.id, args.reason)

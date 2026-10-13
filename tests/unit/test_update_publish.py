@@ -47,6 +47,8 @@ class Recorder:
         if args[0] == "uv":
             return done(code=self.verify_code if "verify" in args else 0, args=args)
         if args[0] == "gh":
+            if args[1:] == ["--version"]:  # présence de GitHub CLI vérifiée avant la poussée (décision 244)
+                return done("gh version test", args=args)
             if args[1:3] == ["run", "list"]:
                 branch = args[args.index("--branch") + 1]
                 sha = git(cwd, "rev-parse", branch)

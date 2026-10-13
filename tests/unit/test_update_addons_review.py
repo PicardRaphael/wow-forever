@@ -36,12 +36,11 @@ AUTO_DRY = UpdateOptions(auto=True, dry_run=True)
 
 
 def automated_history(data_dir):
-    """Une révision écrite par un passage automatique dans l'historique d'une version du dépôt."""
-    existing = sorted(p for p in data_dir.glob("*/revisions.json"))
-    path = existing[-1] if existing else data_dir / "1.60.1.79997" / "revisions.json"
+    """Une révision écrite par un passage automatique dans l'historique du dépôt (dossier d'une ancienne version,
+    hors du manifeste : les données lues par le passage ne changent pas)."""
+    path = data_dir / "1.60.1.10000" / "revisions.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    doc = json.loads(path.read_text("utf-8")) if path.is_file() else {"schema_version": 1, "revisions": []}
-    doc["revisions"].append({"revision": len(doc["revisions"]) + 1, "automated": True})
+    doc = {"schema_version": 1, "revisions": [{"revision": 2, "automated": True}]}
     path.write_text(json.dumps(doc), encoding="utf-8")
 
 
@@ -107,7 +106,7 @@ def test_addon_card_says_what_changed_and_why_a_session_is_needed():
     assert "1 fichier(s) ajouté(s), 2 modifié(s)" in text
     assert "table des monstres (PV comparés à Questie)" in text
     assert "session" in text.lower() and "comparer" in text
-    assert "forever" not in text.lower()
+    assert "forever update" not in text and "forever measures" not in text  # aucune commande interne
 
 
 def test_addon_card_after_a_reset_says_there_was_no_previous_inventory():

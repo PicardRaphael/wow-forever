@@ -114,7 +114,12 @@ COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update (
 INVENTORY_DOC = "docs/research/valeurs-ecrites-a-la-main.md"  # rendu de `forever origins inventory` (version courante)
 PASS_PATHS = ("forever/data/", "docs/research/data-", INVENTORY_DOC)  # seuls chemins du clone écrits par `_publish`
 DATA_BRANCH_RE = re.compile(r"data/(?P<version>\d+\.\d+\.\d+\.\d+)-r(?P<revision>\d+)")
-BLOCKED_BY = ("uv_sync", "verify", "ci")  # écriture arrêtée en route : pas de nouvel essai tant que main n'a pas bougé
+BLOCKED_BY = (
+    "uv_sync",
+    "verify",
+    "ci",
+    "gh",
+)  # écriture arrêtée en route : pas de nouvel essai tant que main n'a pas bougé
 AUTO_COMMAND = "forever update --auto"
 CARRY_FR = ("gardé", "réappliqué", "remplacé", "perdu")
 
@@ -849,11 +854,25 @@ def summary_text(summary: Mapping[str, Any] | None) -> str:
     return " ; ".join(str(s.get("sentence")) for s in summary.values() if isinstance(s, Mapping) and s.get("sentence"))
 
 
-def first_write_guard(cache_dir: Path) -> bool:
+def first_write_guard(cache_dir: Path, data_dir: Path | None = None) -> bool:
     """Vrai tant qu'aucun passage réel n'a été approuvé : une écriture de `--auto` reste alors en attente
-    (demande de l'utilisateur du 2026-10-06)."""
+    (demande de l'utilisateur du 2026-10-06). Levé par l'état du cache, ou par l'historique du dépôt quand une
+    révision y a déjà été écrite par un passage automatique (`automated` dans `revisions.json`) : la remise à zéro
+    du PC efface le cache, pas l'historique (décision 244)."""
     state = _read(update_dir(cache_dir) / "state.json")
-    return not (isinstance(state, dict) and state.get("first_write_approved_at"))
+    if isinstance(state, dict) and state.get("first_write_approved_at"):
+        return False
+    return not (data_dir is not None and automated_history(data_dir))
+
+
+def automated_history(data_dir: Path) -> bool:
+    """Vrai si une version du dépôt porte une révision écrite par `forever update --auto`."""
+    for path in sorted(data_dir.glob("*/revisions.json")):
+        doc = _read(path)
+        revisions = doc.get("revisions") if isinstance(doc, dict) else None
+        if isinstance(revisions, list) and any(isinstance(r, dict) and r.get("automated") for r in revisions):
+            return True
+    return False
 
 
 def _lift_guard(cache_dir: Path, pending_id: str, at: str) -> None:
@@ -937,7 +956,7 @@ def _evaluate(
     if replay_error is not None:  # rien n'a été comparé : le passage ne conclut rien
         action = "bloqué"
         reasons.append(replay_error)
-    guarded = action == "écrire" and run.options.auto and first_write_guard(run.deps.cache_dir)
+    guarded = action == "écrire" and run.options.auto and first_write_guard(run.deps.cache_dir, run.base_data)
     if guarded and not _approved(run, pending_id):
         action = "attente"
         reasons.append(GUARD_REASON)
@@ -1524,7 +1543,7 @@ def _step_logs(run: _Run) -> Step:
         "commands": [f"forever update approve {pending_id}"],
     }
     _replace_measures(run, installed, pending_id)
-    if no_change and not approved and run.options.auto and first_write_guard(run.deps.cache_dir):
+    if no_change and not approved and run.options.auto and first_write_guard(run.deps.cache_dir, run.base_data):
         no_change = False  # garde-fou de la décision 184 : première écriture de --auto sur accord
         entry["reasons"].append(GUARD_REASON)
     if no_change or approved or approved_from is not None:
@@ -1885,6 +1904,9 @@ def _step_addons(run: _Run) -> Step:
                     else f"{addon['name']} changé : {', '.join(proposal.get('depends', []))}"
                 ],
                 "files": addon.get("files"),
+                "previous_version": addon.get("previous_version"),
+                "first": bool(proposal.get("first")),
+                "uses": list(proposal.get("uses") or []),
                 "created_at": run.now,
                 "base": {"origin_main": run.origin_main, "fingerprint": addon.get("fingerprint")},
                 "commands": [str(proposal.get("action"))],
@@ -1983,6 +2005,10 @@ def _publish(
     assert run.clone is not None
     runner = run.runner or gitops.subprocess_runner
     clone = run.clone
+    missing = _gh_missing(runner, clone)
+    if missing is not None:  # décision 244 : rien n'est copié ni poussé sans pouvoir attendre la CI
+        _block(run, pending_id=str(verdict["id"]), version=version, revision=revision, by="gh", reason=missing)
+        return Step(step, "arrêt", f"{version} r{revision} : {missing}", {"id": verdict["id"]})
     data = clone / "forever" / "data"
     run.say(f"{step} : copie de {version} r{revision} dans le clone")
     shutil.rmtree(data)
@@ -2052,6 +2078,21 @@ def _publish(
     return Step(
         step, "fait", f"{version} r{revision} installée par le clone ({sha[:12]}) : `git pull` dans la session", info
     )
+
+
+GH_MISSING = (
+    "GitHub CLI (gh) introuvable sur ce PC : rien n'a été poussé ; installer GitHub CLI "
+    "(winget install --id GitHub.cli), puis `gh auth login`"
+)
+
+
+def _gh_missing(runner: Runner, clone: Path) -> str | None:
+    """Raison d'arrêt si GitHub CLI manque (la CI de la branche ne pourrait pas être attendue), sinon None."""
+    try:
+        done = runner(["gh", "--version"], clone, 30)
+    except OSError:
+        return GH_MISSING
+    return None if done.returncode == 0 else GH_MISSING
 
 
 def _close_installed(cache_dir: Path, version: str, revision: int, written_id: str, at: str) -> None:
@@ -2484,6 +2525,24 @@ def approve(
     else:
         detail = "approuvée : passage lancé en arrière-plan (`forever update status` pour suivre)"
     return {"id": pending_id, "state": "approuvée", "detail": detail}
+
+
+REVIEW_KINDS = ("addon_data", "column_names")  # relectures faites en session, closes par `forever update done`
+
+
+def mark_done(cache_dir: Path, pending_id: str, note: str, at: str) -> dict[str, Any]:
+    """Clôt une relecture faite en session (décision 244) : `faite`, avec sa note ; refusé pour une autre attente
+    (installation, mesure : Valider, Refuser ou le passage suivant les closent)."""
+    entry = _load(cache_dir, pending_id)
+    if entry.get("kind") not in REVIEW_KINDS:
+        raise InvalidArgumentError(
+            f"L'attente {pending_id} ({entry.get('kind')}) n'est pas une relecture faite en session.",
+            "`forever update approve` ou `forever update reject` pour une installation ou une mesure",
+        )
+    if entry.get("state") not in OPEN_STATES:
+        raise InvalidArgumentError(f"L'attente {pending_id} est déjà {entry.get('state')}.", "rien à faire")
+    doc = _set_state(cache_dir, pending_id, "faite", done_at=at, done_by=note)
+    return {"id": pending_id, "state": doc["state"], "note": note}
 
 
 def reject(cache_dir: Path, pending_id: str, reason: str | None) -> dict[str, Any]:

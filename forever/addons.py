@@ -34,6 +34,7 @@ class AddonSpec:
     reader: str  # lecteur du projet, ou tranche qui l'écrira
     depends: tuple[str, ...] = ()  # agrégats du dépôt qui en dépendent
     action: str = ""  # commande proposée quand l'addon change
+    uses: tuple[str, ...] = ()  # données du dépôt qui en dépendent, en mots de joueur (cartes « À valider »)
 
 
 DATA_ADDONS: Mapping[str, AddonSpec] = {
@@ -42,6 +43,7 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         "forever/pipeline/questie.py",
         ("forever/data/<version>/monsters.json questie_correction", "consultations zones et XP des quêtes"),
         "forever measures refresh (relire et proposer la mise à jour de monsters.json)",
+        ("table des monstres (PV comparés à Questie)", "zones et quêtes conseillées"),
     ),
     "AtlasLootClassic": AddonSpec(("AtlasLootClassic", "AtlasLootClassic_*"), "lecteur en DJ1"),
     "ForeverDungeonJournal": AddonSpec(("ForeverDungeonJournal",), "lecteur en DJ1"),
@@ -56,6 +58,7 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         "forever/pipeline/bestiary.py",
         ("forever/data/<version>/pets.json (recoupement)", "forever/data/<version>/pet_rules.json (Guide.lua)"),
         "forever pets crosscheck, puis relire Data/Guide.lua et comparer pet_rules.json",
+        ("familles et capacités des familiers (recoupement avec le client)", "règles d'entraînement des familiers"),
     ),
     # T08d : avancé de FA1 (décision 172), version de contenu dans Data.lua ; FA1 (décision 209) : table de
     # correspondance reconstruite à chaque appel, aucun agrégat du dépôt n'en dépend (plus d'attente addon_data)
@@ -227,6 +230,7 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
                 "depends": list(spec.depends),
                 "action": spec.action,
                 "first": status == "nouveau",
+                "uses": list(spec.uses),
             }
         if spec.depends:
             entry["depends"] = list(spec.depends)
