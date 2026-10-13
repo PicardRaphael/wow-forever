@@ -260,8 +260,14 @@ def _bosses(
         encounter = base["encounter"] or next((b.get("encounter") for _, b in matched if b.get("encounter")), None)
         observed: dict[int, dict[str, int]] = {}
         n_kills = int((kills.get(encounter) or {}).get("n") or 0) if encounter is not None else 0
+        seen_corpses: set[tuple[int, str]] = set()
         for rec in loot_records:
             if (rec.get("boss") and norm(rec["boss"]) == norm(base["name"])) or (npc and rec.get("npc") == npc):
+                corpse = rec.get("source")
+                if isinstance(corpse, str):  # fenêtre de butin rouverte sur le même corps : comptée une fois
+                    if (int(rec["item"]), corpse) in seen_corpses:
+                        continue
+                    seen_corpses.add((int(rec["item"]), corpse))
                 slot = observed.setdefault(int(rec["item"]), {"drops": 0, "kills": n_kills})
                 slot["drops"] += 1
         level = _boss_level(npc, matched, logged)
@@ -437,6 +443,7 @@ def merge_dungeons(
         for q, lv in s.min_levels.items():
             min_levels.setdefault(q, lv)
     book_by_dungeon: dict[str, list[int]] = {}
+    book_names: dict[str, str] = {}
     if book is not None:
         from forever.quests import value
 
@@ -446,6 +453,29 @@ def merge_dungeons(
                 found = index.resolve(name)
                 key = _book_key(found[0], found[1], name) if found else _book_key(None, None, name)
                 book_by_dungeon.setdefault(key, []).append(int(quest_id))
+                book_names.setdefault(key, name)
+    # aile de chaque quête : listes par aile de Naowh Forever d'abord (Forever Guide et FojjiCore listent les quêtes de
+    # toute l'instance sous chaque aile), puis le donjon des quêtes ; une quête de l'instance sans aile reste à part
+    quest_home: dict[int, str] = {}
+    for key, wing_own in contribs.items():
+        if ":" in key and not key.startswith("name:"):
+            for source, wing_facts in wing_own:
+                if source == "naowh_dj":
+                    for q in wing_facts.get("quests", []):
+                        quest_home.setdefault(int(q), key)
+    for key, ids in book_by_dungeon.items():
+        if key in winged or (":" in key and not key.startswith("name:")):
+            for q in ids:
+                quest_home.setdefault(q, key)
+    instance_quests = {k: book_by_dungeon[k] for k in winged if k in book_by_dungeon}
+    for key, ids in sorted(instance_quests.items()):
+        notes.append(
+            f"quêtes de l'instance {key} sans aile ({', '.join(map(str, ids))}) : listées à part dans chaque aile "
+            "(instance_quests), ni comptées ni perdues"
+        )
+    for key in book_by_dungeon:
+        if key not in contribs and key not in winged:
+            contribs[key] = []  # donjon connu des seules quêtes (nom non rattaché) : gardé
     dungeons: dict[str, dict[str, Any]] = {}
     for key, own in contribs.items():
         map_id = None if key.startswith("name:") else int(key.split(":", 1)[0])
@@ -512,13 +542,13 @@ def merge_dungeons(
         for _, f in own_ranked:
             quest_ids += [q for q in f.get("quests", []) if isinstance(q, int)]
         quest_ids += book_by_dungeon.get(key, [])
-        quest_ids = list(dict.fromkeys(quest_ids))
+        quest_ids = [q for q in dict.fromkeys(quest_ids) if quest_home.get(q, key) == key]
         access: list[dict[str, Any]] = next((list(f["access"]) for _, f in ranked if f.get("access")), [])
         dungeons[key] = {
             "id": key,
             "instance": map_id,
             "wing": wing,
-            "name": name_field["value"] if name_field else key,
+            "name": name_field["value"] if name_field else book_names.get(key, key),
             "new": new,
             "closed": closed,
             "aliases": sorted(
@@ -528,6 +558,7 @@ def merge_dungeons(
             "fields": fields,
             "bosses": bosses,
             "quests": _quests(quest_ids, book, min_levels),
+            "instance_quests": _quests(instance_quests.get(str(map_id), []) if wing else [], book, min_levels),
             "first_steps": _first_steps(quest_ids, chains),
             "access": access,
             "runs": [dict(r) for r in runs if r.get("instance_id") == map_id and map_id is not None],
@@ -611,7 +642,11 @@ def _logger_records(wtf: Path) -> tuple[list[dict[str, Any]], dict[int, dict[str
                     if e.id is not None and e.success:
                         kills.setdefault(e.id, {"n": 0})["n"] += 1
             for event in character.loot:
-                loot += [{"item": i["item"], "npc": i.get("npc")} for i in event.items if i.get("npc")]
+                loot += [
+                    {"item": i["item"], "npc": i.get("npc"), "source": i.get("source")}
+                    for i in event.items
+                    if i.get("npc")
+                ]
     return runs, kills, loot
 
 
@@ -667,7 +702,19 @@ def build_dungeons(deps: Deps, *, wow_dir: Path | None = None, rebuild: bool = F
     for k, v in fl_kills.items():
         kills.setdefault(k, {"n": 0})["n"] += v["n"]
     records = {"kills": kills, "loot": [*(naowh.loot if naowh else []), *fl_loot]}
-    runs = [*fl_runs, *(naowh.runs if naowh else [])]
+    tracked = {
+        (r.get("instance_id"), r.get("entered"))
+        for r in (naowh.runs if naowh else [])
+        if r["source"] == "instance_tracker"
+    }
+    runs = [
+        *fl_runs,
+        *(
+            r
+            for r in (naowh.runs if naowh else [])
+            if r["source"] != "journal_run" or (r.get("instance_id"), r.get("entered")) not in tracked
+        ),
+    ]  # un passage de Naowh relevé par journalRun et par InstanceTracker compte une fois
     from forever.gamedata import MECHANICS_FILE
 
     official = (data.read_json(MECHANICS_FILE)["values"].get(OFFICIAL_KEY) or {}).get("value") or {}
@@ -732,7 +779,8 @@ def _level_range(dungeon: Mapping[str, Any]) -> dict[str, int] | None:
 
 
 def lookup_dungeons(book: DungeonBook, *, level: int | None = None, faction: str | None = None) -> list[dict[str, Any]]:
-    """Résumé des donjons, filtrés par niveau (dans la plage retenue) et par camp."""
+    """Résumé des donjons, filtrés par niveau (dans la plage retenue) et par camp (casse ignorée)."""
+    faction = faction.strip().lower() if faction else None
     out = []
     for key, d in sorted(book.dungeons.items(), key=lambda kv: ((_level_range(kv[1]) or {}).get("min", 0), kv[0])):
         rng = _level_range(d)

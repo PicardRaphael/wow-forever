@@ -222,8 +222,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   note du 01/10. Test : plage affichée en jeu ou passage. Priorité : moyenne. Registre H12, I17.
 - **LVL15 — Durée réelle d'un passage de donjon à Forever (groupe ordinaire), et écart à la formule de
   Factoruide ?** Ajoutée le 2026-10-13 (DJ1). Un seul passage relevé (Ragefire Chasm, Naowh `journalRun`).
-  Test : passages relevés par ForeverLogger 0.6.0 ou InstanceTracker de Naowh Forever (à activer). Priorité :
-  moyenne. Registre I16.
+  Test : passages relevés par ForeverLogger 0.6.0 ou InstanceTracker de Naowh Forever (à activer). Limites connues
+  des relevés (relecture de DJ1) : une déconnexion dans l'instance ferme le passage à la reconnexion (temps hors
+  ligne compris), une sortie en fantôme le coupe en deux, les ailes d'une même instance partagent leurs passages,
+  aucun filtre de groupe ni de niveau. Priorité : moyenne. Registre I16.
 - **LVL16 — L'XP d'une quête de donjon lue dans le client (`questcache.wdb`) inclut-elle le bonus de donjon réduit
   de moitié ?** Ajoutée le 2026-10-13 (DJ1). Test : `xpReward` d'une quête de donjon rendue, comparé par
   `forever xp check`. Priorité : moyenne. Registre I9.

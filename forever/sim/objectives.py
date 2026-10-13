@@ -437,7 +437,7 @@ def objectives(
                 return max((z["xp_h"] for z in zone_rows(lv)), default=None)
 
             found = placement_level(
-                range(rng["min"], min(rng["max"], level_cap(data)) + 1),
+                range(rng["min"], min(rng["max"], level_cap(data) - 1) + 1),  # au plafond : plus d'XP
                 first_xp_h,
                 lambda lv: float(gd.xp_to_next[min(lv, len(gd.xp_to_next)) - 1]),
                 zone_best,

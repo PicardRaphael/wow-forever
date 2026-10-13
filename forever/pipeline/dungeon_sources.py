@@ -741,6 +741,8 @@ def dungeon_source_files(addons_dir: Path, wtf_dir: Path | None) -> list[Path]:
         addons_dir / COMPANION / "Data" / "Loot.lua",
         addons_dir / ZONEINFO / "ZoneInfoForever.lua",
     ]
+    for addon in (NAOWH_DJ, FOJJI, FDJ, GUIDE, ATLAS, COMPANION, ZONEINFO):  # versions rendues dans la provenance
+        candidates += sorted((addons_dir / addon).glob("*.toc"))
     if wtf_dir is not None and wtf_dir.is_dir():
         candidates += sorted(wtf_dir.glob(f"Account/*/SavedVariables/{NAOWH_SV}"))
     return [p for p in candidates if p.is_file()]
