@@ -1,2 +1,2 @@
 local _, ns = ...
-ns.LOOT = {rfc={{n="Taragaman the Hungerer",id=11520,lv="16",items={{id=14149,n="Subterranean Cape",p=31.0},{id=14148,n="Crystalline Cuffs"}}}},excavation={{n="Saltspine",id=900002,lv="27",new=true,items={{id=280002,n="Salt Ring",new=true}}}}}
+ns.LOOT = {rfc={{n="Taragaman the Hungerer",id=11520,lv="16",items={{id=14149,n="Subterranean Cape",p=31.0},{id=14148,n="Crystalline Cuffs"}}}},excavation={{n="Saltspine",id=900002,lv="28",new=true,items={{id=280002,n="Salt Ring",new=true}}}}}

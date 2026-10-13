@@ -233,6 +233,7 @@ def read_naowh_journal(addons_dir: Path) -> SourceDungeons | None:
             else None,
             "new": True if d.get("new") is True else None,
             "closed": True if d.get("closed") is True else None,
+            "raid": True if d.get("raid") else None,  # raid rangé dans le journal : écarté du livre
             "bosses": bosses,
             "quests": [
                 qid for qid in (_fields(r).get(1) for r in _fields(q.get("quests")).values()) if isinstance(qid, int)

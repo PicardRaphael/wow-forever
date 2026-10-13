@@ -1451,6 +1451,28 @@ mechanics:
     tolerance: null
     formule: "PV(niveau) = mesure si le niveau est mesuré ; sinon médiane Questie × max(1, pente × niveau + ordonnée) (médiane mesurée / Questie au niveau si elle existe) ; probable dans la plage mesurée, suppose au-delà"
     note: "T04b (décision 5) : Questie charge sur Forever la base Classic Era ; rapport mesuré / Questie de 1 jusqu'au niveau 7 puis +0,0248 par niveau (genou 7,95), 7 niveaux d'une seule zone (les Tarides) ; extrapolé jusqu'à × 2,29 au niveau 60 (suppose). Sarilus Foulborne (PNJ de quête, rapport 1,62) exclu de l'ajustement. Forever semble donner une valeur commune par niveau aux PNJ normaux (lanceurs de sorts compris) ; Sunscale Lashtail à part. Modèle du seed (hp_anchors) gardé pour la parité (mob_source seed). La certitude probable couvre toute la plage 1 à 17 (règle de l'utilisateur), y compris les niveaux 2 à 5, 8 et 9 sans PNJ mesuré ; les niveaux 1, 6, 7, 15 et 17 reposent sur un seul PNJ ; T05 : source par défaut des simulateurs dans les données (leveling.mob_source, measured ; variante seed) ; 1.60.1.70170 révision 2 (2026-10-02) : correction ajustée sur 13 niveaux (1 à 22, trois zones), pente 0,0238, genou 7,44 ; PNJ normaux toujours à valeur commune par niveau (521, 572 et 629 PV aux niveaux 18 à 20) ; quatre PNJ hors norme (Thistle Bear, Grizzled Thistle Bear, Dark Strand Enforcer, Wildthorn Stalker) mesurés mais écartés de hp_by_level et de l'ajustement (décision de l'utilisateur) ; T08d (2026-10-06) : PNJ élites, rares et boss d'après le rang de Questie écartés automatiquement, raison écrite dans curve_excluded ; un PNJ inconnu de Questie reste dans la courbe ; révision 5 (2026-10-06, décision 189) : PNJ nommés de quête écartés par liste écrite, candidats (au plus un point d'apparition dans Questie, ou absents) proposés, correction sur 16 niveaux (1 à 24), pente 0,0299 ; révision 6 (décision 190) : Theil-Sen pondéré, pente 0,0251 ; 1.60.1.70245 révision 2 (2026-10-07) : 33 PNJ ajoutés (Durotar, les Tarides, Ragefire Chasm), courbe et correction inchangées ; invocations de joueur écartées aussi par les drapeaux du journal (décision 204) ; journal mesuré seulement jeu fermé ou au repos depuis 30 min (décision 205) ; décision 222 (2026-10-09) : seuls les PNJ combattus par le joueur et non amis entrent dans la courbe, amis et PNJ seulement vus mesurés mais écartés d'office (drapeaux de réaction et combat lus dans le journal) ; décision 221 : mesures d'une version antérieure sur accord explicite et tracé ; décision 223 : PNJ hors norme (écart de plus du seuil à la médiane des autres PNJ d'un niveau concordant) écartés d'office, paramètres monsters.curve_outlier ; état de combat gardé ligne par ligne"
+  - id: H12
+    categorie: rencontre
+    description: "Donjons de Forever : plages de niveau, boss et leur niveau, butin et taux, quêtes et prérequis (livre fusionné)"
+    forever: modifie
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70338/dungeons.json, révision 6 (tables Map, LFGDungeons, ContentTuning, DungeonEncounter, AreaTable du client : instances, niveau de contenu, rencontres ; tables du journal absentes du build, DON9)"
+      - "forever/data/1.60.1.70338/mechanics.json (dungeon.official : note officielle du 01/10, https://us.forums.blizzard.com/en/wow/t/2360696/4, probable)"
+      - "addons lus en local (décision 265) : Naowh Forever 1.1.11, FojjiCore 3.3.5 (recoupement), ForeverDungeonJournal 1.6.2, Forever Guide 1.33.0, AtlasLoot Classic Forever 1.60.1, Forever Companion 1.0.0, Zone Info: Forever 1.9 ; agrégats dans docs/research/donjons-forever.md"
+      - "niveau des boss relevé dans un journal de combat (monsters.json, bloc avancé, certain) ; butin relevé (ForeverLogger 0.6.0, SavedVariables de Naowh Forever)"
+    tests:
+      - tests/unit/test_dungeons_client.py::test_encounters_are_ordered
+      - tests/unit/test_dungeons.py::test_client_encounters_win
+      - tests/unit/test_dungeons.py::test_level_discrepancy_is_listed
+      - tests/unit/test_dungeons.py::test_logged_boss_level_wins
+      - tests/unit/test_dungeons.py::test_copied_boss_levels_count_once
+      - tests/unit/test_dungeons.py::test_rate_order
+      - tests/unit/test_dungeons.py::test_observed_loot_wins
+      - tests/unit/test_dungeons.py::test_first_steps_are_ordered
+    tolerance: null
+    note: "ordre des sources : relevé du joueur, client (rencontres certain, niveau de contenu probable), note officielle (probable), Naowh, FojjiCore, ForeverDungeonJournal, Forever Guide, Forever Companion, AtlasLoot, Zone Info ; un écart entre sources est listé, jamais tranché au hasard ; niveau d'un boss copié (FojjiCore = ForeverDungeonJournal) compté une fois ; taux Classic seulement pour un donjon que personne ne dit nouveau ; prérequis lus comme chaînes ordonnées (suppose) ; maîtrise d'armure et d'armes non vérifiée pour « utilisable par ma classe » (classes permises et niveau requis seulement)"
   - id: I1
     categorie: optimisation
     description: "Rotations (listes de priorités) par spé et situation"

@@ -903,6 +903,28 @@
    "certainty": "suppose",
    "registry": "I16",
    "source": "formule par défaut d'un passage de donjon de Factoruide (code MIT, crates/fg-route/src/model/dungeons.rs et params.rs, lus le 2026-10-13, décision 265) : minutes = borne(base + pente × niveau des monstres, min, max), monstres = base + pente × niveau des monstres ; non sourcée par son auteur ; repli quand aucun passage n'est relevé (ForeverLogger 0.6.0, InstanceTracker de Naowh Forever) ni aucun compte de monstres d'un addon (question LVL15)"
+  },
+  "dungeon.official": {
+   "value": {
+    "2998": {
+     "levels": {
+      "min": 26,
+      "max": 31
+     },
+     "open": true
+    },
+    "129": {
+     "access_level": 25,
+     "open": true
+    },
+    "70": {
+     "access_level": 30,
+     "open": true
+    }
+   },
+   "certainty": "probable",
+   "registry": "I17",
+   "source": "note officielle de la bêta du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4, docs/research/notes-blizzard-2026-10-01.md) : nouveau donjon Excavation Site: Wetlands (26-31), Razorfen Downs (25+) et Uldaman (30+) ouverts ; clé = instance du client (dungeons.json) ; placée après le client et avant les addons dans le livre des donjons (décision 265)"
   }
  },
  "inherited_from": "1.60.1.70291"

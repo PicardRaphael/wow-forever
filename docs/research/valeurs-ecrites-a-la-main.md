@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70338 (ne
 de `forever/data/1.60.1.70338/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-163 chemins, 696 valeurs ; 87 `probable`, 76 `suppose`
+164 chemins, 703 valeurs ; 88 `probable`, 76 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -53,6 +53,7 @@ Aucun.
 | mechanics.json | `/values/coefficient.slow_factor` | 1 | suppose | G4 | mode seed seulement : le mode forever lit les coefficients du client (spell_scaling.json) | règle Classic (fm.py du seed, PC) |
 | mechanics.json | `/values/crit.winters_chill_per_stack` | 1 | probable | D4 | mode seed seulement : le mode forever lit spell_scaling.json auras.winters_chill | relevé du client 1.60.1.70009 recopié à la main (references/mechanics.md) |
 | mechanics.json | `/values/damage.bonus_stacking` | 3 | probable | A20 | règle du serveur, test en jeu E6 | vidéo communautaire (décision 73) |
+| mechanics.json | `/values/dungeon.official` | 7 | probable | I17 | texte officiel sans lecture du client ni mesure en jeu (question DON18) | note officielle de la bêta du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4), DJ1 bloc C |
 | mechanics.json | `/values/dungeon.run_defaults` | 6 | suppose | I16 | durée d'un passage non mesurée sur Forever (LVL15) ; remplacée par les passages relevés | formule par défaut d'un passage de donjon de Factoruide (MIT, crates/fg-route/src/model/dungeons.rs, 2026-10-13), DJ1 bloc E |
 | mechanics.json | `/values/hit.miss_per_level_below` | 3 | suppose | A3 | règle du serveur, absente du client | règle Classic (PC) |
 | mechanics.json | `/values/legacy.beta_grant` | 4 | probable | G5 | état de la bêta absent du client, porté par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
