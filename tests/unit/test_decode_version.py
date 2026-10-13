@@ -13,9 +13,18 @@ from forever.pipeline.decode import DECODED_FILES, INHERITED_FILES, decode_versi
 from forever.pipeline.fetch import wago_dir
 from forever.pipeline.pets import PETS_FILES
 from forever.pipeline.quest_rewards import QUEST_FILES
+from forever.pipeline.xp_bonuses import XP_BONUS_FILES
 from forever.store import VersionData, current_identity, read_sources
 
-EXPECTED_FILES = {*DECODED_FILES, *INHERITED_FILES, *CHARACTER_FILES, *PETS_FILES, *QUEST_FILES, "sources.json"}
+EXPECTED_FILES = {
+    *DECODED_FILES,
+    *INHERITED_FILES,
+    *CHARACTER_FILES,
+    *PETS_FILES,
+    *QUEST_FILES,
+    *XP_BONUS_FILES,
+    "sources.json",
+}
 
 
 def version_data(root):
@@ -32,8 +41,8 @@ def test_candidate_is_a_complete_data_dir(candidate):
     # T04 : monsters.json hérité, spell_scaling.json décodé ; PV1 : fichiers des 9 classes (hérités ici : la
     # fixture 70009 n'a pas leurs tables), _seed_racials.json hérité, racials.json retiré.
     assert (
-        names == EXPECTED_FILES and len(names) == 21
-    )  # T04d : quest_rewards.json hérité ; PV1, bloc C : pvp_rules.json hérité ; T08b : origins.json, character_scaling.json ; CH0 : pet_rules.json, pets.json
+        names == EXPECTED_FILES and len(names) == 22
+    )  # T04f : xp_bonuses.json hérité ; T04d : quest_rewards.json hérité ; PV1, bloc C : pvp_rules.json hérité ; T08b : origins.json, character_scaling.json ; CH0 : pet_rules.json, pets.json
     assert "_source_gunba_mage_tree.json" not in names and "confirmed_changes.json" not in names
 
 

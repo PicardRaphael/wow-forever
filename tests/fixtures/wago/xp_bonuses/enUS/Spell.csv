@@ -1,0 +1,56 @@
+ID,NameSubtext_lang,Description_lang,AuraDescription_lang
+133,Rank 1,Hurls a fiery ball that causes $s1 Fire damage and an additional $o2 Fire damage over $d.,$s2 Fire damage every $t2 seconds.
+430,,Restores $o1 mana over $d.  Must remain seated while drinking.,Restores $/5;s1 mana per second.
+433,,Restores $o1 health over $d.  Must remain seated while eating.,Restores $/5;s1 health per second.
+362859,,Quest experience increased by $s1%.,"|cFFffd200Season of Mastery|r
+
+Increases experience and gold earned from quests by $s1%. Dungeon and Elite quests grant bonus experience."
+335924,,Experience gains increased by $s1%.,"(CN Only)
+Experience gains increased by $s1%."
+429959,,Experience gains increased by $429959s0%. ,Experience gains increased by $429959s0%.
+429961,,"Unfurl a sleeping bag. Resting inside for at least one minute will provide a bonus to experience earned, stacking up to 3 times.",
+430496,,You feel inspired! Experience gains increased by $s1%.,Experience gains increased by $s1%.
+436412,,"Empowered by the brave discoverers that preceded you, experience gains increased by $w1%, and gold earned from quests also increases by $w3%.",Experience gains increased by $w1%. Gold earned from quests increased by $w3%.
+1225478,,Your rested experience accumulates $s1% faster and your rested experience cap is increased by $s2%.,
+1225479,,Reduces your cooldown on adding Camp features by ${$m1/-36000}%,
+1225499,,Increases the duration of beneficial effects from eating food by $s1%.,
+1229451,,,You cannot gain more rested experience from a Camp Tent for $d.
+1229741,,,"Gained the following camp benefits:
+
+$?a1229451[Tent: You received a small amount of rest experience. You can only receive this effect once per $1229451d.
+
+][]$?a1230587[Mana Well: Restores $1230587w1 Mana every $1230587t seconds.
+
+][]$?a1230172[Sharpening Wheel: Strength increased by $1230172w1.
+
+][]$?a1230653[Enchanted Lute: Armor increased by $1230653w1, all attributes increased by $1230653w2, and all resistances increased by $1230653w3.
+
+][]$?a1230124[First Aid Kit: Stamina increased by $1230124w1.
+
+][]$?a1230098[Fish Bowl: All stats increased by $1230098w1%.
+
+][]$?a1229513[Incense Candle: Intellect increased by $1229513w1.
+
+][]$?a1230164[Lodestone: Melee Attack Power increased by $1230164w1.
+
+][]$?a1229519[Camp Chair: Critical strike chance with all spells and attacks increased by $1229519w1%.
+
+][]$?a1229718[Faction Banner: Spirit increased by $1229718w1.][]"
+1243969,,"$?pc142418[Additionally, experience gained from kills is increased by $s1%.][]",Experience gained from kills increased by $w1%.
+1248377,,"$@spelldesc433 If you spend at least 10 sec eating, you will become well fed and gain $s2 Stamina for $1248406d. $@spelldesc1243969",
+1248378,,"$@spelldesc433 If you spend at least 10 sec eating, you will become well fed and gain $s2 Agility for $1248420d. $@spelldesc1243969",
+1248406,,"A nutritious meal has made you Well Fed, increasing your Stamina.",Your Stamina is increased by $w1. $?a1243969[Experience gained from kills increased by $1243969w1%.][]
+1248420,,"A nutritious meal has made you Well Fed, increasing your Agility.",Your Agility is increased by $w1. $?a1243969[Experience gained from kills increased by $1243969w1%.][]
+1249920,,"$@spelldesc430 If you spend at least 10 sec eating, you will become well fed and gain $s2 Healing Power for $1249927d. $@spelldesc1243969",
+1249927,,"A tasty drink has made you Well Fed, increasing your Healing Power.",Your Healing Power is increased by $w1. $?a1243969[Experience gained from kills increased by $1243969w1%.][]
+1292997,,Increase experience gained from slaying Undead by $s1% for $d.,Increase experience gained from slaying Undead by $w1%.
+1307227,Tier 1,Builds a basic campfire that allows cooking and the placement of up to $s1 additional camp features. Players sitting or crafting nearby for $1229739d will gain benefits from other camp features.,
+1307230,Tier 1,"Builds a tent that allows you and others sitting nearby to increase Rested experience to $s2% of a level. No effect if Rested experience already exceeds that value.
+
+Requires a Campfire nearby. All camping features share a cooldown of $1308027d.",
+1307237,Tier 3,Builds an expert campfire that allows cooking and the placement of up to $s1 additional camp features. Players sitting or crafting nearby for $1229739d will gain benefits from other camp features.,
+1307252,Tier 2,Builds a journeyman campfire that allows cooking and the placement of up to $s1 additional camp features. Players sitting or crafting nearby for $1229739d will gain benefits from other camp features.,
+434,,Restores $o1 health over $d.  Must remain seated while eating.,Restores $/5;s1 health per second.
+429960,,,
+1293736,,Increase experience gained from slaying Undead by $s1% for $d.,Increase experience gained from slaying Undead by $w1%.
+1308027,,,

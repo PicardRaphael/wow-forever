@@ -75,4 +75,5 @@ def test_version_dir_contains_exactly_expected_files():
         "pets.json",  # CH0, révision 5 : familiers du Chasseur décodés du client
         "pet_rules.json",  # CH0, révision 5 : règles des familiers hors du client (suppose, sources citées)
         "quest_rewards.json",  # T04d, révision 4 : QuestXP et quêtes vues par le client (questcache.wdb)
+        "xp_bonuses.json",  # T04f, révision 5 : bonus d'XP décodés du client
     }
