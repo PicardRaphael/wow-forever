@@ -853,7 +853,7 @@ mechanics:
     description: "Buffs de campement et de Legacy"
     forever: modifie
     statut: teste
-    certitude: probable
+    certitude: suppose
     sources:
       - "forever/data/1.60.1.70338/xp_bonuses.json (camp : Camp Tent, seuil du repos en % d'un niveau, recharge partagée, Camp Benefits sans aura d'XP ; auras : perk Legacy Well Rested, valeurs par rang lues dans les courbes)"
       - "forever/data/1.60.1.70338/mechanics.json (xp.camp_tent probable, xp.legacy_rested suppose)"
@@ -864,7 +864,7 @@ mechanics:
       - tests/unit/test_xp_bonuses_decode.py::test_legacy_well_rested_ranks_come_from_the_curves
     tolerance: null
     formule: "réservoir après la tente = max(réservoir, seuil × XP du niveau) ; gain et plafond du repos × (1 + valeur du rang du perk Well Rested)"
-    note: "T04f, bloc B : camps (aucun % d'XP ; la tente remonte le repos) et perk Legacy Well Rested (sens des codes d'aura 386 et 656 probable, application au gain et au plafond supposée) ; rang lu par ForeverLogger 0.5.0 ou réglé au profil, sinon 0 ; catalogue Legacy complet : LG1"
+    note: "T04f, bloc B : camps (aucun % d'XP ; la tente remonte le repos) et perk Legacy Well Rested (sens des codes d'aura 386 et 656 probable, application au gain et au plafond supposée) ; rang lu par ForeverLogger 0.5.0 ou réglé au profil, sinon 0 ; tente probable, perk Legacy suppose (certitude de l'entrée : la plus basse) ; recharge partagée du camp et durée de la tente lues dans le client mais hors modèle (une tente par séance au plus dans « quel bonus prendre ») ; catalogue Legacy complet : LG1"
   - id: D6
     categorie: environnement
     description: "Effets de biome et de type de créature"
@@ -876,11 +876,12 @@ mechanics:
     tolerance: null
   - id: D7
     categorie: environnement
-    description: "Bonus d'XP (Well Fed, repos)"
+    description: "XP de repos (accumulation, plafond, consommation)"
     forever: modifie
     statut: teste
     certitude: suppose
     sources:
+      - "forever/data/1.60.1.70338/xp_bonuses.json (perk Legacy Well Rested : accumulation et plafond par rang ; tente de camp)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : Exhaustion, T08b)"
       - "forever/data/1.60.1.70338/mechanics.json (xp.rested : gain, rapport dehors et plafond, règle de Classic, vMangos, suppose)"
       - "forever/data/1.60.1.70338/character_scaling.json (rested : palier Rested lu par le modèle)"
@@ -921,7 +922,7 @@ mechanics:
       - tests/unit/test_session_xp.py::test_bonus_only_lasts_its_remaining_time
     tolerance: null
     formule: "facteur += valeur par cumul × cumuls (au plus le maximum du client), tant que l'aura dure"
-    note: "T04f : durée de Well-Rested lue dans le client (LVL3 résolue) ; un cumul par période de repos dans le sac posé (déduit de la description, probable) ; chaîne de quêtes du sac lue dans les addons (bloc E)"
+    note: "T04f : durée de Well-Rested lue dans le client (LVL3 résolue) ; un cumul par période de repos dans le sac posé (déduit de la description, probable) ; état par défaut des outils : le maximum de cumuls, durée entière (sleeping_bag_state) ; écoulement hors ligne et perte à la mort inconnus (LVL14) ; chaîne de quêtes du sac lue dans les addons (bloc E)"
   - id: D10
     categorie: environnement
     description: "Cumul des bonus d'XP (addition des pourcentages, repos sur l'XP majorée)"
@@ -937,9 +938,11 @@ mechanics:
       - tests/unit/test_engine_xp_bonuses.py::test_bonus_without_a_player_source_is_never_applied
       - tests/unit/test_session_xp.py::test_parts_add_up_and_bonus_never_lowers_xp
       - tests/unit/test_xp_check_bonuses.py::test_each_bonus_gain_goes_to_its_rule
+      - tests/unit/test_engine_xp_creature_type.py::test_accessible_aura_applies_to_its_creature_type_only
+      - tests/unit/test_engine_xp_creature_type.py::test_aura_without_player_source_never_applies
     tolerance: null
     formule: "facteur = 1 + Σ pourcentages actifs (variante : Π (1 + pourcentage)) ; repos = min(XP majorée × (multiplicateur − 1), réservoir)"
-    note: "T04f (décision 262) : règle de l'émulateur TrinityCore choisie par l'utilisateur, variante gardée ; bonus sans source joueur listés, jamais appliqués ; question LVL12"
+    note: "T04f (décision 262) : règle de l'émulateur TrinityCore choisie par l'utilisateur, variante gardée ; bonus sans source joueur listés, jamais appliqués ; bonus par type de créature (Archmagister's Wisdom, accès objet) appliqué au seul type lu dans sa valeur diverse, type du monstre requis ; question LVL12"
   - id: E1
     categorie: consommables
     description: "Flacons : un seul actif, conservé à la mort, conditions de zone"
@@ -960,7 +963,7 @@ mechanics:
     tolerance: null
   - id: E3
     categorie: consommables
-    description: "Nourriture (Well Fed, Gourmand +33 %)"
+    description: "Nourriture (Well Fed, bonus d'XP de la nourriture nutritive, Gourmand)"
     forever: modifie
     statut: teste
     certitude: suppose
@@ -972,7 +975,7 @@ mechanics:
       - tests/unit/test_engine_xp_bonuses.py::test_kill_factor_adds_well_rested_and_food
       - tests/unit/test_xp_bonuses_decode.py::test_food_xp_boost_is_a_kill_bonus_reached_by_nutritious_food
     tolerance: null
-    note: "T04f, bloc B : bonus d'XP de la nourriture nutritive (monstres tués seulement), sous une condition de joueur évaluée par le serveur (LVL13) ; une séance suppose la nourriture renouvelée ; Gourmand (durée des buffs) listé, non modélisé ; statistiques des buffs hors périmètre"
+    note: "T04f, bloc B : bonus d'XP de la nourriture nutritive (monstres tués ; la part des quêtes vaut 0 dans le client), sous une condition de joueur évaluée par le serveur (LVL13) ; une séance suppose la nourriture renouvelée ; Gourmand (durée des buffs, valeurs dans xp_bonuses.json) listé, non modélisé ; statistiques des buffs hors périmètre"
   - id: E4
     categorie: consommables
     description: "Potions (recharge partagée, soins via First Aid)"

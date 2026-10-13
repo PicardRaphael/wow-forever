@@ -283,6 +283,8 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   (`xp.bonus_stacking`, addition puis repos), variante multiplicative gardée. Test (sans sonde exigée) : gains d'un
   même monstre relevés par ForeverLogger 0.5.0 avec et sans Well-Rested, avec et sans nourriture nutritive, comparés
   par `forever xp check`. Priorité : moyenne. Registre D10.
+- **LVL14 — Well-Rested et le bonus de nourriture s'écoulent-ils hors ligne, et se perdent-ils à la mort ?**
+  Ajoutée le 2026-10-13 (T04f, audit du registre) : `session_xp` ne compte que le temps de jeu ; le client ne dit rien de l'écoulement hors ligne ni de la mort. Test (sans sonde exigée) : temps restant de l'aura relevé par ForeverLogger 0.5.0 avant une déconnexion et à la reconnexion, puis après une mort. Priorité : basse. Registre D9.
 - **LVL13 — Que demande la condition de joueur 142418 du bonus d'XP de la nourriture, et vaut-il pour toute
   nourriture nutritive ?** Ajoutée le 2026-10-13 (T04f, bloc A) : la condition ne porte qu'une expression d'état du
   monde (47054, évaluée par le serveur) et un drapeau de sens inconnu ; rien dans le client ne dit quand elle est
