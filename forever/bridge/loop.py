@@ -187,11 +187,12 @@ class Bridge:
         if self.addons is not None:
             self.status_cache["addons"] = self.addons.status()
         if self.keeper is not None:
-            from forever.bridge.status import status_line
+            from forever.bridge.status import line_parts, status_line
 
             self.status_cache["addon"] = self.keeper.addon_state()
             if self.status_cache.get("version"):
                 self.status_cache["line"] = status_line(self.status_cache)
+                self.status_cache["line_head"], self.status_cache["line_tail"] = line_parts(self.status_cache)
         path = self.addons_dir / ADDON / "Status.lua"
         try:
             path.parent.mkdir(parents=True, exist_ok=True)

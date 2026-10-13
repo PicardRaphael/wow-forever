@@ -104,4 +104,5 @@ def test_last_pass_is_carried(make_deps):
     put(deps.cache_dir, id="measures-1.60.1.70338-a", kind="measures", version="1.60.1.70338")
     update = status_payload(deps)["update"]
     assert update["running"] is False
-    assert update["last"] == {"finished_at": "2026-09-27T11:05:00Z", "written": 1, "approvable": 1}
+    assert update["last"] == {"finished_at": "2026-09-27T11:05:00Z", "written": 1, "approvable": 1,
+                              "text": "Mise à jour terminée en 5 min : données installées"}

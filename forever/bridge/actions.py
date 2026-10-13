@@ -97,47 +97,41 @@ class ActionHandler:
         self.spawn = spawn or _spawn_detached
 
     def handle(self, action: str, target: str | None) -> tuple[str, str]:
-        """(résultat noté au journal, texte de la réponse)."""
+        """(résultat noté au journal, texte de la réponse en mots de joueur, décision 240)."""
+        from forever.bridge.cards import card_title
+        from forever.bridge.status import update_stage
         from forever.update import list_pending, run_log_path, update_summary
 
         now = self.now()
         summary = update_summary(self.cache_dir, now)
-        step = summary.get("running_step") or "inconnue"
+        stage = update_stage(summary.get("running_step"), summary.get("running_detail"))
         if action == "update":
             if self.offline:
-                return "refusée", "Action refusée : mise à jour impossible hors ligne (FOREVER_OFFLINE)."
+                return "refusée", "Mise à jour impossible : le pont tourne hors ligne sur ton PC."
             if summary.get("running"):
-                return (
-                    "passage en cours",
-                    f"Rien de lancé : passage en cours (étape {step}) ; l'état se met à jour à sa fin.",
-                )
-            return self._launch(update_argv("update"), run_log_path(self.cache_dir, now), (
-                "Mise à jour lancée (forever update --auto) : l'état des données se met à jour à la fin du passage."
-            ))  # fmt: skip
+                return "passage en cours", f"Une mise à jour est déjà en cours ({stage}) : attends sa fin."
+            return self._launch(update_argv("update"), run_log_path(self.cache_dir, now), "Mise à jour lancée.")
         if action not in ("approve", "reject") or target is None:
             return "refusée", "Action refusée : action inconnue."
         entry = next((e for e in list_pending(self.cache_dir) if e.get("id") == target), None)
         if entry is None:
-            return "refusée", "Action refusée : attente inconnue."
+            return "refusée", "Action refusée : cette carte n'existe plus."
         if not approvable(entry):
-            return "refusée", f"Action refusée : attente non approuvable ({entry.get('kind')}, {entry.get('state')})."
+            return "refusée", "Action refusée : cette carte ne se valide pas en jeu."
         pending_id = str(entry["id"])  # identifiant relu dans l'attente, jamais celui de la bande
-        later = (
-            f" ; passage en cours (étape {step}) : approbation prise au prochain passage"
-            if summary.get("running")
-            else ""
-        )
+        title = card_title(entry)
         if action == "approve":
-            text = f"Validée : {pending_id}{later or ' ; passage lancé'}."
+            later = f"mise à jour déjà en cours ({stage}), prise à la suivante" if summary.get("running") else ""
+            text = f"Validé : {title} ; {later or 'mise à jour lancée'}."
         else:
-            text = f"Refusée : {pending_id} (raison notée : {REJECT_REASON})."
+            text = f"Refusé : {title}."
         return self._launch(update_argv(action, pending_id), run_log_path(self.cache_dir, now), text)
 
     def _launch(self, argv: list[str], log: Path, text: str) -> tuple[str, str]:
         try:
             self.spawn(argv, log)
-        except OSError as exc:
-            return "erreur", f"Commande non lancée ({exc}) : la lancer sur le PC ({' '.join(argv[2:])})."
+        except OSError:
+            return "erreur", "La mise à jour n'a pas pu démarrer sur ton PC : ouvre une session Claude."
         return "lancée", text
 
 

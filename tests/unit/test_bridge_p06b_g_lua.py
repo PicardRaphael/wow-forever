@@ -218,7 +218,7 @@ def test_polls_follow_the_whole_pass_then_slow_down():
     assert len(times) == 25
     assert times[:2] == pytest.approx([30, 60], abs=1.1)
     assert times[20] - times[19] == pytest.approx(60, abs=1.1)
-    game.stub.Advance(3600, 5.0)
+    game.stub.Advance(3000, 5.0)  # avant le relevé au repos qui suit le plafond
     assert len(loads(game)) == 70  # plafond d'une heure de relevés rapprochés
 
 

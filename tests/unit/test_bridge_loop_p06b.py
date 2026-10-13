@@ -125,7 +125,7 @@ def test_selftest_card_is_published(tmp_path):
     slot = slot_table(addons, 1)
     assert slot.cards[1].id == card["id"] == "selftest-20261010T120000Z"
     keys = [slot.cards[1].buttons[i].key for i in range(1, len(slot.cards[1].buttons) + 1)]
-    assert keys == ["approve", "reject"]
+    assert keys == ["approve", "reject", "hide"]  # « Masquer » sur chaque carte publiée (décision 240)
     status = (addons / "ForeverBridge" / "Status.lua").read_text(encoding="utf-8")
     assert "selftest-20261010T120000Z" in status
 

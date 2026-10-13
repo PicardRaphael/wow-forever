@@ -409,6 +409,21 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     3. « À valider (n) » : les cartes sous les sections ouvertes ; avec plusieurs cartes, molette et barre de
        défilement ; Valider ou Expliquer marchent comme avant.
     4. Déplacer la fenêtre `/fv` : le panneau la suit. Échap : le panneau se ferme, la fenêtre reste.
+20. **Avancement de la mise à jour, croix, Masquer** (P06b, décision 240). Pont relancé après la fusion comme au
+    point 19 ; l'addon est remplacé à la fermeture suivante du jeu (sinon `uv run forever bridge install`, jeu fermé).
+    1. `/fv`, « Mettre à jour » : la réponse dit « Mise à jour lancée. » et la ligne d'état montre aussitôt « Mise à
+       jour en cours… lancement · 2 s », points animés et secondes qui défilent ; dans la minute, l'étape en mots
+       simples (préparation, mesures de tes combats, vérification des données, attente de la validation sur
+       GitHub…) ; à la fin, l'historique gagne « Mise à jour terminée en N min : rien de nouveau » (ou « données
+       installées », « en erreur, voir À valider », « une validation t'attend dans À valider »). Un second clic
+       pendant le passage répond « Une mise à jour est déjà en cours (étape) : attends sa fin. »
+    2. « À valider (n) » : croix en haut à droite du panneau, qui le ferme ; un second clic sur « À valider (n) » le
+       ferme aussi.
+    3. Chaque carte a « Masquer » : la carte disparaît, le compteur « À valider (n) » et la ligne d'état baissent
+       d'autant ; `uv run forever update status` montre toujours l'attente ; `/reload` : la carte reste masquée ; elle
+       revient seule quand l'attente change.
+    4. Deux attentes de la même branche (écriture bloquée) : une seule carte, textes sans jargon (« Une mise à jour
+       attend une correction sur ton PC : ouvre une session Claude »).
 
 ### Protocole de collecte (mesures pour le registre)
 - **Les plus rentables, à faire d'abord** (pistes du 2026-10-01, `tasks/pistes-open-questions-2026-10-01.md` ; chaque résultat est une mesure, source primaire) :

@@ -2499,6 +2499,7 @@ def update_summary(cache_dir: Path, now: datetime | None = None) -> dict[str, An
             "origin_main": last.get("origin_main"),
             "written": last.get("written", []),
             "verdicts": [{"id": v.get("id"), "action": v.get("action")} for v in last.get("verdicts", [])],
+            "steps": [{"name": s.get("name"), "status": s.get("status")} for s in last.get("steps", [])],
         }
     pending = [
         {**{k: e.get(k) for k in ("id", "kind", "action", "version", "state", "created_at")},
@@ -2521,6 +2522,7 @@ def update_summary(cache_dir: Path, now: datetime | None = None) -> dict[str, An
         "pending": pending,
         "running": running,
         "running_step": doc.get("step"),
+        "running_started_at": doc.get("started_at"),
         "running_detail": detail,
         "running_activity": activity_of(detail),
         "running_minutes": minutes,

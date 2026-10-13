@@ -54,8 +54,14 @@ local SLOT_PREFIX = "ForeverBridge_S"
 local GIVE_UP_POLLS = 3 -- relevés sans accusé avant la boîte d'envoi /reload
 local LOW_RESERVE = 10 -- emplacements restants à partir desquels /reload est proposé
 local IDLE_POLL = 600 -- relevé au repos, fenêtre ouverte (secondes)
-local UPDATE_POLL = 30 -- relevé pendant un passage de forever update, fenêtre ouverte
-local UPDATE_POLLS = 20 -- relevés rapprochés au plus par passage
+-- Relevés pendant une mise à jour, fenêtre ouverte (décision 240) : toutes les 30 secondes pour les vingt premiers,
+-- puis toutes les 60 jusqu'à soixante-dix (une heure de passage), puis le relevé au repos.
+local UPDATE_POLL = 30
+local UPDATE_POLLS = 20
+local UPDATE_POLL_SLOW = 60
+local UPDATE_POLLS_MAX = 70
+local UPDATE_CLICK_WAIT = 180 -- après « Mettre à jour », délai pour voir le passage commencer
+local PANEL_BUTTON_MIN = 64 -- largeur minimale d'un bouton de carte
 local HISTORY_KEPT = 50
 local ARCHIVE_KEPT = 5 -- conversations archivées par « Nouvelle conversation »
 -- Calendrier des relevés après un envoi (P06b, forever/bridge/polls.py) : 2, puis de 4 en 4 jusqu'à 60, puis de
@@ -864,8 +870,14 @@ local function BuildPanel()
 	panel:SetScript("OnHide", function()
 		ui.copyText, ui.pasteOpen = nil, false
 	end)
+	-- croix de fermeture en haut à droite (décision 240), au-dessus de la barre de défilement
+	local cross = CreateFrame("Button", "ForeverBridgePanelClose", panel, "UIPanelCloseButton")
+	cross:SetPoint("TOPRIGHT", panel, "TOPRIGHT", -4, -4)
+	cross:SetScript("OnClick", function()
+		panel:Hide()
+	end)
 	local scroll = CreateFrame("ScrollFrame", "ForeverBridgePanelScroll", panel, "UIPanelScrollFrameTemplate")
-	scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, -10)
+	scroll:SetPoint("TOPLEFT", panel, "TOPLEFT", 10, -30)
 	scroll:SetPoint("BOTTOMRIGHT", panel, "BOTTOMRIGHT", -30, 10)
 	scroll:EnableMouseWheel(true)
 	scroll:SetScript("OnMouseWheel", function(self, delta)
@@ -939,10 +951,34 @@ local function CardPlain(card)
 	for _, line in ipairs(type(card.lines) == "table" and card.lines or {}) do
 		lines[#lines + 1] = Plain(line)
 	end
+	-- détail technique de l'attente (jamais affiché), transmis par « Expliquer »
+	if type(card.detail) == "string" and card.detail ~= "" then
+		lines[#lines + 1] = Plain(card.detail)
+	end
 	return table.concat(lines, "\n")
 end
 
--- Cartes placées à partir de y (négatif, haut du contenu) ; rend le y sous la dernière carte.
+-- Cartes montrées : celles du pont moins les cartes masquées par « Masquer » dont l'empreinte n'a pas changé.
+local function VisibleCards()
+	local db = ForeverBridgeDB
+	local hidden = type(db) == "table" and type(db.hidden) == "table" and db.hidden or {}
+	local shown = {}
+	for _, card in ipairs(run.cards) do
+		if not (type(card) == "table" and card.id ~= nil and card.stamp ~= nil and hidden[card.id] == card.stamp) then
+			shown[#shown + 1] = card
+		end
+	end
+	return shown
+end
+
+-- Largeur d'un bouton de carte d'après son libellé (caractères, pas octets).
+local function ButtonWidth(label)
+	local letters = #(label:gsub("[\128-\191]", ""))
+	return math.max(PANEL_BUTTON_MIN, letters * 7 + 24)
+end
+
+-- Cartes placées à partir de y (négatif, haut du contenu) ; rend le y sous la dernière carte. Les boutons d'une
+-- carte passent à la ligne quand ils dépassent la largeur du panneau.
 local function LayoutCards(content, y)
 	for _, widget in pairs(ui.cardButtons) do
 		widget:Hide()
@@ -950,16 +986,18 @@ local function LayoutCards(content, y)
 	for _, text in pairs(ui.cardTexts) do
 		text:Hide()
 	end
-	if #run.cards == 0 then
+	local cards = VisibleCards()
+	if #cards == 0 then
 		ui.cardsLabel:Hide()
 		return y
 	end
 	ui.cardsLabel:ClearAllPoints()
 	ui.cardsLabel:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y)
-	ui.cardsLabel:SetText("À valider (" .. #run.cards .. ")")
+	ui.cardsLabel:SetText("À valider (" .. #cards .. ")")
 	ui.cardsLabel:Show()
 	y = y - 18
-	for i, card in ipairs(run.cards) do
+	local maxX = CARDS_W - 52
+	for i, card in ipairs(cards) do
 		local text = ui.cardTexts[i]
 		if not text then
 			text = content:CreateFontString("ForeverBridgeCard" .. i .. "Text", "OVERLAY", "GameFontHighlightSmall")
@@ -973,28 +1011,30 @@ local function LayoutCards(content, y)
 		text:Show()
 		local count = 1 + (type(card.lines) == "table" and #card.lines or 0)
 		y = y - count * 14 - 4
-		local previous
+		local x = 0
 		for _, entry in ipairs(type(card.buttons) == "table" and card.buttons or {}) do
 			if type(entry) == "table" and type(entry.key) == "string" then
 				local name = "ForeverBridgeCard" .. i .. "_" .. entry.key
 				local widget = ui.cardButtons[name]
 				if not widget then
 					widget = CreateFrame("Button", name, content, "UIPanelButtonTemplate")
-					widget:SetSize(96, BAR_H)
 					ui.cardButtons[name] = widget
 				end
-				widget:ClearAllPoints()
-				if previous then
-					widget:SetPoint("LEFT", previous, "RIGHT", 6, 0)
-				else
-					widget:SetPoint("TOPLEFT", content, "TOPLEFT", 4, y)
+				local label = tostring(entry.label or entry.key)
+				local width = ButtonWidth(label)
+				if x > 0 and x + width > maxX then
+					x = 0
+					y = y - BAR_H - 4
 				end
-				widget:SetText(tostring(entry.label or entry.key))
+				widget:SetSize(width, BAR_H)
+				widget:ClearAllPoints()
+				widget:SetPoint("TOPLEFT", content, "TOPLEFT", 4 + x, y)
+				widget:SetText(label)
 				widget:SetScript("OnClick", function()
 					FB.ClickCard(card, entry, widget)
 				end)
 				widget:Show()
-				previous = widget
+				x = x + width + 6
 			end
 		end
 		y = y - BAR_H - 12
@@ -1031,7 +1071,7 @@ function FB.LayoutPanel()
 	end
 	y = LayoutCards(content, y)
 	content:SetHeight(-y + 4)
-	if not ui.copyText and not ui.pasteOpen and #run.cards == 0 then
+	if not ui.copyText and not ui.pasteOpen and #VisibleCards() == 0 then
 		panel:Hide()
 		return
 	end
@@ -1108,11 +1148,49 @@ function FB.RefreshCards()
 	if not button then
 		return
 	end
-	local count = #run.cards
+	local count = #VisibleCards()
 	button:SetText("À valider (" .. count .. ")")
 	button:SetShown(count > 0)
 	if PanelShown() then
 		FB.LayoutPanel()
+	end
+	FB.UpdateStatus()
+end
+
+-- « Masquer » (décision 240) : la carte quitte le panneau et les compteurs, rien n'est envoyé au pont ; elle revient
+-- quand le pont la publie avec une autre empreinte (attente changée).
+function FB.HideCard(card)
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" or type(card) ~= "table" or card.id == nil or card.stamp == nil then
+		return
+	end
+	if type(db.hidden) ~= "table" then
+		db.hidden = {}
+	end
+	db.hidden[card.id] = card.stamp
+	if run.confirm then
+		run.confirm.widget:SetText(run.confirm.label)
+		run.confirm = nil
+	end
+	FB.RefreshCards()
+end
+
+-- Masquages des cartes que le pont ne publie plus : retirés.
+local function PruneHidden()
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" or type(db.hidden) ~= "table" then
+		return
+	end
+	local present = {}
+	for _, card in ipairs(run.cards) do
+		if type(card) == "table" and card.id ~= nil then
+			present[card.id] = true
+		end
+	end
+	for id in pairs(db.hidden) do
+		if not present[id] then
+			db.hidden[id] = nil
+		end
 	end
 end
 
@@ -1133,6 +1211,10 @@ end
 function FB.ClickCard(card, entry, widget)
 	if entry.explain then
 		FB.Send(EXPLAIN_QUESTION .. "\n" .. CardPlain(card), "explain", { label = "Expliquer : " .. Plain(card.title or "") })
+		return
+	end
+	if entry.hide then
+		FB.HideCard(card)
 		return
 	end
 	if type(entry.action) ~= "string" or entry.action == "" then
@@ -1214,6 +1296,74 @@ local function Remaining()
 	return run.slots - (run.nextSlot - 1)
 end
 
+local function UpdateInfo()
+	return type(run.status) == "table" and type(run.status.update) == "table" and run.status.update or {}
+end
+
+-- Mise à jour en cours : passage vu en cours par le pont, ou « Mettre à jour » cliqué il y a peu (le passage n'est
+-- pas encore visible dans un emplacement relevé).
+local function Updating()
+	if UpdateInfo().running then
+		return true
+	end
+	if run.updateClicked and time() - run.updateClicked > UPDATE_CLICK_WAIT then
+		run.updateClicked = nil
+	end
+	return run.updateClicked ~= nil
+end
+
+local function Elapsed(seconds)
+	seconds = math.max(0, math.floor(seconds))
+	if seconds < 60 then
+		return seconds .. " s"
+	end
+	return math.floor(seconds / 60) .. " min " .. (seconds % 60) .. " s"
+end
+
+-- Avancement (décision 240) : animation, étape en mots simples, temps écoulé depuis le début du passage.
+local function ProgressText()
+	local update = UpdateInfo()
+	local running = update.running
+	local started = running and tonumber(update.started) or run.updateClicked or time()
+	local stage = running and type(update.stage) == "string" and update.stage or (running and "travail en cours"
+		or "lancement")
+	local dots = string.rep(".", math.floor(GetTime() * 2) % 3 + 1)
+	return "Mise à jour en cours" .. dots .. " " .. Escape(Plain(stage)) .. " · " .. Elapsed(time() - started)
+end
+
+-- Ligne des données : tête et fin publiées par le pont, avancement et compteurs des cartes montrées placés ici (les
+-- cartes masquées n'y comptent pas) ; pont plus ancien : sa ligne entière.
+local function DataLine(status)
+	if not status then
+		return "état des données inconnu"
+	end
+	if type(status.line_head) ~= "string" then
+		return type(status.line) == "string" and Escape(Plain(status.line)) or "état des données inconnu"
+	end
+	local parts = { Escape(Plain(status.line_head)) }
+	if Updating() then
+		parts[#parts + 1] = ProgressText()
+	end
+	local approvable, waiting = 0, 0
+	for _, card in ipairs(VisibleCards()) do
+		if card.count == "approvable" then
+			approvable = approvable + 1
+		elseif card.count == "waiting" then
+			waiting = waiting + 1
+		end
+	end
+	if approvable > 0 then
+		parts[#parts + 1] = approvable .. " à valider"
+	end
+	if waiting > 0 then
+		parts[#parts + 1] = waiting .. " en attente"
+	end
+	if type(status.line_tail) == "string" and status.line_tail ~= "" then
+		parts[#parts + 1] = Escape(Plain(status.line_tail))
+	end
+	return table.concat(parts, " · ")
+end
+
 -- Ligne d'état et voyant : données, pont vu, réponse en cours, réserve.
 function FB.UpdateStatus()
 	if not ui.status then
@@ -1221,7 +1371,7 @@ function FB.UpdateStatus()
 	end
 	local parts = {}
 	local status = type(run.status) == "table" and run.status or nil
-	parts[#parts + 1] = status and type(status.line) == "string" and Escape(Plain(status.line)) or "état des données inconnu"
+	parts[#parts + 1] = DataLine(status)
 	local seen = tonumber(run.bridgeSeen)
 	local icon = "Offline"
 	if seen and seen > 0 then
@@ -1287,6 +1437,7 @@ function FB.ApplySlot(slot)
 	end
 	if published and type(slot.cards) == "table" then
 		run.cards = slot.cards
+		PruneHidden()
 		FB.RefreshCards()
 	end
 	local waiting = Waiting()
@@ -1431,10 +1582,10 @@ local function TickPolls()
 		end
 	elseif ui.frame and ui.frame:IsShown() and not run.exhausted then
 		local since = math.max(run.lastPoll or 0, run.openedAt or now)
-		local update = type(run.status) == "table" and type(run.status.update) == "table" and run.status.update or {}
-		if update.running and (run.updatePolls or 0) < UPDATE_POLLS then
-			-- passage de forever update en cours : relevés rapprochés pour montrer sa fin
-			if now - since >= UPDATE_POLL then
+		local polls = run.updatePolls or 0
+		if Updating() and polls < UPDATE_POLLS_MAX then
+			-- mise à jour en cours : relevés rapprochés pour suivre son étape et montrer sa fin
+			if now - since >= (polls < UPDATE_POLLS and UPDATE_POLL or UPDATE_POLL_SLOW) then
 				run.updatePolls = (run.updatePolls or 0) + 1
 				FB.PollSlot()
 			end
@@ -1456,19 +1607,40 @@ function FB.CheckUpdate(status)
 		run.sawRunning = true
 		return
 	end
-	run.updatePolls = 0
+	if not run.updateClicked then
+		run.updatePolls = 0
+	end
 	local last = type(update.last) == "table" and update.last or nil
 	local finished = last and last.finished_at
 	if type(finished) ~= "string" or type(db) ~= "table" or db.update_seen == finished then
 		return
 	end
-	local announce = run.sawRunning or db.update_seen ~= nil
+	local announce = run.sawRunning or run.updateClicked or db.update_seen ~= nil
 	db.update_seen = finished
-	run.sawRunning = nil
+	run.sawRunning, run.updateClicked, run.updatePolls = nil, nil, 0
 	if announce then
-		FB.Print("Mise à jour terminée : " .. tostring(tonumber(last.written) or 0) .. " écrit(s), "
-			.. tostring(tonumber(last.approvable) or 0) .. " à valider")
+		-- phrase de fin rédigée par le pont (décision 240) ; pont plus ancien : écritures et cartes à valider
+		if type(last.text) == "string" and last.text ~= "" then
+			FB.Print(Escape(Plain(last.text)))
+		else
+			FB.Print("Mise à jour terminée : " .. tostring(tonumber(last.written) or 0) .. " écrit(s), "
+				.. tostring(tonumber(last.approvable) or 0) .. " à valider")
+		end
 	end
+	FB.UpdateStatus()
+end
+
+-- « Mettre à jour » cliqué : l'avancement s'affiche tout de suite ; le dernier passage déjà fini n'est pas annoncé
+-- comme la fin de celui-ci.
+local function StartUpdateProgress()
+	local db = ForeverBridgeDB
+	local last = type(UpdateInfo().last) == "table" and UpdateInfo().last or nil
+	if type(db) == "table" and last and type(last.finished_at) == "string" then
+		db.update_seen = last.finished_at
+	end
+	run.updateClicked = time()
+	run.updatePolls = 0
+	FB.UpdateStatus()
 end
 
 function FB.ClickButton(entry)
@@ -1478,7 +1650,10 @@ function FB.ClickButton(entry)
 	end
 	if type(entry.action) == "string" and entry.action ~= "" then
 		-- bouton d'action (Mettre à jour) : a=<action> sans texte, traité par le pont sans conversation
-		FB.Send("", nil, { flags = { "a=" .. entry.action }, label = tostring(entry.label or entry.key) })
+		if FB.Send("", nil, { flags = { "a=" .. entry.action }, label = tostring(entry.label or entry.key) })
+			and entry.action == "update" then
+			StartUpdateProgress()
+		end
 		return
 	end
 	local class = PlayerClass()
@@ -1533,7 +1708,7 @@ function FB.Tick(elapsed)
 	run.statusClock = (run.statusClock or 0) + elapsed
 	if run.statusClock >= 0.5 then
 		run.statusClock = 0
-		if run.scheduleStart then
+		if run.scheduleStart or Updating() then
 			FB.UpdateStatus()
 		end
 	end
@@ -1681,6 +1856,9 @@ function handlers.ADDON_LOADED(name)
 	if type(db.window) ~= "table" then
 		db.window = {}
 	end
+	if type(db.hidden) ~= "table" then
+		db.hidden = {} -- cartes masquées : identifiant → empreinte (décision 240)
+	end
 end
 
 -- Connexion et /reload : état et boutons de Status.lua, réponses arrivées dans Inbox.lua (chemin de secours).
@@ -1699,6 +1877,7 @@ function handlers.PLAYER_ENTERING_WORLD()
 			run.bridgeSeen = tonumber(ForeverBridgeStatus.now)
 			if type(ForeverBridgeStatus.cards) == "table" then
 				run.cards = ForeverBridgeStatus.cards
+				PruneHidden()
 				FB.RefreshCards()
 			end
 		end

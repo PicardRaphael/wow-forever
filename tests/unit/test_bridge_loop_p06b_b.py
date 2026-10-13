@@ -81,13 +81,13 @@ def test_update_during_a_pass_launches_nothing(tmp_path):
                     encoding="utf-8")  # fmt: skip
     send(bridge, capture, {"a=update"}, 2)
     assert spawn.calls == []
-    assert "passage en cours (étape clone)" in replies(addons)[-1].text
+    assert "Une mise à jour est déjà en cours (préparation)" in replies(addons)[-1].text
 
 
 def test_update_is_refused_offline(tmp_path):
     bridge, addons, capture, spawn, _, _ = bridge_with_actions(tmp_path, offline=True)
     send(bridge, capture, {"a=update"}, 3)
-    assert spawn.calls == [] and "mise à jour impossible hors ligne" in replies(addons)[-1].text
+    assert spawn.calls == [] and "Mise à jour impossible : le pont tourne hors ligne" in replies(addons)[-1].text
 
 
 def test_approve_and_reject_an_approvable_entry(tmp_path):
@@ -96,7 +96,7 @@ def test_approve_and_reject_an_approvable_entry(tmp_path):
     pending(cache, "measures", ident)
     send(bridge, capture, {f"a=approve:{ident}"}, 4)
     assert [argv for argv, _ in spawn.calls] == [[*PYTHON, "update", "approve", ident, "--json"]]
-    assert replies(addons)[-1].text.startswith("Validée")
+    assert replies(addons)[-1].text.startswith("Validé : ")
     send(bridge, capture, {f"a=reject:{ident}"}, 5)
     assert spawn.calls[-1][0] == [*PYTHON, "update", "reject", ident, "--reason", "refusé en jeu", "--json"]
     assert len(spawn.calls) == 2
@@ -105,10 +105,10 @@ def test_approve_and_reject_an_approvable_entry(tmp_path):
 @pytest.mark.parametrize(
     ("flag", "why"),
     [
-        (f"a=approve:network-{VERSION}", "attente non approuvable"),
+        (f"a=approve:network-{VERSION}", "ne se valide pas en jeu"),
         ("a=approve:../x", "action inconnue"),
-        ("a=approve:inconnu", "attente inconnue"),
-        (f"a=reject:measures-{VERSION}-faite", "attente non approuvable"),
+        ("a=approve:inconnu", "cette carte n'existe plus"),
+        (f"a=reject:measures-{VERSION}-faite", "ne se valide pas en jeu"),
         ("a=explain:x", "action inconnue"),
         ("a=autre", "action inconnue"),
     ],
