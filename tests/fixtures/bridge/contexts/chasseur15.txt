@@ -1,0 +1,12 @@
+name=Mydream
+realm=Classic Beta PvE 2
+level=15
+class=HUNTER
+race=Orc
+faction=Horde
+zone=The Barrens
+subzone=The Merchant Coast
+map=1413
+talents=104960:5,104975:1
+gear=4=127::::::::15:1485::75=Trapper's Shirt;5=5957:15:::::::15:1485::::::::Player-0000-00000001=Handstitched Leather Vest;6=14113::::::::15:1485:::1:12718=Aboriginal Sash of the Eagle;7=1507::::::::15:1485::1::1:28:5244=Warped Leather Pants;8=4942::::::::15:1485::11=Tiger Hide Boots;9=15453::::::::15:1485::11=Savannah Bracers;10=15300:15:::::::15:1485::1::1:28:5244=Grizzly Gloves;11=281268::::::::15:1485::11=Depleted Ritual Band;15=14365::::::::15:1485::1::1:28:5244=Mystic's Cape;16=2632::::::::15:1485::1:1:12721:1:28:5244=Curved Dagger of the Monkey;18=3036::::::::15:1485=Heavy Shortbow
+client=1.60.1.70338
