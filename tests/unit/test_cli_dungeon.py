@@ -53,7 +53,10 @@ def test_dungeon_item_where(capsys, tmp_path, monkeypatch):
     assert code == 0
     doc = json.loads(out)
     (hit,) = doc["hits"]
-    assert hit["boss"] == "Taragaman the Hungerer" and hit["source"] == "naowh_dj" and hit["version"] == "1.1.11"
+    assert hit["boss"] == "Taragaman the Hungerer" and hit["source"] == "relevé" and hit["certainty"] == "certain"
+    code, out = run(capsys, ["dungeon", "item", "14148", "--json"], tmp_path, monkeypatch)
+    (hit,) = json.loads(out)["hits"]
+    assert hit["source"] == "fojji" and hit["version"] == "3.3.5"  # sans relevé : source et version de l'addon
     assert validate_provenance(doc["provenance"]) == []
 
 
