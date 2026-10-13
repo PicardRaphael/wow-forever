@@ -29,7 +29,17 @@ QUEST_FIELDS = ("name", "requiredLevel", "questLevel", "requiredRaces", "require
 # Masques du format de Questie : bit (identifiant - 1) des races (ChrRaces) et des classes (ChrClasses).
 FACTION_RACES = {"horde": (2, 5, 6, 8), "alliance": (1, 3, 4, 7)}
 FACTION_MASKS = {faction: sum(1 << (race - 1) for race in races) for faction, races in FACTION_RACES.items()}
-CLASS_IDS = {"mage": 8}
+CLASS_IDS = {  # identifiants de ChrClasses (masque requiredClasses de Questie), T04d : les 9 classes
+    "warrior": 1,
+    "paladin": 2,
+    "hunter": 3,
+    "rogue": 4,
+    "priest": 5,
+    "shaman": 7,
+    "mage": 8,
+    "warlock": 9,
+    "druid": 11,
+}
 CLASS_MASKS = {name: 1 << (class_id - 1) for name, class_id in CLASS_IDS.items()}
 # Champs lus dans `npcKeys` (noms du fichier de Questie).
 NPC_FIELDS = ("name", "minLevelHealth", "maxLevelHealth", "minLevel", "maxLevel", "rank", "zoneID")

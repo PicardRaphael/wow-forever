@@ -171,7 +171,8 @@ def build_parser() -> argparse.ArgumentParser:
 
     lookup = sub.add_parser("lookup", help="consulter une entité du jeu")
     lookup.add_argument(
-        "kind", help="type d'entité : spell (T01), zones (T04c), talent (T06) ; fiches PvP : forever pvp"
+        "kind",
+        help="type d'entité : spell (T01), zones (T04c), talent (T06), quests (T04d) ; fiches PvP : forever pvp",
     )
     lookup.add_argument("name", nargs="?", help="nom anglais du sort ou du talent (casse, espaces et tirets ignorés)")
     lookup.add_argument("--level", type=int, help="zones : niveau du personnage")
@@ -180,6 +181,12 @@ def build_parser() -> argparse.ArgumentParser:
     lookup.add_argument("--rank", type=int, help="position du rang, à partir de 1")
     lookup.add_argument("--class", dest="cls", help="talent : classe (défaut : Mage ; 9 classes depuis PV1)")
     lookup.add_argument("--detail", action="store_true", help="champs complémentaires")
+    lookup.add_argument("--zone", help="quests : zone (nom anglais ou uiMapID)")
+    lookup.add_argument(
+        "--status", help="quests : nouvelle, retouchée, « absente des sources Forever », inchangée, « non couverte »"
+    )
+    lookup.add_argument("--id", type=int, dest="quest_id", help="quests : identifiant de la quête")
+    lookup.add_argument("--dungeon", help="quests : donjon (nom anglais)")
     lookup.add_argument("--limit", type=int, default=20, help="rangs par page")
     lookup.add_argument("--offset", type=int, default=0, help="premier rang de la page (à partir de 0)")
     lookup.add_argument("--json", action="store_true", help="sortie JSON")
@@ -339,6 +346,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     measure.add_argument("--caster-level", type=int, help="niveau du lanceur en dernier recours")
     measure.add_argument("--json", action="store_true", help="sortie JSON")
+
+    quests = sub.add_parser("quests", help="quêtes de Forever fusionnées (addons et client lus en local, T04d)")
+    quests_sub = quests.add_subparsers(dest="quests_command", required=True, parser_class=_Parser)
+    q_build = quests_sub.add_parser("build", help="bâtir la liste fusionnée dans le cache (relue si inchangée)")
+    q_build.add_argument("--rebuild", action="store_true", help="rebâtir même si aucune source n'a changé")
+    q_build.add_argument("--json", action="store_true", help="sortie JSON")
+    q_diff = quests_sub.add_parser("diff", help="écarts entre sources, champ par champ")
+    q_diff.add_argument("--sources", help="deux sources séparées par une virgule (ex. naowh_dj,forever_guide)")
+    q_diff.add_argument("--limit", type=int, default=50, help="écarts affichés")
+    q_diff.add_argument("--json", action="store_true", help="sortie JSON")
+    q_show = quests_sub.add_parser("show", help="quêtes d'un identifiant, d'une zone ou d'un donjon")
+    q_show.add_argument("--id", type=int, dest="quest_id", help="identifiant de la quête")
+    q_show.add_argument("--zone", help="zone (nom anglais ou uiMapID)")
+    q_show.add_argument("--dungeon", help="donjon (nom anglais)")
+    q_show.add_argument("--faction", choices=["horde", "alliance"], help="camp")
+    q_show.add_argument("--status", help="statut")
+    q_show.add_argument("--level", type=int, help="niveau du personnage")
+    q_show.add_argument("--limit", type=int, default=50, help="quêtes par page")
+    q_show.add_argument("--offset", type=int, default=0, help="première quête de la page")
+    q_show.add_argument("--json", action="store_true", help="sortie JSON")
 
     questie = sub.add_parser("questie", help="base locale de l'addon Questie (communautaire, sans réseau)")
     questie_sub = questie.add_subparsers(dest="questie_command", required=True, parser_class=_Parser)
@@ -952,7 +979,108 @@ def _cmd_status(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK if rep["integrity"]["ok"] else EXIT_INTEGRITY
 
 
+def _quest_line(q: Mapping[str, Any]) -> str:
+    level = f"niveau {q['level']}" if q.get("level") is not None else "niveau ?"
+    required = f", requis {q['min_level']}" if q.get("min_level") is not None else ""
+    where = q.get("dungeon") or q.get("zone") or "zone ?"
+    xp = f", XP {q['xp']:.0f} ({q['xp_source']})" if isinstance(q.get("xp"), int | float) else ""
+    gaps = f", écarts : {', '.join(q['discrepancies'])}" if q.get("discrepancies") else ""
+    return f"  {q['id']} {q['name']} · {level}{required} · {where} · {q['status']}{xp}{gaps}"
+
+
+def render_quests(res: Mapping[str, Any]) -> list[str]:
+    lines = [f"Quêtes : {res['total']} (affichées {len(res['quests'])} à partir de {res['offset']})"]
+    lines += [_quest_line(q) for q in res["quests"]] or ["  aucune"]
+    return lines
+
+
+def _cmd_quests(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.provenance import make_provenance
+    from forever.quests import STATUSES, build_quests, lookup_quests
+    from forever.store import load_version
+
+    if args.quests_command == "show":
+        res = lookup_quests(
+            deps,
+            level=args.level,
+            zone=args.zone,
+            status=args.status,
+            faction=args.faction,
+            quest_id=args.quest_id,
+            dungeon=args.dungeon,
+            limit=args.limit,
+            offset=args.offset,
+        )
+        _emit(res, render_quests(res), res["provenance"], args.json)
+        return EXIT_OK
+    book = build_quests(deps, rebuild=getattr(args, "rebuild", False))
+    data = load_version(deps)
+    provenance = make_provenance(
+        deps,
+        game_version=data.game_version,
+        data_sha=data.data_sha,
+        freshness="unknown",
+        certainty="suppose",
+        assumptions=[f"{s['label']} {s['version'] or ''}".strip() for s in book.sources] + book.notes,
+    )
+    if args.quests_command == "build":
+        statuses = {s: sum(1 for q in book.quests.values() if q["status"] == s) for s in STATUSES}
+        present = {s: n for s, n in statuses.items() if n}
+        payload = {
+            "count": len(book.quests),
+            "statuses": present,
+            "sources": book.sources,
+            "fingerprint": book.fingerprint,
+            "from_cache": book.from_cache,
+            "notes": book.notes,
+            "provenance": provenance,
+        }
+        state = "cache relu" if book.from_cache else "rebâtie"
+        lines = [f"Quêtes fusionnées : {len(book.quests)} ({state}, empreinte {book.fingerprint})"]
+        lines += [f"  {s} : {n}" for s, n in present.items()]
+        lines += [f"  source {s['label']} {s['version'] or ''} : {s['quests']} quête(s)" for s in book.sources]
+        lines += [f"  note : {n}" for n in book.notes]
+        _emit(payload, lines, provenance, args.json)
+        return EXIT_OK
+    pair = [s.strip() for s in args.sources.split(",")] if args.sources else None
+    rows = []
+    for q in book.quests.values():
+        for field, values in q["discrepancies"].items():
+            if pair and not all(s in values for s in pair):
+                continue
+            rows.append({"id": q["id"], "name": q["name"], "field": field, "values": values})
+    pairs: dict[str, int] = {}
+    for row in rows:
+        keys = sorted(row["values"])
+        for i, a in enumerate(keys):
+            for b in keys[i + 1 :]:
+                if row["values"][a] != row["values"][b]:
+                    pairs[f"{a} / {b}"] = pairs.get(f"{a} / {b}", 0) + 1
+    payload = {"total": len(rows), "discrepancies": rows[: args.limit], "pairs": pairs, "provenance": provenance}
+    lines = [f"Écarts entre sources : {len(rows)}"]
+    lines += [f"  {r['id']} {r['name']} · {r['field']} : {r['values']}" for r in rows[: args.limit]]
+    lines += [f"  paire {k} : {n}" for k, n in sorted(pairs.items(), key=lambda kv: -kv[1])]
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
+    if args.kind == "quests":
+        from forever.quests import lookup_quests
+
+        found = lookup_quests(
+            deps,
+            level=args.level,
+            zone=args.zone,
+            status=args.status,
+            faction=args.faction,
+            quest_id=args.quest_id,
+            dungeon=args.dungeon,
+            limit=args.limit,
+            offset=args.offset,
+        )
+        _emit(found, render_quests(found), found["provenance"], args.json)
+        return EXIT_OK
     if args.kind == "zones":
         zones = lookup_zones(
             deps, args.level, faction=args.faction, questie_dir=Path(args.questie) if args.questie else None
@@ -978,7 +1106,7 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         _emit(talent, render_talent(talent), talent["provenance"], args.json)
         return EXIT_OK
     if args.kind != "spell":
-        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones", "pvp", "pets"])
+        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones", "quests", "pvp", "pets"])
     if not args.name:
         raise InvalidArgumentError("Nom du sort manquant.", "écrire forever lookup spell <nom>")
     res = lookup_spell(deps, args.name, args.rank, detail=args.detail, limit=args.limit, offset=args.offset)
@@ -3694,6 +3822,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "report": _cmd_report,
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
+        "quests": _cmd_quests,
         "origins": _cmd_origins,
         "hotfixes": _cmd_hotfixes,
         "addons": _cmd_addons,

@@ -46,9 +46,18 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         ("table des monstres (PV comparés à Questie)", "zones et quêtes conseillées"),
     ),
     "AtlasLootClassic": AddonSpec(("AtlasLootClassic", "AtlasLootClassic_*"), "lecteur en DJ1"),
-    "ForeverDungeonJournal": AddonSpec(("ForeverDungeonJournal",), "lecteur en DJ1"),
-    "GearQuestForever": AddonSpec(("GearQuestForever", "GearQuestForever_*"), "lecteur en DJ1 (recoupement)"),
-    "ForeverGuide": AddonSpec(("ForeverGuide",), "lecteur à venir (décision 133)"),
+    "ForeverDungeonJournal": AddonSpec(
+        ("ForeverDungeonJournal",),
+        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build)",
+    ),
+    "GearQuestForever": AddonSpec(
+        ("GearQuestForever", "GearQuestForever_*"),
+        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build)",
+    ),
+    "ForeverGuide": AddonSpec(
+        ("ForeverGuide",),
+        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build)",
+    ),
     "LegacyForever": AddonSpec(("LegacyForever",), "lecteur en LG1"),
     # Décision 228 : ZoneLevelForever renommé par son auteur (« Formerly Zone Level »), même table de zones
     "ZoneInfoForever": AddonSpec(("ZoneInfoForever",), "lecteur à venir (décision 133)"),
@@ -69,7 +78,10 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         "forever talents tf crosscheck",
     ),
     "ForeverCompanion": AddonSpec(("ForeverCompanion",), "inventaire T08d, lecteur à venir"),
-    "NaowhForever": AddonSpec(("NaowhForever", "NaowhForever_*"), "lecteur à venir (inventaire proposé en T08d)"),
+    "NaowhForever": AddonSpec(
+        ("NaowhForever", "NaowhForever_*"),
+        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build)",
+    ),
     # Décision 227 : module d'AtlasLoot Classic Forever (« AtlasLoot Forever [BiS ToolTip] »), base ClassDataBase de
     # listes BiS par classe ; source communautaire, au mieux suppose
     "AtlasBIStooltips": AddonSpec(("AtlasBIStooltips",), "lecteur en T10a (listes BiS de la communauté, suppose)"),

@@ -89,6 +89,9 @@ def build_server(deps: Deps) -> MCPServer:
         class_name: str | None = None,
         zone: str | None = None,
         current: str | None = None,
+        status: str | None = None,
+        quest_id: int | None = None,
+        dungeon: str | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -119,8 +122,27 @@ def build_server(deps: Deps) -> MCPServer:
         lien et commande `/tf import` de chaque build, légalité sur le client ; certitude `suppose` (choix de
         joueurs). P06b : avec `current` (talents actuels, « clé=rang,… »), `closest` : le build populaire le plus
         proche, calculé par l'outil (même spécialisation, points absents, écarts) ; à donner tel quel, sans en choisir
-        un autre ; `null` si aucun point n'est placé."""
+        un autre ; `null` si aucun point n'est placé.
+        T04d : `kind="quests"` : quêtes de Forever fusionnées (Questie, Naowh Forever, Forever Guide,
+        ForeverDungeonJournal, GearQuest et quêtes vues par le client, lus en local) ; filtres `level` (quêtes
+        accessibles et non grises), `faction`, `zone`, `status` (nouvelle, retouchée, absente des sources Forever,
+        inchangée, non couverte), `dungeon`, `quest_id` ; chaque champ porte sa source et sa certitude, chaque
+        désaccord entre sources est dans `discrepancies` ; paginé (`limit`, `offset`, `total`)."""
         try:
+            if kind == "quests":
+                from forever.quests import lookup_quests
+
+                return lookup_quests(
+                    deps,
+                    level=level,
+                    zone=zone,
+                    status=status,
+                    faction=faction,
+                    quest_id=quest_id,
+                    dungeon=dungeon,
+                    limit=limit,
+                    offset=offset,
+                )
             if kind == "zones":
                 path = Path(questie) if questie else None
                 return dict(lookup_zones(deps, level, faction=faction, questie_dir=path))
