@@ -5,6 +5,14 @@ pour les 9 classes (choix des talents, temps par monstre et XP par heure en leve
 et des priorités de rotation de wowsims Forever et des addons, marquée `suppose`, puis affinée par chaque tranche de
 classe. Étude seulement : rien n'est implémenté ici.
 
+> **Correction du 2026-10-13 (décision 252)** : la première version de cette étude disait qu'aucun simulateur
+> wowsims pour Forever n'existait. C'est faux : **ElliotWood/Forever** (Go, MIT, fork de wowsims/classic) simule les
+> 9 classes de Forever au niveau 60, avec des données au build 1.60.1.70291, et publie chaque semaine
+> `wowsimcli-windows.exe` ; `sage3648/mythicsim-forever-engine-go` (moteur de MythicSim) en est un fork. Voir la
+> décision 224, la tranche SIM1 et [l'étude wowsims](wowsims-forever.md). Les passages concernés sont corrigés plus
+> bas. **Décision prise** (décision 252) : pas de moteur générique avant la sortie ; les tranches de classe gardent
+> leur ordre (CM1 après PV2 et AN1, vérifiée sur les journaux de l'utilisateur).
+
 ## 1. Ce qui existe aujourd'hui
 
 - **Moteur** (`forever/engine/`, environ 2 900 lignes) : écrit pour le **Mage** : sorts lancés (temps d'incantation,
@@ -23,7 +31,7 @@ classe. Étude seulement : rien n'est implémenté ici.
 | --- | --- | --- | --- |
 | Client 1.60.1.70338 (wago.tools, décodé par `forever update`) | sorts de toutes les classes : rangs, dégâts (`SpellEffect`), temps d'incantation, coûts, recharges, niveaux ; effets des talents (auras de modification) | certain pour la valeur, `probable` pour son interprétation | oui, déjà téléchargé ; décodage limité au Mage |
 | Coefficients des sorts | absents du client Classic : règle de Classic (temps d'incantation / 3,5, pénalités) | `suppose` | règle connue, appliquée au Mage |
-| Rotations de wowsims | listes de priorités (APL) des classes de Classic et de Saison de la découverte | `suppose` (pas Forever) | **aucun simulateur wowsims pour Forever trouvé le 2026-10-13** ; seuls Classic, SoD et MoP existent |
+| Rotations de wowsims | listes de priorités (APL) des 9 classes de Forever au niveau 60, dans le moteur d'ElliotWood/Forever (décision 233 : formules reprises en citant dépôt, commit et fichier) | `suppose` (source communautaire ; niveau 60 seulement, pas le leveling) | **oui** : ElliotWood/Forever (MIT, build 1.60.1.70291, `wowsimcli-windows.exe` hebdomadaire ; fork MythicSim `sage3648/mythicsim-forever-engine-go`), décision 224, [étude](wowsims-forever.md) ; *corrigé le 2026-10-13* (la première version disait « aucun simulateur wowsims pour Forever ») |
 | Addons installés | Naowh Forever (arbres des talents, planificateur d'entraînement : sorts à apprendre par niveau), Forever Guide, Forever Companion | `suppose` | oui, lecture locale (décision 133) |
 | Mes journaux de combat | dégâts réels, durée des combats, armure effective des monstres | `certain` après mesure | seulement pour les classes que je joue (Mage, Chasseur) |
 
@@ -34,7 +42,8 @@ Trois niveaux, du plus sûr au plus ambitieux :
 1. **Lanceurs de sorts** (Prêtre Ombre, Démoniste, Druide Équilibre, Chaman Élémentaire), **3 à 4 jours** :
    généraliser le décodage des sorts du Mage (mêmes tables du client) à leurs sorts de dégâts, et le moteur de
    lancement (mana, toucher, critique, résistances) qui sert déjà. Rotation : priorité simple par classe (DoT
-   entretenus, puis sort principal), tirée des APL de Classic, `suppose`. Donne le temps par monstre et l'XP par
+   entretenus, puis sort principal), tirée des APL de wowsims Forever (niveau 60, à adapter aux sorts connus au
+   niveau du personnage), `suppose`. Donne le temps par monstre et l'XP par
    heure. Choix des talents : seulement les talents qui modifient des dégâts, des coûts ou des temps d'incantation
    par des auras lisibles dans le client ; les autres restent « non calculé ».
 2. **Classes physiques** (Guerrier, Voleur, Paladin Vindicte, Chaman Amélioration, Druide Farouche), **5 à 7 jours
@@ -49,6 +58,9 @@ glisser). Le niveau 2 vaut une tranche par famille de classes, en novembre.
 
 ## 4. Temps et effet sur le calendrier
 
+*Calendrier remplacé le 2026-10-13 par la décision 251* (T04d, T04f, DJ1, RX1, puis LN1 au plus tard le
+24 octobre, puis EX1, SIM1 et T10a) ; le texte ci-dessous est celui de l'étude.
+
 - Fenêtre réelle : du 13 au 21 octobre, la bêta est ouverte et les tests en jeu priment (P06b, sondes) ; du 21 octobre
   au 4 novembre, LN1 passe en tête (décision 231), puis T04d, T04f, DJ1, SIM1, T10a, EX1.
 - **Niveau 1 (3 à 4 jours)** : il ne tient qu'en repoussant T04d et T04f après le lancement, ou en raccourcissant
@@ -61,12 +73,13 @@ glisser). Le niveau 2 vaut une tranche par famille de classes, en novembre.
 ## 5. Risques
 
 - **Fausse précision** : un nombre calculé inspire plus confiance qu'un build populaire ; sans mesure dans mes
-  journaux, un écart de 20 à 40 % sur l'XP par heure est plausible (coefficients supposés, rotation de Classic, armure
-  des monstres inconnue). Parade : `suppose` partout, mention en clair dans chaque réponse, entrées du registre au
+  journaux, un écart de 20 à 40 % sur l'XP par heure est plausible (coefficients supposés, rotation pensée pour le
+  niveau 60, armure des monstres inconnue). Parade : `suppose` partout, mention en clair dans chaque réponse, entrées du registre au
   statut `modelise`.
-- **Rotations sans source Forever** : wowsims n'a pas de module Forever ; les APL de Classic ignorent les sorts et
-  talents propres à Forever (sorts ajoutés, rangs changés). Un sort de Forever absent de la rotation fausse le
-  classement des talents.
+- **Rotations pensées pour le niveau 60** (*corrigé le 2026-10-13*) : wowsims a bien un moteur Forever
+  (ElliotWood/Forever), dont les APL portent les sorts et talents propres à Forever, mais au niveau 60 seulement ;
+  en leveling, une partie des sorts et des talents manque, et la rotation doit être adaptée sans source pour la
+  valider. Le risque est réduit, pas levé.
 - **Effets des talents** : beaucoup d'effets ne sont pas de simples pourcentages (procs, conditions, déclencheurs) ;
   le décodage générique n'en lira qu'une partie : talents non lus marqués « non calculé », jamais devinés.
 - **Charge du registre** : chaque mécanique ajoutée demande son entrée dans `docs/MECHANICS_REGISTRY.yaml` (source,
@@ -74,6 +87,9 @@ glisser). Le niveau 2 vaut une tranche par famille de classes, en novembre.
 - **Validation** : aucune mesure avant que je joue ces classes ; AN1 et les tranches de classe la feront.
 
 ## 6. Décision à prendre
+
+*Prise le 2026-10-13 (décision 252)* : tout garder pour les tranches de classe après le 4 novembre ; la règle de
+la décision 243 reste la réponse en attendant.
 
 - Lancer le **niveau 1** après LN1, en repoussant T04d et T04f après le lancement ? Ou tout garder pour les tranches de
   classe après le 4 novembre (calendrier actuel) ?

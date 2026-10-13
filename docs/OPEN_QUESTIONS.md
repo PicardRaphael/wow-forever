@@ -159,8 +159,9 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   rien ne le lit encore dans le client. Test : PV d'autres membres des mêmes familles (ours, raptors) à niveau connu,
   puis recherche d'un champ de multiplicateur dans les tables de créatures du client (`CreatureDifficulty`, à
   télécharger sur accord). Priorité : moyenne (le simulateur prend la valeur commune du niveau : un combat contre un ours
-  est sous-estimé d'environ 20 à 25 %). Registre H11. *Modifiée le 2026-10-09* : aucune réponse dans les simulateurs
-  wowsims Forever et MythicSim (cible de raid fixe, pas de multiplicateur par famille,
+  est sous-estimé d'environ 20 à 25 %). Test en jeu facultatif (décisions 247 et 260) : tuer des monstres de familles
+  variées en jouant normalement, ForeverLogger et le journal de combat actifs. Registre H11.
+  *Modifiée le 2026-10-09* : aucune réponse dans les simulateurs wowsims Forever et MythicSim (cible de raid fixe, pas de multiplicateur par famille,
   [étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)).
 - **MON3 — Quelles tables d'armure et de PV des monstres le serveur applique-t-il ?** Test : réduction d'un coup de
   monstre de niveau connu sur une armure connue ; PV mesurés comparés à `ExpectedStat` et `npctotalhp`. Priorité :
@@ -401,7 +402,21 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   qui existent, `hooksecurefunc`). Sonde G du 2026-10-10 : un objet d'un sac et un objet équipé sont insérés, avec
   les couleurs nommées de Forever (`|cnIQ0:` … `|r`) ; sort, quête et partage de pile non essayés. *Modifiée le
   2026-10-10* : sonde H, Maj+clic d'un sort du grimoire et d'une quête du journal insérés ; reste le partage de
-  pile d'un objet empilé. Test : prochaine sonde en jeu. Priorité : basse.
+  pile d'un objet empilé. Test (*modifié le 2026-10-13*, décisions 247 et 260 : sans sonde exigée) : Maj+clic sur une
+  pile d'objets en jouant normalement ; la fenêtre de partage de pile s'ouvre-t-elle aussi ? Priorité : basse.
+- **BR9 — Le bouton Talents d'une autre classe que le Mage rend-il le build populaire le plus proche ?** Ajoutée le
+  2026-10-13 (décision 260) : vu sur le Chasseur (décision 243), à confirmer avec le build populaire le plus proche
+  de Talents Forever sur une autre classe. Test (facultatif, décision 247) : bouton Talents en jouant un autre
+  personnage. Priorité : basse.
+- **RXP1 — `RXPGuides.ImportGuide`, appelé par notre addon, ajoute-t-il un guide gardé d'une session à l'autre sans
+  code lié au compte ?** Ajoutée le 2026-10-13 (RX1, décision 253) : lu dans `GuideLoader.lua` (guide analysé, ajouté
+  et gardé dans `addon.db.profile.guides`), jamais essayé en jeu. Test (facultatif, décision 247) : une route livrée
+  par le pont, puis `/reload` et nouvelle connexion, en jouant normalement ou à la sortie. Priorité : moyenne (RX1 ;
+  repli : petit addon de guide écrit par le pont jeu fermé).
+- **NFB1 — Un build exporté par Naowh Forever (`!NFB1!`) se relit-il à l'identique par notre codec ?** Ajoutée le
+  2026-10-13 (EX1, décision 255) : format relevé dans `NaowhForever_Training` (LibSerialize, LibDeflate,
+  `EncodeForPrint`), jamais vérifié sur une chaîne réelle. Test (facultatif, décision 247) : exporter un build depuis
+  Naowh en jouant, le coller dans le chat ; va-et-vient exact. Priorité : basse (EX1).
 - **BR6 — L'export SimulationCraft omet-il vraiment l'emplacement à distance (18) sur Forever ?** Oui pour la
   baguette : le premier export réel (sonde G, `tests/fixtures/simc/mage19_sonde_g.txt`) n'a pas de ligne `ranged=`
   alors que le contexte du même instant porte l'emplacement 18 (Greater Magic Wand). Reste à voir avec une arme à
@@ -424,4 +439,5 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **PET1 — Quel rang enseigne une bête dont Forever Bestiary donne un rang au-dessus de son niveau ?** Le correctif
   officiel du 2026-10-01 dit que ces rangs ont été abaissés, sans dire jusqu'où ; forever suppose le plus haut rang
   dont le niveau requis ne dépasse pas celui de la bête (décision 242, `pets.corrected_taught`). Test : Beast Lore sur
-  une des 11 bêtes marquées (par exemple Ukorsbane, Durotar). Priorité : moyenne. Registre L3.
+  une des 11 bêtes marquées (par exemple Ukorsbane, Durotar), facultatif, en jouant normalement (décisions 247 et 260).
+  Priorité : moyenne. Registre L3.

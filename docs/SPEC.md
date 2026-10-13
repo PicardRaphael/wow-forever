@@ -92,7 +92,7 @@ Chaque valeur garde sa source et sa certitude. « — » : la source n'apporte r
 - Modifier le code des addons de la communauté (décision 196).
 - Recopier le contenu protégé des guides (seulement des faits sourcés).
 - Prédire un duel PvP : le PvP reste un profil comparatif, marqué `suppose`.
-- Guide de leveling pas à pas (Questie et Forever Guide le font en jeu ; RestedXP reste exclu comme source de données) : l'agent répond « quelle zone ou quel donjon à mon niveau » et, avec T04d et T04f, quel objectif suivant et quels bonus d'XP prendre.
+- Guide de leveling pas à pas (Questie et Forever Guide le font en jeu ; RestedXP reste exclu comme source de données ; *amendé le 2026-10-13, décision 253* : la feuille de route sur mesure arrive avec RX1, construite par forever et livrée dans RestedXP par son API publique) : l'agent répond « quelle zone ou quel donjon à mon niveau » et, avec T04d et T04f, quel objectif suivant et quels bonus d'XP prendre.
 - Suivre en direct les temps de recharge adverses dans un addon : impossible sur Forever (abonnement au journal de combat refusé aux addons, valeurs de combat secrètes, `docs/research/addon-forever.md`). En jeu, seules des fiches fixes s'affichent ; l'analyse des combats se fait après coup sur les journaux.
 - Acheter ou vendre à l'hôtel des ventes à la place du joueur.
 - Aspirer automatiquement Wowhead (ses conditions l'interdisent) : consultation ponctuelle par le sous-agent de recherche seulement.
