@@ -118,6 +118,7 @@ def test_bridge_launch_uses_the_real_interpreter(tmp_path, monkeypatch):
     calls = []
     monkeypatch.setattr(spawn, "spawn_detached", lambda args, log, env=None: calls.append((args, log, env)))
     monkeypatch.setattr(spawn, "current_interpreter", lambda: ("REAL", {"__PYVENV_LAUNCHER__": "VENV"}))
+    monkeypatch.setattr(spawn, "probe_environment", lambda exe, env, **kw: None)  # environnement vérifié (décision 241)
     from datetime import UTC, datetime
 
     log = autostart.launch_bridge(tmp_path / "wow", tmp_path / "cache", datetime(2026, 10, 9, 18, 0, tzinfo=UTC))
@@ -134,6 +135,7 @@ def test_bridge_start_uses_the_real_interpreter(make_deps, tmp_path, monkeypatch
     calls = []
     monkeypatch.setattr(spawn, "spawn_detached", lambda args, log, env=None: calls.append((args, env)))
     monkeypatch.setattr(spawn, "current_interpreter", lambda: ("REAL", {"__PYVENV_LAUNCHER__": "VENV"}))
+    monkeypatch.setattr(spawn, "probe_environment", lambda exe, env, **kw: None)  # environnement vérifié (décision 241)
     assert main(["bridge", "start", "--model", "haiku"], deps) == 0
     args, env = calls[0]
     assert args[:6] == ["REAL", "-u", "-m", "forever", "bridge", "run"] and args[-2:] == ["--model", "haiku"]

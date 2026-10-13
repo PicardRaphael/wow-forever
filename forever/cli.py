@@ -2302,6 +2302,10 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
                 running += f" depuis {summary['running_minutes']} min"
             running += ")"
         lines = [f"Dernier passage : {last['finished_at'] if last else 'aucun'}" + running]
+        broken = _spawn_env(deps.cache_dir / "update")
+        if broken:
+            lines.insert(0, f"Tâche planifiée « WoW Forever - mise à jour » : {broken['line']}")
+            summary = {**summary, "environment": broken}
         if summary["running"] and summary.get("running_detail"):
             lines.append(f"  dernière ligne : {summary['running_detail']}")
         lines += [f"  écrit : {update.written_text(w)}" for w in (last or {}).get("written") or []]
@@ -2501,6 +2505,14 @@ def _bridge_addon_state(deps: Deps, running: bool) -> tuple[str | None, list[str
     return ("en_attente" if running else "a_reinstaller"), files
 
 
+def _spawn_env(folder: Path) -> dict[str, Any] | None:
+    """Échec de la vérification de l'environnement gardé dans `folder` (décision 241), avec sa ligne d'état."""
+    from forever import spawn
+
+    doc = spawn.read_environment(folder)
+    return {**doc, "line": spawn.environment_line(doc)} if doc else None
+
+
 def _bridge_status(deps: Deps, args: argparse.Namespace, provenance: Provenance, journal: Any) -> int:
     """`forever bridge status` : pont en marche ou arrêté (arrêt sans `stop` signalé avec son dernier signe de vie),
     état des données et de l'addon, défauts de contexte des sept derniers jours, dernières lignes du journal."""
@@ -2528,6 +2540,9 @@ def _bridge_status(deps: Deps, args: argparse.Namespace, provenance: Provenance,
     else:
         state = "arrêté"
     lines = [f"Pont : {state}", data["line"]]
+    broken = _spawn_env(deps.cache_dir / "bridge")
+    if broken and holder is None:
+        lines.insert(1, f"  {broken['line']}")
     if defects:
         d = defects[-1]
         plural = "s" if len(defects) > 1 else ""
@@ -2545,6 +2560,7 @@ def _bridge_status(deps: Deps, args: argparse.Namespace, provenance: Provenance,
         "data": data,
         "context_defects": summary,
         "journal": last,
+        "environment": broken,
     }
     _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
     return EXIT_OK

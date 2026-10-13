@@ -19,11 +19,13 @@ l'utilise depuis l'interpréteur de base, hors de l'environnement."""
 
 from __future__ import annotations
 
+import json
 import os
 import subprocess
 import sys
 from collections.abc import Mapping, Sequence
 from pathlib import Path, PureWindowsPath
+from typing import Any
 
 # Drapeaux de Windows : processus détaché, nouveau groupe (Ctrl+C de la session ne le tue pas), sans fenêtre.
 _DETACHED = 0x00000008 | 0x00000200 | 0x08000000
@@ -33,7 +35,69 @@ _RELAY_TIMEOUT_S = 60.0
 _STILL_ACTIVE = 259
 _ERROR_ACCESS_DENIED = 5
 VENV_LAUNCHER = "__PYVENV_LAUNCHER__"
+# Python retire `__PYVENV_LAUNCHER__` de son propre environnement au démarrage : le relais la reçoit sous ce nom et la
+# remet pour le processus final (décision 241 ; sans elle, le pont tournait sans les paquets du projet).
+FORWARDED_LAUNCHER = "FOREVER_PYVENV_LAUNCHER"
 REPO_ROOT = Path(__file__).resolve().parents[1]
+# Vérification de l'environnement au démarrage (décision 241) : l'interpréteur choisi importe le point d'entrée du
+# projet et ses dépendances ; l'état d'un échec est gardé dans `<dossier>/environment.json`.
+PROBE_CODE = "import forever.cli"
+PROBE_TIMEOUT_S = 120.0
+ENV_STATE = "environment.json"
+ENV_HINT = "lancer `uv sync` à la racine du dépôt (environnement du projet incomplet), puis relancer la tâche planifiée"
+
+
+class EnvironmentBroken(OSError):
+    """L'interpréteur choisi n'importe pas les dépendances du projet : rien n'est lancé."""
+
+
+def probe_environment(
+    exe: str, env: Mapping[str, str], *, code: str = PROBE_CODE, timeout: float = PROBE_TIMEOUT_S
+) -> str | None:
+    """None si `exe`, avec les variables `env`, importe le projet et ses dépendances ; sinon la dernière ligne de
+    l'erreur (« ModuleNotFoundError: No module named 'yaml' »)."""
+    try:
+        done = subprocess.run(  # liste d'arguments, sans shell
+            [exe, "-c", code],
+            cwd=REPO_ROOT,
+            env=dict(env),
+            stdin=subprocess.DEVNULL,
+            capture_output=True,
+            timeout=timeout,
+            check=False,
+            creationflags=_NO_WINDOW if sys.platform == "win32" else 0,
+        )
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        return f"{type(exc).__name__}: {exc}"
+    if done.returncode == 0:
+        return None
+    lines = (done.stderr or b"").decode("utf-8", errors="replace").strip().splitlines()
+    return lines[-1] if lines else f"code de sortie {done.returncode}"
+
+
+def record_environment(folder: Path, error: str | None, exe: str, at: str) -> None:
+    """Garde l'échec de la vérification (`error`) dans `<folder>/environment.json`, ou retire l'état (None)."""
+    path = folder / ENV_STATE
+    if error is None:
+        path.unlink(missing_ok=True)
+        return
+    folder.mkdir(parents=True, exist_ok=True)
+    doc = {"error": error, "interpreter": exe, "at": at, "hint": ENV_HINT}
+    path.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
+
+
+def read_environment(folder: Path) -> dict[str, Any] | None:
+    """Dernier échec de la vérification gardé dans `folder`, ou None."""
+    try:
+        doc = json.loads((folder / ENV_STATE).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    return doc if isinstance(doc, dict) and doc.get("error") else None
+
+
+def environment_line(doc: Mapping[str, Any]) -> str:
+    """Ligne des commandes d'état : « ne peut pas démarrer : … depuis … : lancer `uv sync` … »."""
+    return f"ne peut pas démarrer : {doc.get('error')} (depuis {doc.get('at')}) : {doc.get('hint') or ENV_HINT}"
 
 
 def real_interpreter(
@@ -76,6 +140,9 @@ def spawn_detached(args: Sequence[str], log_path: Path, env: Mapping[str, str] |
     log_path.parent.mkdir(parents=True, exist_ok=True)
     relay = [sys.executable, "-m", "forever.spawn", str(log_path), *args]
     flags = _NO_WINDOW if sys.platform == "win32" else 0
+    if env is not None and VENV_LAUNCHER in env:
+        env = dict(env)
+        env[FORWARDED_LAUNCHER] = env.pop(VENV_LAUNCHER)  # remise par le relais au processus final
     try:
         done = subprocess.run(  # liste d'arguments, sans shell
             relay,
@@ -94,24 +161,35 @@ def spawn_detached(args: Sequence[str], log_path: Path, env: Mapping[str, str] |
         raise OSError(f"relais du lancement détaché en échec ({done.returncode}) : {detail[-1] if detail else '?'}")
 
 
+def _child_env(environ: Mapping[str, str]) -> dict[str, str]:
+    """Variables du processus final : `__PYVENV_LAUNCHER__` remise depuis `FORWARDED_LAUNCHER` (voir ce nom)."""
+    env = dict(environ)
+    launcher = env.pop(FORWARDED_LAUNCHER, None)
+    if launcher:
+        env[VENV_LAUNCHER] = launcher
+    return env
+
+
 def _launch(args: Sequence[str], log_path: Path) -> None:
     """Démarre `args` détaché, sortie dans `log_path` (dans le relais)."""
+    env = _child_env(os.environ)
     with log_path.open("ab") as log:
         if sys.platform == "win32":
             try:  # hors du job du lanceur s'il le permet, sinon dans le job (refus : OSError)
                 subprocess.Popen(  # liste d'arguments, sans shell
                     list(args), stdout=log, stderr=log, stdin=subprocess.DEVNULL,
-                    creationflags=_DETACHED | _BREAKAWAY_FROM_JOB, close_fds=True,
+                    creationflags=_DETACHED | _BREAKAWAY_FROM_JOB, close_fds=True, env=env,
                 )  # fmt: skip
             except OSError:
                 subprocess.Popen(  # liste d'arguments, sans shell
                     list(args), stdout=log, stderr=log, stdin=subprocess.DEVNULL, creationflags=_DETACHED,
-                    close_fds=True,
+                    close_fds=True, env=env,
                 )  # fmt: skip
         else:
             subprocess.Popen(  # liste d'arguments, sans shell
-                list(args), stdout=log, stderr=log, stdin=subprocess.DEVNULL, start_new_session=True, close_fds=True
-            )
+                list(args), stdout=log, stderr=log, stdin=subprocess.DEVNULL, start_new_session=True, close_fds=True,
+                env=env,
+            )  # fmt: skip
 
 
 def pid_alive(pid: object) -> bool | None:

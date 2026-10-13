@@ -110,7 +110,7 @@ def test_update_task_command_is_the_hook_command_with_its_log():
     assert update_task.command("REAL") == ["REAL", "-u", "-m", "forever", "update", "--auto", "--json", "--log"]
 
 
-def test_update_task_waits_for_the_pass_and_returns_its_code(monkeypatch):
+def test_update_task_waits_for_the_pass_and_returns_its_code(monkeypatch, tmp_path):
     calls = []
 
     def run(args, env):
@@ -119,6 +119,8 @@ def test_update_task_waits_for_the_pass_and_returns_its_code(monkeypatch):
 
     monkeypatch.setattr(update_task, "run_held", run)
     monkeypatch.setattr("forever.spawn.current_interpreter", lambda: ("REAL", {"__PYVENV_LAUNCHER__": "VENV"}))
+    monkeypatch.setattr("forever.spawn.probe_environment", lambda exe, env, **kw: None)  # décision 241
+    monkeypatch.setenv("FOREVER_CACHE_DIR", str(tmp_path))
     assert update_task.main() == 3
     assert calls == [(update_task.command("REAL"), {"__PYVENV_LAUNCHER__": "VENV"})]
 

@@ -10,13 +10,17 @@ tâche (qui tue le relais) l'atteigne aussi."""
 
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
+from pathlib import Path
 
 from forever import spawn
 
 _NO_WINDOW = 0x08000000
+EXIT_ENVIRONMENT = 3  # environnement du projet incomplet : passage non lancé
 
 
 def command(exe: str) -> list[str]:
@@ -89,8 +93,22 @@ def run_held(args: Sequence[str], env: Mapping[str, str]) -> int:
     return process.wait()
 
 
+def cache_dir(environ: Mapping[str, str] = os.environ) -> Path:
+    """Même règle que `config.default_cache_dir` (FOREVER_CACHE_DIR, sinon ~/.cache/forever), sans l'importer : ce
+    module ne dépend que de la bibliothèque standard."""
+    configured = environ.get("FOREVER_CACHE_DIR")
+    return Path(configured) if configured else Path.home() / ".cache" / "forever"
+
+
 def main() -> int:
+    """Vérifie l'environnement du projet (décision 241), puis lance le passage et rend son code ; environnement
+    incomplet : rien n'est lancé, l'erreur est gardée pour `forever update status`, code `EXIT_ENVIRONMENT`."""
     exe, env = spawn.current_interpreter()
+    error = spawn.probe_environment(exe, env)
+    at = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+    spawn.record_environment(cache_dir() / "update", error, exe, at)
+    if error is not None:
+        return EXIT_ENVIRONMENT
     return run_held(command(exe), env)
 
 

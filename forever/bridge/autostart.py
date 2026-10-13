@@ -40,6 +40,7 @@ TASK_NAME = "WoW Forever - pont"
 CHECK_S = 15.0
 FAST_DEATH_S = 60.0  # un pont mort moins d'une minute après son lancement : attente avant le suivant
 MAX_DELAY_S = 1800.0
+ENV_RETRY_S = 300.0  # environnement du projet incomplet : nouvelle vérification (décision 241)
 STATE = "autostart.json"
 STOP_MARKER = "autostart.stop"
 SUPPORTED = sys.platform == "win32"
@@ -280,6 +281,11 @@ def launch_bridge(wow_dir: Path, cache_dir: Path, now: datetime, model: str | No
     du lancement. Lève OSError si le lancement échoue."""
     exe, env = spawn.current_interpreter()
     env = {**env, "FOREVER_CACHE_DIR": str(cache_dir)}  # même verrou que la surveillance qui le lit
+    # environnement vérifié avant tout lancement (décision 241) : un pont sans ses paquets mourrait aussitôt
+    error = spawn.probe_environment(exe, env)
+    spawn.record_environment(cache_dir / "bridge", error, exe, format_utc(now))
+    if error is not None:
+        raise spawn.EnvironmentBroken(f"{error} ({exe}) : {spawn.ENV_HINT}")
     args = [exe, "-u", "-m", "forever", "bridge", "run", "--wow-dir", os.path.abspath(wow_dir)]
     if model:
         args += ["--model", model]
@@ -321,6 +327,7 @@ def supervise(
     watching = False  # un pont tourne (ou vient d'être lancé) : sa mort sera notée
     failures = 0
     next_at = 0.0
+    env_error: str | None = None  # dernier échec de la vérification de l'environnement, noté une fois
     try:
         while True:
             if marker.exists():
@@ -349,9 +356,18 @@ def supervise(
                 if now >= next_at:
                     try:
                         log = launch()
+                    except spawn.EnvironmentBroken as exc:
+                        # rien n'a été lancé : pas de pont à surveiller, nouvelle vérification plus tard
+                        if str(exc) != env_error:
+                            env_error = str(exc)
+                            journal.write("autostart_env_error", error=env_error, next_in_s=round(ENV_RETRY_S))
+                        next_at = now + ENV_RETRY_S
+                        sleep(CHECK_S)
+                        continue
                     except OSError as exc:
                         journal.write("error", where="lancement du pont", error=str(exc))
                     else:
+                        env_error = None
                         journal.write("autostart_launch", log=str(log) if log else None)
                     last_launch, watching = now, True
             sleep(CHECK_S)
