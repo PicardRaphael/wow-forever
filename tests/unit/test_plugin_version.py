@@ -45,7 +45,9 @@ def test_plugin_json_has_a_semver_version():
     # 0.8.9 : cas du bouton PvP régénéré (consigne resserrée sous 600 caractères, décision 237).
     # 0.9.0 : cas des boutons régénérés (note d'équipement sans nom de tranche), cas « pont-question-de-suite-faute »,
     # règle « mots de joueur » du format des réponses venues du jeu (sonde H, décision 238).
-    assert version == "0.9.1"
+    # 0.10.0 : objectifs de leveling pour toutes les classes et quêtes de Forever (forever-leveling, routeur), cas des
+    # boutons Leveling régénérés (T04d, bloc F).
+    assert version == "0.10.0"
 
 
 def test_fingerprint_is_up_to_date():

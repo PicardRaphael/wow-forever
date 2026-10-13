@@ -1659,6 +1659,23 @@ mechanics:
       - tests/unit/test_engine_xp.py::test_every_term_carries_a_known_certainty_and_a_source
     tolerance: null
     note: "facteur de Classic, non vérifié pour Forever (question LVL8) ; s'applique avant le bonus de donjon"
+  - id: I14
+    categorie: optimisation
+    description: "Rentabilité d'un objectif de leveling : zone, donjon au premier passage avec ses quêtes, passages suivants"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "modèle d'XP (I6, I10, I11, I12, I13), quêtes fusionnées (forever/quests.py), temps par monstre (I15, moteur du Mage)"
+      - "forever/data/1.60.1.70338/mechanics.json (leveling.objectives : monstres par quête, surcoût par quête, trajet et monstres d'un donjon, taille et gain de vitesse du groupe ; suppose)"
+    tests:
+      - tests/unit/test_sim_objectives.py::test_ragefire_chasm_has_a_first_pass_and_repeats
+      - tests/unit/test_sim_objectives.py::test_xp_per_hour_is_xp_over_time
+      - tests/unit/test_sim_objectives.py::test_advice_repeats_the_numbers_of_the_objective
+      - tests/unit/test_sim_objectives.py::test_mage_kill_time_comes_from_the_engine
+    tolerance: null
+    formule: "XP par heure = (XP des quêtes accessibles non grises + monstres × XP d'un monstre) / temps ; zone : monstres × temps par monstre + surcoût par quête ; donjon, premier passage : trajet aller et retour + surcoût par quête + monstres × temps par monstre / gain du groupe ; passages suivants : monstres seuls"
+    note: "hypothèses de temps suppose, à mesurer par ForeverLogger (acceptation -> rendu, durée d'un passage) ; le classement peut en dépendre plus que de l'XP et la sortie le dit ; conseil construit par l'outil à partir de ses chiffres ; repos non appliqué au classement"
   - id: I15
     categorie: optimisation
     description: "Temps par monstre des classes sans moteur : mesuré dans les relevés du joueur, sinon estimé"

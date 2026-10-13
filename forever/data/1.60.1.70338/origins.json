@@ -1262,6 +1262,17 @@
       "source": "paramètres de mesure du temps par monstre (T04d, bloc E)",
       "reason": "réglage de l'outil de mesure, pas une valeur du jeu",
       "registry": "I15"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.objectives"
+      ],
+      "origin": "manuel",
+      "source": "hypothèses de temps des objectifs de leveling, T04d bloc F",
+      "certainty": "suppose",
+      "reason": "temps de trajet, de quête et de donjon non mesurés (ForeverLogger les mesurera)",
+      "registry": "I14"
     }
   ],
   "pending": [],

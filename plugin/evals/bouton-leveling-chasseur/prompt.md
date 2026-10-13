@@ -25,10 +25,12 @@ Talents actuels (clés de forever, pour `current` de forever_build) : deadlyAspe
 Consigne du bouton « leveling » : appelle exactement, dans cet ordre :
 - forever_lookup {"kind": "zones", "level": 15, "faction": "horde", "limit": 5}
 - forever_lookup {"kind": "tf_popular", "name": "Hunter", "current": "deadlyAspects=5,focusedFire=1"}
+- forever_sim_leveling {"kind": "objectives", "level": 15, "class_name": "Hunter", "faction": "horde", "race": "Orc"}
 Puis :
 - Zones et quêtes : les trois premières zones du résultat de zones, dans l'ordre rendu, avec leur nombre de quêtes utiles ; prochain donjon : le premier donjon rendu (`dungeons`).
 - Build populaire de ta classe : `closest` s'il est rendu (le plus proche de tes talents), sinon le build le plus joué ; son lien et sa commande `/tf import` tels quels, sa date (`asOf`).
-- Dis clairement ce qui est calculé et ce qui ne l'est pas encore : zones, quêtes et donjon viennent des données ; le build est un choix de joueurs ; le prochain talent et l'XP par heure ne sont pas encore calculés pour ta classe.
+- Objectifs (résultat de forever_sim_leveling, kind objectives) : rends `advice` tel quel, puis le meilleur objectif (`best` : nom, XP, minutes, XP par heure) et, s'il y a un donjon, son premier passage avec ses quêtes et ses passages suivants ; dis d'où vient le temps par monstre (`kill_time.source` : engine calculé, measured mesuré sur tes relevés, estimated estimé) et que les temps de trajet et de quête sont des hypothèses.
+- Dis clairement ce qui est calculé et ce qui ne l'est pas encore : zones, quêtes, donjon et XP par heure viennent des données et de tes relevés ; le build est un choix de joueurs ; le prochain talent n'est pas encore calculé pour ta classe.
 
 Question posée par le bouton « leveling » de la fenêtre :
 Quel est mon prochain objectif de leveling ?

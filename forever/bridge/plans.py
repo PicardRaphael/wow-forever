@@ -92,10 +92,28 @@ def _next_point(r: Resolved, level_cap: int | None) -> tuple[Call, tuple[str, ..
     return Call("forever_build", args), read
 
 
+def _objectives_call(r: Resolved) -> Call:
+    """Objectifs de leveling de T04d (toutes les classes) : XP par heure par zone et par donjon."""
+    args: dict[str, Any] = {"kind": "objectives", "level": r.level, "class_name": r.class_name}
+    if r.faction in ("horde", "alliance"):
+        args["faction"] = r.faction
+    if r.race:
+        args["race"] = r.race
+    return Call("forever_sim_leveling", args)
+
+
+OBJECTIVES_READ = (
+    "Objectifs (résultat de forever_sim_leveling, kind objectives) : rends `advice` tel quel, puis le meilleur "
+    "objectif (`best` : nom, XP, minutes, XP par heure) et, s'il y a un donjon, son premier passage avec ses quêtes "
+    "et ses passages suivants ; dis d'où vient le temps par monstre (`kill_time.source` : engine calculé, measured "
+    "mesuré sur tes relevés, estimated estimé) et que les temps de trajet et de quête sont des hypothèses."
+)
+
+
 def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
-    """Bouton Leveling, toutes les classes (décision 242) : zones, quêtes et donjon (indépendants de la classe), puis
-    pour le Mage, seule classe calculée, le prochain talent et l'XP par heure ; ailleurs, le build populaire de la
-    classe et son lien, et la mention de ce qui n'est pas encore calculé."""
+    """Bouton Leveling, toutes les classes (décisions 242 et 243, T04d) : zones, quêtes et donjon, objectifs de
+    leveling (XP par heure par zone et par donjon) ; pour le Mage en plus le prochain talent calculé ; ailleurs, le
+    build populaire de la classe et son lien, et la mention de ce qui n'est pas encore calculé (prochain talent)."""
     zones: dict[str, Any] = {"kind": "zones", "level": r.level}
     if r.faction in ("horde", "alliance"):
         zones["faction"] = r.faction
@@ -106,11 +124,8 @@ def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
     )
     if r.class_token == "MAGE":
         point = _next_point(r, level_cap)
-        sim: dict[str, Any] = {"level": r.level}
-        if r.race:
-            sim["race"] = r.race
-        calls = [Call("forever_lookup", zones)] + ([point[0]] if point else []) + [Call("forever_sim_leveling", sim)]
-        read = (
+        mage_calls = [Call("forever_lookup", zones)] + ([point[0]] if point else []) + [_objectives_call(r)]
+        mage_read = (
             head,
             (
                 "Prochain talent calculé, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton "
@@ -118,9 +133,9 @@ def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
                 "tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun "
                 "gain mesurable ; instable si `stability.stable` est faux)."
             ),
-            "XP par heure calculée à ton niveau (résultat de forever_sim_leveling), avec sa certitude.",
+            OBJECTIVES_READ,
         )
-        return Plan("leveling", tuple(calls), read)
+        return Plan("leveling", tuple(mage_calls), mage_read)
     popular: dict[str, Any] = {"kind": "tf_popular", "name": r.class_name}
     if r.current:
         popular["current"] = ",".join(f"{k}={v}" for k, v in r.current.items())
@@ -130,13 +145,15 @@ def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
             "Build populaire de ta classe : `closest` s'il est rendu (le plus proche de tes talents), sinon le build le "
             "plus joué ; son lien et sa commande `/tf import` tels quels, sa date (`asOf`)."
         ),
+        OBJECTIVES_READ,
         (
-            "Dis clairement ce qui est calculé et ce qui ne l'est pas encore : zones, quêtes et donjon viennent des "
-            "données ; le build est un choix de joueurs ; le prochain talent et l'XP par heure ne sont pas encore "
-            "calculés pour ta classe."
+            "Dis clairement ce qui est calculé et ce qui ne l'est pas encore : zones, quêtes, donjon et XP par heure "
+            "viennent des données et de tes relevés ; le build est un choix de joueurs ; le prochain talent n'est pas "
+            "encore calculé pour ta classe."
         ),
     )
-    return Plan("leveling", (Call("forever_lookup", zones), Call("forever_lookup", popular)), read)
+    calls = (Call("forever_lookup", zones), Call("forever_lookup", popular), _objectives_call(r))
+    return Plan("leveling", calls, read)
 
 
 def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:

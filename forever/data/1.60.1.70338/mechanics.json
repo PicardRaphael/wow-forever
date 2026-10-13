@@ -805,6 +805,19 @@
    "certainty": "suppose",
    "registry": "I15",
    "source": "paramètres de mesure (T04d, bloc E) : relevés minimaux d'une tranche avant de remplacer l'estimation, largeur des tranches de niveaux, pause au-delà de laquelle deux gains d'XP de ForeverLogger ne sont plus de la même séance"
+  },
+  "leveling.objectives": {
+   "value": {
+    "kills_per_quest": 8,
+    "quest_overhead_s": 90.0,
+    "dungeon_travel_s": 600.0,
+    "dungeon_kills": 40,
+    "dungeon_party": 5,
+    "dungeon_group_speedup": 2.5
+   },
+   "certainty": "suppose",
+   "registry": "I14",
+   "source": "hypothèses de temps des objectifs de leveling (T04d, bloc F), à mesurer par ForeverLogger (acceptation -> rendu d'une quête, durée d'un passage en donjon) : monstres tués par quête, surcoût par quête (prise, trajet, rendu), trajet aller et retour d'un donjon, monstres tués dans un donjon, taille du groupe de donjon, gain de vitesse d'un groupe sur le temps par monstre seul ; le classement des objectifs peut en dépendre plus que de l'XP"
   }
  },
  "inherited_from": "1.60.1.70291"

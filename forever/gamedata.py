@@ -605,7 +605,9 @@ def _xp_rules(values: Mapping[str, Any], raw_char: Any) -> XpRules | None:
         higher_max_diff=r.int_(diff, "higher_max_diff", "xp.mob_level_difference"),
         zero_difference=tuple((int(a), int(b)) for a, b in zero),
         elite_factor=r.num(r.obj(values, "xp.elite_factor", "xp.elite_factor"), "value", "xp.elite_factor"),
-        dungeon_bonus=r.num(r.obj(values, "xp.dungeon_kill_bonus", "xp.dungeon_kill_bonus"), "value", "xp.dungeon_kill_bonus"),
+        dungeon_bonus=r.num(
+            r.obj(values, "xp.dungeon_kill_bonus", "xp.dungeon_kill_bonus"), "value", "xp.dungeon_kill_bonus"
+        ),
         group_rates=tuple(float(x) for x in r.list_(group, "rates", "xp.group.rates")),
         group_level_basis=_choice(values, "xp.group_level_basis"),
         rested_factor=factor,

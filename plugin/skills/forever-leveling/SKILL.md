@@ -40,6 +40,8 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 | Suivre cet ordre en jeu avec Talents Forever | même appel : bloc `export.talents_forever` (`link`, `import` : `/tf import <code>`, ordre compris), recopié tel quel |
 | Faut-il respec, à quel niveau | `forever_build(context="leveling", level, current=<build actuel>, respecs=<nombre déjà fait>)` : bloc `respec` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` |
+| Où gagner le plus d'XP par heure, faut-il faire tel donjon (toutes les classes) | `forever_sim_leveling(kind="objectives", level, class_name, faction)` : `advice` rendu tel quel, `best`, `zones`, `dungeons` (`first_pass` avec ses quêtes, `repeat`), `kill_time.source` (`engine`, `measured`, `estimated`) |
+| Quêtes de Forever (nouvelles, retouchées, écarts entre addons) | `forever_lookup(kind="quests", level, faction, zone, status, dungeon)` |
 | Pourquoi ce résultat (mécanique) | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` |
 
 - `rotation` : `frost`, `fire` ou `arcane`. Sans préférence du joueur, prends la rotation du build conseillé par

@@ -645,6 +645,15 @@ def build_parser() -> argparse.ArgumentParser:
     sim_leveling = sim_sub.add_parser("leveling", help="temps par monstre et XP par heure (Monte Carlo et analytique)")
     sim_leveling.add_argument("--level", type=int, required=True, help="niveau du personnage")
     _leveling_arguments(sim_leveling, n_default=1500)
+    sim_obj = sim_sub.add_parser("objectives", help="XP par heure par zone et par donjon, toutes les classes (T04d)")
+    sim_obj.add_argument("--level", type=int, required=True, help="niveau du personnage")
+    sim_obj.add_argument("--class", dest="cls", required=True, help="classe (anglais : hunter, mage…)")
+    sim_obj.add_argument("--faction", choices=["horde", "alliance"], help="camp")
+    sim_obj.add_argument("--race", help="race du personnage")
+    sim_obj.add_argument("--rested", type=float, default=0.0, help="réservoir de repos (XP)")
+    sim_obj.add_argument("--party", type=int, default=1, help="taille du groupe dehors")
+    sim_obj.add_argument("--limit", type=int, default=5, help="zones affichées")
+    sim_obj.add_argument("--json", action="store_true", help="sortie JSON")
 
     chart = sub.add_parser("chart", help="graphiques (leveling)")
     chart_sub = chart.add_subparsers(dest="chart_command", required=True, parser_class=_Parser)
@@ -2197,7 +2206,46 @@ def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _objective_line(o: Mapping[str, Any]) -> str:
+    return (
+        f"  {o['name']} ({o['kind']}) : {o['xp']:.0f} XP en {o['minutes']:.0f} min, {o['xp_h']:.0f} XP/h "
+        f"({o['quests']} quête(s), {o['kills']:.0f} monstre(s))"
+    )
+
+
+def _cmd_sim_objectives(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.sim.objectives import objectives
+
+    rep = objectives(
+        deps,
+        class_name=args.cls,
+        level=args.level,
+        faction=args.faction,
+        race=args.race,
+        rested=args.rested,
+        party=args.party,
+        limit=args.limit,
+    )
+    kt = rep["kill_time"]
+    lines = [
+        f"Objectifs de leveling : {rep['class']} niveau {rep['level']}",
+        f"Temps par monstre : {kt['seconds']:.1f} s ({kt['source']}, {kt['method']}, {kt['certainty']})",
+        "Zones :",
+        *([_objective_line(z) for z in rep["zones"]] or ["  aucune"]),
+        "Donjons :",
+    ]
+    for d in rep["dungeons"]:
+        lines += [_objective_line(d["first_pass"]), _objective_line(d["repeat"])]
+        if d["first_pass"]["missing_prereqs"]:
+            lines.append(f"    prérequis hors du donjon : {', '.join(map(str, d['first_pass']['missing_prereqs']))}")
+    lines.append(f"Conseil : {rep['advice']}")
+    _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
+
+
 def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
+    if args.sim_command == "objectives":
+        return _cmd_sim_objectives(deps, args)
     rep = simulate_leveling(
         deps,
         args.level,

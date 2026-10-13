@@ -18,7 +18,7 @@ from forever.build import build_report
 from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
-from forever.leveling import LevelingReport, parse_talents, simulate_leveling
+from forever.leveling import parse_talents, simulate_leveling
 from forever.lookup import check_talents, lookup_class_talent, lookup_spell, lookup_talent, lookup_zones
 from forever.pets_lookup import lookup_pets
 from forever.profile import ProfileView, normalize_class, read_profile
@@ -228,7 +228,13 @@ def build_server(deps: Deps) -> MCPServer:
         ab_stacks: int | None = None,
         ab_dump: str | None = None,
         low_level_penalty: bool | None = None,
-    ) -> LevelingReport:
+        kind: str = "kill",
+        class_name: str | None = None,
+        faction: str | None = None,
+        rested: float = 0.0,
+        party: int = 1,
+        limit: int = 5,
+    ) -> dict[str, Any]:
         """Leveling du Mage : temps par monstre (combat, repos, total), mana, dégâts subis et XP par heure, par Monte
         Carlo (moyenne de `n` combats, graine fixe) et par le modèle analytique, avec les PV du monstre (valeur,
         source, certitude) et la provenance.
@@ -241,9 +247,29 @@ def build_server(deps: Deps) -> MCPServer:
         Mage Armor sous son niveau d'apprentissage est refusée).
         Rotation arcane (niveau 20 et talent arcaneBlast) : `ab_stacks` cumuls d'Arcane Blast (0 au maximum du
         talent ; défaut : maximum) puis `ab_dump` (frostbolt par défaut, fireball, arcane_missiles).
-        `low_level_penalty` : pénalité des sorts de bas niveau (None : défaut des données ; False refusé avec seed)."""
+        `low_level_penalty` : pénalité des sorts de bas niveau (None : défaut des données ; False refusé avec seed).
+        T04d : `kind="objectives"` (toutes les classes, `class_name` en anglais, `faction`, `level`, `race`,
+        `rested`, `party`) : XP par heure par zone et par donjon (premier passage avec ses quêtes, passages
+        suivants), temps par monstre et sa source (`engine` pour le Mage, `measured` ou `estimated` sinon), `advice`
+        : phrase de conseil construite par l'outil à partir de ses chiffres, à rendre telle quelle."""
+        if kind == "objectives":
+            from forever.sim.objectives import objectives
+
+            try:
+                return objectives(
+                    deps,
+                    class_name=class_name or "mage",
+                    level=level,
+                    faction=faction,
+                    race=race,
+                    rested=rested,
+                    party=party,
+                    limit=limit,
+                )
+            except ForeverError as err:
+                return cast(dict[str, Any], _error_result(deps, err))
         try:
-            return simulate_leveling(
+            report = simulate_leveling(
                 deps,
                 level,
                 race=race,
@@ -262,7 +288,8 @@ def build_server(deps: Deps) -> MCPServer:
                 low_level_penalty=low_level_penalty,
             )
         except ForeverError as err:
-            return cast(LevelingReport, _error_result(deps, err))
+            return cast(dict[str, Any], _error_result(deps, err))
+        return dict(report)
 
     @server.tool()
     def forever_build(

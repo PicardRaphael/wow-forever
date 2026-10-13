@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70338 (ne
 de `forever/data/1.60.1.70338/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-157 chemins, 674 valeurs ; 87 `probable`, 70 `suppose`
+159 chemins, 682 valeurs ; 87 `probable`, 72 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -63,8 +63,10 @@ Aucun.
 | mechanics.json | `/values/leveling.frostbite_freeze_s` | 1 | suppose | C5 | estimation du simulateur du seed | sim_leveling.py du seed (EST) |
 | mechanics.json | `/values/leveling.ignite` | 4 | probable | A18 | mode seed seulement : le mode forever lit spell_scaling.json auras.ignite | tables du client 1.60.1.70009 relues à la main (T04c) |
 | mechanics.json | `/values/leveling.ignite_rule` | 3 | suppose | A18 | règle du serveur (Ignite roulant), absente du client | T04c, décision 2 |
+| mechanics.json | `/values/leveling.kill_time_estimate` | 2 | suppose | I15 | estimation de repli d'une classe sans moteur ni relevé, marquée « estimé » | cible de Blizzard de 10 à 15 s par monstre en solo (leveling.json mob_model), T04d bloc E |
 | mechanics.json | `/values/leveling.mob_hit_damage` | 2 | suppose | I6 | combat des monstres : règle du serveur, absente du client | sim_leveling.py du seed (EST) |
 | mechanics.json | `/values/leveling.mob_xp` | 2 | suppose | I6 | XP par monstre : GameTable xp en recoupement (bloc A), modulation au serveur | règle Classic (PC) |
+| mechanics.json | `/values/leveling.objectives` | 6 | suppose | I14 | temps de trajet, de quête et de donjon non mesurés (ForeverLogger les mesurera) | hypothèses de temps des objectifs de leveling, T04d bloc F |
 | mechanics.json | `/values/leveling.projectile_speed` | 2 | suppose | C1 | vitesse des projectiles non publiée | sim_leveling.py du seed (EST) |
 | mechanics.json | `/values/leveling.rest_hp_regen_fraction` | 1 | suppose | I6 | régénération au repos : formule du serveur (courbes de GlobalCurve décodées au bloc A, non utilisées) | sim_leveling.py du seed (EST) |
 | mechanics.json | `/values/mana.regen_stacking` | 3 | suppose | B7 | règle du serveur, absente du client | règle Classic (décision 66) |
