@@ -121,12 +121,16 @@ def mob_kill_xp(
     basis = player_level
     if party is not None and len(party.levels) > 1 and rules.group_level_basis == "highest_member":
         basis = max(party.levels)
-    base, base_term = base_kill_xp(gd, basis)
+    lower = mob_level < basis and mob_level > gray_level(gd, basis)
+    # monstre plus bas : XP de base au niveau du monstre (xp.lower_mob_base, relevés du joueur) ou du joueur
+    base, base_term = base_kill_xp(gd, mob_level if lower and rules.lower_base == "mob" else basis)
     terms = [base_term]
     xp = base
     level = _level_factor(gd, rules, basis, mob_level)
     if mob_level != basis:
         terms.append(_term(rules, "xp.mob_level_difference", level))
+        if lower:
+            terms.append(_term(rules, "xp.lower_mob_base", base / base_kill_xp(gd, basis)[0]))
         xp *= level
     if elite:
         terms.append(_term(rules, "xp.elite_factor", rules.elite_factor))

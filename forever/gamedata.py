@@ -80,6 +80,7 @@ CHOICES = {
     "damage.bonus_stacking": ("multiplicative", "additive"),
     "coefficient.ice_lance_source": ("client", "seed"),
     "xp.group_level_basis": ("individual", "highest_member"),  # T04d : seule « individual » est modélisée
+    "xp.lower_mob_base": ("mob", "player"),  # T04d : XP de base d'un monstre plus bas
 }
 SCALING_KINDS = ("direct", "dot", "channel")
 MS_PER_S = 1000.0  # conversion d'unité : durées du client en millisecondes
@@ -562,6 +563,7 @@ XP_KEYS = (
     "xp.group_level_basis",
     "xp.rested",
     "xp.quest_level_difference",
+    "xp.lower_mob_base",
 )
 
 
@@ -604,6 +606,7 @@ def _xp_rules(values: Mapping[str, Any], raw_char: Any) -> XpRules | None:
         higher_per_level=r.num(diff, "higher_per_level", "xp.mob_level_difference"),
         higher_max_diff=r.int_(diff, "higher_max_diff", "xp.mob_level_difference"),
         zero_difference=tuple((int(a), int(b)) for a, b in zero),
+        lower_base=_choice(values, "xp.lower_mob_base"),
         elite_factor=r.num(r.obj(values, "xp.elite_factor", "xp.elite_factor"), "value", "xp.elite_factor"),
         dungeon_bonus=r.num(
             r.obj(values, "xp.dungeon_kill_bonus", "xp.dungeon_kill_bonus"), "value", "xp.dungeon_kill_bonus"

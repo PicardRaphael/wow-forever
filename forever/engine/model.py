@@ -450,6 +450,7 @@ class XpRules:
     higher_per_level: float  # monstre plus haut : + part de l'XP par niveau d'écart
     higher_max_diff: int  # écart au-delà duquel la hausse ne croît plus
     zero_difference: tuple[tuple[int, int], ...]  # (niveau du joueur max, écart nul) par ligne, croissant
+    lower_base: str  # monstre plus bas : XP de base au niveau du « mob » (relevés) ou du « player » (Classic)
     elite_factor: float
     dungeon_bonus: float  # part ajoutée à l'XP d'un monstre tué en donjon (xp.dungeon_kill_bonus)
     group_rates: tuple[float, ...]  # multiplicateur de groupe par taille (taille 1 en premier)

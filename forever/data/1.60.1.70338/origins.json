@@ -1283,6 +1283,17 @@
       "source": "paramètres de la vérification passive du modèle d'XP (T04d, bloc G)",
       "reason": "réglage de l'outil de vérification, pas une valeur du jeu",
       "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.lower_mob_base"
+      ],
+      "origin": "journal",
+      "source": "gains d'XP relevés par ForeverLogger (forever xp check), T04d",
+      "certainty": "probable",
+      "reason": "règle ajustée sur 87 gains sur 92 ; niveau des monstres tiré du niveau fixe de Questie",
+      "registry": "I6"
     }
   ],
   "pending": [],

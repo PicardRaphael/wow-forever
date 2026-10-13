@@ -182,8 +182,8 @@
     },
     "1.60.1.70338": {
       "collected_at": "2026-10-10",
-      "data_sha": "74dabe99c242",
-      "data_sha256": "74dabe99c242ca91f171f1447a66f740b4d6d83af7eb62ba9bb48b9ab9f68e60",
+      "data_sha": "ca33a53a7898",
+      "data_sha256": "ca33a53a789897bf4a8f3c54557fa7390a28b7328f86b2468f4eec133d4dd66a",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -194,10 +194,10 @@
         "confirmed_changes.json": "bd4f4e12c72df51d4c14ca64932b5a0a67d3950c56de0e1907746d5238b45c57",
         "decode_rules.json": "317d01ab6efa344d7fed8ce77e91d3f18d8c2ae17e2d593e04c5e2e721ce94fa",
         "leveling.json": "3ab7c38b692291d7ca8ef1dbc6d6613a502a0175a45ea4ed403a9520a2c17227",
-        "mechanics.json": "ffbf4f7c6d35c3b2ddd22bbd7f3cd1d8f29169fa034e4a82bfb1771c6ba5149d",
+        "mechanics.json": "f36bc48df12c12ad5f6367b6a9b648175f397d7ebf49ebc2cdde94e043eddcbd",
         "meta.json": "ce24831dfc46363de1468549ce79667e53774b4012ffe20b2516b78cd7f54295",
         "monsters.json": "c4161b02e87a446dbe678d809619a9235f0b0c9c4c481e2b21df2cc6c9029aa1",
-        "origins.json": "11b011c4b6a4f1946db293926b3ddf50d9bf7359db4b8aed06e556df37e0072a",
+        "origins.json": "08da2e920de14cd15efc1b927ab6ce913c0ac270a1a63283976c4e30d09254c4",
         "overrides.json": "1b320da1201fdd21dc4da7f8f60d88fa692f7dba5fd91763cdc1592949f71ff5",
         "pet_rules.json": "2ed4d0873f5fa8d1a7a8602d75cf395e1f0b42c035656394a77648b7805cf142",
         "pets.json": "0e34ab73a78f4d279a6064c9e156b584a2a6ffb3d03838d59f72c8c847a0320b",

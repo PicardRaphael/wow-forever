@@ -45,6 +45,7 @@ class KillTime(NamedTuple):
     samples: int
     certainty: str
     method: str  # journaux, cadence de ForeverLogger, estimation
+    scope: str = "total"  # « total » : combat, récupération et déplacement ; « combat » : combat seul
 
 
 class KillParams(NamedTuple):
@@ -204,12 +205,22 @@ def kill_time(params: KillParams, *, class_name: str, level: int, measures: dict
     ]
     if candidates:
         best = min(candidates, key=lambda b: (b["method"] != "cadence", -b["samples"]))
-        method = "durée des combats (journaux)" if best["method"] == "journaux" else "cadence des gains (ForeverLogger)"
+        combat = best["method"] == "journaux"
+        method = "durée des combats (journaux)" if combat else "cadence des gains (ForeverLogger)"
         return KillTime(
-            cls, level, "measured", best["median_s"], best["low_s"], best["high_s"], best["samples"], "probable", method
+            cls,
+            level,
+            "measured",
+            best["median_s"],
+            best["low_s"],
+            best["high_s"],
+            best["samples"],
+            "probable",
+            method,
+            "combat" if combat else "total",
         )
     low, high = params.estimate_low_s, params.estimate_high_s
-    return KillTime(cls, level, "estimated", (low + high) / 2, low, high, 0, "suppose", "estimé")
+    return KillTime(cls, level, "estimated", (low + high) / 2, low, high, 0, "suppose", "estimé", "combat")
 
 
 def refresh_kill_times(deps: Deps, *, logs_dir: Path | None = None, sv_dir: Path | None = None) -> dict[str, Any]:

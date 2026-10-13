@@ -60,6 +60,8 @@ def _engine_kill_time(deps: Deps, level: int, race: str | None) -> dict[str, Any
         "samples": 0,
         "certainty": report["provenance"]["certainty"],
         "method": "simulateur de leveling du Mage (analytique, sans talent, rotation givre)",
+        "scope": "total",
+        "combat_s": float(report["analytic"]["combat"]),
     }
 
 
@@ -156,11 +158,16 @@ def objectives(
     values = data.read_json(MECHANICS_FILE)["values"]
     p = _params(values)
     group = int(dungeon_party or p["dungeon_party"])
+    # même règle pour toutes les classes : temps mesuré sur les relevés du joueur d'abord ; à défaut, moteur
+    # (Mage) ou estimation ; le temps du moteur du Mage reste rendu à côté d'une mesure, pour comparaison
+    measured = kill_time(kill_params(values), class_name=cls, level=level, measures=load_kill_times(deps))
+    kt = {**measured._asdict()}
     if cls == MAGE:
-        kt = _engine_kill_time(deps, level, race)
-    else:
-        k = kill_time(kill_params(values), class_name=cls, level=level, measures=load_kill_times(deps))
-        kt = {**k._asdict()}
+        engine = _engine_kill_time(deps, level, race)
+        if measured.source == "measured":
+            kt["engine"] = engine
+        else:
+            kt = engine
     book: QuestBook = build_quests(deps, wow_dir=wow_dir)
     gray = gray_level(gd, level)
     red = gd.leveling.quest_band.red_min_diff
@@ -225,7 +232,8 @@ def objectives(
         certainty="suppose",
         assumptions=[
             *fresh["assumptions"],
-            f"temps par monstre : {kt['source']} ({kt['method']}, {kt['certainty']})",
+            f"temps par monstre : {kt['source']} ({kt['method']}, {kt['certainty']}) ; durée : "
+            + ("combat, récupération et déplacement" if kt.get("scope") == "total" else "combat seul (sous-estime)"),
             f"hypothèses de temps {OBJECTIVES_KEY} (suppose) : le classement peut en dépendre plus que de l'XP",
             (
                 "XP des quêtes : client si la quête a été vue, sinon addon ou Questie (suppose) ; monstres des "

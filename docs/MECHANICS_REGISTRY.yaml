@@ -1529,6 +1529,7 @@ mechanics:
       - "forever/data/1.60.1.70338/character_scaling.json (kill_xp : GameTable xp, colonne PerKill, T04d)"
       - "forever/data/1.60.1.70338/mechanics.json (xp.mob_level_difference, règle de Classic, vMangos, T04d ; measures.xp_check : paramètres de forever xp check)"
       - "forever/data/1.60.1.70338/mechanics.json (leveling.quest_band, gray_rows : niveau gris des monstres, I7)"
+      - "relevés du joueur (ForeverLogger, forever xp check) : mechanics.json xp.lower_mob_base, monstre plus bas à XP de base au niveau du monstre (décision 249)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : LevelExperience, ExpectedStat.ArmorConstant, T08b)"
     tests:
       - tests/unit/test_engine_leveling.py::test_monster_formulas_match_the_seed
@@ -1554,7 +1555,7 @@ mechanics:
       - tests/unit/test_xp_check.py::test_level_difference_gap_is_reported
     tolerance: null
     formule: "temps par monstre = combat + repos + course entre monstres ; repos = max(mana dépensée / (boisson + Esprit), dégâts subis / (nourriture + régénération de repos × PV)) ; XP par heure = XP du monstre × secondes par heure / temps par monstre"
-    note: "T08b, bloc A : en mode forever, XP par niveau (LevelExperience, concorde avec la GameTable xp) et constante d'armure par niveau (ExpectedStat, probable : table lue par le serveur inconnue, armormitigationbylvl en écart) lues dans le client ; T04d, bloc C : XP d'un monstre de même niveau lue dans le client (GameTable xp, colonne PerKill, character_scaling.json kill_xp ; égale à 45 + 5 × niveau, la règle leveling.mob_xp, à chaque niveau), modulation par l'écart de niveau et monstres gris (xp.mob_level_difference) règle de Classic (suppose), modèle dans forever/engine/xp.py ; note officielle du 08/10 (t/2360696/5, révision 1) : XP des monstres de donjon (I10) et XP en groupe (I11) changées par le serveur, sans effet sur ce simulateur (monstres du monde, joueur seul)"
+    note: "T08b, bloc A : en mode forever, XP par niveau (LevelExperience, concorde avec la GameTable xp) et constante d'armure par niveau (ExpectedStat, probable : table lue par le serveur inconnue, armormitigationbylvl en écart) lues dans le client ; T04d, bloc C : XP d'un monstre de même niveau lue dans le client (GameTable xp, colonne PerKill, character_scaling.json kill_xp ; égale à 45 + 5 × niveau, la règle leveling.mob_xp, à chaque niveau), modulation par l'écart de niveau et monstres gris (xp.mob_level_difference) règle de Classic (suppose), monstre plus bas à XP de base au niveau du monstre (xp.lower_mob_base, relevés du joueur, probable, décision 249), modèle dans forever/engine/xp.py ; note officielle du 08/10 (t/2360696/5, révision 1) : XP des monstres de donjon (I10) et XP en groupe (I11) changées par le serveur, sans effet sur ce simulateur (monstres du monde, joueur seul)"
   - id: I7
     categorie: optimisation
     description: "Zone ou donjon à mon niveau (quêtes utiles, plages de niveau des quêtes et des PNJ)"
@@ -1704,8 +1705,10 @@ mechanics:
       - tests/unit/test_kill_time.py::test_measures_by_class_and_level_band
       - tests/unit/test_kill_time.py::test_without_measures_the_estimate_is_a_range
       - tests/unit/test_kill_time.py::test_measured_when_enough_samples
+      - tests/unit/test_objectives_kill_time.py::test_mage_measure_wins_over_the_engine_which_stays_for_comparison
+      - tests/unit/test_objectives_kill_time.py::test_journal_combat_time_is_marked_as_combat_only
     tolerance: null
-    note: "mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), comme le moteur du Mage, et passe avant la durée des combats des journaux, qui n'en compte pas ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
+    note: "mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), comme le moteur du Mage, et passe avant la durée des combats des journaux, qui n'en compte pas (champ scope : total ou combat) ; même règle pour le Mage (décision 249) : la mesure passe avant le moteur, dont le temps reste rendu à côté ; écart moteur et mesure : question LVL11 ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

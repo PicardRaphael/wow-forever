@@ -50,7 +50,9 @@ def test_higher_level_mob_gains_per_level_up_to_the_cap(game_data):
 @pytest.mark.parametrize(("player", "mob"), [(20, 15), (12, 10), (40, 36)])
 def test_lower_level_mob_follows_zero_difference(game_data, player, mob):
     assert mob > gray_level(game_data, player)
-    expected = kill(player) * (1 - (player - mob) / zero_difference(player))
+    # xp.lower_mob_base (relevés du joueur, accord du 2026-10-13) : XP de base au niveau du monstre, ou du joueur
+    base = kill(mob) if rule("xp.lower_mob_base")["value"] == "mob" else kill(player)
+    expected = base * (1 - (player - mob) / zero_difference(player))
     assert mob_kill_xp(game_data, player, mob).xp == pytest.approx(expected, rel=1e-12)
 
 

@@ -270,7 +270,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   joueur × (1 - écart / écart nul)) surestime l'XP d'environ 8 % (106 cas sur 145 hors tolérance), alors que la même
   formule avec l'XP de base au **niveau du monstre** retrouve presque tous les gains relevés (par exemple niveau 2
   contre un monstre de niveau 1 : 40 ; niveau 10 contre 5 : 20 ; niveau 16 contre 15 : 107). Règle non changée sans
-  accord (règle de jeu) ; à trancher : adopter la base au niveau du monstre. [Détail](research/questions-ouvertes-detail.md#lvl1)
+  accord (règle de jeu) ; *tranchée le 2026-10-13* (accord de l'utilisateur, décision 249) : base au niveau du
+  monstre adoptée (`xp.lower_mob_base`, `probable`), 87 gains sur 92 conformes, aucun gain sur un monstre gris ; reste
+  à confirmer avec le niveau de la cible relevé par ForeverLogger 0.4.0 (les 5 autres gains ne suivent aucune règle :
+  niveau de Questie probablement faux sur Forever). [Détail](research/questions-ouvertes-detail.md#lvl1)
 - **LVL2 — Les couleurs de quête de Forever sont-elles celles de Classic ?** Test : `UnitQuestTrivialLevelRange`
   relevé à chaque niveau par ForeverLogger. Priorité : basse. Registre I7.
   [Détail](research/questions-ouvertes-detail.md#lvl2)
@@ -309,6 +312,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   n'y figurent pas (surtout des échanges de montures et des quêtes techniques) ; aucune source ne dit « retirée ».
   Test : quête offerte ou non par son donneur en jeu, ou vue par le client (`questcache.wdb`). Priorité : basse.
   [Agrégats](research/quetes-forever.md)
+- **LVL11 — Pourquoi le simulateur du Mage donne-t-il un temps par monstre bien plus long que les relevés ?**
+  Ajoutée le 2026-10-13 (T04d, décision 249) : au niveau 19, le moteur (analytique, sans talent, rotation givre) rend
+  environ 51 s par monstre (combat 28 s, récupération 16 s, course 6 s), la cadence des gains de ForeverLogger du Mage
+  19 s pour la tranche 16-20 (313 relevés) ; même définition des deux côtés (combat, récupération et déplacement).
+  Pistes : talents absents du calcul, PV des monstres, part des monstres tués à plusieurs ou en zone, récupération sur
+  la route. Les objectifs prennent la mesure ; le temps du moteur est rendu à côté. Test : durée des combats et des
+  pauses du Mage dans un journal de combat, comparée au moteur avec ses talents. Priorité : moyenne. Registre I6, I15.
 - **LVL10 — Pourquoi aucun bonus de repos dans les 2 714 gains d'XP relevés par ForeverLogger 0.3.0 ?** Ajoutée le
   2026-10-13 (T04d) : aucun texte ne porte la forme de Classic « (+N exp Rested bonus) » : pas de repos pendant ces
   séances, ou texte (ou règle) du repos différent sur Forever. Test (décision 247 : sans sonde exigée) : en jouant

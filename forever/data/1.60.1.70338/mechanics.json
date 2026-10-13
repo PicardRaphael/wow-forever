@@ -738,7 +738,7 @@
    },
    "certainty": "suppose",
    "registry": "I6",
-   "source": "règle de Classic (T04d, bloc C) : XP de base calculée au niveau du joueur ; monstre plus haut : × (1 + 0,05 × écart), écart plafonné à 4 ; plus bas : × (1 - écart / écart nul), écart nul par tranche de niveau du joueur (zero_difference, lignes [niveau max, écart nul], reprises de leveling.json mob_xp) ; gris (aucune XP) au niveau gris des quêtes (leveling.quest_band.gray_rows) ; vMangos (émulateur de Classic 1.12, règle communautaire) : src/game/Formulas.h, MaNGOS::XP ; non vérifiée pour Forever"
+   "source": "règle de Classic (T04d, bloc C) : XP de base au niveau du joueur, sauf pour un monstre plus bas (xp.lower_mob_base, relevés du joueur) ; monstre plus haut : × (1 + 0,05 × écart), écart plafonné à 4 ; plus bas : × (1 - écart / écart nul), écart nul par tranche de niveau du joueur (zero_difference, lignes [niveau max, écart nul], reprises de leveling.json mob_xp) ; gris (aucune XP) au niveau gris des quêtes (leveling.quest_band.gray_rows) ; vMangos (émulateur de Classic 1.12, règle communautaire) : src/game/Formulas.h, MaNGOS::XP ; non vérifiée pour Forever"
   },
   "xp.elite_factor": {
    "value": 2.0,
@@ -827,6 +827,22 @@
    "certainty": "suppose",
    "registry": "I6",
    "source": "paramètres de forever xp check (T04d, bloc G) : écart relatif toléré entre un gain relevé et le modèle (arrondis du serveur), cas minimaux pour dire une règle vérifiée"
+  },
+  "xp.lower_mob_base": {
+   "value": "mob",
+   "certainty": "probable",
+   "registry": "I6",
+   "source": "relevés du joueur (ForeverLogger 0.3.0, gains d'XP du 2026-09-27 au 2026-10-13, décision 127 : ses observations priment ; accord de l'utilisateur du 2026-10-13) : pour un monstre plus bas que le joueur et non gris, XP = XP de base au niveau du monstre (PerKill du client) × (1 - écart / écart nul) ; 87 gains sur 92 conformes à l'arrondi près (niveau 2 contre 1 : 40 ; 10 contre 5 : 20 ; 16 contre 15 : 107), les 5 autres ne suivent ni cette règle ni celle de Classic (niveau du monstre pris au niveau fixe de Questie, à revérifier) ; aucun gain relevé sur un monstre gris ; probable tant que le niveau des monstres vient de Questie et non de la cible relevée par ForeverLogger 0.4.0",
+   "range": [
+    {
+     "value": "mob",
+     "source": "relevés du joueur (forever xp check, T04d)"
+    },
+    {
+     "value": "player",
+     "source": "règle de Classic (vMangos, MaNGOS::XP::BaseGain) : XP de base au niveau du joueur"
+    }
+   ]
   }
  },
  "inherited_from": "1.60.1.70291"
