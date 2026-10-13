@@ -304,6 +304,11 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **LVL8 — Quel est le facteur d'XP des monstres élites sur Forever ?** Ajoutée le 2026-10-13 (T04d, bloc C) : facteur
   de Classic écrit en `suppose` (`xp.elite_factor`). Test : gain d'XP d'un élite de niveau connu (cible relevée par
   ForeverLogger 0.4.0), seul et hors donjon, comparé par `forever xp check`. Priorité : basse. Registre I13.
+- **LVL9 — Les quêtes « absentes des sources Forever » sont-elles vraiment retirées ?** Ajoutée le 2026-10-13
+  (T04d, bloc D) : 19 quêtes de la base Classic de Questie, dans des zones couvertes par Completo de Naowh Forever,
+  n'y figurent pas (surtout des échanges de montures et des quêtes techniques) ; aucune source ne dit « retirée ».
+  Test : quête offerte ou non par son donneur en jeu, ou vue par le client (`questcache.wdb`). Priorité : basse.
+  [Agrégats](research/quetes-forever.md)
 - **LVL10 — Pourquoi aucun bonus de repos dans les 2 714 gains d'XP relevés par ForeverLogger 0.3.0 ?** Ajoutée le
   2026-10-13 (T04d) : aucun texte ne porte la forme de Classic « (+N exp Rested bonus) » : pas de repos pendant ces
   séances, ou texte (ou règle) du repos différent sur Forever. Test (décision 247 : sans sonde exigée) : en jouant

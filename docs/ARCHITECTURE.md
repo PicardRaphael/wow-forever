@@ -142,9 +142,9 @@ forever-core/
 | Outil | Rôle |
 | --- | --- |
 | `forever_status` | Fraîcheur et couverture du registre |
-| `forever_lookup` | Sort, talent (T06 ; 9 classes en PV1 avec `class_name`), zones (T04c), fiches PvP `pvp` et contrôle de build `build_check` (PV1), builds populaires de Talents Forever `tf_popular` (FA1) ; objet, consommable à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
+| `forever_lookup` | Sort, talent (T06 ; 9 classes en PV1 avec `class_name`), zones (T04c), quêtes de Forever fusionnées `quests` (T04d), fiches PvP `pvp` et contrôle de build `build_check` (PV1), builds populaires de Talents Forever `tf_popular` (FA1) ; objet, consommable à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
 | `forever_explain_mechanic` | Entrée du registre (par identifiant ou par mots de la description, T06), formule, certitude, paramètres de la version, implémentation, sources |
-| `forever_sim_leveling` | Temps par monstre, XP/h : Monte Carlo et analytique, PV du monstre (valeur, source, certitude) ; graphique par `forever chart leveling` (T04b) |
+| `forever_sim_leveling` | Temps par monstre, XP/h : Monte Carlo et analytique, PV du monstre (valeur, source, certitude) ; graphique par `forever chart leveling` (T04b) ; `kind="objectives"` (T04d, toutes les classes) : XP par heure par zone et par donjon, temps par monstre du moteur, mesuré ou estimé, conseil construit par l'outil |
 | `forever_sim_raid` | DPS, intervalle de confiance, contributions |
 | `forever_build` | Build par contexte (leveling, donjon, raid, PvP) : talents, ordre, raisons, alternative, stabilité, sensibilité, respec, angles morts (T05, décision 86) ; bloc `export.talents_forever` : code, lien et import Talents Forever, build populaire le plus proche (FA1) |
 | `forever_optimize_gear` | Ensemble réel simulé sous contraintes |

@@ -324,9 +324,23 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
 - Message `[forever:chiffres]` en fin de réponse : un chiffre de jeu de la réponse ne vient d'aucun outil forever de
   la session ; ne pas s'y fier, redemander la valeur.
 
+## Quêtes et XP de Forever (T04d)
+- `uv run forever quests build` : liste fusionnée des quêtes (Questie, Naowh Forever, Forever Guide,
+  ForeverDungeonJournal, GearQuest, quêtes apprises de Questie et quêtes vues par le client), dans le cache local
+  seulement ; relue tant qu'aucun addon ne change. `forever quests diff` : écarts entre sources ; `forever quests show
+  --dungeon "Ragefire Chasm" --faction horde` (ou `--id`, `--zone`) : quêtes, statut, XP et sa source.
+- `uv run forever lookup quests --level 15 --faction horde [--status nouvelle]` : quêtes accessibles et non grises.
+- `uv run forever sim objectives --level 15 --class hunter --faction horde` : XP par heure par zone et par donjon
+  (premier passage avec ses quêtes, passages suivants), temps par monstre calculé (Mage), mesuré sur vos relevés ou
+  estimé, et le conseil ; le bouton Leveling s'en sert pour toutes les classes.
+- `uv run forever measures kill-time [--class hunter --level 15]` : temps par monstre mesuré par classe et tranche de
+  niveaux (journaux, ForeverLogger), gardé dans le cache.
+- `uv run forever xp check` : vérification passive du modèle d'XP sur ce que vous avez joué avec ForeverLogger 0.4.0
+  (vérifié, écart, à vérifier) ; rien n'est écrit, aucune sonde n'est exigée (décision 247).
+
 ## Ce que le plugin ne sait pas encore
 PvP de champ de bataille et rendements décroissants mesurés (PV2), boss et butin des donjons (DJ1), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
-ventes (EC1), quêtes et XP propres à Forever (T04d), mana des combats longs (T05b), mémoire du joueur (T07), raid
+ventes (EC1), mana des combats longs (T05b), mémoire du joueur (T07), raid
 complet (T09), équipement (T10), consommables (T11), analyse de mes combats (AN1, AN2), autres classes que le Mage
 (dégâts et rotations : tranches de classe CM1 à DR1 ; leur PvP et la légalité de leurs builds sont couverts depuis PV1). Sur ces sujets, il répond « je ne sais pas » et cite la tranche de `docs/ROADMAP.md` qui les
 couvrira ; pour une classe pas encore calculée, il propose des builds de la communauté trouvés par le sous-agent de

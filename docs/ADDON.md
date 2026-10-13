@@ -425,8 +425,9 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
     4. Deux attentes de la même branche (écriture bloquée) : une seule carte, textes sans jargon (« Une mise à jour
        attend une correction sur ton PC : ouvre une session Claude »).
 
-21. **Sonde en jeu I : XP des monstres, des quêtes et du repos** (T04d, bloc A, décisions 245 et 246 ; **à jouer
-    du 2026-10-14 au 2026-10-16**, puis une seconde fois avant le 2026-10-21 si la première laisse des trous). Elle
+21. **Sonde en jeu I : XP des monstres, des quêtes et du repos** (T04d, bloc A, décisions 245 et 246 ;
+    **facultative depuis la décision 247** : T04d est finie sans elle ; jouer normalement avec ForeverLogger 0.4.0
+    installé suffit, puis `uv run forever xp check` dit ce qui est vérifié et ce qui reste à vérifier). Elle
     dit l'XP réelle de chaque monstre selon son niveau (I6), l'XP réelle des quêtes rendues (`xpReward`, I9, LVL1),
     le bonus des monstres de donjon (LVL5), l'effet du repos (LVL10, D7) et la couleur des quêtes (LVL2).
     Personnages : le Mage orc (niveau 19) et le Chasseur orc (niveau 15). Durée : 1 h 15 à 1 h 30 en tout.
