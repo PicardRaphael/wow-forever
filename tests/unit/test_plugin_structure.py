@@ -18,14 +18,21 @@ from forever.hooks import GAME_NUMBER, NUMBERS_MARKER
 from forever.mcp_server import build_server
 
 PLUGIN = REPO_ROOT / "plugin"
-SKILLS = ("forever-router", "forever-leveling", "forever-mage", "forever-pvp", "forever-builds", "forever-familiers")
+SKILLS = (
+    "forever-router",
+    "forever-leveling",
+    "forever-mage",
+    "forever-pvp",
+    "forever-builds",
+    "forever-familiers",
+    "forever-donjons",
+)
 AGENTS = ("forever-web-researcher", "forever-sim-runner")
 MCP_PREFIX = "mcp__plugin_forever_forever__"
 # Domaines non couverts à ce stade et tranche qui les couvrira (docs/ROADMAP.md). CH0 (savoir des familiers)
 # est couverte depuis CH0 ; CH1 reste citée pour le moteur du Chasseur et le choix du familier.
 UNCOVERED_TRANCHES = (
     "PV2",
-    "DJ1",
     "LG1",
     "MT1",
     "RP1",
@@ -180,6 +187,8 @@ def test_skill_descriptions_carry_trigger_words():
         "retail",
     ):
         assert word in desc["forever-familiers"], word
+    for word in ("donjon", "boss", "butin", "taux", "quête", "prérequis", "retail"):  # DJ1
+        assert word in desc["forever-donjons"], word
 
 
 def test_router_maps_skills_and_uncovered_domains():
@@ -188,6 +197,7 @@ def test_router_maps_skills_and_uncovered_domains():
     assert "forever-pvp" in body and "forever-builds" in body
     assert 'kind="pvp"' in body and 'kind="build_check"' in body
     assert 'kind="pets"' in body and "forever-familiers" in body
+    assert 'kind="dungeons"' in body and 'kind="dungeon_item"' in body and "forever-donjons" in body  # DJ1
     assert "format-reponse.md" in body
     assert "forever_status" in body
     for tranche in UNCOVERED_TRANCHES:
@@ -195,7 +205,8 @@ def test_router_maps_skills_and_uncovered_domains():
 
 
 @pytest.mark.parametrize(
-    "name", ["forever-leveling", "forever-mage", "forever-pvp", "forever-builds", "forever-familiers"]
+    "name",
+    ["forever-leveling", "forever-mage", "forever-pvp", "forever-builds", "forever-familiers", "forever-donjons"],
 )
 def test_domain_skills_use_the_response_format(name):
     _, body = frontmatter(PLUGIN / "skills" / name / "SKILL.md")

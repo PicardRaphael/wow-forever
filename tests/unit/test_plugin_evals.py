@@ -34,6 +34,7 @@ POSITIVE_CATEGORIES = (
     "hors-perimetre",
     "pvp",
     "familiers",
+    "donjons",
 )
 NEGATIVE_CATEGORIES = ("wow-autre", "autre-jeu", "programmation")
 POSITIVE_GRADERS = {"skill", "outil", "chiffres", "certitude", "provenance"}
