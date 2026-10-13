@@ -1,6 +1,6 @@
 # T04d : demandes de correction de tests verrouillés
 
-## 1. `tests/unit/test_addon_logger_xp.py::to_py` (bloc A)
+## 1. `tests/unit/test_addon_logger_xp.py::to_py` (bloc A) — appliquée le 2026-10-13 avec l'accord de l'utilisateur
 - **Constat** : `to_py` teste `lupa.lua_type(value) == "table"` ; `lupa.lua_type` est celui du runtime par défaut de
   lupa 2.8 et rend `None` pour une table créée par `lupa.lua51` (relevé : `lupa.lua_type(t)` → `None`,
   `lua51.lua_type(t)` → `table`). `to_py` rend alors la table Lua telle quelle et les cinq comparaisons à un `dict`
