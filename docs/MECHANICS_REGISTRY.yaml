@@ -1659,6 +1659,24 @@ mechanics:
       - tests/unit/test_engine_xp.py::test_every_term_carries_a_known_certainty_and_a_source
     tolerance: null
     note: "facteur de Classic, non vérifié pour Forever (question LVL8) ; s'applique avant le bonus de donjon"
+  - id: I15
+    categorie: optimisation
+    description: "Temps par monstre des classes sans moteur : mesuré dans les relevés du joueur, sinon estimé"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "journaux de combat du joueur (durée de la première frappe du joueur ou de son familier à UNIT_DIED), lus en local"
+      - "ForeverLogger (cadence des gains d'XP de monstre d'une même séance), lu en local"
+      - "forever/data/1.60.1.70338/mechanics.json (leveling.kill_time_estimate : cible de Blizzard de 10 à 15 s par monstre en solo ; measures.kill_time : paramètres de mesure)"
+    tests:
+      - tests/unit/test_kill_time.py::test_fight_durations_include_the_pet
+      - tests/unit/test_kill_time.py::test_kill_cadence_skips_long_pauses_and_other_gains
+      - tests/unit/test_kill_time.py::test_measures_by_class_and_level_band
+      - tests/unit/test_kill_time.py::test_without_measures_the_estimate_is_a_range
+      - tests/unit/test_kill_time.py::test_measured_when_enough_samples
+    tolerance: null
+    note: "mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), la durée des combats non ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

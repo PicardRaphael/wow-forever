@@ -564,6 +564,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     measures = sub.add_parser("measures", help="mesures tirées des journaux et SavedVariables")
     measures_sub = measures.add_subparsers(dest="measures_command", required=True, parser_class=_Parser)
+    kt = measures_sub.add_parser(
+        "kill-time", help="temps par monstre mesuré par classe et tranche de niveaux (cache seulement, T04d)"
+    )
+    kt.add_argument("--logs", help="dossier des journaux (défaut : <FOREVER_WOW_DIR>/Logs)")
+    kt.add_argument("--sv", help="dossier SavedVariables contenant ForeverLogger.lua (défaut : tous les comptes)")
+    kt.add_argument("--class", dest="cls", help="classe dont on veut le temps par monstre (anglais)")
+    kt.add_argument("--level", type=int, help="niveau du personnage (avec --class)")
+    kt.add_argument("--json", action="store_true", help="sortie JSON")
     refresh = measures_sub.add_parser(
         "refresh", help="relancer toutes les mesures, afficher ce qui change, écrire après accord"
     )
@@ -3553,7 +3561,43 @@ def _refresh_lines(sources: RefreshSources, diff: Mapping[str, Any], status: str
     return lines
 
 
+def _cmd_kill_time(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.gamedata import MECHANICS_FILE
+    from forever.kill_time import kill_params, kill_time, refresh_kill_times
+
+    data = load_version(deps)
+    out = refresh_kill_times(
+        deps, logs_dir=Path(args.logs) if args.logs else None, sv_dir=Path(args.sv) if args.sv else None
+    )
+    lines = [f"Temps par monstre : {len(out['bands'])} tranche(s) mesurée(s) ({out['logs']} journal(aux), "]
+    lines[0] += f"{out['loggers']} SavedVariable(s) ForeverLogger, {out['unattributed']} combat(s) non attribué(s))"
+    lines += [
+        f"  {b['class']} {b['level_min']}-{b['level_max']} · {b['method']} · {b['samples']} relevé(s) · médiane "
+        f"{b['median_s']:.1f} s ({b['low_s']:.1f} à {b['high_s']:.1f} s)"
+        for b in out["bands"]
+    ]
+    payload: dict[str, Any] = {**out}
+    if args.cls and args.level is not None:
+        params = kill_params(data.read_json(MECHANICS_FILE)["values"])
+        kt = kill_time(params, class_name=args.cls, level=args.level, measures=out)
+        payload["kill_time"] = kt._asdict()
+        lines.append(
+            f"{kt.class_name} niveau {kt.level} : {kt.seconds:.1f} s ({kt.low:.1f} à {kt.high:.1f} s), "
+            f"{kt.source} ({kt.method}, {kt.certainty})"
+        )
+    provenance = local_provenance(
+        deps,
+        certainty="probable" if out["bands"] else "suppose",
+        assumptions=["relevés du joueur lus en local (journaux, ForeverLogger), gardés dans le cache seulement"],
+    )
+    payload["provenance"] = provenance
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
+    if args.measures_command == "kill-time":
+        return _cmd_kill_time(deps, args)
     into = Path(args.into).resolve() if args.into else None
     if into is not None and (into == deps.data_dir.resolve() or not (into / "manifest.json").is_file()):
         raise InvalidArgumentError(

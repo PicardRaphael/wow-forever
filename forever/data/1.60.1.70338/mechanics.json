@@ -786,6 +786,25 @@
    "certainty": "suppose",
    "registry": "I12",
    "source": "règle de Classic (T04d, bloc C) : une quête rend toute son XP tant que le joueur la dépasse d'au plus full_diff niveaux, puis 80, 60, 40, 20 % aux écarts suivants et 10 % au-delà ; vMangos (émulateur de Classic 1.12) : src/game/Objects/Quest.cpp, Quest::XPValue ; arrondi de Forever inconnu (question LVL7)"
+  },
+  "leveling.kill_time_estimate": {
+   "value": {
+    "low_s": 10.0,
+    "high_s": 15.0
+   },
+   "certainty": "suppose",
+   "registry": "I15",
+   "source": "cible de Blizzard de 10 à 15 s par monstre en solo, déjà citée par leveling.json mob_model (calibrage du simulateur du Mage) ; temps par monstre d'une classe sans moteur ni relevé, rendu en fourchette et marqué « estimé » (T04d, bloc E)"
+  },
+  "measures.kill_time": {
+   "value": {
+    "min_samples": 5,
+    "band_levels": 5,
+    "pause_s": 120.0
+   },
+   "certainty": "suppose",
+   "registry": "I15",
+   "source": "paramètres de mesure (T04d, bloc E) : relevés minimaux d'une tranche avant de remplacer l'estimation, largeur des tranches de niveaux, pause au-delà de laquelle deux gains d'XP de ForeverLogger ne sont plus de la même séance"
   }
  },
  "inherited_from": "1.60.1.70291"
