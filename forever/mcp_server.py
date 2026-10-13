@@ -92,6 +92,7 @@ def build_server(deps: Deps) -> MCPServer:
         status: str | None = None,
         quest_id: int | None = None,
         dungeon: str | None = None,
+        access: str | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -127,8 +128,16 @@ def build_server(deps: Deps) -> MCPServer:
         ForeverDungeonJournal, GearQuest et quêtes vues par le client, lus en local) ; filtres `level` (quêtes
         accessibles et non grises), `faction`, `zone`, `status` (nouvelle, retouchée, absente des sources Forever,
         inchangée, non couverte), `dungeon`, `quest_id` ; chaque champ porte sa source et sa certitude, chaque
-        désaccord entre sources est dans `discrepancies` ; paginé (`limit`, `offset`, `total`)."""
+        désaccord entre sources est dans `discrepancies` ; paginé (`limit`, `offset`, `total`).
+        T04f : `kind="xp_bonuses"` (toutes les classes), `access` facultatif (item, legacy, food, camp, none) : chaque
+        bonus d'XP du client avec ses effets, sa durée, son cumul, son accès, sa source et sa certitude ; `applied`
+        faux pour un bonus sans source joueur (jamais appliqué) ; sac de couchage, nourritures nutritives, camp, règle
+        de cumul."""
         try:
+            if kind == "xp_bonuses":
+                from forever.xp_bonuses import lookup_xp_bonuses
+
+                return lookup_xp_bonuses(deps, access=access)
             if kind == "quests":
                 from forever.quests import lookup_quests
 
@@ -178,7 +187,8 @@ def build_server(deps: Deps) -> MCPServer:
                 return compact(report, detail=detail, limit=limit, offset=offset)
             if kind != "spell":
                 raise UnsupportedKindError(
-                    f"type « {kind} »", ["spell", "talent", "zones", "pvp", "build_check", "pets", "tf_popular"]
+                    f"type « {kind} »",
+                    ["spell", "talent", "zones", "pvp", "build_check", "pets", "tf_popular", "quests", "xp_bonuses"],
                 )
             if not name:
                 raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")
@@ -234,6 +244,11 @@ def build_server(deps: Deps) -> MCPServer:
         rested: float = 0.0,
         party: int = 1,
         limit: int = 5,
+        bonus: list[str] | None = None,
+        hours: float | None = None,
+        sleeping_bag: int | None = None,
+        food: bool = False,
+        legacy_rested_rank: int | None = None,
     ) -> dict[str, Any]:
         """Leveling du Mage : temps par monstre (combat, repos, total), mana, dégâts subis et XP par heure, par Monte
         Carlo (moyenne de `n` combats, graine fixe) et par le modèle analytique, avec les PV du monstre (valeur,
@@ -251,7 +266,12 @@ def build_server(deps: Deps) -> MCPServer:
         T04d : `kind="objectives"` (toutes les classes, `class_name` en anglais, `faction`, `level`, `race`,
         `rested`, `party`) : XP par heure par zone et par donjon (premier passage avec ses quêtes, passages
         suivants), temps par monstre et sa source (`engine` pour le Mage, `measured` ou `estimated` sinon), `advice`
-        : phrase de conseil construite par l'outil à partir de ses chiffres, à rendre telle quelle."""
+        : phrase de conseil construite par l'outil à partir de ses chiffres, à rendre telle quelle.
+        T04f : bonus d'XP. `kind="kill"` : `bonus` (sleeping_bag, food), `rested` (réservoir), `hours` (séance) :
+        `xp_h` multiplié par le facteur de la séance, `bonuses` les liste ; sans bonus, sortie inchangée.
+        `kind="objectives"` : `rested`, `sleeping_bag` (cumuls, 0 : le maximum), `food`, `legacy_rested_rank`,
+        `hours` : chaque objectif rend `xp_h`, `xp_h_rested`, `xp_h_sleeping_bag`, `xp_h_all` ; `bonuses.advice`
+        (bonus à prendre, rangés par gain) et `bonus_advice` (phrase de l'outil, à rendre telle quelle)."""
         if kind == "objectives":
             from forever.sim.objectives import objectives
 
@@ -265,6 +285,10 @@ def build_server(deps: Deps) -> MCPServer:
                     rested=rested,
                     party=party,
                     limit=limit,
+                    sleeping_bag=sleeping_bag,
+                    food=food,
+                    legacy_rested_rank=legacy_rested_rank,
+                    hours=hours,
                 )
             except ForeverError as err:
                 return cast(dict[str, Any], _error_result(deps, err))
@@ -286,6 +310,9 @@ def build_server(deps: Deps) -> MCPServer:
                 ab_stacks=ab_stacks,
                 ab_dump=ab_dump,
                 low_level_penalty=low_level_penalty,
+                bonus=bonus or (),
+                rested=rested,
+                hours=hours,
             )
         except ForeverError as err:
             return cast(dict[str, Any], _error_result(deps, err))

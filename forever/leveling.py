@@ -8,7 +8,8 @@ from __future__ import annotations
 import difflib
 import statistics
 from collections.abc import Mapping, Sequence
-from typing import Any, TypedDict, cast
+from dataclasses import asdict
+from typing import Any, NotRequired, TypedDict, cast
 
 from forever.config import Deps
 from forever.engine.model import CharacterOverrides, GameData, MonsterHp
@@ -52,6 +53,7 @@ class LevelingReport(TypedDict):
     analytic_gap: float
     mob_hp: MobHpInfo
     provenance: Provenance
+    bonuses: NotRequired[dict[str, Any]]  # T04f : bonus d'XP appliqués (absent sans bonus ni repos)
 
 
 DEFAULT_RACE = "Orc"  # race par défaut des outils de calcul (T04), toujours signalée dans `inputs` (T06b)
@@ -233,8 +235,6 @@ def simulate_leveling(
     """Monte Carlo (moyenne de `n` combats, graine fixe) et analytique pour un build, avec la provenance.
 
     `low_level_penalty` : pénalité des sorts de bas niveau (None : `coefficient.low_level_default` des données)."""
-    if bonus or rested:
-        raise NotImplementedError
     inputs = {
         "race": given(race, DEFAULT_RACE),
         "level": given(level, None),
@@ -280,6 +280,7 @@ def simulate_leveling(
         raise InvalidArgumentError(
             f"{exc}.", "choisir un niveau où le sort principal (et l'armure demandée) est appris"
         ) from exc
+    bonuses = _apply_bonuses(gd, level, m, a, bonus=bonus, rested=rested, hours=hours)
     certainty = min_certainty([cast(Certainty, hp.certainty), constants_certainty(data), "suppose"])
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)
     provenance = make_provenance(
@@ -293,9 +294,10 @@ def simulate_leveling(
             *assumptions(options, hp, pts, n, seed, gd.constants.coefficients.low_level_default),
             ratio_assumption(gd),
             *([DEFAULT_RACE_NOTE] if inputs["race"]["origin"] == "default" else []),
+            *(bonuses["assumptions"] if bonuses else []),
         ],
     )
-    return {
+    report: LevelingReport = {
         "level": level,
         "race": race,
         "inputs": inputs,
@@ -315,4 +317,56 @@ def simulate_leveling(
             "source": hp.source,
         },
         "provenance": provenance,
+    }
+    if bonuses:
+        report["bonuses"] = {k: v for k, v in bonuses.items() if k != "assumptions"}
+    return report
+
+
+def _apply_bonuses(
+    gd: Any,
+    level: int,
+    m: KillResult,
+    a: KillResult,
+    *,
+    bonus: Sequence[str],
+    rested: float,
+    hours: float | None,
+) -> dict[str, Any] | None:
+    """T04f : bonus d'XP actifs (`bonus`) et réservoir de repos : l'XP par heure du Monte Carlo et de l'analytique est
+    multipliée par le facteur de la séance (`session_xp`, monstres seulement) ; le temps par monstre ne change pas.
+    None sans bonus ni repos (sortie inchangée).
+
+    Registre : D7, D9, D10, E3"""
+    from forever.engine.xp import session_xp
+    from forever.xp_bonuses import DEFAULT_SESSION_H, active_bonuses, bonus_state
+
+    if not bonus and rested <= 0:
+        return None
+    state = bonus_state(gd, list(bonus)) if bonus else None
+    session_h = hours or DEFAULT_SESSION_H
+    factors = {}
+    terms: list[dict[str, Any]] = []
+    for name, side in (("monte_carlo", m), ("analytic", a)):
+        base = float(side["xp_h"])
+        s = session_xp(
+            gd, base_xp_h=base, kill_share=1.0, hours=session_h, state=state, rested_pool=rested, level=level
+        )
+        side["xp_h"] = s.xp_h
+        factors[name] = s.xp_h / base if base > 0 else 1.0
+        terms = [asdict(t) for t in s.terms]
+    return {
+        "names": list(bonus),
+        "rested": rested,
+        "hours": session_h,
+        "factor": factors["analytic"],
+        "factors": factors,
+        "terms": terms,
+        "active": active_bonuses(gd, state) if state is not None else [],
+        "assumptions": [
+            (
+                f"bonus d'XP appliqués à l'XP par heure ({', '.join(bonus) or 'repos seul'}, séance de {session_h} h, "
+                "xp.bonus_stacking suppose) ; temps par monstre inchangé"
+            )
+        ],
     }

@@ -410,14 +410,14 @@ def session_xp(
     dt_s = hours * 3600 / steps
     data = xp_bonus_data(gd) if state is not None else None
     rules = xp_rules(gd) if rested_pool > 0 else None
-    pool, used_total, total = rested_pool, 0.0, 0.0
+    pool, used_total, extra_total = rested_pool, 0.0, 0.0
     by: dict[str, float] = defaultdict(float)
     terms: dict[str, Term] = {}
     active = _active(state, data) if state is not None and data is not None else []
     for i in range(steps):
         kill = base_xp_h * dt_s / 3600 * kill_share
         quest = base_xp_h * dt_s / 3600 * (1 - kill_share)
-        gained, kill_after = kill + quest, kill
+        gained, kill_after = 0.0, kill  # XP en plus de la base sur ce pas
         if data is not None:
             now = _covered(active, i * dt_s, dt_s)
             weights = {a.spell_id: w for a, w in now}
@@ -444,7 +444,8 @@ def session_xp(
             gained += used
             by["xp.rested"] += used
             terms.setdefault("xp.rested", _term(rules, "xp.rested", rules.rested_factor))
-        total += gained
+        extra_total += gained
+    total = base_xp_h * hours + extra_total  # base comptée d'un bloc : sans bonus, XP par heure exacte
     return SessionXp(
         xp_h=total / hours,
         base_xp_h=base_xp_h,

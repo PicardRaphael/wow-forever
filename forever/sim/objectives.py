@@ -17,16 +17,24 @@ from __future__ import annotations
 
 import statistics
 from collections.abc import Sequence
+from dataclasses import asdict
 from pathlib import Path
 from typing import Any
 
 from forever.config import Deps
 from forever.engine.leveling import gray_level
-from forever.engine.xp import ActiveAura, Party, QuestXpInput, mob_kill_xp, quest_xp
+from forever.engine.xp import ActiveAura, Party, QuestXpInput, mob_kill_xp, quest_xp, session_xp, sleeping_bag_state
 from forever.errors import InvalidArgumentError
 from forever.kill_time import kill_params, kill_time, load_kill_times
 from forever.pipeline.questie import CLASS_MASKS
 from forever.quests import QuestBook, build_quests, value
+from forever.xp_bonuses import (
+    DEFAULT_SESSION_H,
+    active_bonuses,
+    best_bonus,
+    bonus_advice_sentence,
+    bonus_state,
+)
 
 KINDS = ("zone", "dungeon_first", "dungeon_repeat")
 SECONDS_PER_MINUTE = 60.0  # conversions d'unité
@@ -124,6 +132,77 @@ def _advice(best: dict[str, Any] | None) -> str:
     if best["kind"] == "dungeon_repeat":
         return f"refais {best['name']} : environ {round(best['xp_h'])} XP par heure"
     return f"continue dehors : {best['name']} (environ {round(best['xp_h'])} XP par heure)"
+
+
+def _bonus_rates(
+    gd: Any,
+    rows: list[dict[str, Any]],
+    *,
+    level: int,
+    rested: float,
+    hours: float,
+    sleeping_bag: int | None,
+    food: bool,
+    auras: Sequence[ActiveAura],
+    legacy_rested_rank: int | None,
+) -> dict[str, Any] | None:
+    """T04f : XP par heure de chaque objectif avec repos, avec le sac de couchage et avec les bonus actifs (séance de
+    `hours` heures, `session_xp`), bonus actifs et bonus à prendre pour le meilleur objectif. None si la version ne
+    porte pas les bonus d'XP.
+
+    Registre : D7, D9, D10, E3"""
+    if gd.xp_bonuses is None:
+        return None
+    names = [*(["sleeping_bag"] if sleeping_bag is not None else []), *(["food"] if food else [])]
+    state = bonus_state(gd, names, auras=auras, sleeping_bag_stacks=sleeping_bag or None)
+    bag = sleeping_bag_state(gd)
+
+    def rate(r: dict[str, Any], st: Any, pool: float) -> float:
+        if r["xp_h"] <= 0 or (st is None and pool <= 0):
+            return float(r["xp_h"])
+        return session_xp(
+            gd, base_xp_h=r["xp_h"], kill_share=r["kill_share"], hours=hours, state=st, rested_pool=pool, level=level
+        ).xp_h
+
+    for r in rows:
+        r["kill_share"] = r["kills"] * r["kill_xp"] / r["xp"] if r["xp"] > 0 else 0.0
+        r["xp_h_rested"] = rate(r, None, rested)
+        r["xp_h_sleeping_bag"] = rate(r, bag, 0.0)
+        r["xp_h_all"] = rate(r, state, rested)
+    best = rows[0] if rows else None
+    advice = (
+        best_bonus(
+            gd,
+            state,
+            level=level,
+            base_xp_h=best["xp_h"],
+            kill_share=best["kill_share"],
+            hours=hours,
+            rested_pool=rested,
+        )
+        if best
+        else []
+    )
+    data = gd.xp_bonuses
+    stacking = data.sources.get("xp.bonus_stacking")
+    rank = legacy_rested_rank or 0
+    return {
+        "hours": hours,
+        "rested": rested,
+        "stacking": data.stacking,
+        "active": active_bonuses(gd, state),
+        "advice": [asdict(a) for a in advice],
+        "legacy_rested_rank": rank,
+        "sentence": bonus_advice_sentence(advice),
+        "assumptions": [
+            (
+                f"bonus d'XP : {data.stacking} des pourcentages puis repos sur l'XP majorée (xp.bonus_stacking, "
+                f"{stacking.certainty if stacking else 'suppose'}, LVL12) ; séance de {hours} h ; nourriture renouvelée"
+            ),
+            f"rang du perk Legacy Well Rested : {rank}"
+            + (" (non donné : 0 retenu, relevé par ForeverLogger ou profil)" if legacy_rested_rank is None else ""),
+        ],
+    }
 
 
 def objectives(
@@ -229,6 +308,18 @@ def objectives(
         rows += [first, repeat]
     rows.sort(key=lambda r: -r["xp_h"])
     best = rows[0] if rows else None
+    session_h = hours or DEFAULT_SESSION_H
+    bonuses = _bonus_rates(
+        gd,
+        rows,
+        level=level,
+        rested=rested,
+        hours=session_h,
+        sleeping_bag=sleeping_bag,
+        food=food,
+        auras=auras,
+        legacy_rested_rank=legacy_rested_rank,
+    )
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)
     provenance = make_provenance(
         deps,
@@ -245,7 +336,7 @@ def objectives(
                 "XP des quêtes : client si la quête a été vue, sinon addon ou Questie (suppose) ; monstres des "
                 "objectifs au niveau médian des quêtes"
             ),
-            *(["repos non appliqué au classement (réservoir donné : rested)"] if rested else []),
+            *(bonuses["assumptions"] if bonuses else []),
             *book.notes[:1],
         ],
     )
@@ -259,5 +350,7 @@ def objectives(
         "dungeons": out_dungeons,
         "best": best,
         "advice": _advice(best),
+        "bonuses": {k: v for k, v in bonuses.items() if k != "assumptions"} if bonuses else None,
+        "bonus_advice": bonuses["sentence"] if bonuses else None,
         "provenance": provenance,
     }

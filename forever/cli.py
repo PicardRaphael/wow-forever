@@ -172,7 +172,8 @@ def build_parser() -> argparse.ArgumentParser:
     lookup = sub.add_parser("lookup", help="consulter une entité du jeu")
     lookup.add_argument(
         "kind",
-        help="type d'entité : spell (T01), zones (T04c), talent (T06), quests (T04d) ; fiches PvP : forever pvp",
+        help="type d'entité : spell (T01), zones (T04c), talent (T06), quests (T04d), xp_bonuses (T04f) ; fiches PvP : "
+        "forever pvp",
     )
     lookup.add_argument("name", nargs="?", help="nom anglais du sort ou du talent (casse, espaces et tirets ignorés)")
     lookup.add_argument("--level", type=int, help="zones : niveau du personnage")
@@ -187,6 +188,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     lookup.add_argument("--id", type=int, dest="quest_id", help="quests : identifiant de la quête")
     lookup.add_argument("--dungeon", help="quests : donjon (nom anglais)")
+    lookup.add_argument("--access", help="xp_bonuses : voie d'accès (item, legacy, food, camp, none)")
     lookup.add_argument("--limit", type=int, default=20, help="rangs par page")
     lookup.add_argument("--offset", type=int, default=0, help="premier rang de la page (à partir de 0)")
     lookup.add_argument("--json", action="store_true", help="sortie JSON")
@@ -658,6 +660,9 @@ def build_parser() -> argparse.ArgumentParser:
     sim_leveling = sim_sub.add_parser("leveling", help="temps par monstre et XP par heure (Monte Carlo et analytique)")
     sim_leveling.add_argument("--level", type=int, required=True, help="niveau du personnage")
     _leveling_arguments(sim_leveling, n_default=1500)
+    sim_leveling.add_argument("--bonus", help="bonus d'XP actifs, séparés par des virgules (sleeping_bag, food)")
+    sim_leveling.add_argument("--rested", type=float, default=0.0, help="réservoir de repos (XP)")
+    sim_leveling.add_argument("--hours", type=float, help="durée de la séance en heures (défaut : 2)")
     sim_obj = sim_sub.add_parser("objectives", help="XP par heure par zone et par donjon, toutes les classes (T04d)")
     sim_obj.add_argument("--level", type=int, required=True, help="niveau du personnage")
     sim_obj.add_argument("--class", dest="cls", required=True, help="classe (anglais : hunter, mage…)")
@@ -665,6 +670,17 @@ def build_parser() -> argparse.ArgumentParser:
     sim_obj.add_argument("--race", help="race du personnage")
     sim_obj.add_argument("--rested", type=float, default=0.0, help="réservoir de repos (XP)")
     sim_obj.add_argument("--party", type=int, default=1, help="taille du groupe dehors")
+    sim_obj.add_argument(
+        "--sleeping-bag",
+        nargs="?",
+        type=int,
+        const=0,
+        default=None,
+        help="Well-Rested du sac de couchage actif (cumuls ; sans nombre : le maximum du client)",
+    )
+    sim_obj.add_argument("--food", action="store_true", help="nourriture nutritive mangée et renouvelée")
+    sim_obj.add_argument("--legacy-rested-rank", type=int, help="rang du perk Legacy Well Rested (défaut : 0, signalé)")
+    sim_obj.add_argument("--hours", type=float, help="durée de la séance en heures (défaut : 2)")
     sim_obj.add_argument("--limit", type=int, default=5, help="zones affichées")
     sim_obj.add_argument("--json", action="store_true", help="sortie JSON")
 
@@ -1113,7 +1129,32 @@ def _cmd_quests(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _render_xp_bonuses(found: Mapping[str, Any]) -> list[str]:
+    lines = [f"Bonus d'XP : {len(found['bonuses'])} aura(s) du client"]
+    for b in found["bonuses"]:
+        effects = ", ".join(f"{e['key']} {_num(e['value_pct'])} %" for e in b["effects"] if e["value_pct"])
+        duration = "sans fin" if b["duration_s"] is None else f"{_num(round(b['duration_s']))} s"
+        state = "appliqué" if b["applied"] else "jamais appliqué (aucune source joueur)"
+        lines.append(
+            f"  {b['name']} ({b['spell_id']}) : {effects} ; durée {duration} ; cumul {b['max_stacks']} ; accès "
+            f"{b['access']} ; {state} ; {b['certainty']}"
+        )
+    bag = found.get("sleeping_bag")
+    if bag:
+        lines.append(f"Sac de couchage : {bag['name']} (objet {bag['item']}), aura {bag['aura_name']}")
+    lines.append(f"Nourritures nutritives : {found['food']['count']}")
+    stacking = found["stacking"]
+    lines.append(f"Cumul : {stacking['mode']}, repos sur l'XP majorée : {'oui' if stacking['rested_after'] else 'non'}")
+    return lines
+
+
 def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
+    if args.kind == "xp_bonuses":
+        from forever.xp_bonuses import lookup_xp_bonuses
+
+        found = lookup_xp_bonuses(deps, access=args.access)
+        _emit(found, _render_xp_bonuses(found), found["provenance"], args.json)
+        return EXIT_OK
     if args.kind == "quests":
         from forever.quests import lookup_quests
 
@@ -1155,7 +1196,9 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         _emit(talent, render_talent(talent), talent["provenance"], args.json)
         return EXIT_OK
     if args.kind != "spell":
-        raise UnsupportedKindError(f"type « {args.kind} »", ["spell", "talent", "zones", "quests", "pvp", "pets"])
+        raise UnsupportedKindError(
+            f"type « {args.kind} »", ["spell", "talent", "zones", "quests", "pvp", "pets", "xp_bonuses"]
+        )
     if not args.name:
         raise InvalidArgumentError("Nom du sort manquant.", "écrire forever lookup spell <nom>")
     res = lookup_spell(deps, args.name, args.rank, detail=args.detail, limit=args.limit, offset=args.offset)
@@ -2239,10 +2282,16 @@ def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
 
 
 def _objective_line(o: Mapping[str, Any]) -> str:
-    return (
+    line = (
         f"  {o['name']} ({o['kind']}) : {o['xp']:.0f} XP en {o['minutes']:.0f} min, {o['xp_h']:.0f} XP/h "
         f"({o['quests']} quête(s), {o['kills']:.0f} monstre(s))"
     )
+    if "xp_h_all" in o:
+        line += (
+            f" ; avec repos {o['xp_h_rested']:.0f}, avec le sac {o['xp_h_sleeping_bag']:.0f}, avec les bonus "
+            f"actifs {o['xp_h_all']:.0f} XP/h"
+        )
+    return line
 
 
 def _cmd_sim_objectives(deps: Deps, args: argparse.Namespace) -> int:
@@ -2257,6 +2306,10 @@ def _cmd_sim_objectives(deps: Deps, args: argparse.Namespace) -> int:
         rested=args.rested,
         party=args.party,
         limit=args.limit,
+        sleeping_bag=args.sleeping_bag,
+        food=args.food,
+        legacy_rested_rank=args.legacy_rested_rank,
+        hours=args.hours,
     )
     kt = rep["kill_time"]
     lines = [
@@ -2271,6 +2324,11 @@ def _cmd_sim_objectives(deps: Deps, args: argparse.Namespace) -> int:
         if d["first_pass"]["missing_prereqs"]:
             lines.append(f"    prérequis hors du donjon : {', '.join(map(str, d['first_pass']['missing_prereqs']))}")
     lines.append(f"Conseil : {rep['advice']}")
+    bonuses = rep.get("bonuses")
+    if bonuses:
+        active = ", ".join(f"{b['name']} ×{b['stacks']}" for b in bonuses["active"]) or "aucun"
+        lines.append(f"Bonus actifs : {active} (séance de {_num(bonuses['hours'])} h)")
+        lines.append(f"Bonus à prendre : {rep['bonus_advice']}")
     _emit(rep, lines, rep["provenance"], args.json)
     return EXIT_OK
 
@@ -2295,6 +2353,9 @@ def _cmd_sim(deps: Deps, args: argparse.Namespace) -> int:
         ab_stacks=args.ab_stacks,
         ab_dump=args.ab_dump,
         low_level_penalty=None if args.low_level_penalty is None else args.low_level_penalty == "on",
+        bonus=[b.strip() for b in args.bonus.split(",") if b.strip()] if args.bonus else (),
+        rested=args.rested,
+        hours=args.hours,
     )
     hp = rep["mob_hp"]
     gap = f"{rep['analytic_gap'] * 100:+.1f}".replace(".", ",")
