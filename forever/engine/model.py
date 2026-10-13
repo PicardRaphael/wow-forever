@@ -288,6 +288,9 @@ class LevelingConstants:
     mob_source: str = "measured"  # PV des monstres par défaut des simulateurs (leveling.mob_source, T05)
     # T08b, bloc A : constante d'armure par niveau de l'attaquant (character_scaling.json, mode forever) ; vide : formule
     armor_constant_by_level: tuple[float, ...] = ()
+    # T04d, bloc C : XP d'un monstre normal de même niveau par niveau (character_scaling.json kill_xp, mode forever) ;
+    # vide : règle leveling.mob_xp
+    kill_xp_by_level: tuple[float, ...] = ()
 
     @property
     def ignite_ticks(self) -> int:
@@ -431,6 +434,37 @@ class ClassKnowledge:
 
 
 @dataclass(frozen=True)
+class XpRuleSource:
+    """Certitude, source et entrée du registre d'une règle d'XP (`mechanics.json`, clés `xp.*`)."""
+
+    certainty: str
+    source: str
+    registry: str
+
+
+@dataclass(frozen=True)
+class XpRules:
+    """Règles du modèle d'XP (T04d, bloc C), lues dans `mechanics.json` (`xp.*`) et, en mode forever, dans
+    `character_scaling.json` (palier « Rested » de la table Exhaustion du client)."""
+
+    higher_per_level: float  # monstre plus haut : + part de l'XP par niveau d'écart
+    higher_max_diff: int  # écart au-delà duquel la hausse ne croît plus
+    zero_difference: tuple[tuple[int, int], ...]  # (niveau du joueur max, écart nul) par ligne, croissant
+    elite_factor: float
+    dungeon_bonus: float  # part ajoutée à l'XP d'un monstre tué en donjon (xp.dungeon_kill_bonus)
+    group_rates: tuple[float, ...]  # multiplicateur de groupe par taille (taille 1 en premier)
+    group_level_basis: str  # « individual » : XP calculée au niveau de chaque joueur
+    rested_factor: float  # multiplicateur de l'XP d'un monstre tant que le repos dure
+    rested_period_h: float  # durée d'une période de repos en auberge
+    rested_gain_per_period: float  # part de l'XP du niveau gagnée par période en auberge
+    rested_outdoor_ratio: float  # part du gain en auberge gagnée dehors
+    rested_cap_levels: float  # plafond du repos, en niveaux d'XP
+    quest_full_diff: int  # écart (joueur - quête) jusqu'auquel une quête rend toute son XP
+    quest_reduction: tuple[float, ...]  # part rendue à chaque écart suivant, puis la dernière au-delà
+    sources: Mapping[str, XpRuleSource] = field(default_factory=dict)  # règle -> certitude, source, registre
+
+
+@dataclass(frozen=True)
 class GameData:
     """Données d'une version, pour la classe Mage (un espace par classe est prévu : données des 9 classes en PV1, moteurs dans les tranches de classe)."""
 
@@ -464,6 +498,7 @@ class GameData:
     character_ratios_from: str | None = None  # version d'origine d'un character_scaling.json hérité
     # T08b, bloc B (D2) : fichier dont viennent les utilitaires du Mage (classes.json en mode forever s'il les porte)
     utility_source: str = "spells.json"
+    xp: XpRules | None = None  # T04d, bloc C : modèle d'XP (mechanics.json xp.*) ; None : version sans ces règles
 
 
 class CharacterOverrides(TypedDict, total=False):
