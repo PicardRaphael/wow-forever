@@ -1878,7 +1878,12 @@ def _step_addons(run: _Run) -> Step:
                 "version": addon.get("version"),
                 "revision": None,
                 "clauses": {},
-                "reasons": [f"{addon['name']} changé : {', '.join(proposal.get('depends', []))}"],
+                "reasons": [
+                    f"{addon['name']} : aucun inventaire précédent, relecture complète : "
+                    f"{', '.join(proposal.get('depends', []))}"
+                    if proposal.get("first")
+                    else f"{addon['name']} changé : {', '.join(proposal.get('depends', []))}"
+                ],
                 "files": addon.get("files"),
                 "created_at": run.now,
                 "base": {"origin_main": run.origin_main, "fingerprint": addon.get("fingerprint")},

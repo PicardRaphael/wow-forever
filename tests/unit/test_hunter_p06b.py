@@ -66,7 +66,7 @@ def test_zone_guide_without_a_name_lists_the_tameable_beasts(make_deps, wow):
     beasts = [b for z in out["zones"] for b in z["beasts"]]
     assert beasts, "des bêtes de la fixture sont dans The Barrens à ce niveau"
     assert all(b["tameable_now"] for b in beasts)  # niveau inférieur ou égal au mien
-    assert all(b["taught"] for b in first["beasts"])  # capacités et rangs enseignés
+    assert all(b["taught"] or b["family_abilities"] for b in first["beasts"])  # rangs enseignés, sinon de la famille
     assert any(b["coords"] for b in first["beasts"])  # positions
 
 

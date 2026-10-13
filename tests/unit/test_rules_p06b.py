@@ -13,8 +13,8 @@ import copy
 import shutil
 
 import pytest
-from mcp import Client  # noqa: F401  (tests MCP : socket local autorisé par conftest)
 from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, read_json
+from mcp import Client  # noqa: F401  (tests MCP : socket local autorisé par conftest)
 from test_hunter_p06b import LEVEL, context, hunter_bench, run_calls  # noqa: F401  (fixture importée)
 
 from forever.bridge.buttons import BUTTONS

@@ -522,6 +522,20 @@ def _ability_by_name(pets: Mapping[str, Any], name: Any) -> Mapping[str, Any] | 
     return next((a for a in pets.get("abilities", {}).values() if normalize_text(a["name"]["en"]) == wanted), None)
 
 
+def _family_abilities(pets: Mapping[str, Any], family: str | None, level: int) -> list[dict[str, Any]]:
+    """Capacités qu'une famille apprend (client) avec le rang le plus haut atteignable à ce niveau."""
+    fam = pets.get("families", {}).get(family or "")
+    out = []
+    for key in fam.get("abilities", []) if fam else []:
+        a = pets.get("abilities", {}).get(key)
+        if a is None:
+            continue
+        ranks = [r for r in a.get("ranks", []) if isinstance(r.get("level"), int) and r["level"] <= level]
+        best = max(ranks, key=lambda r: r["rank"]) if ranks else None
+        out.append({"key": key, "name": a["name"], "highest_rank": best["rank"] if best else None})
+    return out
+
+
 def corrected_taught(
     taught: Mapping[str, Any],
     beast_levels: Sequence[int] | None,
@@ -666,9 +680,9 @@ def tame_guide(
         target = {"kind": "all", "key": None}
 
         def matches(b: Mapping[str, Any]) -> bool:
-            # apprivoisable maintenant (niveau au plus celui du Chasseur, marge comprise) et rangs enseignés connus
+            # apprivoisable maintenant (niveau au plus celui du Chasseur, marge comprise), rangs enseignés connus ou non
             low = (b.get("level") or [None])[0]
-            return isinstance(low, int) and low <= level + margin and bool(b.get("taught"))
+            return isinstance(low, int) and low <= level + margin
 
     # bêtes candidates : base de l'addon, puis découvertes de la carte absentes de la base
     pool: list[dict[str, Any]] = [dict(b) for b in bestiary.get("beasts", [])]
@@ -738,9 +752,12 @@ def tame_guide(
             "tameable_now": now,
             "tameable_at": None if now or not isinstance(low, int) else low - margin,
             "taught": taught,
+            # rangs enseignés inconnus de Forever Bestiary : capacités de la famille lues dans le client (décision 243)
+            "family_abilities": [] if taught else _family_abilities(pets, _family_of(aliases, b.get("family")), level),
             "confirmation": b.get("confirmation"),
             "speed_s": b.get("speed_s"),
             "coords": coords,
+            "positions_known": bool(coords),
             "reporters": obs.get("reporters"),
             "gaps": _gaps_about(gaps, {str(b["id"])}),
         }

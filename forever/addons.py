@@ -189,7 +189,9 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
             "removed": sorted(before - set(files)),
             "modified": sorted(k for k in set(files) & before if files[k]["sha256"] != old["files"][k].get("sha256")),
         }
-        status = "nouveau" if not old else ("inchangé" if fp == old.get("fingerprint") else "changé")
+        # changé : fichiers de données ou version (`.toc`) différents (décision 243 : une version seule suffit)
+        same = fp == old.get("fingerprint") and version == old.get("version")
+        status = "nouveau" if not old else ("inchangé" if same else "changé")
         entry: dict[str, Any] = {
             "name": name,
             "status": status,
@@ -217,9 +219,15 @@ def addons_status(deps: Deps, *, save: bool = False, addons_dir: Path | None = N
             record["content_version"] = cv
         if name == "TalentsForeverBook" and status != "inchangé":
             entry["recheck"] = _talents_recheck(deps, folders[0])
-        if status == "changé" and spec.depends:
-            # un agrégat du dépôt en dépend : attente d'accord proposée (forever update, T08d)
-            entry["proposal"] = {"kind": "addon_data", "depends": list(spec.depends), "action": spec.action}
+        if status in ("changé", "nouveau") and spec.depends:
+            # un agrégat du dépôt en dépend : attente d'accord proposée (forever update, T08d) ; « nouveau » : aucun
+            # inventaire précédent (remise à zéro du PC, décision 243), relecture complète
+            entry["proposal"] = {
+                "kind": "addon_data",
+                "depends": list(spec.depends),
+                "action": spec.action,
+                "first": status == "nouveau",
+            }
         if spec.depends:
             entry["depends"] = list(spec.depends)
         if spec.action:

@@ -180,9 +180,12 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
         read = (
             (
                 "Bêtes apprivoisables maintenant (niveau inférieur ou égal au tien), la zone actuelle d'abord puis les "
-                "zones voisines dans l'ordre rendu : pour chacune, son nom, son niveau, les capacités et les rangs "
-                "qu'elle enseigne et ses positions (coordonnées et date, telles que rendues) ; cinq bêtes au plus, "
-                "celles qui enseignent les rangs les plus hauts d'abord."
+                "zones voisines dans l'ordre rendu : pour chacune, son nom, sa famille, son niveau, les capacités et les "
+                "rangs qu'elle enseigne et ses positions (coordonnées et date, telles que rendues ; `positions_known` "
+                "faux : dis que sa position n'est pas connue) ; rangs enseignés inconnus : les capacités de sa famille "
+                "(`family_abilities`) ; cinq bêtes au plus, celles qui enseignent les rangs les plus hauts d'abord. "
+                "Familles, capacités, rangs et niveaux requis viennent des données du client du jeu installé, qui priment "
+                "sur l'addon."
             ),
             (
                 "Rang marqué au-dessus du niveau de sa bête (`above_beast_level`) : donne le rang corrigé supposé "

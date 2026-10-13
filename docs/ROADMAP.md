@@ -356,7 +356,7 @@ Réécrite le 2026-10-07 (décisions 193, 194 et 197 ; avant : évaluation d'un 
 ## P06b — Boutons, validation et refus en jeu, liens d'export
 Découpée de P06 le 2026-10-07 (décision 202), après P06a et FA1. Reprend la fiche PvP fixe de la cible (FA1p) et, une fois AN1 et AN2 faites, l'analyse du dernier combat (FA3).
 - **Fait** :
-    1. **Boutons en jeu** pour tout ce que sait faire l'agent, chacun étant une **question prédéfinie** passée par le pont de P06a. Talents, Familiers, PvP et Leveling sont livrés dès P06a (décision 212, 2026-10-09) ; P06b ajoute « Mettre à jour » et les boutons des tranches faites ensuite. **Un bouton n'apparaît que si la tranche qui le calcule est faite** :
+    1. **Boutons en jeu** pour tout ce que sait faire l'agent, chacun étant une **question prédéfinie** passée par le pont de P06a. Talents, Familiers, PvP et Leveling sont livrés dès P06a (décision 212, 2026-10-09) ; P06b ajoute « Mettre à jour » et les boutons des tranches faites ensuite. **Règle générale (décision 243) : aucune fonction ni aucun bouton n'est réservé à une classe** ; chaque bouton marche pour tous mes personnages avec la meilleure source disponible : le calcul de notre moteur quand il existe, sinon les addons installés lus en local (Naowh Forever, Talents Forever, Forever Companion, AtlasLoot, Forever Bestiary, Questie, Forever Guide…) et les données du client ; la réponse dit clairement ce qui est calculé, ce qui vient d'un addon et ce qui manque. Seul Familiers reste propre aux classes qui ont un familier (Chasseur : bêtes, fait ; Démoniste : démons, avec DE1). **Un bouton n'apparaît que si la tranche qui le calcule est faite** :
 
         | Bouton | Ce qu'il rend | Tranche qui le calcule |
         | --- | --- | --- |
@@ -673,3 +673,9 @@ Détaillées au moment de les planifier, avec la même structure (fait, hors pé
 - **V2 (proposée avec T07, qui lit déjà les SavedVariables)** : l'addon écrit hors combat le contexte du personnage (niveau, talents `C_Traits`, équipement, zone, quêtes) dans `ForeverAssistCharDB` ; `forever ingest-sv` le lit après un `/reload`, recalcule et régénère `Generated.lua`. Hors périmètre : tout canal temps réel. Critères de fin : lecture d'une SavedVariable d'exemple, régénération déterministe, fiche du vault mise à jour.
 - **V3 (tranche FA3, après T08, AN1 et AN2)** : compagnon de bureau qui analyse `WoWCombatLog-*.txt` après le combat (`forever analyze` de AN1 et AN2, `forever logs measure`), résume le dernier combat, l'expose au MCP et prépare le fichier de V1. Hors périmètre : toute consigne en direct. Critères de fin : découpe des combats testée sur fixtures, résumé avec provenance.
 
+## RX1 — notes (tranche à définir : déplacements)
+- **Naowh Forever, module Journeys** (relevé du 2026-10-13, décision 243) : `NaowhForever_Journeys` et
+  `NaowhForever_JourneysData` (version 1.1.11, chargés à la demande) contiennent un réseau de marche par carte (passages
+  et trajets entre les lieux, en CBOR compressé) : source possible pour estimer les déplacements (temps entre deux
+  lieux, coût d'un trajet dans le leveling), en lecture locale seulement (décision 133 : seuls des agrégats entrent dans
+  le dépôt). Autre source déjà inventoriée : ShortestPathForever (trajets et transports, suppose).
