@@ -73,7 +73,7 @@ class Logger:
 
 
 def to_py(value):
-    if lupa.lua_type(value) == "table":
+    if lua51.lua_type(value) == "table":
         return {k: to_py(v) for k, v in value.items()}
     return value
 
