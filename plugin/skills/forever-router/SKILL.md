@@ -50,6 +50,8 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Planifier : respec à un autre niveau, plan d'un personnage prévu | `forever_build(context, level, current=<talents du profil>)` : `respec.projected` | `forever-leveling` |
 | Temps par monstre, XP par heure, repos, mana | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
+| Donjons à mon niveau, fiche d'un donjon (boss, butin et taux, quêtes, prérequis, écarts) | `forever_lookup(kind="dungeons", level, faction)`, `forever_lookup(kind="dungeon", name, class_name, level)` | `forever-donjons` |
+| Où trouver tel objet (donjon, boss, taux) | `forever_lookup(kind="dungeon_item", name=<identifiant>)` | `forever-donjons` |
 | XP par heure par zone et par donjon, toutes les classes | `forever_sim_leveling(kind="objectives", level, class_name, faction)` | `forever-leveling` |
 | Quêtes de Forever : nouvelles, retouchées, écarts entre sources | `forever_lookup(kind="quests", …)` | `forever-leveling` |
 | Bonus d'XP (sac de couchage, nourriture, repos, Legacy, tente), lequel prendre | `forever_lookup(kind="xp_bonuses")`, `forever_sim_leveling(kind="objectives", …)` : `bonus_advice` | `forever-leveling` |
@@ -64,8 +66,8 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Où apprivoiser la bête qui enseigne un rang, près de ma zone | `forever_lookup(kind="pets", name, rank, zone, level)` | `forever-familiers` |
 | Données à jour ? version du jeu ? | `forever_status` | — |
 
-- Charge le skill du domaine (`forever-leveling`, `forever-mage`, `forever-pvp`, `forever-builds` ou
-  `forever-familiers`) dès que la question en relève.
+- Charge le skill du domaine (`forever-leveling`, `forever-mage`, `forever-pvp`, `forever-builds`,
+  `forever-familiers` ou `forever-donjons`) dès que la question en relève.
 - `forever_explain_mechanic` accepte un identifiant du registre (« A18 ») ou des mots de sa description (« Ignite ») ;
   plusieurs entrées : l'erreur liste « identifiant : description », choisis puis rappelle l'outil.
 - Calcul lourd (preset `complet`, plusieurs niveaux ou contextes à comparer) : sous-agent `forever-sim-runner`.
@@ -77,7 +79,6 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Domaine | Tranche qui le couvrira |
 |---|---|
 | PvP : champs de bataille, récompenses, monde ouvert ; rendements décroissants mesurés, profil PvP du Mage | PV2 |
-| Donjons : boss, butin (le niveau d'un donjon : `forever_lookup(kind="zones")`) | DJ1 |
 | Legacy : défis, points, bonus ; suivi de ma progression | LG1, LG2 |
 | Métiers | MT1 |
 | Réputations | RP1 |

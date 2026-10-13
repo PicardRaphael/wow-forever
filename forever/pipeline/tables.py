@@ -175,6 +175,7 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "ContentTuning": _cols("ID:int MinLevelSquish:int MaxLevelSquish:int LfgMinLevel:int LfgMaxLevel:int"),
     "DungeonEncounter": _cols("ID:int Name_lang:str MapID:int DifficultyID:int OrderIndex:int Flags:int"),
     "AreaTable": _cols("ID:int AreaName_lang:str ContinentID:int ParentAreaID:int"),
+    "DungeonItemSparse": _cols("ID:int Display_lang:str AllowableClass:int RequiredLevel:int"),
 }
 
 

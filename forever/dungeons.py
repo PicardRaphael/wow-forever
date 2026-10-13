@@ -38,6 +38,7 @@ LOOT_ORDER = ("naowh_dj", "fojji", "fdj", "forever_guide", "companion", "atlaslo
 COPY_FAMILY = frozenset({"fojji", "fdj"})  # niveaux des nouveaux boss recopiés d'une source à l'autre (plan de DJ1)
 GENERIC_WORDS = frozenset({"spire"})  # mots du nom d'instance qu'une aile peut omettre (« Lower Spire »)
 CACHE_DIR = "dungeons"
+ITEM_TABLE = "DungeonItemSparse"  # ItemSparse lue avec classes permises et niveau requis
 MERGE_FORMAT = 1
 DUNGEON_FILE = "dungeons.json"
 MONSTERS_FILE = "monsters.json"
@@ -844,3 +845,112 @@ def render_report(book: DungeonBook) -> str:
             lines.append(f"- {d['name']} : {values}")
     lines += ["", "## Notes", "", *(f"- {n}" for n in book.notes), ""]
     return "\n".join(lines)
+
+
+# --- consultation avec provenance (CLI, MCP) ------------------------------------------------------------------------
+
+
+def _item_rows(deps: Deps, version: str) -> dict[int, dict[str, Any]]:
+    """Classes permises et niveau requis des objets (`ItemSparse` du cache de `forever fetch`), vide sans cache."""
+    from forever.errors import ForeverError
+    from forever.pipeline.fetch import DEFAULT_LOCALE, table_path
+    from forever.pipeline.tables import read_table
+
+    path = table_path(deps.cache_dir, version, DEFAULT_LOCALE, "ItemSparse")
+    if not path.is_file():
+        return {}
+    try:
+        return {int(r["ID"]): dict(r) for r in read_table(path, ITEM_TABLE)}
+    except ForeverError:
+        return {}
+
+
+def _payload_provenance(deps: Deps, book: DungeonBook, extra: Sequence[str] = ()) -> dict[str, Any]:
+    from forever.freshness import freshness_for_version
+    from forever.provenance import make_provenance
+    from forever.store import load_version
+
+    data = load_version(deps)
+    fresh = freshness_for_version(deps, data.game_version, allow_network=False)
+    labels = [f"{s['label']} {s['version'] or ''}".strip() for s in book.sources]
+    return dict(
+        make_provenance(
+            deps,
+            game_version=data.game_version,
+            data_sha=data.data_sha,
+            freshness=fresh["freshness"],
+            certainty="suppose",
+            assumptions=[
+                *fresh["assumptions"],
+                f"sources lues en local : {', '.join(labels)}",
+                (
+                    "priorité par champ : relevé du joueur > client > note officielle > Naowh Forever > FojjiCore > "
+                    "ForeverDungeonJournal > Forever Guide > Forever Companion > AtlasLoot > Zone Info ; écarts listés"
+                ),
+                *extra,
+                *book.notes[:3],
+            ],
+        )
+    )
+
+
+def dungeons_payload(
+    deps: Deps,
+    *,
+    level: int | None = None,
+    faction: str | None = None,
+    wow_dir: Path | None = None,
+    rebuild: bool = False,
+) -> dict[str, Any]:
+    """Donjons du livre (`forever dungeon list`, `forever_lookup(kind="dungeons")`)."""
+    book = build_dungeons(deps, wow_dir=wow_dir, rebuild=rebuild)
+    rows = lookup_dungeons(book, level=level, faction=faction)
+    return {
+        "total": len(rows),
+        "dungeons": rows,
+        "sources": book.sources,
+        "fingerprint": book.fingerprint,
+        "from_cache": book.from_cache,
+        "provenance": _payload_provenance(deps, book),
+    }
+
+
+def dungeon_payload(
+    deps: Deps,
+    name: str,
+    *,
+    class_name: str | None = None,
+    level: int | None = None,
+    wow_dir: Path | None = None,
+) -> dict[str, Any]:
+    """Fiche d'un donjon (`forever dungeon info`, `forever_lookup(kind="dungeon")`)."""
+    from forever.store import load_version
+
+    book = build_dungeons(deps, wow_dir=wow_dir)
+    items = _item_rows(deps, load_version(deps).game_version) if class_name or level is not None else {}
+    info = dungeon_info(book, name, class_name=class_name, level=level, items=items)
+    extra = []
+    if (class_name or level is not None) and not items:
+        extra.append("objets utilisables non vérifiés : ItemSparse absente du cache (forever fetch)")
+    return {"dungeon": info, "sources": book.sources, "provenance": _payload_provenance(deps, book, extra)}
+
+
+def item_payload(deps: Deps, item: str, *, wow_dir: Path | None = None) -> dict[str, Any]:
+    """Où trouver un objet (`forever dungeon item`, `forever_lookup(kind="dungeon_item")`) : identifiant, ou nom
+    anglais du client quand `ItemSparse` est dans le cache."""
+    from forever.errors import InvalidArgumentError
+    from forever.store import load_version
+
+    book = build_dungeons(deps, wow_dir=wow_dir)
+    text = item.strip()
+    if text.isdigit():
+        ids = [int(text)]
+    else:
+        rows = _item_rows(deps, load_version(deps).game_version)
+        ids = [i for i, r in rows.items() if str(r.get("Display_lang", "")).lower() == text.lower()]
+        if not ids:
+            raise InvalidArgumentError(
+                f"Objet inconnu : {item}.", "donner l'identifiant de l'objet, ou télécharger ItemSparse (forever fetch)"
+            )
+    hits = [h for i in ids for h in where_item(book, i)]
+    return {"items": ids, "hits": hits, "provenance": _payload_provenance(deps, book)}

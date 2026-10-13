@@ -132,8 +132,25 @@ def build_server(deps: Deps) -> MCPServer:
         T04f : `kind="xp_bonuses"` (toutes les classes), `access` facultatif (item, legacy, food, camp, none) : chaque
         bonus d'XP du client avec ses effets, sa durée, son cumul, son accès, sa source et sa certitude ; `applied`
         faux pour un bonus sans source joueur (jamais appliqué) ; sac de couchage, nourritures nutritives, camp, règle
-        de cumul."""
+        de cumul.
+        DJ1 : `kind="dungeons"` (filtres `level`, `faction`) : donjons du livre fusionné (client, note officielle,
+        addons et relevés du joueur lus en local), plage retenue et sa source, niveau de contenu du client, nouveau ou
+        fermé, nombre d'écarts ; `kind="dungeon"` avec `name` (nom anglais, identifiant d'instance ou clé
+        `189:graveyard`), `class_name` et `level` facultatifs : fiche (plages et écarts entre sources, entrée, boss
+        et leur niveau, butin avec taux en fraction et sa source, `null` = inconnu, `classic` = taux de Classic,
+        objets utilisables, quêtes avec XP et sa source, prérequis « à faire d'abord », passages relevés) ;
+        `kind="dungeon_item"` avec `name` (identifiant de l'objet) : donjon, boss, taux, source et version."""
         try:
+            if kind in ("dungeons", "dungeon", "dungeon_item"):
+                from forever.dungeons import dungeon_payload, dungeons_payload, item_payload
+
+                if kind == "dungeons":
+                    return dungeons_payload(deps, level=level, faction=faction)
+                if not name:
+                    raise InvalidArgumentError("Nom manquant.", "donner name (donjon, ou identifiant de l'objet)")
+                if kind == "dungeon":
+                    return dungeon_payload(deps, name, class_name=class_name, level=level)
+                return item_payload(deps, name)
             if kind == "xp_bonuses":
                 from forever.xp_bonuses import lookup_xp_bonuses
 
@@ -188,7 +205,20 @@ def build_server(deps: Deps) -> MCPServer:
             if kind != "spell":
                 raise UnsupportedKindError(
                     f"type « {kind} »",
-                    ["spell", "talent", "zones", "pvp", "build_check", "pets", "tf_popular", "quests", "xp_bonuses"],
+                    [
+                        "spell",
+                        "talent",
+                        "zones",
+                        "pvp",
+                        "build_check",
+                        "pets",
+                        "tf_popular",
+                        "quests",
+                        "xp_bonuses",
+                        "dungeons",
+                        "dungeon",
+                        "dungeon_item",
+                    ],
                 )
             if not name:
                 raise InvalidArgumentError("Nom du sort manquant.", "donner name (nom anglais du sort)")

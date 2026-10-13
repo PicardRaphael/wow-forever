@@ -6,4 +6,4 @@ timeout_seconds: 300
 allowed_tools: [Skill, ToolSearch, Read, Glob, Grep]
 ---
 
-Qu'est-ce que lâche le dernier boss des Mortemines dans Forever ?
+Combien de réputation Argent Dawn me rapporte chaque quête dans Forever ?

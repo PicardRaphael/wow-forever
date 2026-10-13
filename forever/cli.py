@@ -350,6 +350,23 @@ def build_parser() -> argparse.ArgumentParser:
     measure.add_argument("--caster-level", type=int, help="niveau du lanceur en dernier recours")
     measure.add_argument("--json", action="store_true", help="sortie JSON")
 
+    dungeon = sub.add_parser("dungeon", help="donjons de Forever : client, addons et relevés fusionnés (DJ1)")
+    dungeon_sub = dungeon.add_subparsers(dest="dungeon_command", required=True, parser_class=_Parser)
+    d_list = dungeon_sub.add_parser("list", help="donjons, filtrés par niveau et par camp")
+    d_list.add_argument("--level", type=int, help="niveau du personnage (dans la plage retenue)")
+    d_list.add_argument("--faction", choices=["horde", "alliance"], help="camp")
+    d_list.add_argument("--rebuild", action="store_true", help="rebâtir le livre même si aucune source n'a changé")
+    d_list.add_argument("--json", action="store_true", help="sortie JSON")
+    d_info = dungeon_sub.add_parser("info", help="fiche d'un donjon : niveaux, entrée, boss, butin, quêtes, écarts")
+    d_info.add_argument("name", help="nom anglais, identifiant d'instance ou clé du livre (ex. 189:graveyard)")
+    d_info.add_argument("--class", dest="cls", help="classe, pour les objets utilisables")
+    d_info.add_argument("--level", type=int, help="niveau du personnage, pour le niveau requis des objets")
+    d_info.add_argument("--json", action="store_true", help="sortie JSON")
+    d_item = dungeon_sub.add_parser("item", help="où trouver un objet : donjon, boss, taux, source et version")
+    d_item.add_argument("item", help="identifiant de l'objet (ou nom anglais si ItemSparse est dans le cache)")
+    d_item.add_argument("--json", action="store_true", help="sortie JSON")
+    dungeon_sub.add_parser("report", help="agrégats du livre en Markdown (docs/research/donjons-forever.md)")
+
     quests = sub.add_parser("quests", help="quêtes de Forever fusionnées (addons et client lus en local, T04d)")
     quests_sub = quests.add_subparsers(dest="quests_command", required=True, parser_class=_Parser)
     q_build = quests_sub.add_parser("build", help="bâtir la liste fusionnée dans le cache (relue si inchangée)")
@@ -1057,6 +1074,105 @@ def _cmd_xp(deps: Deps, args: argparse.Namespace) -> int:
     if skipped:
         lines.append(f"  écartés : {skipped}")
     _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
+
+
+def _rate_text(entry: Mapping[str, Any]) -> str:
+    if entry.get("rate") is None:
+        return "taux inconnu"
+    text = f"{entry['rate']:.1%} ({entry['rate_source']}"
+    if entry.get("classic"):
+        text += ", Classic"
+    if entry.get("observed"):
+        text += f", {entry['observed']['drops']} sur {entry['observed']['kills']} victoire(s)"
+    return text + ")"
+
+
+def _field_text(entry: Mapping[str, Any] | None) -> str:
+    if not entry:
+        return "inconnu"
+    value = entry["value"]
+    shown = f"{value['min']}-{value['max']}" if isinstance(value, dict) and "min" in value else str(value)
+    return f"{shown} ({entry['source']}, {entry['certainty']})"
+
+
+def render_dungeon(info: Mapping[str, Any]) -> list[str]:
+    """Fiche texte d'un donjon (DJ1, bloc F)."""
+    fields = info["fields"]
+    state = ", ".join(s for s, on in (("nouveau", info["new"]), ("fermé", info["closed"])) if on)
+    lines = [
+        f"{info['name']} (`{info['id']}`)" + (f" : {state}" if state else ""),
+        (
+            f"  Plage : {_field_text(fields.get('levels'))} ; niveau de contenu du client : "
+            f"{_field_text(fields.get('client_level'))}"
+        ),
+    ]
+    if fields.get("access_level"):
+        lines.append(f"  Accès : niveau {_field_text(fields['access_level'])}")
+    if fields.get("entrance"):
+        e = fields["entrance"]["value"]
+        lines.append(f"  Entrée : carte {e['map']} ({e['x']:.1f}, {e['y']:.1f}) ({fields['entrance']['source']})")
+    lines.append(f"  Sources : {', '.join(info['sources'])}")
+    lines.append("  Boss :")
+    for b in info["bosses"]:
+        lines.append(f"    {b['name']} (PNJ {b['npc'] or 'inconnu'}) : niveau {_field_text(b.get('level'))}")
+        for entry in b["loot"]:
+            usable = ""
+            if "usable" in entry or "level_ok" in entry:
+                usable = f" ; pour toi : classe {entry.get('usable')}, niveau {entry.get('level_ok')}"
+            lines.append(f"      objet {entry['item']} : {_rate_text(entry)}{usable}")
+    if info["quests"]:
+        lines.append("  Quêtes :")
+        for q in info["quests"]:
+            xp = f"{q['xp']} XP ({q['xp_source']})" if q["xp"] is not None else "XP inconnue"
+            lines.append(
+                f"    {q['id']} {q['name'] or ''} : niveau {q['level']}, prise au niveau {q['min_level']}, {xp}"
+            )
+    if info["first_steps"]:
+        lines.append(f"  À faire d'abord (hors du donjon) : {', '.join(map(str, info['first_steps']))}")
+    for a in info["access"]:
+        lines.append(f"  Accès : objet {a.get('item')} {a.get('name') or ''} (quêtes {a.get('quests')})")
+    if info["runs"]:
+        seconds = [r["seconds"] for r in info["runs"] if r.get("seconds")]
+        lines.append(f"  Passages relevés : {len(info['runs'])} (durées en secondes : {seconds})")
+    if info["discrepancies"]:
+        lines.append("  Écarts entre sources :")
+        for d in info["discrepancies"]:
+            values = ", ".join(f"{v['source']} {v['value']}" for v in d["values"])
+            lines.append(f"    {d['field']} : {values}")
+    return lines
+
+
+def _cmd_dungeon(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.dungeons import build_dungeons, dungeon_payload, dungeons_payload, item_payload, render_report
+
+    if args.dungeon_command == "report":
+        print(render_report(build_dungeons(deps)))
+        return EXIT_OK
+    if args.dungeon_command == "list":
+        res = dungeons_payload(deps, level=args.level, faction=args.faction, rebuild=args.rebuild)
+        lines = [f"Donjons : {res['total']}"]
+        for d in res["dungeons"]:
+            rng = f"{d['levels']['min']}-{d['levels']['max']}" if d["levels"] else "plage inconnue"
+            flags = "".join(f" [{f}]" for f, on in (("nouveau", d["new"]), ("fermé", d["closed"])) if on)
+            lines.append(
+                f"  {d['name']} (`{d['id']}`) : {rng} ({d['levels_source']}), niveau du client {d['client_level']}, "
+                f"{d['bosses']} boss, {d['quests']} quête(s), {d['discrepancies']} écart(s){flags}"
+            )
+        _emit(res, lines, res["provenance"], args.json)
+        return EXIT_OK
+    if args.dungeon_command == "info":
+        res = dungeon_payload(deps, args.name, class_name=args.cls, level=args.level)
+        _emit(res, render_dungeon(res["dungeon"]), res["provenance"], args.json)
+        return EXIT_OK
+    res = item_payload(deps, args.item)
+    lines = [f"Objet {', '.join(map(str, res['items']))} : {len(res['hits'])} source(s) de butin"]
+    for h in res["hits"]:
+        lines.append(
+            f"  {h['dungeon_name']} (`{h['dungeon']}`), {h['boss']} : {_rate_text({**h, 'rate_source': h['source']})}"
+            + (f", version {h['version']}" if h["version"] else "")
+        )
+    _emit(res, lines, res["provenance"], args.json)
     return EXIT_OK
 
 
@@ -4041,6 +4157,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
         "quests": _cmd_quests,
+        "dungeon": _cmd_dungeon,
         "xp": _cmd_xp,
         "origins": _cmd_origins,
         "hotfixes": _cmd_hotfixes,
