@@ -62,7 +62,9 @@ QUARTILES = 4  # bornes basse et haute d'une tranche : premier et troisième qua
 
 
 def kill_params(values: dict[str, Any]) -> KillParams:
-    """Paramètres lus dans les valeurs de `mechanics.json` (`measures.kill_time`, `leveling.kill_time_estimate`)."""
+    """Paramètres lus dans les valeurs de `mechanics.json` (`measures.kill_time`, `leveling.kill_time_estimate`).
+
+    Registre : I15"""
     try:
         measure = values["measures.kill_time"]["value"]
         estimate = values["leveling.kill_time_estimate"]
@@ -97,7 +99,10 @@ def _mine(unit: Any, mine: str) -> tuple[bool, bool]:
 
 
 def fight_durations(events: Iterable[Event], mine: str) -> list[FightDuration]:
-    """Combats du joueur `mine` (ou de son familier) terminés par la mort du monstre."""
+    """Combats du joueur `mine` (ou de son familier) terminés par la mort du monstre (combat seul, sans repos ni
+    trajet).
+
+    Registre : I15"""
     started: dict[str, tuple[datetime, bool, int | None]] = {}
     out: list[FightDuration] = []
     for e in events:
@@ -121,7 +126,9 @@ def fight_durations(events: Iterable[Event], mine: str) -> list[FightDuration]:
 
 def kill_cadence(gains: Sequence[XpGain], *, pause_s: float) -> list[float]:
     """Intervalles entre deux gains d'XP de monstre successifs d'une même séance (pauses de plus de `pause_s`
-    écartées)."""
+    écartées) : combat, repos et trajet compris, comme le temps par monstre du moteur du Mage.
+
+    Registre : I15"""
     times = sorted(g.time for g in gains if g.kind == "monster" and g.time is not None)
     return [float(b - a) for a, b in pairwise(times) if 0 < b - a <= pause_s]
 
@@ -148,7 +155,9 @@ def _summary(cls: str, band: tuple[int, int], method: str, values: list[float]) 
 
 def measure_kill_times(params: KillParams, *, logs: Sequence[Path], loggers: Sequence[LoggerDB]) -> dict[str, Any]:
     """Mesures par classe et tranche de niveaux : `{"bands": [{class, level_min, level_max, method, samples,
-    median_s, low_s, high_s}], "unattributed": n}` (classe et niveau lus dans ForeverLogger par le GUID)."""
+    median_s, low_s, high_s}], "unattributed": n}` (classe et niveau lus dans ForeverLogger par le GUID).
+
+    Registre : I15"""
     groups: dict[tuple[str, tuple[int, int], str], list[float]] = {}
     unattributed = 0
     characters = {guid: (db, c) for db in loggers for guid, c in db.characters.items()}
@@ -182,7 +191,11 @@ def measure_kill_times(params: KillParams, *, logs: Sequence[Path], loggers: Seq
 
 
 def kill_time(params: KillParams, *, class_name: str, level: int, measures: dict[str, Any] | None) -> KillTime:
-    """Temps par monstre d'une classe sans moteur : mesuré si la tranche a assez de relevés, sinon estimé."""
+    """Temps par monstre d'une classe sans moteur : mesuré si la tranche a assez de relevés (cadence de ForeverLogger
+    d'abord, qui compte repos et trajet comme le moteur du Mage ; durée des combats des journaux ensuite), sinon
+    estimé.
+
+    Registre : I15"""
     cls = class_name.lower()
     candidates = [
         b
@@ -190,7 +203,7 @@ def kill_time(params: KillParams, *, class_name: str, level: int, measures: dict
         if b["class"] == cls and b["level_min"] <= level <= b["level_max"] and b["samples"] >= params.min_samples
     ]
     if candidates:
-        best = min(candidates, key=lambda b: (b["method"] != "journaux", -b["samples"]))
+        best = min(candidates, key=lambda b: (b["method"] != "cadence", -b["samples"]))
         method = "durée des combats (journaux)" if best["method"] == "journaux" else "cadence des gains (ForeverLogger)"
         return KillTime(
             cls, level, "measured", best["median_s"], best["low_s"], best["high_s"], best["samples"], "probable", method

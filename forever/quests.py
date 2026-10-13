@@ -127,7 +127,7 @@ def _status(quest: Quest, by_source: dict[str, qs.Facts], covered: set[int], com
     certainty = quest["fields"].get("level", {}).get("certainty", "suppose")
     changed: list[str] = []
     if questie is None:
-        status = "nouvelle"
+        status = "nouvelle"  # absente de la base Classic (ou Questie absent : voir les notes, statut supposé)
     elif forever:
         for field in CHANGED:
             retained = quest["fields"].get(field)
@@ -283,6 +283,9 @@ def build_quests(deps: Deps, *, wow_dir: Path | None = None, rebuild: bool = Fal
         sources.append(recorded)
     gear = qs.read_gearquest(addons)
     quests, gear_notes = _merge(sources, completo, gear[1] if gear else [])
+    if questie is None:
+        for quest in quests.values():
+            quest["certainty"] = "suppose"
     for s in sources:
         notes += s.notes
     notes += gear_notes

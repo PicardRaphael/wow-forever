@@ -44,10 +44,13 @@ def _params(values: dict[str, Any]) -> dict[str, float]:
         ) from exc
 
 
-def _engine_kill_time(deps: Deps, level: int) -> dict[str, Any]:
+def _engine_kill_time(deps: Deps, level: int, race: str | None) -> dict[str, Any]:
+    """Temps par monstre du Mage : total de l'analytique du simulateur (combat, repos, course).
+
+    Registre : I6, I14"""
     from forever.leveling import simulate_leveling
 
-    report = simulate_leveling(deps, level, n=ENGINE_N)
+    report = simulate_leveling(deps, level, race=race, n=ENGINE_N)
     seconds = float(report["analytic"]["total"])
     return {
         "source": "engine",
@@ -62,7 +65,9 @@ def _engine_kill_time(deps: Deps, level: int) -> dict[str, Any]:
 
 def _eligible(quest: dict[str, Any], cls: str, faction: str | None, level: int, gray: int, red: int) -> bool:
     """Quête prise en compte : camp et classe permis, niveau requis atteint, ni grise ni rouge (couleurs de
-    `leveling.quest_band`), XP connue."""
+    `leveling.quest_band`), XP connue.
+
+    Registre : I7, I14"""
     side = value(quest, "faction")
     if faction is not None and side not in (faction, "both", None):
         return False
@@ -131,7 +136,9 @@ def objectives(
     limit: int = 5,
     wow_dir: Path | None = None,
 ) -> dict[str, Any]:
-    """Objectifs classés par XP par heure, temps par monstre et sa source, conseil, provenance."""
+    """Objectifs classés par XP par heure, temps par monstre et sa source, conseil, provenance.
+
+    Registre : I14"""
     from forever.freshness import freshness_for_version
     from forever.gamedata import MECHANICS_FILE, build_game_data
     from forever.leveling import check_level, level_cap
@@ -150,7 +157,7 @@ def objectives(
     p = _params(values)
     group = int(dungeon_party or p["dungeon_party"])
     if cls == MAGE:
-        kt = _engine_kill_time(deps, level)
+        kt = _engine_kill_time(deps, level, race)
     else:
         k = kill_time(kill_params(values), class_name=cls, level=level, measures=load_kill_times(deps))
         kt = {**k._asdict()}

@@ -81,7 +81,7 @@ def base_kill_xp(gd: GameData, level: int) -> tuple[float, Term]:
 def gray_level(gd: GameData, player_level: int) -> int:
     """Niveau de monstre le plus haut encore gris (aucune XP) pour `player_level` (règle de Classic, I7).
 
-    Registre : I6"""
+    Registre : I6, I7"""
     return leveling.gray_level(gd, player_level)
 
 

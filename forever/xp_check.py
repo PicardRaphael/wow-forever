@@ -82,8 +82,9 @@ def _gain_cases(gd: GameData, gain: XpGain, mob: int) -> list[tuple[str, float]]
     else:
         rule = "kill_xp"
     cases = [_case(rule, base_observed, model)]
-    if rested:
-        cases.append(_case("xp.rested", float(rested), base_observed * (rules.rested_factor - 1)))
+    expected_rested = base_observed * (rules.rested_factor - 1)
+    if rested and rested >= expected_rested:  # repos moindre : réservoir épuisé pendant le gain, non comparable
+        cases.append(_case("xp.rested", float(rested), expected_rested))
     return cases
 
 

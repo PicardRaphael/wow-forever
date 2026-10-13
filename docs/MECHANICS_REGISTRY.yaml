@@ -872,12 +872,14 @@ mechanics:
     description: "Bonus d'XP (Well Fed, repos)"
     forever: modifie
     statut: teste
-    certitude: probable
+    certitude: suppose
     sources:
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : Exhaustion, T08b)"
       - "forever/data/1.60.1.70338/mechanics.json (xp.rested : gain, rapport dehors et plafond, règle de Classic, vMangos, suppose)"
+      - "forever/data/1.60.1.70338/character_scaling.json (rested : palier Rested lu par le modèle)"
     tests:
       - tests/unit/test_decode_character.py::test_rested_equals_exhaustion
+      - tests/unit/test_xp_check.py::test_rested_and_seen_quest_are_compared
       - tests/unit/test_engine_xp.py::test_rested_doubles_while_the_pool_lasts
       - tests/unit/test_engine_xp.py::test_rested_gain_in_the_inn_outside_and_capped
     tolerance: null
@@ -1525,7 +1527,8 @@ mechanics:
       - "forever/data/1.60.1.70009/leveling.json (mob_model)"
       - "forever/data/1.60.1.70009/spell_scaling.json (utility : armures du client, niveaux d'apprentissage)"
       - "forever/data/1.60.1.70338/character_scaling.json (kill_xp : GameTable xp, colonne PerKill, T04d)"
-      - "forever/data/1.60.1.70338/mechanics.json (xp.mob_level_difference, règle de Classic, vMangos, T04d)"
+      - "forever/data/1.60.1.70338/mechanics.json (xp.mob_level_difference, règle de Classic, vMangos, T04d ; measures.xp_check : paramètres de forever xp check)"
+      - "forever/data/1.60.1.70338/mechanics.json (leveling.quest_band, gray_rows : niveau gris des monstres, I7)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : LevelExperience, ExpectedStat.ArmorConstant, T08b)"
     tests:
       - tests/unit/test_engine_leveling.py::test_monster_formulas_match_the_seed
@@ -1600,6 +1603,7 @@ mechanics:
     tests:
       - tests/unit/test_questcache.py::test_dungeon_quest_multiplier_is_read_as_a_float
       - tests/unit/test_quest_rewards_decode.py::test_seen_quest_xp_is_the_cell_times_the_multiplier
+      - tests/unit/test_xp_check.py::test_rested_and_seen_quest_are_compared
     tolerance: null
     note: "T04d : le bonus des quêtes de donjon est porté par le multiplicateur d'XP de la quête, lu dans le cache des quêtes du client pour chaque quête vue (5725 The Power to Destroy... : multiplicateur 2,025 en 1.60.1.70338, contre l'XP Classic de Questie) ; quête non vue : XP d'un addon ou de Questie (suppose), sans le bonus ; sans effet sur le classement des builds"
   - id: I10
@@ -1628,7 +1632,7 @@ mechanics:
     tests:
       - tests/unit/test_engine_xp.py::test_group_share_is_computed_on_each_member_level
     tolerance: null
-    note: "T04d : XP du monstre au niveau de chaque joueur (individual), × multiplicateur de la taille du groupe × niveau du joueur / somme des niveaux (formule de Classic, suppose) ; variante highest_member (avant 1.60.1.70291) calculée au niveau du plus haut membre ; seuil de coupure par un membre de niveau très supérieur non modélisé (question LVL4) ; le simulateur de leveling est solo"
+    note: "T04d : certitude probable pour l'assiette (niveau de chaque joueur, note officielle) seulement ; le partage est suppose : XP du monstre au niveau de chaque joueur (individual), × multiplicateur de la taille du groupe × niveau du joueur / somme des niveaux (formule de Classic) ; variante highest_member (avant 1.60.1.70291) calculée au niveau du plus haut membre ; seuil de coupure par un membre de niveau très supérieur non modélisé (question LVL4) ; le simulateur de leveling est solo"
   - id: I12
     categorie: optimisation
     description: "XP d'une quête : XP du client (QuestXP × multiplicateur de la quête vue) et réduction selon l'écart de niveau"
@@ -1647,11 +1651,11 @@ mechanics:
       - tests/unit/test_engine_xp.py::test_quest_xp_by_level_difference
     tolerance: null
     formule: "XP = QuestXP[niveau de la quête][difficulté] × multiplicateur (quête vue par le client) ; × 1 tant que le joueur dépasse la quête d'au plus full_diff niveaux, puis la part de reduction de l'écart ; aucun repos"
-    note: "XP de base du client pour une quête vue, disposition du cache probable ; règle d'écart de niveau et arrondi de Classic, non vérifiés pour Forever (question LVL7) ; quête non vue : XP d'un addon ou de Questie (suppose)"
+    note: "XP de base du client pour une quête vue, disposition du cache probable ; règle d'écart de niveau de Classic, non vérifiée pour Forever, arrondi du serveur non modélisé (question LVL7) ; quête non vue : XP d'un addon ou de Questie (suppose)"
   - id: I13
     categorie: optimisation
     description: "XP des monstres élites"
-    forever: oui
+    forever: inconnu
     statut: teste
     certitude: suppose
     sources:
@@ -1670,14 +1674,20 @@ mechanics:
     sources:
       - "modèle d'XP (I6, I10, I11, I12, I13), quêtes fusionnées (forever/quests.py), temps par monstre (I15, moteur du Mage)"
       - "forever/data/1.60.1.70338/mechanics.json (leveling.objectives : monstres par quête, surcoût par quête, trajet et monstres d'un donjon, taille et gain de vitesse du groupe ; suppose)"
+      - "forever/data/1.60.1.70338/mechanics.json (leveling.quest_band : quêtes grises et rouges écartées, I7)"
     tests:
       - tests/unit/test_sim_objectives.py::test_ragefire_chasm_has_a_first_pass_and_repeats
       - tests/unit/test_sim_objectives.py::test_xp_per_hour_is_xp_over_time
       - tests/unit/test_sim_objectives.py::test_advice_repeats_the_numbers_of_the_objective
       - tests/unit/test_sim_objectives.py::test_mage_kill_time_comes_from_the_engine
+      - tests/unit/test_objectives_eligibility.py::test_gray_and_red_quests_are_left_out
     tolerance: null
     formule: "XP par heure = (XP des quêtes accessibles non grises + monstres × XP d'un monstre) / temps ; zone : monstres × temps par monstre + surcoût par quête ; donjon, premier passage : trajet aller et retour + surcoût par quête + monstres × temps par monstre / gain du groupe ; passages suivants : monstres seuls"
-    note: "hypothèses de temps suppose, à mesurer par ForeverLogger (acceptation -> rendu, durée d'un passage) ; le classement peut en dépendre plus que de l'XP et la sortie le dit ; conseil construit par l'outil à partir de ses chiffres ; repos non appliqué au classement"
+    note: "hypothèses de temps suppose, à mesurer par ForeverLogger (acceptation -> rendu, durée d'un passage) ; le classement peut en dépendre plus que de l'XP et la sortie le dit ; conseil construit par l'outil à partir de ses chiffres ; repos non appliqué au classement ; hypothèses du code (suppose) : tous les monstres de donjon élites, boss non distingués, niveau des monstres = médiane des niveaux des quêtes (au moins celui du joueur en donjon), groupe de donjon au niveau du joueur, aucune coupure de l'XP de groupe par un membre très au-dessus (LVL4) ; angle mort : XP des boss et part de monstres normaux d'un donjon (le facteur élite sur tous les monstres surestime les passages de donjon) ; temps par monstre : combat, repos et trajet compris (cadence de ForeverLogger, total du moteur du Mage), la durée des combats des journaux en dernier recours"
+    angle_mort:
+      talents: []
+      contextes: [dungeon]
+      estimation: null
   - id: I15
     categorie: optimisation
     description: "Temps par monstre des classes sans moteur : mesuré dans les relevés du joueur, sinon estimé"
@@ -1695,7 +1705,7 @@ mechanics:
       - tests/unit/test_kill_time.py::test_without_measures_the_estimate_is_a_range
       - tests/unit/test_kill_time.py::test_measured_when_enough_samples
     tolerance: null
-    note: "mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), la durée des combats non ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
+    note: "mesuré : certitude probable, relevés propres au joueur gardés dans <cache>/measures/kill_time.json (jamais dans forever/data/) ; la cadence de ForeverLogger compte tout le temps entre deux monstres (repos, trajet), comme le moteur du Mage, et passe avant la durée des combats des journaux, qui n'en compte pas ; estimé : fourchette suppose, marquée « estimé » ; aucun moteur de classe ajouté (décision 246)"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"
