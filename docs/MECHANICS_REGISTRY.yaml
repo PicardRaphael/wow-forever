@@ -1826,6 +1826,8 @@ mechanics:
       - tests/unit/test_engine_dungeon.py::test_placement_tie_takes_lowest
       - tests/unit/test_sim_objectives_dungeons.py::test_placement_level_is_reported
       - tests/unit/test_sim_objectives_dungeons.py::test_dungeon_advice_repeats_the_numbers
+      - tests/unit/test_route_dungeons.py::test_placements_cover_each_open_dungeon
+      - tests/unit/test_route_dungeons.py::test_steps_start_with_prerequisites
     tolerance: null
     formule: "niveau retenu = argmax sur la plage du donjon de (XP par heure du premier passage ÷ XP du niveau), à égalité le plus bas ; fenêtre = niveaux où le premier passage bat la meilleure zone"
     note: "zones des autres niveaux chiffrées avec le temps par monstre du niveau du joueur (approximation) ; quêtes grises ou hors de portée exclues à chaque niveau ; donjons fermés exclus"
