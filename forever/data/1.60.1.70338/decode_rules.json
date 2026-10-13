@@ -752,5 +752,101 @@
   "difficulty_prefix": "Difficulty_",
   "difficulty_columns": 10,
   "note": "T04d, bloc B : table QuestXP (XP d'une quête par niveau et par difficulté) décodée dans quest_rewards.json ; quêtes vues lues dans questcache.wdb du client (lecture locale, disposition probable, question LVL6)"
+ },
+ "xp_bonus_tables": [
+  "PlayerCondition"
+ ],
+ "xp_bonuses": {
+  "tables": [
+   "SpellName",
+   "Spell",
+   "SpellEffect",
+   "SpellMisc",
+   "SpellDuration",
+   "SpellAuraOptions",
+   "ItemSparse",
+   "ItemEffect",
+   "ItemXItemEffect",
+   "TraitDefinition",
+   "TraitDefinitionEffectPoints",
+   "CurvePoint",
+   "TraitNodeEntry",
+   "TraitNodeXTraitNodeEntry",
+   "TraitNode",
+   "PlayerCondition"
+  ],
+  "apply_aura_effect": 6,
+  "aura_codes": {
+   "200": {
+    "key": "kill_xp_pct",
+    "applies_to": "kill",
+    "label": "% d'XP des monstres tués"
+   },
+   "291": {
+    "key": "quest_xp_pct",
+    "applies_to": "quest",
+    "label": "% d'XP des quêtes"
+   },
+   "386": {
+    "key": "rested_rate_pct",
+    "applies_to": "rested_gain",
+    "label": "vitesse d'accumulation du repos (%)"
+   },
+   "656": {
+    "key": "rested_cap_pct",
+    "applies_to": "rested_cap",
+    "label": "plafond du repos (%)"
+   },
+   "447": {
+    "key": "creature_type_kill_xp_pct",
+    "applies_to": "kill",
+    "label": "% d'XP contre un type de créature (valeur diverse : type)",
+    "misc": "creature_type"
+   }
+  },
+  "aura_codes_certainty": "probable",
+  "aura_codes_note": "sens des codes d'aura (effet 6) déduit des descriptions des sorts qui les portent (probable) ; 348 (or des quêtes) et 637 (inconnu, valeur 0) hors sujet",
+  "permanent_duration": -1,
+  "periodic_trigger_aura": 23,
+  "food_buff_aura": 227,
+  "spelldesc_pattern": "\\$@spelldesc(\\d+)",
+  "condition_pattern": "\\$\\?pc(\\d+)",
+  "sleeping_bag": {
+   "item": 211527,
+   "use_spell": 429961,
+   "tracking_aura": 429960,
+   "note": "lien du sort de pose (Unroll Bag) à l'aura de suivi : par l'objet de jeu posé, absent des tables du client ; déclaré ici, recoupé par la description du sort de pose (probable)"
+  },
+  "camp": {
+   "tent": 1307230,
+   "tent_threshold_effect": 1,
+   "shared_cooldown": 1308027,
+   "benefits": 1229741,
+   "fires": [
+    1307227,
+    1307252,
+    1307237
+   ],
+   "note": "éléments de camp : tente (repos remonté à un seuil en % d'un niveau, sans effet au-dessus, d'après sa description), recharge partagée, Camp Benefits (aucune aura d'XP), feux"
+  },
+  "condition_fields": {
+   "MinLevel": "niveau minimal",
+   "MaxLevel": "niveau maximal",
+   "ClassMask": "masque des classes",
+   "WorldStateExpressionID": "expression d'état du monde (évaluée par le serveur, non lisible dans le client)",
+   "PrevQuestID_0": "quête faite requise",
+   "SpellID_0": "sort connu requis",
+   "AuraSpellID_0": "aura active requise",
+   "ItemID_0": "objet possédé requis",
+   "Flags": "inconnu"
+  },
+  "condition_null_values": [
+   0,
+   -1
+  ],
+  "condition_server_fields": [
+   "WorldStateExpressionID"
+  ],
+  "note": "T04f, bloc A : bonus d'XP du client décodés dans xp_bonuses.json ; accès : perk Legacy (TraitDefinition rattachée à un nœud), objet (effet d'objet puis sorts déclenchés, chaîne du sac déclarée), nourriture (sort d'utilisation d'un objet dont la description cite l'aura par $@spelldesc), sinon aucun (listé, jamais appliqué, décision 262)"
  }
 }

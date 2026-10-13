@@ -5040,6 +5040,136 @@
      "key": "predatoryInstincts"
     }
    ]
+  },
+  {
+   "revision": 5,
+   "date": "2026-10-13",
+   "motif": "T04f, bloc A : bonus d'XP décodés du client (xp_bonuses.json, table PlayerCondition), règles de lecture et d'origine xp_bonuses ; accord de l'utilisateur du 2026-10-13 (aucune recommandation changée au rejeu)",
+   "command": "forever install <cache>/candidates/1.60.1.70338 --yes",
+   "candidate": {
+    "path": "<cache>/candidates/1.60.1.70338",
+    "data_sha": "dd1d19f63b87"
+   },
+   "report": null,
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 1,
+    "added_file": 1,
+    "replaced_file": 2,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 0,
+    "rules": 2
+   },
+   "changes": [
+    {
+     "file": "talents.json",
+     "path": "hotStreak.source",
+     "before": {
+      "build": "1.60.1.70338",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-13",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times.",
+      "client_key": "heatingUp"
+     },
+     "after": {
+      "build": "1.60.1.70338",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-13",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times."
+     },
+     "source": "client 1.60.1.70338, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": "74559ad27680",
+     "after": "453d3f532592",
+     "source": "Client 1.60.1.70338 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    },
+    {
+     "file": "quest_rewards.json",
+     "path": "*",
+     "before": "b16767d3d1a3",
+     "after": "582035eb52e3",
+     "source": "Client 1.60.1.70338 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    },
+    {
+     "file": "xp_bonuses.json",
+     "path": "*",
+     "before": null,
+     "after": "864966c7299a",
+     "source": "Client 1.60.1.70338 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "added_file"
+    },
+    {
+     "file": "decode_rules.json",
+     "path": "*",
+     "before": "317d01ab6efa",
+     "after": "f9dd1fb7bc02",
+     "source": "règles de la tranche (decode_rules.json du dépôt, lu par forever decode)",
+     "certainty": "certain",
+     "rule": "rules"
+    },
+    {
+     "file": "origins.json",
+     "path": "*",
+     "before": "08da2e920de1",
+     "after": "9d74f8ea6cea",
+     "source": "règles de la tranche (origins.json du dépôt, lu par forever decode)",
+     "certainty": "certain",
+     "rule": "rules"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 30,
+     "source": "observation",
+     "certainty": "certain",
+     "carried": true,
+     "carried_from": "révision 4",
+     "date": "2026-10-02",
+     "revision": 1
+    }
+   },
+   "hotfixes": [
+    112444,
+    112469,
+    112486,
+    112504,
+    112513,
+    112515,
+    112544
+   ],
+   "renamed_in_classes": [
+    {
+     "class": "Mage",
+     "client_key": "heatingUp",
+     "key": "hotStreak"
+    },
+    {
+     "class": "Druid",
+     "client_key": "naturalInstinct",
+     "key": "predatoryInstincts"
+    }
+   ]
   }
  ]
 }

@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-13)",
+      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-13)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-13)",
+      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 5 (forever install, 2026-10-13)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -203,7 +203,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 4 (forever install, 2026-10-13)"
+        "installé en révision 5 (forever install, 2026-10-13)"
       ]
     },
     "races.json": {
@@ -302,11 +302,20 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 4 (forever install, 2026-10-13)"
+        "installé en révision 5 (forever install, 2026-10-13)"
+      ]
+    },
+    "xp_bonuses.json": {
+      "source": "Client 1.60.1.70338 : tables du client 1.60.1.70338 (wago.tools, 1.60.1.70338) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "bonus d'XP du client : auras d'XP, durée, cumul, accès (objet, perk Legacy, nourriture, aucun), sac de couchage, nourritures nutritives, camp, conditions de joueur (decode_rules.json, xp_bonuses)",
+        "sens des codes d'aura déduit des descriptions (probable) ; lien du sac de couchage à son aura déclaré (probable) ; condition 142418 évaluée par le serveur (LVL13)",
+        "installé en révision 5 (forever install, 2026-10-13)"
       ]
     }
   },
-  "revision": 4,
+  "revision": 5,
   "revised_at": "2026-10-13",
   "hotfixes": {
     "dbcache": {
@@ -316,8 +325,8 @@
       "build": 70338,
       "size": 3033586,
       "sha256": "7d67e37dd11c7ca1a67d063213afa4296d9fcb606bf05b17d4415a8c942e5352",
-      "file_date": "2026-10-13T07:52:02Z",
-      "read_at": "2026-10-13T10:06:49Z"
+      "file_date": "2026-10-13T07:51:40Z",
+      "read_at": "2026-10-13T14:19:18Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -402,7 +411,7 @@
       "ItemSparse": {
         "VALID": 22,
         "DELETE": 0,
-        "identical": 17
+        "identical": 1
       },
       "Spell": {
         "VALID": 1,
@@ -621,7 +630,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -629,7 +638,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -637,7 +646,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -645,7 +654,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -693,7 +702,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -701,7 +710,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -709,7 +718,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -717,7 +726,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -725,7 +734,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -733,7 +742,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -741,7 +750,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -749,7 +758,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -757,7 +766,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -765,7 +774,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -773,7 +782,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -781,7 +790,7 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
-        "identical": true
+        "identical": false
       },
       {
         "table": "Spell",
@@ -885,6 +894,22 @@
       "ItemSparse 16886",
       "ItemSparse 16887",
       "ItemSparse 270043",
+      "ItemSparse 271794",
+      "ItemSparse 271795",
+      "ItemSparse 271796",
+      "ItemSparse 271797",
+      "ItemSparse 271798",
+      "ItemSparse 271799",
+      "ItemSparse 271800",
+      "ItemSparse 271801",
+      "ItemSparse 271802",
+      "ItemSparse 271803",
+      "ItemSparse 271804",
+      "ItemSparse 271805",
+      "ItemSparse 6773",
+      "ItemSparse 6774",
+      "ItemSparse 6788",
+      "ItemSparse 6789",
       "ItemSparse 9538",
       "ItemSparse 9588",
       "SpellAuraOptions 122049",

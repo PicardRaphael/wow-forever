@@ -960,10 +960,12 @@
         "/circular_sufficient_edges",
         "/parked_nodes",
         "/quest_tables",
-        "/quest_rewards"
+        "/quest_rewards",
+        "/xp_bonus_tables",
+        "/xp_bonuses"
       ],
       "origin": "parametre",
-      "source": "règles de lecture du client (T03, PV1, CH0)",
+      "source": "règles de lecture du client (T03, PV1, CH0, T04f)",
       "reason": "règle de lecture des tables, pas une valeur de jeu"
     },
     {
@@ -1186,6 +1188,46 @@
       "certainty": "probable",
       "reason": "disposition des champs du cache établie sur les quêtes vues et recoupée par Questie, à recouper par xpReward en jeu (question LVL6)",
       "registry": "I12"
+    },
+    {
+      "file": "xp_bonuses.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables Spell*, Item*, Trait*, CurvePoint et PlayerCondition du client (forever decode, decode_rules.json xp_bonuses)",
+      "certainty": "certain"
+    },
+    {
+      "file": "xp_bonuses.json",
+      "paths": [
+        "/aura_codes",
+        "/auras/*/effects/*/key",
+        "/auras/*/effects/*/applies_to",
+        "/auras/*/access",
+        "/camp/tent/threshold_pct_of_level",
+        "/camp/benefits/xp_bonus",
+        "/conditions/*/fields/*/meaning",
+        "/conditions/*/readable_in_client"
+      ],
+      "origin": "client",
+      "source": "sens des codes d'aura, voie d'accès et sens des champs de condition déduits des descriptions des sorts du client (decode_rules.json xp_bonuses)",
+      "certainty": "probable",
+      "reason": "sens déduit des descriptions, pas lu (LVL12, LVL13)",
+      "registry": "D10"
+    },
+    {
+      "file": "xp_bonuses.json",
+      "paths": [
+        "/sleeping_bag/use_spell",
+        "/sleeping_bag/tracking_aura",
+        "/sleeping_bag/use_spell_name"
+      ],
+      "origin": "client",
+      "source": "lien du sort de pose à l'aura de suivi déclaré dans decode_rules.json (objet de jeu posé, absent des tables), recoupé par la description du sort",
+      "certainty": "probable",
+      "reason": "lien déclaré, pas lu dans une table",
+      "registry": "D9"
     },
     {
       "file": "mechanics.json",
