@@ -45,10 +45,20 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         "forever measures refresh (relire et proposer la mise à jour de monsters.json)",
         ("table des monstres (PV comparés à Questie)", "zones et quêtes conseillées"),
     ),
-    "AtlasLootClassic": AddonSpec(("AtlasLootClassic", "AtlasLootClassic_*"), "lecteur en DJ1"),
+    "AtlasLootClassic": AddonSpec(
+        ("AtlasLootClassic", "AtlasLootClassic_*"),
+        "forever/pipeline/dungeon_sources.py (lecteur des donjons, DJ1 ; livre fusionné dans le cache : forever dungeon list)",
+        (),
+        "forever dungeon list --rebuild",
+        ("livre des donjons (plages, boss, taux Classic)",),
+    ),
     "ForeverDungeonJournal": AddonSpec(
         ("ForeverDungeonJournal",),
-        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build)",
+        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build) ; "
+        "forever/pipeline/dungeon_sources.py (lecteur des donjons, DJ1 ; livre fusionné dans le cache : forever dungeon list)",
+        (),
+        "forever dungeon list --rebuild",
+        ("livre des donjons (plages, boss, prérequis)",),
     ),
     "GearQuestForever": AddonSpec(
         ("GearQuestForever", "GearQuestForever_*"),
@@ -60,7 +70,13 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     ),
     "LegacyForever": AddonSpec(("LegacyForever",), "lecteur en LG1"),
     # Décision 228 : ZoneLevelForever renommé par son auteur (« Formerly Zone Level »), même table de zones
-    "ZoneInfoForever": AddonSpec(("ZoneInfoForever",), "lecteur à venir (décision 133)"),
+    "ZoneInfoForever": AddonSpec(
+        ("ZoneInfoForever",),
+        "forever/pipeline/dungeon_sources.py (lecteur des donjons, DJ1 ; livre fusionné dans le cache : forever dungeon list)",
+        (),
+        "forever dungeon list --rebuild",
+        ("livre des donjons (plages de Classic)",),
+    ),
     "Auctionator": AddonSpec(("Auctionator",), "forever/pipeline/auctionator.py (SavedVariables)"),
     "ForeverBestiary": AddonSpec(  # CH0 : bêtes, carte communautaire, guide de l'entraînement des familiers
         ("ForeverBestiary",),
@@ -77,10 +93,20 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
         (),
         "forever talents tf crosscheck",
     ),
-    "ForeverCompanion": AddonSpec(("ForeverCompanion",), "inventaire T08d, lecteur à venir"),
+    "ForeverCompanion": AddonSpec(
+        ("ForeverCompanion",),
+        "forever/pipeline/dungeon_sources.py (lecteur des donjons, DJ1 ; livre fusionné dans le cache : forever dungeon list)",
+        (),
+        "forever dungeon list --rebuild",
+        ("livre des donjons (plages, taux Classic)",),
+    ),
     "NaowhForever": AddonSpec(
         ("NaowhForever", "NaowhForever_*"),
-        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build)",
+        "forever/pipeline/quest_sources.py (quêtes, T04d ; liste fusionnée dans le cache : forever quests build) ; "
+        "forever/pipeline/dungeon_sources.py (lecteur des donjons, DJ1 ; livre fusionné dans le cache : forever dungeon list)",
+        (),
+        "forever dungeon list --rebuild",
+        ("livre des donjons (boss, taux, prérequis, passages relevés)",),
     ),
     # Décision 227 : module d'AtlasLoot Classic Forever (« AtlasLoot Forever [BiS ToolTip] »), base ClassDataBase de
     # listes BiS par classe ; source communautaire, au mieux suppose
@@ -89,8 +115,11 @@ DATA_ADDONS: Mapping[str, AddonSpec] = {
     # wago.tools et CMaNGOS pour les deux addons de cjber
     "FojjiCore": AddonSpec(
         ("FojjiCore", "FojjiCore_*"),
-        "lecteur à venir (DungeonJournal, SpellRanks : recoupement, au mieux suppose ; lu en local sans ForeverAuras, "
-        "décision 229)",
+        "forever/pipeline/dungeon_sources.py (lecteur des donjons, DJ1 ; livre fusionné dans le cache : forever dungeon list) : DungeonJournal en recoupement seulement (au mieux suppose ; lu en local sans ForeverAuras, "
+        "décision 229) ; SpellRanks : lecteur à venir",
+        (),
+        "forever dungeon list --rebuild",
+        ("livre des donjons (recoupement des taux et des niveaux des boss)",),
     ),
     "ShortestPathForever": AddonSpec(("ShortestPathForever",), "lecteur à venir (trajets et transports, suppose)"),
     "SkillUpForever": AddonSpec(("SkillUpForever",), "lecteur à venir (paliers des métiers, recoupement du client)"),

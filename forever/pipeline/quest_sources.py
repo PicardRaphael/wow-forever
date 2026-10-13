@@ -80,6 +80,7 @@ COMPLETO = ("NaowhForever_Discovery", "QuestList/Data/Quests.lua")
 JOURNEYS = ("NaowhForever_Journeys", "Data/QuestSpots.lua")
 NAOWH_DJ = ("NaowhForever_DungeonJournal", "Data/Quests.lua")
 GUIDE = ("ForeverGuide", "DungeonData.lua")
+GUIDE_DALARAN = "DalaranData.lua"  # DJ1 : quêtes de City of Dalaran, ajoutées après DungeonData.lua
 FDJ_REWARDS = ("ForeverDungeonJournal", "Data/QuestRewards.lua")
 FDJ_DUNGEONS = ("ForeverDungeonJournal", "Data/Dungeons.lua")
 GEARQUEST_PREFIX = "GearQuestForever_"
@@ -120,6 +121,8 @@ FDJ_FACTIONS = {"Both": "both", "Horde": "horde", "Alliance": "alliance"}
 _XP_TEXT = re.compile(r"([\d,]+) XP")
 _BARE_NAME = re.compile(r"=\s*[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+\s*(?=[,}\n])")
 _ENTRY_LINE = re.compile(r"^\s*\[(\d+)\]\s*=\s*(\{.*\}),?\s*$")
+_GUIDE_DQ_LINE = re.compile(r"^ns\.DQ\[(\d+)\]\s*=\s*(\{.*\})\s*$", re.MULTILINE)
+_GUIDE_DUNGEON_Q = re.compile(r'd\.key\s*==\s*"([^"]+)"\s*then\s*d\.q\s*=\s*(\{[^}]*\})')
 
 
 def _read(path: Path) -> str:
@@ -203,6 +206,7 @@ def source_files(addons_dir: Path, wtf_dir: Path | None) -> list[Path]:
         q / QUESTIE_FIXES,
         q / QUESTIE_ZONES,
         *(addons_dir / a / f for a, f in (COMPLETO, JOURNEYS, NAOWH_DJ, GUIDE, FDJ_REWARDS, FDJ_DUNGEONS)),
+        addons_dir / GUIDE[0] / GUIDE_DALARAN,
         *sorted(addons_dir.glob(f"{GEARQUEST_PREFIX}*/*.lua")),
     ]
     if wtf_dir is not None:
@@ -557,8 +561,28 @@ def read_forever_guide(addons_dir: Path) -> SourceQuests | None:
             return npc
         return {"name": name} if isinstance(name, str) else None
 
+    rows = dict(_fields(_table_after(text, "ns.DQ = ", path)))
+    files = [path]
+    dalaran = addon / GUIDE_DALARAN
+    if dalaran.is_file():  # DJ1 : quêtes ajoutées une à une (ns.DQ[id] = {…}) et quêtes du donjon (boucle)
+        files.append(dalaran)
+        extra = _read(dalaran)
+        for m in _GUIDE_DQ_LINE.finditer(extra):
+            try:
+                rows[int(m[1])] = parse_lua_value(m[2])
+            except ValueError as exc:
+                raise DataSchemaError(f"{dalaran} : {exc}.") from exc
+        names = {
+            d.get("key"): d.get("en")
+            for d in (_fields(x) for x in _fields(_table_after(text, "ns.DUNGEONS = ", path)).values())
+        }
+        for m in _GUIDE_DUNGEON_Q.finditer(extra):
+            name = names.get(m[1])
+            if isinstance(name, str):
+                for quest_id in (int(q) for q in re.findall(r"\d+", m[2])):
+                    dungeon_of[quest_id] = name
     quests: dict[int, Facts] = {}
-    for quest_id, row in _fields(_table_after(text, "ns.DQ = ", path)).items():
+    for quest_id, row in rows.items():
         f = _fields(row)
         if not isinstance(quest_id, int):
             continue
@@ -595,7 +619,27 @@ def read_forever_guide(addons_dir: Path) -> SourceQuests | None:
         if f.get("new") is True:
             facts["new"] = True
         quests[quest_id] = {k: v for k, v in facts.items() if v is not None}
-    return SourceQuests(_info("forever_guide", addon, _version(addon), [path]), quests, [])
+    return SourceQuests(_info("forever_guide", addon, _version(addon), files), quests, [])
+
+
+_FDJ_ENTRY = re.compile(r'^(?:FDJ\.)?DB\["([^"]+)"\]\s*=\s*', re.MULTILINE)
+
+
+def fdj_db_entries(text: str, where: Path) -> list[tuple[str, Any]]:
+    """(nom, table) de chaque donjon de `Data/Dungeons.lua` de ForeverDungeonJournal, sous ses trois formes
+    d'écriture : `FDJ.DB = { ["X"] = {…} }`, `DB["X"] = {…}` (après `local DB = FDJ.DB`), `FDJ.DB["X"] = {…}`
+    (DJ1 : avant, seule la première était lue)."""
+    text = _BARE_NAME.sub("= nil", text)  # constantes de l'addon (positions) : non lues
+    out: list[tuple[str, Any]] = []
+    if "FDJ.DB = " in text:
+        out += [(str(k), v) for k, v in _fields(_table_after(text, "FDJ.DB = ", where)).items()]
+    for m in _FDJ_ENTRY.finditer(text):
+        try:
+            value, _ = parse_lua_value_at(text, m.end())
+        except ValueError as exc:
+            raise DataSchemaError(f"{where} : {exc}.") from exc
+        out.append((m[1], value))
+    return out
 
 
 def read_fdj(addons_dir: Path) -> SourceQuests | None:
@@ -612,8 +656,7 @@ def read_fdj(addons_dir: Path) -> SourceQuests | None:
                 quests.setdefault(quest_id, {})["xp"] = xp
     if dungeons.is_file():
         files.append(dungeons)
-        text = _BARE_NAME.sub("= nil", _read(dungeons))  # constantes de l'addon (positions) : non lues
-        for name, dungeon in _fields(_table_after(text, "FDJ.DB = ", dungeons)).items():
+        for name, dungeon in fdj_db_entries(_read(dungeons), dungeons):
             for row in _fields(_fields(dungeon).get("quests")).values():
                 f = _fields(row)
                 quest_id = f.get("id")
