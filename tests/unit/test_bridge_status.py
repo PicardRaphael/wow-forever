@@ -90,7 +90,9 @@ def test_running_pass_and_its_step(make_deps):
                                 "heartbeat": started, "step": "correctifs"}), encoding="utf-8")  # fmt: skip
     payload = status_payload(deps)
     assert payload["update"]["running"] is True and payload["update"]["step"] == "correctifs"
-    assert "mise à jour en cours (lecture des correctifs du serveur)" in status_line({**base(), "running": True, "update": payload["update"]})
+    assert "mise à jour en cours (lecture des correctifs du serveur)" in status_line(
+        {**base(), "running": True, "update": payload["update"]}
+    )
 
 
 def test_last_pass_is_carried(make_deps):
@@ -104,5 +106,9 @@ def test_last_pass_is_carried(make_deps):
     put(deps.cache_dir, id="measures-1.60.1.70338-a", kind="measures", version="1.60.1.70338")
     update = status_payload(deps)["update"]
     assert update["running"] is False
-    assert update["last"] == {"finished_at": "2026-09-27T11:05:00Z", "written": 1, "approvable": 1,
-                              "text": "Mise à jour terminée en 5 min : données installées"}
+    assert update["last"] == {
+        "finished_at": "2026-09-27T11:05:00Z",
+        "written": 1,
+        "approvable": 1,
+        "text": "Mise à jour terminée en 5 min : données installées",
+    }
