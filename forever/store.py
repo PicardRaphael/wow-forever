@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass
+from collections.abc import Collection
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -88,9 +89,14 @@ def describe_integrity(report: IntegrityReport) -> str:
     )
 
 
-def ensure_integrity(data_dir: Path) -> IntegrityReport:
-    """Lève ManifestMissingError ou DataIntegrityError si les données ne correspondent pas au manifeste."""
+def ensure_integrity(data_dir: Path, *, allow_mismatched: Collection[str] = ()) -> IntegrityReport:
+    """Lève ManifestMissingError ou DataIntegrityError si les données ne correspondent pas au manifeste.
+
+    `allow_mismatched` : chemins (relatifs, `/`) dont l'écart est admis (règles de lecture en attente d'installation,
+    décision 263) ; tout autre écart reste refusé."""
     report = verify(data_dir)
+    if allow_mismatched:
+        report = replace(report, mismatched=[p for p in report.mismatched if p not in allow_mismatched])
     if not report.manifest_found:
         raise ManifestMissingError(f"Manifeste des données absent dans {data_dir}.")
     if report.manifest_error is not None:

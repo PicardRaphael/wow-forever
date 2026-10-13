@@ -5,7 +5,7 @@ Une version candidate est un dossier de données complet (`manifest.json` + un s
 
 from __future__ import annotations
 
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from pathlib import Path
 from typing import NamedTuple, cast
 
@@ -45,10 +45,11 @@ def resolve_source(deps: Deps, ref: str) -> DataSource:
     raise UnknownVersionError(ref, version_dirs(deps.data_dir))
 
 
-def load_source(deps: Deps, ref: str) -> tuple[DataSource, VersionData]:
-    """Source résolue et chargée après contrôle d'intégrité de son manifeste (DataIntegrityError sinon)."""
+def load_source(deps: Deps, ref: str, *, allow_mismatched: Collection[str] = ()) -> tuple[DataSource, VersionData]:
+    """Source résolue et chargée après contrôle d'intégrité de son manifeste (DataIntegrityError sinon ;
+    `allow_mismatched` : écarts admis, voir `ensure_integrity`)."""
     src = resolve_source(deps, ref)
-    ensure_integrity(src.root)
+    ensure_integrity(src.root, allow_mismatched=allow_mismatched)
     vdir = src.root / src.version
     return src, VersionData(src.version, data_sha(version_files(vdir)), vdir, read_sources(src.root, src.version) or {})
 

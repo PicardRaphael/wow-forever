@@ -26,8 +26,8 @@ from pathlib import Path
 from typing import Any, NotRequired, TypedDict
 
 from forever.config import Deps
-from forever.errors import ForeverError, InvalidArgumentError
-from forever.manifest import SOURCES_NAME, write_manifest
+from forever.errors import DataIntegrityError, ForeverError, InvalidArgumentError
+from forever.manifest import SOURCES_NAME, load_manifest, verify, write_manifest
 from forever.pipeline.builds import version_key
 from forever.pipeline.diff import TALENT_FIELDS, Change, _rows
 from forever.pipeline.sources import load_source
@@ -55,7 +55,9 @@ RULES = (
     "retired_file",
     "game_state",
     "value",
+    "rules",
 )
+RULES_FILE = "decode_rules.json"  # T04f, décision 263 : règles de lecture de la tranche, installées avec la révision
 FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
 CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json", "_seed_racials.json")
@@ -416,6 +418,39 @@ def _file_changes(repo: Path, cand: Path, cand_sources: Mapping[str, Any], versi
     return changes
 
 
+def _pending_rules(data_dir: Path, version: str, cand_vdir: Path) -> tuple[list[str], list[InstallChange]]:
+    """Règles de lecture en attente (décision 263) : `decode_rules.json` du dépôt modifié depuis le manifeste (règles
+    nouvelles d'une tranche) et identique aux règles portées par la candidate (lues par `forever decode`, marque
+    `inherited_from` mise à part). Rend (écart admis, changement `rules`) ; rien si les règles n'ont pas changé.
+    DataIntegrityError si elles diffèrent de celles de la candidate (règles modifiées après le décodage)."""
+    rel = f"{version}/{RULES_FILE}"
+    if rel not in verify(data_dir).mismatched:
+        return [], []
+    repo = data_dir / version / RULES_FILE
+    cand = cand_vdir / RULES_FILE
+
+    def rules(doc: Any) -> Any:
+        return {k: v for k, v in doc.items() if k != "inherited_from"} if isinstance(doc, dict) else doc
+
+    if rules(_json(cand) if cand.is_file() else None) != rules(_json(repo)):
+        raise DataIntegrityError(
+            f"{rel} modifié dans le dépôt et différent des règles de lecture de la candidate.",
+            "redécoder la candidate avec les règles du dépôt (`forever decode --force`), puis relancer l'installation",
+        )
+    manifest = load_manifest(data_dir) or {}
+    before = ((manifest.get("versions") or {}).get(version) or {}).get("files", {}).get(RULES_FILE)
+    change: InstallChange = {
+        "file": RULES_FILE,
+        "path": "*",
+        "before": before[:12] if isinstance(before, str) else None,
+        "after": _short_sha(repo),
+        "source": "règles de lecture de la tranche (decode_rules.json du dépôt, lues par forever decode)",
+        "certainty": "certain",
+        "rule": "rules",
+    }
+    return [rel], [change]
+
+
 def _game_state(
     repo: Path, rev: int, cap: int | None, source: str | None
 ) -> tuple[dict[str, Any], list[InstallChange]]:
@@ -488,7 +523,8 @@ def _merge(
         raise InvalidArgumentError(
             f"{candidate} n'est pas une version candidate.", "donner le dossier écrit par `forever decode`"
         )
-    _, rv = load_source(deps, identity.game_version)
+    pending, rules_changes = ([], []) if new_version else _pending_rules(deps.data_dir, identity.game_version, cv.path)
+    _, rv = load_source(deps, identity.game_version, allow_mismatched=pending)
     if new_version:
         if cv.game_version == rv.game_version:
             raise InvalidArgumentError(
@@ -514,6 +550,7 @@ def _merge(
     spells = m.spells(_json(rv.path / SPELLS), _json(cv.path / SPELLS))
     if not new_version:
         m.changes += _file_changes(rv.path, cv.path, cv.sources, rv.game_version)
+        m.changes += rules_changes
     rev = data_revision_of(rv.sources)
     game_state, state_changes = _game_state(rv.path, rev, beta_level_cap, beta_level_cap_source)
     m.changes += state_changes
@@ -996,6 +1033,7 @@ LABELS = {
     "retired_file": "fichier retiré (retired_files)",
     "game_state": "état du jeu (plafond de la bêta, meta.json game_state)",
     "value": "valeur d'un fichier décodé (spell_scaling.json, character_scaling.json)",
+    "rules": "règles de lecture nouvelles (decode_rules.json du dépôt, lues par forever decode)",
     "refused": "hors règles (refusé)",
 }
 CELL_MAX = 80
