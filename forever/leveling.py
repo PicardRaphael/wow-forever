@@ -339,12 +339,12 @@ def _apply_bonuses(
 
     Registre : D7, D9, D10, E3"""
     from forever.engine.xp import session_xp
-    from forever.xp_bonuses import DEFAULT_SESSION_H, active_bonuses, bonus_state
+    from forever.xp_bonuses import active_bonuses, bonus_state, check_hours
 
     if not bonus and rested <= 0:
         return None
     state = bonus_state(gd, list(bonus)) if bonus else None
-    session_h = hours or DEFAULT_SESSION_H
+    session_h = check_hours(hours)
     factors = {}
     terms: list[dict[str, Any]] = []
     for name, side in (("monte_carlo", m), ("analytic", a)):

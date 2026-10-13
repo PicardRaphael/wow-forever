@@ -317,7 +317,7 @@ function M.XpItems(watch)
 	end
 	local out = {}
 	for _, id in ipairs(watch.items) do
-		local count = safe(C_Item.GetItemCount, id)
+		local count = safe(C_Item.GetItemCount, id, true) -- banque comprise : un sac rangé reste possédé
 		if type(count) == "number" then
 			out[#out + 1] = id .. ":" .. count
 		end

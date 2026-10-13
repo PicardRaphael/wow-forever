@@ -942,7 +942,7 @@ mechanics:
       - tests/unit/test_engine_xp_creature_type.py::test_aura_without_player_source_never_applies
     tolerance: null
     formule: "facteur = 1 + Σ pourcentages actifs (variante : Π (1 + pourcentage)) ; repos = min(XP majorée × (multiplicateur − 1), réservoir)"
-    note: "T04f (décision 262) : règle de l'émulateur TrinityCore choisie par l'utilisateur, variante gardée ; bonus sans source joueur listés, jamais appliqués ; bonus par type de créature (Archmagister's Wisdom, accès objet) appliqué au seul type lu dans sa valeur diverse, type du monstre requis ; question LVL12"
+    note: "T04f (décision 262) : règle de l'émulateur TrinityCore choisie par l'utilisateur, variante gardée ; bonus sans source joueur listés, jamais appliqués ; bonus par type de créature (Archmagister's Wisdom, accès objet) appliqué au seul type de créature de sa valeur diverse, lue comme masque de types (suppose), type du monstre requis ; question LVL12"
   - id: E1
     categorie: consommables
     description: "Flacons : un seul actif, conservé à la mort, conditions de zone"

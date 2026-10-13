@@ -29,13 +29,13 @@ from forever.kill_time import kill_params, kill_time, load_kill_times
 from forever.pipeline.questie import CLASS_MASKS
 from forever.quests import QuestBook, build_quests, value
 from forever.xp_bonuses import (
-    DEFAULT_SESSION_H,
     active_bonuses,
     best_bonus,
     bonus_advice_sentence,
     bonus_state,
     chain_payload,
     chain_sentence,
+    check_hours,
     sleeping_bag_chain,
 )
 
@@ -158,7 +158,7 @@ def _bonus_rates(
         return None
     names = [*(["sleeping_bag"] if sleeping_bag is not None else []), *(["food"] if food else [])]
     state = bonus_state(gd, names, auras=auras, sleeping_bag_stacks=sleeping_bag or None)
-    bag = sleeping_bag_state(gd)
+    bag = sleeping_bag_state(gd) if gd.xp_bonuses.sleeping_bag is not None else None
 
     def rate(r: dict[str, Any], st: Any, pool: float) -> float:
         if r["xp_h"] <= 0 or (st is None and pool <= 0):
@@ -170,7 +170,7 @@ def _bonus_rates(
     for r in rows:
         r["kill_share"] = r["kills"] * r["kill_xp"] / r["xp"] if r["xp"] > 0 else 0.0
         r["xp_h_rested"] = rate(r, None, rested)
-        r["xp_h_sleeping_bag"] = rate(r, bag, 0.0)
+        r["xp_h_sleeping_bag"] = rate(r, bag, 0.0) if bag is not None else float(r["xp_h"])
         r["xp_h_all"] = rate(r, state, rested)
     best = rows[0] if rows else None
     advice = (
@@ -345,7 +345,7 @@ def objectives(
         rows += [first, repeat]
     rows.sort(key=lambda r: -r["xp_h"])
     best = rows[0] if rows else None
-    session_h = hours or DEFAULT_SESSION_H
+    session_h = check_hours(hours)
     bonuses = _bonus_rates(
         gd,
         rows,

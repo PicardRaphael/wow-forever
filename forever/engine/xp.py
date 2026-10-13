@@ -280,11 +280,17 @@ def _applied(
         for e in a.effects:
             if e.applies_to != source or not e.value:
                 continue
-            if e.key == "creature_type_kill_xp_pct" and e.misc != creature_type:
+            if e.key == "creature_type_kill_xp_pct" and not _creature_matches(e.misc, creature_type):
                 continue
             prev = out.get(a.spell_id, (a, 0.0))[1]
             out[a.spell_id] = (a, prev + e.value * stacks / PERCENT)
     return [v for v in out.values() if v[1]]
+
+
+def _creature_matches(mask: int, creature_type: int | None) -> bool:
+    """Valeur diverse d'un bonus par type de créature lue comme masque de types (bit `type - 1`, `suppose`, comme
+    les masques de types de créature du client) ; type du monstre inconnu : jamais appliqué."""
+    return creature_type is not None and creature_type > 0 and bool(mask & (1 << (creature_type - 1)))
 
 
 def _bonus_term(a: XpBonusAura, part: float) -> Term:
@@ -404,8 +410,8 @@ def session_xp(
     (`level` : niveau du personnage, gardé pour les règles qui en dépendent).
 
     Registre : D7, D9, D10, E3"""
-    if hours <= 0:
-        raise ValueError("durée de séance positive attendue")
+    if hours <= 0 or not 0.0 <= kill_share <= 1.0:
+        raise ValueError("durée de séance positive et part des monstres entre 0 et 1 attendues")
     steps = max(1, math.ceil(hours * 3600 / step_s))
     dt_s = hours * 3600 / steps
     data = xp_bonus_data(gd) if state is not None else None

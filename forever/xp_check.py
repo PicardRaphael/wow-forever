@@ -45,6 +45,7 @@ RULES: dict[str, tuple[str, str]] = {
     "xp.food_bonus": ("bonus d'XP de la nourriture nutritive", "LVL13"),
     "xp.bonus_stacking": ("cumul de plusieurs bonus d'XP", "LVL12"),
     "xp.legacy_rested": ("perk Legacy Well Rested (gain et plafond du repos)", "LVL10"),
+    "xp.other_bonus": ("autre bonus d'XP d'objet (par type de créature)", "LVL12"),
 }
 
 
@@ -91,7 +92,7 @@ def _bonuses(gd: GameData, gain: XpGain) -> tuple[XpBonusState | None, str | Non
         return state, "xp.sleeping_bag"
     if data.auras[spell].access == "food":
         return state, "xp.food_bonus"
-    return state, "xp.bonus_stacking"
+    return state, "xp.other_bonus"
 
 
 def _gain_cases(gd: GameData, gain: XpGain, mob: int) -> list[tuple[str, float]]:

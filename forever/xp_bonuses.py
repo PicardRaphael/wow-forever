@@ -21,7 +21,7 @@ from forever.engine.xp import (
     tent_rested,
     xp_bonus_data,
 )
-from forever.errors import InvalidArgumentError
+from forever.errors import DataSchemaError, InvalidArgumentError
 
 DEFAULT_SESSION_H = 2.0  # durée de séance par défaut (paramètre des outils, pas une valeur du jeu)
 BONUS_NAMES = ("sleeping_bag", "food")  # bonus nommés des outils (forever sim leveling --bonus)
@@ -47,6 +47,15 @@ class BonusAdvice:
     xp_h_gain: float
     how: str
     certainty: str
+
+
+def check_hours(hours: float | None) -> float:
+    """Durée de séance donnée (heures, positive) ou la durée par défaut ; InvalidArgumentError sinon."""
+    if hours is None:
+        return DEFAULT_SESSION_H
+    if not hours > 0:
+        raise InvalidArgumentError(f"Durée de séance invalide : {hours} h.", "donner un nombre d'heures positif")
+    return float(hours)
 
 
 def bonus_state(
@@ -373,12 +382,22 @@ def sleeping_bag_chain(
         if addons_dir is not None
         else (deps.wow_dir / "Interface" / "AddOns" if deps.wow_dir else None)
     )
-    naowh = read_naowh_chain(addons) if addons is not None else None
-    fojji = read_fojji_chain(addons) if addons is not None else None
+    unreadable: list[str] = []
+
+    def read(reader: Any, addons_dir: Path) -> Any:
+        try:
+            return reader(addons_dir)
+        except DataSchemaError as exc:  # format de l'addon changé : source manquante, jamais une erreur des outils
+            unreadable.append(exc.message)
+            return None
+
+    naowh = read(read_naowh_chain, addons) if addons is not None else None
+    fojji = read(read_fojji_chain, addons) if addons is not None else None
     side, side_name = SIDES.get(faction or "", ("H", "Horde"))
     maps = _map_names(deps)
     missing = [f"{a} (Interface/AddOns/{a}/{f})" for (a, f), chain in ((NAOWH, naowh), (FOJJI, fojji)) if chain is None]
     notes = [] if faction in SIDES else ["camp inconnu : ordre de la Horde retenu"]
+    notes += [f"illisible : {m}" for m in unreadable]
     steps: list[RouteStep] = []
     if naowh is not None:
         source = f"{naowh.addon} {naowh.version or '?'}"
