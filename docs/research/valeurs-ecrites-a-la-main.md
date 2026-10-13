@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70338 (ne
 de `forever/data/1.60.1.70338/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-152 chemins, 631 valeurs ; 87 `probable`, 65 `suppose`
+157 chemins, 674 valeurs ; 87 `probable`, 70 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -79,7 +79,12 @@ Aucun.
 | mechanics.json | `/values/talents.first_level` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel) | fm.py du seed (points_available) |
 | mechanics.json | `/values/talents.points_per_tier` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (TraitCond) | fm.py du seed (check_build) |
 | mechanics.json | `/values/xp.dungeon_kill_bonus` | 2 | probable | I10 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
+| mechanics.json | `/values/xp.elite_factor` | 1 | suppose | I13 | règle du serveur absente du client ; facteur de Classic, non vérifié pour Forever (LVL8) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
+| mechanics.json | `/values/xp.group` | 5 | suppose | I11 | règle du serveur absente du client ; multiplicateurs de groupe de Classic, non vérifiés pour Forever (LVL4) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
 | mechanics.json | `/values/xp.group_level_basis` | 3 | probable | I11 | règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
+| mechanics.json | `/values/xp.mob_level_difference` | 26 | suppose | I6 | règle du serveur absente du client ; écart de niveau de Classic, non vérifié pour Forever | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
+| mechanics.json | `/values/xp.quest_level_difference` | 6 | suppose | I12 | règle du serveur absente du client ; réduction de Classic, non vérifiée pour Forever (LVL7) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
+| mechanics.json | `/values/xp.rested` | 5 | suppose | D7 | règle du serveur ; multiplicateur et période relus dans le client en mode forever, gain et plafond de Classic (LVL10) | règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C |
 | overrides.json | `/Arcane~1Arcane Blast` | 6 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Blast Wave` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |
 | overrides.json | `/Fire~1Pyroblast` | 4 | probable | — | corrections de rangs relevées sur un site, jamais lues par le moteur | foreverchanges.pro (build 1.60.1.70009) |

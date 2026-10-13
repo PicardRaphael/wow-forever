@@ -623,14 +623,14 @@
    "value": 0.2,
    "certainty": "probable",
    "registry": "I10",
-   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : XP des monstres tués en donjon augmentée d'environ 20 % (« approximately »), règle du serveur absente des tables ; assiette (élites, boss, repos, groupe) et valeur exacte à mesurer (question LVL5) ; aucun moteur ne la lit encore (T04d, DJ1)",
+   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : XP des monstres tués en donjon augmentée d'environ 20 % (« approximately »), règle du serveur absente des tables ; assiette (élites, boss, repos, groupe) et valeur exacte à mesurer (question LVL5) ; lue par le modèle d'XP (forever/engine/xp.py, T04d), appliquée à l'XP du monstre avant le groupe et le repos (assiette supposée)",
    "approximate": true
   },
   "xp.group_level_basis": {
    "value": "individual",
    "certainty": "probable",
    "registry": "I11",
-   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : l'XP d'un monstre tué en groupe est ajustée sur le niveau de chaque joueur (règle de Classic Era, individual), plus sur le plus haut niveau du groupe (highest_member, avant ce build) ; aucune XP pour le groupe si un membre est d'un niveau très supérieur au monstre (seuil non donné, question LVL4) ; aucun moteur ne la lit encore (T04d)",
+   "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) : l'XP d'un monstre tué en groupe est ajustée sur le niveau de chaque joueur (règle de Classic Era, individual), plus sur le plus haut niveau du groupe (highest_member, avant ce build) ; aucune XP pour le groupe si un membre est d'un niveau très supérieur au monstre (seuil non donné, question LVL4) ; lue par le modèle d'XP (forever/engine/xp.py, T04d, avec xp.group)",
    "range": [
     {
      "value": "highest_member",
@@ -680,6 +680,112 @@
    "certainty": "suppose",
    "registry": "H11",
    "source": "décision 223 : PNJ hors norme écartés de la courbe des PV ; seuil choisi par l'utilisateur le 2026-10-09 d'après les mesures de 1.60.1.70291 r4 (122 PNJ sur 137 exactement à la médiane des autres, écarts des ours et de Sunscale Lashtail de 19,6 à 20,1 %, faux écarts de 8,9 % au plus), au moins 3 PNJ au niveau, référence concordante (deux tiers des autres PNJ à moins du seuil de leur médiane) ; paramètre de mesure, pas une valeur du jeu"
+  },
+  "xp.mob_level_difference": {
+   "value": {
+    "higher_per_level": 0.05,
+    "higher_max_diff": 4,
+    "zero_difference": [
+     [
+      7,
+      5
+     ],
+     [
+      9,
+      6
+     ],
+     [
+      11,
+      7
+     ],
+     [
+      15,
+      8
+     ],
+     [
+      19,
+      9
+     ],
+     [
+      29,
+      11
+     ],
+     [
+      39,
+      12
+     ],
+     [
+      44,
+      13
+     ],
+     [
+      49,
+      14
+     ],
+     [
+      54,
+      15
+     ],
+     [
+      59,
+      16
+     ],
+     [
+      60,
+      17
+     ]
+    ]
+   },
+   "certainty": "suppose",
+   "registry": "I6",
+   "source": "règle de Classic (T04d, bloc C) : XP de base calculée au niveau du joueur ; monstre plus haut : × (1 + 0,05 × écart), écart plafonné à 4 ; plus bas : × (1 - écart / écart nul), écart nul par tranche de niveau du joueur (zero_difference, lignes [niveau max, écart nul], reprises de leveling.json mob_xp) ; gris (aucune XP) au niveau gris des quêtes (leveling.quest_band.gray_rows) ; vMangos (émulateur de Classic 1.12, règle communautaire) : src/game/Formulas.h, MaNGOS::XP ; non vérifiée pour Forever"
+  },
+  "xp.elite_factor": {
+   "value": 2.0,
+   "certainty": "suppose",
+   "registry": "I13",
+   "source": "règle de Classic (T04d, bloc C) : XP d'un monstre élite doublée ; vMangos (émulateur de Classic 1.12, règle communautaire) : src/game/Formulas.h, MaNGOS::XP ; facteur de Forever inconnu (question LVL8)"
+  },
+  "xp.group": {
+   "value": {
+    "rates": [
+     1.0,
+     1.0,
+     1.166,
+     1.3,
+     1.4
+    ]
+   },
+   "certainty": "suppose",
+   "registry": "I11",
+   "source": "règle de Classic (T04d, bloc C) : en groupe, chaque membre reçoit l'XP du monstre calculée à son niveau (xp.group_level_basis individual) × le multiplicateur de la taille du groupe (rates, taille 1 en premier) × son niveau / somme des niveaux ; vMangos (émulateur de Classic 1.12, règle communautaire) : src/game/Formulas.h, MaNGOS::XP (xp_in_group_rate) ; seuil de coupure par un membre de niveau très supérieur non modélisé (question LVL4)"
+  },
+  "xp.rested": {
+   "value": {
+    "factor": 2.0,
+    "period_h": 8.0,
+    "gain_per_period": 0.05,
+    "outdoor_ratio": 0.25,
+    "cap_levels": 1.5
+   },
+   "certainty": "suppose",
+   "registry": "D7",
+   "source": "règle de Classic (T04d, bloc C) : tant que le repos dure, l'XP d'un monstre est multipliée par factor et le surplus est pris au réservoir (les quêtes n'en prennent pas) ; le réservoir gagne gain_per_period de l'XP du niveau par période de period_h heures en auberge, outdoor_ratio de ce gain dehors, plafonné à cap_levels niveaux ; mode forever : factor et period_h lus dans le palier Rested de la table Exhaustion du client (character_scaling.json rested : Factor, InnHours, sens probable) ; gain, rapport dehors et plafond : règle de Classic (vMangos, Player::SetRestBonus et le repos de l'auberge), non vérifiés pour Forever (question LVL10)"
+  },
+  "xp.quest_level_difference": {
+   "value": {
+    "full_diff": 5,
+    "reduction": [
+     0.8,
+     0.6,
+     0.4,
+     0.2,
+     0.1
+    ]
+   },
+   "certainty": "suppose",
+   "registry": "I12",
+   "source": "règle de Classic (T04d, bloc C) : une quête rend toute son XP tant que le joueur la dépasse d'au plus full_diff niveaux, puis 80, 60, 40, 20 % aux écarts suivants et 10 % au-delà ; vMangos (émulateur de Classic 1.12) : src/game/Objects/Quest.cpp, Quest::XPValue ; arrondi de Forever inconnu (question LVL7)"
   }
  },
  "inherited_from": "1.60.1.70291"

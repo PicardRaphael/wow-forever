@@ -871,14 +871,17 @@ mechanics:
     categorie: environnement
     description: "Bonus d'XP (Well Fed, repos)"
     forever: modifie
-    statut: absent
+    statut: teste
     certitude: probable
     sources:
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : Exhaustion, T08b)"
+      - "forever/data/1.60.1.70338/mechanics.json (xp.rested : gain, rapport dehors et plafond, règle de Classic, vMangos, suppose)"
     tests:
       - tests/unit/test_decode_character.py::test_rested_equals_exhaustion
+      - tests/unit/test_engine_xp.py::test_rested_doubles_while_the_pool_lasts
+      - tests/unit/test_engine_xp.py::test_rested_gain_in_the_inn_outside_and_capped
     tolerance: null
-    note: "T08b, bloc A : paliers du repos décodés du client (Exhaustion, character_scaling.json), non modélisés dans le leveling ; T04f (décision 199) : Well-Rested du Cozy Sleeping Bag, nourriture et cumul des bonus d'XP, durée du Well-Rested à lire dans le client (question LVL3)"
+    note: "T04d, bloc C : repos modélisé (forever/engine/xp.py) : multiplicateur et période lus dans le palier Rested de la table Exhaustion du client (sens probable), gain par période, rapport dehors et plafond de Classic (suppose) ; les quêtes n'en prennent pas ; aucun bonus de repos dans les gains relevés par ForeverLogger 0.3.0 (question LVL10) ; T08b, bloc A : paliers du repos décodés du client (Exhaustion, character_scaling.json) ; T04f (décision 199) : Well-Rested du Cozy Sleeping Bag, nourriture et cumul des bonus d'XP, durée du Well-Rested à lire dans le client (question LVL3)"
   - id: D8
     categorie: environnement
     description: "Butin : un monstre sans butin reste interactif (comportement Classic)"
@@ -1521,6 +1524,8 @@ mechanics:
       - "forever/data/1.60.1.70009/spells.json (utility.conjure_water, conjure_food)"
       - "forever/data/1.60.1.70009/leveling.json (mob_model)"
       - "forever/data/1.60.1.70009/spell_scaling.json (utility : armures du client, niveaux d'apprentissage)"
+      - "forever/data/1.60.1.70338/character_scaling.json (kill_xp : GameTable xp, colonne PerKill, T04d)"
+      - "forever/data/1.60.1.70338/mechanics.json (xp.mob_level_difference, règle de Classic, vMangos, T04d)"
       - "forever/data/1.60.1.70124/decode_rules.json (character_scaling : LevelExperience, ExpectedStat.ArmorConstant, T08b)"
     tests:
       - tests/unit/test_engine_leveling.py::test_monster_formulas_match_the_seed
@@ -1536,9 +1541,15 @@ mechanics:
       - tests/unit/test_sim_rules.py::test_mage_armor_changes_the_monte_carlo
       - tests/unit/test_decode_character.py::test_xp_to_next_equals_level_experience
       - tests/unit/test_decode_character.py::test_armor_constant_equals_expected_stat
+      - tests/unit/test_quest_rewards_decode.py::test_kill_xp_is_decoded_from_the_xp_gametable
+      - tests/unit/test_quest_rewards_decode.py::test_installed_kill_xp_agrees_with_the_mob_xp_rule
+      - tests/unit/test_engine_xp.py::test_same_level_is_the_client_per_kill_and_mob_xp_delegates
+      - tests/unit/test_engine_xp.py::test_higher_level_mob_gains_per_level_up_to_the_cap
+      - tests/unit/test_engine_xp.py::test_lower_level_mob_follows_zero_difference
+      - tests/unit/test_engine_xp.py::test_gray_mob_gives_nothing
     tolerance: null
     formule: "temps par monstre = combat + repos + course entre monstres ; repos = max(mana dépensée / (boisson + Esprit), dégâts subis / (nourriture + régénération de repos × PV)) ; XP par heure = XP du monstre × secondes par heure / temps par monstre"
-    note: "T08b, bloc A : en mode forever, XP par niveau (LevelExperience, concorde avec la GameTable xp) et constante d'armure par niveau (ExpectedStat, probable : table lue par le serveur inconnue, armormitigationbylvl en écart) lues dans le client ; XP par monstre et modulation par l'écart de niveau restent la règle Classic (suppose) ; note officielle du 08/10 (t/2360696/5, révision 1) : XP des monstres de donjon (I10) et XP en groupe (I11) changées par le serveur, sans effet sur ce simulateur (monstres du monde, joueur seul)"
+    note: "T08b, bloc A : en mode forever, XP par niveau (LevelExperience, concorde avec la GameTable xp) et constante d'armure par niveau (ExpectedStat, probable : table lue par le serveur inconnue, armormitigationbylvl en écart) lues dans le client ; T04d, bloc C : XP d'un monstre de même niveau lue dans le client (GameTable xp, colonne PerKill, character_scaling.json kill_xp ; égale à 45 + 5 × niveau, la règle leveling.mob_xp, à chaque niveau), modulation par l'écart de niveau et monstres gris (xp.mob_level_difference) règle de Classic (suppose), modèle dans forever/engine/xp.py ; note officielle du 08/10 (t/2360696/5, révision 1) : XP des monstres de donjon (I10) et XP en groupe (I11) changées par le serveur, sans effet sur ce simulateur (monstres du monde, joueur seul)"
   - id: I7
     categorie: optimisation
     description: "Zone ou donjon à mon niveau (quêtes utiles, plages de niveau des quêtes et des PNJ)"
@@ -1579,37 +1590,75 @@ mechanics:
     categorie: optimisation
     description: "XP des quêtes de donjon : bonus au-delà de la valeur normale d'une quête"
     forever: modifie
-    statut: absent
+    statut: teste
     certitude: probable
     sources:
+      - "Cache/WDB/enUS/questcache.wdb du client (T04d : multiplicateur d'XP de chaque quête vue, quest_rewards.json seen_quests)"
       - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : bonus d'XP des quêtes de donjon au-delà de la valeur normale réduit de 50 % ; récompenses de certaines quêtes recalibrées"
-    tests: []
+    tests:
+      - tests/unit/test_questcache.py::test_dungeon_quest_multiplier_is_read_as_a_float
+      - tests/unit/test_quest_rewards_decode.py::test_seen_quest_xp_is_the_cell_times_the_multiplier
     tolerance: null
-    note: "règle du serveur, absente des données ; le modèle d'XP des quêtes vient en T04d (question LVL1), les quêtes de donjon en DJ1 ; sans effet sur le classement des builds"
+    note: "T04d : le bonus des quêtes de donjon est porté par le multiplicateur d'XP de la quête, lu dans le cache des quêtes du client pour chaque quête vue (5725 The Power to Destroy... : multiplicateur 2,025 en 1.60.1.70338, contre l'XP Classic de Questie) ; quête non vue : XP d'un addon ou de Questie (suppose), sans le bonus ; sans effet sur le classement des builds"
   - id: I10
     categorie: optimisation
     description: "XP des monstres tués en donjon"
     forever: modifie
-    statut: absent
+    statut: teste
     certitude: probable
     sources:
       - "note officielle du 08/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1 du 2026-10-08), recoupée dans docs/research/notes-blizzard-2026-10-08.md : XP des monstres tués en donjon augmentée d'environ 20 %"
       - "forever/data/1.60.1.70291/mechanics.json (xp.dungeon_kill_bonus, manuel, probable)"
-    tests: []
+    tests:
+      - tests/unit/test_engine_xp.py::test_elite_and_dungeon_multiply
     tolerance: null
-    note: "règle du serveur, absente des tables ; assiette et valeur exacte à mesurer (question LVL5) ; le simulateur de leveling (monstres du monde, I6) n'est pas touché ; à modéliser avec le modèle d'XP de T04d, XP par heure en donjon en DJ1"
+    note: "règle du serveur, absente des tables ; modélisée en T04d (forever/engine/xp.py) : × (1 + xp.dungeon_kill_bonus) sur l'XP du monstre, après l'élite et avant le groupe et le repos (assiette supposée) ; assiette et valeur exacte à vérifier (question LVL5, forever xp check) ; le simulateur de leveling (monstres du monde, I6) n'est pas touché"
   - id: I11
     categorie: optimisation
     description: "XP en groupe : ajustement sur le niveau de chaque joueur"
     forever: modifie
-    statut: absent
+    statut: teste
     certitude: probable
     sources:
       - "note officielle du 08/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1 du 2026-10-08), recoupée dans docs/research/notes-blizzard-2026-10-08.md : l'XP d'un monstre en groupe est ajustée sur le niveau de chaque joueur (règle de Classic Era), plus sur le plus haut niveau du groupe ; aucune XP pour personne si un membre est d'un niveau très supérieur au monstre"
       - "forever/data/1.60.1.70291/mechanics.json (xp.group_level_basis, manuel, probable)"
-    tests: []
+      - "forever/data/1.60.1.70338/mechanics.json (xp.group : multiplicateurs par taille de groupe, règle de Classic, vMangos, suppose)"
+    tests:
+      - tests/unit/test_engine_xp.py::test_group_share_is_computed_on_each_member_level
     tolerance: null
-    note: "règle du serveur ; formule de Classic Era et seuil de coupure non donnés (question LVL4) ; le simulateur de leveling est solo : sans effet aujourd'hui ; à modéliser en T04d (DJ1 pour les groupes de donjon)"
+    note: "T04d : XP du monstre au niveau de chaque joueur (individual), × multiplicateur de la taille du groupe × niveau du joueur / somme des niveaux (formule de Classic, suppose) ; variante highest_member (avant 1.60.1.70291) calculée au niveau du plus haut membre ; seuil de coupure par un membre de niveau très supérieur non modélisé (question LVL4) ; le simulateur de leveling est solo"
+  - id: I12
+    categorie: optimisation
+    description: "XP d'une quête : XP du client (QuestXP × multiplicateur de la quête vue) et réduction selon l'écart de niveau"
+    forever: modifie
+    statut: teste
+    certitude: suppose
+    sources:
+      - "table QuestXP du client (wago.tools), forever/data/1.60.1.70338/quest_rewards.json (quest_xp)"
+      - "Cache/WDB/enUS/questcache.wdb du client, lu en local (quest_rewards.json seen_quests, disposition probable, question LVL6)"
+      - "forever/data/1.60.1.70338/mechanics.json (xp.quest_level_difference : règle de Classic, vMangos Quest::XPValue, suppose)"
+    tests:
+      - tests/unit/test_questcache.py::test_quest_479_fields
+      - tests/unit/test_questcache.py::test_fields_agree_with_questie_for_classic_quests
+      - tests/unit/test_quest_rewards_decode.py::test_quest_xp_equals_the_client_table
+      - tests/unit/test_quest_rewards_decode.py::test_seen_quest_xp_is_the_cell_times_the_multiplier
+      - tests/unit/test_engine_xp.py::test_quest_xp_by_level_difference
+    tolerance: null
+    formule: "XP = QuestXP[niveau de la quête][difficulté] × multiplicateur (quête vue par le client) ; × 1 tant que le joueur dépasse la quête d'au plus full_diff niveaux, puis la part de reduction de l'écart ; aucun repos"
+    note: "XP de base du client pour une quête vue, disposition du cache probable ; règle d'écart de niveau et arrondi de Classic, non vérifiés pour Forever (question LVL7) ; quête non vue : XP d'un addon ou de Questie (suppose)"
+  - id: I13
+    categorie: optimisation
+    description: "XP des monstres élites"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70338/mechanics.json (xp.elite_factor : règle de Classic, vMangos, suppose)"
+    tests:
+      - tests/unit/test_engine_xp.py::test_elite_and_dungeon_multiply
+      - tests/unit/test_engine_xp.py::test_every_term_carries_a_known_certainty_and_a_source
+    tolerance: null
+    note: "facteur de Classic, non vérifié pour Forever (question LVL8) ; s'applique avant le bonus de donjon"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

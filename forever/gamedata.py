@@ -48,6 +48,8 @@ from forever.engine.model import (
     TalentRules,
     Utility,
     Variant,
+    XpRules,
+    XpRuleSource,
 )
 from forever.errors import DataSchemaError, InvalidArgumentError
 from forever.store import VersionData, load_version
@@ -77,6 +79,7 @@ CHOICES = {
     "mana.regen_stacking": ("sum", "max"),
     "damage.bonus_stacking": ("multiplicative", "additive"),
     "coefficient.ice_lance_source": ("client", "seed"),
+    "xp.group_level_basis": ("individual", "highest_member"),  # T04d : seule « individual » est modélisée
 }
 SCALING_KINDS = ("direct", "dot", "channel")
 MS_PER_S = 1000.0  # conversion d'unité : durées du client en millisecondes
@@ -551,6 +554,71 @@ def _leveling(values: Mapping[str, Any]) -> LevelingConstants:
     )
 
 
+XP_KEYS = (
+    "xp.mob_level_difference",
+    "xp.elite_factor",
+    "xp.dungeon_kill_bonus",
+    "xp.group",
+    "xp.group_level_basis",
+    "xp.rested",
+    "xp.quest_level_difference",
+)
+
+
+def _xp_rules(values: Mapping[str, Any], raw_char: Any) -> XpRules | None:
+    """Clés `xp.*` de `mechanics.json` (T04d, bloc C) ; None si la version ne les porte pas. Mode forever
+    (`raw_char` : `character_scaling.json`) : multiplicateur et période du repos lus dans le palier « Rested » de la
+    table Exhaustion du client."""
+    if any(key not in values for key in XP_KEYS):
+        return None
+    r = _Reader(MECHANICS_FILE)
+
+    def obj(key: str) -> Mapping[str, Any]:
+        return r.obj(r.obj(values, key, key), "value", key)
+
+    diff, group, rested, quest = (
+        obj("xp.mob_level_difference"),
+        obj("xp.group"),
+        obj("xp.rested"),
+        obj("xp.quest_level_difference"),
+    )
+    zero = r.list_(diff, "zero_difference", "xp.mob_level_difference.zero_difference")
+    if not all(isinstance(z, list) and len(z) == 2 and all(isinstance(x, int) for x in z) for z in zero):
+        raise r.fail("xp.mob_level_difference.zero_difference", "lignes [niveau max, écart nul]")
+    factor = r.num(rested, "factor", "xp.rested")
+    period = r.num(rested, "period_h", "xp.rested")
+    tiers = raw_char.get("rested") if isinstance(raw_char, dict) else None
+    tier = next((t for t in tiers or [] if isinstance(t, dict) and t.get("name") == "Rested"), None)
+    if tier is not None and _kept("rested"):
+        factor = float(tier["factor"])
+        period = float(tier["inn_hours"])
+    sources = {
+        key: XpRuleSource(
+            certainty=str(values[key].get("certainty", "suppose")),
+            source=str(values[key].get("source", "")),
+            registry=str(values[key].get("registry", "")),
+        )
+        for key in XP_KEYS
+    }
+    return XpRules(
+        higher_per_level=r.num(diff, "higher_per_level", "xp.mob_level_difference"),
+        higher_max_diff=r.int_(diff, "higher_max_diff", "xp.mob_level_difference"),
+        zero_difference=tuple((int(a), int(b)) for a, b in zero),
+        elite_factor=r.num(r.obj(values, "xp.elite_factor", "xp.elite_factor"), "value", "xp.elite_factor"),
+        dungeon_bonus=r.num(r.obj(values, "xp.dungeon_kill_bonus", "xp.dungeon_kill_bonus"), "value", "xp.dungeon_kill_bonus"),
+        group_rates=tuple(float(x) for x in r.list_(group, "rates", "xp.group.rates")),
+        group_level_basis=_choice(values, "xp.group_level_basis"),
+        rested_factor=factor,
+        rested_period_h=period,
+        rested_gain_per_period=r.num(rested, "gain_per_period", "xp.rested"),
+        rested_outdoor_ratio=r.num(rested, "outdoor_ratio", "xp.rested"),
+        rested_cap_levels=r.num(rested, "cap_levels", "xp.rested"),
+        quest_full_diff=r.int_(quest, "full_diff", "xp.quest_level_difference"),
+        quest_reduction=tuple(float(x) for x in r.list_(quest, "reduction", "xp.quest_level_difference.reduction")),
+        sources=sources,
+    )
+
+
 def _mob_model(raw: Any) -> MobModel:
     """`leveling.json.mob_model` (copie du seed) ; certitude « EST » du seed : `suppose`."""
     r = _Reader(LEVELING_FILE)
@@ -961,6 +1029,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
     xp_to_next = _xp_to_next(raw[LEVELING_FILE])
     ratios = "estimations"
     ratios_from = None
+    raw_char: Any = None
     if rules == "forever" and (version.path / CHARACTER_FILE).is_file():
         try:
             raw_char = version.read_json(CHARACTER_FILE)
@@ -1008,6 +1077,7 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
         character_ratios=ratios,
         character_ratios_from=str(ratios_from) if ratios_from else None,
         utility_source=utility_source,
+        xp=_xp_rules(values, raw_char),
     )
 
 
@@ -1169,12 +1239,14 @@ def _client_ratios(
     decoded_xp = tuple(r.int_({"v": v}, "v", "xp_to_next") for v in r.list_(raw, "xp_to_next", "xp_to_next"))
     xp = decoded_xp if _kept("xp_to_next") else xp_estimate
     armor = numbers(raw, "armor_constant", "armor_constant") if _kept("armor_constant") else ()
+    kill_xp = numbers(raw, "kill_xp", "kill_xp") if isinstance(raw.get("kill_xp"), list) else ()
     talents = raw.get("talents") if isinstance(raw.get("talents"), dict) else {}
     first = talents.get("first_level")
     per_tier = (talents.get("points_per_tier") or {}).get(MAGE_CLASS)
     if isinstance(first, int) and isinstance(per_tier, int) and _kept("talents"):
         constants = replace(constants, talents=TalentRules(first_level=first, points_per_tier=per_tier))
-    return replace(constants, character=character), replace(leveling, armor_constant_by_level=armor), xp
+    leveling = replace(leveling, armor_constant_by_level=armor, kill_xp_by_level=kill_xp)
+    return replace(constants, character=character), leveling, xp
 
 
 def load_game_data(deps: Deps) -> GameData:

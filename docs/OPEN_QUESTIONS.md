@@ -290,6 +290,14 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   relevé (5725) ; certitude `probable` (`quest_rewards.json`, `seen_quests`). Test : `xpReward` de chaque quête rendue,
   relevé par ForeverLogger 0.4.0 pendant le jeu ordinaire, comparé par `forever xp check` (décision 247). Priorité :
   basse. Registre I12.
+- **LVL7 — La réduction de l'XP d'une quête selon l'écart de niveau (et son arrondi) est-elle celle de Classic sur
+  Forever ?** Ajoutée le 2026-10-13 (T04d, bloc C) : règle de Classic écrite en `suppose` (`xp.quest_level_difference`,
+  vMangos), arrondi inconnu (une quête de donjon au multiplicateur non entier, 5725, rend une XP non entière avant
+  arrondi). Test : `xpReward` d'une quête rendue verte ou grise par ForeverLogger 0.4.0 pendant le jeu ordinaire,
+  comparé par `forever xp check` (décision 247). Priorité : basse. Registre I12.
+- **LVL8 — Quel est le facteur d'XP des monstres élites sur Forever ?** Ajoutée le 2026-10-13 (T04d, bloc C) : facteur
+  de Classic écrit en `suppose` (`xp.elite_factor`). Test : gain d'XP d'un élite de niveau connu (cible relevée par
+  ForeverLogger 0.4.0), seul et hors donjon, comparé par `forever xp check`. Priorité : basse. Registre I13.
 - **LVL10 — Pourquoi aucun bonus de repos dans les 2 714 gains d'XP relevés par ForeverLogger 0.3.0 ?** Ajoutée le
   2026-10-13 (T04d) : aucun texte ne porte la forme de Classic « (+N exp Rested bonus) » : pas de repos pendant ces
   séances, ou texte (ou règle) du repos différent sur Forever. Test (décision 247 : sans sonde exigée) : en jouant

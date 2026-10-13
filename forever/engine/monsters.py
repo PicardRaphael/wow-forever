@@ -103,10 +103,13 @@ def armor_reduction(gd: GameData, armor: float, attacker_level: int) -> float:
 
 
 def mob_xp(gd: GameData, level: int) -> float:
-    """XP d'un monstre normal de même niveau (`leveling.mob_xp`, règle Classic ; XP de Forever en T04d).
+    """XP d'un monstre normal de même niveau : modèle d'XP de T04d (`forever/engine/xp.py`), soit `PerKill` du client
+    en mode forever, sinon la règle `leveling.mob_xp`.
 
     Registre : I6"""
-    return gd.leveling.xp_base + gd.leveling.xp_per_level * level
+    from forever.engine.xp import mob_kill_xp
+
+    return mob_kill_xp(gd, level, level).xp
 
 
 def mob_swing_damage(gd: GameData, level: int, armor: float) -> float:

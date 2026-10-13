@@ -1186,6 +1186,61 @@
       "certainty": "probable",
       "reason": "disposition des champs du cache établie sur les quêtes vues et recoupée par Questie, à recouper par xpReward en jeu (question LVL6)",
       "registry": "I12"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.mob_level_difference"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; écart de niveau de Classic, non vérifié pour Forever",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.elite_factor"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; facteur de Classic, non vérifié pour Forever (LVL8)",
+      "registry": "I13"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.group"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; multiplicateurs de groupe de Classic, non vérifiés pour Forever (LVL4)",
+      "registry": "I11"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.rested"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur ; multiplicateur et période relus dans le client en mode forever, gain et plafond de Classic (LVL10)",
+      "registry": "D7"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.quest_level_difference"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; réduction de Classic, non vérifiée pour Forever (LVL7)",
+      "registry": "I12"
     }
   ],
   "pending": [],
