@@ -904,7 +904,7 @@ mechanics:
       - "note officielle du 08/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1 du 2026-10-08), recoupée dans docs/research/notes-blizzard-2026-10-08.md : retour au comportement de butin de Classic"
     tests: []
     tolerance: null
-    note: "DJ1 : butin ramassé relevé par ForeverLogger 0.6.0 (objet, PNJ source) et par Naowh Forever, taux relevé = lâchés ÷ victoires dans le livre des donjons, aucun effet sur un calcul de combat ; règle d'interaction du serveur, sans valeur ni effet sur les calculs ; à relever avec le butin des boss en DJ1"
+    note: "DJ1 : le butin ramassé est relevé (ForeverLogger 0.6.0, Naowh Forever) et le taux relevé (lâchés ÷ victoires) vit dans le livre des donjons, registre H12 ; la règle d'interaction reste absente, sans effet sur un calcul de combat"
   - id: D9
     categorie: environnement
     description: "Cozy Sleeping Bag : Well-Rested (bonus d'XP par cumul, durée, cumuls, pose)"
@@ -1807,7 +1807,7 @@ mechanics:
       - tests/unit/test_logger_runs.py::test_run_entry_and_exit_recorded
     tolerance: null
     formule: "minutes = médiane des passages relevés, sinon borne(base + pente × niveau des monstres, min, max) ; monstres = médiane relevée, sinon compte d'un addon, sinon base + pente × niveau des monstres"
-    note: "aucun addon ne donne un compte de monstres tués (TRASH_NPC de Forever Guide compte des types de monstres, non utilisé) ; la formule de Factoruide n'est pas sourcée par son auteur ; le temps par monstre de T04d n'est plus utilisé pour un passage en groupe ; question LVL15"
+    note: "certitude certain pour la durée relevée seulement : le nombre de monstres vient encore de la formule (suppose) tant qu'aucun compte n'est relevé ; passages relevés non filtrés par taille du groupe ni par niveau (Naowh journalRun ne les donne pas ; représentativité probable) ; branche « compte d'un addon » de run_model réservée, non branchée : aucun addon ne donne un compte de monstres tués (TRASH_NPC de Forever Guide compte des types de monstres, non utilisé) ; la formule de Factoruide n'est pas sourcée par son auteur ; le temps par monstre de T04d n'est plus utilisé pour un passage en groupe ; question LVL15"
     angle_mort:
       talents: []
       contextes: [dungeon]
@@ -1820,7 +1820,7 @@ mechanics:
     certitude: suppose
     sources:
       - "livre des donjons (H12), objectifs de leveling (I14), passage (I16), courbe d'XP par niveau (leveling.json)"
-      - "forever/data/1.60.1.70338/mechanics.json (dungeon.official : niveaux et ouverture de la note officielle du 01/10, probable)"
+      - "forever/data/1.60.1.70338/mechanics.json (dungeon.official, registre H12 : niveaux et ouverture de la note officielle du 01/10, probable)"
     tests:
       - tests/unit/test_engine_dungeon.py::test_placement_maximises_level_share
       - tests/unit/test_engine_dungeon.py::test_placement_tie_takes_lowest
@@ -1830,7 +1830,7 @@ mechanics:
       - tests/unit/test_route_dungeons.py::test_steps_start_with_prerequisites
     tolerance: null
     formule: "niveau retenu = argmax sur la plage du donjon de (XP par heure du premier passage ÷ XP du niveau), à égalité le plus bas ; fenêtre = niveaux où le premier passage bat la meilleure zone"
-    note: "zones des autres niveaux chiffrées avec le temps par monstre du niveau du joueur (approximation) ; quêtes grises ou hors de portée exclues à chaque niveau ; donjons fermés exclus"
+    note: "un niveau sans zone chiffrée entre dans la fenêtre (rien à battre) ; zones des autres niveaux chiffrées avec le temps par monstre du niveau du joueur (approximation) ; quêtes grises ou hors de portée exclues à chaque niveau ; donjons fermés exclus"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

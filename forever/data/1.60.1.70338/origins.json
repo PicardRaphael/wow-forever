@@ -1362,7 +1362,7 @@
       "source": "note officielle de la bêta du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4), DJ1 bloc C",
       "certainty": "probable",
       "reason": "texte officiel sans lecture du client ni mesure en jeu (question DON18)",
-      "registry": "I17"
+      "registry": "H12"
     },
     {
       "file": "mechanics.json",

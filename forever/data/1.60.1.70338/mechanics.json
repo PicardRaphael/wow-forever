@@ -923,7 +923,7 @@
     }
    },
    "certainty": "probable",
-   "registry": "I17",
+   "registry": "H12",
    "source": "note officielle de la bêta du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4, docs/research/notes-blizzard-2026-10-01.md) : nouveau donjon Excavation Site: Wetlands (26-31), Razorfen Downs (25+) et Uldaman (30+) ouverts ; clé = instance du client (dungeons.json) ; placée après le client et avant les addons dans le livre des donjons (décision 265)"
   }
  },

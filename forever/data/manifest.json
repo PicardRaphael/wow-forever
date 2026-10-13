@@ -182,8 +182,8 @@
     },
     "1.60.1.70338": {
       "collected_at": "2026-10-10",
-      "data_sha": "80419e79af22",
-      "data_sha256": "80419e79af22fb80e2c845bb82d73176ca0caa7a1051926034b34e97ada2f8a9",
+      "data_sha": "a009ffb3d852",
+      "data_sha256": "a009ffb3d8527b8dad4ee2ca4ee50212829b5f049f76d48e9317044cfa40fa7a",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -195,10 +195,10 @@
         "decode_rules.json": "40b6f7271c8dae655a9603f6f5fc9e476f5c0e34a88a9e713687b8a327983b0e",
         "dungeons.json": "2d9b95973e85c7b49b0edf919c3da830b011b63a664cbaffd6f2919e6c0729e8",
         "leveling.json": "3ab7c38b692291d7ca8ef1dbc6d6613a502a0175a45ea4ed403a9520a2c17227",
-        "mechanics.json": "031cc676b94e5cafaf0c74de984d2e39982a2963633f316a6a2e2c0cd1586a28",
+        "mechanics.json": "df8ec4bc92fe8a643dd1aa8347925470815fc4d401ec79da5ffbe4cf5884b8de",
         "meta.json": "e8a060d4a4cbc4aed0c2ad4047631e6f82de7ef1591412694b1a43f7c389d94b",
         "monsters.json": "c4161b02e87a446dbe678d809619a9235f0b0c9c4c481e2b21df2cc6c9029aa1",
-        "origins.json": "d4c0514f9122157c73cd13a6b58ce8a3dcc1dd37304c747188ad423e635b3ce2",
+        "origins.json": "4fb6995450a6488fe7cbcc1fce2b018ca53dd1d4f78d262280c220bfc134ec07",
         "overrides.json": "1b320da1201fdd21dc4da7f8f60d88fa692f7dba5fd91763cdc1592949f71ff5",
         "pet_rules.json": "2ed4d0873f5fa8d1a7a8602d75cf395e1f0b42c035656394a77648b7805cf142",
         "pets.json": "0e34ab73a78f4d279a6064c9e156b584a2a6ffb3d03838d59f72c8c847a0320b",

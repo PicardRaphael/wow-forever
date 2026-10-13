@@ -7,7 +7,7 @@ Info: Forever) ; rattachement fait dans `forever/dungeons.py`. Champs présents 
 `bosses` (`name`, `npc`, `level`, `encounter`, `loot` : `item`, `rate` en fraction, `classic`), `quests`,
 `trash_npcs`, `access`. Rien n'est deviné. Les SavedVariables de Naowh Forever (`journalRun`, `journalKills`,
 `journalLoot`, `instanceTrackerChars`) sont lues sans jamais garder les noms de joueurs (`rolls`, `team`, `drops`,
-`group`, `name`). AlexAtlasLoot n'est jamais lu (licence, décision 229). Aucun chiffre de jeu ici : les conversions
+`group`, `name`). Registre : H12, I16. AlexAtlasLoot n'est jamais lu (licence, décision 229). Aucun chiffre de jeu ici : les conversions
 (pourcentage -> fraction, coordonnées 0-1 -> %) sont celles du format de chaque fichier."""
 
 from __future__ import annotations
@@ -262,7 +262,7 @@ def read_naowh_journal(addons_dir: Path) -> SourceDungeons | None:
 
 
 def read_naowh_runs(wtf_dir: Path) -> NaowhRuns | None:
-    """Passages et butin relevés par Naowh Forever (compte entier) ; noms de joueurs jamais gardés."""
+    """Passages et butin relevés par Naowh Forever (compte entier) ; noms de joueurs jamais gardés. Registre : I16"""
     paths = sorted(wtf_dir.glob(f"Account/*/SavedVariables/{NAOWH_SV}")) if wtf_dir.is_dir() else []
     if not paths:
         return None

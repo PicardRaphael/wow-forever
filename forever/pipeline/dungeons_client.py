@@ -68,7 +68,7 @@ def _lfg_entry(row: Row, tun: Row | None, factions: Mapping[int, str]) -> dict[s
 
 
 def decode_dungeons(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
-    """Document `dungeons.json`."""
+    """Document `dungeons.json`. Registre : H12"""
     spec = rules["dungeons"]
     prefixes = tuple(spec.get("strip_prefixes", []))
     party = int(spec["party_instance_type"])
