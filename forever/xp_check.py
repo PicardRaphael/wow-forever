@@ -16,7 +16,16 @@ from typing import Any
 
 from forever.config import Deps
 from forever.engine.model import GameData
-from forever.engine.xp import Party, QuestXpInput, mob_kill_xp, quest_xp, xp_rules
+from forever.engine.xp import (
+    ActiveAura,
+    Party,
+    QuestXpInput,
+    XpBonusState,
+    mob_kill_xp,
+    quest_xp,
+    xp_multiplier,
+    xp_rules,
+)
 from forever.pipeline.addon_sv import LoggerDB, XpGain, read_logger_db
 from forever.pipeline.quest_rewards import QUEST_FILE, seen_quest_xp
 
@@ -31,6 +40,11 @@ RULES: dict[str, tuple[str, str]] = {
     "xp.rested": ("repos", "LVL10"),
     "quest_xp": ("XP des quêtes vues par le client (QuestXP × multiplicateur)", "LVL6"),
     "xp.quest_level_difference": ("XP des quêtes selon l'écart de niveau", "LVL7"),
+    # T04f : gains relevés avec leurs auras (ForeverLogger 0.5.0)
+    "xp.sleeping_bag": ("Well-Rested du sac de couchage", "LVL12"),
+    "xp.food_bonus": ("bonus d'XP de la nourriture nutritive", "LVL13"),
+    "xp.bonus_stacking": ("cumul de plusieurs bonus d'XP", "LVL12"),
+    "xp.legacy_rested": ("perk Legacy Well Rested (gain et plafond du repos)", "LVL10"),
 }
 
 
@@ -54,6 +68,32 @@ def _case(rule: str, observed: float, expected: float) -> tuple[str, float]:
     return rule, gap
 
 
+def _bonuses(gd: GameData, gain: XpGain) -> tuple[XpBonusState | None, str | None]:
+    """T04f : auras relevées avec le gain (ForeverLogger 0.5.0) : état des bonus et règle vérifiée par ce gain
+    (`xp.sleeping_bag`, `xp.food_bonus`, `xp.bonus_stacking` quand plusieurs se cumulent) ; (None, None) sans aura
+    applicable aux monstres.
+
+    Registre : D9, D10, E3"""
+    if not gain.auras or gd.xp_bonuses is None:
+        return None, None
+    state = XpBonusState(
+        auras=tuple(ActiveAura(int(a["spell"]), int(a.get("stacks") or 1), a.get("remaining")) for a in gain.auras)
+    )
+    _, terms = xp_multiplier(gd, state, source="kill")
+    applied = [t for t in terms if t.rule.startswith("xp_bonus.")]
+    if not applied:
+        return None, None
+    if len(applied) > 1:
+        return state, "xp.bonus_stacking"
+    spell = int(applied[0].rule.split(".", 1)[1])
+    data = gd.xp_bonuses
+    if data.sleeping_bag is not None and spell == data.sleeping_bag.aura:
+        return state, "xp.sleeping_bag"
+    if data.auras[spell].access == "food":
+        return state, "xp.food_bonus"
+    return state, "xp.bonus_stacking"
+
+
 def _gain_cases(gd: GameData, gain: XpGain, mob: int) -> list[tuple[str, float]]:
     rules = xp_rules(gd)
     if gain.level is None:
@@ -70,8 +110,11 @@ def _gain_cases(gd: GameData, gain: XpGain, mob: int) -> list[tuple[str, float]]
         return []  # groupe sans les niveaux de chaque membre (ou ancien gain avec bonus de groupe) : non comparable
     rested = gain.rested_bonus or 0
     base_observed = float((gain.amount or 0) - rested)  # le bonus de repos est compris dans le montant
-    model = mob_kill_xp(gd, player, mob, elite=elite, dungeon=inside, party=party).xp
-    if party is not None:
+    bonuses, bonus_rule = _bonuses(gd, gain)
+    model = mob_kill_xp(gd, player, mob, elite=elite, dungeon=inside, party=party, bonuses=bonuses).xp
+    if bonus_rule is not None:
+        rule = bonus_rule
+    elif party is not None:
         rule = "xp.group"
     elif inside:
         rule = "xp.dungeon_kill_bonus"

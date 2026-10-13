@@ -24,3 +24,4 @@ inventées et ne sont pas des valeurs de jeu.
   GearQuestForever 0.5.4-beta (deux objets : « From The Wreckage.... » et « Sarkoth »).
 - `QuestieForeverDB` (SavedVariable de Questie) : deux quêtes apprises en jeu (96607, 886), champs `questId`,
   `title`, `level`, `mapID` seulement (aucun horodatage, aucun nom de personnage).
+- `xp_bonuses/` (T04f, bloc E) : extraits structurels de `NaowhForever_Discovery/Data/SleepingBag.lua` (1.1.11) et de `FojjiCore_DungeonJournal/Data/Guides.lua` (3.3.5, clé `sleepingbag`) : forme, objets, cartes, positions, quêtes et camps gardés ; conseils et textes remplacés (« tip », « text »).

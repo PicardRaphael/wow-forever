@@ -15,3 +15,4 @@
   monstre absent de la fixture de Questie ; rendu de la quête 5725 à 2936 XP (`QuestXP[16][6]` × 2,025 du cache des
   quêtes, arrondi) ; Mage de niveau 1 : ancien gain de 50 XP sur « Hare » (niveau fixe 1 dans la fixture de Questie).
 - `ForeverLoggerDB_auras.lua` (T04f, bloc D, synthétique) : schéma 3 de ForeverLogger 0.5.0, Chasseur `Player-0000-0000BEEF` : un gain d'XP et un état de l'XP avec une aura relevée (Well-Rested, 429959, deux cumuls), rangs Legacy (arbre 1188, nœud 110301 du perk Well Rested, rang 2) ; valeurs inventées : ce n'est pas une mesure.
+- `ForeverLoggerDB_xpcheck_bonus.lua` (T04f, bloc F, synthétique, écrit par un script jetable) : Chasseur de niveau 15, quatre gains sur un monstre de niveau 15 (`kill_xp` 120) relevés avec leurs auras : Well-Rested à trois cumuls (124), Well Fed XP Boost (126), les deux (130), une aura sans rapport (120) ; valeurs inventées.

@@ -936,6 +936,7 @@ mechanics:
       - tests/unit/test_engine_xp_bonuses.py::test_rested_applies_to_the_boosted_xp
       - tests/unit/test_engine_xp_bonuses.py::test_bonus_without_a_player_source_is_never_applied
       - tests/unit/test_session_xp.py::test_parts_add_up_and_bonus_never_lowers_xp
+      - tests/unit/test_xp_check_bonuses.py::test_each_bonus_gain_goes_to_its_rule
     tolerance: null
     formule: "facteur = 1 + Σ pourcentages actifs (variante : Π (1 + pourcentage)) ; repos = min(XP majorée × (multiplicateur − 1), réservoir)"
     note: "T04f (décision 262) : règle de l'émulateur TrinityCore choisie par l'utilisateur, variante gardée ; bonus sans source joueur listés, jamais appliqués ; question LVL12"

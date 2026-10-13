@@ -336,6 +336,7 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
 - `uv run forever measures kill-time [--class hunter --level 15]` : temps par monstre mesuré par classe et tranche de
   niveaux (journaux, ForeverLogger), gardé dans le cache.
 - `uv run forever xp check` : vérification passive du modèle d'XP sur ce que vous avez joué avec ForeverLogger 0.4.0
+- T04f : `uv run forever lookup xp_bonuses [--access item|legacy|food|camp|none]` (bonus d'XP du client, chaîne du sac de couchage lue dans les addons) ; `uv run forever sim objectives … [--rested XP] [--sleeping-bag [N]] [--food] [--legacy-rested-rank R] [--hours H]` (XP par heure sans bonus, avec repos, avec le sac, avec les bonus actifs, bonus à prendre) ; `uv run forever sim leveling --level N --bonus sleeping_bag,food [--rested XP]` ; `uv run forever profile set <nom> --legacy-rested-rank R` ; `forever xp check` compare aussi les gains relevés avec leurs auras (ForeverLogger 0.5.0).
   (vérifié, écart, à vérifier) ; rien n'est écrit, aucune sonde n'est exigée (décision 247).
 
 ## Ce que le plugin ne sait pas encore
