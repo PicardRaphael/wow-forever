@@ -320,7 +320,8 @@ uv run forever export read "<chaîne>"                 # relit !NFB1!, !NFM1!, !
 - `forever export bis` et `forever export weights` : formats prêts, contenu rempli par T10a.
 - MCP : `forever_lookup(kind="export", name="naowh_build" | "naowh_macros" | "ellesmere" | "read")` ;
   `forever_build` porte `export.naowh` à côté de `export.talents_forever`.
-- En jeu : liens cliquables `[Naowh : build]`, bouton « Exports », `/fb exports`, `/fb role dps|heal|tank`.
+- En jeu : liens cliquables `[Naowh : build]`, bouton « Exports » (build actuel, `[Naowh : macros]`,
+  `[EllesmereUI : <rôle>]` une fois le rôle choisi), `/fb exports`, `/fb role dps|heal|tank`.
 
 ## Familiers du Chasseur (CH0)
 ```powershell

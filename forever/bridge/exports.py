@@ -69,6 +69,9 @@ def exports_reply(
     """Réponse du bouton « Exports » pour le personnage du contexte : texte (une ligne par export, ce qui manque
     dit) et liens typés à copier."""
     from forever.bridge.context import CLASS_NAMES, describe_talents, talent_table
+    from forever.errors import InvalidArgumentError
+    from forever.exports.ellesmere import ROLE_LABELS, ellesmere_export
+    from forever.exports.macros import macros_export
     from forever.exports.talents import naowh_export
 
     token = str(context.get("class") or "")
@@ -91,6 +94,26 @@ def exports_reply(
             lines.append(f"- Build actuel vers Naowh Forever{note} ; {block['import']}.")
         else:
             lines.append(f"- Build actuel : export Naowh bloqué : {block['reason']}.")
+    macros = macros_export(deps, cls, level, talents)
+    if macros["code"]:
+        links.append(typed_link("naowh_macros", macros["code"]))
+        lines.append(f"- Macros de la classe au niveau {level} vers Naowh Forever ; {macros['import']}.")
+    else:
+        lines.append(f"- Macros : {macros['reason']}.")
+    role = str(context.get("role") or "")
+    realm = str(context.get("realm") or "")
+    if role not in ROLE_LABELS:
+        lines.append("- Profil EllesmereUI : aucun rôle choisi pour ce personnage (/fb role dps, heal ou tank).")
+    elif not realm:
+        lines.append("- Profil EllesmereUI : royaume absent du contexte du jeu.")
+    else:
+        try:
+            eui = ellesmere_export(deps, who, realm, cls, level, role, talents=talents)
+        except InvalidArgumentError as err:
+            lines.append(f"- Profil EllesmereUI : {err.message}")
+        else:
+            links.append(typed_link("ellesmere", eui["code"], f"EllesmereUI : {ROLE_LABELS[role]}"))
+            lines.append(f"- Profil EllesmereUI « {eui['profile_name']} » ; {eui['import']}.")
     if last:
         lines.append("- Dernier build donné dans le chat : ses liens ci-dessous (Talents Forever, Naowh).")
         links.extend(dict(link) for link in last)

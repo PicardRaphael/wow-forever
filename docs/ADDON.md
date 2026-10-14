@@ -530,7 +530,8 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
   `!NFM1!`, profil `!EUI_`) en plus de `link` (gardé pour un addon pas encore rechargé) : chaque lien est imprimé
   `[libellé]`, cliquable, et ouvre la boîte de copie du panneau d'action avec **sa** chaîne. `/fb exports` (alias
   `/fb` de `/fv`) réimprime les liens d'export reçus pendant la session. Bouton « Exports » : réponse rédigée par le
-  pont sans le modèle (code Naowh du build actuel, liens du dernier build donné dans le chat).
+  pont sans le modèle (code Naowh du build actuel, macros de la classe au niveau, profil EllesmereUI du rôle choisi
+  par `/fb role` s'il existe un profil de base, liens du dernier build donné dans le chat ; ce qui manque est dit).
 - `/fb role dps|heal|tank` : rôle du personnage (rôles permis par la table de `docs/SPEC.md`), gardé dans
   `ForeverBridgeDB.roles["<nom> - <royaume>"]` et envoyé dans le contexte (`role`). Bascule vers le profil EllesmereUI
   « <nom> - <rôle> » (`DPS`, `Soins`, `Tank`) : au `/fb role`, quelques secondes après la connexion (la bascule
