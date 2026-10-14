@@ -67,7 +67,7 @@ jobs:
               gh issue edit "$existante" --title "$titre"
             else
               gh issue create --label veille --title "$titre" \
-                --body "Aucune version du client publiée depuis $age jours (seuil : 14, SILENT_AFTER). Vérifier que wago.tools répond et que le produit wow_classic_beta est toujours le bon."
+                --body "Aucune version du client publiée depuis $age jours (seuil : 14, SILENT_AFTER). Vérifier que wago.tools répond et que le produit demandé (champ product de forever builds --json, tiré de sources.json) est toujours le bon : au lancement, forever wow list puis forever wow adopt (docs/LANCEMENT.md)."
             fi
           fi
         env:
