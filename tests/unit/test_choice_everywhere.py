@@ -209,7 +209,8 @@ def test_a_candidate_decoded_from_the_final_carries_its_product(tmp_path, make_d
     adopt(deps.cache_dir, root)
     code = main(["decode", "--version", LOCAL_VERSION, "--csv-dir", str(WAGO_70009), "--json"], deps)
     assert code == 0, capsys.readouterr()
-    sources = json.loads((deps.cache_dir / "candidates" / LOCAL_VERSION / "sources.json").read_text(encoding="utf-8"))
+    candidate = deps.cache_dir / "candidates" / LOCAL_VERSION / LOCAL_VERSION
+    sources = json.loads((candidate / "sources.json").read_text(encoding="utf-8"))
     assert (sources["product"], sources["version_prefix"]) == (FINAL, "1.60.")
 
 
