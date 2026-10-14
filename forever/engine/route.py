@@ -281,7 +281,8 @@ def missed_visit(world: RouteWorld, before: RouteState, after: RouteState) -> st
 
 def missed_training(world: RouteWorld, before: RouteState, after: RouteState) -> int | None:
     """Niveau d'entraînement atteint avant l'arrêt et dépassé de plus de `train_max_delay` niveaux sans visite au
-    maître (None sinon). Registre : I18"""
+    maître (None sinon). Un arrêt qui saute d'un coup un niveau d'entraînement n'est pas fautif : la visite devient
+    due et c'est l'arrêt suivant, s'il n'est pas la visite, qui la manque. Registre : I18"""
     if not world.trainers:
         return None
     for level in world.train_levels:

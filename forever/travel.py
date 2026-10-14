@@ -43,8 +43,8 @@ def graph_from_doc(doc: dict[str, Any], faction: str) -> tuple[Graph, dict[int, 
 
 
 def transports_from_network(network: Any, faction: str) -> tuple[Any, ...]:
-    """Transports de Journeys permis au camp `faction`, dans les deux sens (bateaux et zeppelins : un trajet par
-    quai vers le suivant ; portails et tram : durée de l'addon). Registre : I19"""
+    """Transports de Journeys permis au camp `faction` (bateaux et zeppelins : un circuit, chaque quai vers le
+    suivant, le dernier vers le premier ; portails et tram : dans les deux sens, durée de l'addon). Registre : I19"""
     from forever.engine.travel import Point, Transport, ride_seconds
 
     side = SIDES[faction]
@@ -53,18 +53,12 @@ def transports_from_network(network: Any, faction: str) -> tuple[Any, ...]:
         speed = network.speeds.get(ship.kind)
         if side not in ship.sides or not speed:
             continue
-        docks = ship.docks
+        docks = ship.docks  # circuit : chaque quai vers le suivant, le dernier vers le premier
         for i, dock in enumerate(docks):
             nxt = docks[(i + 1) % len(docks)]
-            if len(docks) == 2 or i + 1 < len(docks):
-                seconds = ride_seconds(dock.wait, dock.length, speed, network.board_s, network.loading_s)
-                out.append(Transport(ship.kind, Point(dock.continent, dock.x, dock.y),
-                                     Point(nxt.continent, nxt.x, nxt.y), seconds))  # fmt: skip
-            if len(docks) > 2 and i > 0:  # escale : retour vers le quai précédent
-                back = docks[i - 1]
-                seconds = ride_seconds(dock.wait, back.length, speed, network.board_s, network.loading_s)
-                out.append(Transport(ship.kind, Point(dock.continent, dock.x, dock.y),
-                                     Point(back.continent, back.x, back.y), seconds))  # fmt: skip
+            seconds = ride_seconds(dock.wait, dock.length, speed, network.board_s, network.loading_s)
+            out.append(Transport(ship.kind, Point(dock.continent, dock.x, dock.y), Point(nxt.continent, nxt.x, nxt.y),
+                                 seconds))  # fmt: skip
     for link in network.links:
         if side not in link.sides:
             continue
@@ -88,14 +82,16 @@ class WalkCache:
         from forever.engine.travel import nearest_node, node_distances, walk_yards
 
         net = self.nets.get(a.continent)
-        if net is None or a.continent != b.continent:
+        if a.continent != b.continent:
             return math.inf
+        if net is None:
+            return math.nan  # pas de réseau sur ce continent : ligne droite allongée
         for p in (a, b):
             if p not in self.near:
                 self.near[p] = nearest_node(net, p)
         source, target = self.near[a], self.near[b]
         if source is None or target is None:
-            return math.inf
+            return math.nan
         key = (a.continent, source)
         if key not in self.dist:
             self.dist[key] = node_distances(net, source)

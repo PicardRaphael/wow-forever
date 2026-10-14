@@ -916,7 +916,7 @@ def parse_professions(raw: Any) -> tuple[tuple[str, int, int], ...]:
         head, sep2, cap = name.rpartition(":")
         if not (sep and sep2 and head.strip() and rest.isdigit() and cap.isdigit()):
             raise InvalidArgumentError(
-                f"Métier illisible : {item}.", "donner « Nom:rang:rang maximal », par exemple Alchemy:60:75"
+                f"Métier illisible : {item}.", "donner « Nom:rang:rang maximal », rangs lus en jeu"
             )
         out.append((head.strip(), int(cap), int(rest)))
     return tuple(out)

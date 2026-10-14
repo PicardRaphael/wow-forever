@@ -164,13 +164,16 @@ def _flights(graph: Graph, start: int, known: AbstractSet[int], params: TravelPa
 def _walk_s(
     a: Point, b: Point, params: TravelParams, level: int, walk: Callable[[Point, Point], float] | None
 ) -> float:
-    """Secondes à pied : réseau de marche (`walk`, yards) s'il est donné, sinon ligne droite allongée."""
+    """Secondes à pied : réseau de marche (`walk`, yards) s'il est donné ; `walk` rend NaN sans réseau pour ces
+    points (ligne droite allongée) et l'infini quand le réseau ne les relie pas (île : un transport est nécessaire)."""
     if a.continent != b.continent:
         return math.inf
     if walk is None:
         return walk_seconds(a, b, params, level)
     yards = walk(a, b)
-    return yards / run_speed(params, level) if math.isfinite(yards) else walk_seconds(a, b, params, level)
+    if math.isnan(yards):
+        return walk_seconds(a, b, params, level)
+    return yards / run_speed(params, level)
 
 
 def travel_time(

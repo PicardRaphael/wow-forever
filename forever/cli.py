@@ -407,7 +407,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--profession",
         action="append",
         default=[],
-        help="métier « Nom:rang:rang maximal » (anglais, ex. Alchemy:60:75) ; visite au maître quand le rang suivant "
+        help="métier « Nom:rang:rang maximal » (nom anglais, rangs lus en jeu) ; visite au maître quand le rang suivant "
         "est ouvert",
     )
     r_plan.add_argument("--json", action="store_true", help="sortie JSON")
@@ -1316,6 +1316,8 @@ def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
             + f"{theirs['quests']} quêtes rendues (Factoruide annonce {theirs['factoruide_hours']:.1f} h)",
             f"  quêtes communes : {len(doc['common'])} ; seulement chez forever : {len(doc['only_ours'])} ; "
             + f"seulement chez Factoruide : {len(doc['only_theirs'])} ; arrêts sautés : {len(theirs['skipped'])}",
+            "  sans donjon des deux côtés",
+            *(f"  avertissement ({side}) : {w}" for side in ("ours", "theirs") for w in doc[side]["warnings"]),
         ]
         _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK

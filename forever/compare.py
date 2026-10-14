@@ -3,7 +3,8 @@
 Le joueur exporte une route de Factoruide (bouton « Share », fichier `.fgguide` : JSON `factoruide-guide`, lu en
 local, jamais recopié dans le dépôt). Ses arrêts de quête sont rejoués par notre simulation (`forever/engine/route.py`,
 nos règles d'XP et de temps) ; un arrêt impossible chez nous (quête inconnue, prérequis, niveau) est sauté et dit ;
-les visites au maître de classe sont placées comme dans nos routes. Le résultat se compare à notre route pour la même
+les visites au maître de classe sont placées comme dans nos routes ; aucun donjon des deux côtés (les arrêts
+de Factoruide ne portent pas ses passages de donjon). Le résultat se compare à notre route pour la même
 demande : temps, XP par heure, quêtes communes et propres à chacune."""
 
 from __future__ import annotations
@@ -97,7 +98,15 @@ def replay_guide(
 
 def _side(result: RouteResult, quests: set[int]) -> dict[str, Any]:
     hours = result.seconds / SECONDS_PER_HOUR
-    return {"hours": hours, "xp_h": result.xp_h, "quests": len(quests), "certainty": result.certainty}
+    return {
+        "hours": hours,
+        "xp_h": result.xp_h,
+        "quests": len(quests),
+        "certainty": result.certainty,
+        "feasible": result.feasible,
+        "reached": result.reached,
+        "warnings": list(result.warnings),
+    }
 
 
 def compare_route(deps: Any, path: Path, *, wow_dir: Path | None = None) -> dict[str, Any]:
@@ -110,7 +119,8 @@ def compare_route(deps: Any, path: Path, *, wow_dir: Path | None = None) -> dict
     from forever.route import RouteRequest, route_context
 
     guide = read_fgguide(path)
-    request = RouteRequest(guide.class_name, guide.faction, guide.from_level, guide.to_level)
+    # sans donjon des deux côtés : les arrêts de Factoruide ne portent pas ses passages de donjon
+    request = RouteRequest(guide.class_name, guide.faction, guide.from_level, guide.to_level, dungeons="none")
     ctx = route_context(deps, request, wow_dir=wow_dir)
     ours = plan(ctx.gd, ctx.world, ctx.start, end_level=guide.to_level, cap=ctx.cap)
     replay = replay_guide(ctx.gd, ctx.world, guide.stops, ctx.start, end_level=guide.to_level, cap=ctx.cap)

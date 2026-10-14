@@ -21,9 +21,9 @@ le calcul (classe, camp, niveau de départ et d'arrivée), jamais devinée.
 
 ## Outil
 - `forever_route(action="plan", class_name, faction, start_level, end_level, dungeons="auto", class_quests=True,
-  exclude=[…], include=[…], professions=["Alchemy:60:75"])` : plan et `preview` (niveaux, `hours`, `xp_h`, donjons placés, récompenses, bonus
+  exclude=[…], include=[…], professions=["Nom:rang:max"])` : plan et `preview` (niveaux, `hours`, `xp_h`, donjons placés, récompenses, bonus
   rappelés, certitude, nombre d'arrêts) ; `stops` : arrêts dans l'ordre (`kind` : accept, objective, turnin,
-  dungeon, dungeon_repeat, grind ; `name`, `zone`, `x`, `y`, `level`, `xp`, `certainty`) ; `warnings` : quêtes
+  dungeon, dungeon_repeat, train, prof, grind ; `name`, `zone`, `x`, `y`, `level`, `xp`, `certainty`) ; `warnings` : quêtes
   écartées et pourquoi ; `id` du plan.
 - `forever_route(action="show", plan_id)` : relire un plan ; `forever_route(action="guide", plan_id)` : texte du guide
   RestedXP (à importer dans RestedXP, ou livré en jeu par le bouton « Livrer dans RestedXP » du pont).
