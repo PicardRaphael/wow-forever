@@ -1870,7 +1870,19 @@ mechanics:
       - "recherche : code MIT de Factoruide (brouznouf/factoruide@f7da6da : plan/worth.rs, plan/construct.rs nearest_stop, plan/moves.rs, plan/search.rs), porté en sous-ensemble ; règles d'XP et de temps de forever, jamais celles de Factoruide"
       - "forever/data/1.60.1.70374/mechanics.json (route.search : journal, frais d'arrêt, poids de zone et part du farm repris de Factoruide, suppose ; essais et graine de la recherche)"
       - "RX1c (décision 268) : parcours gratuits en clair de RestedXP rejoués par la même simulation pour mesurer nos routes (une mesure, pas une source) ; farm au milieu d'une route (grind_to, mêmes règles que le farm final)"
+      - "CJ1 (décision 277) : départ de la position réelle (carte et coordonnées de ForeverBridge), sinon du premier donneur du parcours gratuit de RestedXP de la race, sinon départage par la distance ; quêtes faites du personnage (profil, Questie) retirées ; masques de race (bit étendu des sources de Forever pour les Skyborne) ; garde-fous route.filters (catégories QuestSort et specialFlags de Questie : événements, effort de guerre, champs de bataille, répétables, métiers ; suppose) ; quête rouge jamais prise par notre route hors donjon (politique de route, le rejeu d'un guide la permet) ; parcours gratuits de RestedXP : référence d'apprentissage et base adaptée (décision 277)"
     tests:
+      - tests/unit/test_route_cj1_start.py::test_start_from_the_context_position_first
+      - tests/unit/test_route_cj1_start.py::test_start_from_the_free_guide_of_the_race_without_position
+      - tests/unit/test_route_cj1_start.py::test_start_quest_ties_go_to_the_nearest_giver_not_the_lowest_id
+      - tests/unit/test_route_cj1_start.py::test_rxp_start_giver_is_the_first_accept_of_the_race_chain
+      - tests/unit/test_route_cj1_start.py::test_done_quests_leave_the_route_but_open_their_followers
+      - tests/unit/test_route_cj1_start.py::test_race_mask_rules
+      - tests/unit/test_route_cj1_start.py::test_other_race_quests_are_dropped
+      - tests/unit/test_route_cj1_start.py::test_event_war_effort_and_repeatable_quests_are_dropped
+      - tests/unit/test_route_cj1_start.py::test_profession_quests_need_the_profession
+      - tests/unit/test_route_cj1_start.py::test_red_quests_are_not_accepted
+      - tests/unit/test_route_cj1_bridge.py::test_route_button_passes_race_position_and_character
       - tests/unit/test_rxp_compare.py::test_replay_follows_the_guide_logic
       - tests/unit/test_rxp_compare.py::test_replay_starts_in_the_guide_of_the_start_level
       - tests/unit/test_rxp_compare.py::test_rxp_compare_cli

@@ -1454,7 +1454,7 @@ def _route_rxp_compare(deps: Deps, args: argparse.Namespace) -> int:
         ),
         f"  zones (forever) : {' → '.join(ours['zones'][:12])}",
         f"  zones (RestedXP) : {' → '.join(theirs['zones'][:12])}",
-        "  sans donjon des deux côtés ; une mesure, pas une source (décision 268)",
+        "  sans donjon des deux côtés ; référence d'apprentissage de notre optimiseur (décisions 268 et 277)",
     ]
     _emit(doc, lines, doc["provenance"], args.json)
     return EXIT_OK

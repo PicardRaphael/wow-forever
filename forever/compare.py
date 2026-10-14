@@ -7,7 +7,7 @@ les visites au maître de classe sont placées comme dans nos routes ; aucun don
 de Factoruide ne portent pas ses passages de donjon). Le résultat se compare à notre route pour la même
 demande : temps, XP par heure, quêtes communes et propres à chacune.
 
-Même comparaison avec les parcours gratuits en clair de RestedXP (RX1c, décision 268) : une mesure, pas une source ;
+Même comparaison avec les parcours gratuits en clair de RestedXP (RX1c, décisions 268 et 277) : référence d'apprentissage ;
 lecture dans `forever/rxp_guides.py`, aucun texte de guide dans le résultat."""
 
 from __future__ import annotations
@@ -79,6 +79,7 @@ def replay_guide(
     avec leur raison ; une visite au maître de classe est placée dès qu'elle est due. Registre : I18"""
     from forever.engine.route import apply_stop, check_stop, simulate
 
+    world = replace(world, refuse_red=False)  # CJ1 : route d'un autre outil rejouée telle quelle
     state = start
     stops: list[Stop] = []
     skipped: list[dict[str, Any]] = []
@@ -225,6 +226,10 @@ def replay_rxp(
     dits ; entraînements placés comme dans nos routes ; farm final jusqu'à `end_level`. Registre : I18"""
     from forever.engine.route import apply_stop, check_stop, grind_to, weakest
     from forever.rxp_guides import applies, xp_rate_ok
+
+    world = replace(
+        world, refuse_red=False
+    )  # CJ1 : le jeu permet de prendre une quête rouge ; seule notre route s'en garde
 
     steps = [
         s
@@ -410,7 +415,7 @@ def compare_rxp(
             *fresh["assumptions"],
             (
                 "parcours gratuits en clair de RestedXP lus en local (RXPGuides/Guides/Forever), rejoués par nos règles "
-                "d'XP et de temps : une mesure, pas une source (décision 268)"
+                "d'XP et de temps : référence d'apprentissage de notre optimiseur (décisions 268 et 277)"
             ),
             f"blocs non lisibles en clair ignorés sans être décodés : {library.refused}",
             "sans donjon des deux côtés, même point de départ ; objectifs d'une quête faits en un arrêt",

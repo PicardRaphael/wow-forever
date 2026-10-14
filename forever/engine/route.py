@@ -112,6 +112,9 @@ class RouteWorld:
     trainers: tuple[Point, ...] = ()  # maîtres de classe du camp (bloc F)
     train_levels: tuple[int, ...] = ()  # niveaux où la classe apprend des sorts, dans la route
     prof_visits: Mapping[str, tuple[int, tuple[Point, ...]]] = field(default_factory=dict)  # bloc H
+    refuse_red: bool = (
+        True  # CJ1 : notre route ne prend pas de quête rouge ; le rejeu d'un guide la permet (le jeu aussi)
+    )
 
 
 @dataclass(frozen=True)
@@ -191,7 +194,7 @@ def _check_accept(gd: GameData, world: RouteWorld, state: RouteState, quest_id: 
         return "quête déjà prise"
     if q.min_level > state.level:
         return f"niveau minimal {q.min_level}"
-    if q.dungeon is None and q.level >= state.level + gd.leveling.quest_band.red_min_diff:
+    if world.refuse_red and q.dungeon is None and q.level >= state.level + gd.leveling.quest_band.red_min_diff:
         return "quête rouge, trop haute pour ce niveau (CJ1)"
     if not set(q.prereq_all) <= state.done:
         return "prérequis non rendus"

@@ -1,6 +1,8 @@
 """Parcours gratuits en clair de RestedXP pour Forever, lus en local pour les comparer à nos routes (RX1c, décision 268).
 
-Exception encadrée à l'exclusion de RXPGuides : **une mesure, pas une source**. Seuls les fichiers
+Exception encadrée à l'exclusion de RXPGuides : une mesure (décision 268), devenue **référence d'apprentissage de notre
+optimiseur et base adaptée** là où le parcours fait mieux, avec attribution (licence CC BY-NC-SA 4.0, usage personnel,
+décision 277) ; leur texte n'entre jamais dans le dépôt. Seuls les fichiers
 `RXPGuides/Guides/Forever/*.lua` de l'addon installé sont ouverts (et `dungeon/` sur demande) ; seuls les blocs
 `RXPGuides.RegisterGuide([[…]])` dont le texte est un guide en clair (première ligne utile en `#`) sont analysés ;
 tout autre bloc (guide chiffré ou encodé) est compté dans `refused` et jamais décodé ; les guides importés
