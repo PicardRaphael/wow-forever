@@ -1,0 +1,57 @@
+# Catalogue court de macros par classe (EX1, décision 267) : clés de sorts de classes.json seulement, aucun chiffre.
+# Modèles (forever/exports/macros.py) : help (soin ou buff sur la cible survolée, sinon la cible), focus (contrôle sur
+# la focalisation, sinon la cible), interrupt (/stopcasting puis le sort), melee (/startattack puis le sort).
+# Une macro n'est rendue que si son sort est appris au niveau du personnage (rangs de classes.json ; un sort de
+# talent seulement si le talent est pris). Utilité des macros : choix de catalogue, certitude suppose.
+Warrior:
+  - {template: melee, spell: heroicStrike}
+  - {template: melee, spell: sunderArmor}
+  - {template: interrupt, spell: pummel}
+  - {template: interrupt, spell: shieldBash}
+  - {template: focus, spell: disarm}
+Paladin:
+  - {template: help, spell: holyLight}
+  - {template: help, spell: flashOfLight}
+  - {template: help, spell: blessingOfMight}
+  - {template: help, spell: purify}
+  - {template: focus, spell: hammerOfJustice}
+  - {template: melee, spell: holyStrike}
+Hunter:
+  - {template: melee, spell: raptorStrike}
+  - {template: focus, spell: concussiveShot}
+  - {template: focus, spell: huntersMark}
+  - {template: focus, spell: wingClip}
+Rogue:
+  - {template: melee, spell: sinisterStrike}
+  - {template: interrupt, spell: kick}
+  - {template: focus, spell: sap}
+  - {template: focus, spell: gouge}
+  - {template: focus, spell: blind}
+Priest:
+  - {template: help, spell: powerWordShield}
+  - {template: help, spell: renew}
+  - {template: help, spell: flashHeal}
+  - {template: help, spell: powerWordFortitude}
+  - {template: help, spell: dispelMagic}
+  - {template: focus, spell: shackleUndead}
+Shaman:
+  - {template: help, spell: healingWave}
+  - {template: help, spell: lesserHealingWave}
+  - {template: interrupt, spell: earthShock}
+  - {template: focus, spell: purge}
+Mage:
+  - {template: help, spell: arcaneIntellect}
+  - {template: help, spell: removeLesserCurse}
+  - {template: focus, spell: polymorph}
+  - {template: interrupt, spell: counterspell}
+Warlock:
+  - {template: focus, spell: fear}
+  - {template: focus, spell: banish}
+  - {template: focus, spell: deathCoil}
+Druid:
+  - {template: help, spell: rejuvenation}
+  - {template: help, spell: regrowth}
+  - {template: help, spell: healingTouch}
+  - {template: help, spell: markOfTheWild}
+  - {template: focus, spell: entanglingRoots}
+  - {template: focus, spell: hibernate}

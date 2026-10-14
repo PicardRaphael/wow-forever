@@ -38,6 +38,7 @@ def test_forever_logger_toc_is_repaired():
         ("file_alias.lua", 2, "alias local de ForeverLoggerDB"),
         ("bare_register.lua", 3, "RegisterEvent sans pcall"),
         ("cast_spell.lua", 3, "fonction interdite CastSpellByName"),
+        ("create_macro.lua", 3, "fonction interdite CreateMacro"),  # EX1 : macros importées par le joueur seulement
         ("combat_log.lua", 3, "COMBAT_LOG_EVENT_UNFILTERED"),
         ("init_at_file_level.lua", 2, "hors d'une fonction"),
     ],

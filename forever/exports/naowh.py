@@ -75,3 +75,19 @@ def read_naowh_build(text: str) -> NaowhBuild:
         spec=build_text(spec) if isinstance(spec, str) else "",
         points=_check_points(points),
     )
+
+
+MACRO_PREFIX = "!NFM1!"
+MACRO_VERSION = 1
+MACRO_NAME_MAX = 16  # octets du nom (`C.NAME_MAX` de NaowhForever_Macros)
+MACRO_BODY_MAX = 255  # octets du corps (`C.LIMIT`)
+
+
+def naowh_macros(macros: Sequence[tuple[str, str]]) -> str:
+    """Chaîne `!NFM1!` de macros `(nom, corps)` ; `ExportFormatError` si une seule est hors bornes (Naowh rejette
+    alors toute la chaîne)."""
+    raise NotImplementedError
+
+
+def read_naowh_macros(text: str) -> list[tuple[str, str]]:
+    raise NotImplementedError
