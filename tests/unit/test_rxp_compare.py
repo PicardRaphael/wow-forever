@@ -11,13 +11,13 @@ import shutil
 
 import pytest
 from conftest import FIXTURES
-from forever.rxp_guides import Who, applies, coverage, guide_chain, read_rxp_guides
 from test_engine_route import CAP, make_world, start_state
 
 from forever.cli import main
 from forever.compare import replay_rxp
 from forever.errors import InvalidArgumentError
 from forever.provenance import validate_provenance
+from forever.rxp_guides import Who, applies, coverage, guide_chain, read_rxp_guides
 
 ADDONS = FIXTURES / "rxp_guides"
 ORC_MAGE = Who("Mage", "Orc", "Horde")

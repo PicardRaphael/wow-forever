@@ -74,7 +74,7 @@ def test_unknown_base_in_the_profile_is_refused_with_the_list(deps):
     set_character(deps, WHO, cls="Mage", ellesmere_base="Inconnu")
     with pytest.raises(InvalidArgumentError) as err:
         ellesmere_export(deps, WHO, REALM, "Mage", 19, "dps")
-    assert "Inconnu" in err.value.message and "Autre" in err.value.hint
+    assert "Inconnu" in err.value.message and "Autre" in err.value.action
 
 
 def test_context_key_is_part_of_the_protocol():
@@ -106,9 +106,7 @@ def test_exports_button_with_an_unknown_base_lists_the_profiles(deps):
     text, links = exports_reply(deps, {**CONTEXT, "role": "dps", "eui_base": "Inconnu"}, [])
     assert not any(link["kind"] == "ellesmere" for link in links)
     assert "Inconnu" in text and "Autre" in text
-    assert read_profile(deps, WHO)["character"] is None or read_profile(deps, WHO)["character"].get(
-        "ellesmere_base"
-    ) in (None, "")
+    assert WHO not in read_profile(deps)["characters"]
 
 
 def test_cli_profile_set_and_export(deps, capsys):
