@@ -1,0 +1,79 @@
+# Sorts d'un rôle par classe pour les profils EllesmereUI (EX1, bloc F, décision 267) : clés de sorts de classes.json
+# seulement, aucun chiffre. Rôles tenus par chaque classe : table des spécialisations de docs/SPEC.md.
+# cooldowns et utility : barres du gestionnaire de recharges (un sort n'y entre que s'il a une recharge plus longue
+# que le temps de recharge global de son rang) ; buffs : rappels de buffs (customIDs). Un sort n'est rendu que s'il
+# est appris au niveau (rangs de classes.json ; sort de talent : seulement si le talent est pris).
+# Choix de catalogue : certitude suppose.
+Warrior:
+  dps:
+    cooldowns: [recklessness, deathWish, sweepingStrikes, bloodrage, berserkerRage]
+    utility: [charge, intercept, intimidatingShout, pummel, disarm]
+    buffs: [battleShout]
+  tank:
+    cooldowns: [shieldWall, lastStand, shieldBlock, challengingShout, bloodrage]
+    utility: [taunt, mockingBlow, shieldBash, disarm, intimidatingShout]
+    buffs: [battleShout]
+Paladin:
+  heal:
+    cooldowns: [divineFavor, holyShock, layOnHands, divineProtection, divineShield]
+    utility: [hammerOfJustice, blessingOfProtection, blessingOfFreedom, divineIntervention]
+    buffs: [blessingOfWisdom, blessingOfKings, concentrationAura, devotionAura]
+  tank:
+    cooldowns: [holyShield, consecration, layOnHands, divineProtection]
+    utility: [hammerOfJustice, blessingOfFreedom, blessingOfProtection]
+    buffs: [righteousFury, devotionAura, blessingOfKings]
+  dps:
+    cooldowns: [judgement, consecration, exorcism, hammerOfWrath, holyWrath]
+    utility: [hammerOfJustice, divineShield, layOnHands, blessingOfFreedom]
+    buffs: [blessingOfMight, retributionAura, sealOfRighteousness]
+Hunter:
+  dps:
+    cooldowns: [rapidFire, aimedShot, arcaneShot, multiShot, bestialWrath, intimidation]
+    utility: [feignDeath, disengage, freezingTrap, scatterShot, deterrence, concussiveShot]
+    buffs: [aspectOfTheHawk, trueshotAura]
+Rogue:
+  dps:
+    cooldowns: [sprint, evasion, bladeFlurry, kidneyShot, preparation]
+    utility: [kick, gouge, blind, vanish]
+    buffs: []
+Priest:
+  heal:
+    cooldowns: [powerInfusion, innerFocus, desperatePrayer, fade]
+    utility: [psychicScream, fearWard]
+    buffs: [powerWordFortitude, divineSpirit, innerFire]
+  dps:
+    cooldowns: [mindBlast, vampiricEmbrace, silence, psychicScream]
+    utility: [fade, desperatePrayer]
+    buffs: [powerWordFortitude, innerFire]
+Shaman:
+  dps:
+    cooldowns: [earthShock, flameShock, frostShock, stormstrike, chainLightning]
+    utility: [groundingTotem, earthbindTotem]
+    buffs: [lightningShield]
+  heal:
+    cooldowns: [naturesSwiftness, manaTideTotem, earthShock]
+    utility: [groundingTotem, earthbindTotem]
+    buffs: [lightningShield]
+Mage:
+  dps:
+    cooldowns: [fireBlast, frostNova, coneOfCold, blastWave, combustion, presenceOfMind, arcanePower, coldSnap]
+    utility: [counterspell, blink, iceBlock, iceBarrier, evocation, frostWard, fireWard]
+    buffs: [arcaneIntellect, frostArmor, iceArmor, mageArmor]
+Warlock:
+  dps:
+    cooldowns: [shadowburn, conflagrate, soulFire]
+    utility: [deathCoil, howlOfTerror]
+    buffs: [demonSkin, demonArmor]
+Druid:
+  dps:
+    cooldowns: [barkskin, naturesGrasp]
+    utility: [rebirth, dash]
+    buffs: [markOfTheWild, thorns, omenOfClarity]
+  tank:
+    cooldowns: [enrage, frenziedRegeneration, bash, challengingRoar, growl]
+    utility: [barkskin, dash, rebirth]
+    buffs: [markOfTheWild, thorns, omenOfClarity]
+  heal:
+    cooldowns: [naturesSwiftness, swiftmend, tranquility, barkskin]
+    utility: [rebirth]
+    buffs: [markOfTheWild, thorns, omenOfClarity]

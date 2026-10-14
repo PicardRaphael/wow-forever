@@ -1,0 +1,39 @@
+{
+  "source": "docs/SPEC.md, section « Classes, spécialisations et rôles » (décision 146), rôles tenus par chaque classe",
+  "roles": {
+    "Warrior": [
+      "dps",
+      "tank"
+    ],
+    "Paladin": [
+      "heal",
+      "tank",
+      "dps"
+    ],
+    "Hunter": [
+      "dps"
+    ],
+    "Rogue": [
+      "dps"
+    ],
+    "Priest": [
+      "heal",
+      "dps"
+    ],
+    "Shaman": [
+      "dps",
+      "heal"
+    ],
+    "Mage": [
+      "dps"
+    ],
+    "Warlock": [
+      "dps"
+    ],
+    "Druid": [
+      "dps",
+      "tank",
+      "heal"
+    ]
+  }
+}
