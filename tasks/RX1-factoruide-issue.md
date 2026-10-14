@@ -1,4 +1,4 @@
-# Issue proposée pour Factoruide (RX1, bloc G) — à envoyer seulement sur accord
+# Issue pour Factoruide (RX1, bloc G) — envoyée le 2026-10-14 sur accord : https://github.com/brouznouf/factoruide/issues/13
 
 Dépôt : https://github.com/brouznouf/factoruide (code MIT, lu à `f7da6da`). Texte en anglais, sans chiffre de jeu
 recopié de nos données (l'auteur relira ses propres sources).
