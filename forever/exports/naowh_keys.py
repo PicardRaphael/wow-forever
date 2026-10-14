@@ -4,6 +4,64 @@ des valeurs du jeu ; un test les compare à `tests/fixtures/exports/naowh_keys.j
 
 from __future__ import annotations
 
-SPEC_KEYS: tuple[str, ...] = ()
-STAT_KEYS: tuple[str, ...] = ()
-BIS_SLOTS: tuple[int, ...] = ()
+SPEC_KEYS: tuple[str, ...] = (
+    "balance-druid",
+    "feral-dps-druid",
+    "feral-tank-druid",
+    "restoration-druid",
+    "beast-mastery-hunter",
+    "marksmanship-hunter",
+    "survival-hunter",
+    "arcane-mage",
+    "fire-mage",
+    "frost-mage",
+    "holy-paladin",
+    "protection-paladin",
+    "retribution-paladin",
+    "discipline-priest",
+    "holy-priest",
+    "shadow-priest",
+    "assassination-rogue",
+    "combat-rogue",
+    "subtlety-rogue",
+    "elemental-shaman",
+    "enhancement-shaman",
+    "restoration-shaman",
+    "affliction-warlock",
+    "demonology-warlock",
+    "destruction-warlock",
+    "arms-warrior",
+    "fury-warrior",
+    "protection-warrior",
+)
+STAT_KEYS: tuple[str, ...] = (
+    "str",
+    "agi",
+    "sta",
+    "int",
+    "spi",
+    "ap",
+    "rap",
+    "dps",
+    "hit",
+    "crit",
+    "haste",
+    "spell",
+    "heal",
+    "shit",
+    "scrit",
+    "mp5",
+    "fire",
+    "frost",
+    "shadow",
+    "nature",
+    "arcane",
+    "holy",
+    "def",
+    "dodge",
+    "block",
+    "armor",
+    "threat",
+)
+# Emplacements d'inventaire d'une liste BiS, dans l'ordre de l'addon (`GEAR_SLOTS` : pas de chemise).
+BIS_SLOTS: tuple[int, ...] = (1, 2, 3, 15, 5, 9, 10, 6, 7, 8, 11, 12, 13, 14, 16, 17, 18)

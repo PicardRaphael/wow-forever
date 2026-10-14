@@ -10,17 +10,21 @@ from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.exports.codec import ExportFormatError
 
-KNOWN_PREFIXES = ("!NFB1!", "!NFM1!")
+KNOWN_PREFIXES = ("!NFB1!", "!NFM1!", "!NBIS1!", "NFSW1:")
 
 
 def read_export(deps: Deps, text: str) -> dict[str, Any]:
     """Contenu d'une chaîne d'export ; `InvalidArgumentError` en français si elle est illisible ou inconnue."""
     from forever.exports.naowh import (
+        BIS_PREFIX,
         BUILD_PREFIX,
         MACRO_PREFIX,
         NAOWH_VERSION,
+        WEIGHTS_PREFIX,
+        read_naowh_bis,
         read_naowh_build,
         read_naowh_macros,
+        read_naowh_weights,
     )
     from forever.gamedata import build_game_data
     from forever.provenance import local_provenance
@@ -50,6 +54,26 @@ def read_export(deps: Deps, text: str) -> dict[str, Any]:
                 "order": order,
                 "unknown_nodes": unknown,
                 "provenance": local_provenance(deps, certainty="probable", assumptions=notes),
+            }
+        if body.startswith(BIS_PREFIX):
+            bis = read_naowh_bis(body)
+            note = f"chaîne !NBIS1! relue (format de Naowh Forever {NAOWH_VERSION}, v=4)"
+            return {
+                "kind": "naowh_bis",
+                "name": bis.name,
+                "spec": bis.spec,
+                "slots": dict(bis.slots),
+                "extra": {slot: list(ids) for slot, ids in bis.extra.items()},
+                "provenance": local_provenance(deps, certainty="probable", assumptions=[note]),
+            }
+        if body.startswith(WEIGHTS_PREFIX + ":"):
+            spec, weights = read_naowh_weights(body)
+            note = f"ligne NFSW1: relue (format de Naowh Forever {NAOWH_VERSION})"
+            return {
+                "kind": "naowh_weights",
+                "spec": spec,
+                "weights": weights,
+                "provenance": local_provenance(deps, certainty="probable", assumptions=[note]),
             }
         if body.startswith(MACRO_PREFIX):
             macros = read_naowh_macros(body)

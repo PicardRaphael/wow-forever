@@ -7,6 +7,7 @@ bornes lève une erreur nommée, jamais une chaîne que Naowh rejetterait."""
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -146,17 +147,115 @@ class NaowhBis:
     extra: dict[int, tuple[int, ...]]
 
 
+def _item_id(value: Any) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or not 0 < value < BIS_MAX_ID:
+        raise ExportFormatError(f"identifiant d'objet invalide : {value!r}")
+    return value
+
+
+def _bis_slot(slot: Any) -> int:
+    from forever.exports.naowh_keys import BIS_SLOTS
+
+    if isinstance(slot, bool) or not isinstance(slot, int) or slot not in BIS_SLOTS:
+        raise ExportFormatError(f"emplacement {slot!r} hors de la liste BiS de Naowh")
+    return slot
+
+
+def _spec_key(spec: Any) -> str:
+    from forever.exports.naowh_keys import SPEC_KEYS
+
+    if spec not in SPEC_KEYS:
+        raise ExportFormatError(f"spécialisation « {spec} » inconnue de Naowh Forever")
+    return str(spec)
+
+
 def naowh_bis(name: str, spec: str, slots: Mapping[int, int], extra: Mapping[int, Sequence[int]]) -> str:
-    raise NotImplementedError
+    """Chaîne `!NBIS1!` (v=4, liste ordonnée) : objet par emplacement d'inventaire et objets de repli dans l'ordre ;
+    emplacement hors liste (dont la chemise), identifiant invalide ou spécialisation inconnue : `ExportFormatError`.
+    Remplie par T10a seulement (EX1 prépare le format)."""
+    table = {
+        "v": BIS_VERSION,
+        "name": build_text(name),
+        "spec": _spec_key(spec),
+        "slots": {_bis_slot(s): _item_id(i) for s, i in slots.items()},
+        "extra": {_bis_slot(s): [_item_id(i) for i in ids] for s, ids in extra.items()},
+    }
+    return pack(BIS_PREFIX, table)
+
+
+def _indexed(value: Any) -> dict[Any, Any]:
+    """Table relue : `list` (clés 1..n) ou `dict`."""
+    if isinstance(value, list):
+        return dict(enumerate(value, 1))
+    if isinstance(value, dict):
+        return value
+    raise ExportFormatError("table attendue")
 
 
 def read_naowh_bis(text: str) -> NaowhBis:
-    raise NotImplementedError
+    """Liste BiS relue d'une chaîne `!NBIS1!` en v=4 ; toute autre version est refusée (forever n'écrit que v=4)."""
+    data = unpack(BIS_PREFIX, text, NAOWH_LIMITS)
+    if not isinstance(data, dict) or data.get("v") != BIS_VERSION:
+        raise ExportFormatError(f"liste BiS de version inconnue (attendu v={BIS_VERSION})")
+    name, spec = data.get("name"), data.get("spec")
+    slots = {_bis_slot(s): _item_id(i) for s, i in _indexed(data.get("slots")).items()}
+    extra_raw = data.get("extra")
+    extra = (
+        {_bis_slot(s): tuple(_item_id(i) for i in _indexed(ids).values()) for s, ids in _indexed(extra_raw).items()}
+        if extra_raw is not None
+        else {}
+    )
+    return NaowhBis(
+        name=build_text(name) if isinstance(name, str) else "",
+        spec=str(spec) if isinstance(spec, str) else "",
+        slots=slots,
+        extra=extra,
+    )
+
+
+def _weight_text(value: Any) -> str:
+    if isinstance(value, bool) or not isinstance(value, int | float):
+        raise ExportFormatError(f"poids illisible : {value!r}")
+    if not math.isfinite(value) or value < 0 or value >= WEIGHTS_MAX:
+        raise ExportFormatError(f"poids {value!r} hors de [0, {WEIGHTS_MAX}[")
+    text = f"{float(value):.6f}".rstrip("0").rstrip(".")
+    return text or "0"
 
 
 def naowh_weights(spec_key: str, weights: Mapping[str, float]) -> str:
-    raise NotImplementedError
+    """Ligne `NFSW1:<spécialisation>:<stat>=<poids>,…` (texte clair) : poids en chiffres et point seulement (jamais
+    de notation `e`), dans [0, 1000[, clés de statistiques de Naowh ; remplie par T10a seulement."""
+    from forever.exports.naowh_keys import STAT_KEYS
+
+    key = _spec_key(spec_key)
+    parts = []
+    for stat in STAT_KEYS:
+        if stat in weights:
+            parts.append(f"{stat}={_weight_text(weights[stat])}")
+    unknown = sorted(set(weights) - set(STAT_KEYS))
+    if unknown:
+        raise ExportFormatError(f"statistique inconnue de Naowh Forever : {', '.join(unknown)}")
+    return f"{WEIGHTS_PREFIX}:{key}:{','.join(parts)}"
 
 
 def read_naowh_weights(text: str) -> tuple[str, dict[str, float]]:
-    raise NotImplementedError
+    """(spécialisation, poids) d'une ligne `NFSW1:` ; refus d'une clé, d'une statistique ou d'un poids illisibles."""
+    from forever.exports.naowh_keys import STAT_KEYS
+
+    match = re.fullmatch(r"\s*" + WEIGHTS_PREFIX + r":([A-Za-z0-9-]+):([A-Za-z0-9=.,-]*)\s*", text)
+    if match is None:
+        raise ExportFormatError("ligne qui n'est pas une ligne de poids NFSW1")
+    key = _spec_key(match.group(1))
+    out: dict[str, float] = {}
+    for part in filter(None, match.group(2).split(",")):
+        found = re.fullmatch(r"([A-Za-z0-9]+)=([0-9.]+)", part)
+        if found is None or found.group(1) not in STAT_KEYS:
+            raise ExportFormatError(f"poids illisible : {part}")
+        try:
+            value = float(found.group(2))
+        except ValueError:
+            raise ExportFormatError(f"poids illisible : {part}") from None
+        if value >= WEIGHTS_MAX:
+            raise ExportFormatError(f"poids {part} au-delà de {WEIGHTS_MAX}")
+        out[found.group(1)] = value
+    return key, out
