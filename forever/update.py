@@ -521,6 +521,23 @@ def _build_number(version: str) -> str:
 
 
 def _step_archive(run: _Run) -> Step:
+    step = _archive_client(run)
+    if not run.options.auto or run.options.dry_run:
+        return step
+    # LN1 (décision 271) : sauvegarde du jour au passage automatique (tâche de 08:00, passages du pont), jeu fermé
+    from forever.backup import daily
+
+    try:
+        made = daily(run.deps, run.deps.now())
+    except (OSError, ValueError) as exc:
+        return step._replace(detail=f"{step.detail} ; sauvegarde du jour en échec : {exc}")
+    if made is None:
+        return step
+    data = {**step.data, "backup": str(made)}
+    return step._replace(status="fait", detail=f"{step.detail} ; sauvegarde du jour : {made}", data=data)
+
+
+def _archive_client(run: _Run) -> Step:
     from forever.archive import archive_client_files
 
     if run.deps.wow_dir is None or not run.deps.wow_dir.is_dir():

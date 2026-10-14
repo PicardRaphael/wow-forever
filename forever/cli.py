@@ -23,6 +23,10 @@ from typing import Any, NoReturn, cast
 from forever import registry
 from forever.addons import addons_status
 from forever.addons import inventory as addons_inventory
+from forever.backup import KINDS as BACKUP_KINDS
+from forever.backup import default_root as default_backup_root
+from forever.backup import list_backups, make_backup, manifest_of
+from forever.backup import restore as restore_backup
 from forever.build import CONTEXTS, build_report
 from forever.chart import leveling_chart
 from forever.config import CHAIN_MAX_GAP_S, FETCH_TIMEOUT, Deps, default_deps
@@ -903,6 +907,22 @@ def build_parser() -> argparse.ArgumentParser:
         "measure", parents=[pets_common], help="relevés du familier de ForeverLogger comparés au client (hors ligne)"
     )
     pets_measure.add_argument("--addon-sv", required=True, help="SavedVariables ForeverLogger.lua")
+
+    backup = sub.add_parser("backup", help="sauvegarder ce qui n'est pas sur GitHub ; list, restore (LN1)")
+    backup.add_argument("--reason", default="à la main", help="raison notée dans la sauvegarde")
+    backup.add_argument("--json", action="store_true", help="sortie JSON")
+    backup_sub = backup.add_subparsers(dest="backup_command", required=False, parser_class=_Parser)
+    bk_list = backup_sub.add_parser("list", help="sauvegardes gardées (14 au plus)")
+    bk_list.add_argument("--json", action="store_true", help="sortie JSON")
+    bk_restore = backup_sub.add_parser(
+        "restore", help="restaurer une sauvegarde, jeu fermé (la plus récente par défaut)"
+    )
+    bk_restore.add_argument("stamp", nargs="?", help="sauvegarde (AAAA-MM-JJTHHMMSS, voir forever backup list)")
+    bk_restore.add_argument(
+        "--only", action="append", choices=list(BACKUP_KINDS), help="seulement ce contenu (répétable)"
+    )
+    bk_restore.add_argument("--yes", action="store_true", help="accord donné d'avance")
+    bk_restore.add_argument("--json", action="store_true", help="sortie JSON")
 
     wow = sub.add_parser("wow", help="installations du client sur ce poste : découverte, choix, adoption (LN1)")
     wow_sub = wow.add_subparsers(dest="wow_command", required=True, parser_class=_Parser)
@@ -4634,6 +4654,42 @@ def _cmd_wow(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_backup(deps: Deps, args: argparse.Namespace) -> int:
+    root, warning = default_backup_root(deps)
+    provenance = local_provenance(deps, assumptions=[warning] if warning else [])
+    if args.backup_command == "list":
+        found = list_backups(root)
+        lines = [f"Sauvegardes dans {root} : {len(found)}"]
+        lines += [f"  {b.stamp} · {b.reason} · {b.files} fichier(s)" for b in found]
+        if warning:
+            lines.append(f"Attention : {warning}")
+        payload: dict[str, Any] = {"root": str(root), "backups": [b.as_dict() for b in found], "warning": warning}
+        _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.backup_command == "restore":
+        only = frozenset(args.only or ())
+        plan = restore_backup(deps, args.stamp, only=only, confirm=False, root=root)
+        prompt = f"Restaurer {plan.stamp} ({len(plan.written)} fichier(s) écrasé(s), état courant sauvegardé) ? [o/N] "
+        if not args.yes and (deps.confirm is None or not deps.confirm(prompt)):
+            raise InvalidArgumentError(
+                f"Restauration de {plan.stamp} non confirmée : rien n'est écrit ({len(plan.written)} fichier(s)).",
+                "relancer avec --yes, jeu fermé",
+            )
+        plan = restore_backup(deps, args.stamp, only=only, confirm=True, root=root)
+        lines = [f"Restauré : {plan.stamp} ({len(plan.written)} fichier(s)) ; état précédent gardé dans {plan.before}"]
+        lines += [f"  laissé de côté : {s}" for s in plan.skipped]
+        _emit({**plan.as_dict(), "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    path = make_backup(deps, deps.now(), reason=args.reason, root=root)
+    files = manifest_of(path)["files"]
+    lines = [f"Sauvegarde faite : {path} ({len(files)} fichier(s))"]
+    if warning:
+        lines.append(f"Attention : {warning}")
+    payload = {"path": str(path), "files": len(files), "warning": warning}
+    _emit({**payload, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_wow_adopt(deps: Deps, args: argparse.Namespace) -> int:
     folder = Path(args.folder)
     if not folder.is_dir():
@@ -4649,8 +4705,14 @@ def _cmd_wow_adopt(deps: Deps, args: argparse.Namespace) -> int:
     asked = install.product is not None and install.role == "unknown" and not args.yes
     if asked and (deps.confirm is None or not deps.confirm(prompt)):
         raise InvalidArgumentError("Adoption non confirmée : rien n'est inscrit.", "relancer avec --yes")
+    notes = []
+    if install.role == "unknown" and install.product is not None:
+        try:  # LN1 : sauvegarde avant toute bascule d'installation
+            notes.append(f"sauvegarde faite avant : {make_backup(deps, deps.now(), reason='avant adoption')}")
+        except OSError as exc:
+            notes.append(f"sauvegarde avant adoption en échec : {exc}")
     entry = adopt_product(deps.cache_dir, install, deps.now())
-    provenance = local_provenance(deps)
+    provenance = local_provenance(deps, assumptions=notes)
     lines = [
         f"Adopté comme version finale : {entry['product']} ({entry['folder']})",
         "Ensuite : forever wow list, puis scripts/install_plugin.ps1 (FOREVER_WOW_DIR), voir docs/LANCEMENT.md",
@@ -4718,6 +4780,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "build": _cmd_build,
         "export": _cmd_export,
         "wow": _cmd_wow,
+        "backup": _cmd_backup,
     }
     try:
         return handlers[args.command](deps, args)
