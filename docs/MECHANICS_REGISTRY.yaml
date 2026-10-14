@@ -762,6 +762,8 @@ mechanics:
     sources:
       - "forever/engine/travel.py (ligne droite allongée du détour de route.travel, vols, pierre de foyer)"
     tests:
+      - tests/unit/test_travel_journeys.py::test_walk_through_the_network
+      - tests/unit/test_travel_journeys.py::test_walk_network_used_by_travel_time
       - tests/unit/test_engine_travel.py::test_straight_line_time
       - tests/unit/test_engine_travel.py::test_flight_used_when_known
       - tests/unit/test_engine_travel.py::test_flight_ignored_when_unknown
@@ -1857,6 +1859,9 @@ mechanics:
       - "recherche : code MIT de Factoruide (brouznouf/factoruide@f7da6da : plan/worth.rs, plan/construct.rs nearest_stop, plan/moves.rs, plan/search.rs), porté en sous-ensemble ; règles d'XP et de temps de forever, jamais celles de Factoruide"
       - "forever/data/1.60.1.70374/mechanics.json (route.search : journal, frais d'arrêt, poids de zone et part du farm repris de Factoruide, suppose ; essais et graine de la recherche)"
     tests:
+      - tests/unit/test_route_training.py::test_train_stop
+      - tests/unit/test_route_training.py::test_missed_training_is_infeasible
+      - tests/unit/test_route_training.py::test_plan_trains_in_time
       - tests/unit/test_engine_route.py::test_prerequisite_and_chain_checked
       - tests/unit/test_engine_route.py::test_exclusive_checked
       - tests/unit/test_engine_route.py::test_log_size_checked
@@ -1874,7 +1879,7 @@ mechanics:
       - tests/unit/test_optimize_route.py::test_route_provenance
     tolerance: null
     formule: "coût d'une route = somme des trajets (marche, vols connus) et des actions (frais d'arrêt de route.search, monstres × temps par monstre, durée d'un passage) jusqu'au niveau d'arrivée, farm final au niveau du joueur ; construction : arrêt possible le plus proche en temps × poids de sa sorte (poids de nearest_stop de Factoruide) × zone_stay hors de la zone courante ; amélioration : mouvement gardé s'il rend une route possible plus courte"
-    note: "bonus d'XP et repos non pris dans le calcul (rappels à part ; RouteState.rested non consommé) ; vols et pierre de foyer jamais pris dans une route réelle (vols connus et auberge inconnus, RTE3 ; recharge du foyer non modélisée) ; temps par monstre au niveau du joueur, monstres au niveau de la quête (quêtes rouges sous-estimées en temps) ; poids de nearest_stop écrits dans le code comme réglages portés de Factoruide ; angles morts : temps morts hors combat (manger, boire, morts, réparations, maître de classe : durée sous-estimée, de l'ordre de 10 à 25 %), objectifs de collecte et réapparition (tout objectif vaut le même nombre de monstres), changement de continent impossible avant le bloc F ; position de départ = donneur de la première quête et aucun vol connu (RTE3) ; objectif d'une quête au premier camp de Journeys, sinon au donneur, monstres par quête de leveling.objectives, niveau des monstres = niveau de la quête ; un donjon manqué par le farm final est signalé et refusé par l'optimiseur ; pas de tournoi, d'ALNS, de modèle de puissance, d'élites de quête ni de terrain (hors périmètre de RX1) ; écart avec les routes de Factoruide mesuré au bloc G (RTE1)"
+    note: "bonus d'XP et repos non pris dans le calcul (rappels à part ; RouteState.rested non consommé) ; vols et pierre de foyer jamais pris dans une route réelle (vols connus et auberge inconnus, RTE3 ; recharge du foyer non modélisée) ; temps par monstre au niveau du joueur, monstres au niveau de la quête (quêtes rouges sous-estimées en temps) ; poids de nearest_stop écrits dans le code comme réglages portés de Factoruide ; visites au maître de classe comptées depuis le bloc F (niveaux de Naowh Training, maîtres de Questie, au plus tard un niveau après ; gain de vitesse des nouveaux sorts non modélisé) ; angles morts : autres temps morts hors combat (manger, boire, morts, réparations : durée sous-estimée), objectifs de collecte et réapparition (tout objectif vaut le même nombre de monstres), changement de continent par les transports de Journeys depuis le bloc F ; position de départ = donneur de la première quête et aucun vol connu (RTE3) ; objectif d'une quête au premier camp de Journeys, sinon au donneur, monstres par quête de leveling.objectives, niveau des monstres = niveau de la quête ; un donjon manqué par le farm final est signalé et refusé par l'optimiseur ; pas de tournoi, d'ALNS, de modèle de puissance, d'élites de quête ni de terrain (hors périmètre de RX1) ; écart avec les routes de Factoruide mesuré au bloc G (RTE1)"
     angle_mort:
       talents: []
       contextes: [leveling]
@@ -1889,6 +1894,9 @@ mechanics:
       - "forever/data/1.60.1.70338/travel.json (tables TaxiNodes, TaxiPath, TaxiPathNode, UiMapAssignment du client ; existence et coût des vols certains, camp par les drapeaux probable)"
       - "durée d'un vol : longueur du client ÷ vitesse de route.travel (suppose, TRV1)"
     tests:
+      - tests/unit/test_travel_journeys.py::test_journeys_network_read
+      - tests/unit/test_travel_journeys.py::test_transports_follow_faction_and_direction
+      - tests/unit/test_travel_journeys.py::test_transport_leg_changes_continent
       - tests/unit/test_travel.py::test_travel_tables_decoded
       - tests/unit/test_travel.py::test_teleport_segment_is_excluded
       - tests/unit/test_travel.py::test_maps_decoded
@@ -1897,7 +1905,7 @@ mechanics:
       - tests/unit/test_engine_travel.py::test_map_to_world
       - tests/unit/test_engine_travel.py::test_flight_used_when_known
     tolerance: null
-    note: "conditions d'accès d'un point de vol (ConditionID) non lues ; 13 trajets vers un point absent de TaxiNodes écartés ; passages entre zones de Journeys (graphe compressé CBOR) et transports de Shortest Path Forever au bloc F"
+    note: "conditions d'accès d'un point de vol (ConditionID) non lues ; 13 trajets vers un point absent de TaxiNodes écartés ; bloc F : bateaux, zeppelins, portail et tram de Naowh Journeys lus en local (durée = attente au quai + longueur ÷ vitesse + embarquement + chargement, valeurs de l'addon, suppose) et réseau de marche de Journeys (graphe des passages, yards de marche) ; transports de Shortest Path Forever non lus (recoupement TRV2)"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

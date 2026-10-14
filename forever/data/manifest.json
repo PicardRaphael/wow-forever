@@ -182,8 +182,8 @@
     },
     "1.60.1.70338": {
       "collected_at": "2026-10-10",
-      "data_sha": "d5334af0f06f",
-      "data_sha256": "d5334af0f06f463cfbefd72264a2dc73cd8fa5d792de09c3ed93c6cea6fda762",
+      "data_sha": "e2975bb1fb2e",
+      "data_sha256": "e2975bb1fb2eb9801f3abec2f395ff673f23ae39bb2cc7842be9599ceaeba3ae",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -195,7 +195,7 @@
         "decode_rules.json": "9e46f3ac5ad46e212841782e59f8ddf9586c43ba44c7f3ba5f04ea269ab910d7",
         "dungeons.json": "2d9b95973e85c7b49b0edf919c3da830b011b63a664cbaffd6f2919e6c0729e8",
         "leveling.json": "3ab7c38b692291d7ca8ef1dbc6d6613a502a0175a45ea4ed403a9520a2c17227",
-        "mechanics.json": "03d5587f502d02786babfeeda9f80b93824c70154a181738e555d4d33c0125eb",
+        "mechanics.json": "43c874634300954cfe520dbd978b213c19d623f4b3773c4eb4eb772fe6a37a9a",
         "meta.json": "bdbf3991f825cded764796608370f6cf24ca7c5404a1f42123a4cd46e8cd0a9b",
         "monsters.json": "c4161b02e87a446dbe678d809619a9235f0b0c9c4c481e2b21df2cc6c9029aa1",
         "origins.json": "837d0ed925511f8fb62f8aa8ad37ee83859089299c8b7a22d10fe1f4ffecf751",
@@ -223,8 +223,8 @@
     },
     "1.60.1.70374": {
       "collected_at": "2026-10-14",
-      "data_sha": "22d3dff33d62",
-      "data_sha256": "22d3dff33d623959aa49e2edfbc6127d7021385602309ae48e9e545c3281a986",
+      "data_sha": "643f5d4aa256",
+      "data_sha256": "643f5d4aa256fd4c26dcbc1b13d17e998317cc77d16ecc1c908acecbe2ae09c9",
       "files": {
         "_seed_racials.json": "3a7daa39480e86fc4ef0492b03a79471074abf78e67e2d094c1b129ebf7b1f1d",
         "_seed_spells.json": "49272dc659d468dd340597258ccd2c5659283387d7c4ef77d1566ada7994be0d",
@@ -236,7 +236,7 @@
         "decode_rules.json": "de795d5e34525f55fdb41d0b5bcdd0a4e888c23d7f0f77f2ea37440738c9a1da",
         "dungeons.json": "fdaf68b48ec182d795e7086ce821951c4344c8448254ccb1ef11c30c74492a89",
         "leveling.json": "c577d82452a73fcdbc3a888d2c2f7f21927c927ba59dcf24808fc87b90e82dec",
-        "mechanics.json": "57ff655672be64486eac0fd83bbc85839dad103330787efbffee70bc588bfe63",
+        "mechanics.json": "eba46fd1a3febf714254418c4a0c13975416054edcd743fa443674adf06a5085",
         "meta.json": "035928294a01061cd1214bef1ce78104d1993aa6780977ad3bf5e4de918ac0e3",
         "monsters.json": "a0edd29d4bf077ac4e86ad3b6ba1a3f51cf5b53dee59e9c89aacc1219ae7c38c",
         "origins.json": "535c83ae7fa9f66fbccdf8e7cad9df5e1a42ee2d022ba66c982fbcb93b682e4e",

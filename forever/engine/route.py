@@ -31,7 +31,7 @@ from forever.engine.xp import (
     quest_xp,
 )
 
-STOP_KINDS = ("accept", "objective", "turnin", "dungeon", "dungeon_repeat", "grind")
+STOP_KINDS = ("accept", "objective", "turnin", "dungeon", "dungeon_repeat", "train", "grind")
 SEARCH_KEY = "route.search"
 
 
@@ -92,6 +92,8 @@ class RouteParams:
     seed: int
     zone_stay: float  # poids d'un arrêt hors de la zone courante dans la construction
     min_efficiency: float  # part du farm qu'une quête doit battre pour être prise
+    train_time_s: float = 0.0  # visite au maître de classe (bloc F)
+    train_max_delay: int = 0  # niveaux de retard permis pour l'entraînement
 
 
 @dataclass(frozen=True)
@@ -107,6 +109,8 @@ class RouteWorld:
     best_zone_xp_h: Callable[[int], float | None]
     bonuses: XpBonusState | None = None
     required: frozenset[int] = frozenset()  # quêtes imposées par le joueur (--include)
+    trainers: tuple[Point, ...] = ()  # maîtres de classe du camp (bloc F)
+    train_levels: tuple[int, ...] = ()  # niveaux où la classe apprend des sorts, dans la route
 
 
 @dataclass(frozen=True)
@@ -120,6 +124,7 @@ class RouteState:
     done: frozenset[int] = frozenset()
     dungeons_done: frozenset[str] = frozenset()
     rested: float = 0.0
+    trained: frozenset[int] = frozenset()  # niveaux d'entraînement faits
 
 
 @dataclass(frozen=True)
@@ -210,6 +215,12 @@ def check_stop(gd: GameData, world: RouteWorld, state: RouteState, stop: Stop) -
                 return "aucun objectif hors donjon"
             return "objectif déjà fait" if stop.ref in state.progressed else None
         return None if _ready(q, state) else "objectif non fait"
+    if stop.kind == "train" and isinstance(stop.ref, int):
+        if not world.trainers or stop.ref not in world.train_levels:
+            return "aucun entraînement à ce niveau"
+        if stop.ref > state.level:
+            return f"niveau {stop.ref} pas encore atteint"
+        return "entraînement déjà fait" if stop.ref in state.trained else None
     if stop.kind in ("dungeon", "dungeon_repeat") and isinstance(stop.ref, str):
         d = world.dungeons.get(stop.ref)
         if d is None:
@@ -237,10 +248,29 @@ def gain(gd: GameData, level: int, xp: float, gained: float, cap: int) -> tuple[
     return level, xp
 
 
+def nearest_trainer(world: RouteWorld, position: Point, level: int) -> tuple[Point, float]:
+    """Maître de classe le plus proche en temps et le trajet jusqu'à lui. Registre : I18"""
+    best = min(((t, world.travel(position, t, level)) for t in world.trainers), key=lambda x: x[1])
+    return best
+
+
+def missed_training(world: RouteWorld, before: RouteState, after: RouteState) -> int | None:
+    """Niveau d'entraînement atteint avant l'arrêt et dépassé de plus de `train_max_delay` niveaux sans visite au
+    maître (None sinon). Registre : I18"""
+    if not world.trainers:
+        return None
+    for level in world.train_levels:
+        if level not in after.trained and level <= before.level and after.level > level + world.params.train_max_delay:
+            return level
+    return None
+
+
 def _target(world: RouteWorld, state: RouteState, stop: Stop) -> tuple[Point, str]:
     if stop.kind in ("dungeon", "dungeon_repeat"):
         d = world.dungeons[str(stop.ref)]
         return d.entrance, d.certainty
+    if stop.kind == "train":
+        return nearest_trainer(world, state.position, state.level)[0], "suppose"
     q = world.quests[int(stop.ref)]
     place = {"accept": q.giver, "turnin": q.turn_in, "objective": q.objective or q.giver}[stop.kind]
     return place, q.certainty
@@ -256,7 +286,11 @@ def apply_stop(
     terms: tuple[Term, ...] = ()
     xp = 0.0
     log, progressed, done, dungeons_done = state.log, state.progressed, state.done, state.dungeons_done
-    if stop.kind == "accept":
+    trained = state.trained
+    if stop.kind == "train":
+        action = world.params.train_time_s
+        trained = trained | {lv for lv in world.train_levels if lv <= level}
+    elif stop.kind == "accept":
         action = world.params.stop_overhead_s
         log = log | {int(stop.ref)}
     elif stop.kind == "objective":
@@ -293,6 +327,7 @@ def apply_stop(
         done=done,
         dungeons_done=dungeons_done,
         rested=state.rested,
+        trained=trained,
     )
     return after, result
 
@@ -310,6 +345,10 @@ def _grind(
     """Farm au niveau du joueur jusqu'à `end_level` (monstres de même niveau, temps par monstre du niveau) ;
     un monstre sans XP rend le farm impossible (durée infinie). Registre : I18, I6"""
     level, xp, seconds, total = state.level, state.xp, 0.0, 0.0
+    if world.trainers:  # entraînements dus et non faits au début du farm
+        due = [lv for lv in world.train_levels if lv <= level and lv not in state.trained]
+        if due:
+            seconds += 2 * nearest_trainer(world, state.position, level)[1] + world.params.train_time_s
     terms: tuple[Term, ...] = ()
     missed = None
     while level < min(end_level, cap):
@@ -320,6 +359,9 @@ def _grind(
         total += need
         level, xp = level + 1, 0.0
         missed = missed or _missed(world, start, replace(state, level=level))
+        if world.trainers and level in world.train_levels and level not in state.trained:
+            # visite au maître pendant le farm : aller et retour depuis la position, temps de la visite
+            seconds += 2 * nearest_trainer(world, state.position, level)[1] + world.params.train_time_s
     certainty = weakest(*(t.certainty for t in terms))
     result = StopResult("grind", GRIND_REF, state.level, total, seconds, 0.0, terms, certainty)
     return replace(state, level=level, xp=xp, seconds=state.seconds + seconds), result, missed
@@ -346,12 +388,16 @@ def simulate(
             break
         reason = check_stop(gd, world, state, stop)
         if reason is None:
+            before = state
             state, result = apply_stop(gd, world, state, stop, cap=cap)
             if not math.isfinite(result.seconds):
                 reason = "trajet impossible"
             else:
                 results.append(result)
                 reason = _missed(world, start, state)
+                skipped = missed_training(world, before, state)
+                if reason is None and skipped is not None:
+                    reason = f"entraînement du niveau {skipped} manqué"
         if reason is not None:
             feasible = False
             warnings.append(f"{stop.kind} {stop.ref} : {reason}")

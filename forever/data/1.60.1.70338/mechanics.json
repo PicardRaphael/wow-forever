@@ -948,11 +948,13 @@
     "zone_stay": 4.0,
     "min_efficiency": 0.5,
     "tries": 300,
-    "seed": 1
+    "seed": 1,
+    "train_time_s": 30.0,
+    "train_max_delay": 1
    },
    "certainty": "suppose",
    "registry": "I18",
-   "source": "feuille de route (RX1, bloc C) : taille du journal de quêtes, frais fixes d'un arrêt (parler, ramasser, lire), poids d'un arrêt hors de la zone courante et part du farm qu'une quête doit battre, repris des paramètres par défaut de Factoruide (code MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs : quest_log_size « 40 on WoW Forever », stop_overhead 8 s, zone_stay 4, min_efficiency 0,5 ; lus le 2026-10-14, non sourcés par son auteur ; question RTE2) ; essais de l'amélioration locale et graine : réglages de la recherche, pas des valeurs du jeu"
+   "source": "feuille de route (RX1, bloc C) : taille du journal de quêtes, frais fixes d'un arrêt (parler, ramasser, lire), poids d'un arrêt hors de la zone courante et part du farm qu'une quête doit battre, repris des paramètres par défaut de Factoruide (code MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs : quest_log_size « 40 on WoW Forever », stop_overhead 8 s, zone_stay 4, min_efficiency 0,5, train_time 30 s, train_max_delay 1 niveau (visite au maître de classe, bloc F) ; lus le 2026-10-14, non sourcés par son auteur ; question RTE2) ; essais de l'amélioration locale et graine : réglages de la recherche, pas des valeurs du jeu"
   }
  },
  "inherited_from": "1.60.1.70291"

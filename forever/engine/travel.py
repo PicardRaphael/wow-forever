@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import heapq
 import math
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from collections.abc import Set as AbstractSet
 from typing import Any, NamedTuple
 
@@ -161,6 +161,18 @@ def _flights(graph: Graph, start: int, known: AbstractSet[int], params: TravelPa
     return best
 
 
+def _walk_s(
+    a: Point, b: Point, params: TravelParams, level: int, walk: Callable[[Point, Point], float] | None
+) -> float:
+    """Secondes à pied : réseau de marche (`walk`, yards) s'il est donné, sinon ligne droite allongée."""
+    if a.continent != b.continent:
+        return math.inf
+    if walk is None:
+        return walk_seconds(a, b, params, level)
+    yards = walk(a, b)
+    return yards / run_speed(params, level) if math.isfinite(yards) else walk_seconds(a, b, params, level)
+
+
 def travel_time(
     graph: Graph,
     a: Point,
@@ -170,66 +182,119 @@ def travel_time(
     level: int,
     flights_known: AbstractSet[int],
     hearth: Point | None = None,
+    walk: Callable[[Point, Point], float] | None = None,
 ) -> Leg:
-    """Trajet le plus court de `a` à `b` : à pied, par vols entre points connus, ou par la pierre de foyer (`hearth` :
-    position de l'auberge liée, None si la pierre n'est pas disponible). Registre : C6, I19"""
-    walk = walk_seconds(a, b, params, level)
-    best = (
-        Leg(walk, [{"kind": "walk", "seconds": walk}], CERTAINTY)
-        if math.isfinite(walk)
-        else Leg(math.inf, [], CERTAINTY)
-    )
+    """Trajet le plus court de `a` à `b` (Dijkstra sur les points utiles : départ, arrivée, points de vol connus,
+    quais et extrémités des transports) : marche (réseau `walk` en yards, sinon ligne droite allongée), vols entre
+    points connus, transports (bateaux, zeppelins, portails, tram), pierre de foyer depuis le départ (`hearth` :
+    auberge liée, None si indisponible). Registre : C6, I19"""
+    hubs: list[Point] = [a, b]
+    flight_hub: dict[int, int] = {}
+    for node in sorted(n for n in flights_known if n in graph.nodes):
+        flight_hub[node] = len(hubs)
+        hubs.append(graph.nodes[node].point)
+    ride: dict[int, list[tuple[int, float, Transport]]] = {}
+    for t in graph.transports:
+        ia, ib = len(hubs), len(hubs) + 1
+        hubs += [t.a, t.b]
+        ride.setdefault(ia, []).append((ib, t.seconds, t))
+    fly: dict[int, list[tuple[int, float, int, int]]] = {}
+    for start, i in flight_hub.items():
+        for end, (seconds, _) in _flights(graph, start, flights_known, params).items():
+            if end != start and end in flight_hub:
+                fly.setdefault(i, []).append((flight_hub[end], seconds, start, end))
+    best: dict[int, float] = {0: 0.0}
+    prev: dict[int, tuple[int, dict[str, Any]]] = {}
+    queue: list[tuple[float, int]] = [(0.0, 0)]
     if hearth is not None:
-        after = walk_seconds(hearth, b, params, level)
-        total = params.hearth_cast + after
-        if total < best.seconds:
-            best = Leg(
-                total,
-                [{"kind": "hearth", "seconds": params.hearth_cast}, {"kind": "walk", "seconds": after}],
-                CERTAINTY,
-            )
-    known = [n for n in flights_known if n in graph.nodes]
-    for start in known:
-        to_start = walk_seconds(a, graph.nodes[start].point, params, level)
-        if not math.isfinite(to_start) or to_start >= best.seconds:
+        hubs.append(hearth)
+        best[len(hubs) - 1] = params.hearth_cast
+        prev[len(hubs) - 1] = (0, {"kind": "hearth", "seconds": params.hearth_cast})
+        heapq.heappush(queue, (params.hearth_cast, len(hubs) - 1))
+    while queue:
+        cost, u = heapq.heappop(queue)
+        if cost > best.get(u, math.inf) or u == 1:
             continue
-        reached = _flights(graph, start, flights_known, params)
-        for end, (flown, _) in reached.items():
-            if end == start:
-                continue
-            after = walk_seconds(graph.nodes[end].point, b, params, level)
-            total = to_start + flown + after
-            if total < best.seconds:
-                best = Leg(
-                    total,
-                    [
-                        {"kind": "walk", "seconds": to_start, "to_node": start},
-                        {"kind": "fly", "seconds": flown, "from": start, "to": end},
-                        {"kind": "walk", "seconds": after, "from_node": end},
-                    ],
-                    CERTAINTY,
-                )
-    return best
+        moves: list[tuple[int, float, dict[str, Any]]] = []
+        for v, point in enumerate(hubs):
+            if v != u and point.continent == hubs[u].continent:
+                s = _walk_s(hubs[u], point, params, level, walk)
+                moves.append((v, s, {"kind": "walk", "seconds": s}))
+        for v, s, t in ride.get(u, []):
+            moves.append((v, s, {"kind": "ride", "seconds": s, "transport": t.kind}))
+        for v, s, start, end in fly.get(u, []):
+            moves.append((v, s, {"kind": "fly", "seconds": s, "from": start, "to": end}))
+        for v, s, leg in moves:
+            total = cost + s
+            if total < best.get(v, math.inf):
+                best[v] = total
+                prev[v] = (u, leg)
+                heapq.heappush(queue, (total, v))
+    if 1 not in best:
+        return Leg(math.inf, [], CERTAINTY)
+    legs: list[dict[str, Any]] = []
+    node = 1
+    while node != 0:
+        node, leg = prev[node]
+        legs.append(leg)
+    legs.reverse()
+    merged: list[dict[str, Any]] = []
+    for leg in legs:  # deux marches de suite (passage par un point sans s'y arrêter) : une seule
+        if merged and leg["kind"] == "walk" and merged[-1]["kind"] == "walk":
+            merged[-1] = {"kind": "walk", "seconds": merged[-1]["seconds"] + leg["seconds"]}
+        else:
+            merged.append(leg)
+    return Leg(best[1], merged, CERTAINTY)
 
 
 def ride_seconds(wait: float, length: float, speed: float, board_s: float, loading_s: float) -> float:
     """Durée d'un trajet de bateau ou de zeppelin : attente au quai, traversée, embarquement et chargement.
     Registre : I19"""
-    raise NotImplementedError
+    return wait + length / speed + board_s + loading_s
 
 
 def nearest_node(net: WalkNet, p: Point) -> int | None:
     """Nœud du réseau le plus proche de `p` (même continent), None si le réseau est vide ou d'un autre continent."""
-    raise NotImplementedError
+    if p.continent != net.continent or not net.points:
+        return None
+    return min(range(len(net.points)), key=lambda i: (net.points[i][0] - p.x) ** 2 + (net.points[i][1] - p.y) ** 2)
 
 
 def node_distances(net: WalkNet, source: int) -> list[float]:
     """Yards de marche du nœud `source` vers chaque nœud (Dijkstra ; infini si inatteignable). Registre : C6"""
-    raise NotImplementedError
+    dist = [math.inf] * len(net.points)
+    dist[source] = 0.0
+    queue = [(0.0, source)]
+    while queue:
+        d, u = heapq.heappop(queue)
+        if d > dist[u]:
+            continue
+        for v, w in net.adj[u]:
+            if d + w < dist[v]:
+                dist[v] = d + w
+                heapq.heappush(queue, (d + w, v))
+    return dist
 
 
-def walk_yards(net: WalkNet, a: Point, b: Point, *, detour: float, distances: list[float] | None = None) -> float:
+def walk_yards(
+    net: WalkNet,
+    a: Point,
+    b: Point,
+    *,
+    detour: float,
+    distances: list[float] | None = None,
+    ends: tuple[int | None, int | None] | None = None,
+) -> float:
     """Yards à pied de `a` à `b` par le réseau : ligne droite jusqu'au nœud le plus proche de chaque point, puis le
     réseau ; même nœud des deux côtés : ligne droite allongée de `detour`. `distances` : distances déjà calculées
-    depuis le nœud de `a`. Registre : C6, I19"""
-    raise NotImplementedError
+    depuis le nœud de `a` ; `ends` : nœuds les plus proches déjà connus. Registre : C6, I19"""
+    na, nb = ends if ends is not None else (nearest_node(net, a), nearest_node(net, b))
+    if na is None or nb is None:
+        return math.inf
+    if na == nb:
+        return math.dist((a.x, a.y), (b.x, b.y)) * detour
+    dist = distances if distances is not None else node_distances(net, na)
+    through = dist[nb]
+    if not math.isfinite(through):
+        return math.inf
+    return math.dist((a.x, a.y), net.points[na]) + through + math.dist(net.points[nb], (b.x, b.y))

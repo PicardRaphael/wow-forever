@@ -24,6 +24,7 @@ from forever.engine.route import (
     Stop,
     apply_stop,
     check_stop,
+    missed_training,
     simulate,
 )
 from forever.engine.xp import QuestXpInput, gray_level, mob_kill_xp, quest_xp
@@ -35,6 +36,7 @@ TURNIN_WEIGHT = 0.7  # poids de nearest_stop (Factoruide, construct.rs) : rendre
 ACCEPT_WEIGHT = 1.3
 REPEAT_WEIGHT = 0.8
 DUNGEON_WEIGHT = 0.5  # premier passage d'un donjon placé (forcé chez Factoruide)
+TRAIN_WEIGHT = 0.7  # visite au maître de classe : pesée comme un rendu (réglage de forever)
 REQUIRED_WEIGHT = 0.1  # quête imposée par le joueur : prise en priorité (réglage de forever, pas de Factoruide)
 DUNGEON_QUEST_WEIGHT = 0.25  # quête d'un donjon proche en niveau (détour accepté)
 MOVES = 5  # déplacer un arrêt, un bloc, échanger deux arrêts, retirer une quête, en insérer une
@@ -133,19 +135,25 @@ def _candidates(gd: GameData, world: RouteWorld, state: RouteState) -> list[tupl
             weight = ACCEPT_WEIGHT * (DUNGEON_QUEST_WEIGHT if q.dungeon else 1.0)
             out.append((Stop("accept", q.id), weight * (REQUIRED_WEIGHT if q.id in world.required else 1.0)))
     out += [(Stop("dungeon_repeat", k), REPEAT_WEIGHT) for k in sorted(state.dungeons_done)]
+    due = [lv for lv in world.train_levels if lv <= state.level and lv not in state.trained]
+    if world.trainers and due:
+        out.append((Stop("train", due[-1]), TRAIN_WEIGHT))
     out = [(s, w) for s, w in out if check_stop(gd, world, state, s) is None]
     return out + [(s, DUNGEON_WEIGHT) for s in _dungeon_ready(gd, world, state)]
 
 
-def _misses(world: RouteWorld, start: RouteState, after: RouteState) -> bool:
-    """L'arrêt fait dépasser la fenêtre d'un donjon placé sans son premier passage."""
+def _misses(world: RouteWorld, start: RouteState, after: RouteState, before: RouteState | None = None) -> bool:
+    """L'arrêt fait dépasser la fenêtre d'un donjon placé sans son premier passage, ou le retard permis d'un
+    entraînement."""
+    if before is not None and missed_training(world, before, after) is not None:
+        return True
     return any(
         k not in after.dungeons_done and start.level <= d.levels[1] < after.level for k, d in world.dungeons.items()
     )
 
 
 def _zone(world: RouteWorld, stop: Stop) -> int | None:
-    if stop.kind in ("dungeon", "dungeon_repeat"):
+    if stop.kind in ("dungeon", "dungeon_repeat", "train"):
         return None
     return world.quests[int(stop.ref)].zone
 
@@ -169,7 +177,7 @@ def construct(gd: GameData, world: RouteWorld, start: RouteState, *, end_level: 
                 continue
             if stop.kind == "accept" and not _worth_it(gd, world, state, int(stop.ref), result.travel_s):
                 continue
-            if _misses(world, start, after):
+            if _misses(world, start, after, state):
                 continue
             if stop.kind == "dungeon_repeat" and (
                 result.seconds <= 0 or result.xp / result.seconds <= _grind_rate(gd, world, state.level)

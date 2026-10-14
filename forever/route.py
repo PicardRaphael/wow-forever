@@ -12,7 +12,7 @@ from typing import Any
 from forever.engine.model import GameData
 from forever.engine.xp import XpBonusState
 
-KINDS = ("goto", "accept", "turnin", "click", "use_item", "note", "complete", "dungeon", "xp")
+KINDS = ("goto", "accept", "turnin", "click", "use_item", "note", "complete", "dungeon", "xp", "train")
 SECONDS_PER_HOUR = 3600.0  # conversion d'unité
 FOOD_EXAMPLES = 3  # nourritures citées dans un rappel
 
@@ -252,6 +252,8 @@ def route_params(values: Any) -> Any:
         seed=int(raw["seed"]),
         zone_stay=float(raw["zone_stay"]),
         min_efficiency=float(raw["min_efficiency"]),
+        train_time_s=float(raw["train_time_s"]),
+        train_max_delay=int(raw["train_max_delay"]),
     )
 
 
@@ -351,6 +353,8 @@ def route_world(
     dungeons: Any,
     travel: Any,
     kill_seconds: Any,
+    trainers: Any = (),
+    train_levels: Any = (),
 ) -> tuple[Any, list[str]]:
     """Entrées du moteur de route (`RouteWorld`) tirées du livre des quêtes, des placements de donjon de DJ1 et des
     cartes de zone ; avertissements (quêtes écartées et pourquoi). Registre : I18"""
@@ -461,8 +465,21 @@ def route_world(
         kill_seconds=kill_seconds,
         best_zone_xp_h=best_zone,
         required=frozenset(q for q in request.include if q in quests),
+        trainers=_trainer_points(maps, trainers, request.faction),
+        train_levels=tuple(lv for lv in sorted(set(train_levels)) if request.start_level < lv < request.end_level),
     )
     return world, warnings
+
+
+def _trainer_points(maps: Any, trainers: Any, faction: str) -> tuple[Any, ...]:
+    """Positions monde des maîtres de classe amicaux pour le camp, sans doublon."""
+    side = {"horde": "H", "alliance": "A"}.get(faction, "")
+    out: list[Any] = []
+    for t in trainers:
+        point = _point(maps, {"map": t.ui_map, "x": t.x, "y": t.y}) if side in t.sides else None
+        if point is not None and point not in out:
+            out.append(point)
+    return tuple(out)
 
 
 def _place_of(book: Any, rows: dict[str, Any], kind: str, ref: Any) -> dict[str, Any]:
@@ -472,7 +489,7 @@ def _place_of(book: Any, rows: dict[str, Any], kind: str, ref: Any) -> dict[str,
         row = rows.get(str(ref)) or {}
         goto = next((s for s in row.get("steps") or [] if _step_kind(s) == "goto"), None)
         return _step_place(goto) if goto is not None else {}
-    if kind == "grind":
+    if kind in ("grind", "train"):
         return {}
     q = book.quests.get(ref)
     if q is None:
@@ -493,6 +510,7 @@ STEP_KIND = {
     "dungeon": "dungeon",
     "dungeon_repeat": "dungeon",
     "grind": "xp",
+    "train": "train",
 }
 STEP_VERB = {
     "accept": "prends",
@@ -500,6 +518,7 @@ STEP_VERB = {
     "turnin": "rends",
     "dungeon": "fais",
     "dungeon_repeat": "refais",
+    "train": "apprends tes nouveaux sorts chez",
 }
 
 
@@ -509,6 +528,8 @@ def _stop_payload(book: Any, rows: dict[str, Any], r: Any, *, end_level: int) ->
         name = (rows.get(str(r.ref)) or {}).get("name", str(r.ref))
     elif r.kind == "grind":
         name = None
+    elif r.kind == "train":
+        name = "ton maître de classe"
     else:
         q = book.quests.get(r.ref)
         name = (q or {}).get("name") or f"la quête {r.ref}"
@@ -577,11 +598,17 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     from forever.kill_time import kill_params, kill_time, load_kill_times
     from forever.leveling import check_level, level_cap
     from forever.optimize.route import plan
-    from forever.pipeline.questie import CLASS_MASKS
+    from forever.pipeline.questie import CLASS_IDS, CLASS_MASKS
+    from forever.pipeline.travel_sources import (
+        read_journeys_network,
+        read_journeys_walks,
+        read_questie_trainers,
+        read_training_levels,
+    )
     from forever.provenance import make_provenance
     from forever.quests import build_quests
     from forever.store import load_version
-    from forever.travel import load_travel
+    from forever.travel import WalkCache, load_travel, transports_from_network, walk_nets
 
     cls = request.class_name.strip().lower()
     if cls not in CLASS_MASKS:
@@ -612,8 +639,24 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
             kill_memo[level] = kill_time(kp, class_name=cls, level=level, measures=measures)
         return kill_memo[level]
 
+    addons = (wow_dir or deps.wow_dir) / "Interface" / "AddOns" if (wow_dir or deps.wow_dir) else None
+    network = read_journeys_network(addons) if addons else None
+    if network is not None:  # bateaux, zeppelins, portail et tram de Journeys (bloc F, suppose)
+        graph = graph._replace(transports=transports_from_network(network, request.faction))
+    nets = walk_nets(read_journeys_walks(addons)) if addons else {}
+    walker = WalkCache(nets, tp.detour) if nets else None
+    travel_memo: dict[tuple[Any, Any, int], float] = {}
+
     def travel(a: Any, b: Any, level: int) -> float:
-        return travel_time(graph, a, b, params=tp, level=level, flights_known=frozenset()).seconds
+        key = (a, b, int(level >= tp.mount_level))
+        if key not in travel_memo:
+            travel_memo[key] = travel_time(
+                graph, a, b, params=tp, level=level, flights_known=frozenset(), walk=walker
+            ).seconds
+        return travel_memo[key]
+
+    trainers = read_questie_trainers(addons, f"{cls.capitalize()} Trainer") if addons else []
+    train_levels = read_training_levels(addons).get(CLASS_IDS[cls], ()) if addons else ()
 
     rows: list[dict[str, Any]] = []
     if request.dungeons != "none":
@@ -627,6 +670,8 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
         dungeons=rows,
         travel=travel,
         kill_seconds=lambda level: kill(level).seconds,
+        trainers=trainers,
+        train_levels=train_levels,
     )
     if not world.quests:
         warnings.append("aucune quête placée : la route n'est que du farm")
@@ -652,8 +697,18 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
         *fresh["assumptions"],
         f"temps par monstre : {k.source} ({k.method}, {k.certainty})",
         (
-            "trajets : marche en ligne droite allongée et vols du client (route.travel repris de Factoruide, "
-            "suppose, TRV1) ; vols connus du personnage inconnus : aucun vol pris"
+            "trajets : marche par le réseau de Naowh Journeys "
+            + ("lu en local" if walker else "absent : ligne droite allongée")
+            + ", bateaux, zeppelins, portail et tram de Journeys "
+            + (f"{network.version or ''} (suppose)" if network else "absents : aucun changement de continent")
+            + " ; vitesses de route.travel reprises de Factoruide (suppose, TRV1) ; vols connus du personnage inconnus : "
+            "aucun vol pris"
+        ),
+        (
+            f"maître de classe : {len(train_levels)} niveau(x) d'entraînement (Naowh Training), "
+            f"{len(trainers)} position(s) de maître (Questie), visite au plus tard un niveau après (route.search)"
+            if trainers and train_levels
+            else "maître de classe : niveaux ou positions inconnus, visites non comptées"
         ),
         "position de départ supposée : donneur de la première quête de la route",
         "objectif d'une quête : camp de Journeys, sinon donneur (suppose) ; monstres par quête de leveling.objectives",
