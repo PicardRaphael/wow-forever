@@ -1453,6 +1453,23 @@ local function ImportGuideNow(guide)
 	end
 end
 
+-- RX1 : « voir À valider » n'a de sens que si une carte est visible (cartes masquées comprises) ; sinon la ligne qui
+-- le dit est retirée de la réponse.
+local PENDING_MENTION = "voir À valider"
+
+local function WithoutPendingMention(text)
+	if type(text) ~= "string" or not text:find(PENDING_MENTION, 1, true) or #VisibleCards() > 0 then
+		return text
+	end
+	local kept = {}
+	for line in (text .. "\n"):gmatch("(.-)\n") do
+		if not line:find(PENDING_MENTION, 1, true) then
+			kept[#kept + 1] = line
+		end
+	end
+	return (table.concat(kept, "\n"):gsub("%s+$", ""))
+end
+
 function FB.DeliverGuide(guide)
 	local db = ForeverBridgeDB
 	if type(db) ~= "table" or type(guide) ~= "table" or type(guide.text) ~= "string" or type(guide.sha) ~= "string" then
@@ -1544,7 +1561,7 @@ function FB.ApplySlot(slot)
 					role = "assistant",
 					id = reply.id,
 					status = reply.status,
-					text = reply.text,
+					text = WithoutPendingMention(reply.text),
 					provenance = reply.provenance,
 					link = reply.link,
 				}

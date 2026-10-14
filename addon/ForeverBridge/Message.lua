@@ -26,7 +26,8 @@ M.TOOLTIP_LINES = 30
 M.TOOLTIP_CHARS = 120
 M.LINK_KINDS = { item = true, spell = true, quest = true, talent = true }
 M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "talents", "gear",
-	"target", "target_level", "target_race", "client", "links", "rested", "resting", "xp_auras", "xp_items" }
+	"target", "target_level", "target_race", "client", "links", "rested", "resting", "xp_auras", "xp_items",
+	"professions" }
 -- T04f (0.2.0) : auras du joueur relevées (au plus MAX_AURAS, parmi les AURA_SCAN premières), filtrées par la liste
 -- que le pont écrit dans Status.lua (ForeverBridgeStatus.xp, identifiants lus dans les données, jamais écrits ici).
 M.MAX_AURAS = 16
@@ -328,6 +329,33 @@ function M.XpItems(watch)
 	return table.concat(out, ",")
 end
 
+-- RX1 (0.3.0) : métiers « nom:rang:rang maximal » séparés par des virgules (lignes de compétence que le joueur peut
+-- désapprendre : métiers principaux et secondaires) ; nil si l'API manque, échoue ou ne rend rien.
+function M.Professions()
+	if type(GetNumSkillLines) ~= "function" or type(GetSkillLineInfo) ~= "function" then
+		return nil
+	end
+	local ok, count = pcall(GetNumSkillLines)
+	if not ok or type(count) ~= "number" or isSecret(count) then
+		return nil
+	end
+	local out = {}
+	for index = 1, count do
+		local fine, name, header, _, rank, _, _, maxRank, abandonable = pcall(GetSkillLineInfo, index)
+		if not fine then
+			return nil
+		end
+		if type(name) == "string" and not isSecret(name) and not header and abandonable == true
+			and type(rank) == "number" and type(maxRank) == "number" then
+			out[#out + 1] = name:gsub("[,:]", " ") .. ":" .. rank .. ":" .. maxRank
+		end
+	end
+	if #out == 0 then
+		return nil
+	end
+	return table.concat(out, ",")
+end
+
 function M.Context()
 	local ctx = {}
 	local function put(key, value)
@@ -372,6 +400,7 @@ function M.Context()
 	local watch = xpWatch()
 	put("xp_auras", M.XpAuras(watch))
 	put("xp_items", M.XpItems(watch))
+	put("professions", M.Professions())
 	return ctx, pieces
 end
 

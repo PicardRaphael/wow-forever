@@ -58,14 +58,26 @@ ROUTE_CHOICES: tuple[Choice, ...] = (
 
 def choice_card(choice: Choice) -> dict[str, Any]:
     """Carte « À valider » d'une question : un bouton par option, action `choice:<question>.<option>`."""
-    raise NotImplementedError
+    return {
+        "id": CARD_PREFIX + choice.id,
+        "kind": "choice",
+        "title": choice.prompt,
+        "lines": [],
+        "buttons": [
+            {"key": o.key, "label": o.label, "action": f"{ACTION}:{choice.id}.{o.key}"} for o in choice.options
+        ],
+    }
 
 
 def find_answer(choices: Sequence[Choice], target: str) -> tuple[Choice, Option] | None:
     """(question, option) publiées dont `<question>.<option>` vaut exactement `target` ; None sinon."""
-    raise NotImplementedError
+    for choice in choices:
+        for option in choice.options:
+            if target == f"{choice.id}.{option.key}":
+                return choice, option
+    return None
 
 
 def answer_text(option: Option) -> str:
     """Texte transmis à la conversation : « Réponse : <libellé> »."""
-    raise NotImplementedError
+    return f"Réponse : {option.label}"

@@ -546,6 +546,20 @@ def _step(stop: dict[str, Any]) -> RouteStep:
     )
 
 
+def _rewards(book: Any, stops: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Objets de récompense des quêtes rendues sur la route (sources du livre des quêtes), au plus LISTED_IDS."""
+    from forever.quests import value
+
+    out: list[dict[str, Any]] = []
+    for s in stops:
+        quest = book.quests.get(s["ref"]) if s["kind"] == "turnin" else None
+        rewards = value(quest, "rewards") if quest else None
+        for item in (rewards or {}).get("items") or [] if isinstance(rewards, dict) else []:
+            if isinstance(item, dict) and item.get("item") is not None:
+                out.append({"quest": s["ref"], "item": item["item"], "name": item.get("name")})
+    return out[:LISTED_IDS]
+
+
 def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict[str, Any]:
     """Feuille de route calculée, gardée dans le cache, avec sa provenance (`forever route plan`). Registre : I18"""
     import hashlib
@@ -673,6 +687,7 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
             if s["kind"] in ("dungeon", "dungeon_repeat")
         ],
         "reminders": [asdict(r) for r in reminders],
+        "rewards": _rewards(book, stops),
         "warnings": [*warnings, *found.warnings, *result.warnings],
         "search": {
             "tries": found.tries,
@@ -714,4 +729,18 @@ PREVIEW_FIELDS = ("id", "levels", "hours", "xp_h", "dungeons", "rewards", "bonus
 def route_preview(plan: Any) -> dict[str, Any]:
     """Aperçu d'un plan pour le joueur (bouton « Feuille de route », outil `forever_route`) : niveaux, temps, XP par
     heure, donjons placés, récompenses notables, bonus rappelés, certitude, nombre d'arrêts."""
-    raise NotImplementedError
+    return {
+        "id": plan["id"],
+        "levels": plan["levels"],
+        "hours": plan.get("hours"),
+        "xp_h": plan.get("xp_h"),
+        "dungeons": [
+            {"name": s["name"], "level": s["level"]}
+            for s in plan["stops"]
+            if s["kind"] in ("dungeon", "dungeon_repeat")
+        ],
+        "rewards": list(plan.get("rewards") or []),
+        "bonuses": [r["text"] for r in plan.get("reminders") or []],
+        "certainty": plan["certainty"],
+        "stops": len(plan["stops"]),
+    }

@@ -62,6 +62,7 @@ CONTEXT_KEYS = (
     "resting",
     "xp_auras",
     "xp_items",
+    "professions",  # RX1 (ForeverBridge 0.3.0) : métiers « nom:rang:rang maximal »
 )
 
 

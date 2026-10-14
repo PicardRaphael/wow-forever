@@ -357,6 +357,62 @@ def build_server(deps: Deps) -> MCPServer:
         return dict(report)
 
     @server.tool()
+    def forever_route(
+        action: str = "plan",
+        class_name: str | None = None,
+        faction: str | None = None,
+        start_level: int | None = None,
+        end_level: int | None = None,
+        dungeons: str = "auto",
+        class_quests: bool = True,
+        exclude: list[int] | None = None,
+        include: list[int] | None = None,
+        seed: int | None = None,
+        plan_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Feuille de route de leveling (RX1) : `action="plan"` calcule une route (`class_name`, `faction` horde ou
+        alliance, `start_level`, `end_level`, `dungeons` auto, none ou noms séparés par des virgules, `class_quests`,
+        quêtes `exclude` ou `include`, `seed`) et rend le plan, son aperçu (`preview` : niveaux, heures, XP par heure,
+        donjons placés, récompenses, bonus rappelés, certitude) et sa provenance ; `action="show"` relit un plan
+        (`plan_id`) ; `action="guide"` rend son guide RestedXP (texte). Ajuster : relancer `plan` avec les options
+        changées (« enlève Wailing Caverns » : `dungeons` sans lui, ou `exclude`)."""
+        from forever.route import RouteRequest, guide_name, load_plan, plan_route, route_preview
+        from forever.rxp import encode_guide
+
+        if action == "plan":
+            if not class_name or not faction or start_level is None or end_level is None:
+                raise InvalidArgumentError(
+                    "Feuille de route : classe, camp, niveau de départ et niveau d'arrivée requis.",
+                    "donner class_name, faction, start_level et end_level",
+                )
+            chosen: str | tuple[str, ...] = dungeons
+            if dungeons not in ("auto", "none"):
+                chosen = tuple(d.strip() for d in dungeons.split(",") if d.strip())
+            plan = plan_route(
+                deps,
+                RouteRequest(
+                    class_name=class_name,
+                    faction=faction,
+                    start_level=start_level,
+                    end_level=end_level,
+                    dungeons=chosen,
+                    class_quests=class_quests,
+                    exclude=tuple(exclude or ()),
+                    include=tuple(include or ()),
+                    seed=seed,
+                ),
+            )
+        elif action in ("show", "guide") and plan_id:
+            plan = load_plan(deps, plan_id)
+        else:
+            raise InvalidArgumentError(f"Action inconnue ou plan manquant : {action}.", "plan, show ou guide (plan_id)")
+        if action == "guide":
+            name = guide_name(plan)
+            return {"id": plan["id"], "name": name, "text": encode_guide(plan, name=name, group="Forever Routes"),
+                    "provenance": plan["provenance"]}  # fmt: skip
+        return {**plan, "preview": route_preview(plan)}
+
+    @server.tool()
     def forever_build(
         context: str,
         level: int | None = None,

@@ -520,6 +520,8 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
 - Repli jeu fermé : `uv run forever route deliver <id> --addon` écrit le seul dossier `Interface/AddOns/ForeverRoute/`
   (`.toc` dépendant de RXPGuides, ligne `## Interface` reprise de ForeverBridge ; `Guide.lua` appelle
   `RXPGuides.RegisterGuide`), ancien dossier sauvegardé dans le cache de forever.
+- Questions à choix (décision 258) : publiées par le pont comme cartes « À valider » de sorte `choice`, un bouton par option ; un clic envoie l'action `a=choice:<question>.<option>` (le drapeau `c=` désigne la conversation), le pont l'apparie exactement et transmet « Réponse : <libellé> » à la conversation. La ligne « voir À valider » d'une réponse est retirée quand aucune carte n'est visible (cartes masquées comprises).
+- Métiers (décision 254) : ForeverBridge 0.3.0 envoie `professions` (« nom:rang:rang maximal », lignes de compétence que le joueur peut désapprendre, `GetNumSkillLines` et `GetSkillLineInfo` sous `pcall`) ; écrits au profil au clic de la carte d'écart.
 - Vérification facultative en jouant (RXP1, RXP2, décision 247) : livrer une route, ouvrir le menu des guides de
   RestedXP sans `/reload`, puis `/reload` et nouvelle connexion : le guide est-il toujours là ?
 

@@ -47,7 +47,7 @@ def argv(tmp_path, **kwargs):
     )
 
 
-def test_allowed_tools_are_skill_and_the_six_forever_tools():
+def test_allowed_tools_are_skill_and_the_seven_forever_tools():
     assert FOREVER_TOOLS == (
         "mcp__forever__forever_status",
         "mcp__forever__forever_lookup",
@@ -55,6 +55,7 @@ def test_allowed_tools_are_skill_and_the_six_forever_tools():
         "mcp__forever__forever_explain_mechanic",
         "mcp__forever__forever_sim_leveling",
         "mcp__forever__forever_build",
+        "mcp__forever__forever_route",  # RX1
     )
     assert ALLOWED_TOOLS == ("Skill", *FOREVER_TOOLS)
 

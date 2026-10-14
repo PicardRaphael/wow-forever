@@ -18,7 +18,7 @@ from typing import Any
 
 from forever.timefmt import format_utc
 
-FIELDS = ("class", "race", "faction", "level", "talents", "gear")
+FIELDS = ("class", "race", "faction", "level", "talents", "gear", "professions")
 LABELS = {
     "sheet": "fiche",
     "class": "classe",
@@ -27,6 +27,7 @@ LABELS = {
     "level": "niveau",
     "talents": "talents",
     "gear": "équipement",
+    "professions": "métiers",
 }
 DISMISSED_KEPT = 200
 GAP_NOTE = "Le jeu l'emporte pour cette réponse."
@@ -56,6 +57,7 @@ def game_fields(resolved: Any) -> dict[str, Any]:
         "level": resolved.level,
         "talents": dict(resolved.current),
         "gear": {str(p.slot): _piece(p) for p in resolved.pieces},
+        "professions": dict(resolved.professions) if resolved.professions is not None else None,
     }
 
 
@@ -72,7 +74,7 @@ def _same(field: str, profile: Any, game: Any) -> bool:
         return str(profile or "").lower() == str(game or "").lower()
     if field == "gear":
         return _comparable_gear(profile) == _comparable_gear(game)
-    if field == "talents":
+    if field in ("talents", "professions"):
         return dict(profile or {}) == dict(game or {})
     return bool(profile == game)
 
@@ -100,13 +102,15 @@ def gap_fingerprint(gaps: Sequence[Gap]) -> str:
 
 def _text(field: str, value: Any) -> str:
     if value in (None, "", {}):
-        return "aucun" if field in ("talents", "gear") else ("aucune" if field == "sheet" else "?")
+        return "aucun" if field in ("talents", "gear", "professions") else ("aucune" if field == "sheet" else "?")
     if field == "sheet":
         return f"{len(value)} rubrique(s)"
     if field == "talents":
         return f"{len(value)} talent(s)"
     if field == "gear":
         return f"{len(value)} pièce(s)"
+    if field == "professions":
+        return ", ".join(f"{k} {v}" for k, v in sorted(value.items()))
     return str(value)
 
 

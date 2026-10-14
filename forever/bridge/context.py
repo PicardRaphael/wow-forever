@@ -129,6 +129,7 @@ class Resolved:
     defects: list[Defect]
     pieces: list[GearPiece] = field(default_factory=list)  # pièces complètes (enchantement, suffixe ; P06b)
     xp: XpContext | None = None  # T04f : repos, auras d'XP, objets surveillés (ForeverBridge 0.2.0)
+    professions: dict[str, int] | None = None  # RX1 : métiers et rang (ForeverBridge 0.3.0)
 
 
 def load_context_data(deps: Deps) -> ContextData:
@@ -215,6 +216,7 @@ def resolve(data: ContextData, context: Mapping[str, str]) -> Resolved:
         defects=defects,
         pieces=pieces,
         xp=xp_context(context),
+        professions=professions_context(context),
     )
 
 
@@ -287,4 +289,12 @@ def xp_context(context: Mapping[str, str]) -> XpContext:
 def professions_context(context: Mapping[str, str]) -> dict[str, int] | None:
     """RX1 : métiers envoyés par ForeverBridge 0.3.0 (`Nom:rang:rang maximal`, séparés par des virgules) → nom → rang ;
     None si le jeu ne les a pas envoyés ; une entrée illisible est ignorée."""
-    raise NotImplementedError
+    raw = context.get("professions")
+    if not raw:
+        return None
+    out: dict[str, int] = {}
+    for entry in raw.split(","):
+        parts = entry.rsplit(":", 2)
+        if len(parts) == 3 and parts[0].strip() and parts[1].isdigit():
+            out[parts[0].strip()] = int(parts[1])
+    return out

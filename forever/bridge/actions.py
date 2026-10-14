@@ -16,8 +16,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
-ACTIONS = ("update", "approve", "reject", "profile_apply", "profile_dismiss")
-WITH_ID = frozenset({"approve", "reject", "profile_apply", "profile_dismiss"})
+ACTIONS = ("update", "approve", "reject", "profile_apply", "profile_dismiss", "choice", "route_deliver")
+WITH_ID = frozenset({"approve", "reject", "profile_apply", "profile_dismiss", "choice"})
 _ID = re.compile(r"[A-Za-z0-9._-]{1,120}")
 
 

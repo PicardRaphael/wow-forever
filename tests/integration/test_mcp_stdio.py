@@ -31,6 +31,7 @@ def test_stdio_server(tmp_path):
         "forever_sim_leveling",
         "forever_build",
         "forever_player_profile",  # T06b : profil joueur, lecture seule
+        "forever_route",  # RX1 : feuille de route de leveling
     }
     assert not result.is_error
     frostbolt_rank_2 = read_json(DATA_DIR / LOCAL_VERSION / "spells.json")["spells"]["frostbolt"]["ranks"][1]

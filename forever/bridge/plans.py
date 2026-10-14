@@ -14,6 +14,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from forever.bridge.buttons import BUTTONS
+from forever.bridge.choices import ROUTE_CHOICES
 from forever.bridge.context import ContextData, Defect, Resolved, context_notes, resolve
 from forever.bridge.record import Record
 
@@ -232,6 +233,33 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
             ),
         )
         return Plan(key, (call,), read)
+    if key == "route" and r.faction:
+        # RX1 : route calculée aussitôt avec les réponses par défaut des questions (choices.ROUTE_CHOICES), ajustée
+        # ensuite à chaque « Réponse : … » du joueur
+        span = int(ROUTE_CHOICES[0].default or ROUTE_CHOICES[0].options[0].key)
+        end = min(r.level + span, level_cap) if level_cap else r.level + span
+        if end <= r.level:
+            return None
+        args = {
+            "action": "plan",
+            "class_name": r.class_name,
+            "faction": r.faction.lower(),
+            "start_level": r.level,
+            "end_level": end,
+        }
+        read = (
+            (
+                "Aperçu (`preview`) en premier : niveaux, heures, XP par heure, donjons et leur niveau, récompenses "
+                "notables, certitude ; puis les cinq premiers arrêts (`stops` : `text`, zone et position) ; une ligne "
+                "pour les avertissements (`warnings`) s'il y en a."
+            ),
+            (
+                "Les questions de la feuille de route attendent le joueur dans À valider : à chaque « Réponse : … », "
+                "rappelle forever_route avec l'option changée (`end_level`, `dungeons` « none », `class_quests`) et "
+                "redonne l'aperçu ; « Livrer dans RestedXP » livre le dernier plan."
+            ),
+        )
+        return Plan(key, (Call("forever_route", args),), read)
     if key == "pvp" and r.target_class:
         args: dict[str, Any] = {"kind": "pvp", "name": r.class_name, "level": r.level}
         if r.race:

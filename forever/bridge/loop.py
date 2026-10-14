@@ -14,11 +14,13 @@ réduit, rien n'est capturé ; la liste des sauvegardes de ForeverBridge est rel
 
 from __future__ import annotations
 
+import json
 import os
 import threading
 import time
 from collections import deque
 from collections.abc import Callable, Iterable, Mapping
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -27,6 +29,7 @@ from forever.bridge.actions import action_flag, card_for, parse_action
 from forever.bridge.agent import AgentResult, provenance_line
 from forever.bridge.buttons import BUTTONS, button_payload, visible_buttons
 from forever.bridge.capture import GameWindow, Rect, band_rect, probe_rect
+from forever.bridge.choices import ROUTE_CHOICES, Choice, answer_text, choice_card, find_answer
 from forever.bridge.codec import SELFTEST_ID, BandError, Decoded, decode_band, detect_cell_px, selftest_payload
 from forever.bridge.format import normalize_reply
 from forever.bridge.fragments import Fragment, FragmentBuffer, parse_fragment
@@ -51,6 +54,8 @@ CARDS_CHECK_S = 1.0  # cartes « À valider » relues (carte de test de selftest
 SIMC_FLAG = "k=simc"
 ADDONS_FLAG = "c=addons"  # message de l'onglet « Addons » (bloc F)
 ACTION_LABELS = {"approve": "Valider", "reject": "Refuser"}
+ROUTE_BUTTON = "b=route"  # bouton « Feuille de route » (RX1)
+ROUTE_GROUP = "Forever Routes"  # groupe des guides livrés dans RestedXP
 _SELFTEST = Decoded(SELFTEST_ID, selftest_payload())
 
 Agent = Callable[[str, str | None], AgentResult]
@@ -149,6 +154,9 @@ class Bridge:
         self.xp_watch = xp_watch  # T04f : identifiants surveillés par les addons (xp_bonuses.xp_watch)
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
+        self.choices: list[Choice] = []  # RX1 : questions à choix publiées en cartes (décision 258)
+        self.routes_dir: Path | None = None  # RX1 : plans de forever route plan (`<cache>/routes`)
+        self.guide: dict[str, Any] | None = None  # RX1 : guide RestedXP à livrer par l'emplacement
         self.last_cards_check: float | None = None
         self.fragments = FragmentBuffer()
         self.last_beat: float | None = None
@@ -173,7 +181,9 @@ class Bridge:
 
     def _publish(self, first: int, reason: str) -> None:
         with self._lock:
-            inbox = inbox_lua(self.epoch(), self.status_cache, self.state.replies, self.buttons, self.card_list)
+            inbox = inbox_lua(
+                self.epoch(), self.status_cache, self.state.replies, self.buttons, self._cards(), guide=self.guide
+            )
             started = time.perf_counter()
             try:
                 count = publish(self.addons_dir, inbox, self.slots, first)
@@ -183,6 +193,10 @@ class Bridge:
                 return
             ms = round((time.perf_counter() - started) * 1000, 1)
             self.journal.write("published", reason=reason, first=first, files=count, ms=ms)
+
+    def _cards(self) -> list[dict[str, Any]]:
+        """Cartes publiées : « À valider » de la source, puis les questions à choix en attente (RX1)."""
+        return [*self.card_list, *(choice_card(c) for c in self.choices)]
 
     def _xp(self) -> Mapping[str, Any] | None:
         if self.xp_watch is None:
@@ -209,7 +223,7 @@ class Bridge:
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
             tmp = path.with_name(path.name + ".tmp")
-            content = status_lua(self.status_cache, self.buttons, self.epoch(), self.card_list, self._xp())
+            content = status_lua(self.status_cache, self.buttons, self.epoch(), self._cards(), self._xp())
             tmp.write_bytes(content.encode("utf-8"))
             tmp.replace(path)
         except OSError as exc:
@@ -382,6 +396,21 @@ class Bridge:
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
                 result, text = "erreur", f"Profil non écrit : {type(exc).__name__}: {exc}"
             self._check_cards(self.clock(), force=True)
+        elif action == "choice" and target and (found := find_answer(self.choices, target)) is not None:
+            choice, option = found
+            self.choices = [c for c in self.choices if c.id != choice.id]
+            answer = replace(record, flags=frozenset(), text=answer_text(option))
+            with self._lock:
+                self.state.put_reply(
+                    {"session": record.session, "id": record.message_id, "status": "working", "since": self.epoch()}
+                )
+                self.queue.append(answer)
+            self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target,
+                               result="transmise")  # fmt: skip
+            self._publish(self.first_slot, "réponse à une question")
+            return
+        elif action == "route_deliver":
+            result, text = self._deliver_route()
         elif action in ("update", "approve", "reject") and self.actions is not None:
             try:
                 result, text = self.actions.handle(str(action), target)
@@ -399,6 +428,24 @@ class Bridge:
             text = f"Action refusée : {why}."
         self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
         self._done(record, text, "action")
+
+    def _deliver_route(self) -> tuple[str, str]:
+        """RX1 : dernier plan de `forever route plan` encodé en guide RestedXP et publié dans l'emplacement ; le jeu
+        l'importe hors combat (ForeverBridge 0.3.0)."""
+        import hashlib
+
+        from forever.route import guide_name
+        from forever.rxp import encode_guide
+
+        plans = sorted(self.routes_dir.glob("*.json"), key=lambda p: p.stat().st_mtime) if self.routes_dir else []
+        if not plans:
+            return "aucun plan", "Aucune feuille de route calculée : clique d'abord « Feuille de route »."
+        plan = json.loads(plans[-1].read_text(encoding="utf-8"))
+        name, group = guide_name(plan), ROUTE_GROUP
+        text = encode_guide(plan, name=name, group=group)
+        sha = hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
+        self.guide = {"name": name, "group": group, "text": text, "sha": sha}
+        return "livrée", f"Feuille de route « {name} » envoyée à RestedXP : elle s'importe hors combat."
 
     def _simc(self, record: Record, parts: int) -> None:
         """Export SimulationCraft collé : gardé anonymisé dans le journal (fixture réelle, décision 235), sans le
@@ -534,6 +581,8 @@ class Bridge:
                 with self._lock:
                     self.busy = False
             return
+        if ROUTE_BUTTON in record.flags:  # RX1 : questions de la feuille de route publiées en cartes
+            self.choices = list(ROUTE_CHOICES)
         try:
             session = None if "n" in record.flags else self.state.session
             started = self.clock()

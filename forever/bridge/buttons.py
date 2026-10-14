@@ -11,7 +11,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 # Tranches faites qui calculent un bouton (feuille de route du 2026-10-09 ; T08d, T08e et P06b : « Mettre à jour »).
-DONE_SLICES: frozenset[str] = frozenset({"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b"})
+DONE_SLICES: frozenset[str] = frozenset({"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b", "RX1"})
 
 TALENTS_NOTICE = "Build populaire de Talents Forever (choix de joueurs), pas encore calculé par le moteur de forever."
 LEVELING_NOTICE = (
@@ -73,6 +73,15 @@ BUTTONS: tuple[Button, ...] = (
     Button("gear", "Équipement", "Quel est mon prochain objet à viser, et où le trouver ?", ("T10a",)),
     Button("last_fight", "Dernier combat", "Résume mon dernier combat analysé.", ("AN1", "AN2")),
     Button("update", "Mettre à jour", "", ("T08d", "T08e", "P06b"), action="update"),
+    # RX1 (décision 243) : questions à choix publiées par le pont, puis aperçu calculé par forever_route ; livraison
+    # du dernier plan à RestedXP par l'emplacement (action, sans conversation).
+    Button(
+        "route",
+        "Feuille de route",
+        "Prépare ma feuille de route de leveling et montre-moi l'aperçu ; je l'ajuste avec les questions de À valider.",
+        ("RX1",),
+    ),
+    Button("route_deliver", "Livrer dans RestedXP", "", ("RX1",), action="route_deliver"),
 )
 
 

@@ -3295,6 +3295,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
         from forever.bridge.cards import CardSource
         from forever.bridge.profile_gap import ProfileWatch
         from forever.bridge.updater import UpdateWatch
+        from forever.route import ROUTES_DIR
 
         profile_watch = (
             ProfileWatch(
@@ -3324,6 +3325,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             addons=addons_turn,
             xp_watch=lambda: _bridge_xp_watch(deps),
         )
+        bridge.routes_dir = deps.cache_dir / ROUTES_DIR  # RX1 : livraison du dernier plan à RestedXP
         journal.write("config", model=model)
         print("Pont en marche : Ctrl+C ou uv run forever bridge stop pour l'arrêter.", file=sys.stderr, flush=True)
         return bridge.run(deps.cache_dir / "bridge" / "stop", started=launched)

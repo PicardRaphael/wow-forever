@@ -29,6 +29,7 @@ FOREVER_TOOLS: tuple[str, ...] = (
     "mcp__forever__forever_explain_mechanic",
     "mcp__forever__forever_sim_leveling",
     "mcp__forever__forever_build",
+    "mcp__forever__forever_route",  # RX1 : feuille de route
 )
 ALLOWED_TOOLS: tuple[str, ...] = ("Skill", *FOREVER_TOOLS)
 # Conversations du pont sans les hooks du plugin (démarrage, contrôle de fin) : le pont publie lui-même l'état des

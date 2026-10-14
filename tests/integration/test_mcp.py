@@ -30,6 +30,7 @@ def test_list_tools(make_deps):
         "forever_sim_leveling",
         "forever_build",
         "forever_player_profile",  # T06b : profil joueur, lecture seule
+        "forever_route",  # RX1 : feuille de route de leveling
     }
     for t in tools:
         assert t.output_schema is not None

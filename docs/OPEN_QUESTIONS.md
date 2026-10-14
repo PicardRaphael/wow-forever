@@ -473,6 +473,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   directement ?** Ajoutée le 2026-10-14 (RX1, bloc D). ForeverBridge appelle `RXP:ScheduleTask` sur
   `RXPFrame.GenerateMenuTable` (objet `RXP` global « pour le débogage » dans `RXPGuides.lua`, non garanti). Test
   (facultatif, décision 247) : livraison d'une route, menu des guides ouvert aussitôt. Priorité : basse.
+- **PRO1 — Les métiers secondaires (Cooking, First Aid, Fishing) sont-ils « abandonnables » dans `GetSkillLineInfo` de Forever ?** Ajoutée le 2026-10-14 (RX1, bloc E). ForeverBridge 0.3.0 n'envoie que les lignes abandonnables (métiers principaux, et secondaires si le client les marque ainsi) ; `suppose`. Test (facultatif, décision 247) : `/dump GetSkillLineInfo(i)` sur une ligne de métier secondaire. Priorité : basse.
 - **NFB1 — Un build exporté par Naowh Forever (`!NFB1!`) se relit-il à l'identique par notre codec ?** Ajoutée le
   2026-10-13 (EX1, décision 255) : format relevé dans `NaowhForever_Training` (LibSerialize, LibDeflate,
   `EncodeForPrint`), jamais vérifié sur une chaîne réelle. Test (facultatif, décision 247) : exporter un build depuis
