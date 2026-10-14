@@ -607,6 +607,7 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     )
     from forever.provenance import make_provenance
     from forever.quests import build_quests
+    from forever.sim.objectives import MAGE
     from forever.store import load_version
     from forever.travel import WalkCache, load_travel, transports_from_network, walk_nets
 
@@ -635,8 +636,19 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     kill_memo: dict[int, Any] = {}
 
     def kill(level: int) -> Any:
+        """Temps par monstre : relevés du joueur d'abord ; à défaut, moteur du Mage (combat, repos, course), sinon
+        estimation (combat seul, sous-estime la durée)."""
         if level not in kill_memo:
-            kill_memo[level] = kill_time(kp, class_name=cls, level=level, measures=measures)
+            found = kill_time(kp, class_name=cls, level=level, measures=measures)
+            if cls == MAGE and found.source != "measured":
+                from forever.sim.objectives import _engine_kill_time
+
+                engine = _engine_kill_time(deps, level, None)
+                found = found._replace(
+                    source="engine", seconds=engine["seconds"], low=engine["low"], high=engine["high"],
+                    certainty=engine["certainty"], method=engine["method"], scope="total",
+                )  # fmt: skip
+            kill_memo[level] = found
         return kill_memo[level]
 
     addons = (wow_dir or deps.wow_dir) / "Interface" / "AddOns" if (wow_dir or deps.wow_dir) else None
@@ -695,7 +707,8 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)
     assumptions = [
         *fresh["assumptions"],
-        f"temps par monstre : {k.source} ({k.method}, {k.certainty})",
+        f"temps par monstre : {k.source} ({k.method}, {k.certainty}) ; durée : "
+        + ("combat, récupération et déplacement" if k.scope == "total" else "combat seul (sous-estime la route)"),
         (
             "trajets : marche par le réseau de Naowh Journeys "
             + ("lu en local" if walker else "absent : ligne droite allongée")
