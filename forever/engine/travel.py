@@ -64,9 +64,27 @@ class FlightEdge(NamedTuple):
     length: float  # yards
 
 
+class Transport(NamedTuple):
+    """Trajet d'un transport (bateau, zeppelin, portail, tram) d'un point à un autre, durée comprise."""
+
+    kind: str
+    a: Point
+    b: Point
+    seconds: float
+
+
+class WalkNet(NamedTuple):
+    """Réseau de marche d'un continent : nœuds (x, y) et voisins (nœud, yards de marche)."""
+
+    continent: int
+    points: list[tuple[float, float]]
+    adj: list[list[tuple[int, float]]]
+
+
 class Graph(NamedTuple):
     nodes: dict[int, FlightNode]
     edges: dict[int, list[FlightEdge]]  # départ -> trajets
+    transports: tuple[Transport, ...] = ()
 
 
 class Leg(NamedTuple):
@@ -192,3 +210,26 @@ def travel_time(
                     CERTAINTY,
                 )
     return best
+
+
+def ride_seconds(wait: float, length: float, speed: float, board_s: float, loading_s: float) -> float:
+    """Durée d'un trajet de bateau ou de zeppelin : attente au quai, traversée, embarquement et chargement.
+    Registre : I19"""
+    raise NotImplementedError
+
+
+def nearest_node(net: WalkNet, p: Point) -> int | None:
+    """Nœud du réseau le plus proche de `p` (même continent), None si le réseau est vide ou d'un autre continent."""
+    raise NotImplementedError
+
+
+def node_distances(net: WalkNet, source: int) -> list[float]:
+    """Yards de marche du nœud `source` vers chaque nœud (Dijkstra ; infini si inatteignable). Registre : C6"""
+    raise NotImplementedError
+
+
+def walk_yards(net: WalkNet, a: Point, b: Point, *, detour: float, distances: list[float] | None = None) -> float:
+    """Yards à pied de `a` à `b` par le réseau : ligne droite jusqu'au nœud le plus proche de chaque point, puis le
+    réseau ; même nœud des deux côtés : ligne droite allongée de `detour`. `distances` : distances déjà calculées
+    depuis le nœud de `a`. Registre : C6, I19"""
+    raise NotImplementedError

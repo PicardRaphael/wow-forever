@@ -38,3 +38,9 @@ def graph_from_doc(doc: dict[str, Any], faction: str) -> tuple[Graph, dict[int, 
         for m in doc["maps"]
     }
     return Graph(nodes, edges), maps
+
+
+def transports_from_network(network: Any, faction: str) -> tuple[Any, ...]:
+    """Transports de Journeys permis au camp `faction`, dans les deux sens (bateaux et zeppelins : un trajet par
+    quai vers le suivant ; portails et tram : durée de l'addon). Registre : I19"""
+    raise NotImplementedError
