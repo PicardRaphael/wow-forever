@@ -10,6 +10,7 @@ EXIT_INTEGRITY = 3
 EXIT_NOT_FOUND = 4
 EXIT_NETWORK = 5
 EXIT_PENDING = 6  # T08d : `forever update` fini avec au moins une attente d'accord
+EXIT_DOCTOR = 7  # LN1 : `forever doctor` a trouvé au moins un problème bloquant (fail)
 
 
 class ErrorInfo(TypedDict):
