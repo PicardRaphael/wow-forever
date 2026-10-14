@@ -25,3 +25,18 @@ Regroupées pour une seule validation avant la fusion (règle « regroupement de
 -    ) in (None, "")
 +    assert WHO not in read_profile(deps)["characters"]
 ```
+
+## 2. `tests/unit/test_rxp_compare.py` : ordre des imports (lint seulement)
+
+**Constat** : `ruff check` (I001) : au commit des tests, `forever.rxp_guides` n'existait pas encore et ruff le rangeait
+parmi les modules tiers ; le module écrit, il est du projet et son import va avec ceux de `forever`. Aucune assertion
+touchée.
+
+```diff
+ from conftest import FIXTURES
+-from forever.rxp_guides import Who, applies, coverage, guide_chain, read_rxp_guides
+ from test_engine_route import CAP, make_world, start_state
+@@
+ from forever.provenance import validate_provenance
++from forever.rxp_guides import Who, applies, coverage, guide_chain, read_rxp_guides
+```

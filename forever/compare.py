@@ -5,11 +5,16 @@ local, jamais recopié dans le dépôt). Ses arrêts de quête sont rejoués par
 nos règles d'XP et de temps) ; un arrêt impossible chez nous (quête inconnue, prérequis, niveau) est sauté et dit ;
 les visites au maître de classe sont placées comme dans nos routes ; aucun donjon des deux côtés (les arrêts
 de Factoruide ne portent pas ses passages de donjon). Le résultat se compare à notre route pour la même
-demande : temps, XP par heure, quêtes communes et propres à chacune."""
+demande : temps, XP par heure, quêtes communes et propres à chacune.
+
+Même comparaison avec les parcours gratuits en clair de RestedXP (RX1c, décision 268) : une mesure, pas une source ;
+lecture dans `forever/rxp_guides.py`, aucun texte de guide dans le résultat."""
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import math
+from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from pathlib import Path
 from typing import Any, NamedTuple
 
@@ -158,4 +163,287 @@ def compare_route(deps: Any, path: Path, *, wow_dir: Path | None = None) -> dict
         "only_ours": sorted(mine - theirs),
         "only_theirs": sorted(theirs - mine),
         "provenance": provenance,
+    }
+
+
+# --- parcours gratuits en clair de RestedXP (RX1c, décision 268) ---------------------------------------------------
+
+
+def _objective_kept(items: Sequence[tuple[int, Any]]) -> set[int]:
+    """Indices des objectifs gardés : pour une quête, seule la dernière ligne `.complete` avant son rendu fait un arrêt
+    (nos objectifs se font d'un seul arrêt)."""
+    kept: set[int] = set()
+    last: dict[int, int] = {}
+    for index, (_, action) in enumerate(items):
+        if action.kind == "objective":
+            last[action.ref] = index
+        elif action.kind == "turnin" and action.ref in last:
+            kept.add(last.pop(action.ref))
+    kept |= set(last.values())
+    return kept
+
+
+def _guards_ok(world: RouteWorld, state: RouteState, step: Any) -> bool:
+    """Conditions d'une étape lues sur notre état : `.xp N,1` (sautée au niveau N ou plus), `.xp <N,1` (sautée sous le
+    niveau N), `.isOnQuest`, `.isQuestTurnedIn`, `.isQuestComplete`, `.isQuestAvailable`."""
+    if step.xp_guard is not None:
+        op, level, _ = step.xp_guard
+        if (op == "<" and state.level < level) or (op != "<" and state.level >= level):
+            return False
+    for guard, quest in step.guards:
+        q = world.quests.get(quest)
+        complete = quest in state.progressed or (q is not None and q.objective is None and q.dungeon is None)
+        ok = {
+            "isonquest": quest in state.log,
+            "isquestturnedin": quest in state.done,
+            "isquestcomplete": quest in state.log and complete,
+            "isquestavailable": quest not in state.done and quest not in state.log,
+        }[guard]
+        if not ok:
+            return False
+    return True
+
+
+def replay_rxp(
+    gd: GameData,
+    world: RouteWorld,
+    guides: Sequence[Any],
+    who: Any,
+    start: RouteState,
+    *,
+    end_level: int,
+    cap: int,
+) -> Replay:
+    """Parcours RestedXP en clair rejoué par notre simulation : guides dont la tranche dépasse le niveau de départ,
+    étapes et lignes filtrées pour le personnage (`<<`, `#xprate`), étapes de donjon écartées, conditions lues sur
+    notre état au début de chaque étape, `.xp N` en farm jusqu'au niveau N, arrêts impossibles chez nous sautés et
+    dits ; entraînements placés comme dans nos routes ; farm final jusqu'à `end_level`. Registre : I18"""
+    from forever.engine.route import apply_stop, check_stop, grind_to, weakest
+    from forever.rxp_guides import applies, xp_rate_ok
+
+    steps = [
+        s
+        for g in guides
+        if g.levels is None or g.levels[1] > start.level
+        for s in g.steps
+        if not s.dungeon and applies(s.filter, who) and xp_rate_ok(s.xp_rate)
+    ]
+    items = [(i, a) for i, s in enumerate(steps) for a in s.actions if applies(a.filter, who)]
+    kept = _objective_kept(items)
+    state = start
+    stops: list[Stop] = []
+    results: list[Any] = []
+    skipped: list[dict[str, Any]] = []
+    feasible = True
+    opened: dict[int, bool] = {}
+    for index, (step_index, action) in enumerate(items):
+        if state.level >= end_level:
+            break
+        if step_index not in opened:
+            opened[step_index] = _guards_ok(world, state, steps[step_index])
+        if not opened[step_index] or (action.kind == "objective" and index not in kept):
+            continue
+        if action.kind == "grind":
+            if state.level < action.ref:
+                state, res = grind_to(gd, world, start, state, level=min(action.ref, end_level), cap=cap)
+                stops.append(Stop("grind", action.ref))
+                results.append(res)
+            continue
+        due = [lv for lv in world.train_levels if lv <= state.level and lv not in state.trained]
+        if world.trainers and due and check_stop(gd, world, state, Stop("train", due[-1])) is None:
+            state, res = apply_stop(gd, world, state, Stop("train", due[-1]), cap=cap)
+            stops.append(Stop("train", due[-1]))
+            results.append(res)
+        stop = Stop(action.kind, action.ref)
+        reason = check_stop(gd, world, state, stop)
+        if reason is not None:
+            skipped.append({"kind": action.kind, "quest": action.ref, "reason": reason})
+            continue
+        after, res = apply_stop(gd, world, state, stop, cap=cap)
+        if not math.isfinite(res.seconds):
+            skipped.append({"kind": action.kind, "quest": action.ref, "reason": "trajet impossible"})
+            continue
+        state = after
+        stops.append(stop)
+        results.append(res)
+    if state.level < end_level:
+        state, res = grind_to(gd, world, start, state, level=end_level, cap=cap)
+        stops.append(Stop("grind", end_level))
+        results.append(res)
+    seconds = sum(r.seconds for r in results)
+    xp = sum(r.xp for r in results)
+    feasible = math.isfinite(seconds)
+    result = RouteResult(
+        start_level=start.level,
+        end_level=state.level,
+        reached=state.level >= end_level,
+        feasible=feasible,
+        seconds=seconds,
+        xp=xp,
+        xp_h=xp / (seconds / SECONDS_PER_HOUR) if seconds > 0 and feasible else 0.0,
+        stops=tuple(results),
+        warnings=(),
+        certainty=weakest(*(r.certainty for r in results)),
+    )
+    return Replay(stops, skipped, result)
+
+
+def breakdown(world: RouteWorld, result: RouteResult, zone_names: Mapping[int, str]) -> dict[str, Any]:
+    """Parts d'une route : heures de trajet, d'objectifs (combat), de farm et des autres arrêts ; part d'XP des rendus,
+    des objectifs et du farm ; ordre des zones des rendus (zones consécutives fusionnées)."""
+    hours = {"travel": 0.0, "objective": 0.0, "grind": 0.0, "other": 0.0}
+    xp = {"quest": 0.0, "objective": 0.0, "grind": 0.0, "other": 0.0}
+    zones: list[str] = []
+    for r in result.stops:
+        part = r.kind if r.kind in ("objective", "grind") else "other"
+        hours["travel"] += r.travel_s / SECONDS_PER_HOUR
+        hours[part] += (r.seconds - r.travel_s) / SECONDS_PER_HOUR
+        xp["quest" if r.kind == "turnin" else part] += r.xp
+        if r.kind == "turnin" and (q := world.quests.get(int(r.ref))) is not None and q.zone is not None:
+            name = zone_names.get(q.zone) or str(q.zone)
+            if not zones or zones[-1] != name:
+                zones.append(name)
+    total = sum(xp.values()) or 1.0
+    return {
+        "travel_hours": hours["travel"],
+        "objective_hours": hours["objective"],
+        "grind_hours": hours["grind"],
+        "other_hours": hours["other"],
+        "xp_share": {k: v / total for k, v in xp.items()},
+        "zones": zones,
+    }
+
+
+def _skip_reasons(skipped: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for s in skipped:
+        key = str(s["reason"]).split(" (")[0]
+        out[key] = out.get(key, 0) + 1
+    return dict(sorted(out.items(), key=lambda kv: (-kv[1], kv[0])))
+
+
+def _addons(deps: Any, wow_dir: Path | None) -> Path:
+    from forever.errors import InvalidArgumentError
+
+    root = wow_dir or deps.wow_dir
+    if root is None:
+        raise InvalidArgumentError("Dossier du jeu inconnu (FOREVER_WOW_DIR).", "régler FOREVER_WOW_DIR")
+    return Path(root) / "Interface" / "AddOns"
+
+
+def compare_rxp(
+    deps: Any,
+    *,
+    class_name: str,
+    race: str,
+    faction: str,
+    from_level: int,
+    to_level: int,
+    start_guide: str | None = None,
+    wow_dir: Path | None = None,
+) -> dict[str, Any]:
+    """Notre route et le parcours gratuit en clair de RestedXP du même personnage, rejoué par nos règles, pour la même
+    tranche de niveaux, sans donjon des deux côtés (`forever route rxp-compare`, décision 268). Aucun texte de guide
+    dans le résultat. Registre : I18"""
+    from forever.engine.route import weakest
+    from forever.freshness import freshness_for_version
+    from forever.optimize.route import plan
+    from forever.provenance import make_provenance
+    from forever.route import RouteRequest, route_context
+    from forever.rxp_guides import applies, guide_chain, read_rxp_guides, who_for
+
+    library = read_rxp_guides(_addons(deps, wow_dir))
+    who = who_for(class_name, race, faction)
+    chain = guide_chain(library, who, start=start_guide)
+    request = RouteRequest(class_name.strip().lower(), faction.strip().lower(), from_level, to_level, dungeons="none")
+    ctx = route_context(deps, request, wow_dir=wow_dir)
+    # même départ des deux côtés : donneur de la première quête prise du parcours, sinon le départ de nos routes
+    giver = next(
+        (
+            ctx.world.quests[a.ref].giver
+            for g in chain.guides
+            if g.levels is None or g.levels[1] > from_level
+            for s in g.steps
+            for a in s.actions
+            if a.kind == "accept" and a.ref in ctx.world.quests and applies(a.filter, who) and applies(s.filter, who)
+        ),
+        None,
+    )
+    start = replace(ctx.start, position=giver) if giver is not None else ctx.start
+    ours = plan(ctx.gd, ctx.world, start, end_level=to_level, cap=ctx.cap)
+    replay = replay_rxp(ctx.gd, ctx.world, chain.guides, who, start, end_level=to_level, cap=ctx.cap)
+    mine = {int(s.ref) for s in ours.stops if s.kind == "turnin"}
+    theirs = {int(s.ref) for s in replay.stops if s.kind == "turnin"}
+    certainty = weakest(ours.result.certainty, replay.result.certainty)
+    fresh = freshness_for_version(deps, ctx.data.game_version, allow_network=False)
+    levels = [g.levels[1] for g in chain.guides if g.levels]
+    provenance = make_provenance(
+        deps,
+        game_version=ctx.data.game_version,
+        data_sha=ctx.data.data_sha,
+        freshness=fresh["freshness"],
+        certainty=certainty,  # type: ignore[arg-type]
+        assumptions=[
+            *fresh["assumptions"],
+            (
+                "parcours gratuits en clair de RestedXP lus en local (RXPGuides/Guides/Forever), rejoués par nos règles "
+                "d'XP et de temps : une mesure, pas une source (décision 268)"
+            ),
+            f"blocs non lisibles en clair ignorés sans être décodés : {library.refused}",
+            "sans donjon des deux côtés, même point de départ ; objectifs d'une quête faits en un arrêt",
+            f"étapes de RestedXP impossibles chez nous : {len(replay.skipped)}",
+            *ctx.warnings[:3],
+        ],
+    )
+    zone_names = ctx.book.zone_names
+    return {
+        "request": {
+            "class": request.class_name,
+            "race": who.race,
+            "faction": request.faction,
+            "from": from_level,
+            "to": to_level,
+        },
+        "guides": {
+            "count": len(chain.guides),
+            "missing": list(chain.missing),
+            "max_level": max(levels) if levels else None,
+            "refused": library.refused,
+        },
+        "ours": {**_side(ours.result, mine), **breakdown(ctx.world, ours.result, zone_names)},
+        "theirs": {
+            **_side(replay.result, theirs),
+            **breakdown(ctx.world, replay.result, zone_names),
+            "skipped": replay.skipped,
+            "skip_reasons": _skip_reasons(replay.skipped),
+        },
+        "common": sorted(mine & theirs),
+        "only_ours": sorted(mine - theirs),
+        "only_theirs": sorted(theirs - mine),
+        "provenance": provenance,
+    }
+
+
+def rxp_coverage(deps: Any, *, wow_dir: Path | None = None, dungeon_guides: bool = False) -> dict[str, Any]:
+    """Jusqu'où vont les parcours gratuits en clair de RestedXP installés (`forever route rxp-coverage`)."""
+    from forever.provenance import local_provenance
+    from forever.rxp_guides import coverage, read_rxp_guides
+
+    library = read_rxp_guides(_addons(deps, wow_dir), dungeon_guides=dungeon_guides)
+    return {
+        "files": library.files,
+        "guides": len(library.guides),
+        "refused": library.refused,
+        "chains": coverage(library),
+        "provenance": local_provenance(
+            deps,
+            certainty="probable",
+            assumptions=[
+                (
+                    "en-têtes des parcours gratuits en clair de RestedXP lus en local (décision 268) ; une suite annoncée "
+                    "absente en clair est un guide payant ou non livré"
+                ),
+                f"blocs non lisibles en clair ignorés sans être décodés : {library.refused}",
+            ],
+        ),
     }

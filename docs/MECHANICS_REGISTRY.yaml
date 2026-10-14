@@ -1866,7 +1866,13 @@ mechanics:
       - "simulation : XP de T04d (quest_xp, mob_kill_xp ; élite, donjon, groupe), bonus de T04f (xp_multiplier), temps par monstre (kill_time, mesure du joueur d'abord), trajets (I19), donjon à son placement (I17)"
       - "recherche : code MIT de Factoruide (brouznouf/factoruide@f7da6da : plan/worth.rs, plan/construct.rs nearest_stop, plan/moves.rs, plan/search.rs), porté en sous-ensemble ; règles d'XP et de temps de forever, jamais celles de Factoruide"
       - "forever/data/1.60.1.70374/mechanics.json (route.search : journal, frais d'arrêt, poids de zone et part du farm repris de Factoruide, suppose ; essais et graine de la recherche)"
+      - "RX1c (décision 268) : parcours gratuits en clair de RestedXP rejoués par la même simulation pour mesurer nos routes (une mesure, pas une source) ; farm au milieu d'une route (grind_to, mêmes règles que le farm final)"
     tests:
+      - tests/unit/test_rxp_compare.py::test_replay_follows_the_guide_logic
+      - tests/unit/test_rxp_compare.py::test_replay_starts_in_the_guide_of_the_start_level
+      - tests/unit/test_rxp_compare.py::test_rxp_compare_cli
+      - tests/unit/test_route_start.py::test_start_quest_is_allowed_and_nearest_to_the_start_level
+      - tests/unit/test_route_start.py::test_mage_kill_time_at_level_1_falls_back_to_the_estimate
       - tests/unit/test_route_professions.py::test_visit_only_when_the_next_rank_is_open
       - tests/unit/test_route_professions.py::test_plan_visits_the_profession_trainer
       - tests/unit/test_route_compare.py::test_replay_skips_what_our_rules_refuse

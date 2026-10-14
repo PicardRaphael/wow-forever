@@ -615,6 +615,13 @@ class RouteContext:
     train_levels: Any
 
 
+def start_quest(quests: Any, level: int) -> Any:
+    """Quête dont le donneur sert de départ : permise au niveau de départ, au niveau le plus proche (RX1c : la quête de
+    plus bas niveau du livre pouvait être une quête neutre de l'autre continent, et toute la route devenait infinie).
+    Registre : I18"""
+    return min(quests, key=lambda q: (q.min_level > level, abs(q.level - level), q.min_level, q.id), default=None)
+
+
 def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> RouteContext:
     """Monde de la route d'une demande : livre des quêtes, donjons placés, trajets (client, Journeys), maîtres de
     classe, temps par monstre, départ. Registre : I18"""
@@ -670,7 +677,11 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
             if cls == MAGE and found.source != "measured":
                 from forever.sim.objectives import _engine_kill_time
 
-                engine = _engine_kill_time(deps, level, None)
+                try:
+                    engine = _engine_kill_time(deps, level, None)
+                except InvalidArgumentError:  # niveau sans rotation du moteur (premiers niveaux) : estimation gardée
+                    kill_memo[level] = found
+                    return found
                 found = found._replace(
                     source="engine", seconds=engine["seconds"], low=engine["low"], high=engine["high"],
                     certainty=engine["certainty"], method=engine["method"], scope="total",
@@ -726,7 +737,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     )
     if not world.quests:
         warnings.append("aucune quête placée : la route n'est que du farm")
-    first = min(world.quests.values(), key=lambda q: (q.min_level, q.level, q.id), default=None)
+    first = start_quest(world.quests.values(), request.start_level)
     if first is not None:
         position = first.giver
     else:

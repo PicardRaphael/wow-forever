@@ -381,6 +381,20 @@ Réponse courte par défaut ; demander « détaille » ou « pourquoi » pour le
 - Relevés facultatifs (décision 247) : ForeverLogger 0.6.0 relève passages et butin ; activer InstanceTracker dans
   Naowh Forever ajoute ses passages (durée, XP), lus en local.
 
+## Nos routes face aux parcours gratuits de RestedXP (RX1c)
+Une mesure, pas une source (décision 268) : seuls les parcours gratuits livrés en clair dans RXPGuides
+(`Guides/Forever`) sont lus, en local ; aucun guide payant ni chiffré, rien de RestedXP dans nos routes.
+
+```powershell
+uv run forever route rxp-coverage                    # jusqu'où vont les parcours en clair, par race et par camp
+uv run forever route rxp-compare --to 22             # personnage actif du profil, de son niveau au niveau 22
+uv run forever route rxp-compare --class Mage --race Orc --faction horde --from 12 --to 21 --start-guide "Barrens AoE"
+```
+
+Sortie : durée, XP par heure, parts du trajet, des objectifs et du farm, ordre des zones, quêtes communes et propres,
+étapes de RestedXP impossibles chez nous (et pourquoi), sans donjon des deux côtés. Résultats et leçons :
+`docs/research/rxp-comparaison.md`.
+
 ## Ce que le plugin ne sait pas encore
 PvP de champ de bataille et rendements décroissants mesurés (PV2), raids (T09 à T11), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
 ventes (EC1), mana des combats longs (T05b), mémoire du joueur (T07), raid

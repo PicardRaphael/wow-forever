@@ -402,6 +402,18 @@ def _grind(
     return replace(state, level=level, xp=xp, seconds=state.seconds + seconds), result, missed
 
 
+def grind_to(
+    gd: GameData, world: RouteWorld, start: RouteState, state: RouteState, *, level: int, cap: int
+) -> tuple[RouteState, StopResult]:
+    """Farm au niveau du joueur jusqu'à `level` au milieu d'une route (étape de farm d'un guide rejoué, RX1c) : mêmes
+    règles que le farm final ; les entraînements et les visites de métier faits pendant le farm sont marqués faits.
+    Registre : I18, I6"""
+    after, result, _ = _grind(gd, world, start, state, end_level=level, cap=cap)
+    trained = after.trained | {lv for lv in world.train_levels if lv <= after.level}
+    prof_done = after.prof_done | {name for name, (at, _) in world.prof_visits.items() if at < after.level}
+    return replace(after, trained=trained, prof_done=prof_done), replace(result, ref=level)
+
+
 def simulate(
     gd: GameData,
     world: RouteWorld,

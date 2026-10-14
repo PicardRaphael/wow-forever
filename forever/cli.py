@@ -424,6 +424,19 @@ def build_parser() -> argparse.ArgumentParser:
     r_compare = route_sub.add_parser("compare", help="comparer une route de Factoruide (.fgguide) à la nôtre")
     r_compare.add_argument("file", help="fichier .fgguide exporté par Factoruide (bouton Share)")
     r_compare.add_argument("--json", action="store_true", help="sortie JSON")
+    r_rxp = route_sub.add_parser(
+        "rxp-compare", help="comparer notre route au parcours gratuit en clair de RestedXP (mesure, décision 268)"
+    )
+    r_rxp.add_argument("--class", dest="cls", help="classe (défaut : personnage actif du profil)")
+    r_rxp.add_argument("--race", help="race (défaut : personnage actif)")
+    r_rxp.add_argument("--faction", help="camp, horde ou alliance (défaut : personnage actif)")
+    r_rxp.add_argument("--from", dest="from_level", type=int, help="niveau de départ (défaut : niveau du personnage)")
+    r_rxp.add_argument("--to", dest="to_level", type=int, required=True, help="niveau d'arrivée")
+    r_rxp.add_argument("--start-guide", help="parcours de départ (partie de son nom, voir rxp-coverage)")
+    r_rxp.add_argument("--json", action="store_true", help="sortie JSON")
+    r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
+    r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
+    r_cov.add_argument("--json", action="store_true", help="sortie JSON")
     r_deliver = route_sub.add_parser("deliver", help="livrer une feuille de route à RestedXP")
     r_deliver.add_argument("id", help="identifiant rendu par forever route plan")
     r_deliver.add_argument(
@@ -1336,6 +1349,58 @@ def _route_guide(deps: Deps, args: argparse.Namespace, plan: Mapping[str, Any]) 
     return EXIT_OK
 
 
+def _route_rxp_compare(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever route rxp-compare` : personnage du profil par défaut (classe, race, camp, niveau)."""
+    from forever.compare import compare_rxp
+
+    character: Mapping[str, Any] = {}
+    if not (args.cls and args.race and args.faction and args.from_level):
+        character = read_profile(deps)["character"] or {}
+    cls, race = args.cls or character.get("class"), args.race or character.get("race")
+    faction, level = args.faction or character.get("faction"), args.from_level or character.get("level")
+    if not (cls and race and faction and level):
+        raise InvalidArgumentError(
+            "Personnage incomplet pour la comparaison (classe, race, camp, niveau).",
+            "donner --class, --race, --faction et --from, ou compléter le profil (forever profile set)",
+        )
+    doc = compare_rxp(
+        deps,
+        class_name=str(cls),
+        race=str(race),
+        faction=str(faction),
+        from_level=int(level),
+        to_level=args.to_level,
+        start_guide=args.start_guide,
+    )
+    ours, theirs, req, guides = doc["ours"], doc["theirs"], doc["request"], doc["guides"]
+
+    def side(label: str, s: Mapping[str, Any]) -> str:
+        return (
+            f"  {label} : {s['hours']:.1f} h, environ {round(s['xp_h'])} XP par heure, {s['quests']} quêtes rendues ; "
+            f"trajet {s['travel_hours']:.1f} h, objectifs {s['objective_hours']:.1f} h, farm {s['grind_hours']:.1f} h"
+        )
+
+    missing = f", suite absente en clair : {', '.join(guides['missing'])}" if guides["missing"] else ""
+    lines = [
+        (
+            f"Parcours gratuit de RestedXP rejoué par forever ({req['class']}, {req['race']}, {req['faction']}, niveau "
+            f"{req['from']} → {req['to']}) : {guides['count']} guides en clair jusqu'au niveau {guides['max_level']}"
+            f"{missing}"
+        ),
+        side("forever", ours),
+        side("RestedXP rejoué", theirs),
+        (
+            f"  quêtes communes : {len(doc['common'])} ; seulement chez forever : {len(doc['only_ours'])} ; seulement chez "
+            f"RestedXP : {len(doc['only_theirs'])} ; étapes impossibles chez nous : {len(theirs['skipped'])}"
+        ),
+        f"  zones (forever) : {' → '.join(ours['zones'][:12])}",
+        f"  zones (RestedXP) : {' → '.join(theirs['zones'][:12])}",
+        "  sans donjon des deux côtés ; une mesure, pas une source (décision 268)",
+    ]
+    _emit(doc, lines, doc["provenance"], args.json)
+    return EXIT_OK
+
+
 def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
     from forever.route import RouteRequest, load_plan, parse_professions, plan_route
 
@@ -1357,6 +1422,21 @@ def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
             "  sans donjon des deux côtés",
             *(f"  avertissement ({side}) : {w}" for side in ("ours", "theirs") for w in doc[side]["warnings"]),
         ]
+        _emit(doc, lines, doc["provenance"], args.json)
+        return EXIT_OK
+    if args.route_command == "rxp-compare":
+        return _route_rxp_compare(deps, args)
+    if args.route_command == "rxp-coverage":
+        from forever.compare import rxp_coverage
+
+        doc = rxp_coverage(deps, dungeon_guides=args.dungeon_guides)
+        lines = [f"Parcours gratuits en clair de RestedXP : {doc['guides']} guides ({doc['refused']} blocs non lus)"]
+        for row in doc["chains"]:
+            missing = f" ; suite absente en clair : {', '.join(row['missing'])}" if row["missing"] else ""
+            lines.append(
+                f"  {row['faction']} · {row['defaultfor']} : {row['start']} → niveau {row['max_level']} "
+                f"({len(row['guides'])} guides){missing}"
+            )
         _emit(doc, lines, doc["provenance"], args.json)
         return EXIT_OK
     if args.route_command in ("guide", "deliver"):
