@@ -22,6 +22,10 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   dis la raison (`reason` : addon absent, export bloqué, format non pris en charge), jamais un code deviné. Cite
   `order_note` quand l'ordre n'est pas compris, la certitude du bloc (`probable` : pas encore relu en jeu) et la
   version de l'addon (`provenance.version`).
+- Code Naowh Forever du même build (bloc `export.naowh` de `forever_build`, EX1) : si `status` vaut `ok` ou
+  `ordre_genere`, recopie tel quel `code` (chaîne `!NFB1!`) et `import` (en jeu : `/nf`, Profiles, Import) à côté du
+  lien Talents Forever ; cite `order_note` quand l'ordre est généré (légal à chaque prise, pas un ordre de leveling)
+  et la certitude du bloc (`probable` : jamais importé en jeu) ; `bloque` : dis la raison, jamais un code deviné.
 - Build populaire le plus proche (`export.talents_forever.closest_popular`) : rang, spécialisation, points du nôtre
   absents du sien (`missing_points`), points à ajouter, écart total, lien et date `asOf` ; certitude supposé
   (choix de joueurs).
@@ -31,6 +35,11 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   pour le choix du build.
 - Question personnelle : `forever_player_profile` d'abord (classe, niveau, talents du profil) ; question générale :
   rien à demander, hypothèse neutre annoncée.
+- Chaque build populaire et chaque contrôle `build_check` légal portent aussi `naowh` (code `!NFB1!`, ordre
+  généré) : donne-le à côté du lien Talents Forever, tel quel.
+- Macros de la classe ou profil EllesmereUI demandés : `forever_lookup(kind="export", name="naowh_macros")` (avec
+  `class_name`, `level`) ou `name="ellesmere"` (avec `character`, `realm`, `class_name`, `level`, `role`) ; recopie
+  `code` et `import` tels quels, certitude supposé (choix de catalogue).
 - Builds populaires de Talents Forever d'abord : `forever_lookup(kind="tf_popular", name=<classe>)` (addon lu sur
   disque) : part de chaque spécialisation, date `asOf` et fenêtre, puis chaque build avec son lien, sa commande
   `import` et sa légalité déjà contrôlée sur le client (`légal`, `illégal`, ou `non vérifiable` avec le talent

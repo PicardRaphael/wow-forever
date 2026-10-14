@@ -525,6 +525,41 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
 - Vérification facultative en jouant (RXP1, RXP2, décision 247) : livrer une route, ouvrir le menu des guides de
   RestedXP sans `/reload`, puis `/reload` et nouvelle connexion : le guide est-il toujours là ?
 
+### Exports vers les addons d'interface (EX1, ForeverBridge 0.4.0)
+- Une réponse du pont peut porter `links = { { kind, label, text }… }` (Talents Forever, `!NFB1!` de Naowh, macros
+  `!NFM1!`, profil `!EUI_`) en plus de `link` (gardé pour un addon pas encore rechargé) : chaque lien est imprimé
+  `[libellé]`, cliquable, et ouvre la boîte de copie du panneau d'action avec **sa** chaîne. `/fb exports` (alias
+  `/fb` de `/fv`) réimprime les liens d'export reçus pendant la session. Bouton « Exports » : réponse rédigée par le
+  pont sans le modèle (code Naowh du build actuel, liens du dernier build donné dans le chat).
+- `/fb role dps|heal|tank` : rôle du personnage (rôles permis par la table de `docs/SPEC.md`), gardé dans
+  `ForeverBridgeDB.roles["<nom> - <royaume>"]` et envoyé dans le contexte (`role`). Bascule vers le profil EllesmereUI
+  « <nom> - <rôle> » (`DPS`, `Soins`, `Tank`) : au `/fb role`, quelques secondes après la connexion (la bascule
+  d'EllesmereUI passe d'abord) et à `PLAYER_REGEN_ENABLED` si elle attendait la fin du combat ;
+  `EllesmereUI.SwitchProfile` sous `pcall`, seulement si `GetProfileList()` contient le nom et qu'il n'est pas déjà
+  actif. **Si la bascule automatique d'EllesmereUI vaut pour le personnage** (sa spécialisation, lue dans
+  `EllesmereUIDB.lastSpecByChar` ou en direct, est affectée à un profil par `GetSpecProfile`), ForeverBridge le
+  signale une fois et ne fait rien (décision 267, EUI2). Aucune écriture de `EllesmereUIDB`.
+- Objet LibDataBroker « Forever » : créé seulement si `LibStub("LibDataBroker-1.1", true)` existe (chargé par
+  EllesmereUI, rien d'embarqué) ; texte = ligne d'état des données, et XP par heure et prochain objectif seulement
+  quand le pont les publie (`status.xp_per_hour`, `status.next_objective` ; pas encore publiés) ; clic : fenêtre `/fv`.
+- `CreateMacro` et `EditMacro` sont refusés par `scripts/check_addon.py` : le joueur importe lui-même les macros.
+
+#### Vérifications facultatives en jouant (décision 247 ; NFB1, MAC1, EUI1, EUI2)
+1. **Build vers Naowh Forever** : `uv run forever export naowh-build --class Mage --level <niveau> --talents <…>`
+   (ou le lien `[Naowh : build]` d'une réponse du chat, ou le bouton « Exports »), copier le code `!NFB1!` ; en jeu,
+   `/nf`, puis **Profiles**, puis **Import**, coller, confirmer : le build apparaît dans la fenêtre Training de Naowh,
+   avec le nom et les points attendus (question NFB1). Dans l'autre sens : exporter un build depuis Naowh et le
+   coller dans `uv run forever export read "<chaîne>"`.
+2. **Macros** : `uv run forever export naowh-macros --class <classe> --level <niveau>`, puis `/nf`, **Profiles**,
+   **Import** (ou la fenêtre Macros de Naowh), hors combat : les macros « F … » apparaissent dans `/macro` ; lancer
+   l'une avant et après l'apprentissage d'un rang (question MAC1).
+3. **Profil EllesmereUI** : `uv run forever export ellesmere <personnage> --role <rôle>` (profil de base : le profil
+   actif de la sauvegarde, ou `--base`, ou `--paste "<!EUI_…>"`), puis `/eui`, **Profiles**, **Import**, coller,
+   nommer le profil exactement comme indiqué (« Jen - DPS »), `/reload` : le gestionnaire de recharges montre les
+   sorts du rôle (question EUI1). Puis `/fb role dps` : ForeverBridge bascule vers ce profil, sauf si la
+   spécialisation du personnage est affectée à un profil dans EllesmereUI (message, rien fait) ; vérifier après un
+   `/reload` et une nouvelle connexion que le profil reste celui attendu (question EUI2).
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 
