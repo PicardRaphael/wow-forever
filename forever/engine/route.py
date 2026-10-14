@@ -112,6 +112,7 @@ class RouteWorld:
     required: frozenset[int] = frozenset()  # quêtes imposées par le joueur (--include)
     trainers: tuple[Point, ...] = ()  # maîtres de classe du camp (bloc F)
     train_levels: tuple[int, ...] = ()  # niveaux où la classe apprend des sorts, dans la route
+    dropped: Mapping[int, str] = field(default_factory=dict)  # CJ1 : quêtes écartées du livre et pourquoi
     prof_visits: Mapping[str, tuple[int, tuple[Point, ...]]] = field(default_factory=dict)  # bloc H
     # CJ1 : zone de départ d'abord ; sous `early_level`, une quête hors de `early_zones` (ni de classe ni de donjon)
     # n'est pas prise ; None : aucune contrainte (rejeu d'un guide, race inconnue)

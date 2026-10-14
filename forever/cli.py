@@ -440,6 +440,15 @@ def build_parser() -> argparse.ArgumentParser:
     r_guide.add_argument("id", help="identifiant rendu par forever route plan")
     r_guide.add_argument("--out", help="fichier où écrire le guide (défaut : sortie standard)")
     r_guide.add_argument("--json", action="store_true", help="sortie JSON")
+    r_recette = route_sub.add_parser(
+        "recette",
+        help="accepter ou refuser nos routes face au parcours gratuit de RestedXP de la même race et classe (décision 279)",
+    )
+    r_recette.add_argument("--race", help="une race seulement (nom de races.json) ; défaut : toutes")
+    r_recette.add_argument("--class", dest="cls", help="une classe seulement ; défaut : toutes celles de la race")
+    r_recette.add_argument("--from", dest="from_level", type=int, default=1, help="niveau de départ (défaut : 1)")
+    r_recette.add_argument("--to", dest="to_level", type=int, default=10, help="niveau d'arrivée (défaut : 10)")
+    r_recette.add_argument("--json", action="store_true", help="sortie JSON")
     r_compare = route_sub.add_parser("compare", help="comparer une route de Factoruide (.fgguide) à la nôtre")
     r_compare.add_argument("file", help="fichier .fgguide exporté par Factoruide (bouton Share)")
     r_compare.add_argument("--json", action="store_true", help="sortie JSON")
@@ -1460,6 +1469,63 @@ def _route_rxp_compare(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _route_recette(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever route recette` : verdict de la décision 279 pour chaque race et classe jouable (races.json)."""
+    from forever.compare import route_recette
+    from forever.engine.route import weakest
+    from forever.freshness import freshness_for_version
+    from forever.provenance import make_provenance
+    from forever.store import load_version
+
+    data = load_version(deps)
+    races = data.read_json("races.json").get("races") or {}
+    if args.race and args.race not in races:
+        raise InvalidArgumentError(f"Race inconnue : {args.race}.", f"choisir parmi : {', '.join(races)}")
+    rows = []
+    for name, race in races.items():
+        if args.race and name != args.race:
+            continue
+        for cls in race.get("classes") or []:
+            if args.cls and cls.lower() != args.cls.lower():
+                continue
+            rows.append(
+                route_recette(
+                    deps,
+                    class_name=cls,
+                    race=name,
+                    faction=str(race["faction"]),
+                    from_level=args.from_level,
+                    to_level=args.to_level,
+                )
+            )
+    fresh = freshness_for_version(deps, data.game_version, allow_network=False)
+    provenance = make_provenance(
+        deps,
+        game_version=data.game_version,
+        data_sha=data.data_sha,
+        freshness=fresh["freshness"],
+        certainty=weakest(*(r["certainty"] for r in rows)),  # type: ignore[arg-type]
+        assumptions=[
+            *fresh["assumptions"],
+            (
+                "parcours gratuits en clair de RestedXP lus en local, rejoués par nos règles depuis le même départ ; "
+                "référence de qualité des routes sur les niveaux qu'ils couvrent (décision 279), aucun texte de guide repris"
+            ),
+            (
+                "acceptée : mêmes zones et au plus trois différences, chacune expliquée (quête de classe, donjon avec ses "
+                "quêtes, gain mesuré) ; notre route avec donjons et quêtes de classe par défaut"
+            ),
+        ],
+    )
+    doc = {"rows": rows, "accepted": sum(1 for r in rows if r["accepted"]), "provenance": provenance}
+    lines = [f"Recette des routes (décision 279) : {doc['accepted']} acceptée(s) sur {len(rows)}"]
+    for r in rows:
+        hours = f"{r['hours_ours']:.1f} h contre {r['hours_reference']:.1f} h" if r["hours_ours"] is not None else ""
+        lines.append(f"  {r['race']} {r['class']} ({r['from']} → {r['to']}) : {r['explanation']} {hours}".rstrip())
+    _emit(doc, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
     from forever.route import RouteRequest, load_plan, parse_professions, plan_route
 
@@ -1485,6 +1551,8 @@ def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
         return EXIT_OK
     if args.route_command == "rxp-compare":
         return _route_rxp_compare(deps, args)
+    if args.route_command == "recette":
+        return _route_recette(deps, args)
     if args.route_command == "rxp-coverage":
         from forever.compare import rxp_coverage
 

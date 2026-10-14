@@ -474,3 +474,105 @@ def rxp_coverage(deps: Any, *, wow_dir: Path | None = None, dungeon_guides: bool
             ],
         ),
     }
+
+
+# --- acceptation automatique des routes (CJ1, décision 279) -------------------------------------------------------
+
+
+def _measured_gains(
+    gd: GameData,
+    world: RouteWorld,
+    stops: Sequence[Stop],
+    start: RouteState,
+    *,
+    quests: Any,
+    end_level: int,
+    cap: int,
+    seconds: float,
+) -> dict[int, float]:
+    """Secondes gagnées par chaque quête `quests` de notre route : route simulée sans ses arrêts, moins la route
+    entière (gain positif : la quête fait gagner du temps). Registre : I18"""
+    from forever.engine.route import simulate
+
+    out: dict[int, float] = {}
+    for quest_id in quests:
+        rest = [s for s in stops if not (s.kind in ("accept", "objective", "turnin") and s.ref == quest_id)]
+        without = simulate(gd, world, rest, start, end_level=end_level, cap=cap)
+        if without.feasible and math.isfinite(without.seconds):
+            out[quest_id] = without.seconds - seconds
+    return out
+
+
+def route_recette(
+    deps: Any,
+    *,
+    class_name: str,
+    race: str,
+    faction: str,
+    from_level: int,
+    to_level: int,
+    wow_dir: Path | None = None,
+) -> dict[str, Any]:
+    """Verdict de la décision 279 pour un personnage : notre route (donjons et quêtes de classe par défaut, départ de la
+    zone de la race) face au parcours gratuit en clair de RestedXP de la même race et classe, rejoué par nos règles
+    depuis le même départ jusqu'au même niveau. Aucun texte de guide dans le résultat. Registre : I18"""
+    from forever.errors import InvalidArgumentError
+    from forever.optimize.route import plan
+    from forever.route import RouteRequest, route_context
+    from forever.route_check import accept_route
+    from forever.rxp_guides import guide_chain, read_rxp_guides, who_for
+
+    library = read_rxp_guides(_addons(deps, wow_dir))
+    who = who_for(class_name, race, faction)
+    request = RouteRequest(class_name.strip().lower(), faction.strip().lower(), from_level, to_level, race=race)
+    ctx = route_context(deps, request, wow_dir=wow_dir)
+    row: dict[str, Any] = {"race": race, "class": class_name, "from": from_level, "to": to_level}
+    try:
+        chain = guide_chain(library, who)
+    except InvalidArgumentError as exc:  # parcours absent : verdict impossible, dit tel quel
+        return {
+            **row,
+            "accepted": False,
+            "explanation": f"aucun parcours gratuit en clair ({exc})",
+            "guides": [],
+            "zones_ours": [],
+            "zones_reference": [],
+            "differences": [],
+            "common": 0,
+            "hours_ours": None,
+            "hours_reference": None,
+            "certainty": "suppose",
+        }
+    ours = plan(ctx.gd, ctx.world, ctx.start, end_level=to_level, cap=ctx.cap)
+    replay = replay_rxp(ctx.gd, ctx.world, chain.guides, who, ctx.start, end_level=to_level, cap=ctx.cap)
+    quests = ctx.world.quests
+
+    def turnins(stops: Sequence[Stop]) -> list[tuple[int, int | None]]:
+        return [
+            (int(s.ref), quests[int(s.ref)].zone if int(s.ref) in quests else None) for s in stops if s.kind == "turnin"
+        ]
+
+    mine, theirs = turnins(ours.stops), turnins(replay.stops)
+    alone = [q for q, _ in mine if q not in {r for r, _ in theirs}]
+    gains = _measured_gains(
+        ctx.gd,
+        ctx.world,
+        ours.stops,
+        ctx.start,
+        quests=alone,
+        end_level=to_level,
+        cap=ctx.cap,
+        seconds=ours.result.seconds,
+    )
+    verdict = accept_route(mine, theirs, quests, ctx.book.zone_names, dropped=ctx.world.dropped, gains=gains)
+    from forever.engine.route import weakest
+
+    return {
+        **row,
+        **verdict,
+        "guides": [g.name for g in chain.guides if g.levels is None or g.levels[0] < to_level],
+        "hours_ours": ours.result.seconds / SECONDS_PER_HOUR,
+        "hours_reference": replay.result.seconds / SECONDS_PER_HOUR,
+        "skipped_reference": len(replay.skipped),
+        "certainty": weakest(ours.result.certainty, replay.result.certainty),
+    }

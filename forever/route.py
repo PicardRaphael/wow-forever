@@ -157,10 +157,13 @@ def dungeon_steps(book: Any, key: str, *, faction: str | None, level: int, quest
     return steps
 
 
-def dungeon_placements(deps: Any, *, class_name: str, faction: str | None, wow_dir: Any = None) -> list[dict[str, Any]]:
+def dungeon_placements(
+    deps: Any, *, class_name: str, faction: str | None, wow_dir: Any = None, below: int | None = None
+) -> list[dict[str, Any]]:
     """Pour chaque donjon ouvert du livre (plage connue, camp permis) : niveau de placement et fenêtre (objectifs de
     leveling au premier niveau de sa plage), étapes de route, XP et minutes du premier passage (passages suivants
-    sans quête). Un donjon au-delà du plafond de niveau est rendu sans placement.
+    sans quête). Un donjon au-delà du plafond de niveau est rendu sans placement ; `below` (CJ1) : donjons dont la
+    plage commence à ce niveau ou plus laissés de côté (hors de la route, calcul évité).
 
     Registre : I17"""
     from forever.dungeons import build_dungeons
@@ -178,6 +181,8 @@ def dungeon_placements(deps: Any, *, class_name: str, faction: str | None, wow_d
         rng = (d["fields"].get("levels") or {}).get("value")
         own = (d["fields"].get("faction") or {}).get("value")
         if d["closed"] or not rng or (faction is not None and own not in (None, faction)):
+            continue
+        if below is not None and rng["min"] >= below:
             continue
         row: dict[str, Any] = {
             "id": key,
@@ -565,6 +570,7 @@ def route_world(
             if (points := _trainer_points(maps, people, request.faction))
         },
         train_levels=tuple(lv for lv in sorted(set(train_levels)) if request.start_level < lv < request.end_level),
+        dropped={qid: reason for reason, ids in dropped.items() for qid in ids},
     )
     return world, warnings
 
@@ -949,7 +955,9 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
 
     rows: list[dict[str, Any]] = []
     if request.dungeons != "none":
-        rows = dungeon_placements(deps, class_name=cls, faction=request.faction, wow_dir=wow_dir)
+        rows = dungeon_placements(
+            deps, class_name=cls, faction=request.faction, wow_dir=wow_dir, below=request.end_level
+        )
     races = data.read_json("races.json").get("races") or {}
     if request.race and request.race not in races:
         raise InvalidArgumentError(f"Race inconnue : {request.race}.", f"choisir parmi : {', '.join(races)}")
