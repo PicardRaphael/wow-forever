@@ -83,11 +83,46 @@ MACRO_NAME_MAX = 16  # octets du nom (`C.NAME_MAX` de NaowhForever_Macros)
 MACRO_BODY_MAX = 255  # octets du corps (`C.LIMIT`)
 
 
+def _check_macro(name: Any, body: Any) -> tuple[str, str]:
+
+    if not isinstance(name, str) or not isinstance(body, str):
+        raise ExportFormatError("macro sans nom ou sans corps")
+    clean = re.sub(r"[|\r\n]", "", name)
+    if not 1 <= len(clean.encode("utf-8")) <= MACRO_NAME_MAX:
+        raise ExportFormatError(f"nom de macro « {name} » : de 1 à {MACRO_NAME_MAX} octets")
+    if len(body.encode("utf-8")) > MACRO_BODY_MAX:
+        raise ExportFormatError(f"corps de la macro « {clean} » au-delà de {MACRO_BODY_MAX} octets")
+    return clean, body
+
+
 def naowh_macros(macros: Sequence[tuple[str, str]]) -> str:
     """Chaîne `!NFM1!` de macros `(nom, corps)` ; `ExportFormatError` si une seule est hors bornes (Naowh rejette
-    alors toute la chaîne)."""
-    raise NotImplementedError
+    alors toute la chaîne) ou porte une commande interdite (`macro_violations`)."""
+    from forever.exports.macros import macro_violations
+
+    if not macros:
+        raise ExportFormatError("aucune macro à exporter")
+    out = []
+    for name, body in macros:
+        clean, checked = _check_macro(name, body)
+        bad = macro_violations(checked)
+        if bad:
+            raise ExportFormatError(f"macro « {clean} » : commande interdite {bad[0]}")
+        out.append({"name": clean, "body": checked})
+    return pack(MACRO_PREFIX, {"v": MACRO_VERSION, "macros": out})
 
 
 def read_naowh_macros(text: str) -> list[tuple[str, str]]:
-    raise NotImplementedError
+    """Macros `(nom, corps)` relues d'une chaîne `!NFM1!` ; une seule macro invalide refuse toute la chaîne, comme
+    Naowh."""
+    data = unpack(MACRO_PREFIX, text, NAOWH_LIMITS)
+    if not isinstance(data, dict) or data.get("v") != MACRO_VERSION or not isinstance(data.get("macros"), list):
+        raise ExportFormatError(f"macros de version inconnue (attendu v={MACRO_VERSION})")
+    if not data["macros"]:
+        raise ExportFormatError("aucune macro dans la chaîne")
+    out = []
+    for m in data["macros"]:
+        if not isinstance(m, dict):
+            raise ExportFormatError("macro illisible")
+        out.append(_check_macro(m.get("name"), m.get("body")))
+    return out

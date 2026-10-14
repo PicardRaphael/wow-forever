@@ -808,6 +808,11 @@ def build_parser() -> argparse.ArgumentParser:
     exp_nfb.add_argument("--order", help="ordre de prise « clé,clé,… », un point par entrée (avec --talents)")
     exp_nfb.add_argument("--name", help="nom du build dans Naowh (défaut : classe, niveau, arbre)")
     exp_nfb.add_argument("--json", action="store_true", help="sortie JSON")
+    exp_nfm = exp_sub.add_parser("naowh-macros", help="macros de la classe au niveau en code !NFM1! (Naowh Forever)")
+    exp_nfm.add_argument("--class", dest="cls", required=True, help="classe (nom français ou anglais)")
+    exp_nfm.add_argument("--level", type=int, required=True, help="niveau du personnage")
+    exp_nfm.add_argument("--talents", help="talents « clé=rang,… » (sorts de talent rendus seulement s'ils sont pris)")
+    exp_nfm.add_argument("--json", action="store_true", help="sortie JSON")
     exp_read = exp_sub.add_parser("read", help="relit une chaîne d'export (!NFB1!…) : contenu en nos clés")
     exp_read.add_argument("text", help="chaîne complète, préfixe compris")
     exp_read.add_argument("--json", action="store_true", help="sortie JSON")
@@ -2638,6 +2643,12 @@ def _cmd_export_naowh_build(deps: Deps, args: argparse.Namespace) -> int:
 def _cmd_export(deps: Deps, args: argparse.Namespace) -> int:
     if args.export_cmd == "naowh-build":
         return _cmd_export_naowh_build(deps, args)
+    if args.export_cmd == "naowh-macros":
+        from forever.exports.macros import macros_export, render_macros
+
+        rep = macros_export(deps, args.cls, args.level, parse_talents(args.talents) if args.talents else None)
+        _emit(rep, render_macros(rep), rep["provenance"], args.json)
+        return EXIT_OK
     from forever.exports.read import read_export
 
     rep = read_export(deps, args.text)
@@ -2647,6 +2658,10 @@ def _cmd_export(deps: Deps, args: argparse.Namespace) -> int:
             f"Build Naowh « {rep['name']} » : {rep['class'] or rep['class_id']}, {rep['spec']}, {len(rep['points'])} points"
         )
         lines.append("  Ordre : " + ", ".join(k or "?" for k in rep["order"]))
+    elif rep["kind"] == "naowh_macros":
+        lines[0] = f"Macros Naowh : {len(rep['macros'])}"
+        for m in rep["macros"]:
+            lines += [f"  {m['name']} :", *(f"    {line}" for line in m["body"].splitlines())]
     _emit(rep, lines, rep["provenance"], args.json)
     return EXIT_OK
 

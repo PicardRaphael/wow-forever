@@ -17,7 +17,17 @@ ROOT = Path(__file__).resolve().parent.parent
 INTERFACE = "16001"  # interface de l'API du client Forever (Mainline 12.1.5, build 70009)
 SAVED_VARIABLE = "ForeverLoggerDB"
 FORBIDDEN = frozenset(
-    {"CastSpell", "CastSpellByName", "CastSpellByID", "UseAction", "SendChatMessage", "RunMacro", "RunMacroText"}
+    {
+        "CastSpell",
+        "CastSpellByName",
+        "CastSpellByID",
+        "UseAction",
+        "SendChatMessage",
+        "RunMacro",
+        "RunMacroText",
+        "CreateMacro",  # EX1 (décision 195) : macros importées par le joueur, jamais créées par l'addon
+        "EditMacro",
+    }
 )
 # RX1 : aucun code reçu exécuté, aucune chaîne d'import chiffrée de RestedXP ; seuls RXPGuides.ImportGuide,
 # RXPGuides.RegisterGuide et RXP:ScheduleTask sont appelés (sous pcall).

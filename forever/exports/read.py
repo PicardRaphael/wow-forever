@@ -10,12 +10,18 @@ from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.exports.codec import ExportFormatError
 
-KNOWN_PREFIXES = ("!NFB1!",)
+KNOWN_PREFIXES = ("!NFB1!", "!NFM1!")
 
 
 def read_export(deps: Deps, text: str) -> dict[str, Any]:
     """Contenu d'une chaîne d'export ; `InvalidArgumentError` en français si elle est illisible ou inconnue."""
-    from forever.exports.naowh import BUILD_PREFIX, NAOWH_VERSION, read_naowh_build
+    from forever.exports.naowh import (
+        BUILD_PREFIX,
+        MACRO_PREFIX,
+        NAOWH_VERSION,
+        read_naowh_build,
+        read_naowh_macros,
+    )
     from forever.gamedata import build_game_data
     from forever.provenance import local_provenance
     from forever.store import load_version
@@ -44,6 +50,14 @@ def read_export(deps: Deps, text: str) -> dict[str, Any]:
                 "order": order,
                 "unknown_nodes": unknown,
                 "provenance": local_provenance(deps, certainty="probable", assumptions=notes),
+            }
+        if body.startswith(MACRO_PREFIX):
+            macros = read_naowh_macros(body)
+            note = f"chaîne !NFM1! relue (format de Naowh Forever {NAOWH_VERSION})"
+            return {
+                "kind": "naowh_macros",
+                "macros": [{"name": name, "body": text} for name, text in macros],
+                "provenance": local_provenance(deps, certainty="probable", assumptions=[note]),
             }
     except ExportFormatError as err:
         raise InvalidArgumentError(

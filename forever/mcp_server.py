@@ -57,7 +57,7 @@ def _error_result(deps: Deps, err: ForeverError) -> CallToolResult:
     )
 
 
-EXPORT_KINDS = ("naowh_build", "read")
+EXPORT_KINDS = ("naowh_build", "naowh_macros", "read")
 
 
 def _export_lookup(
@@ -76,6 +76,12 @@ def _export_lookup(
         if level is None or not talents:
             raise InvalidArgumentError("Niveau ou talents manquants.", "donner class_name, level et talents")
         return naowh_export(deps, class_name or "Mage", level, parse_talents(talents))
+    if name == "naowh_macros":
+        from forever.exports.macros import macros_export
+
+        if not class_name or level is None:
+            raise InvalidArgumentError("Classe ou niveau manquant.", "donner class_name et level")
+        return macros_export(deps, class_name, level, parse_talents(talents) if talents else None)
     raise InvalidArgumentError(f"Export « {name} » inconnu.", "name : " + ", ".join(EXPORT_KINDS))
 
 
@@ -166,8 +172,10 @@ def build_server(deps: Deps) -> MCPServer:
         EX1 : `kind="export"`, chaînes d'import des addons d'interface, que le joueur colle lui-même ; `name` =
         `naowh_build` avec `class_name`, `level` et `talents` (« clé=rang,… ») : code `!NFB1!` de Naowh Forever (en
         jeu : /nf, Profiles, Import), ordre légal généré et signalé (`order_note`), statut `bloque` avec sa raison si
-        le build est illégal ; `name` = `read` avec `text` (chaîne complète) : contenu relu en nos clés. Certitude
-        `probable` (jamais importé en jeu)."""
+        le build est illégal ; `name` = `naowh_macros` avec `class_name` et `level` (`talents` facultatif) : macros de
+        la classe apprises au niveau, code `!NFM1!` et texte brut à coller sans Naowh (certitude `suppose`) ; `name` =
+        `read` avec `text` (chaîne complète) : contenu relu en nos clés. Certitude `probable` (jamais importé en
+        jeu)."""
         try:
             if kind in ("dungeons", "dungeon", "dungeon_item"):
                 from forever.dungeons import dungeon_payload, dungeons_payload, item_payload
