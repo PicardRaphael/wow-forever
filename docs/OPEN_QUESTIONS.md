@@ -251,6 +251,23 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   (RX1, bloc C). La route part du donneur de la première quête et ne prend aucun vol (vols connus inconnus), `suppose`.
   Test : race et vols connus lus par ForeverBridge (`GetTaxiNodes` hors combat, à confirmer) ou donnés au profil.
   Priorité : moyenne. Registre I18, I19.
+  Complément du 2026-10-14 (RX1c) : le départ est désormais le donneur d'une quête permise au niveau de départ, au
+  niveau le plus proche ; le parcours gratuit Horde 1 → 22 de RestedXP prend 39 vols et 24 fois la pierre de foyer,
+  que nos trajets ignorent (`docs/research/rxp-comparaison.md`).
+- **RTE4 — Où placer une quête lancée par un objet ou une nouvelle quête de Forever sans donneur positionné ?**
+  Ajoutée le 2026-10-14 (RX1c, décision 268). 832 quêtes du livre sont écartées des routes faute de donneur
+  positionné ; le parcours gratuit du Chasseur Horde 1 → 22 de RestedXP en prend 5 (dont deux lancées par un objet et
+  la série « camping » de Forever) et 6 autres en dépendent par leur chaîne. Test : objet de départ lu (Questie
+  `startedBy`, cache des objets), lieu où il tombe, ou prise relevée par ForeverLogger. Priorité : moyenne. Registre I18.
+- **RTE5 — Combien de monstres tue-t-on en chemin, par zone et par niveau ?** Ajoutée le 2026-10-14 (RX1c). Notre
+  simulation ne crédite que les monstres des objectifs ; les parcours de RestedXP comptent sur les monstres croisés et
+  placent des étapes « farm jusqu'au niveau N ». Test : XP de monstres relevée par ForeverLogger entre deux arrêts
+  d'une route suivie en jeu. Priorité : moyenne. Registre I18.
+- **LVL18 — « Vile Familiars » (792) demande-t-elle vraiment la quête 1485 sur Forever ?** Ajoutée le 2026-10-14
+  (RX1c). Nos sources lui donnent un prérequis « un parmi » 1485, quête d'une autre classe : 792, 794 et 805 sont donc
+  écartées des routes de la Horde, alors que le parcours gratuit de RestedXP les fait. Ne pas trancher sans relevé.
+  Test : quête prise en jeu par un personnage non Démoniste sans 1485 (Questie, ForeverLogger). Priorité : moyenne.
+  Registre I18.
 - **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
   Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
 - **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**
