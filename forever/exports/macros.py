@@ -69,32 +69,23 @@ def _short_name(spell_name: str) -> str:
     return raw.decode("utf-8", errors="ignore").rstrip()
 
 
-def _learned_level(spell: Mapping[str, Any]) -> int | None:
-    """Premier niveau d'apprentissage connu (rang du client) ; un niveau absent ou nul reste inconnu."""
-    levels = [int(r["level"]) for r in spell.get("ranks") or [] if r.get("level")]
-    return min(levels) if levels else None
-
-
 def class_macros(gd: GameData, class_name: str, level: int, talents: Mapping[str, int] | None = None) -> list[Macro]:
     """Macros du catalogue dont le sort est appris au niveau (sort de talent : seulement si le talent est pris),
     dans l'ordre du catalogue, sans doublon de nom."""
+    from forever.engine.spells import learned_class_ranks
     from forever.profile import normalize_class
 
     cls = normalize_class(class_name)
     knowledge = gd.classes.get(cls)
     if knowledge is None:
         return []
-    taken = {k for k, r in (talents or {}).items() if r > 0}
     out: list[Macro] = []
     names: set[str] = set()
     for entry in catalogue().get(cls, []):
         spell = knowledge.spells.get(entry["spell"])
         if spell is None:
             continue
-        first = _learned_level(spell)
-        if first is None or first > level:
-            continue
-        if spell.get("talent") is not None and spell["talent"] not in taken:
+        if not learned_class_ranks(spell, level, talents or {}):
             continue
         body = "\n".join(line.format(spell=spell["name"]) for line in TEMPLATES[entry["template"]])
         name = _short_name(str(spell["name"]))

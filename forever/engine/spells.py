@@ -184,4 +184,11 @@ def learned_class_ranks(spell: Mapping[str, Any], level: int, talents: Mapping[s
     égal à celui du personnage.
 
     Registre : G4"""
-    raise NotImplementedError
+    talent = spell.get("talent")
+    ranks = list(spell.get("ranks") or [])
+    if talent is not None:
+        key = talent.get("key") if isinstance(talent, Mapping) else talent
+        if talents.get(str(key), 0) <= 0 or not ranks:
+            return []
+        return [ranks[0], *(r for r in ranks[1:] if r.get("level") and r["level"] <= level)]
+    return [r for r in ranks if r.get("level") and r["level"] <= level]

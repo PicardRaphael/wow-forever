@@ -262,17 +262,6 @@ def role_catalogue() -> dict[str, dict[str, dict[str, list[str]]]]:
     return data
 
 
-def _learned_ranks(spell: Mapping[str, Any], level: int, taken: set[str]) -> list[Mapping[str, Any]]:
-    talent = spell.get("talent")
-    if talent is not None:
-        key = talent.get("key") if isinstance(talent, Mapping) else talent
-        if key not in taken:
-            return []
-        known = [r for r in spell.get("ranks") or [] if not r.get("level") or r["level"] <= level]
-        return known
-    return [r for r in spell.get("ranks") or [] if r.get("level") and r["level"] <= level]
-
-
 def role_spells(
     gd: GameData, class_name: str, role: str, level: int, talents: Mapping[str, int] | None = None
 ) -> dict[str, list[int]]:
@@ -285,7 +274,8 @@ def role_spells(
     groups = role_catalogue().get(cls, {}).get(role)
     if knowledge is None or groups is None:
         return {"cooldowns": [], "utility": [], "buffs": []}
-    taken = {k for k, r in (talents or {}).items() if r > 0}
+    from forever.engine.spells import learned_class_ranks
+
     out: dict[str, list[int]] = {}
     for bar in ("cooldowns", "utility", "buffs"):
         ids: list[int] = []
@@ -293,7 +283,7 @@ def role_spells(
             spell = knowledge.spells.get(key)
             if spell is None:
                 continue
-            for rank in _learned_ranks(spell, level, taken):
+            for rank in learned_class_ranks(spell, level, talents or {}):
                 if bar != "buffs" and not (rank.get("cooldown_s") and rank["cooldown_s"] > (rank.get("gcd_s") or 0)):
                     continue
                 if int(rank["spell_id"]) not in ids:
