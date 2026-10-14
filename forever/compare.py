@@ -79,7 +79,7 @@ def replay_guide(
     avec leur raison ; une visite au maître de classe est placée dès qu'elle est due. Registre : I18"""
     from forever.engine.route import apply_stop, check_stop, simulate
 
-    world = replace(world, refuse_red=False)  # CJ1 : route d'un autre outil rejouée telle quelle
+    world = replace(world, refuse_red=False, early_zones=None)  # CJ1 : route d'un autre outil rejouée telle quelle
     state = start
     stops: list[Stop] = []
     skipped: list[dict[str, Any]] = []
@@ -227,9 +227,8 @@ def replay_rxp(
     from forever.engine.route import apply_stop, check_stop, grind_to, weakest
     from forever.rxp_guides import applies, xp_rate_ok
 
-    world = replace(
-        world, refuse_red=False
-    )  # CJ1 : le jeu permet de prendre une quête rouge ; seule notre route s'en garde
+    # CJ1 : le jeu permet une quête rouge ou hors de la zone de départ ; seule notre route s'en garde
+    world = replace(world, refuse_red=False, early_zones=None)
 
     steps = [
         s

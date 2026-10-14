@@ -523,6 +523,7 @@ def route_world(
             exclusive=tuple(value(q, "exclusive") or ()),
             dungeon=dungeon_of.get(quest_id),
             certainty=weakest(q["fields"]["giver"]["certainty"], *(["suppose"] if guessed else [])),
+            class_quest=isinstance(classes, int) and classes != 0,
         )
     # quêtes dont un prérequis est hors de la route (ni dans la route, ni déjà faite) : jamais prenables
     changed = True
@@ -765,6 +766,32 @@ def rxp_start_giver(library: Any, who: Any, quests: Any, level: int) -> Any:
     return None
 
 
+def reference_zones(library: Any, who: Any, quests: Any, *, below: int) -> frozenset[int]:
+    """Zones (cartes des donneurs) des quêtes que le parcours gratuit de la race et de la classe prend dans ses guides
+    qui commencent sous le niveau `below` (étapes et lignes filtrées pour le personnage, `#xprate` compris, étapes de
+    donjon écartées) ; vide sans parcours. Registre : I18"""
+    from forever.errors import InvalidArgumentError
+    from forever.rxp_guides import applies, guide_chain, xp_rate_ok
+
+    try:
+        chain = guide_chain(library, who)
+    except InvalidArgumentError:
+        return frozenset()
+    zones: set[int] = set()
+    for g in chain.guides:
+        if g.levels is not None and g.levels[0] >= below:
+            continue
+        for s in g.steps:
+            if s.dungeon or s.hardcore or not applies(s.filter, who):
+                continue
+            if s.xp_rate is not None and applies(s.xp_rate[1], who) and not xp_rate_ok(s.xp_rate[0]):
+                continue
+            for a in s.actions:
+                if a.kind == "accept" and a.ref in quests and applies(a.filter, who) and quests[a.ref].zone is not None:
+                    zones.add(quests[a.ref].zone)
+    return frozenset(zones)
+
+
 def start_position(maps: Any, request: RouteRequest, quests: Any, *, rxp_giver: Any) -> tuple[Any, str]:
     """Départ d'une route et sa raison : la position réelle du contexte (`position`), sinon le premier donneur du
     parcours gratuit de la race (`parcours`), sinon le donneur d'une quête permise au niveau de départ (`quête`).
@@ -788,20 +815,39 @@ START_REASONS = {
 }
 
 
-def _race_start(addons: Any, request: RouteRequest, quests: Any) -> Any:
-    """Donneur de départ pris du parcours gratuit de la race (lecture locale de RestedXP, décision 277) ; None sans
-    race, sans RestedXP installé ou sans quête connue. Registre : I18"""
+def _race_reference(addons: Any, request: RouteRequest, quests: Any, below: int | None) -> tuple[Any, frozenset[int]]:
+    """Donneur de départ et zones des bas niveaux pris du parcours gratuit de la race (lecture locale de RestedXP,
+    décisions 277 et 278) ; (None, vide) sans race ou sans RestedXP installé. Registre : I18"""
     from forever.errors import InvalidArgumentError
     from forever.rxp_guides import read_rxp_guides, who_for
 
-    if not request.race or addons is None or request.start_at is not None:
-        return None
+    if not request.race or addons is None:
+        return None, frozenset()
     try:
         library = read_rxp_guides(addons)
     except InvalidArgumentError:
-        return None
+        return None, frozenset()
     who = who_for(request.class_name, request.race, request.faction)
-    return rxp_start_giver(library, who, quests, request.start_level)
+    giver = None if request.start_at is not None else rxp_start_giver(library, who, quests, request.start_level)
+    zones = reference_zones(library, who, quests, below=below) if below is not None else frozenset()
+    return giver, zones
+
+
+def _map_of(maps: Any, point: Any) -> int | None:
+    """Carte (uiMapID) qui contient un point du monde : la plus petite des cartes de son continent qui le couvrent."""
+    if point is None:
+        return None
+    best: tuple[float, int] | None = None
+    for ui_map, m in maps.items():
+        if m.continent != point.continent:
+            continue
+        if min(m.min_x, m.max_x) <= point.x <= max(m.min_x, m.max_x) and min(m.min_y, m.max_y) <= point.y <= max(
+            m.min_y, m.max_y
+        ):
+            area = abs(m.max_x - m.min_x) * abs(m.max_y - m.min_y)
+            if best is None or area < best[0]:
+                best = (area, ui_map)
+    return best[1] if best else None
 
 
 def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> RouteContext:
@@ -923,12 +969,25 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     )
     if not world.quests:
         warnings.append("aucune quête placée : la route n'est que du farm")
-    giver = _race_start(addons, request, world.quests)
+    filters = route_filters(values)
+    low = filters.low_level if filters is not None and request.start_level < filters.low_level else None
+    giver, zones = _race_reference(addons, request, world.quests, low)
     position, reason = start_position(maps, request, world.quests, rxp_giver=giver)
     if position is None:
         position = next(iter(maps.values()), None)
         position = position and _point(maps, {"map": position.ui_map, "x": 50.0, "y": 50.0})
     warnings.insert(0, START_REASONS[reason])
+    if low is not None and request.race:
+        here = request.start_at[0] if request.start_at is not None else _map_of(maps, position)
+        start_zone = next((q.zone for q in world.quests.values() if q.giver == position), None) or here
+        allowed = frozenset(z for z in (*zones, start_zone) if z is not None)
+        if allowed:
+            world = replace(world, early_zones=allowed, early_level=low)
+            names = ", ".join(sorted(str(book.zone_names.get(z) or z) for z in allowed))
+            warnings.insert(
+                1,
+                f"zone de départ d'abord : jusqu'au niveau {low}, quêtes de {names} seulement (hors classe et donjon)",
+            )
     done = frozenset(request.done)
     start = RouteState(level=request.start_level, xp=0.0, position=position, done=done)
     return RouteContext(

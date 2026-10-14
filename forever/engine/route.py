@@ -58,6 +58,7 @@ class RouteQuest:
     exclusive: tuple[int, ...] = ()
     dungeon: str | None = None
     certainty: str = "suppose"  # positions et objectif
+    class_quest: bool = False  # CJ1 : quête réservée à la classe (permise hors des zones de départ)
 
 
 @dataclass(frozen=True)
@@ -112,9 +113,11 @@ class RouteWorld:
     trainers: tuple[Point, ...] = ()  # maîtres de classe du camp (bloc F)
     train_levels: tuple[int, ...] = ()  # niveaux où la classe apprend des sorts, dans la route
     prof_visits: Mapping[str, tuple[int, tuple[Point, ...]]] = field(default_factory=dict)  # bloc H
-    refuse_red: bool = (
-        True  # CJ1 : notre route ne prend pas de quête rouge ; le rejeu d'un guide la permet (le jeu aussi)
-    )
+    # CJ1 : zone de départ d'abord ; sous `early_level`, une quête hors de `early_zones` (ni de classe ni de donjon)
+    # n'est pas prise ; None : aucune contrainte (rejeu d'un guide, race inconnue)
+    early_zones: frozenset[int] | None = None
+    early_level: int = 0
+    refuse_red: bool = True  # CJ1 : notre route ne prend pas de quête rouge ; le rejeu d'un guide la permet
 
 
 @dataclass(frozen=True)
@@ -196,6 +199,14 @@ def _check_accept(gd: GameData, world: RouteWorld, state: RouteState, quest_id: 
         return f"niveau minimal {q.min_level}"
     if world.refuse_red and q.dungeon is None and q.level >= state.level + gd.leveling.quest_band.red_min_diff:
         return "quête rouge, trop haute pour ce niveau (CJ1)"
+    if (
+        world.early_zones is not None
+        and state.level < world.early_level
+        and q.dungeon is None
+        and not q.class_quest
+        and q.zone not in world.early_zones
+    ):
+        return f"hors de la zone de départ avant le niveau {world.early_level} (CJ1)"
     if not set(q.prereq_all) <= state.done:
         return "prérequis non rendus"
     if q.prereq_any and not set(q.prereq_any) & state.done:
