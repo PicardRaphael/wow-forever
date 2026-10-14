@@ -9,10 +9,10 @@ Valeurs : sauvegarde fabriquée ici (structure seulement, aucun guide de RestedX
 from pathlib import Path
 
 import pytest
-from forever.rxp_clean import ROUTES_GROUP, clean_rxp_routes, forever_keys
 
 from forever.errors import InvalidArgumentError
 from forever.pipeline.lua_table import parse_lua_value_at
+from forever.rxp_clean import ROUTES_GROUP, clean_rxp_routes, forever_keys
 
 SV = """
 RXPDB = {
