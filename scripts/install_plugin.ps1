@@ -4,9 +4,10 @@ Installe le plugin Claude Code « forever » au niveau utilisateur. Même script
 
 .DESCRIPTION
 1. Contrôle git (Git for Windows fournit aussi le bash des hooks), uv et claude.
-2. Fixe les variables d'environnement utilisateur FOREVER_HOME (ce dépôt) et FOREVER_WOW_DIR (dossier du client,
-   cherché dans Program Files (x86) puis Program Files, ou donné par -WowDir).
-3. Synchronise l'environnement Python du dépôt (uv sync).
+2. Fixe la variable d'environnement utilisateur FOREVER_HOME (ce dépôt).
+3. Synchronise l'environnement Python du dépôt (uv sync), puis fixe FOREVER_WOW_DIR sur l'installation que choisit
+   forever wow list (bêta, ou version finale adoptée par forever wow adopt ; ou -WowDir) ; demande l'accord avant
+   de remplacer une valeur différente.
 4. Déclare la marketplace locale du dépôt (wow-forever), installe le plugin forever@wow-forever en portée
    utilisateur, ou le met à jour s'il est déjà installé.
 5. Contrôles : validation du plugin, état des données sans réseau, plugin présent et activé.
@@ -16,11 +17,15 @@ Lancement, depuis la racine du dépôt (contourne la politique d'exécution des 
 Mise à jour : git pull, puis la même commande.
 
 .PARAMETER WowDir
-Dossier du client (celui qui contient Interface et Logs), si le client n'est pas dans Program Files.
+Dossier du client (celui qui contient Interface et Logs), s'il n'est pas trouvé par forever wow list.
+
+.PARAMETER Print
+Affiche seulement l'installation choisie et sa raison, sans rien changer (diagnostic, LN1).
 #>
 [CmdletBinding()]
 param(
-    [string]$WowDir = ""
+    [string]$WowDir = "",
+    [switch]$Print
 )
 
 $ErrorActionPreference = "Stop"
@@ -39,11 +44,27 @@ function Invoke-Checked([string]$What, [scriptblock]$Command) {
     if ($LASTEXITCODE -ne 0) { Fail "$What a échoué (code de sortie $LASTEXITCODE)." }
 }
 
+function Read-WowChoice([string]$Project) {
+    # Choix de forever (LN1) : bêta, version finale adoptée, ou dossier forcé ; --no-sync : jamais de réseau ici.
+    $text = (& uv run --no-sync --quiet --project $Project forever wow list --json | Out-String)
+    if ($LASTEXITCODE -ne 0) { Fail "forever wow list --json en échec (code de sortie $LASTEXITCODE)." }
+    return ($text | ConvertFrom-Json)
+}
+
 function Read-Json([scriptblock]$Command) {
     $text = (& $Command | Out-String)
     if ($LASTEXITCODE -ne 0) { Fail "commande claude en échec (code de sortie $LASTEXITCODE)." }
     # Windows PowerShell 5.1 rend un tableau JSON comme un seul objet : ForEach-Object en émet les éléments.
     return ($text | ConvertFrom-Json | ForEach-Object { $_ })
+}
+
+if ($Print) {
+    [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    $here = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+    $listing = Read-WowChoice $here
+    Write-Output "Installation choisie : $($listing.choice.folder) ($($listing.reason))"
+    Write-Output "FOREVER_WOW_DIR actuel : $([Environment]::GetEnvironmentVariable('FOREVER_WOW_DIR', 'User'))"
+    exit 0
 }
 
 # 1. Outils requis
@@ -68,27 +89,38 @@ if (-not (Test-Path -LiteralPath (Join-Path $Root ".claude-plugin\marketplace.js
 $env:FOREVER_HOME = $Root
 Step "FOREVER_HOME = $Root"
 
-# 3. Dossier du client
-$candidates = @()
-if ($WowDir) { $candidates += $WowDir }
-$previous = [Environment]::GetEnvironmentVariable("FOREVER_WOW_DIR", "User")
-if ($previous) { $candidates += $previous }
-$candidates += "C:\Program Files (x86)\World of Warcraft\_classic_beta_"
-$candidates += "C:\Program Files\World of Warcraft\_classic_beta_"
-$wow = $candidates | Where-Object { $_ -and (Test-Path -LiteralPath $_ -PathType Container) } | Select-Object -First 1
-if ($wow) {
-    [Environment]::SetEnvironmentVariable("FOREVER_WOW_DIR", $wow, "User")
-    $env:FOREVER_WOW_DIR = $wow
-    Step "FOREVER_WOW_DIR = $wow"
-} else {
-    Write-Warning ("Client WoW Forever introuvable (Program Files (x86) et Program Files) : FOREVER_WOW_DIR n'est pas " +
-        "fixée. Relancer avec -WowDir <dossier du client>. Le plugin fonctionne sans, sauf les zones (Questie) et " +
-        "les journaux de combat.")
-}
-
 # 4. Environnement Python
 Step "Synchronisation de l'environnement Python"
 Invoke-Checked "uv sync" { uv sync --project $Root }
+
+# 4 bis. Dossier du client : choix de `forever wow list --json` (LN1), accord avant de remplacer une autre valeur
+$previous = [Environment]::GetEnvironmentVariable("FOREVER_WOW_DIR", "User")
+if ($WowDir) {
+    $wow = $WowDir
+    $reason = "dossier donné par -WowDir"
+} else {
+    $listing = Read-WowChoice $Root
+    $wow = $listing.choice.folder
+    $reason = $listing.reason
+}
+if ($wow) {
+    $apply = $true
+    if ($previous -and $previous -ne $wow) {
+        $answer = Read-Host "FOREVER_WOW_DIR vaut $previous ; forever choisit $wow ($reason). Remplacer ? [o/N]"
+        $apply = $answer -match '^(o|oui)$'
+    }
+    if ($apply) {
+        [Environment]::SetEnvironmentVariable("FOREVER_WOW_DIR", $wow, "User")
+        $env:FOREVER_WOW_DIR = $wow
+        Step "FOREVER_WOW_DIR = $wow ($reason)"
+    } else {
+        Step "FOREVER_WOW_DIR gardé : $previous (forever wow list pour revoir le choix)"
+    }
+} else {
+    Write-Warning ("Client WoW Forever introuvable ($reason) : FOREVER_WOW_DIR n'est pas fixée. Relancer avec " +
+        "-WowDir <dossier du client>, ou déclarer sa racine dans FOREVER_WOW_ROOTS. Le plugin fonctionne sans, sauf " +
+        "les zones (Questie) et les journaux de combat.")
+}
 
 # 5. Marketplace et plugin
 Step "Marketplace locale $Marketplace"

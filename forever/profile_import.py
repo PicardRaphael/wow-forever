@@ -18,6 +18,7 @@ from typing import Any, TypedDict
 
 from forever.config import Deps
 from forever.errors import DataSchemaError, UnsupportedLogError
+from forever.installs import product_of
 from forever.pipeline.addon_sv import read_logger_db
 from forever.pipeline.auctionator import read_price_database
 from forever.pipeline.client_builds import ClientBuild, current_builds, version_at
@@ -269,7 +270,9 @@ def plan_import(
     (défaut : `class_spell_index` des données courantes)."""
     data = load_version(deps)
     index = class_spells if class_spells is not None else class_spell_index(data)
-    stamp = _Stamper(current_builds(deps.cache_dir, deps.wow_dir))
+    builds = current_builds(deps.cache_dir, deps.wow_dir)
+    product = product_of(deps.wow_dir)[0] if deps.wow_dir is not None and deps.wow_dir.is_dir() else None
+    stamp = _Stamper([b for b in builds if product is None or b.product == product])  # LN1 : produit lu seulement
     notes: list[str] = []
 
     def present(directory: Path | None, name: str) -> Path | None:

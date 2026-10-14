@@ -40,7 +40,7 @@ from forever.errors import (
 )
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.gamedata import build_game_data, load_game_data
-from forever.installs import Choice, Install, roots, same_folder, survey
+from forever.installs import Choice, Install, product_of, roots, same_folder, survey
 from forever.leveling import (
     DEFAULT_RACE,
     MAX_N,
@@ -80,6 +80,7 @@ from forever.pipeline.client_builds import (
     read_build_info,
     split_by_version,
     version_at,
+    wago_product,
 )
 from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
 from forever.pipeline.dbd import layouts_from_json
@@ -626,7 +627,9 @@ def build_parser() -> argparse.ArgumentParser:
     a_install = auto_sub.add_parser(
         "install", help="créer ou remplacer la tâche « WoW Forever - pont » (sans droits administrateur) et la lancer"
     )
-    a_install.add_argument("--wow-dir", type=Path, help="dossier du client (défaut : FOREVER_WOW_DIR)")
+    a_install.add_argument(
+        "--wow-dir", type=Path, help="dossier du client forcé (défaut : installation choisie à chaque lancement)"
+    )
     a_install.add_argument("--no-start", action="store_true", help="ne pas la lancer maintenant")
     a_install.add_argument("--json", action="store_true", help="sortie JSON")
     for name, text in (
@@ -1690,16 +1693,16 @@ def _split(value: str) -> list[str]:
 
 
 def _local_product(deps: Deps) -> tuple[str, str, str]:
-    """(version locale, produit, préfixe) lus dans sources.json de la version la plus récente."""
+    """(version locale, produit, préfixe) : produit de la version finale adoptée quand c'est l'installation lue
+    (LN1), sinon ceux de sources.json de la version la plus récente."""
     version = current_identity(deps.data_dir).game_version
-    sources = read_sources(deps.data_dir, version) or {}
-    product, prefix = sources.get("product"), sources.get("version_prefix")
-    if not (isinstance(product, str) and isinstance(prefix, str)):
+    found = wago_product(deps.cache_dir, deps.wow_dir, read_sources(deps.data_dir, version))
+    if found is None:
         raise InvalidArgumentError(
             f"Produit inconnu : sources.json absent ou incomplet pour {version}.",
             "vérifier forever/data/<version>/sources.json (champs product et version_prefix)",
         )
-    return version, product, prefix
+    return version, *found
 
 
 def _cmd_builds(deps: Deps, args: argparse.Namespace) -> int:
@@ -2436,8 +2439,18 @@ def _log_provenance(deps: Deps, headers: list[LogHeader], certainty: Certainty, 
 
 
 def _client_builds(deps: Deps) -> list[Any]:
-    """Journal des versions du client, complété du relevé courant quand le dossier du client est lisible (T08a)."""
-    return current_builds(deps.cache_dir, deps.wow_dir)
+    """Journal des versions du client, complété du relevé courant quand le dossier du client est lisible (T08a) ;
+    LN1 : seulement les versions du produit de l'installation lue, quand il est connu."""
+    builds = current_builds(deps.cache_dir, deps.wow_dir)
+    product = _logs_product(deps)
+    return [b for b in builds if b.product == product] if product is not None else builds
+
+
+def _logs_product(deps: Deps) -> str | None:
+    """Produit de l'installation dont les journaux sont tirés (LN1) ; None s'il est illisible."""
+    if deps.wow_dir is None or not deps.wow_dir.is_dir():
+        return None
+    return product_of(deps.wow_dir)[0]
 
 
 def _summary_json(s: LogSummary, builds: list[Any]) -> dict[str, Any]:
@@ -3687,7 +3700,8 @@ def _bridge_autostart(deps: Deps, args: argparse.Namespace, provenance: Provenan
         )
     name = autostart.TASK_NAME
     if args.autostart_command == "install":
-        wow = Path(os.path.abspath(_bridge_wow_dir(deps, args)))
+        # LN1 : dossier forcé seulement sur --wow-dir explicite ; sinon la surveillance suit le choix
+        wow = Path(os.path.abspath(args.wow_dir)) if args.wow_dir else None
         cache = Path(os.path.abspath(deps.cache_dir))
         pythonw = autostart.base_pythonw()
         if not pythonw.is_file():
@@ -4379,7 +4393,12 @@ def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     builds = _client_builds(deps)
     starts = {s.name: s.start for s in scan_logs(logs_dir)}
     keep, held, unknown = split_by_version(
-        [(p.name, starts.get(p.name)) for p in sources.logs], builds, data.game_version, utc_offset=offset
+        [(p.name, starts.get(p.name)) for p in sources.logs],
+        builds,
+        data.game_version,
+        utc_offset=offset,
+        product=_logs_product(deps),
+        data_product=data.sources.get("product") if isinstance(data.sources.get("product"), str) else None,
     )
     accepted: list[Accepted] = []
     if args.accept_version:

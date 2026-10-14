@@ -17,8 +17,11 @@ from forever.config import Deps
 
 LOCAL_HOSTS = ["127.0.0.1"]  # boucle asyncio de Windows : paire de sockets locale (tests MCP)
 
-# LN1 : la suite ne cherche jamais le client sur les disques réels du poste (`default_deps`, sous-processus compris).
+# LN1 : la suite ne cherche jamais le client sur les disques réels du poste (`default_deps`, sous-processus compris),
+# ni dans les dossiers que déclarent les variables de l'utilisateur.
 os.environ["FOREVER_WOW_NO_DRIVES"] = "1"
+for _name in ("FOREVER_WOW_DIR", "FOREVER_WOW_FORCE", "FOREVER_WOW_ROOTS"):
+    os.environ.pop(_name, None)
 
 
 _MCP_IMPORT = re.compile(r"^\s*(from mcp[ .]|import mcp\b)", re.MULTILINE)

@@ -145,16 +145,19 @@ def version_at(
     when: datetime,
     *,
     utc_offset: timedelta | None = None,
+    product: str | None = None,
 ) -> str | None:
     """Version du client en vigueur à `when`, ou `None` si elle est antérieure au premier relevé.
 
     `when` sans fuseau est lu en heure locale : les journaux de combat datent leurs événements ainsi. `utc_offset`
-    donne le décalage de cette heure locale (défaut : celui du système)."""
+    donne le décalage de cette heure locale (défaut : celui du système). `product` : seules les versions de ce produit
+    comptent (LN1 : la bêta et la version finale peuvent cohabiter) ; None : toutes, comme avant LN1."""
     moment = when
     if moment.tzinfo is None:
         offset = utc_offset if utc_offset is not None else datetime.now().astimezone().utcoffset() or timedelta()
         moment = moment.replace(tzinfo=UTC) - offset
-    found = [e for e in sorted(builds, key=lambda e: e.installed_at) if e.installed_at <= moment]
+    ordered = sorted(builds, key=lambda e: e.installed_at)
+    found = [e for e in ordered if e.installed_at <= moment and (product is None or e.product == product)]
     return found[-1].build if found else None
 
 
@@ -172,17 +175,37 @@ def split_by_version(
     installed: str,
     *,
     utc_offset: timedelta | None = None,
+    product: str | None = None,
+    data_product: str | None = None,
 ) -> tuple[list[str], list[HeldBack], list[str]]:
     """Sépare les journaux à mesurer, ceux à retenir et ceux dont la version est inconnue, d'après la version du
     client en vigueur à leur début.
 
     Un journal antérieur au premier relevé (ou sans aucun relevé) n'est **pas** écarté : on ne sait pas, et écarter
-    serait aussi faux qu'attribuer. Il est rendu dans la troisième liste, pour que l'appelant dise l'incertitude."""
+    serait aussi faux qu'attribuer. Il est rendu dans la troisième liste, pour que l'appelant dise l'incertitude.
+
+    LN1 : `product` est le produit de l'installation dont les journaux sont tirés (dossier `Logs`), `data_product`
+    celui des données `installed` (`sources.json`). Un journal d'un autre produit (la bêta face aux données de la
+    version finale, ou l'inverse) est toujours retenu, sauf accord explicite (`accept_earlier`)."""
     keep: list[str] = []
     held: list[HeldBack] = []
     unknown: list[str] = []
+    other_product = product is not None and data_product is not None and product != data_product
     for name, start in logs:
-        seen = version_at(builds, start, utc_offset=utc_offset) if start is not None else None
+        seen = version_at(builds, start, utc_offset=utc_offset, product=product) if start is not None else None
+        if other_product:
+            held.append(
+                HeldBack(
+                    name=name,
+                    client_version=seen,
+                    reason=(
+                        f"écrit sous le produit {product} ({seen or 'version inconnue'}), les données {installed} "
+                        f"sont celles du produit {data_product} : jamais mesuré dans ces données sans accord "
+                        "(--accept-version)"
+                    ),
+                )
+            )
+            continue
         if seen is None:
             keep.append(name)
             unknown.append(name)
@@ -285,9 +308,26 @@ def forget_product(cache_dir: Path, product: str) -> bool:
 
 def version_prefix(version: str) -> str:
     """Préfixe des versions publiées d'un produit (`1.60.`), tiré d'une version lue."""
-    raise NotImplementedError
+    return ".".join(version.split(".")[:2]) + "."
 
 
 def final_client(cache_dir: Path, wow_dir: Path | None) -> ClientBuild | None:
-    """Version du client de `wow_dir` si son produit est adopté comme version finale ; None sinon."""
-    raise NotImplementedError
+    """Version du client de `wow_dir` si son produit est adopté comme version finale ; None sinon (LN1)."""
+    if wow_dir is None or not wow_dir.is_dir():
+        return None
+    client = read_build_info(wow_dir)
+    if client is None or client.product not in adopted_products(cache_dir):
+        return None
+    return client
+
+
+def wago_product(cache_dir: Path, wow_dir: Path | None, sources: dict[str, Any] | None) -> tuple[str, str] | None:
+    """(produit, préfixe) demandés à wago.tools : ceux de la version finale adoptée quand c'est l'installation lue,
+    sinon ceux de `sources.json` ; None s'ils sont inconnus."""
+    client = final_client(cache_dir, wow_dir)
+    if client is not None:
+        return client.product, version_prefix(client.build)
+    product, prefix = (sources or {}).get("product"), (sources or {}).get("version_prefix")
+    if isinstance(product, str) and isinstance(prefix, str):
+        return product, prefix
+    return None

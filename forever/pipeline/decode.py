@@ -28,6 +28,7 @@ from forever.pipeline.character_scaling import (
     load_character_tables,
     load_gametables,
 )
+from forever.pipeline.client_builds import final_client, version_prefix
 from forever.pipeline.dbd import LayoutCheck
 from forever.pipeline.dungeons_client import DUNGEON_FILE, decode_dungeons, dungeon_table_files, load_dungeon_tables
 from forever.pipeline.fetch import DEFAULT_LOCALE, optional_table, wago_dir
@@ -1693,13 +1694,24 @@ def _read_json(path: Path) -> Any:
         raise DataSchemaError(f"{path} illisible ({exc}).") from exc
 
 
+def _candidate_product(deps: Deps, version: str) -> dict[str, str]:
+    """Produit et préfixe de la candidate quand son build vient de la version finale adoptée (LN1, décision 271) ;
+    sinon rien : ceux de la base sont repris."""
+    client = final_client(deps.cache_dir, deps.wow_dir)
+    if client is None or client.build != version:
+        return {}
+    return {"product": client.product, "version_prefix": version_prefix(version)}
+
+
 def _questcache_for(deps: Deps, version: str, path: Path | None) -> tuple[QuestCache | None, str]:
     """Cache des quêtes à lire pour `version` : `path` s'il est donné, sinon la copie archivée du build ; un cache
     d'un autre build est écarté (ses quêtes peuvent avoir changé)."""
     from forever.archive import archived_questcache
 
     build = version.rsplit(".", 1)[-1]
-    path = path or archived_questcache(deps.cache_dir, build)
+    client = final_client(deps.cache_dir, deps.wow_dir)
+    product = client.product if client is not None and client.build == version else None  # LN1
+    path = path or archived_questcache(deps.cache_dir, build, product=product)
     if path is None:
         return None, f"aucun cache des quêtes du build {build} : quêtes vues de la base reprises"
     cache = read_questcache(path)
@@ -2096,6 +2108,7 @@ def decode_version(
         **{
             k: v for k, v in local_sources.items() if k not in ("files", "hotfixes", "missing_names")
         },  # T08c : correctifs propres à chaque candidate ; noms manquants propres à chaque candidate (décision 230)
+        **_candidate_product(deps, version),
         "game_version": version,
         "collected_at": format_utc(deps.now())[:10],
         "candidate": True,

@@ -633,7 +633,7 @@ def _resume_branch(run: _Run, runner: Runner, clone: Path) -> str | None:
 
 def _step_game(run: _Run) -> tuple[Step, str | None]:
     from forever.pipeline.builds import list_builds, version_key
-    from forever.pipeline.client_builds import read_build_info
+    from forever.pipeline.client_builds import read_build_info, wago_product
     from forever.store import read_sources
 
     if not run.wants("jeu"):
@@ -652,9 +652,12 @@ def _step_game(run: _Run) -> tuple[Step, str | None]:
     if not run.options.network:
         return Step("jeu", "rien", "hors ligne : builds publiés non relevés", data), None
     sources = read_sources(run.base_data, installed) if installed else None
-    product, prefix = (sources or {}).get("product"), (sources or {}).get("version_prefix")
-    if not (isinstance(product, str) and isinstance(prefix, str)):
+    # LN1 : produit de la version finale adoptée quand c'est l'installation lue, sinon celui des données
+    found = wago_product(run.deps.cache_dir, wow, sources)
+    if found is None:
         return Step("jeu", "erreur", f"produit inconnu : sources.json incomplet pour {installed}", data), None
+    product, prefix = found
+    data["product"] = product
     published = {b.version for b in list_builds(run.deps, product, prefix)}
     newer = [v for v in published if version_key(v) > version_key(client)]
     data["newer_on_wago"] = max(newer, key=version_key) if newer else None
@@ -1114,7 +1117,8 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
         return Step("nouvelle_version", "rien", "non demandé (--only)", {})
     if target is None:
         return Step("nouvelle_version", "rien", "aucune version à installer", {})
-    archive = archived_dbcache(run.deps.cache_dir, _build_number(target))
+    product = run.client.product if run.client is not None else None  # LN1 : archives du produit lu
+    archive = archived_dbcache(run.deps.cache_dir, _build_number(target), product=product)
     seen = _first_seen(run, target)
     gate = hotfix_gate(archive is not None, seen, run.deps.now(), UPDATE_HOTFIX_WAIT)
     if gate == "attendre":
@@ -1391,7 +1395,7 @@ def _step_hotfixes(run: _Run) -> Step:
     version = str(client.build)
     if version not in installed_versions(run.base_data):
         return Step("correctifs", "rien", f"version du client {version} non installée", {})
-    archive = archived_dbcache(run.deps.cache_dir, _build_number(version))
+    archive = archived_dbcache(run.deps.cache_dir, _build_number(version), product=client.product)
     rules = _rules(run.base_data)
     sources = read_sources(run.base_data, version) or {}
     absent = [str(n) for n in sources.get("missing_names") or []]
@@ -1564,9 +1568,11 @@ def _written_logs(cache_dir: Path, data_dir: Path, version: str) -> dict[str, se
 
 
 def _step_logs(run: _Run) -> Step:
+    from forever.installs import product_of
     from forever.pipeline.client_builds import current_builds, split_by_version
     from forever.pipeline.combatlog import log_files
     from forever.pipeline.live_logs import split_live
+    from forever.store import read_sources
 
     if not run.wants("journaux"):
         return Step("journaux", "rien", "non demandé (--only)", {})
@@ -1578,7 +1584,14 @@ def _step_logs(run: _Run) -> Step:
     builds = current_builds(run.deps.cache_dir, wow)
     # Décision 205 : un journal que le jeu ouvert écrit encore est tenu et reproposé au passage suivant.
     files, writing = split_live(log_files(wow / "Logs"), now=run.deps.now(), running=run.deps.game_running())
-    keep, held, unknown = split_by_version([(p.name, _log_start(p)) for p in files], builds, installed)
+    sources = read_sources(run.base_data, installed) or {}
+    keep, held, unknown = split_by_version(
+        [(p.name, _log_start(p)) for p in files],
+        builds,
+        installed,
+        product=product_of(wow)[0],
+        data_product=sources.get("product") if isinstance(sources.get("product"), str) else None,
+    )
     done = _written_logs(run.deps.cache_dir, run.base_data, installed)
     shas = {p.name: _sha256(p) for p in files if p.name in keep}
     fresh = [p for p in files if p.name in shas and shas[p.name] not in done.get(p.name, set())]

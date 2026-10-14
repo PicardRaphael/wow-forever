@@ -24,7 +24,7 @@ import subprocess
 import sys
 import time
 import xml.etree.ElementTree as ET
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -71,11 +71,14 @@ def _quoted(path: Path) -> str:
     return f'"{text}\\"' if text.endswith("\\") else f'"{text}"'
 
 
-def task_arguments(wow_dir: Path, cache_dir: Path) -> str:
-    return f"-m forever.bridge.autostart --wow-dir {_quoted(wow_dir)} --cache-dir {_quoted(cache_dir)}"
+def task_arguments(wow_dir: Path | None, cache_dir: Path) -> str:
+    """Arguments de la surveillance ; `wow_dir` None (LN1) : le dossier du client suit le choix de
+    `forever.installs` à chaque lancement du pont, sinon il est forcé."""
+    forced = f" --wow-dir {_quoted(wow_dir)}" if wow_dir is not None else ""
+    return f"-m forever.bridge.autostart{forced} --cache-dir {_quoted(cache_dir)}"
 
 
-def task_xml(*, user: str, pythonw: Path, repo: Path, wow_dir: Path, cache_dir: Path) -> str:
+def task_xml(*, user: str, pythonw: Path, repo: Path, wow_dir: Path | None, cache_dir: Path) -> str:
     """Définition de la tâche : ouverture de session de `user` seulement, jeton interactif (bureau de la session :
     fenêtre du jeu, capture), privilèges limités, une seule instance, sans limite de durée, sur batterie aussi."""
     user_x = escape(user)
@@ -276,9 +279,9 @@ def stop_supervisor(
     return False
 
 
-def launch_bridge(wow_dir: Path, cache_dir: Path, now: datetime, model: str | None = None) -> Path:
+def launch_bridge(wow_dir: Path | None, cache_dir: Path, now: datetime, model: str | None = None) -> Path:
     """Lance le pont détaché avec le vrai interpréteur (`forever bridge start` et la surveillance) ; rend le journal
-    du lancement. Lève OSError si le lancement échoue."""
+    du lancement. Lève OSError si le lancement échoue. `wow_dir` None : le pont lit l'installation choisie (LN1)."""
     exe, env = spawn.current_interpreter()
     env = {**env, "FOREVER_CACHE_DIR": str(cache_dir)}  # même verrou que la surveillance qui le lit
     # environnement vérifié avant tout lancement (décision 241) : un pont sans ses paquets mourrait aussitôt
@@ -286,7 +289,9 @@ def launch_bridge(wow_dir: Path, cache_dir: Path, now: datetime, model: str | No
     spawn.record_environment(cache_dir / "bridge", error, exe, format_utc(now))
     if error is not None:
         raise spawn.EnvironmentBroken(f"{error} ({exe}) : {spawn.ENV_HINT}")
-    args = [exe, "-u", "-m", "forever", "bridge", "run", "--wow-dir", os.path.abspath(wow_dir)]
+    args = [exe, "-u", "-m", "forever", "bridge", "run"]
+    if wow_dir is not None:
+        args += ["--wow-dir", os.path.abspath(wow_dir)]
     if model:
         args += ["--model", model]
     log = cache_dir / "bridge" / f"run-{now:%Y%m%d-%H%M%S}.log"
@@ -303,8 +308,15 @@ def supervise(
     sleep: Callable[[float], None] = time.sleep,
     alive: Callable[[object], bool | None] | None = None,
     pid: int | None = None,
+    resolve: Callable[[], Path | None] | None = None,
+    game_running: Callable[[Path | None, Path | None], bool | None] | None = None,
 ) -> int:
-    """Boucle de surveillance jusqu'à `STOP_MARKER` ; rend 0. Une autre surveillance vivante : rend 0 aussitôt."""
+    """Boucle de surveillance jusqu'à `STOP_MARKER` ; rend 0. Une autre surveillance vivante : rend 0 aussitôt.
+
+    LN1 : `resolve` (None quand la tâche force le dossier) rend le dossier du client choisi. Quand il change pendant
+    qu'un pont tourne, la surveillance attend que le jeu soit fermé (`game_running` faux pour l'ancien et le nouveau
+    dossier ; inconnu = ouvert), note `autostart_wow_changed`, pose le fichier d'arrêt du pont, puis le relance (sur
+    le nouveau dossier) comme un pont mort."""
     pid = os.getpid() if pid is None else pid
     home = cache_dir / "bridge"
     home.mkdir(parents=True, exist_ok=True)
@@ -328,6 +340,8 @@ def supervise(
     failures = 0
     next_at = 0.0
     env_error: str | None = None  # dernier échec de la vérification de l'environnement, noté une fois
+    launched_for: Path | None = resolve() if resolve is not None else None  # dossier du pont en marche (LN1)
+    moving = False  # arrêt demandé au pont pour changer d'installation
     try:
         while True:
             if marker.exists():
@@ -343,6 +357,8 @@ def supervise(
                 if now - since >= FAST_DEATH_S:
                     failures = 0
                 watching = True
+                if resolve is not None and not moving:
+                    moving = _follow_choice(cache_dir, journal, resolve, game_running, launched_for)
             else:
                 if watching:
                     watching = False
@@ -354,6 +370,9 @@ def supervise(
                     journal.write("autostart_bridge_down", lived_s=round(lived), next_in_s=round(delay))
                 since = None
                 if now >= next_at:
+                    moving = False
+                    if resolve is not None:
+                        launched_for = resolve()
                     try:
                         log = launch()
                     except spawn.EnvironmentBroken as exc:
@@ -377,6 +396,47 @@ def supervise(
             state.unlink(missing_ok=True)
 
 
+def _follow_choice(
+    cache_dir: Path,
+    journal: Journal,
+    resolve: Callable[[], Path | None],
+    game_running: Callable[[Path | None, Path | None], bool | None] | None,
+    launched_for: Path | None,
+) -> bool:
+    """Choix changé et jeu fermé : arrêt du pont demandé (vrai) ; sinon rien (faux)."""
+    current = resolve()
+    if current is None or current == launched_for:
+        return False
+    running = game_running(launched_for, current) if game_running is not None else None
+    if running is not False:
+        return False  # jeu ouvert, ou état inconnu : jamais de bascule en pleine partie
+    journal.write("autostart_wow_changed", old=str(launched_for), new=str(current))
+    (cache_dir / "bridge" / "stop").write_text("", encoding="utf-8")
+    return True
+
+
+def _game_running(old: Path | None, new: Path | None) -> bool | None:
+    """Le client d'un des deux dossiers tourne-t-il ? None si la liste des processus est illisible."""
+    from forever.pipeline.live_logs import detect_game_running
+
+    states = [detect_game_running(folder) for folder in (old, new)]
+    if any(s is True for s in states):
+        return True
+    return None if any(s is None for s in states) else False
+
+
+def resolve_wow_dir(cache_dir: Path, environ: Mapping[str, str] | None = None) -> Path | None:
+    """Dossier du client choisi par `forever.installs` (`FOREVER_WOW_FORCE`, version finale adoptée, bêta,
+    `FOREVER_WOW_DIR`), avec les disques fixes du poste ; None si aucun (LN1)."""
+    from forever.installs import fixed_drives, no_drives, survey
+
+    env = os.environ if environ is None else environ
+    drives = no_drives if env.get("FOREVER_WOW_NO_DRIVES", "") not in ("", "0") else fixed_drives
+    data_dir = Path(__file__).resolve().parent.parent / "data"
+    choice, _ = survey(env, drives=drives, cache_dir=cache_dir, data_dir=data_dir)
+    return choice.folder
+
+
 def _stop_starting_bridge(
     cache_dir: Path, alive: Callable[[object], bool | None] | None, sleep: Callable[[float], None]
 ) -> None:
@@ -389,22 +449,22 @@ def _stop_starting_bridge(
         sleep(1.0)
 
 
-def resolve_wow_dir(cache_dir: Path) -> Path | None:
-    """Dossier du client choisi par `forever.installs` (LN1)."""
-    raise NotImplementedError
-
-
 def main(argv: list[str] | None = None) -> int:
     """Point d'entrée de la tâche planifiée (`pythonw.exe -m forever.bridge.autostart`) : aucune console, tout va
     dans le journal du pont."""
     parser = argparse.ArgumentParser(prog="python -m forever.bridge.autostart")
-    parser.add_argument("--wow-dir", type=Path, required=True)
+    parser.add_argument("--wow-dir", type=Path, help="dossier forcé (sinon : choix de forever.installs, LN1)")
     parser.add_argument("--cache-dir", type=Path, required=True)
     args = parser.parse_args(argv)
     journal = Journal(args.cache_dir / "bridge" / "journal", lambda: datetime.now(UTC))
+    forced: Path | None = args.wow_dir
     try:
         return supervise(
-            args.cache_dir, lambda: launch_bridge(args.wow_dir, args.cache_dir, datetime.now(UTC)), journal=journal
+            args.cache_dir,
+            lambda: launch_bridge(forced, args.cache_dir, datetime.now(UTC)),
+            journal=journal,
+            resolve=None if forced is not None else (lambda: resolve_wow_dir(args.cache_dir)),
+            game_running=_game_running,
         )
     except Exception as exc:  # noqa: BLE001 : sans console, l'erreur n'a que le journal
         journal.write("error", where="surveillance", error=f"{type(exc).__name__}: {exc}")

@@ -29,6 +29,7 @@ from typing import Any, NamedTuple
 
 from forever.config import Deps
 from forever.errors import DataSchemaError
+from forever.installs import product_of
 from forever.pipeline import dbcache, hotfixes
 from forever.pipeline.client_builds import JOURNAL_NAME, load_builds, read_build_info, record_build, version_at
 from forever.pipeline.questcache import QuestCache, parse_questcache, questcache_path
@@ -36,6 +37,23 @@ from forever.timefmt import format_utc
 
 ARCHIVE_DIR = "dbcache"
 STATE_NAME = "state.json"
+# Produit des archives d'avant LN1, rangées sans produit (`<cache>/dbcache/<build>/`) : la bêta, relevée dans
+# `.build.info` depuis T08a ; les empreintes de `sources.json` et `forever update --hotfixes` y renvoient. Tout autre
+# produit est rangé à part (`<cache>/dbcache/<produit>/<build>/`, décision 271).
+LEGACY_PRODUCT = "wow_classic_beta"
+
+
+def archive_root(cache_dir: Path, product: str | None) -> Path:
+    """Racine des archives d'un produit ; celle d'avant LN1 pour la bêta ou un produit illisible."""
+    root = cache_dir / ARCHIVE_DIR
+    return root if product in (None, "", LEGACY_PRODUCT) else root / str(product)
+
+
+def archive_dir(cache_dir: Path, product: str | None, build: str) -> Path:
+    """Dossier des archives d'un build d'un produit (LN1) : jamais celui d'un autre produit, même à build égal."""
+    return archive_root(cache_dir, product) / build
+
+
 INDEX_NAME = "index.json"
 CURRENT = "DBCache.bin"
 QUESTCACHE = "questcache.wdb"  # T04d, bloc B : cache des quêtes vues par le client
@@ -214,9 +232,11 @@ def _session_start(raw: bytes, live: Path) -> datetime:
     return datetime.fromtimestamp(live.stat().st_mtime, tz=UTC)
 
 
-def _archive_hotfix_log(deps: Deps, live: Path, root: Path, raw: bytes, client: str | None, now: str) -> ArchivedCopy:
+def _archive_hotfix_log(
+    deps: Deps, live: Path, root: Path, raw: bytes, client: str | None, now: str, product: str | None = None
+) -> ArchivedCopy:
     start = _session_start(raw, live)
-    version = version_at(load_builds(deps.cache_dir), start)
+    version = version_at(load_builds(deps.cache_dir), start, product=product)
     source = JOURNAL_NAME
     if version is None:
         version, source = client, ".build.info"
@@ -266,18 +286,24 @@ def archive_client_files(
     wow = deps.wow_dir
     if wow is None or not wow.is_dir():
         return ArchiveResult(copies, errors, None)
-    root = deps.cache_dir / ARCHIVE_DIR
-    state_path = root / STATE_NAME
-    state = _read_json(state_path)
     now = format_utc(deps.now())
     client: str | None = None
+    product: str | None = None
     try:
         seen = read_build_info(wow)
         if seen is not None:
-            client = seen.build
+            client, product = seen.build, seen.product
             record_build(deps.cache_dir, seen)  # le build vu est inscrit même sans journal de combat
     except Exception as exc:  # noqa: BLE001 : l'archivage ne doit jamais échouer
         errors.append(f"journal des versions du client : {_message(exc)}")
+    if product is None:
+        try:
+            product = product_of(wow)[0]
+        except Exception:  # noqa: BLE001
+            product = None
+    root = archive_root(deps.cache_dir, product)  # LN1 : chaque produit a ses archives
+    state_path = root / STATE_NAME
+    state = _read_json(state_path)
 
     live = wow.joinpath(*(part.format(locale=locale) for part in dbcache.DBCACHE_PATH))
     try:
@@ -321,7 +347,7 @@ def archive_client_files(
             if state.get("hotfix_log") != stamp:
                 raw = read_bytes(log)
                 if raw:
-                    copies.append(_archive_hotfix_log(deps, log, root, raw, client, now))
+                    copies.append(_archive_hotfix_log(deps, log, root, raw, client, now, product))
                 state["hotfix_log"] = stamp
     except Exception as exc:  # noqa: BLE001
         errors.append(f"Hotfix.log non archivé : {_message(exc)}")
@@ -333,16 +359,17 @@ def archive_client_files(
     return ArchiveResult(copies, errors, client)
 
 
-def archived_dbcache(cache_dir: Path, build: str) -> Path | None:
-    """Copie la plus récente du `DBCache.bin` d'un build (`70235`), ou None."""
-    path = cache_dir / ARCHIVE_DIR / build / CURRENT
+def archived_dbcache(cache_dir: Path, build: str, *, product: str | None = None) -> Path | None:
+    """Copie la plus récente du `DBCache.bin` d'un build (`70235`) d'un produit (défaut : la bêta), ou None."""
+    path = archive_dir(cache_dir, product, build) / CURRENT
     return path if path.is_file() else None
 
 
 def archive_line(cache_dir: Path) -> str | None:
     """Ligne de démarrage quand `DBCache.bin` est illisible depuis `FAILURE_ALERT` passages ; None sinon."""
-    try:
-        failures = int(_read_json(cache_dir / ARCHIVE_DIR / STATE_NAME).get("dbcache_failures", 0))
+    states = [cache_dir / ARCHIVE_DIR / STATE_NAME, *sorted((cache_dir / ARCHIVE_DIR).glob(f"*/{STATE_NAME}"))]
+    try:  # LN1 : un état par produit
+        failures = max(int(_read_json(path).get("dbcache_failures", 0)) for path in states)
     except (TypeError, ValueError):
         return None
     if failures < FAILURE_ALERT:
@@ -350,12 +377,8 @@ def archive_line(cache_dir: Path) -> str | None:
     return f"Archivage : DBCache.bin illisible depuis {failures} passages (`forever watch` pour le détail)"
 
 
-def archived_questcache(cache_dir: Path, build: str) -> Path | None:
-    """Copie la plus récente du `questcache.wdb` d'un build (`70338`), ou None (T04d, bloc B)."""
-    path = cache_dir / ARCHIVE_DIR / build / QUESTCACHE
+def archived_questcache(cache_dir: Path, build: str, *, product: str | None = None) -> Path | None:
+    """Copie la plus récente du `questcache.wdb` d'un build (`70338`) d'un produit (défaut : la bêta), ou None (T04d,
+    bloc B)."""
+    path = archive_dir(cache_dir, product, build) / QUESTCACHE
     return path if path.is_file() else None
-
-
-def archive_dir(cache_dir: Path, product: str | None, build: str) -> Path:
-    """Dossier des archives d'un build d'un produit (LN1)."""
-    raise NotImplementedError
