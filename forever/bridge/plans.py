@@ -172,25 +172,59 @@ def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
     return Plan("leveling", calls, read)
 
 
-def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
+def _full_plan(r: Resolved, level_cap: int, first: int) -> Plan:
+    """CJ1, bloc 3 : avant le premier point de talent, le build conseillé jusqu'à l'objectif (niveau maximal des
+    données), point par point, avec le lien Talents Forever et le code Naowh du Training Planner."""
+    args: dict[str, Any] = {"context": "leveling", "level": level_cap, "sensitivity": False}
+    if r.race:
+        args["race"] = r.race
+    read = (
+        (
+            f"Pas encore de point à placer (premier point au niveau {first}) : donne le plan complet, sans dire qu'il "
+            "n'y a rien à faire. En premier, le premier point et son niveau (`order`), puis l'ordre de prise point par "
+            "point, regroupé par paliers de niveaux, jusqu'à l'objectif."
+        ),
+        (
+            "Lien Talents Forever (`export.talents_forever`) et code Naowh (`export.naowh`) tels quels ; dis de coller "
+            "le code dans Naowh Forever, Training, Builds, Import, puis de suivre « Level by level »."
+        ),
+    )
+    return Plan("talents", (Call("forever_build", args),), read, link="build")
+
+
+NAOWH_NEXT = (
+    "Code Naowh du build (`export.naowh` ou `respec.projected.export.naowh` s'il y est) tel quel, à coller dans Naowh "
+    "Forever, Training, Builds, Import, pour suivre l'ordre de prise « Level by level »."
+)
+NAOWH_POPULAR = (
+    "Code Naowh du build (`naowh`) tel quel, à coller dans Naowh Forever, Training, Builds, Import ; dis que son ordre "
+    "de prise est généré (palier, prérequis), pas un ordre de leveling optimisé."
+)
+
+
+def button_plan(key: str, r: Resolved, level_cap: int | None, *, first_talent_level: int | None = None) -> Plan | None:
     """Appels et lecture du bouton `key` pour ce contexte ; None si le contexte ne suffit pas (niveau inconnu, pas de
     cible joueur pour PvP, classe que le bouton ne sert pas)."""
     if r.class_name is None or r.level is None:
         return None
     if key == "talents":
+        if r.class_token == "MAGE" and first_talent_level and level_cap and r.level + 1 < first_talent_level:
+            return _full_plan(r, level_cap, first_talent_level)
         if r.class_token == "MAGE":
             point = _next_point(r, level_cap)
             if point is None:
                 return None
             call, read = point
-            return Plan(key, (call,), read, link="projected")
+            return Plan(key, (call,), (*read, NAOWH_NEXT), link="projected")
         if not r.current:
             calls = [Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name})]
             read = (
                 (
                     "aucun talent placé : build le plus joué de la classe (rang 1) ; donne son lien et sa commande "
-                    "`/tf import` tels quels, sa date (`asOf`) et sa certitude."
+                    "`/tf import` tels quels, sa date (`asOf`) et sa certitude ; c'est le plan complet à suivre dès le "
+                    "premier point."
                 ),
+                NAOWH_POPULAR,
             )
             return Plan(key, tuple(calls), read)
         current = ",".join(f"{k}={v}" for k, v in r.current.items())
@@ -307,7 +341,7 @@ def prepare_record(data: ContextData, record: Record) -> Prepared:
     """Contexte du message relié à nos données, consigne du bouton s'il y en a un."""
     resolved = resolve(data, record.context)
     key = button_key(record)
-    plan = button_plan(key, resolved, data.level_cap) if key else None
+    plan = button_plan(key, resolved, data.level_cap, first_talent_level=data.talent_first_level) if key else None
     return Prepared(
         notes=context_notes(resolved) or None,
         guide=plan_text(plan) if plan else None,
@@ -323,5 +357,5 @@ def button_message(data: ContextData, key: str, context: Mapping[str, str]) -> t
     button = next(b for b in BUTTONS if b.key == key)
     record = Record("eval", 1, frozenset({f"b={key}"}), dict(context), button.question_for(context.get("class", "")))
     prepared = prepare_record(data, record)
-    plan = button_plan(key, resolve(data, record.context), data.level_cap)
+    plan = button_plan(key, resolve(data, record.context), data.level_cap, first_talent_level=data.talent_first_level)
     return message_text(record, talents=prepared.notes, guide=prepared.guide), plan

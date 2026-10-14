@@ -101,6 +101,7 @@ class ContextData:
     level_cap: int | None
     races: Mapping[str, tuple[str, ...]]
     factions: Mapping[str, str] = field(default_factory=dict)  # race → faction (minuscules)
+    talent_first_level: int | None = None  # CJ1 : premier niveau de talent des données (plan complet avant lui)
 
 
 @dataclass(frozen=True)
@@ -149,11 +150,14 @@ def load_context_data(deps: Deps) -> ContextData:
         if race.get("faction"):
             factions[str(name)] = str(race["faction"]).lower()
     cap = data.read_json("spell_scaling.json").get("level_cap")
+    from forever.gamedata import build_game_data
+
     return ContextData(
         talents=talent_table(deps),
         level_cap=int(cap) if isinstance(cap, int) else None,
         races={k: tuple(sorted(set(v))) for k, v in races.items()},
         factions=factions,
+        talent_first_level=build_game_data(data).constants.talents.first_level,
     )
 
 
