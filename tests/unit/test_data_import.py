@@ -77,4 +77,5 @@ def test_version_dir_contains_exactly_expected_files():
         "quest_rewards.json",  # T04d, révision 4 : QuestXP et quêtes vues par le client (questcache.wdb)
         "xp_bonuses.json",  # T04f, révision 5 : bonus d'XP décodés du client
         "dungeons.json",  # DJ1, révision 6 : donjons décodés du client
+        "travel.json",  # RX1, révision 7 : trajets décodés du client
     }

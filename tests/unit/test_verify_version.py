@@ -12,6 +12,7 @@ from forever.pipeline.decode import CLASS_FILES, INHERITED_FILES
 from forever.pipeline.dungeons_client import DUNGEON_FILES
 from forever.pipeline.pets import PETS_FILES
 from forever.pipeline.quest_rewards import QUEST_FILES
+from forever.pipeline.travel_client import TRAVEL_FILES
 from forever.pipeline.verify import verify_version
 from forever.pipeline.xp_bonuses import XP_BONUS_FILES
 from forever.provenance import validate_provenance
@@ -44,7 +45,9 @@ def test_candidate_is_ok_and_lists_inherited_files(make_deps, candidate):
     assert r["ok"], r["errors"]
     assert set(r["inherited"]) == set(INHERITED_FILES) | set(CLASS_FILES) | set(CHARACTER_FILES) | set(
         PETS_FILES
-    ) | set(QUEST_FILES) | set(XP_BONUS_FILES) | set(DUNGEON_FILES)  # PV1, T08b, CH0, T04d, T04f, DJ1
+    ) | set(QUEST_FILES) | set(XP_BONUS_FILES) | set(DUNGEON_FILES) | set(
+        TRAVEL_FILES
+    )  # PV1, T08b, CH0, T04d, T04f, DJ1, RX1
     assert any("hérité" in a for a in r["provenance"]["assumptions"])
 
 
