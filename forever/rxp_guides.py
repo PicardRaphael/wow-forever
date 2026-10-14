@@ -57,11 +57,12 @@ class Action:
 @dataclass(frozen=True)
 class Step:
     filter: str | None
-    xp_rate: str | None  # `#xprate` de l'étape
-    xp_guard: tuple[str, int, bool] | None  # (opérateur, niveau, saut) de `.xp …,1`
-    guards: tuple[tuple[str, int], ...]  # (`isonquest`…, quête)
+    xp_rate: tuple[str, str | None] | None  # `#xprate` de l'étape et son filtre
+    xp_guard: tuple[bool, int, str | None] | None  # (logique inversée, niveau, filtre) de `.xp N,saut`
+    guards: tuple[tuple[str, int, str | None], ...]  # (`isonquest`…, quête, filtre)
     dungeon: bool  # étape de donjon (`.dungeon`) : écartée, nos comparaisons sont sans donjon
     actions: tuple[Action, ...]
+    hardcore: bool = False  # étape `#hardcore` : écartée (Forever n'est pas un serveur hardcore)
 
 
 @dataclass(frozen=True)
@@ -144,37 +145,40 @@ def _first_int(args: str) -> int | None:
 
 def _parse_step(lines: list[str], header: str) -> Step:
     _, step_filter = _split_filter(header[len("step") :])
-    xp_rate: str | None = None
-    xp_guard: tuple[str, int, bool] | None = None
-    guards: list[tuple[str, int]] = []
+    xp_rate: tuple[str, str | None] | None = None
+    xp_guard: tuple[bool, int, str | None] | None = None
+    guards: list[tuple[str, int, str | None]] = []
     actions: list[Action] = []
-    dungeon = False
+    dungeon = hardcore = False
     for raw in lines:
         line = raw.split("--", 1)[0].strip() if not raw.strip().startswith("--") else ""
         if line.startswith("#xprate"):
-            xp_rate = line[len("#xprate") :].strip()
+            xp_rate = _split_filter(line[len("#xprate") :])
+            continue
+        if line.split(" ", 1)[0] == "#hardcore":
+            hardcore = True
             continue
         if not line.startswith("."):
             continue
         command, _, rest = line[1:].partition(" ")
-        rest = rest.split(">>", 1)[0]
-        args, line_filter = _split_filter(rest)
+        body, line_filter = _split_filter(rest)  # le filtre se place en fin de ligne, après le texte `>>`
+        args = body.split(">>", 1)[0]
         command = command.lower()
         if command in QUEST_COMMANDS and (quest := _first_int(args)) is not None:
             actions.append(Action(QUEST_COMMANDS[command], quest, line_filter))
         elif command == "xp" and (m := _XP.match(args.strip())):
             level, skip = int(m.group("level")), m.group("skip")
-            if skip is not None:
-                xp_guard = (m.group("op"), level, True)
+            if skip is not None:  # saut négatif : logique inversée (`functions.xp` de RXPGuides)
+                xp_guard = (m.group("op") == "<" or int(skip) < 0, level, line_filter)
             else:
                 frac = m.group("frac")
                 target = level - 1 if frac.startswith("-") else level  # « N-x » : à x points du niveau N
                 actions.append(Action("grind", target, line_filter))
         elif command in GUARDS and (quest := _first_int(args)) is not None:
-            guards.append((command, quest))
+            guards.append((command, quest, line_filter))
         elif command == "dungeon":
             dungeon = True
-    return Step(step_filter, xp_rate, xp_guard, tuple(guards), dungeon, tuple(actions))
+    return Step(step_filter, xp_rate, xp_guard, tuple(guards), dungeon, tuple(actions), hardcore)
 
 
 def parse_guide(text: str, file: str, *, dungeon: bool = False) -> Guide | None:
@@ -205,7 +209,7 @@ def parse_guide(text: str, file: str, *, dungeon: bool = False) -> Guide | None:
             nexts.extend((name.strip().split("\\")[-1].strip(), expr) for name in body.split(";") if name.strip())
         elif stripped.startswith("#") and not stripped.startswith("#displayname"):
             key, _, value = stripped[1:].partition(" ")
-            head.setdefault(key.lower(), value.strip())
+            head.setdefault(key.lower(), _split_filter(value)[0])  # filtre de la valeur retiré
     if current is not None:
         steps.append(_parse_step(current[1], current[0]))
     name = head.get("name", "").strip()

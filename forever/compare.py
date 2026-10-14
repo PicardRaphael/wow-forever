@@ -171,7 +171,7 @@ def compare_route(deps: Any, path: Path, *, wow_dir: Path | None = None) -> dict
 
 def _objective_kept(items: Sequence[tuple[int, Any]]) -> set[int]:
     """Indices des objectifs gardés : pour une quête, seule la dernière ligne `.complete` avant son rendu fait un arrêt
-    (nos objectifs se font d'un seul arrêt)."""
+    (nos objectifs se font d'un seul arrêt) ; si l'étape de cette ligne reste fermée, l'objectif se fait au rendu."""
     kept: set[int] = set()
     last: dict[int, int] = {}
     for index, (_, action) in enumerate(items):
@@ -183,14 +183,19 @@ def _objective_kept(items: Sequence[tuple[int, Any]]) -> set[int]:
     return kept
 
 
-def _guards_ok(world: RouteWorld, state: RouteState, step: Any) -> bool:
-    """Conditions d'une étape lues sur notre état : `.xp N,1` (sautée au niveau N ou plus), `.xp <N,1` (sautée sous le
-    niveau N), `.isOnQuest`, `.isQuestTurnedIn`, `.isQuestComplete`, `.isQuestAvailable`."""
-    if step.xp_guard is not None:
-        op, level, _ = step.xp_guard
-        if (op == "<" and state.level < level) or (op != "<" and state.level >= level):
+def _guards_ok(world: RouteWorld, state: RouteState, step: Any, who: Any) -> bool:
+    """Conditions d'une étape lues sur notre état : `.xp N,1` (sautée au niveau N ou plus), `.xp <N,1` ou saut négatif
+    (sautée sous le niveau N), `.isOnQuest`, `.isQuestTurnedIn`, `.isQuestComplete`, `.isQuestAvailable` ; une condition
+    dont le filtre ne vise pas le personnage est sans effet."""
+    from forever.rxp_guides import applies
+
+    if step.xp_guard is not None and applies(step.xp_guard[2], who):
+        reverse, level, _ = step.xp_guard
+        if (reverse and state.level < level) or (not reverse and state.level >= level):
             return False
-    for guard, quest in step.guards:
+    for guard, quest, expr in step.guards:
+        if not applies(expr, who):
+            continue
         q = world.quests.get(quest)
         complete = quest in state.progressed or (q is not None and q.objective is None and q.dungeon is None)
         ok = {
@@ -226,7 +231,10 @@ def replay_rxp(
         for g in guides
         if g.levels is None or g.levels[1] > start.level
         for s in g.steps
-        if not s.dungeon and applies(s.filter, who) and xp_rate_ok(s.xp_rate)
+        if not s.dungeon
+        and not s.hardcore
+        and applies(s.filter, who)
+        and (s.xp_rate is None or not applies(s.xp_rate[1], who) or xp_rate_ok(s.xp_rate[0]))
     ]
     items = [(i, a) for i, s in enumerate(steps) for a in s.actions if applies(a.filter, who)]
     kept = _objective_kept(items)
@@ -236,12 +244,32 @@ def replay_rxp(
     skipped: list[dict[str, Any]] = []
     feasible = True
     opened: dict[int, bool] = {}
+    pending: set[int] = set()  # objectifs dont la dernière ligne n'est pas encore passée
+
+    def attempt(kind: str, ref: int) -> None:
+        nonlocal state
+        stop = Stop(kind, ref)
+        reason = check_stop(gd, world, state, stop)
+        if reason is not None:
+            skipped.append({"kind": kind, "quest": ref, "reason": reason})
+            return
+        after, res = apply_stop(gd, world, state, stop, cap=cap)
+        if not math.isfinite(res.seconds):
+            skipped.append({"kind": kind, "quest": ref, "reason": "trajet impossible"})
+            return
+        state = after
+        stops.append(stop)
+        results.append(res)
+
     for index, (step_index, action) in enumerate(items):
         if state.level >= end_level:
             break
         if step_index not in opened:
-            opened[step_index] = _guards_ok(world, state, steps[step_index])
-        if not opened[step_index] or (action.kind == "objective" and index not in kept):
+            opened[step_index] = _guards_ok(world, state, steps[step_index], who)
+        if not opened[step_index]:
+            continue
+        if action.kind == "objective" and index not in kept:
+            pending.add(action.ref)
             continue
         if action.kind == "grind":
             if state.level < action.ref:
@@ -254,18 +282,13 @@ def replay_rxp(
             state, res = apply_stop(gd, world, state, Stop("train", due[-1]), cap=cap)
             stops.append(Stop("train", due[-1]))
             results.append(res)
-        stop = Stop(action.kind, action.ref)
-        reason = check_stop(gd, world, state, stop)
-        if reason is not None:
-            skipped.append({"kind": action.kind, "quest": action.ref, "reason": reason})
-            continue
-        after, res = apply_stop(gd, world, state, stop, cap=cap)
-        if not math.isfinite(res.seconds):
-            skipped.append({"kind": action.kind, "quest": action.ref, "reason": "trajet impossible"})
-            continue
-        state = after
-        stops.append(stop)
-        results.append(res)
+        if action.kind == "objective":
+            pending.discard(action.ref)
+        elif action.kind == "turnin" and action.ref in pending:  # dernière ligne `.complete` fermée : objectif ici
+            pending.discard(action.ref)
+            if action.ref in state.log and action.ref not in state.progressed:
+                attempt("objective", action.ref)
+        attempt(action.kind, action.ref)
     if state.level < end_level:
         state, res = grind_to(gd, world, start, state, level=end_level, cap=cap)
         stops.append(Stop("grind", end_level))

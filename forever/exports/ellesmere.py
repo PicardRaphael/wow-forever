@@ -382,6 +382,7 @@ BASE_CHOICES = {
     "collé": "profil de base collé (--paste)",
     "donné": "profil de base « {name} » donné pour cet export (--base)",
     "personnage": "profil de base « {name} » choisi pour {character} (profil forever)",
+    "jeu": "profil de base « {name} » choisi en jeu pour {character} (/fb base)",
     "actif": (
         "profil actif « {name} » d'EllesmereUI : aucun profil de base choisi pour {character} "
         "(forever profile set {character} --ellesmere-base <profil>, ou /fb base <profil> en jeu)"
@@ -410,6 +411,7 @@ def ellesmere_export(
     paste: str | None = None,
     spec_key: str | None = None,
     talents: Mapping[str, int] | None = None,
+    choice: str | None = None,
 ) -> dict[str, Any]:
     """Code `!EUI_` du profil « <personnage> - <rôle> » : rôle tenu par la classe (`roles.yaml`, table de
     docs/SPEC.md), profil de base lu en local (ou collé), clé de spécialisation du personnage (gardée par EllesmereUI,
@@ -426,7 +428,7 @@ def ellesmere_export(
         held = ", ".join(sorted(roles)) or "aucun"
         raise InvalidArgumentError(f"Rôle « {role} » non tenu par la classe {cls}.", f"rôles de la classe : {held}")
     key = f"{character} - {realm}"
-    choice = "collé" if paste else "donné" if base_name else None
+    choice = "collé" if paste else (choice or "donné") if base_name else None  # `choice` : origine de `base_name`
     if not paste and not base_name and (base_name := character_base(deps, character)):
         choice = "personnage"
     if paste:

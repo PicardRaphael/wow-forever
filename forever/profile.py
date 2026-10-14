@@ -71,6 +71,7 @@ WRAPPED: dict[str, Any] = {
     "sheet": {},
     "legacy_ranks": {},  # T04f : rangs des perks Legacy (sort du perk -> rang), ForeverLogger 0.5.0 ou joueur
     "ellesmere_base": None,  # EX1 (décision 269) : profil de base EllesmereUI du personnage (joueur ou /fb base)
+    "ellesmere_base_game": None,  # dernier choix reçu du jeu (/fb base) : seul un choix nouveau remplace le profil
 }
 _SCHEMA_1_FIELDS = ("class", *FIELDS)
 _META = ("source", "at", "client_build", "certainty")

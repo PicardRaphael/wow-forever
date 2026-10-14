@@ -63,18 +63,27 @@ def typed_links(value: Any) -> dict[str, list[dict[str, str]]]:
     return out
 
 
+def game_base(deps: Deps, name: str) -> str | None:
+    """Dernier profil de base reçu du jeu pour ce personnage (`ellesmere_base_game`), sinon None."""
+    from forever.profile import character_values, load_profile, resolve_path
+
+    raw = load_profile(resolve_path(deps))["characters"].get(name)
+    value = character_values(raw).get("ellesmere_base_game") if isinstance(raw, dict) else None
+    return value if isinstance(value, str) and value else None
+
+
 def keep_base(deps: Deps, name: str, realm: str, base: str) -> None:
-    """Profil de base choisi en jeu (/fb base) écrit au profil forever du personnage (source `jeu`, au clic sur
-    « Exports », décision 269), s'il diffère de celui déjà gardé."""
-    from forever.exports.ellesmere import character_base
-    from forever.profile import apply_game_fields, resolve_path
+    """Nouveau profil de base choisi en jeu (/fb base) écrit au profil forever du personnage, source `jeu`, au clic sur
+    « Exports » (décision 269) : il remplace le choix précédent, quelle qu'en soit la source ; le même choix renvoyé
+    à chaque clic ne réécrit rien (une commande `--ellesmere-base` postérieure est gardée)."""
+    from forever.profile import apply_game_fields, load_profile, make_field, resolve_path, save_profile
     from forever.timefmt import format_utc
 
-    if character_base(deps, name) != base:
-        at = format_utc(deps.now())
-        apply_game_fields(
-            resolve_path(deps), name, realm, {"ellesmere_base": base}, source="jeu", at=at, client_build=None
-        )
+    path, at = resolve_path(deps), format_utc(deps.now())
+    apply_game_fields(path, name, realm, {"ellesmere_base_game": base}, source="jeu", at=at, client_build=None)
+    doc = load_profile(path)
+    doc["characters"][name]["ellesmere_base"] = make_field(base, "jeu", at)
+    save_profile(path, doc)
 
 
 def exports_reply(
@@ -121,9 +130,12 @@ def exports_reply(
     elif not realm:
         lines.append("- Profil EllesmereUI : royaume absent du contexte du jeu.")
     else:
-        chosen = str(context.get("eui_base") or "").strip() or None
+        sent = str(context.get("eui_base") or "").strip() or None
+        chosen = sent if sent is not None and sent != game_base(deps, who) else None  # choix nouveau en jeu
         try:
-            eui = ellesmere_export(deps, who, realm, cls, level, role, base_name=chosen, talents=talents)
+            eui = ellesmere_export(
+                deps, who, realm, cls, level, role, base_name=chosen, talents=talents, choice="jeu" if chosen else None
+            )
         except InvalidArgumentError as err:
             lines.append(f"- Profil EllesmereUI : {err.message} ({err.action}).")
         else:
@@ -132,7 +144,7 @@ def exports_reply(
             base = eui["base"]["name"]
             how = (
                 f"profil de base « {base} »"
-                if chosen is not None or eui["base"]["choice"] == "personnage"
+                if eui["base"]["choice"] in ("jeu", "personnage")
                 else f"profil de base « {base} », le profil actif : choisir celui du personnage par /fb base <profil>"
             )
             links.append(typed_link("ellesmere", eui["code"], f"EllesmereUI : {ROLE_LABELS[role]}"))
