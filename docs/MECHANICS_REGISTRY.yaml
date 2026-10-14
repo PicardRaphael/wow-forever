@@ -1903,6 +1903,9 @@ mechanics:
       - tests/unit/test_route_no_farm.py::test_no_farm_while_quests_remain
       - tests/unit/test_route_no_farm.py::test_improvement_keeps_the_quests_of_the_construction
       - tests/unit/test_route_dungeon_chain.py::test_prerequisite_of_a_dungeon_quest_is_always_worth_it
+      - tests/unit/test_route_adapted_text.py::test_adapted_guide_keeps_original_steps_and_inserts_our_additions
+      - tests/unit/test_route_adapted_text.py::test_steps_of_quests_already_done_are_removed
+      - tests/unit/test_route_adapted_text.py::test_encoded_guide_uses_the_adapted_body_and_the_attribution
       - tests/unit/test_rxp_compare.py::test_replay_follows_the_guide_logic
       - tests/unit/test_rxp_compare.py::test_replay_starts_in_the_guide_of_the_start_level
       - tests/unit/test_rxp_compare.py::test_rxp_compare_cli

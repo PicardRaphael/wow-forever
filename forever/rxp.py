@@ -62,6 +62,11 @@ def _step(stop: Mapping[str, Any], end_level: int) -> list[str]:
     return lines
 
 
+def encode_stop(stop: Mapping[str, Any], end_level: int = 0) -> list[str]:
+    """Étape de guide d'un seul arrêt (ajouts de la base adaptée, CJ1)."""
+    return _step(stop, end_level)
+
+
 def encode_guide(plan: Mapping[str, Any], *, name: str, group: str) -> str:
     """Guide RestedXP déterministe d'un plan de `forever route plan`."""
     faction = str(plan.get("faction") or "").capitalize()
@@ -81,8 +86,12 @@ def encode_guide(plan: Mapping[str, Any], *, name: str, group: str) -> str:
         f"{str(prov.get('data_sha', ''))[:12]}"
     )
     basis = plan.get("basis") or {}
+    stops = list(plan["stops"])
     if basis.get("kind") == "parcours adapté":  # décision 277 : attribution obligatoire
         lines.append(f"-- {guide_text(str(basis.get('attribution') or ''))}")
-    for stop in plan["stops"]:
+        if basis.get("body"):  # CJ1, bloc 1d : étapes d'origine du parcours (vols, foyer) et nos ajouts
+            lines += [str(line) for line in basis["body"]]
+            stops = stops[int(basis.get("adapted_stops") or 0) :]
+    for stop in stops:
         lines += _step(stop, end_level)
     return "\n".join(lines) + "\n"

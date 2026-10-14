@@ -72,6 +72,7 @@ class Step:
     dungeon: bool  # étape de donjon (`.dungeon`) : écartée, nos comparaisons sont sans donjon
     actions: tuple[Action, ...]
     hardcore: bool = False  # étape `#hardcore` : écartée (Forever n'est pas un serveur hardcore)
+    raw: tuple[str, ...] = ()  # CJ1 : lignes de l'étape telles quelles (base adaptée, décision 277)
 
 
 @dataclass(frozen=True)
@@ -187,7 +188,8 @@ def _parse_step(lines: list[str], header: str) -> Step:
             guards.append((command, quest, line_filter))
         elif command == "dungeon":
             dungeon = True
-    return Step(step_filter, xp_rate, xp_guard, tuple(guards), dungeon, tuple(actions), hardcore)
+    text = (header.strip(), *(ln.rstrip() for ln in lines if ln.strip()))
+    return Step(step_filter, xp_rate, xp_guard, tuple(guards), dungeon, tuple(actions), hardcore, text)
 
 
 def parse_guide(text: str, file: str, *, dungeon: bool = False) -> Guide | None:

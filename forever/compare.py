@@ -39,6 +39,8 @@ class Replay(NamedTuple):
     stops: list[Stop]
     skipped: list[dict[str, Any]]  # {"kind", "quest", "reason"}
     result: RouteResult
+    origins: tuple[int, ...] = ()  # CJ1 : étape d'origine (indice dans `steps`) de chaque arrêt (guide RestedXP)
+    steps: tuple[Any, ...] = ()  # CJ1 : étapes du parcours retenues pour le personnage, dans l'ordre
 
 
 def read_fgguide(path: Path) -> FgGuide:
@@ -249,6 +251,12 @@ def replay_rxp(
     feasible = True
     opened: dict[int, bool] = {}
     pending: set[int] = set()  # objectifs dont la dernière ligne n'est pas encore passée
+    origins: list[int] = []
+    current = -1
+
+    def push(stop: Stop) -> None:
+        stops.append(stop)
+        origins.append(current)
 
     def attempt(kind: str, ref: int) -> None:
         nonlocal state
@@ -262,12 +270,13 @@ def replay_rxp(
             skipped.append({"kind": kind, "quest": ref, "reason": "trajet impossible"})
             return
         state = after
-        stops.append(stop)
+        push(stop)
         results.append(res)
 
     for index, (step_index, action) in enumerate(items):
         if state.level >= end_level:
             break
+        current = step_index
         if step_index not in opened:
             opened[step_index] = _guards_ok(world, state, steps[step_index], who)
         if not opened[step_index]:
@@ -278,13 +287,13 @@ def replay_rxp(
         if action.kind == "grind":
             if state.level < action.ref:
                 state, res = grind_to(gd, world, start, state, level=min(action.ref, end_level), cap=cap)
-                stops.append(Stop("grind", action.ref))
+                push(Stop("grind", action.ref))
                 results.append(res)
             continue
         due = [lv for lv in world.train_levels if lv <= state.level and lv not in state.trained]
         if world.trainers and due and check_stop(gd, world, state, Stop("train", due[-1])) is None:
             state, res = apply_stop(gd, world, state, Stop("train", due[-1]), cap=cap)
-            stops.append(Stop("train", due[-1]))
+            push(Stop("train", due[-1]))
             results.append(res)
         if action.kind == "objective":
             pending.discard(action.ref)
@@ -295,7 +304,7 @@ def replay_rxp(
         attempt(action.kind, action.ref)
     if state.level < end_level:
         state, res = grind_to(gd, world, start, state, level=end_level, cap=cap)
-        stops.append(Stop("grind", end_level))
+        push(Stop("grind", end_level))
         results.append(res)
     seconds = sum(r.seconds for r in results)
     xp = sum(r.xp for r in results)
@@ -312,7 +321,7 @@ def replay_rxp(
         warnings=(),
         certainty=weakest(*(r.certainty for r in results)),
     )
-    return Replay(stops, skipped, result)
+    return Replay(stops, skipped, result, tuple(origins), tuple(steps))
 
 
 def breakdown(world: RouteWorld, result: RouteResult, zone_names: Mapping[int, str]) -> dict[str, Any]:
@@ -594,6 +603,7 @@ class Adapted(NamedTuple):
     stops: list[Stop]  # arrêts du parcours rejoué (farm `.xp` et maîtres compris) et nos ajouts
     additions: list[dict[str, Any]]  # {"kind", "ref", "level", "seconds" (temps ajouté), "placed"}
     result: RouteResult
+    lines: tuple[str, ...] = ()  # CJ1, bloc 1d : corps du guide (étapes d'origine du parcours et nos ajouts)
 
 
 def run_stops(
@@ -681,12 +691,15 @@ def adapted_route(
     cap: int,
     class_quests: bool = True,
     dungeons: bool = True,
+    done: frozenset[int] = frozenset(),
 ) -> Adapted:
     """Base adaptée (décisions 277 et 279) : le parcours gratuit de la race et de la classe rejoué par nos règles, puis
     chaque ajout par défaut de nos routes (donjon avec toutes ses quêtes, quête de classe absente) inséré d'un bloc à
     la place où la route est la plus courte ; un ajout impossible à placer est dit (`placed` faux). Registre : I18"""
     replay = replay_rxp(gd, world, guides, who, start, end_level=end_level, cap=cap)
     stops = list(replay.stops)
+    anchors: list[int | None] = list(replay.origins)  # étape d'origine ; None : un de nos ajouts
+    placed: list[tuple[int, str, int | str, list[Stop]]] = []  # (étape après laquelle l'écrire, sorte, réf, arrêts)
     current = run_stops(gd, world, stops, start, end_level=end_level, cap=cap)
     taken = {int(s.ref) for s in stops if s.kind == "turnin"}
     additions: list[dict[str, Any]] = []
@@ -705,8 +718,41 @@ def adapted_route(
             None,
         )
         additions.append({"kind": kind, "ref": ref, "level": at, "seconds": best[0] - current.seconds, "placed": True})
+        pos = next(i for i in range(len(best[1])) if best[1][i : i + len(unit)] == unit)
+        anchor = next((a for a in reversed(anchors[:pos]) if a is not None), -1)
+        placed.append((anchor, kind, ref, unit))
+        anchors = anchors[:pos] + [None] * len(unit) + anchors[pos:]
         stops, current = best[1], best[2]
-    return Adapted(stops, additions, current)
+    lines = _adapted_lines(world, replay, placed, done)
+    return Adapted(stops, additions, current, tuple(lines))
+
+
+def _adapted_lines(
+    world: RouteWorld, replay: Replay, placed: Sequence[tuple[int, str, int | str, list[Stop]]], done: frozenset[int]
+) -> list[str]:
+    """Corps du guide adapté (décision 277, l'étape entière comme unité) : étapes d'origine du parcours jusqu'à la
+    dernière qui sert la route, sauf celles dont toutes les quêtes sont déjà faites, et nos ajouts écrits après l'étape
+    qui les précède dans la route. Registre : I18, I19"""
+    from forever.rxp import encode_stop
+
+    last = max((o for o in replay.origins if o >= 0), default=-1)
+    lines: list[str] = []
+
+    def additions_after(anchor: int) -> None:
+        for at, kind, ref, unit in placed:
+            if at != anchor:
+                continue
+            for s in unit:
+                name = world.dungeons[str(s.ref)].name if s.kind == "dungeon" else world.quests[int(s.ref)].name
+                lines.extend(encode_stop({"kind": s.kind, "ref": s.ref, "name": name}))
+
+    additions_after(-1)
+    for index, step in enumerate(replay.steps[: last + 1]):
+        quests = {a.ref for a in step.actions if a.kind in ("accept", "objective", "turnin")}
+        if not (quests and quests <= done):
+            lines.extend(step.raw)
+        additions_after(index)
+    return lines
 
 
 ATTRIBUTION = (
@@ -808,10 +854,13 @@ def delivered_route(
         cap=cap,
         class_quests=request.class_quests,
         dungeons=request.dungeons != "none",
+        done=frozenset(request.done),
     )
     basis.update(
         kind="parcours adapté",
         additions=adapted.additions,
+        body=list(adapted.lines),  # CJ1, bloc 1d : étapes d'origine du parcours (vols, foyer) et nos ajouts
+        adapted_stops=len(adapted.result.stops),
         attribution=ATTRIBUTION.format(guides=", ".join(guides)),
         verdict=(
             f"notre calcul {verdict['explanation']} ; route livrée : le parcours gratuit de RestedXP de la race et de "
@@ -822,10 +871,9 @@ def delivered_route(
         return adapted.result, basis
     after = _final_state(gd, world, adapted.stops, start, end_level=covered, cap=cap)
     rest = plan(gd, world, after, end_level=request.end_level, cap=cap)
-    stops = (
-        *[r for r in adapted.result.stops if r.kind != "grind" or r is not adapted.result.stops[-1]],
-        *rest.result.stops,
-    )
+    head = [r for r in adapted.result.stops if r.kind != "grind" or r is not adapted.result.stops[-1]]
+    basis["adapted_stops"] = len(head)
+    stops = (*head, *rest.result.stops)
     seconds = sum(r.seconds for r in stops)
     xp = sum(r.xp for r in stops)
     from forever.engine.route import weakest
