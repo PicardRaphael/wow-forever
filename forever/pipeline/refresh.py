@@ -529,3 +529,8 @@ def npc_details(
             for e in table.get("curve_excluded", []) or []
         ],
     }
+
+
+def inherited_measures(data_dir: Path, version: str) -> list[dict[str, Any]]:
+    """Mesures de PV encore héritées de la version précédente (LN1)."""
+    raise NotImplementedError

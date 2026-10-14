@@ -560,3 +560,8 @@ def apply_game_fields(
     doc["schema_version"] = SCHEMA_VERSION
     save_profile(path, doc)
     return doc
+
+
+def archive_characters(deps: Deps, product: str, now: Any) -> list[str]:
+    """Personnages d'un produit rangés dans `archived_characters` (LN1)."""
+    raise NotImplementedError
