@@ -1563,6 +1563,9 @@ function FB.ApplySlot(slot)
 		if type(slot.status) == "table" then
 			run.status = slot.status
 			FB.CheckUpdate(slot.status)
+			if FB.UpdateBroker then
+				FB.UpdateBroker()
+			end
 			FB.RefreshTabs()
 			run.slots = tonumber(slot.status.slots) or run.slots
 		end
@@ -2149,6 +2152,61 @@ function FB.SetRole(value)
 end
 
 ---------------------------------------------------------------------------
+-- Objet LibDataBroker « Forever » (EX1, bloc G) : affiché par le bloc Broker des DataBars d'EllesmereUI
+---------------------------------------------------------------------------
+
+-- Créé seulement si LibDataBroker est déjà chargé par un autre addon (EllesmereUI) : rien d'embarqué ici. Le texte
+-- reprend l'état publié par le pont ; XP par heure et prochain objectif seulement s'ils sont envoyés, jamais inventés.
+local function BrokerText()
+	local status = run.status
+	if type(status) ~= "table" then
+		return "pont pas encore vu"
+	end
+	local parts = {}
+	if type(status.line) == "string" and status.line ~= "" then
+		parts[#parts + 1] = Plain(status.line)
+	end
+	if status.xp_per_hour ~= nil then
+		parts[#parts + 1] = "XP/h " .. Plain(tostring(status.xp_per_hour))
+	end
+	if type(status.next_objective) == "string" and status.next_objective ~= "" then
+		parts[#parts + 1] = Plain(status.next_objective)
+	end
+	return #parts > 0 and table.concat(parts, " · ") or "pont pas encore vu"
+end
+
+function FB.UpdateBroker()
+	if not run.broker then
+		if type(LibStub) ~= "table" and type(LibStub) ~= "function" then
+			return
+		end
+		local ok, ldb = pcall(LibStub, "LibDataBroker-1.1", true)
+		if not ok or type(ldb) ~= "table" or type(ldb.NewDataObject) ~= "function" then
+			return
+		end
+		local created, obj = pcall(ldb.NewDataObject, ldb, "Forever", {
+			type = "data source",
+			label = "Forever",
+			text = "",
+			OnClick = function()
+				FB.Toggle()
+			end,
+			OnTooltipShow = function(tooltip)
+				if type(tooltip) == "table" and type(tooltip.AddLine) == "function" then
+					tooltip:AddLine("Forever")
+					tooltip:AddLine(BrokerText())
+				end
+			end,
+		})
+		if not created or type(obj) ~= "table" then
+			return
+		end
+		run.broker = obj
+	end
+	run.broker.text = BrokerText()
+end
+
+---------------------------------------------------------------------------
 -- Événements et commandes
 ---------------------------------------------------------------------------
 
@@ -2212,6 +2270,7 @@ function handlers.PLAYER_ENTERING_WORLD()
 		end
 	end
 	FB.ApplySlot(ForeverBridgeSlot)
+	FB.UpdateBroker()
 	-- secours /reload : la boîte d'envoi vient d'être écrite, le pont la lit ; consultation relancée
 	if (next(Waiting()) ~= nil or #Outbox() > 0) and not run.scheduleStart then
 		run.afterReload = true
