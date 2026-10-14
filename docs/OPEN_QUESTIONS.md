@@ -475,10 +475,26 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   `RXPFrame.GenerateMenuTable` (objet `RXP` global « pour le débogage » dans `RXPGuides.lua`, non garanti). Test
   (facultatif, décision 247) : livraison d'une route, menu des guides ouvert aussitôt. Priorité : basse.
 - **PRO1 — Les métiers secondaires (Cooking, First Aid, Fishing) sont-ils « abandonnables » dans `GetSkillLineInfo` de Forever ?** Ajoutée le 2026-10-14 (RX1, bloc E). ForeverBridge 0.3.0 n'envoie que les lignes abandonnables (métiers principaux, et secondaires si le client les marque ainsi) ; `suppose`. Test (facultatif, décision 247) : `/dump GetSkillLineInfo(i)` sur une ligne de métier secondaire. Priorité : basse.
-- **NFB1 — Un build exporté par Naowh Forever (`!NFB1!`) se relit-il à l'identique par notre codec ?** Ajoutée le
-  2026-10-13 (EX1, décision 255) : format relevé dans `NaowhForever_Training` (LibSerialize, LibDeflate,
-  `EncodeForPrint`), jamais vérifié sur une chaîne réelle. Test (facultatif, décision 247) : exporter un build depuis
-  Naowh en jouant, le coller dans le chat ; va-et-vient exact. Priorité : basse (EX1).
+- **NFB1 — Un build exporté par Naowh Forever (`!NFB1!`) se relit-il à l'identique par notre codec, et un code produit
+  par forever s'importe-t-il ?** Ajoutée le 2026-10-13 (EX1, décision 255), précisée le 2026-10-14 (plan d'EX1,
+  décision 267) : format relevé dans `NaowhForever_Training` 1.1.12 (LibSerialize, LibDeflate, `EncodeForPrint`) ;
+  l'oracle des tests (vraies bibliothèques sous `lupa`) prouve la compatibilité avec les bibliothèques, pas
+  l'acceptation par Naowh (contrôle de l'arbre, des paliers et des prérequis à chaque prise). Test (facultatif,
+  décision 247) : coller un code `!NFB1!` de forever dans `/nf`, Profiles, Import, et voir le build apparaître dans la
+  fenêtre Training ; exporter un build depuis Naowh et le coller dans le chat (va-et-vient exact). Priorité : moyenne
+  (EX1).
+- **MAC1 — Sur Forever, `/cast <sort>` sans rang lance-t-il le meilleur rang appris ?** Ajoutée le 2026-10-14 (EX1,
+  décision 267) : les macros d'EX1 écrivent `/cast` sans rang (`suppose`). Test (facultatif, décision 247) : une macro
+  importée par Naowh, lancée avant et après l'apprentissage d'un nouveau rang. Priorité : basse (EX1).
+- **EUI1 — Un profil `!EUI_` produit par forever s'importe-t-il dans EllesmereUI, et sa clé `cdmSpells` est-elle
+  reprise ?** Ajoutée le 2026-10-14 (EX1, décision 267) : enveloppe version 3, `type="full"`, `client="forever"`,
+  sérialiseur relu dans EllesmereUI 9.5.4 ; jamais importé en jeu. Test (facultatif, décision 247) : `/eui`, Profiles,
+  Import, puis le gestionnaire de recharges montre les sorts attendus. Priorité : basse (EX1).
+- **EUI2 — La bascule par `SwitchProfile` tient-elle face à la bascule d'EllesmereUI au `PLAYER_ENTERING_WORLD` ?**
+  Ajoutée le 2026-10-14 (EX1, décision 267) : EllesmereUI rebascule lui-même quand la spécialisation du personnage
+  est affectée à un profil (`specProfiles`). Règle retenue : dans ce cas ForeverBridge le signale une fois et **ne
+  bascule pas** (jamais de lutte). Reste à voir en jeu si, sans affectation, la bascule de ForeverBridge tient après
+  un `/reload` et une nouvelle connexion. Test (facultatif, décision 247). Priorité : basse (EX1).
 - **BR6 — L'export SimulationCraft omet-il vraiment l'emplacement à distance (18) sur Forever ?** Oui pour la
   baguette : le premier export réel (sonde G, `tests/fixtures/simc/mage19_sonde_g.txt`) n'a pas de ligne `ranged=`
   alors que le contexte du même instant porte l'emplacement 18 (Greater Magic Wand). Reste à voir avec une arme à

@@ -778,3 +778,31 @@ copies `ForeverLogger.bak-*` du 2026-10-02 ont quitté le dossier des addons pou
 Il ne lit que le premier `.toc` trié (pour FojjiCore : `RequiredDeps: WeakAuras` du `.toc` générique au lieu de
 `ForeverAuras` du `_Camelot.toc`), omet `SavedVariablesPerCharacter` et ne nomme pas la licence d'un fichier
 `LICENSE` (seulement `X-License`). Les licences de ce relevé viennent de la lecture des fichiers.
+
+## Relevé du 2026-10-14 (plan d'EX1, décision 267)
+
+Lecture seule des addons installés sous le client 1.60.1.70374, sans réseau ; aucun code recopié, seuls des formats,
+des noms et des chemins `fichier:ligne` sont repris (détail dans `tasks/EX1-plan.md`, section « Constats »).
+
+- **Naowh Forever 1.1.12** (interface 16001 seulement) : plus de `/nftraining` ni `/nfbis` ; l'import passe par `/nf`,
+  Profiles, Import (aiguillage par préfixe) ou par le bouton Import de chaque fenêtre. Chaîne commune : préfixe +
+  `EncodeForPrint(CompressDeflate(Serialize(t)))` ; lecture bornée (`NaowhForever/Shared/Decode.lua`) : 100 000
+  caractères, 1 Mio décompressé, profondeur 8, 20 000 valeurs pour les builds, macros et listes BiS.
+  - `!NFB1!` (`NaowhForever_Training/Builds.lua`) : `{v=1, class, name, spec, points={TraitNodeID…}, skip}` ; au plus
+    51 points ; contrôle à chaque prise (nœud de l'arbre, rang, prérequis au maximum, 5 × (rangée − 1) points dans la
+    colonne) ; nom et spécialisation coupés à 40 caractères ; aucun build livré.
+  - `!NFM1!` (`NaowhForever_Macros/Sharing.lua`) : `{v=1, macros={{name, body}…}}` ; nom de 1 à 16 octets, corps d'au
+    plus 255 ; une macro invalide rejette toute la chaîne ; alerte sur `/run`, `/script`, `/dump` et les commandes
+    d'addons.
+  - `!NBIS1!` (`NaowhForever_BiS/BiS/Sharing.lua`, export en `v=4`) et `NFSW1:` (`StatWeights/Sharing.lua`, texte
+    clair) : formats de T10a.
+  - API publique : `NaowhForever_API:ImportProfile` (`NFPROFILE1:`) importe sans confirmation : écartée (décision
+    196).
+- **EllesmereUI 9.5.4** : import dans un **profil nommé** (copie du profil actif recouverte), plus dans le profil
+  actif ; enveloppe `{version=3, type="full", data, meta, client="forever"}` ; sérialiseur maison (`s<longueur>:`,
+  `n<texte>;`, `T`, `F`, `N`, tables) ; API `SwitchProfile`, `GetActiveProfileName`, `GetProfileList`,
+  `ImportProfileSilent` ; bascule automatique quand la spécialisation est affectée à un profil
+  (`EllesmereUIDB.specProfiles`, résolue avant l'activation des modules) ; aucune fonction publique d'affectation.
+  Bloc Broker des DataBars : lit tout objet LibDataBroker.
+- **Bibliothèques** : LibSerialize MINOR 7 (MIT) et LibDeflate 1.0.2 (zlib), même copie chez Naowh et EllesmereUI ;
+  copiées pour les tests seulement dans `tests/fixtures/third_party/` (décision 267).
