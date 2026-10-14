@@ -706,6 +706,12 @@ def _fetch_version(run: _Run, version: str, rules: Mapping[str, Any]) -> list[st
             fetch_tables(deps, version, dungeon_tables, log=run.say)
         except FetchFailedError as exc:  # DJ1 : sans elles, dungeons.json est hérité de la base
             run.say(f"tables des donjons facultatives : {exc.message}")
+    travel_tables = [t for t in rules.get("travel_tables", []) if t not in enus]
+    if travel_tables:
+        try:
+            fetch_tables(deps, version, travel_tables, log=run.say)
+        except FetchFailedError as exc:  # RX1 : sans elles, travel.json est hérité de la base
+            run.say(f"tables des trajets facultatives : {exc.message}")
     if rules.get("gametables"):
         fetch_gametables(deps, version, rules["gametables"], log=run.say)
     run.cleared[f"network-{version}"] = "téléchargement réussi"

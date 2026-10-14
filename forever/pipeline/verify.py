@@ -21,6 +21,7 @@ from forever.pipeline.dungeons_client import DUNGEON_FILE, dungeons_errors
 from forever.pipeline.pets import PETS_FILE, pets_errors
 from forever.pipeline.quest_rewards import QUEST_FILE, quest_rewards_errors
 from forever.pipeline.sources import CERTAINTIES, inherited_files, load_source, source_provenance
+from forever.pipeline.travel_client import TRAVEL_FILE, travel_errors
 from forever.pipeline.xp_bonuses import XP_BONUS_FILE, xp_bonuses_errors
 from forever.provenance import Provenance
 from forever.store import VersionData, current_identity
@@ -142,6 +143,11 @@ def check_version(v: VersionData) -> tuple[list[str], list[str], list[str]]:
             errors += dungeons_errors(_json(v, DUNGEON_FILE))
         except (OSError, ValueError) as exc:
             errors.append(f"{DUNGEON_FILE} illisible ({exc})")
+    if (v.path / TRAVEL_FILE).is_file():  # RX1, bloc B : trajets du client
+        try:
+            errors += travel_errors(_json(v, TRAVEL_FILE))
+        except (OSError, ValueError) as exc:
+            errors.append(f"{TRAVEL_FILE} illisible ({exc})")
     inherited = inherited_files(v)
     if inherited:
         warnings.append(f"{len(inherited)} fichier(s) hérité(s) d'une version antérieure, à revérifier")

@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 6 (forever install, 2026-10-13)",
+      "source": "Client 1.60.1.70338 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 7 (forever install, 2026-10-14)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 6 (forever install, 2026-10-13)",
+      "source": "Client 1.60.1.70338 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 7 (forever install, 2026-10-14)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -203,7 +203,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 6 (forever install, 2026-10-13)"
+        "installé en révision 7 (forever install, 2026-10-14)"
       ]
     },
     "races.json": {
@@ -322,10 +322,19 @@
         "lien d'une entrée de recherche de groupe à sa carte par le nom (alias de decode_rules.json) ; sens du niveau de ContentTuning et des codes de faction probable (DON9)",
         "installé en révision 6 (forever install, 2026-10-13)"
       ]
+    },
+    "travel.json": {
+      "source": "Client 1.60.1.70338 : tables du client 1.60.1.70338 (wago.tools, 1.60.1.70338) décodées par forever decode",
+      "certainty": "certain",
+      "notes": [
+        "trajets du client : points de vol, trajets et leur longueur, cartes de zone et leurs bornes (decode_rules.json, travel)",
+        "camp d'un point de vol par ses drapeaux (decode_rules.json travel.faction_flags) : sens probable ; durée d'un vol non lue (vitesse de mechanics.json, TRV1)",
+        "installé en révision 7 (forever install, 2026-10-14)"
+      ]
     }
   },
-  "revision": 6,
-  "revised_at": "2026-10-13",
+  "revision": 7,
+  "revised_at": "2026-10-14",
   "hotfixes": {
     "dbcache": {
       "file": "Cache/ADB/enUS/DBCache.bin",
@@ -334,62 +343,62 @@
       "build": 70338,
       "size": 3033586,
       "sha256": "7d67e37dd11c7ca1a67d063213afa4296d9fcb606bf05b17d4415a8c942e5352",
-      "file_date": "2026-10-13T07:51:40Z",
-      "read_at": "2026-10-13T17:41:53Z"
+      "file_date": "2026-10-13T07:52:02Z",
+      "read_at": "2026-10-14T07:08:59Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
-      "commit": "07d008f28907c00827cacadf2d7c1a40f578b6a3",
+      "commit": "464a25b3a7c02b0c74726be7a53a0b0ccf1a2d10",
       "files": {
-        "CharBaseInfo": "32dc1ebe93cfbe5c270b193237e245696fcccfcb57b1c4776be96331dbbff702",
-        "ChrClasses": "cbb1025694dd988dbc83ac1f7bfc14ec348833628bb8ef9263c69d80eeda7cee",
-        "ChrRaces": "e0c2a5e011b35b57baede8d04ba7d04c2a919da020fcfca063401046d226ecb8",
-        "CreatureFamily": "afe3a187ed449ace85485aa0f871c0575c94eac594bc9b85393deb917247cc0c",
-        "Curve": "a59168e238d5fb62f801243c10bd6710508b43495a9491b5caf7feb3892be800",
-        "CurvePoint": "aa0edadb5abe454b42530b48ebf30608fc0a709bdef18495a9fa10f6d44ffd4a",
-        "Exhaustion": "d3533494dae49db79abc78d3904c9aff760c2271caa09a0477889f09f658ca15",
-        "ExpectedStat": "1e19953a63419ec65aa52caf5355d728eebc034fbb796bfb4bdb65794137de98",
-        "GlobalCurve": "a53a42140a79f32b93c9f8dd2f3fecd4d3f2e9c4dda3f6b55b0f6e1c33faa973",
-        "Item": "5742e1cc6900baf81b8844c8c1ad28d126739b9d80a02ac2524f01205792f28e",
-        "ItemEffect": "0a81ca146997b03caf7f228f123e17ea7908b57fa20ea396647ed90d459c3fb8",
-        "ItemPetFood": "138141b3cebcb7011f2cedaff0858f6173702352066bdbd18fb5cfcf2cdd0dc0",
-        "ItemSparse": "ba1d25b52726176d26442bd2ecf28d04f95912e7bfc982905669bd6ad83dd8cf",
-        "ItemXItemEffect": "dfb36d691963edb7240e09644600a42564ca8b56d00f062fee5c09b51c69a29d",
-        "LevelExperience": "070b1b779789bd54b3f73ed27fdcfa68faa053c5d061d852a7ae1d7269a0d94c",
-        "NumTalentsAtLevel": "799d29b1d70b2c450185da1db86da2b41a85075b06336338908c78519ceaf1e7",
-        "PlayerExpectedStat": "632b31c7f5f746a20092ae52f554661e530020bb06312a1ff1141056940b8e9d",
-        "SkillLine": "225876879ed7148786cd59395b11f2db36a94ae2ad0fa988f3a019bd8f16bf4f",
-        "SkillLineAbility": "2d57e0592a85813ff6ba557c238ddf40ea762107551a226d7dad9297a7f8a77d",
-        "SkillLineXTraitTree": "750cdc35bb13b30e18395ada2ecab0bb5ab950dd37206622a1d222fb3478fe96",
-        "SkillRaceClassInfo": "cc874fed1a0e579d3e0d023a157c46451dfb58c4ddf15133609d3eadb90526b1",
-        "Spell": "076655c8d1a243fb3e4181fbac68128812cb33acefd873d4bb69c963e84cb921",
-        "SpellAuraOptions": "954ca9d8f839ef9639fefc091b0e5edc3e0076002d4682b8a8a76ccee8fcb236",
-        "SpellAuraRestrictions": "4dc2ed5de230aca1ee2c33d728d6fdb3cd17557e89ec51737569ced2968bd016",
-        "SpellCastTimes": "4214cdabcbc1f2af3232cc5411c4e11c64c2bf5f084139f5c6562b66e5958309",
-        "SpellCategories": "f56fc7ce9bec8aead826d380e9af53b46e04576510954c3e4f40609d41a844f3",
-        "SpellCategory": "b36a3ebff175d2e8c0b11bce1d825acfe5691094d46cce3776a9881d7c1242ea",
-        "SpellClassOptions": "ef0aa425b946acfd88ef5a76730012e82d49d764436f881891a3422963346d22",
-        "SpellCooldowns": "7dce889e028b4b1467f199baec3881796a8b2ab9072e86631c4f11e97dab0481",
-        "SpellDispelType": "440c11eb12916e63685e5286f3a33ad3a1d364ab285900b20dcf5a5e366bb600",
-        "SpellDuration": "bf0036a13d961bd8e54a86b0882ddc3f34790b9d2f7347ed7d8d3170b0d39bed",
-        "SpellEffect": "2b0ae49509d7feb7976c2e5e913e1d35f4c67caebe1fef7d6276e6f26cfa96e7",
-        "SpellInterrupts": "51dd8e3a4362893b3b5b1be85f7f6db4c6a0f40f1282624e2dca01dfdf8251d3",
-        "SpellLevels": "8cb2cc25a662fb926955930d0f2204771602c6e973fd07f4eeb1683c22df3fbc",
-        "SpellMechanic": "d64af0227e3ef1d9fab7d95c1462f16215a0d7152b4ea7bb461c755953703e05",
-        "SpellMisc": "6feeaadac81c528efd33caebd4d05981a4b097b4690810e8694bd96b6a7012ce",
-        "SpellName": "cf2e4d710cd432559c8de4a0491d13f79cfd6df7b26d87fc2a46ae852d38aa82",
-        "SpellPower": "5c56fbfe1a03290a32a1f0b69d6c819c5d6d21d378bbce1796570b0ab14dc90c",
-        "SpellRange": "43263580dacb0933bf6ecbce0947d8d57fa47b8e4b23bb9c3596035005207efc",
-        "SpellShapeshift": "173a064fb2908affc99054bac13a6806b151d464946e9d2489369f401f3e35fa",
-        "TraitCond": "2e3107a6bd8f69b947f9a733b3a0587b77af4d2852157e83f4184b28c5af75c3",
-        "TraitDefinition": "009887c3e8524c12a610b3c2b265a66a65c98a808750e6445d47404e9c0f4d78",
-        "TraitDefinitionEffectPoints": "080df7a9cbf433e3713c9092645ca790371652bc41030f2199c3a586b22dc2ab",
-        "TraitEdge": "8d0ba7defd77778bb581a1687b835c6d8ef51433d5261da656fd11a9894345f8",
-        "TraitNode": "a25f11a9e474315f78461ef865b67781158cffc77cfc86004199b4410d0e5d9e",
-        "TraitNodeEntry": "fda96bb3540909d585c73695373f2a581b9ea8cde1ec07bf05c3c03569537bb1",
-        "TraitNodeGroupXTraitNode": "401aefd3c8e6a593810d3d0f232a4bbbd2c7bcb79d8972a3d4450fcf0f437c89",
-        "TraitNodeXTraitNodeEntry": "c6e0883d1b0127d8ab4234e2d13cedb2d71c880b8c82f5db463c696e37ab4d33",
-        "UiMap": "6ee3871c5a20ce686fc1ea9d14cd5b8ac7d7f0912e9a6f627321177959b455a8"
+        "CharBaseInfo": "bef7358b4609dae73d1002ca608e5082e3ba40c1f13ed4e899f2a2981007f4be",
+        "ChrClasses": "3422044a3e115dc9561b6ba3c146456e8dec06ea90d14438e6a392cee24306c4",
+        "ChrRaces": "be89d3066962adf024cd062ceb23a8e94ee331990d6c0ab78b70a786d30f5eed",
+        "CreatureFamily": "64f48074311fe7400bf8395b078b6fb076fd6c28868cc8fb24fea5d95d6e6d9b",
+        "Curve": "e3b0d8b3368c9932234cf5f4c5c8dbdf4bd387d88fe4bae26af089e83f0d0784",
+        "CurvePoint": "fd3862be41ff0f7f762cc532a9dd2d7df32b842a6960eb37e722eac0b420efa3",
+        "Exhaustion": "1dd987748bd25a61425703dc431aac49da48010d29f7e8c3dde86ed60c499f47",
+        "ExpectedStat": "6dc33768940b4fae787c926d780c637c30f1314745287a41839864d4ba877700",
+        "GlobalCurve": "e3ba90429ca387de0c29251d65b0d43c3450c1a4cd71a6e2bd55407d54a020c4",
+        "Item": "7908ab1a2066bc8de99bcbbb54d4b936cebab5b1b8a69238a299a00589933323",
+        "ItemEffect": "706e60f678b7834c20f0dc1ef04de2403993b959030e95e20c814e0aed8b3ec6",
+        "ItemPetFood": "34b7462f19e011fcb695b3dd73351177e2dd275087823903a81d3cf419b6da44",
+        "ItemSparse": "55f834812adfcb1b07a6f5c65915e6b7ca944976c990fc27b43f8dd24a3b1cae",
+        "ItemXItemEffect": "d77fee54ae06a0a584e64050de6345c0f290399389134899477f20b9525e449f",
+        "LevelExperience": "1dc67f6baf69f6bf124b97a31cb6e507fbeef2d13810a1543b6fde01b66a885b",
+        "NumTalentsAtLevel": "f77ecb138625d0ca5149f07b7456e2131118a8b85d6286d77f7548c831d122c0",
+        "PlayerExpectedStat": "55349a2ed0cb919fcd0d8001379a95b4f61144cbc7cbb8cddce953201e611ba3",
+        "SkillLine": "df06259c1919cd5fba6755fba4c25dea5c531a793e9d3274586fdc5d0233190e",
+        "SkillLineAbility": "cd7c0c6dd9b36c9f7c5cfafd959b28b0232f1c67ba6bdfe97a8c06df88c518cd",
+        "SkillLineXTraitTree": "213f078c545ac96bb5a719439424472863fb466872cadec1842e99d7f18c8c1f",
+        "SkillRaceClassInfo": "e3115ce1b52fe792f742340e1810e5dbfd36f37144bd4cad94f32c2762188734",
+        "Spell": "cd9418cc2f62db4060b04d5768b4ed7eb636b1b2baacf81a166c448a62e238dc",
+        "SpellAuraOptions": "3ae8c0895c5afe745a9b063d1b4f2adb2a1bf37e5bc864ed2525805b637bda52",
+        "SpellAuraRestrictions": "83c17d39f95aca900895497a9f00f6574b02e94b9408726d36403ea74c64895c",
+        "SpellCastTimes": "235c265aa4a822e9e5557af127e7200a189997fc409231fedb8756ea02d96bcf",
+        "SpellCategories": "370cd828dafe8dc60dca42ef5186ba14b513e4d4f6684f1cfe4dae0657b8b3da",
+        "SpellCategory": "972b7b641294a2fb0bc35086195b916bdd26c344bcbbf5f535a64f0b3716b667",
+        "SpellClassOptions": "ff49e0e7876d24ae42ba154d939f5d5fb3e3563090c482797178720a49f0931a",
+        "SpellCooldowns": "66513e44fd14ee0657cfb8aa573d9ce0d8ea9eec63c0a486ddde48065f5d9856",
+        "SpellDispelType": "c085cf7cf90c0a9c30c678c8a1c2802db8e10550769b402c162533814dad1869",
+        "SpellDuration": "8acd7cf6e9b7b69f236a511bfc517fb77f03dd47fc51e1c7823d86464870b773",
+        "SpellEffect": "f28e45bbb5112b70ce27ff13d0b9bdd044f7f4f8bca4f655c3095e174a318eb4",
+        "SpellInterrupts": "3635eb1461bd986ab6d6441a12398692b6367b32f90a5c391ecdaea91171acae",
+        "SpellLevels": "315bc6082cef4347a319b6793a2a12537ec4c5ea12f8809fce121e1480756a65",
+        "SpellMechanic": "505138e9358fa402f9935f3f2390f0453260a9b6bc86de918192a4e50ea2b9e7",
+        "SpellMisc": "79e0fe022d9491e08bce1f9098c7ced3ed148edf670012368a6e387940322c30",
+        "SpellName": "ceb9bd8c5641a7fc019b0f9d5951411bfd2d23c36a773b731ea012ff572d8650",
+        "SpellPower": "2633358b72aaec35778e266dea89642fc0db1cbb037b56dd4e2fd874834791b8",
+        "SpellRange": "3dc182e6e97e2df5e7e55560996266ab3df7557943e5cee150078cd40b29de0d",
+        "SpellShapeshift": "2f36b2c0ef37ece7511a5780127e82e0b8c13747c6810a56539de8e5ae4459fb",
+        "TraitCond": "27a87673fea86cb0db0679d41d60c83e16a7f601f7cd18573ee67ba7c1330ae9",
+        "TraitDefinition": "24757e2d8bfe07504ea9b98967e291864b32c9dd256118142f2d24daf3b5c99b",
+        "TraitDefinitionEffectPoints": "cf66a74cf760d373879c5ef36a0e31d00f3f486044ef8e49a2910d1e70d9c792",
+        "TraitEdge": "8165cdc0c82325fb5bbf6f7a3edd5d6f528124e66974acaaf3dac6ca626c0a12",
+        "TraitNode": "a04887cd61f8e9ac25b3082d5cbffeab4f52f595dd368e1618af09825f685143",
+        "TraitNodeEntry": "582fc6242387cb3e1f29d22564f18a3332b7b0152075e7c399c485893c56afae",
+        "TraitNodeGroupXTraitNode": "a827d493013cec357c61f64a14cebcdb31c478d51a60f1e9cc8d34d71b3b465c",
+        "TraitNodeXTraitNodeEntry": "803ae78dfa72e13bf8f521d5b3aee8dccbed1628e085f3aeed0f09c7536f0f36",
+        "UiMap": "d956dbb322d34f89fe58ffcb4b20e5b4259e42fca5776462a6bc0196f21fa51b"
       }
     },
     "pushes": [

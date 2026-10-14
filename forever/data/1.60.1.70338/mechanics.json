@@ -925,6 +925,21 @@
    "certainty": "probable",
    "registry": "H12",
    "source": "note officielle de la bêta du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4, docs/research/notes-blizzard-2026-10-01.md) : nouveau donjon Excavation Site: Wetlands (26-31), Razorfen Downs (25+) et Uldaman (30+) ouverts ; clé = instance du client (dungeons.json) ; placée après le client et avant les addons dans le livre des donjons (décision 265)"
+  },
+  "route.travel": {
+   "value": {
+    "run_speed": 7.0,
+    "mount_level": 40,
+    "mount_bonus": 0.6,
+    "flight_speed": 30.0,
+    "detour": 1.3,
+    "flight_overhead": 25.0,
+    "hearth_cast": 10.0,
+    "hearth_cooldown": 3600.0
+   },
+   "certainty": "suppose",
+   "registry": "C4",
+   "source": "paramètres par défaut de Factoruide (code MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14, décision 266) : course 7 yards par seconde, monture au niveau 40 (+60 %), vol 30 yards par seconde, ligne droite allongée de 30 %, 25 s par vol, pierre de foyer 10 s et 1 h de recharge ; non sourcés par son auteur pour Forever (Shortest Path Forever estime 32 yards par seconde en vol, d'après CMaNGOS : écart TRV2) ; à remplacer par les relevés (question TRV1)"
   }
  },
  "inherited_from": "1.60.1.70291"

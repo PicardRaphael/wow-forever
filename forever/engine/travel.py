@@ -8,6 +8,8 @@ monde (`continent`, `x`, `y`) ; une carte de zone donne des pourcentages convert
 
 from __future__ import annotations
 
+import heapq
+import math
 from collections.abc import Mapping
 from collections.abc import Set as AbstractSet
 from typing import Any, NamedTuple
@@ -73,30 +75,72 @@ class Leg(NamedTuple):
     certainty: str
 
 
+CERTAINTY = "suppose"  # vitesses et détour repris de Factoruide (TRV1)
+PERCENT = 100.0  # conversion d'unité : position de carte en pourcentage
+
+
 def travel_params(values: Mapping[str, Any]) -> TravelParams:
     """Paramètres des trajets (`mechanics.json`, `route.travel`). Registre : C4"""
-    raise NotImplementedError
+    raw = values[TRAVEL_KEY]["value"]
+    return TravelParams(
+        run_speed=float(raw["run_speed"]),
+        mount_level=int(raw["mount_level"]),
+        mount_bonus=float(raw["mount_bonus"]),
+        flight_speed=float(raw["flight_speed"]),
+        detour=float(raw["detour"]),
+        flight_overhead=float(raw["flight_overhead"]),
+        hearth_cast=float(raw["hearth_cast"]),
+        hearth_cooldown=float(raw["hearth_cooldown"]),
+    )
 
 
 def map_to_world(rect: MapRect, x_pct: float, y_pct: float) -> Point:
     """Position monde d'un point de carte en pourcentage (0 à 100) : x croît vers l'est (y du monde décroît),
     y croît vers le sud (x du monde décroît). Registre : I19"""
-    raise NotImplementedError
+    fx, fy = x_pct / PERCENT, y_pct / PERCENT
+    return Point(
+        rect.continent,
+        rect.max_x - fy * (rect.max_x - rect.min_x),
+        rect.max_y - fx * (rect.max_y - rect.min_y),
+    )
 
 
 def run_speed(params: TravelParams, level: int) -> float:
     """Vitesse au sol (yards par seconde) : course, majorée de la monture à partir de `mount_level`. Registre : C4"""
-    raise NotImplementedError
+    if level >= params.mount_level:
+        return params.run_speed * (1 + params.mount_bonus)
+    return params.run_speed
 
 
 def walk_seconds(a: Point, b: Point, params: TravelParams, level: int) -> float:
     """Secondes à pied (ligne droite × détour) ; infini entre deux continents. Registre : C6"""
-    raise NotImplementedError
+    if a.continent != b.continent:
+        return math.inf
+    return math.dist((a.x, a.y), (b.x, b.y)) * params.detour / run_speed(params, level)
 
 
 def flight_seconds(length: float, params: TravelParams) -> float:
     """Secondes d'un vol de `length` yards, frais fixes compris. Registre : I19"""
-    raise NotImplementedError
+    return length / params.flight_speed + params.flight_overhead
+
+
+def _flights(graph: Graph, start: int, known: AbstractSet[int], params: TravelParams) -> dict[int, tuple[float, int]]:
+    """Plus courts vols depuis `start` entre points connus : arrivée -> (secondes, précédent). Chaque trajet compte
+    ses frais fixes (un atterrissage par trajet du client)."""
+    best: dict[int, tuple[float, int]] = {start: (0.0, start)}
+    queue = [(0.0, start)]
+    while queue:
+        cost, node = heapq.heappop(queue)
+        if cost > best[node][0]:
+            continue
+        for edge in graph.edges.get(node, []):
+            if edge.to not in known:
+                continue
+            nxt = cost + flight_seconds(edge.length, params)
+            if edge.to not in best or nxt < best[edge.to][0]:
+                best[edge.to] = (nxt, node)
+                heapq.heappush(queue, (nxt, edge.to))
+    return best
 
 
 def travel_time(
@@ -111,4 +155,40 @@ def travel_time(
 ) -> Leg:
     """Trajet le plus court de `a` à `b` : à pied, par vols entre points connus, ou par la pierre de foyer (`hearth` :
     position de l'auberge liée, None si la pierre n'est pas disponible). Registre : C6, I19"""
-    raise NotImplementedError
+    walk = walk_seconds(a, b, params, level)
+    best = (
+        Leg(walk, [{"kind": "walk", "seconds": walk}], CERTAINTY)
+        if math.isfinite(walk)
+        else Leg(math.inf, [], CERTAINTY)
+    )
+    if hearth is not None:
+        after = walk_seconds(hearth, b, params, level)
+        total = params.hearth_cast + after
+        if total < best.seconds:
+            best = Leg(
+                total,
+                [{"kind": "hearth", "seconds": params.hearth_cast}, {"kind": "walk", "seconds": after}],
+                CERTAINTY,
+            )
+    known = [n for n in flights_known if n in graph.nodes]
+    for start in known:
+        to_start = walk_seconds(a, graph.nodes[start].point, params, level)
+        if not math.isfinite(to_start) or to_start >= best.seconds:
+            continue
+        reached = _flights(graph, start, flights_known, params)
+        for end, (flown, _) in reached.items():
+            if end == start:
+                continue
+            after = walk_seconds(graph.nodes[end].point, b, params, level)
+            total = to_start + flown + after
+            if total < best.seconds:
+                best = Leg(
+                    total,
+                    [
+                        {"kind": "walk", "seconds": to_start, "to_node": start},
+                        {"kind": "fly", "seconds": flown, "from": start, "to": end},
+                        {"kind": "walk", "seconds": after, "from_node": end},
+                    ],
+                    CERTAINTY,
+                )
+    return best

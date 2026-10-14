@@ -880,5 +880,19 @@
    "Dire Maul - North": "Dire Maul"
   },
   "note": "DJ1, bloc A : instances de groupe (Map.InstanceType), entrées de recherche de groupe (LFGDungeons.TypeID) reliées par le nom (MapID vide dans le client ; alias déclarés ici, entrée non reliée listée), niveau de ContentTuning, rencontres de DungeonEncounter (difficultés normale et 5 joueurs), zones d'AreaTable ; faction : sens des codes déduit (Ragefire Chasm Horde, Stormwind Stockade Alliance), probable"
+ },
+ "travel_tables": [
+  "TaxiNodes",
+  "TaxiPath",
+  "TaxiPathNode",
+  "UiMapAssignment"
+ ],
+ "travel": {
+  "faction_flags": {
+   "alliance": 1,
+   "horde": 2
+  },
+  "teleport_flag": 1,
+  "note": "RX1, bloc B : camp d'un point de vol par TaxiNodes.Flags (bit Alliance, bit Horde : les deux = neutre, aucun = caché ; relevé sur 1.60.1.70338 : Stormwind 1025, Orgrimmar 1026, Ratchet 1027) ; segment de TaxiPathNode qui part d'un point au drapeau de téléportation exclu de la longueur d'un trajet"
  }
 }

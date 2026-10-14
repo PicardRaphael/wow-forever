@@ -46,6 +46,7 @@ from forever.pipeline.quest_rewards import QUEST_FILE, decode_quest_rewards, loa
 from forever.pipeline.questcache import QuestCache, read_questcache
 from forever.pipeline.tables import Row, read_table
 from forever.pipeline.tooltip import half_up, normalize, tooltip_values
+from forever.pipeline.travel_client import TRAVEL_FILE, decode_travel, load_travel_tables, travel_table_files
 from forever.pipeline.xp_bonuses import (
     XP_BONUS_FILE,
     XP_BONUS_SCHEMAS,
@@ -1998,8 +1999,14 @@ def decode_version(
         dungeon_doc = decode_dungeons(load_dungeon_tables(csv_dir, rules), rules, version)
         decoded_classes[DUNGEON_FILE] = dungeon_doc
         extra_notes.append(f"{DUNGEON_FILE} : {dungeon_doc['notes'][0]}")
+    # RX1, bloc B : trajets (travel_tables) : tables présentes (décodé) ou absentes (hérité de la base).
+    travel_files = travel_table_files(rules)
+    if travel_files and all((csv_dir / rel).is_file() for _, rel in travel_files):
+        travel_doc = decode_travel(load_travel_tables(csv_dir, rules), rules, version)
+        decoded_classes[TRAVEL_FILE] = travel_doc
+        extra_notes.append(f"{TRAVEL_FILE} : {travel_doc['notes'][0]}")
     inherited = {}
-    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE, QUEST_FILE, XP_BONUS_FILE, DUNGEON_FILE)
+    optional = (*CLASS_FILES, *CHARACTER_FILES, PETS_FILE, QUEST_FILE, XP_BONUS_FILE, DUNGEON_FILE, TRAVEL_FILE)
     names = [*INHERITED_FILES, *(n for n in optional if n not in decoded_classes)]
     for name in names:
         path = _inherited_source(base, name, rules)
@@ -2023,6 +2030,11 @@ def decode_version(
             if name == DUNGEON_FILE:
                 extra_notes.append(
                     f"{name} absent : tables des donjons absentes de {csv_dir.name} et de {base_version}"
+                )
+                continue
+            if name == TRAVEL_FILE:
+                extra_notes.append(
+                    f"{name} absent : tables des trajets absentes de {csv_dir.name} et de {base_version}"
                 )
                 continue
             if name in CLASS_FILES:
@@ -2065,6 +2077,8 @@ def decode_version(
         "sac de couchage, nourritures nutritives, camp, conditions de joueur (decode_rules.json, xp_bonuses)",
         DUNGEON_FILE: "donjons du client : instances de groupe, entrées de recherche de groupe et leur niveau, "
         "rencontres, zones (decode_rules.json, dungeons)",
+        TRAVEL_FILE: "trajets du client : points de vol, trajets et leur longueur, cartes de zone et leurs bornes "
+        "(decode_rules.json, travel)",
     }
     class_certainty_note = {
         CHARACTER_FILE: "PV par Endurance et constante d'armure : sens ou usage par le serveur probable",
@@ -2075,6 +2089,8 @@ def decode_version(
         "déclaré (probable) ; condition 142418 évaluée par le serveur (LVL13)",
         DUNGEON_FILE: "lien d'une entrée de recherche de groupe à sa carte par le nom (alias de decode_rules.json) ; "
         "sens du niveau de ContentTuning et des codes de faction probable (DON9)",
+        TRAVEL_FILE: "camp d'un point de vol par ses drapeaux (decode_rules.json travel.faction_flags) : sens "
+        "probable ; durée d'un vol non lue (vitesse de mechanics.json, TRV1)",
     }
     sources = {
         **{

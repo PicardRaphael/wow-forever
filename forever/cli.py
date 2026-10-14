@@ -1443,6 +1443,7 @@ def _fetch_defaults(deps: Deps) -> tuple[list[str], dict[str, list[str]]]:
             localized = rules.get("localized_tables", {})
             tables = list(rules["tables"])
             tables += [t for t in rules.get("dungeon_tables", []) if t not in tables]  # DJ1 : donjons
+            tables += [t for t in rules.get("travel_tables", []) if t not in tables]  # RX1 : trajets
             return tables, {k: list(v) for k, v in localized.items()}
     raise InvalidArgumentError(
         "Aucune liste de tables : --tables est obligatoire tant qu'aucune version locale n'a de decode_rules.json.",

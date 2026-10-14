@@ -725,11 +725,16 @@ mechanics:
     categorie: physique
     description: "Vitesse de déplacement du joueur"
     forever: oui
-    statut: absent
-    certitude: certain
-    sources: []
-    tests: []
+    statut: teste  # RX1, bloc B : course, monture, vol (paramètres de Factoruide)
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70338/mechanics.json (route.travel : paramètres par défaut de Factoruide, code MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14 ; suppose)"
+    tests:
+      - tests/unit/test_engine_travel.py::test_params_come_from_mechanics
+      - tests/unit/test_engine_travel.py::test_mount_speed_from_level
+      - tests/unit/test_engine_travel.py::test_flight_seconds
     tolerance: null
+    note: "vitesses de Forever non mesurées (question TRV1) ; Shortest Path Forever estime 32 yards par seconde en vol d'après CMaNGOS (écart TRV2) ; monture au niveau 40 selon Factoruide, non sourcé"
   - id: C5
     categorie: physique
     description: "Vitesse des monstres, ralentis, gel (Nova, Frostbite)"
@@ -752,11 +757,18 @@ mechanics:
     categorie: physique
     description: "Temps en mouvement, sorts utilisables en mouvement"
     forever: oui
-    statut: absent
+    statut: teste  # RX1, bloc B : trajet hors combat seulement (sorts en mouvement hors périmètre)
     certitude: suppose
-    sources: []
-    tests: []
+    sources:
+      - "forever/engine/travel.py (ligne droite allongée du détour de route.travel, vols, pierre de foyer)"
+    tests:
+      - tests/unit/test_engine_travel.py::test_straight_line_time
+      - tests/unit/test_engine_travel.py::test_flight_used_when_known
+      - tests/unit/test_engine_travel.py::test_flight_ignored_when_unknown
+      - tests/unit/test_engine_travel.py::test_hearth_used_when_shorter
+      - tests/unit/test_engine_travel.py::test_unreachable_other_continent
     tolerance: null
+    note: "trajet hors combat d'une feuille de route seulement ; sorts utilisables en mouvement non modélisés ; marche en ligne droite (réseau de marche de Journeys et transports de Shortest Path au bloc F de RX1)"
   - id: C7
     categorie: physique
     description: "Rayon des zones et plafonds de cibles"
@@ -1831,6 +1843,25 @@ mechanics:
     tolerance: null
     formule: "niveau retenu = argmax sur la plage du donjon de (XP par heure du premier passage ÷ XP du niveau), à égalité le plus bas ; fenêtre = niveaux où le premier passage bat la meilleure zone"
     note: "un niveau sans zone chiffrée entre dans la fenêtre (rien à battre) ; zones des autres niveaux chiffrées avec le temps par monstre du niveau du joueur (approximation) ; quêtes grises ou hors de portée exclues à chaque niveau ; donjons fermés exclus"
+  - id: I19
+    categorie: optimisation
+    description: "Trajets d'une feuille de route : points de vol, trajets et leur longueur, cartes de zone (client) ; marche et transports (addons, bloc F)"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70338/travel.json (tables TaxiNodes, TaxiPath, TaxiPathNode, UiMapAssignment du client ; existence et coût des vols certains, camp par les drapeaux probable)"
+      - "durée d'un vol : longueur du client ÷ vitesse de route.travel (suppose, TRV1)"
+    tests:
+      - tests/unit/test_travel.py::test_travel_tables_decoded
+      - tests/unit/test_travel.py::test_teleport_segment_is_excluded
+      - tests/unit/test_travel.py::test_maps_decoded
+      - tests/unit/test_travel.py::test_graph_from_doc_filters_faction
+      - tests/unit/test_travel.py::test_installed_travel_matches_the_fixture_rows
+      - tests/unit/test_engine_travel.py::test_map_to_world
+      - tests/unit/test_engine_travel.py::test_flight_used_when_known
+    tolerance: null
+    note: "conditions d'accès d'un point de vol (ConditionID) non lues ; 13 trajets vers un point absent de TaxiNodes écartés ; passages entre zones de Journeys (graphe compressé CBOR) et transports de Shortest Path Forever au bloc F"
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

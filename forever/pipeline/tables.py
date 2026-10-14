@@ -175,6 +175,16 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "ContentTuning": _cols("ID:int MinLevelSquish:int MaxLevelSquish:int LfgMinLevel:int LfgMaxLevel:int"),
     "DungeonEncounter": _cols("ID:int Name_lang:str MapID:int DifficultyID:int OrderIndex:int Flags:int"),
     "AreaTable": _cols("ID:int AreaName_lang:str ContinentID:int ParentAreaID:int"),
+    # RX1, bloc B : trajets (decode_rules.json, travel).
+    "TaxiNodes": _cols("ID:int Name_lang:str Pos_0:float Pos_1:float Pos_2:float ContinentID:int Flags:int"),
+    "TaxiPath": _cols("ID:int FromTaxiNode:int ToTaxiNode:int Cost:int"),
+    "TaxiPathNode": _cols(
+        "ID:int PathID:int NodeIndex:int ContinentID:int Flags:int Loc_0:float Loc_1:float Loc_2:float"
+    ),
+    "UiMapAssignment": _cols(
+        "ID:int UiMapID:int OrderIndex:int MapID:int AreaID:int Region_0:float Region_1:float Region_3:float "
+        "Region_4:float"
+    ),
     "DungeonItemSparse": _cols("ID:int Display_lang:str AllowableClass:int RequiredLevel:int"),
 }
 

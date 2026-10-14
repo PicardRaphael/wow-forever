@@ -235,6 +235,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   récupérées, `docs/research/quetes-forever.md`). Statut « vue seulement chez Factoruide », `suppose`, jamais placées
   dans une route. Test : une quête vue en jeu (QuestieForeverDB, quêtes faites de Questie, ForeverLogger) l'établit ;
   AllTheThings (saveur `forever`, MIT), s'il est installé, serait lu en local. Priorité : moyenne.
+- **TRV1 — Vitesse de course, de monture (et son niveau) et de vol de Forever ?** Ajoutée le 2026-10-14 (RX1, bloc
+  B). `route.travel` reprend les valeurs par défaut de Factoruide (`params.rs`, non sourcées), `suppose`. Test : durée
+  d'un vol connu chronométrée (ForeverLogger : départ et arrivée), course mesurée entre deux points d'une carte.
+  Priorité : moyenne. Registre C4.
+- **TRV2 — Écart entre la durée des vols du client et celle de Shortest Path Forever (`Taxi.lua`, InFlight et
+  CMaNGOS, 32 yards par seconde) ?** Ajoutée le 2026-10-14 (RX1, bloc B ; lecture des données de Shortest Path au bloc
+  F). Test : comparaison trajet par trajet, puis un vol chronométré. Priorité : basse. Registre I19.
 - **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
   Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
 - **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**
