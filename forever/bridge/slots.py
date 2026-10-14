@@ -105,20 +105,21 @@ def inbox_lua(
     replies: Sequence[Mapping[str, Any]],
     buttons: Sequence[Mapping[str, Any]],
     cards: Sequence[Mapping[str, Any]] = (),
+    guide: Mapping[str, Any] | None = None,
 ) -> str:
     """Contenu d'un emplacement : `ForeverBridgeSlot = { v, now, status, buttons, replies, cards }` (cartes « À
-    valider » depuis P06b)."""
-    return _assign(
-        "ForeverBridgeSlot",
-        {
-            "v": 1,
-            "now": now,
-            "status": dict(status),
-            "buttons": list(buttons),
-            "replies": list(replies),
-            "cards": list(cards),
-        },
-    )
+    valider » depuis P06b) ; `guide = { name, group, text, sha }` : feuille de route à livrer à RestedXP (RX1)."""
+    slot: dict[str, Any] = {
+        "v": 1,
+        "now": now,
+        "status": dict(status),
+        "buttons": list(buttons),
+        "replies": list(replies),
+        "cards": list(cards),
+    }
+    if guide is not None:
+        slot["guide"] = {k: guide[k] for k in ("name", "group", "text", "sha")}
+    return _assign("ForeverBridgeSlot", slot)
 
 
 def status_lua(

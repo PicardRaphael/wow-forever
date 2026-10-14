@@ -19,6 +19,9 @@ SAVED_VARIABLE = "ForeverLoggerDB"
 FORBIDDEN = frozenset(
     {"CastSpell", "CastSpellByName", "CastSpellByID", "UseAction", "SendChatMessage", "RunMacro", "RunMacroText"}
 )
+# RX1 : aucun code reçu exécuté, aucune chaîne d'import chiffrée de RestedXP ; seuls RXPGuides.ImportGuide,
+# RXPGuides.RegisterGuide et RXP:ScheduleTask sont appelés (sous pcall).
+NO_CODE = frozenset({"loadstring", "RunScript", "ImportString"})
 COMBAT_LOG = frozenset({"COMBAT_LOG_EVENT", "COMBAT_LOG_EVENT_UNFILTERED"})
 # Fonctions de Blizzard qu'un addon accroche (hooksecurefunc) sans jamais les remplacer (P06b, Maj+clic).
 BLIZZARD_HOOKED = (
@@ -116,6 +119,8 @@ def check_lua(path: Path) -> list[str]:
                 errors.append(f"{name}:{line} : {word} sans pcall (un événement inconnu du client lève une erreur)")
         elif word in FORBIDDEN or word.startswith("CastSpell"):
             errors.append(f"{name}:{line} : fonction interdite {word} (aucune action de jeu)")
+        elif word in NO_CODE:
+            errors.append(f"{name}:{line} : {word} interdit (aucun code ni guide chiffré exécuté, RX1)")
         if word in COMBAT_LOG:
             errors.append(f"{name}:{line} : abonnement au journal de combat interdit ({word})")
     for m in _REPLACED.finditer(code):

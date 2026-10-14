@@ -1415,6 +1415,61 @@ function FB.UpdateStatus()
 end
 
 -- Contenu d'un emplacement ou d'Inbox.lua : état, boutons, accusés et réponses de cette session.
+-- RX1 : feuille de route livrée par le pont (guide RestedXP), importée hors combat par l'API publique de RestedXP
+-- (RXPGuides.ImportGuide), une seule fois par guide ; aucun code reçu n'est exécuté, jamais de chaîne chiffrée.
+local pendingGuide
+
+local function ImportGuideNow(guide)
+	local db = ForeverBridgeDB
+	if type(db.guides) ~= "table" then
+		db.guides = {}
+	end
+	local api = type(RXPGuides) == "table" and RXPGuides.ImportGuide
+	local status, detail
+	if type(api) ~= "function" then
+		status = "absent"
+	else
+		local ok, result = pcall(api, guide.text)
+		if ok and result then
+			status = "livré"
+			local rxp = RXP
+			local frame = type(rxp) == "table" and rxp.RXPFrame
+			if type(rxp.ScheduleTask) == "function" and type(frame) == "table" and frame.GenerateMenuTable then
+				pcall(rxp.ScheduleTask, rxp, frame.GenerateMenuTable)
+			end
+		else
+			status = "erreur"
+			detail = tostring(result)
+		end
+	end
+	db.guides[guide.sha] = status
+	local name = Escape(tostring(guide.name or ""))
+	if status == "livré" then
+		FB.Print("Feuille de route livrée dans RestedXP : " .. name .. " (menu des guides de RestedXP).")
+	elseif status == "absent" then
+		FB.Print("RestedXP absent : feuille de route " .. name .. " non livrée (forever route deliver --addon, jeu fermé).")
+	else
+		FB.Print("RestedXP a refusé la feuille de route " .. name .. " : " .. Escape(detail or "?"))
+	end
+end
+
+function FB.DeliverGuide(guide)
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" or type(guide) ~= "table" or type(guide.text) ~= "string" or type(guide.sha) ~= "string" then
+		return
+	end
+	if type(db.guides) == "table" and db.guides[guide.sha] then
+		return
+	end
+	local ok, combat = pcall(InCombatLockdown)
+	if ok and combat then
+		pendingGuide = guide -- importée à la sortie du combat (PLAYER_REGEN_ENABLED)
+		return
+	end
+	pendingGuide = nil
+	ImportGuideNow(guide)
+end
+
 function FB.ApplySlot(slot)
 	if type(slot) ~= "table" then
 		return
@@ -1434,6 +1489,9 @@ function FB.ApplySlot(slot)
 			run.buttons = slot.buttons
 			FB.RefreshButtons()
 		end
+	end
+	if published and type(slot.guide) == "table" then
+		FB.DeliverGuide(slot.guide)
 	end
 	if published and type(slot.cards) == "table" then
 		run.cards = slot.cards
@@ -1858,6 +1916,13 @@ function handlers.ADDON_LOADED(name)
 	end
 	if type(db.hidden) ~= "table" then
 		db.hidden = {} -- cartes masquées : identifiant → empreinte (décision 240)
+	end
+end
+
+-- Sortie du combat : feuille de route reçue pendant le combat, importée maintenant (RX1).
+function handlers.PLAYER_REGEN_ENABLED()
+	if pendingGuide then
+		FB.DeliverGuide(pendingGuide)
 	end
 end
 

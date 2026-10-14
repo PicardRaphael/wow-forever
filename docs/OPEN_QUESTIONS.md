@@ -469,6 +469,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   et gardé dans `addon.db.profile.guides`), jamais essayé en jeu. Test (facultatif, décision 247) : une route livrée
   par le pont, puis `/reload` et nouvelle connexion, en jouant normalement ou à la sortie. Priorité : moyenne (RX1 ;
   repli : petit addon de guide écrit par le pont jeu fermé).
+- **RXP2 — Le menu de RestedXP montre-t-il un guide importé sans `/reload`, et `RXP:LoadGuide` le charge-t-il
+  directement ?** Ajoutée le 2026-10-14 (RX1, bloc D). ForeverBridge appelle `RXP:ScheduleTask` sur
+  `RXPFrame.GenerateMenuTable` (objet `RXP` global « pour le débogage » dans `RXPGuides.lua`, non garanti). Test
+  (facultatif, décision 247) : livraison d'une route, menu des guides ouvert aussitôt. Priorité : basse.
 - **NFB1 — Un build exporté par Naowh Forever (`!NFB1!`) se relit-il à l'identique par notre codec ?** Ajoutée le
   2026-10-13 (EX1, décision 255) : format relevé dans `NaowhForever_Training` (LibSerialize, LibDeflate,
   `EncodeForPrint`), jamais vérifié sur une chaîne réelle. Test (facultatif, décision 247) : exporter un build depuis

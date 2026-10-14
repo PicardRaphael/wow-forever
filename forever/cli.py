@@ -407,6 +407,16 @@ def build_parser() -> argparse.ArgumentParser:
     r_show = route_sub.add_parser("show", help="relire une feuille de route gardée dans le cache")
     r_show.add_argument("id", help="identifiant rendu par forever route plan")
     r_show.add_argument("--json", action="store_true", help="sortie JSON")
+    r_guide = route_sub.add_parser("guide", help="guide RestedXP d'une feuille de route (texte à importer)")
+    r_guide.add_argument("id", help="identifiant rendu par forever route plan")
+    r_guide.add_argument("--out", help="fichier où écrire le guide (défaut : sortie standard)")
+    r_guide.add_argument("--json", action="store_true", help="sortie JSON")
+    r_deliver = route_sub.add_parser("deliver", help="livrer une feuille de route à RestedXP")
+    r_deliver.add_argument("id", help="identifiant rendu par forever route plan")
+    r_deliver.add_argument(
+        "--addon", action="store_true", required=True, help="repli jeu fermé : dossier Interface/AddOns/ForeverRoute"
+    )
+    r_deliver.add_argument("--json", action="store_true", help="sortie JSON")
 
     xp = sub.add_parser("xp", help="modèle d'XP de Forever (T04d)")
     xp_sub = xp.add_subparsers(dest="xp_command", required=True, parser_class=_Parser)
@@ -1226,9 +1236,63 @@ def render_route(doc: Mapping[str, Any]) -> list[str]:
     return lines
 
 
+def _route_guide(deps: Deps, args: argparse.Namespace, plan: Mapping[str, Any]) -> int:
+    import hashlib
+
+    from forever.bridge.guide_addon import write_guide_addon
+    from forever.provenance import make_provenance
+    from forever.route import guide_name
+    from forever.rxp import encode_guide
+    from forever.store import load_version
+
+    name, group = guide_name(plan), "Forever Routes"
+    text = encode_guide(plan, name=name, group=group)
+    data = load_version(deps)
+    provenance = make_provenance(
+        deps,
+        game_version=data.game_version,
+        data_sha=data.data_sha,
+        freshness="unknown",
+        certainty=plan.get("certainty", "suppose"),
+        assumptions=[f"feuille de route {plan['id']} (forever route plan) encodée au format des guides RestedXP"],
+    )
+    doc: dict[str, Any] = {
+        "id": plan["id"],
+        "name": name,
+        "group": group,
+        "sha": hashlib.sha256(text.encode("utf-8")).hexdigest()[:12],
+        "provenance": provenance,
+    }
+    if args.route_command == "deliver":
+        if deps.wow_dir is None:
+            raise InvalidArgumentError("Dossier du client inconnu.", "définir FOREVER_WOW_DIR")
+        folder = write_guide_addon(
+            deps.wow_dir / "Interface" / "AddOns",
+            text,
+            game_running=deps.game_running,
+            backup_dir=deps.cache_dir / "backups",
+            now=deps.now(),
+        )
+        doc["folder"] = str(folder)
+        lines = [f"Guide « {name} » écrit dans {folder} : lance le jeu, RestedXP le charge (ForeverRoute)."]
+        _emit(doc, lines, provenance, args.json)
+        return EXIT_OK
+    if args.out:
+        Path(args.out).write_bytes(text.encode("utf-8"))
+        doc["out"] = args.out
+        _emit(doc, [f"Guide « {name} » écrit dans {args.out}."], provenance, args.json)
+    elif args.json:
+        _emit({**doc, "text": text}, [], provenance, True)
+    else:
+        print(text, end="")
+    return EXIT_OK
+
+
 def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
     from forever.route import RouteRequest, load_plan, plan_route
 
+    if args.route_command in ("guide", "deliver"):
+        return _route_guide(deps, args, load_plan(deps, args.id))
     if args.route_command == "show":
         doc = load_plan(deps, args.id)
     else:

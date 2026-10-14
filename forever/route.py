@@ -689,6 +689,12 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     return payload
 
 
+def guide_name(plan: Any) -> str:
+    """Nom du guide RestedXP d'un plan (anglais, client enUS) : classe et niveaux."""
+    lv = plan["levels"]
+    return f"Forever {str(plan.get('class', '')).capitalize()} {lv['from']}-{lv['to']} ({plan['id'][:6]})"
+
+
 def load_plan(deps: Any, plan_id: str) -> dict[str, Any]:
     """Plan gardé dans le cache (`forever route show`)."""
     import json

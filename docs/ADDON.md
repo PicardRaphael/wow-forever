@@ -511,6 +511,18 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
 - SavedVariables : la sauvegarde de ForeverLogger du poste garde des instantanés du 2026-09-28 au 2026-10-02 dans un fichier écrit le 2026-10-02 (builds 70009 à 70170) : elles sont relues d'une session à l'autre. À confirmer par un réglage qui survit à un redémarrage complet du client.
 - Produit TACT : `.build.info` du client installé indique `wow_classic_beta` (1.60.1.70170, lu sur disque le 2026-10-02) ; le produit du lancement reste inconnu.
 
+### Feuille de route livrée à RestedXP (RX1, ForeverBridge 0.3.0)
+- Un emplacement publié par le pont peut porter `guide = { name, group, text, sha }` : ForeverBridge appelle
+  `RXPGuides.ImportGuide(text)` sous `pcall`, hors combat (sinon à `PLAYER_REGEN_ENABLED`), une seule fois par
+  empreinte (`ForeverBridgeDB.guides[sha]` : `livré`, `absent` ou `erreur`), puis `RXP:ScheduleTask` (régénération
+  du menu des guides) s'il existe ; l'issue s'écrit dans la fenêtre `/fv`. Aucun `loadstring`, `RunScript` ni
+  `ImportString` (chaîne chiffrée de RestedXP) : `scripts/check_addon.py` les refuse.
+- Repli jeu fermé : `uv run forever route deliver <id> --addon` écrit le seul dossier `Interface/AddOns/ForeverRoute/`
+  (`.toc` dépendant de RXPGuides, ligne `## Interface` reprise de ForeverBridge ; `Guide.lua` appelle
+  `RXPGuides.RegisterGuide`), ancien dossier sauvegardé dans le cache de forever.
+- Vérification facultative en jouant (RXP1, RXP2, décision 247) : livrer une route, ouvrir le menu des guides de
+  RestedXP sans `/reload`, puis `/reload` et nouvelle connexion : le guide est-il toujours là ?
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 
