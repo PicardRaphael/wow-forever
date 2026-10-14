@@ -11,6 +11,8 @@
 -- ici), gardés dans legacy.
 -- DJ1 (0.6.0, schéma 4) : passages en instance (entrée, sortie, rencontres de ENCOUNTER_END) dans runs, butin
 -- ramassé (objet, quantité, PNJ source par GetLootSourceInfo) dans loot.
+-- LN1 (0.7.0) : chaque instantané note le client (version, build, interface de GetBuildInfo), comparé hors du jeu
+-- aux .toc par forever doctor.
 --
 -- Règles (docs/ADDON.md) :
 -- * ForeverLoggerDB est initialisée dans ADDON_LOADED, jamais d'alias local au niveau du fichier ;
@@ -354,6 +356,14 @@ local function updateRun()
   end
 end
 
+local function readClient()
+  local info = returns(GetBuildInfo)
+  if not info then
+    return nil
+  end
+  return { version = info[1], build = info[2], interface = info[4] }
+end
+
 local function snapshot(reason, level)
   local entry = character()
   if not entry then
@@ -368,6 +378,7 @@ local function snapshot(reason, level)
     trivial_range = safe(UnitQuestTrivialLevelRange, "player"),
     state = readState(),
     resting = safe(IsResting),
+    client = readClient(),
   }))
 end
 

@@ -22,6 +22,7 @@ from typing import Any
 
 from forever.config import Deps
 from forever.timefmt import format_utc
+from forever.toc import toc_files
 
 STATE_NAME = "state.json"
 SCHEMA_VERSION = 1
@@ -128,7 +129,8 @@ _VERSION = re.compile(r"^## Version:\s*(.+?)\s*$", re.MULTILINE)
 
 
 def _version(folder: Path) -> str | None:
-    tocs = sorted(folder.glob("*_Camelot.toc")) + sorted(p for p in folder.glob("*.toc") if "_Camelot" not in p.name)
+    ordered = toc_files(folder)  # LN1 : ordre de lecture du client (_Forever, _Camelot, _Mainline, sans suffixe)
+    tocs = ordered + sorted(p for p in folder.glob("*.toc") if p not in ordered)
     for toc in tocs:
         try:
             m = _VERSION.search(toc.read_text(encoding="utf-8", errors="replace"))

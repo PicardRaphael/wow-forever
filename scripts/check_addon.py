@@ -4,7 +4,7 @@
 
 Règles : SavedVariable initialisée dans le gestionnaire d'ADDON_LOADED, jamais d'alias ni d'usage au niveau du
 fichier ; chaque RegisterEvent sous pcall ; aucune fonction d'action ; aucun abonnement au journal de combat ;
-`.toc` sans lignes fusionnées, `## Interface: 16001`, fichiers listés présents. Commentaires et chaînes ignorés
+`.toc` sans lignes fusionnées, `## Interface` aux valeurs de `forever.toc.INTERFACES`, fichiers listés présents. Commentaires et chaînes ignorés
 (sauf les noms d'événement, qui s'écrivent dans des chaînes). Chaque erreur nomme le fichier et la ligne."""
 
 from __future__ import annotations
@@ -14,7 +14,10 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-INTERFACE = "16001"  # interface de l'API du client Forever (Mainline 12.1.5, build 70009)
+sys.path.insert(0, str(ROOT))
+
+from forever import toc
+
 SAVED_VARIABLE = "ForeverLoggerDB"
 FORBIDDEN = frozenset(
     {
@@ -155,13 +158,15 @@ def check_toc(path: Path) -> list[str]:
             continue
         if line.startswith("## Interface:"):
             interface_seen = True
-            values = [v.strip() for v in line.split(":", 1)[1].split(",")]
-            if INTERFACE not in values:
-                errors.append(f"{name}:{number} : ## Interface: {INTERFACE} attendu (lu : {', '.join(values)})")
+            # LN1 : valeurs admises de forever.toc.INTERFACES (plusieurs possibles, toutes admises)
+            errors += [
+                f"{name}:{number} : ## Interface: {', '.join(toc.INTERFACES)} attendu ({e})"
+                for e in toc.interface_errors(toc.interface_values(line))
+            ]
         elif line.strip() and not line.startswith("#") and not (path.parent / line.strip()).is_file():
             errors.append(f"{name}:{number} : fichier listé introuvable « {line.strip()} »")
     if not interface_seen:
-        errors.append(f"{name}:1 : ## Interface: {INTERFACE} absent")
+        errors.append(f"{name}:1 : ## Interface absent (attendu : {', '.join(toc.INTERFACES)})")
     return errors
 
 

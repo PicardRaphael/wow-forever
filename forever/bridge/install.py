@@ -43,6 +43,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 
+from forever import toc
 from forever.bridge.slots import SILENT_WAV, SLOTS, inbox_lua, slot_name
 from forever.errors import EXIT_USAGE, ForeverError
 
@@ -51,7 +52,6 @@ SOURCE = REPO_ROOT / "addon" / "ForeverBridge"
 ADDON = "ForeverBridge"
 PROBE_ADDON = "ForeverBridge_Probe"
 PROBE2_ADDON = "ForeverBridge_Probe2"
-INTERFACE = "16001"
 MIN_SLOTS = 8
 # Fichiers d'attente de l'addon, réécrits par le pont : jamais remplacés par une réinstallation.
 BRIDGE_WRITTEN = ("Inbox.lua", "Status.lua")
@@ -95,7 +95,7 @@ def find_ogg(addons: Path) -> Path | None:
 def _probe_toc(title: str = "sonde", command: str = "/fv diag", lua: str = "Probe.lua") -> str:
     return "\n".join(
         [
-            f"## Interface: {INTERFACE}",
+            toc.interface_line(),
             f"## Title: ForeverBridge ({title})",
             f"## Notes: Sonde du pont de forever-core, chargée à la demande par {command} (P06a).",
             "## LoadOnDemand: 1",
@@ -146,7 +146,7 @@ class _Writer:
 def _slot_toc(index: int) -> str:
     return "\n".join(
         [
-            f"## Interface: {INTERFACE}",
+            toc.interface_line(),
             f"## Title: ForeverBridge (emplacement {index:03d})",
             "## Notes: Réponses du pont de forever-core, chargées à la demande (P06a).",
             "## LoadOnDemand: 1",

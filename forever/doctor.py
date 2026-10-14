@@ -17,8 +17,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from forever import toc
 from forever.config import Deps
-from forever.errors import EXIT_DOCTOR, EXIT_OK
+from forever.errors import EXIT_DOCTOR, EXIT_OK, ForeverError
 
 STATUSES = ("ok", "warn", "fail", "unknown", "info")
 MARKS = {"ok": "[ok]", "warn": "[!]", "fail": "[x]", "unknown": "[?]", "info": "[i]"}
@@ -254,7 +255,36 @@ def _addons_logger(ctx: _Context) -> Check:
     stale = _differs(ctx.addons / "ForeverLogger", REPO_ROOT / "addon" / "ForeverLogger")
     if stale:
         return Check("addons.logger", "fail", f"ForeverLogger différent du dépôt : {', '.join(stale[:5])}", FIX_LOGGER)
+    seen = _interface_seen(ctx)
+    if seen is not None and seen not in toc.INTERFACES:
+        return Check(
+            "addons.logger",
+            "fail",
+            f"le jeu annonce l'interface {seen} (ForeverLogger), absente des .toc ({', '.join(toc.INTERFACES)}) : "
+            "addons « périmés » pour ce client",
+            "ajouter la valeur à forever.toc.INTERFACES puis réinstaller les addons (docs/LANCEMENT.md)",
+        )
     return Check("addons.logger", "ok", "ForeverLogger identique au dépôt")
+
+
+def _interface_seen(ctx: _Context) -> str | None:
+    """Interface du client notée par ForeverLogger 0.7.0 dans l'instantané le plus récent (tous les comptes)."""
+    from forever.pipeline.addon_sv import read_logger_db
+
+    if ctx.wow is None:
+        return None
+    latest: tuple[int, str] | None = None
+    for path in sorted((ctx.wow / "WTF" / "Account").glob("*/SavedVariables/ForeverLogger.lua")):
+        try:
+            db = read_logger_db(path)
+        except (OSError, ForeverError):  # une sauvegarde illisible ne cache pas les autres
+            continue
+        for character in db.characters.values():
+            for snap in character.snapshots:
+                interface = (snap.client or {}).get("interface")
+                if interface is not None and (latest is None or (snap.time or 0) >= latest[0]):
+                    latest = (snap.time or 0, str(interface))
+    return latest[1] if latest else None
 
 
 def _addons_bridge(ctx: _Context) -> Check:

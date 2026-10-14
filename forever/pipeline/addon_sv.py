@@ -37,6 +37,7 @@ class Snapshot(NamedTuple):
     trivial_range: int | None = None  # UnitQuestTrivialLevelRange (0.4.0)
     state: dict[str, Any] = {}  # noqa: RUF012 : xp, max, rested, rest_state (0.4.0)
     resting: bool | None = None
+    client: dict[str, Any] | None = None  # LN1 (0.7.0) : version, build, interface de GetBuildInfo
 
 
 class ParsedXp(NamedTuple):
@@ -473,6 +474,7 @@ def read_logger_db(path: Path) -> LoggerDB:
                     trivial_range=_opt_int(s.get("trivial_range")),
                     state=_table(s.get("state")),
                     resting=_bool(s.get("resting")),
+                    client=_table(s.get("client")) or None,
                 )
             )
         xp = [_xp_gain(x, path) for x in _list(c.get("xp")) if isinstance(x, dict)]

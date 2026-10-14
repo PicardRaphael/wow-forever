@@ -18,16 +18,23 @@ TOC_SUFFIXES: tuple[str, ...] = ("_Forever", "_Camelot", "_Mainline", "")
 
 
 def interface_line(values: Sequence[str] | None = None) -> str:
-    raise NotImplementedError
+    """Ligne `## Interface` d'un `.toc` généré : toutes les valeurs admises (ou `values`), séparées par des virgules."""
+    return "## Interface: " + ", ".join(INTERFACES if values is None else values)
 
 
 def interface_values(line: str) -> list[str]:
-    raise NotImplementedError
+    """Valeurs d'une ligne `## Interface: a, b`."""
+    return [v.strip() for v in line.split(":", 1)[1].split(",") if v.strip()] if ":" in line else []
 
 
 def interface_errors(values: Sequence[str]) -> list[str]:
-    raise NotImplementedError
+    """Valeurs non admises (toutes doivent l'être, au moins une), en texte ; liste vide si la ligne est bonne."""
+    if not values:
+        return [f"aucune valeur (attendu : {', '.join(INTERFACES)})"]
+    return [f"{v} non admise (admises : {', '.join(INTERFACES)})" for v in values if v not in INTERFACES]
 
 
 def toc_files(folder: Path) -> list[Path]:
-    raise NotImplementedError
+    """`.toc` de l'addon dans l'ordre où le client les lit (suffixe du jeu, de la famille, puis sans suffixe)."""
+    name = folder.name
+    return [folder / f"{name}{suffix}.toc" for suffix in TOC_SUFFIXES if (folder / f"{name}{suffix}.toc").is_file()]
