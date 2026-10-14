@@ -1,405 +1,406 @@
 # CJ1 — Corrections après les essais en jeu du 14 octobre : plan
 
-Tranche hors de la table de la ROADMAP, demandée par l'utilisateur le 2026-10-14 après ses essais en jeu (personnage
-neuf « Bob », Gnome, Alliance, niveau 1, Coldridge Valley). Code proposé : **CJ1** (lettres CJ, « corrections après le
-jeu », à valider, question 1). Elle passe **avant toutes les autres tranches** jusqu'au 4 novembre (RX2, SIM1, T10a
-telle qu'écrite) et reprend en elle T10a revue selon l'audit des addons. Plan écrit le 2026-10-14, sans code ; arrêt
-pour validation.
+Tranche hors de la table d'origine de la ROADMAP, demandée par l'utilisateur le 2026-10-14 après ses essais en jeu
+(personnage neuf « Bob », Gnome, Alliance, niveau 1, Coldridge Valley). Elle passe **avant toutes les autres tranches**
+jusqu'au 4 novembre et reprend en elle T10a revue selon l'audit des addons et le cœur de RX2 (vols et pierre de foyer).
+Décisions 272 à 277. Plan écrit le 2026-10-14 ; **révisé le même jour** après les deux corrections de cap de
+l'utilisateur sur les routes (décision 277, qui amende 268).
 
-Bases : `tasks/idees-du-chat-2026-10-14-ux-routes.md` (interface, routes, exports, talents) et
-`tasks/audit-addons-capacites-2026-10-14.md` (ce que les addons installés font déjà), intégrées au bloc 0 puis
-archivées dans `tasks/archive/`.
+Bases : `tasks/archive/idees-du-chat-2026-10-14-ux-routes.md` (interface, routes, exports, talents) et
+`tasks/archive/audit-addons-capacites-2026-10-14.md` (ce que les addons installés font déjà), intégrées au bloc 0.
 
 ## Demande de l'utilisateur (2026-10-14)
 
-**Règles de méthode, à consigner** (bloc 0) :
-1. Avant de construire une fonction, regarder si un addon installé la fait déjà (Forever Companion, Naowh Forever,
-   GearQuest Forever, Forever Guide, SkillUp Forever, Talents Forever, RestedXP, Shortest Path Forever…). Si oui,
-   l'agent s'en sert (lecture locale, agrégats seulement, décision 133) et l'alimente par des exports ; il ne refait
-   ni son interface ni ses données.
+**Règles de méthode** (décisions 272 à 274, section « Façon de travailler » de `CLAUDE.md`) :
+1. Avant de construire une fonction, regarder si un addon installé la fait déjà ; si oui, l'agent s'en sert (lecture
+   locale, agrégats seulement) et l'alimente par des exports, il ne refait ni son interface ni ses données.
 2. Rien n'est déclaré fini tant que l'utilisateur ne l'a pas essayé et accepté en jeu : chaque bloc se termine par une
    courte procédure en jeu, et la tranche ne se ferme qu'avec son accord.
 3. « Mon interface est la mienne » : rien ne modifie EllesmereUI sans demande explicite.
 
 **Contenu, dans l'ordre de priorité** :
-1. Routes, priorité absolue : départ depuis la position du personnage et la zone de départ de sa race ; test par race
-   de départ, Alliance et Horde ; garde-fous de vraisemblance ; recette de référence (la route 1 à 10 de chaque zone
-   de départ suit le même enchaînement de zones que les parcours gratuits de RestedXP, sinon elle est refusée et
-   l'écart expliqué) ; vols connus et pierre de foyer (RX2) si le temps le permet.
-2. Conversation de la feuille de route : questions dans le chat, une à la fois, boutons de réponse sous le message,
-   plus jamais dans « À valider » ; un seul aperçu à jour ; à la validation de l'aperçu, livraison d'office dans
-   RestedXP (remplace la route précédente du même personnage), avec son nom et où la trouver.
-3. Talents dès le niveau 1 : plan complet (niveau 10 à l'objectif, point par point dans l'ordre de prise), lien Talents
-   Forever et code Naowh pour le Training Planner.
-4. BiS et équipement appuyés sur les addons (T10a revue) : poids calculés exportés vers Forever Companion et Naowh ;
-   liste BiS personnelle bâtie depuis Forever Companion, Naowh et FojjiCore, classée par nos poids, exportée vers Naowh
-   (`!NBIS1!`) ; BiS de leveling appuyé sur GearQuest Forever ; « est-ce une amélioration ? » dans le chat.
-5. EllesmereUI : lien de profil et bascule de rôle retirés par défaut, disponibles sur demande seulement.
-6. Refonte de l'interface de ForeverBridge au niveau des meilleurs addons, après étude de Naowh Forever, Forever
-   Companion, EllesmereUI et RestedXP (sans recopier leur code).
+1. **Routes** (précisé par la correction de cap, décision 277) :
+   - les parcours gratuits de RestedXP (jusqu'au niveau 22 environ, licence CC BY-NC-SA 4.0) servent surtout à
+     **apprendre à notre moteur à bien choisir** : pour chaque zone de départ et chaque tranche qu'ils couvrent, notre
+     route calculée doit retrouver leurs décisions (enchaînement des zones, regroupement des quêtes, moment des donjons
+     et des quêtes de classe, retours en ville, vols et pierre de foyer) ; écarts mesurés, expliqués, règles et poids de
+     l'optimiseur réglés jusqu'à ce que nos routes soient aussi bonnes ; ces réglages servent ensuite jusqu'au 60 ;
+   - là où un parcours gratuit donne une meilleure route que notre calcul, il peut servir de base, avec l'attribution ;
+     jamais aucun guide payant ni chiffré ;
+   - une route de leveling inclut **toujours, par défaut et sans question**, les donjons avec leurs quêtes au niveau où
+     ils rapportent le plus (DJ1) et les quêtes de classe au bon niveau ; retirables à la demande ;
+   - une route part **toujours de la position réelle** et tient compte des **quêtes déjà faites** ;
+   - autres routes sur demande : réputation, métier (avec SkillUp Forever), et **route d'équipement** (bloc 4b) ;
+   - lire les addons qui calculent déjà : GearQuest Forever, Forever Guide, Questie, Naowh, SkillUp Forever.
+2. **Conversation de la feuille de route** : questions dans le chat, une à la fois, boutons de réponse sous le
+   message, plus jamais dans « À valider » ; un seul aperçu à jour ; à la validation, livraison d'office dans RestedXP
+   (remplace la route précédente du même personnage), avec son nom et où la trouver ; **commande sûre qui retire de
+   RestedXP les routes livrées par l'agent** (groupe « Forever Routes »).
+3. **Talents dès le niveau 1** : plan complet, lien Talents Forever et code Naowh pour le Training Planner.
+4. **BiS et équipement** appuyés sur les addons (T10a revue), puis **route d'équipement** (4b).
+5. **EllesmereUI** : lien de profil et bascule de rôle retirés par défaut.
+6. **Refonte de l'interface** de ForeverBridge, après étude de Naowh Forever, Forever Companion, EllesmereUI et
+   RestedXP (sans recopier leur code).
 
-## Étude de l'existant (décision 264, étendue aux addons installés ; 2026-10-14, lecture locale seule)
+## Étude de l'existant (décisions 264 et 272 ; 2026-10-14, lecture locale seule)
 
 Addons lus dans `C:\Program Files (x86)\World of Warcraft\_classic_beta_\Interface\AddOns` (aucun code recopié,
-aucune écriture). **Partie web de la décision 264 non faite à ce stade** : proposée en tête des blocs 4 (formats de
-poids, échelles publiques) et 6 (bonnes pratiques d'interface des addons), lecture seule.
+aucune écriture). **Partie web de la décision 264 non faite à ce stade** : en tête des blocs 4 (formats de poids,
+échelles publiques) et 6 (bonnes pratiques d'interface), lecture seule.
 
 | Besoin | Ce qui le fait déjà (version relevée) | Verdict |
 | --- | --- | --- |
-| Zone de départ d'une race, enchaînement de zones 1 à 10 | RestedXP 4.11.23 : parcours gratuits en clair par zone de départ (`Guides/Forever/`) | **Mesurer** (décision 268) : enchaînement de zones comparé, jamais repris ; la source de la zone de départ est ailleurs (question 2) |
-| Route pas à pas suivie en jeu | RestedXP (`ImportGuide`, public) ; Shortest Path Forever (suit la cible de RestedXP) | **Alimenter** : notre route livrée dans RestedXP, rien à refaire |
-| Retrait d'un guide | RestedXP : `addon.RemoveGuide(guideKey)` (`GuideLoader.lua:208`), **interne** (non exporté dans `_G.RXPGuides`, `GuideLoader.lua:1268-1273`) ; `ImportGuide` met en cache par clé de guide (`GuideLoader.lua:399-402`) | **Se servir** de la clé : nom stable par personnage, même clé, remplacement par `ImportGuide` (à confirmer en jeu, RXP3) ; jamais d'appel interne |
-| Plan de talents niveau par niveau | Naowh Training 1.1.15 (« Level by level », `!NFB1!`) ; Talents Forever Book 0.38.2 (`TF.Decode` lit code et lien) | **Alimenter** : plan calculé exporté (déjà fait par EX1 dès le niveau 10) |
-| Échelles de statistiques et score dans les infobulles | Forever Companion 1.0.0 (données v88 du 2026-10-12) : import et export **Pawn v1** (`Scales.lua:361-373`, Options, « Import scale… ») ; aucune API publique pour régler une échelle | **Alimenter** par une chaîne Pawn v1 que le joueur colle ; jamais d'écriture de `ForeverCompanionDB` |
-| Poids chez Naowh | Naowh Forever 1.1.15 : « Import weights » (`NFSW1:` ou export EP de WoWSims, `StatWeights/Sharing.lua:95`) ; le Naowh Score **ne dépend pas des poids** (niveau d'objet, qualité, niveau requis : `NaowhScore/Data/Formula.lua`) | **Alimenter** (`NFSW1:`, format prêt depuis EX1) ; dire que le Naowh Score reste le leur |
-| Listes BiS | Forever Companion (`ForeverCompanionData.bis[classe][spé]`, phase « BETA », sans niveau, source et taux par objet dans `Data/Dictionary.lua`) ; Naowh BiS (une liste par spécialisation, sans niveau, mise à jour le 11 octobre) ; **FojjiCore absent** (retiré entre le 10 et le 14 octobre) | **Se servir** des listes (lecture locale), **construire** la liste personnelle classée, **alimenter** Naowh (`!NBIS1!`) |
-| Équipement de leveling par niveau | GearQuest Forever 0.5.5-beta (modules de classe 0.3.6-beta) : `GQ.Data.<classe>Picks` (objet, emplacement, plage de niveaux, rang, spécialisation, camp, score) dans des fichiers Lua générés ; **rien dans ses SavedVariables** ; `/gq` | **Se servir** : lecture locale des fichiers générés, réponse qui renvoie à sa chasse (`/gq`) ; rien recalculé |
-| Comparaison d'équipement | Forever Guide 1.35.1 (GearAdvisor, GearCalc, GearExplain ; poids donnés en unités WoWSims) | **Recouper** seulement |
-| Thème compatible | EllesmereUI 9.5.4 : API publique d'habillage (`SKINNING_API.md` : `RegisterSkin`, `GetAccentColor`, `GetFont`, `OnLooksChanged` ; `## OptionalDeps`) | **Se servir en lecture** pour habiller **notre** fenêtre ; EllesmereUI lui-même jamais modifié (question 9) |
-| Organisation des fenêtres | Naowh (barre latérale, cartes, onglets, recherche, `Shared/UI/Window.lua`, `Panels.lua`) ; Forever Companion (onglets latéraux à icône, `Compat.lua:265-558`) ; EllesmereUI Options (barre latérale, en-tête, onglets, fabrique de contrôles) ; RestedXP (`GuideWindow.lua`, étapes empilées, thèmes) | **Étudier** (bloc 6), rien recopié |
+| Décisions d'une bonne route 1 à 22 (zones, regroupements, donjons, classe, villes, vols, foyer) | RestedXP 4.11.23 : parcours gratuits en clair, `Guides/Forever/` (une chaîne par zone de départ, variantes Mage « AoE » et « ADV », Skyborne « 1-14 Zephras Isle ») ; licence CC BY-NC-SA 4.0 (`RXPGuides/LICENSE`) | **Référence d'apprentissage** de l'optimiseur, **base adaptée** là où elle est meilleure (décision 277) |
+| Route pas à pas suivie en jeu | RestedXP (`ImportGuide`, public) ; Shortest Path Forever (suit la cible de RestedXP) | **Alimenter** : notre route livrée dans RestedXP |
+| Retrait d'un guide importé | RestedXP : `/rxp import`, liste « current guides » et bouton Remove avec confirmation (`UI/V2/GuideImporter.lua:575-597`, `:1048-1056`) ; mais l'entrée en cache est rangée sous `clé|n` (`GuideLoader.lua:371-388`) et le bouton efface `clé` (`GuideImporter.lua:1052`) : le guide revient très probablement au `/reload` ; `addon.RemoveGuide` est interne (`GuideLoader.lua:208`, absent de `_G.RXPGuides`, `:1268-1273`) ; cache dans la SavedVariable de compte `RXPDB` (`RXPGuides.lua:1477`), relu au démarrage entrée par entrée (`GuideLoader.lua:774-837`) | **Construire** une commande sûre (bloc 2, question 12) |
+| Toutes les quêtes, chaînes, taux de butin | Questie, Naowh (Discovery, Dungeon Journal), Forever Guide 1.35.1 (chaînes, butin), ForeverDungeonJournal, AtlasLoot | **Se servir** (déjà lus par T04d, DJ1, RX1) |
+| Équipement de leveling par quête | GearQuest Forever 0.5.5-beta (modules de classe 0.3.6-beta) : `GQ.Data.<classe>Picks` dans des fichiers Lua générés, rien dans ses SavedVariables ; `/gq` | **Se servir** : lecture locale, renvoi à sa chasse |
+| Montée de métier | SkillUp Forever 0.9.3 (plan, itinéraire, courses) | **Se servir** (routes de métier sur demande, MT1) |
+| Plan de talents niveau par niveau | Naowh Training 1.1.15 (« Level by level », `!NFB1!`) ; Talents Forever Book 0.38.2 | **Alimenter** (déjà fait par EX1 dès le niveau 10) |
+| Échelles de statistiques | Forever Companion 1.0.0 (données v88 du 2026-10-12) : import et export **Pawn v1** (`Scales.lua:361-373`), aucune API publique | **Alimenter** par une chaîne Pawn v1 collée par le joueur |
+| Poids chez Naowh | Naowh 1.1.15 : « Import weights » (`NFSW1:` ou export EP de WoWSims) ; le Naowh Score **ne dépend pas des poids** | **Alimenter** (`NFSW1:`) |
+| Listes BiS | Forever Companion (par spécialisation, phase « BETA », sans niveau, source et taux par objet) ; Naowh BiS (une liste par spécialisation, mise à jour le 11 octobre) ; **FojjiCore absent** (retiré entre le 10 et le 14 octobre) | **Se servir**, **construire** la liste personnelle classée, **alimenter** Naowh (`!NBIS1!`) |
+| Comparaison d'équipement | Forever Guide (GearAdvisor, GearCalc, GearExplain) | **Recouper** |
+| Thème compatible | EllesmereUI 9.5.4 : API publique d'habillage (`SKINNING_API.md`) | **Se servir en lecture** pour notre fenêtre |
+| Organisation des fenêtres | Naowh, Forever Companion, EllesmereUI Options, RestedXP | **Étudier** (bloc 6), rien recopié |
 
-Écarts de version avec nos documents, à corriger au bloc 0 : Naowh Forever 1.1.15 (EX1 : 1.1.12), Forever Guide 1.35.1
-(inventaire : 1.25.7), Forever Companion données v88 (inventaire : v79), listes BiS de Naowh du 11 octobre, GearQuest
-Forever 0.5.5-beta, FojjiCore absent.
+**Les parcours gratuits contiennent-ils les quêtes de classe ?** Relevé du 2026-10-14 (livre de quêtes fusionné face
+aux étapes de chaque chaîne, filtres de classe et de race appliqués, jusqu'au niveau 20) : **en partie**. Les quêtes de
+classe de la zone de départ (niveaux 1 à 6 : lettres du maître, premières quêtes du Chaman, du Druide, du Paladin) y
+sont pour la plupart ; celles du niveau 10 et au-delà en sont **presque toutes absentes** : The Hunter's Path (familier
+du Chasseur), quêtes du Guerrier au 10, du Voleur au 10 et au 16, du Prêtre au 10, Fire Sapta et Call of Fire du
+Chaman, chaînes du Mage au 10 et au 15 — y compris dans les variantes Mage « AoE » et « ADV » (une ou deux quêtes de
+classe sur dix). Bruit du relevé, écarté : quêtes de fête (cadeaux de Winter Veil), 792 (prérequis douteux, LVL18),
+quêtes raciales du Prêtre. Conséquence : nos routes placent elles-mêmes les quêtes de classe (décision 277, point 4).
 
 ## Constats (dépôt, 2026-10-14 ; chemins `fichier:ligne` pour la relecture)
 
 ### Routes (bloc 1)
 - **Cause 1 : la position du personnage n'atteint jamais le planificateur.** `RouteRequest` ne porte ni race, ni carte,
-  ni coordonnées (`forever/route.py:219-235`) ; l'outil MCP (`forever/mcp_server.py:428-441`), la CLI
-  (`forever/cli.py:414-432`) non plus ; le pont n'envoie que classe, camp et niveaux (`forever/bridge/plans.py:243-249`).
-  ForeverBridge envoie `race`, `zone`, `subzone` et `map` mais pas de coordonnées (`addon/ForeverBridge/Message.lua:370-374`),
-  et `Resolved` ne garde que `zone` (`forever/bridge/context.py:209`).
+  ni coordonnées (`forever/route.py:219-235`) ; MCP (`forever/mcp_server.py:428-441`) et CLI (`forever/cli.py:414-432`)
+  non plus ; le pont n'envoie que classe, camp et niveaux (`forever/bridge/plans.py:243-249`) ; ForeverBridge envoie
+  `race`, `zone`, `subzone` et `map` sans coordonnées (`addon/ForeverBridge/Message.lua:370-374`), et `Resolved` ne
+  garde que `zone` (`forever/bridge/context.py:209`).
 - **Cause 2 : le départ est la quête de plus petit identifiant.** `start_quest` trie par (permise, écart de niveau,
-  niveau minimal, id) (`forever/route.py:618-622`) ; toutes les quêtes de niveau 1 de l'Alliance sont à égalité et
-  l'identifiant départage : une quête d'Elwynn Forest passe avant celle de Coldridge Valley. Le trajet initial vaut
-  zéro, le départ étant posé sur ce donneur (`forever/route.py:740-746`, `forever/engine/route.py:312`).
-- **Le masque de race seul ne suffirait pas** : ces deux quêtes ont le même masque (toute l'Alliance). Il faut la
-  position réelle **et** une table race → zone de départ (pour la CLI, les tests et un personnage hors contexte).
-- **Aucune table race → zone de départ** : `races.json` n'a pas de carte de départ, `ChrRaces` est lue sans elle
-  (`forever/pipeline/tables.py:131-133`) ; question RTE3 ouverte. Dix races jouables dans les données (huit
-  classiques et deux Skyborne, une par camp), sept zones de départ attendues.
-- **Filtres absents** (`forever/route.py:386-450`) : masque de race (lu de Questie et Completo,
-  `forever/quest_sources.py:344-346`, `:465`, jamais appliqué), répétable, effort de guerre, métier requis,
-  événement (Foire de Sombrelune), capitale ou autre continent (seul un poids doux, `forever/optimize/route.py:188`).
-  `specialFlags` et `requiredSkill` de Questie ne sont pas lus (`forever/quest_sources.py:99-113`).
-- **Pourquoi les quêtes « The Alliance Needs… » passent** : connues de Questie seulement, de niveau maximal avec un
-  niveau minimal de 1 et sans masque, donc « both » ; jamais grises ; acceptées par `_candidates`
-  (`forever/optimize/route.py:134`). Deux artefacts du modèle les rendent attirantes : un rendu d'objets compté comme
-  des combats au niveau de la quête (`forever/route.py:339-343`, `:428`) et l'XP de Questie (`suppose`) appliquée
-  sans contrôle d'accessibilité. Les quêtes trop hautes ne sont écartées que dans `best_zone_xp_h`
-  (`forever/engine/route.py:487`), pas dans la construction.
-- **Farm** : seulement en fin de route, quand plus aucune quête ne vaut le détour (`forever/optimize/route.py:99-110`,
-  `:192-193` ; `forever/engine/route.py:451-455`) ; rien ne vérifie qu'il ne reste pas de quête faisable dans la zone.
-- **Recette** : `rxp_guides.coverage` donne déjà la chaîne des parcours gratuits par `#defaultfor`
-  (`forever/rxp_guides.py:287`, `:307-345`), et `compare_rxp` part déjà du donneur de la première quête du parcours
-  (`forever/compare.py:383-395`). Relevé local : Coldridge Valley → Dun Morogh pour les Nains et les Gnomes, Northshire
-  → Elwynn Forest pour les Humains, Shadowglen → Teldrassil, Durotar, Tirisfal Glades, Mulgore, Zephras Isle
-  (Skyborne, les deux camps) ; variantes du Mage (« AoE », « ADV »).
+  niveau minimal, id) (`forever/route.py:618-622`) : à égalité, une quête d'Elwynn Forest passe avant celle de
+  Coldridge Valley ; le trajet initial vaut zéro (`forever/route.py:740-746`, `forever/engine/route.py:312`).
+- **Le masque de race seul ne suffirait pas** : ces deux quêtes ont le même masque (toute l'Alliance).
+- **Jetons de race des Skyborne** : `who_for` donne `HighOrderSkyborne` (`forever/rxp_guides.py:353-357`) alors que
+  RestedXP attend `Skyborne` (`#defaultfor Skyborne`), le `client_file` de `races.json` : la chaîne Skyborne est
+  introuvable aujourd'hui.
+- **Quêtes faites** : le champ `completed` du livre est l'**union de tous les personnages** (QuestieConfig lue sans
+  nom, `forever/pipeline/quest_sources.py:397-407`) ; les quêtes faites **par personnage** sont au profil
+  (`quests_completed`, par GUID de Questie, `forever/profile_import.py:311-317`), jamais lues par la route.
+- **Filtres absents** (`forever/route.py:386-450`) : masque de race, répétable, effort de guerre, métier requis,
+  événement, capitale ou autre continent ; `specialFlags` et `requiredSkill` de Questie non lus
+  (`forever/pipeline/quest_sources.py:99-113`).
+- **Artefacts du modèle** : un rendu d'objets compté comme des combats au niveau de la quête (`forever/route.py:339-343`,
+  `:428`) ; quêtes trop hautes écartées seulement dans `best_zone_xp_h` (`forever/engine/route.py:487`).
+- **Farm** : seulement en fin de route, sans contrôle des quêtes restantes (`forever/optimize/route.py:99-110`,
+  `:192-193` ; `forever/engine/route.py:451-455`).
+- **Déjà là pour la mesure** : lecteur des parcours (`forever/rxp_guides.py`), chaîne par personnage (`guide_chain`),
+  rejeu par nos règles (`forever/compare.py`, `replay_rxp`, `breakdown` des zones `:314-337`), départ commun au
+  donneur de la première quête du parcours (`:383-395`). Le lecteur jette le texte des étapes à dessein (décision 268) :
+  la base adaptée exige de garder les lignes de chaque étape.
+- **Choix du parcours par RestedXP** : le premier guide enregistré dont `#defaultfor` s'applique devient le guide par
+  défaut (`GuideLoader.lua:201-203`, ordre de chargement du `.toc`) ; `guide_chain` prend au contraire le défaut de
+  plus bas niveau, donc « 1-5 Coldridge Valley » pour un Gnome Mage au lieu de sa variante Mage.
 
 ### Conversation et livraison (bloc 2)
 - Les trois questions de `ROUTE_CHOICES` (`forever/bridge/choices.py:34-53`) partent **ensemble** en cartes de
-  « À valider » (`forever/bridge/loop.py:201-203`), sans empreinte ni « Masquer ».
+  « À valider » (`forever/bridge/loop.py:201-203`).
 - **Deux sources de vérité pour « À valider »** : le compteur compte toutes les cartes visibles, questions comprises
-  (`addon/ForeverBridge/ForeverBridge.lua:1025-1035`, `:1214-1215`) ; le modèle ne voit jamais les cartes publiées (seule
-  la consigne de route les mentionne, `forever/bridge/plans.py:256-260` ; `forever_status` ne liste que les attentes de
-  `forever update`, `forever/update.py:2685-2690`) et peut répondre « aucune question n'attend de validation ».
-- L'historique est un `ScrollingMessageFrame` (`ForeverBridge.lua:272-294`) : pas de boutons enfants, seulement des
-  liens `|H…|h` (aujourd'hui `foreverbridge:copy:N`).
-- Le modèle ne peut pas émettre de question : `AgentResult` n'a pas de champ pour cela (`forever/bridge/agent.py:58-76`).
-- **Aperçus** : un fichier par demande (`<cache>/routes/<id>.json`, `forever/route.py:793-853`), rien n'est lié à la
-  conversation ni au personnage ; deux aperçus coexistent.
-- **Livraison** : `_deliver_route` prend le plan le plus récent de même classe et même camp, pas du personnage
-  (`forever/bridge/loop.py:467-489`) ; nom `Forever <Classe> a-b (<id6>)` (`forever/route.py:856-859`), donc un nouveau
-  guide par plan, jamais de remplacement (`ForeverBridge.lua:1537-1552`).
+  (`ForeverBridge.lua:1025-1035`, `:1214-1215`) ; le modèle ne voit jamais les cartes publiées
+  (`forever/bridge/plans.py:256-260` ; `forever/update.py:2685-2690`).
+- L'historique est un `ScrollingMessageFrame` (`ForeverBridge.lua:272-294`) : pas de boutons enfants.
+- Le modèle ne peut pas émettre de question (`forever/bridge/agent.py:58-76`).
+- **Aperçus** : un fichier par demande (`forever/route.py:793-853`), rien n'est lié au personnage ; deux aperçus
+  coexistent.
+- **Livraison** : `_deliver_route` prend le plan le plus récent de même classe et camp, pas du personnage
+  (`forever/bridge/loop.py:467-489`) ; nom `Forever <Classe> a-b (<id6>)` (`forever/route.py:856-859`) ; chaque
+  import ajoute une entrée `clé|n` au cache de RestedXP : deux imports du même guide laissent deux entrées, relues dans
+  un ordre quelconque au démarrage (question RXP3).
 
-### Talents (bloc 3)
-- Au niveau 1, le bouton demande le point du niveau suivant (`forever/bridge/plans.py:51-57`) ; `forever_build` refuse
-  sous le premier niveau de talent (`forever/build.py:278-284`) et le modèle paraphrase le refus. À partir du niveau 10,
-  `forever_build` rend déjà l'ordre de prise, le lien Talents Forever et le code `!NFB1!`
-  (`forever/talents_forever.py:575-603`) ; les builds populaires portent un ordre généré (`talents_forever.py:763-766`).
+### Talents, EllesmereUI, fenêtre (blocs 3, 5, 6)
+- Au niveau 1, le bouton Talents demande le point du niveau suivant (`forever/bridge/plans.py:51-57`) et
+  `forever_build` refuse (`forever/build.py:278-284`) ; à partir du niveau 10, lien et code sont déjà rendus
+  (`forever/talents_forever.py:575-603`).
+- EllesmereUI : lien dans la réponse Exports (`forever/bridge/exports.py:126-151`), bascule à `/fb role`, à la connexion
+  et en sortie de combat (`ForeverBridge.lua:2075-2152`, `:2311-2323`), aucun réglage pour l'éteindre.
+- Fenêtre : 520×360, jusqu'à huit boutons de 100 px enchaînés sans retour à la ligne (`ForeverBridge.lua:357-364`,
+  `:492-503`), réponses en texte brut (`:608-639`).
 
-### EllesmereUI (bloc 5)
-- Aucun réglage pour l'éteindre : lien `[EllesmereUI : rôle]` dans la réponse Exports (`forever/bridge/exports.py:126-151`,
-  incitation même sans rôle `:129`), bascule `FB.SwitchProfile` à `/fb role`, à la connexion et en sortie de combat
-  (`ForeverBridge.lua:2075-2152`, `:2311-2323`), ligne d'aide (`:2373`), aucune commande pour effacer un rôle.
+## À valider
 
-### Fenêtre (bloc 6)
-- ForeverBridge 0.4.0, fenêtre 520×360 redimensionnable ; « Nouvelle conversation » puis jusqu'à huit boutons de
-  100 px enchaînés sans retour à la ligne (`ForeverBridge.lua:357-364`, `:492-503` ; `forever/bridge/buttons.py:46-90`) :
-  la barre déborde et les libellés longs se chevauchent. Réponses en texte brut, trois mises en forme seulement
-  (`ForeverBridge.lua:608-639`). Aide affichée une fois (`:2363-2417`). Banc lupa : `tests/unit/test_bridge_*_lua.py` et
-  `tests/fixtures/bridge/wow_stub.lua`.
+Réponses retenues le 2026-10-14 (décision 275) : **Q1** une branche par bloc, fusion dès la CI verte, bloc « accepté »
+à ton accord ; **Q4** aucun téléchargement de table pour les catégories de quêtes (Questie et tables présentes, sinon
+`suppose` et question ouverte) ; **Q10** règles de méthode dans les décisions et `CLAUDE.md`. **Q2 et Q3 caduques**
+(décision 277 : zone de départ prise du parcours gratuit de la race, parcours comme référence et non comme recette).
+Questions encore ouvertes, tranchées au début de leur bloc (défaut proposé en premier) :
 
-## À valider (dix questions ; défaut proposé en premier)
-
-1. **Code, branches et acceptation.** *Défaut* : tranche **CJ1** ; une branche par bloc (`cj1-0`, `cj1-1`…) partie de
-   `origin/main`, fusionnée en fast-forward dès la CI verte pour que le pont relancé sur `main` serve l'essai en jeu ;
-   un bloc fusionné est « livré, en attente d'essai » (ROADMAP), puis « accepté » à ton accord ; un refus ouvre une
-   branche de corrections ; la tranche se ferme quand les blocs sont tous acceptés. *Autre* : essai en jeu sur la
-   branche (le pont lancé depuis le dépôt sur la branche) et fusion seulement après ton accord.
-2. **Source de la table race → zone de départ** (`start_zones.json` dans les données de la version, origine déclarée
-   dans `origins.json`). *Défaut* : zone vue en jeu par le pont à la création d'un personnage (carte du contexte au
-   niveau 1, `certain`) d'abord ; à défaut, zone des quêtes de niveau 1 réservées à la race chez Questie et dans le
-   client, recoupée avec Wowhead (`probable`) ; jamais écrite de mémoire. *Autre* : tu me donnes les sept zones.
-3. **Recette de référence.** *Défaut* : commande locale `forever route recette` (forme au bloc) qui calcule la route 1
-   à 10 de chaque race et compare son enchaînement de zones (zones dans l'ordre, doublons fusionnés) à celui du
-   parcours gratuit de RestedXP de la même race (variante Mage comprise pour un Mage) ; écart = route **refusée** :
-   pas d'aperçu proposé à la livraison, écart expliqué en une phrase (zone en trop, manquante ou dans le désordre) ;
-   la même vérification tourne avant chaque livraison d'une route qui commence sous le niveau 10 ; sans RestedXP
-   installé, garde-fous seuls, et la réponse le dit. Résultats consignés dans `docs/research/rxp-comparaison.md`.
-   Tests sur guides fabriqués (décision 268). *Autre* : refus signalé mais livraison possible sur ta demande.
-4. **Quêtes écartées par défaut** : d'une autre race ou d'un autre camp, d'effort de guerre, répétables, d'événement,
-   de métier (sauf métier du personnage et route de métier demandée), trop hautes pour être faites au niveau du
-   personnage, dans une capitale ou sur un autre continent sous le niveau 10 (sauf zone de départ de la race sur cet
-   autre continent ou trajet de classe obligatoire). *Défaut* : catégories lues dans `specialFlags` et `requiredSkill`
-   de Questie et dans les tables du client déjà téléchargées ; si une catégorie exige une table du client absente
-   (`QuestInfo`, `QuestSort`), téléchargement par la voie existante de `forever fetch` (accès réseau : ton accord ici) ;
-   une catégorie introuvable dans aucune source est marquée `suppose` et la question va dans `docs/OPEN_QUESTIONS.md`.
-   L'XP des quêtes n'est pas touchée (règle de jeu incertaine). *Autre* : liste d'identifiants écartés à la main (non
-   recommandé, ne suit pas les versions).
-5. **Questions dans le chat.** *Défaut* : la question en cours s'affiche sous le dernier message, avec une rangée de
-   vrais boutons de réponse ancrée sous l'historique (au plus quatre, plus « Autre » qui rend la main à la saisie) ;
-   une seule question à la fois, posée par le pont dans l'ordre (niveaux, donjons, quêtes de classe), sautée quand la
-   demande y répond déjà ; le modèle peut aussi poser une question par un bloc structuré de sa réponse, relu et borné
-   par le pont ; plus aucune question dans « À valider », qui ne garde que mises à jour et profil. *Autre* : liens
-   cliquables dans le texte du message (moins lisibles, mais sans nouveau cadre).
-6. **Aperçu et livraison.** *Défaut* : une seule route « en cours » par personnage (dans l'état du pont, liée au
-   personnage du contexte) ; chaque ajustement la remplace, l'aperçu précédent est marqué « remplacé » dans
-   l'historique ; sous l'aperçu, « Valider et livrer » et « Ajuster » ; la validation livre d'office dans RestedXP sous
-   le nom stable « Forever · <Personnage> · <a>-<b> » (groupe « Forever Routes ») qui remplace le guide précédent du
-   même personnage par la même clé ; la réponse dit où le trouver dans RestedXP. Le bouton « Livrer dans RestedXP » est
-   retiré. *Autre* : garder un bouton de livraison séparé.
-7. **BiS (bloc 4)** : FojjiCore n'est plus installé. *Défaut* : liste personnelle bâtie depuis Forever Companion et
-   Naowh (FojjiCore relu s'il revient, sans rien bloquer) ; classée par nos poids calculés pour le Mage, et pour les
-   autres classes par l'échelle de Forever Companion de la spécialisation (`suppose`, « poids de la communauté ») ;
-   exportée en `!NBIS1!` pour toutes les classes (amende la décision 250, qui ne réexportait pas les listes des
-   autres classes) ; BiS de leveling lu dans GearQuest Forever. Tables d'objets du client (`Item`, `ItemSparse`
-   complète, `ItemEffect`…) téléchargées par la voie existante (accès réseau : ton accord) ; si les objets de Forever
-   portent des notations (toucher, critique, hâte), la conversion des notations (PER8) est avancée de SIM1 dans ce
-   bloc. *Autre* : Mage seulement pour l'export, listes des addons laissées dans leur addon pour les autres classes.
-8. **EllesmereUI.** *Défaut* : lien de profil et bascule retirés par défaut ; `/fb eui on` les rallume (réglage du
-   compte dans `ForeverBridgeDB`), `/fb eui off` les éteint, `/fb role clear` efface un rôle ; les rôles déjà gardés
-   restent sans effet tant que le réglage est éteint. *Autre* : retirer tout le code de bascule.
-9. **Thème de la nouvelle fenêtre.** *Défaut* : si EllesmereUI est chargé, notre fenêtre s'habille par son API
-   publique d'habillage (`## OptionalDeps: EllesmereUI`, couleur d'accent et police lues, aucune écriture dans
-   EllesmereUI ni ses réglages) ; sinon thème sobre propre (fond sombre, une couleur d'accent, police du jeu). Les
-   maquettes (texte et schémas) te sont montrées le 27 octobre avant tout code. *Autre* : thème propre toujours,
-   sans lien avec EllesmereUI.
-10. **Règles de méthode.** *Défaut* : trois décisions (272 à 274) et trois lignes dans la section « Façon de
-    travailler » de `CLAUDE.md` ; la règle d'acceptation en jeu amende la décision 247 (les essais en jeu ne sont
-    plus facultatifs pour clore un bloc qui touche au jeu ; ils restent courts) ; entre la fin de la bêta et la sortie,
-    l'essai attend le 4 novembre et s'inscrit dans `docs/LANCEMENT.md`. *Autre* : décisions seulement, `CLAUDE.md`
-    inchangé.
+5. **Questions dans le chat** (bloc 2). *Défaut* : la question en cours s'affiche sous le dernier message avec une
+   rangée de vrais boutons ancrée sous l'historique (au plus quatre, plus « Autre ») ; une seule à la fois ; le modèle
+   peut aussi poser une question par un bloc structuré, relu et borné par le pont. *Autre* : liens cliquables dans le
+   texte.
+6. **Aperçu et livraison** (bloc 2). *Défaut* : une seule route « en cours » par personnage ; « Valider et livrer » et
+   « Ajuster » sous l'aperçu ; nom stable « Forever · <Personnage> · <a>-<b> », groupe « Forever Routes » ; le bouton
+   « Livrer dans RestedXP » est retiré. *Autre* : garder un bouton de livraison séparé.
+7. **BiS** (bloc 4). *Défaut* : liste personnelle depuis Forever Companion et Naowh (FojjiCore relu s'il revient) ;
+   classée par nos poids (Mage) ou l'échelle de Forever Companion (`suppose`) ; exportée en `!NBIS1!` pour toutes les
+   classes ; tables d'objets du client téléchargées par la voie existante (**accord réseau demandé**) ; PER8 avancée de
+   SIM1 si les objets portent des notations. *Autre* : Mage seulement pour l'export.
+8. **EllesmereUI** (bloc 5). *Défaut* : éteint par défaut, `/fb eui on|off`, `/fb role clear`. *Autre* : retirer le
+   code de bascule.
+9. **Thème** (bloc 6). *Défaut* : habillage par l'API publique d'EllesmereUI quand il est chargé, sinon thème sobre ;
+   maquettes montrées avant tout code. *Autre* : thème propre toujours.
+11. **« Aussi bonne »** (bloc 1). *Défaut* : sur chaque zone de départ et chaque tranche couverte, notre route est
+    « aussi bonne » quand son temps simulé ne dépasse pas celui du parcours rejoué par nos règles (mêmes départ,
+    personnage, donjons et quêtes de classe) et que son enchaînement de zones est le même, ou que l'écart est expliqué
+    et chiffré ; tant qu'elle ne l'est pas, la base adaptée est livrée sur cette tranche. Variante du Mage : celle que
+    RestedXP choisit lui-même (premier `#defaultfor` permis), l'autre sur demande. *Autre* : une tolérance de temps à
+    fixer.
+12. **Commande de retrait des routes livrées** (bloc 2). Le bouton Remove de `/rxp import` existe, mais n'efface
+    probablement pas l'entrée en cache (constat plus haut) et `RemoveGuide` est interne. *Défaut* :
+    `forever route rxp-clean` **jeu fermé** : liste d'abord (essai à blanc), puis, sur confirmation, retire de la
+    SavedVariable de compte `RXPDB` (`SavedVariables/RXPGuides.lua`) **les seules entrées dont la clé commence par
+    `Forever Routes|`**, après une copie datée du fichier ; refus si le jeu tourne ou si le fichier ne se relit pas à
+    l'identique hors de ces entrées ; c'est une écriture dans la SavedVariable d'un addon tiers : **ton accord explicite
+    est demandé ici** (décision 272). *Autre* : seulement documenter le bouton de RestedXP et le `/reload`, à vérifier
+    en jeu (RXP3).
 
 ## Conception
 
-### Bloc 1 — Routes
-- **Requête** : `RouteRequest` gagne `race` et `start` (carte `uiMapID`, x, y, facultatifs) ; MCP `forever_route`, CLI
-  `forever route plan --race --from-map --at x,y` (forme au bloc) ; le pont les remplit depuis le contexte
-  (`Resolved` garde `map`, ForeverBridge envoie x et y hors combat par `C_Map.GetPlayerMapPosition` sous `pcall`).
-- **Départ** (`start_position`, fonction pure) : position du contexte si présente ; sinon, au niveau 1, zone de départ
-  de la race (table de la question 2) et premier donneur de cette zone ; sinon la règle de RX1c. Le trajet jusqu'au
-  premier arrêt est compté. `start_quest` ne départage plus par l'identifiant : à égalité, le plus proche du départ.
-- **Garde-fous** (`forever/route_guards.py` ou dans `route_world`, au bloc) : filtres de la question 4 avant la
-  recherche ; contrôles **après** la recherche, qui refusent une route invraisemblable avec la raison : première zone
-  ≠ zone de départ au niveau 1, quête d'une autre race ou d'un autre camp, capitale ou autre continent sous le niveau
-  10 sans raison, farm alors qu'une quête faisable reste dans la zone ou une zone voisine prévue pour le camp.
-- **Modèle** (registre I18) : un objectif « rapporter des objets » n'est plus compté comme des combats au niveau de la
-  quête ; une quête trop haute pour ses objectifs n'est pas candidate (seuil lu dans les données, origine déclarée,
-  `suppose` si aucune source).
-- **Recette** (question 3) : `forever route recette` et contrôle avant livraison, sur `rxp_guides.coverage` et la
-  chaîne de zones de `compare.breakdown` ; mesure seulement (décision 268).
-- **Vols et foyer (bloc 7, facultatif)** : repris de RX2 seulement s'il reste du temps après l'acceptation des blocs 1
-  à 3 ; sinon RX2 inchangée après la sortie.
+### Bloc 1 — Routes (décision 277)
 
-### Bloc 2 — Conversation et livraison
-- **Questions** (question 5) : `Choice` devient séquentiel (`next_choice`), une question par réponse du pont, avec un
-  champ `choices` dans la réponse (`forever/bridge/loop.py:381-384`, `:650-668`) ; ForeverBridge dessine la rangée de
-  boutons sous l'historique et envoie `a=choice:…` (action existante, `forever/bridge/actions.py:19-21`) ; bloc
-  structuré du modèle relu par le pont (au plus quatre réponses, libellés courts, sinon ignoré et journalisé) ; les
-  cartes de choix ne sont plus publiées (`loop.py:203`).
-- **Compteur cohérent** : un seul calcul des cartes visibles, partagé par le bouton et la ligne d'état ; le pont donne
-  au modèle, dans la consigne de chaque message, le nombre et le titre des cartes « À valider » réellement publiées ;
-  test : jamais « aucune question » quand une carte est visible.
-- **Route en cours par personnage** (question 6) ; `_deliver_route` prend la route du personnage, pas la plus récente
-  de la classe ; nom stable ; remplacement par la clé de RestedXP (lecture de `BuildGuideKey` et `CacheGuide` au bloc
-  pour confirmer, sinon repli : nom stable et question RXP3) ; message « Ta route “Forever · Bob · 1-10” est dans
-  RestedXP : menu des guides, groupe Forever Routes » (libellés exacts relus dans RestedXP en anglais, client enUS).
+**1a. Départ réel et quêtes faites.**
+- `RouteRequest` gagne `race`, `character` et `start` (carte `uiMapID`, x, y) ; MCP `forever_route`, CLI
+  `forever route plan --race --character --at <carte>,<x>,<y>` (forme au bloc) ; le pont les remplit depuis le
+  contexte (`Resolved` garde `map` ; ForeverBridge envoie x et y hors combat, `C_Map.GetPlayerMapPosition` sous
+  `pcall`).
+- Départ (`start_position`, fonction pure) : position du contexte ; sinon, au niveau 1, premier donneur du parcours
+  gratuit de la race ; sinon la règle de RX1c, départagée par la distance, plus par l'identifiant. Trajet initial compté.
+- `who_for` prend le `client_file` de `races.json` (Skyborne, Scourge → Undead).
+- Quêtes faites : `quests_completed` du personnage au profil (Questie, par GUID), relu à chaque demande ; la quête
+  en cours (journal envoyé par le pont, forme au bloc) comptée comme prise ; jamais le champ `completed` du livre.
+
+**1b. Défauts et garde-fous.**
+- Donjons avec leurs quêtes (DJ1, niveau où ils rapportent le plus) et quêtes de classe **inclus par défaut** ; la
+  demande peut les retirer (« sans donjon », « sans quêtes de classe »).
+- Filtres avant la recherche : autre race (masque), autre camp, effort de guerre, répétable, événement, métier (sauf
+  route de métier), quête trop haute pour être faite au niveau du personnage (seuil des données, origine déclarée,
+  `suppose` sans source) ; catégories lues dans `specialFlags` et `requiredSkill` de Questie (lus en plus par
+  `quest_sources.py`).
+- Objectif « rapporter des objets » plus jamais compté comme des combats ; registre I18.
+- Contrôles après la recherche, avec raison : première zone ≠ zone du départ, quête d'une autre race ou d'un autre
+  camp, capitale ou autre continent sous le niveau 10 sans raison (quête de classe, maître, donjon), farm alors qu'une
+  quête faisable reste dans la zone ou une zone voisine.
+
+**1c. Mesure des décisions face aux parcours gratuits (« recette »).**
+- `forever route recette` (forme au bloc) : pour chaque race (dix races, sept zones de départ, variante Mage
+  comprise) et chaque tranche couverte (1 à 10, puis jusqu'à la fin du parcours), notre route et le parcours rejoué par
+  nos règles, même personnage et même départ ; **décisions comparées** : enchaînement des zones, regroupement des
+  quêtes (quêtes prises et rendues au même passage), niveau d'entrée des donjons et des quêtes de classe, retours en
+  ville (maître, capitale), vols et pierre de foyer, farm ; temps et XP par heure.
+- Sortie : écarts chiffrés, chacun avec son explication (règle manquante, poids, donnée absente) ; aucun texte de guide
+  dans la sortie ni dans le dépôt ; résultats agrégés dans `docs/research/rxp-comparaison.md`.
+
+**1d. Trajets comme en jeu** (cœur de RX2, question RTE3, registre I19).
+- Vols : points de vol découverts en passant au maître de vol (au niveau 1 aucun n'est connu), vols connus du personnage
+  envoyés par le pont quand il les voit (forme au bloc) ou gardés au profil ; durée des vols du client (`TaxiPath`).
+- Pierre de foyer : lieu lié (changeable à un aubergiste, arrêt de la route), recharge lue dans les données de la
+  version (origine déclarée) ; la recherche choisit entre marche, vol, foyer.
+
+**1e. Réglage de l'optimiseur.**
+- Boucle : recette → écart le plus coûteux → règle ou poids changé (regroupement par pôle de quêtes, coût d'un retour
+  en ville, valeur d'une quête de classe, seuil `_worth_it`, poids de zone) → recette refaite ; chaque réglage noté
+  (avant, après, zones concernées) ; aucun réglage qui améliore une zone en dégradant une autre sans le dire.
+- Les réglages sont des paramètres de l'optimiseur (données de méthode, pas des chiffres de jeu) ; ils servent tels
+  quels au-delà des parcours, jusqu'au niveau maximal.
+
+**1f. Base adaptée là où le parcours est meilleure** (question 11).
+- Le lecteur garde les lignes de chaque étape (`Step.raw`) ; l'unité d'adaptation est **l'étape entière** : on retire
+  une étape dont toutes les quêtes sont faites, on insère nos étapes (quêtes de classe absentes, donjons et leurs
+  quêtes) encodées par `forever/rxp.py` ; les filtres `<<`, gardes `.xp` et `isonquest` restent tels quels (RestedXP
+  les évalue).
+- En-tête neuf : `#name Forever · <Personnage> · <a>-<b>`, `#group Forever Routes`, sans `#next` ni `#defaultfor`
+  hérités ; commentaire d'attribution : parcours sources nommés, « RestedXP Guides, CC BY-NC-SA 4.0 », usage personnel
+  non commercial, adaptation sous la même licence.
+- **Jamais moins bonne** : un changement non demandé qui allonge le temps simulé est retiré et l'aperçu le dit ; un
+  changement demandé (donjon, quête de classe) affiche son coût en temps.
+- Fin de route à une frontière d'étape après le niveau visé (estimé par le rejeu, dit comme tel).
+
+**1g. Autres routes sur demande** (après 1a à 1f) : réputation (quêtes de réputation connues), métier (itinéraire de
+SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous les mêmes garde-fous.
+
+### Bloc 2 — Conversation, livraison et retrait
+- **Questions** (question 5) : séquentielles, une par réponse du pont, champ `choices` dans la réponse, rangée de
+  boutons sous l'historique, action `a=choice:` existante ; donjons et quêtes de classe ne sont plus demandés (inclus
+  par défaut, décision 277) ; les cartes de choix ne sont plus publiées.
+- **Compteur cohérent** : un seul calcul des cartes visibles ; le pont donne au modèle, à chaque message, le nombre et
+  le titre des cartes réellement publiées.
+- **Route en cours par personnage** (question 6) ; aperçu remplacé à l'ajustement ; validation → livraison d'office,
+  nom stable ; avant l'import, retrait en jeu de la version précédente si RestedXP le permet par son API publique,
+  sinon nom stable et `/reload` conseillé, puis `forever route rxp-clean` (question 12) pour les doublons ; message
+  qui dit où trouver le guide (libellés de RestedXP relus en anglais, client enUS).
+- **Retrait sûr** (question 12) : `forever route rxp-clean [--apply]` jeu fermé, essai à blanc par défaut, copie
+  datée, seules les clés `Forever Routes|…`, relecture du fichier après écriture ; bouton ou commande du pont qui
+  l'annonce (le pont ne l'exécute pas jeu ouvert).
 - **Relecture humaine** : la première route de chaque zone de départ est montrée en texte (zones et quêtes dans
-  l'ordre) dans l'aperçu avant d'être livrée.
+  l'ordre) avant d'être livrée.
 
 ### Bloc 3 — Talents dès le niveau 1
-- Le bouton Talents demande le plan jusqu'à l'objectif (niveau visé du profil, sinon niveau maximal des données) quel
-  que soit le niveau ; sous le premier niveau de talent, la réponse dit « ton premier point arrive au niveau N » (lu
-  dans les données) et donne le plan complet, le lien Talents Forever et le code `!NFB1!` à coller dans Naowh Training
-  (Builds, Import), à suivre « Level by level ». Mage calculé ; autres classes : build populaire ou de la communauté
-  le plus proche, ordre généré signalé comme tel (EX1).
+- Plan jusqu'à l'objectif quel que soit le niveau ; sous le premier niveau de talent, « ton premier point arrive au
+  niveau N » (lu dans les données) et le plan complet, le lien Talents Forever et le code `!NFB1!` à coller dans Naowh
+  Training (Builds, Import). Mage calculé ; autres classes : build populaire le plus proche, ordre généré signalé.
 
-### Bloc 4 — BiS et équipement (T10a revue selon l'audit)
-- **Poids** du Mage par le moteur (`forever/engine/`, fonctions pures) par niveau et par contexte (leveling, donjon),
-  rendus en `NFSW1:` (Naowh, « Import weights ») et en Pawn v1 (Forever Companion, « Import scale… »), nommés
-  « Forever · <Personnage> · <contexte> ».
-- **Liste personnelle** : listes de Forever Companion et de Naowh lues en local à chaque demande (cache, jamais dans le
-  dépôt), fusionnées par emplacement, classées par nos poids (ou l'échelle de Forever Companion, question 7), lieu de
-  butin (DJ1, dictionnaire de Forever Companion), exportées en `!NBIS1!` (format prêt depuis EX1).
-- **Leveling** : choix de GearQuest Forever lus dans ses fichiers générés pour la classe et la plage de niveaux,
-  « prochain objet à viser » avec renvoi à `/gq` ; aucun classement recalculé.
-- **« Est-ce une amélioration ? »** dans le chat (objet par Maj+clic, P06b) : score par nos poids (Mage) et par
-  l'échelle active de Forever Companion lue dans ses données (`suppose`), Naowh Score cité comme le leur ; source et
-  certitude affichées ; « non calculé » sans poids.
-- Commande et outil MCP `forever gear` (forme au bloc), provenance complète.
+### Bloc 4 — BiS et équipement (T10a revue)
+- Poids du Mage par le moteur (`forever/engine/`, fonctions pures), par niveau et contexte, rendus en `NFSW1:` et en
+  Pawn v1, nommés « Forever · <Personnage> · <contexte> ».
+- Liste personnelle : listes de Forever Companion et de Naowh lues en local (cache, jamais dans le dépôt), fusionnées
+  par emplacement, classées (question 7), lieu de butin, exportées en `!NBIS1!`.
+- Leveling : choix de GearQuest Forever lus dans ses fichiers générés, renvoi à `/gq`.
+- « Est-ce une amélioration ? » dans le chat : nos poids (Mage) et l'échelle active de Forever Companion (`suppose`),
+  Naowh Score cité comme le leur ; source et certitude ; « non calculé » sans poids.
+- `forever gear` (commande et outil MCP, forme au bloc), provenance complète.
+
+### Bloc 4b — Route d'équipement (décision 277, point 6)
+- Entrée : liste BiS du personnage (Forever Companion, Naowh, puis notre liste du bloc 4), emplacements choisis.
+- Source de chaque objet : quête qui le donne (récompenses du livre, GearQuest Forever, Forever Guide), boss qui le lâche
+  (DJ1, `dungeons.json`) avec son taux (Naowh d'abord, Forever Guide, AtlasLoot ; écarts montrés, relevés du joueur
+  premiers), marchand ou métier sinon « source inconnue ».
+- Ordre : l'optimiseur de routes ordonne quêtes, donjons et trajets (mêmes garde-fous) ; un objet de donjon à faible
+  taux donne un **passage en boucle** avec le nombre de passages attendu (espérance et nombre pour une chance de 90 %,
+  fonctions pures dans `forever/engine/`, registre) ; plusieurs objets d'un même donjon cumulés.
+- Livraison dans RestedXP comme une route de leveling ; aperçu par objet (source, taux, passages, temps).
 
 ### Bloc 5 — EllesmereUI éteint par défaut (question 8)
-- `exports.py` ne propose plus le profil ni le rôle sauf réglage allumé ; `FB.SwitchProfile` jamais appelé réglage
-  éteint ; aide mise à jour ; `/fb eui on|off`, `/fb role clear`.
+- `exports.py` ne propose plus profil ni rôle sauf réglage allumé ; `FB.SwitchProfile` jamais appelé réglage éteint ;
+  `/fb eui on|off`, `/fb role clear` ; aide mise à jour.
 
 ### Bloc 6 — Refonte de l'interface de ForeverBridge
-- **Étude** (lecture locale, puis web en lecture seule) : navigation, cartes, typographie, aides des quatre addons ;
-  notes dans `docs/research/interface-addons.md` (organisation et principes, aucun code).
-- **Maquettes** montrées le 27 octobre (question 9), puis code :
-  - navigation à gauche ou en onglets : Chat, Feuille de route, Talents, Équipement, Exports, Mises à jour ;
-  - barre d'actions hiérarchisée : trois actions principales visibles, le reste dans un menu « Plus » ; largeurs
-    mesurées sur le texte, retour à la ligne ou menu, jamais de chevauchement (test lupa sur toutes les largeurs
-    permises de la fenêtre) ;
-  - assistant de feuille de route : niveaux de départ et d'arrivée (curseurs ou listes), cases à cocher (donjons,
-    quêtes de classe, métiers, réputations), « Calculer », aperçu en carte, « Valider et livrer » ;
-  - historique en cartes (titre, icône de certitude, listes courtes, liens), remplaçant le `ScrollingMessageFrame`
-    par une liste défilante de cartes ; la rangée de réponses du bloc 2 y devient des boutons dans la carte ;
-  - compteur « À valider » du bloc 2 ; aide d'accueil courte au premier lancement ; thème de la question 9.
-- Aucune fonction protégée, rien en combat (`test_addon_rules.py`) ; `check_addon.py` vert.
+- Étude (locale, puis web en lecture seule) dans `docs/research/interface-addons.md` (principes, aucun code).
+- Maquettes montrées pour accord (question 9), puis : navigation (Chat, Feuille de route, Talents, Équipement, Exports,
+  Mises à jour) ; barre d'actions hiérarchisée, jamais de chevauchement (test lupa à toutes les largeurs permises) ;
+  assistant de feuille de route (niveaux, cases à cocher, « Calculer », aperçu en carte, « Valider et livrer ») ;
+  historique en cartes ; compteur cohérent ; aide d'accueil courte ; thème ; ancienne fenêtre gardée derrière un
+  réglage jusqu'à l'acceptation. Aucune fonction protégée, rien en combat.
 
 ## Blocs et calendrier (fin de la bêta annoncée le 21 octobre, sortie le 4 novembre)
 
 | Dates | Bloc | Essai en jeu |
 | --- | --- | --- |
-| jeu. 15 oct. (matin) | **0** — Intégration des deux fichiers, décisions 272 à 276, ROADMAP, DATA_SOURCES, inventaire, `CLAUDE.md`, archivage | — |
-| 15 → 17 oct. | **1** — Routes : départ et race (1a), garde-fous et filtres (1b), recette (1c) | sam. 17 et dim. 18 |
-| 18 → 19 oct. | **2** — Conversation, aperçu unique, livraison d'office | 19 et 20 |
-| mar. 20 oct. | **3** — Talents dès le niveau 1 ; **5** — EllesmereUI éteint (petit, avancé pour profiter de la bêta) | 20 et 21 |
-| mer. 21 oct. au soir | Fin de la bêta : corrections des essais 1 à 3 et 5 avant la fermeture si possible | dernier jour |
-| 22 → 23 oct. | Corrections restantes ; **7** — vols et foyer si les blocs 1 à 3 sont acceptés | au 4 nov. |
-| 22 → 27 oct. | **4** — BiS et équipement | au 4 nov. |
-| mar. 27 oct. | **6** — Étude et maquettes montrées pour accord | — |
-| 28 oct. → 2 nov. | **6** — Code de la nouvelle fenêtre | au 4 nov. |
-| mar. 3 nov. | Marge ; `docs/LANCEMENT.md` (essais restés en attente) | — |
-| mer. 4 nov. | Sortie : essais des blocs 4, 6, 7 et de ce qui reste ; clôture de CJ1 à ton accord | 4 nov. et suivants |
+| 14 oct. (soir) | **0** — Intégration : décisions 272 à 277, ROADMAP, DATA_SOURCES, inventaire, `CLAUDE.md`, archivage | — |
+| 15 → 18 oct. | **1** — Routes : 1a départ réel et quêtes faites, 1b défauts et garde-fous, 1c recette, 1f base adaptée (ce qui sert dès l'essai), puis 1d vols et foyer | sam. 17 (1a, 1b, 1f) et dim. 18 |
+| 19 → 20 oct. | **2** — Conversation, aperçu unique, livraison d'office, retrait sûr | 20 et 21 |
+| 20 oct. | **3** — Talents dès le niveau 1 ; **5** — EllesmereUI éteint | 20 et 21 |
+| 21 oct. au soir | Fin de la bêta : corrections des essais 1, 2, 3, 5 avant la fermeture si possible | dernier jour |
+| 19 oct. → 3 nov. | **1e** — Réglage de l'optimiseur sur la recette (en continu, hors jeu), puis 1g | au 4 nov. |
+| 22 → 26 oct. | **4** — BiS et équipement | au 4 nov. |
+| 27 → 28 oct. | **4b** — Route d'équipement ; maquettes du bloc 6 montrées le 28 | au 4 nov. |
+| 29 oct. → 2 nov. | **6** — Nouvelle fenêtre | au 4 nov. |
+| 3 nov. | Marge ; `docs/LANCEMENT.md` (essais restés en attente) | — |
+| 4 nov. | Sortie : essais des blocs 1e, 1g, 4, 4b, 6 ; clôture de CJ1 à ton accord | 4 nov. et suivants |
 
-Ce qui glisse : SIM1 et la suite de RX2 (quêtes lancées par un objet, comparaisons refaites) après le 4 novembre ;
-CM1 dès la sortie, comme prévu (décision 261). Si un bloc de 1 à 3 n'est pas accepté le 21 au soir, ses corrections
-passent devant les blocs 4 et 6.
+Ce qui glisse : SIM1 et la suite de RX2 (quêtes lancées par un objet, comparaison à Factoruide refaite) après le
+4 novembre ; CM1 dès la sortie (décision 261). Si un essai des blocs 1, 2, 3 ou 5 échoue, sa correction passe devant
+les blocs 4 à 6.
 
-### Bloc 0 — Intégration (après validation, avant tout code)
-- `docs/DECISIONS.md` : 272 (addons d'abord, prolonge 264 et 133), 273 (acceptation en jeu, amende 247), 274
-  (EllesmereUI intouché sans demande, amende 267 et 269), 275 (CJ1, ordre et calendrier jusqu'au 4 novembre, amende
-  251, 267 et 270 ; SIM1 et la suite de RX2 après la sortie ; T10a revue dans CJ1), 276 (conséquences de l'audit :
-  T10a revue, BiS de leveling par GearQuest Forever, MT1 sur SkillUp Forever et Forever Companion, la fenêtre du chat
-  renvoie à l'affichage de chaque addon ; questions dans le chat, amende 258 et 266) ; réponses aux questions de ce
-  plan reportées dans 275.
-- `docs/ROADMAP.md` : ligne et section CJ1 en tête du calendrier ; T10a réécrite (renvoi à CJ1, bloc 4) ; RX2, SIM1,
-  MT1 (s'appuyer sur SkillUp Forever) et l'idée « fenêtre du chat » mises à jour.
-- `docs/DATA_SOURCES.md` : Forever Companion (BiS, échelles Pawn v1, rotations, onglet « BiS Talents »), GearQuest
-  Forever (BiS de leveling), Naowh BiS et Stat Weights, FojjiCore absent ; section « Addons pilotés » complétée
-  (Pawn v1 vers Forever Companion).
-- `tasks/inventaire-addons.md` : relevé du 2026-10-14 (versions, capacités de la carte de l'audit, écarts).
-- `docs/OPEN_QUESTIONS.md` : questions de la section plus bas.
-- Archivage : `git mv` des deux fichiers de base vers `tasks/archive/`.
+### Bloc 0 — Intégration (fait le 2026-10-14 avec cette révision)
+- `docs/DECISIONS.md` : 272 à 277 ; 268 marquée « amendée par 277 ».
+- `docs/ROADMAP.md` : CJ1 en tête du calendrier ; T10a, RX2, SIM1, MT1 et l'idée « fenêtre du chat » mises à jour.
+- `docs/DATA_SOURCES.md` : Forever Companion, GearQuest Forever, Naowh BiS et Stat Weights, FojjiCore absent,
+  RestedXP comme référence d'apprentissage (277) ; « Addons pilotés » : Pawn v1 vers Forever Companion.
+- `tasks/inventaire-addons.md` : relevé du 2026-10-14.
+- `docs/OPEN_QUESTIONS.md` : questions ci-dessous ; `CLAUDE.md` : trois règles de méthode.
+- Archivage des deux fichiers de base dans `tasks/archive/`.
 
-## Procédures d'essai en jeu (courtes ; écrites dans `docs/ADDON.md`, celles d'après le 21 dans `docs/LANCEMENT.md`)
+## Procédures d'essai en jeu (courtes ; `docs/ADDON.md`, celles d'après le 21 dans `docs/LANCEMENT.md`)
 - **CJ-1** (routes) : un Gnome neuf à Coldridge Valley et un personnage Horde neuf (Orc ou Troll à Valley of Trials) ;
-  « Feuille de route » 1 à 10 ; attendu : la route part de la vallée de départ, puis la zone voisine de la race, sans
-  capitale, sans quête d'une autre race ni d'effort de guerre ; enchaînement de zones conforme au parcours gratuit de
-  RestedXP, ou refus expliqué. Les autres races : couvertes par les tests.
-- **CJ-2** (conversation) : la question arrive dans le chat, une à la fois, avec ses boutons ; « À valider » ne la
-  montre pas et son compteur dit la même chose que la réponse ; un ajustement remplace l'aperçu ; « Valider et
-  livrer » met « Forever · <Personnage> · 1-10 » dans RestedXP ; une deuxième route du même personnage remplace la
-  première (après `/reload` aussi).
-- **CJ-3** (talents) : au niveau 1, le bouton Talents donne le plan complet, le lien Talents Forever et le code
-  Naowh ; le code s'importe dans Naowh Training et s'affiche « Level by level ».
-- **CJ-5** (EllesmereUI) : aucune proposition de profil ni bascule après connexion, combat et `/reload` ; `/fb eui on`
-  les rallume.
-- **CJ-4** (au 4 novembre) : poids importés dans Forever Companion et Naowh ; liste `!NBIS1!` visible dans la fenêtre
-  BiS de Naowh ; « est-ce une amélioration ? » sur un objet par Maj+clic.
-- **CJ-6** (au 4 novembre) : nouvelle fenêtre aux tailles minimale et maximale, aucun chevauchement, assistant de
-  feuille de route de bout en bout, accueil, avec et sans EllesmereUI.
+  « Feuille de route » 1 à 10 ; attendu : départ de ta position, zones dans l'ordre des parcours gratuits (ou écart
+  expliqué), quêtes de classe et donjon au bon niveau, aucune capitale sans raison, aucune quête d'une autre race ni
+  d'effort de guerre ; un personnage déjà avancé : ses quêtes faites absentes.
+- **CJ-2** (conversation) : question dans le chat avec ses boutons, absente de « À valider », compteur cohérent ;
+  ajustement qui remplace l'aperçu ; « Valider et livrer » ; une deuxième route du même personnage remplace la
+  première (après `/reload` aussi) ; jeu fermé, `forever route rxp-clean` puis connexion : plus aucune route
+  « Forever Routes ».
+- **CJ-3** (talents) : niveau 1, plan complet, lien Talents Forever et code Naowh importable.
+- **CJ-5** (EllesmereUI) : aucune proposition de profil ni bascule ; `/fb eui on` les rallume.
+- **CJ-4**, **CJ-4b**, **CJ-6** (au 4 novembre) : poids importés dans Forever Companion et Naowh, liste `!NBIS1!`
+  visible chez Naowh, « est-ce une amélioration ? » ; route d'équipement livrée, passages en boucle annoncés ; nouvelle
+  fenêtre à toutes les tailles, avec et sans EllesmereUI.
 
 ## Tests attendus (aucun chiffre de jeu dans un test : valeurs de `tests/fixtures/` ou de `forever/data/`)
-- **Bloc 1** (`tests/unit/test_route_start.py` étendu, `test_route_guards.py`, `test_route_recette.py`) : départ par
-  race pour les dix races (sept zones, deux camps pour Zephras Isle) sur un monde fabriqué ; position du contexte
-  prioritaire ; trajet initial compté ; départage par distance, plus par identifiant ; chaque catégorie de quête de la
-  question 4 écartée ; route refusée avec sa raison pour chaque garde-fou ; rendu d'objets non compté comme combat ;
-  recette sur guides fabriqués : même enchaînement accepté, zone en trop, manquante ou dans le désordre refusée avec
-  l'écart ; sortie sans texte de guide (décision 268) ; contexte du pont avec `map`, x et y jusqu'à la requête.
-- **Bloc 2** (`test_bridge_choices*.py`, `test_bridge_route_session.py`, lupa) : une question à la fois, dans l'ordre,
-  sautée quand la demande y répond ; boutons sous l'historique et `a=choice:` ; aucune carte de choix publiée ;
-  compteur et ligne d'état égaux ; consigne au modèle avec les cartes réelles ; route en cours par personnage
-  remplacée à l'ajustement ; livraison à la validation, nom stable, même clé, un seul guide par personnage ; bloc
-  structuré du modèle borné.
-- **Bloc 3** : bouton Talents au niveau 1, 9 et 10 pour le Mage et une autre classe ; plan, lien et code présents.
-- **Bloc 4** (`test_gear_*.py`) : poids déterministes avec provenance ; va-et-vient `NFSW1:`, Pawn v1 et `!NBIS1!` ;
-  fusion et classement sur fixtures fabriquées d'addons (structure seulement) ; rien des listes dans le dépôt ;
-  amélioration avec source et certitude, « non calculé » sans poids.
-- **Bloc 5** (lupa) : réglage éteint par défaut, aucune bascule à la connexion, en sortie de combat ni à `/fb role` ;
-  `on`, `off`, `clear`.
-- **Bloc 6** (lupa, stub étendu aux nouveaux contrôles) : aucun bouton hors de la barre ni chevauchement aux tailles
-  extrêmes ; navigation ; assistant qui produit la même requête que la conversation ; cartes ; accueil au premier
-  lancement seulement ; habillage EllesmereUI sur bouchon de son API, thème propre sans lui ; `test_addon_rules.py`.
+- **Bloc 1** : départ par position, puis par race pour les dix races (jetons de RestedXP, Skyborne compris) sur un monde
+  et des guides fabriqués ; départage par distance ; trajet initial compté ; quêtes faites du seul personnage retirées ;
+  donjons et quêtes de classe inclus par défaut, retirés à la demande ; chaque filtre et chaque garde-fou ; rendu
+  d'objets non compté comme combat ; recette : décisions comparées et écarts nommés sur guides fabriqués, sortie sans
+  texte de guide ; base adaptée : étapes faites retirées, insertions à la bonne place, en-tête et attribution, aucun
+  `#next` hérité, changement non demandé plus lent retiré ; vols connus pris seulement s'ils sont plus courts, vol
+  inconnu jamais, foyer et sa recharge.
+- **Bloc 2** (Python et lupa) : une question à la fois ; boutons et `a=choice:` ; aucune carte de choix ; compteur et
+  ligne d'état égaux ; route en cours par personnage ; livraison à la validation, nom stable ; `rxp-clean` : essai à
+  blanc, seules les clés `Forever Routes|`, copie datée, refus jeu ouvert, fichier relu à l'identique hors de ces
+  entrées (SavedVariable fabriquée dans `tmp_path`).
+- **Bloc 3** : bouton Talents aux niveaux 1, 9 et 10, Mage et une autre classe.
+- **Bloc 4** : poids déterministes ; va-et-vient `NFSW1:`, Pawn v1, `!NBIS1!` ; fusion et classement sur fixtures
+  fabriquées ; rien des listes dans le dépôt ; amélioration avec source et certitude.
+- **Bloc 4b** : source de chaque objet (quête, boss, inconnue) ; passages attendus (fonctions pures, registre) ; route
+  ordonnée sous les garde-fous ; cumul de plusieurs objets d'un donjon.
+- **Bloc 5** et **6** (lupa) : réglage éteint par défaut ; aucune bascule ; barre sans chevauchement aux tailles
+  extrêmes ; assistant qui produit la même requête que la conversation ; habillage sur bouchon de l'API d'EllesmereUI.
 
 ## Registre (`docs/MECHANICS_REGISTRY.yaml`)
-I18 (route : départ, filtres, objectifs d'objets, garde-fous, recette), I19 (trajets, si le bloc 7 est fait) ; entrée
-nouvelle pour l'accessibilité d'une quête trop haute (statut `suppose` sans source) ; poids des statistiques du Mage
-(bloc 4, nouvelle entrée ; A4, A5, A7, A8, B2 si PER8 est avancée). Comptes de `test_registry.py` écrits au commit
-« tests » du bloc concerné.
+I18 (route : départ, quêtes faites, filtres, objectifs d'objets, garde-fous, recette, base adaptée), I19 (vols et
+foyer) ; entrée nouvelle pour l'accessibilité d'une quête trop haute (`suppose` sans source) ; passages attendus d'un
+donjon en boucle (bloc 4b) ; poids des statistiques du Mage (bloc 4 ; A4, A5, A7, A8, B2 si PER8 est avancée). Comptes
+de `test_registry.py` écrits au commit « tests » du bloc concerné.
 
-## Questions ouvertes (à ajouter à `docs/OPEN_QUESTIONS.md`)
-- **RTE3** (précisée) : zone de départ de chaque race, vue en jeu par le pont.
-- **RTE6** : les quêtes d'effort de guerre de Forever sont-elles faisables et rémunérées à bas niveau ? Ne pas
-  trancher sans relevé ; écartées des routes d'ici là.
-- **RXP3** : `ImportGuide` avec la même clé remplace-t-il le guide précédent, y compris après `/reload` ?
-- **FC1** : une échelle Pawn v1 produite par forever s'importe-t-elle dans Forever Companion, et devient-elle active ?
-- **NBIS2** : la liste personnelle `!NBIS1!` s'affiche-t-elle dans la fenêtre BiS de Naowh avec ses lieux de butin ?
-- **GQ1** : les fichiers générés de GearQuest Forever restent-ils stables d'une version à l'autre (modules de classe en
-  retard sur le cœur) ?
+## Questions ouvertes (`docs/OPEN_QUESTIONS.md`)
+- **RTE3** (précisée) : zone de départ et vols connus, vus en jeu par le pont.
+- **RTE6** : les quêtes d'effort de guerre de Forever sont-elles faisables et rémunérées à bas niveau ? Écartées des
+  routes d'ici là.
+- **RXP3** : deux imports du même guide laissent deux entrées `clé|n` dans `RXPDB` : laquelle RestedXP charge-t-il au
+  démarrage, et le bouton Remove de `/rxp import` efface-t-il vraiment un guide importé ?
+- **FC1** : une échelle Pawn v1 produite par forever s'importe-t-elle dans Forever Companion ?
+- **NBIS2** : la liste `!NBIS1!` personnelle s'affiche-t-elle chez Naowh avec ses lieux de butin ?
+- **GQ1** : les fichiers générés de GearQuest Forever restent-ils stables d'une version à l'autre ?
 
 ## Hors périmètre
-Vols et foyer au-delà du bloc 7 ; quêtes lancées par un objet (RX2) ; SIM1 ; poids et BiS calculés des autres classes
-(leurs tranches) ; écriture dans les SavedVariables d'un addon tiers (Forever Companion, Naowh, RestedXP, GearQuest,
-EllesmereUI) ; appel d'une fonction interne d'un addon tiers ; recopie de leur code ou de leurs données dans le dépôt ;
-reprise d'étapes de RestedXP.
+Quêtes lancées par un objet (RX2, après la sortie) ; SIM1 ; poids et BiS calculés des autres classes ; écriture dans
+une SavedVariable d'un addon tiers autre que le retrait du bloc 2 accordé ; appel d'une fonction interne d'un addon
+tiers ; texte des parcours de RestedXP dans le dépôt ; tout guide payant ou chiffré.
 
 ## Risques
-- **Fenêtre de jeu courte** : sept jours de bêta pour les blocs 1, 2, 3 et 5 ; si un essai échoue tard, la correction
-  ne sera essayée qu'au 4 novembre. Mitigation : routes d'abord, fusion dès la CI verte (question 1).
-- **Recette trop stricte** : un parcours de RestedXP peut passer par une zone que nos données ne couvrent pas (quêtes
-  sans donneur, RTE4) ; la comparaison porte sur les zones, pas sur les quêtes, et l'écart est expliqué plutôt que
-  forcé.
-- **Remplacement dans RestedXP** non garanti sans fonction publique de retrait : repli sur le nom stable et RXP3.
-- **Formats tiers mouvants** (Naowh plusieurs versions par semaine, GearQuest en bêta) : version relevée dans la
-  provenance, changement signalé par `forever addons status`.
-- **Refonte de la fenêtre** sans jeu pour l'essayer avant le 4 novembre : maquettes validées d'abord, banc lupa étendu,
-  ancienne fenêtre gardée derrière un réglage jusqu'à l'acceptation.
+- **Fenêtre de jeu courte** : routes d'abord, base adaptée pour que l'essai du 17 serve même si l'optimiseur n'est pas
+  encore réglé ; fusion dès la CI verte.
+- **Réglage de l'optimiseur long** : il continue hors jeu jusqu'au 3 novembre ; la base adaptée couvre les tranches où
+  il reste moins bon, et l'aperçu dit laquelle des deux est livrée.
+- **Licence** : adaptation pour l'usage personnel et non commercial de l'utilisateur seulement, attribution dans chaque
+  guide livré ; rien n'est publié ni redistribué.
+- **Cache de RestedXP** : doublons possibles avant le bloc 2 ; retrait sûr jeu fermé.
+- **Formats tiers mouvants** : version relevée dans la provenance, changement signalé par `forever addons status`.
+- **Refonte sans jeu avant le 4 novembre** : maquettes validées d'abord, banc lupa étendu, ancienne fenêtre gardée.
 
 ## Angles morts (prévus)
-- Vols et pierre de foyer absents si le bloc 7 n'est pas fait : routes plus lentes en temps réel que leur estimation
-  dès que RestedXP prend un vol (effet : sous-estimation du temps, surtout au-delà de la zone de départ).
-- Monstres tués en chemin (RTE5) et quêtes lancées par un objet (RTE4) absents : XP par heure sous-estimée pour la
-  première, quêtes manquantes pour la seconde.
-- Poids des autres classes repris de Forever Companion (`suppose`) : classement BiS non calculé hors Mage.
+- Monstres tués en chemin (RTE5) et quêtes lancées par un objet (RTE4) : XP par heure sous-estimée, quêtes manquantes.
+- Au-delà des parcours gratuits (après le niveau 22 environ), la qualité repose sur les réglages appris en dessous,
+  sans référence pour la vérifier.
+- Poids des autres classes repris de Forever Companion (`suppose`).
 
 ## Étapes d'exécution
-1. Validation du plan et réponses aux dix questions ; bloc 0 committé sur `main` (`CJ1: intégration…`).
-2. Pour chaque bloc : `git fetch`, branche depuis `origin/main`, tests d'abord (`CJ1: tests (bloc N)`), puis
+1. Bloc 0 committé sur `main` avec cette révision.
+2. Pour chaque bloc : `git fetch`, branche `cj1-N` depuis `origin/main`, tests d'abord (`CJ1: tests (bloc N)`), puis
    `CJ1: bloc N vert` ; `uv run tasks.py quick` pendant le travail ; `uv run ruff check . --no-cache` et
    `uv run tasks.py verify` une fois avant de pousser ; CI verte sous Ubuntu et Windows ; fusion en fast-forward
-   (revérifier `origin/main` juste avant, la veille y pousse) ; plugin et skills touchés mis à jour
-   (`forever-routes`, `forever-builds`) ; ForeverBridge réinstallé ; pont arrêté puis relancé ; procédure d'essai
-   donnée en une dizaine de lignes ; arrêt pour ton essai.
+   (revérifier `origin/main` juste avant) ; plugin et skills touchés mis à jour (`forever-routes`, `forever-builds`) ;
+   ForeverBridge réinstallé ; pont arrêté puis relancé ; procédure d'essai donnée ; arrêt pour ton essai.
 3. Fin de tranche : `/verifier`, résumé (Bloqué sur moi, Fait, Tests ajoutés, Registre modifié, Questions ouvertes,
    Angles morts), clôture à ton accord.
 
 ## Critères de fin
-Blocs 0 à 6 (et 7 s'il est fait) fusionnés et **acceptés en jeu par l'utilisateur** ; route 1 à 10 de chaque race
-conforme aux garde-fous et à la recette, ou refusée avec l'écart ; questions dans le chat, compteur cohérent, aperçu
-unique, livraison d'office et remplacement ; plan de talents dès le niveau 1 ; poids et liste BiS exportés vers
-Forever Companion et Naowh ; EllesmereUI éteint par défaut ; nouvelle fenêtre sans débordement ; registre à jour ;
+Blocs 0 à 6 et 4b fusionnés et **acceptés en jeu par l'utilisateur** ; pour chaque zone de départ et tranche couverte,
+notre route aussi bonne que le parcours gratuit (question 11) ou la base adaptée livrée avec l'écart dit ; départ
+réel et quêtes faites ; donjons et quêtes de classe par défaut ; questions dans le chat, compteur cohérent, aperçu
+unique, livraison d'office, retrait sûr ; plan de talents dès le niveau 1 ; poids et liste BiS exportés ; route
+d'équipement ; EllesmereUI éteint par défaut ; nouvelle fenêtre sans débordement ; registre à jour ;
 `test_addon_rules.py` et `check_addon.py` verts ; `uv run tasks.py verify` vert.

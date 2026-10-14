@@ -806,3 +806,45 @@ des noms et des chemins `fichier:ligne` sont repris (détail dans `tasks/EX1-pla
   Bloc Broker des DataBars : lit tout objet LibDataBroker.
 - **Bibliothèques** : LibSerialize MINOR 7 (MIT) et LibDeflate 1.0.2 (zlib), même copie chez Naowh et EllesmereUI ;
   copiées pour les tests seulement dans `tests/fixtures/third_party/` (décision 267).
+
+## Relevé du 2026-10-14 (audit des capacités, CJ1, décisions 272 et 276)
+
+Lecture locale seule (`.toc` et fichiers de données), aucun code recopié, aucune écriture. Carte complète
+« besoin → addon → verdict » dans `tasks/plan-corrections-jeu.md` (section « Étude de l'existant ») ; base de l'audit
+archivée dans `tasks/archive/audit-addons-capacites-2026-10-14.md`.
+
+### Versions
+| Addon | Version | Écart avec les relevés précédents |
+| --- | --- | --- |
+| Naowh Forever | 1.1.15 | 1.1.12 dans le plan d'EX1 ; listes BiS « updated 11 Oct 2026 » pour les 28 spécialisations |
+| Forever Companion | 1.0.0, `dataVersion` 88 (`updated` 2026-10-12) | v79 au 2026-10-06 ; ajouts : `Scales.lua`, `ScalesOverlay.lua`, `Data/Weights.lua`, `Data/Training.lua`, `Data/Nodes.lua` |
+| Forever Guide | 1.35.1 | 1.25.7 en septembre |
+| GearQuest Forever | cœur 0.5.5-beta, modules de classe 0.3.6-beta | 0.3.6-beta au 2026-10-07 |
+| Talents Forever Book | 0.38.2 (données du build 70291, 2026-10-08, `codeVersion` 6) | 0.37.1 au 2026-10-07 |
+| RestedXP (RXPGuides) | v4.11.23 | réinstallé ; parcours gratuits en clair dans `Guides/Forever/` |
+| SkillUp Forever | 0.9.3 | 0.9.2 au 2026-10-10 |
+| FojjiCore | **absent** | 3.1.5 au 2026-10-10 ; retiré entre le 10 et le 14 octobre |
+
+### Capacités (structure seulement)
+- **Forever Companion** : échelles de statistiques livrées (`ForeverCompanionData.weights[classe]`, présentées comme des
+  échelles Wowhead), échelles personnelles dans `ForeverCompanionDB` (`global.custom_scales`), échelle active par
+  personnage ; import et export texte **Pawn v1** (`Scales.Export`, `Scales.ParsePawn`, Options, « Import scale… ») ;
+  aucune API publique pour régler une échelle. BiS : `bis[classe][spé]["BETA"]` par emplacement, sans niveau ; source,
+  lieu et taux par objet dans `Data/Dictionary.lua`. Rotations par jetons (texte ou sort). Onglet « BiS Talents »
+  (builds par arbre et rang, sans ordre de prise). Commandes `/fc`, `/bis`.
+- **Naowh Forever** : BiS (« Import a list », `ns.ImportBisList`, une liste par spécialisation, sans niveau ni phase) ;
+  Stat Weights (« Import weights », `SW.Import` : `NFSW1:` ou export EP de WoWSims) ; Naowh Score fondé sur le niveau
+  d'objet, la qualité et le niveau requis, **sans les poids** ; Training « Level by level » (`!NFB1!`, relevé par EX1).
+- **GearQuest Forever** : `GQ.Data.<classe>Picks` (objet, emplacement, niveaux, rang, spécialisation, camp, score ;
+  `origin` facultatif) dans des fichiers Lua générés (1 à 9 fait main pour l'Alliance, modèle de 10 à 59, guides au
+  60) ; poids « TBC stat priority » pour réordonner sous le 60 ; `GearQuestForeverDB` ne garde que les chasses et les
+  objets obtenus, pas les recommandations ; `/gq`.
+- **Forever Guide** : GearAdvisor (comparaison de l'équipement complet par rôle et objectif), GearCalc (scénario par
+  incantation), GearExplain ; poids en unités WoWSims ; `ns.GEAR_DATA` (build 70291).
+- **RestedXP** : parcours gratuits par zone de départ (Northshire → Elwynn Forest, Coldridge Valley → Dun Morogh,
+  Shadowglen → Teldrassil, Durotar, Tirisfal Glades, Mulgore, Zephras Isle pour les Skyborne des deux camps), variantes
+  Mage « AoE » et « ADV » ; guides importés mis en cache dans `RXPDB` sous `clé|n` ; bouton Remove de `/rxp import`
+  (question RXP3) ; licence CC BY-NC-SA 4.0 (`LICENSE`).
+- **EllesmereUI** 9.5.4 : API publique d'habillage (`SKINNING_API.md` : `RegisterSkin`, couleur d'accent, police,
+  `OnLooksChanged`) et de modules (`PLUGINS_API.md`) ; accent « bronze doux » sur le client Forever ; polices dans
+  `media\fonts\` enregistrées dans LibSharedMedia.

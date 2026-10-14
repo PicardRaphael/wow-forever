@@ -256,6 +256,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   Complément du 2026-10-14 (RX1c) : le départ est désormais le donneur d'une quête permise au niveau de départ, au
   niveau le plus proche ; le parcours gratuit Horde 1 → 22 de RestedXP prend 39 vols et 24 fois la pierre de foyer,
   que nos trajets ignorent (`docs/research/rxp-comparaison.md`).
+  Complément du 2026-10-14 (CJ1, décision 277) : un Gnome de niveau 1 à Coldridge Valley recevait une route partant
+  d'Elwynn Forest (position du contexte jamais transmise, départage par identifiant de quête) ; la route partira de la
+  carte et des coordonnées du contexte, sinon du premier donneur du parcours gratuit de la race ; vols connus vus par
+  le pont ou gardés au profil (CJ1, bloc 1d).
 - **RTE4 — Où placer une quête lancée par un objet ou une nouvelle quête de Forever sans donneur positionné ?**
   Ajoutée le 2026-10-14 (RX1c, décision 268). 832 quêtes du livre sont écartées des routes faute de donneur
   positionné ; le parcours gratuit du Chasseur Horde 1 → 22 de RestedXP en prend 5 (dont deux lancées par un objet et
@@ -265,6 +269,11 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   simulation ne crédite que les monstres des objectifs ; les parcours de RestedXP comptent sur les monstres croisés et
   placent des étapes « farm jusqu'au niveau N ». Test : XP de monstres relevée par ForeverLogger entre deux arrêts
   d'une route suivie en jeu. Priorité : moyenne. Registre I18.
+- **RTE6 — Les quêtes d'effort de guerre de Forever (« The Alliance Needs… », rendues à Ironforge) sont-elles
+  faisables et rémunérées à bas niveau ?** Ajoutée le 2026-10-14 (CJ1). Connues de Questie seulement, de niveau
+  maximal avec un niveau minimal de 1, sans masque de race, XP de Questie (`suppose`) ; une route 1 → 10 les prenait.
+  Ne pas trancher sans relevé : écartées des routes d'ici là (décision 277, garde-fous). Test : une quête prise en jeu
+  à bas niveau, XP relevée par ForeverLogger. Priorité : basse. Registre I18.
 - **LVL18 — « Vile Familiars » (792) demande-t-elle vraiment la quête 1485 sur Forever ?** Ajoutée le 2026-10-14
   (RX1c). Nos sources lui donnent un prérequis « un parmi » 1485, quête d'une autre classe : 792, 794 et 805 sont donc
   écartées des routes de la Horde, alors que le parcours gratuit de RestedXP les fait. Ne pas trancher sans relevé.
@@ -493,6 +502,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   directement ?** Ajoutée le 2026-10-14 (RX1, bloc D). ForeverBridge appelle `RXP:ScheduleTask` sur
   `RXPFrame.GenerateMenuTable` (objet `RXP` global « pour le débogage » dans `RXPGuides.lua`, non garanti). Test
   (facultatif, décision 247) : livraison d'une route, menu des guides ouvert aussitôt. Priorité : basse.
+- **RXP3 — Deux imports du même guide : lequel RestedXP charge-t-il, et son bouton Remove efface-t-il vraiment un
+  guide importé ?** Ajoutée le 2026-10-14 (CJ1). Lu dans RXPGuides 4.11.23 : `CacheGuide` range chaque import sous
+  `clé|n` dans `RXPDB` (`GuideLoader.lua:371-388`), le démarrage relit toutes les entrées (`:774-837`), et le bouton
+  Remove de `/rxp import` efface l'entrée `clé` sans suffixe (`UI/V2/GuideImporter.lua:1052`) : le guide reviendrait au
+  `/reload`. Test (CJ-2) : livrer deux fois la route d'un personnage, `/reload`, compter les guides du groupe
+  « Forever Routes » ; Remove puis `/reload`. Réponse attendue avant la commande de retrait sûr (CJ1, bloc 2).
+  Priorité : haute.
 - **PRO1 — Les métiers secondaires (Cooking, First Aid, Fishing) sont-ils « abandonnables » dans `GetSkillLineInfo` de Forever ?** Ajoutée le 2026-10-14 (RX1, bloc E). ForeverBridge 0.3.0 n'envoie que les lignes abandonnables (métiers principaux, et secondaires si le client les marque ainsi) ; `suppose`. Test (facultatif, décision 247) : `/dump GetSkillLineInfo(i)` sur une ligne de métier secondaire. Priorité : basse.
 - **NFB1 — Un build exporté par Naowh Forever (`!NFB1!`) se relit-il à l'identique par notre codec, et un code produit
   par forever s'importe-t-il ?** Ajoutée le 2026-10-13 (EX1, décision 255), précisée le 2026-10-14 (plan d'EX1,
@@ -515,6 +531,15 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   est affectée à un profil (`specProfiles`). Règle retenue : dans ce cas ForeverBridge le signale une fois et **ne
   bascule pas** (jamais de lutte). Reste à voir en jeu si, sans affectation, la bascule de ForeverBridge tient après
   un `/reload` et une nouvelle connexion. Test (facultatif, décision 247). Priorité : basse (EX1).
+- **FC1 — Une échelle Pawn v1 produite par forever s'importe-t-elle dans Forever Companion et devient-elle active ?**
+  Ajoutée le 2026-10-14 (CJ1, bloc 4) : import par Options, « Import scale… » (`Scales.ParsePawn`), échelle gardée
+  dans `ForeverCompanionDB` (jamais écrite par forever). Test : CJ-4, à la sortie. Priorité : moyenne.
+- **NBIS2 — La liste BiS personnelle `!NBIS1!` s'affiche-t-elle dans la fenêtre BiS de Naowh avec ses lieux de
+  butin ?** Ajoutée le 2026-10-14 (CJ1, bloc 4) : bouton « Import a list » de la fenêtre BiS (`ns.ImportBisList`).
+  Test : CJ-4, à la sortie. Priorité : moyenne.
+- **GQ1 — Les fichiers générés de GearQuest Forever restent-ils lisibles d'une version à l'autre ?** Ajoutée le
+  2026-10-14 (CJ1, bloc 4) : cœur 0.5.5-beta, modules de classe 0.3.6-beta, en-têtes qui annoncent un autre nom de
+  fichier que le vrai ; suivi par `forever addons status`. Priorité : basse.
 - **BR6 — L'export SimulationCraft omet-il vraiment l'emplacement à distance (18) sur Forever ?** Oui pour la
   baguette : le premier export réel (sonde G, `tests/fixtures/simc/mage19_sonde_g.txt`) n'a pas de ligne `ranged=`
   alors que le contexte du même instant porte l'emplacement 18 (Greater Magic Wand). Reste à voir avec une arme à
