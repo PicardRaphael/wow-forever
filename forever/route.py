@@ -907,7 +907,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
         """Temps par monstre : relevés du joueur d'abord ; à défaut, moteur du Mage (combat, repos, course), sinon
         estimation (combat seul, sous-estime la durée)."""
         if level not in kill_memo:
-            found = kill_time(kp, class_name=cls, level=level, measures=measures)
+            found = kill_time(kp, class_name=cls, level=level, measures=measures, camp=True)
             if cls == MAGE and found.source != "measured":
                 from forever.sim.objectives import _engine_kill_time
 

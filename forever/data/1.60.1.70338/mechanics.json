@@ -800,11 +800,12 @@
    "value": {
     "min_samples": 5,
     "band_levels": 5,
-    "pause_s": 120.0
+    "pause_s": 120.0,
+    "camp_pause_s": 45.0
    },
    "certainty": "suppose",
    "registry": "I15",
-   "source": "paramètres de mesure (T04d, bloc E) : relevés minimaux d'une tranche avant de remplacer l'estimation, largeur des tranches de niveaux, pause au-delà de laquelle deux gains d'XP de ForeverLogger ne sont plus de la même séance"
+   "source": "paramètres de mesure (T04d, bloc E) : relevés minimaux d'une tranche avant de remplacer l'estimation, largeur des tranches de niveaux, pause au-delà de laquelle deux gains d'XP de ForeverLogger ne sont plus de la même séance ; camp_pause_s (CJ1, 2026-10-14) : intervalle au-delà duquel le joueur change de camp ou rend une quête ; pour une route, dont les trajets sont comptés à part, seuls les intervalles plus courts mesurent le temps par monstre (choix de méthode d'après la distribution des intervalles relevés, Chasseur, Chaman et Mage de 1 à 20)"
   },
   "leveling.objectives": {
    "value": {

@@ -55,6 +55,7 @@ class KillParams(NamedTuple):
     estimate_low_s: float
     estimate_high_s: float
     estimate_source: str
+    camp_pause_s: float | None = None  # CJ1 : intervalles « au camp » pour les routes (trajets comptés à part)
 
 
 DAMAGE_SUFFIXES = ("_DAMAGE", "_DAMAGE_LANDED")
@@ -76,6 +77,7 @@ def kill_params(values: dict[str, Any]) -> KillParams:
             estimate_low_s=float(estimate["value"]["low_s"]),
             estimate_high_s=float(estimate["value"]["high_s"]),
             estimate_source=str(estimate.get("source", "")),
+            camp_pause_s=float(measure["camp_pause_s"]) if "camp_pause_s" in measure else None,
         )
     except (KeyError, TypeError, ValueError) as exc:
         raise DataSchemaError(
@@ -187,26 +189,38 @@ def measure_kill_times(params: KillParams, *, logs: Sequence[Path], loggers: Seq
                 intervals = kill_cadence(gains, pause_s=params.pause_s)
                 if cls and intervals:
                     groups.setdefault((cls, _band(level, params.band_levels), "cadence"), []).extend(intervals)
+                camp = kill_cadence(gains, pause_s=params.camp_pause_s) if params.camp_pause_s else []
+                if cls and camp:  # CJ1 : au camp, pour les routes
+                    groups.setdefault((cls, _band(level, params.band_levels), "camp"), []).extend(camp)
     bands = [_summary(cls, band, method, values) for (cls, band, method), values in sorted(groups.items())]
     return {"bands": bands, "unattributed": unattributed}
 
 
-def kill_time(params: KillParams, *, class_name: str, level: int, measures: dict[str, Any] | None) -> KillTime:
+def kill_time(
+    params: KillParams, *, class_name: str, level: int, measures: dict[str, Any] | None, camp: bool = False
+) -> KillTime:
     """Temps par monstre d'une classe sans moteur : mesuré si la tranche a assez de relevés (cadence de ForeverLogger
     d'abord, qui compte repos et trajet comme le moteur du Mage ; durée des combats des journaux ensuite), sinon
-    estimé.
+    estimé. `camp` (CJ1, routes) : la cadence au camp d'abord (intervalles courts, trajets comptés à part par la route).
 
     Registre : I15"""
     cls = class_name.lower()
     candidates = [
         b
         for b in (measures or {}).get("bands", [])
-        if b["class"] == cls and b["level_min"] <= level <= b["level_max"] and b["samples"] >= params.min_samples
+        if b["class"] == cls
+        and b["level_min"] <= level <= b["level_max"]
+        and b["samples"] >= params.min_samples
+        and (camp or b["method"] != "camp")
     ]
     if candidates:
-        best = min(candidates, key=lambda b: (b["method"] != "cadence", -b["samples"]))
+        order = ("camp", "cadence", "journaux") if camp else ("cadence", "journaux")
+        best = min(candidates, key=lambda b: (order.index(b["method"]), -b["samples"]))
         combat = best["method"] == "journaux"
-        method = "durée des combats (journaux)" if combat else "cadence des gains (ForeverLogger)"
+        if best["method"] == "camp":
+            method = "cadence des gains au camp (ForeverLogger)"
+        else:
+            method = "durée des combats (journaux)" if combat else "cadence des gains (ForeverLogger)"
         return KillTime(
             cls,
             level,
@@ -217,7 +231,7 @@ def kill_time(params: KillParams, *, class_name: str, level: int, measures: dict
             best["samples"],
             "probable",
             method,
-            "combat" if combat else "total",
+            "combat" if combat else ("camp" if best["method"] == "camp" else "total"),
         )
     low, high = params.estimate_low_s, params.estimate_high_s
     return KillTime(cls, level, "estimated", (low + high) / 2, low, high, 0, "suppose", "estimé", "combat")
