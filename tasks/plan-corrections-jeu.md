@@ -116,7 +116,9 @@ quêtes raciales du Prêtre. Conséquence : nos routes placent elles-mêmes les 
   recette (1c) ; (2) **idées à reprendre**, réécrites et citées : paquets par visite de zone et pôles de quêtes,
   pénalité de changement de zone et règle « zone de départ d'abord, pas de changement de continent avant le 10 »,
   construction aléatoire pondérée et recuit avec redémarrages, passe de robustesse, route commune par camp au-delà des
-  zones de départ ; (3) **contribution**, plus tard et sur ton accord : nos relevés réels (temps par monstre, XP des
+  zones de départ, **sauf sa règle sur les donjons** (pour son modèle, un donjon ne bat jamais les quêtes en solo) : nos
+  routes incluent toujours par défaut les donjons avec leurs quêtes au premier passage et les quêtes de classe
+  (décisions 277 et 278) ; (3) **contribution**, plus tard et sur ton accord : nos relevés réels (temps par monstre, XP des
   quêtes de Forever) leur manquent ; une issue pour les écarts que la recette trouvera.
 
 ## Constats (dépôt, 2026-10-14 ; chemins `fichier:ligne` pour la relecture)
