@@ -52,7 +52,9 @@ def test_plugin_json_has_a_semver_version():
     # 0.12.0 : feuilles de route (skill forever-routes, outil forever_route, routeur), RX1.
     # 0.12.1 : métiers et comparaison avec Factoruide dans forever-routes (RX1, blocs G et H).
     # 0.13.0 : code Naowh Forever à côté du lien Talents Forever, macros et profils EllesmereUI (forever-builds, EX1).
-    assert version == "0.13.0"
+    # 0.14.0 : feuilles de route de CJ1 (race, position, personnage, base adaptée, questions sous la réponse, livraison
+    # sous un nom stable, retrait sûr), forever-routes.
+    assert version == "0.14.0"
 
 
 def test_fingerprint_is_up_to_date():
