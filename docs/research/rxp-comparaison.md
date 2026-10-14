@@ -25,32 +25,32 @@ RestedXP). Au-delà, tout est payant : la comparaison s'arrête donc au niveau 2
 
 | Personnage, tranche | forever | RestedXP rejoué | Trajet (forever / RXP) | Objectifs | Farm |
 |---|---|---|---|---|---|
-| Mydream, Orc Chasseur, 15 → 22 | 8,4 h · 16 359 XP/h · 55 quêtes | 11,2 h · 12 301 XP/h · 58 quêtes | 5,1 h / 7,4 h | 2,4 h / 2,0 h | 0,7 h / 1,5 h |
-| Orc Chasseur, 1 → 22 | 13,4 h · 16 043 XP/h · 136 quêtes | 19,1 h · 11 264 XP/h · 107 quêtes | 7,1 h / 10,4 h | 5,3 h / 3,4 h | 0,3 h / 4,8 h |
-| Orc Chasseur, 12 → 22 | 9,4 h · 18 334 XP/h · 96 quêtes | 13,3 h · 12 900 XP/h · 55 quêtes | 4,1 h / 6,3 h | 4,5 h / 1,9 h | 0,3 h / 4,8 h |
-| Orc Mage, 1 → 22 | 15,3 h · 14 117 XP/h · 125 quêtes | 19,5 h · 11 048 XP/h · 126 quêtes | 9,5 h / 12,3 h | 5,1 h / 3,4 h | 0,0 h / 3,2 h |
+| Mydream, Orc Chasseur, 15 → 22 | 8,4 h · 16 359 XP/h · 55 quêtes | 11,2 h · 12 214 XP/h · 60 quêtes | 5,1 h / 7,5 h | 2,4 h / 2,1 h | 0,7 h / 1,3 h |
+| Orc Chasseur, 1 → 22 | 13,4 h · 16 043 XP/h · 136 quêtes | 18,9 h · 11 428 XP/h · 111 quêtes | 7,1 h / 11,3 h | 5,3 h / 3,5 h | 0,3 h / 3,5 h |
+| Orc Chasseur, 12 → 22 | 9,4 h · 18 334 XP/h · 96 quêtes | 13,3 h · 12 917 XP/h · 57 quêtes | 4,1 h / 6,4 h | 4,5 h / 2,0 h | 0,3 h / 4,6 h |
+| Orc Mage, 1 → 22 | 15,3 h · 14 117 XP/h · 125 quêtes | 19,4 h · 11 090 XP/h · 127 quêtes | 9,5 h / 12,2 h | 5,1 h / 3,5 h | 0,0 h / 3,1 h |
 | Orc Mage, 12 → 21 (Mage AoE) | 6,8 h · 21 589 XP/h · 78 quêtes | 9,0 h · 16 193 XP/h · 44 quêtes | 3,8 h / 5,1 h | 2,6 h / 1,0 h | 0,1 h / 2,7 h |
 
-Partir au milieu d'un parcours (Mydream au niveau 15) le pénalise : 51 rendus de quêtes prises avant le niveau 15
-sont impossibles dans le rejeu. Les tranches 1 → 22 sont les plus justes.
+Partir au milieu d'un parcours (Mydream au niveau 15) le pénalise : 46 objectifs ou rendus de quêtes prises avant
+le niveau 15 sont impossibles dans le rejeu. Les tranches 1 → 22 sont les plus justes.
 
 ## 3. Pourquoi notre route paraît plus rapide
 
 1. **Le farm du rejeu est surestimé.** RestedXP place des étapes « farm jusqu'au niveau N » (vers 16, 21, 22) en
    comptant sur les monstres tués en chemin ; notre rejeu ne crédite que les monstres des objectifs. Le rejeu arrive
-   donc en retard à ces étapes et farme 4,8 h (35 % de l'XP) sur la tranche 1 → 22 du Chasseur. Sans le farm, l'écart
-   tombe de 13,4 h contre 19,1 h à 13,2 h contre 14,3 h : **environ 8 % en notre faveur, pas 30 %**.
+   donc en retard à ces étapes et farme 3,5 h (32 % de l'XP) sur la tranche 1 → 22 du Chasseur. Sans le farm, l'écart
+   tombe de 13,4 h contre 18,9 h à 13,2 h contre 15,4 h : **environ 15 % en notre faveur, pas 30 %**.
 2. **Nos trajets ignorent les vols et la pierre de foyer.** Le parcours Horde 1 → 22 compte 39 vols, 24 usages de
    la pierre de foyer et 26 changements de lieu de foyer ; notre modèle de trajet marche partout (aucun vol connu,
    pas de foyer). Le trajet représente plus de la moitié du temps des deux côtés (7,1 h et 10,4 h sur 1 → 22) : c'est
-   le poste le plus incertain (TRV1, RTE3).
-3. **Notre optimiseur préfère les quêtes à tuer.** 119 arrêts d'objectif chez nous contre 59 chez RestedXP sur
-   1 → 22 ; XP des objectifs 111 073 contre 52 936, XP des rendus 98 884 contre 87 129. Notre avance tient surtout à
+   le poste le plus incertain (TRV1, RTE3). Une fois les vols comptés, l'écart restant de l'Orc Chasseur 1 → 22
+   (11,3 h de trajet contre 7,1 h) peut s'inverser.
+3. **Notre optimiseur préfère les quêtes à tuer.** 119 arrêts d'objectif chez nous contre 61 chez RestedXP sur
+   1 → 22 ; XP des objectifs 111 073 contre 54 844, XP des rendus 98 884 contre 92 389. Notre avance tient surtout à
    l'XP des monstres d'objectif, dont le nombre est souvent estimé (`kills_per_quest`, suppose) : à vérifier sur des
    mesures avant d'y croire.
-4. **Quêtes que nous ne savons pas placer.** Sur 182 quêtes prises par le parcours du Chasseur 1 → 22, 26 manquent à
-   notre monde de route : 10 d'une autre classe (RestedXP les liste toutes, le jeu trie : sans effet), 5 sans donneur
-   positionné (quêtes lancées par un objet, nouvelles quêtes de Forever comme la série du camping), 6 écartées par une
+4. **Quêtes que nous ne savons pas placer.** Sur 171 quêtes prises par le parcours du Chasseur 1 → 22, 16 manquent à
+   notre monde de route : 5 sans donneur positionné (quêtes lancées par un objet, nouvelles quêtes de Forever comme la série du camping), 6 écartées par une
    chaîne qui en dépend, 3 de donjon (comparaison sans donjon), 1 sans niveau connu, 1 autre.
 5. **Ordre des zones.** Les deux routes font les Tarides puis Stonetalon ; RestedXP revient trois fois à
    Orgrimmar (maître de classe, foyer), nous passons par Mulgore et Thunder Bluff.
