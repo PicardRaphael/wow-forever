@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import shutil
 from collections.abc import Callable, Mapping
@@ -15,6 +16,9 @@ import pytest
 from forever.config import Deps
 
 LOCAL_HOSTS = ["127.0.0.1"]  # boucle asyncio de Windows : paire de sockets locale (tests MCP)
+
+# LN1 : la suite ne cherche jamais le client sur les disques réels du poste (`default_deps`, sous-processus compris).
+os.environ["FOREVER_WOW_NO_DRIVES"] = "1"
 
 
 _MCP_IMPORT = re.compile(r"^\s*(from mcp[ .]|import mcp\b)", re.MULTILINE)

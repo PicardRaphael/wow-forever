@@ -14,7 +14,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from forever import __version__
-from forever.installs import no_drives
+from forever.installs import fixed_drives, no_drives, survey
 from forever.pipeline.http_client import urllib_get
 from forever.pipeline.live_logs import detect_game_running
 
@@ -35,8 +35,8 @@ FETCH_TIMEOUT = 30.0  # téléchargement d'une table CSV (plusieurs Mo)
 FETCH_ATTEMPTS = 3
 FETCH_BACKOFF = (5.0, 15.0)
 USER_AGENT = f"forever-core/{__version__}"
-DEFAULT_WOW_DIR = Path(r"C:\Program Files (x86)\World of Warcraft\_classic_beta_")
-FALLBACK_WOW_DIR = DEFAULT_WOW_DIR
+# Repli quand aucune installation n'est trouvée ni déclarée (LN1 : le choix vient de `forever.installs`).
+FALLBACK_WOW_DIR = Path(r"C:\Program Files (x86)\World of Warcraft\_classic_beta_")
 # Mesure des journaux : au-delà de cet écart, deux sorts instantanés ne sont pas « enchaînés » (paramètre de
 # l'outil, modifiable par --max-gap ; ce n'est pas une règle du jeu).
 CHAIN_MAX_GAP_S = 3.0
@@ -93,25 +93,37 @@ def default_cache_dir(environ: Mapping[str, str] = os.environ) -> Path:
     return Path(configured) if configured else Path.home() / ".cache" / "forever"
 
 
-# Emplacements usuels du client sous Windows, dans l'ordre d'essai (Program Files 32 bits, puis 64 bits).
-WOW_DIR_CANDIDATES: tuple[Path, ...] = (
-    DEFAULT_WOW_DIR,
-    Path(r"C:\Program Files\World of Warcraft\_classic_beta_"),
-)
+def deps_drives(environ: Mapping[str, str]) -> Callable[[], list[Path]]:
+    """Disques fixes examinés pour trouver le client ; aucun si `FOREVER_WOW_NO_DRIVES` est posée (suite de tests :
+    jamais l'installation réelle du poste)."""
+    return no_drives if environ.get("FOREVER_WOW_NO_DRIVES", "") not in ("", "0") else fixed_drives
 
 
-def default_wow_dir(environ: Mapping[str, str] = os.environ, exists: Callable[[Path], bool] = Path.is_dir) -> Path:
-    """FOREVER_WOW_DIR, sinon le premier dossier de `WOW_DIR_CANDIDATES` présent, sinon le dossier de la bêta Forever
-    sous Program Files (x86)."""
-    configured = environ.get("FOREVER_WOW_DIR")
-    if configured:
-        return Path(configured)
-    return next((p for p in WOW_DIR_CANDIDATES if exists(p)), DEFAULT_WOW_DIR)
+def default_wow_dir(
+    environ: Mapping[str, str] = os.environ,
+    *,
+    drives: Callable[[], list[Path]] | None = None,
+    cache_dir: Path | None = None,
+    data_dir: Path = DATA_DIR,
+) -> Path:
+    """Dossier du client choisi par `forever.installs` (`FOREVER_WOW_FORCE`, version finale adoptée, bêta,
+    `FOREVER_WOW_DIR`, LN1) ; à défaut `FOREVER_WOW_DIR` même absent, sinon `FALLBACK_WOW_DIR`."""
+    choice, _ = survey(
+        environ,
+        drives=drives or deps_drives(environ),
+        cache_dir=cache_dir or default_cache_dir(environ),
+        data_dir=data_dir,
+    )
+    if choice.folder is not None:
+        return choice.folder
+    configured = environ.get("FOREVER_WOW_DIR", "").strip()
+    return Path(configured) if configured else FALLBACK_WOW_DIR
 
 
 def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
     """Dépendances de production ; FOREVER_OFFLINE=1 interdit tout appel réseau."""
-    wow_dir = default_wow_dir(environ)
+    drives = deps_drives(environ)
+    wow_dir = default_wow_dir(environ, drives=drives)
     return Deps(
         data_dir=DATA_DIR,
         registry_path=REGISTRY_PATH,
@@ -122,4 +134,6 @@ def default_deps(environ: Mapping[str, str] = os.environ) -> Deps:
         wow_dir=wow_dir,
         confirm=terminal_confirm,
         game_running=lambda: detect_game_running(wow_dir),
+        environ=environ,
+        drives=drives,
     )

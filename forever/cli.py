@@ -34,11 +34,13 @@ from forever.errors import (
     ForeverError,
     InvalidArgumentError,
     PathNotFoundError,
+    UnknownProductError,
     UnsupportedKindError,
     UsageError,
 )
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.gamedata import build_game_data, load_game_data
+from forever.installs import Choice, Install, roots, same_folder, survey
 from forever.leveling import (
     DEFAULT_RACE,
     MAX_N,
@@ -72,7 +74,9 @@ from forever.pipeline.builds import list_builds
 from forever.pipeline.client_builds import (
     Accepted,
     accept_earlier,
+    adopt_product,
     current_builds,
+    forget_product,
     read_build_info,
     split_by_version,
     version_at,
@@ -897,6 +901,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     pets_measure.add_argument("--addon-sv", required=True, help="SavedVariables ForeverLogger.lua")
 
+    wow = sub.add_parser("wow", help="installations du client sur ce poste : découverte, choix, adoption (LN1)")
+    wow_sub = wow.add_subparsers(dest="wow_command", required=True, parser_class=_Parser)
+    w_list = wow_sub.add_parser("list", help="installations trouvées, rôle, produit, version et choix")
+    w_list.add_argument("--wow-dir", type=Path, help="dossier du client imposé (l'emporte sur tout)")
+    w_list.add_argument("--json", action="store_true", help="sortie JSON")
+    w_adopt = wow_sub.add_parser("adopt", help="inscrire le produit d'un dossier comme version finale (une fois)")
+    w_adopt.add_argument("folder", type=Path, help="dossier de l'installation (…\\World of Warcraft\\_xxx_)")
+    w_adopt.add_argument("--yes", action="store_true", help="accord donné d'avance")
+    w_adopt.add_argument("--json", action="store_true", help="sortie JSON")
+    w_forget = wow_sub.add_parser("forget", help="retirer l'adoption d'un produit")
+    w_forget.add_argument("product", help="produit adopté")
+    w_forget.add_argument("--json", action="store_true", help="sortie JSON")
+
     sub.add_parser("mcp", help="serveur MCP sur stdio")
     hook = sub.add_parser("hook", help="hooks du plugin Claude Code (entrée JSON sur stdin)")
     hook.add_argument(
@@ -1131,7 +1148,10 @@ def _emit_error(deps: Deps, err: ForeverError, as_json: bool) -> int:
 
 def _cmd_status(deps: Deps, args: argparse.Namespace) -> int:
     rep = status_report(deps, allow_network=not args.offline)
-    _emit(rep, render_status(rep), rep["provenance"], args.json)
+    choice, _ = _survey(deps)
+    lines = render_status(rep)
+    lines.append(f"Installation lue : {choice.folder or 'aucune'} ({choice.reason})")
+    _emit({**rep, "installation": choice.as_dict()}, lines, rep["provenance"], args.json)
     return EXIT_OK if rep["integrity"]["ok"] else EXIT_INTEGRITY
 
 
@@ -4551,6 +4571,75 @@ def _cmd_hook(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _survey(deps: Deps, option: Path | None = None) -> tuple[Choice, list[Install]]:
+    return survey(deps.environ, drives=deps.drives, cache_dir=deps.cache_dir, data_dir=deps.data_dir, option=option)
+
+
+ROLE_TEXT = {"beta": "bêta", "final": "version finale", "other": "autre jeu", "unknown": "inconnu"}
+
+
+def _cmd_wow(deps: Deps, args: argparse.Namespace) -> int:
+    if args.wow_command == "adopt":
+        return _cmd_wow_adopt(deps, args)
+    if args.wow_command == "forget":
+        if not forget_product(deps.cache_dir, args.product):
+            raise UnknownProductError(args.product)
+        provenance = local_provenance(deps)
+        _emit(
+            {"forgotten": args.product, "provenance": provenance},
+            [f"Adoption retirée : {args.product}"],
+            provenance,
+            args.json,
+        )
+        return EXIT_OK
+    choice, found = _survey(deps, args.wow_dir)
+    provenance = local_provenance(deps, assumptions=["installations lues sur disque (.build.info, .flavor.info)"])
+    payload = {
+        "installs": [i.as_dict() for i in found],
+        "choice": choice.as_dict(),
+        "reason": choice.reason,
+        "roots": [str(r) for r in roots(deps.environ, deps.drives())],
+        "provenance": provenance,
+    }
+    lines = [f"Installations du client : {len(found)}"]
+    for i in found:
+        mark = " (choisie)" if choice.install is not None and i.folder == choice.install.folder else ""
+        lines.append(
+            f"  {i.folder} · {ROLE_TEXT.get(i.role, i.role)} · {i.product or 'produit illisible'} · "
+            f"{i.version or 'version ?'} · {i.executable}{mark}"
+        )
+        if i.role == "unknown" and i.product is not None:
+            lines.append(f"    produit inconnu : si c'est la version finale, forever wow adopt {i.folder}")
+    lines.append(f"Choix : {choice.folder or 'aucun'} ({choice.reason})")
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _cmd_wow_adopt(deps: Deps, args: argparse.Namespace) -> int:
+    folder = Path(args.folder)
+    if not folder.is_dir():
+        raise InvalidArgumentError(f"Dossier introuvable : {folder}.", "donner un dossier listé par forever wow list")
+    _, found = _survey(deps, folder)
+    install = next((i for i in found if same_folder(i.folder, folder)), None)
+    if install is None:
+        raise InvalidArgumentError(
+            f"Aucune installation dans {folder} (exécutable Wow*.exe absent).",
+            "donner un dossier listé par forever wow list",
+        )
+    prompt = f"Adopter {install.product} ({install.folder}) comme version finale ? [o/N] "
+    asked = install.product is not None and install.role == "unknown" and not args.yes
+    if asked and (deps.confirm is None or not deps.confirm(prompt)):
+        raise InvalidArgumentError("Adoption non confirmée : rien n'est inscrit.", "relancer avec --yes")
+    entry = adopt_product(deps.cache_dir, install, deps.now())
+    provenance = local_provenance(deps)
+    lines = [
+        f"Adopté comme version finale : {entry['product']} ({entry['folder']})",
+        "Ensuite : forever wow list, puis scripts/install_plugin.ps1 (FOREVER_WOW_DIR), voir docs/LANCEMENT.md",
+    ]
+    _emit({"adopted": entry, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
     argv = sys.argv[1:] if argv is None else argv
     try:
@@ -4609,6 +4698,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "chart": _cmd_chart,
         "build": _cmd_build,
         "export": _cmd_export,
+        "wow": _cmd_wow,
     }
     try:
         return handlers[args.command](deps, args)

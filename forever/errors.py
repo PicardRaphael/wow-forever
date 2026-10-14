@@ -211,6 +211,19 @@ class PathNotFoundError(ForeverError):
         super().__init__("path_not_found", f"{what} introuvable : {path}.", action)
 
 
+class UnknownProductError(ForeverError):
+    """Produit absent des adoptions du journal des versions (`forever wow forget`, LN1)."""
+
+    exit_code = EXIT_NOT_FOUND
+
+    def __init__(self, product: str) -> None:
+        super().__init__(
+            "unknown_product",
+            f"Produit non adopté : {product}.",
+            "voir les produits adoptés et leur dossier par forever wow list",
+        )
+
+
 class HotfixBuildMismatchError(ForeverError):
     """`DBCache.bin` d'un autre build que la version décodée (T08c) : ses valeurs ne valent que pour son build."""
 

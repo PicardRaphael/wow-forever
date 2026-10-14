@@ -20,14 +20,14 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any, NamedTuple
 
-from forever.errors import DataSchemaError
-from forever.installs import Install
+from forever.errors import DataSchemaError, InvalidArgumentError
+from forever.installs import NOT_FOREVER_PRODUCTS, ROLE_BETA, ROLE_OTHER, Install, product_of
 from forever.pipeline.builds import version_key
 from forever.timefmt import format_utc
 
 JOURNAL_NAME = "client_builds.json"
 BUILD_INFO = ".build.info"
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2  # 2 : produits adoptés (LN1) ; le schéma 1 se relit
 
 
 class ClientBuild(NamedTuple):
@@ -47,37 +47,60 @@ def _journal_path(cache_dir: Path) -> Path:
 
 def read_build_info(wow_dir: Path) -> ClientBuild | None:
     """Version courante du client, lue dans `.build.info` à la racine de l'installation (le dossier parent de
-    `_classic_beta_`), datée de la dernière écriture du fichier.
+    `wow_dir`), datée de la dernière écriture du fichier.
+
+    Le produit du dossier est lu dans son `.flavor.info` ; à défaut, la ligne d'un produit public dont le dossier est
+    connu, sinon la ligne unique (`forever.installs.product_of`, LN1, décision 271). Il n'est jamais déduit du nom du
+    dossier : attribuer la version d'un autre produit installé à côté est exactement l'erreur que ce journal doit
+    empêcher.
 
     Rend `None` si le fichier est absent ou illisible : l'absence d'un relevé n'est pas une erreur, elle rend
     seulement l'attribution incertaine."""
     path = wow_dir.parent / BUILD_INFO
     if not path.is_file():
         return None
-    try:
-        lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
-        columns = [field.split("!", 1)[0] for field in lines[0].split("|")]
-        version_at_column = columns.index("Version")
-        product_at_column = columns.index("Product")
-        rows = [line.split("|") for line in lines[1:]]
-        # Le fichier liste un produit par ligne (wow, wow_classic_beta…). On exige le produit exact du dossier lu
-        # (`_classic_beta_` -> `wow_classic_beta`) : une correspondance approchée attribuerait la version d'un autre
-        # produit installé à côté, c'est-à-dire exactement l'erreur que ce journal doit empêcher.
-        wanted = f"wow_{wow_dir.name.strip('_')}"
-        matching = [r for r in rows if r[product_at_column].strip() == wanted]
-        if not matching:
-            # Aucun produit ne correspond : acceptable seulement si le fichier n'en décrit qu'un seul.
-            if len(rows) != 1:
-                return None
-            matching = rows
-        chosen = matching[0]
-        build = chosen[version_at_column].strip()
-        if not build:
-            return None
-    except (OSError, IndexError, ValueError, UnicodeDecodeError):
+    product, version, _source = product_of(wow_dir)
+    if product is None or not version:
         return None
-    installed_at = datetime.fromtimestamp(path.stat().st_mtime, tz=UTC)
-    return ClientBuild(build=build, installed_at=installed_at, product=chosen[product_at_column].strip())
+    try:
+        installed_at = datetime.fromtimestamp(path.stat().st_mtime, tz=UTC)
+    except OSError:
+        return None
+    return ClientBuild(build=version, installed_at=installed_at, product=product)
+
+
+def _read_doc(cache_dir: Path) -> dict[str, Any]:
+    path = _journal_path(cache_dir)
+    if not path.is_file():
+        return {}
+    try:
+        doc: Any = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(doc, dict):
+            raise TypeError("objet JSON attendu")
+    except (OSError, ValueError, TypeError) as err:
+        raise DataSchemaError(
+            f"Journal des versions du client illisible ({JOURNAL_NAME}) : {err}.",
+            f"supprimer {path} : il sera reconstruit au prochain relevé (les versions antérieures seront perdues)",
+        ) from err
+    return doc
+
+
+def _write_doc(cache_dir: Path, entries: list[ClientBuild], products: dict[str, dict[str, Any]]) -> None:
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    doc = {
+        "schema_version": SCHEMA_VERSION,
+        "note": (
+            "Versions du client vues sur ce poste, avec la date de la mise à jour (date de .build.info). "
+            "En ajout seulement : sert à attribuer une mesure à la version du client qui l'a produite (T08a). "
+            "products : produits adoptés comme version finale (forever wow adopt, LN1)."
+        ),
+        "builds": [
+            {"build": e.build, "installed_at": format_utc(e.installed_at), "product": e.product, "source": e.source}
+            for e in entries
+        ],
+        "products": products,
+    }
+    _journal_path(cache_dir).write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
 
 
 def load_builds(cache_dir: Path) -> list[ClientBuild]:
@@ -105,27 +128,15 @@ def load_builds(cache_dir: Path) -> list[ClientBuild]:
 
 
 def record_build(cache_dir: Path, build: ClientBuild) -> list[ClientBuild]:
-    """Ajoute `build` au journal s'il n'y est pas déjà, et rend le journal complet.
+    """Ajoute `build` au journal s'il n'y est pas déjà (même build du même produit), et rend le journal complet.
 
     En ajout seulement : un build déjà relevé garde sa **première** date d'installation, qui est la plus proche du
-    moment de la mise à jour."""
+    moment de la mise à jour. Les adoptions (`products`) sont gardées."""
     entries = load_builds(cache_dir) if _journal_path(cache_dir).is_file() else []
-    if any(e.build == build.build for e in entries):
+    if any(e.build == build.build and e.product == build.product for e in entries):
         return entries
     entries = sorted([*entries, build], key=lambda e: e.installed_at)
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    doc = {
-        "schema_version": SCHEMA_VERSION,
-        "note": (
-            "Versions du client vues sur ce poste, avec la date de la mise à jour (date de .build.info). "
-            "En ajout seulement : sert à attribuer une mesure à la version du client qui l'a produite (T08a)."
-        ),
-        "builds": [
-            {"build": e.build, "installed_at": format_utc(e.installed_at), "product": e.product, "source": e.source}
-            for e in entries
-        ],
-    }
-    _journal_path(cache_dir).write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
+    _write_doc(cache_dir, entries, adopted_products(cache_dir))
     return entries
 
 
@@ -231,15 +242,42 @@ def accept_earlier(
 
 def adopted_products(cache_dir: Path) -> dict[str, dict[str, Any]]:
     """Produits adoptés comme version finale (`products` du journal, schéma 2) ; vide pour un journal de schéma 1."""
-    raise NotImplementedError
+    products = _read_doc(cache_dir).get("products") or {}
+    if not isinstance(products, dict):
+        return {}
+    return {str(k): dict(v) for k, v in products.items() if isinstance(v, dict)}
 
 
 def adopt_product(cache_dir: Path, install: Install, now: datetime) -> dict[str, Any]:
     """Inscrit le produit de `install` comme version finale ; refuse la bêta, un produit public connu ou un produit
-    illisible (InvalidArgumentError)."""
-    raise NotImplementedError
+    illisible (InvalidArgumentError). Jamais d'adoption automatique : seul `forever wow adopt` appelle cette fonction."""
+    if install.product is None:
+        raise InvalidArgumentError(
+            f"Produit illisible pour {install.folder} (ni .flavor.info, ni ligne unique dans .build.info).",
+            "forcer ce dossier par FOREVER_WOW_FORCE plutôt que de l'adopter",
+        )
+    if install.role == ROLE_BETA:
+        raise InvalidArgumentError(
+            f"{install.product} est le produit de la bêta (celui des données installées) : rien à adopter.",
+            "adopter le dossier de la version finale, signalé « unknown » par forever wow list",
+        )
+    if install.role == ROLE_OTHER or install.product in NOT_FOREVER_PRODUCTS:
+        raise InvalidArgumentError(
+            f"{install.product} est un produit public connu qui n'est pas Forever : adoption refusée.",
+            "adopter le dossier de la version finale, signalé « unknown » par forever wow list",
+        )
+    products = adopted_products(cache_dir)
+    entry = {"role": "final", "adopted_at": format_utc(now), "folder": str(install.folder)}
+    products[install.product] = entry
+    _write_doc(cache_dir, load_builds(cache_dir), products)
+    return {"product": install.product, **entry}
 
 
 def forget_product(cache_dir: Path, product: str) -> bool:
     """Retire une adoption ; False si le produit n'était pas adopté."""
-    raise NotImplementedError
+    products = adopted_products(cache_dir)
+    if product not in products:
+        return False
+    del products[product]
+    _write_doc(cache_dir, load_builds(cache_dir), products)
+    return True
