@@ -1518,10 +1518,20 @@ def _route_recette(deps: Deps, args: argparse.Namespace) -> int:
         ],
     )
     doc = {"rows": rows, "accepted": sum(1 for r in rows if r["accepted"]), "provenance": provenance}
-    lines = [f"Recette des routes (décision 279) : {doc['accepted']} acceptée(s) sur {len(rows)}"]
+    adapted_ok = sum(1 for r in rows if (r.get("adapted") or {}).get("accepted"))
+    doc["adapted_accepted"] = adapted_ok
+    lines = [
+        (
+            f"Recette des routes (décision 279) : notre calcul {doc['accepted']} acceptée(s) sur {len(rows)}, "
+            f"base adaptée {adapted_ok} acceptée(s)"
+        )
+    ]
     for r in rows:
         hours = f"{r['hours_ours']:.1f} h contre {r['hours_reference']:.1f} h" if r["hours_ours"] is not None else ""
         lines.append(f"  {r['race']} {r['class']} ({r['from']} → {r['to']}) : {r['explanation']} {hours}".rstrip())
+        if r.get("adapted"):
+            a = r["adapted"]
+            lines.append(f"    base adaptée ({a['hours']:.1f} h) : {a['explanation']}")
     _emit(doc, lines, provenance, args.json)
     return EXIT_OK
 

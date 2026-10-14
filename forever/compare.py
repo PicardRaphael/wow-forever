@@ -565,6 +565,8 @@ def route_recette(
         seconds=ours.result.seconds,
     )
     verdict = accept_route(mine, theirs, quests, ctx.book.zone_names, dropped=ctx.world.dropped, gains=gains)
+    adapted = adapted_route(ctx.gd, ctx.world, chain.guides, who, ctx.start, end_level=to_level, cap=ctx.cap)
+    base = accept_route(turnins(adapted.stops), theirs, quests, ctx.book.zone_names, dropped=ctx.world.dropped)
     from forever.engine.route import weakest
 
     return {
@@ -574,5 +576,134 @@ def route_recette(
         "hours_ours": ours.result.seconds / SECONDS_PER_HOUR,
         "hours_reference": replay.result.seconds / SECONDS_PER_HOUR,
         "skipped_reference": len(replay.skipped),
+        "adapted": {
+            "accepted": base["accepted"],
+            "explanation": base["explanation"],
+            "hours": adapted.result.seconds / SECONDS_PER_HOUR,
+            "additions": adapted.additions,
+            "differences": base["differences"],
+        },
         "certainty": weakest(ours.result.certainty, replay.result.certainty),
     }
+
+
+# --- base adaptée (CJ1, bloc 1f, décisions 277 et 279) -----------------------------------------------------------
+
+
+class Adapted(NamedTuple):
+    stops: list[Stop]  # arrêts du parcours rejoué (farm `.xp` et maîtres compris) et nos ajouts
+    additions: list[dict[str, Any]]  # {"kind", "ref", "level", "seconds" (temps ajouté), "placed"}
+    result: RouteResult
+
+
+def run_stops(
+    gd: GameData, world: RouteWorld, stops: Sequence[Stop], start: RouteState, *, end_level: int, cap: int
+) -> RouteResult:
+    """Suite d'arrêts déroulée par nos règles, farm du parcours (`Stop("grind", niveau)`) compris, farm final au
+    besoin ; un arrêt impossible rend la route `feasible=False`. Les règles propres à notre recherche (quête rouge,
+    zone de départ d'abord) ne s'appliquent pas : c'est le parcours de référence. Registre : I18"""
+    from forever.engine.route import apply_stop, check_stop, grind_to, weakest
+
+    world = replace(world, refuse_red=False, early_zones=None)
+    state, results, warnings = start, [], []
+    for stop in stops:
+        if state.level >= end_level:
+            break
+        if stop.kind == "grind":
+            if state.level < int(stop.ref):
+                state, res = grind_to(gd, world, start, state, level=min(int(stop.ref), end_level), cap=cap)
+                results.append(res)
+            continue
+        reason = check_stop(gd, world, state, stop)
+        if reason is not None:
+            warnings.append(f"{stop.kind} {stop.ref} : {reason}")
+            break
+        state, res = apply_stop(gd, world, state, stop, cap=cap)
+        results.append(res)
+    feasible = not warnings
+    if feasible and state.level < end_level:
+        state, res = grind_to(gd, world, start, state, level=end_level, cap=cap)
+        results.append(res)
+    seconds = sum(r.seconds for r in results)
+    xp = sum(r.xp for r in results)
+    feasible = feasible and math.isfinite(seconds)
+    return RouteResult(
+        start_level=start.level,
+        end_level=state.level,
+        reached=state.level >= end_level,
+        feasible=feasible,
+        seconds=seconds,
+        xp=xp,
+        xp_h=xp / (seconds / SECONDS_PER_HOUR) if seconds > 0 and feasible else 0.0,
+        stops=tuple(results),
+        warnings=tuple(warnings),
+        certainty=weakest(*(r.certainty for r in results)),
+    )
+
+
+def _units(world: RouteWorld, taken: set[int], *, end_level: int, class_quests: bool, dungeons: bool) -> list[Any]:
+    """Ajouts de nos routes : chaque donjon placé avec toutes ses quêtes non prises par le parcours (prises, passage,
+    rendus), puis chaque quête de classe absente du parcours (prise, objectif, rendu), par niveau minimal."""
+    units: list[tuple[str, int | str, list[Stop]]] = []
+    if dungeons:
+        for key, d in sorted(world.dungeons.items()):
+            own = [q for q in d.quests if q in world.quests and q not in taken]
+            known = taken | set(own)
+            own = [q for q in own if set(world.quests[q].prereq_all) <= known]
+            units.append(
+                (
+                    "donjon avec ses quêtes",
+                    key,
+                    [*(Stop("accept", q) for q in own), Stop("dungeon", key), *(Stop("turnin", q) for q in own)],
+                )
+            )
+    if class_quests:
+        mine = sorted(
+            (q for q in world.quests.values() if q.class_quest and q.dungeon is None and q.id not in taken),
+            key=lambda q: (q.min_level, q.id),
+        )
+        for q in mine:
+            if q.min_level >= end_level:
+                continue
+            body = [Stop("accept", q.id), *([Stop("objective", q.id)] if q.objective is not None else [])]
+            units.append(("quête de classe", q.id, [*body, Stop("turnin", q.id)]))
+    return units
+
+
+def adapted_route(
+    gd: GameData,
+    world: RouteWorld,
+    guides: Sequence[Any],
+    who: Any,
+    start: RouteState,
+    *,
+    end_level: int,
+    cap: int,
+    class_quests: bool = True,
+    dungeons: bool = True,
+) -> Adapted:
+    """Base adaptée (décisions 277 et 279) : le parcours gratuit de la race et de la classe rejoué par nos règles, puis
+    chaque ajout par défaut de nos routes (donjon avec toutes ses quêtes, quête de classe absente) inséré d'un bloc à
+    la place où la route est la plus courte ; un ajout impossible à placer est dit (`placed` faux). Registre : I18"""
+    replay = replay_rxp(gd, world, guides, who, start, end_level=end_level, cap=cap)
+    stops = list(replay.stops)
+    current = run_stops(gd, world, stops, start, end_level=end_level, cap=cap)
+    taken = {int(s.ref) for s in stops if s.kind == "turnin"}
+    additions: list[dict[str, Any]] = []
+    for kind, ref, unit in _units(world, taken, end_level=end_level, class_quests=class_quests, dungeons=dungeons):
+        best: tuple[float, list[Stop], RouteResult] | None = None
+        for pos in range(len(stops) + 1):
+            candidate = stops[:pos] + unit + stops[pos:]
+            res = run_stops(gd, world, candidate, start, end_level=end_level, cap=cap)
+            if res.feasible and res.reached and (best is None or res.seconds < best[0]):
+                best = (res.seconds, candidate, res)
+        if best is None:
+            additions.append({"kind": kind, "ref": ref, "level": None, "seconds": None, "placed": False})
+            continue
+        at = next(
+            (r.level for r in best[2].stops if r.kind == unit[0].kind and r.ref == unit[0].ref),
+            None,
+        )
+        additions.append({"kind": kind, "ref": ref, "level": at, "seconds": best[0] - current.seconds, "placed": True})
+        stops, current = best[1], best[2]
+    return Adapted(stops, additions, current)

@@ -55,16 +55,20 @@ def accept_route(
 ) -> dict[str, Any]:
     """Verdict de la décision 279 sur deux suites de rendus `(quête, carte du donneur)` : notre route et la référence.
     Une différence = une quête rendue d'un seul côté ; les quêtes d'un même donjon forment une seule différence, les
-    quêtes de classe aussi. Registre : I18"""
+    quêtes de classe aussi ; l'enchaînement des zones se compare sans les quêtes des différences expliquées.
+    Registre : I18"""
     dropped, gains = dropped or {}, gains or {}
-
-    def names(rows: Sequence[tuple[int, int | None]]) -> list[str]:
-        return zone_sequence(None if z is None else zone_names.get(z) or str(z) for _, z in rows)
 
     ours_ids = list(dict.fromkeys(q for q, _ in ours))
     ref_ids = list(dict.fromkeys(q for q, _ in reference))
     differences = [_difference(q, "ours", quests, dropped, gains) for q in ours_ids if q not in set(ref_ids)]
     differences += [_difference(q, "reference", quests, dropped, gains) for q in ref_ids if q not in set(ours_ids)]
+    explained = {d["quest"] for d in differences if d["explained"]}
+
+    def names(rows: Sequence[tuple[int, int | None]]) -> list[str]:
+        # une différence expliquée (quête de classe en ville, donjon) ne change pas l'enchaînement comparé
+        return zone_sequence(None if z is None or q in explained else zone_names.get(z) or str(z) for q, z in rows)
+
     zones_ours, zones_ref = names(ours), names(reference)
     same_zones = zones_ours == zones_ref
     groups = {d["group"] for d in differences}
