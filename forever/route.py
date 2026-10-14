@@ -584,20 +584,36 @@ def _rewards(book: Any, stops: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return out[:LISTED_IDS]
 
 
-def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict[str, Any]:
-    """Feuille de route calculée, gardée dans le cache, avec sa provenance (`forever route plan`). Registre : I18"""
-    import hashlib
-    import json
-    from dataclasses import asdict
+@dataclass
+class RouteContext:
+    """Ce qu'il faut pour calculer ou rejouer une route : données, monde du moteur, départ, sources lues."""
+
+    cls: str
+    data: Any
+    cap: int
+    gd: Any
+    book: Any
+    rows: list[dict[str, Any]]
+    world: Any
+    warnings: list[str]
+    start: Any
+    kill: Any
+    walker: Any
+    network: Any
+    trainers: Any
+    train_levels: Any
+
+
+def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> RouteContext:
+    """Monde de la route d'une demande : livre des quêtes, donjons placés, trajets (client, Journeys), maîtres de
+    classe, temps par monstre, départ. Registre : I18"""
 
     from forever.engine.route import RouteState
     from forever.engine.travel import travel_params, travel_time
     from forever.errors import InvalidArgumentError
-    from forever.freshness import freshness_for_version
     from forever.gamedata import MECHANICS_FILE, build_game_data
     from forever.kill_time import kill_params, kill_time, load_kill_times
     from forever.leveling import check_level, level_cap
-    from forever.optimize.route import plan
     from forever.pipeline.questie import CLASS_IDS, CLASS_MASKS
     from forever.pipeline.travel_sources import (
         read_journeys_network,
@@ -605,7 +621,6 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
         read_questie_trainers,
         read_training_levels,
     )
-    from forever.provenance import make_provenance
     from forever.quests import build_quests
     from forever.sim.objectives import MAGE
     from forever.store import load_version
@@ -694,6 +709,32 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
         position = next(iter(maps.values()), None)
         position = position and _point(maps, {"map": position.ui_map, "x": 50.0, "y": 50.0})
     start = RouteState(level=request.start_level, xp=0.0, position=position)
+    return RouteContext(
+        cls, data, cap, gd, book, rows, world, warnings, start, kill, walker, network, trainers, train_levels
+    )
+
+
+def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict[str, Any]:
+    """Feuille de route calculée, gardée dans le cache, avec sa provenance (`forever route plan`). Registre : I18"""
+    import hashlib
+    import json
+    from dataclasses import asdict
+
+    from forever.freshness import freshness_for_version
+    from forever.optimize.route import plan
+    from forever.provenance import make_provenance
+
+    ctx = route_context(deps, request, wow_dir=wow_dir)
+    cls, data, cap, gd, book, rows = ctx.cls, ctx.data, ctx.cap, ctx.gd, ctx.book, ctx.rows
+    world, warnings, start, kill, walker, network = (
+        ctx.world,
+        ctx.warnings,
+        ctx.start,
+        ctx.kill,
+        ctx.walker,
+        ctx.network,
+    )
+    trainers, train_levels = ctx.trainers, ctx.train_levels
     found = plan(gd, world, start, end_level=request.end_level, cap=cap, tries=request.tries, seed=request.seed)
     result = found.result
     by_id = {str(r["id"]): r for r in rows}

@@ -1859,6 +1859,8 @@ mechanics:
       - "recherche : code MIT de Factoruide (brouznouf/factoruide@f7da6da : plan/worth.rs, plan/construct.rs nearest_stop, plan/moves.rs, plan/search.rs), porté en sous-ensemble ; règles d'XP et de temps de forever, jamais celles de Factoruide"
       - "forever/data/1.60.1.70374/mechanics.json (route.search : journal, frais d'arrêt, poids de zone et part du farm repris de Factoruide, suppose ; essais et graine de la recherche)"
     tests:
+      - tests/unit/test_route_compare.py::test_replay_skips_what_our_rules_refuse
+      - tests/unit/test_route_compare.py::test_route_compare_cli
       - tests/unit/test_route_training.py::test_train_stop
       - tests/unit/test_route_training.py::test_missed_training_is_infeasible
       - tests/unit/test_route_training.py::test_plan_trains_in_time

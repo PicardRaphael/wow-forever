@@ -411,6 +411,9 @@ def build_parser() -> argparse.ArgumentParser:
     r_guide.add_argument("id", help="identifiant rendu par forever route plan")
     r_guide.add_argument("--out", help="fichier où écrire le guide (défaut : sortie standard)")
     r_guide.add_argument("--json", action="store_true", help="sortie JSON")
+    r_compare = route_sub.add_parser("compare", help="comparer une route de Factoruide (.fgguide) à la nôtre")
+    r_compare.add_argument("file", help="fichier .fgguide exporté par Factoruide (bouton Share)")
+    r_compare.add_argument("--json", action="store_true", help="sortie JSON")
     r_deliver = route_sub.add_parser("deliver", help="livrer une feuille de route à RestedXP")
     r_deliver.add_argument("id", help="identifiant rendu par forever route plan")
     r_deliver.add_argument(
@@ -1291,6 +1294,24 @@ def _route_guide(deps: Deps, args: argparse.Namespace, plan: Mapping[str, Any]) 
 def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
     from forever.route import RouteRequest, load_plan, plan_route
 
+    if args.route_command == "compare":
+        from forever.compare import compare_route
+
+        doc = compare_route(deps, Path(args.file))
+        ours, theirs = doc["ours"], doc["theirs"]
+        req = doc["request"]
+        lines = [
+            f"Route de Factoruide rejouée par forever ({req['class']}, {req['faction']}, niveau {req['from']} → "
+            + f"{req['to']}) :",
+            f"  forever : {ours['hours']:.1f} h, environ {round(ours['xp_h'])} XP par heure, {ours['quests']} quêtes "
+            + "rendues",
+            f"  Factoruide rejouée : {theirs['hours']:.1f} h, environ {round(theirs['xp_h'])} XP par heure, "
+            + f"{theirs['quests']} quêtes rendues (Factoruide annonce {theirs['factoruide_hours']:.1f} h)",
+            f"  quêtes communes : {len(doc['common'])} ; seulement chez forever : {len(doc['only_ours'])} ; "
+            + f"seulement chez Factoruide : {len(doc['only_theirs'])} ; arrêts sautés : {len(theirs['skipped'])}",
+        ]
+        _emit(doc, lines, doc["provenance"], args.json)
+        return EXIT_OK
     if args.route_command in ("guide", "deliver"):
         return _route_guide(deps, args, load_plan(deps, args.id))
     if args.route_command == "show":
