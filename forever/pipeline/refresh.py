@@ -532,5 +532,44 @@ def npc_details(
 
 
 def inherited_measures(data_dir: Path, version: str) -> list[dict[str, Any]]:
-    """Mesures de PV encore héritées de la version précédente (LN1)."""
-    raise NotImplementedError
+    """PV encore hérités de la version d'où vient `monsters.json` de `version` (LN1, décision 271) : chaque niveau de
+    PNJ dont la valeur et la source sont celles de la version de base (`inherited_from`, sinon la version installée
+    précédente). Une mesure reprise d'un journal de la nouvelle version (`forever measures refresh`) sort de la
+    liste. Lecture seule."""
+    from forever.manifest import version_dirs
+    from forever.pipeline.builds import version_key
+
+    def read(v: str) -> dict[str, Any] | None:
+        try:
+            doc = json.loads((data_dir / v / MONSTERS_FILE).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return None
+        return doc if isinstance(doc, dict) else None
+
+    current = read(version)
+    if current is None:
+        return []
+    base = current.get("inherited_from")
+    if not isinstance(base, str) or base == version:
+        earlier = [v for v in version_dirs(data_dir) if version_key(v) < version_key(version)]
+        base = earlier[-1] if earlier else None
+    old = read(base) if base else None
+    if old is None:
+        return []
+    found = []
+    for npc_id, npc in (current.get("npcs") or {}).items():
+        previous = ((old.get("npcs") or {}).get(npc_id) or {}).get("levels") or {}
+        for level, entry in (npc.get("levels") or {}).items():
+            before = previous.get(level)
+            if before and before.get("max_hp") == entry.get("max_hp") and before.get("source") == entry.get("source"):
+                found.append(
+                    {
+                        "npc_id": npc_id,
+                        "name": npc.get("name"),
+                        "level": level,
+                        "max_hp": entry.get("max_hp"),
+                        "source": entry.get("source"),
+                        "from": base,
+                    }
+                )
+    return found

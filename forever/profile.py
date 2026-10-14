@@ -19,7 +19,14 @@ Schéma 3 (P06b) : champs sourcés `gear` (équipement complet par emplacement :
 aléatoire, identifiant unique, nom) et `sheet` (fiche du personnage lue par l'export SimulationCraft, note « lue avec
 les buffs actifs ») ; sources `jeu` (contexte envoyé par le jeu au pont) et `simulationcraft` (export collé), écrites
 par le pont seulement (`apply_game_fields`, au clic du joueur). Un profil de schéma 2 se lit tel quel et passe au
-schéma 3 à la première écriture."""
+schéma 3 à la première écriture.
+
+Schéma 4 (LN1, décision 271) : `product` d'un personnage (produit de l'installation où il a été vu) et
+`archived_characters` : `{<nom>-<royaume> : personnage + archived {at, product, game_version}}`. `forever profile
+archive --product <produit>` y range les personnages d'un produit (ceux sans produit, d'avant LN1, sont ceux de la
+bêta, produit de `sources.json`) : gardés, jamais plus actifs ; un homonyme vu ensuite est un nouveau personnage. Les
+personnages actifs restent indexés par leur nom (pont, MCP et exports les lisent ainsi). Un profil de schéma 1 à 3 se
+lit tel quel ; à la première écriture, le fichier d'origine est gardé à côté (`profile.json.schema<N>.bak`)."""
 
 from __future__ import annotations
 
@@ -29,6 +36,7 @@ import json
 import os
 import re
 from collections.abc import Mapping
+from datetime import datetime
 from pathlib import Path
 from typing import Any, TypedDict
 
@@ -40,7 +48,7 @@ from forever.provenance import Provenance, local_provenance
 from forever.store import current_identity, load_version
 from forever.timefmt import format_utc
 
-SCHEMA_VERSION = 3
+SCHEMA_VERSION = 4
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CLASSES = ("Warrior", "Paladin", "Hunter", "Rogue", "Priest", "Shaman", "Mage", "Warlock", "Druid")
 CLASS_NAMES = {
@@ -93,6 +101,7 @@ SHEET_NOTE = "lue avec les buffs actifs"
 
 
 class ProfileView(TypedDict):
+    archived: list[str]
     path: str
     active: str | None
     character: dict[str, Any] | None
@@ -233,7 +242,7 @@ def resolve_path(deps: Deps) -> Path:
 
 
 def _empty() -> dict[str, Any]:
-    return {"schema_version": SCHEMA_VERSION, "active": None, "characters": {}, "realms": {}}
+    return {"schema_version": SCHEMA_VERSION, "active": None, "characters": {}, "realms": {}, "archived_characters": {}}
 
 
 def _migrate_character(c: Mapping[str, Any]) -> dict[str, Any]:
@@ -266,11 +275,13 @@ def load_profile(path: Path) -> dict[str, Any]:
         raise _schema_error(path)
     if doc.get("schema_version") == 1:
         chars = {name: _migrate_character(c) for name, c in doc["characters"].items() if isinstance(c, dict)}
-        return {"schema_version": SCHEMA_VERSION, "active": doc.get("active"), "characters": chars, "realms": {}}
-    if doc.get("schema_version") not in (2, SCHEMA_VERSION):
+        return {**_empty(), "active": doc.get("active"), "characters": chars}
+    if doc.get("schema_version") not in (2, 3, SCHEMA_VERSION):
         raise _schema_error(path)
-    doc["schema_version"] = SCHEMA_VERSION  # schéma 2 : mêmes champs, `gear` et `sheet` en plus ; réécrit en 3
+    doc["schema_version"] = SCHEMA_VERSION  # schémas 2 et 3 : mêmes champs ; réécrits en 4 à la première écriture
     doc.setdefault("realms", {})
+    if not isinstance(doc.get("archived_characters"), dict):
+        doc["archived_characters"] = {}
     return doc
 
 
@@ -282,9 +293,23 @@ def save_profile(path: Path, doc: Mapping[str, Any]) -> None:
             "choisir FOREVER_PROFILE hors du dépôt (défaut : ~/.forever/profile.json)",
         )
     path.parent.mkdir(parents=True, exist_ok=True)
+    _keep_older_schema(path)
     tmp = path.with_name(path.name + ".tmp")
     tmp.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
     os.replace(tmp, path)
+
+
+def _keep_older_schema(path: Path) -> None:
+    """Avant la première écriture en schéma 4, le profil d'un schéma antérieur est gardé à côté (LN1)."""
+    try:
+        old = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return
+    version = old.get("schema_version") if isinstance(old, dict) else None
+    if isinstance(version, int) and version < SCHEMA_VERSION:
+        kept = path.with_name(f"{path.name}.schema{version}.bak")
+        if not kept.exists():
+            kept.write_bytes(path.read_bytes())
 
 
 def normalize_class(value: str) -> str:
@@ -450,6 +475,12 @@ def set_character(
 
 
 def _known(doc: Mapping[str, Any], name: str) -> None:
+    archived = [key for key in doc.get("archived_characters") or {} if key == name or key.startswith(f"{name}-")]
+    if name not in doc["characters"] and archived:
+        raise InvalidArgumentError(
+            f"Personnage « {name} » archivé ({', '.join(archived)}) : il n'est plus jamais actif.",
+            "créer ou importer le personnage de la version finale (forever profile import)",
+        )
     if name not in doc["characters"]:
         names = list(doc["characters"])
         close = difflib.get_close_matches(name, names, n=3, cutoff=0.5)
@@ -505,6 +536,7 @@ def read_profile(deps: Deps, name: str | None = None) -> ProfileView:
         "active": doc.get("active"),
         "character": character,
         "characters": list(doc["characters"]),
+        "archived": list(doc.get("archived_characters") or {}),
         "stale": flat["game_version"] != version if flat is not None else None,
         "missing": missing,
         "game_locale": game_locale(deps, doc),
@@ -562,6 +594,37 @@ def apply_game_fields(
     return doc
 
 
-def archive_characters(deps: Deps, product: str, now: Any) -> list[str]:
-    """Personnages d'un produit rangés dans `archived_characters` (LN1)."""
-    raise NotImplementedError
+def archive_characters(deps: Deps, product: str, now: datetime) -> list[str]:
+    """Personnages du produit `product` rangés dans `archived_characters` sous `<nom>-<royaume>` (LN1) : gardés,
+    marqués (`archived` : date, produit, version des données), plus jamais actifs. Un personnage sans produit (d'avant
+    LN1) est un personnage de la bêta : archivé quand `product` est le produit de `sources.json`. Rend les clés."""
+    from forever.installs import beta_product
+
+    path = resolve_path(deps)
+    doc = load_profile(path)
+    beta = beta_product(deps.data_dir)
+    archived: dict[str, Any] = doc.setdefault("archived_characters", {})
+    moved: list[str] = []
+    names: list[str] = []
+    for name, raw in sorted(doc["characters"].items()):
+        own = raw.get("product") or beta
+        if own != product:
+            continue
+        key = f"{name}-{raw['realm']}" if raw.get("realm") else name
+        n = 2
+        while key in archived:
+            key = f"{key}-{n}"
+            n += 1
+        stamp = {"at": format_utc(now), "product": product, "game_version": raw.get("game_version")}
+        archived[key] = {**raw, "product": product, "archived": stamp}
+        moved.append(key)
+        names.append(name)
+    if not moved:
+        return []
+    for name in names:
+        del doc["characters"][name]
+    if doc.get("active") not in doc["characters"]:
+        doc["active"] = next(iter(doc["characters"]), None)
+    doc["schema_version"] = SCHEMA_VERSION
+    save_profile(path, doc)
+    return moved

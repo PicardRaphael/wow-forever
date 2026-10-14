@@ -44,7 +44,7 @@ from forever.errors import (
 )
 from forever.explain import MechanicExplanation, explain_mechanic
 from forever.gamedata import build_game_data, load_game_data
-from forever.installs import Choice, Install, product_of, roots, same_folder, survey
+from forever.installs import Choice, Install, beta_product, product_of, roots, same_folder, survey
 from forever.leveling import (
     DEFAULT_RACE,
     MAX_N,
@@ -122,6 +122,7 @@ from forever.pipeline.refresh import (
     compare,
     curve_candidates,
     curve_exclusions,
+    inherited_measures,
     npc_details,
     read_snapshot,
     remeasure,
@@ -132,6 +133,7 @@ from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
 from forever.profile import (
     ProfileView,
+    archive_characters,
     check_locale,
     load_profile,
     normalize_class,
@@ -263,7 +265,12 @@ def build_parser() -> argparse.ArgumentParser:
     show.add_argument("name", nargs="?", help="nom du personnage (défaut : actif)")
     show.add_argument("--json", action="store_true", help="sortie JSON")
     plist = psub.add_parser("list", help="personnages du profil")
+    plist.add_argument("--archived", action="store_true", help="montrer aussi les personnages archivés (LN1)")
     plist.add_argument("--json", action="store_true", help="sortie JSON")
+    parch = psub.add_parser("archive", help="archiver les personnages d'un produit (bêta au lancement, LN1)")
+    parch.add_argument("--product", required=True, help="produit (forever wow list), par exemple celui de la bêta")
+    parch.add_argument("--yes", action="store_true", help="accord donné d'avance")
+    parch.add_argument("--json", action="store_true", help="sortie JSON")
     pset = psub.add_parser("set", help="créer ou mettre à jour un personnage (champs donnés seulement)")
     pset.add_argument("name", nargs="?", help="nom du personnage (absent : seulement --game-locale)")
     pset.add_argument("--game-locale", help="langue du client du joueur (enUS, frFR…), prioritaire sur Config.wtf")
@@ -673,6 +680,9 @@ def build_parser() -> argparse.ArgumentParser:
     kt.add_argument("--class", dest="cls", help="classe dont on veut le temps par monstre (anglais)")
     kt.add_argument("--level", type=int, help="niveau du personnage (avec --class)")
     kt.add_argument("--json", action="store_true", help="sortie JSON")
+    inherited = measures_sub.add_parser("inherited", help="PV encore hérités de la version précédente (LN1)")
+    inherited.add_argument("--version", help="version des données (défaut : installée)")
+    inherited.add_argument("--json", action="store_true", help="sortie JSON")
     refresh = measures_sub.add_parser(
         "refresh", help="relancer toutes les mesures, afficher ce qui change, écrire après accord"
     )
@@ -2018,7 +2028,7 @@ def _import_lines(plan: ImportPlan) -> list[str]:
 
 
 def _cmd_profile_import(deps: Deps, args: argparse.Namespace) -> int:
-    sv_dir = Path(args.wtf) if args.wtf else _default_sv(deps)
+    sv_dir: Path | list[Path] | None = Path(args.wtf) if args.wtf else _account_svs(deps)
     logs_dir = Path(args.logs) if args.logs else (deps.wow_dir / "Logs" if deps.wow_dir is not None else None)
     offset = timedelta(hours=args.utc_offset) if args.utc_offset is not None else None
     plan = plan_import(deps, sv_dir=sv_dir, logs_dir=logs_dir, utc_offset=offset)
@@ -2269,6 +2279,8 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
     cmd = args.profile_cmd
     if cmd == "import":
         return _cmd_profile_import(deps, args)
+    if cmd == "archive":
+        return _cmd_profile_archive(deps, args)
     name: str | None = getattr(args, "name", None)
     target = name or ""
     if cmd == "set" and args.game_locale is not None:
@@ -2308,9 +2320,22 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
             f"  {'* ' if n == view['active'] else '  '}{n}" + (" (prévu)" if chars[n].get("planned") else "")
             for n in view["characters"]
         ] or ["  (vide)"]
+        if args.archived:
+            lines += [f"Archivés ({len(view['archived'])}) :", *(f"    {k}" for k in view["archived"])]
     else:
         lines = render_profile(view)
     _emit(view, lines, view["provenance"], args.json)
+    return EXIT_OK
+
+
+def _cmd_profile_archive(deps: Deps, args: argparse.Namespace) -> int:
+    prompt = f"Archiver les personnages du produit {args.product} (gardés, plus jamais actifs) ? [o/N] "
+    if not args.yes and (deps.confirm is None or not deps.confirm(prompt)):
+        raise InvalidArgumentError("Archivage non confirmé : rien n'est écrit.", "relancer avec --yes")
+    keys = archive_characters(deps, args.product, deps.now())
+    view = read_profile(deps)
+    lines = [f"Personnages archivés ({args.product}) : {', '.join(keys) or 'aucun'}"]
+    _emit({"archived": keys, "provenance": view["provenance"]}, lines, view["provenance"], args.json)
     return EXIT_OK
 
 
@@ -4279,6 +4304,13 @@ def _cmd_origins(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _account_svs(deps: Deps) -> list[Path]:
+    """Dossiers `WTF/Account/*/SavedVariables` de tous les comptes du client (LN1)."""
+    if deps.wow_dir is None:
+        return []
+    return sorted((deps.wow_dir / "WTF" / "Account").glob("*/SavedVariables"))
+
+
 def _default_sv(deps: Deps) -> Path | None:
     """Premier dossier `WTF/Account/*/SavedVariables` du client, s'il existe."""
     if deps.wow_dir is None:
@@ -4377,9 +4409,26 @@ def _cmd_kill_time(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_measures_inherited(deps: Deps, args: argparse.Namespace) -> int:
+    data = load_version(deps)  # intégrité contrôlée
+    version = args.version or data.game_version
+    found = inherited_measures(deps.data_dir, version)
+    base = found[0]["from"] if found else None
+    provenance = local_provenance(deps, assumptions=["comparaison de monsters.json avec sa version de base"])
+    lines = [f"PV hérités dans {version} : {len(found)}" + (f" (de {base})" if base else "")]
+    lines += [f"  {m['name']} ({m['npc_id']}) niveau {m['level']} : {m['source']}" for m in found[:30]]
+    if len(found) > 30:
+        lines.append(f"  … et {len(found) - 30} autre(s) (--json pour la liste complète)")
+    payload = {"version": version, "from": base, "count": len(found), "measures": found, "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_measures_refresh(deps: Deps, args: argparse.Namespace) -> int:
     if args.measures_command == "kill-time":
         return _cmd_kill_time(deps, args)
+    if args.measures_command == "inherited":
+        return _cmd_measures_inherited(deps, args)
     into = Path(args.into).resolve() if args.into else None
     if into is not None and (into == deps.data_dir.resolve() or not (into / "manifest.json").is_file()):
         raise InvalidArgumentError(
@@ -4740,6 +4789,9 @@ def _cmd_wow_adopt(deps: Deps, args: argparse.Namespace) -> int:
         f"Adopté comme version finale : {entry['product']} ({entry['folder']})",
         "Ensuite : forever wow list, puis scripts/install_plugin.ps1 (FOREVER_WOW_DIR), voir docs/LANCEMENT.md",
     ]
+    beta = beta_product(deps.data_dir)
+    if beta:
+        lines.append(f"Personnages de la bêta : forever profile archive --product {beta} (gardés, plus jamais actifs)")
     _emit({"adopted": entry, "provenance": provenance}, lines, provenance, args.json)
     return EXIT_OK
 

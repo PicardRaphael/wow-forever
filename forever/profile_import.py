@@ -10,7 +10,7 @@ importée. Rien n'est écrit sans accord : `plan_import` rend les changements, `
 from __future__ import annotations
 
 import copy
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -210,7 +210,12 @@ def _change(character: str | None, name: str, old: Any, new: Mapping[str, Any], 
 
 
 def _merge_character(
-    deps: Deps, doc: dict[str, Any], seen: _Seen, plan: dict[str, list[dict[str, Any]]], version: str
+    deps: Deps,
+    doc: dict[str, Any],
+    seen: _Seen,
+    plan: dict[str, list[dict[str, Any]]],
+    version: str,
+    product: str | None = None,
 ) -> None:
     chars: dict[str, Any] = doc["characters"]
     raw = copy.deepcopy(chars.get(seen.name) or {})
@@ -239,9 +244,9 @@ def _merge_character(
             if record not in conflicts:
                 conflicts.append(record)
                 changes.append(_change(seen.name, f"conflit:{name}", None, conflict["other"]))
-    for key, value in (("guid", seen.guid), ("realm", seen.realm)):
+    for key, value in (("guid", seen.guid), ("realm", seen.realm), ("product", product)):
         if value is not None and raw.get(key) is None:
-            raw[key] = value
+            raw[key] = value  # LN1 : produit de l'installation où le personnage a été vu
     if raw.get("planned"):
         changes.append(_change(seen.name, "planned", True, make_field(False, "journal", None)))
     raw["planned"] = False
@@ -261,13 +266,14 @@ def _merge_character(
 def plan_import(
     deps: Deps,
     *,
-    sv_dir: Path | None,
+    sv_dir: Path | Sequence[Path] | None,
     logs_dir: Path | None,
     utc_offset: timedelta | None = None,
     class_spells: Mapping[int, str] | None = None,
 ) -> ImportPlan:
-    """Changements que l'import apporterait au profil, sans rien écrire. `class_spells` : index sort -> classe
-    (défaut : `class_spell_index` des données courantes)."""
+    """Changements que l'import apporterait au profil, sans rien écrire. `sv_dir` : un dossier SavedVariables, ou
+    ceux de tous les comptes de l'installation (LN1). `class_spells` : index sort -> classe (défaut :
+    `class_spell_index` des données courantes)."""
     data = load_version(deps)
     index = class_spells if class_spells is not None else class_spell_index(data)
     builds = current_builds(deps.cache_dir, deps.wow_dir)
@@ -275,21 +281,24 @@ def plan_import(
     stamp = _Stamper([b for b in builds if product is None or b.product == product])  # LN1 : produit lu seulement
     notes: list[str] = []
 
-    def present(directory: Path | None, name: str) -> Path | None:
-        path = directory / name if directory is not None else None
-        return path if path is not None and path.is_file() else None
+    dirs = [sv_dir] if isinstance(sv_dir, Path) else list(sv_dir or [])
 
-    logger, questie, auctionator = (present(sv_dir, n) for n in (LOGGER_FILE, QUESTIE_FILE, AUCTIONATOR_FILE))
+    def present(name: str) -> list[Path]:
+        return [d / name for d in dirs if (d / name).is_file()]
+
+    loggers, questies, auctionators = (present(n) for n in (LOGGER_FILE, QUESTIE_FILE, AUCTIONATOR_FILE))
     logs = logs_dir if logs_dir is not None and logs_dir.is_dir() and log_files(logs_dir) else None
     sources = {
-        "ForeverLogger": str(logger) if logger else None,
-        "Questie": str(questie) if questie else None,
-        "Auctionator": str(auctionator) if auctionator else None,
+        "ForeverLogger": ", ".join(map(str, loggers)) or None,
+        "Questie": ", ".join(map(str, questies)) or None,
+        "Auctionator": ", ".join(map(str, auctionators)) or None,
         "journaux": str(logs) if logs else None,
     }
     notes += [f"source absente : {name}" for name, path in sources.items() if path is None]
 
-    seen = _from_logger(logger, stamp, utc_offset, node_keys(data), notes) if logger else {}
+    seen: dict[str, _Seen] = {}
+    for logger in loggers:  # LN1 : tous les comptes de l'installation
+        seen.update(_from_logger(logger, stamp, utc_offset, node_keys(data), notes))
     skipped: list[dict[str, Any]] = []
     for guid, (name, realm, last, casts) in (_from_logs(logs, utc_offset, notes) if logs else {}).items():
         if guid in seen:
@@ -299,7 +308,7 @@ def plan_import(
             skipped.append({"name": name, "guid": guid, "reason": reason})
             continue
         seen[guid] = _Seen(guid, name, realm, {"class": stamp.field(cls, "journal", last, "probable")})
-    if questie is not None:
+    for questie in questies:
         for guid, character in seen.items():
             done = read_completed_quests(questie, guid)
             if done:
@@ -311,8 +320,8 @@ def plan_import(
     plan: dict[str, list[dict[str, Any]]] = {"changes": [], "conflicts": [], "skipped": skipped}
     version = current_identity(deps.data_dir).game_version
     for character in seen.values():
-        _merge_character(deps, doc, character, plan, version)
-    if auctionator is not None:
+        _merge_character(deps, doc, character, plan, version, product)
+    for auctionator in auctionators:
         realms = doc.setdefault("realms", {})
         for realm, items in read_price_database(auctionator).items():
             table = {str(item): price._asdict() for item, price in sorted(items.items())}
