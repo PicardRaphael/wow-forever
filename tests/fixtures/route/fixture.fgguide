@@ -1,0 +1,152 @@
+{
+ "format": "factoruide-guide",
+ "version": 2,
+ "meta": {
+  "note": "fixture RX1 bloc G : structure seulement, valeurs inventées"
+ },
+ "request": {
+  "race": "Orc",
+  "class": "Hunter",
+  "from_level": 10,
+  "to_level": 18
+ },
+ "outcome": {
+  "route": {
+   "format": 3,
+   "name": "Fixture Route",
+   "race_id": 2,
+   "class_id": 3,
+   "class": "Hunter",
+   "faction": "Horde",
+   "from_level": 10,
+   "to_level": 18,
+   "total_time": 5400.0,
+   "total_time_text": "1h30",
+   "quests": 2,
+   "breakdown": {},
+   "professions": [],
+   "spells": [],
+   "checkpoints": [],
+   "steps": [
+    {
+     "kind": "accept",
+     "text": "",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": [],
+     "quest": 5723
+    },
+    {
+     "kind": "fly",
+     "text": "fixture",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": []
+    },
+    {
+     "kind": "objective",
+     "text": "",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": [],
+     "quest": 5723
+    },
+    {
+     "kind": "turnin",
+     "text": "",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": [],
+     "quest": 5723
+    },
+    {
+     "kind": "accept",
+     "text": "",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": [],
+     "quest": 999999
+    },
+    {
+     "kind": "turnin",
+     "text": "",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": [],
+     "quest": 999999
+    },
+    {
+     "kind": "train",
+     "text": "",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": []
+    },
+    {
+     "kind": "grind",
+     "text": "",
+     "alt": [],
+     "pre": [],
+     "pre_any": [],
+     "bg": false,
+     "inside": false,
+     "say": [],
+     "mobs": [],
+     "mob_ids": [],
+     "elite": false,
+     "spells": []
+    }
+   ]
+  },
+  "notes": []
+ }
+}
