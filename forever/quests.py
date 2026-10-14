@@ -317,6 +317,12 @@ def build_quests(deps: Deps, *, wow_dir: Path | None = None, rebuild: bool = Fal
     return book
 
 
+def routable(quest: Quest) -> bool:
+    """Vrai si une route peut placer la quête (RX1) : jamais une quête vue seulement chez Factoruide, jamais une
+    quête sans donneur positionné."""
+    raise NotImplementedError
+
+
 def value(quest: Quest, field: str) -> Any:
     """Valeur retenue d'un champ (None si aucune source ne le donne)."""
     entry = quest["fields"].get(field)

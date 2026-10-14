@@ -25,3 +25,12 @@ inventées et ne sont pas des valeurs de jeu.
 - `QuestieForeverDB` (SavedVariable de Questie) : deux quêtes apprises en jeu (96607, 886), champs `questId`,
   `title`, `level`, `mapID` seulement (aucun horodatage, aucun nom de personnage).
 - `xp_bonuses/` (T04f, bloc E) : extraits structurels de `NaowhForever_Discovery/Data/SleepingBag.lua` (1.1.11) et de `FojjiCore_DungeonJournal/Data/Guides.lua` (3.3.5, clé `sleepingbag`) : forme, objets, cartes, positions, quêtes et camps gardés ; conseils et textes remplacés (« tip », « text »).
+
+## `quests_rx1/` (RX1, bloc A)
+- Fichiers écrits à la main d'après la **structure** des fichiers installés le 2026-10-14 que nos lecteurs ignoraient
+  (Naowh Discovery `Data/Books.lua`, Forever Guide `ChainData.lua`, Dungeon Journal de Naowh `Data/QuestChains.lua`,
+  ForeverDungeonJournal `Data/QuestChains.lua` et `Data/QuestMaps.lua`, `QuestieConfig.char[…].complete` et entrées
+  sans titre de `QuestieForeverDB`) ; identifiants (990000 et plus), noms, niveaux et positions **inventés** ; aucun
+  nom de personnage réel.
+- `../factoruide/forever.sql` : schéma réduit de la base de Factoruide (`m_quest`, `m_quest_relation`,
+  `import_run`), cinq quêtes inventées ; la base SQLite est bâtie par le test dans `tmp_path`.
