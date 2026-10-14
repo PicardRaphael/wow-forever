@@ -13,7 +13,16 @@ def keys(buttons):
 def test_buttons_since_p06b():
     """P06b (décision 235) : « Mettre à jour » visible (T08d, T08e et P06b faites) ; RX1 : « Feuille de route » et
     « Livrer dans RestedXP »."""
-    assert keys(visible_buttons()) == ["talents", "leveling", "pets", "pvp", "update", "route", "route_deliver"]
+    assert keys(visible_buttons()) == [
+        "talents",
+        "leveling",
+        "pets",
+        "pvp",
+        "update",
+        "route",
+        "route_deliver",
+        "exports",
+    ]
     assert {"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b"} <= DONE_SLICES
 
 
@@ -22,7 +31,7 @@ def test_buttons_of_unfinished_slices_are_hidden():
     assert {"update", "gear", "last_fight"} <= set(all_keys)
     visible = keys(visible_buttons())
     assert "gear" not in visible and "last_fight" not in visible
-    assert keys(visible_buttons(DONE_SLICES - {"CH0", "P06b", "RX1"})) == ["talents", "leveling", "pvp"]
+    assert keys(visible_buttons(DONE_SLICES - {"CH0", "P06b", "RX1", "EX1"})) == ["talents", "leveling", "pvp"]
 
 
 def test_update_button_is_an_action_without_question():

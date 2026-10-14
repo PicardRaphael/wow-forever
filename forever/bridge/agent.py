@@ -71,6 +71,8 @@ class AgentResult:
     events: list[dict[str, Any]] = field(
         default_factory=list, compare=False, repr=False
     )  # flux lu (contrôle des chiffres)
+    # EX1 : liens typés `{kind, label, text}` rangés comme `links` (« build », « closest », « check », « export »)
+    exports: dict[str, list[dict[str, str]]] = field(default_factory=dict)
 
 
 def find_claude(which: Callable[[str], str | None] = shutil.which) -> str:

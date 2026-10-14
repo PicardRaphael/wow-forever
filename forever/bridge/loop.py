@@ -19,7 +19,7 @@ import os
 import threading
 import time
 from collections import deque
-from collections.abc import Callable, Iterable, Mapping
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import replace
 from pathlib import Path
 from typing import Any, Protocol
@@ -129,6 +129,8 @@ class Bridge:
         profile: Any | None = None,
         addons: Any | None = None,
         xp_watch: Callable[[], Mapping[str, Any] | None] | None = None,
+        exporter: Callable[[Mapping[str, str], Sequence[Mapping[str, str]]], tuple[str, list[dict[str, str]]]]
+        | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -152,6 +154,8 @@ class Bridge:
         self.profile = profile  # profile_gap.ProfileWatch : écart entre le jeu et le profil (bloc C)
         self.addons = addons  # addons.AddonsTurn : conversation « addons » (bloc F)
         self.xp_watch = xp_watch  # T04f : identifiants surveillés par les addons (xp_bonuses.xp_watch)
+        self.exporter = exporter  # EX1 : réponse du bouton Exports (exports.exports_reply), sans le modèle
+        self.last_exports: list[dict[str, str]] = []  # EX1 : liens typés de la dernière réponse qui en portait
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
         self.choices: list[Choice] = []  # RX1 : questions à choix publiées en cartes (décision 258)
