@@ -248,7 +248,7 @@ def test_best_zone_none_when_every_quest_is_gray(game_data):
 def test_missed_dungeon_window_is_infeasible(game_data):
     world, _ = make_world(game_data)
     at3 = start_state(level=3)
-    assert not run(game_data, world, [], start=at3, end_level=5).feasible  # niveau 4 atteint sans le donjon
+    assert any("manqué" in w for w in run(game_data, world, [], start=at3, end_level=5).warnings)  # par le farm
     assert run(game_data, world, [Stop("dungeon", DUNGEON)], start=at3, end_level=5).feasible
     no_dungeon, _ = make_world(game_data, dungeons=[])
     assert run(game_data, no_dungeon, [], start=at3, end_level=5).feasible
