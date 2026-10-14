@@ -964,10 +964,12 @@
         "/xp_bonus_tables",
         "/xp_bonuses",
         "/dungeon_tables",
-        "/dungeons"
+        "/dungeons",
+        "/travel_tables",
+        "/travel"
       ],
       "origin": "parametre",
-      "source": "règles de lecture du client (T03, PV1, CH0, T04f, DJ1)",
+      "source": "règles de lecture du client (T03, PV1, CH0, T04f, DJ1, RX1)",
       "reason": "règle de lecture des tables, pas une valeur de jeu"
     },
     {
@@ -1232,6 +1234,25 @@
       "registry": "D9"
     },
     {
+      "file": "travel.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables TaxiNodes, TaxiPath, TaxiPathNode et UiMapAssignment du client (forever decode, decode_rules.json travel)",
+      "certainty": "certain"
+    },
+    {
+      "file": "travel.json",
+      "paths": [
+        "/nodes/*/faction"
+      ],
+      "origin": "client",
+      "source": "camp d'un point de vol par TaxiNodes.Flags (bits de decode_rules.json travel.faction_flags)",
+      "certainty": "probable",
+      "reason": "sens des drapeaux déduit des noms des points (relevé sur 1.60.1.70338), pas lu"
+    },
+    {
       "file": "dungeons.json",
       "paths": [
         "**"
@@ -1352,6 +1373,17 @@
       "certainty": "suppose",
       "reason": "durée d'un passage non mesurée sur Forever (LVL15) ; remplacée par les passages relevés",
       "registry": "I16"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/route.travel"
+      ],
+      "origin": "manuel",
+      "source": "paramètres de trajet de Factoruide (MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14), RX1 bloc B",
+      "certainty": "suppose",
+      "reason": "vitesses de course, de monture et de vol de Forever non mesurées (TRV1) ; remplacées par les relevés",
+      "registry": "C4"
     },
     {
       "file": "mechanics.json",

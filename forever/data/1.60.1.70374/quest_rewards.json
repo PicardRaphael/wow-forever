@@ -5543,7 +5543,7 @@
   "build": 70374,
   "locale": "enUS",
   "records": 187,
-  "kept_from_base": 203
+  "kept_from_base": 361
  },
  "notes": [
   "quest_xp : XP d'une quête par niveau de quête (clé) et par difficulté (colonne), table QuestXP du client",
