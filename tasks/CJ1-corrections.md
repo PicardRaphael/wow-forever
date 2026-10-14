@@ -10,4 +10,4 @@
   -    props = tool.inputSchema["properties"]
   +    props = tool.input_schema["properties"]
   ```
-- **Statut** : en attente de ton accord.
+- **Statut** : acceptée par l'utilisateur le 2026-10-14, appliquée.

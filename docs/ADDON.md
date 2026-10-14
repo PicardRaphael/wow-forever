@@ -567,6 +567,22 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
    spécialisation du personnage est affectée à un profil dans EllesmereUI (message, rien fait) ; vérifier après un
    `/reload` et une nouvelle connexion que le profil reste celui attendu (question EUI2).
 
+#### Essai CJ-1 : départ réel des feuilles de route (CJ1, bloc 1a, décisions 273 et 277 ; avant la fin de la bêta)
+Acceptation par l'utilisateur exigée (décision 273). Préparation, jeu fermé : `uv run forever bridge install`
+(ForeverBridge envoie désormais ses coordonnées), `uv run forever bridge stop`, attendre « surveillance : arrêtée »
+dans `uv run forever bridge autostart status`, puis `schtasks /Run /TN "WoW Forever - pont"`.
+1. **Gnome neuf** à Coldridge Valley, niveau 1 : `/fv`, bouton « Feuille de route », puis dans « À valider » choisir
+   « 10 niveaux » (les questions passent dans le chat au bloc 2). Attendu : premiers arrêts dans Coldridge Valley ou
+   Dun Morogh, aucun arrêt à Elwynn Forest ni à Stormwind City, aucune quête « The Alliance Needs… », de la Foire ou
+   d'une fête ; l'aperçu dit « départ : position du personnage dans le jeu ».
+2. **Personnage Horde neuf** (Orc ou Troll, Valley of Trials) : même demande. Attendu : départ dans Valley of Trials
+   puis Durotar ; un passage à Orgrimmar vers le niveau 9 est une quête de la chaîne de Durotar (« Hidden Enemies »),
+   pas un détour.
+3. **Personnage déjà avancé** (quêtes faites) : `/reload` d'abord (Questie sauvegarde ses quêtes faites), puis
+   `uv run forever profile import --yes`, puis la même demande. Attendu : aucune quête déjà rendue dans la route.
+4. Ce qui ne change pas encore (blocs suivants) : questions dans « À valider », deux aperçus possibles, nom du guide
+   livré, vols et pierre de foyer absents des trajets. À dire si autre chose cloche ; sinon : « CJ-1 accepté ».
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 

@@ -74,7 +74,7 @@ def test_mcp_forever_route_accepts_race_position_and_character(make_deps):
             return tool, planned
 
     tool, planned = asyncio.run(go())
-    props = tool.inputSchema["properties"]
+    props = tool.input_schema["properties"]
     assert {"race", "start_map", "start_x", "start_y", "character"} <= set(props)
     assert not planned.is_error
     assert planned.structured_content["request"]["race"] == "Orc"
