@@ -27,6 +27,10 @@ PC `RAPHAEL-GAMING`, jeu dans `C:\Program Files (x86)\World of Warcraft`, sauveg
      d'archivage des personnages de la bêta (étape 13). `uv run forever wow list` montre ensuite
      `Choix : <dossier> (version finale adoptée)`.
    - Sinon : un refus dit pourquoi (produit de la bêta, produit public connu, produit illisible).
+   - **Profil gelé jusqu'à l'étape 13** : à partir d'ici et jusqu'à l'archivage des personnages de la bêta,
+     aucune écriture dans le profil depuis la version finale : ni import du profil, ni carte « profil »
+     du pont en jeu (« Créer le personnage au profil », « Appliquer »), ni `/fb base`. Sinon un personnage de la
+     version finale du même nom serait fusionné avec celui de la bêta.
 5. **Variables d'environnement** : `powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1`.
    - À voir : la question « FOREVER_WOW_DIR vaut … ; forever choisit … (version finale adoptée). Remplacer ? »,
      répondre `o` ; puis `FOREVER_WOW_DIR = <dossier>`. Ouvrir ensuite un **nouveau** terminal.
@@ -52,7 +56,8 @@ PC `RAPHAEL-GAMING`, jeu dans `C:\Program Files (x86)\World of Warcraft`, sauveg
 9. **Diagnostic** : `uv run forever doctor`.
    - À voir : `Bilan : … 0 bloquant(s)` (seul `antivirus` reste `[?]`). Sinon : appliquer la correction donnée sous
      chaque `[x]` et `[!]`, puis relancer.
-10. **Première connexion** : se connecter avec un personnage, jouer quelques minutes, quitter.
+10. **Première connexion** : se connecter avec un personnage, jouer quelques minutes, quitter (profil toujours
+    gelé : ignorer les cartes « profil » du pont).
     - À voir ensuite : `uv run forever doctor` → `combatlog` `[ok]` (journal avancé récent, activé par
       ForeverLogger).
 11. **Données de la version finale** : `uv run forever update`.
@@ -61,8 +66,8 @@ PC `RAPHAEL-GAMING`, jeu dans `C:\Program Files (x86)\World of Warcraft`, sauveg
       attente le demande).
     - Sinon : `uv run forever update status` ; une version pas encore publiée sur wago.tools attend.
 12. **Données héritées de la bêta** : `uv run forever measures inherited` liste les PV encore issus de la bêta.
-13. **Profil** : `uv run forever profile archive --product <produit de la bêta>` (affiché à l'étape 4), puis
-    `uv run forever profile import`.
+13. **Profil, dans cet ordre** : d'abord `uv run forever profile archive --product <produit de la bêta>`
+    (affiché à l'étape 4), **ensuite seulement** `uv run forever profile import` ; le profil n'est plus gelé.
     - À voir : les personnages de la bêta dans `uv run forever profile list --archived` ; les nouveaux personnages
       importés (produit de la version finale).
 14. **Mesures** : après quelques sessions de jeu, `uv run forever measures refresh`.
@@ -83,6 +88,7 @@ sont dites à chaque étape.
 3. `uv run forever wow list` : même lecture qu'au PC de jeu ; la racine peut différer (autre disque) : section « Le
    jeu change de dossier ».
 4. `uv run forever wow adopt "<dossier>"` : l'adoption est propre à chaque PC (journal des versions du cache local).
+   Profil gelé jusqu'à l'étape 13, comme au PC de jeu (ni import, ni carte « profil » du pont, ni `/fb base`).
 5. `powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1`, accepter le nouveau `FOREVER_WOW_DIR`,
    nouveau terminal.
 6. Addons, jeu fermé : `uv run python scripts/install_addon.py`, puis `uv run forever bridge install`.
@@ -95,8 +101,8 @@ sont dites à chaque étape.
 11. `uv run forever update` : si le PC de jeu l'a déjà fait, la version finale arrive par `git pull` (rien à
     télécharger).
 12. `uv run forever measures inherited`.
-13. Profil : le profil est propre à chaque PC ; `uv run forever profile archive --product <produit de la bêta>`, puis
-    `uv run forever profile import`.
+13. Profil, dans cet ordre : le profil est propre à chaque PC ; d'abord
+    `uv run forever profile archive --product <produit de la bêta>`, ensuite seulement `uv run forever profile import`.
 14. `uv run forever measures refresh` si des journaux de la version finale y sont écrits.
 
 ## Le jeu change de dossier
@@ -113,7 +119,8 @@ Nouveau disque, `Program Files` ↔ `Program Files (x86)`, dossier choisi dans B
 4. Puis, dans l'ordre : étape 5 (`install_plugin.ps1`), étape 6 (addons), étape 8 (tâches), étape 9 (`forever doctor`).
    La surveillance du pont suit seule le nouveau choix (jeu fermé, événement `autostart_wow_changed` du journal du
    pont) ; une tâche qui force l'ancien dossier est à recréer.
-5. SavedVariables restées dans l'ancien dossier, même produit : `uv run forever backup restore --only wtf`, jeu fermé.
+5. SavedVariables restées dans l'ancien dossier, même produit : `uv run forever backup restore <date> --only wtf`,
+   jeu fermé, avec une sauvegarde postérieure à l'adoption (section « Restaurer une sauvegarde »).
 
 ## Antivirus
 
@@ -134,10 +141,25 @@ Leçon du 12 octobre (décision 256) : tout C: effacé. Ordre :
 5. `powershell -ExecutionPolicy Bypass -File scripts\install_plugin.ps1`, nouveau terminal.
 6. Tâches : `uv run forever bridge autostart install`, puis
    `powershell -ExecutionPolicy Bypass -File scripts\install_update_task.ps1`.
-7. Restauration, jeu fermé : `uv run forever backup list`, puis `uv run forever backup restore` (la plus récente ;
-   l'état courant est sauvegardé d'abord). Les sauvegardes sont sur F: (jamais sur C: par défaut).
+7. Restauration, jeu fermé : `uv run forever backup restore <date>`, avec une sauvegarde **postérieure à
+   l'adoption** de la version finale (section « Restaurer une sauvegarde » ci-dessous). Les sauvegardes sont sur F:
+   (jamais sur C: par défaut).
 8. Addons : `uv run python scripts/install_addon.py` et `uv run forever bridge install`.
 9. `uv run forever doctor` jusqu'à 0 bloquant.
+
+## Restaurer une sauvegarde
+
+**Jamais une sauvegarde antérieure à l'adoption de la version finale.** Elle contient le journal des versions
+d'avant l'adoption : la restaurer efface l'adoption et les versions relevées depuis, et forever repasse sur la
+bêta. La sauvegarde de raison « avant adoption » est elle-même **antérieure** : ne pas la restaurer non plus.
+
+1. Jeu fermé : `uv run forever backup list` ; repérer la ligne « avant adoption » et ne retenir qu'une
+   sauvegarde **plus récente** qu'elle (date `AAAA-MM-JJTHHMMSS` en heure UTC).
+2. `uv run forever backup restore <date>` (sans date : la plus récente, toujours postérieure si l'adoption a eu
+   lieu sur ce PC) ; `--only profile|wtf|bridge|update|cache` pour une partie seulement. L'état courant est
+   sauvegardé d'abord (raison « avant restauration »).
+3. Si une sauvegarde antérieure a été restaurée par erreur : `uv run forever wow list`, puis refaire
+   `uv run forever wow adopt "<dossier>"`, ou restaurer la sauvegarde « avant restauration ».
 
 ## Tests en jeu restés en attente
 

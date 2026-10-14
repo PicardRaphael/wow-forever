@@ -56,10 +56,12 @@ Pas-à-pas du lancement du 4 novembre, sur chaque PC : `docs/LANCEMENT.md`.
   hors système (d'abord celui dont le nom contient « sauvegarde » ou « backup »), sinon OneDrive connecté, sinon
   Documents (avertissement). Sauvegarde du jour au passage automatique de `forever update` (jeu fermé), avant
   `forever wow adopt` et avant toute restauration. La restauration exige le jeu fermé et l'accord, et sauvegarde
-  l'état courant d'abord.
+  l'état courant d'abord. Jamais une sauvegarde antérieure à l'adoption de la version finale (elle effacerait l'adoption) :
+  `docs/LANCEMENT.md`, section « Restaurer une sauvegarde ».
 - `forever profile archive --product <produit> [--yes]`, `forever profile list --archived` : personnages d'un
   produit (la bêta au lancement) rangés à part, gardés, plus jamais actifs ; un homonyme de la version finale est un
-  nouveau personnage. `forever profile import` lit tous les comptes de l'installation.
+  nouveau personnage, à condition d'archiver **avant** tout import depuis la version finale. `forever profile
+  import` lit tous les comptes de l'installation.
 - `forever measures inherited [--version …] [--json]` : PV encore hérités de la version précédente (la bêta), qui
   sortent de la liste une fois remesurés par les journaux de la version finale. Un journal d'un autre produit que
   celui des données n'est jamais mesuré sans `--accept-version`.
