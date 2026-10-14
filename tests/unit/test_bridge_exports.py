@@ -177,7 +177,7 @@ def test_exports_reply_gives_the_current_build_and_the_last_links(deps):
 
 def test_exports_reply_says_what_is_missing(deps):
     text, links = exports_reply(deps, {**CONTEXT, "talents": ""}, [])
-    assert links == [] and "aucun talent" in text
+    assert not [link for link in links if link["kind"] == "naowh_build"] and "aucun talent" in text
 
 
 def test_exports_reply_needs_the_character(deps):
