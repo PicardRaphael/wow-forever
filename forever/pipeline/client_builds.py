@@ -281,3 +281,13 @@ def forget_product(cache_dir: Path, product: str) -> bool:
     del products[product]
     _write_doc(cache_dir, load_builds(cache_dir), products)
     return True
+
+
+def version_prefix(version: str) -> str:
+    """Préfixe des versions publiées d'un produit (`1.60.`), tiré d'une version lue."""
+    raise NotImplementedError
+
+
+def final_client(cache_dir: Path, wow_dir: Path | None) -> ClientBuild | None:
+    """Version du client de `wow_dir` si son produit est adopté comme version finale ; None sinon."""
+    raise NotImplementedError

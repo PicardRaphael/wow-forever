@@ -56,11 +56,22 @@ def test_script_sets_user_environment_variables():
         assert re.search(rf"SetEnvironmentVariable\(\s*['\"]{name}['\"][^)]*['\"]User['\"]\s*\)", text), name
 
 
-def test_script_detects_wow_in_both_program_files():
+def test_script_takes_the_client_folder_from_forever_wow_list():
+    """LN1 : le dossier vient du choix de `forever wow list --json` (bêta ou version finale adoptée), plus d'une
+    liste de dossiers écrite en dur ; l'accord est demandé avant de remplacer un FOREVER_WOW_DIR différent."""
     text = script()
-    assert "Program Files (x86)" in text
-    assert re.search(r"Program Files\\World of Warcraft|ProgramW6432|\$env:ProgramFiles\b", text)
-    assert "_classic_beta_" in text
+    assert "forever wow list --json" in text
+    assert "_classic_beta_" not in text
+    assert re.search(r"\[switch\]\$Print", text)
+    asked = text.index("Read-Host")
+    assert asked < text.index('SetEnvironmentVariable("FOREVER_WOW_DIR"')
+
+
+def test_script_finds_the_folder_after_uv_sync():
+    """`uv run` sur un environnement non synchronisé le synchroniserait (réseau possible) : le choix se lit après
+    `uv sync`."""
+    text = script()
+    assert text.index("uv sync --project") < text.index("forever wow list --json", text.index("# 4."))
 
 
 def test_script_installs_the_plugin_at_user_scope():

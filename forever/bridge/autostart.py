@@ -389,6 +389,11 @@ def _stop_starting_bridge(
         sleep(1.0)
 
 
+def resolve_wow_dir(cache_dir: Path) -> Path | None:
+    """Dossier du client choisi par `forever.installs` (LN1)."""
+    raise NotImplementedError
+
+
 def main(argv: list[str] | None = None) -> int:
     """Point d'entrée de la tâche planifiée (`pythonw.exe -m forever.bridge.autostart`) : aucune console, tout va
     dans le journal du pont."""

@@ -345,8 +345,18 @@ def test_install_registers_the_task_and_starts_it(windows, make_deps, tmp_path, 
     assert xml.parent == deps.cache_dir / "bridge" and xml.read_bytes()[:2] == b"\xff\xfe"  # UTF-16 avec BOM
     root = ET.fromstring(windows.tasks[autostart.TASK_NAME].split("?>", 1)[1])
     assert text(root, "t:Actions/t:Exec/t:Command") == str(tmp_path / "pythonw.exe")
-    assert f'--wow-dir "{tmp_path / "wow"}"' in text(root, "t:Actions/t:Exec/t:Arguments")
+    # LN1 : sans --wow-dir explicite, la surveillance suit le choix de forever.installs à chaque lancement
+    assert "--wow-dir" not in text(root, "t:Actions/t:Exec/t:Arguments")
     assert payload["installed"] is True and payload["started"] is True and "provenance" in payload
+
+
+def test_install_with_an_explicit_folder_forces_it(windows, make_deps, tmp_path, capsys):
+    deps = deps_with_wow(make_deps, tmp_path)
+    assert main(["bridge", "autostart", "install", "--wow-dir", str(tmp_path / "wow"), "--no-start"], deps) == 0
+    create = windows.calls[0]
+    root = ET.fromstring(windows.tasks[autostart.TASK_NAME].split("?>", 1)[1])
+    assert create[0] == "/Create"
+    assert f'--wow-dir "{tmp_path / "wow"}"' in text(root, "t:Actions/t:Exec/t:Arguments")
 
 
 def test_install_without_start(windows, make_deps, tmp_path, capsys):

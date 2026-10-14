@@ -354,3 +354,8 @@ def archived_questcache(cache_dir: Path, build: str) -> Path | None:
     """Copie la plus récente du `questcache.wdb` d'un build (`70338`), ou None (T04d, bloc B)."""
     path = cache_dir / ARCHIVE_DIR / build / QUESTCACHE
     return path if path.is_file() else None
+
+
+def archive_dir(cache_dir: Path, product: str | None, build: str) -> Path:
+    """Dossier des archives d'un build d'un produit (LN1)."""
+    raise NotImplementedError
