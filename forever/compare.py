@@ -707,3 +707,140 @@ def adapted_route(
         additions.append({"kind": kind, "ref": ref, "level": at, "seconds": best[0] - current.seconds, "placed": True})
         stops, current = best[1], best[2]
     return Adapted(stops, additions, current)
+
+
+ATTRIBUTION = (
+    "Adapté des parcours gratuits de RestedXP Guides ({guides}), licence CC BY-NC-SA 4.0 ; usage personnel non "
+    "commercial ; cette adaptation reste sous la même licence"
+)
+
+
+def _final_state(
+    gd: GameData, world: RouteWorld, stops: Sequence[Stop], start: RouteState, *, end_level: int, cap: int
+) -> RouteState:
+    """État à la fin d'une suite d'arrêts déroulée comme `run_stops` (farm du parcours compris, sans farm final)."""
+    from forever.engine.route import apply_stop, check_stop, grind_to
+
+    world = replace(world, refuse_red=False, early_zones=None)
+    state = start
+    for stop in stops:
+        if state.level >= end_level:
+            break
+        if stop.kind == "grind":
+            if state.level < int(stop.ref):
+                state, _ = grind_to(gd, world, start, state, level=min(int(stop.ref), end_level), cap=cap)
+            continue
+        if check_stop(gd, world, state, stop) is not None:
+            break
+        state, _ = apply_stop(gd, world, state, stop, cap=cap)
+    return state
+
+
+def delivered_route(
+    deps: Any, ctx: Any, request: Any, found: Any, *, wow_dir: Path | None = None
+) -> tuple[RouteResult, dict[str, Any]]:
+    """Route livrée (décisions 277 et 279) : sur les niveaux couverts par le parcours gratuit de la race et de la
+    classe, notre calcul s'il est accepté, sinon la base adaptée (attribution à RestedXP) ; au-delà, notre calcul repris
+    depuis la fin de la base adaptée. Sans race ou sans parcours : notre calcul, dit tel quel. Registre : I18"""
+    from forever.errors import InvalidArgumentError
+    from forever.optimize.route import plan
+    from forever.route_check import accept_route
+    from forever.rxp_guides import guide_chain, read_rxp_guides, who_for
+
+    basis: dict[str, Any] = {
+        "kind": "calcul",
+        "guides": [],
+        "accepted": None,
+        "additions": [],
+        "attribution": None,
+        "verdict": "aucun parcours gratuit de référence (race inconnue ou RestedXP absent)",
+    }
+    if not request.race:
+        return found.result, basis
+    try:
+        library = read_rxp_guides(_addons(deps, wow_dir))
+        who = who_for(request.class_name, request.race, request.faction)
+        chain = guide_chain(library, who)
+    except InvalidArgumentError:
+        return found.result, basis
+    tops = [g.levels[1] for g in chain.guides if g.levels]
+    covered = min(request.end_level, max(tops)) if tops else request.start_level
+    guides = [
+        g.name
+        for g in chain.guides
+        if g.levels is None or (g.levels[0] < covered and g.levels[1] > request.start_level)
+    ]
+    basis["guides"] = guides
+    if covered <= request.start_level:
+        basis["verdict"] = (
+            "niveaux au-delà des parcours gratuits : notre calcul (référence Polestar à venir, décision 278)"
+        )
+        return found.result, basis
+    gd, world, start, cap = ctx.gd, ctx.world, ctx.start, ctx.cap
+    ours = found if covered == request.end_level else plan(gd, world, start, end_level=covered, cap=cap)
+    replay = replay_rxp(gd, world, chain.guides, who, start, end_level=covered, cap=cap)
+    quests = world.quests
+
+    def turnins(stops: Sequence[Stop]) -> list[tuple[int, int | None]]:
+        return [
+            (int(s.ref), quests[int(s.ref)].zone if int(s.ref) in quests else None) for s in stops if s.kind == "turnin"
+        ]
+
+    mine, theirs = turnins(ours.stops), turnins(replay.stops)
+    alone = [q for q, _ in mine if q not in {r for r, _ in theirs}]
+    gains = _measured_gains(
+        gd, world, ours.stops, start, quests=alone, end_level=covered, cap=cap, seconds=ours.result.seconds
+    )
+    verdict = accept_route(mine, theirs, quests, ctx.book.zone_names, dropped=world.dropped, gains=gains)
+    basis["accepted"] = verdict["accepted"]
+    if verdict["accepted"]:
+        basis["verdict"] = (
+            f"notre calcul, {verdict['explanation']} (parcours gratuit de RestedXP de la race et de la classe)"
+        )
+        return found.result, basis
+    adapted = adapted_route(
+        gd,
+        world,
+        chain.guides,
+        who,
+        start,
+        end_level=covered,
+        cap=cap,
+        class_quests=request.class_quests,
+        dungeons=request.dungeons != "none",
+    )
+    basis.update(
+        kind="parcours adapté",
+        additions=adapted.additions,
+        attribution=ATTRIBUTION.format(guides=", ".join(guides)),
+        verdict=(
+            f"notre calcul {verdict['explanation']} ; route livrée : le parcours gratuit de RestedXP de la race et de "
+            "la classe, adapté (quêtes de classe et donjons ajoutés)"
+        ),
+    )
+    if covered >= request.end_level or not adapted.result.feasible:
+        return adapted.result, basis
+    after = _final_state(gd, world, adapted.stops, start, end_level=covered, cap=cap)
+    rest = plan(gd, world, after, end_level=request.end_level, cap=cap)
+    stops = (
+        *[r for r in adapted.result.stops if r.kind != "grind" or r is not adapted.result.stops[-1]],
+        *rest.result.stops,
+    )
+    seconds = sum(r.seconds for r in stops)
+    xp = sum(r.xp for r in stops)
+    from forever.engine.route import weakest
+
+    combined = RouteResult(
+        start_level=start.level,
+        end_level=rest.result.end_level,
+        reached=rest.result.reached,
+        feasible=adapted.result.feasible and rest.result.feasible,
+        seconds=seconds,
+        xp=xp,
+        xp_h=xp / (seconds / SECONDS_PER_HOUR) if seconds > 0 else 0.0,
+        stops=stops,
+        warnings=(*adapted.result.warnings, *rest.result.warnings),
+        certainty=weakest(adapted.result.certainty, rest.result.certainty),
+    )
+    basis["verdict"] += f" ; au-delà du niveau {covered}, notre calcul"
+    return combined, basis

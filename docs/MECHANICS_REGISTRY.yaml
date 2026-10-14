@@ -1805,6 +1805,9 @@ mechanics:
       - "ForeverLogger (cadence des gains d'XP de monstre d'une même séance), lu en local"
       - "forever/data/1.60.1.70338/mechanics.json (leveling.kill_time_estimate : cible de Blizzard de 10 à 15 s par monstre en solo ; measures.kill_time : paramètres de mesure)"
     tests:
+      - tests/unit/test_kill_time_camp.py::test_camp_pause_comes_from_mechanics
+      - tests/unit/test_kill_time_camp.py::test_camp_band_keeps_only_short_intervals
+      - tests/unit/test_kill_time_camp.py::test_route_scope_prefers_the_camp_band
       - tests/unit/test_kill_time.py::test_fight_durations_include_the_pet
       - tests/unit/test_kill_time.py::test_kill_cadence_skips_long_pauses_and_other_gains
       - tests/unit/test_kill_time.py::test_measures_by_class_and_level_band
@@ -1870,7 +1873,7 @@ mechanics:
       - "recherche : code MIT de Factoruide (brouznouf/factoruide@f7da6da : plan/worth.rs, plan/construct.rs nearest_stop, plan/moves.rs, plan/search.rs), porté en sous-ensemble ; règles d'XP et de temps de forever, jamais celles de Factoruide"
       - "forever/data/1.60.1.70374/mechanics.json (route.search : journal, frais d'arrêt, poids de zone et part du farm repris de Factoruide, suppose ; essais et graine de la recherche)"
       - "RX1c (décision 268) : parcours gratuits en clair de RestedXP rejoués par la même simulation pour mesurer nos routes (une mesure, pas une source) ; farm au milieu d'une route (grind_to, mêmes règles que le farm final)"
-      - "CJ1 (décision 277) : départ de la position réelle (carte et coordonnées de ForeverBridge), sinon du premier donneur du parcours gratuit de RestedXP de la race, sinon départage par la distance ; quêtes faites du personnage (profil, Questie) retirées ; masques de race (bit étendu des sources de Forever pour les Skyborne) ; garde-fous route.filters (catégories QuestSort et specialFlags de Questie : événements, effort de guerre, champs de bataille, répétables, métiers ; suppose) ; quête rouge jamais prise par notre route hors donjon (politique de route, le rejeu d'un guide la permet) ; zone de départ d'abord sous route.filters.low_level : quêtes de la zone de départ et des zones que le parcours gratuit de la race visite à ces niveaux, sauf quête de classe ou de donjon (décision 278, règle aussi tenue par Polestar) ; parcours gratuits de RestedXP : référence d'apprentissage et base adaptée (décision 277)"
+      - "CJ1 (décision 277) : départ de la position réelle (carte et coordonnées de ForeverBridge), sinon du premier donneur du parcours gratuit de RestedXP de la race, sinon départage par la distance ; quêtes faites du personnage (profil, Questie) retirées ; masques de race (bit étendu des sources de Forever pour les Skyborne) ; garde-fous route.filters (catégories QuestSort et specialFlags de Questie : événements, effort de guerre, champs de bataille, répétables, métiers ; suppose) ; quête rouge jamais prise par notre route hors donjon (politique de route, le rejeu d'un guide la permet) ; acceptation automatique (décision 279 : forever route recette, zones et au plus trois différences expliquées) et base adaptée (parcours gratuit de la race rejoué, quêtes de classe et donjons avec toutes leurs quêtes ajoutés, attribution) ; pas de farm quand des quêtes restent ; quête qui ouvre une quête de donjon toujours prise ; zone de départ d'abord sous route.filters.low_level : quêtes de la zone de départ et des zones que le parcours gratuit de la race visite à ces niveaux, sauf quête de classe ou de donjon (décision 278, règle aussi tenue par Polestar) ; parcours gratuits de RestedXP : référence d'apprentissage et base adaptée (décision 277)"
     tests:
       - tests/unit/test_route_cj1_start.py::test_start_from_the_context_position_first
       - tests/unit/test_route_cj1_start.py::test_start_from_the_free_guide_of_the_race_without_position
@@ -1887,6 +1890,19 @@ mechanics:
       - tests/unit/test_route_cj1_zone.py::test_class_and_dungeon_quests_stay_allowed
       - tests/unit/test_route_cj1_zone.py::test_reference_zones_are_the_zones_of_the_race_guide_below_the_threshold
       - tests/unit/test_route_cj1_zone.py::test_guide_replays_are_not_constrained
+      - tests/unit/test_route_check.py::test_same_route_is_accepted
+      - tests/unit/test_route_check.py::test_explained_differences_within_the_limit_are_accepted
+      - tests/unit/test_route_check.py::test_measured_gain_explains_a_quest_of_ours
+      - tests/unit/test_route_check.py::test_unexplained_differences_refuse_the_route_with_the_gap
+      - tests/unit/test_route_check.py::test_different_zone_sequence_refuses_the_route
+      - tests/unit/test_route_check.py::test_recette_cli
+      - tests/unit/test_route_adapted.py::test_adapted_route_keeps_the_guide_and_adds_class_quests_and_dungeons
+      - tests/unit/test_route_adapted.py::test_adapted_route_without_additions_is_the_replay
+      - tests/unit/test_route_basis.py::test_plan_says_which_route_is_delivered_and_why
+      - tests/unit/test_route_basis.py::test_without_race_the_route_is_our_calculation
+      - tests/unit/test_route_no_farm.py::test_no_farm_while_quests_remain
+      - tests/unit/test_route_no_farm.py::test_improvement_keeps_the_quests_of_the_construction
+      - tests/unit/test_route_dungeon_chain.py::test_prerequisite_of_a_dungeon_quest_is_always_worth_it
       - tests/unit/test_rxp_compare.py::test_replay_follows_the_guide_logic
       - tests/unit/test_rxp_compare.py::test_replay_starts_in_the_guide_of_the_start_level
       - tests/unit/test_rxp_compare.py::test_rxp_compare_cli

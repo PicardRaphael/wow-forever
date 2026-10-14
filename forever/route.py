@@ -661,8 +661,9 @@ def _stop_payload(book: Any, rows: dict[str, Any], r: Any, *, end_level: int) ->
     else:
         q = book.quests.get(r.ref)
         name = (q or {}).get("name") or f"la quête {r.ref}"
+    target = r.ref if r.kind == "grind" and isinstance(r.ref, int) else end_level  # farm du milieu d'une route
     text = (
-        f"farme des monstres de ton niveau jusqu'au niveau {end_level}"
+        f"farme des monstres de ton niveau jusqu'au niveau {target}"
         if r.kind == "grind"
         else (f"{STEP_VERB[r.kind]} {name}")
     )
@@ -1050,7 +1051,9 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     )
     trainers, train_levels = ctx.trainers, ctx.train_levels
     found = plan(gd, world, start, end_level=request.end_level, cap=cap, tries=request.tries, seed=request.seed)
-    result = found.result
+    from forever.compare import delivered_route
+
+    result, basis = delivered_route(deps, ctx, request, found, wow_dir=wow_dir)
     by_id = {str(r["id"]): r for r in rows}
     stops = [_stop_payload(book, by_id, r, end_level=request.end_level) for r in result.stops]
     reminders = bonus_reminders(gd, XpBonusState(), hours=result.seconds / SECONDS_PER_HOUR, level=request.start_level)
@@ -1126,6 +1129,7 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
             "seconds": result.seconds,
         },
         "certainty": result.certainty,
+        "basis": basis,
         "provenance": provenance,
     }
     path = deps.cache_dir / ROUTES_DIR / f"{plan_id}.json"
@@ -1155,7 +1159,7 @@ def load_plan(deps: Any, plan_id: str) -> dict[str, Any]:
     return doc
 
 
-PREVIEW_FIELDS = ("id", "levels", "hours", "xp_h", "dungeons", "rewards", "bonuses", "certainty", "stops")
+PREVIEW_FIELDS = ("id", "levels", "hours", "xp_h", "dungeons", "rewards", "bonuses", "certainty", "stops", "basis")
 
 
 def route_preview(plan: Any) -> dict[str, Any]:
@@ -1175,6 +1179,7 @@ def route_preview(plan: Any) -> dict[str, Any]:
         "bonuses": [r["text"] for r in plan.get("reminders") or []],
         "certainty": plan["certainty"],
         "stops": len(plan["stops"]),
+        "basis": {k: (plan.get("basis") or {}).get(k) for k in ("kind", "verdict", "guides")},
     }
 
 

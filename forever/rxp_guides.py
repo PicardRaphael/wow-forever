@@ -274,6 +274,12 @@ def _find(library: Library, name: str, who: Who, group: str | None) -> Guide | N
     return found[0] if found else None
 
 
+def _for_class(guide: Guide, who: Who) -> bool:
+    """Le guide vise la classe du personnage (sa classe nommée dans le filtre du guide, sans négation)."""
+    tokens = (guide.filter or "").replace("/", " ").split()
+    return who.class_name.lower() in {tok.lower() for tok in tokens}
+
+
 def guide_chain(library: Library, who: Who, *, start: str | None = None) -> Chain:
     """Parcours suivi par ce personnage : guide de départ (`start`, partie du nom ; sinon le guide `#defaultfor` du
     personnage au plus bas niveau), puis chaque `#next` permis (le premier nom connu d'une ligne « ; »). Les suites
@@ -293,7 +299,10 @@ def guide_chain(library: Library, who: Who, *, start: str | None = None) -> Chai
                 "Aucun parcours RestedXP en clair pour ce personnage (classe, race, camp).",
                 "voir forever route rxp-coverage, ou donner --start-guide",
             )
-        first = min(defaults, key=lambda g: (g.levels or (999, 999), g.name))
+        # CJ1 : variante de la classe d'abord (« Mage AoE »), la variante standard avant « ADV » (avancée)
+        first = min(
+            defaults, key=lambda g: (not _for_class(g, who), "ADV" in g.name.split(), g.levels or (999, 999), g.name)
+        )
     chain, current = [first], first
     missing: list[str] = []
     while True:

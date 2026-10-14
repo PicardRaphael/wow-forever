@@ -55,7 +55,8 @@ def _step(stop: Mapping[str, Any], end_level: int) -> list[str]:
     elif kind == "train":
         lines.append(f"{INDENT}>>Train your new spells at your class trainer")
     elif kind == "grind":
-        lines.append(f"{INDENT}.xp {int(end_level)} >>Kill mobs of your level until level {int(end_level)}")
+        target = int(stop["ref"]) if isinstance(stop.get("ref"), int) else int(end_level)  # farm du milieu d'une route
+        lines.append(f"{INDENT}.xp {target} >>Kill mobs of your level until level {target}")
     else:
         raise ValueError(f"arrêt inconnu : {kind}")
     return lines
@@ -79,6 +80,9 @@ def encode_guide(plan: Mapping[str, Any], *, name: str, group: str) -> str:
         f"certitude {plan.get('certainty', 'suppose')}, données {prov.get('game_version', '?')} "
         f"{str(prov.get('data_sha', ''))[:12]}"
     )
+    basis = plan.get("basis") or {}
+    if basis.get("kind") == "parcours adapté":  # décision 277 : attribution obligatoire
+        lines.append(f"-- {guide_text(str(basis.get('attribution') or ''))}")
     for stop in plan["stops"]:
         lines += _step(stop, end_level)
     return "\n".join(lines) + "\n"
