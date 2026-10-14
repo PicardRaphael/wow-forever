@@ -10,7 +10,7 @@ from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.exports.codec import ExportFormatError
 
-KNOWN_PREFIXES = ("!NFB1!", "!NFM1!", "!NBIS1!", "NFSW1:")
+KNOWN_PREFIXES = ("!NFB1!", "!NFM1!", "!NBIS1!", "NFSW1:", "!EUI_")
 
 
 def read_export(deps: Deps, text: str) -> dict[str, Any]:
@@ -54,6 +54,16 @@ def read_export(deps: Deps, text: str) -> dict[str, Any]:
                 "order": order,
                 "unknown_nodes": unknown,
                 "provenance": local_provenance(deps, certainty="probable", assumptions=notes),
+            }
+        if body.startswith("!EUI_"):
+            from forever.exports.ellesmere import ELLESMERE_VERSION, read_ellesmere
+
+            payload = read_ellesmere(body)
+            note = f"chaîne !EUI_ relue (format d'EllesmereUI {ELLESMERE_VERSION})"
+            return {
+                "kind": "ellesmere",
+                **payload,
+                "provenance": local_provenance(deps, certainty="probable", assumptions=[note]),
             }
         if body.startswith(BIS_PREFIX):
             bis = read_naowh_bis(body)

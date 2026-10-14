@@ -57,11 +57,20 @@ def _error_result(deps: Deps, err: ForeverError) -> CallToolResult:
     )
 
 
-EXPORT_KINDS = ("naowh_build", "naowh_macros", "read")
+EXPORT_KINDS = ("naowh_build", "naowh_macros", "ellesmere", "read")
 
 
 def _export_lookup(
-    deps: Deps, name: str, *, class_name: str | None, level: int | None, talents: str | None, text: str | None
+    deps: Deps,
+    name: str,
+    *,
+    class_name: str | None,
+    level: int | None,
+    talents: str | None,
+    text: str | None,
+    character: str | None = None,
+    realm: str | None = None,
+    role: str | None = None,
 ) -> dict[str, Any]:
     """Domaine `export` de forever_lookup (EX1)."""
     if name == "read":
@@ -76,6 +85,17 @@ def _export_lookup(
         if level is None or not talents:
             raise InvalidArgumentError("Niveau ou talents manquants.", "donner class_name, level et talents")
         return naowh_export(deps, class_name or "Mage", level, parse_talents(talents))
+    if name == "ellesmere":
+        from forever.exports.ellesmere import ellesmere_export
+
+        if not (character and realm and class_name and role) or level is None:
+            raise InvalidArgumentError(
+                "Personnage, royaume, classe, niveau ou rôle manquant.",
+                "donner character, realm, class_name, level et role (dps, heal ou tank)",
+            )
+        return ellesmere_export(
+            deps, character, realm, class_name, level, role, talents=parse_talents(talents) if talents else None
+        )
     if name == "naowh_macros":
         from forever.exports.macros import macros_export
 
@@ -122,6 +142,9 @@ def build_server(deps: Deps) -> MCPServer:
         dungeon: str | None = None,
         access: str | None = None,
         text: str | None = None,
+        character: str | None = None,
+        realm: str | None = None,
+        role: str | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -173,7 +196,10 @@ def build_server(deps: Deps) -> MCPServer:
         `naowh_build` avec `class_name`, `level` et `talents` (« clé=rang,… ») : code `!NFB1!` de Naowh Forever (en
         jeu : /nf, Profiles, Import), ordre légal généré et signalé (`order_note`), statut `bloque` avec sa raison si
         le build est illégal ; `name` = `naowh_macros` avec `class_name` et `level` (`talents` facultatif) : macros de
-        la classe apprises au niveau, code `!NFM1!` et texte brut à coller sans Naowh (certitude `suppose`) ; `name` =
+        la classe apprises au niveau, code `!NFM1!` et texte brut à coller sans Naowh (certitude `suppose`) ;
+        `name` = `ellesmere` avec `character`, `realm`, `class_name`, `level` et `role` (dps, heal ou tank) : profil
+        EllesmereUI `!EUI_` « <personnage> - <rôle> » bâti sur le profil de base de la sauvegarde locale du joueur ;
+        `name` =
         `read` avec `text` (chaîne complète) : contenu relu en nos clés. Certitude `probable` (jamais importé en
         jeu)."""
         try:
@@ -224,7 +250,10 @@ def build_server(deps: Deps) -> MCPServer:
                 placed = parse_talents(current) if current else None
                 return popular_builds(require_addon(deps), deps, name or None, current=placed)
             if kind == "export":
-                return _export_lookup(deps, name, class_name=class_name, level=level, talents=talents, text=text)
+                return _export_lookup(
+                    deps, name, class_name=class_name, level=level, talents=talents, text=text,
+                    character=character, realm=realm, role=role,
+                )  # fmt: skip
             if kind == "pets":
                 return lookup_pets(deps, name or None, rank=rank, zone=zone, level=level, detail=detail)
             if kind == "pvp":

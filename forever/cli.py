@@ -813,6 +813,17 @@ def build_parser() -> argparse.ArgumentParser:
     exp_nfm.add_argument("--level", type=int, required=True, help="niveau du personnage")
     exp_nfm.add_argument("--talents", help="talents « clé=rang,… » (sorts de talent rendus seulement s'ils sont pris)")
     exp_nfm.add_argument("--json", action="store_true", help="sortie JSON")
+    exp_eui = exp_sub.add_parser("ellesmere", help="profil EllesmereUI !EUI_ « <personnage> - <rôle> » (EX1)")
+    exp_eui.add_argument("character", help="nom du personnage")
+    exp_eui.add_argument("--role", required=True, choices=["dps", "heal", "tank"], help="rôle du profil")
+    exp_eui.add_argument("--realm", help="royaume (défaut : profil forever du personnage)")
+    exp_eui.add_argument("--class", dest="cls", help="classe (défaut : profil forever du personnage)")
+    exp_eui.add_argument("--level", type=int, help="niveau (défaut : profil forever du personnage)")
+    exp_eui.add_argument("--talents", help="talents « clé=rang,… » (sorts de talent rendus seulement s'ils sont pris)")
+    exp_eui.add_argument("--base", help="profil de base de la sauvegarde EllesmereUI (défaut : le profil actif)")
+    exp_eui.add_argument("--paste", help="chaîne !EUI_ collée comme profil de base (au lieu de la sauvegarde)")
+    exp_eui.add_argument("--spec-key", help="clé de spécialisation EllesmereUI du personnage (si elle est inconnue)")
+    exp_eui.add_argument("--json", action="store_true", help="sortie JSON")
     for name, what in (("bis", "liste BiS !NBIS1!"), ("weights", "poids de statistiques NFSW1:")):
         exp_t10a = exp_sub.add_parser(name, help=f"{what} de Naowh Forever : format prêt, rempli par T10a")
         exp_t10a.add_argument("--json", action="store_true", help="sortie JSON")
@@ -2643,6 +2654,34 @@ def _cmd_export_naowh_build(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_export_ellesmere(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.exports.ellesmere import ellesmere_export
+    from forever.profile import read_profile
+
+    cls, level, realm = args.cls, args.level, args.realm
+    if cls is None or level is None or realm is None:
+        view = read_profile(deps, args.character)
+        found = view["character"] or {}
+        values = {k: (v.get("value") if isinstance(v, dict) else v) for k, v in found.items()}
+        cls, level, realm = cls or values.get("class"), level or values.get("level"), realm or values.get("realm")
+    if not cls or level is None or not realm:
+        raise InvalidArgumentError(
+            f"Classe, niveau ou royaume de {args.character} inconnus.", "donner --class, --level et --realm"
+        )
+    rep = ellesmere_export(
+        deps, args.character, str(realm), str(cls), int(level), args.role,
+        base_name=args.base, paste=args.paste, spec_key=args.spec_key,
+        talents=parse_talents(args.talents) if args.talents else None,
+    )  # fmt: skip
+    lines = [
+        f"EllesmereUI : profil « {rep['profile_name']} » ({rep['certainty']}) · {rep['import']}",
+        f"  base « {rep['base']['name']} » ({rep['base']['source']}), clé de spécialisation {rep['spec_key']}",
+        f"  {rep['code']}",
+    ]
+    _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
+
+
 def _cmd_export(deps: Deps, args: argparse.Namespace) -> int:
     if args.export_cmd == "naowh-build":
         return _cmd_export_naowh_build(deps, args)
@@ -2652,6 +2691,8 @@ def _cmd_export(deps: Deps, args: argparse.Namespace) -> int:
         rep = macros_export(deps, args.cls, args.level, parse_talents(args.talents) if args.talents else None)
         _emit(rep, render_macros(rep), rep["provenance"], args.json)
         return EXIT_OK
+    if args.export_cmd == "ellesmere":
+        return _cmd_export_ellesmere(deps, args)
     if args.export_cmd in ("bis", "weights"):
         what = "liste BiS (!NBIS1!)" if args.export_cmd == "bis" else "poids de statistiques (NFSW1:)"
         raise InvalidArgumentError(
@@ -2667,6 +2708,8 @@ def _cmd_export(deps: Deps, args: argparse.Namespace) -> int:
             f"Build Naowh « {rep['name']} » : {rep['class'] or rep['class_id']}, {rep['spec']}, {len(rep['points'])} points"
         )
         lines.append("  Ordre : " + ", ".join(k or "?" for k in rep["order"]))
+    elif rep["kind"] == "ellesmere":
+        lines[0] = f"Profil EllesmereUI (version {rep['version']}, {rep['type']}, client {rep.get('client')})"
     elif rep["kind"] == "naowh_bis":
         lines[0] = f"Liste BiS « {rep['name']} » ({rep['spec']}) : {len(rep['slots'])} emplacement(s)"
     elif rep["kind"] == "naowh_weights":

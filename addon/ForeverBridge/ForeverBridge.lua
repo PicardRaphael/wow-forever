@@ -1853,6 +1853,10 @@ function FB.Tick(elapsed)
 			FB.UpdateStatus()
 		end
 	end
+	if run.roleAt and GetTime() >= run.roleAt then
+		run.roleAt = nil
+		FB.SwitchProfile()
+	end
 	if run.testLeft then
 		run.testLeft = run.testLeft - elapsed
 		if run.testLeft <= 0 then
@@ -1974,6 +1978,177 @@ function FB.SetBackground(value)
 end
 
 ---------------------------------------------------------------------------
+-- Rôle du personnage et bascule de profil EllesmereUI (EX1, décision 267)
+---------------------------------------------------------------------------
+
+-- Rôles tenus par chaque classe (table des spécialisations de docs/SPEC.md) et libellés du nom de profil
+-- « <personnage> - <rôle> » écrit par forever export ellesmere.
+local ROLE_LABELS = { dps = "DPS", heal = "Soins", tank = "Tank" }
+local ROLE_ORDER = { "dps", "heal", "tank" }
+local CLASS_ROLES = {
+	WARRIOR = { dps = true, tank = true }, PALADIN = { heal = true, tank = true, dps = true },
+	HUNTER = { dps = true }, ROGUE = { dps = true }, PRIEST = { heal = true, dps = true },
+	SHAMAN = { dps = true, heal = true }, MAGE = { dps = true }, WARLOCK = { dps = true },
+	DRUID = { dps = true, tank = true, heal = true },
+}
+local CLASS_LABELS = {
+	WARRIOR = "Warrior", PALADIN = "Paladin", HUNTER = "Hunter", ROGUE = "Rogue", PRIEST = "Priest",
+	SHAMAN = "Shaman", MAGE = "Mage", WARLOCK = "Warlock", DRUID = "Druid",
+}
+local SWITCH_DELAY = 5 -- attente après la connexion : la bascule propre d'EllesmereUI passe d'abord
+
+local function CharName()
+	local ok, name = pcall(UnitName, "player")
+	return ok and type(name) == "string" and name or nil
+end
+
+local function CharKey()
+	local name = CharName()
+	local ok, realm = pcall(GetRealmName)
+	if not name or not ok or type(realm) ~= "string" then
+		return nil
+	end
+	return name .. " - " .. realm
+end
+
+local function PlayerClass()
+	local ok, token = pcall(UnitClassBase, "player")
+	return ok and type(token) == "string" and token or nil
+end
+
+function FB.Role()
+	local db, key = ForeverBridgeDB, CharKey()
+	if type(db) ~= "table" or type(db.roles) ~= "table" or not key then
+		return nil
+	end
+	return db.roles[key]
+end
+
+local function AllowedRoles(token)
+	local allowed = {}
+	for _, role in ipairs(ROLE_ORDER) do
+		if not CLASS_ROLES[token] or CLASS_ROLES[token][role] then
+			allowed[#allowed + 1] = role
+		end
+	end
+	return allowed
+end
+
+-- Vrai si la bascule automatique d'EllesmereUI vaut pour ce personnage : sa spécialisation (gardée par EllesmereUI,
+-- lecture seule de EllesmereUIDB) est affectée à un profil existant. Jamais d'écriture dans EllesmereUIDB.
+local function EllesmereAuto()
+	if type(EllesmereUI) ~= "table" or type(EllesmereUI.GetSpecProfile) ~= "function" then
+		return false
+	end
+	local key, spec = CharKey(), nil
+	if key and type(EllesmereUIDB) == "table" then
+		local ok, last = pcall(function()
+			local byChar = EllesmereUIDB.lastSpecByChar
+			return type(byChar) == "table" and byChar[key] or nil
+		end)
+		spec = ok and last or nil
+	end
+	local info = C_SpecializationInfo
+	if not spec and type(info) == "table" and type(info.GetSpecialization) == "function" then
+		local ok, index = pcall(info.GetSpecialization)
+		if ok and type(index) == "number" and index > 0 then
+			local okInfo, id = pcall(info.GetSpecializationInfo, index)
+			spec = okInfo and id or nil
+		end
+	end
+	if not spec then
+		return false
+	end
+	local ok, assigned = pcall(EllesmereUI.GetSpecProfile, spec)
+	if not ok or type(assigned) ~= "string" then
+		return false
+	end
+	local okList, _, profiles = pcall(EllesmereUI.GetProfileList)
+	return okList and type(profiles) == "table" and profiles[assigned] ~= nil
+end
+
+-- Bascule vers le profil « <personnage> - <rôle> » : hors combat (sinon à la sortie du combat), seulement si le profil
+-- existe et n'est pas déjà actif, jamais si la bascule automatique d'EllesmereUI vaut pour ce personnage (EUI2).
+function FB.SwitchProfile()
+	run.rolePending = nil
+	local role, name = FB.Role(), CharName()
+	if not role or not ROLE_LABELS[role] or not name then
+		return
+	end
+	if type(EllesmereUI) ~= "table" or type(EllesmereUI.SwitchProfile) ~= "function" then
+		return
+	end
+	if EllesmereAuto() then
+		if not run.autoNoted then
+			run.autoNoted = true
+			FB.Print("EllesmereUI : bascule automatique active pour ce personnage (spécialisation affectée à un profil) : "
+				.. "ForeverBridge ne bascule pas.")
+		end
+		return
+	end
+	if InCombatLockdown() then
+		run.rolePending = true
+		return
+	end
+	local profile = name .. " - " .. ROLE_LABELS[role]
+	local okList, order = pcall(EllesmereUI.GetProfileList)
+	local found = false
+	if okList and type(order) == "table" then
+		for _, each in ipairs(order) do
+			if each == profile then
+				found = true
+			end
+		end
+	end
+	if not found then
+		if run.missingNoted ~= profile then
+			run.missingNoted = profile
+			FB.Print("EllesmereUI : profil « " .. profile .. " » absent : importer d'abord la chaîne !EUI_ (bouton "
+				.. "Exports) sous ce nom.")
+		end
+		return
+	end
+	local okActive, active = pcall(EllesmereUI.GetActiveProfileName)
+	if okActive and active == profile then
+		return
+	end
+	if pcall(EllesmereUI.SwitchProfile, profile) then
+		FB.Print("EllesmereUI : profil « " .. profile .. " » activé.")
+	end
+end
+
+-- /fb role [dps|heal|tank] : rôle du personnage, gardé dans ForeverBridgeDB.roles, envoyé dans le contexte.
+function FB.SetRole(value)
+	FB.Open()
+	local key, token = CharKey(), PlayerClass()
+	local allowed = AllowedRoles(token)
+	value = string.lower(value or "")
+	if value == "" then
+		FB.Print("Rôle de ce personnage : " .. (FB.Role() or "aucun") .. " (/fb role " .. table.concat(allowed, ", ") .. ")")
+		return
+	end
+	if not ROLE_LABELS[value] then
+		FB.Print("rôle : /fb role suivi de " .. table.concat(allowed, ", ") .. ".")
+		return
+	end
+	if CLASS_ROLES[token] and not CLASS_ROLES[token][value] then
+		FB.Print("Rôle « " .. value .. " » non tenu par la classe " .. (CLASS_LABELS[token] or tostring(token))
+			.. " (rôles : " .. table.concat(allowed, ", ") .. ").")
+		return
+	end
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" or not key then
+		return
+	end
+	if type(db.roles) ~= "table" then
+		db.roles = {}
+	end
+	db.roles[key] = value
+	FB.Print("Rôle de " .. key .. " : " .. value .. ".")
+	FB.SwitchProfile()
+end
+
+---------------------------------------------------------------------------
 -- Événements et commandes
 ---------------------------------------------------------------------------
 
@@ -2007,12 +2182,18 @@ function handlers.PLAYER_REGEN_ENABLED()
 	if pendingGuide then
 		FB.DeliverGuide(pendingGuide)
 	end
+	if run.rolePending then
+		FB.SwitchProfile()
+	end
 end
 
 -- Connexion et /reload : état et boutons de Status.lua, réponses arrivées dans Inbox.lua (chemin de secours).
 function handlers.PLAYER_ENTERING_WORLD()
 	if type(ForeverBridgeDB) ~= "table" then
 		return
+	end
+	if FB.Role() then
+		run.roleAt = GetTime() + SWITCH_DELAY -- EX1 : bascule de profil après celle d'EllesmereUI
 	end
 	if type(ForeverBridgeStatus) == "table" then
 		if type(ForeverBridgeStatus.status) == "table" and next(ForeverBridgeStatus.status) ~= nil then
@@ -2062,6 +2243,7 @@ local HELP = {
 	"/fv case N : taille de case de la bande des messages, 1 (défaut) à 4 pixels, si le pont ne la lit pas.",
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
 	"/fb exports : réafficher les liens d'export de la session (Talents Forever, Naowh), à copier depuis le panneau.",
+	"/fb role dps|heal|tank : rôle de ce personnage ; bascule vers le profil EllesmereUI « <nom> - <rôle> » s'il existe.",
 }
 
 -- Taille de case de la bande des messages, gardée dans ForeverBridgeDB.cell.
@@ -2119,6 +2301,8 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.Diag()
 	elseif command == "exports" then
 		FB.Exports()
+	elseif command == "role" then
+		FB.SetRole(rest)
 	else
 		Help()
 	end
