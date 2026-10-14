@@ -27,7 +27,7 @@ M.TOOLTIP_CHARS = 120
 M.LINK_KINDS = { item = true, spell = true, quest = true, talent = true }
 M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "talents", "gear",
 	"target", "target_level", "target_race", "client", "links", "rested", "resting", "xp_auras", "xp_items",
-	"professions", "role" }
+	"professions", "role", "eui_base" }
 -- T04f (0.2.0) : auras du joueur relevées (au plus MAX_AURAS, parmi les AURA_SCAN premières), filtrées par la liste
 -- que le pont écrit dans Status.lua (ForeverBridgeStatus.xp, identifiants lus dans les données, jamais écrits ici).
 M.MAX_AURAS = 16
@@ -402,6 +402,7 @@ function M.Context()
 	put("xp_items", M.XpItems(watch))
 	put("professions", M.Professions())
 	put("role", M.Role())
+	put("eui_base", M.Base())
 	return ctx, pieces
 end
 
@@ -418,6 +419,22 @@ function M.Role()
 	end
 	local role = db.roles[name .. " - " .. realm]
 	return type(role) == "string" and role or nil
+end
+
+-- EX1 (décision 269) : profil de base EllesmereUI choisi par le joueur (/fb base), gardé par personnage dans
+-- ForeverBridgeDB.bases.
+function M.Base()
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" or type(db.bases) ~= "table" then
+		return nil
+	end
+	local okName, name = pcall(UnitName, "player")
+	local okRealm, realm = pcall(GetRealmName)
+	if not (okName and okRealm) or type(name) ~= "string" or type(realm) ~= "string" then
+		return nil
+	end
+	local base = db.bases[name .. " - " .. realm]
+	return type(base) == "string" and base or nil
 end
 
 function M.ContextText(ctx)

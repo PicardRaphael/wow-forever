@@ -63,6 +63,20 @@ def typed_links(value: Any) -> dict[str, list[dict[str, str]]]:
     return out
 
 
+def keep_base(deps: Deps, name: str, realm: str, base: str) -> None:
+    """Profil de base choisi en jeu (/fb base) écrit au profil forever du personnage (source `jeu`, au clic sur
+    « Exports », décision 269), s'il diffère de celui déjà gardé."""
+    from forever.exports.ellesmere import character_base
+    from forever.profile import apply_game_fields, resolve_path
+    from forever.timefmt import format_utc
+
+    if character_base(deps, name) != base:
+        at = format_utc(deps.now())
+        apply_game_fields(
+            resolve_path(deps), name, realm, {"ellesmere_base": base}, source="jeu", at=at, client_build=None
+        )
+
+
 def exports_reply(
     deps: Deps, context: Mapping[str, str], last: Sequence[Mapping[str, str]]
 ) -> tuple[str, list[dict[str, str]]]:
@@ -107,13 +121,22 @@ def exports_reply(
     elif not realm:
         lines.append("- Profil EllesmereUI : royaume absent du contexte du jeu.")
     else:
+        chosen = str(context.get("eui_base") or "").strip() or None
         try:
-            eui = ellesmere_export(deps, who, realm, cls, level, role, talents=talents)
+            eui = ellesmere_export(deps, who, realm, cls, level, role, base_name=chosen, talents=talents)
         except InvalidArgumentError as err:
-            lines.append(f"- Profil EllesmereUI : {err.message}")
+            lines.append(f"- Profil EllesmereUI : {err.message} ({err.action}).")
         else:
+            if chosen is not None:
+                keep_base(deps, who, realm, chosen)
+            base = eui["base"]["name"]
+            how = (
+                f"profil de base « {base} »"
+                if chosen is not None or eui["base"]["choice"] == "personnage"
+                else f"profil de base « {base} », le profil actif : choisir celui du personnage par /fb base <profil>"
+            )
             links.append(typed_link("ellesmere", eui["code"], f"EllesmereUI : {ROLE_LABELS[role]}"))
-            lines.append(f"- Profil EllesmereUI « {eui['profile_name']} » ; {eui['import']}.")
+            lines.append(f"- Profil EllesmereUI « {eui['profile_name']} » ({how}) ; {eui['import']}.")
     if last:
         lines.append("- Dernier build donné dans le chat : ses liens ci-dessous (Talents Forever, Naowh).")
         links.extend(dict(link) for link in last)

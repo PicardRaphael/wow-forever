@@ -70,6 +70,7 @@ WRAPPED: dict[str, Any] = {
     "gear": {},
     "sheet": {},
     "legacy_ranks": {},  # T04f : rangs des perks Legacy (sort du perk -> rang), ForeverLogger 0.5.0 ou joueur
+    "ellesmere_base": None,  # EX1 (décision 269) : profil de base EllesmereUI du personnage (joueur ou /fb base)
 }
 _SCHEMA_1_FIELDS = ("class", *FIELDS)
 _META = ("source", "at", "client_build", "certainty")
@@ -378,9 +379,11 @@ def set_character(
     professions: Mapping[str, int] | None = None,
     planned: bool | None = None,
     legacy_ranks: Mapping[int, int] | None = None,
+    ellesmere_base: str | None = None,
 ) -> dict[str, Any]:
     """Crée ou met à jour un personnage (champs donnés seulement, source `joueur`) ; le premier créé devient actif.
-    Rend le profil. `planned` vrai : personnage prévu (pas encore créé) ; faux : créé en jeu."""
+    Rend le profil. `planned` vrai : personnage prévu (pas encore créé) ; faux : créé en jeu. `ellesmere_base` :
+    profil de base EllesmereUI du personnage (EX1, décision 269)."""
     if not name.strip():
         raise InvalidArgumentError("Nom de personnage vide.", "donner un nom")
     path = resolve_path(deps)
@@ -398,6 +401,10 @@ def set_character(
             given[key] = value
     if talents is not None:
         given["talents"] = {k: int(v) for k, v in talents.items() if int(v) > 0}
+    if ellesmere_base is not None:
+        if not ellesmere_base.strip():
+            raise InvalidArgumentError("Profil de base EllesmereUI vide.", "donner le nom d'un profil d'EllesmereUI")
+        given["ellesmere_base"] = ellesmere_base.strip()
     if professions is not None:
         merged = dict(flat["professions"] or {})
         for skill, value in professions.items():

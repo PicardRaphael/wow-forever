@@ -265,6 +265,9 @@ def build_parser() -> argparse.ArgumentParser:
     pset.add_argument("--talents", help="talents « clé=rang,… » (remplacent les précédents)")
     pset.add_argument("--profession", action="append", default=[], help="métier « Nom=compétence » (répétable)")
     pset.add_argument("--legacy-rested-rank", type=int, help="rang du perk Legacy Well Rested (T04f)")
+    pset.add_argument(
+        "--ellesmere-base", help="profil de base EllesmereUI de ce personnage (EX1 : export ellesmere, bouton Exports)"
+    )
     pstate = pset.add_mutually_exclusive_group()
     pstate.add_argument(
         "--planned", dest="planned", action="store_const", const=True, help="personnage prévu, pas encore créé"
@@ -820,7 +823,7 @@ def build_parser() -> argparse.ArgumentParser:
     exp_eui.add_argument("--class", dest="cls", help="classe (défaut : profil forever du personnage)")
     exp_eui.add_argument("--level", type=int, help="niveau (défaut : profil forever du personnage)")
     exp_eui.add_argument("--talents", help="talents « clé=rang,… » (sorts de talent rendus seulement s'ils sont pris)")
-    exp_eui.add_argument("--base", help="profil de base de la sauvegarde EllesmereUI (défaut : le profil actif)")
+    exp_eui.add_argument("--base", help="profil de base EllesmereUI (défaut : celui du personnage, sinon l'actif)")
     exp_eui.add_argument("--paste", help="chaîne !EUI_ collée comme profil de base (au lieu de la sauvegarde)")
     exp_eui.add_argument("--spec-key", help="clé de spécialisation EllesmereUI du personnage (si elle est inconnue)")
     exp_eui.add_argument("--json", action="store_true", help="sortie JSON")
@@ -2160,6 +2163,7 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
             professions=_parse_professions(args.profession),
             planned=args.planned,
             legacy_ranks=_legacy_rested_rank(deps, args.legacy_rested_rank),
+            ellesmere_base=args.ellesmere_base,
         )
     elif cmd == "use":
         use(deps, target)

@@ -51,6 +51,9 @@ class BaseProfile:
     spec_key: str | None
     source: str
     meta: Mapping[str, Any] = field(default_factory=dict)
+    # sorts du gestionnaire de recharges des autres profils de la sauvegarde : la clé de spécialisation est celle de
+    # la classe, pas du profil ; elle s'y cherche quand le profil de base n'en porte aucune (décision 269)
+    others: tuple[Mapping[str, Any], ...] = ()
 
 
 # --- sérialiseur ----------------------------------------------------------------------------------------------------
@@ -232,6 +235,13 @@ def read_base_profile(wow_dir: Path, character_key: str, name: str | None = None
         spec_key=str(last) if last is not None else None,
         source="sauvegarde",
         meta=meta,
+        others=tuple(
+            b["specProfiles"]
+            for n, b in sorted(buckets.items(), key=lambda kv: str(kv[0]))
+            if n != chosen and isinstance(b, dict) and isinstance(b.get("specProfiles"), dict)
+        )
+        if isinstance(buckets, dict)
+        else (),
     )
 
 
@@ -342,9 +352,17 @@ def ellesmere_profile(
 
 
 def _spec_key_from_spells(base: BaseProfile, class_ids: set[int]) -> str | None:
-    """Clé de spécialisation dont les barres portent le plus de sorts de la classe (aucune : None)."""
+    """Clé de spécialisation dont les barres portent le plus de sorts de la classe, dans le profil de base, sinon dans
+    les autres profils de la sauvegarde (aucune : None)."""
+    for cdm in (base.cdm, *base.others):
+        if (key := _spec_key_in(cdm, class_ids)) is not None:
+            return key
+    return None
+
+
+def _spec_key_in(cdm: Mapping[str, Any], class_ids: set[int]) -> str | None:
     best: tuple[int, str] | None = None
-    for key, spec in base.cdm.items():
+    for key, spec in cdm.items():
         bars = (spec or {}).get("barSpells") if isinstance(spec, Mapping) else None
         seen: set[int] = set()
         for name, bar in (bars or {}).items():
@@ -357,6 +375,27 @@ def _spec_key_from_spells(base: BaseProfile, class_ids: set[int]) -> str | None:
         if score and (best is None or score > best[0]):
             best = (score, str(key))
     return best[1] if best else None
+
+
+# Origine du profil de base (décision 269), dite dans la provenance.
+BASE_CHOICES = {
+    "collé": "profil de base collé (--paste)",
+    "donné": "profil de base « {name} » donné pour cet export (--base)",
+    "personnage": "profil de base « {name} » choisi pour {character} (profil forever)",
+    "actif": (
+        "profil actif « {name} » d'EllesmereUI : aucun profil de base choisi pour {character} "
+        "(forever profile set {character} --ellesmere-base <profil>, ou /fb base <profil> en jeu)"
+    ),
+}
+
+
+def character_base(deps: Deps, character: str) -> str | None:
+    """Profil de base EllesmereUI choisi pour ce personnage dans le profil forever (décision 269), sinon None."""
+    from forever.profile import character_values, load_profile, resolve_path
+
+    raw = load_profile(resolve_path(deps))["characters"].get(character)
+    value = character_values(raw).get("ellesmere_base") if isinstance(raw, dict) else None
+    return value if isinstance(value, str) and value else None
 
 
 def ellesmere_export(
@@ -387,6 +426,9 @@ def ellesmere_export(
         held = ", ".join(sorted(roles)) or "aucun"
         raise InvalidArgumentError(f"Rôle « {role} » non tenu par la classe {cls}.", f"rôles de la classe : {held}")
     key = f"{character} - {realm}"
+    choice = "collé" if paste else "donné" if base_name else None
+    if not paste and not base_name and (base_name := character_base(deps, character)):
+        choice = "personnage"
     if paste:
         base = base_from_string(paste, key)
     elif deps.wow_dir is not None:
@@ -411,6 +453,7 @@ def ellesmere_export(
     notes = [
         f"format !EUI_ relevé dans EllesmereUI {ELLESMERE_VERSION}, jamais importé en jeu (question EUI1)",
         f"profil de base « {base.name} » ({base.source}), recopié sauf cdmSpells et customIDs",
+        BASE_CHOICES[choice or "actif"].format(name=base.name, character=character),
         f"clé de spécialisation {chosen} ({'gardée par EllesmereUI' if chosen == base.spec_key else 'choisie'})",
         "sorts du rôle : catalogue forever/exports/roles.yaml, rangs appris au niveau (classes.json), supposé",
     ]
@@ -422,7 +465,7 @@ def ellesmere_export(
         "level": level,
         "role": role,
         "profile_name": profile_name,
-        "base": {"name": base.name, "source": base.source},
+        "base": {"name": base.name, "source": base.source, "choice": choice or "actif"},
         "spec_key": chosen,
         "spells": spells,
         "code": code,

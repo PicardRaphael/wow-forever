@@ -540,6 +540,11 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
   actif. **Si la bascule automatique d'EllesmereUI vaut pour le personnage** (sa spécialisation, lue dans
   `EllesmereUIDB.lastSpecByChar` ou en direct, est affectée à un profil par `GetSpecProfile`), ForeverBridge le
   signale une fois et ne fait rien (décision 267, EUI2). Aucune écriture de `EllesmereUIDB`.
+- `/fb base <profil>` : profil de base EllesmereUI du personnage (décision 269), gardé dans
+  `ForeverBridgeDB.bases["<nom> - <royaume>"]` et envoyé dans le contexte (`eui_base`) ; refusé s'il manque à
+  `GetProfileList()` (liste affichée) ; accepté sans contrôle si EllesmereUI est absent ; sans argument : choix courant
+  et liste des profils. Au clic sur « Exports », le pont l'écrit au profil forever du personnage (`ellesmere_base`,
+  source `jeu`) et part de lui ; sans choix, il part du profil actif d'EllesmereUI et le dit.
 - Objet LibDataBroker « Forever » : créé seulement si `LibStub("LibDataBroker-1.1", true)` existe (chargé par
   EllesmereUI, rien d'embarqué) ; texte = ligne d'état des données, et XP par heure et prochain objectif seulement
   quand le pont les publie (`status.xp_per_hour`, `status.next_objective` ; pas encore publiés) ; clic : fenêtre `/fv`.

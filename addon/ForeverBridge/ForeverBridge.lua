@@ -2151,6 +2151,74 @@ function FB.SetRole(value)
 	FB.SwitchProfile()
 end
 
+-- Noms des profils d'EllesmereUI (API publique, lecture seule), ou nil si EllesmereUI est absent.
+local function EllesmereProfiles()
+	if type(EllesmereUI) ~= "table" or type(EllesmereUI.GetProfileList) ~= "function" then
+		return nil
+	end
+	local ok, order, profiles = pcall(EllesmereUI.GetProfileList)
+	if not ok or type(order) ~= "table" then
+		return nil
+	end
+	-- ordre d'EllesmereUI d'abord, puis les profils absents de l'ordre (table des profils), triés
+	local names, seen, rest = {}, {}, {}
+	for _, each in ipairs(order) do
+		if type(each) == "string" and not seen[each] then
+			seen[each] = true
+			names[#names + 1] = each
+		end
+	end
+	if type(profiles) == "table" then
+		for each in pairs(profiles) do
+			if type(each) == "string" and not seen[each] then
+				rest[#rest + 1] = each
+			end
+		end
+	end
+	table.sort(rest)
+	for _, each in ipairs(rest) do
+		names[#names + 1] = each
+	end
+	return names
+end
+
+-- /fb base [profil] : profil de base EllesmereUI de ce personnage (décision 269), gardé dans ForeverBridgeDB.bases,
+-- envoyé dans le contexte ; le pont le garde au profil forever et le bouton Exports part de lui.
+function FB.SetBase(value)
+	FB.Open()
+	local key = CharKey()
+	local db = ForeverBridgeDB
+	local names = EllesmereProfiles()
+	local list = names and table.concat(names, ", ") or "EllesmereUI absent"
+	value = value or ""
+	if value == "" then
+		local current = type(db) == "table" and type(db.bases) == "table" and key and db.bases[key] or nil
+		FB.Print("Profil de base EllesmereUI de ce personnage : " .. (current or "aucun (le profil actif)") .. ".")
+		FB.Print("Profils : " .. list .. " (/fb base <profil>).")
+		return
+	end
+	if names then
+		local found = false
+		for _, each in ipairs(names) do
+			if each == value then
+				found = true
+			end
+		end
+		if not found then
+			FB.Print("Profil EllesmereUI « " .. value .. " » absent ; profils : " .. list .. ".")
+			return
+		end
+	end
+	if type(db) ~= "table" or not key then
+		return
+	end
+	if type(db.bases) ~= "table" then
+		db.bases = {}
+	end
+	db.bases[key] = value
+	FB.Print("Profil de base EllesmereUI de " .. key .. " : " .. value .. " (bouton Exports).")
+end
+
 ---------------------------------------------------------------------------
 -- Objet LibDataBroker « Forever » (EX1, bloc G) : affiché par le bloc Broker des DataBars d'EllesmereUI
 ---------------------------------------------------------------------------
@@ -2303,6 +2371,7 @@ local HELP = {
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
 	"/fb exports : réafficher les liens d'export de la session (Talents Forever, Naowh), à copier depuis le panneau.",
 	"/fb role dps|heal|tank : rôle de ce personnage ; bascule vers le profil EllesmereUI « <nom> - <rôle> » s'il existe.",
+	"/fb base <profil> : profil EllesmereUI de base de ce personnage, d'où part le bouton Exports (sans nom : la liste).",
 }
 
 -- Taille de case de la bande des messages, gardée dans ForeverBridgeDB.cell.
@@ -2362,6 +2431,8 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.Exports()
 	elseif command == "role" then
 		FB.SetRole(rest)
+	elseif command == "base" then
+		FB.SetBase(rest)
 	else
 		Help()
 	end

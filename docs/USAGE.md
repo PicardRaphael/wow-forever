@@ -307,7 +307,8 @@ uv run forever export naowh-build --class Mage --level 20 --talents improvedFros
 uv run forever export naowh-build --code "https://talentsforever.com/mage/20/..."   # ordre du code repris
 uv run forever export naowh-build --class Hunter --popular 1                        # build populaire, ordre généré
 uv run forever export naowh-macros --class Priest --level 30
-uv run forever export ellesmere Jen --role dps        # classe, niveau et royaume lus dans le profil forever
+uv run forever profile set Jen --ellesmere-base Mage  # profil de base EllesmereUI de Jen, choisi une fois
+uv run forever export ellesmere Jen --role dps        # classe, niveau, royaume et profil de base lus dans le profil
 uv run forever export read "<chaîne>"                 # relit !NFB1!, !NFM1!, !NBIS1!, NFSW1: ou !EUI_
 ```
 
@@ -316,12 +317,14 @@ uv run forever export read "<chaîne>"                 # relit !NFB1!, !NFM1!, !
   un ordre de leveling optimisé.
 - EllesmereUI : `/eui`, **Profiles**, **Import**, nommer le profil « <personnage> - <rôle> », puis `/fb role` en jeu.
   Le profil de base (disposition, polices, couleurs) reste celui du joueur ; forever ne remplit que les sorts du
-  gestionnaire de recharges et les rappels de buffs.
+  gestionnaire de recharges et les rappels de buffs. Profil de base : celui du personnage (`forever profile set <nom>
+  --ellesmere-base <profil>` ou `/fb base <profil>` en jeu, décision 269), sinon le profil actif d'EllesmereUI (dit
+  dans la réponse) ; `--base` le remplace pour un export.
 - `forever export bis` et `forever export weights` : formats prêts, contenu rempli par T10a.
 - MCP : `forever_lookup(kind="export", name="naowh_build" | "naowh_macros" | "ellesmere" | "read")` ;
   `forever_build` porte `export.naowh` à côté de `export.talents_forever`.
 - En jeu : liens cliquables `[Naowh : build]`, bouton « Exports » (build actuel, `[Naowh : macros]`,
-  `[EllesmereUI : <rôle>]` une fois le rôle choisi), `/fb exports`, `/fb role dps|heal|tank`.
+  `[EllesmereUI : <rôle>]` une fois le rôle choisi), `/fb exports`, `/fb role dps|heal|tank`, `/fb base <profil>`.
 
 ## Familiers du Chasseur (CH0)
 ```powershell
