@@ -8,7 +8,7 @@ bornes lève une erreur nommée, jamais une chaîne que Naowh rejetterait."""
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -126,3 +126,37 @@ def read_naowh_macros(text: str) -> list[tuple[str, str]]:
             raise ExportFormatError("macro illisible")
         out.append(_check_macro(m.get("name"), m.get("body")))
     return out
+
+
+BIS_PREFIX = "!NBIS1!"
+BIS_VERSION = 4  # liste ordonnée par emplacement (`ORDERED` de NaowhForever_BiS/BiS/Sharing.lua)
+BIS_TEXT_MAX = 40
+BIS_MAX_ID = 2**31
+WEIGHTS_PREFIX = "NFSW1"
+WEIGHTS_MAX = 1000  # poids refusé à partir de cette valeur (`SW.MAX_WORTH`)
+
+
+@dataclass(frozen=True)
+class NaowhBis:
+    """Liste BiS relue d'une chaîne `!NBIS1!` : objet par emplacement d'inventaire, objets de repli par emplacement."""
+
+    name: str
+    spec: str
+    slots: dict[int, int]
+    extra: dict[int, tuple[int, ...]]
+
+
+def naowh_bis(name: str, spec: str, slots: Mapping[int, int], extra: Mapping[int, Sequence[int]]) -> str:
+    raise NotImplementedError
+
+
+def read_naowh_bis(text: str) -> NaowhBis:
+    raise NotImplementedError
+
+
+def naowh_weights(spec_key: str, weights: Mapping[str, float]) -> str:
+    raise NotImplementedError
+
+
+def read_naowh_weights(text: str) -> tuple[str, dict[str, float]]:
+    raise NotImplementedError
