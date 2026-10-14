@@ -96,15 +96,34 @@ def _grind_rate(gd: GameData, world: RouteWorld, level: int) -> float:
     return mob_kill_xp(gd, level, level, bonuses=world.bonuses).xp / seconds if seconds > 0 else 0.0
 
 
+def _opens_dungeon(world: RouteWorld, quest_id: int, level: int) -> bool:
+    """La quête ouvre (par sa chaîne) une quête d'un donjon placé encore à portée."""
+    followers = _followers(world)
+    seen, frontier = {quest_id}, [quest_id]
+    for _ in range(CHAIN_DEPTH):
+        frontier = sorted({n for i in frontier for n in followers.get(i, []) if n not in seen})
+        if not frontier:
+            return False
+        seen.update(frontier)
+        for n in frontier:
+            d = world.dungeons.get(world.quests[n].dungeon or "")
+            if d is not None and level <= d.levels[1]:
+                return True
+    return False
+
+
 def _worth_it(gd: GameData, world: RouteWorld, state: RouteState, quest_id: int, trip: float) -> bool:
-    """La quête vaut le détour : quête de donjon tant que le donjon est à portée, sinon XP par seconde (chaîne
-    comprise, trajet depuis la position compris) au moins `min_efficiency` fois le farm (portage de `worth_it`)."""
+    """La quête vaut le détour : quête de donjon tant que le donjon est à portée, ou quête qui ouvre une quête de donjon
+    (CJ1 : toutes les quêtes d'un donjon, aller-retour compris), sinon XP par seconde (chaîne comprise, trajet depuis
+    la position compris) au moins `min_efficiency` fois le farm (portage de `worth_it`)."""
     q = world.quests[quest_id]
     if quest_id in world.required:
         return True
     if q.dungeon is not None:
         d = world.dungeons.get(q.dungeon)
         return d is not None and state.level <= d.levels[1]
+    if _opens_dungeon(world, quest_id, state.level):
+        return True
     cost = max(trip + _quest_cost(world, quest_id, state.level), 1.0)
     efficiency = quest_worth(gd, world, quest_id, state.level) / cost
     return efficiency >= world.params.min_efficiency * _grind_rate(gd, world, state.level)
@@ -163,7 +182,8 @@ def construct(gd: GameData, world: RouteWorld, start: RouteState, *, end_level: 
     """Route gloutonne (portage de `nearest_stop`, construct.rs) : l'arrêt le plus proche en temps, pondéré par sa
     sorte et par `zone_stay` hors de la zone courante (finir une zone avant d'en partir) ; une quête n'est prise que si
     elle vaut le détour, un passage suivant que s'il bat le farm ; jamais un arrêt qui ferait manquer la fenêtre d'un
-    donjon placé (ses quêtes prises avant son passage). Registre : I18, I17"""
+    donjon placé (ses quêtes prises avant son passage). CJ1 (règle de l'utilisateur) : pas de farm quand des quêtes
+    restent ; une prise moins rentable que le farm reste choisie s'il n'y a rien de mieux. Registre : I18, I17"""
     state = start
     zone: int | None = None
     stops: list[Stop] = []
@@ -172,11 +192,10 @@ def construct(gd: GameData, world: RouteWorld, start: RouteState, *, end_level: 
         if state.level >= end_level:
             break
         best: tuple[float, Stop, RouteState] | None = None
+        fallback: tuple[float, Stop, RouteState] | None = None  # prise moins rentable que le farm
         for stop, weight in _candidates(gd, world, state):
             after, result = apply_stop(gd, world, state, stop, cap=cap)
             if not math.isfinite(result.seconds):
-                continue
-            if stop.kind == "accept" and not _worth_it(gd, world, state, int(stop.ref), result.travel_s):
                 continue
             if _misses(world, start, after, state):
                 continue
@@ -187,8 +206,13 @@ def construct(gd: GameData, world: RouteWorld, start: RouteState, *, end_level: 
             here = _zone(world, stop)
             stay = 1.0 if zone is None or here == zone else world.params.zone_stay
             score = (result.travel_s + world.params.stop_overhead_s) * weight * stay
+            if stop.kind == "accept" and not _worth_it(gd, world, state, int(stop.ref), result.travel_s):
+                if fallback is None or score < fallback[0]:
+                    fallback = (score, stop, after)
+                continue
             if best is None or score < best[0]:
                 best = (score, stop, after)
+        best = best or fallback
         if best is None:
             break
         stops.append(best[1])
@@ -252,6 +276,18 @@ def _mutate(world: RouteWorld, stops: list[Stop], rng: random.Random) -> list[St
     return None
 
 
+def _dungeon_quests_first(world: RouteWorld, stops: Sequence[Stop]) -> bool:
+    """Chaque quête d'un donjon prise par la route l'est avant son premier passage (I17, CJ1 : l'amélioration ne
+    repousse plus une quête de donjon après le donjon)."""
+    passed: set[str] = set()
+    for s in stops:
+        if s.kind == "dungeon":
+            passed.add(str(s.ref))
+        elif s.kind == "accept" and (q := world.quests.get(int(s.ref))) is not None and q.dungeon in passed:
+            return False
+    return True
+
+
 def improve(
     gd: GameData,
     world: RouteWorld,
@@ -270,7 +306,7 @@ def improve(
     best_cost = _cost(gd, world, best, start, end_level, cap)
     for _ in range(tries):
         candidate = _mutate(world, best, rng)
-        if candidate is None:
+        if candidate is None or not _dungeon_quests_first(world, candidate):
             continue
         cost = _cost(gd, world, candidate, start, end_level, cap)
         if cost < best_cost:
@@ -313,7 +349,18 @@ def plan(
             dungeons={k: v for k, v in world.dungeons.items() if k != missed},
             quests={k: q for k, q in world.quests.items() if q.dungeon != missed},
         )
-    improved = improve(gd, world, built, start, end_level=end_level, cap=cap, tries=tries, seed=seed)
+    # CJ1 : l'amélioration réordonne sans retirer une quête de la construction (pas de farm quand des quêtes restent)
+    kept = frozenset(int(s.ref) for s in built if s.kind == "accept")
+    improved = improve(
+        gd,
+        replace(world, required=world.required | kept),
+        built,
+        start,
+        end_level=end_level,
+        cap=cap,
+        tries=tries,
+        seed=seed,
+    )
     result = simulate(gd, world, improved, start, end_level=end_level, cap=cap)
     done = [Stop(r.kind, r.ref) for r in result.stops if r.kind != "grind"]
     return PlanResult(tuple(done), result, first.seconds, tries, tuple(warnings))
