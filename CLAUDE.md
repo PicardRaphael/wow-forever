@@ -39,7 +39,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - Petits commits, message `Txx: <ce qui change>`.
 - Continuer sans demander tant qu'une étape n'a pas besoin de moi. S'arrêter et demander avant : toucher `tests/golden/`, ajouter une dépendance, un accès réseau, supprimer des données, trancher une règle de jeu.
 - Mes addons d'abord (décision 272) : avant de construire une fonction, regarder si un addon installé la fait déjà ; si oui, s'en servir (lecture locale, agrégats) et l'alimenter par des exports, sans refaire son interface ni ses données.
-- Rien n'est fini sans mon essai en jeu (décision 273) : chaque bloc qui touche au jeu se termine par une courte procédure d'essai, et une tranche ne se ferme qu'avec mon accord.
+- Rien n'est fini sans mon essai en jeu (décision 273) : chaque bloc qui touche au jeu se termine par une courte procédure d'essai, et une tranche ne se ferme qu'avec mon accord. Exception pour les feuilles de route (décision 279) : acceptées automatiquement si elles ressemblent au parcours gratuit de RestedXP de la même race et classe (Polestar au-delà), sinon refusées avec l'écart expliqué.
 - Mon interface est la mienne (décision 274) : rien ne modifie EllesmereUI sans demande explicite.
 - Fin de tranche : `/verifier`, puis un résumé avec, dans l'ordre : Bloqué sur moi, Fait, Tests ajoutés, Registre modifié, Questions ouvertes, Angles morts (mécaniques absentes du registre qui influencent les résultats, avec leur effet estimé).
 

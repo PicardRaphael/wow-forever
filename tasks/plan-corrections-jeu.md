@@ -3,7 +3,7 @@
 Tranche hors de la table d'origine de la ROADMAP, demandée par l'utilisateur le 2026-10-14 après ses essais en jeu
 (personnage neuf « Bob », Gnome, Alliance, niveau 1, Coldridge Valley). Elle passe **avant toutes les autres tranches**
 jusqu'au 4 novembre et reprend en elle T10a revue selon l'audit des addons et le cœur de RX2 (vols et pierre de foyer).
-Décisions 272 à 278. Plan écrit le 2026-10-14 ; **révisé le même jour** après les deux corrections de cap de
+Décisions 272 à 279. Plan écrit le 2026-10-14 ; **révisé le même jour** après les deux corrections de cap de
 l'utilisateur sur les routes (décision 277, qui amende 268).
 
 Bases : `tasks/archive/idees-du-chat-2026-10-14-ux-routes.md` (interface, routes, exports, talents) et
@@ -246,6 +246,11 @@ Questions encore ouvertes, tranchées au début de leur bloc (défaut proposé e
   Polestar et RestedXP) : sous le niveau des bas niveaux, l'optimiseur ne prend aucune quête dans la zone de départ
   d'une autre race ni dans une capitale, sauf quête de classe, maître ou quête que le parcours de référence de la race
   fait aussi ; à corriger **avant l'essai du samedi 17**.
+
+**Acceptation des routes (décision 279, 2026-10-14)** : sans essai en jeu ; une route est acceptée si elle ressemble
+au parcours gratuit de RestedXP de la même race et classe (même enchaînement de zones, mêmes quêtes à deux ou trois
+différences près, chacune expliquée : quête de classe, donjon avec ses quêtes, gain mesuré), sinon refusée avec
+l'écart expliqué ; Polestar au-delà des parcours gratuits ; contrôle sur toutes les zones de départ et classes.
 
 **1c. Mesure des décisions face aux parcours gratuits (« recette »).**
 - `forever route recette` (forme au bloc) : pour chaque race (dix races, sept zones de départ, variante Mage

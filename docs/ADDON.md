@@ -567,8 +567,9 @@ Signalées par un wiki de fans (warcraft.wiki.gg), qui n'est pas une source : ri
    spécialisation du personnage est affectée à un profil dans EllesmereUI (message, rien fait) ; vérifier après un
    `/reload` et une nouvelle connexion que le profil reste celui attendu (question EUI2).
 
-#### Essai CJ-1 : départ réel des feuilles de route (CJ1, bloc 1a, décisions 273 et 277 ; avant la fin de la bêta)
-Acceptation par l'utilisateur exigée (décision 273). Préparation, jeu fermé : `uv run forever bridge install`
+#### Essai CJ-1 : départ réel des feuilles de route (CJ1, bloc 1a, décisions 273 et 277 ; facultatif)
+**Remplacé par le contrôle automatique de la décision 279** (`forever route recette`) : l'utilisateur ne fait pas cet
+essai ; la procédure reste pour mémoire. Préparation, jeu fermé : `uv run forever bridge install`
 (ForeverBridge envoie désormais ses coordonnées), `uv run forever bridge stop`, attendre « surveillance : arrêtée »
 dans `uv run forever bridge autostart status`, puis `schtasks /Run /TN "WoW Forever - pont"`.
 1. **Gnome neuf** à Coldridge Valley, niveau 1 : `/fv`, bouton « Feuille de route », puis dans « À valider » choisir
