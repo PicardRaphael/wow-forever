@@ -200,3 +200,52 @@ def dungeon_placements(deps: Any, *, class_name: str, faction: str | None, wow_d
         row["steps"] = dungeon_steps(book, key, faction=faction, level=at, quests=quests)
         out.append(row)
     return out
+
+
+# --- RX1, bloc C : feuille de route assemblée (hors moteur) -----------------------------------------------------
+
+ROUTES_DIR = "routes"  # plans gardés dans <cache>/routes/<id>.json
+
+
+@dataclass(frozen=True)
+class RouteRequest:
+    """Demande d'une feuille de route : personnage, niveaux, donjons (`auto`, `none` ou clés du livre), quêtes de
+    classe, quêtes exclues ou imposées, réglages de la recherche (défaut : `route.search`)."""
+
+    class_name: str
+    faction: str
+    start_level: int
+    end_level: int
+    dungeons: str | tuple[str, ...] = "auto"
+    group: bool = False
+    class_quests: bool = True
+    exclude: tuple[int, ...] = ()
+    include: tuple[int, ...] = ()
+    tries: int | None = None
+    seed: int | None = None
+
+
+def route_world(
+    gd: GameData,
+    book: Any,
+    maps: Any,
+    *,
+    request: RouteRequest,
+    values: Any,
+    dungeons: Any,
+    travel: Any,
+    kill_seconds: Any,
+) -> tuple[Any, list[str]]:
+    """Entrées du moteur de route (`RouteWorld`) tirées du livre des quêtes, des placements de donjon de DJ1 et des
+    cartes de zone ; avertissements (quêtes écartées et pourquoi). Registre : I18"""
+    raise NotImplementedError
+
+
+def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict[str, Any]:
+    """Feuille de route calculée, gardée dans le cache, avec sa provenance (`forever route plan`). Registre : I18"""
+    raise NotImplementedError
+
+
+def load_plan(deps: Any, plan_id: str) -> dict[str, Any]:
+    """Plan gardé dans le cache (`forever route show`)."""
+    raise NotImplementedError

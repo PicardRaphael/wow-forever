@@ -1,0 +1,988 @@
+{
+ "note": "Fixture de RX1, bloc C : valeurs inventées pour les tests (rien de recopié d'un addon ni du client).",
+ "maps": [
+  {
+   "ui_map": 9001,
+   "continent": 1,
+   "min_x": 0.0,
+   "min_y": 0.0,
+   "max_x": 1000.0,
+   "max_y": 1000.0
+  },
+  {
+   "ui_map": 9002,
+   "continent": 1,
+   "min_x": 0.0,
+   "min_y": -1000.0,
+   "max_x": 1000.0,
+   "max_y": 0.0
+  }
+ ],
+ "zone_names": {
+  "9001": "Fixture Vale",
+  "9002": "Fixture Hills"
+ },
+ "quests": [
+  {
+   "id": 101,
+   "name": "Fixture First Steps",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture First Steps",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 1,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 1,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 100,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 40.0,
+      "y": 40.0,
+      "name": "Guide A"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 40.0,
+      "y": 40.0,
+      "name": "Guide A"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 45.0,
+        "y": 45.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 102,
+   "name": "Fixture Chain One",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Chain One",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 1,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 150,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 42.0,
+      "y": 40.0,
+      "name": "Guide B"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 42.0,
+      "y": 40.0,
+      "name": "Guide B"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 50.0,
+        "y": 40.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 103,
+   "name": "Fixture Chain Two",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Chain Two",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 200,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 42.0,
+      "y": 40.0,
+      "name": "Guide B"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 42.0,
+      "y": 40.0,
+      "name": "Guide B"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 55.0,
+        "y": 45.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "prereq_all": {
+     "value": [
+      102
+     ],
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "chain": {
+     "value": {
+      "step": 1,
+      "after": [
+       102
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 104,
+   "name": "Fixture Chain Three",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Chain Three",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 3,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 400,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 42.0,
+      "y": 40.0,
+      "name": "Guide B"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 42.0,
+      "y": 40.0,
+      "name": "Guide B"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 60.0,
+        "y": 50.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "prereq_all": {
+     "value": [
+      103
+     ],
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "chain": {
+     "value": {
+      "step": 2,
+      "after": [
+       103
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 105,
+   "name": "Fixture Either One",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Either One",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 1,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 250,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 41.0,
+      "y": 42.0,
+      "name": "Guide C"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 41.0,
+      "y": 42.0,
+      "name": "Guide C"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 35.0,
+        "y": 50.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "exclusive": {
+     "value": [
+      106
+     ],
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 106,
+   "name": "Fixture Either Two",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Either Two",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 1,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 120,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 41.0,
+      "y": 42.0,
+      "name": "Guide C"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 41.0,
+      "y": 42.0,
+      "name": "Guide C"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 30.0,
+        "y": 55.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "exclusive": {
+     "value": [
+      105
+     ],
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 107,
+   "name": "Fixture Arcane Lesson",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Arcane Lesson",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 3,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 1,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 300,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 43.0,
+      "y": 41.0,
+      "name": "Guide Mage"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 43.0,
+      "y": 41.0,
+      "name": "Guide Mage"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "classes": {
+     "value": 128,
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 108,
+   "name": "Fixture Far Future",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Far Future",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 9,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 8,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 600,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9001,
+      "x": 44.0,
+      "y": 44.0,
+      "name": "Guide D"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9001,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 44.0,
+      "y": 44.0,
+      "name": "Guide D"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 70.0,
+        "y": 70.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 109,
+   "name": "Fixture Nobody Gives",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Nobody Gives",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 1,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 200,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9001,
+      "x": 50.0,
+      "y": 50.0
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9001,
+        "x": 50.0,
+        "y": 50.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 110,
+   "name": "Fixture Second Zone",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Second Zone",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 3,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 2,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 350,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9002,
+      "x": 40.0,
+      "y": 40.0,
+      "name": "Guide E"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9002,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9002,
+      "x": 40.0,
+      "y": 40.0,
+      "name": "Guide E"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "objectives": {
+     "value": {
+      "camps": [
+       {
+        "map": 9002,
+        "x": 50.0,
+        "y": 50.0
+       }
+      ]
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 111,
+   "name": "Fixture Depths Relic",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Depths Relic",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 4,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 3,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 800,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9002,
+      "x": 45.0,
+      "y": 40.0,
+      "name": "Guide F"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9002,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9002,
+      "x": 45.0,
+      "y": 40.0,
+      "name": "Guide F"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "dungeon": {
+     "value": "Fixture Depths",
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  },
+  {
+   "id": 112,
+   "name": "Fixture Depths Boss",
+   "sources": [
+    "fixture"
+   ],
+   "fields": {
+    "name": {
+     "value": "Fixture Depths Boss",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "level": {
+     "value": 4,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "min_level": {
+     "value": 3,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "faction": {
+     "value": "horde",
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "xp": {
+     "value": 700,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "giver": {
+     "value": {
+      "map": 9002,
+      "x": 46.0,
+      "y": 40.0,
+      "name": "Guide F"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "map": {
+     "value": 9002,
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "turn_in": {
+     "value": {
+      "map": 9002,
+      "x": 46.0,
+      "y": 40.0,
+      "name": "Guide F"
+     },
+     "source": "fixture",
+     "certainty": "probable"
+    },
+    "dungeon": {
+     "value": "Fixture Depths",
+     "source": "fixture",
+     "certainty": "probable"
+    }
+   },
+   "discrepancies": {},
+   "status": "nouvelle",
+   "changed_fields": [],
+   "certainty": "probable"
+  }
+ ],
+ "dungeon": {
+  "id": "9901",
+  "name": "Fixture Depths",
+  "levels": {
+   "min": 3,
+   "max": 6
+  },
+  "placement": {
+   "level": 3,
+   "share_h": 1.0,
+   "window": [
+    3
+   ]
+  },
+  "run": {
+   "minutes": 20.0,
+   "kills": 30.0,
+   "source": "formula",
+   "certainty": "suppose",
+   "samples": 0,
+   "mob_level": 5
+  },
+  "quests": [
+   111,
+   112
+  ],
+  "steps": [
+   {
+    "kind": "goto",
+    "map": 9002,
+    "x": 60.0,
+    "y": 60.0
+   }
+  ]
+ },
+ "kill_seconds": 20.0,
+ "start": {
+  "map": 9001,
+  "x": 40.0,
+  "y": 41.0
+ }
+}
