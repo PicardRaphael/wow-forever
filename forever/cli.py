@@ -375,6 +375,9 @@ def build_parser() -> argparse.ArgumentParser:
     q_diff = quests_sub.add_parser("diff", help="écarts entre sources, champ par champ")
     q_diff.add_argument("--sources", help="deux sources séparées par une virgule (ex. naowh_dj,forever_guide)")
     q_diff.add_argument("--limit", type=int, default=50, help="écarts affichés")
+    q_diff.add_argument(
+        "--factoruide", action="store_true", help="recoupement avec la base de Factoruide du cache (RX1, lecture seule)"
+    )
     q_diff.add_argument("--json", action="store_true", help="sortie JSON")
     q_show = quests_sub.add_parser("show", help="quêtes d'un identifiant, d'une zone ou d'un donjon")
     q_show.add_argument("--id", type=int, dest="quest_id", help="identifiant de la quête")
@@ -1224,6 +1227,8 @@ def _cmd_quests(deps: Deps, args: argparse.Namespace) -> int:
         lines += [f"  note : {n}" for n in book.notes]
         _emit(payload, lines, provenance, args.json)
         return EXIT_OK
+    if getattr(args, "factoruide", False):
+        return _quests_factoruide(deps, book, provenance, args)
     pair = [s.strip() for s in args.sources.split(",")] if args.sources else None
     rows = []
     for q in book.quests.values():
@@ -1242,6 +1247,32 @@ def _cmd_quests(deps: Deps, args: argparse.Namespace) -> int:
     lines = [f"Écarts entre sources : {len(rows)}"]
     lines += [f"  {r['id']} {r['name']} · {r['field']} : {r['values']}" for r in rows[: args.limit]]
     lines += [f"  paire {k} : {n}" for k, n in sorted(pairs.items(), key=lambda kv: -kv[1])]
+    _emit(payload, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _quests_factoruide(deps: Deps, book: Any, provenance: Provenance, args: argparse.Namespace) -> int:
+    """`forever quests diff --factoruide` : recoupement avec la base de Factoruide du cache (RX1, décision 266)."""
+    from forever.pipeline.factoruide import SEEN_ONLY, diff_factoruide, load_factoruide
+
+    db = load_factoruide(deps.cache_dir)
+    diff = diff_factoruide({q for q, v in book.quests.items() if v["status"] != SEEN_ONLY}, db)
+    shown = diff["seen_only"][: args.limit]
+    payload = {
+        "factoruide": {**diff, "seen_only": shown, "seen_only_total": len(diff["seen_only"])},
+        "provenance": provenance,
+    }
+    if diff["status"] != "present":
+        lines = [f"Factoruide : base {diff['status']}", *(f"  note : {n}" for n in diff["notes"])]
+        _emit(payload, lines, provenance, args.json)
+        return EXIT_OK
+    p = diff["provenance"]
+    lines = [f"Recoupement avec Factoruide ({p['commit']}, empreinte {p['sha256']}, import {p['imported_at']})"]
+    for status, n in diff["counts"].items():
+        lines.append(f"  {status} : {n['both']} connue(s) des deux, {n['factoruide_only']} de Factoruide seul")
+    lines.append(f"  connues de nous seuls : {diff['ours_only']}")
+    lines.append(f"  {SEEN_ONLY} : {len(diff['seen_only'])} (suppose, hors des routes)")
+    lines += [f"    {q['id']} {q['name'] or '?'} (niveau {q['level'] or '?'})" for q in shown]
     _emit(payload, lines, provenance, args.json)
     return EXIT_OK
 

@@ -109,3 +109,41 @@ Guide et Questie).
 - `QuestLine` : 3 ligne(s) ; `QuestLineXQuest` : 22 ligne(s), 22 d'ID ≥ 90000, 11 présentes dans la liste fusionnée dont 11 au statut `nouvelle` ; 3 chaîne(s) touchent une quête de Forever.
 - `QuestPOIPoint` : 99 point(s), sans colonne de quête (seulement `QuestPOIBlobID`) : leur rattachement
   exige `QuestPOIBlob`, à décider au plan de RX1.
+
+## Recoupement avec Factoruide (RX1, bloc A, 2026-10-14)
+
+> `forever quests build --rebuild` puis `forever quests diff --factoruide` (empreinte de la liste `170ca2799c91a5ec`,
+> base de Factoruide `f7da6da`, empreinte `109110f37776b7b3`, import du 2026-10-13). Lecture locale du cache
+> (décision 266) ; seuls ces agrégats entrent dans le dépôt.
+
+| Statut chez Factoruide | Connues des deux | De Factoruide seul |
+| --- | --- | --- |
+| available | 4439 | 332 |
+| incomplete | 82 | 67 |
+| removed | 363 | 213 |
+
+Liste fusionnée : 5224 quêtes (nouvelle 648, retouchée 196, absente des sources Forever 19, inchangée 2645, non
+couverte 1384, **vue seulement chez Factoruide 332**) ; 8 quêtes connues de nous seuls.
+
+**Lecteurs incomplets corrigés** (avant : 387 quêtes `available` de Factoruide absentes de notre liste ; 89 citées par
+un fichier local ; **51 récupérées**, d'où 332) :
+- `read_questie_forever` jetait les entrées de `QuestieForeverDB` sans titre ni niveau (quête rendue vue en jeu) et ne
+  lisait pas les quêtes faites (`QuestieConfig.char[…].complete`, sans nom de personnage gardé) : livres, « Camping
+  101 », quêtes de classe faites ;
+- Naowh Discovery `Data/Books.lua` (livres de la bibliothèque et objectifs « Friend of the Library ») jamais lu ;
+- Forever Guide `ChainData.lua` (chaîne du sac de couchage, départ propre à chaque camp) jamais lu ;
+- Dungeon Journal de Naowh `Data/QuestChains.lua` (chaînes « Call of Fire », « The Moonsilver Blade », « Old
+  Fire-Eye » : noms, niveaux minimaux, ordre, donneur du début) jamais lu ;
+- ForeverDungeonJournal `Data/QuestChains.lua` et `Data/QuestMaps.lua` (prérequis requis, détails, donneurs) jamais
+  lus.
+
+**38 citations écartées, avec leur preuve** : coïncidences numériques (identifiants d'objets, de PNJ ou de sorts dans
+`ItemCatalog*`, `LootDB`, `*NpcDB`, `*ObjectDB`, `EnchantSpells*`, `Transports.lua`, `Data.lua` de ForeverMapFix) ;
+fichiers d'un autre mode de jeu exclus par construction (Questie `SeasonOfDiscovery.lua` : 16 quêtes de la Saison de
+la Découverte ; `QuestieQuestBlacklist.lua` et corrections de Classic pour les quêtes de classe retirées en Classic
+5640, 5678, 7669, 7670, 8259 et 65593 à 65610) ; AlexAtlasLoot `QuestDB.lua` (écarté, décision 265) ;
+SavedVariables d'AllTheThings (addon désinstallé, fichier du 2026-09-24) et de RaphCompletionist (92479).
+
+**Les 332 restantes** sont « vue seulement chez Factoruide » (`suppose`, jamais placées dans une route, LVL17) :
+Factoruide les tient de Wowhead Forever et d'AllTheThings. AllTheThings a une saveur `forever` (interface 16001,
+licence MIT, base Forever mise à jour chaque jour) : une fois installé, un lecteur local pourra les confirmer.

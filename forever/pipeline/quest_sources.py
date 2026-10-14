@@ -11,7 +11,8 @@ Rien n'est deviné : un champ absent de la source n'est pas rendu. Sources :
 - `QuestieForeverDB` (SavedVariable de Questie : quêtes apprises en jeu, relevé du joueur) ;
 - Naowh Forever : Completo (`NaowhForever_Discovery/QuestList/Data/Quests.lua`), Journeys
   (`NaowhForever_Journeys/Data/QuestSpots.lua`), Dungeon Journal (`NaowhForever_DungeonJournal/Data/Quests.lua`) ;
-- Forever Guide (`ForeverGuide/DungeonData.lua`) ;
+- Forever Guide (`ForeverGuide/DungeonData.lua`, `DalaranData.lua`, `ChainData.lua`) ; livres de Naowh Discovery
+  (`Data/Books.lua`) et chaînes du Dungeon Journal de Naowh (`Data/QuestChains.lua`), RX1 ;
 - ForeverDungeonJournal (`Data/QuestRewards.lua`, `Data/Dungeons.lua`) ;
 - GearQuestForever (récompenses par objet, nom de quête sans identifiant : rapprochées par nom et zone dans
   `forever/quests.py`).
@@ -40,6 +41,7 @@ SOURCE_LABELS = {
     "fdj": "ForeverDungeonJournal",
     "gearquest": "GearQuestForever",
     "questie": "Questie (Classic Era, corrections comprises)",
+    "factoruide": "Factoruide (recoupement local, quêtes vues seulement chez lui)",
 }
 
 
@@ -81,6 +83,12 @@ JOURNEYS = ("NaowhForever_Journeys", "Data/QuestSpots.lua")
 NAOWH_DJ = ("NaowhForever_DungeonJournal", "Data/Quests.lua")
 GUIDE = ("ForeverGuide", "DungeonData.lua")
 GUIDE_DALARAN = "DalaranData.lua"  # DJ1 : quêtes de City of Dalaran, ajoutées après DungeonData.lua
+GUIDE_CHAINS = "ChainData.lua"  # RX1 : chaînes importantes (sac de couchage, clés) et leurs quêtes
+COMPLETO_BOOKS = "Data/Books.lua"  # RX1 : livres de la bibliothèque (Naowh Discovery)
+NAOWH_DJ_CHAINS = "Data/QuestChains.lua"  # RX1 : chaînes, niveaux minimaux, noms (Dungeon Journal de Naowh)
+FDJ_CHAINS = "Data/QuestChains.lua"  # RX1 : prérequis requis et leurs détails (ForeverDungeonJournal)
+FDJ_MAPS = "Data/QuestMaps.lua"  # RX1 : positions des donneurs (ForeverDungeonJournal)
+FDJ_UNIT_TO_PERCENT = 100.0  # format : coordonnées de ForeverDungeonJournal écrites de 0 à 1
 FDJ_REWARDS = ("ForeverDungeonJournal", "Data/QuestRewards.lua")
 FDJ_DUNGEONS = ("ForeverDungeonJournal", "Data/Dungeons.lua")
 GEARQUEST_PREFIX = "GearQuestForever_"
@@ -120,6 +128,8 @@ COMPLETO_FACTIONS = {1: "alliance", 2: "horde", 3: "both"}
 FDJ_FACTIONS = {"Both": "both", "Horde": "horde", "Alliance": "alliance"}
 _XP_TEXT = re.compile(r"([\d,]+) XP")
 _BARE_NAME = re.compile(r"=\s*[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)+\s*(?=[,}\n])")
+_BARE_IDENT = re.compile(r"=\s*(?!nil\b|true\b|false\b)[A-Za-z_][A-Za-z0-9_]*\s*(?=[,}\n])")
+_COMPLETE = re.compile(r'\["complete"\]\s*=\s*\{')
 _ENTRY_LINE = re.compile(r"^\s*\[(\d+)\]\s*=\s*(\{.*\}),?\s*$")
 _GUIDE_DQ_LINE = re.compile(r"^ns\.DQ\[(\d+)\]\s*=\s*(\{.*\})\s*$", re.MULTILINE)
 _GUIDE_DUNGEON_Q = re.compile(r'd\.key\s*==\s*"([^"]+)"\s*then\s*d\.q\s*=\s*(\{[^}]*\})')
@@ -207,6 +217,11 @@ def source_files(addons_dir: Path, wtf_dir: Path | None) -> list[Path]:
         q / QUESTIE_ZONES,
         *(addons_dir / a / f for a, f in (COMPLETO, JOURNEYS, NAOWH_DJ, GUIDE, FDJ_REWARDS, FDJ_DUNGEONS)),
         addons_dir / GUIDE[0] / GUIDE_DALARAN,
+        addons_dir / GUIDE[0] / GUIDE_CHAINS,
+        addons_dir / COMPLETO[0] / COMPLETO_BOOKS,
+        addons_dir / NAOWH_DJ[0] / NAOWH_DJ_CHAINS,
+        addons_dir / FDJ_REWARDS[0] / FDJ_CHAINS,
+        addons_dir / FDJ_REWARDS[0] / FDJ_MAPS,
         *sorted(addons_dir.glob(f"{GEARQUEST_PREFIX}*/*.lua")),
     ]
     if wtf_dir is not None:
@@ -375,11 +390,24 @@ def read_questie_forever(wtf_dir: Path) -> SourceQuests | None:
     read: list[Path] = []
     for path in paths:
         text = path.read_bytes().decode("latin-1")
-        marker = "QuestieForeverDB = "
+        marker, config = "QuestieForeverDB = ", "QuestieConfig = "
+        if marker not in text and config not in text:
+            continue
+        read.append(path)
+        if config in text:  # RX1 : quêtes faites de chaque personnage (aucun nom de personnage gardé)
+            start = text.find(config)
+            end = text.find(marker, start)
+            for m in _COMPLETE.finditer(text, start, end if end > start else len(text)):
+                try:  # seules les tables `complete` sont lues : la table entière est trop lente à analyser
+                    done, _ = parse_lua_value_at(text, m.end() - 1)
+                except ValueError as exc:
+                    raise DataSchemaError(f"{path} : {exc}.") from exc
+                for quest_id, flag in _fields(done).items():
+                    if isinstance(quest_id, int) and flag is True:
+                        quests.setdefault(quest_id, {})["completed"] = True
         if marker not in text:
             continue
         db = _fields(_table_after(text, marker, path))
-        read.append(path)
         for quest_id, row in _fields(db.get("quests")).items():
             f = _fields(row)
             if not isinstance(quest_id, int):
@@ -391,8 +419,8 @@ def read_questie_forever(wtf_dir: Path) -> SourceQuests | None:
                 facts["level"] = f["level"]
             if isinstance(f.get("mapID"), int) and f["mapID"] > 0:
                 facts["map"] = f["mapID"]
-            if facts:
-                quests[quest_id] = facts
+            # RX1 : une entrée sans titre ni niveau (quête rendue, vue en jeu) prouve encore que la quête existe
+            quests.setdefault(quest_id, {}).update(facts or {"seen": True})
     if not read:
         return None
     info = SourceInfo("questie_forever", "Questie (SavedVariables)", None, RECORD_CERTAINTY, tuple(read))
@@ -455,8 +483,57 @@ def read_completo(addons_dir: Path) -> Completo | None:
             for quest_id in step:
                 if quest_id in quests:
                     quests[quest_id]["chain"] = {"index": index, "step": k, "after": chain[k - 1] if k else []}
+    files = [path]
+    books = addon / COMPLETO_BOOKS
+    if books.is_file():
+        files.append(books)
+        _read_books(books, quests)
     version = _version(addon)
-    return Completo(SourceQuests(_info("completo", addon, version, [path]), quests, []), zones, names, chains)
+    return Completo(SourceQuests(_info("completo", addon, version, files), quests, []), zones, names, chains)
+
+
+def _spot(row: Any) -> dict[str, Any] | None:
+    """Position `{map, x, y, nom}` des fichiers de Naowh (liste positionnelle), ou None sans carte."""
+    f = _fields(row)
+    place = _place(f.get(4) if isinstance(f.get(4), str) else None, f.get(1), f.get(2), f.get(3))
+    return place if place and "map" in place else None
+
+
+def _read_books(path: Path, quests: dict[int, Facts]) -> None:
+    """Livres de la bibliothèque de Naowh Discovery (RX1) : objectifs (`LibraryGoals`) et livres (`LibraryBooks`,
+    ramassés à leur emplacement, rendus au lieu de `LibraryTurnIns`) ; une quête de `QuestList` n'est pas écrasée."""
+    text = _read(path)
+    turn_ins: dict[str, dict[str, Any]] = {}
+    if "ns.LibraryTurnIns = " in text:
+        for key, spots in _fields(_table_after(text, "ns.LibraryTurnIns = ", path)).items():
+            place = _spot(_fields(spots).get(1))
+            if isinstance(key, str) and place:
+                turn_ins[key] = place
+    found: dict[int, Facts] = {}
+    if "ns.LibraryGoals = " in text:
+        for row in _fields(_table_after(text, "ns.LibraryGoals = ", path)).values():
+            f = _fields(row)
+            if isinstance(f.get("quest"), int):
+                facts: Facts = {"name": f.get("name")}
+                if isinstance(f.get("level"), int):
+                    facts["level"] = f["level"]
+                found[f["quest"]] = facts
+    for row in _fields(_table_after(text, "ns.LibraryBooks = ", path)).values():
+        f = _fields(row)
+        if not isinstance(f.get("quest"), int):
+            continue
+        facts = {"name": f.get("name"), "faction": FACTION_LETTERS.get(str(f.get("side")))}
+        if isinstance(f.get("item"), int):
+            facts["start_item"] = f["item"]
+        giver = _spot(_fields(f.get("spots")).get(1))
+        if giver:
+            facts["giver"] = giver
+        if f.get("turnIn") in turn_ins:
+            facts["turn_in"] = turn_ins[f["turnIn"]]
+        found[f["quest"]] = facts
+    for quest_id, facts in found.items():
+        if quest_id not in quests:
+            quests[quest_id] = {k: v for k, v in facts.items() if v is not None}
 
 
 def read_journeys(addons_dir: Path) -> SourceQuests | None:
@@ -521,7 +598,53 @@ def read_naowh_dj(addons_dir: Path) -> SourceQuests | None:
             if steps:
                 facts["next"] = steps[0]
             quests[quest_id] = {k: v for k, v in facts.items() if v is not None}
-    return SourceQuests(_info("naowh_dj", addon, _version(addon), [path]), quests, [])
+    files = [path]
+    chains = addon / NAOWH_DJ_CHAINS
+    if chains.is_file():
+        files.append(chains)
+        _read_naowh_chains(chains, quests)
+    return SourceQuests(_info("naowh_dj", addon, _version(addon), files), quests, [])
+
+
+def _steps(chain: Any) -> list[list[int]]:
+    """Étapes d'une chaîne : un identifiant, ou un groupe (`{a, b}`) dont une quête suffit."""
+    out: list[list[int]] = []
+    for step in _fields(chain).values():
+        ids = [step] if isinstance(step, int) else _ints(step)
+        if ids:
+            out.append(ids)
+    return out
+
+
+def _read_naowh_chains(path: Path, quests: dict[int, Facts]) -> None:
+    """Chaînes de quêtes du Dungeon Journal de Naowh (RX1) : ordre (étape précédente = `prereq_any`), noms,
+    niveaux minimaux, donneur du début de chaîne ; ne remplace jamais un champ de `Data/Quests.lua`."""
+    text = _read(path)
+
+    def table(marker: str) -> dict[Any, Any]:
+        return _fields(_table_after(text, marker, path)) if marker in text else {}
+
+    for chain in table("J.QuestChains = ").values():
+        steps = _steps(chain)
+        for k, step in enumerate(steps):
+            for quest_id in step:
+                facts = quests.setdefault(quest_id, {})
+                if k:
+                    facts.setdefault("prereq_any", steps[k - 1])
+    for quest_id, name in table("J.QuestChainNames = ").items():
+        if isinstance(quest_id, int) and isinstance(name, str):
+            quests.setdefault(quest_id, {}).setdefault("name", name)
+    for quest_id, level in table("J.QuestMinLevel = ").items():
+        if isinstance(quest_id, int) and isinstance(level, int):
+            quests.setdefault(quest_id, {}).setdefault("min_level", level)
+    for quest_id, row in table("J.QuestChainStarts = ").items():
+        giver = _spot(row)
+        if isinstance(quest_id, int) and giver:
+            quests.setdefault(quest_id, {}).setdefault("giver", giver)
+    for quest_id, where in table("J.QuestWhere = ").items():
+        name = _giver_name(where)
+        if isinstance(quest_id, int) and name:
+            quests.setdefault(quest_id, {}).setdefault("giver", {"name": name})
 
 
 def read_forever_guide(addons_dir: Path) -> SourceQuests | None:
@@ -619,7 +742,54 @@ def read_forever_guide(addons_dir: Path) -> SourceQuests | None:
         if f.get("new") is True:
             facts["new"] = True
         quests[quest_id] = {k: v for k, v in facts.items() if v is not None}
+    chains = addon / GUIDE_CHAINS
+    if chains.is_file():
+        files.append(chains)
+        _read_guide_chains(chains, quests)
     return SourceQuests(_info("forever_guide", addon, _version(addon), files), quests, [])
+
+
+GUIDE_FACTIONS = {"Alliance": "alliance", "Horde": "horde"}
+
+
+def _read_guide_chains(path: Path, quests: dict[int, Facts]) -> None:
+    """Chaînes importantes de Forever Guide (RX1, `ChainData.lua`) : étapes (départ propre à chaque camp, puis
+    `ids`), positions (`points`), noms et niveaux minimaux (`ChainExtraQuests`) ; ne remplace aucun champ de `ns.DQ`."""
+    text = _read(path)
+    extra = _fields(_table_after(text, "ns.ChainExtraQuests=", path)) if "ns.ChainExtraQuests=" in text else {}
+    for chain in _fields(_table_after(text, "ns.ChainCatalog=", path)).values():
+        c = _fields(chain)
+        ids = _ints(c.get("ids"))
+        if not ids:
+            continue
+        start_of = {
+            q: GUIDE_FACTIONS[k]
+            for k, q in _fields(c.get("factionStart")).items()
+            if k in GUIDE_FACTIONS and isinstance(q, int)
+        }
+        starts = list(start_of) or ids[:1]
+        steps = [starts] + [[q] for q in ids if q not in starts]
+        points = _fields(c.get("points"))
+        start_points = _fields(points.get(ids[0]))
+        for k, step in enumerate(steps):
+            for quest_id in step:
+                facts = quests.setdefault(quest_id, {})
+                facts.setdefault("chain", {"name": c.get("name"), "step": k, "after": steps[k - 1] if k else []})
+                if k:
+                    facts.setdefault("prereq_any", steps[k - 1])
+                if quest_id in start_of:
+                    facts.setdefault("faction", start_of[quest_id])
+                    point = start_points.get({"alliance": "Alliance", "horde": "Horde"}[start_of[quest_id]])
+                else:
+                    point = points.get(quest_id)
+                giver = _spot(point)
+                if giver:
+                    facts.setdefault("giver", giver)
+                e = _fields(extra.get(quest_id))
+                if isinstance(e.get("n"), str):
+                    facts.setdefault("name", e["n"])
+                if isinstance(e.get("rl"), int):
+                    facts.setdefault("min_level", e["rl"])
 
 
 _FDJ_ENTRY = re.compile(r'^(?:FDJ\.)?DB\["([^"]+)"\]\s*=\s*', re.MULTILINE)
@@ -645,7 +815,8 @@ def fdj_db_entries(text: str, where: Path) -> list[tuple[str, Any]]:
 def read_fdj(addons_dir: Path) -> SourceQuests | None:
     addon = addons_dir / FDJ_REWARDS[0]
     rewards, dungeons = addon / FDJ_REWARDS[1], addon / FDJ_DUNGEONS[1]
-    if not rewards.is_file() and not dungeons.is_file():
+    chains, maps = addon / FDJ_CHAINS, addon / FDJ_MAPS
+    if not any(p.is_file() for p in (rewards, dungeons, chains, maps)):
         return None
     quests: dict[int, Facts] = {}
     files: list[Path] = []
@@ -677,7 +848,60 @@ def read_fdj(addons_dir: Path) -> SourceQuests | None:
                 m = _XP_TEXT.search(f.get("rewards") or "") if isinstance(f.get("rewards"), str) else None
                 if m:
                     facts["xp_text"] = int(m[1].replace(",", ""))
+    for path in (maps, chains):
+        if path.is_file():
+            files.append(path)
+            _read_fdj_chains(path, quests)
     return SourceQuests(_info("fdj", addon, _version(addon), files), quests, [])
+
+
+def _fdj_place(row: Any) -> dict[str, Any] | None:
+    f = _fields(row)
+    x, y = f.get("x"), f.get("y")
+    if not isinstance(x, int | float) or not isinstance(y, int | float):
+        return None
+    name = f.get("targetName") if isinstance(f.get("targetName"), str) else None
+    place = _place(name, f.get("mapID"), x * FDJ_UNIT_TO_PERCENT, y * FDJ_UNIT_TO_PERCENT)
+    return place if place and "map" in place else None
+
+
+def _read_fdj_chains(path: Path, quests: dict[int, Facts]) -> None:
+    """ForeverDungeonJournal (RX1) : positions des donneurs (`QUEST_START_MAPS`, lues en premier), prérequis requis
+    (`QUEST_PREREQ_CHAINS` : tous requis), niveau et niveau minimal (`QUEST_PREREQ_DETAILS`) ; constantes de l'addon
+    ignorées ; un champ déjà lu n'est pas remplacé."""
+    text = _BARE_IDENT.sub("= nil", _BARE_NAME.sub("= nil", _read(path)))
+
+    def table(marker: str) -> dict[Any, Any]:
+        return _fields(_table_after(text, marker, path)) if marker in text else {}
+
+    for quest_id, row in table("FDJ.QUEST_START_MAPS = ").items():
+        giver = _fdj_place(row)
+        if isinstance(quest_id, int) and giver:
+            quests.setdefault(quest_id, {}).setdefault("giver", giver)
+    for quest_id, rows in table("FDJ.QUEST_PREREQ_CHAINS = ").items():
+        if not isinstance(quest_id, int):
+            continue
+        required = []
+        for row in _fields(rows).values():
+            f = _fields(row)
+            if isinstance(f.get("id"), int):
+                required.append(f["id"])
+                if isinstance(f.get("name"), str):
+                    quests.setdefault(f["id"], {}).setdefault("name", f["name"])
+        if required:
+            quests.setdefault(quest_id, {}).setdefault("prereq_all", required)
+    for quest_id, row in table("FDJ.QUEST_PREREQ_DETAILS = ").items():
+        f = _fields(row)
+        if not isinstance(quest_id, int):
+            continue
+        facts = quests.setdefault(quest_id, {})
+        if isinstance(f.get("level"), int):
+            facts.setdefault("level", f["level"])
+        if isinstance(f.get("requires"), int):
+            facts.setdefault("min_level", f["requires"])
+        giver = _fdj_place(f.get("map"))
+        if giver:
+            facts.setdefault("giver", giver)
 
 
 def read_gearquest(addons_dir: Path) -> tuple[SourceInfo, list[GearReward]] | None:

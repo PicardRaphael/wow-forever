@@ -23,6 +23,7 @@ from typing import Any, NamedTuple
 from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.pipeline import quest_sources as qs
+from forever.pipeline.factoruide import AVAILABLE, DB_REL, SEEN_ONLY, FactoruideDB, load_factoruide
 from forever.pipeline.quest_rewards import QUEST_FILE, seen_quest_xp
 
 PRIORITY = (
@@ -38,9 +39,9 @@ PRIORITY = (
 )
 COMPARED = ("level", "min_level", "faction", "prereq_all", "prereq_any", "next", "xp")
 CHANGED = ("level", "min_level", "prereq_all", "prereq_any", "xp")
-STATUSES = ("nouvelle", "retouchée", "absente des sources Forever", "inchangée", "non couverte")
+STATUSES = ("nouvelle", "retouchée", "absente des sources Forever", "inchangée", "non couverte", SEEN_ONLY)
 CACHE_DIR = "quests"
-MERGE_FORMAT = 2  # version de la forme du cache (changée avec la règle de fusion)
+MERGE_FORMAT = 3  # version de la forme du cache (changée avec la règle de fusion ; 3 : RX1, Factoruide)
 CLIENT_CERTAINTY = "probable"  # disposition de questcache.wdb probable (LVL6) ; QuestXP elle-même est certaine
 FDJ_TEXT = "fdj_text"  # source d'écart : XP écrite dans le texte des récompenses de ForeverDungeonJournal
 XP_TEXT = "xp_text"  # champ de ForeverDungeonJournal qui la porte
@@ -198,6 +199,30 @@ def _merge(
     return quests, notes
 
 
+def _seen_only(db: FactoruideDB, ours: dict[int, Quest]) -> dict[int, Quest]:
+    """Quêtes `available` de Factoruide inconnues de nos sources : signalées, jamais fusionnées (décision 266)."""
+    out: dict[int, Quest] = {}
+    for quest_id, q in db.quests.items():
+        if q.status != AVAILABLE or quest_id in ours:
+            continue
+        fields = {
+            k: {"value": v, "source": "factoruide", "certainty": "suppose"}
+            for k, v in (("name", q.name), ("level", q.level), ("min_level", q.min_level))
+            if v is not None
+        }
+        out[quest_id] = {
+            "id": quest_id,
+            "name": q.name,
+            "sources": ["factoruide"],
+            "fields": fields,
+            "discrepancies": {},
+            "status": SEEN_ONLY,
+            "changed_fields": [],
+            "certainty": "suppose",
+        }
+    return out
+
+
 def _wow(deps: Deps, wow_dir: Path | None) -> Path:
     wow = wow_dir or deps.wow_dir
     if wow is None:
@@ -251,7 +276,9 @@ def build_quests(deps: Deps, *, wow_dir: Path | None = None, rebuild: bool = Fal
     wow = _wow(deps, wow_dir)
     addons, wtf = wow / "Interface" / "AddOns", wow / "WTF"
     client_doc, data_id = _client_doc(deps)
-    fingerprint = _fingerprint(qs.source_files(addons, wtf), data_id)
+    factoruide_db = deps.cache_dir / DB_REL
+    files = qs.source_files(addons, wtf) + ([factoruide_db] if factoruide_db.is_file() else [])
+    fingerprint = _fingerprint(files, data_id)
     cache = deps.cache_dir / CACHE_DIR / f"{fingerprint}.json"
     if cache.is_file() and not rebuild:
         try:
@@ -289,6 +316,11 @@ def build_quests(deps: Deps, *, wow_dir: Path | None = None, rebuild: bool = Fal
     for s in sources:
         notes += s.notes
     notes += gear_notes
+    factoruide = load_factoruide(deps.cache_dir)
+    if factoruide.status == "illisible":
+        notes += factoruide.notes
+    seen_only = _seen_only(factoruide, quests)
+    quests.update(seen_only)
     infos = [
         {
             "source": s.info.key,
@@ -311,6 +343,17 @@ def build_quests(deps: Deps, *, wow_dir: Path | None = None, rebuild: bool = Fal
                 "quests": sum(1 for q in quests.values() if "gearquest" in q["sources"]),
             }
         )
+    if factoruide.status == "present":
+        infos.append(
+            {
+                "source": "factoruide",
+                "label": qs.SOURCE_LABELS["factoruide"],
+                "addon": "Factoruide (cache local)",
+                "version": factoruide.provenance["commit"],
+                "certainty": "suppose",
+                "quests": len(seen_only),
+            }
+        )
     book = QuestBook(quests, infos, fingerprint, False, notes, completo.zone_names if completo else {})
     cache.parent.mkdir(parents=True, exist_ok=True)
     cache.write_bytes(json.dumps(_to_json(book), ensure_ascii=False).encode("utf-8"))
@@ -320,7 +363,10 @@ def build_quests(deps: Deps, *, wow_dir: Path | None = None, rebuild: bool = Fal
 def routable(quest: Quest) -> bool:
     """Vrai si une route peut placer la quête (RX1) : jamais une quête vue seulement chez Factoruide, jamais une
     quête sans donneur positionné."""
-    raise NotImplementedError
+    if quest.get("status") == SEEN_ONLY:
+        return False
+    giver = value(quest, "giver")
+    return isinstance(giver, dict) and isinstance(giver.get("map"), int)
 
 
 def value(quest: Quest, field: str) -> Any:

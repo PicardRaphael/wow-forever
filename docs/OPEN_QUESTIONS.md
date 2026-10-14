@@ -229,6 +229,12 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **LVL16 — L'XP d'une quête de donjon lue dans le client (`questcache.wdb`) inclut-elle le bonus de donjon réduit
   de moitié ?** Ajoutée le 2026-10-13 (DJ1). Test : `xpReward` d'une quête de donjon rendue, comparé par
   `forever xp check`. Priorité : moyenne. Registre I9.
+- **LVL17 — Les quêtes vues seulement chez Factoruide existent-elles dans Forever ?** Ajoutée le 2026-10-14 (RX1,
+  bloc A). 332 quêtes `available` dans la base de Factoruide (`f7da6da`, tirées de Wowhead Forever et
+  d'AllTheThings) qu'aucune de nos sources locales ni le client ne connaît, après correction de nos lecteurs (51
+  récupérées, `docs/research/quetes-forever.md`). Statut « vue seulement chez Factoruide », `suppose`, jamais placées
+  dans une route. Test : une quête vue en jeu (QuestieForeverDB, quêtes faites de Questie, ForeverLogger) l'établit ;
+  AllTheThings (saveur `forever`, MIT), s'il est installé, serait lu en local. Priorité : moyenne.
 - **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
   Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
 - **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**
