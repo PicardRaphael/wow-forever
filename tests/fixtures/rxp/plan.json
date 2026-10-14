@@ -1,0 +1,19 @@
+{
+ "note": "Plan de fixture (RX1, bloc D) : forme d'un plan de forever route plan, valeurs inventées.",
+ "id": "fixture00001",
+ "class": "mage",
+ "faction": "horde",
+ "levels": {"from": 1, "to": 5, "reached": 5},
+ "certainty": "suppose",
+ "stops": [
+  {"kind": "accept", "ref": 101, "name": "Fixture First Steps", "level": 1, "xp": 0.0, "map": 9001, "x": 40.0, "y": 40.0},
+  {"kind": "objective", "ref": 101, "name": "Fixture First Steps", "level": 1, "xp": 400.0, "map": 9001, "x": 45.0, "y": 45.0},
+  {"kind": "turnin", "ref": 101, "name": "Fixture First Steps", "level": 2, "xp": 100.0, "map": 9001, "x": 40.0, "y": 40.0},
+  {"kind": "accept", "ref": 111, "name": "Fixture >> Odd, Name | With -- Marks << Here", "level": 3, "xp": 0.0, "map": 9002, "x": 45.0, "y": 40.0},
+  {"kind": "dungeon", "ref": "9901", "name": "Fixture Depths", "level": 3, "xp": 1331.0, "map": 9002, "x": 60.0, "y": 60.0},
+  {"kind": "turnin", "ref": 111, "name": "Fixture >> Odd, Name | With -- Marks << Here", "level": 4, "xp": 800.0, "map": 9002, "x": 45.0, "y": 40.0},
+  {"kind": "accept", "ref": 107, "name": "Fixture Arcane Lesson", "level": 4, "xp": 0.0, "map": null, "x": null, "y": null},
+  {"kind": "turnin", "ref": 107, "name": "Fixture Arcane Lesson", "level": 4, "xp": 300.0, "map": null, "x": null, "y": null},
+  {"kind": "grind", "ref": "farm", "name": null, "level": 4, "xp": 900.0, "map": null, "x": null, "y": null}
+ ]
+}

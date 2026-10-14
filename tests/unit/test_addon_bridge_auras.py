@@ -116,6 +116,6 @@ def test_no_spell_or_item_identifier_in_the_addons():
         assert not [i for i in ids if i in text], path
 
 
-def test_bridge_version_is_0_2_0():
+def test_bridge_version_is_0_3_0():
     toc = (ADDONS / "ForeverBridge" / "ForeverBridge.toc").read_text(encoding="utf-8")
-    assert "## Version: 0.2.0" in toc.splitlines()
+    assert "## Version: 0.3.0" in toc.splitlines()
