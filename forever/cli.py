@@ -429,6 +429,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="métier « Nom:rang:rang maximal » (nom anglais, rangs lus en jeu) ; visite au maître quand le rang suivant "
         "est ouvert",
     )
+    r_plan.add_argument("--race", help="race du personnage (nom de races.json, ex. Gnome) : masques et zone de départ")
+    r_plan.add_argument("--at", help="position réelle « carte,x,y » (uiMapID, pourcentages de la carte)")
+    r_plan.add_argument("--character", help="personnage du profil dont les quêtes faites sont retirées")
     r_plan.add_argument("--json", action="store_true", help="sortie JSON")
     r_show = route_sub.add_parser("show", help="relire une feuille de route gardée dans le cache")
     r_show.add_argument("id", help="identifiant rendu par forever route plan")
@@ -1516,10 +1519,25 @@ def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
             tries=args.tries,
             seed=args.seed,
             professions=parse_professions(args.profession),
+            race=args.race,
+            start_at=_position(args.at),
+            character=args.character,
         )
         doc = plan_route(deps, request)
     _emit(doc, render_route(doc), doc["provenance"], args.json)
     return EXIT_OK
+
+
+def _position(raw: str | None) -> tuple[int, float, float] | None:
+    """Position « carte,x,y » de `forever route plan --at` (CJ1)."""
+    if not raw:
+        return None
+    parts = [p.strip() for p in raw.split(",")]
+    try:
+        ui_map, x, y = int(parts[0]), float(parts[1]), float(parts[2])
+    except (ValueError, IndexError) as exc:
+        raise InvalidArgumentError(f"Position illisible : {raw}.", "donner « carte,x,y » : uiMapID puis pourcentages de la carte") from exc
+    return ui_map, x, y
 
 
 def _cmd_quests(deps: Deps, args: argparse.Namespace) -> int:

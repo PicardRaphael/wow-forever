@@ -6,7 +6,8 @@ au format RestedXP. Aucun chiffre de jeu ici."""
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, replace
 from typing import Any
 
 from forever.engine.model import GameData
@@ -233,6 +234,83 @@ class RouteRequest:
     tries: int | None = None
     seed: int | None = None
     professions: tuple[tuple[str, int, int], ...] = ()  # (métier, rang, rang maximal), bloc H
+    race: str | None = None  # CJ1 : race du personnage (nom de races.json), masques de race et zone de départ
+    start_at: tuple[int, float, float] | None = None  # CJ1 : position réelle (uiMapID, x, y en pourcentage)
+    done: tuple[int, ...] = ()  # CJ1 : quêtes déjà faites par ce personnage (profil, Questie)
+    character: str | None = None  # CJ1 : nom du personnage (quêtes faites lues au profil, nom du guide)
+
+
+FILTERS_KEY = "route.filters"  # CJ1 : garde-fous des feuilles de route (mechanics.json)
+CLASSIC_MASK_BITS = 32  # largeur des masques de races des sources Classic (Questie) : format, pas une valeur du jeu
+
+
+@dataclass(frozen=True)
+class RouteFilters:
+    """Garde-fous de la route (`mechanics.json`, `route.filters`, CJ1) : catégories QuestSort écartées, catégories de
+    métier, drapeaux de Questie, seuil des bas niveaux, capitales. Registre : I18"""
+
+    excluded_sorts: frozenset[int]
+    profession_sorts: Mapping[int, str]
+    repeatable_flag: int
+    event_flag: int
+    low_level: int
+    capitals: tuple[str, ...]
+
+
+def route_filters(values: Any) -> RouteFilters | None:
+    """Garde-fous lus dans les données (None : version sans `route.filters`). Registre : I18"""
+    if FILTERS_KEY not in values:
+        return None
+    raw = values[FILTERS_KEY]["value"]
+    return RouteFilters(
+        excluded_sorts=frozenset(int(s) for s in raw["excluded_sorts"]),
+        profession_sorts={int(k): str(v) for k, v in raw["profession_sorts"].items()},
+        repeatable_flag=int(raw["repeatable_flag"]),
+        event_flag=int(raw["event_flag"]),
+        low_level=int(raw["low_level"]),
+        capitals=tuple(str(c) for c in raw["capitals"]),
+    )
+
+
+def race_allowed(mask: Any, race_id: int, races: Mapping[str, Any]) -> bool:
+    """Quête permise à la race `race_id` d'après son masque de races (0 ou absent : toutes). Une race au-delà des
+    masques Classic (Skyborne) passe un masque qui couvre tout son camp ou qui porte un bit étendu des sources de
+    Forever, jamais le masque d'autres races seulement. Registre : I18"""
+    if not isinstance(mask, int) or mask == 0:
+        return True
+    if race_id <= CLASSIC_MASK_BITS:
+        return bool(mask & (1 << (race_id - 1)))
+    faction = next((str(r.get("faction", "")).lower() for r in races.values() if r.get("id") == race_id), "")
+    classic = 0
+    for r in races.values():
+        if str(r.get("faction", "")).lower() == faction and int(r.get("id", 0)) <= CLASSIC_MASK_BITS:
+            classic |= 1 << (int(r["id"]) - 1)
+    return (mask >> CLASSIC_MASK_BITS) != 0 or (classic != 0 and mask & classic == classic)
+
+
+def _races_doc(gd: GameData) -> dict[str, Any]:
+    """Races de la version des données du paquet (repli quand l'appelant ne les donne pas)."""
+    import json
+    from pathlib import Path
+
+    path = Path(__file__).resolve().parent / "data" / gd.game_version / "races.json"
+    if not path.is_file():
+        return {}
+    races: dict[str, Any] = json.loads(path.read_text(encoding="utf-8")).get("races") or {}
+    return races
+
+
+def done_quests(deps: Any, character: str | None) -> tuple[int, ...]:
+    """Quêtes faites par ce personnage, lues au profil (Questie, par GUID) ; jamais l'union des personnages."""
+    from forever.profile import character_values, load_profile, resolve_path
+
+    if not character:
+        return ()
+    raw = (load_profile(resolve_path(deps)).get("characters") or {}).get(character)
+    if not isinstance(raw, dict):
+        return ()
+    done = character_values(raw).get("quests_completed") or {}
+    return tuple(sorted(int(q) for q in done if str(q).isdigit()))
 
 
 def _ids(label: str, ids: list[int]) -> str:
@@ -357,6 +435,7 @@ def route_world(
     trainers: Any = (),
     train_levels: Any = (),
     prof_visits: Any = None,
+    races: Mapping[str, Any] | None = None,
 ) -> tuple[Any, list[str]]:
     """Entrées du moteur de route (`RouteWorld`) tirées du livre des quêtes, des placements de donjon de DJ1 et des
     cartes de zone ; avertissements (quêtes écartées et pourquoi). Registre : I18"""
@@ -376,6 +455,11 @@ def route_world(
     dungeon_of = {q: d.key for d in chosen.values() for q in d.quests}
     mask = CLASS_MASKS.get(request.class_name.strip().lower(), 0)
     gray = gray_level(gd, request.start_level)
+    filters = route_filters(values)
+    races = races if races is not None else (_races_doc(gd) if request.race else {})
+    race_id = next((int(r["id"]) for name, r in races.items() if request.race and name == request.race), None)
+    owned = {name.lower() for name, _, _ in request.professions}
+    done = set(request.done)
     dropped: dict[str, list[int]] = {}
     quests: dict[int, Any] = {}
     for quest_id, q in sorted(book.quests.items()):
@@ -383,8 +467,14 @@ def route_world(
         side, classes = value(q, "faction"), value(q, "classes")
         level, min_level = value(q, "level"), value(q, "min_level")
         reason = None
+        if quest_id in done and not forced:
+            continue  # déjà faite par ce personnage (profil) : jamais reprise
         if quest_id in request.exclude:
             reason = "exclues à la demande"
+        elif race_id is not None and not race_allowed(value(q, "races"), race_id, races):
+            continue  # autre race : rien à dire
+        elif filters is not None and not forced and (why := _filtered(q, filters, owned)) is not None:
+            reason = why
         elif not routable(q):
             reason = "sans donneur positionné ou vues seulement chez Factoruide"
         elif side not in (request.faction, "both", None):
@@ -434,12 +524,12 @@ def route_world(
             dungeon=dungeon_of.get(quest_id),
             certainty=weakest(q["fields"]["giver"]["certainty"], *(["suppose"] if guessed else [])),
         )
-    # quêtes dont un prérequis est hors de la route : jamais prenables
+    # quêtes dont un prérequis est hors de la route (ni dans la route, ni déjà faite) : jamais prenables
     changed = True
     while changed:
         changed = False
         for quest_id, rq in list(quests.items()):
-            known = set(quests)
+            known = set(quests) | done
             if (
                 not set(rq.prereq_all) <= known
                 or (rq.prereq_any and not set(rq.prereq_any) & known)
@@ -476,6 +566,26 @@ def route_world(
         train_levels=tuple(lv for lv in sorted(set(train_levels)) if request.start_level < lv < request.end_level),
     )
     return world, warnings
+
+
+def _filtered(quest: Any, filters: RouteFilters, owned: set[str]) -> str | None:
+    """Raison d'écarter une quête d'après les garde-fous (CJ1) : catégorie d'événement ou d'effort de guerre, drapeaux
+    répétable ou événement, quête de métier sans le métier (None : gardée). Registre : I18"""
+    from forever.quests import value
+
+    sort, special, skill = value(quest, "sort"), value(quest, "special"), value(quest, "skill")
+    if isinstance(sort, int) and sort in filters.excluded_sorts:
+        return "quêtes d'événement, d'effort de guerre ou de champ de bataille"
+    if isinstance(special, int) and special & filters.event_flag:
+        return "quêtes d'événement mensuel"
+    if isinstance(special, int) and special & filters.repeatable_flag:
+        return "quêtes répétables"
+    if isinstance(sort, int) and sort in filters.profession_sorts:
+        if filters.profession_sorts[sort].lower() not in owned:
+            return "quêtes d'un métier que le personnage n'a pas"
+    elif isinstance(skill, int) and not owned:
+        return "quêtes d'un métier que le personnage n'a pas"
+    return None
 
 
 def _trainer_points(maps: Any, trainers: Any, faction: str) -> tuple[Any, ...]:
@@ -615,11 +725,83 @@ class RouteContext:
     train_levels: Any
 
 
-def start_quest(quests: Any, level: int) -> Any:
+def _distance(a: Any, b: Any) -> float:
+    if a is None or b is None or a.continent != b.continent:
+        return math.inf
+    return math.hypot(a.x - b.x, a.y - b.y)
+
+
+def start_quest(quests: Any, level: int, *, near: Any = None) -> Any:
     """Quête dont le donneur sert de départ : permise au niveau de départ, au niveau le plus proche (RX1c : la quête de
-    plus bas niveau du livre pouvait être une quête neutre de l'autre continent, et toute la route devenait infinie).
+    plus bas niveau du livre pouvait être une quête neutre de l'autre continent, et toute la route devenait infinie) ;
+    à égalité, le donneur le plus proche de `near` (CJ1 : l'identifiant départageait, et un Gnome partait d'Elwynn
+    Forest). Registre : I18"""
+    return min(
+        quests,
+        key=lambda q: (q.min_level > level, abs(q.level - level), q.min_level, _distance(near, q.giver), q.id),
+        default=None,
+    )
+
+
+def rxp_start_giver(library: Any, who: Any, quests: Any, level: int) -> Any:
+    """Donneur de la première quête prise du parcours gratuit de la race et de la classe (zone de départ de la race,
+    décision 277) au-delà du niveau `level` ; None sans parcours ou sans quête connue. Registre : I18"""
+    from forever.errors import InvalidArgumentError
+    from forever.rxp_guides import applies, guide_chain
+
+    try:
+        chain = guide_chain(library, who)
+    except InvalidArgumentError:
+        return None
+    for g in chain.guides:
+        if g.levels is not None and g.levels[1] <= level:
+            continue
+        for s in g.steps:
+            if s.dungeon or not applies(s.filter, who):
+                continue
+            for a in s.actions:
+                if a.kind == "accept" and a.ref in quests and applies(a.filter, who):
+                    return quests[a.ref].giver
+    return None
+
+
+def start_position(maps: Any, request: RouteRequest, quests: Any, *, rxp_giver: Any) -> tuple[Any, str]:
+    """Départ d'une route et sa raison : la position réelle du contexte (`position`), sinon le premier donneur du
+    parcours gratuit de la race (`parcours`), sinon le donneur d'une quête permise au niveau de départ (`quête`).
     Registre : I18"""
-    return min(quests, key=lambda q: (q.min_level > level, abs(q.level - level), q.min_level, q.id), default=None)
+    near = None
+    if request.start_at is not None:
+        ui_map, x, y = request.start_at
+        near = _point(maps, {"map": ui_map, "x": x, "y": y})
+        if near is not None:
+            return near, "position"
+    if rxp_giver is not None:
+        return rxp_giver, "parcours"
+    first = start_quest(list(quests.values()), request.start_level, near=near)
+    return (first.giver if first is not None else None), "quête"
+
+
+START_REASONS = {
+    "position": "départ : position du personnage dans le jeu",
+    "parcours": "départ : zone de départ de la race (première quête du parcours gratuit de RestedXP de sa race)",
+    "quête": "départ supposé : donneur d'une quête permise au niveau de départ (position et race inconnues)",
+}
+
+
+def _race_start(addons: Any, request: RouteRequest, quests: Any) -> Any:
+    """Donneur de départ pris du parcours gratuit de la race (lecture locale de RestedXP, décision 277) ; None sans
+    race, sans RestedXP installé ou sans quête connue. Registre : I18"""
+    from forever.errors import InvalidArgumentError
+    from forever.rxp_guides import read_rxp_guides, who_for
+
+    if not request.race or addons is None or request.start_at is not None:
+        return None
+    try:
+        library = read_rxp_guides(addons)
+    except InvalidArgumentError:
+        return None
+    who = who_for(request.class_name, request.race, request.faction)
+    return rxp_start_giver(library, who, quests, request.start_level)
 
 
 def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> RouteContext:
@@ -722,6 +904,9 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     rows: list[dict[str, Any]] = []
     if request.dungeons != "none":
         rows = dungeon_placements(deps, class_name=cls, faction=request.faction, wow_dir=wow_dir)
+    races = data.read_json("races.json").get("races") or {}
+    if request.race and request.race not in races:
+        raise InvalidArgumentError(f"Race inconnue : {request.race}.", f"choisir parmi : {', '.join(races)}")
     world, warnings = route_world(
         gd,
         book,
@@ -734,16 +919,18 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
         trainers=trainers,
         train_levels=train_levels,
         prof_visits=prof_visits,
+        races=races,
     )
     if not world.quests:
         warnings.append("aucune quête placée : la route n'est que du farm")
-    first = start_quest(world.quests.values(), request.start_level)
-    if first is not None:
-        position = first.giver
-    else:
+    giver = _race_start(addons, request, world.quests)
+    position, reason = start_position(maps, request, world.quests, rxp_giver=giver)
+    if position is None:
         position = next(iter(maps.values()), None)
         position = position and _point(maps, {"map": position.ui_map, "x": 50.0, "y": 50.0})
-    start = RouteState(level=request.start_level, xp=0.0, position=position)
+    warnings.insert(0, START_REASONS[reason])
+    done = frozenset(request.done)
+    start = RouteState(level=request.start_level, xp=0.0, position=position, done=done)
     return RouteContext(
         cls, data, cap, gd, book, rows, world, warnings, start, kill, walker, network, trainers, train_levels
     )
@@ -759,6 +946,8 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     from forever.optimize.route import plan
     from forever.provenance import make_provenance
 
+    if request.character and not request.done:
+        request = replace(request, done=done_quests(deps, request.character))
     ctx = route_context(deps, request, wow_dir=wow_dir)
     cls, data, cap, gd, book, rows = ctx.cls, ctx.data, ctx.cap, ctx.gd, ctx.book, ctx.rows
     world, warnings, start, kill, walker, network = (
@@ -799,7 +988,11 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
             if trainers and train_levels
             else "maître de classe : niveaux ou positions inconnus, visites non comptées"
         ),
-        "position de départ supposée : donneur de la première quête de la route",
+        (
+            f"quêtes déjà faites par {request.character} (profil, Questie) : {len(request.done)} retirée(s)"
+            if request.character
+            else "quêtes déjà faites : personnage inconnu, aucune retirée"
+        ),
         "objectif d'une quête : camp de Journeys, sinon donneur (suppose) ; monstres par quête de leveling.objectives",
         "bonus d'XP : aucun pris en compte dans le calcul (rappels à part)",
         "recherche : sous-ensemble porté de Factoruide (MIT, brouznouf/factoruide@f7da6da), graine fixe",

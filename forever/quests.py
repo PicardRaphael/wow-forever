@@ -240,7 +240,7 @@ def _client_doc(deps: Deps) -> tuple[dict[str, Any] | None, str]:
 
 
 def _fingerprint(files: list[Path], data_id: str) -> str:
-    parts: list[Any] = [MERGE_FORMAT, data_id]
+    parts: list[Any] = [MERGE_FORMAT, qs.READ_FORMAT, data_id]
     for path in files:
         st = os.stat(path)
         parts.append([path.as_posix(), st.st_size, st.st_mtime_ns])

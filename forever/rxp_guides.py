@@ -31,7 +31,14 @@ _INT = re.compile(r"-?\d+")
 _XP = re.compile(r"^(?P<op>[<>]?)\s*(?P<level>\d+)(?P<frac>[+.\-]?\d*)\s*(?:,\s*(?P<skip>-?\d+))?")
 # Jetons de filtre qui ne désignent jamais le personnage comparé (saisons, modes, guides à sauter).
 NEVER = frozenset({"skip", "sod", "som", "hc", "hardcore", "era", "tbc", "wotlk", "beta"})
-RACES = {"undead": "Undead", "scourge": "Undead", "nightelf": "NightElf"}
+RACES = {
+    "undead": "Undead",
+    "scourge": "Undead",
+    "nightelf": "NightElf",
+    # CJ1 : les deux races Skyborne portent le jeton du fichier du client (`#defaultfor Skyborne`)
+    "highorderskyborne": "Skyborne",
+    "windshaperskyborne": "Skyborne",
+}
 QUEST_COMMANDS = {"accept": "accept", "complete": "objective", "turnin": "turnin"}
 GUARDS = ("isonquest", "isquestturnedin", "isquestcomplete", "isquestavailable")
 DEFAULT_XP_RATE = 1.0  # taux d'XP de Forever pour `#xprate` (celui de RestedXP hors saison : 1)

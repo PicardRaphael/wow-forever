@@ -244,7 +244,15 @@ UnitExists = api("UnitExists", function(unit) return unit == "player" or (unit =
 UnitIsPlayer = api("UnitIsPlayer", function(unit) return unit == "player" or (unit == "target" and Stub.player.target ~= nil) end)
 GetBuildInfo = api("GetBuildInfo", function() return Stub.player.version, Stub.player.build, "Oct 1 2026", 16001 end)
 GetInventoryItemLink = api("GetInventoryItemLink", function(unit, slot) return Stub.player.gear[slot] end)
-C_Map = { GetBestMapForUnit = api("C_Map.GetBestMapForUnit", function() return Stub.player.map end) }
+C_Map = {
+	GetBestMapForUnit = api("C_Map.GetBestMapForUnit", function() return Stub.player.map end),
+	-- CJ1 : position du joueur (fraction de la carte), nil si Stub.player.pos est absent
+	GetPlayerMapPosition = api("C_Map.GetPlayerMapPosition", function(_, _)
+		local pos = Stub.player.pos
+		if not pos then return nil end
+		return { x = pos.x, y = pos.y, GetXY = function(self) return self.x, self.y end }
+	end),
+}
 C_ClassTalents = { GetActiveConfigID = api("C_ClassTalents.GetActiveConfigID", function() return Stub.player.config end) }
 C_Traits = {
 	GetConfigInfo = api("C_Traits.GetConfigInfo", function(config) return { treeIDs = Stub.player.trees } end),

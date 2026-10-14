@@ -93,6 +93,7 @@ FDJ_REWARDS = ("ForeverDungeonJournal", "Data/QuestRewards.lua")
 FDJ_DUNGEONS = ("ForeverDungeonJournal", "Data/Dungeons.lua")
 GEARQUEST_PREFIX = "GearQuestForever_"
 QUESTIE_SV = "Questie.lua"
+READ_FORMAT = 2  # champs lus dans les sources (2 : CJ1, catégorie, drapeaux, métier requis) : empreinte du cache
 ADDON_CERTAINTY = "suppose"  # addon : relevé de la communauté ou de son auteur
 RECORD_CERTAINTY = "probable"  # relevé en jeu du joueur (QuestieForeverDB)
 # Champs de `questKeys` lus dans la base Classic de Questie (positions lues dans l'en-tête du fichier).
@@ -110,6 +111,8 @@ QUESTIE_FIELDS = (
     "exclusiveTo",
     "zoneOrSort",
     "nextQuestInChain",
+    "requiredSkill",  # CJ1 : quête de métier
+    "specialFlags",  # CJ1 : répétable, événement
 )
 # Corrections de Questie appliquées : champs numériques ou listes de nombres seulement.
 FIX_FIELDS = (
@@ -351,6 +354,13 @@ def read_questie_quests(addons_dir: Path) -> tuple[SourceQuests, QuestieExtras] 
             facts["zone_area"] = zone
             if zone in area_to_map:
                 facts["map"] = area_to_map[zone]
+        elif isinstance(zone, int) and zone < 0:  # CJ1 : catégorie QuestSort (événement, classe, métier…)
+            facts["sort"] = zone
+        if isinstance(v.get("specialFlags"), int) and v["specialFlags"] > 0:
+            facts["special"] = v["specialFlags"]
+        skill = _ints(v.get("requiredSkill"))
+        if skill:
+            facts["skill"] = skill[0]
         giver, turn_in = npc_place(v.get("startedBy")), npc_place(v.get("finishedBy"))
         if giver:
             facts["giver"] = giver

@@ -1399,6 +1399,17 @@
     {
       "file": "mechanics.json",
       "paths": [
+        "/values/route.filters"
+      ],
+      "origin": "addon",
+      "source": "Questie (lookupQuestCategories.lua, questKeys specialFlags) et règle de l'utilisateur du 2026-10-14 (CJ1)",
+      "certainty": "suppose",
+      "reason": "catégories et drapeaux des quêtes lus dans l'addon ; seuil des bas niveaux et capitales : choix de route",
+      "registry": "I18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
         "/values/dungeon.official"
       ],
       "origin": "manuel",

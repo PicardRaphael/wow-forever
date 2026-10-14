@@ -183,7 +183,7 @@ def repeat_xp_h(gd: GameData, world: RouteWorld, d: RouteDungeon, level: int) ->
     return d.kills * dungeon_kill_xp(gd, world, d, level).xp / seconds * SECONDS_PER_HOUR if seconds > 0 else 0.0
 
 
-def _check_accept(world: RouteWorld, state: RouteState, quest_id: int) -> str | None:
+def _check_accept(gd: GameData, world: RouteWorld, state: RouteState, quest_id: int) -> str | None:
     q = world.quests.get(quest_id)
     if q is None:
         return "quête hors de la route"
@@ -191,6 +191,8 @@ def _check_accept(world: RouteWorld, state: RouteState, quest_id: int) -> str | 
         return "quête déjà prise"
     if q.min_level > state.level:
         return f"niveau minimal {q.min_level}"
+    if q.dungeon is None and q.level >= state.level + gd.leveling.quest_band.red_min_diff:
+        return "quête rouge, trop haute pour ce niveau (CJ1)"
     if not set(q.prereq_all) <= state.done:
         return "prérequis non rendus"
     if q.prereq_any and not set(q.prereq_any) & state.done:
@@ -207,7 +209,7 @@ def _check_accept(world: RouteWorld, state: RouteState, quest_id: int) -> str | 
 def check_stop(gd: GameData, world: RouteWorld, state: RouteState, stop: Stop) -> str | None:
     """Raison pour laquelle `stop` est impossible dans `state` (None : possible). Registre : I18, I17, I14"""
     if stop.kind == "accept" and isinstance(stop.ref, int):
-        return _check_accept(world, state, stop.ref)
+        return _check_accept(gd, world, state, stop.ref)
     if stop.kind in ("objective", "turnin") and isinstance(stop.ref, int):
         q = world.quests.get(stop.ref)
         if q is None or stop.ref not in state.log:

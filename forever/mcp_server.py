@@ -438,11 +438,17 @@ def build_server(deps: Deps) -> MCPServer:
         seed: int | None = None,
         plan_id: str | None = None,
         professions: list[str] | None = None,
+        race: str | None = None,
+        start_map: int | None = None,
+        start_x: float | None = None,
+        start_y: float | None = None,
+        character: str | None = None,
     ) -> dict[str, Any]:
         """Feuille de route de leveling (RX1) : `action="plan"` calcule une route (`class_name`, `faction` horde ou
         alliance, `start_level`, `end_level`, `dungeons` auto, none ou noms séparés par des virgules, `class_quests`,
         quêtes `exclude` ou `include`, `seed`, `professions` : « Nom:rang:rang maximal » en anglais, visite au maître
-        quand le rang suivant est ouvert) et rend le plan, son aperçu (`preview` : niveaux, heures, XP par heure,
+        quand le rang suivant est ouvert ; CJ1 : `race`, position réelle `start_map`, `start_x`, `start_y`, `character`
+        dont les quêtes faites sont retirées) et rend le plan, son aperçu (`preview` : niveaux, heures, XP par heure,
         donjons placés, récompenses, bonus rappelés, certitude) et sa provenance ; `action="show"` relit un plan
         (`plan_id`) ; `action="guide"` rend son guide RestedXP (texte). Ajuster : relancer `plan` avec les options
         changées (« enlève Wailing Caverns » : `dungeons` sans lui, ou `exclude`)."""
@@ -472,6 +478,11 @@ def build_server(deps: Deps) -> MCPServer:
                         include=tuple(include or ()),
                         seed=seed,
                         professions=parse_professions(professions or []),
+                        race=race,
+                        start_at=(start_map, start_x, start_y)
+                        if start_map is not None and start_x is not None and start_y is not None
+                        else None,
+                        character=character,
                     ),
                 )
             elif action in ("show", "guide") and plan_id:

@@ -50,6 +50,8 @@ CONTEXT_KEYS = (
     "zone",
     "subzone",
     "map",
+    "x",  # CJ1 : position du joueur sur sa carte, en pourcentage
+    "y",
     "talents",
     "gear",
     "target",

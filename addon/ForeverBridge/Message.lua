@@ -25,7 +25,7 @@ M.MAX_LINKS = 8
 M.TOOLTIP_LINES = 30
 M.TOOLTIP_CHARS = 120
 M.LINK_KINDS = { item = true, spell = true, quest = true, talent = true }
-M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "talents", "gear",
+M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "x", "y", "talents", "gear",
 	"target", "target_level", "target_race", "client", "links", "rested", "resting", "xp_auras", "xp_items",
 	"professions", "role", "eui_base" }
 -- T04f (0.2.0) : auras du joueur relevées (au plus MAX_AURAS, parmi les AURA_SCAN premières), filtrées par la liste
@@ -356,6 +356,30 @@ function M.Professions()
 	return table.concat(out, ",")
 end
 
+-- CJ1 : position du joueur sur sa carte, en pourcentage avec une décimale (départ réel d'une feuille de route) ;
+-- nil, nil si l'API manque, échoue ou rend une valeur secrète (instance, restriction).
+function M.Position(mapId)
+	if type(mapId) ~= "number" or not C_Map or type(C_Map.GetPlayerMapPosition) ~= "function" then
+		return nil, nil
+	end
+	local ok, pos = pcall(C_Map.GetPlayerMapPosition, mapId, "player")
+	if not ok or type(pos) ~= "table" or isSecret(pos) then
+		return nil, nil
+	end
+	local px, py = pos.x, pos.y
+	if type(pos.GetXY) == "function" then
+		local fine, gx, gy = pcall(pos.GetXY, pos)
+		if fine then
+			px, py = gx, gy
+		end
+	end
+	if type(px) ~= "number" or type(py) ~= "number" or isSecret(px) or isSecret(py) then
+		return nil, nil
+	end
+	local scale = 100 -- fraction de la carte en pourcentage (unité du protocole)
+	return string.format("%.1f", px * scale), string.format("%.1f", py * scale)
+end
+
 function M.Context()
 	local ctx = {}
 	local function put(key, value)
@@ -371,7 +395,11 @@ function M.Context()
 	put("faction", safe(UnitFactionGroup, "player"))
 	put("zone", safe(GetRealZoneText))
 	put("subzone", safe(GetSubZoneText))
-	put("map", safe(C_Map and C_Map.GetBestMapForUnit, "player"))
+	local mapId = safe(C_Map and C_Map.GetBestMapForUnit, "player")
+	put("map", mapId)
+	local px, py = M.Position(mapId)
+	put("x", px)
+	put("y", py)
 	put("talents", Talents())
 	local pieces = Gear()
 	if #pieces > 0 then

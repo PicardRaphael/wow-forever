@@ -130,6 +130,10 @@ class Resolved:
     pieces: list[GearPiece] = field(default_factory=list)  # pièces complètes (enchantement, suffixe ; P06b)
     xp: XpContext | None = None  # T04f : repos, auras d'XP, objets surveillés (ForeverBridge 0.2.0)
     professions: dict[str, int] | None = None  # RX1 : métiers et rang (ForeverBridge 0.3.0)
+    map: int | None = None  # CJ1 : carte du joueur (uiMapID)
+    x: float | None = None  # CJ1 : position sur la carte, en pourcentage
+    y: float | None = None
+    name: str | None = None  # CJ1 : nom du personnage (quêtes faites lues au profil)
 
 
 def load_context_data(deps: Deps) -> ContextData:
@@ -155,6 +159,15 @@ def load_context_data(deps: Deps) -> ContextData:
 
 def _int(text: str | None) -> int | None:
     return int(text) if text and text.isdigit() else None
+
+
+def _pct(text: str | None) -> float | None:
+    """Coordonnée en pourcentage de la carte (0 à 100), None si illisible."""
+    try:
+        value = float(text) if text else None
+    except ValueError:
+        return None
+    return value if value is not None and 0.0 <= value <= 100.0 else None
 
 
 def _races(data: ContextData, text: str | None, defects: list[Defect]) -> tuple[str, ...]:
@@ -217,6 +230,10 @@ def resolve(data: ContextData, context: Mapping[str, str]) -> Resolved:
         pieces=pieces,
         xp=xp_context(context),
         professions=professions_context(context),
+        map=_int(context.get("map")),
+        x=_pct(context.get("x")),
+        y=_pct(context.get("y")),
+        name=context.get("name") or None,
     )
 
 

@@ -955,6 +955,51 @@
    "certainty": "suppose",
    "registry": "I18",
    "source": "feuille de route (RX1, bloc C) : taille du journal de quêtes, frais fixes d'un arrêt (parler, ramasser, lire), poids d'un arrêt hors de la zone courante et part du farm qu'une quête doit battre, repris des paramètres par défaut de Factoruide (code MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs : quest_log_size « 40 on WoW Forever », stop_overhead 8 s, zone_stay 4, min_efficiency 0,5, train_time 30 s, train_max_delay 1 niveau (visite au maître de classe, bloc F) ; lus le 2026-10-14, non sourcés par son auteur ; question RTE2) ; essais de l'amélioration locale et graine : réglages de la recherche, pas des valeurs du jeu"
+  },
+  "route.filters": {
+   "value": {
+    "excluded_sorts": [
+     -365,
+     -364,
+     -22,
+     -21,
+     -41,
+     -25,
+     -366,
+     -368,
+     -369,
+     -370,
+     -374,
+     -375,
+     -376,
+     -378
+    ],
+    "profession_sorts": {
+     "-24": "Herbalism",
+     "-101": "Fishing",
+     "-121": "Blacksmithing",
+     "-181": "Alchemy",
+     "-182": "Leatherworking",
+     "-201": "Engineering",
+     "-264": "Tailoring",
+     "-304": "Cooking",
+     "-324": "First Aid"
+    },
+    "repeatable_flag": 1,
+    "event_flag": 4,
+    "low_level": 10,
+    "capitals": [
+     "Stormwind City",
+     "Ironforge",
+     "Darnassus",
+     "Orgrimmar",
+     "Thunder Bluff",
+     "Undercity"
+    ]
+   },
+   "certainty": "suppose",
+   "registry": "I18",
+   "source": "garde-fous des feuilles de route (CJ1, décision 277) : catégories de quêtes écartées (événements saisonniers, Foire de Sombrelune, effort de guerre d'Ahn'Qiraj, champs de bataille) et catégories de métier, identifiants QuestSort lus dans Questie (Localization/lookups/lookupQuestCategories.lua, « données de QuestSort.dbc ») ; drapeaux specialFlags de Questie (questKeys : 1 répétable, 4 réinitialisation mensuelle, quêtes d'événement mensuel comme la Foire ; le drapeau 2, exploration ou script, n'écarte rien) ; bas niveaux (sous le niveau 10 : aucun détour vers une capitale ou un autre continent sans raison, règle de l'utilisateur du 2026-10-14) ; capitales : noms anglais des zones (Naowh Completo)"
   }
  },
  "inherited_from": "1.60.1.70338"

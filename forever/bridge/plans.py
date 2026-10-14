@@ -247,6 +247,12 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
             "start_level": r.level,
             "end_level": end,
         }
+        if r.race:  # CJ1 : masques de race et zone de départ de la race
+            route_args["race"] = r.race
+        if r.name:  # CJ1 : quêtes déjà faites par ce personnage (profil)
+            route_args["character"] = r.name
+        if r.map is not None and r.x is not None and r.y is not None:  # CJ1 : départ de la position réelle
+            route_args.update(start_map=r.map, start_x=r.x, start_y=r.y)
         read = (
             (
                 "Aperçu (`preview`) en premier : niveaux, heures, XP par heure, donjons et leur niveau, récompenses "
