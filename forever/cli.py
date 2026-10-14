@@ -3399,6 +3399,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
 
         from forever.bridge.actions import ActionHandler
         from forever.bridge.cards import CardSource
+        from forever.bridge.exports import exports_reply
         from forever.bridge.profile_gap import ProfileWatch
         from forever.bridge.updater import UpdateWatch
         from forever.route import ROUTES_DIR
@@ -3430,6 +3431,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
             profile=profile_watch,
             addons=addons_turn,
             xp_watch=lambda: _bridge_xp_watch(deps),
+            exporter=lambda context, last: exports_reply(deps, context, last),
         )
         bridge.routes_dir = deps.cache_dir / ROUTES_DIR  # RX1 : livraison du dernier plan à RestedXP
         journal.write("config", model=model)

@@ -620,6 +620,69 @@ local function PrintUser(text, shown)
 	FB.Print("|cff4fa3ffVous|r : " .. (shown or Escape(text)))
 end
 
+-- EX1 : liens typés d'une réponse (`{kind, label, text}`), chacun cliquable : le clic ouvre la boîte de copie du
+-- panneau avec sa propre chaîne. Rend vrai si au moins un lien a été imprimé.
+function FB.PrintLinks(links)
+	if type(links) ~= "table" then
+		return false
+	end
+	local printed = false
+	for _, item in ipairs(links) do
+		if type(item) == "table" and type(item.text) == "string" and item.text ~= "" then
+			run.links[#run.links + 1] = item.text
+			local label = Escape(Plain(type(item.label) == "string" and item.label or "Export"))
+			FB.Print("|Hforeverbridge:copy:" .. #run.links .. "|h|cff66ccff[" .. label .. "]|r|h  (cliquer pour copier)")
+			printed = true
+		end
+	end
+	return printed
+end
+
+-- EX1 : liens d'export reçus pendant la session (sans doublon), réimprimés par /fb exports.
+local function KeepExports(links)
+	if type(links) ~= "table" then
+		return
+	end
+	run.exports = run.exports or {}
+	for _, item in ipairs(links) do
+		if type(item) == "table" and type(item.text) == "string" and item.text ~= "" then
+			local seen = false
+			for _, old in ipairs(run.exports) do
+				if old.text == item.text then
+					seen = true
+				end
+			end
+			if not seen then
+				run.exports[#run.exports + 1] = { kind = item.kind, label = item.label, text = item.text }
+			end
+		end
+	end
+end
+
+-- Copie simple des liens d'un emplacement (la table de l'emplacement est remplacée au relevé suivant).
+local function CopyLinks(links)
+	if type(links) ~= "table" then
+		return nil
+	end
+	local out = {}
+	for _, item in ipairs(links) do
+		if type(item) == "table" and type(item.text) == "string" then
+			out[#out + 1] = { kind = item.kind, label = item.label, text = item.text }
+		end
+	end
+	return #out > 0 and out or nil
+end
+
+function FB.Exports()
+	FB.Open()
+	if not run.exports or #run.exports == 0 then
+		FB.Print("Exports : aucun export dans cette session (bouton Exports, ou une question sur un build).")
+		return
+	end
+	FB.Print("|cffffd100Exports de la session|r :")
+	FB.PrintLinks(run.exports)
+end
+
 local function PrintReply(entry)
 	if entry.status == "error" then
 		FB.Print("|cffff6060Forever|r : " .. Escape(Plain(entry.text or "erreur")))
@@ -632,7 +695,7 @@ local function PrintReply(entry)
 	if type(entry.provenance) == "string" and entry.provenance ~= "" then
 		FB.Print("|cff888888" .. Escape(Plain(entry.provenance)) .. "|r")
 	end
-	if type(entry.link) == "string" and entry.link ~= "" then
+	if not FB.PrintLinks(entry.links) and type(entry.link) == "string" and entry.link ~= "" then
 		run.links[#run.links + 1] = entry.link
 		FB.Print("|Hforeverbridge:copy:" .. #run.links .. "|h|cff66ccff[Talents Forever]|r|h  (cliquer pour copier le lien)")
 	end
@@ -1565,7 +1628,9 @@ function FB.ApplySlot(slot)
 					text = WithoutPendingMention(reply.text),
 					provenance = reply.provenance,
 					link = reply.link,
+					links = CopyLinks(reply.links),
 				}
+				KeepExports(entry.links)
 				if conv == run.conv then
 					PrintReply(entry)
 				end
@@ -1996,6 +2061,7 @@ local HELP = {
 	"Coller /simc : colle l'export de l'addon SimulationCraft (/simc, Ctrl+C, Ctrl+V), envoyé au pont sans question.",
 	"/fv case N : taille de case de la bande des messages, 1 (défaut) à 4 pixels, si le pont ne la lit pas.",
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
+	"/fb exports : réafficher les liens d'export de la session (Talents Forever, Naowh), à copier depuis le panneau.",
 }
 
 -- Taille de case de la bande des messages, gardée dans ForeverBridgeDB.cell.
@@ -2029,6 +2095,7 @@ end
 
 SLASH_FOREVERBRIDGE1 = "/fv"
 SLASH_FOREVERBRIDGE2 = "/forever"
+SLASH_FOREVERBRIDGE3 = "/fb"
 SlashCmdList.FOREVERBRIDGE = function(message)
 	local command, rest = (message or ""):match("^%s*(%S*)%s*(.-)%s*$")
 	command = string.lower(command or "")
@@ -2050,6 +2117,8 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.SetCell(rest)
 	elseif command == "diag" then
 		FB.Diag()
+	elseif command == "exports" then
+		FB.Exports()
 	else
 		Help()
 	end

@@ -11,7 +11,9 @@ from dataclasses import dataclass, field
 from typing import Any
 
 # Tranches faites qui calculent un bouton (feuille de route du 2026-10-09 ; T08d, T08e et P06b : « Mettre à jour »).
-DONE_SLICES: frozenset[str] = frozenset({"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b", "RX1"})
+DONE_SLICES: frozenset[str] = frozenset(
+    {"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b", "RX1", "EX1"}
+)
 
 TALENTS_NOTICE = "Build populaire de Talents Forever (choix de joueurs), pas encore calculé par le moteur de forever."
 LEVELING_NOTICE = (
@@ -82,6 +84,9 @@ BUTTONS: tuple[Button, ...] = (
         ("RX1",),
     ),
     Button("route_deliver", "Livrer dans RestedXP", "", ("RX1",), action="route_deliver"),
+    # EX1 (décision 267) : chaînes d'import des addons d'interface pour le personnage, rédigées par le pont sans le
+    # modèle (code Naowh du build actuel, liens du dernier build donné dans le chat).
+    Button("exports", "Exports", "", ("EX1",), action="exports"),
 )
 
 

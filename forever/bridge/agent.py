@@ -20,6 +20,7 @@ from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
+from forever.bridge.exports import typed_links
 from forever.errors import EXIT_USAGE, ForeverError
 
 FOREVER_TOOLS: tuple[str, ...] = (
@@ -201,6 +202,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
     events: list[dict[str, Any]] = []
     link: str | None = None
     links: dict[str, str] = {}
+    exports: dict[str, list[dict[str, str]]] = {}
     last_text = ""
     final: dict[str, Any] | None = None
     session_id: str | None = None
@@ -249,6 +251,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
                 closest = value.get("closest") if isinstance(value, dict) else None
                 if isinstance(closest, dict) and closest.get("link"):
                     links["closest"] = str(closest["link"])  # build populaire le plus proche (P06b)
+                exports.update(typed_links(value))  # EX1 : liens typés (Talents Forever, Naowh)
         elif kind == "result":
             final = event
     if final is None:
@@ -263,6 +266,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
             links=links,
             calls=calls,
             events=events,
+            exports=exports,
         )
     denied = [str(d.get("tool_name")) for d in final.get("permission_denials") or [] if isinstance(d, dict)]
     cost = final.get("total_cost_usd")
@@ -281,6 +285,7 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
         links=links,
         calls=calls,
         events=events,
+        exports=exports,
     )
 
 

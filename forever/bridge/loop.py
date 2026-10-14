@@ -377,9 +377,24 @@ class Bridge:
 
     # --- actions et export, sans le modèle (P06b) ---------------------------------------------------------------
 
-    def _done(self, record: Record, text: str, reason: str) -> None:
-        self.state.put_reply({"session": record.session, "id": record.message_id, "status": "done", "text": text})
+    def _done(self, record: Record, text: str, reason: str, links: Sequence[Mapping[str, str]] = ()) -> None:
+        reply: dict[str, Any] = {"session": record.session, "id": record.message_id, "status": "done", "text": text}
+        if links:
+            reply["links"] = [dict(link) for link in links]
+        self.state.put_reply(reply)
         self._publish(self.first_slot, reason)
+
+    @staticmethod
+    def _typed_links(result: AgentResult, prefer: str | None, link: Any) -> list[dict[str, str]]:
+        """EX1 : liens typés de la réponse, ceux du lien publié d'abord (`prefer`, sinon l'export du build) ; le lien
+        Talents Forever publié (`link`) y figure toujours, en tête."""
+        from forever.bridge.exports import typed_link
+
+        found = result.exports.get(prefer or "build") or next(iter(result.exports.values()), [])
+        typed = [dict(e) for e in found]
+        if isinstance(link, str) and not any(e["kind"] == "talents_forever" and e["text"] == link for e in typed):
+            typed = [typed_link("talents_forever", link), *(e for e in typed if e["kind"] != "talents_forever")]
+        return typed
 
     def _action(self, record: Record, flag: str) -> None:
         """Action `a=…` : jamais confiée à l'agent. Carte de test : notée, rien de lancé ; Mettre à jour, Valider et
@@ -412,6 +427,15 @@ class Bridge:
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target,
                                result="transmise")  # fmt: skip
             self._publish(self.first_slot, "réponse à une question")
+            return
+        elif action == "exports" and self.exporter is not None:
+            try:
+                text, links = self.exporter(record.context, list(self.last_exports))
+                result = "exports"
+            except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
+                result, text, links = "erreur", f"Exports impossibles : {type(exc).__name__}: {exc}", []
+            self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
+            self._done(record, text, "action", links)
             return
         elif action == "route_deliver":
             try:
@@ -634,6 +658,10 @@ class Bridge:
                 link = result.links.get(prefer) if prefer else None
                 if link or result.link:
                     reply["link"] = link or result.link
+                typed = self._typed_links(result, prefer, reply.get("link"))
+                if typed:
+                    reply["links"] = typed
+                    self.last_exports = typed
                 if result.session_id:
                     self.state.set_session(result.session_id)
                 self.journal.write(

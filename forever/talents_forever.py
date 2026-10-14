@@ -871,6 +871,7 @@ def closest_popular(
         "link": best["link"],
         "import": best["import"],
         "legality": best["legality"],
+        "naowh": best.get("naowh"),  # EX1 : code Naowh Forever du même build (ordre généré)
         "missing_points": missing,
         "points_to_add": to_add,
         "total_gap": total,
