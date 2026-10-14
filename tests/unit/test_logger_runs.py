@@ -59,7 +59,7 @@ def test_schema_and_version():
     game = Logger()
     assert game.db().schema == 4
     toc = (ADDON / "ForeverLogger.toc").read_text(encoding="utf-8")
-    assert re.search(r"^## Version: 0\.6\.0$", toc, re.MULTILINE)
+    assert re.search(r"^## Version: 0.7.0$", toc, re.MULTILINE)  # DJ1 : 0.6.0 ; LN1 : 0.7.0
 
 
 def test_run_entry_and_exit_recorded():
