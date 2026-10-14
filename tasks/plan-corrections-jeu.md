@@ -61,6 +61,7 @@ aucune écriture). **Partie web de la décision 264 non faite à ce stade** : en
 | Poids chez Naowh | Naowh 1.1.15 : « Import weights » (`NFSW1:` ou export EP de WoWSims) ; le Naowh Score **ne dépend pas des poids** | **Alimenter** (`NFSW1:`) |
 | Listes BiS | Forever Companion (par spécialisation, phase « BETA », sans niveau, source et taux par objet) ; Naowh BiS (une liste par spécialisation, mise à jour le 11 octobre) ; **FojjiCore absent** (retiré entre le 10 et le 14 octobre) | **Se servir**, **construire** la liste personnelle classée, **alimenter** Naowh (`!NBIS1!`) |
 | Comparaison d'équipement | Forever Guide (GearAdvisor, GearCalc, GearExplain) | **Recouper** |
+| Origine d'un objet (route d'équipement) | Naowh Forever (lieu de chute et quêtes des objets de sa liste BiS) ; Forever Guide (recherche d'objets avec lieu et chance, quêtes de donjon et leurs chaînes, butin des boss et des monstres ordinaires) ; GearQuest Forever (objets de leveling par quête) ; AtlasLoot (butin par boss) | **Se servir** (lecture locale), écarts signalés ; rien recalculé |
 | Thème compatible | EllesmereUI 9.5.4 : API publique d'habillage (`SKINNING_API.md`) | **Se servir en lecture** pour notre fenêtre |
 | Organisation des fenêtres | Naowh, Forever Companion, EllesmereUI Options, RestedXP | **Étudier** (bloc 6), rien recopié |
 
@@ -265,9 +266,17 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
 
 ### Bloc 4b — Route d'équipement (décision 277, point 6)
 - Entrée : liste BiS du personnage (Forever Companion, Naowh, puis notre liste du bloc 4), emplacements choisis.
-- Source de chaque objet : quête qui le donne (récompenses du livre, GearQuest Forever, Forever Guide), boss qui le lâche
-  (DJ1, `dungeons.json`) avec son taux (Naowh d'abord, Forever Guide, AtlasLoot ; écarts montrés, relevés du joueur
-  premiers), marchand ou métier sinon « source inconnue ».
+- Source de chaque objet, **lue en local** dans les addons qui la connaissent déjà (décision 272 ; précision de
+  l'utilisateur du 2026-10-14) :
+  - **Naowh Forever** : où tombe chaque objet de sa liste BiS (boss, donjon, taux) et quelles quêtes le donnent ;
+  - **Forever Guide** : recherche d'objets avec lieu et chance, récompenses et chaînes des quêtes de donjon, butin des
+    boss **et des monstres ordinaires** ; GearAdvisor et GearCalc en recoupement seulement ;
+  - **GearQuest Forever** : équipement de leveling par quête (objet, plage de niveaux, quête) ;
+  - **AtlasLoot** : butin par boss ;
+  - puis nos données : récompenses du livre des quêtes, donjons et boss de DJ1 (`dungeons.json`) ; marchand ou
+    métier, sinon « source inconnue ».
+  Les **écarts entre sources** (lieu, boss, taux, quête) sont signalés objet par objet, jamais tranchés au hasard ;
+  relevés du joueur (ForeverLogger) premiers quand ils existent ; certitude au mieux `suppose` pour un addon.
 - Ordre : l'optimiseur de routes ordonne quêtes, donjons et trajets (mêmes garde-fous) ; un objet de donjon à faible
   taux donne un **passage en boucle** avec le nombre de passages attendu (espérance et nombre pour une chance de 90 %,
   fonctions pures dans `forever/engine/`, registre) ; plusieurs objets d'un même donjon cumulés.
