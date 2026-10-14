@@ -50,6 +50,8 @@ def _step(stop: Mapping[str, Any], end_level: int) -> list[str]:
     elif kind in ("dungeon", "dungeon_repeat"):
         verb = "Run" if kind == "dungeon" else "Run again"
         lines.append(f"{INDENT}>>{verb} {name} with your group")
+    elif kind == "prof":
+        lines.append(f"{INDENT}>>Learn the next rank at {name}")
     elif kind == "train":
         lines.append(f"{INDENT}>>Train your new spells at your class trainer")
     elif kind == "grind":

@@ -232,6 +232,7 @@ class RouteRequest:
     include: tuple[int, ...] = ()
     tries: int | None = None
     seed: int | None = None
+    professions: tuple[tuple[str, int, int], ...] = ()  # (métier, rang, rang maximal), bloc H
 
 
 def _ids(label: str, ids: list[int]) -> str:
@@ -355,6 +356,7 @@ def route_world(
     kill_seconds: Any,
     trainers: Any = (),
     train_levels: Any = (),
+    prof_visits: Any = None,
 ) -> tuple[Any, list[str]]:
     """Entrées du moteur de route (`RouteWorld`) tirées du livre des quêtes, des placements de donjon de DJ1 et des
     cartes de zone ; avertissements (quêtes écartées et pourquoi). Registre : I18"""
@@ -466,6 +468,11 @@ def route_world(
         best_zone_xp_h=best_zone,
         required=frozenset(q for q in request.include if q in quests),
         trainers=_trainer_points(maps, trainers, request.faction),
+        prof_visits={
+            name: (level, points)
+            for name, (level, people) in (prof_visits or {}).items()
+            if (points := _trainer_points(maps, people, request.faction))
+        },
         train_levels=tuple(lv for lv in sorted(set(train_levels)) if request.start_level < lv < request.end_level),
     )
     return world, warnings
@@ -489,7 +496,7 @@ def _place_of(book: Any, rows: dict[str, Any], kind: str, ref: Any) -> dict[str,
         row = rows.get(str(ref)) or {}
         goto = next((s for s in row.get("steps") or [] if _step_kind(s) == "goto"), None)
         return _step_place(goto) if goto is not None else {}
-    if kind in ("grind", "train"):
+    if kind in ("grind", "train", "prof"):
         return {}
     q = book.quests.get(ref)
     if q is None:
@@ -511,6 +518,7 @@ STEP_KIND = {
     "dungeon_repeat": "dungeon",
     "grind": "xp",
     "train": "train",
+    "prof": "train",
 }
 STEP_VERB = {
     "accept": "prends",
@@ -519,6 +527,7 @@ STEP_VERB = {
     "dungeon": "fais",
     "dungeon_repeat": "refais",
     "train": "apprends tes nouveaux sorts chez",
+    "prof": "apprends le rang suivant chez",
 }
 
 
@@ -530,6 +539,8 @@ def _stop_payload(book: Any, rows: dict[str, Any], r: Any, *, end_level: int) ->
         name = None
     elif r.kind == "train":
         name = "ton maître de classe"
+    elif r.kind == "prof":
+        name = f"ton maître de {r.ref}"
     else:
         q = book.quests.get(r.ref)
         name = (q or {}).get("name") or f"la quête {r.ref}"
@@ -618,6 +629,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     from forever.pipeline.travel_sources import (
         read_journeys_network,
         read_journeys_walks,
+        read_profession_data,
         read_questie_trainers,
         read_training_levels,
     )
@@ -684,6 +696,17 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
 
     trainers = read_questie_trainers(addons, f"{cls.capitalize()} Trainer") if addons else []
     train_levels = read_training_levels(addons).get(CLASS_IDS[cls], ()) if addons else ()
+    prof_visits = (
+        profession_visits(
+            read_profession_data(addons),
+            {name: (rank, cap) for name, rank, cap in request.professions},
+            faction=request.faction,
+            start_level=request.start_level,
+            end_level=request.end_level,
+        )
+        if addons and request.professions
+        else {}
+    )
 
     rows: list[dict[str, Any]] = []
     if request.dungeons != "none":
@@ -699,6 +722,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
         kill_seconds=lambda level: kill(level).seconds,
         trainers=trainers,
         train_levels=train_levels,
+        prof_visits=prof_visits,
     )
     if not world.quests:
         warnings.append("aucune quête placée : la route n'est que du farm")
@@ -866,4 +890,33 @@ def profession_visits(
     """RX1, bloc H : métiers dont le rang suivant est ouvert (compétence actuelle au moins celle du rang, plafond
     actuel sous le sien) et dont le niveau requis tombe dans la route : niveau de la visite et maîtres du camp.
     `professions` : nom -> (rang, rang maximal). La montée de compétence n'est pas simulée (MT1). Registre : I18"""
-    raise NotImplementedError
+    side = {"horde": "H", "alliance": "A"}.get(faction, "")
+    out: dict[str, tuple[int, list[Any]]] = {}
+    for name, (rank, cap) in sorted(professions.items()):
+        prof = data.get(name)
+        if prof is None:
+            continue
+        nxt = next((r for r in sorted(prof.ranks, key=lambda r: r.cap) if r.cap > cap and r.skill <= rank), None)
+        if nxt is None:
+            continue
+        level = max(start_level, nxt.level or start_level)
+        trainers = [t for t in prof.trainers if side in t.sides]
+        if level < end_level and trainers:
+            out[name] = (level, trainers)
+    return out
+
+
+def parse_professions(raw: Any) -> tuple[tuple[str, int, int], ...]:
+    """Métiers « Nom:rang:rang maximal » (CLI, outil MCP) -> (nom, rang, rang maximal)."""
+    from forever.errors import InvalidArgumentError
+
+    out = []
+    for item in raw:
+        name, sep, rest = item.rpartition(":")
+        head, sep2, cap = name.rpartition(":")
+        if not (sep and sep2 and head.strip() and rest.isdigit() and cap.isdigit()):
+            raise InvalidArgumentError(
+                f"Métier illisible : {item}.", "donner « Nom:rang:rang maximal », par exemple Alchemy:60:75"
+            )
+        out.append((head.strip(), int(cap), int(rest)))
+    return tuple(out)

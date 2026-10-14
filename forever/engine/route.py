@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 
 from forever.engine.dungeon import SECONDS_PER_HOUR, SECONDS_PER_MINUTE
 from forever.engine.model import GameData
@@ -31,7 +31,7 @@ from forever.engine.xp import (
     quest_xp,
 )
 
-STOP_KINDS = ("accept", "objective", "turnin", "dungeon", "dungeon_repeat", "train", "grind")
+STOP_KINDS = ("accept", "objective", "turnin", "dungeon", "dungeon_repeat", "train", "prof", "grind")
 SEARCH_KEY = "route.search"
 
 
@@ -111,6 +111,7 @@ class RouteWorld:
     required: frozenset[int] = frozenset()  # quêtes imposées par le joueur (--include)
     trainers: tuple[Point, ...] = ()  # maîtres de classe du camp (bloc F)
     train_levels: tuple[int, ...] = ()  # niveaux où la classe apprend des sorts, dans la route
+    prof_visits: Mapping[str, tuple[int, tuple[Point, ...]]] = field(default_factory=dict)  # bloc H
 
 
 @dataclass(frozen=True)
@@ -125,6 +126,7 @@ class RouteState:
     dungeons_done: frozenset[str] = frozenset()
     rested: float = 0.0
     trained: frozenset[int] = frozenset()  # niveaux d'entraînement faits
+    prof_done: frozenset[str] = frozenset()  # visites aux maîtres de métier faites
 
 
 @dataclass(frozen=True)
@@ -221,6 +223,13 @@ def check_stop(gd: GameData, world: RouteWorld, state: RouteState, stop: Stop) -
         if stop.ref > state.level:
             return f"niveau {stop.ref} pas encore atteint"
         return "entraînement déjà fait" if stop.ref in state.trained else None
+    if stop.kind == "prof" and isinstance(stop.ref, str):
+        visit = world.prof_visits.get(stop.ref)
+        if visit is None:
+            return "aucun rang de métier à apprendre"
+        if visit[0] > state.level:
+            return f"niveau {visit[0]} pas encore atteint"
+        return "rang déjà appris" if stop.ref in state.prof_done else None
     if stop.kind in ("dungeon", "dungeon_repeat") and isinstance(stop.ref, str):
         d = world.dungeons.get(stop.ref)
         if d is None:
@@ -254,6 +263,22 @@ def nearest_trainer(world: RouteWorld, position: Point, level: int) -> tuple[Poi
     return best
 
 
+def nearest_place(world: RouteWorld, places: Sequence[Point], position: Point, level: int) -> tuple[Point, float]:
+    """Lieu le plus proche en temps parmi `places`, et le trajet jusqu'à lui. Registre : I18"""
+    return min(((p, world.travel(position, p, level)) for p in places), key=lambda x: x[1])
+
+
+def missed_visit(world: RouteWorld, before: RouteState, after: RouteState) -> str | None:
+    """Visite due (maître de classe ou de métier) dépassée de plus de `train_max_delay` niveaux sans être faite."""
+    level = missed_training(world, before, after)
+    if level is not None:
+        return f"entraînement du niveau {level} manqué"
+    for name, (at, _) in sorted(world.prof_visits.items()):
+        if name not in after.prof_done and at <= before.level and after.level > at + world.params.train_max_delay:
+            return f"visite au maître de {name} manquée"
+    return None
+
+
 def missed_training(world: RouteWorld, before: RouteState, after: RouteState) -> int | None:
     """Niveau d'entraînement atteint avant l'arrêt et dépassé de plus de `train_max_delay` niveaux sans visite au
     maître (None sinon). Registre : I18"""
@@ -271,6 +296,8 @@ def _target(world: RouteWorld, state: RouteState, stop: Stop) -> tuple[Point, st
         return d.entrance, d.certainty
     if stop.kind == "train":
         return nearest_trainer(world, state.position, state.level)[0], "suppose"
+    if stop.kind == "prof":
+        return nearest_place(world, world.prof_visits[str(stop.ref)][1], state.position, state.level)[0], "suppose"
     q = world.quests[int(stop.ref)]
     place = {"accept": q.giver, "turnin": q.turn_in, "objective": q.objective or q.giver}[stop.kind]
     return place, q.certainty
@@ -286,8 +313,11 @@ def apply_stop(
     terms: tuple[Term, ...] = ()
     xp = 0.0
     log, progressed, done, dungeons_done = state.log, state.progressed, state.done, state.dungeons_done
-    trained = state.trained
-    if stop.kind == "train":
+    trained, prof_done = state.trained, state.prof_done
+    if stop.kind == "prof":
+        action = world.params.train_time_s
+        prof_done = prof_done | {str(stop.ref)}
+    elif stop.kind == "train":
         action = world.params.train_time_s
         trained = trained | {lv for lv in world.train_levels if lv <= level}
     elif stop.kind == "accept":
@@ -328,6 +358,7 @@ def apply_stop(
         dungeons_done=dungeons_done,
         rested=state.rested,
         trained=trained,
+        prof_done=prof_done,
     )
     return after, result
 
@@ -345,6 +376,9 @@ def _grind(
     """Farm au niveau du joueur jusqu'à `end_level` (monstres de même niveau, temps par monstre du niveau) ;
     un monstre sans XP rend le farm impossible (durée infinie). Registre : I18, I6"""
     level, xp, seconds, total = state.level, state.xp, 0.0, 0.0
+    for name, (at, places) in sorted(world.prof_visits.items()):  # visites de métier non faites
+        if name not in state.prof_done and at < end_level:
+            seconds += 2 * nearest_place(world, places, state.position, level)[1] + world.params.train_time_s
     if world.trainers:  # entraînements dus et non faits au début du farm
         due = [lv for lv in world.train_levels if lv <= level and lv not in state.trained]
         if due:
@@ -395,9 +429,8 @@ def simulate(
             else:
                 results.append(result)
                 reason = _missed(world, start, state)
-                skipped = missed_training(world, before, state)
-                if reason is None and skipped is not None:
-                    reason = f"entraînement du niveau {skipped} manqué"
+                if reason is None:
+                    reason = missed_visit(world, before, state)
         if reason is not None:
             feasible = False
             warnings.append(f"{stop.kind} {stop.ref} : {reason}")

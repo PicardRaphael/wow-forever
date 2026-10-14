@@ -369,14 +369,16 @@ def build_server(deps: Deps) -> MCPServer:
         include: list[int] | None = None,
         seed: int | None = None,
         plan_id: str | None = None,
+        professions: list[str] | None = None,
     ) -> dict[str, Any]:
         """Feuille de route de leveling (RX1) : `action="plan"` calcule une route (`class_name`, `faction` horde ou
         alliance, `start_level`, `end_level`, `dungeons` auto, none ou noms séparés par des virgules, `class_quests`,
-        quêtes `exclude` ou `include`, `seed`) et rend le plan, son aperçu (`preview` : niveaux, heures, XP par heure,
+        quêtes `exclude` ou `include`, `seed`, `professions` : « Nom:rang:rang maximal » en anglais, visite au maître
+        quand le rang suivant est ouvert) et rend le plan, son aperçu (`preview` : niveaux, heures, XP par heure,
         donjons placés, récompenses, bonus rappelés, certitude) et sa provenance ; `action="show"` relit un plan
         (`plan_id`) ; `action="guide"` rend son guide RestedXP (texte). Ajuster : relancer `plan` avec les options
         changées (« enlève Wailing Caverns » : `dungeons` sans lui, ou `exclude`)."""
-        from forever.route import RouteRequest, guide_name, load_plan, plan_route, route_preview
+        from forever.route import RouteRequest, guide_name, load_plan, parse_professions, plan_route, route_preview
         from forever.rxp import encode_guide
 
         try:
@@ -401,6 +403,7 @@ def build_server(deps: Deps) -> MCPServer:
                         exclude=tuple(exclude or ()),
                         include=tuple(include or ()),
                         seed=seed,
+                        professions=parse_professions(professions or []),
                     ),
                 )
             elif action in ("show", "guide") and plan_id:

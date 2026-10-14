@@ -25,6 +25,7 @@ from forever.pipeline.quest_sources import _fields, _read, _table_after
 JOURNEYS = "NaowhForever_Journeys"
 JOURNEYS_DATA = "NaowhForever_JourneysData"
 TRAINING = "NaowhForever_Training"
+PROFESSIONS = "NaowhForever_Professions"
 NETWORK = Path("Data") / "Network.lua"
 CONSTANTS = Path("Constants.lua")
 
@@ -244,4 +245,33 @@ class ProfessionData(NamedTuple):
 def read_profession_data(addons: Path) -> dict[str, ProfessionData]:
     """Métiers de Naowh Forever Professions (`Data/RecipeData.lua`) : maîtres et leurs positions, rangs ; clé : nom
     anglais du métier (tiré du nom des rangs). Vide sans l'addon."""
-    raise NotImplementedError
+    path = addons / PROFESSIONS / "Data" / "RecipeData.lua"
+    if not path.is_file():
+        return {}
+    try:
+        raw = _fields(_table_after(_read(path), "ns.RecipeData = ", path))
+    except DataSchemaError:
+        return {}
+    out: dict[str, ProfessionData] = {}
+    for line, entry in raw.items():
+        f = _fields(entry)
+        ranks: list[ProfessionRank] = []
+        for row in _fields(f.get("ranks")).values():
+            r = _fields(row)
+            if isinstance(r.get("cap"), int) and isinstance(r.get("skill"), int):
+                level = r.get("level") if isinstance(r.get("level"), int) else None
+                ranks.append(ProfessionRank(r["cap"], r["skill"], level, str(r.get("name") or "")))
+        named = next((r.name for r in ranks if " " in r.name), None)
+        if not isinstance(line, int) or named is None:
+            continue
+        name = named.split(" ", 1)[1]
+        trainers: list[TrainerNpc] = []
+        for row in _fields(f.get("trainers")).values():
+            t = _fields(row)
+            x, y = _num(t.get(5)), _num(t.get(6))
+            if isinstance(t.get(1), int) and isinstance(t.get(4), int) and x is not None and y is not None:
+                trainers.append(
+                    TrainerNpc(t[1], str(t.get(2) or ""), f"{name} Trainer", str(t.get(3) or ""), t[4], x, y)
+                )
+        out[name] = ProfessionData(line, name, trainers, ranks)
+    return out

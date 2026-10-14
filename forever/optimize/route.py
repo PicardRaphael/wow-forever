@@ -24,7 +24,7 @@ from forever.engine.route import (
     Stop,
     apply_stop,
     check_stop,
-    missed_training,
+    missed_visit,
     simulate,
 )
 from forever.engine.xp import QuestXpInput, gray_level, mob_kill_xp, quest_xp
@@ -138,6 +138,7 @@ def _candidates(gd: GameData, world: RouteWorld, state: RouteState) -> list[tupl
     due = [lv for lv in world.train_levels if lv <= state.level and lv not in state.trained]
     if world.trainers and due:
         out.append((Stop("train", due[-1]), TRAIN_WEIGHT))
+    out += [(Stop("prof", name), TRAIN_WEIGHT) for name in sorted(world.prof_visits)]
     out = [(s, w) for s, w in out if check_stop(gd, world, state, s) is None]
     return out + [(s, DUNGEON_WEIGHT) for s in _dungeon_ready(gd, world, state)]
 
@@ -145,7 +146,7 @@ def _candidates(gd: GameData, world: RouteWorld, state: RouteState) -> list[tupl
 def _misses(world: RouteWorld, start: RouteState, after: RouteState, before: RouteState | None = None) -> bool:
     """L'arrêt fait dépasser la fenêtre d'un donjon placé sans son premier passage, ou le retard permis d'un
     entraînement."""
-    if before is not None and missed_training(world, before, after) is not None:
+    if before is not None and missed_visit(world, before, after) is not None:
         return True
     return any(
         k not in after.dungeons_done and start.level <= d.levels[1] < after.level for k, d in world.dungeons.items()
@@ -153,7 +154,7 @@ def _misses(world: RouteWorld, start: RouteState, after: RouteState, before: Rou
 
 
 def _zone(world: RouteWorld, stop: Stop) -> int | None:
-    if stop.kind in ("dungeon", "dungeon_repeat", "train"):
+    if stop.kind in ("dungeon", "dungeon_repeat", "train", "prof"):
         return None
     return world.quests[int(stop.ref)].zone
 

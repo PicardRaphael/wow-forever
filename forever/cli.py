@@ -403,6 +403,13 @@ def build_parser() -> argparse.ArgumentParser:
     r_plan.add_argument("--include", help="quêtes imposées (identifiants séparés par des virgules)")
     r_plan.add_argument("--tries", type=int, help="essais de l'amélioration locale (défaut : route.search)")
     r_plan.add_argument("--seed", type=int, help="graine de la recherche (défaut : route.search)")
+    r_plan.add_argument(
+        "--profession",
+        action="append",
+        default=[],
+        help="métier « Nom:rang:rang maximal » (anglais, ex. Alchemy:60:75) ; visite au maître quand le rang suivant "
+        "est ouvert",
+    )
     r_plan.add_argument("--json", action="store_true", help="sortie JSON")
     r_show = route_sub.add_parser("show", help="relire une feuille de route gardée dans le cache")
     r_show.add_argument("id", help="identifiant rendu par forever route plan")
@@ -1292,7 +1299,7 @@ def _route_guide(deps: Deps, args: argparse.Namespace, plan: Mapping[str, Any]) 
 
 
 def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
-    from forever.route import RouteRequest, load_plan, plan_route
+    from forever.route import RouteRequest, load_plan, parse_professions, plan_route
 
     if args.route_command == "compare":
         from forever.compare import compare_route
@@ -1332,6 +1339,7 @@ def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
             include=_ints(args.include),
             tries=args.tries,
             seed=args.seed,
+            professions=parse_professions(args.profession),
         )
         doc = plan_route(deps, request)
     _emit(doc, render_route(doc), doc["provenance"], args.json)
