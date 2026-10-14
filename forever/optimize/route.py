@@ -35,6 +35,7 @@ TURNIN_WEIGHT = 0.7  # poids de nearest_stop (Factoruide, construct.rs) : rendre
 ACCEPT_WEIGHT = 1.3
 REPEAT_WEIGHT = 0.8
 DUNGEON_WEIGHT = 0.5  # premier passage d'un donjon placé (forcé chez Factoruide)
+REQUIRED_WEIGHT = 0.1  # quête imposée par le joueur : prise en priorité (réglage de forever, pas de Factoruide)
 DUNGEON_QUEST_WEIGHT = 0.25  # quête d'un donjon proche en niveau (détour accepté)
 MOVES = 5  # déplacer un arrêt, un bloc, échanger deux arrêts, retirer une quête, en insérer une
 
@@ -97,6 +98,8 @@ def _worth_it(gd: GameData, world: RouteWorld, state: RouteState, quest_id: int,
     """La quête vaut le détour : quête de donjon tant que le donjon est à portée, sinon XP par seconde (chaîne
     comprise, trajet depuis la position compris) au moins `min_efficiency` fois le farm (portage de `worth_it`)."""
     q = world.quests[quest_id]
+    if quest_id in world.required:
+        return True
     if q.dungeon is not None:
         d = world.dungeons.get(q.dungeon)
         return d is not None and state.level <= d.levels[1]
@@ -127,7 +130,8 @@ def _candidates(gd: GameData, world: RouteWorld, state: RouteState) -> list[tupl
         out += [(Stop("turnin", quest_id), TURNIN_WEIGHT), (Stop("objective", quest_id), 1.0)]
     for q in sorted(world.quests.values(), key=lambda q: q.id):
         if q.level > gray or q.dungeon is not None:
-            out.append((Stop("accept", q.id), ACCEPT_WEIGHT * (DUNGEON_QUEST_WEIGHT if q.dungeon else 1.0)))
+            weight = ACCEPT_WEIGHT * (DUNGEON_QUEST_WEIGHT if q.dungeon else 1.0)
+            out.append((Stop("accept", q.id), weight * (REQUIRED_WEIGHT if q.id in world.required else 1.0)))
     out += [(Stop("dungeon_repeat", k), REPEAT_WEIGHT) for k in sorted(state.dungeons_done)]
     out = [(s, w) for s, w in out if check_stop(gd, world, state, s) is None]
     return out + [(s, DUNGEON_WEIGHT) for s in _dungeon_ready(gd, world, state)]
@@ -167,7 +171,9 @@ def construct(gd: GameData, world: RouteWorld, start: RouteState, *, end_level: 
                 continue
             if _misses(world, start, after):
                 continue
-            if stop.kind == "dungeon_repeat" and result.xp / result.seconds <= _grind_rate(gd, world, state.level):
+            if stop.kind == "dungeon_repeat" and (
+                result.seconds <= 0 or result.xp / result.seconds <= _grind_rate(gd, world, state.level)
+            ):
                 continue
             here = _zone(world, stop)
             stay = 1.0 if zone is None or here == zone else world.params.zone_stay
@@ -220,8 +226,9 @@ def _mutate(world: RouteWorld, stops: list[Stop], rng: random.Random) -> list[St
         out[i], out[j] = out[j], out[i]
         return out
     taken = sorted({int(s.ref) for s in stops if s.kind == "accept"})
-    if move == 3 and taken:
-        quest_id = rng.choice(taken)
+    removable = [q for q in taken if q not in world.required]  # une quête imposée n'est jamais retirée
+    if move == 3 and removable:
+        quest_id = rng.choice(removable)
         return [s for s in out if not (s.kind in ("accept", "objective", "turnin") and s.ref == quest_id)]
     if move == 4:
         unused = sorted(q for q in world.quests if q not in taken)

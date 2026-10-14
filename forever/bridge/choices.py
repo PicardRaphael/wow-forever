@@ -45,9 +45,6 @@ ROUTE_CHOICES: tuple[Choice, ...] = (
         default="auto",
     ),
     Choice(
-        "route_group", "Feuille de route : seul ou en groupe ?", (Option("solo", "Seul"), Option("group", "En groupe"))
-    ),
-    Choice(
         "route_class",
         "Feuille de route : quêtes de classe ?",
         (Option("yes", "Avec les quêtes de classe"), Option("no", "Sans les quêtes de classe")),

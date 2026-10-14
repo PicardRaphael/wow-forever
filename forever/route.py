@@ -448,7 +448,9 @@ def route_world(
 
     def best_zone(level: int) -> float | None:
         if level not in memo:
-            memo[level] = best_zone_xp_h(gd, zone_quests, level, kill_seconds=kill_seconds(level), overhead_s=overhead)
+            memo[level] = best_zone_xp_h(
+                gd, zone_quests, level, kill_seconds=kill_seconds(level), overhead_s=overhead, bonuses=None
+            )
         return memo[level]
 
     world = RouteWorld(
@@ -458,6 +460,7 @@ def route_world(
         travel=travel,
         kill_seconds=kill_seconds,
         best_zone_xp_h=best_zone,
+        required=frozenset(q for q in request.include if q in quests),
     )
     return world, warnings
 
@@ -700,7 +703,9 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     }
     path = deps.cache_dir / ROUTES_DIR / f"{plan_id}.json"
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_bytes(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+    tmp = path.with_name(path.name + ".tmp")  # écriture atomique : le pont peut lire le plan au même moment
+    tmp.write_bytes(json.dumps(payload, ensure_ascii=False).encode("utf-8"))
+    tmp.replace(path)
     return payload
 
 

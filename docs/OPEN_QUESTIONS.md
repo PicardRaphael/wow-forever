@@ -242,6 +242,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **TRV2 — Écart entre la durée des vols du client et celle de Shortest Path Forever (`Taxi.lua`, InFlight et
   CMaNGOS, 32 yards par seconde) ?** Ajoutée le 2026-10-14 (RX1, bloc B ; lecture des données de Shortest Path au bloc
   F). Test : comparaison trajet par trajet, puis un vol chronométré. Priorité : basse. Registre I19.
+- **RTE1 — Quel écart entre nos routes et celles de Factoruide sur un même personnage ?** Ajoutée le 2026-10-14 (RX1, bloc C). Test : route de Factoruide exportée par le joueur (`.fgguide`), relue par `forever route compare` (bloc G). Priorité : moyenne. Registre I18.
 - **RTE2 — Taille du journal de quêtes de Forever, et temps d'un arrêt (prise, rendu, objet) ?** Ajoutée le
   2026-10-14 (RX1, bloc C). `route.search` reprend Factoruide (`params.rs` : journal de 40 quêtes « on WoW Forever »,
   8 s par arrêt, non sourcés), `suppose`. Test : journal rempli en jeu (message de journal plein), durée

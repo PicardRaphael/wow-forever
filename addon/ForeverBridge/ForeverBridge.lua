@@ -1434,7 +1434,8 @@ local function ImportGuideNow(guide)
 			status = "livré"
 			local rxp = RXP
 			local frame = type(rxp) == "table" and rxp.RXPFrame
-			if type(rxp.ScheduleTask) == "function" and type(frame) == "table" and frame.GenerateMenuTable then
+			if type(rxp) == "table" and type(rxp.ScheduleTask) == "function" and type(frame) == "table"
+				and frame.GenerateMenuTable then
 				pcall(rxp.ScheduleTask, rxp, frame.GenerateMenuTable)
 			end
 		else

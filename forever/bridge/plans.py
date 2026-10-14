@@ -240,7 +240,7 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
         end = min(r.level + span, level_cap) if level_cap else r.level + span
         if end <= r.level:
             return None
-        args = {
+        route_args: dict[str, Any] = {
             "action": "plan",
             "class_name": r.class_name,
             "faction": r.faction.lower(),
@@ -259,7 +259,7 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
                 "redonne l'aperçu ; « Livrer dans RestedXP » livre le dernier plan."
             ),
         )
-        return Plan(key, (Call("forever_route", args),), read)
+        return Plan(key, (Call("forever_route", route_args),), read)
     if key == "pvp" and r.target_class:
         args: dict[str, Any] = {"kind": "pvp", "name": r.class_name, "level": r.level}
         if r.race:

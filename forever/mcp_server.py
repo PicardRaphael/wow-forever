@@ -379,38 +379,43 @@ def build_server(deps: Deps) -> MCPServer:
         from forever.route import RouteRequest, guide_name, load_plan, plan_route, route_preview
         from forever.rxp import encode_guide
 
-        if action == "plan":
-            if not class_name or not faction or start_level is None or end_level is None:
-                raise InvalidArgumentError(
-                    "Feuille de route : classe, camp, niveau de départ et niveau d'arrivée requis.",
-                    "donner class_name, faction, start_level et end_level",
+        try:
+            if action == "plan":
+                if not class_name or not faction or start_level is None or end_level is None:
+                    raise InvalidArgumentError(
+                        "Feuille de route : classe, camp, niveau de départ et niveau d'arrivée requis.",
+                        "donner class_name, faction, start_level et end_level",
+                    )
+                chosen: str | tuple[str, ...] = dungeons
+                if dungeons not in ("auto", "none"):
+                    chosen = tuple(d.strip() for d in dungeons.split(",") if d.strip())
+                plan = plan_route(
+                    deps,
+                    RouteRequest(
+                        class_name=class_name,
+                        faction=faction.lower(),
+                        start_level=start_level,
+                        end_level=end_level,
+                        dungeons=chosen,
+                        class_quests=class_quests,
+                        exclude=tuple(exclude or ()),
+                        include=tuple(include or ()),
+                        seed=seed,
+                    ),
                 )
-            chosen: str | tuple[str, ...] = dungeons
-            if dungeons not in ("auto", "none"):
-                chosen = tuple(d.strip() for d in dungeons.split(",") if d.strip())
-            plan = plan_route(
-                deps,
-                RouteRequest(
-                    class_name=class_name,
-                    faction=faction,
-                    start_level=start_level,
-                    end_level=end_level,
-                    dungeons=chosen,
-                    class_quests=class_quests,
-                    exclude=tuple(exclude or ()),
-                    include=tuple(include or ()),
-                    seed=seed,
-                ),
-            )
-        elif action in ("show", "guide") and plan_id:
-            plan = load_plan(deps, plan_id)
-        else:
-            raise InvalidArgumentError(f"Action inconnue ou plan manquant : {action}.", "plan, show ou guide (plan_id)")
-        if action == "guide":
-            name = guide_name(plan)
-            return {"id": plan["id"], "name": name, "text": encode_guide(plan, name=name, group="Forever Routes"),
-                    "provenance": plan["provenance"]}  # fmt: skip
-        return {**plan, "preview": route_preview(plan)}
+            elif action in ("show", "guide") and plan_id:
+                plan = load_plan(deps, plan_id)
+            else:
+                raise InvalidArgumentError(
+                    f"Action inconnue ou plan manquant : {action}.", "plan, show ou guide (plan_id)"
+                )
+            if action == "guide":
+                name = guide_name(plan)
+                return {"id": plan["id"], "name": name, "text": encode_guide(plan, name=name, group="Forever Routes"),
+                        "provenance": plan["provenance"]}  # fmt: skip
+            return {**plan, "preview": route_preview(plan)}
+        except ForeverError as err:
+            return cast("dict[str, Any]", _error_result(deps, err))
 
     @server.tool()
     def forever_build(

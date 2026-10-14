@@ -410,7 +410,10 @@ class Bridge:
             self._publish(self.first_slot, "réponse à une question")
             return
         elif action == "route_deliver":
-            result, text = self._deliver_route()
+            try:
+                result, text = self._deliver_route(record.context)
+            except (OSError, ValueError, KeyError, TypeError) as exc:
+                result, text = "erreur", f"Feuille de route illisible : {type(exc).__name__}: {exc}"
         elif action in ("update", "approve", "reject") and self.actions is not None:
             try:
                 result, text = self.actions.handle(str(action), target)
@@ -429,7 +432,7 @@ class Bridge:
         self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
         self._done(record, text, "action")
 
-    def _deliver_route(self) -> tuple[str, str]:
+    def _deliver_route(self, context: Mapping[str, str]) -> tuple[str, str]:
         """RX1 : dernier plan de `forever route plan` encodé en guide RestedXP et publié dans l'emplacement ; le jeu
         l'importe hors combat (ForeverBridge 0.3.0)."""
         import hashlib
@@ -437,10 +440,16 @@ class Bridge:
         from forever.route import guide_name
         from forever.rxp import encode_guide
 
-        plans = sorted(self.routes_dir.glob("*.json"), key=lambda p: p.stat().st_mtime) if self.routes_dir else []
-        if not plans:
+        paths = sorted(self.routes_dir.glob("*.json"), key=lambda p: p.stat().st_mtime) if self.routes_dir else []
+        cls, faction = str(context.get("class") or "").lower(), str(context.get("faction") or "").lower()
+        plan = None
+        for path in reversed(paths):  # le plus récent du personnage (classe et camp du contexte)
+            doc = json.loads(path.read_text(encoding="utf-8"))
+            if (not cls or doc.get("class") == cls) and (not faction or doc.get("faction") == faction):
+                plan = doc
+                break
+        if plan is None:
             return "aucun plan", "Aucune feuille de route calculée : clique d'abord « Feuille de route »."
-        plan = json.loads(plans[-1].read_text(encoding="utf-8"))
         name, group = guide_name(plan), ROUTE_GROUP
         text = encode_guide(plan, name=name, group=group)
         sha = hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]

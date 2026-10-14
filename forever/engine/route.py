@@ -106,6 +106,7 @@ class RouteWorld:
     kill_seconds: Callable[[int], float]
     best_zone_xp_h: Callable[[int], float | None]
     bonuses: XpBonusState | None = None
+    required: frozenset[int] = frozenset()  # quêtes imposées par le joueur (--include)
 
 
 @dataclass(frozen=True)
@@ -228,7 +229,7 @@ def check_stop(gd: GameData, world: RouteWorld, state: RouteState, stop: Stop) -
 
 
 def gain(gd: GameData, level: int, xp: float, gained: float, cap: int) -> tuple[int, float]:
-    """Niveau et XP dans le niveau après un gain (courbe d'XP de la version, plafond `cap`)."""
+    """Niveau et XP dans le niveau après un gain (courbe d'XP de la version, plafond `cap`). Registre : I18"""
     xp += gained
     while level < cap and xp >= gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1]:
         xp -= gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1]
@@ -306,7 +307,8 @@ def _missed(world: RouteWorld, start: RouteState, state: RouteState) -> str | No
 def _grind(
     gd: GameData, world: RouteWorld, start: RouteState, state: RouteState, *, end_level: int, cap: int
 ) -> tuple[RouteState, StopResult, str | None]:
-    """Farm au niveau du joueur jusqu'à `end_level` (monstres de même niveau, temps par monstre du niveau)."""
+    """Farm au niveau du joueur jusqu'à `end_level` (monstres de même niveau, temps par monstre du niveau) ;
+    un monstre sans XP rend le farm impossible (durée infinie). Registre : I18, I6"""
     level, xp, seconds, total = state.level, state.xp, 0.0, 0.0
     terms: tuple[Term, ...] = ()
     missed = None
@@ -314,7 +316,7 @@ def _grind(
         need = gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1] - xp
         per = mob_kill_xp(gd, level, level, bonuses=world.bonuses)
         terms = terms or per.terms
-        seconds += need / per.xp * world.kill_seconds(level)
+        seconds += need / per.xp * world.kill_seconds(level) if per.xp > 0 else math.inf
         total += need
         level, xp = level + 1, 0.0
         missed = missed or _missed(world, start, replace(state, level=level))
@@ -382,6 +384,7 @@ def best_zone_xp_h(
     *,
     kill_seconds: float,
     overhead_s: float,
+    bonuses: XpBonusState | None = None,
 ) -> float | None:
     """XP par heure de la meilleure zone à `level` : quêtes accessibles et non grises de chaque zone, XP des quêtes et
     de leurs monstres sur le temps des monstres et des arrêts (même forme que les objectifs de T04d). Registre : I14"""
@@ -392,7 +395,8 @@ def best_zone_xp_h(
         if q.dungeon is not None or q.min_level > level or q.level <= gray or q.level >= level + red:
             continue
         inp = QuestXpInput(q.level, q.base_xp, q.xp_source, q.xp_certainty)
-        xp = quest_xp(gd, level, inp).xp + q.kills * mob_kill_xp(gd, level, q.mob_level).xp
+        xp = quest_xp(gd, level, inp, bonuses=bonuses).xp
+        xp += q.kills * mob_kill_xp(gd, level, q.mob_level, bonuses=bonuses).xp
         seconds = q.kills * kill_seconds + overhead_s
         total_xp, total_s = zones.get(q.zone, (0.0, 0.0))
         zones[q.zone] = (total_xp + xp, total_s + seconds)
