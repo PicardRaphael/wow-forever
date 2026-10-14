@@ -1388,6 +1388,17 @@
     {
       "file": "mechanics.json",
       "paths": [
+        "/values/route.search"
+      ],
+      "origin": "manuel",
+      "source": "réglages de la feuille de route (RX1 bloc C) : journal et frais d'arrêt repris de Factoruide (MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14), essais et graine de la recherche",
+      "certainty": "suppose",
+      "reason": "taille du journal de quêtes et frais d'un arrêt de Forever non mesurés (RTE2) ; essais et graine : réglages de l'optimiseur",
+      "registry": "I18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
         "/values/dungeon.official"
       ],
       "origin": "manuel",

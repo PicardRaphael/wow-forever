@@ -1840,9 +1840,45 @@ mechanics:
       - tests/unit/test_sim_objectives_dungeons.py::test_dungeon_advice_repeats_the_numbers
       - tests/unit/test_route_dungeons.py::test_placements_cover_each_open_dungeon
       - tests/unit/test_route_dungeons.py::test_steps_start_with_prerequisites
+      - tests/unit/test_engine_route.py::test_dungeon_only_in_its_window
+      - tests/unit/test_optimize_route.py::test_dungeon_at_first_pass_with_quests
+      - tests/unit/test_optimize_route.py::test_no_repeat_dungeon_without_reason
     tolerance: null
     formule: "niveau retenu = argmax sur la plage du donjon de (XP par heure du premier passage ÷ XP du niveau), à égalité le plus bas ; fenêtre = niveaux où le premier passage bat la meilleure zone"
     note: "un niveau sans zone chiffrée entre dans la fenêtre (rien à battre) ; zones des autres niveaux chiffrées avec le temps par monstre du niveau du joueur (approximation) ; quêtes grises ou hors de portée exclues à chaque niveau ; donjons fermés exclus"
+  - id: I18
+    categorie: optimisation
+    description: "Feuille de route de leveling : simulation d'une suite d'arrêts, construction gloutonne et amélioration locale (portage cité de Factoruide)"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "simulation : XP de T04d (quest_xp, mob_kill_xp ; élite, donjon, groupe), bonus de T04f (xp_multiplier), temps par monstre (kill_time, mesure du joueur d'abord), trajets (I19), donjon à son placement (I17)"
+      - "recherche : code MIT de Factoruide (brouznouf/factoruide@f7da6da : plan/worth.rs, plan/construct.rs nearest_stop, plan/moves.rs, plan/search.rs), porté en sous-ensemble ; règles d'XP et de temps de forever, jamais celles de Factoruide"
+      - "forever/data/1.60.1.70374/mechanics.json (route.search : journal, frais d'arrêt, poids de zone et part du farm repris de Factoruide, suppose ; essais et graine de la recherche)"
+    tests:
+      - tests/unit/test_engine_route.py::test_prerequisite_and_chain_checked
+      - tests/unit/test_engine_route.py::test_exclusive_checked
+      - tests/unit/test_engine_route.py::test_log_size_checked
+      - tests/unit/test_engine_route.py::test_turnin_needs_objective_or_dungeon
+      - tests/unit/test_engine_route.py::test_dungeon_only_in_its_window
+      - tests/unit/test_engine_route.py::test_no_repeat_dungeon_without_reason
+      - tests/unit/test_engine_route.py::test_route_xp_uses_t04d_and_t04f
+      - tests/unit/test_engine_route.py::test_grind_finishes_the_route
+      - tests/unit/test_engine_route.py::test_travel_counted_between_stops
+      - tests/unit/test_optimize_route.py::test_prerequisites_respected
+      - tests/unit/test_optimize_route.py::test_dungeon_at_first_pass_with_quests
+      - tests/unit/test_optimize_route.py::test_route_deterministic
+      - tests/unit/test_optimize_route.py::test_improvement_never_worse
+      - tests/unit/test_optimize_route.py::test_route_cli_plan_json
+      - tests/unit/test_optimize_route.py::test_route_provenance
+    tolerance: null
+    formule: "coût d'une route = somme des trajets (marche, vols connus) et des actions (frais d'arrêt de route.search, monstres × temps par monstre, durée d'un passage) jusqu'au niveau d'arrivée, farm final au niveau du joueur ; construction : arrêt possible le plus proche en temps × poids de sa sorte (poids de nearest_stop de Factoruide) × zone_stay hors de la zone courante ; amélioration : mouvement gardé s'il rend une route possible plus courte"
+    note: "bonus d'XP non pris dans le calcul (rappels à part) ; position de départ = donneur de la première quête et aucun vol connu (RTE3) ; objectif d'une quête au premier camp de Journeys, sinon au donneur, monstres par quête de leveling.objectives, niveau des monstres = niveau de la quête ; un donjon manqué par le farm final est signalé et refusé par l'optimiseur ; pas de tournoi, d'ALNS, de modèle de puissance, d'élites de quête ni de terrain (hors périmètre de RX1) ; écart avec les routes de Factoruide mesuré au bloc G (RTE1)"
+    angle_mort:
+      talents: []
+      contextes: [leveling]
+      estimation: null
   - id: I19
     categorie: optimisation
     description: "Trajets d'une feuille de route : points de vol, trajets et leur longueur, cartes de zone (client) ; marche et transports (addons, bloc F)"

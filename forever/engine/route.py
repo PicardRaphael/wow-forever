@@ -12,12 +12,24 @@ Registre : I18 (feuille de route), I17 (placement d'un donjon), I14, I6, I12, D1
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
+from forever.engine.dungeon import SECONDS_PER_HOUR, SECONDS_PER_MINUTE
 from forever.engine.model import GameData
+from forever.engine.travel import CERTAINTY as TRAVEL_CERTAINTY
 from forever.engine.travel import Point
-from forever.engine.xp import Term, XpBonusState
+from forever.engine.xp import (
+    Party,
+    QuestXpInput,
+    Term,
+    XpBonusState,
+    XpResult,
+    gray_level,
+    mob_kill_xp,
+    quest_xp,
+)
 
 STOP_KINDS = ("accept", "objective", "turnin", "dungeon", "dungeon_repeat", "grind")
 SEARCH_KEY = "route.search"
@@ -78,6 +90,8 @@ class RouteParams:
     stop_overhead_s: float
     tries: int
     seed: int
+    zone_stay: float  # poids d'un arrêt hors de la zone courante dans la construction
+    min_efficiency: float  # part du farm qu'une quête doit battre pour être prise
 
 
 @dataclass(frozen=True)
@@ -133,16 +147,180 @@ class RouteResult:
     certainty: str
 
 
+_RANK = {"certain": 2, "probable": 1, "suppose": 0}
+GRIND_REF = "farm"  # référence de l'arrêt de farm final
+
+
+def weakest(*values: str) -> str:
+    """Certitude la plus faible (`suppose` < `probable` < `certain`)."""
+    return min(values, key=lambda c: _RANK.get(c, 0)) if values else "suppose"
+
+
+def _ready(q: RouteQuest, state: RouteState) -> bool:
+    """Objectif fait (ou rien à faire) : la quête peut être rendue."""
+    if q.dungeon is not None or q.objective is not None:
+        return q.id in state.progressed
+    return True
+
+
+def dungeon_kill_xp(gd: GameData, world: RouteWorld, d: RouteDungeon, level: int) -> XpResult:
+    """XP d'un monstre du donjon : élite, bonus de donjon, part du groupe, bonus d'XP. Registre : I6, I10, I11, I13"""
+    party = Party(tuple([level] * d.group))
+    return mob_kill_xp(gd, level, d.mob_level, elite=True, dungeon=True, party=party, bonuses=world.bonuses)
+
+
+def repeat_xp_h(gd: GameData, world: RouteWorld, d: RouteDungeon, level: int) -> float:
+    """XP par heure d'un passage suivant (monstres seuls, sur la durée du passage). Registre : I14, I16"""
+    seconds = d.minutes * SECONDS_PER_MINUTE
+    return d.kills * dungeon_kill_xp(gd, world, d, level).xp / seconds * SECONDS_PER_HOUR if seconds > 0 else 0.0
+
+
+def _check_accept(world: RouteWorld, state: RouteState, quest_id: int) -> str | None:
+    q = world.quests.get(quest_id)
+    if q is None:
+        return "quête hors de la route"
+    if quest_id in state.log or quest_id in state.done:
+        return "quête déjà prise"
+    if q.min_level > state.level:
+        return f"niveau minimal {q.min_level}"
+    if not set(q.prereq_all) <= state.done:
+        return "prérequis non rendus"
+    if q.prereq_any and not set(q.prereq_any) & state.done:
+        return "aucun des prérequis rendu"
+    if q.after and not set(q.after) & state.done:
+        return "étape précédente de la chaîne non rendue"
+    if set(q.exclusive) & (state.done | state.log):
+        return "quête exclusive déjà prise"
+    if len(state.log) >= world.params.log_size:
+        return "journal de quêtes plein"
+    return None
+
+
 def check_stop(gd: GameData, world: RouteWorld, state: RouteState, stop: Stop) -> str | None:
     """Raison pour laquelle `stop` est impossible dans `state` (None : possible). Registre : I18, I17, I14"""
-    raise NotImplementedError
+    if stop.kind == "accept" and isinstance(stop.ref, int):
+        return _check_accept(world, state, stop.ref)
+    if stop.kind in ("objective", "turnin") and isinstance(stop.ref, int):
+        q = world.quests.get(stop.ref)
+        if q is None or stop.ref not in state.log:
+            return "quête absente du journal"
+        if stop.kind == "objective":
+            if q.objective is None or q.dungeon is not None:
+                return "aucun objectif hors donjon"
+            return "objectif déjà fait" if stop.ref in state.progressed else None
+        return None if _ready(q, state) else "objectif non fait"
+    if stop.kind in ("dungeon", "dungeon_repeat") and isinstance(stop.ref, str):
+        d = world.dungeons.get(stop.ref)
+        if d is None:
+            return "donjon hors de la route"
+        if stop.kind == "dungeon":
+            if stop.ref in state.dungeons_done:
+                return "premier passage déjà fait"
+            low, high = d.levels
+            return None if low <= state.level <= high else f"hors de la fenêtre de placement ({low}-{high})"
+        if stop.ref not in state.dungeons_done:
+            return "passage suivant avant le premier"
+        zone = world.best_zone_xp_h(state.level)
+        if zone is not None and repeat_xp_h(gd, world, d, state.level) <= zone:
+            return "passage suivant moins bon que la meilleure zone"
+        return None
+    return f"arrêt inconnu : {stop.kind}"
+
+
+def gain(gd: GameData, level: int, xp: float, gained: float, cap: int) -> tuple[int, float]:
+    """Niveau et XP dans le niveau après un gain (courbe d'XP de la version, plafond `cap`)."""
+    xp += gained
+    while level < cap and xp >= gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1]:
+        xp -= gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1]
+        level += 1
+    return level, xp
+
+
+def _target(world: RouteWorld, state: RouteState, stop: Stop) -> tuple[Point, str]:
+    if stop.kind in ("dungeon", "dungeon_repeat"):
+        d = world.dungeons[str(stop.ref)]
+        return d.entrance, d.certainty
+    q = world.quests[int(stop.ref)]
+    place = {"accept": q.giver, "turnin": q.turn_in, "objective": q.objective or q.giver}[stop.kind]
+    return place, q.certainty
 
 
 def apply_stop(
     gd: GameData, world: RouteWorld, state: RouteState, stop: Stop, *, cap: int
 ) -> tuple[RouteState, StopResult]:
     """État après `stop` (supposé possible) et son résultat. Registre : I18, I6, I12, D10"""
-    raise NotImplementedError
+    target, place_certainty = _target(world, state, stop)
+    travel_s = 0.0 if target == state.position else world.travel(state.position, target, state.level)
+    level = state.level
+    terms: tuple[Term, ...] = ()
+    xp = 0.0
+    log, progressed, done, dungeons_done = state.log, state.progressed, state.done, state.dungeons_done
+    if stop.kind == "accept":
+        action = world.params.stop_overhead_s
+        log = log | {int(stop.ref)}
+    elif stop.kind == "objective":
+        q = world.quests[int(stop.ref)]
+        per = mob_kill_xp(gd, level, q.mob_level, bonuses=world.bonuses)
+        xp, terms = q.kills * per.xp, per.terms
+        action = q.kills * world.kill_seconds(level) + world.params.stop_overhead_s
+        progressed = progressed | {q.id}
+    elif stop.kind == "turnin":
+        q = world.quests[int(stop.ref)]
+        res = quest_xp(gd, level, QuestXpInput(q.level, q.base_xp, q.xp_source, q.xp_certainty), bonuses=world.bonuses)
+        xp, terms = res.xp, res.terms
+        action = world.params.stop_overhead_s
+        log, done = log - {q.id}, done | {q.id}
+    else:  # dungeon, dungeon_repeat
+        d = world.dungeons[str(stop.ref)]
+        per = dungeon_kill_xp(gd, world, d, level)
+        xp, terms = d.kills * per.xp, per.terms
+        action = d.minutes * SECONDS_PER_MINUTE
+        if stop.kind == "dungeon":
+            dungeons_done = dungeons_done | {d.key}
+            progressed = progressed | {i for i in log if world.quests[i].dungeon == d.key}
+    new_level, new_xp = gain(gd, level, state.xp, xp, cap)
+    certainty = weakest(place_certainty, *(t.certainty for t in terms), *([TRAVEL_CERTAINTY] if travel_s else []))
+    seconds = travel_s + action
+    result = StopResult(stop.kind, stop.ref, level, xp, seconds, travel_s, terms, certainty)
+    after = RouteState(
+        level=new_level,
+        xp=new_xp,
+        position=target,
+        seconds=state.seconds + seconds,
+        log=log,
+        progressed=progressed,
+        done=done,
+        dungeons_done=dungeons_done,
+        rested=state.rested,
+    )
+    return after, result
+
+
+def _missed(world: RouteWorld, start: RouteState, state: RouteState) -> str | None:
+    for d in world.dungeons.values():
+        if d.key not in state.dungeons_done and start.level <= d.levels[1] < state.level:
+            return f"donjon {d.name} manqué (fenêtre {d.levels[0]}-{d.levels[1]} dépassée)"
+    return None
+
+
+def _grind(
+    gd: GameData, world: RouteWorld, start: RouteState, state: RouteState, *, end_level: int, cap: int
+) -> tuple[RouteState, StopResult, str | None]:
+    """Farm au niveau du joueur jusqu'à `end_level` (monstres de même niveau, temps par monstre du niveau)."""
+    level, xp, seconds, total = state.level, state.xp, 0.0, 0.0
+    terms: tuple[Term, ...] = ()
+    missed = None
+    while level < min(end_level, cap):
+        need = gd.xp_to_next[min(level, len(gd.xp_to_next)) - 1] - xp
+        per = mob_kill_xp(gd, level, level, bonuses=world.bonuses)
+        terms = terms or per.terms
+        seconds += need / per.xp * world.kill_seconds(level)
+        total += need
+        level, xp = level + 1, 0.0
+        missed = missed or _missed(world, start, replace(state, level=level))
+    certainty = weakest(*(t.certainty for t in terms))
+    result = StopResult("grind", GRIND_REF, state.level, total, seconds, 0.0, terms, certainty)
+    return replace(state, level=level, xp=xp, seconds=state.seconds + seconds), result, missed
 
 
 def simulate(
@@ -157,7 +335,44 @@ def simulate(
 ) -> RouteResult:
     """Route déroulée jusqu'à `end_level` (arrêts suivants ignorés), farm final au besoin (`finish`) ; un arrêt
     impossible rend une route `feasible=False`. Registre : I18"""
-    raise NotImplementedError
+    state = start
+    results: list[StopResult] = []
+    warnings: list[str] = []
+    feasible = True
+    for stop in stops:
+        if state.level >= end_level:
+            break
+        reason = check_stop(gd, world, state, stop)
+        if reason is None:
+            state, result = apply_stop(gd, world, state, stop, cap=cap)
+            if not math.isfinite(result.seconds):
+                reason = "trajet impossible"
+            else:
+                results.append(result)
+                reason = _missed(world, start, state)
+        if reason is not None:
+            feasible = False
+            warnings.append(f"{stop.kind} {stop.ref} : {reason}")
+            break
+    if feasible and finish and state.level < end_level:
+        state, result, missed = _grind(gd, world, start, state, end_level=end_level, cap=cap)
+        results.append(result)
+        if missed:  # farm final : le donjon n'est pas fait, c'est dit (l'optimiseur refuse une telle route)
+            warnings.append(f"farm : {missed}")
+    seconds = sum(r.seconds for r in results)
+    xp = sum(r.xp for r in results)
+    return RouteResult(
+        start_level=start.level,
+        end_level=state.level,
+        reached=state.level >= end_level,
+        feasible=feasible,
+        seconds=seconds,
+        xp=xp,
+        xp_h=xp / (seconds / SECONDS_PER_HOUR) if seconds > 0 else 0.0,
+        stops=tuple(results),
+        warnings=tuple(warnings),
+        certainty=weakest(*(r.certainty for r in results)),
+    )
 
 
 def best_zone_xp_h(
@@ -170,4 +385,16 @@ def best_zone_xp_h(
 ) -> float | None:
     """XP par heure de la meilleure zone à `level` : quêtes accessibles et non grises de chaque zone, XP des quêtes et
     de leurs monstres sur le temps des monstres et des arrêts (même forme que les objectifs de T04d). Registre : I14"""
-    raise NotImplementedError
+    gray = gray_level(gd, level)
+    red = gd.leveling.quest_band.red_min_diff
+    zones: dict[int | None, tuple[float, float]] = {}
+    for q in quests:
+        if q.dungeon is not None or q.min_level > level or q.level <= gray or q.level >= level + red:
+            continue
+        inp = QuestXpInput(q.level, q.base_xp, q.xp_source, q.xp_certainty)
+        xp = quest_xp(gd, level, inp).xp + q.kills * mob_kill_xp(gd, level, q.mob_level).xp
+        seconds = q.kills * kill_seconds + overhead_s
+        total_xp, total_s = zones.get(q.zone, (0.0, 0.0))
+        zones[q.zone] = (total_xp + xp, total_s + seconds)
+    rates = [x / s * SECONDS_PER_HOUR for x, s in zones.values() if s > 0]
+    return max(rates) if rates else None

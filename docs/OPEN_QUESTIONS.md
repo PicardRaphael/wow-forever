@@ -242,6 +242,14 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **TRV2 — Écart entre la durée des vols du client et celle de Shortest Path Forever (`Taxi.lua`, InFlight et
   CMaNGOS, 32 yards par seconde) ?** Ajoutée le 2026-10-14 (RX1, bloc B ; lecture des données de Shortest Path au bloc
   F). Test : comparaison trajet par trajet, puis un vol chronométré. Priorité : basse. Registre I19.
+- **RTE2 — Taille du journal de quêtes de Forever, et temps d'un arrêt (prise, rendu, objet) ?** Ajoutée le
+  2026-10-14 (RX1, bloc C). `route.search` reprend Factoruide (`params.rs` : journal de 40 quêtes « on WoW Forever »,
+  8 s par arrêt, non sourcés), `suppose`. Test : journal rempli en jeu (message de journal plein), durée
+  acceptation -> rendu d'une quête sans objectif relevée par ForeverLogger. Priorité : moyenne. Registre I18.
+- **RTE3 — Où commence un personnage (zone de départ de sa race) et quels vols connaît-il ?** Ajoutée le 2026-10-14
+  (RX1, bloc C). La route part du donneur de la première quête et ne prend aucun vol (vols connus inconnus), `suppose`.
+  Test : race et vols connus lus par ForeverBridge (`GetTaxiNodes` hors combat, à confirmer) ou donnés au profil.
+  Priorité : moyenne. Registre I18, I19.
 - **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
   Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
 - **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**

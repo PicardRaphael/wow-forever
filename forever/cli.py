@@ -390,6 +390,24 @@ def build_parser() -> argparse.ArgumentParser:
     q_show.add_argument("--offset", type=int, default=0, help="première quête de la page")
     q_show.add_argument("--json", action="store_true", help="sortie JSON")
 
+    route = sub.add_parser("route", help="feuille de route de leveling (RX1) : calcul et relecture")
+    route_sub = route.add_subparsers(dest="route_command", required=True, parser_class=_Parser)
+    r_plan = route_sub.add_parser("plan", help="calculer une feuille de route (quêtes, donjons placés, farm)")
+    r_plan.add_argument("--class", dest="cls", required=True, help="classe (ex. mage)")
+    r_plan.add_argument("--faction", choices=["horde", "alliance"], required=True, help="camp")
+    r_plan.add_argument("--from", dest="start", type=int, required=True, help="niveau de départ")
+    r_plan.add_argument("--to", dest="end", type=int, required=True, help="niveau d'arrivée")
+    r_plan.add_argument("--dungeons", default="auto", help="auto, none ou donjons séparés par des virgules")
+    r_plan.add_argument("--no-class-quests", action="store_true", help="laisser de côté les quêtes de classe")
+    r_plan.add_argument("--exclude", help="quêtes exclues (identifiants séparés par des virgules)")
+    r_plan.add_argument("--include", help="quêtes imposées (identifiants séparés par des virgules)")
+    r_plan.add_argument("--tries", type=int, help="essais de l'amélioration locale (défaut : route.search)")
+    r_plan.add_argument("--seed", type=int, help="graine de la recherche (défaut : route.search)")
+    r_plan.add_argument("--json", action="store_true", help="sortie JSON")
+    r_show = route_sub.add_parser("show", help="relire une feuille de route gardée dans le cache")
+    r_show.add_argument("id", help="identifiant rendu par forever route plan")
+    r_show.add_argument("--json", action="store_true", help="sortie JSON")
+
     xp = sub.add_parser("xp", help="modèle d'XP de Forever (T04d)")
     xp_sub = xp.add_subparsers(dest="xp_command", required=True, parser_class=_Parser)
     xp_check_p = xp_sub.add_parser(
@@ -1176,6 +1194,62 @@ def _cmd_dungeon(deps: Deps, args: argparse.Namespace) -> int:
             + (f", version {h['version']}" if h["version"] else "")
         )
     _emit(res, lines, res["provenance"], args.json)
+    return EXIT_OK
+
+
+def _ints(raw: str | None) -> tuple[int, ...]:
+    if not raw:
+        return ()
+    try:
+        return tuple(int(x) for x in raw.split(",") if x.strip())
+    except ValueError as exc:
+        raise InvalidArgumentError(
+            f"Identifiants illisibles : {raw}.", "donner des nombres séparés par des virgules"
+        ) from exc
+
+
+def render_route(doc: Mapping[str, Any]) -> list[str]:
+    lv = doc["levels"]
+    head = (
+        f"Feuille de route {doc['class']} ({doc['faction']}), niveau {lv['from']} → {lv['to']} "
+        f"(atteint : {lv['reached']}) : {doc['hours']:.1f} h, environ {round(doc['xp_h'])} XP par heure, "
+        f"certitude {doc['certainty']} · id {doc['id']}"
+    )
+    lines = [head]
+    if doc["dungeons"]:
+        lines.append("Donjons : " + ", ".join(f"{d['name']} (niveau {d['level']})" for d in doc["dungeons"]))
+    lines += [f"  rappel : {r['text']}" for r in doc["reminders"]]
+    for i, s in enumerate(doc["stops"], 1):
+        where = f" · {s['zone']} {s['x']:.1f}, {s['y']:.1f}" if s["zone"] and s["x"] is not None else ""
+        lines.append(f"  {i:3d}. niveau {s['level']} · {s['text']}{where} · {round(s['xp'])} XP · {s['certainty']}")
+    lines += [f"  avertissement : {w}" for w in doc["warnings"]]
+    return lines
+
+
+def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.route import RouteRequest, load_plan, plan_route
+
+    if args.route_command == "show":
+        doc = load_plan(deps, args.id)
+    else:
+        raw: str = args.dungeons
+        dungeons: str | tuple[str, ...] = raw
+        if raw not in ("auto", "none"):
+            dungeons = tuple(x.strip() for x in raw.split(",") if x.strip())
+        request = RouteRequest(
+            class_name=args.cls,
+            faction=args.faction,
+            start_level=args.start,
+            end_level=args.end,
+            dungeons=dungeons,
+            class_quests=not args.no_class_quests,
+            exclude=_ints(args.exclude),
+            include=_ints(args.include),
+            tries=args.tries,
+            seed=args.seed,
+        )
+        doc = plan_route(deps, request)
+    _emit(doc, render_route(doc), doc["provenance"], args.json)
     return EXIT_OK
 
 
@@ -4189,6 +4263,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "logs": _cmd_logs,
         "questie": _cmd_questie_info,
         "quests": _cmd_quests,
+        "route": _cmd_route,
         "dungeon": _cmd_dungeon,
         "xp": _cmd_xp,
         "origins": _cmd_origins,
