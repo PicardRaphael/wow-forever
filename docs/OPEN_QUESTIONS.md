@@ -260,11 +260,17 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   d'Elwynn Forest (position du contexte jamais transmise, départage par identifiant de quête) ; la route partira de la
   carte et des coordonnées du contexte, sinon du premier donneur du parcours gratuit de la race ; vols connus vus par
   le pont ou gardés au profil (CJ1, bloc 1d).
+  Complément du 2026-10-14 (CJ1) : Polestar compte un journal de 20 quêtes, Factoruide 40 « on WoW Forever » (RTE2).
 - **RTE4 — Où placer une quête lancée par un objet ou une nouvelle quête de Forever sans donneur positionné ?**
   Ajoutée le 2026-10-14 (RX1c, décision 268). 832 quêtes du livre sont écartées des routes faute de donneur
   positionné ; le parcours gratuit du Chasseur Horde 1 → 22 de RestedXP en prend 5 (dont deux lancées par un objet et
   la série « camping » de Forever) et 6 autres en dépendent par leur chaîne. Test : objet de départ lu (Questie
   `startedBy`, cache des objets), lieu où il tombe, ou prise relevée par ForeverLogger. Priorité : moyenne. Registre I18.
+- **RTE7 — Les guides de Polestar, rejoués par nos règles, battent-ils notre route ?** Ajoutée le 2026-10-14 (CJ1,
+  décision 278). Polestar (GPL-3.0, `fitzforge/polestar`) publie des routes 1 à 60 trouvées par simulation, sans relevé
+  en jeu encore ; son modèle donne environ 2 h jusqu'au niveau 10 en Dun Morogh et en Durotar. Test : lecteur de leurs
+  guides dans la recette (CJ1, bloc 1c), trois colonnes (notre route, RestedXP, Polestar). Priorité : moyenne.
+  Registre I18.
 - **RTE5 — Combien de monstres tue-t-on en chemin, par zone et par niveau ?** Ajoutée le 2026-10-14 (RX1c). Notre
   simulation ne crédite que les monstres des objectifs ; les parcours de RestedXP comptent sur les monstres croisés et
   placent des étapes « farm jusqu'au niveau N ». Test : XP de monstres relevée par ForeverLogger entre deux arrêts
@@ -553,6 +559,8 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   `.toc` restent sans suffixe tant que le client n'en exige pas ; le numéro s'ajoute aux valeurs admises après lecture
   en jeu (`/dump select(4, GetBuildInfo())`), jamais deviné. Test : étape de `docs/LANCEMENT.md` le 4 novembre.
   Priorité : haute le 4 novembre.
+  Indice tiers du 2026-10-14 (`suppose`, jamais adopté sans relevé) : le README de Polestar dit que la version finale
+  s'installe dans un dossier `_forever_` et que son `.flavor.info` porte une saveur `wow_forever…`.
 - **LNC2 — La version finale s'installe-t-elle à côté de la bêta (même racine) ou la remplace-t-elle ?** La découverte
   gère les deux cas (`forever wow list`). Test : `forever wow list` le 4 novembre. Priorité : basse.
 - **LNC3 — `claude auth status` voit-il une session expirée sans réseau ?** *Modifiée le 2026-10-14 (bloc D de

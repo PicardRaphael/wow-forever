@@ -3,7 +3,7 @@
 Tranche hors de la table d'origine de la ROADMAP, demandée par l'utilisateur le 2026-10-14 après ses essais en jeu
 (personnage neuf « Bob », Gnome, Alliance, niveau 1, Coldridge Valley). Elle passe **avant toutes les autres tranches**
 jusqu'au 4 novembre et reprend en elle T10a revue selon l'audit des addons et le cœur de RX2 (vols et pierre de foyer).
-Décisions 272 à 277. Plan écrit le 2026-10-14 ; **révisé le même jour** après les deux corrections de cap de
+Décisions 272 à 278. Plan écrit le 2026-10-14 ; **révisé le même jour** après les deux corrections de cap de
 l'utilisateur sur les routes (décision 277, qui amende 268).
 
 Bases : `tasks/archive/idees-du-chat-2026-10-14-ux-routes.md` (interface, routes, exports, talents) et
@@ -51,6 +51,7 @@ aucune écriture). **Partie web de la décision 264 non faite à ce stade** : en
 | Besoin | Ce qui le fait déjà (version relevée) | Verdict |
 | --- | --- | --- |
 | Décisions d'une bonne route 1 à 22 (zones, regroupements, donjons, classe, villes, vols, foyer) | RestedXP 4.11.23 : parcours gratuits en clair, `Guides/Forever/` (une chaîne par zone de départ, variantes Mage « AoE » et « ADV », Skyborne « 1-14 Zephras Isle ») ; licence CC BY-NC-SA 4.0 (`RXPGuides/LICENSE`) | **Référence d'apprentissage** de l'optimiseur, **base adaptée** là où elle est meilleure (décision 277) |
+| Routes de leveling calculées par simulation (1 à 60, toutes les zones de départ) | **Polestar Guides** (0xFitz, `github.com/fitzforge/polestar`, GPL-3.0 et exception pour les paquets de guides, v0.2.3 au commit `80dda0b` du 2026-10-14, dépôt créé le 2026-10-13 ; lu en lecture seule dans `<cache>/third_party/polestar`, rien exécuté) : recherche hors ligne (construction gloutonne aléatoire, recherche locale et recuit, redémarrages, passe de robustesse, route commune 12-60 par camp), guides retouchés à la main ensuite ; données Questie (sans licence), pfQuest (MIT), tables du client 1.60.1.70338 ; aucun relevé en jeu encore | **Référence de calibrage** (ses guides relus en local et rejoués par nos règles, comme RestedXP) et **idées reprises** en les réécrivant, citées ; ni code ni données copiés ; **contribution** sur accord (section ci-dessous) |
 | Route pas à pas suivie en jeu | RestedXP (`ImportGuide`, public) ; Shortest Path Forever (suit la cible de RestedXP) | **Alimenter** : notre route livrée dans RestedXP |
 | Retrait d'un guide importé | RestedXP : `/rxp import`, liste « current guides » et bouton Remove avec confirmation (`UI/V2/GuideImporter.lua:575-597`, `:1048-1056`) ; mais l'entrée en cache est rangée sous `clé|n` (`GuideLoader.lua:371-388`) et le bouton efface `clé` (`GuideImporter.lua:1052`) : le guide revient très probablement au `/reload` ; `addon.RemoveGuide` est interne (`GuideLoader.lua:208`, absent de `_G.RXPGuides`, `:1268-1273`) ; cache dans la SavedVariable de compte `RXPDB` (`RXPGuides.lua:1477`), relu au démarrage entrée par entrée (`GuideLoader.lua:774-837`) | **Construire** une commande sûre (bloc 2, question 12) |
 | Toutes les quêtes, chaînes, taux de butin | Questie, Naowh (Discovery, Dungeon Journal), Forever Guide 1.35.1 (chaînes, butin), ForeverDungeonJournal, AtlasLoot | **Se servir** (déjà lus par T04d, DJ1, RX1) |
@@ -73,6 +74,50 @@ du Chasseur), quêtes du Guerrier au 10, du Voleur au 10 et au 16, du Prêtre au
 Chaman, chaînes du Mage au 10 et au 15 — y compris dans les variantes Mage « AoE » et « ADV » (une ou deux quêtes de
 classe sur dix). Bruit du relevé, écarté : quêtes de fête (cadeaux de Winter Veil), 792 (prérequis douteux, LVL18),
 quêtes raciales du Prêtre. Conséquence : nos routes placent elles-mêmes les quêtes de classe (décision 277, point 4).
+
+### Polestar Guides (étude du 2026-10-14, demandée par l'utilisateur ; lecture seule)
+- **Simulation** (`docs/SIMULATION.md`, `tools/lib/sim/`) : objectif = heures de jeu jusqu'au niveau 60 ; unité de
+  recherche = « paquet » (une visite de zone, quêtes par tranches de 5 niveaux, ordre interne par plus proche voisin
+  et 2-opt), pôles de quêtes de 150 yards avec maître de vol, auberge et maître ; construction gloutonne aléatoire
+  (choix pondéré par l'XP par heure, température), recherche locale (échanger, insérer, retirer, ajouter, remplacer,
+  fusionner) et recuit simulé, redémarrages jusqu'à convergence, graines fixes ; passe de robustesse sur 2000 tirages
+  des paramètres ; route commune 12-60 par camp. Politiques : farm compté 2,5 fois, changement de zone pénalisé,
+  zone de départ d'abord, aucun changement de continent avant le niveau 10, filtre « solo » (sans donjon, élite,
+  réputation, répétable). Modèle : vitesses, détours de marche, vols du client, foyer, temps par monstre par niveau et
+  par classe, journal de 20 quêtes (le nôtre : 40, repris de Factoruide, RTE2), XP des quêtes de la table `QuestXP` du
+  client avec une pénalité d'écart de niveau et un facteur d'échelle observé sur Forever (règles de jeu à ne pas
+  reprendre sans source : `suppose`).
+- **Couverture** : toutes les zones de départ (Skyborne compris) puis une chaîne par camp jusqu'au 60 (sans les zones
+  nouvelles de Forever 30-60), 65 guides de classe, quêtes de classe ajoutées aux guides de leveling le 2026-10-14,
+  quêtes nouvelles de Forever ; donjons seulement comme alternative au farm (pour leur modèle, un donjon ne bat jamais
+  les quêtes en solo).
+- **Fraîcheur et validation** : dépôt de deux jours, plusieurs versions par jour ; aucun enregistrement de partie réelle
+  encore (temps absolus « non garantis » selon l'auteur) ; aucune comparaison à RestedXP.
+- **Licence** : GPL-3.0 pour le code et les guides ; l'exception ne couvre que les paquets produits par leur compilateur.
+  Lire leurs guides pour se calibrer n'est pas restreint ; reprendre du code imposerait la GPL à ce qui serait
+  distribué ; leurs faits de quêtes viennent en partie de Questie, sans licence. Choix proposé : **ni code ni données
+  repris**, idées réécrites et citées (comme Factoruide, décision 266).
+- **Comparaison sur une zone de départ, niveaux 1 à 10** (Gnome et Orc Guerriers, sans donjon ; nos chiffres et le
+  rejeu de RestedXP par nos règles, ceux de Polestar par leur modèle, non rejoués chez nous : à comparer avec prudence)
+  :
+
+  | Route | Gnome Guerrier (Coldridge Valley) | Orc Guerrier (Valley of Trials) |
+  | --- | --- | --- |
+  | **Notre route** (`forever route plan --race`) | 1,95 h ; Dun Morogh **puis Elwynn Forest** (défaut à corriger, 1b) | 1,76 h ; Durotar, Orgrimmar au niveau 9 (« Hidden Enemies ») |
+  | **RestedXP gratuit**, rejoué par nos règles | 2,99 h ; Dun Morogh → Loch Modan → Dun Morogh | 2,74 h ; Durotar |
+  | **Polestar**, d'après son modèle | environ 2,0 h jusqu'au 10 ; Coldridge Valley → Kharanos → Dun Morogh, foyer une fois, Ironforge seulement vers 12 | environ 2,3 h ; Valley of Trials → Razor Hill → Durotar, foyer une fois, Orgrimmar seulement pour le Démoniste et le Chasseur |
+
+  Lecture : les deux références restent dans la zone de la race jusqu'au niveau 10 et ne passent par la capitale
+  qu'après, ou pour une classe ; notre route est plus courte sur le papier mais sort de la zone (Gnome) ou passe par la
+  capitale plus tôt (Orc) ; nos rejeux sautent encore des étapes (quêtes inconnues, objectifs), d'où un temps de
+  RestedXP sans doute surestimé.
+- **Recommandation** : (1) **référence de calibrage**, en seconde référence après RestedXP : un lecteur de leurs guides
+  (`accept`, `turnin`, `zone`, `hearth`, `fly`, `level`), lus dans le clone en cache, rejoués par nos règles dans la
+  recette (1c) ; (2) **idées à reprendre**, réécrites et citées : paquets par visite de zone et pôles de quêtes,
+  pénalité de changement de zone et règle « zone de départ d'abord, pas de changement de continent avant le 10 »,
+  construction aléatoire pondérée et recuit avec redémarrages, passe de robustesse, route commune par camp au-delà des
+  zones de départ ; (3) **contribution**, plus tard et sur ton accord : nos relevés réels (temps par monstre, XP des
+  quêtes de Forever) leur manquent ; une issue pour les écarts que la recette trouvera.
 
 ## Constats (dépôt, 2026-10-14 ; chemins `fichier:ligne` pour la relecture)
 
@@ -195,6 +240,10 @@ Questions encore ouvertes, tranchées au début de leur bloc (défaut proposé e
 - Contrôles après la recherche, avec raison : première zone ≠ zone du départ, quête d'une autre race ou d'un autre
   camp, capitale ou autre continent sous le niveau 10 sans raison (quête de classe, maître, donjon), farm alors qu'une
   quête faisable reste dans la zone ou une zone voisine.
+- **Zone de départ d'abord** (constat du 2026-10-14 : le Gnome Guerrier part vers Elwynn Forest ; règle aussi tenue par
+  Polestar et RestedXP) : sous le niveau des bas niveaux, l'optimiseur ne prend aucune quête dans la zone de départ
+  d'une autre race ni dans une capitale, sauf quête de classe, maître ou quête que le parcours de référence de la race
+  fait aussi ; à corriger **avant l'essai du samedi 17**.
 
 **1c. Mesure des décisions face aux parcours gratuits (« recette »).**
 - `forever route recette` (forme au bloc) : pour chaque race (dix races, sept zones de départ, variante Mage
@@ -204,6 +253,10 @@ Questions encore ouvertes, tranchées au début de leur bloc (défaut proposé e
   ville (maître, capitale), vols et pierre de foyer, farm ; temps et XP par heure.
 - Sortie : écarts chiffrés, chacun avec son explication (règle manquante, poids, donnée absente) ; aucun texte de guide
   dans la sortie ni dans le dépôt ; résultats agrégés dans `docs/research/rxp-comparaison.md`.
+- **Seconde référence : Polestar Guides** (étude plus haut) : lecteur de leurs guides (clone en cache, commit épinglé
+  dans la provenance, lecture locale, rien exécuté), rejoués par nos règles comme RestedXP ; trois colonnes (notre
+  route, RestedXP, Polestar) ; leurs guides couvrent aussi 12 à 60, référence là où RestedXP gratuit s'arrête.
+- `rxp-compare` passe la race au calcul de notre route (il ne la passait pas : un Gnome partait vers Elwynn Forest).
 
 **1d. Trajets comme en jeu** (cœur de RX2, question RTE3, registre I19).
 - Vols : points de vol découverts en passant au maître de vol (au niveau 1 aucun n'est connu), vols connus du personnage
@@ -212,6 +265,9 @@ Questions encore ouvertes, tranchées au début de leur bloc (défaut proposé e
   version (origine déclarée) ; la recherche choisit entre marche, vol, foyer.
 
 **1e. Réglage de l'optimiseur.**
+- Idées de Polestar à essayer en premier, réécrites et citées (GPL-3.0 : aucun code repris) : visite de zone comme
+  unité (paquets par tranche de niveaux, pôles de quêtes), pénalité de changement de zone, construction aléatoire
+  pondérée par l'XP par heure, recuit et redémarrages, passe de robustesse, route commune par camp au-delà du 12.
 - Boucle : recette → écart le plus coûteux → règle ou poids changé (regroupement par pôle de quêtes, coût d'un retour
   en ville, valeur d'une quête de classe, seuil `_worth_it`, poids de zone) → recette refaite ; chaque réglage noté
   (avant, après, zones concernées) ; aucun réglage qui améliore une zone en dégradant une autre sans le dire.
@@ -366,6 +422,8 @@ de `test_registry.py` écrits au commit « tests » du bloc concerné.
 
 ## Questions ouvertes (`docs/OPEN_QUESTIONS.md`)
 - **RTE3** (précisée) : zone de départ et vols connus, vus en jeu par le pont.
+- **RTE2** (complément) : Polestar compte un journal de 20 quêtes, Factoruide 40 « on WoW Forever » ; relevé en jeu attendu.
+- **RTE7** : les guides de Polestar, rejoués par nos règles, battent-ils notre route sur les zones de départ et au-delà du 22 ? Réponse par la recette (1c).
 - **RTE6** : les quêtes d'effort de guerre de Forever sont-elles faisables et rémunérées à bas niveau ? Écartées des
   routes d'ici là.
 - **RXP3** : deux imports du même guide laissent deux entrées `clé|n` dans `RXPDB` : laquelle RestedXP charge-t-il au
