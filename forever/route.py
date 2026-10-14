@@ -821,22 +821,41 @@ START_REASONS = {
 }
 
 
-def _race_reference(addons: Any, request: RouteRequest, quests: Any, below: int | None) -> tuple[Any, frozenset[int]]:
-    """Donneur de départ et zones des bas niveaux pris du parcours gratuit de la race (lecture locale de RestedXP,
-    décisions 277 et 278) ; (None, vide) sans race ou sans RestedXP installé. Registre : I18"""
+def _race_reference(addons: Any, request: RouteRequest, quests: Any) -> tuple[Any, Any, Any]:
+    """Donneur de départ pris du parcours gratuit de la race (lecture locale de RestedXP, décisions 277 et 278), avec
+    la bibliothèque des parcours et les jetons du personnage ; (None, None, None) sans race ou sans RestedXP installé.
+    Registre : I18"""
     from forever.errors import InvalidArgumentError
     from forever.rxp_guides import read_rxp_guides, who_for
 
     if not request.race or addons is None:
-        return None, frozenset()
+        return None, None, None
     try:
         library = read_rxp_guides(addons)
     except InvalidArgumentError:
-        return None, frozenset()
+        return None, None, None
     who = who_for(request.class_name, request.race, request.faction)
     giver = None if request.start_at is not None else rxp_start_giver(library, who, quests, request.start_level)
-    zones = reference_zones(library, who, quests, below=below) if below is not None else frozenset()
-    return giver, zones
+    return giver, library, who
+
+
+def _replayed_zones(gd: Any, world: Any, library: Any, who: Any, start: Any, *, below: int, cap: int) -> frozenset[int]:
+    """Zones des quêtes que le parcours gratuit de la race prend avant le niveau `below`, d'après son rejeu par nos
+    règles depuis le même départ (un guide « 1-14 » finit ailleurs après le niveau 10). Registre : I18"""
+    from forever.compare import replay_rxp
+    from forever.errors import InvalidArgumentError
+    from forever.rxp_guides import guide_chain
+
+    try:
+        chain = guide_chain(library, who)
+    except InvalidArgumentError:
+        return frozenset()
+    replay = replay_rxp(gd, world, chain.guides, who, start, end_level=below, cap=cap)
+    return frozenset(
+        z
+        for s in replay.stops
+        if s.kind == "accept" and int(s.ref) in world.quests and (z := world.quests[int(s.ref)].zone) is not None
+    )
 
 
 def _map_of(maps: Any, point: Any) -> int | None:
@@ -979,7 +998,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
         warnings.append("aucune quête placée : la route n'est que du farm")
     filters = route_filters(values)
     low = filters.low_level if filters is not None and request.start_level < filters.low_level else None
-    giver, zones = _race_reference(addons, request, world.quests, low)
+    giver, library, who = _race_reference(addons, request, world.quests)
     position, reason = start_position(maps, request, world.quests, rxp_giver=giver)
     if position is None:
         position = next(iter(maps.values()), None)
@@ -988,6 +1007,10 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     if low is not None and request.race:
         here = request.start_at[0] if request.start_at is not None else _map_of(maps, position)
         start_zone = next((q.zone for q in world.quests.values() if q.giver == position), None) or here
+        first = RouteState(level=request.start_level, xp=0.0, position=position, done=frozenset(request.done))
+        zones = (
+            _replayed_zones(gd, world, library, who, first, below=low, cap=cap) if library is not None else frozenset()
+        )
         allowed = frozenset(z for z in (*zones, start_zone) if z is not None)
         if allowed:
             world = replace(world, early_zones=allowed, early_level=low)
