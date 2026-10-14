@@ -597,12 +597,13 @@ def apply_game_fields(
 def archive_characters(deps: Deps, product: str, now: datetime) -> list[str]:
     """Personnages du produit `product` rangés dans `archived_characters` sous `<nom>-<royaume>` (LN1) : gardés,
     marqués (`archived` : date, produit, version des données), plus jamais actifs. Un personnage sans produit (d'avant
-    LN1) est un personnage de la bêta : archivé quand `product` est le produit de `sources.json`. Rend les clés."""
-    from forever.installs import beta_product
+    LN1) est un personnage de la bêta (`archive.LEGACY_PRODUCT`), même après l'installation des données finales. Rend les clés."""
+    from forever.archive import LEGACY_PRODUCT
 
     path = resolve_path(deps)
     doc = load_profile(path)
-    beta = beta_product(deps.data_dir)
+    # Un personnage sans produit date d'avant LN1 : la bêta, quel que soit le produit des données installées depuis.
+    beta = LEGACY_PRODUCT
     archived: dict[str, Any] = doc.setdefault("archived_characters", {})
     moved: list[str] = []
     names: list[str] = []

@@ -305,8 +305,13 @@ def survey(
     option: Path | None = None,
 ) -> tuple[Choice, list[Install]]:
     """Découverte, rôles et choix en un appel."""
+    from forever.errors import ForeverError
     from forever.pipeline.client_builds import adopted_products
 
     found = discover([*roots(environ, drives()), *([option.parent] if option is not None else [])])
-    found = assign_roles(found, beta=beta_product(data_dir), adopted=adopted_products(cache_dir))
+    try:
+        adopted = adopted_products(cache_dir)
+    except ForeverError:
+        adopted = {}  # journal des versions illisible : aucune adoption lue (forever doctor le signale), rien n'échoue
+    found = assign_roles(found, beta=beta_product(data_dir), adopted=adopted)
     return choose(found, option=option, environ=environ), found

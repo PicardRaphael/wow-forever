@@ -341,7 +341,7 @@ def supervise(
     failures = 0
     next_at = 0.0
     env_error: str | None = None  # dernier échec de la vérification de l'environnement, noté une fois
-    launched_for: Path | None = resolve() if resolve is not None else None  # dossier du pont en marche (LN1)
+    launched_for: Path | None = None  # dossier du pont en marche (LN1), relu à chaque lancement
     moving = False  # arrêt demandé au pont pour changer d'installation
     try:
         while True:
@@ -378,7 +378,10 @@ def supervise(
                 if now >= next_at:
                     moving = False
                     if resolve is not None:
-                        launched_for = resolve()
+                        try:
+                            launched_for = resolve()
+                        except Exception:  # noqa: BLE001 : le pont choisit lui-même son installation
+                            launched_for = None
                     try:
                         log = launch()
                     except spawn.EnvironmentBroken as exc:
@@ -409,8 +412,12 @@ def _follow_choice(
     game_running: Callable[[Path | None, Path | None], bool | None] | None,
     launched_for: Path | None,
 ) -> bool:
-    """Choix changé et jeu fermé : arrêt du pont demandé (vrai) ; sinon rien (faux)."""
-    current = resolve()
+    """Choix changé et jeu fermé : arrêt du pont demandé (vrai) ; sinon rien (faux). Une résolution en échec ne
+    change rien : la surveillance continue sur le dossier en cours."""
+    try:
+        current = resolve()
+    except Exception:  # noqa: BLE001 : la surveillance ne s'arrête jamais pour un choix illisible
+        return False
     if current is None or current == launched_for:
         return False
     running = game_running(launched_for, current) if game_running is not None else None

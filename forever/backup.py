@@ -20,6 +20,7 @@ import hashlib
 import json
 import os
 import platform
+import re
 import shutil
 import sys
 from collections.abc import Iterator, Mapping, Sequence
@@ -39,6 +40,8 @@ MIN_FREE = 1 << 30  # 1 Go libre au moins sur un disque de sauvegarde
 DAILY_EVERY = timedelta(hours=24)
 STAMP_FORMAT = "%Y-%m-%dT%H%M%S"
 MANIFEST = "manifest.json"
+MANIFEST_NOTE = "Sauvegarde de forever (LN1)"
+_STAMP = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{6}(-\d+)?$")
 PARTIAL_SUFFIX = ".partiel"
 KINDS = ("profile", "wtf", "bridge", "update", "cache")
 NEVER_COPIED = (".credentials.json",)
@@ -284,12 +287,14 @@ def make_backup(deps: Deps, now: datetime, *, reason: str, root: Path | None = N
         shutil.rmtree(partial)
     partial.mkdir(parents=True)
     files = []
+    skipped: list[str] = []
     for item in collect(deps):
         target = partial / item.path
         target.parent.mkdir(parents=True, exist_ok=True)
         try:
             shutil.copy2(item.origin, target)
-        except OSError:
+        except OSError as exc:
+            skipped.append(f"{item.origin} : {exc}")  # signalé dans le manifeste, jamais omis sans trace
             continue
         entry: dict[str, Any] = {
             "kind": item.kind,
@@ -306,8 +311,9 @@ def make_backup(deps: Deps, now: datetime, *, reason: str, root: Path | None = N
         "created_at": format_utc(now),
         "reason": reason,
         "machine": platform.node(),
-        "note": "Sauvegarde de forever (LN1) : copie simple de ce qui n'est pas sur GitHub ; forever backup restore.",
+        "note": f"{MANIFEST_NOTE} : copie simple de ce qui n'est pas sur GitHub ; forever backup restore.",
         "files": files,
+        "skipped": skipped,
     }
     (partial / MANIFEST).write_bytes((json.dumps(manifest, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
     partial.rename(final)
@@ -328,13 +334,18 @@ def list_backups(root: Path) -> list[BackupInfo]:
     found = []
     if not root.is_dir():
         return []
-    for path in sorted(p for p in root.iterdir() if p.is_dir() and not p.name.endswith(PARTIAL_SUFFIX)):
+    # Seuls les dossiers datés dont le manifeste est celui de forever comptent : une racine partagée (FOREVER_BACKUP_DIR
+    # sur un disque) peut contenir d'autres dossiers, jamais lus comme des sauvegardes ni supprimés par prune.
+    for path in sorted(p for p in root.iterdir() if p.is_dir() and _STAMP.match(p.name)):
         try:
             doc = manifest_of(path)
-        except (OSError, ValueError, TypeError):
+            files = doc["files"]
+            if not str(doc.get("note", "")).startswith(MANIFEST_NOTE) or not isinstance(files, list):
+                continue
+        except (OSError, ValueError, TypeError, KeyError):
             continue
         found.append(
-            BackupInfo(path.name, path, str(doc.get("created_at", "")), str(doc.get("reason", "")), len(doc["files"]))
+            BackupInfo(path.name, path, str(doc.get("created_at", "")), str(doc.get("reason", "")), len(files))
         )
     return found
 
