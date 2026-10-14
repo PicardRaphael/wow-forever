@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import math
-from typing import NamedTuple
+from collections.abc import Mapping
+from typing import Any, NamedTuple
 
 from forever.engine.model import GameData, Points, Rank
 
@@ -175,3 +176,12 @@ def dot_ticks(gd: GameData, key: str, rank: Rank, *, rules: str = "forever") -> 
     if rules == "seed":
         return max(1, int(rank.dot_duration_s / gd.leveling.dot_tick_s))
     return round(sum(c.ticks for c in gd.scaling[key][rank.position - 1].components if c.kind == "dot"))
+
+
+def learned_class_ranks(spell: Mapping[str, Any], level: int, talents: Mapping[str, int]) -> list[Mapping[str, Any]]:
+    """Rangs appris au niveau d'un sort d'une des 9 classes (`classes.json`), même règle que `best_rank` : un sort de
+    talent exige le talent et son rang 1 vient du talent ; tout autre rang exige un niveau connu (au moins 1) au plus
+    égal à celui du personnage.
+
+    Registre : G4"""
+    raise NotImplementedError
