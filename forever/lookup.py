@@ -432,6 +432,11 @@ def check_talents(deps: Deps, cls: str, talents: dict[str, int], level: int) -> 
     if community:
         notes.append(f"palier communautaire (probable) pour {', '.join(community)}")
     data = load_version(deps)
+    naowh = None
+    if not errors:  # EX1 : code Naowh Forever du build contrôlé, ordre légal généré
+        from forever.exports.talents import compact, naowh_block
+
+        naowh = compact(naowh_block(gd, cls_name, level, talents))
     return {
         "kind": "build_check",
         "class": cls_name,
@@ -444,6 +449,7 @@ def check_talents(deps: Deps, cls: str, talents: dict[str, int], level: int) -> 
             "by_tree": by_tree,
         },
         "talents": taken,
+        "naowh": naowh,
         "provenance": make_provenance(
             deps,
             game_version=data.game_version,

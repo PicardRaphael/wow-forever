@@ -1204,6 +1204,7 @@ mechanics:
       - "forever/data/1.60.1.70124/decode_rules.json (character_tables : NumTalentsAtLevel, TraitCond.SpentAmountRequired, T08b)"
       - "Cache/ADB/enUS/DBCache.bin du client 1.60.1.70170 (T08c : arbres corrigés par le serveur, poussée 112347 du 2026-10-02, appliqués en mode forever)"
       - "relevés en jeu de l'utilisateur du 2026-10-08 : Intimidation exige Bestial Swiftness (DON5, arête circulaire écartée), Improved Serpent Sting absent (CLS3), Improved Life Tap et Amplify Curse placés (CLS1) ; forever/data/1.60.1.70245 révision 6"
+      - "EX1 (décision 267) : ordre de prise contrôlé point par point (forever/engine/talents.py check_order, legal_order), même règle que le contrôle d'import de Naowh Forever 1.1.12 (CheckBuild : points de l'arbre déjà pris pour le palier, prérequis au maximum avant la prise)"
     tests:
       - tests/unit/test_engine_talents.py::test_prerequisites
       - tests/unit/test_engine_talents.py::test_build_legality
@@ -1220,6 +1221,9 @@ mechanics:
       - tests/unit/test_class_build_legality.py::test_mage_check_is_unchanged
       - tests/unit/test_class_build_legality.py::test_unresolved_tier_uses_community_tier_else_is_undecidable
       - tests/unit/test_in_game_survey.py::test_intimidation_without_bestial_swiftness_is_illegal
+      - tests/unit/test_export_naowh_build.py::test_legal_order_of_every_popular_build
+      - tests/unit/test_export_naowh_build.py::test_check_order_refuses_a_tier_before_its_points
+      - tests/unit/test_export_naowh_build.py::test_check_order_refuses_a_prerequisite_not_at_full_rank
       - tests/unit/test_in_game_survey.py::test_circular_sufficient_edge_is_dropped
       - tests/unit/test_in_game_survey.py::test_observed_absent_node_is_dropped_with_its_source
       - tests/unit/test_parked_nodes.py::test_real_case_not_in_talents_forever_is_parked

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from forever.engine.model import ClassKnowledge, GameData, Points, TalentRules
@@ -183,13 +183,58 @@ def check_class_build(
     return err
 
 
+def _tier(t: Any) -> int | None:
+    if t.get("tier") is not None:
+        return int(t["tier"])
+    community = t.get("tier_community")
+    return int(community["tier"]) if community else None
+
+
+def _step_error(t: Any, taken: Mapping[str, int], spent: int, per_tier: int, by_node: Mapping[int, Any]) -> str | None:
+    """Erreur de la prise d'un point de `t` (None : légale), d'après les points déjà pris (`taken`) et ceux déjà
+    dépensés dans son arbre (`spent`)."""
+    if taken.get(t["key"], 0) + 1 > t["max"]:
+        return f"{t['name']} : déjà à son rang maximal ({t['max']})"
+    tier = _tier(t)
+    if tier is None:
+        return f"{t['name']} : palier inconnu (nœud hors grille), légalité non décidable"
+    if spent < per_tier * (tier - 1):
+        return f"{t['name']} (palier {tier}) exige {per_tier * (tier - 1)} points dans l'arbre avant, {spent} pris"
+    strange = [p for p in t["prereqs"] if p["kind"] not in ("required", "sufficient")]
+    if strange:
+        return f"{t['name']} : prérequis de type inconnu ({strange[0]['kind']}), légalité non décidable"
+    required = [by_node[p["node_id"]] for p in t["prereqs"] if p["kind"] == "required" and p["node_id"] in by_node]
+    sufficient = [by_node[p["node_id"]] for p in t["prereqs"] if p["kind"] == "sufficient" and p["node_id"] in by_node]
+    for p in required:
+        if taken.get(p["key"], 0) < p["max"]:
+            return f"{t['name']} exige {p['name']} au maximum avant"
+    if sufficient and not any(taken.get(p["key"], 0) >= p["max"] for p in sufficient):
+        return f"{t['name']} exige {' ou '.join(p['name'] for p in sufficient)} au maximum avant"
+    return None
+
+
 def check_order(knowledge: ClassKnowledge, rules: TalentRules, order: Sequence[str]) -> list[str]:
     """Erreurs d'un ordre de prise, point par point (liste vide : chaque prise est légale au moment où elle est
     faite) : talent connu, rang maximal, prérequis au maximum avant la prise, points déjà dépensés dans l'arbre
     pour le palier (comme le contrôle de Naowh Forever, `CheckBuild`).
 
     Registre : G3"""
-    raise NotImplementedError
+    known = {t["key"]: t for tree in knowledge.trees for t in tree["talents"]}
+    by_node = {t["node_id"]: t for t in known.values()}
+    taken: dict[str, int] = {}
+    spent: dict[str, int] = {}
+    errors = []
+    for i, key in enumerate(order, 1):
+        t = known.get(key)
+        if t is None:
+            errors.append(f"prise {i} : talent inconnu : {key}")
+            continue
+        err = _step_error(t, taken, spent.get(t["tree"], 0), rules.points_per_tier, by_node)
+        if err:
+            errors.append(f"prise {i} : {err}")
+        taken[key] = taken.get(key, 0) + 1
+        spent[t["tree"]] = spent.get(t["tree"], 0) + 1
+    return errors
 
 
 def legal_order(knowledge: ClassKnowledge, rules: TalentRules, pts: Points) -> list[str]:
@@ -198,4 +243,35 @@ def legal_order(knowledge: ClassKnowledge, rules: TalentRules, pts: Points) -> l
     Ce n'est pas un ordre de leveling optimisé.
 
     Registre : G3"""
-    raise NotImplementedError
+    known = {t["key"]: t for tree in knowledge.trees for t in tree["talents"]}
+    by_node = {t["node_id"]: t for t in known.values()}
+    unknown = sorted(k for k, r in pts.items() if r > 0 and k not in known)
+    if unknown:
+        raise ValueError(f"talent inconnu : {', '.join(unknown)}")
+    trees = [str(tree["name"]) for tree in knowledge.trees]
+    load = {name: sum(r for k, r in pts.items() if r > 0 and known[k]["tree"] == name) for name in trees}
+    tree_rank = {name: i for i, name in enumerate(sorted(trees, key=lambda n: (-load[n], trees.index(n))))}
+    position = {t["key"]: i for tree in knowledge.trees for i, t in enumerate(tree["talents"])}
+    remaining = {k: r for k, r in pts.items() if r > 0}
+    taken: dict[str, int] = {}
+    spent: dict[str, int] = {}
+    order: list[str] = []
+    while remaining:
+        ready = [
+            k
+            for k in remaining
+            if _step_error(known[k], taken, spent.get(known[k]["tree"], 0), rules.points_per_tier, by_node) is None
+        ]
+        if not ready:
+            blocked = sorted(remaining, key=lambda k: (tree_rank[known[k]["tree"]], _tier(known[k]) or 0, position[k]))
+            t = known[blocked[0]]
+            why = _step_error(t, taken, spent.get(t["tree"], 0), rules.points_per_tier, by_node)
+            raise ValueError(f"aucun ordre légal : {why}")
+        key = min(ready, key=lambda k: (tree_rank[known[k]["tree"]], _tier(known[k]) or 0, position[k]))
+        order.append(key)
+        taken[key] = taken.get(key, 0) + 1
+        spent[known[key]["tree"]] = spent.get(known[key]["tree"], 0) + 1
+        remaining[key] -= 1
+        if remaining[key] == 0:
+            del remaining[key]
+    return order

@@ -57,6 +57,28 @@ def _error_result(deps: Deps, err: ForeverError) -> CallToolResult:
     )
 
 
+EXPORT_KINDS = ("naowh_build", "read")
+
+
+def _export_lookup(
+    deps: Deps, name: str, *, class_name: str | None, level: int | None, talents: str | None, text: str | None
+) -> dict[str, Any]:
+    """Domaine `export` de forever_lookup (EX1)."""
+    if name == "read":
+        from forever.exports.read import read_export
+
+        if not text:
+            raise InvalidArgumentError("Chaîne manquante.", "donner text (chaîne complète, préfixe compris)")
+        return read_export(deps, text)
+    if name == "naowh_build":
+        from forever.exports.talents import naowh_export
+
+        if level is None or not talents:
+            raise InvalidArgumentError("Niveau ou talents manquants.", "donner class_name, level et talents")
+        return naowh_export(deps, class_name or "Mage", level, parse_talents(talents))
+    raise InvalidArgumentError(f"Export « {name} » inconnu.", "name : " + ", ".join(EXPORT_KINDS))
+
+
 def build_server(deps: Deps) -> MCPServer:
     server = MCPServer("forever", version=__version__, instructions=INSTRUCTIONS)
 
@@ -93,6 +115,7 @@ def build_server(deps: Deps) -> MCPServer:
         quest_id: int | None = None,
         dungeon: str | None = None,
         access: str | None = None,
+        text: str | None = None,
     ) -> dict[str, Any]:
         """Consulte une entité du jeu. T01 : `kind="spell"` (sorts de dégâts, nom anglais, ex. « frostbolt »).
 
@@ -139,7 +162,12 @@ def build_server(deps: Deps) -> MCPServer:
         `189:graveyard`), `class_name` et `level` facultatifs : fiche (plages et écarts entre sources, entrée, boss
         et leur niveau, butin avec taux en fraction et sa source, `null` = inconnu, `classic` = taux de Classic,
         objets utilisables, quêtes avec XP et sa source, prérequis « à faire d'abord », passages relevés) ;
-        `kind="dungeon_item"` avec `name` (identifiant de l'objet) : donjon, boss, taux, source et version."""
+        `kind="dungeon_item"` avec `name` (identifiant de l'objet) : donjon, boss, taux, source et version.
+        EX1 : `kind="export"`, chaînes d'import des addons d'interface, que le joueur colle lui-même ; `name` =
+        `naowh_build` avec `class_name`, `level` et `talents` (« clé=rang,… ») : code `!NFB1!` de Naowh Forever (en
+        jeu : /nf, Profiles, Import), ordre légal généré et signalé (`order_note`), statut `bloque` avec sa raison si
+        le build est illégal ; `name` = `read` avec `text` (chaîne complète) : contenu relu en nos clés. Certitude
+        `probable` (jamais importé en jeu)."""
         try:
             if kind in ("dungeons", "dungeon", "dungeon_item"):
                 from forever.dungeons import dungeon_payload, dungeons_payload, item_payload
@@ -187,6 +215,8 @@ def build_server(deps: Deps) -> MCPServer:
 
                 placed = parse_talents(current) if current else None
                 return popular_builds(require_addon(deps), deps, name or None, current=placed)
+            if kind == "export":
+                return _export_lookup(deps, name, class_name=class_name, level=level, talents=talents, text=text)
             if kind == "pets":
                 return lookup_pets(deps, name or None, rank=rank, zone=zone, level=level, detail=detail)
             if kind == "pvp":
@@ -218,6 +248,7 @@ def build_server(deps: Deps) -> MCPServer:
                         "dungeons",
                         "dungeon",
                         "dungeon_item",
+                        "export",
                     ],
                 )
             if not name:

@@ -796,6 +796,22 @@ def build_parser() -> argparse.ArgumentParser:
     )
     tf_pop.add_argument("--json", action="store_true", help="sortie JSON")
 
+    exp = sub.add_parser("export", help="chaînes d'import des addons d'interface (Naowh Forever, EllesmereUI ; EX1)")
+    exp_sub = exp.add_subparsers(dest="export_cmd", required=True)
+    exp_nfb = exp_sub.add_parser("naowh-build", help="build de talents en code !NFB1! (Naowh Forever, module Training)")
+    exp_nfb.add_argument("--class", dest="cls", help="classe (nom français ou anglais ; défaut : Mage)")
+    exp_nfb.add_argument("--level", type=int, help="niveau du build (défaut : celui du code ou du build populaire)")
+    exp_src = exp_nfb.add_mutually_exclusive_group(required=True)
+    exp_src.add_argument("--talents", help="talents « clé=rang,… » (clés de classes.json)")
+    exp_src.add_argument("--code", help="code ou lien Talents Forever (ordre du code repris s'il en porte un)")
+    exp_src.add_argument("--popular", type=int, help="rang d'un build populaire de Talents Forever (avec --class)")
+    exp_nfb.add_argument("--order", help="ordre de prise « clé,clé,… », un point par entrée (avec --talents)")
+    exp_nfb.add_argument("--name", help="nom du build dans Naowh (défaut : classe, niveau, arbre)")
+    exp_nfb.add_argument("--json", action="store_true", help="sortie JSON")
+    exp_read = exp_sub.add_parser("read", help="relit une chaîne d'export (!NFB1!…) : contenu en nos clés")
+    exp_read.add_argument("text", help="chaîne complète, préfixe compris")
+    exp_read.add_argument("--json", action="store_true", help="sortie JSON")
+
     pvp = sub.add_parser("pvp", help="fiches PvP fixes des 9 classes (savoir du client, sans calcul de combat)")
     pvp_sub = pvp.add_subparsers(dest="pvp_cmd", required=True)
     pvp_class = pvp_sub.add_parser("class", help="fiche d'une classe : contrôles, défensifs, ruptures, recharges")
@@ -2578,6 +2594,63 @@ def render_build(rep: Mapping[str, Any]) -> list[str]:
     return lines
 
 
+def _cmd_export_naowh_build(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.exports.talents import OrderSource, naowh_export, render_naowh
+
+    cls = args.cls or "Mage"
+    order = [k for k in (args.order or "").split(",") if k] or None
+    source: OrderSource = "leveling"
+    if args.code:
+        from forever.talents_forever import decode_code
+
+        rep = decode_code(_tf_addon(deps), deps, args.code)
+        if rep["unverifiable"]:
+            raise InvalidArgumentError(
+                "Code Talents Forever non vérifiable : " + ", ".join(rep["unverifiable"]) + ".",
+                "exporter un build dont chaque talent a sa correspondance",
+            )
+        cls, level, talents = rep["class"], args.level or rep["level"], rep["talents"]
+        order, source = rep["order"], "code"
+    elif args.popular is not None:
+        from forever.talents_forever import popular_builds
+
+        if not args.cls:
+            raise InvalidArgumentError("Classe manquante pour --popular.", "ajouter --class <classe>")
+        popular = popular_builds(_tf_addon(deps), deps, args.cls)
+        block = next(iter(popular["classes"].values()))
+        entry = next((b for b in block["top"] if b["rank"] == args.popular), None)
+        if entry is None:
+            ranks = ", ".join(str(b["rank"]) for b in block["top"])
+            raise InvalidArgumentError(f"Build populaire n° {args.popular} absent.", f"rangs relevés : {ranks}")
+        cls, level, talents = next(iter(popular["classes"])), args.level or entry["level"], entry["talents"]
+        args.name = args.name or f"Talents Forever n° {entry['rank']} {entry['spec'] or ''}".strip()
+    else:
+        if args.level is None:
+            raise InvalidArgumentError("Niveau manquant.", "ajouter --level <niveau>")
+        level, talents = args.level, parse_talents(args.talents)
+    rep = naowh_export(deps, cls, level, talents, order, args.name, order_source=source)
+    if rep["status"] == "bloque":
+        raise InvalidArgumentError(f"Export Naowh bloqué : {rep['reason']}.", "corriger le build ou son ordre")
+    _emit(rep, render_naowh(rep), rep["provenance"], args.json)
+    return EXIT_OK
+
+
+def _cmd_export(deps: Deps, args: argparse.Namespace) -> int:
+    if args.export_cmd == "naowh-build":
+        return _cmd_export_naowh_build(deps, args)
+    from forever.exports.read import read_export
+
+    rep = read_export(deps, args.text)
+    lines = [f"Chaîne {rep['kind']} relue"]
+    if rep["kind"] == "naowh_build":
+        lines[0] = (
+            f"Build Naowh « {rep['name']} » : {rep['class'] or rep['class_id']}, {rep['spec']}, {len(rep['points'])} points"
+        )
+        lines.append("  Ordre : " + ", ".join(k or "?" for k in rep["order"]))
+    _emit(rep, lines, rep["provenance"], args.json)
+    return EXIT_OK
+
+
 def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
     from forever.talents_forever import attach_export, render_export
 
@@ -2597,7 +2670,9 @@ def _cmd_build(deps: Deps, args: argparse.Namespace) -> int:
         talented_bonus=args.talented_bonus,
     )
     rep = attach_export(deps, report, args.talented_bonus)
-    lines = render_build(rep) + render_export(rep["export"]["talents_forever"])
+    from forever.exports.talents import render_naowh
+
+    lines = render_build(rep) + render_export(rep["export"]["talents_forever"]) + render_naowh(rep["export"]["naowh"])
     _emit(rep, lines, rep["provenance"], args.json)
     return EXIT_OK
 
@@ -4376,6 +4451,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "sim": _cmd_sim,
         "chart": _cmd_chart,
         "build": _cmd_build,
+        "export": _cmd_export,
     }
     try:
         return handlers[args.command](deps, args)

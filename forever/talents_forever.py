@@ -597,7 +597,10 @@ def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> B
         export = {k: own.get(k) for k in ("status", "reason", "code", "link", "import")}
         respec = {**respec, "projected": {**projected, "export": export}}
         report = cast(BuildReport, {**report, "respec": respec})
-    return cast(BuildWithExport, {**report, "export": {"talents_forever": block}})
+    from forever.exports.talents import naowh_export
+
+    naowh = naowh_export(deps, MAGE, report["level"], report["talents"], order or None)
+    return cast(BuildWithExport, {**report, "export": {"talents_forever": block, "naowh": naowh}})
 
 
 def render_export(block: Mapping[str, Any]) -> list[str]:
@@ -742,6 +745,7 @@ def _popular_entry(layout: TfLayout, gd: Any, b: Mapping[str, Any]) -> dict[str,
         "legality": "illisible",
         "errors": [],
         "unverifiable": [],
+        "naowh": None,
     }
     try:
         plan = decode(code, layout.max_ranks, layout.slug)
@@ -755,6 +759,11 @@ def _popular_entry(layout: TfLayout, gd: Any, b: Mapping[str, Any]) -> dict[str,
         return entry
     errors = check_class_build(gd.classes[layout.class_name], gd.constants.talents, talents, plan.level)
     entry.update(legality="illégal" if errors else "légal", errors=list(errors))
+    if not errors:  # EX1 : code Naowh Forever du même build, ordre légal généré (aucun ordre dans le code populaire)
+        from forever.exports.talents import compact, naowh_block
+
+        label = f"Talents Forever n° {b.get('rank')} {b.get('lead') or ''}".strip()
+        entry["naowh"] = compact(naowh_block(gd, layout.class_name, plan.level, talents, name=label))
     return entry
 
 
