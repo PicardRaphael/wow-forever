@@ -1536,7 +1536,9 @@ def _position(raw: str | None) -> tuple[int, float, float] | None:
     try:
         ui_map, x, y = int(parts[0]), float(parts[1]), float(parts[2])
     except (ValueError, IndexError) as exc:
-        raise InvalidArgumentError(f"Position illisible : {raw}.", "donner « carte,x,y » : uiMapID puis pourcentages de la carte") from exc
+        raise InvalidArgumentError(
+            f"Position illisible : {raw}.", "donner « carte,x,y » : uiMapID puis pourcentages de la carte"
+        ) from exc
     return ui_map, x, y
 
 
