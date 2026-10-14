@@ -310,6 +310,7 @@ def supervise(
     pid: int | None = None,
     resolve: Callable[[], Path | None] | None = None,
     game_running: Callable[[Path | None, Path | None], bool | None] | None = None,
+    on_switch: Callable[[], object] | None = None,
 ) -> int:
     """Boucle de surveillance jusqu'à `STOP_MARKER` ; rend 0. Une autre surveillance vivante : rend 0 aussitôt.
 
@@ -359,6 +360,11 @@ def supervise(
                 watching = True
                 if resolve is not None and not moving:
                     moving = _follow_choice(cache_dir, journal, resolve, game_running, launched_for)
+                    if moving and on_switch is not None:
+                        try:  # sauvegarde avant la bascule (LN1) : son échec n'arrête pas la surveillance
+                            on_switch()
+                        except OSError as exc:
+                            journal.write("error", where="sauvegarde avant bascule", error=str(exc))
             else:
                 if watching:
                     watching = False
@@ -415,6 +421,18 @@ def _follow_choice(
     return True
 
 
+def backup_before_switch(cache_dir: Path, now: datetime) -> Path:
+    """`forever backup` lancé détaché avec l'interpréteur réel avant une bascule d'installation (LN1) ; rend son
+    journal."""
+    exe, env = spawn.current_interpreter()
+    env = {**env, "FOREVER_CACHE_DIR": str(cache_dir)}
+    log = cache_dir / "bridge" / f"backup-{now:%Y%m%d-%H%M%S}.log"
+    spawn.spawn_detached(
+        [exe, "-u", "-m", "forever", "backup", "--reason", "avant bascule d'installation"], log, env=env
+    )
+    return log
+
+
 def _game_running(old: Path | None, new: Path | None) -> bool | None:
     """Le client d'un des deux dossiers tourne-t-il ? None si la liste des processus est illisible."""
     from forever.pipeline.live_logs import detect_game_running
@@ -465,6 +483,7 @@ def main(argv: list[str] | None = None) -> int:
             journal=journal,
             resolve=None if forced is not None else (lambda: resolve_wow_dir(args.cache_dir)),
             game_running=_game_running,
+            on_switch=lambda: backup_before_switch(args.cache_dir, datetime.now(UTC)),
         )
     except Exception as exc:  # noqa: BLE001 : sans console, l'erreur n'a que le journal
         journal.write("error", where="surveillance", error=f"{type(exc).__name__}: {exc}")
