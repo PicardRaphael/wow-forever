@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
 from forever.engine.model import ClassKnowledge, GameData, Points, TalentRules
@@ -180,3 +181,21 @@ def check_class_build(
             names = " ou ".join(p["name"] for p in sufficient)
             err.append(f"{t['name']} exige {names} au maximum")
     return err
+
+
+def check_order(knowledge: ClassKnowledge, rules: TalentRules, order: Sequence[str]) -> list[str]:
+    """Erreurs d'un ordre de prise, point par point (liste vide : chaque prise est légale au moment où elle est
+    faite) : talent connu, rang maximal, prérequis au maximum avant la prise, points déjà dépensés dans l'arbre
+    pour le palier (comme le contrôle de Naowh Forever, `CheckBuild`).
+
+    Registre : G3"""
+    raise NotImplementedError
+
+
+def legal_order(knowledge: ClassKnowledge, rules: TalentRules, pts: Points) -> list[str]:
+    """Ordre de prise légal d'un build sans ordre (EX1, décision 267) : arbre le plus chargé d'abord, palier
+    croissant, prérequis d'abord, un point par entrée ; `ValueError` en français si aucun ordre légal n'existe.
+    Ce n'est pas un ordre de leveling optimisé.
+
+    Registre : G3"""
+    raise NotImplementedError

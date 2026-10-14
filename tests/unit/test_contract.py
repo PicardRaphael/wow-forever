@@ -115,6 +115,19 @@ CASES = {
     ),
     "usage-sim-no-level": (["sim", "leveling"], 2, None),
     "usage-chart-no-out": (["chart", "leveling"], 2, None),
+    # EX1 : build vers Naowh Forever (ordre généré), build illégal, chaîne illisible
+    "export-naowh-build": (
+        ["export", "naowh-build", "--class", "Mage", "--level", "20", "--talents", "improvedFrostbolt=5"],
+        0,
+        None,
+    ),
+    "export-naowh-build-illegal": (
+        ["export", "naowh-build", "--class", "Mage", "--level", "20", "--talents", "iceLance=1"],
+        2,
+        None,
+    ),
+    "export-read-damaged": (["export", "read", "!NFB1!abc("], 2, None),
+    "usage-export-no-subcommand": (["export"], 2, None),
 }
 
 
