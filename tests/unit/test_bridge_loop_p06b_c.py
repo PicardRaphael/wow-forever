@@ -94,7 +94,7 @@ def test_missing_character_is_proposed_for_creation(setup):
     assert not deps.profile_path.exists()
     send(flags={f"a=profile_apply:{card.id}"}, text="")
     doc = json.loads(deps.profile_path.read_text(encoding="utf-8"))
-    assert doc["schema_version"] == 3 and doc["active"] == "Jen"
+    assert doc["schema_version"] == 4 and doc["active"] == "Jen"  # schéma 4 depuis LN1
     c = read_profile(deps)["character"]
     assert (c["class"], c["race"], c["level"], c["realm"]) == ("Mage", "Orc", 19, "Classic Beta PvE 2")
 

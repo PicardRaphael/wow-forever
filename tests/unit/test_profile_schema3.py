@@ -24,7 +24,7 @@ SHEET = {"spell_power": {"frost": 29, "fire": 29}, "crit": {"spell": 4.18}, "rea
 
 
 def test_schema_and_source_order():
-    assert SCHEMA_VERSION == 3
+    assert SCHEMA_VERSION == 4  # schéma 4 depuis LN1 (personnages archivés, décision 271)
     order = sorted(SOURCE_RANK, key=SOURCE_RANK.__getitem__)
     assert order[:4] == ["joueur", "jeu", "simulationcraft", "ForeverLogger"]
     kept, conflict = merge_field(make_field(18, "simulationcraft", AT), make_field(19, "jeu", AT))
@@ -45,7 +45,7 @@ def test_schema_2_is_read_then_written_as_3(tmp_path, make_deps):
     deps = replace(make_deps(), profile_path=path)
     set_character(deps, "Jen", level=19)
     written = json.loads(path.read_text(encoding="utf-8"))
-    assert written["schema_version"] == 3
+    assert written["schema_version"] == 4  # schéma courant (4 depuis LN1)
     c = read_profile(deps)["character"]
     assert (c["class"], c["level"], c["gear"], c["sheet"]) == ("Mage", 19, {}, {})
 
@@ -59,7 +59,7 @@ def test_apply_game_fields_creates_and_updates(tmp_path):
     assert raw["level"] == {"value": 19, "source": "jeu", "at": AT, "client_build": "1.60.1.70338",
                             "certainty": "certain"}  # fmt: skip
     assert raw["gear"]["value"] == GEAR and raw["talents"]["value"] == {"a": 5}
-    assert load_profile(path)["schema_version"] == 3
+    assert load_profile(path)["schema_version"] == 4  # schéma courant (4 depuis LN1)
     doc = apply_game_fields(path, "Jen", "Royaume", {"sheet": SHEET}, source="simulationcraft", at=AT,
                             client_build="1.60.1.70338")  # fmt: skip
     sheet = doc["characters"]["Jen"]["sheet"]

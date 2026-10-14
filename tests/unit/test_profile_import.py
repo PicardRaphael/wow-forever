@@ -365,8 +365,8 @@ def test_schema_1_profile_is_migrated_on_read(make_deps, tmp_path):
         "certainty": "certain",
     }
     assert c["conflicts"] == []
-    assert load_profile(path)["schema_version"] == 3  # schéma 3 en mémoire (P06b)
+    assert load_profile(path)["schema_version"] == 4  # schéma courant en mémoire (4 depuis LN1)
     assert path.read_bytes() == before  # migré à la lecture seulement
     set_character(deps, "Givrelame", level=24)  # une commande qui écrit réécrit au schéma courant (3 depuis P06b)
-    assert json.loads(path.read_text(encoding="utf-8"))["schema_version"] == 3
+    assert json.loads(path.read_text(encoding="utf-8"))["schema_version"] == 4
     assert read_profile(deps)["character"]["race"] == "Orc"
