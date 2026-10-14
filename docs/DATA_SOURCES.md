@@ -162,6 +162,12 @@ Non conseillés pour l'instant : MobInfo2 (dernier fichier du 2026-09-20, antér
 
 Écartés : addons sans version Forever (Exalted, RepMatic, GrindPlus, HonorSpy, Rank Marshal, What's Crafting?, WhatItDrops…), ForeverQuest (base Classic, licence incohérente : « All Rights Reserved » sur des données de Questie en GPLv3), ForeverWisp (quêtes Classic-DB), AtlasLootClassic Continued (donjons Forever en attente).
 
+**Sources de RX1** (étude du 2026-10-14, décision 266 ; lecture locale, seuls nos agrégats dans le dépôt, décision 133) :
+- **Factoruide** (<https://github.com/brouznouf/factoruide>, 0.8.0, code MIT, `data/` GPL-2.0+ tirée de VMaNGOS, données de Questie sans licence et de Wowhead Forever) : clone superficiel épinglé à `f7da6da` dans `~/.cache/forever/third_party/factoruide`, base `forever.sqlite.zst` décompressée dans le cache ; **recoupement seulement** (`forever quests diff --factoruide`, statut « vue seulement chez Factoruide », `suppose`) ; algorithmes de route portés et cités (option 2).
+- **VMaNGOS** (GPL-2.0, Classic 1.12) : **non téléchargé** ; Questie installé donne déjà les positions « base Classic » (`suppose`).
+- **QuestieDB** (`a4cad87`, 2026-10-12) : trois fichiers lus par `gh api` ; rien de plus que Questie installé pour les quêtes nouvelles.
+- **AllTheThings** (<https://github.com/ATTWoWAddon/AllTheThings>, 5.3.16a du 2026-10-13, MIT ; saveur `forever`, interface 16001, base Forever propre `.contrib/.db/forever/` mise à jour chaque jour) : **candidat à l'installation** (décision 131) pour les quêtes vues seulement chez Factoruide (LVL17), qui le cite comme source ; non installé au 2026-10-14.
+
 ## Notes officielles de Blizzard (T08b, bloc F, décision 148)
 Forum de Blizzard (Discourse), catégories 349 (discussion de la bêta) et 347 (discussion générale de Forever), lu par
 `forever notes` **à la main seulement** (ou proposé par `forever watch` quand le build du client change) ; workflow
