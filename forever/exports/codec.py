@@ -39,6 +39,7 @@ class Limits:
 NAOWH_LIMITS = Limits(max_chars=100_000, max_bytes=1_048_576, max_depth=8, max_values=20_000)
 
 SERIALIZATION_VERSION = 1
+DEFAULT_MAX_DEPTH = 64  # imbrication lue au plus sans bornes données (bien en deçà de la pile de Python)
 READABLE_VERSIONS = (1, 2)
 MAX_INT = 2**53
 COMPRESSION_LEVEL = 9
@@ -281,6 +282,13 @@ class _Reader:
         self.pos = 0
         self.strings: list[str] = []
         self.tables: list[Any] = []
+        self.depth = 0
+        self.max_depth = DEFAULT_MAX_DEPTH
+
+    def enter(self) -> None:
+        self.depth += 1
+        if self.depth > self.max_depth:
+            raise ExportFormatError(f"tables imbriquées au-delà de la profondeur {self.max_depth}")
 
     def take(self, n: int) -> bytes:
         if self.pos + n > len(self.data):
@@ -359,6 +367,7 @@ class _Reader:
 
     def mapping(self, count: int, table: dict[Any, Any], register: bool = True) -> dict[Any, Any]:
         if register:
+            self.enter()
             self.tables.append(table)
         for _ in range(count):
             key = self.value()
@@ -367,24 +376,31 @@ class _Reader:
             if isinstance(key, dict | list):
                 raise ExportFormatError("clé de table qui est une table : refusée")
             table[key] = self.value()
+        if register:
+            self.depth -= 1
         return table
 
     def array(self, count: int) -> list[Any]:
         items: list[Any] = []
+        self.enter()
         self.tables.append(items)
         for _ in range(count):
             items.append(self.value())
+        self.depth -= 1
         return items
 
     def mixed(self, array: int, mapped: int) -> dict[Any, Any]:
         table: dict[Any, Any] = {}
+        self.enter()
         self.tables.append(table)
         for i in range(1, array + 1):
             table[i] = self.value()
-        return self.mapping(mapped, table, register=False)
+        self.mapping(mapped, table, register=False)
+        self.depth -= 1
+        return table
 
 
-def deserialize(data: bytes) -> Any:
+def deserialize(data: bytes, max_depth: int | None = None) -> Any:
     """Octets de LibSerialize → une valeur Python ; références de chaînes et de tables lues ; refus en français d'une
     entrée vide, d'une version inconnue, tronquée, ou qui porte plus d'une valeur."""
     if not data:
@@ -393,6 +409,8 @@ def deserialize(data: bytes) -> Any:
         raise ExportFormatError(f"version de sérialisation inconnue : {data[0]}")
     r = _Reader(data)
     r.pos = 1
+    if max_depth is not None:
+        r.max_depth = max_depth
     value = r.value()
     if r.pos != len(data):
         raise ExportFormatError("plusieurs valeurs sérialisées : une seule attendue")
@@ -436,6 +454,6 @@ def unpack(prefix: str, text: str, limits: Limits = NAOWH_LIMITS) -> Any:
     body = match.group(1)
     if len(body) > limits.max_chars:
         raise ExportFormatError(f"chaîne de plus de {limits.max_chars} caractères")
-    value = deserialize(inflate(decode_for_print(body), limits.max_bytes))
+    value = deserialize(inflate(decode_for_print(body), limits.max_bytes), limits.max_depth)
     _check_plain(value, limits)
     return value

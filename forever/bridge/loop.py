@@ -390,8 +390,12 @@ class Bridge:
         Talents Forever publié (`link`) y figure toujours, en tête."""
         from forever.bridge.exports import typed_link
 
-        found = result.exports.get(prefer or "build") or next(iter(result.exports.values()), [])
-        typed = [dict(e) for e in found]
+        found = (
+            result.exports.get(prefer)
+            if prefer
+            else result.exports.get("build") or next(iter(result.exports.values()), [])
+        )
+        typed = [dict(e) for e in found or []]
         if isinstance(link, str) and not any(e["kind"] == "talents_forever" and e["text"] == link for e in typed):
             typed = [typed_link("talents_forever", link), *(e for e in typed if e["kind"] != "talents_forever")]
         return typed

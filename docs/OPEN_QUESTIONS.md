@@ -481,8 +481,9 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   l'oracle des tests (vraies bibliothèques sous `lupa`) prouve la compatibilité avec les bibliothèques, pas
   l'acceptation par Naowh (contrôle de l'arbre, des paliers et des prérequis à chaque prise). Test (facultatif,
   décision 247) : coller un code `!NFB1!` de forever dans `/nf`, Profiles, Import, et voir le build apparaître dans la
-  fenêtre Training ; exporter un build depuis Naowh et le coller dans le chat (va-et-vient exact). Priorité : moyenne
-  (EX1).
+  fenêtre Training ; exporter un build depuis Naowh et le coller dans le chat (va-et-vient exact). Aussi : Naowh borne un
+  build à 51 points ; au niveau maximal avec le bonus Legacy « Talented », forever refuse le build : Naowh compte-t-il
+  ce bonus ? Priorité : moyenne (EX1).
 - **MAC1 — Sur Forever, `/cast <sort>` sans rang lance-t-il le meilleur rang appris ?** Ajoutée le 2026-10-14 (EX1,
   décision 267) : les macros d'EX1 écrivent `/cast` sans rang (`suppose`). Test (facultatif, décision 247) : une macro
   importée par Naowh, lancée avant et après l'apprentissage d'un nouveau rang. Priorité : basse (EX1).

@@ -35,6 +35,7 @@ CDM_BARS = ("cooldowns", "utility")
 BUFF_ADDON = "EllesmereUIAuraBuffReminders"
 DROPPED_SPEC_KEYS = ("_barFilterModelV6", "_importGhostMode")  # comme l'export d'EllesmereUI
 GHOST_BAR = "__ghost_cd"
+MAX_DEPTH = 64  # imbrication lue au plus dans un profil (bien en deçà de la pile de Python)
 MAX_BYTES = 4 * 1024 * 1024  # borne de lecture d'une chaîne collée (profil complet)
 IMPORT_STEPS = "en jeu : /eui, Profiles, Import, coller le code et nommer le profil « {name} », puis /reload"
 
@@ -81,7 +82,7 @@ def _write(value: Any, out: bytearray) -> None:
     elif isinstance(value, int | float):
         out += b"n" + _number(value) + b";"
     elif isinstance(value, str):
-        raw = value.encode("utf-8")
+        raw = value.encode("utf-8", errors="surrogateescape")
         out += b"s" + str(len(raw)).encode() + b":" + raw
     elif isinstance(value, list | tuple):
         out += b"{"
@@ -96,7 +97,7 @@ def _write(value: Any, out: bytearray) -> None:
         for i in range(1, n + 1):
             _write(value[i], out)
         for key in sorted((k for k in value if not (isinstance(k, int) and 1 <= k <= n)), key=_sort_key):
-            if not isinstance(key, str | int | float) or isinstance(key, bool):
+            if not isinstance(key, str | int | float):
                 raise TypeError(f"clé non sérialisable : {type(key).__name__}")
             out += b"K"
             _write(key, out)
@@ -113,7 +114,7 @@ def ellesmere_serialize(value: Any) -> bytes:
     return bytes(out)
 
 
-def _read(data: bytes, pos: int) -> tuple[Any, int]:
+def _read(data: bytes, pos: int, depth: int = 0) -> tuple[Any, int]:
     if pos >= len(data):
         raise ExportFormatError("profil tronqué")
     tag = data[pos : pos + 1]
@@ -125,7 +126,7 @@ def _read(data: bytes, pos: int) -> tuple[Any, int]:
         raw = data[colon + 1 : colon + 1 + size]
         if len(raw) != size:
             raise ExportFormatError("chaîne tronquée dans le profil")
-        return raw.decode("utf-8", errors="replace"), colon + 1 + size
+        return raw.decode("utf-8", errors="surrogateescape"), colon + 1 + size
     if tag == b"n":
         semi = data.find(b";", pos + 1)
         if semi < 0:
@@ -135,12 +136,16 @@ def _read(data: bytes, pos: int) -> tuple[Any, int]:
             number = float(text)
         except ValueError:
             raise ExportFormatError(f"nombre illisible dans le profil : {text}") from None
+        if not math.isfinite(number):
+            raise ExportFormatError(f"nombre non fini dans le profil : {text}")
         return (int(number) if number.is_integer() and abs(number) < 2**53 else number), semi + 1
     if tag in (b"T", b"F"):
         return tag == b"T", pos + 1
     if tag == b"N":
         return None, pos + 1
     if tag == b"{":
+        if depth + 1 > MAX_DEPTH:
+            raise ExportFormatError(f"tables imbriquées au-delà de la profondeur {MAX_DEPTH}")
         array: list[Any] = []
         pairs: dict[Any, Any] = {}
         p = pos + 1
@@ -152,12 +157,12 @@ def _read(data: bytes, pos: int) -> tuple[Any, int]:
                 p += 1
                 break
             if c == b"K":
-                key, p = _read(data, p + 1)
-                val, p = _read(data, p)
+                key, p = _read(data, p + 1, depth + 1)
+                val, p = _read(data, p, depth + 1)
                 if key is not None:
                     pairs[key] = val
             else:
-                val, p = _read(data, p)
+                val, p = _read(data, p, depth + 1)
                 array.append(val)
         if not pairs:
             return array, p
@@ -295,6 +300,15 @@ def role_spells(
 # --- profil rendu ---------------------------------------------------------------------------------------------------
 
 
+def _as_table(value: Any) -> dict[Any, Any]:
+    """Table nommée : `dict` tel quel, liste vide ou absente → `dict` vide, liste → clés 1..n."""
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, list):
+        return dict(enumerate(value, 1))
+    return {}
+
+
 def ellesmere_profile(
     base: BaseProfile, *, spec_key: str, bars: Mapping[str, Sequence[int]], buff_ids: Sequence[int]
 ) -> dict[str, Any]:
@@ -313,9 +327,10 @@ def ellesmere_profile(
         bar_spells[bar] = current
     spec["barSpells"] = bar_spells
     data["cdmSpells"] = {spec_key: spec}
-    addons = data.setdefault("addons", {})
-    reminders = addons.setdefault(BUFF_ADDON, {})
-    forever = reminders.setdefault("forever", {})
+    # une table vide du profil de base se relit en liste : elle devient une table nommée pour y écrire
+    addons = data["addons"] = _as_table(data.get("addons"))
+    reminders = addons[BUFF_ADDON] = _as_table(addons.get(BUFF_ADDON))
+    forever = reminders["forever"] = _as_table(reminders.get("forever"))
     forever["customIDs"] = list(buff_ids)
     return {
         "version": PAYLOAD_VERSION,

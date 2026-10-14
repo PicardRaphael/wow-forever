@@ -599,7 +599,7 @@ def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> B
         report = cast(BuildReport, {**report, "respec": respec})
     from forever.exports.talents import naowh_export
 
-    naowh = naowh_export(deps, MAGE, report["level"], report["talents"], order or None)
+    naowh = naowh_export(deps, MAGE, report["level"], report["talents"], order or None, talented_bonus=talented_bonus)
     return cast(BuildWithExport, {**report, "export": {"talents_forever": block, "naowh": naowh}})
 
 

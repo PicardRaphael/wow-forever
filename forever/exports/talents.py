@@ -57,6 +57,7 @@ def naowh_block(
     name: str | None = None,
     *,
     order_source: OrderSource = "leveling",
+    talented_bonus: int = 0,
 ) -> dict[str, Any]:
     """Code `!NFB1!` d'un build légal au niveau, sur des données déjà chargées (sans provenance) : ordre donné
     (leveling ou code Talents Forever), contrôlé à chaque prise comme le fait Naowh ; sans ordre, ordre légal généré
@@ -97,7 +98,7 @@ def naowh_block(
     block["class_id"] = knowledge.id
     if not placed:
         return refuse("aucun point placé")
-    errors = check_class_build(knowledge, gd.constants.talents, placed, level)
+    errors = check_class_build(knowledge, gd.constants.talents, placed, level, talented_bonus)
     if errors:
         return refuse(f"build illégal au niveau {level} : {errors[0]}")
     if order:
@@ -142,13 +143,16 @@ def naowh_export(
     name: str | None = None,
     *,
     order_source: OrderSource = "leveling",
+    talented_bonus: int = 0,
 ) -> dict[str, Any]:
     """`naowh_block` sur les données installées, avec sa provenance (CLI, MCP, pont)."""
     from forever.gamedata import build_game_data
     from forever.store import load_version
 
     gd = build_game_data(load_version(deps))
-    block = naowh_block(gd, class_name, level, talents, order, name, order_source=order_source)
+    block = naowh_block(
+        gd, class_name, level, talents, order, name, order_source=order_source, talented_bonus=talented_bonus
+    )
     notes = [f"export bloqué : {block['reason']}"] if block["reason"] else []
     if block["order_note"]:
         notes.append(block["order_note"])
