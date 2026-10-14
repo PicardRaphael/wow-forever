@@ -225,3 +225,23 @@ def read_questie_trainers(addons: Path, title: str) -> list[TrainerNpc]:
                 if x is not None and y is not None:
                     out.append(TrainerNpc(npc_id, name, title, str(sides or ""), ui_map, x, y))
     return out
+
+
+class ProfessionRank(NamedTuple):
+    cap: int  # rang maximal après l'apprentissage
+    skill: int  # compétence requise
+    level: int | None  # niveau requis (None : aucun)
+    name: str
+
+
+class ProfessionData(NamedTuple):
+    skill_line: int
+    name: str
+    trainers: list[TrainerNpc]
+    ranks: list[ProfessionRank]
+
+
+def read_profession_data(addons: Path) -> dict[str, ProfessionData]:
+    """Métiers de Naowh Forever Professions (`Data/RecipeData.lua`) : maîtres et leurs positions, rangs ; clé : nom
+    anglais du métier (tiré du nom des rangs). Vide sans l'addon."""
+    raise NotImplementedError

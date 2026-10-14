@@ -858,3 +858,12 @@ def route_preview(plan: Any) -> dict[str, Any]:
         "certainty": plan["certainty"],
         "stops": len(plan["stops"]),
     }
+
+
+def profession_visits(
+    data: Any, professions: Any, *, faction: str, start_level: int, end_level: int
+) -> dict[str, tuple[int, list[Any]]]:
+    """RX1, bloc H : métiers dont le rang suivant est ouvert (compétence actuelle au moins celle du rang, plafond
+    actuel sous le sien) et dont le niveau requis tombe dans la route : niveau de la visite et maîtres du camp.
+    `professions` : nom -> (rang, rang maximal). La montée de compétence n'est pas simulée (MT1). Registre : I18"""
+    raise NotImplementedError
