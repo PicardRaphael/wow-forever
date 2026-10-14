@@ -19,16 +19,54 @@ Sur chaque PC (Windows), une fois :
 3. Ouvrir un **nouveau** terminal (les variables d'environnement n'arrivent que dans les nouveaux terminaux).
 
 Ce que fait le script (relançable sans risque) :
-- fixe les variables d'environnement utilisateur `FOREVER_HOME` (le dépôt) et `FOREVER_WOW_DIR` (dossier du client,
-  cherché dans `C:\Program Files (x86)\World of Warcraft\_classic_beta_` puis `C:\Program Files\World of Warcraft\_classic_beta_`) ;
-- `uv sync` ;
+- fixe la variable d'environnement utilisateur `FOREVER_HOME` (le dépôt) ;
+- `uv sync`, puis fixe `FOREVER_WOW_DIR` sur l'installation que choisit `forever wow list` (LN1), en demandant
+  l'accord avant de remplacer une autre valeur (`-Print` : afficher le choix sans rien changer) ;
 - déclare la marketplace locale `wow-forever` (le dépôt) et installe le plugin `forever@wow-forever` en portée
   utilisateur ;
 - contrôle : `claude plugin validate --strict` (plugin versionné : la mise à jour recopie le plugin quand la version
   de `plugin.json` change), `forever status --offline`, plugin présent et activé.
 
 Second PC : même procédure. L'addon ForeverLogger s'installe à part : `uv run python scripts/install_addon.py`
-(il lit `FOREVER_WOW_DIR`, sinon cherche le client dans les deux dossiers Program Files).
+(il vise l'installation choisie par `forever wow list`, ou `--wow-dir`).
+
+## Installations, diagnostic et sauvegardes (LN1)
+Pas-à-pas du lancement du 4 novembre, sur chaque PC : `docs/LANCEMENT.md`.
+
+- `forever wow list [--json]` : installations du client trouvées (racines usuelles de chaque disque fixe, parents
+  de `FOREVER_WOW_DIR` et `FOREVER_WOW_FORCE`, `FOREVER_WOW_ROOTS`), leur rôle (`bêta`, `version finale`, `autre
+  jeu`, `inconnu`), produit (lu dans `.flavor.info` et `.build.info`, jamais déduit du nom du dossier), version,
+  exécutable, et l'installation lue avec sa raison. Choix : `--wow-dir`, puis `FOREVER_WOW_FORCE`, puis la version
+  finale adoptée la plus récente, puis la bêta, puis `FOREVER_WOW_DIR`.
+- `forever wow adopt <dossier> [--yes]` : inscrit **une fois** le produit d'un dossier comme version finale (journal
+  des versions du cache, sauvegarde faite avant) ; refuse la bêta, un produit public connu ou un produit illisible.
+  `forever wow forget <produit>` retire l'adoption.
+- `forever doctor [--json]` : contrôle toute l'installation sans réseau, une ligne par contrôle (`[ok]`, `[!]` à
+  corriger, `[x]` bloquant, `[?]` non vérifiable, `[i]` information) et la correction en dessous ; code 7 dès un
+  bloquant. Contrôles : `repo`, `env.python`, `env.state`, `env.uv`, `wow.installs`, `wow.choice`, `wow.unknown`,
+  `wow.env`, `wow.paths`, `addons.logger` (dont l'interface vue en jeu par ForeverLogger 0.7.0), `addons.bridge`,
+  `combatlog`, `addons.data`, `env.vars`, `gh` (jeton présent, validité non contrôlée), `claude` (`claude auth status`
+  réduit à `loggedIn` et `authMethod`, et erreurs d'authentification du journal du pont), `tasks.bridge`,
+  `tasks.update`, `bridge.running`, `bridge.journal`, `profile`, `backup`, `antivirus` (toujours `[?]`),
+  `info.sv_bridge`.
+- `forever backup [--reason …]`, `forever backup list`, `forever backup restore [<date>] [--only profile|wtf|bridge|update|cache] [--yes]` :
+  sauvegarde de ce qui n'est pas sur GitHub (profil, SavedVariables et `Config.wtf`, réglages et conversation
+  « addons » du pont, attentes de `forever update`, journal des versions, dernier instantané des mesures ; jamais un
+  jeton), dans `<racine>\<date>` avec `manifest.json`, 14 gardées. Racine : `FOREVER_BACKUP_DIR`, sinon un disque fixe
+  hors système (d'abord celui dont le nom contient « sauvegarde » ou « backup »), sinon OneDrive connecté, sinon
+  Documents (avertissement). Sauvegarde du jour au passage automatique de `forever update` (jeu fermé), avant
+  `forever wow adopt` et avant toute restauration. La restauration exige le jeu fermé et l'accord, et sauvegarde
+  l'état courant d'abord.
+- `forever profile archive --product <produit> [--yes]`, `forever profile list --archived` : personnages d'un
+  produit (la bêta au lancement) rangés à part, gardés, plus jamais actifs ; un homonyme de la version finale est un
+  nouveau personnage. `forever profile import` lit tous les comptes de l'installation.
+- `forever measures inherited [--version …] [--json]` : PV encore hérités de la version précédente (la bêta), qui
+  sortent de la liste une fois remesurés par les journaux de la version finale. Un journal d'un autre produit que
+  celui des données n'est jamais mesuré sans `--accept-version`.
+- Variables : `FOREVER_WOW_DIR` (installation lue, fixée par le script d'installation), `FOREVER_WOW_FORCE` (dossier
+  forcé), `FOREVER_WOW_ROOTS` (racines « World of Warcraft » de plus, séparées par `;`), `FOREVER_BACKUP_DIR`,
+  `FOREVER_CACHE_DIR` (cache, défaut `~\.cache\forever`), `FOREVER_PROFILE` (profil, défaut
+  `~\.forever\profile.json`), `FOREVER_HOME` (dépôt).
 
 ## Mise à jour
 ```powershell
@@ -187,7 +225,10 @@ Files\Python313\python.exe` dans l'environnement du dépôt), jamais avec le lan
 ce lanceur retient l'interpréteur dans un objet de tâche et l'emporte quand on le tue (c'est ainsi que les ponts
 lancés d'un terminal mouraient avec lui). Un pont mort est relancé aussitôt ; s'il meurt dans la minute, l'attente
 double à chaque essai (30 s, 1 min, 2 min…, 30 min au plus). Journal du pont : `autostart_start`, `autostart_launch`,
-`autostart_bridge_down`, `autostart_stop`. Au repos, jeu fermé ou en arrière-plan, le pont ne capture rien : jeu
+`autostart_bridge_down`, `autostart_stop`, `autostart_env_error` (environnement du projet incomplet : `uv sync`,
+décision 241), `autostart_skip` (une autre surveillance tourne déjà) et, depuis LN1, `autostart_wow_changed`
+(installation choisie changée : jeu fermé, le pont est arrêté puis relancé sur la nouvelle ; une tâche créée sans
+`--wow-dir` suit le choix, une tâche avec `--wow-dir` garde ce dossier). Au repos, jeu fermé ou en arrière-plan, le pont ne capture rien : jeu
 fermé, il cherche la fenêtre du jeu toutes les 3 secondes et ne se réveille qu'une fois par seconde ; il relit la
 liste des sauvegardes toutes les 30 secondes et réécrit la réserve toutes les 10 minutes. Mesure du 2026-10-09
 (jeu fermé, 11 min, un rafraîchissement compris) : pont 0,61 s de processeur, soit 0,09 % d'un cœur (0,22 % avant ces

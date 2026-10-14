@@ -530,8 +530,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   Priorité : haute le 4 novembre.
 - **LNC2 — La version finale s'installe-t-elle à côté de la bêta (même racine) ou la remplace-t-elle ?** La découverte
   gère les deux cas (`forever wow list`). Test : `forever wow list` le 4 novembre. Priorité : basse.
-- **LNC3 — `claude auth status` voit-il une session expirée sans réseau ?** `forever doctor` croise sa réponse
-  (`loggedIn`) et les erreurs d'authentification du journal du pont. Test : relevé au bloc D de LN1, puis à la
+- **LNC3 — `claude auth status` voit-il une session expirée sans réseau ?** *Modifiée le 2026-10-14 (bloc D de
+  LN1)* : la commande est locale (réponse en 0,2 s derrière un proxy inexistant) ; elle dit qu'une session est
+  enregistrée, pas qu'elle est encore acceptée par le serveur. `forever doctor` croise donc sa réponse
+  (`loggedIn`) et les erreurs d'authentification du journal du pont. Reste à voir : ce que rend la commande à la
   prochaine expiration réelle. Priorité : basse.
 
 ## Legacy et API

@@ -24,11 +24,12 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
 - `pcall` autour de **chaque** `RegisterEvent` : [Certain] sur Forever, un événement inconnu lève une erreur et interrompt le fichier. `pcall` aussi autour de chaque API incertaine (talents `C_Traits`, bonus des sorts, critique) ; une valeur secrète ou une erreur donne un champ absent, jamais une erreur visible.
 - **Aucun abonnement au journal de combat** : [Certain, mesuré sur Forever] `COMBAT_LOG_EVENT` et `COMBAT_LOG_EVENT_UNFILTERED` sont refusés (`ADDON_ACTION_FORBIDDEN`, même hors combat). L'addon ne lit ni n'analyse aucun combat ; l'analyse se fait toujours hors du jeu, sur `WoWCombatLog-*.txt`.
 - Aucun chiffre de jeu dans `addon/` (`scripts/check_game_numbers.py` couvre `.lua` et `.toc`).
-- `.toc` : `## Interface: 16001`, une directive par ligne, fichiers listés présents.
+- `.toc` : `## Interface` aux valeurs admises de `forever.toc.INTERFACES` (aujourd'hui `16001` ; plusieurs valeurs
+  séparées par des virgules acceptées si toutes sont admises, LN1), une directive par ligne, fichiers listés présents.
 
 ## 3. Plateforme
 - [Certain] Forever partage l'architecture d'interface de Mainline et la grande majorité des API de 12.1.5 ; les restrictions de Midnight (valeurs secrètes) y sont actives.
-- [Certain] Interface `16001` ; le client cherche `<Addon>_Camelot.toc` avant le `.toc` sans suffixe (Blizzard parle de renommer « Camelot » avant le lancement : [À vérifier] au lancement).
+- [Certain] Interface `16001` ; le client cherche `<Addon>_Camelot.toc` avant le `.toc` sans suffixe (Blizzard parle de renommer « Camelot » avant le lancement : [À vérifier] au lancement). LN1 : ordre lu par forever `_Forever`, `_Camelot`, `_Mainline`, sans suffixe (warcraft.wiki.gg `TOC_format`, 2026-10-09, `forever/toc.py`) ; nos `.toc` restent sans suffixe tant que la version finale n'en exige pas ; numéro d'interface de la version finale relevé en jeu (`/dump select(4, GetBuildInfo())`) et ajouté à `forever.toc.INTERFACES` le 4 novembre (`docs/LANCEMENT.md`, question LNC1), jamais deviné. **ForeverLogger 0.7.0** : chaque instantané note `client` (`version`, `build`, `interface` de `GetBuildInfo`, sous `pcall`), comparé aux `.toc` par `forever doctor`.
 - [Certain] `WOW_PROJECT_ID == WOW_PROJECT_MAINLINE` ; l'en-tête du journal de combat porte `PROJECT_ID 18` : deux identifiants différents [Supposé] (vérifier avec `/dump WOW_PROJECT_ID`).
 - [Certain] Fonctions globales anciennes disparues (`GetItemInfo`, `GetSpellInfo`, `GetTalentInfo`…) : utiliser `C_Item`, `C_Spell`, `C_Traits`.
 - [Certain] Valeurs secrètes : les informations de combat sont affichables mais pas « connues » ; `UnitHealth` et `UnitPower` secrets même hors combat ; barres d'incantation fonctionnelles.

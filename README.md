@@ -134,10 +134,12 @@ après coup.
 | Variable | À quoi elle sert | Valeur |
 |---|---|---|
 | `FOREVER_HOME` | Dit au plugin où trouver le dépôt. Le plugin est installé au niveau utilisateur, il faut donc lui indiquer le code. **Sans elle, rien ne répond hors du dépôt.** | Le dossier du clone |
-| `FOREVER_WOW_DIR` | Dossier du client du jeu, lu en lecture seule (journaux de combat, addons, sauvegardes) | Par défaut la bêta trouvée sous `Program Files (x86)` ou `Program Files` |
+| `FOREVER_WOW_DIR` | Dossier du client du jeu, lu en lecture seule (journaux de combat, addons, sauvegardes) | L'installation choisie par `forever wow list` : la version finale adoptée, sinon la bêta (LN1) |
 | `FOREVER_PROFILE` | Fichier de mon profil de personnages. Il vit **hors du dépôt** : c'est une donnée personnelle | Par défaut `%USERPROFILE%\.forever\profile.json` |
 
 Les deux premières sont posées par le script d'installation ; la troisième ne se règle que pour déplacer le profil.
+D'autres variables servent au lancement et aux sauvegardes (`FOREVER_WOW_FORCE`, `FOREVER_WOW_ROOTS`,
+`FOREVER_BACKUP_DIR`) : [docs/USAGE.md](docs/USAGE.md), section « Installations, diagnostic et sauvegardes ».
 
 ### L'addon ForeverLogger
 
@@ -154,6 +156,7 @@ combat en jeu. Les règles complètes : [docs/ADDON.md](docs/ADDON.md).
 
 La même procédure, à l'identique : cloner, lancer le script, ouvrir un nouveau terminal, installer l'addon. Le profil
 des personnages n'est pas dans le dépôt : il se recopie à la main, ou se refait avec `forever profile set`.
+Jour du lancement (4 novembre) : [docs/LANCEMENT.md](docs/LANCEMENT.md), une section par PC.
 
 ### Mettre à jour
 
@@ -312,6 +315,7 @@ vérifie qu'il l'a fait.
 
 | Symptôme | Cause et remède |
 |---|---|
+| Quelque chose ne marche plus (pont, tâches, addons, Claude Code) | `uv run forever doctor` : une ligne par contrôle, sans réseau, et la correction sous chaque problème. Après une remise à zéro du PC : `docs/LANCEMENT.md`, section « Remise à zéro du PC », puis `forever backup restore`. |
 | Le plugin ne tient pas compte d'une mise à jour | **Redémarrer Claude Code.** Un plugin déjà chargé garde sa version en mémoire ; après `git pull` + script d'installation, il faut une nouvelle session. |
 | « Le serveur forever ne répond pas » | `FOREVER_HOME` est absent ou faux (le dépôt a été déplacé ou renommé). Relancer `scripts\install_plugin.ps1` **depuis le dépôt**, puis ouvrir un nouveau terminal. Vérifier avec `echo $env:FOREVER_HOME`. |
 | Rien ne répond hors du dépôt, tout marche dedans | Même cause : sans `FOREVER_HOME`, le plugin ne retrouve le code que lorsqu'il est chargé sur place. |
