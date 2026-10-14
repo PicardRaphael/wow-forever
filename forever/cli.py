@@ -908,6 +908,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     pets_measure.add_argument("--addon-sv", required=True, help="SavedVariables ForeverLogger.lua")
 
+    doctor = sub.add_parser("doctor", help="contrôle de toute l'installation, sans réseau, avec la correction (LN1)")
+    doctor.add_argument("--json", action="store_true", help="sortie JSON")
+
     backup = sub.add_parser("backup", help="sauvegarder ce qui n'est pas sur GitHub ; list, restore (LN1)")
     backup.add_argument("--reason", default="à la main", help="raison notée dans la sauvegarde")
     backup.add_argument("--json", action="store_true", help="sortie JSON")
@@ -4654,6 +4657,26 @@ def _cmd_wow(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_doctor(deps: Deps, args: argparse.Namespace) -> int:
+    from forever import doctor, doctor_probes
+
+    checks = doctor.run_checks(deps, doctor_probes.default_probes())
+    unknown = [c.id for c in checks if c.status == "unknown"]
+    assumptions = ["contrôles locaux, sans réseau"]
+    if unknown:
+        assumptions.append(f"non vérifié ici : {', '.join(unknown)}")
+    provenance = local_provenance(deps, assumptions=assumptions)
+    counts = doctor.summary(checks)
+    lines = [line for c in checks for line in c.lines()]
+    lines.append(
+        f"Bilan : {counts['ok']} ok, {counts['warn']} à corriger, {counts['fail']} bloquant(s), "
+        f"{counts['unknown']} non vérifié(s), {counts['info']} information(s)"
+    )
+    payload = {"checks": [c.as_dict() for c in checks], "summary": counts, "provenance": provenance}
+    _emit(payload, lines, provenance, args.json)
+    return doctor.exit_code(checks)
+
+
 def _cmd_backup(deps: Deps, args: argparse.Namespace) -> int:
     root, warning = default_backup_root(deps)
     provenance = local_provenance(deps, assumptions=[warning] if warning else [])
@@ -4781,6 +4804,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "export": _cmd_export,
         "wow": _cmd_wow,
         "backup": _cmd_backup,
+        "doctor": _cmd_doctor,
     }
     try:
         return handlers[args.command](deps, args)
