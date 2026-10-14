@@ -188,8 +188,10 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   « absent » ; aucune ne touche un bijou PvP de `pvp_items.json`. Test : lecture des tables d'objets (T10).
   Priorité : basse.
   [Détail](research/questions-ouvertes-detail.md#don3)
-- **DON4 — Quel produit TACT au lancement (`wow_classic_forever` ?) ?** Test : `.build.info` après le lancement du
-  4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don4)
+- **DON4 — Quel produit TACT au lancement ?** *Modifiée le 2026-10-14 (LN1, décision 271)* : le produit n'est plus
+  deviné ; il est lu dans `.build.info` et `.flavor.info`, signalé « inconnu » par `forever wow list` et `forever
+  doctor`, puis adopté une fois par `forever wow adopt <dossier>`. Test : `forever wow list` le 4 novembre
+  (`docs/LANCEMENT.md`). Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don4)
 - **DON6 — Quelles tables portent les pièges, totems et portails ?** Test : inventaire des tables `GameObjects` et
   `Creature*`. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#don6)
 - **DON7 — Que disent les conditions d'emploi des sorts (posture, forme, camouflage) et les durées à points de
@@ -520,6 +522,17 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **BR7 — Combien de tours de carrousel faut-il pour un export de 9 parties à une case par pixel ?** Une capture faite
   pendant le changement de partie est rejetée par la somme de contrôle de la bande. Test : sonde G (journal du pont,
   événements `parts`). Priorité : moyenne.
+
+## Lancement (LN1)
+- **LNC1 — La version finale lit-elle encore les `.toc` sans suffixe, et quel numéro d'interface rend-elle ?** Nos
+  `.toc` restent sans suffixe tant que le client n'en exige pas ; le numéro s'ajoute aux valeurs admises après lecture
+  en jeu (`/dump select(4, GetBuildInfo())`), jamais deviné. Test : étape de `docs/LANCEMENT.md` le 4 novembre.
+  Priorité : haute le 4 novembre.
+- **LNC2 — La version finale s'installe-t-elle à côté de la bêta (même racine) ou la remplace-t-elle ?** La découverte
+  gère les deux cas (`forever wow list`). Test : `forever wow list` le 4 novembre. Priorité : basse.
+- **LNC3 — `claude auth status` voit-il une session expirée sans réseau ?** `forever doctor` croise sa réponse
+  (`loggedIn`) et les erreurs d'authentification du journal du pont. Test : relevé au bloc D de LN1, puis à la
+  prochaine expiration réelle. Priorité : basse.
 
 ## Legacy et API
 - **LEG1 — Comment est fait Legacy (arbres, défis, état en bêta et au lancement, tables, API d'addon) ?**
