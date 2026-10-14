@@ -28,6 +28,7 @@ Puis :
 - Égalité : si `next_step.decided_by` vaut `non_departage` ou `modelise`, dis que le choix est à égalité statistique (non départagé par le calcul) et nomme `next_step.runner_up` et les autres candidats dont l'écart (`next_step.candidates[].gap.significant`) n'est pas significatif.
 - Lien Talents Forever : celui de `respec.projected.export` (build actuel plus ce point), tel quel.
 - Build, en complément, après le prochain point : le chemin part de ton niveau et de ton build actuels (temps cumulé, décision 220). Respec : si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, dis que le build d'une respec (`respec.versus_optimal.optimal_rotation`) n'apporte aucun gain mesurable et que tu gardes ton build ; si `stability.stable` est faux, ajoute que le build retenu est instable (il change avec la graine). Si `respec.versus_optimal.current_better` est vrai, dis que ton build actuel est meilleur que le build d'une respec et que tu le gardes. Sinon, donne l'écart (`respec.versus_optimal`) et le conseil de respec (`respec.verdict`).
+- Code Naowh du build (`export.naowh` ou `respec.projected.export.naowh` s'il y est) tel quel, à coller dans Naowh Forever, Training, Builds, Import, pour suivre l'ordre de prise « Level by level ».
 
 Question posée par le bouton « talents » de la fenêtre :
 Quel est mon prochain talent, avec le lien Talents Forever ?
