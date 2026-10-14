@@ -75,3 +75,70 @@ le niveau 15 sont impossibles dans le rejeu. Les tranches 1 → 22 sont les plus
 
 Quand le joueur suivra un guide payant en jouant, la comparaison se fera sur ses mesures réelles (ForeverLogger,
 niveau par niveau), jamais sur le guide lui-même (décision 268).
+
+## Recette des routes 1 → 10 (CJ1, décision 279, 2026-10-14)
+
+`forever route recette` sur les 56 combinaisons race et classe jouables (`races.json`), données 1.60.1.70374, parcours gratuits de RestedXP 4.11.23 lus en local et rejoués par nos règles depuis le même départ (zone de départ de la race) ; temps par monstre au camp pour les routes ; donjons et quêtes de classe inclus par défaut. Acceptée : mêmes zones et au plus trois différences, chacune expliquée. Chiffres seulement, aucun texte de guide.
+
+Bilan : notre calcul accepté **7 fois sur 56** ; base adaptée acceptée **56 fois sur 56** ; la route livrée est donc la base adaptée partout où notre calcul est refusé.
+
+| Race | Classe | Notre calcul | Différences | Parcours rejoué | Base adaptée | Ajouts de la base | Route livrée |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Human | Warrior | refusée, 2.4 h | 16 (14 sans explication ; zones différentes) | 2.9 h | acceptée, 2.9 h | aucun | base adaptée |
+| Human | Paladin | refusée, 2.4 h | 14 (12 sans explication ; zones identiques) | 3.1 h | acceptée, 3.1 h | aucun | base adaptée |
+| Human | Hunter | refusée, 3.9 h | 16 (16 sans explication ; zones identiques) | 4.2 h | acceptée, 4.2 h | aucun | base adaptée |
+| Human | Rogue | refusée, 2.4 h | 14 (12 sans explication ; zones identiques) | 3.0 h | acceptée, 3.0 h | aucun | base adaptée |
+| Human | Priest | refusée, 2.2 h | 13 (12 sans explication ; zones différentes) | 3.2 h | acceptée, 3.2 h | aucun | base adaptée |
+| Human | Mage | refusée, 2.6 h | 11 (9 sans explication ; zones identiques) | 3.8 h | acceptée, 3.8 h | aucun | base adaptée |
+| Human | Warlock | refusée, 2.3 h | 15 (14 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | 1 quête de classe | base adaptée |
+| Orc | Warrior | refusée, 2.0 h | 22 (20 sans explication ; zones identiques) | 2.7 h | acceptée, 2.7 h | aucun | base adaptée |
+| Orc | Hunter | refusée, 2.0 h | 16 (14 sans explication ; zones identiques) | 3.4 h | acceptée, 3.4 h | 1 quête de classe | base adaptée |
+| Orc | Rogue | refusée, 2.0 h | 22 (20 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | aucun | base adaptée |
+| Orc | Shaman | refusée, 1.8 h | 23 (20 sans explication ; zones différentes) | 3.4 h | acceptée, 3.4 h | 3 quête de classe | base adaptée |
+| Orc | Mage | acceptée, 3.5 h | 0 (0 sans explication ; zones identiques) | 3.5 h | acceptée, 3.5 h | aucun | notre calcul |
+| Orc | Warlock | refusée, 1.5 h | 19 (17 sans explication ; zones identiques) | 2.9 h | acceptée, 2.9 h | 1 quête de classe | base adaptée |
+| Dwarf | Warrior | refusée, 2.9 h | 21 (20 sans explication ; zones différentes) | 3.0 h | acceptée, 3.0 h | 1 quête de classe | base adaptée |
+| Dwarf | Paladin | refusée, 2.9 h | 21 (20 sans explication ; zones différentes) | 2.7 h | acceptée, 2.7 h | 1 quête de classe | base adaptée |
+| Dwarf | Hunter | acceptée, 3.2 h | 0 (0 sans explication ; zones identiques) | 3.2 h | acceptée, 3.2 h | 1 quête de classe | notre calcul |
+| Dwarf | Rogue | refusée, 2.8 h | 21 (20 sans explication ; zones différentes) | 2.9 h | acceptée, 2.9 h | aucun | base adaptée |
+| Dwarf | Priest | refusée, 2.5 h | 24 (22 sans explication ; zones différentes) | 3.0 h | acceptée, 3.0 h | 1 quête de classe | base adaptée |
+| Dwarf | Shaman | refusée, 2.9 h | 22 (21 sans explication ; zones identiques) | 2.9 h | acceptée, 2.9 h | 1 quête de classe | base adaptée |
+| Night Elf | Warrior | acceptée, 2.1 h | 0 (0 sans explication ; zones identiques) | 2.1 h | acceptée, 2.1 h | aucun | notre calcul |
+| Night Elf | Hunter | acceptée, 2.8 h | 0 (0 sans explication ; zones identiques) | 3.0 h | acceptée, 3.0 h | aucun | notre calcul |
+| Night Elf | Rogue | refusée, 2.1 h | 2 (1 sans explication ; zones identiques) | 2.1 h | acceptée, 2.0 h | 1 quête de classe | base adaptée |
+| Night Elf | Priest | refusée, 2.2 h | 1 (1 sans explication ; zones identiques) | 2.1 h | acceptée, 2.1 h | 2 quête de classe | base adaptée |
+| Night Elf | Druid | acceptée, 2.1 h | 0 (0 sans explication ; zones identiques) | 2.2 h | acceptée, 2.2 h | aucun | notre calcul |
+| Undead | Warrior | refusée, 2.5 h | 18 (17 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | aucun | base adaptée |
+| Undead | Paladin | refusée, 2.5 h | 17 (17 sans explication ; zones identiques) | 2.7 h | acceptée, 2.7 h | aucun | base adaptée |
+| Undead | Rogue | refusée, 2.5 h | 18 (17 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | aucun | base adaptée |
+| Undead | Priest | refusée, 2.5 h | 18 (17 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | aucun | base adaptée |
+| Undead | Mage | acceptée, 3.5 h | 0 (0 sans explication ; zones identiques) | 3.5 h | acceptée, 3.5 h | 1 quête de classe | notre calcul |
+| Undead | Warlock | refusée, 2.5 h | 16 (15 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | 3 quête de classe | base adaptée |
+| Tauren | Warrior | refusée, 4.1 h | 8 (7 sans explication ; zones identiques) | 3.5 h | acceptée, 3.5 h | aucun | base adaptée |
+| Tauren | Hunter | refusée, 4.3 h | 7 (6 sans explication ; zones identiques) | 4.1 h | acceptée, 4.1 h | 1 quête de classe | base adaptée |
+| Tauren | Shaman | refusée, 4.4 h | 8 (7 sans explication ; zones identiques) | 3.8 h | acceptée, 3.8 h | 7 quête de classe | base adaptée |
+| Tauren | Druid | refusée, 4.1 h | 8 (7 sans explication ; zones identiques) | 3.5 h | acceptée, 3.5 h | 1 quête de classe | base adaptée |
+| Gnome | Warrior | refusée, 2.9 h | 21 (20 sans explication ; zones différentes) | 3.0 h | acceptée, 3.0 h | 1 quête de classe | base adaptée |
+| Gnome | Rogue | refusée, 2.8 h | 21 (20 sans explication ; zones différentes) | 2.9 h | acceptée, 2.9 h | aucun | base adaptée |
+| Gnome | Priest | refusée, 2.8 h | 20 (20 sans explication ; zones différentes) | 3.0 h | acceptée, 3.0 h | aucun | base adaptée |
+| Gnome | Mage | refusée, 3.2 h | 12 (10 sans explication ; zones identiques) | 3.1 h | acceptée, 3.1 h | aucun | base adaptée |
+| Gnome | Warlock | refusée, 2.8 h | 21 (20 sans explication ; zones différentes) | 3.4 h | acceptée, 3.4 h | 1 quête de classe | base adaptée |
+| Troll | Warrior | refusée, 2.0 h | 22 (20 sans explication ; zones identiques) | 2.7 h | acceptée, 2.7 h | aucun | base adaptée |
+| Troll | Hunter | refusée, 2.0 h | 16 (14 sans explication ; zones identiques) | 3.4 h | acceptée, 3.4 h | 1 quête de classe | base adaptée |
+| Troll | Rogue | refusée, 2.0 h | 22 (20 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | aucun | base adaptée |
+| Troll | Priest | refusée, 2.1 h | 25 (22 sans explication ; zones identiques) | 2.8 h | acceptée, 2.8 h | aucun | base adaptée |
+| Troll | Shaman | refusée, 1.8 h | 23 (20 sans explication ; zones différentes) | 3.4 h | acceptée, 3.4 h | 4 quête de classe | base adaptée |
+| Troll | Mage | acceptée, 3.5 h | 0 (0 sans explication ; zones identiques) | 3.5 h | acceptée, 3.5 h | 1 quête de classe | notre calcul |
+| Troll | Warlock | refusée, 1.5 h | 19 (17 sans explication ; zones identiques) | 2.9 h | acceptée, 2.9 h | 2 quête de classe | base adaptée |
+| High Order Skyborne | Warrior | refusée, 5.4 h | 24 (22 sans explication ; zones identiques) | 5.7 h | acceptée, 5.7 h | 1 quête de classe | base adaptée |
+| High Order Skyborne | Hunter | refusée, 5.8 h | 24 (23 sans explication ; zones identiques) | 6.3 h | acceptée, 6.3 h | aucun | base adaptée |
+| High Order Skyborne | Rogue | refusée, 5.4 h | 24 (22 sans explication ; zones identiques) | 5.7 h | acceptée, 5.7 h | aucun | base adaptée |
+| High Order Skyborne | Mage | refusée, 4.1 h | 1 (1 sans explication ; zones différentes) | 3.5 h | acceptée, 3.5 h | aucun | base adaptée |
+| High Order Skyborne | Druid | refusée, 5.0 h | 24 (22 sans explication ; zones identiques) | 5.3 h | acceptée, 5.3 h | aucun | base adaptée |
+| Windshaper Skyborne | Warrior | refusée, 3.4 h | 27 (27 sans explication ; zones identiques) | 3.8 h | acceptée, 3.8 h | aucun | base adaptée |
+| Windshaper Skyborne | Hunter | refusée, 4.2 h | 32 (32 sans explication ; zones identiques) | 4.3 h | acceptée, 4.3 h | 1 quête de classe | base adaptée |
+| Windshaper Skyborne | Rogue | refusée, 5.5 h | 26 (24 sans explication ; zones identiques) | 5.9 h | acceptée, 5.9 h | aucun | base adaptée |
+| Windshaper Skyborne | Shaman | refusée, 3.7 h | 31 (31 sans explication ; zones identiques) | 3.9 h | acceptée, 3.9 h | 6 quête de classe | base adaptée |
+| Windshaper Skyborne | Druid | refusée, 3.6 h | 27 (27 sans explication ; zones identiques) | 3.9 h | acceptée, 3.9 h | 1 quête de classe | base adaptée |
+
+Lecture : notre calcul prend surtout d'autres quêtes que le parcours (les différences sans explication sont des quêtes prises d'un seul côté) ; il est plus court sur le papier, mais la décision 279 juge la ressemblance, pas le temps simulé. Le réglage de l'optimiseur (CJ1, bloc 1e) vise à faire accepter notre calcul ; d'ici là, la base adaptée est livrée, avec l'attribution à RestedXP dans le guide.
