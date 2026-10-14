@@ -20,13 +20,18 @@ Question personnelle : `forever_player_profile` d'abord (classe, camp, niveau). 
 le calcul (classe, camp, niveau de départ et d'arrivée), jamais devinée.
 
 ## Outil
-- `forever_route(action="plan", class_name, faction, start_level, end_level, dungeons="auto", class_quests=True,
-  exclude=[…], include=[…], professions=["Nom:rang:max"])` : plan et `preview` (niveaux, `hours`, `xp_h`, donjons placés, récompenses, bonus
-  rappelés, certitude, nombre d'arrêts) ; `stops` : arrêts dans l'ordre (`kind` : accept, objective, turnin,
+- `forever_route(action="plan", class_name, faction, start_level, end_level, race, character, start_map, start_x,
+  start_y, dungeons="auto", class_quests=True, exclude=[…], include=[…], professions=["Nom:rang:max"])` : `race` et
+  `character` du profil toujours donnés (zone de départ de la race, quêtes déjà faites du personnage retirées),
+  position si connue ; donjons avec leurs quêtes et quêtes de classe inclus par défaut ; plan et `preview` (niveaux,
+  `hours`, `xp_h`, donjons placés, récompenses, bonus rappelés, certitude, nombre d'arrêts, `basis`) ; `basis` dit la
+  route livrée : notre calcul s'il ressemble au parcours gratuit de RestedXP de la race et de la classe, sinon ce
+  parcours adapté (attribution à RestedXP, décision 279) ; `stops` : arrêts dans l'ordre (`kind` : accept, objective, turnin,
   dungeon, dungeon_repeat, train, prof, grind ; `name`, `zone`, `x`, `y`, `level`, `xp`, `certainty`) ; `warnings` : quêtes
   écartées et pourquoi ; `id` du plan.
 - `forever_route(action="show", plan_id)` : relire un plan ; `forever_route(action="guide", plan_id)` : texte du guide
-  RestedXP (à importer dans RestedXP, ou livré en jeu par le bouton « Livrer dans RestedXP » du pont).
+  RestedXP, nom stable « Forever · <personnage> · a-b » (livré en jeu par « Valider et livrer » sous l'aperçu ;
+  `forever route rxp-clean`, jeu fermé, retire de RestedXP les routes livrées).
 
 - Métiers : `professions` (« Nom:rang:rang maximal » en anglais, lus dans `forever_player_profile` ou demandés) ;
   la route place une visite au maître quand le rang suivant est déjà ouvert ; elle ne monte pas la compétence.

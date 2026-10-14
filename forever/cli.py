@@ -440,6 +440,12 @@ def build_parser() -> argparse.ArgumentParser:
     r_guide.add_argument("id", help="identifiant rendu par forever route plan")
     r_guide.add_argument("--out", help="fichier où écrire le guide (défaut : sortie standard)")
     r_guide.add_argument("--json", action="store_true", help="sortie JSON")
+    r_clean = route_sub.add_parser(
+        "rxp-clean",
+        help="retirer de RestedXP les routes livrées par forever (groupe Forever Routes), jeu fermé ; à blanc par défaut",
+    )
+    r_clean.add_argument("--apply", action="store_true", help="retirer vraiment (jeu fermé, copie datée avant)")
+    r_clean.add_argument("--json", action="store_true", help="sortie JSON")
     r_recette = route_sub.add_parser(
         "recette",
         help="accepter ou refuser nos routes face au parcours gratuit de RestedXP de la même race et classe (décision 279)",
@@ -1469,6 +1475,35 @@ def _route_rxp_compare(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _route_rxp_clean(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever route rxp-clean` : routes de forever dans les sauvegardes de RestedXP, listées ou retirées (CJ1)."""
+    from forever.provenance import local_provenance
+    from forever.rxp_clean import clean_rxp_routes
+
+    out = clean_rxp_routes(
+        deps.wow_dir,
+        apply=args.apply,
+        backup_dir=deps.cache_dir / "backups" / "rxp",
+        game_running=deps.game_running,
+    )
+    provenance = local_provenance(
+        deps,
+        certainty="probable",
+        assumptions=[
+            (
+                "sauvegardes de RestedXP lues en local (RXPDB) ; seules les entrées du groupe « Forever Routes » sont "
+                "visées ; jeu fermé exigé pour écrire, copie datée avant, relecture identique hors de ces entrées"
+            )
+        ],
+    )
+    lines = [out["message"]]
+    for row in out["files"]:
+        keys = row.get("removed", row["keys"])
+        lines.append(f"  {row['path']} : {len(keys)} route(s)" + (f" ({', '.join(keys)})" if keys else ""))
+    _emit({**out, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _route_recette(deps: Deps, args: argparse.Namespace) -> int:
     """`forever route recette` : verdict de la décision 279 pour chaque race et classe jouable (races.json)."""
     from forever.compare import route_recette
@@ -1563,6 +1598,8 @@ def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
         return _route_rxp_compare(deps, args)
     if args.route_command == "recette":
         return _route_recette(deps, args)
+    if args.route_command == "rxp-clean":
+        return _route_rxp_clean(deps, args)
     if args.route_command == "rxp-coverage":
         from forever.compare import rxp_coverage
 

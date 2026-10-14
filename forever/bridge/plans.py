@@ -260,9 +260,11 @@ def button_plan(key: str, r: Resolved, level_cap: int | None) -> Plan | None:
                 "pour les avertissements (`warnings`) s'il y en a."
             ),
             (
-                "Les questions de la feuille de route attendent le joueur dans À valider : à chaque « Réponse : … », "
-                "rappelle forever_route avec l'option changée (`end_level`, `dungeons` « none », `class_quests`) et "
-                "redonne l'aperçu ; « Livrer dans RestedXP » livre le dernier plan."
+                "La question suivante (nombre de niveaux) et le bouton « Valider et livrer » apparaissent sous ta "
+                "réponse, posés par le pont : ne les répète pas et ne parle pas de « À valider ». Donjons avec leurs "
+                "quêtes et quêtes de classe sont inclus par défaut. À chaque « Réponse : … », rappelle forever_route "
+                "avec l'option changée et redonne l'aperçu (il remplace le précédent) ; dis la base de la route "
+                "(`basis.verdict`) en une ligne."
             ),
         )
         return Plan(key, (Call("forever_route", route_args),), read)

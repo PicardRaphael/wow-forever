@@ -584,6 +584,17 @@ dans `uv run forever bridge autostart status`, puis `schtasks /Run /TN "WoW Fore
 4. Ce qui ne change pas encore (blocs suivants) : questions dans « À valider », deux aperçus possibles, nom du guide
    livré, vols et pierre de foyer absents des trajets. À dire si autre chose cloche ; sinon : « CJ-1 accepté ».
 
+#### Essai CJ-2 : conversation de la feuille de route (CJ1, bloc 2, décision 273 ; avant la fin de la bêta, sinon à la sortie)
+Préparation, jeu fermé : `uv run forever bridge install`, `uv run forever route rxp-clean --apply` (retire l'ancienne
+route « Forever Mage 1-10 »), pont arrêté puis relancé (`forever bridge stop`, `schtasks /Run /TN "WoW Forever - pont"`).
+1. `/fv`, « Feuille de route » : l'aperçu arrive avec, sous la réponse, la question « combien de niveaux ? » et ses
+   boutons, et « Valider et livrer » ; « À valider » ne montre aucune question.
+2. Un nombre de niveaux : nouvel aperçu, puis « Valider et livrer » seul sous la réponse.
+3. « Valider et livrer » : la réponse donne le nom « Forever · <personnage> · a-b » et où le trouver ; le guide est
+   dans RestedXP, groupe « Forever Routes », avec ses vols et sa pierre de foyer d'origine.
+4. Deuxième route du même personnage, `/reload` : un seul guide « Forever · <personnage> · … » de ces niveaux ; s'il y
+   en a deux (question RXP3), `forever route rxp-clean --apply` jeu fermé les retire.
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 

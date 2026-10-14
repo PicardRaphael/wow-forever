@@ -1141,9 +1141,11 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
 
 
 def guide_name(plan: Any) -> str:
-    """Nom du guide RestedXP d'un plan (anglais, client enUS) : classe et niveaux."""
+    """Nom stable du guide RestedXP d'un plan (CJ1, bloc 2) : « Forever · <personnage> · a-b », la classe à défaut du
+    personnage ; le même nom pour le même personnage et les mêmes niveaux, d'une livraison à l'autre."""
     lv = plan["levels"]
-    return f"Forever {str(plan.get('class', '')).capitalize()} {lv['from']}-{lv['to']} ({plan['id'][:6]})"
+    who = str((plan.get("request") or {}).get("character") or "") or str(plan.get("class", "")).capitalize()
+    return f"Forever · {who} · {lv['from']}-{lv['to']}"
 
 
 def load_plan(deps: Any, plan_id: str) -> dict[str, Any]:

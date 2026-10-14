@@ -80,10 +80,11 @@ BUTTONS: tuple[Button, ...] = (
     Button(
         "route",
         "Feuille de route",
-        "Prépare ma feuille de route de leveling et montre-moi l'aperçu ; je l'ajuste avec les questions de À valider.",
+        "Prépare ma feuille de route de leveling et montre-moi l'aperçu ; je l'ajuste avec les boutons sous ta réponse.",
         ("RX1",),
     ),
-    Button("route_deliver", "Livrer dans RestedXP", "", ("RX1",), action="route_deliver"),
+    # CJ1 (décision 276) : plus de bouton « Livrer dans RestedXP » ; la livraison part de « Valider et livrer » sous
+    # l'aperçu (action `route_deliver`, gardée).
     # EX1 (décision 267) : chaînes d'import des addons d'interface pour le personnage, rédigées par le pont sans le
     # modèle (code Naowh du build actuel, liens du dernier build donné dans le chat).
     Button("exports", "Exports", "", ("EX1",), action="exports"),

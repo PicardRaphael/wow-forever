@@ -701,14 +701,100 @@ local function PrintReply(entry)
 	end
 end
 
+-- CJ1 (bloc 2, décision 276) : question en cours sous la dernière réponse, une rangée de boutons ; un clic envoie
+-- a=<action> sans texte (question à choix, « Valider et livrer ») et la rangée disparaît.
+local ANSWER_H = 22
+local ANSWER_PAD = 24 -- marge du texte d'un bouton (largeur mesurée sur le libellé)
+
+local function CopyChoices(choices)
+	if type(choices) ~= "table" or type(choices.buttons) ~= "table" then
+		return nil
+	end
+	local out = { prompt = type(choices.prompt) == "string" and choices.prompt or "", buttons = {} }
+	for _, b in ipairs(choices.buttons) do
+		if type(b) == "table" and type(b.label) == "string" and type(b.action) == "string" and b.action ~= "" then
+			out.buttons[#out.buttons + 1] = { label = b.label, action = b.action }
+		end
+	end
+	return #out.buttons > 0 and out or nil
+end
+
+function FB.HideAnswers()
+	if ui.answers then
+		ui.answers:Hide()
+	end
+	run.answering = nil
+end
+
+function FB.ShowAnswers(entry)
+	if not (ui.frame and ui.history) or type(entry) ~= "table" or entry.answered or not entry.choices then
+		FB.HideAnswers()
+		return
+	end
+	if not ui.answers then
+		local bar = CreateFrame("Frame", "ForeverBridgeAnswers", ui.frame)
+		bar:SetHeight(ANSWER_H)
+		bar:SetPoint("BOTTOMLEFT", ui.history, "BOTTOMLEFT", 0, 0)
+		bar:SetPoint("BOTTOMRIGHT", ui.history, "BOTTOMRIGHT", 0, 0)
+		ui.answers = bar
+		ui.answerButtons = {}
+	end
+	if entry.choices.prompt ~= "" then
+		FB.Print("|cffffd100Question|r : " .. Escape(Plain(entry.choices.prompt)))
+	end
+	local previous
+	for i, choice in ipairs(entry.choices.buttons) do
+		local button = ui.answerButtons[i]
+		if not button then
+			button = CreateFrame("Button", "ForeverBridgeAnswer" .. i, ui.answers, "UIPanelButtonTemplate")
+			ui.answerButtons[i] = button
+		end
+		local label = Plain(choice.label)
+		button:SetText(label)
+		button:SetSize(math.max(60, #label * 7 + ANSWER_PAD), ANSWER_H)
+		button:ClearAllPoints()
+		if previous then
+			button:SetPoint("LEFT", previous, "RIGHT", 6, 0)
+		else
+			button:SetPoint("LEFT", ui.answers, "LEFT", 0, 0)
+		end
+		button:SetScript("OnClick", function()
+			FB.Answer(i)
+		end)
+		button:Show()
+		previous = button
+	end
+	for i = #entry.choices.buttons + 1, #ui.answerButtons do
+		ui.answerButtons[i]:Hide()
+	end
+	run.answering = entry
+	ui.answers:Show()
+end
+
+function FB.Answer(index)
+	local entry = run.answering
+	local choice = entry and entry.choices and entry.choices.buttons[index]
+	if not choice then
+		return
+	end
+	entry.answered = true
+	FB.HideAnswers()
+	FB.Send("", nil, { flags = { "a=" .. choice.action }, label = Plain(choice.label) })
+end
+
 -- Historique gardé dans ForeverBridgeDB, rendu à la construction de la fenêtre.
 function FB.RenderHistory()
+	local last
 	for _, entry in ipairs(History()) do
 		if entry.role == "user" then
 			PrintUser(entry.text or "", type(entry.shown) == "string" and entry.shown or nil)
 		elseif entry.role == "assistant" then
 			PrintReply(entry)
+			last = entry
 		end
+	end
+	if last then
+		FB.ShowAnswers(last)
 	end
 end
 
@@ -1632,10 +1718,12 @@ function FB.ApplySlot(slot)
 					provenance = reply.provenance,
 					link = reply.link,
 					links = CopyLinks(reply.links),
+					choices = CopyChoices(reply.choices),
 				}
 				KeepExports(entry.links)
 				if conv == run.conv then
 					PrintReply(entry)
+					FB.ShowAnswers(entry)
 				end
 				Remember(entry, conv)
 				if not (ui.frame and ui.frame:IsShown()) or conv ~= run.conv then

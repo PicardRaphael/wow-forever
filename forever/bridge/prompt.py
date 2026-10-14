@@ -58,7 +58,12 @@ def addons_message(name: str, question: str) -> str:
 
 
 def message_text(
-    record: Record, *, talents: str | None = None, guide: str | None = None, profile: str | None = None
+    record: Record,
+    *,
+    talents: str | None = None,
+    guide: str | None = None,
+    profile: str | None = None,
+    pending: str | None = None,
 ) -> str:
     """Message envoyé sur l'entrée standard : bloc de contexte, puis ce que le pont en a relié à nos données
     (`talents` : lignes de `context.context_notes`, ou la seule liste des talents en clés de forever), la consigne du
@@ -75,6 +80,8 @@ def message_text(
         lines.append(f"Talents actuels (clés de forever, pour `current` de forever_build) : {talents}")
     if profile:  # écart entre le jeu et le profil (P06b, décision 122) : ligne fixe du pont
         lines.append(profile)
+    if pending:  # CJ1 : cartes « À valider » réellement montrées au joueur (ligne fixe du pont)
+        lines.append(pending)
     if guide:
         lines += ["", guide]
     lines.append("")

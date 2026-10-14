@@ -438,6 +438,22 @@ Sortie : durée, XP par heure, parts du trajet, des objectifs et du farm, ordre 
 étapes de RestedXP impossibles chez nous (et pourquoi), sans donjon des deux côtés. Résultats et leçons :
 `docs/research/rxp-comparaison.md`.
 
+### Acceptation des routes et retrait des routes livrées (CJ1, décisions 277 et 279)
+
+```powershell
+uv run forever route recette                               # 1 à 10, toutes les races et classes : acceptée ou refusée
+uv run forever route recette --race Gnome --class Mage --to 12
+uv run forever route plan --class mage --faction alliance --race Gnome --character Bob --from 1 --to 10
+uv run forever route rxp-clean                             # à blanc : routes de forever dans RestedXP
+uv run forever route rxp-clean --apply                     # jeu fermé : les retire (copie datée avant)
+```
+
+Une route est acceptée si elle ressemble au parcours gratuit de RestedXP de la même race et classe (mêmes zones, au
+plus trois différences expliquées) ; sinon, la route livrée est ce parcours adapté (étapes d'origine, vols et pierre
+de foyer compris, quêtes de classe et donjons ajoutés, attribution à RestedXP). En jeu, la question en cours et
+« Valider et livrer » apparaissent sous la réponse ; le guide livré s'appelle « Forever · <personnage> · a-b »,
+groupe « Forever Routes ».
+
 ## Ce que le plugin ne sait pas encore
 PvP de champ de bataille et rendements décroissants mesurés (PV2), raids (T09 à T11), Legacy (LG1, LG2), métiers (MT1), réputations (RP1), hôtel des
 ventes (EC1), mana des combats longs (T05b), mémoire du joueur (T07), raid

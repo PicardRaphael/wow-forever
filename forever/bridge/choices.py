@@ -53,6 +53,24 @@ ROUTE_CHOICES: tuple[Choice, ...] = (
 )
 
 
+# CJ1 (décision 277) : donjons et quêtes de classe sont inclus par défaut, sans question ; seule la longueur de la
+# route est demandée dans le chat. Les autres questions restent reconnues si le joueur les donne.
+ROUTE_ASKED: tuple[str, ...] = ("route_levels",)
+VALIDATE = {"label": "Valider et livrer", "action": "route_deliver"}
+
+
+def chat_choices(pending: Sequence[Choice], *, validate: bool) -> dict[str, Any] | None:
+    """Question en cours sous la réponse (CJ1, bloc 2, décision 276) : la première question posée encore en attente,
+    un bouton par option, puis « Valider et livrer » sous un aperçu de route ; None s'il n'y a rien à proposer."""
+    asked = next((c for c in pending if c.id in ROUTE_ASKED), None)
+    buttons = [{"label": o.label, "action": f"{ACTION}:{asked.id}.{o.key}"} for o in asked.options] if asked else []
+    if validate:
+        buttons.append(dict(VALIDATE))
+    if not buttons:
+        return None
+    return {"prompt": asked.prompt if asked else "", "buttons": buttons}
+
+
 def choice_card(choice: Choice) -> dict[str, Any]:
     """Carte « À valider » d'une question : un bouton par option, action `choice:<question>.<option>`."""
     return {

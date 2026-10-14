@@ -29,7 +29,7 @@ from forever.bridge.actions import action_flag, card_for, parse_action
 from forever.bridge.agent import AgentResult, provenance_line
 from forever.bridge.buttons import BUTTONS, button_payload, visible_buttons
 from forever.bridge.capture import GameWindow, Rect, band_rect, probe_rect
-from forever.bridge.choices import ROUTE_CHOICES, Choice, answer_text, choice_card, find_answer
+from forever.bridge.choices import ROUTE_CHOICES, Choice, answer_text, chat_choices, find_answer
 from forever.bridge.codec import SELFTEST_ID, BandError, Decoded, decode_band, detect_cell_px, selftest_payload
 from forever.bridge.format import normalize_reply
 from forever.bridge.fragments import Fragment, FragmentBuffer, parse_fragment
@@ -158,7 +158,8 @@ class Bridge:
         self.last_exports: list[dict[str, str]] = []  # EX1 : liens typés de la dernière réponse qui en portait
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
-        self.choices: list[Choice] = []  # RX1 : questions à choix publiées en cartes (décision 258)
+        self.choices: list[Choice] = []  # RX1 : questions à choix en attente (CJ1 : posées dans le chat)
+        self.route_active = False  # CJ1 : une feuille de route est en cours (aperçu, ajustements, validation)
         self.routes_dir: Path | None = None  # RX1 : plans de forever route plan (`<cache>/routes`)
         self.guide: dict[str, Any] | None = None  # RX1 : guide RestedXP à livrer par l'emplacement
         self.last_cards_check: float | None = None
@@ -199,8 +200,17 @@ class Bridge:
             self.journal.write("published", reason=reason, first=first, files=count, ms=ms)
 
     def _cards(self) -> list[dict[str, Any]]:
-        """Cartes publiées : « À valider » de la source, puis les questions à choix en attente (RX1)."""
-        return [*self.card_list, *(choice_card(c) for c in self.choices)]
+        """Cartes publiées : « À valider » de la source seulement (CJ1, décision 276 : plus aucune question en carte,
+        les questions partent avec la réponse, sous le message)."""
+        return list(self.card_list)
+
+    def _pending_note(self) -> str:
+        """Ligne fixe du pont pour le modèle : cartes « À valider » réellement montrées au joueur (CJ1, compteur
+        cohérent avec la réponse)."""
+        titles = [str(c.get("title") or c.get("id") or "") for c in self.card_list]
+        if not titles:
+            return "À valider (fenêtre du joueur) : aucune carte."
+        return f"À valider (fenêtre du joueur) : {len(titles)} carte(s) : " + " ; ".join(titles)
 
     def _xp(self) -> Mapping[str, Any] | None:
         if self.xp_watch is None:
@@ -465,8 +475,8 @@ class Bridge:
         self._done(record, text, "action")
 
     def _deliver_route(self, context: Mapping[str, str]) -> tuple[str, str]:
-        """RX1 : dernier plan de `forever route plan` encodé en guide RestedXP et publié dans l'emplacement ; le jeu
-        l'importe hors combat (ForeverBridge 0.3.0)."""
+        """RX1, CJ1 : dernier plan du personnage (nom du contexte, sinon classe et camp) encodé en guide RestedXP sous
+        un nom stable et publié dans l'emplacement ; le jeu l'importe hors combat ; la réponse dit où le trouver."""
         import hashlib
 
         from forever.route import guide_name
@@ -474,19 +484,29 @@ class Bridge:
 
         paths = sorted(self.routes_dir.glob("*.json"), key=lambda p: p.stat().st_mtime) if self.routes_dir else []
         cls, faction = str(context.get("class") or "").lower(), str(context.get("faction") or "").lower()
-        plan = None
-        for path in reversed(paths):  # le plus récent du personnage (classe et camp du contexte)
-            doc = json.loads(path.read_text(encoding="utf-8"))
-            if (not cls or doc.get("class") == cls) and (not faction or doc.get("faction") == faction):
-                plan = doc
-                break
+        who = str(context.get("name") or "")
+        docs = [json.loads(path.read_text(encoding="utf-8")) for path in reversed(paths)]
+        mine = [d for d in docs if who and (d.get("request") or {}).get("character") == who]
+        same = [
+            d
+            for d in docs
+            if (not cls or d.get("class") == cls) and (not faction or d.get("faction") == faction)
+            and not (d.get("request") or {}).get("character")
+        ]  # fmt: skip
+        plan = (mine or same or [None])[0]
         if plan is None:
             return "aucun plan", "Aucune feuille de route calculée : clique d'abord « Feuille de route »."
         name, group = guide_name(plan), ROUTE_GROUP
         text = encode_guide(plan, name=name, group=group)
         sha = hashlib.sha256(text.encode("utf-8")).hexdigest()[:12]
         self.guide = {"name": name, "group": group, "text": text, "sha": sha}
-        return "livrée", f"Feuille de route « {name} » envoyée à RestedXP : elle s'importe hors combat."
+        self.route_active = False
+        self.choices = []
+        return "livrée", (
+            f"Ta feuille de route « {name} » est envoyée à RestedXP (elle s'importe hors combat). Pour la suivre : ouvre "
+            f"la liste des guides de RestedXP, groupe « {group} », puis « {name} ». Elle remplace la précédente du même "
+            "nom ; s'il en reste deux, `forever route rxp-clean` (jeu fermé) retire les anciennes."
+        )
 
     def _simc(self, record: Record, parts: int) -> None:
         """Export SimulationCraft collé : gardé anonymisé dans le journal (fixture réelle, décision 235), sans le
@@ -622,8 +642,9 @@ class Bridge:
                 with self._lock:
                     self.busy = False
             return
-        if ROUTE_BUTTON in record.flags:  # RX1 : questions de la feuille de route publiées en cartes
+        if ROUTE_BUTTON in record.flags:  # RX1, CJ1 : feuille de route en cours, questions posées dans le chat
             self.choices = list(ROUTE_CHOICES)
+            self.route_active = True
         try:
             session = None if "n" in record.flags else self.state.session
             started = self.clock()
@@ -642,7 +663,10 @@ class Bridge:
                 else:
                     talents = self.describe(record) if self.describe and record.context.get("talents") else None
                 gap_note, proposed = self._profile_gap(record)
-                result = self.agent(message_text(record, talents=talents, guide=guide, profile=gap_note), session)
+                result = self.agent(
+                    message_text(record, talents=talents, guide=guide, profile=gap_note, pending=self._pending_note()),
+                    session,
+                )
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
                 result = AgentResult(text="", session_id=None, is_error=True, error=f"{type(exc).__name__}: {exc}")
             if result.denied:
@@ -666,6 +690,10 @@ class Bridge:
                 if typed:
                     reply["links"] = typed
                     self.last_exports = typed
+                if self.route_active:  # CJ1 : question en cours et « Valider et livrer » sous l'aperçu
+                    asked = chat_choices(self.choices, validate=True)
+                    if asked:
+                        reply["choices"] = asked
                 if result.session_id:
                     self.state.set_session(result.session_id)
                 self.journal.write(
