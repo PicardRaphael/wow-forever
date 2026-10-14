@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70374 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-10-14)",
+      "source": "Client 1.60.1.70374 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-10-14)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70374 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-10-14)",
+      "source": "Client 1.60.1.70374 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-10-14)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -210,7 +210,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 2 (forever install, 2026-10-14)"
+        "installé en révision 3 (forever install, 2026-10-14)"
       ]
     },
     "races.json": {
@@ -312,7 +312,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 2 (forever install, 2026-10-14)"
+        "installé en révision 3 (forever install, 2026-10-14)"
       ]
     },
     "xp_bonuses.json": {
@@ -341,7 +341,7 @@
       ]
     }
   },
-  "revision": 2,
+  "revision": 3,
   "revised_at": "2026-10-14",
   "hotfixes": {
     "dbcache": {
@@ -349,10 +349,10 @@
       "locale": "enUS",
       "format": 9,
       "build": 70374,
-      "size": 3014241,
-      "sha256": "eab40c093658698043bfa9020a18c5e0015d081352828ea27d4644ca508e7dcd",
-      "file_date": "2026-10-14T06:39:29Z",
-      "read_at": "2026-10-14T07:21:47Z"
+      "size": 3032332,
+      "sha256": "6b5e88eb8b80cb29d1f5afc15097f24d55e58c25af86600ae11dbb577cf71b1c",
+      "file_date": "2026-10-14T13:51:52Z",
+      "read_at": "2026-10-14T13:51:54Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -947,8 +947,9 @@
       "invalid": [],
       "notpublic": [],
       "dbreply": {
-        "ItemSparse": 49,
-        "Spell": 2
+        "0x021826bb": 1,
+        "ItemSparse": 219,
+        "Spell": 3
       },
       "item_reply": {
         "0x198e28b5": 4742,
