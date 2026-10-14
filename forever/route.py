@@ -706,3 +706,12 @@ def load_plan(deps: Any, plan_id: str) -> dict[str, Any]:
         raise InvalidArgumentError(f"Feuille de route inconnue : {plan_id}.", "lancer forever route plan")
     doc: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     return doc
+
+
+PREVIEW_FIELDS = ("id", "levels", "hours", "xp_h", "dungeons", "rewards", "bonuses", "certainty", "stops")
+
+
+def route_preview(plan: Any) -> dict[str, Any]:
+    """Aperçu d'un plan pour le joueur (bouton « Feuille de route », outil `forever_route`) : niveaux, temps, XP par
+    heure, donjons placés, récompenses notables, bonus rappelés, certitude, nombre d'arrêts."""
+    raise NotImplementedError

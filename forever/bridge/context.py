@@ -282,3 +282,9 @@ def xp_context(context: Mapping[str, str]) -> XpContext:
             items[int(key)] = int(count)
     resting = {"1": True, "0": False}.get(context.get("resting") or "")
     return XpContext(rested=_float(context.get("rested")), resting=resting, auras=tuple(auras), items=items)
+
+
+def professions_context(context: Mapping[str, str]) -> dict[str, int] | None:
+    """RX1 : métiers envoyés par ForeverBridge 0.3.0 (`Nom:rang:rang maximal`, séparés par des virgules) → nom → rang ;
+    None si le jeu ne les a pas envoyés ; une entrée illisible est ignorée."""
+    raise NotImplementedError

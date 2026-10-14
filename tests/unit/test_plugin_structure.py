@@ -26,6 +26,7 @@ SKILLS = (
     "forever-builds",
     "forever-familiers",
     "forever-donjons",
+    "forever-routes",
 )
 AGENTS = ("forever-web-researcher", "forever-sim-runner")
 MCP_PREFIX = "mcp__plugin_forever_forever__"
@@ -189,6 +190,8 @@ def test_skill_descriptions_carry_trigger_words():
         assert word in desc["forever-familiers"], word
     for word in ("donjon", "boss", "butin", "taux", "quête", "prérequis", "retail"):  # DJ1
         assert word in desc["forever-donjons"], word
+    for word in ("feuille de route", "restedxp", "quête", "niveau", "donjon", "retail"):  # RX1
+        assert word in desc["forever-routes"], word
 
 
 def test_router_maps_skills_and_uncovered_domains():
@@ -198,6 +201,7 @@ def test_router_maps_skills_and_uncovered_domains():
     assert 'kind="pvp"' in body and 'kind="build_check"' in body
     assert 'kind="pets"' in body and "forever-familiers" in body
     assert 'kind="dungeons"' in body and 'kind="dungeon_item"' in body and "forever-donjons" in body  # DJ1
+    assert "forever_route" in body and "forever-routes" in body  # RX1
     assert "format-reponse.md" in body
     assert "forever_status" in body
     for tranche in UNCOVERED_TRANCHES:
@@ -206,7 +210,15 @@ def test_router_maps_skills_and_uncovered_domains():
 
 @pytest.mark.parametrize(
     "name",
-    ["forever-leveling", "forever-mage", "forever-pvp", "forever-builds", "forever-familiers", "forever-donjons"],
+    [
+        "forever-leveling",
+        "forever-mage",
+        "forever-pvp",
+        "forever-builds",
+        "forever-familiers",
+        "forever-donjons",
+        "forever-routes",
+    ],
 )
 def test_domain_skills_use_the_response_format(name):
     _, body = frontmatter(PLUGIN / "skills" / name / "SKILL.md")

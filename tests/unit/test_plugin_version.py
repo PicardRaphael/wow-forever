@@ -49,7 +49,8 @@ def test_plugin_json_has_a_semver_version():
     # boutons Leveling régénérés (T04d, bloc F).
     # 0.11.0 : donjons (skill forever-donjons, routeur), cas des boutons Leveling régénérés (conseil de donjon et
     # niveau de placement, DJ1).
-    assert version == "0.11.0"
+    # 0.12.0 : feuilles de route (skill forever-routes, outil forever_route, routeur), RX1.
+    assert version == "0.12.0"
 
 
 def test_fingerprint_is_up_to_date():
