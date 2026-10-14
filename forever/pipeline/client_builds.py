@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Any, NamedTuple
 
 from forever.errors import DataSchemaError
+from forever.installs import Install
 from forever.pipeline.builds import version_key
 from forever.timefmt import format_utc
 
@@ -223,3 +224,22 @@ def accept_earlier(
         raise ValueError(f"{version} n'est pas antérieure à la version installée {installed}")
     accepted = [Accepted(h.name, version, reason) for h in held if h.client_version == version]
     return accepted, [h for h in held if h.client_version != version]
+
+
+# --- Produits adoptés (LN1, décision 271) --------------------------------------------------------------------------
+
+
+def adopted_products(cache_dir: Path) -> dict[str, dict[str, Any]]:
+    """Produits adoptés comme version finale (`products` du journal, schéma 2) ; vide pour un journal de schéma 1."""
+    raise NotImplementedError
+
+
+def adopt_product(cache_dir: Path, install: Install, now: datetime) -> dict[str, Any]:
+    """Inscrit le produit de `install` comme version finale ; refuse la bêta, un produit public connu ou un produit
+    illisible (InvalidArgumentError)."""
+    raise NotImplementedError
+
+
+def forget_product(cache_dir: Path, product: str) -> bool:
+    """Retire une adoption ; False si le produit n'était pas adopté."""
+    raise NotImplementedError

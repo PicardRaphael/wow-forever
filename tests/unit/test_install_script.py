@@ -4,45 +4,26 @@ dossier du client dans les deux Program Files (`forever.config.default_wow_dir`,
 
 import importlib.util
 import re
-from pathlib import Path
 
 import pytest
 from conftest import REPO_ROOT
 
-from forever.config import WOW_DIR_CANDIDATES, default_wow_dir
 from forever.hooks import GAME_NUMBER
 
 SCRIPT = REPO_ROOT / "scripts" / "install_plugin.ps1"
 USAGE = REPO_ROOT / "docs" / "USAGE.md"
-X86 = Path(r"C:\Program Files (x86)\World of Warcraft\_classic_beta_")
-X64 = Path(r"C:\Program Files\World of Warcraft\_classic_beta_")
 
 
 def script():
     return SCRIPT.read_text(encoding="utf-8-sig")
 
 
-# --- Dossier du client ---------------------------------------------------------------------------------------------
+def test_no_fixed_candidates_any_more():
+    """LN1 : les dossiers candidats écrits en dur cèdent la place aux racines de `forever.installs` (décision 271,
+    tests dans `test_installs.py` et `test_wow_cli.py`)."""
+    from forever import config
 
-
-def test_candidates_cover_both_program_files():
-    assert WOW_DIR_CANDIDATES == (X86, X64)
-
-
-def test_environment_variable_wins():
-    assert default_wow_dir({"FOREVER_WOW_DIR": r"D:\Jeux\WoW"}, exists=lambda p: True) == Path(r"D:\Jeux\WoW")
-
-
-def test_program_files_without_x86_is_found():
-    assert default_wow_dir({}, exists=lambda p: p == X64) == X64
-
-
-def test_x86_first_when_both_exist():
-    assert default_wow_dir({}, exists=lambda p: True) == X86
-
-
-def test_default_when_nothing_is_found():
-    assert default_wow_dir({}, exists=lambda p: False) == X86
+    assert not hasattr(config, "WOW_DIR_CANDIDATES")
 
 
 def test_install_addon_reads_forever_wow_dir(tmp_path, monkeypatch, capsys):

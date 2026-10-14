@@ -128,6 +128,11 @@ CASES = {
     ),
     "export-read-damaged": (["export", "read", "!NFB1!abc("], 2, None),
     "usage-export-no-subcommand": (["export"], 2, None),
+    # LN1 : installations du client (aucune racine dans les dépendances de test)
+    "wow-list": (["wow", "list"], 0, None),
+    "wow-adopt-missing": (["wow", "adopt", "{tmp}/absent", "--yes"], 2, None),
+    "wow-forget-unknown": (["wow", "forget", "wow_fictif_finale"], 4, None),
+    "usage-wow-no-subcommand": (["wow"], 2, None),
 }
 
 

@@ -9,11 +9,12 @@ import os
 import sys
 import time
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from forever import __version__
+from forever.installs import no_drives
 from forever.pipeline.http_client import urllib_get
 from forever.pipeline.live_logs import detect_game_running
 
@@ -35,6 +36,7 @@ FETCH_ATTEMPTS = 3
 FETCH_BACKOFF = (5.0, 15.0)
 USER_AGENT = f"forever-core/{__version__}"
 DEFAULT_WOW_DIR = Path(r"C:\Program Files (x86)\World of Warcraft\_classic_beta_")
+FALLBACK_WOW_DIR = DEFAULT_WOW_DIR
 # Mesure des journaux : au-delà de cet écart, deux sorts instantanés ne sont pas « enchaînés » (paramètre de
 # l'outil, modifiable par --max-gap ; ce n'est pas une règle du jeu).
 CHAIN_MAX_GAP_S = 3.0
@@ -65,6 +67,10 @@ class Deps:
     profile_path: Path | None = None  # profil joueur hors du dépôt (None : FOREVER_PROFILE ou ~/.forever, T06b)
     game_running: Callable[[], bool | None] = game_closed  # client lancé ? None : inconnu (décision 205)
     sleep: Callable[[float], None] = time.sleep  # attente entre deux essais d'un téléchargement (décision 230)
+    # Variables d'environnement et disques fixes lus pour trouver les installations du client (LN1) : vides dans les
+    # dépendances construites à la main (tests), jamais le disque réel.
+    environ: Mapping[str, str] = field(default_factory=dict)
+    drives: Callable[[], list[Path]] = no_drives
 
 
 def terminal_confirm(prompt: str) -> bool:

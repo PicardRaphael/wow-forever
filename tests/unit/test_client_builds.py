@@ -57,9 +57,28 @@ def test_installed_at_is_the_file_date(tmp_path):
 
 
 def test_the_right_product_is_picked(tmp_path):
+    """Deux produits dans `.build.info` : celui du dossier est lu dans son `.flavor.info` (LN1, décision 271)."""
     wow_dir = build_info(tmp_path, extra="eu|1|12.0.1.70210|wow\n")
+    (wow_dir / ".flavor.info").write_bytes(b"Product Flavor!STRING:0\nwow_classic_beta\n")
     found = read_build_info(wow_dir)
     assert found is not None and found.build == BETA
+
+
+def test_the_folder_name_never_gives_the_product(tmp_path):
+    """Sans `.flavor.info`, deux produits et aucun dont le dossier public est connu : produit illisible, jamais
+    déduit du nom `_classic_beta_` (LN1, décision 271)."""
+    wow_dir = build_info(tmp_path, extra="eu|1|12.0.1.70210|wow\n")
+    assert read_build_info(wow_dir) is None
+
+
+def test_the_flavor_wins_over_the_folder_name(tmp_path):
+    root = tmp_path / "World of Warcraft"
+    (root / "_classic_beta_").mkdir(parents=True)
+    rows = f"{HEADER}\nus|1|{BETA}|wow_classic_beta\nus|1|9.99.9.99999|wow_fictif_finale\n"
+    (root / ".build.info").write_text(rows, encoding="utf-8")
+    (root / "_classic_beta_" / ".flavor.info").write_bytes(b"Product Flavor!STRING:0\nwow_fictif_finale\n")
+    found = read_build_info(root / "_classic_beta_")
+    assert found is not None and (found.build, found.product) == ("9.99.9.99999", "wow_fictif_finale")
 
 
 def test_another_product_is_never_taken_for_this_one(tmp_path):
