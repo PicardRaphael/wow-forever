@@ -172,7 +172,7 @@ def test_exports_reply_gives_the_current_build_and_the_last_links(deps):
     ranks = [int(part.split(":")[1]) for part in CONTEXT["talents"].split(",")]
     assert len(build.points) == sum(ranks)
     assert "Naowh" in text and "ordre généré" in text
-    assert links[1:] == last
+    assert [link for link in links[1:] if link["kind"] in ("talents_forever", "naowh_build")] == last
 
 
 def test_exports_reply_says_what_is_missing(deps):

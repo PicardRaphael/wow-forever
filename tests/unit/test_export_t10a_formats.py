@@ -85,7 +85,7 @@ def test_weights_round_trip_and_text():
     weights = {"int": 0.5, "spell": 1.0, "scrit": 12.25, "sta": 0.000125, "mp5": 0.0}
     text = naowh_weights("frost-mage", weights)
     assert text.startswith("NFSW1:frost-mage:")
-    assert "e" not in text.split(":", 2)[2]
+    assert all("e" not in part.split("=", 1)[1] for part in text.split(":", 2)[2].split(","))
     assert all(ch.isalnum() or ch in "=.," for ch in text.split(":", 2)[2])
     key, back = read_naowh_weights(text)
     assert key == "frost-mage" and back == pytest.approx(weights, rel=1e-9)

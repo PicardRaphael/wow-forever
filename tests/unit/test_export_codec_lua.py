@@ -109,10 +109,10 @@ def test_lua_serialization_with_references_read_by_python(lua) -> None:  # type:
 def test_lua_compression_levels_read_by_python(lua) -> None:  # type: ignore[no-untyped-def]
     data = ("forever " * 400 + "".join(chr(97 + i % 26) for i in range(3000))).encode()
     for level in (0, 1, 5, 9):
-        packed = lua.eval(b"function(s, l) return LD:CompressDeflate(s, { level = l }) end")(data, level)
+        packed = lua.eval(b"function(s, l) return (LD:CompressDeflate(s, { level = l })) end")(data, level)
         assert inflate(packed, 1_048_576) == data
 
 
 def test_python_deflate_read_by_lua(lua) -> None:  # type: ignore[no-untyped-def]
     data = bytes(random.Random(3).randrange(256) for _ in range(5000)) + b"z" * 5000
-    assert lua.eval(b"function(s) return LD:DecompressDeflate(s) end")(deflate(data)) == data
+    assert lua.eval(b"function(s) return (LD:DecompressDeflate(s)) end")(deflate(data)) == data
