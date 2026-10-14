@@ -10,10 +10,10 @@ import shutil
 from dataclasses import dataclass
 
 from conftest import FIXTURES
-from forever.route_check import MAX_DIFFERENCES, accept_route, zone_sequence
 
 from forever.cli import main
 from forever.provenance import validate_provenance
+from forever.route_check import MAX_DIFFERENCES, accept_route, zone_sequence
 
 ADDONS = FIXTURES / "rxp_guides"
 
