@@ -97,7 +97,8 @@ local function newRegion(kind, name, parent)
 	function r:SetMovable(v) self.movable = v and true or false end
 	function r:SetResizable(v) self.resizable = v and true or false end
 	function r:SetClampedToScreen(v) self.clamped = v and true or false end
-	function r:SetResizeBounds(w, h) self.minWidth, self.minHeight = w, h end
+	function r:SetResizeBounds(w, h, mw, mh) self.minWidth, self.minHeight, self.maxWidth, self.maxHeight = w, h, mw, mh end
+	function r:RegisterForClicks(...) self.clicks = { ... } end
 	function r:EnableMouse(v) self.mouse = v and true or false end
 	function r:EnableMouseWheel(v) self.wheel = v and true or false end
 	function r:RegisterForDrag(...) self.drag = { ... } end
