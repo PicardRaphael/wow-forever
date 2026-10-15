@@ -424,6 +424,7 @@ def leveling_gear(
     spec: str | None = None,
     access: Access | None = None,
     weights: Mapping[str, float] | None = None,
+    loaded: tuple[Any, Any, Any] | None = None,
 ) -> LevelingPicks:
     """Équipement de leveling de GearQuest Forever (décision 276) : pour chaque emplacement, le premier choix de
     l'addon dont la plage de niveaux contient `level`, pour le camp (et la spécialisation si donnée), avec ce que
@@ -433,9 +434,10 @@ def leveling_gear(
     dans `gearquest_choice`. Registre : I21"""
     from forever.pipeline.gear_sources import read_gearquest_facts, read_gearquest_picks, read_guide_gear
 
-    picks = read_gearquest_picks(addons, class_token)
-    facts = read_gearquest_facts(addons, class_token)
-    stats = read_guide_gear(addons) if weights else {}
+    if loaded is None:  # tranche de niveaux : fichiers lus une fois par l'appelant (`loaded`)
+        loaded = (read_gearquest_picks(addons, class_token), read_gearquest_facts(addons, class_token), None)
+    picks, facts, guide = loaded
+    stats = (guide if guide is not None else read_guide_gear(addons)) if weights else {}
 
     def score(item: int) -> float | None:
         """Score par nos poids ; None sans statistiques connues (objet à suffixe aléatoire : « - » chez Forever Guide)."""
@@ -592,6 +594,7 @@ def gear_report(
     equipped: list[int] | None = None,
     name: str | None = None,
     professions: list[str] | None = None,
+    to_level: int | None = None,
 ) -> dict[str, Any]:
     """Rapport de `forever gear` et de `forever_gear` : `weights` (poids du Mage, lignes NFSW1 et Pawn v1), `bis`
     (liste personnelle et `!NBIS1!`), `leveling` (GearQuest Forever), `upgrade` (« est-ce une amélioration ? »)."""
@@ -629,23 +632,55 @@ def gear_report(
         return {**out, "weights": weights, "weights_source": source, "provenance": _provenance(deps, assumptions)}
     if action == "leveling":
         access = level_access(deps, professions or [])
-        lines: dict[str, Any] = {}
-        level_weights: dict[str, float] | None = None
-        if cls == "MAGE":  # bloc 4c : Mage reclassé par nos poids ; autres classes : ordre de GearQuest
-            key = spec if spec and "-" in spec else DEFAULT_SPECS["MAGE"]
-            report = mage_weights(deps, level=level, race=race, rotation=key.split("-")[0])
-            level_weights = mage_guide_weights(report, spec_key=key)
-            label = name or f"Forever · Mage · niveau {level}"
-            lines = {"naowh": naowh_weight_line(report, spec=key), "pawn": pawn_line(report, label=label)}
-        picks = leveling_gear(
-            addons,
-            cls,
-            level=level,
-            faction=faction,
-            spec=None if level_weights else spec,
-            access=access,
-            weights=level_weights,
+        last = to_level if to_level is not None and to_level > level else level
+        from forever.pipeline.gear_sources import read_gearquest_facts, read_gearquest_picks, read_guide_gear
+
+        loaded = (
+            read_gearquest_picks(addons, cls),
+            read_gearquest_facts(addons, cls),
+            read_guide_gear(addons) if cls == "MAGE" else None,
         )
+
+        def at(lv: int) -> tuple[LevelingPicks, dict[str, Any], dict[str, float] | None]:
+            """Choix obtenables au niveau `lv` ; Mage : nos poids à ce niveau et leurs lignes à copier."""
+            found: dict[str, Any] = {}
+            weights_at: dict[str, float] | None = None
+            if cls == "MAGE":  # bloc 4c : Mage reclassé par nos poids ; autres classes : ordre de GearQuest
+                key = spec if spec and "-" in spec else DEFAULT_SPECS["MAGE"]
+                report = mage_weights(deps, level=lv, race=race, rotation=key.split("-")[0])
+                weights_at = mage_guide_weights(report, spec_key=key)
+                label = name or f"Forever · Mage · niveau {lv}"
+                found = {"naowh": naowh_weight_line(report, spec=key), "pawn": pawn_line(report, label=label)}
+            chosen = leveling_gear(
+                addons, cls, level=lv, faction=faction, spec=None if weights_at else spec, access=access,
+                weights=weights_at, loaded=loaded,
+            )  # fmt: skip
+            return chosen, found, weights_at
+
+        picks, lines, level_weights = at(level)
+        segments: list[dict[str, Any]] = []
+        set_aside = list(picks.set_aside)
+        excluded = list(picks.excluded)
+        if last > level:  # bloc 4c : tranche de niveaux, un segment par palier où l'objet visé change
+            open_: dict[str, dict[str, Any]] = {}
+            for lv in range(level, last + 1):
+                chosen, found, _ = (picks, lines, level_weights) if lv == level else at(lv)
+                if lv == last:
+                    lines = found
+                seen_items = {a["item"] for a in set_aside}
+                set_aside += [a for a in chosen.set_aside if a["item"] not in seen_items]
+                seen_items = {e["item"] for e in excluded}
+                excluded += [e for e in chosen.excluded if e["item"] not in seen_items]
+                now = {c["slot"]: c for c in chosen}
+                for slot in list(open_):
+                    if slot not in now or now[slot]["item"] != open_[slot]["item"]:
+                        segments.append(open_.pop(slot))
+                for slot, c in now.items():
+                    if slot in open_:
+                        open_[slot]["to"] = lv
+                    else:
+                        open_[slot] = {**c, "from": lv, "to": lv}
+            segments += list(open_.values())
         assumptions = [
             "choix de leveling de GearQuest Forever lus en local (premier choix obtenable de chaque emplacement)",
             (
@@ -665,9 +700,11 @@ def gear_report(
             **lines,
             "class": cls,
             "level": level,
+            "to_level": last,
             "picks": list(picks),
-            "set_aside": picks.set_aside,
-            "excluded": picks.excluded,
+            "segments": segments,
+            "set_aside": set_aside,
+            "excluded": excluded,
             "professions": sorted(access.professions),
             "provenance": _provenance(deps, assumptions),
         }

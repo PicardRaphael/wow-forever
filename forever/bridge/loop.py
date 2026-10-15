@@ -103,6 +103,18 @@ def outbox_records(path: Path) -> list[Record]:
     return records
 
 
+def gear_levels(action: str | None, target: str | None) -> int | tuple[int, int] | None:
+    """Niveau des actions d'équipement : « N » (N ≥ 1), ou « de-à » (1 ≤ de < à) pour `gear_level` ; None sinon."""
+    low, sep, high = (target or "").partition("-")
+    if not low.isdigit() or int(low) < 1:
+        return None
+    if not sep:
+        return int(low)
+    if action == "gear_level" and high.isdigit() and int(high) > int(low):
+        return int(low), int(high)
+    return None
+
+
 class Bridge:
     def __init__(
         self,
@@ -131,8 +143,8 @@ class Bridge:
         xp_watch: Callable[[], Mapping[str, Any] | None] | None = None,
         exporter: Callable[[Mapping[str, str], Sequence[Mapping[str, str]]], tuple[str, list[dict[str, str]]]]
         | None = None,
-        gearer: Callable[[Mapping[str, str], int], Any] | None = None,
-        gear_router: Callable[[Mapping[str, str], int], Any] | None = None,
+        gearer: Callable[[Mapping[str, str], Any], Any] | None = None,
+        gear_router: Callable[[Mapping[str, str], Any], Any] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -456,7 +468,7 @@ class Bridge:
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
             self._done(record, text, "action", links)
             return
-        elif action in ("gear_level", "gear_route") and not (target and target.isdigit() and int(target) > 0):
+        elif action in ("gear_level", "gear_route") and gear_levels(action, target) is None:
             result, text = "refusée", "Action refusée : niveau invalide."
         elif action in ("gear_level", "gear_route") and target:
             handler = self.gearer if action == "gear_level" else self.gear_router
@@ -465,7 +477,7 @@ class Bridge:
                 if handler is None:
                     result, text = "refusée", "Action refusée : équipement pas encore pris en charge par ce pont."
                 else:
-                    made = handler(record.context, int(target))
+                    made = handler(record.context, gear_levels(action, target))
                     text, gear_links = made if isinstance(made, tuple) else (made, [])
                     result = "équipement"
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur

@@ -309,14 +309,35 @@ local function BuildGear(screen)
 	S.gearLevel = Stepper("ForeverBridgeGearLevel", screen, 180, -ROW, function()
 		return state.level
 	end, function(v)
+		local before = state.level
 		state.level = math.max(1, v)
+		-- sans tranche choisie (haut = départ), ou haut dépassé : le haut de la tranche suit le départ
+		if state.to == before or (state.to or 0) < state.level then
+			state.to = state.level
+			if S.gearTo then
+				S.gearTo()
+			end
+		end
+	end)
+	-- bloc 4c : tranche de niveaux, une ligne par palier où l'objet visé change
+	local toLabel = Text("ForeverBridgeGearToLabel", screen)
+	Place(toLabel, screen, 290, -ROW - 4)
+	toLabel:SetText("jusqu'au")
+	S.gearTo = Stepper("ForeverBridgeGearTo", screen, 350, -ROW, function()
+		return state.to
+	end, function(v)
+		state.to = math.max(state.level, v)
 	end)
 	local list = Button("ForeverBridgeGearList", screen, "Mon équipement à ce niveau", 210)
 	Place(list, screen, 0, -2 * ROW)
 	list:SetScript("OnClick", function()
 		-- essai CJ-6 : action traitée par le pont sans le modèle (seule la sortie de l'outil, au niveau choisi)
-		local label = "Mon équipement au niveau " .. state.level
-		if FB.Send("", nil, { flags = { "a=gear_level:" .. state.level }, label = label }) then
+		local label, levels = "Mon équipement au niveau " .. state.level, tostring(state.level)
+		if state.to > state.level then
+			label = "Mon équipement du niveau " .. state.level .. " au niveau " .. state.to
+			levels = state.level .. "-" .. state.to
+		end
+		if FB.Send("", nil, { flags = { "a=gear_level:" .. levels }, label = label }) then
 			FB.ShowScreen("chat")
 		end
 	end)
@@ -347,10 +368,11 @@ end
 function FB.RefreshGear()
 	if S.gear and not S.gear.level then
 		local _, level = Player()
-		S.gear.level = level
+		S.gear.level, S.gear.to = level, level
 	end
 	if S.gearLevel then
 		S.gearLevel()
+		S.gearTo()
 	end
 end
 

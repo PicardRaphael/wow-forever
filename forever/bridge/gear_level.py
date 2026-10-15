@@ -44,9 +44,11 @@ def _race(deps: Any, context: Mapping[str, str]) -> str:
     return next((n for n, r in races.items() if sent in (n, r.get("client_file"))), "Orc")
 
 
-def _leveling(deps: Any, context: Mapping[str, str], level: int) -> dict[str, Any]:
-    """Un seul appel de l'outil : équipement obtenable au niveau `level` pour le personnage du contexte."""
+def _leveling(deps: Any, context: Mapping[str, str], level: int, to_level: int | None = None) -> dict[str, Any]:
+    """Un seul appel de l'outil : équipement obtenable au niveau `level` (ou de `level` à `to_level`) pour le
+    personnage du contexte."""
     who = str(context.get("name") or "Mage")
+    span = f"niveaux {level}-{to_level}" if to_level else f"niveau {level}"
     return gear_report(
         deps,
         "leveling",
@@ -55,7 +57,8 @@ def _leveling(deps: Any, context: Mapping[str, str], level: int) -> dict[str, An
         race=_race(deps, context),
         faction=str(context.get("faction") or "").lower() or None,
         professions=_professions(context),
-        name=f"Forever · {who} · niveau {level}",
+        name=f"Forever · {who} · {span}",
+        to_level=to_level,
     )
 
 
@@ -91,7 +94,7 @@ def _why(p: Mapping[str, Any], level: int) -> str:
 
 
 def _links(
-    doc: Mapping[str, Any], context: Mapping[str, str], level: int, deps: Any
+    doc: Mapping[str, Any], context: Mapping[str, str], level: int, deps: Any, span: str | None = None
 ) -> tuple[list[str], list[dict[str, str]]]:
     """Liens à copier : [Naowh : BiS] de la liste de ce niveau, poids et échelle du Mage."""
     from forever.bridge.exports import WHERE, typed_link
@@ -114,15 +117,22 @@ def _links(
         keys = [k for k, s in lists.items() if s.class_token == token]
     spec = DEFAULT_SPECS.get(token) or (keys[0] if keys else None)
     chosen: dict[int, int] = {}
-    for p in doc["picks"]:
+    extra: dict[int, list[int]] = {}
+    segments = doc.get("segments") or []
+    finals = [s for s in segments if s["to"] == doc.get("to_level")] if segments else doc["picks"]
+    for p in finals:  # tranche : objet du haut de la tranche, les précédents en repli dans l'ordre inverse
         free = [s for s in INVENTORY.get(p["slot"], ()) if s not in chosen]
         if free:
             chosen[free[0]] = int(p["item"])
+            earlier = [int(s["item"]) for s in reversed(segments) if s["slot"] == p["slot"] and s["item"] != p["item"]]
+            if earlier:
+                extra[free[0]] = list(dict.fromkeys(earlier))
     if spec and chosen:
         who = str(context.get("name") or "Mage")
-        export = naowh_bis(f"Forever · {who} · niveau {level}", spec, chosen, {})
+        label = span or f"niveau {level}"
+        export = naowh_bis(f"Forever · {who} · {label}", spec, chosen, extra)
         links.append(typed_link("naowh_bis", export))
-        lines.append(f"Cette liste du niveau {level} : [Naowh : BiS] dans {WHERE['naowh_bis']}.")
+        lines.append(f"Cette liste ({label}) : [Naowh : BiS] dans {WHERE['naowh_bis']}.")
     return lines, links
 
 
@@ -144,10 +154,44 @@ def _tail(doc: Mapping[str, Any], level: int) -> list[str]:
     return lines
 
 
-def gear_level_reply(deps: Any, context: Mapping[str, str], level: int) -> tuple[str, list[dict[str, str]]]:
+def _span(low: int, high: int) -> str:
+    return f"niveau {low}" if low == high else f"niveaux {low} à {high}"
+
+
+def _range_reply(deps: Any, context: Mapping[str, str], low: int, high: int) -> tuple[str, list[dict[str, str]]]:
+    """Tranche de niveaux (bloc 4c) : une ligne par emplacement, un segment par palier où l'objet visé change."""
+    doc = _leveling(deps, context, low, high)
+    if "segments" not in doc:
+        return (
+            f"Équipement du niveau {low} au niveau {high} : {doc.get('error') or doc.get('message') or 'non calculé'}",
+            [],
+        )
+    lines = [f"## Équipement du niveau {low} au niveau {high} (GearQuest Forever, objets obtenables à chaque niveau)"]
+    by_slot: dict[str, list[dict[str, Any]]] = {}
+    for s in sorted(doc["segments"], key=lambda s: s["from"]):
+        by_slot.setdefault(s["slot"], []).append(s)
+    order = sorted(by_slot, key=lambda slot: all(s.get("source") in RANDOM_DROP for s in by_slot[slot]))
+    for slot in order:
+        parts = [
+            f"{_span(s['from'], s['to'])} {item_tag(s['item'], s.get('quality'), s.get('name'))} "
+            f"(niveau requis {s['required_level']} ; {_how(s)})"
+            for s in by_slot[slot]
+        ]
+        lines.append(f"- {SLOTS_FR.get(slot, slot)} : " + " ; ".join(parts))
+    if not by_slot:
+        lines.append("- Aucun objet de GearQuest Forever obtenable dans cette tranche pour ta classe et ton camp.")
+    extra, links = _links(doc, context, high, deps, span=f"niveaux {low}-{high}")
+    return "\n".join(lines + extra + _tail(doc, high)), links
+
+
+def gear_level_reply(
+    deps: Any, context: Mapping[str, str], level: int | tuple[int, int]
+) -> tuple[str, list[dict[str, str]]]:
     """« Mon équipement à ce niveau » : un objet par emplacement (lien, niveau requis, comment l'obtenir), objets
     visés exprès d'abord, butin aléatoire ensuite ; Mage : choix de GearQuest montré quand nos poids en préfèrent un
-    autre ; objets mis à part, écartés, liens à copier, provenance."""
+    autre ; objets mis à part, écartés, liens à copier, provenance. Une tranche (de, à) : `_range_reply`."""
+    if isinstance(level, tuple):
+        return _range_reply(deps, context, *level)
     doc = _leveling(deps, context, level)
     if "picks" not in doc:  # erreur de l'outil : son message tel quel
         return f"Équipement au niveau {level} : {doc.get('error') or doc.get('message') or 'non calculé'}", []

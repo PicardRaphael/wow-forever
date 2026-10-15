@@ -422,6 +422,7 @@ def build_parser() -> argparse.ArgumentParser:
     gear.add_argument(
         "--profession", action="append", default=[], help="métier appris, nom anglais (leveling ; répétable)"
     )
+    gear.add_argument("--to", dest="to_level", type=int, help="tranche de niveaux jusqu'à ce niveau (leveling)")
     gear.add_argument("--json", action="store_true", help="sortie JSON")
 
     route = sub.add_parser("route", help="feuille de route de leveling (RX1) : calcul et relecture")
@@ -1602,6 +1603,7 @@ def _cmd_gear(deps: Deps, args: argparse.Namespace) -> int:
         equipped=list(_ints(args.equipped)),
         name=args.name,
         professions=args.profession,
+        to_level=args.to_level,
     )
     lines: list[str] = []
     if args.action == "weights":

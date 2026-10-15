@@ -436,6 +436,7 @@ def build_server(deps: Deps) -> MCPServer:
         equipped: list[int] | None = None,
         name: str | None = None,
         professions: list[str] | None = None,
+        to_level: int | None = None,
     ) -> dict[str, Any]:
         """Équipement (CJ1, bloc 4 ; essai CJ-6 : une question d'équipement à un niveau appelle seulement
         `action="leveling"` à ce niveau, jamais `route`, qui part de la liste BiS sans niveau) : `action="weights"` poids du Mage calculés par le moteur et lignes à importer
@@ -444,7 +445,8 @@ def build_server(deps: Deps) -> MCPServer:
         depuis Naowh Forever et Forever Companion, classée par nos poids (Mage) ou l'échelle de Forever Companion, avec
         lieux de butin et `export` (!NBIS1!, Naowh, fenêtre BiS, « Import a list ») ; `action="leveling"` choix de
         GearQuest Forever obtenables au niveau (`required_level` de chaque objet, `excluded` avec leur raison, `set_aside`
-        à source inconnue ; `professions` : métiers appris du profil, noms anglais, sinon aucun objet de métier) ;
+        à source inconnue ; `professions` : métiers appris du profil, noms anglais, sinon aucun objet de métier ;
+        `to_level` : tranche de niveaux, `segments` : un par palier où l'objet visé change) ;
         `action="upgrade"` « est-ce une amélioration ? » (`item`, `equipped` : objets
         portés) ; `action="route"` route d'équipement de la liste BiS : donjons (objets cumulés, `expected_runs`,
         `runs_for_chance` pour 9 chances sur 10), quêtes par zone, autres origines (métier, réputation, marchand)."""
@@ -453,7 +455,7 @@ def build_server(deps: Deps) -> MCPServer:
         try:
             return gear_report(
                 deps, action, class_name=class_name, level=level, race=race, spec=spec, faction=faction,
-                item=item, equipped=equipped, name=name, professions=professions,
+                item=item, equipped=equipped, name=name, professions=professions, to_level=to_level,
             )  # fmt: skip
         except ForeverError as err:
             return cast("dict[str, Any]", _error_result(deps, err))

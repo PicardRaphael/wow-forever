@@ -452,6 +452,7 @@ uv run forever gear bis --class Mage --spec frost-mage --faction alliance --race
 uv run forever gear bis --class Warrior --spec fury-warrior --faction horde   # échelle de Forever Companion
 uv run forever gear leveling --class Mage --level 22 --faction alliance      # choix de GearQuest Forever
 uv run forever gear leveling --class Mage --level 10 --faction alliance --profession Tailoring  # obtenables au niveau 10
+uv run forever gear leveling --class Mage --level 10 --to 20 --faction alliance  # tranche : un segment par palier
 uv run forever gear upgrade --class Mage --level 30 --item <objet> --equipped <objets portés>
 uv run forever gear route --class Mage --spec frost-mage --faction horde --race Orc --level 60   # bloc 4b
 ```
