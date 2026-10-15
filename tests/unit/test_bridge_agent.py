@@ -47,7 +47,7 @@ def argv(tmp_path, **kwargs):
     )
 
 
-def test_allowed_tools_are_skill_and_the_seven_forever_tools():
+def test_allowed_tools_are_skill_and_the_eight_forever_tools():
     assert FOREVER_TOOLS == (
         "mcp__forever__forever_status",
         "mcp__forever__forever_lookup",
@@ -56,8 +56,39 @@ def test_allowed_tools_are_skill_and_the_seven_forever_tools():
         "mcp__forever__forever_sim_leveling",
         "mcp__forever__forever_build",
         "mcp__forever__forever_route",  # RX1
+        "mcp__forever__forever_gear",  # CJ1 : essai CJ-6 du 2026-10-15, outil refusé à l'écran Équipement
     )
     assert ALLOWED_TOOLS == ("Skill", *FOREVER_TOOLS)
+
+
+def test_every_forever_tool_named_by_a_button_a_screen_or_a_guide_is_allowed(make_deps):
+    """Essai CJ-6 du 2026-10-15 : « l'outil qui donne l'équipement conseillé par niveau m'est refusé ». Tout outil
+    forever nommé par le pont (consignes des boutons, prompt), par l'addon (écrans, boutons) ou par les skills que la
+    conversation « jeu » peut charger est dans la liste autorisée (les appels fixés des boutons vivent dans plans.py)."""
+    import asyncio
+    import re
+
+    from mcp import Client
+
+    from forever.mcp_server import build_server
+
+    async def names():
+        async with Client(build_server(make_deps(offline=True))) as client:
+            return {t.name for t in (await client.list_tools()).tools}
+
+    registered = asyncio.run(names())
+    sources = [
+        *(REPO_ROOT / "forever" / "bridge").glob("*.py"),
+        *(REPO_ROOT / "addon" / "ForeverBridge").glob("*.lua"),
+        *(REPO_ROOT / "plugin" / "skills").rglob("*.md"),
+    ]
+    named = set()
+    for path in sources:
+        named |= set(re.findall(r"\bforever_[a-z_]+\b", path.read_text(encoding="utf-8"))) & registered
+    assert "forever_gear" in named and "forever_route" in named
+    missing = sorted(n for n in named if f"mcp__forever__{n}" not in FOREVER_TOOLS)
+    assert missing == []
+    assert {f"mcp__forever__{n}" for n in registered} >= set(FOREVER_TOOLS)  # aucun nom autorisé inventé
 
 
 def test_command_line_of_the_probe(tmp_path):

@@ -146,9 +146,11 @@ local function newRegion(kind, name, parent)
 	function r:SetFading(v) self.fading = v end
 	function r:SetInsertMode(m) self.insertMode = m end
 	function r:SetHyperlinksEnabled(v) self.hyperlinks = v end
-	function r:ScrollUp() end
-	function r:ScrollDown() end
-	function r:ScrollToBottom() end
+	function r:ScrollUp() self.offset = math.min((self.offset or 0) + 1, #(self.messages or {})) end
+	function r:ScrollDown() self.offset = math.max((self.offset or 0) - 1, 0) end
+	function r:ScrollToBottom() self.offset = 0 end
+	function r:GetScrollOffset() return self.offset or 0 end
+	function r:AtBottom() return (self.offset or 0) == 0 end
 	function r:SetSpacing() end
 	function r:GetScript(what) return self.scripts[what] end
 	function r:RegisterEvent(event)
