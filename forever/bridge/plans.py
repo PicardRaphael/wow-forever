@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -202,7 +203,32 @@ NAOWH_POPULAR = (
 )
 
 
-def button_plan(key: str, r: Resolved, level_cap: int | None, *, first_talent_level: int | None = None) -> Plan | None:
+def route_options(flags: AbstractSet[str]) -> dict[str, Any]:
+    """Choix de l'assistant de feuille de route de la fenêtre (CJ1, bloc 6a, décision 280), lus dans les drapeaux du
+    message : `lv=<de>-<à>` (niveaux, de ≥ 1 et à > de), `dj=auto|none` (donjons), `cq=yes|no` (quêtes de classe) ;
+    un drapeau mal formé est ignoré."""
+    out: dict[str, Any] = {}
+    for flag in flags:
+        name, _, value = flag.partition("=")
+        if name == "lv":
+            low, _, high = value.partition("-")
+            if low.isdigit() and high.isdigit() and 1 <= int(low) < int(high):
+                out["lv"] = (int(low), int(high))
+        elif name == "dj" and value in ("auto", "none"):
+            out["dj"] = value
+        elif name == "cq" and value in ("yes", "no"):
+            out["cq"] = value == "yes"
+    return out
+
+
+def button_plan(
+    key: str,
+    r: Resolved,
+    level_cap: int | None,
+    *,
+    first_talent_level: int | None = None,
+    options: Mapping[str, Any] | None = None,
+) -> Plan | None:
     """Appels et lecture du bouton `key` pour ce contexte ; None si le contexte ne suffit pas (niveau inconnu, pas de
     cible joueur pour PvP, classe que le bouton ne sert pas)."""
     if r.class_name is None or r.level is None:
@@ -271,21 +297,27 @@ def button_plan(key: str, r: Resolved, level_cap: int | None, *, first_talent_le
         # RX1 : route calculée aussitôt avec les réponses par défaut des questions (choices.ROUTE_CHOICES), ajustée
         # ensuite à chaque « Réponse : … » du joueur
         span = int(ROUTE_CHOICES[0].default or ROUTE_CHOICES[0].options[0].key)
-        end = min(r.level + span, level_cap) if level_cap else r.level + span
-        if end <= r.level:
+        opts = options or {}
+        start, end = opts.get("lv") or (r.level, r.level + span)  # CJ1, bloc 6a : niveaux de l'assistant
+        end = min(end, level_cap) if level_cap else end
+        if end <= start:
             return None
         route_args: dict[str, Any] = {
             "action": "plan",
             "class_name": r.class_name,
             "faction": r.faction.lower(),
-            "start_level": r.level,
+            "start_level": start,
             "end_level": end,
         }
+        if "dj" in opts:
+            route_args["dungeons"] = opts["dj"]
+        if "cq" in opts:
+            route_args["class_quests"] = opts["cq"]
         if r.race:  # CJ1 : masques de race et zone de départ de la race
             route_args["race"] = r.race
         if r.name:  # CJ1 : quêtes déjà faites par ce personnage (profil)
             route_args["character"] = r.name
-        if r.map is not None and r.x is not None and r.y is not None:  # CJ1 : départ de la position réelle
+        if start == r.level and r.map is not None and r.x is not None and r.y is not None:  # CJ1 : position réelle
             route_args.update(start_map=r.map, start_x=r.x, start_y=r.y)
         read = (
             (
@@ -341,7 +373,17 @@ def prepare_record(data: ContextData, record: Record) -> Prepared:
     """Contexte du message relié à nos données, consigne du bouton s'il y en a un."""
     resolved = resolve(data, record.context)
     key = button_key(record)
-    plan = button_plan(key, resolved, data.level_cap, first_talent_level=data.talent_first_level) if key else None
+    plan = (
+        button_plan(
+            key,
+            resolved,
+            data.level_cap,
+            first_talent_level=data.talent_first_level,
+            options=route_options(record.flags),
+        )
+        if key
+        else None
+    )
     return Prepared(
         notes=context_notes(resolved) or None,
         guide=plan_text(plan) if plan else None,

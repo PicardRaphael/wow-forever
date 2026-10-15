@@ -611,6 +611,18 @@ Sans terminal (bloc 5) : bouton « Exports », ou « donne-moi ma liste BiS » d
 2. `/fb eui on` puis `/fb role dps` : la bascule vers « <personnage> - DPS » revient (si ce profil existe) ;
    `/fb eui off` l'éteint ; `/fb role clear` efface le rôle.
 
+#### Essai CJ-6 : nouvelle fenêtre de ForeverBridge (CJ1, bloc 6a, décision 280)
+1. Après la fusion : jeu fermé (le pont réinstalle l'addon, nouveau fichier `Screens.lua` vu au lancement seulement),
+   relance du jeu, puis `/fv` : barre latérale à gauche (Chat, Feuille de route, Talents, Équipement, Exports, Mises
+   à jour, Aide), accueil une fois (« Compris »), fenêtre agrandissable et réductible sans chevauchement.
+2. « Plus... » : Nouvelle conversation, Coller /simc, À valider, et les boutons du pont (Leveling, PvP, Mettre à
+   jour…), un par ligne.
+3. Feuille de route : type Leveling, niveaux réglés, « Calculer » : l'aperçu et « Valider et livrer » arrivent dans
+   le chat ; type Réputation avec une faction : réponse honnête (route de réputation pas encore calculée, bloc 4e).
+4. Équipement : niveau changé, « Mon équipement à ce niveau » puis « En faire une route ».
+5. EllesmereUI chargé : la barre de l'entrée choisie prend sa couleur d'accent ; rien ne change dans EllesmereUI.
+6. `/fv classique`, puis `/reload` : l'ancienne fenêtre revient ; `/fv classique` et `/reload` : la nouvelle.
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 

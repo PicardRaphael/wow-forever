@@ -47,8 +47,13 @@ local CTL = "Interface\\AddOns\\ForeverBridge\\ctl\\"
 local PROBE_ADDON = "ForeverBridge_Probe"
 local PROBE2_ADDON = "ForeverBridge_Probe2"
 local PREFIX = "|cff33ff99ForeverBridge|r : "
-local WINDOW_W, WINDOW_H = 520, 360
+local WINDOW_W, WINDOW_H = 520, 360 -- ancienne fenêtre (/fv classique)
 local MIN_W, MIN_H = 360, 240
+-- CJ1, bloc 6a (décision 280) : nouvelle fenêtre, barre latérale à gauche
+local NEW_W, NEW_H = 640, 440
+local NEW_MIN_W, NEW_MIN_H = 520, 380
+local NAV_W = 150 -- largeur de la barre latérale, marges comprises
+local MENU_STEP = 26 -- hauteur d'une ligne du menu « Plus »
 local MAX_LETTERS = 1000 -- question tapée, en caractères (zone de saisie), séquences des liens comprises
 local SLOT_PREFIX = "ForeverBridge_S"
 local GIVE_UP_POLLS = 3 -- relevés sans accusé avant la boîte d'envoi /reload
@@ -160,11 +165,36 @@ function FB.SaveGeometry()
 	state.width, state.height = f:GetWidth(), f:GetHeight()
 end
 
+-- Ancienne fenêtre gardée derrière /fv classique (décision 280), lue une fois à la construction de la fenêtre.
+local function Classic()
+	return type(ForeverBridgeDB) == "table" and ForeverBridgeDB.classic == true
+end
+
+-- Tailles par défaut et minimales de la disposition choisie.
+local function Sizes()
+	if ui.classic then
+		return WINDOW_W, WINDOW_H, MIN_W, MIN_H
+	end
+	return NEW_W, NEW_H, NEW_MIN_W, NEW_MIN_H
+end
+
+-- Marge gauche du contenu : après la barre latérale, sauf dans l'ancienne fenêtre.
+local function ContentLeft()
+	return ui.classic and 14 or NAV_W
+end
+
+-- Largeur du contenu (historique, rangée des réponses, écrans), calculée sur la fenêtre.
+function FB.ContentWidth()
+	local f = ui.frame
+	return f and math.max(0, f:GetWidth() - ContentLeft() - 14) or 0
+end
+
 local function RestoreGeometry(f)
 	local state = WindowState() or {}
-	local width = tonumber(state.width) or WINDOW_W
-	local height = tonumber(state.height) or WINDOW_H
-	f:SetSize(math.max(width, MIN_W), math.max(height, MIN_H))
+	local defaultW, defaultH, minW, minH = Sizes()
+	local width = tonumber(state.width) or defaultW
+	local height = tonumber(state.height) or defaultH
+	f:SetSize(math.max(width, minW), math.max(height, minH))
 	f:ClearAllPoints()
 	if type(state.point) == "string" then
 		f:SetPoint(state.point, UIParent, state.relPoint or state.point, tonumber(state.x) or 0, tonumber(state.y) or 0)
@@ -188,15 +218,24 @@ local function BuildWindow()
 	if ui.frame then
 		return ui.frame
 	end
+	ui.classic = Classic()
+	local _, _, minW, minH = Sizes()
 	local f = CreateFrame("Frame", "ForeverBridgeWindow", UIParent, "BackdropTemplate")
 	ui.frame = f
 	f:SetFrameStrata("DIALOG")
 	f:SetMovable(true)
 	f:SetResizable(true)
 	f:SetClampedToScreen(true)
-	if not (f.SetResizeBounds and pcall(f.SetResizeBounds, f, MIN_W, MIN_H)) and f.SetMinResize then
-		pcall(f.SetMinResize, f, MIN_W, MIN_H)
+	if not (f.SetResizeBounds and pcall(f.SetResizeBounds, f, minW, minH)) and f.SetMinResize then
+		pcall(f.SetMinResize, f, minW, minH)
 	end
+	-- largeur changée : rangée des réponses, menu et écrans replacés (jamais de chevauchement)
+	f:SetScript("OnSizeChanged", function()
+		FB.LayoutAnswers()
+		if FB.LayoutScreens then
+			FB.LayoutScreens()
+		end
+	end)
 	f:EnableMouse(true)
 	f:RegisterForDrag("LeftButton")
 	f:SetScript("OnDragStart", function(self)
@@ -254,23 +293,45 @@ local function BuildWindow()
 	end)
 	ui.tabGame, ui.tabAddons = tabGame, tabAddons
 
-	local pasteButton = CreateFrame("Button", "ForeverBridgePasteButton", f, "UIPanelButtonTemplate")
+	-- Nouvelle fenêtre : menu « Plus » (décision 280) ; les actions secondaires y gardent leur nom et leur rôle.
+	local holder = f
+	if not ui.classic then
+		local more = CreateFrame("Frame", "ForeverBridgeMore", f, "BackdropTemplate")
+		more:SetFrameStrata("DIALOG")
+		more:SetFrameLevel(50)
+		if more.SetBackdrop then
+			more:SetBackdrop(BACKDROP)
+			more:SetBackdropColor(0.08, 0.08, 0.1, 1)
+		end
+		more:EnableMouse(true)
+		more:Hide()
+		ui.more = more
+		holder = more
+	end
+
+	local pasteButton = CreateFrame("Button", "ForeverBridgePasteButton", holder, "UIPanelButtonTemplate")
 	pasteButton:SetSize(96, 20)
-	pasteButton:SetPoint("TOPRIGHT", f, "TOPRIGHT", -32, -8)
+	if ui.classic then
+		pasteButton:SetPoint("TOPRIGHT", f, "TOPRIGHT", -32, -8)
+	end
 	pasteButton:SetText("Coller /simc")
 	pasteButton:SetScript("OnClick", function()
+		FB.HideMore()
 		FB.TogglePaste()
 	end)
-	local cardsButton = CreateFrame("Button", "ForeverBridgeCardsButton", f, "UIPanelButtonTemplate")
+	local cardsButton = CreateFrame("Button", "ForeverBridgeCardsButton", holder, "UIPanelButtonTemplate")
 	cardsButton:SetSize(110, 20)
-	cardsButton:SetPoint("RIGHT", pasteButton, "LEFT", -6, 0)
+	if ui.classic then
+		cardsButton:SetPoint("RIGHT", pasteButton, "LEFT", -6, 0)
+	end
 	cardsButton:SetScript("OnClick", function()
+		FB.HideMore()
 		FB.ToggleCards()
 	end)
 	ui.cardsButton = cardsButton
 
 	local history = CreateFrame("ScrollingMessageFrame", "ForeverBridgeHistory", f)
-	history:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -52)
+	history:SetPoint("TOPLEFT", f, "TOPLEFT", ContentLeft(), -52)
 	history:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14, 16 + INPUT_H + 8 + BAR_H + 8)
 	history:SetFontObject(ChatFontNormal)
 	history:SetJustifyH("LEFT")
@@ -309,7 +370,7 @@ local function BuildWindow()
 
 	-- Zone de saisie avec « Envoyer » accolé (disposition de wow-ai) : Entrée envoie, Maj+Entrée passe à la ligne.
 	local inputBg = CreateFrame("Frame", nil, f, "BackdropTemplate")
-	inputBg:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", 14, 16)
+	inputBg:SetPoint("BOTTOMLEFT", f, "BOTTOMLEFT", ContentLeft(), 16)
 	inputBg:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14 - SEND_W - 6, 16)
 	inputBg:SetHeight(INPUT_H)
 	if inputBg.SetBackdrop then
@@ -354,21 +415,104 @@ local function BuildWindow()
 		FB.SendFromInput()
 	end)
 
-	local new = CreateFrame("Button", "ForeverBridgeNewButton", f, "UIPanelButtonTemplate")
+	local new = CreateFrame("Button", "ForeverBridgeNewButton", holder, "UIPanelButtonTemplate")
 	new:SetSize(160, BAR_H)
-	new:SetPoint("BOTTOMLEFT", inputBg, "TOPLEFT", 0, 8)
 	new:SetText("Nouvelle conversation")
 	new:SetScript("OnClick", function()
+		FB.HideMore()
 		FB.NewConversation()
 	end)
 	ui.newButton = new
+	ui.chatWidgets = { history, inputBg, send }
+	if ui.classic then
+		new:SetPoint("BOTTOMLEFT", inputBg, "TOPLEFT", 0, 8)
+		ui.chatWidgets[#ui.chatWidgets + 1] = new
+	else
+		-- barre d'actions courte : « Envoyer » à droite de la saisie, « Plus » au-dessus (au plus trois actions)
+		local moreButton = CreateFrame("Button", "ForeverBridgeMoreButton", f, "UIPanelButtonTemplate")
+		moreButton:SetSize(80, BAR_H)
+		moreButton:SetPoint("BOTTOMLEFT", inputBg, "TOPLEFT", 0, 8)
+		moreButton:SetText("Plus...")
+		moreButton:SetScript("OnClick", function()
+			FB.ToggleMore()
+		end)
+		ui.moreButton = moreButton
+		ui.more:SetPoint("BOTTOMLEFT", moreButton, "TOPLEFT", 0, 4)
+		ui.chatWidgets[#ui.chatWidgets + 1] = moreButton
+	end
 	ui.buttons = {}
 	FB.RefreshButtons()
 	FB.RenderHistory()
 	FB.UpdateStatus()
 	FB.RefreshCards()
 	FB.RefreshTabs()
+	if not ui.classic and FB.BuildScreens then
+		FB.BuildScreens(f)
+	end
 	return f
+end
+
+-- Menu « Plus » : une action par ligne, largeur de la plus longue (libellés mesurés), fermé après chaque action.
+local function MenuWidth(label)
+	local letters = #(tostring(label or ""):gsub("[\128-\191]", ""))
+	return letters * 7 + 24
+end
+
+function FB.LayoutMore()
+	local more = ui.more
+	if not more then
+		return
+	end
+	local items = { ui.newButton, _G.ForeverBridgePasteButton, ui.cardsButton }
+	for _, key in ipairs(ui.buttonOrder or {}) do
+		items[#items + 1] = ui.buttons[key]
+	end
+	local width, row = 160, 0
+	for _, item in ipairs(items) do
+		if item and item:IsShown() then
+			width = math.max(width, MenuWidth(item:GetText()))
+		end
+	end
+	for _, item in ipairs(items) do
+		if item and item:IsShown() then
+			item:ClearAllPoints()
+			item:SetPoint("TOPLEFT", more, "TOPLEFT", 6, -6 - row * MENU_STEP)
+			item:SetSize(width, BAR_H)
+			row = row + 1
+		end
+	end
+	more:SetSize(width + 12, row * MENU_STEP + 8)
+end
+
+function FB.ToggleMore()
+	if not ui.more then
+		return
+	end
+	if ui.more:IsShown() then
+		ui.more:Hide()
+	else
+		FB.LayoutMore()
+		ui.more:Show()
+	end
+end
+
+function FB.HideMore()
+	if ui.more then
+		ui.more:Hide()
+	end
+end
+
+-- Écran « Chat » montré ou caché (les autres écrans viennent de Screens.lua).
+function FB.ShowChat(shown)
+	for _, widget in ipairs(ui.chatWidgets or {}) do
+		widget:SetShown(shown)
+	end
+	if ui.answers then
+		ui.answers:SetShown(shown and run.answering ~= nil)
+	end
+	if not shown then
+		FB.HideMore()
+	end
 end
 
 -- Onglets visibles selon l'état publié par le pont ; l'onglet courant est grisé.
@@ -476,6 +620,7 @@ function FB.RefreshButtons()
 	local entries = run.buttons or (type(state.buttons) == "table" and state.buttons) or {}
 	local class = PlayerClass()
 	local previous = ui.newButton
+	ui.buttonOrder = {}
 	for _, entry in ipairs(entries) do
 		local allowed = type(entry) == "table" and type(entry.key) == "string"
 		if allowed and type(entry.classes) == "table" then
@@ -489,20 +634,38 @@ function FB.RefreshButtons()
 		if allowed then
 			local button = ui.buttons[entry.key]
 			if not button then
-				button = CreateFrame("Button", "ForeverBridgeButton_" .. entry.key, ui.frame, "UIPanelButtonTemplate")
+				local parent = ui.more or ui.frame
+				button = CreateFrame("Button", "ForeverBridgeButton_" .. entry.key, parent, "UIPanelButtonTemplate")
 				button:SetSize(100, BAR_H)
 				ui.buttons[entry.key] = button
 			end
 			button:SetText(tostring(entry.label or entry.key))
-			button:ClearAllPoints()
-			button:SetPoint("LEFT", previous, "RIGHT", 6, 0)
+			if not ui.more then
+				button:ClearAllPoints()
+				button:SetPoint("LEFT", previous, "RIGHT", 6, 0)
+			end
 			button:SetScript("OnClick", function()
+				FB.HideMore()
 				FB.ClickButton(entry)
 			end)
 			button:Show()
 			previous = button
+			ui.buttonOrder[#ui.buttonOrder + 1] = entry.key
 		end
 	end
+	FB.LayoutMore()
+end
+
+-- Entrée publiée par le pont pour un bouton (écrans de la nouvelle fenêtre), ou nil.
+function FB.ButtonEntry(key)
+	local state = type(ForeverBridgeStatus) == "table" and ForeverBridgeStatus or {}
+	local entries = run.buttons or (type(state.buttons) == "table" and state.buttons) or {}
+	for _, entry in ipairs(entries) do
+		if type(entry) == "table" and entry.key == key then
+			return entry
+		end
+	end
+	return nil
 end
 
 ---------------------------------------------------------------------------
@@ -673,6 +836,11 @@ local function CopyLinks(links)
 	return #out > 0 and out or nil
 end
 
+-- Liens d'export de la session (écran Exports de la nouvelle fenêtre).
+function FB.SessionExports()
+	return run.exports or {}
+end
+
 function FB.Exports()
 	FB.Open()
 	if not run.exports or #run.exports == 0 then
@@ -735,40 +903,56 @@ function FB.ShowAnswers(entry)
 		local bar = CreateFrame("Frame", "ForeverBridgeAnswers", ui.frame)
 		bar:SetHeight(ANSWER_H)
 		bar:SetPoint("BOTTOMLEFT", ui.history, "BOTTOMLEFT", 0, 0)
-		bar:SetPoint("BOTTOMRIGHT", ui.history, "BOTTOMRIGHT", 0, 0)
 		ui.answers = bar
 		ui.answerButtons = {}
 	end
 	if entry.choices.prompt ~= "" then
 		FB.Print("|cffffd100Question|r : " .. Escape(Plain(entry.choices.prompt)))
 	end
-	local previous
 	for i, choice in ipairs(entry.choices.buttons) do
 		local button = ui.answerButtons[i]
 		if not button then
 			button = CreateFrame("Button", "ForeverBridgeAnswer" .. i, ui.answers, "UIPanelButtonTemplate")
 			ui.answerButtons[i] = button
 		end
-		local label = Plain(choice.label)
-		button:SetText(label)
-		button:SetSize(math.max(60, #label * 7 + ANSWER_PAD), ANSWER_H)
-		button:ClearAllPoints()
-		if previous then
-			button:SetPoint("LEFT", previous, "RIGHT", 6, 0)
-		else
-			button:SetPoint("LEFT", ui.answers, "LEFT", 0, 0)
-		end
+		button:SetText(Plain(choice.label))
 		button:SetScript("OnClick", function()
 			FB.Answer(i)
 		end)
 		button:Show()
-		previous = button
 	end
 	for i = #entry.choices.buttons + 1, #ui.answerButtons do
 		ui.answerButtons[i]:Hide()
 	end
 	run.answering = entry
+	FB.LayoutAnswers()
 	ui.answers:Show()
+end
+
+-- Rangée des réponses sur la largeur du contenu : largeur de chaque bouton mesurée sur son libellé (caractères),
+-- passage à la ligne quand le bouton suivant ne tient plus, jamais de chevauchement (CJ1, bloc 6a).
+function FB.LayoutAnswers()
+	local bar = ui.answers
+	if not bar then
+		return
+	end
+	local width = FB.ContentWidth()
+	bar:SetWidth(width)
+	local x, row = 0, 0
+	for _, button in ipairs(ui.answerButtons) do
+		if button:IsShown() then
+			local letters = #(tostring(button:GetText() or ""):gsub("[\128-\191]", ""))
+			local w = math.min(math.max(60, letters * 7 + ANSWER_PAD), width)
+			if x > 0 and x + w > width then
+				row, x = row + 1, 0
+			end
+			button:SetSize(w, ANSWER_H)
+			button:ClearAllPoints()
+			button:SetPoint("TOPLEFT", bar, "TOPLEFT", x, -row * (ANSWER_H + 4))
+			x = x + w + 6
+		end
+	end
+	bar:SetHeight((row + 1) * (ANSWER_H + 4))
 end
 
 function FB.Answer(index)
@@ -1300,6 +1484,10 @@ function FB.RefreshCards()
 	local count = #VisibleCards()
 	button:SetText("À valider (" .. count .. ")")
 	button:SetShown(count > 0)
+	if FB.OnCardsCount then -- entrée « Mises à jour (n) » de la barre latérale : le même compte
+		FB.OnCardsCount(count)
+	end
+	FB.LayoutMore()
 	if PanelShown() then
 		FB.LayoutPanel()
 	end
@@ -2492,7 +2680,18 @@ local HELP = {
 	"/fb role dps|heal|tank|clear : rôle de ce personnage (profil EllesmereUI seulement après /fb eui on).",
 	"/fb eui on|off : propositions et bascule de profil EllesmereUI, éteintes par défaut (ton interface reste la tienne).",
 	"/fb base <profil> : profil EllesmereUI de base de ce personnage, d'où part le bouton Exports (sans nom : la liste).",
+	"/fv classique : ancienne fenêtre ou nouvelle fenêtre (barre latérale), au /reload suivant.",
 }
+
+-- Ancienne fenêtre (décision 280) : réglage gardé, pris en compte au /reload suivant que le joueur tape.
+function FB.ToggleClassic()
+	if type(ForeverBridgeDB) ~= "table" then
+		return
+	end
+	ForeverBridgeDB.classic = not (ForeverBridgeDB.classic == true)
+	local which = ForeverBridgeDB.classic and "l'ancienne fenêtre" or "la nouvelle fenêtre (barre latérale)"
+	FB.Print("Fenêtre : " .. which .. " au prochain /reload (tapez /reload).")
+end
 
 -- Taille de case de la bande des messages, gardée dans ForeverBridgeDB.cell.
 function FB.SetCell(value)
@@ -2522,6 +2721,7 @@ local function Help()
 	end
 	ui.helpAt = ui.count
 end
+FB.Help = Help
 
 SLASH_FOREVERBRIDGE1 = "/fv"
 SLASH_FOREVERBRIDGE2 = "/forever"
@@ -2555,6 +2755,9 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.SetEui(rest)
 	elseif command == "base" then
 		FB.SetBase(rest)
+	elseif command == "classique" then
+		FB.Open()
+		FB.ToggleClassic()
 	else
 		Help()
 	end
