@@ -410,7 +410,7 @@ def build_parser() -> argparse.ArgumentParser:
     q_show.add_argument("--json", action="store_true", help="sortie JSON")
 
     gear = sub.add_parser("gear", help="équipement (CJ1, bloc 4) : poids, liste BiS, leveling, amélioration")
-    gear.add_argument("action", choices=["weights", "bis", "leveling", "upgrade"], help="ce qu'il faut rendre")
+    gear.add_argument("action", choices=["weights", "bis", "leveling", "upgrade", "route"], help="ce qu'il faut rendre")
     gear.add_argument("--class", dest="cls", default="Mage", help="classe (défaut : Mage)")
     gear.add_argument("--level", type=int, default=60, help="niveau du personnage (défaut : 60)")
     gear.add_argument("--race", default="Orc", help="race (nom de races.json)")
@@ -1618,6 +1618,21 @@ def _cmd_gear(deps: Deps, args: argparse.Namespace) -> int:
         lines = [
             f"  {p['slot']} : {p['name'] or p['item']} ({p['source'] or '?'}, {p['zone'] or '?'})" for p in doc["picks"]
         ]
+    elif args.action == "route":
+        lines = [f"Route d'équipement ({doc['spec']}) :"]
+        for d in doc["dungeons"]:
+            head = f"  {d['name']} : {len(d['items'])} objet(s) ({', '.join(d['bosses'])})"
+            if d["expected_runs"] is None:
+                lines.append(f"{head} ; taux inconnu des sources, passages non chiffrés")
+            else:
+                runs = d["runs_for_chance"] if d["runs_for_chance"] is not None else "jamais"
+                lines.append(
+                    f"{head} ; environ {d['expected_runs']:.1f} passage(s) en moyenne, {runs} pour 9 chances sur 10"
+                )
+        lines += [f"  Quêtes en {z['zone']} : {', '.join(map(str, z['quests']))}" for z in doc["quests"]]
+        lines += [f"  Objet {o['item']} : {o['text']}" for o in doc["others"]]
+        if doc["unknown"]:
+            lines.append(f"  Origine inconnue : {', '.join(map(str, doc['unknown']))}")
     else:
         lines = [f"Objet {doc['item']} : {doc['verdict']} (écart {doc['delta']}, poids : {doc['weights_source']})"]
     _emit(doc, lines, doc["provenance"], args.json)

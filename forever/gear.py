@@ -201,10 +201,11 @@ def personal_bis(
     """Liste BiS personnelle d'une spécialisation (décision 276) : candidats de Naowh Forever puis de Forever
     Companion par emplacement, classés par `weights` (clés de Forever Guide) sur les statistiques de Forever Guide ;
     objet sans statistiques connues après les objets chiffrés, dans l'ordre des addons ; bagues et bijoux sur deux
-    emplacements distincts ; lieu de butin de Naowh ; objets de l'autre camp écartés (`faction`) ; chaîne `!NBIS1!`
+    emplacements distincts ; lieu de butin de Naowh ; objets de l'autre camp écartés (`faction` : mention de Naowh,
+    sinon objet choisi par GearQuest pour l'autre camp seulement) ; chaîne `!NBIS1!`
     (None sans liste)."""
     from forever.exports.naowh import naowh_bis
-    from forever.pipeline.gear_sources import read_companion_bis, read_guide_gear, read_naowh_bis
+    from forever.pipeline.gear_sources import read_companion_bis, read_gearquest_picks, read_guide_gear, read_naowh_bis
 
     gear = read_guide_gear(addons)
     naowh, sources = read_naowh_bis(addons)
@@ -222,6 +223,13 @@ def personal_bis(
     if faction:  # objets réservés à l'autre camp d'après le lieu de butin de Naowh (« Quest (Horde) »…)
         other = {"horde": "(Alliance)", "alliance": "(Horde)"}.get(faction.lower())
         banned = {i for i, s in sources.items() if other and s.rstrip().endswith(other)}
+        # sinon d'après GearQuest (une liste de choix par camp) : objet choisi pour l'autre camp seulement
+        marked = {i for i, s in sources.items() if s.rstrip().endswith(("(Alliance)", "(Horde)"))}
+        camps: dict[int, set[str]] = {}
+        for p in read_gearquest_picks(addons, spec.class_token) if spec else []:
+            if p.faction:
+                camps.setdefault(p.item, set()).add(p.faction.lower())
+        banned |= {i for i, c in camps.items() if i not in marked and faction.lower() not in c}
         lists = {slot: [(i, o) for i, o in entries if i not in banned] for slot, entries in lists.items()}
     origins: dict[int, set[str]] = {}
     for entries in lists.values():
@@ -440,4 +448,24 @@ def gear_report(
             f"poids : {source} ; statistiques des objets de Forever Guide ; Naowh Score : le leur, non repris"
         ]
         return {**out, "weights_source": source, "provenance": _provenance(deps, assumptions)}
-    raise InvalidArgumentError(f"Action inconnue : {action}.", "weights, bis, leveling ou upgrade")
+    if action == "route":  # CJ1, bloc 4b : route d'équipement des objets de la liste BiS personnelle
+        from forever.gear_route import CHANCE, gear_route
+
+        key = spec or DEFAULT_SPECS.get(cls) or ""
+        if not key:
+            raise InvalidArgumentError("Spécialisation requise (clé de Naowh, ex. fury-warrior).", "donner --spec")
+        weights, source = _weights_for(deps, addons, cls, level=level, race=race, spec=key)
+        bis = personal_bis(addons, spec_key=key, weights=weights, name=name or f"Forever · {key}", faction=faction)
+        route = gear_route(deps, addons, bis)
+        assumptions = [
+            (
+                f"objets de la liste BiS personnelle ({source}) ; origines : boss et taux de DJ1 (Naowh d'abord), "
+                "quêtes du livre (récompenses de Forever Guide et de GearQuest), sinon lieu de Naowh Forever"
+            ),
+            (
+                f"passages d'un donjon : espérance pour obtenir tous ses objets voulus et nombre pour {int(CHANCE * 10)} "
+                "chances sur 10, chaque objet tombant indépendamment à son taux"
+            ),
+        ]
+        return {"spec": key, "export": bis["export"], **route, "provenance": _provenance(deps, assumptions)}
+    raise InvalidArgumentError(f"Action inconnue : {action}.", "weights, bis, leveling, upgrade ou route")

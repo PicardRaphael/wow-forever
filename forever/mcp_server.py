@@ -442,7 +442,8 @@ def build_server(deps: Deps) -> MCPServer:
         depuis Naowh Forever et Forever Companion, classée par nos poids (Mage) ou l'échelle de Forever Companion, avec
         lieux de butin et `export` (!NBIS1!, Naowh, fenêtre BiS, « Import a list ») ; `action="leveling"` choix de
         GearQuest Forever au niveau ; `action="upgrade"` « est-ce une amélioration ? » (`item`, `equipped` : objets
-        portés)."""
+        portés) ; `action="route"` route d'équipement de la liste BiS : donjons (objets cumulés, `expected_runs`,
+        `runs_for_chance` pour 9 chances sur 10), quêtes par zone, autres origines (métier, réputation, marchand)."""
         from forever.gear import gear_report
 
         try:
