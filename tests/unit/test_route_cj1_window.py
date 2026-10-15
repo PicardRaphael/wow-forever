@@ -46,3 +46,13 @@ def test_without_options_the_route_is_unchanged(make_deps):
     data = load_context_data(make_deps())
     r = resolve(data, _ctx())
     assert button_plan("route", r, data.level_cap, options={}) == button_plan("route", r, data.level_cap)
+
+
+def test_levels_from_the_assistant_are_not_asked_again(tmp_path):
+    from test_bridge_choices import setup_bridge
+
+    _bridge, _addons, _agent, send, _cards = setup_bridge(tmp_path)
+    reply = send(flags={"b=route", "lv=1-4"}, text="Prépare ma feuille de route de leveling du niveau 1 au niveau 4.")
+    choices = reply.choices
+    actions = [choices.buttons[i].action for i in range(1, len(choices.buttons) + 1)]
+    assert actions == ["route_deliver"]  # niveaux déjà choisis : seulement « Valider et livrer »

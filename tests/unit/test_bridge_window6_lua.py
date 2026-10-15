@@ -298,3 +298,23 @@ def test_no_forbidden_call_through_every_screen():
     click(game, "ForeverBridgeMoreButton")
     resize(game, 520, 380)
     assert len(game.stub.forbidden) == 0
+
+
+def test_answer_row_waits_for_the_chat_screen():
+    game = opened()
+    click(game, "ForeverBridgeNav_gear")
+    choices = {"prompt": "", "buttons": [{"label": "Valider et livrer", "action": "route_deliver"}]}
+    fill(game, [reply(game, "done", text="Aperçu", provenance="p", choices=choices)])
+    type_and_enter(game, "Prépare ma feuille de route")
+    click(game, "ForeverBridgeNav_gear")
+    game.stub.Advance(4)
+    assert not visible(game, "ForeverBridgeAnswers")  # jamais par-dessus un autre écran
+    click(game, "ForeverBridgeNav_chat")
+    assert visible(game, "ForeverBridgeAnswers")
+
+
+def test_updates_entry_without_cards_says_so():
+    game = opened()
+    assert text(game, "ForeverBridgeNav_updates") == "Mises à jour"
+    click(game, "ForeverBridgeNav_updates")
+    assert any("aucune mise à jour" in line.lower() for line in history(game))
