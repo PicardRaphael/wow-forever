@@ -125,6 +125,13 @@ COMPANION_SLOTS: dict[str, tuple[int, ...]] = {
     "ranged": (18,),
 }
 PAIRED = ((11, 12), (13, 14))  # deux bagues, deux bijoux : deux objets distincts
+# objets dont l'origine dépend du camp : types de GearQuest Forever et genres du lieu de butin de Naowh Forever
+CAMP_SOURCES = ("quest_reward", "seasonal_quest", "vendor")
+NAOWH_CAMP_KINDS = ("Quest", "Reputation", "PvP Rank")
+CAMP_NOTE = (
+    "objets de l'autre camp écartés : mention du camp chez Naowh, sinon objet absent du classement de GearQuest "
+    "pour ce camp quand son origine dépend du camp (quête, marchand, réputation, rang JcJ ; suppose)"
+)
 # Statistiques de l'échelle de Forever Companion -> clés de Forever Guide (`GearData.lua`).
 PAWN_TO_GUIDE = {
     "Strength": "str",
@@ -202,10 +209,16 @@ def personal_bis(
     Companion par emplacement, classés par `weights` (clés de Forever Guide) sur les statistiques de Forever Guide ;
     objet sans statistiques connues après les objets chiffrés, dans l'ordre des addons ; bagues et bijoux sur deux
     emplacements distincts ; lieu de butin de Naowh ; objets de l'autre camp écartés (`faction` : mention de Naowh,
-    sinon objet choisi par GearQuest pour l'autre camp seulement) ; chaîne `!NBIS1!`
+    sinon objet choisi par GearQuest pour l'autre camp seulement quand son origine dépend du camp) ; chaîne `!NBIS1!`
     (None sans liste)."""
     from forever.exports.naowh import naowh_bis
-    from forever.pipeline.gear_sources import read_companion_bis, read_gearquest_picks, read_guide_gear, read_naowh_bis
+    from forever.pipeline.gear_sources import (
+        read_companion_bis,
+        read_gearquest_facts,
+        read_gearquest_picks,
+        read_guide_gear,
+        read_naowh_bis,
+    )
 
     gear = read_guide_gear(addons)
     naowh, sources = read_naowh_bis(addons)
@@ -223,13 +236,20 @@ def personal_bis(
     if faction:  # objets réservés à l'autre camp d'après le lieu de butin de Naowh (« Quest (Horde) »…)
         other = {"horde": "(Alliance)", "alliance": "(Horde)"}.get(faction.lower())
         banned = {i for i, s in sources.items() if other and s.rstrip().endswith(other)}
-        # sinon d'après GearQuest (une liste de choix par camp) : objet choisi pour l'autre camp seulement
+        # sinon d'après GearQuest (une liste de choix par camp) : objet choisi pour l'autre camp seulement, quand son
+        # origine dépend du camp (quête, marchand, réputation, rang JcJ) ; jamais un objet fabriqué ou lâché
         marked = {i for i, s in sources.items() if s.rstrip().endswith(("(Alliance)", "(Horde)"))}
+        facts = read_gearquest_facts(addons, spec.class_token) if spec else {}
         camps: dict[int, set[str]] = {}
         for p in read_gearquest_picks(addons, spec.class_token) if spec else []:
             if p.faction:
                 camps.setdefault(p.item, set()).add(p.faction.lower())
-        banned |= {i for i, c in camps.items() if i not in marked and faction.lower() not in c}
+
+        def camp_bound(item: int) -> bool:
+            kind = sources.get(item, "").rsplit("·", 1)[-1].strip()
+            return facts.get(item, {}).get("sourceType") in CAMP_SOURCES or kind in NAOWH_CAMP_KINDS
+
+        banned |= {i for i, c in camps.items() if i not in marked and faction.lower() not in c and camp_bound(i)}
         lists = {slot: [(i, o) for i, o in entries if i not in banned] for slot, entries in lists.items()}
     origins: dict[int, set[str]] = {}
     for entries in lists.values():
@@ -432,7 +452,7 @@ def gear_report(
                 f"listes BiS de Naowh Forever et de Forever Companion lues en local, classées par les poids : {source} ; "
                 "statistiques des objets de Forever Guide (objets inconnus après les objets chiffrés)"
             ),
-            "lieux de butin de Naowh Forever ; objets réservés à l'autre camp écartés d'après ces lieux",
+            f"lieux de butin de Naowh Forever ; {CAMP_NOTE}",
         ]
         return {**out, "weights": weights, "weights_source": source, "provenance": _provenance(deps, assumptions)}
     if action == "leveling":
@@ -464,8 +484,9 @@ def gear_report(
             ),
             (
                 f"passages d'un donjon : espérance pour obtenir tous ses objets voulus et nombre pour {int(CHANCE * 10)} "
-                "chances sur 10, chaque objet tombant indépendamment à son taux"
+                "chances sur 10, chaque objet tombant indépendamment à son taux ; butin partagé en groupe non compté"
             ),
+            CAMP_NOTE,
         ]
         return {"spec": key, "export": bis["export"], **route, "provenance": _provenance(deps, assumptions)}
     raise InvalidArgumentError(f"Action inconnue : {action}.", "weights, bis, leveling, upgrade ou route")
