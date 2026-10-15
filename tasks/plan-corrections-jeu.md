@@ -344,6 +344,37 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
   taux donne un **passage en boucle** avec le nombre de passages attendu (espérance et nombre pour une chance de 90 %,
   fonctions pures dans `forever/engine/`, registre) ; plusieurs objets d'un même donjon cumulés.
 - Livraison dans RestedXP comme une route de leveling ; aperçu par objet (source, taux, passages, temps).
+- **Fait le 2026-10-15 (première partie)** : origine de chaque objet choisi de la liste BiS (boss et taux du livre
+  des donjons, quête du livre des quêtes, sinon lieu de Naowh), donjons regroupés avec passages attendus et pour 9
+  chances sur 10 (registre I20), quêtes par zone (`forever gear route`, `forever_gear` action `route`). **Reste en
+  4d** : ordre par l'optimiseur de trajets, livraison dans RestedXP, écarts entre sources montrés objet par objet,
+  relevés du joueur d'abord.
+
+### Bloc 4c — Équipement par niveau, à la demande (idées du chat du 2026-10-15, point 3 ; premier des ajouts)
+- « Mon équipement BiS pour le niveau 20 », « par niveau du 10 au 30 » : pour **n'importe quel niveau ou tranche**,
+  pas seulement le niveau du personnage ; pour chaque emplacement l'objet visé et ce qui le donne (quête : donneur,
+  chaîne, position ; donjon et boss avec taux), sources dans l'ordre : GearQuest Forever, Forever Guide, Naowh
+  Forever, Forever Companion (décision 272, lecture locale) ; classement par nos poids (Mage) ou l'échelle de Forever
+  Companion (autres classes, `suppose`).
+- Tranche de niveaux : une ligne par palier où l'objet visé change (pas une liste par niveau).
+- « En faire une route » : la liste devient l'entrée de la route d'équipement (4b, puis 4d).
+- Outils : `forever gear leveling --level N` étendu (tranche `--to M`, quêtes et donjons joints), `forever_gear` ;
+  écran Équipement du bloc 6 (choix du niveau, bouton « En faire une route »).
+
+### Bloc 4d — Route d'équipement complète (idées du chat du 2026-10-15, point 2)
+- Suite de 4b : quêtes (donneur, chaîne, position) et donjons ordonnés **par l'optimiseur de trajets** (mêmes
+  garde-fous que les routes de leveling), passages en boucle d'un donjon à faible taux avec leur nombre attendu ;
+  livraison dans RestedXP comme les autres routes (nom stable « Forever · <perso> · équipement ») ; écarts entre
+  sources montrés objet par objet ; relevés du joueur (ForeverLogger) d'abord ; partage du butin en groupe dit.
+
+### Bloc 4e — Route de réputation (idées du chat du 2026-10-15, point 1)
+- « Monte ma réputation avec X » : toutes les sources de réputation de la faction ordonnées en une route : quêtes
+  (gain de réputation), objets à rendre, et **monstres à tuer avec leur nombre** : gain par monstre, palier au-delà
+  duquel le gain cesse (plafond éventuel), nombre de monstres jusqu'au palier visé.
+- Réponse : palier actuel (lu en jeu), palier visé, temps estimé, répartition quêtes, objets, monstres ; sources :
+  tables du client (réputation, récompenses des quêtes), addons installés (Forever Guide, Naowh, Questie, Forever
+  Companion), notes officielles ; certitude affichée ; règle incertaine (plafond, bonus) marquée `suppose` avec sa
+  question ouverte. Livraison dans RestedXP comme les autres routes.
 
 ### Bloc 5 — EllesmereUI éteint par défaut (question 8)
 - `exports.py` ne propose plus profil ni rôle sauf réglage allumé ; `FB.SwitchProfile` jamais appelé réglage éteint ;
@@ -356,6 +387,20 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
   assistant de feuille de route (niveaux, cases à cocher, « Calculer », aperçu en carte, « Valider et livrer ») ;
   historique en cartes ; compteur cohérent ; aide d'accueil courte ; thème ; ancienne fenêtre gardée derrière un
   réglage jusqu'à l'acceptation. Aucune fonction protégée, rien en combat.
+- **Maquettes acceptées le 2026-10-15** (`tasks/CJ1-maquettes.md`, décision 280) avec les cinq choix par défaut
+  (barre latérale à gauche ; 640 × 440 redimensionnable dès 520 × 380 ; habillage par EllesmereUI en lecture seule
+  s'il est chargé ; ancienne fenêtre derrière `/fv classique` jusqu'à l'accord ; étude web en lecture seule) et deux
+  ajouts : **type de route** dans l'assistant (leveling, réputation, métier, équipement) ; dans l'écran Équipement,
+  **choix du niveau** (« mon équipement pour le niveau 20 ») et bouton **« En faire une route »**.
+- **Découpage** :
+  - **6a** (maintenant) : barre latérale (Chat, Feuille de route, Talents, Équipement, Exports, Mises à jour (n),
+    Aide), écrans, barre d'actions à trois actions au plus et menu « Plus ▾ » (boutons du pont gardés sous leur nom),
+    thème, aide d'accueil, `/fv classique` (prend effet au `/reload` suivant, que le joueur tape). L'assistant envoie
+    la même demande que le chat (`b=route` et drapeaux `lv=<de>-<à>`, `dj=none`, `cq=no` pour une route de leveling ;
+    question sans bouton pour réputation, métier, équipement, que l'agent traite ou dit non calculée) ; **l'aperçu
+    et « Valider et livrer » s'affichent dans le Chat** (même rangée de boutons qu'aujourd'hui), pas dans l'écran.
+  - **6b** (après 4c) : réponses en cartes dans l'historique (titre, certitude, boutons dans la carte) et aperçu de
+    route dans l'écran Feuille de route ; écart aux maquettes signalé ici jusque-là.
 
 ## Blocs et calendrier (fin de la bêta annoncée le 21 octobre, sortie le 4 novembre)
 
@@ -367,11 +412,14 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
 | 20 oct. | **3** — Talents dès le niveau 1 ; **5** — EllesmereUI éteint | 20 et 21 |
 | 21 oct. au soir | Fin de la bêta : corrections des essais 1, 2, 3, 5 avant la fermeture si possible | dernier jour |
 | 19 oct. → 3 nov. | **1e** — Réglage de l'optimiseur sur la recette (en continu, hors jeu), puis 1g | au 4 nov. |
-| 22 → 26 oct. | **4** — BiS et équipement | au 4 nov. |
-| 27 → 28 oct. | **4b** — Route d'équipement ; maquettes du bloc 6 montrées le 28 | au 4 nov. |
-| 29 oct. → 2 nov. | **6** — Nouvelle fenêtre | au 4 nov. |
+| 15 oct. | **4**, **5**, **4b** (première partie) faits ; maquettes du bloc 6 acceptées | au 4 nov. |
+| 16 → 19 oct. | **6a** — Nouvelle fenêtre (barre latérale, écrans, assistant, thème, `/fv classique`) | 20 et 21 |
+| 20 → 23 oct. | **4c** — Équipement par niveau ou tranche, à la demande, « En faire une route » | au 4 nov. |
+| 24 → 27 oct. | **4d** — Route d'équipement complète (optimiseur de trajets, livraison RestedXP) | au 4 nov. |
+| 28 → 31 oct. | **4e** — Route de réputation ; **6b** — Réponses en cartes | au 4 nov. |
+| 1 → 2 nov. | **1d** — Vols et pierre de foyer dans notre calcul, puis lecteur de Polestar (si le temps le permet) | au 4 nov. |
 | 3 nov. | Marge ; `docs/LANCEMENT.md` (essais restés en attente) | — |
-| 4 nov. | Sortie : essais des blocs 1e, 1g, 4, 4b, 6 ; clôture de CJ1 à ton accord | 4 nov. et suivants |
+| 4 nov. | Sortie : essais des blocs 1e, 1g, 4, 4b à 4e, 6 ; clôture de CJ1 à ton accord | 4 nov. et suivants |
 
 Ce qui glisse : SIM1 et la suite de RX2 (quêtes lancées par un objet, comparaison à Factoruide refaite) après le
 4 novembre ; CM1 dès la sortie (décision 261). Si un essai des blocs 1, 2, 3 ou 5 échoue, sa correction passe devant
