@@ -78,6 +78,11 @@ ELWYNN_AREA, ELWYNN_MAP = 12, 1429  # zone couverte par Completo : une quête Cl
 QUESTIE = Path("Questie")
 COMPLETO = Path("NaowhForever_Discovery/QuestList/Data/Quests.lua")
 JOURNEYS = Path("NaowhForever_Journeys/Data/QuestSpots.lua")
+# Naowh Forever 1.1.19 : fichiers installés dans des addons de données ; la fixture garde l'ancienne disposition
+INSTALLED = {
+    COMPLETO: Path("NaowhForever_DiscoveryData/Quests.lua"),
+    JOURNEYS: Path("NaowhForever_JourneysData/QuestSpots.lua"),
+}
 NAOWH_DJ = Path("NaowhForever_DungeonJournal/Data/Quests.lua")
 GUIDE = Path("ForeverGuide/DungeonData.lua")
 FDJ_REWARDS = Path("ForeverDungeonJournal/Data/QuestRewards.lua")
@@ -115,11 +120,17 @@ def _section(text: str, start: str) -> str:
     return text[i : j + 2]
 
 
+def _installed(addons: Path, rel: Path) -> Path:
+    """Fichier installé : nouvel emplacement de Naowh Forever 1.1.19 s'il existe, sinon l'ancien."""
+    new = addons / INSTALLED[rel]
+    return new if new.is_file() else addons / rel
+
+
 def _questie(addons: Path, extra: set[int]) -> tuple[set[int], int]:
     root = addons / QUESTIE
     qtext = (root / "Database/Classic/classicQuestDB.lua").read_text(encoding="utf-8")
     keys = qtext[: qtext.index("QuestieDB.questData")]
-    completo = (addons / COMPLETO).read_text(encoding="utf-8")
+    completo = _installed(addons, COMPLETO).read_text(encoding="utf-8")
     elwynn = re.search(rf"map = {ELWYNN_MAP}, .*?quests = {{([^}}]*)}}", completo)
     assert elwynn is not None
     covered = {int(x) for x in elwynn[1].split(",")}
@@ -185,7 +196,7 @@ def extract_addons(wow: Path) -> Path:
         header = [line for line in text.splitlines() if line.startswith("## ") and "Notes" not in line]
         _write(toc, "\n".join(header) + "\n")
     ids, absent = _questie(addons, set(GEARQUEST_AMBIGUOUS))
-    completo = (addons / COMPLETO).read_text(encoding="utf-8")
+    completo = _installed(addons, COMPLETO).read_text(encoding="utf-8")
     zones = [line for line in _section(completo, "D.Zones = {").splitlines() if f"map = {ELWYNN_MAP}," in line]
     zones += [line for line in _section(completo, "D.Zones = {").splitlines() if "map = 1416," in line]
     zones += [line for line in _section(completo, "D.Zones = {").splitlines() if "map = 1411," in line]
@@ -202,7 +213,7 @@ def extract_addons(wow: Path) -> Path:
         + "\n".join(chains)
         + "\n}\n",
     )
-    spots = (addons / JOURNEYS).read_text(encoding="utf-8")
+    spots = _installed(addons, JOURNEYS).read_text(encoding="utf-8")
     _write(
         JOURNEYS,
         "local ns = _G.NaowhForever\n\nns.JourneyQuestSpots = {\n" + "\n".join(_lines(spots, ids)) + "\n}\n",
