@@ -230,7 +230,8 @@ def test_gear_screen_level_choice_and_make_a_route():
     click(game, "ForeverBridgeNav_gear")
     click(game, "ForeverBridgeGearRoute")
     _, record = sent(game)
-    assert "route d'équipement" in record.text and "niveau 18" in record.text
+    # bloc 4c : action traitée par le pont sans le modèle (route des objets obtenables au niveau choisi)
+    assert record.flags == frozenset({"a=gear_route:18"}) and record.text == ""
 
 
 def test_exports_screen_lists_the_session_links_with_a_copy_button():

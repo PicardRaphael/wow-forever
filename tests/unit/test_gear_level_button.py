@@ -85,3 +85,24 @@ def test_gear_level_action_with_a_bad_level_is_refused(wired):
     send, _agent, calls = wired
     reply = send(flags={"a=gear_level:abc"}, text="")
     assert calls == [] and "refusée" in reply.text
+
+
+def test_make_a_route_button_end_to_end(wired):
+    """« En faire une route » (bloc 4c) : action `a=gear_route:<N>` sans le modèle, faite des seuls objets
+    obtenables au niveau N (jamais la route de la liste BiS, sans niveau), regroupés par origine."""
+    send, agent, calls = wired
+    before = len(agent.calls)
+    reply = send(flags={f"a=gear_route:{LEVEL}"}, text="")
+    assert len(agent.calls) == before and [c[0] for c in calls] == ["leveling"]
+    assert calls[0][1]["level"] == LEVEL
+    text = reply.text
+    assert f"Route d'équipement au niveau {LEVEL}" in text
+    assert "Ok Vendor Shoes" in text and "Ok Drop Gloves" in text and "Haut" not in text
+
+
+def test_gear_actions_with_a_bad_level_say_why(wired):
+    send, _agent, calls = wired
+    for flag in ("a=gear_route:abc", "a=gear_level:0"):
+        reply = send(flags={flag}, text="")
+        assert "niveau invalide" in reply.text
+    assert calls == []
