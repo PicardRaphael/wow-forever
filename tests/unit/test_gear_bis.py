@@ -5,6 +5,8 @@ connues garde le rang de l'addon, après les objets chiffrés ; lieu de butin de
 
 Valeurs : addons fabriqués `tests/fixtures/addons/gear/` ; poids fabriqués ici. Aucun chiffre de jeu ici."""
 
+import shutil
+
 from conftest import FIXTURES
 
 from forever.exports.naowh import read_naowh_bis as decode_nbis
@@ -57,11 +59,31 @@ def test_items_of_the_other_faction_are_left_out():
     assert alliance["slots"][11] == 900003
 
 
-def test_items_listed_only_for_the_other_faction_by_gearquest_are_left_out():
-    # 900001 et 900002 : choix de GearQuest pour l'Alliance seulement (fixture), sans camp chez Naowh : écartés pour la
-    # Horde (réputation ou marchand d'un camp, ex. les ceintures de l'Arathi Basin) ; la mention de Naowh prime
-    # (900003 : « (Alliance) » chez Naowh, choix Horde chez GearQuest : gardé pour l'Alliance)
-    horde = personal_bis(ADDONS, spec_key="fire-mage", weights=WEIGHTS, name="n", faction="horde")
+def _camp_fixture(tmp_path):
+    """Copie de la fixture : origines de GearQuest (900001 récompense de quête, 900002 marchand) et 900008, fabriqué,
+    choisi pour l'Alliance seulement et candidat de Naowh (emplacement 13)."""
+    addons = tmp_path / "gear"
+    shutil.copytree(ADDONS, addons)
+    data = addons / "GearQuestForever_MAGE" / "Data.Mage.generated.lua"
+    text = data.read_text(encoding="utf-8").replace('sourceType="quest"', 'sourceType="quest_reward"')
+    facts = '\n    [900002]={name="Fixture Cap",quality=2,sourceType="vendor"},'
+    facts += '\n    [900008]={name="Fixture Charm",quality=3,sourceType="profession"},'
+    text = text.replace("GQ.Data.mageItemFacts = {", "GQ.Data.mageItemFacts = {" + facts)
+    pick = '\n    {900008,"Trinket",20,25,1,"fire","Alliance",1.0},'
+    text = text.replace("GQ.Data.magePicks = {", "GQ.Data.magePicks = {" + pick)
+    data.write_text(text, encoding="utf-8")
+    bis = addons / "NaowhForever_BiS" / "BiS" / "Data" / "BiS.lua"
+    bis.write_text(bis.read_text(encoding="utf-8").replace("[13] = { 900005 }", "[13] = { 900005, 900008 }"), "utf-8")
+    return addons
+
+
+def test_items_listed_only_for_the_other_faction_by_gearquest_are_left_out(tmp_path):
+    # GearQuest tient une liste de choix par camp ; un objet choisi pour l'Alliance seulement est écarté pour la Horde
+    # quand son origine dépend du camp (récompense de quête, marchand : 900001, 900002), gardé sinon (900008 :
+    # fabriqué) ; la mention de Naowh prime (900003 : « (Alliance) » chez Naowh, choix Horde chez GearQuest)
+    addons = _camp_fixture(tmp_path)
+    horde = personal_bis(addons, spec_key="fire-mage", weights=WEIGHTS, name="n", faction="horde")
     assert not {900001, 900002} & set(horde["slots"].values())
-    alliance = personal_bis(ADDONS, spec_key="fire-mage", weights=WEIGHTS, name="n", faction="alliance")
+    assert any(i["item"] == 900008 for i in horde["items"])
+    alliance = personal_bis(addons, spec_key="fire-mage", weights=WEIGHTS, name="n", faction="alliance")
     assert alliance["slots"][1] in {900001, 900002} and alliance["slots"][11] == 900003
