@@ -321,3 +321,21 @@ def test_updates_entry_without_cards_says_so():
     assert text(game, "ForeverBridgeNav_updates") == "Mises à jour"
     click(game, "ForeverBridgeNav_updates")
     assert any("aucune mise à jour" in line.lower() for line in history(game))
+
+
+def test_gear_screen_level_range():
+    # bloc 4c : « jusqu'au niveau » ; une tranche part en a=gear_level:<de>-<à>, un seul niveau en a=gear_level:<N>
+    game = opened()
+    click(game, "ForeverBridgeNav_gear")
+    assert int(text(game, "ForeverBridgeGearToValue")) == 19
+    click(game, "ForeverBridgeGearToUp")
+    click(game, "ForeverBridgeGearToUp")
+    click(game, "ForeverBridgeGearList")
+    _, record = sent(game)
+    assert record.flags == frozenset({"a=gear_level:19-21"})
+    click(game, "ForeverBridgeNav_gear")
+    for _ in range(5):
+        click(game, "ForeverBridgeGearToDown")
+    assert int(text(game, "ForeverBridgeGearToValue")) == 19  # jamais sous le niveau de départ
+    click(game, "ForeverBridgeGearLevelUp")
+    assert int(text(game, "ForeverBridgeGearToValue")) == 20  # le haut de la tranche suit le départ
