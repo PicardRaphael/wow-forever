@@ -36,6 +36,7 @@ def game_with_ellesmere(**kwargs):
     game = Game(prelude=ELLESMERE, **kwargs)
     game.stub.Fire("PLAYER_ENTERING_WORLD", True, False)
     game.slash("/fv")
+    game.slash("/fb eui on")  # CJ1 (décision 274) : bascule seulement après /fb eui on
     return game
 
 
@@ -123,7 +124,7 @@ def test_without_ellesmere_nothing_fails():
 
 
 def test_saved_role_switches_after_login_with_a_delay():
-    game = Game(prelude=ELLESMERE, saved={"roles": {"Jen - Forever": "dps"}})
+    game = Game(prelude=ELLESMERE, saved={"roles": {"Jen - Forever": "dps"}, "eui": True})
     game.stub.Fire("PLAYER_ENTERING_WORLD", True, False)
     assert calls(game) == []
     game.stub.Advance(10, 0.5)

@@ -83,6 +83,7 @@ CONTEXT = dict(
     for line in (FIXTURES / "bridge" / "contexts" / "mage19.txt").read_text(encoding="utf-8").split("\n")
     if "=" in line
 )
+CONTEXT["eui"] = "on"  # CJ1 (décision 274) : EllesmereUI rallumé par le joueur (/fb eui on)
 WHO, REALM = CONTEXT["name"], CONTEXT["realm"]
 
 

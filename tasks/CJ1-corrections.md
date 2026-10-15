@@ -79,4 +79,4 @@ Tests concernés : `test_switch_out_of_combat_with_the_profile_name`, `test_swit
 `test_missing_profile_is_never_switched_to`, `test_ellesmere_automatic_switch_wins_and_is_reported_once`,
 `test_saved_role_switches_after_login_with_a_delay`.
 
-- **Statut** : en attente de ton accord ; ces treize tests sont listés dans `tasks/.rouge`.
+- **Statut** : acceptée par l'utilisateur le 2026-10-15, appliquée ; `tasks/.rouge` vidé.
