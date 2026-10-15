@@ -65,7 +65,8 @@ CONTEXT_KEYS = (
     "xp_auras",
     "xp_items",
     "professions",  # RX1 (ForeverBridge 0.3.0) : métiers « nom:rang:rang maximal »
-    "role",  # EX1 (ForeverBridge 0.4.0) : rôle choisi par le joueur (/fb role), dps, heal ou tank
+    "role",
+    "eui",  # CJ1 (décision 274) : « on » quand le joueur a rallumé EllesmereUI (/fb eui on)  # EX1 (ForeverBridge 0.4.0) : rôle choisi par le joueur (/fb role), dps, heal ou tank
     "eui_base",  # EX1 (décision 269) : profil de base EllesmereUI choisi pour le personnage (/fb base)
 )
 

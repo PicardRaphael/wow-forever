@@ -42,3 +42,41 @@ seul le bouton séparé de la barre disparaît.
 (la question en cours part avec la réponse, sous le message : test nouveau du bloc 2).
 
 - **Statut** : acceptée par l'utilisateur le 2026-10-15, appliquée ; `tasks/.rouge` vidé.
+
+## 3. Bloc 5 : treize tests d'EX1 qui supposent EllesmereUI allumé par défaut (décision 274 : éteint par défaut)
+Ces tests vérifient le lien de profil EllesmereUI et la bascule par rôle ; depuis la décision 274, ils n'existent
+qu'après `/fb eui on` (contexte `eui=on`). Correction proposée : rallumer EllesmereUI dans la préparation de ces tests,
+**aucune assertion touchée**.
+
+### 3.1 `tests/unit/test_bridge_exports_more.py`, `tests/unit/test_ellesmere_base_choice.py`, `tests/unit/test_rx1c_review.py` (contexte commun)
+Dans chacun des trois fichiers, après la construction de `CONTEXT` :
+```diff
+ CONTEXT = dict(
+     line.split("=", 1)
+     for line in (FIXTURES / "bridge" / "contexts" / "mage19.txt").read_text(encoding="utf-8").split("\n")
+     if "=" in line
+ )
++CONTEXT["eui"] = "on"  # CJ1 (décision 274) : EllesmereUI rallumé par le joueur (/fb eui on)
+```
+Tests concernés : `test_macros_and_ellesmere_links_follow_the_current_build`, `test_without_base_profile_the_reply_says_so`,
+`test_without_role_the_reply_says_so`, les quatre `test_exports_button_*` de `test_ellesmere_base_choice.py`,
+`test_later_command_is_not_overwritten_by_an_old_game_choice`.
+
+### 3.2 `tests/unit/test_bridge_role_lua.py` (bascule par rôle)
+```diff
+ def game_with_ellesmere(**kwargs):
+     game = Game(prelude=ELLESMERE, **kwargs)
+     game.stub.Fire("PLAYER_ENTERING_WORLD", True, False)
+     game.slash("/fv")
++    game.slash("/fb eui on")  # CJ1 (décision 274) : bascule seulement après /fb eui on
+     return game
+```
+```diff
+-    game = Game(prelude=ELLESMERE, saved={"roles": {"Jen - Forever": "dps"}})
++    game = Game(prelude=ELLESMERE, saved={"roles": {"Jen - Forever": "dps"}, "eui": True})
+```
+Tests concernés : `test_switch_out_of_combat_with_the_profile_name`, `test_switch_waits_for_the_end_of_combat`,
+`test_missing_profile_is_never_switched_to`, `test_ellesmere_automatic_switch_wins_and_is_reported_once`,
+`test_saved_role_switches_after_login_with_a_delay`.
+
+- **Statut** : en attente de ton accord ; ces treize tests sont listés dans `tasks/.rouge`.

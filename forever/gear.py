@@ -415,6 +415,10 @@ def gear_report(
             raise InvalidArgumentError("Spécialisation requise (clé de Naowh, ex. fury-warrior).", "donner --spec")
         weights, source = _weights_for(deps, addons, cls, level=level, race=race, spec=key)
         out = personal_bis(addons, spec_key=key, weights=weights, name=name or f"Forever · {key}", faction=faction)
+        if cls == "MAGE":  # CJ1, bloc 5 : poids à coller aussi, depuis la même demande
+            report = mage_weights(deps, level=level, race=race, rotation=key.split("-")[0])
+            out["naowh"] = naowh_weight_line(report, spec=key)
+            out["pawn"] = pawn_line(report, label=f"{name or 'Forever · Mage'} · poids")
         assumptions = [
             (
                 f"listes BiS de Naowh Forever et de Forever Companion lues en local, classées par les poids : {source} ; "

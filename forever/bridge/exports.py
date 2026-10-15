@@ -14,6 +14,14 @@ LABELS = {
     "naowh_build": "Naowh : build",
     "naowh_macros": "Naowh : macros",
     "ellesmere": "EllesmereUI",
+    "naowh_weights": "Naowh : poids",  # CJ1, bloc 5 : poids des statistiques (NFSW1)
+    "companion_scale": "Forever Companion : échelle",  # échelle Pawn v1
+    "naowh_bis": "Naowh : BiS",  # liste BiS personnelle (!NBIS1!)
+}
+WHERE = {
+    "naowh_weights": "Naowh Forever, Stat Weights, « Import weights »",
+    "companion_scale": "Forever Companion, Options, « Import scale… »",
+    "naowh_bis": "Naowh Forever, fenêtre BiS, « Import a list »",
 }
 
 
@@ -60,7 +68,70 @@ def typed_links(value: Any) -> dict[str, list[dict[str, str]]]:
         out["check"] = [code]
     if value.get("kind") == "naowh_build" and (code := _naowh(value)) is not None:
         out["export"] = [code]
+    gear = []  # CJ1, bloc 5 : résultats de forever_gear (poids, échelle, liste BiS)
+    if isinstance(value.get("naowh"), str) and str(value["naowh"]).startswith("NFSW1:"):
+        gear.append(typed_link("naowh_weights", str(value["naowh"])))
+    if isinstance(value.get("pawn"), str) and str(value["pawn"]).startswith("( Pawn:"):
+        gear.append(typed_link("companion_scale", str(value["pawn"])))
+    if isinstance(export, str) and export.startswith("!NBIS1!"):
+        gear.append(typed_link("naowh_bis", export))
+    if gear:
+        out["gear"] = gear
     return out
+
+
+def _gear_section(
+    deps: Deps, context: Mapping[str, str], cls: str, level: int, who: str
+) -> tuple[list[str], list[dict[str, str]]]:
+    """CJ1, bloc 5 : liens d'équipement de « Exports » : poids du Mage et échelle (Naowh, Forever Companion), liste BiS
+    personnelle (Naowh) ; spécialisation : celle de Naowh pour la classe (Givre pour le Mage), dite comme supposée."""
+    from forever.errors import ForeverError
+    from forever.gear import gear_report
+    from forever.pipeline.gear_sources import read_naowh_bis
+    from forever.store import load_version
+
+    if deps.wow_dir is None:
+        return ["- Équipement : dossier du jeu inconnu (FOREVER_WOW_DIR), aucun export."], []
+    races = load_version(deps).read_json("races.json").get("races") or {}
+    sent = str(context.get("race") or "")
+    race = next((n for n, r in races.items() if sent in (n, r.get("client_file"))), "Orc")
+    faction = str(context.get("faction") or "").lower() or None
+    token = cls.upper()
+    lists, _ = read_naowh_bis(deps.wow_dir / "Interface" / "AddOns")
+    keys = [k for k, s in lists.items() if s.class_token == token]
+    spec = "frost-mage" if "frost-mage" in keys else (keys[0] if keys else None)
+    lines: list[str] = []
+    links: list[dict[str, str]] = []
+    if token == "MAGE":
+        try:
+            weights = gear_report(deps, "weights", class_name=cls, level=level, race=race,
+                                  spec=spec or "frost-mage", name=f"Forever · {who} · niveau {level}")  # fmt: skip
+        except ForeverError as err:
+            lines.append(f"- Poids du Mage : {err.message}")
+        else:
+            links += [typed_link("naowh_weights", weights["naowh"]), typed_link("companion_scale", weights["pawn"])]
+            lines.append(
+                f"- Poids du Mage au niveau {level} : [Naowh : poids] dans {WHERE['naowh_weights']} ; "
+                f"[Forever Companion : échelle] dans {WHERE['companion_scale']}."
+            )
+    if spec is None:
+        lines.append("- Liste BiS : aucune liste de Naowh Forever pour cette classe.")
+        return lines, links
+    try:
+        bis = gear_report(deps, "bis", class_name=cls, level=level, race=race, spec=spec, faction=faction,
+                          name=f"Forever · {who} · BiS")  # fmt: skip
+    except ForeverError as err:
+        lines.append(f"- Liste BiS : {err.message}")
+        return lines, links
+    if bis["export"]:
+        links.append(typed_link("naowh_bis", bis["export"]))
+        lines.append(
+            f"- Liste BiS ({spec}, supposée : demande ta liste BiS avec ta spécialisation pour en changer ; poids : "
+            f"{bis['weights_source']}) : [Naowh : BiS] dans {WHERE['naowh_bis']}."
+        )
+    else:
+        lines.append(f"- Liste BiS ({spec}) : aucune liste dans les addons.")
+    return lines, links
 
 
 def game_base(deps: Deps, name: str) -> str | None:
@@ -125,7 +196,12 @@ def exports_reply(
         lines.append(f"- Macros : {macros['reason']}.")
     role = str(context.get("role") or "")
     realm = str(context.get("realm") or "")
-    if role not in ROLE_LABELS:
+    gear_lines, gear_links = _gear_section(deps, context, cls, level, who)
+    lines += gear_lines
+    links += gear_links
+    if context.get("eui") != "on":
+        pass  # décision 274 : EllesmereUI jamais proposé d'office (/fb eui on pour le rallumer)
+    elif role not in ROLE_LABELS:
         lines.append("- Profil EllesmereUI : aucun rôle choisi pour ce personnage (/fb role dps, heal ou tank).")
     elif not realm:
         lines.append("- Profil EllesmereUI : royaume absent du contexte du jeu.")

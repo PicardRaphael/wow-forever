@@ -27,7 +27,7 @@ M.TOOLTIP_CHARS = 120
 M.LINK_KINDS = { item = true, spell = true, quest = true, talent = true }
 M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "x", "y", "talents", "gear",
 	"target", "target_level", "target_race", "client", "links", "rested", "resting", "xp_auras", "xp_items",
-	"professions", "role", "eui_base" }
+	"professions", "role", "eui", "eui_base" }
 -- T04f (0.2.0) : auras du joueur relevées (au plus MAX_AURAS, parmi les AURA_SCAN premières), filtrées par la liste
 -- que le pont écrit dans Status.lua (ForeverBridgeStatus.xp, identifiants lus dans les données, jamais écrits ici).
 M.MAX_AURAS = 16
@@ -430,6 +430,9 @@ function M.Context()
 	put("xp_items", M.XpItems(watch))
 	put("professions", M.Professions())
 	put("role", M.Role())
+	if type(ForeverBridgeDB) == "table" and ForeverBridgeDB.eui == true then
+		put("eui", "on") -- CJ1 (décision 274) : EllesmereUI rallumé par le joueur (/fb eui on)
+	end
 	put("eui_base", M.Base())
 	return ctx, pieces
 end

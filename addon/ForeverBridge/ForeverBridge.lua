@@ -2162,6 +2162,9 @@ end
 -- existe et n'est pas déjà actif, jamais si la bascule automatique d'EllesmereUI vaut pour ce personnage (EUI2).
 function FB.SwitchProfile()
 	run.rolePending = nil
+	if type(ForeverBridgeDB) ~= "table" or ForeverBridgeDB.eui ~= true then
+		return -- CJ1 (décision 274) : EllesmereUI éteint par défaut, jamais de bascule sans /fb eui on
+	end
 	local role, name = FB.Role(), CharName()
 	if not role or not ROLE_LABELS[role] or not name then
 		return
@@ -2218,8 +2221,16 @@ function FB.SetRole(value)
 		FB.Print("Rôle de ce personnage : " .. (FB.Role() or "aucun") .. " (/fb role " .. table.concat(allowed, ", ") .. ")")
 		return
 	end
+	if value == "clear" then
+		local db = ForeverBridgeDB
+		if type(db) == "table" and type(db.roles) == "table" and key then
+			db.roles[key] = nil
+		end
+		FB.Print("Rôle de ce personnage effacé.")
+		return
+	end
 	if not ROLE_LABELS[value] then
-		FB.Print("rôle : /fb role suivi de " .. table.concat(allowed, ", ") .. ".")
+		FB.Print("rôle : /fb role suivi de " .. table.concat(allowed, ", ") .. ", ou clear.")
 		return
 	end
 	if CLASS_ROLES[token] and not CLASS_ROLES[token][value] then
@@ -2237,6 +2248,26 @@ function FB.SetRole(value)
 	db.roles[key] = value
 	FB.Print("Rôle de " .. key .. " : " .. value .. ".")
 	FB.SwitchProfile()
+end
+
+-- CJ1 (décision 274) : /fb eui on|off : propositions et bascule de profil EllesmereUI, éteintes par défaut.
+function FB.SetEui(value)
+	FB.Open()
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" then
+		return
+	end
+	value = string.lower(value or "")
+	if value == "on" then
+		db.eui = true
+		FB.Print("EllesmereUI : profils et bascule par rôle rallumés (/fb eui off pour les éteindre).")
+		FB.SwitchProfile()
+	elseif value == "off" then
+		db.eui = nil
+		FB.Print("EllesmereUI : éteint ; ForeverBridge ne propose ni ne bascule aucun profil.")
+	else
+		FB.Print("EllesmereUI : " .. (db.eui == true and "rallumé" or "éteint (défaut)") .. " ; /fb eui on ou off.")
+	end
 end
 
 -- Noms des profils d'EllesmereUI (API publique, lecture seule), ou nil si EllesmereUI est absent.
@@ -2458,7 +2489,8 @@ local HELP = {
 	"/fv case N : taille de case de la bande des messages, 1 (défaut) à 4 pixels, si le pont ne la lit pas.",
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
 	"/fb exports : réafficher les liens d'export de la session (Talents Forever, Naowh), à copier depuis le panneau.",
-	"/fb role dps|heal|tank : rôle de ce personnage ; bascule vers le profil EllesmereUI « <nom> - <rôle> » s'il existe.",
+	"/fb role dps|heal|tank|clear : rôle de ce personnage (profil EllesmereUI seulement après /fb eui on).",
+	"/fb eui on|off : propositions et bascule de profil EllesmereUI, éteintes par défaut (ton interface reste la tienne).",
 	"/fb base <profil> : profil EllesmereUI de base de ce personnage, d'où part le bouton Exports (sans nom : la liste).",
 }
 
@@ -2519,6 +2551,8 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.Exports()
 	elseif command == "role" then
 		FB.SetRole(rest)
+	elseif command == "eui" then
+		FB.SetEui(rest)
 	elseif command == "base" then
 		FB.SetBase(rest)
 	else
