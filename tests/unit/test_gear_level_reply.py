@@ -20,6 +20,9 @@ from forever.exports.naowh import read_naowh_bis as decode_nbis
 LEVEL = 10
 # objet : (emplacement GearQuest, rang, qualité, faits, statistiques de Forever Guide)
 ITEMS = {
+    # objet à suffixe aléatoire : statistiques inconnues de Forever Guide (« - ») ; jamais écarté sur un score inconnu
+    930005: ("Wrist", 1, 2, 'reqLevel=8,sourceType="vendor",instructions="Bought from Fixture Vendor."', "-"),
+    930006: ("Wrist", 2, 2, 'reqLevel=8,sourceType="vendor",instructions="Bought from Fixture Vendor."', "int=1"),
     930001: ("Back", 1, 2, 'reqLevel=8,sourceType="world_drop",instructions="World drop around level 8-12."', "int=1"),
     930002: (
         "Feet",
@@ -38,7 +41,7 @@ ITEMS = {
     ),
 }
 FR = {"Back": "Dos", "Feet": "Pieds", "Hands": "Mains"}
-GUIDE_SLOTS = {"Back": 16, "Feet": 8, "Hands": 10}  # type d'emplacement de Forever Guide (INVTYPE)
+GUIDE_SLOTS = {"Back": 16, "Feet": 8, "Hands": 10, "Wrist": 9}  # type d'emplacement de Forever Guide (INVTYPE)
 
 
 def wow_dir(tmp_path, token="MAGE"):
@@ -74,7 +77,7 @@ def mage(tmp_path, make_deps):
 def test_items_are_game_links_and_the_reply_gives_links_to_copy(mage):
     text, links = gear_level_reply(mage, context(), LEVEL)
     for item, (_, _, quality, _, _) in ITEMS.items():
-        if item != 930003:  # écarté par nos poids au profit de 930004 (voir plus bas)
+        if item not in (930003, 930006):  # écartés par nos poids, ou derrière le choix de GearQuest gardé
             assert f"[[item:{item}:{quality}|Fixture {item}]]" in text
     kinds = {link["kind"]: link for link in links}
     assert {"naowh_bis", "naowh_weights", "companion_scale"} <= set(kinds)
@@ -111,3 +114,9 @@ def test_other_classes_keep_the_gearquest_order(tmp_path, make_deps):
     hands = next(line for line in text.splitlines() if line.startswith("- Mains :"))
     assert "930003" in hands and "930004" not in hands and "GearQuest proposait" not in hands
     assert "naowh_weights" not in {link["kind"] for link in links}  # poids calculés pour le Mage seulement
+
+
+def test_unknown_stats_never_lose_on_a_score(mage):
+    text, _ = gear_level_reply(mage, context(), LEVEL)
+    wrist = next(line for line in text.splitlines() if line.startswith("- Poignets :"))
+    assert "930005" in wrist and "930006" not in wrist and "GearQuest proposait" not in wrist
