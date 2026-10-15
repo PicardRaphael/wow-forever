@@ -309,6 +309,19 @@ local function BuildWindow()
 		holder = more
 	end
 
+	if not ui.classic then
+		-- essai CJ-6 : effacer la conversation depuis l'en-tête (l'historique reste archivé, sans s'afficher)
+		local clear = CreateFrame("Button", "ForeverBridgeClearButton", f, "UIPanelButtonTemplate")
+		clear:SetSize(80, 20)
+		clear:SetPoint("TOPRIGHT", f, "TOPRIGHT", -32, -8)
+		clear:SetText("Effacer")
+		clear:SetScript("OnClick", function()
+			FB.HideMore()
+			FB.HideAnswers()
+			FB.NewConversation()
+		end)
+	end
+
 	local pasteButton = CreateFrame("Button", "ForeverBridgePasteButton", holder, "UIPanelButtonTemplate")
 	pasteButton:SetSize(96, 20)
 	if ui.classic then
@@ -331,8 +344,8 @@ local function BuildWindow()
 	ui.cardsButton = cardsButton
 
 	local history = CreateFrame("ScrollingMessageFrame", "ForeverBridgeHistory", f)
-	history:SetPoint("TOPLEFT", f, "TOPLEFT", ContentLeft(), -52)
-	history:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", -14, 16 + INPUT_H + 8 + BAR_H + 8)
+	ui.history = history
+	FB.PlaceHistory()
 	history:SetFontObject(ChatFontNormal)
 	history:SetJustifyH("LEFT")
 	history:SetFading(false)
@@ -345,6 +358,7 @@ local function BuildWindow()
 		else
 			self:ScrollDown()
 		end
+		FB.RefreshAnswers() -- la rangée suit le défilement
 	end)
 	history:SetScript("OnHyperlinkClick", function(_, link)
 		local n = type(link) == "string" and link:match("^foreverbridge:copy:(%d+)$")
@@ -507,9 +521,7 @@ function FB.ShowChat(shown)
 	for _, widget in ipairs(ui.chatWidgets or {}) do
 		widget:SetShown(shown)
 	end
-	if ui.answers then
-		ui.answers:SetShown(shown and run.answering ~= nil)
-	end
+	FB.RefreshAnswers()
 	if not shown then
 		FB.HideMore()
 	end
@@ -892,6 +904,35 @@ function FB.HideAnswers()
 		ui.answers:Hide()
 	end
 	run.answering = nil
+	FB.PlaceHistory()
+end
+
+-- Historique au-dessus de la barre d'actions ; quand une réponse attend un choix, il se raccourcit de la hauteur de
+-- la rangée des réponses, placée juste dessous (essai CJ-6 : jamais de bouton dessiné sur du texte).
+local HISTORY_BOTTOM = 16 + INPUT_H + 8 + BAR_H + 8
+
+function FB.PlaceHistory()
+	local history = ui.history
+	if not history then
+		return
+	end
+	local reserve = (run.answering and ui.answers) and (ui.answers:GetHeight() + 4) or 0
+	history:ClearAllPoints()
+	history:SetPoint("TOPLEFT", ui.frame, "TOPLEFT", ContentLeft(), -52)
+	history:SetPoint("BOTTOMRIGHT", ui.frame, "BOTTOMRIGHT", -14, HISTORY_BOTTOM + reserve)
+end
+
+-- Rangée montrée quand une réponse attend un choix, que le chat est à l'écran et que la dernière réponse est en vue
+-- (historique en bas) ; le joueur remonte l'historique : la rangée se retire avec la réponse.
+function FB.RefreshAnswers()
+	local bar = ui.answers
+	if not bar then
+		return
+	end
+	local chat = not ui.chatWidgets or ui.chatWidgets[1]:IsShown()
+	local history = ui.history
+	local atBottom = not (history and history.AtBottom) or history:AtBottom()
+	bar:SetShown(run.answering ~= nil and chat and atBottom)
 end
 
 function FB.ShowAnswers(entry)
@@ -902,7 +943,7 @@ function FB.ShowAnswers(entry)
 	if not ui.answers then
 		local bar = CreateFrame("Frame", "ForeverBridgeAnswers", ui.frame)
 		bar:SetHeight(ANSWER_H)
-		bar:SetPoint("BOTTOMLEFT", ui.history, "BOTTOMLEFT", 0, 0)
+		bar:SetPoint("TOPLEFT", ui.history, "BOTTOMLEFT", 0, -4)
 		ui.answers = bar
 		ui.answerButtons = {}
 	end
@@ -927,7 +968,10 @@ function FB.ShowAnswers(entry)
 	run.answering = entry
 	FB.LayoutAnswers()
 	-- jamais par-dessus un autre écran : la rangée revient avec le chat (FB.ShowChat)
-	ui.answers:SetShown(not ui.chatWidgets or ui.chatWidgets[1]:IsShown())
+	if ui.history and ui.history.ScrollToBottom then
+		ui.history:ScrollToBottom()
+	end
+	FB.RefreshAnswers()
 end
 
 -- Rangée des réponses sur la largeur du contenu : largeur de chaque bouton mesurée sur son libellé (caractères),
@@ -954,6 +998,7 @@ function FB.LayoutAnswers()
 		end
 	end
 	bar:SetHeight((row + 1) * (ANSWER_H + 4))
+	FB.PlaceHistory()
 end
 
 function FB.Answer(index)

@@ -623,6 +623,11 @@ Sans terminal (bloc 5) : bouton « Exports », ou « donne-moi ma liste BiS » d
 5. EllesmereUI chargé : la barre de l'entrée choisie prend sa couleur d'accent ; rien ne change dans EllesmereUI.
 6. `/fv classique`, puis `/reload` : l'ancienne fenêtre revient ; `/fv classique` et `/reload` : la nouvelle.
 
+Reprise du 2026-10-15 (défauts de l'essai corrigés) : « Calculer » donne un aperçu lisible (heures, XP par heure,
+zones, quêtes de classe, premiers arrêts) ; « Valider et livrer » s'affiche sous l'historique, jamais sur le texte, et
+se retire quand on remonte l'historique ; l'écran Équipement répond (outil `forever_gear` autorisé) ; « Effacer »,
+dans l'en-tête, vide l'historique et repart d'une nouvelle conversation.
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 
