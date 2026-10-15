@@ -1967,6 +1967,28 @@ mechanics:
       - tests/unit/test_engine_travel.py::test_flight_used_when_known
     tolerance: null
     note: "conditions d'accès d'un point de vol (ConditionID) non lues ; 13 trajets vers un point absent de TaxiNodes écartés ; bloc F : bateaux, zeppelins, portail et tram de Naowh Journeys lus en local (durée = attente au quai + longueur ÷ vitesse + embarquement + chargement, valeurs de l'addon, suppose) et réseau de marche de Journeys (graphe des passages, yards de marche) ; transports de Shortest Path Forever non lus (recoupement TRV2)"
+  - id: I20
+    categorie: optimisation
+    description: "Route d'équipement : origine des objets de la liste BiS et passages d'un donjon pour les obtenir (espérance et nombre pour une chance donnée)"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "taux de butin du livre des donjons (H12 : relevés, Naowh Forever, Forever Guide, AtlasLoot), récompenses de quêtes du livre des quêtes (Forever Guide, GearQuest Forever), lieu de butin de Naowh Forever BiS ; lus en local"
+      - "chaque objet tombe indépendamment à chaque passage à son taux (hypothèse de calcul, suppose) ; espérance par inclusion-exclusion"
+    tests:
+      - tests/unit/test_gear_route.py::test_expected_runs_single_item
+      - tests/unit/test_gear_route.py::test_expected_runs_of_several_items_of_one_dungeon
+      - tests/unit/test_gear_route.py::test_impossible_drop_has_no_finite_runs
+      - tests/unit/test_gear_route.py::test_item_sources_dungeon_then_quest_then_naowh
+      - tests/unit/test_gear_route.py::test_plan_groups_dungeons_and_quests
+    tolerance: null
+    formule: "E[passages] = somme sur les sous-ensembles S non vides des objets voulus de (-1)^(|S|+1) / (1 - prod(1 - p_i, i dans S)) ; passages pour la chance c = plus petit n avec prod(1 - (1 - p_i)^n) >= c"
+    note: "CJ1, bloc 4b (décision 277) : seuil affiché 9 chances sur 10 ; un boss connu sans taux garde le donjon, passages non chiffrés ; butin partagé avec le groupe (jet de dés, objet pris par un autre) non modélisé : passages sous-estimés en groupe ; la meilleure source seulement par objet (taux le plus haut) ; ordre de la route : donjons qui donnent le plus d'objets, puis le moins de passages, quêtes par zone du donneur, autres origines (métier, réputation, marchand) en texte de Naowh"
+    angle_mort:
+      talents: []
+      contextes: [dungeon]
+      estimation: null
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"

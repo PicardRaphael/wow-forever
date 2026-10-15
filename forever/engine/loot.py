@@ -3,7 +3,7 @@ indépendamment à chaque passage avec son taux (fraction) ; espérance du nombr
 (inclusion-exclusion sur les objets voulus du donjon) et plus petit nombre de passages qui les donne tous avec la chance
 demandée. Taux lus dans les sources (DJ1), jamais écrits ici.
 
-Registre : I16."""
+Registre : I20."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ def expected_runs(rates: Sequence[float]) -> float:
     """Espérance du nombre de passages pour obtenir chacun des objets de taux `rates` (au moins une fois) : somme sur
     les sous-ensembles non vides S de (-1)^(|S|+1) / (1 - prod(1 - p_i, i dans S)) ; infini si un taux est nul.
 
-    Registre : I16"""
+    Registre : I20"""
     if not rates:
         return 0.0
     if any(p <= 0 for p in rates):
@@ -35,7 +35,7 @@ def runs_for_chance(rates: Sequence[float], chance: float) -> int | None:
     """Plus petit nombre de passages n tel que la probabilité d'avoir obtenu tous les objets, prod(1 - (1 - p_i)^n),
     atteigne `chance` ; None si un taux est nul (jamais atteint).
 
-    Registre : I16"""
+    Registre : I20"""
     if not rates:
         return 0
     if any(p <= 0 for p in rates):

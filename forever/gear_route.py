@@ -40,7 +40,7 @@ def item_sources(
 def plan_gear_route(items: Sequence[Mapping[str, Any]], *, chance: float = CHANCE) -> dict[str, Any]:
     """Route regroupée : donjons (meilleure source de chaque objet, objets d'un même donjon cumulés ; les donjons qui
     donnent le plus d'objets d'abord, puis le moins de passages), quêtes par zone, autres origines, objets sans origine.
-    Registre : I16"""
+    Registre : I20"""
     dungeons: dict[str, dict[str, Any]] = {}
     zones: dict[str, dict[str, Any]] = {}
     others: list[dict[str, Any]] = []
@@ -97,7 +97,7 @@ def quest_index(book: Any) -> dict[int, list[int]]:
 
 def gear_route(deps: Any, addons: Any, bis: Mapping[str, Any], *, chance: float = CHANCE) -> dict[str, Any]:
     """Route d'équipement des objets choisis d'une liste BiS personnelle (`personal_bis`) : origines (DJ1, livre des
-    quêtes, Naowh) et route regroupée. Registre : I16"""
+    quêtes, Naowh) et route regroupée. Registre : I20"""
     from forever.dungeons import build_dungeons, where_item
     from forever.pipeline.gear_sources import read_naowh_bis
     from forever.quests import build_quests, value

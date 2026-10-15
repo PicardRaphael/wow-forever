@@ -1,4 +1,4 @@
-"""CJ1, bloc 4b (décision 277, point 6, registre I16) : route d'équipement. Pour chaque objet de la liste BiS, son
+"""CJ1, bloc 4b (décision 277, point 6, registre I20) : route d'équipement. Pour chaque objet de la liste BiS, son
 origine (boss d'un donjon avec son taux, quête qui le donne, sinon ce que dit Naowh : métier, réputation, marchand) ;
 les donjons sont regroupés (plusieurs objets d'un même donjon cumulés) avec le nombre de passages attendu (espérance)
 et le nombre pour neuf chances sur dix ; les quêtes sont regroupées par zone.

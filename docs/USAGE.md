@@ -446,6 +446,7 @@ uv run forever gear bis --class Mage --spec frost-mage --faction alliance --race
 uv run forever gear bis --class Warrior --spec fury-warrior --faction horde   # échelle de Forever Companion
 uv run forever gear leveling --class Mage --level 22 --faction alliance      # choix de GearQuest Forever
 uv run forever gear upgrade --class Mage --level 30 --item <objet> --equipped <objets portés>
+uv run forever gear route --class Mage --spec frost-mage --faction horde --race Orc --level 60   # bloc 4b
 ```
 
 Les poids du Mage viennent de notre moteur (gain d'XP par heure par point, Intelligence = 1) ; les autres classes
@@ -453,6 +454,13 @@ utilisent l'échelle de Forever Companion (`suppose`). La liste BiS part des lis
 Companion, classées sur les statistiques de Forever Guide, avec le lieu de butin de Naowh. Où coller : ligne `NFSW1:`
 dans Naowh Forever (Stat Weights, « Import weights ») ; échelle Pawn dans Forever Companion (Options, « Import
 scale… ») ; chaîne `!NBIS1!` dans Naowh Forever (fenêtre BiS, « Import a list »).
+
+Route d'équipement (bloc 4b, registre I20) : pour chaque objet choisi de la liste BiS, sa meilleure origine (boss et taux du
+livre des donjons, quête du livre des quêtes, sinon le lieu de Naowh : métier, réputation, marchand) ; donjons regroupés
+avec les passages attendus (espérance) et le nombre pour 9 chances sur 10, chaque objet tombant indépendamment ; un
+boss sans taux connu garde son donjon, passages non chiffrés ; quêtes par zone du donneur. Le partage du butin en groupe
+n'est pas compté (passages sous-estimés en groupe). Objets de l'autre camp écartés : mention de Naowh, sinon objet
+choisi par GearQuest pour l'autre camp seulement.
 
 ### Acceptation des routes et retrait des routes livrées (CJ1, décisions 277 et 279)
 
