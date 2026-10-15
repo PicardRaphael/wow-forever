@@ -137,7 +137,7 @@ def _links(
 
 
 def _tail(doc: Mapping[str, Any], level: int) -> list[str]:
-    lines = []
+    lines = list(doc.get("weights_notes") or [])  # sort pas encore appris, ordre de GearQuest, niveau manquant
     aside = doc.get("set_aside") or []
     if aside:
         shown = ", ".join(

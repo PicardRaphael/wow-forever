@@ -565,13 +565,62 @@ def _addons_dir(deps: Deps) -> Any:
     return deps.wow_dir / "Interface" / "AddOns"
 
 
+MAGE_ROTATIONS = ("fire", "frost", "arcane")  # rotations dont le moteur calcule les poids (sort principal : MAIN)
+
+
+def spell_label(rotation: str) -> str:
+    """Nom du sort principal d'une rotation, tiré de sa clé (« fireball » -> « Fireball »)."""
+    from forever.sim.encounter import MAIN
+
+    return MAIN.get(rotation, rotation).replace("_", " ").title()
+
+
+def learned_mage_weights(
+    deps: Deps, *, level: int, race: str, preferred: str
+) -> tuple[dict[str, Any] | None, str | None]:
+    """Poids du Mage au niveau `level` avec la rotation `preferred` si son sort principal est appris, sinon avec une
+    autre rotation dont le sort est appris à ce niveau (Fireball au niveau 1) ; (None, None) si aucune ne se calcule
+    (l'appelant garde alors l'ordre de GearQuest). Bug de l'écran Équipement du 2026-10-15 : « frostbolt n'est pas
+    appris au niveau 1 ». Registre : I3"""
+    for rotation in (preferred, *(r for r in MAGE_ROTATIONS if r != preferred)):
+        try:
+            return mage_weights(deps, level=level, race=race, rotation=rotation), rotation
+        except Exception:  # noqa: BLE001, S112 : sort pas appris ou calcul impossible : rotation suivante, puis GearQuest
+            continue
+    return None, None
+
+
+def _rotation_notes(rotations: Mapping[int, str | None], preferred: str) -> list[str]:
+    """Phrases de joueur : niveaux où le sort de la spécialisation n'est pas encore appris, niveaux sans poids."""
+    notes: list[str] = []
+    runs: list[tuple[int, int, str | None]] = []
+    for lv in sorted(rotations):
+        rot = rotations[lv]
+        if runs and runs[-1][2] == rot and runs[-1][1] == lv - 1:
+            runs[-1] = (runs[-1][0], lv, rot)
+        else:
+            runs.append((lv, lv, rot))
+    for low, high, rot in runs:
+        span = f"Au niveau {low}" if low == high else f"Aux niveaux {low} à {high}"
+        if rot is None:
+            notes.append(f"{span}, poids du Mage non calculés : objets dans l'ordre de GearQuest.")
+        elif rot != preferred:
+            notes.append(
+                f"{span}, {spell_label(preferred)} n'est pas encore appris : nos poids y sont calculés avec "
+                f"{spell_label(rot)}."
+            )
+    return notes
+
+
 def _weights_for(
     deps: Deps, addons: Any, cls: str, *, level: int, race: str, spec: str
 ) -> tuple[dict[str, float], str]:
     if cls == "MAGE":
         key = spec or DEFAULT_SPECS["MAGE"]
-        report = mage_weights(deps, level=level, race=race, rotation=key.split("-")[0])
-        return mage_guide_weights(report, spec_key=key), f"moteur du Mage (niveau {level})"
+        report, used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0])
+        if report is not None:
+            how = "" if used == key.split("-")[0] else f", avec {spell_label(str(used))}, seul sort appris"
+            return mage_guide_weights(report, spec_key=key), f"moteur du Mage (niveau {level}{how})"
     return companion_weights(addons, cls), "Forever Companion (échelle de la classe, suppose)"
 
 
@@ -609,9 +658,20 @@ def gear_report(
                 "donner --class Mage, ou forever gear bis, qui classe avec l'échelle de Forever Companion",
             )
         key = spec or DEFAULT_SPECS["MAGE"]
-        report = mage_weights(deps, level=level, race=race, rotation=key.split("-")[0])
+        found, used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0])
+        if found is None:
+            raise InvalidArgumentError(
+                f"Poids du Mage non calculés au niveau {level} : aucun sort de dégâts calculé n'y est appris.",
+                "choisir un niveau plus haut",
+            )
         label = name or f"Forever · Mage · {level}"
-        return {**report, "naowh": naowh_weight_line(report, spec=key), "pawn": pawn_line(report, label=label)}
+        notes = _rotation_notes({level: used}, key.split("-")[0])
+        return {
+            **found,
+            "naowh": naowh_weight_line(found, spec=key),
+            "pawn": pawn_line(found, label=label),
+            "weights_notes": notes,
+        }
     if action == "bis":
         key = spec or DEFAULT_SPECS.get(cls) or ""
         if not key:
@@ -619,9 +679,10 @@ def gear_report(
         weights, source = _weights_for(deps, addons, cls, level=level, race=race, spec=key)
         out = personal_bis(addons, spec_key=key, weights=weights, name=name or f"Forever · {key}", faction=faction)
         if cls == "MAGE":  # CJ1, bloc 5 : poids à coller aussi, depuis la même demande
-            report = mage_weights(deps, level=level, race=race, rotation=key.split("-")[0])
-            out["naowh"] = naowh_weight_line(report, spec=key)
-            out["pawn"] = pawn_line(report, label=f"{name or 'Forever · Mage'} · poids")
+            report, _used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0])
+            if report is not None:
+                out["naowh"] = naowh_weight_line(report, spec=key)
+                out["pawn"] = pawn_line(report, label=f"{name or 'Forever · Mage'} · poids")
         assumptions = [
             (
                 f"listes BiS de Naowh Forever et de Forever Companion lues en local, classées par les poids : {source} ; "
@@ -641,30 +702,51 @@ def gear_report(
             read_guide_gear(addons) if cls == "MAGE" else None,
         )
 
+        key = spec if spec and "-" in spec else DEFAULT_SPECS["MAGE"]
+        preferred = key.split("-")[0]
+        rotations: dict[int, str | None] = {}
+        gaps: list[dict[str, Any]] = []
+
         def at(lv: int) -> tuple[LevelingPicks, dict[str, Any], dict[str, float] | None]:
-            """Choix obtenables au niveau `lv` ; Mage : nos poids à ce niveau et leurs lignes à copier."""
+            """Choix obtenables au niveau `lv` ; Mage : nos poids à ce niveau (sort réellement appris) et leurs lignes
+            à copier ; sans poids, ordre de GearQuest."""
             found: dict[str, Any] = {}
             weights_at: dict[str, float] | None = None
             if cls == "MAGE":  # bloc 4c : Mage reclassé par nos poids ; autres classes : ordre de GearQuest
-                key = spec if spec and "-" in spec else DEFAULT_SPECS["MAGE"]
-                report = mage_weights(deps, level=lv, race=race, rotation=key.split("-")[0])
-                weights_at = mage_guide_weights(report, spec_key=key)
-                label = name or f"Forever · Mage · niveau {lv}"
-                found = {"naowh": naowh_weight_line(report, spec=key), "pawn": pawn_line(report, label=label)}
+                report, used = learned_mage_weights(deps, level=lv, race=race, preferred=preferred)
+                rotations[lv] = used
+                if report is not None:
+                    weights_at = mage_guide_weights(report, spec_key=key)
+                    label = name or f"Forever · Mage · niveau {lv}"
+                    found = {"naowh": naowh_weight_line(report, spec=key), "pawn": pawn_line(report, label=label)}
+            gq_spec = None if cls == "MAGE" else (spec.split("-")[0] if spec else None)  # spécialisation de GearQuest
             chosen = leveling_gear(
-                addons, cls, level=lv, faction=faction, spec=None if weights_at else spec, access=access,
-                weights=weights_at, loaded=loaded,
+                addons, cls, level=lv, faction=faction, spec=gq_spec, access=access, weights=weights_at, loaded=loaded,
             )  # fmt: skip
             return chosen, found, weights_at
 
-        picks, lines, level_weights = at(level)
+        def safe_at(lv: int) -> tuple[LevelingPicks, dict[str, Any], dict[str, float] | None] | None:
+            """Un niveau en échec ne fait jamais tomber la tranche : il est noté (`gaps`) et sauté."""
+            try:
+                return at(lv)
+            except Exception as exc:  # noqa: BLE001 : détail technique gardé dans `gaps`, jamais montré au joueur
+                gaps.append({"level": lv, "error": f"{type(exc).__name__}: {exc}"})
+                return None
+
+        first = safe_at(level)
+        picks, lines, level_weights = first if first is not None else (LevelingPicks([], [], []), {}, None)
         segments: list[dict[str, Any]] = []
         set_aside = list(picks.set_aside)
         excluded = list(picks.excluded)
         if last > level:  # bloc 4c : tranche de niveaux, un segment par palier où l'objet visé change
             open_: dict[str, dict[str, Any]] = {}
             for lv in range(level, last + 1):
-                chosen, found, _ = (picks, lines, level_weights) if lv == level else at(lv)
+                got = (picks, lines, level_weights) if lv == level else safe_at(lv)
+                if got is None or (lv == level and first is None):
+                    for slot in list(open_):  # niveau manquant : les segments ouverts se ferment avant lui
+                        segments.append(open_.pop(slot))
+                    continue
+                chosen, found, _ = got
                 if lv == last:
                     lines = found
                 seen_items = {a["item"] for a in set_aside}
@@ -696,8 +778,16 @@ def gear_report(
                 else "ordre de GearQuest Forever (poids calculés pour le Mage seulement)"
             ),
         ]
+        notes = _rotation_notes(rotations, preferred) if cls == "MAGE" else [
+            "Poids calculés pour le Mage seulement : objets dans l'ordre de GearQuest."
+        ]  # fmt: skip
+        for gap in gaps:
+            notes.append(f"Niveau {gap['level']} : équipement non calculé (problème de données noté de mon côté).")
         return {
             **lines,
+            "rotations": {str(lv): rot for lv, rot in sorted(rotations.items())},
+            "weights_notes": notes,
+            "gaps": gaps,
             "class": cls,
             "level": level,
             "to_level": last,

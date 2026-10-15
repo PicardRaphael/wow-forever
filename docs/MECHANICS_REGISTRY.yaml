@@ -1544,7 +1544,9 @@ mechanics:
       - tests/unit/test_gear_weights.py::test_stat_weights_are_finite_differences
       - tests/unit/test_gear_weights.py::test_normalize_on_intellect_and_drop_negatives
       - tests/unit/test_gear_weights.py::test_mage_weights_from_the_engine
+      - tests/unit/test_gear_levels_from_one.py::test_mage_specs_from_level_one_use_a_learned_spell
     tolerance: null
+    note: "bug de l'écran Équipement du 2026-10-15 : sort principal de la spécialisation pas encore appris (Frostbolt avant son niveau, Arcane Blast) : poids calculés avec une autre rotation dont le sort est appris à ce niveau (Fireball dès le niveau 1), dit au joueur ; aucune : ordre de GearQuest"
   - id: I4
     categorie: optimisation
     description: "Simulation de l'ensemble réel"

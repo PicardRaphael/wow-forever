@@ -103,6 +103,16 @@ def outbox_records(path: Path) -> list[Record]:
     return records
 
 
+def player_error(error: str | None) -> str:
+    """Erreur de la conversation dite en mots de joueur (le détail reste dans le journal du pont)."""
+    if error and "délai" in error:
+        return "Pas de réponse à temps (délai dépassé) : repose ta question, le pont était peut-être occupé."
+    return (
+        "Je n'ai pas pu répondre : un problème est survenu de mon côté (détail dans le journal du pont, "
+        "uv run forever bridge status). Repose ta question."
+    )
+
+
 def gear_levels(action: str | None, target: str | None) -> int | tuple[int, int] | None:
     """Niveau des actions d'équipement : « N » (N ≥ 1), ou « de-à » (1 ≤ de < à) pour `gear_level` ; None sinon."""
     low, sep, high = (target or "").partition("-")
@@ -444,7 +454,7 @@ class Bridge:
                 handle = self.profile.apply if action == "profile_apply" else self.profile.dismiss
                 result, text = handle(target)
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
-                result, text = "erreur", f"Profil non écrit : {type(exc).__name__}: {exc}"
+                result, text = "erreur", self._oops("Profil non écrit", "profil", exc)
             self._check_cards(self.clock(), force=True)
         elif action == "choice" and target and (found := find_answer(self.choices, target)) is not None:
             choice, option = found
@@ -464,7 +474,7 @@ class Bridge:
                 text, links = self.exporter(record.context, list(self.last_exports))
                 result = "exports"
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
-                result, text, links = "erreur", f"Exports impossibles : {type(exc).__name__}: {exc}", []
+                result, text, links = "erreur", self._oops("Exports impossibles", "exports", exc), []
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
             self._done(record, text, "action", links)
             return
@@ -481,7 +491,7 @@ class Bridge:
                     text, gear_links = made if isinstance(made, tuple) else (made, [])
                     result = "équipement"
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
-                result, text = "erreur", f"Équipement non calculé : {type(exc).__name__}: {exc}"
+                result, text = "erreur", self._oops("Équipement non calculé", "équipement", exc)
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
             self._done(record, text, "action", gear_links)
             return
@@ -489,12 +499,12 @@ class Bridge:
             try:
                 result, text = self._deliver_route(record.context)
             except (OSError, ValueError, KeyError, TypeError) as exc:
-                result, text = "erreur", f"Feuille de route illisible : {type(exc).__name__}: {exc}"
+                result, text = "erreur", self._oops("Feuille de route illisible", "feuille de route", exc)
         elif action in ("update", "approve", "reject") and self.actions is not None:
             try:
                 result, text = self.actions.handle(str(action), target)
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
-                result, text = "erreur", f"Action non traitée : {type(exc).__name__}: {exc}"
+                result, text = "erreur", self._oops("Action non traitée", "action", exc)
             self.last_refresh = None  # attentes et passage relus au pas suivant
         else:
             result = "refusée"
@@ -507,6 +517,11 @@ class Bridge:
             text = f"Action refusée : {why}."
         self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
         self._done(record, text, "action")
+
+    def _oops(self, what: str, where: str, exc: BaseException) -> str:
+        """Message de joueur pour une action en échec ; nom de l'exception et détail technique au journal seulement."""
+        self.journal.write("error", where=where, error=f"{type(exc).__name__}: {exc}")
+        return f"{what} : un problème est survenu de mon côté (détail dans le journal du pont, uv run forever bridge status)."
 
     def _deliver_route(self, context: Mapping[str, str]) -> tuple[str, str]:
         """RX1, CJ1 : dernier plan du personnage (nom du contexte, sinon classe et camp) encodé en guide RestedXP sous
@@ -572,7 +587,7 @@ class Bridge:
             gaps, warnings, proposed = self.profile.check_simc(record.context, export)
         except Exception as exc:  # noqa: BLE001 : un export illisible ne doit pas arrêter le pont
             self.journal.write("error", where="lecture de l'export", error=f"{type(exc).__name__}: {exc}")
-            return f", mais illisible ({type(exc).__name__}) : recopiez /simc."
+            return ", mais illisible : recopiez /simc."
         self.journal.write(
             "simc_read", id=record.message_id, gaps=[g.field for g in gaps], warnings=warnings, proposed=proposed,
             items=len(export.items),
@@ -654,7 +669,7 @@ class Bridge:
             if result.denied:
                 self.journal.write("denied", id=record.message_id, tools=result.denied, conversation="addons")
             if result.is_error:
-                reply.update(status="error", text=f"Erreur : {result.error or 'réponse impossible'}")
+                reply.update(status="error", text=player_error(result.error))
                 self.journal.write("error", id=record.message_id, where="conversation addons", error=result.error)
             else:
                 text = normalize_reply(result.text)
@@ -709,7 +724,7 @@ class Bridge:
                 self.journal.write("denied", id=record.message_id, tools=result.denied)
             reply: dict[str, Any] = {"session": record.session, "id": record.message_id}
             if result.is_error:
-                reply.update(status="error", text=f"Erreur : {result.error or 'réponse impossible'}")
+                reply.update(status="error", text=player_error(result.error))
                 self.journal.write("error", id=record.message_id, where="conversation", error=result.error)
             else:
                 text = normalize_reply(result.text)
