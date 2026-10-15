@@ -28,7 +28,7 @@ ITEMS = {
     910007: ("Legs", 3, 'reqLevel=7,sourceType="boss_drop",instructions="Drops from Fixture Boss."'),  # donjon ouvert
     910008: ("Head", 1, 'reqLevel=1,sourceType="unsourced",instructions="Source not listed yet."'),  # mis à part
     910009: ("Head", 2, 'reqLevel=10,sourceType="quest_reward",questName="Fixture Horde Call"'),  # autre camp
-    910010: ("Wrist", 1, 'reqLevel=12,sourceType="boss_drop",instructions="Drops from Fixture Late Boss."'),
+    910010: ("Wrist", 1, 'reqLevel=9,sourceType="boss_drop",instructions="Drops from Fixture Late Boss."'),
 }
 QUESTS = {
     "Fixture Far Hope": [{"level": LEVEL + RED + 3, "min_level": LEVEL, "faction": "alliance"}],

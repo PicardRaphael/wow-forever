@@ -80,6 +80,8 @@ def test_mcp_forever_gear(make_deps, tmp_path):
     tools, leveling, upgrade = asyncio.run(go())
     assert "forever_gear" in tools and not leveling.is_error and not upgrade.is_error
     assert validate_provenance(leveling.structured_content["provenance"]) == []
-    assert leveling.structured_content["picks"][0]["item"] == 900001
+    # essai CJ-6 du 2026-10-15 : une récompense de quête inconnue du livre n'est plus proposée, elle est mise à part
+    aside = {a["item"]: a["reason"] for a in leveling.structured_content["set_aside"]}
+    assert 900001 in aside and leveling.structured_content["picks"] == []
     assert upgrade.structured_content["verdict"] == "amélioration"
     assert upgrade.structured_content["weights_source"].startswith("Forever Companion")

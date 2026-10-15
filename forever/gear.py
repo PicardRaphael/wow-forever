@@ -4,6 +4,9 @@ moteur et exportés vers Naowh Forever (`NFSW1:`) et Forever Companion (Pawn v1)
 
 from __future__ import annotations
 
+import re
+from collections.abc import Callable, Mapping, Sequence
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
 from forever.config import Deps
@@ -299,17 +302,137 @@ INVTYPE_SLOTS: dict[int, tuple[int, ...]] = {
 }  # fmt: skip
 
 
+@dataclass(frozen=True)
+class Access:
+    """Ce qu'il faut savoir pour dire si un objet s'obtient à un niveau (essai CJ-6 du 2026-10-15) : quêtes du livre
+    par nom (`level`, `min_level`, `faction`), niveau d'ouverture du donjon qui lâche un objet, écart d'une quête
+    rouge (`leveling.quest_band.red_min_diff`, registre I7), métiers appris du personnage (noms anglais, minuscules)."""
+
+    quests: Callable[[str], Sequence[Mapping[str, Any]]]
+    dungeon_level: Callable[[int], int | None]
+    red_min_diff: int
+    professions: frozenset[str] = frozenset()
+
+
+class LevelingPicks(list[dict[str, Any]]):
+    """Choix retenus par emplacement, plus les objets mis à part (source inconnue) et écartés (raison)."""
+
+    def __init__(self, picks: list[dict[str, Any]], set_aside: list[dict[str, Any]], excluded: list[dict[str, Any]]):
+        super().__init__(picks)
+        self.set_aside = set_aside
+        self.excluded = excluded
+
+
+DROP_RANGE = re.compile(r"level (\d+)\s*-\s*(\d+)")  # « World drop around level 11-16. » (GearQuest Forever)
+QUEST_SOURCES = ("quest_reward", "seasonal_quest")
+DUNGEON_SOURCES = ("boss_drop", "raid_trash")
+
+
+def obtainable(fact: Mapping[str, Any], item: int, level: int, faction: str | None, access: Access) -> tuple[str, str]:
+    """(« ok » | « out » | « aside », raison) : l'objet s'obtient-il au niveau `level` ? Niveau requis au plus
+    `level` ; quête du camp prise à ce niveau et pas rouge ; butin dont la plage commence au plus à `level` ; donjon
+    ouvert à ce niveau ; métier appris ; sinon mis à part (source ou niveau inconnus). Registre : I21"""
+    required = fact.get("reqLevel")
+    if isinstance(required, int) and required > level:
+        return "out", f"niveau requis {required}"
+    kind = fact.get("sourceType")
+    if kind in QUEST_SOURCES:
+        name = str(fact.get("questName") or "")
+        if not name:
+            return "aside", "quête sans nom chez GearQuest"
+        quests = [q for q in access.quests(name) if q.get("faction") in (None, "both", (faction or "").lower())]
+        if not quests:
+            mine = access.quests(name)
+            return ("out", f"quête « {name} » de l'autre camp") if mine else ("aside", f"quête « {name} » inconnue")
+        known = [q for q in quests if isinstance(q.get("level"), int)]
+        if not known:
+            return "aside", f"quête « {name} » sans niveau connu"
+        for q in known:
+            low = int(q["min_level"]) if isinstance(q.get("min_level"), int) else 1
+            if low <= level and q["level"] - level < access.red_min_diff:
+                return "ok", f"quête « {name} », niveau {q['level']}"
+        q = min(known, key=lambda q: q["level"])
+        low = int(q["min_level"]) if isinstance(q.get("min_level"), int) else 1
+        if low > level:
+            return "out", f"quête « {name} » prise au niveau {low}"
+        return "out", f"quête « {name} » de niveau {q['level']}, rouge au niveau {level}"
+    if kind == "profession":
+        craft = str(fact.get("profession") or "")
+        if craft.lower() in access.professions:
+            return "ok", f"métier {craft}"
+        return "out", f"métier {craft or 'inconnu'} non appris"
+    if kind in DUNGEON_SOURCES:
+        opens = access.dungeon_level(item)
+        if opens is None:
+            return "aside", "donjon et niveau inconnus"
+        if opens > level:
+            return "out", f"donjon ouvert au niveau {opens}"
+        return "ok", f"donjon ouvert au niveau {opens}"
+    if kind == "vendor":
+        return "ok", "marchand"
+    found = DROP_RANGE.search(str(fact.get("instructions") or ""))
+    if found:
+        low = int(found.group(1))
+        if low > level:
+            return "out", f"butin des niveaux {found.group(1)} à {found.group(2)}"
+        return "ok", f"butin des niveaux {found.group(1)} à {found.group(2)}"
+    if kind == "unsourced" or not kind:
+        return "aside", "source inconnue de GearQuest"
+    return "aside", f"source « {kind} » sans niveau connu"
+
+
+def level_access(deps: Deps, professions: list[str]) -> Access:
+    """`Access` lu dans nos données : quêtes du livre par nom, donjons de DJ1 (niveau bas de leur plage), écart
+    d'une quête rouge (`mechanics.json`), métiers donnés (noms anglais). Registre : I21"""
+    from forever.dungeons import build_dungeons, where_item
+    from forever.gamedata import load_game_data
+    from forever.quests import build_quests, value
+
+    book = build_quests(deps)
+    by_name: dict[str, list[dict[str, Any]]] = {}
+    for q in book.quests.values():
+        quest_name = value(q, "name")
+        if isinstance(quest_name, str):
+            by_name.setdefault(quest_name, []).append(
+                {"level": value(q, "level"), "min_level": value(q, "min_level"), "faction": value(q, "faction")}
+            )
+    dungeons = build_dungeons(deps)
+
+    def dungeon_level(item: int) -> int | None:
+        lows = []
+        for found in where_item(dungeons, item):
+            levels = ((dungeons.dungeons[found["dungeon"]].get("fields") or {}).get("levels") or {}).get("value")
+            if isinstance(levels, dict) and isinstance(levels.get("min"), int):
+                lows.append(levels["min"])
+        return min(lows) if lows else None
+
+    red = load_game_data(deps).leveling.quest_band.red_min_diff
+    return Access(
+        quests=lambda name: by_name.get(name, []),
+        dungeon_level=dungeon_level,
+        red_min_diff=int(red),
+        professions=frozenset(p.strip().lower() for p in professions if p.strip()),
+    )
+
+
 def leveling_gear(
-    addons: Any, class_token: str, *, level: int, faction: str | None = None, spec: str | None = None
-) -> list[dict[str, Any]]:
+    addons: Any,
+    class_token: str,
+    *,
+    level: int,
+    faction: str | None = None,
+    spec: str | None = None,
+    access: Access | None = None,
+) -> LevelingPicks:
     """Équipement de leveling de GearQuest Forever (décision 276) : pour chaque emplacement, le premier choix de
     l'addon dont la plage de niveaux contient `level`, pour le camp (et la spécialisation si donnée), avec ce que
-    l'addon dit pour l'obtenir ; rien recalculé."""
+    l'addon dit pour l'obtenir et son niveau requis ; avec `access` (essai CJ-6), seulement un objet obtenable à ce
+    niveau (`obtainable`), les autres écartés avec leur raison ou mis à part. Registre : I21"""
     from forever.pipeline.gear_sources import read_gearquest_facts, read_gearquest_picks
 
     picks = read_gearquest_picks(addons, class_token)
     facts = read_gearquest_facts(addons, class_token)
-    best: dict[str, Any] = {}
+    ranked: dict[str, list[Any]] = {}
     for p in picks:
         if not p.min_level <= level <= p.max_level:
             continue
@@ -317,25 +440,45 @@ def leveling_gear(
             continue
         if spec and p.spec and p.spec.lower() != spec.lower():
             continue
-        if p.slot not in best or p.rank < best[p.slot].rank:
-            best[p.slot] = p
-    out = []
-    for slot, p in best.items():
-        fact = facts.get(p.item) or {}
-        out.append(
-            {
-                "slot": slot,
-                "item": p.item,
-                "name": fact.get("name"),
-                "zone": fact.get("zone"),
-                "source": fact.get("sourceType"),
-                "how": fact.get("instructions"),
-                "rank": p.rank,
-                "levels": [p.min_level, p.max_level],
-                "spec": p.spec,
-            }
-        )
-    return out
+        ranked.setdefault(p.slot, []).append(p)
+    out: list[dict[str, Any]] = []
+    set_aside: list[dict[str, Any]] = []
+    excluded: list[dict[str, Any]] = []
+    for slot, candidates in ranked.items():
+        seen: set[int] = set()
+        for p in sorted(candidates, key=lambda p: p.rank):
+            if p.item in seen:
+                continue
+            seen.add(p.item)
+            fact = facts.get(p.item) or {}
+            required = fact.get("reqLevel") if isinstance(fact.get("reqLevel"), int) else None
+            if access is not None:
+                verdict, reason = obtainable(fact, p.item, level, faction, access)
+            elif required is not None and required > level:
+                verdict, reason = "out", f"niveau requis {required}"
+            else:
+                verdict, reason = "ok", ""
+            entry = {"slot": slot, "item": p.item, "name": fact.get("name"), "required_level": required}
+            if verdict == "aside":
+                set_aside.append({**entry, "reason": reason})
+                continue
+            if verdict == "out":
+                excluded.append({**entry, "reason": reason})
+                continue
+            out.append(
+                {
+                    **entry,
+                    "zone": fact.get("zone"),
+                    "source": fact.get("sourceType"),
+                    "how": fact.get("instructions"),
+                    "access": reason or None,
+                    "rank": p.rank,
+                    "levels": [p.min_level, p.max_level],
+                    "spec": p.spec,
+                }
+            )
+            break
+    return LevelingPicks(out, set_aside, excluded)
 
 
 def is_upgrade(addons: Any, *, item: int, equipped: list[int], weights: dict[str, float]) -> dict[str, Any]:
@@ -420,6 +563,7 @@ def gear_report(
     item: int | None = None,
     equipped: list[int] | None = None,
     name: str | None = None,
+    professions: list[str] | None = None,
 ) -> dict[str, Any]:
     """Rapport de `forever gear` et de `forever_gear` : `weights` (poids du Mage, lignes NFSW1 et Pawn v1), `bis`
     (liste personnelle et `!NBIS1!`), `leveling` (GearQuest Forever), `upgrade` (« est-ce une amélioration ? »)."""
@@ -456,9 +600,26 @@ def gear_report(
         ]
         return {**out, "weights": weights, "weights_source": source, "provenance": _provenance(deps, assumptions)}
     if action == "leveling":
-        picks = leveling_gear(addons, cls, level=level, faction=faction, spec=spec)
-        assumptions = ["choix de leveling de GearQuest Forever lus en local (premier choix de chaque emplacement)"]
-        return {"class": cls, "level": level, "picks": picks, "provenance": _provenance(deps, assumptions)}
+        access = level_access(deps, professions or [])
+        picks = leveling_gear(addons, cls, level=level, faction=faction, spec=spec, access=access)
+        assumptions = [
+            "choix de leveling de GearQuest Forever lus en local (premier choix obtenable de chaque emplacement)",
+            (
+                f"obtenable au niveau {level} : niveau requis au plus {level}, quête du camp prise à ce niveau et pas "
+                "rouge (même seuil que les routes), butin dont la plage commence à ce niveau, donjon ouvert à ce "
+                "niveau, objet de métier seulement avec le métier ; source ou niveau inconnus : mis à part"
+            ),
+            "zone de la quête non vérifiée au-delà de son camp et de son niveau",
+        ]
+        return {
+            "class": cls,
+            "level": level,
+            "picks": list(picks),
+            "set_aside": picks.set_aside,
+            "excluded": picks.excluded,
+            "professions": sorted(access.professions),
+            "provenance": _provenance(deps, assumptions),
+        }
     if action == "upgrade":
         if item is None:
             raise InvalidArgumentError("Objet requis.", "donner l'identifiant de l'objet (lien Maj+clic)")

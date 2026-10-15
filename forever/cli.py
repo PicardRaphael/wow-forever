@@ -419,6 +419,9 @@ def build_parser() -> argparse.ArgumentParser:
     gear.add_argument("--item", type=int, help="objet à juger (upgrade)")
     gear.add_argument("--equipped", help="objets portés, identifiants séparés par des virgules (upgrade)")
     gear.add_argument("--name", help="nom de l'export (liste BiS, échelle)")
+    gear.add_argument(
+        "--profession", action="append", default=[], help="métier appris, nom anglais (leveling ; répétable)"
+    )
     gear.add_argument("--json", action="store_true", help="sortie JSON")
 
     route = sub.add_parser("route", help="feuille de route de leveling (RX1) : calcul et relecture")
@@ -1598,6 +1601,7 @@ def _cmd_gear(deps: Deps, args: argparse.Namespace) -> int:
         item=args.item,
         equipped=list(_ints(args.equipped)),
         name=args.name,
+        professions=args.profession,
     )
     lines: list[str] = []
     if args.action == "weights":
@@ -1616,8 +1620,15 @@ def _cmd_gear(deps: Deps, args: argparse.Namespace) -> int:
         lines.append(doc["export"] or "aucune liste pour cette spécialisation")
     elif args.action == "leveling":
         lines = [
-            f"  {p['slot']} : {p['name'] or p['item']} ({p['source'] or '?'}, {p['zone'] or '?'})" for p in doc["picks"]
+            f"  {p['slot']} : {p['name'] or p['item']} (niveau requis {p['required_level'] or '?'} ; "
+            f"{p['access'] or p['source'] or '?'} ; {p['zone'] or '?'})"
+            for p in doc["picks"]
         ]
+        lines += [f"  Mis à part : {a['name'] or a['item']} ({a['slot']}, {a['reason']})" for a in doc["set_aside"]]
+        if doc["excluded"]:
+            lines.append(
+                f"  Écartés au niveau {doc['level']} : {len(doc['excluded'])} objet(s) (--json pour le détail)"
+            )
     elif args.action == "route":
         lines = [f"Route d'équipement ({doc['spec']}) :"]
         for d in doc["dungeons"]:

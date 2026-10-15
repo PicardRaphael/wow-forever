@@ -1989,6 +1989,26 @@ mechanics:
       talents: []
       contextes: [dungeon]
       estimation: null
+  - id: I21
+    categorie: optimisation
+    description: "Équipement obtenable à un niveau : niveau requis, quête de son camp prise à ce niveau et pas rouge, butin et donjon à ce niveau, métier appris"
+    forever: oui
+    statut: teste
+    certitude: suppose
+    sources:
+      - "GearQuest Forever (choix par emplacement, fiches : reqLevel, sourceType, questName, profession, plage de butin), lu en local"
+      - "livre des quêtes (niveau, niveau minimal, camp), livre des donjons de DJ1 (plage de niveaux), écart d'une quête rouge de mechanics.json (leveling.quest_band.red_min_diff, registre I7)"
+    tests:
+      - tests/unit/test_gear_level_access.py::test_gnome_mage_at_level_ten_gets_nothing_above_ten
+      - tests/unit/test_gear_level_access.py::test_profession_items_only_with_the_profession
+      - tests/unit/test_gear_tools.py::test_mcp_forever_gear
+    tolerance: null
+    formule: "proposé au niveau N si niveau requis ≤ N, et selon la source : quête du camp avec niveau minimal ≤ N et niveau − N < écart rouge ; butin dont la plage commence ≤ N ; donjon dont la plage commence ≤ N ; métier appris ; marchand ; sinon mis à part (source ou niveau inconnus)"
+    note: "essai CJ-6 du 2026-10-15 (objets de niveau 18 à 30 proposés au niveau 10) ; zone de la quête non vérifiée au-delà de son camp et de son niveau ; une quête orange compte comme obtenable (même règle que les routes) ; plage de butin lue dans le texte de GearQuest (« around level a-b »)"
+    angle_mort:
+      talents: []
+      contextes: [leveling]
+      estimation: null
   - id: J1
     categorie: meta
     description: "Version du client et hotfixes"
