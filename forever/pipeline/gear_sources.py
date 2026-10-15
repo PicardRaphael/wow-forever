@@ -189,3 +189,19 @@ def read_gearquest_picks(addons: Path, class_token: str) -> list[GearPick]:
                 out.append(GearPick(item, str(slot), int(low), int(high), int(rank), str(spec), str(faction),
                                     float(score)))  # fmt: skip
     return out
+
+
+def read_gearquest_facts(addons: Path, class_token: str) -> dict[int, dict[str, Any]]:
+    """Fiches d'objets de GearQuest Forever (`GQ.Data.<classe>ItemFacts`) : nom, zone, sorte de source, consigne."""
+    folder = addons / f"{GEARQUEST_PREFIX}{class_token.upper()}"
+    marker = f"GQ.Data.{class_token.lower()}ItemFacts = "
+    out: dict[int, dict[str, Any]] = {}
+    for path in sorted(folder.glob("*.lua")) if folder.is_dir() else []:
+        text = _read(path) or ""
+        if marker not in text:
+            continue
+        facts = _value_after(text, marker)
+        for item, row in (facts or {}).items() if isinstance(facts, dict) else ():
+            if isinstance(item, int) and isinstance(row, dict):
+                out[item] = row
+    return out

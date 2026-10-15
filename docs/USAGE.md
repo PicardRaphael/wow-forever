@@ -438,6 +438,22 @@ Sortie : durée, XP par heure, parts du trajet, des objectifs et du farm, ordre 
 étapes de RestedXP impossibles chez nous (et pourquoi), sans donjon des deux côtés. Résultats et leçons :
 `docs/research/rxp-comparaison.md`.
 
+### Équipement (CJ1, bloc 4, décision 276)
+
+```powershell
+uv run forever gear weights --level 30 --race Gnome --spec frost-mage   # poids du Mage, lignes NFSW1 et Pawn v1
+uv run forever gear bis --class Mage --spec frost-mage --faction alliance --race Gnome --level 60
+uv run forever gear bis --class Warrior --spec fury-warrior --faction horde   # échelle de Forever Companion
+uv run forever gear leveling --class Mage --level 22 --faction alliance      # choix de GearQuest Forever
+uv run forever gear upgrade --class Mage --level 30 --item <objet> --equipped <objets portés>
+```
+
+Les poids du Mage viennent de notre moteur (gain d'XP par heure par point, Intelligence = 1) ; les autres classes
+utilisent l'échelle de Forever Companion (`suppose`). La liste BiS part des listes de Naowh Forever et de Forever
+Companion, classées sur les statistiques de Forever Guide, avec le lieu de butin de Naowh. Où coller : ligne `NFSW1:`
+dans Naowh Forever (Stat Weights, « Import weights ») ; échelle Pawn dans Forever Companion (Options, « Import
+scale… ») ; chaîne `!NBIS1!` dans Naowh Forever (fenêtre BiS, « Import a list »).
+
 ### Acceptation des routes et retrait des routes livrées (CJ1, décisions 277 et 279)
 
 ```powershell

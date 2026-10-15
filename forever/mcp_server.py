@@ -425,6 +425,35 @@ def build_server(deps: Deps) -> MCPServer:
         return dict(report)
 
     @server.tool()
+    def forever_gear(
+        action: str = "bis",
+        class_name: str = "Mage",
+        level: int = 60,
+        race: str = "Orc",
+        spec: str | None = None,
+        faction: str | None = None,
+        item: int | None = None,
+        equipped: list[int] | None = None,
+        name: str | None = None,
+    ) -> dict[str, Any]:
+        """Équipement (CJ1, bloc 4) : `action="weights"` poids du Mage calculés par le moteur et lignes à importer
+        (`naowh` : NFSW1, Naowh Forever, « Import weights » ; `pawn` : Forever Companion, « Import scale… ») ;
+        `action="bis"` liste BiS personnelle (`spec` : clé de Naowh, ex. frost-mage, fury-warrior ; `faction`) bâtie
+        depuis Naowh Forever et Forever Companion, classée par nos poids (Mage) ou l'échelle de Forever Companion, avec
+        lieux de butin et `export` (!NBIS1!, Naowh, fenêtre BiS, « Import a list ») ; `action="leveling"` choix de
+        GearQuest Forever au niveau ; `action="upgrade"` « est-ce une amélioration ? » (`item`, `equipped` : objets
+        portés)."""
+        from forever.gear import gear_report
+
+        try:
+            return gear_report(
+                deps, action, class_name=class_name, level=level, race=race, spec=spec, faction=faction,
+                item=item, equipped=equipped, name=name,
+            )  # fmt: skip
+        except ForeverError as err:
+            return cast("dict[str, Any]", _error_result(deps, err))
+
+    @server.tool()
     def forever_route(
         action: str = "plan",
         class_name: str | None = None,

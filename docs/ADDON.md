@@ -595,6 +595,14 @@ route « Forever Mage 1-10 »), pont arrêté puis relancé (`forever bridge sto
 4. Deuxième route du même personnage, `/reload` : un seul guide « Forever · <personnage> · … » de ces niveaux ; s'il y
    en a deux (question RXP3), `forever route rxp-clean --apply` jeu fermé les retire.
 
+#### Essai CJ-4 : équipement vers Naowh Forever et Forever Companion (CJ1, bloc 4, décision 273 ; FC1, NBIS2)
+1. `uv run forever gear weights --level <niveau> --race <race> --spec frost-mage` : coller la ligne `NFSW1:` dans
+   Naowh Forever (Stat Weights, « Import weights ») et l'échelle Pawn dans Forever Companion (Options, « Import
+   scale… ») ; l'échelle « Forever · Mage · … » apparaît et devient choisissable (FC1).
+2. `uv run forever gear bis --class Mage --spec frost-mage --faction <camp> --race <race>` : coller la chaîne
+   `!NBIS1!` dans la fenêtre BiS de Naowh (« Import a list ») : la liste s'affiche avec ses lieux de butin (NBIS2).
+3. Dans le chat, un objet par Maj+clic et « est-ce une amélioration ? » : verdict, écart, source des poids.
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 

@@ -409,6 +409,18 @@ def build_parser() -> argparse.ArgumentParser:
     q_show.add_argument("--offset", type=int, default=0, help="première quête de la page")
     q_show.add_argument("--json", action="store_true", help="sortie JSON")
 
+    gear = sub.add_parser("gear", help="équipement (CJ1, bloc 4) : poids, liste BiS, leveling, amélioration")
+    gear.add_argument("action", choices=["weights", "bis", "leveling", "upgrade"], help="ce qu'il faut rendre")
+    gear.add_argument("--class", dest="cls", default="Mage", help="classe (défaut : Mage)")
+    gear.add_argument("--level", type=int, default=60, help="niveau du personnage (défaut : 60)")
+    gear.add_argument("--race", default="Orc", help="race (nom de races.json)")
+    gear.add_argument("--spec", help="spécialisation, clé de Naowh Forever (ex. frost-mage, fury-warrior)")
+    gear.add_argument("--faction", choices=["horde", "alliance"], help="camp (objets de l'autre camp écartés)")
+    gear.add_argument("--item", type=int, help="objet à juger (upgrade)")
+    gear.add_argument("--equipped", help="objets portés, identifiants séparés par des virgules (upgrade)")
+    gear.add_argument("--name", help="nom de l'export (liste BiS, échelle)")
+    gear.add_argument("--json", action="store_true", help="sortie JSON")
+
     route = sub.add_parser("route", help="feuille de route de leveling (RX1) : calcul et relecture")
     route_sub = route.add_subparsers(dest="route_command", required=True, parser_class=_Parser)
     r_plan = route_sub.add_parser("plan", help="calculer une feuille de route (quêtes, donjons placés, farm)")
@@ -1568,6 +1580,47 @@ def _route_recette(deps: Deps, args: argparse.Namespace) -> int:
             a = r["adapted"]
             lines.append(f"    base adaptée ({a['hours']:.1f} h) : {a['explanation']}")
     _emit(doc, lines, provenance, args.json)
+    return EXIT_OK
+
+
+def _cmd_gear(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever gear` : poids du Mage et lignes d'import, liste BiS personnelle, leveling de GearQuest, amélioration."""
+    from forever.gear import gear_report
+
+    doc = gear_report(
+        deps,
+        args.action,
+        class_name=args.cls,
+        level=args.level,
+        race=args.race,
+        spec=args.spec,
+        faction=args.faction,
+        item=args.item,
+        equipped=list(_ints(args.equipped)),
+        name=args.name,
+    )
+    lines: list[str] = []
+    if args.action == "weights":
+        lines = [
+            f"Poids du Mage, niveau {doc['level']} (Intelligence = 1) : {doc['weights']}",
+            doc["naowh"],
+            doc["pawn"],
+        ]
+    elif args.action == "bis":
+        lines = [f"Liste BiS « {doc['name']} » ({doc['weights_source']}) :"]
+        lines += [
+            f"  {i['slot']} : {i['item']} (score {i['score']}) {i.get('source') or ''}".rstrip()
+            for i in doc["items"]
+            if i["chosen"]
+        ]
+        lines.append(doc["export"] or "aucune liste pour cette spécialisation")
+    elif args.action == "leveling":
+        lines = [
+            f"  {p['slot']} : {p['name'] or p['item']} ({p['source'] or '?'}, {p['zone'] or '?'})" for p in doc["picks"]
+        ]
+    else:
+        lines = [f"Objet {doc['item']} : {doc['verdict']} (écart {doc['delta']}, poids : {doc['weights_source']})"]
+    _emit(doc, lines, doc["provenance"], args.json)
     return EXIT_OK
 
 
@@ -4973,6 +5026,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "questie": _cmd_questie_info,
         "quests": _cmd_quests,
         "route": _cmd_route,
+        "gear": _cmd_gear,
         "dungeon": _cmd_dungeon,
         "xp": _cmd_xp,
         "origins": _cmd_origins,

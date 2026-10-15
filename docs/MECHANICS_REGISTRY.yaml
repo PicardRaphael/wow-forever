@@ -1535,10 +1535,15 @@ mechanics:
     categorie: optimisation
     description: "Poids de stats avec erreur standard"
     forever: oui
-    statut: absent
-    certitude: certain
-    sources: []
-    tests: []
+    statut: teste
+    certitude: suppose
+    sources:
+      - "CJ1, bloc 4 (décision 276) : gain d'XP par heure du leveling du Mage (analytique du moteur, combat, repos, course) par point de chaque statistique, différences finies avant sur la fiche estimée du niveau, Intelligence = 1 ; critique et toucher par point de pourcentage ; erreur standard pas encore calculée (analytique déterministe)"
+      - "autres classes : échelle de Forever Companion (suppose), jusqu'à leur tranche"
+    tests:
+      - tests/unit/test_gear_weights.py::test_stat_weights_are_finite_differences
+      - tests/unit/test_gear_weights.py::test_normalize_on_intellect_and_drop_negatives
+      - tests/unit/test_gear_weights.py::test_mage_weights_from_the_engine
     tolerance: null
   - id: I4
     categorie: optimisation

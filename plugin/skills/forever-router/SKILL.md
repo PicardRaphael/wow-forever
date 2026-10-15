@@ -52,6 +52,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
 | Donjons à mon niveau, fiche d'un donjon (boss, butin et taux, quêtes, prérequis, écarts) | `forever_lookup(kind="dungeons", level, faction)`, `forever_lookup(kind="dungeon", name, class_name, level)` | `forever-donjons` |
 | Où trouver tel objet (donjon, boss, taux) | `forever_lookup(kind="dungeon_item", name=<identifiant>)` | `forever-donjons` |
+| Équipement : poids des statistiques (Mage), liste BiS personnelle à importer dans Naowh, objet de leveling à viser, « est-ce une amélioration ? » | `forever_gear(action="weights"|"bis"|"leveling"|"upgrade", class_name, level, race, spec, faction, item, equipped)` : lignes `naowh` et `pawn`, `export` (!NBIS1!), `picks` de GearQuest, `verdict` ; donner les chaînes telles quelles avec où les coller | `forever-builds` |
 | Feuille de route de leveling (quêtes dans l'ordre, donjons placés, guide RestedXP) | `forever_route(action="plan", class_name, faction, start_level, end_level)` | `forever-routes` |
 | XP par heure par zone et par donjon, toutes les classes | `forever_sim_leveling(kind="objectives", level, class_name, faction)` | `forever-leveling` |
 | Quêtes de Forever : nouvelles, retouchées, écarts entre sources | `forever_lookup(kind="quests", …)` | `forever-leveling` |
@@ -88,7 +89,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 | Mana des combats longs (Évocation, potions, gemmes) | T05b |
 | Mémoire du joueur au-delà du profil (équipement enregistré, historique, fiches datées) | T07 |
 | Raid complet (le build de raid actuel est un scénario provisoire de `forever_build`) | T09 |
-| Équipement et objets | T10 |
+| Équipement calculé des autres classes, plan d'équipement complet (coûts, réputation, raid) | T10 |
 | Consommables et préparation de raid | T11 |
 | Analyse de mes combats PvP (contrôles, recharges, morts, cibles) | AN1 |
 | Analyse de mes combats PvE (rotation réelle, écarts, perte chiffrée) | AN2 |
