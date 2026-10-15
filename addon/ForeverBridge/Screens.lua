@@ -441,7 +441,12 @@ end
 
 local function NavClick(key)
 	if key == "updates" then
-		FB.ToggleCards()
+		if (S.cards or 0) == 0 then
+			FB.ShowScreen("chat")
+			FB.Print("Mises à jour : aucune mise à jour en attente.")
+		else
+			FB.ToggleCards()
+		end
 	elseif key == "help" then
 		S.welcome:Show()
 		FB.Help()
@@ -451,6 +456,7 @@ local function NavClick(key)
 end
 
 function FB.OnCardsCount(count)
+	S.cards = count
 	local entry = S.nav.updates
 	if entry then
 		entry:SetText(count > 0 and ("Mises à jour (" .. count .. ")") or "Mises à jour")

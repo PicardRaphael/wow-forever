@@ -216,7 +216,11 @@ avec sa ligne de provenance. Sous Windows, jeu en fenêtré ou plein écran fen�
 | `uv run forever bridge selftest --live` | lit la bande de test de `/fv test` (diagnostic) |
 
 En jeu : `/fv` ouvre la fenêtre (raccourci dans Options > Raccourcis > AddOns), Entrée envoie, Maj+Entrée passe à la
-ligne ; boutons Talents, Leveling, Familiers, PvP selon la classe ; `/fv fond N` règle l'opacité. Pont arrêté ou
+ligne ; boutons Talents, Leveling, Familiers, PvP selon la classe ; `/fv fond N` règle l'opacité. Depuis
+ForeverBridge 0.5.0 (CJ1, bloc 6a) : barre latérale à gauche (Chat, Feuille de route, Talents, Équipement, Exports,
+Mises à jour, Aide), boutons du pont dans « Plus... », assistant de feuille de route (leveling, réputation, métier,
+équipement ; niveaux, donjons, quêtes de classe) qui envoie la même demande que le chat ; `/fv classique` rend
+l'ancienne fenêtre au `/reload` suivant (et inversement). Pont arrêté ou
 réserve vide : tapez `/reload` après `forever bridge start`, la réponse arrive par la sauvegarde. Procédure complète :
 `docs/ADDON.md`, section 7, étape 11.
 

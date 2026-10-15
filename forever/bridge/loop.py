@@ -29,7 +29,7 @@ from forever.bridge.actions import action_flag, card_for, parse_action
 from forever.bridge.agent import AgentResult, provenance_line
 from forever.bridge.buttons import BUTTONS, button_payload, visible_buttons
 from forever.bridge.capture import GameWindow, Rect, band_rect, probe_rect
-from forever.bridge.choices import ROUTE_CHOICES, Choice, answer_text, chat_choices, find_answer
+from forever.bridge.choices import ROUTE_CHOICES, Choice, answer_text, chat_choices, find_answer, route_options
 from forever.bridge.codec import SELFTEST_ID, BandError, Decoded, decode_band, detect_cell_px, selftest_payload
 from forever.bridge.format import normalize_reply
 from forever.bridge.fragments import Fragment, FragmentBuffer, parse_fragment
@@ -644,6 +644,8 @@ class Bridge:
             return
         if ROUTE_BUTTON in record.flags:  # RX1, CJ1 : feuille de route en cours, questions posées dans le chat
             self.choices = list(ROUTE_CHOICES)
+            if "lv" in route_options(record.flags):  # CJ1, bloc 6a : niveaux choisis dans l'assistant, pas redemandés
+                self.choices = [c for c in self.choices if c.id != "route_levels"]
             self.route_active = True
         try:
             session = None if "n" in record.flags else self.state.session

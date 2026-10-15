@@ -9,6 +9,7 @@ Questions de la feuille de route : `ROUTE_CHOICES`. Aucun chiffre de jeu ici."""
 from __future__ import annotations
 
 from collections.abc import Sequence
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass
 from typing import Any
 
@@ -57,6 +58,24 @@ ROUTE_CHOICES: tuple[Choice, ...] = (
 # route est demandée dans le chat. Les autres questions restent reconnues si le joueur les donne.
 ROUTE_ASKED: tuple[str, ...] = ("route_levels",)
 VALIDATE = {"label": "Valider et livrer", "action": "route_deliver"}
+
+
+def route_options(flags: AbstractSet[str]) -> dict[str, Any]:
+    """Choix de l'assistant de feuille de route de la fenêtre (CJ1, bloc 6a, décision 280), lus dans les drapeaux du
+    message : `lv=<de>-<à>` (niveaux, de ≥ 1 et à > de), `dj=auto|none` (donjons), `cq=yes|no` (quêtes de classe) ;
+    un drapeau mal formé est ignoré."""
+    out: dict[str, Any] = {}
+    for flag in flags:
+        name, _, value = flag.partition("=")
+        if name == "lv":
+            low, _, high = value.partition("-")
+            if low.isdigit() and high.isdigit() and 1 <= int(low) < int(high):
+                out["lv"] = (int(low), int(high))
+        elif name == "dj" and value in ("auto", "none"):
+            out["dj"] = value
+        elif name == "cq" and value in ("yes", "no"):
+            out["cq"] = value == "yes"
+    return out
 
 
 def chat_choices(pending: Sequence[Choice], *, validate: bool) -> dict[str, Any] | None:

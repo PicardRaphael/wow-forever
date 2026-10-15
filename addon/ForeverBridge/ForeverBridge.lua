@@ -926,7 +926,8 @@ function FB.ShowAnswers(entry)
 	end
 	run.answering = entry
 	FB.LayoutAnswers()
-	ui.answers:Show()
+	-- jamais par-dessus un autre écran : la rangée revient avec le chat (FB.ShowChat)
+	ui.answers:SetShown(not ui.chatWidgets or ui.chatWidgets[1]:IsShown())
 end
 
 -- Rangée des réponses sur la largeur du contenu : largeur de chaque bouton mesurée sur son libellé (caractères),

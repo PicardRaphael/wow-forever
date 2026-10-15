@@ -10,12 +10,11 @@ from __future__ import annotations
 
 import json
 from collections.abc import Mapping
-from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, field
 from typing import Any
 
 from forever.bridge.buttons import BUTTONS
-from forever.bridge.choices import ROUTE_CHOICES
+from forever.bridge.choices import ROUTE_CHOICES, route_options
 from forever.bridge.context import ContextData, Defect, Resolved, context_notes, resolve
 from forever.bridge.record import Record
 
@@ -201,24 +200,6 @@ NAOWH_POPULAR = (
     "Code Naowh du build (`naowh`) tel quel, à coller dans Naowh Forever, Training, Builds, Import ; dis que son ordre "
     "de prise est généré (palier, prérequis), pas un ordre de leveling optimisé."
 )
-
-
-def route_options(flags: AbstractSet[str]) -> dict[str, Any]:
-    """Choix de l'assistant de feuille de route de la fenêtre (CJ1, bloc 6a, décision 280), lus dans les drapeaux du
-    message : `lv=<de>-<à>` (niveaux, de ≥ 1 et à > de), `dj=auto|none` (donjons), `cq=yes|no` (quêtes de classe) ;
-    un drapeau mal formé est ignoré."""
-    out: dict[str, Any] = {}
-    for flag in flags:
-        name, _, value = flag.partition("=")
-        if name == "lv":
-            low, _, high = value.partition("-")
-            if low.isdigit() and high.isdigit() and 1 <= int(low) < int(high):
-                out["lv"] = (int(low), int(high))
-        elif name == "dj" and value in ("auto", "none"):
-            out["dj"] = value
-        elif name == "cq" and value in ("yes", "no"):
-            out["cq"] = value == "yes"
-    return out
 
 
 def button_plan(
