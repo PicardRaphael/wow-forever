@@ -312,6 +312,10 @@ class Access:
     dungeon_level: Callable[[int], int | None]
     red_min_diff: int
     professions: frozenset[str] = frozenset()
+    # décision 282 : zones (noms) de ma route de leveling (None : inconnues, ordre de GearQuest gardé) et zones de
+    # départ des autres races (jamais proposées hors de ma route)
+    route_zones: frozenset[str] | None = None
+    other_start_zones: frozenset[str] = frozenset()
 
 
 class LevelingPicks(list[dict[str, Any]]):
@@ -336,6 +340,10 @@ def obtainable(fact: Mapping[str, Any], item: int, level: int, faction: str | No
     if isinstance(required, int) and required > level:
         return "out", f"niveau requis {required}"
     kind = fact.get("sourceType")
+    zone = fact.get("zone")
+    my_route = access.route_zones or frozenset()
+    if kind != "world_drop" and zone in access.other_start_zones and zone not in my_route:
+        return "out", f"zone de départ d'une autre race ({zone}), hors de ta route"
     if kind in QUEST_SOURCES:
         name = str(fact.get("questName") or "")
         if not name:
@@ -381,9 +389,68 @@ def obtainable(fact: Mapping[str, Any], item: int, level: int, faction: str | No
     return "aside", f"source « {kind} » sans niveau connu"
 
 
-def level_access(deps: Deps, professions: list[str]) -> Access:
+def route_zones(
+    deps: Deps, *, class_name: str, race: str, faction: str, below: int
+) -> tuple[frozenset[str] | None, frozenset[str]]:
+    """(zones de ma route, zones de départ des autres races), noms de zone : zones des quêtes que le parcours gratuit
+    de RestedXP de ma race et de ma classe prend dans ses guides qui commencent sous le niveau `below`, et zones des
+    quêtes du premier guide du parcours de chaque autre race ; (None, vide) sans RestedXP ou sans parcours (décision
+    282, lecture locale). Registre : I21"""
+    from types import SimpleNamespace
+
+    from forever.errors import InvalidArgumentError
+    from forever.quests import build_quests, value
+    from forever.route import reference_zones, rxp_start_giver
+    from forever.rxp_guides import read_rxp_guides, who_for
+    from forever.store import load_version
+
+    if deps.wow_dir is None:
+        return None, frozenset()
+    try:
+        library = read_rxp_guides(deps.wow_dir / "Interface" / "AddOns")
+    except InvalidArgumentError:
+        return None, frozenset()
+    book = build_quests(deps)
+    quests = {
+        qid: SimpleNamespace(
+            zone=value(q, "map") if isinstance(value(q, "map"), int) else None,
+            giver=value(q, "map") if isinstance(value(q, "map"), int) else None,  # carte du donneur, pour son départ
+        )
+        for qid, q in book.quests.items()
+    }
+
+    def names(maps: frozenset[int]) -> frozenset[str]:
+        return frozenset(book.zone_names[m] for m in maps if m in book.zone_names)
+
+    mine = names(reference_zones(library, who_for(class_name, race, faction), quests, below=below))
+    others: set[str] = set()
+    races = load_version(deps).read_json("races.json").get("races") or {}
+    for other, info in races.items():
+        if other == race:
+            continue
+        playable = list(info.get("classes") or [])
+        order = [class_name, *playable] if class_name in playable else playable  # classes que la race joue seulement
+        for played in order:
+            who = who_for(str(played), other, str(info.get("faction") or faction))
+            start_map = rxp_start_giver(library, who, quests, 0)  # zone de la première quête du parcours
+            if start_map is not None and start_map in book.zone_names:
+                others.add(book.zone_names[start_map])
+                break
+    return (mine or None), frozenset(others - mine)
+
+
+def level_access(
+    deps: Deps,
+    professions: list[str],
+    *,
+    class_name: str | None = None,
+    race: str | None = None,
+    faction: str | None = None,
+    below: int | None = None,
+) -> Access:
     """`Access` lu dans nos données : quêtes du livre par nom, donjons de DJ1 (niveau bas de leur plage), écart
-    d'une quête rouge (`mechanics.json`), métiers donnés (noms anglais). Registre : I21"""
+    d'une quête rouge (`mechanics.json`), métiers donnés (noms anglais) ; avec la classe, la race et le camp, les
+    zones de ma route et celles du départ des autres races (`route_zones`). Registre : I21"""
     from forever.dungeons import build_dungeons, where_item
     from forever.gamedata import load_game_data
     from forever.quests import build_quests, value
@@ -407,11 +474,18 @@ def level_access(deps: Deps, professions: list[str]) -> Access:
         return min(lows) if lows else None
 
     red = load_game_data(deps).leveling.quest_band.red_min_diff
+    mine, others = (
+        route_zones(deps, class_name=class_name, race=race, faction=faction, below=below)
+        if class_name and race and faction and below
+        else (None, frozenset())
+    )
     return Access(
         quests=lambda name: by_name.get(name, []),
         dungeon_level=dungeon_level,
         red_min_diff=int(red),
         professions=frozenset(p.strip().lower() for p in professions if p.strip()),
+        route_zones=mine,
+        other_start_zones=others,
     )
 
 
@@ -496,10 +570,18 @@ def leveling_gear(
                     "spec": p.spec,
                 }
             )
-            if not weights:
-                break
+            if not weights and (access is None or access.route_zones is None):
+                break  # sans poids ni route : le premier choix obtenable de GearQuest suffit
         if not oks:
             continue
+        if access is not None and access.route_zones is not None:  # décision 282 : ma route d'abord
+            on_route = [
+                o for o in oks if o.get("source") == "world_drop" or o.get("zone") in (None, *access.route_zones)
+            ]
+            if on_route:
+                oks = on_route
+            else:  # faute de mieux : détour signalé
+                oks = [{**o, "detour": o.get("zone")} for o in oks]
         first = oks[0]
         scored = [o for o in oks if o["score"] is not None]
         best = max(scored, key=lambda o: o["score"]) if scored else first
@@ -791,7 +873,10 @@ def gear_report(
         ]
         return {**out, "weights": weights, "weights_source": source, "provenance": _provenance(deps, assumptions)}
     if action == "leveling":
-        access = level_access(deps, professions or [])
+        top = to_level if to_level is not None and to_level > level else level
+        access = level_access(
+            deps, professions or [], class_name=cls.capitalize(), race=race, faction=faction, below=top + 1
+        )
         last = to_level if to_level is not None and to_level > level else level
         from forever.pipeline.gear_sources import read_gearquest_facts, read_gearquest_picks, read_guide_gear
 

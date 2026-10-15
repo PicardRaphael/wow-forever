@@ -89,7 +89,8 @@ def _how(p: Mapping[str, Any]) -> str:
         low, high = p["drop_levels"]
         return f"butin aléatoire des monstres de niveau {low} à {high}, n'importe où"
     zone = f", {p['zone']}" if p.get("zone") else ""
-    return f"{p.get('access') or p.get('source') or '?'}{zone}"
+    detour = f" ; détour : {p['detour']}, hors de ta route" if p.get("detour") else ""
+    return f"{p.get('access') or p.get('source') or '?'}{zone}{detour}"
 
 
 def _ordered(picks: list[dict[str, Any]]) -> list[dict[str, Any]]:
