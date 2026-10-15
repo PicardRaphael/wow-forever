@@ -380,6 +380,23 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
 - `exports.py` ne propose plus profil ni rôle sauf réglage allumé ; `FB.SwitchProfile` jamais appelé réglage éteint ;
   `/fb eui on|off`, `/fb role clear` ; aide mise à jour.
 
+### Bloc 6b — Réponses en cartes, assistant par type de route, PvP actionnable (décision 281)
+- **Réponses en cartes** dans l'historique (titre, certitude, boutons dans la carte), aperçu de route dans le chat
+  (écart aux maquettes accepté le 2026-10-15).
+- **Assistant de feuille de route selon le type** (idées du chat du 2026-10-15, soir, point 1) :
+  - Leveling : niveaux de départ et d'arrivée, donjons et quêtes de classe (comme 6a) ;
+  - Réputation : **faction choisie dans une liste** (factions de mon camp, palier actuel lu en jeu, API de réputation
+    sous `pcall`, nouvelle clé du contexte), puis **palier visé** ; ni niveaux ni champ libre ;
+  - Métier : **un de mes métiers** (liste lue en jeu avec mon rang actuel, clé `professions` déjà envoyée), puis
+    **rang visé** ; la réponse s'appuie sur SkillUp Forever (décision 272) ;
+  - Équipement : niveau visé, comme l'écran Équipement ;
+  - type pas encore calculé (réputation avant 4e, métier avant sa route) : l'écran le **dit clairement**, sans
+    formulaire inutile ni question envoyée.
+- **PvP actionnable** (point 2) : la réponse du bouton PvP commence par **« Comment jouer contre lui »**, trois à cinq
+  consignes concrètes dans l'ordre du combat, adaptées à ma classe et à mes sorts, tirées des menaces et réponses que
+  rend `forever_lookup(kind="pvp")` (aucune règle inventée) ; puis le détail en langage de joueur (chaque sort nommé
+  avec ce qu'il fait, « rendement décroissant » expliqué en une phrase) ; certitude affichée.
+
 ### Bloc 6 — Refonte de l'interface de ForeverBridge
 - Étude (locale, puis web en lecture seule) dans `docs/research/interface-addons.md` (principes, aucun code).
 - Maquettes montrées pour accord (question 9), puis : navigation (Chat, Feuille de route, Talents, Équipement, Exports,
@@ -414,9 +431,10 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
 | 19 oct. → 3 nov. | **1e** — Réglage de l'optimiseur sur la recette (en continu, hors jeu), puis 1g | au 4 nov. |
 | 15 oct. | **4**, **5**, **4b** (première partie) faits ; maquettes du bloc 6 acceptées | au 4 nov. |
 | 16 → 19 oct. | **6a** — Nouvelle fenêtre (barre latérale, écrans, assistant, thème, `/fv classique`) | 20 et 21 |
-| 20 → 23 oct. | **4c** — Équipement par niveau ou tranche, à la demande, « En faire une route » | au 4 nov. |
-| 24 → 27 oct. | **4d** — Route d'équipement complète (optimiseur de trajets, livraison RestedXP) | au 4 nov. |
-| 28 → 31 oct. | **4e** — Route de réputation ; **6b** — Réponses en cartes | au 4 nov. |
+| 15 → 19 oct. | **4c** — Équipement par niveau ou tranche, à la demande, « En faire une route » (départ : l'action `a=gear_level` sans le modèle) | au 4 nov. |
+| 20 → 23 oct. | **4d** — Route d'équipement complète (optimiseur de trajets, livraison RestedXP) | au 4 nov. |
+| 24 → 27 oct. | **6b** — Réponses en cartes, assistant par type de route, PvP « Comment jouer contre lui » | au 4 nov. |
+| 28 → 31 oct. | **4e** — Route de réputation (l'assistant de 6b la propose dès qu'elle est calculée) | au 4 nov. |
 | 1 → 2 nov. | **1d** — Vols et pierre de foyer dans notre calcul, puis lecteur de Polestar (si le temps le permet) | au 4 nov. |
 | 3 nov. | Marge ; `docs/LANCEMENT.md` (essais restés en attente) | — |
 | 4 nov. | Sortie : essais des blocs 1e, 1g, 4, 4b à 4e, 6 ; clôture de CJ1 à ton accord | 4 nov. et suivants |
