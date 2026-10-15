@@ -55,3 +55,13 @@ def test_items_of_the_other_faction_are_left_out():
     assert 900003 not in horde["slots"].values() and all(i["item"] != 900003 for i in horde["items"])
     alliance = personal_bis(ADDONS, spec_key="fire-mage", weights=WEIGHTS, name="n", faction="alliance")
     assert alliance["slots"][11] == 900003
+
+
+def test_items_listed_only_for_the_other_faction_by_gearquest_are_left_out():
+    # 900001 et 900002 : choix de GearQuest pour l'Alliance seulement (fixture), sans camp chez Naowh : écartés pour la
+    # Horde (réputation ou marchand d'un camp, ex. les ceintures de l'Arathi Basin) ; la mention de Naowh prime
+    # (900003 : « (Alliance) » chez Naowh, choix Horde chez GearQuest : gardé pour l'Alliance)
+    horde = personal_bis(ADDONS, spec_key="fire-mage", weights=WEIGHTS, name="n", faction="horde")
+    assert not {900001, 900002} & set(horde["slots"].values())
+    alliance = personal_bis(ADDONS, spec_key="fire-mage", weights=WEIGHTS, name="n", faction="alliance")
+    assert alliance["slots"][1] in {900001, 900002} and alliance["slots"][11] == 900003
