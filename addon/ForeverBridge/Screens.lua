@@ -314,8 +314,11 @@ local function BuildGear(screen)
 	local list = Button("ForeverBridgeGearList", screen, "Mon équipement à ce niveau", 210)
 	Place(list, screen, 0, -2 * ROW)
 	list:SetScript("OnClick", function()
-		SendQuestion("Quel équipement viser au niveau " .. state.level .. " ? Pour chaque emplacement, l'objet et la "
-			.. "quête ou le donjon qui le donne.")
+		-- essai CJ-6 : action traitée par le pont sans le modèle (seule la sortie de l'outil, au niveau choisi)
+		local label = "Mon équipement au niveau " .. state.level
+		if FB.Send("", nil, { flags = { "a=gear_level:" .. state.level }, label = label }) then
+			FB.ShowScreen("chat")
+		end
 	end)
 	local route = Button("ForeverBridgeGearRoute", screen, "En faire une route", 160)
 	Place(route, screen, 216, -2 * ROW)

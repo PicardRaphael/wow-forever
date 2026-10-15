@@ -131,6 +131,7 @@ class Bridge:
         xp_watch: Callable[[], Mapping[str, Any] | None] | None = None,
         exporter: Callable[[Mapping[str, str], Sequence[Mapping[str, str]]], tuple[str, list[dict[str, str]]]]
         | None = None,
+        gearer: Callable[[Mapping[str, str], int], str] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -155,6 +156,9 @@ class Bridge:
         self.addons = addons  # addons.AddonsTurn : conversation « addons » (bloc F)
         self.xp_watch = xp_watch  # T04f : identifiants surveillés par les addons (xp_bonuses.xp_watch)
         self.exporter = exporter  # EX1 : réponse du bouton Exports (exports.exports_reply), sans le modèle
+        self.gearer = (
+            gearer  # essai CJ-6 : « Mon équipement à ce niveau » (gear_level.gear_level_reply), sans le modèle
+        )
         self.last_exports: list[dict[str, str]] = []  # EX1 : liens typés de la dernière réponse qui en portait
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
@@ -451,6 +455,11 @@ class Bridge:
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
             self._done(record, text, "action", links)
             return
+        elif action == "gear_level" and self.gearer is not None and target and target.isdigit() and int(target) > 0:
+            try:
+                result, text = "équipement", self.gearer(record.context, int(target))
+            except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
+                result, text = "erreur", f"Équipement non calculé : {type(exc).__name__}: {exc}"
         elif action == "route_deliver":
             try:
                 result, text = self._deliver_route(record.context)
