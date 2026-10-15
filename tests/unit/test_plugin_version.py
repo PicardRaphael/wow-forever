@@ -54,7 +54,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.13.0 : code Naowh Forever à côté du lien Talents Forever, macros et profils EllesmereUI (forever-builds, EX1).
     # 0.14.0 : feuilles de route de CJ1 (race, position, personnage, base adaptée, questions sous la réponse, livraison
     # sous un nom stable, retrait sûr), forever-routes.
-    assert version == "0.14.0"
+    # 0.15.0 : équipement (forever_gear : poids du Mage, liste BiS personnelle, leveling, amélioration), routeur.
+    assert version == "0.15.0"
 
 
 def test_fingerprint_is_up_to_date():
