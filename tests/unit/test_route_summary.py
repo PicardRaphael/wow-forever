@@ -19,6 +19,7 @@ from forever.route import route_summary
 
 PLAN = read_json(FIXTURES / "rxp" / "plan.json")
 MAX_SUMMARY = 8000  # caractères du résumé sérialisé : bien sous la limite d'un résultat d'outil de Claude Code
+WALK = [s for s in PLAN["stops"] if s["kind"] not in ("dungeon", "dungeon_repeat")]  # arrêts hors donjon
 
 
 def big_plan():
@@ -26,7 +27,7 @@ def big_plan():
     zones = ["Fixture Vale", "Fixture Hills", "Fixture Vale", "Fixture Coast"]
     stops = []
     for i in range(120):
-        stop = dict(PLAN["stops"][i % len(PLAN["stops"])])
+        stop = dict(WALK[i % len(WALK)])
         stop.update(zone=zones[(i // 30) % len(zones)], text=f"arrêt {i}", seconds=1.0, travel_s=0.5)
         stops.append(stop)
     stops[3].update(kind="accept", name="Fixture Class Call", class_quest=True)

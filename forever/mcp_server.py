@@ -473,6 +473,7 @@ def build_server(deps: Deps) -> MCPServer:
         start_x: float | None = None,
         start_y: float | None = None,
         character: str | None = None,
+        detail: bool = False,
     ) -> dict[str, Any]:
         """Feuille de route de leveling (RX1) : `action="plan"` calcule une route (`class_name`, `faction` horde ou
         alliance, `start_level`, `end_level`, `dungeons` auto, none ou noms séparés par des virgules, `class_quests`,
@@ -481,8 +482,18 @@ def build_server(deps: Deps) -> MCPServer:
         dont les quêtes faites sont retirées) et rend le plan, son aperçu (`preview` : niveaux, heures, XP par heure,
         donjons placés, récompenses, bonus rappelés, certitude) et sa provenance ; `action="show"` relit un plan
         (`plan_id`) ; `action="guide"` rend son guide RestedXP (texte). Ajuster : relancer `plan` avec les options
-        changées (« enlève Wailing Caverns » : `dungeons` sans lui, ou `exclude`)."""
-        from forever.route import RouteRequest, guide_name, load_plan, parse_professions, plan_route, route_preview
+        changées (« enlève Wailing Caverns » : `dungeons` sans lui, ou `exclude`). Réponse compacte par défaut
+        (résumé : `hours`, `xp_h`, `zones` dans l'ordre, `dungeons`, `class_quests`, `rewards`, `first_stops`, `basis`,
+        `stops_total`) ; `detail=True` rend le plan entier (arrêts, étapes), la route complète restant sur le disque."""
+        from forever.route import (
+            RouteRequest,
+            guide_name,
+            load_plan,
+            parse_professions,
+            plan_route,
+            route_preview,
+            route_summary,
+        )
         from forever.rxp import encode_guide
 
         try:
@@ -525,7 +536,9 @@ def build_server(deps: Deps) -> MCPServer:
                 name = guide_name(plan)
                 return {"id": plan["id"], "name": name, "text": encode_guide(plan, name=name, group="Forever Routes"),
                         "provenance": plan["provenance"]}  # fmt: skip
-            return {**plan, "preview": route_preview(plan)}
+            if detail:
+                return {**plan, "preview": route_preview(plan)}
+            return route_summary(plan)
         except ForeverError as err:
             return cast("dict[str, Any]", _error_result(deps, err))
 

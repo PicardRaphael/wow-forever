@@ -55,7 +55,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.14.0 : feuilles de route de CJ1 (race, position, personnage, base adaptée, questions sous la réponse, livraison
     # sous un nom stable, retrait sûr), forever-routes.
     # 0.15.0 : équipement (forever_gear : poids du Mage, liste BiS personnelle, leveling, amélioration), routeur.
-    assert version == "0.15.0"
+    # 0.15.1 : réponse compacte de forever_route par défaut (`detail=True` pour le plan entier), forever-routes.
+    assert version == "0.15.1"
 
 
 def test_fingerprint_is_up_to_date():

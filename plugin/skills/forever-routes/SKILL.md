@@ -23,12 +23,13 @@ le calcul (classe, camp, niveau de départ et d'arrivée), jamais devinée.
 - `forever_route(action="plan", class_name, faction, start_level, end_level, race, character, start_map, start_x,
   start_y, dungeons="auto", class_quests=True, exclude=[…], include=[…], professions=["Nom:rang:max"])` : `race` et
   `character` du profil toujours donnés (zone de départ de la race, quêtes déjà faites du personnage retirées),
-  position si connue ; donjons avec leurs quêtes et quêtes de classe inclus par défaut ; plan et `preview` (niveaux,
-  `hours`, `xp_h`, donjons placés, récompenses, bonus rappelés, certitude, nombre d'arrêts, `basis`) ; `basis` dit la
-  route livrée : notre calcul s'il ressemble au parcours gratuit de RestedXP de la race et de la classe, sinon ce
-  parcours adapté (attribution à RestedXP, décision 279) ; `stops` : arrêts dans l'ordre (`kind` : accept, objective, turnin,
-  dungeon, dungeon_repeat, train, prof, grind ; `name`, `zone`, `x`, `y`, `level`, `xp`, `certainty`) ; `warnings` : quêtes
-  écartées et pourquoi ; `id` du plan.
+  position si connue ; donjons avec leurs quêtes et quêtes de classe inclus par défaut. Réponse compacte par défaut :
+  `hours`, `xp_h`, `zones` dans l'ordre, `dungeons` placés, `class_quests`, `rewards`, `first_stops` (cinq premiers
+  arrêts : `text`, `zone`, `x`, `y`, `level`), `stops_total`, `preview`, `warnings` (les premiers, `warnings_total`),
+  `basis` : la route livrée, notre calcul s'il ressemble au parcours gratuit de RestedXP de la race et de la classe,
+  sinon ce parcours adapté (attribution à RestedXP, décision 279) ; `id` du plan. `detail=True` rend le plan entier
+  (`stops` dans l'ordre : `kind` accept, objective, turnin, dungeon, dungeon_repeat, train, prof, grind ; `name`,
+  `zone`, `x`, `y`, `level`, `xp`, `certainty`) : seulement si la question le demande, la réponse est longue.
 - `forever_route(action="show", plan_id)` : relire un plan ; `forever_route(action="guide", plan_id)` : texte du guide
   RestedXP, nom stable « Forever · <personnage> · a-b » (livré en jeu par « Valider et livrer » sous l'aperçu ;
   `forever route rxp-clean`, jeu fermé, retire de RestedXP les routes livrées).

@@ -302,9 +302,11 @@ def button_plan(
             route_args.update(start_map=r.map, start_x=r.x, start_y=r.y)
         read = (
             (
-                "Aperçu (`preview`) en premier : niveaux, heures, XP par heure, donjons et leur niveau, récompenses "
-                "notables, certitude ; puis les cinq premiers arrêts (`stops` : `text`, zone et position) ; une ligne "
-                "pour les avertissements (`warnings`) s'il y en a."
+                "Résumé de la route (réponse compacte de forever_route) : heures, XP par heure, zones dans l'ordre "
+                "(`zones`), donjons et leur niveau, quêtes de classe (`class_quests`), récompenses notables, base "
+                "utilisée (`basis`), certitude ; puis les cinq premiers arrêts (`first_stops` : `text`, zone et "
+                "position) ; une ligne pour les avertissements (`warnings`) s'il y en a. Jamais `detail=True` ici : "
+                "la route complète reste sur le disque pour la livraison."
             ),
             (
                 "La question suivante (nombre de niveaux) et le bouton « Valider et livrer » apparaissent sous ta "

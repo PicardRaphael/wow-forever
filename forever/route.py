@@ -648,6 +648,12 @@ STEP_VERB = {
 }
 
 
+def _quest_value(quest: Any, name: str) -> Any:
+    from forever.quests import value
+
+    return value(quest, name)
+
+
 def _stop_payload(book: Any, rows: dict[str, Any], r: Any, *, end_level: int) -> dict[str, Any]:
     place = _place_of(book, rows, r.kind, r.ref)
     if r.kind in ("dungeon", "dungeon_repeat"):
@@ -661,6 +667,7 @@ def _stop_payload(book: Any, rows: dict[str, Any], r: Any, *, end_level: int) ->
     else:
         q = book.quests.get(r.ref)
         name = (q or {}).get("name") or f"la quête {r.ref}"
+    classes = _quest_value(q, "classes") if r.kind in ("accept", "objective", "turnin") and q else None
     target = r.ref if r.kind == "grind" and isinstance(r.ref, int) else end_level  # farm du milieu d'une route
     text = (
         f"farme des monstres de ton niveau jusqu'au niveau {target}"
@@ -681,6 +688,7 @@ def _stop_payload(book: Any, rows: dict[str, Any], r: Any, *, end_level: int) ->
         "zone": book.zone_names.get(place.get("map")) if place.get("map") is not None else None,
         "x": place.get("x"),
         "y": place.get("y"),
+        **({"class_quest": True} if isinstance(classes, int) and classes else {}),  # CJ1 : résumé de la route
     }
 
 
@@ -1182,6 +1190,64 @@ def route_preview(plan: Any) -> dict[str, Any]:
         "certainty": plan["certainty"],
         "stops": len(plan["stops"]),
         "basis": {k: (plan.get("basis") or {}).get(k) for k in ("kind", "verdict", "guides")},
+    }
+
+
+FIRST_STOPS = 5  # arrêts montrés dans le résumé (réglage de présentation)
+SUMMARY_WARNINGS = 5
+SUMMARY_REQUEST = ("class_name", "faction", "start_level", "end_level", "race", "character", "dungeons", "class_quests")
+
+
+def route_summary(plan: Any) -> dict[str, Any]:
+    """Résumé compact d'un plan pour la conversation (essai CJ-6 du 2026-10-15 : le plan complet, guide RestedXP
+    compris, dépassait ce qu'un résultat d'outil peut porter) : aperçu, zones dans l'ordre de première visite, donjons,
+    quêtes de classe, récompenses notables, cinq premiers arrêts, base utilisée sans le texte du guide, quelques
+    avertissements, provenance ; la route complète reste sur le disque (`<cache>/routes/<id>.json`) pour la
+    livraison et `forever_route(action="show", detail=True)`."""
+    stops = list(plan.get("stops") or [])
+    zones: list[str] = []
+    for stop in stops:
+        zone = stop.get("zone")
+        if zone and zone not in zones:
+            zones.append(zone)
+    class_quests: list[str] = []
+    for stop in stops:
+        if stop.get("class_quest") and stop.get("kind") == "accept" and stop.get("name") not in class_quests:
+            class_quests.append(stop["name"])
+    preview = route_preview(plan)
+    dungeons: list[dict[str, Any]] = []  # un donjon une fois, à son premier passage
+    for d in preview["dungeons"]:
+        if all(d["name"] != seen["name"] for seen in dungeons):
+            dungeons.append(d)
+    basis = plan.get("basis") or {}
+    request = plan.get("request") or {}
+    warnings = list(plan.get("warnings") or [])
+    return {
+        "id": plan["id"],
+        "name": guide_name(plan),
+        "class": plan.get("class"),
+        "faction": plan.get("faction"),
+        "levels": plan.get("levels"),
+        "feasible": plan.get("feasible"),
+        "hours": plan.get("hours"),
+        "xp_h": plan.get("xp_h"),
+        "certainty": plan.get("certainty"),
+        "zones": zones,
+        "dungeons": dungeons,
+        "class_quests": class_quests,
+        "rewards": list(plan.get("rewards") or []),
+        "first_stops": [
+            {k: s.get(k) for k in ("kind", "text", "zone", "x", "y", "level")} for s in stops[:FIRST_STOPS]
+        ],
+        "stops_total": len(stops),
+        "basis": {k: basis.get(k) for k in ("kind", "verdict", "guides", "attribution") if k in basis},
+        "warnings": warnings[:SUMMARY_WARNINGS],
+        "warnings_total": len(warnings),
+        "request": {k: request[k] for k in SUMMARY_REQUEST if k in request},
+        "full_route": "route complète sur le disque (plan id), livrée par « Valider et livrer » ; détail : "
+        'forever_route(action="show", plan_id, detail=True)',
+        "preview": preview,
+        "provenance": plan.get("provenance"),
     }
 
 
