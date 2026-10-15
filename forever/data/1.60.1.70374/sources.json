@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70374 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-10-14)",
+      "source": "Client 1.60.1.70374 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-15)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70374 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-10-14)",
+      "source": "Client 1.60.1.70374 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 4 (forever install, 2026-10-15)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -210,7 +210,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 3 (forever install, 2026-10-14)"
+        "installé en révision 4 (forever install, 2026-10-15)"
       ]
     },
     "races.json": {
@@ -312,7 +312,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 3 (forever install, 2026-10-14)"
+        "installé en révision 4 (forever install, 2026-10-15)"
       ]
     },
     "xp_bonuses.json": {
@@ -341,18 +341,18 @@
       ]
     }
   },
-  "revision": 3,
-  "revised_at": "2026-10-14",
+  "revision": 4,
+  "revised_at": "2026-10-15",
   "hotfixes": {
     "dbcache": {
       "file": "Cache/ADB/enUS/DBCache.bin",
       "locale": "enUS",
       "format": 9,
       "build": 70374,
-      "size": 3032332,
-      "sha256": "6b5e88eb8b80cb29d1f5afc15097f24d55e58c25af86600ae11dbb577cf71b1c",
-      "file_date": "2026-10-14T13:51:52Z",
-      "read_at": "2026-10-14T13:51:54Z"
+      "size": 3064303,
+      "sha256": "def9785106fbf114e3eadccea1ef9dd630806e6c29996a18f180ee13233b222b",
+      "file_date": "2026-10-15T07:57:59Z",
+      "read_at": "2026-10-15T07:58:01Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -416,9 +416,11 @@
       112504,
       112513,
       112515,
-      112544
+      112544,
+      112623,
+      112668
     ],
-    "max_push": 112544,
+    "max_push": 112668,
     "seen_at": {
       "112444": null,
       "112469": null,
@@ -426,21 +428,23 @@
       "112504": null,
       "112513": null,
       "112515": null,
-      "112544": null
+      "112544": null,
+      "112623": null,
+      "112668": null
     },
     "counts": {
       "Item": {
-        "VALID": 22,
+        "VALID": 28,
         "DELETE": 0,
-        "identical": 22
+        "identical": 28
       },
       "ItemSparse": {
-        "VALID": 22,
+        "VALID": 28,
         "DELETE": 0,
-        "identical": 1
+        "identical": 7
       },
       "Spell": {
-        "VALID": 1,
+        "VALID": 5,
         "DELETE": 0,
         "identical": 1
       },
@@ -450,17 +454,17 @@
         "identical": 1
       },
       "SpellEffect": {
-        "VALID": 5,
+        "VALID": 9,
         "DELETE": 0,
         "identical": 3
       },
       "SpellMisc": {
-        "VALID": 3,
+        "VALID": 7,
         "DELETE": 0,
         "identical": 2
       },
       "SpellName": {
-        "VALID": 1,
+        "VALID": 5,
         "DELETE": 0,
         "identical": 1
       }
@@ -540,6 +544,30 @@
       },
       {
         "table": "Item",
+        "rec_id": 269716,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 269717,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 269742,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 270043,
         "status": "VALID",
         "push": 112544,
@@ -640,6 +668,30 @@
         "status": "VALID",
         "push": 112515,
         "unique_id": 2132000995,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 277286,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 277288,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 277289,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
         "identical": true
       },
       {
@@ -716,6 +768,30 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 269716,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 269717,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 269742,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 270043,
         "status": "VALID",
         "push": 112544,
@@ -819,12 +895,68 @@
         "identical": false
       },
       {
+        "table": "ItemSparse",
+        "rec_id": 277286,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 277288,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 277289,
+        "status": "VALID",
+        "push": 112623,
+        "unique_id": 2677683558,
+        "identical": true
+      },
+      {
         "table": "Spell",
         "rec_id": 8913,
         "status": "VALID",
         "push": 112486,
         "unique_id": 1014734777,
         "identical": true
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1325994,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1325995,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1325996,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "Spell",
+        "rec_id": 1325997,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
       },
       {
         "table": "SpellAuraOptions",
@@ -883,6 +1015,38 @@
         "identical": false
       },
       {
+        "table": "SpellEffect",
+        "rec_id": 1363659,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1363661,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1363662,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellEffect",
+        "rec_id": 1363663,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
         "table": "SpellMisc",
         "rec_id": 786136,
         "status": "VALID",
@@ -907,12 +1071,76 @@
         "identical": false
       },
       {
+        "table": "SpellMisc",
+        "rec_id": 871519,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 871520,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 871521,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellMisc",
+        "rec_id": 871522,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
         "table": "SpellName",
         "rec_id": 8913,
         "status": "VALID",
         "push": 112486,
         "unique_id": 1014734777,
         "identical": true
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1325994,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1325995,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1325996,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
+      },
+      {
+        "table": "SpellName",
+        "rec_id": 1325997,
+        "status": "VALID",
+        "push": 112668,
+        "unique_id": 3619694980,
+        "identical": false
       }
     ],
     "entities": 0,
@@ -938,44 +1166,72 @@
       "ItemSparse 6789",
       "ItemSparse 9538",
       "ItemSparse 9588",
+      "Spell 1325994",
+      "Spell 1325995",
+      "Spell 1325996",
+      "Spell 1325997",
       "SpellAuraOptions 122049",
       "SpellEffect 1337938",
       "SpellEffect 1349232",
-      "SpellMisc 862534"
+      "SpellEffect 1363659",
+      "SpellEffect 1363661",
+      "SpellEffect 1363662",
+      "SpellEffect 1363663",
+      "SpellMisc 862534",
+      "SpellMisc 871519",
+      "SpellMisc 871520",
+      "SpellMisc 871521",
+      "SpellMisc 871522",
+      "SpellName 1325994",
+      "SpellName 1325995",
+      "SpellName 1325996",
+      "SpellName 1325997"
     ],
     "listed": {
       "invalid": [],
       "notpublic": [],
       "dbreply": {
-        "0x021826bb": 1,
-        "ItemSparse": 219,
+        "0x021826bb": 2,
+        "ItemSparse": 340,
         "Spell": 3
       },
       "item_reply": {
-        "0x198e28b5": 4742,
-        "0x5481af88": 4742,
-        "0xb50ca635": 4742,
-        "0xce88edca": 4742,
-        "Item": 4742,
-        "ItemSparse": 4742
+        "0x198e28b5": 4745,
+        "0x5481af88": 4745,
+        "0xb50ca635": 4745,
+        "0xce88edca": 4745,
+        "Item": 4745,
+        "ItemSparse": 4745
       },
       "unknown_hash": {
-        "0x01325ca0": 2,
+        "0x01325ca0": 3,
+        "0x021826bb": 2,
         "0x0f992211": 25,
         "0x1018add5": 1,
-        "0x198e28b5": 22,
+        "0x13c403a5": 2,
+        "0x198e28b5": 28,
+        "0x1d53eb74": 2,
+        "0x23cbe682": 1,
+        "0x27b7a01a": 4,
         "0x3ac83109": 25,
-        "0x4553e9f7": 5,
+        "0x4553e9f7": 6,
         "0x45952e6e": 1,
-        "0x5481af88": 22,
+        "0x5481af88": 28,
         "0x61025756": 1,
+        "0x936188f9": 11,
         "0xaa0ecb1c": 1,
-        "0xb50ca635": 22,
+        "0xb2bb19eb": 1,
+        "0xb50ca635": 28,
         "0xb94c2807": 2,
-        "0xc9d6b6b3": 2,
-        "0xce88edca": 22,
+        "0xc842493a": 3,
+        "0xc9d6b6b3": 13,
+        "0xc9e0a749": 11,
+        "0xce88edca": 28,
+        "0xd055d7b5": 13,
+        "0xd5a4e33a": 18,
         "0xe064a75c": 1,
         "0xe44abbd4": 1,
+        "0xe9becb23": 5,
         "0xf6bc85df": 1,
         "0xffd9d676": 1
       },
@@ -997,9 +1253,9 @@
     "checks": {
       "Item": {
         "ok": true,
-        "reason": "disposition 9A2A4834 validée : 22 entrée(s) décodée(s), 22 comparée(s), 100% des valeurs égales au build",
-        "decoded": 22,
-        "compared": 22,
+        "reason": "disposition 9A2A4834 validée : 28 entrée(s) décodée(s), 28 comparée(s), 100% des valeurs égales au build",
+        "decoded": 28,
+        "compared": 28,
         "equal_ratio": 1.0,
         "references_ok": null
       },
@@ -1013,10 +1269,10 @@
       },
       "ItemSparse": {
         "ok": true,
-        "reason": "disposition 6FCC3191 validée : 22 entrée(s) décodée(s), 17 comparée(s), 96% des valeurs égales au build",
-        "decoded": 22,
-        "compared": 17,
-        "equal_ratio": 0.9640205596801827,
+        "reason": "disposition 6FCC3191 validée : 28 entrée(s) décodée(s), 23 comparée(s), 97% des valeurs égales au build",
+        "decoded": 28,
+        "compared": 23,
+        "equal_ratio": 0.970873786407767,
         "references_ok": null
       },
       "ItemXItemEffect": {
@@ -1029,8 +1285,8 @@
       },
       "Spell": {
         "ok": true,
-        "reason": "disposition E3D134FB validée : 1 entrée(s) décodée(s), 1 comparée(s), 100% des valeurs égales au build",
-        "decoded": 1,
+        "reason": "disposition E3D134FB validée : 5 entrée(s) décodée(s), 1 comparée(s), 100% des valeurs égales au build",
+        "decoded": 5,
         "compared": 1,
         "equal_ratio": 1.0,
         "references_ok": null
@@ -1045,24 +1301,24 @@
       },
       "SpellEffect": {
         "ok": true,
-        "reason": "disposition 5362E3D4 validée : 5 entrée(s) décodée(s), 5 comparée(s), 97% des valeurs égales au build, 5/5 références résolues",
-        "decoded": 5,
+        "reason": "disposition 5362E3D4 validée : 9 entrée(s) décodée(s), 5 comparée(s), 97% des valeurs égales au build, 9/9 références résolues",
+        "decoded": 9,
         "compared": 5,
         "equal_ratio": 0.9666666666666667,
         "references_ok": true
       },
       "SpellMisc": {
         "ok": true,
-        "reason": "disposition 434B3607 validée : 3 entrée(s) décodée(s), 3 comparée(s), 97% des valeurs égales au build, 12/12 références résolues",
-        "decoded": 3,
+        "reason": "disposition 434B3607 validée : 7 entrée(s) décodée(s), 3 comparée(s), 97% des valeurs égales au build, 24/24 références résolues",
+        "decoded": 7,
         "compared": 3,
         "equal_ratio": 0.9696969696969697,
         "references_ok": true
       },
       "SpellName": {
         "ok": true,
-        "reason": "disposition 782EE721 validée : 1 entrée(s) décodée(s), 1 comparée(s), 100% des valeurs égales au build",
-        "decoded": 1,
+        "reason": "disposition 782EE721 validée : 5 entrée(s) décodée(s), 1 comparée(s), 100% des valeurs égales au build",
+        "decoded": 5,
         "compared": 1,
         "equal_ratio": 1.0,
         "references_ok": null
