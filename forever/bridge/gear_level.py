@@ -186,14 +186,15 @@ def _range_reply(deps: Any, context: Mapping[str, str], low: int, high: int) -> 
     by_slot: dict[str, list[dict[str, Any]]] = {}
     for s in sorted(doc["segments"], key=lambda s: s["from"]):
         by_slot.setdefault(s["slot"], []).append(s)
+    lines.append(_summary(list({s["item"]: s for s in doc["segments"]}.values())))
     order = sorted(by_slot, key=lambda slot: all(s.get("source") in RANDOM_DROP for s in by_slot[slot]))
-    for slot in order:
-        parts = [
-            f"{_span(s['from'], s['to'])} {item_tag(s['item'], s.get('quality'), s.get('name'))} "
+    for slot in order:  # décision 282 : titre de l'emplacement, puis un objet par ligne, du plus tôt au plus tard
+        lines.append(f"- {SLOTS_FR.get(slot, slot)} :")
+        lines += [
+            f"  · {_span(s['from'], s['to'])} : {item_tag(s['item'], s.get('quality'), s.get('name'))} "
             f"(niveau requis {s['required_level']} ; {_how(s)})"
             for s in by_slot[slot]
         ]
-        lines.append(f"- {SLOTS_FR.get(slot, slot)} : " + " ; ".join(parts))
     if not by_slot:
         lines.append("- Aucun objet de GearQuest Forever obtenable dans cette tranche pour ta classe et ton camp.")
     extra, links = _links(doc, context, high, deps, span=f"niveaux {low}-{high}")
@@ -211,7 +212,10 @@ def gear_level_reply(
     doc = _leveling(deps, context, level)
     if "picks" not in doc:  # erreur de l'outil : son message tel quel
         return f"Équipement au niveau {level} : {doc.get('error') or doc.get('message') or 'non calculé'}", []
-    lines = [f"## Équipement au niveau {level} (GearQuest Forever, objets obtenables à ce niveau)"]
+    lines = [
+        f"## Équipement au niveau {level} (GearQuest Forever, objets obtenables à ce niveau)",
+        _summary(doc["picks"]),
+    ]
     for p in _ordered(doc["picks"]):
         slot = SLOTS_FR.get(p["slot"], p["slot"])
         tag = item_tag(p["item"], p.get("quality"), p.get("name"))
@@ -219,7 +223,28 @@ def gear_level_reply(
     if not doc["picks"]:
         lines.append("- Aucun objet de GearQuest Forever obtenable à ce niveau pour ta classe et ton camp.")
     extra, links = _links(doc, context, level, deps)
-    return "\n".join(lines + extra + _tail(doc, level)), links
+    offer = [NEXT_STEP] if doc["picks"] else []  # décision 282 : la suite, avec le bouton posé par le pont
+    return "\n".join(lines + extra + _tail(doc, level) + offer), links
+
+
+NEXT_STEP = "Veux-tu la feuille de route pour obtenir ces objets ?"
+KINDS = (
+    ("quest_reward", "de quêtes"), ("seasonal_quest", "de quêtes"), ("boss_drop", "de donjon"), ("raid_trash", "de donjon"),
+    ("vendor", "de marchand"), ("world_drop", "de butin aléatoire"),
+)  # fmt: skip
+
+
+def _summary(picks: list[dict[str, Any]]) -> str:
+    """Résumé d'abord : combien d'objets par origine (décision 282)."""
+    counts: dict[str, int] = {}
+    labels = dict(KINDS)
+    for p in picks:
+        label = labels.get(str(p.get("source")), "d'autres origines")
+        counts[label] = counts.get(label, 0) + 1
+    if not counts:
+        return "En bref : aucun objet."
+    parts = [f"{n} objet{'s' if n > 1 else ''} {label}" for label, n in counts.items()]
+    return "En bref : " + ", ".join(parts) + "."
 
 
 def gear_route_reply(deps: Any, context: Mapping[str, str], level: int) -> tuple[str, list[dict[str, str]]]:

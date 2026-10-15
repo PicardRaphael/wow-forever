@@ -59,7 +59,10 @@ def send(tmp_path, make_deps):
 
 def test_range_action_reply(send):
     text = send(flags={f"a=gear_level:{LOW}-{HIGH}"}, text="").text
-    hands = next(line for line in text.splitlines() if line.startswith("- Mains :"))
+    lines = text.splitlines()  # décision 282 : titre de l'emplacement, puis un objet par ligne
+    head = lines.index("- Mains :")
+    block = [line for line in lines[head + 1 :] if line.startswith("  · ")]
+    hands = " ".join(block[:2])
     assert f"niveaux {LOW} à {LOW + 1}" in hands and f"niveaux {LOW + 2} à {HIGH}" in hands
     assert hands.index("940001") < hands.index("940002")
     assert f"Équipement du niveau {LOW} au niveau {HIGH}" in text

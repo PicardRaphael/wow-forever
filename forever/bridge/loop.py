@@ -414,10 +414,20 @@ class Bridge:
 
     # --- actions et export, sans le modèle (P06b) ---------------------------------------------------------------
 
-    def _done(self, record: Record, text: str, reason: str, links: Sequence[Mapping[str, str]] = ()) -> None:
+    def _done(
+        self,
+        record: Record,
+        text: str,
+        reason: str,
+        links: Sequence[Mapping[str, str]] = (),
+        *,
+        choices: Mapping[str, Any] | None = None,
+    ) -> None:
         reply: dict[str, Any] = {"session": record.session, "id": record.message_id, "status": "done", "text": text}
         if links:
             reply["links"] = [dict(link) for link in links]
+        if choices:
+            reply["choices"] = dict(choices)
         self.state.put_reply(reply)
         self._publish(self.first_slot, reason)
 
@@ -493,7 +503,12 @@ class Bridge:
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
                 result, text = "erreur", self._oops("Équipement non calculé", "équipement", exc)
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
-            self._done(record, text, "action", gear_links)
+            offer = None
+            if action == "gear_level" and result == "équipement" and isinstance(gear_levels(action, target), int):
+                # décision 282 : la suite proposée sous la réponse, comme une question du chat
+                offer = {"prompt": "", "buttons": [{"label": "Feuille de route de ces objets",
+                                                    "action": f"gear_route:{target}"}]}  # fmt: skip
+            self._done(record, text, "action", gear_links, choices=offer)
             return
         elif action == "route_deliver":
             try:
