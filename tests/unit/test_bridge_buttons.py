@@ -11,8 +11,8 @@ def keys(buttons):
 
 
 def test_buttons_since_p06b():
-    """P06b (décision 235) : « Mettre à jour » visible (T08d, T08e et P06b faites) ; RX1 : « Feuille de route » et
-    « Livrer dans RestedXP »."""
+    """P06b (décision 235) : « Mettre à jour » visible (T08d, T08e et P06b faites) ; RX1 : « Feuille de route » ;
+    la livraison se fait par « Valider et livrer » sous l'aperçu (CJ1, décision 276)."""
     assert keys(visible_buttons()) == [
         "talents",
         "leveling",
@@ -20,7 +20,6 @@ def test_buttons_since_p06b():
         "pvp",
         "update",
         "route",
-        "route_deliver",
         "exports",
     ]
     assert {"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b"} <= DONE_SLICES

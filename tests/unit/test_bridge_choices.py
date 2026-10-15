@@ -50,7 +50,7 @@ def test_choice_payload():
 
 def test_route_button_visible_when_rx1_done():
     keys = {b.key for b in BUTTONS if "RX1" in b.requires}
-    assert {"route", "route_deliver"} <= keys
+    assert "route" in keys and "route_deliver" not in keys  # CJ1 : plus de bouton séparé (décision 276)
     assert all(b.classes is None for b in BUTTONS if b.key in keys)  # toutes les classes
     assert not keys & {b.key for b in visible_buttons(DONE_SLICES - {"RX1"})}
     assert keys <= {b.key for b in visible_buttons(DONE_SLICES | {"RX1"})}
@@ -61,8 +61,7 @@ def test_route_button_publishes_the_choices(tmp_path):
     _bridge, _addons, agent, send, cards = setup_bridge(tmp_path)
     send(flags={"b=route"}, text="Prépare ma feuille de route.")
     assert agent.calls  # la conversation est prévenue (consigne du bouton)
-    ids = [c.id for c in cards()]
-    assert ids == [f"choice-{c.id}" for c in ROUTE_CHOICES]
+    assert not [c.id for c in cards() if c.id.startswith("choice-")]  # CJ1 : plus de question dans À valider
 
 
 def test_choice_click_sends_answer(tmp_path):

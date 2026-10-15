@@ -41,4 +41,4 @@ seul le bouton séparé de la barre disparaît.
 ```
 (la question en cours part avec la réponse, sous le message : test nouveau du bloc 2).
 
-- **Statut** : en attente de ton accord ; d'ici là, ces trois tests sont listés dans `tasks/.rouge`.
+- **Statut** : acceptée par l'utilisateur le 2026-10-15, appliquée ; `tasks/.rouge` vidé.
