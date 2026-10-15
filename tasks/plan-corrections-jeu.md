@@ -360,14 +360,40 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
 - « En faire une route » : la liste devient l'entrée de la route d'équipement (4b, puis 4d).
 - Outils : `forever gear leveling --level N` étendu (tranche `--to M`, quêtes et donjons joints), `forever_gear` ;
   écran Équipement du bloc 6 (choix du niveau, bouton « En faire une route »).
+- **Fait le 2026-10-15** : objets obtenables au niveau N (registre I21), actions `a=gear_level` et `a=gear_route` sans
+  le modèle, liens d'objets, emplacements en français, butin aléatoire en dernier, Mage reclassé par nos poids avec un
+  sort réellement appris (registre I3), tranche de niveaux, messages en mots de joueur.
+- **Suite (idées du chat du 2026-10-16, décision 282)** :
+  - **poids avec mes talents** : mes vrais talents (contexte du jeu) à mon niveau ; pour un niveau futur, les talents
+    que j'aurai selon mon plan de talents (ordre de prise du bouton Talents) ; sans talent avant le premier point ;
+    la réponse dit le build qui a servi ; vérifié dans `forever gear` et `forever_gear` (poids, liste BiS, équipement
+    par niveau et par tranche, liens Naowh et Forever Companion), test : le classement change quand un talent qui
+    modifie la valeur d'une statistique est pris ;
+  - **objets sur ma route** : préférer les objets obtenus dans les zones de ma route de leveling à ces niveaux, puis
+    les zones proches ; jamais la zone de départ d'une autre race (Zephras Isle pour un Gnome) sauf si elle est sur ma
+    route ; détour signalé ;
+  - **réponse lisible** : résumé d'abord (combien d'objets par quêtes, donjons, butin aléatoire), puis une ligne
+    courte par emplacement : l'objet à viser maintenant, puis les suivants, chacun sur sa ligne ; les cartes repliables
+    arrivent au bloc 6b ;
+  - **proposer la suite** : après la liste, « Veux-tu la feuille de route pour obtenir ces objets ? » avec un bouton
+    (route d'équipement du bloc 4d, livrée par « Valider et livrer ») ; « des alternatives par emplacement ? » si utile ;
+  - quêtes et donjons détaillés (donneur, position, chaîne ; boss, taux), autres sources quand GearQuest n'a rien.
 
 ### Bloc 4d — Route d'équipement complète (idées du chat du 2026-10-15, point 2)
 - Suite de 4b : quêtes (donneur, chaîne, position) et donjons ordonnés **par l'optimiseur de trajets** (mêmes
   garde-fous que les routes de leveling), passages en boucle d'un donjon à faible taux avec leur nombre attendu ;
   livraison dans RestedXP comme les autres routes (nom stable « Forever · <perso> · équipement ») ; écarts entre
   sources montrés objet par objet ; relevés du joueur (ForeverLogger) d'abord ; partage du butin en groupe dit.
+- **Donnée directement** (décision 282) : la réponse de « En faire une route » et du bouton « Veux-tu la feuille de
+  route… ? » est la route d'équipement calculée (aperçu compact dans le chat), avec **« Valider et livrer »** dessous,
+  comme une route de leveling ; la livraison passe par le même chemin (`route_deliver`).
 
 ### Bloc 4e — Route de réputation (idées du chat du 2026-10-15, point 1)
+- **Étude d'abord** (idées du chat du 2026-10-15, nuit ; décision 264, lecture seule), avant 6b et 4e :
+  `docs/research/reputations-forever.md` : factions du client (tables Faction et FactionGroup), camp, regroupement
+  (villes de chaque camp, neutres, factions de zone, factions propres à Forever), comment on les monte (quêtes,
+  monstres, objets à rendre, donjons), plafonds, changements de Forever (notes officielles, Forever Guide, Naowh,
+  Forever Companion, Questie).
 - « Monte ma réputation avec X » : toutes les sources de réputation de la faction ordonnées en une route : quêtes
   (gain de réputation), objets à rendre, et **monstres à tuer avec leur nombre** : gain par monstre, palier au-delà
   duquel le gain cesse (plafond éventuel), nombre de monstres jusqu'au palier visé.
@@ -396,6 +422,13 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
   consignes concrètes dans l'ordre du combat, adaptées à ma classe et à mes sorts, tirées des menaces et réponses que
   rend `forever_lookup(kind="pvp")` (aucune règle inventée) ; puis le détail en langage de joueur (chaque sort nommé
   avec ce qu'il fait, « rendement décroissant » expliqué en une phrase) ; certitude affichée.
+- **Écran Réputation** (idées du 2026-10-15, nuit) : factions lues dans le panneau de réputation du personnage, avec
+  leur palier, groupées comme dans le jeu (camp, neutres, zones), filtrables par zone ; puis le palier visé ; jamais de
+  niveaux ni de champ libre ; conçu après l'étude des réputations (bloc 4e).
+- **Réponse d'équipement en cartes repliables** (idées du 2026-10-16, point 1) : une carte par emplacement, détail des
+  sources replié.
+- **Plusieurs conversations** (idées du 2026-10-16, point 4) : créer, nommer, passer de l'une à l'autre, effacer ;
+  chacune garde son historique et sa session (ici ou juste après 6b).
 
 ### Bloc 6 — Refonte de l'interface de ForeverBridge
 - Étude (locale, puis web en lecture seule) dans `docs/research/interface-addons.md` (principes, aucun code).
@@ -432,7 +465,8 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
 | 15 oct. | **4**, **5**, **4b** (première partie) faits ; maquettes du bloc 6 acceptées | au 4 nov. |
 | 16 → 19 oct. | **6a** — Nouvelle fenêtre (barre latérale, écrans, assistant, thème, `/fv classique`) | 20 et 21 |
 | 15 → 19 oct. | **4c** — Équipement par niveau ou tranche, à la demande, « En faire une route » (départ : l'action `a=gear_level` sans le modèle) | au 4 nov. |
-| 20 → 23 oct. | **4d** — Route d'équipement complète (optimiseur de trajets, livraison RestedXP) | au 4 nov. |
+| 16 → 19 oct. | **4c** (suite) — Poids avec mes talents, objets sur ma route, réponse lisible, proposer la suite | au 4 nov. |
+| 20 → 23 oct. | **4d** — Route d'équipement complète donnée directement, « Valider et livrer » (optimiseur de trajets, livraison RestedXP) ; étude des réputations (`docs/research/reputations-forever.md`) | au 4 nov. |
 | 24 → 27 oct. | **6b** — Réponses en cartes, assistant par type de route, PvP « Comment jouer contre lui » | au 4 nov. |
 | 28 → 31 oct. | **4e** — Route de réputation (l'assistant de 6b la propose dès qu'elle est calculée) | au 4 nov. |
 | 1 → 2 nov. | **1d** — Vols et pierre de foyer dans notre calcul, puis lecteur de Polestar (si le temps le permet) | au 4 nov. |
