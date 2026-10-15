@@ -638,6 +638,11 @@ par le pont sans le modèle (un seul appel de `forever_gear` leveling au niveau 
 sortie) : aucun objet au-dessus du niveau, chacun avec son niveau requis ; la route regroupe donjons, quêtes par
 zone et autres origines (ordre par l'optimiseur et livraison au bloc 4d).
 
+Bloc 4c (2026-10-15) : chaque objet de ces réponses est un lien du jeu (infobulle au survol, clic, Maj+clic) ;
+emplacements en français ; butin aléatoire dit comme tel, sans zone, en dernier ; liens [Naowh : BiS] de la liste du
+niveau (« Forever · <personnage> · niveau N »), [Naowh : poids] et [Forever Companion : échelle] ; Mage : objets
+reclassés par nos poids, choix de GearQuest montré quand il diffère.
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 

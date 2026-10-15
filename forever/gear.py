@@ -423,15 +423,26 @@ def leveling_gear(
     faction: str | None = None,
     spec: str | None = None,
     access: Access | None = None,
+    weights: Mapping[str, float] | None = None,
 ) -> LevelingPicks:
     """Équipement de leveling de GearQuest Forever (décision 276) : pour chaque emplacement, le premier choix de
     l'addon dont la plage de niveaux contient `level`, pour le camp (et la spécialisation si donnée), avec ce que
     l'addon dit pour l'obtenir et son niveau requis ; avec `access` (essai CJ-6), seulement un objet obtenable à ce
-    niveau (`obtainable`), les autres écartés avec leur raison ou mis à part. Registre : I21"""
-    from forever.pipeline.gear_sources import read_gearquest_facts, read_gearquest_picks
+    niveau (`obtainable`), les autres écartés avec leur raison ou mis à part ; avec `weights` (Mage, bloc 4c), le
+    meilleur objet obtenable par nos poids (statistiques de Forever Guide) passe devant, le choix de GearQuest gardé
+    dans `gearquest_choice`. Registre : I21"""
+    from forever.pipeline.gear_sources import read_gearquest_facts, read_gearquest_picks, read_guide_gear
 
     picks = read_gearquest_picks(addons, class_token)
     facts = read_gearquest_facts(addons, class_token)
+    stats = read_guide_gear(addons) if weights else {}
+
+    def score(item: int) -> float | None:
+        """Score par nos poids ; None sans statistiques connues (objet à suffixe aléatoire : « - » chez Forever Guide)."""
+        if not weights or item not in stats or not stats[item].stats:
+            return None
+        return _score(stats[item].stats, dict(weights))
+
     ranked: dict[str, list[Any]] = {}
     for p in picks:
         if not p.min_level <= level <= p.max_level:
@@ -446,6 +457,7 @@ def leveling_gear(
     excluded: list[dict[str, Any]] = []
     for slot, candidates in ranked.items():
         seen: set[int] = set()
+        oks: list[dict[str, Any]] = []
         for p in sorted(candidates, key=lambda p: p.rank):
             if p.item in seen:
                 continue
@@ -459,15 +471,19 @@ def leveling_gear(
             else:
                 verdict, reason = "ok", ""
             entry = {"slot": slot, "item": p.item, "name": fact.get("name"), "required_level": required}
-            if verdict == "aside":
-                set_aside.append({**entry, "reason": reason})
+            if verdict in ("aside", "out"):
+                if not oks:  # seulement ce qui passait avant le premier choix obtenable
+                    (set_aside if verdict == "aside" else excluded).append({**entry, "reason": reason})
                 continue
-            if verdict == "out":
-                excluded.append({**entry, "reason": reason})
-                continue
-            out.append(
+            found = DROP_RANGE.search(str(fact.get("instructions") or ""))
+            oks.append(
                 {
                     **entry,
+                    "quality": fact.get("quality") if isinstance(fact.get("quality"), int) else None,
+                    "drop_levels": [int(found.group(1)), int(found.group(2))]
+                    if found and fact.get("sourceType") == "world_drop"
+                    else None,
+                    "score": score(p.item),
                     "zone": fact.get("zone"),
                     "source": fact.get("sourceType"),
                     "how": fact.get("instructions"),
@@ -478,7 +494,18 @@ def leveling_gear(
                     "spec": p.spec,
                 }
             )
-            break
+            if not weights:
+                break
+        if not oks:
+            continue
+        first = oks[0]
+        scored = [o for o in oks if o["score"] is not None]
+        best = max(scored, key=lambda o: o["score"]) if scored else first
+        if best is not first and first["score"] is not None and best["score"] > first["score"]:
+            keep = {k: first[k] for k in ("item", "name", "quality", "score", "rank")}
+            out.append({**best, "gearquest_choice": keep})
+        else:
+            out.append(first)
     return LevelingPicks(out, set_aside, excluded)
 
 
@@ -602,7 +629,23 @@ def gear_report(
         return {**out, "weights": weights, "weights_source": source, "provenance": _provenance(deps, assumptions)}
     if action == "leveling":
         access = level_access(deps, professions or [])
-        picks = leveling_gear(addons, cls, level=level, faction=faction, spec=spec, access=access)
+        lines: dict[str, Any] = {}
+        level_weights: dict[str, float] | None = None
+        if cls == "MAGE":  # bloc 4c : Mage reclassé par nos poids ; autres classes : ordre de GearQuest
+            key = spec if spec and "-" in spec else DEFAULT_SPECS["MAGE"]
+            report = mage_weights(deps, level=level, race=race, rotation=key.split("-")[0])
+            level_weights = mage_guide_weights(report, spec_key=key)
+            label = name or f"Forever · Mage · niveau {level}"
+            lines = {"naowh": naowh_weight_line(report, spec=key), "pawn": pawn_line(report, label=label)}
+        picks = leveling_gear(
+            addons,
+            cls,
+            level=level,
+            faction=faction,
+            spec=None if level_weights else spec,
+            access=access,
+            weights=level_weights,
+        )
         assumptions = [
             "choix de leveling de GearQuest Forever lus en local (premier choix obtenable de chaque emplacement)",
             (
@@ -611,8 +654,15 @@ def gear_report(
                 "niveau, objet de métier seulement avec le métier ; source ou niveau inconnus : mis à part"
             ),
             "zone de la quête non vérifiée au-delà de son camp et de son niveau",
+            (
+                f"Mage : objets obtenables reclassés par nos poids (moteur du Mage, niveau {level}) sur les statistiques "
+                "de Forever Guide ; choix de GearQuest gardé quand il diffère"
+                if level_weights
+                else "ordre de GearQuest Forever (poids calculés pour le Mage seulement)"
+            ),
         ]
         return {
+            **lines,
             "class": cls,
             "level": level,
             "picks": list(picks),

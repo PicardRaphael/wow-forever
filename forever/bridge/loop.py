@@ -131,8 +131,8 @@ class Bridge:
         xp_watch: Callable[[], Mapping[str, Any] | None] | None = None,
         exporter: Callable[[Mapping[str, str], Sequence[Mapping[str, str]]], tuple[str, list[dict[str, str]]]]
         | None = None,
-        gearer: Callable[[Mapping[str, str], int], str] | None = None,
-        gear_router: Callable[[Mapping[str, str], int], str] | None = None,
+        gearer: Callable[[Mapping[str, str], int], Any] | None = None,
+        gear_router: Callable[[Mapping[str, str], int], Any] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -460,13 +460,19 @@ class Bridge:
             result, text = "refusée", "Action refusée : niveau invalide."
         elif action in ("gear_level", "gear_route") and target:
             handler = self.gearer if action == "gear_level" else self.gear_router
+            gear_links: list[dict[str, str]] = []
             try:
                 if handler is None:
                     result, text = "refusée", "Action refusée : équipement pas encore pris en charge par ce pont."
                 else:
-                    result, text = "équipement", handler(record.context, int(target))
+                    made = handler(record.context, int(target))
+                    text, gear_links = made if isinstance(made, tuple) else (made, [])
+                    result = "équipement"
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
                 result, text = "erreur", f"Équipement non calculé : {type(exc).__name__}: {exc}"
+            self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
+            self._done(record, text, "action", gear_links)
+            return
         elif action == "route_deliver":
             try:
                 result, text = self._deliver_route(record.context)

@@ -420,10 +420,27 @@ local function BuildWindow()
 		end
 		FB.RefreshAnswers() -- la rangée suit le défilement
 	end)
-	history:SetScript("OnHyperlinkClick", function(_, link)
+	history:SetScript("OnHyperlinkClick", function(_, link, text, button)
 		local n = type(link) == "string" and link:match("^foreverbridge:copy:(%d+)$")
 		if n and run.links[tonumber(n)] then
 			FB.ShowCopy(run.links[tonumber(n)])
+		elseif type(link) == "string" and link:match("^item:%d+") and type(SetItemRef) == "function" then
+			pcall(SetItemRef, link, text, button) -- clic du jeu : infobulle fixe, Maj+clic dans la saisie
+		end
+	end)
+	-- bloc 4c : infobulle de l'objet au survol d'un lien
+	history:SetScript("OnHyperlinkEnter", function(self, link)
+		if type(link) == "string" and link:match("^item:%d+") and type(GameTooltip) == "table" then
+			pcall(function()
+				GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+				GameTooltip:SetHyperlink(link)
+				GameTooltip:Show()
+			end)
+		end
+	end)
+	history:SetScript("OnHyperlinkLeave", function()
+		if type(GameTooltip) == "table" then
+			pcall(GameTooltip.Hide, GameTooltip)
 		end
 	end)
 	ui.history = history
@@ -847,7 +864,13 @@ function FB.FormatLine(line)
 	elseif s:match("^%- ") then
 		s = "  • " .. s:sub(3)
 	end
-	return (s:gsub("%*%*(.-)%*%*", "|cffffffff%1|r"))
+	s = s:gsub("%*%*(.-)%*%*", "|cffffffff%1|r")
+	-- bloc 4c : objet nommé par le pont, [[item:<id>:<qualité>|<nom>]] (« | » déjà doublé), rendu en lien du jeu
+	return (s:gsub("%[%[item:(%d+):(%d+)||(.-)%]%]", function(id, quality, name)
+		local colors = type(ITEM_QUALITY_COLORS) == "table" and ITEM_QUALITY_COLORS[tonumber(quality)]
+		local hex = type(colors) == "table" and type(colors.hex) == "string" and colors.hex or "|cffffffff"
+		return hex .. "|Hitem:" .. id .. "|h[" .. name .. "]|h|r"
+	end))
 end
 
 -- `shown` : texte déjà prêt à l'affichage (liens de la question gardés en liens, Message.Links), sinon neutralisé.
