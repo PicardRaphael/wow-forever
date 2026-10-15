@@ -85,6 +85,7 @@ def _gear_section(
 ) -> tuple[list[str], list[dict[str, str]]]:
     """CJ1, bloc 5 : liens d'équipement de « Exports » : poids du Mage et échelle (Naowh, Forever Companion), liste BiS
     personnelle (Naowh) ; spécialisation : celle de Naowh pour la classe (Givre pour le Mage), dite comme supposée."""
+    from forever.bridge.gear_level import _talents
     from forever.errors import ForeverError
     from forever.gear import gear_report
     from forever.pipeline.gear_sources import read_naowh_bis
@@ -105,7 +106,8 @@ def _gear_section(
     if token == "MAGE":
         try:
             weights = gear_report(deps, "weights", class_name=cls, level=level, race=race,
-                                  spec=spec or "frost-mage", name=f"Forever · {who} · niveau {level}")  # fmt: skip
+                                  spec=spec or "frost-mage", name=f"Forever · {who} · niveau {level}",
+                                  **_talents(deps, context))  # fmt: skip
         except ForeverError as err:
             lines.append(f"- Poids du Mage : {err.message}")
         else:
@@ -119,7 +121,7 @@ def _gear_section(
         return lines, links
     try:
         bis = gear_report(deps, "bis", class_name=cls, level=level, race=race, spec=spec, faction=faction,
-                          name=f"Forever · {who} · BiS")  # fmt: skip
+                          name=f"Forever · {who} · BiS", **_talents(deps, context))  # fmt: skip
     except ForeverError as err:
         lines.append(f"- Liste BiS : {err.message}")
         return lines, links

@@ -576,7 +576,7 @@ def spell_label(rotation: str) -> str:
 
 
 def learned_mage_weights(
-    deps: Deps, *, level: int, race: str, preferred: str
+    deps: Deps, *, level: int, race: str, preferred: str, talents: Mapping[str, int] | None = None
 ) -> tuple[dict[str, Any] | None, str | None]:
     """Poids du Mage au niveau `level` avec la rotation `preferred` si son sort principal est appris, sinon avec une
     autre rotation dont le sort est appris à ce niveau (Fireball au niveau 1) ; (None, None) si aucune ne se calcule
@@ -584,40 +584,128 @@ def learned_mage_weights(
     appris au niveau 1 ». Registre : I3"""
     for rotation in (preferred, *(r for r in MAGE_ROTATIONS if r != preferred)):
         try:
-            return mage_weights(deps, level=level, race=race, rotation=rotation), rotation
+            return mage_weights(deps, level=level, race=race, rotation=rotation, talents=dict(talents or {})), rotation
         except Exception:  # noqa: BLE001, S112 : sort pas appris ou calcul impossible : rotation suivante, puis GearQuest
             continue
     return None, None
 
 
-def _rotation_notes(rotations: Mapping[int, str | None], preferred: str) -> list[str]:
-    """Phrases de joueur : niveaux où le sort de la spécialisation n'est pas encore appris, niveaux sans poids."""
+def talent_plan(deps: Deps, *, level: int, race: str, current: Mapping[str, int] | None) -> list[dict[str, Any]]:
+    """Plan de talents du Mage jusqu'au niveau `level` : ordre de prise point par point du build de leveling calculé
+    (le même que le bouton Talents), depuis mes talents actuels s'ils sont connus. Registre : I3"""
+    from forever.build import build_report
+    from forever.store import load_version
+
+    key = (load_version(deps).data_sha, level, race, tuple(sorted((current or {}).items())))
+    if key not in _PLANS:  # même plan pour les poids, la liste BiS et l'équipement d'une même demande
+        report = build_report(deps, "leveling", level, race=race, current=current or None, sensitivity=False)
+        _PLANS[key] = list(report.get("order") or [])
+    return _PLANS[key]
+
+
+_PLANS: dict[tuple[Any, ...], list[dict[str, Any]]] = {}
+
+
+def mage_talents_for(
+    deps: Deps, *, level: int, race: str, talents: Mapping[str, int] | None, talents_level: int | None
+) -> tuple[dict[str, int], str, str | None]:
+    """(talents, source, rotation du plan) pour les poids du Mage au niveau `level` : mes talents si `level` est mon
+    niveau, sinon mon plan de talents, aucun avant le premier point ou si le plan ne se calcule pas. Registre : I3"""
+    from forever.gamedata import build_game_data
+    from forever.store import load_version
+
+    if talents is not None and talents_level == level:
+        return dict(talents), "actuels", None
+    if level < build_game_data(load_version(deps)).constants.talents.first_level:
+        return {}, "aucun", None
+    try:
+        chosen, rotation = talents_from_plan(talent_plan(deps, level=level, race=race, current=talents), level)
+    except Exception:  # noqa: BLE001 : plan impossible : poids sans talents
+        return {}, "aucun", None
+    return chosen, ("plan" if chosen else "aucun"), rotation
+
+
+def talents_from_plan(plan: list[dict[str, Any]], level: int) -> tuple[dict[str, int], str | None]:
+    """Talents pris au niveau `level` selon le plan (points des niveaux au plus `level`) et la rotation du dernier
+    point pris (None sans point)."""
+    talents: dict[str, int] = {}
+    rotation = None
+    for step in plan:
+        if isinstance(step.get("level"), int) and step["level"] <= level and step.get("talent"):
+            talents[step["talent"]] = talents.get(step["talent"], 0) + 1
+            rotation = (step.get("choice") or {}).get("rotation") or step.get("rotation") or rotation
+    return talents, rotation
+
+
+def _talent_names(deps: Deps) -> dict[str, str]:
+    """Noms des talents tels qu'en jeu (données du client)."""
+    from forever.gamedata import build_game_data
+    from forever.store import load_version
+
+    return {k: talent.name for k, talent in build_game_data(load_version(deps)).talents.items()}
+
+
+def _talent_notes(used: Mapping[int, Mapping[str, Any]], names: Mapping[str, str]) -> list[str]:
+    """Phrase de joueur : le build qui a servi aux poids (talents actuels, plan de talents, aucun)."""
+    sources = {u["source"] for u in used.values()}
+    notes = []
+    if "actuels" in sources:
+        lv = next(lv for lv, u in sorted(used.items()) if u["source"] == "actuels")
+        notes.append(f"Talents des poids au niveau {lv} : tes talents actuels.")
+    planned = [lv for lv, u in sorted(used.items()) if u["source"] == "plan"]
+    if planned:
+        last = used[planned[-1]]["talents"]
+        build = ", ".join(f"{names.get(k, k)} {v}" for k, v in sorted(last.items(), key=lambda kv: -kv[1]))
+        span = f"au niveau {planned[0]}" if len(planned) == 1 else f"des niveaux {planned[0]} à {planned[-1]}"
+        notes.append(f"Talents des poids {span} : ton plan de talents (build calculé, au dernier niveau : {build}).")
+    none = [lv for lv, u in sorted(used.items()) if u["source"] == "aucun"]
+    if none:
+        span = f"Au niveau {none[0]}" if len(none) == 1 else f"Aux niveaux {none[0]} à {none[-1]}"
+        notes.append(f"{span}, aucun point de talent : poids sans talents.")
+    return notes
+
+
+def _rotation_notes(rotations: Mapping[int, str | None], wanted: Mapping[int, str] | str) -> list[str]:
+    """Phrases de joueur : niveaux où le sort voulu (spécialisation, ou rotation du plan de talents) n'est pas encore
+    appris, niveaux sans poids."""
     notes: list[str] = []
-    runs: list[tuple[int, int, str | None]] = []
+    runs: list[tuple[int, int, str | None, str]] = []
     for lv in sorted(rotations):
         rot = rotations[lv]
-        if runs and runs[-1][2] == rot and runs[-1][1] == lv - 1:
-            runs[-1] = (runs[-1][0], lv, rot)
+        want = wanted if isinstance(wanted, str) else wanted.get(lv, rot or "")
+        if runs and runs[-1][2] == rot and runs[-1][3] == want and runs[-1][1] == lv - 1:
+            runs[-1] = (runs[-1][0], lv, rot, want)
         else:
-            runs.append((lv, lv, rot))
-    for low, high, rot in runs:
+            runs.append((lv, lv, rot, want))
+    for low, high, rot, want in runs:
         span = f"Au niveau {low}" if low == high else f"Aux niveaux {low} à {high}"
         if rot is None:
             notes.append(f"{span}, poids du Mage non calculés : objets dans l'ordre de GearQuest.")
-        elif rot != preferred:
+        elif rot != want:
             notes.append(
-                f"{span}, {spell_label(preferred)} n'est pas encore appris : nos poids y sont calculés avec "
+                f"{span}, {spell_label(want)} n'est pas encore appris : nos poids y sont calculés avec "
                 f"{spell_label(rot)}."
             )
     return notes
 
 
 def _weights_for(
-    deps: Deps, addons: Any, cls: str, *, level: int, race: str, spec: str
+    deps: Deps,
+    addons: Any,
+    cls: str,
+    *,
+    level: int,
+    race: str,
+    spec: str,
+    talents: Mapping[str, int] | None = None,
+    talents_level: int | None = None,
 ) -> tuple[dict[str, float], str]:
     if cls == "MAGE":
         key = spec or DEFAULT_SPECS["MAGE"]
-        report, used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0])
+        pts, _source, _rotation = mage_talents_for(
+            deps, level=level, race=race, talents=talents, talents_level=talents_level
+        )
+        report, used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0], talents=pts)
         if report is not None:
             how = "" if used == key.split("-")[0] else f", avec {spell_label(str(used))}, seul sort appris"
             return mage_guide_weights(report, spec_key=key), f"moteur du Mage (niveau {level}{how})"
@@ -644,6 +732,8 @@ def gear_report(
     name: str | None = None,
     professions: list[str] | None = None,
     to_level: int | None = None,
+    talents: Mapping[str, int] | None = None,
+    talents_level: int | None = None,
 ) -> dict[str, Any]:
     """Rapport de `forever gear` et de `forever_gear` : `weights` (poids du Mage, lignes NFSW1 et Pawn v1), `bis`
     (liste personnelle et `!NBIS1!`), `leveling` (GearQuest Forever), `upgrade` (« est-ce une amélioration ? »)."""
@@ -658,14 +748,18 @@ def gear_report(
                 "donner --class Mage, ou forever gear bis, qui classe avec l'échelle de Forever Companion",
             )
         key = spec or DEFAULT_SPECS["MAGE"]
-        found, used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0])
+        pts, source, _rotation = mage_talents_for(
+            deps, level=level, race=race, talents=talents, talents_level=talents_level
+        )
+        found, used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0], talents=pts)
         if found is None:
             raise InvalidArgumentError(
                 f"Poids du Mage non calculés au niveau {level} : aucun sort de dégâts calculé n'y est appris.",
                 "choisir un niveau plus haut",
             )
         label = name or f"Forever · Mage · {level}"
-        notes = _rotation_notes({level: used}, key.split("-")[0])
+        used_talents = {level: {"source": source, "talents": pts}}
+        notes = [*_rotation_notes({level: used}, key.split("-")[0]), *_talent_notes(used_talents, _talent_names(deps))]
         return {
             **found,
             "naowh": naowh_weight_line(found, spec=key),
@@ -676,10 +770,15 @@ def gear_report(
         key = spec or DEFAULT_SPECS.get(cls) or ""
         if not key:
             raise InvalidArgumentError("Spécialisation requise (clé de Naowh, ex. fury-warrior).", "donner --spec")
-        weights, source = _weights_for(deps, addons, cls, level=level, race=race, spec=key)
+        weights, source = _weights_for(
+            deps, addons, cls, level=level, race=race, spec=key, talents=talents, talents_level=talents_level
+        )
         out = personal_bis(addons, spec_key=key, weights=weights, name=name or f"Forever · {key}", faction=faction)
         if cls == "MAGE":  # CJ1, bloc 5 : poids à coller aussi, depuis la même demande
-            report, _used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0])
+            pts, _src, _rot = mage_talents_for(
+                deps, level=level, race=race, talents=talents, talents_level=talents_level
+            )
+            report, _used = learned_mage_weights(deps, level=level, race=race, preferred=key.split("-")[0], talents=pts)
             if report is not None:
                 out["naowh"] = naowh_weight_line(report, spec=key)
                 out["pawn"] = pawn_line(report, label=f"{name or 'Forever · Mage'} · poids")
@@ -705,7 +804,32 @@ def gear_report(
         key = spec if spec and "-" in spec else DEFAULT_SPECS["MAGE"]
         preferred = key.split("-")[0]
         rotations: dict[int, str | None] = {}
+        wanted_at: dict[int, str] = {}
+        talents_used: dict[int, dict[str, Any]] = {}
         gaps: list[dict[str, Any]] = []
+        plan_cache: list[list[dict[str, Any]]] = []
+        plan_errors: list[str] = []
+
+        def talents_at(lv: int) -> tuple[dict[str, int], str, str | None]:
+            """(talents, source, rotation du plan) : mes talents à mon niveau, sinon mon plan de talents (calculé une
+            fois jusqu'au haut de la tranche), aucun avant le premier point."""
+            if talents is not None and talents_level == lv:
+                return dict(talents), "actuels", None
+            if not plan_cache:
+                from forever.gamedata import build_game_data
+                from forever.store import load_version
+
+                first_point = build_game_data(load_version(deps)).constants.talents.first_level
+                if last < first_point:  # aucun point dans la tranche : pas de plan à calculer
+                    plan_cache.append([])
+                else:
+                    try:  # un seul plan, jusqu'au haut de la tranche : son ordre donne les talents de chaque niveau
+                        plan_cache.append(talent_plan(deps, level=last, race=race, current=talents))
+                    except Exception as exc:  # noqa: BLE001 : plan impossible : poids sans talents, dit au joueur
+                        plan_errors.append(f"{type(exc).__name__}: {exc}")
+                        plan_cache.append([])
+            chosen, rotation = talents_from_plan(plan_cache[0], lv)
+            return chosen, ("plan" if chosen else "aucun"), rotation
 
         def at(lv: int) -> tuple[LevelingPicks, dict[str, Any], dict[str, float] | None]:
             """Choix obtenables au niveau `lv` ; Mage : nos poids à ce niveau (sort réellement appris) et leurs lignes
@@ -713,8 +837,15 @@ def gear_report(
             found: dict[str, Any] = {}
             weights_at: dict[str, float] | None = None
             if cls == "MAGE":  # bloc 4c : Mage reclassé par nos poids ; autres classes : ordre de GearQuest
-                report, used = learned_mage_weights(deps, level=lv, race=race, preferred=preferred)
+                pts, source, plan_rotation = talents_at(lv)
+                wanted = preferred if spec and "-" in spec else (plan_rotation or preferred)
+                report, used = learned_mage_weights(deps, level=lv, race=race, preferred=wanted, talents=pts)
+                if report is None and pts:  # talents refusés à ce niveau : poids sans talents plutôt que rien
+                    report, used = learned_mage_weights(deps, level=lv, race=race, preferred=wanted)
+                    pts, source = {}, "aucun"
                 rotations[lv] = used
+                wanted_at[lv] = wanted
+                talents_used[lv] = {"source": source, "talents": pts, "rotation": used}
                 if report is not None:
                     weights_at = mage_guide_weights(report, spec_key=key)
                     label = name or f"Forever · Mage · niveau {lv}"
@@ -778,14 +909,23 @@ def gear_report(
                 else "ordre de GearQuest Forever (poids calculés pour le Mage seulement)"
             ),
         ]
-        notes = _rotation_notes(rotations, preferred) if cls == "MAGE" else [
+        if plan_errors:
+            gaps.append({"level": last, "error": f"plan de talents : {plan_errors[0]}", "plan": True})
+        notes = [*_rotation_notes(rotations, wanted_at), *_talent_notes(talents_used, _talent_names(deps))] if cls == "MAGE" else [
             "Poids calculés pour le Mage seulement : objets dans l'ordre de GearQuest."
         ]  # fmt: skip
         for gap in gaps:
-            notes.append(f"Niveau {gap['level']} : équipement non calculé (problème de données noté de mon côté).")
+            if gap.get("plan"):
+                notes.append("Plan de talents non calculé : poids sans talents (problème noté de mon côté).")
+            else:
+                notes.append(f"Niveau {gap['level']} : équipement non calculé (problème de données noté de mon côté).")
         return {
             **lines,
             "rotations": {str(lv): rot for lv, rot in sorted(rotations.items())},
+            "talents_used": {
+                str(lv): ({"source": u["source"], "talents": u["talents"]} if u["source"] == "actuels" else dict(u))
+                for lv, u in sorted(talents_used.items())
+            },
             "weights_notes": notes,
             "gaps": gaps,
             "class": cls,

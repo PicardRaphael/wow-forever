@@ -43,7 +43,8 @@ def test_mage_specs_from_level_one_use_a_learned_spell(tmp_path, make_deps, spec
     assert all(r is None or r in ("fire", "frost", "arcane") for r in rotations.values())
     assert rotations[str(LOW)] == "fire"  # seul sort de dégâts appris au niveau 1 parmi les rotations
     if spec == "fire-mage":
-        assert set(rotations.values()) == {"fire"} and not doc["weights_notes"]
+        # décision 282 : la réponse dit aussi le build des poids ; aucune phrase « pas encore appris » pour Feu
+        assert set(rotations.values()) == {"fire"} and not any("pas encore appris" in n for n in doc["weights_notes"])
     else:
         assert doc["weights_notes"] and any("pas encore appris" in n for n in doc["weights_notes"])
 

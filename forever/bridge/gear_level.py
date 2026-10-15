@@ -44,6 +44,20 @@ def _race(deps: Any, context: Mapping[str, str]) -> str:
     return next((n for n, r in races.items() if sent in (n, r.get("client_file"))), "Orc")
 
 
+def _talents(deps: Any, context: Mapping[str, str]) -> dict[str, Any]:
+    """Mes talents lus en jeu (contexte relié à nos données) et mon niveau : poids avec mes vrais talents à mon
+    niveau, avec mon plan de talents ailleurs (décision 282)."""
+    from forever.bridge.context import load_context_data, resolve
+
+    try:
+        resolved = resolve(load_context_data(deps), context)
+    except Exception:  # noqa: BLE001 : contexte illisible : plan de talents seul
+        return {}
+    if resolved.level is None or resolved.current is None:
+        return {}
+    return {"talents": dict(resolved.current), "talents_level": resolved.level}
+
+
 def _leveling(deps: Any, context: Mapping[str, str], level: int, to_level: int | None = None) -> dict[str, Any]:
     """Un seul appel de l'outil : équipement obtenable au niveau `level` (ou de `level` à `to_level`) pour le
     personnage du contexte."""
@@ -59,6 +73,7 @@ def _leveling(deps: Any, context: Mapping[str, str], level: int, to_level: int |
         professions=_professions(context),
         name=f"Forever · {who} · {span}",
         to_level=to_level,
+        **_talents(deps, context),
     )
 
 

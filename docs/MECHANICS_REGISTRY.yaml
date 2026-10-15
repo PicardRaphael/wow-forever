@@ -1545,8 +1545,10 @@ mechanics:
       - tests/unit/test_gear_weights.py::test_normalize_on_intellect_and_drop_negatives
       - tests/unit/test_gear_weights.py::test_mage_weights_from_the_engine
       - tests/unit/test_gear_levels_from_one.py::test_mage_specs_from_level_one_use_a_learned_spell
+      - tests/unit/test_gear_talents.py::test_a_talent_that_changes_a_stat_value_changes_the_ranking
+      - tests/unit/test_gear_talents.py::test_my_level_uses_my_real_talents
     tolerance: null
-    note: "bug de l'écran Équipement du 2026-10-15 : sort principal de la spécialisation pas encore appris (Frostbolt avant son niveau, Arcane Blast) : poids calculés avec une autre rotation dont le sort est appris à ce niveau (Fireball dès le niveau 1), dit au joueur ; aucune : ordre de GearQuest"
+    note: "décision 282 : poids avec mes vrais talents à mon niveau (contexte du jeu), sinon ceux de mon plan de talents (ordre de prise du build de leveling calculé, rotation du plan), aucun avant le premier point ; build dit au joueur ; bug de l'écran Équipement du 2026-10-15 : sort principal de la spécialisation pas encore appris (Frostbolt avant son niveau, Arcane Blast) : poids calculés avec une autre rotation dont le sort est appris à ce niveau (Fireball dès le niveau 1), dit au joueur ; aucune : ordre de GearQuest"
   - id: I4
     categorie: optimisation
     description: "Simulation de l'ensemble réel"
