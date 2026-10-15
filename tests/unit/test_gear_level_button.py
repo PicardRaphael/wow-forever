@@ -61,6 +61,7 @@ def wired(tmp_path, make_deps, monkeypatch):
     (tmp_path / "bridge").mkdir()
     bridge, _addons, agent, send, _cards = setup_bridge(tmp_path / "bridge")
     bridge.gearer = lambda context, level: gear_level.gear_level_reply(deps, context, level)
+    bridge.gear_router = lambda context, level: gear_level.gear_route_reply(deps, context, level)
     return send, agent, calls
 
 

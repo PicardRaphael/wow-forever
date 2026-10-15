@@ -633,6 +633,11 @@ Suite du 2026-10-15 : « Mon équipement à ce niveau » au niveau 10 ne propose
 métier seulement avec le métier. Fenêtre jamais plus grande que l'écran ; `/fv reset` ou un double-clic sur le
 titre la remet à 640 × 440 au centre.
 
+Retour du 2026-10-15 au soir : « Mon équipement à ce niveau » et « En faire une route » sont des actions traitées
+par le pont sans le modèle (un seul appel de `forever_gear` leveling au niveau choisi, réponse faite de sa seule
+sortie) : aucun objet au-dessus du niveau, chacun avec son niveau requis ; la route regroupe donjons, quêtes par
+zone et autres origines (ordre par l'optimiseur et livraison au bloc 4d).
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 

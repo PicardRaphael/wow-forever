@@ -323,8 +323,11 @@ local function BuildGear(screen)
 	local route = Button("ForeverBridgeGearRoute", screen, "En faire une route", 160)
 	Place(route, screen, 216, -2 * ROW)
 	route:SetScript("OnClick", function()
-		SendQuestion("Fais-en une route d'équipement : mon équipement pour le niveau " .. state.level
-			.. ", avec ses quêtes et ses donjons dans l'ordre.")
+		-- bloc 4c : action traitée par le pont sans le modèle (objets obtenables au niveau choisi, jamais la route BiS)
+		local label = "Route d'équipement au niveau " .. state.level
+		if FB.Send("", nil, { flags = { "a=gear_route:" .. state.level }, label = label }) then
+			FB.ShowScreen("chat")
+		end
 	end)
 	local bis = Button("ForeverBridgeGearBis", screen, "Ma liste BiS", 120)
 	Place(bis, screen, 0, -3 * ROW)

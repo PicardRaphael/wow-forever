@@ -437,7 +437,8 @@ def build_server(deps: Deps) -> MCPServer:
         name: str | None = None,
         professions: list[str] | None = None,
     ) -> dict[str, Any]:
-        """Équipement (CJ1, bloc 4) : `action="weights"` poids du Mage calculés par le moteur et lignes à importer
+        """Équipement (CJ1, bloc 4 ; essai CJ-6 : une question d'équipement à un niveau appelle seulement
+        `action="leveling"` à ce niveau, jamais `route`, qui part de la liste BiS sans niveau) : `action="weights"` poids du Mage calculés par le moteur et lignes à importer
         (`naowh` : NFSW1, Naowh Forever, « Import weights » ; `pawn` : Forever Companion, « Import scale… ») ;
         `action="bis"` liste BiS personnelle (`spec` : clé de Naowh, ex. frost-mage, fury-warrior ; `faction`) bâtie
         depuis Naowh Forever et Forever Companion, classée par nos poids (Mage) ou l'échelle de Forever Companion, avec

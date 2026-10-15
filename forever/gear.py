@@ -472,6 +472,7 @@ def leveling_gear(
                     "source": fact.get("sourceType"),
                     "how": fact.get("instructions"),
                     "access": reason or None,
+                    "quest": fact.get("questName"),
                     "rank": p.rank,
                     "levels": [p.min_level, p.max_level],
                     "spec": p.spec,
