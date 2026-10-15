@@ -9,8 +9,9 @@ Rien n'est deviné : un champ absent de la source n'est pas rendu. Sources :
 - Questie (`classicQuestDB.lua`, `classicNpcDB.lua`, `xpDB-classic.lua`, `areaIdToUiMapId.lua`, corrections
   `classicQuestFixes.lua` appliquées aux champs numériques), base Classic Era ;
 - `QuestieForeverDB` (SavedVariable de Questie : quêtes apprises en jeu, relevé du joueur) ;
-- Naowh Forever : Completo (`NaowhForever_Discovery/QuestList/Data/Quests.lua`), Journeys
-  (`NaowhForever_Journeys/Data/QuestSpots.lua`), Dungeon Journal (`NaowhForever_DungeonJournal/Data/Quests.lua`) ;
+- Naowh Forever : Completo (`NaowhForever_DiscoveryData/Quests.lua` depuis 1.1.19, avant
+  `NaowhForever_Discovery/QuestList/Data/Quests.lua`), Journeys (`NaowhForever_JourneysData/QuestSpots.lua` depuis
+  1.1.19, avant `NaowhForever_Journeys/Data/QuestSpots.lua`), Dungeon Journal (`NaowhForever_DungeonJournal/Data/Quests.lua`) ;
 - Forever Guide (`ForeverGuide/DungeonData.lua`, `DalaranData.lua`, `ChainData.lua`) ; livres de Naowh Discovery
   (`Data/Books.lua`) et chaînes du Dungeon Journal de Naowh (`Data/QuestChains.lua`), RX1 ;
 - ForeverDungeonJournal (`Data/QuestRewards.lua`, `Data/Dungeons.lua`) ;
@@ -78,8 +79,11 @@ QUESTIE_NPCS = "Database/Classic/classicNpcDB.lua"
 QUESTIE_XP = "Database/QuestXP/DB/xpDB-classic.lua"
 QUESTIE_FIXES = "Database/Corrections/classicQuestFixes.lua"
 QUESTIE_ZONES = "Database/Zones/data/areaIdToUiMapId.lua"
-COMPLETO = ("NaowhForever_Discovery", "QuestList/Data/Quests.lua")
-JOURNEYS = ("NaowhForever_Journeys", "Data/QuestSpots.lua")
+# Naowh Forever 1.1.19 : quêtes et positions passées dans des addons de données chargés à la demande ; le nouvel
+# emplacement d'abord, l'ancien ensuite
+COMPLETO = (("NaowhForever_DiscoveryData", "Quests.lua"), ("NaowhForever_Discovery", "QuestList/Data/Quests.lua"))
+JOURNEYS = (("NaowhForever_JourneysData", "QuestSpots.lua"), ("NaowhForever_Journeys", "Data/QuestSpots.lua"))
+DISCOVERY = "NaowhForever_Discovery"
 NAOWH_DJ = ("NaowhForever_DungeonJournal", "Data/Quests.lua")
 GUIDE = ("ForeverGuide", "DungeonData.lua")
 GUIDE_DALARAN = "DalaranData.lua"  # DJ1 : quêtes de City of Dalaran, ajoutées après DungeonData.lua
@@ -218,10 +222,10 @@ def source_files(addons_dir: Path, wtf_dir: Path | None) -> list[Path]:
         q / QUESTIE_XP,
         q / QUESTIE_FIXES,
         q / QUESTIE_ZONES,
-        *(addons_dir / a / f for a, f in (COMPLETO, JOURNEYS, NAOWH_DJ, GUIDE, FDJ_REWARDS, FDJ_DUNGEONS)),
+        *(addons_dir / a / f for a, f in (*COMPLETO, *JOURNEYS, NAOWH_DJ, GUIDE, FDJ_REWARDS, FDJ_DUNGEONS)),
         addons_dir / GUIDE[0] / GUIDE_DALARAN,
         addons_dir / GUIDE[0] / GUIDE_CHAINS,
-        addons_dir / COMPLETO[0] / COMPLETO_BOOKS,
+        addons_dir / DISCOVERY / COMPLETO_BOOKS,
         addons_dir / NAOWH_DJ[0] / NAOWH_DJ_CHAINS,
         addons_dir / FDJ_REWARDS[0] / FDJ_CHAINS,
         addons_dir / FDJ_REWARDS[0] / FDJ_MAPS,
@@ -437,6 +441,14 @@ def read_questie_forever(wtf_dir: Path) -> SourceQuests | None:
     return SourceQuests(info, quests, [])
 
 
+def _first(addons_dir: Path, places: tuple[tuple[str, str], ...]) -> tuple[Path, Path] | None:
+    """Premier emplacement présent (dossier de l'addon, fichier), ou None."""
+    for addon, rel in places:
+        if (addons_dir / addon / rel).is_file():
+            return addons_dir / addon, addons_dir / addon / rel
+    return None
+
+
 class Completo(NamedTuple):
     source: SourceQuests
     zones: dict[int, list[int]]  # uiMapID -> quêtes de la zone
@@ -446,10 +458,10 @@ class Completo(NamedTuple):
 
 def read_completo(addons_dir: Path) -> Completo | None:
     """Quêtes de Completo, quêtes et noms de chaque zone, chaînes."""
-    addon, rel = addons_dir / COMPLETO[0], COMPLETO[1]
-    path = addon / rel
-    if not path.is_file():
+    found = _first(addons_dir, COMPLETO)
+    if found is None:
         return None
+    addon, path = found
     text = _read(path)
     zones: dict[int, list[int]] = {}
     names: dict[int, str] = {}
@@ -494,7 +506,7 @@ def read_completo(addons_dir: Path) -> Completo | None:
                 if quest_id in quests:
                     quests[quest_id]["chain"] = {"index": index, "step": k, "after": chain[k - 1] if k else []}
     files = [path]
-    books = addon / COMPLETO_BOOKS
+    books = addons_dir / DISCOVERY / COMPLETO_BOOKS
     if books.is_file():
         files.append(books)
         _read_books(books, quests)
@@ -547,10 +559,10 @@ def _read_books(path: Path, quests: dict[int, Facts]) -> None:
 
 
 def read_journeys(addons_dir: Path) -> SourceQuests | None:
-    addon, rel = addons_dir / JOURNEYS[0], JOURNEYS[1]
-    path = addon / rel
-    if not path.is_file():
+    found = _first(addons_dir, JOURNEYS)
+    if found is None:
         return None
+    addon, path = found
     quests: dict[int, Facts] = {}
     for quest_id, row in _fields(_table_after(_read(path), "ns.JourneyQuestSpots = ", path)).items():
         f = _fields(row)
