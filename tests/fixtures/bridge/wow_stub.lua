@@ -113,6 +113,8 @@ local function newRegion(kind, name, parent)
 	function r:SetText(text) self.text = text end
 	function r:GetText() return self.text end
 	function r:SetFontObject(o) self.font = o end
+	function r:SetFont(path, size, flags) self.fontPath, self.fontSize = path, size; return true end
+	function r:SetFontString(fs) self.fontString = fs end
 	function r:SetJustifyH(j) self.justify = j end
 	function r:SetJustifyV(j) self.justifyV = j end
 	function r:SetTextColor() end
@@ -158,6 +160,7 @@ local function newRegion(kind, name, parent)
 	function r:CreateTexture(tname, layer)
 		local t = newRegion("Texture", tname, self)
 		t.layer = layer
+		if tname then _G[tname] = t end
 		table.insert(self.textures, t)
 		return t
 	end

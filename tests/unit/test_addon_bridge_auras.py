@@ -116,6 +116,6 @@ def test_no_spell_or_item_identifier_in_the_addons():
         assert not [i for i in ids if i in text], path
 
 
-def test_bridge_version_is_0_4_0():
+def test_bridge_version_is_0_5_0():
     toc = (ADDONS / "ForeverBridge" / "ForeverBridge.toc").read_text(encoding="utf-8")
-    assert "## Version: 0.4.0" in toc.splitlines()  # EX1 : liens typés, /fb exports, /fb role
+    assert "## Version: 0.5.0" in toc.splitlines()  # EX1 : 0.4.0 ; CJ1, bloc 6a : 0.5.0, nouvelle fenêtre (Screens.lua)
