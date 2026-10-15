@@ -224,7 +224,9 @@ def test_gear_screen_level_choice_and_make_a_route():
     click(game, "ForeverBridgeGearLevelDown")
     click(game, "ForeverBridgeGearList")
     _, record = sent(game)
-    assert "niveau 18" in record.text and record.flags == frozenset()
+    # essai CJ-6 : action traitée par le pont sans le modèle (une seule sortie de l'outil, au niveau choisi)
+    assert record.flags == frozenset({"a=gear_level:18"}) and record.text == ""
+    assert any("niveau 18" in line for line in history(game))
     click(game, "ForeverBridgeNav_gear")
     click(game, "ForeverBridgeGearRoute")
     _, record = sent(game)
