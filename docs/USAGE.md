@@ -220,7 +220,8 @@ ligne ; boutons Talents, Leveling, Familiers, PvP selon la classe ; `/fv fond N`
 ForeverBridge 0.5.0 (CJ1, bloc 6a) : barre latérale à gauche (Chat, Feuille de route, Talents, Équipement, Exports,
 Mises à jour, Aide), boutons du pont dans « Plus... », assistant de feuille de route (leveling, réputation, métier,
 équipement ; niveaux, donjons, quêtes de classe) qui envoie la même demande que le chat ; « Effacer » (en-tête)
-vide l'historique et repart d'une nouvelle conversation, l'ancienne restant archivée ; `/fv classique` rend
+vide l'historique et repart d'une nouvelle conversation, l'ancienne restant archivée ; `/fv reset` (ou un
+double-clic sur le titre) remet la fenêtre à sa taille par défaut, au centre ; `/fv classique` rend
 l'ancienne fenêtre au `/reload` suivant (et inversement). Pont arrêté ou
 réserve vide : tapez `/reload` après `forever bridge start`, la réponse arrive par la sauvegarde. Procédure complète :
 `docs/ADDON.md`, section 7, étape 11.
@@ -450,6 +451,7 @@ uv run forever gear weights --level 30 --race Gnome --spec frost-mage   # poids 
 uv run forever gear bis --class Mage --spec frost-mage --faction alliance --race Gnome --level 60
 uv run forever gear bis --class Warrior --spec fury-warrior --faction horde   # échelle de Forever Companion
 uv run forever gear leveling --class Mage --level 22 --faction alliance      # choix de GearQuest Forever
+uv run forever gear leveling --class Mage --level 10 --faction alliance --profession Tailoring  # obtenables au niveau 10
 uv run forever gear upgrade --class Mage --level 30 --item <objet> --equipped <objets portés>
 uv run forever gear route --class Mage --spec frost-mage --faction horde --race Orc --level 60   # bloc 4b
 ```

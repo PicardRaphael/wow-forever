@@ -189,18 +189,53 @@ function FB.ContentWidth()
 	return f and math.max(0, f:GetWidth() - ContentLeft() - 14) or 0
 end
 
+-- Taille la plus grande : l'écran de l'interface (essai CJ-6 : une fenêtre plus grande que l'écran cachait son coin
+-- de redimensionnement et ne se réduisait plus).
+local function ScreenSize()
+	local w, h = UIParent:GetWidth(), UIParent:GetHeight()
+	if type(w) ~= "number" or w <= 0 or type(h) ~= "number" or h <= 0 then
+		return nil, nil
+	end
+	return w, h
+end
+
+-- Taille ramenée entre le minimum de la disposition et l'écran.
+local function Bounded(width, height)
+	local _, _, minW, minH = Sizes()
+	local maxW, maxH = ScreenSize()
+	width, height = math.max(width, minW), math.max(height, minH)
+	if maxW then
+		width, height = math.min(width, maxW), math.min(height, maxH)
+	end
+	return width, height
+end
+
 local function RestoreGeometry(f)
 	local state = WindowState() or {}
-	local defaultW, defaultH, minW, minH = Sizes()
+	local defaultW, defaultH = Sizes()
 	local width = tonumber(state.width) or defaultW
 	local height = tonumber(state.height) or defaultH
-	f:SetSize(math.max(width, minW), math.max(height, minH))
+	f:SetSize(Bounded(width, height))
 	f:ClearAllPoints()
 	if type(state.point) == "string" then
 		f:SetPoint(state.point, UIParent, state.relPoint or state.point, tonumber(state.x) or 0, tonumber(state.y) or 0)
 	else
 		f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
 	end
+end
+
+-- Fenêtre remise à sa taille par défaut, au centre de l'écran (/fv reset, double-clic sur le titre).
+function FB.ResetWindow()
+	local f = ui.frame
+	if not f then
+		return
+	end
+	local defaultW, defaultH = Sizes()
+	f:ClearAllPoints()
+	f:SetPoint("CENTER", UIParent, "CENTER", 0, 0)
+	f:SetSize(Bounded(defaultW, defaultH))
+	FB.SaveGeometry()
+	FB.LayoutAnswers()
 end
 
 -- Opacité du fond : celle gardée dans ForeverBridgeDB.window, opaque à défaut.
@@ -226,11 +261,19 @@ local function BuildWindow()
 	f:SetMovable(true)
 	f:SetResizable(true)
 	f:SetClampedToScreen(true)
-	if not (f.SetResizeBounds and pcall(f.SetResizeBounds, f, minW, minH)) and f.SetMinResize then
+	local maxW, maxH = ScreenSize()
+	if not (f.SetResizeBounds and pcall(f.SetResizeBounds, f, minW, minH, maxW, maxH)) and f.SetMinResize then
 		pcall(f.SetMinResize, f, minW, minH)
+		if maxW and f.SetMaxResize then
+			pcall(f.SetMaxResize, f, maxW, maxH)
+		end
 	end
-	-- largeur changée : rangée des réponses, menu et écrans replacés (jamais de chevauchement)
-	f:SetScript("OnSizeChanged", function()
+	-- largeur changée : jamais plus grande que l'écran ; rangée des réponses, menu et écrans replacés
+	f:SetScript("OnSizeChanged", function(self, width, height)
+		local w, h = Bounded(width or self:GetWidth(), height or self:GetHeight())
+		if w ~= self:GetWidth() or h ~= self:GetHeight() then
+			self:SetSize(w, h)
+		end
 		FB.LayoutAnswers()
 		if FB.LayoutScreens then
 			FB.LayoutScreens()
@@ -263,6 +306,23 @@ local function BuildWindow()
 	local title = f:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
 	title:SetPoint("LEFT", dot, "RIGHT", 6, 0)
 	title:SetText("ForeverBridge")
+
+	-- Titre : on y déplace la fenêtre ; un double-clic la remet à sa taille par défaut, au centre (comme /fv reset).
+	local titleBar = CreateFrame("Button", "ForeverBridgeTitleBar", f)
+	titleBar:SetPoint("TOPLEFT", dot, "TOPLEFT", -4, 4)
+	titleBar:SetPoint("BOTTOMRIGHT", title, "BOTTOMRIGHT", 4, -4)
+	titleBar:RegisterForClicks("LeftButtonUp")
+	titleBar:RegisterForDrag("LeftButton")
+	titleBar:SetScript("OnDragStart", function()
+		f:StartMoving()
+	end)
+	titleBar:SetScript("OnDragStop", function()
+		f:StopMovingOrSizing()
+		FB.SaveGeometry()
+	end)
+	titleBar:SetScript("OnDoubleClick", function()
+		FB.ResetWindow()
+	end)
 
 	local status = f:CreateFontString("ForeverBridgeStatusLine", "OVERLAY", "GameFontHighlightSmall")
 	status:SetPoint("TOPLEFT", f, "TOPLEFT", 14, -34)
@@ -2727,6 +2787,7 @@ local HELP = {
 	"/fb eui on|off : propositions et bascule de profil EllesmereUI, éteintes par défaut (ton interface reste la tienne).",
 	"/fb base <profil> : profil EllesmereUI de base de ce personnage, d'où part le bouton Exports (sans nom : la liste).",
 	"/fv classique : ancienne fenêtre ou nouvelle fenêtre (barre latérale), au /reload suivant.",
+	"/fv reset : fenêtre remise à sa taille par défaut, au centre (ou double-clic sur le titre).",
 }
 
 -- Ancienne fenêtre (décision 280) : réglage gardé, pris en compte au /reload suivant que le joueur tape.
@@ -2801,6 +2862,10 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.SetEui(rest)
 	elseif command == "base" then
 		FB.SetBase(rest)
+	elseif command == "reset" then
+		FB.Open()
+		FB.ResetWindow()
+		FB.Print("Fenêtre remise à sa taille par défaut, au centre de l'écran.")
 	elseif command == "classique" then
 		FB.Open()
 		FB.ToggleClassic()
