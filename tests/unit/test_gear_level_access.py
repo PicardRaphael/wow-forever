@@ -78,3 +78,18 @@ def test_gnome_mage_at_level_ten_gets_nothing_above_ten(tmp_path):
 def test_profession_items_only_with_the_profession(tmp_path):
     out = leveling_gear(addons(tmp_path), "MAGE", level=LEVEL, faction="alliance", access=access({"tailoring"}))
     assert {p["slot"]: p["item"] for p in out}["Legs"] == 910005
+
+
+def test_quest_of_another_race_is_never_offered(tmp_path):
+    # « Exploring the Alliance » (Skyborne seulement) proposée à un Gnome le 2026-10-16 : la race de la quête compte
+    gnome_only = Access(
+        quests=lambda name: (
+            [{**QUESTS[name][0], "races": "autre race"}] if name == "Fixture Near Errand" else QUESTS.get(name, [])
+        ),
+        dungeon_level=lambda item: DUNGEON_MIN.get(item),
+        red_min_diff=RED,
+        race_ok=lambda races: races != "autre race",
+    )
+    out = leveling_gear(addons(tmp_path), "MAGE", level=LEVEL, faction="alliance", access=gnome_only)
+    assert 910002 not in {p["item"] for p in out}
+    assert "autre race" in {e["item"]: e["reason"] for e in out.excluded}[910002]
