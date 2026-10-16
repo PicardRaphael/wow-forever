@@ -51,3 +51,12 @@ def test_bad_markup_stays_plain_text():
     answered(game, "- Mains : [[item:abc:3|Pas un objet]]")
     (line,) = [line for line in history(game) if "Pas un objet" in line]
     assert "|Hitem:" not in line
+
+
+def test_unnamed_item_takes_its_name_from_the_game():
+    game = Game(
+        prelude=PRELUDE + 'C_Item = C_Item or {}\nfunction C_Item.GetItemNameByID(id) return "Fixture Choker" end\n'
+    )
+    answered(game, "- Cou : [[item:970202:3|970202]] (donjon ouvert au niveau 8)")
+    (line,) = [line for line in history(game) if "|Hitem:970202" in line]
+    assert "[Fixture Choker]" in line
