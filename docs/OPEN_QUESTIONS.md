@@ -585,3 +585,5 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   dont le niveau requis ne dépasse pas celui de la bête (décision 242, `pets.corrected_taught`). Test : Beast Lore sur
   une des 11 bêtes marquées (par exemple Ukorsbane, Durotar), facultatif, en jouant normalement (décisions 247 et 260).
   Priorité : moyenne. Registre L3.
+
+- **RTE8** (2026-10-16, bloc 4d) : le réseau de marche ne mène pas au donneur Bink dans Ironforge (Tinker Town) : trajet infini depuis Dun Morogh, donc Mage-tastic Gizmonitor (quête de classe du Mage, récompenses Arcane Staff et Arcane Orb) n'entre dans aucune route, même imposée. À vérifier : entrée d'Ironforge et passages intérieurs dans le réseau de Journeys, autres donneurs des capitales.

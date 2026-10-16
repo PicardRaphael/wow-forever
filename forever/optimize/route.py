@@ -25,6 +25,7 @@ from forever.engine.route import (
     apply_stop,
     check_stop,
     missed_visit,
+    pending_required,
     simulate,
 )
 from forever.engine.xp import QuestXpInput, gray_level, mob_kill_xp, quest_xp
@@ -150,7 +151,7 @@ def _candidates(gd: GameData, world: RouteWorld, state: RouteState) -> list[tupl
     for quest_id in sorted(state.log):
         out += [(Stop("turnin", quest_id), TURNIN_WEIGHT), (Stop("objective", quest_id), 1.0)]
     for q in sorted(world.quests.values(), key=lambda q: q.id):
-        if q.level > gray or q.dungeon is not None:
+        if q.level > gray or q.dungeon is not None or q.id in world.required:  # imposée : prise même grise
             weight = ACCEPT_WEIGHT * (DUNGEON_QUEST_WEIGHT if q.dungeon else 1.0)
             out.append((Stop("accept", q.id), weight * (REQUIRED_WEIGHT if q.id in world.required else 1.0)))
     out += [(Stop("dungeon_repeat", k), REPEAT_WEIGHT) for k in sorted(state.dungeons_done)]
@@ -189,11 +190,14 @@ def construct(gd: GameData, world: RouteWorld, start: RouteState, *, end_level: 
     stops: list[Stop] = []
     guard = 4 * len(world.quests) + 4 * len(world.dungeons) + 4
     for _ in range(guard):
-        if state.level >= end_level:
+        pending = pending_required(world, state)
+        if state.level >= end_level and not pending:
             break
         best: tuple[float, Stop, RouteState] | None = None
         fallback: tuple[float, Stop, RouteState] | None = None  # prise moins rentable que le farm
         for stop, weight in _candidates(gd, world, state):
+            if state.level >= end_level and stop.ref not in pending:
+                continue  # bloc 4d : au-delà du niveau final, seulement les étapes des quêtes imposées
             after, result = apply_stop(gd, world, state, stop, cap=cap)
             if not math.isfinite(result.seconds):
                 continue

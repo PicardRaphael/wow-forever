@@ -468,6 +468,14 @@ def route_world(
     done = set(request.done)
     dropped: dict[str, list[int]] = {}
     quests: dict[int, Any] = {}
+    # bloc 4d : une quête imposée écarte ses quêtes exclusives (sinon l'optimiseur peut la rendre impossible)
+    blocked = {
+        int(e)
+        for qid in request.include
+        if qid in book.quests
+        for e in (value(book.quests[qid], "exclusive") or ())
+        if int(e) not in request.include
+    }
     for quest_id, q in sorted(book.quests.items()):
         forced = quest_id in request.include
         side, classes = value(q, "faction"), value(q, "classes")
@@ -477,6 +485,8 @@ def route_world(
             continue  # déjà faite par ce personnage (profil) : jamais reprise
         if quest_id in request.exclude:
             reason = "exclues à la demande"
+        elif quest_id in blocked:
+            reason = "exclusives d'une quête imposée"
         elif race_id is not None and not race_allowed(value(q, "races"), race_id, races):
             continue  # autre race : rien à dire
         elif filters is not None and not forced and (why := _filtered(q, filters, owned)) is not None:

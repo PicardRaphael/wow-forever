@@ -431,6 +431,12 @@ def grind_to(
     return replace(after, trained=trained, prof_done=prof_done), replace(result, ref=level)
 
 
+def pending_required(world: RouteWorld, state: RouteState) -> frozenset[int]:
+    """Quêtes imposées de la route pas encore rendues (bloc 4d) : la route continue au-delà du niveau final tant
+    qu'il en reste. Registre : I18"""
+    return frozenset(q for q in world.required if q in world.quests and q not in state.done)
+
+
 def simulate(
     gd: GameData,
     world: RouteWorld,
@@ -448,7 +454,7 @@ def simulate(
     warnings: list[str] = []
     feasible = True
     for stop in stops:
-        if state.level >= end_level:
+        if state.level >= end_level and not pending_required(world, state):
             break
         reason = check_stop(gd, world, state, stop)
         if reason is None:
