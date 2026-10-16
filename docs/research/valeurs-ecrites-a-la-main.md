@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70374 (ne
 de `forever/data/1.60.1.70374/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-166 chemins, 719 valeurs ; 88 `probable`, 78 `suppose`
+167 chemins, 737 valeurs ; 89 `probable`, 78 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -80,6 +80,7 @@ Aucun.
 | mechanics.json | `/values/respec.gold_per_hour` | 6 | suppose | I5 | rythme de gain d'or du joueur estimé | respec.py du seed (EST) |
 | mechanics.json | `/values/respec.trip_minutes` | 1 | suppose | I5 | trajet chez le maître de classe estimé | respec.py du seed (EST) |
 | mechanics.json | `/values/route.search` | 8 | suppose | I18 | taille du journal de quêtes et frais d'un arrêt de Forever non mesurés (RTE2) ; essais et graine : réglages de l'optimiseur | réglages de la feuille de route (RX1 bloc C) : journal et frais d'arrêt repris de Factoruide (MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14), essais et graine de la recherche |
+| mechanics.json | `/values/route.start_zones` | 18 | probable | I18 | zone de départ de chaque race donnée par le joueur, jamais devinée par le parcours | table de l'utilisateur du 2026-10-16 (question 2 du plan de CJ1, décision 283) |
 | mechanics.json | `/values/route.travel` | 8 | suppose | C4 | vitesses de course, de monture et de vol de Forever non mesurées (TRV1) ; remplacées par les relevés | paramètres de trajet de Factoruide (MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14), RX1 bloc B |
 | mechanics.json | `/values/spell.default_range_yd` | 1 | suppose | C2 | portée par défaut d'un sort sans portée publiée | repli de fm.py du seed |
 | mechanics.json | `/values/talents.first_level` | 1 | probable | G3 | mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel) | fm.py du seed (points_available) |
