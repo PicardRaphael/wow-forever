@@ -303,6 +303,18 @@ INVTYPE_SLOTS: dict[int, tuple[int, ...]] = {
 
 
 @dataclass(frozen=True)
+class DungeonDrop:
+    """Objet lâché dans un donjon (livre des donjons de DJ1) : donjon, boss, taux (fraction), niveau d'ouverture."""
+
+    item: int
+    dungeon: str
+    boss: str
+    rate: float | None
+    opens: int | None
+    name: str | None = None
+
+
+@dataclass(frozen=True)
 class Access:
     """Ce qu'il faut savoir pour dire si un objet s'obtient à un niveau (essai CJ-6 du 2026-10-15) : quêtes du livre
     par nom (`level`, `min_level`, `faction`), niveau d'ouverture du donjon qui lâche un objet, écart d'une quête
@@ -316,6 +328,9 @@ class Access:
     # départ des autres races (jamais proposées hors de ma route)
     route_zones: frozenset[str] | None = None
     other_start_zones: frozenset[str] = frozenset()
+    # fin du bloc 4c : butin de donjon d'un objet (boss, taux) et tout le butin des donjons (autre source)
+    dungeon_drops: Callable[[int], Sequence[DungeonDrop]] | None = None
+    all_dungeon_drops: Callable[[], Sequence[DungeonDrop]] | None = None
 
 
 class LevelingPicks(list[dict[str, Any]]):
@@ -332,61 +347,96 @@ QUEST_SOURCES = ("quest_reward", "seasonal_quest")
 DUNGEON_SOURCES = ("boss_drop", "raid_trash")
 
 
+def _quest_detail(quest: Mapping[str, Any] | None) -> dict[str, Any] | None:
+    """Donneur, zone, position et quêtes à faire d'abord d'une quête du livre (fin du bloc 4c)."""
+    if not quest or not isinstance(quest.get("giver"), Mapping):
+        return None
+    giver = quest["giver"]
+    return {
+        "id": quest.get("id"),
+        "giver": giver.get("name"),
+        "zone": giver.get("zone"),
+        "x": giver.get("x"),
+        "y": giver.get("y"),
+        "after": list(quest.get("after") or []),
+    }
+
+
+def _dungeon_detail(drops: Sequence[DungeonDrop]) -> dict[str, Any] | None:
+    """Donjon, boss et taux du meilleur butin connu d'un objet (fin du bloc 4c)."""
+    if not drops:
+        return None
+    best = max(drops, key=lambda d: d.rate if d.rate is not None else -1.0)
+    return {"dungeon": best.dungeon, "boss": best.boss, "rate": best.rate}
+
+
 def obtainable(fact: Mapping[str, Any], item: int, level: int, faction: str | None, access: Access) -> tuple[str, str]:
+    """(« ok » | « out » | « aside », raison) : voir `obtainable_detail`. Registre : I21"""
+    verdict, reason, _quest = obtainable_detail(fact, item, level, faction, access)
+    return verdict, reason
+
+
+def obtainable_detail(
+    fact: Mapping[str, Any], item: int, level: int, faction: str | None, access: Access
+) -> tuple[str, str, Mapping[str, Any] | None]:
     """(« ok » | « out » | « aside », raison) : l'objet s'obtient-il au niveau `level` ? Niveau requis au plus
     `level` ; quête du camp prise à ce niveau et pas rouge ; butin dont la plage commence au plus à `level` ; donjon
     ouvert à ce niveau ; métier appris ; sinon mis à part (source ou niveau inconnus). Registre : I21"""
     required = fact.get("reqLevel")
     if isinstance(required, int) and required > level:
-        return "out", f"niveau requis {required}"
+        return "out", f"niveau requis {required}", None
     kind = fact.get("sourceType")
     zone = fact.get("zone")
     my_route = access.route_zones or frozenset()
     if kind != "world_drop" and zone in access.other_start_zones and zone not in my_route:
-        return "out", f"zone de départ d'une autre race ({zone}), hors de ta route"
+        return "out", f"zone de départ d'une autre race ({zone}), hors de ta route", None
     if kind in QUEST_SOURCES:
         name = str(fact.get("questName") or "")
         if not name:
-            return "aside", "quête sans nom chez GearQuest"
+            return "aside", "quête sans nom chez GearQuest", None
         quests = [q for q in access.quests(name) if q.get("faction") in (None, "both", (faction or "").lower())]
         if not quests:
             mine = access.quests(name)
-            return ("out", f"quête « {name} » de l'autre camp") if mine else ("aside", f"quête « {name} » inconnue")
+            return (
+                ("out", f"quête « {name} » de l'autre camp", None)
+                if mine
+                else ("aside", f"quête « {name} » inconnue", None)
+            )
         known = [q for q in quests if isinstance(q.get("level"), int)]
         if not known:
-            return "aside", f"quête « {name} » sans niveau connu"
+            return "aside", f"quête « {name} » sans niveau connu", None
         for q in known:
             low = int(q["min_level"]) if isinstance(q.get("min_level"), int) else 1
             if low <= level and q["level"] - level < access.red_min_diff:
-                return "ok", f"quête « {name} », niveau {q['level']}"
+                return "ok", f"quête « {name} », niveau {q['level']}", q  # quête retenue : son détail suit
         q = min(known, key=lambda q: q["level"])
         low = int(q["min_level"]) if isinstance(q.get("min_level"), int) else 1
         if low > level:
-            return "out", f"quête « {name} » prise au niveau {low}"
-        return "out", f"quête « {name} » de niveau {q['level']}, rouge au niveau {level}"
+            return "out", f"quête « {name} » prise au niveau {low}", None
+        return "out", f"quête « {name} » de niveau {q['level']}, rouge au niveau {level}", None
     if kind == "profession":
         craft = str(fact.get("profession") or "")
         if craft.lower() in access.professions:
-            return "ok", f"métier {craft}"
-        return "out", f"métier {craft or 'inconnu'} non appris"
+            return "ok", f"métier {craft}", None
+        return "out", f"métier {craft or 'inconnu'} non appris", None
     if kind in DUNGEON_SOURCES:
         opens = access.dungeon_level(item)
         if opens is None:
-            return "aside", "donjon et niveau inconnus"
+            return "aside", "donjon et niveau inconnus", None
         if opens > level:
-            return "out", f"donjon ouvert au niveau {opens}"
-        return "ok", f"donjon ouvert au niveau {opens}"
+            return "out", f"donjon ouvert au niveau {opens}", None
+        return "ok", f"donjon ouvert au niveau {opens}", None
     if kind == "vendor":
-        return "ok", "marchand"
+        return "ok", "marchand", None
     found = DROP_RANGE.search(str(fact.get("instructions") or ""))
     if found:
         low = int(found.group(1))
         if low > level:
-            return "out", f"butin des niveaux {found.group(1)} à {found.group(2)}"
-        return "ok", f"butin des niveaux {found.group(1)} à {found.group(2)}"
+            return "out", f"butin des niveaux {found.group(1)} à {found.group(2)}", None
+        return "ok", f"butin des niveaux {found.group(1)} à {found.group(2)}", None
     if kind == "unsourced" or not kind:
-        return "aside", "source inconnue de GearQuest"
-    return "aside", f"source « {kind} » sans niveau connu"
+        return "aside", "source inconnue de GearQuest", None
+    return "aside", f"source « {kind} » sans niveau connu", None
 
 
 def other_start_zones(values: Any, race: str) -> set[str]:
@@ -454,14 +504,43 @@ def level_access(
     from forever.quests import build_quests, value
 
     book = build_quests(deps)
+    names = {qid: value(q, "name") for qid, q in book.quests.items()}
     by_name: dict[str, list[dict[str, Any]]] = {}
-    for q in book.quests.values():
+    for qid, q in book.quests.items():
         quest_name = value(q, "name")
         if isinstance(quest_name, str):
+            giver = value(q, "giver") if isinstance(value(q, "giver"), dict) else {}
+            first = [*(value(q, "prereq_all") or []), *(value(q, "prereq_any") or [])[:1]]  # fin du bloc 4c
             by_name.setdefault(quest_name, []).append(
-                {"level": value(q, "level"), "min_level": value(q, "min_level"), "faction": value(q, "faction")}
+                {
+                    "id": qid,
+                    "level": value(q, "level"),
+                    "min_level": value(q, "min_level"),
+                    "faction": value(q, "faction"),
+                    "giver": {
+                        "name": giver.get("name"),
+                        "zone": book.zone_names.get(giver["map"]) if isinstance(giver.get("map"), int) else None,
+                        "x": giver.get("x"),
+                        "y": giver.get("y"),
+                    }
+                    if giver
+                    else None,
+                    "after": list(dict.fromkeys(names[i] for i in first if isinstance(names.get(i), str))),
+                }
             )
     dungeons = build_dungeons(deps)
+    drops: list[DungeonDrop] = []  # fin du bloc 4c : tout le butin des donjons, boss et taux
+    for d in dungeons.dungeons.values():
+        levels = ((d.get("fields") or {}).get("levels") or {}).get("value")
+        opens = levels.get("min") if isinstance(levels, dict) and isinstance(levels.get("min"), int) else None
+        for boss in d.get("bosses") or []:
+            for entry in boss.get("loot") or []:
+                if isinstance(entry.get("item"), int):
+                    rate = entry["rate"] if isinstance(entry.get("rate"), int | float) else None
+                    drops.append(DungeonDrop(entry["item"], d["name"], boss["name"], rate, opens))
+    by_item: dict[int, list[DungeonDrop]] = {}
+    for drop in drops:
+        by_item.setdefault(drop.item, []).append(drop)
 
     def dungeon_level(item: int) -> int | None:
         lows = []
@@ -484,6 +563,8 @@ def level_access(
         professions=frozenset(p.strip().lower() for p in professions if p.strip()),
         route_zones=mine,
         other_start_zones=others,
+        dungeon_drops=lambda item: by_item.get(item, []),
+        all_dungeon_drops=lambda: drops,
     )
 
 
@@ -509,6 +590,8 @@ def leveling_gear(
     if loaded is None:  # tranche de niveaux : fichiers lus une fois par l'appelant (`loaded`)
         loaded = (read_gearquest_picks(addons, class_token), read_gearquest_facts(addons, class_token), None)
     picks, facts, guide = loaded
+    if guide is None and access is not None and access.all_dungeon_drops is not None:
+        guide = read_guide_gear(addons)  # autre source : types d'objets et statistiques de Forever Guide
     stats = (guide if guide is not None else read_guide_gear(addons)) if weights else {}
 
     def score(item: int) -> float | None:
@@ -539,11 +622,11 @@ def leveling_gear(
             fact = facts.get(p.item) or {}
             required = fact.get("reqLevel") if isinstance(fact.get("reqLevel"), int) else None
             if access is not None:
-                verdict, reason = obtainable(fact, p.item, level, faction, access)
+                verdict, reason, matched = obtainable_detail(fact, p.item, level, faction, access)
             elif required is not None and required > level:
-                verdict, reason = "out", f"niveau requis {required}"
+                verdict, reason, matched = "out", f"niveau requis {required}", None
             else:
-                verdict, reason = "ok", ""
+                verdict, reason, matched = "ok", "", None
             entry = {"slot": slot, "item": p.item, "name": fact.get("name"), "required_level": required}
             if verdict in ("aside", "out"):
                 if not oks:  # seulement ce qui passait avant le premier choix obtenable
@@ -563,6 +646,12 @@ def leveling_gear(
                     "how": fact.get("instructions"),
                     "access": reason or None,
                     "quest": fact.get("questName"),
+                    "quest_detail": _quest_detail(matched),
+                    "dungeon_detail": _dungeon_detail(access.dungeon_drops(p.item))
+                    if access is not None
+                    and access.dungeon_drops is not None
+                    and fact.get("sourceType") in DUNGEON_SOURCES
+                    else None,
                     "rank": p.rank,
                     "levels": [p.min_level, p.max_level],
                     "spec": p.spec,
@@ -588,7 +677,77 @@ def leveling_gear(
             out.append({**best, "gearquest_choice": keep})
         else:
             out.append(first)
+    if access is not None and access.all_dungeon_drops is not None:
+        out += _other_sources(addons, picks, guide, {o["slot"] for o in out}, level, access, weights)
     return LevelingPicks(out, set_aside, excluded)
+
+
+def _other_sources(
+    addons: Any,
+    picks: Sequence[Any],
+    guide: Mapping[int, Any] | None,
+    filled: set[str],
+    level: int,
+    access: Access,
+    weights: Mapping[str, float] | None,
+) -> list[dict[str, Any]]:
+    """Autre source quand GearQuest n'a rien d'obtenable pour un emplacement (fin du bloc 4c) : butin d'un donjon
+    ouvert au niveau, d'un type d'objet (emplacement et sous-classe de Forever Guide) que GearQuest donne à la classe
+    pour cet emplacement, niveau requis au plus `level` ; le meilleur par nos poids, sinon par qualité. Registre : I21"""
+    from forever.pipeline.gear_sources import read_guide_gear
+
+    stats = guide if guide is not None else read_guide_gear(addons)
+    kinds: dict[str, set[tuple[int, int]]] = {}
+    for p in picks:  # types d'objets que GearQuest donne à la classe, emplacement par emplacement
+        g = stats.get(p.item)
+        if g is not None:
+            kinds.setdefault(p.slot, set()).add((g.inv_type, g.subclass))
+    drops = list(access.all_dungeon_drops() if access.all_dungeon_drops else [])
+    out = []
+    for slot, allowed in kinds.items():
+        if slot in filled:
+            continue
+        found = []
+        for d in drops:
+            g = stats.get(d.item)
+            if g is None or (g.inv_type, g.subclass) not in allowed or g.req_level > level:
+                continue
+            if d.opens is None or d.opens > level:
+                continue
+            found.append((d, g))
+        if not found:
+            continue
+
+        def rank(pair: tuple[DungeonDrop, Any]) -> tuple[float, int, int]:
+            _drop, g = pair
+            value = _score(g.stats, dict(weights)) if weights and g.stats else None
+            return (value if value is not None else -1.0, g.quality, g.req_level)
+
+        d, g = max(found, key=rank)
+        same = [x for x, _ in found if x.item == d.item]
+        out.append(
+            {
+                "slot": slot,
+                "item": d.item,
+                "name": d.name,
+                "required_level": g.req_level,
+                "quality": g.quality,
+                "drop_levels": None,
+                "score": _score(g.stats, dict(weights)) if weights and g.stats else None,
+                "zone": d.dungeon,
+                "source": "boss_drop",
+                "how": None,
+                "access": f"donjon ouvert au niveau {d.opens}",
+                "quest": None,
+                "quest_detail": None,
+                "dungeon_detail": _dungeon_detail(same),
+                "other_source": "butin de donjon (Forever Guide et livre des donjons), GearQuest n'ayant rien ici",
+                "rank": None,
+                "levels": None,
+                "spec": None,
+            }
+        )
+    return out
 
 
 def is_upgrade(addons: Any, *, item: int, equipped: list[int], weights: dict[str, float]) -> dict[str, Any]:

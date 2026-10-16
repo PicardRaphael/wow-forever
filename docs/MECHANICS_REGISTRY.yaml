@@ -2006,6 +2006,8 @@ mechanics:
       - "GearQuest Forever (choix par emplacement, fiches : reqLevel, sourceType, questName, profession, plage de butin), lu en local"
       - "livre des quêtes (niveau, niveau minimal, camp), livre des donjons de DJ1 (plage de niveaux), écart d'une quête rouge de mechanics.json (leveling.quest_band.red_min_diff, registre I7)"
     tests:
+      - tests/unit/test_gear_details.py::test_empty_slot_gets_another_source
+      - tests/unit/test_gear_details.py::test_quest_pick_says_giver_position_and_quests_first
       - tests/unit/test_start_zones.py::test_gear_never_offers_another_race_start_zone
       - tests/unit/test_gear_on_my_route.py::test_other_race_start_zone_is_never_proposed_and_detour_is_said
       - tests/unit/test_gear_level_access.py::test_gnome_mage_at_level_ten_gets_nothing_above_ten

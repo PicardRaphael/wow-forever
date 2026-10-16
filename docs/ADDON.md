@@ -644,6 +644,10 @@ niveau (« Forever · <personnage> · niveau N »), [Naowh : poids] et [Forever 
 reclassés par nos poids, choix de GearQuest montré quand il diffère.
 Écran Équipement : « jusqu'au » donne une tranche (« Mon équipement du niveau 10 au niveau 20 ») : une ligne par
 emplacement, un segment par palier où l'objet visé change.
+Fin du bloc 4c (2026-10-16) : objets d'abord sur ta route (jamais une zone de départ d'une autre race, table des
+zones de départ), poids avec tes talents, résumé d'abord, un objet par ligne, quête avec donneur, position et quêtes
+d'abord, donjon avec boss et taux, autre source (butin de donjon) quand GearQuest n'a rien, bouton « Feuille de
+route de ces objets ».
 
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).

@@ -88,9 +88,36 @@ def _how(p: Mapping[str, Any]) -> str:
     if p.get("source") in RANDOM_DROP and p.get("drop_levels"):
         low, high = p["drop_levels"]
         return f"butin aléatoire des monstres de niveau {low} à {high}, n'importe où"
-    zone = f", {p['zone']}" if p.get("zone") else ""
+    zone = f", {p['zone']}" if p.get("zone") and not p.get("dungeon_detail") else ""
     detour = f" ; détour : {p['detour']}, hors de ta route" if p.get("detour") else ""
-    return f"{p.get('access') or p.get('source') or '?'}{zone}{detour}"
+    return f"{p.get('access') or p.get('source') or '?'}{zone}{_detail(p)}{detour}"
+
+
+def _number(value: Any) -> str:
+    return f"{value:.1f}".replace(".", ",") if isinstance(value, int | float) else "?"
+
+
+def _detail(p: Mapping[str, Any]) -> str:
+    """Fin du bloc 4c : donneur, position et quêtes d'abord ; donjon, boss et taux ; autre source."""
+    parts = []
+    q = p.get("quest_detail")
+    if q and q.get("giver"):
+        where = f" ({q['zone']} {_number(q.get('x'))} {_number(q.get('y'))})" if q.get("zone") else ""
+        parts.append(f"donneur {q['giver']}{where}")
+        if q.get("after"):
+            parts.append("d'abord : " + ", ".join(f"« {name} »" for name in q["after"]))
+    d = p.get("dungeon_detail")
+    if d:
+        rate = f", {round(d['rate'] * 100)} %" if isinstance(d.get("rate"), int | float) else ", taux inconnu"
+        parts.append(f"{d['dungeon']}, boss {d['boss']}{rate}")
+    if p.get("other_source"):
+        parts.append(f"autre source : {p['other_source']}")
+    return "".join(f" ; {part}" for part in parts)
+
+
+def source_text(p: Mapping[str, Any]) -> str:
+    """Comment obtenir un objet, en mots de joueur (accès, zone, détails, détour)."""
+    return _how(p)
 
 
 def _ordered(picks: list[dict[str, Any]]) -> list[dict[str, Any]]:

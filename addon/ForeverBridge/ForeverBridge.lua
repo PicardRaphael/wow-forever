@@ -869,6 +869,13 @@ function FB.FormatLine(line)
 	return (s:gsub("%[%[item:(%d+):(%d+)||(.-)%]%]", function(id, quality, name)
 		local colors = type(ITEM_QUALITY_COLORS) == "table" and ITEM_QUALITY_COLORS[tonumber(quality)]
 		local hex = type(colors) == "table" and type(colors.hex) == "string" and colors.hex or "|cffffffff"
+		if name == id and type(C_Item) == "table" and type(C_Item.GetItemNameByID) == "function" then
+			-- objet sans nom côté pont (butin d'un donjon) : son nom tel que le jeu le connaît
+			local ok, found = pcall(C_Item.GetItemNameByID, tonumber(id))
+			if ok and type(found) == "string" and found ~= "" and not issecretvalue(found) then
+				name = found:gsub("|", "||")
+			end
+		end
 		return hex .. "|Hitem:" .. id .. "|h[" .. name .. "]|h|r"
 	end))
 end
