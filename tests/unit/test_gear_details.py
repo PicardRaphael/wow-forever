@@ -90,3 +90,18 @@ def test_empty_slot_gets_another_source(tmp_path):
     assert head["item"] == 970202 and head["other_source"]  # meilleur score parmi le tissu des donjons ouverts
     assert head["dungeon_detail"] == {"dungeon": "Fixture Depths", "boss": "Fixture Boss", "rate": 0.3}
     assert head["required_level"] == LEVEL
+
+
+def test_the_reply_says_the_details():
+    from forever.bridge.gear_level import source_text
+
+    quest = {"source": "quest_reward", "access": "quête « Fixture Errand », niveau 10", "zone": "Fixture Vale",
+             "quest_detail": {"id": 1, "giver": "Fixture Giver", "zone": "Fixture Vale", "x": 41.5, "y": 63.0,
+                              "after": ["Fixture First Step"]}}  # fmt: skip
+    text = source_text(quest)
+    assert "Fixture Giver" in text and "41,5 63,0" in text and "d'abord : « Fixture First Step »" in text
+    boss = {"source": "boss_drop", "access": "donjon ouvert au niveau 8", "zone": "Fixture Depths",
+            "dungeon_detail": {"dungeon": "Fixture Depths", "boss": "Fixture Boss", "rate": 0.25},
+            "other_source": "butin de donjon (Forever Guide et livre des donjons), GearQuest n'ayant rien ici"}  # fmt: skip
+    text = source_text(boss)
+    assert "Fixture Boss" in text and "25 %" in text and "autre source" in text
