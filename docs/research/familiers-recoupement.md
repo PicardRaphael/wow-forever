@@ -3,11 +3,11 @@
 Rapport généré par `forever pets crosscheck --markdown` : ne pas éditer à la main. Le client fait foi ;
 chaque écart est listé avec ses deux valeurs et leurs sources, jamais tranché.
 
-- Client : client 1.60.1.70338 (pets.json)
-- Addon : Forever Bestiary 0.5.0 (base du 2026-09-25, client 1.60.1.69913 ; carte communautaire du 2026-09-29)
+- Client : client 1.60.1.70374 (pets.json)
+- Addon : Forever Bestiary 0.6.0 (base du 2026-10-12, client 1.60.1.70338 ; carte communautaire du 2026-10-12)
 - Questie : Questie 11.38.0 (base Classic Era)
-- Familles : 19 dans le client, 18 dans l'addon, 18 comparées ; capacités de l'addon : 25 ; bêtes de l'addon : 606 (dont 552 dans Questie)
-- Écarts : 30 ; PNJ dont Questie ne donne que le continent (non comptés) : 32
+- Familles : 19 dans le client, 18 dans l'addon, 18 comparées ; capacités de l'addon : 26 ; bêtes de l'addon : 682 (dont 574 dans Questie)
+- Écarts : 48 ; PNJ dont Questie ne donne que le continent (non comptés) : 43
 
 ## Entrées du client jamais vues en jeu
 
@@ -46,36 +46,49 @@ chaque écart est listé avec ses deux valeurs et leurs sources, jamais tranché
 | --- | --- | --- | --- |
 | core-hound | — | Core Hound | — |
 
-## Capacités d'une famille différentes (1)
-
-| Sujet | Champ | client | addon |
-| --- | --- | --- | --- |
-| bat | — | bite, dive, sonic-blast | bite, dive |
-
-## Plage de niveau d'un PNJ différente de Questie (20)
+## Plage de niveau d'un PNJ différente de Questie (39)
 
 | Sujet | Champ | questie | addon |
 | --- | --- | --- | --- |
+| 10979 | niveau | 52, 53 | 52, 61 |
 | 1129 | niveau | 6, 6 | 6, 7 |
+| 11370 | niveau | 61, 61 | 56, 61 |
 | 11739 | niveau | 57, 59 | 57, 58 |
 | 1184 | niveau | 18, 18 | 13, 14 |
 | 14268 | niveau | 16, 16 | 15, 16 |
-| 14283 | niveau | 53, 54 | 53, 63 |
-| 1780 | niveau | 12, 13 | 12, 12 |
-| 2070 | niveau | 16, 17 | 10, 11 |
+| 14532 | niveau | 60, 60 | 55, 60 |
+| 15041 | niveau | 60, 60 | 55, 60 |
+| 1811 | niveau | 56, 58 | 56, 56 |
+| 2070 | niveau | 16, 17 | 10, 17 |
 | 2232 | niveau | 13, 14 | 12, 14 |
 | 2729 | niveau | 38, 40 | 39, 40 |
+| 2931 | niveau | 55, 55 | 55, 56 |
 | 2956 | niveau | 6, 8 | 6, 7 |
 | 3634 | niveau | 15, 16 | 15, 17 |
-| 3862 | niveau | 18, 18 | 18, 19 |
+| 3861 | niveau | 18, 19 | 18, 25 |
+| 3862 | niveau | 18, 18 | 18, 25 |
+| 3939 | niveau | 7, 8 | 7, 56 |
+| 43 | niveau | 8, 9 | 7, 9 |
 | 4304 | niveau | 33, 33 | 33, 34 |
+| 4535 | niveau | 25, 26 | 22, 26 |
+| 471 | niveau | 10, 10 | 7, 10 |
+| 4724 | niveau | 30, 31 | 30, 30 |
+| 4725 | niveau | 37, 39 | 37, 37 |
+| 4821 | niveau | 22, 23 | 22, 25 |
+| 4822 | niveau | 23, 24 | 23, 25 |
+| 4950 | niveau | 20, 20 | 35, 35 |
 | 5272 | niveau | 44, 44 | 44, 45 |
+| 5288 | niveau | 47, 48 | 8, 48 |
+| 5708 | niveau | 51, 51 | 50, 51 |
+| 5766 | niveau | 9, 9 | 4, 13 |
 | 6013 | niveau | 37, 37 | 35, 37 |
 | 6369 | niveau | 50, 50 | 50, 52 |
 | 6585 | niveau | 53, 53 | 52, 53 |
 | 7443 | niveau | 54, 56 | 55, 56 |
 | 7455 | niveau | 55, 56 | 54, 56 |
+| 930 | niveau | 24, 25 | 20, 25 |
 | 9695 | niveau | 54, 54 | 54, 55 |
+| 9696 | niveau | 56, 57 | 56, 60 |
 
 ## Zone d'un PNJ différente de Questie (8)
 
