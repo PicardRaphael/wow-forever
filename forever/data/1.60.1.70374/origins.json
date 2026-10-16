@@ -1410,6 +1410,17 @@
     {
       "file": "mechanics.json",
       "paths": [
+        "/values/route.start_zones"
+      ],
+      "origin": "manuel",
+      "source": "table de l'utilisateur du 2026-10-16 (question 2 du plan de CJ1, décision 283)",
+      "certainty": "probable",
+      "reason": "zone de départ de chaque race donnée par le joueur, jamais devinée par le parcours",
+      "registry": "I18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
         "/values/dungeon.official"
       ],
       "origin": "manuel",

@@ -1001,6 +1001,53 @@
    "certainty": "suppose",
    "registry": "I18",
    "source": "garde-fous des feuilles de route (CJ1, décision 277) : catégories de quêtes écartées (événements saisonniers, Foire de Sombrelune, effort de guerre d'Ahn'Qiraj, champs de bataille) et catégories de métier, identifiants QuestSort lus dans Questie (Localization/lookups/lookupQuestCategories.lua, « données de QuestSort.dbc ») ; drapeaux specialFlags de Questie (questKeys : 1 répétable, 4 réinitialisation mensuelle, quêtes d'événement mensuel comme la Foire ; le drapeau 2, exploration ou script, n'écarte rien) ; bas niveaux (sous le niveau 10 : aucun détour vers une capitale ou un autre continent sans raison, règle de l'utilisateur du 2026-10-14) ; capitales : noms anglais des zones (Naowh Completo)"
+  },
+  "route.start_zones": {
+   "value": {
+    "Human": {
+     "zone": "Elwynn Forest",
+     "subzone": "Northshire"
+    },
+    "Dwarf": {
+     "zone": "Dun Morogh",
+     "subzone": "Coldridge Valley"
+    },
+    "Gnome": {
+     "zone": "Dun Morogh",
+     "subzone": "Coldridge Valley"
+    },
+    "Night Elf": {
+     "zone": "Teldrassil",
+     "subzone": "Shadowglen"
+    },
+    "Orc": {
+     "zone": "Durotar",
+     "subzone": "Valley of Trials"
+    },
+    "Troll": {
+     "zone": "Durotar",
+     "subzone": "Valley of Trials"
+    },
+    "Undead": {
+     "zone": "Tirisfal Glades",
+     "subzone": "Deathknell"
+    },
+    "Tauren": {
+     "zone": "Mulgore",
+     "subzone": "Camp Narache"
+    },
+    "High Order Skyborne": {
+     "zone": "Zephras Isle",
+     "subzone": null
+    },
+    "Windshaper Skyborne": {
+     "zone": "Zephras Isle",
+     "subzone": null
+    }
+   },
+   "certainty": "probable",
+   "registry": "I18",
+   "source": "table de l'utilisateur (question 2 du plan de CJ1, rétablie le 2026-10-16, décision 283) : zone de départ de chaque race, noms anglais des zones et sous-zones du client (Naowh Completo pour les noms de zone)"
   }
  },
  "inherited_from": "1.60.1.70338"

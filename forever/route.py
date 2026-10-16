@@ -823,9 +823,40 @@ def start_position(maps: Any, request: RouteRequest, quests: Any, *, rxp_giver: 
     return (first.giver if first is not None else None), "quête"
 
 
+START_ZONES_KEY = "route.start_zones"
+
+
+def race_start_zone(values: Any, race: str | None) -> dict[str, Any] | None:
+    """Zone de départ de la race (`{zone, subzone}`) lue dans la table des données (décision 283) ; None sans table
+    ou sans race. Registre : I18"""
+    if not race or START_ZONES_KEY not in values:
+        return None
+    entry = (values[START_ZONES_KEY]["value"] or {}).get(race)
+    return {"zone": entry.get("zone"), "subzone": entry.get("subzone")} if isinstance(entry, dict) else None
+
+
+def start_zone_map(values: Any, race: str | None, zone_names: Any) -> int | None:
+    """Carte (uiMapID) de la zone de départ de la race, d'après les noms de zone du livre des quêtes. Registre : I18"""
+    found = race_start_zone(values, race)
+    if found is None:
+        return None
+    return next((int(m) for m, name in zone_names.items() if name == found["zone"]), None)
+
+
+def start_giver_in_zone(quests: Any, ui_map: int | None, *, level: int) -> Any:
+    """Donneur de départ supposé dans la zone de départ de la race : quête de cette zone permise au niveau, la plus
+    basse d'abord ; None sans quête dans la zone. Registre : I18"""
+    if ui_map is None:
+        return None
+    inside = [q for q in quests.values() if q.zone == ui_map and q.min_level <= level]
+    inside.sort(key=lambda q: (q.level, q.min_level))
+    return inside[0].giver if inside else None
+
+
 START_REASONS = {
     "position": "départ : position du personnage dans le jeu",
-    "parcours": "départ : zone de départ de la race (première quête du parcours gratuit de RestedXP de sa race)",
+    "parcours": "départ : zone de départ de la race (table des zones de départ ; premier donneur du parcours gratuit de "
+    "RestedXP de sa race dans cette zone)",
     "quête": "départ supposé : donneur d'une quête permise au niveau de départ (position et race inconnues)",
 }
 
@@ -1008,6 +1039,11 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     filters = route_filters(values)
     low = filters.low_level if filters is not None and request.start_level < filters.low_level else None
     giver, library, who = _race_reference(addons, request, world.quests)
+    zone_map = start_zone_map(values, request.race, book.zone_names)  # décision 283 : table des zones de départ
+    if zone_map is not None and request.start_at is None:
+        giver_zone = next((q.zone for q in world.quests.values() if q.giver == giver), None)
+        if giver is None or giver_zone != zone_map:  # jamais un départ supposé hors de la zone de départ de la race
+            giver = start_giver_in_zone(world.quests, zone_map, level=request.start_level) or giver
     position, reason = start_position(maps, request, world.quests, rxp_giver=giver)
     if position is None:
         position = next(iter(maps.values()), None)
@@ -1015,7 +1051,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     warnings.insert(0, START_REASONS[reason])
     if low is not None and request.race:
         here = request.start_at[0] if request.start_at is not None else _map_of(maps, position)
-        start_zone = next((q.zone for q in world.quests.values() if q.giver == position), None) or here
+        start_zone = zone_map or next((q.zone for q in world.quests.values() if q.giver == position), None) or here
         first = RouteState(level=request.start_level, xp=0.0, position=position, done=frozenset(request.done))
         zones = (
             _replayed_zones(gd, world, library, who, first, below=low, cap=cap) if library is not None else frozenset()

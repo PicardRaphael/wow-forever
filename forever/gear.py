@@ -389,18 +389,28 @@ def obtainable(fact: Mapping[str, Any], item: int, level: int, faction: str | No
     return "aside", f"source « {kind} » sans niveau connu"
 
 
+def other_start_zones(values: Any, race: str) -> set[str]:
+    """Zones de départ des autres races (table des données, décision 283), sans la mienne. Registre : I21"""
+    from forever.route import START_ZONES_KEY, race_start_zone
+
+    mine = (race_start_zone(values, race) or {}).get("zone")
+    table = values[START_ZONES_KEY]["value"] if START_ZONES_KEY in values else {}
+    return {entry["zone"] for entry in table.values() if isinstance(entry, dict) and entry.get("zone") != mine}
+
+
 def route_zones(
     deps: Deps, *, class_name: str, race: str, faction: str, below: int
 ) -> tuple[frozenset[str] | None, frozenset[str]]:
     """(zones de ma route, zones de départ des autres races), noms de zone : zones des quêtes que le parcours gratuit
-    de RestedXP de ma race et de ma classe prend dans ses guides qui commencent sous le niveau `below`, et zones des
-    quêtes du premier guide du parcours de chaque autre race ; (None, vide) sans RestedXP ou sans parcours (décision
+    de RestedXP de ma race et de ma classe prend dans ses guides qui commencent sous le niveau `below`, et zones de
+    départ des autres races lues dans la table des données (décision 283) ; (None, vide) sans RestedXP ou sans parcours (décision
     282, lecture locale). Registre : I21"""
     from types import SimpleNamespace
 
     from forever.errors import InvalidArgumentError
+    from forever.gamedata import MECHANICS_FILE
     from forever.quests import build_quests, value
-    from forever.route import reference_zones, rxp_start_giver
+    from forever.route import reference_zones
     from forever.rxp_guides import read_rxp_guides, who_for
     from forever.store import load_version
 
@@ -423,19 +433,7 @@ def route_zones(
         return frozenset(book.zone_names[m] for m in maps if m in book.zone_names)
 
     mine = names(reference_zones(library, who_for(class_name, race, faction), quests, below=below))
-    others: set[str] = set()
-    races = load_version(deps).read_json("races.json").get("races") or {}
-    for other, info in races.items():
-        if other == race:
-            continue
-        playable = list(info.get("classes") or [])
-        order = [class_name, *playable] if class_name in playable else playable  # classes que la race joue seulement
-        for played in order:
-            who = who_for(str(played), other, str(info.get("faction") or faction))
-            start_map = rxp_start_giver(library, who, quests, 0)  # zone de la première quête du parcours
-            if start_map is not None and start_map in book.zone_names:
-                others.add(book.zone_names[start_map])
-                break
+    others = other_start_zones(load_version(deps).read_json(MECHANICS_FILE)["values"], race)  # décision 283
     return (mine or None), frozenset(others - mine)
 
 
