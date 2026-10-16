@@ -70,8 +70,9 @@ def test_gear_route_button_end_to_end(tmp_path, make_deps, monkeypatch):
 
     def fake_plan(deps_, request, **_kwargs):
         asked.append(request)
-        (routes / "gear0000001.json").write_text(json.dumps(plan), encoding="utf-8")
-        return plan
+        made = {**plan, "request": {**plan["request"], "character": request.character}}  # personnage du contexte
+        (routes / "gear0000001.json").write_text(json.dumps(made), encoding="utf-8")
+        return made
 
     monkeypatch.setattr(gear_level, "plan_route", fake_plan)
     monkeypatch.setattr(gear_level, "_leveling", lambda deps_, context, level, to_level=None: dict(DOC))
@@ -86,4 +87,31 @@ def test_gear_route_button_end_to_end(tmp_path, make_deps, monkeypatch):
     actions = [reply.choices.buttons[i].action for i in range(1, len(reply.choices.buttons) + 1)]
     assert actions == ["route_deliver"]
     send(flags={"a=route_deliver"}, text="")
-    assert slot_table(addons, 1).guide.name == "Forever · Go · équipement"
+    assert slot_table(addons, 1).guide.name == f"Forever · {asked[0].character} · équipement"
+
+
+def test_imposed_quests_keep_our_calculation(make_deps):
+    """Une route qui impose des quêtes (route d'équipement) garde notre calcul : la base adaptée de RestedXP ne
+    connaît pas ces quêtes."""
+    from types import SimpleNamespace
+
+    from forever.compare import delivered_route
+    from forever.route import RouteRequest
+
+    found = SimpleNamespace(result="notre route")
+    request = RouteRequest("mage", "alliance", 1, 10, include=(980101,), race="Gnome", purpose="équipement")
+    result, basis = delivered_route(make_deps(offline=True), None, request, found)
+    assert result == "notre route" and basis["kind"] == "calcul" and "imposées" in basis["verdict"]
+
+
+def test_reply_says_which_quests_are_in_the_route(tmp_path, make_deps, monkeypatch):
+    deps = make_deps(offline=True)
+    plan = {"id": "g", "class": "mage", "levels": {"from": 4, "to": LEVEL}, "hours": 1.0, "xp_h": 100.0,
+            "certainty": "suppose", "stops": [], "rewards": [], "reminders": [], "warnings": [],
+            "request": {"character": "Go", "purpose": "équipement"}, "basis": {"kind": "calcul"}, "provenance": {}}  # fmt: skip
+    monkeypatch.setattr(gear_level, "plan_route", lambda deps_, request, **_k: plan)
+    monkeypatch.setattr(gear_level, "_leveling", lambda deps_, context, level, to_level=None: dict(DOC))
+    monkeypatch.setattr(gear_level, "_who", lambda deps_, context: dict(WHO))
+    text, _ = gear_level.gear_route_reply(deps, {}, LEVEL)
+    gloves = next(line for line in text.splitlines() if "Quest Gloves" in line)
+    assert "pas dans cette route" in gloves and "dans la route" not in gloves.replace("pas dans cette route", "")
