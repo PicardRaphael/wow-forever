@@ -803,6 +803,9 @@ def delivered_route(
     }
     if not request.race:
         return found.result, basis
+    if request.include:  # bloc 4d : quêtes imposées (route d'équipement) : la base adaptée ne les connaît pas
+        basis["verdict"] = "notre calcul : la route garde les quêtes imposées (route d'équipement)"
+        return found.result, basis
     try:
         library = read_rxp_guides(_addons(deps, wow_dir))
         who = who_for(request.class_name, request.race, request.faction)

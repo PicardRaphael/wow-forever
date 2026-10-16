@@ -243,6 +243,7 @@ class RouteRequest:
     start_at: tuple[int, float, float] | None = None  # CJ1 : position réelle (uiMapID, x, y en pourcentage)
     done: tuple[int, ...] = ()  # CJ1 : quêtes déjà faites par ce personnage (profil, Questie)
     character: str | None = None  # CJ1 : nom du personnage (quêtes faites lues au profil, nom du guide)
+    purpose: str | None = None  # bloc 4d : « équipement » pour une route d'équipement (nom stable du guide)
 
 
 FILTERS_KEY = "route.filters"  # CJ1 : garde-fous des feuilles de route (mechanics.json)
@@ -1188,7 +1189,10 @@ def guide_name(plan: Any) -> str:
     """Nom stable du guide RestedXP d'un plan (CJ1, bloc 2) : « Forever · <personnage> · a-b », la classe à défaut du
     personnage ; le même nom pour le même personnage et les mêmes niveaux, d'une livraison à l'autre."""
     lv = plan["levels"]
-    who = str((plan.get("request") or {}).get("character") or "") or str(plan.get("class", "")).capitalize()
+    request = plan.get("request") or {}
+    who = str(request.get("character") or "") or str(plan.get("class", "")).capitalize()
+    if request.get("purpose"):  # bloc 4d : « Forever · Go · équipement », remplacée à chaque livraison
+        return f"Forever · {who} · {request['purpose']}"
     return f"Forever · {who} · {lv['from']}-{lv['to']}"
 
 
@@ -1231,7 +1235,17 @@ def route_preview(plan: Any) -> dict[str, Any]:
 
 FIRST_STOPS = 5  # arrêts montrés dans le résumé (réglage de présentation)
 SUMMARY_WARNINGS = 5
-SUMMARY_REQUEST = ("class_name", "faction", "start_level", "end_level", "race", "character", "dungeons", "class_quests")
+SUMMARY_REQUEST = (
+    "class_name",
+    "faction",
+    "start_level",
+    "end_level",
+    "race",
+    "character",
+    "dungeons",
+    "class_quests",
+    "purpose",
+)
 
 
 def route_summary(plan: Any) -> dict[str, Any]:

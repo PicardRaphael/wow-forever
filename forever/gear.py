@@ -331,6 +331,7 @@ class Access:
     # fin du bloc 4c : butin de donjon d'un objet (boss, taux) et tout le butin des donjons (autre source)
     dungeon_drops: Callable[[int], Sequence[DungeonDrop]] | None = None
     all_dungeon_drops: Callable[[], Sequence[DungeonDrop]] | None = None
+    race_ok: Callable[[Any], bool] | None = None  # masque de races d'une quête permis pour ma race (None : non vérifié)
 
 
 class LevelingPicks(list[dict[str, Any]]):
@@ -395,6 +396,11 @@ def obtainable_detail(
         if not name:
             return "aside", "quête sans nom chez GearQuest", None
         quests = [q for q in access.quests(name) if q.get("faction") in (None, "both", (faction or "").lower())]
+        if access.race_ok is not None and quests:
+            ours = [q for q in quests if access.race_ok(q.get("races"))]
+            if not ours:
+                return "out", f"quête « {name} » d'une autre race", None
+            quests = ours
         if not quests:
             mine = access.quests(name)
             return (
@@ -514,6 +520,7 @@ def level_access(
             by_name.setdefault(quest_name, []).append(
                 {
                     "id": qid,
+                    "races": value(q, "races"),
                     "level": value(q, "level"),
                     "min_level": value(q, "min_level"),
                     "faction": value(q, "faction"),
@@ -565,7 +572,22 @@ def level_access(
         other_start_zones=others,
         dungeon_drops=lambda item: by_item.get(item, []),
         all_dungeon_drops=lambda: drops,
+        race_ok=_race_check(deps, race),
     )
+
+
+def _race_check(deps: Deps, race: str | None) -> Callable[[Any], bool] | None:
+    """Masque de races d'une quête permis pour `race` (même règle que les routes, `race_allowed`). Registre : I21"""
+    if not race:
+        return None
+    from forever.route import race_allowed
+    from forever.store import load_version
+
+    races = load_version(deps).read_json("races.json").get("races") or {}
+    if race not in races:
+        return None
+    race_id = int(races[race]["id"])
+    return lambda mask: race_allowed(mask, race_id, races)
 
 
 def leveling_gear(
@@ -647,6 +669,7 @@ def leveling_gear(
                     "access": reason or None,
                     "quest": fact.get("questName"),
                     "quest_detail": _quest_detail(matched),
+                    "quest_min_level": matched.get("min_level") if matched else None,  # bloc 4d : fin de la route
                     "dungeon_detail": _dungeon_detail(access.dungeon_drops(p.item))
                     if access is not None
                     and access.dungeon_drops is not None

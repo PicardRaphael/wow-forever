@@ -29,7 +29,15 @@ from forever.bridge.actions import action_flag, card_for, parse_action
 from forever.bridge.agent import AgentResult, provenance_line
 from forever.bridge.buttons import BUTTONS, button_payload, visible_buttons
 from forever.bridge.capture import GameWindow, Rect, band_rect, probe_rect
-from forever.bridge.choices import ROUTE_CHOICES, Choice, answer_text, chat_choices, find_answer, route_options
+from forever.bridge.choices import (
+    ROUTE_CHOICES,
+    VALIDATE,
+    Choice,
+    answer_text,
+    chat_choices,
+    find_answer,
+    route_options,
+)
 from forever.bridge.codec import SELFTEST_ID, BandError, Decoded, decode_band, detect_cell_px, selftest_payload
 from forever.bridge.format import normalize_reply
 from forever.bridge.fragments import Fragment, FragmentBuffer, parse_fragment
@@ -504,7 +512,9 @@ class Bridge:
                 result, text = "erreur", self._oops("Équipement non calculé", "équipement", exc)
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
             offer = None
-            if action == "gear_level" and result == "équipement" and isinstance(gear_levels(action, target), int):
+            if action == "gear_route" and result == "équipement" and "Valider et livrer : " in text:
+                offer = {"prompt": "", "buttons": [dict(VALIDATE)]}  # bloc 4d : la route d'équipement se livre ici
+            elif action == "gear_level" and result == "équipement" and isinstance(gear_levels(action, target), int):
                 # décision 282 : la suite proposée sous la réponse, comme une question du chat
                 offer = {"prompt": "", "buttons": [{"label": "Feuille de route de ces objets",
                                                     "action": f"gear_route:{target}"}]}  # fmt: skip

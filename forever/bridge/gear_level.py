@@ -11,6 +11,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from forever.gear import gear_report
+from forever.route import RouteRequest, plan_route, route_summary
 
 SET_ASIDE_SHOWN = 6  # objets mis à part montrés (réglage de présentation)
 
@@ -274,15 +275,115 @@ def _summary(picks: list[dict[str, Any]]) -> str:
     return "En bref : " + ", ".join(parts) + "."
 
 
+VALIDATE_LINE = "Valider et livrer : la route part dans RestedXP sous « {name} » (bouton sous cette réponse)."
+
+
+def _who(deps: Any, context: Mapping[str, str]) -> dict[str, Any]:
+    """Personnage du contexte relié à nos données : classe, camp, niveau, race, nom, position (bloc 4d)."""
+    from forever.bridge.context import load_context_data, resolve
+
+    try:
+        r = resolve(load_context_data(deps), context)
+    except Exception:  # noqa: BLE001 : contexte illisible : pas de route, repli sur la liste regroupée
+        return {}
+    start_at = (r.map, r.x, r.y) if r.map is not None and r.x is not None and r.y is not None else None
+    return {"class_name": r.class_name, "faction": (r.faction or "").lower() or None, "level": r.level,
+            "race": r.race, "name": r.name, "start_at": start_at}  # fmt: skip
+
+
+def gear_route_request(doc: Mapping[str, Any], who: Mapping[str, Any], level: int) -> RouteRequest:
+    """Demande de la route d'équipement (bloc 4d, décision 282) : route de leveling depuis mon niveau jusqu'au
+    niveau visé, qui inclut les quêtes donnant les objets choisis et les donjons de leurs boss ; nom stable
+    « Forever · <perso> · équipement »."""
+    quests = tuple(
+        dict.fromkeys(
+            int(p["quest_detail"]["id"])
+            for p in doc.get("picks") or []
+            if isinstance((p.get("quest_detail") or {}).get("id"), int)
+        )
+    )
+    dungeons = tuple(
+        dict.fromkeys(str(p["dungeon_detail"]["dungeon"]) for p in doc.get("picks") or [] if p.get("dungeon_detail"))
+    )
+    start = int(who["level"])
+    lows = [int(p["quest_min_level"]) for p in doc.get("picks") or [] if isinstance(p.get("quest_min_level"), int)]
+    # une quête imposée se prend à son niveau minimal : la route va un niveau au-delà pour la faire
+    end = max(level, start + 1, *(low + 1 for low in lows))
+    return RouteRequest(
+        class_name=str(who["class_name"]),
+        faction=str(who["faction"]),
+        start_level=start,
+        end_level=end,
+        dungeons=dungeons or "auto",
+        include=quests,
+        race=who.get("race"),
+        start_at=who.get("start_at"),
+        character=who.get("name"),
+        purpose="équipement",
+    )
+
+
 def gear_route_reply(deps: Any, context: Mapping[str, str], level: int) -> tuple[str, list[dict[str, str]]]:
-    """« En faire une route » (bloc 4c) : les objets obtenables au niveau `level` (même sortie que
-    `gear_level_reply`), regroupés par origine : donjons avec leurs passages attendus (taux du livre des donjons),
-    quêtes par zone, autres origines, butin aléatoire en dernier ; l'ordre par l'optimiseur de trajets et la livraison
-    dans RestedXP viennent au bloc 4d."""
+    """« Feuille de route de ces objets » (bloc 4d, décision 282) : la route d'équipement calculée par l'optimiseur
+    (route de leveling qui inclut les quêtes et donjons des objets obtenables au niveau `level`), son aperçu compact,
+    les objets qu'elle rapporte et « Valider et livrer » ; sans route calculable, la liste regroupée du bloc 4c."""
+    doc = _leveling(deps, context, level)
+    if "picks" not in doc:
+        return f"Route d'équipement au niveau {level} : {doc.get('error') or doc.get('message') or 'non calculée'}", []
+    who = _who(deps, context)
+    if not (who.get("class_name") and who.get("faction") and isinstance(who.get("level"), int)):
+        return _grouped_reply(deps, context, level, doc)
+    try:
+        plan = plan_route(deps, gear_route_request(doc, who, level))
+    except Exception:  # noqa: BLE001 : route impossible : la liste regroupée, sans bouton de livraison
+        text, links = _grouped_reply(deps, context, level, doc)
+        return text + "\nFeuille de route non calculée (détail noté de mon côté) : objets regroupés par origine.", links
+    summary = route_summary(plan)
+    lv = summary.get("levels") or {}
+    hours = summary.get("hours")
+    head = f"## Route d'équipement au niveau {level} (feuille de route du niveau {lv.get('from')} au niveau {lv.get('to')})"
+    lines = [head]
+    zones = ", ".join(summary.get("zones") or []) or "zones inconnues"
+    lines.append(
+        f"En bref : {_number(hours)} h, {round(summary['xp_h']) if summary.get('xp_h') else '?'} XP par heure ; {zones}."
+    )
+    lines.append("Objets rapportés :")
+    in_route = {s.get("ref") for s in plan.get("stops") or []}
+    dungeons_in = {d.get("name") for d in summary.get("dungeons") or []}
+    for p in _ordered(doc["picks"]):
+        slot = SLOTS_FR.get(p["slot"], p["slot"])
+        tag = item_tag(p["item"], p.get("quality"), p.get("name"))
+        if p.get("quest_detail"):  # vérifié sur les arrêts de la route, jamais supposé
+            where = (
+                "dans la route" if p["quest_detail"].get("id") in in_route else "pas dans cette route, à faire ensuite"
+            )
+            how = f"{p.get('access') or 'quête'}, {where}"
+        elif p.get("dungeon_detail"):
+            d = p["dungeon_detail"]
+            where = "dans la route" if d["dungeon"] in dungeons_in else "pas dans cette route"
+            how = f"donjon {d['dungeon']}, boss {d['boss']}, {where}"
+        else:
+            how = _how(p)
+        lines.append(f"- {slot} : {tag} ({how})")
+    for stop in summary.get("first_stops") or []:
+        lines.append(f"  · {stop.get('text')} ({stop.get('zone') or '?'})")
+    basis = (summary.get("basis") or {}).get("kind")
+    if basis:
+        lines.append(f"Base : {basis}.")
+    extra, links = _links(doc, context, level, deps)
+    lines.append(VALIDATE_LINE.format(name=summary.get("name") or "Forever · équipement"))
+    return "\n".join(lines + extra + _tail(doc, level)), links
+
+
+def _grouped_reply(
+    deps: Any, context: Mapping[str, str], level: int, doc: dict[str, Any] | None = None
+) -> tuple[str, list[dict[str, str]]]:
+    """Repli de « Feuille de route de ces objets » quand la route ne se calcule pas (bloc 4c) : objets obtenables au
+    niveau `level` regroupés par origine (donjons et passages attendus, quêtes par zone, autres, butin aléatoire)."""
     from forever.dungeons import build_dungeons, where_item
     from forever.gear_route import plan_gear_route
 
-    doc = _leveling(deps, context, level)
+    doc = doc if doc is not None else _leveling(deps, context, level)
     if "picks" not in doc:
         return f"Route d'équipement au niveau {level} : {doc.get('error') or doc.get('message') or 'non calculée'}", []
     dungeons = build_dungeons(deps)
