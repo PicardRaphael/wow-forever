@@ -72,7 +72,8 @@ def test_rules_changed_after_the_decode_are_refused(pending, make_deps):
 
 def test_another_modified_file_is_still_refused(pending, make_deps):
     data, cand = pending
-    path = data / LOCAL_VERSION / "mechanics.json"
+    # mechanics.json est désormais un fichier de règles (valeurs écrites à la main) : un autre fichier hérité
+    path = data / LOCAL_VERSION / "leveling.json"
     path.write_bytes(path.read_bytes() + b"\n")
     with pytest.raises(DataIntegrityError):
         plan_install(make_deps(data_dir=data), str(cand.root))
