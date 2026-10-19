@@ -91,3 +91,19 @@ def test_range_reply_offers_its_route(tmp_path, monkeypatch):
     reply_ = send(flags={"a=gear_level:6-12"}, text="")
     actions = [reply_.choices.buttons[i].action for i in range(1, len(reply_.choices.buttons) + 1)]
     assert actions == ["gear_route:6-12"]
+
+
+def test_gear_screen_route_button_sends_the_range():
+    import pytest
+
+    pytest.importorskip("lupa")
+    from test_bridge_send_lua import sent
+    from test_bridge_window6_lua import click, opened
+
+    game = opened()
+    click(game, "ForeverBridgeNav_gear")
+    click(game, "ForeverBridgeGearToUp")
+    click(game, "ForeverBridgeGearToUp")
+    click(game, "ForeverBridgeGearRoute")
+    _, record = sent(game)
+    assert record.flags == frozenset({"a=gear_route:19-21"}) and record.text == ""
