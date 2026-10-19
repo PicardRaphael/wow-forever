@@ -21212,7 +21212,7 @@
     {
      "node_id": 105003,
      "kept_node": null,
-     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.2 (Data.lua build 1.60.1.70291, généré le 2026-10-08, empreinte c59092d8bd77) à la rangée 4, colonne 4 ; absent de l'arbre en jeu : relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Chasseur, arbre Marksmanship : Improved Stings affiché, Improved Serpent Sting absent)"
+     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.6 (Data.lua build 1.60.1.70425, généré le 2026-10-16, empreinte 3e9c649cc690) à la rangée 4, colonne 4 ; absent de l'arbre en jeu : relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Chasseur, arbre Marksmanship : Improved Stings affiché, Improved Serpent Sting absent)"
     }
    ],
    "dropped_edges": [
@@ -21233,11 +21233,11 @@
      "pos_y": 39300,
      "tier": 4,
      "col": 4,
-     "talents_forever": "Talents Forever 0.38.2 (Data.lua build 1.60.1.70291, généré le 2026-10-08, empreinte c59092d8bd77)",
+     "talents_forever": "Talents Forever 0.38.6 (Data.lua build 1.60.1.70425, généré le 2026-10-16, empreinte 3e9c649cc690)",
      "status": "garé",
      "answered": "relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Chasseur, arbre Marksmanship : Improved Stings affiché, Improved Serpent Sting absent)",
-     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.2 (Data.lua build 1.60.1.70291, généré le 2026-10-08, empreinte c59092d8bd77) à la rangée 4, colonne 4 : question ouverte à créer",
-     "question": "Hunter : Improved Serpent Sting (improvedSerpentSting, nœud 105003) est-il dans l'arbre en jeu ? Le client le garde hors du canevas (PosY 39300, dix fois la grille ; rangée 4, colonne 4 une fois corrigé) et Talents Forever 0.38.2 (Data.lua build 1.60.1.70291, généré le 2026-10-08, empreinte c59092d8bd77) ne le confirme pas. Test : arbre de la classe en jeu ; réponse dans decode_rules.json (observed_absent ou observed_positions)."
+     "reason": "garé hors du canevas (PosY 39300 : dix fois la grille), non confirmé par Talents Forever 0.38.6 (Data.lua build 1.60.1.70425, généré le 2026-10-16, empreinte 3e9c649cc690) à la rangée 4, colonne 4 : question ouverte à créer",
+     "question": "Hunter : Improved Serpent Sting (improvedSerpentSting, nœud 105003) est-il dans l'arbre en jeu ? Le client le garde hors du canevas (PosY 39300, dix fois la grille ; rangée 4, colonne 4 une fois corrigé) et Talents Forever 0.38.6 (Data.lua build 1.60.1.70425, généré le 2026-10-16, empreinte 3e9c649cc690) ne le confirme pas. Test : arbre de la classe en jeu ; réponse dans decode_rules.json (observed_absent ou observed_positions)."
     }
    ],
    "tree_checks": [
