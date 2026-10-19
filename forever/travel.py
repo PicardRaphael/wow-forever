@@ -7,12 +7,14 @@ temps. Registre : I19."""
 from __future__ import annotations
 
 import json
+from collections.abc import Callable, Mapping
 from typing import Any
 
 from forever.config import Deps
 from forever.engine.travel import FlightEdge, FlightNode, Graph, MapRect, Point
 
 SIDES = {"horde": "H", "alliance": "A"}  # camp -> lettre des transports de Journeys
+CITIES_KEY = "route.cities"  # RTE8 : cartes de zone des capitales des deux camps (mechanics.json)
 
 
 def load_travel(deps: Deps, faction: str) -> tuple[Graph, dict[int, MapRect]]:
@@ -68,18 +70,37 @@ def transports_from_network(network: Any, faction: str) -> tuple[Any, ...]:
 
 
 class WalkCache:
-    """Marche par les réseaux de Journeys, avec mémoire (nœud le plus proche d'un point, distances d'un nœud)."""
+    """Marche par les réseaux de Journeys, avec mémoire (nœud le plus proche d'un point, distances d'un nœud).
+    `city` : un point est-il dans une capitale (RTE8) ; `city_lines` : points de capitale atteints en ligne droite."""
 
-    def __init__(self, nets: dict[int, Any], detour: float) -> None:
+    def __init__(self, nets: dict[int, Any], detour: float, city: Callable[[Point], bool] | None = None) -> None:
         self.nets = nets
         self.detour = detour
+        self.city = city
         self.near: dict[Point, int | None] = {}
         self.dist: dict[tuple[int, int], list[float]] = {}
+        self.inside: dict[Point, bool] = {}
+        self.city_lines: set[Point] = set()
+
+    def _distances(self, continent: int, node: int) -> list[float]:
+        from forever.engine.travel import node_distances
+
+        key = (continent, node)
+        if key not in self.dist:
+            self.dist[key] = node_distances(self.nets[continent], node)
+        return self.dist[key]
+
+    def _in_city(self, p: Point) -> bool:
+        if self.city is None:
+            return False
+        if p not in self.inside:
+            self.inside[p] = bool(self.city(p))
+        return self.inside[p]
 
     def __call__(self, a: Point, b: Point) -> float:
         import math
 
-        from forever.engine.travel import nearest_node, node_distances, walk_yards
+        from forever.engine.travel import nearest_node, walk_yards
 
         net = self.nets.get(a.continent)
         if a.continent != b.continent:
@@ -92,10 +113,19 @@ class WalkCache:
         source, target = self.near[a], self.near[b]
         if source is None or target is None:
             return math.nan
-        key = (a.continent, source)
-        if key not in self.dist:
-            self.dist[key] = node_distances(net, source)
-        return walk_yards(net, a, b, detour=self.detour, distances=self.dist[key], ends=(source, target))
+        dist = self._distances(a.continent, source)
+        if source == target or math.isfinite(dist[target]):
+            return walk_yards(net, a, b, detour=self.detour, distances=dist, ends=(source, target))
+        in_city = (self._in_city(a), self._in_city(b))
+        if not any(in_city):
+            return math.inf  # île : un transport est nécessaire
+        back = self._distances(a.continent, target) if in_city[0] else None
+        yards = walk_yards(
+            net, a, b, detour=self.detour, distances=dist, ends=(source, target), in_city=in_city, back=back
+        )
+        if math.isfinite(yards):
+            self.city_lines.update(p for p, inside in zip((a, b), in_city, strict=True) if inside)
+        return yards
 
 
 def walk_nets(raw: dict[int, Any]) -> dict[int, Any]:
@@ -110,3 +140,40 @@ def walk_nets(raw: dict[int, Any]) -> dict[int, Any]:
             adj[b].append((a, w))
         nets[continent] = WalkNet(continent, points, adj)
     return nets
+
+
+def city_maps(values: Mapping[str, Any]) -> frozenset[int]:
+    """Cartes de zone (uiMapID) des capitales des deux camps (`route.cities`) ; vide si la clé manque. Registre : C6"""
+    entry = values.get(CITIES_KEY)
+    if not isinstance(entry, Mapping):
+        return frozenset()
+    return frozenset(int(m) for m in (entry.get("value") or {}).get("maps", []))
+
+
+def map_of(maps: Mapping[int, MapRect], point: Point | None) -> int | None:
+    """Carte (uiMapID) qui contient un point du monde : la plus petite des cartes de son continent qui le couvrent."""
+    if point is None:
+        return None
+    best: tuple[float, int] | None = None
+    for ui_map, m in maps.items():
+        if m.continent != point.continent:
+            continue
+        inside_x = min(m.min_x, m.max_x) <= point.x <= max(m.min_x, m.max_x)
+        if inside_x and min(m.min_y, m.max_y) <= point.y <= max(m.min_y, m.max_y):
+            area = abs(m.max_x - m.min_x) * abs(m.max_y - m.min_y)
+            if best is None or area < best[0]:
+                best = (area, ui_map)
+    return best[1] if best else None
+
+
+def city_line_warning(walker: Any, maps: Mapping[int, MapRect], names: Mapping[int, str]) -> str | None:
+    """Avertissement d'une route dont un trajet finit en ligne droite dans une capitale (RTE8), None sinon."""
+    points = getattr(walker, "city_lines", None)
+    if not points:
+        return None
+    found = sorted({names.get(m, str(m)) for m in (map_of(maps, p) for p in points) if m is not None})
+    where = ", ".join(found) if found else "une capitale"
+    return (
+        f"trajets supposés (suppose) : ligne droite allongée dans {where}, le réseau de marche de Journeys n'y "
+        "reliant pas certains points (question RTE8)"
+    )

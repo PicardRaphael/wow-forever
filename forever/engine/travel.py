@@ -279,6 +279,14 @@ def node_distances(net: WalkNet, source: int) -> list[float]:
     return dist
 
 
+def _nearest_reached(net: WalkNet, p: Point, reached: list[float]) -> int | None:
+    """Nœud le plus proche de `p` parmi ceux qu'atteint un parcours (distance finie)."""
+    found = [i for i, d in enumerate(reached) if math.isfinite(d)]
+    if not found:
+        return None
+    return min(found, key=lambda i: (net.points[i][0] - p.x) ** 2 + (net.points[i][1] - p.y) ** 2)
+
+
 def walk_yards(
     net: WalkNet,
     a: Point,
@@ -287,10 +295,15 @@ def walk_yards(
     detour: float,
     distances: list[float] | None = None,
     ends: tuple[int | None, int | None] | None = None,
+    in_city: tuple[bool, bool] = (False, False),
+    back: list[float] | None = None,
 ) -> float:
     """Yards à pied de `a` à `b` par le réseau : ligne droite jusqu'au nœud le plus proche de chaque point, puis le
     réseau ; même nœud des deux côtés : ligne droite allongée de `detour`. `distances` : distances déjà calculées
-    depuis le nœud de `a` ; `ends` : nœuds les plus proches déjà connus. Registre : C6, I19"""
+    depuis le nœud de `a` ; `ends` : nœuds les plus proches déjà connus. Points non reliés : infini (île), sauf un
+    point d'une capitale (`in_city`, RTE8) : le réseau mène au nœud le plus proche de lui parmi ceux qu'atteint
+    l'autre bout, puis la ligne droite allongée de `detour` (suppose) ; `back` : distances depuis le nœud de `b`.
+    Registre : C6, I19"""
     na, nb = ends if ends is not None else (nearest_node(net, a), nearest_node(net, b))
     if na is None or nb is None:
         return math.inf
@@ -298,6 +311,18 @@ def walk_yards(
         return math.dist((a.x, a.y), (b.x, b.y)) * detour
     dist = distances if distances is not None else node_distances(net, na)
     through = dist[nb]
-    if not math.isfinite(through):
-        return math.inf
-    return math.dist((a.x, a.y), net.points[na]) + through + math.dist(net.points[nb], (b.x, b.y))
+    if math.isfinite(through):
+        return math.dist((a.x, a.y), net.points[na]) + through + math.dist(net.points[nb], (b.x, b.y))
+    best = math.inf
+    if in_city[1]:
+        alt = _nearest_reached(net, b, dist)
+        if alt is not None:
+            line = math.dist(net.points[alt], (b.x, b.y)) * detour
+            best = min(best, math.dist((a.x, a.y), net.points[na]) + dist[alt] + line)
+    if in_city[0]:
+        rev = back if back is not None else node_distances(net, nb)
+        alt = _nearest_reached(net, a, rev)
+        if alt is not None:
+            line = math.dist((a.x, a.y), net.points[alt]) * detour
+            best = min(best, line + rev[alt] + math.dist(net.points[nb], (b.x, b.y)))
+    return best

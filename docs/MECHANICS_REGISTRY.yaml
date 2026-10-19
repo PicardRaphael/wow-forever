@@ -769,8 +769,14 @@ mechanics:
       - tests/unit/test_engine_travel.py::test_flight_ignored_when_unknown
       - tests/unit/test_engine_travel.py::test_hearth_used_when_shorter
       - tests/unit/test_engine_travel.py::test_unreachable_other_continent
+      - tests/unit/test_walk_city_fallback.py::test_unlinked_point_outside_a_city_stays_unreachable
+      - tests/unit/test_walk_city_fallback.py::test_unlinked_city_point_takes_the_straight_line_from_the_nearest_reached_node
+      - tests/unit/test_walk_city_fallback.py::test_linked_city_point_keeps_the_network
+      - tests/unit/test_walk_city_fallback.py::test_walk_cache_uses_the_city_predicate_and_records_the_fallback
+      - tests/unit/test_walk_city_fallback.py::test_warning_names_the_cities_reached_by_a_straight_line
+      - tests/unit/test_walk_city_fallback.py::test_the_capitals_of_both_factions_are_in_the_data
     tolerance: null
-    note: "trajet hors combat d'une feuille de route seulement ; sorts utilisables en mouvement non modélisés ; marche en ligne droite (réseau de marche de Journeys et transports de Shortest Path au bloc F de RX1)"
+    note: "trajet hors combat d'une feuille de route seulement ; sorts utilisables en mouvement non modélisés ; marche en ligne droite (réseau de marche de Journeys et transports de Shortest Path au bloc F de RX1) ; RTE8 (CJ1, 2026-10-19) : un point d'une capitale (mechanics.json route.cities) que le réseau de Journeys ne relie pas (poche d'un autre étage : 76 donneurs à Ironforge, Undercity, Thunder Bluff et Stormwind) est atteint depuis le nœud atteint le plus proche, en ligne droite allongée du détour (suppose, avertissement de la route) ; hors capitale, un point non relié reste injoignable à pied (île)"
   - id: C7
     categorie: physique
     description: "Rayon des zones et plafonds de cibles"

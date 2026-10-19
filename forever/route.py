@@ -750,6 +750,7 @@ class RouteContext:
     network: Any
     trainers: Any
     train_levels: Any
+    maps: Any = None  # cartes de zone (uiMapID -> MapRect), pour nommer les capitales (RTE8)
 
 
 def _distance(a: Any, b: Any) -> float:
@@ -911,19 +912,9 @@ def _replayed_zones(gd: Any, world: Any, library: Any, who: Any, start: Any, *, 
 
 def _map_of(maps: Any, point: Any) -> int | None:
     """Carte (uiMapID) qui contient un point du monde : la plus petite des cartes de son continent qui le couvrent."""
-    if point is None:
-        return None
-    best: tuple[float, int] | None = None
-    for ui_map, m in maps.items():
-        if m.continent != point.continent:
-            continue
-        if min(m.min_x, m.max_x) <= point.x <= max(m.min_x, m.max_x) and min(m.min_y, m.max_y) <= point.y <= max(
-            m.min_y, m.max_y
-        ):
-            area = abs(m.max_x - m.min_x) * abs(m.max_y - m.min_y)
-            if best is None or area < best[0]:
-                best = (area, ui_map)
-    return best[1] if best else None
+    from forever.travel import map_of
+
+    return map_of(maps, point)
 
 
 def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> RouteContext:
@@ -947,7 +938,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     from forever.quests import build_quests
     from forever.sim.objectives import MAGE
     from forever.store import load_version
-    from forever.travel import WalkCache, load_travel, transports_from_network, walk_nets
+    from forever.travel import WalkCache, city_maps, load_travel, transports_from_network, walk_nets
 
     cls = request.class_name.strip().lower()
     if cls not in CLASS_MASKS:
@@ -998,7 +989,8 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     if network is not None:  # bateaux, zeppelins, portail et tram de Journeys (bloc F, suppose)
         graph = graph._replace(transports=transports_from_network(network, request.faction))
     nets = walk_nets(read_journeys_walks(addons)) if addons else {}
-    walker = WalkCache(nets, tp.detour) if nets else None
+    cities = city_maps(values)
+    walker = WalkCache(nets, tp.detour, city=lambda p: _map_of(maps, p) in cities) if nets else None
     travel_memo: dict[tuple[Any, Any, int], float] = {}
 
     def travel(a: Any, b: Any, level: int) -> float:
@@ -1078,7 +1070,7 @@ def route_context(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> R
     done = frozenset(request.done)
     start = RouteState(level=request.start_level, xp=0.0, position=position, done=done)
     return RouteContext(
-        cls, data, cap, gd, book, rows, world, warnings, start, kill, walker, network, trainers, train_levels
+        cls, data, cap, gd, book, rows, world, warnings, start, kill, walker, network, trainers, train_levels, maps
     )
 
 
@@ -1109,6 +1101,11 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     from forever.compare import delivered_route
 
     result, basis = delivered_route(deps, ctx, request, found, wow_dir=wow_dir)
+    from forever.travel import city_line_warning
+
+    city_line = city_line_warning(walker, ctx.maps or {}, book.zone_names)
+    if city_line:  # RTE8 : trajet supposé en ligne droite dans une capitale
+        warnings = [*warnings, city_line]
     by_id = {str(r["id"]): r for r in rows}
     stops = [_stop_payload(book, by_id, r, end_level=request.end_level) for r in result.stops]
     reminders = bonus_reminders(gd, XpBonusState(), hours=result.seconds / SECONDS_PER_HOUR, level=request.start_level)
