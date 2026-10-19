@@ -3,7 +3,8 @@ installées par une révision numérotée et reportées à chaque nouvelle versi
 (décision 263 ; demande de l'utilisateur du 2026-10-19 pour `route.start_zones` et `route.filters`).
 
 - révision de la version courante : `mechanics.json` du dépôt modifié depuis le manifeste et porté par la candidate est
-  installé (changement `rules` par clé), manifeste réécrit ;
+  installé (changement `rules` du fichier : le manifeste ne garde que l'empreinte de l'ancien contenu), manifeste
+  réécrit ;
 - nouvelle version : une candidate décodée **avant** l'ajout des valeurs (version finale du 4 novembre décodée par la
   veille, par exemple) reçoit les valeurs et les règles d'origine du dépôt ; les règles des correctifs du serveur de
   la candidate sont gardées ; le journal de la révision 1 nomme les clés reportées.
@@ -98,13 +99,13 @@ def test_revision_installs_the_hand_values(data_at_class_fixture_version, tmp_pa
     cand = decode(data, tmp_path)
     plan = plan_install(make_deps(data_dir=data), str(cand.root))
     assert not plan["refused"]
-    assert {c["path"] for c in rules_changes(plan, MECHANICS)} == {f"values.{k}" for k in KEYS}
+    assert [c["path"] for c in rules_changes(plan, MECHANICS)] == ["*"]  # ancien contenu inconnu : son empreinte seule
     assert rules_changes(plan, ORIGINS)
     report = render_install_report(plan)
-    assert all(f"values.{k}" in report for k in KEYS)
+    assert MECHANICS in report
     revision = apply_install(make_deps(data_dir=data), str(cand.root), motif="test")
     ensure_integrity(data)  # manifeste réécrit par l'installation
-    assert {c["path"] for c in rules_changes(revision, MECHANICS)} == {f"values.{k}" for k in KEYS}
+    assert [c["path"] for c in rules_changes(revision, MECHANICS)] == ["*"]
     values, _ = hand_values()
     installed = read_json(data / LOCAL_VERSION / MECHANICS)["values"]
     assert {k: installed[k] for k in KEYS} == values

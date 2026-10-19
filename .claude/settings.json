@@ -25,21 +25,19 @@
       "Bash(uv run forever logs:*)",
       "Bash(uv run forever questie:*)",
       "Bash(uv run forever monsters:*)",
-      "Bash(uv run forever manifest --update:*)"
-    ],
-    "ask": [
-      "Bash(uv run forever fetch:*)",
+      "Bash(uv run forever manifest --update:*)",
       "Bash(uv run forever builds:*)",
-      "Bash(uv add:*)",
-      "Bash(git push:*)",
-      "Bash(curl:*)",
-      "Bash(rm:*)"
+      "Bash(uv run forever fetch:*)"
     ],
     "deny": [
       "Edit(seed/**)",
       "Write(seed/**)",
       "Read(./.env)",
       "Read(./.env.*)"
+    ],
+    "ask": [
+      "Bash(uv add:*)",
+      "Bash(rm:*)"
     ]
   },
   "hooks": {
