@@ -1421,6 +1421,17 @@
     {
       "file": "mechanics.json",
       "paths": [
+        "/values/route.cities"
+      ],
+      "origin": "manuel",
+      "source": "cartes de zone du client des six capitales (travel.json maps), choisies à la main (RTE8, 2026-10-19)",
+      "certainty": "probable",
+      "reason": "liste des capitales écrite à la main : aucune table lue ne marque une capitale",
+      "registry": "C6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
         "/values/dungeon.official"
       ],
       "origin": "manuel",

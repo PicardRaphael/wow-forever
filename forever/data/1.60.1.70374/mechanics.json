@@ -1048,6 +1048,21 @@
    "certainty": "probable",
    "registry": "I18",
    "source": "table de l'utilisateur (question 2 du plan de CJ1, rétablie le 2026-10-16, décision 283) : zone de départ de chaque race, noms anglais des zones et sous-zones du client (Naowh Completo pour les noms de zone)"
+  },
+  "route.cities": {
+   "value": {
+    "maps": [
+     1453,
+     1454,
+     1455,
+     1456,
+     1457,
+     1458
+    ]
+   },
+   "certainty": "probable",
+   "registry": "C6",
+   "source": "cartes de zone du client (travel.json maps : Stormwind City, Orgrimmar, Ironforge, Thunder Bluff, Darnassus, Undercity ; noms de Naowh Completo) : capitales des deux camps, où un point que le réseau de marche de Journeys ne relie pas est atteint en ligne droite allongée (RTE8, demande de l'utilisateur du 2026-10-19)"
   }
  },
  "inherited_from": "1.60.1.70338"
