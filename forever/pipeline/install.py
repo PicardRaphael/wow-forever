@@ -57,8 +57,13 @@ RULES = (
     "value",
     "rules",
 )
-# T04f, décision 263 : fichiers de règles d'une tranche (lecture, origines), installés avec la révision.
-RULE_FILES = ("decode_rules.json", "origins.json")
+# T04f, décision 263 : fichiers de règles d'une tranche (lecture, origines), installés avec la révision. CJ1
+# (2026-10-19) : mechanics.json aussi, valeurs écrites à la main jamais décodées (hérité tel quel par forever decode) ;
+# reportées du dépôt dans chaque nouvelle version, même décodée avant elles (`_carried_rules`).
+RULE_FILES = ("decode_rules.json", "origins.json", MECHANICS)
+RULE_SOURCES = {
+    MECHANICS: "valeurs écrites à la main de la tranche ({name} du dépôt, hérité par forever decode)",
+}
 FILE_RULES = ("added_file", "replaced_file", "retired_file")
 # Copies figées reportées d'une version à la suivante (forever decode ne les écrit pas).
 CARRIED = ("_seed_talents.json", "_seed_spells.json", "_source_gunba_mage_tree.json", "_seed_racials.json")
@@ -464,12 +469,78 @@ def _pending_rules(data_dir: Path, version: str, cand_vdir: Path) -> tuple[list[
                 "path": "*",
                 "before": before[:12] if isinstance(before, str) else None,
                 "after": _short_sha(repo),
-                "source": f"règles de la tranche ({name} du dépôt, lu par forever decode)",
-                "certainty": "certain",
+                "source": RULE_SOURCES.get(
+                    name, "règles de la tranche ({name} du dépôt, lu par forever decode)"
+                ).format(name=name),
+                # valeurs écrites à la main : certitude propre à chaque valeur, jamais certaine d'office
+                "certainty": "probable" if name == MECHANICS else "certain",
                 "rule": "rules",
             }
         )
     return pending, changes
+
+
+def _carried_origins(repo: Mapping[str, Any], cand: Mapping[str, Any]) -> dict[str, Any]:
+    """`origins.json` d'une nouvelle version : règles de la tranche du dépôt, règles des correctifs du serveur de la
+    candidate (propres à son build)."""
+    from forever.origins import SERVER_ORIGIN
+    from forever.pipeline.hotfix_overlay import HOTFIX_KEY
+
+    server = [r for r in cand.get("rules", []) if r.get("origin") == SERVER_ORIGIN]
+    keys = [k for k in repo.get("metadata_keys", []) if k != HOTFIX_KEY]
+    out = {**repo, "rules": [r for r in repo.get("rules", []) if r.get("origin") != SERVER_ORIGIN] + server}
+    out["metadata_keys"] = [*keys, HOTFIX_KEY] if HOTFIX_KEY in cand.get("metadata_keys", []) else keys
+    if "inherited_from" in cand:
+        out["inherited_from"] = cand["inherited_from"]
+    return out
+
+
+def _carried_rules(repo: Path, cand: Path) -> tuple[dict[str, dict[str, Any]], list[InstallChange]]:
+    """Nouvelle version (CJ1, 2026-10-19) : valeurs écrites à la main (`mechanics.json`) et règles d'origine de la
+    tranche reprises du dépôt quand la candidate en diffère (décodée avant elles). Rend (fichiers à écrire dans la
+    nouvelle version, changements `rules` : une ligne par clé de `mechanics.json`, une pour `origins.json`)."""
+    from forever.origins import ORIGINS_NAME
+
+    docs: dict[str, dict[str, Any]] = {}
+    changes: list[InstallChange] = []
+    for name in (MECHANICS, ORIGINS_NAME):
+        if not (repo / name).is_file() or not (cand / name).is_file():
+            continue
+        mine, theirs = _json(repo / name), _json(cand / name)
+        if _tranche_rules(name, mine) == _tranche_rules(name, theirs):
+            continue
+        if name == ORIGINS_NAME:
+            docs[name] = _carried_origins(mine, theirs)
+            changes.append(
+                {
+                    "file": name,
+                    "path": "*",
+                    "before": _short_sha(cand / name),
+                    "after": None,
+                    "source": "règles d'origine de la tranche (origins.json du dépôt), candidate décodée avant elles",
+                    "certainty": "certain",
+                    "rule": "rules",
+                }
+            )
+            continue
+        docs[name] = {**mine, **({"inherited_from": theirs["inherited_from"]} if "inherited_from" in theirs else {})}
+        old, new = theirs.get("values", {}), mine.get("values", {})
+        for key in sorted(set(old) | set(new)):
+            if old.get(key) == new.get(key):
+                continue
+            entry = new.get(key) or old.get(key) or {}
+            changes.append(
+                {
+                    "file": name,
+                    "path": f"values.{key}",
+                    "before": (old.get(key) or {}).get("value"),
+                    "after": (new.get(key) or {}).get("value"),
+                    "source": f"valeur écrite à la main du dépôt ({name}), candidate décodée avant elle",
+                    "certainty": str(entry.get("certainty", "suppose")),
+                    "rule": "rules",
+                }
+            )
+    return docs, changes
 
 
 def _game_state(
@@ -569,8 +640,12 @@ def _merge(
     m = _Merge(cv.game_version if new_version else rv.game_version, confirmed_doc["changes"], read_at)
     talents = m.talents(_json(rv.path / TALENTS), _json(cv.path / TALENTS))
     spells = m.spells(_json(rv.path / SPELLS), _json(cv.path / SPELLS))
+    carried: dict[str, dict[str, Any]] = {}
     if not new_version:
         m.changes += _file_changes(rv.path, cv.path, cv.sources, rv.game_version)
+        m.changes += rules_changes
+    else:
+        carried, rules_changes = _carried_rules(rv.path, cv.path)
         m.changes += rules_changes
     rev = data_revision_of(rv.sources)
     game_state, state_changes = _game_state(rv.path, rev, beta_level_cap, beta_level_cap_source)
@@ -611,6 +686,7 @@ def _merge(
         "candidate_path": cv.path,
         "collected_at": cv.sources.get("collected_at"),
         "candidate_sources": cv.sources,
+        "carried_rules": carried,
     }
     return plan, docs
 
@@ -885,6 +961,8 @@ def apply_install(
     previous_path = Path(docs["path"]) / "classes.json"  # lu avant tout remplacement (révision : même dossier)
     previous_classes = _json(previous_path) if previous_path.is_file() else None
     vdir: Path = _new_version_dir(deps, plan, docs, day) if new_version else docs["path"]
+    for name, doc in docs["carried_rules"].items():  # avant _write_game_state, qui réécrit mechanics.json
+        _write(vdir / name, doc, 1)  # comme forever decode
     docs = {
         **docs,
         "file_changes": [c for c in plan["changes"] if c["rule"] in FILE_RULES],
@@ -1054,7 +1132,8 @@ LABELS = {
     "retired_file": "fichier retiré (retired_files)",
     "game_state": "état du jeu (plafond de la bêta, meta.json game_state)",
     "value": "valeur d'un fichier décodé (spell_scaling.json, character_scaling.json)",
-    "rules": "règles de lecture ou d'origine nouvelles (decode_rules.json, origins.json du dépôt, lues par forever decode)",
+    "rules": "règles de lecture ou d'origine, valeurs écrites à la main (decode_rules.json, origins.json, "
+    "mechanics.json du dépôt)",
     "refused": "hors règles (refusé)",
 }
 CELL_MAX = 80
@@ -1084,7 +1163,13 @@ def render_install_report(plan: InstallPlan) -> str:
     lines.append("")
     values = [c for c in plan["changes"] if c["rule"] in ("confirmed", "observation", "removed_field", "value")]
     files = [c for c in plan["changes"] if c["rule"] in FILE_RULES]
-    for title, rows in (("Valeurs changées", values), ("Fichiers", files), ("Écarts refusés", plan["refused"])):
+    rules = [c for c in plan["changes"] if c["rule"] == "rules"]
+    for title, rows in (
+        ("Valeurs changées", values),
+        ("Fichiers", files),
+        ("Règles et valeurs écrites à la main", rules),
+        ("Écarts refusés", plan["refused"]),
+    ):
         if not rows:
             continue
         lines += [f"## {title}", "", "| Fichier | Chemin | Avant | Après | Règle | Source | Certitude |"]

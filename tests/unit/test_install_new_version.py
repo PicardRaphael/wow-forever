@@ -189,8 +189,13 @@ def test_nothing_changed_is_installed_anyway(installed, newer):
     }
     # Seule la provenance bouge : les valeurs ont été relues dans la candidate, leur bloc `source` la nomme.
     # `metadata` : le bloc `source` existait déjà (révision 2) et nomme désormais le build relu.
-    assert {c["rule"] for c in plan["changes"]} <= {"added_field", "metadata", "certainty", "game_state"}
-    assert all(c["path"].endswith(".source") or c["rule"] in ("certainty", "game_state") for c in plan["changes"])
+    # `rules` (CJ1, 2026-10-19) : la candidate de la session hérite des valeurs écrites à la main du dépôt réel, la
+    # copie installée est ramenée à 1.60.1.70009 : celles du dépôt installé sont reprises (mechanics.json, origines).
+    assert {c["rule"] for c in plan["changes"]} <= {"added_field", "metadata", "certainty", "game_state", "rules"}
+    assert {c["file"] for c in plan["changes"] if c["rule"] == "rules"} <= {"mechanics.json", "origins.json"}
+    assert all(
+        c["path"].endswith(".source") or c["rule"] in ("certainty", "game_state", "rules") for c in plan["changes"]
+    )
     apply_install(installed, newer, motif="T08a", new_version=True)
     assert (installed.data_dir / NEW_VERSION / "talents.json").is_file()
 
