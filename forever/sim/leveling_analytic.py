@@ -334,7 +334,8 @@ def _fight(
             cyc_dmg += fbl["dmg"] * c_melee / fbl_cd
             cyc_mana += fbl["mana"] * c_melee / fbl_cd
             cyc_time += gcd * c_melee / fbl_cd
-            hs_crits += fbl["hit"] * fbl["crit"] * c_melee / fbl_cd
+            extra_charges = gd.constants.hot_streak_fire_blast_extra  # 70450 : règle du serveur (A19)
+            hs_crits += fbl["hit"] * (fbl["crit"] + extra_charges) * c_melee / fbl_cd
         if hs_n:  # un Pyroblast raccourci tous les `hs_n` critiques
             py_buffs = merge_buffs(hot_streak_buffs(gd, pts, hs_n), extra)
             py = expected_cast(gd, PYROBLAST, level, pts, ch, level_diff, buffs=py_buffs, **eng)

@@ -1111,7 +1111,21 @@ def _constants(raw: Any) -> Constants:
         miss_per_level_below=num("hit.miss_per_level_below"),
         regen_stacking=_choice(values, "mana.regen_stacking"),
         bonus_stacking=_choice(values, "damage.bonus_stacking"),
+        hot_streak_fire_blast_extra=_hot_streak_extra(values),
     )
+
+
+HEATING_UP_KEY = "hot_streak.server_rules"  # 70450 : règles du serveur de Heating Up (note du 15 octobre)
+
+
+def _hot_streak_extra(values: Mapping[str, Any]) -> int:
+    """Charges de Heating Up en plus par Fire Blast (`hot_streak.server_rules.fire_blast_extra_charges`), 0 sans la
+    clé (versions passées)."""
+    entry = values.get(HEATING_UP_KEY)
+    if not isinstance(entry, Mapping):
+        return 0
+    raw = (entry.get("value") or {}).get("fire_blast_extra_charges", 0)
+    return int(raw) if isinstance(raw, int | float) else 0
 
 
 def build_game_data(version: VersionData, rules: str = "forever") -> GameData:

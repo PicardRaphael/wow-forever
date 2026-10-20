@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from forever.engine.casting import cast_time
 from forever.engine.crit import crit_chance, crit_mult
-from forever.engine.damage import dmg_mult, dot_sp_per_tick, spell_power
+from forever.engine.damage import dmg_mult, dot_sp_per_tick, fire_effects_steady, spell_power
 from forever.engine.hit import hit_chance
 from forever.engine.mana import clearcast_cost_factor, mana_cost
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, CastEstimate, Character, GameData, Points
 from forever.engine.spells import best_rank, coefficient, dot_ticks, rank_damage
-from forever.engine.talents import talent_value
+from forever.engine.talents import talent_model, talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
 
@@ -54,6 +54,12 @@ def expected_cast(
     hit = hit_chance(gd, school, level_diff, pts, ch)
     crit = crit_chance(gd, key, school, pts, ch, frozen=frozen, wc_stacks=wc_stacks, buffs=buffs)
     cm = crit_mult(gd, school, pts)
+    if (
+        school in SCHOOL_FIRE
+        and "fire_effects" not in (buffs or {})
+        and talent_model(gd, "firePower") == "per_fire_effect"
+    ):
+        buffs = {**(buffs or {}), "fire_effects": fire_effects_steady(gd, pts, crit=crit)}  # 70450 : analytique
     dm = dmg_mult(gd, school, pts, buffs, key=key, rules=rules) * (1 + ch.racial_dmg)  # 70450 : Eureka! (G1)
     sp = spell_power(ch, buffs)
     c = coefficient(gd, key, r, rules=rules, low_level_penalty=low_level_penalty)

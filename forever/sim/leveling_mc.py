@@ -25,7 +25,6 @@ from typing import Any, NamedTuple, TypedDict, cast
 from forever.engine.armor import ARMOR_CHOICES, worn_armor
 from forever.engine.buffs import (
     ARCANE_MISSILES,
-    HOT_STREAK_SPELLS,
     PYROBLAST,
     ArcaneBlastAura,
     arcane_blast_active,
@@ -38,6 +37,7 @@ from forever.engine.buffs import (
     arcane_power_window,
     arcane_wrath_bonus,
     hot_streak_buffs,
+    hot_streak_gain,
     hot_streak_rules,
     merge_buffs,
     missile_barrage_buffs,
@@ -88,7 +88,7 @@ from forever.engine.movement import (
     travel_time,
 )
 from forever.engine.spells import FROSTBOLT_LIKE, SPELL_LEVELS, best_rank
-from forever.engine.talents import talent_value
+from forever.engine.talents import talent_model, talent_value
 
 # sort principal de chaque rotation ; 70450 : Frost Blast proposé dès qu'il est appris (comparé, jamais imposé)
 ROTATIONS = {"frost": "frostbolt", "frost_blast": "frost_blast", "fire": "fireball", "arcane": "arcane_blast"}
@@ -344,6 +344,9 @@ def kill_mc(
     ignites: list[tuple[float, float]] = []  # forever : (instant de l'impact, part d'Ignite posée)
     ig_state: list[IgniteState | None] = [None]  # forever : Ignite roulant en cours sur le monstre
     impacts: list[tuple[float, str, float, bool, bool]] = []  # (instant, sort, dégâts, touché, critique)
+    # 70450 : effets de Feu du Mage sur la cible (Fire Power refondu) : fin de chaque effet (DoT, Ignite)
+    fire_until: dict[str, float] = {}
+    fp_new = talent_model(gd, "firePower") == "per_fire_effect" and pts.get("firePower", 0) > 0
 
     def fire_spell(key: str, frozen: bool, extra: Buffs | None = None, free: bool = False) -> CastEstimate:
         stacks = arcane_blast_active(aura[0], s["t"]) if arcane else 0
@@ -352,6 +355,8 @@ def kill_mc(
             buffs = merge_buffs(buffs, arcane_wrath_bonus(gd, pts, ch))
         if extra or (ap_on and s["t"] < ap_end):
             buffs = merge_buffs(buffs, extra, ap_buffs if s["t"] < ap_end else None)
+        if fp_new:
+            buffs = merge_buffs(buffs, {"fire_effects": float(sum(1 for v in fire_until.values() if v > s["t"]))})
         e = expected_cast(
             gd,
             key,
@@ -413,7 +418,10 @@ def kill_mc(
                 for at in ticks:
                     tick_crit = gd.rules.dot_can_crit and rng.random() < e["crit"]
                     dots.append((s["t"] + travel + at, tick * (e["crit_mult"] if tick_crit else 1.0)))
+                if e["school"] in SCHOOL_FIRE:
+                    fire_until[key] = s["t"] + travel + r.dot_duration_s
             if crit and e["school"] in SCHOOL_FIRE and ignite:
+                fire_until["ignite"] = s["t"] + travel + gd.leveling.ignite_duration_s
                 ig = ignite_damage(gd, pts, dmg)
                 if rolling:
                     ignites.append((s["t"] + travel, ig))
@@ -430,9 +438,10 @@ def kill_mc(
         s["aggro"] = True
         if not landed:
             return
-        if hs_rules is not None and crit and key in HOT_STREAK_SPELLS:
+        gain = hot_streak_gain(gd, key, crit=crit) if hs_rules is not None else 0
+        if hs_rules is not None and gain:  # 70450 : Fire Blast donne une charge de plus (règle du serveur)
             active = s["hs"] if now < s["hs_exp"] else 0
-            s["hs"], s["hs_exp"] = min(hs_rules[2], active + 1), now + hs_rules[0]
+            s["hs"], s["hs_exp"] = min(hs_rules[2], active + gain), now + hs_rules[0]
         hp[0] -= dmg
         if s["nova"] and key != "frost_nova" and dmg > 0 and rng.random() < o["nova_break"]:
             s["nova"] = False

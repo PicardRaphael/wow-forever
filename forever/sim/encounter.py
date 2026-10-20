@@ -24,7 +24,6 @@ from typing import Any, NamedTuple, TypedDict
 
 from forever.engine.buffs import (
     ARCANE_MISSILES,
-    HOT_STREAK_SPELLS,
     INTELLECT_SP,
     PYROBLAST,
     SPELL,
@@ -37,6 +36,7 @@ from forever.engine.buffs import (
     arcane_power_windows,
     arcane_wrath_bonus,
     hot_streak_buffs,
+    hot_streak_gain,
     hot_streak_rules,
     merge_buffs,
     missile_barrage_buffs,
@@ -241,7 +241,8 @@ def _cycle(
         f_rate = (
             1 / cooldown_period(gd, spell_cooldown(gd, "fire_blast", fbl["rank"], pts), e["cast_s"]) if fbl else 0.0
         )
-        k_fbl = fbl["hit"] * fbl["crit"] if fbl else 0.0
+        # 70450 (règle du serveur, A19) : Fire Blast donne des charges en plus de celle d'un critique
+        k_fbl = fbl["hit"] * (fbl["crit"] + gd.constants.hot_streak_fire_blast_extra) if fbl else 0.0
         hs_n = hot_streak_plan(gd, level, pts, rotation, o)
         py = None
         if hs_n:
@@ -587,9 +588,10 @@ def encounter_fight(
             ready[key] = t + spell_cooldown(gd, key, rank, pts)
         hit_targets = [i for i in range(n) if hp[i] > 0] if rotation == "aoe" else [_target()]
         total = _resolve(gd, key, e, hit_targets, end, ch, pts, o, buffs, rng, s, wc, frozen_until, ig_state, push)
-        if total[1] and hs_rules is not None and key in HOT_STREAK_SPELLS:
+        gain = hot_streak_gain(gd, key, crit=bool(total[1])) if hs_rules is not None and total[2] else 0
+        if hs_rules is not None and gain:  # 70450 : Fire Blast donne une charge de plus (règle du serveur)
             active = s["hs"] if end < s["hs_exp"] else 0
-            s["hs"], s["hs_exp"] = min(hs_rules[2], active + 1), end + hs_rules[0]
+            s["hs"], s["hs_exp"] = min(hs_rules[2], active + gain), end + hs_rules[0]
         missiles = arcane_missiles_count(gd, rank.position) if key == ARCANE_MISSILES else 1.0
         if (
             mb_on

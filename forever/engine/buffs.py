@@ -189,6 +189,17 @@ def hot_streak_rules(gd: GameData, pts: Points) -> tuple[float, float, int] | No
     )
 
 
+def hot_streak_gain(gd: GameData, key: str, *, crit: bool) -> int:
+    """Charges de Hot Streak (Heating Up) gagnées par un lancer de `key` : une sur un critique d'un sort listé ;
+    70450 (règle du serveur de la note du 15 octobre, `mechanics.json`) : Fire Blast en donne toujours en plus.
+
+    Registre : A19, B15"""
+    gain = 1 if crit and key in HOT_STREAK_SPELLS else 0
+    if key == "fire_blast":
+        gain += gd.constants.hot_streak_fire_blast_extra
+    return gain
+
+
 def hot_streak_buffs(gd: GameData, pts: Points, stacks: int) -> Buffs:
     """Buff de Pyroblast lancé avec `stacks` cumuls de Hot Streak : réduction de l'incantation (`cast_reduction`).
 

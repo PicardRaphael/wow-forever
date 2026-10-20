@@ -7,7 +7,7 @@ from typing import NamedTuple
 
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, Character, GameData, Points, Rank
 from forever.engine.spells import check_rules, coefficient, dot_coefficient
-from forever.engine.talents import talent_value
+from forever.engine.talents import talent_model, talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents de dégâts sont exprimés en %
 MS_PER_S = 1000.0  # conversion d'unité : périodes du client en millisecondes
@@ -53,7 +53,7 @@ def dmg_mult(
     if school in SCHOOL_FROST:
         m *= 1 + talent_value(gd, pts, "piercingIce") / PERCENT
     if school in SCHOOL_FIRE:
-        m *= 1 + talent_value(gd, pts, "firePower") / PERCENT
+        m *= 1 + fire_power_bonus(gd, pts, buffs.get("fire_effects", 0.0))
     sources = buffs.get("dmg_sources", ())
     fire = fire_vulnerability_part(gd, school, buffs.get("fire_vulnerability", 0))
     if rules == "seed":
@@ -66,6 +66,31 @@ def dmg_mult(
     for s in sources:
         m *= 1 + s
     return m * (1 + fire)
+
+
+def fire_power_bonus(gd: GameData, pts: Points, effects: float) -> float:
+    """Bonus de Fire Power (fraction) : bonus plat du talent ; 70450 (marqueur `per_fire_effect`) : x % par effet de
+    Feu du Mage sur la cible, au plus le plafond du talent (deuxième variable).
+
+    Registre : A20"""
+    if talent_model(gd, "firePower") == "per_fire_effect":
+        per, cap = talent_value(gd, pts, "firePower", 0), talent_value(gd, pts, "firePower", 1)
+        return min(per * effects, cap) / PERCENT
+    return talent_value(gd, pts, "firePower") / PERCENT
+
+
+def fire_effects_steady(gd: GameData, pts: Points, *, crit: float) -> float:
+    """Effets de Feu du Mage sur la cible en régime établi d'une rotation de Feu (calcul analytique, `suppose`) : le
+    DoT de Fireball, toujours renouvelé, et Ignite avec la chance qu'un des lancers de sa durée critique ; le
+    simulateur Monte Carlo compte, lui, les effets réellement posés.
+
+    Registre : A20"""
+    count = 1.0
+    if talent_value(gd, pts, "ignite") > 0 and "fireball" in gd.spells:
+        cast = max(gd.rules.gcd_s, gd.spells["fireball"].ranks[-1].cast_time_s)
+        casts = max(1.0, gd.leveling.ignite_duration_s / cast)
+        count += 1 - (1 - crit) ** casts
+    return count
 
 
 def spell_power(ch: Character, buffs: Buffs | None = None) -> float:

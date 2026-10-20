@@ -161,6 +161,7 @@ class Constants:
     regen_stacking: str = "sum"  # régénération d'Arcane Meditation et de l'armure : sum ou max (mana.regen_stacking)
     bonus_stacking: str = "multiplicative"  # bonus de dégâts : multiplicative ou additive (damage.bonus_stacking)
     cone_of_cold_per_winters_chill_stack: float = 0.0  # 70450 : dégâts de Cone of Cold par cumul (aura 271)
+    hot_streak_fire_blast_extra: int = 0  # 70450 : charges de Heating Up en plus par Fire Blast (règle du serveur)
 
 
 @dataclass(frozen=True)
@@ -620,6 +621,7 @@ class Buffs(TypedDict, total=False):
     dmg: float  # bonus de dégâts d'une source (fraction), par exemple les cumuls d'Arcane Blast
     dmg_sources: tuple[float, ...]  # bonus de dégâts d'autres sources distinctes (Arcane Power…), une par entrée
     fire_vulnerability: int  # cumuls de Fire Vulnerability sur la cible
+    fire_effects: float  # 70450 : effets de Feu du Mage sur la cible (Fire Power refondu)
     haste: float
     cost: float
     sp_pct: float
