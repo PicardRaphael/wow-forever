@@ -42,7 +42,8 @@ et `make_deps_at_pre_70450_version`. Garde : `test_revision_constants.py::test_f
 | `test_decode_spells::test_installed_observations_are_recorded` | les entrées de 70450 à `old` null (sort ajouté, rang de talent ajouté) ne sont pas des observations | filtre : sort modifié là où le dépôt avait null |
 | Moteur, ancien sens (`test_engine_arcane_blast`, `test_engine_character`, `test_engine_mechanics`, `test_engine_talents`, `test_engine_values`, `test_gamedata`, `test_rotations_t05`, `test_totals`, `test_video_examples`, `test_review_t04b`, `test_review_t04c`, `test_encounter`, `test_optimize_leveling::test_build_choices`, `test_blind_spots::test_estimates_are_positive_bounds_from_the_data`) | aura d'Arcane Blast consommée, Winter's Chill au critique, épée de l'Humain, Ice Lance ×4, paliers du Mage de 70374, vidéos et contrôles du seed | `game_data_at_pre_70450_version`, test par test |
 | Mes tests de 70450 écrits sur données sans marqueurs (`test_engine_70450_*`) | ils supposaient l'ancien sens dans la version installée | `PRE_70450_VERSION` ; Ruthless et Savage comparés à une base sans critique racial |
-| `test_observation_jen`, `test_community_builds::test_legality_is_recomputed` | relevé et builds d'avant 70450 | `PRE_70450_VERSION` |
+| `test_observation_jen`, `test_community_builds::test_legality_is_recomputed` | relevé et builds d’avant 70450 | `PRE_70450_VERSION` |
+| `test_lookup_talent::test_rank_gives_the_value_and_the_description_of_that_rank`, `::test_cli_text` | texte d’Improved Frostbolt changé par le client (Frost Blast ajouté, révision 4) | `PRE_70450_VERSION` |
 
 ## Restent des angles morts
 - L'analytique surestime les nouveaux Arcanes de 8 à 10 % face au Monte Carlo (`docs/research/rejeu-70450.md`) :

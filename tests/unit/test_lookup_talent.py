@@ -8,7 +8,7 @@ import asyncio
 import json
 
 import pytest
-from conftest import LOCAL_VERSION, FakeHttp
+from conftest import LOCAL_VERSION, PRE_70450_VERSION, FakeHttp
 from mcp import Client
 
 from forever.cli import main
@@ -40,8 +40,9 @@ def test_key_and_english_name_find_the_same_talent(make_deps, name):
     assert r["prereq"] is None
 
 
-def test_rank_gives_the_value_and_the_description_of_that_rank(make_deps):
-    r = lookup_talent(make_deps(), "Improved Frostbolt", rank=3)
+def test_rank_gives_the_value_and_the_description_of_that_rank(make_deps_at_pre_70450_version):
+    # texte d'avant 1.60.1.70450, qui ajoute Frost Blast à l'infobulle (révision 4, conftest)
+    r = lookup_talent(make_deps_at_pre_70450_version(), "Improved Frostbolt", rank=3)
     assert r["ranks"] == [
         {
             "rank": 3,
@@ -95,13 +96,16 @@ def test_provenance_and_certainty_by_source_build(make_deps):
     assert new["provenance"]["certainty"] == "certain"
 
 
-def test_cli_text(capsys, make_deps):
-    code, out, _ = run(capsys, ["lookup", "talent", "Improved Frostbolt", "--rank", "3"], make_deps())
+def test_cli_text(capsys, make_deps_at_pre_70450_version):
+    # texte d'avant 1.60.1.70450 (conftest)
+    code, out, _ = run(
+        capsys, ["lookup", "talent", "Improved Frostbolt", "--rank", "3"], make_deps_at_pre_70450_version()
+    )
     assert code == 0
     assert "Improved Frostbolt" in out and "Frost" in out
     assert "3/5" in out
     assert "Reduces the casting time of your Frostbolt spell by 0.3 sec." in out
-    assert LOCAL_VERSION in out
+    assert PRE_70450_VERSION in out
 
 
 def test_cli_unknown_talent_exit_code(capsys, make_deps):
