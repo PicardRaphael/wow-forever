@@ -35,7 +35,8 @@ def test_no_more_crit_from_the_stacks(game_data):
     )
 
 
-def test_before_70450_cone_of_cold_unchanged(game_data):
+def test_before_70450_cone_of_cold_unchanged(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # aura de critique : version d'avant la refonte (conftest)
     ch = character(game_data, L, "Orc")
     assert expected_cast(game_data, "cone_of_cold", L, {}, ch, wc_stacks=2)["dmg_mult"] == pytest.approx(
         expected_cast(game_data, "cone_of_cold", L, {}, ch)["dmg_mult"]

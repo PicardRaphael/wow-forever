@@ -15,8 +15,9 @@ PERCENT = 100.0  # conversion d'unité : fraction -> pourcentage
 
 
 @pytest.fixture
-def predictions(make_deps):
-    version = load_version(make_deps())
+def predictions(make_deps_at_pre_70450_version):
+    # Relevé fait avant 1.60.1.70450, dont le racial Savage ajoute 1 % de critique à l'Orc (conftest).
+    version = load_version(make_deps_at_pre_70450_version())
     over = {"intellect": float(OBS["intellect"]), "crit_gear": OBS["gear_crit_pct"] / PERCENT}
     r4 = character(build_game_data(version), OBS["level"], OBS["race"], over)
     with ablated({"int_per_crit", "base_mana"}):

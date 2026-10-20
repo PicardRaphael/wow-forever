@@ -46,7 +46,8 @@ def test_steady_count_grows_with_crit_and_ignite(game_data):
     assert high > low > without >= 1.0  # DoT de Fireball, puis Ignite
 
 
-def test_old_meaning_without_the_marker(game_data):
+def test_old_meaning_without_the_marker(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # sans marqueur : version d'avant la refonte (conftest)
     pts = {"firePower": 2}
     base = dmg_mult(game_data, "fire", {}, None, key="fireball")
     assert dmg_mult(game_data, "fire", pts, {"fire_effects": 3}, key="fireball") == pytest.approx(
@@ -55,11 +56,12 @@ def test_old_meaning_without_the_marker(game_data):
     assert dmg_mult(game_data, "fire", pts, None, key="fireball") > base
 
 
-def test_heating_up_fire_blast_extra_charge(game_data):
+def test_heating_up_fire_blast_extra_charge(game_data, game_data_at_pre_70450_version):
     from dataclasses import replace
 
     gd = replace(game_data, constants=replace(game_data.constants, hot_streak_fire_blast_extra=1))
     assert hot_streak_gain(gd, "fire_blast", crit=False) == 1
     assert hot_streak_gain(gd, "fire_blast", crit=True) == 2
     assert hot_streak_gain(gd, "fireball", crit=True) == 1 and hot_streak_gain(gd, "fireball", crit=False) == 0
-    assert hot_streak_gain(game_data, "fire_blast", crit=False) == 0  # sans la règle : ancien sens
+    old = game_data_at_pre_70450_version  # sans la règle du serveur (installée en 1.60.1.70450 r2) : ancien sens
+    assert hot_streak_gain(old, "fire_blast", crit=False) == 0

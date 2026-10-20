@@ -1338,8 +1338,10 @@ def _client_mechanics(
             constants = replace(
                 constants, crit_per_winters_chill_stack=0.0, cone_of_cold_per_winters_chill_stack=per_stack
             )
-        else:
-            constants = replace(constants, crit_per_winters_chill_stack=per_stack)
+        else:  # aura de critique (avant 70450) : Cone of Cold jamais renforcé, quelles que soient les constantes reçues
+            constants = replace(
+                constants, crit_per_winters_chill_stack=per_stack, cone_of_cold_per_winters_chill_stack=0.0
+            )
     return constants, leveling
 
 

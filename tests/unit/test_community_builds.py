@@ -64,7 +64,9 @@ def test_every_build_has_source_date_context_level(doc):
         assert b["points"]
 
 
-def test_legality_is_recomputed(game_data, doc):
+def test_legality_is_recomputed(game_data_at_pre_70450_version, doc):
+    """Builds relevés avant 1.60.1.70450 : légalité recalculée sur les arbres de leur époque (conftest)."""
+    game_data = game_data_at_pre_70450_version
     for b in doc["builds"]:
         pts = {k: v for k, v in b["points"].items() if k in game_data.talents}
         known = len(pts) == len(b["points"])

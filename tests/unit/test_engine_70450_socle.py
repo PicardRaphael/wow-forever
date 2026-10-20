@@ -32,10 +32,11 @@ def with_racials(gd, **tables):
 
 
 def test_ruthless_and_savage_count_with_any_weapon(game_data):
+    bare = with_racials(game_data)  # sans critique racial (la version installée porte déjà Ruthless et Savage)
     gd = with_racials(game_data, crit={"Human": 0.02, "Orc": 0.01})
-    plain = character(game_data, L, "Gnome").crit
+    plain = character(bare, L, "Gnome").crit
     assert character(gd, L, "Human").crit == pytest.approx(plain + 0.02)
-    assert character(gd, L, "Orc").crit == pytest.approx(character(game_data, L, "Orc").crit + 0.01)
+    assert character(gd, L, "Orc").crit == pytest.approx(character(bare, L, "Orc").crit + 0.01)
 
 
 def test_wind_blessed_haste(game_data):

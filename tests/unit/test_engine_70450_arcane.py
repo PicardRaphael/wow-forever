@@ -76,7 +76,8 @@ def test_bonus_is_spell_power_for_every_spell(game_data):
     assert arcane_blast_bonus(gd, pts, 2, for_spell="frostbolt", ch=ch) == {"sp_flat": pytest.approx(want)}
 
 
-def test_old_meaning_without_the_marker(game_data):
+def test_old_meaning_without_the_marker(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # sans marqueur : version d'avant la refonte (conftest)
     pts = {"arcaneBlast": 1}
     aura = arcane_blast_after_cast(game_data, pts, None, 0.0)
     assert arcane_blast_after_spell(game_data, pts, aura, 1.0, "frostbolt") is None  # consommée
