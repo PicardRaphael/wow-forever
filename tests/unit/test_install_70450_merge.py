@@ -86,3 +86,29 @@ def test_spell_field_change_needs_a_confirmation():
     m = _Merge(VERSION, [confirmed("spell", "ice_lance", "modified", "frozen_mult", 4.0, 3)], "2026-10-20")
     out = m.spells(repo, cand)
     assert not m.refused and out["spells"]["ice_lance"]["frozen_mult"] == 3
+
+
+def test_added_talent_takes_the_repository_template():
+    """Talent ajouté : `desc` au gabarit du dépôt (`{i}`, `desc_template` de la candidate), jamais le gabarit brut
+    du client (`$s1`), gardé dans `source.client_desc` ; `desc_template` n'est pas recopié."""
+    repo = doc(talent("blast"))
+    cand = doc(talent("blast"), talent("wrath", tier=4, desc="causing $s1 damage", desc_template="causing {0} damage"))
+    m = _Merge(VERSION, [confirmed("talent", "wrath", "added", None, None, "wrath")], "2026-10-20")
+    wrath = m.talents(repo, cand)["trees"][0]["talents"][1]
+    assert wrath["desc"] == "causing {0} damage" and "desc_template" not in wrath
+    assert wrath["source"]["client_desc"] == "causing $s1 damage"
+
+
+def test_raw_repository_description_is_replaced_by_the_template():
+    """Gabarit brut déjà installé (Arcane Wrath de 1.60.1.70450 r1) : remplacé par le gabarit de la candidate, sans
+    confirmation (même texte, variables numérotées) ; un gabarit `{i}` du dépôt est toujours gardé."""
+    repo = doc(talent("wrath", desc="causing $s1 damage"), talent("blast", col=2, desc="deals {0} damage"))
+    cand = doc(
+        talent("wrath", desc="causing $s1 damage", desc_template="causing {0} damage"),
+        talent("blast", col=2, desc="deals $s1 damage", desc_template="deals {0} damage now"),
+    )
+    m = _Merge(VERSION, [], "2026-10-20")
+    wrath, blast = m.talents(repo, cand)["trees"][0]["talents"]
+    assert not m.refused
+    assert wrath["desc"] == "causing {0} damage" and blast["desc"] == "deals {0} damage"
+    assert any(c["path"] == "wrath.desc" and c["rule"] == "metadata" for c in m.changes)

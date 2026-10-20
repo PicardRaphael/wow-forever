@@ -5,7 +5,7 @@ renvoyées par le résolveur sont choisies pour le test : seule la mécanique de
 
 import pytest
 
-from forever.pipeline.tooltip import half_up, normalize, tooltip_values
+from forever.pipeline.tooltip import half_up, normalize, placeholder_template, tooltip_values
 
 
 def resolver(values):
@@ -113,3 +113,27 @@ def test_half_up():
 def test_normalize():
     assert normalize(3.0) == 3 and isinstance(normalize(3.0), int)
     assert normalize(0.1 + 0.2) == pytest.approx(0.3) and isinstance(normalize(0.3), float)
+
+
+def test_placeholder_template_numbers_values_in_order():
+    """Gabarit du dépôt (`{i}`, décision de T03) tiré de l'infobulle du client : chaque valeur lue par
+    `tooltip_values` devient `{i}` à sa place ; une variable à variance (minimum et maximum) devient `{i} to {i+1}`,
+    comme l'affiche le client (70450 : talent ajouté par la fusion, Arcane Wrath)."""
+    values = {(None, "s", 0): [50, 58], (None, "s", 1): [5]}
+    template = "causing $s1 Arcane damage, plus $s2% of your maximum Mana."
+    assert placeholder_template(template, resolver(values)) == (
+        "causing {0} to {1} Arcane damage, plus {2}% of your maximum Mana."
+    )
+
+
+def test_placeholder_template_covers_every_pattern_of_tooltip_values():
+    values = {(None, "s", 0): [-15], (None, "d", 0): [6000], (None, "s", 1): [4]}
+    template = "de $s1% pendant $/1000;S1 s ($d), ${$s2*2} $lpoint:points;."
+    out = placeholder_template(template, resolver(values))
+    assert out == "de {0}% pendant {1} s ({2}), {3} points."
+    assert "$" not in out
+
+
+def test_placeholder_template_refuses_what_tooltip_values_refuses():
+    with pytest.raises(ValueError):
+        placeholder_template("$?s123[a][b]", resolver({}))

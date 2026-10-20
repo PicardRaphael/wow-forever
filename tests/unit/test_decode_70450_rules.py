@@ -107,3 +107,23 @@ def test_new_spell_fields_from_the_client():
     wrath = new_spell_fields(school_mask=64, masks=masks, range_max=30, slow_points=None, durations=[None],
                              talent="arcaneWrath")  # fmt: skip
     assert wrath == {"school": "arcane", "range": 30, "talent": "arcaneWrath"}
+
+
+def test_decoded_talents_carry_the_repository_template(candidate):
+    """Chaque talent décodé porte `desc_template` : son infobulle au gabarit du dépôt (`{i}`), autant de variables
+    que de valeurs lues (`tooltip_values`), plus aucun `$` (fixtures wago de 1.60.1.70009)."""
+    import json
+    import re
+
+    from conftest import PREVIOUS_VERSION
+
+    talents = json.loads((candidate.root / PREVIOUS_VERSION / "talents.json").read_text(encoding="utf-8"))
+    checked = 0
+    for tree in talents["trees"]:
+        for t in tree["talents"]:
+            template = t["desc_template"]
+            assert "$" not in template, t["key"]
+            numbers = [int(n) for n in re.findall(r"\{(\d+)\}", template)]
+            assert numbers == list(range(len(t["tooltip_values"][0]))), t["key"]
+            checked += 1
+    assert checked > 0
