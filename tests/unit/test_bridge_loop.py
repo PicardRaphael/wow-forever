@@ -295,3 +295,24 @@ def test_published_status_tells_the_size_of_the_reserve(tmp_path):
     bridge, addons, _ = make(tmp_path, FakeCapture(None), FakeAgent(), slots=8)
     bridge.step()
     assert slot_table(addons, 1).status.slots == 8
+
+
+def test_each_game_conversation_keeps_its_own_session(tmp_path):
+    """CJ1, bloc 6b : plusieurs conversations de jeu (`c=<id>`, hors « addons ») ; chacune reprend sa propre session,
+    la conversation par défaut garde la sienne ; `n` repart de zéro dans la conversation où il est envoyé."""
+    capture = FakeCapture(band_of(RECORD))
+    results = [
+        AgentResult(text="ok", session_id=s, provenances=[PROVENANCE])
+        for s in ("s-def", "s-c2", "s-def", "s-c2", "s-c3")
+    ]
+    agent = FakeAgent(results=results)
+    bridge, _, _ = make(tmp_path, capture, agent)
+    bridge.step()  # conversation par défaut : nouvelle session s-def
+    for i, (flags, text) in enumerate(
+        [({"c=c2"}, "Autre fil"), (set(), "Suite"), ({"c=c2"}, "Suite du fil"), ({"c=c3", "n"}, "Troisième")], start=4
+    ):
+        capture.band = band_of(Record("6ac884ce31ab", i, frozenset(flags), {}, text, slot=i + 1))
+        bridge.step()
+    assert [session for _, session in agent.calls] == [None, None, "s-def", "s-c2", None]
+    state = BridgeState.load(tmp_path / "state.json")
+    assert state.session == "s-def" and state.sessions["game:c2"] == "s-c2" and state.sessions["game:c3"] == "s-c3"
