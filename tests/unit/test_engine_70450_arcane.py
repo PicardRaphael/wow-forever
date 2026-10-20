@@ -120,3 +120,22 @@ def test_arcane_rotation_with_wrath_simulates(game_data):
     pts = {"arcaneBlast": 1, "missileBarrage": 2, "arcaneWrath": 1}
     result = kill_mc(gd, L, pts, character(gd, L, "Orc"), "arcane", random.Random(3), ab_dump="arcane_missiles")
     assert result["total"] > 0
+
+
+def test_derived_tables_follow_the_new_aura(game_data):
+    """Tables par cumul de `forever explain B11` et `lookup` : l'aura de 70450 donne de la puissance des sorts selon
+    l'Intelligence (valeur du talent par cumul), plus des dégâts aux autres sorts ; le coût par cumul reste."""
+    from forever.engine.derived import stack_tables
+
+    tables = {t["effect"]: t for t in stack_tables(game_data, "arcaneBlast")}
+    assert set(tables) == {"arcane_blast_cost", "intellect_spell_power"}
+    per = game_data.talents["arcaneBlast"].ranks[0][2]
+    rows = tables["intellect_spell_power"]["rows"]
+    assert [r["value"] for r in rows] == pytest.approx([n * per for n in range(len(rows))])
+
+
+def test_derived_tables_keep_the_old_meaning_before_70450(game_data_at_pre_70450_version):
+    from forever.engine.derived import stack_tables
+
+    effects = {t["effect"] for t in stack_tables(game_data_at_pre_70450_version, "arcaneBlast")}
+    assert effects == {"arcane_blast_cost", "other_spells_damage"}

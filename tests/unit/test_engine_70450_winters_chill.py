@@ -41,3 +41,15 @@ def test_before_70450_cone_of_cold_unchanged(game_data_at_pre_70450_version):
     assert expected_cast(game_data, "cone_of_cold", L, {}, ch, wc_stacks=2)["dmg_mult"] == pytest.approx(
         expected_cast(game_data, "cone_of_cold", L, {}, ch)["dmg_mult"]
     )
+
+
+def test_derived_tables_give_the_cone_of_cold_bonus(game_data, game_data_at_pre_70450_version):
+    """Tables par cumul de Winter's Chill : bonus de Cone of Cold par cumul en 70450 (constante lue dans le client),
+    critique avant."""
+    from forever.engine.derived import stack_tables
+
+    new = stack_tables(game_data, "wintersChill")
+    assert {t["effect"] for t in new} == {"cone_of_cold_damage"}
+    per = game_data.constants.cone_of_cold_per_winters_chill_stack
+    assert all(t["per_stack"] == pytest.approx(per) and t["at_max"] == pytest.approx(per * t["max_stacks"]) for t in new)
+    assert {t["effect"] for t in stack_tables(game_data_at_pre_70450_version, "wintersChill")} == {"crit"}
