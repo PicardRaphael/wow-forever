@@ -69,3 +69,22 @@ def test_gear_reply_says_why_an_imposed_quest_is_not_in_the_route(monkeypatch, m
     text, _ = gear_level.gear_route_reply(make_deps(offline=True), {}, 10)
     gloves = next(line for line in text.splitlines() if "Quest Gloves" in line)
     assert "pas dans cette route" in gloves and "donjon hors de la route" in gloves
+
+
+def test_imposed_quest_on_another_continent_says_so():
+    # essai sur le contexte réel du 2026-10-20 : trois quêtes de Darkshore, depuis Dun Morogh, disaient seulement
+    # « non placée par l'optimiseur »
+    from types import SimpleNamespace
+
+    from forever.engine.travel import Point
+    from forever.route import missing_reason
+
+    world = SimpleNamespace(
+        quests={1: SimpleNamespace(giver=Point(1, 0.0, 0.0)), 2: SimpleNamespace(giver=Point(0, 5.0, 5.0))},
+        dropped={3: "quêtes d'un donjon hors de la route"},
+    )
+    start = SimpleNamespace(position=Point(0, 0.0, 0.0))
+    assert "autre continent" in missing_reason(1, world=world, start=start, done=())
+    assert missing_reason(2, world=world, start=start, done=()) == "non placée par l'optimiseur"
+    assert missing_reason(3, world=world, start=start, done=()) == "quêtes d'un donjon hors de la route"
+    assert missing_reason(4, world=world, start=start, done=(4,)) == "déjà faite"
