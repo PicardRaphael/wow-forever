@@ -2,7 +2,7 @@
 ## Title: ForeverBridge
 ## Notes: Pont de conversation de forever-core : question en jeu, réponse de l'agent, état des données (P06a).
 ## Author: forever-core
-## Version: 0.5.0
+## Version: 0.6.0
 ## SavedVariables: ForeverBridgeDB
 ## Group: ForeverBridge
 

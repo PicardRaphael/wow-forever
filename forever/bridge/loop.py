@@ -61,6 +61,18 @@ UPDATE_CHECK_S = 5.0  # verrou et dernier passage de forever update relus (fin d
 CARDS_CHECK_S = 1.0  # cartes « À valider » relues (carte de test de selftest --card, attentes au bloc B)
 SIMC_FLAG = "k=simc"
 ADDONS_FLAG = "c=addons"  # message de l'onglet « Addons » (bloc F)
+CONVERSATION_PREFIX = "c="  # CJ1, bloc 6b : autre conversation de jeu (`c=<id>`), chacune avec sa session
+
+
+def game_conversation(flags: frozenset[str]) -> str | None:
+    """Conversation de jeu nommée par le drapeau `c=<id>` (lettres et chiffres, jamais « addons ») ; None pour la
+    conversation par défaut."""
+    for flag in flags:
+        if flag.startswith(CONVERSATION_PREFIX) and flag != ADDONS_FLAG:
+            name = flag[len(CONVERSATION_PREFIX) :]
+            if name.isalnum() and name.isascii():
+                return name
+    return None
 ACTION_LABELS = {"approve": "Valider", "reject": "Refuser"}
 ROUTE_BUTTON = "b=route"  # bouton « Feuille de route » (RX1)
 ROUTE_GROUP = "Forever Routes"  # groupe des guides livrés dans RestedXP
@@ -723,7 +735,9 @@ class Bridge:
                 self.choices = [c for c in self.choices if c.id != "route_levels"]
             self.route_active = True
         try:
-            session = None if "n" in record.flags else self.state.session
+            conversation = game_conversation(record.flags)
+            stored = self.state.sessions.get(f"game:{conversation}") if conversation else self.state.session
+            session = None if "n" in record.flags else stored
             started = self.clock()
             self.journal.write("agent", id=record.message_id, resumed=session is not None)
             prefer: str | None = None
@@ -771,7 +785,9 @@ class Bridge:
                     asked = chat_choices(self.choices, validate=True)
                     if asked:
                         reply["choices"] = asked
-                if result.session_id:
+                if result.session_id and conversation:
+                    self.state.set_conversation_session(f"game:{conversation}", result.session_id)
+                elif result.session_id:
                     self.state.set_session(result.session_id)
                 self.journal.write(
                     "reply",

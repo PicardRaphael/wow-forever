@@ -69,6 +69,9 @@ local UPDATE_CLICK_WAIT = 180 -- après « Mettre à jour », délai pour voir l
 local PANEL_BUTTON_MIN = 64 -- largeur minimale d'un bouton de carte
 local HISTORY_KEPT = 50
 local ARCHIVE_KEPT = 5 -- conversations archivées par « Nouvelle conversation »
+local MAX_CONVERSATIONS = 8 -- conversations de jeu gardées (CJ1, bloc 6b ; réglage d'interface)
+local CONV_NAME_CHARS = 30
+local CONFIRM_S = 5 -- délai du second clic qui confirme un effacement
 -- Calendrier des relevés après un envoi (P06b, forever/bridge/polls.py) : 2, puis de 4 en 4 jusqu'à 60, puis de
 -- 10 en 10 jusqu'au plafond (190, au-delà du délai de la conversation du pont).
 local SCHEDULE = { 2 }
@@ -343,11 +346,19 @@ local function BuildWindow()
 	tabGame:SetPoint("LEFT", title, "RIGHT", 12, 0)
 	tabGame:SetText("Jeu")
 	tabGame:SetScript("OnClick", function()
-		FB.SwitchConversation("game")
+		FB.SwitchConversation(run.gameConv or "game")
+	end)
+	-- CJ1, bloc 6b : menu des conversations de jeu (passer de l'une à l'autre, créer, renommer, effacer)
+	local toggle = CreateFrame("Button", "ForeverBridgeConvToggle", f, "UIPanelButtonTemplate")
+	toggle:SetSize(24, 20)
+	toggle:SetPoint("LEFT", tabGame, "RIGHT", 2, 0)
+	toggle:SetText("v")
+	toggle:SetScript("OnClick", function()
+		FB.ToggleConversationMenu()
 	end)
 	local tabAddons = CreateFrame("Button", "ForeverBridgeTabAddons", f, "UIPanelButtonTemplate")
 	tabAddons:SetSize(150, 20)
-	tabAddons:SetPoint("LEFT", tabGame, "RIGHT", 4, 0)
+	tabAddons:SetPoint("LEFT", toggle, "RIGHT", 4, 0)
 	tabAddons:SetScript("OnClick", function()
 		FB.SwitchConversation("addons")
 	end)
@@ -610,13 +621,17 @@ function FB.RefreshTabs()
 		return
 	end
 	local addons = type(run.status) == "table" and type(run.status.addons) == "table" and run.status.addons or nil
+	-- CJ1, bloc 6b : l'onglet Jeu porte le nom de la conversation de jeu courante, toujours montré
+	local current = FB.FindConversation(run.gameConv or "game") or FB.Conversations()[1]
+	local name = tostring(current.name):gsub("|", "||")
+	ui.tabGame:SetText(name)
+	ui.tabGame:SetWidth(math.min(160, math.max(60, MenuWidth(name))))
+	ui.tabGame:Show()
 	if addons and addons.configured then
 		local label = tostring(addons.name or "?"):gsub("||", "|"):gsub("|", "||")
 		ui.tabAddons:SetText("Addons (" .. label .. ")")
-		ui.tabGame:Show()
 		ui.tabAddons:Show()
 	else
-		ui.tabGame:Hide()
 		ui.tabAddons:Hide()
 		if run.conv == "addons" then
 			FB.SwitchConversation("game")
@@ -635,7 +650,13 @@ end
 
 -- Changement de conversation : la fenêtre montre l'historique de la conversation choisie.
 function FB.SwitchConversation(name)
-	run.conv = name == "addons" and "addons" or "game"
+	if name == "addons" then
+		run.conv = "addons"
+	else
+		run.conv = FB.FindConversation(name) and name or "game"
+		run.gameConv = run.conv
+	end
+	run.renaming = nil
 	run.links = {}
 	if ui.history then
 		ui.history:Clear()
@@ -833,7 +854,246 @@ end
 
 -- Historique d'une conversation : « game » (db.history) ou « addons » (db.history_addons, P06b).
 local function HistoryKey(conv)
-	return (conv or run.conv) == "addons" and "history_addons" or "history"
+	conv = conv or run.conv
+	if conv == "addons" then
+		return "history_addons"
+	end
+	return (conv == nil or conv == "game") and "history" or ("history_" .. conv)
+end
+
+---------------------------------------------------------------------------
+-- Conversations de jeu (CJ1, bloc 6b) : « Jeu » (par défaut, jamais retirée) et celles que le joueur crée ; chacune
+-- garde son historique (history_<id>) et sa session côté pont (drapeau c=<id>).
+---------------------------------------------------------------------------
+
+function FB.Conversations()
+	local db = ForeverBridgeDB
+	if type(db) ~= "table" then
+		return { { id = "game", name = "Jeu" } }
+	end
+	if type(db.conversations) ~= "table" or #db.conversations == 0 then
+		db.conversations = { { id = "game", name = "Jeu" } }
+	end
+	return db.conversations
+end
+
+function FB.FindConversation(id)
+	for index, conv in ipairs(FB.Conversations()) do
+		if conv.id == id then
+			return conv, index
+		end
+	end
+	return nil
+end
+
+-- Nom propre : sans « | » ni caractère de contrôle, au plus CONV_NAME_CHARS octets, jamais coupé dans un caractère.
+local function CleanName(text)
+	local name = tostring(text or ""):gsub("[%c|]", ""):gsub("^%s+", ""):gsub("%s+$", "")
+	if #name > CONV_NAME_CHARS then
+		name = name:sub(1, CONV_NAME_CHARS):gsub("[\192-\255][\128-\191]*$", "")
+	end
+	return name
+end
+
+function FB.CreateConversation(name)
+	local convs = FB.Conversations()
+	if #convs >= MAX_CONVERSATIONS then
+		FB.Print("Conversations : " .. MAX_CONVERSATIONS .. " au plus ; effacez-en une d'abord (/fb conv effacer).")
+		return
+	end
+	local db = ForeverBridgeDB
+	local n = tonumber(type(db) == "table" and db.conv_next) or 2
+	if type(db) == "table" then
+		db.conv_next = n + 1
+	end
+	name = CleanName(name)
+	local conv = { id = "c" .. n, name = name ~= "" and name or ("Conversation " .. (#convs + 1)) }
+	convs[#convs + 1] = conv
+	FB.SwitchConversation(conv.id)
+	FB.Print("|cff888888— Conversation « " .. conv.name:gsub("|", "||") .. " » —|r")
+end
+
+function FB.RenameConversation(name)
+	local conv = FB.FindConversation(run.gameConv or "game")
+	name = CleanName(name)
+	if not conv or name == "" then
+		FB.Print("Nom de conversation vide : rien n'est changé.")
+		return
+	end
+	conv.name = name
+	FB.RefreshTabs()
+	FB.Print("Conversation renommée : " .. name:gsub("|", "||") .. ".")
+end
+
+-- Effacement en deux temps (second appel dans les CONFIRM_S secondes) ; « Jeu » n'est jamais retirée : son
+-- historique est vidé et le message suivant repart de zéro.
+function FB.DeleteConversation()
+	local id = run.gameConv or "game"
+	local pending = run.confirmDelete
+	if not (pending and pending.id == id and GetTime() - pending.at <= CONFIRM_S) then
+		run.confirmDelete = { id = id, at = GetTime() }
+		if ui.convDelete then
+			ui.convDelete:SetText("Confirmer l'effacement")
+		end
+		FB.Print("Effacer cette conversation ? Cliquez à nouveau (ou retapez /fb conv effacer) pour confirmer.")
+		return
+	end
+	run.confirmDelete = nil
+	if ui.convDelete then
+		ui.convDelete:SetText("Effacer…")
+	end
+	FB.HideConversationMenu()
+	local db = ForeverBridgeDB
+	if id == "game" then
+		if type(db) == "table" then
+			db.history = {}
+		end
+		FB.SwitchConversation("game")
+		run.newConversation = true
+		FB.Print("|cff888888— Conversation « Jeu » effacée : le prochain message repart de zéro —|r")
+		return
+	end
+	local _, index = FB.FindConversation(id)
+	if index then
+		table.remove(FB.Conversations(), index)
+	end
+	if type(db) == "table" then
+		db[HistoryKey(id)] = nil
+	end
+	FB.SwitchConversation("game")
+end
+
+function FB.HideConversationMenu()
+	if ui.convMenu then
+		ui.convMenu:Hide()
+	end
+end
+
+local function BuildConversationMenu()
+	local menu = CreateFrame("Frame", "ForeverBridgeConvMenu", ui.frame, "BackdropTemplate")
+	menu:SetFrameStrata("DIALOG")
+	menu:SetPoint("TOPLEFT", ui.tabGame, "BOTTOMLEFT", 0, -2)
+	if menu.SetBackdrop then
+		menu:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8" })
+		menu:SetBackdropColor(0.05, 0.05, 0.05, 0.95)
+	end
+	ui.convMenu, ui.convItems = menu, {}
+	for i = 1, MAX_CONVERSATIONS do
+		local item = CreateFrame("Button", "ForeverBridgeConvItem" .. i, menu, "UIPanelButtonTemplate")
+		item:SetScript("OnClick", function(self)
+			FB.HideConversationMenu()
+			FB.SwitchConversation(self.convId)
+		end)
+		ui.convItems[i] = item
+	end
+	local actions = {
+		{
+			"ForeverBridgeConvNew",
+			"Nouvelle conversation",
+			function()
+				FB.HideConversationMenu()
+				FB.CreateConversation()
+			end,
+		},
+		{
+			"ForeverBridgeConvRename",
+			"Renommer…",
+			function()
+				FB.HideConversationMenu()
+				run.renaming = true
+				FB.Print("Nouveau nom de la conversation : tapez-le dans la saisie, puis Entrée.")
+				if ui.input then
+					ui.input:SetFocus()
+				end
+			end,
+		},
+		{
+			"ForeverBridgeConvDelete",
+			"Effacer…",
+			function()
+				FB.DeleteConversation()
+			end,
+		},
+	}
+	ui.convActions = {}
+	for _, action in ipairs(actions) do
+		local button = CreateFrame("Button", action[1], menu, "UIPanelButtonTemplate")
+		button:SetText(action[2])
+		button:SetScript("OnClick", action[3])
+		ui.convActions[#ui.convActions + 1] = button
+	end
+	ui.convDelete = _G.ForeverBridgeConvDelete
+	menu:Hide()
+end
+
+-- Menu de l'onglet Jeu : une ligne par conversation (la courante marquée), puis Nouvelle, Renommer, Effacer.
+function FB.ToggleConversationMenu()
+	if not ui.frame then
+		return
+	end
+	if not ui.convMenu then
+		BuildConversationMenu()
+	end
+	if ui.convMenu:IsShown() then
+		FB.HideConversationMenu()
+		return
+	end
+	local width, row = 200, 0
+	local convs = FB.Conversations()
+	local rows = {}
+	for i, item in ipairs(ui.convItems) do
+		local conv = convs[i]
+		item.convId = conv and conv.id or nil
+		if conv then
+			local label = conv.name:gsub("|", "||") .. (conv.id == (run.gameConv or "game") and " (en cours)" or "")
+			item:SetText(label)
+			width = math.max(width, MenuWidth(label))
+			rows[#rows + 1] = item
+		end
+		item:SetShown(conv ~= nil)
+	end
+	ui.convDelete:SetText("Effacer…")
+	run.confirmDelete = nil
+	for _, button in ipairs(ui.convActions) do
+		rows[#rows + 1] = button
+	end
+	for _, widget in ipairs(rows) do
+		widget:ClearAllPoints()
+		widget:SetPoint("TOPLEFT", ui.convMenu, "TOPLEFT", 6, -6 - row * MENU_STEP)
+		widget:SetSize(width, BAR_H)
+		row = row + 1
+	end
+	ui.convMenu:SetSize(width + 12, row * MENU_STEP + 8)
+	ui.convMenu:Show()
+end
+
+-- /fb conv : liste ; new <nom> ; nom <nom> ; effacer ; <numéro>.
+function FB.ConversationCommand(rest)
+	FB.Open()
+	local verb, arg = (rest or ""):match("^%s*(%S*)%s*(.-)%s*$")
+	verb = string.lower(verb or "")
+	if verb == "" then
+		for i, conv in ipairs(FB.Conversations()) do
+			local mark = conv.id == (run.gameConv or "game") and " (en cours)" or ""
+			FB.Print(i .. ". " .. conv.name:gsub("|", "||") .. mark)
+		end
+		FB.Print("/fb conv new <nom>, /fb conv nom <nom>, /fb conv effacer, /fb conv <numéro>.")
+	elseif verb == "new" or verb == "nouvelle" then
+		FB.CreateConversation(arg)
+	elseif verb == "nom" then
+		FB.RenameConversation(arg)
+	elseif verb == "effacer" then
+		FB.DeleteConversation()
+	elseif tonumber(verb) then
+		local conv = FB.Conversations()[tonumber(verb)]
+		if conv then
+			FB.SwitchConversation(conv.id)
+		else
+			FB.Print("Pas de conversation numéro " .. verb .. " (/fb conv pour la liste).")
+		end
+	else
+		FB.Print("/fb conv : commande inconnue (/fb conv pour la liste).")
+	end
 end
 
 local function History(conv)
@@ -1225,6 +1485,8 @@ function FB.Send(text, buttonKey, opts)
 	local conv = run.conv
 	if conv == "addons" then
 		flags[#flags + 1] = "c=addons"
+	elseif conv and conv ~= "game" then
+		flags[#flags + 1] = "c=" .. conv -- CJ1, bloc 6b : conversation de jeu créée par le joueur, sa propre session
 	end
 	local payload, contextText = Message.Build(db.session, id, flags, run.nextSlot, text, opts.extra)
 	FB.Open()
@@ -1268,6 +1530,12 @@ function FB.SendFromInput()
 	end
 	local text = (input:GetText() or ""):gsub("^%s+", ""):gsub("%s+$", "")
 	if text == "" then
+		return
+	end
+	if run.renaming then -- « Renommer… » du menu des conversations : le texte est le nouveau nom, rien n'est envoyé
+		run.renaming = nil
+		input:SetText("")
+		FB.RenameConversation(text)
 		return
 	end
 	local question, links, shown = Message.Links(text)
@@ -2031,7 +2299,10 @@ function FB.ApplySlot(slot)
 				end
 			end
 			if waiting[reply.id] and (reply.status == "done" or reply.status == "error") then
-				local conv = waiting[reply.id] == "addons" and "addons" or "game"
+				local conv = waiting[reply.id]
+				if conv ~= "addons" and not FB.FindConversation(conv) then
+					conv = "game" -- conversation effacée entre-temps : la réponse revient dans « Jeu »
+				end
 				waiting[reply.id] = nil
 				RemoveFromOutbox(reply.id)
 				local entry = {
@@ -2812,6 +3083,7 @@ local HELP = {
 	"Coller /simc : colle l'export de l'addon SimulationCraft (/simc, Ctrl+C, Ctrl+V), envoyé au pont sans question.",
 	"/fv case N : taille de case de la bande des messages, 1 (défaut) à 4 pixels, si le pont ne la lit pas.",
 	"/fv diag : autotest des fichiers de contrôle, écrit dans la discussion générale.",
+	"/fb conv : conversations de jeu (liste ; new <nom>, nom <nom>, effacer, <numéro> ; ou le menu v de l'onglet).",
 	"/fb exports : réafficher les liens d'export de la session (Talents Forever, Naowh), à copier depuis le panneau.",
 	"/fb role dps|heal|tank|clear : rôle de ce personnage (profil EllesmereUI seulement après /fb eui on).",
 	"/fb eui on|off : propositions et bascule de profil EllesmereUI, éteintes par défaut (ton interface reste la tienne).",
@@ -2886,6 +3158,8 @@ SlashCmdList.FOREVERBRIDGE = function(message)
 		FB.Diag()
 	elseif command == "exports" then
 		FB.Exports()
+	elseif command == "conv" then
+		FB.ConversationCommand(rest)
 	elseif command == "role" then
 		FB.SetRole(rest)
 	elseif command == "eui" then

@@ -657,6 +657,21 @@ et pour 9 chances sur 10, puis le partage du butin en groupe ; « En faire une r
 bouton sous la réponse d'une tranche donnent la route de la tranche (« Route d'équipement du niveau 10 au niveau
 20 ») ; les donneurs des capitales (Bink à Ironforge) entrent dans les routes, trajet marqué supposé.
 
+### Bloc 6b (ForeverBridge 0.6.0, décision 281)
+- **Assistant de feuille de route selon le type** : leveling et équipement calculés (l'équipement part en action
+  `a=gear_route:<de>-<à>`, comme « En faire une route ») ; réputation et métier pas encore calculés : l'écran le dit,
+  sans niveaux, champ libre ni question envoyée.
+- **Réputations** : panneau de réputation lu par `C_Reputation.GetNumFactions` et `GetFactionDataByIndex`, repli sur
+  `GetNumFactions` et `GetFactionInfo`, chaque appel sous `pcall` (comme Forever Guide et EllesmereUI) ; un groupe
+  replié ne montre pas ses factions (rien n'est déplié). Clé de contexte `reputations` (« faction:palier:réputation »,
+  entiers), lue par `forever/bridge/context.py` (`reputations_context`) pour le bloc 4e. Dans l'assistant : factions
+  groupées comme dans le jeu, filtre par groupe, palier visé (libellés `FACTION_STANDING_LABEL<n>` du client).
+- **Plusieurs conversations de jeu** : l'onglet Jeu porte le nom de la conversation courante ; son menu (▾) les
+  liste, en crée, renomme (le nom se tape dans la saisie, rien n'est envoyé) et efface (second clic dans les 5 s) ;
+  `/fb conv` (liste, `new <nom>`, `nom <nom>`, `effacer`, `<numéro>`). Historique propre (`history_<id>`) et session
+  propre côté pont (drapeau `c=<id>`, `sessions["game:<id>"]`) ; « Jeu » n'est jamais retirée (effacer vide son
+  historique et le message suivant repart de zéro). Au plus 8 conversations.
+
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).
 
