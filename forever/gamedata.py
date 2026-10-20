@@ -248,6 +248,7 @@ def _talents(raw: Any, file: str = TALENTS_FILE) -> tuple[dict[str, Talent], tup
                 ranks=tuple(ranks),
                 prereq=prereq,
                 duration_s=r.opt_num(t, "duration_s", f"{where}.duration_s"),
+                model=t.get("model") if isinstance(t.get("model"), str) else None,
             )
     return talents, tuple(trees)
 
@@ -276,7 +277,13 @@ def _racials_from_races(raw: Any) -> Racials:
     r = _Reader(RACES_FILE)
     if not isinstance(raw, dict):
         raise r.fail("racine", "objet")
-    tables: dict[str, dict[str, float]] = {"sword_crit": {}, "spirit_pct": {}, "mana_pct": {}}
+    tables: dict[str, dict[str, float]] = {
+        k: {}
+        for k in (
+            "sword_crit", "spirit_pct", "mana_pct", "crit", "haste",
+            "eureka_dmg", "eureka_cost", "eureka_duration_s", "eureka_cooldown_s",
+        )
+    }  # fmt: skip
     for race, entry in r.obj(raw, "races", "races").items():
         values = r.obj(entry, "mage_values", f"races.{race}.mage_values") if isinstance(entry, dict) else None
         if values is None:
@@ -284,7 +291,7 @@ def _racials_from_races(raw: Any) -> Racials:
         for key, table in tables.items():
             if key in values:
                 table[race] = r.num(values, key, f"races.{race}.mage_values.{key}")
-    return Racials(sword_crit=tables["sword_crit"], spirit_pct=tables["spirit_pct"], mana_pct=tables["mana_pct"])
+    return Racials(**tables)
 
 
 def racials_source(version: VersionData, rules: str = "forever") -> str:
@@ -1312,10 +1319,13 @@ def _client_mechanics(
         )
     wc = auras.get("winters_chill")
     if isinstance(wc, dict) and _kept("winters_chill"):
-        constants = replace(
-            constants,
-            crit_per_winters_chill_stack=r.num(wc, "pct_per_stack", "auras.winters_chill.pct_per_stack") / PERCENT,
-        )
+        per_stack = r.num(wc, "pct_per_stack", "auras.winters_chill.pct_per_stack") / PERCENT
+        if wc.get("kind") == "cone_of_cold":  # 70450 : l'aura renforce Cone of Cold, plus aucun critique (D4)
+            constants = replace(
+                constants, crit_per_winters_chill_stack=0.0, cone_of_cold_per_winters_chill_stack=per_stack
+            )
+        else:
+            constants = replace(constants, crit_per_winters_chill_stack=per_stack)
     return constants, leveling
 
 

@@ -29,7 +29,7 @@ def mana_cost(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
     if s.school in SCHOOL_FROST:
         m *= 1 - talent_value(gd, pts, "frostChanneling") / PERCENT
     m *= 1 + buffs.get("cost", 0.0)
-    return m
+    return m * (1 + ch.racial_cost)  # 70450 : Eureka! en temps d'effet moyen (G1, suppose)
 
 
 def in_combat_regen_fraction(

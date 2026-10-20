@@ -385,6 +385,7 @@ def kill_mc(
                 frozen=frozen and key == "ice_lance",
                 rules=o["rules"],
                 low_level_penalty=o["low_level_penalty"],
+                buffs=buffs,  # 70450 : puissance des sorts des buffs (Arcane Blast, Arcane Wrath) sur les coups directs
             )
             crit = rng.random() < e["crit"]
             dmg = base * e["dmg_mult"] * (e["crit_mult"] if crit else 1.0)

@@ -22,6 +22,19 @@ def int_per_crit(gd: GameData, level: int) -> float:
     return t.at_min + (t.at_max - t.at_min) * (clamped - t.level_min) / (t.level_max - t.level_min)
 
 
+def eureka_average(gd: GameData, race: str) -> tuple[float, float]:
+    """Eureka! (Gnome, 70450 : racial à activer, `races.json`) en temps d'effet moyen : (dégâts en plus, coût) ×
+    durée / recharge ; (0, 0) sans le racial. Moyenne sur un long combat, lancé dès sa recharge (suppose).
+
+    Registre : G1"""
+    r = gd.racials
+    duration, cooldown = r.eureka_duration_s.get(race), r.eureka_cooldown_s.get(race)
+    if not duration or not cooldown:
+        return 0.0, 0.0
+    uptime = min(1.0, duration / cooldown)
+    return r.eureka_dmg.get(race, 0.0) * uptime, r.eureka_cost.get(race, 0.0) * uptime
+
+
 def character(gd: GameData, level: int, race: str = "Orc", overrides: CharacterOverrides | None = None) -> Character:
     """Stats du personnage. `overrides` (fiche du personnage) remplace toute estimation.
 
@@ -56,6 +69,8 @@ def character(gd: GameData, level: int, race: str = "Orc", overrides: CharacterO
         crit = m.crit_base + intellect / int_per_crit(gd, L) / PERCENT + over.get("crit_gear", 0.0)
         if over.get("sword"):
             crit += gd.racials.sword_crit.get(race, 0.0)
+        crit += gd.racials.crit.get(race, 0.0)  # 70450 : Ruthless, Savage, toute arme (A5, G1)
+    eureka_dmg, eureka_cost = eureka_average(gd, race)
     return Character(
         level=L,
         race=race,
@@ -66,11 +81,13 @@ def character(gd: GameData, level: int, race: str = "Orc", overrides: CharacterO
         mana=over.get("mana", mana),
         crit=crit,
         hit_gear=over.get("hit_gear", 0.0),
-        haste=over.get("haste", 0.0),
+        haste=over.get("haste", 0.0) + gd.racials.haste.get(race, 0.0),  # 70450 : Wind Blessed (G1)
         hp=over.get("hp", m.hp_base + m.hp_per_level * L + m.hp_per_level_squared * L * L),
         armor=over.get(
             "armor", m.armor_per_agility * (m.agility_base + m.agility_per_level * L) + m.armor_per_level * L
         ),
         spirit_regen=(m.regen_base + spirit / m.regen_spirit_divisor) / m.regen_tick_s,
         overrides=over,
+        racial_dmg=eureka_dmg,
+        racial_cost=eureka_cost,
     )

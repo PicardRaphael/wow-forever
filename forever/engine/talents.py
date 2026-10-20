@@ -20,6 +20,15 @@ def talent_value(gd: GameData, pts: Points, key: str, i: int = 0, default: float
     return v[i] if i < len(v) else default
 
 
+def talent_model(gd: GameData, key: str) -> str | None:
+    """Sens d'un talent dont le client a changé le texte (70450 : marqueur `model` de forever decode) ; None : ancien
+    sens (versions passées) ou talent inconnu.
+
+    Registre : G3"""
+    t = gd.talents.get(key)
+    return t.model if t is not None else None
+
+
 def points_available(gd: GameData, level: int, talented_bonus: int = 0) -> int:
     """Points de talent disponibles au niveau donné ; le bonus Legacy « Talented » avance le premier point.
 

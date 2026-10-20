@@ -118,14 +118,15 @@ def roll_base_damage(
     frozen: bool = False,
     rules: str = "forever",
     low_level_penalty: bool | None = None,
+    buffs: Buffs | None = None,
 ) -> float:
     """Dégâts de base d'un coup tiré : min + (max - min) × `u` (tirage uniforme dans [0, 1[ fourni par l'appelant)
-    + coefficient (`coefficient`, selon `rules`) × puissance des sorts ; multiplicateur sur cible gelée du sort s'il
-    en publie un (Ice Lance).
+    + coefficient (`coefficient`, selon `rules`) × puissance des sorts (buffs de puissance compris : `sp_flat`,
+    `sp_pct`, 70450) ; multiplicateur sur cible gelée du sort s'il en publie un (Ice Lance).
 
     Registre : G4"""
     c = coefficient(gd, key, rank, rules=rules, low_level_penalty=low_level_penalty)
-    base = rank.damage_min + (rank.damage_max - rank.damage_min) * u + c * spell_power(ch)
+    base = rank.damage_min + (rank.damage_max - rank.damage_min) * u + c * spell_power(ch, buffs)
     frozen_mult = gd.spells[key].frozen_mult
     if frozen and frozen_mult is not None:
         base *= frozen_mult

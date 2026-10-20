@@ -57,6 +57,7 @@ class Talent:
     ranks: tuple[tuple[float, ...], ...]
     prereq: tuple[int, int] | None  # (palier, colonne) dans le même arbre
     duration_s: float | None = None  # durée d'aura corrigée : copie du seed seulement (Hot Streak, mode seed)
+    model: str | None = None  # 70450 : sens du talent changé par le client (marqueur de forever decode), None : ancien
 
 
 @dataclass(frozen=True)
@@ -159,6 +160,7 @@ class Constants:
     miss_per_level_below: float  # raté retiré par niveau d'écart sous la cible (écart négatif)
     regen_stacking: str = "sum"  # régénération d'Arcane Meditation et de l'armure : sum ou max (mana.regen_stacking)
     bonus_stacking: str = "multiplicative"  # bonus de dégâts : multiplicative ou additive (damage.bonus_stacking)
+    cone_of_cold_per_winters_chill_stack: float = 0.0  # 70450 : dégâts de Cone of Cold par cumul (aura 271)
 
 
 @dataclass(frozen=True)
@@ -168,6 +170,13 @@ class Racials:
     sword_crit: Mapping[str, float]
     spirit_pct: Mapping[str, float]
     mana_pct: Mapping[str, float]
+    # 70450 (décision 285) : raciaux lus par leur sort, toute arme (Ruthless, Savage), hâte (Wind Blessed), Eureka!
+    crit: Mapping[str, float] = field(default_factory=dict)
+    haste: Mapping[str, float] = field(default_factory=dict)
+    eureka_dmg: Mapping[str, float] = field(default_factory=dict)
+    eureka_cost: Mapping[str, float] = field(default_factory=dict)
+    eureka_duration_s: Mapping[str, float] = field(default_factory=dict)
+    eureka_cooldown_s: Mapping[str, float] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -602,6 +611,8 @@ class Character:
     armor: float
     spirit_regen: float  # mana par seconde, hors règle d'incantation (combat_rules.five_second_rule)
     overrides: CharacterOverrides
+    racial_dmg: float = 0.0  # 70450 : Eureka! en temps d'effet moyen (fraction de dégâts en plus, suppose)
+    racial_cost: float = 0.0  # 70450 : Eureka! en temps d'effet moyen (fraction de coût, négative : réduit)
 
 
 class Buffs(TypedDict, total=False):

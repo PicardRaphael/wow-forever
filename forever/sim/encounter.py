@@ -652,6 +652,7 @@ def _resolve(
             frozen=key == "ice_lance",
             rules=o["rules"],
             low_level_penalty=o["low_level_penalty"],
+            buffs=buffs,  # 70450 : puissance des sorts des buffs sur les coups directs
         )
         crit = rng.random() < e["crit"]
         dmg = base * e["dmg_mult"] * (e["crit_mult"] if crit else 1.0)
