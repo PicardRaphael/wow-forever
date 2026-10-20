@@ -86,9 +86,10 @@ mechanics:
       - tests/unit/test_engine_character_rules.py::test_forever_mode_reads_decoded_ratios
       - tests/unit/test_engine_character_rules.py::test_seed_mode_keeps_estimates
       - tests/unit/test_observation_jen.py::test_client_ratios_predict_the_observed_spell_crit
+      - tests/unit/test_engine_70450_socle.py::test_ruthless_and_savage_count_with_any_weapon
     tolerance: null
     formule: "crit = crit_base + Int / int_par_crit(niveau) + crit_équipement (+ épée, racial) + talents (Arcane Instability, Critical Mass, Arcane Impact, Incineration, Shatter si gelé) + crit_par_cumul × cumuls de Winter's Chill + buffs, bornée à [0, 1]"
-    note: "T08b, bloc A : en mode forever, Intelligence par point de critique lue dans le client par niveau (character_scaling.json, terme certain) ; critique de base absente du client (suppose) ; mode seed : interpolation de fm.py. Preuve en jeu (2026-10-01, Jen, Mage orc niveau 19, Intelligence de la fiche) : la critique des sorts prédite par la révision 4 égale celle rendue par GetSpellCritChance (ForeverLogger), la révision 3 s'en écarte davantage ; certain pour ce terme à ce niveau"
+    note: "T08b, bloc A : en mode forever, Intelligence par point de critique lue dans le client par niveau (character_scaling.json, terme certain) ; critique de base absente du client (suppose) ; mode seed : interpolation de fm.py. Preuve en jeu (2026-10-01, Jen, Mage orc niveau 19, Intelligence de la fiche) : la critique des sorts prédite par la révision 4 égale celle rendue par GetSpellCritChance (ForeverLogger), la révision 3 s'en écarte davantage ; certain pour ce terme à ce niveau ; 70450 (décision 285) : Ruthless (Humain) et Savage (Orc) au critique avec toute arme, lus dans races.json"
   - id: A6
     categorie: attaque
     description: "Érafles (taux et pénalité selon la compétence d'arme)"
@@ -300,9 +301,11 @@ mechanics:
       - tests/unit/test_video_examples.py::test_video_example
       - tests/unit/test_video_examples.py::test_seed_rules_miss_the_video
       - tests/unit/test_variants.py::test_bonus_stacking_variant_adds_like_the_seed
+      - tests/unit/test_engine_70450_fire.py::test_bonus_per_fire_effect_up_to_the_cap
+      - tests/unit/test_engine_70450_fire.py::test_steady_count_grows_with_crit_and_ignite
     tolerance: null
     formule: "forever : mult_dégâts = (1 + Arcane Instability) × (1 + talent d'école : Piercing Ice ou Fire Power) × (1 + buff de dégâts) × Π (1 + autre source) × (1 + Improved Cone of Cold, Cone of Cold seul) × (1 + cumuls × part de Fire Vulnerability, écoles de l'aura) ; seed : talents × (1 + buff + Σ sources + cumuls × part), Improved Cone of Cold ignoré ; Ice Lance contre cible gelée : × mult_gelé du sort"
-    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 12 / 23 / 35 %, rangs de talents.json (courbe Trait 83066 du client, absente des lignes hotfixées de Hotfix.log du 2026-09-27 ; décision 77 ; Classic : 15 / 25 / 35). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09). ; T05 : cumul lu dans les données (damage.bonus_stacking, multiplicative, probable ; variante additive du seed) ; note officielle du 01/10 (t/2360696/4, révision 4) : Fire Vulnerability (Improved Scorch) ne fait plus de second jet de résistance (client 1.60.1.70170 : Attributes_3 du sort 22959, bit 18 ajouté) ; sans effet tant que Fire Vulnerability n'est pas lancée par les rotations (I8)"
+    note: "T04e : bonus en pourcentage multipliés entre sources en mode forever (probable : les exemples V13 et V18 de la vidéo ne tombent juste qu'en multipliant ; test par journal E6), additionnés en mode seed. Improved Cone of Cold en forever : 12 / 23 / 35 %, rangs de talents.json (courbe Trait 83066 du client, absente des lignes hotfixées de Hotfix.log du 2026-09-27 ; décision 77 ; Classic : 15 / 25 / 35). Fire Vulnerability : Givre-feu compte comme feu (suppose). Arcane Power (B15) et Fire Vulnerability ne sont pas lancés par les rotations (T05, T09). ; T05 : cumul lu dans les données (damage.bonus_stacking, multiplicative, probable ; variante additive du seed) ; note officielle du 01/10 (t/2360696/4, révision 4) : Fire Vulnerability (Improved Scorch) ne fait plus de second jet de résistance (client 1.60.1.70170 : Attributes_3 du sort 22959, bit 18 ajouté) ; sans effet tant que Fire Vulnerability n'est pas lancée par les rotations (I8) ; 70450 (marqueur per_fire_effect) : Fire Power par effet de Feu du Mage sur la cible, au plus le plafond du talent ; effets suivis par les simulations Monte Carlo (DoT de Fireball et de Pyroblast, Ignite), nombre moyen en régime établi pour le calcul analytique (suppose) ; Impact et Fire Vulnerability hors rotation"
   - id: A21
     categorie: attaque
     description: "Multiplicateur de critique des sorts et talents qui l'augmentent"
@@ -500,9 +503,10 @@ mechanics:
       - tests/unit/test_lookup.py::test_talent_rank_mana_from_the_client
       - tests/unit/test_totals.py::test_arcane_blast_cost_by_stack
       - tests/unit/test_totals.py::test_explain_mechanic_gives_derived_values
+      - tests/unit/test_engine_70450_arcane.py::test_cycle_lasts_the_aura_and_stacks_pay_off
     tolerance: null
     formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié ; Arcane Blast à n cumuls : coût × (1 + n × hausse par cumul du talent arcaneBlast) (mode seed seulement depuis T06b)"
-    note: "T04c : escalade d'Arcane Blast (mana.arcane_blast_cost ; hausses de l'aura additionnées : probable, voir OPEN_QUESTIONS), payée lancer par lancer (Monte Carlo) et sur le cycle (analytique) ; Clearcasting rend le lancer gratuit sans retirer de cumul (suppose) ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2) ; T06b (révision 2) : coûts des rangs 1 issus d'un talent (Pyroblast, Ice Lance, Blast Wave) lus dans le client (SpellPower.ManaCost), l'estimation mana.talent_rank_cost ne sert plus qu'au mode seed"
+    note: "T04c : escalade d'Arcane Blast (mana.arcane_blast_cost ; hausses de l'aura additionnées : probable, voir OPEN_QUESTIONS), payée lancer par lancer (Monte Carlo) et sur le cycle (analytique) ; Clearcasting rend le lancer gratuit sans retirer de cumul (suppose) ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2) ; T06b (révision 2) : coûts des rangs 1 issus d'un talent (Pyroblast, Ice Lance, Blast Wave) lus dans le client (SpellPower.ManaCost), l'estimation mana.talent_rank_cost ne sert plus qu'au mode seed ; 70450 : cycle de la rotation arcane de la durée de l'aura (Arcane Blast à coût croissant, puis décharges et Arcane Wrath)"
   - id: B12
     categorie: ressources
     description: "Clearcasting"
@@ -549,9 +553,10 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_missile_barrage_rules
       - tests/unit/test_rotations_t05.py::test_missile_barrage_halves_the_dump_and_makes_it_free
       - tests/unit/test_rotations_t05.py::test_missile_barrage_in_the_arcane_cycle
+      - tests/unit/test_engine_70450_arcane.py::test_missile_barrage_per_missile
     tolerance: null
     formule: "Missile Barrage (T05) : chaque Arcane Blast qui touche déclenche l'aura avec la chance du talent (Fireball, Frostbolt, Frostfire Bolt : autre chance) ; l'Arcane Missiles suivant est canalisé en (1 - réduction) du temps et gratuit ; analytique : P = 1 - (1 - chance × toucher)^cumuls par cycle arcane ; Fingers of Frost (chance et charges du talent) et Frostbite (C5) : procs modélisés depuis T04b"
-    note: "T05 : rotation arcane à décharge Arcane Missiles seulement (un tirage par déclencheur qui touche, mode forever) ; tisser Arcane Missiles dans les rotations de givre ou de feu : angle mort ; autres procs (Impact ; Clearcasting compté en B12) absents"
+    note: "T05 : rotation arcane à décharge Arcane Missiles seulement (un tirage par déclencheur qui touche, mode forever) ; tisser Arcane Missiles dans les rotations de givre ou de feu : angle mort ; autres procs (Impact ; Clearcasting compté en B12) absents ; 70450 (marqueur missile_hits) : chance sur chaque projectile d'Arcane Missiles (1 - (1 - p)^projectiles) et sur Arcane Wrath, variables décalées"
   - id: B15
     categorie: temps
     description: "Durée, charges, rafraîchissement et cumul des buffs"
@@ -589,9 +594,13 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_pyroblast_enters_the_fire_rotation_after_enough_crits
       - tests/unit/test_rotations_t05.py::test_fewer_stacks_cast_more_pyroblasts
       - tests/unit/test_rotations_t05.py::test_hot_streak_in_the_analytic_model
+      - tests/unit/test_engine_70450_arcane.py::test_aura_keeps_its_first_timer_and_is_not_consumed
+      - tests/unit/test_engine_70450_arcane.py::test_bonus_is_spell_power_for_every_spell
+      - tests/unit/test_engine_70450_arcane.py::test_arcane_wrath_spell_power_from_max_mana
+      - tests/unit/test_engine_70450_fire.py::test_heating_up_fire_blast_extra_charge
     tolerance: null
     formule: "aura d'Arcane Blast : +1 cumul par Arcane Blast (borné au maximum du talent), durée relancée, consommée par tout autre sort de dégâts ; Arcane Power (T05) : au pull dès que la recharge du client est écoulée, + dégâts (multipliés aux autres bonus) et + coût sur les lancers qui finissent dans sa durée ; Hot Streak (T05) : un cumul par critique direct de Fireball, Frostfire Bolt, Fire Blast, Scorch, Pyroblast à hs_stacks cumuls, incantation × (1 - part × cumuls), cumuls consommés"
-    note: "T04c : forever/engine/buffs.py, valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11). T04e : buffs d'Arcane Power (arcane_power_buffs), cumul avec Arcane Blast multiplicatif en forever (A20) ; aura de 15 s et recharge de 180 s non modélisées (l'appelant décide quand l'aura est active ; rotations : T05). Missile Barrage et autres buffs : absents ; T05 (décision 79) : Arcane Power dans les rotations, au pull dès que prête (horloge de session de mc, recharge du client 180 s), aura sur les lancers qui finissent dans sa durée (+30 % de dégâts multipliés aux autres bonus, +30 % de coût, multiplié au coût croissant d'Arcane Blast : suppose), aucun tirage ; analytique : combat à dégâts uniformes, part des combats min(1, cycle / recharge) au point fixe ; option arcane_power (auto, off), jamais en seed. Hot Streak (décision 83) : cumul à l'impact d'un critique non périodique de Fireball, Frostfire Bolt, Fire Blast, Scorch ; Pyroblast à hs_stacks cumuls (1 au maximum, choix du build), incantation × (1 - 25 % × cumuls), cumuls consommés ; durée 20 s (client 70009) ; cumuls remis à zéro entre deux combats (sous-évalue légèrement) ; analytique : un Pyroblast tous les hs_stacks critiques, expiration ignorée ; T05 (relecture) : certitude suppose (Arcane Power multiplié au coût croissant d'Arcane Blast, Clearcasting qui garde le cumul, cumuls de Hot Streak remis à zéro entre deux combats) ; cumul de Hot Streak posé à l'impact en leveling, à la fin de l'incantation dans les scénarios (écart de moins d'un temps de vol)"
+    note: "T04c : forever/engine/buffs.py, valeurs du talent recoupées avec l'aura 400573 du client ; consommation par tout autre sort de dégâts (arcane_blast_after_spell) ; Clearcasting garde le cumul : suppose (B11). T04e : buffs d'Arcane Power (arcane_power_buffs), cumul avec Arcane Blast multiplicatif en forever (A20) ; aura de 15 s et recharge de 180 s non modélisées (l'appelant décide quand l'aura est active ; rotations : T05). Missile Barrage et autres buffs : absents ; T05 (décision 79) : Arcane Power dans les rotations, au pull dès que prête (horloge de session de mc, recharge du client 180 s), aura sur les lancers qui finissent dans sa durée (+30 % de dégâts multipliés aux autres bonus, +30 % de coût, multiplié au coût croissant d'Arcane Blast : suppose), aucun tirage ; analytique : combat à dégâts uniformes, part des combats min(1, cycle / recharge) au point fixe ; option arcane_power (auto, off), jamais en seed. Hot Streak (décision 83) : cumul à l'impact d'un critique non périodique de Fireball, Frostfire Bolt, Fire Blast, Scorch ; Pyroblast à hs_stacks cumuls (1 au maximum, choix du build), incantation × (1 - 25 % × cumuls), cumuls consommés ; durée 20 s (client 70009) ; cumuls remis à zéro entre deux combats (sous-évalue légèrement) ; analytique : un Pyroblast tous les hs_stacks critiques, expiration ignorée ; T05 (relecture) : certitude suppose (Arcane Power multiplié au coût croissant d'Arcane Blast, Clearcasting qui garde le cumul, cumuls de Hot Streak remis à zéro entre deux combats) ; cumul de Hot Streak posé à l'impact en leveling, à la fin de l'incantation dans les scénarios (écart de moins d'un temps de vol) ; 70450 (marqueur intellect_spell_power) : Arcane Blast donne une part de l'Intelligence en puissance des sorts à tous les sorts, aura depuis sa première application, jamais consommée ; Arcane Wrath : puissance des sorts tirée du mana maximum ; Heating Up : charges de plus de Fire Blast (règle du serveur, mechanics.json hot_streak.server_rules), Presence of Mind hors des simulateurs"
   - id: B16
     categorie: temps
     description: "Temps d'incantation réduits par talents"
@@ -750,9 +759,11 @@ mechanics:
     tests:
       - tests/unit/test_engine_leveling.py::test_slow_freeze_and_range
       - tests/parity/test_sim_leveling_parity.py::test_every_branch_matches_the_seed
+      - tests/unit/test_engine_70450_frost_blast.py::test_frost_blast_has_its_own_slow
+      - tests/unit/test_engine_70450_frost_blast.py::test_frost_blast_takes_the_frostbolt_talents
     tolerance: null
     formule: "vitesse du monstre = vitesse de course × (1 − ralenti) ; ralenti de Frostbolt = ralenti du sort + Permafrost, durée = durée du rang × (1 + Permafrost) ; gel de Frostbite (chance du talent) et de Frost Nova ; coups ralentis par Frost Armor ou Ice Armor portée (rules forever ; toujours en rules seed)"
-    note: "T04b : porté du seed (forever/engine/movement.py) ; vitesse de course, portée de mêlée et cadence des coups du modèle de monstre du seed (EST) ; Frost Nova rompue par les dégâts avec la chance nova_break ; T04c : plus de ralenti des coups sous Mage Armor (worn_armor, I6) ; Ice Armor reprend la durée et le ralenti de Frost Armor (spells.json.utility.frost_armor) alors que son sort de ralenti est 7321 (6136 pour Frost Armor) : suppose, voir OPEN_QUESTIONS"
+    note: "T04b : porté du seed (forever/engine/movement.py) ; vitesse de course, portée de mêlée et cadence des coups du modèle de monstre du seed (EST) ; Frost Nova rompue par les dégâts avec la chance nova_break ; T04c : plus de ralenti des coups sous Mage Armor (worn_armor, I6) ; Ice Armor reprend la durée et le ralenti de Frost Armor (spells.json.utility.frost_armor) alors que son sort de ralenti est 7321 (6136 pour Frost Armor) : suppose, voir OPEN_QUESTIONS ; 70450 : Frost Blast prend les talents de Frostbolt (note du 15 octobre, probable) avec son propre ralentissement"
   - id: C6
     categorie: physique
     description: "Temps en mouvement, sorts utilisables en mouvement"
@@ -865,9 +876,12 @@ mechanics:
       - tests/unit/test_totals.py::test_winters_chill_crit_by_stack_and_rank
       - tests/unit/test_totals.py::test_lookup_talent_gives_derived_values
       - tests/unit/test_decode_mechanics.py::test_winters_chill_equals_client_rows
+      - tests/unit/test_engine_70450_winters_chill.py::test_stacks_raise_cone_of_cold
+      - tests/unit/test_engine_70450_winters_chill.py::test_no_more_crit_from_the_stacks
+      - tests/unit/test_engine_70450_socle.py::test_winters_chill_crit_only_with_the_crit_aura
     tolerance: null
     formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance) ; cumuls ≤ 2e variable du rang du talent"
-    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact)"
+    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact) ; 70450 : aura 271 (sorte cone_of_cold) : chaque cumul augmente les dégâts du prochain Cone of Cold, consommés par lui, posés par les sorts de Givre de dégâts ; plus aucun critique ; avant 70450 inchangé"
   - id: D5
     categorie: environnement
     description: "Buffs de campement et de Legacy"
@@ -1173,9 +1187,12 @@ mechanics:
       - tests/unit/test_gamedata.py::test_engine_racials_read_from_races_json
       - tests/unit/test_decode_races.py::test_mage_racial_values_equal_the_community_record
       - tests/unit/test_decode_races.py::test_racials_have_effect_cooldown_duration
+      - tests/unit/test_engine_70450_socle.py::test_wind_blessed_haste
+      - tests/unit/test_engine_70450_socle.py::test_eureka_average_uptime
+      - tests/unit/test_decode_70450_rules.py::test_racial_values_by_spell_name
     tolerance: null
     formule: "esprit × (1 + bonus racial) ; mana × (1 + bonus racial) ; crit + bonus d'épée (racial)"
-    note: "PV1 : raciaux des 10 races jouables décodés du client (races.json : effets, recharges, durées, variantes de classe, Skyborne compris) ; grandeurs du moteur du Mage (esprit, mana, critique à l'épée) égales au relevé communautaire ; seuls les passifs Humain et Gnome entrent dans les calculs du Mage, raciaux actifs non modélisés (affichés dans les fiches PvP)"
+    note: "PV1 : raciaux des 10 races jouables décodés du client (races.json : effets, recharges, durées, variantes de classe, Skyborne compris) ; grandeurs du moteur du Mage (esprit, mana, critique à l'épée) égales au relevé communautaire ; seuls les passifs Humain et Gnome entrent dans les calculs du Mage, raciaux actifs non modélisés (affichés dans les fiches PvP) ; 70450 : raciaux du Mage lus par leur sort (racial_values) : Wind Blessed à la hâte ; Eureka! racial à activer compté en temps d'effet moyen (durée / recharge, suppose)"
   - id: G2
     categorie: personnage
     description: "Stats de base par race, classe et niveau"
@@ -1524,9 +1541,11 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_arcane_power_raises_cost_and_damage_inside_the_window_only
       - tests/unit/test_encounter.py::test_pack_rotation_uses_area_spells
       - tests/unit/test_encounter.py::test_bosses_cannot_be_frozen
+      - tests/unit/test_engine_70450_frost_blast.py::test_frost_blast_is_offered_once_learned
+      - tests/unit/test_engine_70450_arcane.py::test_arcane_rotation_with_wrath_simulates
     tolerance: null
     formule: "rotation arcane (T04c) : Arcane Blast jusqu'à ab_stacks cumuls, puis la décharge ab_dump ; rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
-    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test) ; T05 : rotation fire avec Pyroblast à hs_stacks cumuls de Hot Streak (talent pris, mode forever) ; rotation arcane avec Missile Barrage sur la décharge Arcane Missiles ; Arcane Power au pull dès que prête dans toutes les rotations ; Pyroblast d'ouverture non modélisé ; T05 : rotations des scénarios (forever/sim/encounter.py) : mêmes priorités qu'en leveling sans approche ni mêlée ; rotation aoe pour les paquets"
+    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test) ; T05 : rotation fire avec Pyroblast à hs_stacks cumuls de Hot Streak (talent pris, mode forever) ; rotation arcane avec Missile Barrage sur la décharge Arcane Missiles ; Arcane Power au pull dès que prête dans toutes les rotations ; Pyroblast d'ouverture non modélisé ; T05 : rotations des scénarios (forever/sim/encounter.py) : mêmes priorités qu'en leveling sans approche ni mêlée ; rotation aoe pour les paquets ; 70450 : Frost Blast proposé comme rotation de leveling une fois appris (comparé, jamais imposé) ; Arcane Wrath lancé dès sa recharge pendant la décharge arcane"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"
