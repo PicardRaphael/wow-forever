@@ -51,5 +51,7 @@ def test_derived_tables_give_the_cone_of_cold_bonus(game_data, game_data_at_pre_
     new = stack_tables(game_data, "wintersChill")
     assert {t["effect"] for t in new} == {"cone_of_cold_damage"}
     per = game_data.constants.cone_of_cold_per_winters_chill_stack
-    assert all(t["per_stack"] == pytest.approx(per) and t["at_max"] == pytest.approx(per * t["max_stacks"]) for t in new)
+    assert all(
+        t["per_stack"] == pytest.approx(per) and t["at_max"] == pytest.approx(per * t["max_stacks"]) for t in new
+    )
     assert {t["effect"] for t in stack_tables(game_data_at_pre_70450_version, "wintersChill")} == {"crit"}

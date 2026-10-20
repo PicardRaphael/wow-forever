@@ -430,7 +430,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
                 raise DataSchemaError(f"Infobulle du talent {key} (sort {spell}, rang {rank}) : {exc}.") from exc
         spec = rules.get("rank_variables", {}).get(key)
         ranks = _select(key, values, spec)
-        template = rank_template(template, values, _selected_indices(spec, len(values[0]) if values else 0))
+        desc_template = rank_template(template, values, _selected_indices(spec, len(values[0]) if values else 0))
         talents[int(node["ID"])] = {
             "key": key,
             "name": name,
@@ -442,7 +442,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "ranks": ranks,
             "tooltip_values": values,
             "desc": desc,
-            "desc_template": template,  # 70450 : gabarit du dépôt ({i} : valeurs de `ranks`) ; None : aucun
+            "desc_template": desc_template,  # 70450 : gabarit du dépôt ({i} : valeurs de `ranks`) ; None : aucun
             "spellIds": [spell],
             "prereq": None,
             "certainty": f"FC-{version}",
