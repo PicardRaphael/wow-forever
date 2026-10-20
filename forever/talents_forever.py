@@ -571,7 +571,8 @@ def export_build(
         link=link(code),
         order_included=bool(steps),
         order_note=None if steps else NO_ORDER_NOTE,
-        certainty="certain",
+        # 70450 : un format jamais relu en jeu (génération 7) n'est que probable
+        certainty="certain" if addon.generation in VERIFIED_IN_GAME else "probable",
     )
     block["import"] = f"/tf import {code}"
     return block

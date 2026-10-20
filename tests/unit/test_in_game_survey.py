@@ -276,12 +276,18 @@ def test_v6_format_is_certain_after_the_in_game_test(addon, deps):
 
 def test_other_generation_is_never_certain(tmp_path, make_deps):
     root = tmp_path / "wow"
-    write_addon(root, CLASSES, mutate=lambda doc: doc.update(codeVersion="7"))
+    write_addon(root, CLASSES, mutate=lambda doc: doc.update(codeVersion="8"))  # 70450 : la 7 est lue, la 8 inconnue
     loaded = load_addon(make_deps(wow_dir=root))
     case = CASES["leveling-20"]
     block = export_build(loaded, "Mage", case["level"], case["talents"], case["order"])
     assert block["code"] is None and block["certainty"] is None
     assert block["provenance"]["verified_in_game"] is False
+    # génération 7 (70450) : lue et écrite, jamais relue en jeu, donc jamais certaine
+    root7 = tmp_path / "wow7"
+    write_addon(root7, CLASSES, mutate=lambda doc: doc.update(codeVersion="7"))
+    block7 = export_build(load_addon(make_deps(wow_dir=root7)), "Mage", case["level"], case["talents"], case["order"])
+    assert block7["code"] is not None and block7["certainty"] != "certain"
+    assert block7["provenance"]["verified_in_game"] is False
 
 
 def test_hunter_and_warlock_are_exportable(addon):
