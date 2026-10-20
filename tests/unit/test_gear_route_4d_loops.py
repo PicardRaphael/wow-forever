@@ -114,3 +114,16 @@ def test_no_item_gives_no_route(monkeypatch, make_deps):
     # simple route de leveling avec « Objets rapportés : » vide et « Valider et livrer »
     text, asked = reply(monkeypatch, make_deps, doc={"picks": []})
     assert asked == [] and "Valider et livrer" not in text and "Aucun objet" in text
+
+
+def test_random_drops_take_one_line(monkeypatch, make_deps):
+    # essai sur le contexte réel du 2026-10-20 : la route d'une tranche alignait plus de 40 objets de butin aléatoire
+    drops = [
+        {"slot": "Back", "item": 981000 + i, "name": f"Drop {i}", "source": "world_drop", "drop_levels": [8, 12]}
+        for i in range(12)
+    ]
+    doc = {"picks": [*DOC["picks"][:2], *drops]}
+    text, _ = reply(monkeypatch, make_deps, doc=doc)
+    lines = [line for line in text.splitlines() if "Drop " in line or "butin aléatoire" in line.lower()]
+    assert len(lines) == 1 and "12" in lines[0]
+    assert "Quest Gloves" in text and "Boss Choker" in text
