@@ -116,7 +116,7 @@ def test_delete_asks_for_a_second_click_and_never_removes_the_default():
     assert len(db(game).conversations) == 2
     click(game, "ForeverBridgeConvDelete")
     assert len(db(game).conversations) == 1 and text(game, "ForeverBridgeTabGame") == "Jeu"
-    assert all(not str(k).startswith("history_c") for k in db(game).keys())
+    assert all(not str(k).startswith("history_c") for k in db(game))  # clés de la table Lua
     type_and_enter(game, "Question principale")
     game.stub.Advance(12)
     game.slash("/fb conv effacer")  # conversation par défaut : historique vidé, fil repris de zéro, jamais retirée
