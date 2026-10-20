@@ -107,3 +107,10 @@ def test_gear_screen_route_button_sends_the_range():
     click(game, "ForeverBridgeGearRoute")
     _, record = sent(game)
     assert record.flags == frozenset({"a=gear_route:19-21"}) and record.text == ""
+
+
+def test_no_item_gives_no_route(monkeypatch, make_deps):
+    # essai sur le contexte réel du 2026-10-20 (Gnome Mage niveau 1) : aucun objet, la route calculée était une
+    # simple route de leveling avec « Objets rapportés : » vide et « Valider et livrer »
+    text, asked = reply(monkeypatch, make_deps, doc={"picks": []})
+    assert asked == [] and "Valider et livrer" not in text and "Aucun objet" in text
