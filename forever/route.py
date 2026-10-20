@@ -6,7 +6,8 @@ au format RestedXP. Aucun chiffre de jeu ici."""
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from collections.abc import Set as AbstractSet
 from dataclasses import dataclass, replace
 from typing import Any
 
@@ -428,6 +429,42 @@ def _objective(maps: Any, quest: Any, giver: Any, kills_per_quest: float) -> tup
     return None, 0.0, False
 
 
+def required_chain(
+    book_quests: Mapping[int, Any], include: Sequence[int], *, done: AbstractSet[int], faction: str
+) -> frozenset[int]:
+    """Quêtes imposées et leur chaîne (bloc 4d) : préalables obligatoires, un préalable au choix et l'étape
+    précédente de la chaîne, sauf ce que le personnage a déjà fait ; un choix va à une quête de son camp (ou des deux),
+    la plus basse. Sans cela, une quête imposée dont le préalable ne vaut pas le détour ne s'ouvre jamais. Registre :
+    I18"""
+    from forever.quests import value
+
+    def mine(qid: int) -> bool:
+        return qid in book_quests and value(book_quests[qid], "faction") in (faction, "both", None)
+
+    def level(qid: int) -> int:
+        lv = value(book_quests[qid], "level")
+        return lv if isinstance(lv, int) else 0
+
+    out: set[int] = set()
+    todo = [int(q) for q in include if int(q) in book_quests]
+    while todo:
+        qid = todo.pop()
+        if qid in out or qid in done:
+            continue
+        out.add(qid)
+        q = book_quests[qid]
+        todo += [int(p) for p in value(q, "prereq_all") or () if int(p) in book_quests]
+        chain = value(q, "chain") or {}
+        for choice in (value(q, "prereq_any") or (), chain.get("after") or ()):
+            ids = [int(p) for p in choice]
+            if not ids or set(ids) & (set(done) | out):
+                continue
+            mine_ids = sorted((p for p in ids if mine(p)), key=lambda p: (level(p), p))
+            if mine_ids:
+                todo.append(mine_ids[0])
+    return frozenset(out)
+
+
 def route_world(
     gd: GameData,
     book: Any,
@@ -469,15 +506,17 @@ def route_world(
     dropped: dict[str, list[int]] = {}
     quests: dict[int, Any] = {}
     # bloc 4d : une quête imposée écarte ses quêtes exclusives (sinon l'optimiseur peut la rendre impossible)
+    # bloc 4d : une quête imposée impose sa chaîne de préalables (sinon elle ne s'ouvre jamais)
+    imposed = set(request.include) | required_chain(book.quests, request.include, done=done, faction=request.faction)
     blocked = {
         int(e)
-        for qid in request.include
+        for qid in imposed
         if qid in book.quests
         for e in (value(book.quests[qid], "exclusive") or ())
-        if int(e) not in request.include
+        if int(e) not in imposed
     }
     for quest_id, q in sorted(book.quests.items()):
-        forced = quest_id in request.include
+        forced = quest_id in imposed
         side, classes = value(q, "faction"), value(q, "classes")
         level, min_level = value(q, "level"), value(q, "min_level")
         reason = None
@@ -573,7 +612,7 @@ def route_world(
         travel=travel,
         kill_seconds=kill_seconds,
         best_zone_xp_h=best_zone,
-        required=frozenset(q for q in request.include if q in quests),
+        required=frozenset(q for q in imposed if q in quests),
         trainers=_trainer_points(maps, trainers, request.faction),
         prof_visits={
             name: (level, points)
@@ -1108,6 +1147,17 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
         warnings = [*warnings, city_line]
     by_id = {str(r["id"]): r for r in rows}
     stops = [_stop_payload(book, by_id, r, end_level=request.end_level) for r in result.stops]
+    placed = {s["ref"] for s in stops if s["kind"] == "accept"}
+    missing = {  # bloc 4d : quête imposée hors de la route, avec sa raison
+        str(q): (world.dropped.get(q) or ("déjà faite" if q in request.done else "non placée par l'optimiseur"))
+        for q in request.include
+        if q not in placed
+    }
+    if missing:
+        warnings = [
+            *warnings,
+            "quêtes imposées hors de la route : " + ", ".join(f"{q} ({why})" for q, why in missing.items()),
+        ]
     reminders = bonus_reminders(gd, XpBonusState(), hours=result.seconds / SECONDS_PER_HOUR, level=request.start_level)
     request_doc = {**asdict(request), "class_name": cls}
     plan_id = hashlib.sha256(
@@ -1174,6 +1224,7 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
         "reminders": [asdict(r) for r in reminders],
         "rewards": _rewards(book, stops),
         "warnings": [*warnings, *found.warnings, *result.warnings],
+        "required_missing": missing,
         "search": {
             "tries": found.tries,
             "seed": request.seed if request.seed is not None else world.params.seed,

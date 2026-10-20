@@ -29,6 +29,7 @@ INVENTORY = {
     "OneHand": (16,), "TwoHand": (16,), "SecondaryHand": (17,), "OffHand": (17,), "Ranged": (18,),
 }  # fmt: skip
 RANDOM_DROP = ("world_drop",)  # butin aléatoire : après les objets qu'on peut viser exprès
+RANDOM_LISTED = 6  # butin aléatoire d'une route d'équipement : nommé jusqu'à ce nombre, compté au-delà (présentation)
 
 
 def _professions(context: Mapping[str, str]) -> list[str]:
@@ -402,6 +403,12 @@ def gear_route_reply(
         doc = _leveling(deps, context, high)
     if "picks" not in doc:
         return f"Route d'équipement {span} : {doc.get('error') or doc.get('message') or 'non calculée'}", []
+    if not doc["picks"]:  # sans objet, la route ne serait qu'une route de leveling : aucune livrée
+        empty = (
+            f"## Route d'équipement {span}\n- Aucun objet de GearQuest Forever obtenable {span} pour ta classe et ton "
+            "camp : pas de route d'équipement. Une route de leveling se demande dans l'écran Feuille de route."
+        )
+        return empty, []
     who = _who(deps, context)
     if not (who.get("class_name") and who.get("faction") and isinstance(who.get("level"), int)):
         return _grouped_reply(deps, context, high, doc)
@@ -426,13 +433,23 @@ def gear_route_reply(
     }
     drops = _drops(deps)
     tags = {}
+    random_drops: list[str] = []
     for p in _ordered(doc["picks"]):
         slot = SLOTS_FR.get(p["slot"], p["slot"])
         tag = item_tag(p["item"], p.get("quality"), p.get("name"))
         tags[p["item"]] = tag
+        if p.get("source") in RANDOM_DROP:  # ne se vise pas : une ligne pour tous, après les objets visés
+            random_drops.append(tag)
+            continue
         if p.get("quest_detail"):  # vérifié sur les arrêts de la route, jamais supposé
+            qid = p["quest_detail"].get("id")
+            why = (plan.get("required_missing") or {}).get(str(qid))
             where = (
-                "dans la route" if p["quest_detail"].get("id") in in_route else "pas dans cette route, à faire ensuite"
+                "dans la route"
+                if qid in in_route
+                else f"pas dans cette route ({why}), à faire ensuite"
+                if why
+                else "pas dans cette route, à faire ensuite"
             )
             how = f"{p.get('access') or 'quête'}, {where}"
         elif p.get("dungeon_detail"):
@@ -443,6 +460,12 @@ def gear_route_reply(
         else:
             how = _how(p)
         lines.append(f"- {slot} : {tag} ({how})")
+    if random_drops:
+        listed = f" : {', '.join(random_drops)}" if len(random_drops) <= RANDOM_LISTED else ""
+        lines.append(
+            f"- Butin aléatoire des monstres, n'importe où, qui ne se vise pas : {len(random_drops)} objet(s){listed}"
+            + ("" if listed else " (détail dans « Mon équipement » de l'écran Équipement)")
+        )
     for stop in summary.get("first_stops") or []:
         lines.append(f"  · {stop.get('text')} ({stop.get('zone') or '?'})")
     lines += _loops(doc["picks"], drops, tags, dungeons_in)
