@@ -112,3 +112,15 @@ def test_raw_repository_description_is_replaced_by_the_template():
     assert not m.refused
     assert wrath["desc"] == "causing {0} damage" and blast["desc"] == "deals {0} damage"
     assert any(c["path"] == "wrath.desc" and c["rule"] == "metadata" for c in m.changes)
+
+
+def test_renamed_talent_takes_the_template_of_the_client_description():
+    """Renommage confirmé dont la décision cite l'infobulle brute du client (Wake of Fire devenu Improved Fire Blast,
+    décision 285) : le dépôt prend le gabarit `{i}` de cette infobulle, jamais le texte brut."""
+    raw = "cooldown reduced by ${$s1/-1000} sec"
+    repo = doc(talent("wake", desc="old {0}"))
+    cand = doc(talent("improved", name="Improved", desc=raw, desc_template="cooldown reduced by {0} sec"))
+    rename = {**confirmed("talent", "wake", "renamed", "key", "wake", "improved"), "desc": raw}
+    m = _Merge(VERSION, [rename], "2026-10-20")
+    out = m.talents(repo, cand)["trees"][0]["talents"][0]
+    assert not m.refused and out["key"] == "wake" and out["desc"] == "cooldown reduced by {0} sec"
