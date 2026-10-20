@@ -75,3 +75,14 @@ def test_added_spell_needs_a_confirmation():
     m = _Merge(VERSION, [confirmed("spell", "frost_blast", "added", None, None, "frost_blast")], "2026-10-20")
     out = m.spells(repo, cand)
     assert not m.refused and out["spells"]["frost_blast"]["ranks"] == [[24, 5, 6]]
+
+
+def test_spell_field_change_needs_a_confirmation():
+    repo = spells_doc(ice_lance=spell(frozen_mult=4.0))
+    cand = spells_doc(ice_lance=spell(frozen_mult=3))
+    m = _Merge(VERSION, [], "2026-10-20")
+    m.spells(repo, cand)
+    assert [r["path"] for r in m.refused] == ["ice_lance.frozen_mult"]
+    m = _Merge(VERSION, [confirmed("spell", "ice_lance", "modified", "frozen_mult", 4.0, 3)], "2026-10-20")
+    out = m.spells(repo, cand)
+    assert not m.refused and out["spells"]["ice_lance"]["frozen_mult"] == 3
