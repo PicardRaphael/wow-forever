@@ -8,7 +8,7 @@ from forever.engine.talents import talent_value
 PERCENT = 100.0  # conversion d'unité : les talents de critique sont exprimés en %
 # Sorts concernés par les talents (lien talent -> effet : c'est la formule, pas un chiffre de jeu).
 INCINERATION_SPELLS = frozenset({"fire_blast", "ice_lance", "arcane_blast", "scorch"})
-WINTERS_CHILL_SPELLS = frozenset({"frostbolt", "ice_lance"})
+WINTERS_CHILL_SPELLS = frozenset({"frostbolt", "ice_lance", "frost_blast"})  # 70450 : Frost Blast aussi
 
 
 def crit_chance(

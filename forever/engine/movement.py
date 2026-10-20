@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from forever.engine.model import SCHOOL_FIRE, GameData, Points, Rank
+from forever.engine.spells import FROSTBOLT_LIKE
 from forever.engine.talents import talent_value
 
 PERCENT = 100.0  # conversion d'unité : les talents sont exprimés en %
@@ -20,20 +21,20 @@ def travel_time(gd: GameData, key: str, distance_yd: float, *, analytic: bool = 
     return distance_yd / speed
 
 
-def frostbolt_slow(gd: GameData, pts: Points) -> float:
-    """Ralenti de Frostbolt (fraction de vitesse retirée), Permafrost compris.
+def frostbolt_slow(gd: GameData, pts: Points, key: str = "frostbolt") -> float:
+    """Ralenti de Frostbolt, ou de Frost Blast (`key`, 70450), en fraction de vitesse retirée, Permafrost compris.
 
     Registre : C5"""
-    slow = gd.spells["frostbolt"].slow
-    assert slow is not None  # spells.json : Frostbolt ralentit
+    slow = gd.spells[key].slow
+    assert slow is not None  # spells.json : Frostbolt et Frost Blast ralentissent
     return slow + talent_value(gd, pts, "permafrost", 1) / PERCENT
 
 
-def chill_duration(gd: GameData, rank: Rank, pts: Points) -> float:
-    """Durée du ralenti d'un rang de Frostbolt, allongée par Permafrost.
+def chill_duration(gd: GameData, rank: Rank, pts: Points, key: str = "frostbolt") -> float:
+    """Durée du ralenti d'un rang de Frostbolt, ou de Frost Blast (`key`, 70450), allongée par Permafrost.
 
     Registre : C5"""
-    durations = gd.spells["frostbolt"].slow_dur
+    durations = gd.spells[key].slow_dur
     assert durations is not None  # spells.json : slow_dur par rang
     return durations[rank.position - 1] * (1 + talent_value(gd, pts, "permafrost", 0) / PERCENT)
 
@@ -68,7 +69,7 @@ def spell_range(gd: GameData, key: str, pts: Points, *, rules: str = "forever") 
     spell = gd.spells[key]
     base = spell.range_yd
     base = gd.constants.default_range_yd if base is None else base
-    r = float(base) * ((1 + talent_value(gd, pts, "arcticReach") / PERCENT) if key == "frostbolt" else 1)
+    r = float(base) * ((1 + talent_value(gd, pts, "arcticReach") / PERCENT) if key in FROSTBOLT_LIKE else 1)
     if rules == "forever":
         if spell.school in SCHOOL_FIRE:
             r += talent_value(gd, pts, "flameThrowing")

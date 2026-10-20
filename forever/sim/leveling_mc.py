@@ -85,10 +85,11 @@ from forever.engine.movement import (
     spell_range,
     travel_time,
 )
-from forever.engine.spells import SPELL_LEVELS, best_rank
+from forever.engine.spells import FROSTBOLT_LIKE, SPELL_LEVELS, best_rank
 from forever.engine.talents import talent_value
 
-ROTATIONS = {"frost": "frostbolt", "fire": "fireball", "arcane": "arcane_blast"}  # sort principal de chaque rotation
+# sort principal de chaque rotation ; 70450 : Frost Blast proposé dès qu'il est appris (comparé, jamais imposé)
+ROTATIONS = {"frost": "frostbolt", "frost_blast": "frost_blast", "fire": "fireball", "arcane": "arcane_blast"}
 AB_DUMPS = ("frostbolt", "fireball", "arcane_missiles")  # sorts de décharge de la rotation arcane
 PUSHBACK_FIRE_SPELLS = frozenset({"fireball", "pyroblast"})  # incantations de feu protégées par Burning Soul
 OPTIONS = (
@@ -284,7 +285,7 @@ def kill_mc(
     r_main = best_rank(gd, main, level, pts)
     if r_main is None:
         raise ValueError(f"{main} n'est pas appris au niveau {level}")
-    r_frostbolt = best_rank(gd, "frostbolt", level, pts)
+    r_chill = {k: best_rank(gd, k, level, pts) for k in FROSTBOLT_LIKE if k in gd.spells}
     arcane = rotation == "arcane"
     ab_n, dump = arcane_plan(gd, level, pts, o["ab_stacks"], o["ab_dump"]) if arcane else (0, main)
     r_dump = best_rank(gd, dump, level, pts)
@@ -300,7 +301,7 @@ def kill_mc(
     has_il = best_rank(gd, "ice_lance", level, pts) is not None
     has_fbl = best_rank(gd, "fire_blast", level, pts) is not None
     nova_r = best_rank(gd, "frost_nova", level, pts)
-    slow = frostbolt_slow(gd, pts)
+    slow = frostbolt_slow(gd, pts, main if main in FROSTBOLT_LIKE else "frostbolt")
     fbite = frostbite_chance(gd, pts)
     fof_p = talent_value(gd, pts, "fingersOfFrost", 0) / PERCENT
     fof_n = int(talent_value(gd, pts, "fingersOfFrost", 1, 1))
@@ -427,14 +428,15 @@ def kill_mc(
         hp[0] -= dmg
         if s["nova"] and key != "frost_nova" and dmg > 0 and rng.random() < o["nova_break"]:
             s["nova"] = False
-        if key == "frostbolt":
-            assert r_frostbolt is not None  # un Frostbolt a été lancé, il est appris
-            s["chill"] = now + chill_duration(gd, r_frostbolt, pts)
+        if key in FROSTBOLT_LIKE:  # 70450 : Frost Blast prend les talents de Frostbolt
+            r_cast = r_chill[key]
+            assert r_cast is not None  # le sort a été lancé, il est appris
+            s["chill"] = now + chill_duration(gd, r_cast, pts, key)
             if fbite and rng.random() < fbite:
                 s["frozen"] = now + frostbite_freeze_s(gd)
             if fof_p and rng.random() < fof_p:
                 s["fof"] = fof_n
-        if key in ("frostbolt", "ice_lance", "frost_nova") and wc_max and rng.random() < wc_p:
+        if key in ("frostbolt", "frost_blast", "ice_lance", "frost_nova") and wc_max and rng.random() < wc_p:
             s["wc"] = min(wc_max, s["wc"] + 1)
 
     def advance(t1: float, casting: bool, fire_school: bool = False) -> float:

@@ -45,7 +45,7 @@ from forever.engine.movement import (
     spell_range,
     travel_time,
 )
-from forever.engine.spells import best_rank
+from forever.engine.spells import FROSTBOLT_LIKE, best_rank
 from forever.engine.talents import talent_value
 from forever.sim.leveling_mc import (
     PERCENT,
@@ -211,7 +211,7 @@ def _fight(
     mlevel = level + level_diff
     hp = mob_hp(gd, mlevel, o["mob_source"]).value
     main = ROTATIONS[rotation]
-    frostbolt = main == "frostbolt"
+    frostbolt = main in FROSTBOLT_LIKE  # 70450 : Frost Blast prend les talents de Frostbolt
     # empilements moyens de Winter's Chill (estimation du seed)
     wc = talent_value(gd, pts, "wintersChill", 1, 0) * min(
         1.0, talent_value(gd, pts, "wintersChill", 0) / PERCENT * lv.analytic_winters_chill_casts
@@ -228,7 +228,7 @@ def _fight(
         c, d_cast, m_cast = cyc["time_s"] / casts, cyc["dmg"] / casts, cyc["mana"] / casts
     frng = spell_range(gd, main, pts, rules=o["rules"])
     flight = travel_time(gd, main, frng, analytic=True)
-    slow = frostbolt_slow(gd, pts) if frostbolt else 0.0
+    slow = frostbolt_slow(gd, pts, main) if frostbolt else 0.0
     run = mob_speed(gd, slow * e["hit"])
     t0 = c + flight + (frng - mm.melee_range) / run
     forever = o["rules"] == "forever"

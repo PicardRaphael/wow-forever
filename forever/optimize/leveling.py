@@ -19,6 +19,7 @@ from forever.engine.armor import worn_armor
 from forever.engine.buffs import hot_streak_rules
 from forever.engine.model import CharacterOverrides, GameData, Points
 from forever.engine.monsters import mob_xp
+from forever.engine.spells import best_rank
 from forever.engine.talents import check_build, legal_additions, points_available, tier_points_required
 from forever.optimize.decide import gap_dict, paired_gap, tie_break
 from forever.sim.leveling_analytic import kill_analytic
@@ -122,6 +123,8 @@ def _rotations(gd: GameData, level: int, pts: Points, rules: str) -> list[str]:
     if rules == "seed":
         return list(SEED_ROTATIONS)
     out = ["frost", "fire"]
+    if "frost_blast" in gd.spells and best_rank(gd, "frost_blast", level, pts) is not None:
+        out.append("frost_blast")  # 70450 : proposé dès qu'il est appris, comparé par le simulateur
     try:
         arcane_plan(gd, level, pts, None, None)
         out.append("arcane")

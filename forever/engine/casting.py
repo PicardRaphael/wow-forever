@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 
 from forever.engine.model import Buffs, Character, GameData, Points, Rank
+from forever.engine.spells import FROSTBOLT_LIKE
 from forever.engine.talents import talent_value
 
 # Sorts réduits par les talents (lien talent -> effet ; la réduction vient des rangs du talent).
@@ -20,7 +21,7 @@ def cast_time(gd: GameData, key: str, rank: Rank, pts: Points, ch: Character, bu
     buffs = buffs or {}
     gcd = gd.rules.gcd_s
     cast = rank.cast_time_s
-    if key == "frostbolt":
+    if key in FROSTBOLT_LIKE:  # 70450 : Frost Blast aussi
         cast -= talent_value(gd, pts, "improvedFrostbolt")
     if key in IMPROVED_FIREBALL_SPELLS:
         cast -= talent_value(gd, pts, "improvedFireball")

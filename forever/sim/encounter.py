@@ -75,7 +75,7 @@ from forever.engine.model import (
 )
 from forever.engine.monsters import MOB_SOURCES
 from forever.engine.movement import frostbite_chance, frostbite_freeze_s, spell_range, travel_time
-from forever.engine.spells import SPELL_LEVELS, best_rank
+from forever.engine.spells import FROSTBOLT_LIKE, SPELL_LEVELS, best_rank
 from forever.engine.talents import talent_value
 from forever.sim.leveling_analytic import arcane_cycle
 from forever.sim.leveling_mc import (
@@ -582,12 +582,12 @@ def encounter_fight(
             s["hs"], s["hs_exp"] = min(hs_rules[2], active + 1), end + hs_rules[0]
         if mb_on and total[2] and (chance := missile_barrage_chance(gd, pts, key)) and rng.random() < chance:
             s["mb"] = True
-        if key == "frostbolt" and total[2]:
+        if key in FROSTBOLT_LIKE and total[2]:
             if fbite and rng.random() < fbite:
                 frozen_until[tgt] = end + frostbite_freeze_s(gd)
             if fof_p and rng.random() < fof_p:
                 s["fof"] = fof_n
-        if key in ("frostbolt", "ice_lance") and total[2] and wc_max and rng.random() < wc_p:
+        if key in ("frostbolt", "frost_blast", "ice_lance") and total[2] and wc_max and rng.random() < wc_p:
             wc[tgt] = min(wc_max, wc[tgt] + 1)
         if clearcast and total[2] and rng.random() < clearcast:
             s["cc"] = True

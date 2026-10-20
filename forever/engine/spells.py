@@ -50,6 +50,8 @@ def rank_values_at_level(gd: GameData, key: str, rank: int, level: int) -> RankV
 
 
 SPELL_LEVELS = ("rank", "character")
+# 70450 (note du 15 octobre) : Frost Blast « profite de tous les talents de Frostbolt » (probable)
+FROSTBOLT_LIKE = frozenset({"frostbolt", "frost_blast"})
 
 
 def rank_damage(gd: GameData, key: str, rank: Rank, level: int, spell_level: str = "rank") -> RankValues:

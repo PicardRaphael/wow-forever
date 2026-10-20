@@ -24,7 +24,7 @@ SLOW = 0.5  # ralentissement fabriqué, différent de celui de Frostbolt
 
 def with_frost_blast(gd):
     fb = gd.spells["frostbolt"]
-    rank = replace(fb.ranks[3], position=1, level=LEARNED, cast_time_s=2.5)  # au-dessus du temps de recharge global
+    rank = fb.ranks[3]._replace(position=1, level=LEARNED, cast_time_s=2.5)  # au-dessus du temps de recharge global
     blast = replace(fb, key="frost_blast", ranks=(rank,), slow=SLOW, slow_dur=(fb.slow_dur or (5,))[:1])
     scaling = (gd.scaling["frostbolt"][3],)
     return replace(gd, spells={**gd.spells, "frost_blast": blast}, scaling={**gd.scaling, "frost_blast": scaling})
