@@ -137,3 +137,10 @@ def test_placeholder_template_covers_every_pattern_of_tooltip_values():
 def test_placeholder_template_refuses_what_tooltip_values_refuses():
     with pytest.raises(ValueError):
         placeholder_template("$?s123[a][b]", resolver({}))
+
+
+def test_placeholder_template_shows_durations_in_seconds():
+    """`$d` s'affiche « N sec » dans le client (Arcane Blast de 70450 : « lasts 15 sec from time of initial
+    application ») : le gabarit garde l'unité."""
+    out = placeholder_template("lasts $d from now", resolver({(None, "d", 0): [15]}))
+    assert out == "lasts {0} sec from now"

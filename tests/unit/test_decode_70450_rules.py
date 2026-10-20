@@ -110,8 +110,9 @@ def test_new_spell_fields_from_the_client():
 
 
 def test_decoded_talents_carry_the_repository_template(candidate):
-    """Chaque talent décodé porte `desc_template` : son infobulle au gabarit du dépôt (`{i}`), autant de variables
-    que de valeurs lues (`tooltip_values`), plus aucun `$` (fixtures wago de 1.60.1.70009)."""
+    """Chaque talent décodé porte `desc_template` : son infobulle au gabarit du dépôt, `{i}` numérotant les valeurs
+    retenues par rang (`ranks`, comme les gabarits du seed : Winter's Chill garde « 2% for 15 sec » en clair), plus
+    aucun `$` (fixtures wago de 1.60.1.70009)."""
     import json
     import re
 
@@ -123,7 +124,20 @@ def test_decoded_talents_carry_the_repository_template(candidate):
         for t in tree["talents"]:
             template = t["desc_template"]
             assert "$" not in template, t["key"]
-            numbers = [int(n) for n in re.findall(r"\{(\d+)\}", template)]
-            assert numbers == list(range(len(t["tooltip_values"][0]))), t["key"]
+            numbers = sorted({int(n) for n in re.findall(r"\{(\d+)\}", template)})
+            assert numbers == list(range(len(t["ranks"][0]))), t["key"]
             checked += 1
     assert checked > 0
+
+
+
+def test_rank_template_numbers_the_selected_values():
+    """Gabarit tiré des variables de l'infobulle ramené aux valeurs retenues (`rank_variables`) : une variable retenue
+    garde sa place dans `ranks`, une variable constante non retenue s'écrit en clair ; non constante, pas de gabarit
+    (le dépôt garde le sien)."""
+    from forever.pipeline.decode import rank_template
+
+    tooltip = [[20, 40, 5], [40, 40, 5]]
+    assert rank_template("a {0}% b {1}% c {2} times", tooltip, [0, 2]) == "a {0}% b 40% c {1} times"
+    assert rank_template("a {0} b {1}", [[1, 2], [3, 4]], None) == "a {0} b {1}"
+    assert rank_template("a {0} b {1}", [[1, 2], [3, 5]], [0]) is None
