@@ -587,3 +587,19 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   Priorité : moyenne. Registre L3.
 
 - **RTE8** (2026-10-16, bloc 4d) : le réseau de marche ne mène pas au donneur Bink dans Ironforge (Tinker Town) : trajet infini depuis Dun Morogh, donc Mage-tastic Gizmonitor (quête de classe du Mage, récompenses Arcane Staff et Arcane Orb) n'entre dans aucune route, même imposée. À vérifier : entrée d'Ironforge et passages intérieurs dans le réseau de Journeys, autres donneurs des capitales. **Réponse partielle (2026-10-19, révision 8)** : cause trouvée : le nœud du réseau le plus proche sur la carte est une poche isolée (autre étage : la hauteur n'est pas lue) à 10 yards d'un nœud du réseau principal ; Journeys part du polygone de navigation sous le point, que nous ne lisons pas. Repli voulu par l'utilisateur : dans les six capitales (`route.cities`), ligne droite allongée depuis le nœud atteint le plus proche (`suppose`) ; Bink est joint, 76 donneurs des capitales le sont (contrôle sur les vraies données). Reste ouvert : lire les tuiles de navigation de Journeys (hauteur et polygones) pour un trajet exact dans les villes.
+
+## Réputations (étude du 2026-10-20, `docs/research/reputations-forever.md`)
+- **REP1** : gain de réputation par monstre tué et palier où il cesse : règle du serveur, aucune source locale.
+- **REP2** : seuils des paliers à Forever (Haï à Exalté) : ceux de Classic sont supposés, le client ne les porte pas.
+- **REP3** : montants des quêtes des 14 factions propres à Forever : Forever Guide donne la faction sans montant, Questie
+  n'a que les factions de Classic.
+- **REP4** : sens de « Legacy Reputation Reward » (sort 1324722) et des réputations des objectifs Legacy (voir LEG1).
+- **REP5** : disposition des champs de réputation de `questcache.wdb` (indices de `QuestFactionReward` ou montants) :
+  source possible des gains des quêtes vues par le client.
+
+## Notes du 15 octobre (`docs/research/notes-blizzard-2026-10-15.md`)
+- **NOT1** : la note donne deux textes pour Winter's Chill (dégâts de Cone of Cold +40 % par cumul, ou +5 % et une part
+  de la puissance des sorts, 5 cumuls) ; les tables de 70450 portent 40 par cumul et 5 cumuls : le premier est retenu
+  (`probable`), le second reste à vérifier en jeu.
+- **NOT2** : Ruthless (Humain) et Savage (Orc) : la note dit « toute arme » ; les tables de 70450 gardent l'aura de
+  critique de l'ancien racial d'arme (290), sans restriction d'arme lue : à vérifier en jeu (fenêtre du personnage).
