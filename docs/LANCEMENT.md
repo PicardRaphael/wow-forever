@@ -203,7 +203,12 @@ correction passe devant le reste.
 13. En jeu, la fenêtre du personnage : Ruthless (Humain) ou Savage (Orc) comptés au critique des sorts avec toute arme
     (question NOT2) ; Eureka! (Gnome) : 8 s d'effet, 2 min de recharge.
 14. Arcane Blast : l'aura dure 15 s depuis le premier lancer et n'est pas consommée par Arcane Missiles ; Winter's
-    Chill n'augmente plus le critique de Frostbolt (infobulle du débuff sur la cible).
+    Chill n'augmente plus le critique de Frostbolt (infobulle du débuff sur la cible). Les descriptions de talents
+    du pont (Arcane Blast, Winter's Chill, Fire Power, Missile Barrage, Arcane Wrath) sont celles des infobulles du
+    jeu (révisions 3 à 5).
+    Données installées **sans correctifs du serveur** (pas de session possible avant la sortie) : une fois connecté,
+    `forever update status` dit l'écriture en attente ; la lancer, puis rejouer les builds
+    (`scripts/replay_builds.py`) si elle change une valeur du Mage.
 
 ### 6. Fin
 15. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
