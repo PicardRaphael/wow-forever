@@ -27,7 +27,7 @@ M.TOOLTIP_CHARS = 120
 M.LINK_KINDS = { item = true, spell = true, quest = true, talent = true }
 M.KEYS = { "name", "realm", "level", "class", "race", "faction", "zone", "subzone", "map", "x", "y", "talents", "gear",
 	"target", "target_level", "target_race", "client", "links", "rested", "resting", "xp_auras", "xp_items",
-	"professions", "role", "eui", "eui_base" }
+	"professions", "role", "eui", "eui_base", "reputations" }
 -- T04f (0.2.0) : auras du joueur relevées (au plus MAX_AURAS, parmi les AURA_SCAN premières), filtrées par la liste
 -- que le pont écrit dans Status.lua (ForeverBridgeStatus.xp, identifiants lus dans les données, jamais écrits ici).
 M.MAX_AURAS = 16
@@ -356,6 +356,68 @@ function M.Professions()
 	return table.concat(out, ",")
 end
 
+-- CJ1 (bloc 6b) : réputations du panneau du personnage, dans son ordre (groupes compris) : { name, id, reaction,
+-- standing, header } ; C_Reputation d'abord, sinon l'ancienne API (comme Forever Guide), chaque appel sous pcall ;
+-- nil si l'API manque ou échoue. Un groupe replié ne montre pas ses factions (on ne déplie rien).
+M.MAX_REPUTATIONS = 120
+
+local function repRow(name, id, reaction, standing, header)
+	if type(name) ~= "string" or isSecret(name) or isSecret(id) or isSecret(reaction) or isSecret(standing) then
+		return nil
+	end
+	return { name = name, id = type(id) == "number" and id or nil, reaction = type(reaction) == "number" and reaction
+		or nil, standing = type(standing) == "number" and standing or nil, header = header == true }
+end
+
+function M.Reputations()
+	local rep = C_Reputation
+	local modern = type(rep) == "table" and type(rep.GetNumFactions) == "function"
+		and type(rep.GetFactionDataByIndex) == "function"
+	local count = modern and safe(rep.GetNumFactions) or safe(GetNumFactions)
+	if type(count) ~= "number" or (not modern and type(GetFactionInfo) ~= "function") then
+		return nil
+	end
+	local out = {}
+	for index = 1, math.min(count, M.MAX_REPUTATIONS) do
+		local row
+		if modern then
+			local ok, d = pcall(rep.GetFactionDataByIndex, index)
+			if not ok then
+				return nil
+			end
+			if type(d) == "table" then
+				local header = d.isHeader == true and d.isHeaderWithRep ~= true
+				row = repRow(d.name, d.factionID, d.reaction, d.currentStanding, header)
+			end
+		else
+			local ok, name, _, reaction, _, _, value, _, _, isHeader, _, hasRep, _, _, id =
+				pcall(GetFactionInfo, index)
+			if not ok then
+				return nil
+			end
+			row = repRow(name, id, reaction, value, isHeader == true and hasRep ~= true)
+		end
+		if row then
+			out[#out + 1] = row
+		end
+	end
+	return #out > 0 and out or nil
+end
+
+-- Réputations envoyées au pont : « faction:palier:réputation » (entiers), factions seulement, séparées par des virgules.
+function M.ReputationsText(rows)
+	if type(rows) ~= "table" then
+		return nil
+	end
+	local out = {}
+	for _, row in ipairs(rows) do
+		if not row.header and row.id and row.reaction and row.standing then
+			out[#out + 1] = string.format("%d:%d:%d", row.id, row.reaction, row.standing)
+		end
+	end
+	return #out > 0 and table.concat(out, ",") or nil
+end
+
 -- CJ1 : position du joueur sur sa carte, en pourcentage avec une décimale (départ réel d'une feuille de route) ;
 -- nil, nil si l'API manque, échoue ou rend une valeur secrète (instance, restriction).
 function M.Position(mapId)
@@ -434,6 +496,7 @@ function M.Context()
 		put("eui", "on") -- CJ1 (décision 274) : EllesmereUI rallumé par le joueur (/fb eui on)
 	end
 	put("eui_base", M.Base())
+	put("reputations", M.ReputationsText(M.Reputations()))
 	return ctx, pieces
 end
 

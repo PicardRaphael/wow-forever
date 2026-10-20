@@ -8,7 +8,7 @@ Factions, paliers et valeurs inventés pour le test ; libellés des paliers four
 
 import pytest
 from test_bridge_addon_lua import Game
-from test_bridge_window6_lua import click, opened, text, visible
+from test_bridge_window6_lua import click, g, opened, text, visible
 
 from forever.bridge.codec import decode_band
 from forever.bridge.context import reputations_context
@@ -111,3 +111,22 @@ def test_faction_list_hidden_for_the_other_route_types():
     assert visible(game, "ForeverBridgeRepRow1")
     click(game, "ForeverBridgeRouteType_leveling")
     assert not visible(game, "ForeverBridgeRepRow1") and not visible(game, "ForeverBridgeRepTargetValue")
+
+
+def test_reputation_screen_fits_the_smallest_window():
+    """Fenêtre au plus petit (520 × 380, bloc 6a) : la liste, le palier visé et le message tiennent dans l'écran."""
+    from test_bridge_window6_lua import resize
+
+    game = opened(prelude=REPS)
+    resize(game, 520, 380)
+    click(game, "ForeverBridgeNav_route")
+    click(game, "ForeverBridgeRouteType_reputation")
+    screen = g(game, "ForeverBridgeScreen_route")
+    width, height = 520 - 150 - 14, 380 - 52 - 16  # fenêtre moins barre latérale, en-tête et marges (Screens.lua)
+    for name in ("ForeverBridgeRepRow5", "ForeverBridgeRepChosen", "ForeverBridgeRepTargetUp",
+                 "ForeverBridgeRouteUnavailable", "ForeverBridgeRepNext"):  # fmt: skip
+        widget = g(game, name)
+        point = widget.points[1]
+        assert game.lua.eval("rawequal")(point.rel, screen), name
+        assert point.x + widget.GetWidth(widget) <= width, name
+        assert -point.y + (widget.GetHeight(widget) or 0) <= height, name

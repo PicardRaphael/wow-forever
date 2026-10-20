@@ -41,6 +41,8 @@ local NOT_COMPUTED = {
 }
 
 local S = { screens = {}, nav = {}, exportRows = {} }
+local REP_ROWS = 5 -- lignes de la liste des factions montrées à la fois (réglage d'interface)
+local REP_ROW_H = 20
 
 local function Player()
 	local okName, name = pcall(UnitName, "player")
@@ -137,6 +139,156 @@ end
 -- Feuille de route : type, niveaux, options ; même demande que le chat
 ---------------------------------------------------------------------------
 
+---------------------------------------------------------------------------
+-- Réputation (bloc 6b, décision 281) : factions du panneau du personnage, groupées comme dans le jeu, filtrables
+-- par groupe, puis le palier visé ; ni niveaux ni champ libre. Libellés des paliers : ceux du client.
+---------------------------------------------------------------------------
+
+local function StandingLabel(reaction)
+	local label = type(reaction) == "number" and _G["FACTION_STANDING_LABEL" .. reaction]
+	return type(label) == "string" and label or tostring(reaction or "?")
+end
+
+-- Dernier palier connu du client (libellés FACTION_STANDING_LABEL<n> présents), jamais un nombre écrit ici.
+local function TopStanding()
+	local top = 1
+	while type(_G["FACTION_STANDING_LABEL" .. (top + 1)]) == "string" do
+		top = top + 1
+	end
+	return top
+end
+
+function S.BuildReputation(screen, state)
+	local group = Button("ForeverBridgeRepGroup", screen, "", 220)
+	Place(group, screen, 0, -3 * ROW)
+	group:SetScript("OnClick", function()
+		state.repGroup = ((state.repGroup or 0) + 1) % (#(state.repGroups or {}) + 1)
+		state.repPage = 0
+		S.RefreshReputation(true)
+	end)
+	local page = Button("ForeverBridgeRepNext", screen, "Suite >", 80)
+	Place(page, screen, 226, -3 * ROW)
+	page:SetScript("OnClick", function()
+		state.repPage = (state.repPage or 0) + 1
+		S.RefreshReputation(true)
+	end)
+	S.repRows = {}
+	for i = 1, REP_ROWS do
+		local row = Button("ForeverBridgeRepRow" .. i, screen, "", 340)
+		row:SetHeight(REP_ROW_H)
+		Place(row, screen, 0, -4 * ROW - (i - 1) * REP_ROW_H)
+		row:SetScript("OnClick", function(self)
+			local chosen = self.faction
+			if chosen then
+				state.repChosen = chosen
+				state.repTarget = math.min((chosen.reaction or 0) + 1, TopStanding())
+				S.RefreshReputation(true)
+			end
+		end)
+		S.repRows[i] = row
+	end
+	local y = -4 * ROW - REP_ROWS * REP_ROW_H - 6
+	local chosen = Text("ForeverBridgeRepChosen", screen)
+	Place(chosen, screen, 0, y)
+	chosen:SetWidth(340)
+	local targetLabel = Text("ForeverBridgeRepTargetLabel", screen)
+	Place(targetLabel, screen, 0, y - 26)
+	targetLabel:SetText("Palier visé")
+	local down = Button("ForeverBridgeRepTargetDown", screen, "<", 26)
+	local value = Text("ForeverBridgeRepTargetValue", screen)
+	local up = Button("ForeverBridgeRepTargetUp", screen, ">", 26)
+	Place(down, screen, 90, y - 22)
+	Place(value, screen, 124, y - 26)
+	value:SetWidth(110)
+	Place(up, screen, 240, y - 22)
+	down:SetScript("OnClick", function()
+		if state.repChosen then
+			state.repTarget = math.max((state.repChosen.reaction or 0) + 1, (state.repTarget or 1) - 1)
+			S.RefreshReputation(true)
+		end
+	end)
+	up:SetScript("OnClick", function()
+		if state.repChosen then
+			state.repTarget = math.min(TopStanding(), (state.repTarget or 1) + 1)
+			S.RefreshReputation(true)
+		end
+	end)
+	S.repWidgets = { group, page, chosen, targetLabel, down, value, up }
+	S.repState = state
+end
+
+function S.RefreshReputation(shown)
+	if not S.repWidgets then
+		return
+	end
+	local state = S.repState
+	for _, widget in ipairs(S.repWidgets) do
+		widget:SetShown(shown)
+	end
+	for _, row in ipairs(S.repRows) do
+		row:SetShown(false)
+	end
+	if not shown then
+		return
+	end
+	local Message = ForeverBridge_Message
+	local all = type(Message) == "table" and type(Message.Reputations) == "function" and Message.Reputations() or nil
+	local chosen, value = _G.ForeverBridgeRepChosen, _G.ForeverBridgeRepTargetValue
+	if not all then
+		chosen:SetText("Aucune réputation lue en jeu (panneau de réputation indisponible).")
+		for _, name in ipairs({ "ForeverBridgeRepGroup", "ForeverBridgeRepNext", "ForeverBridgeRepTargetLabel",
+			"ForeverBridgeRepTargetDown", "ForeverBridgeRepTargetValue", "ForeverBridgeRepTargetUp" }) do
+			_G[name]:SetShown(false)
+		end
+		return
+	end
+	-- groupes : en-têtes du panneau, dans leur ordre ; filtre 0 = tous
+	state.repGroups = {}
+	for _, row in ipairs(all) do
+		if row.header then
+			state.repGroups[#state.repGroups + 1] = row.name
+		end
+	end
+	local wanted = state.repGroups[state.repGroup or 0]
+	local rows, current = {}, nil
+	for _, row in ipairs(all) do
+		if row.header then
+			current = row.name
+		end
+		if not wanted or current == wanted then
+			rows[#rows + 1] = row
+		end
+	end
+	_G.ForeverBridgeRepGroup:SetText("Groupe : " .. (wanted and wanted:gsub("|", "||") or "tous"))
+	local pages = math.max(1, math.ceil(#rows / REP_ROWS))
+	state.repPage = (state.repPage or 0) % pages
+	_G.ForeverBridgeRepNext:SetShown(pages > 1)
+	for i, widget in ipairs(S.repRows) do
+		local row = rows[state.repPage * REP_ROWS + i]
+		widget.faction = nil
+		if row then
+			local name = row.name:gsub("|", "||")
+			if row.header then
+				widget:SetText(name)
+				widget:Disable()
+			else
+				widget:SetText("  " .. name .. " — " .. StandingLabel(row.reaction))
+				widget:Enable()
+				widget.faction = row
+			end
+			widget:SetShown(true)
+		end
+	end
+	if state.repChosen then
+		chosen:SetText("Faction choisie : " .. state.repChosen.name:gsub("|", "||") .. " · palier actuel : "
+			.. StandingLabel(state.repChosen.reaction))
+		value:SetText(StandingLabel(state.repTarget))
+	else
+		chosen:SetText("Choisissez une faction dans la liste, puis le palier visé.")
+		value:SetText("—")
+	end
+end
+
 local function BuildRoute(screen)
 	local state = { kind = "leveling", dungeons = true, class = true }
 	S.route = state
@@ -194,8 +346,9 @@ local function BuildRoute(screen)
 
 	local unavailable = Text("ForeverBridgeRouteUnavailable", screen)
 	Place(unavailable, screen, 0, -3 * ROW - 4)
-	unavailable:SetWidth(460)
-	S.routeUnavailable = unavailable
+	unavailable:SetWidth(340)
+	S.routeUnavailable, S.routeScreen = unavailable, screen
+	S.BuildReputation(screen, state)
 
 	local compute = Button("ForeverBridgeRouteCompute", screen, "Calculer", 120)
 	Place(compute, screen, 0, -6 * ROW - 6)
@@ -249,6 +402,11 @@ function FB.RefreshRoute()
 	ShowStepper("ForeverBridgeRouteTo", computed)
 	S.routeUnavailable:SetText(NOT_COMPUTED[state.kind] or "")
 	S.routeUnavailable:SetShown(not computed)
+	local reputation = state.kind == "reputation"
+	-- réputation : le message vient sous la liste des factions et le palier visé
+	Place(S.routeUnavailable, S.routeScreen, 0, reputation and (-4 * ROW - REP_ROWS * REP_ROW_H - 64)
+		or (-3 * ROW - 4))
+	S.RefreshReputation(reputation)
 	S.routeFrom()
 	S.routeTo()
 end

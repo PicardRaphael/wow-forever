@@ -131,6 +131,7 @@ class Resolved:
     pieces: list[GearPiece] = field(default_factory=list)  # pièces complètes (enchantement, suffixe ; P06b)
     xp: XpContext | None = None  # T04f : repos, auras d'XP, objets surveillés (ForeverBridge 0.2.0)
     professions: dict[str, int] | None = None  # RX1 : métiers et rang (ForeverBridge 0.3.0)
+    reputations: dict[int, tuple[int, int]] | None = None  # CJ1 (6b) : faction -> (palier, réputation)
     map: int | None = None  # CJ1 : carte du joueur (uiMapID)
     x: float | None = None  # CJ1 : position sur la carte, en pourcentage
     y: float | None = None
@@ -234,6 +235,7 @@ def resolve(data: ContextData, context: Mapping[str, str]) -> Resolved:
         pieces=pieces,
         xp=xp_context(context),
         professions=professions_context(context),
+        reputations=reputations_context(context),
         map=_int(context.get("map")),
         x=_pct(context.get("x")),
         y=_pct(context.get("y")),
@@ -305,6 +307,21 @@ def xp_context(context: Mapping[str, str]) -> XpContext:
             items[int(key)] = int(count)
     resting = {"1": True, "0": False}.get(context.get("resting") or "")
     return XpContext(rested=_float(context.get("rested")), resting=resting, auras=tuple(auras), items=items)
+
+
+def reputations_context(context: Mapping[str, str]) -> dict[int, tuple[int, int]] | None:
+    """CJ1 (bloc 6b) : réputations envoyées par ForeverBridge (`faction:palier:réputation`, entiers, séparées par des
+    virgules ; panneau de réputation du personnage) -> identifiant de faction -> (palier, réputation) ; None si le jeu
+    ne les a pas envoyées ; une entrée illisible est ignorée."""
+    raw = context.get("reputations")
+    if not raw:
+        return None
+    out: dict[int, tuple[int, int]] = {}
+    for entry in raw.split(","):
+        parts = entry.split(":")
+        if len(parts) == 3 and parts[0].isdigit() and parts[1].isdigit() and parts[2].lstrip("-").isdigit():
+            out[int(parts[0])] = (int(parts[1]), int(parts[2]))
+    return out
 
 
 def professions_context(context: Mapping[str, str]) -> dict[str, int] | None:

@@ -68,6 +68,7 @@ CONTEXT_KEYS = (
     "role",
     "eui",  # CJ1 (décision 274) : « on » quand le joueur a rallumé EllesmereUI (/fb eui on)  # EX1 (ForeverBridge 0.4.0) : rôle choisi par le joueur (/fb role), dps, heal ou tank
     "eui_base",  # EX1 (décision 269) : profil de base EllesmereUI choisi pour le personnage (/fb base)
+    "reputations",  # CJ1 (bloc 6b) : réputations « faction:palier:réputation », séparées par des virgules
 )
 
 
