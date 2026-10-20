@@ -208,7 +208,11 @@ class _Merge:
                 continue
             if not self._confirmed_field(TALENTS, "talent", key, None, None, key, source):
                 continue
-            added = {**{k: v for k, v in extra.items() if k != "certainty"}, "certainty": f"FC-{self.build}"}
+            added = {
+                **{k: v for k, v in extra.items() if k not in ("certainty", "desc_template")},
+                "certainty": f"FC-{self.build}",
+            }
+            added["desc"] = extra.get("desc_template", extra.get("desc", ""))  # gabarit du dépôt ({i}), brut en source
             added["source"] = self._talent_source(extra)
             for tree in doc["trees"]:  # 70450 : talent ajouté, tranché « client » (Arcane Wrath)
                 if tree["name"] == extra.get("tree", tree["name"]):
@@ -290,6 +294,11 @@ class _Merge:
                     self.add(
                         TALENTS, f"{key}.tooltip_values", None, out["tooltip_values"], source, "certain", "added_field"
                     )
+                continue
+            if f == "desc" and "$" in str(v) and "$" not in str(c.get("desc_template", "$")):
+                # 70450 : gabarit brut du client installé (talent ajouté en r1) remplacé par le gabarit du dépôt
+                self.add(TALENTS, f"{key}.desc", v, c["desc_template"], source, "certain", "metadata")
+                out[f] = c["desc_template"]
                 continue
             if f == "certainty":
                 if v != certainty:

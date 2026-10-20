@@ -46,7 +46,7 @@ from forever.pipeline.pets import PETS_FILE, decode_pets, load_pet_tables, own_p
 from forever.pipeline.quest_rewards import QUEST_FILE, decode_quest_rewards, load_quest_tables, quest_table_files
 from forever.pipeline.questcache import QuestCache, read_questcache
 from forever.pipeline.tables import Row, read_table
-from forever.pipeline.tooltip import half_up, normalize, tooltip_values
+from forever.pipeline.tooltip import half_up, normalize, placeholder_template, tooltip_values
 from forever.pipeline.travel_client import TRAVEL_FILE, decode_travel, load_travel_tables, travel_table_files
 from forever.pipeline.xp_bonuses import (
     XP_BONUS_FILE,
@@ -381,6 +381,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
         key = talent_key(name)
         max_rank = int(entry["MaxRanks"])
         values: list[list[int | float]] = []
+        template = desc
         for rank in range(1, max_rank + 1):
             overrides: dict[int, float] = {}
             for p in points.get(int(definition["ID"]), []):
@@ -391,9 +392,10 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
                     raise DataSchemaError(f"{key} : courbe {p['CurveID']} sans valeur au rang {rank}.")
                 overrides[int(p["EffectIndex"])] = curve[float(rank)]
             try:
-                values.append(
-                    tooltip_values(desc, client.resolver(spell, rules["levels"]["talent_tooltip"], overrides))
-                )
+                resolve = client.resolver(spell, rules["levels"]["talent_tooltip"], overrides)
+                values.append(tooltip_values(desc, resolve))
+                if rank == 1:
+                    template = placeholder_template(desc, resolve)
             except ValueError as exc:
                 raise DataSchemaError(f"Infobulle du talent {key} (sort {spell}, rang {rank}) : {exc}.") from exc
         ranks = _select(key, values, rules.get("rank_variables", {}).get(key))
@@ -408,6 +410,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "ranks": ranks,
             "tooltip_values": values,
             "desc": desc,
+            "desc_template": template,  # 70450 : gabarit du dépôt ({i}) d'un talent ajouté par la fusion
             "spellIds": [spell],
             "prereq": None,
             "certainty": f"FC-{version}",
@@ -1473,7 +1476,8 @@ def decode_spells(
     doc["source"] = f"Client {version} : tables Spell* et SkillLineAbility (wago.tools) décodées par forever decode"
     for key, name in rules["spells"].items():
         if key not in found:
-            continue  # sort nouveau absent de ce client
+            doc["spells"].pop(key, None)  # sort nouveau absent de ce client : jamais repris de la version héritée
+            continue
         ids = found[key]
         entry = dict(doc["spells"].get(key, {}))
         if (

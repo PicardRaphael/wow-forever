@@ -16,7 +16,7 @@ from __future__ import annotations
 import ast
 import math
 import re
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Iterator, Sequence
 
 Resolver = Callable[[int | None, str, int], Sequence[float]]
 """(sort cité, None pour le sort de l'infobulle ; lettre en minuscule sauf M ; indice d'effet à partir de 0)
@@ -94,11 +94,12 @@ def _expression(body: str, resolve: Resolver) -> float:
     return _evaluate(expression)
 
 
-def tooltip_values(template: str, resolve: Resolver) -> list[int | float]:
-    """Valeurs affichées par l'infobulle, dans l'ordre d'apparition des variables."""
-    out: list[int | float] = []
+def _tokens(template: str, resolve: Resolver) -> Iterator[tuple[int, int, list[int | float], str]]:
+    """Variables de l'infobulle dans l'ordre d'apparition : (début, fin, valeurs affichées, texte affiché à la place
+    pour `$lsingulier:pluriel;`, vide sinon)."""
     i = 0
     while (start := template.find("$", i)) != -1:
+        token = start
         rest = template[start + 1 :]
         if rest.startswith("{"):
             end = rest.find("}")
@@ -111,10 +112,11 @@ def tooltip_values(template: str, resolve: Resolver) -> list[int | float]:
             if decimals:
                 places = int(decimals[1])
                 i = decimals.end()
-            out.append(normalize(half_up(value, places)))
+            yield token, i, [normalize(half_up(value, places))], ""
             continue
         if rest[:1] in ("l", "L") and ":" in rest and ";" in rest:
             i = start + 1 + rest.index(";") + 1  # texte singulier / pluriel
+            yield token, i, [], rest[rest.index(":") + 1 : rest.index(";")]
             continue
         divisor = 1
         if divide := _DIVIDE.match(rest):
@@ -124,6 +126,25 @@ def tooltip_values(template: str, resolve: Resolver) -> list[int | float]:
         var = _VAR.match(rest)
         if not var:
             raise ValueError(f"motif d'infobulle non pris en charge : {template[start : start + 12]}")
-        out += [normalize(abs(v) / divisor) for v in _values(resolve, var[1], var[2], var[3])]
         i = start + 1 + var.end()
-    return out
+        yield token, i, [normalize(abs(v) / divisor) for v in _values(resolve, var[1], var[2], var[3])], ""
+
+
+def tooltip_values(template: str, resolve: Resolver) -> list[int | float]:
+    """Valeurs affichées par l'infobulle, dans l'ordre d'apparition des variables."""
+    return [v for _start, _end, values, _text in _tokens(template, resolve) for v in values]
+
+
+def placeholder_template(template: str, resolve: Resolver) -> str:
+    """Infobulle au gabarit du dépôt : la i-ème valeur de `tooltip_values` devient `{i}`, une variable à variance
+    (minimum et maximum) `{i} to {i+1}` comme l'affiche le client, `$lsingulier:pluriel;` son pluriel (70450 : talent
+    ajouté par la fusion)."""
+    out: list[str] = []
+    i = n = 0
+    for start, end, values, text in _tokens(template, resolve):
+        out.append(template[i:start])
+        out.append(" to ".join(f"{{{n + k}}}" for k in range(len(values))) if values else text)
+        n += len(values)
+        i = end
+    out.append(template[i:])
+    return "".join(out)
