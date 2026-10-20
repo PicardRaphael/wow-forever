@@ -1,0 +1,3976 @@
+{
+ "schema_version": 1,
+ "build": "1.60.1.70450",
+ "nodes": [
+  {
+   "id": 1,
+   "name": "Northshire Abbey",
+   "continent": 0,
+   "x": -8888.98046875,
+   "y": -0.54000002146,
+   "z": 94.38999938965,
+   "faction": null
+  },
+  {
+   "id": 2,
+   "name": "Stormwind, Elwynn",
+   "continent": 0,
+   "x": -8832.76953125,
+   "y": 478.62298583984,
+   "z": 109.61599731445,
+   "faction": "alliance"
+  },
+  {
+   "id": 3,
+   "name": "Programmer Isle",
+   "continent": 0,
+   "x": 16391.810546875,
+   "y": 16341.209960938,
+   "z": 69.44000244141,
+   "faction": null
+  },
+  {
+   "id": 4,
+   "name": "Sentinel Hill, Westfall",
+   "continent": 0,
+   "x": -10628.889648438,
+   "y": 1036.6800537109,
+   "z": 34.06000137329,
+   "faction": "alliance"
+  },
+  {
+   "id": 5,
+   "name": "Lakeshire, Redridge",
+   "continent": 0,
+   "x": -9429.099609375,
+   "y": -2231.3999023438,
+   "z": 68.65000152588,
+   "faction": "alliance"
+  },
+  {
+   "id": 6,
+   "name": "Ironforge, Dun Morogh",
+   "continent": 0,
+   "x": -4821.7797851562,
+   "y": -1155.4399414062,
+   "z": 502.20999145508,
+   "faction": "alliance"
+  },
+  {
+   "id": 7,
+   "name": "Menethil Harbor, Wetlands",
+   "continent": 0,
+   "x": -3792.2600097656,
+   "y": -783.28997802734,
+   "z": 9.06000041962,
+   "faction": "alliance"
+  },
+  {
+   "id": 8,
+   "name": "Thelsamar, Loch Modan",
+   "continent": 0,
+   "x": -5421.91015625,
+   "y": -2930.0100097656,
+   "z": 347.25,
+   "faction": "alliance"
+  },
+  {
+   "id": 9,
+   "name": "Booty Bay, Stranglethorn",
+   "continent": 0,
+   "x": -14271.76953125,
+   "y": 299.86999511719,
+   "z": 31.09000015259,
+   "faction": null
+  },
+  {
+   "id": 10,
+   "name": "The Sepulcher, Silverpine Forest",
+   "continent": 0,
+   "x": 478.85998535156,
+   "y": 1536.5899658203,
+   "z": 131.32000732422,
+   "faction": "horde"
+  },
+  {
+   "id": 11,
+   "name": "Undercity, Tirisfal",
+   "continent": 0,
+   "x": 1568.6199951172,
+   "y": 267.9700012207,
+   "z": -43.09999847412,
+   "faction": "horde"
+  },
+  {
+   "id": 12,
+   "name": "Darkshire, Duskwood",
+   "continent": 0,
+   "x": -10515.459960938,
+   "y": -1261.6500244141,
+   "z": 41.34000015259,
+   "faction": "alliance"
+  },
+  {
+   "id": 13,
+   "name": "Tarren Mill, Hillsbrad",
+   "continent": 0,
+   "x": -0.05999999866,
+   "y": -859.90997314453,
+   "z": 58.83000183105,
+   "faction": "horde"
+  },
+  {
+   "id": 14,
+   "name": "Southshore, Hillsbrad",
+   "continent": 0,
+   "x": -711.47998046875,
+   "y": -515.47998046875,
+   "z": 26.11000061035,
+   "faction": "alliance"
+  },
+  {
+   "id": 15,
+   "name": "Eastern Plaguelands",
+   "continent": 0,
+   "x": 2253.3999023438,
+   "y": -5344.8999023438,
+   "z": 83.37999725342,
+   "faction": null
+  },
+  {
+   "id": 16,
+   "name": "Refuge Pointe, Arathi",
+   "continent": 0,
+   "x": -1240.5300292969,
+   "y": -2515.1101074219,
+   "z": 22.15999984741,
+   "faction": "alliance"
+  },
+  {
+   "id": 17,
+   "name": "Hammerfall, Arathi",
+   "continent": 0,
+   "x": -916.28997802734,
+   "y": -3496.8898925781,
+   "z": 70.44999694824,
+   "faction": "horde"
+  },
+  {
+   "id": 18,
+   "name": "Booty Bay, Stranglethorn",
+   "continent": 0,
+   "x": -14444.290039062,
+   "y": 509.61999511719,
+   "z": 26.20000076294,
+   "faction": "horde"
+  },
+  {
+   "id": 19,
+   "name": "Booty Bay, Stranglethorn",
+   "continent": 0,
+   "x": -14473.049804688,
+   "y": 464.14999389648,
+   "z": 36.43000030518,
+   "faction": "alliance"
+  },
+  {
+   "id": 20,
+   "name": "Grom'gol, Stranglethorn",
+   "continent": 0,
+   "x": -12414.1796875,
+   "y": 146.28999328613,
+   "z": 3.27999997139,
+   "faction": "horde"
+  },
+  {
+   "id": 21,
+   "name": "Kargath, Badlands",
+   "continent": 0,
+   "x": -6633.990234375,
+   "y": -2180.0500488281,
+   "z": 244.13999938965,
+   "faction": "horde"
+  },
+  {
+   "id": 22,
+   "name": "Thunder Bluff, Mulgore",
+   "continent": 1,
+   "x": -1197.2099609375,
+   "y": 29.70999908447,
+   "z": 176.94999694824,
+   "faction": "horde"
+  },
+  {
+   "id": 23,
+   "name": "Orgrimmar, Durotar",
+   "continent": 1,
+   "x": 1677.5899658203,
+   "y": -4315.7099609375,
+   "z": 61.16999816895,
+   "faction": "horde"
+  },
+  {
+   "id": 24,
+   "name": "Generic, World target for Zeppelin Paths",
+   "continent": 0,
+   "x": -6666.0,
+   "y": -2222.3000488281,
+   "z": 278.60000610352,
+   "faction": null
+  },
+  {
+   "id": 25,
+   "name": "Crossroads, The Barrens",
+   "continent": 1,
+   "x": -441.79998779297,
+   "y": -2596.080078125,
+   "z": 96.05999755859,
+   "faction": "horde"
+  },
+  {
+   "id": 26,
+   "name": "Auberdine, Darkshore",
+   "continent": 1,
+   "x": 6341.3798828125,
+   "y": 557.67999267578,
+   "z": 16.29000091553,
+   "faction": "alliance"
+  },
+  {
+   "id": 27,
+   "name": "Rut'theran Village, Teldrassil",
+   "continent": 1,
+   "x": 8643.58984375,
+   "y": 841.04998779297,
+   "z": 23.29999923706,
+   "faction": "alliance"
+  },
+  {
+   "id": 28,
+   "name": "Astranaar, Ashenvale",
+   "continent": 1,
+   "x": 2827.3400878906,
+   "y": -289.23999023438,
+   "z": 107.16000366211,
+   "faction": "alliance"
+  },
+  {
+   "id": 29,
+   "name": "Sun Rock Retreat, Stonetalon Mountains",
+   "continent": 1,
+   "x": 966.57000732422,
+   "y": 1040.3199462891,
+   "z": 104.26999664307,
+   "faction": "horde"
+  },
+  {
+   "id": 30,
+   "name": "Freewind Post, Thousand Needles",
+   "continent": 1,
+   "x": -5407.7099609375,
+   "y": -2414.3000488281,
+   "z": 90.31999969482,
+   "faction": "horde"
+  },
+  {
+   "id": 31,
+   "name": "Thalanaar, Feralas",
+   "continent": 1,
+   "x": -4491.8798828125,
+   "y": -775.89001464844,
+   "z": -39.52000045776,
+   "faction": "alliance"
+  },
+  {
+   "id": 32,
+   "name": "Theramore, Dustwallow Marsh",
+   "continent": 1,
+   "x": -3825.3701171875,
+   "y": -4516.580078125,
+   "z": 10.43999958038,
+   "faction": "alliance"
+  },
+  {
+   "id": 33,
+   "name": "Stonetalon Peak, Stonetalon Mountains",
+   "continent": 1,
+   "x": 2681.1298828125,
+   "y": 1461.6800537109,
+   "z": 232.88000488281,
+   "faction": "alliance"
+  },
+  {
+   "id": 34,
+   "name": "Transport, Booty Bay - Ratchet",
+   "continent": 1,
+   "x": -1965.1700439453,
+   "y": -5824.2900390625,
+   "z": -1.05999994278,
+   "faction": null
+  },
+  {
+   "id": 35,
+   "name": "Transport, Orgrimmar Zepplins",
+   "continent": 1,
+   "x": 1320.0699462891,
+   "y": -4649.2001953125,
+   "z": 21.56999969482,
+   "faction": null
+  },
+  {
+   "id": 36,
+   "name": "Generic, World target",
+   "continent": 0,
+   "x": -8644.6201171875,
+   "y": 433.2799987793,
+   "z": 59.45999908447,
+   "faction": null
+  },
+  {
+   "id": 37,
+   "name": "Nijel's Point, Desolace",
+   "continent": 1,
+   "x": 139.24000549316,
+   "y": 1325.8199462891,
+   "z": 193.5,
+   "faction": "alliance"
+  },
+  {
+   "id": 38,
+   "name": "Shadowprey Village, Desolace",
+   "continent": 1,
+   "x": -1767.6400146484,
+   "y": 3263.8898925781,
+   "z": 4.94000005722,
+   "faction": "horde"
+  },
+  {
+   "id": 39,
+   "name": "Gadgetzan, Tanaris",
+   "continent": 1,
+   "x": -7223.9702148438,
+   "y": -3734.5900878906,
+   "z": 8.39000034332,
+   "faction": "alliance"
+  },
+  {
+   "id": 40,
+   "name": "Gadgetzan, Tanaris",
+   "continent": 1,
+   "x": -7048.8901367188,
+   "y": -3780.3601074219,
+   "z": 10.18999958038,
+   "faction": "horde"
+  },
+  {
+   "id": 41,
+   "name": "Feathermoon, Feralas",
+   "continent": 1,
+   "x": -4373.7998046875,
+   "y": 3338.6499023438,
+   "z": 12.27000045776,
+   "faction": "alliance"
+  },
+  {
+   "id": 42,
+   "name": "Camp Mojache, Feralas",
+   "continent": 1,
+   "x": -4419.8598632812,
+   "y": 199.30999755859,
+   "z": 25.05999946594,
+   "faction": "horde"
+  },
+  {
+   "id": 43,
+   "name": "Aerie Peak, The Hinterlands",
+   "continent": 0,
+   "x": 283.73999023438,
+   "y": -2002.7600097656,
+   "z": 194.74000549316,
+   "faction": "alliance"
+  },
+  {
+   "id": 44,
+   "name": "Valormok, Azshara",
+   "continent": 1,
+   "x": 3661.5200195312,
+   "y": -4390.3798828125,
+   "z": 113.05000305176,
+   "faction": "horde"
+  },
+  {
+   "id": 45,
+   "name": "Nethergarde Keep, Blasted Lands",
+   "continent": 0,
+   "x": -11112.25,
+   "y": -3435.7399902344,
+   "z": 79.08999633789,
+   "faction": "alliance"
+  },
+  {
+   "id": 46,
+   "name": "Southshore Ferry, Hillsbrad",
+   "continent": 0,
+   "x": -986.42999267578,
+   "y": -547.85998535156,
+   "z": -3.8599998951,
+   "faction": null
+  },
+  {
+   "id": 47,
+   "name": "Transport, Grom'gol - Orgrimmar",
+   "continent": 0,
+   "x": -12418.76953125,
+   "y": 235.42999267578,
+   "z": 1.12000000477,
+   "faction": null
+  },
+  {
+   "id": 48,
+   "name": "Bloodvenom Post, Felwood",
+   "continent": 1,
+   "x": 5068.3999023438,
+   "y": -337.2200012207,
+   "z": 367.41000366211,
+   "faction": "horde"
+  },
+  {
+   "id": 49,
+   "name": "Moonglade",
+   "continent": 1,
+   "x": 7458.4501953125,
+   "y": -2487.2099609375,
+   "z": 462.32998657227,
+   "faction": "alliance"
+  },
+  {
+   "id": 50,
+   "name": "Transport, Menethil Ships",
+   "continent": 0,
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "faction": null
+  },
+  {
+   "id": 51,
+   "name": "Transport, Rut'theran - Auberdine",
+   "continent": 0,
+   "x": 0.0,
+   "y": 0.0,
+   "z": 0.0,
+   "faction": null
+  },
+  {
+   "id": 52,
+   "name": "Everlook, Winterspring",
+   "continent": 1,
+   "x": 6799.240234375,
+   "y": -4742.4399414062,
+   "z": 701.5,
+   "faction": "alliance"
+  },
+  {
+   "id": 53,
+   "name": "Everlook, Winterspring",
+   "continent": 1,
+   "x": 6813.0600585938,
+   "y": -4611.1201171875,
+   "z": 710.66998291016,
+   "faction": "horde"
+  },
+  {
+   "id": 54,
+   "name": "Transport, Feathermoon - Feralas",
+   "continent": 1,
+   "x": -4203.8701171875,
+   "y": 3284.0,
+   "z": -12.85999965668,
+   "faction": null
+  },
+  {
+   "id": 55,
+   "name": "Brackenwall Village, Dustwallow Marsh",
+   "continent": 1,
+   "x": -3147.3898925781,
+   "y": -2842.1799316406,
+   "z": 34.61000061035,
+   "faction": "horde"
+  },
+  {
+   "id": 56,
+   "name": "Stonard, Swamp of Sorrows",
+   "continent": 0,
+   "x": -10456.969726562,
+   "y": -3279.25,
+   "z": 21.35000038147,
+   "faction": "horde"
+  },
+  {
+   "id": 57,
+   "name": "Fishing Village, Teldrassil",
+   "continent": 1,
+   "x": 8701.509765625,
+   "y": 991.36999511719,
+   "z": 14.21000003815,
+   "faction": null
+  },
+  {
+   "id": 58,
+   "name": "Zoram'gar Outpost, Ashenvale",
+   "continent": 1,
+   "x": 3374.7099609375,
+   "y": 996.96997070313,
+   "z": 5.19000005722,
+   "faction": "horde"
+  },
+  {
+   "id": 59,
+   "name": "Dun Baldar, Alterac Valley",
+   "continent": 30,
+   "x": 574.21002197266,
+   "y": -46.65000152588,
+   "z": 37.61000061035,
+   "faction": "alliance"
+  },
+  {
+   "id": 60,
+   "name": "Frostwolf Keep, Alterac Valley",
+   "continent": 30,
+   "x": -1335.4399414062,
+   "y": -319.69000244141,
+   "z": 90.66000366211,
+   "faction": "horde"
+  },
+  {
+   "id": 61,
+   "name": "Splintertree Post, Ashenvale",
+   "continent": 1,
+   "x": 2302.3898925781,
+   "y": -2524.5500488281,
+   "z": 104.40000152588,
+   "faction": "horde"
+  },
+  {
+   "id": 62,
+   "name": "Nighthaven, Moonglade",
+   "continent": 1,
+   "x": 7793.6098632812,
+   "y": -2403.4699707031,
+   "z": 489.32000732422,
+   "faction": "alliance"
+  },
+  {
+   "id": 63,
+   "name": "Nighthaven, Moonglade",
+   "continent": 1,
+   "x": 7787.7202148438,
+   "y": -2404.1000976562,
+   "z": 489.55999755859,
+   "faction": "horde"
+  },
+  {
+   "id": 64,
+   "name": "Talrendis Point, Azshara",
+   "continent": 1,
+   "x": 2721.9899902344,
+   "y": -3880.6398925781,
+   "z": 100.87000274658,
+   "faction": "alliance"
+  },
+  {
+   "id": 65,
+   "name": "Talonbranch Glade, Felwood",
+   "continent": 1,
+   "x": 6205.8798828125,
+   "y": -1949.6300048828,
+   "z": 571.28997802734,
+   "faction": "alliance"
+  },
+  {
+   "id": 66,
+   "name": "Chillwind Camp, Western Plaguelands",
+   "continent": 0,
+   "x": 931.32000732422,
+   "y": -1430.1099853516,
+   "z": 64.66999816895,
+   "faction": "alliance"
+  },
+  {
+   "id": 67,
+   "name": "Light's Hope Chapel, Eastern Plaguelands",
+   "continent": 0,
+   "x": 2271.0900878906,
+   "y": -5340.7998046875,
+   "z": 87.11000061035,
+   "faction": "alliance"
+  },
+  {
+   "id": 68,
+   "name": "Light's Hope Chapel, Eastern Plaguelands",
+   "continent": 0,
+   "x": 2327.4099121094,
+   "y": -5286.8901367188,
+   "z": 81.7799987793,
+   "faction": "horde"
+  },
+  {
+   "id": 69,
+   "name": "Moonglade",
+   "continent": 1,
+   "x": 7470.3901367188,
+   "y": -2123.3798828125,
+   "z": 492.33999633789,
+   "faction": "horde"
+  },
+  {
+   "id": 70,
+   "name": "Flame Crest, Burning Steppes",
+   "continent": 0,
+   "x": -7504.0297851562,
+   "y": -2187.5400390625,
+   "z": 165.5299987793,
+   "faction": "horde"
+  },
+  {
+   "id": 71,
+   "name": "Morgan's Vigil, Burning Steppes",
+   "continent": 0,
+   "x": -8364.6103515625,
+   "y": -2738.3500976562,
+   "z": 185.46000671387,
+   "faction": "alliance"
+  },
+  {
+   "id": 72,
+   "name": "Cenarion Hold, Silithus",
+   "continent": 1,
+   "x": -6811.3901367188,
+   "y": 836.73999023438,
+   "z": 49.81000137329,
+   "faction": "horde"
+  },
+  {
+   "id": 73,
+   "name": "Cenarion Hold, Silithus",
+   "continent": 1,
+   "x": -6761.830078125,
+   "y": 772.03002929688,
+   "z": 88.91000366211,
+   "faction": "alliance"
+  },
+  {
+   "id": 74,
+   "name": "Thorium Point, Searing Gorge",
+   "continent": 0,
+   "x": -6552.58984375,
+   "y": -1168.2700195312,
+   "z": 309.30999755859,
+   "faction": "alliance"
+  },
+  {
+   "id": 75,
+   "name": "Thorium Point, Searing Gorge",
+   "continent": 0,
+   "x": -6554.9301757812,
+   "y": -1100.0500488281,
+   "z": 309.57000732422,
+   "faction": "horde"
+  },
+  {
+   "id": 76,
+   "name": "Revantusk Village, The Hinterlands",
+   "continent": 0,
+   "x": -635.26000976563,
+   "y": -4720.5,
+   "z": 5.38000011444,
+   "faction": "horde"
+  },
+  {
+   "id": 77,
+   "name": "Camp Taurajo, The Barrens",
+   "continent": 1,
+   "x": -2380.669921875,
+   "y": -1882.6700439453,
+   "z": 95.84999847412,
+   "faction": "horde"
+  },
+  {
+   "id": 78,
+   "name": "Naxxramas",
+   "continent": 0,
+   "x": 3133.3100585938,
+   "y": -3399.9299316406,
+   "z": 139.5299987793,
+   "faction": null
+  },
+  {
+   "id": 79,
+   "name": "Marshal's Refuge, Un'Goro Crater",
+   "continent": 1,
+   "x": -6113.8198242188,
+   "y": -1142.6999511719,
+   "z": -187.63000488281,
+   "faction": "both"
+  },
+  {
+   "id": 80,
+   "name": "Ratchet, The Barrens",
+   "continent": 1,
+   "x": -894.59002685547,
+   "y": -3773.0100097656,
+   "z": 11.47999954224,
+   "faction": "both"
+  },
+  {
+   "id": 84,
+   "name": "Plaguewood Tower, Eastern Plaguelands",
+   "continent": 0,
+   "x": 2998.7099609375,
+   "y": -3050.1000976562,
+   "z": 117.19000244141,
+   "faction": "both"
+  },
+  {
+   "id": 85,
+   "name": "Northpass Tower, Eastern Plaguelands",
+   "continent": 0,
+   "x": 3109.3100585938,
+   "y": -4285.1298828125,
+   "z": 109.44999694824,
+   "faction": "both"
+  },
+  {
+   "id": 86,
+   "name": "Eastwall Tower, Eastern Plaguelands",
+   "continent": 0,
+   "x": 2499.2299804688,
+   "y": -4742.8500976562,
+   "z": 93.5,
+   "faction": "both"
+  },
+  {
+   "id": 87,
+   "name": "Crown Guard Tower, Eastern Plaguelands",
+   "continent": 0,
+   "x": 1857.5600585938,
+   "y": -3658.4699707031,
+   "z": 143.72999572754,
+   "faction": "both"
+  },
+  {
+   "id": 559,
+   "name": "Summit of Eternity, Mount Hyjal",
+   "continent": 1,
+   "x": 5283.1899414062,
+   "y": -3306.6999511719,
+   "z": 1658.9300537109,
+   "faction": "both"
+  },
+  {
+   "id": 2913,
+   "name": "Quest Path 9571: 1.60.0 - Shaman - Level 40 Quest - Thousand Needles - H - 6",
+   "continent": 1,
+   "x": -5167.2900390625,
+   "y": -2788.5100097656,
+   "z": 89.67520141602,
+   "faction": null
+  },
+  {
+   "id": 2914,
+   "name": "Quest Path 9574: 1.60.0 - Shaman - Level 40 Quest - Thousand Needles - H - 6 - Flight Back",
+   "continent": 1,
+   "x": -5459.7001953125,
+   "y": -2468.3100585938,
+   "z": 89.27600097656,
+   "faction": null
+  },
+  {
+   "id": 2930,
+   "name": "Quest Path 9620: S03 - Runecarving - Shaman - Level 40 Rune - Corrupted Fire Totem - Tal Taxi Path - KJA",
+   "continent": 1,
+   "x": 7470.6899414062,
+   "y": -2126.7700195312,
+   "z": 492.41500854492,
+   "faction": null
+  },
+  {
+   "id": 3203,
+   "name": "Rog'mar, Riverglades",
+   "continent": 0,
+   "x": -7923.740234375,
+   "y": -4782.9599609375,
+   "z": 21.58169937134,
+   "faction": "horde"
+  },
+  {
+   "id": 3205,
+   "name": "Tidegear Coast, Dun Morogh",
+   "continent": 0,
+   "x": -4375.7001953125,
+   "y": 864.77801513672,
+   "z": 32.67900085449,
+   "faction": null
+  },
+  {
+   "id": 3206,
+   "name": "zzOLDBolder'ok, Riverglades",
+   "continent": 0,
+   "x": -6554.9301757812,
+   "y": -1100.0500488281,
+   "z": 309.57000732422,
+   "faction": "horde"
+  },
+  {
+   "id": 3207,
+   "name": "zzOLDRiverglades, Farholde Keep",
+   "continent": 0,
+   "x": -711.47998046875,
+   "y": -515.47998046875,
+   "z": 26.11000061035,
+   "faction": "alliance"
+  },
+  {
+   "id": 3208,
+   "name": "zzOLDPowderfuse Port, Riverglades",
+   "continent": 1,
+   "x": -894.59002685547,
+   "y": -3773.0100097656,
+   "z": 11.47999954224,
+   "faction": "both"
+  },
+  {
+   "id": 3242,
+   "name": "Tainted Foothills, Mount Hyjal",
+   "continent": 1,
+   "x": 4393.5200195312,
+   "y": -2836.3500976562,
+   "z": 1108.1300048828,
+   "faction": "both"
+  },
+  {
+   "id": 3260,
+   "name": "Quest Path 11512: 1.60.0 - Dalaran Translocation Path",
+   "continent": 0,
+   "x": 73.12149810791,
+   "y": 224.18200683594,
+   "z": 107.45600128174,
+   "faction": null
+  },
+  {
+   "id": 3261,
+   "name": "Quest Path 11515: 1.60.0 - Shaman - Level 40 Quest - Thousand Needles - A - 6",
+   "continent": 1,
+   "x": -5167.2900390625,
+   "y": -2788.5100097656,
+   "z": 89.67520141602,
+   "faction": null
+  },
+  {
+   "id": 3262,
+   "name": "Quest Path 11517: 1.60.0 - Shaman - Level 40 Quest - Thousand Needles - A - 6 - Flight Back",
+   "continent": 1,
+   "x": -4491.8798828125,
+   "y": -775.89001464844,
+   "z": -39.52000045776,
+   "faction": null
+  },
+  {
+   "id": 3274,
+   "name": "Powderfuse Port, Riverglades",
+   "continent": 0,
+   "x": -8157.2001953125,
+   "y": -5724.669921875,
+   "z": 3.09037995338,
+   "faction": null
+  },
+  {
+   "id": 3275,
+   "name": "Powderfuse Port, Riverglades",
+   "continent": 0,
+   "x": -8180.0498046875,
+   "y": -5616.259765625,
+   "z": 4.06544017792,
+   "faction": null
+  },
+  {
+   "id": 3276,
+   "name": "Farholde Keep, Riverglades",
+   "continent": 0,
+   "x": -9104.099609375,
+   "y": -4830.4702148438,
+   "z": 23.19029998779,
+   "faction": "alliance"
+  }
+ ],
+ "paths": [
+  {
+   "id": 6,
+   "from": 2,
+   "to": 4,
+   "cost": 110,
+   "length": 2328.8410006017607,
+   "points": 28
+  },
+  {
+   "id": 7,
+   "from": 4,
+   "to": 2,
+   "cost": 110,
+   "length": 2443.10143723158,
+   "points": 27
+  },
+  {
+   "id": 8,
+   "from": 5,
+   "to": 2,
+   "cost": 210,
+   "length": 3374.189051962988,
+   "points": 23
+  },
+  {
+   "id": 9,
+   "from": 2,
+   "to": 5,
+   "cost": 210,
+   "length": 3380.0677735791996,
+   "points": 43
+  },
+  {
+   "id": 12,
+   "from": 6,
+   "to": 2,
+   "cost": 50,
+   "length": 6310.28382833089,
+   "points": 68
+  },
+  {
+   "id": 13,
+   "from": 2,
+   "to": 6,
+   "cost": 50,
+   "length": 7757.256714785874,
+   "points": 62
+  },
+  {
+   "id": 15,
+   "from": 8,
+   "to": 6,
+   "cost": 110,
+   "length": 3265.9527995936983,
+   "points": 39
+  },
+  {
+   "id": 16,
+   "from": 6,
+   "to": 8,
+   "cost": 110,
+   "length": 3037.1689665373137,
+   "points": 35
+  },
+  {
+   "id": 17,
+   "from": 7,
+   "to": 6,
+   "cost": 330,
+   "length": 2658.3472543004996,
+   "points": 35
+  },
+  {
+   "id": 18,
+   "from": 6,
+   "to": 7,
+   "cost": 330,
+   "length": 3860.6369784205294,
+   "points": 38
+  },
+  {
+   "id": 20,
+   "from": 11,
+   "to": 10,
+   "cost": 110,
+   "length": 3180.4996895467707,
+   "points": 50
+  },
+  {
+   "id": 21,
+   "from": 10,
+   "to": 11,
+   "cost": 110,
+   "length": 3344.7907489038903,
+   "points": 48
+  },
+  {
+   "id": 22,
+   "from": 12,
+   "to": 2,
+   "cost": 330,
+   "length": 2628.8703951854995,
+   "points": 17
+  },
+  {
+   "id": 23,
+   "from": 2,
+   "to": 12,
+   "cost": 330,
+   "length": 3480.017656075357,
+   "points": 20
+  },
+  {
+   "id": 24,
+   "from": 13,
+   "to": 11,
+   "cost": 330,
+   "length": 4171.517740607668,
+   "points": 56
+  },
+  {
+   "id": 25,
+   "from": 11,
+   "to": 13,
+   "cost": 330,
+   "length": 4222.1444553688325,
+   "points": 44
+  },
+  {
+   "id": 26,
+   "from": 14,
+   "to": 6,
+   "cost": 330,
+   "length": 6173.625098953398,
+   "points": 46
+  },
+  {
+   "id": 27,
+   "from": 6,
+   "to": 14,
+   "cost": 330,
+   "length": 7937.675178362348,
+   "points": 58
+  },
+  {
+   "id": 30,
+   "from": 16,
+   "to": 6,
+   "cost": 530,
+   "length": 8108.940263292772,
+   "points": 62
+  },
+  {
+   "id": 31,
+   "from": 6,
+   "to": 16,
+   "cost": 530,
+   "length": 7585.0810336993745,
+   "points": 41
+  },
+  {
+   "id": 32,
+   "from": 17,
+   "to": 11,
+   "cost": 530,
+   "length": 7763.462302346119,
+   "points": 80
+  },
+  {
+   "id": 33,
+   "from": 11,
+   "to": 17,
+   "cost": 530,
+   "length": 9013.81919132526,
+   "points": 90
+  },
+  {
+   "id": 34,
+   "from": 20,
+   "to": 18,
+   "cost": 630,
+   "length": 2421.6862882500295,
+   "points": 12
+  },
+  {
+   "id": 35,
+   "from": 18,
+   "to": 20,
+   "cost": 630,
+   "length": 3047.22681983647,
+   "points": 23
+  },
+  {
+   "id": 36,
+   "from": 18,
+   "to": 21,
+   "cost": 630,
+   "length": 12190.473005591799,
+   "points": 41
+  },
+  {
+   "id": 37,
+   "from": 21,
+   "to": 18,
+   "cost": 630,
+   "length": 12492.851562285516,
+   "points": 54
+  },
+  {
+   "id": 38,
+   "from": 21,
+   "to": 11,
+   "cost": 630,
+   "length": 14918.09105624572,
+   "points": 131
+  },
+  {
+   "id": 39,
+   "from": 11,
+   "to": 21,
+   "cost": 630,
+   "length": 15025.682432164676,
+   "points": 154
+  },
+  {
+   "id": 40,
+   "from": 2,
+   "to": 19,
+   "cost": 630,
+   "length": 7317.740399308871,
+   "points": 71
+  },
+  {
+   "id": 41,
+   "from": 19,
+   "to": 2,
+   "cost": 630,
+   "length": 6584.5712832947875,
+   "points": 52
+  },
+  {
+   "id": 42,
+   "from": 23,
+   "to": 22,
+   "cost": 50,
+   "length": 6744.99451931285,
+   "points": 44
+  },
+  {
+   "id": 44,
+   "from": 25,
+   "to": 22,
+   "cost": 110,
+   "length": 5461.115794721334,
+   "points": 32
+  },
+  {
+   "id": 45,
+   "from": 25,
+   "to": 23,
+   "cost": 110,
+   "length": 4252.043434100266,
+   "points": 24
+  },
+  {
+   "id": 46,
+   "from": 22,
+   "to": 25,
+   "cost": 110,
+   "length": 4752.488939054745,
+   "points": 27
+  },
+  {
+   "id": 47,
+   "from": 23,
+   "to": 25,
+   "cost": 110,
+   "length": 3304.1180933850346,
+   "points": 27
+  },
+  {
+   "id": 50,
+   "from": 28,
+   "to": 26,
+   "cost": 330,
+   "length": 4425.8358110939425,
+   "points": 37
+  },
+  {
+   "id": 51,
+   "from": 26,
+   "to": 28,
+   "cost": 330,
+   "length": 5270.161461575824,
+   "points": 31
+  },
+  {
+   "id": 52,
+   "from": 29,
+   "to": 22,
+   "cost": 210,
+   "length": 5227.471161005478,
+   "points": 33
+  },
+  {
+   "id": 53,
+   "from": 22,
+   "to": 29,
+   "cost": 210,
+   "length": 5438.7239341021705,
+   "points": 28
+  },
+  {
+   "id": 54,
+   "from": 30,
+   "to": 22,
+   "cost": 430,
+   "length": 6764.0806353442695,
+   "points": 36
+  },
+  {
+   "id": 55,
+   "from": 22,
+   "to": 30,
+   "cost": 430,
+   "length": 6112.814631599411,
+   "points": 36
+  },
+  {
+   "id": 56,
+   "from": 32,
+   "to": 31,
+   "cost": 430,
+   "length": 4886.519794513941,
+   "points": 27
+  },
+  {
+   "id": 57,
+   "from": 31,
+   "to": 32,
+   "cost": 730,
+   "length": 4779.654475594504,
+   "points": 27
+  },
+  {
+   "id": 58,
+   "from": 33,
+   "to": 26,
+   "cost": 330,
+   "length": 5304.467567464746,
+   "points": 23
+  },
+  {
+   "id": 59,
+   "from": 26,
+   "to": 33,
+   "cost": 330,
+   "length": 5431.828715965344,
+   "points": 23
+  },
+  {
+   "id": 82,
+   "from": 18,
+   "to": 56,
+   "cost": 630,
+   "length": 7985.784113575934,
+   "points": 88
+  },
+  {
+   "id": 101,
+   "from": 26,
+   "to": 27,
+   "cost": 0,
+   "length": 2525.043610848206,
+   "points": 15
+  },
+  {
+   "id": 102,
+   "from": 27,
+   "to": 26,
+   "cost": 0,
+   "length": 2551.358793674553,
+   "points": 14
+  },
+  {
+   "id": 121,
+   "from": 56,
+   "to": 18,
+   "cost": 630,
+   "length": 7797.626920488739,
+   "points": 81
+  },
+  {
+   "id": 141,
+   "from": 37,
+   "to": 32,
+   "cost": 530,
+   "length": 9201.55561812255,
+   "points": 68
+  },
+  {
+   "id": 161,
+   "from": 38,
+   "to": 22,
+   "cost": 530,
+   "length": 5330.973225578163,
+   "points": 40
+  },
+  {
+   "id": 162,
+   "from": 22,
+   "to": 38,
+   "cost": 530,
+   "length": 4751.981250920372,
+   "points": 36
+  },
+  {
+   "id": 163,
+   "from": 32,
+   "to": 37,
+   "cost": 530,
+   "length": 10016.66768298668,
+   "points": 57
+  },
+  {
+   "id": 181,
+   "from": 26,
+   "to": 32,
+   "cost": 630,
+   "length": 20224.514222288628,
+   "points": 115
+  },
+  {
+   "id": 182,
+   "from": 32,
+   "to": 26,
+   "cost": 630,
+   "length": 18633.118053153554,
+   "points": 120
+  },
+  {
+   "id": 201,
+   "from": 39,
+   "to": 32,
+   "cost": 630,
+   "length": 4606.0885846436295,
+   "points": 22
+  },
+  {
+   "id": 222,
+   "from": 32,
+   "to": 39,
+   "cost": 730,
+   "length": 4693.636442281719,
+   "points": 24
+  },
+  {
+   "id": 223,
+   "from": 40,
+   "to": 23,
+   "cost": 730,
+   "length": 10495.370080450455,
+   "points": 66
+  },
+  {
+   "id": 224,
+   "from": 23,
+   "to": 40,
+   "cost": 730,
+   "length": 12500.106897905838,
+   "points": 92
+  },
+  {
+   "id": 225,
+   "from": 41,
+   "to": 26,
+   "cost": 730,
+   "length": 14013.915561617803,
+   "points": 80
+  },
+  {
+   "id": 226,
+   "from": 26,
+   "to": 41,
+   "cost": 730,
+   "length": 14167.906592959811,
+   "points": 68
+  },
+  {
+   "id": 227,
+   "from": 42,
+   "to": 22,
+   "cost": 730,
+   "length": 7777.343322770122,
+   "points": 46
+  },
+  {
+   "id": 228,
+   "from": 22,
+   "to": 42,
+   "cost": 730,
+   "length": 7563.116581947841,
+   "points": 45
+  },
+  {
+   "id": 229,
+   "from": 43,
+   "to": 14,
+   "cost": 330,
+   "length": 2039.204825794393,
+   "points": 14
+  },
+  {
+   "id": 230,
+   "from": 14,
+   "to": 43,
+   "cost": 730,
+   "length": 2139.0574684034814,
+   "points": 22
+  },
+  {
+   "id": 241,
+   "from": 34,
+   "to": 35,
+   "cost": 0,
+   "length": 5831.826729380939,
+   "points": 37
+  },
+  {
+   "id": 242,
+   "from": 44,
+   "to": 23,
+   "cost": 830,
+   "length": 3622.20401784397,
+   "points": 33
+  },
+  {
+   "id": 243,
+   "from": 23,
+   "to": 44,
+   "cost": 830,
+   "length": 2964.847310937238,
+   "points": 25
+  },
+  {
+   "id": 244,
+   "from": 45,
+   "to": 2,
+   "cost": 830,
+   "length": 5672.244801995676,
+   "points": 46
+  },
+  {
+   "id": 245,
+   "from": 2,
+   "to": 45,
+   "cost": 830,
+   "length": 5282.048536237821,
+   "points": 31
+  },
+  {
+   "id": 249,
+   "from": 4,
+   "to": 5,
+   "cost": 210,
+   "length": 3890.0356370333257,
+   "points": 32
+  },
+  {
+   "id": 250,
+   "from": 4,
+   "to": 12,
+   "cost": 330,
+   "length": 2897.4437577676404,
+   "points": 19
+  },
+  {
+   "id": 252,
+   "from": 12,
+   "to": 4,
+   "cost": 110,
+   "length": 2793.577987887679,
+   "points": 16
+  },
+  {
+   "id": 253,
+   "from": 46,
+   "to": 7,
+   "cost": 0,
+   "length": 6250.304497475138,
+   "points": 30
+  },
+  {
+   "id": 254,
+   "from": 5,
+   "to": 4,
+   "cost": 110,
+   "length": 4003.200673649685,
+   "points": 25
+  },
+  {
+   "id": 255,
+   "from": 4,
+   "to": 19,
+   "cost": 630,
+   "length": 5560.5152314355055,
+   "points": 36
+  },
+  {
+   "id": 256,
+   "from": 19,
+   "to": 4,
+   "cost": 530,
+   "length": 5438.937732001289,
+   "points": 29
+  },
+  {
+   "id": 257,
+   "from": 5,
+   "to": 12,
+   "cost": 330,
+   "length": 1812.1925074996188,
+   "points": 19
+  },
+  {
+   "id": 258,
+   "from": 12,
+   "to": 5,
+   "cost": 210,
+   "length": 1787.229085640563,
+   "points": 16
+  },
+  {
+   "id": 259,
+   "from": 12,
+   "to": 19,
+   "cost": 630,
+   "length": 5134.697073197615,
+   "points": 26
+  },
+  {
+   "id": 260,
+   "from": 19,
+   "to": 12,
+   "cost": 330,
+   "length": 5242.444642896042,
+   "points": 25
+  },
+  {
+   "id": 261,
+   "from": 12,
+   "to": 45,
+   "cost": 830,
+   "length": 2903.073036847693,
+   "points": 20
+  },
+  {
+   "id": 262,
+   "from": 45,
+   "to": 12,
+   "cost": 330,
+   "length": 2747.649258655355,
+   "points": 19
+  },
+  {
+   "id": 263,
+   "from": 6,
+   "to": 43,
+   "cost": 730,
+   "length": 8941.084761681263,
+   "points": 63
+  },
+  {
+   "id": 264,
+   "from": 43,
+   "to": 6,
+   "cost": 730,
+   "length": 7658.074854962099,
+   "points": 43
+  },
+  {
+   "id": 265,
+   "from": 8,
+   "to": 7,
+   "cost": 330,
+   "length": 4564.383249721562,
+   "points": 29
+  },
+  {
+   "id": 266,
+   "from": 7,
+   "to": 8,
+   "cost": 110,
+   "length": 4876.657156515815,
+   "points": 26
+  },
+  {
+   "id": 267,
+   "from": 8,
+   "to": 16,
+   "cost": 530,
+   "length": 4901.677159116017,
+   "points": 29
+  },
+  {
+   "id": 268,
+   "from": 16,
+   "to": 8,
+   "cost": 110,
+   "length": 5112.8223453246765,
+   "points": 30
+  },
+  {
+   "id": 269,
+   "from": 7,
+   "to": 16,
+   "cost": 530,
+   "length": 3388.474973522353,
+   "points": 21
+  },
+  {
+   "id": 270,
+   "from": 16,
+   "to": 7,
+   "cost": 330,
+   "length": 3775.6049383682007,
+   "points": 21
+  },
+  {
+   "id": 271,
+   "from": 7,
+   "to": 14,
+   "cost": 330,
+   "length": 3215.2012966294437,
+   "points": 12
+  },
+  {
+   "id": 272,
+   "from": 14,
+   "to": 7,
+   "cost": 330,
+   "length": 3304.047351376442,
+   "points": 15
+  },
+  {
+   "id": 273,
+   "from": 16,
+   "to": 14,
+   "cost": 330,
+   "length": 2596.289908717097,
+   "points": 15
+  },
+  {
+   "id": 274,
+   "from": 14,
+   "to": 16,
+   "cost": 530,
+   "length": 2214.126857890639,
+   "points": 13
+  },
+  {
+   "id": 275,
+   "from": 16,
+   "to": 43,
+   "cost": 730,
+   "length": 2151.9463161758586,
+   "points": 16
+  },
+  {
+   "id": 276,
+   "from": 43,
+   "to": 16,
+   "cost": 530,
+   "length": 2266.944913700941,
+   "points": 14
+  },
+  {
+   "id": 279,
+   "from": 25,
+   "to": 29,
+   "cost": 210,
+   "length": 4494.973952392906,
+   "points": 24
+  },
+  {
+   "id": 280,
+   "from": 29,
+   "to": 25,
+   "cost": 210,
+   "length": 4476.729710940423,
+   "points": 29
+  },
+  {
+   "id": 281,
+   "from": 25,
+   "to": 30,
+   "cost": 430,
+   "length": 5531.886357383998,
+   "points": 23
+  },
+  {
+   "id": 282,
+   "from": 30,
+   "to": 25,
+   "cost": 430,
+   "length": 5809.613618698688,
+   "points": 22
+  },
+  {
+   "id": 283,
+   "from": 25,
+   "to": 44,
+   "cost": 830,
+   "length": 5051.133433205136,
+   "points": 23
+  },
+  {
+   "id": 284,
+   "from": 44,
+   "to": 25,
+   "cost": 830,
+   "length": 5162.666602308503,
+   "points": 25
+  },
+  {
+   "id": 285,
+   "from": 47,
+   "to": 35,
+   "cost": 0,
+   "length": 4044.6335793406315,
+   "points": 27
+  },
+  {
+   "id": 286,
+   "from": 48,
+   "to": 25,
+   "cost": 930,
+   "length": 7227.459939799165,
+   "points": 50
+  },
+  {
+   "id": 287,
+   "from": 25,
+   "to": 48,
+   "cost": 930,
+   "length": 7603.103571570444,
+   "points": 50
+  },
+  {
+   "id": 289,
+   "from": 26,
+   "to": 49,
+   "cost": 830,
+   "length": 4525.057107195238,
+   "points": 23
+  },
+  {
+   "id": 290,
+   "from": 22,
+   "to": 44,
+   "cost": 830,
+   "length": 8069.793419344509,
+   "points": 34
+  },
+  {
+   "id": 291,
+   "from": 44,
+   "to": 22,
+   "cost": 830,
+   "length": 7699.983996005183,
+   "points": 30
+  },
+  {
+   "id": 292,
+   "from": 50,
+   "to": 36,
+   "cost": 0,
+   "length": 4977.111989316792,
+   "points": 30
+  },
+  {
+   "id": 293,
+   "from": 51,
+   "to": 50,
+   "cost": 0,
+   "length": 4500.261550829493,
+   "points": 25
+  },
+  {
+   "id": 295,
+   "from": 50,
+   "to": 51,
+   "cost": 0,
+   "length": 3923.9964900465184,
+   "points": 32
+  },
+  {
+   "id": 298,
+   "from": 52,
+   "to": 49,
+   "cost": 830,
+   "length": 3638.8472824083283,
+   "points": 24
+  },
+  {
+   "id": 301,
+   "from": 35,
+   "to": 20,
+   "cost": 0,
+   "length": 4964.331493980495,
+   "points": 29
+  },
+  {
+   "id": 302,
+   "from": 35,
+   "to": 24,
+   "cost": 0,
+   "length": 5688.638724232195,
+   "points": 36
+  },
+  {
+   "id": 303,
+   "from": 54,
+   "to": 24,
+   "cost": 0,
+   "length": 4487.119493037675,
+   "points": 22
+  },
+  {
+   "id": 304,
+   "from": 55,
+   "to": 25,
+   "cost": 630,
+   "length": 4847.588853142802,
+   "points": 28
+  },
+  {
+   "id": 305,
+   "from": 58,
+   "to": 25,
+   "cost": 110,
+   "length": 6826.753173763929,
+   "points": 59
+  },
+  {
+   "id": 306,
+   "from": 53,
+   "to": 48,
+   "cost": 930,
+   "length": 5853.0662606549,
+   "points": 34
+  },
+  {
+   "id": 307,
+   "from": 48,
+   "to": 53,
+   "cost": 1020,
+   "length": 5699.7770976202155,
+   "points": 33
+  },
+  {
+   "id": 308,
+   "from": 30,
+   "to": 40,
+   "cost": 730,
+   "length": 2781.6066837121803,
+   "points": 21
+  },
+  {
+   "id": 309,
+   "from": 22,
+   "to": 40,
+   "cost": 730,
+   "length": 8692.90489171614,
+   "points": 51
+  },
+  {
+   "id": 310,
+   "from": 40,
+   "to": 30,
+   "cost": 430,
+   "length": 2601.9123350325876,
+   "points": 18
+  },
+  {
+   "id": 311,
+   "from": 40,
+   "to": 22,
+   "cost": 730,
+   "length": 9107.049359801087,
+   "points": 49
+  },
+  {
+   "id": 312,
+   "from": 59,
+   "to": 6,
+   "cost": 0,
+   "length": 3799.987401907258,
+   "points": 31
+  },
+  {
+   "id": 313,
+   "from": 60,
+   "to": 11,
+   "cost": 0,
+   "length": 482.39817110287214,
+   "points": 8
+  },
+  {
+   "id": 314,
+   "from": 6,
+   "to": 59,
+   "cost": 1020,
+   "length": 3798.5085122447526,
+   "points": 32
+  },
+  {
+   "id": 315,
+   "from": 62,
+   "to": 27,
+   "cost": 0,
+   "length": 4558.8243047595615,
+   "points": 31
+  },
+  {
+   "id": 316,
+   "from": 63,
+   "to": 22,
+   "cost": 0,
+   "length": 16313.318692045119,
+   "points": 78
+  },
+  {
+   "id": 317,
+   "from": 21,
+   "to": 56,
+   "cost": 710,
+   "length": 8424.08367504645,
+   "points": 45
+  },
+  {
+   "id": 318,
+   "from": 56,
+   "to": 21,
+   "cost": 630,
+   "length": 8555.281669731474,
+   "points": 51
+  },
+  {
+   "id": 319,
+   "from": 21,
+   "to": 17,
+   "cost": 630,
+   "length": 7880.6737050557285,
+   "points": 39
+  },
+  {
+   "id": 320,
+   "from": 17,
+   "to": 21,
+   "cost": 630,
+   "length": 7760.143898364631,
+   "points": 41
+  },
+  {
+   "id": 321,
+   "from": 17,
+   "to": 13,
+   "cost": 330,
+   "length": 3493.3503050371523,
+   "points": 20
+  },
+  {
+   "id": 322,
+   "from": 13,
+   "to": 17,
+   "cost": 530,
+   "length": 3532.252554359296,
+   "points": 20
+  },
+  {
+   "id": 323,
+   "from": 39,
+   "to": 31,
+   "cost": 430,
+   "length": 5303.624446168374,
+   "points": 33
+  },
+  {
+   "id": 324,
+   "from": 31,
+   "to": 39,
+   "cost": 730,
+   "length": 5121.509147946603,
+   "points": 31
+  },
+  {
+   "id": 325,
+   "from": 31,
+   "to": 41,
+   "cost": 630,
+   "length": 5335.161192026074,
+   "points": 30
+  },
+  {
+   "id": 326,
+   "from": 41,
+   "to": 31,
+   "cost": 430,
+   "length": 4635.182727892309,
+   "points": 28
+  },
+  {
+   "id": 327,
+   "from": 61,
+   "to": 23,
+   "cost": 530,
+   "length": 2869.0136782777604,
+   "points": 25
+  },
+  {
+   "id": 328,
+   "from": 23,
+   "to": 61,
+   "cost": 530,
+   "length": 2680.408334525164,
+   "points": 23
+  },
+  {
+   "id": 329,
+   "from": 64,
+   "to": 26,
+   "cost": 730,
+   "length": 9038.406866014922,
+   "points": 53
+  },
+  {
+   "id": 330,
+   "from": 26,
+   "to": 64,
+   "cost": 730,
+   "length": 8980.675627971663,
+   "points": 54
+  },
+  {
+   "id": 332,
+   "from": 64,
+   "to": 65,
+   "cost": 730,
+   "length": 8501.954349216112,
+   "points": 53
+  },
+  {
+   "id": 333,
+   "from": 61,
+   "to": 25,
+   "cost": 530,
+   "length": 4806.455965728906,
+   "points": 33
+  },
+  {
+   "id": 334,
+   "from": 25,
+   "to": 61,
+   "cost": 530,
+   "length": 4871.197207467565,
+   "points": 35
+  },
+  {
+   "id": 335,
+   "from": 23,
+   "to": 55,
+   "cost": 630,
+   "length": 6853.465185213167,
+   "points": 58
+  },
+  {
+   "id": 336,
+   "from": 55,
+   "to": 23,
+   "cost": 630,
+   "length": 6496.40550357244,
+   "points": 58
+  },
+  {
+   "id": 338,
+   "from": 23,
+   "to": 48,
+   "cost": 830,
+   "length": 7558.193082345415,
+   "points": 63
+  },
+  {
+   "id": 339,
+   "from": 52,
+   "to": 65,
+   "cost": 730,
+   "length": 3669.965578798813,
+   "points": 26
+  },
+  {
+   "id": 341,
+   "from": 48,
+   "to": 23,
+   "cost": 930,
+   "length": 7747.274983929198,
+   "points": 65
+  },
+  {
+   "id": 343,
+   "from": 56,
+   "to": 20,
+   "cost": 630,
+   "length": 5645.986374527024,
+   "points": 54
+  },
+  {
+   "id": 344,
+   "from": 20,
+   "to": 56,
+   "cost": 630,
+   "length": 6151.449352056047,
+   "points": 51
+  },
+  {
+   "id": 345,
+   "from": 22,
+   "to": 55,
+   "cost": 630,
+   "length": 7148.795406271183,
+   "points": 26
+  },
+  {
+   "id": 346,
+   "from": 66,
+   "to": 14,
+   "cost": 330,
+   "length": 2559.0962458289036,
+   "points": 28
+  },
+  {
+   "id": 347,
+   "from": 14,
+   "to": 66,
+   "cost": 830,
+   "length": 2417.6114023781856,
+   "points": 25
+  },
+  {
+   "id": 348,
+   "from": 55,
+   "to": 22,
+   "cost": 630,
+   "length": 6728.848221441439,
+   "points": 28
+  },
+  {
+   "id": 349,
+   "from": 43,
+   "to": 67,
+   "cost": 1020,
+   "length": 4921.692120646982,
+   "points": 28
+  },
+  {
+   "id": 350,
+   "from": 58,
+   "to": 61,
+   "cost": 530,
+   "length": 5013.424345204469,
+   "points": 50
+  },
+  {
+   "id": 351,
+   "from": 61,
+   "to": 58,
+   "cost": 330,
+   "length": 4994.925473808065,
+   "points": 49
+  },
+  {
+   "id": 352,
+   "from": 67,
+   "to": 43,
+   "cost": 730,
+   "length": 4870.9261890237585,
+   "points": 26
+  },
+  {
+   "id": 353,
+   "from": 42,
+   "to": 25,
+   "cost": 730,
+   "length": 7915.287635252557,
+   "points": 43
+  },
+  {
+   "id": 354,
+   "from": 25,
+   "to": 58,
+   "cost": 330,
+   "length": 6902.29355549835,
+   "points": 59
+  },
+  {
+   "id": 355,
+   "from": 25,
+   "to": 42,
+   "cost": 730,
+   "length": 7546.749050019519,
+   "points": 36
+  },
+  {
+   "id": 356,
+   "from": 38,
+   "to": 29,
+   "cost": 210,
+   "length": 5965.796087890874,
+   "points": 40
+  },
+  {
+   "id": 357,
+   "from": 11,
+   "to": 68,
+   "cost": 1020,
+   "length": 7849.138226696002,
+   "points": 37
+  },
+  {
+   "id": 358,
+   "from": 29,
+   "to": 38,
+   "cost": 530,
+   "length": 4297.406318259368,
+   "points": 29
+  },
+  {
+   "id": 359,
+   "from": 68,
+   "to": 11,
+   "cost": 1020,
+   "length": 7837.102778876015,
+   "points": 39
+  },
+  {
+   "id": 360,
+   "from": 25,
+   "to": 55,
+   "cost": 630,
+   "length": 4877.534135753121,
+   "points": 28
+  },
+  {
+   "id": 361,
+   "from": 20,
+   "to": 21,
+   "cost": 630,
+   "length": 9802.22390383437,
+   "points": 70
+  },
+  {
+   "id": 362,
+   "from": 21,
+   "to": 20,
+   "cost": 530,
+   "length": 9375.564535137013,
+   "points": 70
+  },
+  {
+   "id": 363,
+   "from": 53,
+   "to": 69,
+   "cost": 830,
+   "length": 4015.8089029397643,
+   "points": 25
+  },
+  {
+   "id": 364,
+   "from": 69,
+   "to": 48,
+   "cost": 930,
+   "length": 4712.579797542841,
+   "points": 43
+  },
+  {
+   "id": 365,
+   "from": 48,
+   "to": 69,
+   "cost": 830,
+   "length": 4947.246489430338,
+   "points": 42
+  },
+  {
+   "id": 366,
+   "from": 69,
+   "to": 53,
+   "cost": 1020,
+   "length": 4255.8795174891475,
+   "points": 25
+  },
+  {
+   "id": 367,
+   "from": 49,
+   "to": 52,
+   "cost": 1020,
+   "length": 3900.1255746962906,
+   "points": 24
+  },
+  {
+   "id": 368,
+   "from": 49,
+   "to": 26,
+   "cost": 830,
+   "length": 4246.995955337161,
+   "points": 20
+  },
+  {
+   "id": 369,
+   "from": 65,
+   "to": 26,
+   "cost": 730,
+   "length": 5621.786084041901,
+   "points": 39
+  },
+  {
+   "id": 371,
+   "from": 65,
+   "to": 52,
+   "cost": 1020,
+   "length": 3600.795125506593,
+   "points": 26
+  },
+  {
+   "id": 372,
+   "from": 65,
+   "to": 64,
+   "cost": 730,
+   "length": 8465.4215138131,
+   "points": 52
+  },
+  {
+   "id": 373,
+   "from": 37,
+   "to": 41,
+   "cost": 730,
+   "length": 6948.911200919613,
+   "points": 32
+  },
+  {
+   "id": 374,
+   "from": 41,
+   "to": 37,
+   "cost": 730,
+   "length": 6797.466974601721,
+   "points": 32
+  },
+  {
+   "id": 375,
+   "from": 42,
+   "to": 38,
+   "cost": 730,
+   "length": 6015.963042444593,
+   "points": 34
+  },
+  {
+   "id": 376,
+   "from": 38,
+   "to": 42,
+   "cost": 730,
+   "length": 5873.092204784084,
+   "points": 34
+  },
+  {
+   "id": 377,
+   "from": 70,
+   "to": 21,
+   "cost": 830,
+   "length": 2993.6717700993154,
+   "points": 22
+  },
+  {
+   "id": 378,
+   "from": 21,
+   "to": 70,
+   "cost": 830,
+   "length": 2592.9565340548465,
+   "points": 22
+  },
+  {
+   "id": 379,
+   "from": 70,
+   "to": 56,
+   "cost": 830,
+   "length": 6376.432361134951,
+   "points": 38
+  },
+  {
+   "id": 380,
+   "from": 56,
+   "to": 70,
+   "cost": 830,
+   "length": 5916.324224162222,
+   "points": 40
+  },
+  {
+   "id": 381,
+   "from": 71,
+   "to": 45,
+   "cost": 830,
+   "length": 6287.984557795239,
+   "points": 20
+  },
+  {
+   "id": 382,
+   "from": 45,
+   "to": 71,
+   "cost": 830,
+   "length": 6251.398722815333,
+   "points": 22
+  },
+  {
+   "id": 383,
+   "from": 11,
+   "to": 60,
+   "cost": 1020,
+   "length": 482.3981711028722,
+   "points": 8
+  },
+  {
+   "id": 384,
+   "from": 37,
+   "to": 26,
+   "cost": 530,
+   "length": 8458.229478716275,
+   "points": 34
+  },
+  {
+   "id": 385,
+   "from": 26,
+   "to": 37,
+   "cost": 530,
+   "length": 8722.650300498564,
+   "points": 33
+  },
+  {
+   "id": 386,
+   "from": 26,
+   "to": 65,
+   "cost": 730,
+   "length": 5681.710889557943,
+   "points": 38
+  },
+  {
+   "id": 387,
+   "from": 22,
+   "to": 23,
+   "cost": 50,
+   "length": 6213.258094545709,
+   "points": 20
+  },
+  {
+   "id": 388,
+   "from": 40,
+   "to": 55,
+   "cost": 630,
+   "length": 6647.435842407143,
+   "points": 15
+  },
+  {
+   "id": 389,
+   "from": 40,
+   "to": 42,
+   "cost": 630,
+   "length": 5972.957959692158,
+   "points": 37
+  },
+  {
+   "id": 390,
+   "from": 55,
+   "to": 40,
+   "cost": 730,
+   "length": 6659.645199357199,
+   "points": 15
+  },
+  {
+   "id": 391,
+   "from": 42,
+   "to": 40,
+   "cost": 630,
+   "length": 6024.142971694352,
+   "points": 27
+  },
+  {
+   "id": 392,
+   "from": 40,
+   "to": 25,
+   "cost": 730,
+   "length": 9008.226974109753,
+   "points": 27
+  },
+  {
+   "id": 393,
+   "from": 25,
+   "to": 40,
+   "cost": 730,
+   "length": 9093.171275480452,
+   "points": 28
+  },
+  {
+   "id": 394,
+   "from": 39,
+   "to": 73,
+   "cost": 1020,
+   "length": 5906.52099418228,
+   "points": 25
+  },
+  {
+   "id": 395,
+   "from": 40,
+   "to": 72,
+   "cost": 1020,
+   "length": 6975.701609406277,
+   "points": 32
+  },
+  {
+   "id": 398,
+   "from": 53,
+   "to": 23,
+   "cost": 1020,
+   "length": 9114.845865333134,
+   "points": 49
+  },
+  {
+   "id": 399,
+   "from": 23,
+   "to": 53,
+   "cost": 1020,
+   "length": 9582.210062347349,
+   "points": 43
+  },
+  {
+   "id": 400,
+   "from": 44,
+   "to": 48,
+   "cost": 930,
+   "length": 6955.448159784179,
+   "points": 45
+  },
+  {
+   "id": 401,
+   "from": 48,
+   "to": 44,
+   "cost": 830,
+   "length": 7220.974127187037,
+   "points": 47
+  },
+  {
+   "id": 402,
+   "from": 74,
+   "to": 6,
+   "cost": 830,
+   "length": 2801.51301346491,
+   "points": 24
+  },
+  {
+   "id": 404,
+   "from": 6,
+   "to": 74,
+   "cost": 830,
+   "length": 2594.0128120505105,
+   "points": 20
+  },
+  {
+   "id": 406,
+   "from": 21,
+   "to": 75,
+   "cost": 830,
+   "length": 1682.1695558843157,
+   "points": 10
+  },
+  {
+   "id": 407,
+   "from": 75,
+   "to": 21,
+   "cost": 630,
+   "length": 2090.004875031796,
+   "points": 13
+  },
+  {
+   "id": 408,
+   "from": 70,
+   "to": 75,
+   "cost": 830,
+   "length": 2153.6309652630075,
+   "points": 13
+  },
+  {
+   "id": 409,
+   "from": 75,
+   "to": 70,
+   "cost": 830,
+   "length": 2296.9570835334384,
+   "points": 12
+  },
+  {
+   "id": 410,
+   "from": 71,
+   "to": 74,
+   "cost": 830,
+   "length": 3089.901524110714,
+   "points": 13
+  },
+  {
+   "id": 411,
+   "from": 74,
+   "to": 71,
+   "cost": 830,
+   "length": 2865.479566027933,
+   "points": 13
+  },
+  {
+   "id": 412,
+   "from": 76,
+   "to": 13,
+   "cost": 330,
+   "length": 4767.05493344781,
+   "points": 18
+  },
+  {
+   "id": 413,
+   "from": 13,
+   "to": 76,
+   "cost": 730,
+   "length": 5839.876673783438,
+   "points": 15
+  },
+  {
+   "id": 414,
+   "from": 11,
+   "to": 76,
+   "cost": 730,
+   "length": 8530.441643579055,
+   "points": 67
+  },
+  {
+   "id": 415,
+   "from": 76,
+   "to": 11,
+   "cost": 730,
+   "length": 8538.280623608653,
+   "points": 68
+  },
+  {
+   "id": 416,
+   "from": 77,
+   "to": 25,
+   "cost": 110,
+   "length": 2380.2598078314386,
+   "points": 12
+  },
+  {
+   "id": 417,
+   "from": 25,
+   "to": 77,
+   "cost": 110,
+   "length": 2705.335625302717,
+   "points": 10
+  },
+  {
+   "id": 419,
+   "from": 22,
+   "to": 77,
+   "cost": 110,
+   "length": 2598.6146926713973,
+   "points": 9
+  },
+  {
+   "id": 420,
+   "from": 77,
+   "to": 22,
+   "cost": 110,
+   "length": 3409.6215005575586,
+   "points": 14
+  },
+  {
+   "id": 421,
+   "from": 77,
+   "to": 30,
+   "cost": 430,
+   "length": 3750.0909474677946,
+   "points": 21
+  },
+  {
+   "id": 422,
+   "from": 30,
+   "to": 77,
+   "cost": 430,
+   "length": 4111.149794741284,
+   "points": 21
+  },
+  {
+   "id": 423,
+   "from": 72,
+   "to": 40,
+   "cost": 730,
+   "length": 7224.099965671172,
+   "points": 33
+  },
+  {
+   "id": 424,
+   "from": 73,
+   "to": 39,
+   "cost": 730,
+   "length": 5652.020623073379,
+   "points": 23
+  },
+  {
+   "id": 425,
+   "from": 71,
+   "to": 2,
+   "cost": 830,
+   "length": 4527.772078978402,
+   "points": 29
+  },
+  {
+   "id": 427,
+   "from": 2,
+   "to": 71,
+   "cost": 830,
+   "length": 4706.091188490147,
+   "points": 27
+  },
+  {
+   "id": 428,
+   "from": 6,
+   "to": 66,
+   "cost": 1020,
+   "length": 8816.30366681593,
+   "points": 45
+  },
+  {
+   "id": 429,
+   "from": 66,
+   "to": 6,
+   "cost": 1020,
+   "length": 7782.404011632352,
+   "points": 36
+  },
+  {
+   "id": 431,
+   "from": 66,
+   "to": 67,
+   "cost": 1020,
+   "length": 4390.226280273354,
+   "points": 18
+  },
+  {
+   "id": 432,
+   "from": 67,
+   "to": 66,
+   "cost": 1020,
+   "length": 4483.881957169537,
+   "points": 17
+  },
+  {
+   "id": 436,
+   "from": 78,
+   "to": 24,
+   "cost": 0,
+   "length": 1367.0222185543616,
+   "points": 13
+  },
+  {
+   "id": 437,
+   "from": 67,
+   "to": 6,
+   "cost": 1020,
+   "length": 11024.433516993173,
+   "points": 48
+  },
+  {
+   "id": 438,
+   "from": 6,
+   "to": 67,
+   "cost": 1020,
+   "length": 10440.007452805707,
+   "points": 35
+  },
+  {
+   "id": 439,
+   "from": 36,
+   "to": 24,
+   "cost": 0,
+   "length": 738.3517210372947,
+   "points": 17
+  },
+  {
+   "id": 440,
+   "from": 10,
+   "to": 13,
+   "cost": 330,
+   "length": 2867.9819051547165,
+   "points": 16
+  },
+  {
+   "id": 441,
+   "from": 13,
+   "to": 10,
+   "cost": 110,
+   "length": 2989.434928939521,
+   "points": 18
+  },
+  {
+   "id": 443,
+   "from": 28,
+   "to": 33,
+   "cost": 330,
+   "length": 4599.015824520463,
+   "points": 25
+  },
+  {
+   "id": 444,
+   "from": 33,
+   "to": 28,
+   "cost": 330,
+   "length": 4613.461597335554,
+   "points": 23
+  },
+  {
+   "id": 445,
+   "from": 32,
+   "to": 64,
+   "cost": 730,
+   "length": 7051.916099479392,
+   "points": 23
+  },
+  {
+   "id": 446,
+   "from": 64,
+   "to": 32,
+   "cost": 630,
+   "length": 7241.627558165167,
+   "points": 21
+  },
+  {
+   "id": 447,
+   "from": 64,
+   "to": 52,
+   "cost": 1030,
+   "length": 5354.660974368233,
+   "points": 21
+  },
+  {
+   "id": 448,
+   "from": 52,
+   "to": 64,
+   "cost": 730,
+   "length": 5265.080895087406,
+   "points": 19
+  },
+  {
+   "id": 449,
+   "from": 72,
+   "to": 42,
+   "cost": 730,
+   "length": 3895.2319560835463,
+   "points": 29
+  },
+  {
+   "id": 450,
+   "from": 42,
+   "to": 72,
+   "cost": 1030,
+   "length": 3896.885689430727,
+   "points": 29
+  },
+  {
+   "id": 451,
+   "from": 73,
+   "to": 41,
+   "cost": 730,
+   "length": 5238.685687191964,
+   "points": 29
+  },
+  {
+   "id": 452,
+   "from": 79,
+   "to": 39,
+   "cost": 730,
+   "length": 3099.9957774791487,
+   "points": 16
+  },
+  {
+   "id": 453,
+   "from": 79,
+   "to": 40,
+   "cost": 730,
+   "length": 3395.9280572134417,
+   "points": 17
+  },
+  {
+   "id": 454,
+   "from": 79,
+   "to": 72,
+   "cost": 1030,
+   "length": 3003.390741841228,
+   "points": 17
+  },
+  {
+   "id": 455,
+   "from": 79,
+   "to": 73,
+   "cost": 1030,
+   "length": 2823.3378320837965,
+   "points": 17
+  },
+  {
+   "id": 456,
+   "from": 72,
+   "to": 79,
+   "cost": 830,
+   "length": 2896.0848025046485,
+   "points": 17
+  },
+  {
+   "id": 457,
+   "from": 73,
+   "to": 79,
+   "cost": 830,
+   "length": 2744.769712684977,
+   "points": 17
+  },
+  {
+   "id": 458,
+   "from": 39,
+   "to": 79,
+   "cost": 830,
+   "length": 3114.728722720282,
+   "points": 14
+  },
+  {
+   "id": 459,
+   "from": 40,
+   "to": 79,
+   "cost": 830,
+   "length": 3218.3758101365333,
+   "points": 16
+  },
+  {
+   "id": 460,
+   "from": 80,
+   "to": 32,
+   "cost": 630,
+   "length": 3148.568757797198,
+   "points": 13
+  },
+  {
+   "id": 461,
+   "from": 80,
+   "to": 25,
+   "cost": 110,
+   "length": 2041.186502140132,
+   "points": 14
+  },
+  {
+   "id": 462,
+   "from": 25,
+   "to": 80,
+   "cost": 110,
+   "length": 1545.4471388748311,
+   "points": 11
+  },
+  {
+   "id": 464,
+   "from": 32,
+   "to": 80,
+   "cost": 110,
+   "length": 3445.8186738493155,
+   "points": 13
+  },
+  {
+   "id": 465,
+   "from": 64,
+   "to": 80,
+   "cost": 110,
+   "length": 4061.7732860930537,
+   "points": 17
+  },
+  {
+   "id": 466,
+   "from": 80,
+   "to": 64,
+   "cost": 730,
+   "length": 3960.107278257265,
+   "points": 16
+  },
+  {
+   "id": 467,
+   "from": 28,
+   "to": 64,
+   "cost": 730,
+   "length": 4428.141019938686,
+   "points": 34
+  },
+  {
+   "id": 468,
+   "from": 64,
+   "to": 28,
+   "cost": 330,
+   "length": 4577.863845821371,
+   "points": 34
+  },
+  {
+   "id": 469,
+   "from": 5,
+   "to": 71,
+   "cost": 830,
+   "length": 1824.575946310286,
+   "points": 13
+  },
+  {
+   "id": 470,
+   "from": 71,
+   "to": 5,
+   "cost": 210,
+   "length": 1884.2755305028259,
+   "points": 15
+  },
+  {
+   "id": 471,
+   "from": 41,
+   "to": 73,
+   "cost": 1030,
+   "length": 4773.777627548173,
+   "points": 26
+  },
+  {
+   "id": 473,
+   "from": 76,
+   "to": 68,
+   "cost": 1030,
+   "length": 4159.362601963052,
+   "points": 21
+  },
+  {
+   "id": 474,
+   "from": 68,
+   "to": 76,
+   "cost": 730,
+   "length": 4232.023223875502,
+   "points": 16
+  },
+  {
+   "id": 475,
+   "from": 43,
+   "to": 66,
+   "cost": 1020,
+   "length": 1590.1790716960734,
+   "points": 16
+  },
+  {
+   "id": 476,
+   "from": 66,
+   "to": 43,
+   "cost": 730,
+   "length": 1957.5511256989691,
+   "points": 15
+  },
+  {
+   "id": 477,
+   "from": 37,
+   "to": 33,
+   "cost": 330,
+   "length": 3581.067226940725,
+   "points": 27
+  },
+  {
+   "id": 478,
+   "from": 33,
+   "to": 37,
+   "cost": 530,
+   "length": 3802.8631991883963,
+   "points": 25
+  },
+  {
+   "id": 479,
+   "from": 49,
+   "to": 65,
+   "cost": 730,
+   "length": 1839.9961338383118,
+   "points": 20
+  },
+  {
+   "id": 480,
+   "from": 65,
+   "to": 49,
+   "cost": 1020,
+   "length": 2005.2632976519922,
+   "points": 17
+  },
+  {
+   "id": 481,
+   "from": 61,
+   "to": 44,
+   "cost": 830,
+   "length": 2869.5592623138214,
+   "points": 29
+  },
+  {
+   "id": 482,
+   "from": 44,
+   "to": 61,
+   "cost": 530,
+   "length": 2795.4065596396135,
+   "points": 26
+  },
+  {
+   "id": 484,
+   "from": 17,
+   "to": 76,
+   "cost": 730,
+   "length": 2704.6252794855786,
+   "points": 21
+  },
+  {
+   "id": 485,
+   "from": 76,
+   "to": 17,
+   "cost": 530,
+   "length": 2784.859870490248,
+   "points": 16
+  },
+  {
+   "id": 486,
+   "from": 42,
+   "to": 30,
+   "cost": 430,
+   "length": 3215.0420104081736,
+   "points": 29
+  },
+  {
+   "id": 487,
+   "from": 30,
+   "to": 42,
+   "cost": 730,
+   "length": 3684.8835783268078,
+   "points": 26
+  },
+  {
+   "id": 494,
+   "from": 84,
+   "to": 85,
+   "cost": 0,
+   "length": 1477.9468835150603,
+   "points": 17
+  },
+  {
+   "id": 495,
+   "from": 84,
+   "to": 86,
+   "cost": 0,
+   "length": 1897.4360591600707,
+   "points": 18
+  },
+  {
+   "id": 496,
+   "from": 84,
+   "to": 87,
+   "cost": 0,
+   "length": 1538.6522160038405,
+   "points": 21
+  },
+  {
+   "id": 499,
+   "from": 53,
+   "to": 44,
+   "cost": 830,
+   "length": 4077.97011669453,
+   "points": 22
+  },
+  {
+   "id": 500,
+   "from": 44,
+   "to": 53,
+   "cost": 1020,
+   "length": 3905.128565699424,
+   "points": 19
+  },
+  {
+   "id": 9571,
+   "from": 2913,
+   "to": 2913,
+   "cost": 0,
+   "length": 1206.5831348566376,
+   "points": 5
+  },
+  {
+   "id": 9574,
+   "from": 2914,
+   "to": 2914,
+   "cost": 0,
+   "length": 1237.8918591666113,
+   "points": 4
+  },
+  {
+   "id": 9620,
+   "from": 2930,
+   "to": 2930,
+   "cost": 0,
+   "length": 10851.71674335075,
+   "points": 19
+  },
+  {
+   "id": 10552,
+   "from": 84,
+   "to": 85,
+   "cost": 0,
+   "length": 1477.9468835150603,
+   "points": 17
+  },
+  {
+   "id": 11512,
+   "from": 3260,
+   "to": 3260,
+   "cost": 0,
+   "length": 71.31258779875643,
+   "points": 7
+  },
+  {
+   "id": 11515,
+   "from": 3261,
+   "to": 3261,
+   "cost": 0,
+   "length": 2823.572379988308,
+   "points": 19
+  },
+  {
+   "id": 11517,
+   "from": 3262,
+   "to": 3262,
+   "cost": 0,
+   "length": 2624.595068424919,
+   "points": 21
+  },
+  {
+   "id": 11524,
+   "from": 559,
+   "to": 3242,
+   "cost": 510,
+   "length": 1865.6804337689264,
+   "points": 35
+  },
+  {
+   "id": 11525,
+   "from": 53,
+   "to": 3242,
+   "cost": 330,
+   "length": 4078.3308262504424,
+   "points": 51
+  },
+  {
+   "id": 11526,
+   "from": 3242,
+   "to": 53,
+   "cost": 1020,
+   "length": 3967.2849049541105,
+   "points": 68
+  },
+  {
+   "id": 11528,
+   "from": 3242,
+   "to": 559,
+   "cost": 510,
+   "length": 1848.9159444157654,
+   "points": 40
+  },
+  {
+   "id": 11529,
+   "from": 3242,
+   "to": 52,
+   "cost": 1020,
+   "length": 3744.59661583283,
+   "points": 75
+  },
+  {
+   "id": 11530,
+   "from": 52,
+   "to": 3242,
+   "cost": 330,
+   "length": 4057.2051416486324,
+   "points": 65
+  },
+  {
+   "id": 11574,
+   "from": 3203,
+   "to": 56,
+   "cost": 630,
+   "length": 4623.769260336173,
+   "points": 31
+  },
+  {
+   "id": 11575,
+   "from": 56,
+   "to": 3203,
+   "cost": 630,
+   "length": 5085.401026101957,
+   "points": 43
+  },
+  {
+   "id": 11576,
+   "from": 3203,
+   "to": 21,
+   "cost": 630,
+   "length": 3606.6452024708988,
+   "points": 23
+  },
+  {
+   "id": 11577,
+   "from": 21,
+   "to": 3203,
+   "cost": 630,
+   "length": 3820.590921377471,
+   "points": 27
+  },
+  {
+   "id": 11578,
+   "from": 3203,
+   "to": 70,
+   "cost": 630,
+   "length": 3993.391738435137,
+   "points": 27
+  },
+  {
+   "id": 11579,
+   "from": 70,
+   "to": 3203,
+   "cost": 630,
+   "length": 4113.427617392417,
+   "points": 32
+  },
+  {
+   "id": 11580,
+   "from": 3203,
+   "to": 17,
+   "cost": 830,
+   "length": 9845.432932723596,
+   "points": 53
+  },
+  {
+   "id": 11581,
+   "from": 17,
+   "to": 3203,
+   "cost": 830,
+   "length": 9766.744944337628,
+   "points": 55
+  },
+  {
+   "id": 11582,
+   "from": 3275,
+   "to": 3276,
+   "cost": 330,
+   "length": 1624.4255259719253,
+   "points": 22
+  },
+  {
+   "id": 11583,
+   "from": 3276,
+   "to": 3275,
+   "cost": 330,
+   "length": 2028.8993644464058,
+   "points": 25
+  },
+  {
+   "id": 11584,
+   "from": 3276,
+   "to": 5,
+   "cost": 630,
+   "length": 3917.1158396237656,
+   "points": 42
+  },
+  {
+   "id": 11585,
+   "from": 5,
+   "to": 3276,
+   "cost": 630,
+   "length": 3962.46245255777,
+   "points": 43
+  },
+  {
+   "id": 11586,
+   "from": 3276,
+   "to": 71,
+   "cost": 630,
+   "length": 3675.790295698009,
+   "points": 33
+  },
+  {
+   "id": 11587,
+   "from": 71,
+   "to": 3276,
+   "cost": 630,
+   "length": 3935.894003883084,
+   "points": 35
+  },
+  {
+   "id": 11588,
+   "from": 3276,
+   "to": 8,
+   "cost": 630,
+   "length": 5193.017714872651,
+   "points": 40
+  },
+  {
+   "id": 11589,
+   "from": 8,
+   "to": 3276,
+   "cost": 630,
+   "length": 5530.723018232679,
+   "points": 42
+  }
+ ],
+ "maps": [
+  {
+   "ui_map": 947,
+   "continent": 1,
+   "area": 0,
+   "min_x": -12800.0,
+   "min_y": -9600.0,
+   "max_x": 12266.700195312,
+   "max_y": 6933.2998046875
+  },
+  {
+   "ui_map": 1411,
+   "continent": 1,
+   "area": 14,
+   "min_x": -1716.6666259766,
+   "min_y": -7249.9995117188,
+   "max_x": 1808.3332519531,
+   "max_y": -1962.4998779297
+  },
+  {
+   "ui_map": 1412,
+   "continent": 1,
+   "area": 215,
+   "min_x": -3835.416015625,
+   "min_y": -3675.0,
+   "max_x": 266.666015625,
+   "max_y": 2479.1669921875
+  },
+  {
+   "ui_map": 1413,
+   "continent": 1,
+   "area": 17,
+   "min_x": -5143.75,
+   "min_y": -7510.4165039062,
+   "max_x": 1612.4998779297,
+   "max_y": 2622.9165039062
+  },
+  {
+   "ui_map": 1414,
+   "continent": 1,
+   "area": 0,
+   "min_x": -11733.299804688,
+   "min_y": -19733.2109375,
+   "max_x": 12799.900390625,
+   "max_y": 17066.599609375
+  },
+  {
+   "ui_map": 1415,
+   "continent": 0,
+   "area": 0,
+   "min_x": -16000.0,
+   "min_y": -19199.900390625,
+   "max_x": 7466.6000976562,
+   "max_y": 16000.0
+  },
+  {
+   "ui_map": 1416,
+   "continent": 0,
+   "area": 36,
+   "min_x": -366.66665649414,
+   "min_y": -2016.6666259766,
+   "max_x": 1500.0,
+   "max_y": 783.33331298828
+  },
+  {
+   "ui_map": 1417,
+   "continent": 0,
+   "area": 45,
+   "min_x": -2533.3332519531,
+   "min_y": -4466.6665039062,
+   "max_x": -133.33332824707,
+   "max_y": -866.66662597656
+  },
+  {
+   "ui_map": 1418,
+   "continent": 0,
+   "area": 3,
+   "min_x": -7547.9165039062,
+   "min_y": -4566.6665039062,
+   "max_x": -5889.5830078125,
+   "max_y": -2079.1665039062
+  },
+  {
+   "ui_map": 1419,
+   "continent": 0,
+   "area": 4,
+   "min_x": -12800.0,
+   "min_y": -4591.6665039062,
+   "max_x": -10566.666015625,
+   "max_y": -1241.6666259766
+  },
+  {
+   "ui_map": 1420,
+   "continent": 0,
+   "area": 85,
+   "min_x": 824.99993896484,
+   "min_y": -1485.4166259766,
+   "max_x": 3837.4997558594,
+   "max_y": 3033.3332519531
+  },
+  {
+   "ui_map": 1421,
+   "continent": 0,
+   "area": 130,
+   "min_x": -1133.3332519531,
+   "min_y": -750.0,
+   "max_x": 1666.6666259766,
+   "max_y": 3449.9997558594
+  },
+  {
+   "ui_map": 1422,
+   "continent": 0,
+   "area": 28,
+   "min_x": 499.99996948242,
+   "min_y": -3883.3332519531,
+   "max_x": 3366.6665039062,
+   "max_y": 416.66665649414
+  },
+  {
+   "ui_map": 1423,
+   "continent": 0,
+   "area": 139,
+   "min_x": 825.0,
+   "min_y": -6558.333984375,
+   "max_x": 3691.6669921875,
+   "max_y": -2256.25
+  },
+  {
+   "ui_map": 1424,
+   "continent": 0,
+   "area": 267,
+   "min_x": -1733.3332519531,
+   "min_y": -2133.3332519531,
+   "max_x": 400.0,
+   "max_y": 1066.6666259766
+  },
+  {
+   "ui_map": 1425,
+   "continent": 0,
+   "area": 47,
+   "min_x": -1100.0,
+   "min_y": -5425.0,
+   "max_x": 1466.6666259766,
+   "max_y": -1575.0
+  },
+  {
+   "ui_map": 1426,
+   "continent": 0,
+   "area": 1,
+   "min_x": -7160.4165039062,
+   "min_y": -3122.9165039062,
+   "max_x": -3877.0832519531,
+   "max_y": 1802.0832519531
+  },
+  {
+   "ui_map": 1427,
+   "continent": 0,
+   "area": 51,
+   "min_x": -7587.4995117188,
+   "min_y": -2554.1665039062,
+   "max_x": -6100.0,
+   "max_y": -322.91665649414
+  },
+  {
+   "ui_map": 1428,
+   "continent": 0,
+   "area": 46,
+   "min_x": -8983.3330078125,
+   "min_y": -3195.8332519531,
+   "max_x": -7031.2495117188,
+   "max_y": -266.66665649414
+  },
+  {
+   "ui_map": 1429,
+   "continent": 0,
+   "area": 12,
+   "min_x": -10254.166015625,
+   "min_y": -1935.4166259766,
+   "max_x": -7939.5830078125,
+   "max_y": 1535.4166259766
+  },
+  {
+   "ui_map": 1430,
+   "continent": 0,
+   "area": 41,
+   "min_x": -11533.333007812,
+   "min_y": -3333.3332519531,
+   "max_x": -9866.666015625,
+   "max_y": -833.33331298828
+  },
+  {
+   "ui_map": 1431,
+   "continent": 0,
+   "area": 10,
+   "min_x": -11516.666015625,
+   "min_y": -1866.6666259766,
+   "max_x": -9716.666015625,
+   "max_y": 833.33331298828
+  },
+  {
+   "ui_map": 1432,
+   "continent": 0,
+   "area": 38,
+   "min_x": -6327.0830078125,
+   "min_y": -4752.0830078125,
+   "max_x": -4487.5,
+   "max_y": -1993.7498779297
+  },
+  {
+   "ui_map": 1433,
+   "continent": 0,
+   "area": 44,
+   "min_x": -10022.916015625,
+   "min_y": -3852.083984375,
+   "max_x": -8575.0,
+   "max_y": -1681.25
+  },
+  {
+   "ui_map": 1434,
+   "continent": 0,
+   "area": 33,
+   "min_x": -15422.916015625,
+   "min_y": -4160.4165039062,
+   "max_x": -11168.75,
+   "max_y": 2220.8332519531
+  },
+  {
+   "ui_map": 1435,
+   "continent": 0,
+   "area": 8,
+   "min_x": -11150.0,
+   "min_y": -4516.6665039062,
+   "max_x": -9620.8330078125,
+   "max_y": -2222.9165039062
+  },
+  {
+   "ui_map": 1436,
+   "continent": 0,
+   "area": 40,
+   "min_x": -11733.333007812,
+   "min_y": -483.33331298828,
+   "max_x": -9400.0,
+   "max_y": 3016.6665039062
+  },
+  {
+   "ui_map": 1437,
+   "continent": 0,
+   "area": 11,
+   "min_x": -4904.1665039062,
+   "min_y": -4525.0,
+   "max_x": -2147.9165039062,
+   "max_y": -389.58331298828
+  },
+  {
+   "ui_map": 1438,
+   "continent": 1,
+   "area": 141,
+   "min_x": 8437.5,
+   "min_y": -1277.0832519531,
+   "max_x": 11831.25,
+   "max_y": 3814.5832519531
+  },
+  {
+   "ui_map": 1439,
+   "continent": 1,
+   "area": 148,
+   "min_x": 3966.6665039062,
+   "min_y": -3608.3332519531,
+   "max_x": 8333.3330078125,
+   "max_y": 2941.6665039062
+  },
+  {
+   "ui_map": 1440,
+   "continent": 1,
+   "area": 331,
+   "min_x": 829.16662597656,
+   "min_y": -4066.6665039062,
+   "max_x": 4672.9165039062,
+   "max_y": 1699.9998779297
+  },
+  {
+   "ui_map": 1441,
+   "continent": 1,
+   "area": 400,
+   "min_x": -6899.9995117188,
+   "min_y": -4833.3330078125,
+   "max_x": -3966.6665039062,
+   "max_y": -433.33331298828
+  },
+  {
+   "ui_map": 1442,
+   "continent": 1,
+   "area": 406,
+   "min_x": -339.58331298828,
+   "min_y": -1637.4998779297,
+   "max_x": 2916.6665039062,
+   "max_y": 3245.8332519531
+  },
+  {
+   "ui_map": 1443,
+   "continent": 1,
+   "area": 405,
+   "min_x": -2545.8332519531,
+   "min_y": -262.5,
+   "max_x": 452.08331298828,
+   "max_y": 4233.3330078125
+  },
+  {
+   "ui_map": 1444,
+   "continent": 1,
+   "area": 357,
+   "min_x": -6999.9995117188,
+   "min_y": -1508.3332519531,
+   "max_x": -2366.6665039062,
+   "max_y": 5441.6665039062
+  },
+  {
+   "ui_map": 1445,
+   "continent": 1,
+   "area": 15,
+   "min_x": -5533.3330078125,
+   "min_y": -6225.0,
+   "max_x": -2033.3332519531,
+   "max_y": -974.99993896484
+  },
+  {
+   "ui_map": 1446,
+   "continent": 1,
+   "area": 440,
+   "min_x": -10475.0,
+   "min_y": -7118.7495117188,
+   "max_x": -5875.0,
+   "max_y": -218.74998474121
+  },
+  {
+   "ui_map": 1447,
+   "continent": 1,
+   "area": 16,
+   "min_x": 1960.4166259766,
+   "min_y": -8347.916015625,
+   "max_x": 5341.6665039062,
+   "max_y": -3277.0832519531
+  },
+  {
+   "ui_map": 1448,
+   "continent": 1,
+   "area": 361,
+   "min_x": 3299.9997558594,
+   "min_y": -4108.3330078125,
+   "max_x": 7133.3330078125,
+   "max_y": 1641.6666259766
+  },
+  {
+   "ui_map": 1449,
+   "continent": 1,
+   "area": 490,
+   "min_x": -8433.3330078125,
+   "min_y": -3166.6665039062,
+   "max_x": -5966.6665039062,
+   "max_y": 533.33331298828
+  },
+  {
+   "ui_map": 1450,
+   "continent": 1,
+   "area": 493,
+   "min_x": 6952.0830078125,
+   "min_y": -3689.5832519531,
+   "max_x": 8491.666015625,
+   "max_y": -1381.25
+  },
+  {
+   "ui_map": 1451,
+   "continent": 1,
+   "area": 1377,
+   "min_x": -8281.25,
+   "min_y": -945.833984375,
+   "max_x": -5958.333984375,
+   "max_y": 2537.5
+  },
+  {
+   "ui_map": 1452,
+   "continent": 1,
+   "area": 618,
+   "min_x": 3799.9997558594,
+   "min_y": -7416.6665039062,
+   "max_x": 8533.3330078125,
+   "max_y": -316.66665649414
+  },
+  {
+   "ui_map": 1453,
+   "continent": 0,
+   "area": 1519,
+   "min_x": -9154.169921875,
+   "min_y": -14.58399963379,
+   "max_x": -7995.830078125,
+   "max_y": 1722.9200439453
+  },
+  {
+   "ui_map": 1454,
+   "continent": 1,
+   "area": 1637,
+   "min_x": 1338.4605712891,
+   "min_y": -5083.2055664062,
+   "max_x": 2273.8771972656,
+   "max_y": -3680.6010742188
+  },
+  {
+   "ui_map": 1455,
+   "continent": 0,
+   "area": 1537,
+   "min_x": -5096.845703125,
+   "min_y": -1504.2164306641,
+   "max_x": -4569.2412109375,
+   "max_y": -713.59136962891
+  },
+  {
+   "ui_map": 1456,
+   "continent": 1,
+   "area": 1638,
+   "min_x": -1545.8332519531,
+   "min_y": -527.08331298828,
+   "max_x": -849.99993896484,
+   "max_y": 516.66662597656
+  },
+  {
+   "ui_map": 1457,
+   "continent": 1,
+   "area": 1657,
+   "min_x": 9532.5869140625,
+   "min_y": 1880.0295410156,
+   "max_x": 10238.31640625,
+   "max_y": 2938.3627929688
+  },
+  {
+   "ui_map": 1458,
+   "continent": 0,
+   "area": 1497,
+   "min_x": 1237.8411865234,
+   "min_y": -86.18240356445,
+   "max_x": 1877.9453125,
+   "max_y": 873.19262695313
+  },
+  {
+   "ui_map": 1459,
+   "continent": 30,
+   "area": 2597,
+   "min_x": -1739.5832519531,
+   "min_y": -2456.25,
+   "max_x": 1085.4166259766,
+   "max_y": 1781.2498779297
+  },
+  {
+   "ui_map": 1460,
+   "continent": 489,
+   "area": 3277,
+   "min_x": 862.49993896484,
+   "min_y": 895.83331298828,
+   "max_x": 1627.0832519531,
+   "max_y": 2041.6666259766
+  },
+  {
+   "ui_map": 1461,
+   "continent": 529,
+   "area": 3358,
+   "min_x": 337.5,
+   "min_y": 102.08332824707,
+   "max_x": 1508.3332519531,
+   "max_y": 1858.3332519531
+  },
+  {
+   "ui_map": 1463,
+   "continent": 0,
+   "area": 0,
+   "min_x": -15980.0,
+   "min_y": -11880.0,
+   "max_x": 5817.0,
+   "max_y": 9917.0
+  },
+  {
+   "ui_map": 1464,
+   "continent": 1,
+   "area": 0,
+   "min_x": -11870.0,
+   "min_y": -13370.0,
+   "max_x": 12470.0,
+   "max_y": 10970.0
+  },
+  {
+   "ui_map": 2482,
+   "continent": 1,
+   "area": 616,
+   "min_x": 3989.5830078125,
+   "min_y": -4395.833984375,
+   "max_x": 6304.166015625,
+   "max_y": -922.916015625
+  },
+  {
+   "ui_map": 2521,
+   "continent": 2991,
+   "area": 16593,
+   "min_x": 1247.9169921875,
+   "min_y": -1331.25,
+   "max_x": 4956.25,
+   "max_y": 4231.25
+  },
+  {
+   "ui_map": 2524,
+   "continent": 2997,
+   "area": 16606,
+   "min_x": -835.416015625,
+   "min_y": 993.75,
+   "max_x": 447.916015625,
+   "max_y": 2918.75
+  },
+  {
+   "ui_map": 2548,
+   "continent": 0,
+   "area": 16591,
+   "min_x": -9700.0,
+   "min_y": -6741.666015625,
+   "max_x": -6466.666015625,
+   "max_y": -1891.666015625
+  },
+  {
+   "ui_map": 2652,
+   "continent": 1,
+   "area": 16651,
+   "min_x": -3266.666015625,
+   "min_y": -25.0,
+   "max_x": -1900.0,
+   "max_y": 2025.0
+  },
+  {
+   "ui_map": 2665,
+   "continent": 2991,
+   "area": 0,
+   "min_x": 1247.9200439453,
+   "min_y": -1331.25,
+   "max_x": 4956.25,
+   "max_y": 4231.25
+  }
+ ],
+ "notes": [
+  "100 point(s) de vol, 315 trajet(s) (longueur : somme des segments de TaxiPathNode, téléportations exclues), 60 carte(s) de zone ; 13 trajet(s) vers un point absent écartés",
+  "camp d'un point de vol par ses drapeaux (decode_rules.json travel.faction_flags), sens probable ; conditions d'accès (ConditionID) non lues"
+ ],
+ "source": "Client 1.60.1.70450 : tables TaxiNodes, TaxiPath, TaxiPathNode et UiMapAssignment (wago.tools, decode_rules.json travel)",
+ "certainty": "certain"
+}

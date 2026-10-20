@@ -619,6 +619,824 @@
       "nature": "client",
       "decision": "rangs bas lissés par le client 1.60.1.70291 (Arcane Missiles (5143, 7269, 7270) : SpellEffect.EffectBasePointsF et EffectRealPointsPerLevel), annoncés par la note officielle du 08/10 (t/2360696/5, révision 1) ; recommandations changées au rejeu de T05 (leveling 20 et 30, donjon et raid 20 ; ordre des talents en leveling 40 et 60 : docs/research/data-1.60.1.70291-r1.md, section Rejeu ; affirmation contraire du 2026-10-09 corrigée, le rejeu de forever update ayant comparé 70245 à elle-même) ; décision de l'utilisateur du 2026-10-09",
       "applied_in_revision": 1
+    },
+    {
+      "kind": "talent",
+      "key": "wakeOfFire",
+      "change": "renamed",
+      "field": "key",
+      "old": "wakeOfFire",
+      "new": "improvedFireBlast",
+      "desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards.",
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "arcaneBlast",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        50,
+        58,
+        10,
+        175,
+        4,
+        8
+      ],
+      "new": [
+        30,
+        34,
+        15,
+        175,
+        4,
+        15
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "arcaneBlast",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        50,
+        58,
+        10,
+        175,
+        4,
+        8
+      ],
+      "new": [
+        30,
+        34,
+        15,
+        175,
+        4,
+        15
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "tier",
+      "old": 4,
+      "new": 1,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "max",
+      "old": 1,
+      "new": 2,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        40,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "new": [
+        20,
+        5,
+        10,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": null,
+      "new": [
+        40,
+        10,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        40,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "new": [
+        20,
+        5,
+        10,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": null,
+      "new": [
+        40,
+        10,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "criticalMass",
+      "change": "modified",
+      "field": "max",
+      "old": 3,
+      "new": 5,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "criticalMass",
+      "change": "modified",
+      "field": "ranks[4]",
+      "old": null,
+      "new": [
+        8
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "criticalMass",
+      "change": "modified",
+      "field": "ranks[5]",
+      "old": null,
+      "new": [
+        10
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "criticalMass",
+      "change": "modified",
+      "field": "tooltip_values[4]",
+      "old": null,
+      "new": [
+        8
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "criticalMass",
+      "change": "modified",
+      "field": "tooltip_values[5]",
+      "old": null,
+      "new": [
+        10
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "max",
+      "old": 5,
+      "new": 3,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        2
+      ],
+      "new": [
+        1,
+        4
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        4
+      ],
+      "new": [
+        2,
+        8
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "ranks[3]",
+      "old": [
+        6
+      ],
+      "new": [
+        3,
+        12
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "ranks[4]",
+      "old": [
+        8
+      ],
+      "new": null,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "ranks[5]",
+      "old": [
+        10
+      ],
+      "new": null,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        2
+      ],
+      "new": [
+        1,
+        4
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": [
+        4
+      ],
+      "new": [
+        2,
+        8
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "tooltip_values[3]",
+      "old": [
+        6
+      ],
+      "new": [
+        3,
+        12
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "tooltip_values[4]",
+      "old": [
+        8
+      ],
+      "new": null,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "firePower",
+      "change": "modified",
+      "field": "tooltip_values[5]",
+      "old": [
+        10
+      ],
+      "new": null,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "iceLance",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        26,
+        30,
+        300
+      ],
+      "new": [
+        26,
+        30,
+        200
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "iceLance",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        26,
+        30,
+        300
+      ],
+      "new": [
+        26,
+        30,
+        200
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        20,
+        1
+      ],
+      "new": [
+        20,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        40,
+        2
+      ],
+      "new": [
+        40,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "ranks[3]",
+      "old": [
+        60,
+        3
+      ],
+      "new": [
+        60,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "ranks[4]",
+      "old": [
+        80,
+        4
+      ],
+      "new": [
+        80,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        20,
+        2,
+        15,
+        1
+      ],
+      "new": [
+        20,
+        40,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": [
+        40,
+        2,
+        15,
+        2
+      ],
+      "new": [
+        40,
+        40,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[3]",
+      "old": [
+        60,
+        2,
+        15,
+        3
+      ],
+      "new": [
+        60,
+        40,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[4]",
+      "old": [
+        80,
+        2,
+        15,
+        4
+      ],
+      "new": [
+        80,
+        40,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[5]",
+      "old": [
+        100,
+        2,
+        15,
+        5
+      ],
+      "new": [
+        100,
+        40,
+        5
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "arcaneWrath",
+      "change": "added",
+      "field": null,
+      "old": null,
+      "new": "arcaneWrath",
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "ice_lance",
+      "change": "modified",
+      "field": "frozen_mult",
+      "old": 4.0,
+      "new": 3,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[1].min",
+      "old": 57,
+      "new": 33,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[1].max",
+      "old": 66,
+      "new": 39,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[1].cast_s",
+      "old": 2.5,
+      "new": 1.5,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[2].min",
+      "old": 131,
+      "new": 78,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[2].max",
+      "old": 152,
+      "new": 91,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[2].cast_s",
+      "old": 2.5,
+      "new": 1.5,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[3].min",
+      "old": 168,
+      "new": 101,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[3].max",
+      "old": 196,
+      "new": 117,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[3].cast_s",
+      "old": 2.5,
+      "new": 1.5,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[4].min",
+      "old": 269,
+      "new": 165,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[4].max",
+      "old": 313,
+      "new": 192,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[4].cast_s",
+      "old": 2.5,
+      "new": 1.5,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[5].min",
+      "old": 364,
+      "new": 218,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[5].max",
+      "old": 424,
+      "new": 254,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_blast",
+      "change": "modified",
+      "field": "ranks[5].cast_s",
+      "old": 2.5,
+      "new": 1.5,
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "frost_blast",
+      "change": "added",
+      "field": null,
+      "old": null,
+      "new": "frost_blast",
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "spell",
+      "key": "arcane_wrath",
+      "change": "added",
+      "field": null,
+      "old": null,
+      "new": "arcane_wrath",
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wakeOfFire",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        1,
+        30,
+        25
+      ],
+      "new": [
+        1,
+        8
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wakeOfFire",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        2,
+        30,
+        50
+      ],
+      "new": [
+        2,
+        15
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wakeOfFire",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        1,
+        30,
+        25
+      ],
+      "new": [
+        1,
+        8
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
+    },
+    {
+      "kind": "talent",
+      "key": "wakeOfFire",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": [
+        2,
+        30,
+        50
+      ],
+      "new": [
+        2,
+        15
+      ],
+      "nature": "client",
+      "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)"
     }
   ],
   "carried_from": "1.60.1.70338"

@@ -1,0 +1,1555 @@
+{
+  "schema_version": 1,
+  "game_version": "1.60.1.70124",
+  "notes": [
+    "Origine déclarée de chaque valeur des données de la version (T08b, bloc H, D4) ; contrôle : uv run tasks.py verify (étape origins), inventaire : uv run forever origins inventory.",
+    "Pointeurs JSON (RFC 6901) ; un chemin couvre son sous-arbre ; motifs * et ** permis pour client, journal, addon et copie_figee seulement.",
+    "pending : abaissements de certitude prévus et datés, tolérés par le contrôle jusqu'à leur échéance."
+  ],
+  "metadata_keys": [
+    "source",
+    "sources",
+    "certainty",
+    "registry",
+    "note",
+    "notes",
+    "build",
+    "source_build",
+    "inherited_from",
+    "schema_version",
+    "game_version",
+    "carried_from",
+    "field_certainty",
+    "field_notes",
+    "hotfix"
+  ],
+  "not_game_values": [
+    {
+      "file": "revisions.json",
+      "paths": [
+        "**"
+      ],
+      "reason": "ne décrit pas le jeu : journal, sources ou légende"
+    },
+    {
+      "file": "sources.json",
+      "paths": [
+        "**"
+      ],
+      "reason": "ne décrit pas le jeu : journal, sources ou légende"
+    },
+    {
+      "file": "confirmed_changes.json",
+      "paths": [
+        "**"
+      ],
+      "reason": "filtre de l'installation : écarts tranchés par l'utilisateur, valeurs relues dans le client à chaque installation"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/rank_format"
+      ],
+      "reason": "format des colonnes de rang, pas une valeur"
+    },
+    {
+      "file": "monsters.json",
+      "paths": [
+        "/logs",
+        "/questie_version",
+        "/questie_source"
+      ],
+      "reason": "provenance des mesures"
+    },
+    {
+      "file": "pvp_rules.json",
+      "paths": [
+        "/open_question"
+      ],
+      "reason": "question ouverte, texte"
+    },
+    {
+      "file": "decode_rules.json",
+      "paths": [
+        "/classes_note",
+        "/races_note",
+        "/gametables_note",
+        "/hotfix_related_tables_note",
+        "/circular_sufficient_edges_note",
+        "/parked_nodes_note"
+      ],
+      "reason": "notes de lecture, texte"
+    },
+    {
+      "file": "meta.json",
+      "paths": [
+        "/collected",
+        "/launch",
+        "/certainty_legend",
+        "/sources"
+      ],
+      "reason": "ne décrit pas le jeu : collecte, légende des certitudes, sources"
+    },
+    {
+      "file": "quest_rewards.json",
+      "paths": [
+        "/questcache",
+        "/difficulty_columns"
+      ],
+      "reason": "provenance de la lecture du cache et format de la table, pas une valeur du jeu"
+    }
+  ],
+  "rules": [
+    {
+      "file": "_seed_spells.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "copie_figee",
+      "source": "copie figée (sources.json), lue en mode seed seulement ou gardée pour mémoire"
+    },
+    {
+      "file": "_seed_talents.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "copie_figee",
+      "source": "copie figée (sources.json), lue en mode seed seulement ou gardée pour mémoire"
+    },
+    {
+      "file": "_seed_racials.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "copie_figee",
+      "source": "copie figée (sources.json), lue en mode seed seulement ou gardée pour mémoire"
+    },
+    {
+      "file": "_source_gunba_mage_tree.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "copie_figee",
+      "source": "copie figée (sources.json), lue en mode seed seulement ou gardée pour mémoire"
+    },
+    {
+      "file": "talents.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables Trait*, Spell* et CurvePoint du client (forever decode)",
+      "certainty": "certain"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables des classes du client (forever decode, decode_rules.json classes)",
+      "certainty": "certain"
+    },
+    {
+      "file": "races.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "ChrRaces, CharBaseInfo, SkillLineAbility et Spell* du client (forever decode)",
+      "certainty": "certain"
+    },
+    {
+      "file": "pvp_items.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "Item* et Spell* du client (forever decode)",
+      "certainty": "certain"
+    },
+    {
+      "file": "spell_scaling.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "SpellEffect, SpellLevels, SpellMisc, SpellCastTimes, SpellDuration, SpellPower, SpellCooldowns du client (forever decode)",
+      "certainty": "certain"
+    },
+    {
+      "file": "spell_scaling.json",
+      "paths": [
+        "/level_cap"
+      ],
+      "origin": "manuel",
+      "source": "decode_rules.json levels.level_cap",
+      "certainty": "probable",
+      "reason": "niveau maximal écrit à la main, recopié du fichier des règles de lecture (D2)"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/*/ranks"
+      ],
+      "origin": "client",
+      "source": "SpellEffect, SpellLevels, SpellMisc, SpellCastTimes, SpellDuration, SpellPower, SpellCooldowns du client (forever decode)",
+      "certainty": "certain"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/ice_lance/frozen_mult"
+      ],
+      "origin": "client",
+      "source": "forever decode : multiplicateur d'Ice Lance lu dans le talent iceLance (decode_rules.json frozen_mult)",
+      "certainty": "certain",
+      "reason": "70450 (décision 285) : valeur du client, plus recopiée du seed"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/frost_blast/*",
+        "/spells/arcane_wrath/*"
+      ],
+      "origin": "client",
+      "source": "forever decode : champs des sorts nouveaux lus dans le client (decode_rules.json new_spells : école, portée, ralentissement, talent)",
+      "certainty": "certain",
+      "reason": "70450 (décision 285) : sorts nouveaux de la refonte du Mage",
+      "anticipe": "1.60.1.70450 : Frost Blast et Arcane Wrath, absents des versions précédentes"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/frost_nova/aoe",
+        "/spells/cone_of_cold/aoe",
+        "/spells/arcane_explosion/aoe",
+        "/spells/blizzard/aoe",
+        "/spells/flamestrike/aoe",
+        "/spells/blast_wave/aoe",
+        "/spells/frostbolt/binary",
+        "/spells/frost_nova/breaks_on_damage",
+        "/spells/arcane_missiles/channel",
+        "/spells/blizzard/channel",
+        "/spells/blast_wave/daze",
+        "/spells/frost_nova/freeze",
+        "/spells/arcane_blast/mana_pct_base",
+        "/spells/arcane_explosion/radius",
+        "/spells/frostbolt/range",
+        "/spells/fireball/range",
+        "/spells/fire_blast/range",
+        "/spells/scorch/range",
+        "/spells/pyroblast/range",
+        "/spells/frostfire_bolt/range",
+        "/spells/ice_lance/range",
+        "/spells/arcane_blast/range",
+        "/spells/arcane_missiles/range",
+        "/spells/frostbolt/school",
+        "/spells/fireball/school",
+        "/spells/fire_blast/school",
+        "/spells/scorch/school",
+        "/spells/pyroblast/school",
+        "/spells/frostfire_bolt/school",
+        "/spells/ice_lance/school",
+        "/spells/arcane_blast/school",
+        "/spells/arcane_missiles/school",
+        "/spells/frost_nova/school",
+        "/spells/cone_of_cold/school",
+        "/spells/arcane_explosion/school",
+        "/spells/blizzard/school",
+        "/spells/flamestrike/school",
+        "/spells/blast_wave/school",
+        "/spells/frostbolt/slow",
+        "/spells/frostfire_bolt/slow",
+        "/spells/cone_of_cold/slow",
+        "/spells/frostbolt/slow_dur",
+        "/spells/frostfire_bolt/slow_dur",
+        "/spells/cone_of_cold/slow_dur",
+        "/spells/pyroblast/talent",
+        "/spells/ice_lance/talent",
+        "/spells/arcane_blast/talent",
+        "/spells/blast_wave/talent"
+      ],
+      "origin": "manuel",
+      "source": "copie du seed (wowforevertalents.com, build 1.60.1.70009)",
+      "certainty": "probable",
+      "reason": "champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B)"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/frostbolt/projectile_speed",
+        "/spells/fireball/projectile_speed",
+        "/spells/pyroblast/projectile_speed",
+        "/spells/frostfire_bolt/projectile_speed",
+        "/spells/ice_lance/projectile_speed"
+      ],
+      "origin": "manuel",
+      "source": "estimation du seed (EST)",
+      "certainty": "suppose",
+      "reason": "champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B)"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/utility/blink",
+        "/utility/evocation",
+        "/utility/counterspell",
+        "/utility/polymorph",
+        "/utility/frost_armor",
+        "/utility/ice_armor",
+        "/utility/mage_armor",
+        "/utility/mana_shield",
+        "/utility/ice_barrier",
+        "/utility/frost_ward",
+        "/utility/fire_ward",
+        "/utility/mana_gems",
+        "/utility/arcane_intellect",
+        "/utility/conjure_water",
+        "/utility/conjure_food"
+      ],
+      "origin": "manuel",
+      "source": "copie du seed (wowforevertalents.com, build 1.60.1.70009)",
+      "certainty": "probable",
+      "reason": "utilitaire recopié du seed ; classes.json porte des valeurs décodées (D2, bloc B)",
+      "registry": "C2"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/coefficient.cast_divisor",
+        "/values/coefficient.cast_bounds_s",
+        "/values/coefficient.slow_factor",
+        "/values/coefficient.channel_cap_s",
+        "/values/coefficient.fixed"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (fm.py du seed, PC)",
+      "certainty": "suppose",
+      "reason": "mode seed seulement : le mode forever lit les coefficients du client (spell_scaling.json)",
+      "registry": "G4"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/coefficient.low_level"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "pénalité des sorts de bas niveau : absente du client (question E2)",
+      "registry": "G4"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/coefficient.low_level_default"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC), décision 72 ; existence confirmée par la note officielle du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4)",
+      "certainty": "probable",
+      "reason": "pénalité des sorts de bas niveau : absente du client, existence portée par un texte officiel sans mesure ; formule à mesurer (question E2)",
+      "registry": "G4"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/talents.first_level"
+      ],
+      "origin": "manuel",
+      "source": "fm.py du seed (points_available)",
+      "certainty": "probable",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json (NumTalentsAtLevel)",
+      "registry": "G3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/talents.points_per_tier"
+      ],
+      "origin": "manuel",
+      "source": "fm.py du seed (check_build)",
+      "certainty": "probable",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json (TraitCond)",
+      "registry": "G3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.crit_base"
+      ],
+      "origin": "manuel",
+      "source": "Warcraft Tavern, règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "absente du client (chancetospellcritbase vide)",
+      "registry": "A5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.int_per_crit"
+      ],
+      "origin": "manuel",
+      "source": "fm.py du seed (EST, interpolation)",
+      "certainty": "suppose",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json",
+      "registry": "A5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.intellect",
+        "/values/character.spirit",
+        "/values/character.armor"
+      ],
+      "origin": "manuel",
+      "source": "fm.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "statistiques de base absentes du client (fichiers du serveur)",
+      "registry": "G2"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.spell_power"
+      ],
+      "origin": "manuel",
+      "source": "fm.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "puissance des sorts d'équipement estimée, hors du client",
+      "registry": "G2"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.base_mana"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json",
+      "registry": "B9"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.mana_from_intellect"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "absente du client",
+      "registry": "B9"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.hp"
+      ],
+      "origin": "manuel",
+      "source": "fm.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "PV de base absents du client (octbasehpbyclass vide)",
+      "registry": "G2"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/character.spirit_regen"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "absente du client (regenmpperspt vide)",
+      "registry": "G2"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/crit.winters_chill_per_stack"
+      ],
+      "origin": "manuel",
+      "source": "relevé du client 1.60.1.70009 recopié à la main (references/mechanics.md)",
+      "certainty": "probable",
+      "reason": "mode seed seulement : le mode forever lit spell_scaling.json auras.winters_chill",
+      "registry": "D4"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/mana.talent_rank_cost"
+      ],
+      "origin": "manuel",
+      "source": "estimation du seed (EST)",
+      "certainty": "suppose",
+      "reason": "mode seed seulement : coût non publié",
+      "registry": "B11"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/hit.miss_per_level_below"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "règle du serveur, absente du client",
+      "registry": "A3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.mob_hit_damage"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "combat des monstres : règle du serveur, absente du client",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.armor_reduction"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json armor_constant",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.mob_xp"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "XP par monstre : GameTable xp en recoupement (bloc A), modulation au serveur",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.frostbite_freeze_s"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "estimation du simulateur du seed",
+      "registry": "C5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.dot_tick_s"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "mode seed : le mode forever lit period_ms du client",
+      "registry": "A17"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.ignite"
+      ],
+      "origin": "manuel",
+      "source": "tables du client 1.60.1.70009 relues à la main (T04c)",
+      "certainty": "probable",
+      "reason": "mode seed seulement : le mode forever lit spell_scaling.json auras.ignite",
+      "registry": "A18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.ignite_rule"
+      ],
+      "origin": "manuel",
+      "source": "T04c, décision 2",
+      "certainty": "suppose",
+      "reason": "règle du serveur (Ignite roulant), absente du client",
+      "registry": "A18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.quest_band"
+      ],
+      "origin": "addon",
+      "source": "Questie 11.38.0 (QuestieLib.lua) et règle Classic",
+      "certainty": "suppose",
+      "reason": "couleurs de quête lues dans l'addon",
+      "registry": "I7"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.frost_nova_retreat_yd"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "estimation du simulateur du seed",
+      "registry": "I1"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.rest_hp_regen_fraction"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "régénération au repos : formule du serveur (courbes de GlobalCurve décodées au bloc A, non utilisées)",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.projectile_speed"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "vitesse des projectiles non publiée",
+      "registry": "C1"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.analytic"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "hypothèses du modèle analytique",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.defaults"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "hypothèses par défaut du simulateur (monstre, course entre deux monstres)",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/spell.default_range_yd"
+      ],
+      "origin": "manuel",
+      "source": "repli de fm.py du seed",
+      "certainty": "suppose",
+      "reason": "portée par défaut d'un sort sans portée publiée",
+      "registry": "C2"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/build.confidence",
+        "/values/build.stability_seeds",
+        "/values/build.presets",
+        "/values/build.contexts",
+        "/values/build.concord_threshold"
+      ],
+      "origin": "parametre",
+      "source": "paramètre de méthode (T05)",
+      "reason": "réglage de l'outil, pas une valeur de jeu",
+      "registry": "I5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/respec.gold_per_hour"
+      ],
+      "origin": "manuel",
+      "source": "respec.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "rythme de gain d'or du joueur estimé",
+      "registry": "I5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/respec.trip_minutes"
+      ],
+      "origin": "manuel",
+      "source": "respec.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "trajet chez le maître de classe estimé",
+      "registry": "I5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/respec.beta_observed_resets"
+      ],
+      "origin": "manuel",
+      "source": "observations de la bêta (respec.json)",
+      "certainty": "probable",
+      "reason": "relevé communautaire, pas de mesure du projet",
+      "registry": "I5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.mob_source"
+      ],
+      "origin": "parametre",
+      "source": "T04c, décision 57",
+      "reason": "source par défaut des PV des monstres dans les simulateurs",
+      "registry": "H11"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/mana.regen_stacking"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (décision 66)",
+      "certainty": "suppose",
+      "reason": "règle du serveur, absente du client",
+      "registry": "B7"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/damage.bonus_stacking"
+      ],
+      "origin": "manuel",
+      "source": "vidéo communautaire (décision 73)",
+      "certainty": "probable",
+      "reason": "règle du serveur, test en jeu E6",
+      "registry": "A20"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/coefficient.ice_lance_source"
+      ],
+      "origin": "parametre",
+      "source": "T04e, question E4",
+      "reason": "choix de la source du coefficient d'Ice Lance, pas une valeur de jeu",
+      "registry": "G4"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/build.scenarios"
+      ],
+      "origin": "manuel",
+      "source": "scénarios provisoires (T05, décision 82)",
+      "certainty": "suppose",
+      "reason": "rencontres inventées pour comparer les builds, affinées en DJ1 et T09",
+      "registry": "H3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/pvp.profile",
+        "/values/pvp.weights"
+      ],
+      "origin": "manuel",
+      "source": "pvp.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "modèle de scénarios du seed, sans simulation de duel",
+      "registry": "I5"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/xp_to_next"
+      ],
+      "origin": "manuel",
+      "source": "courbe Classic (FC dans le seed)",
+      "certainty": "suppose",
+      "reason": "mode seed seulement : le mode forever lit character_scaling.json (LevelExperience)"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/mob_xp"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (texte)",
+      "certainty": "suppose",
+      "reason": "texte jamais lu ; doublon de mechanics.json leveling.mob_xp"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/mob_model"
+      ],
+      "origin": "manuel",
+      "source": "sim_leveling.py du seed (EST)",
+      "certainty": "suppose",
+      "reason": "combat et PV des monstres du mode seed : règles du serveur"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/player_model"
+      ],
+      "origin": "manuel",
+      "source": "règles Classic (texte)",
+      "certainty": "suppose",
+      "reason": "texte jamais lu ; doublon des entrées character de mechanics.json"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/combat_rules/gcd"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "règle du serveur ; mesures B1 dans les journaux"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/combat_rules/spell_miss_by_level_diff",
+        "/combat_rules/min_miss",
+        "/combat_rules/pushback_s"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (PC)",
+      "certainty": "suppose",
+      "reason": "règle du serveur, absente du client"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/combat_rules/crit_mult_spell",
+        "/combat_rules/dot_can_crit"
+      ],
+      "origin": "manuel",
+      "source": "écrite à la main (règle Classic)",
+      "certainty": "suppose",
+      "reason": "règle du serveur, absente des tables ; probable seulement si les journaux la recoupent (bloc B)"
+    },
+    {
+      "file": "leveling.json",
+      "paths": [
+        "/combat_rules/five_second_rule",
+        "/combat_rules/armor_dr",
+        "/combat_rules/level_resist",
+        "/combat_rules/coef_direct",
+        "/combat_rules/haste_rating_per_pct"
+      ],
+      "origin": "manuel",
+      "source": "règle Classic (texte)",
+      "certainty": "suppose",
+      "reason": "jamais lue par le moteur (audit, section 1.4)"
+    },
+    {
+      "file": "respec.json",
+      "paths": [
+        "/beta_observed"
+      ],
+      "origin": "manuel",
+      "source": "observations de la bêta (relevé communautaire)",
+      "certainty": "probable",
+      "reason": "barème observé sur la bêta, pas mesuré par le projet"
+    },
+    {
+      "file": "respec.json",
+      "paths": [
+        "/classic_schedule_gold",
+        "/classic_decay",
+        "/legacy_reset",
+        "/dual_spec"
+      ],
+      "origin": "manuel",
+      "source": "barème Classic (PC)",
+      "certainty": "suppose",
+      "reason": "règle du serveur, absente du client"
+    },
+    {
+      "file": "overrides.json",
+      "paths": [
+        "/Fire~1Pyroblast",
+        "/Fire~1Blast Wave",
+        "/Arcane~1Arcane Blast",
+        "/Frost~1Ice Lance",
+        "/Frost~1Ice Barrier"
+      ],
+      "origin": "manuel",
+      "source": "foreverchanges.pro (build 1.60.1.70009)",
+      "certainty": "probable",
+      "reason": "corrections de rangs relevées sur un site, jamais lues par le moteur"
+    },
+    {
+      "file": "monsters.json",
+      "paths": [
+        "/npcs"
+      ],
+      "origin": "journal",
+      "source": "journaux de combat (PV max du bloc avancé, forever monsters build)",
+      "certainty": "certain"
+    },
+    {
+      "file": "monsters.json",
+      "paths": [
+        "/hp_by_level",
+        "/questie_correction",
+        "/questie_gaps"
+      ],
+      "origin": "addon",
+      "source": "Questie 11.38.0 corrigé par les PV mesurés (décision 57)",
+      "certainty": "probable"
+    },
+    {
+      "file": "monsters.json",
+      "paths": [
+        "/inversions"
+      ],
+      "origin": "journal",
+      "source": "contrôles des mesures des journaux (forever monsters build)",
+      "certainty": "probable"
+    },
+    {
+      "file": "monsters.json",
+      "paths": [
+        "/curve_excluded"
+      ],
+      "origin": "parametre",
+      "source": "PNJ hors norme écartés de la courbe des PV par niveau et de la correction Questie (forever measures refresh --curve-exclude)",
+      "reason": "choix de calcul de l'agrégat (décision de l'utilisateur du 2026-10-02, révision 2), pas une valeur de jeu ; les PV de ces PNJ restent dans /npcs"
+    },
+    {
+      "file": "pvp_rules.json",
+      "paths": [
+        "/diminishing_returns",
+        "/categories",
+        "/sheets"
+      ],
+      "origin": "manuel",
+      "source": "règles de Classic (vmangos, forum de 2019)",
+      "certainty": "suppose",
+      "reason": "règles du serveur des rendements décroissants, absentes du client",
+      "registry": "K1"
+    },
+    {
+      "file": "decode_rules.json",
+      "paths": [
+        "/class",
+        "/tables",
+        "/localized_tables",
+        "/skill_lines",
+        "/talent_geometry",
+        "/shared_spell",
+        "/rank_variables",
+        "/curve_operations",
+        "/levels/talent_tooltip",
+        "/levels/spell_rank",
+        "/tooltip",
+        "/effects",
+        "/spell_ranks",
+        "/spells",
+        "/utility_spells",
+        "/target_auras",
+        "/talent_cooldowns",
+        "/school_masks",
+        "/rank_format",
+        "/class_tables",
+        "/localized_class_tables",
+        "/classes",
+        "/trait_edge_types",
+        "/racial_skill_lines",
+        "/race_factions",
+        "/passive_attributes_0_mask",
+        "/racial_values",
+        "/pvp_trinkets",
+        "/pvp_classification",
+        "/retired_files",
+        "/gametables",
+        "/character_tables",
+        "/character_scaling",
+        "/mechanic_auras",
+        "/hotfix_related_tables",
+        "/pet_tables",
+        "/localized_pet_tables",
+        "/pets",
+        "/circular_sufficient_edges",
+        "/parked_nodes",
+        "/quest_tables",
+        "/quest_rewards",
+        "/xp_bonus_tables",
+        "/xp_bonuses",
+        "/dungeon_tables",
+        "/dungeons",
+        "/travel_tables",
+        "/travel",
+        "/frozen_mult",
+        "/talent_models",
+        "/new_spells"
+      ],
+      "origin": "parametre",
+      "source": "règles de lecture du client (T03, PV1, CH0, T04f, DJ1, RX1)",
+      "reason": "règle de lecture des tables, pas une valeur de jeu"
+    },
+    {
+      "file": "decode_rules.json",
+      "paths": [
+        "/levels/level_cap"
+      ],
+      "origin": "manuel",
+      "source": "niveau maximal annoncé de Forever",
+      "certainty": "probable",
+      "reason": "aucune table du client ne le porte (D2)",
+      "registry": "I5"
+    },
+    {
+      "file": "decode_rules.json",
+      "paths": [
+        "/community_positions"
+      ],
+      "origin": "manuel",
+      "source": "calculateurs communautaires de la bêta (PV1, D3)",
+      "certainty": "probable",
+      "reason": "positions hors grille absentes du client"
+    },
+    {
+      "file": "decode_rules.json",
+      "paths": [
+        "/observed_positions"
+      ],
+      "origin": "journal",
+      "source": "positions relevées en jeu par l'utilisateur (décision 144)",
+      "certainty": "certain"
+    },
+    {
+      "file": "decode_rules.json",
+      "paths": [
+        "/observed_absent"
+      ],
+      "origin": "journal",
+      "source": "talents absents de l'arbre en jeu, relevé de l'utilisateur du 2026-10-08 (décision 210)",
+      "certainty": "certain"
+    },
+    {
+      "file": "character_scaling.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "PlayerExpectedStat, LevelExperience, Exhaustion, ExpectedStat, GlobalCurve, CurvePoint, NumTalentsAtLevel, TraitCond du client (forever decode), recoupés par les GameTables",
+      "certainty": "certain"
+    },
+    {
+      "file": "character_scaling.json",
+      "paths": [
+        "/level_cap"
+      ],
+      "origin": "manuel",
+      "source": "decode_rules.json levels.level_cap",
+      "certainty": "probable",
+      "reason": "niveau maximal écrit à la main, recopié du fichier des règles de lecture (D2)"
+    },
+    {
+      "file": "meta.json",
+      "paths": [
+        "/game_state"
+      ],
+      "origin": "journal",
+      "source": "relevé en jeu par l'utilisateur (forever install --beta-level-cap-source observation)",
+      "certainty": "certain",
+      "reason": "fait d'installation (D2) : plafond de la bêta donné à l'installation avec sa source",
+      "registry": "I5"
+    },
+    {
+      "file": "pets.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "SkillLine, SkillLineAbility, Spell*, CreatureFamily, ItemPetFood et UiMap du client (forever decode, decode_rules.json pets)",
+      "certainty": "certain"
+    },
+    {
+      "file": "pets.json",
+      "paths": [
+        "/families/*/training_costs",
+        "/abilities/*/ranks/*/training_cost"
+      ],
+      "origin": "client",
+      "source": "colonne sans nom de SkillLineAbility (decode_rules.json pets.training_cost_column)",
+      "certainty": "probable",
+      "reason": "sens de la colonne (coût en points d'entraînement) probable",
+      "registry": "L4"
+    },
+    {
+      "file": "pets.json",
+      "paths": [
+        "/families/*/bonus",
+        "/families/*/diet",
+        "/pet_scaling"
+      ],
+      "origin": "client",
+      "source": "aura passive de famille, masque de régime et Hunter Pet Scaling du client",
+      "certainty": "probable",
+      "reason": "sens des types d'aura et des bits du masque probable (decode_rules.json pets)"
+    },
+    {
+      "file": "pet_rules.json",
+      "paths": [
+        "/rules",
+        "/reported_bugs"
+      ],
+      "origin": "addon",
+      "source": "Forever Bestiary 0.5.0 (Data/Guide.lua) : relevés de joueurs de la bêta cités par section",
+      "certainty": "suppose",
+      "reason": "règles du système de familiers absentes du client (décision 127)"
+    },
+    {
+      "file": "pet_rules.json",
+      "paths": [
+        "/rules/tame.level_margin"
+      ],
+      "origin": "manuel",
+      "source": "notes de développement officielles de la bêta du 24 septembre 2026, révisées le 1er octobre (https://us.forums.blizzard.com/en/wow/t/2360696)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 6)",
+      "registry": "L13"
+    },
+    {
+      "file": "pet_rules.json",
+      "paths": [
+        "/official_fixes"
+      ],
+      "origin": "manuel",
+      "source": "notes de développement officielles de la bêta, mise à jour du 1er octobre 2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4)",
+      "certainty": "probable",
+      "reason": "correctif du serveur absent du client, porté par un texte officiel sans mesure (révision 3)",
+      "registry": "L3"
+    },
+    {
+      "file": "pet_rules.json",
+      "paths": [
+        "/rules/training.rank_level_applies_to",
+        "/rules/training.points_gain"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (niveau du familier) ; gain des points d'entraînement inconnu",
+      "certainty": "suppose",
+      "reason": "aucune source propre à Forever (CH0)",
+      "registry": "L3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.dungeon_kill_bonus"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "I10"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.group_level_basis"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "I11"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/rage.damage_taken_rule"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "règle du serveur absente du client, portée par un texte officiel sans mesure (révision 2)",
+      "registry": "B21"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/legacy.beta_grant"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1)",
+      "certainty": "probable",
+      "reason": "état de la bêta absent du client, porté par un texte officiel sans mesure (révision 2)",
+      "registry": "G5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/monsters.curve_outlier"
+      ],
+      "origin": "parametre",
+      "source": "décision 223 (choix de l'utilisateur du 2026-10-09 d'après les mesures)",
+      "reason": "paramètre de la mesure des PV (règle hors norme de la courbe), pas une valeur du jeu (révision 5)",
+      "registry": "H11"
+    },
+    {
+      "file": "quest_rewards.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "table QuestXP du client (forever decode, decode_rules.json quest_rewards)",
+      "certainty": "certain"
+    },
+    {
+      "file": "quest_rewards.json",
+      "paths": [
+        "/seen_quests/**"
+      ],
+      "origin": "client",
+      "source": "Cache/WDB/enUS/questcache.wdb du client, lu en local par forever decode (forever/pipeline/questcache.py)",
+      "certainty": "probable",
+      "reason": "disposition des champs du cache établie sur les quêtes vues et recoupée par Questie, à recouper par xpReward en jeu (question LVL6)",
+      "registry": "I12"
+    },
+    {
+      "file": "xp_bonuses.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables Spell*, Item*, Trait*, CurvePoint et PlayerCondition du client (forever decode, decode_rules.json xp_bonuses)",
+      "certainty": "certain"
+    },
+    {
+      "file": "xp_bonuses.json",
+      "paths": [
+        "/aura_codes",
+        "/auras/*/effects/*/key",
+        "/auras/*/effects/*/applies_to",
+        "/auras/*/access",
+        "/camp/tent/threshold_pct_of_level",
+        "/camp/benefits/xp_bonus",
+        "/conditions/*/fields/*/meaning",
+        "/conditions/*/readable_in_client"
+      ],
+      "origin": "client",
+      "source": "sens des codes d'aura, voie d'accès et sens des champs de condition déduits des descriptions des sorts du client (decode_rules.json xp_bonuses)",
+      "certainty": "probable",
+      "reason": "sens déduit des descriptions, pas lu (LVL12, LVL13)",
+      "registry": "D10"
+    },
+    {
+      "file": "xp_bonuses.json",
+      "paths": [
+        "/sleeping_bag/use_spell",
+        "/sleeping_bag/tracking_aura",
+        "/sleeping_bag/use_spell_name"
+      ],
+      "origin": "client",
+      "source": "lien du sort de pose à l'aura de suivi déclaré dans decode_rules.json (objet de jeu posé, absent des tables), recoupé par la description du sort",
+      "certainty": "probable",
+      "reason": "lien déclaré, pas lu dans une table",
+      "registry": "D9"
+    },
+    {
+      "file": "travel.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables TaxiNodes, TaxiPath, TaxiPathNode et UiMapAssignment du client (forever decode, decode_rules.json travel)",
+      "certainty": "certain"
+    },
+    {
+      "file": "travel.json",
+      "paths": [
+        "/nodes/*/faction"
+      ],
+      "origin": "client",
+      "source": "camp d'un point de vol par TaxiNodes.Flags (bits de decode_rules.json travel.faction_flags)",
+      "certainty": "probable",
+      "reason": "sens des drapeaux déduit des noms des points (relevé sur 1.60.1.70338), pas lu"
+    },
+    {
+      "file": "dungeons.json",
+      "paths": [
+        "**"
+      ],
+      "origin": "client",
+      "source": "tables Map, LFGDungeons, ContentTuning, DungeonEncounter et AreaTable du client (forever decode, decode_rules.json dungeons)",
+      "certainty": "certain"
+    },
+    {
+      "file": "dungeons.json",
+      "paths": [
+        "/instances/*/lfg",
+        "/instances/*/lfg/*/level",
+        "/instances/*/lfg/*/level_min",
+        "/instances/*/lfg/*/level_max",
+        "/instances/*/lfg/*/faction",
+        "/unmatched_lfg"
+      ],
+      "origin": "client",
+      "source": "lien d'une entrée de recherche de groupe à sa carte par le nom (alias de decode_rules.json dungeons) ; sens du niveau de ContentTuning et des codes de faction déduits",
+      "certainty": "probable",
+      "reason": "lien et sens déduits, pas lus (DON9)"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.mob_level_difference"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; écart de niveau de Classic, non vérifié pour Forever",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.elite_factor"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; facteur de Classic, non vérifié pour Forever (LVL8)",
+      "registry": "I13"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.group"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; multiplicateurs de groupe de Classic, non vérifiés pour Forever (LVL4)",
+      "registry": "I11"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.rested"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur ; multiplicateur et période relus dans le client en mode forever, gain et plafond de Classic (LVL10)",
+      "registry": "D7"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.quest_level_difference"
+      ],
+      "origin": "manuel",
+      "source": "règle de Classic (vMangos, émulateur de Classic 1.12), T04d bloc C",
+      "certainty": "suppose",
+      "reason": "règle du serveur absente du client ; réduction de Classic, non vérifiée pour Forever (LVL7)",
+      "registry": "I12"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.kill_time_estimate"
+      ],
+      "origin": "manuel",
+      "source": "cible de Blizzard de 10 à 15 s par monstre en solo (leveling.json mob_model), T04d bloc E",
+      "certainty": "suppose",
+      "reason": "estimation de repli d'une classe sans moteur ni relevé, marquée « estimé »",
+      "registry": "I15"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/measures.kill_time"
+      ],
+      "origin": "parametre",
+      "source": "paramètres de mesure du temps par monstre (T04d, bloc E)",
+      "reason": "réglage de l'outil de mesure, pas une valeur du jeu",
+      "registry": "I15"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/leveling.objectives"
+      ],
+      "origin": "manuel",
+      "source": "hypothèses de temps des objectifs de leveling, T04d bloc F",
+      "certainty": "suppose",
+      "reason": "temps de trajet, de quête et de donjon non mesurés (ForeverLogger les mesurera)",
+      "registry": "I14"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/dungeon.run_defaults"
+      ],
+      "origin": "manuel",
+      "source": "formule par défaut d'un passage de donjon de Factoruide (MIT, crates/fg-route/src/model/dungeons.rs, 2026-10-13), DJ1 bloc E",
+      "certainty": "suppose",
+      "reason": "durée d'un passage non mesurée sur Forever (LVL15) ; remplacée par les passages relevés",
+      "registry": "I16"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/route.travel"
+      ],
+      "origin": "manuel",
+      "source": "paramètres de trajet de Factoruide (MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14), RX1 bloc B",
+      "certainty": "suppose",
+      "reason": "vitesses de course, de monture et de vol de Forever non mesurées (TRV1) ; remplacées par les relevés",
+      "registry": "C4"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/route.search"
+      ],
+      "origin": "manuel",
+      "source": "réglages de la feuille de route (RX1 bloc C) : journal et frais d'arrêt repris de Factoruide (MIT, brouznouf/factoruide@f7da6da, crates/fg-route/src/params.rs, lus le 2026-10-14), essais et graine de la recherche",
+      "certainty": "suppose",
+      "reason": "taille du journal de quêtes et frais d'un arrêt de Forever non mesurés (RTE2) ; essais et graine : réglages de l'optimiseur",
+      "registry": "I18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/route.filters"
+      ],
+      "origin": "addon",
+      "source": "Questie (lookupQuestCategories.lua, questKeys specialFlags) et règle de l'utilisateur du 2026-10-14 (CJ1)",
+      "certainty": "suppose",
+      "reason": "catégories et drapeaux des quêtes lus dans l'addon ; seuil des bas niveaux et capitales : choix de route",
+      "registry": "I18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/route.start_zones"
+      ],
+      "origin": "manuel",
+      "source": "table de l'utilisateur du 2026-10-16 (question 2 du plan de CJ1, décision 283)",
+      "certainty": "probable",
+      "reason": "zone de départ de chaque race donnée par le joueur, jamais devinée par le parcours",
+      "registry": "I18"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/route.cities"
+      ],
+      "origin": "manuel",
+      "source": "cartes de zone du client des six capitales (travel.json maps), choisies à la main (RTE8, 2026-10-19)",
+      "certainty": "probable",
+      "reason": "liste des capitales écrite à la main : aucune table lue ne marque une capitale",
+      "registry": "C6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/hot_streak.server_rules"
+      ],
+      "origin": "manuel",
+      "source": "note officielle du 15 octobre (t/2360696/6, révision 2)",
+      "certainty": "probable",
+      "reason": "règle du serveur de Heating Up, absente du client",
+      "registry": "A19"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/dungeon.official"
+      ],
+      "origin": "manuel",
+      "source": "note officielle de la bêta du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4), DJ1 bloc C",
+      "certainty": "probable",
+      "reason": "texte officiel sans lecture du client ni mesure en jeu (question DON18)",
+      "registry": "H12"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/measures.xp_check"
+      ],
+      "origin": "parametre",
+      "source": "paramètres de la vérification passive du modèle d'XP (T04d, bloc G)",
+      "reason": "réglage de l'outil de vérification, pas une valeur du jeu",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.lower_mob_base"
+      ],
+      "origin": "journal",
+      "source": "gains d'XP relevés par ForeverLogger (forever xp check), T04d",
+      "certainty": "probable",
+      "reason": "règle ajustée sur 87 gains sur 92 ; niveau des monstres tiré du niveau fixe de Questie",
+      "registry": "I6"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.bonus_stacking"
+      ],
+      "origin": "manuel",
+      "source": "règle de l'émulateur TrinityCore et réponse de l'utilisateur au plan de T04f",
+      "certainty": "suppose",
+      "reason": "règle du serveur non observée (LVL12)",
+      "registry": "D10"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.sleeping_bag"
+      ],
+      "origin": "client",
+      "source": "description d'Unroll Bag et période de l'aura de suivi (client 1.60.1.70338)",
+      "certainty": "probable",
+      "registry": "D9"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.food_bonus"
+      ],
+      "origin": "manuel",
+      "source": "descriptions des nourritures nutritives du client, condition du serveur",
+      "certainty": "suppose",
+      "reason": "condition évaluée par le serveur (LVL13)",
+      "registry": "E3"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.legacy_rested"
+      ],
+      "origin": "manuel",
+      "source": "description du perk Legacy Well Rested du client",
+      "certainty": "suppose",
+      "reason": "application au gain et au plafond supposée (LVL10)",
+      "registry": "D5"
+    },
+    {
+      "file": "mechanics.json",
+      "paths": [
+        "/values/xp.camp_tent"
+      ],
+      "origin": "client",
+      "source": "description du sort Camp Tent du client",
+      "certainty": "probable",
+      "registry": "D5"
+    }
+  ],
+  "pending": [],
+  "inherited_from": "1.60.1.70374"
+}

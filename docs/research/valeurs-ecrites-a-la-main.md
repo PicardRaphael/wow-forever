@@ -1,11 +1,11 @@
 # Valeurs écrites à la main
 
-Généré par `uv run forever origins inventory` sur la version 1.60.1.70374 (ne pas éditer à la main : le test
+Généré par `uv run forever origins inventory` sur la version 1.60.1.70450 (ne pas éditer à la main : le test
 `tests/unit/test_origins_inventory.py` compare ce fichier au rendu de la commande). Chaque ligne est un chemin
-de `forever/data/1.60.1.70374/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
+de `forever/data/1.60.1.70450/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-167 chemins, 742 valeurs ; 89 `probable`, 78 `suppose`
+168 chemins, 744 valeurs ; 90 `probable`, 78 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -56,6 +56,7 @@ Aucun.
 | mechanics.json | `/values/dungeon.official` | 7 | probable | H12 | texte officiel sans lecture du client ni mesure en jeu (question DON18) | note officielle de la bêta du 01/10 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4), DJ1 bloc C |
 | mechanics.json | `/values/dungeon.run_defaults` | 6 | suppose | I16 | durée d'un passage non mesurée sur Forever (LVL15) ; remplacée par les passages relevés | formule par défaut d'un passage de donjon de Factoruide (MIT, crates/fg-route/src/model/dungeons.rs, 2026-10-13), DJ1 bloc E |
 | mechanics.json | `/values/hit.miss_per_level_below` | 3 | suppose | A3 | règle du serveur, absente du client | règle Classic (PC) |
+| mechanics.json | `/values/hot_streak.server_rules` | 2 | probable | A19 | règle du serveur de Heating Up, absente du client | note officielle du 15 octobre (t/2360696/6, révision 2) |
 | mechanics.json | `/values/legacy.beta_grant` | 4 | probable | G5 | état de la bêta absent du client, porté par un texte officiel sans mesure (révision 2) | note officielle du 08/10 (https://us.forums.blizzard.com/en/wow/t/2360696/5, révision 1) |
 | mechanics.json | `/values/leveling.analytic` | 3 | suppose | I6 | hypothèses du modèle analytique | sim_leveling.py du seed (EST) |
 | mechanics.json | `/values/leveling.armor_reduction` | 2 | suppose | I6 | mode seed seulement : le mode forever lit character_scaling.json armor_constant | règle Classic (PC) |

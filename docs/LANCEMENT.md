@@ -197,8 +197,16 @@ correction passe devant le reste.
 10. Bouton Talents au niveau 1 : plan complet, lien Talents Forever et code Naowh importables.
 11. Aucune proposition de profil EllesmereUI ni bascule ; `/fb eui on` les rallume, `/fb eui off` les éteint.
 
-### 5. Fin
-12. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
+### 5. Refonte du Mage de 1.60.1.70450 (décision 285 ; 5 min)
+12. Bouton Talents (leveling, niveau 30 ou plus) : un build des Arcanes (Missile Barrage à 2 points, Arcane Wrath) ;
+    le lien Talents Forever s'ouvre dans l'addon (codes de génération 7) avec les mêmes points, ordre compris.
+13. En jeu, la fenêtre du personnage : Ruthless (Humain) ou Savage (Orc) comptés au critique des sorts avec toute arme
+    (question NOT2) ; Eureka! (Gnome) : 8 s d'effet, 2 min de recharge.
+14. Arcane Blast : l'aura dure 15 s depuis le premier lancer et n'est pas consommée par Arcane Missiles ; Winter's
+    Chill n'augmente plus le critique de Frostbolt (infobulle du débuff sur la cible).
+
+### 6. Fin
+15. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
     et corrige le reste.
 
 Blocs à venir, ajoutés ici à leur livraison : 6b (réponses en cartes, assistant par type de route, PvP « Comment
