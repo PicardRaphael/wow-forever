@@ -16,6 +16,8 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 CODE_VERSION = "6"
+# 70450 (bloc D) : même format, la génération dit la disposition des arbres (7 : build 70425, addon 0.38.9)
+CODE_VERSIONS = ("6", "7")
 SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz056789"
 COUNTS = "1234"
 SITE = "https://talentsforever.com/"
@@ -72,8 +74,11 @@ def _encode_order(plan: TfPlan, flat: list[tuple[int, int]]) -> str:
     return "".join(out)
 
 
-def encode(plan: TfPlan) -> str:
-    """Code v6 d'un plan (ValueError en français : disposition trop grande, ordre incohérent)."""
+def encode(plan: TfPlan, *, generation: str = CODE_VERSION) -> str:
+    """Code d'un plan dans la génération `generation` (celle de l'addon installé ; ValueError en français :
+    disposition trop grande, ordre incohérent, génération inconnue)."""
+    if generation not in CODE_VERSIONS:
+        raise ValueError(f"génération « {generation} » inconnue ({', '.join(CODE_VERSIONS)} prises en charge)")
     flat = _flat([len(t) for t in plan.ranks])
     if len(plan.ranks) != TREES:
         raise ValueError(f"{len(plan.ranks)} arbres : le code v6 en attend {TREES}")
@@ -83,7 +88,7 @@ def encode(plan: TfPlan) -> str:
         parts += list(plan.legacy)
     if plan.order:
         parts.append(_encode_order(plan, flat))
-    parts.append(CODE_VERSION)
+    parts.append(generation)
     return f"{plan.class_slug}/{plan.level}/" + "-".join(parts)
 
 
@@ -131,7 +136,9 @@ def _decode_order(segment: str, ranks: list[list[int]], flat: list[tuple[int, in
     return tuple(order)
 
 
-def decode(code: str, max_ranks: Sequence[Sequence[int]], class_slug: str | None = None) -> TfPlan:
+def decode(
+    code: str, max_ranks: Sequence[Sequence[int]], class_slug: str | None = None, *, generation: str | None = None
+) -> TfPlan:
     """Plan d'un code v6 ou d'un lien, sur la disposition `max_ranks` (ValueError en français : génération non prise
     en charge, forme invalide, rang ou position hors de la disposition, ordre incohérent, autre classe)."""
     flat = _flat([len(t) for t in max_ranks])
@@ -143,8 +150,10 @@ def decode(code: str, max_ranks: Sequence[Sequence[int]], class_slug: str | None
     if class_slug is not None and slug != class_slug:
         raise ValueError(f"code d'une autre classe : « {slug} », classe « {class_slug} » attendue")
     parts = body.split("-")
-    if parts[-1] != CODE_VERSION:
-        raise ValueError(f"génération « {parts[-1]} » non prise en charge (seule la génération {CODE_VERSION} est lue)")
+    wanted = generation or CODE_VERSION
+    if parts[-1] != wanted:
+        known = "inconnue" if parts[-1] not in CODE_VERSIONS else f"écrite sur une autre disposition que la {wanted}"
+        raise ValueError(f"génération « {parts[-1]} » {known} (l'addon installé lit la génération {wanted})")
     parts = parts[:-1]
     if len(parts) not in (TREES, TREES + 1, TREES + LEGACY, TREES + LEGACY + 1):
         raise ValueError(f"forme invalide : {len(parts)} segment(s) avant la génération")

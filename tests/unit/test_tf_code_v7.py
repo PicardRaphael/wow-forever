@@ -14,7 +14,7 @@ from forever.talents_forever import export_build, load_addon
 from forever.tf_code import CODE_VERSIONS, TfPlan, decode, encode
 
 CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
-PLAN = TfPlan("mage", 20, ((1, 0), (0, 2), ()), None)
+PLAN = TfPlan("mage", 20, ((1, 0), (0, 2), (0,)), None)  # une position par talent de la disposition MAX
 MAX = ((3, 2), (5, 2), (1,))
 
 

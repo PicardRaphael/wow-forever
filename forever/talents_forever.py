@@ -20,7 +20,7 @@ from forever.build import BuildReport
 from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.provenance import Certainty, Provenance
-from forever.tf_code import CODE_VERSION, SYMBOLS, TREES, TfPlan, code_of, decode, encode, link
+from forever.tf_code import CODE_VERSION, CODE_VERSIONS, SYMBOLS, TREES, TfPlan, code_of, decode, encode, link
 
 ADDON_FOLDER = "TalentsForeverBook"
 DATA_FILE = "Data.lua"
@@ -97,8 +97,13 @@ class TfAddon:
 
     @property
     def supported(self) -> bool:
-        """Génération des codes prise en charge (v6) et `Data.lua` lisible."""
+        """Génération des codes prise en charge (6 ou 7) et `Data.lua` lisible."""
         return not self.checks
+
+    @property
+    def generation(self) -> str:
+        """Génération des codes de l'addon installé (disposition de ses arbres)."""
+        return str(self.head.get("codeVersion") or CODE_VERSION)
 
     def describe(self) -> dict[str, Any]:
         """Identité de l'addon pour la provenance."""
@@ -297,7 +302,7 @@ def load_addon(deps: Deps, *, folder: Path | None = None) -> TfAddon | None:
     except (ValueError, KeyError, TypeError):
         return TfAddon(folder, version, {}, fingerprint, game_version, {}, ("illisible",), None)
     checks: list[str] = []
-    if str(head.get("codeVersion")) != CODE_VERSION:
+    if str(head.get("codeVersion")) not in CODE_VERSIONS:  # 70450 : générations 6 et 7 (même format)
         checks.append("format_non_pris_en_charge")
     ours = _our_classes(deps.data_dir / game_version / "classes.json")
     layouts: dict[str, TfLayout] = {}
@@ -467,7 +472,7 @@ def _export_provenance(addon: TfAddon | None, talented_bonus: int, class_name: s
             "l'addon lit le rang de Talented en jeu et doit y trouver le même rang"
         )
     return {
-        "format": f"v{CODE_VERSION}",
+        "format": f"v{addon.generation if addon is not None and addon.supported else CODE_VERSION}",
         **ident,
         "verified_in_game": verified is not None,
         "verified_in_game_source": verified,
@@ -523,7 +528,7 @@ def export_build(
         return refuse(
             "format_non_pris_en_charge",
             f"Talents Forever {addon.version} : codes de génération « {addon.head.get('codeVersion')} » "
-            f"({', '.join(addon.checks)}) ; forever écrit la génération {CODE_VERSION} seulement",
+            f"({', '.join(addon.checks)}) ; forever écrit les générations {', '.join(CODE_VERSIONS)} seulement",
         )
     layout = addon.layouts.get(class_name)
     if layout is None:
@@ -558,7 +563,7 @@ def export_build(
             steps.append(pos)
     plan = TfPlan(layout.slug, level, tuple(tuple(t) for t in ranks), tuple(steps) or None)
     try:
-        code = encode(plan)
+        code = encode(plan, generation=addon.generation)
     except ValueError as err:
         return refuse("bloque", str(err))
     block.update(
@@ -643,7 +648,7 @@ def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:
             f"Code Talents Forever d'une classe inconnue « {slug} ».", "classes : " + ", ".join(known)
         )
     try:
-        plan = decode(raw, layout.max_ranks, layout.slug)
+        plan = decode(raw, layout.max_ranks, layout.slug, generation=addon.generation)
     except ValueError as err:
         raise InvalidArgumentError(
             f"Code Talents Forever illisible : {err}.", "coller le code ou le lien tel quel"
@@ -748,7 +753,8 @@ def _popular_entry(layout: TfLayout, gd: Any, b: Mapping[str, Any]) -> dict[str,
         "naowh": None,
     }
     try:
-        plan = decode(code, layout.max_ranks, layout.slug)
+        # build populaire écrit par l'addon dans sa propre génération, sur la même disposition (70450)
+        plan = decode(code, layout.max_ranks, layout.slug, generation=code_of(code).rsplit("-", 1)[-1])
     except ValueError as err:
         entry["errors"] = [str(err)]
         return entry
