@@ -8,8 +8,8 @@ from __future__ import annotations
 import math
 from typing import Any, NamedTuple, cast
 
-from forever.engine.model import Buffs, GameData, Points
-from forever.engine.talents import talent_value
+from forever.engine.model import Buffs, Character, GameData, Points
+from forever.engine.talents import talent_model, talent_value
 
 TALENT = "arcaneBlast"
 SPELL = "arcane_blast"
@@ -31,6 +31,13 @@ MISSILE_BARRAGE = "missileBarrage"
 MB_AB_CHANCE, MB_OTHER_CHANCE, MB_CHANNEL_PCT, MB_COST_PCT = 0, 1, 2, 3
 MB_OTHER_SPELLS = frozenset({"fireball", "frostbolt", "frostfire_bolt"})
 ARCANE_MISSILES = "arcane_missiles"
+# 70450 (marqueur `missile_hits`) : « Arcane Blast {0}%, chaque projectile d'Arcane Missiles {1}%, Arcane Wrath,
+# Fireball, Frostbolt, Frostfire Bolt {2}% ... canalisation raccourcie de {3}%, coût réduit de {4}% ».
+MB_HITS_AB, MB_HITS_MISSILE, MB_HITS_OTHER, MB_HITS_CHANNEL, MB_HITS_COST = 0, 1, 2, 3, 4
+MB_HITS_OTHER_SPELLS = frozenset({"arcane_wrath", "fireball", "frostbolt", "frostfire_bolt"})
+INTELLECT_SP = "intellect_spell_power"  # 70450 : Arcane Blast donne une part de l'Intelligence en puissance des sorts
+# Arcane Wrath (70450, « gains additional Spell Damage equal to {2}% of your maximum Mana »)
+ARCANE_WRATH, ARCANE_WRATH_SPELL, AW_MANA_PCT = "arcaneWrath", "arcane_wrath", 2
 
 
 class ArcaneBlastAura(NamedTuple):
@@ -54,18 +61,28 @@ def arcane_blast_active(aura: ArcaneBlastAura | None, now: float) -> int:
 
 def arcane_blast_after_cast(gd: GameData, pts: Points, aura: ArcaneBlastAura | None, now: float) -> ArcaneBlastAura:
     """Aura après un Arcane Blast lancé à `now` : un cumul de plus (borné au maximum du talent), durée relancée.
-    Consommation : tout autre sort de dégâts retire l'aura (l'appelant la remet à None).
+    Consommation : tout autre sort de dégâts retire l'aura (l'appelant la remet à None). 70450 (marqueur
+    `intellect_spell_power`) : la durée court depuis la **première** application, jamais relancée.
 
     Registre : B15"""
-    stacks = min(arcane_blast_max_stacks(gd, pts), arcane_blast_active(aura, now) + 1)
+    active = arcane_blast_active(aura, now)
+    stacks = min(arcane_blast_max_stacks(gd, pts), active + 1)
+    if talent_model(gd, TALENT) == INTELLECT_SP and active and aura is not None:
+        return ArcaneBlastAura(stacks, aura.expires)
     return ArcaneBlastAura(stacks, now + talent_value(gd, pts, TALENT, DURATION))
 
 
-def arcane_blast_bonus(gd: GameData, pts: Points, stacks: int, *, for_spell: str) -> Buffs:
+def arcane_blast_bonus(gd: GameData, pts: Points, stacks: int, *, for_spell: str, ch: Character | None = None) -> Buffs:
     """Bonus de dégâts de l'aura pour `for_spell` (buff `dmg`, fraction) : +x % par cumul sur les autres sorts,
-    aucun sur Arcane Blast lui-même (son aura augmente son coût, pas ses dégâts).
+    aucun sur Arcane Blast lui-même (son aura augmente son coût, pas ses dégâts). 70450 (marqueur
+    `intellect_spell_power`) : x % de l'Intelligence de `ch` en puissance des sorts par cumul (`sp_flat`), sur tous
+    les sorts, Arcane Blast compris.
 
     Registre : B15"""
+    if talent_model(gd, TALENT) == INTELLECT_SP:
+        if stacks <= 0 or ch is None:
+            return {}
+        return {"sp_flat": stacks * talent_value(gd, pts, TALENT, DMG_PER_STACK) / PERCENT * ch.intellect}
     if for_spell == SPELL or stacks <= 0:
         return {}
     return {"dmg": stacks * talent_value(gd, pts, TALENT, DMG_PER_STACK) / PERCENT}
@@ -74,10 +91,13 @@ def arcane_blast_bonus(gd: GameData, pts: Points, stacks: int, *, for_spell: str
 def arcane_blast_after_spell(
     gd: GameData, pts: Points, aura: ArcaneBlastAura | None, now: float, key: str
 ) -> ArcaneBlastAura | None:
-    """Aura après un sort de dégâts `key` lancé à `now` : Arcane Blast cumule, tout autre sort de dégâts la consomme.
+    """Aura après un sort de dégâts `key` lancé à `now` : Arcane Blast cumule, tout autre sort de dégâts la consomme ;
+    70450 (marqueur `intellect_spell_power`) : les autres sorts la laissent jusqu'à son expiration.
 
     Registre : B15"""
-    return arcane_blast_after_cast(gd, pts, aura, now) if key == SPELL else None
+    if key == SPELL:
+        return arcane_blast_after_cast(gd, pts, aura, now)
+    return aura if talent_model(gd, TALENT) == INTELLECT_SP else None
 
 
 def arcane_power_buffs(gd: GameData, pts: Points) -> Buffs:
@@ -179,10 +199,21 @@ def hot_streak_buffs(gd: GameData, pts: Points, stacks: int) -> Buffs:
     return {"cast_reduction": min(stacks, rules[2]) * rules[1]}
 
 
-def missile_barrage_chance(gd: GameData, pts: Points, key: str) -> float:
+def missile_barrage_chance(gd: GameData, pts: Points, key: str, *, missiles: float = 1.0) -> float:
     """Chance qu'un sort `key` qui touche déclenche Missile Barrage (0 sans le talent ou pour un autre sort).
+    70450 (marqueur `missile_hits`) : aussi chaque projectile d'Arcane Missiles (`missiles` projectiles :
+    1 - (1 - p)^missiles) et Arcane Wrath.
 
     Registre : B14"""
+    if talent_model(gd, MISSILE_BARRAGE) == "missile_hits":
+        if key == SPELL:
+            return talent_value(gd, pts, MISSILE_BARRAGE, MB_HITS_AB) / PERCENT
+        if key == ARCANE_MISSILES:
+            per = talent_value(gd, pts, MISSILE_BARRAGE, MB_HITS_MISSILE) / PERCENT
+            return 1 - (1 - per) ** missiles if per > 0 else 0.0
+        if key in MB_HITS_OTHER_SPELLS:
+            return talent_value(gd, pts, MISSILE_BARRAGE, MB_HITS_OTHER) / PERCENT
+        return 0.0
     if key == SPELL:
         return talent_value(gd, pts, MISSILE_BARRAGE, MB_AB_CHANCE) / PERCENT
     if key in MB_OTHER_SPELLS:
@@ -197,10 +228,32 @@ def missile_barrage_buffs(gd: GameData, pts: Points) -> Buffs:
     Registre : B14"""
     if pts.get(MISSILE_BARRAGE, 0) <= 0:
         return {}
+    hits = talent_model(gd, MISSILE_BARRAGE) == "missile_hits"  # 70450 : variables décalées d'un rang
     return {
-        "cast_reduction": talent_value(gd, pts, MISSILE_BARRAGE, MB_CHANNEL_PCT) / PERCENT,
-        "cost": -talent_value(gd, pts, MISSILE_BARRAGE, MB_COST_PCT) / PERCENT,
+        "cast_reduction": talent_value(gd, pts, MISSILE_BARRAGE, MB_HITS_CHANNEL if hits else MB_CHANNEL_PCT) / PERCENT,
+        "cost": -talent_value(gd, pts, MISSILE_BARRAGE, MB_HITS_COST if hits else MB_COST_PCT) / PERCENT,
     }
+
+
+def arcane_missiles_count(gd: GameData, position: int) -> float:
+    """Projectiles d'un rang d'Arcane Missiles (tics de canalisation de `spell_scaling.json`) ; 1 sans donnée.
+
+    Registre : B14"""
+    ranks = gd.scaling.get(ARCANE_MISSILES, ())
+    if not 1 <= position <= len(ranks):
+        return 1.0
+    ticks = sum(c.ticks for c in ranks[position - 1].components if c.kind == "channel")
+    return ticks if ticks > 0 else 1.0
+
+
+def arcane_wrath_bonus(gd: GameData, pts: Points, ch: Character) -> Buffs:
+    """Arcane Wrath (70450, talent en or) : puissance des sorts en plus égale à x % du mana maximum, sur lui seul
+    (`sp_flat`) ; {} sans le talent.
+
+    Registre : B15"""
+    if pts.get(ARCANE_WRATH, 0) <= 0:
+        return {}
+    return {"sp_flat": talent_value(gd, pts, ARCANE_WRATH, AW_MANA_PCT) / PERCENT * ch.mana}
 
 
 def arcane_power_windows(gd: GameData, pts: Points, duration_s: float) -> list[tuple[float, float]]:

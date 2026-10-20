@@ -19,16 +19,22 @@ from typing import Any, TypedDict
 from forever.engine.armor import worn_armor
 from forever.engine.buffs import (
     ARCANE_MISSILES,
+    INTELLECT_SP,
     PYROBLAST,
     SPELL,
     arcane_blast_bonus,
+    arcane_missiles_count,
     arcane_power_buffs,
     arcane_power_share,
     arcane_power_window,
+    arcane_wrath_bonus,
     hot_streak_buffs,
     merge_buffs,
     missile_barrage_buffs,
     missile_barrage_chance,
+)
+from forever.engine.buffs import (
+    DURATION as AB_DURATION,
 )
 from forever.engine.cast import expected_cast
 from forever.engine.casting import melee_cast_time, pushback_rate, spell_cooldown
@@ -46,7 +52,7 @@ from forever.engine.movement import (
     travel_time,
 )
 from forever.engine.spells import FROSTBOLT_LIKE, best_rank
-from forever.engine.talents import talent_value
+from forever.engine.talents import talent_model, talent_value
 from forever.sim.leveling_mc import (
     PERCENT,
     ROTATIONS,
@@ -66,6 +72,7 @@ class ArcaneCycle(TypedDict):
     dmg: float
     mana: float
     ab_mana: float
+    casts: float  # lancers du cycle (70450 : plusieurs décharges sous l'aura)
 
 
 def arcane_cycle(
@@ -94,6 +101,8 @@ def arcane_cycle(
     Registre : B11, B14, B15, I1"""
     n, dump = arcane_plan(gd, level, pts, ab_stacks, ab_dump)
     eng: dict[str, Any] = {"spell_level": spell_level, "rules": rules, "low_level_penalty": low_level_penalty}
+    if talent_model(gd, "arcaneBlast") == INTELLECT_SP:  # 70450 : aura en puissance des sorts, jamais consommée
+        return _arcane_cycle_spell_power(gd, level, pts, ch, level_diff, n, dump, eng, extra_buffs)
     ab = expected_cast(gd, "arcane_blast", level, pts, ch, level_diff, buffs=extra_buffs, **eng)
     buffs = arcane_blast_bonus(gd, pts, n, for_spell=dump)
     if extra_buffs:
@@ -116,6 +125,71 @@ def arcane_cycle(
         "dmg": n * ab["dmg"] + de["dmg"],
         "mana": mana,
         "ab_mana": ab_mana,
+        "casts": n + 1,
+    }
+
+
+def _arcane_cycle_spell_power(
+    gd: GameData,
+    level: int,
+    pts: Points,
+    ch: Character,
+    level_diff: int,
+    n: int,
+    dump: str,
+    eng: dict[str, Any],
+    extra_buffs: Buffs | None,
+) -> ArcaneCycle:
+    """Cycle de la rotation arcane refondue (70450) : `n` Arcane Blast, chacun avec la puissance des sorts des cumuls
+    déjà posés et au coût de son cumul, puis, jusqu'à la fin de l'aura (durée depuis la première application), Arcane
+    Wrath dès sa recharge (talent pris) et la décharge, avec la puissance des `n` cumuls ; sans cumul : la décharge
+    seule sur la même durée. Missile Barrage (décharge Arcane Missiles) : chance moyenne par décharge, la première
+    venant des Arcane Blast, les suivantes des projectiles et d'Arcane Wrath (suppose).
+
+    Registre : B11, B14, B15, I1"""
+    duration = talent_value(gd, pts, "arcaneBlast", AB_DURATION)
+    extra_cost = (extra_buffs or {}).get("cost", 0.0)
+    ab_dmg = ab_time = ab_mana = 0.0
+    ab_hit = 1.0
+    for i in range(n):
+        buffs = merge_buffs(arcane_blast_bonus(gd, pts, i, for_spell=SPELL, ch=ch), extra_buffs)
+        e = expected_cast(gd, SPELL, level, pts, ch, level_diff, buffs=buffs, **eng)
+        assert e is not None  # vérifié par arcane_plan
+        free = clearcast_cost_factor(gd, pts, e["hit"])
+        ab_dmg, ab_time, ab_hit = ab_dmg + e["dmg"], ab_time + e["cast_s"], e["hit"]
+        ab_mana += arcane_blast_cost(gd, e["rank"], pts, ch, i) * free * (1 + extra_cost)
+    rest = max(0.0, duration - ab_time) if n else duration
+    stacked = arcane_blast_bonus(gd, pts, n, for_spell=dump, ch=ch)
+    aw_dmg = aw_time = aw_mana = aw_casts = 0.0
+    if pts.get("arcaneWrath", 0) > 0 and "arcane_wrath" in gd.spells:
+        buffs = merge_buffs(stacked, arcane_wrath_bonus(gd, pts, ch), extra_buffs)
+        aw = expected_cast(gd, "arcane_wrath", level, pts, ch, level_diff, buffs=buffs, **eng)
+        if aw is not None:
+            cooldown = max(aw["rank"].cooldown_s, aw["cast_s"])
+            aw_casts = min(rest / cooldown, rest / aw["cast_s"]) if rest > 0 else 0.0
+            aw_dmg, aw_time, aw_mana = aw_casts * aw["dmg"], aw_casts * aw["cast_s"], aw_casts * aw["mana"]
+    de = expected_cast(gd, dump, level, pts, ch, level_diff, buffs=merge_buffs(stacked, extra_buffs), **eng)
+    assert de is not None  # vérifié par arcane_plan
+    left = max(0.0, rest - aw_time)
+    cast_s, mana_each = de["cast_s"], de["mana"]
+    mb = missile_barrage_buffs(gd, pts) if dump == ARCANE_MISSILES and eng["rules"] == "forever" else {}
+    if mb:
+        first = 1 - (1 - missile_barrage_chance(gd, pts, SPELL) * ab_hit) ** n
+        missiles = arcane_missiles_count(gd, de["rank"].position)
+        later = missile_barrage_chance(gd, pts, ARCANE_MISSILES, missiles=missiles) * de["hit"]
+        later = 1 - (1 - later) * (1 - missile_barrage_chance(gd, pts, "arcane_wrath") * (aw_casts > 0))
+        k0 = left / cast_s if cast_s > 0 else 0.0
+        p = (first + max(0.0, k0 - 1) * later) / k0 if k0 >= 1 else first
+        cast_s *= 1 - p * mb.get("cast_reduction", 0.0)
+        mana_each *= 1 + p * mb.get("cost", 0.0)
+    dumps = left / cast_s if cast_s > 0 else 0.0
+    return {
+        "ab_casts": n,
+        "time_s": ab_time + aw_time + dumps * cast_s,
+        "dmg": ab_dmg + aw_dmg + dumps * de["dmg"],
+        "mana": ab_mana + aw_mana + dumps * mana_each,
+        "ab_mana": ab_mana,
+        "casts": n + aw_casts + dumps,
     }
 
 
@@ -224,7 +298,7 @@ def _fight(
         cyc = arcane_cycle(
             gd, level, pts, ch, level_diff, ab_stacks=o["ab_stacks"], ab_dump=o["ab_dump"], extra_buffs=extra, **eng
         )
-        casts = cyc["ab_casts"] + 1
+        casts = cyc["casts"]
         c, d_cast, m_cast = cyc["time_s"] / casts, cyc["dmg"] / casts, cyc["mana"] / casts
     frng = spell_range(gd, main, pts, rules=o["rules"])
     flight = travel_time(gd, main, frng, analytic=True)

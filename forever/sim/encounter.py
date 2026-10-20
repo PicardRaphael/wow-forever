@@ -25,14 +25,17 @@ from typing import Any, NamedTuple, TypedDict
 from forever.engine.buffs import (
     ARCANE_MISSILES,
     HOT_STREAK_SPELLS,
+    INTELLECT_SP,
     PYROBLAST,
     SPELL,
     ArcaneBlastAura,
     arcane_blast_active,
     arcane_blast_after_spell,
     arcane_blast_bonus,
+    arcane_missiles_count,
     arcane_power_buffs,
     arcane_power_windows,
+    arcane_wrath_bonus,
     hot_streak_buffs,
     hot_streak_rules,
     merge_buffs,
@@ -76,7 +79,7 @@ from forever.engine.model import (
 from forever.engine.monsters import MOB_SOURCES
 from forever.engine.movement import frostbite_chance, frostbite_freeze_s, spell_range, travel_time
 from forever.engine.spells import FROSTBOLT_LIKE, SPELL_LEVELS, best_rank
-from forever.engine.talents import talent_value
+from forever.engine.talents import talent_model, talent_value
 from forever.sim.leveling_analytic import arcane_cycle
 from forever.sim.leveling_mc import (
     AB_DUMPS,
@@ -301,8 +304,8 @@ def encounter_analytic(
         need = hp[0] if rotation == "aoe" else sum(hp)
         end = min(duration, _kill_time(need, windows, plain[0], buffed[0], duration))
     regen = in_combat_regen_fraction(gd, pts, level, armor=o["armor"], rules=o["rules"]) * ch.spirit_regen
-    if rotation == "arcane" and sc.hp == "boss":
-        return _arcane_walk(gd, level, pts, ch, sc, o, windows, regen)
+    if rotation == "arcane" and sc.hp == "boss" and talent_model(gd, "arcaneBlast") != INTELLECT_SP:
+        return _arcane_walk(gd, level, pts, ch, sc, o, windows, regen)  # 70450 : cycle stationnaire (_cycle) sinon
     pool, t, dmg, oom = ch.mana, 0.0, 0.0, None
     for a, b, (dps, mps) in _segments(windows, plain, buffed, end):
         drain = mps - regen
@@ -457,6 +460,9 @@ def encounter_fight(
     hs_n = hot_streak_plan(gd, level, pts, rotation, o)
     hs_rules = hot_streak_rules(gd, pts) if hs_n else None
     mb_on = arcane and dump == ARCANE_MISSILES and bool(missile_barrage_buffs(gd, pts))
+    # 70450 : Arcane Wrath lancé dès sa recharge pendant la décharge de la rotation arcane
+    r_aw = best_rank(gd, "arcane_wrath", level, pts) if arcane and "arcane_wrath" in gd.spells else None
+    aw_ready = [0.0]
     windows = arcane_power_windows(gd, pts, duration) if o["arcane_power"] == "auto" else []
     ap = arcane_power_buffs(gd, pts)
     has_il = rotation == "frost" and best_rank(gd, "ice_lance", level, pts) is not None
@@ -522,6 +528,8 @@ def encounter_fight(
             return "fire_blast", None, False
         if hs_n and (s["hs"] if t < s["hs_exp"] else 0) >= hs_n:
             return PYROBLAST, hot_streak_buffs(gd, pts, s["hs"]), False
+        if arcane and arcane_blast_active(aura[0], t) >= ab_n and r_aw is not None and t >= aw_ready[0]:
+            return "arcane_wrath", arcane_wrath_bonus(gd, pts, ch), False
         if arcane and arcane_blast_active(aura[0], t) >= ab_n:
             if mb_on and s["mb"]:
                 return dump, missile_barrage_buffs(gd, pts), True
@@ -541,7 +549,7 @@ def encounter_fight(
         if not cast_fits(end, duration):
             break
         stacks = arcane_blast_active(aura[0], end) if arcane else 0
-        buffs: Buffs | None = arcane_blast_bonus(gd, pts, stacks, for_spell=key) if arcane else None
+        buffs: Buffs | None = arcane_blast_bonus(gd, pts, stacks, for_spell=key, ch=ch) if arcane else None
         if extra or in_window(end):
             buffs = merge_buffs(buffs, extra, ap if in_window(end) else None)
         frozen = key == "ice_lance"
@@ -573,6 +581,8 @@ def encounter_fight(
             aura[0] = arcane_blast_after_spell(gd, pts, aura[0], end, key)
         if key == "fire_blast":
             s["fbl"] = t + spell_cooldown(gd, key, rank, pts)
+        if key == "arcane_wrath":
+            aw_ready[0] = t + spell_cooldown(gd, key, rank, pts)
         if key in ready:
             ready[key] = t + spell_cooldown(gd, key, rank, pts)
         hit_targets = [i for i in range(n) if hp[i] > 0] if rotation == "aoe" else [_target()]
@@ -580,7 +590,13 @@ def encounter_fight(
         if total[1] and hs_rules is not None and key in HOT_STREAK_SPELLS:
             active = s["hs"] if end < s["hs_exp"] else 0
             s["hs"], s["hs_exp"] = min(hs_rules[2], active + 1), end + hs_rules[0]
-        if mb_on and total[2] and (chance := missile_barrage_chance(gd, pts, key)) and rng.random() < chance:
+        missiles = arcane_missiles_count(gd, rank.position) if key == ARCANE_MISSILES else 1.0
+        if (
+            mb_on
+            and total[2]
+            and (chance := missile_barrage_chance(gd, pts, key, missiles=missiles))
+            and rng.random() < chance
+        ):
             s["mb"] = True
         if key in FROSTBOLT_LIKE and total[2]:
             if fbite and rng.random() < fbite:

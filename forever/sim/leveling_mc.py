@@ -32,9 +32,11 @@ from forever.engine.buffs import (
     arcane_blast_after_spell,
     arcane_blast_bonus,
     arcane_blast_max_stacks,
+    arcane_missiles_count,
     arcane_power_buffs,
     arcane_power_pull,
     arcane_power_window,
+    arcane_wrath_bonus,
     hot_streak_buffs,
     hot_streak_rules,
     merge_buffs,
@@ -293,6 +295,9 @@ def kill_mc(
     hs_rules = hot_streak_rules(gd, pts) if hs_n else None
     r_pyro = best_rank(gd, PYROBLAST, level, pts) if hs_n else None
     mb_on = arcane and dump == ARCANE_MISSILES and o["rules"] == "forever" and bool(missile_barrage_buffs(gd, pts))
+    # 70450 : Arcane Wrath (talent en or) lancé dès sa recharge pendant la décharge de la rotation arcane
+    r_aw = best_rank(gd, "arcane_wrath", level, pts) if arcane and "arcane_wrath" in gd.spells else None
+    aw_ready = [0.0]
     window = arcane_power_window(gd, pts)
     ap_on = arcane_power_ready and window is not None and o["arcane_power"] == "auto" and o["rules"] == "forever"
     ap_end = window[0] if ap_on and window is not None else -1.0  # l'aura part du premier lancer (t = 0)
@@ -342,7 +347,9 @@ def kill_mc(
 
     def fire_spell(key: str, frozen: bool, extra: Buffs | None = None, free: bool = False) -> CastEstimate:
         stacks = arcane_blast_active(aura[0], s["t"]) if arcane else 0
-        buffs: Buffs | None = arcane_blast_bonus(gd, pts, stacks, for_spell=key) if arcane else None
+        buffs: Buffs | None = arcane_blast_bonus(gd, pts, stacks, for_spell=key, ch=ch) if arcane else None
+        if key == "arcane_wrath":
+            buffs = merge_buffs(buffs, arcane_wrath_bonus(gd, pts, ch))
         if extra or (ap_on and s["t"] < ap_end):
             buffs = merge_buffs(buffs, extra, ap_buffs if s["t"] < ap_end else None)
         e = expected_cast(
@@ -394,7 +401,8 @@ def kill_mc(
                 s["mana"] -= master_of_elements_refund(gd, pts, r, e["mana"])
             if rng.random() < clearcast:
                 s["cc"] = True
-            if mb_on and (chance := missile_barrage_chance(gd, pts, key)) and rng.random() < chance:
+            missiles = arcane_missiles_count(gd, r.position) if key == ARCANE_MISSILES else 1.0
+            if mb_on and (chance := missile_barrage_chance(gd, pts, key, missiles=missiles)) and rng.random() < chance:
                 s["mb"] = True
             if r.dot_total:
                 ticks = dot_tick_times(gd, r.dot_duration_s, dot_tick_period_s(gd, key, r, rules=o["rules"]))
@@ -522,7 +530,10 @@ def kill_mc(
         key, r_key = main, cast("Rank | None", r_main)
         extra: Buffs | None = None
         free = False
-        if arcane and arcane_blast_active(aura[0], s["t"]) >= ab_n:
+        if arcane and arcane_blast_active(aura[0], s["t"]) >= ab_n and r_aw is not None and s["t"] >= aw_ready[0]:
+            key, r_key = "arcane_wrath", r_aw
+            aw_ready[0] = s["t"] + spell_cooldown(gd, key, r_aw, pts)
+        elif arcane and arcane_blast_active(aura[0], s["t"]) >= ab_n:
             key, r_key = dump, r_dump
             if mb_on and s["mb"]:  # Missile Barrage consommé au début de la canalisation
                 s["mb"], extra, free = False, missile_barrage_buffs(gd, pts), True
