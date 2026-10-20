@@ -112,7 +112,9 @@ def test_selection_follows_talents_and_context(game_data, rules):
     assert "B18" not in {b.id for b in select_blind_spots(game_data, rules, "raid", 40, {"arcaneFocus": 5})}
 
 
-def test_estimates_are_positive_bounds_from_the_data(game_data):
+def test_estimates_are_positive_bounds_from_the_data(game_data_at_pre_70450_version):
+    """Estimations d'avant 1.60.1.70450 : Wake of Fire y porte encore son bonus de critique (conftest)."""
+    game_data = game_data_at_pre_70450_version
     ch = character(game_data, 40, "Orc")
     pom = estimate_cooldown_talents(game_data, 40, {"presenceOfMind": 1, "improvedFireball": 5}, "Orc")
     longest = max(
@@ -145,3 +147,9 @@ def test_blind_spot_effects_come_from_the_estimators(game_data, rules):
     unrated = [b for b in spots.values() if b.effect is None]
     assert unrated  # angles morts non chiffrés gardés (effet inconnu, signalé)
     assert all(isinstance(r, BlindSpotRule) for r in blind_spot_rules(load(REGISTRY_PATH)))
+
+
+def test_improved_fire_blast_has_no_crit_bonus_to_estimate(game_data):
+    """1.60.1.70450 : Wake of Fire devient Improved Fire Blast (recharge et portée, plus de critique après une mise à
+    mort) : rien à estimer pour B19, jamais une estimation nulle présentée comme un angle mort."""
+    assert estimate_wake_of_fire_crit(game_data, 20, {"wakeOfFire": 2}, "Orc") is None
