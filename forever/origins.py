@@ -210,7 +210,8 @@ class _Checker:
             skipped = [p for f, p in not_values if f == name]
             self._check_file(name, metadata, resolver, skipped, pending, sources, used, used_pending)
         for r in rules:
-            if r.file in present and r.index not in used:
+            # 70450 : règle anticipée d'une tranche pour une version à venir, sans effet tant que ses valeurs manquent
+            if r.file in present and r.index not in used and not r.doc.get("anticipe"):
                 self.issue("regle_sans_effet", r.file, r.raw_path, f"aucune valeur sous {r.raw_path}")
         for i, (file, seg, _) in enumerate(pending):
             if i not in used_pending:
