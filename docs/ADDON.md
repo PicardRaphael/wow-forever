@@ -666,7 +666,7 @@ bouton sous la réponse d'une tranche donnent la route de la tranche (« Route d
   replié ne montre pas ses factions (rien n'est déplié). Clé de contexte `reputations` (« faction:palier:réputation »,
   entiers), lue par `forever/bridge/context.py` (`reputations_context`) pour le bloc 4e. Dans l'assistant : factions
   groupées comme dans le jeu, filtre par groupe, palier visé (libellés `FACTION_STANDING_LABEL<n>` du client).
-- **Plusieurs conversations de jeu** : l'onglet Jeu porte le nom de la conversation courante ; son menu (▾) les
+- **Plusieurs conversations de jeu** : l'onglet Jeu porte le nom de la conversation courante ; son menu (bouton « v » à côté) les
   liste, en crée, renomme (le nom se tape dans la saisie, rien n'est envoyé) et efface (second clic dans les 5 s) ;
   `/fb conv` (liste, `new <nom>`, `nom <nom>`, `effacer`, `<numéro>`). Historique propre (`history_<id>`) et session
   propre côté pont (drapeau `c=<id>`, `sessions["game:<id>"]`) ; « Jeu » n'est jamais retirée (effacer vide son
