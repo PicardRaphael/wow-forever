@@ -144,3 +144,11 @@ def test_placeholder_template_shows_durations_in_seconds():
     application ») : le gabarit garde l'unité."""
     out = placeholder_template("lasts $d from now", resolver({(None, "d", 0): [15]}))
     assert out == "lasts {0} sec from now"
+
+
+def test_placeholder_template_takes_the_duration_unit_of_the_resolver():
+    """Unité d'une durée donnée par le résolveur (`duration_unit`, unités de decode_rules.json : « min » dès une
+    minute, comme Ice Barrier « Lasts 1 min ») ; `$D` en majuscule de même."""
+    resolve = resolver({(None, "d", 0): [1], (123, "d", 0): [10]})
+    resolve.duration_unit = lambda spell: "min" if spell is None else "sec"
+    assert placeholder_template("Lasts $d, then $123D.", resolve) == "Lasts {0} min, then {1} sec."
