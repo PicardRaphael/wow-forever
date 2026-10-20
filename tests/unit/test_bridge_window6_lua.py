@@ -186,24 +186,35 @@ def test_route_levels_stay_ordered():
     assert int(text(game, "ForeverBridgeRouteFromValue")) == 1
 
 
-def test_route_assistant_other_types_send_a_plain_question():
+@pytest.mark.parametrize("kind", ["reputation", "profession"])
+def test_route_type_not_yet_computed_says_so_without_a_form(kind):
+    """Bloc 6b (décision 281) : un type de route que Forever ne calcule pas encore (réputation avant le bloc 4e,
+    métier) le dit clairement dans l'écran : ni niveaux, ni champ libre, ni « Calculer », aucune question envoyée."""
     game = opened()
     click(game, "ForeverBridgeNav_route")
-    click(game, "ForeverBridgeRouteType_reputation")
-    click(game, "ForeverBridgeRouteCompute")
-    assert decode_band(game.screen_image()) is None  # faction manquante : rien n'est envoyé
-    assert any("faction" in line for line in history(game))
-    click(game, "ForeverBridgeNav_route")
-    box = g(game, "ForeverBridgeRouteTarget")
-    box.SetText(box, "Darkspear Raiders")
-    click(game, "ForeverBridgeRouteCompute")
-    _, record = sent(game)
-    assert "réputation" in record.text and "Darkspear Raiders" in record.text and record.flags == frozenset()
+    click(game, f"ForeverBridgeRouteType_{kind}")
+    assert visible(game, "ForeverBridgeRouteUnavailable")
+    assert "pas encore" in text(game, "ForeverBridgeRouteUnavailable")
+    for name in ("ForeverBridgeRouteTarget", "ForeverBridgeRouteCompute", "ForeverBridgeRouteFromValue",
+                 "ForeverBridgeRouteDungeons", "ForeverBridgeRouteClass"):  # fmt: skip
+        assert not visible(game, name), name
+    assert decode_band(game.screen_image()) is None
+    click(game, "ForeverBridgeRouteType_leveling")  # retour au leveling : le formulaire revient
+    assert not visible(game, "ForeverBridgeRouteUnavailable") and visible(game, "ForeverBridgeRouteCompute")
+
+
+def test_route_assistant_gear_sends_the_gear_route_action():
+    """Bloc 6b : la route d'équipement de l'assistant part comme celle de l'écran Équipement (action traitée par le
+    pont sans le modèle, bloc 4d), sur la tranche de niveaux choisie ; ni donjons ni quêtes de classe."""
+    game = opened()
     click(game, "ForeverBridgeNav_route")
     click(game, "ForeverBridgeRouteType_gear")
+    assert not visible(game, "ForeverBridgeRouteDungeons") and not visible(game, "ForeverBridgeRouteClass")
+    start = int(text(game, "ForeverBridgeRouteFromValue"))
+    end = int(text(game, "ForeverBridgeRouteToValue"))
     click(game, "ForeverBridgeRouteCompute")
     _, record = sent(game)
-    assert "route d'équipement" in record.text and record.flags == frozenset()
+    assert record.flags == frozenset({f"a=gear_route:{start}-{end}"}) and record.text == ""
 
 
 # --- 3. écrans Talents, Équipement, Exports, Mises à jour ------------------------------------------------------
