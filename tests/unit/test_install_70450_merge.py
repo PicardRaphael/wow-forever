@@ -141,3 +141,14 @@ def test_description_follows_a_changed_client_text():
     assert not m.refused
     assert blast["desc"] == "new {0}" and focus["desc"] == "seed wording {0}"
     assert any(c["path"] == "blast.desc" and c["rule"] == "metadata" for c in m.changes)
+
+
+def test_older_rename_does_not_override_a_changed_client_text():
+    """Renommage confirmé d'une version passée (Hot Streak, 70170) dont la décision porte un gabarit : il ne remet pas
+    l'ancien texte quand le client a changé le sien depuis (70450 : Fire Blast donne un cumul de plus)."""
+    repo = doc(talent("hot", desc="old {0}"))
+    cand = doc(talent("heating", name="Heating", desc="new $s1", desc_template="new {0}"))
+    rename = {**confirmed("talent", "hot", "renamed", "key", "hot", "heating"), "desc": "old {0}"}
+    m = _Merge(VERSION, [rename], "2026-10-20", previous_client_desc={"hot": "old $s1"})
+    out = m.talents(repo, cand)["trees"][0]["talents"][0]
+    assert not m.refused and out["key"] == "hot" and out["desc"] == "new {0}"
