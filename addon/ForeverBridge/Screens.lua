@@ -344,9 +344,14 @@ local function BuildGear(screen)
 	local route = Button("ForeverBridgeGearRoute", screen, "En faire une route", 160)
 	Place(route, screen, 216, -2 * ROW)
 	route:SetScript("OnClick", function()
-		-- bloc 4c : action traitée par le pont sans le modèle (objets obtenables au niveau choisi, jamais la route BiS)
-		local label = "Route d'équipement au niveau " .. state.level
-		if FB.Send("", nil, { flags = { "a=gear_route:" .. state.level }, label = label }) then
+		-- bloc 4c : action traitée par le pont sans le modèle (objets obtenables au niveau choisi, jamais la route BiS) ;
+		-- bloc 4d : une tranche choisie donne la route de ses objets
+		local label, levels = "Route d'équipement au niveau " .. state.level, tostring(state.level)
+		if state.to > state.level then
+			label = "Route d'équipement du niveau " .. state.level .. " au niveau " .. state.to
+			levels = state.level .. "-" .. state.to
+		end
+		if FB.Send("", nil, { flags = { "a=gear_route:" .. levels }, label = label }) then
 			FB.ShowScreen("chat")
 		end
 	end)

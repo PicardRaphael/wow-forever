@@ -835,7 +835,8 @@ def dungeon_info(
 
 
 def where_item(book: DungeonBook, item: int) -> list[dict[str, Any]]:
-    """Où trouver un objet : donjon, boss, taux retenu, source et version de la source."""
+    """Où trouver un objet : donjon, boss, taux retenu, source et version de la source, taux des autres sources et
+    relevé du joueur (passages, objets tombés) quand il existe."""
     versions = {s["source"]: s.get("version") for s in book.sources}
     out = []
     for key, d in book.dungeons.items():
@@ -853,6 +854,8 @@ def where_item(book: DungeonBook, item: int) -> list[dict[str, Any]]:
                             "classic": bool(entry.get("classic")),
                             "certainty": entry["certainty"],
                             "sources": entry["sources"],
+                            "others": entry.get("others") or [],  # bloc 4d : écarts entre sources
+                            **({"observed": entry["observed"]} if entry.get("observed") else {}),
                         }
                     )
     return out

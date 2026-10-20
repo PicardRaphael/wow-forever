@@ -122,13 +122,14 @@ def player_error(error: str | None) -> str:
 
 
 def gear_levels(action: str | None, target: str | None) -> int | tuple[int, int] | None:
-    """Niveau des actions d'équipement : « N » (N ≥ 1), ou « de-à » (1 ≤ de < à) pour `gear_level` ; None sinon."""
+    """Niveau des actions d'équipement : « N » (N ≥ 1), ou « de-à » (1 ≤ de < à) pour `gear_level` et `gear_route`
+    (route d'équipement d'une tranche, bloc 4d) ; None sinon."""
     low, sep, high = (target or "").partition("-")
     if not low.isdigit() or int(low) < 1:
         return None
     if not sep:
         return int(low)
-    if action == "gear_level" and high.isdigit() and int(high) > int(low):
+    if action in ("gear_level", "gear_route") and high.isdigit() and int(high) > int(low):
         return int(low), int(high)
     return None
 
@@ -514,7 +515,7 @@ class Bridge:
             offer = None
             if action == "gear_route" and result == "équipement" and "Valider et livrer : " in text:
                 offer = {"prompt": "", "buttons": [dict(VALIDATE)]}  # bloc 4d : la route d'équipement se livre ici
-            elif action == "gear_level" and result == "équipement" and isinstance(gear_levels(action, target), int):
+            elif action == "gear_level" and result == "équipement":
                 # décision 282 : la suite proposée sous la réponse, comme une question du chat
                 offer = {"prompt": "", "buttons": [{"label": "Feuille de route de ces objets",
                                                     "action": f"gear_route:{target}"}]}  # fmt: skip

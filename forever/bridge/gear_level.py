@@ -11,6 +11,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from forever.gear import gear_report
+from forever.gear_route import drop_text
 from forever.route import RouteRequest, plan_route, route_summary
 
 SET_ASIDE_SHOWN = 6  # objets mis à part montrés (réglage de présentation)
@@ -323,25 +324,96 @@ def gear_route_request(doc: Mapping[str, Any], who: Mapping[str, Any], level: in
     )
 
 
-def gear_route_reply(deps: Any, context: Mapping[str, str], level: int) -> tuple[str, list[dict[str, str]]]:
+def _drops(deps: Any) -> Any:
+    """Où tombe un objet (livre des donjons de DJ1 : relevés du joueur d'abord, taux des autres sources) ; livre lu à
+    la première question, aucun taux sans lui (client absent)."""
+    from forever.dungeons import build_dungeons, where_item
+    from forever.errors import ForeverError
+
+    book: list[Any] = []
+
+    def where(item: int) -> list[dict[str, Any]]:
+        if not book:
+            try:
+                book.append(build_dungeons(deps))
+            except (ForeverError, OSError):
+                book.append(None)
+        return where_item(book[0], item) if book[0] is not None else []
+
+    return where
+
+
+GROUP_LOOT = (
+    "En groupe, un objet qui tombe peut revenir à un autre joueur (jets de besoin) : prévois des passages en plus."
+)
+
+
+def _loops(picks: list[dict[str, Any]], drops: Any, tags: Mapping[int, str], dungeons_in: set[Any]) -> list[str]:
+    """Boucles de donjon (bloc 4d, registre I20) : objets visés d'un même donjon cumulés, passages attendus et pour
+    9 chances sur 10, avec le taux retenu par le livre des donjons (relevés du joueur d'abord)."""
+    from forever.gear_route import item_sources, plan_gear_route
+
+    items = []
+    for p in picks:
+        if not p.get("dungeon_detail"):
+            continue
+        sources = item_sources(p["item"], drops, lambda _item: [], {})
+        if sources and sources[0].get("kind") == "donjon":
+            items.append({"slot": p["slot"], "item": p["item"], "sources": sources})
+    lines = []
+    for d in plan_gear_route(items)["dungeons"]:
+        name = d.get("name") or d["dungeon"]
+        objects = ", ".join(tags[i] for i in d["items"])
+        visit = "la route y passe une fois" if name in dungeons_in else "hors de cette route"
+        if d["expected_runs"] is None:
+            lines.append(f"- {name} : {objects} ; {visit} ; taux inconnu, passages non chiffrés")
+        else:
+            runs = f"{d['expected_runs']:.1f}".replace(".", ",")
+            lines.append(
+                f"- {name} : {objects} ; {visit} ; environ {runs} passage(s) en moyenne, "
+                f"{d['runs_for_chance']} pour 9 chances sur 10"
+            )
+    return ["Boucles de donjon :", *lines, GROUP_LOOT] if lines else []
+
+
+def _range_picks(doc: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """Objets d'une tranche de niveaux : chaque objet visé une fois, au premier palier où il l'est."""
+    seen: dict[int, dict[str, Any]] = {}
+    for s in sorted(doc.get("segments") or [], key=lambda s: s["from"]):
+        seen.setdefault(int(s["item"]), dict(s))
+    return list(seen.values())
+
+
+def gear_route_reply(
+    deps: Any, context: Mapping[str, str], level: int | tuple[int, int]
+) -> tuple[str, list[dict[str, str]]]:
     """« Feuille de route de ces objets » (bloc 4d, décision 282) : la route d'équipement calculée par l'optimiseur
-    (route de leveling qui inclut les quêtes et donjons des objets obtenables au niveau `level`), son aperçu compact,
-    les objets qu'elle rapporte et « Valider et livrer » ; sans route calculable, la liste regroupée du bloc 4c."""
-    doc = _leveling(deps, context, level)
+    (route de leveling qui inclut les quêtes et donjons des objets obtenables au niveau `level`, ou dans la tranche
+    (de, à)), son aperçu compact, les objets qu'elle rapporte avec leur taux et ses écarts, les boucles de donjon et
+    « Valider et livrer » ; sans route calculable, la liste regroupée du bloc 4c."""
+    low, high = level if isinstance(level, tuple) else (level, level)
+    span = f"du niveau {low} au niveau {high}" if low != high else f"au niveau {high}"
+    if low != high:
+        doc = _leveling(deps, context, low, high)
+        if "segments" not in doc:
+            return f"Route d'équipement {span} : {doc.get('error') or doc.get('message') or 'non calculée'}", []
+        doc = {**doc, "picks": _range_picks(doc)}
+    else:
+        doc = _leveling(deps, context, high)
     if "picks" not in doc:
-        return f"Route d'équipement au niveau {level} : {doc.get('error') or doc.get('message') or 'non calculée'}", []
+        return f"Route d'équipement {span} : {doc.get('error') or doc.get('message') or 'non calculée'}", []
     who = _who(deps, context)
     if not (who.get("class_name") and who.get("faction") and isinstance(who.get("level"), int)):
-        return _grouped_reply(deps, context, level, doc)
+        return _grouped_reply(deps, context, high, doc)
     try:
-        plan = plan_route(deps, gear_route_request(doc, who, level))
+        plan = plan_route(deps, gear_route_request(doc, who, high))
     except Exception:  # noqa: BLE001 : route impossible : la liste regroupée, sans bouton de livraison
-        text, links = _grouped_reply(deps, context, level, doc)
+        text, links = _grouped_reply(deps, context, high, doc)
         return text + "\nFeuille de route non calculée (détail noté de mon côté) : objets regroupés par origine.", links
     summary = route_summary(plan)
     lv = summary.get("levels") or {}
     hours = summary.get("hours")
-    head = f"## Route d'équipement au niveau {level} (feuille de route du niveau {lv.get('from')} au niveau {lv.get('to')})"
+    head = f"## Route d'équipement {span} (feuille de route du niveau {lv.get('from')} au niveau {lv.get('to')})"
     lines = [head]
     zones = ", ".join(summary.get("zones") or []) or "zones inconnues"
     lines.append(
@@ -349,10 +421,15 @@ def gear_route_reply(deps: Any, context: Mapping[str, str], level: int) -> tuple
     )
     lines.append("Objets rapportés :")
     in_route = {s.get("ref") for s in plan.get("stops") or []}
-    dungeons_in = {d.get("name") for d in summary.get("dungeons") or []}
+    dungeons_in = {d.get("name") for d in summary.get("dungeons") or []} | {
+        d.get("name") for d in plan.get("dungeons") or [] if isinstance(d, dict)
+    }
+    drops = _drops(deps)
+    tags = {}
     for p in _ordered(doc["picks"]):
         slot = SLOTS_FR.get(p["slot"], p["slot"])
         tag = item_tag(p["item"], p.get("quality"), p.get("name"))
+        tags[p["item"]] = tag
         if p.get("quest_detail"):  # vérifié sur les arrêts de la route, jamais supposé
             where = (
                 "dans la route" if p["quest_detail"].get("id") in in_route else "pas dans cette route, à faire ensuite"
@@ -361,18 +438,20 @@ def gear_route_reply(deps: Any, context: Mapping[str, str], level: int) -> tuple
         elif p.get("dungeon_detail"):
             d = p["dungeon_detail"]
             where = "dans la route" if d["dungeon"] in dungeons_in else "pas dans cette route"
-            how = f"donjon {d['dungeon']}, boss {d['boss']}, {where}"
+            rates = drop_text(drops(p["item"]), boss=d.get("boss"))
+            how = f"donjon {d['dungeon']}, boss {d['boss']}, {where}" + (f" ; {rates}" if rates else "")
         else:
             how = _how(p)
         lines.append(f"- {slot} : {tag} ({how})")
     for stop in summary.get("first_stops") or []:
         lines.append(f"  · {stop.get('text')} ({stop.get('zone') or '?'})")
+    lines += _loops(doc["picks"], drops, tags, dungeons_in)
     basis = (summary.get("basis") or {}).get("kind")
     if basis:
         lines.append(f"Base : {basis}.")
-    extra, links = _links(doc, context, level, deps)
+    extra, links = _links(doc, context, high, deps)
     lines.append(VALIDATE_LINE.format(name=summary.get("name") or "Forever · équipement"))
-    return "\n".join(lines + extra + _tail(doc, level)), links
+    return "\n".join(lines + extra + _tail(doc, high)), links
 
 
 def _grouped_reply(

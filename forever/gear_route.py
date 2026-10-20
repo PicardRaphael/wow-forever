@@ -37,6 +37,49 @@ def item_sources(
     return [{"kind": "inconnue"}]
 
 
+PERCENT = 100  # affichage d'un taux (fraction) en pourcentage
+
+
+def _percent(rate: float) -> str:
+    return f"{rate * PERCENT:.0f} %" if rate * PERCENT >= 1 else f"{rate * PERCENT:.1f} %".replace(".", ",")
+
+
+def drop_text(drops: Sequence[Mapping[str, Any]], *, boss: str | None = None) -> str:
+    """Taux de butin d'un objet dit au joueur (bloc 4d) : le taux retenu par le livre des donjons et sa source (tes
+    relevés d'abord : ForeverLogger et Naowh, passages comptés), les autres sources qui en diffèrent (« écart »),
+    les autres boss qui le donnent (« aussi ») ; rien n'est tranché ici, DJ1 a choisi."""
+    from forever.dungeons import RECORD_SOURCE
+    from forever.pipeline.dungeon_sources import DUNGEON_SOURCE_LABELS
+
+    if not drops:
+        return ""
+    main = next((d for d in drops if boss and d.get("boss") == boss), None) or max(
+        drops, key=lambda d: d["rate"] if isinstance(d.get("rate"), int | float) else -1.0
+    )
+    rate = main.get("rate")
+    parts: list[str] = []
+    if isinstance(rate, int | float):
+        obs = main.get("observed") or {}
+        if main.get("source") == RECORD_SOURCE and obs.get("kills"):
+            origin = f"ton relevé : {obs.get('drops')} sur {obs.get('kills')} passages"
+        else:
+            origin = DUNGEON_SOURCE_LABELS.get(str(main.get("source")), str(main.get("source") or "source inconnue"))
+        parts.append(f"taux {_percent(float(rate))} ({origin})")
+        gaps = [
+            f"{DUNGEON_SOURCE_LABELS.get(str(o['source']), str(o['source']))} {_percent(float(o['rate']))}"
+            for o in main.get("others") or []
+            if isinstance(o.get("rate"), int | float) and abs(float(o["rate"]) - float(rate)) > 1e-9
+        ]
+        if gaps:
+            parts.append("écart : " + ", ".join(gaps))
+    else:
+        parts.append("taux inconnu des sources")
+    also = [f"{d.get('boss')} ({d.get('dungeon_name') or d.get('dungeon')})" for d in drops if d is not main]
+    if also:
+        parts.append("aussi : " + ", ".join(also))
+    return " ; ".join(parts)
+
+
 def plan_gear_route(items: Sequence[Mapping[str, Any]], *, chance: float = CHANCE) -> dict[str, Any]:
     """Route regroupée : donjons (meilleure source de chaque objet, objets d'un même donjon cumulés ; les donjons qui
     donnent le plus d'objets d'abord, puis le moins de passages), quêtes par zone, autres origines, objets sans origine.

@@ -651,6 +651,11 @@ route de ces objets ».
 Bloc 4d (2026-10-16) : « Feuille de route de ces objets » calcule la route de leveling qui inclut les quêtes et
 donjons des objets, dit pour chaque objet s'il est dans la route, et la livre par « Valider et livrer » sous
 « Forever · <perso> · équipement ».
+Suite du bloc 4d (2026-10-20) : chaque objet de donjon dit son taux et d'où il vient (« ton relevé : 3 sur 12
+passages » d'abord), les écarts entre sources et les autres boss ; « Boucles de donjon » donne les passages attendus
+et pour 9 chances sur 10, puis le partage du butin en groupe ; « En faire une route » avec « jusqu'au » réglé et le
+bouton sous la réponse d'une tranche donnent la route de la tranche (« Route d'équipement du niveau 10 au niveau
+20 ») ; les donneurs des capitales (Bink à Ironforge) entrent dans les routes, trajet marqué supposé.
 
 ## 8. Checklist à chaque build
 Pont ForeverBridge : `/fv test` et `uv run forever bridge selftest --live` (case d'un pixel), une question dans la fenêtre `/fv` (réponse sans `/reload`), puis `/fv diag` (section 7, étapes 10 et 11). P06b : Maj+clic d'un objet dans la saisie (lien et infobulle, `uv run forever bridge contexts last`), « Coller /simc » (export reçu, somme juste), `uv run forever bridge selftest --card` (Valider, Confirmer, rien de lancé), « Mettre à jour » (section 7, étapes 17 et 18). Régénérer la référence d'API Forever ; relancer une sonde (`/dump` des API clés : `C_Traits`, `issecretvalue`, `GetSpellBonusDamage`) ; `uv run python scripts/check_addon.py` ; vérifier le numéro d'interface et le suffixe du `.toc` ; vérifier l'en-tête du journal (`COMBAT_LOG_VERSION`, bloc avancé à 19 champs).

@@ -1997,9 +1997,14 @@ mechanics:
       - tests/unit/test_gear_route.py::test_impossible_drop_has_no_finite_runs
       - tests/unit/test_gear_route.py::test_item_sources_dungeon_then_quest_then_naowh
       - tests/unit/test_gear_route.py::test_plan_groups_dungeons_and_quests
+      - tests/unit/test_gear_route_4d_loops.py::test_my_records_come_first_with_their_counts
+      - tests/unit/test_gear_route_4d_loops.py::test_other_sources_disagreeing_are_shown
+      - tests/unit/test_gear_route_4d_loops.py::test_an_addon_rate_names_its_source_and_other_bosses_are_listed
+      - tests/unit/test_gear_route_4d_loops.py::test_route_reply_gives_the_dungeon_loop
+      - tests/unit/test_gear_route_4d_loops.py::test_route_for_a_level_range
     tolerance: null
     formule: "E[passages] = somme sur les sous-ensembles S non vides des objets voulus de (-1)^(|S|+1) / (1 - prod(1 - p_i, i dans S)) ; passages pour la chance c = plus petit n avec prod(1 - (1 - p_i)^n) >= c"
-    note: "CJ1, bloc 4b (décision 277) : seuil affiché 9 chances sur 10 ; un boss connu sans taux garde le donjon, passages non chiffrés ; butin partagé avec le groupe (jet de dés, objet pris par un autre) non modélisé : passages sous-estimés en groupe ; la meilleure source seulement par objet (taux le plus haut) ; ordre de la route : donjons qui donnent le plus d'objets, puis le moins de passages, quêtes par zone du donneur, autres origines (métier, réputation, marchand) en texte de Naowh"
+    note: "CJ1, bloc 4b (décision 277) : seuil affiché 9 chances sur 10 ; un boss connu sans taux garde le donjon, passages non chiffrés ; butin partagé avec le groupe (jet de dés, objet pris par un autre) non modélisé : passages sous-estimés en groupe ; la meilleure source seulement par objet (taux le plus haut) ; bloc 4d (2026-10-20) : la route d'équipement calculée dit pour chaque objet de donjon le taux retenu par le livre (relevés du joueur d'abord, ForeverLogger et Naowh, avec le compte des passages), les autres sources qui en diffèrent (« écart ») et les autres boss, puis une boucle par donjon (la route y passe une fois, passages attendus et pour 9 chances sur 10) et le partage du butin en groupe dit en clair ; ordre de la route : donjons qui donnent le plus d'objets, puis le moins de passages, quêtes par zone du donneur, autres origines (métier, réputation, marchand) en texte de Naowh"
     angle_mort:
       talents: []
       contextes: [dungeon]
