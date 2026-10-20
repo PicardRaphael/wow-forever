@@ -414,6 +414,10 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
   `/fb eui on|off`, `/fb role clear` ; aide mise à jour.
 
 ### Bloc 6b — Réponses en cartes, assistant par type de route, PvP actionnable (décision 281)
+- **Statut (2026-10-20)** : livré, en attente d'essai (`docs/LANCEMENT.md` §6) : PvP « Comment jouer contre lui »,
+  assistant selon le type (réputation et métier dits non calculés), réputations lues en jeu et liste des factions,
+  plusieurs conversations (ForeverBridge 0.6.0). À faire : réponses en cartes et équipement en cartes repliables,
+  derrière un réglage, l'affichage actuel restant le défaut (décision 287).
 - **Réponses en cartes** dans l'historique (titre, certitude, boutons dans la carte), aperçu de route dans le chat
   (écart aux maquettes accepté le 2026-10-15).
 - **Assistant de feuille de route selon le type** (idées du chat du 2026-10-15, soir, point 1) :

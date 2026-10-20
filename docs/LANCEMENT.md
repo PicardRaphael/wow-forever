@@ -210,12 +210,24 @@ correction passe devant le reste.
     `forever update status` dit l'écriture en attente ; la lancer, puis rejouer les builds
     (`scripts/replay_builds.py`) si elle change une valeur du Mage.
 
-### 6. Fin
-15. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
+### 6. Bloc 6b, ForeverBridge 0.6.0 (décision 281 ; 5 min)
+15. Bouton PvP, un joueur ennemi en cible : la réponse commence par « Comment jouer contre lui » (trois à cinq
+    consignes dans l'ordre du combat), puis le détail en mots de joueur.
+16. Feuille de route, type Réputation : tes factions groupées comme dans le panneau de réputation (un groupe replié
+    n'y montre rien), « Groupe : … » filtre, une faction choisie propose le palier suivant, « < > » change le palier
+    visé ; le message dit que la route n'est pas encore calculée, rien n'est envoyé. Type Métier : même message.
+    Type Équipement : « Calculer » donne « Route d'équipement du niveau N au niveau M ».
+17. Onglet Jeu, bouton « v » : « Nouvelle conversation », une question, puis retour à « Jeu » par le menu : chaque
+    conversation garde son historique, et une réponse arrivée pendant que tu étais ailleurs est dans la bonne.
+18. « Renommer… » : le nom tapé dans la saisie renomme sans rien envoyer ; « Effacer… » demande un second clic ;
+    `/fb conv` liste les conversations.
+
+### 7. Fin
+19. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
     et corrige le reste.
 
-Blocs à venir, ajoutés ici à leur livraison : 6b (réponses en cartes, assistant par type de route, PvP « Comment
-jouer contre lui »), 4e (route de réputation), 1d (vols et pierre de foyer), Polestar.
+Blocs à venir, ajoutés ici à leur livraison : fin de 6b (réponses en cartes, derrière un réglage ; équipement en
+cartes repliables), 4e (route de réputation), 1d (vols et pierre de foyer), Polestar.
 
 ## Tests en jeu restés en attente
 
