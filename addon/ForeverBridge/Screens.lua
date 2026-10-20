@@ -32,6 +32,13 @@ local ROUTE_TYPES = {
 	{ key = "profession", label = "Métier" },
 	{ key = "gear", label = "Équipement" },
 }
+-- Bloc 6b (décision 281) : types de route que Forever calcule ; un autre type le dit, sans formulaire ni question.
+local COMPUTED = { leveling = true, gear = true }
+local NOT_COMPUTED = {
+	reputation = "La route de réputation n'est pas encore calculée par Forever (bloc 4e, avant le 4 novembre) : "
+		.. "rien n'est envoyé.",
+	profession = "La route de métier n'est pas encore calculée par Forever : rien n'est envoyé.",
+}
 
 local S = { screens = {}, nav = {}, exportRows = {} }
 
@@ -185,18 +192,10 @@ local function BuildRoute(screen)
 	end)
 	S.routeDungeons, S.routeClass = dungeons, class
 
-	local targetLabel = Text("ForeverBridgeRouteTargetLabel", screen)
-	Place(targetLabel, screen, 0, -5 * ROW - 4)
-	targetLabel:SetText("Faction ou métier visé :")
-	local target = CreateFrame("EditBox", "ForeverBridgeRouteTarget", screen, "InputBoxTemplate")
-	target:SetSize(220, 22)
-	target:SetAutoFocus(false)
-	target:SetMaxLetters(60)
-	Place(target, screen, 170, -5 * ROW)
-	target:SetScript("OnEscapePressed", function(self)
-		self:ClearFocus()
-	end)
-	S.routeTarget, S.routeTargetLabel = target, targetLabel
+	local unavailable = Text("ForeverBridgeRouteUnavailable", screen)
+	Place(unavailable, screen, 0, -3 * ROW - 4)
+	unavailable:SetWidth(460)
+	S.routeUnavailable = unavailable
 
 	local compute = Button("ForeverBridgeRouteCompute", screen, "Calculer", 120)
 	Place(compute, screen, 0, -6 * ROW - 6)
@@ -206,6 +205,17 @@ local function BuildRoute(screen)
 	local note = Text("ForeverBridgeRouteNote", screen, "GameFontHighlightSmall")
 	Place(note, screen, 0, -7 * ROW - 6)
 	note:SetText("L'aperçu et « Valider et livrer » arrivent dans le chat.")
+	S.routeForm = { from, to, compute, note }
+end
+
+-- Sélecteur montré ou caché avec ses trois éléments (« < », valeur, « > »).
+local function ShowStepper(prefix, shown)
+	for _, suffix in ipairs({ "Down", "Value", "Up" }) do
+		local widget = _G[prefix .. suffix]
+		if widget then
+			widget:SetShown(shown)
+		end
+	end
 end
 
 function FB.RefreshRoute()
@@ -231,9 +241,14 @@ function FB.RefreshRoute()
 	local leveling = state.kind == "leveling"
 	S.routeDungeons:SetShown(leveling)
 	S.routeClass:SetShown(leveling)
-	local targeted = state.kind == "reputation" or state.kind == "profession"
-	S.routeTarget:SetShown(targeted)
-	S.routeTargetLabel:SetShown(targeted)
+	local computed = COMPUTED[state.kind] == true
+	for _, widget in ipairs(S.routeForm) do
+		widget:SetShown(computed)
+	end
+	ShowStepper("ForeverBridgeRouteFrom", computed)
+	ShowStepper("ForeverBridgeRouteTo", computed)
+	S.routeUnavailable:SetText(NOT_COMPUTED[state.kind] or "")
+	S.routeUnavailable:SetShown(not computed)
 	S.routeFrom()
 	S.routeTo()
 end
@@ -255,23 +270,13 @@ function FB.ComputeRoute()
 		return
 	end
 	if state.kind == "gear" then
-		SendQuestion("Prépare ma route d'équipement du niveau " .. a .. " au niveau " .. b
-			.. " : objets visés, quêtes et donjons qui les donnent, dans l'ordre, livrable dans RestedXP.")
-		return
+		-- bloc 6b : même action que « En faire une route » de l'écran Équipement (traitée par le pont, bloc 4d)
+		local label = "Route d'équipement du niveau " .. a .. " au niveau " .. b
+		if FB.Send("", nil, { flags = { "a=gear_route:" .. a .. "-" .. b }, label = label }) then
+			FB.ShowScreen("chat")
+		end
 	end
-	local target = tostring(S.routeTarget:GetText() or ""):gsub("^%s+", ""):gsub("%s+$", "")
-	if target == "" then
-		local what = state.kind == "reputation" and "la faction" or "le métier"
-		FB.Print("Feuille de route : indiquez " .. what .. " visé(e), puis « Calculer ».")
-		return
-	end
-	if state.kind == "reputation" then
-		SendQuestion("Prépare ma route de réputation avec " .. target .. " : toutes les sources ordonnées (quêtes, "
-			.. "objets à rendre, monstres à tuer avec leur nombre jusqu'au palier visé et le plafond éventuel).")
-	else
-		SendQuestion("Prépare ma route de métier pour " .. target .. " jusqu'au niveau de compétence visé, en "
-			.. "suivant mon chemin de leveling.")
-	end
+	-- type pas encore calculé : l'écran le dit (FB.RefreshRoute), rien n'est envoyé
 end
 
 ---------------------------------------------------------------------------
