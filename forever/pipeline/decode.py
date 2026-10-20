@@ -315,12 +315,24 @@ def _tree_of(x: int, tabs: Mapping[str, int], step: int, divisor: int) -> tuple[
     raise DataSchemaError(f"Abscisse {x} hors des onglets de l'arbre ({dict(tabs)}).")
 
 
-def _select(key: str, values: list[list[int | float]], indices: Sequence[int] | None) -> list[list[int | float]]:
-    """Variables retenues dans `ranks` (`rank_variables` de decode_rules.json) ; toutes si le talent n'y figure pas."""
+def _select(
+    key: str, values: list[list[int | float]], indices: Sequence[int] | Mapping[str, Sequence[int]] | None
+) -> list[list[int | float]]:
+    """Variables retenues dans `ranks` (`rank_variables` de decode_rules.json) ; toutes si le talent n'y figure pas.
+    Variables selon la forme de l'infobulle (70450, Winter's Chill) : `{nombre de variables: indices}` ; une forme
+    absente de la règle est refusée (jamais une lecture devinée)."""
     if indices is None:
         return [list(v) for v in values]
     out = []
     for rank, row in enumerate(values, start=1):
+        if isinstance(indices, Mapping):
+            shaped = indices.get(str(len(row)))
+            if shaped is None:
+                raise DataSchemaError(
+                    f"{RULES_NAME} : rank_variables de {key} sans forme à {len(row)} variable(s) (rang {rank}, {row})."
+                )
+            out.append([row[i] for i in shaped])
+            continue
         if any(i >= len(row) for i in indices):
             raise DataSchemaError(
                 f"{RULES_NAME} : rank_variables de {key} {list(indices)} hors de l'infobulle du rang {rank} ({row})."
@@ -400,6 +412,9 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "prereq": None,
             "certainty": f"FC-{version}",
         }
+        model = talent_model(rules.get("talent_models", {}), key, desc)
+        if model is not None:  # 70450 : sens du talent changé par le client, lu par le moteur
+            talents[int(node["ID"])]["model"] = model
     for edge in tables["TraitEdge"]:
         left, right = int(edge["LeftTraitNodeID"]), int(edge["RightTraitNodeID"])
         if left in talents and right in talents:
@@ -425,6 +440,15 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "desc : gabarit d'infobulle du client ; spellIds : sort unique du nœud (le client n'a pas un sort par rang).",
         ],
     }
+
+
+def talent_model(models: Mapping[str, Any], key: str, description: str) -> str | None:
+    """Modèle d'un talent dont le client a changé le sens (`talent_models` de decode_rules.json, 70450) : le premier
+    dont le texte figure dans la description du client ; None (ancien sens, versions passées) sinon."""
+    for rule in models.get(key, ()):
+        if str(rule["contains"]) in description:
+            return str(rule["model"])
+    return None
 
 
 def _mandatory(talents: Mapping[int, dict[str, Any]]) -> dict[int, set[int]]:
@@ -1165,6 +1189,27 @@ def _duration_s(client: _Client, spell: int) -> float | None:
     return normalize(ms / 1000) if ms is not None and ms > 0 else None  # -1 : jusqu'à annulation
 
 
+def racial_mage_values(values_rules: Mapping[str, Any], racial: Mapping[str, Any]) -> dict[str, float]:
+    """Grandeurs d'un racial lues par le moteur du Mage (`racial_values`) : effets d'aura (aura, valeur diverse,
+    échelle) ou champ du racial (`field` : durée, recharge), pour un sort nommé (`spell_name`) ou l'un de plusieurs
+    (`spell_names`, 70450 : Ruthless et Savage) ; aucun nom : tout racial du Mage."""
+    name = racial["name"]
+    out: dict[str, float] = {}
+    for key, rule in values_rules.items():
+        names = rule.get("spell_names") or ([rule["spell_name"]] if "spell_name" in rule else None)
+        if names is not None and name not in names:
+            continue
+        if "field" in rule:
+            value = racial.get(rule["field"])
+            if isinstance(value, int | float):
+                out[key] = value
+            continue
+        for e in racial["effects"]:
+            if e["aura"] == rule["aura"] and ("misc" not in rule or e["misc"] == rule["misc"]):
+                out[key] = round(out.get(key, 0.0) + e["base_points"] * rule["scale"], 10)
+    return out
+
+
 def decode_races(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
     """Contenu de `races.json` (PV1, décision 106) : races jouables (présentes dans CharBaseInfo), nom anglais et
     français, jeton du client, faction, classes permises ; raciaux (lignes `racial_skill_lines`) par race avec les
@@ -1214,12 +1259,8 @@ def decode_races(tables: Tables, rules: Mapping[str, Any], version: str) -> dict
             )
             if classes is not None and "Mage" not in classes:
                 continue
-            for key, rule in values_rules.items():
-                if "spell_name" in rule and rule["spell_name"] != name:
-                    continue
-                for e in effects:
-                    if e["aura"] == rule["aura"] and ("misc" not in rule or e["misc"] == rule["misc"]):
-                        mage_values[key] = round(mage_values.get(key, 0.0) + e["base_points"] * rule["scale"], 10)
+            for key, value in racial_mage_values(values_rules, racials[-1]).items():
+                mage_values[key] = round(mage_values.get(key, 0.0) + value, 10)
         races[str(row["Name_lang"])] = {
             "id": race_id,
             "client_file": str(row["ClientFileString"]),
@@ -1425,12 +1466,98 @@ def decode_spells(
     for key, name in rules["spells"].items():
         ids = found[key]
         entry = dict(doc["spells"].get(key, {}))
+        new_spells = rules.get("new_spells", {})
+        if (
+            "school" not in entry and key in new_spells
+        ):  # 70450 : sort nouveau (Frost Blast, Arcane Wrath), lu au client
+            entry.update(_client_spell_fields(client, ids, rules, new_spells[key]))
         entry["ranks"] = [_rank_row(client, i, rules) for i in ids]
         entry["name"] = name
         entry["name_fr"] = client.names_fr.get(ids[0], "")
         entry["spell_ids"] = ids
         doc["spells"][key] = entry
     return doc
+
+
+def _client_spell_fields(
+    client: _Client, ids: Sequence[int], rules: Mapping[str, Any], talent: str | None
+) -> dict[str, Any]:
+    """Champs d'un sort nouveau lus dans le client (école, portée, ralentissement et sa durée par rang)."""
+    misc = client.misc.get(ids[0]) or {}
+    ranges = getattr(client, "ranges", {})
+    row = ranges.get(int(misc.get("RangeIndex") or 0))
+    slow = [
+        float(e["EffectBasePointsF"])
+        for e in client.effects.get(ids[0], {}).values()
+        if int(e["Effect"]) == rules["effects"]["apply_aura"]
+        and int(e["EffectAura"]) == int(rules["effects"].get("aura_decrease_speed", -1))
+    ]
+    return new_spell_fields(
+        school_mask=int(misc.get("SchoolMask") or 0),
+        masks=rules["school_masks"],
+        range_max=float(row["RangeMax_0"]) if row is not None else None,
+        slow_points=slow[0] if slow else None,
+        durations=[_duration_s(client, i) for i in ids],
+        talent=talent,
+    )
+
+
+def new_spell_fields(
+    *,
+    school_mask: int,
+    masks: Mapping[str, int],
+    range_max: float | None,
+    slow_points: float | None,
+    durations: Sequence[float | None],
+    talent: str | None,
+) -> dict[str, Any]:
+    """Champs du moteur pour un sort nouveau (70450), lus dans le client : école (`school_masks`), portée maximale,
+    ralentissement (fraction) et sa durée par rang, talent qui l'apprend."""
+    schools = [name for name, bit in masks.items() if school_mask & int(bit)]
+    if len(schools) != 1:
+        raise DataSchemaError(f"Sort nouveau : école {school_mask} hors de school_masks ou mêlée ({schools}).")
+    out: dict[str, Any] = {"school": schools[0]}
+    if range_max is not None:
+        out["range"] = normalize(range_max)
+    if slow_points is not None:
+        out["slow"] = normalize(-slow_points / 100)
+        out["slow_dur"] = [normalize(d) if d is not None else None for d in durations]
+    if talent is not None:
+        out["talent"] = talent
+    return out
+
+
+def frozen_mult_of(row: Sequence[float], index: int) -> float:
+    """Multiplicateur d'Ice Lance contre une cible gelée lu dans le talent (variable `index`, bonus en %) : 1 + bonus."""
+    return normalize(1 + float(row[index]) / 100)
+
+
+def _complete_new_spells(spells: dict[str, Any], classes: Mapping[str, Any], new_spells: Mapping[str, Any]) -> None:
+    """Portée d'un sort nouveau (sans portée héritée) lue dans `classes.json` décodé du même client (SpellRange y est
+    lue) : portée maximale de son premier rang."""
+    mage = (classes.get("classes") or {}).get("Mage") or {}
+    raw = mage.get("spells") or {}
+    by_name = {s.get("name"): s for s in (raw.values() if isinstance(raw, dict) else raw)}
+    for key, entry in spells["spells"].items():
+        if "range" in entry or key not in new_spells:
+            continue
+        found = by_name.get(entry.get("name"))
+        reach = ((found or {}).get("ranks") or [{}])[0].get("range_yd") if found else None
+        if isinstance(reach, dict) and isinstance(reach.get("max"), int | float):
+            entry["range"] = reach["max"]
+
+
+def _frozen_mult(spells: dict[str, Any], talents: Mapping[str, Any], rules: Mapping[str, Any]) -> None:
+    """`frozen_mult` d'un sort lu dans le talent qui l'apprend (`frozen_mult` de decode_rules.json, 70450 : Ice
+    Lance) ; sans règle, la valeur héritée reste."""
+    spec = rules.get("frozen_mult")
+    if not spec:
+        return
+    for tree in talents["trees"]:
+        for t in tree["talents"]:
+            if t["key"] == spec["talent"] and spec["spell"] in spells["spells"]:
+                row = t["tooltip_values"][0]
+                spells["spells"][spec["spell"]]["frozen_mult"] = frozen_mult_of(row, int(spec["index"]))
 
 
 def _component(
@@ -1632,25 +1759,37 @@ def _target_auras(tables: Tables, rules: Mapping[str, Any], client: _Client) -> 
         if len(triggers) != 1:
             raise DataSchemaError(f"{key} : {len(triggers)} sort(s) déclenché(s) par {source}, un seul attendu.")
         aura = triggers[0]
-        effects = [
-            e
-            for e in client.effects.get(aura, {}).values()
-            if int(e["Effect"]) == fx["apply_aura"] and int(e["EffectAura"]) == spec["aura"]
-        ]
+        picked = pick_target_aura(spec, list(client.effects.get(aura, {}).values()), apply_aura=fx["apply_aura"])
         options, duration = client.auras.get(aura), client.duration_ms(aura)
-        if len(effects) != 1 or options is None or duration is None:
+        if picked is None or options is None or duration is None:
             raise DataSchemaError(f"{key} (sort {aura}) : effet d'aura {spec['aura']}, cumuls ou durée absents.")
-        mask = int(effects[0]["EffectMiscValue_0"])
+        kind, effect = picked
+        mask = int(effect["EffectMiscValue_0"])
         out[key] = {
             "spell_id": aura,
             "source_spell_id": source,
             "talent": talent_key(spec["talent"]),
-            "pct_per_stack": normalize(float(effects[0][spec["field"]])),
+            "pct_per_stack": normalize(float(effect[spec["field"]])),
             "max_stacks": int(options["CumulativeAura"]),
             "duration_ms": duration,
             "schools": [school for school, bit in masks.items() if mask & int(bit)],
         }
+        if "alternatives" in spec:  # 70450 : la sorte de l'aura dit au moteur ce qu'elle fait (critique, Cone of Cold)
+            out[key]["kind"] = kind
     return out
+
+
+def pick_target_aura(
+    spec: Mapping[str, Any], effects: Sequence[Mapping[str, Any]], *, apply_aura: int
+) -> tuple[str, Mapping[str, Any]] | None:
+    """Effet de l'aura d'une règle `target_auras` et sa sorte : l'aura de la règle d'abord (`kind`, critique par
+    défaut), puis ses replis (`alternatives`, 70450 : Winter's Chill passe du critique aux dégâts de Cone of Cold) ;
+    None si aucune ne correspond à un seul effet."""
+    for choice in ({"aura": spec["aura"], "kind": spec.get("kind", "crit")}, *spec.get("alternatives", ())):
+        found = [e for e in effects if int(e["Effect"]) == apply_aura and int(e["EffectAura"]) == int(choice["aura"])]
+        if len(found) == 1:
+            return str(choice["kind"]), found[0]
+    return None
 
 
 def _utility(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, list[dict[str, Any]]]:
@@ -1948,6 +2087,8 @@ def decode_version(
         }
         extra_notes += _class_observations(decoded_classes["classes.json"])
         check_mage_not_parked(talents, decoded_classes["classes.json"])
+        _complete_new_spells(spells, decoded_classes["classes.json"], rules.get("new_spells", {}))
+    _frozen_mult(spells, talents, rules)
     # T08b, bloc A : ratios du personnage (character_tables) : toutes les tables (décodées) ou aucune (héritées).
     char_files = [(n, rel) for n, rel in character_table_files(rules) if n in rules.get("character_tables", [])]
     char_missing = [rel for _, rel in char_files if not (csv_dir / rel).is_file()]

@@ -186,9 +186,11 @@ class _Merge:
                     seen.add(rename["new"])
                     self.applied.append(rename)
                 assert c is not None
+                t = dict(t)
                 for f in TALENT_FIELDS:
                     if t.get(f) != c.get(f) and not (rename is not None and f == "name"):
-                        self.add(TALENTS, f"{key}.{f}", t.get(f), c.get(f), source, "certain", "refused")
+                        if self._confirmed_field(TALENTS, "talent", key, f, t.get(f), c.get(f), source):
+                            t[f] = c.get(f)  # 70450 : champ du talent tranché « client » (ligne, rangs, prérequis)
                 for ch in _rows("talent", key, t.get("ranks", []), c.get("ranks", []), None):
                     self.value(TALENTS, ch, source)
                 if "tooltip_values" in t:
@@ -202,9 +204,41 @@ class _Merge:
                 merged.append(out)
             tree["talents"] = merged
         for key, extra in by_key.items():
-            if key not in seen:
-                self.add(TALENTS, key, None, extra, source, "certain", "refused")
+            if key in seen:
+                continue
+            if not self._confirmed_field(TALENTS, "talent", key, None, None, key, source):
+                continue
+            added = {**{k: v for k, v in extra.items() if k != "certainty"}, "certainty": f"FC-{self.build}"}
+            added["source"] = self._talent_source(extra)
+            for tree in doc["trees"]:  # 70450 : talent ajouté, tranché « client » (Arcane Wrath)
+                if tree["name"] == extra.get("tree", tree["name"]):
+                    tree["talents"].append(added)
+                    tree["talents"].sort(key=lambda x: (x.get("tier", 0), x.get("col", 0)))
+                    break
         return doc
+
+    def _confirmed_field(
+        self, file: str, kind: str, key: str, field: str | None, old: Any, new: Any, source: str
+    ) -> bool:
+        """Écart hors des rangs (champ de talent, talent ou sort ajouté) : appliqué s'il est confirmé dans
+        `confirmed_changes.json` (règle `confirmed`), refusé sinon."""
+        entry = self.confirmed.get(_key(kind, key, field, old, new))
+        path = key if field is None else f"{key}.{field}"
+        if entry is None:
+            self.add(file, path, old, new if field is not None else new, source, "certain", "refused")
+            return False
+        self.applied.append(entry)
+        self.add(file, path, old, new, f"{source} ; {entry['decision']}", "certain", "confirmed")
+        return True
+
+    def _talent_source(self, c: Mapping[str, Any]) -> dict[str, Any]:
+        return {
+            "build": self.version,
+            "tables": TALENT_TABLES,
+            "read_at": self.read_at,
+            "client_spell_ids": c.get("spellIds", []),
+            "client_desc": c.get("desc", ""),
+        }
 
     def _renamed(self, key: str, by_key: Mapping[str, Any]) -> Mapping[str, Any] | None:
         """Renommage confirmé du talent `key` (`change` « renamed », champ `key`) vers une clé de la candidate."""
@@ -266,13 +300,14 @@ class _Merge:
             if f == "name" and "name_fr" not in t:
                 out["name_fr"] = c.get("name_fr", "")
                 self.add(TALENTS, f"{key}.name_fr", None, out["name_fr"], source, "certain", "added_field")
-        client = {
-            "build": self.version,
-            "tables": TALENT_TABLES,
-            "read_at": self.read_at,
-            "client_spell_ids": c.get("spellIds", []),
-            "client_desc": c.get("desc", ""),
-        }
+        if c.get("model") != t.get("model"):  # 70450 : sens du talent lu dans le client (marqueur de forever decode)
+            rule = "added_field" if "model" not in t else "metadata"
+            self.add(TALENTS, f"{key}.model", t.get("model"), c.get("model"), source, "certain", rule)
+        if c.get("model") is not None:
+            out["model"] = c["model"]
+        else:
+            out.pop("model", None)
+        client = self._talent_source(c)
         if t.get("source") != client:
             rule = "added_field" if "source" not in t else "metadata"
             self.add(TALENTS, f"{key}.source", t.get("source"), client, source, "certain", rule)
@@ -315,8 +350,16 @@ class _Merge:
                 self.add(SPELLS, f"{key}.source", s.get("source"), client, source, "certain", rule)
             s["source"] = client
         for key in cand_spells:
-            if key not in doc["spells"]:
-                self.add(SPELLS, key, None, cand_spells[key], source, "certain", "refused")
+            if key not in doc["spells"] and self._confirmed_field(SPELLS, "spell", key, None, None, key, source):
+                added = dict(cand_spells[key])  # 70450 : sort ajouté, tranché « client » (Frost Blast, Arcane Wrath)
+                added["source"] = {
+                    "build": self.version,
+                    "tables": SPELL_TABLES,
+                    "read_at": self.read_at,
+                    "rank_spell_ids": added.pop("spell_ids", []),
+                    "mana": "SpellPower.ManaCost",
+                }
+                doc["spells"][key] = added
         return doc
 
 
