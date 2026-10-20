@@ -124,3 +124,20 @@ def test_renamed_talent_takes_the_template_of_the_client_description():
     m = _Merge(VERSION, [rename], "2026-10-20")
     out = m.talents(repo, cand)["trees"][0]["talents"][0]
     assert not m.refused and out["key"] == "wake" and out["desc"] == "cooldown reduced by {0} sec"
+
+
+def test_description_follows_a_changed_client_text():
+    """Texte du client changé depuis la version installée précédente (Arcane Blast de 70450 : puissance des sorts
+    selon l'Intelligence au lieu des dégâts des autres sorts) : le gabarit du dépôt devient celui du client ; texte
+    inchangé : le gabarit du dépôt reste, même s'il est rédigé autrement."""
+    repo = doc(talent("blast", desc="old wording {0}"), talent("focus", col=2, desc="seed wording {0}"))
+    cand = doc(
+        talent("blast", desc="new $s1", desc_template="new {0}"),
+        talent("focus", col=2, desc="same $s1", desc_template="same {0}"),
+    )
+    previous = {"blast": "old $s1", "focus": "same $s1"}
+    m = _Merge(VERSION, [], "2026-10-20", previous_client_desc=previous)
+    blast, focus = m.talents(repo, cand)["trees"][0]["talents"]
+    assert not m.refused
+    assert blast["desc"] == "new {0}" and focus["desc"] == "seed wording {0}"
+    assert any(c["path"] == "blast.desc" and c["rule"] == "metadata" for c in m.changes)
