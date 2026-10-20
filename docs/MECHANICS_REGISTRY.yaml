@@ -504,9 +504,11 @@ mechanics:
       - tests/unit/test_totals.py::test_arcane_blast_cost_by_stack
       - tests/unit/test_totals.py::test_explain_mechanic_gives_derived_values
       - tests/unit/test_engine_70450_arcane.py::test_cycle_lasts_the_aura_and_stacks_pay_off
+      - tests/unit/test_engine_70450_arcane.py::test_derived_tables_follow_the_new_aura
+      - tests/unit/test_engine_70450_arcane.py::test_derived_tables_keep_the_old_meaning_before_70450
     tolerance: null
     formule: "coût = part_mana_base × mana_base si le sort la publie, sinon coût du rang ; rang de talent sans coût publié : ratio × premier coût publié ; Arcane Blast à n cumuls : coût × (1 + n × hausse par cumul du talent arcaneBlast) (mode seed seulement depuis T06b)"
-    note: "T04c : escalade d'Arcane Blast (mana.arcane_blast_cost ; hausses de l'aura additionnées : probable, voir OPEN_QUESTIONS), payée lancer par lancer (Monte Carlo) et sur le cycle (analytique) ; Clearcasting rend le lancer gratuit sans retirer de cumul (suppose) ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2) ; T06b (révision 2) : coûts des rangs 1 issus d'un talent (Pyroblast, Ice Lance, Blast Wave) lus dans le client (SpellPower.ManaCost), l'estimation mana.talent_rank_cost ne sert plus qu'au mode seed ; 70450 : cycle de la rotation arcane de la durée de l'aura (Arcane Blast à coût croissant, puis décharges et Arcane Wrath)"
+    note: "T04c : escalade d'Arcane Blast (mana.arcane_blast_cost ; hausses de l'aura additionnées : probable, voir OPEN_QUESTIONS), payée lancer par lancer (Monte Carlo) et sur le cycle (analytique) ; Clearcasting rend le lancer gratuit sans retirer de cumul (suppose) ; coût des rangs de talent estimé (voir OPEN_QUESTIONS) ; T04a : coûts relevés dans le journal du 2026-09-27 égaux à spells.json pour les quatre sorts lancés (Frostbolt r3, Fireball r3, Arcane Explosion r1, Fire Blast r2) ; T06b (révision 2) : coûts des rangs 1 issus d'un talent (Pyroblast, Ice Lance, Blast Wave) lus dans le client (SpellPower.ManaCost), l'estimation mana.talent_rank_cost ne sert plus qu'au mode seed ; 70450 : cycle de la rotation arcane de la durée de l'aura (Arcane Blast à coût croissant, puis décharges et Arcane Wrath) ; 1.60.1.70450 (décision 285) : tables par cumul de lookup et explain (engine/derived) selon le marqueur model : coût et puissance des sorts selon l'Intelligence, plus les dégâts des autres sorts"
   - id: B12
     categorie: ressources
     description: "Clearcasting"
@@ -879,9 +881,10 @@ mechanics:
       - tests/unit/test_engine_70450_winters_chill.py::test_stacks_raise_cone_of_cold
       - tests/unit/test_engine_70450_winters_chill.py::test_no_more_crit_from_the_stacks
       - tests/unit/test_engine_70450_socle.py::test_winters_chill_crit_only_with_the_crit_aura
+      - tests/unit/test_engine_70450_winters_chill.py::test_derived_tables_give_the_cone_of_cold_bonus
     tolerance: null
     formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance) ; cumuls ≤ 2e variable du rang du talent"
-    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact) ; 70450 : aura 271 (sorte cone_of_cold) : chaque cumul augmente les dégâts du prochain Cone of Cold, consommés par lui, posés par les sorts de Givre de dégâts ; plus aucun critique ; avant 70450 inchangé"
+    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact) ; 70450 : aura 271 (sorte cone_of_cold) : chaque cumul augmente les dégâts du prochain Cone of Cold, consommés par lui, posés par les sorts de Givre de dégâts ; plus aucun critique ; avant 70450 inchangé ; 1.60.1.70450 (décision 285) : tables par cumul (engine/derived) : bonus de Cone of Cold par cumul quand l'aura le renforce, critique avant"
   - id: D5
     categorie: environnement
     description: "Buffs de campement et de Legacy"
