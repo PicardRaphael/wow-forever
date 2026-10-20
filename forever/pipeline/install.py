@@ -129,9 +129,38 @@ def _key(kind: str, key: str, field: str | None, old: Any, new: Any) -> tuple[st
     return (kind, key, str(field), json.dumps(old, sort_keys=True), json.dumps(new, sort_keys=True))
 
 
+def _previous_client_desc(data_dir: Path, target: str) -> dict[str, str]:
+    """Infobulle brute du client par talent (`source.client_desc`) dans la plus récente version installée antérieure
+    à `target` (la version courante pour une nouvelle version, la précédente pour une révision) ; vide sans elle."""
+    older = [
+        d
+        for d in data_dir.iterdir()
+        if d.is_dir() and d.name[:1].isdigit() and version_key(d.name) < version_key(target)
+    ]
+    path = max(older, key=lambda d: version_key(d.name)) / TALENTS if older else None
+    if path is None or not path.exists():
+        return {}
+    doc = _json(path)
+    return {
+        t["key"]: t["source"]["client_desc"]
+        for tree in doc["trees"]
+        for t in tree["talents"]
+        if isinstance(t.get("source"), dict) and isinstance(t["source"].get("client_desc"), str)
+    }
+
+
 class _Merge:
-    def __init__(self, version: str, confirmed: Sequence[Mapping[str, Any]], read_at: str) -> None:
+    def __init__(
+        self,
+        version: str,
+        confirmed: Sequence[Mapping[str, Any]],
+        read_at: str,
+        previous_client_desc: Mapping[str, str] | None = None,
+    ) -> None:
         self.build = version.rsplit(".", 1)[-1]
+        # Infobulle brute du client de la version installée précédente, par talent : un texte changé depuis fait
+        # suivre au gabarit du dépôt celui du client (70450 : Arcane Blast, Winter's Chill…).
+        self.previous_client_desc = previous_client_desc or {}
         self.version = version
         self.read_at = read_at
         self.confirmed = {_key(c["kind"], c["key"], c["field"], c["old"], c["new"]): c for c in confirmed}
@@ -270,6 +299,8 @@ class _Merge:
         desc = rename.get("desc")
         if desc is not None and desc == c.get("desc") and "desc_template" in c:
             desc = c["desc_template"]  # infobulle brute du client citée par la décision : gabarit du dépôt ({i})
+        elif self.previous_client_desc.get(key, c.get("desc")) != c.get("desc"):
+            desc = None  # texte du client changé depuis la décision : le gabarit du client (_talent) l'emporte
         for f, new in (("name", c.get("name")), ("name_fr", c.get("name_fr", "")), ("desc", desc)):
             if new is not None and out.get(f) != new:
                 self.add(TALENTS, f"{key}.{f}", out.get(f), new, why, "certain", "confirmed")
@@ -298,11 +329,15 @@ class _Merge:
                         TALENTS, f"{key}.tooltip_values", None, out["tooltip_values"], source, "certain", "added_field"
                     )
                 continue
-            if f == "desc" and "$" in str(v) and "$" not in str(c.get("desc_template", "$")):
-                # 70450 : gabarit brut du client installé (talent ajouté en r1) remplacé par le gabarit du dépôt
-                self.add(TALENTS, f"{key}.desc", v, c["desc_template"], source, "certain", "metadata")
-                out[f] = c["desc_template"]
-                continue
+            template = c.get("desc_template")
+            if f == "desc" and template is not None and "$" not in template and v != template:
+                previous = self.previous_client_desc.get(key)
+                if "$" in str(v) or (previous is not None and previous != c.get("desc")):
+                    # gabarit brut installé (talent ajouté en 70450 r1) ou texte du client changé depuis la version
+                    # précédente : le gabarit du dépôt devient celui du client
+                    self.add(TALENTS, f"{key}.desc", v, template, source, "certain", "metadata")
+                    out[f] = template
+                    continue
             if f == "certainty":
                 if v != certainty:
                     self.add(TALENTS, f"{key}.certainty", v, certainty, source, "certain", "certainty")
@@ -693,7 +728,8 @@ def _merge(
     confirmed_doc = _json(rv.path / CONFIRMED)
     read_at = str(cv.sources.get("collected_at") or format_utc(deps.now())[:10])
     # Les valeurs sont relues dans la candidate : leur certitude et leur bloc `source` nomment le build lu.
-    m = _Merge(cv.game_version if new_version else rv.game_version, confirmed_doc["changes"], read_at)
+    target = cv.game_version if new_version else rv.game_version
+    m = _Merge(target, confirmed_doc["changes"], read_at, _previous_client_desc(deps.data_dir, target))
     talents = m.talents(_json(rv.path / TALENTS), _json(cv.path / TALENTS))
     spells = m.spells(_json(rv.path / SPELLS), _json(cv.path / SPELLS))
     carried: dict[str, dict[str, Any]] = {}
@@ -708,7 +744,6 @@ def _merge(
     m.changes += state_changes
     counts = {r: sum(1 for c in m.changes if c["rule"] == r) for r in RULES}
     counts["refused"] = len(m.refused)
-    target = cv.game_version if new_version else rv.game_version
     assumption = f"candidate {display_path(deps, candidate)} (données {cv.data_sha}) sur la version {rv.game_version}"
     provenance = make_provenance(
         deps,
