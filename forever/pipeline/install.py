@@ -324,10 +324,11 @@ class _Merge:
             if c is None:
                 self.add(SPELLS, key, s, None, source, "certain", "refused")
                 continue
-            for f in set(s) | set(c):
+            for f in sorted(set(s) | set(c)):
                 if f in ("ranks", "source", "name", "name_fr", "spell_ids") or s.get(f) == c.get(f):
                     continue
-                self.add(SPELLS, f"{key}.{f}", s.get(f), c.get(f), source, "certain", "refused")
+                if self._confirmed_field(SPELLS, "spell", key, f, s.get(f), c.get(f), source):
+                    s[f] = c.get(f)  # 70450 : champ du sort tranché « client » (frozen_mult d'Ice Lance)
             for ch in _rows("spell", key, s["ranks"], c["ranks"], fields):
                 self.value(SPELLS, ch, source)
             s["ranks"] = [
