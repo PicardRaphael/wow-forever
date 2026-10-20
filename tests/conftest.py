@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import functools
 import json
 import os
 import re
@@ -80,6 +81,11 @@ CLASS_FIXTURE_VERSION = "1.60.1.70124"
 # 1.60.1.70291 lisse les rangs bas de Frostbolt, Fireball et Arcane Missiles (note officielle du 08/10). Les tests qui
 # écrivent ces dégâts en dur lisent cette version (copie du dépôt ramenée à elle), jamais la version installée.
 RANK_VALUES_VERSION = "1.60.1.70245"
+# Dernière version avant la refonte de 1.60.1.70450 (note officielle du 15/10, t/2360696/6 ; décision 285) : Mage
+# (aura d'Arcane Blast, Winter's Chill, Ice Lance, Arcane Wrath, Frost Blast, raciaux du Mage), arbres du Prêtre, du
+# Chaman et du Démoniste. Les tests qui vérifient l'ancien sens d'une mécanique, ou dont les fixtures sont relevées
+# sur ces arbres (`tests/fixtures/talents_forever/layout.json`), lisent cette version, jamais la version installée.
+PRE_70450_VERSION = "1.60.1.70374"
 PRODUCT = "wow_classic_beta"
 PREFIX = "1.60."
 NOW = datetime(2026, 9, 27, 12, 0, tzinfo=UTC)
@@ -222,6 +228,28 @@ def game_data_at_rank_values_version(
     from forever.gamedata import load_game_data
 
     return load_game_data(isolated_deps(tmp_path_factory.mktemp("deps-rank-values"), data_at_rank_values_version))
+
+
+@pytest.fixture(scope="session")
+def data_at_pre_70450_version(tmp_path_factory: pytest.TempPathFactory) -> Path:
+    """Copie de forever/data ramenée à PRE_70450_VERSION, en lecture seule (ancien Mage, anciens arbres)."""
+    dst = tmp_path_factory.mktemp("data-pre-70450") / "data"
+    shutil.copytree(DATA_DIR, dst, ignore=shutil.ignore_patterns("__pycache__"))
+    return rewind_to(dst, PRE_70450_VERSION)
+
+
+@pytest.fixture(scope="session")
+def game_data_at_pre_70450_version(data_at_pre_70450_version: Path, tmp_path_factory: pytest.TempPathFactory) -> Any:
+    """Données typées du moteur à PRE_70450_VERSION (sens des mécaniques d'avant la refonte du Mage)."""
+    from forever.gamedata import load_game_data
+
+    return load_game_data(isolated_deps(tmp_path_factory.mktemp("deps-pre-70450"), data_at_pre_70450_version))
+
+
+@pytest.fixture
+def make_deps_at_pre_70450_version(make_deps: MakeDeps, data_at_pre_70450_version: Path) -> MakeDeps:
+    """`make_deps` dont les données par défaut sont celles de PRE_70450_VERSION (un `data_dir` donné l'emporte)."""
+    return functools.partial(make_deps, data_dir=data_at_pre_70450_version)
 
 
 def tamper(path: Path) -> None:

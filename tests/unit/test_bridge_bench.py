@@ -12,7 +12,7 @@ import json
 import shutil
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION
+from conftest import DATA_DIR, FIXTURES, PRE_70450_VERSION
 from mcp import Client
 from talents_forever_data import write_addon
 
@@ -34,7 +34,7 @@ def context(name: str) -> dict[str, str]:
 
 
 @pytest.fixture(scope="module")
-def bench(tmp_path_factory):
+def bench(tmp_path_factory, data_at_pre_70450_version):
     """Deps d'un poste de joueur simulé : addon Talents Forever (fixture) et Questie (fixture) dans le dossier du
     client, cache isolé ; données du dépôt."""
     from conftest import NOW, REGISTRY_PATH, FakeHttp
@@ -43,10 +43,10 @@ def bench(tmp_path_factory):
 
     root = tmp_path_factory.mktemp("banc")
     wow = root / "wow"
-    write_addon(wow, DATA_DIR / LOCAL_VERSION / "classes.json")
+    write_addon(wow, DATA_DIR / PRE_70450_VERSION / "classes.json")
     shutil.copytree(QUESTIE, wow / "Interface" / "AddOns" / "Questie")
     deps = Deps(
-        data_dir=DATA_DIR,
+        data_dir=data_at_pre_70450_version,
         registry_path=REGISTRY_PATH,
         cache_dir=root / "cache",
         http_get=FakeHttp.failing(),

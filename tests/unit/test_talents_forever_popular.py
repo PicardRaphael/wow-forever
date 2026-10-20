@@ -10,7 +10,7 @@ import asyncio
 import json
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION
+from conftest import DATA_DIR, PRE_70450_VERSION
 from mcp import Client
 from talents_forever_data import load_fixture, write_addon
 
@@ -19,7 +19,13 @@ from forever.errors import InvalidArgumentError
 from forever.mcp_server import build_server
 from forever.talents_forever import attach_export, closest_popular, load_addon, popular_builds
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 CASES = load_fixture("mage_builds.json")["cases"]
 
 

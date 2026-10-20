@@ -12,14 +12,14 @@ import copy
 import csv
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, REPO_ROOT, WAGO_70124, read_json
+from conftest import DATA_DIR, PRE_70450_VERSION, REPO_ROOT, WAGO_70124, read_json
 from talents_forever_data import write_addon
 
 from forever.errors import DataSchemaError
 from forever.pipeline.decode import check_mage_not_parked, decode_classes
 from forever.pipeline.talents_forever import tf_positions
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 KEY = "improvedSerpentSting"
 
 
@@ -82,7 +82,7 @@ def test_installed_rules_enable_the_parked_rule(decode_rules):
 
 
 def test_real_case_not_in_talents_forever_is_parked(class_tables, rules, tf, iss, corrected):
-    hunter = decode_classes(class_tables, rules, LOCAL_VERSION, tf=tf)["classes"]["Hunter"]
+    hunter = decode_classes(class_tables, rules, PRE_70450_VERSION, tf=tf)["classes"]["Hunter"]
     assert KEY not in talents_of(hunter)
     p = parked_entry(hunter, iss["node_id"])
     assert p["key"] == KEY and p["status"] == "garé" and p["answered"] is None
@@ -97,7 +97,7 @@ def test_confirmed_by_talents_forever_is_placed(class_tables, rules, tf, iss, co
     tab, tier, col, _ = corrected
     tf = copy.deepcopy(tf)
     tf["classes"]["HUNTER"][tab].append([spell_of(class_tables, iss["node_id"]), tier, col])
-    hunter = decode_classes(class_tables, rules, LOCAL_VERSION, tf=tf)["classes"]["Hunter"]
+    hunter = decode_classes(class_tables, rules, PRE_70450_VERSION, tf=tf)["classes"]["Hunter"]
     t = talents_of(hunter)[KEY]
     assert (t["tier"], t["col"]) == (tier, col)
     assert "Talents Forever" in t["position"]["source"] and t["position"]["certainty"] == "probable"
@@ -112,20 +112,20 @@ def test_any_other_position_is_not_a_confirmation(class_tables, rules, tf, iss, 
     tf = copy.deepcopy(tf)
     other = (tab + dt) % len(tf["classes"]["HUNTER"])
     tf["classes"]["HUNTER"][other].append([spell_of(class_tables, iss["node_id"]) + ds, tier + dr, col + dc])
-    hunter = decode_classes(class_tables, rules, LOCAL_VERSION, tf=tf)["classes"]["Hunter"]
+    hunter = decode_classes(class_tables, rules, PRE_70450_VERSION, tf=tf)["classes"]["Hunter"]
     assert KEY not in talents_of(hunter)
     assert parked_entry(hunter, iss["node_id"])["status"] == "garé"
 
 
 def test_without_talents_forever_the_node_is_parked(class_tables, rules, iss):
-    hunter = decode_classes(class_tables, rules, LOCAL_VERSION)["classes"]["Hunter"]
+    hunter = decode_classes(class_tables, rules, PRE_70450_VERSION)["classes"]["Hunter"]
     p = parked_entry(hunter, iss["node_id"])
     assert p["status"] == "garé" and "absent" in p["talents_forever"]
     assert KEY not in talents_of(hunter)
 
 
 def test_in_game_answers_close_the_question(class_tables, decode_rules, tf, iss, corrected):
-    hunter = decode_classes(class_tables, decode_rules, LOCAL_VERSION, tf=tf)["classes"]["Hunter"]
+    hunter = decode_classes(class_tables, decode_rules, PRE_70450_VERSION, tf=tf)["classes"]["Hunter"]
     p = parked_entry(hunter, iss["node_id"])
     assert p["status"] == "garé" and p["answered"] == iss["source"]
     reason = {d["node_id"]: d for d in hunter["dropped_nodes"]}[iss["node_id"]]["reason"]
@@ -135,7 +135,7 @@ def test_in_game_answers_close_the_question(class_tables, decode_rules, tf, iss,
     _, tier, col, _ = corrected
     seen = {"tier": tier, "col": col, "source": "relevé de test", "certainty": "certain"}
     rules["observed_positions"]["Hunter"] = {KEY: seen}
-    hunter = decode_classes(class_tables, rules, LOCAL_VERSION, tf=tf)["classes"]["Hunter"]
+    hunter = decode_classes(class_tables, rules, PRE_70450_VERSION, tf=tf)["classes"]["Hunter"]
     t = talents_of(hunter)[KEY]
     assert (t["tier"], t["col"]) == (tier, col) and t["position"]["source"] == "relevé de test"
     assert parked_entry(hunter, iss["node_id"])["answered"] == "relevé de test"
@@ -143,7 +143,7 @@ def test_in_game_answers_close_the_question(class_tables, decode_rules, tf, iss,
 
 def test_rules_without_the_parked_rule_keep_the_old_behaviour(class_tables, rules, iss, corrected):
     del rules["parked_nodes"]  # règles d'une version antérieure : décodage reproductible
-    hunter = decode_classes(class_tables, rules, LOCAL_VERSION)["classes"]["Hunter"]
+    hunter = decode_classes(class_tables, rules, PRE_70450_VERSION)["classes"]["Hunter"]
     t = talents_of(hunter)[KEY]
     assert (t["tier"], t["col"]) == (corrected[1], corrected[2])
     assert hunter["parked_nodes"] == []

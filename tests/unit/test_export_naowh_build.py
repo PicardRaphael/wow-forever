@@ -11,7 +11,7 @@ import json
 from collections import Counter
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION
+from conftest import DATA_DIR, PRE_70450_VERSION
 from lua_oracle import lua_unpack, runtime
 from mcp import Client
 from talents_forever_data import load_fixture, write_addon
@@ -28,7 +28,13 @@ from forever.provenance import validate_provenance
 from forever.store import load_version
 from forever.talents_forever import load_addon, popular_builds
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 DOC = json.loads(CLASSES.read_text(encoding="utf-8"))["classes"]
 CASES = load_fixture("mage_builds.json")["cases"]
 ORDERED = [name for name, case in CASES.items() if case.get("order")]

@@ -15,6 +15,12 @@ from conftest import FIXTURES
 from forever.addons import DATA_ADDONS, STATE_NAME, addons_status
 from forever.cli import main
 
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
 QUESTIE = FIXTURES / "questie" / "11.38.0"
 
 
@@ -129,11 +135,11 @@ def test_forever_bestiary_changed_at_same_version(wow, make_deps):
 
 
 def test_talents_forever_change_rechecks_the_export_without_pending_entry(tmp_path, make_deps):
-    from conftest import DATA_DIR, LOCAL_VERSION
+    from conftest import DATA_DIR, PRE_70450_VERSION
     from talents_forever_data import write_addon
 
     root = tmp_path / "wow"
-    folder = write_addon(root, DATA_DIR / LOCAL_VERSION / "classes.json")
+    folder = write_addon(root, DATA_DIR / PRE_70450_VERSION / "classes.json")
     deps = make_deps(wow_dir=root)
     first = by_name(addons_status(deps, save=True))["TalentsForeverBook"]
     assert first["status"] == "nouveau" and first["recheck"]["code_version_supported"] is True

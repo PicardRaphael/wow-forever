@@ -8,13 +8,19 @@ Addon synthétique écrit dans `tmp_path` par `tests/talents_forever_data.py` (a
 import json
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION
+from conftest import DATA_DIR, PRE_70450_VERSION
 from talents_forever_data import write_addon
 
 from forever.cli import main
 from forever.talents_forever import crosscheck_report, load_addon, render_crosscheck
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 
 
 @pytest.fixture
@@ -40,7 +46,7 @@ def test_header_version_and_fingerprint(addon):
     assert addon.head == {"build": "1.60.1.70170", "generated": "2026-10-04", "codeVersion": "6"}
     assert addon.supported and addon.checks == ()
     assert len(addon.fingerprint) == 12
-    assert addon.game_version == LOCAL_VERSION
+    assert addon.game_version == PRE_70450_VERSION
     assert set(addon.layouts) == {
         "Warrior",
         "Paladin",
@@ -126,7 +132,7 @@ def test_absent_addon_is_none(tmp_path, make_deps):
 def test_crosscheck_of_the_installed_version(addon):
     report = crosscheck_report(addon)
     assert report["totals"] == {"renumbered": 4, "unmatched": 0, "prereq": 0, "tree_names": 2}
-    assert report["game_version"] == LOCAL_VERSION
+    assert report["game_version"] == PRE_70450_VERSION
     assert report["addon"]["version"] == "0.37.1" and report["addon"]["build"] == "1.60.1.70170"
     hunter = report["classes"]["Hunter"]
     assert hunter["matched"] == 50 and hunter["export"] == "possible"
@@ -139,7 +145,7 @@ def test_crosscheck_render_is_deterministic(addon):
     assert text == render_crosscheck(crosscheck_report(addon))
     for words in (
         "0.37.1",
-        LOCAL_VERSION,
+        PRE_70450_VERSION,
         "lingeringRage",
         "Shadow Magic",
         "Elemental Combat",
@@ -153,7 +159,7 @@ def test_cli_crosscheck(wow, make_deps, tmp_path, capsys):
     assert main(["talents", "tf", "crosscheck", "--out", str(out), "--json"], make_deps(wow_dir=wow)) == 0
     data = json.loads(capsys.readouterr().out)
     assert data["totals"]["unmatched"] == 0
-    assert data["provenance"]["game_version"] == LOCAL_VERSION
+    assert data["provenance"]["game_version"] == PRE_70450_VERSION
     assert "lingeringRage" in out.read_text(encoding="utf-8")
 
 

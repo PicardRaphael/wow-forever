@@ -6,12 +6,12 @@ Dispositions (rangs maximaux par position de liste) rebâties par `tests/talents
 `classes.json` et `layout.json` ; aucun chiffre de jeu écrit ici hors des codes relevés de la fixture."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION
+from conftest import DATA_DIR, PRE_70450_VERSION
 from talents_forever_data import load_fixture, max_ranks, position
 
 from forever.tf_code import CODE_VERSION, SYMBOLS, TfPlan, code_of, decode, encode, link
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 POPULAR = load_fixture("popular.json")
 MAGE = max_ranks(CLASSES, "MAGE")
 

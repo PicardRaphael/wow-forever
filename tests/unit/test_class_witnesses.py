@@ -3,13 +3,19 @@ fixes de `tests/fixtures/talents_forever/class_witnesses.json`, légaux sur nos 
 exportateur et relus à l'identique. Addon synthétique dans `tmp_path` ; aucun accès au dossier réel du jeu."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION
+from conftest import DATA_DIR, PRE_70450_VERSION
 from talents_forever_data import load_fixture, write_addon
 
 from forever.lookup import check_talents
 from forever.talents_forever import decode_code, export_build, load_addon
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 CASES = load_fixture("class_witnesses.json")["cases"]
 
 

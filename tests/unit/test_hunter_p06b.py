@@ -21,7 +21,7 @@ import shutil
 from pathlib import Path
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, read_json
+from conftest import DATA_DIR, FIXTURES, PRE_70450_VERSION, read_json
 from talents_forever_data import write_addon
 
 from forever.bridge.buttons import BUTTONS, visible_buttons
@@ -30,8 +30,14 @@ from forever.bridge.plans import button_plan, plan_text
 from forever.pets import corrected_taught
 from forever.pets_lookup import lookup_pets
 
-PETS = read_json(DATA_DIR / LOCAL_VERSION / "pets.json")
-PET_RULES = read_json(DATA_DIR / LOCAL_VERSION / "pet_rules.json")
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+PETS = read_json(DATA_DIR / PRE_70450_VERSION / "pets.json")
+PET_RULES = read_json(DATA_DIR / PRE_70450_VERSION / "pet_rules.json")
 CONTEXTS = FIXTURES / "bridge" / "contexts"
 LEVEL = 15
 
@@ -135,19 +141,19 @@ def test_leveling_button_is_shown_for_every_class():
 
 
 @pytest.fixture(scope="module")
-def hunter_bench(tmp_path_factory):
+def hunter_bench(tmp_path_factory, data_at_pre_70450_version):
     from conftest import NOW, REGISTRY_PATH, FakeHttp
 
     from forever.config import Deps
 
     root = tmp_path_factory.mktemp("banc-chasseur")
     wow = root / "wow"
-    write_addon(wow, DATA_DIR / LOCAL_VERSION / "classes.json")
+    write_addon(wow, DATA_DIR / PRE_70450_VERSION / "classes.json")
     addons = wow / "Interface" / "AddOns"
     shutil.copytree(FIXTURES / "questie" / "11.38.0", addons / "Questie")
     shutil.copytree(FIXTURES / "bestiary" / "ForeverBestiary", addons / "ForeverBestiary")
     deps = Deps(
-        data_dir=DATA_DIR, registry_path=REGISTRY_PATH, cache_dir=root / "cache", http_get=FakeHttp.failing(),
+        data_dir=data_at_pre_70450_version, registry_path=REGISTRY_PATH, cache_dir=root / "cache", http_get=FakeHttp.failing(),
         now=lambda: NOW, wow_dir=wow, profile_path=root / "profil" / "profile.json",
     )  # fmt: skip
     return deps, load_context_data(deps)

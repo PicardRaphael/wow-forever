@@ -12,7 +12,7 @@ import copy
 import re
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REPO_ROOT, read_json
+from conftest import DATA_DIR, FIXTURES, PRE_70450_VERSION, REPO_ROOT, read_json
 from talents_forever_data import load_fixture, write_addon
 
 from forever.engine.talents import check_class_build
@@ -23,7 +23,13 @@ from forever.pipeline.decode import decode_classes
 from forever.store import load_version
 from forever.talents_forever import crosscheck_report, decode_code, export_build, load_addon
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 CASES = load_fixture("mage_builds.json")["cases"]
 HUNTER_EXAMPLE = read_json(FIXTURES / "community" / "hunter_example_build.json")
 EVALS = REPO_ROOT / "plugin" / "evals"
@@ -40,7 +46,7 @@ def talents_of(c):
 
 @pytest.fixture(scope="module")
 def doc(class_tables, decode_rules):
-    return decode_classes(class_tables, decode_rules, LOCAL_VERSION)
+    return decode_classes(class_tables, decode_rules, PRE_70450_VERSION)
 
 
 @pytest.fixture(scope="module")
@@ -70,7 +76,7 @@ def test_observed_absent_unknown_talent_stops_the_decode(class_tables, decode_ru
     seen = next(iter(spec.values()))
     spec["noSuchTalent"] = dict(seen, node_id=seen["node_id"] + 1)
     with pytest.raises(DataSchemaError):
-        decode_classes(class_tables, rules, LOCAL_VERSION)
+        decode_classes(class_tables, rules, PRE_70450_VERSION)
 
 
 def test_observed_absent_with_another_node_stops_the_decode(class_tables, decode_rules):
@@ -78,7 +84,7 @@ def test_observed_absent_with_another_node_stops_the_decode(class_tables, decode
     seen = next(iter(specs(rules, "observed_absent")["Hunter"].values()))
     seen["node_id"] += 1  # le relevé ne désigne plus le nœud décodé sous cette clé
     with pytest.raises(DataSchemaError):
-        decode_classes(class_tables, rules, LOCAL_VERSION)
+        decode_classes(class_tables, rules, PRE_70450_VERSION)
 
 
 # --- Décodage : arête suffisante circulaire (DON5) ---------------------------------------------------------------
@@ -113,7 +119,7 @@ def _with_edges(class_tables, decode_rules, cls, *pairs):
     top = max(int(e["ID"]) for e in tables["TraitEdge"])
     added = [dict(model, ID=top + i + 1, LeftTraitNodeID=a, RightTraitNodeID=b) for i, (a, b) in enumerate(pairs)]
     tables["TraitEdge"] = [*tables["TraitEdge"], *added]
-    c = decode_classes(tables, decode_rules, LOCAL_VERSION)["classes"][cls]
+    c = decode_classes(tables, decode_rules, PRE_70450_VERSION)["classes"][cls]
     return {x["node_id"]: x for x in talents_of(c).values()}, c
 
 

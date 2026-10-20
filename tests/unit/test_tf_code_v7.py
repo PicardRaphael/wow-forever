@@ -7,13 +7,19 @@ Format v7 pas encore relu en jeu : certitude `probable` de l'export.
 Addon fabriqué dans `tmp_path` (structure de Talents Forever) ; aucun chiffre de jeu."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION
+from conftest import DATA_DIR, PRE_70450_VERSION
 from talents_forever_data import write_addon
 
 from forever.talents_forever import export_build, load_addon
 from forever.tf_code import CODE_VERSIONS, TfPlan, decode, encode
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 PLAN = TfPlan("mage", 20, ((1, 0), (0, 2), (0,)), None)  # une position par talent de la disposition MAX
 MAX = ((3, 2), (5, 2), (1,))
 

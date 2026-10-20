@@ -9,7 +9,7 @@ import asyncio
 import json
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION
+from conftest import DATA_DIR, PRE_70450_VERSION
 from mcp import Client
 from talents_forever_data import load_fixture, write_addon
 
@@ -19,7 +19,13 @@ from forever.errors import InvalidArgumentError
 from forever.mcp_server import build_server
 from forever.talents_forever import attach_export, decode_code, export_build, load_addon
 
-CLASSES = DATA_DIR / LOCAL_VERSION / "classes.json"
+
+@pytest.fixture
+def make_deps(make_deps_at_pre_70450_version):
+    """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
+    return make_deps_at_pre_70450_version
+
+CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 CASES = load_fixture("mage_builds.json")["cases"]
 NO_ORDER = "ordre non calculé pour ce contexte"
 
@@ -151,7 +157,7 @@ def test_cli_decode(deps, capsys):
     data = json.loads(capsys.readouterr().out)
     assert data["talents"] == CASES["leveling-30"]["talents"]
     assert data["order"] == CASES["leveling-30"]["order"]
-    assert data["legal"] is True and data["provenance"]["game_version"] == LOCAL_VERSION
+    assert data["legal"] is True and data["provenance"]["game_version"] == PRE_70450_VERSION
     assert main(["talents", "tf", "decode", code], deps) == 0
     out = capsys.readouterr().out
     assert "légal" in out and "improvedFrostbolt" in out
