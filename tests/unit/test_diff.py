@@ -7,7 +7,7 @@ import json
 import shutil
 
 import pytest
-from conftest import LOCAL_VERSION, PREVIOUS_VERSION, read_json, tamper
+from conftest import LOCAL_VERSION, PRE_70450_VERSION, PREVIOUS_VERSION, read_json, tamper
 
 from forever.errors import DataIntegrityError, UnknownVersionError
 from forever.manifest import write_manifest
@@ -129,7 +129,8 @@ def test_integrity_is_required(make_deps, data_copy, next_version):
 
 
 def test_repository_against_candidate_path(make_deps, candidate):
-    d = diff_versions(make_deps(), LOCAL_VERSION, str(candidate.root))
+    # Arbres des fixtures : ceux d'avant 1.60.1.70450 (Missile Barrage y change de palier, conftest).
+    d = diff_versions(make_deps(), PRE_70450_VERSION, str(candidate.root))
     files = {(c["key"], c["change"]) for c in d["changes"] if c["kind"] == "file"}
     # Fichiers propres au dépôt, jamais produits par `forever decode` (copies figées du seed : T06b, décision D2).
     assert files == {

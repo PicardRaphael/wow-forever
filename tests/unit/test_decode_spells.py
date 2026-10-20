@@ -8,6 +8,7 @@ import pytest
 from conftest import (
     DATA_DIR,
     LOCAL_VERSION,
+    PRE_70450_VERSION,
     PREVIOUS_VERSION,
     change_key,
     client_vs_reference,
@@ -17,7 +18,8 @@ from conftest import (
 
 from forever.pipeline.decode import decode_spells
 
-REFERENCE = read_json(DATA_DIR / LOCAL_VERSION / "spells.json")
+# Les 15 sorts des fixtures : 1.60.1.70450 ajoute Frost Blast et Arcane Wrath, absents de ce client (conftest).
+REFERENCE = read_json(DATA_DIR / PRE_70450_VERSION / "spells.json")
 DECODED_FIELDS = {"ranks", "name", "name_fr", "spell_ids"}
 
 
@@ -127,8 +129,10 @@ def test_null_reference_values_are_observations(candidate):
 def test_installed_observations_are_recorded(candidate):
     """T06b : les observations installées en révision 2 figurent dans confirmed_changes.json (nature client)."""
     _, observations, _ = client_vs_reference(candidate, "spell")
-    recorded = [
-        c for c in read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"] if c["old"] is None
+    recorded = [  # observation de sort : valeur là où le dépôt avait null (pas un ajout ni un rang de talent de 70450)
+        c
+        for c in read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"]
+        if c["kind"] == "spell" and c["old"] is None and c["change"] == "modified"
     ]
     assert sorted(map(change_key, recorded)) == sorted(map(change_key, observations))
     assert {c["nature"] for c in recorded} == {"client"}

@@ -10,7 +10,7 @@ from collections import defaultdict
 from functools import cache
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, WAGO_70124, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, PRE_70450_VERSION, WAGO_70124, read_json
 
 from forever.pipeline.decode import decode_classes
 
@@ -94,7 +94,7 @@ def test_class_spells_have_ranks_cooldown_duration_school_range(doc, decode_rule
 
 
 def test_mage_part_matches_spells_json(doc, decode_rules):
-    reference = read_json(DATA_DIR / LOCAL_VERSION / "spells.json")
+    reference = read_json(DATA_DIR / PRE_70450_VERSION / "spells.json")  # sorts des fixtures (avant 70450)
     fields = reference["rank_format"]
     mana_type = decode_rules["spell_ranks"]["mana_power_type"]
     mage = doc["classes"]["Mage"]["spells"]

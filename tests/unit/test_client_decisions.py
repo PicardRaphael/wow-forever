@@ -6,13 +6,13 @@
 Valeurs : talents.json pour `ranks`, fixtures wago 1.60.1.70009 pour les variables propres au client."""
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, PRE_70450_VERSION, PREVIOUS_VERSION, read_json
 
 from forever.pipeline.decode import decode_talents
 
 REFERENCE = {
-    t["key"]: t for tree in read_json(DATA_DIR / LOCAL_VERSION / "talents.json")["trees"] for t in tree["talents"]
-}
+    t["key"]: t for tree in read_json(DATA_DIR / PRE_70450_VERSION / "talents.json")["trees"] for t in tree["talents"]
+}  # talents des fixtures : 1.60.1.70450 change les rangs retenus de Winter's Chill (conftest)
 CONFIRMED = read_json(DATA_DIR / LOCAL_VERSION / "confirmed_changes.json")["changes"]
 
 

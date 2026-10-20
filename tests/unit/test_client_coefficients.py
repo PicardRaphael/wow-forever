@@ -65,10 +65,11 @@ def edit_version_file(data_dir, name, change):
     write_manifest(data_dir)  # modification voulue : l'intégrité reste valide
 
 
-def test_coefficient_matches_client_table(game_data):
+def test_coefficient_matches_client_table(game_data_at_pre_70450_version):
     """Pour chaque rang des 15 sorts : coups directs + éclairs canalisés × tics, coefficients lus dans SpellEffect.csv
     (Frost Nova 0,029 ; Cone of Cold et Blast Wave 0,129 ; Ice Lance 0 ; Blizzard 8 × 0,042 ; Arcane Missiles r8
-    5 × 0,286), sans pénalité des sorts de bas niveau."""
+    5 × 0,286), sans pénalité des sorts de bas niveau (rangs d'avant 1.60.1.70450, qui change Arcane Blast)."""
+    game_data = game_data_at_pre_70450_version
     table = client_coefficients()
     checked = 0
     for key in SPELLS:

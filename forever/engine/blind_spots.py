@@ -84,8 +84,8 @@ def estimate_wake_of_fire_crit(
     combat, rapporté aux PV du monstre du niveau. Borne haute, fraction des dégâts d'un combat.
 
     Registre : I5 (estimation de l'angle mort B19)"""
-    if pts.get(WAKE_OF_FIRE, 0) <= 0:
-        return None
+    if pts.get(WAKE_OF_FIRE, 0) <= 0 or len(gd.talents[WAKE_OF_FIRE].ranks[0]) <= WOF_CRIT:
+        return None  # 70450 : Improved Fire Blast (recharge et portée), plus de critique après une mise à mort
     ch = character(gd, level, race, over)
     e = expected_cast(gd, "fire_blast", level, pts, ch, 0, spell_level="character")
     if e is None:
