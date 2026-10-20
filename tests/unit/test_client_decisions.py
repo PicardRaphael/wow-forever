@@ -25,7 +25,9 @@ def talents(client_tables, decode_rules):
 def test_selection_targets_known_talents(decode_rules):
     selection = decode_rules["rank_variables"]
     assert selection and set(selection) <= set(REFERENCE)
-    assert all(isinstance(i, int) and i >= 0 for indices in selection.values() for i in indices)
+    # 70450 (décision 285) : variables selon la forme de l'infobulle (`{nombre de variables: indices}`)
+    lists = [v for s in selection.values() for v in (s.values() if isinstance(s, dict) else [s])]
+    assert all(isinstance(i, int) and i >= 0 for indices in lists for i in indices)
 
 
 @pytest.mark.parametrize(
@@ -54,7 +56,11 @@ def test_every_talent_keeps_all_tooltip_values(talents, decode_rules):
         if key not in selection:
             assert t["ranks"] == t["tooltip_values"], key
         else:
-            expected = [[values[i] for i in selection[key]] for values in t["tooltip_values"]]
+            sel = selection[key]  # 70450 : indices selon la forme de l'infobulle quand la règle en donne plusieurs
+            expected = [
+                [values[i] for i in (sel[str(len(values))] if isinstance(sel, dict) else sel)]
+                for values in t["tooltip_values"]
+            ]
             assert t["ranks"] == expected, key
 
 

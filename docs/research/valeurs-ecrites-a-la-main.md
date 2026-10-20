@@ -5,7 +5,7 @@ Généré par `uv run forever origins inventory` sur la version 1.60.1.70374 (ne
 de `forever/data/1.60.1.70374/` dont l'origine déclarée dans `origins.json` est `manuel` : ni décodé du client,
 ni mesuré, ni lu dans un addon. Les valeurs elles-mêmes ne sont pas recopiées ici.
 
-168 chemins, 743 valeurs ; 90 `probable`, 78 `suppose`
+167 chemins, 742 valeurs ; 89 `probable`, 78 `suppose`
 
 ## Abaissements de certitude prévus
 
@@ -157,7 +157,6 @@ Aucun.
 | spells.json | `/spells/frostfire_bolt/school` | 1 | probable | — | champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B) | copie du seed (wowforevertalents.com, build 1.60.1.70009) |
 | spells.json | `/spells/frostfire_bolt/slow` | 1 | probable | — | champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B) | copie du seed (wowforevertalents.com, build 1.60.1.70009) |
 | spells.json | `/spells/frostfire_bolt/slow_dur` | 3 | probable | — | champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B) | copie du seed (wowforevertalents.com, build 1.60.1.70009) |
-| spells.json | `/spells/ice_lance/frozen_mult` | 1 | probable | — | champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B) | copie du seed (wowforevertalents.com, build 1.60.1.70009) |
 | spells.json | `/spells/ice_lance/projectile_speed` | 1 | suppose | — | champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B) | estimation du seed (EST) |
 | spells.json | `/spells/ice_lance/range` | 1 | probable | — | champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B) | copie du seed (wowforevertalents.com, build 1.60.1.70009) |
 | spells.json | `/spells/ice_lance/school` | 1 | probable | — | champ hors rang recopié du seed, jamais relu dans le client ; classes.json en porte plusieurs (D2, bloc B) | copie du seed (wowforevertalents.com, build 1.60.1.70009) |

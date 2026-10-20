@@ -1075,7 +1075,11 @@
     }
    ],
    "mage_values": {
-    "mana_pct": 0.05
+    "mana_pct": 0.05,
+    "eureka_dmg": 0.1,
+    "eureka_cost": -0.1,
+    "eureka_duration_s": 15.0,
+    "eureka_cooldown_s": 120.0
    }
   },
   "Troll": {
@@ -1327,7 +1331,9 @@
      "certainty": "FC-1.60.1.70374"
     }
    ],
-   "mage_values": {}
+   "mage_values": {
+    "haste": 0.01
+   }
   },
   "Windshaper Skyborne": {
    "id": 96,
@@ -1462,7 +1468,9 @@
      "certainty": "FC-1.60.1.70374"
     }
    ],
-   "mage_values": {}
+   "mage_values": {
+    "haste": 0.01
+   }
   }
  },
  "notes": [

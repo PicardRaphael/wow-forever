@@ -68,10 +68,16 @@
   "improvedBlizzard": [
    0
   ],
-  "wintersChill": [
-   0,
-   3
-  ]
+  "wintersChill": {
+   "4": [
+    0,
+    3
+   ],
+   "3": [
+    0,
+    2
+   ]
+  }
  },
  "curve_operations": {
   "0": "set"
@@ -98,7 +104,8 @@
   "apply_aura": 6,
   "aura_periodic_damage": 3,
   "aura_periodic_trigger_spell": 23,
-  "aura_periodic_dummy": 226
+  "aura_periodic_dummy": 226,
+  "aura_decrease_speed": 33
  },
  "spell_ranks": {
   "acquire_methods": [
@@ -124,7 +131,9 @@
   "arcane_explosion": "Arcane Explosion",
   "blizzard": "Blizzard",
   "flamestrike": "Flamestrike",
-  "blast_wave": "Blast Wave"
+  "blast_wave": "Blast Wave",
+  "frost_blast": "Frost Blast",
+  "arcane_wrath": "Arcane Wrath"
  },
  "utility_spells": {
   "spells": {
@@ -169,7 +178,14 @@
    "talent": "Winter's Chill",
    "trigger_aura": 42,
    "aura": 308,
-   "field": "EffectBasePointsF"
+   "field": "EffectBasePointsF",
+   "kind": "crit",
+   "alternatives": [
+    {
+     "aura": 271,
+     "kind": "cone_of_cold"
+    }
+   ]
   }
  },
  "talent_cooldowns": {
@@ -382,6 +398,39 @@
    "aura": 290,
    "spell_name": "Sword Specialization",
    "scale": 0.01
+  },
+  "crit": {
+   "aura": 290,
+   "spell_names": [
+    "Ruthless",
+    "Savage"
+   ],
+   "scale": 0.01
+  },
+  "haste": {
+   "aura": 65,
+   "spell_name": "Wind Blessed",
+   "scale": 0.01
+  },
+  "eureka_dmg": {
+   "aura": 108,
+   "misc": 0,
+   "spell_name": "Eureka!",
+   "scale": 0.01
+  },
+  "eureka_cost": {
+   "aura": 108,
+   "misc": 14,
+   "spell_name": "Eureka!",
+   "scale": 0.01
+  },
+  "eureka_duration_s": {
+   "field": "duration_s",
+   "spell_name": "Eureka!"
+  },
+  "eureka_cooldown_s": {
+   "field": "cooldown_s",
+   "spell_name": "Eureka!"
   }
  },
  "pvp_trinkets": {
@@ -894,5 +943,41 @@
   },
   "teleport_flag": 1,
   "note": "RX1, bloc B : camp d'un point de vol par TaxiNodes.Flags (bit Alliance, bit Horde : les deux = neutre, aucun = caché ; relevé sur 1.60.1.70338 : Stormwind 1025, Orgrimmar 1026, Ratchet 1027) ; segment de TaxiPathNode qui part d'un point au drapeau de téléportation exclu de la longueur d'un trajet"
+ },
+ "talent_models": {
+  "arcaneBlast": [
+   {
+    "contains": "of your Intellect as Spell Damage",
+    "model": "intellect_spell_power"
+   }
+  ],
+  "missileBarrage": [
+   {
+    "contains": "Arcane Missile hits",
+    "model": "missile_hits"
+   }
+  ],
+  "firePower": [
+   {
+    "contains": "per your Fire effects",
+    "model": "per_fire_effect"
+   }
+  ],
+  "wintersChill": [
+   {
+    "contains": "Cone of Cold",
+    "model": "cone_of_cold"
+   }
+  ],
+  "note": "70450 (décision 285) : sens d'un talent changé par le client, reconnu à un texte de sa description (Spell.Description_lang) ; sans correspondance, le moteur garde l'ancien sens"
+ },
+ "new_spells": {
+  "frost_blast": null,
+  "arcane_wrath": "arcaneWrath"
+ },
+ "frozen_mult": {
+  "spell": "ice_lance",
+  "talent": "iceLance",
+  "index": 2
  }
 }

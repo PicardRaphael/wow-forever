@@ -188,9 +188,9 @@ class _Merge:
                 assert c is not None
                 t = dict(t)
                 for f in TALENT_FIELDS:
-                    if t.get(f) != c.get(f) and not (rename is not None and f == "name"):
-                        if self._confirmed_field(TALENTS, "talent", key, f, t.get(f), c.get(f), source):
-                            t[f] = c.get(f)  # 70450 : champ du talent tranché « client » (ligne, rangs, prérequis)
+                    changed = t.get(f) != c.get(f) and not (rename is not None and f == "name")
+                    if changed and self._confirmed_field(TALENTS, "talent", key, f, t.get(f), c.get(f), source):
+                        t[f] = c.get(f)  # 70450 : champ du talent tranché « client » (ligne, rangs, prérequis)
                 for ch in _rows("talent", key, t.get("ranks", []), c.get("ranks", []), None):
                     self.value(TALENTS, ch, source)
                 if "tooltip_values" in t:
@@ -225,7 +225,7 @@ class _Merge:
         entry = self.confirmed.get(_key(kind, key, field, old, new))
         path = key if field is None else f"{key}.{field}"
         if entry is None:
-            self.add(file, path, old, new if field is not None else new, source, "certain", "refused")
+            self.add(file, path, old, new, source, "certain", "refused")
             return False
         self.applied.append(entry)
         self.add(file, path, old, new, f"{source} ; {entry['decision']}", "certain", "confirmed")

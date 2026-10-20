@@ -126,7 +126,14 @@ def test_mage_racial_values_equal_the_community_record(races):
             for field in ("spirit_pct", "mana_pct"):
                 if field in trait:
                     expected.setdefault(race, {})[field] = trait[field]
-    decoded = {name: race["mage_values"] for name, race in races.items() if race["mage_values"]}
+    # 70450 (décision 285) : les raciaux lus par leur sort (Eureka!, Wind Blessed, Ruthless, Savage) s'ajoutent, absents
+    # du relevé communautaire ; les trois grandeurs historiques restent comparées au relevé
+    historic = ("sword_crit", "spirit_pct", "mana_pct")
+    decoded = {
+        name: {k: v for k, v in race["mage_values"].items() if k in historic}
+        for name, race in races.items()
+        if any(k in historic for k in race["mage_values"])
+    }
     assert decoded == expected
 
 

@@ -199,6 +199,28 @@
     {
       "file": "spells.json",
       "paths": [
+        "/spells/ice_lance/frozen_mult"
+      ],
+      "origin": "client",
+      "source": "forever decode : multiplicateur d'Ice Lance lu dans le talent iceLance (decode_rules.json frozen_mult)",
+      "certainty": "certain",
+      "reason": "70450 (décision 285) : valeur du client, plus recopiée du seed"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/frost_blast/*",
+        "/spells/arcane_wrath/*"
+      ],
+      "origin": "client",
+      "source": "forever decode : champs des sorts nouveaux lus dans le client (decode_rules.json new_spells : école, portée, ralentissement, talent)",
+      "certainty": "certain",
+      "reason": "70450 (décision 285) : sorts nouveaux de la refonte du Mage",
+      "anticipe": "1.60.1.70450 : Frost Blast et Arcane Wrath, absents des versions précédentes"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
         "/spells/frost_nova/aoe",
         "/spells/cone_of_cold/aoe",
         "/spells/arcane_explosion/aoe",
@@ -211,7 +233,6 @@
         "/spells/blizzard/channel",
         "/spells/blast_wave/daze",
         "/spells/frost_nova/freeze",
-        "/spells/ice_lance/frozen_mult",
         "/spells/arcane_blast/mana_pct_base",
         "/spells/arcane_explosion/radius",
         "/spells/frostbolt/range",
@@ -966,7 +987,10 @@
         "/dungeon_tables",
         "/dungeons",
         "/travel_tables",
-        "/travel"
+        "/travel",
+        "/frozen_mult",
+        "/talent_models",
+        "/new_spells"
       ],
       "origin": "parametre",
       "source": "règles de lecture du client (T03, PV1, CH0, T04f, DJ1, RX1)",

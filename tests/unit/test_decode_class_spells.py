@@ -99,6 +99,8 @@ def test_mage_part_matches_spells_json(doc, decode_rules):
     mana_type = decode_rules["spell_ranks"]["mana_power_type"]
     mage = doc["classes"]["Mage"]["spells"]
     for key in decode_rules["spells"]:
+        if key not in reference["spells"] and key in decode_rules.get("new_spells", {}):
+            continue  # 70450 : sort nouveau (Frost Blast, Arcane Wrath), absent des versions précédentes
         ref = reference["spells"][key]
         (spell,) = [s for s in mage.values() if s["name"] == decode_rules["spells"][key]]
         ranked = [r for r in spell["ranks"] if r["rank"] is not None]

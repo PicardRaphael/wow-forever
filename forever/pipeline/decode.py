@@ -11,7 +11,7 @@ import json
 import re
 import shutil
 from collections import defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Container, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, NamedTuple
@@ -1420,10 +1420,15 @@ def _rank_row(client: _Client, spell: int, rules: Mapping[str, Any]) -> list[Any
 
 
 def _rank_ids(
-    tables: Tables, rules: Mapping[str, Any], client: _Client, names: Mapping[str, str]
+    tables: Tables,
+    rules: Mapping[str, Any],
+    client: _Client,
+    names: Mapping[str, str],
+    optional: Container[str] = (),
 ) -> dict[str, list[int]]:
     """Clé -> identifiants des rangs 1, 2, … des sorts `names` (clé -> nom anglais) : lignes du Mage de
-    SkillLineAbility aux méthodes d'acquisition retenues, rang lu dans Spell.NameSubtext (`spell_ranks`)."""
+    SkillLineAbility aux méthodes d'acquisition retenues, rang lu dans Spell.NameSubtext (`spell_ranks`). Un sort de
+    `optional` (sort nouveau, 70450) absent du client est omis."""
     lines = set(rules["skill_lines"].values())
     methods = set(rules["spell_ranks"]["acquire_methods"])
     rank_re = re.compile(rules["spell_ranks"]["rank_subtext"])
@@ -1444,6 +1449,8 @@ def _rank_ids(
     out = {}
     for key, name in names.items():
         ranks = found.get(key, {})
+        if not ranks and key in optional:
+            continue
         if not ranks or sorted(ranks) != list(range(1, len(ranks) + 1)):
             raise DataSchemaError(f"{key} ({name}) : rangs incomplets dans le client ({sorted(ranks)}).")
         out[key] = [ranks[r] for r in sorted(ranks)]
@@ -1458,15 +1465,17 @@ def decode_spells(
     if list(inherited.get("rank_format", [])) != list(rules["rank_format"]):
         raise DataSchemaError(f"rank_format de {RULES_NAME} différent de celui de spells.json hérité.")
     client = _Client(tables, rules)
-    found = _rank_ids(tables, rules, client, rules["spells"])
+    new_spells = rules.get("new_spells", {})
+    found = _rank_ids(tables, rules, client, rules["spells"], optional=new_spells)
     doc = copy.deepcopy(dict(inherited))
     doc["build"] = version
     doc["inherited_from"] = inherited.get("build")
     doc["source"] = f"Client {version} : tables Spell* et SkillLineAbility (wago.tools) décodées par forever decode"
     for key, name in rules["spells"].items():
+        if key not in found:
+            continue  # sort nouveau absent de ce client
         ids = found[key]
         entry = dict(doc["spells"].get(key, {}))
-        new_spells = rules.get("new_spells", {})
         if (
             "school" not in entry and key in new_spells
         ):  # 70450 : sort nouveau (Frost Blast, Arcane Wrath), lu au client
@@ -1774,7 +1783,7 @@ def _target_auras(tables: Tables, rules: Mapping[str, Any], client: _Client) -> 
             "duration_ms": duration,
             "schools": [school for school, bit in masks.items() if mask & int(bit)],
         }
-        if "alternatives" in spec:  # 70450 : la sorte de l'aura dit au moteur ce qu'elle fait (critique, Cone of Cold)
+        if kind != spec.get("kind", "crit"):  # 70450 : sorte de repli (Cone of Cold) dite au moteur ; critique sinon
             out[key]["kind"] = kind
     return out
 
@@ -2322,7 +2331,7 @@ def decode_version(
         root=out,
         version=version,
         talents=sum(len(t["talents"]) for t in talents["trees"]),
-        spells=len(rules["spells"]),
-        spell_ranks=sum(len(spells["spells"][k]["ranks"]) for k in rules["spells"]),
+        spells=sum(1 for k in rules["spells"] if k in spells["spells"]),
+        spell_ranks=sum(len(spells["spells"][k]["ranks"]) for k in rules["spells"] if k in spells["spells"]),
         observations=[*_observations(talents, spells, base), *extra_notes],
     )
