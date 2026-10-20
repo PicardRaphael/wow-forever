@@ -22,8 +22,11 @@ from forever.store import VersionData, load_version
 # Valeurs dérivées rendues par mécanique : (talent, effets de `stack_tables`) (T06b, décision D4).
 DERIVED: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
     "B11": (("arcaneBlast", ("arcane_blast_cost",)),),
-    "B15": (("arcaneBlast", ("other_spells_damage",)), ("hotStreak", ("pyroblast_cast_reduction",))),
-    "D4": (("wintersChill", ("crit",)),),
+    "B15": (
+        ("arcaneBlast", ("other_spells_damage", "intellect_spell_power")),  # 70450 : puissance des sorts
+        ("hotStreak", ("pyroblast_cast_reduction",)),
+    ),
+    "D4": (("wintersChill", ("crit", "cone_of_cold_damage")),),  # 70450 : bonus de Cone of Cold
 }
 ABSENT_NOTE = "mécanique non modélisée dans forever-core : aucun calcul ne s'appuie encore sur elle"
 _CERTAINTIES: tuple[str, ...] = get_args(Certainty)

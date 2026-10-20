@@ -127,7 +127,10 @@ def _tokens(template: str, resolve: Resolver) -> Iterator[tuple[int, int, list[i
         if not var:
             raise ValueError(f"motif d'infobulle non pris en charge : {template[start : start + 12]}")
         i = start + 1 + var.end()
-        unit = " sec" if var[2] == "d" else ""  # le client affiche une durée en secondes avec son unité
+        unit = ""
+        if var[2] in ("d", "D"):  # le client affiche une durée avec son unité (résolveur ; secondes à défaut)
+            unit_of = getattr(resolve, "duration_unit", None)
+            unit = " " + (unit_of(int(var[1]) if var[1] else None) if unit_of else "sec")
         yield token, i, [normalize(abs(v) / divisor) for v in _values(resolve, var[1], var[2], var[3])], unit
 
 
@@ -138,7 +141,7 @@ def tooltip_values(template: str, resolve: Resolver) -> list[int | float]:
 
 def placeholder_template(template: str, resolve: Resolver) -> str:
     """Infobulle au gabarit du dépôt : la i-ème valeur de `tooltip_values` devient `{i}`, une variable à variance
-    (minimum et maximum) `{i} to {i+1}` comme l'affiche le client, une durée `$d` `{i} sec`, `$lsingulier:pluriel;`
+    (minimum et maximum) `{i} to {i+1}` comme l'affiche le client, une durée `$d` `{i} sec` (ou l'unité du résolveur), `$lsingulier:pluriel;`
     son pluriel (70450 : talent ajouté par la fusion)."""
     out: list[str] = []
     i = n = 0

@@ -603,3 +603,8 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   (`probable`), le second reste à vérifier en jeu.
 - **NOT2** : Ruthless (Humain) et Savage (Orc) : la note dit « toute arme » ; les tables de 70450 gardent l'aura de
   critique de l'ancien racial d'arme (290), sans restriction d'arme lue : à vérifier en jeu (fenêtre du personnage).
+- **RJ1** : analytique des nouveaux Arcanes de 70450 optimiste face au Monte Carlo (temps par monstre −20,8 % à L24,
+  −12,6 % à L30, −8 % en leveling 30 ; DPS +3,5 % sur un boss au niveau 40). Cause probable : l'aura d'Arcane Blast
+  qui dure depuis sa première application et les projectiles de Missile Barrage, comptés en moyenne par le cycle
+  analytique. Les recommandations se départagent au Monte Carlo ; tests en `xfail` strict
+  (`test_encounter.py`, `test_engine_arcane_blast.py`) jusqu'à la correction du cycle.

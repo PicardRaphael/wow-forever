@@ -58,9 +58,22 @@ def test_scenarios_come_from_the_data(game_data):
     assert (sc["dungeon_boss"].level_offset, sc["raid_boss"].duration_s, sc["dungeon_pack"].targets) == (2, 180, 4)
 
 
-@pytest.mark.parametrize(("rotation", "pts", "opts"), ROTATIONS)
-def test_analytic_close_to_monte_carlo_on_a_single_target(game_data_at_pre_70450_version, rotation, pts, opts):
-    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
+# 1.60.1.70450 : l'analytique des nouveaux Arcanes s'écarte du Monte Carlo au-delà de la tolérance (question RJ1) ;
+# l'écart reste visible (xfail strict), l'ancien sens est vérifié sur PRE_70450_VERSION.
+ARCANE_GAP = pytest.mark.xfail(strict=True, reason="RJ1 : analytique des Arcanes de 70450 hors tolérance")
+ROTATIONS_NOW = [pytest.param(*r, marks=ARCANE_GAP) if r[0] == "arcane" else r for r in ROTATIONS]
+
+
+@pytest.mark.parametrize(("rotation", "pts", "opts"), ROTATIONS_NOW)
+def test_analytic_close_to_monte_carlo_on_a_single_target(game_data, rotation, pts, opts):
+    _analytic_close_to_monte_carlo(game_data, rotation, pts, opts)
+
+
+def test_analytic_close_to_monte_carlo_for_the_arcanes_before_70450(game_data_at_pre_70450_version):
+    _analytic_close_to_monte_carlo(game_data_at_pre_70450_version, *next(r for r in ROTATIONS if r[0] == "arcane"))
+
+
+def _analytic_close_to_monte_carlo(game_data, rotation, pts, opts):
     a = encounter_analytic(game_data, "dungeon_boss", 40, pts, "Orc", rotation, NO_OOM, **opts)
     m = encounter_mc(game_data, "dungeon_boss", 40, pts, "Orc", rotation, 400, seed=1, over=NO_OOM, **opts)
     assert a["dps"] == pytest.approx(m.mean, rel=0.03), (a["dps"], m.mean)

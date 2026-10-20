@@ -24,8 +24,8 @@ puis rattacher chaque famille à la version d'où viennent ses valeurs.
 | un talent ajouté par la fusion gardait l'infobulle brute du client | `forever lookup talent "Arcane Wrath"` affichait `$s1` | `tooltip.placeholder_template`, `desc_template` de chaque talent décodé, repris par la fusion |
 | le dépôt gardait l'ancien gabarit quand le client changeait son texte | Arcane Blast décrit avec « dégâts des autres sorts », Winter's Chill avec le critique, Fire Power sans effets de Feu… | le gabarit suit le texte du client changé depuis la plus récente version installée antérieure ; un renommage passé (Hot Streak) ne le remet plus |
 | gabarit numéroté sur toutes les variables de l'infobulle | Winter's Chill affichait « {2} » | `decode.rank_template` : numéros sur `ranks`, constantes non retenues en clair |
-| `$d` sans unité | « lasts 15 from time of initial application » | `{i} sec`, comme le client |
-| tables par cumul à l'ancien sens | `lookup`/`explain` : Arcane Blast « dégâts des autres sorts », Winter's Chill « critique » nul | `engine/derived` selon le marqueur `model` et la sorte de l'aura |
+| `$d` sans unité | « lasts 15 from time of initial application » | unité du client (`duration_unit` du résolveur : sec, min dès une minute), `$D` compris |
+| tables par cumul à l'ancien sens (et `explain B15`, `D4` sans l'effet de 70450) | `lookup`/`explain` : Arcane Blast « dégâts des autres sorts », Winter's Chill « critique » nul | `engine/derived` selon le marqueur `model` et la sorte de l'aura |
 | B19 : estimation nulle d'Improved Fire Blast | angle mort « critique de Wake of Fire » chiffré à 0 | l'estimation rend None (plus de critique dans 70450) |
 | `_client_mechanics` : aura de critique sans remise à zéro du bonus de Cone of Cold | sans effet en production (constantes de base à zéro), visible avec des constantes déjà chargées | remise à zéro explicite |
 
@@ -46,8 +46,15 @@ et `make_deps_at_pre_70450_version`. Garde : `test_revision_constants.py::test_f
 | `test_lookup_talent::test_rank_gives_the_value_and_the_description_of_that_rank`, `::test_cli_text` | texte d’Improved Frostbolt changé par le client (Frost Blast ajouté, révision 4) | `PRE_70450_VERSION` |
 
 ## Restent des angles morts
-- L'analytique surestime les nouveaux Arcanes de 8 à 10 % face au Monte Carlo (`docs/research/rejeu-70450.md`) :
-  les tests « analytique ≈ Monte Carlo » des Arcanes ne tournent plus que sur 70374.
+- RJ1 : l'analytique est optimiste sur les nouveaux Arcanes face au Monte Carlo (temps par monstre −20,8 % à L24,
+  −12,6 % à L30, −8 % en leveling 30 du rejeu ; DPS +3,5 % sur un boss au niveau 40). Les tests « analytique ≈ Monte
+  Carlo » tournent sur la version installée (Givre, Feu, Arcanes à L30), les cas hors tolérance (Arcanes à L24 et
+  sur un boss) en `xfail` strict ; l'ancien sens reste vérifié sur 70374. Registre (notes) et `docs/OPEN_QUESTIONS.md`.
 - Aucun relevé de la disposition de Talents Forever génération 7 dans les fixtures : les tests de l'addon tournent
   sur les arbres de 70374 ; l'export des 9 classes sur 70450 a été vérifié à la main (bloc D).
 - Presence of Mind : gabarit `{0}` sans valeur retenue (`ranks` vide), antérieur à 70450.
+- Limites de la fusion des gabarits (relecture du 2026-10-20) : un talent ajouté dont le gabarit ne peut être ramené
+  aux valeurs retenues (`rank_template` rend None) garde l'infobulle brute ; un texte changé dans ce cas garde
+  l'ancien gabarit sans le signaler ; une révision réaligne les gabarits des talents changés depuis la version
+  précédente (une correction à la main serait réécrite). B19 déduit l'absence de critique du nombre de variables
+  d'Improved Fire Blast.

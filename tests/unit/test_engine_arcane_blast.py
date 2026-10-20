@@ -163,9 +163,23 @@ def test_monte_carlo_is_reproducible(game_data):
     assert a != mc(game_data, 24, B24, "Orc", "arcane", 100, seed=2, ab_stacks=2)
 
 
+@pytest.mark.parametrize(
+    ("level", "pts"),
+    [  # 1.60.1.70450 : au niveau 24, l'analytique s'écarte du Monte Carlo au-delà de 15 % (question RJ1)
+        pytest.param(24, B24, marks=pytest.mark.xfail(strict=True, reason="RJ1 : analytique des Arcanes de 70450")),
+        (30, B30),
+    ],
+)
+def test_analytic_close_to_monte_carlo(game_data, level, pts):
+    _analytic_close_to_monte_carlo(game_data, level, pts)
+
+
 @pytest.mark.parametrize(("level", "pts"), [(24, B24), (30, B30)])
-def test_analytic_close_to_monte_carlo(game_data_at_pre_70450_version, level, pts):
-    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
+def test_analytic_close_to_monte_carlo_before_70450(game_data_at_pre_70450_version, level, pts):
+    _analytic_close_to_monte_carlo(game_data_at_pre_70450_version, level, pts)
+
+
+def _analytic_close_to_monte_carlo(game_data, level, pts):
     m = mc(game_data, level, pts, "Orc", "arcane", 600)["total"]
     a = kill_analytic(game_data, level, pts, rotation="arcane")["total"]
     assert abs(a / m - 1) < 0.15, (level, round(m, 1), round(a, 1))

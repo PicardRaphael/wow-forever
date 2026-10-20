@@ -574,6 +574,7 @@ mechanics:
       - "notes de développement officielles du 24/09/2026 (https://us.forums.blizzard.com/en/wow/t/2360696) : Hot Streak passé de 15 à 20 s, concorde avec le client"
       - "client 1.60.1.70170 : Hot Streak renommé Heating Up (même nœud 105786, sort 400624, aura 400625 aux mêmes effets), clé hotStreak gardée (tasks/70170-ecarts.md) ; texte « next Pyroblast » : cumuls consommés au Pyroblast, comme le modèle"
     tests:
+      - tests/unit/test_totals.py::test_tools_give_the_derived_values_of_the_installed_version
       - tests/unit/test_engine_arcane_blast.py::test_max_stacks_come_from_the_talent
       - tests/unit/test_engine_arcane_blast.py::test_stacks_are_capped_and_expire
       - tests/unit/test_engine_arcane_blast.py::test_bonus_applies_to_other_spells_only
@@ -873,6 +874,7 @@ mechanics:
       - "forever/data/1.60.1.70124/decode_rules.json (target_auras.winters_chill : aura posée par le talent, EffectBasePointsF, CumulativeAura, T08b)"
       - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : Winter's Chill ne fait pas de jet de résistance (le sort qui le pose a déjà dû toucher) ; client 1.60.1.70170 : SpellMisc.Attributes_3 du sort 12579, bit 18 ajouté (« ne peut pas rater », sens communautaire)"
     tests:
+      - tests/unit/test_totals.py::test_tools_give_the_derived_values_of_the_installed_version
       - tests/unit/test_engine_mechanics.py::test_mechanic_check
       - tests/parity/test_fm_parity.py::test_expected_cast_parity
       - tests/unit/test_totals.py::test_winters_chill_crit_by_stack_and_rank
@@ -1408,6 +1410,7 @@ mechanics:
       - "forever/data/1.60.1.70009/mechanics.json (build.scenarios : scénarios provisoires T05, suppose)"
     tests:
       - tests/unit/test_encounter.py::test_analytic_close_to_monte_carlo_on_a_single_target
+      - tests/unit/test_encounter.py::test_analytic_close_to_monte_carlo_for_the_arcanes_before_70450
       - tests/unit/test_encounter.py::test_no_damage_once_the_mana_is_gone
       - tests/unit/test_encounter.py::test_casts_fit_inside_the_duration
       - tests/unit/test_encounter.py::test_tank_present_no_damage_taken_and_no_pushback
@@ -1417,7 +1420,7 @@ mechanics:
       - tests/unit/test_build_contexts_end_to_end.py::test_context_value_uses_the_effective_duration_in_the_arcane_rotation
     tolerance: null
     formule: "durée fixe du scénario (build.scenarios, duration_s) ; un lancer n'est commencé que s'il finit dans la durée (cast_fits) ; dégâts par seconde = dégâts / durée retenue (encounter_length : mort du paquet, sinon durée entière après une fin de mana, sinon fin du dernier lancer) ; tank présent : aucun coup reçu, aucun recul ; mana : réserve + régénération en combat, sans Évocation ni potion (B10)"
-    note: "T05 (décision 82) : scénarios provisoires, affinés en DJ1 et T09 ; analytique : cycle en taux (Fire Blast à période arrondie aux incantations de Fireball) ou déroulé lancer par lancer en espérance (Arcanes sur un boss : cycle incomplet de fin de combat, fenêtres d'Arcane Power, fin de mana) ; écart au Monte Carlo ≤ 1,5 % au niveau 40 (boss de donjon, n = 400) ; boss insensibles au gel (suppose, OPEN_QUESTIONS) ; la rotation ne s'adapte pas à la mana restante (angle mort) ; T05 bloc I2 : l'analytique du paquet compte toute la durée après une fin de mana (comme le Monte Carlo) ; écart analytique / Monte Carlo sur un paquet : +2 à +19 % sans fin de mana (DoT de Flamestrike compté en entier, morts simultanées), jusqu'à +28 % avec (dernière canalisation de Blizzard non payable au Monte Carlo) ; décision au Monte Carlo"
+    note: "T05 (décision 82) : scénarios provisoires, affinés en DJ1 et T09 ; analytique : cycle en taux (Fire Blast à période arrondie aux incantations de Fireball) ou déroulé lancer par lancer en espérance (Arcanes sur un boss : cycle incomplet de fin de combat, fenêtres d'Arcane Power, fin de mana) ; écart au Monte Carlo ≤ 1,5 % au niveau 40 (boss de donjon, n = 400) ; boss insensibles au gel (suppose, OPEN_QUESTIONS) ; la rotation ne s'adapte pas à la mana restante (angle mort) ; T05 bloc I2 : l'analytique du paquet compte toute la durée après une fin de mana (comme le Monte Carlo) ; écart analytique / Monte Carlo sur un paquet : +2 à +19 % sans fin de mana (DoT de Flamestrike compté en entier, morts simultanées), jusqu'à +28 % avec (dernière canalisation de Blizzard non payable au Monte Carlo) ; décision au Monte Carlo ; 1.60.1.70450 (décision 285, question RJ1) : nouveaux Arcanes au niveau 40 sur un boss de donjon, analytique +3,5 % de DPS face au Monte Carlo (hors des 3 % du test, xfail strict) ; Givre +0,4 %, Feu +0,1 %"
   - id: H6
     categorie: rencontre
     description: "Mouvement programmé"
@@ -1538,6 +1541,7 @@ mechanics:
       - tests/parity/test_sim_leveling_parity.py::test_every_analytic_branch_matches_the_seed
       - tests/unit/test_engine_arcane_blast.py::test_zero_stacks_is_the_dump_rotation
       - tests/unit/test_engine_arcane_blast.py::test_analytic_close_to_monte_carlo
+      - tests/unit/test_engine_arcane_blast.py::test_analytic_close_to_monte_carlo_before_70450
       - tests/unit/test_engine_arcane_blast.py::test_invalid_arcane_rotations_are_refused
       - tests/unit/test_rotations_t05.py::test_pyroblast_enters_the_fire_rotation_after_enough_crits
       - tests/unit/test_rotations_t05.py::test_missile_barrage_halves_the_dump_and_makes_it_free
@@ -1548,7 +1552,7 @@ mechanics:
       - tests/unit/test_engine_70450_arcane.py::test_arcane_rotation_with_wrath_simulates
     tolerance: null
     formule: "rotation arcane (T04c) : Arcane Blast jusqu'à ab_stacks cumuls, puis la décharge ab_dump ; rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
-    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test) ; T05 : rotation fire avec Pyroblast à hs_stacks cumuls de Hot Streak (talent pris, mode forever) ; rotation arcane avec Missile Barrage sur la décharge Arcane Missiles ; Arcane Power au pull dès que prête dans toutes les rotations ; Pyroblast d'ouverture non modélisé ; T05 : rotations des scénarios (forever/sim/encounter.py) : mêmes priorités qu'en leveling sans approche ni mêlée ; rotation aoe pour les paquets ; 70450 : Frost Blast proposé comme rotation de leveling une fois appris (comparé, jamais imposé) ; Arcane Wrath lancé dès sa recharge pendant la décharge arcane"
+    note: "T04b : listes de priorités du seed pour le leveling (forever/sim/leveling_mc.py) ; après Frost Nova, le Mage est replacé à leveling.frost_nova_retreat_yd sans temps de déplacement (C4, C6 absentes) ; Fingers of Frost (chance et charges du talent) et Winter's Chill (chance d'application, cumuls sans expiration dans le Monte Carlo, moyenne sur leveling.analytic.winters_chill_casts dans l'analytique) sont portés ici (B14, D4) ; autres spécialisations et situations (raid, JcJ) : tranches suivantes ; T04c : rotation arcane (rules forever seulement, niveau du rang 1 et talent requis), ab_stacks paramètre de build (0 au maximum du talent) que T05 optimisera, ab_dump frostbolt, fireball ou arcane_missiles ; écart analytique / Monte Carlo sous 15 % à L24 et L30 (test) ; T05 : rotation fire avec Pyroblast à hs_stacks cumuls de Hot Streak (talent pris, mode forever) ; rotation arcane avec Missile Barrage sur la décharge Arcane Missiles ; Arcane Power au pull dès que prête dans toutes les rotations ; Pyroblast d'ouverture non modélisé ; T05 : rotations des scénarios (forever/sim/encounter.py) : mêmes priorités qu'en leveling sans approche ni mêlée ; rotation aoe pour les paquets ; 70450 : Frost Blast proposé comme rotation de leveling une fois appris (comparé, jamais imposé) ; Arcane Wrath lancé dès sa recharge pendant la décharge arcane ; 1.60.1.70450 (décision 285, question RJ1) : nouveaux Arcanes, analytique optimiste face au Monte Carlo : temps par monstre −20,8 % à L24 (xfail strict, tolérance 15 %), −12,6 % à L30 ; −8 % en leveling 30 du rejeu (docs/research/rejeu-70450.md)"
   - id: I2
     categorie: optimisation
     description: "Optimisation des rotations"

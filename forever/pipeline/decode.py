@@ -238,6 +238,11 @@ class _Client:
         value, variance = self.points(spell, index, mode, override)
         return int(half_up(value * (1 - variance / 2))), int(half_up(value * (1 + variance / 2)))
 
+    def duration_unit(self, ms: int) -> str:
+        """Unité d'affichage d'une durée (`tooltip.duration_units`), celle de `display_duration`."""
+        units = sorted(self.rules["tooltip"]["duration_units"], key=lambda u: -int(u["ms"]))
+        return str(next((u for u in units if ms >= int(u["ms"])), units[-1])["unit"])
+
     def display_duration(self, ms: int) -> int | float:
         if ms < 0:
             raise ValueError("durée illimitée dans une infobulle")
@@ -280,6 +285,11 @@ class _Client:
                 return [int(aura["CumulativeAura" if letter == "u" else "ProcCharges"])]
             raise ValueError(f"variable ${letter} non prise en charge")
 
+        def duration_unit(cited: int | None) -> str:
+            duration = self.duration_ms(main if cited is None else cited)
+            return self.duration_unit(duration) if duration is not None and duration >= 0 else "sec"
+
+        resolve.duration_unit = duration_unit  # type: ignore[attr-defined]  # unité de `$d` (placeholder_template)
         return resolve
 
 
