@@ -73,7 +73,8 @@ PC `RAPHAEL-GAMING`, jeu dans `C:\Program Files (x86)\World of Warcraft`, sauveg
 14. **Mesures** : après quelques sessions de jeu, `uv run forever measures refresh`.
     - À voir : les journaux de la bêta « retenus » (autre produit), ceux de la version finale mesurés ; les PV
       remesurés sortent de `forever measures inherited`.
-15. Tests en jeu restés en attente : section du même nom, facultatifs, en jouant normalement.
+15. Essai en jeu de CJ1 : section du même nom (environ 25 min, blocs livrés en attente d'essai).
+16. Tests en jeu restés en attente : section du même nom, facultatifs, en jouant normalement.
 
 ## Portable
 
@@ -160,6 +161,48 @@ bêta. La sauvegarde de raison « avant adoption » est elle-même **antérieure
    sauvegardé d'abord (raison « avant restauration »).
 3. Si une sauvegarde antérieure a été restaurée par erreur : `uv run forever wow list`, puis refaire
    `uv run forever wow adopt "<dossier>"`, ou restaurer la sauvegarde « avant restauration ».
+
+## Essai en jeu de CJ1 (blocs livrés, en attente d'essai)
+
+Une seule procédure pour tous les blocs de CJ1 livrés sans essai (la bêta s'est terminée avant, décision 273 : rien
+n'est accepté sans ton essai). À faire après l'étape 13 du PC de jeu (profil importé), avec un personnage neuf de la
+version finale ; les étapes supposent un Mage Gnome, un autre personnage convient (les noms des quêtes changent).
+Chaque bloc livré d'ici la sortie ajoute ici ses étapes. Un défaut : noter l'étape et la réponse (ou une capture), sa
+correction passe devant le reste.
+
+### 1. Fenêtre et conversation (blocs 6a, 2 ; 5 min)
+1. `/fv` : barre latérale, accueil une fois, fenêtre agrandie puis réduite sans chevauchement ; `/fv reset` la remet
+   au centre ; avec et sans EllesmereUI, rien n'y change.
+2. Une question dans le chat (« Que faire à mon niveau ? ») : réponse sans `/reload`, boutons sous la réponse.
+
+### 2. Feuille de route (blocs 1, RTE8 ; 5 min)
+3. Feuille de route, type Leveling, du niveau 1 au niveau 10, « Calculer » : départ de ta position, zone de départ de
+   ta race d'abord, aperçu lisible ; « Valider et livrer » : la route arrive dans RestedXP sous un nom stable.
+4. Plus tard (niveau 10 ou plus) : une route qui passe par une capitale (Ironforge pour un Gnome) ; les trajets dans
+   la ville sont marqués supposés, aucun donneur injoignable.
+
+### 3. Équipement (blocs 4, 4b, 4c, 4d ; 10 min)
+5. Écran Équipement, ton niveau, « Mon équipement à ce niveau » : objets obtenables à ce niveau seulement (niveau
+   requis affiché), liens d'objets (infobulle, Maj+clic), résumé d'abord, butin aléatoire en dernier.
+6. « Liens à copier » : poids importés dans Naowh Forever (Stat Weights) et Forever Companion (Import scale) ; liste
+   `!NBIS1!` visible dans la fenêtre BiS de Naowh.
+7. Bouton « Feuille de route de ces objets » : quêtes des objets « dans la route » ou hors de la route avec leur
+   raison (autre continent, quête de donjon…), taux de butin avec sa source (tes relevés d'abord), « Boucles de
+   donjon » avec les passages attendus et pour 9 chances sur 10, butin aléatoire en une ligne ; « Valider et
+   livrer » : la route arrive dans RestedXP sous « Forever · <perso> · équipement ».
+8. « jusqu'au » réglé 8 niveaux plus haut, « En faire une route » : « Route d'équipement du niveau N au niveau M ».
+9. Un personnage sans objet obtenable (niveau 1) : réponse « pas de route d'équipement », sans « Valider et livrer ».
+
+### 4. Talents et EllesmereUI (blocs 3, 5 ; 2 min)
+10. Bouton Talents au niveau 1 : plan complet, lien Talents Forever et code Naowh importables.
+11. Aucune proposition de profil EllesmereUI ni bascule ; `/fb eui on` les rallume, `/fb eui off` les éteint.
+
+### 5. Fin
+12. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
+    et corrige le reste.
+
+Blocs à venir, ajoutés ici à leur livraison : 6b (réponses en cartes, assistant par type de route, PvP « Comment
+jouer contre lui »), 4e (route de réputation), 1d (vols et pierre de foyer), Polestar.
 
 ## Tests en jeu restés en attente
 
