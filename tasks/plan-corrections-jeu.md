@@ -387,12 +387,13 @@ SkillUp Forever lu en local, visites aux maîtres, récolte sur le chemin), sous
 - **Donnée directement** (décision 282) : la réponse de « En faire une route » et du bouton « Veux-tu la feuille de
   route… ? » est la route d'équipement calculée (aperçu compact dans le chat), avec **« Valider et livrer »** dessous,
   comme une route de leveling ; la livraison passe par le même chemin (`route_deliver`).
-- **Fait (code, 2026-10-16 à 2026-10-20)** : route calculée par l'optimiseur qui impose les quêtes des objets (même
+- **Livré, en attente d'essai (code, 2026-10-16 à 2026-10-20 ; essai au plus tard le 4 novembre, `docs/LANCEMENT.md`)** : route calculée par l'optimiseur qui impose les quêtes des objets (même
   grises, au-delà du niveau final si besoin, exclusives écartées) et les donjons de leurs boss ; livraison sous
   « Forever · <perso> · équipement » ; taux objet par objet (relevés du joueur d'abord, écarts entre sources, autres
   boss), boucles de donjon (passages attendus et pour 9 chances sur 10), partage du butin en groupe dit ; route d'une
   tranche de niveaux (`a=gear_route:<de>-<à>`, écran Équipement et bouton sous la réponse de la tranche) ; donneurs
-  des capitales joints (RTE8, ligne droite allongée `suppose`). **Reste** : l'essai en jeu (décision 273).
+  des capitales joints (RTE8, ligne droite allongée `suppose`) ; quête imposée hors de la route avec sa raison (autre
+  continent compris). Pas accepté tant que l'essai n'est pas fait (décision 273).
 
 ### Bloc 4e — Route de réputation (idées du chat du 2026-10-15, point 1)
 - **Étude d'abord** (idées du chat du 2026-10-15, nuit ; décision 264, lecture seule), avant 6b et 4e :

@@ -465,6 +465,20 @@ def required_chain(
     return frozenset(out)
 
 
+def missing_reason(quest_id: int, *, world: Any, start: Any, done: Any) -> str:
+    """Pourquoi une quête imposée reste hors de la route (bloc 4d) : écartée du livre (raison gardée), déjà faite,
+    donneur sur un autre continent que le départ (transport nécessaire), sinon non placée par l'optimiseur."""
+    if quest_id in world.dropped:
+        return str(world.dropped[quest_id])
+    if quest_id in done:
+        return "déjà faite"
+    q = world.quests.get(quest_id)
+    position = getattr(start, "position", None)
+    if q is not None and position is not None and q.giver.continent != position.continent:
+        return "sur un autre continent : transport nécessaire, hors de cette route"
+    return "non placée par l'optimiseur"
+
+
 def route_world(
     gd: GameData,
     book: Any,
@@ -1149,7 +1163,7 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
     stops = [_stop_payload(book, by_id, r, end_level=request.end_level) for r in result.stops]
     placed = {s["ref"] for s in stops if s["kind"] == "accept"}
     missing = {  # bloc 4d : quête imposée hors de la route, avec sa raison
-        str(q): (world.dropped.get(q) or ("déjà faite" if q in request.done else "non placée par l'optimiseur"))
+        str(q): missing_reason(q, world=world, start=start, done=request.done)
         for q in request.include
         if q not in placed
     }
