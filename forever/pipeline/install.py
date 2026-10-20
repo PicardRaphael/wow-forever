@@ -241,7 +241,9 @@ class _Merge:
                 **{k: v for k, v in extra.items() if k not in ("certainty", "desc_template")},
                 "certainty": f"FC-{self.build}",
             }
-            added["desc"] = extra.get("desc_template", extra.get("desc", ""))  # gabarit du dépôt ({i}), brut en source
+            added["desc"] = extra.get("desc_template") or extra.get(
+                "desc", ""
+            )  # gabarit du dépôt ({i}), brut en source
             added["source"] = self._talent_source(extra)
             for tree in doc["trees"]:  # 70450 : talent ajouté, tranché « client » (Arcane Wrath)
                 if tree["name"] == extra.get("tree", tree["name"]):
@@ -297,7 +299,7 @@ class _Merge:
             self.add(TALENTS, f"{key}.former_names", out.get("former_names"), former, why, "certain", "confirmed")
             out["former_names"] = former
         desc = rename.get("desc")
-        if desc is not None and desc == c.get("desc") and "desc_template" in c:
+        if desc is not None and desc == c.get("desc") and c.get("desc_template"):
             desc = c["desc_template"]  # infobulle brute du client citée par la décision : gabarit du dépôt ({i})
         elif self.previous_client_desc.get(key, c.get("desc")) != c.get("desc"):
             desc = None  # texte du client changé depuis la décision : le gabarit du client (_talent) l'emporte

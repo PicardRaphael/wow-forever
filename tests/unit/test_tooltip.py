@@ -130,7 +130,7 @@ def test_placeholder_template_covers_every_pattern_of_tooltip_values():
     values = {(None, "s", 0): [-15], (None, "d", 0): [6000], (None, "s", 1): [4]}
     template = "de $s1% pendant $/1000;S1 s ($d), ${$s2*2} $lpoint:points;."
     out = placeholder_template(template, resolver(values))
-    assert out == "de {0}% pendant {1} s ({2}), {3} points."
+    assert out == "de {0}% pendant {1} s ({2} sec), {3} points."
     assert "$" not in out
 
 

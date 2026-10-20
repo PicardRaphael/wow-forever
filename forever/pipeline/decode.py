@@ -315,6 +315,36 @@ def _tree_of(x: int, tabs: Mapping[str, int], step: int, divisor: int) -> tuple[
     raise DataSchemaError(f"Abscisse {x} hors des onglets de l'arbre ({dict(tabs)}).")
 
 
+def _selected_indices(indices: Sequence[int] | Mapping[str, Sequence[int]] | None, width: int) -> list[int] | None:
+    """Indices des variables retenues par `_select` pour une infobulle de `width` variables ; None : toutes."""
+    if indices is None:
+        return None
+    if isinstance(indices, Mapping):
+        shaped = indices.get(str(width))
+        return None if shaped is None else list(shaped)
+    return list(indices)
+
+
+def rank_template(template: str, tooltip: list[list[int | float]], selected: Sequence[int] | None) -> str | None:
+    """Gabarit tiré de l'infobulle (`{j}` : j-ième variable) ramené aux valeurs retenues par rang (`ranks`), comme les
+    gabarits du seed : variable retenue numérotée à sa place, variable constante sur tous les rangs écrite en clair ;
+    None si une variable non retenue change d'un rang à l'autre (le dépôt garde alors son gabarit)."""
+    if selected is None:
+        return template
+    literal: dict[int, str] = {}
+    for j in {int(m) for m in re.findall(r"\{(\d+)\}", template)} - set(selected):
+        if not tooltip or not all(j < len(row) and row[j] == tooltip[0][j] for row in tooltip):
+            return None
+        v = tooltip[0][j]
+        literal[j] = str(int(v)) if float(v).is_integer() else repr(float(v))
+
+    def number(m: re.Match[str]) -> str:
+        j = int(m[1])
+        return literal[j] if j in literal else f"{{{list(selected).index(j)}}}"
+
+    return re.sub(r"\{(\d+)\}", number, template)
+
+
 def _select(
     key: str, values: list[list[int | float]], indices: Sequence[int] | Mapping[str, Sequence[int]] | None
 ) -> list[list[int | float]]:
@@ -398,7 +428,9 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
                     template = placeholder_template(desc, resolve)
             except ValueError as exc:
                 raise DataSchemaError(f"Infobulle du talent {key} (sort {spell}, rang {rank}) : {exc}.") from exc
-        ranks = _select(key, values, rules.get("rank_variables", {}).get(key))
+        spec = rules.get("rank_variables", {}).get(key)
+        ranks = _select(key, values, spec)
+        template = rank_template(template, values, _selected_indices(spec, len(values[0]) if values else 0))
         talents[int(node["ID"])] = {
             "key": key,
             "name": name,
@@ -410,7 +442,7 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "ranks": ranks,
             "tooltip_values": values,
             "desc": desc,
-            "desc_template": template,  # 70450 : gabarit du dépôt ({i}) d'un talent ajouté par la fusion
+            "desc_template": template,  # 70450 : gabarit du dépôt ({i} : valeurs de `ranks`) ; None : aucun
             "spellIds": [spell],
             "prereq": None,
             "certainty": f"FC-{version}",

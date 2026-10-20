@@ -162,7 +162,7 @@
        70
       ]
      ],
-     "desc": "Gives you a {0}% chance to avoid interruption caused by damage while channeling Arcane Missiles and a {1}% chance while casting Arcane Blast.",
+     "desc": "Gives you a {0}% chance to avoid interruption caused by damage while channeling Arcane Missiles and a {1}% chance while casting Arcane Blast or Arcane Wrath.",
      "spellIds": [
       11237,
       12463,
@@ -227,7 +227,7 @@
        0.5
       ]
      ],
-     "desc": "Gives your Arcane Blast spell a {0}% chance, and your Fireball, Frostbolt, and Frostfire Bolt spells a {1}% chance to reduce the channeled duration of your next Arcane Missiles spell by {2}%, reduce the Mana cost by {3}%, and missiles will fire every {4} sec.",
+     "desc": "Gives your Arcane Blast spell a {0}% chance, your Arcane Missile hits a {1}% chance, and your Arcane Wrath, Fireball, Frostbolt, and Frostfire Bolt spells a {2}% chance to reduce the channeled duration of your next Arcane Missiles spell by {3}%, reduce the Mana cost by {4}%, and missiles fire every {5} sec.",
      "spellIds": [
       44404
      ],
@@ -566,7 +566,7 @@
        15
       ]
      ],
-     "desc": "Blasts the target with energy, dealing {0} to {1} Arcane damage. Each time you cast Arcane Blast, the damage of all your other spells is increased by {2}% and the mana cost of Arcane Blast is increased by {3}%. Effect stacks up to {4} times and lasts {5} sec or until any other damage spell is cast.",
+     "desc": "Blasts the target with energy, dealing {0} to {1} Arcane damage. Each time you cast Arcane Blast, you gain {2}% of your Intellect as Spell Damage and the mana cost of Arcane Blast is increased by {3}%. Effect stacks up to {4} times and lasts {5} sec from time of initial application.",
      "spellIds": [
       30451
      ],
@@ -1562,7 +1562,7 @@
        3
       ]
      ],
-     "desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within {0} sec by {1}%, stacking up to {2} times.",
+     "desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within {0} sec by {1}%, stacking up to {2} times. Fire Blast grants an additional stack every time it deals damage.",
      "spellIds": [
       44445
      ],
@@ -1773,7 +1773,7 @@
        12
       ]
      ],
-     "desc": "Increases the damage done by your Fire spells by {0}%.",
+     "desc": "Increases the damage done by your Fire spells by {0}% per your Fire effects on the target, up to a maximum increase of {1}%. Effects which mix multiple schools of magic do not qualify.",
      "spellIds": [
       11124,
       12378,
@@ -1928,7 +1928,7 @@
        0.5
       ]
      ],
-     "desc": "Reduces the casting time of your Frostbolt spell by {0} sec.",
+     "desc": "Reduces the casting time of your Frostbolt and Frost Blast spells by {0} sec.",
      "spellIds": [
       11070,
       12473,
@@ -2443,7 +2443,7 @@
        20
       ]
      ],
-     "desc": "Increases the range of your Frostbolt and Blizzard spells and the radius of your Frost Nova and Cone of Cold spells by {0}%.",
+     "desc": "Increases the range of your Frostbolt, Frost Blast, and Blizzard spells and the radius of your Frost Nova and Cone of Cold spells by {0}%.",
      "spellIds": [
       16757,
       16758
@@ -2735,7 +2735,7 @@
        5
       ]
      ],
-     "desc": "Gives your frost damage spells a {0}% chance to apply the Winter's Chill effect, which increases the chance your Ice Lance and Frostbolt spells will critically hit the target by 2% for 15 sec. Stacks up to {1} times.",
+     "desc": "Gives your Frost damage spells a {0}% chance to apply the Winter's Chill effect, which increases the damage done by your Cone of Cold spell to the target by 40%, stacking up to {1} times.",
      "spellIds": [
       11180,
       28592,

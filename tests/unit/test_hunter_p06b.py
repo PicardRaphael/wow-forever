@@ -36,6 +36,7 @@ def make_deps(make_deps_at_pre_70450_version):
     """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
     return make_deps_at_pre_70450_version
 
+
 PETS = read_json(DATA_DIR / PRE_70450_VERSION / "pets.json")
 PET_RULES = read_json(DATA_DIR / PRE_70450_VERSION / "pet_rules.json")
 CONTEXTS = FIXTURES / "bridge" / "contexts"

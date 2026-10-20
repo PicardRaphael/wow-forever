@@ -95,8 +95,8 @@ def _expression(body: str, resolve: Resolver) -> float:
 
 
 def _tokens(template: str, resolve: Resolver) -> Iterator[tuple[int, int, list[int | float], str]]:
-    """Variables de l'infobulle dans l'ordre d'apparition : (début, fin, valeurs affichées, texte affiché à la place
-    pour `$lsingulier:pluriel;`, vide sinon)."""
+    """Variables de l'infobulle dans l'ordre d'apparition : (début, fin, valeurs affichées, texte affiché après les
+    valeurs : le pluriel de `$lsingulier:pluriel;` sans valeur, « sec » après une durée `$d`)."""
     i = 0
     while (start := template.find("$", i)) != -1:
         token = start
@@ -127,7 +127,8 @@ def _tokens(template: str, resolve: Resolver) -> Iterator[tuple[int, int, list[i
         if not var:
             raise ValueError(f"motif d'infobulle non pris en charge : {template[start : start + 12]}")
         i = start + 1 + var.end()
-        yield token, i, [normalize(abs(v) / divisor) for v in _values(resolve, var[1], var[2], var[3])], ""
+        unit = " sec" if var[2] == "d" else ""  # le client affiche une durée en secondes avec son unité
+        yield token, i, [normalize(abs(v) / divisor) for v in _values(resolve, var[1], var[2], var[3])], unit
 
 
 def tooltip_values(template: str, resolve: Resolver) -> list[int | float]:
@@ -137,13 +138,13 @@ def tooltip_values(template: str, resolve: Resolver) -> list[int | float]:
 
 def placeholder_template(template: str, resolve: Resolver) -> str:
     """Infobulle au gabarit du dépôt : la i-ème valeur de `tooltip_values` devient `{i}`, une variable à variance
-    (minimum et maximum) `{i} to {i+1}` comme l'affiche le client, `$lsingulier:pluriel;` son pluriel (70450 : talent
-    ajouté par la fusion)."""
+    (minimum et maximum) `{i} to {i+1}` comme l'affiche le client, une durée `$d` `{i} sec`, `$lsingulier:pluriel;`
+    son pluriel (70450 : talent ajouté par la fusion)."""
     out: list[str] = []
     i = n = 0
     for start, end, values, text in _tokens(template, resolve):
         out.append(template[i:start])
-        out.append(" to ".join(f"{{{n + k}}}" for k in range(len(values))) if values else text)
+        out.append(" to ".join(f"{{{n + k}}}" for k in range(len(values))) + text if values else text)
         n += len(values)
         i = end
     out.append(template[i:])
