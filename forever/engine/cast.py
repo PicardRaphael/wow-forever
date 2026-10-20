@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from forever.engine.casting import cast_time
 from forever.engine.crit import crit_chance, crit_mult
-from forever.engine.damage import dmg_mult, dot_sp_per_tick, fire_effects_steady, spell_power
+from forever.engine.damage import CONE_OF_COLD, dmg_mult, dot_sp_per_tick, fire_effects_steady, spell_power
 from forever.engine.hit import hit_chance
 from forever.engine.mana import clearcast_cost_factor, mana_cost
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, CastEstimate, Character, GameData, Points
@@ -61,6 +61,8 @@ def expected_cast(
     ):
         buffs = {**(buffs or {}), "fire_effects": fire_effects_steady(gd, pts, crit=crit)}  # 70450 : analytique
     dm = dmg_mult(gd, school, pts, buffs, key=key, rules=rules) * (1 + ch.racial_dmg)  # 70450 : Eureka! (G1)
+    if key == CONE_OF_COLD and wc_stacks and gd.constants.cone_of_cold_per_winters_chill_stack:
+        dm *= 1 + gd.constants.cone_of_cold_per_winters_chill_stack * wc_stacks  # 70450 : Winter's Chill (D4)
     sp = spell_power(ch, buffs)
     c = coefficient(gd, key, r, rules=rules, low_level_penalty=low_level_penalty)
     base = (r.damage_min + r.damage_max) / 2.0 + c * sp

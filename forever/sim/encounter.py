@@ -94,6 +94,8 @@ ENCOUNTER_ROTATIONS = ("frost", "fire", "arcane", "aoe")  # aoe : paquet (sorts 
 AOE_FILLERS = ("arcane_explosion", "blizzard", "flamestrike")  # sort de zone de remplissage de la rotation aoe
 AOE_COOLDOWNS = ("blast_wave", "cone_of_cold")  # sorts de zone à recharge, lancés dès qu'ils sont prêts
 MAIN = {"frost": "frostbolt", "fire": "fireball", "arcane": "arcane_blast"}
+# 70450 : Winter's Chill posé par les sorts de Givre de dégâts (description du client), Cone of Cold mis à part
+WC_SPELLS_CONE = ("frostbolt", "frost_blast", "ice_lance", "blizzard", "frost_nova")
 OPTIONS = (
     "armor",
     "ab_stacks",
@@ -605,7 +607,12 @@ def encounter_fight(
                 frozen_until[tgt] = end + frostbite_freeze_s(gd)
             if fof_p and rng.random() < fof_p:
                 s["fof"] = fof_n
-        if key in ("frostbolt", "frost_blast", "ice_lance") and total[2] and wc_max and rng.random() < wc_p:
+        cone = gd.constants.cone_of_cold_per_winters_chill_stack
+        if cone and key == "cone_of_cold":  # 70450 : Cone of Cold consomme les cumuls de Winter's Chill (D4)
+            for i in hit_targets:
+                wc[i] = 0
+        wc_spells = WC_SPELLS_CONE if cone else ("frostbolt", "frost_blast", "ice_lance")
+        if key in wc_spells and total[2] and wc_max and rng.random() < wc_p:
             wc[tgt] = min(wc_max, wc[tgt] + 1)
         if clearcast and total[2] and rng.random() < clearcast:
             s["cc"] = True
