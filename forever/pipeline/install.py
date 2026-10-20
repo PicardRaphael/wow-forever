@@ -267,7 +267,10 @@ class _Merge:
             former = [*out.get("former_names", []), old_name]
             self.add(TALENTS, f"{key}.former_names", out.get("former_names"), former, why, "certain", "confirmed")
             out["former_names"] = former
-        for f, new in (("name", c.get("name")), ("name_fr", c.get("name_fr", "")), ("desc", rename.get("desc"))):
+        desc = rename.get("desc")
+        if desc is not None and desc == c.get("desc") and "desc_template" in c:
+            desc = c["desc_template"]  # infobulle brute du client citée par la décision : gabarit du dépôt ({i})
+        for f, new in (("name", c.get("name")), ("name_fr", c.get("name_fr", "")), ("desc", desc)):
             if new is not None and out.get(f) != new:
                 self.add(TALENTS, f"{key}.{f}", out.get(f), new, why, "certain", "confirmed")
                 out[f] = new

@@ -3414,6 +3414,145 @@
      "key": "predatoryInstincts"
     }
    ]
+  },
+  {
+   "revision": 3,
+   "date": "2026-10-20",
+   "motif": "70450 r3 : gabarit {i} du dépôt pour Arcane Wrath (talent ajouté en r1) et Wake of Fire renommé (infobulle brute du client) ; sans correctifs du serveur",
+   "command": "forever install ~/AppData/Local/Temp/claude/C--Users-rapha-Documents-wow-forever/e023bd1e-0fc5-48fe-8864-2e5448fc288b/scratchpad/cand70450r3 --yes",
+   "candidate": {
+    "path": "~/AppData/Local/Temp/claude/C--Users-rapha-Documents-wow-forever/e023bd1e-0fc5-48fe-8864-2e5448fc288b/scratchpad/cand70450r3",
+    "data_sha": "ee1c792fd7ea"
+   },
+   "report": "docs/research/data-1.60.1.70450-r3.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 4,
+    "added_file": 0,
+    "replaced_file": 1,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 0,
+    "rules": 0
+   },
+   "changes": [
+    {
+     "file": "talents.json",
+     "path": "arcaneWrath.desc",
+     "before": "Launches a projectile of pure Arcane energy at the enemy target, causing $s1 Arcane damage. This spell gains additional Spell Damage equal to $s2% of your maximum Mana.",
+     "after": "Launches a projectile of pure Arcane energy at the enemy target, causing {0} to {1} Arcane damage. This spell gains additional Spell Damage equal to {2}% of your maximum Mana.",
+     "source": "client 1.60.1.70450, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "wakeOfFire.desc",
+     "before": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards.",
+     "after": "Reduces the cooldown of your Fire Blast spell by {0} sec and increases its range by {1} yards.",
+     "source": "client 1.60.1.70450, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "wakeOfFire.source",
+     "before": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-20",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards.",
+      "client_key": "improvedFireBlast"
+     },
+     "after": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-20",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards."
+     },
+     "source": "client 1.60.1.70450, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "hotStreak.source",
+     "before": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-20",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage.",
+      "client_key": "heatingUp"
+     },
+     "after": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-20",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage."
+     },
+     "source": "client 1.60.1.70450, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": "22bc0741a605",
+     "after": "9bade1f03863",
+     "source": "Client 1.60.1.70450 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 30,
+     "source": "observation",
+     "certainty": "certain",
+     "carried": true,
+     "carried_from": "révision 2",
+     "date": "2026-10-02",
+     "revision": 1
+    }
+   },
+   "renamed_in_classes": [
+    {
+     "class": "Mage",
+     "client_key": "improvedFireBlast",
+     "key": "wakeOfFire"
+    },
+    {
+     "class": "Mage",
+     "client_key": "heatingUp",
+     "key": "hotStreak"
+    },
+    {
+     "class": "Shaman",
+     "client_key": "trialByFire",
+     "key": "improvedFireNova"
+    },
+    {
+     "class": "Druid",
+     "client_key": "naturalInstinct",
+     "key": "predatoryInstincts"
+    }
+   ]
   }
  ]
 }

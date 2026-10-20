@@ -746,7 +746,7 @@
        5
       ]
      ],
-     "desc": "Launches a projectile of pure Arcane energy at the enemy target, causing $s1 Arcane damage. This spell gains additional Spell Damage equal to $s2% of your maximum Mana.",
+     "desc": "Launches a projectile of pure Arcane energy at the enemy target, causing {0} to {1} Arcane damage. This spell gains additional Spell Damage equal to {2}% of your maximum Mana.",
      "spellIds": [
       1326079
      ],
@@ -999,7 +999,7 @@
        15
       ]
      ],
-     "desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards.",
+     "desc": "Reduces the cooldown of your Fire Blast spell by {0} sec and increases its range by {1} yards.",
      "spellIds": [
       11078,
       11080
