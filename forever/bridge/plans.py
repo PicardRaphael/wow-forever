@@ -328,11 +328,14 @@ def button_plan(
             args["opponent_level"] = r.target_level
         read = (
             (
-                f"Fiche de {r.target_class} face à ton personnage, en 600 caractères au plus, mise en forme comprise, et "
-                "en 5 lignes « - » au plus, sans titre : ses deux menaces principales (`threats`, catégorie de "
-                "rendement décroissant), tes deux meilleures réponses (`answers`), ses réponses (`their_answers`), la "
-                "fenêtre à saisir (`windows`) ; une seule ligne pour ce qui manque (`missing`), s'il manque quelque "
-                "chose. Noms des sorts seulement : ni rang, ni durée, ni recharge."
+                f"{r.target_class} face à ton personnage (bloc 6b, décision 281), en 1200 caractères au plus, mise en "
+                "forme comprise, sans titre. Commence par « Comment jouer contre lui » : trois à cinq consignes "
+                "concrètes, dans l'ordre du combat (ouverture, ses menaces, tes réponses, la fenêtre à saisir), avec "
+                "tes sorts, tirées seulement de ses menaces (`threats`), de tes réponses (`answers`), de ses réponses "
+                "(`their_answers`) et des fenêtres (`windows`) : aucune règle inventée. Puis le détail, en mots de "
+                "joueur : chaque sort nommé avec ce qu'il fait en quelques mots ; « rendement décroissant » expliqué "
+                "en une phrase la première fois. Une seule ligne pour ce qui manque (`missing`), s'il manque quelque "
+                "chose ; la certitude de la fiche en fin de réponse. Noms des sorts : ni rang, ni durée, ni recharge."
             ),
         )
         return Plan(key, (Call("forever_lookup", args),), read)

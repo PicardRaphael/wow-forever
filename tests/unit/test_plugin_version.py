@@ -57,7 +57,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.15.0 : équipement (forever_gear : poids du Mage, liste BiS personnelle, leveling, amélioration), routeur.
     # 0.15.1 : réponse compacte de forever_route par défaut (`detail=True` pour le plan entier), forever-routes.
     # 0.15.2 : « équipement au niveau N » : forever_gear leveling seul, jamais route (routeur ; essai CJ-6).
-    assert version == "0.15.2"
+    # 0.15.3 : cas du bouton PvP régénéré (« Comment jouer contre lui » puis le détail, 1200 caractères, décision 281).
+    assert version == "0.15.3"
 
 
 def test_fingerprint_is_up_to_date():

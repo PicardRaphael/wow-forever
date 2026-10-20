@@ -28,7 +28,7 @@ Cible (joueur) : Shaman, niveau 21, race Tauren
 Consigne du bouton « pvp » : appelle exactement, dans cet ordre :
 - forever_lookup {"kind": "pvp", "name": "Mage", "level": 19, "race": "Orc", "talents": "elementalPrecision=5,improvedFrostbolt=5", "opponent": "Shaman", "opponent_level": 21}
 Puis :
-- Fiche de Shaman face à ton personnage, en 600 caractères au plus, mise en forme comprise, et en 5 lignes « - » au plus, sans titre : ses deux menaces principales (`threats`, catégorie de rendement décroissant), tes deux meilleures réponses (`answers`), ses réponses (`their_answers`), la fenêtre à saisir (`windows`) ; une seule ligne pour ce qui manque (`missing`), s'il manque quelque chose. Noms des sorts seulement : ni rang, ni durée, ni recharge.
+- Shaman face à ton personnage (bloc 6b, décision 281), en 1200 caractères au plus, mise en forme comprise, sans titre. Commence par « Comment jouer contre lui » : trois à cinq consignes concrètes, dans l'ordre du combat (ouverture, ses menaces, tes réponses, la fenêtre à saisir), avec tes sorts, tirées seulement de ses menaces (`threats`), de tes réponses (`answers`), de ses réponses (`their_answers`) et des fenêtres (`windows`) : aucune règle inventée. Puis le détail, en mots de joueur : chaque sort nommé avec ce qu'il fait en quelques mots ; « rendement décroissant » expliqué en une phrase la première fois. Une seule ligne pour ce qui manque (`missing`), s'il manque quelque chose ; la certitude de la fiche en fin de réponse. Noms des sorts : ni rang, ni durée, ni recharge.
 
 Question posée par le bouton « pvp » de la fenêtre :
 Fiche de la classe de ma cible

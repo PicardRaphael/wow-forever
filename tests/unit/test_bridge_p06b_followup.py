@@ -60,6 +60,7 @@ def test_pvp_guide_asks_a_short_answer(make_deps):
     ctx = dict(line.split("=", 1) for line in text.split("\n") if "=" in line)
     plan = button_plan("pvp", resolve(data, ctx), data.level_cap)
     guide = " ".join(plan.read)
-    assert "600 caractères au plus" in guide and "5 lignes" in guide
+    # décision 281 (bloc 6b) : « Comment jouer contre lui » puis le détail, la limite passe de 600 à 1200 caractères
+    assert "1200 caractères au plus" in guide
     for key in ("threats", "answers", "their_answers", "windows", "missing"):
         assert f"`{key}`" in guide
