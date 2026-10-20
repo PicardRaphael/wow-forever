@@ -1,6 +1,7 @@
 """Valeurs dérivées des talents à cumuls (T06b, décision D4) : effet de chaque cumul, de 0 au maximum du rang, pour
 que les outils rendent les tables que le modèle calculait (coût d'Arcane Blast, bonus aux autres sorts, critique de
-Winter's Chill, incantation de Pyroblast sous Hot Streak). Chiffres : variables des talents (`talents.json`) et
+Winter's Chill, incantation de Pyroblast sous Hot Streak ; 70450 : puissance des sorts d'Arcane Blast, bonus de Cone of
+Cold de Winter's Chill). Chiffres : variables des talents (`talents.json`) et
 constantes de `mechanics.json`, par les fonctions du moteur."""
 
 from __future__ import annotations
@@ -8,13 +9,13 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import TypedDict
 
-from forever.engine.buffs import DMG_PER_STACK, HOT_STREAK, HS_CAST_PCT, HS_MAX_STACKS, MAX_STACKS
+from forever.engine.buffs import DMG_PER_STACK, HOT_STREAK, HS_CAST_PCT, HS_MAX_STACKS, INTELLECT_SP, MAX_STACKS
 from forever.engine.buffs import TALENT as ARCANE_BLAST
 from forever.engine.character import character
 from forever.engine.crit import winters_chill_crit
 from forever.engine.mana import arcane_blast_cost
 from forever.engine.model import GameData
-from forever.engine.talents import talent_value
+from forever.engine.talents import talent_model, talent_value
 
 WINTERS_CHILL = "wintersChill"
 WC_MAX_STACKS = 1  # 2e variable du rang de Winter's Chill : cumuls maximum
@@ -82,12 +83,22 @@ def _arcane_blast(gd: GameData, rank: int, level: int | None) -> list[StackTable
         ARCANE_BLAST, rank, "arcane_blast_cost", "% du mana de base", top, pct, level, mana if level else None
     )
     bonus = talent_value(gd, pts, ARCANE_BLAST, DMG_PER_STACK)
+    if talent_model(gd, ARCANE_BLAST) == INTELLECT_SP:  # 70450 : puissance des sorts selon l'Intelligence
+        power = _table(
+            ARCANE_BLAST, rank, "intellect_spell_power", "% de l'Intelligence en puissance des sorts", top,
+            lambda n: n * bonus,
+        )  # fmt: skip
+        return [cost, power]
     damage = _table(ARCANE_BLAST, rank, "other_spells_damage", "% de dégâts", top, lambda n: n * bonus)
     return [cost, damage]
 
 
 def _winters_chill(gd: GameData, rank: int) -> list[StackTable]:
     top = int(talent_value(gd, {WINTERS_CHILL: rank}, WINTERS_CHILL, WC_MAX_STACKS))
+    cone = gd.constants.cone_of_cold_per_winters_chill_stack
+    if cone > 0:  # 70450 : l'aura renforce Cone of Cold, plus aucun critique (D4)
+        return [_table(WINTERS_CHILL, rank, "cone_of_cold_damage", "fraction de dégâts de Cone of Cold", top,
+                       lambda n: n * cone)]  # fmt: skip
     return [_table(WINTERS_CHILL, rank, "crit", "fraction de critique", top, lambda n: winters_chill_crit(gd, n))]
 
 

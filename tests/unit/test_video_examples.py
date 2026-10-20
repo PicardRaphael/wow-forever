@@ -55,7 +55,8 @@ def test_fixture_is_marked_as_community_source():
 
 
 @pytest.mark.parametrize("e", INCLUDED, ids=[e["id"] for e in INCLUDED])
-def test_video_example(game_data, e):
+def test_video_example(game_data_at_pre_70450_version, e):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     normal, crit, _ = engine(game_data, e)
     assert abs(normal - e["normal"]) <= TOL, (e["id"], normal)
     if "crit" in e:
@@ -63,9 +64,10 @@ def test_video_example(game_data, e):
 
 
 @pytest.mark.parametrize("e", EXCLUDED, ids=[e["id"] for e in EXCLUDED])
-def test_video_rounding_gap(game_data, e):
+def test_video_rounding_gap(game_data_at_pre_70450_version, e):
     """Écart hors tolérance, expliqué par l'arrondi seul : avec les bornes tronquées du tableur (`sheet_bounds`) à la
     place des bornes du moteur (demi supérieur, G7), la même formule redonne la valeur de la vidéo à ±0,5."""
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     normal, _, est = engine(game_data, e)
     gap = normal - e["normal"]
     assert abs(gap) > TOL

@@ -114,7 +114,8 @@ def test_level_weight_is_zero_at_the_cap(game_data):
     assert level_weight(game_data, 10) > 0
 
 
-def test_build_choices(game_data):
+def test_build_choices(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert build_choices(game_data, 20, {}, rules="seed") == [BuildChoice("frost"), BuildChoice("fire")]
     quick = build_choices(game_data, 40, ARC40)
     assert {c.rotation for c in quick} == {"frost", "fire", "arcane"}

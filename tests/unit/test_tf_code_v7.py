@@ -19,6 +19,7 @@ def make_deps(make_deps_at_pre_70450_version):
     """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
     return make_deps_at_pre_70450_version
 
+
 CLASSES = DATA_DIR / PRE_70450_VERSION / "classes.json"
 PLAN = TfPlan("mage", 20, ((1, 0), (0, 2), (0,)), None)  # une position par talent de la disposition MAX
 MAX = ((3, 2), (5, 2), (1,))

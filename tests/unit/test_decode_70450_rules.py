@@ -130,7 +130,6 @@ def test_decoded_talents_carry_the_repository_template(candidate):
     assert checked > 0
 
 
-
 def test_rank_template_numbers_the_selected_values():
     """Gabarit tiré des variables de l'infobulle ramené aux valeurs retenues (`rank_variables`) : une variable retenue
     garde sa place dans `ranks`, une variable constante non retenue s'écrit en clair ; non constante, pas de gabarit

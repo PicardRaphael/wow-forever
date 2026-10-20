@@ -29,7 +29,8 @@ MS = 1000  # conversion d'unité
 # --- Audit des mécaniques -------------------------------------------------------------------------
 
 
-def test_arcane_blast_talent_matches_the_client_aura(game_data, client_tables):
+def test_arcane_blast_talent_matches_the_client_aura(game_data_at_pre_70450_version, client_tables):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     aura = next(r for r in client_tables["SpellAuraOptions"] if r["SpellID"] == ARCANE_BLAST_AURA)
     misc = next(r for r in client_tables["SpellMisc"] if r["SpellID"] == ARCANE_BLAST_AURA)
     duration = next(r["Duration"] for r in client_tables["SpellDuration"] if r["ID"] == misc["DurationIndex"])
@@ -37,7 +38,8 @@ def test_arcane_blast_talent_matches_the_client_aura(game_data, client_tables):
     assert talent_value(game_data, B20, "arcaneBlast", 5) == duration / MS
 
 
-def test_any_other_damage_spell_consumes_the_arcane_blast_aura(game_data):
+def test_any_other_damage_spell_consumes_the_arcane_blast_aura(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     aura = ArcaneBlastAura(3, 10.0)
     assert arcane_blast_after_spell(game_data, B20, aura, 5.0, "frostbolt") is None
     assert arcane_blast_after_spell(game_data, B20, aura, 5.0, "arcane_blast") == ArcaneBlastAura(4, 13.0)

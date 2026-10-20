@@ -70,7 +70,8 @@ def test_dot_ticks_do_not_crit_when_the_rule_says_so(game_data):
     assert slower > kill_analytic(game_data, 6, {}, "Orc", "fire", **SEED_MODE)["combat"]
 
 
-def test_engine_helpers(game_data):
+def test_engine_helpers(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     lv, mm = game_data.leveling, game_data.mob_model
     frostbolt = game_data.spells["frostbolt"].ranks[0]
     ch = character(game_data, 10)

@@ -103,8 +103,11 @@ def test_talent_spell_requires_talent(game_data, ch):
     assert r is not None and r.position == 1
 
 
-def test_ice_lance_frozen_multiplier(game_data, ch):
-    """Ice Lance contre cible gelée : dégâts de base × frozen_mult du sort (4.0 dans spells.json), ignoré si demandé."""
+def test_ice_lance_frozen_multiplier(game_data_at_pre_70450_version):
+    """Ice Lance contre cible gelée : dégâts de base × frozen_mult du sort (4.0 dans spells.json d'avant 1.60.1.70450,
+    qui le lit dans le talent : conftest), ignoré si demandé."""
+    game_data = game_data_at_pre_70450_version
+    ch = character(game_data, 60, "Orc", {"sp": 500, "spell_crit": 0.10})
     pts = {"iceLance": 1}
     free = expected_cast(game_data, "ice_lance", 60, pts, ch)
     frozen = expected_cast(game_data, "ice_lance", 60, pts, ch, frozen=True)

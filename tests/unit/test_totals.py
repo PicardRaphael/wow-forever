@@ -95,7 +95,8 @@ def test_text_output_gives_the_total(reports):
     assert "Talents : 11 point(s) sur 11" in "\n".join(render_build(rep))
 
 
-def test_arcane_blast_cost_by_stack(game_data):
+def test_arcane_blast_cost_by_stack(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     tables = stack_tables(game_data, "arcaneBlast")
     cost = table(tables, "arcaneBlast", "arcane_blast_cost")
     assert [r["stacks"] for r in cost["rows"]] == [0, 1, 2, 3, 4]
@@ -111,7 +112,8 @@ def test_arcane_blast_cost_by_stack(game_data):
     assert [r["value"] for r in damage["rows"]] == pytest.approx(AB_DAMAGE_PCT, rel=1e-12)
 
 
-def test_winters_chill_crit_by_stack_and_rank(game_data):
+def test_winters_chill_crit_by_stack_and_rank(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert winters_chill_crit(game_data, 5) == pytest.approx(0.10, rel=1e-12)
     tables = stack_tables(game_data, "wintersChill")
     assert [t["rank"] for t in tables] == [1, 2, 3, 4, 5]
@@ -127,7 +129,10 @@ def test_hot_streak_by_stack(game_data):
     assert stack_tables(game_data, "improvedFrostbolt") == []
 
 
-def test_explain_mechanic_gives_derived_values(deps):
+def test_explain_mechanic_gives_derived_values(data_at_pre_70450_version, tmp_path):
+    deps = isolated_deps(
+        tmp_path, data_at_pre_70450_version
+    )  # ancien sens : version d'avant la refonte de 70450 (conftest)
     b11 = explain_mechanic(deps, "B11", level=40)
     cost = table(b11["derived"], "arcaneBlast", "arcane_blast_cost")
     assert [r["value"] for r in cost["rows"]] == pytest.approx(AB_COST_PCT, rel=1e-12)
@@ -150,7 +155,10 @@ def test_explain_by_alias(deps, name, mechanic):
     assert explain_mechanic(deps, name)["id"] == mechanic
 
 
-def test_lookup_talent_gives_derived_values(deps):
+def test_lookup_talent_gives_derived_values(data_at_pre_70450_version, tmp_path):
+    deps = isolated_deps(
+        tmp_path, data_at_pre_70450_version
+    )  # ancien sens : version d'avant la refonte de 70450 (conftest)
     wc = lookup_talent(deps, "Winter's Chill")
     assert [t["rank"] for t in wc["derived"]] == [1, 2, 3, 4, 5]
     assert lookup_talent(deps, "Winter's Chill", rank=5)["derived"][0]["at_max"] == pytest.approx(0.10, rel=1e-12)

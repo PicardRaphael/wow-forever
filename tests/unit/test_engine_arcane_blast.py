@@ -62,7 +62,8 @@ def test_max_stacks_come_from_the_talent(game_data):
     assert arcane_blast_max_stacks(game_data, {}) == 0
 
 
-def test_stacks_are_capped_and_expire(game_data):
+def test_stacks_are_capped_and_expire(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     aura = None
     for t in range(5):  # cinq Arcane Blast à 0, 1, 2, 3 et 4 s
         aura = arcane_blast_after_cast(game_data, B20, aura, float(t))
@@ -73,7 +74,8 @@ def test_stacks_are_capped_and_expire(game_data):
     assert arcane_blast_after_cast(game_data, B20, aura, 13.0) == ArcaneBlastAura(1, 21.0)
 
 
-def test_bonus_applies_to_other_spells_only(game_data):
+def test_bonus_applies_to_other_spells_only(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert arcane_blast_bonus(game_data, B20, 3, for_spell="frostbolt")["dmg"] == pytest.approx(0.3, rel=1e-12)
     assert arcane_blast_bonus(game_data, B20, 3, for_spell="arcane_blast") == {}
     assert arcane_blast_bonus(game_data, B20, 0, for_spell="frostbolt") == {}
@@ -90,7 +92,8 @@ def test_analytic_cycle_pays_the_growing_cost(game_data, stacks, factor):
     assert cycle["ab_mana"] == pytest.approx(_base_cost(game_data, 24, B24) * factor, rel=1e-12)
 
 
-def test_analytic_mana_and_rest_grow_with_the_stacks(game_data):
+def test_analytic_mana_and_rest_grow_with_the_stacks(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     runs = [kill_analytic(game_data, 24, B24, rotation="arcane", ab_stacks=n) for n in range(5)]
     mana = [r["mana"] for r in runs]
     down = [r["downtime"] for r in runs]
@@ -119,9 +122,10 @@ def _fight_log(gd, level, pts, seed, fights=5, **options):
     return out
 
 
-def test_monte_carlo_pays_each_cast_at_its_stack_cost(game_data):
+def test_monte_carlo_pays_each_cast_at_its_stack_cost(game_data_at_pre_70450_version):
     """Sans Clearcasting (pas d'Arcane Concentration), sans régénération en combat (Frost Armor au niveau 24) et sans
     Master of Elements : la mana du combat est la somme des coûts relevés lancer par lancer."""
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     ch = character(game_data, 24)
     rank = best_rank(game_data, "arcane_blast", 24, B24)
     for res, log in _fight_log(game_data, 24, B24, seed=3):
@@ -160,7 +164,8 @@ def test_monte_carlo_is_reproducible(game_data):
 
 
 @pytest.mark.parametrize(("level", "pts"), [(24, B24), (30, B30)])
-def test_analytic_close_to_monte_carlo(game_data, level, pts):
+def test_analytic_close_to_monte_carlo(game_data_at_pre_70450_version, level, pts):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     m = mc(game_data, level, pts, "Orc", "arcane", 600)["total"]
     a = kill_analytic(game_data, level, pts, rotation="arcane")["total"]
     assert abs(a / m - 1) < 0.15, (level, round(m, 1), round(a, 1))

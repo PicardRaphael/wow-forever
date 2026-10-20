@@ -59,7 +59,8 @@ def test_scenarios_come_from_the_data(game_data):
 
 
 @pytest.mark.parametrize(("rotation", "pts", "opts"), ROTATIONS)
-def test_analytic_close_to_monte_carlo_on_a_single_target(game_data, rotation, pts, opts):
+def test_analytic_close_to_monte_carlo_on_a_single_target(game_data_at_pre_70450_version, rotation, pts, opts):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     a = encounter_analytic(game_data, "dungeon_boss", 40, pts, "Orc", rotation, NO_OOM, **opts)
     m = encounter_mc(game_data, "dungeon_boss", 40, pts, "Orc", rotation, 400, seed=1, over=NO_OOM, **opts)
     assert a["dps"] == pytest.approx(m.mean, rel=0.03), (a["dps"], m.mean)
@@ -136,7 +137,8 @@ def test_pack_rotation_uses_area_spells(game_data):
         assert filler in {c.key for c in f}
 
 
-def test_arcane_power_at_the_pull_then_at_each_cooldown(game_data):
+def test_arcane_power_at_the_pull_then_at_each_cooldown(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     on: list[EncounterLog] = []
     off: list[EncounterLog] = []
     opts = {"ab_dump": "arcane_missiles"}

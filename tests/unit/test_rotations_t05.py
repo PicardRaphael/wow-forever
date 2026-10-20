@@ -102,7 +102,8 @@ def _kill(gd, pts, ready, rng=None, log=None, **opts):
     )
 
 
-def test_arcane_power_raises_cost_and_damage_inside_the_window_only(game_data):
+def test_arcane_power_raises_cost_and_damage_inside_the_window_only(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     on, off = [], []
     _kill(game_data, ARC40, True, log=on)
     _kill(game_data, ARC40, False, log=off)
@@ -131,7 +132,8 @@ class CountingRandom(random.Random):
         return super().random()
 
 
-def test_arcane_power_draws_no_random_number(game_data):
+def test_arcane_power_draws_no_random_number(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     on, off = [], []
     r_on, r_off = CountingRandom(5, on), CountingRandom(5, off)
     _kill(game_data, ARC40, True, rng=r_on, log=on)
@@ -213,7 +215,8 @@ def _fire_log(gd, pts, seed, **opts):
     return log
 
 
-def test_pyroblast_enters_the_fire_rotation_after_enough_crits(game_data):
+def test_pyroblast_enters_the_fire_rotation_after_enough_crits(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     for n in (1, 2, 3):
         pyros = 0
         for seed in range(6):
@@ -247,7 +250,8 @@ def test_hot_streak_in_the_analytic_model(game_data):
 # --- Missile Barrage -------------------------------------------------------------------------------------------
 
 
-def test_missile_barrage_rules(game_data):
+def test_missile_barrage_rules(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert missile_barrage_chance(game_data, ARC40, "arcane_blast") == 0.40
     for key in ("fireball", "frostbolt", "frostfire_bolt"):
         assert missile_barrage_chance(game_data, ARC40, key) == 0.20
@@ -277,7 +281,8 @@ def test_missile_barrage_halves_the_dump_and_makes_it_free(game_data):
     assert all(d == full0 for d, _ in durations0)
 
 
-def test_missile_barrage_in_the_arcane_cycle(game_data):
+def test_missile_barrage_in_the_arcane_cycle(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     ch = character(game_data, 40, "Orc")
     with_mb = arcane_cycle(game_data, 40, ARC40, ch, ab_dump="arcane_missiles")
     without = arcane_cycle(game_data, 40, ARC40_NO_MB, ch, ab_dump="arcane_missiles")

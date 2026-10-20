@@ -21,6 +21,7 @@ def make_deps(make_deps_at_pre_70450_version):
     """Données de PRE_70450_VERSION : les arbres de l'addon fabriqué sont ceux de layout.json (conftest)."""
     return make_deps_at_pre_70450_version
 
+
 QUESTIE = FIXTURES / "questie" / "11.38.0"
 
 

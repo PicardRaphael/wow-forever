@@ -75,7 +75,8 @@ CHECKS = {
 
 
 @pytest.mark.parametrize("label", CHECKS)
-def test_mechanic_check(label, game_data):
+def test_mechanic_check(label, game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert CHECKS[label](game_data), f"mécanique inopérante : {label}"
 
 

@@ -62,7 +62,8 @@ def test_human_spirit_bonus(game_data):
     assert character(game_data, 60, "Human").spirit == approx(character(game_data, 60, "Orc").spirit * 1.05)
 
 
-def test_human_sword_crit(game_data):
+def test_human_sword_crit(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     human = character(game_data, 60, "Human").crit
     assert character(game_data, 60, "Human", {"sword": True}).crit == approx(human + 0.02)
     # l'épée ne sert qu'au racial humain

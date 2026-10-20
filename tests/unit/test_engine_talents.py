@@ -52,7 +52,8 @@ def test_points_available(game_data):
     assert points_available(game_data, 9, talented_bonus=1) == 1
 
 
-def test_legal_additions_tier_one(game_data):
+def test_legal_additions_tier_one(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert legal_additions(game_data, {}, 10) == [
         "wandSpecialization",
         "arcaneFocus",
@@ -75,7 +76,8 @@ def test_tree_split(game_data):
     assert tree_split(game_data, {}) == {"Arcane": 0, "Fire": 0, "Frost": 0}
 
 
-def test_talent_value(game_data):
+def test_talent_value(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert talent_value(game_data, {}, "improvedFrostbolt") == 0.0
     assert talent_value(game_data, {}, "improvedFrostbolt", default=-1.0) == -1.0
     assert talent_value(game_data, {"improvedFrostbolt": 3}, "improvedFrostbolt") == 0.3

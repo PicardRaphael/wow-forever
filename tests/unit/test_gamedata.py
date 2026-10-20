@@ -25,13 +25,15 @@ def edit_mechanics(data_dir, change):
     write_manifest(data_dir)  # modification voulue : l'intégrité reste valide, seul le schéma est en cause
 
 
-def test_trees(game_data):
-    assert Counter(t.tree for t in game_data.talents.values()) == {"Arcane": 18, "Fire": 17, "Frost": 19}
+def test_trees(game_data, game_data_at_pre_70450_version):
+    old = game_data_at_pre_70450_version  # nombre de talents d'avant 1.60.1.70450, qui ajoute Arcane Wrath (conftest)
+    assert Counter(t.tree for t in old.talents.values()) == {"Arcane": 18, "Fire": 17, "Frost": 19}
     assert game_data.trees == ("Arcane", "Fire", "Frost")
     assert game_data.game_version == LOCAL_VERSION
 
 
-def test_spell_ranks(game_data, seed_game_data):
+def test_spell_ranks(game_data_at_pre_70450_version, seed_game_data):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert len(game_data.spells) >= 15
     # Valeurs du seed (seed/forever-mage/data/1.60.1.70009/spells.json), lues dans ses copies figées : une nouvelle
     # version du jeu qui change ces rangs (1.60.1.70291 : rangs bas lissés) ne touche pas ce test.
@@ -49,7 +51,8 @@ def test_spell_ranks(game_data, seed_game_data):
     assert game_data.spells["frost_nova"].range_yd is None
 
 
-def test_talent_ranks(game_data):
+def test_talent_ranks(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     t = game_data.talents
     assert t["iceLance"].ranks == ((26, 30, 300),)
     assert [r[0] for r in t["improvedFrostbolt"].ranks] == [0.1, 0.2, 0.3, 0.4, 0.5]
@@ -70,14 +73,16 @@ def test_combat_rules(game_data):
     assert r.spell_miss_by_level_diff["-"] == 0.04
 
 
-def test_racials(game_data):
+def test_racials(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     assert game_data.racials.sword_crit["Human"] == 0.02
     assert game_data.racials.spirit_pct["Human"] == 0.05
     assert game_data.racials.mana_pct["Gnome"] == 0.05
     assert game_data.racials.sword_crit.get("Orc", 0.0) == 0.0
 
 
-def test_constants(game_data):
+def test_constants(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # ancien sens : version d'avant la refonte de 70450 (conftest)
     c = game_data.constants
     assert c.coefficients.cast_divisor == 3.5
     assert (c.coefficients.cast_min_s, c.coefficients.cast_max_s) == (1.5, 3.5)
