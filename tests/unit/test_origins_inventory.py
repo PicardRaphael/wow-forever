@@ -3,7 +3,7 @@
 
 import json
 
-from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, REPO_ROOT
+from conftest import DATA_DIR, LOCAL_VERSION, PREVIOUS_VERSION, REPO_DATA_DIR, REPO_ROOT
 
 from forever.cli import main
 from forever.origins import ORIGINS_NAME, inventory, inventory_payload, render_inventory
@@ -47,8 +47,11 @@ def test_pending_lowerings_come_first():
 
 
 def test_committed_inventory_is_up_to_date():
-    rows, pending = inventory(DATA_DIR, LOCAL_VERSION)
-    assert DOC.read_text(encoding="utf-8") == render_inventory(LOCAL_VERSION, rows, pending)
+    """Le rendu committé suit la version installée (la veille le réécrit avec chaque version, `forever update`), pas
+    la version figée des valeurs des tests (décision 291)."""
+    installed = json.loads((REPO_DATA_DIR / "manifest.json").read_text(encoding="utf-8"))["game_version"]
+    rows, pending = inventory(REPO_DATA_DIR, installed)
+    assert DOC.read_text(encoding="utf-8") == render_inventory(installed, rows, pending)
 
 
 def test_payload_counts():
