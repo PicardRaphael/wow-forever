@@ -174,7 +174,7 @@ TABLES: Mapping[str, tuple[Column, ...]] = {
     "LFGDungeons": _cols("ID:int Name_lang:str TypeID:int Faction:int ContentTuningID:int"),
     "ContentTuning": _cols("ID:int MinLevelSquish:int MaxLevelSquish:int LfgMinLevel:int LfgMaxLevel:int"),
     "DungeonEncounter": _cols("ID:int Name_lang:str MapID:int DifficultyID:int OrderIndex:int Flags:int"),
-    "AreaTable": _cols("ID:int AreaName_lang:str ContinentID:int ParentAreaID:int"),
+    "AreaTable": _cols("ID:int AreaName_lang:str ContinentID:int ParentAreaID:int FactionGroupMask:int"),
     # RX1, bloc B : trajets (decode_rules.json, travel).
     "TaxiNodes": _cols("ID:int Name_lang:str Pos_0:float Pos_1:float Pos_2:float ContinentID:int Flags:int"),
     "TaxiPath": _cols("ID:int FromTaxiNode:int ToTaxiNode:int Cost:int"),

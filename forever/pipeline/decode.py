@@ -2228,7 +2228,11 @@ def decode_version(
     # RX1, bloc B : trajets (travel_tables) : tables présentes (décodé) ou absentes (hérité de la base).
     travel_files = travel_table_files(rules)
     if travel_files and all((csv_dir / rel).is_file() for _, rel in travel_files):
-        travel_doc = decode_travel(load_travel_tables(csv_dir, rules), rules, version)
+        travel_tables = load_travel_tables(csv_dir, rules)
+        area = csv_dir / DEFAULT_LOCALE / "AreaTable.csv"
+        if area.is_file():  # décision 294 : camp de la zone de chaque carte (serveur JcJ)
+            travel_tables["AreaTable"] = list(read_table(area, "AreaTable"))
+        travel_doc = decode_travel(travel_tables, rules, version)
         decoded_classes[TRAVEL_FILE] = travel_doc
         extra_notes.append(f"{TRAVEL_FILE} : {travel_doc['notes'][0]}")
     inherited = {}

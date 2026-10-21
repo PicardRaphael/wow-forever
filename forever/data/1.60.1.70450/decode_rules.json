@@ -943,7 +943,11 @@
    "horde": 2
   },
   "teleport_flag": 1,
-  "note": "RX1, bloc B : camp d'un point de vol par TaxiNodes.Flags (bit Alliance, bit Horde : les deux = neutre, aucun = caché ; relevé sur 1.60.1.70338 : Stormwind 1025, Orgrimmar 1026, Ratchet 1027) ; segment de TaxiPathNode qui part d'un point au drapeau de téléportation exclu de la longueur d'un trajet"
+  "area_faction_masks": {
+   "alliance": 2,
+   "horde": 4
+  },
+  "note": "décision 294 (serveur JcJ) : camp de la zone d'une carte par AreaTable.FactionGroupMask (bit Alliance, bit Horde ; aucun = zone disputée, les deux = both ; sens relevé sur 1.60.1.70450 : Elwynn Forest 2, Durotar 4, Stranglethorn Vale 0, probable) ; RX1, bloc B : camp d'un point de vol par TaxiNodes.Flags (bit Alliance, bit Horde : les deux = neutre, aucun = caché ; relevé sur 1.60.1.70338 : Stormwind 1025, Orgrimmar 1026, Ratchet 1027) ; segment de TaxiPathNode qui part d'un point au drapeau de téléportation exclu de la longueur d'un trajet"
  },
  "talent_models": {
   "arcaneBlast": [

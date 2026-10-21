@@ -1277,6 +1277,16 @@
       "reason": "sens des drapeaux déduit des noms des points (relevé sur 1.60.1.70338), pas lu"
     },
     {
+      "file": "travel.json",
+      "paths": [
+        "/maps/*/territory"
+      ],
+      "origin": "client",
+      "source": "camp de la zone d'une carte par AreaTable.FactionGroupMask (bits de decode_rules.json travel.area_faction_masks)",
+      "certainty": "probable",
+      "reason": "sens des bits déduit des zones connues (Elwynn Forest, Durotar, Stranglethorn Vale, relevé sur 1.60.1.70450), pas lu"
+    },
+    {
       "file": "dungeons.json",
       "paths": [
         "**"
@@ -1563,7 +1573,7 @@
         112694
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1578,7 +1588,7 @@
         112753
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1594,7 +1604,7 @@
         112864
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1609,7 +1619,7 @@
         112864
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1628,7 +1638,7 @@
         112753
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1643,7 +1653,7 @@
         113024
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1658,7 +1668,7 @@
         112827
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1672,7 +1682,7 @@
         112833
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1686,7 +1696,7 @@
         112842
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1702,7 +1712,7 @@
         112844
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1717,7 +1727,7 @@
         112845
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1745,7 +1755,7 @@
         112864
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1759,7 +1769,7 @@
         112887
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1773,7 +1783,7 @@
         112901
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1788,7 +1798,7 @@
         112918
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1802,7 +1812,7 @@
         112976
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "classes.json",
@@ -1816,7 +1826,7 @@
         113046
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "races.json",
@@ -1834,7 +1844,7 @@
         112864
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "spell_scaling.json",
@@ -1850,7 +1860,7 @@
         112694
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "spell_scaling.json",
@@ -1865,7 +1875,7 @@
         112864
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "spell_scaling.json",
@@ -1882,7 +1892,7 @@
         112845
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "spells.json",
@@ -1896,7 +1906,7 @@
         112694
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "spells.json",
@@ -1910,7 +1920,7 @@
         112845
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "talents.json",
@@ -1925,7 +1935,7 @@
         112694
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "talents.json",
@@ -1940,7 +1950,7 @@
         112864
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "talents.json",
@@ -1958,7 +1968,7 @@
         112753
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "talents.json",
@@ -1972,7 +1982,7 @@
         112845
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     },
     {
       "file": "talents.json",
@@ -1987,7 +1997,7 @@
         112864
       ],
       "seen_at": null,
-      "dbcache_date": "2026-10-21T09:45:09Z"
+      "dbcache_date": "2026-10-21T12:50:20Z"
     }
   ],
   "pending": [],
