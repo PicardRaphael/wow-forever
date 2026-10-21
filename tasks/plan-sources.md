@@ -3,7 +3,9 @@
 Demande de l'utilisateur du 2026-10-21, prioritaire sur la suite du bloc 6b de CJ1. Plan écrit pour validation :
 **rien n'est construit avant son accord**.
 
-> Statut : **proposé, revu par l'advisor (§9), en attente de validation**.
+> Statut : **validé le 2026-10-21** (décisions 289 à 291). Fait : Piercing Ice et correctifs du serveur (révision 6 de
+> 70450, lus chez Raidbots, veille branchée sur Raidbots) ; lecture de Forever Guide avec ses deltas `ItemBuild`. En
+> cours : (a).
 
 ## 0. Constat et règle
 - Notre moteur maison casse à chaque refonte de classe : 229 tests rouges pour 1.60.1.70450 (8 vrais défauts, le

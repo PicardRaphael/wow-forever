@@ -209,6 +209,13 @@ correction passe devant le reste.
     Données installées **sans correctifs du serveur** (pas de session possible avant la sortie) : une fois connecté,
     `forever update status` dit l'écriture en attente ; la lancer, puis rejouer les builds
     (`scripts/replay_builds.py`) si elle change une valeur du Mage.
+    Correctifs lus chez Raidbots sans session (révision 6, décision 290, question HF1) : à ta première connexion, ton
+    propre `DBCache.bin` doit confirmer Piercing Ice absent de l'arbre du Givre, Elemental Precision à 3 rangs, Winter's
+    Chill (+5 % par cumul sur Cone of Cold) ; `forever lookup talent "Piercing Ice"` dit « probablement retiré ».
+    Le matin de la sortie, avant de jouer : `uv run forever hotfixes --raidbots` doit trouver le cache du build final ;
+    s'il répond « aucun cache vérifié », le nom du produit de la version finale n'est pas encore connu de
+    `raidbots_version()` (bêta : `wow_classic_beta` -> `classic_beta`) : me le dire, la veille passera alors par ton
+    propre cache.
 
 ### 6. Bloc 6b, ForeverBridge 0.6.0 (décision 281 ; 5 min)
 15. Bouton PvP, un joueur ennemi en cible : la réponse commence par « Comment jouer contre lui » (trois à cinq

@@ -82,3 +82,10 @@ Candidate : `~/AppData/Local/Temp/claude/C--Users-rapha-Documents-wow-forever/e0
 - talents.json : source (54)
 
 Provenance · version 1.60.1.70450 r5 · données cf5f94ca67d6 · générée 2026-10-21T06:55:35Z · fraîcheur fresh · certitude certain · registre 76/147 · hypothèses : candidate ~/AppData/Local/Temp/claude/C--Users-rapha-Documents-wow-forever/e023bd1e-0fc5-48fe-8864-2e5448fc288b/scratchpad/cand70450hf (données d845f6f505f8) sur la version 1.60.1.70450 r5
+
+## Note de provenance (2026-10-21)
+La règle de lecture `talent_models.missileBarrage` (`listed_spells`, correctif 112753) a été écrite dans
+`decode_rules.json` avant le décodage, comme le veut la décision 284 ; mais le script qui a ajouté les écarts confirmés
+a réécrit le manifeste (`write_manifest`) avant `forever install` : la révision 6 compte donc `rules: 0` et
+`revisions.json` ne journalise pas ce changement de règle. Il est décrit ici et dans `tasks/70450-corrections.md` ; la
+prochaine fois, les écarts confirmés s'ajoutent sans réécrire le manifeste et `forever install` porte la règle.

@@ -82,3 +82,7 @@ et `make_deps_at_pre_70450_version`. Garde : `test_revision_constants.py::test_f
   quasi-égalité au niveau 16 (Ice Shards contre Elemental Precision) ; à reprendre avec l'inversion de fixture (c).
 - **Angles morts** : 7 % de puissance des sorts par cumul de Winter's Chill sur Cone of Cold ; Frigid Power d'Ice
   Barrier (HF2).
+- **Provenance** : la règle `listed_spells` de `decode_rules.json` n'est pas journalisée dans `revisions.json` (manifeste
+  réécrit par le script de confirmation avant l'installation) ; décrite dans `docs/research/data-1.60.1.70450-r6.md`.
+- **Veille** : sans `DBCache.bin` du jeu pour le build, elle lit maintenant le cache vérifié de Raidbots avant de passer
+  « sans correctifs » (`update.dbcache_for_build`) ; le cache du jeu prime.
