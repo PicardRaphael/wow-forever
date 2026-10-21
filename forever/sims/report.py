@@ -12,6 +12,10 @@ from forever.pipeline.wowsims_build import pinned, wowsims_dir
 from forever.provenance import local_provenance
 from forever.sims import wowsims
 
+MAGE_ENGINE_FROZEN = (
+    "moteur du Mage gelé à la révision 7 de 1.60.1.70450 (décision 293) : plus aucune mécanique ajoutée, recoupé par "
+    "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
+)
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
 ACTIONS = ("presets", "races", "weights")
 

@@ -43,6 +43,7 @@ from forever.provenance import Certainty, Provenance, make_provenance, min_certa
 from forever.registry import blind_spot_rules
 from forever.registry import load as load_registry
 from forever.sim.leveling_mc import McStats, mc_stats
+from forever.sims.report import MAGE_ENGINE_FROZEN
 from forever.store import VersionData, load_version
 
 PERCENT = 100.0  # conversion d'unité : effets des angles morts en %
@@ -845,7 +846,7 @@ def build_report(
         data_sha=data.data_sha,
         freshness=fresh["freshness"],
         certainty=certainty,
-        assumptions=[*fresh["assumptions"], *assumptions],
+        assumptions=[*fresh["assumptions"], *assumptions, MAGE_ENGINE_FROZEN],
     )
     return {
         "context": context,

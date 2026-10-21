@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
 from forever.config import Deps
+from forever.sims.report import MAGE_ENGINE_FROZEN
 
 if TYPE_CHECKING:
     from forever.engine.model import CharacterOverrides
@@ -88,6 +89,7 @@ def mage_weights(
                 "= 1 ; critique et toucher par point de pourcentage"
             ),
             "équipement porté non pris en compte ; talents seulement s'ils sont donnés ; écoles = puissance des sorts",
+            MAGE_ENGINE_FROZEN,
         ],
     )
     return {"level": level, "race": race, "rotation": rotation, "weights": weights, "provenance": provenance}

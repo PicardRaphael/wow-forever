@@ -21,6 +21,7 @@ from forever.gamedata import RACES_FILE, RULES, build_game_data, mage_races
 from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
 from forever.sim.leveling_analytic import kill_analytic
 from forever.sim.leveling_mc import KillResult, McStats, mc, mc_stats, options_with_defaults
+from forever.sims.report import MAGE_ENGINE_FROZEN
 from forever.store import VersionData, load_version
 
 MECHANICS_FILE = "mechanics.json"
@@ -293,6 +294,7 @@ def simulate_leveling(
             *fresh["assumptions"],
             *assumptions(options, hp, pts, n, seed, gd.constants.coefficients.low_level_default),
             ratio_assumption(gd),
+            MAGE_ENGINE_FROZEN,
             *([DEFAULT_RACE_NOTE] if inputs["race"]["origin"] == "default" else []),
             *(bonuses["assumptions"] if bonuses else []),
         ],
