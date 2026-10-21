@@ -229,8 +229,20 @@ correction passe devant le reste.
 18. « Renommer… » : le nom tapé dans la saisie renomme sans rien envoyer ; « Effacer… » demande un second clic ;
     `/fb conv` liste les conversations.
 
-### 7. Fin
-19. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
+### 7. Plan « Sources d'abord » (décisions 288 à 291 ; 5 min)
+19. `uv run forever status` : la ligne « Sources » dit, pour chaque source (moteur du Mage, Talents Forever, Forever
+    Companion, SkillUp), « à jour » ou « en retard » avec sa raison ; après la mise à jour de tes addons pour la
+    version finale, Talents Forever et Companion ne doivent plus être « en retard » pour le Mage.
+20. Bouton Talents avec un personnage d'une autre classe : en plus du build populaire, le build de Forever Companion
+    pour ta spécialisation et sa rotation (écrite pour le niveau 30), avec la mention « ordre de prise non calculé ».
+21. Dans le chat : « que dois-je fabriquer en Couture au rang 60 ? » : les recettes qui montent encore (orange puis
+    jaune), lues dans SkillUp Forever, et le rappel de `/skillup` pour l'itinéraire complet.
+22. Feuille de route au-delà du niveau 21 (ou un personnage déjà plus haut) : la route suit les guides de Polestar,
+    l'attribution le dit dans RestedXP (« Polestar Guides … commit … »), les quêtes de classe et les donjons avec leurs
+    quêtes y sont ajoutés. Avant : `uv run forever route polestar` met le clone à jour.
+
+### 8. Fin
+23. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
     et corrige le reste.
 
 Blocs à venir, ajoutés ici à leur livraison : fin de 6b (réponses en cartes, derrière un réglage ; équipement en
