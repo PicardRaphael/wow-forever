@@ -85,13 +85,69 @@ def _ints(values: Any) -> tuple[int, ...]:
     return tuple(int(v) for v in items if isinstance(v, int))
 
 
+_LUA_FLAGS = re.compile(r"\[(\d+)\]=true")
+_LUA_STRINGS = re.compile(r'\[(\d+)\]="([^"]*)"')
+
+
+def _lua_table(text: str, head: str) -> str:
+    """Corps `{...}` de la table qui suit `head` (`local gear=`), sans accolade imbriquée ; vide si absente."""
+    start = text.find(head)
+    if start < 0:
+        return ""
+    end = text.find("}", start)
+    return text[start + len(head) : end] if end > 0 else ""
+
+
+def _apply_item_builds(addons: Path, lines: list[str]) -> list[str]:
+    """Deltas `ItemBuild<build>.lua` de Forever Guide, dans l'ordre de son `.toc`, appliqués aux lignes de
+    `GearData.lua` comme le fait l'addon au chargement (relevé de 1.60.1.70425) : emplacement, sous-classe, niveau,
+    rareté remplacés ; classes si non nulles ; statistiques seulement pour un objet de `BETA_STAT_CHANGED` ; objet de
+    `removed` retiré ; objet nouveau ajouté (flags 0)."""
+    folder = addons / GUIDE_GEAR[0]
+    toc = _read(folder / f"{GUIDE_GEAR[0]}.toc") or ""
+    names = [ln.strip() for ln in toc.splitlines() if re.fullmatch(r"ItemBuild\d+\.lua", ln.strip())]
+    for name in names:
+        text = _read(folder / name)
+        if not text or "local gear=" not in text:
+            continue
+        gear = {int(k): v.split() for k, v in _LUA_STRINGS.findall(_lua_table(text, "local gear="))}
+        removed = {int(k) for k in _LUA_FLAGS.findall(_lua_table(text, "local removed="))}
+        changed = {int(k) for k in _LUA_FLAGS.findall(_lua_table(text, "ns.BETA_STAT_CHANGED="))}
+        seen: set[int] = set()
+        out: list[str] = []
+        for line in lines:
+            a = line.split()
+            if not a or not a[0].isdigit():
+                out.append(line)
+                continue
+            item = int(a[0])
+            if item in removed:
+                continue
+            b = gear.get(item)
+            if b is not None and len(a) >= 7:
+                seen.add(item)
+                a[1:5] = b[0:4]
+                if len(b) > 4 and b[4] != "0":
+                    a[6] = b[4]
+                if item in changed:
+                    a = [*a[:7], b[5] if len(b) > 5 else ""]
+                line = " ".join(a).rstrip()
+            out.append(line)
+        for item, b in gear.items():
+            if item not in seen and item not in removed:
+                out.append(" ".join([str(item), *b[0:4], "0", b[4] if len(b) > 4 else "0", *(b[5:6])]).rstrip())
+        lines = out
+    return lines
+
+
 def read_guide_gear(addons: Path) -> dict[int, GearItem]:
-    """Statistiques des objets de Forever Guide, par identifiant."""
+    """Statistiques des objets de Forever Guide, par identifiant, deltas `ItemBuild<build>.lua` appliqués comme
+    l'addon (sinon les statistiques d'un build ancien : 291 objets changés et 20 retirés au build 70425)."""
     text = _read(addons.joinpath(*GUIDE_GEAR))
     if text is None:
         return {}
     out: dict[int, GearItem] = {}
-    for line in text.splitlines():
+    for line in _apply_item_builds(addons, text.splitlines()):
         m = _GEAR_LINE.match(line.strip())
         if not m:
             continue
