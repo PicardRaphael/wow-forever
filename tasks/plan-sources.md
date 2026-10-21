@@ -4,8 +4,12 @@ Demande de l'utilisateur du 2026-10-21, prioritaire sur la suite du bloc 6b de C
 **rien n'est construit avant son accord**.
 
 > Statut : **validé le 2026-10-21** (décisions 289 à 291). Fait : Piercing Ice et correctifs du serveur (révision 6 de
-> 70450, lus chez Raidbots, veille branchée sur Raidbots) ; lecture de Forever Guide avec ses deltas `ItemBuild`. En
-> cours : (a).
+> 70450, lus chez Raidbots, veille branchée sur Raidbots) ; lecture de Forever Guide avec ses deltas `ItemBuild` ;
+> (a) registre des sources (`forever/sources.py`, `forever status`, provenance de `forever_build`) ; (b) Forever
+> Companion pour les neuf classes (`class_guide`, bouton Talents) et SkillUp (`profession`) ; (c) inversion de fixture
+> (`VALUES_VERSION`, invariants, répétition générale verte) et aperçu du rejeu avec talents ajoutés ou retirés ; (d)
+> Polestar au-delà de RestedXP (`forever/polestar.py`, `forever route polestar`). Reste : quêtes de classe de Forever
+> Guide, poids de Naowh, assistant Métier du pont, mise à jour de Polestar par la veille.
 
 ## 0. Constat et règle
 - Notre moteur maison casse à chaque refonte de classe : 229 tests rouges pour 1.60.1.70450 (8 vrais défauts, le
