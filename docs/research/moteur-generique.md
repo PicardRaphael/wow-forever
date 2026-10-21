@@ -12,6 +12,10 @@ classe. Étude seulement : rien n'est implémenté ici.
 > décision 224, la tranche SIM1 et [l'étude wowsims](wowsims-forever.md). Les passages concernés sont corrigés plus
 > bas. **Décision prise** (décision 252) : pas de moteur générique avant la sortie ; les tranches de classe gardent
 > leur ordre (CM1 après PV2 et AN1, vérifiée sur les journaux de l'utilisateur).
+>
+> **Mise à jour du 2026-10-21** ([étude du jour](simulateur-communaute-2026-10-21.md)) : ElliotWood/Forever répond 404
+> depuis environ le 19 octobre ; le simulateur de référence est `wowsims/forever` (MIT, données à 1.60.1.70450), sans
+> binaire à jour publié ; MythicSim le suit directement.
 
 ## 1. Ce qui existe aujourd'hui
 

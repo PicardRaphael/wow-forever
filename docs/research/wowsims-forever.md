@@ -1,5 +1,14 @@
 # Simulateurs wowsims Forever et MythicSim : étude (SIM1)
 
+> **Mise à jour du 2026-10-21** ([étude du jour](simulateur-communaute-2026-10-21.md)) : (1) **ElliotWood/Forever
+> répond 404** depuis environ le 19 octobre ; la référence est le dépôt officiel **`wowsims/forever`** (MIT), que
+> MythicSim suit désormais directement ; (2) **aucun binaire `wowsimcli` à jour n'est publié** (aucune publication
+> chez `wowsims/forever`, MythicSim ni gunba ; un ancien `ForeverSim-windows-amd64.exe` de `Bearly-Tanky/foreversim`,
+> antérieur à 70450, n'est plus suivi) : il faut compiler (Go 1.25, `protoc`) ; (3) données du simulateur à
+> **1.60.1.70450**, avec le correctif du serveur 112753 pour le Mage (Piercing Ice retiré), que nos données de 70450 n'ont
+> pas. Le niveau fixé à 60 et le format `RaidSimRequest` restent valables. Les passages ci-dessous sur ElliotWood, le
+> binaire hebdomadaire et le build 70291 sont datés du 9 octobre.
+
 Étude en lecture seule du 2026-10-09, documentation seulement (décision 224). Dépôts lus sur GitHub en anonyme, avec l'accord de l'utilisateur du même jour : pages, `raw.githubusercontent.com` et une vingtaine de requêtes à `api.github.com`. Rien n'a été cloné, téléchargé, compilé ni exécuté, aucun compte n'a servi, et rien n'a été lu sur mythicsim.com. La page CurseForge de l'addon MythicSim a été lue. L'addon SimulationCraft a été lu sur disque dans `Interface/AddOns`, sans être modifié.
 
 Tout ce qui vient de ces dépôts est une **source communautaire** : au mieux `suppose` (hiérarchie de `docs/DATA_SOURCES.md`), daté au commit lu. Une valeur citée ici sert à orienter un test et n'entre jamais dans `forever/data/`. **[lu]** : vu dans le fichier cité ; **[déduit]** : interprétation.
