@@ -5,7 +5,6 @@ copié dans le dépôt de forever, l'addon n'est jamais installé. Le commit ép
 
 from __future__ import annotations
 
-import subprocess
 from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
@@ -14,7 +13,11 @@ REPO = "https://github.com/fitzforge/polestar.git"
 
 
 def _run(args: Sequence[str], cwd: Path | None = None) -> Any:
-    return subprocess.run(list(args), cwd=cwd, check=True, capture_output=True, text=True, timeout=300)
+    """git du réseau par le seul exécuteur de `forever.pipeline.gitops` (sans shell, sans invite, sans fenêtre)."""
+    from forever.pipeline.gitops import _run as run_checked
+    from forever.pipeline.gitops import subprocess_runner
+
+    return run_checked(subprocess_runner, args, cwd or Path.cwd(), timeout=300)
 
 
 def update_polestar(cache_dir: Path, *, run: Callable[..., Any] = _run) -> Path:
@@ -24,7 +27,7 @@ def update_polestar(cache_dir: Path, *, run: Callable[..., Any] = _run) -> Path:
     clone = polestar_clone(cache_dir)
     if not (clone / ".git").is_dir():
         clone.parent.mkdir(parents=True, exist_ok=True)
-        run(["git", "clone", "--depth", "1", REPO, str(clone)])
+        run(["git", "clone", "--depth", "1", REPO, str(clone)], cwd=clone.parent)
         return clone
     run(["git", "fetch", "--depth", "1", "origin"], cwd=clone)
     run(["git", "reset", "--hard", "FETCH_HEAD"], cwd=clone)
