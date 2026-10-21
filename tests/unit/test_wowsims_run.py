@@ -184,3 +184,29 @@ def test_local_objects_are_spread_and_aliases_followed():
     refs = {"classOptions": {"ammo": "ThoriumHeadedArrow", "petUptime": 1}}
     value, _ = ts_literal("{ classOptions: { ...classOptions, petType: PetType.PetNone } }", 0, None, refs)
     assert value == {"classOptions": {"ammo": "ThoriumHeadedArrow", "petUptime": 1, "petType": "PetNone"}}
+
+
+def test_presets_are_compared_in_identical_conditions(tmp_path):
+    """Comparaison entre classes (demande du 2026-10-21) : mêmes buffs de raid, de groupe et individuels (réunion de
+    ceux des préréglages comparés), mêmes affaiblissements, même rencontre et même durée, même graine ; consommables :
+    aucun pour personne (conditions strictement identiques) ou ceux de chaque préréglage (`own`), dit dans la sortie."""
+    from forever.sims.wowsims import compare_presets
+
+    root = clone(tmp_path)
+    presets = {p.key: p for p in read_presets(root / "forever")}
+    sim = Sim()
+    cases = [(presets["mage/dps/Fire"], "RaceGnome"), (presets["shaman/elemental/testing"], "RaceDwarf")]
+    rows, conditions = compare_presets(tmp_path, cases, ENCOUNTER, consumables="none", runner=sim)
+    assert [r["preset"] for r in rows] == ["mage/dps/Fire", "shaman/elemental/testing"]  # du meilleur au moins bon
+    players = [r["raid"]["parties"][0]["players"][0] for r in sim.requests]
+    assert all("consumables" not in p for p in players)
+    assert {json.dumps(r["raid"].get("buffs"), sort_keys=True) for r in sim.requests} == {
+        json.dumps({"arcaneBrilliance": True}, sort_keys=True)
+    }
+    assert {json.dumps(r["raid"].get("debuffs"), sort_keys=True) for r in sim.requests} == {
+        json.dumps({"curseOfElements": True}, sort_keys=True)
+    }
+    assert {r["encounter"]["duration"] for r in sim.requests} == {ENCOUNTER["duration"]}
+    assert conditions["consumables"] == "none" and conditions["debuffs"] == {"curseOfElements": True}
+    rows, conditions = compare_presets(tmp_path, cases, ENCOUNTER, consumables="own", runner=Sim())
+    assert conditions["consumables"] == "own"
