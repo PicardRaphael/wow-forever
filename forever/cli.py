@@ -1989,9 +1989,7 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         _emit(found, render_quests(found), found["provenance"], args.json)
         return EXIT_OK
     if args.kind == "zones":
-        zones = lookup_zones(
-            deps, args.level, faction=args.faction, questie_dir=Path(args.questie) if args.questie else None
-        )
+        zones = lookup_zones(deps, args.level, faction=args.faction, player_class=args.cls)
         _emit(zones, render_zones(zones), zones["provenance"], args.json)
         return EXIT_OK
     if args.kind == "talent":

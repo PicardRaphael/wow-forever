@@ -17,7 +17,7 @@ from forever.errors import (
 )
 from forever.freshness import freshness_for_version
 from forever.pipeline.hotfixes import entity_assumptions
-from forever.pipeline.questie import TOC_NAME, ZoneAdvice, read_questie, zones_for_level
+from forever.pipeline.questie import ZoneAdvice
 from forever.provenance import Certainty, Provenance, local_provenance, make_provenance, min_certainty
 from forever.store import current_identity, load_version
 
@@ -304,37 +304,28 @@ def lookup_zones(
     level: int | None,
     *,
     faction: str | None = None,
-    questie_dir: Path | None = None,
     player_class: str | None = None,
+    wow_dir: Path | None = None,
 ) -> ZoneLookup:
-    """Zones et donjons adaptés au niveau (base Questie lue sur disque, jamais par le réseau), avec la provenance ;
-    InvalidArgumentError (code 2) si le niveau manque ou sort des bornes, si la faction est inconnue ou si l'addon
-    Questie est introuvable.
+    """Zones et donjons adaptés au niveau, d'après le livre de quêtes fusionné des sources Forever (décision 294 : plus
+    la base Classic Era de Questie), avec la provenance ; InvalidArgumentError (code 2) si le niveau manque ou sort
+    des bornes, si la faction est inconnue ou si le dossier du jeu manque.
 
     Registre : I7"""
     from forever.gamedata import build_game_data
     from forever.leveling import check_level, level_cap
+    from forever.profile import normalize_class
+    from forever.quests import build_quests, zones_from_book
 
     if level is None:
         raise InvalidArgumentError("Niveau manquant.", "donner --level (niveau du personnage)")
+    if faction is not None and faction not in ("horde", "alliance"):
+        raise InvalidArgumentError(f"Faction inconnue « {faction} ».", "choisir --faction horde ou alliance")
     data = load_version(deps)
     check_level(level, level_cap(data))
-    if questie_dir is None and deps.wow_dir is not None:
-        questie_dir = deps.wow_dir / "Interface" / "AddOns" / "Questie"
-    if questie_dir is None or not (questie_dir / TOC_NAME).is_file():
-        raise InvalidArgumentError(
-            f"Addon Questie introuvable : {questie_dir or 'aucun dossier'}.",
-            "donner --questie <Interface/AddOns/Questie> ou définir FOREVER_WOW_DIR",
-        )
-    try:
-        from forever.profile import normalize_class
-
-        cls = normalize_class(player_class).lower() if player_class else "mage"  # classe du personnage connecté
-        advice = zones_for_level(
-            read_questie(questie_dir), build_game_data(data), level, faction=faction, player_class=cls
-        )
-    except ValueError as exc:
-        raise InvalidArgumentError(f"{exc}.", "choisir --faction horde ou alliance") from exc
+    cls = normalize_class(player_class).lower() if player_class else "mage"  # classe du personnage connecté
+    book = build_quests(deps, wow_dir=wow_dir)
+    advice = zones_from_book(book, build_game_data(data), level, faction=faction, player_class=cls)
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)
     provenance = make_provenance(
         deps,
@@ -344,7 +335,7 @@ def lookup_zones(
         certainty="suppose",
         assumptions=[*fresh["assumptions"], f"source : {advice['source']}", *advice["notes"]],
     )
-    return {**advice, "provenance": provenance}
+    return cast(ZoneLookup, {**advice, "provenance": provenance})
 
 
 def _class_knowledge(deps: Deps, cls: str) -> tuple[str, Any, Any]:

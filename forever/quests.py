@@ -514,3 +514,77 @@ def order_quests(book: QuestBook, ids: list[int]) -> OrderResult:
         done.append(ready[0])
         left.remove(ready[0])
     return OrderResult(done, [], missing)
+
+
+CLASSIC_ONLY = frozenset({"questie"})  # source de la Classic Era : jamais comptée seule (décision 294)
+
+
+def zones_from_book(
+    book: QuestBook, gd: Any, level: int, *, faction: str | None = None, player_class: str = "mage"
+) -> Any:
+    """Zones et donjons classés par quêtes utiles (vertes, jaunes, orange) au niveau `level`, d'après le livre de
+    quêtes fusionné des sources Forever (décision 294) : une quête connue de la seule Classic Era de Questie n'est pas
+    comptée ; camp, classe (masque du client) et niveau requis filtrent ; zone nommée par sa carte (Completo), quêtes
+    de donjon au donjon. Certitude `suppose` (addons).
+
+    Registre : I7"""
+    from forever.engine.leveling import USEFUL_COLORS, level_band, quest_color
+    from forever.pipeline.questie import CLASS_MASKS
+
+    mask = CLASS_MASKS[player_class]
+    grouped: dict[tuple[str, Any], list[tuple[int, int]]] = {}
+    for qid, q in book.quests.items():
+        if q["status"] == "absente des sources Forever" or set(q["sources"]) <= CLASSIC_ONLY:
+            continue
+        lvl, min_level, side = value(q, "level"), value(q, "min_level"), value(q, "faction")
+        classes, map_id, dungeon = value(q, "classes"), value(q, "map"), value(q, "dungeon")
+        if not isinstance(lvl, int) or (faction and side not in (None, "both", faction)):
+            continue
+        if isinstance(classes, int) and classes and not classes & mask:
+            continue
+        if isinstance(min_level, int) and min_level > level:
+            continue
+        if dungeon:
+            grouped.setdefault(("dungeon", dungeon), []).append((qid, lvl))
+        elif isinstance(map_id, int):
+            grouped.setdefault(("zone", map_id), []).append((qid, lvl))
+    zones: list[dict[str, Any]] = []
+    dungeons: list[dict[str, Any]] = []
+    for (kind, key), rows in grouped.items():
+        colors = {c: 0 for c in ("gray", "green", "yellow", "orange", "red")}
+        for _, lvl in rows:
+            colors[quest_color(gd, level, lvl)] += 1
+        levels = [lvl for _, lvl in rows]
+        entry = {
+            "area_id": key if isinstance(key, int) else 0,
+            "name": str(key) if kind == "dungeon" else book.zone_names.get(key, f"carte {key}"),
+            "kind": kind,
+            "useful_quests": sum(colors[c] for c in USEFUL_COLORS),
+            "by_color": colors,
+            "quests": sorted(qid for qid, _ in rows),
+            "quest_levels": [min(levels), max(levels)],
+            "npc_levels": None,
+        }
+        (dungeons if kind == "dungeon" else zones).append(entry)
+
+    def rank(e: dict[str, Any]) -> tuple[int, str]:
+        return -e["useful_quests"], e["name"]
+
+    return {
+        "level": level,
+        "faction": faction,
+        "band": list(level_band(gd, level)),
+        "zones": sorted((z for z in zones if z["useful_quests"]), key=rank),
+        "dungeons": sorted((d for d in dungeons if d["useful_quests"]), key=rank),
+        "certainty": "suppose",
+        "source": "livre de quêtes fusionné des sources Forever (forever.quests)",
+        "notes": [
+            (
+                "quêtes des sources Forever seulement (addons de Forever, client) ; la base Classic Era de Questie "
+                "n'est plus comptée (décision 294)"
+            ),
+            "zones nommées par leur carte (noms de Completo, en anglais) ; niveaux des monstres non donnés",
+            "couleurs de quête : règle de leveling.quest_band (valeur héritée de la Classic, marquée, suppose)",
+            f"quêtes disponibles : faction {faction or 'toutes'}, classe {player_class}, niveau requis atteint",
+        ],
+    }

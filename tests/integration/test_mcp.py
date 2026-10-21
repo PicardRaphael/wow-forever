@@ -167,13 +167,16 @@ def test_sim_leveling_arcane_rotation(make_deps):
 
 
 def test_lookup_zones(make_deps):
-    """T04c : domaine `zones` de forever_lookup (Questie lu sur disque, provenance, certitude suppose)."""
-    questie = str(FIXTURES / "questie" / "11.38.0")
-    args = {"kind": "zones", "level": 12, "faction": "horde", "questie": questie}
-    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", args))
-    assert not r.is_error and r.structured_content["zones"][0]["name"] == "The Barrens"
+    """T04c, décision 294 : domaine `zones` de forever_lookup tiré du livre de quêtes des sources Forever (dossier du
+    client de la fixture), provenance, certitude suppose ; plus la base Classic Era de Questie."""
+    deps = make_deps(wow_dir=FIXTURES / "addons" / "quests")
+    args = {"kind": "zones", "level": 12, "faction": "horde"}
+    r = call(deps, lambda c: c.call_tool("forever_lookup", args))
+    assert not r.is_error and r.structured_content["zones"][0]["name"] == "Durotar"
+    assert r.structured_content["dungeons"][0]["name"] == "Ragefire Chasm"
+    assert "sources Forever" in r.structured_content["source"]
     assert validate_provenance(r.structured_content["provenance"]) == []
-    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", {**args, "questie": questie + "-absent"}))
+    r = call(deps, lambda c: c.call_tool("forever_lookup", {**args, "faction": "elfe"}))
     assert r.is_error and r.structured_content["error"]["code"] == "invalid_argument"
 
 
@@ -206,19 +209,18 @@ def test_instructions_rules(make_deps):
 def test_lookup_zones_follows_the_class(make_deps, monkeypatch):
     """Les zones suivent la classe demandée (personnage connecté), jamais le Mage par défaut (décision 294 : rien de
     figé sur une classe)."""
-    from forever import lookup
+    from forever import quests
 
     seen = []
-    real = lookup.zones_for_level
+    real = quests.zones_from_book
 
     def spy(*args, **kwargs):
         seen.append(kwargs.get("player_class"))
         return real(*args, **kwargs)
 
-    monkeypatch.setattr(lookup, "zones_for_level", spy)
-    questie = str(FIXTURES / "questie" / "11.38.0")
-    args = {"kind": "zones", "level": 12, "faction": "horde", "questie": questie, "class_name": "Chaman"}
-    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", args))
+    monkeypatch.setattr(quests, "zones_from_book", spy)
+    args = {"kind": "zones", "level": 12, "faction": "horde", "class_name": "Chaman"}
+    r = call(make_deps(wow_dir=FIXTURES / "addons" / "quests"), lambda c: c.call_tool("forever_lookup", args))
     assert not r.is_error and seen == ["shaman"]
 
 
