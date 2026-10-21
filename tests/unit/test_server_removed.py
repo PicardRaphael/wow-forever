@@ -10,10 +10,10 @@ import shutil
 
 import pytest
 from conftest import DATA_DIR, LOCAL_VERSION, read_json
-from forever.server_removed import exclude_removed_builds, server_removed_talents
 
 from forever.errors import ForeverError
 from forever.lookup import lookup_talent
+from forever.server_removed import exclude_removed_builds, server_removed_talents
 
 
 def test_piercing_ice_is_listed_with_its_source(make_deps):

@@ -1548,6 +1548,431 @@
       "source": "description du sort Camp Tent du client",
       "certainty": "probable",
       "registry": "D5"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Mage/spells/frostBlast",
+        "/classes/Mage/spells/frostbite",
+        "/classes/Mage/spells/permafrost"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694",
+      "certainty": "probable",
+      "pushes": [
+        112694
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Mage/tree_checks/2"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694, 112753",
+      "certainty": "probable",
+      "pushes": [
+        112694,
+        112753
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Mage/trees/2/talents"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694, 112753, 112864",
+      "certainty": "probable",
+      "pushes": [
+        112694,
+        112753,
+        112864
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Mage/spells/wintersChill"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694, 112864",
+      "certainty": "probable",
+      "pushes": [
+        112694,
+        112864
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Mage/spells/elementalPrecision",
+        "/classes/Mage/spells/frostChanneling",
+        "/classes/Mage/spells/frostWarding",
+        "/classes/Mage/spells/iceBarrier",
+        "/classes/Mage/spells/improvedBlizzard",
+        "/classes/Mage/spells/piercingIce"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112753",
+      "certainty": "probable",
+      "pushes": [
+        112753
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Mage/spells/frostWard"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112753, 113024",
+      "certainty": "probable",
+      "pushes": [
+        112753,
+        113024
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Shaman/spells/elementalMastery",
+        "/classes/Shaman/trees/0/talents/15"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112827",
+      "certainty": "probable",
+      "pushes": [
+        112827
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Priest/spells/holyFire"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112833",
+      "certainty": "probable",
+      "pushes": [
+        112833
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Paladin/trees/2/talents/14"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112842",
+      "certainty": "probable",
+      "pushes": [
+        112842
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Warlock/spells/amplifyCurse",
+        "/classes/Warlock/spells/baneOfAgony",
+        "/classes/Warlock/trees/0/talents/8"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112844",
+      "certainty": "probable",
+      "pushes": [
+        112844
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Mage/spells/arcaneWrath",
+        "/classes/Mage/trees/0/talents/14"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112845",
+      "certainty": "probable",
+      "pushes": [
+        112845
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Druid/spells/naturesFocus",
+        "/classes/Druid/trees/2/talents/0",
+        "/classes/Mage/spells/improvedChanneling",
+        "/classes/Mage/trees/0/talents/2",
+        "/classes/Mage/trees/0/talents/3",
+        "/classes/Priest/spells/twilightFocus",
+        "/classes/Priest/trees/1/talents/0",
+        "/classes/Shaman/spells/eyeOfTheStorm",
+        "/classes/Shaman/spells/healingFocus",
+        "/classes/Shaman/trees/0/talents/9",
+        "/classes/Shaman/trees/2/talents/7",
+        "/classes/Warlock/spells/felConcentration",
+        "/classes/Warlock/spells/intensity",
+        "/classes/Warlock/trees/0/talents/7",
+        "/classes/Warlock/trees/2/talents/8"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112864",
+      "certainty": "probable",
+      "pushes": [
+        112864
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Hunter/trees/2/talents/14"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112887",
+      "certainty": "probable",
+      "pushes": [
+        112887
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Rogue/spells/sap"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112901",
+      "certainty": "probable",
+      "pushes": [
+        112901
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Shaman/spells/elementalFocus",
+        "/classes/Shaman/trees/0/talents/6"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112918",
+      "certainty": "probable",
+      "pushes": [
+        112918
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Hunter/spells/huntersMark"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112976",
+      "certainty": "probable",
+      "pushes": [
+        112976
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "classes.json",
+      "paths": [
+        "/classes/Shaman/spells/lavaBurst"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 113046",
+      "certainty": "probable",
+      "pushes": [
+        113046
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "races.json",
+      "paths": [
+        "/races/Gnome/racials/5",
+        "/races/Gnome/racials/6",
+        "/races/Gnome/racials/7",
+        "/races/Gnome/racials/8",
+        "/races/Gnome/racials/9"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112864",
+      "certainty": "probable",
+      "pushes": [
+        112864
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "spell_scaling.json",
+      "paths": [
+        "/spells/frost_blast/0",
+        "/spells/frost_blast/1",
+        "/spells/frost_blast/2"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694",
+      "certainty": "probable",
+      "pushes": [
+        112694
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "spell_scaling.json",
+      "paths": [
+        "/spells/arcane_wrath/0",
+        "/spells/arcane_wrath/1",
+        "/spells/arcane_wrath/2",
+        "/spells/arcane_wrath/3"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112845",
+      "certainty": "probable",
+      "pushes": [
+        112845
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/frost_blast"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694",
+      "certainty": "probable",
+      "pushes": [
+        112694
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "spells.json",
+      "paths": [
+        "/spells/arcane_wrath"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112845",
+      "certainty": "probable",
+      "pushes": [
+        112845
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "talents.json",
+      "paths": [
+        "/trees/2/talents/4",
+        "/trees/2/talents/6"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694",
+      "certainty": "probable",
+      "pushes": [
+        112694
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "talents.json",
+      "paths": [
+        "/trees/2/talents/16"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112694, 112864",
+      "certainty": "probable",
+      "pushes": [
+        112694,
+        112864
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "talents.json",
+      "paths": [
+        "/trees/2/talents/0",
+        "/trees/2/talents/17",
+        "/trees/2/talents/2",
+        "/trees/2/talents/7",
+        "/trees/2/talents/8"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112753",
+      "certainty": "probable",
+      "pushes": [
+        112753
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "talents.json",
+      "paths": [
+        "/trees/0/talents/14"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112845",
+      "certainty": "probable",
+      "pushes": [
+        112845
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+    },
+    {
+      "file": "talents.json",
+      "paths": [
+        "/trees/0/talents/2",
+        "/trees/0/talents/3"
+      ],
+      "origin": "correctif_serveur",
+      "source": "DBCache.bin vérifié de Raidbots (https://storage.googleapis.com/raidbots-static/wow%2F70450%2FenUS%2FDBCache-8y3MRnd6ZSV9moZJKPopAi.bin, créé le 2026-10-21T06:25:13.118Z) (build 70450, enUS, sha256 68e09c5c315e…), dispositions WoWDBDefs 77582e12f6f6 ; poussée(s) 112864",
+      "certainty": "probable",
+      "pushes": [
+        112864
+      ],
+      "seen_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
     }
   ],
   "pending": [],

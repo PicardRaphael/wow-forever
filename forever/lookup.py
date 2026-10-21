@@ -206,6 +206,11 @@ def lookup_talent(deps: Deps, name: str, rank: int | None = None) -> TalentLooku
             index.setdefault(_talent_key(former), key)
     wanted = _talent_key(name)
     if wanted not in index:
+        from forever.server_removed import RemovedTalentError, removed_entry
+
+        gone = removed_entry(deps.data_dir, wanted, _talent_key)  # décision 290 : retiré par un correctif du serveur
+        if gone is not None:
+            raise RemovedTalentError(gone)
         names = {_talent_key(t["name"]): t["name"] for t in entries.values()}
         close = difflib.get_close_matches(wanted, sorted(names), n=3, cutoff=0.6)
         raise UnknownTalentError(name, [names[c] for c in close])

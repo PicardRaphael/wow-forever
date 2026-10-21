@@ -207,8 +207,9 @@ class _Merge:
                 c = by_key.get(key)
                 rename = self._renamed(key, by_key) if c is None else None
                 if c is None and rename is None:
-                    self.add(TALENTS, key, t, None, source, "certain", "refused")
-                    merged.append(t)
+                    # décision 290 : talent retiré par un correctif du serveur, confirmé (Piercing Ice, 112753)
+                    if not self._confirmed_field(TALENTS, "talent", key, None, key, None, source):
+                        merged.append(t)
                     continue
                 if rename is not None:
                     c = by_key[rename["new"]]
@@ -374,8 +375,8 @@ class _Merge:
                 self.add(SPELLS, key, s, None, source, "certain", "refused")
                 continue
             for f in sorted(set(s) | set(c)):
-                if f in ("ranks", "source", "name", "name_fr", "spell_ids") or s.get(f) == c.get(f):
-                    continue
+                if f in ("ranks", "source", "name", "name_fr", "spell_ids", "hotfix") or s.get(f) == c.get(f):
+                    continue  # `hotfix` : provenance du correctif, portée par origins.json et sources.json
                 if self._confirmed_field(SPELLS, "spell", key, f, s.get(f), c.get(f), source):
                     s[f] = c.get(f)  # 70450 : champ du sort tranché « client » (frozen_mult d'Ice Lance)
             for ch in _rows("spell", key, s["ranks"], c["ranks"], fields):

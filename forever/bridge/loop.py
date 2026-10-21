@@ -73,6 +73,8 @@ def game_conversation(flags: frozenset[str]) -> str | None:
             if name.isalnum() and name.isascii():
                 return name
     return None
+
+
 ACTION_LABELS = {"approve": "Valider", "reject": "Refuser"}
 ROUTE_BUTTON = "b=route"  # bouton « Feuille de route » (RX1)
 ROUTE_GROUP = "Forever Routes"  # groupe des guides livrés dans RestedXP

@@ -919,7 +919,17 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 1259812"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     {
      "spell_id": 1259821,
@@ -961,7 +971,17 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 1259821"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     {
      "spell_id": 1259823,
@@ -1003,7 +1023,17 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 1259823"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     {
      "spell_id": 1259817,
@@ -1045,7 +1075,17 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 1259817"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     {
      "spell_id": 1259813,
@@ -1087,7 +1127,17 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 1259813"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     }
    ],
    "mage_values": {

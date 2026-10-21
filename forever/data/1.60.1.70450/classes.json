@@ -10801,7 +10801,19 @@
        "spell_id": 1311084,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112842
+        ],
+        "rows": [
+         "CurvePoint 331369",
+         "CurvePoint 331370",
+         "CurvePoint 331371"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "instrumentOfLaw",
@@ -21174,7 +21186,17 @@
        "spell_id": 1310496,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112887
+        ],
+        "rows": [
+         "SpellAuraOptions 247366"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "striderKick",
@@ -21803,7 +21825,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112976
+      ],
+      "rows": [
+       "SpellEffect 690991"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "beastLore": {
      "name": "Beast Lore",
@@ -42215,7 +42247,7 @@
         "amount": 65,
         "pct": 0
        },
-       "mechanic": 14,
+       "mechanic": 30,
        "diminish": 16,
        "dispel_type": 0
       },
@@ -42238,7 +42270,7 @@
         "amount": 65,
         "pct": 0
        },
-       "mechanic": 14,
+       "mechanic": 30,
        "diminish": 16,
        "dispel_type": 0
       },
@@ -42261,7 +42293,7 @@
         "amount": 65,
         "pct": 0
        },
-       "mechanic": 14,
+       "mechanic": 30,
        "diminish": 16,
        "dispel_type": 0
       }
@@ -42276,8 +42308,8 @@
        "types": [
         "étourdissement"
        ],
-       "mechanic": 14,
-       "mechanic_name": "incapacitated",
+       "mechanic": 30,
+       "mechanic_name": "sapped",
        "diminish": 16,
        "breaks_on_damage": true,
        "duration_s": 45,
@@ -42285,7 +42317,19 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112901
+      ],
+      "rows": [
+       "SpellCategories 71203",
+       "SpellCategories 72235",
+       "SpellCategories 74155"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "blind": {
      "name": "Blind",
@@ -48810,11 +48854,21 @@
        "tier": 1,
        "col": 1,
        "max": 3,
-       "desc": "Gives you a $s1% chance to avoid interruption caused by damage while casting any spell.",
+       "desc": "Gives your spells a $s1% chance to not lose casting time when you take damage.",
        "spell_id": 14913,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 14913"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "improvedRenew",
@@ -55495,7 +55549,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 14913"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "holyFire": {
      "name": "Holy Fire",
@@ -55693,7 +55757,18 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112833
+      ],
+      "rows": [
+       "SpellEffect 687113",
+       "SpellEffect 693006"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "sort15008": {
      "name": "sort 15008",
@@ -60828,11 +60903,22 @@
        "tier": 3,
        "col": 1,
        "max": 1,
-       "desc": "Gives you a $h% chance to enter a Clearcasting state after casting any Fire, Frost, or Nature damage spell.  The Clearcasting state reduces the mana cost of your next damage spell by $16246s1%.",
+       "desc": "Gives you a $s1% chance to enter a Clearcasting state after casting any Fire, Frost, or Nature damage spell.  The Clearcasting state reduces the mana cost of your next damage spell by $16246s1%.",
        "spell_id": 16164,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112918
+        ],
+        "rows": [
+         "Spell 16164",
+         "SpellEffect 694887"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "elementalWarding",
@@ -60877,11 +60963,21 @@
        "tier": 4,
        "col": 2,
        "max": 3,
-       "desc": "Reduces the pushback suffered from damaging attacks while casting Lightning Bolt, Chain Lightning, and Lava Burst by $m1%.",
+       "desc": "Gives your Lightning Bolt, Chain Lightning, and Lava Burst spells a $m1% chance to not lose casting time when you take damage.",
        "spell_id": 29062,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 29062"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "earthbound",
@@ -61004,7 +61100,17 @@
          "kind": "sufficient"
         }
        ],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112827
+        ],
+        "rows": [
+         "SpellMisc 327042"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       }
      ]
     },
@@ -61435,11 +61541,21 @@
        "tier": 3,
        "col": 2,
        "max": 3,
-       "desc": "Gives you a $m1% chance to avoid interruption caused by damage while casting any healing spell.",
+       "desc": "Gives your healing spells a $m1% chance to not lose casting time when you take damage.",
        "spell_id": 16181,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 16181"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "waterShield",
@@ -66899,7 +67015,18 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112918
+      ],
+      "rows": [
+       "Spell 16164",
+       "SpellEffect 694887"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "elementalMastery": {
      "name": "Elemental Mastery",
@@ -66944,7 +67071,17 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112827
+      ],
+      "rows": [
+       "SpellMisc 327042"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "totemicFocus": {
      "name": "Totemic Focus",
@@ -67228,7 +67365,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 16181"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "improvedHealingWave": {
      "name": "Improved Healing Wave",
@@ -70287,7 +70434,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 29062"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "sort29063": {
      "name": "sort 29063",
@@ -71357,7 +71514,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       113046
+      ],
+      "rows": [
+       "SpellEffect 1340790"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "riptide": {
      "name": "Riptide",
@@ -71702,11 +71869,21 @@
        "tier": 1,
        "col": 3,
        "max": 5,
-       "desc": "Gives you a $m1% chance to avoid interruption caused by damage while channeling Arcane Missiles and a $m2% chance while casting Arcane Blast or Arcane Wrath.",
+       "desc": "Gives your Arcane Missiles spell a $m1% chance and your Arcane Blast and Arcane Wrath spells a $m2% chance to not lose casting time when you take damage.",
        "spell_id": 11237,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 11237"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "missileBarrage",
@@ -71717,11 +71894,21 @@
        "tier": 1,
        "col": 4,
        "max": 2,
-       "desc": "Gives your Arcane Blast spell a $m1% chance, your Arcane Missile hits a ${$m1/4}% chance, and your Arcane Wrath, Fireball, Frostbolt, and Frostfire Bolt spells a ${$m1/2}% chance to reduce the channeled duration of your next Arcane Missiles spell by $400589s1%, reduce the Mana cost by $400589s3%, and missiles fire every ${$m2/10}.1 sec.",
+       "desc": "Gives your Arcane Blast spell a $m1% chance, and your Arcane Wrath, Fireball, Frostbolt, Frost Blast, and Frostfire Bolt spells a ${$m1/2}% chance to reduce the channeled duration of your next Arcane Missiles spell by $400589s1%, reduce the Mana cost by $400589s3%, and missiles fire every ${$m2/10}.1 sec.",
        "spell_id": 400588,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 400588"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "arcaneSubtlety",
@@ -71908,7 +72095,18 @@
          "kind": "sufficient"
         }
        ],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112845
+        ],
+        "rows": [
+         "SpellCategories 190242",
+         "SpellCooldowns 102218"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "presenceOfMind",
@@ -72284,11 +72482,26 @@
        "tier": 1,
        "col": 1,
        "max": 2,
-       "desc": "Increases the Armor and resistance given by your Frost Armor and Ice Armor spells by $s1%. In addition, gives your Frost Ward a $s2% chance to reflect Frost spells and effects while active.",
+       "desc": "Increases the Armor and resistances granted by your Frost Armor and Ice Armor spells by $s1%, gives your Frost Ward a $s2% chance to negate the warded damage spell, and increases the amount absorbed by your Ice Barrier and Frost Ward by $s3%.",
        "spell_id": 11189,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112753
+        ],
+        "rows": [
+         "CurvePoint 369682",
+         "CurvePoint 369683",
+         "Spell 11189",
+         "SpellEffect 689702",
+         "SpellEffect 1365208",
+         "TraitDefinitionEffectPoints 25206"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "improvedFrostbolt",
@@ -72313,12 +72526,27 @@
        "tree": "Frost",
        "tier": 1,
        "col": 3,
-       "max": 5,
+       "max": 3,
        "desc": "Improves your chance to hit with Frost and Fire spells by $s1%.",
        "spell_id": 29438,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112753
+        ],
+        "rows": [
+         "CurvePoint 241098",
+         "CurvePoint 241099",
+         "CurvePoint 241100",
+         "CurvePoint 316864",
+         "CurvePoint 316865",
+         "TraitNodeEntry 130507"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "iceShards",
@@ -72336,19 +72564,29 @@
        "certainty": "FC-1.60.1.70450"
       },
       {
-       "key": "permafrost",
-       "name": "Permafrost",
-       "name_fr": "Gel prolongé",
-       "node_id": 105776,
+       "key": "frostbite",
+       "name": "Frostbite",
+       "name_fr": "Morsure de givre",
+       "node_id": 105774,
        "tree": "Frost",
        "tier": 2,
        "col": 2,
        "max": 3,
-       "desc": "Increases the duration of your Chill effects by $s1% and reduces the target's speed by an additional $s2%.",
-       "spell_id": 11175,
+       "desc": "Gives your Chill effects a $s1% chance to Freeze the target for $12494d.",
+       "spell_id": 11071,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112694
+        ],
+        "rows": [
+         "TraitNode 105774"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "improvedFrostNova",
@@ -72366,34 +72604,29 @@
        "certainty": "FC-1.60.1.70450"
       },
       {
-       "key": "frostbite",
-       "name": "Frostbite",
-       "name_fr": "Morsure de givre",
-       "node_id": 105774,
+       "key": "permafrost",
+       "name": "Permafrost",
+       "name_fr": "Gel prolongé",
+       "node_id": 105776,
        "tree": "Frost",
        "tier": 2,
        "col": 4,
        "max": 3,
-       "desc": "Gives your Chill effects a $s1% chance to Freeze the target for $12494d.",
-       "spell_id": 11071,
+       "desc": "Increases the duration of your Chill effects by $s1% and reduces the target's speed by an additional $s2%.",
+       "spell_id": 11175,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
-      },
-      {
-       "key": "piercingIce",
-       "name": "Piercing Ice",
-       "name_fr": "Glace perçante",
-       "node_id": 105773,
-       "tree": "Frost",
-       "tier": 3,
-       "col": 1,
-       "max": 3,
-       "desc": "Increases the damage done by your Frost spells by $s1%.",
-       "spell_id": 11151,
-       "prereq": null,
-       "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112694
+        ],
+        "rows": [
+         "TraitNode 105776"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "frostChanneling",
@@ -72402,13 +72635,48 @@
        "node_id": 105772,
        "tree": "Frost",
        "tier": 3,
-       "col": 2,
+       "col": 1,
        "max": 3,
        "desc": "Reduces the mana cost of your Frost spells by $s1% and reduces the threat caused by your Frost spells by $s2%.",
        "spell_id": 11160,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112753
+        ],
+        "rows": [
+         "TraitNode 105772"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
+      },
+      {
+       "key": "improvedBlizzard",
+       "name": "Improved Blizzard",
+       "name_fr": "Blizzard amélioré",
+       "node_id": 105771,
+       "tree": "Frost",
+       "tier": 3,
+       "col": 2,
+       "max": 3,
+       "desc": "Adds a Chill effect to your Blizzard spell. This effect lowers the target's movement speed by $m1% for $12484d.",
+       "spell_id": 11185,
+       "prereq": null,
+       "prereqs": [],
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112753
+        ],
+        "rows": [
+         "TraitNode 105771"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "iceLance",
@@ -72421,21 +72689,6 @@
        "max": 1,
        "desc": "Deals $s1 Frost damage to an enemy target. Deals $s2% increased damage to Frozen targets.",
        "spell_id": 1312002,
-       "prereq": null,
-       "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
-      },
-      {
-       "key": "improvedBlizzard",
-       "name": "Improved Blizzard",
-       "name_fr": "Blizzard amélioré",
-       "node_id": 105771,
-       "tree": "Frost",
-       "tier": 3,
-       "col": 4,
-       "max": 3,
-       "desc": "Adds a Chill effect to your Blizzard spell. This effect lowers the target's movement speed by $m1% for $12484d.",
-       "spell_id": 11185,
        "prereq": null,
        "prereqs": [],
        "certainty": "FC-1.60.1.70450"
@@ -72550,11 +72803,24 @@
        "tier": 6,
        "col": 3,
        "max": 5,
-       "desc": "Gives your Frost damage spells a $m2% chance to apply the Winter's Chill effect, which increases the damage done by your Cone of Cold spell to the target by $12579s1%, stacking up to $s1 times.",
+       "desc": "Gives your Frostbolt, Frost Blast, and Fingers of Frost empowered Ice Lance spells a $m2% chance to apply Winter's Chill, increasing the target's damage taken from your next Cone of Cold by $12579s1% and it gains an additional $s3% of your spell damage, stacking up to $s1 times.",
        "spell_id": 11180,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112694,
+         112864
+        ],
+        "rows": [
+         "Spell 11180",
+         "SpellAuraOptions 123565",
+         "SpellEffect 1364855"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "iceBarrier",
@@ -72565,7 +72831,7 @@
        "tier": 7,
        "col": 2,
        "max": 1,
-       "desc": "Instantly shields you, absorbing $s1 damage. Lasts $d. While the shield holds, your spellcasts will not be interrupted or delayed from taking damage.\r\n",
+       "desc": "Shield yourself, absorbing ${$s1+($SPFR*0.1)*($11189s3/100+1)} damage and increasing your Frost damage by $1326891s1% for $d. While shielded, your Frost damage is increased by an additional $s2% and you do not lose casting time when you take damage.",
        "spell_id": 11426,
        "prereq": {
         "node_id": 105766,
@@ -72580,7 +72846,19 @@
          "kind": "sufficient"
         }
        ],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112753
+        ],
+        "rows": [
+         "Spell 11426",
+         "SpellEffect 1364979",
+         "SpellEffect 1364980"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       }
      ]
     }
@@ -72611,7 +72889,7 @@
      "skill_line": 6,
      "majority": 6,
      "counts": {
-      "6": 18
+      "6": 17
      }
     }
    ],
@@ -76559,7 +76837,27 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112753,
+       113024
+      ],
+      "rows": [
+       "Spell 6143",
+       "Spell 8461",
+       "Spell 8462",
+       "Spell 10177",
+       "Spell 28609",
+       "SpellEffect 685052",
+       "SpellEffect 686140",
+       "SpellEffect 686193",
+       "SpellEffect 687291",
+       "SpellEffect 690849"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "iceArmor": {
      "name": "Ice Armor",
@@ -76933,7 +77231,17 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112694
+      ],
+      "rows": [
+       "TraitNode 105774"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "improvedFireBlast": {
      "name": "Improved Fire Blast",
@@ -77585,10 +77893,7 @@
      "name": "Piercing Ice",
      "name_fr": "Glace perçante",
      "skill_line": 6,
-     "talent": {
-      "node_id": 105773,
-      "key": "piercingIce"
-     },
+     "talent": null,
      "ranks": [
       {
        "spell_id": 11151,
@@ -77615,7 +77920,18 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112753
+      ],
+      "rows": [
+       "TraitNode 105773",
+       "TraitNodeXTraitNodeEntry 127969"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "frostChanneling": {
      "name": "Frost Channeling",
@@ -77651,7 +77967,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112753
+      ],
+      "rows": [
+       "TraitNode 105772"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "improvedFrostNova": {
      "name": "Improved Frost Nova",
@@ -77759,7 +78085,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112694
+      ],
+      "rows": [
+       "TraitNode 105776"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "wintersChill": {
      "name": "Winter's Chill",
@@ -77795,7 +78131,20 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112694,
+       112864
+      ],
+      "rows": [
+       "Spell 11180",
+       "SpellAuraOptions 123565",
+       "SpellEffect 1364855"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "improvedBlizzard": {
      "name": "Improved Blizzard",
@@ -77831,7 +78180,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112753
+      ],
+      "rows": [
+       "TraitNode 105771"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "frostWarding": {
      "name": "Frost Warding",
@@ -77867,7 +78226,22 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112753
+      ],
+      "rows": [
+       "CurvePoint 369682",
+       "CurvePoint 369683",
+       "Spell 11189",
+       "SpellEffect 689702",
+       "SpellEffect 1365208",
+       "TraitDefinitionEffectPoints 25206"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "improvedConeOfCold": {
      "name": "Improved Cone of Cold",
@@ -78119,7 +78493,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 11237"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "arcaneImpact": {
      "name": "Arcane Impact",
@@ -78827,7 +79211,28 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112753
+      ],
+      "rows": [
+       "Spell 11426",
+       "Spell 13031",
+       "Spell 13032",
+       "Spell 13033",
+       "SpellEffect 1364979",
+       "SpellEffect 1364980",
+       "SpellEffect 1365009",
+       "SpellEffect 1365010",
+       "SpellEffect 1365012",
+       "SpellEffect 1365013",
+       "SpellEffect 1365014",
+       "SpellEffect 1365015"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "iceBlock": {
      "name": "Ice Block",
@@ -82137,7 +82542,22 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112753
+      ],
+      "rows": [
+       "CurvePoint 241098",
+       "CurvePoint 241099",
+       "CurvePoint 241100",
+       "CurvePoint 316864",
+       "CurvePoint 316865",
+       "TraitNodeEntry 130507"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "sort29439": {
      "name": "sort 29439",
@@ -82923,7 +83343,19 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112694
+      ],
+      "rows": [
+       "SpellEffect 1363753",
+       "SpellEffect 1363755",
+       "SpellEffect 1363757"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "arcaneWrath": {
      "name": "Arcane Wrath",
@@ -83032,7 +83464,24 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112845
+      ],
+      "rows": [
+       "SpellCategories 190242",
+       "SpellCategories 190243",
+       "SpellCategories 190244",
+       "SpellCategories 190245",
+       "SpellCooldowns 102218",
+       "SpellCooldowns 102219",
+       "SpellCooldowns 102220",
+       "SpellCooldowns 102221"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     }
    },
    "unresolved_spells": [
@@ -83201,11 +83650,21 @@
        "tier": 3,
        "col": 2,
        "max": 3,
-       "desc": "Gives you a $s1% chance to avoid interruption caused by damage while channeling or casting your Drain Life, Drain Mana, Drain Soul, or Wrack spells.",
+       "desc": "Gives your Drain Life, Drain Mana, Drain Soul, and Wrack spells a $s1% chance to not lose casting time when you take damage.",
        "spell_id": 17783,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 17783"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "amplifyCurse",
@@ -83224,6 +83683,16 @@
        "position": {
         "source": "relevé en jeu de l'utilisateur du 2026-10-08 (fenêtre des talents du Démoniste, arbre Affliction)",
         "certainty": "certain"
+       },
+       "hotfix": {
+        "pushes": [
+         112844
+        ],
+        "rows": [
+         "SpellEffect 1365363"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
        }
       },
       {
@@ -83827,11 +84296,21 @@
        "tier": 4,
        "col": 1,
        "max": 3,
-       "desc": "Gives you a $s1% chance to resist interruption caused by damage while casting or channeling any Destruction spell.",
+       "desc": "Gives your Destruction spells a $s1% chance to not lose casting time when you take damage.",
        "spell_id": 18135,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 18135"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "agonizingFlames",
@@ -86143,7 +86622,22 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112844
+      ],
+      "rows": [
+       "SpellEffect 1365365",
+       "SpellEffect 1365366",
+       "SpellEffect 1365367",
+       "SpellEffect 1365368",
+       "SpellEffect 1365369",
+       "SpellEffect 1365370"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "subjugateDemon": {
      "name": "Subjugate Demon",
@@ -88131,7 +88625,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 17783"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "sort17784": {
      "name": "sort 17784",
@@ -90406,7 +90910,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 18135"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "sort18136": {
      "name": "sort 18136",
@@ -91219,7 +91733,17 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112844
+      ],
+      "rows": [
+       "SpellEffect 1365363"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "improvedCurseOfExhaustion": {
      "name": "Improved Curse of Exhaustion",
@@ -97018,11 +97542,21 @@
        "tier": 1,
        "col": 2,
        "max": 5,
-       "desc": "Gives you a $m1% chance to avoid interruption caused by damage while casting Arcane and Nature spells.",
+       "desc": "Gives your Arcane and Nature spells a $m1% chance to not lose casting time when you take damage.",
        "spell_id": 17063,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70450"
+       "certainty": "FC-1.60.1.70450",
+       "hotfix": {
+        "pushes": [
+         112864
+        ],
+        "rows": [
+         "Spell 17063"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-10-21T06:53:56Z"
+       }
       },
       {
        "key": "furor",
@@ -105265,7 +105799,17 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70450"
+     "certainty": "FC-1.60.1.70450",
+     "hotfix": {
+      "pushes": [
+       112864
+      ],
+      "rows": [
+       "Spell 17063"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-10-21T06:53:56Z"
+     }
     },
     "sort17065": {
      "name": "sort 17065",

@@ -40,7 +40,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        6057
       ],
@@ -103,7 +103,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11222
       ],
@@ -162,7 +162,7 @@
        70
       ]
      ],
-     "desc": "Gives you a {0}% chance to avoid interruption caused by damage while channeling Arcane Missiles and a {1}% chance while casting Arcane Blast or Arcane Wrath.",
+     "desc": "Gives your Arcane Missiles spell a {0}% chance and your Arcane Blast and Arcane Wrath spells a {1}% chance to not lose casting time when you take damage.",
      "spellIds": [
       11237,
       12463,
@@ -176,11 +176,11 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11237
       ],
-      "client_desc": "Gives you a $m1% chance to avoid interruption caused by damage while channeling Arcane Missiles and a $m2% chance while casting Arcane Blast or Arcane Wrath."
+      "client_desc": "Gives your Arcane Missiles spell a $m1% chance and your Arcane Blast and Arcane Wrath spells a $m2% chance to not lose casting time when you take damage."
      }
     },
     {
@@ -194,7 +194,6 @@
      "ranks": [
       [
        20,
-       5,
        10,
        50,
        100,
@@ -202,7 +201,6 @@
       ],
       [
        40,
-       10,
        20,
        50,
        100,
@@ -212,7 +210,6 @@
      "tooltip_values": [
       [
        20,
-       5,
        10,
        50,
        100,
@@ -220,14 +217,13 @@
       ],
       [
        40,
-       10,
        20,
        50,
        100,
        0.5
       ]
      ],
-     "desc": "Gives your Arcane Blast spell a {0}% chance, your Arcane Missile hits a {1}% chance, and your Arcane Wrath, Fireball, Frostbolt, and Frostfire Bolt spells a {2}% chance to reduce the channeled duration of your next Arcane Missiles spell by {3}%, reduce the Mana cost by {4}%, and missiles fire every {5} sec.",
+     "desc": "Gives your Arcane Blast spell a {0}% chance, and your Arcane Wrath, Fireball, Frostbolt, Frost Blast, and Frostfire Bolt spells a {1}% chance to reduce the channeled duration of your next Arcane Missiles spell by {2}%, reduce the Mana cost by {3}%, and missiles fire every {4} sec.",
      "spellIds": [
       44404
      ],
@@ -237,13 +233,13 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        400588
       ],
-      "client_desc": "Gives your Arcane Blast spell a $m1% chance, your Arcane Missile hits a ${$m1/4}% chance, and your Arcane Wrath, Fireball, Frostbolt, and Frostfire Bolt spells a ${$m1/2}% chance to reduce the channeled duration of your next Arcane Missiles spell by $400589s1%, reduce the Mana cost by $400589s3%, and missiles fire every ${$m2/10}.1 sec."
+      "client_desc": "Gives your Arcane Blast spell a $m1% chance, and your Arcane Wrath, Fireball, Frostbolt, Frost Blast, and Frostfire Bolt spells a ${$m1/2}% chance to reduce the channeled duration of your next Arcane Missiles spell by $400589s1%, reduce the Mana cost by $400589s3%, and missiles fire every ${$m2/10}.1 sec."
      },
-     "model": "missile_hits"
+     "model": "listed_spells"
     },
     {
      "key": "arcaneSubtlety",
@@ -284,7 +280,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11210
       ],
@@ -330,7 +326,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        29441
       ],
@@ -398,7 +394,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11213
       ],
@@ -440,7 +436,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        28574
       ],
@@ -482,7 +478,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11247
       ],
@@ -531,7 +527,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11242
       ],
@@ -576,7 +572,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        400574
       ],
@@ -623,7 +619,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11252
       ],
@@ -665,7 +661,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11255
       ],
@@ -717,7 +713,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        18462
       ],
@@ -758,7 +754,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        1326079
       ],
@@ -789,7 +785,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        12043
       ],
@@ -862,7 +858,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11232
       ],
@@ -917,7 +913,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        15058
       ],
@@ -959,7 +955,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        12042
       ],
@@ -1010,7 +1006,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11078
       ],
@@ -1063,7 +1059,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        18459
       ],
@@ -1126,7 +1122,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11069
       ],
@@ -1194,7 +1190,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11119
       ],
@@ -1236,7 +1232,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11100
       ],
@@ -1288,7 +1284,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11103
       ],
@@ -1343,7 +1339,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11083
       ],
@@ -1392,7 +1388,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11108
       ],
@@ -1433,7 +1429,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11366
       ],
@@ -1491,7 +1487,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11095
       ],
@@ -1533,7 +1529,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11094
       ],
@@ -1575,7 +1571,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        400624
       ],
@@ -1628,7 +1624,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        29074
       ],
@@ -1689,7 +1685,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11115
       ],
@@ -1730,7 +1726,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11113
       ],
@@ -1787,7 +1783,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11124
       ],
@@ -1828,7 +1824,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11129
       ],
@@ -1851,24 +1847,28 @@
      "ranks": [
       [
        15,
+       10,
        10
       ],
       [
        30,
+       20,
        20
       ]
      ],
      "tooltip_values": [
       [
        15,
+       10,
        10
       ],
       [
        30,
+       20,
        20
       ]
      ],
-     "desc": "Increases the Armor and resistance given by your Frost Armor and Ice Armor spells by {0}%. In addition, gives your Frost Ward a {1}% chance to reflect Frost spells and effects while active.",
+     "desc": "Increases the Armor and resistances granted by your Frost Armor and Ice Armor spells by {0}%, gives your Frost Ward a {1}% chance to negate the warded damage spell, and increases the amount absorbed by your Ice Barrier and Frost Ward by {2}%.",
      "spellIds": [
       11189,
       28332
@@ -1879,11 +1879,11 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11189
       ],
-      "client_desc": "Increases the Armor and resistance given by your Frost Armor and Ice Armor spells by $s1%. In addition, gives your Frost Ward a $s2% chance to reflect Frost spells and effects while active."
+      "client_desc": "Increases the Armor and resistances granted by your Frost Armor and Ice Armor spells by $s1%, gives your Frost Ward a $s2% chance to negate the warded damage spell, and increases the amount absorbed by your Ice Barrier and Frost Ward by $s3%."
      }
     },
     {
@@ -1942,7 +1942,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11070
       ],
@@ -1956,39 +1956,27 @@
      "tree": "Frost",
      "tier": 1,
      "col": 3,
-     "max": 5,
+     "max": 3,
      "ranks": [
       [
-       1
-      ],
-      [
        2
-      ],
-      [
-       3
       ],
       [
        4
       ],
       [
-       5
+       6
       ]
      ],
      "tooltip_values": [
       [
-       1
-      ],
-      [
        2
-      ],
-      [
-       3
       ],
       [
        4
       ],
       [
-       5
+       6
       ]
      ],
      "desc": "Improves your chance to hit with Frost and Fire spells by {0}%.",
@@ -2005,7 +1993,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        29438
       ],
@@ -2068,7 +2056,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11207
       ],
@@ -2081,7 +2069,7 @@
      "name_fr": "Gel prolongé",
      "tree": "Frost",
      "tier": 2,
-     "col": 2,
+     "col": 4,
      "max": 3,
      "ranks": [
       [
@@ -2123,7 +2111,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11175
       ],
@@ -2165,7 +2153,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11165
       ],
@@ -2178,7 +2166,7 @@
      "name_fr": "Morsure de givre",
      "tree": "Frost",
      "tier": 2,
-     "col": 4,
+     "col": 2,
      "max": 3,
      "ranks": [
       [
@@ -2217,60 +2205,11 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11071
       ],
       "client_desc": "Gives your Chill effects a $s1% chance to Freeze the target for $12494d."
-     }
-    },
-    {
-     "key": "piercingIce",
-     "name": "Piercing Ice",
-     "name_fr": "Glace perçante",
-     "tree": "Frost",
-     "tier": 3,
-     "col": 1,
-     "max": 3,
-     "ranks": [
-      [
-       2
-      ],
-      [
-       4
-      ],
-      [
-       6
-      ]
-     ],
-     "tooltip_values": [
-      [
-       2
-      ],
-      [
-       4
-      ],
-      [
-       6
-      ]
-     ],
-     "desc": "Increases the damage done by your Frost spells by {0}%.",
-     "spellIds": [
-      11151,
-      12952,
-      12953
-     ],
-     "prereq": null,
-     "wowsims_not_simulated": false,
-     "certainty": "FC-70450",
-     "source": {
-      "build": "1.60.1.70450",
-      "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
-      "client_spell_ids": [
-       11151
-      ],
-      "client_desc": "Increases the damage done by your Frost spells by $s1%."
      }
     },
     {
@@ -2279,7 +2218,7 @@
      "name_fr": "Canalisation du givre",
      "tree": "Frost",
      "tier": 3,
-     "col": 2,
+     "col": 1,
      "max": 3,
      "ranks": [
       [
@@ -2321,7 +2260,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11160
       ],
@@ -2360,7 +2299,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        1312002
       ],
@@ -2373,7 +2312,7 @@
      "name_fr": "Blizzard amélioré",
      "tree": "Frost",
      "tier": 3,
-     "col": 4,
+     "col": 2,
      "max": 3,
      "ranks": [
       [
@@ -2412,7 +2351,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11185
       ],
@@ -2454,7 +2393,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        16757
       ],
@@ -2489,7 +2428,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11958
       ],
@@ -2538,7 +2477,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11170
       ],
@@ -2587,7 +2526,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11190
       ],
@@ -2618,7 +2557,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        12472
       ],
@@ -2671,7 +2610,7 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        400647
       ],
@@ -2711,31 +2650,36 @@
      "tooltip_values": [
       [
        20,
-       40,
+       5,
+       7,
        5
       ],
       [
        40,
-       40,
+       5,
+       7,
        5
       ],
       [
        60,
-       40,
+       5,
+       7,
        5
       ],
       [
        80,
-       40,
+       5,
+       7,
        5
       ],
       [
        100,
-       40,
+       5,
+       7,
        5
       ]
      ],
-     "desc": "Gives your Frost damage spells a {0}% chance to apply the Winter's Chill effect, which increases the damage done by your Cone of Cold spell to the target by 40%, stacking up to {1} times.",
+     "desc": "Gives your Frostbolt, Frost Blast, and Fingers of Frost empowered Ice Lance spells a {0}% chance to apply Winter's Chill, increasing the target's damage taken from your next Cone of Cold by 5% and it gains an additional 7% of your spell damage, stacking up to {1} times.",
      "spellIds": [
       11180,
       28592,
@@ -2749,11 +2693,11 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11180
       ],
-      "client_desc": "Gives your Frost damage spells a $m2% chance to apply the Winter's Chill effect, which increases the damage done by your Cone of Cold spell to the target by $12579s1%, stacking up to $s1 times."
+      "client_desc": "Gives your Frostbolt, Frost Blast, and Fingers of Frost empowered Ice Lance spells a $m2% chance to apply Winter's Chill, increasing the target's damage taken from your next Cone of Cold by $12579s1% and it gains an additional $s3% of your spell damage, stacking up to $s1 times."
      },
      "model": "cone_of_cold"
     },
@@ -2768,16 +2712,20 @@
      "ranks": [
       [
        431,
-       1
+       3,
+       1,
+       3
       ]
      ],
      "tooltip_values": [
       [
        431,
-       1
+       3,
+       1,
+       3
       ]
      ],
-     "desc": "Instantly shields you, absorbing {0} damage. Lasts {1} min. While the shield holds, your spellcasts will not be interrupted or delayed from taking damage.",
+     "desc": "Shield yourself, absorbing {0} damage and increasing your Frost damage by {1}% for {2} min. While shielded, your Frost damage is increased by an additional {3}% and you do not lose casting time when you take damage.",
      "spellIds": [
       11426
      ],
@@ -2790,11 +2738,11 @@
      "source": {
       "build": "1.60.1.70450",
       "tables": "tables Trait* et Spell* (wago.tools)",
-      "read_at": "2026-10-20",
+      "read_at": "2026-10-21",
       "client_spell_ids": [
        11426
       ],
-      "client_desc": "Instantly shields you, absorbing $s1 damage. Lasts $d. While the shield holds, your spellcasts will not be interrupted or delayed from taking damage.\r\n"
+      "client_desc": "Shield yourself, absorbing ${$s1+($SPFR*0.1)*($11189s3/100+1)} damage and increasing your Frost damage by $1326891s1% for $d. While shielded, your Frost damage is increased by an additional $s2% and you do not lose casting time when you take damage."
      }
     }
    ]

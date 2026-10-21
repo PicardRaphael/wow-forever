@@ -955,6 +955,10 @@
    {
     "contains": "Arcane Missile hits",
     "model": "missile_hits"
+   },
+   {
+    "contains": "Frost Blast, and Frostfire Bolt",
+    "model": "listed_spells"
    }
   ],
   "firePower": [
@@ -969,7 +973,7 @@
     "model": "cone_of_cold"
    }
   ],
-  "note": "70450 (décision 285) : sens d'un talent changé par le client, reconnu à un texte de sa description (Spell.Description_lang) ; sans correspondance, le moteur garde l'ancien sens"
+  "note": "70450 (décision 285) : sens d'un talent changé par le client, reconnu à un texte de sa description (Spell.Description_lang) ; sans correspondance, le moteur garde l'ancien sens ; correctif du serveur 112753 (Raidbots, décision 290) : Missile Barrage nomme ses sorts (Frost Blast compris) sans chance par projectile (listed_spells)"
  },
  "new_spells": {
   "frost_blast": null,

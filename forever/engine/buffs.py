@@ -35,6 +35,9 @@ ARCANE_MISSILES = "arcane_missiles"
 # Fireball, Frostbolt, Frostfire Bolt {2}% ... canalisation raccourcie de {3}%, coût réduit de {4}% ».
 MB_HITS_AB, MB_HITS_MISSILE, MB_HITS_OTHER, MB_HITS_CHANNEL, MB_HITS_COST = 0, 1, 2, 3, 4
 MB_HITS_OTHER_SPELLS = frozenset({"arcane_wrath", "fireball", "frostbolt", "frostfire_bolt"})
+# Correctif du serveur 112753 de 70450 (marqueur `listed_spells`) : plus de chance par projectile, sorts nommés par
+# la description, variables dans l'ordre d'avant 70450 (MB_AB_CHANCE, MB_OTHER_CHANCE, MB_CHANNEL_PCT, MB_COST_PCT).
+MB_LISTED_SPELLS = MB_HITS_OTHER_SPELLS | {"frost_blast"}
 INTELLECT_SP = "intellect_spell_power"  # 70450 : Arcane Blast donne une part de l'Intelligence en puissance des sorts
 # Arcane Wrath (70450, « gains additional Spell Damage equal to {2}% of your maximum Mana »)
 ARCANE_WRATH, ARCANE_WRATH_SPELL, AW_MANA_PCT = "arcaneWrath", "arcane_wrath", 2
@@ -213,10 +216,18 @@ def hot_streak_buffs(gd: GameData, pts: Points, stacks: int) -> Buffs:
 def missile_barrage_chance(gd: GameData, pts: Points, key: str, *, missiles: float = 1.0) -> float:
     """Chance qu'un sort `key` qui touche déclenche Missile Barrage (0 sans le talent ou pour un autre sort).
     70450 (marqueur `missile_hits`) : aussi chaque projectile d'Arcane Missiles (`missiles` projectiles :
-    1 - (1 - p)^missiles) et Arcane Wrath.
+    1 - (1 - p)^missiles) et Arcane Wrath ; correctif 112753 (marqueur `listed_spells`) : plus de projectiles, Frost
+    Blast parmi les autres sorts.
 
     Registre : B14"""
-    if talent_model(gd, MISSILE_BARRAGE) == "missile_hits":
+    model = talent_model(gd, MISSILE_BARRAGE)
+    if model == "listed_spells":
+        if key == SPELL:
+            return talent_value(gd, pts, MISSILE_BARRAGE, MB_AB_CHANCE) / PERCENT
+        if key in MB_LISTED_SPELLS:
+            return talent_value(gd, pts, MISSILE_BARRAGE, MB_OTHER_CHANCE) / PERCENT
+        return 0.0
+    if model == "missile_hits":
         if key == SPELL:
             return talent_value(gd, pts, MISSILE_BARRAGE, MB_HITS_AB) / PERCENT
         if key == ARCANE_MISSILES:

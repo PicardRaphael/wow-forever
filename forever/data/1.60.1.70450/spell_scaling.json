@@ -2705,12 +2705,22 @@
       "base_level": 24,
       "max_level": 35,
       "base_points": 26.0,
-      "points_per_level": 0.30000001192,
-      "variance": 0.10526315868,
-      "bonus_coefficient": 0.34299999475,
+      "points_per_level": 0.3,
+      "variance": 0.10526316,
+      "bonus_coefficient": 0.271,
       "period_ms": 0
      }
-    ]
+    ],
+    "hotfix": {
+     "pushes": [
+      112694
+     ],
+     "rows": [
+      "SpellEffect 1363753"
+     ],
+     "first_logged_at": null,
+     "dbcache_date": "2026-10-21T06:53:56Z"
+    }
    },
    {
     "rank": 2,
@@ -2729,11 +2739,21 @@
       "max_level": 47,
       "base_points": 45.0,
       "points_per_level": 0.5,
-      "variance": 0.10526315868,
-      "bonus_coefficient": 0.34299999475,
+      "variance": 0.10526316,
+      "bonus_coefficient": 0.271,
       "period_ms": 0
      }
-    ]
+    ],
+    "hotfix": {
+     "pushes": [
+      112694
+     ],
+     "rows": [
+      "SpellEffect 1363755"
+     ],
+     "first_logged_at": null,
+     "dbcache_date": "2026-10-21T06:53:56Z"
+    }
    },
    {
     "rank": 3,
@@ -2751,12 +2771,22 @@
       "base_level": 48,
       "max_level": 60,
       "base_points": 77.0,
-      "points_per_level": 0.60000002384,
-      "variance": 0.10526315868,
-      "bonus_coefficient": 0.34299999475,
+      "points_per_level": 0.6,
+      "variance": 0.10526316,
+      "bonus_coefficient": 0.271,
       "period_ms": 0
      }
-    ]
+    ],
+    "hotfix": {
+     "pushes": [
+      112694
+     ],
+     "rows": [
+      "SpellEffect 1363757"
+     ],
+     "first_logged_at": null,
+     "dbcache_date": "2026-10-21T06:53:56Z"
+    }
    }
   ],
   "arcane_wrath": [
@@ -2781,7 +2811,18 @@
       "bonus_coefficient": 1.0,
       "period_ms": 0
      }
-    ]
+    ],
+    "hotfix": {
+     "pushes": [
+      112845
+     ],
+     "rows": [
+      "SpellCategories 190242",
+      "SpellCooldowns 102218"
+     ],
+     "first_logged_at": null,
+     "dbcache_date": "2026-10-21T06:53:56Z"
+    }
    },
    {
     "rank": 2,
@@ -2804,7 +2845,18 @@
       "bonus_coefficient": 1.0,
       "period_ms": 0
      }
-    ]
+    ],
+    "hotfix": {
+     "pushes": [
+      112845
+     ],
+     "rows": [
+      "SpellCategories 190243",
+      "SpellCooldowns 102219"
+     ],
+     "first_logged_at": null,
+     "dbcache_date": "2026-10-21T06:53:56Z"
+    }
    },
    {
     "rank": 3,
@@ -2827,7 +2879,18 @@
       "bonus_coefficient": 1.0,
       "period_ms": 0
      }
-    ]
+    ],
+    "hotfix": {
+     "pushes": [
+      112845
+     ],
+     "rows": [
+      "SpellCategories 190244",
+      "SpellCooldowns 102220"
+     ],
+     "first_logged_at": null,
+     "dbcache_date": "2026-10-21T06:53:56Z"
+    }
    },
    {
     "rank": 4,
@@ -2850,7 +2913,18 @@
       "bonus_coefficient": 1.0,
       "period_ms": 0
      }
-    ]
+    ],
+    "hotfix": {
+     "pushes": [
+      112845
+     ],
+     "rows": [
+      "SpellCategories 190245",
+      "SpellCooldowns 102221"
+     ],
+     "first_logged_at": null,
+     "dbcache_date": "2026-10-21T06:53:56Z"
+    }
    }
   ]
  },
@@ -2976,7 +3050,7 @@
    "spell_id": 12579,
    "source_spell_id": 11180,
    "talent": "wintersChill",
-   "pct_per_stack": 40,
+   "pct_per_stack": 5,
    "max_stacks": 5,
    "duration_ms": 15000,
    "schools": [

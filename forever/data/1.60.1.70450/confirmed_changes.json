@@ -44,7 +44,8 @@
     "Changements installés dans 1.60.1.70450 en révision 2 (forever install, 2026-10-20) : champ applied_in_revision.",
     "Changements installés dans 1.60.1.70450 en révision 3 (forever install, 2026-10-20) : champ applied_in_revision.",
     "Changements installés dans 1.60.1.70450 en révision 4 (forever install, 2026-10-20) : champ applied_in_revision.",
-    "Changements installés dans 1.60.1.70450 en révision 5 (forever install, 2026-10-20) : champ applied_in_revision."
+    "Changements installés dans 1.60.1.70450 en révision 5 (forever install, 2026-10-20) : champ applied_in_revision.",
+    "Changements installés dans 1.60.1.70450 en révision 6 (forever install, 2026-10-21) : champ applied_in_revision."
   ],
   "changes": [
     {
@@ -1502,6 +1503,520 @@
       "nature": "client",
       "decision": "70450 : écart du client tranché « client » par l'utilisateur le 2026-10-20 (décision 285) après le rejeu des builds (docs/research/rejeu-70450.md) ; refonte du Mage de la note officielle du 15 octobre (t/2360696/6, révision 2)",
       "applied_in_revision": 1
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        20,
+        5,
+        10,
+        50,
+        100,
+        0.5
+      ],
+      "new": [
+        20,
+        10,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        40,
+        10,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "new": [
+        40,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        20,
+        5,
+        10,
+        50,
+        100,
+        0.5
+      ],
+      "new": [
+        20,
+        10,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "missileBarrage",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": [
+        40,
+        10,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "new": [
+        40,
+        20,
+        50,
+        100,
+        0.5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "frostWarding",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        15,
+        10
+      ],
+      "new": [
+        15,
+        10,
+        10
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "frostWarding",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        30,
+        20
+      ],
+      "new": [
+        30,
+        20,
+        20
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "frostWarding",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        15,
+        10
+      ],
+      "new": [
+        15,
+        10,
+        10
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "frostWarding",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": [
+        30,
+        20
+      ],
+      "new": [
+        30,
+        20,
+        20
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "max",
+      "old": 5,
+      "new": 3,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        1
+      ],
+      "new": [
+        2
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "ranks[2]",
+      "old": [
+        2
+      ],
+      "new": [
+        4
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "ranks[3]",
+      "old": [
+        3
+      ],
+      "new": [
+        6
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "ranks[4]",
+      "old": [
+        4
+      ],
+      "new": null,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "ranks[5]",
+      "old": [
+        5
+      ],
+      "new": null,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        1
+      ],
+      "new": [
+        2
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": [
+        2
+      ],
+      "new": [
+        4
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "tooltip_values[3]",
+      "old": [
+        3
+      ],
+      "new": [
+        6
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "tooltip_values[4]",
+      "old": [
+        4
+      ],
+      "new": null,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "elementalPrecision",
+      "change": "modified",
+      "field": "tooltip_values[5]",
+      "old": [
+        5
+      ],
+      "new": null,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "permafrost",
+      "change": "modified",
+      "field": "col",
+      "old": 2,
+      "new": 4,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "frostbite",
+      "change": "modified",
+      "field": "col",
+      "old": 4,
+      "new": 2,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "piercingIce",
+      "change": "removed",
+      "field": null,
+      "old": "piercingIce",
+      "new": null,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "frostChanneling",
+      "change": "modified",
+      "field": "col",
+      "old": 2,
+      "new": 1,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "improvedBlizzard",
+      "change": "modified",
+      "field": "col",
+      "old": 4,
+      "new": 2,
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        20,
+        40,
+        5
+      ],
+      "new": [
+        20,
+        5,
+        7,
+        5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[2]",
+      "old": [
+        40,
+        40,
+        5
+      ],
+      "new": [
+        40,
+        5,
+        7,
+        5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[3]",
+      "old": [
+        60,
+        40,
+        5
+      ],
+      "new": [
+        60,
+        5,
+        7,
+        5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[4]",
+      "old": [
+        80,
+        40,
+        5
+      ],
+      "new": [
+        80,
+        5,
+        7,
+        5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "wintersChill",
+      "change": "modified",
+      "field": "tooltip_values[5]",
+      "old": [
+        100,
+        40,
+        5
+      ],
+      "new": [
+        100,
+        5,
+        7,
+        5
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "iceBarrier",
+      "change": "modified",
+      "field": "ranks[1]",
+      "old": [
+        431,
+        1
+      ],
+      "new": [
+        431,
+        3,
+        1,
+        3
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
+    },
+    {
+      "kind": "talent",
+      "key": "iceBarrier",
+      "change": "modified",
+      "field": "tooltip_values[1]",
+      "old": [
+        431,
+        1
+      ],
+      "new": [
+        431,
+        3,
+        1,
+        3
+      ],
+      "nature": "correctif_serveur",
+      "decision": "70450 r6 : correctif du serveur lu dans le DBCache.bin vérifié de Raidbots (créé le 2026-10-21T06:25:13Z, sha256 68e09c5c315e…, poussées jusqu'à 112845 dont 112753), appliqué sans session de jeu par accord de l'utilisateur du 2026-10-21 (décision 290) ; certitude au plus probable, le cache du jeu de l'utilisateur primera",
+      "applied_in_revision": 6
     }
   ],
   "carried_from": "1.60.1.70374"

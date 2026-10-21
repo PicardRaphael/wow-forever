@@ -796,6 +796,9 @@ def popular_builds(
             f"Classe {wanted} absente de Talents Forever {addon.version}.", "choisir une autre classe"
         )
     gd = build_game_data(load_version(deps))
+    from forever.server_removed import exclude_removed_builds, server_removed_talents
+
+    removed = server_removed_talents(deps.data_dir)  # décision 290 : jamais un build avec un talent retiré
     classes: dict[str, Any] = {}
     for name, layout in addon.layouts.items():
         block = addon.popular.get(layout.file)
@@ -815,8 +818,18 @@ def popular_builds(
             "spec": spec,
             "top": [_popular_entry(layout, gd, b) for b in block.get("top") or [] if isinstance(b, dict)],
         }
+        kept, aside = exclude_removed_builds(classes[name]["top"], name, removed)
+        if aside:
+            classes[name]["top"] = kept
+            classes[name]["set_aside"] = aside  # écartés : talent probablement retiré par le serveur
     dates = sorted({str(c["asOf"]) for c in classes.values()})
     notes = [POPULAR_NOTE, f"relevés du {', '.join(dates) or '?'} (fenêtre par classe : champ window)"]
+    for name, c in classes.items():
+        for a in c.get("set_aside", []):
+            notes.append(
+                f"{name} : build populaire n° {a['rank']} écarté, talent probablement retiré par le serveur "
+                f"({', '.join(a['removed'])}, décision 290)"
+            )
     out: dict[str, Any] = {
         "kind": "tf_popular",
         "addon": addon.describe(),
