@@ -255,3 +255,18 @@ def test_simulate_races_and_weights(make_deps, tmp_path, monkeypatch):
     r = call(deps, lambda c: c.call_tool("forever_simulate", args))
     assert not r.is_error and r.structured_content["normalised"]["StatSpellDamage"] == 1.0
     assert r.structured_content["level"] == 60
+
+
+def test_simulate_compares_presets_in_identical_conditions(make_deps, tmp_path, monkeypatch):
+    """`forever_simulate(action="compare")` : préréglages et races (`cases` : « clé@Race » séparés par des virgules)
+    comparés dans des conditions identiques ; conditions et consommables dits dans la sortie."""
+    from wowsims_fakes import Sim, clone
+
+    from forever.pipeline import gitops
+
+    clone(tmp_path)
+    monkeypatch.setattr(gitops, "subprocess_runner", Sim())
+    args = {"action": "compare", "cases": "mage/dps/Fire@Gnome,shaman/elemental/testing@Dwarf", "consumables": "none"}
+    r = call(make_deps(cache_dir=tmp_path), lambda c: c.call_tool("forever_simulate", args))
+    assert not r.is_error and r.structured_content["rows"][0]["preset"] == "mage/dps/Fire"
+    assert r.structured_content["conditions"]["consumables"] == "none"

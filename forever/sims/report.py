@@ -17,7 +17,7 @@ MAGE_ENGINE_FROZEN = (
     "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
 )
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
-ACTIONS = ("presets", "races", "weights")
+ACTIONS = ("presets", "races", "weights", "compare")
 
 
 def _stat(name: str) -> str:
@@ -35,9 +35,12 @@ def simulate(
     stats: str | None = None,
     reference: str | None = None,
     iterations: int | None = None,
+    cases: str | None = None,
+    consumables: str = "none",
 ) -> dict[str, Any]:
     """`action` : `presets` (liste), `races` (races séparées par des virgules, sur `preset`), `weights` (statistiques
-    séparées par des virgules, rapportées à `reference`, race facultative)."""
+    séparées par des virgules, rapportées à `reference`, race facultative), `compare` (`cases` : « clé@Race » séparés
+    par des virgules, conditions identiques ; `consumables` : `none` ou `own`)."""
     if action not in ACTIONS:
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
     pin = pinned(deps.cache_dir)
@@ -48,6 +51,19 @@ def simulate(
     if action == "presets":
         listed = [{"key": p.key, "class": p.class_token, "race": p.race} for p in presets]
         return {"level": LEVEL, "presets": listed, "provenance": provenance}
+    if action == "compare":
+        by_key = {p.key: p for p in presets}
+        pairs = []
+        for item in (cases or "").split(","):
+            key, _, race_name = item.strip().partition("@")
+            if key not in by_key or not race_name:
+                raise InvalidArgumentError(f"Cas illisible : « {item} ».", "donner cases, ex. mage/dps/Fire@Human")
+            pairs.append((by_key[key], wowsims.race_enum(race_name)))
+        kw: dict[str, Any] = {"iterations": iterations} if iterations else {}
+        rows, conditions = wowsims.compare_presets(
+            deps.cache_dir, pairs, wowsims.reference_encounter(presets), consumables=consumables, **kw
+        )
+        return {"level": LEVEL, "rows": rows, "conditions": conditions, "provenance": provenance}
     chosen = next((p for p in presets if p.key == preset), None)
     if chosen is None:
         raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir action=presets")
