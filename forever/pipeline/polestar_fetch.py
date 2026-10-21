@@ -14,10 +14,16 @@ REPO = "https://github.com/fitzforge/polestar.git"
 
 def _run(args: Sequence[str], cwd: Path | None = None) -> Any:
     """git du réseau par le seul exécuteur de `forever.pipeline.gitops` (sans shell, sans invite, sans fenêtre)."""
+    from forever.pipeline.gitops import GitOpsError, subprocess_runner
     from forever.pipeline.gitops import _run as run_checked
-    from forever.pipeline.gitops import subprocess_runner
 
-    return run_checked(subprocess_runner, args, cwd or Path.cwd(), timeout=300)
+    try:
+        return run_checked(subprocess_runner, args, cwd or Path.cwd(), timeout=300)
+    except GitOpsError as exc:
+        raise GitOpsError(
+            exc.message,
+            "vérifier la connexion, puis relancer `forever route polestar` ; une copie déjà faite reste lue",
+        ) from exc
 
 
 def update_polestar(cache_dir: Path, *, run: Callable[..., Any] = _run) -> Path:

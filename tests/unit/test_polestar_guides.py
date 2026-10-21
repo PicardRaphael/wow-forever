@@ -118,3 +118,18 @@ def test_polestar_clone_is_made_then_updated_read_only(tmp_path):
     update_polestar(tmp_path, run=run)
     assert [c[0][:2] for c in calls] == [["git", "fetch"], ["git", "reset"]]
     assert all(c[1] == clone for c in calls) and not any("push" in c[0] for c in calls)
+
+
+def test_a_git_failure_points_to_route_polestar(tmp_path, monkeypatch):
+    """Un échec de git (réseau) se rapporte à `forever route polestar`, pas au passage de `forever update`."""
+    import pytest
+
+    from forever.pipeline import gitops, polestar_fetch
+
+    def failing(args, cwd, timeout=None):
+        return __import__("subprocess").CompletedProcess(args, 128, "", "fatal: unable to access")
+
+    monkeypatch.setattr(gitops, "subprocess_runner", failing)
+    with pytest.raises(gitops.GitOpsError) as err:
+        polestar_fetch.update_polestar(tmp_path)
+    assert "forever route polestar" in err.value.action and "forever update" not in err.value.action
