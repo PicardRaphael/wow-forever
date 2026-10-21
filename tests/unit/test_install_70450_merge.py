@@ -152,3 +152,16 @@ def test_older_rename_does_not_override_a_changed_client_text():
     m = _Merge(VERSION, [rename], "2026-10-20", previous_client_desc={"hot": "old $s1"})
     out = m.talents(repo, cand)["trees"][0]["talents"][0]
     assert not m.refused and out["key"] == "hot" and out["desc"] == "new {0}"
+
+
+def test_removed_talent_needs_a_confirmation():
+    """Talent retiré par un correctif du serveur (Piercing Ice, correctif 112753, décision 290) : refusé sans entrée
+    confirmée ; confirmé (« removed »), il quitte talents.json."""
+    repo, cand = doc(talent("ice"), talent("piercing", col=2)), doc(talent("ice"))
+    m = _Merge(VERSION, [], "2026-10-21")
+    m.talents(repo, cand)
+    assert [r["path"] for r in m.refused] == ["piercing"]
+    m = _Merge(VERSION, [confirmed("talent", "piercing", "removed", None, "piercing", None)], "2026-10-21")
+    out = m.talents(repo, cand)
+    assert not m.refused and [t["key"] for t in out["trees"][0]["talents"]] == ["ice"]
+    assert any(c["rule"] == "confirmed" and c["path"] == "piercing" for c in m.changes)
