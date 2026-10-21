@@ -32,6 +32,7 @@ FOREVER_TOOLS: tuple[str, ...] = (
     "mcp__forever__forever_build",
     "mcp__forever__forever_route",  # RX1 : feuille de route
     "mcp__forever__forever_gear",  # CJ1 : équipement (écran Équipement, essai CJ-6)
+    "mcp__forever__forever_simulate",  # décisions 293 et 294 : wowsims/forever au niveau 60 (binaire local épinglé)
 )
 ALLOWED_TOOLS: tuple[str, ...] = ("Skill", *FOREVER_TOOLS)
 # Conversations du pont sans les hooks du plugin (démarrage, contrôle de fin) : le pont publie lui-même l'état des
