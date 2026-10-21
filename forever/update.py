@@ -79,8 +79,19 @@ if TYPE_CHECKING:
 
 SCHEMA_VERSION = 1
 UPDATE_DIR = "update"
-STEPS = ("verrou", "archivage", "clone", "jeu", "nouvelle_version", "correctifs", "journaux", "addons", "fin")
-ONLY = ("jeu", "correctifs", "journaux", "addons")
+STEPS = (
+    "verrou",
+    "archivage",
+    "clone",
+    "jeu",
+    "nouvelle_version",
+    "correctifs",
+    "journaux",
+    "addons",
+    "guides",
+    "fin",
+)
+ONLY = ("jeu", "correctifs", "journaux", "addons", "guides")
 KINDS = ("install_version", "install_revision", "measures", "addon_data", "network_dbd", "network")
 STATUSES = ("fait", "rien", "attente", "arrêt", "erreur")
 ACTIONS = ("écrire", "attente", "bloqué")
@@ -108,7 +119,9 @@ STEP_LIMITS_S: dict[str, float] = {
     "correctifs": 30 * 60,
     "journaux": 120 * 60,
     "addons": 75 * 60,
+    "guides": 15 * 60,
 }
+STEP_GIT_TIMEOUT_S = 300.0  # délai d'une commande git des guides de Polestar
 PASS_TIMEOUT_EXIT = 7
 PASS_ERROR_KIND = "pass_error"  # passage arrêté (délai) ou étape en erreur : attente visible, levée au passage réussi
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
@@ -2067,6 +2080,46 @@ def _step_addons(run: _Run) -> Step:
     return Step("addons", "rien", "aucun addon changé", data)
 
 
+def _step_guides(run: _Run) -> Step:
+    """Clone en cache des guides de Polestar remis sur leur dernier commit (décision 289 ; lecture seule, réseau) :
+    seulement s'il existe déjà (créé à la main par `forever route polestar`), jamais en simulation ni hors réseau ; un
+    échec garde la copie existante (attente, nouvel essai au passage suivant), sans bloquer le passage."""
+    from forever.compare import polestar_clone, polestar_commit
+    from forever.pipeline import gitops
+    from forever.pipeline.polestar_fetch import update_polestar
+
+    if not run.wants("guides"):
+        return Step("guides", "rien", "non demandé (--only)", {})
+    clone = polestar_clone(run.deps.cache_dir)
+    if not (clone / ".git").is_dir():
+        return Step("guides", "rien", "aucun clone de Polestar (le créer une fois : `forever route polestar`)", {})
+    before = polestar_commit(clone)
+    if run.options.dry_run or not run.options.network or run.deps.offline:
+        return Step(
+            "guides", "rien", f"Polestar non mis à jour (simulation ou hors réseau), commit {_short(before)}", {}
+        )
+    runner = run.runner or gitops.subprocess_runner
+
+    def git(args: Sequence[str], cwd: Path | None = None) -> Any:
+        return gitops._run(runner, args, cwd or clone, timeout=STEP_GIT_TIMEOUT_S)
+
+    try:
+        update_polestar(run.deps.cache_dir, run=git)
+    except gitops.GitOpsError as exc:
+        detail = (
+            f"Polestar non mis à jour ({exc.message}) : copie du commit {_short(before)} gardée, nouvel essai au "
+            "passage suivant"
+        )
+        return Step("guides", "attente", detail, {"commit": before})
+    after = polestar_commit(clone)
+    moved = "inchangé" if after == before else f"{_short(before)} → {_short(after)}"
+    return Step("guides", "fait", f"guides de Polestar à jour : commit {_short(after)} ({moved})", {"commit": after})
+
+
+def _short(commit: str | None) -> str:
+    return commit[:12] if commit else "inconnu"
+
+
 # --- Écriture par le clone et le chemin git ------------------------------------------------------------------
 
 
@@ -2449,6 +2502,7 @@ def run_update(
             advance("correctifs", lambda: _step_hotfixes(run))
             advance("journaux", lambda: _step_logs(run))
             advance("addons", lambda: _step_addons(run))
+            advance("guides", lambda: _step_guides(run))
             done(_end_step(run))
         finally:
             stop.set()

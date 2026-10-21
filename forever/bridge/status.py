@@ -45,6 +45,7 @@ _STEP_STAGES = {
     "correctifs": "lecture des correctifs du serveur",
     "journaux": "mesures de tes combats",
     "addons": "lecture des addons",
+    "guides": "mise à jour des guides de Polestar",
     "fin": "finalisation",
 }
 DEFAULT_STAGE = "travail en cours"

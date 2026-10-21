@@ -544,7 +544,7 @@ def build_parser() -> argparse.ArgumentParser:
     up.add_argument("--auto", action="store_true", help="passage automatique (hook de démarrage, tâche planifiée)")
     up.add_argument("--dry-run", action="store_true", help="tout calculer, ne rien écrire ni enregistrer")
     up.add_argument("--no-network", action="store_true", help="aucun accès réseau (ni wago, ni WoWDBDefs, ni git)")
-    up.add_argument("--only", help="étapes : jeu,correctifs,journaux,addons (défaut : toutes)")
+    up.add_argument("--only", help="étapes : jeu,correctifs,journaux,addons,guides (défaut : toutes)")
     up.add_argument("--json", action="store_true", help="sortie JSON")
     up.add_argument(
         "--log", action="store_true", help="sortie dans <cache>/update/run-<horodatage>.log (tâche planifiée)"
