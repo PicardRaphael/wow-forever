@@ -200,3 +200,22 @@ def test_instructions_rules(make_deps):
     assert "aucun chiffre" in low and "outil" in low
     assert "certitude" in low and "provenance" in low
     assert "je ne sais pas" in low
+
+
+def test_lookup_zones_follows_the_class(make_deps, monkeypatch):
+    """Les zones suivent la classe demandée (personnage connecté), jamais le Mage par défaut (décision 294 : rien de
+    figé sur une classe)."""
+    from forever import lookup
+
+    seen = []
+    real = lookup.zones_for_level
+
+    def spy(*args, **kwargs):
+        seen.append(kwargs.get("player_class"))
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(lookup, "zones_for_level", spy)
+    questie = str(FIXTURES / "questie" / "11.38.0")
+    args = {"kind": "zones", "level": 12, "faction": "horde", "questie": questie, "class_name": "Chaman"}
+    r = call(make_deps(), lambda c: c.call_tool("forever_lookup", args))
+    assert not r.is_error and seen == ["shaman"]
