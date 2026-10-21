@@ -46,3 +46,10 @@ def test_lookup_zones_errors(capsys, make_deps):
 def test_lookup_spell_still_needs_a_name(capsys, make_deps):
     code, out = run_json(capsys, ["lookup", "spell"], make_deps())
     assert code == 2 and out["error"]["code"] == "invalid_argument"
+
+
+def test_without_class_the_answer_says_so(capsys, make_deps):
+    code, out = run_json(
+        capsys, ["lookup", "zones", "--level", "12", "--faction", "horde", "--wow", str(WOW)], make_deps()
+    )
+    assert code == 0 and any("classe inconnue" in a for a in out["provenance"]["assumptions"])

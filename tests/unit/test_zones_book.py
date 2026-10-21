@@ -65,3 +65,12 @@ def test_dungeon_quests_go_to_the_dungeon_and_zones_are_ranked(game_data):
     out = zones_from_book(b, game_data, 12, faction="alliance", player_class="mage")
     assert [z["name"] for z in out["zones"]] == ["Zone Deux", "Zone Une"]
     assert out["dungeons"][0]["name"] == "Fixture Depths" and out["dungeons"][0]["kind"] == "dungeon"
+
+
+def test_unknown_class_is_said_and_class_quests_are_left_out(game_data):
+    """Classe inconnue : la réponse le dit, ne suppose aucune classe (plus le Mage par défaut) et laisse de côté les
+    quêtes de classe."""
+    b = book(quest(1, 12, map_id=9001), quest(2, 12, map_id=9001, classes=MAGE))
+    out = zones_from_book(b, game_data, 12, faction="alliance", player_class=None)
+    assert out["zones"][0]["quests"] == [1]
+    assert any("classe inconnue" in n for n in out["notes"]) and not any("classe mage" in n for n in out["notes"])
