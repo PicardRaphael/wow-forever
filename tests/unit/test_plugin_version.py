@@ -61,7 +61,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.16.0 : guide de Forever Companion pour les autres classes (`class_guide`, forever-builds ; plan Sources, étape b).
     # 0.17.0 : outil forever_simulate (wowsims/forever au niveau 60, décisions 293 et 294) ; zones du livre de quêtes.
     # 0.18.0 : forever_simulate compare des classes dans des conditions identiques.
-    assert version == "0.18.0"
+    # 0.19.0 : poids de l'équipement au niveau 60 par wowsims/forever.
+    assert version == "0.19.0"
 
 
 def test_fingerprint_is_up_to_date():

@@ -593,3 +593,68 @@ def compare_presets(
     best = rows[0]["dps"] if rows else 0.0
     conditions = {**common, "consumables": consumables, "encounter": encounter, "seed": seed, "iterations": iterations}
     return [{**r, "gap_to_best": r["dps"] - best} for r in rows], conditions
+
+
+# Spécialisation (clé de Naowh, celle de forever_gear) -> préréglage du dépôt de wowsims qui la représente (choix
+# de l'outil, noms des deux projets ; un préréglage absent du commit épinglé : poids d'avant gardés).
+SPEC_PRESETS = {
+    "arcane-mage": "mage/dps/Arcane Fire", "fire-mage": "mage/dps/Fire", "frost-mage": "mage/dps/FFB",
+    "elemental-shaman": "shaman/elemental/testing", "enhancement-shaman": "shaman/enhancement/testing",
+    "balance-druid": "druid/balance/défaut", "feral-dps-druid": "druid/feralcat/défaut",
+    "feral-tank-druid": "druid/feralbear/défaut", "beast-mastery-hunter": "hunter/dps/BM",
+    "marksmanship-hunter": "hunter/dps/MM", "survival-hunter": "hunter/dps/SV Weave",
+    "protection-paladin": "paladin/protection/défaut", "retribution-paladin": "paladin/retribution/Twist of Light",
+    "shadow-priest": "priest/dps/testing", "assassination-rogue": "rogue/dps/Asn Muti",
+    "combat-rogue": "rogue/dps/Combat SS", "subtlety-rogue": "rogue/dps/Subtlety Hemo",
+    "affliction-warlock": "warlock/dps/aff_wrack", "demonology-warlock": "warlock/dps/demo_shadow_brand",
+    "destruction-warlock": "warlock/dps/destro", "arms-warrior": "warrior/dps/Arms Pre-BiS",
+    "fury-warrior": "warrior/dps/Fury Pre-BiS", "protection-warrior": "warrior/protection/défaut",
+}  # fmt: skip
+# Statistiques de wowsims -> clés de Forever Guide (mêmes points, vérifié le 2026-10-21 sur les objets communs ;
+# wowsims n'a qu'un toucher et qu'un critique : ils valent aussi pour ceux des sorts de Guide).
+STAT_TO_GUIDE = {
+    "StatStrength": ("str",), "StatAgility": ("agi",), "StatIntellect": ("int",), "StatSpirit": ("spi",),
+    "StatSpellDamage": ("sp",), "StatArcaneDamage": ("arc",), "StatFireDamage": ("fir",), "StatFrostDamage": ("fro",),
+    "StatHolyDamage": ("hol",), "StatNatureDamage": ("nat",), "StatShadowDamage": ("sha",),
+    "StatAttackPower": ("ap",), "StatRangedAttackPower": ("rap",), "StatFeralAttackPower": ("fap",),
+    "StatHitRating": ("hit", "shit"), "StatCritRating": ("crit", "scrit"), "StatMP5": ("mp5",),
+}  # fmt: skip
+WEIGHTS_ITERATIONS = 4000  # combats par statistique pour les poids de l'équipement (réglage de l'outil)
+
+
+def gear_weights(cache_dir: Path, spec_key: str, race: str) -> tuple[dict[str, float], str] | None:
+    """Poids de l'équipement au niveau 60 d'une spécialisation, en clés de Forever Guide : gain de dégâts par seconde
+    par point (tirages appariés sur le préréglage de la spécialisation, race du personnage) ; gardés par commit,
+    préréglage et race. None sans wowsims compilé ou sans préréglage pour cette spécialisation."""
+    pin = pinned(cache_dir)
+    key = SPEC_PRESETS.get(spec_key)
+    if pin is None or key is None:
+        return None
+    clone = wowsims_dir(cache_dir) / "forever"
+    presets = {p.key: p for p in read_presets(clone)}
+    preset = presets.get(key)
+    if preset is None:
+        return None
+    names = stat_names(clone)
+    stats = [s for s in STAT_TO_GUIDE if s in names]
+    if not stats:
+        return None
+    race_name = race_enum(race)
+    slug = re.sub(r"[^A-Za-z0-9]+", "-", key)
+    path = wowsims_dir(cache_dir) / "runs" / f"weights-{str(pin['commit'])[:12]}-{slug}-{race_name}.json"
+    if path.is_file():
+        per_point = dict(json.loads(path.read_text(encoding="utf-8")))
+    else:
+        out = stat_weights(cache_dir, preset, stats, reference=stats[0], race=race_name,
+                           encounter=reference_encounter(list(presets.values())), iterations=WEIGHTS_ITERATIONS)  # fmt: skip
+        per_point = out["per_point"]
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(per_point, ensure_ascii=False, indent=1), encoding="utf-8")
+    weights: dict[str, float] = {}
+    for stat, value in per_point.items():
+        if value > 0:
+            for guide in STAT_TO_GUIDE.get(stat, ()):
+                weights[guide] = round(float(value), 4)
+    label = (f"wowsims/forever (niveau 60, préréglage {key}, {race}, commit {str(pin['commit'])[:12]}, gain de dégâts "
+             "par seconde par point, suppose)")  # fmt: skip
+    return weights, label

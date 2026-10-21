@@ -488,7 +488,8 @@ def build_server(deps: Deps) -> MCPServer:
         `action="leveling"` à ce niveau, jamais `route`, qui part de la liste BiS sans niveau) : `action="weights"` poids du Mage calculés par le moteur et lignes à importer
         (`naowh` : NFSW1, Naowh Forever, « Import weights » ; `pawn` : Forever Companion, « Import scale… ») ;
         `action="bis"` liste BiS personnelle (`spec` : clé de Naowh, ex. frost-mage, fury-warrior ; `faction`) bâtie
-        depuis Naowh Forever et Forever Companion, classée par nos poids (Mage) ou l'échelle de Forever Companion, avec
+        depuis Naowh Forever et Forever Companion, classée au niveau 60 par les poids de wowsims/forever (toutes
+        classes de dégâts, gain par point, décision 293), sinon par nos poids (Mage) ou l'échelle de Forever Companion, avec
         lieux de butin et `export` (!NBIS1!, Naowh, fenêtre BiS, « Import a list ») ; `action="leveling"` choix de
         GearQuest Forever obtenables au niveau (`required_level` de chaque objet, `excluded` avec leur raison, `set_aside`
         à source inconnue ; `professions` : métiers appris du profil, noms anglais, sinon aucun objet de métier ;

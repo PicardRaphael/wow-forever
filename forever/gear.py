@@ -867,6 +867,7 @@ def is_upgrade(addons: Any, *, item: int, equipped: list[int], weights: dict[str
 # --- rapport commun de la CLI et de l'outil MCP -------------------------------------------------------------------
 
 DEFAULT_SPECS = {"MAGE": "frost-mage"}
+WOWSIMS_LEVEL = 60  # niveau que simule wowsims/forever (constante de son code)
 
 
 def _addons_dir(deps: Deps) -> Any:
@@ -1012,6 +1013,15 @@ def _weights_for(
     talents: Mapping[str, int] | None = None,
     talents_level: int | None = None,
 ) -> tuple[dict[str, float], str]:
+    if level == WOWSIMS_LEVEL:  # décision 293 : au niveau 60, poids de wowsims/forever (toutes classes)
+        from forever.sims.wowsims import WowsimsError, gear_weights
+
+        try:
+            found = gear_weights(deps.cache_dir, spec or DEFAULT_SPECS.get(cls, ""), race)
+        except WowsimsError:
+            found = None
+        if found is not None and found[0]:
+            return found
     if cls == "MAGE":
         key = spec or DEFAULT_SPECS["MAGE"]
         pts, _source, _rotation = mage_talents_for(

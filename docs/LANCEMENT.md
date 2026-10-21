@@ -270,6 +270,10 @@ correction passe devant le reste.
     vient de wowsims/forever (forever_simulate), avec commit et certitude `suppose`. « Niveau 20, quel arbre ? » : le
     moteur du Mage répond et dit qu'il est gelé (révision 7 de 70450) ; pour un Chaman sous le 60 : « non calculé »
     (ou tes journaux), avec le build de Forever Companion.
+22f-bis. Écran Équipement au niveau 60 (ou `uv run forever gear bis --class <classe> --spec <clé> --race <race>
+    --level 60`) : la source des poids dit « wowsims/forever (niveau 60, préréglage …, commit …) » pour toute
+    spécialisation de dégâts ; soigneur ou niveau plus bas : les poids d'avant (Forever Companion, Naowh, moteur du
+    Mage gelé).
 22g. Bouton Leveling avec un Chaman (ou toute autre classe) : zones et quêtes tirées des sources Forever, filtrées pour
     sa classe (plus pour le Mage) ; la provenance dit les valeurs héritées de la Classic qu'une réponse utilise
     (`uv run forever origins classic` pour la liste).
