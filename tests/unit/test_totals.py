@@ -183,5 +183,8 @@ def test_tools_give_the_derived_values_of_the_installed_version(deps):
     b15 = {(t["talent"], t["effect"]) for t in explain_mechanic(deps, "B15")["derived"]}
     assert ("arcaneBlast", "intellect_spell_power") in b15 and ("arcaneBlast", "other_spells_damage") not in b15
     wc = lookup_talent(deps, "Winter's Chill")["derived"]
-    assert {t["effect"] for t in wc} == {"cone_of_cold_damage"}
-    assert {t["effect"] for t in explain_mechanic(deps, "D4")["derived"]} == {"cone_of_cold_damage"}
+    assert {t["effect"] for t in wc} == {"cone_of_cold_damage", "cone_of_cold_spell_power"}  # r7 (HF2)
+    assert {t["effect"] for t in explain_mechanic(deps, "D4")["derived"]} == {
+        "cone_of_cold_damage",
+        "cone_of_cold_spell_power",
+    }
