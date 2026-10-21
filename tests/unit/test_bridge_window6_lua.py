@@ -186,7 +186,7 @@ def test_route_levels_stay_ordered():
     assert int(text(game, "ForeverBridgeRouteFromValue")) == 1
 
 
-@pytest.mark.parametrize("kind", ["reputation", "profession"])
+@pytest.mark.parametrize("kind", ["reputation"])
 def test_route_type_not_yet_computed_says_so_without_a_form(kind):
     """Bloc 6b (décision 281) : un type de route que Forever ne calcule pas encore (réputation avant le bloc 4e,
     métier) le dit clairement dans l'écran : ni niveaux, ni champ libre, ni « Calculer », aucune question envoyée."""
@@ -215,6 +215,25 @@ def test_route_assistant_gear_sends_the_gear_route_action():
     click(game, "ForeverBridgeRouteCompute")
     _, record = sent(game)
     assert record.flags == frozenset({f"a=gear_route:{start}-{end}"}) and record.text == ""
+
+
+def test_route_assistant_profession_sends_the_profession_action():
+    """Assistant Métier (plan « Sources d'abord ») : ni niveaux, ni donjons, ni quêtes de classe ; « Calculer » envoie
+    l'action `a=profession`, traitée par le pont sans le modèle (métiers et rangs lus dans le contexte du jeu)."""
+    game = opened()
+    click(game, "ForeverBridgeNav_route")
+    click(game, "ForeverBridgeRouteType_profession")
+    assert not visible(game, "ForeverBridgeRouteUnavailable") and visible(game, "ForeverBridgeRouteCompute")
+    for name in ("ForeverBridgeRouteFromValue", "ForeverBridgeRouteToValue", "ForeverBridgeRouteDungeons",
+                 "ForeverBridgeRouteClass"):  # fmt: skip
+        assert not visible(game, name), name
+    assert "SkillUp" in text(game, "ForeverBridgeRouteNote")
+    click(game, "ForeverBridgeRouteCompute")
+    _, record = sent(game)
+    assert record.flags == frozenset({"a=profession"}) and record.text == ""
+    click(game, "ForeverBridgeNav_route")
+    click(game, "ForeverBridgeRouteType_leveling")  # retour au leveling : niveaux et note d'origine
+    assert visible(game, "ForeverBridgeRouteFromValue") and "SkillUp" not in text(game, "ForeverBridgeRouteNote")
 
 
 # --- 3. écrans Talents, Équipement, Exports, Mises à jour ------------------------------------------------------
