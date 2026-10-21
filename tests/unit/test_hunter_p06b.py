@@ -152,6 +152,8 @@ def hunter_bench(tmp_path_factory, data_at_pre_70450_version):
     write_addon(wow, DATA_DIR / PRE_70450_VERSION / "classes.json")
     addons = wow / "Interface" / "AddOns"
     shutil.copytree(FIXTURES / "questie" / "11.38.0", addons / "Questie")
+    # décision 294 : zones du livre de quêtes des sources Forever (addons de la fixture des quêtes)
+    shutil.copytree(FIXTURES / "addons" / "quests" / "Interface" / "AddOns", addons, dirs_exist_ok=True)
     shutil.copytree(FIXTURES / "bestiary" / "ForeverBestiary", addons / "ForeverBestiary")
     deps = Deps(
         data_dir=data_at_pre_70450_version, registry_path=REGISTRY_PATH, cache_dir=root / "cache", http_get=FakeHttp.failing(),

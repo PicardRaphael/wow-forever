@@ -189,7 +189,8 @@ def build_parser() -> argparse.ArgumentParser:
     lookup.add_argument("name", nargs="?", help="nom anglais du sort ou du talent (casse, espaces et tirets ignorés)")
     lookup.add_argument("--level", type=int, help="zones : niveau du personnage")
     lookup.add_argument("--faction", choices=["horde", "alliance"], help="zones : faction (défaut : toutes)")
-    lookup.add_argument("--questie", help="zones : dossier de l'addon Questie (défaut : dans FOREVER_WOW_DIR)")
+    lookup.add_argument("--questie", help="dossier de l'addon Questie (défaut : dans FOREVER_WOW_DIR)")
+    lookup.add_argument("--wow", help="zones : dossier du client (livre de quêtes Forever ; défaut : FOREVER_WOW_DIR)")
     lookup.add_argument("--rank", type=int, help="position du rang, à partir de 1")
     lookup.add_argument("--class", dest="cls", help="talent : classe (défaut : Mage ; 9 classes depuis PV1)")
     lookup.add_argument("--detail", action="store_true", help="champs complémentaires")
@@ -1989,7 +1990,9 @@ def _cmd_lookup(deps: Deps, args: argparse.Namespace) -> int:
         _emit(found, render_quests(found), found["provenance"], args.json)
         return EXIT_OK
     if args.kind == "zones":
-        zones = lookup_zones(deps, args.level, faction=args.faction, player_class=args.cls)
+        zones = lookup_zones(
+            deps, args.level, faction=args.faction, player_class=args.cls, wow_dir=Path(args.wow) if args.wow else None
+        )
         _emit(zones, render_zones(zones), zones["provenance"], args.json)
         return EXIT_OK
     if args.kind == "talent":

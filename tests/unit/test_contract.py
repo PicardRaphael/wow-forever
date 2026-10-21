@@ -25,6 +25,7 @@ from forever.cli import main
 from forever.provenance import validate_provenance
 
 QUESTIE = FIXTURES / "questie" / "11.38.0"
+WOW_QUESTS = FIXTURES / "addons" / "quests"  # dossier du client réduit : livre de quêtes des sources Forever
 
 LABELS = ["version ", "données ", "générée ", "fraîcheur ", "certitude ", "registre ", "hypothèses : "]
 
@@ -86,8 +87,8 @@ CASES = {
         None,
     ),
     # T04c : zone ou donjon à mon niveau
-    "lookup-zones": (["lookup", "zones", "--level", "12", "--questie", str(QUESTIE)], 0, None),
-    "lookup-zones-bad-level": (["lookup", "zones", "--level", "0", "--questie", str(QUESTIE)], 2, None),
+    "lookup-zones": (["lookup", "zones", "--level", "12", "--wow", str(WOW_QUESTS)], 0, None),  # décision 294
+    "lookup-zones-bad-level": (["lookup", "zones", "--level", "0", "--wow", str(WOW_QUESTS)], 2, None),
     # T04c : rafraîchissement des mesures (simulation : aucune écriture)
     "measures-refresh": (["measures", "refresh", "--logs", str(COMBATLOG), "--dry-run"], 0, None),
     "measures-refresh-missing-logs": (["measures", "refresh", "--logs", "{tmp}/absent", "--dry-run"], 2, None),

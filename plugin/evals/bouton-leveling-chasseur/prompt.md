@@ -23,7 +23,7 @@ Talents actuels (clés de forever, pour `current` de forever_build) : deadlyAspe
 Équipement (noms du client ; objets pas encore reliés aux données de forever, comparaison d'objets à venir) : Trapper's Shirt, Handstitched Leather Vest (enchantement 15), Aboriginal Sash of the Eagle, Warped Leather Pants, Tiger Hide Boots, Savannah Bracers, Grizzly Gloves (enchantement 15), Depleted Ritual Band, Mystic's Cape, Curved Dagger of the Monkey, Heavy Shortbow
 
 Consigne du bouton « leveling » : appelle exactement, dans cet ordre :
-- forever_lookup {"kind": "zones", "level": 15, "faction": "horde", "limit": 5}
+- forever_lookup {"kind": "zones", "level": 15, "faction": "horde", "limit": 5, "class_name": "Hunter"}
 - forever_lookup {"kind": "tf_popular", "name": "Hunter", "current": "deadlyAspects=5,focusedFire=1"}
 - forever_sim_leveling {"kind": "objectives", "level": 15, "class_name": "Hunter", "faction": "horde", "race": "Orc"}
 Puis :
