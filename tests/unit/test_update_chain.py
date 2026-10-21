@@ -25,12 +25,13 @@ import shutil
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from conftest import RAIDBOTS_VERIFIED, (
+from conftest import (
     CLASS_FIXTURE_VERSION,
     DATA_DIR,
     FIXTURES,
     LOCAL_VERSION,
     NOW,
+    RAIDBOTS_VERIFIED,
     WAGO_70124,
     FakeHttp,
     isolated_deps,
