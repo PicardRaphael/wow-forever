@@ -53,3 +53,15 @@ def test_a_leveling_build_is_computed_on_the_installed_version(deps):
     assert rep["provenance"]["game_version"] == INSTALLED and rep["talents"]
     gone = {r["key"] for r in server_removed_talents(REPO_DATA_DIR)}
     assert not set(rep["talents"]) & gone
+
+
+def test_every_talent_description_variable_has_a_value():
+    """Aucune description de talent installée n'affiche une variable `{i}` sans valeur dans ses rangs (« {0} »)."""
+    import re
+
+    talents = json.loads((REPO_DATA_DIR / INSTALLED / "talents.json").read_text(encoding="utf-8"))
+    for tree in talents["trees"]:
+        for t in tree["talents"]:
+            used = [int(i) for i in re.findall(r"\{(\d+)\}", t.get("desc") or "")]
+            values = t.get("tooltip_values") or t["ranks"]
+            assert not used or max(used) < min(len(r) for r in values), (t["key"], t["desc"])

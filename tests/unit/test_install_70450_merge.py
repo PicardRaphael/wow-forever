@@ -165,3 +165,23 @@ def test_removed_talent_needs_a_confirmation():
     out = m.talents(repo, cand)
     assert not m.refused and [t["key"] for t in out["trees"][0]["talents"]] == ["ice"]
     assert any(c["rule"] == "confirmed" and c["path"] == "piercing" for c in m.changes)
+
+
+def test_description_with_a_variable_the_ranks_no_longer_carry_takes_the_client_text():
+    """Gabarit du dépôt dont une variable `{i}` n'a plus de valeur dans les rangs (Presence of Mind : le client écrit le
+    seuil en clair, rangs vides, « {0} » affiché) : le dépôt prend le texte du client, même inchangé depuis la version
+    précédente ; un gabarit dont chaque variable a sa valeur reste."""
+    repo = doc(
+        talent("pom", ranks=((),), desc="less than {0} sec"),
+        talent("focus", col=2, desc="seed wording {0}"),
+    )
+    cand = doc(
+        talent("pom", ranks=((),), desc="less than 7 sec", desc_template="less than 7 sec"),
+        talent("focus", col=2, desc="same $s1", desc_template="same {0}"),
+    )
+    previous = {"pom": "less than 7 sec", "focus": "same $s1"}
+    m = _Merge(VERSION, [], "2026-10-20", previous_client_desc=previous)
+    pom, focus = m.talents(repo, cand)["trees"][0]["talents"]
+    assert not m.refused
+    assert pom["desc"] == "less than 7 sec" and focus["desc"] == "seed wording {0}"
+    assert any(c["path"] == "pom.desc" and c["rule"] == "metadata" for c in m.changes)
