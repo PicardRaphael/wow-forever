@@ -247,3 +247,16 @@ def test_every_button_question_is_in_player_words():
     for b in BUTTONS:
         for text in [b.question, *b.questions.values()]:
             assert internal_jargon(text) == [], (b.key, text)
+
+
+def test_talents_button_of_another_class_reads_the_class_guide(hunter_bench):
+    """Plan « Sources d'abord », étape b : le bouton Talents d'une classe autre que le Mage demande aussi le guide de
+    Forever Companion (`class_guide` : build adapté au niveau, rotation en prose, fraîcheur), à côté des builds
+    populaires de Talents Forever ; la lecture dit sa source et ce qui n'est pas calculé."""
+    _deps, data = hunter_bench
+    r = resolve(data, context("chasseur15"))
+    plan = button_plan("talents", r, data.level_cap)
+    guide = [c for c in plan.calls if c.args.get("kind") == "class_guide"]
+    assert guide and guide[0].args["name"] == r.class_name and guide[0].args["level"] == r.level
+    text = plan_text(plan)
+    assert "rotation" in text and "Forever Companion" in text

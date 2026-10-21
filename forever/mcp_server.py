@@ -170,6 +170,9 @@ def build_server(deps: Deps) -> MCPServer:
         (nom français ou anglais) et `level` (niveau du Chasseur, jamais deviné) : guide d'apprivoisement (bêtes de la
         zone puis des zones voisines du même continent à son niveau, coordonnées datées, rang le plus haut
         atteignable). Forever Bestiary lu sur disque ; sans lui, fiches du client seules.
+        Sources (étape b, décision 291) : `kind="class_guide"` avec `name` (classe), `level` et `class_name` facultatif
+        (spécialisation) : guide de la classe lu dans Forever Companion (build adapté au niveau en nos clés et contrôlé,
+        builds écartés avec leur raison, rotation en prose au niveau 30, fraîcheur de la source ; `suppose`).
         FA1 : `kind="tf_popular"` avec `name` (classe, nom français ou anglais ; vide : les 9 classes) : builds
         populaires de Talents Forever (addon lu sur disque) : part de chaque spécialisation, date `asOf`, fenêtre,
         lien et commande `/tf import` de chaque build, légalité sur le client ; certitude `suppose` (choix de
@@ -244,6 +247,12 @@ def build_server(deps: Deps) -> MCPServer:
                 if not name or level is None:
                     raise InvalidArgumentError("Classe ou niveau manquant.", "donner name (classe), level et talents")
                 return check_talents(deps, name, parse_talents(talents) if talents else {}, level)
+            if kind == "class_guide":
+                from forever.lookup import lookup_class_guide
+
+                if not name or level is None:
+                    raise InvalidArgumentError("Classe ou niveau manquant.", "donner name (classe) et level")
+                return lookup_class_guide(deps, name, level=level, spec=class_name or None)
             if kind == "tf_popular":
                 from forever.talents_forever import popular_builds, require_addon
 
