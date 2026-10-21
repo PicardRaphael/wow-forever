@@ -18,7 +18,7 @@ from forever.errors import (
 from forever.freshness import freshness_for_version
 from forever.pipeline.hotfixes import entity_assumptions
 from forever.pipeline.questie import TOC_NAME, ZoneAdvice, read_questie, zones_for_level
-from forever.provenance import Certainty, Provenance, make_provenance, min_certainty
+from forever.provenance import Certainty, Provenance, local_provenance, make_provenance, min_certainty
 from forever.store import load_version
 
 SPELLS_FILE = "spells.json"
@@ -464,3 +464,65 @@ def check_talents(deps: Deps, cls: str, talents: dict[str, int], level: int) -> 
             assumptions=notes,
         ),
     }
+
+
+def lookup_class_guide(deps: Deps, cls: str, *, level: int, spec: str | None = None) -> dict[str, Any]:
+    """Guide d'une des neuf classes lu dans Forever Companion (plan « Sources d'abord », étape b ; décision 288) : par
+    spécialisation, le build adapté au niveau (« Level 30 (Beta) » jusqu'au niveau 30, « Leveling 1-60 » au-delà, sinon
+    le premier), ramené à nos clés et contrôlé sur nos arbres, les builds écartés (position inconnue de nos données :
+    talent retiré, arbre plus ancien) et la rotation en prose ; fraîcheur de la source par son contenu (talents de ses
+    arbres sans correspondance chez nous) ; certitude `suppose` (addon). Lecture locale du dossier du jeu.
+
+    Registre : G3"""
+    from forever.engine.talents import check_class_build
+    from forever.pipeline.companion import read_companion
+    from forever.sources import choose
+
+    cls_name, knowledge, gd = _class_knowledge(deps, cls)
+    data = load_version(deps)
+    classes = data.read_json("classes.json")["classes"]
+    addons = Path(deps.wow_dir) / "Interface" / "AddOns" if deps.wow_dir is not None else None
+    guide = read_companion(addons, classes) if addons is not None else None
+    if guide is None or cls_name not in guide["classes"]:
+        reason = f"Forever Companion introuvable ou sans {cls_name} (lecture locale du dossier du jeu)"
+        return {"kind": "class_guide", "class": cls_name, "level": level, "available": False, "reason": reason,
+                "specs": {}, "provenance": local_provenance(deps, certainty="suppose", assumptions=[reason])}  # fmt: skip
+    entry = guide["classes"][cls_name]
+    rules = gd.constants.talents
+    specs: dict[str, Any] = {}
+    for name, s in entry["specs"].items():
+        if spec is not None and name.lower() != spec.lower():
+            continue
+        kept = [b for b in s["builds"] if not b["unmatched"]]
+        aside = [{"name": b["name"], "reason": f"talents inconnus de nos données : {', '.join(b['unmatched'])}"}
+                 for b in s["builds"] if b["unmatched"]]  # fmt: skip
+        wanted = "Level 30" if level <= 30 else "Leveling"
+        pick = next((b for b in kept if wanted in b["name"]), None) or (kept[0] if kept else None)
+        if pick is not None:
+            at = int(pick["level"] or gd.level_cap)
+            errors = check_class_build(knowledge, rules, pick["talents"], at)
+            pick = {**pick, "build_level": at, "legal_at_level": not errors, "errors": errors}
+        specs[name] = {"pick": pick, "builds": kept, "set_aside": aside, "rotation": s["rotation"]}
+    meta = guide["meta"]
+    fresh = _companion_freshness(cls_name, entry["unmatched"])
+    notes = [
+        (
+            f"Forever Companion (données {meta.get('dataVersion')} du {meta.get('updated')}) : builds sans ordre de "
+            "prise, rotation de raid au niveau 30, en prose ; source de la communauté"
+        ),
+    ]
+    note = choose([fresh])["note"]
+    if note:
+        notes.append(note)
+    provenance = local_provenance(deps, certainty="suppose", assumptions=notes)
+    return {"kind": "class_guide", "class": cls_name, "level": level, "available": True, "specs": specs,
+            "freshness": fresh, "provenance": provenance}  # fmt: skip
+
+
+def _companion_freshness(cls: str, unmatched: list[str]) -> Any:
+    from forever.sources import _fresh
+
+    if unmatched:
+        return _fresh(f"companion:{cls}", "Forever Companion", "builds", [cls], "en retard", "contenu",
+                      [f"talents inconnus de nos données : {', '.join(unmatched)}"])  # fmt: skip
+    return _fresh(f"companion:{cls}", "Forever Companion", "builds", [cls], "à jour", "contenu", [])

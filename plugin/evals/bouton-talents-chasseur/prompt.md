@@ -25,8 +25,10 @@ Talents actuels (clés de forever, pour `current` de forever_build) : deadlyAspe
 Consigne du bouton « talents » : appelle exactement, dans cet ordre :
 - forever_lookup {"kind": "tf_popular", "name": "Hunter", "current": "deadlyAspects=5,focusedFire=1"}
 - forever_lookup {"kind": "build_check", "name": "Hunter", "level": 15, "talents": "deadlyAspects=5,focusedFire=1"}
+- forever_lookup {"kind": "class_guide", "name": "Hunter", "level": 15}
 Puis :
 - Donne `closest` tel quel (spécialisation, lien, commande `/tf import`, points absents `missing_points`, écarts `differences`), avec sa date (`asOf`) et sa certitude ; n'en choisis pas un autre.
+- Guide de Forever Companion (`class_guide`), pour la spécialisation du build retenu ci-dessus : son build `pick` (nom ; légal à son niveau ou non) et les builds écartés avec leur raison (`set_aside`), puis la rotation telle quelle (`rotation.single`, puis `rotation.aoe`), en disant qu'elle vient de Forever Companion, qu'elle est écrite pour le niveau 30 et qu'aucun ordre de prise n'est calculé pour ta classe ; si `freshness.status` n'est pas « à jour », dis « calcul en cours de mise à jour » avec sa raison. Forever Companion absent : ne dis rien de plus.
 
 Question posée par le bouton « talents » de la fenêtre :
 Quel build populaire de Talents Forever est le plus proche de mes talents actuels ? Donne son lien Talents Forever.

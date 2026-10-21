@@ -40,6 +40,11 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 - Macros de la classe ou profil EllesmereUI demandés : `forever_lookup(kind="export", name="naowh_macros")` (avec
   `class_name`, `level`) ou `name="ellesmere"` (avec `character`, `realm`, `class_name`, `level`, `role`) ; recopie
   `code` et `import` tels quels, certitude supposé (choix de catalogue).
+- Classe autre que le Mage (plan « Sources d'abord ») : `forever_lookup(kind="class_guide", name=<classe>,
+  level=<niveau>)` rend le guide de Forever Companion : par spécialisation, le build adapté au niveau (`pick`, légal à
+  son niveau ou non), les builds écartés avec leur raison (`set_aside`) et la rotation en prose (`rotation.single`,
+  `rotation.aoe`, écrite pour le niveau 30) ; dis que l'ordre de prise n'est pas calculé ; `freshness.status` autre que
+  « à jour » : « calcul en cours de mise à jour » et sa raison ; `available` faux : addon absent, dis-le.
 - Builds populaires de Talents Forever d'abord : `forever_lookup(kind="tf_popular", name=<classe>)` (addon lu sur
   disque) : part de chaque spécialisation, date `asOf` et fenêtre, puis chaque build avec son lien, sa commande
   `import` et sa légalité déjà contrôlée sur le client (`légal`, `illégal`, ou `non vérifiable` avec le talent

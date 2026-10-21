@@ -97,6 +97,7 @@ def test_build_says_when_the_engine_is_late(data_copy, make_deps):
     import json
 
     from conftest import LOCAL_VERSION
+
     from forever.build import build_report
     from forever.manifest import write_manifest
 

@@ -11,8 +11,8 @@ inventés ; aucun chiffre de jeu."""
 
 import json
 
-import pytest
 from conftest import DATA_DIR, LOCAL_VERSION
+
 from forever.pipeline.companion import read_companion, talents_of_build
 
 CLASSES = json.loads((DATA_DIR / LOCAL_VERSION / "classes.json").read_text(encoding="utf-8"))["classes"]
@@ -103,9 +103,8 @@ def test_class_guide_picks_the_build_for_the_level(tmp_path, make_deps):
 
 
 def test_class_guide_without_companion_says_so(make_deps, tmp_path):
-    from forever.errors import ForeverError
+    """Addon absent : une réponse qui le dit (le bouton Talents ne tombe pas en erreur), aucune donnée inventée."""
     from forever.lookup import lookup_class_guide
 
-    with pytest.raises(ForeverError) as err:
-        lookup_class_guide(make_deps(wow_dir=tmp_path / "vide"), "Priest", level=20)
-    assert "Forever Companion" in err.value.message
+    out = lookup_class_guide(make_deps(wow_dir=tmp_path / "vide"), "Priest", level=20)
+    assert out["available"] is False and out["specs"] == {} and "Forever Companion" in out["reason"]

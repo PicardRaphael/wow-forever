@@ -192,6 +192,16 @@ def _full_plan(r: Resolved, level_cap: int, first: int) -> Plan:
     return Plan("talents", (Call("forever_build", args),), read, link="build")
 
 
+# Plan « Sources d'abord », étape b : guide de Forever Companion pour les classes autres que le Mage.
+GUIDE_READ = (
+    "Guide de Forever Companion (`class_guide`), pour la spécialisation du build retenu ci-dessus : son build `pick` "
+    "(nom ; légal à son niveau ou non) et les builds écartés avec leur raison (`set_aside`), puis la rotation telle "
+    "quelle (`rotation.single`, puis `rotation.aoe`), en disant qu'elle vient de Forever Companion, qu'elle est écrite "
+    "pour le niveau 30 et qu'aucun ordre de prise n'est calculé pour ta classe ; si `freshness.status` n'est pas « à "
+    "jour », dis « calcul en cours de mise à jour » avec sa raison. Forever Companion absent : ne dis rien de plus."
+)
+
+
 NAOWH_NEXT = (
     "Code Naowh du build (`export.naowh` ou `respec.projected.export.naowh` s'il y est) tel quel, à coller dans Naowh "
     "Forever, Training, Builds, Import, pour suivre l'ordre de prise « Level by level »."
@@ -223,8 +233,9 @@ def button_plan(
                 return None
             call, read = point
             return Plan(key, (call,), (*read, NAOWH_NEXT), link="projected")
+        guide = Call("forever_lookup", {"kind": "class_guide", "name": r.class_name, "level": r.level})
         if not r.current:
-            calls = [Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name})]
+            calls = [Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name}), guide]
             read = (
                 (
                     "aucun talent placé : build le plus joué de la classe (rang 1) ; donne son lien et sa commande "
@@ -232,12 +243,14 @@ def button_plan(
                     "premier point."
                 ),
                 NAOWH_POPULAR,
+                GUIDE_READ,
             )
             return Plan(key, tuple(calls), read)
         current = ",".join(f"{k}={v}" for k, v in r.current.items())
         calls = [
             Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name, "current": current}),
             Call("forever_lookup", {"kind": "build_check", "name": r.class_name, "level": r.level, "talents": current}),
+            guide,
         ]
         read = (
             (
@@ -245,6 +258,7 @@ def button_plan(
                 "`missing_points`, écarts `differences`), avec sa date (`asOf`) et sa certitude ; n'en choisis pas un "
                 "autre."
             ),
+            GUIDE_READ,
         )
         return Plan(key, tuple(calls), read, link="closest")
     if key == "leveling":

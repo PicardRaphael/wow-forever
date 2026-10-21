@@ -58,7 +58,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.15.1 : réponse compacte de forever_route par défaut (`detail=True` pour le plan entier), forever-routes.
     # 0.15.2 : « équipement au niveau N » : forever_gear leveling seul, jamais route (routeur ; essai CJ-6).
     # 0.15.3 : cas du bouton PvP régénéré (« Comment jouer contre lui » puis le détail, 1200 caractères, décision 281).
-    assert version == "0.15.3"
+    # 0.16.0 : guide de Forever Companion pour les autres classes (`class_guide`, forever-builds ; plan Sources, étape b).
+    assert version == "0.16.0"
 
 
 def test_fingerprint_is_up_to_date():
