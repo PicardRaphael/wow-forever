@@ -315,7 +315,7 @@ ENTITY_SPECS: dict[str, tuple[tuple[str, ...], ...]] = {
     "classes.json": (("classes", "*", "trees", "*", "talents", "*"), ("classes", "*", "spells", "*")),
     "talents.json": (("trees", "*", "talents", "*"),),
     "spells.json": (("spells", "*"),),
-    "spell_scaling.json": (("spells", "*", "*"),),
+    "spell_scaling.json": (("spells", "*", "*"), ("auras", "*")),  # HF2 : auras posées par un talent
     "pets.json": (("abilities", "*"),),
     "pvp_items.json": (("trinkets", "*"),),
     "races.json": (("races", "*", "racials", "*"),),
@@ -335,6 +335,7 @@ def _ints(value: Any) -> set[int]:
 def entity_ids(entity: Mapping[str, Any]) -> Reach:
     """Nœud, sorts et objets propres à une entité (pas ceux de ses prérequis)."""
     spells = _ints(entity.get("spell_id")) | _ints(entity.get("spellIds")) | _ints(entity.get("teach_spell_id"))
+    spells |= _ints(entity.get("source_spell_id"))  # aura : sort du talent qui la pose (HF2)
     spells |= (
         _ints((entity.get("source") or {}).get("rank_spell_ids")) if isinstance(entity.get("source"), dict) else set()
     )
