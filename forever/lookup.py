@@ -338,7 +338,9 @@ def lookup_zones(
             *fresh["assumptions"],
             f"source : {advice['source']}",
             *advice["notes"],
-            *filter(None, [classic_note(deps.data_dir / data.game_version, {"mechanics.json"})]),
+            *filter(
+                None, [classic_note(deps.data_dir / data.game_version, {"mechanics.json"}, {"leveling.quest_band"})]
+            ),
         ],
     )
     return cast(ZoneLookup, {**advice, "provenance": provenance})

@@ -51,3 +51,9 @@ def test_installed_build_and_leveling_answers_say_it(make_deps):
 
     out = simulate_leveling(make_deps(), 20, n=5)
     assert any("héritées de la Classic" in a for a in out["provenance"]["assumptions"])
+
+
+def test_note_can_be_limited_to_the_keys_an_answer_uses(tmp_path):
+    vdir = write(tmp_path)
+    note = classic_note(vdir, {"mechanics.json"}, {"xp.group"})
+    assert note is not None and "1 valeur(s)" in note and "xp.group" in note and "elite_factor" not in note

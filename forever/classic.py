@@ -46,11 +46,16 @@ def classic_values(version_dir: Path) -> list[dict[str, Any]]:
     return [out[k] for k in sorted(out)]
 
 
-def classic_note(version_dir: Path, files: Iterable[str]) -> str | None:
-    """Hypothèse de provenance d'une réponse qui s'appuie sur `files` : nombre et premières clés des valeurs héritées
-    de la Classic qu'ils portent ; None s'il n'y en a aucune."""
+def classic_note(version_dir: Path, files: Iterable[str], keys: Iterable[str] | None = None) -> str | None:
+    """Hypothèse de provenance d'une réponse qui s'appuie sur `files` (et, si donnés, sur les seules clés `keys`) :
+    nombre et premières clés des valeurs héritées de la Classic qu'ils portent ; None s'il n'y en a aucune."""
     wanted = set(files)
-    rows = [r for r in classic_values(version_dir) if r["file"] in wanted]
+    only = {k.strip("/") for k in keys} if keys is not None else None
+    rows = [
+        r
+        for r in classic_values(version_dir)
+        if r["file"] in wanted and (only is None or r["path"].removeprefix("/values/").strip("/") in only)
+    ]
     if not rows:
         return None
     keys = [r["path"].removeprefix("/values/").lstrip("/") for r in rows]
