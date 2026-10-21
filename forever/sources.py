@@ -146,13 +146,36 @@ def _build_date(deps: Any, version: str) -> str | None:
 
 
 def _dated_addons(deps: Any, build_date: str | None) -> list[Freshness]:
+    """Addons lus par le plan « Sources d'abord » : Forever Companion par son contenu, classe par classe (talents de
+    ses arbres inconnus de nos données ; sa date à défaut), SkillUp Forever par le build de ses données."""
     from forever.addons import content_version
+    from forever.pipeline.companion import read_companion
+    from forever.pipeline.skillup import read_skillup
+    from forever.store import load_version
 
     addons = Path(deps.wow_dir) / "Interface" / "AddOns"
-    out = []
-    companion = addons / "ForeverCompanion"
-    if companion.is_dir():
-        meta = content_version("ForeverCompanion", companion) or {}
+    out: list[Freshness] = []
+    data = load_version(deps)
+    guide = read_companion(addons, data.read_json("classes.json")["classes"])
+    if guide is not None and guide["classes"]:
+        for cls, entry in sorted(guide["classes"].items()):
+            if entry["unmatched"]:
+                detail = [f"talents inconnus de nos données : {', '.join(entry['unmatched'])}"]
+                out.append(
+                    _fresh(f"companion:{cls}", "Forever Companion", "builds", [cls], "en retard", "contenu", detail)
+                )
+            else:
+                out.append(_fresh(f"companion:{cls}", "Forever Companion", "builds", [cls], "à jour", "contenu", []))
+    elif (addons / "ForeverCompanion").is_dir():
+        meta = content_version("ForeverCompanion", addons / "ForeverCompanion") or {}
         out.append(dated_freshness("companion", "Forever Companion", "builds", ["*"], meta.get("updated"),
                                    build_date))  # fmt: skip
+    skill = read_skillup(addons)
+    if skill is not None:
+        build = skill.get("build")
+        if build == data.game_version:
+            out.append(_fresh("skillup", "SkillUp Forever", "metiers", ["*"], "à jour", "version", []))
+        else:
+            detail = [f"données tirées du build {build or '?'}, jeu {data.game_version}"]
+            out.append(_fresh("skillup", "SkillUp Forever", "metiers", ["*"], "en retard", "version", detail))
     return out

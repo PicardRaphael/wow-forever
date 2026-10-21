@@ -1178,7 +1178,7 @@ def _sources_text(sources: Sequence[Mapping[str, Any]]) -> list[str]:
         groups.setdefault(str(s["label"]), []).append(s)
     out = []
     for label, items in groups.items():
-        basis = " selon sa date" if items[0]["basis"] == "version" else ""
+        basis = " selon sa version" if items[0]["basis"] == "version" else ""  # date ou build de ses données
         late = [s for s in items if s["status"] != "à jour"]
         if not late:
             out.append(f"{label} à jour{basis}")
