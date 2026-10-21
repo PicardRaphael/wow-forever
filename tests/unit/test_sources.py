@@ -78,3 +78,41 @@ def test_choose_without_fresh_source_keeps_the_best_and_says_so():
     assert pick["chosen"] is late and pick["set_aside"] == []
     assert "antérieure au patch" in pick["note"]
     assert choose([])["chosen"] is None
+
+
+def test_status_lists_the_sources(make_deps):
+    """`forever status` et l'outil MCP `forever_status` : fraîcheur de chaque source (sans dossier du jeu : le
+    moteur du Mage seul)."""
+    from forever.cli import render_status
+    from forever.status import status_report
+
+    rep = status_report(make_deps(), allow_network=False)
+    assert [s["source"] for s in rep["sources"]] == ["moteur"] and rep["sources"][0]["status"] == "à jour"
+    assert any(line.startswith("Sources : moteur du Mage à jour") for line in render_status(rep))
+
+
+def test_build_says_when_the_engine_is_late(data_copy, make_deps):
+    """Un texte du client que le moteur ne sait plus lire (règle de Missile Barrage retirée) : la réponse de
+    `forever_build` le dit dans sa provenance, en certitude `suppose`, au lieu de garder l'ancien sens en silence."""
+    import json
+
+    from conftest import LOCAL_VERSION
+    from forever.build import build_report
+    from forever.manifest import write_manifest
+
+    path = data_copy / LOCAL_VERSION / "decode_rules.json"
+    rules = json.loads(path.read_text(encoding="utf-8"))
+    rules["talent_models"]["missileBarrage"] = [{"contains": "texte qui n'existe pas", "model": "listed_spells"}]
+    path.write_text(json.dumps(rules, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    tpath = data_copy / LOCAL_VERSION / "talents.json"
+    talents = json.loads(tpath.read_text(encoding="utf-8"))
+    for tree in talents["trees"]:
+        for t in tree["talents"]:
+            if t["key"] == "missileBarrage":
+                t.pop("model", None)
+    tpath.write_text(json.dumps(talents, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    write_manifest(data_copy)
+    rep = build_report(make_deps(data_dir=data_copy), "leveling", 12, preset="rapide", sensitivity=False)
+    notes = " ".join(rep["provenance"]["assumptions"])
+    assert "moteur du Mage" in notes and "Missile Barrage" in notes
+    assert rep["provenance"]["certainty"] == "suppose"
