@@ -490,6 +490,10 @@ def build_parser() -> argparse.ArgumentParser:
     r_rxp.add_argument("--to", dest="to_level", type=int, required=True, help="niveau d'arrivée")
     r_rxp.add_argument("--start-guide", help="parcours de départ (partie de son nom, voir rxp-coverage)")
     r_rxp.add_argument("--json", action="store_true", help="sortie JSON")
+    r_pole = route_sub.add_parser(
+        "polestar", help="copier ou mettre à jour les guides de Polestar en cache (réseau, lecture seule, décision 289)"
+    )
+    r_pole.add_argument("--json", action="store_true", help="sortie JSON")
     r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
     r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
     r_cov.add_argument("--json", action="store_true", help="sortie JSON")
@@ -1721,6 +1725,22 @@ def _cmd_route(deps: Deps, args: argparse.Namespace) -> int:
         return _route_recette(deps, args)
     if args.route_command == "rxp-clean":
         return _route_rxp_clean(deps, args)
+    if args.route_command == "polestar":
+        from forever.compare import polestar_commit
+        from forever.pipeline.polestar_fetch import update_polestar
+        from forever.polestar import read_polestar_guides
+
+        clone = update_polestar(deps.cache_dir)
+        library = read_polestar_guides(clone)
+        commit = polestar_commit(clone)
+        provenance = local_provenance(
+            deps, certainty="suppose", assumptions=["guides de Polestar, usage privé (GPL-3.0)"]
+        )
+        data = {"clone": str(clone), "commit": commit, "guides": len(library.guides), "files": library.files,
+                "provenance": provenance}  # fmt: skip
+        lines = [f"Guides de Polestar à jour : commit {str(commit)[:12]}, {len(library.guides)} guides de leveling lus"]
+        _emit(data, lines, provenance, args.json)
+        return EXIT_OK
     if args.route_command == "rxp-coverage":
         from forever.compare import rxp_coverage
 
