@@ -166,6 +166,14 @@ PAWN_TO_GUIDE = {
     "BlockRating": "block",
     "BlockValue": "bv",
 }
+# Statistiques des poids par défaut de Naowh -> clés de Forever Guide (hâte et menace : sans clé chez Guide).
+NAOWH_TO_GUIDE = {
+    "str": "str", "agi": "agi", "sta": "sta", "int": "int", "spi": "spi", "ap": "ap", "rap": "rap", "dps": "dps",
+    "hit": "hit", "crit": "crit", "shit": "shit", "scrit": "scrit", "mp5": "mp5", "def": "def", "dodge": "dodge",
+    "block": "block", "armor": "armor", "spell": "sp", "heal": "hp", "arcane": "arc", "fire": "fir", "frost": "fro",
+    "holy": "hol", "nature": "nat", "shadow": "sha",
+}  # fmt: skip
+ROLE_WORDS = ("dps", "tank", "healer")  # rôle porté par une clé de spécialisation ou un libellé d'échelle
 # Poids du Mage (moteur) -> clés de Forever Guide ; l'école de la spécialisation vaut la puissance des sorts.
 MAGE_TO_GUIDE = {"intellect": "int", "spirit": "spi", "sp": "sp", "crit_gear": "scrit", "hit_gear": "shit"}
 SCHOOLS = {"fire": "fir", "frost": "fro", "arcane": "arc"}
@@ -184,6 +192,44 @@ def companion_weights(addons: Any, class_token: str, *, index: int = 0) -> dict[
         if key:
             out[key] = out.get(key, 0.0) + weight
     return out
+
+
+def _guide_keys(scale: Mapping[str, float], table: Mapping[str, str]) -> dict[str, float]:
+    out: dict[str, float] = {}
+    for stat, weight in scale.items():
+        key = table.get(stat)
+        if key:
+            out[key] = out.get(key, 0.0) + weight
+    return out
+
+
+def naowh_weights(addons: Any, spec_key: str) -> dict[str, float]:
+    """Poids par défaut de Naowh Forever d'une spécialisation (niveau 60, `suppose`), en clés de Forever Guide ; vide
+    sans l'addon ou la spécialisation."""
+    from forever.pipeline.gear_sources import read_naowh_weights
+
+    data = read_naowh_weights(addons)
+    spec = data.specs.get(spec_key) if data is not None else None
+    return _guide_keys(spec.weights, NAOWH_TO_GUIDE) if spec is not None else {}
+
+
+def companion_spec_weights(
+    addons: Any, class_token: str, spec_key: str, trees: Sequence[str]
+) -> tuple[dict[str, float], str] | None:
+    """Échelle de Forever Companion d'une spécialisation : celle de son onglet de talents (`trees` : noms des arbres de
+    la classe, dans l'ordre du client), départagée par le rôle du libellé (Feral DPS ou Feral Tank) ; None si aucune
+    échelle n'est sur cet onglet."""
+    from forever.pipeline.gear_sources import read_companion_scales
+
+    words = spec_key.removesuffix(f"-{class_token.lower()}").split("-")
+    role = next((w for w in words if w in ROLE_WORDS), None)
+    base = " ".join(w for w in words if w not in ROLE_WORDS)
+    tab = next((i + 1 for i, name in enumerate(trees) if base and name.lower().startswith(base)), None)
+    scales = [s for s in read_companion_scales(addons).get(class_token.upper()) or [] if s.tab == tab]
+    if not scales:
+        return None
+    pick = next((s for s in scales if role and role in s.label.lower()), scales[0])
+    return _guide_keys(pick.weights, PAWN_TO_GUIDE), pick.label
 
 
 def mage_guide_weights(report: dict[str, Any], *, spec_key: str) -> dict[str, float]:
@@ -971,7 +1017,27 @@ def _weights_for(
         if report is not None:
             how = "" if used == key.split("-")[0] else f", avec {spell_label(str(used))}, seul sort appris"
             return mage_guide_weights(report, spec_key=key), f"moteur du Mage (niveau {level}{how})"
+    if spec:  # plan « Sources d'abord » : échelle de la spécialisation, sinon poids par défaut de Naowh
+        found = companion_spec_weights(addons, cls, spec, _class_trees(deps, cls))
+        if found is not None and found[0]:
+            return found[0], f"Forever Companion (échelle « {found[1]} » de la spécialisation, suppose)"
+        naowh = naowh_weights(addons, spec)
+        if naowh:
+            from forever.pipeline.gear_sources import read_naowh_weights
+
+            data = read_naowh_weights(addons)
+            date = data.updated if data is not None and data.updated else "date inconnue"
+            return naowh, f"Naowh Forever (poids par défaut de la spécialisation, niveau 60, {date}, suppose)"
     return companion_weights(addons, cls), "Forever Companion (échelle de la classe, suppose)"
+
+
+def _class_trees(deps: Deps, class_token: str) -> list[str]:
+    """Noms des arbres de talents d'une classe, dans l'ordre du client (`classes.json`) ; vide si la classe manque."""
+    from forever.store import load_version
+
+    classes = load_version(deps).read_json("classes.json")["classes"]
+    entry = next((v for k, v in classes.items() if k.upper() == class_token.upper()), None)
+    return [str(t.get("name") or "") for t in entry["trees"]] if entry else []
 
 
 def _provenance(deps: Deps, assumptions: list[str]) -> Any:

@@ -52,10 +52,10 @@ ForeverCompanionData.weights = {
 def addons(tmp_path):
     root = tmp_path / "AddOns"
     naowh = root / "NaowhForever_BiS" / "StatWeights" / "Data"
-    naowh.mkdir(parents=True)
+    naowh.mkdir(parents=True, exist_ok=True)
     (naowh / "Defaults.lua").write_text(DEFAULTS, encoding="utf-8")
     comp = root / "ForeverCompanion" / "Data"
-    comp.mkdir(parents=True)
+    comp.mkdir(parents=True, exist_ok=True)
     (comp / "Weights.lua").write_text(COMPANION, encoding="utf-8")
     return root
 

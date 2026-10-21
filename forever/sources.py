@@ -147,9 +147,11 @@ def _build_date(deps: Any, version: str) -> str | None:
 
 def _dated_addons(deps: Any, build_date: str | None) -> list[Freshness]:
     """Addons lus par le plan « Sources d'abord » : Forever Companion par son contenu, classe par classe (talents de
-    ses arbres inconnus de nos données ; sa date à défaut), SkillUp Forever par le build de ses données."""
+    ses arbres inconnus de nos données ; sa date à défaut), poids par défaut de Naowh par leur date, SkillUp Forever
+    par le build de ses données."""
     from forever.addons import content_version
     from forever.pipeline.companion import read_companion
+    from forever.pipeline.gear_sources import read_naowh_weights
     from forever.pipeline.skillup import read_skillup
     from forever.store import load_version
 
@@ -170,6 +172,10 @@ def _dated_addons(deps: Any, build_date: str | None) -> list[Freshness]:
         meta = content_version("ForeverCompanion", addons / "ForeverCompanion") or {}
         out.append(dated_freshness("companion", "Forever Companion", "builds", ["*"], meta.get("updated"),
                                    build_date))  # fmt: skip
+    weights = read_naowh_weights(addons)
+    if weights is not None:  # poids par défaut de Naowh (niveau 60, écrits à la main) : fraîcheur par leur date
+        out.append(dated_freshness("naowh_weights", "Naowh Forever (poids par défaut)", "poids", ["*"],
+                                   weights.updated, build_date))  # fmt: skip
     skill = read_skillup(addons)
     if skill is not None:
         build = skill.get("build")

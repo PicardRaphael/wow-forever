@@ -26,6 +26,11 @@ GUIDE_GEAR = ("ForeverGuide", "GearData.lua")
 NAOWH_BIS = ("NaowhForever_BiS", "BiS", "Data", "BiS.lua")
 COMPANION_BIS = ("ForeverCompanion", "Data", "Bis.lua")
 COMPANION_WEIGHTS = ("ForeverCompanion", "Data", "Weights.lua")
+NAOWH_WEIGHTS = ("NaowhForever_BiS", "StatWeights", "Data", "Defaults.lua")
+_NAOWH_TEMPLATE = re.compile(r"^local\s+([A-Z_]+)\s*=\s*(?=\{)", re.MULTILINE)
+_NAOWH_SPEC = re.compile(r'Spec\(\s*"([A-Z]+)"\s*,\s*"([a-z-]+)"\s*,\s*"([^"]*)"\s*,\s*([A-Z_]+)\s*,\s*(?=\{)')
+_NAOWH_DATE = re.compile(r'StatWeightDefaultsUpdated\s*=\s*"(\d{1,2}) ([A-Z][a-z]{2}) (\d{4})"')
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 GEARQUEST_PREFIX = "GearQuestForever_"
 _GEAR_LINE = re.compile(r"^(\d+) (\d+) (\d+) (\d+) (\d+) (\d+) (\d+)(?: (\S*))?$")
 _COMPANION_SPEC = re.compile(r'^B\["([^"]+)"\]\["([^"]+)"\]\s*=\s*', re.MULTILINE)
@@ -226,6 +231,44 @@ def read_companion_scales(addons: Path) -> dict[str, list[Scale]]:
                 weights = {str(k): float(v) for k, v in s["w"].items() if isinstance(v, int | float)}
                 out.setdefault(str(token), []).append(Scale(str(s.get("label") or ""), int(s.get("tab") or 0), weights))
     return out
+
+
+class NaowhSpecWeights(NamedTuple):
+    class_token: str
+    name: str
+    weights: dict[str, float]  # clés de Naowh (`spell`, `heal`, `shit`…), gabarit de rôle fusionné
+
+
+class NaowhWeights(NamedTuple):
+    updated: str | None  # date ISO de `StatWeightDefaultsUpdated`
+    specs: dict[str, NaowhSpecWeights]  # clé de spécialisation (`balance-druid`) -> poids
+
+
+def read_naowh_weights(addons: Path) -> NaowhWeights | None:
+    """Poids par défaut de Naowh Forever (`StatWeights/Data/Defaults.lua`, niveau 60, écrits à la main) : gabarits de
+    rôle (`local CASTER = {…}`) puis appels `Spec(classe, clé, nom, gabarit, {propres})`, fusionnés comme l'addon (le
+    poids propre l'emporte) ; lus sans exécuter de Lua. None sans l'addon."""
+    text = _read(addons.joinpath(*NAOWH_WEIGHTS))
+    if not text:
+        return None
+    templates: dict[str, dict[str, float]] = {}
+    for m in _NAOWH_TEMPLATE.finditer(text):
+        templates[m.group(1)] = _numbers(parse_lua_value_at(text, m.end())[0])
+    specs: dict[str, NaowhSpecWeights] = {}
+    for m in _NAOWH_SPEC.finditer(text):
+        own = _numbers(parse_lua_value_at(text, m.end())[0])
+        specs[m.group(2)] = NaowhSpecWeights(m.group(1), m.group(3), {**templates.get(m.group(4), {}), **own})
+    d = _NAOWH_DATE.search(text)
+    updated = None
+    if d and d.group(2) in _MONTHS:
+        updated = f"{d.group(3)}-{_MONTHS.index(d.group(2)) + 1:02d}-{int(d.group(1)):02d}"
+    return NaowhWeights(updated, specs)
+
+
+def _numbers(value: Any) -> dict[str, float]:
+    if not isinstance(value, dict):
+        return {}
+    return {str(k): float(v) for k, v in value.items() if isinstance(v, int | float) and not isinstance(v, bool)}
 
 
 def read_gearquest_picks(addons: Path, class_token: str) -> list[GearPick]:
