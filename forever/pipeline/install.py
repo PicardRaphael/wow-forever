@@ -20,6 +20,7 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
+import re
 import shutil
 from collections.abc import Mapping, Sequence
 from pathlib import Path
@@ -127,6 +128,15 @@ def _write(path: Path, doc: Any, indent: int) -> None:
 
 def _key(kind: str, key: str, field: str | None, old: Any, new: Any) -> tuple[str, str, str, str, str]:
     return (kind, key, str(field), json.dumps(old, sort_keys=True), json.dumps(new, sort_keys=True))
+
+
+_PLACEHOLDER = re.compile(r"\{(\d+)\}")
+
+
+def _unresolved_variable(desc: str, values: Sequence[Sequence[Any]]) -> bool:
+    """Le gabarit `desc` a-t-il une variable `{i}` qu'un rang ne porte pas (affichée telle quelle) ?"""
+    used = [int(i) for i in _PLACEHOLDER.findall(desc)]
+    return bool(used) and (not values or max(used) >= min(len(r) for r in values))
 
 
 def _previous_client_desc(data_dir: Path, target: str) -> dict[str, str]:
@@ -335,9 +345,14 @@ class _Merge:
             template = c.get("desc_template")
             if f == "desc" and template is not None and "$" not in template and v != template:
                 previous = self.previous_client_desc.get(key)
-                if "$" in str(v) or (previous is not None and previous != c.get("desc")):
-                    # gabarit brut installé (talent ajouté en 70450 r1) ou texte du client changé depuis la version
-                    # précédente : le gabarit du dépôt devient celui du client
+                if (
+                    "$" in str(v)
+                    or (previous is not None and previous != c.get("desc"))
+                    or _unresolved_variable(str(v), c.get("tooltip_values") or c.get("ranks") or [])
+                ):
+                    # gabarit brut installé (talent ajouté en 70450 r1), texte du client changé depuis la version
+                    # précédente, ou variable {i} sans valeur dans les rangs (Presence of Mind : seuil écrit en clair
+                    # par le client, « {0} » affiché) : le gabarit du dépôt devient celui du client
                     self.add(TALENTS, f"{key}.desc", v, template, source, "certain", "metadata")
                     out[f] = template
                     continue
