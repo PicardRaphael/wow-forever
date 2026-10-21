@@ -22,19 +22,23 @@ def _read(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else None
 
 
-def classic_values(version_dir: Path) -> list[dict[str, Any]]:
+def classic_values(version_dir: Path, files: Iterable[str] | None = None) -> list[dict[str, Any]]:
     """Valeurs héritées de la Classic d'une version installée : (fichier, chemin, origine, certitude, source), sans
-    doublon, triées."""
+    doublon, triées ; `files` : seulement ces fichiers (`mechanics.json` n'est lu que s'il en fait partie)."""
+    wanted = set(files) if files is not None else None
     out: dict[tuple[str, str], dict[str, Any]] = {}
     origins = _read(version_dir / "origins.json") or {}
     for rule in origins.get("rules", []):
         text = " ".join(str(rule.get(k) or "") for k in ("source", "reason"))
         if not _CLASSIC.search(text):
             continue
+        if wanted is not None and rule["file"] not in wanted:
+            continue
         for path in rule.get("paths") or []:
             out.setdefault((rule["file"], path), {"file": rule["file"], "path": path, "origin": rule.get("origin"),
                                                   "certainty": rule.get("certainty"), "source": text.strip()})  # fmt: skip
-    mechanics = _read(version_dir / "mechanics.json") or {}
+    read_mechanics = wanted is None or "mechanics.json" in wanted
+    mechanics = (_read(version_dir / "mechanics.json") if read_mechanics else None) or {}
     for key, entry in (mechanics.get("values") or {}).items():
         if not isinstance(entry, dict):
             continue
@@ -53,7 +57,7 @@ def classic_note(version_dir: Path, files: Iterable[str], keys: Iterable[str] | 
     only = {k.strip("/") for k in keys} if keys is not None else None
     rows = [
         r
-        for r in classic_values(version_dir)
+        for r in classic_values(version_dir, wanted)
         if r["file"] in wanted and (only is None or r["path"].removeprefix("/values/").strip("/") in only)
     ]
     if not rows:

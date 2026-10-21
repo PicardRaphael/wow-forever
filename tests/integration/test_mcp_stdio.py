@@ -33,6 +33,7 @@ def test_stdio_server(tmp_path):
         "forever_player_profile",  # T06b : profil joueur, lecture seule
         "forever_route",  # RX1 : feuille de route de leveling
         "forever_gear",  # CJ1 : équipement (poids, liste BiS, leveling, amélioration)
+        "forever_simulate",  # décisions 293 et 294 : wowsims/forever au niveau 60
     }
     assert not result.is_error
     frostbolt_rank_2 = read_json(DATA_DIR / LOCAL_VERSION / "spells.json")["spells"]["frostbolt"]["ranks"][1]
