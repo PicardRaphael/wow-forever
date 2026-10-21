@@ -596,10 +596,9 @@ tank. Elles n'ont pas de poids propres chez GearQuest et n'ont ni rotation ni Bi
 
 ## Points d'attention
 
-- **AlexAtlasLoot** : un sous-agent de ce relevé a ouvert ses fichiers et compté sa structure. Il n'a recopié aucune
-  valeur : 37 instances, 328 boss, 287 découvertes de joueurs, 337 quêtes, aucun champ de taux. Cela va au-delà de la
-  décision 229 (« exclu et jamais lu »). Rien de ce relevé n'est repris ici au-delà de ces comptes. La décision 229
-  reste en vigueur, sauf si tu en décides autrement.
+- **AlexAtlasLoot** : un sous-agent de ce relevé a ouvert ses fichiers, contre la décision 229 (« exclu et jamais
+  lu »). Aucune valeur n'a été recopiée ; les comptes qu'il avait notés sont retirés de ce rapport (2026-10-21). La
+  décision 229 reste en vigueur.
 - **Naowh Training** : le README annonce des « builds that ship », mais l'addon n'en livre aucun. Les builds de
   naowh.gg ne s'importent que depuis le site (réseau), donc hors de notre lecture locale.
 - **Forever Guide** : son README dit de la 1.37.0 « build non lancé dans le client WoW ». Ses chiffres d'équipement
