@@ -324,7 +324,7 @@ def lookup_zones(
         raise InvalidArgumentError(f"Faction inconnue « {faction} ».", "choisir --faction horde ou alliance")
     data = load_version(deps)
     check_level(level, level_cap(data))
-    cls = normalize_class(player_class).lower() if player_class else "mage"  # classe du personnage connecté
+    cls = normalize_class(player_class).lower() if player_class else None  # classe inconnue : dite, jamais supposée
     book = build_quests(deps, wow_dir=wow_dir)
     advice = zones_from_book(book, build_game_data(data), level, faction=faction, player_class=cls)
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)

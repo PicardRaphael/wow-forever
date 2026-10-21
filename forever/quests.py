@@ -520,7 +520,7 @@ CLASSIC_ONLY = frozenset({"questie"})  # source de la Classic Era : jamais compt
 
 
 def zones_from_book(
-    book: QuestBook, gd: Any, level: int, *, faction: str | None = None, player_class: str = "mage"
+    book: QuestBook, gd: Any, level: int, *, faction: str | None = None, player_class: str | None = None
 ) -> Any:
     """Zones et donjons classés par quêtes utiles (vertes, jaunes, orange) au niveau `level`, d'après le livre de
     quêtes fusionné des sources Forever (décision 294) : une quête connue de la seule Classic Era de Questie n'est pas
@@ -531,7 +531,7 @@ def zones_from_book(
     from forever.engine.leveling import USEFUL_COLORS, level_band, quest_color
     from forever.pipeline.questie import CLASS_MASKS
 
-    mask = CLASS_MASKS[player_class]
+    mask = CLASS_MASKS[player_class] if player_class else None  # classe inconnue : aucune supposée
     grouped: dict[tuple[str, Any], list[tuple[int, int]]] = {}
     for qid, q in book.quests.items():
         if q["status"] == "absente des sources Forever" or set(q["sources"]) <= CLASSIC_ONLY:
@@ -540,8 +540,8 @@ def zones_from_book(
         classes, map_id, dungeon = value(q, "classes"), value(q, "map"), value(q, "dungeon")
         if not isinstance(lvl, int) or (faction and side not in (None, "both", faction)):
             continue
-        if isinstance(classes, int) and classes and not classes & mask:
-            continue
+        if isinstance(classes, int) and classes and (mask is None or not classes & mask):
+            continue  # quête d'une autre classe, ou de classe alors que la classe est inconnue
         if isinstance(min_level, int) and min_level > level:
             continue
         if dungeon:
@@ -585,6 +585,11 @@ def zones_from_book(
             ),
             "zones nommées par leur carte (noms de Completo, en anglais) ; niveaux des monstres non donnés",
             "couleurs de quête : règle de leveling.quest_band (valeur héritée de la Classic, marquée, suppose)",
-            f"quêtes disponibles : faction {faction or 'toutes'}, classe {player_class}, niveau requis atteint",
+            (
+                f"quêtes disponibles : faction {faction or 'toutes'}, classe {player_class}, niveau requis atteint"
+                if player_class
+                else f"quêtes disponibles : faction {faction or 'toutes'}, niveau requis atteint ; classe inconnue : "
+                "aucune classe supposée, quêtes de classe laissées de côté (donner la classe du personnage)"
+            ),
         ],
     }
