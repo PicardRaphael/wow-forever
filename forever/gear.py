@@ -9,6 +9,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
+from forever.classic import ENGINE_FILES, classic_note
 from forever.config import Deps
 from forever.sims.report import MAGE_ENGINE_FROZEN
 
@@ -90,6 +91,7 @@ def mage_weights(
             ),
             "équipement porté non pris en compte ; talents seulement s'ils sont donnés ; écoles = puissance des sorts",
             MAGE_ENGINE_FROZEN,
+            *filter(None, [classic_note(deps.data_dir / data.game_version, ENGINE_FILES)]),
         ],
     )
     return {"level": level, "race": race, "rotation": rotation, "weights": weights, "provenance": provenance}

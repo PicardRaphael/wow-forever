@@ -11,6 +11,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import asdict
 from typing import Any, NotRequired, TypedDict, cast
 
+from forever.classic import ENGINE_FILES, classic_note
 from forever.config import Deps
 from forever.engine.model import CharacterOverrides, GameData, MonsterHp
 from forever.engine.monsters import mob_hp
@@ -295,6 +296,7 @@ def simulate_leveling(
             *assumptions(options, hp, pts, n, seed, gd.constants.coefficients.low_level_default),
             ratio_assumption(gd),
             MAGE_ENGINE_FROZEN,
+            *filter(None, [classic_note(deps.data_dir / data.game_version, ENGINE_FILES)]),
             *([DEFAULT_RACE_NOTE] if inputs["race"]["origin"] == "default" else []),
             *(bonuses["assumptions"] if bonuses else []),
         ],

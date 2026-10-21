@@ -316,6 +316,12 @@ def pvp_report(
         ),
         "fiche fixe : aucun suivi en direct des recharges (voir limits)",
     ]
+    from forever.classic import classic_note
+    from forever.store import current_identity
+
+    note = classic_note(deps.data_dir / current_identity(deps.data_dir).game_version, {"pvp_rules.json"})
+    if note:
+        notes.append(note)
     report["provenance"] = local_provenance(deps, certainty="suppose", assumptions=notes)
     return report
 

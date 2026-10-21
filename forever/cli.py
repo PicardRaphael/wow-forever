@@ -733,6 +733,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--markdown", action="store_true", help="rendu Markdown (docs/research/valeurs-ecrites-a-la-main.md)"
     )
     o_inv.add_argument("--json", action="store_true", help="sortie JSON")
+    o_cl = origins_sub.add_parser("classic", help="valeurs héritées de la Classic, à remplacer (décision 294)")
+    o_cl.add_argument("--version", help="version du jeu (défaut : la plus récente)")
+    o_cl.add_argument("--json", action="store_true", help="sortie JSON")
 
     measures = sub.add_parser("measures", help="mesures tirées des journaux et SavedVariables")
     measures_sub = measures.add_subparsers(dest="measures_command", required=True, parser_class=_Parser)
@@ -4651,6 +4654,14 @@ def _cmd_origins(deps: Deps, args: argparse.Namespace) -> int:
         _emit(payload, render_origins_report(report), provenance, args.json)
         return EXIT_OK if report.ok else EXIT_INTEGRITY
     version = args.version or current_identity(deps.data_dir).game_version
+    if args.origins_command == "classic":
+        from forever.classic import classic_values
+
+        found = classic_values(deps.data_dir / version)
+        lines = [f"Valeurs héritées de la Classic dans {version} ({len(found)}, à remplacer après la sortie) :"]
+        lines += [f"  {r['file']} {r['path']} ({r['origin']}, {r['certainty']}) : {r['source']}" for r in found]
+        _emit({"version": version, "values": found, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
     rows, pending = origins_inventory(deps.data_dir, version)
     if args.markdown and not args.json:
         print(render_inventory(version, rows, pending), end="")

@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 from typing import Any, Literal, TypedDict, cast
 
+from forever.classic import classic_note
 from forever.config import Deps
 from forever.errors import (
     InvalidArgumentError,
@@ -333,7 +334,12 @@ def lookup_zones(
         data_sha=data.data_sha,
         freshness=fresh["freshness"],
         certainty="suppose",
-        assumptions=[*fresh["assumptions"], f"source : {advice['source']}", *advice["notes"]],
+        assumptions=[
+            *fresh["assumptions"],
+            f"source : {advice['source']}",
+            *advice["notes"],
+            *filter(None, [classic_note(deps.data_dir / data.game_version, {"mechanics.json"})]),
+        ],
     )
     return cast(ZoneLookup, {**advice, "provenance": provenance})
 

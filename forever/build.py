@@ -12,6 +12,7 @@ from collections.abc import Mapping
 from dataclasses import asdict
 from typing import Any, TypedDict, cast
 
+from forever.classic import ENGINE_FILES, classic_note
 from forever.config import Deps
 from forever.engine.blind_spots import modeled_talents, select_blind_spots
 from forever.engine.model import CharacterOverrides, GameData, Preset
@@ -846,7 +847,12 @@ def build_report(
         data_sha=data.data_sha,
         freshness=fresh["freshness"],
         certainty=certainty,
-        assumptions=[*fresh["assumptions"], *assumptions, MAGE_ENGINE_FROZEN],
+        assumptions=[
+            *fresh["assumptions"],
+            *assumptions,
+            MAGE_ENGINE_FROZEN,
+            *filter(None, [classic_note(deps.data_dir / data.game_version, ENGINE_FILES)]),
+        ],
     )
     return {
         "context": context,
