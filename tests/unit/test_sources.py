@@ -117,3 +117,19 @@ def test_build_says_when_the_engine_is_late(data_copy, make_deps):
     notes = " ".join(rep["provenance"]["assumptions"])
     assert "moteur du Mage" in notes and "Missile Barrage" in notes
     assert rep["provenance"]["certainty"] == "suppose"
+
+
+def test_report_reads_companion_by_content_and_skillup_by_build(tmp_path, make_deps):
+    """Relevé des sources avec les addons : Forever Companion jugé classe par classe sur son contenu (talents de ses
+    arbres inconnus de nos données), SkillUp Forever sur le build de ses données. Addons fabriqués."""
+    from test_companion_guides import write_companion
+    from test_skillup import write_skillup
+
+    from forever.sources import sources_report
+
+    root, _spec = write_companion(tmp_path)
+    write_skillup(root)
+    rep = {s["source"]: s for s in sources_report(make_deps(wow_dir=root))}
+    assert rep["companion:Priest"]["status"] == "en retard" and rep["companion:Priest"]["basis"] == "contenu"
+    assert "Talent retiré" in rep["companion:Priest"]["detail"][0]
+    assert rep["skillup"]["status"] == "à jour" and rep["skillup"]["basis"] == "version"
