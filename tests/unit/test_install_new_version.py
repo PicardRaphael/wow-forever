@@ -59,6 +59,9 @@ PV1_ADDED |= {"dungeons.json"}  # DJ1, révision 6 de 1.60.1.70338 : hérité de
 PV1_ADDED |= {"travel.json"}  # RX1, révision 7 de 1.60.1.70338 : hérité de même
 
 
+POM_DESC = "presenceOfMind.desc"  # gabarit « {0} » sans valeur dans les rangs : texte du client
+
+
 def strip_provenance(doc):
     """Document sans les blocs `source` ni les certitudes par talent : ce qui reste est la valeur de jeu."""
     if isinstance(doc, dict):
@@ -193,20 +196,34 @@ def test_nothing_changed_is_installed_anyway(installed, newer):
     # copie installée est ramenée à 1.60.1.70009 : celles du dépôt installé sont reprises (mechanics.json, origines).
     assert {c["rule"] for c in plan["changes"]} <= {"added_field", "metadata", "certainty", "game_state", "rules"}
     assert {c["file"] for c in plan["changes"] if c["rule"] == "rules"} <= {"mechanics.json", "origins.json"}
+    # Règle de la variable sans valeur (2026-10-21) : la description de Presence of Mind (« {0} », rangs vides)
+    # prend le texte du client ; c'est la seule métadonnée hors des blocs `source`.
     assert all(
-        c["path"].endswith(".source") or c["rule"] in ("certainty", "game_state", "rules") for c in plan["changes"]
+        c["path"].endswith(".source") or c["path"] == POM_DESC or c["rule"] in ("certainty", "game_state", "rules")
+        for c in plan["changes"]
     )
+    pom = [c for c in plan["changes"] if c["path"] == POM_DESC]
+    assert len(pom) == 1 and "{0}" in pom[0]["before"] and "{0}" not in pom[0]["after"]
     apply_install(installed, newer, motif="T08a", new_version=True)
     assert (installed.data_dir / NEW_VERSION / "talents.json").is_file()
 
 
 def test_the_installed_values_are_those_of_the_previous_version(installed, newer):
-    """Aucune valeur ne change : les fichiers fusionnés de la nouvelle version sont ceux de l'ancienne."""
+    """Aucune valeur ne change : les fichiers fusionnés de la nouvelle version sont ceux de l'ancienne, à la
+    description de Presence of Mind près (variable {0} sans valeur : texte du client, règle du 2026-10-21)."""
     apply_install(installed, newer, motif="T08a", new_version=True)
     for name in ("talents.json", "spells.json"):
         new = strip_provenance(read_json(installed.data_dir / NEW_VERSION / name))
         old = strip_provenance(read_json(DATA_DIR / PREVIOUS_VERSION / name))
+        if name == "talents.json":
+            pom_new, pom_old = (_talent(doc, "presenceOfMind") for doc in (new, old))
+            assert "{0}" in pom_old["desc"] and "{0}" not in pom_new["desc"]
+            pom_new["desc"] = pom_old["desc"]
         assert new == old, name
+
+
+def _talent(doc, key):
+    return next(t for tree in doc["trees"] for t in tree["talents"] if t["key"] == key)
 
 
 def test_an_existing_version_directory_is_refused(installed, newer):

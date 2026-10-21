@@ -36,6 +36,7 @@ from forever.provenance import make_provenance, validate_provenance
 from forever.status import status_report
 from forever.store import ensure_integrity, load_version
 
+POM_DESC = "presenceOfMind.desc"  # gabarit « {0} » sans valeur dans les rangs : texte du client (2026-10-21)
 COUNTS = {"confirmed": 15, "observation": 3, "certainty": 49, "removed_field": 1, "refused": 0}
 ADDED = {
     ("talents.json", "name_fr"): 54,
@@ -92,7 +93,9 @@ def cand(candidate):
 def test_plan_lists_exactly_the_allowed_changes(r1, candidate):
     plan = plan_install(r1, cand(candidate))
     assert {k: plan["counts"][k] for k in COUNTS} == COUNTS
-    assert plan["counts"]["metadata"] == 0
+    # seule métadonnée : la description de Presence of Mind, dont la variable {0} n'a pas de valeur dans les rangs,
+    # prend le texte du client (règle de la variable sans valeur, 2026-10-21)
+    assert [c["path"] for c in plan["changes"] if c["rule"] == "metadata"] == [POM_DESC]
     assert (plan["revision_from"], plan["revision_to"]) == (1, 2)
     added = {}
     for c in plan["changes"]:
