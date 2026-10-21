@@ -89,9 +89,10 @@ STEPS = (
     "journaux",
     "addons",
     "guides",
+    "simulateurs",
     "fin",
 )
-ONLY = ("jeu", "correctifs", "journaux", "addons", "guides")
+ONLY = ("jeu", "correctifs", "journaux", "addons", "guides", "simulateurs")
 KINDS = ("install_version", "install_revision", "measures", "addon_data", "network_dbd", "network")
 STATUSES = ("fait", "rien", "attente", "arrêt", "erreur")
 ACTIONS = ("écrire", "attente", "bloqué")
@@ -120,6 +121,7 @@ STEP_LIMITS_S: dict[str, float] = {
     "journaux": 120 * 60,
     "addons": 75 * 60,
     "guides": 15 * 60,
+    "simulateurs": 45 * 60,
 }
 STEP_GIT_TIMEOUT_S = 300.0  # délai d'une commande git des guides de Polestar
 PASS_TIMEOUT_EXIT = 7
@@ -2116,6 +2118,55 @@ def _step_guides(run: _Run) -> Step:
     return Step("guides", "fait", f"guides de Polestar à jour : commit {_short(after)} ({moved})", {"commit": after})
 
 
+def _step_simulators(run: _Run) -> Step:
+    """wowsims/forever tenu à jour (décisions 293 et 294) : seulement s'il a déjà été compilé (`forever sims update`),
+    jamais en simulation ni hors réseau ; au nouveau commit, recompilation épinglée puis cas de référence rejoués et
+    écarts notés (`veille.json`) ; un échec garde le binaire épinglé (attente, nouvel essai au passage suivant)."""
+    from forever.pipeline import gitops, wowsims_build
+    from forever.sims import wowsims
+
+    if not run.wants("simulateurs"):
+        return Step("simulateurs", "rien", "non demandé (--only)", {})
+    pin = wowsims_build.pinned(run.deps.cache_dir)
+    if pin is None:
+        return Step(
+            "simulateurs", "rien", "wowsims/forever jamais compilé (le faire une fois : `forever sims update`)", {}
+        )
+    before = str(pin.get("commit"))
+    if run.options.dry_run or not run.options.network or run.deps.offline:
+        detail = f"wowsims/forever non mis à jour (simulation ou hors réseau), commit {_short(before)}"
+        return Step("simulateurs", "rien", detail, {})
+    try:
+        new = wowsims_build.update_wowsims(run.deps.cache_dir, runner=run.runner)
+    except gitops.GitOpsError as exc:
+        detail = (
+            f"wowsims/forever non mis à jour ({exc.message}) : binaire du commit {_short(before)} gardé, nouvel essai "
+            "au passage suivant"
+        )
+        return Step("simulateurs", "attente", detail, {"commit": before})
+    if new.get("status") != "compilé":
+        return Step("simulateurs", "rien", f"wowsims/forever à jour : commit {_short(before)}", {"commit": before})
+    report = wowsims.replay_reference(run.deps.cache_dir, _playable_races(run.deps))
+    detail = (
+        f"wowsims/forever compilé au commit {_short(str(new['commit']))} ; {len(report['cases'])} cas rejoués, "
+        f"{len(report['gaps'])} écart(s) au-delà du seuil"
+    )
+    return Step("simulateurs", "fait", detail, {"commit": new["commit"], "gaps": report["gaps"]})
+
+
+def _playable_races(deps: Deps) -> dict[str, str]:
+    """Une race jouable par classe, lue dans les données de Forever (`races.json`), nom du proto de wowsims."""
+    from forever.sims.wowsims import race_enum
+    from forever.store import load_version
+
+    races = load_version(deps).read_json("races.json")["races"]
+    out: dict[str, str] = {}
+    for name in sorted(races):
+        for cls in races[name].get("classes", []):
+            out.setdefault(str(cls), race_enum(name))
+    return out
+
+
 def _short(commit: str | None) -> str:
     return commit[:12] if commit else "inconnu"
 
@@ -2503,6 +2554,7 @@ def run_update(
             advance("journaux", lambda: _step_logs(run))
             advance("addons", lambda: _step_addons(run))
             advance("guides", lambda: _step_guides(run))
+            advance("simulateurs", lambda: _step_simulators(run))
             done(_end_step(run))
         finally:
             stop.set()

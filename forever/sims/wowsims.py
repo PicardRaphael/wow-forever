@@ -42,6 +42,7 @@ _TALENTS = re.compile(
 )
 _BUILD = re.compile(r"PresetUtils\.makePresetBuild\(\s*'([^']*)',\s*\{(.*?)\}\s*\)", re.DOTALL)
 _CREATE = re.compile(r"export const (Default\w+) = \w+\.create\(\s*(?=\{)")
+_OTHER_DEFAULTS = re.compile(r"export const OtherDefaults = (?=\{)")
 
 
 class WowsimsError(ForeverError):
@@ -163,6 +164,9 @@ def _from_presets_ts(spec_dir: Path, rel: str) -> list[Preset]:
     apl_by_label = {label: files.get(src) for _, label, src in apls}
     talents = dict(_TALENTS.findall(text))
     created = {m.group(1): _literal_or_empty(text, m.end()) for m in _CREATE.finditer(text)}
+    other = _OTHER_DEFAULTS.search(text)
+    defaults = _literal_or_empty(text, other.end()) if other else {}
+    race = defaults.get("race") if isinstance(defaults, dict) else None  # race par défaut de la spé (OtherDefaults)
 
     def preset(key: str, g: Path | None, t: str | None, r: Path | None) -> Preset | None:
         if g is None or t is None or r is None or not g.is_file() or not r.is_file():
@@ -179,6 +183,7 @@ def _from_presets_ts(spec_dir: Path, rel: str) -> list[Preset]:
             party_buffs=created.get("DefaultPartyBuffs") or {},
             individual_buffs=created.get("DefaultIndividualBuffs") or {},
             debuffs=created.get("DefaultDebuffs") or {},
+            race=race if isinstance(race, str) else None,
         )
 
     out = []
@@ -419,3 +424,50 @@ def stat_weights(
     normalised = {s: (per_point[s] / ref if ref else 0.0) for s in stats}
     return {"base_dps": base["dps"], "per_point": {s: per_point[s] for s in stats}, "normalised": normalised,
             "reference": reference, "delta": delta, "source": base["source"]}  # fmt: skip
+
+
+GAP_THRESHOLD = 0.01  # écart relatif noté entre deux commits pour un même cas (réglage de l'outil)
+VEILLE_NAME = "veille.json"
+
+
+def replay_reference(
+    cache_dir: Path,
+    race_for: dict[str, str],
+    *,
+    iterations: int = DEFAULT_ITERATIONS,
+    seed: int = DEFAULT_SEED,
+    runner: gitops.Runner | None = None,
+) -> dict[str, Any]:
+    """Cas de référence de la veille : chaque préréglage du clone épinglé, sur le combat de référence, même graine ;
+    race du préréglage, sinon `race_for[classe]` (race jouable lue dans les données de Forever). Écarts au passage
+    précédent au-delà de `GAP_THRESHOLD`, écrits dans `veille.json` avec les deux commits."""
+    root = wowsims_dir(cache_dir)
+    pin = pinned(cache_dir) or {}
+    presets = read_presets(root / "forever")
+    encounter = reference_encounter(presets)
+    path = root / VEILLE_NAME
+    previous = _json(path) if path.is_file() else {}
+    cases: dict[str, float] = {}
+    skipped: list[str] = []
+    for p in presets:
+        race = p.race or race_for.get(p.class_token.removeprefix("Class"))
+        if race is None:
+            skipped.append(p.key)
+            continue
+        try:
+            out = run_sim(cache_dir, request_for(p, race=race, encounter=encounter, iterations=iterations, seed=seed),
+                          runner=runner)  # fmt: skip
+        except WowsimsError:
+            skipped.append(p.key)
+            continue
+        cases[p.key] = out["dps"]
+    old = previous.get("cases") or {}
+    gaps = [
+        {"case": k, "before": old[k], "after": v, "relative": (v - old[k]) / old[k]}
+        for k, v in sorted(cases.items())
+        if k in old and old[k] and abs(v - old[k]) / old[k] > GAP_THRESHOLD
+    ]
+    report = {"commit": pin.get("commit"), "previous_commit": previous.get("commit"), "cases": cases, "gaps": gaps,
+              "skipped": skipped, "threshold": GAP_THRESHOLD, "seed": seed}  # fmt: skip
+    path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    return report

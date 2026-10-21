@@ -46,6 +46,7 @@ _STEP_STAGES = {
     "journaux": "mesures de tes combats",
     "addons": "lecture des addons",
     "guides": "mise à jour des guides de Polestar",
+    "simulateurs": "mise à jour de wowsims/forever",
     "fin": "finalisation",
 }
 DEFAULT_STAGE = "travail en cours"
