@@ -3,8 +3,8 @@
 Rapport généré par `forever pets crosscheck --markdown` : ne pas éditer à la main. Le client fait foi ;
 chaque écart est listé avec ses deux valeurs et leurs sources, jamais tranché.
 
-- Client : client 1.60.1.70374 (pets.json)
-- Addon : Forever Bestiary 0.6.0 (base du 2026-10-12, client 1.60.1.70338 ; carte communautaire du 2026-10-12)
+- Client : client 1.60.1.70450 (pets.json)
+- Addon : Forever Bestiary 0.7.0 (base du 2026-10-19, client 1.60.1.70450 ; carte communautaire du 2026-10-17)
 - Questie : Questie 11.38.0 (base Classic Era)
 - Familles : 19 dans le client, 18 dans l'addon, 18 comparées ; capacités de l'addon : 26 ; bêtes de l'addon : 682 (dont 574 dans Questie)
 - Écarts : 48 ; PNJ dont Questie ne donne que le continent (non comptés) : 43
