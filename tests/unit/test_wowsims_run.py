@@ -154,3 +154,43 @@ def test_race_comparison_is_paired(tmp_path):
 def test_missing_pin_says_how_to_build(tmp_path):
     with pytest.raises(WowsimsError, match="forever sims update"):
         run_sim(tmp_path, {"raid": {}}, runner=Sim())
+
+
+PROTO_STATS = "enum Stat {\n\t// x\n\tStatStrength = 0;\n\tStatIntellect = 1;\n\tStatSpellDamage = 2;\n}\n"
+
+
+class WeightSim(Sim):
+    """wowsimcli simulé : dégâts de base + poids fabriqués × statistiques ajoutées (`bonusStats`)."""
+
+    WEIGHTS: ClassVar[list[float]] = [0.0, 0.4, 0.8]
+
+    def __call__(self, args, cwd, timeout=None):
+        args = list(args)
+        req = json.loads(Path(args[args.index("--infile") + 1]).read_text(encoding="utf-8"))
+        self.requests.append(req)
+        bonus = req["raid"]["parties"][0]["players"][0].get("bonusStats", {}).get("stats", [])
+        dps = 500.0 + sum(w * b for w, b in zip(self.WEIGHTS, bonus, strict=False))
+        res = {"raidMetrics": {"parties": [{"players": [{"dps": {"avg": dps, "stdev": 10.0}}]}]}, "iterationsDone": 10}
+        Path(args[args.index("--outfile") + 1]).write_text(json.dumps(res), encoding="utf-8")
+        return subprocess.CompletedProcess(args, 0, "", "")
+
+
+def test_stat_weights_are_paired_and_normalised(tmp_path):
+    from forever.sims.wowsims import stat_names, stat_weights
+
+    root = clone(tmp_path)
+    (root / "forever" / "proto").mkdir(parents=True, exist_ok=True)
+    (root / "forever" / "proto" / "common.proto").write_text(PROTO_STATS, encoding="utf-8")
+    assert stat_names(root / "forever") == ["StatStrength", "StatIntellect", "StatSpellDamage"]
+    preset = next(p for p in read_presets(root / "forever") if p.key == "mage/dps/Fire")
+    sim = WeightSim()
+    out = stat_weights(tmp_path, preset, ["StatIntellect", "StatSpellDamage"], reference="StatSpellDamage", runner=sim)
+    assert out["per_point"]["StatIntellect"] == pytest.approx(0.4) and out["per_point"][
+        "StatSpellDamage"
+    ] == pytest.approx(0.8)
+    assert out["normalised"] == {"StatIntellect": pytest.approx(0.5), "StatSpellDamage": pytest.approx(1.0)}
+    assert len({r["simOptions"]["randomSeed"] for r in sim.requests}) == 1  # tirages appariés
+    lengths = {
+        len(r["raid"]["parties"][0]["players"][0].get("bonusStats", {}).get("stats", [0, 0, 0])) for r in sim.requests
+    }
+    assert lengths == {3}  # tableau complet du proto épinglé
