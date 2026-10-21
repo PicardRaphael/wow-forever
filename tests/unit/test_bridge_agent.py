@@ -57,6 +57,7 @@ def test_allowed_tools_are_skill_and_the_eight_forever_tools():
         "mcp__forever__forever_build",
         "mcp__forever__forever_route",  # RX1
         "mcp__forever__forever_gear",  # CJ1 : essai CJ-6 du 2026-10-15, outil refusé à l'écran Équipement
+        "mcp__forever__forever_simulate",  # décisions 293 et 294 : wowsims/forever au niveau 60
     )
     assert ALLOWED_TOOLS == ("Skill", *FOREVER_TOOLS)
 
