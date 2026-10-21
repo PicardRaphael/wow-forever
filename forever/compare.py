@@ -750,7 +750,14 @@ def _adapted_lines(
     for index, step in enumerate(replay.steps[: last + 1]):
         quests = {a.ref for a in step.actions if a.kind in ("accept", "objective", "turnin")}
         if not (quests and quests <= done):
-            lines.extend(step.raw)
+            if step.raw:
+                lines.extend(step.raw)
+            else:  # étape de Polestar (décision 289) : réécrite en syntaxe de RestedXP depuis ses actions
+                for a in step.actions:
+                    if a.kind == "grind":
+                        lines.extend(encode_stop({"kind": "grind", "ref": a.ref, "name": ""}))
+                    elif a.ref in world.quests and a.ref not in done:
+                        lines.extend(encode_stop({"kind": a.kind, "ref": a.ref, "name": world.quests[a.ref].name}))
         additions_after(index)
     return lines
 
@@ -821,10 +828,15 @@ def delivered_route(
     ]
     basis["guides"] = guides
     if covered <= request.start_level:
-        basis["verdict"] = (
-            "niveaux au-delà des parcours gratuits : notre calcul (référence Polestar à venir, décision 278)"
-        )
-        return found.result, basis
+        tail = _polestar_tail(deps, ctx, request, who, ctx.start)  # décision 289 : squelette au-delà de RestedXP
+        if tail is None:
+            basis["verdict"] = "niveaux au-delà des parcours gratuits : notre calcul (guides de Polestar absents)"
+            return found.result, basis
+        adapted_tail, names, credit = tail
+        basis.update(kind="parcours adapté", guides=names, additions=adapted_tail.additions,
+                     body=list(adapted_tail.lines), adapted_stops=len(adapted_tail.result.stops), attribution=credit,
+                     verdict="route livrée : les guides de Polestar, adaptés (quêtes de classe et donjons ajoutés)")  # fmt: skip
+        return adapted_tail.result, basis
     gd, world, start, cap = ctx.gd, ctx.world, ctx.start, ctx.cap
     ours = found if covered == request.end_level else plan(gd, world, start, end_level=covered, cap=cap)
     replay = replay_rxp(gd, world, chain.guides, who, start, end_level=covered, cap=cap)
@@ -873,7 +885,13 @@ def delivered_route(
     if covered >= request.end_level or not adapted.result.feasible:
         return adapted.result, basis
     after = _final_state(gd, world, adapted.stops, start, end_level=covered, cap=cap)
-    rest = plan(gd, world, after, end_level=request.end_level, cap=cap)
+    tail = _polestar_tail(deps, ctx, request, who, after)  # décision 289 : Polestar au-delà de RestedXP
+    rest: Any = tail[0] if tail is not None else plan(gd, world, after, end_level=request.end_level, cap=cap)
+    if tail is not None:
+        basis["guides"] = [*basis["guides"], *tail[1]]
+        basis["attribution"] = f"{basis['attribution']} ; {tail[2]}"
+        basis["additions"] = [*basis["additions"], *tail[0].additions]
+        basis["body"] = [*basis.get("body", []), *tail[0].lines]
     head = [r for r in adapted.result.stops if r.kind != "grind" or r is not adapted.result.stops[-1]]
     basis["adapted_stops"] = len(head)
     stops = (*head, *rest.result.stops)
@@ -893,5 +911,70 @@ def delivered_route(
         warnings=(*adapted.result.warnings, *rest.result.warnings),
         certainty=weakest(adapted.result.certainty, rest.result.certainty),
     )
-    basis["verdict"] += f" ; au-delà du niveau {covered}, notre calcul"
+    basis["verdict"] += (
+        f" ; au-delà du niveau {covered}, les guides de Polestar adaptés" if tail is not None
+        else f" ; au-delà du niveau {covered}, notre calcul"
+    )  # fmt: skip
     return combined, basis
+
+
+def polestar_clone(cache_dir: Path) -> Path:
+    """Clone en cache des guides de Polestar (décision 289), copié et mis à jour par `forever routes polestar`."""
+    return cache_dir / "third_party" / "polestar"
+
+
+def polestar_commit(clone: Path) -> str | None:
+    """Commit épinglé du clone (lu dans `.git`, sans lancer git) ; None sans clone."""
+    head = clone / ".git" / "HEAD"
+    if not head.is_file():
+        return None
+    ref = head.read_text(encoding="utf-8").strip()
+    if not ref.startswith("ref: "):
+        return ref or None
+    name = ref[5:]
+    path = clone / ".git" / name
+    if path.is_file():
+        return path.read_text(encoding="utf-8").strip() or None
+    packed = clone / ".git" / "packed-refs"
+    if packed.is_file():
+        for line in packed.read_text(encoding="utf-8").splitlines():
+            if line.endswith(" " + name):
+                return line.split(" ", 1)[0]
+    return None
+
+
+def _polestar_tail(
+    deps: Any, ctx: Any, request: Any, who: Any, state: RouteState
+) -> tuple[Adapted, list[str], str] | None:
+    """Guides de Polestar du camp, de la race et de la classe, à partir du guide qui couvre le niveau de `state`,
+    rejoués et adaptés comme le parcours de RestedXP (quêtes de classe et donjons avec leurs quêtes insérés) jusqu'au
+    niveau visé ; None sans clone ou sans guide pour ce personnage."""
+    from forever.polestar import ATTRIBUTION, read_polestar_guides
+    from forever.rxp_guides import applies, guide_chain
+
+    clone = polestar_clone(deps.cache_dir)
+    library = read_polestar_guides(clone)
+    if not library.guides or state.level >= request.end_level:
+        return None
+    here = [
+        g for g in library.guides if g.levels and g.levels[0] <= state.level < g.levels[1] and applies(g.filter, who)
+    ]
+    if not here:
+        return None
+    first = max(here, key=lambda g: g.levels or (0, 0))
+    chain = guide_chain(library, who, start=first.name)
+    guides = [g for g in chain.guides if g.levels is None or g.levels[0] < request.end_level]
+    adapted = adapted_route(
+        ctx.gd,
+        ctx.world,
+        guides,
+        who,
+        state,
+        end_level=request.end_level,
+        cap=ctx.cap,
+        class_quests=request.class_quests,
+        dungeons=request.dungeons != "none",
+        done=frozenset(request.done),
+    )
+    credit = ATTRIBUTION.format(commit=(polestar_commit(clone) or "?")[:12])
+    return adapted, [g.name for g in guides], credit

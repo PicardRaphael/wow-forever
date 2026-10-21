@@ -8,7 +8,6 @@ de groupe (`group`) écarté comme les donjons de RestedXP ; seuls les guides de
 Guides fabriqués ici (structure du format v1 de Polestar) ; quêtes et niveaux inventés."""
 
 from forever.polestar import parse_polestar, read_polestar_guides
-
 from forever.rxp_guides import Who, applies, guide_chain
 
 GUIDE = """guide forever/horde/zone-a
@@ -91,3 +90,10 @@ def test_library_follows_next_and_keeps_leveling_guides_only(tmp_path):
     assert sorted(g.name for g in library.guides) == ["20-25 Zone A", "25-30 Zone B"]
     chain = guide_chain(library, Who("Mage", "Orc", "Horde"), start="20-25 Zone A")
     assert [g.name for g in chain.guides] == ["20-25 Zone A", "25-30 Zone B"]
+
+
+def test_steps_carry_no_raw_polestar_line():
+    """La route est livrée dans RestedXP : une étape de Polestar ne garde aucune ligne brute (syntaxe de Polestar) ; le
+    corps du guide livré est réécrit depuis ses actions (`forever.compare._adapted_lines`)."""
+    g = parse_polestar(GUIDE, "zone-a.guide")
+    assert all(step.raw == () for step in g.steps)
