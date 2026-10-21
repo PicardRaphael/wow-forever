@@ -166,7 +166,10 @@ bêta. La sauvegarde de raison « avant adoption » est elle-même **antérieure
 
 Une seule procédure pour tous les blocs de CJ1 livrés sans essai (la bêta s'est terminée avant, décision 273 : rien
 n'est accepté sans ton essai). À faire après l'étape 13 du PC de jeu (profil importé), avec un personnage neuf de la
-version finale ; les étapes supposent un Mage Gnome, un autre personnage convient (les noms des quêtes changent).
+version finale. Préférence de départ, jamais un verrou : Alliance, serveur JcJ (peut-être aussi un serveur normal),
+Mage ou Chaman ; tu peux en changer à tout moment. Chaque étape vaut pour les neuf classes, les deux camps et tous les
+types de serveur : le pont répond pour le personnage connecté (classe, race, camp, serveur déclaré), rien n'est figé
+sur ce choix, et le profil garde plusieurs personnages (`uv run forever profile list`, `profile use <nom>`).
 Chaque bloc livré d'ici la sortie ajoute ici ses étapes. Un défaut : noter l'étape et la réponse (ou une capture), sa
 correction passe devant le reste.
 
@@ -178,8 +181,8 @@ correction passe devant le reste.
 ### 2. Feuille de route (blocs 1, RTE8 ; 5 min)
 3. Feuille de route, type Leveling, du niveau 1 au niveau 10, « Calculer » : départ de ta position, zone de départ de
    ta race d'abord, aperçu lisible ; « Valider et livrer » : la route arrive dans RestedXP sous un nom stable.
-4. Plus tard (niveau 10 ou plus) : une route qui passe par une capitale (Ironforge pour un Gnome) ; les trajets dans
-   la ville sont marqués supposés, aucun donneur injoignable.
+4. Plus tard (niveau 10 ou plus) : une route qui passe par la capitale de ta race ; les trajets dans la ville sont
+   marqués supposés, aucun donneur injoignable.
 
 ### 3. Équipement (blocs 4, 4b, 4c, 4d ; 10 min)
 5. Écran Équipement, ton niveau, « Mon équipement à ce niveau » : objets obtenables à ce niveau seulement (niveau
@@ -255,6 +258,21 @@ correction passe devant le reste.
     Polestar à jour (ou « non mis à jour (réseau) », sans erreur du passage).
 22d. Presence of Mind (bouton Talents ou `forever lookup talent "Presence of Mind"`) : le seuil s'affiche en clair,
     plus de « {0} ».
+
+### 7b. Calculs réutilisés, Forever seulement, type de serveur (décisions 293 et 294 ; 10 min)
+22e. Chaque personnage déclare son serveur : `uv run forever profile set <nom> --server pvp` (ou `--server normal`).
+    Sur un serveur JcJ, une feuille de route qui passe par une zone disputée (Stranglethorn Vale, Hillsbrad Foothills…)
+    ou par le territoire de l'autre camp le signale dans ses avertissements ; sur un serveur normal, rien ; serveur
+    non déclaré : la route le dit.
+22f. Une fois avant de jouer (Go et protoc installés) : `uv run forever sims update` compile wowsims/forever épinglé
+    (commit et empreinte affichés). Puis `uv run forever sims races --preset "mage/dps/Fire" --races
+    "Human,Gnome,High Order Skyborne"` et, dans le chat : « au niveau 60, quelle race pour un Mage Feu ? » : la réponse
+    vient de wowsims/forever (forever_simulate), avec commit et certitude `suppose`. « Niveau 20, quel arbre ? » : le
+    moteur du Mage répond et dit qu'il est gelé (révision 7 de 70450) ; pour un Chaman sous le 60 : « non calculé »
+    (ou tes journaux), avec le build de Forever Companion.
+22g. Bouton Leveling avec un Chaman (ou toute autre classe) : zones et quêtes tirées des sources Forever, filtrées pour
+    sa classe (plus pour le Mage) ; la provenance dit les valeurs héritées de la Classic qu'une réponse utilise
+    (`uv run forever origins classic` pour la liste).
 
 ### 8. Fin
 23. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
