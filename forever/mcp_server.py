@@ -443,6 +443,30 @@ def build_server(deps: Deps) -> MCPServer:
         return dict(report)
 
     @server.tool()
+    def forever_simulate(
+        action: str = "presets",
+        preset: str | None = None,
+        races: str | None = None,
+        race: str | None = None,
+        stats: str | None = None,
+        reference: str | None = None,
+        iterations: int | None = None,
+    ) -> dict[str, Any]:
+        """Calculs de wowsims/forever au niveau 60 seulement, toutes classes (décisions 293 et 294 : simulateur
+        maintenu par d'autres, compilé tel quel, épinglé) : `action="presets"` préréglages du dépôt (`key` :
+        classe/spé/build) ; `action="races"` races comparées par paires sur `preset` (`races` séparées par des
+        virgules, noms du client, ex. « Human,Gnome,High Order Skyborne ») ; `action="weights"` poids des statistiques
+        par tirages appariés (`stats` séparées par des virgules, ex. « Intellect,SpellDamage,HitRating », rapportées à
+        `reference`, `race` facultative). Sous le niveau 60 : rien ici (le moteur du Mage gelé répond, en le disant)."""
+        from forever.sims.report import simulate
+
+        try:
+            return simulate(deps, action, preset=preset, races=races, race=race, stats=stats, reference=reference,
+                            iterations=iterations)  # fmt: skip
+        except ForeverError as err:
+            return cast(dict[str, Any], _error_result(deps, err))
+
+    @server.tool()
     def forever_gear(
         action: str = "bis",
         class_name: str = "Mage",

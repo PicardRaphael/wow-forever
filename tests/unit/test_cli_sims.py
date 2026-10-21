@@ -5,7 +5,7 @@ provenance (commit et empreinte du binaire, certitude `suppose`). Clone, binaire
 
 import json
 
-from test_wowsims_run import Sim, clone
+from wowsims_fakes import Sim, clone
 
 from forever.cli import main
 

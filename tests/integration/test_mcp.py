@@ -32,6 +32,7 @@ def test_list_tools(make_deps):
         "forever_player_profile",  # T06b : profil joueur, lecture seule
         "forever_route",  # RX1 : feuille de route de leveling
         "forever_gear",  # CJ1 : équipement (poids, liste BiS, leveling, amélioration)
+        "forever_simulate",  # décisions 293 et 294 : wowsims/forever au niveau 60
     }
     for t in tools:
         assert t.output_schema is not None
@@ -230,7 +231,7 @@ def test_simulate_needs_the_pinned_wowsims(make_deps, tmp_path):
 
 def test_simulate_races_and_weights(make_deps, tmp_path, monkeypatch):
     """`forever_simulate` : races comparées et poids appariés au niveau 60 par wowsims/forever (simulé ici)."""
-    from test_wowsims_run import PROTO_STATS, WeightSim, clone
+    from wowsims_fakes import PROTO_STATS, WeightSim, clone
 
     from forever.pipeline import gitops
 
