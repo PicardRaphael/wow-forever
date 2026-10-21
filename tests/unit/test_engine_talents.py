@@ -84,3 +84,10 @@ def test_talent_value(game_data_at_pre_70450_version):
     assert talent_value(game_data, {"improvedFrostbolt": 7}, "improvedFrostbolt") == 0.5  # dernier rang connu
     assert talent_value(game_data, {"improvedFrostbolt": 3}, "improvedFrostbolt", 1, default=9.0) == 9.0
     assert talent_value(game_data, {"iceLance": 1}, "iceLance", 2) == 300
+
+
+def test_value_of_a_talent_absent_from_the_data_is_the_default(game_data):
+    """Talent retiré par un correctif du serveur (Piercing Ice, décision 290) et resté dans un build écrit avant :
+    sa valeur est celle d'un talent non pris, jamais une panne du moteur (décision 288)."""
+    assert talent_value(game_data, {"talentRetire": 3}, "talentRetire", 0) == 0.0
+    assert talent_value(game_data, {"talentRetire": 3}, "talentRetire", 0, default=1.0) == 1.0
