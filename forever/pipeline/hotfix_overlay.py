@@ -46,6 +46,13 @@ class HotfixSource(NamedTuple):
     dbd: dict[str, Any]  # repo, commit, empreintes des `.dbd`
     seen_at: dict[int, str | None]  # poussée -> première ligne du journal du même build (heure locale du client)
     read_at: str
+    third_party: dict[str, Any] | None = None  # décision 290 : cache vérifié de Raidbots (adresse, date, empreinte)
+
+
+def origin_rules_certainty(source: HotfixSource) -> str:
+    """Certitude des valeurs corrigées : `certain` lues dans le cache du client de l'utilisateur, `probable` lues
+    dans une copie tierce (Raidbots, décision 290)."""
+    return "probable" if source.third_party else "certain"
 
 
 class Applied(NamedTuple):
@@ -97,7 +104,11 @@ def hotfix_source(
             if str(j.get("push")) == str(push) and str(j.get("client_build") or "").endswith(f".{cache.build}")
         ]
         seen[push] = min(times) if times else None
-    return HotfixSource(path, locale, cache, resolved, names, dict(layouts), dict(dbd), seen, read_at)
+    from forever.pipeline.raidbots import third_party_of
+
+    return HotfixSource(
+        path, locale, cache, resolved, names, dict(layouts), dict(dbd), seen, read_at, third_party_of(path)
+    )
 
 
 def load_dbd_layouts(cache_dir: Path, version: str, tables: Sequence[str]) -> tuple[dict[str, Layout], dict[str, Any]]:
@@ -522,9 +533,9 @@ def annotate(
             "file": file,
             "paths": sorted(paths),
             "origin": SERVER_ORIGIN,
-            "source": f"DBCache.bin du client (build {source.cache.build}, {source.locale}, sha256 {sha}…), "
+            "source": f"{_cache_label(source)} (build {source.cache.build}, {source.locale}, sha256 {sha}…), "
             f"dispositions WoWDBDefs {commit} ; poussée(s) {', '.join(map(str, pushes))}",
-            "certainty": "certain",
+            "certainty": origin_rules_certainty(source),
             "pushes": list(pushes),
             "seen_at": first,
         }
@@ -533,6 +544,13 @@ def annotate(
         rules.append(rule)
     unattributed = sorted(f"{t} {r}" for (t, r) in reached if (t, r) not in used)
     return rules, unattributed
+
+
+def _cache_label(source: HotfixSource) -> str:
+    third = source.third_party
+    if not third:
+        return "DBCache.bin du client"
+    return f"DBCache.bin vérifié de Raidbots ({third.get('url')}, créé le {third.get('created')})"
 
 
 def _pushes(
@@ -573,6 +591,7 @@ def sources_block(
             "read_at": source.read_at,
         },
         "dbd": dict(source.dbd),
+        **({"third_party": dict(source.third_party)} if source.third_party else {}),
         "pushes": pushes,
         "max_push": max(pushes) if pushes else None,
         "seen_at": {str(p): source.seen_at.get(p) for p in pushes},

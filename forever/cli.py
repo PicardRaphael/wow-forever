@@ -71,7 +71,7 @@ from forever.origins import check_all as check_origins
 from forever.origins import inventory as origins_inventory
 from forever.origins import inventory_payload, render_inventory
 from forever.origins import render_report as render_origins_report
-from forever.pipeline import blizzard_api, dbcache, hotfixes
+from forever.pipeline import blizzard_api, dbcache, hotfixes, raidbots
 from forever.pipeline import notes as notes_mod
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
 from forever.pipeline.builds import list_builds
@@ -248,7 +248,11 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="appliquer les correctifs du serveur de DBCache.bin (T08c, mode forever)",
     )
-    decode.add_argument("--dbcache", help="DBCache.bin (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin)")
+    decode.add_argument(
+        "--dbcache",
+        help="DBCache.bin (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin) ; « raidbots » : dernier cache vérifié"
+        " de Raidbots épinglé par forever hotfixes --raidbots (décision 290)",
+    )
     decode.add_argument(
         "--questcache",
         help="cache des quêtes du client (défaut : copie archivée du build, <cache>/dbcache/<build>/questcache.wdb)",
@@ -693,6 +697,12 @@ def build_parser() -> argparse.ArgumentParser:
     hot.add_argument("--values", action="store_true", help="chaque valeur corrigée, avant et après (T08c)")
     hot.add_argument("--dbd-layouts", help="dispositions dérivées (JSON) au lieu du relevé de WoWDBDefs du cache")
     hot.add_argument("--csv-dir", help="dossier des CSV du build (défaut : cache de forever fetch)")
+    hot.add_argument(
+        "--raidbots",
+        action="store_true",
+        help="télécharger (lecture seule) le DBCache.bin vérifié le plus récent du build chez Raidbots (décision 290)",
+    )
+    hot.add_argument("--build", type=int, help="build du cache Raidbots (défaut : celui de la version installée)")
     hot.add_argument("--json", action="store_true", help="sortie JSON")
 
     origins = sub.add_parser("origins", help="origine déclarée de chaque valeur des données (hors ligne)")
@@ -2620,7 +2630,15 @@ def _hotfix_source(deps: Deps, args: argparse.Namespace) -> HotfixSource | None:
     """Correctifs du serveur demandés par `--hotfixes` : DBCache.bin, dispositions de WoWDBDefs, journal du cache."""
     if not args.hotfixes:
         return None
-    path = _dbcache_path(deps, args.dbcache)
+    if args.dbcache == raidbots.SOURCE:  # décision 290 : dernier cache vérifié de Raidbots épinglé, sans réseau
+        path = raidbots.cached_dbcache(deps.cache_dir, int(args.version.rsplit(".", 1)[-1]))
+        if path is None:
+            raise InvalidArgumentError(
+                f"Aucun cache de Raidbots épinglé pour {args.version}.",
+                "le télécharger : forever hotfixes --raidbots --build <build>",
+            )
+    else:
+        path = _dbcache_path(deps, args.dbcache)
     if path is None or not path.is_file():
         raise InvalidArgumentError(
             f"DBCache.bin introuvable ({path or 'FOREVER_WOW_DIR absent'}).",
@@ -4356,6 +4374,8 @@ def _cmd_addons(deps: Deps, args: argparse.Namespace) -> int:
 
 
 def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
+    if getattr(args, "raidbots", False):
+        return _cmd_hotfixes_raidbots(deps, args)
     log = Path(args.log) if args.log else (deps.wow_dir.joinpath(*hotfixes.HOTFIX_LOG) if deps.wow_dir else None)
     version = current_identity(deps.data_dir).game_version
     _, rules = load_rules(deps.data_dir)
@@ -4486,6 +4506,28 @@ def _dbd_layouts(
             )
         return layouts_from_json(doc), {"repo": doc.get("repo"), "commit": doc.get("commit"), "files": {}}
     return load_dbd_layouts(deps.cache_dir, version, dbd_tables(rules))
+
+
+def _cmd_hotfixes_raidbots(deps: Deps, args: argparse.Namespace) -> int:
+    """`forever hotfixes --raidbots` (décision 290) : DBCache.bin vérifié le plus récent du build, lu en lecture seule
+    chez Raidbots et épinglé dans le cache avec sa source."""
+    version = current_identity(deps.data_dir).game_version
+    build = args.build or int(version.rsplit(".", 1)[-1])
+    product = str((read_sources(deps.data_dir, version) or {}).get("product") or "wow_classic_beta")
+    path = raidbots.fetch_dbcache(deps, build, product)
+    meta = raidbots.third_party_of(path) or {}
+    provenance = local_provenance(
+        deps, assumptions=["correctifs du serveur : copie tierce (Raidbots), au plus probable"]
+    )
+    data = {"raidbots": {**meta, "path": str(path)}, "provenance": provenance}
+    if args.json:
+        print(json.dumps(data, ensure_ascii=False, indent=2))
+        return 0
+    print(f"DBCache.bin vérifié de Raidbots, build {build} : {path}")
+    print(f"Source : {meta.get('url')} (créé le {meta.get('created')}, sha256 {str(meta.get('sha256'))[:12]}…)")
+    print(f"Appliquer : uv run forever decode --version {version} --hotfixes --dbcache raidbots")
+    print(format_provenance_line(provenance))
+    return 0
 
 
 def _dbcache_path(deps: Deps, option: str | None) -> Path | None:

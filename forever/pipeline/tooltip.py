@@ -27,6 +27,9 @@ LETTERS = frozenset("smMdunot")
 _VAR = re.compile(r"(\d*)([A-Za-z])(\d?)")
 _DIVIDE = re.compile(r"/(\d+);")
 _INNER = re.compile(r"\$(\d*)([A-Za-z])(\d?)")
+# Statistiques du personnage dans une expression : puissance des sorts (`$SP`, par école : `$SPFR`, `$SPFI`…) et
+# puissance d'attaque (`$AP`, `$RAP`) ; jamais suivies d'un indice d'effet.
+_STAT = re.compile(r"\$(?:SP[A-Z]{0,3}|R?AP)(?![A-Za-z0-9])")
 _DECIMALS = re.compile(r"\.(\d)")
 
 
@@ -88,6 +91,7 @@ def _expression(body: str, resolve: Resolver) -> float:
 
     if "$<" in body or "$?" in body:
         raise ValueError(f"expression d'infobulle non prise en charge : {body}")
+    body = _STAT.sub("0", body)  # statistique du personnage : infobulle d'un rang lue sans équipement
     expression = _INNER.sub(substitute, body)
     if "$" in expression:
         raise ValueError(f"expression d'infobulle non prise en charge : {body}")
