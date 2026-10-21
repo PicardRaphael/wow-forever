@@ -830,6 +830,13 @@ def build_report(
         sources["scénarios"] = "suppose"
     if context in PVP_CONTEXTS:
         sources["profil PvP"] = "suppose"
+    if rules == "forever":  # décision 288 : moteur en retard sur le client dit, jamais l'ancien sens en silence
+        from forever.sources import choose, engine_freshness
+
+        engine = engine_freshness(data.read_json("talents.json"), data.read_json("decode_rules.json"))
+        if engine["status"] != "à jour":
+            sources["moteur du Mage (texte du client sans règle de lecture)"] = "suppose"
+            assumptions.append(choose([engine])["note"])
     certainty = min_certainty(cast(Certainty, c) for c in sources.values())
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)
     provenance = make_provenance(

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TypedDict
+from typing import Any, TypedDict
 
 from forever.config import Deps
 from forever.freshness import FreshnessResult, freshness_for_version
@@ -27,6 +27,7 @@ class StatusReport(TypedDict):
     integrity: IntegrityInfo
     registry_coverage: str
     provenance: Provenance
+    sources: list[Any]  # décision 291 : fraîcheur de chaque source (forever.sources)
 
 
 def status_report(deps: Deps, *, allow_network: bool = True) -> StatusReport:
@@ -64,4 +65,14 @@ def status_report(deps: Deps, *, allow_network: bool = True) -> StatusReport:
         },
         "registry_coverage": provenance["registry_coverage"],
         "provenance": provenance,
+        "sources": _sources(deps) if report.ok else [],
     }
+
+
+def _sources(deps: Deps) -> list[Any]:
+    from forever.sources import sources_report
+
+    try:
+        return list(sources_report(deps))
+    except Exception:  # noqa: BLE001 : le relevé des sources ne casse jamais l'état
+        return []

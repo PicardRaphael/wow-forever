@@ -13,7 +13,7 @@ import os
 import re
 import sys
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from contextlib import redirect_stderr, redirect_stdout
 from dataclasses import replace
 from datetime import timedelta
@@ -1165,7 +1165,31 @@ def render_status(rep: StatusReport) -> list[str]:
     ):
         lines += [f"  {label} : {p}" for p in paths]
     lines.append(f"Registre des mécaniques : {rep['registry_coverage']} couvertes")
+    if rep.get("sources"):
+        lines.append("Sources : " + " ; ".join(_sources_text(rep["sources"])))
     return lines
+
+
+def _sources_text(sources: Sequence[Mapping[str, Any]]) -> list[str]:
+    """Sources en mots de joueur, regroupées par nom : « à jour » en bloc, les classes en retard nommées avec leur
+    raison ; « selon sa date » pour une fraîcheur lue dans la date de la source."""
+    groups: dict[str, list[Mapping[str, Any]]] = {}
+    for s in sources:
+        groups.setdefault(str(s["label"]), []).append(s)
+    out = []
+    for label, items in groups.items():
+        basis = " selon sa date" if items[0]["basis"] == "version" else ""
+        late = [s for s in items if s["status"] != "à jour"]
+        if not late:
+            out.append(f"{label} à jour{basis}")
+            continue
+        parts = []
+        for s in late:
+            who = f"{', '.join(s['classes'])} " if len(items) > 1 else ""
+            parts.append(f"{who}{s['status']}{basis} ({'; '.join(s['detail']) or '?'})")
+        fresh = len(items) - len(late)
+        out.append(f"{label} : {', '.join(parts)}" + (f", à jour pour {fresh} autre(s)" if fresh else ""))
+    return out
 
 
 def render_explanation(res: MechanicExplanation) -> list[str]:
