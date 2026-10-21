@@ -25,7 +25,7 @@ import shutil
 from datetime import UTC, datetime, timedelta
 
 import pytest
-from conftest import (
+from conftest import RAIDBOTS_VERIFIED, (
     CLASS_FIXTURE_VERSION,
     DATA_DIR,
     FIXTURES,
@@ -276,7 +276,8 @@ def test_a_new_version_waits_for_its_hotfixes(montage):
     assert entry["version"] == TARGET and entry["action"] == "attente"
     assert not any("approve" in c for c in entry["commands"])
     assert entry["until"] == "2026-09-28T11:00:00Z"  # première vue (NOW - 1 h) + 24 h
-    assert [url for url, _, _ in http.calls if url != BUILDS_URL] == []  # aucune table relevée
+    # aucune table relevée ; seule la liste des caches vérifiés de Raidbots est demandée (décision 290, injoignable ici)
+    assert [url for url, _, _ in http.calls if url not in (BUILDS_URL, RAIDBOTS_VERIFIED)] == []
     assert exit_code(report) == EXIT_PENDING
 
 

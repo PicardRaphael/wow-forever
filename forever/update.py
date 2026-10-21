@@ -322,6 +322,20 @@ def decide(
     return Verdict(action, clauses, reasons)
 
 
+def dbcache_for_build(deps: Deps, build: int, product: str | None, archived: Path | None) -> Path | None:
+    """`DBCache.bin` des correctifs d'un build : celui du jeu archivé d'abord ; sinon le cache vérifié le plus récent
+    de Raidbots, lu en lecture seule et épinglé (décision 290, certitude au plus `probable`) ; None si Raidbots est
+    injoignable ou n'a pas ce build."""
+    if archived is not None:
+        return archived
+    from forever.pipeline import raidbots
+
+    try:
+        return raidbots.fetch_dbcache(deps, build, product or "wow_classic_beta")
+    except ForeverError:
+        return None
+
+
 def hotfix_gate(archived: bool, seen_at: datetime | None, now: datetime, wait: timedelta) -> str:
     """Porte des correctifs d'une nouvelle version (décision 207), pure : `lire` (archive de `DBCache.bin` du build
     présente), `attendre` (pas d'archive, délai non écoulé ou première vue du build inconnue), `sans_correctifs`
@@ -1136,6 +1150,7 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
         return Step("nouvelle_version", "rien", "aucune version à installer", {})
     product = run.client.product if run.client is not None else None  # LN1 : archives du produit lu
     archive = archived_dbcache(run.deps.cache_dir, _build_number(target), product=product)
+    archive = dbcache_for_build(run.deps, int(_build_number(target)), product, archive)  # décision 290 : Raidbots
     seen = _first_seen(run, target)
     gate = hotfix_gate(archive is not None, seen, run.deps.now(), UPDATE_HOTFIX_WAIT)
     if gate == "attendre":
@@ -1413,6 +1428,7 @@ def _step_hotfixes(run: _Run) -> Step:
     if version not in installed_versions(run.base_data):
         return Step("correctifs", "rien", f"version du client {version} non installée", {})
     archive = archived_dbcache(run.deps.cache_dir, _build_number(version), product=client.product)
+    archive = dbcache_for_build(run.deps, int(_build_number(version)), client.product, archive)  # décision 290
     rules = _rules(run.base_data)
     sources = read_sources(run.base_data, version) or {}
     absent = [str(n) for n in sources.get("missing_names") or []]

@@ -91,6 +91,9 @@ PREFIX = "1.60."
 NOW = datetime(2026, 9, 27, 12, 0, tzinfo=UTC)
 
 
+RAIDBOTS_VERIFIED = "https://www.raidbots.com/api/dbcache/verified"  # liste des caches vérifiés (décision 290)
+
+
 class FakeHttp:
     """Client HTTP simulé : renvoie `body` ou lève `exc`, et garde la trace des appels.
 
@@ -104,7 +107,8 @@ class FakeHttp:
     ) -> None:
         self.body = body
         self.exc = exc
-        self.routes = dict(routes or {})
+        # décision 290 : la veille interroge Raidbots quand le jeu n'a pas de cache ; injoignable sauf route donnée
+        self.routes = {RAIDBOTS_VERIFIED: OSError("Raidbots non simulé"), **dict(routes or {})}
         self.calls: list[tuple[str, dict[str, str], float]] = []
 
     def __call__(self, url: str, headers: Mapping[str, str], timeout: float) -> bytes:
