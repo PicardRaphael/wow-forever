@@ -1,4 +1,7 @@
-# Messages aux auteurs (brouillons, à n'envoyer que sur accord de l'utilisateur)
+# Messages aux auteurs
+
+Envoyés le 2026-10-21 sur accord de l'utilisateur : https://github.com/wowsims/forever/issues/624 (avec la demande
+de réactiver la publication des binaires) et https://github.com/Blueteak/SimsForeverExporter/issues/1.
 
 ## 1. wowsims/forever (issue GitHub, en anglais)
 

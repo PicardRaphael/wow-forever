@@ -94,3 +94,27 @@ pont, mesures tirées des journaux de combat, lecteurs du client et des addons, 
    - les zones disputées lues dans un addon (Naowh porte `territory`) ;
    - un signalement dans les routes sur un serveur JcJ.
    Le client Classic ne donne pas ce type de façon sûre, d'où ta déclaration. Avant ou après le 4 novembre ?
+
+## 6. Décisions du 2026-10-21 (suite), validées
+- wowsims/forever **compilé chez nous** depuis un commit épinglé, sans aucune modification du code (pas de binaire
+  publié : la liste des publications GitHub est vide, les workflows de publication sont désactivés). Épinglé par le
+  commit et l'empreinte de notre binaire ; recompilé par la veille à chaque nouveau commit. Outils : Go 1.27.0 et
+  protoc 36.0, déjà installés ; `protoc-gen-go` installé par `go install` (réseau, une fois). Essai : le commit
+  5f0a367 compile en 12 s (`go build --tags=with_db ./cmd/wowsimcli`, binaire de 27 Mo) ; 2 000 combats en moins
+  d'une seconde.
+- Messages envoyés : https://github.com/wowsims/forever/issues/624 (autres niveaux, publication des binaires) et
+  https://github.com/Blueteak/SimsForeverExporter/issues/1 (moteur de leveling).
+- Règle 294 appliquée avant le 4 novembre : l'outil des zones et le bouton Leveling reposent sur le livre de quêtes
+  fusionné des sources Forever, plus sur la base Classic Era de Questie ; les valeurs de `mechanics.json` et
+  `origins.json` qui viennent de la Classic sont recensées et marquées, et toute réponse qui s'appuie sur elles le
+  dit ; leur remplacement par des valeurs de Forever vient après la sortie, avec les mesures de l'utilisateur.
+
+## 7. Étapes de l'adaptateur
+1. `forever sims update` (réseau, lecture seule) : clone en cache `<cache>/third_party/wowsims`, remise sur le dernier
+   commit, génération protobuf, `go build`, épinglage (`pin.json` : commit, date, empreinte, versions de Go et protoc).
+2. `forever/sims/wowsims.py` (aucun réseau) : requête de combat depuis un build du dépôt de wowsims (joueur, combat,
+   buffs) ou depuis le personnage connecté (race, classe, talents, équipement), lancement du binaire épinglé,
+   lecture du résultat ; provenance (commit, empreinte, certitude `suppose`).
+3. Comparaisons au 60 : races, spécialisations, poids par tirages appariés (`bonusStats`), même graine.
+4. Branchement dans `forever_build` et `forever_gear` au niveau 60 ; sous le 60, moteur du Mage gelé, dit comme tel.
+5. Étape `simulateurs` de la veille, rapport des écarts.
