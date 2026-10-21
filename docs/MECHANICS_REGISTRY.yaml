@@ -1747,7 +1747,7 @@ mechanics:
       - tests/unit/test_zones_cli.py::test_lookup_zones_level_12
     tolerance: null
     formule: "couleur = rouge si niveau de quête − niveau ≥ seuil rouge, orange ≥ seuil orange, jaune ≥ seuil jaune, sinon verte au-dessus du niveau gris, grise ; zone classée par quêtes utiles (vertes, jaunes, orange) prenables (faction, classe, niveau requis)"
-    note: "T04c : forever/engine/leveling.py (gray_level, quest_color, level_band), forever/pipeline/questie.py (zones_for_level) ; base Classic Era de Questie sans correction Forever, noms de zones en anglais ; plage verte (GetQuestGreenRange, API du client) remplacée par le niveau gris communautaire de Classic : voir OPEN_QUESTIONS"
+    note: "T04c : forever/engine/leveling.py (gray_level, quest_color, level_band), forever/pipeline/questie.py (zones_for_level) ; base Classic Era de Questie sans correction Forever, noms de zones en anglais ; plage verte (GetQuestGreenRange, API du client) remplacée par le niveau gris communautaire de Classic : voir OPEN_QUESTIONS ; décision 294 (2026-10-21) : zones et donjons du niveau tirés du livre de quêtes fusionné des sources Forever (forever.quests.zones_from_book), plus de la base Classic Era de Questie ; quête connue de la seule Classic jamais comptée ; classe du personnage connecté ; tests : tests/unit/test_zones_book.py"
   - id: I8
     categorie: optimisation
     description: "Rotations non modélisées : Scorch et Fire Vulnerability, Arcane Missiles tissé hors rotation arcane, Pyroblast d'ouverture, Arcane Power avant la décharge, rotation qui s'adapte à la mana restante"
@@ -2043,7 +2043,7 @@ mechanics:
       - tests/unit/test_engine_travel.py::test_map_to_world
       - tests/unit/test_engine_travel.py::test_flight_used_when_known
     tolerance: null
-    note: "conditions d'accès d'un point de vol (ConditionID) non lues ; 13 trajets vers un point absent de TaxiNodes écartés ; bloc F : bateaux, zeppelins, portail et tram de Naowh Journeys lus en local (durée = attente au quai + longueur ÷ vitesse + embarquement + chargement, valeurs de l'addon, suppose) et réseau de marche de Journeys (graphe des passages, yards de marche) ; transports de Shortest Path Forever non lus (recoupement TRV2)"
+    note: "conditions d'accès d'un point de vol (ConditionID) non lues ; 13 trajets vers un point absent de TaxiNodes écartés ; bloc F : bateaux, zeppelins, portail et tram de Naowh Journeys lus en local (durée = attente au quai + longueur ÷ vitesse + embarquement + chargement, valeurs de l'addon, suppose) et réseau de marche de Journeys (graphe des passages, yards de marche) ; transports de Shortest Path Forever non lus (recoupement TRV2) ; décision 294 (2026-10-21, 70450 r9) : camp de la zone de chaque carte (AreaTable.FactionGroupMask, travel.area_faction_masks, sens probable) ; sur un serveur JcJ déclaré au profil, la feuille de route signale ses zones disputées et le territoire de l'autre camp (forever.route.pvp_zone_warnings) ; tests : tests/unit/test_server_type.py"
   - id: I20
     categorie: optimisation
     description: "Route d'équipement : origine des objets de la liste BiS et passages d'un donjon pour les obtenir (espérance et nombre pour une chance donnée)"

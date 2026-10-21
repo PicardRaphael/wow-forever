@@ -620,3 +620,11 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   qui dure depuis sa première application et les projectiles de Missile Barrage, comptés en moyenne par le cycle
   analytique. Les recommandations se départagent au Monte Carlo ; tests en `xfail` strict
   (`test_encounter.py`, `test_engine_arcane_blast.py`) jusqu'à la correction du cycle.
+- **TERR1** (2026-10-21, décision 294) : sens des bits d'`AreaTable.FactionGroupMask` (2 Alliance, 4 Horde, aucun =
+  zone disputée) déduit des zones connues, probable ; le type de serveur (JcJ ou normal) n'est pas lu dans le client :
+  il est déclaré par personnage. À vérifier en jeu : `C_PvP.GetZonePVPInfo()` dans une zone signalée disputée
+  (docs/LANCEMENT.md, étape 22e).
+- **SIM1** (2026-10-21, décisions 293 et 294) : wowsims/forever ne simule que le niveau 60 (constante de son code) ;
+  question posée aux auteurs (https://github.com/wowsims/forever/issues/624) et à l'auteur de Sims Forever
+  (https://github.com/Blueteak/SimsForeverExporter/issues/1). Sous le 60 : moteur du Mage gelé, autres classes non
+  calculées. Chasseur, Voleur et soigneurs : pas de préréglage APL lisible dans le dépôt épinglé.
