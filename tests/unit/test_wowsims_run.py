@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import pytest
+
 from forever.sims.wowsims import (
     WowsimsError,
     compare_races,

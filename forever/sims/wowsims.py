@@ -243,6 +243,18 @@ def read_presets(clone: Path) -> list[Preset]:
     return out
 
 
+def race_enum(name: str) -> str:
+    """Nom de race du proto de wowsims (`RaceHighOrderSkyborne`) depuis un nom du client (« High Order Skyborne »)."""
+    words = name.strip().removeprefix("Race").replace("-", " ").split()
+    return "Race" + "".join(w[:1].upper() + w[1:] for w in words)
+
+
+def source_note(pin: dict[str, Any]) -> str:
+    """Hypothèse de provenance d'un résultat de wowsims : commit et empreinte du binaire épinglé."""
+    return (f"calcul de wowsims/forever, commit {pin['commit'][:12]} du {pin.get('committed_at')}, binaire compilé "
+            f"tel quel (empreinte {pin['sha256'][:12]}), niveau 60 seulement ; simulateur tiers, certitude suppose")  # fmt: skip
+
+
 def reference_encounter(presets: Sequence[Preset]) -> dict[str, Any] | None:
     """Combat de référence du dépôt : celui du premier build complet (cible de raid de wowsims)."""
     return next((p.encounter for p in presets if p.encounter), None)

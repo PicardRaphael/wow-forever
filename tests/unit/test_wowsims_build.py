@@ -10,9 +10,9 @@ import json
 import subprocess
 
 import pytest
-from forever.pipeline.wowsims_build import REPO, pinned, update_wowsims
 
 from forever.pipeline.gitops import GitOpsError
+from forever.pipeline.wowsims_build import REPO, pinned, update_wowsims
 
 COMMIT, NEXT = "a" * 40, "b" * 40
 GOMOD = "module github.com/wowsims/forever\n\ngo 1.25.0\n\nrequire (\n\tgoogle.golang.org/protobuf v1.36.10\n)\n"

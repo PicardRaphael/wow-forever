@@ -494,6 +494,19 @@ def build_parser() -> argparse.ArgumentParser:
         "polestar", help="copier ou mettre à jour les guides de Polestar en cache (réseau, lecture seule, décision 289)"
     )
     r_pole.add_argument("--json", action="store_true", help="sortie JSON")
+    sims = sub.add_parser("sims", help="wowsims/forever au niveau 60 (décisions 293 et 294)")
+    sims_sub = sims.add_subparsers(dest="sims_command", required=True, parser_class=_Parser)
+    s_up = sims_sub.add_parser(
+        "update", help="copier, compiler et épingler wowsims/forever (réseau, lecture seule ; Go et protoc requis)"
+    )
+    s_up.add_argument("--json", action="store_true", help="sortie JSON")
+    s_pre = sims_sub.add_parser("presets", help="préréglages du dépôt épinglé (classe, spé, build)")
+    s_pre.add_argument("--json", action="store_true", help="sortie JSON")
+    s_races = sims_sub.add_parser("races", help="races comparées au niveau 60 sur un préréglage (même graine)")
+    s_races.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Fire (voir forever sims presets)")
+    s_races.add_argument("--races", required=True, help="races séparées par des virgules, ex. Human,Gnome")
+    s_races.add_argument("--iterations", type=int, default=None, help="combats par race (défaut de l'outil)")
+    s_races.add_argument("--json", action="store_true", help="sortie JSON")
     r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
     r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
     r_cov.add_argument("--json", action="store_true", help="sortie JSON")
@@ -1693,6 +1706,43 @@ def _cmd_gear(deps: Deps, args: argparse.Namespace) -> int:
     else:
         lines = [f"Objet {doc['item']} : {doc['verdict']} (écart {doc['delta']}, poids : {doc['weights_source']})"]
     _emit(doc, lines, doc["provenance"], args.json)
+    return EXIT_OK
+
+
+def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
+    from forever.pipeline import wowsims_build
+    from forever.sims import wowsims
+
+    if args.sims_command == "update":
+        pin = wowsims_build.update_wowsims(deps.cache_dir)
+        provenance = local_provenance(deps, certainty="suppose", assumptions=[wowsims.source_note(pin)])
+        lines = [
+            f"wowsims/forever {pin['status']} : commit {pin['commit'][:12]} du {pin['committed_at']}, binaire "
+            + f"{pin['binary']} (empreinte {pin['sha256'][:12]}), {pin['go']}, protoc {pin['protoc']}"
+        ]
+        _emit({"pin": pin, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    pinned = wowsims_build.pinned(deps.cache_dir)
+    if pinned is None:
+        raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")
+    presets = wowsims.read_presets(wowsims_build.wowsims_dir(deps.cache_dir) / "forever")
+    provenance = local_provenance(deps, certainty="suppose", assumptions=[wowsims.source_note(pinned)])
+    if args.sims_command == "presets":
+        listed = [{"key": p.key, "class": p.class_token, "race": p.race} for p in presets]
+        lines = [f"Préréglages de wowsims/forever ({len(listed)}) :", *(f"  {r['key']}" for r in listed)]
+        _emit({"presets": listed, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    preset = next((p for p in presets if p.key == args.preset), None)
+    if preset is None:
+        raise InvalidArgumentError(f"Préréglage inconnu : « {args.preset} ».", "voir `uv run forever sims presets`")
+    races = [wowsims.race_enum(r) for r in args.races.split(",") if r.strip()]
+    kwargs = {"iterations": args.iterations} if args.iterations else {}
+    rows = wowsims.compare_races(deps.cache_dir, preset, races, wowsims.reference_encounter(presets), **kwargs)
+    lines = [f"Races au niveau 60, {preset.key} (wowsims/forever, même graine) :"]
+    lines += [
+        f"  {str(r['race']).removeprefix('Race')} : {r['dps']:.1f} dégâts/s ({r['gap_to_best']:+.1f})" for r in rows
+    ]
+    _emit({"preset": preset.key, "races": rows, "provenance": provenance}, lines, provenance, args.json)
     return EXIT_OK
 
 
@@ -5151,6 +5201,7 @@ def main(argv: list[str] | None = None, deps: Deps | None = None) -> int:
         "questie": _cmd_questie_info,
         "quests": _cmd_quests,
         "route": _cmd_route,
+        "sims": _cmd_sims,
         "gear": _cmd_gear,
         "dungeon": _cmd_dungeon,
         "xp": _cmd_xp,

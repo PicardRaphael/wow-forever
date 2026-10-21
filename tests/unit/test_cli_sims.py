@@ -20,7 +20,9 @@ def test_presets_and_races(tmp_path, make_deps, monkeypatch, capsys):
     keys = [p["key"] for p in json.loads(capsys.readouterr().out)["presets"]]
     assert "mage/dps/Fire" in keys and "shaman/elemental/testing" in keys
     assert (
-        main(["sims", "races", "--preset", "mage/dps/Fire", "--races", "Human,Gnome,High Order Skyborne", "--json"])
+        main(
+            ["sims", "races", "--preset", "mage/dps/Fire", "--races", "Human,Gnome,High Order Skyborne", "--json"], deps
+        )
         == 0
     )
     out = json.loads(capsys.readouterr().out)
