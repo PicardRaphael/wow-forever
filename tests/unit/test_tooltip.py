@@ -152,3 +152,12 @@ def test_placeholder_template_takes_the_duration_unit_of_the_resolver():
     resolve = resolver({(None, "d", 0): [1], (123, "d", 0): [10]})
     resolve.duration_unit = lambda spell: "min" if spell is None else "sec"
     assert placeholder_template("Lasts $d, then $123D.", resolve) == "Lasts {0} min, then {1} sec."
+
+
+def test_character_stat_variables_count_as_zero():
+    """Variables de statistique du personnage dans une expression (`$SPFR`, puissance des sorts de Givre ; `$SP`,
+    `$AP`…, correctif du serveur 112753 sur Ice Barrier) : l'infobulle d'un rang se lit sans équipement, elles valent 0
+    (jamais lues comme `$S` suivi de texte)."""
+    values = {(None, "m", 0): [431]}
+    assert tooltip_values("absorbe ${$m1+($SPFR*0.1)} dégâts", resolver(values)) == [431]
+    assert tooltip_values("${$m1+$SP*0.5+$AP}", resolver(values)) == [431]
