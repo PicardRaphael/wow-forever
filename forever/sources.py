@@ -125,7 +125,8 @@ def sources_report(deps: Any) -> list[Freshness]:
     rules = data.read_json("decode_rules.json")
     out = [engine_freshness(data.read_json("talents.json"), rules)]
     if deps.wow_dir is None:
-        return out
+        sims = wowsims_freshness(Path(deps.cache_dir), _build_date(deps, data.game_version))
+        return [*out, sims] if sims is not None else out
     try:
         from forever.talents_forever import export_states, load_addon
 
@@ -134,7 +135,11 @@ def sources_report(deps: Any) -> list[Freshness]:
         addon = None
     if addon is not None:
         out += tf_freshness(export_states(addon), addon.version)
-    out += _dated_addons(deps, _build_date(deps, data.game_version))
+    build_date = _build_date(deps, data.game_version)
+    out += _dated_addons(deps, build_date)
+    sims = wowsims_freshness(Path(deps.cache_dir), build_date)
+    if sims is not None:
+        out.append(sims)
     return out
 
 
@@ -143,6 +148,20 @@ def _build_date(deps: Any, version: str) -> str | None:
 
     f = freshness_for_version(deps, version, allow_network=False)
     return f["latest_created_at"] if f.get("latest_version") == version else None
+
+
+def wowsims_freshness(cache_dir: Path, build_date: str | None) -> Freshness | None:
+    """wowsims/forever (décisions 293 et 294) : daté par le commit épinglé contre la date de publication du build ;
+    None tant qu'il n'est pas compilé (`forever sims update`)."""
+    from forever.pipeline.wowsims_build import pinned
+
+    pin = pinned(cache_dir)
+    if pin is None:
+        return None
+    fresh = dated_freshness("wowsims", "wowsims/forever (niveau 60)", "calculs", ["*"], pin.get("committed_at"),
+                            build_date)  # fmt: skip
+    fresh["detail"] = [*fresh["detail"], f"commit {str(pin['commit'])[:12]} compilé tel quel"]
+    return fresh
 
 
 def _dated_addons(deps: Any, build_date: str | None) -> list[Freshness]:

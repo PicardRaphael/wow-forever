@@ -133,3 +133,18 @@ def test_report_reads_companion_by_content_and_skillup_by_build(tmp_path, make_d
     assert rep["companion:Priest"]["status"] == "en retard" and rep["companion:Priest"]["basis"] == "contenu"
     assert "Talent retiré" in rep["companion:Priest"]["detail"][0]
     assert rep["skillup"]["status"] == "à jour" and rep["skillup"]["basis"] == "version"
+
+
+def test_wowsims_is_a_source_dated_by_its_pinned_commit(make_deps, tmp_path):
+    """Décisions 293 et 294 : wowsims/forever au registre des sources, daté par le commit épinglé contre la date de
+    publication du build ; absent tant qu'il n'est pas compilé."""
+    from wowsims_fakes import clone
+
+    from forever.sources import wowsims_freshness
+
+    assert wowsims_freshness(tmp_path, "2026-10-16T00:00:00Z") is None
+    clone(tmp_path)
+    fresh = wowsims_freshness(tmp_path, "2026-10-16T00:00:00Z")
+    assert fresh["source"] == "wowsims" and fresh["domain"] == "calculs" and fresh["status"] == "à jour"
+    late = wowsims_freshness(tmp_path, "2026-10-30T00:00:00Z")
+    assert late["status"] == "en retard"
