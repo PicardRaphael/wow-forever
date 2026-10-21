@@ -370,3 +370,52 @@ def compare_races(
     rows.sort(key=lambda r: -r["dps"])
     best = rows[0]["dps"] if rows else 0.0
     return [{**r, "gap_to_best": r["dps"] - best} for r in rows]
+
+
+STAT_DELTA = 50.0  # points ajoutés à une statistique pour mesurer son poids (réglage de l'outil)
+_STAT_ENUM = re.compile(r"enum Stat \{(.*?)\}", re.DOTALL)
+
+
+def stat_names(clone: Path) -> list[str]:
+    """Statistiques du proto épinglé (`enum Stat` de `proto/common.proto`), dans l'ordre de leur numéro."""
+    m = _STAT_ENUM.search((clone / "proto" / "common.proto").read_text(encoding="utf-8"))
+    if m is None:
+        raise WowsimsError("proto de wowsims : énumération Stat introuvable.")
+    pairs = re.findall(r"^\s*(Stat\w+)\s*=\s*(\d+);", m.group(1), re.MULTILINE)
+    return [name for name, _ in sorted(pairs, key=lambda p: int(p[1]))]
+
+
+def stat_weights(
+    cache_dir: Path,
+    preset: Preset,
+    stats: Sequence[str],
+    *,
+    reference: str,
+    race: str | None = None,
+    encounter: dict[str, Any] | None = None,
+    delta: float = STAT_DELTA,
+    iterations: int = DEFAULT_ITERATIONS,
+    seed: int = DEFAULT_SEED,
+    runner: gitops.Runner | None = None,
+) -> dict[str, Any]:
+    """Poids des statistiques par tirages appariés : un combat sans bonus, puis un par statistique avec `delta` points
+    de plus (même préréglage, même graine) ; gain de dégâts par seconde par point, et rapporté à `reference`."""
+    names = stat_names(wowsims_dir(cache_dir) / "forever")
+    unknown = [s for s in [*stats, reference] if s not in names]
+    if unknown:
+        raise WowsimsError(
+            f"statistiques inconnues du proto épinglé : {', '.join(unknown)}.", "voir proto/common.proto"
+        )
+    base_req = request_for(preset, race=race, encounter=encounter, iterations=iterations, seed=seed)
+    base = run_sim(cache_dir, base_req, runner=runner)
+    per_point: dict[str, float] = {}
+    for stat in dict.fromkeys([*stats, reference]):
+        req = request_for(preset, race=race, encounter=encounter, iterations=iterations, seed=seed)
+        bonus = [0.0] * len(names)
+        bonus[names.index(stat)] = delta
+        req["raid"]["parties"][0]["players"][0]["bonusStats"] = {"stats": bonus}
+        per_point[stat] = (run_sim(cache_dir, req, runner=runner)["dps"] - base["dps"]) / delta
+    ref = per_point[reference]
+    normalised = {s: (per_point[s] / ref if ref else 0.0) for s in stats}
+    return {"base_dps": base["dps"], "per_point": {s: per_point[s] for s in stats}, "normalised": normalised,
+            "reference": reference, "delta": delta, "source": base["source"]}  # fmt: skip
