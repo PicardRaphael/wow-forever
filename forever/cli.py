@@ -1172,7 +1172,7 @@ def render_status(rep: StatusReport) -> list[str]:
 
 def _sources_text(sources: Sequence[Mapping[str, Any]]) -> list[str]:
     """Sources en mots de joueur, regroupées par nom : « à jour » en bloc, les classes en retard nommées avec leur
-    raison ; « selon sa date » pour une fraîcheur lue dans la date de la source."""
+    raison ; « selon sa version » pour une fraîcheur lue dans la date ou le build de la source."""
     groups: dict[str, list[Mapping[str, Any]]] = {}
     for s in sources:
         groups.setdefault(str(s["label"]), []).append(s)
