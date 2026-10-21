@@ -221,12 +221,14 @@ correction passe devant le reste.
     Mesure demandée : un monstre de ton niveau qui tape, combien de secondes tient le bouclier (deux ou trois essais) ;
     dis-le-moi, le bonus sous le bouclier sera alors compté en leveling (aujourd'hui seulement en donjon et en raid).
 
-### 6. Bloc 6b, ForeverBridge 0.6.0 (décision 281 ; 5 min)
+### 6. Bloc 6b, ForeverBridge 0.7.0 (décision 281 ; 5 min)
 15. Bouton PvP, un joueur ennemi en cible : la réponse commence par « Comment jouer contre lui » (trois à cinq
     consignes dans l'ordre du combat), puis le détail en mots de joueur.
 16. Feuille de route, type Réputation : tes factions groupées comme dans le panneau de réputation (un groupe replié
     n'y montre rien), « Groupe : … » filtre, une faction choisie propose le palier suivant, « < > » change le palier
-    visé ; le message dit que la route n'est pas encore calculée, rien n'est envoyé. Type Métier : même message.
+    visé ; le message dit que la route n'est pas encore calculée, rien n'est envoyé. Type Métier : ni niveaux
+    ni options, « Calculer » répond dans le chat par tes métiers et leur rang, avec les recettes de SkillUp Forever
+    qui montent encore (orange puis jaune) ; Pêche ou Secourisme : « non couvert ».
     Type Équipement : « Calculer » donne « Route d'équipement du niveau N au niveau M ».
 17. Onglet Jeu, bouton « v » : « Nouvelle conversation », une question, puis retour à « Jeu » par le menu : chaque
     conversation garde son historique, et une réponse arrivée pendant que tu étais ailleurs est dans la bonne.

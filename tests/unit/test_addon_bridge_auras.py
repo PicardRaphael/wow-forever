@@ -118,4 +118,6 @@ def test_no_spell_or_item_identifier_in_the_addons():
 
 def test_bridge_version_is_0_5_0():
     toc = (ADDONS / "ForeverBridge" / "ForeverBridge.toc").read_text(encoding="utf-8")
-    assert "## Version: 0.6.0" in toc.splitlines()  # EX1 : 0.4.0 ; CJ1 : 6a 0.5.0 (Screens.lua), 6b 0.6.0
+    assert (
+        "## Version: 0.7.0" in toc.splitlines()
+    )  # EX1 : 0.4.0 ; CJ1 : 6a 0.5.0 (Screens.lua), 6b 0.6.0 ; Métier 0.7.0

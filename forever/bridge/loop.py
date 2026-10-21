@@ -178,6 +178,7 @@ class Bridge:
         | None = None,
         gearer: Callable[[Mapping[str, str], Any], Any] | None = None,
         gear_router: Callable[[Mapping[str, str], Any], Any] | None = None,
+        profession_router: Callable[[Mapping[str, str]], str] | None = None,
     ) -> None:
         self.addons_dir = addons_dir
         self.capture = capture
@@ -205,6 +206,7 @@ class Bridge:
         # essai CJ-6 et bloc 4c : « Mon équipement à ce niveau » et « En faire une route », sans le modèle
         self.gearer = gearer  # gear_level.gear_level_reply
         self.gear_router = gear_router  # gear_level.gear_route_reply
+        self.profession_router = profession_router  # professions.profession_reply : assistant Métier, sans le modèle
         self.last_exports: list[dict[str, str]] = []  # EX1 : liens typés de la dernière réponse qui en portait
         self.last_update_check: float | None = None
         self.card_list: list[dict[str, Any]] = []
@@ -510,6 +512,17 @@ class Bridge:
                 result, text, links = "erreur", self._oops("Exports impossibles", "exports", exc), []
             self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
             self._done(record, text, "action", links)
+            return
+        elif action == "profession":
+            if self.profession_router is None:
+                result, text = "refusée", "Action refusée : métiers pas encore pris en charge par ce pont."
+            else:
+                try:
+                    text, result = self.profession_router(record.context), "métiers"
+                except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur
+                    result, text = "erreur", self._oops("Métiers non lus", "métiers", exc)
+            self.journal.write("action", id=record.message_id, flag=flag, action=action, target=target, result=result)
+            self._done(record, text, "action", [])
             return
         elif action in ("gear_level", "gear_route") and gear_levels(action, target) is None:
             result, text = "refusée", "Action refusée : niveau invalide."

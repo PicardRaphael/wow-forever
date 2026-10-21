@@ -18,7 +18,7 @@ from typing import Any
 
 ACTIONS = (
     "update", "approve", "reject", "profile_apply", "profile_dismiss", "choice", "route_deliver", "exports",
-    "gear_level", "gear_route",
+    "gear_level", "gear_route", "profession",
 )  # fmt: skip
 WITH_ID = frozenset({"approve", "reject", "profile_apply", "profile_dismiss", "choice", "gear_level", "gear_route"})
 _ID = re.compile(r"[A-Za-z0-9._-]{1,120}")

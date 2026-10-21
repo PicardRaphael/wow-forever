@@ -33,12 +33,15 @@ local ROUTE_TYPES = {
 	{ key = "gear", label = "Équipement" },
 }
 -- Bloc 6b (décision 281) : types de route que Forever calcule ; un autre type le dit, sans formulaire ni question.
-local COMPUTED = { leveling = true, gear = true }
+-- Métier (plan « Sources d'abord ») : ni niveaux ni options, les métiers et leur rang partent avec le contexte.
+local COMPUTED = { leveling = true, gear = true, profession = true }
 local NOT_COMPUTED = {
 	reputation = "La route de réputation n'est pas encore calculée par Forever (bloc 4e, avant le 4 novembre) : "
 		.. "rien n'est envoyé.",
-	profession = "La route de métier n'est pas encore calculée par Forever : rien n'est envoyé.",
 }
+local ROUTE_NOTE = "L'aperçu et « Valider et livrer » arrivent dans le chat."
+local PROFESSION_NOTE = "Tes métiers et leur rang sont lus en jeu ; les recettes qui montent encore (SkillUp "
+	.. "Forever) arrivent dans le chat."
 
 local S = { screens = {}, nav = {}, exportRows = {} }
 local REP_ROWS = 5 -- lignes de la liste des factions montrées à la fois (réglage d'interface)
@@ -357,8 +360,9 @@ local function BuildRoute(screen)
 	end)
 	local note = Text("ForeverBridgeRouteNote", screen, "GameFontHighlightSmall")
 	Place(note, screen, 0, -7 * ROW - 6)
-	note:SetText("L'aperçu et « Valider et livrer » arrivent dans le chat.")
+	note:SetText(ROUTE_NOTE)
 	S.routeForm = { from, to, compute, note }
+	S.routeLevels, S.routeNote = { from, to }, note
 end
 
 -- Sélecteur montré ou caché avec ses trois éléments (« < », valeur, « > »).
@@ -395,11 +399,16 @@ function FB.RefreshRoute()
 	S.routeDungeons:SetShown(leveling)
 	S.routeClass:SetShown(leveling)
 	local computed = COMPUTED[state.kind] == true
+	local levels = computed and state.kind ~= "profession"
 	for _, widget in ipairs(S.routeForm) do
 		widget:SetShown(computed)
 	end
-	ShowStepper("ForeverBridgeRouteFrom", computed)
-	ShowStepper("ForeverBridgeRouteTo", computed)
+	for _, widget in ipairs(S.routeLevels) do
+		widget:SetShown(levels)
+	end
+	S.routeNote:SetText(state.kind == "profession" and PROFESSION_NOTE or ROUTE_NOTE)
+	ShowStepper("ForeverBridgeRouteFrom", levels)
+	ShowStepper("ForeverBridgeRouteTo", levels)
 	S.routeUnavailable:SetText(NOT_COMPUTED[state.kind] or "")
 	S.routeUnavailable:SetShown(not computed)
 	local reputation = state.kind == "reputation"
@@ -431,6 +440,12 @@ function FB.ComputeRoute()
 		-- bloc 6b : même action que « En faire une route » de l'écran Équipement (traitée par le pont, bloc 4d)
 		local label = "Route d'équipement du niveau " .. a .. " au niveau " .. b
 		if FB.Send("", nil, { flags = { "a=gear_route:" .. a .. "-" .. b }, label = label }) then
+			FB.ShowScreen("chat")
+		end
+	end
+	if state.kind == "profession" then
+		-- action traitée par le pont sans le modèle : métiers et rangs lus dans le contexte (SkillUp Forever)
+		if FB.Send("", nil, { flags = { "a=profession" }, label = "Mes métiers : recettes qui montent encore" }) then
 			FB.ShowScreen("chat")
 		end
 	end
