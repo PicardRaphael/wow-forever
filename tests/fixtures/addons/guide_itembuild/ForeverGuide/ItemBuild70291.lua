@@ -1,0 +1,3 @@
+-- Fabriqué : ce fichier ne touche que la sauvegarde de l'addon (aucune table d'objets).
+local ADDON, ns = ...
+local ids = {900001}

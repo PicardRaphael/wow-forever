@@ -1,0 +1,6 @@
+## Interface: 11508
+## Title: Forever Guide (fixture)
+## Version: 9.9.9
+GearData.lua
+ItemBuild70291.lua
+ItemBuild70425.lua

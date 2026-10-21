@@ -58,3 +58,22 @@ def test_missing_addons_read_empty(tmp_path):
     assert read_naowh_bis(tmp_path) == ({}, {})
     assert read_companion_bis(tmp_path) == {} and read_companion_scales(tmp_path) == {}
     assert read_gearquest_picks(tmp_path, "MAGE") == []
+
+
+GUIDE_BUILD = FIXTURES / "addons" / "guide_itembuild"
+
+
+def test_guide_gear_applies_the_item_build_delta_like_the_addon():
+    """Forever Guide applique au chargement ses deltas `ItemBuild<build>.lua` (dans l'ordre du `.toc`) aux lignes de
+    `GearData.lua` (relevé du 2026-10-21 : 291 objets changés et 20 retirés au build 70425) : emplacement, sous-classe,
+    niveau et rareté remplacés ; classes remplacées si non nulles ; statistiques remplacées seulement pour un objet de
+    `BETA_STAT_CHANGED` ; objet retiré absent ; objet nouveau ajouté. Valeurs fabriquées."""
+    items = read_guide_gear(GUIDE_BUILD)
+    hood = items[900001]
+    assert (hood.inv_type, hood.req_level, hood.quality) == (1, 22, 4)
+    assert hood.stats == {"int": 11.0, "sp": 7.0}  # statistiques changées (BETA_STAT_CHANGED)
+    other = items[900002]
+    assert (other.req_level, other.classes) == (21, 8) and other.stats == {"int": 12.0}  # stats gardées
+    assert 900004 not in items  # retiré
+    assert items[900009].stats == {"sp": 15.0} and items[900009].inv_type == 13  # ajouté
+    assert items[900003].stats == {"sp": 9.0, "crit": 1.0}  # intact
