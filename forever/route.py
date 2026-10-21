@@ -245,6 +245,46 @@ class RouteRequest:
     done: tuple[int, ...] = ()  # CJ1 : quêtes déjà faites par ce personnage (profil, Questie)
     character: str | None = None  # CJ1 : nom du personnage (quêtes faites lues au profil, nom du guide)
     purpose: str | None = None  # bloc 4d : « équipement » pour une route d'équipement (nom stable du guide)
+    server_type: str | None = None  # pvp ou normal (profil du personnage si absent) : zones disputées signalées
+
+
+HOSTILE_TERRITORY = ("contested",)  # zone sans camp : disputée sur un serveur JcJ
+
+
+def pvp_zone_warnings(
+    stops: Sequence[Mapping[str, Any]], territory: Mapping[int, str], *, faction: str, server_type: str | None
+) -> list[str]:
+    """Sur un serveur JcJ (type déclaré par le joueur), une ligne par zone de la route disputée ou tenue par l'autre
+    camp (camp des cartes lu dans le client, `travel.json`) ; rien sur un serveur normal ou de type inconnu."""
+    if server_type != "pvp":
+        return []
+    out: list[str] = []
+    seen: set[int] = set()
+    for stop in stops:
+        m = stop.get("map")
+        if not isinstance(m, int) or m in seen:
+            continue
+        seen.add(m)
+        side = territory.get(m)
+        name = stop.get("zone") or f"carte {m}"
+        if side in HOSTILE_TERRITORY:
+            out.append(
+                f"serveur JcJ : {name} est une zone disputée (joueurs de l'autre camp attaquables et attaquants)"
+            )
+        elif side in ("alliance", "horde") and side != faction:
+            out.append(f"serveur JcJ : {name} est un territoire de l'autre camp (gardes et joueurs hostiles)")
+    return out
+
+
+def profile_server_type(deps: Any, character: str | None) -> str | None:
+    """Type de serveur déclaré au profil pour ce personnage (`pvp`, `normal`), None s'il n'est pas déclaré."""
+    if not character:
+        return None
+    from forever.profile import character_values, load_profile, resolve_path
+
+    raw = load_profile(resolve_path(deps))["characters"].get(character)
+    value = character_values(raw).get("server_type") if raw else None
+    return value if isinstance(value, str) else None
 
 
 FILTERS_KEY = "route.filters"  # CJ1 : garde-fous des feuilles de route (mechanics.json)
@@ -1171,6 +1211,19 @@ def plan_route(deps: Any, request: RouteRequest, *, wow_dir: Any = None) -> dict
         warnings = [
             *warnings,
             "quêtes imposées hors de la route : " + ", ".join(f"{q} ({why})" for q, why in missing.items()),
+        ]
+    # serveur JcJ (type déclaré au profil) : zones disputées et territoire de l'autre camp signalés (décision 294)
+    server = request.server_type or profile_server_type(deps, request.character)
+    territory = {
+        int(m["ui_map"]): str(m["territory"])
+        for m in (data.read_json("travel.json") or {}).get("maps", [])
+        if m.get("territory")
+    }
+    warnings = [*warnings, *pvp_zone_warnings(stops, territory, faction=request.faction, server_type=server)]
+    if server is None:
+        warnings = [
+            *warnings,
+            "type de serveur inconnu : zones disputées non signalées (`forever profile set <nom> --server pvp`)",
         ]
     reminders = bonus_reminders(gd, XpBonusState(), hours=result.seconds / SECONDS_PER_HOUR, level=request.start_level)
     request_doc = {**asdict(request), "class_name": cls}

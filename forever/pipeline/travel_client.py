@@ -45,6 +45,12 @@ def _faction(flags: int, spec: Mapping[str, Any]) -> str | None:
     return found[0] if len(found) == 1 else ("both" if found else None)
 
 
+def _territory(mask: int, masks: Mapping[str, Any]) -> str:
+    """Camp d'une zone par `AreaTable.FactionGroupMask` : un seul camp, les deux (`both`) ou aucun (`contested`)."""
+    found = [name for name, bit in masks.items() if mask & int(bit)]
+    return found[0] if len(found) == 1 else ("both" if found else "contested")
+
+
 def _path_length(points: Sequence[Row], teleport: int) -> float:
     """Somme des segments d'un trajet, dans l'ordre des points ; un segment qui part d'un point de téléportation ou
     change de continent n'est pas compté."""
@@ -97,7 +103,9 @@ def decode_travel(tables: Tables, rules: Mapping[str, Any], version: str) -> dic
                 "points": len(points),
             }
         )
-    maps = [
+    masks = spec.get("area_faction_masks") or {}
+    area_mask = {int(r["ID"]): int(r["FactionGroupMask"]) for r in tables.get("AreaTable", ())} if masks else {}
+    maps: list[dict[str, Any]] = [
         {
             "ui_map": int(r["UiMapID"]),
             "continent": int(r["MapID"]),
@@ -110,6 +118,10 @@ def decode_travel(tables: Tables, rules: Mapping[str, Any], version: str) -> dic
         for r in sorted(tables["UiMapAssignment"], key=lambda r: (int(r["UiMapID"]), int(r["OrderIndex"])))
         if int(r["OrderIndex"]) == 0
     ]
+    for m in maps:  # camp de la zone de la carte (AreaTable.FactionGroupMask, bits de travel.area_faction_masks)
+        area = int(m["area"])
+        if area in area_mask:
+            m["territory"] = _territory(area_mask[area], masks)
     notes = [
         (
             f"{len(nodes)} point(s) de vol, {len(paths)} trajet(s) (longueur : somme des segments de TaxiPathNode, "

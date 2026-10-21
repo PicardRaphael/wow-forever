@@ -289,6 +289,9 @@ def build_parser() -> argparse.ArgumentParser:
     pset.add_argument(
         "--ellesmere-base", help="profil de base EllesmereUI de ce personnage (EX1 : export ellesmere, bouton Exports)"
     )
+    pset.add_argument(
+        "--server", choices=("pvp", "normal"), help="type de serveur de ce personnage (déclaré, jamais déduit)"
+    )
     pstate = pset.add_mutually_exclusive_group()
     pstate.add_argument(
         "--planned", dest="planned", action="store_const", const=True, help="personnage prévu, pas encore créé"
@@ -2632,6 +2635,7 @@ def _cmd_profile(deps: Deps, args: argparse.Namespace) -> int:
             planned=args.planned,
             legacy_ranks=_legacy_rested_rank(deps, args.legacy_rested_rank),
             ellesmere_base=args.ellesmere_base,
+            server_type=args.server,
         )
     elif cmd == "use":
         use(deps, target)
