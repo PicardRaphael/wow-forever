@@ -42,11 +42,13 @@ def test_engine_is_late_when_a_tracked_talent_matches_no_rule():
 
 def test_talents_forever_follows_its_export_state_per_class():
     states = {
-        "Mage": {"state": "bloqué", "reasons": ["Piercing Ice absent de nos données"]},
-        "Priest": {"state": "possible", "reasons": []},
+        "Mage": {"status": "bloque", "talents": ["piercingIce"]},
+        "Priest": {"status": "possible", "talents": []},
+        "Rogue": {"status": "format_non_pris_en_charge", "talents": []},
     }
     out = {f["classes"][0]: f for f in tf_freshness(states, "0.38.9")}
-    assert out["Mage"]["status"] == "en retard" and out["Mage"]["detail"] == ["Piercing Ice absent de nos données"]
+    assert out["Mage"]["status"] == "en retard" and out["Mage"]["detail"] == ["sans correspondance : piercingIce"]
+    assert out["Rogue"]["status"] == "en retard" and "génération" in out["Rogue"]["detail"][0]
     assert out["Priest"]["status"] == "à jour" and out["Priest"]["basis"] == "contenu"
     assert "0.38.9" in out["Mage"]["label"]
 
@@ -62,7 +64,7 @@ def test_dated_sources_compare_their_date_to_the_build_release():
 
 def test_choose_takes_the_first_fresh_source_and_says_why_others_were_set_aside():
     engine = engine_freshness(talents("new text", None), RULES)
-    tf = tf_freshness({"Mage": {"state": "possible", "reasons": []}}, "0.38.9")[0]
+    tf = tf_freshness({"Mage": {"status": "possible", "talents": []}}, "0.38.9")[0]
     pick = choose([engine, tf])
     assert pick["chosen"]["source"] == tf["source"]
     assert pick["set_aside"] == [engine]
