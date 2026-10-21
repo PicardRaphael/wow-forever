@@ -538,3 +538,58 @@ def replay_reference(
               "skipped": skipped, "threshold": GAP_THRESHOLD, "seed": seed}  # fmt: skip
     path.write_text(json.dumps(report, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     return report
+
+
+def _union(dicts: Sequence[dict[str, Any]]) -> dict[str, Any]:
+    """Réunion de buffs (un buff donné par un préréglage l'est pour tous ; valeur numérique : la plus grande)."""
+    out: dict[str, Any] = {}
+    for d in dicts:
+        for k, v in d.items():
+            if isinstance(v, bool) or not isinstance(v, int | float):
+                out[k] = out.get(k) or v
+            else:
+                out[k] = max(out.get(k, 0), v)
+    return out
+
+
+def compare_presets(
+    cache_dir: Path,
+    cases: Sequence[tuple[Preset, str]],
+    encounter: dict[str, Any] | None,
+    *,
+    consumables: str = "none",
+    iterations: int = DEFAULT_ITERATIONS,
+    seed: int = DEFAULT_SEED,
+    runner: gitops.Runner | None = None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Préréglages (et races) comparés dans des conditions identiques : mêmes buffs de raid, de groupe et individuels,
+    mêmes affaiblissements (réunion de ceux des préréglages), même rencontre et durée, même graine ; `consumables` :
+    `none` (aucun, strictement identique) ou `own` (ceux de chaque préréglage). Rend les lignes, de la meilleure à la
+    moins bonne, et les conditions appliquées."""
+    import dataclasses
+
+    if consumables not in ("none", "own"):
+        raise WowsimsError(f"consommables « {consumables} » : none ou own attendu.", "choisir none ou own")
+    common = {
+        "raid_buffs": _union([p.raid_buffs for p, _ in cases]),
+        "party_buffs": _union([p.party_buffs for p, _ in cases]),
+        "individual_buffs": _union([p.individual_buffs for p, _ in cases]),
+        "debuffs": _union([p.debuffs for p, _ in cases]),
+    }
+    rows = []
+    for preset, race in cases:
+        same = dataclasses.replace(
+            preset,
+            raid_buffs=common["raid_buffs"],
+            party_buffs=common["party_buffs"],
+            individual_buffs=common["individual_buffs"],
+            debuffs=common["debuffs"],
+            consumables=preset.consumables if consumables == "own" else {},
+        )
+        out = run_sim(cache_dir, request_for(same, race=race, encounter=encounter, iterations=iterations, seed=seed),
+                      runner=runner)  # fmt: skip
+        rows.append({"preset": preset.key, "race": race, **out})
+    rows.sort(key=lambda r: -r["dps"])
+    best = rows[0]["dps"] if rows else 0.0
+    conditions = {**common, "consumables": consumables, "encounter": encounter, "seed": seed, "iterations": iterations}
+    return [{**r, "gap_to_best": r["dps"] - best} for r in rows], conditions
