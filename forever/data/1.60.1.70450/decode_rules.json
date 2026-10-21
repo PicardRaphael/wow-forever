@@ -183,7 +183,8 @@
    "alternatives": [
     {
      "aura": 271,
-     "kind": "cone_of_cold"
+     "kind": "cone_of_cold",
+     "sp_effect": 2
     }
    ]
   }

@@ -216,6 +216,10 @@ correction passe devant le reste.
     s'il répond « aucun cache vérifié », le nom du produit de la version finale n'est pas encore connu de
     `raidbots_version()` (bêta : `wow_classic_beta` -> `classic_beta`) : me le dire, la veille passera alors par ton
     propre cache.
+14b. Givre (HF2, révision 7) : `forever lookup talent "Winter's Chill" --json` donne, par cumul, le bonus de Cone of Cold et la
+    part de puissance des sorts ajoutée ; en jeu, Ice Barrier lancé, l'aura Frigid Power apparaît avec sa durée.
+    Mesure demandée : un monstre de ton niveau qui tape, combien de secondes tient le bouclier (deux ou trois essais) ;
+    dis-le-moi, le bonus sous le bouclier sera alors compté en leveling (aujourd'hui seulement en donjon et en raid).
 
 ### 6. Bloc 6b, ForeverBridge 0.6.0 (décision 281 ; 5 min)
 15. Bouton PvP, un joueur ennemi en cible : la réponse commence par « Comment jouer contre lui » (trois à cinq

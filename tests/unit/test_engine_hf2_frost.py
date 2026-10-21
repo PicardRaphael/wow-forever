@@ -24,6 +24,7 @@ L = 60
 PER_SP = 0.3  # part de la puissance des sorts par cumul, fabriquée
 IB = {"iceBarrier": 1}
 FRIGID, FRIGID_MIN, SHIELDED = 1, 2, 3  # positions des variables du rang d'Ice Barrier (talents.json)
+ENDLESS = {"mana": 10.0**9}  # réserve fabriquée : le combat dure tout le scénario, sans fin de mana
 
 
 def cone(gd):
@@ -126,13 +127,13 @@ def test_raid_fight_recasts_ice_barrier_when_frigid_power_ends(game_data):
 
     sc = game_data.build.scenarios["raid_boss"]
     log: list = []
-    encounter_fight(game_data, "raid_boss", L, IB, rng=__import__("random").Random(1), log=log)
+    encounter_fight(game_data, "raid_boss", L, IB, rng=__import__("random").Random(1), log=log, over=ENDLESS)
     frigid_s = talent_value(game_data, IB, "iceBarrier", FRIGID_MIN) * 60
     recasts = [c for c in log if c.key == "ice_barrier"]
     assert len(recasts) == math.ceil(sc.duration_s / frigid_s) - 1
     assert all(c.end - c.start == pytest.approx(game_data.rules.gcd_s) for c in recasts)
     log.clear()
-    encounter_fight(game_data, "raid_boss", L, {}, rng=__import__("random").Random(1), log=log)
+    encounter_fight(game_data, "raid_boss", L, {}, rng=__import__("random").Random(1), log=log, over=ENDLESS)
     assert not [c for c in log if c.key == "ice_barrier"]
 
 

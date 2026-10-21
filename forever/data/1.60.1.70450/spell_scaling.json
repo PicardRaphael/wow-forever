@@ -2719,7 +2719,7 @@
       "SpellEffect 1363753"
      ],
      "first_logged_at": null,
-     "dbcache_date": "2026-10-21T06:53:56Z"
+     "dbcache_date": "2026-10-21T09:15:23Z"
     }
    },
    {
@@ -2752,7 +2752,7 @@
       "SpellEffect 1363755"
      ],
      "first_logged_at": null,
-     "dbcache_date": "2026-10-21T06:53:56Z"
+     "dbcache_date": "2026-10-21T09:15:23Z"
     }
    },
    {
@@ -2785,7 +2785,7 @@
       "SpellEffect 1363757"
      ],
      "first_logged_at": null,
-     "dbcache_date": "2026-10-21T06:53:56Z"
+     "dbcache_date": "2026-10-21T09:15:23Z"
     }
    }
   ],
@@ -2821,7 +2821,7 @@
       "SpellCooldowns 102218"
      ],
      "first_logged_at": null,
-     "dbcache_date": "2026-10-21T06:53:56Z"
+     "dbcache_date": "2026-10-21T09:15:23Z"
     }
    },
    {
@@ -2855,7 +2855,7 @@
       "SpellCooldowns 102219"
      ],
      "first_logged_at": null,
-     "dbcache_date": "2026-10-21T06:53:56Z"
+     "dbcache_date": "2026-10-21T09:15:23Z"
     }
    },
    {
@@ -2889,7 +2889,7 @@
       "SpellCooldowns 102220"
      ],
      "first_logged_at": null,
-     "dbcache_date": "2026-10-21T06:53:56Z"
+     "dbcache_date": "2026-10-21T09:15:23Z"
     }
    },
    {
@@ -2923,7 +2923,7 @@
       "SpellCooldowns 102221"
      ],
      "first_logged_at": null,
-     "dbcache_date": "2026-10-21T06:53:56Z"
+     "dbcache_date": "2026-10-21T09:15:23Z"
     }
    }
   ]
@@ -3056,7 +3056,8 @@
    "schools": [
     "frost"
    ],
-   "kind": "cone_of_cold"
+   "kind": "cone_of_cold",
+   "sp_pct_per_stack": 7
   },
   "ignite": {
    "spell_id": 412538,

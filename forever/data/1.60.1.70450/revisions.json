@@ -6579,6 +6579,217 @@
      "key": "predatoryInstincts"
     }
    ]
+  },
+  {
+   "revision": 7,
+   "date": "2026-10-21",
+   "motif": "70450 r7 : part de la puissance des sorts ajoutée à Cone of Cold par cumul de Winter's Chill (effet 3 du talent, règle sp_effect de decode_rules.json, HF2), même cache vérifié de Raidbots que r6 (sha256 68e09c5c315e…), certitude probable",
+   "command": "forever install ~/AppData/Local/Temp/claude/C--Users-rapha-Documents-wow-forever/e023bd1e-0fc5-48fe-8864-2e5448fc288b/scratchpad/cand70450r7 --yes",
+   "candidate": {
+    "path": "~/AppData/Local/Temp/claude/C--Users-rapha-Documents-wow-forever/e023bd1e-0fc5-48fe-8864-2e5448fc288b/scratchpad/cand70450r7",
+    "data_sha": "7e5b2813bb12"
+   },
+   "report": "docs/research/data-1.60.1.70450-r7.md",
+   "counts": {
+    "confirmed": 0,
+    "observation": 0,
+    "certainty": 0,
+    "added_field": 0,
+    "removed_field": 0,
+    "metadata": 2,
+    "added_file": 0,
+    "replaced_file": 2,
+    "retired_file": 0,
+    "game_state": 0,
+    "value": 1,
+    "rules": 1
+   },
+   "changes": [
+    {
+     "file": "talents.json",
+     "path": "wakeOfFire.source",
+     "before": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-21",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards.",
+      "client_key": "improvedFireBlast"
+     },
+     "after": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-21",
+      "client_spell_ids": [
+       11078
+      ],
+      "client_desc": "Reduces the cooldown of your Fire Blast spell by ${$s1/-1000} sec and increases its range by $s2 yards."
+     },
+     "source": "client 1.60.1.70450, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "talents.json",
+     "path": "hotStreak.source",
+     "before": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-21",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage.",
+      "client_key": "heatingUp"
+     },
+     "after": {
+      "build": "1.60.1.70450",
+      "tables": "tables Trait* et Spell* (wago.tools)",
+      "read_at": "2026-10-21",
+      "client_spell_ids": [
+       400624
+      ],
+      "client_desc": "Non-periodic critical strikes with Fireball, Frostfire Bolt, Fire Blast, and Scorch reduce the cast time of your next Pyroblast cast within $400625d by $400625s1%, stacking up to $400625s2 times. Fire Blast grants an additional stack every time it deals damage."
+     },
+     "source": "client 1.60.1.70450, tables Trait* et Spell* (wago.tools)",
+     "certainty": "certain",
+     "rule": "metadata"
+    },
+    {
+     "file": "spell_scaling.json",
+     "path": "auras winters_chill · sp_pct_per_stack",
+     "before": null,
+     "after": 7,
+     "source": "Client 1.60.1.70450 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "value"
+    },
+    {
+     "file": "classes.json",
+     "path": "*",
+     "before": "821fdff4acb4",
+     "after": "1d02b6200571",
+     "source": "Client 1.60.1.70450 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    },
+    {
+     "file": "races.json",
+     "path": "*",
+     "before": "c05d7362840e",
+     "after": "e86c954d7251",
+     "source": "Client 1.60.1.70450 : fichier décodé par forever decode (candidate)",
+     "certainty": "certain",
+     "rule": "replaced_file"
+    },
+    {
+     "file": "decode_rules.json",
+     "path": "*",
+     "before": "3980d056b698",
+     "after": "cabb82f61061",
+     "source": "règles de la tranche (decode_rules.json du dépôt, lu par forever decode)",
+     "certainty": "certain",
+     "rule": "rules"
+    }
+   ],
+   "game_state": {
+    "beta_level_cap": {
+     "value": 30,
+     "source": "observation",
+     "certainty": "certain",
+     "carried": true,
+     "carried_from": "révision 6",
+     "date": "2026-10-02",
+     "revision": 1
+    }
+   },
+   "hotfixes": [
+    112624,
+    112640,
+    112641,
+    112686,
+    112687,
+    112694,
+    112695,
+    112709,
+    112713,
+    112724,
+    112727,
+    112740,
+    112741,
+    112742,
+    112753,
+    112766,
+    112770,
+    112771,
+    112775,
+    112791,
+    112793,
+    112819,
+    112827,
+    112831,
+    112833,
+    112838,
+    112839,
+    112840,
+    112842,
+    112843,
+    112844,
+    112845,
+    112858,
+    112863,
+    112864,
+    112875,
+    112878,
+    112887,
+    112890,
+    112901,
+    112918,
+    112919,
+    112920,
+    112934,
+    112947,
+    112948,
+    112961,
+    112964,
+    112965,
+    112970,
+    112976,
+    112980,
+    112985,
+    112992,
+    113000,
+    113005,
+    113006,
+    113011,
+    113024,
+    113042,
+    113046
+   ],
+   "renamed_in_classes": [
+    {
+     "class": "Mage",
+     "client_key": "improvedFireBlast",
+     "key": "wakeOfFire"
+    },
+    {
+     "class": "Mage",
+     "client_key": "heatingUp",
+     "key": "hotStreak"
+    },
+    {
+     "class": "Shaman",
+     "client_key": "trialByFire",
+     "key": "improvedFireNova"
+    },
+    {
+     "class": "Druid",
+     "client_key": "naturalInstinct",
+     "key": "predatoryInstincts"
+    }
+   ]
   }
  ]
 }

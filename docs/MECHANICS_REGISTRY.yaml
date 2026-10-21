@@ -323,6 +323,28 @@ mechanics:
     tolerance: null
     formule: "mult_crit = 1 + (mult_crit_sorts − 1) × (1 + Ice Shards (givre) ou Arcane Mind (arcane))"
     note: "Givre-feu : branche givre (voir OPEN_QUESTIONS)"
+  - id: A22
+    categorie: attaque
+    description: "Frigid Power d'Ice Barrier (bonus de dégâts de Givre, bonus de plus sous le bouclier)"
+    alias: ["Frigid Power", "Ice Barrier (dégâts)"]
+    forever: modifie
+    statut: teste
+    certitude: suppose
+    sources:
+      - "forever/data/1.60.1.70450/talents.json (iceBarrier : variables du rang, correctif du serveur 112753 lu dans le DBCache.bin vérifié de Raidbots, 70450 r6, décision 290)"
+      - "forever/data/1.60.1.70450/mechanics.json (build.scenarios : tank présent, aucun coup reçu)"
+    tests:
+      - tests/unit/test_engine_hf2_frost.py::test_frigid_power_raises_frost_damage_when_the_talent_is_taken
+      - tests/unit/test_engine_hf2_frost.py::test_shield_counts_only_where_the_mage_is_not_hit
+      - tests/unit/test_engine_hf2_frost.py::test_raid_fight_recasts_ice_barrier_when_frigid_power_ends
+      - tests/unit/test_engine_hf2_frost.py::test_shield_is_a_blind_spot_in_leveling_and_pvp
+    tolerance: null
+    formule: "dégâts de Givre × (1 + Frigid Power) × (1 + part du temps sous le bouclier × bonus sous le bouclier) ; part : 1 dans les scénarios de donjon et de raid (aucun coup reçu), 0 ailleurs"
+    note: "HF2 (2026-10-21) : variables du rang d'Ice Barrier lues dans talents.json (Frigid Power, durée en minutes, bonus sous le bouclier) ; talent pris : Ice Barrier lancé avant le combat et relancé à l'expiration de Frigid Power (une incantation globale par relance dans le Monte Carlo des rencontres, coût en mana de la relance non compté), suppose ; bonus sous le bouclier compté seulement dans les scénarios sans coups reçus (build.scenarios, tank présent) ; leveling et PvP : tenue du bouclier sous les coups non modélisée, angle mort chiffré (borne haute : bouclier tenu tout le combat) ; bonus multipliés entre eux et avec les autres sources (damage.bonus_stacking) ; mesure en jeu : docs/LANCEMENT.md"
+    angle_mort:
+      talents: [iceBarrier]
+      contextes: [leveling, pvp-bg, pvp-world]
+      estimation: frigid_shield
   - id: B1
     categorie: temps
     description: "Temps de recharge global (1,5 s)"
@@ -885,9 +907,16 @@ mechanics:
       - tests/unit/test_engine_70450_winters_chill.py::test_no_more_crit_from_the_stacks
       - tests/unit/test_engine_70450_socle.py::test_winters_chill_crit_only_with_the_crit_aura
       - tests/unit/test_engine_70450_winters_chill.py::test_derived_tables_give_the_cone_of_cold_bonus
+      - tests/unit/test_engine_hf2_frost.py::test_decode_reads_the_spell_power_part_from_the_talent_effect
+      - tests/unit/test_engine_hf2_frost.py::test_client_mechanics_reads_the_spell_power_part
+      - tests/unit/test_engine_hf2_frost.py::test_stacks_add_spell_power_to_cone_of_cold
+      - tests/unit/test_engine_hf2_frost.py::test_monte_carlo_roll_adds_the_same_part
+      - tests/unit/test_engine_hf2_frost.py::test_only_the_patched_spells_apply_winters_chill
+      - tests/unit/test_engine_hf2_frost.py::test_derived_tables_give_the_spell_power_part
+      - tests/unit/test_engine_hf2_frost.py::test_installed_spell_power_part_matches_the_client_tooltip
     tolerance: null
     formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance) ; cumuls ≤ 2e variable du rang du talent"
-    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact) ; 70450 : aura 271 (sorte cone_of_cold) : chaque cumul augmente les dégâts du prochain Cone of Cold, consommés par lui, posés par les sorts de Givre de dégâts ; plus aucun critique ; avant 70450 inchangé ; 1.60.1.70450 (décision 285) : tables par cumul (engine/derived) : bonus de Cone of Cold par cumul quand l'aura le renforce, critique avant ; correctif du serveur 112753 (70450 r6, cache vérifié de Raidbots, décision 290, probable) : posé par Frostbolt, Frost Blast et Ice Lance renforcé par Fingers of Frost, +5 % de dégâts subis par Cone of Cold par cumul (lu, modélisé) et 7 % de la puissance des sorts par cumul ajoutés à Cone of Cold (**non modélisé**, angle mort) ; le texte du correctif tranche NOT1 (seconde lecture)"
+    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact) ; 70450 : aura 271 (sorte cone_of_cold) : chaque cumul augmente les dégâts du prochain Cone of Cold, consommés par lui, posés par les sorts de Givre de dégâts ; plus aucun critique ; avant 70450 inchangé ; 1.60.1.70450 (décision 285) : tables par cumul (engine/derived) : bonus de Cone of Cold par cumul quand l'aura le renforce, critique avant ; correctif du serveur 112753 (70450 r6, cache vérifié de Raidbots, décision 290, probable) : posé par Frostbolt, Frost Blast et Ice Lance renforcé par Fingers of Frost, +5 % de dégâts subis par Cone of Cold par cumul (lu, modélisé) et une part de la puissance des sorts par cumul ajoutée à Cone of Cold ; le texte du correctif tranche NOT1 (seconde lecture) ; HF2 (70450 r7) : cette part est lue dans le 3e effet du talent (decode_rules.json target_auras.winters_chill, sp_effect ; spell_scaling.json auras.winters_chill.sp_pct_per_stack, recoupée avec l'infobulle) et ajoutée au coefficient de Cone of Cold (espérance et tirage du Monte Carlo) ; Winter's Chill posé seulement par Frostbolt, Frost Blast et Ice Lance qui consomme une charge de Fingers of Frost (plus par Blizzard, Frost Nova ni Ice Lance sur cible gelée) dans les rencontres ; le leveling ne lance pas Cone of Cold"
   - id: D5
     categorie: environnement
     description: "Buffs de campement et de Legacy"

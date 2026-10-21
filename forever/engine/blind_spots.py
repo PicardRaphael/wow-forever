@@ -13,6 +13,7 @@ from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time
 from forever.engine.character import character
 from forever.engine.crit import crit_mult
+from forever.engine.damage import frigid_power_mult
 from forever.engine.model import CharacterOverrides, GameData, Points
 from forever.engine.monsters import mob_hp
 from forever.engine.spells import best_rank
@@ -109,8 +110,22 @@ def estimate_evocation(
     return u.evocation_regen_mult * ch.spirit_regen * u.evocation_duration_s / ch.mana
 
 
+def estimate_frigid_shield(
+    gd: GameData, level: int, pts: Points, race: str, over: CharacterOverrides | None = None
+) -> float | None:
+    """Bonus de dégâts de Givre de Frigid Power sous le bouclier d'Ice Barrier, hors scénarios sans coups reçus
+    (leveling, PvP) : la tenue du bouclier sous les coups n'est pas modélisée (HF2). Borne haute : bouclier tenu tout
+    le combat, fraction des dégâts de Givre ; None sans le talent ou avant le correctif 112753.
+
+    Registre : I5 (estimation de l'angle mort A22)"""
+    if frigid_power_mult(gd, pts) == 1.0:
+        return None
+    return frigid_power_mult(gd, pts, 1.0) / frigid_power_mult(gd, pts) - 1
+
+
 ESTIMATORS: Mapping[str, Estimator] = {
     "cooldown_talents": estimate_cooldown_talents,
+    "frigid_shield": estimate_frigid_shield,
     "wake_of_fire_crit": estimate_wake_of_fire_crit,
     "evocation": estimate_evocation,
 }

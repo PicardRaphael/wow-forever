@@ -126,6 +126,14 @@ def fire_vulnerability_buffs(gd: GameData, stacks: int) -> Buffs:
     return {"fire_vulnerability": n} if n > 0 else {}
 
 
+def ice_barrier_shield_buffs(gd: GameData, pts: Points) -> Buffs:
+    """Bouclier d'Ice Barrier tenu tout le combat (Frigid Power, bonus sous le bouclier) : seulement dans les scénarios
+    de donjon et de raid, où le Mage ne prend aucun coup (tank présent, `build.scenarios`) ; vide sans le talent.
+
+    Registre : A22"""
+    return {"ice_barrier_shield": 1.0} if pts.get("iceBarrier", 0) > 0 else {}
+
+
 def merge_buffs(*buffs: Buffs | None) -> Buffs:
     """Réunion de plusieurs buffs : somme des bonus scalaires, sources de dégâts distinctes mises bout à bout,
     cumuls de Fire Vulnerability au plus grand (une seule aura sur la cible).

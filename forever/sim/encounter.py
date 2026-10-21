@@ -38,6 +38,7 @@ from forever.engine.buffs import (
     hot_streak_buffs,
     hot_streak_gain,
     hot_streak_rules,
+    ice_barrier_shield_buffs,
     merge_buffs,
     missile_barrage_buffs,
     missile_barrage_chance,
@@ -45,12 +46,14 @@ from forever.engine.buffs import (
 from forever.engine.cast import expected_cast
 from forever.engine.casting import cast_time, cooldown_period, spell_cooldown
 from forever.engine.character import character
+from forever.engine.crit import applies_winters_chill
 from forever.engine.damage import (
     IgniteState,
     dot_sp_per_tick,
     dot_tick_damage,
     dot_tick_period_s,
     dot_tick_times,
+    frigid_power_duration_s,
     ignite_damage,
     ignite_tick_times,
     ignite_ticks_due,
@@ -95,7 +98,6 @@ AOE_FILLERS = ("arcane_explosion", "blizzard", "flamestrike")  # sort de zone de
 AOE_COOLDOWNS = ("blast_wave", "cone_of_cold")  # sorts de zone à recharge, lancés dès qu'ils sont prêts
 MAIN = {"frost": "frostbolt", "fire": "fireball", "arcane": "arcane_blast"}
 # 70450 : Winter's Chill posé par les sorts de Givre de dégâts (description du client), Cone of Cold mis à part
-WC_SPELLS_CONE = ("frostbolt", "frost_blast", "ice_lance", "blizzard", "frost_nova")
 OPTIONS = (
     "armor",
     "ab_stacks",
@@ -297,8 +299,10 @@ def encounter_analytic(
     filler = _best_filler(gd, scenario, level, pts, race, over, o) if rotation == "aoe" else None
     duration = sc.duration_s
     windows = arcane_power_windows(gd, pts, duration) if o["arcane_power"] == "auto" else []
-    plain = _cycle(gd, level, pts, ch, rotation, sc, o, None, filler)
-    buffed = _cycle(gd, level, pts, ch, rotation, sc, o, arcane_power_buffs(gd, pts), filler) if windows else plain
+    shield = ice_barrier_shield_buffs(gd, pts) or None  # 70450 r6 : aucun coup reçu, bouclier tenu (A22)
+    plain = _cycle(gd, level, pts, ch, rotation, sc, o, shield, filler)
+    ap = merge_buffs(arcane_power_buffs(gd, pts), shield)
+    buffed = _cycle(gd, level, pts, ch, rotation, sc, o, ap, filler) if windows else plain
     # rotation de zone : chaque cible touchée, mortes ensemble ; à une cible : une cible après l'autre
     targets = sc.targets if rotation == "aoe" else 1
     end = duration
@@ -490,6 +494,11 @@ def encounter_fight(
     s.update({"mb": False, "fbl": 0.0, "last_end": 0.0, "dead_at": None})
     ready: dict[str, float] = dict.fromkeys(AOE_COOLDOWNS, 0.0)
     aura: list[ArcaneBlastAura | None] = [None]
+    # 70450 r6 (A22) : Ice Barrier lancé avant le combat, relancé (une incantation globale) quand Frigid Power expire ;
+    # bouclier tenu sans coups reçus ; coût en mana de la relance non compté (suppose)
+    shield = ice_barrier_shield_buffs(gd, pts)
+    frigid_s = frigid_power_duration_s(gd, pts)
+    ib_until = [frigid_s if frigid_s else math.inf]
 
     def push(at: float, target: int, dmg: float, direct: bool = False) -> None:
         order[0] += 1
@@ -544,6 +553,16 @@ def encounter_fight(
 
     while any(h > 0 for h in hp):
         t = s["t"]
+        if frigid_s and t >= ib_until[0]:
+            end = t + gd.rules.gcd_s
+            if not cast_fits(end, duration):
+                break
+            deal(end)
+            s["pool"] = min(ch.mana, s["pool"] + regen * (end - s["last_end"]))
+            s["t"], s["last_end"], ib_until[0] = end, end, t + frigid_s
+            if log is not None:
+                log.append(EncounterLog(t, end, "ice_barrier", 0.0, 0.0))
+            continue
         key, extra, free = pick(t)
         rank = best_rank(gd, key, level, pts)
         if rank is None:
@@ -555,6 +574,8 @@ def encounter_fight(
         buffs: Buffs | None = arcane_blast_bonus(gd, pts, stacks, for_spell=key, ch=ch) if arcane else None
         if extra or in_window(end):
             buffs = merge_buffs(buffs, extra, ap if in_window(end) else None)
+        if shield:
+            buffs = merge_buffs(buffs, shield)
         frozen = key == "ice_lance"
         tgt = _target()
         e = expected_cast(gd, key, level, pts, ch, ld, frozen=frozen, wc_stacks=wc[tgt], buffs=buffs, **eng)
@@ -575,8 +596,10 @@ def encounter_fight(
             s["mb"] = False
         if key == PYROBLAST:
             s["hs"], s["hs_exp"] = 0, -1.0
+        s["il_fof"] = False
         if rotation == "frost" and key == "ice_lance" and s["fof"] > 0 and not t < frozen_until[tgt]:
             s["fof"] -= 1
+            s["il_fof"] = True  # Ice Lance renforcé par Fingers of Frost (pose Winter's Chill, correctif 112753)
         deal(end)
         s["pool"] = min(ch.mana, s["pool"] + regen * (end - t))
         s["t"], s["last_end"] = end, end
@@ -611,8 +634,8 @@ def encounter_fight(
         if cone and key == "cone_of_cold":  # 70450 : Cone of Cold consomme les cumuls de Winter's Chill (D4)
             for i in hit_targets:
                 wc[i] = 0
-        wc_spells = WC_SPELLS_CONE if cone else ("frostbolt", "frost_blast", "ice_lance")
-        if key in wc_spells and total[2] and wc_max and rng.random() < wc_p:
+        empowered = bool(s.get("il_fof"))
+        if applies_winters_chill(gd, key, empowered=empowered) and total[2] and wc_max and rng.random() < wc_p:
             wc[tgt] = min(wc_max, wc[tgt] + 1)
         if clearcast and total[2] and rng.random() < clearcast:
             s["cc"] = True
@@ -678,6 +701,7 @@ def _resolve(
             rules=o["rules"],
             low_level_penalty=o["low_level_penalty"],
             buffs=buffs,  # 70450 : puissance des sorts des buffs sur les coups directs
+            wc_stacks=wc[i],  # 70450 r7 : part de la puissance des sorts de Winter's Chill (Cone of Cold)
         )
         crit = rng.random() < e["crit"]
         dmg = base * e["dmg_mult"] * (e["crit_mult"] if crit else 1.0)

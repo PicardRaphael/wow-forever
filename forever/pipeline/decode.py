@@ -1831,7 +1831,25 @@ def _target_auras(tables: Tables, rules: Mapping[str, Any], client: _Client) -> 
         }
         if kind != spec.get("kind", "crit"):  # 70450 : sorte de repli (Cone of Cold) dite au moteur ; critique sinon
             out[key]["kind"] = kind
+        choice: Mapping[str, Any] = next((c for c in spec.get("alternatives", ()) if c["kind"] == kind), {})
+        sp = source_effect_points(choice, client.effects.get(source, {}), spec["field"])
+        if sp is not None:  # 70450 r7 (correctif 112753) : part de la puissance des sorts par cumul, effet du talent
+            out[key]["sp_pct_per_stack"] = normalize(sp)
     return out
+
+
+def source_effect_points(
+    choice: Mapping[str, Any], effects: Mapping[int, Mapping[str, Any]], field: str
+) -> float | None:
+    """Points de l'effet `sp_effect` (index d'effet) du sort du talent pour la sorte d'aura retenue ; None si la règle
+    n'en lit aucun. Effet absent : refus (jamais une valeur devinée)."""
+    index = choice.get("sp_effect")
+    if index is None:
+        return None
+    effect = effects.get(int(index))
+    if effect is None:
+        raise DataSchemaError(f"{RULES_NAME} : effet {index} absent du sort du talent (sp_effect).")
+    return float(effect[field])
 
 
 def pick_target_aura(

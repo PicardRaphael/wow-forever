@@ -54,6 +54,20 @@ def crit_mult(gd: GameData, school: str, pts: Points) -> float:
     return 1 + base_bonus
 
 
+WINTERS_CHILL_CONE_SPELLS = frozenset({"frostbolt", "frost_blast"})  # correctif 112753 : + Ice Lance renforcé
+
+
+def applies_winters_chill(gd: GameData, key: str, *, empowered: bool = False) -> bool:
+    """Le sort `key` peut-il poser Winter's Chill quand l'aura renforce Cone of Cold (70450) : Frostbolt, Frost Blast
+    et Ice Lance renforcé par Fingers of Frost (`empowered`, charge consommée), texte du correctif du serveur 112753
+    (70450 r6, décision 290) ; avant (aura de critique) : Frostbolt, Frost Blast et Ice Lance.
+
+    Registre : D4"""
+    if not gd.constants.cone_of_cold_per_winters_chill_stack:
+        return key in WINTERS_CHILL_SPELLS
+    return key in WINTERS_CHILL_CONE_SPELLS or (key == "ice_lance" and empowered)
+
+
 def winters_chill_crit(gd: GameData, stacks: float) -> float:
     """Critique ajouté par `stacks` cumuls de Winter's Chill sur la cible (Frostbolt et Ice Lance), en fraction.
 

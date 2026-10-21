@@ -161,6 +161,7 @@ class Constants:
     regen_stacking: str = "sum"  # régénération d'Arcane Meditation et de l'armure : sum ou max (mana.regen_stacking)
     bonus_stacking: str = "multiplicative"  # bonus de dégâts : multiplicative ou additive (damage.bonus_stacking)
     cone_of_cold_per_winters_chill_stack: float = 0.0  # 70450 : dégâts de Cone of Cold par cumul (aura 271)
+    cone_of_cold_sp_per_winters_chill_stack: float = 0.0  # 70450 r7 : part de la puissance des sorts par cumul
     hot_streak_fire_blast_extra: int = 0  # 70450 : charges de Heating Up en plus par Fire Blast (règle du serveur)
 
 
@@ -627,6 +628,7 @@ class Buffs(TypedDict, total=False):
     sp_pct: float
     sp_flat: float
     cast_reduction: float  # part de l'incantation retirée (Hot Streak, Missile Barrage), avant la hâte
+    ice_barrier_shield: float  # 70450 r6 : part du temps sous le bouclier d'Ice Barrier (Frigid Power, HF2)
 
 
 class CastEstimate(TypedDict):

@@ -608,9 +608,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **HF1** : correctifs du serveur de 1.60.1.70450 lus dans un cache vérifié de Raidbots (r6, décision 290), sans
   session de jeu : à confirmer par le `DBCache.bin` du jeu de l'utilisateur à sa première connexion (Piercing Ice
   retiré, Elemental Precision à 3 rangs, Winter's Chill, Missile Barrage, Ice Barrier, Frost Warding, Frost Blast).
-- **HF2** : Ice Barrier après le correctif 112753 donne Frigid Power (+3 % de dégâts de Givre pendant 1 min) et +3 %
-  de plus tant que le bouclier tient : non modélisé (angle mort, jusqu'à +6 % de dégâts de Givre) ; durée du bouclier
-  sous les coups et usage en leveling à relever.
+- **HF2** (resserrée le 2026-10-21, 70450 r7) : Ice Barrier après le correctif 112753 donne Frigid Power (bonus de
+  dégâts de Givre pendant la durée du sort) et un bonus de plus tant que le bouclier tient. Modélisé (A22) : Frigid
+  Power dès que le talent est pris (lancé avant le combat, relancé à l'expiration ; coût en mana de la relance non
+  compté) ; bonus sous le bouclier dans les scénarios de donjon et de raid seulement (aucun coup reçu). Reste ouvert :
+  la **tenue du bouclier sous les coups** en leveling et en PvP (angle mort chiffré, borne haute : bouclier tenu tout
+  le combat) ; à relever en jeu (docs/LANCEMENT.md, étape 14b). Winter's Chill : la part de la puissance des sorts
+  ajoutée à Cone of Cold est modélisée (D4, r7).
 - **RJ1** : analytique des nouveaux Arcanes de 70450 optimiste face au Monte Carlo (temps par monstre −20,8 % à L24,
   −12,6 % à L30, −8 % en leveling 30 ; DPS +3,5 % sur un boss au niveau 40). Cause probable : l'aura d'Arcane Blast
   qui dure depuis sa première application et les projectiles de Missile Barrage, comptés en moyenne par le cycle

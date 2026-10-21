@@ -4,7 +4,14 @@ from __future__ import annotations
 
 from forever.engine.casting import cast_time
 from forever.engine.crit import crit_chance, crit_mult
-from forever.engine.damage import CONE_OF_COLD, dmg_mult, dot_sp_per_tick, fire_effects_steady, spell_power
+from forever.engine.damage import (
+    CONE_OF_COLD,
+    dmg_mult,
+    dot_sp_per_tick,
+    fire_effects_steady,
+    spell_power,
+    winters_chill_cone_sp,
+)
 from forever.engine.hit import hit_chance
 from forever.engine.mana import clearcast_cost_factor, mana_cost
 from forever.engine.model import SCHOOL_FIRE, SCHOOL_FROST, Buffs, CastEstimate, Character, GameData, Points
@@ -65,6 +72,7 @@ def expected_cast(
         dm *= 1 + gd.constants.cone_of_cold_per_winters_chill_stack * wc_stacks  # 70450 : Winter's Chill (D4)
     sp = spell_power(ch, buffs)
     c = coefficient(gd, key, r, rules=rules, low_level_penalty=low_level_penalty)
+    c += winters_chill_cone_sp(gd, key, wc_stacks)  # 70450 r7 : part de la puissance des sorts (D4)
     base = (r.damage_min + r.damage_max) / 2.0 + c * sp
     if frozen and frozen_mult and s.frozen_mult is not None:
         base *= s.frozen_mult

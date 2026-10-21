@@ -49,7 +49,8 @@ def test_derived_tables_give_the_cone_of_cold_bonus(game_data, game_data_at_pre_
     from forever.engine.derived import stack_tables
 
     new = stack_tables(game_data, "wintersChill")
-    assert {t["effect"] for t in new} == {"cone_of_cold_damage"}
+    assert {t["effect"] for t in new} == {"cone_of_cold_damage", "cone_of_cold_spell_power"}  # r7 : part de puissance
+    new = [t for t in new if t["effect"] == "cone_of_cold_damage"]
     per = game_data.constants.cone_of_cold_per_winters_chill_stack
     assert all(
         t["per_stack"] == pytest.approx(per) and t["at_max"] == pytest.approx(per * t["max_stacks"]) for t in new

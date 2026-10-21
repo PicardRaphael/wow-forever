@@ -97,8 +97,13 @@ def _winters_chill(gd: GameData, rank: int) -> list[StackTable]:
     top = int(talent_value(gd, {WINTERS_CHILL: rank}, WINTERS_CHILL, WC_MAX_STACKS))
     cone = gd.constants.cone_of_cold_per_winters_chill_stack
     if cone > 0:  # 70450 : l'aura renforce Cone of Cold, plus aucun critique (D4)
-        return [_table(WINTERS_CHILL, rank, "cone_of_cold_damage", "fraction de dégâts de Cone of Cold", top,
-                       lambda n: n * cone)]  # fmt: skip
+        tables = [_table(WINTERS_CHILL, rank, "cone_of_cold_damage", "fraction de dégâts de Cone of Cold", top,
+                         lambda n: n * cone)]  # fmt: skip
+        sp = gd.constants.cone_of_cold_sp_per_winters_chill_stack
+        if sp > 0:  # 70450 r7 (correctif 112753) : part de la puissance des sorts ajoutée à Cone of Cold
+            tables.append(_table(WINTERS_CHILL, rank, "cone_of_cold_spell_power",
+                                 "fraction de la puissance des sorts ajoutée à Cone of Cold", top, lambda n: n * sp))  # fmt: skip
+        return tables
     return [_table(WINTERS_CHILL, rank, "crit", "fraction de critique", top, lambda n: winters_chill_crit(gd, n))]
 
 

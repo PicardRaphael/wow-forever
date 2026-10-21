@@ -1335,12 +1335,23 @@ def _client_mechanics(
     if isinstance(wc, dict) and _kept("winters_chill"):
         per_stack = r.num(wc, "pct_per_stack", "auras.winters_chill.pct_per_stack") / PERCENT
         if wc.get("kind") == "cone_of_cold":  # 70450 : l'aura renforce Cone of Cold, plus aucun critique (D4)
+            sp = wc.get("sp_pct_per_stack")  # 70450 r7 : part de la puissance des sorts (correctif 112753)
             constants = replace(
-                constants, crit_per_winters_chill_stack=0.0, cone_of_cold_per_winters_chill_stack=per_stack
+                constants,
+                crit_per_winters_chill_stack=0.0,
+                cone_of_cold_per_winters_chill_stack=per_stack,
+                cone_of_cold_sp_per_winters_chill_stack=(
+                    r.num(wc, "sp_pct_per_stack", "auras.winters_chill.sp_pct_per_stack") / PERCENT
+                    if sp is not None
+                    else 0.0
+                ),
             )
         else:  # aura de critique (avant 70450) : Cone of Cold jamais renforcé, quelles que soient les constantes reçues
             constants = replace(
-                constants, crit_per_winters_chill_stack=per_stack, cone_of_cold_per_winters_chill_stack=0.0
+                constants,
+                crit_per_winters_chill_stack=per_stack,
+                cone_of_cold_per_winters_chill_stack=0.0,
+                cone_of_cold_sp_per_winters_chill_stack=0.0,
             )
     return constants, leveling
 

@@ -26,7 +26,7 @@ DERIVED: dict[str, tuple[tuple[str, tuple[str, ...]], ...]] = {
         ("arcaneBlast", ("other_spells_damage", "intellect_spell_power")),  # 70450 : puissance des sorts
         ("hotStreak", ("pyroblast_cast_reduction",)),
     ),
-    "D4": (("wintersChill", ("crit", "cone_of_cold_damage")),),  # 70450 : bonus de Cone of Cold
+    "D4": (("wintersChill", ("crit", "cone_of_cold_damage", "cone_of_cold_spell_power")),),  # 70450 : bonus de Cone of Cold
 }
 ABSENT_NOTE = "mécanique non modélisée dans forever-core : aucun calcul ne s'appuie encore sur elle"
 _CERTAINTIES: tuple[str, ...] = get_args(Certainty)

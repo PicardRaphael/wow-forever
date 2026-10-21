@@ -52,6 +52,7 @@ def dmg_mult(
     m = 1 + talent_value(gd, pts, "arcaneInstability") / PERCENT
     if school in SCHOOL_FROST:
         m *= 1 + talent_value(gd, pts, "piercingIce") / PERCENT
+        m *= frigid_power_mult(gd, pts, buffs.get("ice_barrier_shield", 0.0))
     if school in SCHOOL_FIRE:
         m *= 1 + fire_power_bonus(gd, pts, buffs.get("fire_effects", 0.0))
     sources = buffs.get("dmg_sources", ())
@@ -66,6 +67,50 @@ def dmg_mult(
     for s in sources:
         m *= 1 + s
     return m * (1 + fire)
+
+
+ICE_BARRIER = "iceBarrier"
+FRIGID_POWER, FRIGID_SHIELDED = 1, 3  # variables du rang d'Ice Barrier : Frigid Power, bonus sous le bouclier
+
+
+def frigid_power_mult(gd: GameData, pts: Points, shielded: float = 0.0) -> float:
+    """Frigid Power d'Ice Barrier (correctif du serveur 112753, 70450 r6, HF2) : bonus de dégâts de Givre du talent pris
+    (Ice Barrier lancé avant le combat et relancé à l'expiration, suppose), multiplié par le bonus sous le bouclier
+    pondéré par `shielded` (part du temps sous le bouclier, bornée à [0, 1]) ; 1 sans le talent ou avant le
+    correctif (rang sans ces variables).
+
+    Registre : A22"""
+    if pts.get(ICE_BARRIER, 0) <= 0 or ICE_BARRIER not in gd.talents:
+        return 1.0
+    rank = gd.talents[ICE_BARRIER].ranks[0]
+    if len(rank) <= FRIGID_SHIELDED:
+        return 1.0
+    share = max(0.0, min(1.0, shielded))
+    base = talent_value(gd, pts, ICE_BARRIER, FRIGID_POWER) / PERCENT
+    return (1 + base) * (1 + share * talent_value(gd, pts, ICE_BARRIER, FRIGID_SHIELDED) / PERCENT)
+
+
+FRIGID_MINUTES = 2  # variable du rang d'Ice Barrier : durée de Frigid Power, en minutes
+SECONDS_PER_MINUTE = 60.0  # conversion d'unité
+
+
+def frigid_power_duration_s(gd: GameData, pts: Points) -> float | None:
+    """Durée de Frigid Power (s), lue dans la variable du rang d'Ice Barrier ; None sans le talent ou avant le correctif.
+
+    Registre : A22"""
+    if frigid_power_mult(gd, pts) == 1.0:
+        return None
+    return talent_value(gd, pts, ICE_BARRIER, FRIGID_MINUTES) * SECONDS_PER_MINUTE
+
+
+def winters_chill_cone_sp(gd: GameData, key: str, wc_stacks: float) -> float:
+    """Part de la puissance des sorts ajoutée au coefficient de Cone of Cold par les cumuls de Winter's Chill
+    (correctif du serveur 112753 : « gains an additional x% of your spell damage », 70450 r7) ; 0 pour un autre sort.
+
+    Registre : D4"""
+    if key != CONE_OF_COLD or not wc_stacks:
+        return 0.0
+    return gd.constants.cone_of_cold_sp_per_winters_chill_stack * wc_stacks
 
 
 def fire_power_bonus(gd: GameData, pts: Points, effects: float) -> float:
@@ -144,13 +189,16 @@ def roll_base_damage(
     rules: str = "forever",
     low_level_penalty: bool | None = None,
     buffs: Buffs | None = None,
+    wc_stacks: float = 0,
 ) -> float:
     """Dégâts de base d'un coup tiré : min + (max - min) × `u` (tirage uniforme dans [0, 1[ fourni par l'appelant)
     + coefficient (`coefficient`, selon `rules`) × puissance des sorts (buffs de puissance compris : `sp_flat`,
-    `sp_pct`, 70450) ; multiplicateur sur cible gelée du sort s'il en publie un (Ice Lance).
+    `sp_pct`, 70450) ; multiplicateur sur cible gelée du sort s'il en publie un (Ice Lance) ; Cone of Cold : part de la
+    puissance des sorts des cumuls de Winter's Chill (`wc_stacks`, 70450 r7).
 
-    Registre : G4"""
+    Registre : G4, D4"""
     c = coefficient(gd, key, rank, rules=rules, low_level_penalty=low_level_penalty)
+    c += winters_chill_cone_sp(gd, key, wc_stacks)
     base = rank.damage_min + (rank.damage_max - rank.damage_min) * u + c * spell_power(ch, buffs)
     frozen_mult = gd.spells[key].frozen_mult
     if frozen and frozen_mult is not None:
