@@ -219,3 +219,36 @@ def test_lookup_zones_follows_the_class(make_deps, monkeypatch):
     args = {"kind": "zones", "level": 12, "faction": "horde", "questie": questie, "class_name": "Chaman"}
     r = call(make_deps(), lambda c: c.call_tool("forever_lookup", args))
     assert not r.is_error and seen == ["shaman"]
+
+
+def test_simulate_needs_the_pinned_wowsims(make_deps, tmp_path):
+    """`forever_simulate` (décisions 293 et 294) : sans wowsims compilé, l'erreur dit la commande à lancer."""
+    r = call(make_deps(cache_dir=tmp_path), lambda c: c.call_tool("forever_simulate", {"action": "presets"}))
+    assert r.is_error and r.structured_content["error"]["code"] == "wowsims_failed"
+    assert "forever sims update" in r.structured_content["error"]["action"]
+
+
+def test_simulate_races_and_weights(make_deps, tmp_path, monkeypatch):
+    """`forever_simulate` : races comparées et poids appariés au niveau 60 par wowsims/forever (simulé ici)."""
+    from test_wowsims_run import PROTO_STATS, WeightSim, clone
+
+    from forever.pipeline import gitops
+
+    root = clone(tmp_path)
+    (root / "forever" / "proto").mkdir(parents=True, exist_ok=True)
+    (root / "forever" / "proto" / "common.proto").write_text(PROTO_STATS, encoding="utf-8")
+    monkeypatch.setattr(gitops, "subprocess_runner", WeightSim())
+    deps = make_deps(cache_dir=tmp_path)
+    args = {"action": "races", "preset": "mage/dps/Fire", "races": "Human,Gnome"}
+    r = call(deps, lambda c: c.call_tool("forever_simulate", args))
+    assert not r.is_error and len(r.structured_content["races"]) == 2
+    assert validate_provenance(r.structured_content["provenance"]) == []
+    args = {
+        "action": "weights",
+        "preset": "mage/dps/Fire",
+        "stats": "Intellect,SpellDamage",
+        "reference": "SpellDamage",
+    }
+    r = call(deps, lambda c: c.call_tool("forever_simulate", args))
+    assert not r.is_error and r.structured_content["normalised"]["StatSpellDamage"] == 1.0
+    assert r.structured_content["level"] == 60
