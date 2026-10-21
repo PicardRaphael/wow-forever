@@ -133,8 +133,8 @@ export const PRESET_BUILD_MUTILATE_ASN = PresetUtils.makePresetBuild('Asn Muti',
 
 def test_hunter_build_helper_and_rogue_simple_rotation_are_read(tmp_path):
     """Formes des préréglages du Chasseur (fonction `build(nom, équipement, talents, rotation, options, distance)`,
-    talents par `talents(nom, chaîne)`) et du Voleur (talents en objet, rotation simple : `TypeSimple` avec la rotation
-    de la spé en JSON, accepté tel quel par le proto de wowsims)."""
+    talents par `talents(nom, chaîne)`) et du Voleur (talents en objet ; rotation « simple » : le moteur ne la joue
+    pas, seule l'interface web la convertit en APL : le build prend l'APL par défaut de la spé)."""
     root = clone(tmp_path) / "forever" / "ui" / "specs"
     hunter = root / "hunter" / "dps"
     (hunter / "apls").mkdir(parents=True)
@@ -146,6 +146,13 @@ def test_hunter_build_helper_and_rogue_simple_rotation_are_read(tmp_path):
     (rogue / "gear_sets").mkdir(parents=True)
     (rogue / "presets.ts").write_text(ROGUE_TS, encoding="utf-8")
     (rogue / "gear_sets" / "p1_muti.gear.json").write_text(json.dumps({"items": [{"id": 2}]}), encoding="utf-8")
+    (rogue / "apls").mkdir()
+    (rogue / "apls" / "default.apl.json").write_text(json.dumps({"type": "TypeAPL", "x": 1}), encoding="utf-8")
+    (rogue / "presets.ts").write_text(
+        "import DefaultAPL from './apls/default.apl.json';\n"
+        "export const ROTATION = PresetUtils.makePresetAPLRotation('Default', DefaultAPL);\n" + ROGUE_TS,
+        encoding="utf-8",
+    )
     presets = {p.key: p for p in read_presets(root.parent.parent)}
     sv = presets["hunter/dps/SV Weave"]
     assert sv.talents == "-0053-5502" and sv.rotation == {"type": "TypeAPL"}
@@ -153,7 +160,14 @@ def test_hunter_build_helper_and_rogue_simple_rotation_are_read(tmp_path):
     assert sv.distance == 12
     asn = presets["rogue/dps/Asn Muti"]
     assert asn.talents == "0053-3023"
-    assert asn.rotation["type"] == "TypeSimple"
-    assert json.loads(asn.rotation["simple"]["specRotationJson"]) == {"useBackstab": False, "useExposeArmor": False}
+    assert asn.rotation == {"type": "TypeAPL", "x": 1}  # APL par défaut de la spé, jamais TypeSimple
     req = request_for(sv, race="RaceDwarf", encounter=ENCOUNTER)
     assert req["raid"]["parties"][0]["players"][0]["distanceFromTarget"] == 12
+
+
+def test_consumables_are_resolved_from_the_generated_table(tmp_path):
+    from forever.sims.wowsims import ts_literal
+
+    text = "{ flaskId: Consumables.FlaskOfTest.id, elixirIds: [Consumables.ElixirOfTest.id], foodId: Consumables.Unknown.id }"
+    value, _ = ts_literal(text, 0, {"FlaskOfTest": 900001, "ElixirOfTest": 900002})
+    assert value == {"flaskId": 900001, "elixirIds": [900002]}
