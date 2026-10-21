@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70450 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 7 (forever install, 2026-10-21)",
+      "source": "Client 1.60.1.70450 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 8 (forever install, 2026-10-21)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70450 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 7 (forever install, 2026-10-21)",
+      "source": "Client 1.60.1.70450 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 8 (forever install, 2026-10-21)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -218,7 +218,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 7 (forever install, 2026-10-21)"
+        "installé en révision 8 (forever install, 2026-10-21)"
       ]
     },
     "races.json": {
@@ -227,7 +227,7 @@
       "notes": [
         "races jouables, classes permises et raciaux (decode_rules.json, racial_skill_lines)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 7 (forever install, 2026-10-21)"
+        "installé en révision 8 (forever install, 2026-10-21)"
       ]
     },
     "pvp_items.json": {
@@ -352,7 +352,7 @@
       ]
     }
   },
-  "revision": 7,
+  "revision": 8,
   "revised_at": "2026-10-21",
   "hotfixes": {
     "dbcache": {
@@ -363,7 +363,7 @@
       "size": 6067699,
       "sha256": "68e09c5c315e0dd5e22970e2c234d92b85dc246713536e24e440285cba6a1b02",
       "file_date": "2026-10-21T06:53:02Z",
-      "read_at": "2026-10-21T09:15:23Z"
+      "read_at": "2026-10-21T09:45:09Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -9566,7 +9566,7 @@
         "identical": false
       }
     ],
-    "entities": 68,
+    "entities": 69,
     "unattributed": [
       "CurvePoint 369579",
       "CurvePoint 369580",
@@ -9634,7 +9634,6 @@
       "SpellEffect 1356262",
       "SpellEffect 1363937",
       "SpellEffect 1364559",
-      "SpellEffect 1364854",
       "SpellEffect 1364951",
       "SpellEffect 1365007",
       "SpellEffect 1365008",
@@ -9645,7 +9644,6 @@
       "SpellEffect 1365780",
       "SpellEffect 1365781",
       "SpellEffect 1365782",
-      "SpellEffect 688253",
       "SpellEffect 701113",
       "SpellInterrupts 251570",
       "SpellInterrupts 251703",

@@ -775,7 +775,7 @@
      "tooltip_values": [
       []
      ],
-     "desc": "When activated, your next Mage spell with a casting time less than {0} sec becomes an instant cast spell.",
+     "desc": "When activated, your next Mage spell with a casting time less than 10 sec becomes an instant cast spell.",
      "spellIds": [
       12043
      ],

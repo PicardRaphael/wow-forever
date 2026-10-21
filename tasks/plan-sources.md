@@ -8,8 +8,10 @@ Demande de l'utilisateur du 2026-10-21, prioritaire sur la suite du bloc 6b de C
 > (a) registre des sources (`forever/sources.py`, `forever status`, provenance de `forever_build`) ; (b) Forever
 > Companion pour les neuf classes (`class_guide`, bouton Talents) et SkillUp (`profession`) ; (c) inversion de fixture
 > (`VALUES_VERSION`, invariants, répétition générale verte) et aperçu du rejeu avec talents ajoutés ou retirés ; (d)
-> Polestar au-delà de RestedXP (`forever/polestar.py`, `forever route polestar`). Reste : quêtes de classe de Forever
-> Guide, poids de Naowh, assistant Métier du pont, mise à jour de Polestar par la veille.
+> Polestar au-delà de RestedXP (`forever/polestar.py`, `forever route polestar`). Livrés le 2026-10-21 (après) : quêtes
+> de classe de Forever Guide (`ClassData.lua`), poids par défaut de Naowh par spécialisation, assistant Métier du pont
+> (action `profession`, ForeverBridge 0.7.0), mise à jour de Polestar par la veille (étape `guides`) ; Givre après
+> 112753 (70450 r7, décision 292) ; Presence of Mind (r8).
 
 ## 0. Constat et règle
 - Notre moteur maison casse à chaque refonte de classe : 229 tests rouges pour 1.60.1.70450 (8 vrais défauts, le

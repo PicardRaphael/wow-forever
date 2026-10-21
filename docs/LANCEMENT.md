@@ -247,6 +247,15 @@ correction passe devant le reste.
     l'attribution le dit dans RestedXP (« Polestar Guides … commit … »), les quêtes de classe et les donjons avec leurs
     quêtes y sont ajoutés. Avant : `uv run forever route polestar` met le clone à jour.
 
+22b. Personnage d'une autre classe, écran Équipement : la réponse nomme la source des poids, « Forever Companion
+    (échelle « … » de la spécialisation) » ou « Naowh Forever (poids par défaut de la spécialisation, niveau 60…) » ;
+    un Druide Restauration n'a plus l'échelle « Balance DPS ». `uv run forever status` : ligne « Sources » avec les
+    poids de Naowh (« en retard » tant que leur date précède le build).
+22c. Après une veille (`uv run forever update status` ou le journal du passage) : étape « guides » faite, commit de
+    Polestar à jour (ou « non mis à jour (réseau) », sans erreur du passage).
+22d. Presence of Mind (bouton Talents ou `forever lookup talent "Presence of Mind"`) : le seuil s'affiche en clair,
+    plus de « {0} ».
+
 ### 8. Fin
 23. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
     et corrige le reste.
