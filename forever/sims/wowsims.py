@@ -48,6 +48,8 @@ _TALENT_OBJECT = re.compile(
 )
 _SIMPLE = re.compile(r"(?:export )?const (\w+) = PresetUtils\.makePresetSimpleRotation\(\s*'[^']*',\s*Spec\.\w+,\s*")
 _BUILD_HELPER = re.compile(r"\bbuild\(\s*'([^']*)',\s*(\w+),\s*(\w+),\s*(\w+),\s*(\w+),\s*(\d+(?:\.\d+)?)\s*\)")
+_LOCAL_OBJECT = re.compile(r"^(?:export )?const (\w+) = (?=\{)", re.MULTILINE)
+_ALIAS = re.compile(r"^export const (\w+) = (\w+);", re.MULTILINE)
 _OTHER_DEFAULTS = re.compile(r"export const OtherDefaults = (?=\{)")
 
 
@@ -84,10 +86,12 @@ def _strip_comments(text: str) -> str:
     return re.sub(r"(?m)^\s*//.*$|(?<=[,{(\s])//[^\n]*", "", text)
 
 
-def ts_literal(text: str, start: int = 0, ids: dict[str, int] | None = None) -> tuple[Any, int]:
+def ts_literal(
+    text: str, start: int = 0, ids: dict[str, int] | None = None, refs: dict[str, Any] | None = None
+) -> tuple[Any, int]:
     """Littéral d'objet de `presets.ts` (clés nues, `'chaînes'`, nombres, booléens, `Enum.Membre` → « Membre »,
     objets et tableaux imbriqués) en valeur Python ; `Consumables.X.id` → identifiant de la table générée du dépôt
-    (`ids`) ; une autre valeur calculée (appel) vaut None."""
+    (`ids`) ; `...nom` : objet local déjà lu (`refs`) étalé ; une autre valeur calculée (appel) vaut None."""
     i = start
 
     def skip() -> None:
@@ -107,6 +111,13 @@ def ts_literal(text: str, start: int = 0, ids: dict[str, int] | None = None) -> 
                 if text[i] == "}":
                     i += 1
                     return out
+                spread = re.compile(r"\.\.\.(\w+)").match(text, i)
+                if spread:  # `...nom` : objet local du même fichier
+                    i = spread.end()
+                    base = (refs or {}).get(spread.group(1))
+                    if isinstance(base, dict):
+                        out.update(base)
+                    continue
                 m = re.compile(r"['\"]?(\w+)['\"]?\s*:").match(text, i)
                 if m is None:
                     raise ValueError(f"clé attendue à la position {i}")
@@ -160,11 +171,13 @@ def consumable_ids(clone: Path) -> dict[str, int]:
     return {name: int(i) for name, i in _CONSUMABLE.findall(text)}
 
 
-def _literal_or_empty(text: str, start: int, ids: dict[str, int] | None = None) -> Any:
+def _literal_or_empty(
+    text: str, start: int, ids: dict[str, int] | None = None, refs: dict[str, Any] | None = None
+) -> Any:
     """Littéral de `presets.ts`, ou {} s'il porte une syntaxe que ce lecteur ne lit pas (le préréglage reste utilisable
     sans ces options ou ces buffs)."""
     try:
-        return ts_literal(text, start, ids)[0]
+        return ts_literal(text, start, ids, refs)[0]
     except (ValueError, IndexError):
         return {}
 
@@ -188,7 +201,13 @@ def _from_presets_ts(spec_dir: Path, rel: str, ids: dict[str, int] | None = None
         **dict(_TALENT_HELPER.findall(text)),
         **dict(_TALENT_OBJECT.findall(text)),
     }
-    created = {m.group(1): _literal_or_empty(text, m.end(), ids) for m in _CREATE.finditer(text)}
+    local: dict[str, Any] = {}  # objets locaux (`const nom = {…}`), dans l'ordre du fichier, pour les `...nom`
+    for m in _LOCAL_OBJECT.finditer(text):
+        local[m.group(1)] = _literal_or_empty(text, m.end(), ids, local)
+    created = {m.group(1): _literal_or_empty(text, m.end(), ids, local) for m in _CREATE.finditer(text)}
+    for var, alias in _ALIAS.findall(text):  # `export const DefaultOptions = NoPetOptions;`
+        if alias in created:
+            created[var] = created[alias]
     # rotations « simples » (`makePresetSimpleRotation`) : converties en APL par l'interface web seulement, le moteur
     # ne les joue pas ; un build qui en porte une prend l'APL du dépôt de même nom, sinon l'APL par défaut de la spé
     simple = {m.group(1) for m in _SIMPLE.finditer(text)}

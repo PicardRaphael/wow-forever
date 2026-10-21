@@ -171,3 +171,16 @@ def test_consumables_are_resolved_from_the_generated_table(tmp_path):
     text = "{ flaskId: Consumables.FlaskOfTest.id, elixirIds: [Consumables.ElixirOfTest.id], foodId: Consumables.Unknown.id }"
     value, _ = ts_literal(text, 0, {"FlaskOfTest": 900001, "ElixirOfTest": 900002})
     assert value == {"flaskId": 900001, "elixirIds": [900002]}
+
+
+def test_local_objects_are_spread_and_aliases_followed():
+    """`...classOptions` (objet local) étalé dans les options, `DefaultOptions = NoPetOptions` suivi : sans eux, le
+    Chasseur partait sans munitions et le moteur plantait."""
+    from forever.sims.wowsims import _from_presets_ts
+
+    assert _from_presets_ts is not None
+    from forever.sims.wowsims import ts_literal
+
+    refs = {"classOptions": {"ammo": "ThoriumHeadedArrow", "petUptime": 1}}
+    value, _ = ts_literal("{ classOptions: { ...classOptions, petType: PetType.PetNone } }", 0, None, refs)
+    assert value == {"classOptions": {"ammo": "ThoriumHeadedArrow", "petUptime": 1, "petType": "PetNone"}}
