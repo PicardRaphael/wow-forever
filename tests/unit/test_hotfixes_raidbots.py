@@ -94,3 +94,18 @@ def test_raidbots_is_a_declared_network_command():
     text = (FIXTURES.parent.parent / "CLAUDE.md").read_text(encoding="utf-8")
     assert "forever hotfixes --raidbots" in text  # décision 290 : accès réseau déclaré
     assert read_json(FIXTURES / "hotfix" / "hotfixes-70170.json")  # fixture toujours là
+
+
+def test_update_takes_raidbots_when_the_game_has_no_cache(make_deps, tmp_path):
+    """La veille (décision 290) : sans `DBCache.bin` du jeu archivé pour le build, elle lit le cache vérifié de
+    Raidbots (lecture seule) avant de passer « sans correctifs » ; le cache du jeu, quand il existe, prime ; Raidbots
+    injoignable : rien, comme avant."""
+    from forever.update import dbcache_for_build
+
+    game = tmp_path / "DBCache.bin"
+    game.write_bytes(DBCACHE)
+    deps = make_deps(http=http())
+    assert dbcache_for_build(deps, BUILD, "wow_classic_beta", game) == game
+    pinned = dbcache_for_build(deps, BUILD, "wow_classic_beta", None)
+    assert pinned is not None and raidbots.third_party_of(pinned)["url"] == URL
+    assert dbcache_for_build(make_deps(), BUILD, "wow_classic_beta", None) is None
