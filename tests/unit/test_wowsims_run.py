@@ -91,3 +91,67 @@ def test_stat_weights_are_paired_and_normalised(tmp_path):
         len(r["raid"]["parties"][0]["players"][0].get("bonusStats", {}).get("stats", [0, 0, 0])) for r in sim.requests
     }
     assert lengths == {3}  # tableau complet du proto épinglé
+
+
+HUNTER_TS = """import WeaveAPL from './apls/default.apl.json';
+import P1GearJson from './gear_sets/p1.gear.json';
+
+export const P1Gear = PresetUtils.makePresetGear('P1', P1GearJson, { devOnly: true });
+export const WeaveAPLRotation = PresetUtils.makePresetAPLRotation('Melee Weave', WeaveAPL);
+const talents = (name: string, talentsString: string) => ({ name, data: SavedTalents.create({ talentsString }) });
+export const SurvivalWeaveTalents = talents('SV Weave', '-0053-5502');
+export const NoPetOptions = HunterOptions.create({ classOptions: { petType: PetType.PetNone } });
+
+const build = (name, gear, talentPreset, rotation, options, distanceFromTarget) =>
+	PresetUtils.makePresetBuild(name, { gear, talents: talentPreset, rotation, settings: { name } });
+
+export const Builds = [
+	build('SV Weave', P1Gear, SurvivalWeaveTalents, WeaveAPLRotation, NoPetOptions, 12),
+];
+"""
+ROGUE_TS = """import P1MutiGear from './gear_sets/p1_muti.gear.json';
+
+export const TALENTS_MUTILATE_ASN = {
+	name: 'Asn Muti',
+	data: SavedTalents.create({
+		talentsString: '0053-3023',
+	}),
+};
+export const DEFAULT_SIMPLE_ROTATION = RogueRotation.create({ useBackstab: false, useExposeArmor: false });
+export const SIMPLE_ROTATION = PresetUtils.makePresetSimpleRotation('Configurable', Spec.SpecRogue, DEFAULT_SIMPLE_ROTATION);
+export const P1_MUTI_GEAR = PresetUtils.makePresetGear('Mutilate', P1MutiGear, { devOnly: true });
+
+export const PRESET_BUILD_MUTILATE_ASN = PresetUtils.makePresetBuild('Asn Muti', {
+	talents: TALENTS_MUTILATE_ASN,
+	rotation: SIMPLE_ROTATION,
+	gear: P1_MUTI_GEAR,
+});
+"""
+
+
+def test_hunter_build_helper_and_rogue_simple_rotation_are_read(tmp_path):
+    """Formes des préréglages du Chasseur (fonction `build(nom, équipement, talents, rotation, options, distance)`,
+    talents par `talents(nom, chaîne)`) et du Voleur (talents en objet, rotation simple : `TypeSimple` avec la rotation
+    de la spé en JSON, accepté tel quel par le proto de wowsims)."""
+    root = clone(tmp_path) / "forever" / "ui" / "specs"
+    hunter = root / "hunter" / "dps"
+    (hunter / "apls").mkdir(parents=True)
+    (hunter / "gear_sets").mkdir()
+    (hunter / "presets.ts").write_text(HUNTER_TS, encoding="utf-8")
+    (hunter / "apls" / "default.apl.json").write_text(json.dumps({"type": "TypeAPL"}), encoding="utf-8")
+    (hunter / "gear_sets" / "p1.gear.json").write_text(json.dumps({"items": [{"id": 1}]}), encoding="utf-8")
+    rogue = root / "rogue" / "dps"
+    (rogue / "gear_sets").mkdir(parents=True)
+    (rogue / "presets.ts").write_text(ROGUE_TS, encoding="utf-8")
+    (rogue / "gear_sets" / "p1_muti.gear.json").write_text(json.dumps({"items": [{"id": 2}]}), encoding="utf-8")
+    presets = {p.key: p for p in read_presets(root.parent.parent)}
+    sv = presets["hunter/dps/SV Weave"]
+    assert sv.talents == "-0053-5502" and sv.rotation == {"type": "TypeAPL"}
+    assert sv.spec_options == {"options": {"classOptions": {"petType": "PetNone"}}}
+    assert sv.distance == 12
+    asn = presets["rogue/dps/Asn Muti"]
+    assert asn.talents == "0053-3023"
+    assert asn.rotation["type"] == "TypeSimple"
+    assert json.loads(asn.rotation["simple"]["specRotationJson"]) == {"useBackstab": False, "useExposeArmor": False}
+    req = request_for(sv, race="RaceDwarf", encounter=ENCOUNTER)
+    assert req["raid"]["parties"][0]["players"][0]["distanceFromTarget"] == 12
