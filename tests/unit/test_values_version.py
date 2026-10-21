@@ -19,7 +19,10 @@ def test_the_suite_reads_the_values_version():
 def test_a_newer_installed_version_is_rewound_for_the_tests(tmp_path):
     repo = tmp_path / "repo"
     shutil.copytree(REPO_DATA_DIR, repo, ignore=shutil.ignore_patterns("__pycache__"))
-    newer = "1.60.1.99999"
+    from forever.pipeline.builds import version_key
+
+    latest = max((d.name for d in repo.iterdir() if d.is_dir() and d.name[0].isdigit()), key=version_key)
+    newer = latest.rsplit(".", 1)[0] + "." + str(int(latest.rsplit(".", 1)[1]) + 1)  # plus récente que tout
     shutil.copytree(repo / VALUES_VERSION, repo / newer)
     write_manifest(repo)
     assert json.loads((repo / "manifest.json").read_text(encoding="utf-8"))["game_version"] == newer

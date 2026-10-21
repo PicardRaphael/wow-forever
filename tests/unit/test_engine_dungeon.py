@@ -6,7 +6,7 @@ import re
 import statistics
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, read_json
+from conftest import DATA_DIR, LOCAL_VERSION, REPO_ROOT, read_json
 
 from forever.engine.dungeon import first_pass, formula_run, placement_level, repeat_pass, run_defaults, run_model
 
@@ -99,7 +99,7 @@ def test_placement_without_any_level_is_none():
 
 
 def test_no_game_number_in_the_engine():
-    source = (DATA_DIR.parent / "engine" / "dungeon.py").read_text(encoding="utf-8")
+    source = (REPO_ROOT / "forever" / "engine" / "dungeon.py").read_text(encoding="utf-8")
     for key, number in read_json(DATA_DIR / LOCAL_VERSION / "mechanics.json")["values"]["dungeon.run_defaults"][
         "value"
     ].items():

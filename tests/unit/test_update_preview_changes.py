@@ -12,12 +12,14 @@ def refused(file, path, before, after):
 
 
 def test_modified_added_and_removed_enter_the_preview():
-    out = preview_changes([
-        refused("talents.json", "frostbite.col", 4, 2),
-        refused("talents.json", "arcaneWrath", None, {"key": "arcaneWrath"}),
-        refused("spells.json", "frost_blast", None, "frost_blast"),
-        refused("talents.json", "piercingIce", {"key": "piercingIce"}, None),
-    ])
+    out = preview_changes(
+        [
+            refused("talents.json", "frostbite.col", 4, 2),
+            refused("talents.json", "arcaneWrath", None, {"key": "arcaneWrath"}),
+            refused("spells.json", "frost_blast", None, "frost_blast"),
+            refused("talents.json", "piercingIce", {"key": "piercingIce"}, None),
+        ]
+    )
     assert [(c["kind"], c["key"], c["change"], c["field"]) for c in out] == [
         ("talent", "frostbite", "modified", "col"),
         ("talent", "arcaneWrath", "added", None),

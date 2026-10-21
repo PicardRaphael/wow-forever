@@ -10,7 +10,7 @@ import re
 import shutil
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, WAGO_70124, isolated_deps, read_json
+from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REPO_ROOT, WAGO_70124, isolated_deps, read_json
 
 from forever.pipeline.decode import decode_version
 from forever.pipeline.travel_client import (
@@ -107,7 +107,7 @@ def test_graph_from_doc_filters_faction():
 
 
 def test_no_game_number_in_the_decoder():
-    source = (DATA_DIR.parent / "pipeline" / "travel_client.py").read_text(encoding="utf-8")
+    source = (REPO_ROOT / "forever" / "pipeline" / "travel_client.py").read_text(encoding="utf-8")
     for number in (STORMWIND, SENTINEL_HILL, DARKSHIRE, TO_SENTINEL_HILL, TO_DARKSHIRE, ELWYNN):
         assert not re.search(rf"\b{number}\b", source), number
 

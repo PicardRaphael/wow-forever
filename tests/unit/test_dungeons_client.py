@@ -8,7 +8,7 @@ import csv
 import re
 import shutil
 
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, WAGO_70124, isolated_deps, read_json
+from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REPO_ROOT, WAGO_70124, isolated_deps, read_json
 
 from forever.pipeline.decode import decode_version
 from forever.pipeline.dungeons_client import (
@@ -121,7 +121,7 @@ def test_no_journal_items_from_this_client():
 
 
 def test_no_game_number_in_the_decoder():
-    source = (DATA_DIR.parent / "pipeline" / "dungeons_client.py").read_text(encoding="utf-8")
+    source = (REPO_ROOT / "forever" / "pipeline" / "dungeons_client.py").read_text(encoding="utf-8")
     for number in (RAGEFIRE, THANES, EXCAVATION, DALARAN, LFG_EXCAVATION):
         assert not re.search(rf"\b{number}\b", source), number
 

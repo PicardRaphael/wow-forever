@@ -16,6 +16,7 @@ from conftest import (
     LOCAL_REVISION,
     LOCAL_VERSION,
     PREVIOUS_VERSION,
+    REPO_ROOT,
     change_key,
     isolated_deps,
     read_json,
@@ -217,7 +218,7 @@ def test_repository_is_revision_two(make_deps):
     history = read_json(v / "revisions.json")
     assert [r["revision"] for r in history["revisions"]] == [1, 2]
     assert history["revisions"][1]["report"] == REPORT
-    assert (DATA_DIR.parent.parent / REPORT).is_file()
+    assert (REPO_ROOT / REPORT).is_file()
     assert read_json(v / "sources.json")["revision"] == 2
     deps = make_deps()
     p = make_provenance(

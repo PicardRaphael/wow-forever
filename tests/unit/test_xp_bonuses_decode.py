@@ -8,7 +8,7 @@ import re
 import shutil
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, WAGO_70124, isolated_deps, read_json
+from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION, REPO_ROOT, WAGO_70124, isolated_deps, read_json
 
 from forever.pipeline.decode import decode_version
 from forever.pipeline.verify import verify_version
@@ -167,7 +167,7 @@ def test_camp_tent_threshold_and_benefits_without_xp(doc):
 
 
 def test_no_game_number_in_the_decoder():
-    source = (DATA_DIR.parent / "pipeline" / "xp_bonuses.py").read_text(encoding="utf-8")
+    source = (REPO_ROOT / "forever" / "pipeline" / "xp_bonuses.py").read_text(encoding="utf-8")
     for number in (str(WELL_RESTED), str(BAG), str(FOOD_XP), str(TENT), str(CONDITION)):
         assert not re.search(rf"\b{number}\b", source), number
 
