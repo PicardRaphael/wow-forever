@@ -60,7 +60,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.15.3 : cas du bouton PvP régénéré (« Comment jouer contre lui » puis le détail, 1200 caractères, décision 281).
     # 0.16.0 : guide de Forever Companion pour les autres classes (`class_guide`, forever-builds ; plan Sources, étape b).
     # 0.17.0 : outil forever_simulate (wowsims/forever au niveau 60, décisions 293 et 294) ; zones du livre de quêtes.
-    assert version == "0.17.0"
+    # 0.18.0 : forever_simulate compare des classes dans des conditions identiques.
+    assert version == "0.18.0"
 
 
 def test_fingerprint_is_up_to_date():

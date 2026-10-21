@@ -627,4 +627,6 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **SIM1** (2026-10-21, décisions 293 et 294) : wowsims/forever ne simule que le niveau 60 (constante de son code) ;
   question posée aux auteurs (https://github.com/wowsims/forever/issues/624) et à l'auteur de Sims Forever
   (https://github.com/Blueteak/SimsForeverExporter/issues/1). Sous le 60 : moteur du Mage gelé, autres classes non
-  calculées. Chasseur, Voleur et soigneurs : pas de préréglage APL lisible dans le dépôt épinglé.
+  calculées. Chasseur et Voleur lus depuis le 2026-10-21 (fonction `build`, étalements d'objets ; rotation « simple »
+  du Voleur jouée par l'interface web seulement : APL par défaut de la spé) ; soigneurs : aucune rotation, non
+  calculés.
