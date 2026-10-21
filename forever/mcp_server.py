@@ -170,6 +170,9 @@ def build_server(deps: Deps) -> MCPServer:
         (nom français ou anglais) et `level` (niveau du Chasseur, jamais deviné) : guide d'apprivoisement (bêtes de la
         zone puis des zones voisines du même continent à son niveau, coordonnées datées, rang le plus haut
         atteignable). Forever Bestiary lu sur disque ; sans lui, fiches du client seules.
+        Sources (étape b) : `kind="profession"` avec `name` (métier, nom anglais) et `level` (rang actuel) : recettes qui
+        font encore monter le métier, lues dans SkillUp Forever (orange puis jaune), fraîcheur, et l'itinéraire complet
+        calculé en jeu par l'addon (`/skillup`) ; `suppose`.
         Sources (étape b, décision 291) : `kind="class_guide"` avec `name` (classe), `level` et `class_name` facultatif
         (spécialisation) : guide de la classe lu dans Forever Companion (build adapté au niveau en nos clés et contrôlé,
         builds écartés avec leur raison, rotation en prose au niveau 30, fraîcheur de la source ; `suppose`).
@@ -247,6 +250,12 @@ def build_server(deps: Deps) -> MCPServer:
                 if not name or level is None:
                     raise InvalidArgumentError("Classe ou niveau manquant.", "donner name (classe), level et talents")
                 return check_talents(deps, name, parse_talents(talents) if talents else {}, level)
+            if kind == "profession":
+                from forever.lookup import lookup_profession
+
+                if not name or level is None:
+                    raise InvalidArgumentError("Métier ou rang manquant.", "donner name (métier) et level (rang)")
+                return lookup_profession(deps, name, rank=level)
             if kind == "class_guide":
                 from forever.lookup import lookup_class_guide
 

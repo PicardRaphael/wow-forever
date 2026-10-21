@@ -49,7 +49,7 @@ def test_profession_guide_lists_what_still_raises_the_skill(tmp_path, make_deps)
     from forever.lookup import lookup_profession
 
     deps = make_deps(wow_dir=write_skillup(tmp_path))
-    out = lookup_profession(deps, "Métier Test", rank=25)
+    out = lookup_profession(deps, "Métier Test", rank=35)
     names = [r["name"] for r in out["recipes"]]
     assert names == [
         "Recette Deux",

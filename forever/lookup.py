@@ -19,7 +19,7 @@ from forever.freshness import freshness_for_version
 from forever.pipeline.hotfixes import entity_assumptions
 from forever.pipeline.questie import TOC_NAME, ZoneAdvice, read_questie, zones_for_level
 from forever.provenance import Certainty, Provenance, local_provenance, make_provenance, min_certainty
-from forever.store import load_version
+from forever.store import current_identity, load_version
 
 SPELLS_FILE = "spells.json"
 TALENTS_FILE = "talents.json"
@@ -526,3 +526,55 @@ def _companion_freshness(cls: str, unmatched: list[str]) -> Any:
         return _fresh(f"companion:{cls}", "Forever Companion", "builds", [cls], "en retard", "contenu",
                       [f"talents inconnus de nos données : {', '.join(unmatched)}"])  # fmt: skip
     return _fresh(f"companion:{cls}", "Forever Companion", "builds", [cls], "à jour", "contenu", [])
+
+
+PROFESSION_LIMIT = 12  # recettes rendues au plus (réglage de l'outil)
+
+
+def lookup_profession(deps: Deps, profession: str, *, rank: int) -> dict[str, Any]:
+    """Recettes qui font encore monter un métier au rang donné, lues dans SkillUp Forever (plan « Sources d'abord »,
+    étape b) : orange d'abord (gain sûr, rang < jaune), puis jaune (rang < vert) ; grises et trop hautes exclues ;
+    fraîcheur par le build des données de l'addon contre la version installée ; l'itinéraire complet se calcule en jeu
+    par SkillUp (`/skillup`). Certitude `suppose` (addon). Addon absent : réponse « indisponible »."""
+    from forever.pipeline.skillup import read_skillup
+    from forever.sources import _fresh, choose
+
+    version = current_identity(deps.data_dir).game_version
+    addons = Path(deps.wow_dir) / "Interface" / "AddOns" if deps.wow_dir is not None else None
+    data = read_skillup(addons) if addons is not None else None
+    in_game = "SkillUp Forever calcule en jeu l'itinéraire jusqu'au rang visé et le coût par point : /skillup"
+    if data is None:
+        reason = "SkillUp Forever introuvable (lecture locale du dossier du jeu)"
+        return {"kind": "profession", "profession": profession, "rank": rank, "available": False, "reason": reason,
+                "recipes": [], "provenance": local_provenance(deps, certainty="suppose", assumptions=[reason])}  # fmt: skip
+    names = {k.lower(): (k, v) for k, v in data["professions"].items()}
+    found = names.get(profession.strip().lower())
+    if found is None:
+        raise InvalidArgumentError(
+            f"Métier inconnu de SkillUp Forever : « {profession} ».",
+            "métiers : " + ", ".join(sorted(data["professions"])),
+        )
+    name, line = found
+    rows = []
+    for spell, r in data["recipes"].items():
+        orange, yellow, green, grey = r["thresholds"]
+        if r["skill_line"] != line or rank < orange or rank >= grey:
+            continue
+        color = "orange" if rank < yellow else "jaune" if rank < green else "vert"
+        if color == "vert":
+            continue
+        rows.append({"spell_id": spell, "name": r["name"], "color": color, "thresholds": list(r["thresholds"])})
+    rows.sort(key=lambda x: (x["color"] != "orange", -x["thresholds"][1], x["name"]))
+    seen: set[str] = set()
+    rows = [r for r in rows if not (r["name"] in seen or seen.add(r["name"]))]  # variantes de même nom : une ligne
+    build = data["build"]
+    status = "à jour" if build == version else ("en retard" if build else "inconnue")
+    detail = [] if status == "à jour" else [f"données de SkillUp tirées du build {build or '?'}, jeu {version}"]
+    fresh = _fresh("skillup", "SkillUp Forever", "metiers", ["*"], status, "version", detail)  # type: ignore[arg-type]
+    notes = [f"SkillUp Forever (données du client {build or '?'} du {data['date'] or '?'}) : seuils de l'addon"]
+    note = choose([fresh])["note"]
+    if note:
+        notes.append(note)
+    return {"kind": "profession", "profession": name, "rank": rank, "available": True,
+            "recipes": rows[:PROFESSION_LIMIT], "total": len(rows), "freshness": fresh, "in_game": in_game,
+            "provenance": local_provenance(deps, certainty="suppose", assumptions=notes)}  # fmt: skip
