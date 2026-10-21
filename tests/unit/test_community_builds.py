@@ -123,7 +123,8 @@ def test_gaps_are_computed_by_the_engine(frozen_game_data, doc):
         assert rel == pytest.approx(b["gap"]["analytic_rel"], rel=1e-9, abs=1e-12), b["id"]
 
 
-def test_references_are_legal_builds_of_the_optimizer(game_data, doc):
+def test_references_are_legal_builds_of_the_optimizer(game_data_at_pre_70450_version, doc):
+    game_data = game_data_at_pre_70450_version  # valeurs d'avant le correctif 112753 de 70450 (Piercing Ice, Elemental Precision à 5 rangs) : conftest
     pairs = {(b["context"], b["level"]) for b in doc["builds"]}
     assert pairs == {(r["context"], r["level"]) for r in doc["references"]}
     for r in doc["references"]:

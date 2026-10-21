@@ -16,8 +16,10 @@ CURRENT = {"improvedFrostbolt": 3, "elementalPrecision": 1}  # 4 points : build 
 
 
 @pytest.fixture(scope="module")
-def deps(tmp_path_factory):
-    return isolated_deps(tmp_path_factory.mktemp("from-current"))
+def deps(tmp_path_factory, data_at_pre_70450_version):
+    # avant le correctif 112753 : après lui, chemin recommandé et projection de la respec départagent autrement une
+    # quasi-égalité (Elemental Precision à 2 % par rang contre Ice Shards), écart noté dans tasks/70450-corrections.md
+    return isolated_deps(tmp_path_factory.mktemp("from-current"), data_at_pre_70450_version)
 
 
 @pytest.fixture(scope="module")
@@ -25,7 +27,8 @@ def with_current(deps):
     return build_report(deps, "leveling", 16, preset="rapide", current=CURRENT, sensitivity=False)
 
 
-def test_the_path_starts_from_the_current_level_and_build(with_current, game_data):
+def test_the_path_starts_from_the_current_level_and_build(with_current, game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version
     rep = with_current
     assert all(rep["talents"].get(k, 0) >= v for k, v in CURRENT.items())
     steps = [s for s in rep["order"] if s["talent"]]

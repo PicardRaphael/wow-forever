@@ -598,11 +598,19 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   source possible des gains des quêtes vues par le client.
 
 ## Notes du 15 octobre (`docs/research/notes-blizzard-2026-10-15.md`)
-- **NOT1** : la note donne deux textes pour Winter's Chill (dégâts de Cone of Cold +40 % par cumul, ou +5 % et une part
+- **NOT1** (tranchée le 2026-10-21 par le correctif du serveur 112753, lu chez Raidbots, `probable`) : la seconde
+  lecture est la bonne (+5 % par cumul et 7 % de la puissance des sorts, 5 cumuls) ; à confirmer en jeu.
+- *(ancien texte)* la note donne deux textes pour Winter's Chill (dégâts de Cone of Cold +40 % par cumul, ou +5 % et une part
   de la puissance des sorts, 5 cumuls) ; les tables de 70450 portent 40 par cumul et 5 cumuls : le premier est retenu
   (`probable`), le second reste à vérifier en jeu.
 - **NOT2** : Ruthless (Humain) et Savage (Orc) : la note dit « toute arme » ; les tables de 70450 gardent l'aura de
   critique de l'ancien racial d'arme (290), sans restriction d'arme lue : à vérifier en jeu (fenêtre du personnage).
+- **HF1** : correctifs du serveur de 1.60.1.70450 lus dans un cache vérifié de Raidbots (r6, décision 290), sans
+  session de jeu : à confirmer par le `DBCache.bin` du jeu de l'utilisateur à sa première connexion (Piercing Ice
+  retiré, Elemental Precision à 3 rangs, Winter's Chill, Missile Barrage, Ice Barrier, Frost Warding, Frost Blast).
+- **HF2** : Ice Barrier après le correctif 112753 donne Frigid Power (+3 % de dégâts de Givre pendant 1 min) et +3 %
+  de plus tant que le bouclier tient : non modélisé (angle mort, jusqu'à +6 % de dégâts de Givre) ; durée du bouclier
+  sous les coups et usage en leveling à relever.
 - **RJ1** : analytique des nouveaux Arcanes de 70450 optimiste face au Monte Carlo (temps par monstre −20,8 % à L24,
   −12,6 % à L30, −8 % en leveling 30 ; DPS +3,5 % sur un boss au niveau 40). Cause probable : l'aura d'Arcane Blast
   qui dure depuis sa première application et les projectiles de Missile Barrage, comptés en moyenne par le cycle

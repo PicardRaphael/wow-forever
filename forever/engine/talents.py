@@ -9,11 +9,12 @@ from forever.engine.model import ClassKnowledge, GameData, Points, TalentRules
 
 
 def talent_value(gd: GameData, pts: Points, key: str, i: int = 0, default: float = 0.0) -> float:
-    """Valeur `i` du rang pris (défaut si le talent n'est pas pris) ; rang borné au nombre de rangs connus.
+    """Valeur `i` du rang pris (défaut si le talent n'est pas pris, ou absent des données : retiré par un correctif du
+    serveur, décision 290) ; rang borné au nombre de rangs connus.
 
     Registre : G3"""
     r = pts.get(key, 0)
-    if r <= 0:
+    if r <= 0 or key not in gd.talents:
         return default
     ranks = gd.talents[key].ranks
     v = ranks[min(r, len(ranks)) - 1]

@@ -8,7 +8,7 @@ Valeurs : contexte réel `tests/fixtures/bridge/contexts/mage19.txt` (talents `n
 import json
 
 import pytest
-from conftest import DATA_DIR, FIXTURES, LOCAL_VERSION
+from conftest import DATA_DIR, FIXTURES, PRE_70450_VERSION
 from test_bridge_loop import FakeAgent, FakeCapture, band_of, make
 from test_bridge_loop_p06b import SESSION, RefusingAgent, replies
 
@@ -26,7 +26,7 @@ CONTEXT = dict(
     for line in (FIXTURES / "bridge" / "contexts" / "mage19.txt").read_text(encoding="utf-8").split("\n")
     if "=" in line
 )
-CLASSES = json.loads((DATA_DIR / LOCAL_VERSION / "classes.json").read_text(encoding="utf-8"))["classes"]
+CLASSES = json.loads((DATA_DIR / PRE_70450_VERSION / "classes.json").read_text(encoding="utf-8"))["classes"]
 
 
 def stream(tool: str, value: dict) -> list[str]:
@@ -156,8 +156,9 @@ def test_exports_action_without_exporter_is_refused(tmp_path):
 
 
 @pytest.fixture
-def deps(make_deps):
-    return make_deps()
+def deps(make_deps_at_pre_70450_version):
+    # contexte mage19 relevé avant le correctif 112753 (Elemental Precision 5/5) : données d'avant 70450 (conftest)
+    return make_deps_at_pre_70450_version()
 
 
 def test_exports_reply_gives_the_current_build_and_the_last_links(deps):

@@ -26,7 +26,9 @@ def ch534(game_data):
     return character(game_data, 60, "Orc", {"sp": 534, "spell_crit": 0.0})
 
 
-def test_improved_cone_of_cold(game_data, ch534):
+def test_improved_cone_of_cold(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # valeurs d'avant le correctif 112753 de 70450 (Piercing Ice, Elemental Precision à 5 rangs) : conftest
+    ch534 = character(game_data, 60, "Orc", {"sp": 534, "spell_crit": 0.0})
     """Cone of Cold r5 à 534, Piercing Ice 3/3 et Improved Cone of Cold 3/3 : (343 + 0,129 × 534) × 1,06 × 1,35."""
     pts = {"piercingIce": 3, "improvedConeOfCold": 3}
     e = expected_cast(game_data, "cone_of_cold", 60, pts, ch534)

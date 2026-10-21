@@ -19,10 +19,11 @@ GEAR = FIXTURES / "addons" / "gear"
 
 
 @pytest.fixture
-def deps(make_deps, tmp_path):
+def deps(make_deps_at_pre_70450_version, tmp_path):
+    # contexte mage19 relevé avant le correctif 112753 (Elemental Precision 5/5) : données d'avant 70450 (conftest)
     root = tmp_path / "wow"
     shutil.copytree(GEAR, root / "Interface" / "AddOns")
-    return make_deps(wow_dir=root)
+    return make_deps_at_pre_70450_version(wow_dir=root)
 
 
 def test_exports_reply_has_no_ellesmere_link_by_default(deps):

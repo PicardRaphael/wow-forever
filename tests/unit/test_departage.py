@@ -52,8 +52,10 @@ def test_no_candidate_beats_the_champion_significantly(threshold):
 
 
 @pytest.fixture(scope="module")
-def deps(tmp_path_factory):
-    return isolated_deps(tmp_path_factory.mktemp("departage"))
+def deps(
+    tmp_path_factory, data_at_pre_70450_version
+):  # valeurs d'avant le correctif 112753 de 70450 (Piercing Ice, Elemental Precision à 5 rangs) : conftest
+    return isolated_deps(tmp_path_factory.mktemp("departage"), data_at_pre_70450_version)
 
 
 def first_neighbor(cands):

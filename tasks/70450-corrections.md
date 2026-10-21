@@ -58,3 +58,27 @@ et `make_deps_at_pre_70450_version`. Garde : `test_revision_constants.py::test_f
   l'ancien gabarit sans le signaler ; une révision réaligne les gabarits des talents changés depuis la version
   précédente (une correction à la main serait réécrite). B19 déduit l'absence de critique du nombre de variables
   d'Improved Fire Blast.
+
+## Révision 6 : correctifs du serveur lus chez Raidbots (2026-10-21, décision 290)
+- `forever hotfixes --raidbots` épingle le `DBCache.bin` vérifié le plus récent de 70450 (créé le 2026-10-21 à 06:25,
+  sha256 68e09c5c315e…) ; `forever decode --hotfixes --dbcache raidbots` l'applique ; certitude `probable`.
+- 31 écarts confirmés (nature `correctif_serveur`) : Piercing Ice retiré (seul talent retiré ; Improved Fire Nova du
+  Chaman est un renommage en Trial by Fire, même nœud, même sort) ; Elemental Precision à 3 rangs ; quatre talents du
+  Givre changent de colonne ; Winter's Chill, Missile Barrage, Frost Warding, Ice Barrier changent d'infobulle ; valeurs
+  de Frost Blast.
+- Défauts corrigés : variables de statistique du personnage (`$SPFR`) dans une infobulle ; talent retiré confirmé
+  accepté par la fusion ; champ `hotfix` d'un sort traité comme provenance ; moteur sans panne sur un talent absent des
+  données (`talent_value`) ; Missile Barrage au marqueur `listed_spells` ; `lookup` dit « probablement retiré » ; builds
+  populaires qui placent Piercing Ice écartés avec leur raison.
+- Talents Forever 0.38.9 (build 70425) n'a pas le correctif : export du Mage bloqué par la table de recoupement jusqu'à
+  la mise à jour de l'addon (dit comme tel).
+- Tests rattachés à `PRE_70450_VERSION` (contextes et valeurs relevés avant le correctif) : `test_engine_talents::
+  test_prerequisite_must_be_maxed`, `test_damage_modifiers::test_improved_cone_of_cold`, `test_community_builds::
+  test_references_are_legal_builds_of_the_optimizer`, `test_departage`, `test_bridge_context::
+  test_real_talents_of_the_probe_are_recognized`, `test_leveling_from_current`, exports (`test_bridge_exports`,
+  `test_cj1_eui_gear`, `test_bridge_exports_more`) et `test_plugin_evals::test_button_cases_are_the_messages_of_the_bridge`.
+  `test_client_decisions::test_confirmed_changes_have_a_nature` admet la nature `correctif_serveur`.
+- **Écart connu** : après le correctif, le chemin recommandé et la projection de la respec départagent autrement une
+  quasi-égalité au niveau 16 (Ice Shards contre Elemental Precision) ; à reprendre avec l'inversion de fixture (c).
+- **Angles morts** : 7 % de puissance des sorts par cumul de Winter's Chill sur Cone of Cold ; Frigid Power d'Ice
+  Barrier (HF2).

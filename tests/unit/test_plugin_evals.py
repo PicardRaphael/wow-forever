@@ -493,11 +493,12 @@ BUTTON_CASES = {
 }
 
 
-def test_button_cases_are_the_messages_of_the_bridge(make_deps):
+def test_button_cases_are_the_messages_of_the_bridge(make_deps_at_pre_70450_version):
     from forever.bridge.context import load_context_data
     from forever.bridge.plans import button_message
 
-    data = load_context_data(make_deps())
+    # cas d'évaluation écrits sur les contextes relevés avant le correctif 112753 (Elemental Precision 5/5)
+    data = load_context_data(make_deps_at_pre_70450_version())
     for name, (key, ctx_name, tag) in BUTTON_CASES.items():
         meta, question = front(EVALS / name / "prompt.md")
         assert meta["tags"] == ["positif", tag], name

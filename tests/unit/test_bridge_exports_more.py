@@ -34,8 +34,9 @@ def by_kind(links, kind):
     return [link for link in links if link["kind"] == kind]
 
 
-def test_macros_and_ellesmere_links_follow_the_current_build(wow, make_deps):
-    text, links = exports_reply(make_deps(wow_dir=wow), {**CONTEXT, "role": "dps"}, [])
+def test_macros_and_ellesmere_links_follow_the_current_build(wow, make_deps_at_pre_70450_version):
+    # contexte mage19 relevé avant le correctif 112753 (Elemental Precision 5/5) : données d'avant 70450 (conftest)
+    text, links = exports_reply(make_deps_at_pre_70450_version(wow_dir=wow), {**CONTEXT, "role": "dps"}, [])
     assert links[0]["kind"] == "naowh_build"
     (macros,) = by_kind(links, "naowh_macros")
     assert macros["text"].startswith(MACRO_PREFIX) and read_naowh_macros(macros["text"])

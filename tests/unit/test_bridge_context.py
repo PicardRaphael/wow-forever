@@ -15,8 +15,9 @@ def real_context() -> dict[str, str]:
     return dict(line.split("=", 1) for line in REAL.splitlines() if "=" in line)
 
 
-def test_real_talents_of_the_probe_are_recognized(make_deps):
-    table = talent_table(make_deps())
+def test_real_talents_of_the_probe_are_recognized(make_deps_at_pre_70450_version):
+    # sonde relevée en jeu avant le correctif 112753 (Elemental Precision à 5 rangs) : conftest
+    table = talent_table(make_deps_at_pre_70450_version())
     reading = describe_talents(table, "MAGE", real_context()["talents"])
     assert [(t.key, t.rank, t.max) for t in reading.known] == [
         ("elementalPrecision", 5, 5),

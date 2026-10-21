@@ -35,7 +35,8 @@ def test_unknown_talent_is_reported(game_data):
     assert check_build(game_data, {"inconnu": 1}, 20) == ["talent inconnu : inconnu"]
 
 
-def test_prerequisite_must_be_maxed(game_data):
+def test_prerequisite_must_be_maxed(game_data_at_pre_70450_version):
+    game_data = game_data_at_pre_70450_version  # valeurs d'avant le correctif 112753 de 70450 (Piercing Ice, Elemental Precision à 5 rangs) : conftest
     pts = {"improvedFrostbolt": 5, "elementalPrecision": 5, "frostbite": 3, "iceLance": 1, "fingersOfFrost": 1}
     errors = check_build(game_data, {**pts, "iceShards": 5, "piercingIce": 3}, 60)
     assert errors == []

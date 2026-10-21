@@ -75,7 +75,8 @@ def test_selection_beyond_tooltip_is_an_error(client_tables, decode_rules):
 
 def test_confirmed_changes_have_a_nature():
     assert CONFIRMED
-    assert {c["nature"] for c in CONFIRMED} <= {"client", "format", "convention"}
+    # décision 290 : écarts d'un correctif du serveur lu sans session de jeu (70450 r6)
+    assert {c["nature"] for c in CONFIRMED} <= {"client", "format", "convention", "correctif_serveur"}
 
 
 def test_presence_of_mind_is_a_format_change():

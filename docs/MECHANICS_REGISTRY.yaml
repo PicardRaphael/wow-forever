@@ -552,13 +552,14 @@ mechanics:
     sources:
       - "forever/data/1.60.1.70009/talents.json (missileBarrage : chances, canalisation, coût)"
     tests:
+      - tests/unit/test_engine_hotfix_112753.py::test_listed_spells_trigger_and_missiles_do_not
       - tests/unit/test_rotations_t05.py::test_missile_barrage_rules
       - tests/unit/test_rotations_t05.py::test_missile_barrage_halves_the_dump_and_makes_it_free
       - tests/unit/test_rotations_t05.py::test_missile_barrage_in_the_arcane_cycle
       - tests/unit/test_engine_70450_arcane.py::test_missile_barrage_per_missile
     tolerance: null
     formule: "Missile Barrage (T05) : chaque Arcane Blast qui touche déclenche l'aura avec la chance du talent (Fireball, Frostbolt, Frostfire Bolt : autre chance) ; l'Arcane Missiles suivant est canalisé en (1 - réduction) du temps et gratuit ; analytique : P = 1 - (1 - chance × toucher)^cumuls par cycle arcane ; Fingers of Frost (chance et charges du talent) et Frostbite (C5) : procs modélisés depuis T04b"
-    note: "T05 : rotation arcane à décharge Arcane Missiles seulement (un tirage par déclencheur qui touche, mode forever) ; tisser Arcane Missiles dans les rotations de givre ou de feu : angle mort ; autres procs (Impact ; Clearcasting compté en B12) absents ; 70450 (marqueur missile_hits) : chance sur chaque projectile d'Arcane Missiles (1 - (1 - p)^projectiles) et sur Arcane Wrath, variables décalées"
+    note: "T05 : rotation arcane à décharge Arcane Missiles seulement (un tirage par déclencheur qui touche, mode forever) ; tisser Arcane Missiles dans les rotations de givre ou de feu : angle mort ; autres procs (Impact ; Clearcasting compté en B12) absents ; 70450 (marqueur missile_hits) : chance sur chaque projectile d'Arcane Missiles (1 - (1 - p)^projectiles) et sur Arcane Wrath, variables décalées ; correctif du serveur 112753 (70450 r6, décision 290) : plus de chance par projectile d'Arcane Missiles ; sorts nommés par la description (Arcane Blast, puis Arcane Wrath, Fireball, Frostbolt, Frost Blast, Frostfire Bolt), variables dans l'ordre d'avant 70450 : marqueur listed_spells (tests/unit/test_engine_hotfix_112753.py)"
   - id: B15
     categorie: temps
     description: "Durée, charges, rafraîchissement et cumul des buffs"
@@ -886,7 +887,7 @@ mechanics:
       - tests/unit/test_engine_70450_winters_chill.py::test_derived_tables_give_the_cone_of_cold_bonus
     tolerance: null
     formule: "crit += crit_par_cumul × cumuls de Winter's Chill (Frostbolt et Ice Lance) ; cumuls ≤ 2e variable du rang du talent"
-    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact) ; 70450 : aura 271 (sorte cone_of_cold) : chaque cumul augmente les dégâts du prochain Cone of Cold, consommés par lui, posés par les sorts de Givre de dégâts ; plus aucun critique ; avant 70450 inchangé ; 1.60.1.70450 (décision 285) : tables par cumul (engine/derived) : bonus de Cone of Cold par cumul quand l'aura le renforce, critique avant"
+    note: "T08b, bloc B : critique par cumul et cumuls maximum de Winter's Chill décodés du client (spell_scaling.json auras.winters_chill), lus en mode forever ; mode seed : copie de mechanics.json ; note officielle du 01/10 : pas de jet de résistance à l'application ; concordance : le Monte Carlo pose Winter's Chill seulement sur un sort qui touche, un seul tirage à la chance du talent (forever/sim/leveling_mc.py, on_impact) ; 70450 : aura 271 (sorte cone_of_cold) : chaque cumul augmente les dégâts du prochain Cone of Cold, consommés par lui, posés par les sorts de Givre de dégâts ; plus aucun critique ; avant 70450 inchangé ; 1.60.1.70450 (décision 285) : tables par cumul (engine/derived) : bonus de Cone of Cold par cumul quand l'aura le renforce, critique avant ; correctif du serveur 112753 (70450 r6, cache vérifié de Raidbots, décision 290, probable) : posé par Frostbolt, Frost Blast et Ice Lance renforcé par Fingers of Frost, +5 % de dégâts subis par Cone of Cold par cumul (lu, modélisé) et 7 % de la puissance des sorts par cumul ajoutés à Cone of Cold (**non modélisé**, angle mort) ; le texte du correctif tranche NOT1 (seconde lecture)"
   - id: D5
     categorie: environnement
     description: "Buffs de campement et de Legacy"
