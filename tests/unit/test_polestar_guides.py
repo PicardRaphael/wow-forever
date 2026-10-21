@@ -97,3 +97,24 @@ def test_steps_carry_no_raw_polestar_line():
     corps du guide livré est réécrit depuis ses actions (`forever.compare._adapted_lines`)."""
     g = parse_polestar(GUIDE, "zone-a.guide")
     assert all(step.raw == () for step in g.steps)
+
+
+def test_polestar_clone_is_made_then_updated_read_only(tmp_path):
+    """`forever route polestar` (décision 289) : premier appel, clone superficiel du dépôt public dans le cache ; ensuite,
+    récupération du dernier commit et remise de la copie dessus ; jamais une écriture vers le dépôt distant. Lanceur de
+    git simulé, aucun réseau."""
+    from forever.pipeline.polestar_fetch import REPO, update_polestar
+
+    calls = []
+
+    def run(args, cwd=None):
+        calls.append((list(args), cwd))
+        if args[:2] == ["git", "clone"]:
+            (tmp_path / "third_party" / "polestar" / ".git").mkdir(parents=True)
+
+    clone = update_polestar(tmp_path, run=run)
+    assert calls[0][0][:4] == ["git", "clone", "--depth", "1"] and REPO in calls[0][0]
+    calls.clear()
+    update_polestar(tmp_path, run=run)
+    assert [c[0][:2] for c in calls] == [["git", "fetch"], ["git", "reset"]]
+    assert all(c[1] == clone for c in calls) and not any("push" in c[0] for c in calls)
