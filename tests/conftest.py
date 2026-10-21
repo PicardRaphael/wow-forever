@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import atexit
 import functools
 import json
 import os
 import re
 import shutil
+import tempfile
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
@@ -50,7 +52,43 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURES = REPO_ROOT / "tests" / "fixtures"
-DATA_DIR = REPO_ROOT / "forever" / "data"
+# Données réellement installées dans le dépôt (version la plus récente) : tests d'invariants seulement
+# (`tests/unit/test_installed_invariants.py`), jamais une valeur de jeu attendue.
+# Répétition d'une nouvelle version (étape c) : FOREVER_TEST_REPO_DATA désigne une copie du dépôt où une version plus
+# récente est installée ; la suite doit rester verte, seuls les tests d'invariants lisent cette version.
+REPO_DATA_DIR = Path(os.environ.get("FOREVER_TEST_REPO_DATA") or REPO_ROOT / "forever" / "data")
+# Plan « Sources d'abord », étape c (décision 291) : version où les valeurs attendues des tests ont été validées. Toute
+# la suite lit une copie des données ramenée à cette version (outils, moteur, fichiers) : une nouvelle version
+# installée par la veille (version finale du 4 novembre comprise) n'allume aucun test de valeur ; elle donne un
+# rapport des valeurs qui changent, à valider. Monter `VALUES_VERSION` est un acte délibéré, fait après ce rapport,
+# avec les attentes revues en une fois. Une révision de cette version (correctifs du serveur) change ses fichiers en
+# place : ses tests se revoient avec elle. Avant (décision 192), la version figée sans données figées rendait rouge le
+# `verify` du clone : les données suivent désormais la version.
+VALUES_VERSION = "1.60.1.70450"
+
+
+def pinned_data_dir(repo_data: Path, values_version: str, tmp_root: Path | None = None) -> Path:
+    """Dossier de données des tests : `repo_data` si `values_version` y est la version courante, sinon une copie
+    (dossier temporaire) ramenée à `values_version` : versions plus récentes retirées, manifeste réécrit."""
+    from forever.manifest import write_manifest
+    from forever.pipeline.builds import version_key
+
+    manifest = json.loads((repo_data / "manifest.json").read_text(encoding="utf-8"))
+    if manifest["game_version"] == values_version:
+        return repo_data
+    root = tmp_root or Path(tempfile.mkdtemp(prefix="forever-values-"))
+    if tmp_root is None:
+        atexit.register(shutil.rmtree, root, True)
+    dst = root / "data"
+    shutil.copytree(repo_data, dst, ignore=shutil.ignore_patterns("__pycache__"))
+    for d in dst.iterdir():
+        if d.is_dir() and d.name[0].isdigit() and version_key(d.name) > version_key(values_version):
+            shutil.rmtree(d)
+    write_manifest(dst)
+    return dst
+
+
+DATA_DIR = pinned_data_dir(REPO_DATA_DIR, VALUES_VERSION)
 REGISTRY_PATH = REPO_ROOT / "docs" / "MECHANICS_REGISTRY.yaml"
 SEED_DATA = REPO_ROOT / "seed" / "forever-mage" / "data"
 # Version des données du seed (lecture seule, figée à la version portée en T02) : le seed ne suit pas les

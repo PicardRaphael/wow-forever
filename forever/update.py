@@ -1084,38 +1084,48 @@ def _evaluate(
     return Step(step, status, f"{version} r{revision} : {action} ({'; '.join(reasons)})", {"id": pending_id})
 
 
+def preview_changes(refused: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]] | None:
+    """Écarts refusés acceptés dans l'aperçu du rejeu (copie seulement) : champ modifié d'un talent ou d'un sort,
+    talent ou sort ajouté, talent retiré (depuis 70450) ; None si un écart ne peut pas s'appliquer (sort retiré,
+    autre fichier)."""
+    kinds = {"talents.json": "talent", "spells.json": "spell"}
+    out: list[dict[str, Any]] = []
+    for r in refused:
+        kind = kinds.get(str(r["file"]))
+        if kind is None:
+            return None
+        path = str(r["path"])
+        if "." in path:
+            key, field = path.split(".", 1)
+            change = {"key": key, "change": "modified", "field": field, "old": r["before"], "new": r["after"]}
+        elif r["before"] is None:
+            change = {"key": path, "change": "added", "field": None, "old": None, "new": path}
+        elif r["after"] is None and kind == "talent":
+            change = {"key": path, "change": "removed", "field": None, "old": path, "new": None}
+        else:
+            return None
+        out.append({"kind": kind, **change, "nature": "client",
+                    "decision": "aperçu du rejeu de forever update (écart refusé, accepté dans l'aperçu seulement)"})  # fmt: skip
+    return out
+
+
 def _replay_after_data(
     run: _Run, stage: Path, candidate: Path, install_ok: bool, plan: Mapping[str, Any] | None
 ) -> Path | None:
     """Données du côté « après » du rejeu : la copie de préparation où la candidate est installée ; si les règles de
     fusion l'ont refusée, un aperçu à côté, où les écarts refusés sont acceptés comme ils le seraient après l'accord de
     l'utilisateur (`confirmed_changes.json` de la copie seulement). None si l'aperçu est impossible (talent ou sort
-    ajouté ou retiré)."""
+    retiré : la fusion ne sait pas l'appliquer)."""
     if install_ok:
         return stage
     if not plan or not plan.get("refused"):
         return None
     from forever.manifest import write_manifest
-    from forever.pipeline.install import SPELLS, TALENTS, InstallRefusedError, apply_install
+    from forever.pipeline.install import InstallRefusedError, apply_install
 
-    kinds = {TALENTS: "talent", SPELLS: "spell"}
-    changes = []
-    for r in plan["refused"]:
-        if r["file"] not in kinds or "." not in r["path"]:
-            return None
-        key, field = r["path"].split(".", 1)
-        changes.append(
-            {
-                "kind": kinds[r["file"]],
-                "key": key,
-                "change": "modified",
-                "field": field,
-                "old": r["before"],
-                "new": r["after"],
-                "nature": "client",
-                "decision": "aperçu du rejeu de forever update (écart refusé, accepté dans l'aperçu seulement)",
-            }
-        )
+    changes = preview_changes(plan["refused"])
+    if changes is None:
+        return None
     preview = stage.parent / "apercu"
     if preview.exists():
         shutil.rmtree(preview)
