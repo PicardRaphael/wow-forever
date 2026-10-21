@@ -8,6 +8,8 @@
 
 Clone et binaire fabriqués dans `tmp_path` (structure de wowsims/forever) ; exécuteur simulé, aucun calcul de jeu."""
 
+import json
+
 import pytest
 from wowsims_fakes import ENCOUNTER, PROTO_STATS, Sim, WeightSim, clone
 
