@@ -11,6 +11,8 @@ Clone et binaire fabriqués dans `tmp_path` (structure de wowsims/forever) ; ex�
 import hashlib
 import json
 import subprocess
+from pathlib import Path
+from typing import ClassVar
 
 import pytest
 from forever.sims.wowsims import (
@@ -80,19 +82,24 @@ def clone(tmp_path):
 class Sim:
     """wowsimcli simulé : lit la requête, écrit un résultat dont les dégâts dépendent de la race (fabriqués)."""
 
-    DPS = {"RaceHuman": 100.0, "RaceGnome": 101.0, "RaceHighOrderSkyborne": 103.0, "RaceDwarf": 90.0}
+    DPS: ClassVar[dict[str, float]] = {
+        "RaceHuman": 100.0,
+        "RaceGnome": 101.0,
+        "RaceHighOrderSkyborne": 103.0,
+        "RaceDwarf": 90.0,
+    }
 
     def __init__(self):
         self.requests = []
 
     def __call__(self, args, cwd, timeout=None):
         args = list(args)
-        req = json.loads(open(args[args.index("--infile") + 1], encoding="utf-8").read())
+        req = json.loads(Path(args[args.index("--infile") + 1]).read_text(encoding="utf-8"))
         self.requests.append(req)
         race = req["raid"]["parties"][0]["players"][0]["race"]
         res = {"raidMetrics": {"parties": [{"players": [{"dps": {"avg": self.DPS[race], "stdev": 10.0}}]}]},
                "iterationsDone": req["simOptions"]["iterations"]}  # fmt: skip
-        open(args[args.index("--outfile") + 1], "w", encoding="utf-8").write(json.dumps(res))
+        Path(args[args.index("--outfile") + 1]).write_text(json.dumps(res), encoding="utf-8")
         return subprocess.CompletedProcess(args, 0, "", "")
 
 
