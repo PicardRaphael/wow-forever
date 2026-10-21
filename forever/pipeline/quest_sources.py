@@ -88,6 +88,9 @@ NAOWH_DJ = ("NaowhForever_DungeonJournal", "Data/Quests.lua")
 GUIDE = ("ForeverGuide", "DungeonData.lua")
 GUIDE_DALARAN = "DalaranData.lua"  # DJ1 : quêtes de City of Dalaran, ajoutées après DungeonData.lua
 GUIDE_CHAINS = "ChainData.lua"  # RX1 : chaînes importantes (sac de couchage, clés) et leurs quêtes
+GUIDE_CLASS = "ClassData.lua"  # plan « Sources d'abord » : quêtes de classe (ns.CLASS_Q) et leurs PNJ (ns.CLASS_NPC)
+GUIDE_SEARCH = "ItemSearchData.lua"  # PNJ de recherche (ns.SI_NPC) : les autres PNJ des quêtes de classe
+_GUIDE_NPC = re.compile(r'^\[(\d+)\]="([^"\n]*)"', re.MULTILINE)
 COMPLETO_BOOKS = "Data/Books.lua"  # RX1 : livres de la bibliothèque (Naowh Discovery)
 NAOWH_DJ_CHAINS = "Data/QuestChains.lua"  # RX1 : chaînes, niveaux minimaux, noms (Dungeon Journal de Naowh)
 FDJ_CHAINS = "Data/QuestChains.lua"  # RX1 : prérequis requis et leurs détails (ForeverDungeonJournal)
@@ -97,7 +100,7 @@ FDJ_REWARDS = ("ForeverDungeonJournal", "Data/QuestRewards.lua")
 FDJ_DUNGEONS = ("ForeverDungeonJournal", "Data/Dungeons.lua")
 GEARQUEST_PREFIX = "GearQuestForever_"
 QUESTIE_SV = "Questie.lua"
-READ_FORMAT = 2  # champs lus dans les sources (2 : CJ1, catégorie, drapeaux, métier requis) : empreinte du cache
+READ_FORMAT = 3  # champs lus (2 : CJ1, catégorie, drapeaux, métier requis ; 3 : quêtes de classe de Forever Guide)
 ADDON_CERTAINTY = "suppose"  # addon : relevé de la communauté ou de son auteur
 RECORD_CERTAINTY = "probable"  # relevé en jeu du joueur (QuestieForeverDB)
 # Champs de `questKeys` lus dans la base Classic de Questie (positions lues dans l'en-tête du fichier).
@@ -225,6 +228,8 @@ def source_files(addons_dir: Path, wtf_dir: Path | None) -> list[Path]:
         *(addons_dir / a / f for a, f in (*COMPLETO, *JOURNEYS, NAOWH_DJ, GUIDE, FDJ_REWARDS, FDJ_DUNGEONS)),
         addons_dir / GUIDE[0] / GUIDE_DALARAN,
         addons_dir / GUIDE[0] / GUIDE_CHAINS,
+        addons_dir / GUIDE[0] / GUIDE_CLASS,
+        addons_dir / GUIDE[0] / GUIDE_SEARCH,
         addons_dir / DISCOVERY / COMPLETO_BOOKS,
         addons_dir / NAOWH_DJ[0] / NAOWH_DJ_CHAINS,
         addons_dir / FDJ_REWARDS[0] / FDJ_CHAINS,
@@ -768,7 +773,67 @@ def read_forever_guide(addons_dir: Path) -> SourceQuests | None:
     if chains.is_file():
         files.append(chains)
         _read_guide_chains(chains, quests)
+    files += _read_guide_classes(addon, quests)
     return SourceQuests(_info("forever_guide", addon, _version(addon), files), quests, [])
+
+
+def _guide_npcs(text: str, wanted: set[int]) -> dict[int, dict[str, Any]]:
+    """PNJ au format de `ns.SI_NPC` (`nomRU\tnomEN\tniv\tniv\t?\tcarte\tx\ty…`) parmi `wanted` : nom anglais et
+    position (carte de l'interface) ; sans position, le nom seul."""
+    out: dict[int, dict[str, Any]] = {}
+    for m in _GUIDE_NPC.finditer(text):
+        npc = int(m[1])
+        if npc not in wanted:
+            continue
+        cols = m[2].split("\t")
+        name = cols[1] if len(cols) > 1 and cols[1] else None
+        try:
+            map_id, x, y = int(cols[5]), float(cols[6]), float(cols[7])
+        except (IndexError, ValueError):
+            map_id, x, y = None, None, None
+        place = _place(name, map_id if map_id else None, x, y, npc)
+        if place:
+            out[npc] = place
+    return out
+
+
+def _read_guide_classes(addon: Path, quests: dict[int, Facts]) -> list[Path]:
+    """Quêtes de classe de Forever Guide (`ClassData.lua`, `ns.CLASS_Q`) : nom, niveaux, classes, races et camp,
+    donneur (`s`, un PNJ ; une quête commencée par un objet n'en a pas), rendu (`e`), suite (`nx`) ; PNJ de
+    `ns.CLASS_NPC`, puis de `ns.SI_NPC`. `pre` n'est pas repris (liste sans distinction « toutes » ou « une parmi »).
+    Un champ déjà lu dans `ns.DQ` n'est pas remplacé. Rend les fichiers lus."""
+    path = addon / GUIDE_CLASS
+    if not path.is_file():
+        return []
+    text = _read(path)
+    rows = _fields(_table_after(text, "ns.CLASS_Q = ", path))
+    wanted = {n for row in rows.values() for k in ("s", "e") if isinstance(n := _fields(row).get(k), int)}
+    npcs = _guide_npcs(text, wanted)
+    files = [path]
+    search = addon / GUIDE_SEARCH
+    if wanted - set(npcs) and search.is_file():
+        files.append(search)
+        npcs.update(_guide_npcs(_read(search), wanted - set(npcs)))
+    for quest_id, row in rows.items():
+        f = _fields(row)
+        if not isinstance(quest_id, int) or not isinstance(f.get("c"), int) or not f["c"]:
+            continue
+        facts: Facts = {"name": f.get("n"), "classes": f["c"]}
+        for key, field in (("level", "lv"), ("min_level", "rl"), ("next", "nx")):
+            if isinstance(f.get(field), int):
+                facts[key] = f[field]
+        if isinstance(f.get("ra"), int) and f["ra"]:
+            facts["races"] = f["ra"]
+            facts["faction"] = _faction_of_races(f["ra"])
+        for key, field in (("giver", "s"), ("turn_in", "e")):
+            npc = f.get(field)
+            if isinstance(npc, int):
+                facts[key] = npcs.get(npc, {"npc": npc})
+        current = quests.setdefault(quest_id, {})
+        for key, v in facts.items():
+            if v is not None:
+                current.setdefault(key, v)
+    return files
 
 
 GUIDE_FACTIONS = {"Alliance": "alliance", "Horde": "horde"}
