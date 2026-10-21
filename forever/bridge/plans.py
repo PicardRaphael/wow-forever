@@ -134,6 +134,8 @@ def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
     if r.faction in ("horde", "alliance"):
         zones["faction"] = r.faction
     zones["limit"] = 5
+    if r.class_name:
+        zones["class_name"] = r.class_name  # classe du personnage connecté (plus le Mage par défaut)
     head = (
         "Zones et quêtes : les trois premières zones du résultat de zones, dans l'ordre rendu, avec leur nombre de "
         "quêtes utiles ; prochain donjon : le premier donjon rendu (`dungeons`)."

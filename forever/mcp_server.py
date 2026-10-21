@@ -239,7 +239,7 @@ def build_server(deps: Deps) -> MCPServer:
                 )
             if kind == "zones":
                 path = Path(questie) if questie else None
-                return dict(lookup_zones(deps, level, faction=faction, questie_dir=path))
+                return dict(lookup_zones(deps, level, faction=faction, questie_dir=path, player_class=class_name))
             if kind == "talent":
                 if not name:
                     raise InvalidArgumentError("Nom du talent manquant.", "donner name (nom anglais ou clé du talent)")

@@ -300,7 +300,12 @@ class ZoneLookup(ZoneAdvice):
 
 
 def lookup_zones(
-    deps: Deps, level: int | None, *, faction: str | None = None, questie_dir: Path | None = None
+    deps: Deps,
+    level: int | None,
+    *,
+    faction: str | None = None,
+    questie_dir: Path | None = None,
+    player_class: str | None = None,
 ) -> ZoneLookup:
     """Zones et donjons adaptés au niveau (base Questie lue sur disque, jamais par le réseau), avec la provenance ;
     InvalidArgumentError (code 2) si le niveau manque ou sort des bornes, si la faction est inconnue ou si l'addon
@@ -322,7 +327,12 @@ def lookup_zones(
             "donner --questie <Interface/AddOns/Questie> ou définir FOREVER_WOW_DIR",
         )
     try:
-        advice = zones_for_level(read_questie(questie_dir), build_game_data(data), level, faction=faction)
+        from forever.profile import normalize_class
+
+        cls = normalize_class(player_class).lower() if player_class else "mage"  # classe du personnage connecté
+        advice = zones_for_level(
+            read_questie(questie_dir), build_game_data(data), level, faction=faction, player_class=cls
+        )
     except ValueError as exc:
         raise InvalidArgumentError(f"{exc}.", "choisir --faction horde ou alliance") from exc
     fresh = freshness_for_version(deps, data.game_version, allow_network=False)

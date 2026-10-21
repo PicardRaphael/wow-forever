@@ -178,7 +178,13 @@ def test_leveling_plan_zones_and_next_point(bench):
     deps, data = bench
     plan = button_plan("leveling", resolve(data, context("mage19")), data.level_cap)
     assert [c.tool for c in plan.calls] == ["forever_lookup", "forever_build", "forever_sim_leveling"]
-    assert plan.calls[0].args == {"kind": "zones", "level": 19, "faction": "horde", "limit": 5}
+    assert plan.calls[0].args == {
+        "kind": "zones",
+        "level": 19,
+        "faction": "horde",
+        "limit": 5,
+        "class_name": "Mage",
+    }  # classe du personnage connecté
     assert plan.calls[1].args["level"] == 20
     zones = run_calls(deps, type(plan)(plan.button, plan.calls[:1], plan.read, plan.link))[0]
     assert "error" not in zones and zones["provenance"]["game_version"]
