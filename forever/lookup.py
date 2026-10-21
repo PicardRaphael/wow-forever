@@ -565,8 +565,10 @@ def lookup_profession(deps: Deps, profession: str, *, rank: int) -> dict[str, An
             continue
         rows.append({"spell_id": spell, "name": r["name"], "color": color, "thresholds": list(r["thresholds"])})
     rows.sort(key=lambda x: (x["color"] != "orange", -x["thresholds"][1], x["name"]))
-    seen: set[str] = set()
-    rows = [r for r in rows if not (r["name"] in seen or seen.add(r["name"]))]  # variantes de même nom : une ligne
+    unique: dict[str, dict[str, Any]] = {}
+    for r in rows:  # variantes de même nom : une ligne, la première dans l'ordre ci-dessus
+        unique.setdefault(r["name"], r)
+    rows = list(unique.values())
     build = data["build"]
     status = "à jour" if build == version else ("en retard" if build else "inconnue")
     detail = [] if status == "à jour" else [f"données de SkillUp tirées du build {build or '?'}, jeu {version}"]
