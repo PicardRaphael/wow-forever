@@ -285,3 +285,15 @@ def test_cli_decode_with_hotfixes(tmp_path, make_deps, capsys):
     assert code == 0, text
     assert "correctif" in text and "112347" in text
     assert "hotfixes" in read_json(out / FIXTURE_VERSION / "sources.json")
+
+
+def test_target_auras_are_marked_by_the_hotfixes_of_their_spells():
+    """HF2 (70450 r8) : une aura posée par un talent (`spell_scaling.json` `auras`, Winter's Chill) est une entité des
+    correctifs : son sort et le sort du talent qui la pose ; une valeur qui en vient (part par cumul, part de la
+    puissance des sorts) porte alors l'origine `correctif_serveur`, plafonnée comme sa source."""
+    from forever.pipeline.hotfix_overlay import ENTITY_SPECS, _walk, entity_ids
+
+    doc = {"auras": {"wc": {"spell_id": 900001, "source_spell_id": 900002, "pct_per_stack": 1}}}
+    found = [path for pattern in ENTITY_SPECS["spell_scaling.json"] for path, _ in _walk(doc, pattern)]
+    assert ("auras", "wc") in found
+    assert entity_ids(doc["auras"]["wc"]).spells == {900001, 900002}
