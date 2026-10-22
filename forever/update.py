@@ -337,17 +337,25 @@ def decide(
     return Verdict(action, clauses, reasons, notes)
 
 
-def dbcache_for_build(deps: Deps, build: int, product: str | None, archived: Path | None) -> Path | None:
+def dbcache_for_build(
+    deps: Deps, build: int, product: str | None, archived: Path | None, *, notes: list[str] | None = None
+) -> Path | None:
     """`DBCache.bin` des correctifs d'un build : celui du jeu archivé d'abord ; sinon le cache vérifié le plus récent
     de Raidbots, lu en lecture seule et épinglé (décision 290, certitude au plus `probable`) ; None si Raidbots est
-    injoignable ou n'a pas ce build."""
+    injoignable (délai des requêtes : `FETCH_TIMEOUT`, téléchargement `raidbots.DOWNLOAD_TIMEOUT`) ou n'a pas ce
+    build, la raison ajoutée à `notes`."""
     if archived is not None:
         return archived
     from forever.pipeline import raidbots
 
     try:
         return raidbots.fetch_dbcache(deps, build, product or "wow_classic_beta")
-    except ForeverError:
+    except ForeverError as exc:
+        if notes is not None and exc.code != "offline":
+            unreachable = isinstance(exc, FetchFailedError) and "injoignable" in exc.message
+            notes.append(
+                exc.message if unreachable else f"Raidbots sans cache vérifié du build {build} ({exc.message})"
+            )
         return None
 
 
@@ -1106,7 +1114,10 @@ def _step_new_version(run: _Run, target: str | None) -> Step:
         return Step("nouvelle_version", "rien", "aucune version à installer", {})
     product = run.client.product if run.client is not None else None  # LN1 : archives du produit lu
     archive = archived_dbcache(run.deps.cache_dir, _build_number(target), product=product)
-    archive = dbcache_for_build(run.deps, int(_build_number(target)), product, archive)  # décision 290 : Raidbots
+    raidbots: list[str] = []
+    archive = dbcache_for_build(run.deps, int(_build_number(target)), product, archive, notes=raidbots)  # décision 290
+    for note in raidbots:
+        run.say(f"nouvelle_version : {note}")
     seen = _first_seen(run, target)
     gate = hotfix_gate(archive is not None, seen, run.deps.now(), UPDATE_HOTFIX_WAIT)
     if gate == "attendre":
@@ -1384,7 +1395,10 @@ def _step_hotfixes(run: _Run) -> Step:
     if version not in installed_versions(run.base_data):
         return Step("correctifs", "rien", f"version du client {version} non installée", {})
     archive = archived_dbcache(run.deps.cache_dir, _build_number(version), product=client.product)
-    archive = dbcache_for_build(run.deps, int(_build_number(version)), client.product, archive)  # décision 290
+    raidbots: list[str] = []
+    archive = dbcache_for_build(run.deps, int(_build_number(version)), client.product, archive, notes=raidbots)
+    for note in raidbots:
+        run.say(f"correctifs : {note}")
     rules = _rules(run.base_data)
     sources = read_sources(run.base_data, version) or {}
     absent = [str(n) for n in sources.get("missing_names") or []]
@@ -1394,7 +1408,8 @@ def _step_hotfixes(run: _Run) -> Step:
             return _names_revision(run, version, rules, None, absent)
         if quest_gap:
             return _quests_revision(run, version, rules, None, quest_gap)
-        return Step("correctifs", "rien", f"aucune archive de DBCache.bin pour {version}", {})
+        why = f" ; {raidbots[0]}" if raidbots else ""
+        return Step("correctifs", "rien", f"aucune archive de DBCache.bin pour {version}{why}", {"raidbots": raidbots})
     pending = hotfixes.pending_hotfixes(dbcache.read_dbcache(archive), sources, rules)
     if not pending:
         if absent:

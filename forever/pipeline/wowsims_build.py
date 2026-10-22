@@ -21,6 +21,7 @@ REPO = "https://github.com/wowsims/forever.git"
 FOLDER = ("third_party", "wowsims")
 PIN_NAME = "pin.json"
 TIMEOUT_S = 1200.0  # compilation et téléchargement des modules (réglage de l'outil)
+GIT_TIMEOUT_S = 120.0  # une commande git du clone superficiel : au-delà, GitHub est tenu pour injoignable
 _PROTOBUF = re.compile(r"google\.golang\.org/protobuf\s+(v[0-9][^\s]*)")
 
 
@@ -37,7 +38,8 @@ def pinned(cache_dir: Path) -> dict[str, Any] | None:
 
 
 def _out(runner: gitops.Runner, args: list[str], cwd: Path) -> str:
-    return gitops._run(runner, args, cwd, timeout=TIMEOUT_S).stdout.strip()
+    timeout = GIT_TIMEOUT_S if args[0] == "git" else TIMEOUT_S
+    return gitops._run(runner, args, cwd, timeout=timeout).stdout.strip()
 
 
 def update_wowsims(

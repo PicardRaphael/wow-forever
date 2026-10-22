@@ -97,7 +97,13 @@ def subprocess_runner(args: Sequence[str], cwd: Path, timeout: float | None = No
 def _run(
     runner: Runner, args: Sequence[str], cwd: Path, *, timeout: float | None = None, check: bool = True
 ) -> subprocess.CompletedProcess[str]:
-    out = runner(args, cwd, timeout)
+    try:
+        out = runner(args, cwd, timeout)
+    except subprocess.TimeoutExpired as exc:  # source lente ou injoignable : échec nommé, jamais une exception brute
+        raise GitOpsError(
+            f"`{' '.join(args)}` : délai de {timeout or 0:.0f} s dépassé (source injoignable ?)",
+            "nouvel essai au passage suivant ; vérifier la connexion si cela se répète",
+        ) from exc
     if check and out.returncode != 0:
         detail = (out.stderr or out.stdout or "").strip().splitlines()
         text = " ".join(detail)
