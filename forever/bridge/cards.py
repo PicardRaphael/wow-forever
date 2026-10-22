@@ -88,8 +88,10 @@ class CardSource:
         """Carte de test, puis cartes des attentes ouvertes de `forever update` ; chacune porte son empreinte et le
         bouton « Masquer » (décision 240)."""
         from forever.update import list_pending
+        from forever.update_installed import notices
 
         cards = read_selftest_cards(self.cache_dir, now=self.now()) + update_cards(list_pending(self.cache_dir))
+        cards += installed_cards(notices(self.cache_dir))
         if self.profile is not None:
             cards += self.profile.cards()
         return [published(card) for card in cards]
@@ -311,6 +313,35 @@ def update_cards(entries: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "detail": _detail(entry),
                 "count": "approvable" if approvable(entry) else "waiting",
                 "buttons": buttons,
+            }
+        )
+    return cards
+
+
+INSTALLED_SHOWN = 3  # cartes « Mis à jour » publiées, les plus récentes
+
+
+def installed_cards(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Cartes « Mis à jour » (décision 295) : ce que la veille a installé d'elle-même, en mots de joueur, avec
+    « Annuler » (retour à la révision précédente, second clic de confirmation) ; « Masquer » s'ajoute à la
+    publication. Non comptées dans la ligne d'état (rien n'attend le joueur)."""
+    from forever.update_installed import notice_lines, title
+
+    cards = []
+    for record in records[:INSTALLED_SHOWN]:
+        record_id = str(record.get("id"))
+        cards.append(
+            {
+                "id": f"installed-{record_id}",
+                "kind": "update",
+                "title": f"Mis à jour : {title(record)}",
+                "lines": [f"Installé le {_day(record.get('installed_at'))}.", *notice_lines(record)],
+                "detail": f"commit {str(record.get('sha'))[:12]} ; {record.get('undo')}",
+                "count": "info",
+                "buttons": [
+                    {"key": "undo", "label": "Annuler", "action": f"undo:{record_id}", "confirm": True},
+                    {"key": "explain", "label": "Expliquer", "explain": True},
+                ],
             }
         )
     return cards

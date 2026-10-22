@@ -63,7 +63,7 @@ def test_70245_r1_without_dbcache_waits():
 # --- Cas réels ---------------------------------------------------------------------------------------------------
 
 
-def test_70245_r1_after_the_delay_waits_on_lost_hotfixes(tmp_path):
+def test_70245_r1_after_the_delay_is_blocked_on_lost_hotfixes(tmp_path):
     before = mount_warrior(tmp_path / "avant", "70170-r5", "70170-r5")
     after = mount_warrior(tmp_path / "après", "70245-r1", None)
     losses = hotfix_losses(before, after)
@@ -71,7 +71,7 @@ def test_70245_r1_after_the_delay_waits_on_lost_hotfixes(tmp_path):
     assert all(c.origin_before == "correctif_serveur" and c.origin_after != "correctif_serveur" for c in losses)
     assert all(c.pointer.startswith("/classes/Warrior/") for c in losses)
     verdict = decide(True, NO_CARRY, compare_inputs(before, after), "install_version", hotfix_losses=losses)
-    assert verdict.action == "attente"
+    assert verdict.action == "bloqué"  # décision 295 : correctif du serveur non relu, bloqué et dit
     assert failed(verdict) == {"hotfixes"}  # les fiches PvP ne changent que par des valeurs du client
     assert any("correctifs du serveur non relus" in r for r in verdict.reasons)
 

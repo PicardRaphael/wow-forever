@@ -1,12 +1,11 @@
 """Suites des attentes vues en jeu après la remise à zéro du PC (décision 244) :
 
-- garde-fou de la première écriture de `forever update --auto` : levé quand l'historique du dépôt porte déjà une
-  révision écrite par un passage automatique (`revisions.json`, `automated`), même si le cache a été effacé (avant :
-  état du cache seulement, réarmé par la remise à zéro : une mesure sans conseil changé attendait un accord) ;
+- garde-fou de la première écriture de `forever update --auto` : retiré par la décision 295 (test_update_guard.py) ;
 - GitHub CLI absent : l'écriture s'arrête avant toute poussée, avec une raison claire (avant : erreur Windows obscure
   au moment d'attendre la CI, branche déjà poussée) ;
 - cartes « Données d'addon » : ce qui a changé dans l'addon (version, fichiers), les données du dépôt qui en dépendent
-  et pourquoi une session est nécessaire ;
+  et pourquoi une session est nécessaire (rappel, rien n'est bloqué) ; Questie est relu par la veille elle-même
+  (décision 295 : la mesure des journaux lit l'addon) ;
 - `forever update done <id> --note` : une relecture faite en session clôt son attente (`faite`, note gardée).
 
 Données de fixtures, aucun chiffre du jeu."""
@@ -20,45 +19,7 @@ from test_update_chain import DRY, montage, only_verdict  # noqa: F401  (fixture
 from test_update_publish import GAME, Recorder, done, isolated_git, origin  # noqa: F401  (fixtures importées)
 
 from forever.bridge.cards import card_lines, update_cards
-from forever.update import (
-    UpdateOptions,
-    first_write_guard,
-    list_pending,
-    record_pending,
-    run_update,
-    update_dir,
-)
-
-AUTO_DRY = UpdateOptions(auto=True, dry_run=True)
-
-
-# --- garde-fou lu dans l'historique du dépôt ---------------------------------------------------------------------
-
-
-def automated_history(data_dir):
-    """Une révision écrite par un passage automatique dans l'historique du dépôt (dossier d'une ancienne version,
-    hors du manifeste : les données lues par le passage ne changent pas)."""
-    path = data_dir / "1.60.1.10000" / "revisions.json"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    doc = {"schema_version": 1, "revisions": [{"revision": 2, "automated": True}]}
-    path.write_text(json.dumps(doc), encoding="utf-8")
-
-
-def test_the_guard_is_down_when_the_repo_already_holds_an_automated_write(tmp_path):
-    cache, data = tmp_path / "cache", tmp_path / "data"
-    data.mkdir()
-    assert first_write_guard(cache, data) is True
-    automated_history(data)
-    assert first_write_guard(cache, data) is False  # cache vide (remise à zéro du PC) : l'historique suffit
-
-
-def test_an_automatic_write_is_not_held_after_a_cache_reset(montage):  # noqa: F811
-    deps, _ = montage()
-    automated_history(deps.data_dir)
-    verdict = only_verdict(run_update(deps, AUTO_DRY))
-    assert verdict["action"] == "écrire"
-    assert not any("garde-fou" in r for r in verdict.get("reasons", []))
-
+from forever.update import UpdateOptions, list_pending, record_pending, run_update, update_dir
 
 # --- GitHub CLI absent -----------------------------------------------------------------------------------------
 
@@ -114,13 +75,26 @@ def test_addon_card_after_a_reset_says_there_was_no_previous_inventory():
     assert "aucun relevé précédent" in text.lower() and "11.39.0 Forever-v28" in text
 
 
-def test_the_pass_records_what_the_card_needs(make_deps, tmp_path):
+def test_questie_is_read_again_by_the_pass_itself(make_deps, tmp_path):
+    """Décision 295 : Questie changé (ici, premier relevé) relance la mesure des journaux, qui lit l'addon ; aucune
+    attente ni relecture en session."""
     wow = tmp_path / "wow"
     shutil.copytree(FIXTURES / "questie" / "11.38.0", wow / "Interface" / "AddOns" / "Questie")
     deps = make_deps(wow_dir=wow)
     report = run_update(deps, UpdateOptions(only=frozenset({"addons"}), network=False))
+    assert [p for p in report["pending"] if p["kind"] == "addon_data"] == []
+    (found,) = [s for s in report["steps"] if s["name"] == "addons"]
+    assert found["status"] == "fait" and "Questie relu" in found["detail"]
+
+
+def test_the_pass_records_what_the_card_needs(make_deps, tmp_path):
+    wow = tmp_path / "wow"
+    shutil.copytree(FIXTURES / "bestiary" / "ForeverBestiary", wow / "Interface" / "AddOns" / "ForeverBestiary")
+    deps = make_deps(wow_dir=wow)
+    report = run_update(deps, UpdateOptions(only=frozenset({"addons"}), network=False))
     (entry,) = [p for p in report["pending"] if p["kind"] == "addon_data"]
-    assert entry["first"] is True and entry["uses"] and entry["previous_version"] is None
+    assert entry["action"] == "relecture" and entry["first"] is True and entry["uses"]
+    assert entry["previous_version"] is None
 
 
 # --- clôture d'une relecture -----------------------------------------------------------------------------------

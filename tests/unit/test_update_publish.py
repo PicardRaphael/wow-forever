@@ -14,7 +14,8 @@ from test_update_chain import BASE, TARGET, Replay, montage  # noqa: F401 : fixt
 
 from forever.manifest import version_files
 from forever.pipeline.gitops import subprocess_runner
-from forever.update import UpdateOptions, approve, list_pending, record_pending, run_update, update_dir
+from forever.update import UpdateOptions, list_pending, record_pending, run_update, undo, update_dir
+from forever.update_installed import list_installed, load_installed, notices
 
 FORBIDDEN = {"--force", "-f", "--force-with-lease", "--force-if-includes"}
 COEFFICIENT = ("SpellEffect", "116", "EffectBonusCoefficient")
@@ -71,6 +72,18 @@ class Recorder:
 
     def pushes(self):
         return [c for c in self.calls if c[:2] == ["git", "push"]]
+
+
+class TalentReplay:
+    """Rejeu simulé dont le conseil « après » met 3 points dans Frostbite (clé de talent du montage)."""
+
+    def __init__(self):
+        self.calls = []
+
+    def __call__(self, engine, case, data_dir):
+        self.calls.append((engine, case, data_dir))
+        after = TARGET in {p.name for p in data_dir.iterdir()}
+        return {"talents": {"frostbite": 3 if after else 0}, "choices": {}, "alternative": {}}
 
 
 @pytest.fixture(autouse=True)
@@ -145,9 +158,9 @@ def test_a_copied_value_is_installed_alone_with_its_summary(origin):
         deps.cache_dir, {"id": other, "kind": "install_version", "action": "attente", "version": TARGET, "revision": 1}
     )
     report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
-    assert [(v["action"], v["approved"]) for v in report["verdicts"]] == [("écrire", False)]
+    assert [v["action"] for v in report["verdicts"]] == ["écrire"]
     (written,) = report["written"]
-    assert written["approved"] is False and "Warrior" in written["summary"]
+    assert "Warrior" in written["summary"]
     text = git(bare, "show", f"main:docs/research/data-{TARGET}-r1.md")
     assert "## Valeurs changées" in text and "| Warrior | sort Shield Wall |" in text
     assert "## Correctifs du serveur" in text and "sans_correctifs" in text
@@ -155,35 +168,44 @@ def test_a_copied_value_is_installed_alone_with_its_summary(origin):
     assert states == {f"hotfixes-{TARGET}": "faite", other: "périmée"}
 
 
-def test_a_changed_engine_input_is_recorded_and_nothing_is_pushed(origin):
+def test_a_changed_engine_input_is_installed_and_said_in_player_words(origin):
+    """Décision 295 : une entrée de moteur changée s'installe au premier passage, sans accord ; la fiche de
+    l'historique dit ce qui change en mots de joueur (rejeu après l'installation) et porte « Annuler »."""
     montage_, bare = origin
     deps, _ = montage_(change=COEFFICIENT)
-    head = git(bare, "rev-parse", "main")
     rec = Recorder()
-    report = run_update(deps, GAME, runner=rec, replay=Replay())
-    assert [v["action"] for v in report["verdicts"]] == ["attente"]
-    assert rec.commits() == [] and rec.pushes() == []
-    assert git(bare, "rev-parse", "main") == head
-    (entry,) = list_pending(deps.cache_dir)
-    assert entry["state"] == "en_attente" and entry["base"]["origin_main"] == head
+    report = run_update(deps, GAME, runner=rec, replay=TalentReplay())
+    assert [v["action"] for v in report["verdicts"]] == ["écrire"]
+    assert git(bare, "ls-tree", "--name-only", "main", f"forever/data/{TARGET}")
+    assert list_pending(deps.cache_dir) == []
+    (record,) = list_installed(deps.cache_dir)
+    assert record["state"] == "installée" and record["sha"] == git(bare, "rev-parse", "main")
+    assert record["undo"] == f"forever update undo {record['id']}"
+    assert record["replay"] == "fait"
+    assert any(line.endswith(": Frostbite passe de 0 à 3") for line in record["changes"]), record["changes"]
+    assert any("moteurs aux entrées changées" in n for n in record["notes"])
 
 
 @pytest.mark.slow
-def test_an_approved_entry_is_written_by_the_next_run(origin):
+def test_an_install_is_undone_and_not_installed_again(origin):
+    """« Annuler » (décision 295) : `forever update undo <id>` revient à la révision précédente par le clone (revert,
+    CI, fusion) ; la fiche passe à « annulée » et le passage suivant ne réinstalle pas le même contenu."""
     montage_, bare = origin
     deps, _ = montage_(change=COEFFICIENT)
     rec = Recorder()
-    run_update(deps, GAME, runner=rec, replay=Replay())
-    (entry,) = list_pending(deps.cache_dir)
-    spawned = []
-    assert approve(deps, entry["id"], spawn=spawned.append)["state"] == "approuvée"
-    assert len(spawned) == 1
-    report = run_update(deps, GAME, runner=rec, replay=Replay())  # le passage lancé par l'approbation
-    assert [(v["action"], v["approved"]) for v in report["verdicts"]] == [("écrire", True)]
-    assert git(bare, "ls-tree", "--name-only", "main", f"forever/data/{TARGET}")
-    revisions = json.loads(git(bare, "show", f"main:forever/data/{TARGET}/revisions.json"))
-    assert revisions["revisions"][-1]["approval"] == entry["id"]
-    assert list_pending(deps.cache_dir)[0]["state"] == "faite"
+    run_update(deps, GAME, runner=rec, replay=TalentReplay())
+    (record,) = list_installed(deps.cache_dir)
+    out = undo(deps, record["id"], runner=rec)
+    assert out["status"] == "fait", out
+    assert not git(bare, "ls-tree", "--name-only", "main", f"forever/data/{TARGET}")
+    assert git(bare, "log", "-1", "--format=%s", "main").startswith(f"Veille : annulation de {record['id']}")
+    assert git(bare, "branch", "--list", f"data/undo-{record['id']}") == ""
+    assert load_installed(deps.cache_dir, record["id"])["state"] == "annulée"
+    pushes = len(rec.pushes())
+    report = run_update(deps, GAME, runner=rec, replay=TalentReplay())
+    assert "annulée par toi" in next(s for s in report["steps"] if s["name"] == "nouvelle_version")["detail"]
+    assert len(rec.pushes()) == pushes and report["written"] == []
+    assert notices(deps.cache_dir) == []
 
 
 def test_a_red_windows_job_merges_nothing_and_keeps_the_branch(origin):
@@ -230,9 +252,6 @@ def test_the_clone_checks_the_engines_whose_inputs_changed(origin):
     montage_, _bare = origin
     deps, _ = montage_(change=COEFFICIENT)
     rec = Recorder()
-    run_update(deps, GAME, runner=rec, replay=Replay())
-    (entry,) = list_pending(deps.cache_dir)
-    approve(deps, entry["id"], spawn=lambda *a: None)
     run_update(deps, GAME, runner=rec, replay=Replay())
     (check,) = clone_checks(rec)
     engines = check[-1].removeprefix("--engines=").split(",")

@@ -553,7 +553,7 @@ class Bridge:
                 result, text = self._deliver_route(record.context)
             except (OSError, ValueError, KeyError, TypeError) as exc:
                 result, text = "erreur", self._oops("Feuille de route illisible", "feuille de route", exc)
-        elif action in ("update", "approve", "reject") and self.actions is not None:
+        elif action in ("update", "approve", "reject", "undo") and self.actions is not None:
             try:
                 result, text = self.actions.handle(str(action), target)
             except Exception as exc:  # noqa: BLE001 : l'erreur est publiée au joueur

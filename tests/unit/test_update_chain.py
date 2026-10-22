@@ -217,8 +217,9 @@ def test_dry_run_writes_nothing_in_the_data_nor_in_the_pending(montage):
     before = version_files(deps.data_dir / BASE)
     manifest = (deps.data_dir / "manifest.json").read_bytes()
     report = run_update(deps, DRY, replay=Replay())
-    assert report["pending"]  # rendue…
-    assert not (update_dir(deps.cache_dir) / "pending").exists()  # … sans être enregistrée
+    assert only_verdict(report)["action"] == "écrire"  # calculée…
+    assert not (update_dir(deps.cache_dir) / "pending").exists()  # … sans rien enregistrer
+    assert not (update_dir(deps.cache_dir) / "installed").exists()
     assert version_files(deps.data_dir / BASE) == before
     assert (deps.data_dir / "manifest.json").read_bytes() == manifest
     assert not (deps.data_dir / TARGET).exists()
@@ -226,25 +227,26 @@ def test_dry_run_writes_nothing_in_the_data_nor_in_the_pending(montage):
     assert not (update_dir(deps.cache_dir) / "last.json").exists()
 
 
-def test_a_mage_value_changed_by_the_client_waits_with_a_targeted_replay(montage):
+def test_a_mage_value_changed_by_the_client_is_written_with_a_targeted_replay(montage):
+    """Décision 295 : un moteur qui calcule aux entrées changées n'attend plus ; la valeur s'écrit, la note le dit,
+    et le rejeu ciblé (fait après l'installation, ici simulée) dit ce qui change."""
     deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
     replay = Replay()
     report = run_update(deps, DRY, replay=replay)
     verdict = only_verdict(report)
-    assert verdict["action"] == "attente"
+    assert verdict["action"] == "écrire" and verdict["reasons"] == []
     assert {k for k, ok in verdict["clauses"].items() if not ok} == {"inputs"}
+    assert any("moteurs aux entrées changées" in n for n in verdict["notes"])
     assert {e for e, d in verdict["inputs"].items() if not d["identical"]} == MAGE
     changed = [i for i in verdict["inputs"]["mage_build"]["items"] if i["status"] == "différent"]
     assert [(i["file"], i["leaves"]) for i in changed] == [("spell_scaling.json", 1)]
-    assert step(report, "nouvelle_version")["status"] == "attente"
+    assert step(report, "nouvelle_version")["status"] == "fait"
     # rejeu ciblé : chaque cas des deux moteurs du Mage, avant et après, aucun cas des rendements décroissants
     expected = {(e, c) for e in MAGE for c in ENGINES[e].cases}
     assert {(e, c) for e, c, _ in replay.calls} == expected
     assert len(replay.calls) == 2 * len(expected)
     assert set(verdict["replay"]) == MAGE
-    (entry,) = report["pending"]
-    assert entry["kind"] == "install_version" and entry["action"] == "attente"
-    assert entry["id"].startswith(f"{TARGET}-r1-") and entry["clauses"] == verdict["clauses"]
+    assert report["pending"] == []
 
 
 def test_a_warrior_value_changed_by_the_client_writes_alone(montage):
@@ -340,15 +342,17 @@ def replay_sides(replay):
     return versions[0::2], versions[1::2]
 
 
-def test_replay_after_runs_on_the_candidate_version_when_the_install_is_refused(montage):
+def test_a_refused_install_is_blocked_without_replay(montage):
+    """Installation refusée par les règles de fusion : intégrité non garantie, bloquée et dite (décision 295) ; rien
+    n'est rejoué (le rejeu ne sert plus qu'à dire ce qu'une installation a changé)."""
     deps, _ = montage(change=REFUSED_MANA)
     replay = Replay()
     report = run_update(deps, DRY, replay=replay)
     verdict = only_verdict(report)
-    assert verdict["clauses"]["install"] is False and verdict["refused"]
-    before, after = replay_sides(replay)
-    assert before and set(before) == {BASE}
-    assert set(after) == {TARGET} and len(after) == len(before)
+    assert verdict["action"] == "bloqué" and verdict["clauses"]["install"] is False and verdict["refused"]
+    assert replay.calls == []
+    (entry,) = report["pending"]
+    assert entry["action"] == "bloqué" and entry["commands"] == ["session nécessaire"]
 
 
 def test_replay_after_runs_on_the_candidate_version_when_the_install_passes(montage):
@@ -361,7 +365,7 @@ def test_replay_after_runs_on_the_candidate_version_when_the_install_passes(mont
 
 def test_replay_labels_name_two_different_data(montage):
     """Les étiquettes du cache des rejeux nomment la version et l'empreinte des données, jamais un emplacement."""
-    deps, _ = montage(change=REFUSED_MANA)
+    deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
     replay = Replay()
     run_update(deps, DRY, replay=replay)
     (_, _, before), (_, _, after) = replay.calls[:2]
@@ -381,17 +385,19 @@ def test_replay_refuses_to_compare_data_with_themselves(montage):
         check_replay_sides(deps.data_dir, copy)
 
 
-def test_a_replay_on_the_same_data_blocks_the_verdict(montage, monkeypatch):
-    """Si les deux côtés désignent les mêmes données, le passage ne conclut rien : attente bloquée, raison dite."""
+def test_a_replay_on_the_same_data_is_said_without_blocking(montage, monkeypatch):
+    """Si les deux côtés du rejeu désignent les mêmes données, le rejeu ne conclut rien et le dit ; l'installation,
+    qu'il ne décide plus (décision 295), n'est pas bloquée."""
     deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
-    monkeypatch.setattr(
-        update_module, "_replay_after_data", lambda run, stage, candidate, install_ok, plan: run.base_data
-    )
+
+    def same(before, after):
+        raise update_module.SameDataReplayError(update_module.replay_label(before))
+
+    monkeypatch.setattr(update_module, "check_replay_sides", same)
     replay = Replay()
-    report = run_update(deps, DRY, replay=replay)
-    verdict = only_verdict(report)
-    assert verdict["action"] == "bloqué"
-    assert any("mêmes données" in r for r in verdict["reasons"])
+    verdict = only_verdict(run_update(deps, DRY, replay=replay))
+    assert verdict["action"] == "écrire"
+    assert verdict["replay"]["rejoué"] is False and "mêmes données" in verdict["replay"]["raison"]
     assert replay.calls == []
 
 
@@ -469,15 +475,15 @@ def test_cli_json_exit_codes(montage, capsys):
 
     shutil.rmtree(deps.cache_dir / "wago" / TARGET)  # tables relevées au premier passage : jamais retéléchargées
     deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
-    assert main(["update", "--dry-run", "--json", "--only", "jeu"], deps) == EXIT_PENDING
-    assert json.loads(capsys.readouterr().out)["pending"]
+    assert main(["update", "--dry-run", "--json", "--only", "jeu"], deps) == 0  # décision 295 : écrite, sans attente
+    assert json.loads(capsys.readouterr().out)["pending"] == []
 
 
 def test_cli_text_names_the_verdict(montage, capsys):
     deps, _ = montage(change=("SpellEffect", "116", "EffectBonusCoefficient"))
-    assert main(["update", "--dry-run"], deps) == EXIT_PENDING
+    assert main(["update", "--dry-run"], deps) == 0
     out = capsys.readouterr().out
-    assert "attente" in out and TARGET in out and "forever update status" in out
+    assert f"verdict {TARGET} r1 : écrire" in out and "écriture simulée" in out
 
 
 # --- Correctifs du serveur (révision suivante) ----------------------------------------------------------------
@@ -571,13 +577,13 @@ def logs(tmp_path, make_deps, data_copy):
 JOURNALS = UpdateOptions(dry_run=True, only=frozenset({"journaux"}))
 
 
-def test_logs_of_the_installed_version_are_measured_and_wait_when_an_engine_input_changes(logs):
+def test_logs_of_the_installed_version_are_measured_and_never_wait(logs):
     deps = logs([(LOCAL_VERSION, 1)])
     measure = Measure([{"file": "monsters.json", "pointer": "/hp_curve"}])
     report = run_update(deps, JOURNALS, replay=Replay(), measure=measure)
     assert measure.calls == [[LOG.name]]
-    assert step(report, "journaux")["status"] == "attente"
-    assert [e["kind"] for e in report["pending"]] == ["measures"]
+    assert step(report, "journaux")["status"] != "attente"
+    assert report["pending"] == []
 
 
 def test_measures_outside_the_engine_inputs_do_not_wait(logs):
@@ -603,7 +609,7 @@ def test_logs_of_another_version_are_listed_and_never_measured(logs):
 # --- Addons de données ---------------------------------------------------------------------------------------
 
 
-def test_a_changed_addon_with_depends_waits(tmp_path, make_deps):
+def test_a_changed_addon_with_depends_is_a_review_reminder(tmp_path, make_deps):
     """FA1 (décision 209) : Talents Forever n'a plus de `depends` (table reconstruite à chaque appel) ; Forever
     Bestiary (pets.json, pet_rules.json) en a toujours."""
     from forever.addons import addons_status
@@ -620,5 +626,8 @@ def test_a_changed_addon_with_depends_waits(tmp_path, make_deps):
     shutil.rmtree(addons / "ForeverBestiary")
     shutil.copytree(FIXTURES / "bestiary" / "changed" / "ForeverBestiary", addons / "ForeverBestiary")
     report = run_update(deps, UpdateOptions(dry_run=True, only=frozenset({"addons"})), replay=Replay())
-    assert step(report, "addons")["status"] == "attente"
-    assert [(e["kind"], e["addon"]) for e in report["pending"]] == [("addon_data", "ForeverBestiary")]
+    found = step(report, "addons")
+    assert found["status"] == "fait" and "rien n'est bloqué" in found["detail"]  # décision 295 : rappel, sans attente
+    assert [(e["kind"], e["addon"], e["action"]) for e in report["pending"]] == [
+        ("addon_data", "ForeverBestiary", "relecture")
+    ]

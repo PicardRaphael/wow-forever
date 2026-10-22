@@ -1,12 +1,9 @@
-"""Mesures sans accord inutile (décision 230, point 1).
+"""Mesures écrites d'elles-mêmes (décision 230, puis décision 295 : plus d'accord).
 
-- Une mesure des journaux qui change la table des monstres s'écrit seule quand, après rejeu, aucun conseil des builds
-  du Mage ne change (les règles d'écartement des PNJ sont automatiques) ; elle ne crée une attente que si un conseil
-  change, ou si le rejeu n'a rien pu comparer.
-- Une attente approuvée s'écrit au passage suivant (jusqu'ici, rien n'écrivait une mesure approuvée).
-- Une approbation reste valable quand l'attente est remplacée par une version qui ne fait qu'ajouter des journaux sans
-  changer aucun conseil (mêmes cas changés, même conseil après) ; l'attente remplacée passe à « périmée » au lieu de
-  rester « approuvée ».
+- Une mesure des journaux qui change la table des monstres s'écrit toujours : qu'aucun conseil des builds du Mage ne
+  change, qu'un conseil change ou que le rejeu n'ait rien pu comparer ; ce qui change est noté (`notes`) pour la carte
+  « Mis à jour », jamais une attente.
+- Une mesure remplacée par une autre de la même version passe à « périmée ».
 - Une mesure écrite est une révision de la version installée dont `revisions.json` garde les journaux mesurés.
 
 Rejeu et mesure simulés, journaux du dépôt de fixtures ; aucun chiffre du jeu."""
@@ -23,7 +20,6 @@ from forever.update import (
     _measure_revision,
     _revision,
     _written_logs,
-    approve,
     list_pending,
     record_pending,
     run_update,
@@ -67,6 +63,11 @@ def add_log(deps, name):
     shutil.copyfile(LOG, deps.wow_dir / "Logs" / name)
 
 
+def measure_verdict(report):
+    (verdict,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
+    return verdict
+
+
 def test_a_measure_that_changes_no_advice_is_written_alone(logs, tmp_path):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
     # révision installée lue avant le passage : 1 sur main, 2 sur une branche de données qui porte déjà la r2
@@ -76,80 +77,42 @@ def test_a_measure_that_changes_no_advice_is_written_alone(logs, tmp_path):  # n
     assert found["status"] == "fait", found
     assert "écriture simulée" in found["detail"]
     assert report["pending"] == []
-    (verdict,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
-    assert verdict["action"] == "écrire" and verdict["approved"] is False
+    verdict = measure_verdict(report)
+    assert verdict["action"] == "écrire" and verdict["reasons"] == []
     assert verdict["revision"] == installed + 1
 
 
-def test_a_measure_that_changes_an_advice_waits(logs, tmp_path):  # noqa: F811
+def test_a_measure_that_changes_an_advice_is_written_and_noted(logs, tmp_path):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
     report = run_update(deps, JOURNALS, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
-    assert step(report, "journaux")["status"] == "attente"
-    (entry,) = report["pending"]
-    assert entry["kind"] == "measures" and entry["action"] == "attente"
-    assert any("conseil" in r for r in entry["reasons"])
+    assert step(report, "journaux")["status"] == "fait"
+    assert report["pending"] == []
+    verdict = measure_verdict(report)
+    assert verdict["action"] == "écrire" and any("conseil changé" in n for n in verdict["notes"])
 
 
-def test_a_measure_without_replay_waits(logs):  # noqa: F811
+def test_a_measure_without_replay_is_written_too(logs):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
 
     def measure(deps, data_dir, files):  # aucun aperçu : rien n'est comparé
-        return {"changed": [{"file": "monsters.json", "pointer": "/npcs"}]}
+        return {"changed": [{"file": "monsters.json", "pointer": "/npcs"}], "preview": None}
 
     report = run_update(deps, JOURNALS, replay=SameReplay(), measure=measure)
-    assert step(report, "journaux")["status"] == "attente"
+    assert report["pending"] == []
+    assert step(report, "journaux")["status"] != "attente"
 
 
-def test_an_approved_measure_is_written_at_the_next_pass(logs, tmp_path):  # noqa: F811
+def test_a_replaced_measure_is_stale(logs, tmp_path):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
-    first = run_update(deps, RECORDED, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
-    (entry,) = first["pending"]
-    approve(deps, entry["id"], spawn=lambda args: None)
-    report = run_update(deps, JOURNALS, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path / "2"))
-    (verdict,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
-    assert verdict["id"] == entry["id"]
-    assert verdict["action"] == "écrire" and verdict["approved"] is True
-    assert step(report, "journaux")["status"] == "fait"
-
-
-def test_an_approval_survives_a_new_log_that_changes_no_advice(logs, tmp_path):  # noqa: F811
-    deps = logs([(LOCAL_VERSION, 1)])
-    first = run_update(deps, RECORDED, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
-    (old,) = first["pending"]
-    approve(deps, old["id"], spawn=lambda args: None)
-    add_log(deps, "WoWCombatLog-092726_160000.anon.txt")
-    report = run_update(deps, RECORDED, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path / "2"))
-    (verdict,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
-    assert verdict["id"] != old["id"]
-    assert verdict["action"] == "écrire" and verdict["approved"] is True
-    assert verdict["approved_from"] == old["id"]
-    assert measures(deps)[old["id"]]["state"] == "périmée"
-
-
-def test_a_replaced_approval_is_stale_when_an_advice_changes(logs, tmp_path):  # noqa: F811
-    deps = logs([(LOCAL_VERSION, 1)])
-    first = run_update(deps, RECORDED, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
-    (old,) = first["pending"]
-    approve(deps, old["id"], spawn=lambda args: None)
-    add_log(deps, "WoWCombatLog-092726_160000.anon.txt")
-    replay = AfterReplay(deps.data_dir, after="C")  # le même cas change, mais vers un autre conseil
-    report = run_update(deps, RECORDED, replay=replay, measure=PreviewMeasure(tmp_path / "2"))
-    assert step(report, "journaux")["status"] == "attente"
-    (new,) = report["pending"]
+    record_pending(
+        deps.cache_dir,
+        {"id": "measures-x-old", "kind": "measures", "action": "écrire", "version": LOCAL_VERSION, "revision": None,
+         "clauses": {}, "reasons": [], "created_at": "2026-10-09T06:00:00Z"},
+    )  # fmt: skip
+    report = run_update(deps, RECORDED, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
+    new = measure_verdict(report)
     found = measures(deps)
-    assert found[new["id"]]["state"] == "en_attente"
-    assert found[old["id"]]["state"] == "périmée" and new["id"] in found[old["id"]]["stale_reason"]
-
-
-def test_an_unapproved_replaced_measure_is_stale_too(logs, tmp_path):  # noqa: F811
-    deps = logs([(LOCAL_VERSION, 1)])
-    first = run_update(deps, RECORDED, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
-    (old,) = first["pending"]
-    add_log(deps, "WoWCombatLog-092726_160000.anon.txt")
-    report = run_update(deps, RECORDED, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path / "2"))
-    (new,) = report["pending"]
-    found = measures(deps)
-    assert found[old["id"]]["state"] == "périmée" and found[new["id"]]["state"] == "en_attente"
+    assert found["measures-x-old"]["state"] == "périmée" and new["id"] in found["measures-x-old"]["stale_reason"]
 
 
 def test_a_measure_of_a_version_no_longer_installed_is_stale(logs, tmp_path):  # noqa: F811
@@ -159,7 +122,7 @@ def test_a_measure_of_a_version_no_longer_installed_is_stale(logs, tmp_path):  #
         {
             "id": "measures-1.60.1.70000-aaaaaaaaaaaa",
             "kind": "measures",
-            "action": "attente",
+            "action": "écrire",
             "version": "1.60.1.70000",
             "revision": None,
             "clauses": {},
@@ -189,5 +152,5 @@ def test_the_written_measure_is_a_revision_that_keeps_its_logs(tmp_path, data_co
 def test_the_replay_keeps_the_advice_after_for_changed_cases(logs, tmp_path):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
     report = run_update(deps, JOURNALS, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
-    builds = report["pending"][0]["summary"]["measures"]["builds"]
+    builds = measure_verdict(report)["summary"]["measures"]["builds"]
     assert builds["after"] == {f"mage_build:{CHANGED_CASE}": {"talents": "B"}}

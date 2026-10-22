@@ -4,7 +4,8 @@
 - Familiers : les bêtes apprivoisables dont Forever Bestiary ne connaît pas les rangs enseignés sont rendues aussi,
   avec leur famille et les capacités de leur famille lues dans le client ; positions absentes dites ;
 - addons : un passage de `forever update` hors ligne voit un addon dont la version change ; sans inventaire précédent
-  (remise à zéro du PC), un addon dont dépend le dépôt est relu (attente `addon_data`) ;
+  (remise à zéro du PC), un addon dont dépend le dépôt est relu (décision 295 : Questie par la veille elle-même,
+  sans attente) ;
 - banc d'essai : PvP depuis le contexte réel du Chasseur (cible ajoutée au contexte relevé).
 
 Fixtures : `tests/fixtures/bestiary/`, Questie ; aucun chiffre du jeu écrit ici."""
@@ -90,10 +91,9 @@ def addons_pass(deps):
 def test_a_pass_without_previous_inventory_rereads_the_addons_the_repo_depends_on(make_deps, wow):
     deps = make_deps(wow_dir=wow)
     report = addons_pass(deps)
-    names = [p["addon"] for p in report["pending"] if p["kind"] == "addon_data"]
-    assert names == ["Questie"]
-    (entry,) = [p for p in report["pending"] if p["kind"] == "addon_data"]
-    assert "aucun inventaire précédent" in " ".join(entry["reasons"])
+    assert [p for p in report["pending"] if p["kind"] == "addon_data"] == []
+    step = next(s for s in report["steps"] if s["name"] == "addons")
+    assert "Questie relu" in step["detail"]
 
 
 def test_an_offline_pass_sees_a_version_change(make_deps, wow):
@@ -108,7 +108,7 @@ def test_an_offline_pass_sees_a_version_change(make_deps, wow):
     )
     report = addons_pass(deps)
     step = next(s for s in report["steps"] if s["name"] == "addons")
-    assert step["status"] == "attente", step
+    assert step["status"] == "fait", step
     assert [c["name"] for c in step["data"]["changed"]] == ["Questie"]
 
 

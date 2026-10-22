@@ -69,4 +69,5 @@ def test_network_failure_keeps_the_copy_and_does_not_fail_the_pass(make_deps, tm
     deps = make_deps(cache_dir=tmp_path)
     _clone(tmp_path)
     step = update._step_guides(_run(deps, Git(code=128)))
-    assert step.status == "attente" and COMMIT[:12] in step.detail and "passage suivant" in step.detail
+    assert step.status == "rien" and COMMIT[:12] in step.detail and "passage suivant" in step.detail
+    assert "injoignable" in step.detail and step.data["unreachable"] is True

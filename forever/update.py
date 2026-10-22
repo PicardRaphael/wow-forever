@@ -73,6 +73,7 @@ from forever.errors import (
 from forever.pipeline.tables import ColumnNamesError
 from forever.store import current_identity
 from forever.timefmt import format_utc, parse_utc
+from forever.update_installed import save_installed, undone
 
 if TYPE_CHECKING:
     from forever.pipeline.gitops import Runner
@@ -104,10 +105,9 @@ SESSION_KINDS = ("column_names",)
 SELF_CLEARING_KINDS = ("hotfixes_unread", "network")
 AUTO_ORIGINS = frozenset({"client", "correctif_serveur"})  # installation seule d'un moteur qui recopie (décision 207)
 INSTALL_KINDS = ("install_version", "install_revision")
-GUARD_REASON = (
-    "garde-fou : première écriture git de `forever update --auto`, en attente de l'accord de l'utilisateur jusqu'à "
-    "l'approbation d'un premier passage réel"
-)  # attentes qu'aucune approbation ne résout : une édition en session est nécessaire
+LEGACY_REASON = "décision 295 : plus d'accord, la veille installe d'elle-même (annulable)"
+# Addons dont les données du dépôt se relisent d'elles-mêmes (décision 295) : la mesure des journaux lit Questie.
+REMEASURED_ADDONS = ("Questie",)
 KEPT_STATES = ("approuvée", "faite", "rejetée")  # un passage qui recalcule la même attente ne les écrase pas
 HISTORY_KEPT = 30
 # Délai maximal de chaque étape (sonde en jeu H du 2026-10-10) : au-delà, le passage s'arrête proprement (verrou
@@ -907,10 +907,11 @@ def _summary_doc(lines: Mapping[str, Sequence[Any]]) -> dict[str, Any]:
 
 
 def written_text(written: Mapping[str, Any]) -> str:
-    """« 1.60.1.70245 r3 installée seule (fiches PvP : Warrior, …) » : écriture par la règle, sans approbation."""
-    text = f"{written.get('version')} r{written.get('revision')} installée"
-    if written.get("approved") is False:
-        text += " seule"
+    """« 1.60.1.70245 r3 installée seule (fiches PvP : Warrior, …) » : écriture de la veille (décision 295) ;
+    « annulée » pour un retour en arrière (`forever update undo`)."""
+    if written.get("undo"):
+        return f"{written['undo']} annulée : retour à la révision précédente"
+    text = f"{written.get('version')} r{written.get('revision')} installée seule"
     return text + (f" ({written['summary']})" if written.get("summary") else "")
 
 
@@ -926,40 +927,6 @@ def summary_text(summary: Mapping[str, Any] | None) -> str:
     if not isinstance(summary, Mapping):
         return ""
     return " ; ".join(str(s.get("sentence")) for s in summary.values() if isinstance(s, Mapping) and s.get("sentence"))
-
-
-def first_write_guard(cache_dir: Path, data_dir: Path | None = None) -> bool:
-    """Vrai tant qu'aucun passage réel n'a été approuvé : une écriture de `--auto` reste alors en attente
-    (demande de l'utilisateur du 2026-10-06). Levé par l'état du cache, ou par l'historique du dépôt quand une
-    révision y a déjà été écrite par un passage automatique (`automated` dans `revisions.json`) : la remise à zéro
-    du PC efface le cache, pas l'historique (décision 244)."""
-    state = _read(update_dir(cache_dir) / "state.json")
-    if isinstance(state, dict) and state.get("first_write_approved_at"):
-        return False
-    return not (data_dir is not None and automated_history(data_dir))
-
-
-def automated_history(data_dir: Path) -> bool:
-    """Vrai si une version du dépôt porte une révision écrite par `forever update --auto`."""
-    for path in sorted(data_dir.glob("*/revisions.json")):
-        doc = _read(path)
-        revisions = doc.get("revisions") if isinstance(doc, dict) else None
-        if isinstance(revisions, list) and any(isinstance(r, dict) and r.get("automated") for r in revisions):
-            return True
-    return False
-
-
-def _lift_guard(cache_dir: Path, pending_id: str, at: str) -> None:
-    path = update_dir(cache_dir) / "state.json"
-    state = _read(path)
-    state = state if isinstance(state, dict) else {}
-    if not state.get("first_write_approved_at"):
-        _write(path, {**state, "first_write_approved_at": at, "first_write_approved_id": pending_id})
-
-
-def _approved(run: _Run, pending_id: str) -> bool:
-    doc = _read(_pending_path(run.deps.cache_dir, pending_id))
-    return isinstance(doc, dict) and doc.get("state") == "approuvée"
 
 
 def _evaluate(
@@ -1004,46 +971,28 @@ def _evaluate(
     if install_ok and carry.reapplied:
         carry_apply(base_vdir, after, carry)
     inputs = compare_inputs(base_vdir, after)
-    replayed: dict[str, Any] = {}
-    replay_error = None
-    if run.replay is not None and any(not d.identical for d in inputs.values()):
-        after_data = _replay_after_data(run, stage, candidate, install_ok, plan)
-        if after_data is None:
-            replayed = {"rejoué": False, "raison": "aperçu de la version candidate impossible : rejeu non fait"}
-        else:
-            try:
-                check_replay_sides(run.base_data, after_data)
-            except SameDataReplayError as exc:
-                replay_error = exc.message
-                replayed = {"rejoué": False, "raison": exc.message}
-            else:
-                replayed = _replay_sides(run, inputs, run.base_data, after_data, version)
     losses = [] if hotfixes_read else hotfix_losses(base_vdir, after)
     verdict = decide(bool(verify["ok"]), carry, inputs, kind, install_ok=install_ok, hotfix_losses=losses)
     lines = _copied(base_vdir, after, inputs)
     summary = _summary_doc(lines)
     fingerprint = candidate_fingerprint(stage if install_ok else candidate)
     pending_id = f"{version}-r{revision}-{content_fingerprint(after)}"
-    approved = verdict.action == "attente" and _approved(run, pending_id) and replay_error is None
-    action = "écrire" if approved else verdict.action
-    reasons = list(verdict.reasons)
-    if replay_error is not None:  # rien n'a été comparé : le passage ne conclut rien
-        action = "bloqué"
-        reasons.append(replay_error)
-    guarded = action == "écrire" and run.options.auto and first_write_guard(run.deps.cache_dir, run.base_data)
-    if guarded and not _approved(run, pending_id):
-        action = "attente"
-        reasons.append(GUARD_REASON)
+    cancelled = undone(run.deps.cache_dir, pending_id)
+    if cancelled is not None:  # décision 295 : un contenu annulé n'est pas réinstallé ; un contenu nouveau, si
+        when = str(cancelled.get("undone_at") or "")[:10]
+        return Step(
+            step, "rien", f"{version} r{revision} : annulée par toi le {when}, pas réinstallée", {"id": pending_id}
+        )
+    action, reasons = verdict.action, list(verdict.reasons)
     doc = {
         "id": pending_id,
         "kind": kind,
         "version": version,
         "revision": revision,
         "action": action,
-        "rule_action": verdict.action,
-        "approved": approved,
         "clauses": dict(verdict.clauses),
         "reasons": reasons,
+        "notes": list(verdict.notes),
         "verify": {"ok": verify["ok"], "errors": verify.get("errors", [])[:20]},
         "carry": _carry_counts(carry),
         "superseded": [{"file": v.file, "pointer": v.pointer, "after": now} for v, now in carry.superseded],
@@ -1060,12 +1009,15 @@ def _evaluate(
             ],
             "lost_count": len(losses),
         },
-        "replay": replayed,
+        "replay": {},
         "refused": (plan or {}).get("refused", []) if plan else [],
     }
     run.verdicts.append(doc)
     if action == "écrire":
+        changed = any(not d.identical for d in inputs.values())
         if run.options.dry_run:
+            if changed:  # simulation : le rejeu qui suivrait l'installation, sur la préparation
+                doc["replay"] = _replay_after_install(run, doc, inputs, run.base_data, stage, version)
             return Step(step, "fait", f"{version} r{revision} : écriture simulée (règle tenue)", {"id": pending_id})
         if not run.writable:
             return Step(step, "arrêt", f"{version} r{revision} : règle tenue, mais clone non disponible", {})
@@ -1074,9 +1026,18 @@ def _evaluate(
             run.pending.append(blocked)
             why = "; ".join(blocked.get("reasons", []))
             return Step(step, "arrêt", f"{version} r{revision} : déjà bloquée sur ce main ({why})", {"id": pending_id})
-        return _publish(
-            run, step=step, version=version, revision=revision, stage=stage, plan=plan, verdict=doc, lines=lines
-        )
+        before = update_dir(run.deps.cache_dir) / f"before-{version}"  # « avant » du rejeu, que `_publish` remplace
+        if changed and run.replay is not None:
+            _copy_data(run.base_data, before)
+        try:
+            written = _publish(
+                run, step=step, version=version, revision=revision, stage=stage, plan=plan, verdict=doc, lines=lines
+            )
+            if written.status == "fait" and changed and run.replay is not None:
+                doc["replay"] = _replay_after_install(run, doc, inputs, before, stage, version)
+        finally:
+            shutil.rmtree(before, ignore_errors=True)
+        return written
     entry = {
         **{k: doc[k] for k in ("id", "kind", "version", "revision", "action", "clauses", "reasons")},
         "summary": summary,
@@ -1085,83 +1046,53 @@ def _evaluate(
         "staged": str(stage if install_ok else candidate),
         "staged_sha": fingerprint,
         "candidate": str(candidate),
-        "replay": replayed,
         "base": {
             "origin_main": run.origin_main,
             "version": installed,
             "revision": _revision(run.base_data, installed),
             "client_build": getattr(run.client, "build", None),
         },
-        "commands": [f"forever update approve {pending_id}"] if action == "attente" else ["session nécessaire"],
+        "commands": ["session nécessaire"],
     }
     run.pending.append(entry)
-    status = "attente" if action == "attente" else "arrêt"
-    return Step(step, status, f"{version} r{revision} : {action} ({'; '.join(reasons)})", {"id": pending_id})
+    return Step(step, "arrêt", f"{version} r{revision} : bloqué ({'; '.join(reasons)})", {"id": pending_id})
 
 
-def preview_changes(refused: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]] | None:
-    """Écarts refusés acceptés dans l'aperçu du rejeu (copie seulement) : champ modifié d'un talent ou d'un sort,
-    talent ou sort ajouté, talent retiré (depuis 70450) ; None si un écart ne peut pas s'appliquer (sort retiré,
-    autre fichier)."""
-    kinds = {"talents.json": "talent", "spells.json": "spell"}
-    out: list[dict[str, Any]] = []
-    for r in refused:
-        kind = kinds.get(str(r["file"]))
-        if kind is None:
-            return None
-        path = str(r["path"])
-        if "." in path:
-            key, field = path.split(".", 1)
-            change = {"key": key, "change": "modified", "field": field, "old": r["before"], "new": r["after"]}
-        elif r["before"] is None:
-            change = {"key": path, "change": "added", "field": None, "old": None, "new": path}
-        elif r["after"] is None and kind == "talent":
-            change = {"key": path, "change": "removed", "field": None, "old": path, "new": None}
-        else:
-            return None
-        out.append({"kind": kind, **change, "nature": "client",
-                    "decision": "aperçu du rejeu de forever update (écart refusé, accepté dans l'aperçu seulement)"})  # fmt: skip
-    return out
-
-
-def _replay_after_data(
-    run: _Run, stage: Path, candidate: Path, install_ok: bool, plan: Mapping[str, Any] | None
-) -> Path | None:
-    """Données du côté « après » du rejeu : la copie de préparation où la candidate est installée ; si les règles de
-    fusion l'ont refusée, un aperçu à côté, où les écarts refusés sont acceptés comme ils le seraient après l'accord de
-    l'utilisateur (`confirmed_changes.json` de la copie seulement). None si l'aperçu est impossible (talent ou sort
-    retiré : la fusion ne sait pas l'appliquer)."""
-    if install_ok:
-        return stage
-    if not plan or not plan.get("refused"):
-        return None
-    from forever.manifest import write_manifest
-    from forever.pipeline.install import InstallRefusedError, apply_install
-
-    changes = preview_changes(plan["refused"])
-    if changes is None:
-        return None
-    preview = stage.parent / "apercu"
-    if preview.exists():
-        shutil.rmtree(preview)
-    shutil.copytree(stage, preview)
-    confirmed_path = preview / str(plan["version_from"]) / "confirmed_changes.json"
-    confirmed = _read(confirmed_path)
-    if not isinstance(confirmed, dict):
-        return None
-    _write(confirmed_path, {**confirmed, "changes": [*confirmed.get("changes", []), *changes]})
-    write_manifest(preview)
+def _talent_names_of(run: _Run, data_dir: Path) -> dict[str, str]:
+    """Clé de talent → nom en jeu, lus dans les données `data_dir` (vide si illisibles)."""
     try:
-        apply_install(
-            run.deps_on(preview),
-            str(candidate),
-            motif="aperçu du rejeu",
-            new_version=bool(plan.get("new_version")),
-            date=run.now[:10],
-        )
-    except (InstallRefusedError, InvalidArgumentError):
-        return None
-    return preview
+        from forever.gamedata import build_game_data
+        from forever.store import load_version
+
+        gd = build_game_data(load_version(run.deps_on(data_dir)))
+    except Exception:  # noqa: BLE001 : les noms ne sont qu'un habillage, la clé reste lisible
+        return {}
+    return {k: t.name for k, t in gd.talents.items()}
+
+
+def _replay_after_install(
+    run: _Run, doc: dict[str, Any], inputs: Mapping[str, InputsDiff], before: Path, after: Path, version: str
+) -> dict[str, Any]:
+    """Rejeu ciblé fait **après** l'installation (décision 295) : il ne décide plus rien, il dit ce qui a changé en
+    mots de joueur. La fiche de l'installation (`installed/<id>.json`) reçoit les phrases ; un rejeu en échec le
+    dit sans rien défaire."""
+    from forever.update_installed import advice_changes, update_installed
+
+    try:
+        check_replay_sides(before, after)
+        replayed = _replay_sides(run, inputs, before, after, version)
+        changes = advice_changes(replayed, _talent_names_of(run, after))
+        state = "fait" if changes else "aucun changement"
+    except SameDataReplayError as exc:
+        replayed, changes, state = {"rejoué": False, "raison": exc.message}, [], f"non fait : {exc.message}"
+    except Exception as exc:  # noqa: BLE001 : l'installation est faite, un rejeu en échec ne la défait pas
+        why = f"{type(exc).__name__}: {exc}"
+        replayed, changes, state = {"rejoué": False, "raison": why}, [], f"non fait : {why}"
+    if not run.options.dry_run:
+        with contextlib.suppress(InvalidArgumentError):
+            update_installed(run.deps.cache_dir, str(doc["id"]), changes=changes, replay=state)
+    doc["changes"] = changes
+    return replayed if isinstance(replayed, dict) else {"rejoué": True, "cas": replayed}
 
 
 def _step_new_version(run: _Run, target: str | None) -> Step:
@@ -1625,14 +1556,17 @@ def _written_logs(cache_dir: Path, data_dir: Path, version: str) -> dict[str, se
     return done
 
 
-def _step_logs(run: _Run) -> Step:
+def _step_logs(run: _Run, *, trigger: str | None = None) -> Step:
+    """Journaux de combat de la version installée mesurés (décision 230), écrits d'eux-mêmes (décision 295).
+    `trigger` (addon relu, ex. « Questie 11.39.0 ») : tous les journaux de la version sont remesurés, déjà mesurés
+    compris, car la mesure lit l'addon (corrections de Questie) ; l'identifiant de la mesure porte le déclencheur."""
     from forever.installs import product_of
     from forever.pipeline.client_builds import current_builds, split_by_version
     from forever.pipeline.combatlog import log_files
     from forever.pipeline.live_logs import split_live
     from forever.store import read_sources
 
-    if not run.wants("journaux"):
+    if not run.wants("journaux") and trigger is None:
         return Step("journaux", "rien", "non demandé (--only)", {})
     wow = run.deps.wow_dir
     installed = _installed(run.base_data)
@@ -1652,7 +1586,7 @@ def _step_logs(run: _Run) -> Step:
     )
     done = _written_logs(run.deps.cache_dir, run.base_data, installed)
     shas = {p.name: _sha256(p) for p in files if p.name in keep}
-    fresh = [p for p in files if p.name in shas and shas[p.name] not in done.get(p.name, set())]
+    fresh = [p for p in files if p.name in shas and (trigger or shas[p.name] not in done.get(p.name, set()))]
     keep = [p.name for p in fresh]
     data: dict[str, Any] = {
         "held_back": [h._asdict() for h in held],
@@ -1678,46 +1612,35 @@ def _step_logs(run: _Run) -> Step:
             f"{len(keep)} journal(aux) mesuré(s), aucune entrée des moteurs changée{held_note}",
             data,
         )
-    digest = hashlib.sha256("\n".join(f"{n}:{shas[n]}" for n in sorted(keep)).encode("utf-8")).hexdigest()[:12]
+    lines = [f"{n}:{shas[n]}" for n in sorted(keep)] + ([f"addon:{trigger}"] if trigger else [])
+    digest = hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()[:12]
     pending_id = f"measures-{installed}-{digest}"
     rebuilt = _measure_builds(run, pending_id, installed, result)
     summary = measure_summary(result.get("details") or {}, result.get("hp_by_level") or {}, rebuilt)
-    no_change = _no_advice_change(rebuilt)
-    approved = _approved(run, pending_id)
-    approved_from = None if approved or no_change else _carried_approval(run, installed, keep, rebuilt)
+    if undone(run.deps.cache_dir, pending_id) is not None:
+        return Step("journaux", "rien", f"mesure {pending_id} annulée par toi : pas réécrite", data)
     entry: dict[str, Any] = {
         "id": pending_id,
         "kind": "measures",
-        "action": "attente",
+        "action": "écrire",
         "version": installed,
         "revision": None,
-        "clauses": {"inputs": False, "advice": no_change},
-        "reasons": [f"mesure des journaux qui change une entrée des moteurs : {touched}", _advice_reason(rebuilt)],
+        "clauses": {"inputs": False, "advice": _no_advice_change(rebuilt)},
+        "reasons": [],
+        "notes": [f"mesure des journaux qui change une entrée des moteurs : {touched}", _advice_reason(rebuilt)],
         "summary": summary,
         "logs": keep,
         "log_shas": {n: shas[n] for n in keep},
         "created_at": run.now,
         "base": {"origin_main": run.origin_main, "version": installed},
-        "commands": [f"forever update approve {pending_id}"],
     }
     _replace_measures(run, installed, pending_id)
-    if no_change and not approved and run.options.auto and first_write_guard(run.deps.cache_dir, run.base_data):
-        no_change = False  # garde-fou de la décision 184 : première écriture de --auto sur accord
-        entry["reasons"].append(GUARD_REASON)
-    if no_change or approved or approved_from is not None:
-        if approved_from is not None and not run.options.dry_run:
-            _record_carried(run, entry, approved_from)
-        written = _write_measure(
-            run, entry, result, approved=approved or approved_from is not None, approved_from=approved_from
-        )
-        return written._replace(data={**data, **written.data})
-    run.pending.append(entry)
-    return Step(
-        "journaux",
-        "attente",
-        f"{len(keep)} journal(aux) mesuré(s) : {_advice_reason(rebuilt)}{held_note}",
-        data,
-    )
+    if not result.get("preview"):
+        return Step("journaux", "arrêt", f"mesure {pending_id} sans copie des données mesurées : rien à écrire", data)
+    written = _write_measure(run, entry, result)
+    if held_note:
+        written = written._replace(detail=written.detail + held_note)
+    return written._replace(data={**data, **written.data})
 
 
 def _no_advice_change(builds: Mapping[str, Any]) -> bool:
@@ -1734,27 +1657,6 @@ def _advice_reason(builds: Mapping[str, Any]) -> str:
     if changed:
         return f"conseil changé après rejeu : {', '.join(changed)}"
     return "aucun conseil ne change après rejeu"
-
-
-def _advice_signature(builds: Mapping[str, Any]) -> tuple[Any, ...]:
-    changed = sorted(f"{c['engine']}:{c['case']}" for c in builds.get("changed") or [])
-    after = builds.get("after") or {}
-    return tuple((key, json.dumps(after.get(key), sort_keys=True, ensure_ascii=False)) for key in changed)
-
-
-def _carried_approval(run: _Run, installed: str, logs: Sequence[str], builds: Mapping[str, Any]) -> str | None:
-    """Attente de mesure approuvée de la même version que celle-ci remplace sans changer aucun conseil (décision 230) :
-    ses journaux sont tous repris, les mêmes cas changent vers le même conseil. Rend son identifiant, sinon None."""
-    if not builds.get("replayed"):
-        return None
-    mine = _advice_signature(builds)
-    for old in list_pending(run.deps.cache_dir):
-        if old.get("kind") != "measures" or old.get("state") != "approuvée" or old.get("version") != installed:
-            continue
-        kept = ((old.get("summary") or {}).get("measures") or {}).get("builds") or {}
-        if set(old.get("logs") or []) <= set(logs) and kept.get("replayed") and _advice_signature(kept) == mine:
-            return str(old["id"])
-    return None
 
 
 def _replace_measures(run: _Run, installed: str, pending_id: str) -> None:
@@ -1776,15 +1678,6 @@ def _close_stale_measures(run: _Run, installed: str) -> None:
     for old in list_pending(run.deps.cache_dir):
         if old.get("kind") == "measures" and old.get("state") in OPEN_STATES and old.get("version") != installed:
             _set_state(run.deps.cache_dir, str(old["id"]), "périmée", stale_reason=f"version installée : {installed}")
-
-
-def _record_carried(run: _Run, entry: Mapping[str, Any], approved_from: str) -> None:
-    """Attente qui reprend l'approbation d'une attente remplacée sans changement de conseil : enregistrée
-    `approuvée` (écrite à ce passage, ou au suivant si l'écriture n'aboutit pas)."""
-    _write(
-        _pending_path(run.deps.cache_dir, str(entry["id"])),
-        {**entry, "state": "approuvée", "approved_at": run.now, "approved_from": approved_from},
-    )
 
 
 def _measure_revision(data: Path, version: str, logs: Mapping[str, str], *, date: str, command: str) -> int:
@@ -1831,16 +1724,13 @@ def _measure_report(verdict: Mapping[str, Any]) -> str:
             f"{_advice_reason(builds)}."
         ),
         "",
-        "Règle d'automatisme : "
-        + (f"approuvée ({verdict.get('approved_from') or verdict['id']})." if verdict.get("approved") else "tenue."),
+        "Règle d'automatisme : tenue (décision 295 : installée d'elle-même, annulable).",
         "",
     ]
     return "\n".join(lines)
 
 
-def _write_measure(
-    run: _Run, entry: Mapping[str, Any], result: Mapping[str, Any], *, approved: bool, approved_from: str | None
-) -> Step:
+def _write_measure(run: _Run, entry: Mapping[str, Any], result: Mapping[str, Any]) -> Step:
     """Écrit la mesure (décision 230) : la copie où elle est écrite (`preview`) devient une révision de la version
     installée, publiée comme une version par le clone (vérification des données, CI, fusion)."""
     version = str(entry["version"])
@@ -1851,11 +1741,9 @@ def _write_measure(
         **{k: entry[k] for k in ("id", "kind", "version", "logs", "summary")},
         "revision": revision,
         "action": "écrire",
-        "rule_action": "écrire" if not approved else "attente",
-        "approved": approved,
-        "approved_from": approved_from,
         "clauses": dict(entry["clauses"]),
-        "reasons": list(entry["reasons"]),
+        "reasons": [],
+        "notes": list(entry["notes"]),
         "carry": {},
         "superseded": [],
         "inputs": _inputs_doc(inputs),
@@ -1881,9 +1769,7 @@ def _write_measure(
 
 
 def _rule(doc: Mapping[str, Any]) -> str:
-    if doc.get("approved"):
-        return f"approuvée ({doc.get('approved_from') or doc['id']})"
-    return "aucun conseil ne change, règle tenue"
+    return "règle tenue" if doc.get("clauses", {}).get("advice") else "conseil changé, règle tenue (décision 295)"
 
 
 def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[str, Any]) -> dict[str, Any]:
@@ -2042,15 +1928,21 @@ def _step_addons(run: _Run) -> Step:
     report = addons_status(run.deps, save=not run.options.dry_run)
     changed = [a for a in report["addons"] if a.get("status") in ("changé", "nouveau")]
     proposals = [u for u in report.get("untracked", []) if u.get("status") == "non_inventorié"]
+    remeasured: list[str] = []
     for addon in changed:
         proposal = addon.get("proposal")
         if not proposal or proposal.get("kind") != "addon_data":
+            continue
+        if addon["name"] in REMEASURED_ADDONS:  # décision 295 : relu d'elle-même par la veille
+            trigger = f"{addon['name']} {addon.get('version') or str(addon.get('fingerprint'))[:12]}"
+            done = _step_logs(run, trigger=trigger)
+            remeasured.append(f"{addon['name']} relu ({done.status} : {done.detail})")
             continue
         run.pending.append(
             {
                 "id": f"addon-{addon['name']}-{str(addon.get('fingerprint'))[:12]}",
                 "kind": "addon_data",
-                "action": "attente",
+                "action": "relecture",  # rappel d'une relecture en session : n'attend aucun accord, ne bloque rien
                 "addon": addon["name"],
                 "version": addon.get("version"),
                 "revision": None,
@@ -2073,12 +1965,16 @@ def _step_addons(run: _Run) -> Step:
     data = {
         "changed": [{"name": a["name"], "status": a["status"], "version": a.get("version")} for a in changed],
         "untracked": proposals,
+        "remeasured": remeasured,
     }
-    waiting = sum(1 for p in run.pending if p["kind"] == "addon_data")
-    if waiting:
-        return Step("addons", "attente", f"{waiting} addon(s) dont dépend le dépôt ont changé", data)
+    review = sum(1 for p in run.pending if p["kind"] == "addon_data")
     if changed or proposals:
-        return Step("addons", "fait", f"{len(changed)} addon(s) changé(s), {len(proposals)} à inventorier", data)
+        detail = f"{len(changed)} addon(s) changé(s), {len(proposals)} à inventorier"
+        if remeasured:
+            detail += " ; " + " ; ".join(remeasured)
+        if review:
+            detail += f" ; {review} relecture(s) en session signalée(s), rien n'est bloqué"
+        return Step("addons", "fait", detail, data)
     return Step("addons", "rien", "aucun addon changé", data)
 
 
@@ -2109,10 +2005,10 @@ def _step_guides(run: _Run) -> Step:
         update_polestar(run.deps.cache_dir, run=git)
     except gitops.GitOpsError as exc:
         detail = (
-            f"Polestar non mis à jour ({exc.message}) : copie du commit {_short(before)} gardée, nouvel essai au "
+            f"Polestar injoignable ({exc.message}) : copie du commit {_short(before)} gardée, nouvel essai au "
             "passage suivant"
         )
-        return Step("guides", "attente", detail, {"commit": before})
+        return Step("guides", "rien", detail, {"commit": before, "unreachable": True})
     after = polestar_commit(clone)
     moved = "inchangé" if after == before else f"{_short(before)} → {_short(after)}"
     return Step("guides", "fait", f"guides de Polestar à jour : commit {_short(after)} ({moved})", {"commit": after})
@@ -2140,10 +2036,10 @@ def _step_simulators(run: _Run) -> Step:
         new = wowsims_build.update_wowsims(run.deps.cache_dir, runner=run.runner)
     except gitops.GitOpsError as exc:
         detail = (
-            f"wowsims/forever non mis à jour ({exc.message}) : binaire du commit {_short(before)} gardé, nouvel essai "
-            "au passage suivant"
+            f"wowsims/forever injoignable ou non compilé ({exc.message}) : binaire du commit {_short(before)} gardé, "
+            "nouvel essai au passage suivant"
         )
-        return Step("simulateurs", "attente", detail, {"commit": before})
+        return Step("simulateurs", "rien", detail, {"commit": before, "unreachable": True})
     if new.get("status") != "compilé":
         return Step("simulateurs", "rien", f"wowsims/forever à jour : commit {_short(before)}", {"commit": before})
     report = wowsims.replay_reference(run.deps.cache_dir, _playable_races(run.deps))
@@ -2187,8 +2083,6 @@ def _annotate_revision(vdir: Path, verdict: Mapping[str, Any], command: str) -> 
     last["rule"] = {"clauses": verdict["clauses"], "carry": verdict["carry"], "inputs": {
         name: all(i["status"] == "identique" for i in d["items"]) for name, d in verdict["inputs"].items()
     }}  # fmt: skip
-    if verdict.get("approved"):
-        last["approval"] = verdict["id"]
     path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=1) + "\n").encode("utf-8"))
     write_manifest(vdir.parent)
 
@@ -2229,7 +2123,8 @@ def _research_report(plan: Any, verdict: Mapping[str, Any], values: Mapping[str,
         lines += [f"- {c['file']} {c['pointer']} : {c['before']!r} → {c['after']!r}" for c in fixes.get("lost", [])]
     lines += [
         "",
-        f"Règle d'automatisme : {verdict['action']} ({'approuvée' if verdict.get('approved') else 'tenue'}).",
+        f"Règle d'automatisme : {verdict['action']} (décision 295 : installée d'elle-même, annulable).",
+        *[f"- {note}" for note in verdict.get("notes") or []],
         "",
     ]
     return "\n".join(lines)
@@ -2246,7 +2141,12 @@ def _publish(
     verdict: Mapping[str, Any],
     lines: Mapping[str, Sequence[Any]] | None = None,
     report: str | None = None,
+    name: str | None = None,
+    message: str | None = None,
 ) -> Step:
+    """Écrit `stage` par le clone : copie, `verify --data`, branche `data/<version>-r<N>` (ou `data/<name>`), CI,
+    fusion en avance rapide. `name` et `message` : annulation (`forever update undo`), qui ne touche pas l'historique
+    des révisions de la version."""
     from forever.pipeline import gitops
 
     assert run.clone is not None
@@ -2260,8 +2160,9 @@ def _publish(
     run.say(f"{step} : copie de {version} r{revision} dans le clone")
     shutil.rmtree(data)
     shutil.copytree(stage, data)
-    _annotate_revision(data / version, verdict, AUTO_COMMAND if run.options.auto else "forever update")
-    report_rel = f"docs/research/data-{version}-r{revision}.md"
+    if name is None:
+        _annotate_revision(data / version, verdict, AUTO_COMMAND if run.options.auto else "forever update")
+    report_rel = f"docs/research/data-{name or f'{version}-r{revision}'}.md"
     (clone / report_rel).parent.mkdir(parents=True, exist_ok=True)
     text = report if report is not None else _research_report(plan, verdict, lines)
     (clone / report_rel).write_bytes(text.encode("utf-8"))
@@ -2289,9 +2190,9 @@ def _publish(
         _block(run, pending_id=str(verdict["id"]), version=version, revision=revision, by="verify", reason=reason,
                extra={"log": str(log)})  # fmt: skip
         return Step(step, "arrêt", f"{version} r{revision} : {reason}", {"id": verdict["id"], "log": str(log)})
-    branch = f"data/{version}-r{revision}"
-    motif = "approuvée" if verdict.get("approved") else "règle tenue"
-    message = COMMIT_MESSAGE.format(version=version, revision=revision, motif=motif)
+    branch = f"data/{name or f'{version}-r{revision}'}"
+    motif = str(verdict.get("motif") or "règle tenue")
+    message = message or COMMIT_MESSAGE.format(version=version, revision=revision, motif=motif)
     run.say(f"{step} : verify vert ; commit et poussée de {branch}")
     if gitops.drop_stale_branch(runner, clone, branch):
         run.say(f"{step} : branche {branch} d'un essai abandonné retirée")
@@ -2306,7 +2207,6 @@ def _publish(
         "sha": sha,
         "ci": ci.url,
         "jobs": ci.jobs,
-        "approved": bool(verdict.get("approved")),
         "summary": summary_text(verdict.get("summary")),
     }
     if not ci.ok:
@@ -2322,8 +2222,39 @@ def _publish(
     gitops.delete_branch(runner, clone, branch)
     run.written.append(info)
     _close_installed(run.deps.cache_dir, version, revision, str(verdict["id"]), run.now)
+    if verdict.get("kind") != "undo":
+        _record_installed(run, verdict, info, base=run.origin_main)
+    run.origin_main = sha  # avance rapide : main distant est maintenant ce commit
     return Step(
         step, "fait", f"{version} r{revision} installée par le clone ({sha[:12]}) : `git pull` dans la session", info
+    )
+
+
+def _record_installed(run: _Run, verdict: Mapping[str, Any], info: Mapping[str, Any], *, base: str | None) -> None:
+    """Fiche de l'historique des installations (décision 295) : écrite à la fusion, avant le rejeu (un arrêt pendant
+    le rejeu laisse la fiche et sa carte) ; `changes` arrive après le rejeu."""
+    measures = (verdict.get("summary") or {}).get("measures") if verdict.get("kind") == "measures" else None
+    save_installed(
+        run.deps.cache_dir,
+        {
+            "id": verdict["id"],
+            "kind": verdict.get("kind"),
+            "version": info["version"],
+            "revision": info["revision"],
+            "installed_at": run.now,
+            "sha": info["sha"],
+            "base": base,
+            "branch": info["branch"],
+            "ci": info.get("ci"),
+            "summary": summary_text(verdict.get("summary")),
+            "measures": measure_summary_lines(verdict.get("summary")) if measures else [],
+            "notes": list(verdict.get("notes") or []),
+            "changes": [],
+            "replay": "en cours" if any(not d["identical"] for d in verdict["inputs"].values()) else "sans objet",
+            "state": "installée",
+            "by": AUTO_COMMAND if run.options.auto else "forever update",
+            "undo": f"forever update undo {verdict['id']}",
+        },
     )
 
 
@@ -2537,6 +2468,8 @@ def run_update(
         done(lock)
     else:
         done(lock or Step("verrou", "fait", "verrou pris", {"stale": False}))
+        if not options.dry_run:
+            close_legacy_waits(deps.cache_dir, run.now)
         watchdog = threading.Thread(target=watch, daemon=True)
         watchdog.start()
         try:
@@ -2590,6 +2523,19 @@ def run_update(
         _close_stale_hotfix_waits(run)
         save_report(deps.cache_dir, report)
     return report
+
+
+def close_legacy_waits(cache_dir: Path, at: str) -> list[str]:
+    """Attentes d'accord d'avant la décision 295 (installation ou mesure d'action `attente`) : `périmée`, car la
+    veille installe désormais d'elle-même ; le passage recalcule et écrit ce qu'elles proposaient. Rend leurs
+    identifiants."""
+    closed = []
+    for entry in list_pending(cache_dir):
+        legacy = entry.get("kind") in (*INSTALL_KINDS, "measures") and entry.get("action") == "attente"
+        if legacy and entry.get("state") in OPEN_STATES:
+            _set_state(cache_dir, str(entry["id"]), "périmée", stale_reason=LEGACY_REASON, closed_at=at)
+            closed.append(str(entry["id"]))
+    return closed
 
 
 def _close_stale_hotfix_waits(run: _Run) -> None:
@@ -2757,8 +2703,6 @@ def approve(
         doc = _set_state(deps.cache_dir, pending_id, "périmée", stale_reason=moved)
         return {"id": pending_id, "state": doc["state"], "detail": f"{moved} : relancer `forever update`"}
     _set_state(deps.cache_dir, pending_id, "approuvée", approved_at=format_utc(deps.now()))
-    if entry.get("kind") in INSTALL_KINDS:
-        _lift_guard(deps.cache_dir, pending_id, format_utc(deps.now()))
     if wait:
         report = run_update(deps, UpdateOptions(auto=True), runner=runner, progress=progress)
         return {"id": pending_id, "state": _load(deps.cache_dir, pending_id)["state"], "detail": "passage fait",
@@ -2774,6 +2718,100 @@ def approve(
     else:
         detail = "approuvée : passage lancé en arrière-plan (`forever update status` pour suivre)"
     return {"id": pending_id, "state": "approuvée", "detail": detail}
+
+
+UNDO_STEP = "annuler"
+
+
+def undo(
+    deps: Deps, record_id: str, *, runner: Runner | None = None, progress: Progress | None = None
+) -> dict[str, Any]:
+    """« Annuler » (décision 295) : revient à la révision précédente par le même chemin qu'une installation (clone,
+    `git revert` du commit de l'installation, `verify --data`, branche `data/undo-<id>`, CI, fusion en avance
+    rapide), sans jeu ouvert. La fiche passe à `annulée` : la veille ne réinstalle pas ce contenu, un contenu nouveau
+    s'installe normalement. Une installation plus récente qui touche les mêmes fichiers empêche l'annulation (le
+    dire : annuler d'abord la plus récente)."""
+    from forever.pipeline import gitops
+    from forever.update_installed import load_installed, update_installed
+
+    record = load_installed(deps.cache_dir, record_id)
+    if record.get("state") == "annulée":
+        raise InvalidArgumentError(f"L'installation {record_id} est déjà annulée.", "rien à faire")
+    command = f"forever update undo {record_id}"
+    run = _Run(deps, UpdateOptions(), runner, None, None, deps.data_dir)
+    run.progress = progress
+    lock = acquire_lock(deps, command)
+    if lock is not None and lock.status == "arrêt":
+        return {"id": record_id, "state": record.get("state"), "status": "arrêt", "detail": lock.detail}
+    try:
+        cloned = _step_clone(run)
+        if not run.writable or run.clone is None:
+            return {"id": record_id, "state": record.get("state"), "status": "arrêt", "detail": cloned.detail}
+        git = run.runner or gitops.subprocess_runner
+        clone, sha = run.clone, str(record.get("sha"))
+        if not gitops.is_ancestor(git, clone, sha, "HEAD"):
+            detail = f"le commit {sha[:12]} n'est pas dans main : rien à annuler"
+            return {"id": record_id, "state": record.get("state"), "status": "arrêt", "detail": detail}
+        reverted = git(["git", "revert", "--no-commit", sha], clone, STEP_GIT_TIMEOUT_S)
+        stage = update_dir(deps.cache_dir) / "undo-stage"
+        try:
+            if reverted.returncode == 0:
+                _copy_data(clone / "forever" / "data", stage)
+        finally:
+            git(["git", "revert", "--abort"], clone, STEP_GIT_TIMEOUT_S)
+            gitops.discard_changes(git, clone)
+        if reverted.returncode != 0:
+            detail = (
+                "une installation plus récente touche les mêmes fichiers : annuler d'abord la plus récente "
+                "(`forever update status`)"
+            )
+            return {"id": record_id, "state": record.get("state"), "status": "arrêt", "detail": detail}
+        current, previous = _installed(run.base_data), _installed(stage)
+        if current is None or previous is None:
+            raise InvalidArgumentError("Version installée illisible dans le clone.", "relancer `forever update`")
+        inputs = compare_inputs(run.base_data / current, stage / previous)
+        name = f"undo-{record_id}"
+        back = _revision(stage, previous)
+        verdict: dict[str, Any] = {
+            "id": name,
+            "kind": "undo",
+            "version": previous,
+            "revision": back,
+            "inputs": _inputs_doc(inputs),
+            "summary": {},
+            "notes": [],
+        }
+        text = (
+            f"# Annulation de {record_id}\n\nDemandée par le joueur (« Annuler », décision 295) : `git revert` de "
+            f"{sha[:12]}, retour à {previous} r{verdict['revision']}.\n"
+        )
+        message = f"Veille : annulation de {record_id} (retour à {previous} r{verdict['revision']}, décision 295)"
+        step = _publish(
+            run, step=UNDO_STEP, version=previous, revision=back, stage=stage, plan=None,
+            verdict=verdict, report=text, name=name, message=message,
+        )  # fmt: skip
+        shutil.rmtree(stage, ignore_errors=True)
+        if step.status != "fait":
+            return {"id": record_id, "state": record.get("state"), "status": step.status, "detail": step.detail}
+        doc = update_installed(
+            deps.cache_dir, record_id, state="annulée", undone_at=run.now, undo_sha=step.data.get("sha")
+        )
+        report: UpdateReport = {
+            "schema_version": SCHEMA_VERSION,
+            "started_at": run.now,
+            "finished_at": run.now,
+            "steps": [cloned._asdict(), step._asdict()],
+            "verdicts": [],
+            "written": [{**step.data, "undo": record_id}],
+            "pending": [],
+            "origin_main": run.origin_main,
+            "provenance": {},
+        }
+        save_report(deps.cache_dir, {**report, "kind": "undo"})
+        detail = f"annulée : retour à {previous} r{verdict['revision']} (`git pull` dans la session)"
+        return {"id": record_id, "state": doc["state"], "status": "fait", "detail": detail}
+    finally:
+        release_lock(deps.cache_dir)
 
 
 REVIEW_KINDS = ("addon_data", "column_names")  # relectures faites en session, closes par `forever update done`

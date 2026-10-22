@@ -6,7 +6,9 @@ attente approuvable de `list_pending`, proposition de profil), jamais passé tel
 - Carte de test (`forever bridge selftest --card`, bloc A) : le pont note l'action et ne lance rien.
 - Mise à jour (bloc B) : `update`, `approve:<id>`, `reject:<id>` lancent une commande fixée (`update_argv`) par
   `spawn` détaché, journal du passage dans `<cache>/update/` ; hors ligne, `update` est refusé ; un passage déjà en
-  cours n'en relance pas un autre."""
+  cours n'en relance pas un autre.
+- « Annuler » d'une carte « Mis à jour » (décision 295) : `undo:<id>` lance `forever update undo <id>`, l'identifiant
+  apparié à une installation de l'historique (`update_installed.notices`) ; hors ligne ou passage en cours : refusé."""
 
 from __future__ import annotations
 
@@ -17,10 +19,12 @@ from pathlib import Path
 from typing import Any
 
 ACTIONS = (
-    "update", "approve", "reject", "profile_apply", "profile_dismiss", "choice", "route_deliver", "exports",
+    "update", "approve", "reject", "undo", "profile_apply", "profile_dismiss", "choice", "route_deliver", "exports",
     "gear_level", "gear_route", "profession",
 )  # fmt: skip
-WITH_ID = frozenset({"approve", "reject", "profile_apply", "profile_dismiss", "choice", "gear_level", "gear_route"})
+WITH_ID = frozenset(
+    {"approve", "reject", "undo", "profile_apply", "profile_dismiss", "choice", "gear_level", "gear_route"}
+)
 _ID = re.compile(r"[A-Za-z0-9._-]{1,120}")
 
 
@@ -80,6 +84,8 @@ def update_argv(kind: str, pending_id: str | None = None) -> list[str]:
         return [*base, "update", "approve", pending_id, "--json"]
     if kind == "reject" and pending_id:
         return [*base, "update", "reject", pending_id, "--reason", REJECT_REASON, "--json"]
+    if kind == "undo" and pending_id:
+        return [*base, "update", "undo", pending_id, "--json"]
     raise ValueError(f"action sans commande fixée : {kind}")
 
 
@@ -114,6 +120,8 @@ class ActionHandler:
             if summary.get("running"):
                 return "passage en cours", f"Une mise à jour est déjà en cours ({stage}) : attends sa fin."
             return self._launch(update_argv("update"), run_log_path(self.cache_dir, now), "Mise à jour lancée.")
+        if action == "undo" and target is not None:
+            return self._undo(target, summary, stage)
         if action not in ("approve", "reject") or target is None:
             return "refusée", "Action refusée : action inconnue."
         entry = next((e for e in list_pending(self.cache_dir) if e.get("id") == target), None)
@@ -129,6 +137,21 @@ class ActionHandler:
         else:
             text = f"Refusé : {title}."
         return self._launch(update_argv(action, pending_id), run_log_path(self.cache_dir, now), text)
+
+    def _undo(self, target: str, summary: Mapping[str, Any], stage: str) -> tuple[str, str]:
+        from forever.update import run_log_path
+        from forever.update_installed import notices, title
+
+        record = next((r for r in notices(self.cache_dir) if r.get("id") == target), None)
+        if record is None:
+            return "refusée", "Action refusée : cette installation n'est plus annulable."
+        if self.offline:
+            return "refusée", "Annulation impossible : le pont tourne hors ligne sur ton PC."
+        if summary.get("running"):
+            return "passage en cours", f"Une mise à jour est en cours ({stage}) : Annuler après sa fin."
+        record_id = str(record["id"])  # identifiant relu dans l'historique, jamais celui de la bande
+        text = f"Annulation lancée : {title(record)} ; retour à la révision précédente dans quelques minutes."
+        return self._launch(update_argv("undo", record_id), run_log_path(self.cache_dir, self.now()), text)
 
     def _launch(self, argv: list[str], log: Path, text: str) -> tuple[str, str]:
         try:

@@ -184,7 +184,7 @@ def test_line_names_an_install_alone_with_its_summary(make_deps, history):
     line = hooks.update_line(deps, repo)
     assert line == "mise à jour : 1.60.1.79999 r1 installée seule (fiches PvP : Warrior, 1 sort modifié)"
     save_report(deps.cache_dir, written(True, summary=""))
-    assert hooks.update_line(deps, repo) == "mise à jour : 1.60.1.79999 r1 installée"
+    assert hooks.update_line(deps, repo) == "mise à jour : 1.60.1.79999 r1 installée seule"
 
 
 def test_line_names_the_hotfixes_to_read(make_deps, history):

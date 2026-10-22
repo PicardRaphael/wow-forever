@@ -72,7 +72,7 @@ def test_same_commit_does_not_replay(make_deps, tmp_path, monkeypatch):
     assert step.status == "rien" and "à jour" in step.detail
 
 
-def test_failure_keeps_the_pin_and_waits(make_deps, tmp_path, monkeypatch):
+def test_failure_keeps_the_pin_and_is_noted_without_waiting(make_deps, tmp_path, monkeypatch):
     from forever.pipeline.gitops import GitOpsError
 
     clone(tmp_path)
@@ -82,4 +82,4 @@ def test_failure_keeps_the_pin_and_waits(make_deps, tmp_path, monkeypatch):
 
     monkeypatch.setattr("forever.pipeline.wowsims_build.update_wowsims", broken)
     step = update._step_simulators(_run(make_deps(cache_dir=tmp_path)))
-    assert step.status == "attente" and "passage suivant" in step.detail
+    assert step.status == "rien" and "passage suivant" in step.detail and "injoignable" in step.detail

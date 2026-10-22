@@ -34,6 +34,7 @@ from forever.errors import (
     EXIT_INTEGRITY,
     EXIT_NOT_FOUND,
     EXIT_OK,
+    EXIT_PENDING,
     EXIT_USAGE,
     ForeverError,
     InvalidArgumentError,
@@ -578,6 +579,11 @@ def build_parser() -> argparse.ArgumentParser:
     u_reject.add_argument("id", help="identifiant de l'attente")
     u_reject.add_argument("--reason", help="raison du rejet")
     u_reject.add_argument("--json", action="store_true", help="sortie JSON")
+    u_undo = up_sub.add_parser(
+        "undo", help="annuler une installation de la veille : retour à la révision précédente (décision 295)"
+    )
+    u_undo.add_argument("id", help="identifiant de l'installation (forever update status)")
+    u_undo.add_argument("--json", action="store_true", help="sortie JSON")
     u_done = up_sub.add_parser("done", help="clore une relecture faite en session (données d'addon, colonnes)")
     u_done.add_argument("id", help="identifiant de l'attente")
     u_done.add_argument("--note", required=True, help="résultat de la relecture (gardé dans l'attente)")
@@ -3578,6 +3584,7 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
         if summary["running"] and summary.get("running_detail"):
             lines.append(f"  dernière ligne : {summary['running_detail']}")
         lines += [f"  écrit : {update.written_text(w)}" for w in (last or {}).get("written") or []]
+        lines += _installed_lines(deps.cache_dir, every=args.all)
         for e in entries:
             lines.append(
                 f"  {e['id']} · {e.get('kind')} · {e.get('action')} · {e.get('state')}"
@@ -3604,6 +3611,11 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
             args.json,
         )
         return EXIT_OK
+    if args.update_command == "undo":
+        out = update.undo(deps, args.id, progress=_update_progress)
+        _emit({**out, "provenance": provenance}, [f"{out['id']} : {out['status']} · {out['detail']}"], provenance,
+              args.json)  # fmt: skip
+        return EXIT_OK if out["status"] == "fait" else EXIT_PENDING
     if args.update_command == "done":
         out = update.mark_done(deps.cache_dir, args.id, args.note, format_utc(deps.now()))
         _emit({**out, "provenance": provenance}, [f"{out['id']} : {out['state']} · {out['note']}"], provenance,
@@ -3629,6 +3641,31 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
     return _run_update(deps, args, options)
 
 
+INSTALLED_SHOWN = 5  # installations listées par `forever update status` (toutes avec --all)
+
+
+def _installed_lines(cache_dir: Path, *, every: bool) -> list[str]:
+    """Lignes « Mis à jour » de `forever update status` (décision 295) : ce qui a changé en mots de joueur et la
+    commande « Annuler » ; installations annulées signalées."""
+    from forever.update_installed import list_installed, notice_lines, title
+
+    records = list_installed(cache_dir)
+    lines = []
+    for record in records if every else records[:INSTALLED_SHOWN]:
+        when = str(record.get("installed_at") or "")[:16].replace("T", " ")
+        if record.get("state") == "annulée":
+            lines.append(
+                f"  Annulée : {title(record)} (installée le {when}, annulée le {str(record.get('undone_at'))[:10]})"
+            )
+            continue
+        lines.append(f"  Mis à jour : {title(record)} le {when} · annuler : `{record.get('undo')}`")
+        lines += [f"    {line}" for line in notice_lines(record)]
+    hidden = len(records) - INSTALLED_SHOWN
+    if hidden > 0 and not every:
+        lines.append(f"  {hidden} installation(s) plus ancienne(s) : `forever update status --all`")
+    return lines
+
+
 def _run_update(deps: Deps, args: argparse.Namespace, options: Any) -> int:
     from forever import update
 
@@ -3645,7 +3682,7 @@ def _run_update(deps: Deps, args: argparse.Namespace, options: Any) -> int:
     if any(p["kind"] in update.SELF_CLEARING_KINDS for p in report["pending"]):
         lines.append(f"  correctifs du serveur à lire : {update.SELF_CLEARING_HINT}")
     if any(p["kind"] not in update.SELF_CLEARING_KINDS for p in report["pending"]):
-        lines.append("  voir `forever update status`, puis `forever update approve <id>`")
+        lines.append("  voir `forever update status`")
     _emit(report, lines, report["provenance"], args.json)  # type: ignore[arg-type]
     return update.exit_code(report)
 

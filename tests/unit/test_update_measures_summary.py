@@ -78,8 +78,8 @@ def test_measure_pending_carries_its_summary(logs, tmp_path):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
     replay = SplitReplay(deps.data_dir)
     report = run_update(deps, JOURNALS, replay=replay, measure=PreviewMeasure(tmp_path))
-    assert step(report, "journaux")["status"] == "attente"
-    (entry,) = report["pending"]
+    assert step(report, "journaux")["status"] == "fait"  # décision 295 : écrite d'elle-même, résumé gardé
+    (entry,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
     summary = entry["summary"]["measures"]
     assert summary["npcs"]["added"][0]["name"] == "Synthetic Boar"
     assert summary["npcs"]["changed"][0]["levels"] == {"8": {"before": 120, "after": 125}}
@@ -92,17 +92,7 @@ def test_measure_pending_carries_its_summary(logs, tmp_path):  # noqa: F811
     assert "1 ajouté" in summary["sentence"] and "1 cas" in summary["sentence"]
 
 
-def test_replay_is_done_once_per_pending(logs, tmp_path):  # noqa: F811
-    deps = logs([(LOCAL_VERSION, 1)])
-    first = run_update(deps, JOURNALS, replay=SplitReplay(deps.data_dir), measure=PreviewMeasure(tmp_path))
-    record_pending(deps.cache_dir, first["pending"][0])
-    replay = SplitReplay(deps.data_dir)
-    again = run_update(deps, JOURNALS, replay=replay, measure=PreviewMeasure(tmp_path / "bis"))
-    assert replay.calls == []
-    assert again["pending"][0]["summary"]["measures"]["builds"] == first["pending"][0]["summary"]["measures"]["builds"]
-
-
-def test_measure_without_preview_says_why_builds_are_not_replayed(logs):  # noqa: F811
+def test_measure_without_preview_is_not_written_and_says_why(logs):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
 
     def measure(deps, data_dir, files):
@@ -110,9 +100,9 @@ def test_measure_without_preview_says_why_builds_are_not_replayed(logs):  # noqa
 
     replay = SplitReplay(deps.data_dir)
     report = run_update(deps, JOURNALS, replay=replay, measure=measure)
-    builds = report["pending"][0]["summary"]["measures"]["builds"]
-    assert builds["replayed"] is False and builds["reason"]
-    assert replay.calls == []
+    found = step(report, "journaux")
+    assert found["status"] == "arrêt" and "rien à écrire" in found["detail"]
+    assert replay.calls == [] and report["pending"] == []
 
 
 # --- forever update status ---------------------------------------------------------------------------------------
@@ -199,5 +189,6 @@ def test_a_listing_replay_says_why_nothing_was_compared(logs, tmp_path):  # noqa
         return {"rejoué": False, "raison": "simulation : cas à rejouer, non calculé"}
 
     report = run_update(deps, JOURNALS, replay=listing, measure=PreviewMeasure(tmp_path))
-    builds = report["pending"][0]["summary"]["measures"]["builds"]
+    (verdict,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
+    builds = verdict["summary"]["measures"]["builds"]
     assert builds["replayed"] is False and builds["reason"] == "simulation : cas à rejouer, non calculé"

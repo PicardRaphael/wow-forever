@@ -18,7 +18,7 @@ def test_a_stale_measure_closes_even_without_a_new_log(logs):  # noqa: F811
         {
             "id": "measures-1.60.1.70000-bbbbbbbbbbbb",
             "kind": "measures",
-            "action": "attente",
+            "action": "écrire",
             "version": "1.60.1.70000",
             "revision": None,
             "clauses": {},
