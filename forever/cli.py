@@ -568,7 +568,9 @@ def build_parser() -> argparse.ArgumentParser:
         "--log", action="store_true", help="sortie dans <cache>/update/run-<horodatage>.log (tâche planifiée)"
     )
     up_sub = up.add_subparsers(dest="update_command", required=False, parser_class=_Parser)
-    u_status = up_sub.add_parser("status", help="installations (Mis à jour, Annuler), attentes ouvertes et dernier passage")
+    u_status = up_sub.add_parser(
+        "status", help="installations (Mis à jour, Annuler), attentes ouvertes et dernier passage"
+    )
     u_status.add_argument("--all", action="store_true", help="toutes les attentes (closes et rejetées comprises)")
     u_status.add_argument("--json", action="store_true", help="sortie JSON")
     u_approve = up_sub.add_parser("approve", help="approuver une attente (base inchangée) et lancer un passage")

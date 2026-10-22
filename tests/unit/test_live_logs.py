@@ -133,4 +133,6 @@ def test_update_holds_a_log_being_written_and_proposes_it_again_later(logs):  # 
     touch(log, deps.now() - QUIET - MINUTE)  # passage suivant : journal au repos
     report = run_update(deps, JOURNALS, replay=Replay(), measure=measure)
     assert measure.calls == [[LOG.name]]
-    assert step(report, "journaux")["status"] != "rien" and report["pending"] == []  # mesuré (décision 295 : sans attente)
+    assert (
+        step(report, "journaux")["status"] != "rien" and report["pending"] == []
+    )  # mesuré (décision 295 : sans attente)

@@ -9,11 +9,11 @@ chiffre du jeu écrit ici."""
 import json
 import shutil
 
-from forever.pipeline.observations import keep_observations, resolve
 from test_update_chain import BASE, DRY, TARGET, Replay, montage, only_verdict  # noqa: F401  (fixture importée)
 
 from forever.manifest import write_manifest
 from forever.pipeline.install import plan_install
+from forever.pipeline.observations import keep_observations, resolve
 from forever.update import run_update
 
 OLD, NEW = "1.60.1.10000", "1.60.1.10001"
