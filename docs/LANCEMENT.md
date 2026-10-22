@@ -288,6 +288,9 @@ correction passe devant le reste.
     comprise), `uv run forever update status` dit « Annulée » et la carte disparaît ; le passage suivant ne
     réinstalle pas ce contenu (« annulée par toi »). Le même retour marche jeu fermé : `uv run forever update undo
     <id>`.
+22i-bis. Nouvelle version qui retire ou change un talent que la version installée tenait (décision 296) : elle
+    s'installe d'elle-même ; la carte « Mis à jour » dit « talent … retiré par la version … ; ton observation datait
+    de … ». Sur une révision de la même version, l'écart est « signalé » et ta valeur reste.
 22j. Plus aucune carte « Valider / Refuser » pour une installation ou une mesure : seules restent les cartes qui
     se lèvent seules (réseau, correctifs à lire), celles qui demandent une session (vérification rouge, valeur
     perdue) et le rappel de relecture de Forever Bestiary.

@@ -6,7 +6,7 @@ serveur (téléchargement, décodage, `verify`, installation dans une copie de p
 la main, preuve d'entrées par moteur ; rejeu ciblé après l'installation), journaux de combat de la version installée, addons de données.
 
 Règle d'automatisme (`decide`, décision 295, qui remplace 180, 198, 207 et 230) : la veille écrit d'elle-même, sauf
-quand l'installation casserait l'intégrité (`verify` rouge, règles de fusion refusées) ou perdrait une valeur faite à la
+quand l'installation casserait l'intégrité (`verify` rouge, écart de fusion que la décision 296 ne tranche pas) ou perdrait une valeur faite à la
 main ou une valeur d'un correctif du serveur non relue (`bloqué`, dit, session nécessaire). Ce qui change sans bloquer
 (entrées de moteur, valeur faite à la main remplacée) est noté pour la carte « Mis à jour ». Une nouvelle version
 attend le `DBCache.bin` de son build (`hotfix_gate`, attente `hotfixes_unread` levée seule). Chaque installation
@@ -974,12 +974,19 @@ def _evaluate(
     stage = _stage(run, version)
     stage_deps = run.deps_on(stage)
     install_ok, plan = True, None
+    observed: list[str] = []  # écarts tranchés par la décision 296 (carte « Mis à jour »)
     try:
         plan = plan_install(stage_deps, str(candidate), new_version=new_version)
+        settled = _settle_observations(run, stage, candidate, plan, version) if plan["refused"] else None
+        if settled is not None:
+            candidate, observed, restore = settled
+            plan = plan_install(stage_deps, str(candidate), new_version=new_version)
         if plan["refused"]:
             install_ok = False
         else:
             apply_install(stage_deps, str(candidate), motif=motif, new_version=new_version, date=run.now[:10])
+            if settled is not None and restore is not None:
+                restore()
     except InstallRefusedError:
         install_ok = False
     except InvalidArgumentError as exc:  # rien à installer (révision qui ne change rien)
@@ -1010,7 +1017,7 @@ def _evaluate(
         "action": action,
         "clauses": dict(verdict.clauses),
         "reasons": reasons,
-        "notes": list(verdict.notes),
+        "notes": [*observed, *verdict.notes],
         "verify": {"ok": verify["ok"], "errors": verify.get("errors", [])[:20]},
         "carry": _carry_counts(carry),
         "superseded": [{"file": v.file, "pointer": v.pointer, "after": now} for v, now in carry.superseded],
@@ -1074,6 +1081,62 @@ def _evaluate(
     }
     run.pending.append(entry)
     return Step(step, "arrêt", f"{version} r{revision} : bloqué ({'; '.join(reasons)})", {"id": pending_id})
+
+
+def _settle_observations(
+    run: _Run, stage: Path, candidate: Path, plan: Mapping[str, Any], version: str
+) -> tuple[Path, list[str], Callable[[], None] | None] | None:
+    """Écarts refusés par la fusion tranchés par la décision 296 (`forever.pipeline.observations`) : les observations
+    plus anciennes que la version du client lui cèdent (entrées ajoutées au `confirmed_changes.json` de la copie de
+    préparation), celles de la même version gardent la priorité (candidate corrigée sur une copie). Rend (candidate à
+    installer, notes, remise en état après l'installation) ; None si un écart reste non tranché (installation
+    refusée, intégrité). Nouvelle version : le fichier de la version précédente est remis tel quel après
+    l'installation, les entrées vivent dans celui de la nouvelle version."""
+    from forever.manifest import write_manifest
+    from forever.pipeline.install import CONFIRMED
+    from forever.pipeline.observations import keep_observations, resolve
+
+    version_from, version_to = str(plan["version_from"]), str(plan["version_to"])
+    base = stage / version_from
+    names = {**_entity_names(base), **_entity_names(candidate / version)}
+    out = resolve(
+        plan["refused"], version_from=version_from, version_to=version_to, candidate_vdir=candidate / version,
+        names=names,
+    )  # fmt: skip
+    if out.unresolved:
+        return None
+    restore = None
+    if out.accepted:
+        path = base / CONFIRMED
+        original = path.read_bytes()
+        doc = json.loads(original.decode("utf-8"))
+        doc["changes"] = [*doc.get("changes", []), *out.accepted]
+        path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+        write_manifest(stage)
+        if version_from != version_to:
+
+            def restore() -> None:
+                path.write_bytes(original)
+                write_manifest(stage)
+
+    if out.kept:
+        dest = update_dir(run.deps.cache_dir) / f"candidate-gardee-{version}"
+        candidate = keep_observations(candidate, version, base, out.kept, dest)
+    for note in out.notes:
+        run.say(f"écart tranché (décision 296) : {note}")
+    return candidate, list(out.notes), restore
+
+
+def _entity_names(vdir: Path) -> dict[str, str]:
+    """Clé → nom des talents et des sorts de `vdir` (vide si illisibles)."""
+    names: dict[str, str] = {}
+    talents = _read(vdir / "talents.json")
+    if isinstance(talents, dict):
+        names |= {t["key"]: str(t.get("name") or t["key"]) for tr in talents.get("trees", []) for t in tr["talents"]}
+    spells = _read(vdir / "spells.json")
+    if isinstance(spells, dict):
+        names |= {k: str(v.get("name") or k) for k, v in spells.get("spells", {}).items() if isinstance(v, dict)}
+    return names
 
 
 def _talent_names_of(run: _Run, data_dir: Path) -> dict[str, str]:

@@ -318,8 +318,10 @@ def test_an_archived_dbcache_is_read(montage):
     assert not any(e["kind"] == "hotfixes_unread" for e in report["pending"])
 
 
-def test_an_install_refused_by_the_merge_rules_is_blocked(montage):
+def test_an_install_refused_by_the_merge_rules_is_blocked(montage, monkeypatch):
+    """Un écart que la décision 296 ne sait pas trancher (autre fichier, sort retiré) laisse l'installation refusée."""
     deps, _ = montage(change=("SpellPower", "116", "ManaCost"))
+    monkeypatch.setattr(update_module, "_settle_observations", lambda *a: None)  # écart non tranché
     report = run_update(deps, DRY, replay=Replay())
     verdict = only_verdict(report)
     assert verdict["action"] == "bloqué"
@@ -342,10 +344,11 @@ def replay_sides(replay):
     return versions[0::2], versions[1::2]
 
 
-def test_a_refused_install_is_blocked_without_replay(montage):
+def test_a_refused_install_is_blocked_without_replay(montage, monkeypatch):
     """Installation refusée par les règles de fusion : intégrité non garantie, bloquée et dite (décision 295) ; rien
     n'est rejoué (le rejeu ne sert plus qu'à dire ce qu'une installation a changé)."""
     deps, _ = montage(change=REFUSED_MANA)
+    monkeypatch.setattr(update_module, "_settle_observations", lambda *a: None)  # écart non tranché (décision 296)
     replay = Replay()
     report = run_update(deps, DRY, replay=replay)
     verdict = only_verdict(report)
