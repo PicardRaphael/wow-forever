@@ -1743,8 +1743,11 @@ def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
     presets = wowsims.read_presets(wowsims_build.wowsims_dir(deps.cache_dir) / "forever")
     provenance = local_provenance(deps, certainty="suppose", assumptions=[wowsims.source_note(pinned)])
     if args.sims_command == "presets":
-        listed = [{"key": p.key, "class": p.class_token, "race": p.race} for p in presets]
-        lines = [f"Préréglages de wowsims/forever ({len(listed)}) :", *(f"  {r['key']}" for r in listed)]
+        listed = [{"key": p.key, "class": p.class_token, "race": p.race, "items": p.items} for p in presets]
+        lines = [
+            f"Préréglages de wowsims/forever ({len(listed)}) :",
+            *(f"  {r['key']}" + ("" if r["items"] else " (sans équipement : jamais simulé)") for r in listed),
+        ]
         _emit({"presets": listed, "provenance": provenance}, lines, provenance, args.json)
         return EXIT_OK
     preset = next((p for p in presets if p.key == args.preset), None)
