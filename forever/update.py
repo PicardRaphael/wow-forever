@@ -187,9 +187,10 @@ class Step(NamedTuple):
 
 
 class Verdict(NamedTuple):
-    action: str  # écrire | attente | bloqué
+    action: str  # écrire | bloqué (décision 295 : plus d'attente)
     clauses: Mapping[str, bool]
-    reasons: list[str]
+    reasons: list[str]  # ce qui bloque
+    notes: list[str] = []  # noqa: RUF012 (jamais modifiée en place) ; ce qui change sans bloquer (carte « Mis à jour »)
 
 
 class UpdateOptions(NamedTuple):
@@ -286,12 +287,14 @@ def decide(
     install_ok: bool = True,
     hotfix_losses: Sequence[ValueChange] = (),
 ) -> Verdict:
-    """Règle d'automatisme (décisions 180, 198 et 207), pure : `écrire`, `attente` (clauses non tenues) ou `bloqué`
-    (`verify` rouge, installation refusée, ou valeur faite à la main perdue).
+    """Règle d'automatisme (décision 295, qui remplace 180, 198, 207 et 230), pure : `écrire`, sauf `bloqué` quand
+    l'installation casserait l'intégrité (`verify` rouge, installation refusée) ou perdrait des données (valeur faite à
+    la main perdue, valeur d'un correctif du serveur non relue). Une valeur faite à la main remplacée ou des entrées de
+    moteur changées s'écrivent et sont notées (`notes`) pour la carte « Mis à jour ».
 
     Clause `inputs` : les entrées de chaque moteur qui calcule sont identiques ; celles d'un moteur qui recopie ne
-    changent que par des feuilles d'origine `client` ou `correctif_serveur`, avant comme après. Clause `hotfixes` :
-    aucune valeur d'un correctif du serveur n'est perdue."""
+    changent que par des feuilles d'origine `client` ou `correctif_serveur`. Clause `hotfixes` : aucune valeur d'un
+    correctif du serveur n'est perdue."""
     for name in inputs:
         if name not in ENGINES:
             raise EngineDeclarationError(f"Moteur {name} : absent de ENGINES, mode non déclaré (décision 207).")
@@ -299,42 +302,39 @@ def decide(
     copying: dict[str, list[Any] | None] = {
         n: _blocking_changes(d) for n, d in sorted(inputs.items()) if not d.identical and ENGINES[n].mode == "recopie"
     }
-    blocked_copies = {n: c for n, c in copying.items() if c is None or c}
+    noted_copies = {n: c for n, c in copying.items() if c is None or c}
     clauses = {
         "verify": verify_ok,
         "install": install_ok,
         "manual": not carry.superseded and not carry.lost,
-        "inputs": not computing and not blocked_copies,
+        "inputs": not computing and not noted_copies,
         "hotfixes": not hotfix_losses,
     }
     reasons: list[str] = []
+    notes: list[str] = []
     if not verify_ok:
-        reasons.append("verify rouge : une session est nécessaire")
+        reasons.append("verify rouge : l'installation casserait l'intégrité des données")
     if not install_ok:
-        reasons.append("installation refusée par les règles de fusion (forever install) : une session est nécessaire")
+        reasons.append("installation refusée par les règles de fusion (forever install) : intégrité non garantie")
     for value in carry.lost:
         reasons.append(f"valeur faite à la main perdue : {value.file} {value.pointer} ({value.origin})")
-    for value, now in carry.superseded:
-        reasons.append(f"valeur faite à la main remplacée : {value.file} {value.pointer} ({value.origin}) → {now!r}")
-    if computing:
-        reasons.append(f"moteurs aux entrées changées : {', '.join(computing)}")
-    for name, changes in blocked_copies.items():
-        if changes is None:
-            reasons.append(f"{name} : entrées changées sans l'origine des valeurs")
-        else:
-            reasons.append(f"{name} : entrée d'origine non permise changée : {_first(changes)}")
     if hotfix_losses:
         reasons.append(
             f"correctifs du serveur non relus : {len(hotfix_losses)} valeur(s) correctif_serveur perdue(s) "
             f"({_first(hotfix_losses)})"
         )
-    if not verify_ok or not install_ok or carry.lost:
-        action = "bloqué"
-    elif not all(clauses.values()):
-        action = "attente"
-    else:
-        action = "écrire"
-    return Verdict(action, clauses, reasons)
+    for value, now in carry.superseded:
+        notes.append(f"valeur faite à la main remplacée : {value.file} {value.pointer} ({value.origin}) → {now!r}")
+    if computing:
+        notes.append(f"moteurs aux entrées changées : {', '.join(computing)}")
+    for name, changes in noted_copies.items():
+        if changes is None:
+            notes.append(f"{name} : entrées changées sans l'origine des valeurs")
+        else:
+            notes.append(f"{name} : entrée d'origine {changes[0].origin_after or changes[0].origin_before} changée : "
+                         f"{_first(changes)}")  # fmt: skip
+    action = "bloqué" if reasons else "écrire"
+    return Verdict(action, clauses, reasons, notes)
 
 
 def dbcache_for_build(deps: Deps, build: int, product: str | None, archived: Path | None) -> Path | None:
