@@ -75,7 +75,7 @@ appliqué, le fichier y revient, et la justification va dans le message de commi
 - **Ne pas démarrer la tranche suivante dans la même session** : ouvrir une session neuve.
 - **Petits commits**, message `Txx: <ce qui change>`.
 - **Continuer sans demander** tant qu'une étape n'a pas besoin de moi. S'arrêter et demander avant de toucher
-  `tests/golden/`, d'ajouter une dépendance ou un accès réseau, de supprimer des données, ou de trancher une règle de
+  le manifeste des données à la main, d'ajouter une dépendance ou un accès réseau, de supprimer des données, ou de trancher une règle de
   jeu.
 
 ### Boucle de tests : trois niveaux
@@ -136,9 +136,7 @@ mais quand les skills ou le format de réponse changent. Commande exacte, seuils
 
 ## Zones protégées
 
-- `tests/golden/` : **ne jamais régénérer pour faire passer un test**. Si un changement voulu les modifie, la session
-  s'arrête, explique pourquoi et demande l'accord ; la justification va dans le message de commit. Un hook bloque
-  l'écriture.
+- `forever/data/manifest.json` : jamais réécrit à la main ; seuls `forever install` et la veille l'écrivent (hook `protect_golden.py`, `FOREVER_ALLOW_GOLDEN=1` sur accord). Pas de tests « golden » : une nouvelle version donne un rapport des valeurs qui changent (décision 288).
 - `seed/forever-mage/` et `seed/grimoire-engine/` : code de référence validé, à porter, en lecture seule.
 
 ## Faire vivre CLAUDE.md

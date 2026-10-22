@@ -46,7 +46,7 @@ rend ; le reste de la réponse en français.
   quête du donjon quand `giver` est rendu.
 
 ## Ce qui n'est pas couvert
-- Raids (T09 à T11), stratégies de boss, valeur d'un objet pour ton personnage et « est-ce une amélioration » (T10a) :
-  dis « je ne sais pas » et la tranche.
+- Raids et stratégies de boss : dis « je ne sais pas » (plan d'équipement complet : T10, préparation de raid : T11).
+  Valeur d'un objet pour ton personnage et « est-ce une amélioration » : skill `forever-builds` (`forever_gear`).
 - Une source extérieure (Wowhead Forever, guide) passe par le sous-agent `forever-web-researcher`, étiquetée comme
   telle, certitude au mieux `suppose`.

@@ -8,6 +8,6 @@ Tu relis en lecture seule (`git diff main...HEAD`, fichiers, tests). Tu ne modif
 Ne signale que ce qui touche à la correction ou aux invariants ; pas de préférences de style ni de refactorisation « pour faire mieux ».
 1. Invariants de `CLAUDE.md` : chiffres de jeu seulement dans `forever/data/`, formules seulement dans `forever/engine/`, bloc `provenance` présent, pas de réseau dans les tests.
 2. Les tests couvrent les critères de fin de la tranche ; aucun test affaibli, supprimé ou contourné.
-3. `tests/golden/` et `seed/` inchangés, ou changement justifié dans le commit.
+3. `forever/data/manifest.json` (hors `forever install` et la veille) et `seed/` inchangés, ou changement justifié dans le commit.
 4. Bugs probables : cas limites, erreurs silencieuses, arrondis, unités.
 Réponse en moins de 20 lignes : Bloquant, Mineur, Recommandation (fusionner ou corriger).

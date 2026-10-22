@@ -52,9 +52,9 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
   `forever_build`.
 - Comparer plusieurs niveaux, rotations ou builds, ou demander le preset `complet` : confie le calcul au sous-agent
   `forever-sim-runner` et reprends son résumé.
-- `forever_lookup(kind="zones")` lit l'addon Questie sur le disque du joueur (dossier `FOREVER_WOW_DIR`) : en erreur,
-  dis que Questie est introuvable et comment régler `FOREVER_WOW_DIR` ; la liste est à certitude `suppose`
-  (base Classic Era, quêtes propres à Forever non couvertes : tranche T04d).
+- `forever_lookup(kind="zones")` lit le livre de quêtes des sources Forever (addons du joueur, décision 294 ; plus
+  la base Classic Era de Questie), filtré par camp, classe et niveau ; certitude `suppose` ; addons introuvables :
+  dis comment régler `FOREVER_WOW_DIR`.
 
 ## Lire les résultats
 - **Prochain talent** (`next_step`) : donne `choice` et sa raison (`decided_by` : `monte_carlo`, écart significatif ;
@@ -70,8 +70,8 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 - **Respec** : donne le conseil du bloc `respec` (coût, gain, niveau conseillé), sans le recalculer ; chemin
   projeté depuis le build actuel : `respec.projected` (`steps` : talent de chaque niveau ; `talents` et `points` au
   niveau demandé).
-- **Angles morts** : `blind_spots` du rapport de build ; XP de Forever et quêtes propres au serveur : non modélisées
-  (tranche T04d), à dire quand la question porte sur l'XP.
+- **Angles morts** : `blind_spots` du rapport de build ; moteur du Mage gelé sous le 60 (révision 7 de 1.60.1.70450),
+  à dire quand une question porte sur une valeur changée depuis.
 
 ## Hors de ce skill
 - Détail d'un sort ou d'un talent, build de donjon, de raid ou de PvP : skill `forever-mage`.

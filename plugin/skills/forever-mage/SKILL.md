@@ -39,8 +39,9 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   (`alternative`) si le joueur hésite entre deux builds.
 - Donne toujours `certainty` et `verifiable_in_game` ; au-delà du plafond de la bêta, le build n'est pas vérifiable
   en jeu.
-- Donjon et raid : scénarios provisoires, mana des combats longs non modélisée (tranche T05b) : écris-le en
-  « Attention ». Raid complet : tranche T09.
+- Moteur du Mage **gelé** (révision 7 de 1.60.1.70450, décision 294) : il répond sous le 60 et le dit. Donjon et
+  raid : scénarios provisoires, mana des combats longs non modélisée : écris-le en « Attention ». Au niveau 60, le
+  calcul de référence est wowsims/forever (`forever_simulate`, skill `forever-builds`).
 - PvP : le build sort de `forever_build` ; classes adverses, contrôles et affrontements : skill `forever-pvp` ;
   profil PvP du Mage avec rendements décroissants et bijou : tranche PV2.
 - `sensitivity` et `stability` : seulement si le joueur demande le détail ou si une hypothèse retourne le choix.
@@ -62,5 +63,5 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 
 ## Hors de ce skill
 - Temps par monstre, XP/h, zone à mon niveau : skill `forever-leveling`.
-- Autres classes : section « Classe pas encore calculée » du routeur (tranches de classe CM1, CH1, DE1, PA1, GU1, VO1, PR1, DR1).
+- Autres classes : section « Classe pas encore calculée sous le 60 » du routeur (au 60 : wowsims/forever ; dessous : SIM2).
 - Équipement (T10), consommables (T11) : « je ne sais pas » + tranche.

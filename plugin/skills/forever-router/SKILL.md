@@ -1,6 +1,6 @@
 ---
 name: forever-router
-description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, PvP des 9 classes (contrôles, affrontements), builds de toutes les classes, familiers du Chasseur (entraînement, capacités, où apprivoiser), fraîcheur des données, et ce que le projet ne couvre pas encore (champs de bataille, Legacy, métiers, réputations, hôtel des ventes, dégâts des autres classes). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
+description: "Toute question sur World of Warcraft: Forever (WoW Forever, serveur ou bêta Forever) : sorts, talents, builds, leveling, niveau, zones, donjons, mécaniques de combat, PvP des 9 classes (contrôles, affrontements), builds de toutes les classes, familiers du Chasseur (entraînement, capacités, où apprivoiser), fraîcheur des données, dégâts et poids des statistiques au niveau 60 pour toutes les classes (wowsims/forever), et ce que le projet ne couvre pas encore (champs de bataille, Legacy, métiers, réputations, hôtel des ventes, dégâts chiffrés sous le niveau 60 des classes autres que le Mage). Le joueur joue à Forever : une question sur WoW qui ne nomme ni retail ni Classic est présumée Forever. Choisit l'outil forever, impose la réponse sourcée et la règle « je ne sais pas ». Ne pas utiliser pour WoW retail, WoW Classic hors Forever, d'autres jeux, la programmation ou le code de ce dépôt."
 ---
 
 # Routeur WoW Forever
@@ -38,17 +38,33 @@ seulement par ce message, sans rien répondre à la question de mémoire :
   question générale (« l'arbre optimal du Mage en raid ») : ni profil ni question au joueur, hypothèse neutre annoncée
   (section « Question personnelle ou générale » de `format-reponse.md`).
 
-## 2. Carte des domaines couverts
+## 2. Ce que l'agent sait faire aujourd'hui
+
+Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décisions 288, 293 et 294, Forever seulement) :
+- **Leveling, toutes les classes** : feuilles de route (Polestar, livrées dans RestedXP), zones, donjons, quêtes de
+  Forever, XP par heure par zone et par donjon, bonus d'XP.
+- **Talents, toutes les classes** : arbres lus dans le client, légalité de tout build, builds populaires de Talents
+  Forever et builds de Forever Companion, lien Talents Forever et code Naowh.
+- **Niveau 60, toutes les classes** : dégâts, races, poids des statistiques et comparaisons par wowsims/forever
+  (`forever_simulate`, simulateur de la communauté compilé tel quel, épinglé, certitude `suppose`) ; l'équipement au
+  60 est classé par ses poids.
+- **Sous le niveau 60** : le moteur du Mage est **gelé** (révision 7 de 1.60.1.70450) ; il répond encore pour le Mage
+  (builds, temps par monstre, XP par heure) et le dit. Les autres classes n'ont pas de calcul chiffré sous le 60 :
+  builds de Talents Forever et de Forever Companion, mesures de tes journaux quand elles existent.
+- **Savoir par classe** : PvP des neuf classes (contrôles, défensifs, affrontements), familiers du Chasseur, donjons
+  et butin, équipement de leveling (GearQuest Forever) et listes BiS (Naowh Forever).
+
+## 2b. Carte des outils
 
 | Question | Outil | Skill |
 |---|---|---|
 | Sort : dégâts, rangs, coût, incantation, portée | `forever_lookup(kind="spell", name=<nom anglais>, rank=…)` | `forever-mage` |
 | Talent : effet à un rang, prérequis, palier | `forever_lookup(kind="talent", name=<nom anglais ou clé>, rank=…)` | `forever-mage` |
-| Meilleur build, ordre des talents, build par contexte | `forever_build(context, level, …)` | `forever-mage` |
+| Mage : meilleur build, ordre des talents, build par contexte (moteur gelé sous le 60, il le dit) | `forever_build(context, level, …)` | `forever-mage` |
 | Quel talent prendre au niveau N, faut-il respec | `forever_build(context="leveling", level, current, respecs)` | `forever-leveling` |
 | Mon personnage (race, faction, niveau, talents, métiers), personnage prévu | `forever_player_profile(name=…)` | selon la question |
 | Planifier : respec à un autre niveau, plan d'un personnage prévu | `forever_build(context, level, current=<talents du profil>)` : `respec.projected` | `forever-leveling` |
-| Temps par monstre, XP par heure, repos, mana | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |
+| Mage : temps par monstre, XP par heure, repos, mana (moteur gelé) | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
 | Donjons à mon niveau, fiche d'un donjon (boss, butin et taux, quêtes, prérequis, écarts) | `forever_lookup(kind="dungeons", level, faction)`, `forever_lookup(kind="dungeon", name, class_name, level)` | `forever-donjons` |
 | Où trouver tel objet (donjon, boss, taux) | `forever_lookup(kind="dungeon_item", name=<identifiant>)` | `forever-donjons` |
@@ -81,44 +97,44 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 
 | Domaine | Tranche qui le couvrira |
 |---|---|
-| PvP : champs de bataille, récompenses, monde ouvert ; rendements décroissants mesurés, profil PvP du Mage | PV2 |
+| PvP : champs de bataille, récompenses, monde ouvert ; rendements décroissants mesurés | PV2 |
 | Legacy : défis, points, bonus ; suivi de ma progression | LG1, LG2 |
-| Métiers | MT1 |
+| Métiers (au-delà de SkillUp Forever) | MT1 |
 | Réputations | RP1 |
 | Hôtel des ventes, prix, économie | EC1 |
-| Quêtes propres à Forever, modèle d'XP de Forever | T04d |
-| Mana des combats longs (Évocation, potions, gemmes) | T05b |
 | Mémoire du joueur au-delà du profil (équipement enregistré, historique, fiches datées) | T07 |
-| Raid complet (le build de raid actuel est un scénario provisoire de `forever_build`) | T09 |
-| Équipement calculé des autres classes, plan d'équipement complet (coûts, réputation, raid) | T10 |
+| Plan d'équipement complet (coûts, réputation, raid) ; équipement chiffré sous le 60 des classes autres que le Mage | T10 |
 | Consommables et préparation de raid | T11 |
 | Analyse de mes combats PvP (contrôles, recharges, morts, cibles) | AN1 |
 | Analyse de mes combats PvE (rotation réelle, écarts, perte chiffrée) | AN2 |
-| Chaman : dégâts, rotations, leveling (première tranche de classe) | CM1 |
-| Chasseur : dégâts, rotations, leveling, choix du familier par contexte (le savoir des familiers est couvert) | CH1 |
-| Démoniste, Paladin, Guerrier, Voleur, Prêtre, Druide : dégâts, rotations, leveling (dans cet ordre) | DE1, PA1, GU1, VO1, PR1, DR1 |
+| Dégâts, rotations et temps de leveling chiffrés sous le niveau 60, classes autres que le Mage (au 60 : wowsims/forever) | SIM2 (selon la réponse des auteurs des simulateurs) |
+| Chaman calculé sous le 60 (première classe après le Mage) | CM1 |
+| Chasseur : choix du familier chiffré par contexte (le savoir des familiers est couvert) | SIM2 |
 
 Pour ces domaines : dis « je ne sais pas » (ou « le projet ne couvre pas encore … »), cite la tranche de
 `docs/ROADMAP.md`, et propose ce qui existe déjà (par exemple le niveau d'un donjon). Ne complète pas avec des
 valeurs de WoW Classic ou retail « pour info ».
 
-### Classe pas encore calculée
-Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin ») : réponds quand même, sans rien deviner.
-- Dis d'abord que la classe n'est pas encore calculée par le moteur (tranche de la classe ci-dessus) et que la
-  certitude est au mieux supposé.
-- Question générale : ne demande rien au joueur. Question personnelle : profil lu, rappelé en une ligne.
+### Classe pas encore calculée sous le 60 (autre que le Mage)
+Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin ») : réponds avec ce qui existe, sans
+rien deviner.
+- **Niveau 60** : `forever_simulate` (wowsims/forever) donne les dégâts, la race et les poids de la spécialisation ;
+  cite le préréglage, le commit et la certitude `suppose`. Un soigneur sans rotation dans wowsims : « non calculé ».
+- **Sous le 60** : dis qu'aucun calcul chiffré n'existe pour cette classe sous le 60 (tranche SIM2) et que la
+  certitude est au mieux supposé. Question générale : ne demande rien au joueur. Question personnelle : profil lu,
+  rappelé en une ligne.
 - Donne d'abord les builds populaires de Talents Forever (`forever_lookup(kind="tf_popular", name=<classe>)`,
-  part, date, lien et légalité ; addon absent : dis-le), puis des builds de la communauté trouvés par le
-  sous-agent `forever-web-researcher`, lancé tout de suite sans
-  demander ni accord ni contexte (contextes courants, ou celui de la question) ; sous-agent indisponible : dis que
-  cette recherche est la suite prévue, sans poser de question. Chaque build avec sa source, son type et sa date, en
-  noms de talents et en points par arbre,
-  présenté comme l'avis de cette source (section « Sources extérieures » de `format-reponse.md`). Un chiffre de ce
-  rapport ne se cite que s'il figure sur une ligne qui porte l'adresse de sa source (le contrôle des chiffres ne
-  reconnaît que ces lignes).
-- Les talents des neuf classes sont décodés du client (PV1) : vérifie la légalité de chaque build par
+  part, date, lien et légalité ; addon absent : dis-le) et ceux de Forever Companion quand l'outil les rend, puis des
+  builds de la communauté trouvés par le sous-agent `forever-web-researcher`, lancé tout de suite sans demander ni
+  accord ni contexte (contextes courants, ou celui de la question) ; sous-agent indisponible : dis que cette
+  recherche est la suite prévue, sans poser de question. Chaque build avec sa source, son type et sa date, en noms de
+  talents et en points par arbre, présenté comme l'avis de cette source (section « Sources extérieures » de
+  `format-reponse.md`). Un chiffre de ce rapport ne se cite que s'il figure sur une ligne qui porte l'adresse de sa
+  source (le contrôle des chiffres ne reconnaît que ces lignes).
+- Les talents des neuf classes sont décodés du client : vérifie la légalité de chaque build par
   `forever_lookup(kind="build_check", name=<classe>, level, talents)` et explique ses talents par
   `forever_lookup(kind="talent", name, class_name)` (skill `forever-builds`) ; un build illégal se dit tel.
+- Leveling (route, zones, XP par heure par zone) : couvert pour toutes les classes, mêmes outils que pour le Mage.
 - Rien de mémoire, de WoW Classic ni de retail.
 
 ### Donnée manquante

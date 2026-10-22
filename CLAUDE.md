@@ -29,7 +29,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - Contrôle : `uv run python scripts/check_addon.py` (et `tests/unit/test_addon_rules.py`).
 
 ## Zones protégées
-- `tests/golden/` : ne jamais régénérer pour faire passer un test. Si un changement voulu les modifie, s'arrêter, expliquer pourquoi et demander l'accord ; la justification va dans le message de commit. Un hook bloque l'écriture.
+- `forever/data/manifest.json` : jamais réécrit à la main ; seuls `forever install` et la veille l'écrivent. Un hook bloque l'écriture directe (`FOREVER_ALLOW_GOLDEN=1` sur mon accord). Il n'y a pas de tests « golden » : une nouvelle version donne un rapport des valeurs qui changent (décision 288).
 - `seed/forever-mage/` et `seed/grimoire-engine/` : code de référence validé, à porter, en lecture seule.
 
 ## Façon de travailler
@@ -37,7 +37,7 @@ Système expert World of Warcraft: Forever : cœur de calcul Python (`forever/`)
 - Exécution dans le dépôt principal (pas de worktree) sur une branche `txx`. Fin de tranche : pousser la branche, attendre la CI verte sous Ubuntu et Windows, fusionner soi-même en fast-forward dans `main`, pousser `main`, supprimer la branche locale et distante.
 - Tests d'abord : écrire les tests, constater l'échec, committer, puis implémenter jusqu'au vert sans modifier ces tests.
 - Petits commits, message `Txx: <ce qui change>`.
-- Continuer sans demander tant qu'une étape n'a pas besoin de moi. S'arrêter et demander avant : toucher `tests/golden/`, ajouter une dépendance, un accès réseau, supprimer des données, trancher une règle de jeu.
+- Continuer sans demander tant qu'une étape n'a pas besoin de moi. S'arrêter et demander avant : réécrire le manifeste des données à la main, ajouter une dépendance, un accès réseau, supprimer des données, trancher une règle de jeu.
 - Avant tout chantier (décision 288), deux questions écrites dans le plan : « qui maintient déjà ça mieux que nous ? » et « que se passe-t-il au prochain patch ? ». Si tout casse au prochain patch, ne pas le construire : lire et alimenter ce qui existe (client, addons, simulateur de la communauté, parcours maintenus) ; notre calcul ne sert qu'en recoupement et pour combler les trous ; une nouvelle version donne un rapport des valeurs qui changent, à valider, pas des tests rouges.
 - IMPORTANT : Forever seulement (décision 294). Tout calcul se base uniquement sur ce qui est fait pour WoW Forever : rien de Season of Discovery ni de la Classic, ni données ni mécanismes, aucun rapprochement ; une source qui ne couvre pas Forever n'est pas prise.
 - Calculs réutilisés (décision 293) : les calculs viennent de ce qui existe et est maintenu par d'autres (simulateurs de la communauté), par des adaptateurs minces, épinglés et mis à jour automatiquement ; aucun nouveau code de calcul qui recopie une mécanique du jeu ; le code redondant est retiré ou gelé.

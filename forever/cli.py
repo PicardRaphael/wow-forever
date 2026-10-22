@@ -988,7 +988,7 @@ def build_parser() -> argparse.ArgumentParser:
     pets_tame.add_argument("--rank", type=int, help="rang de la capacité (défaut : le plus haut atteignable)")
     pets_tame.add_argument("--zone", required=True, help="zone (nom français ou anglais)")
     pets_tame.add_argument("--level", type=int, help="niveau du Chasseur (obligatoire, jamais deviné)")
-    pets_cross = pets_sub.add_parser("crosscheck", parents=[pets_common], help="écarts client ↔ addon ↔ Questie")
+    pets_cross = pets_sub.add_parser("crosscheck", parents=[pets_common], help="écarts entre client, addon et Questie")
     pets_cross.add_argument("--markdown", help="écrire aussi le rapport Markdown dans ce fichier")
     pets_sub.add_parser("mine", parents=[pets_common], help="mes observations et mes familiers (ma sauvegarde)")
     pets_measure = pets_sub.add_parser(

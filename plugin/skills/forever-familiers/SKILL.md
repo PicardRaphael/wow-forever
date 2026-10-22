@@ -50,6 +50,6 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 - Addon absent : fiches du client seules, guide impossible ; dis-le.
 
 ## Hors de ce skill
-- Choix du meilleur familier par contexte (leveling, donjon, raid, PvP), dégâts du familier, moteur du Chasseur :
-  tranche CH1, « je ne sais pas » en attendant.
-- Démons du Démoniste (DE1) ; familiers exotiques et talents de familier : aucun vu dans Forever selon les relevés.
+- Choix du meilleur familier chiffré par contexte (leveling, donjon, raid, PvP), dégâts du familier : aucun calcul
+  sous le 60 (tranche SIM2), « je ne sais pas » en attendant ; au 60, `forever_simulate` (wowsims/forever).
+- Démons du Démoniste : non couverts ; familiers exotiques et talents de familier : aucun vu dans Forever selon les relevés.

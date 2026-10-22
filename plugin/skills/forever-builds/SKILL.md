@@ -31,8 +31,8 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   (choix de joueurs).
 
 ## Autres classes : builds de la communauté vérifiés
-- Le moteur ne calcule pas encore leurs dégâts (tranches de classe CM1, CH1, DE1, PA1, GU1, VO1, PR1, DR1) : dis-le, certitude au mieux supposé
-  pour le choix du build.
+- Au niveau 60, `forever_simulate` (wowsims/forever) calcule leurs dégâts, races et poids ; sous le 60, aucun calcul
+  chiffré (tranche SIM2, le Chaman d'abord : CM1) : dis-le, certitude au mieux supposé pour le choix du build.
 - Question personnelle : `forever_player_profile` d'abord (classe, niveau, talents du profil) ; question générale :
   rien à demander, hypothèse neutre annoncée.
 - Chaque build populaire et chaque contrôle `build_check` légal portent aussi `naowh` (code `!NFB1!`, ordre
