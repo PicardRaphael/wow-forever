@@ -8,8 +8,10 @@ dépôt aux données du client.
 - Observation faite sur la même version : elle garde la priorité ; la candidate est corrigée sur une copie
   (`keep_observations`) et l'écart est signalé, sans bloquer le reste. Une valeur portée par un correctif du serveur
   (champ `hotfix` de l'entité du client) n'est pas une observation : elle est appliquée et dite.
-- Écart d'un autre fichier, ou sort retiré par une nouvelle version (la fusion ne sait pas l'appliquer) : non tranché,
-  l'installation reste refusée (intégrité).
+- Sort retiré par une nouvelle version (décision 297) : tranché comme un talent ; la fusion le garde, marqué
+  « retiré par la version », et plus aucune recommandation ne le propose.
+- Écart d'un autre fichier : non tranché, l'installation reste refusée (intégrité) ; aucun autre fichier ne produit
+  d'écart refusé aujourd'hui (fichiers des classes, tables et valeurs remplacés ou comparés en entier).
 
 Version d'une observation : celle des données installées qui la portent (`version_from` du plan d'installation).
 Fonctions pures, sauf `keep_observations` qui écrit une copie de la candidate."""
@@ -106,9 +108,6 @@ def resolve(
             if c["field"] is None:
                 shown = " garde la priorité"
             notes.append(f"écart signalé : {what}, {field} : ton observation de {version_from}{shown}")
-            continue
-        if kind == "spell" and c["change"] == "removed":
-            unresolved.append(r)  # la fusion ne sait pas retirer un sort
             continue
         if hotfix and not older:
             why = f"par un correctif du serveur de la version {version_to}"

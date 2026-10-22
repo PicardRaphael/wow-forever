@@ -120,6 +120,9 @@ def lookup_spell(
 
     certainties: list[Certainty] = [base_certainty]
     notes: list[str] = list(meta.get("notes", []))
+    retired = spell.get("retired")
+    if isinstance(retired, dict):  # décision 297 : gardé pour mémoire, jamais recommandé
+        notes.append(f"{key} retiré par la version {retired.get('by')} : plus proposé par aucune recommandation")
     if any(r["mana"] is None for r in ranks) and "mana" in field_notes:
         notes.append(field_notes["mana"])
     for field_name, value in (details or {}).items():

@@ -387,7 +387,10 @@ class _Merge:
         for key, s in doc["spells"].items():
             c = cand_spells.get(key)
             if c is None:
-                self.add(SPELLS, key, s, None, source, "certain", "refused")
+                # décision 297 : sort retiré par le client, tranché (décision 296) ou confirmé : gardé, marqué
+                # « retiré par la version », plus jamais recommandé (`best_rank`) ; refusé sinon
+                if not s.get("retired") and self._confirmed_field(SPELLS, "spell", key, None, key, None, source):
+                    s["retired"] = {"by": self.version, "decision": str(self.applied[-1].get("decision") or "")}
                 continue
             for f in sorted(set(s) | set(c)):
                 if f in ("ranks", "source", "name", "name_fr", "spell_ids", "hotfix") or s.get(f) == c.get(f):

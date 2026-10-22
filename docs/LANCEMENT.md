@@ -291,6 +291,9 @@ correction passe devant le reste.
 22i-bis. Nouvelle version qui retire ou change un talent que la version installée tenait (décision 296) : elle
     s'installe d'elle-même ; la carte « Mis à jour » dit « talent … retiré par la version … ; ton observation datait
     de … ». Sur une révision de la même version, l'écart est « signalé » et ta valeur reste.
+22i-ter. Sort retiré par la version finale (décision 297) : la carte « Mis à jour » dit « sort … retiré par la
+    version … » ; `uv run forever lookup spell <nom>` le dit retiré ; le bouton Talents et les exports ne le
+    proposent plus, même si ton personnage l'utilisait.
 22j. Plus aucune carte « Valider / Refuser » pour une installation ou une mesure : seules restent les cartes qui
     se lèvent seules (réseau, correctifs à lire), celles qui demandent une session (vérification rouge, valeur
     perdue) et le rappel de relecture de Forever Bestiary.

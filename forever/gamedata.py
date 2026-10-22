@@ -205,6 +205,7 @@ def _spells(raw: Any, file: str = SPELLS_FILE) -> dict[str, Spell]:
             frozen_mult=r.opt_num(s, "frozen_mult", f"{where}.frozen_mult"),
             projectile_speed=r.opt_num(s, "projectile_speed", f"{where}.projectile_speed"),
             slow_dur=slow_dur,
+            retired_by=str((s.get("retired") or {}).get("by")) if s.get("retired") else None,
         )
     return spells
 

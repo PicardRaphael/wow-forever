@@ -975,6 +975,9 @@ def _evaluate(
     stage_deps = run.deps_on(stage)
     install_ok, plan = True, None
     observed: list[str] = []  # écarts tranchés par la décision 296 (carte « Mis à jour »)
+    decoded = _read(candidate / version / "sources.json")  # relevés en jeu contredits au décodage (décision 297)
+    if isinstance(decoded, dict):
+        observed += [str(n) for n in decoded.get("observation_notes") or []]
     try:
         plan = plan_install(stage_deps, str(candidate), new_version=new_version)
         settled = _settle_observations(run, stage, candidate, plan, version) if plan["refused"] else None
@@ -992,6 +995,8 @@ def _evaluate(
     except InvalidArgumentError as exc:  # rien à installer (révision qui ne change rien)
         return Step(step, "rien", exc.message, {"version": version})
     after = stage / version if install_ok else candidate / version
+    if install_ok:
+        observed += _record_retired_class_spells(stage, base_vdir, version)
     carry = carry_check(base_vdir, after)
     if install_ok and carry.reapplied:
         carry_apply(base_vdir, after, carry)
@@ -1125,6 +1130,38 @@ def _settle_observations(
     for note in out.notes:
         run.say(f"écart tranché (décision 296) : {note}")
     return candidate, list(out.notes), restore
+
+
+def _record_retired_class_spells(stage: Path, base_vdir: Path, version: str) -> list[str]:
+    """Sorts des classes (`classes.json`) que la version installée portait et que le client n'a plus (décision 297) :
+    notés dans `confirmed_changes.json` de la version préparée (« retiré par la version ») ; aucune recommandation ne
+    les propose plus (exports et fiches lisent `classes.json`). Rend les phrases de la carte « Mis à jour »."""
+    from forever.manifest import write_manifest
+    from forever.pipeline.install import CONFIRMED
+
+    before = (_read(base_vdir / "classes.json") or {}).get("classes") or {}
+    now = (_read(stage / version / "classes.json") or {}).get("classes") or {}
+    entries, notes = [], []
+    for cls in sorted(set(before) & set(now)):
+        old, new = before[cls].get("spells") or {}, now[cls].get("spells") or {}
+        for key in sorted(set(old) - set(new)):
+            name = str(old[key].get("name") or key)
+            why = f"sort {name} ({cls}) retiré par la version {version}"
+            notes.append(why)
+            entries.append({"kind": "class_spell", "key": key, "class": cls, "change": "removed", "field": None,
+                            "old": key, "new": None, "nature": "client", "decision": f"décision 297 : {why}"})  # fmt: skip
+    if entries:
+        path = stage / version / CONFIRMED
+        doc = _read(path)
+        if isinstance(doc, dict):
+            known = {(e.get("kind"), e.get("key"), e.get("class")) for e in doc.get("changes", [])}
+            doc["changes"] = [
+                *doc.get("changes", []),
+                *(e for e in entries if (e["kind"], e["key"], e["class"]) not in known),
+            ]
+            path.write_bytes((json.dumps(doc, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+            write_manifest(stage)
+    return notes
 
 
 def _entity_names(vdir: Path) -> dict[str, str]:

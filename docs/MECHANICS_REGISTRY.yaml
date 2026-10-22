@@ -1299,6 +1299,7 @@ mechanics:
     statut: teste
     certitude: probable
     sources:
+      - "Décision 297 (2026-10-22) : un sort retiré par une version du client (spells.json, retired.by) n'a plus aucun rang appris (best_rank) : jamais lancé ni recommandé"
       - "EX1 (relecture du registre) : rangs appris d'un sort de classe (forever/engine/spells.py learned_class_ranks), même règle que best_rank, utilisée par les macros et les profils EllesmereUI ; niveau de rang inconnu : non appris"
       - "Tables du client SpellEffect (EffectBonusCoefficient), 1.60.1.70009 : forever/data/1.60.1.70009/spell_scaling.json (schéma 2, T04e)"
       - "tests/fixtures/wago/1.60.1.70009/enUS/SpellEffect.csv"
@@ -1310,6 +1311,7 @@ mechanics:
       - "note officielle du 01/10/2026 (https://us.forums.blizzard.com/en/wow/t/2360696/4, révision 4 du 2026-10-02), recoupée dans docs/research/notes-blizzard-2026-10-01.md : un rang très inférieur au niveau profite moins de la puissance des sorts (existence, sans formule)"
     tests:
       - tests/unit/test_engine_learned_ranks.py::test_ranks_up_to_the_level
+      - tests/unit/test_retired_spells.py::test_the_final_version_removes_a_spell_my_profile_uses
       - tests/unit/test_engine_learned_ranks.py::test_unknown_level_is_never_learned
       - tests/unit/test_engine_learned_ranks.py::test_talent_spell_needs_the_talent_and_its_first_rank_comes_from_it
       - tests/unit/test_client_coefficients.py::test_coefficient_matches_client_table

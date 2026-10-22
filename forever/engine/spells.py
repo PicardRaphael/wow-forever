@@ -67,10 +67,13 @@ def rank_damage(gd: GameData, key: str, rank: Rank, level: int, spell_level: str
 
 
 def best_rank(gd: GameData, key: str, level: int, pts: Points) -> Rank | None:
-    """Plus haut rang appris au niveau donné. Un sort de talent exige le talent ; son rang 1 vient du talent.
+    """Plus haut rang appris au niveau donné. Un sort de talent exige le talent ; son rang 1 vient du talent. Un
+    sort retiré par le client (`retired_by`, décision 297) n'a aucun rang : jamais lancé ni recommandé.
 
     Registre : G4"""
     s = gd.spells[key]
+    if s.retired_by is not None:
+        return None
     if s.talent is not None and pts.get(s.talent, 0) <= 0:
         return None
     if s.talent is not None:

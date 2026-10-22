@@ -44,6 +44,7 @@ class Spell:
     frozen_mult: float | None
     projectile_speed: float | None
     slow_dur: tuple[float, ...] | None = None  # durée du ralenti par rang (spells.json)
+    retired_by: str | None = None  # décision 297 : version du client qui l'a retiré ; plus jamais recommandé
 
 
 @dataclass(frozen=True)

@@ -19,6 +19,7 @@ from typing import Any, NamedTuple
 from forever.config import Deps
 from forever.errors import CandidateExistsError, CsvMissingError, DataSchemaError, InvalidArgumentError
 from forever.manifest import SOURCES_NAME, VERSION_DIR_RE, version_dirs, write_manifest
+from forever.pipeline.builds import version_key
 from forever.pipeline.character_scaling import (
     CHARACTER_FILE,
     CHARACTER_FILES,
@@ -663,6 +664,8 @@ def _class_talents(
     cls: str,
     version: str,
     tf: Mapping[str, Any] | None = None,
+    observed_in: str | None = None,
+    notes: list[str] | None = None,
 ) -> dict[str, Any]:
     spec = rules["classes"][cls]
     geo = rules["talent_geometry"]
@@ -757,14 +760,31 @@ def _class_talents(
             if entry_p["node_id"] == node_id:
                 entry_p["answered"] = source
 
+    older = observed_in is not None and version_key(observed_in) < version_key(version)
+
+    def contradicted(what: str) -> bool:
+        """Relevé en jeu contredit par le client. Sans version du relevé : arrêt du décodage (contrôle). Décision 296 :
+        relevé d'une version plus ancienne écarté, le client fait foi (vrai) ; de la même version, il garde la
+        priorité (faux) ; la phrase va dans `notes` (carte « Mis à jour »)."""
+        if observed_in is None or notes is None:
+            raise DataSchemaError(f"{what}.")
+        if older:
+            notes.append(
+                f"{what} : relevé écarté, le client {version} fait foi ; ton observation datait de {observed_in}"
+            )
+            return True
+        notes.append(f"écart signalé : {what} ; ton observation de {observed_in} garde la priorité")
+        return False
+
     for key, seen in (rules.get("observed_absent", {}).get(cls) or {}).items():
         found = [t for t in [*talents.values(), *parked_talents.values()] if t["key"] == key]
         if not found:
-            raise DataSchemaError(f"{cls} : absence relevée pour un talent inconnu « {key} ».")
-        if found[0]["node_id"] != int(seen["node_id"]):
-            raise DataSchemaError(
-                f"{cls}, {key} : nœud décodé du client ({found[0]['node_id']}) différent du relevé ({seen['node_id']})."
-            )
+            contradicted(f"{cls} : absence relevée pour un talent inconnu du client « {key} »")
+            continue  # rien à écarter
+        if found[0]["node_id"] != int(seen["node_id"]) and contradicted(
+            f"{cls}, {key} : nœud décodé du client ({found[0]['node_id']}) différent du relevé ({seen['node_id']})"
+        ):
+            continue
         node_id = found[0]["node_id"]
         absent = f"absent de l'arbre en jeu : {seen['source']}"
         answer(node_id, str(seen["source"]))
@@ -781,18 +801,22 @@ def _class_talents(
     for key, pos in (rules.get("observed_positions", {}).get(cls) or {}).items():
         found = [t for t in [*talents.values(), *parked_talents.values()] if t["key"] == key]
         if not found:
-            raise DataSchemaError(f"{cls} : position relevée pour un talent inconnu « {key} ».")
+            contradicted(f"{cls} : position relevée pour un talent inconnu du client « {key} »")
+            continue  # rien à placer
         t = found[0]
+        moved = [
+            f for f in ("tier", "col") if t["node_id"] not in parked_talents and t[f] is not None and t[f] != pos[f]
+        ]
+        if moved and contradicted(
+            f"{cls}, {key} : {'/'.join(moved)} décodé du client ({', '.join(str(t[f]) for f in moved)}) différent du "
+            f"relevé en jeu ({', '.join(str(pos[f]) for f in moved)})"
+        ):
+            continue
         was_parked = parked_talents.pop(t["node_id"], None) is not None
         if was_parked:  # garé : la position corrigée n'est qu'une hypothèse, le relevé la remplace
             talents[t["node_id"]] = t
             dropped = [d for d in dropped if d["node_id"] != t["node_id"]]
             answer(t["node_id"], str(pos["source"]))
-        for field in ("tier", "col"):
-            if not was_parked and t[field] is not None and t[field] != pos[field]:
-                raise DataSchemaError(
-                    f"{cls}, {key} : {field} décodé du client ({t[field]}) différent du relevé en jeu ({pos[field]})."
-                )
         t["tier"], t["col"] = pos["tier"], pos["col"]
         t.pop("unresolved", None)
         t["position"] = {"source": pos["source"], "certainty": pos["certainty"]}
@@ -1161,7 +1185,13 @@ def _class_spells(
 
 
 def decode_classes(
-    tables: Tables, rules: Mapping[str, Any], version: str, tf: Mapping[str, Any] | None = None
+    tables: Tables,
+    rules: Mapping[str, Any],
+    version: str,
+    tf: Mapping[str, Any] | None = None,
+    *,
+    observed_in: str | None = None,
+    notes: list[str] | None = None,
 ) -> dict[str, Any]:
     """Contenu de `classes.json` (PV1) : pour chacune des 9 classes (`classes` des règles), identifiant et jeton du
     client, arbre de traits, trois arbres de talents (nom de la ligne de compétence de l'onglet), talents avec leur
@@ -1169,10 +1199,13 @@ def decode_classes(
     listés non résolus (`unresolved_nodes`, jamais arrondis), doublons périmés écartés (`dropped_nodes`, règle
     `shared_spell`), contrôle de l'ordre des onglets (`tree_checks`). `tf` :
     positions de Talents Forever (`tf_positions`), seule confirmation d'un nœud garé hors du canevas (`parked_nodes`,
-    décision 211)."""
+    décision 211). `observed_in` (version des règles et des relevés en jeu) et `notes` : un relevé contredit par le
+    client suit la décision 296 au lieu d'arrêter le décodage (voir `_class_talents`)."""
     client = _Client(tables, rules)
     index = _ClassIndex(tables)
-    classes = {cls: _class_talents(tables, rules, client, cls, version, tf) for cls in rules["classes"]}
+    classes = {
+        cls: _class_talents(tables, rules, client, cls, version, tf, observed_in, notes) for cls in rules["classes"]
+    }
     for cls, c in classes.items():
         _class_spells(tables, rules, client, index, cls, c, version)
     return {
@@ -2150,15 +2183,18 @@ def decode_version(
     spells = decode_spells(tables, rules, _read_json(base / "spells.json"), version)
     scaling = decode_scaling(tables, rules, version)
     extra_notes: list[str] = []
+    observation_notes: list[str] = []  # décision 296 : relevés en jeu contredits par le client
     decoded_classes: dict[str, Any] = {}
     if class_files and not class_missing:
         more = hot.apply(load_class_tables(csv_dir, rules))
         decoded_classes = {
-            "classes.json": decode_classes(more, rules, version, _installed_tf(deps)),
+            "classes.json": decode_classes(
+                more, rules, version, _installed_tf(deps), observed_in=base_version, notes=observation_notes
+            ),
             "races.json": decode_races(more, rules, version),
             "pvp_items.json": decode_pvp_items(more, rules, version),
         }
-        extra_notes += _class_observations(decoded_classes["classes.json"])
+        extra_notes += _class_observations(decoded_classes["classes.json"]) + observation_notes
         check_mage_not_parked(talents, decoded_classes["classes.json"])
         _complete_new_spells(spells, decoded_classes["classes.json"], rules.get("new_spells", {}))
     _frozen_mult(spells, talents, rules)
@@ -2375,6 +2411,8 @@ def decode_version(
     if absent_names:
         sources["missing_names"] = absent_names
         extra_notes.append(f"noms manquants (tables d'une autre locale absentes) : {', '.join(absent_names)}")
+    if observation_notes:
+        sources["observation_notes"] = observation_notes
     if hot.source is not None:
         docs = {"talents.json": talents, "spells.json": spells, "spell_scaling.json": scaling, **decoded_classes}
         extra_notes.append(hot.finish(docs, inherited, sources, rules.get("talent_geometry")))
