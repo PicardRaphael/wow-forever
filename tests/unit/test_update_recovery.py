@@ -237,3 +237,27 @@ def test_the_written_version_carries_its_manual_values_inventory(origin):  # noq
     assert [w["version"] for w in report["written"]] == [TARGET]
     doc = git(bare, "show", "main:docs/research/valeurs-ecrites-a-la-main.md")
     assert f"forever/data/{TARGET}/" in doc
+
+
+@pytest.mark.slow
+def test_an_undo_killed_before_the_push_returns_to_main_and_can_be_asked_again(origin):  # noqa: F811
+    """Décision 295 : « Annuler » tué sur sa branche `data/undo-<id>` ; le passage suivant ramène le clone sur main
+    (au lieu de s'arrêter, « main attendue ») et l'annulation peut être relancée."""
+    from forever.update import undo
+    from forever.update_installed import list_installed, load_installed
+
+    montage_, bare = origin
+    deps, _ = montage_()
+    run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    (record,) = list_installed(deps.cache_dir)
+    with pytest.raises(Killed):
+        undo(deps, record["id"], runner=KillAt(["git", "push", "-u"]))
+    clone = clone_of(deps)
+    assert head_branch(clone) == f"data/undo-{record['id']}"
+    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    cloned = step(report, "clone")
+    assert cloned["status"] == "fait" and "annulation interrompue" in cloned["detail"], cloned
+    assert head_branch(clone) == "main"
+    assert undo(deps, record["id"], runner=Recorder())["status"] == "fait"
+    assert load_installed(deps.cache_dir, record["id"])["state"] == "annulée"
+    assert not git(bare, "ls-tree", "--name-only", "main", f"forever/data/{TARGET}")
