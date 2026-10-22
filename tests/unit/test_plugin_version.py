@@ -62,7 +62,8 @@ def test_plugin_json_has_a_semver_version():
     # 0.17.0 : outil forever_simulate (wowsims/forever au niveau 60, décisions 293 et 294) ; zones du livre de quêtes.
     # 0.18.0 : forever_simulate compare des classes dans des conditions identiques.
     # 0.19.0 : poids de l'équipement au niveau 60 par wowsims/forever.
-    assert version == "0.19.0"
+    # 0.20.0 : routeur à l'état réel (leveling de toutes les classes, wowsims au 60, moteur du Mage gelé, SIM2 et CM1).
+    assert version == "0.20.0"
 
 
 def test_fingerprint_is_up_to_date():
