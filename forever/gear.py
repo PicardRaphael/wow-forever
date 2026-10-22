@@ -236,6 +236,29 @@ def companion_spec_weights(
     return _guide_keys(pick.weights, PAWN_TO_GUIDE), pick.label
 
 
+# Clés de Forever Guide -> statistiques de Pawn (Forever Companion, « Import scale… »).
+GUIDE_TO_PAWN = {
+    "str": "Strength", "agi": "Agility", "sta": "Stamina", "int": "Intellect", "spi": "Spirit", "ap": "Ap",
+    "rap": "Rap", "fap": "FeralAp", "hit": "HitRating", "crit": "CritRating", "dps": "MeleeDps", "sp": "SpellPower",
+    "hp": "Healing", "arc": "ArcaneSpellDamage", "fir": "FireSpellDamage", "fro": "FrostSpellDamage",
+    "hol": "HolySpellDamage", "nat": "NatureSpellDamage", "sha": "ShadowSpellDamage", "shit": "SpellHitRating",
+    "scrit": "SpellCritRating", "mp5": "Mp5", "armor": "Armor", "def": "DefenseRating", "dodge": "DodgeRating",
+    "parry": "ParryRating", "block": "BlockRating", "bv": "BlockValue",
+}  # fmt: skip
+
+
+def export_lines(weights: Mapping[str, float], *, spec: str, class_token: str, label: str) -> dict[str, str]:
+    """Lignes à importer depuis des poids en clés de Forever Guide : `NFSW1:` (Naowh Forever, « Import weights ») et
+    échelle Pawn v1 (Forever Companion, « Import scale… »)."""
+    from forever.exports.naowh import naowh_weights
+    from forever.exports.pawn import pawn_scale
+
+    to_naowh = {guide: naowh for naowh, guide in NAOWH_TO_GUIDE.items()}
+    naowh = {to_naowh[k]: v for k, v in weights.items() if k in to_naowh and v > 0}
+    pawn = {GUIDE_TO_PAWN[k]: v for k, v in weights.items() if k in GUIDE_TO_PAWN and v > 0}
+    return {"naowh": naowh_weights(spec, naowh), "pawn": pawn_scale(label, class_token, pawn)}
+
+
 def mage_guide_weights(report: dict[str, Any], *, spec_key: str) -> dict[str, float]:
     """Poids d'un rapport de `mage_weights` en clés de Forever Guide (école de la spécialisation comprise)."""
     out = {MAGE_TO_GUIDE[k]: v for k, v in report["weights"].items() if k in MAGE_TO_GUIDE}
@@ -1084,6 +1107,21 @@ def gear_report(
     cls = class_name.strip().upper()
     addons = _addons_dir(deps)
     if action == "weights":
+        key = spec or DEFAULT_SPECS.get(cls) or ""
+        label = name or f"Forever · {key or cls.capitalize()} · {level}"
+        if level == WOWSIMS_LEVEL or cls != "MAGE":  # au 60 : wowsims ; sous le 60 hors Mage : même repli que bis
+            if not key:
+                raise InvalidArgumentError("Spécialisation requise (clé de Naowh, ex. fury-warrior).", "donner --spec")
+            weights, source = _weights_for(
+                deps, addons, cls, level=level, race=race, spec=key, talents=talents, talents_level=talents_level
+            )
+            if weights and (cls != "MAGE" or "wowsims" in source):
+                return {
+                    "weights": weights,
+                    "weights_source": source,
+                    **export_lines(weights, spec=key, class_token=cls, label=label),
+                    "provenance": _provenance(deps, [f"poids : {source}"]),
+                }
         if cls != "MAGE":
             raise InvalidArgumentError(
                 "Poids calculés pour le Mage seulement (autres classes : échelle de Forever Companion).",

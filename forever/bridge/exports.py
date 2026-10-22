@@ -103,17 +103,17 @@ def _gear_section(
     spec = "frost-mage" if "frost-mage" in keys else (keys[0] if keys else None)
     lines: list[str] = []
     links: list[dict[str, str]] = []
-    if token == "MAGE":
+    if spec is not None:  # même calcul que le classement : wowsims au 60, sinon le repli de la classe
         try:
-            weights = gear_report(deps, "weights", class_name=cls, level=level, race=race,
-                                  spec=spec or "frost-mage", name=f"Forever · {who} · niveau {level}",
-                                  **_talents(deps, context))  # fmt: skip
+            weights = gear_report(deps, "weights", class_name=cls, level=level, race=race, spec=spec,
+                                  name=f"Forever · {who} · niveau {level}", **_talents(deps, context))  # fmt: skip
         except ForeverError as err:
-            lines.append(f"- Poids du Mage : {err.message}")
+            lines.append(f"- Poids : {err.message}")
         else:
             links += [typed_link("naowh_weights", weights["naowh"]), typed_link("companion_scale", weights["pawn"])]
+            source = weights.get("weights_source") or "moteur du Mage"
             lines.append(
-                f"- Poids du Mage au niveau {level} : [Naowh : poids] dans {WHERE['naowh_weights']} ; "
+                f"- Poids au niveau {level} ({source}) : [Naowh : poids] dans {WHERE['naowh_weights']} ; "
                 f"[Forever Companion : échelle] dans {WHERE['companion_scale']}."
             )
     if spec is None:
