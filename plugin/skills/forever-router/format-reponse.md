@@ -59,6 +59,9 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
 - Question personnelle qui en dépend (build, prochain talent, temps par monstre, respec, zone) : appelle
   `forever_player_profile` **avant** tout calcul. Les outils de calcul ne lisent jamais le profil : passe-leur toi-même
   les valeurs.
+- Race passée à `forever_simulate` (chaque race de `races`, de `cases`, et `race`) : celle de la question ou du
+  profil, jamais le champ `race` d'un préréglage ni une race supposée ; inconnue : demande-la avant l'appel (en
+  proposant celle de la conversation). Une race citée par le joueur se garde telle quelle.
 - Donnée présente : utilise-la sans la redemander et rappelle le profil en une ligne en tête de réponse :
   « Profil : <nom>, <classe> <race>, niveau <niveau> (profil actif) ». `stale` vrai : signale que le profil date
   d'une autre version des données.

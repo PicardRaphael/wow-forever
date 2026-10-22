@@ -118,6 +118,10 @@ valeurs de WoW Classic ou retail « pour info ».
 ### Classe pas encore calculée sous le 60 (autre que le Mage)
 Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin ») : réponds avec ce qui existe, sans
 rien deviner.
+- **Préréglages de `forever_simulate`** : avant de citer un chiffre, regarde `items` dans `action="presets"` ; un
+  préréglage sans équipement (`items` à 0) est refusé par l'outil et ne se cite jamais. Un résultat qui paraît
+  anormal (écart énorme entre spécialisations proches) se vérifie avant d'être relayé : préréglage, race, `items` ;
+  ne l'explique jamais par une supposition.
 - **Niveau 60** : `forever_simulate` (wowsims/forever) donne les dégâts, la race et les poids de la spécialisation ;
   cite le préréglage, le commit et la certitude `suppose`. Un soigneur sans rotation dans wowsims : « non calculé ».
 - **Sous le 60** : dis qu'aucun calcul chiffré n'existe pour cette classe sous le 60 (tranche SIM2) et que la

@@ -457,9 +457,11 @@ def build_server(deps: Deps) -> MCPServer:
         classe/spé/build) ; `action="races"` races comparées par paires sur `preset` (`races` séparées par des
         virgules, noms du client, ex. « Human,Gnome,High Order Skyborne ») ; `action="weights"` poids des statistiques
         par tirages appariés (`stats` séparées par des virgules, ex. « Intellect,SpellDamage,HitRating », rapportées à
-        `reference`, `race` facultative) ; `action="compare"` préréglages de classes différentes dans des conditions
+        `reference`, `race` exigée) ; `action="compare"` préréglages de classes différentes dans des conditions
         identiques (`cases` : « clé@Race » séparés par des virgules ; mêmes buffs, affaiblissements, rencontre, graine ;
-        `consumables` : `none` aucun, `own` ceux de chaque préréglage). Sous le niveau 60 : rien ici (le moteur du Mage gelé répond, en le disant)."""
+        `consumables` : `none` aucun, `own` ceux de chaque préréglage). La race vient toujours du joueur (question ou
+        profil, sinon la lui demander), jamais du champ `race` d'un préréglage ; préréglage sans équipement (`items`
+        à 0 dans `presets`) : refusé. Sous le niveau 60 : rien ici (le moteur du Mage gelé répond, en le disant)."""
         from forever.sims.report import simulate
 
         try:

@@ -80,6 +80,20 @@ class Preset:
     consumables: dict[str, Any] = field(default_factory=dict)
     encounter: dict[str, Any] | None = None
 
+    @property
+    def items(self) -> int:
+        """Objets équipés par le préréglage (0 : personnage nu, jamais simulé)."""
+        return len(self.equipment.get("items") or [])
+
+
+def require_gear(preset: Preset) -> None:
+    """Refus d'un préréglage sans équipement : ses dégâts sont ceux d'un personnage nu, sans valeur."""
+    if not preset.items:
+        raise WowsimsError(
+            f"préréglage « {preset.key} » sans équipement dans le commit épinglé de wowsims : résultat sans valeur.",
+            "choisir un préréglage équipé (action=presets, champ items)",
+        )
+
 
 def _strip_comments(text: str) -> str:
     text = re.sub(r"/\*.*?\*/", "", text, flags=re.DOTALL)
@@ -186,7 +200,9 @@ def _json(path: Path) -> dict[str, Any]:
     return dict(json.loads(path.read_text(encoding="utf-8")))
 
 
-def _from_presets_ts(spec_dir: Path, rel: str, ids: dict[str, int] | None = None) -> list[Preset]:
+def _from_presets_ts(
+    spec_dir: Path, rel: str, ids: dict[str, int] | None = None, *, fallback: bool = True
+) -> list[Preset]:
     path = spec_dir / "presets.ts"
     if not path.is_file() or rel not in SPEC_FIELDS:
         return []
@@ -261,7 +277,8 @@ def _from_presets_ts(spec_dir: Path, rel: str, ids: dict[str, int] | None = None
                       created.get(o_var), float(distance))  # fmt: skip
         if made is not None:
             out.append(made)
-    if not out and gear and talents and apls:  # aucun build : équipement, talents et rotation par défaut de la spé
+    # aucun build (ni ici ni en fichier de build) : équipement, talents et rotation par défaut de la spé
+    if fallback and not out and gear and talents and apls:
         made = preset(
             f"{rel}/défaut",
             next(iter(gear.values())),
@@ -309,7 +326,8 @@ def read_presets(clone: Path) -> list[Preset]:
     out: list[Preset] = []
     for spec_dir in sorted(p for p in specs.glob("*/*") if p.is_dir()):
         rel = spec_dir.relative_to(specs).as_posix()
-        out += _from_builds(spec_dir, rel) + _from_presets_ts(spec_dir, rel, ids)
+        builds = _from_builds(spec_dir, rel)
+        out += builds + _from_presets_ts(spec_dir, rel, ids, fallback=not builds)
     return out
 
 
@@ -431,6 +449,7 @@ def compare_races(
 ) -> list[dict[str, Any]]:
     """Races comparées par paires (même préréglage, même combat, même graine), de la meilleure à la moins bonne,
     écart à la meilleure en dégâts par seconde."""
+    require_gear(preset)
     rows = []
     for race in races:
         out = run_sim(
@@ -472,6 +491,7 @@ def stat_weights(
 ) -> dict[str, Any]:
     """Poids des statistiques par tirages appariés : un combat sans bonus, puis un par statistique avec `delta` points
     de plus (même préréglage, même graine) ; gain de dégâts par seconde par point, et rapporté à `reference`."""
+    require_gear(preset)
     names = stat_names(wowsims_dir(cache_dir) / "forever")
     unknown = [s for s in [*stats, reference] if s not in names]
     if unknown:
@@ -570,6 +590,8 @@ def compare_presets(
 
     if consumables not in ("none", "own"):
         raise WowsimsError(f"consommables « {consumables} » : none ou own attendu.", "choisir none ou own")
+    for preset, _ in cases:
+        require_gear(preset)
     common = {
         "raid_buffs": _union([p.raid_buffs for p, _ in cases]),
         "party_buffs": _union([p.party_buffs for p, _ in cases]),
@@ -625,7 +647,7 @@ WEIGHTS_ITERATIONS = 4000  # combats par statistique pour les poids de l'équipe
 def gear_weights(cache_dir: Path, spec_key: str, race: str) -> tuple[dict[str, float], str] | None:
     """Poids de l'équipement au niveau 60 d'une spécialisation, en clés de Forever Guide : gain de dégâts par seconde
     par point (tirages appariés sur le préréglage de la spécialisation, race du personnage) ; gardés par commit,
-    préréglage et race. None sans wowsims compilé ou sans préréglage pour cette spécialisation."""
+    préréglage et race. None sans wowsims compilé, sans préréglage pour cette spécialisation ou s'il est nu."""
     pin = pinned(cache_dir)
     key = SPEC_PRESETS.get(spec_key)
     if pin is None or key is None:
@@ -633,7 +655,7 @@ def gear_weights(cache_dir: Path, spec_key: str, race: str) -> tuple[dict[str, f
     clone = wowsims_dir(cache_dir) / "forever"
     presets = {p.key: p for p in read_presets(clone)}
     preset = presets.get(key)
-    if preset is None:
+    if preset is None or not preset.items:  # préréglage nu : poids sans valeur, même gardés d'un passage précédent
         return None
     names = stat_names(clone)
     stats = [s for s in STAT_TO_GUIDE if s in names]
