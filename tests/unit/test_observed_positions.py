@@ -56,3 +56,48 @@ def test_observation_disagreeing_with_the_client_stops_the_decode(class_tables, 
     spec[key]["tier"] += 1  # palier décodé du client différent du relevé
     with pytest.raises(DataSchemaError):
         decode_classes(class_tables, rules, LOCAL_VERSION)
+
+
+# --- Décision 296 au décodage : relevé d'une version plus ancienne ou de la même version ----------------------------
+
+OLDER = "1.60.1.10000"  # version fabriquée, plus ancienne que celle du client décodé
+
+
+def _moved(decode_rules):
+    rules = copy.deepcopy(decode_rules)
+    cls, spec = next(iter(observed(rules).items()))
+    key = next(iter(spec))
+    spec[key]["tier"] += 1  # le client place le nœud ailleurs que le relevé
+    return rules, cls, key, spec[key]
+
+
+def _talent(doc, cls, key):
+    return next(t for tree in doc["classes"][cls]["trees"] for t in tree["talents"] if t["key"] == key)
+
+
+def test_an_older_observation_gives_way_to_the_client_and_is_said(class_tables, decode_rules):
+    rules, cls, key, pos = _moved(decode_rules)
+    notes: list[str] = []
+    doc = decode_classes(class_tables, rules, LOCAL_VERSION, observed_in=OLDER, notes=notes)
+    assert _talent(doc, cls, key)["tier"] != pos["tier"]  # position du client
+    assert any(key in n and f"ton observation datait de {OLDER}" in n for n in notes), notes
+
+
+def test_a_same_version_observation_keeps_priority_and_is_flagged(class_tables, decode_rules):
+    rules, cls, key, pos = _moved(decode_rules)
+    notes: list[str] = []
+    doc = decode_classes(class_tables, rules, LOCAL_VERSION, observed_in=LOCAL_VERSION, notes=notes)
+    assert (_talent(doc, cls, key)["tier"], _talent(doc, cls, key)["col"]) == (pos["tier"], pos["col"])
+    assert any(key in n and "écart signalé" in n for n in notes), notes
+
+
+def test_an_observed_absence_of_a_talent_the_client_no_longer_has_is_said(class_tables, decode_rules):
+    rules = copy.deepcopy(decode_rules)
+    rules["observed_absent"]["Hunter"]["noSuchTalent"] = {
+        "node_id": 1,
+        "source": "relevé fabriqué",
+        "certainty": "certain",
+    }
+    notes: list[str] = []
+    decode_classes(class_tables, rules, LOCAL_VERSION, observed_in=OLDER, notes=notes)
+    assert any("noSuchTalent" in n for n in notes), notes
