@@ -357,12 +357,12 @@ Source de rédaction : `docs/research/addon-forever.md` (rapport du 2026-09-27, 
        lancée » ; la ligne passe à « mise à jour en cours (étape) », puis, une à quelques minutes plus tard, l'historique
        gagne « Mise à jour terminée : n écrit(s), m à valider ». Noter la durée. Pendant un passage, un second clic
        répond « Rien de lancé : passage en cours ».
-    4. **Carte d'une vraie attente** : « À valider (n) » ; lire la carte des mesures (PNJ, niveaux de PV, builds) ;
-       « Expliquer » : réponse de la conversation « jeu » qui explique la carte. Puis, au choix : Valider (vraie
-       approbation : `forever update approve` lance un passage qui peut installer une révision des données) ou Refuser
-       (rejet noté « refusé en jeu ») ; chaque bouton demande « Confirmer » dans les cinq secondes. Dans le terminal,
-       `uv run forever update status` montre l'état changé. Une attente « réseau » ou « correctifs à lire » n'a que
-       « Expliquer ».
+    4. **Carte « Mis à jour »** (décision 295 : plus de Valider ni de Refuser pour une installation ou une mesure) :
+       lire ce que la veille a installé d'elle-même (conseils changés en mots de joueur, sinon résumé des valeurs) ;
+       « Expliquer » : réponse de la conversation « jeu » qui explique la carte. « Annuler » demande « Confirmer » dans
+       les cinq secondes, puis lance `forever update undo <id>` (retour à la révision précédente). Dans le terminal,
+       `uv run forever update status` montre « Mis à jour » puis « Annulée ». Une attente « réseau » ou « correctifs à
+       lire » n'a que « Expliquer ».
     5. **Écart avec le profil** : poser une question quelconque. Profil absent ou différent du jeu : la réponse finit
        par « Écart avec ton profil : voir À valider » et une carte « Créer le personnage … au profil » (ou « Écart avec
        ton profil ») apparaît. Clic sur « Mettre à jour le profil », puis « Confirmer » : « Profil mis à jour … ».

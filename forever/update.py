@@ -3,16 +3,16 @@
 Un passage enchaîne, sans calcul de combat, des fonctions existantes : archivage des fichiers du client, clone dédié
 (`<cache>/update/repo`), version du jeu (build du client publié sur wago.tools), nouvelle version ou correctifs du
 serveur (téléchargement, décodage, `verify`, installation dans une copie de préparation, report des valeurs faites à
-la main, preuve d'entrées par moteur, rejeu ciblé), journaux de combat de la version installée, addons de données.
+la main, preuve d'entrées par moteur ; rejeu ciblé après l'installation), journaux de combat de la version installée, addons de données.
 
-Règle d'automatisme (`decide`, décision 180, amendée par 198 et 207) : une écriture se fait seulement si `verify` est
-vert, si aucune valeur faite à la main n'est perdue ni remplacée, si les entrées de chaque moteur qui calcule sont
-identiques et celles d'un moteur qui recopie ne changent que par des valeurs `client` ou `correctif_serveur`, et si
-aucune valeur d'un correctif du serveur n'est perdue. Une nouvelle version attend le `DBCache.bin` de son build
-(`hotfix_gate`, attente `hotfixes_unread` levée seule). Sinon, attente
-d'accord (`<cache>/update/pending/<id>.json`), approuvée par `forever update approve <id>` tant que sa base n'a pas
-bougé. L'écriture passe par le clone et le chemin git de `forever/pipeline/gitops.py` ; l'arbre de travail de la
-session n'est jamais touché.
+Règle d'automatisme (`decide`, décision 295, qui remplace 180, 198, 207 et 230) : la veille écrit d'elle-même, sauf
+quand l'installation casserait l'intégrité (`verify` rouge, règles de fusion refusées) ou perdrait une valeur faite à la
+main ou une valeur d'un correctif du serveur non relue (`bloqué`, dit, session nécessaire). Ce qui change sans bloquer
+(entrées de moteur, valeur faite à la main remplacée) est noté pour la carte « Mis à jour ». Une nouvelle version
+attend le `DBCache.bin` de son build (`hotfix_gate`, attente `hotfixes_unread` levée seule). Chaque installation
+laisse une fiche (`forever.update_installed`, `<cache>/update/installed/<id>.json`) que « Annuler »
+(`forever update undo <id>`) défait par le même chemin. L'écriture passe par le clone et le chemin git de
+`forever/pipeline/gitops.py` ; l'arbre de travail de la session n'est jamais touché.
 
 La preuve d'entrées et le report à la main comparent la version installée à la version **après installation** dans
 la copie de préparation (`<cache>/update/stage-<version>/data`), jamais à la candidate brute : la candidate porte la

@@ -62,8 +62,8 @@ PC `RAPHAEL-GAMING`, jeu dans `C:\Program Files (x86)\World of Warcraft`, sauveg
       ForeverLogger).
 11. **Données de la version finale** : `uv run forever update`.
     - À voir : la cible est le build du client final, le produit demandé à wago.tools est celui de la version finale
-      (`uv run forever builds` le montre) ; la nouvelle version s'installe (`forever install --new-version` si une
-      attente le demande).
+      (`uv run forever builds` le montre) ; la nouvelle version s'installe d'elle-même (décision 295) et
+      `uv run forever update status` la liste sous « Mis à jour », avec sa commande « Annuler ».
     - Sinon : `uv run forever update status` ; une version pas encore publiée sur wago.tools attend.
 12. **Données héritées de la bêta** : `uv run forever measures inherited` liste les PV encore issus de la bêta.
 13. **Profil, dans cet ordre** : d'abord `uv run forever profile archive --product <produit de la bêta>`
@@ -210,8 +210,8 @@ correction passe devant le reste.
     du pont (Arcane Blast, Winter's Chill, Fire Power, Missile Barrage, Arcane Wrath) sont celles des infobulles du
     jeu (révisions 3 à 5).
     Données installées **sans correctifs du serveur** (pas de session possible avant la sortie) : une fois connecté,
-    `forever update status` dit l'écriture en attente ; la lancer, puis rejouer les builds
-    (`scripts/replay_builds.py`) si elle change une valeur du Mage.
+    la veille lit tes correctifs et installe la révision d'elle-même (décision 295) ; la carte « Mis à jour » dit
+    les conseils du Mage qui changent (rejeu fait après l'installation).
     Correctifs lus chez Raidbots sans session (révision 6, décision 290, question HF1) : à ta première connexion, ton
     propre `DBCache.bin` doit confirmer Piercing Ice absent de l'arbre du Givre, Elemental Precision à 3 rangs, Winter's
     Chill (+5 % par cumul sur Cone of Cold) ; `forever lookup talent "Piercing Ice"` dit « probablement retiré ».
@@ -277,6 +277,20 @@ correction passe devant le reste.
 22g. Bouton Leveling avec un Chaman (ou toute autre classe) : zones et quêtes tirées des sources Forever, filtrées pour
     sa classe (plus pour le Mage) ; la provenance dit les valeurs héritées de la Classic qu'une réponse utilise
     (`uv run forever origins classic` pour la liste).
+
+### 7c. Mise à jour automatique complète (décision 295 ; 5 min)
+22h. Après un passage de la veille qui installe quelque chose (ou `uv run forever update` à la main) : panneau du
+    pont, carte « Mis à jour : données <version> r<N> » ; elle dit ce qui a changé en mots de joueur (par exemple
+    « build Mage donjon niveau 20 : Frostbite passe de 0 à 3 », sinon le résumé des valeurs) ; elle ne compte pas
+    dans « à valider ». `uv run forever update status` montre la même ligne « Mis à jour » et la commande
+    `forever update undo <id>`.
+22i. « Annuler » sur la carte, puis « Confirmer » : réponse « Annulation lancée » ; quelques minutes plus tard (CI
+    comprise), `uv run forever update status` dit « Annulée » et la carte disparaît ; le passage suivant ne
+    réinstalle pas ce contenu (« annulée par toi »). Le même retour marche jeu fermé : `uv run forever update undo
+    <id>`.
+22j. Plus aucune carte « Valider / Refuser » pour une installation ou une mesure : seules restent les cartes qui
+    se lèvent seules (réseau, correctifs à lire), celles qui demandent une session (vérification rouge, valeur
+    perdue) et le rappel de relecture de Forever Bestiary.
 
 ### 8. Fin
 23. Dis-moi les étapes réussies et celles en défaut : je clos les blocs acceptés dans `tasks/plan-corrections-jeu.md`
