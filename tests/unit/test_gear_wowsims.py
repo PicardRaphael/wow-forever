@@ -48,3 +48,22 @@ def test_below_60_or_without_preset_the_previous_weights_stay(tmp_path, make_dep
     assert "wowsims" not in source  # soigneur : aucun préréglage de wowsims
     _, source = _weights_for(deps, tmp_path / "AddOns", "WARRIOR", level=40, race="Orc", spec="fury-warrior")
     assert "wowsims" not in source and not sim.requests
+
+
+def test_weights_action_exports_the_same_wowsims_weights_at_60(tmp_path, make_deps, monkeypatch):
+    """L'action `weights` (lignes à importer dans Naowh et dans Forever Companion) vient du même calcul que le
+    classement de l'équipement : wowsims au niveau 60, toutes classes de dégâts."""
+    from forever.exports.naowh import read_naowh_weights
+    from forever.exports.pawn import read_pawn_scale
+    from forever.gear import gear_report
+
+    setup(tmp_path, monkeypatch)
+    deps = make_deps(cache_dir=tmp_path, wow_dir=tmp_path)
+    (tmp_path / "Interface" / "AddOns").mkdir(parents=True)
+    out = gear_report(deps, "weights", class_name="Mage", level=60, race="Gnome", spec="fire-mage")
+    assert out["weights"] == {"int": 0.4, "sp": 0.8} and "wowsims/forever" in out["weights_source"]
+    spec, naowh = read_naowh_weights(out["naowh"])
+    assert spec == "fire-mage" and naowh == {"int": 0.4, "spell": 0.8}
+    _name, cls, pawn = read_pawn_scale(out["pawn"])
+    assert cls == "Mage" and pawn == {"Intellect": 0.4, "SpellPower": 0.8}
+    assert "wowsims/forever" in " ".join(out["provenance"]["assumptions"])
