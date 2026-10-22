@@ -368,5 +368,5 @@ def test_ch0_is_covered_and_the_pet_choice_waits_for_sim2():
 def test_familiers_skill_states_its_limits():
     _, body = frontmatter(PLUGIN / "skills" / "forever-familiers" / "SKILL.md")
     assert 'kind="pets"' in body and "forever_player_profile" in body
-    for words in ("zone", "niveau", "CH1", "Forever Bestiary", "relevés de joueurs"):
+    for words in ("zone", "niveau", "SIM2", "Forever Bestiary", "relevés de joueurs"):
         assert words in body, words

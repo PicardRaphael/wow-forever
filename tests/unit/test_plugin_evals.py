@@ -224,7 +224,7 @@ def test_general_and_personal_cases():
     uncomputed = graders(EVALS / "generale-classe-non-calculee")
     assert uncomputed["outil"][0]["tool"] == MCP_PREFIX + "forever_status"
     assert re.search(uncomputed["non-calcule"][0]["pattern"], "pas encore calculé par le moteur", re.IGNORECASE)
-    for words in ("PA1", "PV1", "supposé", "communauté", "source"):
+    for words in ("SIM2", "PV1", "supposé", "communauté", "source"):
         assert words in uncomputed["hypothese-neutre"][1], words
     for name in by_tag["personnelle"]:
         g = graders(EVALS / name)

@@ -17,7 +17,7 @@ def section(text, title):
 def test_router_has_a_misinstall_section_before_the_domain_map():
     text = ROUTER.read_text(encoding="utf-8")
     body = section(text, "0. Plugin mal installé")
-    assert text.index("## 0. Plugin mal installé") < text.index("## 2. Carte des domaines couverts")
+    assert text.index("## 0. Plugin mal installé") < text.index("## 2. Ce que l'agent sait faire aujourd'hui")
     # détection : outils du serveur introuvables par ToolSearch, ou serveur en échec
     assert "ToolSearch" in body and "mcp__plugin_forever_forever__" in body
 

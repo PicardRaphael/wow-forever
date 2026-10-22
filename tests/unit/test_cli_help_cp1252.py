@@ -20,5 +20,5 @@ def test_every_help_text_is_printable_in_cp1252():
         try:
             parser.format_help().encode("cp1252")
         except UnicodeEncodeError as exc:
-            bad.append(f"{parser.prog} : {exc.object[exc.start:exc.end]!r}")
+            bad.append(f"{parser.prog} : {exc.object[exc.start : exc.end]!r}")
     assert bad == []
