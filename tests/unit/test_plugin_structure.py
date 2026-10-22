@@ -30,32 +30,25 @@ SKILLS = (
 )
 AGENTS = ("forever-web-researcher", "forever-sim-runner")
 MCP_PREFIX = "mcp__plugin_forever_forever__"
-# Domaines non couverts à ce stade et tranche qui les couvrira (docs/ROADMAP.md). CH0 (savoir des familiers)
-# est couverte depuis CH0 ; CH1 reste citée pour le moteur du Chasseur et le choix du familier.
+# Domaines non couverts à ce stade et tranche qui les couvrira (docs/ROADMAP.md, partie 3, état du 2026-10-22). Les
+# tranches caduques depuis les décisions 288 à 297 (T04d faite, T05b, T09, moteurs de classe CH1 à DR1) ne sont plus
+# citées : au 60, wowsims/forever calcule toutes les classes ; dessous, SIM2 (simulateur de la communauté) et CM1.
 UNCOVERED_TRANCHES = (
     "PV2",
     "LG1",
+    "LG2",
     "MT1",
     "RP1",
     "EC1",
-    "T04d",
-    "T05b",
     "T07",
-    "T09",
     "T10",
     "T11",
     "AN1",
     "AN2",
-    # Tranches de classe (remplacent T12, décision 102).
-    "PA1",
-    "DE1",
-    "PR1",
-    "CH1",
+    "SIM2",
     "CM1",
-    "GU1",
-    "VO1",
-    "DR1",
 )
+OBSOLETE_TRANCHES = ("T04d", "T05b", "T09", "CH1", "DE1", "PA1", "GU1", "VO1", "PR1", "DR1")
 
 
 def read_json(path):
@@ -206,6 +199,17 @@ def test_router_maps_skills_and_uncovered_domains():
     assert "forever_status" in body
     for tranche in UNCOVERED_TRANCHES:
         assert re.search(rf"\b{tranche}\b", body), tranche
+    for tranche in OBSOLETE_TRANCHES:  # caduques ou faites : plus jamais annoncées au joueur
+        assert not re.search(rf"\b{tranche}\b", body), tranche
+
+
+def test_router_describes_what_is_covered_today():
+    """Leveling couvert pour toutes les classes, sources par classe, moteur du Mage gelé sous le 60, wowsims au 60."""
+    _, body = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
+    lowered = body.lower()
+    assert "gelé" in lowered and "wowsims/forever" in body and "forever_simulate" in body
+    assert "toutes les classes" in lowered and "forever companion" in lowered and "talents forever" in lowered
+    assert "leveling" in lowered
 
 
 @pytest.mark.parametrize(
@@ -351,14 +355,14 @@ def test_builds_skill_checks_community_builds():
         assert word in body, word
 
 
-def test_ch0_is_covered_and_ch1_keeps_the_hunter_engine():
-    """CH0 : le savoir des familiers est couvert (aucune ligne « non couvert » ne cite CH0) ; la ligne du Chasseur
-    renvoie à CH1 pour les dégâts, les rotations et le choix du familier par contexte."""
+def test_ch0_is_covered_and_the_pet_choice_waits_for_sim2():
+    """CH0 : le savoir des familiers est couvert (aucune ligne « non couvert » ne cite CH0) ; le choix du familier
+    chiffré par contexte attend un simulateur sous le 60 (SIM2)."""
     _, body = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
     uncovered = body.split("## 3. Domaines non couverts", 1)[1].split("\n## 4.", 1)[0]
     assert not re.search(r"\bCH0\b", uncovered)
     hunter = [line for line in uncovered.splitlines() if "Chasseur" in line]
-    assert hunter and any("familier" in line and "CH1" in line for line in hunter)
+    assert hunter and any("familier" in line and "SIM2" in line for line in hunter)
 
 
 def test_familiers_skill_states_its_limits():
