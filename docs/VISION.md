@@ -82,7 +82,7 @@ communauté n'est jamais modifié.
    vient.
 
 L'ordre des tranches qui sert ces paris est appliqué à `docs/ROADMAP.md` depuis le 2026-10-07 (décision 202 ;
-raisons dans `tasks/ordre-propose-2026-10-07.md`).
+raisons dans `tasks/archive/ordre-propose-2026-10-07.md`).
 
 ## Ce qu'on refuse
 

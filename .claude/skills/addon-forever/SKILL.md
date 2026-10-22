@@ -62,5 +62,5 @@ priment : `CLAUDE.md` (section « Addon »), `docs/ADDON.md`, décisions 194 à 
 ## Sources
 - API : https://warcraft.wiki.gg (pages `API_*`, `TOC_format`, `Secret_Values`, `Lua_functions`) ; code de Blizzard :
   https://github.com/Gethe/wow-ui-source (par exemple `PixelUtil.lua`).
-- wow-ai (MIT, commit 3756eb5a) : https://github.com/chelinho139/wow-ai, résumé dans `tasks/P06a-plan.md`.
+- wow-ai (MIT, commit 3756eb5a) : https://github.com/chelinho139/wow-ai, résumé dans `tasks/archive/P06a-plan.md`.
 - `docs/research/addon-forever.md` (rapport du 2026-09-27) et `docs/ADDON.md`.
