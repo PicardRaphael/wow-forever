@@ -96,7 +96,7 @@ STEPS = (
 ONLY = ("jeu", "correctifs", "journaux", "addons", "guides", "simulateurs")
 KINDS = ("install_version", "install_revision", "measures", "addon_data", "network_dbd", "network")
 STATUSES = ("fait", "rien", "attente", "arrêt", "erreur")
-ACTIONS = ("écrire", "attente", "bloqué")
+ACTIONS = ("écrire", "attente", "bloqué", "relecture")  # attente : se lève seule ; relecture : rappel, sans accord
 STATES = ("en_attente", "approuvée", "rejetée", "périmée", "faite")
 OPEN_STATES = ("en_attente", "approuvée")
 SESSION_KINDS = ("column_names",)
@@ -117,9 +117,9 @@ STEP_LIMITS_S: dict[str, float] = {
     "clone": 75 * 60,
     "jeu": 10 * 60,
     "nouvelle_version": 150 * 60,
-    "correctifs": 30 * 60,
+    "correctifs": 120 * 60,  # décision 295 : écriture (CI jusqu'à 60 min) puis rejeu des builds (environ 15 min)
     "journaux": 120 * 60,
-    "addons": 75 * 60,
+    "addons": 120 * 60,  # Questie relu : mesure, écriture et CI comme l'étape des journaux
     "guides": 15 * 60,
     "simulateurs": 45 * 60,
 }
@@ -129,6 +129,7 @@ PASS_ERROR_KIND = "pass_error"  # passage arrêté (délai) ou étape en erreur 
 COMMIT_MESSAGE = "Veille : {version} r{revision} installée par forever update ({motif})"
 INVENTORY_DOC = "docs/research/valeurs-ecrites-a-la-main.md"  # rendu de `forever origins inventory` (version courante)
 PASS_PATHS = ("forever/data/", "docs/research/data-", INVENTORY_DOC)  # seuls chemins du clone écrits par `_publish`
+UNDO_BRANCH_PREFIX = "data/undo-"  # branche d'une annulation (`forever update undo`, décision 295)
 DATA_BRANCH_RE = re.compile(r"data/(?P<version>\d+\.\d+\.\d+\.\d+)-r(?P<revision>\d+)")
 BLOCKED_BY = (
     "uv_sync",
@@ -638,6 +639,15 @@ def _resume_branch(run: _Run, runner: Runner, clone: Path) -> str | None:
     from forever.pipeline import gitops
 
     branch = gitops.current_branch(runner, clone)
+    if branch.startswith(UNDO_BRANCH_PREFIX):  # « Annuler » tué en route (décision 295) : retour sur main, à relancer
+        dirty = gitops.dirty_paths(runner, clone)
+        if any(not p.startswith(PASS_PATHS) for p in dirty):
+            return None
+        if dirty:
+            gitops.discard_changes(runner, clone, dirty)
+        gitops.leave_branch(runner, clone, branch)
+        gitops.drop_stale_branch(runner, clone, branch)
+        return f"reprise : {branch} (annulation interrompue) abandonnée, clone revenu sur main ; relancer « Annuler »"
     found = DATA_BRANCH_RE.fullmatch(branch)
     if found is None:
         return None

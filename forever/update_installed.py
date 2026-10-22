@@ -160,6 +160,7 @@ def notice_lines(record: Mapping[str, Any]) -> list[str]:
         summary = str(record.get("summary") or "")
         if summary:
             lines.append(summary)
+        lines += [str(m) for m in record.get("measures") or []]
     lines += [str(n) for n in record.get("notes") or []]
     return lines
 
