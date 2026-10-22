@@ -251,10 +251,33 @@ def test_simulate_races_and_weights(make_deps, tmp_path, monkeypatch):
         "preset": "mage/dps/Fire",
         "stats": "Intellect,SpellDamage",
         "reference": "SpellDamage",
+        "race": "Gnome",
     }
     r = call(deps, lambda c: c.call_tool("forever_simulate", args))
     assert not r.is_error and r.structured_content["normalised"]["StatSpellDamage"] == 1.0
     assert r.structured_content["level"] == 60
+
+
+def test_simulate_never_takes_the_race_of_the_preset(make_deps, tmp_path, monkeypatch):
+    """Demande du 2026-10-22 : la race vient du joueur (question ou profil), jamais du préréglage de wowsims ; poids
+    sans race : refus qui dit de la demander. La liste des préréglages dit combien d'objets chacun équipe."""
+    from wowsims_fakes import PROTO_STATS, WeightSim, clone
+
+    from forever.pipeline import gitops
+
+    root = clone(tmp_path)
+    (root / "forever" / "proto").mkdir(parents=True, exist_ok=True)
+    (root / "forever" / "proto" / "common.proto").write_text(PROTO_STATS, encoding="utf-8")
+    sim = WeightSim()
+    monkeypatch.setattr(gitops, "subprocess_runner", sim)
+    deps = make_deps(cache_dir=tmp_path)
+    args = {"action": "weights", "preset": "shaman/elemental/testing", "stats": "Intellect", "reference": "Intellect"}
+    r = call(deps, lambda c: c.call_tool("forever_simulate", args))
+    assert r.is_error and "race" in r.structured_content["error"]["action"]
+    assert sim.requests == []
+    r = call(deps, lambda c: c.call_tool("forever_simulate", {"action": "presets"}))
+    items = {p["key"]: p["items"] for p in r.structured_content["presets"]}
+    assert items == {"mage/dps/Fire": 1, "shaman/elemental/testing": 1}
 
 
 def test_simulate_compares_presets_in_identical_conditions(make_deps, tmp_path, monkeypatch):

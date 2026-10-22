@@ -256,6 +256,16 @@ def test_player_data_rule():
     assert "next_step" in leveling
 
 
+def test_simulate_race_is_asked_never_taken_from_a_preset():
+    """Demande du 2026-10-22 : la race passée à forever_simulate vient de la question ou du profil, jamais de la race
+    par défaut d'un préréglage ; sinon elle est demandée avant l'appel. Préréglage sans équipement : jamais cité."""
+    text = (PLUGIN / "skills" / "forever-router" / "format-reponse.md").read_text(encoding="utf-8")
+    section = text.split("## Données du joueur", 1)[1].split("\n## ", 1)[0]
+    assert "forever_simulate" in section and "préréglage" in section and "demande" in section
+    _, router = frontmatter(PLUGIN / "skills" / "forever-router" / "SKILL.md")
+    assert "items" in router and "sans équipement" in router
+
+
 def test_measured_comparison_rule():
     """T06b (D6, D7) : Monte Carlo contre Monte Carlo avec intervalle ; « non départagé » quand il contient zéro."""
     text = (PLUGIN / "skills" / "forever-router" / "format-reponse.md").read_text(encoding="utf-8")

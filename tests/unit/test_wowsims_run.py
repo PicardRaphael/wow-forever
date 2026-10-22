@@ -11,7 +11,7 @@ Clone et binaire fabriqués dans `tmp_path` (structure de wowsims/forever) ; ex�
 import json
 
 import pytest
-from wowsims_fakes import ENCOUNTER, PROTO_STATS, Sim, WeightSim, clone
+from wowsims_fakes import BUILD, ENCOUNTER, PROTO_STATS, Sim, WeightSim, clone
 
 from forever.sims.wowsims import (
     WowsimsError,
@@ -210,3 +210,79 @@ def test_presets_are_compared_in_identical_conditions(tmp_path):
     assert conditions["consumables"] == "none" and conditions["debuffs"] == {"curseOfElements": True}
     rows, conditions = compare_presets(tmp_path, cases, ENCOUNTER, consumables="own", runner=Sim())
     assert conditions["consumables"] == "own"
+
+
+ENHANCEMENT_TS = """import DefaultApl from './apls/default.apl.json';
+import TestingBuildJson from './builds/testing.build.json';
+
+export const ROTATION_PRESET_DEFAULT = PresetUtils.makePresetAPLRotation('Default', DefaultApl);
+export const DefaultGear = PresetUtils.makePresetGear('Testing', TestingBuildJson.player.equipment, { devOnly: true });
+export const TestingBuild = PresetUtils.makePresetBuildFromJSON('Testing', Spec.SpecEnhancementShaman, TestingBuildJson, { gear: DefaultGear });
+export const StandardTalents = {
+	name: 'Standard',
+	data: SavedTalents.create({
+		talentsString: '05-05',
+	}),
+};
+"""
+
+
+def _naked_build():
+    build = json.loads(json.dumps(BUILD))
+    build["player"].pop("equipment")
+    build["player"]["class"] = "ClassWarlock"
+    return build
+
+
+def test_gear_taken_from_a_build_file_makes_no_naked_default_preset(tmp_path):
+    """Chaman Amélioration du dépôt (vu le 2026-10-22) : l'équipement de `presets.ts` vient du fichier de build
+    (`TestingBuildJson.player.equipment`) ; le build complet est déjà lu, aucun préréglage « défaut » n'est fabriqué
+    avec le fichier de build entier en guise d'équipement (personnage nu, dégâts sans valeur)."""
+    root = clone(tmp_path) / "forever" / "ui" / "specs"
+    enh = root / "shaman" / "enhancement"
+    (enh / "apls").mkdir(parents=True)
+    (enh / "builds").mkdir()
+    (enh / "presets.ts").write_text(ENHANCEMENT_TS, encoding="utf-8")
+    (enh / "apls" / "default.apl.json").write_text(json.dumps({"type": "TypeAPL"}), encoding="utf-8")
+    (enh / "builds" / "testing.build.json").write_text(json.dumps(BUILD), encoding="utf-8")
+    keys = [p.key for p in read_presets(root.parent.parent) if p.key.startswith("shaman/enhancement/")]
+    assert keys == ["shaman/enhancement/testing"]
+
+
+def test_a_preset_without_gear_is_never_simulated(tmp_path):
+    """Démoniste du dépôt (vu le 2026-10-22) : builds sans équipement. Comparer des races ou des classes, ou mesurer
+    des poids, sur un personnage nu ne vaut rien : refus qui le dit, avant tout combat simulé."""
+    from forever.sims.wowsims import compare_presets, stat_weights
+
+    root = clone(tmp_path)
+    builds = root / "forever" / "ui" / "specs" / "warlock" / "dps" / "builds"
+    builds.mkdir(parents=True)
+    (builds / "destro.build.json").write_text(json.dumps(_naked_build()), encoding="utf-8")
+    presets = {p.key: p for p in read_presets(root / "forever")}
+    naked, fire = presets["warlock/dps/destro"], presets["mage/dps/Fire"]
+    sim = Sim()
+    with pytest.raises(WowsimsError, match="sans équipement"):
+        compare_races(tmp_path, naked, ["RaceHuman"], ENCOUNTER, runner=sim)
+    with pytest.raises(WowsimsError, match="sans équipement"):
+        compare_presets(tmp_path, [(fire, "RaceHuman"), (naked, "RaceHuman")], ENCOUNTER, runner=sim)
+    with pytest.raises(WowsimsError, match="sans équipement"):
+        stat_weights(tmp_path, naked, ["StatIntellect"], reference="StatIntellect", race="RaceHuman", runner=sim)
+    assert sim.requests == []
+
+
+def test_gear_weights_skip_a_preset_without_gear(tmp_path):
+    """Poids de l'équipement d'une spécialisation dont le préréglage est nu : aucun poids de wowsims (les poids par
+    défaut prennent le relais), même si un passage précédent en a gardé dans le cache."""
+    from forever.sims.wowsims import gear_weights
+
+    root = clone(tmp_path)
+    (root / "forever" / "proto").mkdir(parents=True, exist_ok=True)
+    (root / "forever" / "proto" / "common.proto").write_text(PROTO_STATS, encoding="utf-8")
+    builds = root / "forever" / "ui" / "specs" / "warlock" / "dps" / "builds"
+    builds.mkdir(parents=True)
+    (builds / "destro.build.json").write_text(json.dumps(_naked_build()), encoding="utf-8")
+    (root / "runs").mkdir()
+    (root / "runs" / f"weights-{'a' * 12}-warlock-dps-destro-RaceOrc.json").write_text(
+        json.dumps({"StatIntellect": 0.5}), encoding="utf-8"
+    )
+    assert gear_weights(tmp_path, "destruction-warlock", "Orc") is None
