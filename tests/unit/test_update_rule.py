@@ -1,10 +1,10 @@
-"""Règle d'automatisme de `forever update` (T08d, bloc E, décision 180, amendée par 198 et 207), testée par table.
+"""Règle d'automatisme de `forever update`, testée par table : décision 295 (2026-10-22), qui remplace les
+attentes des décisions 180, 198, 207 et 230.
 
-Une écriture se fait seulement si (a) `verify` est vert, (b) aucune valeur faite à la main n'est perdue ni remplacée,
-(c) les entrées de chaque moteur qui calcule sont identiques, et celles d'un moteur qui recopie ne changent que par des
-valeurs d'origine `client` ou `correctif_serveur` (avant et après), (d) aucune valeur d'un correctif du serveur n'est
-perdue. `verify` rouge, installation refusée par les règles de fusion ou valeur `perdu` : `bloqué` (jamais
-approuvable). Aucune règle de jeu ici : des valeurs de forme seulement."""
+La veille écrit tout d'elle-même ; ne s'applique pas (`bloqué`, dit) : `verify` rouge, installation refusée par les
+règles de fusion, valeur faite à la main perdue, valeur d'un correctif du serveur perdue. Une valeur faite à la main
+remplacée ou des entrées de moteur changées ne bloquent plus : elles sont écrites et notées (`notes`, pour la carte
+« Mis à jour »). Aucune règle de jeu ici : des valeurs de forme seulement."""
 
 import pytest
 
@@ -63,24 +63,24 @@ def loss():
     [
         (True, True, carry(), inputs(), (), "écrire", set()),
         (True, True, carry(reapplied=1), inputs(), (), "écrire", set()),
-        (True, True, carry(), inputs("mage_build"), (), "attente", {"inputs"}),
-        (True, True, carry(superseded=1), inputs(), (), "attente", {"manual"}),
-        (True, True, carry(superseded=1), inputs("pvp_dr"), (), "attente", {"manual", "inputs"}),
+        (True, True, carry(), inputs("mage_build"), (), "écrire", {"inputs"}),
+        (True, True, carry(superseded=1), inputs(), (), "écrire", {"manual"}),
+        (True, True, carry(superseded=1), inputs("pvp_dr"), (), "écrire", {"manual", "inputs"}),
         (True, True, carry(lost=1), inputs(), (), "bloqué", {"manual"}),
         (False, True, carry(), inputs(), (), "bloqué", {"verify"}),
         (False, True, carry(superseded=1), inputs("mage_build"), (), "bloqué", {"verify", "manual", "inputs"}),
         (True, False, carry(), inputs(), (), "bloqué", {"install"}),
-        # T08e : moteur qui recopie, jugé par l'origine des feuilles changées
+        # moteur qui recopie : toute origine s'écrit (décision 295), l'origine reste notée
         (True, True, carry(), copied(change("client", "client")), (), "écrire", set()),
         (True, True, carry(), copied(change("correctif_serveur", "correctif_serveur")), (), "écrire", set()),
         (True, True, carry(), copied(change("client", "correctif_serveur")), (), "écrire", set()),
-        (True, True, carry(), copied(change("client", None, before=ABSENT)), (), "attente", {"inputs"}),
-        (True, True, carry(), copied(change("manuel", "client")), (), "attente", {"inputs"}),
-        (True, True, carry(), inputs("pvp_dr"), (), "attente", {"inputs"}),  # sans le détail des feuilles
-        (True, True, carry(), copied(change("client", "client"), engine="mage_build"), (), "attente", {"inputs"}),
-        # T08e : perte d'un correctif du serveur
-        (True, True, carry(), inputs(), (loss(),), "attente", {"hotfixes"}),
-        (True, True, carry(), copied(change("client", "client")), (loss(),), "attente", {"hotfixes"}),
+        (True, True, carry(), copied(change("client", None, before=ABSENT)), (), "écrire", {"inputs"}),
+        (True, True, carry(), copied(change("manuel", "client")), (), "écrire", {"inputs"}),
+        (True, True, carry(), inputs("pvp_dr"), (), "écrire", {"inputs"}),  # sans le détail des feuilles
+        (True, True, carry(), copied(change("client", "client"), engine="mage_build"), (), "écrire", {"inputs"}),
+        # perte d'un correctif du serveur : bloqué et dit (décision 295, choix de l'utilisateur du 2026-10-22)
+        (True, True, carry(), inputs(), (loss(),), "bloqué", {"hotfixes"}),
+        (True, True, carry(), copied(change("client", "client")), (loss(),), "bloqué", {"hotfixes"}),
         (False, True, carry(), inputs(), (loss(),), "bloqué", {"verify", "hotfixes"}),
     ],
 )
@@ -89,35 +89,47 @@ def test_rule_table(verify_ok, install_ok, report, diffs, losses, action, failed
     assert verdict.action == action
     assert set(verdict.clauses) == CLAUSES
     assert {k for k, ok in verdict.clauses.items() if not ok} == failed
-    assert (verdict.reasons == []) == (action == "écrire")
+    assert (verdict.reasons == []) == (action == "écrire")  # raisons : ce qui bloque seulement
+    assert (verdict.notes != []) == bool(failed - {"verify", "install", "hotfixes"}) or action == "bloqué"
+
+
+def test_no_verdict_waits_anymore():
+    """Décision 295 : aucune combinaison de clauses ne rend plus `attente`."""
+    for report in (carry(), carry(superseded=1), carry(lost=1)):
+        for diffs in (inputs(), inputs("mage_build"), copied(change("manuel", "client"))):
+            for losses in ((), (loss(),)):
+                verdict = decide(True, report, diffs, "install_version", hotfix_losses=losses)
+                assert verdict.action in ("écrire", "bloqué")
 
 
 @pytest.mark.parametrize("origin", ["manuel", "journal", "addon", "parametre", "copie_figee", None])
-def test_a_copying_engine_waits_on_any_other_origin(origin):
+def test_a_copying_engine_change_of_any_origin_is_written_and_noted(origin):
     for pair in ((origin, origin), ("client", origin), (origin, "correctif_serveur")):
         verdict = decide(True, carry(), copied(change(*pair)), "install_version")
-        assert verdict.action == "attente", pair
+        assert verdict.action == "écrire", pair
         assert {k for k, ok in verdict.clauses.items() if not ok} == {"inputs"}
+        assert verdict.notes
 
 
 def test_a_manual_input_is_named_with_its_pointer():
     diffs = copied(change("client", "client"), change("manuel", "manuel", file="pvp_rules.json", pointer=DR))
     verdict = decide(True, carry(), diffs, "install_version")
-    text = " ".join(verdict.reasons)
-    assert verdict.action == "attente"
+    text = " ".join(verdict.notes)
+    assert verdict.action == "écrire"
     assert "pvp_dr" in text and "pvp_rules.json" in text and DR in text and "manuel" in text
 
 
 def test_a_computing_engine_is_named_and_a_copying_one_is_not():
     verdict = decide(True, carry(), copied(change("client", "client"), others=("mage_build",)), "install_version")
-    text = " ".join(verdict.reasons)
-    assert verdict.action == "attente"
+    text = " ".join(verdict.notes)
+    assert verdict.action == "écrire"
     assert "moteurs aux entrées changées : mage_build" in text and "pvp_dr" not in text
 
 
 def test_a_lost_hotfix_is_named():
     verdict = decide(True, carry(), inputs(), "install_version", hotfix_losses=[loss(), loss()])
     text = " ".join(verdict.reasons)
+    assert verdict.action == "bloqué"
     assert "correctifs du serveur non relus" in text and "2 valeur" in text
     assert "classes.json" in text and WARRIOR in text
 
@@ -128,9 +140,10 @@ def test_an_undeclared_engine_is_refused():
         decide(True, carry(), diffs, "install_version")
 
 
-def test_reasons_name_the_engines_and_the_values():
+def test_notes_name_the_engines_and_the_values():
     verdict = decide(True, carry(superseded=1), inputs("mage_build", "mage_leveling"), "install_revision")
-    text = " ".join(verdict.reasons)
+    assert verdict.action == "écrire"
+    text = " ".join(verdict.notes)
     assert "mage_build" in text and "mage_leveling" in text and "pvp_dr" not in text
     assert "pet_rules.json" in text and "/official_fixes" in text
 
@@ -147,8 +160,9 @@ def test_red_verify_wins_over_every_other_clause():
 
 
 def test_a_copied_item_without_changed_leaves_waits():
-    """Item différent dont aucune feuille ne change (conteneur vide ajouté ou retiré) : origine inconnue, attente."""
+    """Item différent dont aucune feuille ne change (conteneur vide ajouté ou retiré) : origine inconnue, écrit et
+    noté (décision 295)."""
     diffs = copied(change("client", "client"))
     diffs["pvp_dr"].items[0]["changes"] = []
     verdict = decide(True, carry(), diffs, "install_version")
-    assert verdict.action == "attente" and {k for k, ok in verdict.clauses.items() if not ok} == {"inputs"}
+    assert verdict.action == "écrire" and {k for k, ok in verdict.clauses.items() if not ok} == {"inputs"}
