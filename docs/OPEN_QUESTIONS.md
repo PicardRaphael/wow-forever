@@ -7,10 +7,14 @@ question, par identifiant). **Questions résolues** : [RESOLVED_QUESTIONS.md](RE
 leur réponse et leur source. Choix du modèle (poids, paramètres, départage, plugin) :
 [modeling-decisions.md](modeling-decisions.md).
 
-Priorité : **haute** = fausse aujourd'hui un résultat des outils ou bloque la prochaine tranche (T08c, FA1, PV2) ;
-**moyenne** = touche un résultat chiffré, avec une variante, une option ou une borne déjà en place ; **basse** =
-précision, outil ou après le lancement. Une question tranchée part dans `RESOLVED_QUESTIONS.md` avec sa source
-primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24.md),
+Priorité : **haute** = fausse aujourd'hui un résultat des outils ou bloque l'essai du 4 novembre ou la prochaine
+tranche (`docs/ROADMAP.md`, partie 3) ; **moyenne** = touche un résultat chiffré, avec une variante, une option ou
+une borne déjà en place ; **basse** = précision, outil ou après le lancement. Une question tranchée, ou devenue
+caduque, part dans `RESOLVED_QUESTIONS.md` avec sa source primaire ou sa raison. Depuis les décisions 293 et 294, le
+moteur du Mage est gelé (1.60.1.70450 r7) et aucun moteur de classe n'est écrit : la réponse à une question de
+mécanique alimente les données, le recoupement de wowsims/forever et des journaux, jamais une mécanique nouvelle ;
+une question qui demande si une règle « suit Classic » reste ouverte jusqu'à la valeur de Forever (décision 294).
+Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24.md),
 [01/10](research/notes-blizzard-2026-10-01.md) (message n° 4, révision 4) et
 [08/10](research/notes-blizzard-2026-10-08.md) (message n° 5, révision 1).
 
@@ -39,7 +43,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   *Nouvelle le 2026-10-02* : même note officielle (exemples Frostbite et Omen of Clarity ; Frostbolt rang 1 au niveau
   60 ne déclenche jamais Frostbite) ; aucune table du client ne la porte. Test : au même niveau, Frostbolt rang 1
   contre le rang le plus haut, comptes de Frostbite, Winter's Chill et Fingers of Frost dans le journal. Priorité :
-  basse (le moteur prend toujours le rang le plus haut) ; moyenne dès qu'une rotation descend de rang (T05b, AN1).
+  basse (le moteur prend toujours le rang le plus haut) ; moyenne dès qu'une rotation descend de rang (AN1, AN2).
   Registre B20. [Note du 01/10](research/notes-blizzard-2026-10-01.md)
 - **MAG3 — Givre-feu (Frostfire Bolt) profite-t-il des talents des deux écoles (Ice Shards pour le critique, Fire
   Vulnerability) ?** *Modifiée le 2026-10-02* : Fire Vulnerability ne fait plus de second jet de résistance (note du
@@ -115,19 +119,13 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   [Détail](research/questions-ouvertes-detail.md#per6)
 - **PER7 — La « Critical Strike » de la fiche (EllesmereUI) est-elle la critique de mêlée ?** Test : infobulle de la
   fiche du jeu de base. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#per7)
-- **PER8 — Combien de points de notation font 1 % de toucher, de critique et d'expertise ?** Ajoutée le 2026-10-09
-  (étude wowsims) : `leveling.json` laisse le toucher et la critique à `null` et notre moteur ne prend que des
-  fractions ; ElliotWood/Forever lit la table `CombatRatings` du client (constante à tous les niveaux, ce que relevait
-  déjà `audit-mises-a-jour.md`) et en tire une conversion par statistique (`suppose` tant qu'elle n'est pas décodée
-  chez nous). Test : décodage de la table du client, puis `GetCombatRatingBonus` à notation connue (export
-  SimulationCraft ou ForeverLogger). Priorité : moyenne (prérequis de T10a : décodage prévu en SIM1, décision 225 ; preuve en jeu par l'export SimulationCraft collé de P06b). Registre A4, A5, A7,
-  A8, B2. [Étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)
 - **PER9 — Le bonus de soins donne-t-il un tiers en dégâts (registre F7) ?** Ajoutée le 2026-10-09 (étude wowsims) :
   F7 était marqué `certain` sans source ni test (passé à `suppose` le 2026-10-09, décision 225) ; le moteur ElliotWood/Forever a abandonné ce ratio au profit des
   statistiques des objets du client (une statistique pour dégâts et soins, une autre pour les soins seuls), le fork
   de MythicSim l'applique encore sur sa branche `master`. Test : infobulles et fiche (`GetSpellBonusDamage`,
   `GetSpellBonusHealing`) avec un objet à bonus de soins seul ; décodage des statistiques d'objet en T10a. Priorité :
-  basse pour le Mage, haute pour les soigneurs (PA1, PR1, CM1, DR1). Registre F7.
+  basse pour le Mage ; pour les soigneurs, moyenne : aucun moteur de soins à nous (décision 293), la réponse sert au
+  recoupement d'un simulateur de la communauté qui les couvrirait. Registre F7.
   [Étude](research/wowsims-forever.md#3-règles-de-forever-face-à-notre-registre)
 
 ## Monstres et rencontres
@@ -244,7 +242,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **TRV2 — Écart entre la durée des vols du client et celle de Shortest Path Forever (`Taxi.lua`, InFlight et
   CMaNGOS, 32 yards par seconde) ?** Ajoutée le 2026-10-14 (RX1, bloc B ; lecture des données de Shortest Path au bloc
   F). Test : comparaison trajet par trajet, puis un vol chronométré. Priorité : basse. Registre I19.
-- **RTE1 — Quel écart entre nos routes et celles de Factoruide sur un même personnage ?** Ajoutée le 2026-10-14 (RX1, bloc C). Test : route de Factoruide exportée par le joueur (`.fgguide`), relue par `forever route compare` (bloc G : `forever route compare <fichier>` rejoue la route de Factoruide par nos règles et la compare à la nôtre ; texte d'issue préparé dans `tasks/archive/RX1-factoruide-issue.md`, non envoyé). Priorité : moyenne. Registre I18.
+- **RTE1 — Quel écart entre nos routes et celles de Factoruide sur un même personnage ?** Ajoutée le 2026-10-14 (RX1, bloc C). Test : route de Factoruide exportée par le joueur (`.fgguide`), relue par `forever route compare` (bloc G : `forever route compare <fichier>` rejoue la route de Factoruide par nos règles et la compare à la nôtre ; issue envoyée sur accord le 2026-10-14 : brouznouf/factoruide#13). Comparaison à refaire avec les vols et le foyer (RX2). Priorité : moyenne. Registre I18.
 - **RTE2 — Taille du journal de quêtes de Forever, et temps d'un arrêt (prise, rendu, objet) ?** Ajoutée le
   2026-10-14 (RX1, bloc C). `route.search` reprend Factoruide (`params.rs` : journal de 40 quêtes « on WoW Forever »,
   8 s par arrêt, non sourcés), `suppose`. Test : journal rempli en jeu (message de journal plein), durée
@@ -261,16 +259,14 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   carte et des coordonnées du contexte, sinon du premier donneur du parcours gratuit de la race ; vols connus vus par
   le pont ou gardés au profil (CJ1, bloc 1d).
   Complément du 2026-10-14 (CJ1) : Polestar compte un journal de 20 quêtes, Factoruide 40 « on WoW Forever » (RTE2).
+  *Modifiée le 2026-10-22* : la première moitié est tranchée : zone de départ par race dans `route.start_zones`
+  (décision 283) et départ de la position du contexte (CJ1, bloc 1a). Reste ouverte la seconde : vols connus du
+  personnage (bloc 1d de CJ1, sinon RX2).
 - **RTE4 — Où placer une quête lancée par un objet ou une nouvelle quête de Forever sans donneur positionné ?**
   Ajoutée le 2026-10-14 (RX1c, décision 268). 832 quêtes du livre sont écartées des routes faute de donneur
   positionné ; le parcours gratuit du Chasseur Horde 1 → 22 de RestedXP en prend 5 (dont deux lancées par un objet et
   la série « camping » de Forever) et 6 autres en dépendent par leur chaîne. Test : objet de départ lu (Questie
   `startedBy`, cache des objets), lieu où il tombe, ou prise relevée par ForeverLogger. Priorité : moyenne. Registre I18.
-- **RTE7 — Les guides de Polestar, rejoués par nos règles, battent-ils notre route ?** Ajoutée le 2026-10-14 (CJ1,
-  décision 278). Polestar (GPL-3.0, `fitzforge/polestar`) publie des routes 1 à 60 trouvées par simulation, sans relevé
-  en jeu encore ; son modèle donne environ 2 h jusqu'au niveau 10 en Dun Morogh et en Durotar. Test : lecteur de leurs
-  guides dans la recette (CJ1, bloc 1c), trois colonnes (notre route, RestedXP, Polestar). Priorité : moyenne.
-  Registre I18.
 - **RTE5 — Combien de monstres tue-t-on en chemin, par zone et par niveau ?** Ajoutée le 2026-10-14 (RX1c). Notre
   simulation ne crédite que les monstres des objectifs ; les parcours de RestedXP comptent sur les monstres croisés et
   placent des étapes « farm jusqu'au niveau N ». Test : XP de monstres relevée par ForeverLogger entre deux arrêts
@@ -285,6 +281,15 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   écartées des routes de la Horde, alors que le parcours gratuit de RestedXP les fait. Ne pas trancher sans relevé.
   Test : quête prise en jeu par un personnage non Démoniste sans 1485 (Questie, ForeverLogger). Priorité : moyenne.
   Registre I18.
+- **RTE8 — Le réseau de marche mène-t-il aux donneurs des capitales (Bink, Tinker Town d'Ironforge) ?** Ajoutée le
+  2026-10-16 (CJ1, bloc 4d) : trajet infini depuis Dun Morogh, donc Mage-tastic Gizmonitor (quête de classe du Mage)
+  n'entrait dans aucune route, même imposée. *Réponse partielle (2026-10-19, révision 8)* : le nœud du réseau le plus
+  proche sur la carte est une poche isolée (autre étage : la hauteur n'est pas lue) à 10 yards d'un nœud du réseau
+  principal ; Journeys part du polygone de navigation sous le point, que nous ne lisons pas. Repli voulu par
+  l'utilisateur : dans les six capitales (`route.cities`), ligne droite allongée depuis le nœud atteint le plus proche
+  (`suppose`) ; Bink est joint, 76 donneurs des capitales le sont. Reste ouvert : lire les tuiles de navigation de
+  Journeys (hauteur et polygones) pour un trajet exact dans les villes (RX2). Test : route qui passe par une capitale
+  (`docs/LANCEMENT.md`, essai de CJ1, étape 4). Priorité : basse. Registre C6.
 - **DON10 — Que veut dire le premier champ des entrées de `DBCache.bin` (70 sur tout le fichier : région ?) ?**
   Ajoutée le 2026-10-05 (T08c). Test : `DBCache.bin` d'un autre compte ou d'une autre région. Priorité : basse.
 - **DON11 — Une réponse `DBReply` « absent » peut-elle viser un enregistrement présent dans les fichiers du build ?**
@@ -327,7 +332,7 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   ou en champ de bataille ?** Test : sondes `/dump` de `docs/ADDON.md` (section 7). Priorité : moyenne.
   [Détail](research/questions-ouvertes-detail.md#log4)
 - **LOG5 — La classe de la cible reste-t-elle lisible, non secrète, en champ de bataille ?** Test : `/dump
-  UnitClass("target")` en champ de bataille. Priorité : moyenne (avant FA1p).
+  UnitClass("target")` en champ de bataille. Priorité : moyenne (bouton PvP de P06b en champ de bataille, PV2).
   [Détail](research/questions-ouvertes-detail.md#log5)
 - **LOG6 — Les SavedVariables sont-elles relues d'une session à l'autre sur la version courante ?** Observation du
   2026-10-02 : oui (probable). Test : un réglage de ForeverLogger qui survit à un redémarrage complet. Priorité :
@@ -399,11 +404,6 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
 - **LVL8 — Quel est le facteur d'XP des monstres élites sur Forever ?** Ajoutée le 2026-10-13 (T04d, bloc C) : facteur
   de Classic écrit en `suppose` (`xp.elite_factor`). Test : gain d'XP d'un élite de niveau connu (cible relevée par
   ForeverLogger 0.4.0), seul et hors donjon, comparé par `forever xp check`. Priorité : basse. Registre I13.
-- **LVL9 — Les quêtes « absentes des sources Forever » sont-elles vraiment retirées ?** Ajoutée le 2026-10-13
-  (T04d, bloc D) : 19 quêtes de la base Classic de Questie, dans des zones couvertes par Completo de Naowh Forever,
-  n'y figurent pas (surtout des échanges de montures et des quêtes techniques) ; aucune source ne dit « retirée ».
-  Test : quête offerte ou non par son donneur en jeu, ou vue par le client (`questcache.wdb`). Priorité : basse.
-  [Agrégats](research/quetes-forever.md)
 - **LVL11 — Pourquoi le simulateur du Mage donne-t-il un temps par monstre bien plus long que les relevés ?**
   Ajoutée le 2026-10-13 (T04d, décision 249) : au niveau 19, le moteur (analytique, sans talent, rotation givre) rend
   environ 51 s par monstre (combat 28 s, récupération 16 s, course 6 s), la cadence des gains de ForeverLogger du Mage
@@ -453,7 +453,8 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   multiplicateurs de dégâts subis (critiques, coups écrasants), sans les absorptions, équilibrée sur une armure de
   20 à 40 % selon le niveau ; ni les PV attendus ni la courbe d'armure ne sont donnés (`ExpectedStat` du client est
   une piste). Test : rage gagnée par coup subi dans un journal de Guerrier ou de Druide ours, dégâts et niveau
-  connus. Priorité : basse (GU1, DR1). Registre B21.
+  connus. Priorité : basse (aucun moteur de Guerrier ni de Druide à nous, décision 293 : recoupement de
+  wowsims/forever seulement). Registre B21.
 
 ## Familiers du Chasseur
 - **FAM1 — Une bête d'un niveau au-dessus du Chasseur est-elle refusée ?** Règle de la note du 24/09 (probable,
@@ -501,7 +502,9 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   personnage. Priorité : basse.
 - **RXP1 — `RXPGuides.ImportGuide`, appelé par notre addon, ajoute-t-il un guide gardé d'une session à l'autre sans
   code lié au compte ?** Ajoutée le 2026-10-13 (RX1, décision 253) : lu dans `GuideLoader.lua` (guide analysé, ajouté
-  et gardé dans `addon.db.profile.guides`), jamais essayé en jeu. Test (facultatif, décision 247) : une route livrée
+  et gardé dans `addon.db.profile.guides`). *Modifiée le 2026-10-22* : essai en jeu de l'utilisateur du 2026-10-14
+  (`tasks/archive/idees-du-chat-2026-10-14-ux-routes.md`, section 3) : après « Livrer dans RestedXP », le guide
+  apparaît bien dans RestedXP ; reste la tenue d'une session à l'autre. Test (facultatif, décision 247) : une route livrée
   par le pont, puis `/reload` et nouvelle connexion, en jouant normalement ou à la sortie. Priorité : moyenne (RX1 ;
   repli : petit addon de guide écrit par le pont jeu fermé).
 - **RXP2 — Le menu de RestedXP montre-t-il un guide importé sans `/reload`, et `RXP:LoadGuide` le charge-t-il
@@ -586,28 +589,28 @@ primaire. Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24
   une des 11 bêtes marquées (par exemple Ukorsbane, Durotar), facultatif, en jouant normalement (décisions 247 et 260).
   Priorité : moyenne. Registre L3.
 
-- **RTE8** (2026-10-16, bloc 4d) : le réseau de marche ne mène pas au donneur Bink dans Ironforge (Tinker Town) : trajet infini depuis Dun Morogh, donc Mage-tastic Gizmonitor (quête de classe du Mage, récompenses Arcane Staff et Arcane Orb) n'entre dans aucune route, même imposée. À vérifier : entrée d'Ironforge et passages intérieurs dans le réseau de Journeys, autres donneurs des capitales. **Réponse partielle (2026-10-19, révision 8)** : cause trouvée : le nœud du réseau le plus proche sur la carte est une poche isolée (autre étage : la hauteur n'est pas lue) à 10 yards d'un nœud du réseau principal ; Journeys part du polygone de navigation sous le point, que nous ne lisons pas. Repli voulu par l'utilisateur : dans les six capitales (`route.cities`), ligne droite allongée depuis le nœud atteint le plus proche (`suppose`) ; Bink est joint, 76 donneurs des capitales le sont (contrôle sur les vraies données). Reste ouvert : lire les tuiles de navigation de Journeys (hauteur et polygones) pour un trajet exact dans les villes.
-
 ## Réputations (étude du 2026-10-20, `docs/research/reputations-forever.md`)
+Questions de la route de réputation (RP1, bloc 4e de CJ1). Test commun : gains relevés hors combat par ForeverLogger
+(relevé de DJ1) pendant le jeu ordinaire, comparés à la source lue.
 - **REP1** : gain de réputation par monstre tué et palier où il cesse : règle du serveur, aucune source locale.
-- **REP2** : seuils des paliers à Forever (Haï à Exalté) : ceux de Classic sont supposés, le client ne les porte pas.
+  Priorité : moyenne (RP1).
+- **REP2** : seuils des paliers à Forever (Haï à Exalté) : ceux de Classic sont supposés, le client ne les porte pas
+  (décision 294 : à remplacer par la valeur de Forever lue en jeu). Priorité : moyenne (RP1).
 - **REP3** : montants des quêtes des 14 factions propres à Forever : Forever Guide donne la faction sans montant, Questie
-  n'a que les factions de Classic.
+  n'a que les factions de Classic. Priorité : moyenne (RP1).
 - **REP4** : sens de « Legacy Reputation Reward » (sort 1324722) et des réputations des objectifs Legacy (voir LEG1).
+  Priorité : basse (LG1).
 - **REP5** : disposition des champs de réputation de `questcache.wdb` (indices de `QuestFactionReward` ou montants) :
-  source possible des gains des quêtes vues par le client.
+  source possible des gains des quêtes vues par le client. Test : gain d'une quête rendue comparé au champ lu.
+  Priorité : moyenne (RP1).
 
-## Notes du 15 octobre (`docs/research/notes-blizzard-2026-10-15.md`)
-- **NOT1** (tranchée le 2026-10-21 par le correctif du serveur 112753, lu chez Raidbots, `probable`) : la seconde
-  lecture est la bonne (+5 % par cumul et 7 % de la puissance des sorts, 5 cumuls) ; à confirmer en jeu.
-- *(ancien texte)* la note donne deux textes pour Winter's Chill (dégâts de Cone of Cold +40 % par cumul, ou +5 % et une part
-  de la puissance des sorts, 5 cumuls) ; les tables de 70450 portent 40 par cumul et 5 cumuls : le premier est retenu
-  (`probable`), le second reste à vérifier en jeu.
+## Version 1.60.1.70450 : notes du 15 octobre, correctifs, simulateurs (`docs/research/notes-blizzard-2026-10-15.md`)
 - **NOT2** : Ruthless (Humain) et Savage (Orc) : la note dit « toute arme » ; les tables de 70450 gardent l'aura de
   critique de l'ancien racial d'arme (290), sans restriction d'arme lue : à vérifier en jeu (fenêtre du personnage).
 - **HF1** : correctifs du serveur de 1.60.1.70450 lus dans un cache vérifié de Raidbots (r6, décision 290), sans
   session de jeu : à confirmer par le `DBCache.bin` du jeu de l'utilisateur à sa première connexion (Piercing Ice
   retiré, Elemental Precision à 3 rangs, Winter's Chill, Missile Barrage, Ice Barrier, Frost Warding, Frost Blast).
+  Couvre aussi la confirmation en jeu de NOT1 (Winter's Chill, seconde lecture), résolue sur le correctif 112753.
 - **HF2** (resserrée le 2026-10-21, 70450 r7) : Ice Barrier après le correctif 112753 donne Frigid Power (bonus de
   dégâts de Givre pendant la durée du sort) et un bonus de plus tant que le bouclier tient. Modélisé (A22) : Frigid
   Power dès que le talent est pris (lancé avant le combat, relancé à l'expiration ; coût en mana de la relance non

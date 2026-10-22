@@ -1,193 +1,329 @@
 # Sources de données
 
-## Hiérarchie des sources (décisions 127 et 128)
-1. **Données du client** (tables décodées, `DBCache.bin` et `Hotfix.log` pour les correctifs) : `certain`.
-2. **Mes observations** : journaux de combat et relevés hors combat de ForeverLogger (`certain` pour ce qu'ils mesurent directement).
-3. **Wowhead Forever et addons de données** (AtlasLoot, ForeverDungeonJournal, Questie, GearQuestForever, Auctionator, Forever Bestiary, Talents Forever, Forever Companion, Naowh Forever) : `suppose` au mieux, source et version citées.
-4. **Guides** (Icy Veins, forums, vidéos) : faits sourcés, `suppose`.
+Chaque source : ce qu'elle fournit, sa licence, sa fraîcheur et comment elle est relue (commande, étape de la veille
+`forever update`, fréquence). L'architecture qui les lit est décrite dans `docs/ARCHITECTURE.md`. Une licence que le
+dépôt n'établit pas (fichier lu, inventaire, décision) est écrite « non déclarée » ou « à vérifier ».
 
-Une source plus haute l'emporte sur une plus basse ; un écart entre deux sources est toujours signalé, jamais tranché au hasard. Une donnée que seules les sources 3 et 4 portent (PV des monstres avant mesure, taux de butin, gains de réputation) reste `suppose` jusqu'à une observation réelle.
+## Règles communes
+- **Forever seulement** (décision 294) : une source qui ne couvre pas WoW Forever n'est pas prise ; rien de Season of
+  Discovery ni de la Classic, ni données ni mécanismes. Les valeurs encore héritées de la Classic sont recensées et
+  dites (`forever origins classic`).
+- **Hiérarchie** (décisions 127 et 128) : 1. données du client (tables, correctifs du serveur) : `certain` ;
+  2. mes observations (journaux de combat, relevés de ForeverLogger) : `certain` pour ce qu'elles mesurent ;
+  3. addons de données, simulateur et parcours de la communauté : `suppose` au mieux, source et version citées ;
+  4. guides et sites : faits sourcés, `suppose`. Une source plus haute l'emporte ; un écart est toujours signalé,
+  jamais tranché au hasard.
+- **Lire ce qui existe** (décisions 272, 288, 293) : une donnée ou un calcul déjà tenu par un addon installé, le
+  simulateur de la communauté ou un parcours maintenu est lu tel quel par un adaptateur mince, jamais refait.
+- **Dans le dépôt, seulement des agrégats** (décisions 123 et 133) : la lecture locale de tout addon installé est
+  libre quelle que soit sa licence ; ce qui entre dans le dépôt (comptes, écarts, valeurs recoupées avec leur source)
+  respecte la licence ; les tables, textes et guides des tiers restent sur le disque de l'utilisateur ou dans le cache.
+- **Provenance** : chaque valeur lue porte sa source (version, empreinte ou commit, date) dans le bloc `provenance`.
+- **Fraîcheur** : le registre des sources (`forever/sources.py`, `forever status`) dit pour chaque source si elle est
+  à jour pour la version du jeu installée, par son contenu quand c'est possible, sinon par sa date ou son build ; une
+  source en retard donne « calcul en cours de mise à jour », jamais une panne.
+- **Réseau** : seulement les accès listés dans `CLAUDE.md`, jamais dans les tests (`tests/fixtures/` seulement).
 
-## Client Forever (vérité)
-- Versions : `https://wago.tools/api/builds` (produit `wow_classic_beta`, versions `1.60.x` ; liste non triée : trier par `created_at`). Produit de lancement : inconnu, prévoir l'alerte `silent`.
-- Tables : `https://wago.tools/db2/<Table>/csv?build=<version>` (enUS) ; autre locale : `&locale=frFR` (vérifié le 2026-09-27 sur `SpellName`). Chaque table est essayée trois fois (délai doublé, attente croissante, décision 230) ; les tables d'une autre locale (noms français) sont facultatives : absentes, la version s'installe avec `name_fr` vide et `missing_names` dans `sources.json`, et `forever update` les ajoute en révision au passage suivant. Liste des tables, colonnes utilisées et règles de lecture : `forever/data/<version>/decode_rules.json`, `forever/pipeline/tables.py`, inventaire `tasks/T03-inventaire.md`. `TraitTreeLoadout*` : HTTP 400 sur 1.60.1.70009 (inutile).
-    - Talents : SkillLineXTraitTree (ligne de compétence → arbre), TraitNode, TraitNodeEntry, TraitNodeXTraitNodeEntry, TraitDefinition, TraitDefinitionEffectPoints (points par rang via CurvePoint), TraitEdge (prérequis), CurvePoint. Ignorer Talent et TalentTab (reliquats Classic). Valeurs d'un rang : variables de l'infobulle du sort du nœud (`Spell.Description_lang`).
-    - Géométrie des arbres : onglets à PosX 1020 / 5020 / 9080, rangées à PosY 2130 + 600 par rangée, colonnes espacées de 600 ; quelques nœuds sont garés hors du canevas (une coordonnée dix fois la grille, « zéro en trop ») : replacés seulement si Talents Forever les confirme à la position corrigée, sinon écartés avec une question ouverte (décision 211) ; si deux nœuds partagent un sort, le plus récent est le bon.
-    - Sorts : SkillLineAbility (rangs par ligne de compétence), Spell (rang dans NameSubtext, infobulle), SpellName, SpellEffect (points de base, RealPointsPerLevel, variance, période, sort déclenché), SpellLevels, SpellMisc (attributs, index d'incantation et de durée), SpellCastTimes, SpellDuration, SpellPower, SpellCooldowns, SpellAuraOptions (cumuls, charges).
-    - 9 classes (PV1, `decode_rules.json`, `class_tables`) : ChrClasses, SkillLine, SpellRange (portée), SpellCategories (mécanique, type de dissipation, catégorie de rendement décroissant `DiminishType`), SpellCategory, SpellMechanic, SpellDispelType, SpellInterrupts (ruptures d'aura), SpellClassOptions, SpellAuraRestrictions, SpellShapeshift ; ChrRaces (enUS, frFR), CharBaseInfo (combinaisons race et classe), SkillRaceClassInfo ; Item, ItemSparse, ItemEffect, ItemXItemEffect (bijoux PvP). Arêtes des arbres : `TraitEdge.Type` (0 visuel, 2 suffisant, 3 requis, probable).
-    - Objets : Item*, formules RandPropPoints, ItemDamage*, ItemArmor*.
-- Hotfixes : `DBCache.bin` du client, à faire correspondre à la version, la région et la langue.
-- Absent du client : PV des monstres, quêtes, positions des PNJ, taux de butin, stocks, listes d'entraîneurs.
+## Vue d'ensemble
 
-## Voie autonome (si wago est indisponible)
-- `db2tool` (wowsims) : lecture du client installé, superposition des hotfixes ; mode hors ligne sur fichiers extraits. **Non utilisé** (T08c) : `DBCache.bin` est lu par `forever/pipeline/dbcache.py`.
-- wow.tools.local (TACTSharp, DBCD, WoWDBDefs) ; définitions de tables : WoWDBDefs.
+| Source | Fournit | Licence | Fraîcheur | Relecture |
+| --- | --- | --- | --- | --- |
+| wago.tools | versions publiées du client, tables du client (CSV), GameTables | non déclarée | `forever status` (cache de 6 h) | étapes `jeu` et `nouvelle_version` de chaque passage ; `forever builds`, `forever fetch` à la main ; `build-watch.yml` chaque jour |
+| WoWDBDefs | dispositions des tables (`.dbd`) pour décoder les correctifs | introuvable (`LICENSE` absent) : à vérifier | commit épinglé dans `<cache>/dbd/dbd.json` | relu par la veille quand des correctifs l'exigent ; `forever fetch --version V --dbd` |
+| `DBCache.bin` du jeu | correctifs du serveur (valeurs) | données du client de l'utilisateur, lecture locale | par build (en-tête du fichier) | étapes `archivage` puis `nouvelle_version` ou `correctifs` ; `forever hotfixes` |
+| Raidbots (caches vérifiés) | `DBCache.bin` d'un build quand le jeu n'en a pas | non déclarée | entrée vérifiée la plus récente du build | repli des étapes `nouvelle_version` et `correctifs` ; `forever hotfixes --raidbots`, `forever decode --hotfixes --raidbots` |
+| `Hotfix.log` | index des poussées vues par le client (sans valeur) | lecture locale | réécrit à chaque démarrage du client | journal `<cache>/hotfixes.json` ; `forever hotfixes`, `forever watch` |
+| `questcache.wdb` | quêtes vues par le client | lecture locale | archivé par build | révision des quêtes vues par la veille ; `forever decode --questcache` |
+| Journaux de combat | PV des monstres, coûts, incantations, touchés et ratés, critiques | données de l'utilisateur | par session (version du client attribuée par `client_builds`) | étape `journaux` ; `forever logs`, `forever measures refresh` |
+| ForeverLogger (notre addon) | niveau, talents, gains d'XP, relevés hors combat | dépôt | à chaque connexion | profil, mesures, `forever xp check` |
+| Addons de données installés | quêtes, donjons, butin, BiS, échelles, builds, familiers, métiers, trajets | variable (table plus bas) | empreinte des fichiers, contenu ou date | étape `addons` ; `forever addons status` |
+| RestedXP (parcours gratuits) | parcours de leveling en clair | CC BY-NC-SA 4.0 | version de l'addon installé | lu à chaque appel (`forever route …`) |
+| Polestar | guides de leveling au-delà de RestedXP | GPL-3.0 | commit épinglé du clone | étape `guides` (clone existant) ; `forever route polestar` |
+| wowsims/forever | calcul au niveau 60 (dégâts, poids, races, classes) | MIT (lien de retour demandé) | commit épinglé et compilé, daté contre le build | étape `simulateurs` (déjà compilé) ; `forever sims update` |
+| Factoruide | base de quêtes et méthode de route (recoupement) | code MIT, `data/` GPL-2.0+ (part VMaNGOS) | commit épinglé `f7da6da` | à la main seulement |
+| Forum de Blizzard | notes officielles (signal) | CC BY-NC-SA 3.0 (textes jamais recopiés) | une fois par jour au plus | `forever notes`, à la main ; `notes-watch.yml` à la main |
+| API Blizzard | (à venir) prix, fiches, PvP | conditions des API de Blizzard | sonde quotidienne | `forever api probe` ; `api-probe.yml` chaque jour |
+| Wowhead Forever | contrôle ponctuel d'une valeur | conditions du site : aucune aspiration | à la consultation | sous-agent `forever-web-researcher` seulement ; aucun code du dépôt ne le lit |
 
-## Données dérivées et simulateurs (MIT, garder le lien vers wowsims/classic)
-- **Formules des classes** (décisions 233 et 234) : chaque tranche de classe peut reprendre du code d'`ElliotWood/Forever` et des forks de MythicSim les formules de la classe (rotations, ressources, sorts, talents), dépôt, commit et fichier cités, **sans aucune valeur** (les valeurs viennent du client) ; une formule reprise est `suppose` comme toute source communautaire (rang 3 de la hiérarchie), puis `probable` ou `certain` une fois vérifiée sur le client ou mes journaux. Lecture seule permise sans nouvel accord pour `ElliotWood/Forever`, `sage3648/mythicsim-forever-engine-go`, `sage3648/mythicsim-forever-engine` et `wowsims/classic` (API GitHub et fichiers bruts).
-- Arbres de talents au format wowsims : `gunba/wow-forever-sim` (`ui/core/talents/trees/mage.json`), rangs confirmés : `ElliotWood/Forever` (`assets/confirmed_talents.json`).
-- Simulateur de référence : fork `ElliotWood/Forever` (Go, MIT, module `github.com/wowsims/forever`, données au build du client, `wowsimcli` Windows publié chaque semaine) ; depuis sa refonte, il ne connaît plus que Forever (plus d'enum `SimOptions.ruleset`, que gardent le `master` de `sage3648/mythicsim-forever-engine-go` et `gunba/wow-forever-sim` : y passer la règle Forever). MythicSim fait tourner les branches `mythicsim/*` de `sage3648/mythicsim-forever-engine-go` et prépare un moteur Rust (`sage3648/mythicsim-forever-engine`). Tous fixent le joueur au niveau 60. Étude du 2026-10-09 : `docs/research/wowsims-forever.md` (décision 224, tranche SIM1). Le dépôt amont `wowsims/forever` a été injoignable (404) : **épingler les commits et copier les arbres utilisés**.
-- Base d'objets de référence : `alcaras/forever-ref` (calcul des stats par formules du client).
-- Recoupements lisibles : ForeverChanges, WoW Forever Talents, Wowhead Forever.
+## Client du jeu (vérité)
 
-## Wowhead Forever : contrôle, jamais vérité (décision 128)
-- Rôle : contrôler les valeurs de sorts décodées du client (dégâts par rang, coûts, durées, recharges). La concordance conforte une valeur `probable` ou `suppose` (valeur calculée, rang lu sur un ancien build) ; elle n'ajoute rien à une valeur `certain` du client.
-- Divergence client ↔ Wowhead : **alerte**, pas un arbitrage. Causes possibles : correctif serveur non appliqué par notre décodage, ou erreur de notre côté. L'agent vérifie dans l'ordre les correctifs du client (`Hotfix.log`, puis `Cache/ADB/<locale>/DBCache.bin`), puis mes journaux (valeur observée), et signale l'écart avec ce qu'il a trouvé ; la question va dans `docs/OPEN_QUESTIONS.md` si rien ne tranche.
-- Accès : consultation ponctuelle par le sous-agent de recherche (`forever-web-researcher`), avec l'adresse de la page et la date de consultation. **Jamais d'aspiration automatique du site**, que ses conditions d'utilisation interdisent : aucun code du dépôt ne lit Wowhead. GearQuestForever, dont les fiches viennent de Wowhead, ne sert qu'au recoupement.
+### wago.tools : versions et tables
+- **Fournit** : la liste des versions publiées du client (`https://wago.tools/api/builds`, produit `wow_classic_beta`,
+  préfixe `1.60.` ; liste non triée : tri par `created_at` ; produit de la version finale à revérifier, d'où l'alerte
+  `silent`) et les tables du client en CSV (`https://wago.tools/db2/<Table>/csv?build=<version>`, `&locale=frFR` pour
+  une autre locale), plus les GameTables (`api/casc`, `forever fetch --gametables`).
+- **Licence** : non déclarée (données du client republiées par wago.tools ; aucune condition relevée dans le dépôt).
+- **Lecteurs** : `forever/pipeline/builds.py`, `fetch.py` (cache `<cache>/wago/<version>/<locale>/<Table>.csv`, index
+  `fetch.json` : adresse, empreinte, taille, date ; une réponse sans en-tête CSV est refusée), `tables.py` (colonnes
+  déclarées par table, plusieurs noms admis par colonne), puis les décodeurs (`decode.py`, `character_scaling.py`,
+  `dungeons_client.py`, `pets.py`, `quest_rewards.py`, `travel_client.py`, `xp_bonuses.py`). Tables lues, colonnes et
+  constantes de lecture : `forever/data/<version>/decode_rules.json` (`tables`, `class_tables`, `character_tables`,
+  `pet_tables`, `travel`…), jamais dans le code.
+- **Couverture** : talents (`Trait*`, `CurvePoint`, `SkillLineXTraitTree`), sorts (`Spell*`, `SkillLineAbility`), neuf
+  classes, races et combinaisons, objets, donjons (`Map`, `LFGDungeons`, `ContentTuning`, `DungeonEncounter`,
+  `AreaTable`), familiers, trajets (`TaxiNodes`, `TaxiPath*`, `UiMapAssignment`), XP (`QuestXP`, `LevelExperience`,
+  GameTable `xp`), bonus d'XP. **Absent du client** : PV des monstres, quêtes non vues, positions des PNJ, taux de
+  butin, listes d'entraîneurs.
+- **Fraîcheur** : `forever status` compare la version installée à la dernière publiée (cache de 6 h, `fresh`, `stale`,
+  `unknown`, `silent`).
+- **Relecture** : chaque passage de la veille (étape `jeu`, puis `nouvelle_version` si une version plus récente paraît :
+  téléchargement, trois essais par table avec délai doublé, décision 230 ; les tables d'une autre locale sont
+  facultatives et ajoutées en révision au passage suivant) ; à la main `forever builds`, `forever fetch --version V
+  [--tables …] [--locale frFR] [--refresh]` ; en CI `build-watch.yml` chaque jour (rapport en pull request, n'installe
+  rien).
 
-## Client installé (sources locales, sans réseau ; T04a)
-Dossier du client : `FOREVER_WOW_DIR` (défaut `C:\Program Files (x86)\World of Warcraft\_classic_beta_`), lu en lecture seule.
-- **Journaux de combat** `Logs/WoWCombatLog-*.txt` : format 22, bloc avancé à 19 champs (dont PV max, coût du sort, position, niveau) ; lecteur `forever/pipeline/combatlog.py`, mesures `forever/pipeline/measure.py` (`forever logs scan`, `forever logs measure`). L'en-tête ne donne que `1.60.1` (pas le build) : la provenance retient la version locale de même préfixe, avec une hypothèse. Source de premier rang pour les PV des monstres (`certain`). Warcraft Logs n'a pas de support Forever documenté. **Journal en cours d'écriture** (décision 205) : tant que le jeu est ouvert, un journal modifié depuis moins de 30 minutes n'est pas mesuré (`forever update`, `forever measures refresh`) et il est reproposé au passage suivant.
-- **Hotfix.log** : index des hotfixes appliqués au démarrage (push, table, RecID, validité), **sans valeur**, réécrit à chaque démarrage : chaque ligne est gardée dans le journal du cache `hotfixes.json` (T08b), qui date chaque poussée (« vu par le client le … »).
-- **DBCache.bin** (T08c, `Cache/ADB/<locale>/DBCache.bin`, lecture locale, `forever/pipeline/dbcache.py`) : en-tête `XFTH`, format 9, build, 32 octets de contrôle (44 octets) ; puis des entrées contiguës (`XFTH`, champ de sens non établi, poussée, identifiant unique, hachage `SStrHash` du nom de table, enregistrement, taille, statut, données). Statuts : `VALID` (données), `DELETE`, `INVALID` et `NOTPUBLIC` (aucune donnée). Familles : poussées réelles (applicables), réponses `DBReply` (poussée −1, « enregistrement absent », jamais appliquées), réponses d'objets (poussée = identifiant unique ≥ 0x01000000, jamais appliquées) ; `TactKey` (clés de chiffrement) ignorée sans être lue. À table et enregistrement égaux, la poussée la plus haute l'emporte. Le client écrit son cache vivant dans `DBCache.bin<pid>.tmp` (jamais lu) et remplace `DBCache.bin` à sa sortie : un `DBCache.bin` ne vaut que pour le build de son en-tête (garde de build). Recoupé avec `hotfixes.json` du même build (`forever hotfixes`).
-- **Dispositions des tables** (T08c) : définitions `.dbd` de WoWDBDefs (<https://github.com/wowdev/WoWDBDefs>), relevées par `forever fetch --version V --dbd` (réseau, sur accord ; commit épinglé dans `<cache>/dbd/dbd.json`, relevé du 2026-10-05 au commit `1d356b44c798`) ; seul le bloc qui **nomme** le build sert, jamais un bloc voisin. Chaque disposition est validée contre le CSV du build avant application (en-tête, taille exacte des données, identifiant, références résolues, taux d'égalité au build). Licence du dépôt introuvable (`LICENSE` absent, 404) : aucun texte de `.dbd` dans le dépôt, les fixtures ne portent que des dispositions dérivées (structure).
-- **Application** (T08c) : `forever decode --version V --hotfixes` superpose les valeurs aux tables du build en mode forever (une ligne `VALID` remplace ou s'ajoute, une ligne `DELETE` est retirée), avant tout décodeur ; origine `correctif_serveur` dans `origins.json` (poussées, date vue), champ `hotfix` sur chaque entité touchée, bloc `hotfixes` de `sources.json` ; installation par `forever install` (révision suivante, accord). Le mode seed n'en lit aucune.
-- **QuestCache.log** : journal de requêtes du cache de quêtes, **aucune donnée** ; le contenu est dans `Cache/WDB/<locale>/questcache.wdb` (`WQST`, lu depuis T04d par `forever/pipeline/questcache.py`, disposition `probable`, archivé par build) et `creaturecache.wdb` (`WMOB`, sans PV, non lu).
-- **SavedVariables** `WTF/Account/<COMPTE>/SavedVariables/` : `ForeverLogger.lua` (`ForeverLoggerDB`, niveau et talents du personnage, `forever/pipeline/addon_sv.py`) ; lus sans exécuter de Lua (`forever/pipeline/lua_table.py`).
-- **Carnet de Questie** (T04b, décision 3) : `SavedVariables/Questie.lua`, table `QuestieConfig.char.<Nom - Royaume>.journey` (événements `Level` : heure Unix, nouveau niveau). Données personnelles de l'utilisateur, lues localement seulement (`forever/pipeline/questie.py : read_journey`), jamais copiées au-delà d'un extrait anonymisé de fixture. Le fichier contient des chaînes compressées (octets quelconques) : lecture octet pour octet et balayage table par table ; Questie écrit parfois plusieurs blocs `char` pour un même GUID (« Unknown ») : réunis par GUID. Heures ramenées à l'heure locale du journal par le décalage d'un instantané ForeverLogger, sinon par le fuseau du système. Repli après ForeverLoggerDB pour le niveau du lanceur.
+### WoWDBDefs : dispositions des tables
+- **Fournit** : les définitions `.dbd` (<https://github.com/wowdev/WoWDBDefs>) qui décrivent l'ordre des octets des
+  enregistrements, nécessaires pour décoder les correctifs de `DBCache.bin` (`forever/pipeline/dbd.py`). Seul le bloc
+  qui nomme le build sert ; chaque disposition est validée contre le CSV du build avant application.
+- **Licence** : introuvable (`LICENSE` absent du dépôt amont au relevé de T08c) : à vérifier. Aucun texte de `.dbd`
+  dans le dépôt ; les fixtures ne portent que des dispositions dérivées.
+- **Fraîcheur et relecture** : commit épinglé dans `<cache>/dbd/dbd.json` (API GitHub, lecture seule, décision 179) ;
+  relu par la veille quand un correctif du serveur demande une disposition absente (sinon attente `network_dbd` qui
+  se lève seule) ; à la main `forever fetch --version V --dbd [--dbd-commit …]`.
 
-## Addons installés (sources communautaires)
-- **Quêtes et zones de Questie** (T04c, décision 69) : `Database/Classic/classicQuestDB.lua` (`questKeys` : niveau requis, niveau, masques de races et de classes, `zoneOrSort`), `Database/Zones/data/dungeons.lua` (zone du donjon, identifiants alternatifs, zone parente), `Localization/lookups/lookupZones.lua` (noms **anglais**, aucune table française), seuils de couleur de `Modules/Libs/QuestieLib.lua`. Lus à l'exécution par `forever lookup zones` ; base Classic Era sans correction Forever, `suppose`, jamais copiée (fixture minimale dans `tests/fixtures/questie/`).
-- **Questie** (`Interface/AddOns/Questie`, version lue dans `Questie_Camelot.toc`, ici 11.38.0 Forever-v27) : base **Classic Era sans correction Forever** (PNJ : PV min/max, niveaux, rang ; XP de quête). Lecture locale seulement (`forever/pipeline/questie.py`), jamais copiée : le dépôt ne garde que l'agrégat par niveau et les PNJ observés dans un journal avec la valeur Questie en regard (`monsters.json`). Certitude `suppose`, étiquette « communautaire », version de l'addon dans la provenance. **Licence amont à vérifier** avant tout élargissement. Relire quand la version change (veille, T08). Écart mesuré le 2026-09-27 : Questie sous-estime les PV de Forever à partir du niveau 10 environ (29 écarts sur 21 PNJ mesurés).
-- **Talents Forever** (FA1, `Interface/AddOns/TalentsForeverBook`, version lue dans `TalentsForeverBook.toc`, ici 0.35.0, 0.37.1 au 2026-10-06 avec des codes **v6** (`codeVersion` 6) ; suivi par empreinte et version de contenu depuis T08d ; **aucune licence**, décision 133) : `Data.lua` (arbres des 9 classes, codes v6, bloc `popular` des builds populaires daté par classe). Lecture locale seulement (`forever/talents_forever.py`, table de correspondance reconstruite à chaque appel, décision 209), jamais copiée : le dépôt ne garde que des agrégats (codes des builds populaires en fixture pour les tests de va-et-vient, parts et dates, écarts du recoupement des arbres). Provenance : version de l'addon, build de ses données, date `asOf` des builds populaires. Certitude `suppose` au mieux pour les builds populaires (choix de joueurs, décision 127) ; pour les arbres, le client l'emporte. Le format du code est réimplémenté sans recopier le code de l'addon.
-- **Forever Bestiary** (CH0, `Interface/AddOns/ForeverBestiary`, version lue dans `ForeverBestiary.toc`, ici 0.5.0 ; **aucune licence**, décision 133) : `Data/Data.lua` (familles, capacités et rangs, bêtes : PNJ, famille, plage de niveau, zones, coordonnées, rangs enseignés avec la marque de l'addon ; base du 2026-09-25 figée sur le client 1.60.1.69913), `Data/Community.lua` (carte communautaire datée, nombre de joueurs, positions par `uiMapID`) et la sauvegarde `ForeverBestiaryDB` (mes observations, mes familiers). Lecture locale seulement (`forever/pipeline/bestiary.py`), jamais copiée : le dépôt ne garde que `pet_rules.json` (règles du guide, chacune avec sa source) et le rapport de recoupement. Anonymisation à la lecture, par liste blanche : empreintes de joueurs (`rp`), noms de tiers (`peers`, `feed[].who`), GUID (`petGuids`), clés `self*`, `likes` et `votes` jamais rendus ; seuls des comptes (nombre de rapporteurs). Provenance : version et empreinte de l'addon, date de la base, date de la carte communautaire, date de chaque observation. Certitude `suppose` au mieux pour un relevé de joueurs (décision 127) ; le client l'emporte en cas d'écart (`forever pets crosscheck`). Suivi par `forever addons status` (entrée `ForeverBestiary` de `DATA_ADDONS`).
-- **RestedXP (RXPGuides) : exclu des données du dépôt** (guides payants, licence non commerciale) ; réinstallé (4.11.23 au 2026-10-14), il reste exclu des données du projet : `forever addons status` le connaît (`EXCLUDED_ADDONS`, statut « connu, exclu ») et ne le signale jamais comme « à inventorier » (décision 227). **Cible de livraison depuis RX1** (décision 253) : les feuilles de route de forever sont livrées par son API publique (`RXPGuides.ImportGuide`) ; son code local n'est lu que pour la syntaxe des guides personnels (`ParseGuide`), jamais ses guides ni ses bases ; aucun guide payant ni chiffré n'est repris. **Parcours gratuits en clair** (`Guides/Forever/*.lua`, licence CC BY-NC-SA 4.0 de son fichier `LICENSE`) : mesure de nos routes depuis RX1c (décision 268), puis **référence d'apprentissage de notre optimiseur et base adaptée** là où ils font mieux, avec attribution, pour l'usage personnel et non commercial de l'utilisateur (décision 277, CJ1) ; lus en local à l'exécution, leur texte n'entre jamais dans le dépôt. Quest Master (copie exacte des bases de Questie, `tasks/inventaire-addons.md`) : non utilisé comme source. EllesmereUI : aucune donnée de jeu, mais **cible d'export** (profils, EX1, section « Addons pilotés » plus bas).
-- **Sources de T04d** (décision 246, relevé du 2026-10-13, lecture locale seulement) : `Cache/WDB/enUS/questcache.wdb` du client (quêtes vues : niveau, requis, zone, suite, difficulté et multiplicateur d'XP, argent ; disposition des champs déduite, `probable`) ; table `QuestXP` (wago.tools, voie de `forever fetch`) ; Naowh Forever 1.1.11 (`NaowhForever_Discovery/QuestList/Data/Quests.lua` dit Completo, `QuestSpots.lua` de Journeys, Dungeon Journal) ; Forever Guide 1.33.0 (`DungeonData.lua`) ; ForeverDungeonJournal 1.6.2 (XP de ses quêtes de donjon) ; GearQuestForever 0.5.4-beta (récompenses par nom de quête, sans ID) ; seuls des agrégats entrent dans le dépôt (décision 133), la liste fusionnée vit dans le cache local. **RXPGuides v4.11.23 est de nouveau installé** (fichiers du 2026-10-11) et reste exclu comme source. Le fichier du sac de couchage de Naowh Forever s'appelle `NaowhForever_Discovery/Data/SleepingBag.lua` (T04f).
-- **Naowh Forever 1.1.19** (installé le 2026-10-15, relevé CJ1) : les quêtes de Completo passent dans l'addon chargé à la demande `NaowhForever_DiscoveryData/Quests.lua` et les positions de Journeys dans `NaowhForever_JourneysData/QuestSpots.lua`, même format ; les lecteurs prennent le nouvel emplacement, sinon l'ancien (`Data/Books.lua` et `Data/SleepingBag.lua` restent dans `NaowhForever_Discovery`, `Data/Network.lua` dans `NaowhForever_Journeys`). Sans ce correctif, le livre des quêtes reconstruit après la mise à jour perdait Completo (noms de zones vides).
-- **Sources de T04f** (lecture locale, décision 262) : tables du client `Spell*`, `Item*`, `Trait*`, `CurvePoint` et `PlayerCondition` (wago.tools, `xp_bonuses.json`) ; Naowh Forever Discovery 1.1.11 (`NaowhForever_Discovery/Data/SleepingBag.lua` : objets à cliquer, cartes, positions, quêtes de la chaîne du sac) recoupé par FojjiCore Dungeon Journal 3.3.5 (`FojjiCore_DungeonJournal/Data/Guides.lua`, clé `sleepingbag`) ; chaîne gardée dans le cache (`<cache>/xp_bonuses/`), jamais dans le dépôt ; écart relevé : dernière zone Arathi Highlands chez Naowh, Hillsbrad Foothills (entrée du mur) chez FojjiCore.
-- **Sources de DJ1** (décision 265, relevé du 2026-10-13, lecture locale seulement) : Naowh Forever 1.1.11 (`NaowhForever_DungeonJournal` : donjons, ailes, boss, `chance` d'origine déclarée, entrées, `QuestPrereqs`, `QuestMinLevel` ; SavedVariables `journalRun`, `journalKills`, `journalLoot` et `instanceTracker` d'InstanceTracker, activé par l'utilisateur le 2026-10-13 ; les noms de joueurs de `rolls` et `team` ne sont jamais lus) ; FojjiCore DungeonJournal 3.3.5 (recoupement seulement, réutilisation interdite : rien n'entre dans le dépôt hors agrégats) ; ForeverDungeonJournal 1.6.2 (14 donjons, lus en entier depuis DJ1) ; Forever Guide 1.33.0 (`DungeonData.lua`, `DalaranData.lua`, `TRASH_NPC`, taux Classic) ; AtlasLoot Classic Forever (`LevelRange`, taux Classic de `droprate.lua`) ; Forever Companion 1.0.0 ; Zone Info: Forever 1.9 (ex-Zone Level: Forever ; plages classiques, pas de Forever). Les durées de speedrun des addons sont des **bornes basses** (groupes très rapides), `suppose`. AlexAtlasLoot 1.7.0 reste **écarté** (copie interdite, décision 229).
-- **AtlasBIStooltips** (« AtlasLoot Forever [BiS ToolTip] », 1.0.1, **aucune licence**) : module d'AtlasLoot Classic Forever installé avec lui (`## Dependencies: AtlasLootClassic`, `## Group: AtlasLootClassic`), lignes « BiS » dans l'infobulle des objets ; base `ClassDataBase/` de listes BiS par spécialisation (22 fichiers, `<Classe>_<Spé>.lua`). **Source communautaire de listes BiS**, au mieux `suppose` (choix de joueurs, décision 127), utile pour T10a (recoupement des listes BiS) ; lecteur à écrire en T10a, lecture locale seulement, jamais copiée. Suivi par `forever addons status` (entrée `AtlasBIStooltips` de `DATA_ADDONS`, décision 227). Corrige le relevé du 2026-10-07, qui le rangeait parmi les restes.
-- **Inventaire du 2026-10-10** (décision 228, détail dans `tasks/inventaire-addons.md`, section du 2026-10-10 ; lecture seule, code des addons jamais modifié) :
-  - **FojjiCore** 3.1.5 et ses modules (`FojjiCore_*` : BiS, DungeonJournal, RaidTools, Speedrun, SpellRanks), auteur Fojji, propres à Forever (`_Camelot.toc` ou `AllowLoadGameType: camelot`) ; cœur « tous droits réservés », modules sans licence ; **ne se charge probablement pas** sur ce poste (`RequiredDeps: ForeverAuras`, absent) ; **lu en local comme source sans installer ForeverAuras** (décision 229 : la lecture se fait sur disque, le chargement en jeu n'est pas nécessaire). Données possibles, au mieux `suppose`, origine non déclarée : `FojjiCore_SpellRanks` (rangs de sorts par niveau, coût d'entraînement, positions des maîtres : recoupement du client) et `FojjiCore_DungeonJournal` (donjons, boss, butin avec probabilités, quêtes : recoupement de ForeverDungeonJournal et d'AtlasLoot). BiS : aucune liste embarquée (pondérations par rôle, export `FCBIS1:`) ; Speedrun : chronomètre, aucun itinéraire ; RaidTools : rien d'embarqué. Suivi par `forever addons status` (entrée `FojjiCore`).
-  - **ShortestPathForever** v1.14.0 et **SkillUpForever** v0.9.2 (auteur cjber, GPL-3.0-or-later) : tables **générées** depuis le client (wago.tools, build 1.60.1.70291) et CMaNGOS : points de vol, trajets et durées, transports, portails, coûts de marche ; paliers de couleur des recettes, recettes, frais des maîtres, sources des recettes. Recoupement de ce que le projet lit lui-même par wago.tools ; parts héritées de CMaNGOS au mieux `suppose`. Suivis par `forever addons status`.
-  - **Zone Info: Forever** (`ZoneInfoForever` 1.7.1, auteur Vaniron, aucune licence) : **nouveau nom de Zone Level: Forever** (« Formerly Zone Level »), même table de 50 zones avec herbes et mines en plus ; suivi à la place de `ZoneLevelForever`.
-  - **Exclus** (connus, jamais lus) : Tamed 2.0.1 (MIT ; tables Forever vides, données de Vanilla seulement) ; AlexAtlasLoot 1.5.0 (butin de Forever relevé par les joueurs, mais licence « tous droits réservés » qui interdit d'en copier les tables dans une base de données : **exclu et jamais lu**, décision 229).
-  - **Interface seule** : Simulationcraft 12.1.5-alpha-01 (addon retail avec branche Forever, Unlicense ; export de la fiche du personnage, SimulationCraft ne simule pas Forever ; P06b, décision 235 : l'export collé par le joueur dans la fenêtre du chat est lu par le pont, `forever/simc.py` : fiche lue au client avec les buffs actifs, source `simulationcraft`, certitude `certain` ; objets recoupés avec le contexte du jeu, qui fait foi ; chaîne `talents=` jamais décodée ; jamais lu sur disque), ExtendedVendorForever 1.4 (aucun catalogue de vendeurs ; journal des transactions du joueur dans ses SavedVariables, non lu), AppelSwingsForever, BetterForeverChat, DeleteCheapestItem, FontMagic, ForeverMove.
-- **Inventaire du 2026-10-14** (audit des capacités, décisions 272 et 276, détail dans `tasks/inventaire-addons.md`, section du 2026-10-14 ; lecture seule) :
-  - **Forever Companion** 1.0.0, données v88 du 2026-10-12 : listes BiS par spécialisation (phase « BETA », sans niveau ; source, lieu et taux par objet dans `Data/Dictionary.lua`), **échelles de statistiques** (une ou plusieurs par classe, présentées comme des échelles Wowhead ; import et export texte **Pawn v1**, échelles personnelles dans `ForeverCompanionDB`, aucune API publique pour les régler), rotations par jetons de sorts, onglet « BiS Talents » : **source de listes BiS et d'échelles** (CJ1, bloc 4) et **cible d'export** (Pawn v1).
-  - **Naowh Forever** 1.1.15 : BiS (une liste par spécialisation, sans niveau, mise à jour le 11 octobre ; import `!NBIS1!`), Stat Weights (import `NFSW1:` ou export EP de WoWSims), Naowh Score (niveau d'objet, qualité et niveau requis, **sans les poids**), Training « Level by level ».
-  - **GearQuest Forever** 0.5.5-beta (modules de classe 0.3.6-beta, chargés à la demande) : choix d'équipement de leveling par plage de niveaux (`GQ.Data.<classe>Picks` : objet, emplacement, niveaux, rang, spécialisation, camp, score) dans des fichiers Lua générés, rien dans ses SavedVariables : **source du BiS de leveling** (CJ1, bloc 4), lue en local.
-  - **Forever Guide** 1.35.1 : chaînes de quêtes, butin, GearAdvisor, GearCalc, GearExplain (poids en unités WoWSims) : recoupement.
-  - **SkillUp Forever** 0.9.3 : itinéraires de métiers, sans guide de leveling : routes de métier sur demande (CJ1, bloc 1g ; MT1).
-  - **FojjiCore absent** (retiré entre le 10 et le 14 octobre) : relu s'il revient, rien n'en dépend.
-- **Nos propres addons**, jamais lus comme sources communautaires ni comptés « à inventorier » (décision 227) : ForeverLogger (addon du dépôt ; ses SavedVariables sont une observation, source 2), ForeverBridge, sa réserve d'emplacements `ForeverBridge_S001`… et ses sondes `ForeverBridge_Probe*` (pont de P06a), RaphCompletionist (addon de l'utilisateur, dossier de la conversation « addons » prévue en P06b).
-- **ForeverCompletionist n'est pas un addon** : projet de développement de l'utilisateur (outil d'inventaire « completionist »), à déplacer hors du dossier des addons ; jamais lu comme un addon, même s'il porte un `.toc` (`NOT_ADDONS`, décision 227).
-- **Sauvegardes de ForeverLogger** : `scripts/install_addon.py` range l'ancien addon dans le cache du projet (`<cache>/addons/backups/ForeverLogger.bak-<date>`), plus jamais dans le dossier des addons ; les deux copies `ForeverLogger.bak-*` du 2026-10-02 y ont été déplacées le 2026-10-10 (`--backups-only`, décision 228). Une copie `.bak` encore trouvée dans le dossier des addons n'est jamais lue.
+### Correctifs du serveur : `DBCache.bin` du jeu et caches vérifiés de Raidbots
+- **`DBCache.bin` du jeu** (`Cache/ADB/<locale>/DBCache.bin`, `forever/pipeline/dbcache.py`) : valeurs des correctifs
+  poussés par le serveur. Le client le réécrit à sa sortie et ne garde que son build : `forever/archive.py` le copie
+  par build dans `<cache>/dbcache/<build>/` (étape `archivage` de chaque passage, et passage lancé par le pont à la
+  fermeture du jeu ou à l'écriture du fichier). Seules les poussées réelles sont appliquées (`VALID` remplace ou
+  ajoute, `DELETE` retire ; la plus haute poussée l'emporte), par `forever/pipeline/hotfix_overlay.py`, avant tout
+  décodeur. Origine `correctif_serveur` dans `origins.json`, certitude jusqu'à `certain`.
+- **Raidbots** (décision 290, `forever/pipeline/raidbots.py`) : quand le jeu n'a pas d'archive du build (utilisateur
+  qui ne peut pas se connecter), le `DBCache.bin` vérifié le plus récent du build est lu dans la liste publique
+  `https://www.raidbots.com/api/dbcache/verified` (celle qu'utilise wowsims/forever), téléchargé en lecture seule et
+  épinglé dans `<cache>/dbcache/<build>/raidbots/` (adresse, date de création, empreinte, date du téléchargement).
+  **Licence** : non déclarée. Certitude au plus `probable` (copie tierce) ; le cache du jeu de l'utilisateur prime
+  dès qu'il existe. Un talent ou un sort retiré par un correctif ainsi lu est « probablement retiré » et exclu des
+  recommandations (`forever/server_removed.py`).
+- **Relecture** : étapes `nouvelle_version` et `correctifs` de chaque passage (révision suivante écrite d'elle-même,
+  décision 295) ; une nouvelle version attend le `DBCache.bin` de son build (`hotfixes_unread`, levée seule), puis
+  s'installe sans correctifs après `UPDATE_HOTFIX_WAIT` si aucune valeur `correctif_serveur` n'est perdue. À la main :
+  `forever hotfixes [--dbcache F | --raidbots] [--values]`, `forever decode --version V --hotfixes [--raidbots]`.
+- **`Hotfix.log`** (`Logs/Hotfix.log`, `forever/pipeline/hotfixes.py`) : index des poussées appliquées au démarrage,
+  sans valeur, réécrit à chaque démarrage ; chaque ligne est gardée dans `<cache>/hotfixes.json`, qui date les
+  poussées. Relu par `forever watch` et par la veille.
 
-## Addons de données : première source communautaire (décision 123)
-Ces addons compilent des données relevées par de nombreux joueurs, souvent plus complètes que mes propres observations. Règles communes :
-- **Lecture locale seulement** (`Interface/AddOns` et `WTF/.../SavedVariables`), jamais par le réseau, jamais dans les tests (fixtures minimales dans `tests/fixtures/`).
-- **Version de l'addon dans la provenance** de chaque valeur, avec l'empreinte de ses fichiers de données (décision 124).
-- **Seuls des agrégats entrent dans le dépôt** (comptes, écarts, valeurs recoupées avec leur source), jamais les tables de l'addon.
-- **Lecture locale libre** de tout addon installé, quelle que soit sa licence (décision de l'utilisateur du 2026-09-30, décision 133) ; la licence ne compte que pour ce qui entrerait dans le dépôt, limité aux agrégats.
-- **Seulement des addons à jour pour Forever** (version Forever explicite, fichier publié depuis la version du jeu jouée) ; un addon périmé est signalé et n'est plus lu comme source.
-- Certitude au mieux `suppose` ; une observation réelle l'emporte (décision 127).
+### Cache des quêtes du client
+`Cache/WDB/<locale>/questcache.wdb` (`forever/pipeline/questcache.py`, disposition `probable`) : quêtes **vues** par le
+client (niveau, requis, zone, suite, difficulté, multiplicateur d'XP, argent), archivé par build ; la veille ajoute les
+quêtes nouvellement vues à `quest_rewards.json` en révision. `creaturecache.wdb` (sans PV) n'est pas lu ;
+`QuestCache.log` ne contient aucune donnée.
 
-| Addon | Version relevée (2026-10-07 ; colonne à jour, relevés antérieurs dans `tasks/inventaire-addons.md`) | Apport | Licence | Usage |
-|---|---|---|---|---|
-| AtlasLoot Classic Forever | 1.2.0 (nom de la version publiée sur CurseForge), `.toc` : « Forever 1.60.1 » | Butin par boss (instance → boss → `npcID` → objets), taux Classic de `droprate.lua` | GPL-2 (installée) | DJ1, T10 ; valeur Classic de `GetForVersion` (premier argument) |
-| ForeverDungeonJournal | 1.5.2 | Donjons, boss, butin, quêtes Forever et leur XP (base et réglée), textes français | aucune ; données de sites tiers (`SOURCES.txt`) | DJ1, T04d ; niveaux des boss hérités copiés de Classic (pas un recoupement de H1) |
-| Questie Forever | 11.38.0 Forever-v27 | Quêtes, PNJ, récompenses ; `QuestieForeverDB` (quêtes Forever apprises en jeu) ; quêtes faites de mes personnages | à vérifier (CurseForge 334372) | Déjà lu (T04a à T04c) ; profil (T07), T04d |
-| GearQuestForever | 0.3.6-beta | Fiches d'objets, infobulles Wowhead Forever, sources (boss, quête, marchand, métier) | aucune ; données Wowhead | **Recoupement seulement** (T10, T04d) : valeurs Classic et infobulles Wowhead, jamais source d'une valeur |
-| Auctionator | 340 | **Mes relevés de prix** (`AUCTIONATOR_PRICE_DATABASE`, CBOR), cache des prix marchands | All Rights Reserved ; `AGENTS.md` adressé aux agents d'IA | Lecture de mes propres SavedVariables par un décodeur maison, code de l'addon jamais lu ni repris (décision de l'utilisateur, confirmée le 2026-09-30) ; profil (T07), prix avant l'API (EC1, T10) |
-| Forever Bestiary | 0.5.0 (relevée le 2026-10-01, inchangée le 2026-10-07), `.toc` : interface 16001, CurseForge 1712376 | Familles de familiers (bonus, régime, capacités), capacités et rangs, bêtes apprivoisables (PNJ, niveaux, zones), guide de l'entraînement des familiers sourcé ; carte communautaire livrée avec l'addon (datée) ; `ForeverBestiaryDB` : mes observations, mes familiers, carte reçue en jeu | **aucune** (`LICENSE` absent) ; bêtes de beastmaster.io, familles et capacités de foreverchanges.pro lues sur le client **1.60.1.69913** | CH0 (décision 154) : recoupement du client pour les familles, capacités et rangs ; source des bêtes, niveaux et zones ; carte communautaire comme source datée ; héritage du familier en `suppose` (relevés de joueurs, décision 127, jusqu'à la mesure du protocole dans mes journaux) ; noms des autres joueurs jamais lus |
-| Talents Forever (`TalentsForeverBook`) | 0.37.1 (relevée le 2026-10-07 ; 0.35.0 au 2026-10-02), codes **v6** (`codeVersion` 6), `.toc` : interface 16001, CurseForge 1700435, site talentsforever.com | Arbres de talents des 9 classes (nœud, sort, rangée, colonne, rangs), code de build au format v6, builds populaires par classe et par spécialisation (part, fenêtre, date `asOf`, rafraîchis chaque jour depuis le site) ; données du client **1.60.1.70170** (`Data.lua` généré le 2026-10-01) | **aucune** (ni fichier de licence ni `X-License`) | FA1 (décision 171) : export de nos builds en code et lien Talents Forever (format réimplémenté, jamais recopié) ; builds populaires comme source communautaire datée, au mieux `suppose`, comparés à nos builds ; recoupement de nos arbres décodés, écarts signalés, le client fait foi ; lecture locale, agrégats seulement |
-| Naowh Forever (`NaowhForever` + 14 modules) | 0.5.25-beta (relevée le 2026-10-07), `.toc` : interfaces retail et 16001, SavedVariable `NaowhForeverDB` ; données datées des builds 1.60.1.69913 à 1.60.1.70205 | Classement BiS de 28 spécialisations (wowsrc.com), poids des statistiques par défaut (sans source), journal des donjons (Wowhead Forever et Classic, wowsrc.com : donjons, boss, butin, capacités), conseils de boss (écrits d'après des sources Classic), quêtes de donjon, chaîne du sac de couchage, sorts et prix des entraîneurs, recettes, livres de bibliothèque | **tous droits réservés** (`LICENSE.md`) | Décision 196 : **cible d'export** (BiS `!NBIS1!` et poids `NFSW1:` en T10, macros `!NFM1!` en EX1) ; ses données en recoupement seulement, au mieux `suppose` (DJ1, T10, T04f pour le sac de couchage) ; lecture locale, agrégats seulement, code jamais recopié |
-| Forever Companion (`ForeverCompanion`) | 1.0.0 (relevée le 2026-10-06, inchangée le 2026-10-07), `.toc` : interface 16001, SavedVariable `ForeverCompanionDB` ; contenu `dataVersion` 79 (`Data/Meta.lua`, 2026-10-05) | Listes BiS, rotations, consommables, talents (sort, rangée, colonne, rangs, sans nœud), butin des donjons, métiers, prix de l'hôtel des ventes ; données générées par Forever Companion Studio | **aucune** (ni fichier de licence ni `X-License`) | T08d : suivi par empreinte et version de contenu (`forever addons status`), inventaire (`tasks/inventaire-addons.md`) ; second témoin des arbres (DON13) ; lecteurs à venir (FA1, DJ1, classes), agrégats seulement, au mieux `suppose` ; **aucun point d'import** (2026-10-07) : rien n'y est exporté (décision 196) |
+## Mes observations
 
-Autres addons de données au 2026-10-07 (hors table, décrits dans la liste des addons conseillés plus bas avec leur version de septembre) : Forever Guide **1.25.7**, Legacy Forever **v0.6.13**, Zone Level: Forever **1.6** (renommé Zone Info: Forever, 1.7.1 au 2026-10-10, décision 228) ; Questie inchangé (11.38.0 Forever-v27).
+### Journaux de combat
+- **Fournit** : `Logs/WoWCombatLog-*.txt` (et `.txt.gz`), format 22 avec le bloc avancé : PV max des PNJ, coûts,
+  durées d'incantation, intervalles, critiques, touchés et ratés par écart de niveau, durée des combats
+  (`forever/pipeline/combatlog.py`, `measure.py`, `levels.py`, `monsters.py`). Source de premier rang pour les PV des
+  monstres (`certain`). L'en-tête ne donne pas le build : la version vient du journal des versions du client vues sur
+  le poste (`forever/pipeline/client_builds.py`).
+- **Licence** : données de l'utilisateur ; aucune donnée de tiers écrite en clair (anonymisation à la lecture).
+- **Relecture** : étape `journaux` de chaque passage, sur les journaux de la version installée seulement ; un journal
+  en cours d'écriture (jeu ouvert, modifié récemment) est remis au passage suivant (`live_logs.py`, décision 205) ; la
+  mesure s'écrit d'elle-même en révision (décision 295). À la main : `forever logs scan | measure`,
+  `forever measures refresh`, `forever monsters build`.
 
-Détail des formats, comptes et recoupements : `tasks/inventaire-addons.md`.
+### ForeverLogger (notre addon)
+`ForeverLoggerDB` (`WTF/Account/<COMPTE>/SavedVariables/ForeverLogger.lua`, `forever/pipeline/addon_sv.py`) :
+instantanés du personnage (niveau, talents), gains d'XP, passages et butin de donjon, relevés hors combat (marchands,
+réputation), sans abonnement au journal de combat ni fonction d'action (`docs/ADDON.md`). Une observation réelle
+l'emporte sur une donnée d'addon et passe la certitude à `certain` ; un écart est signalé. Lu par le profil
+(`forever profile import`), les mesures, `forever xp check` et `forever measures kill-time`.
 
-## Addons pilotés : exports de forever-core (décision 196, `docs/VISION.md`)
-Un export se fait dans la tranche qui calcule la donnée, seulement vers un addon qui a un point d'import ; sinon notre addon affiche la donnée. Le code des addons n'est jamais modifié ni recopié : les formats sont réimplémentés d'après leur description (`tasks/inventaire-addons.md`, section du 2026-10-07, points d'import et d'export).
+### Autres sauvegardes du joueur (lecture locale)
+- **Carnet de Questie** (`Questie.lua`, `journey`) : gains de niveau horodatés, repli pour le niveau du lanceur
+  (`levels.py`) ; `QuestieForeverDB` : quêtes de Forever apprises en jeu (relevé du joueur, `quest_sources.py`).
+- **Auctionator** (`AUCTIONATOR_PRICE_DATABASE`, `forever/pipeline/auctionator.py`, décodeur CBOR maison
+  `cbor.py`) : mes relevés de prix ; le code de l'addon (« All Rights Reserved ») n'est jamais lu.
+- **Export SimulationCraft** collé dans la fenêtre du pont (`forever/simc.py`) : fiche du personnage lue au client,
+  source `simulationcraft`, jamais lue sur disque.
+- **Profil multi-sources** (décision 125) : chaque champ garde sa source et sa date ; la plus récente l'emporte, à date
+  égale la plus directe ; ce que le joueur dit l'emporte pour la réponse en cours (décision 122).
+
+## Addons de données installés
+Dossier du client : `FOREVER_WOW_DIR` ou installation choisie (`forever wow list | adopt`), lu en lecture seule.
+
+**Suivi** : `forever/addons.py` (`DATA_ADDONS`) relève pour chaque addon la version du `.toc` et l'**empreinte de ses
+fichiers de données** (la version seule ne suffit pas : AtlasLoot change de contenu à version égale, décision 124) ;
+statut `nouveau`, `inchangé`, `changé` ou `absent` contre `<cache>/addons/state.json`. **Relecture** : étape `addons`
+de chaque passage de la veille (`forever addons status --save`) ; Questie changé relance la mesure des journaux,
+écrite d'elle-même ; un autre addon changé laisse un rappel de relecture en session (n'attend aucun accord, ne bloque
+rien) ; les livres fusionnés du cache (quêtes, donjons) se rebâtissent quand un fichier lu change. `forever watch`
+le signale hors ligne. **Fraîcheur par le contenu** (registre des sources) : Talents Forever et Forever Companion
+(talents sans correspondance avec nos données), sinon par date ou build (poids de Naowh, SkillUp Forever).
+
+Versions du relevé du 2026-10-21 (`docs/research/sources-addons-2026-10-21.md` ; détail des formats et relevés
+antérieurs : `tasks/inventaire-addons.md`) :
+
+| Addon | Version | Fournit | Licence | Lecteur et usage |
+| --- | --- | --- | --- | --- |
+| Questie | 11.38.0 Forever-v27 | quêtes, PNJ (PV, niveaux), XP des quêtes : base **Classic Era sans correction Forever** | à vérifier (aucun fichier de licence installé ; CurseForge 334372) | `questie.py`, `quest_sources.py`, `travel_sources.py` (maîtres de classe) ; `suppose` ; agrégat par niveau seulement (`monsters.json`) |
+| Naowh Forever (13 dossiers) | 1.1.38 | quêtes (Completo, Journeys), journal des donjons, butin, BiS par spé, poids par défaut, trajets et transports, niveaux d'apprentissage, chaîne du sac de couchage | tous droits réservés (`LICENSE.md`) | `quest_sources.py`, `dungeon_sources.py`, `gear_sources.py`, `travel_sources.py`, `sleeping_bag.py` ; recoupement, `suppose` ; **cible d'export** |
+| Forever Companion | 1.0.0 (`dataVersion` 91) | arbres et builds des neuf classes, rotations en prose, BiS, échelles de statistiques, butin des donjons | aucune | `companion.py`, `gear_sources.py`, `dungeon_sources.py` ; **cible d'export** (Pawn v1) |
+| Talents Forever (`TalentsForeverBook`) | 0.38.9 (`codeVersion` 7) | arbres des neuf classes, codes de build, builds populaires datés | aucune | `forever/talents_forever.py`, `pipeline/talents_forever.py` ; codec réimplémenté (`tf_code.py`) ; le client fait foi |
+| Forever Guide | 1.37.0 | quêtes et chaînes de donjon, butin, `GearData` | aucune pour le projet (briques reprises : LFG en MIT, Ace3 en BSD, cartes Atlas en GPL-2.0+) | `quest_sources.py`, `gear_sources.py` ; recoupement |
+| GearQuest Forever (+ modules de classe) | 1.0.0 | choix d'équipement de leveling par plage de niveaux, récompenses par nom de quête | aucune | `gear_sources.py`, `quest_sources.py` ; recoupement seulement |
+| ForeverDungeonJournal | 1.6.5 | donjons, boss, butin, quêtes de donjon et leur XP | aucune ; données de sites tiers (`SOURCES.txt`) | `quest_sources.py`, `dungeon_sources.py` |
+| AtlasLoot Classic Forever (+ modules) | Forever 1.60.1 (contenu suivi par empreinte) | butin par boss, taux Classic | GPL-2 | `dungeon_sources.py` ; taux Classic dits comme tels |
+| AtlasBIStooltips | 1.0.1 | listes BiS par spécialisation | aucune | suivi seulement (lecteur prévu en T10a) |
+| Forever Bestiary | 0.7.0 | familles, capacités et rangs, bêtes apprivoisables, carte communautaire datée ; `ForeverBestiaryDB` (mes observations) | aucune | `bestiary.py`, anonymisation par liste blanche ; le client fait foi (`forever pets crosscheck`) ; `pet_rules.json` relu en session |
+| SkillUp Forever | 0.18.6 | seuils des recettes, métiers (données du build nommé) | GPL-3.0-or-later | `skillup.py` ; assistant « Métier » du pont ; `/skillup` calcule en jeu |
+| Shortest Path Forever | 1.21.5 | trajets, transports, portails (générés du client) | GPL-3.0-or-later | suivi ; lecteur à venir |
+| Legacy Forever | 0.11.3 | défis et points Legacy (générés du client) | GPL-3.0-or-later | suivi ; lecteur à venir (LG1) |
+| Zone Info: Forever | 1.9.1 | plages de niveau des zones et donjons (plages classiques) | aucune | `dungeon_sources.py` |
+| FojjiCore et modules | absent au 2026-10-21 | rangs de sorts, journal des donjons, sac de couchage | cœur « tous droits réservés », modules sans licence | relu s'il revient ; recoupement seulement |
+| Auctionator | 341 | mes prix (SavedVariables) | All Rights Reserved | `auctionator.py`, code jamais lu |
+
+- **Exclus** (connus, jamais lus comme source, `EXCLUDED_ADDONS`) : RXPGuides comme base de données (ses parcours
+  gratuits sont lus à part, plus bas), Tamed (tables de Forever vides), AlexAtlasLoot (licence qui interdit la copie
+  de ses tables, décision 229).
+- **Interface seule** : SimulationCraft (Unlicense, export collé seulement), EllesmereUI (cible d'export sur demande,
+  décision 274), addons sans données utiles (`docs/research/sources-addons-2026-10-21.md`).
+- **Nos addons** (`OWN_ADDONS`, jamais sources communautaires) : ForeverLogger, ForeverBridge et sa réserve
+  d'emplacements, RaphCompletionist (addon de l'utilisateur). `ForeverCompletionist` n'est pas un addon (`NOT_ADDONS`).
+- **Seulement des addons à jour pour Forever** (version Forever explicite, données postérieures à la version jouée) ;
+  un addon périmé est signalé par le registre des sources et cesse d'être pris en premier.
+
+## Parcours de leveling maintenus
+
+### RestedXP : parcours gratuits en clair
+- **Fournit** : les guides gratuits de `RXPGuides/Guides/Forever/*.lua` (et `dungeon/` sur demande) de l'addon
+  installé (4.11.26 au 2026-10-21), lus par `forever/rxp_guides.py` : mesure de nos routes, référence de
+  l'optimiseur et base adaptée là où ils font mieux (décisions 268 et 277), acceptation automatique d'une feuille de
+  route qui leur ressemble (`forever/route_check.py`, décision 279). Syntaxe des guides relevée dans son code
+  (`forever/rxp.py`) ; livraison de nos routes par son API publique (`RXPGuides.ImportGuide`, décision 253).
+- **Licence** : CC BY-NC-SA 4.0 (`LICENSE` de l'addon) : usage personnel et non commercial, attribution ; leur texte
+  n'entre jamais dans le dépôt. Les guides payants et les bases de l'addon ne sont jamais lus.
+- **Fraîcheur et relecture** : relus à chaque appel (`forever route plan | compare | rxp-compare | rxp-coverage`) ;
+  version suivie comme addon installé.
+
+### Polestar : au-delà de RestedXP
+- **Fournit** : les fichiers `.guide` de la catégorie Leveling, squelette des routes au-delà des parcours gratuits de
+  RestedXP (décision 289), lus par `forever/polestar.py` dans un clone en cache `<cache>/third_party/polestar`
+  (`https://github.com/fitzforge/polestar.git`, `forever/pipeline/polestar_fetch.py`). L'addon n'est jamais installé
+  ni exécuté ; ses règles de jeu restent `suppose`, sa règle sur les donjons n'est pas reprise.
+- **Licence** : GPL-3.0 ; utilisation et modification privées, attribution (commit épinglé) dans chaque route livrée,
+  rien redistribué ni copié dans le dépôt.
+- **Fraîcheur et relecture** : commit du clone dans la provenance ; créé une fois par `forever route polestar`, puis
+  remis sur le dernier commit à l'étape `guides` de chaque passage (git limité à `STEP_GIT_TIMEOUT_S` ; injoignable :
+  copie gardée, nouvel essai au passage suivant).
+
+### Factoruide : recoupement
+`brouznouf/factoruide` (code MIT ; base `data/forever.sqlite.zst` sous GPL-2.0+ pour la part VMaNGOS, données de
+Questie sans licence et de Wowhead Forever), cloné hors du dépôt à `FACTORUIDE_COMMIT` (`f7da6da`), base décompressée
+dans le cache (`forever/pipeline/factoruide.py`). Sert à mesurer les écarts de notre livre des quêtes
+(`forever quests diff --factoruide`, statut « vue seulement chez Factoruide », `suppose`) ; algorithmes de route portés
+et cités (`forever/optimize/route.py`). Relu à la main seulement ; jamais téléchargé par la veille.
+
+## Simulateur de la communauté
+
+### wowsims/forever (référence au niveau 60)
+- **Fournit** : dégâts par seconde de fin de partie, poids des statistiques par tirages appariés, comparaison des races
+  et des classes, préréglages par spécialisation (`ui/specs/<classe>/<spé>/`), neuf classes, **niveau 60 seulement**
+  (constante de son code). Adaptateur `forever/sims/wowsims.py` (requête `RaidSimRequest` en protojson, binaire lancé
+  en local sans réseau, résultat lu), réponses `forever/sims/report.py` (`forever sims presets | races`,
+  `forever_simulate`), poids de `forever gear` au niveau 60.
+- **Licence** : MIT, lien de retour demandé (`docs/research/simulateurs-2026-10-21.md`). Code utilisé tel quel, sans
+  modification (décision 294).
+- **Fraîcheur** : le projet ne publie pas de binaire : compilé chez nous (`forever/pipeline/wowsims_build.py`, clone
+  superficiel `<cache>/third_party/wowsims/forever`, protobuf, `go build` de `cmd/wowsimcli`), épinglé dans `pin.json`
+  (commit, date, empreinte, versions de Go et de protoc) ; le registre des sources date le commit contre la
+  publication du build installé. Certitude `suppose`.
+- **Relecture** : première compilation par `forever sims update` ; puis étape `simulateurs` de chaque passage :
+  recompilation au nouveau commit (git `GIT_TIMEOUT_S`, compilation `TIMEOUT_S`), cas de référence rejoués, écarts
+  notés dans `veille.json` ; échec : binaire précédent gardé.
+
+### Simulateurs relus à la main seulement
+Sims Forever (site sans licence déclarée ; addon exportateur MIT), DPS Forever (aucune licence, code fermé), ForeverDB
+(code fermé, API de données avec clé et crédit obligatoire), MythicSim (MIT, fork de wowsims, en retard d'une version) :
+pas d'API utilisable ou `robots.txt` qui interdit leurs `/api/` ; références de recoupement relues à la main
+(`docs/research/simulateurs-2026-10-21.md`). Le dépôt `ElliotWood/Forever` n'existe plus (décision 291) : les
+reprises de formules prévues par les décisions 233 et 234 sont remplacées par la décision 293 (aucun nouveau code de
+calcul).
+
+## Notre calcul gelé
+Le moteur du Mage (`forever/engine/`) est gelé à la révision 7 de 1.60.1.70450 (décisions 293 et 294) : seul calcul
+sous le niveau 60, recoupé par les journaux de combat, dit comme tel dans chaque réponse. Ses entrées viennent du
+client ; les constantes absentes du client vivent dans `mechanics.json` avec leur origine et leur certitude ; celles
+qui viennent de la Classic sont recensées (`forever/classic.py`) et remplacées après la sortie par les mesures de
+l'utilisateur.
+
+## Signaux officiels
+
+### Notes du forum de Blizzard (décision 148)
+Catégories de la bêta et de la discussion générale de Forever (Discourse), lues par `forever notes`
+(`forever/pipeline/notes.py`) **à la main seulement** (ou proposé par `forever watch` quand le build du client change ;
+workflow `notes-watch` en `workflow_dispatch`), une fois par jour au plus, `robots.txt` relu à chaque passage. Textes
+sous CC BY-NC-SA 3.0, jamais recopiés : la sortie nomme l'adresse, les dates et les entités reconnues. Rang : **signal**,
+jamais une valeur ; une règle sans autre source peut passer de `suppose` à `probable` par un texte officiel, seule la
+mesure donne `certain`. Le sujet « Known Issues » liste des bugs reconnus : jamais modélisés.
+
+### API Blizzard (décisions 126 et 149)
+`forever api probe` (`forever/pipeline/blizzard_api.py`, workflow `api-probe` quotidien, clés dans les secrets du
+dépôt ou `.env`) sonde les seuls espaces de noms candidats de Forever ; aucun espace de Retail ni de Classic. Une issue
+`api-blizzard` s'ouvre dès qu'un espace répond, pour décider du démarrage d'EC1 (prix, fiches, PvP). Conditions des API
+de Blizzard ; tout nouvel accès réseau attend l'accord de l'utilisateur.
+
+### Wowhead Forever : contrôle, jamais vérité (décision 128)
+Consultation ponctuelle par le sous-agent `forever-web-researcher` (adresse et date citées), pour contrôler une valeur
+décodée. Divergence avec le client : **alerte**, pas un arbitrage (vérifier d'abord les correctifs du serveur, puis mes
+journaux ; sinon question dans `docs/OPEN_QUESTIONS.md`). **Aucune aspiration** : aucun code du dépôt ne lit Wowhead.
+
+## Addons pilotés : exports de forever-core (décision 196)
+Un export se fait vers un addon qui a un point d'import ; sinon notre addon affiche la donnée. Le code des addons
+n'est jamais modifié ni recopié : formats réimplémentés d'après leur description (`forever/exports/`, `tf_code.py`).
 
 | Donnée calculée | Addon cible | Point d'import | Tranche |
 | --- | --- | --- | --- |
-| Build de talents | Talents Forever | code et lien v6, nœuds de l'addon par correspondance par sort et par position | FA1 |
-| Liste BiS par personnage et par contexte | Naowh Forever | chaîne `!NBIS1!` (`/nfbis`) | CJ1 bloc 4 (T10a revue), T10 |
-| Poids des statistiques | Naowh Forever | ligne `NFSW1:` (ou format de type Pawn v1) | CJ1 bloc 4 (T10a revue), T10 |
-| Poids des statistiques | Forever Companion | échelle texte Pawn v1 (Options, « Import scale… ») | CJ1 bloc 4 |
-| Feuille de route | RestedXP | `RXPGuides.ImportGuide`, groupe « Forever Routes » ; retrait jeu fermé (CJ1, bloc 2) | RX1, CJ1 |
-| Macros par classe | Naowh Forever | chaîne `!NFM1!` (fenêtre Macros) | EX1 |
-| Profil d'interface par personnage et par rôle | EllesmereUI | chaîne `!EUI_` (import partiel), bascule par `SwitchProfile` ; **sur demande seulement** (`/fb eui on`, décision 274) | EX1, CJ1 bloc 5 |
-| Fraîcheur, XP par heure, objectif suivant | EllesmereUI (DataBars) | objet LibDataBroker de notre addon | EX1 |
-| Conversation et boutons | notre addon | pont de P06a, boutons de P06b | P06a, P06b |
-
-### Versions des addons (décision 124)
-Quand la version d'un addon de données change, le projet le détecte, relit ses données et signale ce qui a changé, comme pour une version du jeu. La chaîne `## Version` du `.toc` ne suffit pas : la version d'AtlasLoot (1.1.3) est le nom de la version publiée sur CurseForge, repris dans le nom du fichier téléchargé par le gestionnaire d'addons, et n'apparaît dans aucun fichier de l'addon (précision de l'utilisateur du 2026-09-30). CurseForge publie depuis le 2026-09-29 une AtlasLoot Classic Forever 1.1.4 (fichier `1.1.4-300926-11601-11509`, recherche du 2026-09-30) ; la version installée reste la 1.1.3. La détection compare donc l'**empreinte des fichiers de données** de l'addon à celle du dernier relevé ; la version affichée est celle du `.toc`, ou celle que le joueur donne quand le `.toc` ne la porte pas. **Fait en T08b (bloc D)** : `forever addons status [--save] [--json]` (lecture locale) rend pour chaque addon suivi (`forever/addons.py`, `DATA_ADDONS`) la version du `.toc`, l'empreinte des fichiers de données (court-circuit par taille et date), le statut `nouveau`, `inchangé`, `changé` ou `absent` par rapport au relevé du cache (`<cache>/addons/state.json`, écrit seulement avec `--save`), les fichiers ajoutés, retirés ou modifiés, et pour Questie les différences de ses agrégats (PNJ, quêtes, XP des quêtes) avec les données du dépôt qui en dépendent (`monsters.json` `questie_correction`) et l'action proposée (`forever measures refresh`) ; les autres addons attendent leur lecteur (DJ1, LG1). La veille locale `forever watch` (bloc G) signale un addon changé à chaque passage.
-
-## Observations de ForeverLogger (décision 127, DJ1)
-ForeverLogger complète et vérifie les addons de données par mes observations réelles, **relevées hors combat**, sans abonnement au journal de combat ni fonction d'action (`docs/ADDON.md`) : objets et prix des marchands à l'ouverture d'un marchand, butin ramassé, gains de réputation ; chaque API sondée sous `pcall`. Une observation réelle l'emporte sur une donnée d'addon et passe la certitude à `certain` ; un écart entre les deux est signalé (valeur de l'addon et sa version en regard).
-
-## Profil multi-sources (décision 125)
-Le profil de mes personnages (hors du dépôt, décision 99) croise : ForeverLogger (niveau, talents, observations), les sauvegardes des autres addons (quêtes faites dans Questie, mes prix d'Auctionator), mes journaux de combat (personnages « à moi ») et, après le lancement, l'API Blizzard (fiche de personnage, équipement, honneur et rang PvP, classements) si elle couvre Forever. Chaque champ garde sa source et sa date ; en cas de désaccord, la valeur la plus récente l'emporte, et à date égale la plus directe (ordre fixé au plan de PV1) ; l'écart est signalé. Ce que le joueur dit dans sa question l'emporte toujours pour la réponse en cours (décision 122), sans écrire le profil (mise à jour proposée). Règle confirmée par l'utilisateur le 2026-09-30.
+| Build de talents | Talents Forever | code et lien | FA1 |
+| Build de talents | Naowh Forever | chaîne `!NFB1!` | EX1 |
+| Liste BiS par personnage et par contexte | Naowh Forever | chaîne `!NBIS1!` | CJ1 bloc 4, T10 |
+| Poids des statistiques | Naowh Forever | ligne `NFSW1:` | CJ1 bloc 4, T10 |
+| Poids des statistiques | Forever Companion | échelle texte Pawn v1 (« Import scale… ») | CJ1 bloc 4 |
+| Feuille de route | RestedXP | `RXPGuides.ImportGuide`, groupe « Forever Routes » ; repli jeu fermé | RX1, CJ1 |
+| Macros par classe | Naowh Forever | chaîne `!NFM1!` | EX1 |
+| Profil d'interface par personnage et par rôle | EllesmereUI | chaîne `!EUI_`, **sur demande seulement** (décision 274) | EX1, CJ1 bloc 5 |
+| Conversation, boutons, cartes | ForeverBridge (notre addon) | pont de P06a et P06b | P06a, P06b |
 
 ## Données manquantes et addons candidats (décision 131)
-Quand l'agent constate qu'il lui manque une donnée pour répondre (angle mort, valeur supposée, domaine pas encore couvert, taux de Classic au lieu de Forever), il cherche sur CurseForge, Wago et la liste des addons Forever de foreverchanges.pro un addon qui embarque ou collecte cette donnée et **propose de l'installer** : donnée apportée, ce que ça change à la réponse, lien, version, date de mise à jour, licence, compatibilité Forever (`.toc` `_Camelot` ou interface 16001) et signalements de stabilité (un addon connu pour faire planter le jeu est écarté). **Il ne télécharge ni n'installe jamais rien** : l'utilisateur installe. Une fois l'addon installé, il l'inventorie en lecture seule (comme `tasks/inventaire-addons.md`, puis par `forever addons status` à partir de DJ1) et l'ajoute à cette page.
+Quand une donnée manque pour répondre (angle mort, valeur supposée, domaine non couvert, taux de Classic au lieu de
+Forever), l'agent cherche un addon de Forever qui l'embarque ou la collecte et **propose de l'installer** (donnée
+apportée, effet sur la réponse, lien, version, date, licence, compatibilité Forever, stabilité). **Il ne télécharge ni
+n'installe rien** ; une fois l'addon installé, il l'inventorie en lecture seule (`forever addons status`,
+`tasks/inventaire-addons.md`) et l'ajoute ici.
 
-Liste tenue à chaque fin de tranche (tirée du registre et de `docs/OPEN_QUESTIONS.md`), regroupée par donnée. Statut du candidat : addon installé qui s'applique, addon candidat (lien, version, date du dernier fichier, licence), ou « aucun trouvé (date) » après recherche.
-
-**Recherche du 2026-09-30** (sous-agent de recherche, sources toutes communautaires : CurseForge, GitHub, <https://foreverchanges.pro/addons> du 2026-09-26 ; Wago Addons illisible par ce canal, pages rendues en JavaScript ; seules quelques pages de résultats CurseForge lues). Limites communes à toutes les lignes :
-- **Compatibilité Forever** : étiquette de jeu « 1.60.1 » de CurseForge, sauf mention « `.toc` lu » (interface 16001 lue dans le dépôt de l'addon). Aucun `_Camelot.toc` vu ; le client charge aussi un `.toc` sans suffixe qui déclare 16001 (`docs/ADDON.md`). À relire sur disque après installation.
-- **Stabilité** : **non vérifiée** pour tous les addons (les commentaires CurseForge ne sont pas lisibles par ce canal) ; seules les mises en garde des auteurs sont notées.
-- **Collecteurs** : un addon qui relève en jeu ne vaut que si ses SavedVariables sont relues d'une session à l'autre (défaut de relecture signalé par des joueurs sur 1.60.1.69893 et 69913, dit corrigé sur 70009 par des joueurs, sans message de Blizzard : `docs/OPEN_QUESTIONS.md`) et s'il ne dépend ni du journal de combat ni d'une valeur secrète.
-- **Licence** : aucune restriction à la lecture locale ; tout addon installé peut être lu, y compris « All Rights Reserved » (décision 133) ; seuls des agrégats entrent dans le dépôt.
-- **À jour pour Forever** : seuls sont retenus les addons à version Forever explicite dont le dernier fichier est postérieur à la sortie de la version du jeu jouée (vers le 2026-09-24 pour 1.60.1.70009) ; à revérifier à chaque nouvelle version du jeu (1.60.1.70124 publiée le 2026-09-30).
+**Recherche du 2026-09-30** (sources communautaires : CurseForge, GitHub, <https://foreverchanges.pro/addons>).
+Limites : compatibilité lue sur l'étiquette « 1.60.1 » de CurseForge sauf mention ; stabilité non vérifiée ; un
+collecteur ne vaut que si ses SavedVariables sont relues d'une session à l'autre et s'il ne dépend ni du journal de
+combat ni d'une valeur secrète ; licence sans effet sur la lecture locale (décision 133). Les addons conseillés alors
+(Forever Guide, Legacy Forever, Zone Level: Forever, mise à jour d'AtlasLoot) sont installés depuis.
 
 | Donnée manquante | Où elle manque | Candidat |
 |---|---|---|
-| PV des monstres de Forever hors des Tarides | H11, `hp_by_level` | **Aucun trouvé qui embarque des PV de Forever (2026-09-30).** Collecteur : MobInfo2 (https://www.curseforge.com/wow/addons/mobinfo2, 12.1.6, 2026-09-20, MIT, Forever annoncé) ; l'auteur écrit que les lectures de PV et de mana reviennent secrètes : collecte probablement vide, à tester une session. Source retenue : mes journaux |
-| XP des monstres de Forever | T04d | **Aucune base trouvée (2026-09-30).** Collecteur : MobInfo2 (ci-dessus ; méthode de capture de l'XP non vérifiée). MyXPBar Forever (https://www.curseforge.com/wow/addons/myxpbar-forever, 3.2, 2026-09-29, All Rights Reserved) : estimation depuis le dernier gain, pas de base par monstre |
-| Taux de butin de Forever | DJ1, T10 | **Aucune table Forever (2026-09-30)** ; Forever Guide (https://www.curseforge.com/wow/addons/forever-guide, 1.16.2, 2026-09-30, All Rights Reserved) dit lui-même reprendre les taux Classic. Collecteurs : KillDex (https://www.curseforge.com/wow/addons/killdex, 1.9.0, All Rights Reserved ; taux par monstre, **rien en donjon ni en raid** sur Forever), MobInfo2 (butins par monstre). AtlasLoot : taux Classic, `suppose` |
-| Butin des donjons et raids Forever (hors Hall of Thanes et Ruins of Lordaeron) | DJ1 | ForeverDungeonJournal, AtlasLoot (installés, incomplets). Candidats : Atlas Forever (https://www.curseforge.com/wow/addons/atlas-forever, 3.18.3, 2026-09-28, GPLv2, source <https://github.com/paulvilla/Atlas-Forever>), Forever Atlas (https://www.curseforge.com/wow/addons/forever-atlas, 1.0.53, 2026-09-30, GPLv2 ; l'auteur dit ne rien inventer, trous annoncés). Forever Guide (butin des boss repris de ForeverChanges, sans taux, All Rights Reserved) |
-| Niveaux des boss et plages de niveau des donjons Forever | DJ1, H1 | ForeverDungeonJournal, AtlasLoot (installés, contradictoires). Candidats : Zone Level: Forever (https://www.curseforge.com/wow/addons/zone-level-forever, 1.4, 2026-09-29, All Rights Reserved), Forever Map Levels (https://www.curseforge.com/wow/addons/forever-map-levels, 1.00, 2026-09-23, All Rights Reserved). Mesure : mes journaux |
-| Quêtes propres à Forever et leur XP | T04d | Installés : `QuestieForeverDB` (sans XP), ForeverDungeonJournal (quêtes de donjon), GearQuestForever (noms sans ID). Candidats : xeR's Forever Level Journal (https://www.curseforge.com/wow/addons/xers-forever-level-journal, 0.4.1-beta.1, 2026-09-28, MIT, 16001), Dungeon Quest (https://www.curseforge.com/wow/addons/dungeon-quest, 1.2.1, 2026-09-30, All Rights Reserved ; quêtes de donjon « Forever-confirmed »), Dungeon Quests Forever (https://www.curseforge.com/wow/addons/dungeon-quests-forever, 0.2.2 beta, 2026-09-28, All Rights Reserved). XP : aucune base trouvée |
-| Couleurs de quête de Forever (plage verte) | I7 | **Aucun addon qui embarque les plages de Forever (2026-09-30).** Bleakfiber's Quest Tracker - Forever (https://www.curseforge.com/wow/addons/bleakfibers-quest-tracker-forever, 1.0.8, 2026-09-29, All Rights Reserved) colore par difficulté, origine de la couleur inconnue (code non publié). Relevé possible par ForeverLogger (`GetQuestDifficultyColor`, hors combat) |
-| Prix de l'hôtel des ventes | EC1, T10, MT1 | Auctionator (installé, mes relevés) ; AHledger (https://www.curseforge.com/wow/addons/ahledger, 0.6.3, 2026-09-29, All Rights Reserved, collecte par scans) ; API Blizzard après le lancement |
-| Objets et prix des marchands | T10, MT1 | Auctionator (cache des prix marchands), GearQuestForever (sources) ; Recipe Registry (plus bas, prix des marchands appris en jeu) ; relevé ForeverLogger (DJ1) |
-| Gains de réputation par source | RP1 | **Aucune base trouvée (2026-09-30).** Collecteurs : Forever Journal (https://www.curseforge.com/wow/addons/forever-journal, 2.0.0, 2026-09-29, MIT ; gains de réputation, quêtes, donjons), Saga (https://www.curseforge.com/wow/addons/saga, 0.4.26, 2026-09-30, MIT ; journal local dont la réputation). WoW Forever Rep & Skill Tracker (https://www.curseforge.com/wow/addons/wowf-rep-tracker) : état courant seulement. Relevé ForeverLogger (DJ1) |
-| Récompenses de réputation par palier | RP1, T10 | **Aucun trouvé (2026-09-30).** Relevé chez les intendants (fenêtre du marchand) |
-| Entraîneurs, sources de recettes | MT1 | SkillUp Forever (https://www.curseforge.com/wow/addons/skillup-forever, 0.6.6-forever, 2026-09-29 ; `.toc` lu : 16001, GPL-3.0-or-later, alors que CurseForge affiche LGPLv3 ; recettes et seuils lus dans le client via wago.tools, **frais d'entraîneur et sources de recettes tirés de CMaNGOS Classic**). Recipe Registry (https://www.curseforge.com/wow/addons/recipe-registry, forever-v0.1.1, 2026-09-26, MIT, source <https://github.com/colettamattia91-cloud/Recipe-Registry> ; recettes Forever, sources incomplètes selon son guide). TrainForever (https://www.curseforge.com/wow/addons/trainforever, 0.8.0-beta-forever, 2026-09-26, MIT ; mémorise les entraîneurs et vendeurs visités) |
-| Chance de gain d'un point de métier | MT1 | **Aucune règle Forever trouvée (2026-09-30)** ; SkillUp Forever applique la formule de Classic. Mesure en jeu |
-| Catalogue Legacy (défis, points, arbres de bonus) | LG1, G5 | Legacy Forever (https://www.curseforge.com/wow/addons/legacy-forever, 0.6.5-forever, 2026-09-29 ; `.toc` lu : 16001, GPLv3, source <https://github.com/cjber/legacy-forever>) : défis et points **tirés des tables du client** (son script liste les tables lues : piste pour l'inventaire de LG1), commande d'audit en jeu. **Arbres de bonus (nœuds, coûts, effets) : aucun addon trouvé (2026-09-30)** ; site foreverchanges.pro/legacy-perks en recoupement |
-| Progression Legacy du compte | LG2 | Legacy Forever (état des défis dans `LegacyForeverDB`, contenu non vérifié). Forever Companion (https://www.curseforge.com/wow/addons/forever-companion, 0.1.0-forever, 2026-09-28, All Rights Reserved, bêta) : annonce le suivi du Legacy, non vérifié. Points dépensés et nœuds pris : **aucun trouvé (2026-09-30)** |
-| Honneur, rang et classements PvP | PV2, LG2 | **Aucun suivi Forever trouvé (2026-09-30).** AtlasLoot (installé ; la 1.1.4 annonce un calculateur de rang d'honneur à saisie manuelle, « en cours pour Forever »). API Blizzard après le lancement |
+| PV des monstres de Forever hors des zones mesurées | H11, `hp_by_level` | **Aucun addon qui embarque des PV de Forever (2026-09-30).** Collecteur : MobInfo2 (MIT ; lectures de PV annoncées secrètes par son auteur). Source retenue : mes journaux |
+| XP des monstres de Forever | T04d | **Aucune base trouvée (2026-09-30).** Collecteur : MobInfo2 (méthode non vérifiée) ; MyXPBar Forever (All Rights Reserved) : estimation, pas de base par monstre |
+| Taux de butin de Forever | DJ1, T10 | **Aucune table Forever (2026-09-30)** ; Forever Guide reprend les taux Classic. Collecteurs : KillDex (All Rights Reserved, rien en donjon), MobInfo2. AtlasLoot : taux Classic, `suppose` |
+| Butin des donjons et raids Forever | DJ1 | ForeverDungeonJournal, AtlasLoot, Naowh Forever, Forever Companion (installés, incomplets). Candidats : Atlas Forever (GPLv2), Forever Atlas (GPLv2) |
+| Niveaux des boss et plages des donjons | DJ1, H1 | client (`dungeons.json`), addons installés (contradictoires). Candidats : Forever Map Levels (All Rights Reserved). Mesure : mes journaux |
+| Quêtes propres à Forever et leur XP | T04d | Installés : `QuestieForeverDB`, Naowh Forever, Forever Guide, ForeverDungeonJournal, GearQuestForever ; `questcache.wdb` du client. Candidats : xeR's Forever Level Journal (MIT), Dungeon Quest, Dungeon Quests Forever (All Rights Reserved) ; AllTheThings (MIT, base Forever propre) non installé au 2026-10-14 |
+| Couleurs de quête de Forever | I7 | **Aucun addon qui embarque les plages de Forever (2026-09-30).** Relevé possible par ForeverLogger |
+| Prix de l'hôtel des ventes | EC1, T10, MT1 | Auctionator (mes relevés) ; AHledger (All Rights Reserved) ; API Blizzard après le lancement |
+| Objets et prix des marchands | T10, MT1 | Auctionator (prix marchands), relevé ForeverLogger ; Recipe Registry (MIT) |
+| Gains de réputation par source | RP1 | **Aucune base trouvée (2026-09-30).** Collecteurs : Forever Journal (MIT), Saga (MIT) ; relevé ForeverLogger |
+| Récompenses de réputation par palier | RP1, T10 | **Aucun trouvé (2026-09-30).** Relevé chez les intendants |
+| Entraîneurs, sources de recettes | MT1 | SkillUp Forever (installé ; frais d'entraîneur et sources de recettes tirés de CMaNGOS Classic), Recipe Registry (MIT), TrainForever (MIT) |
+| Chance de gain d'un point de métier | MT1 | **Aucune règle Forever trouvée (2026-09-30).** Mesure en jeu |
+| Catalogue Legacy | LG1, G5 | Legacy Forever (installé, tiré du client). Arbres de bonus : **aucun addon trouvé (2026-09-30)** |
+| Progression Legacy du compte | LG2 | Legacy Forever (`LegacyForeverDB`, contenu non vérifié) |
+| Honneur, rang et classements PvP | PV2, LG2 | **Aucun suivi Forever trouvé (2026-09-30).** API Blizzard après le lancement |
 | Rendements décroissants de Forever | PV2 | **Aucun trouvé (2026-09-30)** ; un suivi en direct lirait le journal de combat, refusé aux addons. Mesure : mes journaux |
-| Buffs de campement | D5, T11 | Campfire Tooltips (https://www.curseforge.com/wow/addons/campfire-tooltips, 1.0.1, 2026-09-28, GPLv3 ; effets des placements relevés sur le build 70009, à revérifier à chaque build), CampingInfo (https://www.curseforge.com/wow/addons/campinginfo, 0.5.1, 2026-09-27, MIT, source <https://github.com/Fumi24/CampingInfo>) |
+| Buffs de campement | D5, T11 | Campfire Tooltips (GPLv3), CampingInfo (MIT) |
 | Buffs mondiaux, buffs de Legacy, conditions de zone des flacons | D3, D5, E1 | **Aucun trouvé (2026-09-30)** |
-| Armure et résistances des monstres | H2 | **Aucun trouvé (2026-09-30)** ; MobInfo2 compte les résistances et immunités observées (pas de valeur), méthode non vérifiée sur Forever |
-| Statistiques des objets de Forever | T10, F1 | GearQuestForever (recoupement seulement) ; source : tables du client |
-| Familiers du Chasseur : bêtes qui enseignent chaque rang, leur niveau et leurs zones ; héritage des statistiques du Chasseur ; vitesse d'attaque selon le passif ; **gain des points d'entraînement** (aucune source, CH0) ; héritage mesuré (protocole de CH0 à jouer) | CH0, CH1 | **Forever Bestiary** (installé le 2026-10-01, 0.5.0, données du client 69913) ; Questie (niveaux et zones des PNJ, base Classic) ; héritage et vitesse : relevés de joueurs, puis mesure dans mes journaux (protocole de CH0) |
+| Armure et résistances des monstres | H2 | **Aucun trouvé (2026-09-30)** |
+| Statistiques des objets de Forever | T10, F1 | tables du client ; GearQuestForever en recoupement |
+| Familiers du Chasseur : bêtes par rang, héritage des statistiques, gain des points d'entraînement | CH0, CH1 | Forever Bestiary (installé) ; héritage et vitesse : mesure dans mes journaux (protocole de CH0) |
 
-**Addons conseillés à l'installation** (2026-09-30, décision 133 : seulement des addons à jour pour Forever, et seulement pour un manque réel ; l'utilisateur installe, l'agent inventorie ensuite en lecture seule). **Les quatre sont installés depuis le 2026-09-30** ; relevé et empreintes de référence dans `tasks/inventaire-addons.md`, section « Relevé du 2026-09-30 (après installation de nouveaux addons) » :
-1. ~~Mettre à jour AtlasLoot Classic Forever en 1.1.4~~ — **fait** : fichiers du 2026-09-30, mais le `.toc` dit toujours `Version: Forever 1.60.1` ; seule l'empreinte `82c0718e9d98` distinguera la prochaine version (confirme la décision 124). Contenu non recompté.
-2. ~~Forever Guide (1.16.2)~~ — **installé** (1.16.2, empreinte `078fad14acc9`). **Réserve relevée à l'inventaire** : ses fichiers datent du 2026-09-30 mais ses données sont figées à la version du jeu **1.60.1.69913** (entête de `Data.lua`), et son butin vient de la base Classic de cmangos avec les taux Classic de Wowhead. Il échoue donc au critère « à jour pour Forever » de la décision 133 pour tout ce qui vient du client ; il reste la seule source des quêtes et du butin de donjon de Forever et des recettes des métiers. Aucune licence installée.
-3. ~~Legacy Forever~~ — **installé** (v0.6.5, GPL-3.0-or-later, empreinte `c4828de32092`). Ses données sont générées de **wago.tools au build 1.60.1.70009** (instantané du 2026-09-25) : même source et même version que forever-core, donc directement comparables. Clés `rewards`, `feeds`, `zones`, `completion` ; son `tools/gen_legacy.py` liste les tables du client à lire pour le Legacy (raccourci pour l'inventaire de LG1).
-4. ~~Zone Level: Forever~~ — **installé** (1.4, empreinte `a7e922c83b89`, aucune licence). 50 zones avec `minLevel`, `maxLevel`, donjons et leur plage de niveau, transport, faction.
-
-**Apparus sans avoir été conseillés** (2026-09-30, inventoriés en lecture seule) : EllesmereUI (suite d'interface, 20 modules), RXPGuides (guides de leveling, **CC BY-NC-SA 4.0** : la clause non commerciale demande ton accord avant tout agrégat), CraftingOrderClassic (recettes, recoupe Forever Guide, sans licence), ForeverMapFix (tuiles de carte, MIT), AtlasBIStooltips (listes BiS, sans licence), RaphCompletionist (ton addon) ; le 2026-10-01, **Forever Bestiary** (0.5.0, familiers du Chasseur, sans licence, tranche CH0, décision 154). `ForeverCompletionist` n'est **pas un addon** (aucun `.toc`) : dossier de projet déposé dans `Interface/AddOns`, que le client ne charge pas.
-
-Non conseillés pour l'instant : MobInfo2 (dernier fichier du 2026-09-20, antérieur à la version du jeu 70009, et PV secrets selon son auteur ; l'XP des monstres passera par un relevé de ForeverLogger), KillDex (date du dernier fichier non relevée), Forever Journal et TrainForever (le relevé de ForeverLogger prévu en DJ1 couvre réputation et marchands), SkillUp Forever et Recipe Registry (recouvrent Forever Guide ; entraîneurs de SkillUp tirés de Classic), Campfire Tooltips et Atlas Forever (besoin lointain, T11 et recoupement). À revoir quand une tranche bute sur leur donnée.
-
-Écartés : addons sans version Forever (Exalted, RepMatic, GrindPlus, HonorSpy, Rank Marshal, What's Crafting?, WhatItDrops…), ForeverQuest (base Classic, licence incohérente : « All Rights Reserved » sur des données de Questie en GPLv3), ForeverWisp (quêtes Classic-DB), AtlasLootClassic Continued (donjons Forever en attente).
-
-**Sources de RX1** (étude du 2026-10-14, décision 266 ; lecture locale, seuls nos agrégats dans le dépôt, décision 133) :
-- **Factoruide** (<https://github.com/brouznouf/factoruide>, 0.8.0, code MIT, `data/` GPL-2.0+ tirée de VMaNGOS, données de Questie sans licence et de Wowhead Forever) : clone superficiel épinglé à `f7da6da` dans `~/.cache/forever/third_party/factoruide`, base `forever.sqlite.zst` décompressée dans le cache ; **recoupement seulement** (`forever quests diff --factoruide`, statut « vue seulement chez Factoruide », `suppose`) ; algorithmes de route portés et cités (option 2).
-- **VMaNGOS** (GPL-2.0, Classic 1.12) : **non téléchargé** ; Questie installé donne déjà les positions « base Classic » (`suppose`).
-- **QuestieDB** (`a4cad87`, 2026-10-12) : trois fichiers lus par `gh api` ; rien de plus que Questie installé pour les quêtes nouvelles.
-- **AllTheThings** (<https://github.com/ATTWoWAddon/AllTheThings>, 5.3.16a du 2026-10-13, MIT ; saveur `forever`, interface 16001, base Forever propre `.contrib/.db/forever/` mise à jour chaque jour) : **candidat à l'installation** (décision 131) pour les quêtes vues seulement chez Factoruide (LVL17), qui le cite comme source ; non installé au 2026-10-14.
-
-## Notes officielles de Blizzard (T08b, bloc F, décision 148)
-Forum de Blizzard (Discourse), catégories 349 (discussion de la bêta) et 347 (discussion générale de Forever), lu par
-`forever notes` **à la main seulement** (ou proposé par `forever watch` quand le build du client change) ; workflow
-`notes-watch` en `workflow_dispatch` seul. Rang de la source : **signal**, jamais une valeur. Une note ne change aucune
-valeur du client ; une règle du serveur sans autre source peut passer de `suppose` à `probable` par un texte officiel, seule la
-mesure (journaux, relevé en jeu) donne `certain`. Une note peut remplacer une valeur dont la seule source était un relevé de
-joueurs (rangs 3 et 4 de la hiérarchie), écrite à la main (`manuel`, au plus `probable`) dans une révision des données
-(décision 162 : marge d'apprivoisement). Le sujet « Known Issues » liste des bugs reconnus : jamais modélisés.
-
-## API Blizzard (décision 126, tranche EC1)
-Gardée par le lancement et la vérification de la couverture de Forever. Tout ce que l'API couvre pour Forever : prix de l'hôtel des ventes ; fiches de personnages (niveau, équipement, talents si disponibles) ; PvP (honneur, rang, classements). Clés dans `.env` (ignoré par git, jamais lu par les tests). Le client futur vivra dans `forever/pipeline/bnet.py` (via `Deps.http_get`) et sera ajouté à la liste réseau de CLAUDE.md et de `tests/unit/test_network_boundary.py` ce jour-là, **après accord de l'utilisateur** pour chaque nouvel accès réseau. Aucun code avant EC1.
-
-T08b (point 10, décision 149) : `forever api probe` sonde chaque jour (workflow `api-probe`, clés dans les secrets du dépôt) les espaces de noms candidats de Forever (`static-`/`dynamic-forever-<région>`, `static-`/`dynamic-classicforever-<région>`) sur l'index des royaumes, les classes jouables, un objet connu, les royaumes connectés et les saisons PvP ; jamais un espace de Retail, de Classic Era, de Classic ni de TBC. Premier passage du 2026-10-01 : jeton obtenu, aucun espace candidat ne répond (403). Une issue `api-blizzard` s'ouvre dès qu'un espace répond, pour décider du démarrage d'EC1.
+Écartés : addons sans version Forever (Exalted, RepMatic, GrindPlus, HonorSpy, Rank Marshal, What's Crafting?,
+WhatItDrops…), ForeverQuest (base Classic, licence incohérente), ForeverWisp (quêtes Classic-DB), AtlasLootClassic
+Continued (donjons Forever en attente).

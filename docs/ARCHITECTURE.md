@@ -1,240 +1,320 @@
 # Architecture
 
-## Vue d'ensemble
-Option retenue : **cœur MCP + plugin mince**. Toute la logique et les données vivent dans le paquet Python `forever`,
-exposé par une CLI (`forever …`) et un serveur MCP. Le plugin Claude Code ne contient que des skills courts,
-des hooks, des commandes et des sous-agents. Le même serveur MCP servira plus tard Claude.ai et ChatGPT.
+État réel du dépôt après le changement de cap des décisions 288 à 297. Les sources elles-mêmes (ce qu'elles
+fournissent, licence, fraîcheur, relecture) sont décrites dans `docs/DATA_SOURCES.md` ; l'historique des choix dans
+`docs/DECISIONS.md`.
+
+## Principe : lire et alimenter ce qui existe
+- **Deux questions avant tout chantier** (décision 288) : « qui maintient déjà ça mieux que nous ? » et « que se
+  passe-t-il au prochain patch ? ». Ce qui casserait à chaque patch n'est pas construit : on lit le client, les addons
+  de l'utilisateur, le simulateur de la communauté et les parcours maintenus, et on les alimente (exports).
+- **Données réutilisées** : le client du jeu (tables, correctifs du serveur) est la vérité ; les addons installés
+  passent avant toute fonction maison (décision 272) ; seuls des agrégats entrent dans le dépôt (décision 133).
+- **Calculs réutilisés** (décision 293) : les calculs viennent des simulateurs maintenus par d'autres, par des
+  adaptateurs minces, épinglés et tenus à jour par la veille ; plus aucun code de calcul qui recopie une mécanique ;
+  le code redondant est gelé (moteur du Mage) ou retiré.
+- **Forever seulement** (décision 294) : aucune donnée ni mécanique de Season of Discovery ou de la Classic. Les
+  valeurs encore héritées de la Classic sont recensées et dites dans la provenance (`forever/classic.py`,
+  `forever origins classic`).
+- **Mise à jour automatique complète** (décision 295) : la veille installe d'elle-même, prévient (carte « Mis à jour »,
+  `forever update status`) et se défait en un clic (`forever update undo <id>`).
+- **Un cœur, plusieurs portes** : toute la logique vit dans le paquet Python `forever` ; la CLI, le serveur MCP, le pont
+  en jeu et le plugin Claude Code l'appellent sans rien recalculer.
+
+## Flux d'ensemble
 
 ```
-forever-core/
-├── forever/
-│   ├── data/<version>/        # JSON par version : spells, talents, …, mechanics.json, overrides.json, sources.json
-│   ├── data/manifest.json     # version courante, sha256 par fichier, date, source, hotfixes
-│   ├── registry.py            # lecture et contrôle de docs/MECHANICS_REGISTRY.yaml
-│   ├── gamedata.py            # GameData typé et gelé, construit depuis une version vérifiée
-│   ├── engine/                # cœur de mécaniques (fonctions pures, GameData en paramètre)
-│   ├── explain.py             # explication d'une mécanique (registre + paramètres de la version)
-│   ├── sim/                   # leveling_mc.py, leveling_analytic.py, raid_analytic.py, raid_mc.py
-│   ├── optim/                 # talents.py, gear.py, consumables.py, respec.py
-│   ├── charts/                # graphiques déterministes (PNG/SVG)
-│   ├── pipeline/              # builds, fetch, tables, tooltip, decode, sources, diff, verify, report ;
-│   │                          # combatlog, measure, lua_table, questie, monsters, addon_sv, refresh (sources locales)
-│   ├── memory/                # fiches joueur (lecture/écriture dans le vault), import de l'addon
-│   ├── bridge/                # pont du chat en jeu (P06a) : bande, capture, message, réserve, conversation, boucle
-│   ├── provenance.py          # bloc provenance commun
-│   ├── cli.py                 # commandes forever …
-│   └── mcp_server.py          # outils MCP
-├── plugin/                    # plugin Claude Code (skills, agents, hooks, commands, .mcp.json)
-├── addon/                     # addons du jeu (ForeverLogger ; ForeverAssist prévu), règles : docs/ADDON.md
-├── tests/{unit,golden,parity,fixtures}/
-└── .github/workflows/{ci.yml,build-watch.yml}
+ SOURCES MAINTENUES PAR D'AUTRES                  ADAPTATEURS MINCES                     DONNÉES ET ÉTATS
+ ───────────────────────────────                  ──────────────────                     ────────────────
+ wago.tools (tables CSV, builds) ───────┐
+ WoWDBDefs (dispositions .dbd) ─────────┤
+ DBCache.bin du jeu / Raidbots ─────────┼──► forever/pipeline/ (fetch, dbd, dbcache,     ┌► forever/data/<version>/
+ Hotfix.log, questcache.wdb ────────────┤     raidbots, decode, install, verify…) ──────┤   (versionné, haché :
+ journaux de combat, ForeverLogger ─────┘                                               │    manifest, origins,
+                                                                                        │    sources, revisions)
+ addons installés (Questie, Naowh, ─────────► forever/pipeline/*_sources.py, companion, ├► <cache>/ (hors dépôt :
+ Forever Companion, Talents Forever…)          skillup, bestiary… (lecture sur disque)  │    livres fusionnés,
+ RestedXP (parcours gratuits), Polestar ────► forever/rxp_guides.py, forever/polestar.py │    clones, binaires,
+ wowsims/forever (Go, compilé tel quel) ────► forever/pipeline/wowsims_build.py ────────┘    fiches de la veille)
+                                               forever/sims/ (requête, binaire, résultat)
+
+                    forever/gamedata.py ─► forever/engine/ (moteur du Mage, gelé) ─► forever/sim/, forever/optimize/
+                                                       │
+     services (build, leveling, gear, route, lookup, pvp, pets, dungeons, quests, sims/report…) + provenance
+                                                       │
+            ┌──────────────────┬───────────────────────┼─────────────────────┬──────────────────────┐
+         CLI `forever`     serveur MCP          pont en jeu (bridge)     plugin Claude Code     exports d'addons
+         (forever/cli.py)  (mcp_server.py)      + addon ForeverBridge    (skills, hooks)        (forever/exports/)
 ```
 
-## Pont du chat en jeu (P06a, décisions 194 et 212)
-`forever/bridge/` relie la fenêtre de l'addon ForeverBridge à une conversation Claude Code, sans réseau dans forever :
-- **Jeu → pont** : l'addon dessine le message (`Message.lua` : contexte du personnage, question) en bande de pixels,
-  une case par pixel, dans le coin haut gauche ; `capture.py` lit la sonde du marqueur dans la seule zone client de la
-  fenêtre du jeu au premier plan, puis la bande (`codec.py`, `record.py`). Secours : boîte d'envoi des SavedVariables,
-  lue au `/reload`.
-- **Conversation** (`agent.py`, `prompt.py`) : `claude -p` en `stream-json`, liste d'arguments sans shell, outils
-  réduits à `Skill` et aux six outils forever, seul serveur MCP `forever`, réglages ignorés, dossier de travail hors du
-  dépôt ; question sur l'entrée standard ; ligne de provenance tirée des blocs `provenance` des outils.
-- **Pont → jeu** (`slots.py`, `loop.py`) : le même `Inbox.lua` écrit dans les emplacements `ForeverBridge_S001`… que
-  le jeu peut encore charger ; l'addon en charge un à intervalles après chaque envoi (accusé `working`, puis `done` ou
-  `error`). `Status.lua` porte l'état des données (`status.py`) et les boutons des tranches faites (`buttons.py`).
-- **Contexte vérifié et boutons** (sonde en jeu F) : `context.py` relie le contexte du jeu à nos données (talents
-  par nœud, races par nom de fichier du client, cible) et en retire tout élément non relié, journalisé comme
-  défaut ; `plans.py` fixe l'appel d'outil de chaque bouton et sa lecture, placés dans le message (banc d'essai
-  sans modèle : `tests/unit/test_bridge_bench.py`).
-- **Exploitation** : `forever bridge install | start | run | stop | status | ask | selftest`, journal JSONL sans pixel
-  (`journal.py`), état gardé (`state.py`), un pont à la fois (verrou, dernier signe de vie), arrêt par fichier
-  posé seulement pour un pont vivant ; addon tenu à jour par le pont, jeu fermé (`keeper.py`) ; passage
-  `forever update --auto` lancé à la fermeture du jeu ou à l'écriture de `DBCache.bin` (`updater.py`,
-  `update.launch_pass` : même verrou que la tâche de 08:00 et le hook, hors de la règle des 6 h, décision 227).
-- **Démarrage automatique** (décision 226) : `forever bridge autostart install | remove | status` gère la tâche
-  planifiée « WoW Forever - pont » (`autostart.py`, XML pour `schtasks`, ouverture de session, sans droits
-  administrateur) ; la tâche lance la surveillance avec le `pythonw.exe` de base (bibliothèque standard seulement :
-  `autostart.py`, `lock.py`, `journal.py`, `forever/spawn.py`), qui lance et relance le pont avec l'interpréteur réel
-  (`spawn.current_interpreter` : interpréteur de base et `__PYVENV_LAUNCHER__`, jamais le lanceur de `.venv`, qui
-  retient l'interpréteur dans un objet de tâche). `forever bridge start` passe par le même lancement.
-- **P06b** (décision 235) :
-  - *transport* : messages longs en parties (`fragments.py`, carrousel côté addon), équipement complet et liens Maj+clic
-    avec leur infobulle (`items.py`), calendrier des relevés (`polls.py`, miroir du Lua) ;
-  - *actions sans le modèle* : drapeaux `a=` interceptés avant la file (`actions.py` : liste fermée, identifiant apparié
-    à une carte ou à une attente, commandes fixées `forever update` par `spawn`), cartes « À valider » au texte rédigé
-    par le pont (`cards.py`), surveillance du verrou et du dernier passage (`updater.UpdateWatch`) ;
-  - *profil* : écart entre le jeu et le profil (`profile_gap.py`), écrit au clic seulement par
-    `profile.apply_game_fields` (schéma 3 : `gear`, `sheet`, sources `jeu` et `simulationcraft`) ;
-  - *export SimulationCraft* : collé dans la fenêtre, lu par `forever/simc.py` (somme de contrôle, anonymisation pour
-    le journal, objets, fiche) sans le modèle ;
-  - *conversation « addons »* (`addons.py`, `agent.addons_argv`) : agent sans shell limité au dossier de l'addon de
-    l'utilisateur, sauvegarde avant et commit git local après chaque tour, restauration sans suppression ;
-  - *vitesse* : `agent.PersistentSession` (session gardée ouverte, `--input-format stream-json`), banc des variantes
-    et critères de qualité (`speed.py`, `forever bridge bench`) ;
-  - *contextes réels* au journal (`contexts.py`, `forever bridge contexts last | export`).
+La veille (`forever update`) relit chaque source maintenue par d'autres, installe ce qui change dans
+`forever/data/` par un clone dédié et la CI, puis rejoue les conseils et le dit (section « Veille »).
 
-## Bloc provenance (dans chaque réponse d'outil)
-```json
-{"provenance": {"game_version": "1.60.1.70009", "data_sha": "<12 hex>", "generated_at": "2026-09-26T10:00:00Z",
-                "freshness": "fresh|stale|unknown|silent", "certainty": "certain|probable|suppose",
-                "assumptions": ["PV des monstres estimés (cible Blizzard 10-15 s)"], "registry_coverage": "87/120"}}
+## Arborescence réelle
+
+```
+forever/
+├── data/<version>/            # une version du jeu par dossier, révisions numérotées (revisions.json)
+├── data/manifest.json         # version courante, empreintes sha256 de chaque fichier
+├── pipeline/                  # seul endroit qui touche Internet ; lecteurs du client et des addons
+├── sims/                      # adaptateurs des simulateurs maintenus par d'autres (wowsims/forever)
+├── exports/                   # chaînes d'import des addons (Naowh, EllesmereUI, Pawn, Talents Forever)
+├── engine/                    # moteur du Mage en fonctions pures (gelé, décision 293) et règles neutres
+├── sim/ , optimize/           # orchestration du moteur (leveling, rencontres, objectifs) et recherche de builds
+├── bridge/                    # pont du chat en jeu (P06a, P06b)
+├── update.py, update_installed.py, update_task.py, spawn.py, archive.py, carry.py, engine_inputs.py, replay.py
+│                              # veille automatique
+├── sources.py, origins.py, classic.py, registry.py, provenance.py, freshness.py, status.py, store.py,
+│   manifest.py, gamedata.py   # registre des sources, origines, provenance, intégrité
+├── build.py, leveling.py, gear.py, gear_route.py, route.py, route_check.py, rxp.py, rxp_guides.py, rxp_clean.py,
+│   polestar.py, compare.py, travel.py, quests.py, dungeons.py, pets.py, pets_lookup.py, pvp.py, lookup.py,
+│   xp_bonuses.py, xp_check.py, kill_time.py, talents_forever.py, tf_code.py, server_removed.py, simc.py
+│                              # services communs à la CLI, au MCP et au pont
+├── profile.py, profile_import.py, backup.py, installs.py, doctor.py, doctor_probes.py, addons.py, toc.py, watch.py
+├── hooks.py                   # hooks du plugin
+├── cli.py, mcp_server.py      # portes d'entrée
+addon/ForeverLogger, addon/ForeverBridge   # nos addons (règles : docs/ADDON.md)
+plugin/                        # plugin Claude Code mince (skills, agents, hooks, .mcp.json)
+seed/forever-mage, seed/grimoire-engine    # code de référence en lecture seule (parité : tests/parity/)
+tests/{unit,integration,parity,e2e,fixtures}/
+.github/workflows/{ci.yml,build-watch.yml,notes-watch.yml,api-probe.yml}
 ```
 
-## Fraîcheur
-1. `forever status` lit `data/manifest.json`, interroge la dernière version publiée du produit (wago.tools, expiration réseau 2 s, cache 6 h dans `~/.cache/forever/status.json`, ou `FOREVER_CACHE_DIR`) et vérifie les empreintes locales.
-2. Statuts : `fresh` (versions égales), `stale` (plus récente disponible), `unknown` (réseau indisponible, dernier état affiché avec son âge), `silent` (aucune nouvelle version depuis plus de 14 jours : possible changement de produit au lancement).
-3. Moments de contrôle : hook SessionStart (une ligne de contexte), champ `freshness` et bloc provenance de chaque outil, workflow planifié `build-watch.yml` toutes les 6 h. Pas de statusline (décision 15).
-4. Règle réseau : seuls `forever status`, l'outil MCP `forever_status`, `forever builds` et `forever fetch` appellent wago (`fetch --gametables` : `api/casc`, T08b) ; `forever notes` lit le forum de Blizzard (à la main seulement, décision 148 ; `robots.txt` relu à chaque passage) et `forever api probe` sonde l'API Blizzard (décision 149, `POST` du jeton par `urllib_post`) ; tous via `forever/pipeline/builds.py`, `forever/pipeline/fetch.py` et le client HTTP injecté `forever/pipeline/http_client.py` (seul `urlopen` du paquet, contrôlé par `tests/unit/test_network_boundary.py` ; délai 2 s pour `status` et `builds`, 30 s par table pour `fetch`). `builds` et `fetch` échouent avec le code 5 (`offline`, `builds_unavailable`, `fetch_failed`) ; `decode`, `diff`, `verify` et `report` ne touchent jamais au réseau. Les autres outils relisent le cache ; au-delà de 6 h, ils renvoient le dernier état connu et ajoutent son âge aux hypothèses. `unknown` seulement sans aucun cache utilisable : un cache illisible ou daté dans le futur est traité comme absent (hypothèse ajoutée dans le second cas). `FOREVER_OFFLINE=1` ou `--offline` interdit tout appel.
-5. Mise à jour automatique (T08d, décisions 178 à 183) : `forever update` (`forever/update.py`, orchestrateur sans calcul de combat ni module réseau) enchaîne archivage (`forever/archive.py`), clone dédié `<cache>/update/repo`, téléchargement et décodage de la version du client, installation dans une copie de préparation du cache, report des valeurs faites à la main (`forever/carry.py`), preuve d'entrées par moteur (`forever/engine_inputs.py`) et règle d'automatisme ; l'écriture passe par git et `gh` du clone (`forever/pipeline/gitops.py`, seul module qui lance git, jamais de poussée forcée), sinon une attente `<cache>/update/pending/<id>.json`. Accès réseau accordé par la décision 179 : wago.tools, WoWDBDefs, git et `gh` du clone ; PyPI exclu (`uv sync --frozen --offline`). Le hook `SessionStart` lance le passage détaché (`forever/spawn.py`) ; `forever_status` en montre un résumé en lecture seule. Une colonne de table peut porter plusieurs noms (`forever/pipeline/tables.py`, `Nouveau|Ancien`) : aucun nom trouvé lève `ColumnNamesError`, que la chaîne rend en attente `column_names` à traiter en session (décision 185). Garde-fou de la première écriture de `--auto` (décision 184). Journaux déjà mesurés : empreintes de l'instantané de `forever measures refresh` et des sources des révisions (décision 187). Passage interrompu (décision 191) : relais de lancement détaché, verrou repris si son processus est mort, reste d'écriture du clone retiré dans les seuls chemins du passage, journal au fil de l'eau, versions installées lues dans le manifeste. Écriture arrêtée en route (décision 192) : `verify` ou CI rouge en attente bloquée avec sa sortie, branche de données reprise ou abandonnée ; bout en bout dans `tests/e2e/` (`uv run tasks.py e2e`, job `e2e` de la CI). Fiches recopiées et correctifs (T08e, décisions 207 et 208) : chaque moteur déclare son mode (`calcule` ou `recopie`) ; un moteur qui recopie s'installe seul quand ses feuilles changées ont l'origine `client` ou `correctif_serveur` avant et après (`OriginResolver`) ; une nouvelle version attend le `DBCache.bin` de son build (attente `hotfixes_unread`, levée seule), puis, 24 h après sa première vue, s'installe sans correctifs si aucune valeur `correctif_serveur` n'est perdue (`hotfix_losses`) ; résumé des valeurs changées (`forever/pipeline/value_diff.py`, talents alignés par clé).
-5. Priorité des statuts : aucune observation → `unknown` ; version publiée plus récente que la locale → `stale` ; dernière version publiée depuis plus de 14 jours, ou aucune version du préfixe → `silent` ; sinon `fresh`.
-6. Si `stale` : l'agent répond quand même, étiquette la réponse, baisse la certitude des entités touchées par le diff et propose `forever update`. Jamais de mise à jour silencieuse.
-7. Cache des résultats : clé `(game_version, data_sha, registry_version, profil, scénario, seed)`.
+## Adaptateurs minces
+Un adaptateur lit une source telle qu'elle est publiée, sans recopier sa logique, rend une forme commune et porte la
+provenance de la source (version, empreinte ou commit, date). Rien de ce qu'il lit n'entre dans le dépôt hors
+agrégats.
 
-## Données versionnées et manifeste
-- Un dossier par version (`forever/data/<version>/`), immuable ; `overrides.json` (corrections manuelles) vit dans le dossier de version, jamais à la racine.
-- `sources.json` (par version, haché comme les autres fichiers) : produit, préfixe de version, date de collecte, et pour chaque fichier sa source, sa certitude (`certain`, `probable`, `suppose` ; FC→certain, FS→probable, PC et EST→suppose), `field_certainty` et `field_notes` par champ.
-- `manifest.json` : déterministe (aucun horodatage), généré uniquement par `uv run forever manifest --update`.
+- **Client du jeu** (`forever/pipeline/`) : `builds.py` (versions publiées, wago.tools), `fetch.py` (tables CSV,
+  GameTables, `.dbd` de WoWDBDefs à commit épinglé), `tables.py` (lecture typée des CSV), `dbd.py` (dispositions),
+  `dbcache.py` et `hotfix_overlay.py` (correctifs du serveur de `DBCache.bin`), `raidbots.py` (cache vérifié de
+  Raidbots quand le jeu n'a pas d'archive du build, décision 290), `hotfixes.py` (`Hotfix.log`), `questcache.py`
+  (`questcache.wdb`), puis les décodeurs : `decode.py`, `character_scaling.py`, `dungeons_client.py`, `pets.py`,
+  `quest_rewards.py`, `travel_client.py`, `xp_bonuses.py`, `tooltip.py`. Toutes les constantes de lecture vivent dans
+  `forever/data/<version>/decode_rules.json`.
+- **Installation et contrôle** : `install.py` (révision suivante, règles de fusion), `observations.py` (écarts tranchés
+  par la version, décisions 296 et 297), `verify.py`, `diff.py`, `value_diff.py`, `report.py`, `sources.py`
+  (désignation d'une version ou d'une candidate), `gitops.py` (seul module qui lance git et `gh`),
+  `http_client.py` (seul `urlopen` du paquet, contrôlé par `tests/unit/test_network_boundary.py`).
+- **Journaux et sauvegardes du joueur** : `combatlog.py`, `measure.py`, `levels.py`, `live_logs.py`, `monsters.py`,
+  `refresh.py`, `addon_sv.py` (ForeverLogger), `auctionator.py` et `cbor.py`, `lua_table.py` (tables Lua sans
+  exécuter de Lua), `client_builds.py` (versions du client vues sur le poste).
+- **Addons de l'utilisateur** (lecture sur disque) : `questie.py`, `quest_sources.py`, `dungeon_sources.py`,
+  `gear_sources.py`, `companion.py`, `skillup.py`, `bestiary.py`, `talents_forever.py`, `sleeping_bag.py`,
+  `travel_sources.py` ; recoupement : `factoruide.py`. Suivi des versions et empreintes : `forever/addons.py`
+  (`DATA_ADDONS`, `EXCLUDED_ADDONS`, `OWN_ADDONS`, `NOT_ADDONS`).
+- **Parcours de leveling** : `forever/rxp_guides.py` (parcours gratuits de RestedXP lus dans l'addon installé),
+  `forever/polestar.py` et `forever/pipeline/polestar_fetch.py` (guides de Polestar dans un clone en cache,
+  décision 289).
+- **Simulateur** : `forever/pipeline/wowsims_build.py` (clone de wowsims/forever, génération protobuf, compilation de
+  `wowsimcli`, épinglage `pin.json` : commit, date, empreinte, versions de Go et de protoc) et `forever/sims/`
+  (`wowsims.py` : préréglages du dépôt épinglé, `RaidSimRequest` en protojson, lancement du binaire en local, lecture
+  du résultat, cas de référence ; `report.py` : réponses de `forever sims` et `forever_simulate`).
+- **Signaux officiels** : `notes.py` (forum de Blizzard, à la main), `blizzard_api.py` (sonde de l'API).
+- **Exports** (`forever/exports/`) : `codec.py`, `naowh.py`, `naowh_keys.py`, `macros.py`, `talents.py`,
+  `ellesmere.py`, `pawn.py`, `read.py` ; code de build de Talents Forever : `forever/tf_code.py`. Formats
+  réimplémentés d'après leur description, jamais recopiés ; le joueur colle lui-même chaque chaîne.
+
+## Données versionnées, origines et provenance
+- **Un dossier par version** (`forever/data/<version>/`), révisé en place par numéro (`revisions.json`) ; une révision
+  n'est jamais écrite à la main : `forever install` (ou la veille) installe une candidate décodée hors du dépôt.
+- **Manifeste** (`forever/data/manifest.json`) : version courante, empreinte sha256 de chaque fichier, `data_sha`
+  (préfixe de l'empreinte globale) ; déterministe, régénéré par `forever manifest --update` ou par l'installation
+  (décision 263 : les règles d'une tranche écrites dans `decode_rules.json` avant le décodage sont admises par
+  `forever install`). Tout outil qui lit les données refuse une empreinte qui ne correspond pas (`data_integrity`,
+  code 3). `.gitattributes` fixe les octets pour que les empreintes soient les mêmes sous Windows et Linux.
+- **`sources.json`** : pour chaque fichier, sa source, sa certitude (`certain`, `probable`, `suppose`), les
+  certitudes et notes par champ, le bloc `hotfixes` des correctifs lus.
+- **`origins.json`** (`forever/origins.py`, étape `origins` de `verify`) : chaque valeur des données a une origine
+  déclarée par pointeur JSON parmi sept : `client`, `correctif_serveur`, `journal`, `addon`, `manuel`, `copie_figee`,
+  `parametre` ; plafond de certitude par origine ; une valeur `manuel` exige une raison. Inventaire des valeurs écrites
+  à la main : `forever origins inventory` (`docs/research/valeurs-ecrites-a-la-main.md`) ; valeurs héritées de la
+  Classic : `forever origins classic`.
+- **`confirmed_changes.json`** : écarts entre le décodage et la version installée, tranchés (par l'utilisateur, ou par
+  la veille selon la règle de version des décisions 296 et 297, ou retraits par correctif du serveur, décision 290 :
+  `forever/server_removed.py`).
+- **Registre des mécaniques** (`docs/MECHANICS_REGISTRY.yaml`, `forever/registry.py`, `scripts/check_registry.py
+  --strict`) : statut, certitude, sources, tests, preuves de journaux ; chaque fonction du moteur cite ses
+  identifiants. `forever explain-mechanic` et `forever_explain_mechanic` en rendent une entrée avec les paramètres de
+  la version.
+- **Registre des sources** (`forever/sources.py`, plan « Sources d'abord », décision 291) : pour chaque domaine, chaque
+  source dit si elle est à jour pour la version installée, par son **contenu** quand c'est possible (moteur du Mage :
+  talent dont le texte du client n'a plus de règle de lecture ; Talents Forever et Forever Companion : talents sans
+  correspondance) sinon par sa **date ou son build** (poids de Naowh, SkillUp Forever, commit épinglé de wowsims).
+  `choose` prend la première source à jour et dit « calcul en cours de mise à jour » pour celles qu'il écarte ; sans
+  source à jour, la meilleure, « antérieure au patch », jamais une panne. Lu par `forever status`, `build.py` et
+  `lookup.py`.
+- **Bloc `provenance`** (`forever/provenance.py`), dans chaque résultat d'outil (CLI, MCP, pont) :
+
   ```json
-  {"schema_version": 1, "game_version": "1.60.1.70009",
-   "versions": {"1.60.1.70009": {"product": "wow_classic_beta", "version_prefix": "1.60.", "collected_at": "2026-09-26",
-     "hotfixes": [], "data_sha": "<12 hex>", "data_sha256": "<64 hex>", "files": {"spells.json": "<sha256>"}}}}
+  {"provenance": {"game_version": "<version>", "data_sha": "<12 hex>", "generated_at": "<horodatage UTC>",
+                  "freshness": "fresh|stale|unknown|silent", "certainty": "certain|probable|suppose",
+                  "assumptions": ["…"], "registry_coverage": "<testées>/<total>"}}
   ```
-  `data_sha256` = sha256 des lignes `"<nom> <sha256>
-"` triées ; `data_sha` en est le préfixe de 12 caractères.
-- Les outils qui lisent les données refusent de répondre si les empreintes ne correspondent pas ou si le manifeste est présent mais illisible, mal formé ou incohérent (`data_integrity`, code de sortie 3 ; manifeste absent : `manifest_missing`) ; `forever status` le signale sans échouer. Le `data_sha` de la provenance est toujours calculé sur les fichiers présents ; s'il diffère du manifeste, l'écart figure dans les hypothèses. `.gitattributes` fixe les octets (`-text`) pour que les empreintes soient les mêmes sous Windows et Linux.
 
-## Pipeline de données (T03)
-- `forever builds` : versions publiées du produit (`sources.json` de la version locale), de la plus récente à la plus ancienne, version locale marquée.
-- `forever fetch --version X [--tables …] [--locale frFR] [--refresh]` : CSV de `https://wago.tools/db2/<Table>/csv?build=X` (`&locale=frFR` pour une autre locale) dans `<cache>/wago/<version>/<locale>/<Table>.csv`, indexés par `fetch.json` (URL, sha256, taille, date). Un fichier conforme à son empreinte n'est pas retéléchargé ; une réponse sans en-tête CSV est refusée ; les tables réussies restent écrites si d'autres échouent. Sans `--tables`, la liste vient de `decode_rules.json`.
-- `decode_rules.json` (dans le dossier de version, haché, hérité par les versions suivantes) : tables à télécharger, lignes de compétence du Mage, géométrie de l'arbre, identifiants d'effet et d'aura, niveaux d'évaluation, sélection des variables de rang (`rank_variables`), sorts suivis. `forever/pipeline/` ne contient aucune de ces valeurs.
-- `forever/pipeline/tables.py` : lecture typée des CSV (colonnes déclarées par table, `data_schema` qui nomme la table, la colonne et la ligne). `tooltip.py` : évaluation pure des variables d'infobulle (`$s1`, `$d`, `$<sort>s1`, `$/1000;S1`, `${…}.N`), valeurs fournies par un résolveur ; tout autre motif lève une erreur, jamais de valeur devinée.
-- `forever decode --version X [--csv-dir D] [--out D] [--force]` écrit une **version candidate** hors de `forever/data/` (défaut `<cache>/candidates/<version>/`) : `manifest.json` + `<version>/` avec `talents.json` et `spells.json` décodés, les fichiers non dérivables du client hérités de la version locale la plus récente (`inherited_from` dans le fichier et dans son entrée de `sources.json`) et un `sources.json` généré. Talents : `ranks` (forme de la référence, positions lues par le moteur) et `tooltip_values` (toutes les variables de l'infobulle). T03 n'installe jamais une candidate ; `forever install` l'installe en révision de la version courante (T06b) et `forever install --new-version` dans le dossier d'une **nouvelle** version (T08a). Règle de fusion des talents : un écart de rang ou de `tooltip_values` passe s'il figure dans `confirmed_changes.json` ; un talent renommé par le client (`change` « renamed », champ `key`) garde la clé du dépôt, prend les noms du client et le gabarit de la décision, garde l'ancien nom dans `former_names` (trouvé par la recherche) et la clé du client dans `source.client_key` ; l'arbre du Mage de `classes.json` reçoit le même renommage (installation de 1.60.1.70170, 2026-10-02). Tout autre écart est refusé.
-- `forever diff A B`, `forever verify [SOURCE]`, `forever report A B [--out F]` acceptent un identifiant de version du dépôt ou le chemin d'une candidate (`unknown_version`, code 4) et exigent l'intégrité des deux côtés. `verify` : schéma du moteur, `len(ranks) == max`, prérequis, positions uniques, longueur et niveaux des rangs de sort, `sources.json` complet ; code 3 en cas d'écart. `report` : Markdown déterministe « data: A → B », futur corps de PR de T08.
-- `confirmed_changes.json` (dossier de version) : écarts entre le décodage du client et la référence de la version, tranchés par l'utilisateur, avec leur nature (`client`, `format`, `convention`). Les tests vérifient la liste dans les deux sens ; l'installation de ces valeurs revient à T08.
+  Les hypothèses portent les mentions obligatoires : moteur du Mage gelé, valeurs héritées de la Classic, source en
+  retard, correctif lu chez Raidbots, commit et empreinte du binaire de wowsims, version et empreinte d'un addon lu.
 
-## Sources locales du client (T04a)
-- `forever logs scan [--dir D]` et `forever logs measure FICHIER|DOSSIER [--max-gap S] [--addon-sv F]` : lecture des journaux (`combatlog.py` : format 22 et bloc avancé décrits dans le code comme un format de fichier ; événement inconnu gardé brut ; `unsupported_log` code 3 ; ligne mal formée `data_schema` avec fichier et ligne), puis mesures pures (`measure.py`) : PV max par PNJ et niveau (créatures invoquées exclues, conflits listés), coûts, intervalles entre instantanés enchaînés (fenêtre `--max-gap`, paramètre de l'outil), durées d'incantation, critiques, touchés et ratés par école et écart de niveau (niveau du lanceur par `ForeverLoggerDB`).
-- `forever questie info [--dir D]` et `forever monsters build --logs D [--questie D] [--out D] [--force]` : table des monstres écrite hors de `forever/data/` (`candidate_exists` code 2), puis installée à la main avec `forever manifest --update`.
-- `lua_table.py` : analyseur pur des tables Lua littérales (Questie, SavedVariables) ; aucun Lua exécuté, aucune dépendance.
-- Données : `monsters.json` (PNJ mesurés `certain`, agrégat `hp_by_level` : journal d'abord, sinon médiane Questie `suppose`) et `spell_scaling.json` (produit par `forever decode` : points de base, points par niveau, variance et ticks de chaque effet de dégâts ; `MaxLevel` 0 résolu au décodage). `GameData.monsters` et `GameData.scaling` ; moteur : `rank_values_at_level` (registre G7).
-- Registre : champ optionnel `preuves` (journal sous `tests/fixtures/combatlog/`, date, mesure, `n`, test) ; `valide-journal` exige une preuve valide avec `n` ≥ `tolerance.n_min`.
-- T04b : journaux `.txt.gz` lus comme les `.txt` (fixtures compressées) ; `forever logs measure … [--addon-sv F] [--questie-sv F] [--utc-offset H] [--caster-level N]` : niveau du lanceur à l'instant de chaque sort (`forever/pipeline/levels.py` : ForeverLoggerDB, puis carnet `journey` de la SavedVariable de Questie, lu par un balayage tolérant aux chaînes binaires, puis niveau saisi) ; intervalles limités aux sorts qui déclenchent la recharge globale (`start_recovery_ms` de `spell_scaling.json`, décodé de `SpellCooldowns`), touchés et ratés aux sorts des données. Preuves du registre : `journal` peut être une liste (mesure sur leur réunion), les preuves d'une même mesure se cumulent, `tolerance.ecart_s` contrôle `ecart_median_s` et `ecart_p10_s`.
-- `forever measures refresh … [--curve-exclude NPC --curve-exclude-reason TEXTE]` (2026-10-02) : PNJ hors norme gardés dans `npcs`, écartés de `hp_by_level` et de l'ajustement, listés avec leur raison dans `curve_excluded` (repris au passage suivant).
-- `forever monsters build … [--fit-exclude NPC]` : `monsters.json` schéma 2 avec `questie_correction` (rapports médians par niveau mesuré, droite, plage, PNJ exclus) appliquée aux niveaux connus seulement de Questie, et `inversions` listées.
+## Moteur du Mage gelé et simulateur de la communauté
+- **`forever/engine/`** : fonctions pures qui reçoivent `GameData` (`forever/gamedata.py`, seul module qui lit le JSON
+  brut du moteur, après contrôle d'intégrité). Aucun chiffre de jeu dans le code. Le moteur du Mage est **gelé à la
+  révision 7 de 1.60.1.70450** (décisions 293 et 294) : plus aucune mécanique ajoutée, recoupé par les journaux de
+  combat ; chaque réponse qui l'utilise le dit (`MAGE_ENGINE_FROZEN` de `forever/sims/report.py`, repris par
+  `build.py`, `leveling.py`, `gear.py`). Il reste le seul calcul sous le niveau 60 (leveling, builds par contexte,
+  respec, profil PvP analytique).
+- **Règles neutres** qui ne recopient aucune mécanique de classe et restent hors du gel : modèle d'XP (`xp.py`),
+  trajets et routes (`travel.py`, `route.py`), passages de donjon et butin (`dungeon.py`, `loot.py`), rendements
+  décroissants des fiches PvP (`diminishing.py`), poids par différences finies (`weights.py`).
+- **Orchestration** : `forever/sim/` (Monte Carlo et analytique du leveling, scénarios de rencontre, objectifs par
+  zone et donjon, écart avec un build de la communauté) et `forever/optimize/` (recherche des talents, décision
+  appariée, respec, recherche de route portée de Factoruide). Ni formule ni chiffre ici.
+- **wowsims/forever au niveau 60** (`forever/sims/`, `forever sims update | presets | races`, outil MCP
+  `forever_simulate` : préréglages, races par paires, poids par tirages appariés, comparaison de classes) : binaire
+  compilé chez nous depuis un commit épinglé, sans aucune modification, lancé en sous-processus local sans réseau,
+  certitude `suppose`. `forever gear` prend ses poids au niveau 60 ; sous le 60, rien n'est demandé à wowsims.
+- **Valeurs attendues des tests** : la suite lit une copie des données ramenée à `VALUES_VERSION`
+  (`tests/conftest.py`, `pinned_data_dir`) ; seule `tests/unit/test_installed_invariants.py` lit la version réellement
+  installée, et seulement pour des invariants.
 
-## Moteur de mécaniques et registre
-- `forever/gamedata.py` lit une version après contrôle d'intégrité (`store.load_version`) et construit un `GameData` gelé (sorts, talents dans l'ordre du fichier, règles de combat, raciaux, constantes). Seul module qui touche au JSON brut du moteur ; tout écart de schéma lève `data_schema` (code 3). En T02, `GameData` ne couvre que le Mage (un espace par classe : données des 9 classes décodées en PV1, moteurs dans les tranches de classe CM1 à DR1, décisions 102 et 232).
-- `forever/engine/` : fonctions pures qui reçoivent `GameData` en premier paramètre (talents, personnage, sorts, toucher, critique, dégâts, incantation, mana, espérance d'un lancer). Aucun chiffre de jeu dans le code : seuls le lien talent → effet et la conversion d'unité `/ 100` (talents exprimés en %) y figurent. Chaque fonction cite ses identifiants de registre dans sa docstring (`Registre : A3, A4, H1`). `MECHANICS` (dans `forever/engine/__init__.py`) associe les 30 contrôles portés du seed à leurs identifiants.
-- `mechanics.json` (par version, haché) : constantes absentes des tables du client, chacune avec `value`, `certainty`, `registry` (identifiant du registre) et `source` ; T04b : clés `leveling.*` (chiffres du simulateur du seed) et `hit.miss_per_level_below`.
-- T04b, leveling : moteur `forever/engine/monsters.py` (PV par niveau et source, correction Questie, coup et XP des monstres, armure), `movement.py` (temps de vol, ralentis, gel, portée, cadence des coups), recul et recharges (`casting.py`), régénération en combat et repos (`mana.py`), tics de DoT et d'Ignite, tirage des dégâts (`damage.py`), dégâts au niveau du personnage (`spells.rank_damage`, `expected_cast(spell_level=…)`). Simulateurs `forever/sim/leveling_mc.py` (Monte Carlo, générateur injecté, ordre des tirages du seed) et `forever/sim/leveling_analytic.py` : orchestration seulement. Service commun CLI/MCP `forever/leveling.py` ; graphique `forever/chart.py` (matplotlib Agg sans pyplot, PNG déterministe, jamais dans `forever/data/`) ; `forever sim leveling`, `forever chart leveling`.
-- Origine des valeurs (T08b, bloc H) : `forever/data/<version>/origins.json` (hérité et complété à chaque version) déclare l'origine de chaque feuille de chaque fichier de données (`client`, `journal`, `addon`, `manuel`, `copie_figee`, `parametre`), par pointeur JSON ; `forever/origins.py` (étape `origins` de `verify`, `scripts/check_origins.py`) refuse une valeur sans origine, une règle `manuel` sans raison ou au-delà de `probable`, un motif sur une valeur `manuel`, une certitude déclarée (`mechanics.json`, `field_certainty` de `sources.json`) supérieure à celle de son origine hors abaissement prévu (`pending`), et une règle qui ne couvre rien. `forever origins inventory` rend l'inventaire des valeurs écrites à la main (`docs/research/valeurs-ecrites-a-la-main.md`, comparé au rendu par un test).
-- Registre (`docs/MECHANICS_REGISTRY.yaml`) : champs obligatoires `id`, `categorie`, `description`, `forever`, `statut`, `certitude`, `sources`, `tests` ; champs optionnels `formule` (symbolique, seuls 0 et 1 admis) et `note` (périmètre couvert, reprise prévue). Une référence de test prend la forme `tests/…/fichier.py::test_nom` ; `teste` ou mieux en exige une dont la fonction existe (analyse `ast`). `forever.registry.validate` (via `scripts/check_registry.py --strict`, étape `registry` de `verify`) refuse aussi les chemins hors de `tests/`, les formules chiffrées, un identifiant cité par le moteur mais absent du registre, et une entrée testée des catégories A à H sans implémentation citée.
-- `forever explain-mechanic <id>` / `forever_explain_mechanic` : entrée du registre, paramètres de la version courante (`mechanics.json` étiqueté par l'identifiant, règles de `combat_rules` associées), implémentations citées ; `certainty` reprend le registre, la certitude de la provenance est le minimum avec celles des paramètres.
-- T04f : `forever/pipeline/xp_bonuses.py` (décodeur de `xp_bonuses.json`), `forever/engine/xp.py` (bonus d'XP : `xp_multiplier`, `session_xp`, `rested_cap`, `tent_rested`), `forever/xp_bonuses.py` (catalogue, état, bonus à prendre, chaîne du sac, liste de surveillance des addons), `forever/pipeline/sleeping_bag.py` (lecteurs de Naowh Discovery et de FojjiCore), `forever/route.py` (`RouteStep`, étapes et rappels pour RX1) ; `forever install` installe les règles de lecture et d'origine d'une tranche (changement `rules`, décision 263).
+## Veille entièrement automatique (`forever update`)
+`forever/update.py` orchestre des fonctions existantes, sans calcul de combat ni module réseau propre (le réseau passe
+par `forever/pipeline/` et un exécuteur injecté).
 
-## Builds par contexte (T05)
-- `forever build <contexte> --level N` (`leveling`, `dungeon`, `raid`, `pvp-bg`, `pvp-world`) et l'outil MCP `forever_build` : même service, `forever/build.py` (validation, rapport, hypothèses, certitude = minimum des sources, provenance ; au-delà de `build.beta_level_cap`, « non vérifiable en jeu avant la sortie »).
-- `forever/optimize/` : `leveling.py` (faisceau du seed, parité exacte en mode seed ; en mode forever, choix du build cherchés avec les talents et départs multiples par arbre), `endgame.py` (donjon, raid, PvP : départs par arbre et par paire d'arbres, recherche locale, décision au Monte Carlo apparié ; glouton PvP du seed pour la parité), `decide.py` (écart apparié, intervalle, stabilité), `respec.py` (conseil du seed et conseil forever par niveau).
-- `forever/sim/encounter.py` : scénarios provisoires de donjon et de raid (`build.scenarios`), analytique et Monte Carlo ; règles dans `forever/engine/encounter.py`. `forever/sim/community.py` : écart d'un build de la communauté avec le nôtre (bloc J, `scripts/build_community_fixture.py`).
-- Moteur : `variants.py` (hypothèses incertaines, plages `range` de `mechanics.json`), `pvp.py` (profil PvP du seed), `respec.py`, `blind_spots.py` (angles morts : champ `angle_mort` du registre, estimations bornées).
-- Talents Forever (FA1, décision 209) : `forever/tf_code.py` (codec pur du code de build v6 sur une disposition abstraite, sans donnée de l'addon ; règle d'échange, hors de `forever/engine/`) ; `forever/talents_forever.py` (addon installé lu à chaque appel par `forever/pipeline/talents_forever.py` : disposition des listes, table de correspondance par arbre au même indice, sort, rangée et colonne, contrôles, recoupement ; `export_build` et `attach_export` ajoutent le bloc `export.talents_forever` au rapport de `forever build` et de `forever_build` sans toucher `build_report` ; `decode_code`, `popular_builds`, `closest_popular`). Rien de l'addon n'est stocké dans `forever/data/` ; addon absent ou classe bloquée : statut et raison, jamais un code deviné.
+**Déclencheurs** (un seul passage à la fois, verrou `<cache>/update/`) :
+- hook `SessionStart` du plugin (`forever/hooks.py`, `update.due`) : passage détaché si le dernier a plus de 6 h ;
+- tâche planifiée « WoW Forever - mise à jour » chaque jour (`scripts/install_update_task.ps1`,
+  `forever/update_task.py`, `pythonw.exe` sans fenêtre) ;
+- le pont, quand le jeu se ferme ou écrit son `DBCache.bin` (`forever/bridge/updater.py`, `update.launch_pass`, hors
+  de la règle des 6 h) ;
+- à la main : `forever update [--auto] [--dry-run] [--no-network] [--only …]`.
 
-## Outils MCP (peu nombreux, à fort levier)
-| Outil | Rôle |
+**Étapes d'un passage** (`run_update`, chacune avec un délai maximal `STEP_LIMITS_S` : au-delà, le passage s'arrête
+proprement et le dit) :
+
+```
+verrou → archivage → clone → jeu → nouvelle_version → correctifs → journaux → addons → guides → simulateurs → fin
+```
+
+| Étape | Ce qu'elle fait |
 | --- | --- |
-| `forever_status` | Fraîcheur et couverture du registre |
-| `forever_lookup` | Sort, talent (T06 ; 9 classes en PV1 avec `class_name`), zones (T04c), quêtes de Forever fusionnées `quests` (T04d), fiches PvP `pvp` et contrôle de build `build_check` (PV1), builds populaires de Talents Forever `tf_popular` (FA1) ; objet, consommable à venir (paginé, `detail=false` par défaut) ; domaines prévus : section « Outils et skills prévus » |
-| `forever_explain_mechanic` | Entrée du registre (par identifiant ou par mots de la description, T06), formule, certitude, paramètres de la version, implémentation, sources |
-| `forever_sim_leveling` | Temps par monstre, XP/h : Monte Carlo et analytique, PV du monstre (valeur, source, certitude) ; graphique par `forever chart leveling` (T04b) ; `kind="objectives"` (T04d, toutes les classes) : XP par heure par zone et par donjon, temps par monstre du moteur, mesuré ou estimé, conseil construit par l'outil |
-| `forever_sim_raid` | DPS, intervalle de confiance, contributions |
-| `forever_build` | Build par contexte (leveling, donjon, raid, PvP) : talents, ordre, raisons, alternative, stabilité, sensibilité, respec, angles morts (T05, décision 86) ; bloc `export.talents_forever` : code, lien et import Talents Forever, build populaire le plus proche (FA1) |
-| `forever_optimize_gear` | Ensemble réel simulé sous contraintes |
-| `forever_consumables_plan` | Plan par zone, métier, budget |
-| `forever_diff_versions` | Ce qui change entre deux versions, par classe |
-| `forever_analyze` | Analyse d'un combat de mes journaux : PvP (AN1) puis PvE (AN2), provenance ; nom et paramètres fixés au plan de AN1 (décision 104) |
-| `forever_player_profile` | Lire le profil du joueur (personnage actif ou nommé, `stale`, `missing`), en lecture seule ; écriture par `forever profile set` (T06b, décision 99) |
+| `archivage` | copie `DBCache.bin`, `Hotfix.log` et `questcache.wdb` du client par build dans `<cache>/dbcache/<build>/` (`forever/archive.py`), avant que le client ne les réécrive |
+| `clone` | clone dédié `<cache>/update/repo` remis sur `origin/main` ; l'arbre de travail de la session n'est jamais touché ; reprise d'une branche `data/…` restée en route |
+| `jeu` | dernière version publiée du client (wago.tools) |
+| `nouvelle_version` | téléchargement (trois essais par table, décision 230), décodage avec les correctifs du serveur, installation dans une copie de préparation, report des valeurs faites à la main (`forever/carry.py`), preuve d'entrées par moteur (`forever/engine_inputs.py`), écarts tranchés par la version (décisions 296 et 297), écriture |
+| `correctifs` | nouveaux correctifs du serveur de la version installée (archive du jeu, sinon Raidbots) : révision suivante |
+| `journaux` | mesure des journaux de combat de la version installée (journal en cours d'écriture remis au passage suivant) : révision suivante |
+| `addons` | empreintes des addons suivis ; Questie changé relance la mesure des journaux, écrite d'elle-même ; un autre addon changé laisse un rappel de relecture en session, sans rien bloquer |
+| `guides` | clone de Polestar remis sur son dernier commit, s'il existe |
+| `simulateurs` | wowsims/forever recompilé au nouveau commit, s'il a déjà été compilé ; cas de référence rejoués, écarts notés dans `veille.json` |
 
-## Plugin Claude Code
-Livré en T06 (`plugin/`, décisions 91 à 97), installé au niveau utilisateur par `scripts/install_plugin.ps1` depuis la
-marketplace locale du dépôt (`.claude-plugin/marketplace.json`, `forever@wow-forever`) ; mode d'emploi : `docs/USAGE.md`.
-- **Mince** : aucun calcul ni chiffre de jeu ; le serveur MCP (`plugin/.mcp.json`) et les hooks lancent le dépôt pointé
-  par `FOREVER_HOME` (défaut `${CLAUDE_PLUGIN_ROOT}/..`, le dépôt quand le plugin est chargé sur place).
-- **Skills** : `forever-router` (aiguillage, carte des domaines couverts et non couverts avec leur tranche, classe pas
-  encore calculée, format de réponse `format-reponse.md` avec la règle « question personnelle ou générale », règle
-  « je ne sais pas », consignes « donnée manquante » et « pas encore construit », PV1), `forever-leveling`,
-  `forever-mage`, `forever-pvp` et `forever-builds` (PV1), `forever-familiers` (CH0). Un skill par domaine et par usage : chaque tranche ajoute le
-  sien et met à jour la carte du routeur (décision 115). Chaque SKILL.md fait moins de 200 lignes, sans chiffre de jeu.
-- **Sous-agents** : `forever-web-researcher` (WebSearch, WebFetch ; sources étiquetées officielle, communautaire,
-  simulateur ; rien n'entre dans `forever/data/`), `forever-sim-runner` (calculs lourds par les outils forever).
-  `data-updater` (T08) et `evaluator` (remplacé par `claude plugin eval`) : plus tard ou abandonnés.
-- **Hooks** (logique dans `forever/hooks.py`, sous-commandes `forever hook …`) : SessionStart → ligne de fraîcheur,
-  cache seulement, **seulement dans le dépôt** ; Stop → chiffres de jeu de la réponse absents des résultats des outils
-  `forever_*` de la session (et des lignes sourcées du rapport de `forever-web-researcher`, décision 120), message `[forever:chiffres]` sans blocage, **seulement pour une réponse produite avec un skill de jeu du plugin**, jamais dans une session de travail sur une tranche (`/tranche`, skills `tranche` et `verifier` ; PV1, demande de l'utilisateur du 2026-09-30).
-  Garde dans `hooks.json` : rien ne s'exécute sans `pyproject.toml` au chemin du dépôt (aucune erreur ailleurs).
-- **Pas de statusline** (décision 15), pas de commandes `/forever…` en T06 (le langage naturel suffit ; à reprendre si
-  l'évaluation le justifie).
-- **Version** : semver dans `plugin.json` (0.2.1 en fin de T06b, 0.3.0 le 2026-09-29 : décisions 116 et 117 ; 0.4.0 : décisions 118 à 121 ; 0.5.0 : PV1), relevée à chaque changement de `plugin/`, gardée par
-  `plugin/.claude-plugin/fingerprint.json` (`scripts/plugin_fingerprint.py`, décision 101).
-- **Évaluation** : `plugin/evals/` (44 questions réelles dont deux à profil vide, deux générales, deux personnelles, un personnage prévu, trois PvP et trois sur les familiers du Chasseur, 22 voisines ; 62 cas depuis PV1, 66 depuis CH0 ; passage avec le profil de test `EVAL_FOREVER_PROFILE`, sauf le guide d'apprivoisement qui reçoit un profil de Chasseur `profile-chasseur.json`), contrôlée sans modèle en CI
-  (`tests/unit/test_plugin_evals.py`) ; passage avec le modèle à la main, rapport par `scripts/plugin_eval_report.py`
-  (seuils de la décision 96), résultats dans `docs/research/plugin-eval-T06.md`.
+**Écriture** (`_publish`, `forever/pipeline/gitops.py`) : branche `data/<version>-r<N>`, `tasks.py verify --data
+--engines=<moteurs touchés>` dans le clone (la suite complète si autre chose que des données change), poussée, CI
+attendue sous Ubuntu et Windows, puis `main` avancé en avance rapide sur `origin` (refusé si `main` a bougé), jamais
+de poussée forcée. Le rapport de l'installation part dans `docs/research/data-<version>-r<N>.md`.
 
-## Outils et skills prévus (provisoires)
-Nouveaux domaines de `docs/ROADMAP.md`. Tout ce qui suit est **provisoire** : la forme définitive (nom, paramètres, schéma de sortie) se fixe au plan de chaque tranche (décision 63).
-- **Principe** : les consultations passent par `forever_lookup` avec un paramètre de domaine, plutôt que par un outil par domaine ; des outils séparés seulement pour les calculs (simulations, optimiseurs, prix). La liste d'outils reste courte et à fort levier ; chaque domaine renvoie des résultats compacts, paginés, avec provenance et certitude par champ.
-- Un calcul peut aussi rejoindre un outil de calcul existant (par exemple `forever_build` avec le contexte `pvp-bg`) plutôt que créer un outil.
+**Après l'installation** : fiche `<cache>/update/installed/<id>.json` (`forever/update_installed.py` : version,
+révision, commit, ce qui a changé en mots de joueur, état) ; rejeu ciblé des builds du Mage **après** l'installation
+(`forever/replay.py`, cas en cache par version, empreinte des données et empreinte du code, répartis sur les cœurs) qui
+ne décide plus rien mais écrit les conseils changés sur la fiche ; carte « Mis à jour » du pont et ligne de
+`forever update status`. **Annuler** : `forever update undo <id>` revient à la révision précédente par le même chemin
+(`git revert` dans le clone, `verify --data`, branche `data/undo-<id>`, CI, avance rapide), même jeu fermé ; une
+fiche annulée empêche la réinstallation du même contenu.
 
-| Domaine | Consultation (`forever_lookup`, domaine) | Calcul (outil séparé) | Skill | Tranche |
-| --- | --- | --- | --- | --- |
-| Leveling : zone ou donjon à mon niveau | `zones` (données de Questie lues localement) | — | `forever-leveling` | T04c |
-| Profil : import automatique (**fait, PV1**) | — | `forever profile import` (ForeverLogger, Questie, Auctionator, journaux ; changements listés avant accord) ; lecture par `forever_player_profile` | routeur (`format-reponse.md`) | PV1, T07 |
-| Builds de toutes les classes (**fait, PV1** ; Talents Forever **fait, FA1**) | `talent` avec `class_name` ; `build_check` (classe, niveau, talents) ; `tf_popular` (builds populaires de Talents Forever) | `forever_build` (Mage, lien Talents Forever) ; CLI `forever talents check`, `forever talents tf crosscheck / decode / popular` | `forever-builds` | PV1, FA1, puis chaque tranche de classe |
-| PvP (**fiches faites, PV1**) | `pvp` : fiche de classe (`name`, `level`) ou d'affrontement (`opponent`, `race`, `talents`, `opponent_level`), valeurs avec chemin `from` en `detail=true` ; CLI `forever pvp class`, `forever pvp matchup` ; à venir : champs de bataille, équipement PvP, rendements décroissants mesurés | Profil PvP du Mage : `forever_build`, contextes `pvp-bg` et `pvp-world` (rendements et bijou en PV2) | `forever-pvp` | PV1, PV2 (fiches en jeu : FA1p) |
-| Familiers du Chasseur (**savoir fait, CH0**) | `pets` : règles du système (sans `name`), fiche de famille, de capacité (`rank`, `detail`) ou de bête, guide d'apprivoisement (`zone`, `level`) ; CLI `forever pets rules / family / ability / beast / tame / crosscheck / mine` ; Forever Bestiary lu sur disque | Choix du familier par contexte, dégâts du familier : CH1 | `forever-familiers` | CH0, CH1 |
-| Installation et lancement | — | `forever doctor` (contrôle de toute l'installation, correction par problème, sans réseau ; outil MCP ou non fixé au plan) ; découverte des installations par `.build.info` | — | LN1 |
-| Analyse de mes combats PvP | — | `forever_analyze` (AN1) | `forever-analyse-pvp` | AN1, étendue par chaque tranche de classe |
-| Classes (Chaman, Chasseur, Démoniste, Paladin, Guerrier, Voleur, Prêtre, Druide) | `spell`, `talent` de la classe | `forever_build` et `forever_sim_leveling` avec la classe (forme au plan) | `forever-<classe>` | CM1 à DR1 (ordre de la décision 232), parties raid après T09 |
-| Analyse de mes combats PvE | — | `forever_analyze` (AN2) | `forever-analyse-pve` | AN2 |
-| Donjons | `dungeons` : niveaux, boss, butin | — | `forever-dungeons` | DJ1 |
-| Legacy | `legacy` : catalogue, puis état importé | Conseil des bonus par personnage (appelle le simulateur de leveling) | `forever-legacy` | LG1, LG2 |
-| Métiers | `professions` : recettes, sources, points Legacy | Plan de montée de compétence (coût en or avec EC1), répartition des métiers entre mes personnages | `forever-professions` | MT1 |
-| Réputations | `reputations` : factions, paliers, gains, récompenses | Plan de montée (temps estimé) | `forever-reputations` | RP1 |
-| Économie | — | `forever_prices` (seul outil qui ajoute un accès réseau, après accord) | rattaché à `forever-professions` ou skill propre | EC1 |
+**Ce qui ne s'installe pas, et est dit** (attente visible par `forever update status`) : intégrité cassée (`verify`
+rouge, écart de fusion que les décisions 296 et 297 ne tranchent pas, règles modifiées après le décodage, CI rouge),
+source injoignable ou illisible (attente `network` levée seule au passage suivant), colonne renommée par le client
+(`column_names`, session), dispositions WoWDBDefs absentes, valeur écrite à la main perdue, valeur de correctif du
+serveur non relue. Une nouvelle version attend le `DBCache.bin` de son build (`hotfixes_unread`, levée seule), puis
+s'installe sans correctifs après un délai si aucune valeur `correctif_serveur` n'est perdue.
 
-- Skills : un par domaine et par usage, chacun sous 200 lignes, sans chiffre de jeu, ajouté par sa tranche (T06 ne livre que le routeur, le leveling et le Mage) ; le routeur `forever-router` reçoit la carte des domaines à chaque ajout et choisit le skill selon la demande, sans ordre imposé (décision 115).
-- Commandes CLI : `forever profile import`, `forever pvp …`, `forever analyze …`, `forever dungeon …`, `forever legacy …`, `forever profession …`, `forever rep …`, `forever prices …` (détail dans chaque section de `docs/ROADMAP.md`), toutes branchées sur les mêmes services que le MCP.
+**Délais réseau** (réglages de l'outil) : requête HTTP de `status` et `builds` (`HTTP_TIMEOUT`), table CSV
+(`FETCH_TIMEOUT`, doublé à chaque essai), téléchargement de Raidbots (`raidbots.DOWNLOAD_TIMEOUT`), commande git de
+Polestar (`STEP_GIT_TIMEOUT_S`), git et compilation de wowsims (`wowsims_build.GIT_TIMEOUT_S`, `TIMEOUT_S`), attente
+de la CI (`UPDATE_CI_TIMEOUT`), attente du `DBCache.bin` (`UPDATE_HOTFIX_WAIT`). Un accès injoignable est noté sans
+bloquer les étapes suivantes ; la copie précédente (clone, binaire) reste lue.
 
-## Mémoire joueur
-Profil minimal (T06b, décision 99) : `forever/profile.py`, fichier `FOREVER_PROFILE` ou `~/.forever/profile.json`, **hors du dépôt** (écriture refusée sous le dépôt) : personnages (classe, race, faction, niveau, talents, métiers, version des données), un actif. Les outils de calcul ne le lisent jamais : l'agent le lit (`forever_player_profile`) et passe les valeurs ; chaque rapport rend `inputs` (origine `argument` ou `default`).
-Neuf classes et personnages prévus (`planned`, `--planned` / `--created`, décision 119) ; planification d'une respec à un autre niveau par `respec.projected` de `forever_build` (décision 118) ; `forever_build` sans niveau : niveau maximal des données (décision 121).
-Import automatique minimal (PV1, décisions 105 et 125) : schéma 2, chaque champ `{value, source, at, client_build, certainty}` ; fusion par `merge_field` (la plus récente l'emporte, à date égale la plus directe : joueur, ForeverLogger, Questie et Auctionator, journal, API) et désaccords gardés dans `conflicts` ; un profil de schéma 1 est migré à la lecture. Sources : ForeverLogger (classe, race, niveau, nœuds de talents traduits en clés par `classes.json`), journaux (personnages « à moi », classe déduite des sorts de classe, `probable`), Questie (quêtes faites par personnage), Auctionator (mes prix, par royaume, décodeur CBOR maison) ; version du client par instantané et par session ; lus sur disque, écritures listées avant accord ; faction toujours donnée par le joueur. Les 9 classes sont validées (race permise, build légal).
-Vault de T07, hors du dépôt lui aussi (données personnelles) : fiches datées `personnages/<nom>.json` (avec la version du jeu), `objectifs.md`, `decisions.md`, `legacy.json`, `historique/`.
-La mémoire de Claude ne garde que des pointeurs et des décisions, jamais de chiffres de jeu.
+**Veilles hors du poste** (GitHub Actions) : `build-watch.yml` (chaque jour : nouvelle version publiée, décodage et
+rapport en pull request, n'installe rien), `notes-watch.yml` (à la main), `api-probe.yml` (sonde quotidienne de l'API
+Blizzard). `forever watch` est la veille locale hors ligne (build du client, addons, correctifs, journaux) : elle
+signale, ne lance rien.
 
-## Analyse des combats (AN1, AN2, provisoire)
-- Lecture des journaux par `forever/pipeline/combatlog.py` (T04a), découpe en combats et anonymisation des autres joueurs à la lecture (décision 49) ; aucune donnée de tiers écrite en clair.
-- Faits du journal (contrôles et leur rang de rendement décroissant, recharges, interruptions, morts, rotation réelle) : fonctions pures ; règles et seuils dans `forever/data/<version>/` ; jugement par rapport aux fiches de PV1 (AN1) et à la rotation optimale des simulateurs de la classe (AN2, rejeu à tirages communs dans `forever/sim/`).
-- Service commun CLI (`forever analyze <journal> [--combat N]`, texte et `--json`) et MCP (outil de calcul séparé, décision 63) ; rapport Markdown et graphique déterministes écrits hors du dépôt ; tout en local, sans réseau ; taux réels proposés au registre après accord.
+## Rapports de valeurs à la place des tests rouges (décision 288)
+Une nouvelle version ne rend aucun test rouge : les tests de valeurs restent attachés à `VALUES_VERSION`. Elle produit
+un **rapport des valeurs qui changent**, à valider : section « Valeurs changées » du rapport d'installation
+(`docs/research/data-<version>-r<N>.md`, une ligne par valeur : classe, entité, champ, avant, après, par
+`forever/pipeline/value_diff.py` et `diff.py`), conseils rejoués sur la fiche « Mis à jour », écarts de wowsims dans
+`veille.json`. Monter `VALUES_VERSION` est un acte délibéré, fait après ce rapport, avec les attentes revues en une
+fois. Une source en retard (registre des sources) donne « calcul en cours de mise à jour » dans la réponse, pas une
+erreur.
 
-## Veille
-`build-watch.yml` (cron 6 h) : `forever builds` ; si nouvelle version, `fetch`, `decode`, `diff`, `verify`, puis PR « data: A → B » avec le résumé du diff et une note pour le vault. Alerte si `silent`.
+## Fraîcheur et réseau
+- `forever status` et `forever_status` (`forever/freshness.py`, `forever/status.py`) : version locale contre dernière
+  version publiée (cache `<cache>/status.json`, relu au-delà de 6 h), intégrité, couverture du registre, registre des
+  sources. Statuts : `fresh`, `stale` (plus récente publiée), `unknown` (aucune observation), `silent` (aucune
+  nouvelle version depuis longtemps : possible changement de produit). `FOREVER_OFFLINE=1` ou `--offline` interdit
+  tout appel.
+- Accès réseau permis (liste fermée de `CLAUDE.md`, contrôlée par `tests/unit/test_network_boundary.py`) : wago.tools,
+  WoWDBDefs, git et `gh` du clone dédié (décision 179), caches vérifiés de Raidbots (décision 290), clone de Polestar
+  (décision 289), clone de wowsims/forever et modules Go (décisions 293 et 294), forum de Blizzard à la main
+  (décision 148), API Blizzard (décision 149). Jamais dans les tests.
 
-## DJ1 (donjons)
-- `forever/pipeline/dungeons_client.py` : `dungeons.json` décodé du client (`Map`, `LFGDungeons` reliées par le nom
-  avec les alias de `decode_rules.json`, `ContentTuning`, `DungeonEncounter`, `AreaTable`), installé par
-  `forever install` ; tables du journal absentes du build (DON9).
-- `forever/pipeline/dungeon_sources.py` : lecteurs locaux des addons (forme commune, clé = instance, aile ou nom),
-  SavedVariables de Naowh Forever sans noms de joueurs ; `forever/pipeline/addon_sv.py` lit les passages et le butin
-  de ForeverLogger 0.6.0 (schéma 4).
-- `forever/dungeons.py` : livre fusionné champ par champ (ordre déclaré, écarts listés), cache `<cache>/dungeons/`,
-  consultation (`dungeons_payload`, `dungeon_payload`, `item_payload`), agrégats (`render_report`).
-- `forever/engine/dungeon.py` : passage (`run_model` : relevé, compte d'un addon, formule de Factoruide),
-  `first_pass`, `repeat_pass`, `placement_level`, `boss_level` (registre H12, I16, I17) ;
-  `forever/sim/objectives.py` s'en sert ; `forever/route.py` : `dungeon_steps`, `dungeon_placements` pour RX1.
+## Pont en jeu (`forever/bridge/`, addon `addon/ForeverBridge`)
+Relie la fenêtre de l'addon ForeverBridge à une conversation Claude Code ; forever lui-même n'ouvre aucune connexion.
+- **Jeu → pont** : l'addon dessine le message (contexte du personnage, question) en bande de pixels
+  (`Message.lua`) ; `capture.py` la lit dans la seule zone client de la fenêtre du jeu au premier plan (`codec.py`,
+  `record.py`, `fragments.py` pour les messages longs). Secours : boîte d'envoi des SavedVariables, lue au `/reload`.
+- **Conversation** (`agent.py`, `prompt.py`, `plans.py`, `context.py`) : `claude -p` en `stream-json`, outils réduits
+  aux skills et aux outils forever, seul serveur MCP `forever` ; contexte relié à nos données ; appel fixé par bouton.
+- **Pont → jeu** (`slots.py`, `loop.py`, `status.py`, `cards.py`) : réserve d'emplacements `ForeverBridge_S001`…
+  chargés à la demande ; cartes « À valider », « Mis à jour » (avec « Annuler ») et questions à choix (`choices.py`).
+- **Actions sans le modèle** (`actions.py`, liste fermée) : commandes fixées de `forever update`, profil
+  (`profile_gap.py`), exports (`exports.py`), métiers par SkillUp Forever (`professions.py`), équipement
+  (`gear_level.py`), livraison des routes dans RestedXP (`guide_addon.py` en repli jeu fermé), conversation
+  « addons » limitée au dossier de l'addon de l'utilisateur (`addons.py`).
+- **Exploitation** : `forever bridge install | start | run | stop | status | ask | selftest | autostart | …` ; journal
+  sans pixel (`journal.py`), verrou (`lock.py`), addon tenu à jour jeu fermé (`keeper.py`), démarrage à l'ouverture de
+  session (`autostart.py`), passage de la veille à la fermeture du jeu (`updater.py`). Le pont ne recharge jamais seul
+  son code : il se relance après une fusion.
 
-## T04c
-- Moteur : `forever/engine/armor.py` (armure portée selon le niveau d'apprentissage lu dans le client, `worn_armor`), `buffs.py` (aura d'Arcane Blast), `leveling.py` (couleurs de quête, bande de niveaux), `damage.py` (Ignite roulant : `roll_ignite`, `ignite_ticks_due`, `predict_ignite_ticks`), `mana.py` (`arcane_blast_cost`, régénération selon `rules`).
-- Simulateurs : options `rules` (`forever` ou `seed`), `armor`, `ab_stacks`, `ab_dump` ; rotation `arcane` ; journal des lancers `kill_mc(log=…)` pour les tests.
-- Données : `spell_scaling.json.utility` (armures, produit par `decode` avec `decode_rules.json.utility_spells`), `mechanics.json` : `leveling.ignite` (client), `leveling.ignite_rule`, `leveling.quest_band`.
-- `forever/pipeline/client_builds.py` (T08a, décision 135) : journal des versions du client vues sur ce poste, `<cache>/client_builds.json`, en ajout seulement. `.build.info` ne porte que la version courante et est réécrit à chaque mise à jour : sans relevé, l'instant du changement est perdu. `forever logs scan` relève au passage et attribue à chaque **session** la version en vigueur à son début ; l'entête du journal de combat (`BUILD_VERSION 1.60.1`, tronquée) n'est jamais utilisée pour attribuer. C'est un état de l'outil, jamais une donnée de jeu : il ne va pas dans `forever/data/`.
-- `forever measures refresh` (`forever/pipeline/refresh.py`) : collecte sur disque, mesures, comparaison, écriture après accord (`Deps.confirm`) de `monsters.json`, de sa source dans `sources.json`, du manifeste et de l'instantané `<cache>/measures/last.json` ; seuls les journaux écrits sous la version installée sont mesurés, les autres sont listés (`diff.measures.held_back`) et jamais écrits (décision 135) ; `forever lookup zones` et `forever_lookup(kind="zones")` (`forever/lookup.py`, `forever/pipeline/questie.py`).
+## CLI, serveur MCP et plugin
+- **CLI** (`forever/cli.py`) : sortie en français, `--json` pour une sortie structurée, dernière ligne : provenance ;
+  codes de sortie stables (2 usage, 3 intégrité, 4 introuvable, 5 réseau). Groupes : consultation (`status`, `lookup`,
+  `explain-mechanic`, `talents`, `pvp`, `pets`, `dungeon`, `quests`, `xp`), calcul (`build`, `sim`, `chart`, `gear`,
+  `route`, `sims`), données (`builds`, `fetch`, `decode`, `install`, `diff`, `verify`, `report`, `manifest`,
+  `hotfixes`, `origins`, `measures`, `monsters`, `logs`, `questie`, `addons`), veille (`update`, `watch`, `notes`,
+  `api`), poste (`profile`, `bridge`, `export`, `doctor`, `backup`, `wow`), `mcp`, `hook`.
+- **Serveur MCP** (`forever/mcp_server.py`, même cœur que la CLI ; une erreur métier revient comme résultat d'outil
+  avec sa provenance) :
+
+  | Outil | Rôle |
+  | --- | --- |
+  | `forever_status` | fraîcheur, intégrité, registre des sources, résumé de la veille |
+  | `forever_lookup` | consultations par domaine (`kind` : sorts, talents des neuf classes, zones, quêtes, donjons, PvP, familiers, bonus d'XP, builds de Talents Forever, relecture d'un export…) |
+  | `forever_player_profile` | profil du joueur, en lecture seule |
+  | `forever_explain_mechanic` | entrée du registre et paramètres de la version |
+  | `forever_sim_leveling` | temps par monstre et XP par heure (moteur du Mage gelé), objectifs par zone et donjon |
+  | `forever_build` | build du Mage par contexte, avec lien Talents Forever |
+  | `forever_simulate` | wowsims/forever au niveau 60, toutes classes |
+  | `forever_gear` | poids et lignes d'import (moteur du Mage gelé, wowsims/forever au niveau 60), listes BiS et équipement de leveling lus dans les addons |
+  | `forever_route` | feuille de route de leveling (quêtes fusionnées, parcours de RestedXP et de Polestar), aperçu et guide RestedXP |
+
+- **Plugin Claude Code** (`plugin/`, installé par `scripts/install_plugin.ps1`, mode d'emploi `docs/USAGE.md`) :
+  **mince**, aucun calcul ni chiffre de jeu (`scripts/check_game_numbers.py`). Skills `forever-router`,
+  `forever-leveling`, `forever-mage`, `forever-builds`, `forever-pvp`, `forever-familiers`, `forever-donjons`,
+  `forever-routes` ; sous-agents `forever-web-researcher` et `forever-sim-runner` ; hooks `SessionStart` (ligne de
+  fraîcheur et lancement de la veille) et `Stop` (chiffres de jeu absents des résultats d'outils), logique dans
+  `forever/hooks.py`. Version gardée par `plugin/.claude-plugin/fingerprint.json` ; évaluation sans modèle en CI
+  (`tests/unit/test_plugin_evals.py`).
+
+## Profil, mémoire et poste
+- Profil joueur hors du dépôt (`forever/profile.py`, `FOREVER_PROFILE` ou `~/.forever/profile.json`), importé de
+  ForeverLogger, des journaux, de Questie et d'Auctionator (`forever/profile_import.py`) ; chaque champ garde sa
+  source et sa date. Les outils de calcul ne le lisent jamais d'eux-mêmes : l'agent le lit et passe les valeurs.
+- Installations du client (`forever/installs.py`, `forever wow list | adopt | forget`), contrôle du poste sans réseau
+  (`forever doctor`), sauvegarde de ce qui n'est pas sur GitHub (`forever backup`).
+
+## Vérification
+`uv run tasks.py quick` pendant le travail, `uv run tasks.py verify` avant chaque poussée (lint, typage, suite
+complète, registre, chiffres, origines, intégrité), `uv run tasks.py e2e` pour le bout en bout de `forever update`
+(CI simulée du clone comprise) ; la CI sous Ubuntu et Windows juge. Le clone de la veille lance `verify --data` sur
+les seuls moteurs aux entrées changées (décision 206).
