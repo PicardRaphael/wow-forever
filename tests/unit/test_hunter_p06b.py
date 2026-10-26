@@ -193,18 +193,10 @@ def test_hunter_leveling_gives_zones_dungeon_and_popular_build(hunter_bench):
     assert [c.tool for c in plan.calls] == ["forever_lookup", "forever_lookup", "forever_sim_leveling"]
     assert [c.args["kind"] for c in plan.calls] == ["zones", "tf_popular", "objectives"]
     text = plan_text(plan)
-    assert "pas encore calculé" in text and "donjon" in text
+    assert "n'est pas calculé" in text and "donjon" in text
     zones, popular, _objectives = run_calls(deps, plan)
     assert zones["zones"] and zones["provenance"]
     assert popular.get("closest") or popular.get("builds")
-
-
-def test_mage_leveling_adds_the_computed_talent_and_xp_per_hour(hunter_bench):
-    _, data = hunter_bench
-    plan = button_plan("leveling", resolve(data, context("mage19")), data.level_cap)
-    tools = [c.tool for c in plan.calls]
-    assert tools == ["forever_lookup", "forever_build", "forever_sim_leveling"]
-    assert "XP par heure" in plan_text(plan)
 
 
 def test_hunter_pets_and_talents_buttons_on_the_real_context(hunter_bench):

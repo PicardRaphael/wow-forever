@@ -49,9 +49,8 @@ DATA_TESTS = (
 # Modules d'entrée de chaque moteur déclaré dans `forever/engine_inputs.py` (ENGINES) : ses tests sont ceux qui
 # importent directement l'un de ces modules (ou un sous-module).
 ENGINE_MODULES: dict[str, tuple[str, ...]] = {
-    "mage_build": ("forever.build", "forever.optimize"),
     "mage_leveling": ("forever.leveling", "forever.sim", "forever.engine.leveling"),
-    "pvp_dr": ("forever.pvp", "forever.engine.pvp", "forever.engine.diminishing"),
+    "pvp_dr": ("forever.pvp", "forever.engine.diminishing"),
 }
 
 _MODULE_STRING = re.compile(r"^forever(\.\w+)+$")

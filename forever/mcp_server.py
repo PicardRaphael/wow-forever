@@ -1,5 +1,5 @@
-"""Serveur MCP : outils `forever_status`, `forever_lookup`, `forever_explain_mechanic`, `forever_sim_leveling` et
-`forever_build` (même cœur que la CLI).
+"""Serveur MCP : outils `forever_status`, `forever_lookup`, `forever_explain_mechanic`, `forever_sim_leveling`,
+`forever_player_profile`, `forever_route`, `forever_gear` et `forever_simulate` (même cœur que la CLI).
 
 Une erreur métier est renvoyée comme résultat d'outil (`is_error`, `structured_content` avec l'erreur et la
 provenance) : une exception brute ne montrerait au modèle qu'un message générique."""
@@ -13,7 +13,6 @@ from mcp.server.mcpserver import MCPServer
 from mcp.types import CallToolResult, TextContent
 
 from forever import __version__
-from forever.build import build_report
 from forever.config import Deps
 from forever.errors import ForeverError, InvalidArgumentError, UnsupportedKindError
 from forever.explain import MechanicExplanation, explain_mechanic
@@ -24,7 +23,6 @@ from forever.profile import ProfileView, normalize_class, read_profile
 from forever.provenance import error_payload
 from forever.pvp import compact, pvp_report
 from forever.status import status_report
-from forever.talents_forever import BuildWithExport, attach_export
 
 INSTRUCTIONS = (
     "Données de World of Warcraft: Forever, versionnées par version du jeu. Chaque résultat porte un bloc "
@@ -597,59 +595,5 @@ def build_server(deps: Deps) -> MCPServer:
             return route_summary(plan)
         except ForeverError as err:
             return cast("dict[str, Any]", _error_result(deps, err))
-
-    @server.tool()
-    def forever_build(
-        context: str,
-        level: int | None = None,
-        race: str | None = None,
-        current: dict[str, int] | None = None,
-        respecs: int = 0,
-        sp: float | None = None,
-        crit: float | None = None,
-        preset: str = "rapide",
-        seed: int = 12345,
-        rules: str = "forever",
-        sensitivity: bool = True,
-        talented_bonus: int = 0,
-    ) -> BuildWithExport:
-        """Build du Mage par contexte (leveling, dungeon, raid, pvp-bg, pvp-world) à un niveau : talents et ordre
-        d'apprentissage, choix du build (rotation, armure, cumuls d'Arcane Blast et de Hot Streak), raison de chaque
-        talent (valeur marginale), alternative la plus proche avec écart apparié et intervalle de confiance
-        (`alternative.tie` vrai : égalité statistique, présenter les deux options ; `alternative.export` : son lien
-        Talents Forever, sans ordre), stabilité
-        sur plusieurs graines, sensibilité aux sept hypothèses incertaines, respec (coût, gain, niveau conseillé),
-        angles morts (borne haute ou non chiffré), certitude, hypothèses et provenance. Donjon et raid : scénarios
-        provisoires. Au-delà du plafond de la bêta, le build n'est pas vérifiable en jeu avant la sortie.
-
-        `level` absent : niveau maximal des données (question générale sans niveau, `inputs.level.origin` vaut
-        `default`). `current` : build actuel {clé: rang} (conseil de respec ; à un niveau plus bas que `level`, le
-        bloc `respec.projected` donne le chemin conseillé depuis ce build jusqu'à `level`) ; `respecs` : réinitialisations déjà faites ;
-        `sp`, `crit` : fiche remplacée (puissance des sorts, critique en fraction) ; `preset` : rapide (défaut, le même que la CLI) ou
-        complet ; `rules` : forever, ou seed (leveling seulement, parité) ; `talented_bonus` : points du bonus Legacy
-        « Talented » (hypothèse).
-
-        FA1 : bloc `export.talents_forever` : code et lien Talents Forever du build (ordre compris en leveling), commande
-        `/tf import <code>` à relayer telle quelle, build populaire le plus proche ; statut `absent`, `bloque`,
-        `format_non_pris_en_charge` ou `ordre_incoherent` avec sa raison, jamais un code deviné."""
-        try:
-            report = build_report(
-                deps,
-                context,
-                level,
-                race=race,
-                current=current,
-                respecs=respecs,
-                sp=sp,
-                crit=crit,
-                preset=preset,
-                seed=seed,
-                rules=rules,
-                sensitivity=sensitivity,
-                talented_bonus=talented_bonus,
-            )
-            return attach_export(deps, report, talented_bonus)
-        except ForeverError as err:
-            return cast(BuildWithExport, _error_result(deps, err))
 
     return server

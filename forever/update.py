@@ -3,7 +3,7 @@
 Un passage enchaîne, sans calcul de combat, des fonctions existantes : archivage des fichiers du client, clone dédié
 (`<cache>/update/repo`), version du jeu (build du client publié sur wago.tools), nouvelle version ou correctifs du
 serveur (téléchargement, décodage, `verify`, installation dans une copie de préparation, report des valeurs faites à
-la main, preuve d'entrées par moteur ; rejeu ciblé après l'installation), journaux de combat de la version installée, addons de données.
+la main, preuve d'entrées par moteur), journaux de combat de la version installée, addons de données.
 
 Règle d'automatisme (`decide`, décision 295, qui remplace 180, 198, 207 et 230) : la veille écrit d'elle-même, sauf
 quand l'installation casserait l'intégrité (`verify` rouge, écart de fusion que la décision 296 ne tranche pas) ou perdrait une valeur faite à la
@@ -54,12 +54,9 @@ from forever.engine_inputs import (
     EngineDeclarationError,
     InputsDiff,
     ValueChange,
-    cases_to_replay,
     compare_inputs,
     hotfix_losses,
     metadata_keys,
-    monster_contexts,
-    targeted_replay,
 )
 from forever.errors import (
     EXIT_OK,
@@ -71,7 +68,6 @@ from forever.errors import (
     PathNotFoundError,
 )
 from forever.pipeline.tables import ColumnNamesError
-from forever.store import current_identity
 from forever.timefmt import format_utc, parse_utc
 from forever.update_installed import save_installed, undone
 
@@ -117,7 +113,7 @@ STEP_LIMITS_S: dict[str, float] = {
     "clone": 75 * 60,
     "jeu": 10 * 60,
     "nouvelle_version": 150 * 60,
-    "correctifs": 120 * 60,  # décision 295 : écriture (CI jusqu'à 60 min) puis rejeu des builds (environ 15 min)
+    "correctifs": 120 * 60,  # décision 295 : écriture (CI jusqu'à 60 min)
     "journaux": 120 * 60,
     "addons": 120 * 60,  # Questie relu : mesure, écriture et CI comme l'étape des journaux
     "guides": 15 * 60,
@@ -140,36 +136,6 @@ BLOCKED_BY = (
 AUTO_COMMAND = "forever update --auto"
 CARRY_FR = ("gardé", "réappliqué", "remplacé", "perdu")
 
-Replay = Callable[[str, str, Path], Any]
-
-
-class SameDataReplayError(ForeverError):
-    """Rejeu dont « avant » et « après » désignent les mêmes données (même version, même empreinte) : la comparaison
-    ne prouverait rien (défaut relevé à l'installation de 1.60.1.70291, 2026-10-09)."""
-
-    def __init__(self, label: str) -> None:
-        super().__init__(
-            "same_data_replay",
-            f"Rejeu refusé : « avant » et « après » désignent les mêmes données ({label}).",
-            "rejouer « après » sur la version candidate installée dans la copie de préparation",
-        )
-
-
-def replay_label(data_dir: Path) -> str:
-    """Étiquette du cache des rejeux (`<cache>/builds/`) : version et empreinte réelle des données rejouées, jamais
-    l'emplacement du dossier (« avant » et « après » se déduisaient du chemin, 2026-10-09)."""
-    identity = current_identity(data_dir)
-    return f"update-{identity.game_version}-{identity.data_sha}"
-
-
-def check_replay_sides(before: Path, after: Path) -> None:
-    """Refuse un rejeu dont les deux côtés portent la même version et la même empreinte de données."""
-    a, b = current_identity(before), current_identity(after)
-    if (a.game_version, a.data_sha) == (b.game_version, b.data_sha):
-        raise SameDataReplayError(f"{a.game_version}, données {a.data_sha}")
-
-
-"""(moteur, cas, dossier des données) -> résultat du cas ; appelé avant puis après, pour les seuls moteurs touchés."""
 Measure = Callable[[Deps, Path, Sequence[Path]], Mapping[str, Any]]
 """(deps, dossier des données, journaux) -> {"changed": [{"file", "pointer"}…], "details", "hp_by_level",
 "preview"} ; simulation : rien n'est écrit dans les données (`preview` : copie des données où la mesure est écrite,
@@ -449,15 +415,13 @@ def note_detail(cache_dir: Path, detail: str, at: str) -> None:
 
 
 def activity_of(detail: str | None) -> str | None:
-    """Activité réelle lue dans la dernière ligne du journal : « attente de la CI », « rejeu des builds »…"""
+    """Activité réelle lue dans la dernière ligne du journal : « attente de la CI », « contrôle (verify) »…"""
     text = (detail or "").strip()
     low = text.lower()
     if not text:
         return None
     if "ci attendue" in low:
         return "attente de la CI"
-    if low.startswith("rejeu"):
-        return "rejeu des builds"
     if "verify" in low:
         return "contrôle (verify)"
     if "uv sync" in low:
@@ -477,7 +441,6 @@ class _Run:
     deps: Deps
     options: UpdateOptions
     runner: Runner | None
-    replay: Replay | None
     measure: Measure | None
     base_data: Path
     clone: Path | None = None
@@ -1041,15 +1004,11 @@ def _evaluate(
             ],
             "lost_count": len(losses),
         },
-        "replay": {},
         "refused": (plan or {}).get("refused", []) if plan else [],
     }
     run.verdicts.append(doc)
     if action == "écrire":
-        changed = any(not d.identical for d in inputs.values())
         if run.options.dry_run:
-            if changed:  # simulation : le rejeu qui suivrait l'installation, sur la préparation
-                doc["replay"] = _replay_after_install(run, doc, inputs, run.base_data, stage, version)
             return Step(step, "fait", f"{version} r{revision} : écriture simulée (règle tenue)", {"id": pending_id})
         if not run.writable:
             return Step(step, "arrêt", f"{version} r{revision} : règle tenue, mais clone non disponible", {})
@@ -1058,18 +1017,9 @@ def _evaluate(
             run.pending.append(blocked)
             why = "; ".join(blocked.get("reasons", []))
             return Step(step, "arrêt", f"{version} r{revision} : déjà bloquée sur ce main ({why})", {"id": pending_id})
-        before = update_dir(run.deps.cache_dir) / f"before-{version}"  # « avant » du rejeu, que `_publish` remplace
-        if changed and run.replay is not None:
-            _copy_data(run.base_data, before)
-        try:
-            written = _publish(
-                run, step=step, version=version, revision=revision, stage=stage, plan=plan, verdict=doc, lines=lines
-            )
-            if written.status == "fait" and changed and run.replay is not None:
-                doc["replay"] = _replay_after_install(run, doc, inputs, before, stage, version)
-        finally:
-            shutil.rmtree(before, ignore_errors=True)
-        return written
+        return _publish(
+            run, step=step, version=version, revision=revision, stage=stage, plan=plan, verdict=doc, lines=lines
+        )
     entry = {
         **{k: doc[k] for k in ("id", "kind", "version", "revision", "action", "clauses", "reasons")},
         "summary": summary,
@@ -1176,43 +1126,6 @@ def _entity_names(vdir: Path) -> dict[str, str]:
     if isinstance(spells, dict):
         names |= {k: str(v.get("name") or k) for k, v in spells.get("spells", {}).items() if isinstance(v, dict)}
     return names
-
-
-def _talent_names_of(run: _Run, data_dir: Path) -> dict[str, str]:
-    """Clé de talent → nom en jeu, lus dans les données `data_dir` (vide si illisibles)."""
-    try:
-        from forever.gamedata import build_game_data
-        from forever.store import load_version
-
-        gd = build_game_data(load_version(run.deps_on(data_dir)))
-    except Exception:  # noqa: BLE001 : les noms ne sont qu'un habillage, la clé reste lisible
-        return {}
-    return {k: t.name for k, t in gd.talents.items()}
-
-
-def _replay_after_install(
-    run: _Run, doc: dict[str, Any], inputs: Mapping[str, InputsDiff], before: Path, after: Path, version: str
-) -> dict[str, Any]:
-    """Rejeu ciblé fait **après** l'installation (décision 295) : il ne décide plus rien, il dit ce qui a changé en
-    mots de joueur. La fiche de l'installation (`installed/<id>.json`) reçoit les phrases ; un rejeu en échec le
-    dit sans rien défaire."""
-    from forever.update_installed import advice_changes, update_installed
-
-    try:
-        check_replay_sides(before, after)
-        replayed = _replay_sides(run, inputs, before, after, version)
-        changes = advice_changes(replayed, _talent_names_of(run, after))
-        state = "fait" if changes else "aucun changement"
-    except SameDataReplayError as exc:
-        replayed, changes, state = {"rejoué": False, "raison": exc.message}, [], f"non fait : {exc.message}"
-    except Exception as exc:  # noqa: BLE001 : l'installation est faite, un rejeu en échec ne la défait pas
-        why = f"{type(exc).__name__}: {exc}"
-        replayed, changes, state = {"rejoué": False, "raison": why}, [], f"non fait : {why}"
-    if not run.options.dry_run:
-        with contextlib.suppress(InvalidArgumentError):
-            update_installed(run.deps.cache_dir, str(doc["id"]), changes=changes, replay=state)
-    doc["changes"] = changes
-    return replayed if isinstance(replayed, dict) else {"rejoué": True, "cas": replayed}
 
 
 def _step_new_version(run: _Run, target: str | None) -> Step:
@@ -1561,70 +1474,12 @@ def _engine_files() -> set[str]:
     return files
 
 
-class _ProductionReplay:
-    """Rejeu ciblé de production (décision 230) : les cas des builds du Mage passent par `forever/replay.py` (cache
-    `<cache>/builds/update-<version>-<empreinte>/`, `replay_label`, par code du calcul ; cas répartis sur les cœurs par
-    `prefetch`) ; les autres cas (simulation de leveling, fiche PvP) ne sont pas rejoués automatiquement et le disent.
-    `listing` (simulation) : les cas sont nommés sans être calculés."""
-
-    def __init__(self, deps: Deps, listing: bool) -> None:
-        self.deps, self.listing = deps, listing
-        self.log: Progress | None = None
-
-    def prefetch(self, jobs: Sequence[tuple[str, str, Path]]) -> int:
-        """Calcule d'un coup (en parallèle) les cas des builds du Mage de `jobs` (moteur, cas, données) absents du
-        cache ; rend le nombre de cas demandés."""
-        if self.listing:
-            return 0
-        from forever.replay import replay_cases
-
-        cases = [(case, data_dir) for engine, case, data_dir in jobs if engine == "mage_build"]
-        if cases:
-            replay_cases(cases, self.deps.cache_dir, log=self.log)
-        return len(cases)
-
-    def __call__(self, engine: str, case: str, data_dir: Path) -> Any:
-        if self.listing:
-            return {"rejoué": False, "raison": "simulation : cas à rejouer, non calculé"}
-        if engine != "mage_build":
-            return {"rejoué": False, "raison": "cas sans rejeu automatique (builds du Mage seulement)"}
-        from forever.replay import replay_cases
-
-        return replay_cases([(case, data_dir)], self.deps.cache_dir, log=self.log)[case, data_dir]["advice"]
-
-
-def _default_replay(deps: Deps, *, listing: bool = False) -> _ProductionReplay:
-    return _ProductionReplay(deps, listing)
-
-
-def _replay_sides(run: _Run, inputs: Mapping[str, InputsDiff], before: Path, after: Path, version: str) -> Any:
-    """Rejeu des cas touchés, « avant » sur `before` et « après » sur `after` (dossiers des données) : seulement les
-    cas concernés par ce qui change (`monster_contexts` des deux côtés), calculés d'un coup en parallèle quand le
-    rejeu le permet (`prefetch`), durée notée au journal du passage (décision 230)."""
-    replay = run.replay
-    assert replay is not None
-    installed = _installed(before) or version
-    scope = monster_contexts(before / installed) | monster_contexts(after / version)
-    cases = cases_to_replay(inputs, monster_scope=scope)
-    start = time.monotonic()
-    prefetch = getattr(replay, "prefetch", None)
-    if callable(prefetch):
-        if hasattr(replay, "log"):
-            replay.log = run.say
-        prefetch([(e, c, side) for e, c in cases for side in (before, after)])
-    out = targeted_replay(
-        inputs, lambda e, c: {"avant": replay(e, c, before), "après": replay(e, c, after)}, monster_scope=scope
-    )
-    run.say(f"rejeu : {len(cases)} cas comparés en {time.monotonic() - start:.0f} s")
-    return out
-
-
 def _default_measure(deps: Deps, data_dir: Path, logs: Sequence[Path]) -> Mapping[str, Any]:
     """`forever measures refresh --dry-run` sur les données de base : un changement de la table des monstres est
     une entrée des moteurs du Mage (`monsters.json`)."""
     from forever.cli import main
 
-    # Décision 227 : la mesure est écrite dans une copie des données (côté « après » du rejeu), jamais dans les
+    # Décision 227 : la mesure est écrite dans une copie des données, jamais dans les
     # données de base ni dans l'instantané du cache.
     preview = update_dir(deps.cache_dir) / "measures-preview"
     _copy_data(data_dir, preview)
@@ -1742,8 +1597,7 @@ def _step_logs(run: _Run, *, trigger: str | None = None) -> Step:
     lines = [f"{n}:{shas[n]}" for n in sorted(keep)] + ([f"addon:{trigger}"] if trigger else [])
     digest = hashlib.sha256("\n".join(lines).encode("utf-8")).hexdigest()[:12]
     pending_id = f"measures-{installed}-{digest}"
-    rebuilt = _measure_builds(run, pending_id, installed, result)
-    summary = measure_summary(result.get("details") or {}, result.get("hp_by_level") or {}, rebuilt)
+    summary = measure_summary(result.get("details") or {}, result.get("hp_by_level") or {})
     if undone(run.deps.cache_dir, pending_id) is not None:
         return Step("journaux", "rien", f"mesure {pending_id} annulée par toi : pas réécrite", data)
     entry: dict[str, Any] = {
@@ -1752,9 +1606,9 @@ def _step_logs(run: _Run, *, trigger: str | None = None) -> Step:
         "action": "écrire",
         "version": installed,
         "revision": None,
-        "clauses": {"inputs": False, "advice": _no_advice_change(rebuilt)},
+        "clauses": {"inputs": False},
         "reasons": [],
-        "notes": [f"mesure des journaux qui change une entrée des moteurs : {touched}", _advice_reason(rebuilt)],
+        "notes": [f"mesure des journaux qui change une entrée des moteurs : {touched}"],
         "summary": summary,
         "logs": keep,
         "log_shas": {n: shas[n] for n in keep},
@@ -1768,22 +1622,6 @@ def _step_logs(run: _Run, *, trigger: str | None = None) -> Step:
     if held_note:
         written = written._replace(detail=written.detail + held_note)
     return written._replace(data={**data, **written.data})
-
-
-def _no_advice_change(builds: Mapping[str, Any]) -> bool:
-    """Vrai si le rejeu a comparé les cas des builds du Mage et qu'aucun conseil ne change (décision 230) ; les cas de
-    la simulation du leveling (`mage_leveling`) n'ont pas de rejeu automatique et ne comptent pas."""
-    skipped_build = any(s.get("engine") == "mage_build" for s in builds.get("not_replayed") or [])
-    return bool(builds.get("replayed")) and not builds.get("changed") and not skipped_build
-
-
-def _advice_reason(builds: Mapping[str, Any]) -> str:
-    if not builds.get("replayed"):
-        return f"rejeu non fait ({builds.get('reason')}) : aucun conseil n'a pu être comparé"
-    changed = [f"{c['engine']} {c['case']}" for c in builds.get("changed") or []]
-    if changed:
-        return f"conseil changé après rejeu : {', '.join(changed)}"
-    return "aucun conseil ne change après rejeu"
 
 
 def _replace_measures(run: _Run, installed: str, pending_id: str) -> None:
@@ -1838,18 +1676,12 @@ def _measure_revision(data: Path, version: str, logs: Mapping[str, str], *, date
 
 
 def _measure_report(verdict: Mapping[str, Any]) -> str:
-    builds = ((verdict.get("summary") or {}).get("measures") or {}).get("builds") or {}
     lines = [
         f"# Mesure des journaux : {verdict['version']} r{verdict['revision']}",
         "",
         summary_text(verdict.get("summary")) + ".",
         "",
         f"Journaux mesurés : {', '.join(verdict.get('logs') or [])}.",
-        "",
-        (
-            f"Rejeu : {builds.get('unchanged', 0)} cas inchangé(s), {len(builds.get('changed') or [])} changé(s) ; "
-            f"{_advice_reason(builds)}."
-        ),
         "",
         "Règle d'automatisme : tenue (décision 295 : installée d'elle-même, annulable).",
         "",
@@ -1896,66 +1728,12 @@ def _write_measure(run: _Run, entry: Mapping[str, Any], result: Mapping[str, Any
 
 
 def _rule(doc: Mapping[str, Any]) -> str:
-    return "règle tenue" if doc.get("clauses", {}).get("advice") else "conseil changé, règle tenue (décision 295)"
+    return "règle tenue"
 
 
-def _measure_builds(run: _Run, pending_id: str, installed: str, result: Mapping[str, Any]) -> dict[str, Any]:
-    """Cas des moteurs qui changeraient après rejeu d'une mesure (décision 227) : « avant » sur les données de base,
-    « après » sur la copie où la mesure est écrite (`preview`). Fait une fois par attente : un rejeu déjà fait pour
-    la même attente sur la même base est repris (plusieurs minutes par cas du build du Mage)."""
-    base = replay_label(run.base_data)
-    old = _read(_pending_path(run.deps.cache_dir, pending_id))
-    kept = ((old.get("summary") or {}).get("measures") or {}).get("builds") if isinstance(old, dict) else None
-    if isinstance(kept, dict) and kept.get("replayed") and kept.get("base") == base:
-        return kept
-    preview = result.get("preview")
-    if preview is None or run.replay is None:
-        return {"replayed": False, "base": base, "reason": "aperçu des données mesurées absent : rejeu non fait"}
-    after = Path(preview)
-    try:
-        check_replay_sides(run.base_data, after)
-        inputs = compare_inputs(run.base_data / installed, after / installed)
-        replayed = _replay_sides(run, inputs, run.base_data, after, installed)
-    except SameDataReplayError as exc:
-        return {"replayed": False, "base": base, "reason": exc.message}
-    except Exception as exc:  # noqa: BLE001 : un rejeu en échec ne doit pas perdre l'attente de mesure
-        return {"replayed": False, "base": base, "reason": f"rejeu en échec : {type(exc).__name__}: {exc}"}
-    changed: list[dict[str, str]] = []
-    after_advice: dict[str, Any] = {}
-    skipped: list[dict[str, Any]] = []
-    unchanged = 0
-    for engine, cases in replayed.items():
-        for case, sides in cases.items():
-            not_run = next(
-                (s for s in (sides["avant"], sides["après"]) if isinstance(s, Mapping) and s.get("rejoué") is False),
-                None,
-            )
-            if not_run is not None:
-                skipped.append({"engine": engine, "case": case, "reason": not_run.get("raison")})
-            elif sides["avant"] != sides["après"]:
-                changed.append({"engine": engine, "case": case})
-                after_advice[f"{engine}:{case}"] = _plain(sides["après"])
-            else:
-                unchanged += 1
-    if not changed and not unchanged:  # aucun cas comparé (simulation, moteurs sans rejeu automatique)
-        reason = str(skipped[0]["reason"]) if skipped else "aucun cas à rejouer"
-        return {"replayed": False, "base": base, "reason": reason, "not_replayed": skipped}
-    return {
-        "replayed": True,
-        "base": base,
-        "changed": changed,
-        "after": after_advice,  # conseil après de chaque cas changé : approbation reprise (décision 230)
-        "unchanged": unchanged,
-        "not_replayed": skipped,
-    }
-
-
-def measure_summary(
-    details: Mapping[str, Any], hp_by_level: Mapping[str, Any], builds: Mapping[str, Any]
-) -> dict[str, Any]:
+def measure_summary(details: Mapping[str, Any], hp_by_level: Mapping[str, Any]) -> dict[str, Any]:
     """Résumé d'une attente de mesure (décision 227), au format de `summary_text` (phrase par moteur) : PNJ ajoutés,
-    changés, retirés et écartés de la courbe (avec la raison), niveaux dont les PV changent, cas des builds qui
-    changeraient après rejeu."""
+    changés, retirés et écartés de la courbe (avec la raison), niveaux dont les PV changent."""
     npcs = {k: list(details.get(k) or []) for k in ("added", "changed", "removed", "excluded")}
     counts = ", ".join(
         f"{len(npcs[key])} {label}"
@@ -1965,16 +1743,11 @@ def measure_summary(
     parts = [f"PNJ : {counts}, {fresh} nouvellement écarté(s) ({len(npcs['excluded'])} écarté(s) en tout)"]
     if hp_by_level:
         parts.append(f"PV par niveau : {len(hp_by_level)} niveau(x)")
-    if builds.get("replayed"):
-        parts.append(f"builds : {len(builds.get('changed') or [])} cas changerai(en)t après rejeu")
-    else:
-        parts.append(f"builds : non rejoués ({builds.get('reason')})")
     return {
         "measures": {
             "sentence": " ; ".join(parts),
             "npcs": npcs,
             "hp_by_level": dict(hp_by_level),
-            "builds": dict(builds),
         }
     }
 
@@ -2029,19 +1802,6 @@ def measure_summary_lines(summary: Mapping[str, Any] | None) -> list[str]:
             for lv, v in sorted(levels.items(), key=lambda kv: int(kv[0]))
         ]
         lines.append(f"PV par niveau : {_listed(shown)}")
-    builds = doc.get("builds") or {}
-    if builds.get("replayed"):
-        changed = [f"{c['engine']} {c['case']}" for c in builds.get("changed") or []]
-        tail = f" ({builds.get('unchanged', 0)} inchangé(s))"
-        if changed:
-            lines.append(f"builds qui changeraient après rejeu : {', '.join(changed)}{tail}")
-        else:
-            lines.append(f"builds : aucun ne changerait après rejeu{tail}")
-        skipped = [f"{s['engine']} {s['case']} ({s.get('reason')})" for s in builds.get("not_replayed") or []]
-        if skipped:
-            lines.append(f"non rejoué(s) : {', '.join(skipped)}")
-    elif builds:
-        lines.append(f"builds : non rejoués ({builds.get('reason')})")
     return lines
 
 
@@ -2358,8 +2118,7 @@ def _publish(
 
 
 def _record_installed(run: _Run, verdict: Mapping[str, Any], info: Mapping[str, Any], *, base: str | None) -> None:
-    """Fiche de l'historique des installations (décision 295) : écrite à la fusion, avant le rejeu (un arrêt pendant
-    le rejeu laisse la fiche et sa carte) ; `changes` arrive après le rejeu."""
+    """Fiche de l'historique des installations (décision 295) : écrite à la fusion (carte « Mis à jour »)."""
     measures = (verdict.get("summary") or {}).get("measures") if verdict.get("kind") == "measures" else None
     save_installed(
         run.deps.cache_dir,
@@ -2376,8 +2135,6 @@ def _record_installed(run: _Run, verdict: Mapping[str, Any], info: Mapping[str, 
             "summary": summary_text(verdict.get("summary")),
             "measures": measure_summary_lines(verdict.get("summary")) if measures else [],
             "notes": list(verdict.get("notes") or []),
-            "changes": [],
-            "replay": "en cours" if any(not d["identical"] for d in verdict["inputs"].values()) else "sans objet",
             "state": "installée",
             "by": AUTO_COMMAND if run.options.auto else "forever update",
             "undo": f"forever update undo {verdict['id']}",
@@ -2539,7 +2296,6 @@ def run_update(
     options: UpdateOptions,
     *,
     runner: Runner | None = None,
-    replay: Replay | None = None,
     measure: Measure | None = None,
     progress: Progress | None = None,
     max_seconds: float | None = None,
@@ -2552,7 +2308,7 @@ def run_update(
 
     started = format_utc(deps.now())
     command = AUTO_COMMAND if options.auto else "forever update"
-    run = _Run(deps, options, runner, replay or _default_replay(deps, listing=options.dry_run), measure, deps.data_dir)
+    run = _Run(deps, options, runner, measure, deps.data_dir)
     run.progress = progress
     lock = acquire_lock(deps, command)
     steps: list[Step] = []

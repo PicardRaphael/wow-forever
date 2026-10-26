@@ -225,7 +225,8 @@ def test_agent_error_is_published(tmp_path):
     assert any(e["event"] == "error" for e in events(tmp_path))
 
 
-def test_talents_notice_for_other_classes_only(tmp_path):
+def test_talents_notice_for_every_class(tmp_path):
+    """RB1 (décision 299) : plus aucun build calculé, la mention vaut aussi pour le Mage."""
     hunter = Record("6ac884ce31ab", 7, frozenset({"b=talents"}), {"class": "HUNTER"}, "Q ?", slot=1)
     bridge, addons, _ = make(tmp_path, FakeCapture(band_of(hunter)), FakeAgent())
     bridge.step()
@@ -235,7 +236,7 @@ def test_talents_notice_for_other_classes_only(tmp_path):
     bridge.step()
     replies = slot_table(addons, 2).replies
     last = next(replies[i] for i in range(1, len(replies) + 1) if replies[i].id == 8)
-    assert TALENTS_NOTICE not in last.text
+    assert TALENTS_NOTICE in last.text
 
 
 def test_periodic_refresh_rewrites_status_and_the_whole_reserve(tmp_path):

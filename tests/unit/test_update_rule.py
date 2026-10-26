@@ -63,12 +63,12 @@ def loss():
     [
         (True, True, carry(), inputs(), (), "écrire", set()),
         (True, True, carry(reapplied=1), inputs(), (), "écrire", set()),
-        (True, True, carry(), inputs("mage_build"), (), "écrire", {"inputs"}),
+        (True, True, carry(), inputs("mage_leveling"), (), "écrire", {"inputs"}),
         (True, True, carry(superseded=1), inputs(), (), "écrire", {"manual"}),
         (True, True, carry(superseded=1), inputs("pvp_dr"), (), "écrire", {"manual", "inputs"}),
         (True, True, carry(lost=1), inputs(), (), "bloqué", {"manual"}),
         (False, True, carry(), inputs(), (), "bloqué", {"verify"}),
-        (False, True, carry(superseded=1), inputs("mage_build"), (), "bloqué", {"verify", "manual", "inputs"}),
+        (False, True, carry(superseded=1), inputs("mage_leveling"), (), "bloqué", {"verify", "manual", "inputs"}),
         (True, False, carry(), inputs(), (), "bloqué", {"install"}),
         # moteur qui recopie : toute origine s'écrit (décision 295), l'origine reste notée
         (True, True, carry(), copied(change("client", "client")), (), "écrire", set()),
@@ -77,7 +77,7 @@ def loss():
         (True, True, carry(), copied(change("client", None, before=ABSENT)), (), "écrire", {"inputs"}),
         (True, True, carry(), copied(change("manuel", "client")), (), "écrire", {"inputs"}),
         (True, True, carry(), inputs("pvp_dr"), (), "écrire", {"inputs"}),  # sans le détail des feuilles
-        (True, True, carry(), copied(change("client", "client"), engine="mage_build"), (), "écrire", {"inputs"}),
+        (True, True, carry(), copied(change("client", "client"), engine="mage_leveling"), (), "écrire", {"inputs"}),
         # perte d'un correctif du serveur : bloqué et dit (décision 295, choix de l'utilisateur du 2026-10-22)
         (True, True, carry(), inputs(), (loss(),), "bloqué", {"hotfixes"}),
         (True, True, carry(), copied(change("client", "client")), (loss(),), "bloqué", {"hotfixes"}),
@@ -96,7 +96,7 @@ def test_rule_table(verify_ok, install_ok, report, diffs, losses, action, failed
 def test_no_verdict_waits_anymore():
     """Décision 295 : aucune combinaison de clauses ne rend plus `attente`."""
     for report in (carry(), carry(superseded=1), carry(lost=1)):
-        for diffs in (inputs(), inputs("mage_build"), copied(change("manuel", "client"))):
+        for diffs in (inputs(), inputs("mage_leveling"), copied(change("manuel", "client"))):
             for losses in ((), (loss(),)):
                 verdict = decide(True, report, diffs, "install_version", hotfix_losses=losses)
                 assert verdict.action in ("écrire", "bloqué")
@@ -120,10 +120,10 @@ def test_a_manual_input_is_named_with_its_pointer():
 
 
 def test_a_computing_engine_is_named_and_a_copying_one_is_not():
-    verdict = decide(True, carry(), copied(change("client", "client"), others=("mage_build",)), "install_version")
+    verdict = decide(True, carry(), copied(change("client", "client"), others=("mage_leveling",)), "install_version")
     text = " ".join(verdict.notes)
     assert verdict.action == "écrire"
-    assert "moteurs aux entrées changées : mage_build" in text and "pvp_dr" not in text
+    assert "moteurs aux entrées changées : mage_leveling" in text and "pvp_dr" not in text
 
 
 def test_a_lost_hotfix_is_named():
@@ -141,10 +141,10 @@ def test_an_undeclared_engine_is_refused():
 
 
 def test_notes_name_the_engines_and_the_values():
-    verdict = decide(True, carry(superseded=1), inputs("mage_build", "mage_leveling"), "install_revision")
+    verdict = decide(True, carry(superseded=1), inputs("mage_leveling"), "install_revision")
     assert verdict.action == "écrire"
     text = " ".join(verdict.notes)
-    assert "mage_build" in text and "mage_leveling" in text and "pvp_dr" not in text
+    assert "mage_leveling" in text and "pvp_dr" not in text
     assert "pet_rules.json" in text and "/official_fixes" in text
 
 

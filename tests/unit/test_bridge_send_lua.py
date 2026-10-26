@@ -14,7 +14,9 @@ from forever.bridge.slots import status_lua
 
 pytest.importorskip("lupa")
 
-MAGE_TALENTS = "Quel est mon prochain talent, avec le lien Talents Forever ?"
+MAGE_TALENTS = (  # RB1 (décision 299) : la même question pour toutes les classes
+    "Quel build populaire de Talents Forever est le plus proche de mes talents actuels ? Donne son lien Talents Forever."
+)
 
 
 def with_buttons(game):

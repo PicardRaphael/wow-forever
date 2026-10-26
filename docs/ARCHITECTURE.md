@@ -160,14 +160,13 @@ agrégats.
   brut du moteur, après contrôle d'intégrité). Aucun chiffre de jeu dans le code. Le moteur du Mage est **gelé à la
   révision 7 de 1.60.1.70450** (décisions 293 et 294) : plus aucune mécanique ajoutée, recoupé par les journaux de
   combat ; chaque réponse qui l'utilise le dit (`MAGE_ENGINE_FROZEN` de `forever/sims/report.py`, repris par
-  `build.py`, `leveling.py`, `gear.py`). Il reste le seul calcul sous le niveau 60 (leveling, builds par contexte,
-  respec, profil PvP analytique).
+  `leveling.py`, `gear.py`). Il reste le seul calcul sous le niveau 60 (temps par monstre, XP par heure, poids de
+  l'équipement) ; la recherche de build (talents, respec, profil PvP analytique) est retirée (RB1, décision 299).
 - **Règles neutres** qui ne recopient aucune mécanique de classe et restent hors du gel : modèle d'XP (`xp.py`),
   trajets et routes (`travel.py`, `route.py`), passages de donjon et butin (`dungeon.py`, `loot.py`), rendements
   décroissants des fiches PvP (`diminishing.py`), poids par différences finies (`weights.py`).
 - **Orchestration** : `forever/sim/` (Monte Carlo et analytique du leveling, scénarios de rencontre, objectifs par
-  zone et donjon, écart avec un build de la communauté) et `forever/optimize/` (recherche des talents, décision
-  appariée, respec, recherche de route portée de Factoruide). Ni formule ni chiffre ici.
+  zone et donjon) et `forever/optimize/` (recherche de route portée de Factoruide). Ni formule ni chiffre ici.
 - **wowsims/forever au niveau 60** (`forever/sims/`, `forever sims update | presets | races`, outil MCP
   `forever_simulate` : préréglages, races par paires, poids par tirages appariés, comparaison de classes) : binaire
   compilé chez nous depuis un commit épinglé, sans aucune modification, lancé en sous-processus local sans réseau,
@@ -293,7 +292,6 @@ Relie la fenêtre de l'addon ForeverBridge à une conversation Claude Code ; for
   | `forever_player_profile` | profil du joueur, en lecture seule |
   | `forever_explain_mechanic` | entrée du registre et paramètres de la version |
   | `forever_sim_leveling` | temps par monstre et XP par heure (moteur du Mage gelé), objectifs par zone et donjon |
-  | `forever_build` | build du Mage par contexte, avec lien Talents Forever |
   | `forever_simulate` | wowsims/forever au niveau 60, toutes classes |
   | `forever_gear` | poids et lignes d'import (moteur du Mage gelé, wowsims/forever au niveau 60), listes BiS et équipement de leveling lus dans les addons |
   | `forever_route` | feuille de route de leveling (quêtes fusionnées, parcours de RestedXP et de Polestar), aperçu et guide RestedXP |

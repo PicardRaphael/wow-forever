@@ -1,23 +1,22 @@
 """Historique des installations de la veille, carte « Mis à jour » et « Annuler » (décision 295).
 
 La veille installe d'elle-même et prévient : une fiche par installation (`<cache>/update/installed/<id>.json`), dite
-en mots de joueur (« build Mage donjon niveau 20 : Frostbite passe de 0 à 3 »), montrée par `forever update status`
+en mots de joueur (résumé des valeurs changées, notes de la règle), montrée par `forever update status`
 et par une carte « Mis à jour » du pont, avec « Annuler » (`forever update undo <id>`, sans jeu ouvert). Aucune
 attente d'accord ne peut plus bloquer une mise à jour : après un passage, les seules entrées ouvertes sont celles qui
 se lèvent seules, celles qui demandent une session (intégrité cassée, pertes) et les rappels de relecture.
 
-Fiches, rejeux et attentes fabriqués ; aucun chiffre du jeu."""
+Fiches et attentes fabriquées ; aucun chiffre du jeu."""
 
 import sys
 from datetime import UTC, datetime
 
-from test_update_chain import Replay, montage  # noqa: F401  (fixture importée)
+from test_update_chain import montage  # noqa: F401  (fixture importée)
 
 from forever.bridge.actions import ActionHandler, parse_action, update_argv
 from forever.bridge.cards import CardSource, installed_cards
 from forever.update import SELF_CLEARING_KINDS, SESSION_KINDS, UpdateOptions, record_pending, run_update
 from forever.update_installed import (
-    advice_changes,
     list_installed,
     notice_lines,
     notices,
@@ -28,57 +27,27 @@ from forever.update_installed import (
 
 NOW = datetime(2026, 10, 22, 12, 0, tzinfo=UTC)
 PYTHON = [sys.executable, "-u", "-m", "forever"]
-NAMES = {"frostbite": "Frostbite", "iceShards": "Ice Shards"}
 
 
 def record(record_id="1.60.1.70450-r11-abcdefabcdef", **extra):
     base = {
         "id": record_id, "kind": "install_revision", "version": "1.60.1.70450", "revision": 11,
         "installed_at": "2026-10-22T06:40:00Z", "sha": "0123456789abcdef", "state": "installée",
-        "summary": "mage_build : classes.json /classes/Mage/spells, 1 autre valeur changée",
-        "notes": ["moteurs aux entrées changées : mage_build"], "changes": [], "replay": "en cours",
+        "summary": "mage_leveling : classes.json /classes/Mage/spells, 1 autre valeur changée",
+        "notes": ["moteurs aux entrées changées : mage_leveling"],
         "undo": f"forever update undo {record_id}",
     }  # fmt: skip
     return {**base, **extra}
 
 
-# --- conseils changés en mots de joueur ---------------------------------------------------------------------------
+# --- ce qui a changé, en mots de joueur ---------------------------------------------------------------------------
 
 
-def test_advice_changes_name_the_build_the_level_and_the_talent():
-    replayed = {
-        "mage_build": {
-            "dungeon-20": {
-                "avant": {"talents": {"frostbite": 0, "iceShards": 5}, "choices": {}},
-                "après": {"talents": {"frostbite": 3, "iceShards": 5}, "choices": {}},
-            },
-            "leveling-30": {"avant": {"talents": {"frostbite": 3}}, "après": {"talents": {"frostbite": 3}}},
-            "raid-60": {"avant": {"rejoué": False, "raison": "x"}, "après": {"rejoué": False, "raison": "x"}},
-        }
-    }
-    assert advice_changes(replayed, NAMES) == ["build Mage donjon niveau 20 : Frostbite passe de 0 à 3"]
-
-
-def test_advice_changes_say_a_rotation_change():
-    replayed = {
-        "mage_build": {
-            "dungeon-40": {
-                "avant": {"talents": {}, "choices": {"dungeon_boss": {"rotation": "frost", "armor": "frost"}}},
-                "après": {"talents": {}, "choices": {"dungeon_boss": {"rotation": "fire", "armor": "frost"}}},
-            }
-        }
-    }
-    assert advice_changes(replayed, NAMES) == ["build Mage donjon niveau 40 : rotation (boss) : frost → fire"]
-
-
-def test_notice_lines_fall_back_on_the_summary_then_add_the_notes():
+def test_notice_lines_give_the_summary_then_the_notes():
     assert notice_lines(record()) == [
-        "conseils en cours de comparaison",
-        "mage_build : classes.json /classes/Mage/spells, 1 autre valeur changée",
-        "moteurs aux entrées changées : mage_build",
+        "mage_leveling : classes.json /classes/Mage/spells, 1 autre valeur changée",
+        "moteurs aux entrées changées : mage_leveling",
     ]
-    lines = notice_lines(record(changes=["build Mage donjon niveau 20 : Frostbite passe de 0 à 3"], replay="fait"))
-    assert lines[0] == "build Mage donjon niveau 20 : Frostbite passe de 0 à 3"
 
 
 # --- historique -------------------------------------------------------------------------------------------------
@@ -99,9 +68,9 @@ def test_history_keeps_every_install_and_an_undone_one_is_known(tmp_path):
 
 
 def test_the_updated_card_says_what_changed_and_offers_undo():
-    (card,) = installed_cards([record(changes=["build Mage donjon niveau 20 : Frostbite passe de 0 à 3"])])
+    (card,) = installed_cards([record()])
     assert card["title"] == "Mis à jour : données 1.60.1.70450 r11"
-    assert "build Mage donjon niveau 20 : Frostbite passe de 0 à 3" in card["lines"]
+    assert "mage_leveling : classes.json /classes/Mage/spells, 1 autre valeur changée" in card["lines"]
     (undo,) = [b for b in card["buttons"] if b.get("key") == "undo"]
     assert undo == {"key": "undo", "label": "Annuler", "action": f"undo:{record()['id']}", "confirm": True}
     assert card["count"] == "info"  # rien n'attend le joueur
@@ -132,12 +101,12 @@ def test_status_lists_what_was_updated_with_the_undo_command(make_deps, capsys):
     from forever.cli import main
 
     deps = make_deps()
-    save_installed(deps.cache_dir, record(changes=["build Mage donjon niveau 20 : Frostbite passe de 0 à 3"]))
+    save_installed(deps.cache_dir, record())
     assert main(["update", "status"], deps) == 0
     out = capsys.readouterr().out
     assert "Mis à jour : données 1.60.1.70450 r11 le 2026-10-22 06:40" in out
     assert f"forever update undo {record()['id']}" in out
-    assert "build Mage donjon niveau 20 : Frostbite passe de 0 à 3" in out
+    assert "mage_leveling : classes.json /classes/Mage/spells, 1 autre valeur changée" in out
 
 
 # --- aucune attente ne bloque plus une mise à jour ----------------------------------------------------------------
@@ -152,7 +121,7 @@ def test_no_wait_for_approval_is_left_after_a_pass(montage):  # noqa: F811
         deps.cache_dir,
         {"id": "1.60.1.79999-r1-aaaaaaaaaaaa", "kind": "install_version", "action": "attente", "version": "x"},
     )
-    report = run_update(deps, UpdateOptions(network=False), replay=Replay())
+    report = run_update(deps, UpdateOptions(network=False))
     allowed = {*SELF_CLEARING_KINDS, *SESSION_KINDS, "pass_error"}
     for entry in report["pending"]:
         assert entry["action"] != "attente" or entry["kind"] in allowed, entry

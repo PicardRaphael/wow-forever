@@ -19,7 +19,7 @@ from forever.engine.monsters import mob_hp
 from forever.engine.spells import best_rank
 from forever.engine.talents import talent_value
 
-CONTEXTS = ("leveling", "dungeon", "raid", "pvp-bg", "pvp-world")  # contextes des builds (forever build)
+CONTEXTS = ("leveling", "dungeon", "raid", "pvp-bg", "pvp-world")  # contextes des angles morts du registre
 # Liens talent -> effet (noms et positions des variables de talents.json, pas des chiffres de jeu).
 PRESENCE_OF_MIND, COMBUSTION, WAKE_OF_FIRE = "presenceOfMind", "combustion", "wakeOfFire"
 COMBUSTION_CHARGES, WOF_CRIT = 1, 2

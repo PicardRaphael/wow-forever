@@ -14,9 +14,8 @@ import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import Any
 
-from forever.build import BuildReport
 from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.provenance import Certainty, Provenance
@@ -42,12 +41,6 @@ CLASSES_VERIFIED_IN_GAME = {
     "Hunter": "relevé en jeu de l'utilisateur du 2026-10-08 (témoin hunter-40 de class_witnesses.json)",
     "Warlock": "relevé en jeu de l'utilisateur du 2026-10-08 (témoin warlock-30 de class_witnesses.json)",
 }
-
-
-class BuildWithExport(BuildReport):
-    """Rapport de `forever build` augmenté du bloc `export` (CLI et MCP ; `build_report` inchangé)."""
-
-    export: dict[str, Any]
 
 
 @dataclass(frozen=True)
@@ -427,18 +420,10 @@ def render_crosscheck(report: Mapping[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-MAGE = "Mage"  # seule classe dont forever calcule le build (T05)
 NO_ORDER_NOTE = (
     "ordre non calculé pour ce contexte (l'optimiseur ne rend un ordre qu'en leveling) : Talents Forever place les "
     "points arbre par arbre"
 )
-STATUS_LABELS = {
-    "ok": "code prêt",
-    "absent": "addon absent",
-    "bloque": "export bloqué",
-    "format_non_pris_en_charge": "format non pris en charge",
-    "ordre_incoherent": "ordre incohérent",
-}
 
 
 def tf_provenance(deps: Deps, addon: TfAddon | None, certainty: Certainty, notes: Sequence[str] = ()) -> Provenance:
@@ -576,63 +561,6 @@ def export_build(
     )
     block["import"] = f"/tf import {code}"
     return block
-
-
-def attach_export(deps: Deps, report: BuildReport, talented_bonus: int = 0) -> BuildWithExport:
-    """Rapport de build augmenté du bloc `export` (appelé par la CLI et le MCP ; `build_report` n'en sait rien)."""
-    addon = load_addon(deps)
-    order = [str(s["talent"]) for s in report["order"] if s.get("talent")]
-    block = export_build(addon, MAGE, report["level"], report["talents"], order or None, talented_bonus)
-    if addon is not None and addon.popular and MAGE in addon.layouts:
-        try:
-            popular = popular_builds(addon, deps, MAGE)
-        except InvalidArgumentError:
-            popular = None
-        if popular is not None:
-            block["closest_popular"] = closest_popular(addon, popular, MAGE, report["talents"])
-    alt = report.get("alternative") or {}
-    if alt.get("talents"):
-        other = export_build(addon, MAGE, report["level"], alt["talents"], None, talented_bonus)
-        alt = {**alt, "export": {k: other.get(k) for k in ("status", "reason", "code", "link", "import")}}
-        report = cast(BuildReport, {**report, "alternative": alt})
-    # chemin conseillé depuis le build actuel (sonde en jeu F) : lien du build actuel plus les points du chemin
-    respec = report.get("respec") or {}
-    projected = respec.get("projected") if isinstance(respec, dict) else None
-    if isinstance(projected, dict) and projected.get("talents"):
-        own = export_build(addon, MAGE, int(projected["to_level"]), projected["talents"], None, talented_bonus)
-        export = {k: own.get(k) for k in ("status", "reason", "code", "link", "import")}
-        respec = {**respec, "projected": {**projected, "export": export}}
-        report = cast(BuildReport, {**report, "respec": respec})
-    from forever.exports.talents import naowh_export
-
-    naowh = naowh_export(deps, MAGE, report["level"], report["talents"], order or None, talented_bonus=talented_bonus)
-    return cast(BuildWithExport, {**report, "export": {"talents_forever": block, "naowh": naowh}})
-
-
-def render_export(block: Mapping[str, Any]) -> list[str]:
-    """Lignes « Talents Forever » de la sortie texte de `forever build`."""
-    if block["status"] != "ok":
-        return [f"Talents Forever : {STATUS_LABELS.get(block['status'], block['status'])} : {block['reason']}"]
-    prov = block["provenance"]
-    lines = [
-        (
-            f"Talents Forever : {block['code']} · lien {block['link']} · import en jeu {block['import']} "
-            f"({block['certainty']}, format {prov['format']}, addon {prov['version']})"
-        )
-    ]
-    if block.get("order_note"):
-        lines.append(f"  {block['order_note']}")
-    if prov.get("talented_note"):
-        lines.append(f"  {prov['talented_note']}")
-    c = block.get("closest_popular")
-    if c:
-        scope = "même spécialisation" if c["same_spec"] else "toutes spécialisations"
-        lines.append(
-            f"  Build populaire le plus proche ({scope}) : n° {c['rank']} {c['spec']}, {c['missing_points']} point(s) "
-            f"du nôtre absent(s), {c['points_to_add']} à ajouter (écart {c['total_gap']}), {c['link']} "
-            f"({c['certainty']}, relevé du {c['asOf']})"
-        )
-    return lines
 
 
 def decode_code(addon: TfAddon, deps: Deps, code: str) -> dict[str, Any]:

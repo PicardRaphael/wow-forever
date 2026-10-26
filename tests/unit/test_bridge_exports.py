@@ -13,7 +13,7 @@ from test_bridge_loop import FakeAgent, FakeCapture, band_of, make
 from test_bridge_loop_p06b import SESSION, RefusingAgent, replies
 
 from forever.bridge.actions import parse_action
-from forever.bridge.agent import AgentResult, parse_stream
+from forever.bridge.agent import AgentResult
 from forever.bridge.buttons import DONE_SLICES, button_payload, visible_buttons
 from forever.bridge.exports import LABELS, exports_reply, typed_link, typed_links
 from forever.bridge.record import Record
@@ -53,25 +53,9 @@ def stream(tool: str, value: dict) -> list[str]:
 # --- liens typés ----------------------------------------------------------------------------------------------------
 
 
-def test_build_result_gives_both_links():
-    value = {
-        "export": {
-            "talents_forever": {"status": "ok", "link": TF},
-            "naowh": {"status": "ok", "code": NFB},
-        }
-    }
-    assert typed_links(value)["build"] == [typed_link("talents_forever", TF), typed_link("naowh_build", NFB)]
-    result = parse_stream(stream("forever_build", value))
-    assert result.exports["build"] == [
-        {"kind": "talents_forever", "label": LABELS["talents_forever"], "text": TF},
-        {"kind": "naowh_build", "label": LABELS["naowh_build"], "text": NFB},
-    ]
-    assert result.link == TF
-
-
-def test_blocked_naowh_export_gives_no_naowh_link():
-    value = {"export": {"talents_forever": {"status": "ok", "link": TF}, "naowh": {"status": "bloque", "code": None}}}
-    assert typed_links(value)["build"] == [typed_link("talents_forever", TF)]
+def test_blocked_naowh_code_gives_no_naowh_link():
+    value = {"kind": "tf_popular", "closest": {"link": TF, "naowh": {"status": "bloque", "code": None}}}
+    assert typed_links(value)["closest"] == [typed_link("talents_forever", TF)]
 
 
 def test_closest_popular_and_build_check_and_export_lookup():

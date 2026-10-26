@@ -21,51 +21,9 @@ import threading
 import pytest
 from conftest import FIXTURES
 
-from forever import replay
 from forever.update import list_pending, record_pending, update_dir
 
 # --- 9. Rejeu parallèle ----------------------------------------------------------------------------------------------
-
-
-def test_worker_writes_the_code_of_the_pass(tmp_path, monkeypatch):
-    monkeypatch.setattr(replay, "build_case", lambda case, data_dir: {"talents": {"a": 1}})
-    monkeypatch.setattr(replay, "code_fingerprint", lambda: "code-du-processus")
-    path = tmp_path / "leveling-60.json"
-    replay._worker("leveling-60", str(tmp_path), str(path), 1, "code-du-passage")
-    assert json.loads(path.read_text(encoding="utf-8"))["code"] == "code-du-passage"
-
-
-def test_child_refuses_a_code_changed_since_the_pass_started(tmp_path, monkeypatch, capsys):
-    monkeypatch.setattr(replay, "code_fingerprint", lambda: "nouveau")
-    request = tmp_path / "demande.json"
-    request.write_text(json.dumps({"workers": 1, "code": "ancien", "jobs": []}), encoding="utf-8")
-    assert replay.main([str(request)]) == replay.CODE_CHANGED_EXIT
-    assert "code de forever a changé pendant le passage" in capsys.readouterr().err
-
-
-def test_parent_names_a_code_change(tmp_path, monkeypatch):
-    def fake_run(argv, **kwargs):
-        return subprocess.CompletedProcess(argv, replay.CODE_CHANGED_EXIT, stdout="",
-                                           stderr="le code de forever a changé pendant le passage")  # fmt: skip
-
-    monkeypatch.setattr(replay.subprocess, "run", fake_run)
-    with pytest.raises(replay.ReplayFailedError, match="code de forever a changé pendant le passage"):
-        replay._run_child({"workers": 2, "code": "x", "jobs": []}, tmp_path)
-
-
-def test_parent_sends_its_fingerprint(tmp_path, monkeypatch):
-    seen = {}
-
-    def fake_child(request, cache_dir):
-        seen.update(request)
-        for _case, _data, path, _beams in request["jobs"]:
-            replay._write(replay.Path(path), {"talents": {}}, 1.0, code=request["code"])
-        return []
-
-    monkeypatch.setattr(replay, "_run_child", fake_child)
-    monkeypatch.setattr(replay, "code_fingerprint", lambda: "empreinte-du-passage")
-    out = replay.replay_cases([("leveling-20", tmp_path), ("dungeon-20", tmp_path)], tmp_path / "cache", workers=4)
-    assert seen["code"] == "empreinte-du-passage" and len(out) == 2
 
 
 def quiet_steps(monkeypatch, update, **overrides):

@@ -210,10 +210,7 @@ def test_a_new_version_is_installed_end_to_end_with_the_clone_verify(tmp_path, m
     monkeypatch.setattr(decode, "decode_version", lambda *a, **k: SimpleNamespace(root=candidate))
     runner = Runner()
     lines: list[str] = []
-    replay = lambda engine, case, data: {"rejoué": False}  # appelé seulement si une entrée change
-    report = run_update(
-        deps, UpdateOptions(only=frozenset({"jeu"})), runner=runner, replay=replay, progress=lines.append
-    )
+    report = run_update(deps, UpdateOptions(only=frozenset({"jeu"})), runner=runner, progress=lines.append)
     journal = "\n".join(lines)
     assert [v["action"] for v in report["verdicts"]] == ["écrire"], journal
     verify = [(args[5:], code) for args, code in runner.calls if args[0] == "uv" and "verify" in args]

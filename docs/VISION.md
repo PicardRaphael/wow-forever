@@ -55,7 +55,7 @@ Pour chacun des personnages du joueur (profil multi-sources, décision 125) :
 
 ### 4. Agir en jeu
 forever-core ne joue jamais à la place du joueur : il **prépare** ce que le joueur ouvre ou importe lui-même.
-- **Lien Talents Forever** du build calculé (FA1) ;
+- **Lien Talents Forever** du build populaire le plus proche (FA1 ; plus de build calculé depuis RB1, décision 299) ;
 - **liste BiS** et poids des statistiques dans **Naowh Forever** (T10a pour le Mage, puis T10), par ses points d'import ;
 - **profils EllesmereUI** par personnage et par rôle (tranche EX1) ;
 - **macros** par classe, en texte à importer (EX1, décision 195) ;

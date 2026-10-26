@@ -1,10 +1,10 @@
 """Appel fixé de chaque bouton de la fenêtre du jeu (sonde en jeu F du 2026-10-09). Relevé de la sonde : pour un même
 bouton et un même contexte, la conversation « jeu » appelait les outils de façon différente d'une fois à l'autre
-(bouton Talents : `forever_build` au niveau actuel, sans prochain point ; ailleurs au niveau suivant). Le pont calcule
+(bouton Talents : un outil au niveau actuel, ailleurs au niveau suivant). Le pont calcule
 donc lui-même, depuis le contexte vérifié (`context.resolve`), l'appel exact de chaque bouton et la façon d'en lire le
 résultat, et les place dans le message : le modèle n'a plus qu'à appeler et rédiger. Le banc d'essai
 (`tests/unit/test_bridge_bench.py`) exécute ces appels sans modèle sur les contextes réels. Aucune valeur de jeu ici :
-le niveau suivant est le niveau du contexte plus un, borné par le niveau maximal des données."""
+la tranche de la route est bornée par le niveau maximal des données."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ from forever.bridge.record import Record
 
 @dataclass(frozen=True)
 class Call:
-    tool: str  # nom de l'outil forever sans préfixe de serveur (forever_build, forever_lookup…)
+    tool: str  # nom de l'outil forever sans préfixe de serveur (forever_lookup, forever_route…)
     args: dict[str, Any]
 
 
@@ -30,7 +30,7 @@ class Plan:
     button: str
     calls: tuple[Call, ...]
     read: tuple[str, ...]
-    link: str | None = None  # lien publié : « projected » (chemin du joueur) ou None (lien du build)
+    link: str | None = None  # lien publié : « closest » (build populaire le plus proche) ou None
 
 
 @dataclass(frozen=True)
@@ -46,51 +46,6 @@ class Prepared:
 
 def _talents_arg(current: Mapping[str, int]) -> str:
     return ",".join(f"{k}={v}" for k, v in sorted(current.items()))
-
-
-def _next_point(r: Resolved, level_cap: int | None) -> tuple[Call, tuple[str, ...]] | None:
-    """`forever_build` au niveau du prochain point depuis le build actuel, et la lecture de son résultat."""
-    if r.level is None:
-        return None
-    at_cap = level_cap is not None and r.level >= level_cap
-    level = r.level if at_cap else r.level + 1
-    args: dict[str, Any] = {"context": "leveling", "level": level}
-    if r.race:
-        args["race"] = r.race
-    if r.current:
-        args["current"] = dict(sorted(r.current.items()))
-    args["sensitivity"] = False
-    read: tuple[str, ...]
-    if at_cap:
-        read = (
-            (
-                f"Niveau maximal des données ({level}) : aucun point de plus à placer ; donne le conseil de respec "
-                "(`respec.verdict`) et le lien du build (`export.talents_forever`)."
-            ),
-        )
-        return Call("forever_build", args), read
-    read = (
-        (
-            "Prochain point, en premier : le talent du premier pas de `respec.projected.steps` et son niveau (un pas à un "
-            f"niveau inférieur ou égal à {r.level} est un point à placer dès maintenant)."
-        ),
-        (
-            "Égalité : si `next_step.decided_by` vaut `non_departage` ou `modelise`, dis que le choix est à égalité "
-            "statistique (non départagé par le calcul) et nomme `next_step.runner_up` et les autres candidats dont "
-            "l'écart (`next_step.candidates[].gap.significant`) n'est pas significatif."
-        ),
-        "Lien Talents Forever : celui de `respec.projected.export` (build actuel plus ce point), tel quel.",
-        (
-            "Build, en complément, après le prochain point : le chemin part de ton niveau et de ton build actuels "
-            "(temps cumulé, décision 220). Respec : si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` "
-            "est vrai, dis que le build d'une respec (`respec.versus_optimal.optimal_rotation`) n'apporte aucun gain "
-            "mesurable et que tu gardes ton build ; si `stability.stable` est faux, ajoute que le build retenu est "
-            "instable (il change avec la graine). Si `respec.versus_optimal.current_better` est vrai, dis que ton build "
-            "actuel est meilleur que le build d'une respec et que tu le gardes. Sinon, donne l'écart "
-            "(`respec.versus_optimal`) et le conseil de respec (`respec.verdict`)."
-        ),
-    )
-    return Call("forever_build", args), read
 
 
 def _objectives_call(r: Resolved) -> Call:
@@ -128,8 +83,8 @@ OBJECTIVES_READ = (
 
 def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
     """Bouton Leveling, toutes les classes (décisions 242 et 243, T04d) : zones, quêtes et donjon, objectifs de
-    leveling (XP par heure par zone et par donjon) ; pour le Mage en plus le prochain talent calculé ; ailleurs, le
-    build populaire de la classe et son lien, et la mention de ce qui n'est pas encore calculé (prochain talent)."""
+    leveling (XP par heure par zone et par donjon), le build populaire de la classe et son lien, et la mention de ce
+    qui n'est pas calculé (prochain talent ; RB1, décision 299 : le Mage suit le même chemin)."""
     zones: dict[str, Any] = {"kind": "zones", "level": r.level}
     if r.faction in ("horde", "alliance"):
         zones["faction"] = r.faction
@@ -140,20 +95,6 @@ def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
         "Zones et quêtes : les trois premières zones du résultat de zones, dans l'ordre rendu, avec leur nombre de "
         "quêtes utiles ; prochain donjon : le premier donjon rendu (`dungeons`)."
     )
-    if r.class_token == "MAGE":
-        point = _next_point(r, level_cap)
-        mage_calls = [Call("forever_lookup", zones)] + ([point[0]] if point else []) + [_objectives_call(r)]
-        mage_read = (
-            head,
-            (
-                "Prochain talent calculé, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton "
-                "niveau et ton build actuels) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, "
-                "tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun "
-                "gain mesurable ; instable si `stability.stable` est faux)."
-            ),
-            OBJECTIVES_READ,
-        )
-        return Plan("leveling", tuple(mage_calls), mage_read)
     popular: dict[str, Any] = {"kind": "tf_popular", "name": r.class_name}
     if r.current:
         popular["current"] = ",".join(f"{k}={v}" for k, v in r.current.items())
@@ -167,47 +108,23 @@ def _leveling_plan(r: Resolved, level_cap: int | None) -> Plan:
         (
             "Dis clairement ce qui est calculé et ce qui ne l'est pas encore : zones, quêtes, donjon et XP par heure "
             "viennent des données et de tes relevés ; le build est un choix de joueurs ; le prochain talent n'est pas "
-            "encore calculé pour ta classe."
+            "calculé."
         ),
     )
     calls = (Call("forever_lookup", zones), Call("forever_lookup", popular), _objectives_call(r))
     return Plan("leveling", calls, read)
 
 
-def _full_plan(r: Resolved, level_cap: int, first: int) -> Plan:
-    """CJ1, bloc 3 : avant le premier point de talent, le build conseillé jusqu'à l'objectif (niveau maximal des
-    données), point par point, avec le lien Talents Forever et le code Naowh du Training Planner."""
-    args: dict[str, Any] = {"context": "leveling", "level": level_cap, "sensitivity": False}
-    if r.race:
-        args["race"] = r.race
-    read = (
-        (
-            f"Pas encore de point à placer (premier point au niveau {first}) : donne le plan complet, sans dire qu'il "
-            "n'y a rien à faire. En premier, le premier point et son niveau (`order`), puis l'ordre de prise point par "
-            "point, regroupé par paliers de niveaux, jusqu'à l'objectif."
-        ),
-        (
-            "Lien Talents Forever (`export.talents_forever`) et code Naowh (`export.naowh`) tels quels ; dis de coller "
-            "le code dans Naowh Forever, Training, Builds, Import, puis de suivre « Level by level »."
-        ),
-    )
-    return Plan("talents", (Call("forever_build", args),), read, link="build")
-
-
-# Plan « Sources d'abord », étape b : guide de Forever Companion pour les classes autres que le Mage.
+# Plan « Sources d'abord », étape b : guide de Forever Companion, toutes les classes (RB1 : le Mage aussi).
 GUIDE_READ = (
     "Guide de Forever Companion (`class_guide`), pour la spécialisation du build retenu ci-dessus : son build `pick` "
     "(nom ; légal à son niveau ou non) et les builds écartés avec leur raison (`set_aside`), puis la rotation telle "
     "quelle (`rotation.single`, puis `rotation.aoe`), en disant qu'elle vient de Forever Companion, qu'elle est écrite "
-    "pour le niveau 30 et qu'aucun ordre de prise n'est calculé pour ta classe ; si `freshness.status` n'est pas « à "
+    "pour le niveau 30 et qu'aucun ordre de prise n'est calculé ; si `freshness.status` n'est pas « à "
     "jour », dis « calcul en cours de mise à jour » avec sa raison. Forever Companion absent : ne dis rien de plus."
 )
 
 
-NAOWH_NEXT = (
-    "Code Naowh du build (`export.naowh` ou `respec.projected.export.naowh` s'il y est) tel quel, à coller dans Naowh "
-    "Forever, Training, Builds, Import, pour suivre l'ordre de prise « Level by level »."
-)
 NAOWH_POPULAR = (
     "Code Naowh du build (`naowh`) tel quel, à coller dans Naowh Forever, Training, Builds, Import ; dis que son ordre "
     "de prise est généré (palier, prérequis), pas un ordre de leveling optimisé."
@@ -227,14 +144,6 @@ def button_plan(
     if r.class_name is None or r.level is None:
         return None
     if key == "talents":
-        if r.class_token == "MAGE" and first_talent_level and level_cap and r.level + 1 < first_talent_level:
-            return _full_plan(r, level_cap, first_talent_level)
-        if r.class_token == "MAGE":
-            point = _next_point(r, level_cap)
-            if point is None:
-                return None
-            call, read = point
-            return Plan(key, (call,), (*read, NAOWH_NEXT), link="projected")
         guide = Call("forever_lookup", {"kind": "class_guide", "name": r.class_name, "level": r.level})
         if not r.current:
             calls = [Call("forever_lookup", {"kind": "tf_popular", "name": r.class_name}), guide]

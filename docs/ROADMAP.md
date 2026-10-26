@@ -48,8 +48,9 @@ Règles qui gouvernent la suite (elles l'emportent sur tout texte plus ancien) :
 
 ### Calcul
 - **Moteur du Mage** (T02, T04a à T04c, T04e, T05, refonte de 1.60.1.70450 et HF2, décisions 285, 292) : sorts et
-  talents du client, simulateurs de leveling (Monte Carlo et analytique), builds par contexte avec départage au Monte
-  Carlo, respec ; **gelé en r7** (décision 294) et dit comme tel dans chaque provenance.
+  talents du client, simulateurs de leveling (Monte Carlo et analytique) ; **gelé en r7** (décision 294) et dit comme
+  tel dans chaque provenance. Recherche de build (builds par contexte, départage, respec) retirée en RB1 (décision
+  299) : le build du Mage vient des builds populaires de Talents Forever, comme pour les autres classes.
 - **Simulateur de la communauté au niveau 60** (décisions 293, 294 ; remplace SIM1 telle qu'écrite) :
   `wowsims/forever` compilé en local à un commit épinglé (`forever sims update|presets|races`), outil MCP
   `forever_simulate` (préréglages, races, classes comparées dans des conditions identiques), poids de l'équipement au
@@ -275,7 +276,7 @@ Gardées ici pour que leurs identifiants, encore cités ailleurs, renvoient à l
 | T05b | Caduque : mana des combats longs ajoutée au moteur (décision 293) | wowsims/forever au 60 ; sous le 60, moteur du Mage gelé |
 | CH1, DE1, PA1, GU1, VO1, PR1, DR1 | Caduques comme moteurs de classe (briques de mêlée, soins, mitigation, menace, familier comme entité) : décisions 252 et 293 ; formules reprises de wowsims (décision 233) abandonnées | même règle que CM1 (partie 3) : wowsims au 60, SIM2 ou mes journaux dessous, Forever Companion |
 | Moteur générique des classes | Jamais construit (décision 252), confirmé par la décision 293 | — |
-| Rencontres et poids du Mage au 60, optimiseur de fin de partie, PvP analytique | Retirés ou gelés (`tasks/plan-simulateurs.md`) | wowsims/forever au 60 |
+| Rencontres et poids du Mage au 60, optimiseur de fin de partie, PvP analytique | Retirés ou gelés (`tasks/plan-simulateurs.md`) ; recherche de build du Mage retirée (RB1, décision 299) | wowsims/forever au 60, builds populaires de Talents Forever |
 | Eureka! actif (branche `races`) | Abandonné (nouveau code de calcul) | wowsims/forever |
 | T10, base d'objets « par formules du client » | Caduque (formule recopiée) | objets lus (addons, client) |
 | AN2, rejeu « à la rotation optimale du moteur de la classe » | Caduc | AN2 réduite (partie 3) |

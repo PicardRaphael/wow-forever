@@ -1,7 +1,7 @@
 """Talents envoyés par le jeu reliés aux clés de forever (P06a, sonde en jeu E du 2026-10-09). L'addon envoie
 `nœud:rang` (identifiants de nœud de `C_Traits`, rangs achetés) ; `classes.json` relie chaque nœud à un talent
 (tables TraitNode et TraitNodeEntry du client, même build que les données). Le pont ajoute la traduction au message,
-pour que la conversation passe ces clés à `current` de `forever_build` sans rien deviner."""
+pour que la conversation passe ces clés à `current` de `forever_lookup` (`tf_popular`) sans rien deviner."""
 
 from __future__ import annotations
 
@@ -249,7 +249,7 @@ def context_notes(resolved: Resolved) -> str:
     lines = []
     if resolved.reading.known:
         lines.append(
-            "Talents actuels (clés de forever, pour `current` de forever_build) : "
+            "Talents actuels (clés de forever, pour `current` de tf_popular) : "
             + talents_line(TalentReading(known=resolved.reading.known))
         )
     if resolved.target_class:

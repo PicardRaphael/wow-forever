@@ -13,7 +13,6 @@ import pytest
 from conftest import REPO_ROOT, FakeHttp
 from mcp import Client
 
-from forever.build import build_report
 from forever.cli import main
 from forever.errors import InvalidArgumentError
 from forever.leveling import simulate_leveling
@@ -193,17 +192,6 @@ def test_no_network(deps):
 
 
 # --- Défauts visibles des outils de calcul ------------------------------------------------------------------
-
-
-def test_build_report_shows_the_default_race(deps):
-    rep = build_report(deps, "leveling", 11, preset="rapide", sensitivity=False)
-    assert rep["inputs"]["race"] == {"value": "Orc", "origin": "default"}
-    assert rep["race"] == "Orc"
-    assert any("race" in a and "défaut" in a for a in rep["assumptions"])
-    given = build_report(deps, "leveling", 11, race="Troll", preset="rapide", sensitivity=False)
-    assert given["inputs"]["race"] == {"value": "Troll", "origin": "argument"}
-    assert not any("race" in a and "défaut" in a for a in given["assumptions"])
-    assert given["inputs"]["level"] == {"value": 11, "origin": "argument"}
 
 
 def test_sim_leveling_shows_the_default_race(deps):

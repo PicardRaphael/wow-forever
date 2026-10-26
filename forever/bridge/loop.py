@@ -458,15 +458,11 @@ class Bridge:
 
     @staticmethod
     def _typed_links(result: AgentResult, prefer: str | None, link: Any) -> list[dict[str, str]]:
-        """EX1 : liens typés de la réponse, ceux du lien publié d'abord (`prefer`, sinon l'export du build) ; le lien
+        """EX1 : liens typés de la réponse, ceux du lien publié d'abord (`prefer`, sinon le premier rendu) ; le lien
         Talents Forever publié (`link`) y figure toujours, en tête."""
         from forever.bridge.exports import typed_link
 
-        found = (
-            result.exports.get(prefer)
-            if prefer
-            else result.exports.get("build") or next(iter(result.exports.values()), [])
-        )
+        found = result.exports.get(prefer) if prefer else next(iter(result.exports.values()), [])
         typed = [dict(e) for e in found or []]
         if isinstance(link, str) and not any(e["kind"] == "talents_forever" and e["text"] == link for e in typed):
             typed = [typed_link("talents_forever", link), *(e for e in typed if e["kind"] != "talents_forever")]

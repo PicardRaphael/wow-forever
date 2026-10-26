@@ -20,17 +20,11 @@ from conftest import (
     rewind_to,
 )
 
-import forever.build as build_module
-from forever.build import build_report
-from forever.engine.cast import expected_cast
-from forever.engine.character import character
 from forever.errors import InvalidArgumentError
 from forever.gamedata import build_game_data
 from forever.leveling import simulate_leveling
 from forever.manifest import compute_manifest, write_manifest
-from forever.optimize.endgame import seed_pvp_greedy
 from forever.pipeline.verify import verify_version
-from forever.sim.leveling_mc import mc
 from forever.store import load_version
 
 SEED_COPIES = {
@@ -93,20 +87,6 @@ def test_seed_rules_read_the_frozen_copies(client_copy, seed_game_data):
     assert seed.constants.character.base_mana_by_level == ()  # T08b : ratios du client en mode forever seulement
 
 
-def test_seed_results_do_not_move_with_the_client_values(client_copy, seed_game_data):
-    version = load_version(client_copy)
-    seed = build_game_data(version, rules="seed")
-    forever = build_game_data(version, rules="forever")
-    ch = character(seed_game_data, 36, "Human")
-    for key in ("pyroblast", "blast_wave", "ice_lance", "arcane_blast"):
-        before = expected_cast(seed_game_data, key, 36, {}, ch, rules="seed")
-        assert expected_cast(seed, key, 36, {}, character(seed, 36, "Human"), rules="seed") == before, key
-    before = mc(seed_game_data, 24, L24, "Orc", "frost", 120, **SEED_MODE)
-    assert mc(seed, 24, L24, "Orc", "frost", 120, **SEED_MODE) == before
-    assert mc(forever, 24, L24, "Orc", "frost", 120, **SEED_MODE) != before  # Ice Lance rang 1 du client
-    assert seed_pvp_greedy(seed, 20, "Orc", beam=2) == seed_pvp_greedy(seed_game_data, 20, "Orc", beam=2)
-
-
 def test_simulate_leveling_passes_rules_to_the_loader(client_copy, make_deps, data_at_rank_values_version):
     repo = make_deps(data_dir=data_at_rank_values_version)  # même version que client_copy
     args = {"talents": L24, "n": 60, "mob_source": "seed", "spell_level": "rank"}
@@ -118,19 +98,6 @@ def test_simulate_leveling_passes_rules_to_the_loader(client_copy, make_deps, da
     forever_here = simulate_leveling(client_copy, 24, rules="forever", **args)
     assert forever_here["monte_carlo"] == simulate_leveling(repo, 24, rules="forever", **args)["monte_carlo"]
     assert forever_here["monte_carlo"] != seed_here["monte_carlo"]
-
-
-def test_build_report_passes_rules_to_the_loader(make_deps, monkeypatch):
-    seen = []
-    real = build_module.build_game_data
-
-    def spy(version, rules="forever"):
-        seen.append(rules)
-        return real(version, rules=rules)
-
-    monkeypatch.setattr(build_module, "build_game_data", spy)
-    build_report(make_deps(), "leveling", 11, preset="rapide", rules="seed", sensitivity=False)
-    assert seen and set(seen) == {"seed"}
 
 
 def test_unknown_rules_are_refused(make_deps):

@@ -6,8 +6,6 @@ from __future__ import annotations
 
 import json
 from collections.abc import Iterator, Mapping
-from contextlib import contextmanager
-from contextvars import ContextVar
 from dataclasses import replace
 from functools import lru_cache
 from pathlib import Path
@@ -604,7 +602,7 @@ def _xp_rules(values: Mapping[str, Any], raw_char: Any) -> XpRules | None:
     period = r.num(rested, "period_h", "xp.rested")
     tiers = raw_char.get("rested") if isinstance(raw_char, dict) else None
     tier = next((t for t in tiers or [] if isinstance(t, dict) and t.get("name") == "Rested"), None)
-    if tier is not None and _kept("rested"):
+    if tier is not None:
         factor = float(tier["factor"])
         period = float(tier["inn_hours"])
     sources = {
@@ -1160,14 +1158,14 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
             raw_char = version.read_json(CHARACTER_FILE)
         except (OSError, ValueError) as exc:
             raise DataSchemaError(f"{CHARACTER_FILE} de {version.game_version} illisible ({exc}).") from exc
-        constants, leveling, xp_to_next = _client_ratios(raw_char, constants, leveling, xp_to_next)
+        constants, leveling, xp_to_next = _client_ratios(raw_char, constants, leveling)
         ratios = "client"
         ratios_from = raw_char.get("inherited_from") if isinstance(raw_char, dict) else None
     utility, utility_source = _utility(raw[SPELLS_FILE], files[SPELLS_FILE]), files[SPELLS_FILE]
     if rules == "forever":
         constants, leveling = _client_mechanics(raw[SCALING_FILE], constants, leveling)
         mage = _mage_client_spells(version) if (version.path / CLASSES_FILE).is_file() else None
-        if mage and _kept("utility"):
+        if mage:
             utility, spells = _client_utility(mage, utility, spells, _spell_names(version))
             utility_source = CLASSES_FILE
     try:
@@ -1208,42 +1206,6 @@ def build_game_data(version: VersionData, rules: str = "forever") -> GameData:
 
 
 MAGE_CLASS = "Mage"  # moteur du Mage : ses ratios dans character_scaling.json
-# T08b, bloc I : valeurs du client qu'un rejeu peut remettre à leur estimation, une à une (ablation), pour trouver la
-# raison d'une recommandation changée ; jamais utilisé hors de scripts/replay_builds.py et des tests.
-ABLATABLE: tuple[str, ...] = (
-    "int_per_crit",
-    "base_mana",
-    "xp_to_next",
-    "armor_constant",
-    "talents",
-    "utility",
-    "ignite",
-    "winters_chill",
-)
-_ABLATED: ContextVar[frozenset[str]] = ContextVar("ablated", default=frozenset())
-
-
-@contextmanager
-def ablated(names: set[str]) -> Iterator[None]:
-    """Dans ce bloc, `build_game_data` (mode forever) garde l'estimation de `mechanics.json` ou la copie du seed pour
-    chaque valeur nommée au lieu de la valeur du client (InvalidArgumentError pour un nom inconnu)."""
-    unknown = sorted(set(names) - set(ABLATABLE))
-    if unknown:
-        raise InvalidArgumentError(
-            f"Valeur du client inconnue pour l'ablation : {', '.join(unknown)}.",
-            f"choisir parmi {', '.join(ABLATABLE)}",
-        )
-    token = _ABLATED.set(frozenset(names))
-    try:
-        yield
-    finally:
-        _ABLATED.reset(token)
-
-
-def _kept(name: str) -> bool:
-    return name not in _ABLATED.get()
-
-
 PERCENT = 100.0  # conversion d'unité : pourcentage du client -> fraction
 
 
@@ -1324,7 +1286,7 @@ def _client_mechanics(
     r = _Reader(SCALING_FILE)
     auras = raw_scaling.get("auras", {}) if isinstance(raw_scaling, dict) else {}
     ignite = auras.get("ignite")
-    if isinstance(ignite, dict) and _kept("ignite"):
+    if isinstance(ignite, dict):
         leveling = replace(
             leveling,
             ignite_aura_id=r.int_(ignite, "spell_id", "auras.ignite.spell_id"),
@@ -1333,7 +1295,7 @@ def _client_mechanics(
             ignite_cumulative=r.int_(ignite, "cumulative", "auras.ignite.cumulative"),
         )
     wc = auras.get("winters_chill")
-    if isinstance(wc, dict) and _kept("winters_chill"):
+    if isinstance(wc, dict):
         per_stack = r.num(wc, "pct_per_stack", "auras.winters_chill.pct_per_stack") / PERCENT
         if wc.get("kind") == "cone_of_cold":  # 70450 : l'aura renforce Cone of Cold, plus aucun critique (D4)
             sp = wc.get("sp_pct_per_stack")  # 70450 r7 : part de la puissance des sorts (correctif 112753)
@@ -1358,7 +1320,7 @@ def _client_mechanics(
 
 
 def _client_ratios(
-    raw: Any, constants: Constants, leveling: LevelingConstants, xp_estimate: tuple[int, ...]
+    raw: Any, constants: Constants, leveling: LevelingConstants
 ) -> tuple[Constants, LevelingConstants, tuple[int, ...]]:
     """Ratios du client (`character_scaling.json`, T08b, bloc A) à la place des estimations, mode forever : critique
     par Intelligence et mana de base du Mage par niveau, constante d'armure par niveau, XP par niveau."""
@@ -1375,17 +1337,17 @@ def _client_ratios(
     mana = numbers(mage, "base_mana", "classes.Mage.base_mana")
     character = replace(
         constants.character,
-        spell_crit_per_int_by_level=crit if _kept("int_per_crit") else (),
-        base_mana_by_level=mana if _kept("base_mana") else (),
+        spell_crit_per_int_by_level=crit,
+        base_mana_by_level=mana,
     )
     decoded_xp = tuple(r.int_({"v": v}, "v", "xp_to_next") for v in r.list_(raw, "xp_to_next", "xp_to_next"))
-    xp = decoded_xp if _kept("xp_to_next") else xp_estimate
-    armor = numbers(raw, "armor_constant", "armor_constant") if _kept("armor_constant") else ()
+    xp = decoded_xp
+    armor = numbers(raw, "armor_constant", "armor_constant")
     kill_xp = numbers(raw, "kill_xp", "kill_xp") if isinstance(raw.get("kill_xp"), list) else ()
     talents = raw.get("talents") if isinstance(raw.get("talents"), dict) else {}
     first = talents.get("first_level")
     per_tier = (talents.get("points_per_tier") or {}).get(MAGE_CLASS)
-    if isinstance(first, int) and isinstance(per_tier, int) and _kept("talents"):
+    if isinstance(first, int) and isinstance(per_tier, int):
         constants = replace(constants, talents=TalentRules(first_level=first, points_per_tier=per_tier))
     leveling = replace(leveling, armor_constant_by_level=armor, kill_xp_by_level=kill_xp)
     return replace(constants, character=character), leveling, xp

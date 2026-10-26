@@ -11,7 +11,7 @@ import hashlib
 import json
 
 from conftest import LOCAL_VERSION
-from test_update_chain import LOG, Measure, Replay, logs, step  # noqa: F401  (fixture importée)
+from test_update_chain import LOG, Measure, logs, step  # noqa: F401  (fixture importée)
 
 from forever.update import UpdateOptions, record_pending, run_update
 
@@ -32,7 +32,7 @@ def sha_of(deps):
 
 
 def run(deps, measure):
-    report = run_update(deps, PASS, replay=Replay(), measure=measure)
+    report = run_update(deps, PASS, measure=measure)
     for entry in report["pending"]:
         record_pending(deps.cache_dir, entry)
     return report

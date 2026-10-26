@@ -41,12 +41,12 @@ def test_unknown_nodes_and_other_classes(make_deps):
     assert describe_talents(table, "UNKNOWN", "105779:3").unknown == ["105779:3"]
 
 
-def test_message_gives_the_keys_for_forever_build(make_deps):
+def test_message_gives_the_keys_for_tf_popular(make_deps):
     record = Record("6ac884ce31ab", 4, frozenset({"b=talents"}), real_context(), "Quel est mon prochain talent ?")
     table = talent_table(make_deps())
     text = message_text(record, talents=talents_line(describe_talents(table, "MAGE", record.context["talents"])))
     assert "talents=105778:5,105779:5" in text
-    assert "Talents actuels (clés de forever, pour `current` de forever_build) : elementalPrecision:5" in text
+    assert "Talents actuels (clés de forever, pour `current` de tf_popular) : elementalPrecision:5" in text
     assert "race=Orc" in text and text.rstrip().endswith("Quel est mon prochain talent ?")
 
 

@@ -9,7 +9,7 @@ chiffre du jeu écrit ici."""
 import json
 import shutil
 
-from test_update_chain import BASE, DRY, TARGET, Replay, montage, only_verdict  # noqa: F401  (fixture importée)
+from test_update_chain import BASE, DRY, TARGET, montage, only_verdict  # noqa: F401  (fixture importée)
 
 from forever.manifest import write_manifest
 from forever.pipeline.install import plan_install
@@ -59,7 +59,7 @@ def test_a_new_client_version_installs_over_an_older_observation(montage):  # no
     """Chaîne complète : la nouvelle version change un coût en mana que la version installée tenait ; plus de
     blocage, la valeur du client s'installe et la note de la carte le dit."""
     deps, _ = montage(change=("SpellPower", "116", "ManaCost"))
-    report = run_update(deps, DRY, replay=Replay())
+    report = run_update(deps, DRY)
     verdict = only_verdict(report)
     assert verdict["action"] == "écrire", verdict["reasons"]
     assert verdict["clauses"]["install"] is True and report["pending"] == []

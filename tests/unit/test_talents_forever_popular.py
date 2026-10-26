@@ -15,9 +15,8 @@ from mcp import Client
 from talents_forever_data import load_fixture, write_addon
 
 from forever.cli import main
-from forever.errors import InvalidArgumentError
 from forever.mcp_server import build_server
-from forever.talents_forever import attach_export, closest_popular, load_addon, popular_builds
+from forever.talents_forever import closest_popular, load_addon, popular_builds
 
 
 @pytest.fixture
@@ -119,27 +118,6 @@ def test_closest_popular_of_our_mage_builds(addon, popular, name, rank, spec, mi
 def test_closest_is_deterministic(addon, popular):
     talents = CASES["leveling-30"]["talents"]
     assert closest_popular(addon, popular, "Mage", talents) == closest_popular(addon, popular, "Mage", talents)
-
-
-def test_export_of_the_mage_carries_the_closest_popular(deps):
-    case = CASES["leveling-30"]
-    report = {"level": case["level"], "talents": case["talents"], "order": [{"talent": k} for k in case["order"]]}
-    block = attach_export(deps, report)["export"]["talents_forever"]
-    assert block["status"] == "ok"
-    assert block["closest_popular"]["rank"] == 3 and block["closest_popular"]["missing_points"] == 0
-
-
-def test_without_popular_block(tmp_path, make_deps):
-    root = tmp_path / "wow"
-    write_addon(root, CLASSES, with_popular=False)
-    deps = make_deps(wow_dir=root)
-    loaded = load_addon(deps)
-    with pytest.raises(InvalidArgumentError, match="populaires"):
-        popular_builds(loaded, deps)
-    case = CASES["leveling-20"]
-    report = {"level": case["level"], "talents": case["talents"], "order": [{"talent": k} for k in case["order"]]}
-    block = attach_export(deps, report)["export"]["talents_forever"]
-    assert block["status"] == "ok" and block["closest_popular"] is None
 
 
 def test_cli_popular(deps, capsys):

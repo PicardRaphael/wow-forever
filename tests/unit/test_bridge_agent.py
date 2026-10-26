@@ -47,14 +47,13 @@ def argv(tmp_path, **kwargs):
     )
 
 
-def test_allowed_tools_are_skill_and_the_eight_forever_tools():
+def test_allowed_tools_are_skill_and_the_seven_forever_tools():
     assert FOREVER_TOOLS == (
         "mcp__forever__forever_status",
         "mcp__forever__forever_lookup",
         "mcp__forever__forever_player_profile",
         "mcp__forever__forever_explain_mechanic",
         "mcp__forever__forever_sim_leveling",
-        "mcp__forever__forever_build",
         "mcp__forever__forever_route",  # RX1
         "mcp__forever__forever_gear",  # CJ1 : essai CJ-6 du 2026-10-15, outil refusé à l'écran Équipement
         "mcp__forever__forever_simulate",  # décisions 293 et 294 : wowsims/forever au niveau 60
@@ -173,12 +172,6 @@ def test_parse_the_resumed_stream():
 def test_parse_a_denied_tool():
     result = parse_stream(lines("claude_stream_denied.jsonl"))
     assert result.denied == ["WebSearch"] and result.provenances == []
-
-
-def test_parse_a_build_with_its_talents_forever_link():
-    result = parse_stream(lines("claude_stream_build.jsonl"))
-    assert result.link == "https://talents-forever.example/mage/20/--0530002001-klps-6"
-    assert [p["certainty"] for p in result.provenances] == ["probable"]
 
 
 def test_stream_without_result_is_an_error():

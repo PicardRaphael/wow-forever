@@ -13,7 +13,7 @@ from datetime import timedelta
 
 from conftest import LOCAL_VERSION
 from test_measures_refresh import QUESTIE, accept, never, world  # noqa: F401  (fixture importée)
-from test_update_chain import LOG, Measure, Replay, logs, step  # noqa: F401  (fixture importée)
+from test_update_chain import LOG, Measure, logs, step  # noqa: F401  (fixture importée)
 
 from forever.cli import main
 from forever.pipeline.live_logs import (
@@ -125,14 +125,14 @@ def test_update_holds_a_log_being_written_and_proposes_it_again_later(logs):  # 
     log = deps.wow_dir / "Logs" / LOG.name
     measure = Measure([{"file": "monsters.json", "pointer": "/hp_curve"}])
     touch(log, deps.now() - MINUTE)
-    report = run_update(deps, JOURNALS, replay=Replay(), measure=measure)
+    report = run_update(deps, JOURNALS, measure=measure)
     assert measure.calls == []
     journaux = step(report, "journaux")
     assert journaux["status"] == "rien" and "en cours d'écriture" in journaux["detail"]
     assert [w["name"] for w in journaux["data"]["writing"]] == [LOG.name]
     assert report["pending"] == []
     touch(log, deps.now() - QUIET - MINUTE)  # passage suivant : journal au repos
-    report = run_update(deps, JOURNALS, replay=Replay(), measure=measure)
+    report = run_update(deps, JOURNALS, measure=measure)
     assert measure.calls == [[LOG.name]]
     assert (
         step(report, "journaux")["status"] != "rien" and report["pending"] == []

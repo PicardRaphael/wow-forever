@@ -33,7 +33,6 @@ _DETAIL_STAGES = (
     ("uv sync", "préparation de la vérification"),
     ("synchronisation de l'environnement", "préparation de la vérification"),
     ("verify", "vérification des données"),
-    ("rejeu", "recalcul des builds"),
     ("copie de", "préparation des données"),
 )
 _STEP_STAGES = {

@@ -1,88 +1,25 @@
 """Planification et personnages prévus (demande de l'utilisateur du 2026-09-29, complément aux décisions 116 et 117).
 
-- `forever_build` sans niveau : niveau maximal lu dans les données (`level_cap`), origine `default` dans `inputs`.
-- Respec de leveling à un niveau plus haut que celui du build actuel : chemin conseillé projeté depuis ce build
-  (`respec.projected`), pour que l'agent conseille sans redemander le build.
 - Profil : neuf classes, personnages prévus (`planned`), champs manquants propres à un personnage prévu.
 - Contrôle des chiffres : les lignes sourcées (avec une adresse) du rapport de `forever-web-researcher` sont des
   sources ; les autres lignes du rapport n'en sont pas."""
 
-import asyncio
 from dataclasses import replace
 
 import pytest
 from conftest import FIXTURES, isolated_deps
-from mcp import Client
 
 from forever import hooks
-from forever.build import build_report
-from forever.cli import build_parser, main
-from forever.engine.talents import check_build
+from forever.cli import main
 from forever.errors import InvalidArgumentError
-from forever.gamedata import build_game_data
-from forever.mcp_server import build_server
 from forever.profile import read_profile, set_character
-from forever.store import load_version
 
 TRANSCRIPTS = FIXTURES / "transcripts"
-CURRENT_11 = {"wandSpecialization": 2}  # deux points : build légal au niveau 11 (premier niveau de talent + 1)
 
 
 @pytest.fixture(scope="module")
 def deps(tmp_path_factory):
     return isolated_deps(tmp_path_factory.mktemp("planning"))
-
-
-@pytest.fixture(scope="module")
-def game_data(deps):
-    return build_game_data(load_version(deps))
-
-
-# --- Niveau par défaut -----------------------------------------------------------------------------------------------
-
-
-@pytest.mark.slow
-def test_build_without_level_uses_the_level_cap_of_the_data(deps, game_data):
-    rep = build_report(deps, "pvp-bg", None, preset="rapide", sensitivity=False)
-    cap = game_data.level_cap
-    assert rep["level"] == cap
-    assert rep["inputs"]["level"] == {"value": cap, "origin": "default"}
-    assert any("niveau maximal" in a and str(cap) in a for a in rep["assumptions"])
-    assert check_build(game_data, rep["talents"], cap) == []
-
-
-def test_mcp_and_cli_level_is_optional(deps):
-    async def schema():
-        async with Client(build_server(deps)) as client:
-            tools = {t.name: t for t in (await client.list_tools()).tools}
-            return tools["forever_build"].input_schema
-
-    assert "level" not in (asyncio.run(schema()).get("required") or [])
-    assert build_parser().parse_args(["build", "pvp-bg"]).level is None
-
-
-# --- Chemin projeté depuis le build actuel ---------------------------------------------------------------------------
-
-
-@pytest.mark.slow
-def test_respec_projects_the_path_from_the_current_build(deps, game_data):
-    rep = build_report(deps, "leveling", 16, preset="rapide", current=CURRENT_11, sensitivity=False)
-    proj = rep["respec"]["projected"]
-    first = game_data.constants.talents.first_level
-    assert proj["from_level"] == rep["respec"]["current_level"] == first + 1
-    assert proj["to_level"] == 16
-    levels = [s["level"] for s in proj["steps"]]
-    assert levels == sorted(levels) and all(proj["from_level"] < lv <= 16 for lv in levels)
-    assert all(s["talent"] in game_data.talents for s in proj["steps"])
-    talents = proj["talents"]
-    assert all(talents.get(k, 0) >= v for k, v in CURRENT_11.items())  # le build actuel est gardé
-    assert check_build(game_data, talents, 16) == []
-    assert proj["points"]["total"] == sum(talents.values())
-
-
-def test_no_projection_without_current_build(deps):
-    rep = build_report(deps, "leveling", 12, preset="rapide", sensitivity=False)
-    assert rep["respec"].get("projected") is None
 
 
 # --- Profil : neuf classes et personnages prévus ---------------------------------------------------------------------

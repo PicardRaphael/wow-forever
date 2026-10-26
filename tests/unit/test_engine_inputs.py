@@ -16,15 +16,13 @@ from forever.engine_inputs import (
     EngineSpec,
     canonical_sha,
     capture_reads,
-    cases_to_replay,
     check_engines,
     compare_inputs,
     covered,
     metadata_keys,
-    targeted_replay,
 )
 
-MAGE = ("mage_build", "mage_leveling")
+MAGE = ("mage_leveling",)
 
 
 @pytest.fixture
@@ -47,27 +45,24 @@ def different(diffs):
 
 
 def test_engines_are_declared():
-    assert set(ENGINES) == {"mage_build", "mage_leveling", "pvp_dr"}
+    assert set(ENGINES) == {"mage_leveling", "pvp_dr"}  # RB1 (décision 299) : plus de moteur mage_build
     for name, spec in ENGINES.items():
         assert spec.name == name
         assert spec.files
-        assert bool(spec.cases) == (spec.mode == "calcule")  # un moteur qui recopie n'a pas de cas de rejeu
         assert not set(spec.files) & PROVENANCE_FILES
 
 
 def test_engines_declare_their_mode():
     assert {n: s.mode for n, s in ENGINES.items()} == {
-        "mage_build": "calcule",
         "mage_leveling": "calcule",
         "pvp_dr": "recopie",
     }
-    assert ENGINES["pvp_dr"].cases == ()
     check_engines(ENGINES)
 
 
 def test_an_engine_without_mode_cannot_be_built():
     with pytest.raises(TypeError):
-        EngineSpec("sans_mode", ("spells.json",), {}, ())  # type: ignore[call-arg]
+        EngineSpec("sans_mode", ("spells.json",), {})  # type: ignore[call-arg]
 
 
 def test_an_unknown_mode_is_refused():
@@ -186,16 +181,6 @@ def assert_covered(name, reads):
     assert missing == [], f"{name} lit des entrées non déclarées : {missing}"
 
 
-@pytest.mark.slow
-def test_completeness_of_the_mage_build_engine(make_deps):
-    from forever.build import build_report
-
-    deps = make_deps()
-    reads = capture_reads(lambda: build_report(deps, "leveling", 20, preset="rapide", sensitivity=False))
-    assert ("classes.json", "/classes/Mage/spells") in reads
-    assert_covered("mage_build", reads)
-
-
 def test_completeness_of_the_mage_leveling_engine(make_deps):
     from forever.leveling import simulate_leveling
 
@@ -215,48 +200,9 @@ def test_completeness_of_the_pvp_engine(make_deps):
 
 
 def test_an_undeclared_read_is_caught():
-    spec = ENGINES["mage_build"]
+    spec = ENGINES["mage_leveling"]
     assert not covered(spec, ("pvp_rules.json", None))
     assert not covered(spec, ("classes.json", "/classes/Warrior"))
     assert not covered(spec, ("classes.json", None))
     assert covered(spec, ("spells.json", None))
     assert covered(ENGINES["pvp_dr"], ("classes.json", "/classes/Druid"))
-
-
-def test_targeted_replay_runs_only_touched_engines(pair):
-    _, after = pair
-
-    def bump(doc):
-        doc["spells"]["frostbolt"][0]["components"][0]["base_points"] += 1
-
-    edit(after / "spell_scaling.json", bump)
-    diffs = compare_inputs(*pair)
-    diffs = {k: v for k, v in diffs.items() if k != "mage_leveling"} | {
-        "mage_leveling": diffs["mage_leveling"]._replace(identical=True)
-    }
-    chosen = cases_to_replay(diffs)
-    assert chosen and {e for e, _ in chosen} == {"mage_build"}
-    assert {c for _, c in chosen} == set(ENGINES["mage_build"].cases)
-    calls = []
-    result = targeted_replay(diffs, lambda engine, case: calls.append((engine, case)) or f"{engine}:{case}")
-    assert calls == chosen
-    assert set(result) == {"mage_build"}
-    assert not any(e == "pvp_dr" for e, _ in calls)
-
-
-def test_targeted_replay_skips_copying_engines(pair):
-    _, after = pair
-
-    def warrior(doc):
-        spell = next(iter(doc["classes"]["Warrior"]["spells"].values()))
-        spell["ranks"][0]["level"] += 1
-
-    edit(after / "classes.json", warrior)
-    diffs = compare_inputs(*pair)
-    assert different(diffs) == {"pvp_dr"}
-    assert cases_to_replay(diffs) == []
-    assert targeted_replay(diffs, lambda engine, case: pytest.fail(f"rejeu de {engine} {case}")) == {}
-
-
-def test_nothing_to_replay_when_identical(pair):
-    assert cases_to_replay(compare_inputs(*pair)) == []

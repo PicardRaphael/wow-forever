@@ -45,13 +45,11 @@ def test_classes_and_questions():
     assert by_key["pvp"].classes is None and by_key["pvp"].needs_player_target
     talents = by_key["talents"]
     assert talents.classes is None
-    assert talents.question_for("MAGE") == "Quel est mon prochain talent, avec le lien Talents Forever ?"
-    for cls in CLASSES[1:]:
+    for cls in CLASSES:  # RB1 (décision 299) : le Mage comme les autres classes
         assert "build populaire" in talents.question_for(cls) and "Talents Forever" in talents.question_for(cls)
         assert talents.notice_for(cls) == (
-            "Build populaire de Talents Forever (choix de joueurs), pas encore calculé par le moteur de forever."
+            "Build populaire de Talents Forever (choix de joueurs), non calculé par forever."
         )
-    assert talents.notice_for("MAGE") is None
     assert by_key["leveling"].question_for("MAGE") == "Quel est mon prochain objectif de leveling ?"
     assert (
         by_key["pets"].question_for("HUNTER")
@@ -64,7 +62,7 @@ def test_payload_for_the_addon():
     payload = button_payload(visible_buttons())
     talents = payload[0]
     assert talents["key"] == "talents" and talents["label"] == "Talents"
-    assert talents["questions"]["MAGE"].startswith("Quel est mon prochain talent")
+    assert "questions" not in talents
     assert "classes" not in talents
     pets = next(b for b in payload if b["key"] == "pets")
     assert pets["classes"] == ["HUNTER"]

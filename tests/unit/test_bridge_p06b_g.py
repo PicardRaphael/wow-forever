@@ -219,7 +219,6 @@ def test_replies_have_no_internal_jargon(tmp_path):
         ("nouvelle_version", None, "téléchargement de la nouvelle version"),
         ("correctifs", None, "lecture des correctifs du serveur"),
         ("journaux", "journaux : en cours", "mesures de tes combats"),
-        ("journaux", "rejeu : 12 cas comparés en 40 s", "recalcul des builds"),
         ("journaux", "journaux : tasks.py verify --data dans le clone (moteurs : aucun)", "vérification des données"),
         ("journaux", "journaux : uv sync dans le clone", "préparation de la vérification"),
         ("journaux", "journaux : verify vert ; commit et poussée de data/x-r2", "envoi sur GitHub"),

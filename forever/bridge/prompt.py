@@ -13,7 +13,7 @@ Chaque message commence par le contexte de son personnage, envoyé par le jeu, p
 - Réponse courte : 600 caractères au plus, hors mise en forme. En français, sauf si la question est dans une autre
   langue.
 - Parle comme à un joueur, pas à un développeur : jamais de nom de tranche du projet (comme T10a ou T04d), ni de nom
-  de champ, de clé ou d'outil interne (comme next_step, missing_points ou forever_build). Ce qui n'est pas encore
+  de champ, de clé ou d'outil interne (comme missing_points, tf_popular ou forever_lookup). Ce qui n'est pas encore
   couvert se dit en mots de joueur (« je ne sais pas encore comparer les objets »).
 - Lis la question avec la conversation : une faute de frappe se comprend d'après ce qui vient d'être dit (« projet
   step » juste après une question sur le build : « prochain step », soit le prochain talent ou la prochaine étape du
@@ -26,9 +26,7 @@ Chaque message commence par le contexte de son personnage, envoyé par le jeu, p
 - Chiffres de jeu seulement s'ils viennent d'un outil forever, jamais de mémoire ni calculés à la main ; sinon dire
   « je ne sais pas » et ce qui manque.
 - Le contexte donne la race, le niveau et les talents actuels du personnage (clés de forever prêtes pour `current` de
-  forever_build) : utilise-les tels quels, sans les redemander.
-- Égalité : quand forever_build rend `alternative.tie` vrai, dis que les deux builds sont à
-  égalité statistique et présente les deux options, chacune avec son lien Talents Forever quand l'outil le rend.
+  tf_popular) : utilise-les tels quels, sans les redemander.
 - Quand la réponse donne un build, inclure le lien Talents Forever rendu par l'outil, tel quel.
 - Message avec une « Consigne du bouton » : fais exactement les appels indiqués, avec ces arguments, puis lis le
   résultat comme indiqué ; n'ajoute un autre appel que si l'un d'eux échoue.
@@ -77,7 +75,7 @@ def message_text(
     if talents and talents.startswith(("Talents actuels", "Cible", "Équipement")):
         lines.append(talents)
     elif talents:
-        lines.append(f"Talents actuels (clés de forever, pour `current` de forever_build) : {talents}")
+        lines.append(f"Talents actuels (clés de forever, pour `current` de tf_popular) : {talents}")
     if profile:  # écart entre le jeu et le profil (P06b, décision 122) : ligne fixe du pont
         lines.append(profile)
     if pending:  # CJ1 : cartes « À valider » réellement montrées au joueur (ligne fixe du pont)

@@ -18,11 +18,8 @@ from talents_forever_data import write_addon
 
 from forever.bridge.buttons import BUTTONS, visible_buttons
 from forever.bridge.context import load_context_data, resolve
-from forever.bridge.plans import button_plan, plan_text, prepare_record
-from forever.bridge.prompt import message_text
-from forever.bridge.record import Record
+from forever.bridge.plans import button_plan
 from forever.mcp_server import build_server
-from forever.talents_forever import decode_code, load_addon
 
 CONTEXTS = FIXTURES / "bridge" / "contexts"
 QUESTIE = FIXTURES / "questie" / "11.38.0"
@@ -69,14 +66,6 @@ def run_calls(deps, plan) -> list[dict]:
     return asyncio.run(go())
 
 
-@pytest.fixture(scope="module")
-def talents_run(bench):
-    deps, data = bench
-    resolved = resolve(data, context("mage19"))
-    plan = button_plan("talents", resolved, data.level_cap)
-    return plan, run_calls(deps, plan)
-
-
 # --- Contexte réel ------------------------------------------------------------------------------------------------
 
 
@@ -94,90 +83,13 @@ def test_real_contexts_are_fully_recognized(bench):
     assert sky.target_races == ("High Order Skyborne", "Windshaper Skyborne")
 
 
-# --- Bouton Talents (Mage) ----------------------------------------------------------------------------------------
-
-
-def test_talents_plan_asks_the_next_level_from_the_current_build(talents_run, bench):
-    _, data = bench
-    plan, _ = talents_run
-    assert data.level_cap is not None and data.level_cap > 20
-    ((call,),) = (plan.calls,)
-    assert call.tool == "forever_build"
-    assert call.args == {
-        "context": "leveling",
-        "level": 20,
-        "race": "Orc",
-        "current": {"elementalPrecision": 5, "improvedFrostbolt": 5},
-        "sensitivity": False,
-    }
-    assert plan.link == "projected"
-
-
-def test_talents_result_gives_the_next_point_from_the_projected_path(talents_run):
-    _, (report,) = talents_run
-    projected = report["respec"]["projected"]
-    assert (projected["from_level"], projected["to_level"]) == (19, 20)
-    (step,) = projected["steps"]
-    assert step["level"] == 20
-    nxt = report["next_step"]
-    assert nxt is not None and nxt["level"] == 20
-    assert step["talent"] in {c["talent"] for c in nxt["candidates"]}
-    expected = {"elementalPrecision": 5, "improvedFrostbolt": 5}
-    expected[step["talent"]] = expected.get(step["talent"], 0) + 1
-    assert projected["talents"] == expected
-
-
-def test_talents_result_flags_the_tie(talents_run):
-    _, (report,) = talents_run
-    nxt = report["next_step"]
-    if nxt["decided_by"] in ("non_departage", "modelise"):
-        assert nxt["runner_up"] and nxt["gap"]["significant"] is False
-
-
-def test_talents_link_is_the_valid_link_of_the_players_path(talents_run, bench):
-    deps, _ = bench
-    _, (report,) = talents_run
-    export = report["respec"]["projected"]["export"]
-    assert export["status"] == "ok" and export["link"].startswith("https://talentsforever.com/")
-    decoded = decode_code(load_addon(deps), deps, export["link"])
-    assert decoded["talents"] == report["respec"]["projected"]["talents"]
-    assert decoded["legal"] is True
-
-
-def test_talents_guide_reads_the_projected_step_and_the_tie(talents_run):
-    plan, _ = talents_run
-    text = plan_text(plan)
-    for words in ('"level": 20', "respec.projected.steps", "next_step.decided_by", "runner_up", "complément"):
-        assert words in text, words
-
-
-def test_message_of_the_talents_button_carries_the_plan(bench):
-    _, data = bench
-    record = Record(
-        "6ac884ce31ab", 9, frozenset({"b=talents", "n"}), context("mage19"), "Quel est mon prochain talent ?"
-    )
-    prepared = prepare_record(data, record)
-    assert prepared.defects == [] and prepared.link == "projected"
-    text = message_text(record, talents=prepared.notes, guide=prepared.guide)
-    assert "elementalPrecision:5 (Elemental Precision 5/5)" in text
-    assert '"level": 20' in text and "non reconnu" not in text
-    assert text.rstrip().endswith("Quel est mon prochain talent ?")
-
-
-def test_talents_plan_at_the_level_cap_asks_the_same_level(bench):
-    _, data = bench
-    ctx = {**context("mage19"), "level": str(data.level_cap)}
-    plan = button_plan("talents", resolve(data, ctx), data.level_cap)
-    assert plan.calls[0].args["level"] == data.level_cap
-
-
 # --- Bouton Leveling (Mage) ---------------------------------------------------------------------------------------
 
 
-def test_leveling_plan_zones_and_next_point(bench):
+def test_leveling_plan_zones_and_popular_build(bench):
     deps, data = bench
     plan = button_plan("leveling", resolve(data, context("mage19")), data.level_cap)
-    assert [c.tool for c in plan.calls] == ["forever_lookup", "forever_build", "forever_sim_leveling"]
+    assert [c.tool for c in plan.calls] == ["forever_lookup", "forever_lookup", "forever_sim_leveling"]
     assert plan.calls[0].args == {
         "kind": "zones",
         "level": 19,
@@ -185,7 +97,7 @@ def test_leveling_plan_zones_and_next_point(bench):
         "limit": 5,
         "class_name": "Mage",
     }  # classe du personnage connecté
-    assert plan.calls[1].args["level"] == 20
+    assert plan.calls[1].args["kind"] == "tf_popular"  # RB1 : build populaire, comme les autres classes
     zones = run_calls(deps, type(plan)(plan.button, plan.calls[:1], plan.read, plan.link))[0]
     assert "error" not in zones and zones["provenance"]["game_version"]
 

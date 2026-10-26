@@ -29,7 +29,6 @@ def test_stdio_server(tmp_path):
         "forever_lookup",
         "forever_explain_mechanic",
         "forever_sim_leveling",
-        "forever_build",
         "forever_player_profile",  # T06b : profil joueur, lecture seule
         "forever_route",  # RX1 : feuille de route de leveling
         "forever_gear",  # CJ1 : équipement (poids, liste BiS, leveling, amélioration)

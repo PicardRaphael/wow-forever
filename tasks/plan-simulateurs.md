@@ -42,7 +42,7 @@ https://www.curseforge.com/wow/addons/sims-forever), seulement si tu veux coller
 | --- | --- |
 | rencontres du 60 (`forever/sim/encounter.py`, scénarios de donjon et de raid au 60) | **retiré** au profit de wowsims ; gardé pour les niveaux inférieurs au 60, gelé |
 | poids du Mage au 60 (`gear.py` `mage_weights` au niveau 60) | **retiré** au profit des poids de wowsims ; sous le 60, gelé |
-| optimiseur de fin de partie (`optimize/endgame.py`) | **gelé** ; les candidats du 60 sont évalués par wowsims |
+| optimiseur de fin de partie (`optimize/endgame.py`) | **retiré** avec toute la recherche de build du Mage (RB1, décision 299) |
 | mécaniques du Mage (`forever/engine/`, HF2 compris) | **gelées** à 70450 r7 ; plus aucune mécanique nouvelle |
 | Eureka! actif (branche `races`, non fusionnée) | **abandonné** (nouveau code de calcul) ; wowsims modélise Eureka! |
 | PvP analytique (`engine/pvp.py`) | **gelé** |
@@ -77,7 +77,7 @@ pont, mesures tirées des journaux de combat, lecteurs du client et des addons, 
 | --- | --- |
 | 22 oct. | Décision 293 et `CLAUDE.md` (faits avec ce plan) ; registre des sources étendu (références à la main) |
 | 23-25 oct. | Adaptateur wowsims : binaire épinglé, `RaidSimRequest` depuis le personnage connecté, lecture du résultat ; tests sur des sorties enregistrées (sans réseau) |
-| 26-27 oct. | Poids et comparaisons des races et des classes au 60 par wowsims ; outils `forever_build` et `forever_gear` branchés au 60 ; ta comparaison Mage, Chaman et races refaite dessus |
+| 26-27 oct. | Poids et comparaisons des races et des classes au 60 par wowsims ; outils `forever_build` (retiré en RB1) et `forever_gear` branchés au 60 ; ta comparaison Mage, Chaman et races refaite dessus |
 | 28-29 oct. | Étape `simulateurs` de la veille, rapport des écarts ; gel du moteur (marquage, retraits du 60) |
 | 30 oct.-2 nov. | Reste de ta demande précédente : `docs/LANCEMENT.md` (préférences de départ, neuf classes, plusieurs personnages) ; correction de `lookup_zones` filtré sur le Mage ; proposition du type de serveur (ci-dessous) |
 | après le 4 nov. | Leveling par une source externe dès qu'il en existe une ; type de serveur et zones disputées si tu le valides |
@@ -116,5 +116,5 @@ pont, mesures tirées des journaux de combat, lecteurs du client et des addons, 
    buffs) ou depuis le personnage connecté (race, classe, talents, équipement), lancement du binaire épinglé,
    lecture du résultat ; provenance (commit, empreinte, certitude `suppose`).
 3. Comparaisons au 60 : races, spécialisations, poids par tirages appariés (`bonusStats`), même graine.
-4. Branchement dans `forever_build` et `forever_gear` au niveau 60 ; sous le 60, moteur du Mage gelé, dit comme tel.
+4. Branchement dans `forever_gear` au niveau 60 (`forever_build` retiré en RB1, décision 299) ; sous le 60, moteur du Mage gelé, dit comme tel.
 5. Étape `simulateurs` de la veille, rapport des écarts.

@@ -4,29 +4,18 @@ en mots de joueur, état). La fiche nourrit la carte « Mis à jour » du pont e
 commande « Annuler » (`forever update undo <id>`). Une fiche annulée empêche la veille de réinstaller le même
 contenu ; un contenu nouveau s'installe normalement.
 
-Ce module ne fait ni git ni réseau : il lit et écrit des fiches, et traduit un rejeu en phrases."""
+Ce module ne fait ni git ni réseau : il lit et écrit des fiches."""
 
 from __future__ import annotations
 
 import json
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
 from forever.errors import InvalidArgumentError
 
 INSTALLED_STATES = ("installée", "annulée")
-# Contextes des cas rejoués (`forever/replay.py`, « leveling-20 ») en mots de joueur.
-CONTEXT_FR = {
-    "leveling": "leveling",
-    "dungeon": "donjon",
-    "raid": "raid",
-    "pvp-bg": "PvP en champ de bataille",
-    "pvp-world": "PvP sauvage",
-    "sim-leveling": "simulation du leveling",
-}
-CHOICE_FR = {"rotation": "rotation", "armor": "armure", "aoe_filler": "sort de zone"}
-CHANGES_SHOWN = 8  # phrases gardées par fiche ; le reste est compté
 
 
 def installed_dir(cache_dir: Path) -> Path:
@@ -92,75 +81,14 @@ def notices(cache_dir: Path) -> list[dict[str, Any]]:
     return [d for d in list_installed(cache_dir) if d.get("state") == "installée" and not d.get("dismissed")]
 
 
-def _case_label(engine: str, case: str) -> str:
-    context, _, level = case.rpartition("-")
-    what = CONTEXT_FR.get(context, context or case)
-    who = "Mage" if engine.startswith("mage") else engine
-    return f"build {who} {what} niveau {level}" if level.isdigit() else f"build {who} {case}"
-
-
-def _talent_lines(before: Mapping[str, Any], after: Mapping[str, Any], names: Mapping[str, str]) -> list[str]:
-    out = []
-    for key in sorted(set(before) | set(after), key=lambda k: names.get(k, k)):
-        a, b = before.get(key, 0) or 0, after.get(key, 0) or 0
-        if a != b:
-            out.append(f"{names.get(key, key)} passe de {a} à {b}")
-    return out
-
-
-def _choice_lines(before: Mapping[str, Any], after: Mapping[str, Any]) -> list[str]:
-    out = []
-    for situation in sorted(set(before) | set(after)):
-        old, new = before.get(situation) or {}, after.get(situation) or {}
-        for field in sorted(set(old) | set(new)):
-            if old.get(field) != new.get(field) and field in CHOICE_FR:
-                where = situation.rpartition("_")[2] if "_" in situation else situation
-                out.append(f"{CHOICE_FR[field]} ({where}) : {old.get(field)} → {new.get(field)}")
-    return out
-
-
-def advice_changes(replayed: Mapping[str, Any], names: Mapping[str, str]) -> list[str]:
-    """Conseils changés par une installation, en mots de joueur : « build Mage donjon niveau 20 : Frost Warding passe
-    de 0 à 2 ». `replayed` : rejeu ciblé (`{moteur: {cas: {"avant": conseil, "après": conseil}}}`) ; `names` : clé
-    du talent → nom en jeu. Un cas non rejoué ou inchangé ne donne rien."""
-    lines: list[str] = []
-    for engine in sorted(replayed):
-        cases = replayed[engine]
-        if not isinstance(cases, Mapping):
-            continue
-        for case in sorted(cases):
-            sides = cases[case]
-            if not isinstance(sides, Mapping):
-                continue
-            before, after = sides.get("avant"), sides.get("après")
-            if not isinstance(before, Mapping) or not isinstance(after, Mapping) or before == after:
-                continue
-            if before.get("rejoué") is False or after.get("rejoué") is False:
-                continue
-            parts = _talent_lines(before.get("talents") or {}, after.get("talents") or {}, names)
-            parts += _choice_lines(before.get("choices") or {}, after.get("choices") or {})
-            if parts:
-                lines.append(f"{_case_label(engine, case)} : {', '.join(parts)}")
-    return lines
-
-
 def notice_lines(record: Mapping[str, Any]) -> list[str]:
-    """Ce qu'une installation a changé, pour la carte et `forever update status` : conseils changés (rejeu), sinon
-    résumé des valeurs ; puis les notes de la règle (valeur faite à la main remplacée…)."""
-    changes: Sequence[str] = record.get("changes") or []
-    lines = list(changes[:CHANGES_SHOWN])
-    if len(changes) > CHANGES_SHOWN:
-        lines.append(f"et {len(changes) - CHANGES_SHOWN} autre(s) conseil(s) changé(s)")
-    replay = record.get("replay")
-    if not changes:
-        if replay == "en cours":
-            lines.append("conseils en cours de comparaison")
-        elif replay == "aucun changement":
-            lines.append("aucun conseil de build ne change")
-        summary = str(record.get("summary") or "")
-        if summary:
-            lines.append(summary)
-        lines += [str(m) for m in record.get("measures") or []]
+    """Ce qu'une installation a changé, pour la carte et `forever update status` : résumé des valeurs, puis les notes
+    de la règle (valeur faite à la main remplacée…)."""
+    lines: list[str] = []
+    summary = str(record.get("summary") or "")
+    if summary:
+        lines.append(summary)
+    lines += [str(m) for m in record.get("measures") or []]
     lines += [str(n) for n in record.get("notes") or []]
     return lines
 

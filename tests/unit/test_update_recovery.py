@@ -13,7 +13,7 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from test_update_chain import TARGET, Replay, montage, step  # noqa: F401 : fixture partagée
+from test_update_chain import TARGET, montage, step  # noqa: F401 : fixture partagée
 from test_update_publish import GAME, Recorder, git, isolated_git, origin  # noqa: F401 : fixtures partagées
 
 from forever.cli import main
@@ -92,7 +92,7 @@ class SameHead:
 def test_a_red_verify_in_the_clone_is_a_blocked_wait_with_its_output(origin, capsys):  # noqa: F811
     montage_, _bare = origin
     deps, _ = montage_()
-    report = run_update(deps, GAME, runner=RedVerify(), replay=Replay())
+    report = run_update(deps, GAME, runner=RedVerify())
     assert exit_code(report) == EXIT_PENDING
     (entry,) = report["pending"]
     assert (entry["kind"], entry["action"], entry["version"]) == ("install_version", "bloqué", TARGET)
@@ -116,15 +116,15 @@ def test_a_red_verify_in_the_clone_is_a_blocked_wait_with_its_output(origin, cap
 def test_a_blocked_verify_is_not_run_again_until_main_moves(origin, tmp_path):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
-    run_update(deps, GAME, runner=RedVerify(), replay=Replay())
+    run_update(deps, GAME, runner=RedVerify())
     again = RedVerify()
-    report = run_update(deps, GAME, runner=again, replay=Replay())
+    report = run_update(deps, GAME, runner=again)
     assert verify_calls(again) == []  # pas 13 min de verify toutes les 6 h sur le même main
     assert step(report, "nouvelle_version")["status"] == "arrêt"
     assert exit_code(report) == EXIT_PENDING and [p["action"] for p in report["pending"]] == ["bloqué"]
     advance_main(bare, tmp_path)  # une correction arrive sur main : nouvel essai
     green = Recorder()
-    report = run_update(deps, GAME, runner=green, replay=Replay())
+    report = run_update(deps, GAME, runner=green)
     assert len(verify_calls(green)) == 1
     assert [w["version"] for w in report["written"]] == [TARGET]
 
@@ -137,11 +137,11 @@ def test_a_pass_killed_during_the_ci_wait_is_resumed_by_the_next_one(origin):  #
     montage_, bare = origin
     deps, _ = montage_()
     with pytest.raises(Killed):
-        run_update(deps, GAME, runner=KillAt(["gh", "run", "list"]), replay=Replay())
+        run_update(deps, GAME, runner=KillAt(["gh", "run", "list"]))
     clone = clone_of(deps)
     assert head_branch(clone) == BRANCH and git(bare, "branch", "--list", BRANCH)  # poussée, CI non attendue
     rec = Recorder()
-    report = run_update(deps, GAME, runner=rec, replay=Replay())
+    report = run_update(deps, GAME, runner=rec)
     cloned = step(report, "clone")
     assert cloned["status"] == "fait" and "reprise" in cloned["detail"], cloned
     assert verify_calls(rec) == []  # rien n'est refait : CI attendue, puis fusion
@@ -158,12 +158,12 @@ def test_a_pass_killed_after_the_merge_only_cleans_up(origin):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
     with pytest.raises(Killed):
-        run_update(deps, GAME, runner=KillAt(["git", "switch", "main"]), replay=Replay())
+        run_update(deps, GAME, runner=KillAt(["git", "switch", "main"]))
     assert git(bare, "ls-tree", "--name-only", "main", f"forever/data/{TARGET}")  # déjà fusionnée
     clone = clone_of(deps)
     assert head_branch(clone) == BRANCH
     rec = Recorder()
-    report = run_update(deps, GAME, runner=rec, replay=Replay())
+    report = run_update(deps, GAME, runner=rec)
     assert "fusionnée" in step(report, "clone")["detail"]
     assert not any(c[0] in ("uv", "gh") for c in rec.calls)
     assert [w["version"] for w in report["written"]] == [TARGET]
@@ -175,11 +175,11 @@ def test_a_pass_killed_before_the_push_returns_to_main_and_writes_again(origin):
     montage_, bare = origin
     deps, _ = montage_()
     with pytest.raises(Killed):
-        run_update(deps, GAME, runner=KillAt(["git", "push", "-u"]), replay=Replay())
+        run_update(deps, GAME, runner=KillAt(["git", "push", "-u"]))
     clone = clone_of(deps)
     assert head_branch(clone) == BRANCH and git(bare, "branch", "--list", BRANCH) == ""  # jamais poussée
     rec = Recorder()
-    report = run_update(deps, GAME, runner=rec, replay=Replay())
+    report = run_update(deps, GAME, runner=rec)
     cloned = step(report, "clone")
     assert cloned["status"] == "fait" and "abandonnée" in cloned["detail"], cloned
     assert [w["version"] for w in report["written"]] == [TARGET]  # écrite de nouveau, depuis main
@@ -193,9 +193,9 @@ def test_a_red_ci_found_on_resume_returns_to_main_and_blocks(origin, tmp_path): 
     deps, _ = montage_()
     head = git(bare, "rev-parse", "main")
     with pytest.raises(Killed):
-        run_update(deps, GAME, runner=KillAt(["gh", "run", "list"]), replay=Replay())
+        run_update(deps, GAME, runner=KillAt(["gh", "run", "list"]))
     rec = Recorder(failing_job="windows")
-    report = run_update(deps, GAME, runner=rec, replay=Replay())
+    report = run_update(deps, GAME, runner=rec)
     clone = clone_of(deps)
     assert step(report, "clone")["status"] == "fait" and head_branch(clone) == "main"
     assert git(bare, "rev-parse", "main") == head and report["written"] == []
@@ -205,7 +205,7 @@ def test_a_red_ci_found_on_resume_returns_to_main_and_blocks(origin, tmp_path): 
     assert any("CI" in r for r in entry["reasons"]) and exit_code(report) == EXIT_PENDING
     assert verify_calls(rec) == []  # même main : pas de nouvel essai dans le même passage
     advance_main(bare, tmp_path)
-    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder())
     assert [w["version"] for w in report["written"]] == [TARGET]  # branche périmée remplacée, puis fusion
     assert git(bare, "branch", "--list", BRANCH) == ""
 
@@ -214,13 +214,13 @@ def test_a_red_ci_found_on_resume_returns_to_main_and_blocks(origin, tmp_path): 
 def test_a_red_ci_in_the_pass_returns_the_clone_to_main_and_blocks(origin):  # noqa: F811
     montage_, bare = origin
     deps, _ = montage_()
-    report = run_update(deps, GAME, runner=Recorder(failing_job="windows"), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder(failing_job="windows"))
     assert head_branch(clone_of(deps)) == "main"
     assert git(bare, "branch", "--list", BRANCH)  # gardée pour l'examen de la CI
     (entry,) = report["pending"]
     assert entry["action"] == "bloqué" and entry.get("ci")
     again = Recorder()
-    report = run_update(deps, GAME, runner=again, replay=Replay())
+    report = run_update(deps, GAME, runner=again)
     assert verify_calls(again) == [] and report["written"] == []
 
 
@@ -233,7 +233,7 @@ def test_the_written_version_carries_its_manual_values_inventory(origin):  # noq
     courante : l'écriture d'une nouvelle version le rend de nouveau (relevé par le bout en bout, décision 192)."""
     montage_, bare = origin
     deps, _ = montage_()
-    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder())
     assert [w["version"] for w in report["written"]] == [TARGET]
     doc = git(bare, "show", "main:docs/research/valeurs-ecrites-a-la-main.md")
     assert f"forever/data/{TARGET}/" in doc
@@ -248,13 +248,13 @@ def test_an_undo_killed_before_the_push_returns_to_main_and_can_be_asked_again(o
 
     montage_, bare = origin
     deps, _ = montage_()
-    run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    run_update(deps, GAME, runner=Recorder())
     (record,) = list_installed(deps.cache_dir)
     with pytest.raises(Killed):
         undo(deps, record["id"], runner=KillAt(["git", "push", "-u"]))
     clone = clone_of(deps)
     assert head_branch(clone) == f"data/undo-{record['id']}"
-    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder())
     cloned = step(report, "clone")
     assert cloned["status"] == "fait" and "annulation interrompue" in cloned["detail"], cloned
     assert head_branch(clone) == "main"

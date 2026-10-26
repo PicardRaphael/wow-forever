@@ -20,8 +20,7 @@ def entry(kind, *, action="attente", state="en_attente", **extra):
 
 
 def measures(state="en_attente"):
-    builds = {"replayed": True, "changed": [{"engine": "leveling", "case": "leveling-20"}], "unchanged": 3}
-    return entry("measures", state=state, summary=measure_summary(DETAILS, HP_LEVELS, builds))
+    return entry("measures", state=state, summary=measure_summary(DETAILS, HP_LEVELS))
 
 
 @pytest.mark.parametrize(
@@ -61,12 +60,12 @@ def test_measures_card_lines():
     assert any(line.startswith("PNJ changés : Synthetic Wolf") for line in lines)
     assert any(line.startswith("PNJ nouvellement écartés : Synthetic Giant") for line in lines)
     assert any(line.startswith("PV par niveau : niv. 7 : 100 → 111") for line in lines)
-    assert any(line == "Builds changés après rejeu : leveling leveling-20" for line in lines)
+    assert not any(line.startswith("Builds") for line in lines)
 
 
 def test_names_are_listed_ten_at_most():
     details = {**DETAILS, "added": [{"npc_id": 900100 + i, "name": f"Boar {i}", "levels": {}} for i in range(12)]}
-    summary = measure_summary(details, {}, {"replayed": False, "reason": "rejeu non fait"})
+    summary = measure_summary(details, {})
     (added,) = [line for line in card_lines(entry("measures", summary=summary)) if line.startswith("PNJ ajoutés")]
     assert "Boar 9" in added and "Boar 10" not in added and "… et 2 autre(s)" in added
 

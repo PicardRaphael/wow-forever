@@ -24,7 +24,7 @@ from pathlib import Path
 
 import pytest
 from conftest import REPO_ROOT
-from test_update_chain import BASE, DRY, TARGET, Replay, montage, step  # noqa: F401 : fixture partagée
+from test_update_chain import BASE, DRY, TARGET, montage, step  # noqa: F401 : fixture partagée
 from test_update_publish import GAME, Recorder, git, isolated_git, origin  # noqa: F401 : fixtures partagées
 
 from forever import update
@@ -118,7 +118,7 @@ def test_a_fresh_lock_of_a_living_process_still_stops_the_run(montage):  # noqa:
     deps, _ = montage()
     assert acquire_lock(deps, "forever update --auto") is None  # processus des tests : vivant
     assert update_summary(deps.cache_dir, deps.now())["running"] is True
-    report = run_update(deps, DRY, replay=Replay())
+    report = run_update(deps, DRY)
     assert [s["status"] for s in report["steps"]] == ["arrêt"]
 
 
@@ -153,7 +153,7 @@ def test_each_step_is_written_before_the_next_one_starts(montage, monkeypatch, c
 def test_an_empty_version_folder_is_not_an_installed_version(montage):  # noqa: F811
     deps, _ = montage()
     (deps.data_dir / TARGET).mkdir()  # reste d'un passage interrompu, absent du manifeste
-    report = run_update(deps, DRY, replay=Replay())
+    report = run_update(deps, DRY)
     game = step(report, "jeu")
     assert game["status"] == "fait" and game["data"]["target"] == TARGET, game
     assert game["data"]["installed"] == BASE
@@ -185,7 +185,7 @@ def test_an_interrupted_publish_left_in_the_clone_is_discarded(origin):  # noqa:
         f.write(" ")
     (clone / "docs" / "research").mkdir(parents=True)
     (clone / "docs" / "research" / f"data-{TARGET}-r1.md").write_text("rapport", encoding="utf-8")
-    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder())
     cloned = step(report, "clone")
     assert cloned["status"] == "fait", cloned
     assert "passage interrompu" in cloned["detail"]
@@ -198,7 +198,7 @@ def test_an_empty_version_folder_left_in_the_clone_is_removed_and_the_version_in
     """Le cas du poste : `forever/data/1.60.1.70235` vide dans le clone (fichiers retirés, dossier gardé)."""
     deps, bare, clone = _clone(origin)
     (clone / "forever" / "data" / TARGET).mkdir()
-    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder())
     assert step(report, "clone")["status"] == "fait"
     assert f"forever/data/{TARGET}/" in step(report, "clone")["data"]["discarded"]
     assert step(report, "jeu")["data"]["target"] == TARGET
@@ -211,7 +211,7 @@ def test_dirt_outside_the_paths_of_the_pass_still_stops_the_run(origin):  # noqa
     head = git(bare, "rev-parse", "main")
     (clone / "notes.txt").write_text("à moi", encoding="utf-8")
     (clone / "forever" / "data" / TARGET).mkdir()
-    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder())
     cloned = step(report, "clone")
     assert cloned["status"] == "arrêt" and "notes.txt" in cloned["detail"], cloned
     assert (clone / "notes.txt").read_text(encoding="utf-8") == "à moi"  # jamais touché

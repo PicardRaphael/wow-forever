@@ -1273,7 +1273,6 @@ mechanics:
       - tests/unit/test_install.py::test_every_talent_is_certain
       - tests/unit/test_install.py::test_installed_client_values
       - tests/unit/test_totals.py::test_build_points_engine
-      - tests/unit/test_totals.py::test_build_report_gives_points
       - tests/unit/test_class_build_legality.py::test_rejects_tier_overflow_other_class
       - tests/unit/test_class_build_legality.py::test_rejects_missing_prerequisite
       - tests/unit/test_class_build_legality.py::test_mage_check_is_unchanged
@@ -1449,7 +1448,6 @@ mechanics:
       - tests/unit/test_encounter.py::test_arcane_power_at_the_pull_then_at_each_cooldown
       - tests/unit/test_encounter.py::test_monte_carlo_statistics_are_per_fight_dps
       - tests/unit/test_encounter_pack_single_target.py::test_pack_after_running_out_of_mana_counts_the_whole_duration
-      - tests/unit/test_build_contexts_end_to_end.py::test_context_value_uses_the_effective_duration_in_the_arcane_rotation
     tolerance: null
     formule: "durée fixe du scénario (build.scenarios, duration_s) ; un lancer n'est commencé que s'il finit dans la durée (cast_fits) ; dégâts par seconde = dégâts / durée retenue (encounter_length : mort du paquet, sinon durée entière après une fin de mana, sinon fin du dernier lancer) ; tank présent : aucun coup reçu, aucun recul ; mana : réserve + régénération en combat, sans Évocation ni potion (B10)"
     note: "T05 (décision 82) : scénarios provisoires, affinés en DJ1 et T09 ; analytique : cycle en taux (Fire Blast à période arrondie aux incantations de Fireball) ou déroulé lancer par lancer en espérance (Arcanes sur un boss : cycle incomplet de fin de combat, fenêtres d'Arcane Power, fin de mana) ; écart au Monte Carlo ≤ 1,5 % au niveau 40 (boss de donjon, n = 400) ; boss insensibles au gel (suppose, OPEN_QUESTIONS) ; la rotation ne s'adapte pas à la mana restante (angle mort) ; T05 bloc I2 : l'analytique du paquet compte toute la durée après une fin de mana (comme le Monte Carlo) ; écart analytique / Monte Carlo sur un paquet : +2 à +19 % sans fin de mana (DoT de Flamestrike compté en entier, morts simultanées), jusqu'à +28 % avec (dernière canalisation de Blizzard non payable au Monte Carlo) ; décision au Monte Carlo ; 1.60.1.70450 (décision 285, question RJ1) : nouveaux Arcanes au niveau 40 sur un boss de donjon, analytique +3,5 % de DPS face au Monte Carlo (hors des 3 % du test, xfail strict) ; Givre +0,4 %, Feu +0,1 %"
@@ -1580,7 +1578,6 @@ mechanics:
       - tests/unit/test_rotations_t05.py::test_arcane_power_raises_cost_and_damage_inside_the_window_only
       - tests/unit/test_encounter.py::test_pack_rotation_uses_area_spells
       - tests/unit/test_encounter.py::test_bosses_cannot_be_frozen
-      - tests/unit/test_engine_70450_frost_blast.py::test_frost_blast_is_offered_once_learned
       - tests/unit/test_engine_70450_arcane.py::test_arcane_rotation_with_wrath_simulates
     tolerance: null
     formule: "rotation arcane (T04c) : Arcane Blast jusqu'à ab_stacks cumuls, puis la décharge ab_dump ; rotation frost : Frost Nova au contact (option), Ice Lance sur cible gelée ou Fingers of Frost, sinon Frostbolt ; rotation fire : Fire Blast à portée hors recharge, sinon Fireball ; pas de sort si les projectiles en vol suffisent"
@@ -1610,7 +1607,6 @@ mechanics:
       - tests/unit/test_gear_weights.py::test_mage_weights_from_the_engine
       - tests/unit/test_gear_levels_from_one.py::test_mage_specs_from_level_one_use_a_learned_spell
       - tests/unit/test_gear_talents.py::test_a_talent_that_changes_a_stat_value_changes_the_ranking
-      - tests/unit/test_gear_talents.py::test_my_level_uses_my_real_talents
     tolerance: null
     note: "décision 282 : poids avec mes vrais talents à mon niveau (contexte du jeu), sinon ceux de mon plan de talents (ordre de prise du build de leveling calculé, rotation du plan), aucun avant le premier point ; build dit au joueur ; bug de l'écran Équipement du 2026-10-15 : sort principal de la spécialisation pas encore appris (Frostbolt avant son niveau, Arcane Blast) : poids calculés avec une autre rotation dont le sort est appris à ce niveau (Fireball dès le niveau 1), dit au joueur ; aucune : ordre de GearQuest"
   - id: I4
@@ -1626,7 +1622,7 @@ mechanics:
     categorie: optimisation
     description: "Optimiseur de talents et de respec"
     forever: oui
-    statut: teste
+    statut: absent
     certitude: suppose
     sources:
       - "seed/forever-mage/scripts/optimize.py (porté en T05)"
@@ -1639,53 +1635,10 @@ mechanics:
       - "docs/research/community-builds-mage.md (recherche communautaire du 2026-09-28 et comparaison du bloc J)"
       - "forever/data/<version>/meta.json (game_state.beta_level_cap : fait d'installation, forever install --beta-level-cap, T08b, D2)"
     tests:
-      - tests/unit/test_next_step.py::test_tie_prefers_the_modeled_talent
-      - tests/unit/test_next_step.py::test_two_unmodeled_talents_are_not_decided
-      - tests/unit/test_next_step.py::test_significant_gap_is_decided_by_monte_carlo
-      - tests/unit/test_next_step.py::test_next_step_lists_every_legal_candidate
-      - tests/unit/test_next_step.py::test_forever_path_never_prefers_an_unmodeled_talent_in_a_tie
-      - tests/unit/test_next_step.py::test_modeled_talents_follow_the_absent_blind_spots
-      - tests/parity/test_seed_optimize_parity.py::test_optimiseur_legal
-      - tests/parity/test_seed_optimize_parity.py::test_leveling_matches_the_seed
-      - tests/parity/test_seed_optimize_parity.py::test_level_weight_matches_the_seed
-      - tests/parity/test_seed_optimize_parity.py::test_score_plan_matches_the_seed
-      - tests/unit/test_optimize_leveling.py::test_order_is_legal_and_spends_every_point
-      - tests/unit/test_optimize_leveling.py::test_choices_are_legal
-      - tests/unit/test_optimize_leveling.py::test_talented_bonus_adds_legal_points
-      - tests/unit/test_optimize_leveling.py::test_best_choice_is_the_fastest
-      - tests/unit/test_optimize_endgame.py::test_candidates_are_legal_and_ranked
-      - tests/unit/test_optimize_endgame.py::test_every_candidate_is_a_local_optimum
-      - tests/unit/test_optimize_endgame.py::test_dungeon_combines_boss_and_pack
-      - tests/unit/test_mc_stats.py::test_decide_takes_the_monte_carlo_winner_when_the_gap_is_significant
-      - tests/parity/test_seed_pvp_parity.py::test_pvp_et_respec_pvp_part
-      - tests/parity/test_seed_pvp_parity.py::test_profile_matches_the_seed
-      - tests/parity/test_seed_pvp_parity.py::test_seed_pvp_greedy_parity
-      - tests/unit/test_pvp_profile.py::test_score_is_the_weighted_capped_sum
-      - tests/unit/test_pvp_profile.py::test_pvp_context_builds_are_legal_local_optima
-      - tests/unit/test_pvp_profile.py::test_multi_start_beats_the_seed_greedy
-      - tests/parity/test_seed_respec_parity.py::test_pvp_et_respec_respec_part
-      - tests/parity/test_seed_respec_parity.py::test_advice_matches_the_seed
-      - tests/parity/test_seed_respec_parity.py::test_cost_and_gold_per_hour_match_the_seed
-      - tests/unit/test_respec.py::test_useless_build_is_reset
-      - tests/unit/test_respec.py::test_advised_level_is_the_best_balance
-      - tests/unit/test_respec.py::test_optimal_build_is_kept
-      - tests/unit/test_build_respec_tie.py::test_a_gain_that_is_not_measurable_keeps_the_current_build
-      - tests/unit/test_build_respec_tie.py::test_a_current_build_measurably_better_than_the_optimizer_choice_is_kept
-      - tests/unit/test_departage.py::test_no_candidate_beats_the_champion_significantly
-      - tests/unit/test_departage.py::test_real_data_never_recommend_a_dungeon_build_slower_than_a_candidate
-      - tests/unit/test_leveling_from_current.py::test_the_path_starts_from_the_current_level_and_build
-      - tests/unit/test_leveling_from_current.py::test_respec_compares_the_current_build_to_a_free_path
-      - tests/unit/test_build_report.py::test_reasons_cover_every_talent
-      - tests/unit/test_build_report.py::test_stability_and_sensitivity
-      - tests/unit/test_build_report.py::test_certainty_is_the_minimum_of_its_sources
-      - tests/unit/test_build_cli.py::test_json_output
-      - tests/unit/test_community_builds.py::test_every_gap_is_explained
-      - tests/unit/test_community_builds.py::test_gaps_are_computed_by_the_engine
-      - tests/unit/test_community_builds.py::test_no_community_value_in_the_data
       - tests/unit/test_install_game_state.py::test_option_writes_cap_source_and_certainty
       - tests/unit/test_install_game_state.py::test_without_option_the_value_is_carried_and_said
     tolerance: null
-    note: "T08b, bloc B (D2) : plafond de la bêta, fait d'installation (valeur, source, certitude probable pour une note, certain pour une observation ; reporté sinon, report signalé) ; l'ancienne clé de mechanics.json est retirée par l'installation puis refusée ; 2026-10-09 (décision 217) : en leveling, le conseil de respec compare aussi le build actuel projeté au build retenu par Monte Carlo apparié (respec.versus_optimal) ; égalité statistique ou build actuel meilleur : garder ; décision 219 : départage final au Monte Carlo apparié (build de l'optimiseur, alternative, meilleurs voisins analytiques, build actuel) avant toute recommandation, jamais plus lente au Monte Carlo qu'un candidat ; décision 220 : en leveling, chemin au temps cumulé depuis le niveau et le build actuels (niveau 10 pour un personnage neuf), départage au niveau N réservé au donjon, au raid et au PvP ; respec comparée au chemin libre"
+    note: "RB1 (2026-10-26) : retiré, décision 299 : plus de recherche de build du Mage (optimiseur de talents, ordre de prise, conseil et coût de respec, départage) ; le build du Mage vient des builds populaires de Talents Forever vérifiés sur les données du client (G3), et de wowsims au 60 ; données respec.json et clés build.*, pvp.*, respec.* de mechanics.json gardées, sans lecteur. Historique : T08b, bloc B (D2) : plafond de la bêta, fait d'installation (valeur, source, certitude probable pour une note, certain pour une observation ; reporté sinon, report signalé) ; l'ancienne clé de mechanics.json est retirée par l'installation puis refusée ; 2026-10-09 (décision 217) : en leveling, le conseil de respec compare aussi le build actuel projeté au build retenu par Monte Carlo apparié (respec.versus_optimal) ; égalité statistique ou build actuel meilleur : garder ; décision 219 : départage final au Monte Carlo apparié (build de l'optimiseur, alternative, meilleurs voisins analytiques, build actuel) avant toute recommandation, jamais plus lente au Monte Carlo qu'un candidat ; décision 220 : en leveling, chemin au temps cumulé depuis le niveau et le build actuels (niveau 10 pour un personnage neuf), départage au niveau N réservé au donjon, au raid et au PvP ; respec comparée au chemin libre"
     formule: "leveling : faisceau du seed (présélection = moitié temps immédiat, moitié anticipation gloutonne ; tri du faisceau = score + un quart de l'anticipation × poids du niveau), score = Σ temps par monstre × XP pour passer le niveau / XP d'un monstre ; forever : choix du build (rotation, armure, ab_stacks, ab_dump, hs_stacks) cherchés avec les talents, un Monte Carlo sur la meilleure combinaison ; plusieurs points par niveau (bonus Talented) : une étape par point, temps compté sur le build de fin de niveau. Contexte (donjon, raid) : départs gloutons par arbre et par paire d'arbres, recherche locale au meilleur voisin (un point déplacé), métrique Σ dégâts / Σ durée des scénarios, décision au Monte Carlo apparié (decide) ; T06b : à égalité statistique (intervalle apparié qui contient 0), talent modélisé d'abord ; next_step : toutes les additions légales au niveau N depuis un build légal au niveau N − 1"
   - id: I6
     categorie: optimisation
@@ -2136,13 +2089,10 @@ mechanics:
     sources:
       - "seed/forever-mage/scripts/sim_leveling.py (porté en T04b)"
     tests:
-      - tests/unit/test_next_step.py::test_significant_gap_is_decided_by_monte_carlo
       - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_seed_mode
       - tests/unit/test_sim_leveling.py::test_monte_carlo_reproducible_default_mode
       - tests/unit/test_chart.py::test_two_generations_are_identical
       - tests/unit/test_mc_stats.py::test_mc_stats_matches_mc
-      - tests/unit/test_mc_stats.py::test_known_gap_is_significant_on_five_seeds
-      - tests/unit/test_mc_stats.py::test_stability_over_seeds
     tolerance: null
     formule: "même graine, mêmes paramètres, mêmes données : même résultat (générateur injecté, ordre des tirages fixe)"
     note: "T04b : graine par défaut du seed ; le graphique de leveling est identique octet pour octet à graine fixe ; T05 (décision 85) : mc_stats rejoue les combats de mc (même graine) avec écart-type et erreur standard ; paired_gap : différence combat par combat, intervalle normal à build.confidence ; decide : gagnant si l'intervalle exclut 0, sinon analytique ; stability : décision rejouée sur build.stability_seeds graines. Tirages communs faibles : un seul générateur par Monte Carlo (parité), les combats des deux builds se désalignent après le premier ; l'horloge d'Arcane Power rend les combats d'un même Monte Carlo dépendants, l'erreur standard l'ignore (effet faible) ; T06b : decide garde l'analytique pour les écarts de l'alternative ; le départage des étapes du leveling et de next_step suit tie_break (I5)"

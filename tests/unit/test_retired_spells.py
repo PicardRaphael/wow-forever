@@ -10,7 +10,6 @@ import shutil
 
 from conftest import LOCAL_VERSION
 
-from forever.engine.pvp import control
 from forever.engine.spells import best_rank
 from forever.gamedata import build_game_data
 from forever.lookup import lookup_spell
@@ -80,18 +79,16 @@ def test_the_merge_keeps_the_removed_spell_marked_retired(make_deps, data_copy, 
 
 
 def test_the_final_version_removes_a_spell_my_profile_uses(make_deps, data_copy):
-    """Profil d'un Mage Givre : la version finale retire Frostbolt. Plus aucun rang appris (builds et rotations), le
-    contrôle PvP ne le compte plus, la fiche le dit retiré par la version."""
+    """Profil d'un Mage Givre : la version finale retire Frostbolt. Plus aucun rang appris (rotations), la fiche le
+    dit retiré par la version."""
     deps = make_deps(data_dir=data_copy)
     gd = build_game_data(load_version(deps))
     level = max(r.level for r in gd.spells[SPELL].ranks)
-    before = control(gd, {}, level)
     assert best_rank(gd, SPELL, level, {}) is not None
     retire(data_copy)
     gd = build_game_data(load_version(deps))
     assert gd.spells[SPELL].retired_by == NEW
     assert best_rank(gd, SPELL, level, {}) is None
-    assert control(gd, {}, level) < before
     found = lookup_spell(deps, "Frostbolt")
     assert any(f"retiré par la version {NEW}" in a for a in found["provenance"]["assumptions"])
 

@@ -41,22 +41,12 @@ def _naowh(block: Any) -> dict[str, str] | None:
 
 
 def typed_links(value: Any) -> dict[str, list[dict[str, str]]]:
-    """Liens typés d'un résultat d'outil forever, rangés comme `AgentResult.links` : `build` (export de
-    `forever_build`), `closest` (build populaire le plus proche), `check` (`build_check`), `export`
-    (`forever_lookup(kind="export")`)."""
+    """Liens typés d'un résultat d'outil forever, rangés comme `AgentResult.links` : `closest` (build populaire le
+    plus proche), `check` (`build_check`), `export` (`forever_lookup(kind="export")`)."""
     out: dict[str, list[dict[str, str]]] = {}
     if not isinstance(value, Mapping):
         return out
     export = value.get("export")
-    if isinstance(export, Mapping):
-        items = []
-        tf = export.get("talents_forever")
-        if isinstance(tf, Mapping) and tf.get("status") == "ok" and isinstance(tf.get("link"), str):
-            items.append(typed_link("talents_forever", str(tf["link"])))
-        if (code := _naowh(export.get("naowh"))) is not None:
-            items.append(code)
-        if items:
-            out["build"] = items
     closest = value.get("closest")
     if isinstance(closest, Mapping):
         items = [typed_link("talents_forever", str(closest["link"]))] if isinstance(closest.get("link"), str) else []

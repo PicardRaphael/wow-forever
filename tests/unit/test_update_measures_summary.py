@@ -1,11 +1,9 @@
 """Résumé des attentes de mesure et `forever update status` (demande de l'utilisateur du 2026-10-10, décision 227).
 
 Une attente `measures` porte son résumé : PNJ ajoutés, changés et écartés (avec la raison), niveaux dont les PV
-changent, et cas des builds qui changeraient après rejeu (« avant » : données installées, « après » : copie où la
-mesure est écrite, `preview` rendu par la mesure). Le rejeu n'est fait qu'une fois par attente (même identifiant, même
-base). `forever update status` ne montre que les attentes ouvertes, l'historique complet avec `--all`.
+changent (plus de rejeu des builds depuis RB1, décision 299). `forever update status` ne montre que les attentes ouvertes, l'historique complet avec `--all`.
 
-Valeurs des PNJ synthétiques (aucun chiffre du jeu) ; rejeu simulé."""
+Valeurs des PNJ synthétiques (aucun chiffre du jeu)."""
 
 import json
 import shutil
@@ -21,12 +19,10 @@ from forever.update import (
     measure_summary,
     record_pending,
     reject,
-    replay_label,
     run_update,
 )
 
 JOURNALS = UpdateOptions(dry_run=True, only=frozenset({"journaux"}))
-CHANGED_CASE = "leveling-20"
 DETAILS = {
     "added": [{"npc_id": 900001, "name": "Synthetic Boar", "levels": {"7": 111}}],
     "changed": [{"npc_id": 900002, "name": "Synthetic Wolf", "levels": {"8": {"before": 120, "after": 125}}}],
@@ -61,23 +57,9 @@ class PreviewMeasure:
         }
 
 
-class SplitReplay:
-    """Rejeu simulé : le cas `CHANGED_CASE` du build du Mage diffère après ; les autres sont identiques."""
-
-    def __init__(self, base):
-        self.base = base
-        self.calls = []
-
-    def __call__(self, engine, case, data_dir):
-        self.calls.append((engine, case))
-        after = data_dir != self.base
-        return {"talents": "B" if after and engine == "mage_build" and case == CHANGED_CASE else "A"}
-
-
 def test_measure_pending_carries_its_summary(logs, tmp_path):  # noqa: F811
     deps = logs([(LOCAL_VERSION, 1)])
-    replay = SplitReplay(deps.data_dir)
-    report = run_update(deps, JOURNALS, replay=replay, measure=PreviewMeasure(tmp_path))
+    report = run_update(deps, JOURNALS, measure=PreviewMeasure(tmp_path))
     assert step(report, "journaux")["status"] == "fait"  # décision 295 : écrite d'elle-même, résumé gardé
     (entry,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
     summary = entry["summary"]["measures"]
@@ -85,11 +67,8 @@ def test_measure_pending_carries_its_summary(logs, tmp_path):  # noqa: F811
     assert summary["npcs"]["changed"][0]["levels"] == {"8": {"before": 120, "after": 125}}
     assert summary["npcs"]["excluded"][0]["reason"] == "PV hors norme (synthétique)"
     assert summary["hp_by_level"] == HP_LEVELS
-    builds = summary["builds"]
-    assert builds["replayed"] is True and builds["base"] == replay_label(deps.data_dir)
-    assert builds["changed"] == [{"engine": "mage_build", "case": CHANGED_CASE}]
-    assert builds["unchanged"] > 0
-    assert "1 ajouté" in summary["sentence"] and "1 cas" in summary["sentence"]
+    assert "builds" not in summary
+    assert "1 ajouté" in summary["sentence"]
 
 
 def test_measure_without_preview_is_not_written_and_says_why(logs):  # noqa: F811
@@ -98,11 +77,10 @@ def test_measure_without_preview_is_not_written_and_says_why(logs):  # noqa: F81
     def measure(deps, data_dir, files):
         return {"changed": [{"file": "monsters.json", "pointer": "/npcs"}]}
 
-    replay = SplitReplay(deps.data_dir)
-    report = run_update(deps, JOURNALS, replay=replay, measure=measure)
+    report = run_update(deps, JOURNALS, measure=measure)
     found = step(report, "journaux")
     assert found["status"] == "arrêt" and "rien à écrire" in found["detail"]
-    assert replay.calls == [] and report["pending"] == []
+    assert report["pending"] == []
 
 
 # --- forever update status ---------------------------------------------------------------------------------------
@@ -123,14 +101,7 @@ def entry(pending_id, summary=None, kind="measures"):
 
 
 def summary_doc():
-    builds = {
-        "replayed": True,
-        "base": "update-x-y",
-        "changed": [{"engine": "mage_build", "case": CHANGED_CASE}],
-        "unchanged": 15,
-        "not_replayed": [{"engine": "mage_leveling", "case": "sim-leveling-20", "reason": "sans rejeu automatique"}],
-    }
-    return measure_summary(DETAILS, HP_LEVELS, builds)
+    return measure_summary(DETAILS, HP_LEVELS)
 
 
 def test_status_shows_open_entries_by_default_and_all_with_the_flag(make_deps, capsys):
@@ -162,8 +133,7 @@ def test_status_renders_the_measure_summary(make_deps, capsys):
     assert "PNJ changés : Synthetic Wolf (900002) niv. 8 : 120 → 125 PV" in out
     assert "PNJ écartés : Synthetic Giant (900003) : PV hors norme (synthétique) (nouveau)" in out
     assert "PV par niveau : niv. 7 : 100 → 111" in out
-    assert f"builds qui changeraient après rejeu : mage_build {CHANGED_CASE} (15 inchangé(s))" in out
-    assert "non rejoué(s) : mage_leveling sim-leveling-20 (sans rejeu automatique)" in out
+    assert "rejeu" not in out
 
 
 def test_only_newly_excluded_npcs_are_listed(make_deps, capsys):
@@ -171,24 +141,10 @@ def test_only_newly_excluded_npcs_are_listed(make_deps, capsys):
         **DETAILS,
         "excluded": [*DETAILS["excluded"], {"npc_id": 900004, "name": "Old Outlier", "reason": "déjà", "new": False}],
     }
-    builds = {"replayed": False, "base": "update-x-y", "reason": "simulation : cas à rejouer, non calculé"}
-    summary = measure_summary(details, HP_LEVELS, builds)
+    summary = measure_summary(details, HP_LEVELS)
     assert "1 nouvellement écarté(s) (2 écarté(s) en tout)" in summary["measures"]["sentence"]
     deps = make_deps()
     record_pending(deps.cache_dir, entry("measures-open", summary))
     assert main(["update", "status"], deps) == 0
     out = capsys.readouterr().out
     assert "Old Outlier" not in out and "1 déjà écarté(s), non listé(s)" in out
-    assert "builds : non rejoués (simulation : cas à rejouer, non calculé)" in out
-
-
-def test_a_listing_replay_says_why_nothing_was_compared(logs, tmp_path):  # noqa: F811
-    deps = logs([(LOCAL_VERSION, 1)])
-
-    def listing(engine, case, data_dir):
-        return {"rejoué": False, "raison": "simulation : cas à rejouer, non calculé"}
-
-    report = run_update(deps, JOURNALS, replay=listing, measure=PreviewMeasure(tmp_path))
-    (verdict,) = [v for v in report["verdicts"] if v["kind"] == "measures"]
-    builds = verdict["summary"]["measures"]["builds"]
-    assert builds["replayed"] is False and builds["reason"] == "simulation : cas à rejouer, non calculé"

@@ -215,7 +215,7 @@ uv run forever dungeon list --level <niveau>            # dungeon info "<donjon>
 
 **Builds et simulateur**
 ```powershell
-uv run forever build leveling --level <niveau>          # build du Mage (moteur gelé sous le 60) : talents, ordre, respec
+uv run forever talents tf popular --class Mage --current <clé=rang,…>   # build populaire le plus proche (toutes classes)
 uv run forever sims presets                             # préréglages de wowsims/forever (niveau 60)
 uv run forever sims races --preset "mage/dps/Fire" --races Human,Gnome   # races comparées, même graine
 ```

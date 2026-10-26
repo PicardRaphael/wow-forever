@@ -15,7 +15,6 @@ from forever.engine import character
 from forever.engine.casting import cast_time
 from forever.engine.movement import chill_duration, frostbolt_slow
 from forever.engine.spells import FROSTBOLT_LIKE, best_rank
-from forever.optimize.leveling import build_choices
 from forever.sim.leveling_mc import kill_mc
 
 LEARNED = 24  # niveau d'apprentissage fabriqué
@@ -46,13 +45,6 @@ def test_frost_blast_has_its_own_slow(game_data):
     assert frostbolt_slow(gd, {}) == pytest.approx(gd.spells["frostbolt"].slow)
     rank = best_rank(gd, "frost_blast", 40, {})
     assert chill_duration(gd, rank, {}, "frost_blast") > 0
-
-
-def test_frost_blast_is_offered_once_learned(game_data):
-    gd = with_frost_blast(game_data)
-    before = {c.rotation for c in build_choices(gd, LEARNED - 1, {})}
-    after = {c.rotation for c in build_choices(gd, LEARNED, {})}
-    assert "frost_blast" not in before and "frost_blast" in after and "frost" in after  # comparé, jamais imposé
 
 
 def test_frost_blast_rotation_simulates(game_data):

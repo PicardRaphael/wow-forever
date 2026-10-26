@@ -10,7 +10,7 @@ import shutil
 import subprocess
 
 import pytest
-from test_update_chain import BASE, TARGET, Replay, montage  # noqa: F401 : fixture partagée
+from test_update_chain import BASE, TARGET, montage  # noqa: F401 : fixture partagée
 
 from forever.manifest import version_files
 from forever.pipeline.gitops import subprocess_runner
@@ -74,18 +74,6 @@ class Recorder:
         return [c for c in self.calls if c[:2] == ["git", "push"]]
 
 
-class TalentReplay:
-    """Rejeu simulé dont le conseil « après » met 3 points dans Frostbite (clé de talent du montage)."""
-
-    def __init__(self):
-        self.calls = []
-
-    def __call__(self, engine, case, data_dir):
-        self.calls.append((engine, case, data_dir))
-        after = TARGET in {p.name for p in data_dir.iterdir()}
-        return {"talents": {"frostbite": 3 if after else 0}, "choices": {}, "alternative": {}}
-
-
 @pytest.fixture(autouse=True)
 def isolated_git(tmp_path, monkeypatch):
     config = tmp_path / "gitconfig"
@@ -126,7 +114,7 @@ def test_same_tables_are_installed_through_the_clone(origin):
     deps, _ = montage_()
     session = version_files(deps.data_dir / BASE)
     rec = Recorder()
-    report = run_update(deps, GAME, runner=rec, replay=Replay())
+    report = run_update(deps, GAME, runner=rec)
     assert [v["action"] for v in report["verdicts"]] == ["écrire"]
     (written,) = report["written"]
     assert written["version"] == TARGET and written["branch"] == f"data/{TARGET}-r1"
@@ -157,7 +145,7 @@ def test_a_copied_value_is_installed_alone_with_its_summary(origin):
     record_pending(
         deps.cache_dir, {"id": other, "kind": "install_version", "action": "attente", "version": TARGET, "revision": 1}
     )
-    report = run_update(deps, GAME, runner=Recorder(), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder())
     assert [v["action"] for v in report["verdicts"]] == ["écrire"]
     (written,) = report["written"]
     assert "Warrior" in written["summary"]
@@ -170,19 +158,18 @@ def test_a_copied_value_is_installed_alone_with_its_summary(origin):
 
 def test_a_changed_engine_input_is_installed_and_said_in_player_words(origin):
     """Décision 295 : une entrée de moteur changée s'installe au premier passage, sans accord ; la fiche de
-    l'historique dit ce qui change en mots de joueur (rejeu après l'installation) et porte « Annuler »."""
+    l'historique dit ce qui change (résumé, notes) et porte « Annuler »."""
     montage_, bare = origin
     deps, _ = montage_(change=COEFFICIENT)
     rec = Recorder()
-    report = run_update(deps, GAME, runner=rec, replay=TalentReplay())
+    report = run_update(deps, GAME, runner=rec)
     assert [v["action"] for v in report["verdicts"]] == ["écrire"]
     assert git(bare, "ls-tree", "--name-only", "main", f"forever/data/{TARGET}")
     assert list_pending(deps.cache_dir) == []
     (record,) = list_installed(deps.cache_dir)
     assert record["state"] == "installée" and record["sha"] == git(bare, "rev-parse", "main")
     assert record["undo"] == f"forever update undo {record['id']}"
-    assert record["replay"] == "fait"
-    assert any(line.endswith(": Frostbite passe de 0 à 3") for line in record["changes"]), record["changes"]
+    assert "replay" not in record and "changes" not in record
     assert any("moteurs aux entrées changées" in n for n in record["notes"])
 
 
@@ -193,7 +180,7 @@ def test_an_install_is_undone_and_not_installed_again(origin):
     montage_, bare = origin
     deps, _ = montage_(change=COEFFICIENT)
     rec = Recorder()
-    run_update(deps, GAME, runner=rec, replay=TalentReplay())
+    run_update(deps, GAME, runner=rec)
     (record,) = list_installed(deps.cache_dir)
     out = undo(deps, record["id"], runner=rec)
     assert out["status"] == "fait", out
@@ -202,7 +189,7 @@ def test_an_install_is_undone_and_not_installed_again(origin):
     assert git(bare, "branch", "--list", f"data/undo-{record['id']}") == ""
     assert load_installed(deps.cache_dir, record["id"])["state"] == "annulée"
     pushes = len(rec.pushes())
-    report = run_update(deps, GAME, runner=rec, replay=TalentReplay())
+    report = run_update(deps, GAME, runner=rec)
     assert "annulée par toi" in next(s for s in report["steps"] if s["name"] == "nouvelle_version")["detail"]
     assert len(rec.pushes()) == pushes and report["written"] == []
     assert notices(deps.cache_dir) == []
@@ -212,7 +199,7 @@ def test_a_red_windows_job_merges_nothing_and_keeps_the_branch(origin):
     montage_, bare = origin
     deps, _ = montage_()
     head = git(bare, "rev-parse", "main")
-    report = run_update(deps, GAME, runner=Recorder(failing_job="windows"), replay=Replay())
+    report = run_update(deps, GAME, runner=Recorder(failing_job="windows"))
     step = next(s for s in report["steps"] if s["name"] == "nouvelle_version")
     assert step["status"] == "arrêt" and "CI" in step["detail"]
     assert git(bare, "rev-parse", "main") == head
@@ -224,7 +211,7 @@ def test_a_red_verify_in_the_clone_leaves_it_clean(origin):
     montage_, _bare = origin
     deps, _ = montage_()
     rec = Recorder(verify_code=1)
-    report = run_update(deps, GAME, runner=rec, replay=Replay())
+    report = run_update(deps, GAME, runner=rec)
     step = next(s for s in report["steps"] if s["name"] == "nouvelle_version")
     assert step["status"] == "arrêt" and "verify" in step["detail"]
     assert rec.commits() == [] and rec.pushes() == []
@@ -243,7 +230,7 @@ def test_the_clone_runs_the_data_verify_without_engine_tests(origin):
     montage_, _bare = origin
     deps, _ = montage_()
     rec = Recorder()
-    run_update(deps, GAME, runner=rec, replay=Replay())
+    run_update(deps, GAME, runner=rec)
     assert clone_checks(rec) == [["uv", "run", "--frozen", "--offline", "tasks.py", "verify", "--data", "--engines="]]
 
 
@@ -252,7 +239,7 @@ def test_the_clone_checks_the_engines_whose_inputs_changed(origin):
     montage_, _bare = origin
     deps, _ = montage_(change=COEFFICIENT)
     rec = Recorder()
-    run_update(deps, GAME, runner=rec, replay=Replay())
+    run_update(deps, GAME, runner=rec)
     (check,) = clone_checks(rec)
     engines = check[-1].removeprefix("--engines=").split(",")
     assert check[-2:-1] == ["--data"] and "mage_build" in engines and "pvp_dr" not in engines
@@ -263,10 +250,10 @@ def test_a_version_installed_by_the_other_pc_only_advances_the_clone(origin, tmp
     montage_, _bare = origin
     deps, _ = montage_()
     rec = Recorder()
-    run_update(deps, GAME, runner=rec, replay=Replay())  # premier PC : installe 79999
+    run_update(deps, GAME, runner=rec)  # premier PC : installe 79999
     other = make_other_cache(deps, tmp_path)
     rec2 = Recorder()
-    report = run_update(other, GAME, runner=rec2, replay=Replay())  # second PC : clone neuf, déjà à jour
+    report = run_update(other, GAME, runner=rec2)  # second PC : clone neuf, déjà à jour
     game = next(s for s in report["steps"] if s["name"] == "jeu")
     assert game["status"] == "rien" and TARGET in game["detail"]
     assert rec2.commits() == [] and rec2.pushes() == []

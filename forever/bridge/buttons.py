@@ -15,7 +15,7 @@ DONE_SLICES: frozenset[str] = frozenset(
     {"T04b", "T04c", "T05", "FA1", "CH0", "PV1", "T08d", "T08e", "P06b", "RX1", "EX1"}
 )
 
-TALENTS_NOTICE = "Build populaire de Talents Forever (choix de joueurs), pas encore calculé par le moteur de forever."
+TALENTS_NOTICE = "Build populaire de Talents Forever (choix de joueurs), non calculé par forever."
 LEVELING_NOTICE = (
     "Zones, quêtes et build populaire ; prochain talent et XP par heure pas encore calculés pour cette classe."
 )
@@ -49,13 +49,12 @@ BUTTONS: tuple[Button, ...] = (
         "Talents",
         "Quel build populaire de Talents Forever est le plus proche de mes talents actuels ? "
         "Donne son lien Talents Forever.",
-        ("FA1", "T05"),
-        questions={"MAGE": "Quel est mon prochain talent, avec le lien Talents Forever ?"},
-        computed_for=("MAGE",),
+        ("FA1",),
+        computed_for=(),  # RB1 (décision 299) : plus aucun build calculé, toutes les classes ont la mention
         notice=TALENTS_NOTICE,
     ),
-    # Leveling pour toutes les classes (décision 242) : zones, quêtes et donjon ne dépendent pas de la classe ; le
-    # prochain talent calculé et l'XP par heure, seulement pour les classes calculées (`computed_for`).
+    # Leveling pour toutes les classes (décision 242) : zones, quêtes et donjon ne dépendent pas de la classe ; l'XP
+    # par heure, seulement pour les classes calculées (`computed_for`, moteur gelé du Mage) ; build populaire partout.
     Button(
         "leveling",
         "Leveling",

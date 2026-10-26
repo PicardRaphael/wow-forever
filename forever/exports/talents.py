@@ -167,7 +167,7 @@ def compact(block: Mapping[str, Any]) -> dict[str, Any]:
 
 
 def render_naowh(block: Mapping[str, Any]) -> list[str]:
-    """Lignes « Naowh Forever » d'une sortie texte (`forever build`, `forever export naowh-build`)."""
+    """Lignes « Naowh Forever » d'une sortie texte (`forever export naowh-build`)."""
     if block["status"] == "bloque":
         return [f"Naowh Forever : export bloqué : {block['reason']}"]
     addon = block["addon"]

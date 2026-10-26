@@ -166,12 +166,6 @@ def _measure_lines(summary: Any) -> list[str]:
             for lv, v in sorted(levels.items(), key=lambda kv: int(kv[0]))
         ]
         lines.append(f"PV par niveau : {_names(shown)}")
-    builds = doc.get("builds") or {}
-    if builds.get("replayed"):
-        changed = [f"{c.get('engine')} {c.get('case')}" for c in builds.get("changed") or [] if isinstance(c, dict)]
-        lines.append(f"Builds changés après rejeu : {', '.join(changed)}" if changed else "Builds : aucun changement")
-    elif builds:
-        lines.append("Builds : pas encore recalculés")
     return lines
 
 

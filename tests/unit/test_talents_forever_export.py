@@ -13,11 +13,10 @@ from conftest import DATA_DIR, PRE_70450_VERSION
 from mcp import Client
 from talents_forever_data import load_fixture, write_addon
 
-from forever.build import build_report
 from forever.cli import main
 from forever.errors import InvalidArgumentError
 from forever.mcp_server import build_server
-from forever.talents_forever import attach_export, decode_code, export_build, load_addon
+from forever.talents_forever import decode_code, export_build, load_addon
 
 
 @pytest.fixture
@@ -170,16 +169,6 @@ def test_cli_decode(deps, capsys):
 def read_back(addon, deps, block):
     back = decode_code(addon, deps, block["code"])
     return back["talents"], back["order"]
-
-
-@pytest.mark.slow
-def test_build_report_export_reads_back_the_report(addon, deps):
-    rep = attach_export(deps, build_report(deps, "leveling", 20, preset="rapide", sensitivity=False))
-    block = rep["export"]["talents_forever"]
-    assert block["status"] == "ok" and block["code"].startswith("mage/20/")
-    talents, order = read_back(addon, deps, block)
-    assert talents == {k: v for k, v in rep["talents"].items() if v}
-    assert order == [s["talent"] for s in rep["order"] if s["talent"]]
 
 
 @pytest.mark.slow

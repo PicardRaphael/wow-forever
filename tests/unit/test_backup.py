@@ -250,9 +250,9 @@ def test_the_automatic_update_pass_makes_the_daily_backup(world, tmp_path):
     from forever.update import UpdateOptions, run_update
 
     options = UpdateOptions(auto=True, network=False, only=frozenset({"addons"}))
-    run_update(replace(world, game_running=lambda: True), options, replay=lambda *a: {})
+    run_update(replace(world, game_running=lambda: True), options)
     assert list_backups(tmp_path / "sauvegardes") == []
-    report = run_update(world, options, replay=lambda *a: {})
+    report = run_update(world, options)
     assert len(list_backups(tmp_path / "sauvegardes")) == 1
     step = next(s for s in report["steps"] if s["name"] == "archivage")
     assert "backup" in step["data"]

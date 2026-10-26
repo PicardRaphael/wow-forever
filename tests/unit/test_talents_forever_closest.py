@@ -99,12 +99,6 @@ def test_talents_button_without_points_gives_the_most_played_build(bench):  # no
     assert "aucun talent placé : build le plus joué de la classe (rang 1)" in " ".join(plan.read)
 
 
-def test_mage_talents_plan_is_unchanged(bench):  # noqa: F811
-    _, data = bench
-    plan = button_plan("talents", resolve(data, context("mage19")), data.level_cap)
-    assert plan.link == "projected" and plan.calls[0].tool == "forever_build"
-
-
 def test_agent_keeps_the_closest_link():
     link = "https://talentsforever.com/hunter/19/abc"
     events = [

@@ -71,8 +71,7 @@ def test_subprocess_only_in_gitops_and_the_detached_launch():
     ou `ps`, local, décision 205) et la conversation « jeu » du pont (`forever/bridge/agent.py`, exécutable `claude`
     seulement, P06a, décision 212), et les tâches planifiées de la décision 226 : `schtasks` local
     (`forever/bridge/autostart.py`) et le passage `forever update` attendu par le relais de la tâche de mise à jour
-    (`forever/update_task.py`, interpréteur Python), et le rejeu parallèle des builds (`forever/replay.py`,
-    `python -m forever.replay`, local, décision 230), et le git local de la conversation « addons » du pont
+    (`forever/update_task.py`, interpréteur Python), et le git local de la conversation « addons » du pont
     (`forever/bridge/addons.py`, sous-commandes fermées, jamais de réseau, P06b, décision 235)."""
     users = {
         str(path.relative_to(PACKAGE).as_posix())
@@ -87,7 +86,6 @@ def test_subprocess_only_in_gitops_and_the_detached_launch():
         "bridge/addons.py",
         "bridge/autostart.py",
         "update_task.py",
-        "replay.py",
         "doctor_probes.py",  # LN1 : sondes locales de forever doctor (gh, claude, uv hors ligne, schtasks)
     }
     # LN1 : forever doctor lui-même ne lance rien, ses contrôles sont purs
@@ -96,7 +94,7 @@ def test_subprocess_only_in_gitops_and_the_detached_launch():
     probes = (PACKAGE / "doctor_probes.py").read_text(encoding="utf-8")
     assert '"--offline"' in probes  # uv sync --dry-run --offline : jamais de téléchargement
     assert '"gh", "auth", "token"' in probes and '"gh", "auth", "status"' not in probes  # gh auth status : réseau
-    for name in ("bridge/autostart.py", "update_task.py", "replay.py"):
+    for name in ("bridge/autostart.py", "update_task.py"):
         text = (PACKAGE / name).read_text(encoding="utf-8")
         assert '"git"' not in text and '"gh"' not in text and network_uses(PACKAGE / name) == set(), name
     agent = (PACKAGE / "bridge" / "agent.py").read_text(encoding="utf-8")

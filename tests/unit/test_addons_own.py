@@ -100,7 +100,7 @@ def test_status_counts_only_unknown_addons(deps, capsys):
 def test_update_step_counts_only_unknown_addons(deps):
     from forever.update import UpdateOptions, run_update
 
-    report = run_update(deps, UpdateOptions(dry_run=True, only=frozenset({"addons"})), replay=lambda *a: {})
+    report = run_update(deps, UpdateOptions(dry_run=True, only=frozenset({"addons"})))
     step = next(s for s in report["steps"] if s["name"] == "addons")
     assert [u["folder"] for u in step["data"]["untracked"]] == ["SomeDataAddon"]
     assert "1 à inventorier" in step["detail"]

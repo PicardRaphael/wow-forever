@@ -332,8 +332,8 @@ def check_numbers_output(hook_input: Mapping[str, Any]) -> dict[str, Any] | None
     return {
         "systemMessage": (
             f"{NUMBERS_MARKER} Chiffres de jeu sans source dans les outils forever de la session : {listed}. "
-            "Ne pas s'y fier sans vérification (demander la valeur à forever_lookup, forever_build ou "
-            "forever_sim_leveling)."
+            "Ne pas s'y fier sans vérification (demander la valeur à forever_lookup, forever_sim_leveling ou "
+            "forever_simulate)."
         )
     }
 

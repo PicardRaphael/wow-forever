@@ -9,8 +9,6 @@ cumuls, cumuls maximum = 2e variable du rang ; Hot Streak : 25 % d'incantation d
 import pytest
 from conftest import isolated_deps
 
-from forever.build import build_report
-from forever.cli import render_build
 from forever.engine.character import character
 from forever.engine.crit import winters_chill_crit
 from forever.engine.derived import stack_tables
@@ -33,14 +31,6 @@ def deps(tmp_path_factory):
     return isolated_deps(tmp_path_factory.mktemp("totals"))
 
 
-@pytest.fixture(scope="module")
-def reports(deps):
-    return {
-        (ctx, lv): build_report(deps, ctx, lv, preset="rapide", sensitivity=False)
-        for ctx, lv in (("leveling", 20), ("pvp-bg", 40), ("raid", 60))
-    }
-
-
 def table(tables, talent, effect, rank=1):
     return next(t for t in tables if t["talent"] == talent and t["effect"] == effect and t["rank"] == rank)
 
@@ -49,50 +39,6 @@ def test_build_points_engine(game_data):
     p = build_points(game_data, {"improvedFrostbolt": 5, "elementalPrecision": 2}, 20)
     assert p == {"by_tree": {"Arcane": 0, "Fire": 0, "Frost": 7}, "total": 7, "available": 11, "unspent": 4}
     assert build_points(game_data, {}, 20, talented_bonus=2)["available"] == points_available(game_data, 20, 2) == 13
-
-
-@pytest.mark.parametrize(("context", "level", "total"), [("leveling", 20, 11), ("pvp-bg", 40, 31), ("raid", 60, 51)])
-def test_build_report_gives_points(game_data, reports, context, level, total):
-    rep = reports[(context, level)]
-    p = rep["points"]
-    assert p["total"] == total == p["available"] == points_available(game_data, level)
-    assert p["unspent"] == 0
-    assert sum(p["by_tree"].values()) == p["total"]
-    assert p["by_tree"] == {tree: sum(t.values()) for tree, t in rep["talents_by_tree"].items()}
-    alt = rep["alternative"]
-    assert alt["points"]["total"] == sum(alt["talents"].values())
-    assert sum(alt["points"]["by_tree"].values()) == alt["points"]["total"]
-
-
-def test_order_accumulates_points(reports):
-    rep = reports[("leveling", 20)]
-    totals = [s["points_total"] for s in rep["order"]]
-    assert totals == list(range(1, len(totals) + 1))
-    assert totals[-1] == rep["points"]["total"]
-    assert all(sum(s["points_by_tree"].values()) == s["points_total"] for s in rep["order"])
-    assert rep["order"][-1]["points_by_tree"] == rep["points"]["by_tree"]
-
-
-def test_gap_advantage_is_never_negative(reports):
-    for rep in reports.values():
-        gap = rep["alternative"]["gap"]
-        assert gap["advantage"] >= 0
-        assert gap["advantage"] == pytest.approx(abs(gap["mean"]), rel=1e-12)
-
-
-def test_alternative_is_measured_like_the_build(reports):
-    for (context, _), rep in reports.items():
-        alt, metric = rep["alternative"], rep["metric"]
-        if context.startswith("pvp"):
-            assert alt["monte_carlo"] is None and alt["n"] == 0
-            continue
-        assert alt["n"] == metric["n"] > 0
-        assert alt["monte_carlo"] is not None and alt["sd"] >= 0 and alt["se"] >= 0
-
-
-def test_text_output_gives_the_total(reports):
-    rep = reports[("leveling", 20)]
-    assert "Talents : 11 point(s) sur 11" in "\n".join(render_build(rep))
 
 
 def test_arcane_blast_cost_by_stack(game_data_at_pre_70450_version):

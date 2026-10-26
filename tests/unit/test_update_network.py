@@ -148,7 +148,7 @@ def test_french_names_are_not_an_engine_input(tmp_path):
         folder.mkdir()
         doc = {"spells": {"frostbolt": {"name": "Frostbolt", "name_fr": name, "ranks": []}}}
         (folder / "spells.json").write_text(json.dumps(doc), encoding="utf-8")
-    assert compare_inputs(before, after)["mage_build"].identical
+    assert compare_inputs(before, after)["mage_leveling"].identical
 
 
 def test_no_engine_reads_the_french_names():
@@ -156,6 +156,6 @@ def test_no_engine_reads_the_french_names():
     recherche d'une race par son nom) ; sans quoi l'écarter des entrées des moteurs serait faux."""
     roots = ["forever/engine", "forever/optimize", "forever/sim"]
     files = [p for r in roots for p in (REPO / r).rglob("*.py")]
-    files += [REPO / "forever" / "build.py", REPO / "forever" / "leveling.py"]
+    files += [REPO / "forever" / "leveling.py"]
     readers = [p.relative_to(REPO).as_posix() for p in files if "name_fr" in p.read_text(encoding="utf-8")]
     assert readers == []

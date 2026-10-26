@@ -29,7 +29,6 @@ FOREVER_TOOLS: tuple[str, ...] = (
     "mcp__forever__forever_player_profile",
     "mcp__forever__forever_explain_mechanic",
     "mcp__forever__forever_sim_leveling",
-    "mcp__forever__forever_build",
     "mcp__forever__forever_route",  # RX1 : feuille de route
     "mcp__forever__forever_gear",  # CJ1 : équipement (écran Équipement, essai CJ-6)
     "mcp__forever__forever_simulate",  # décisions 293 et 294 : wowsims/forever au niveau 60 (binaire local épinglé)
@@ -68,7 +67,7 @@ class AgentResult:
     tools: list[str] = field(default_factory=list)
     timings: dict[str, Any] = field(default_factory=dict, compare=False)  # durées des étapes (s), stream_timings
     cost_usd: float | None = None
-    # « build » (export), « projected » (chemin du joueur), « closest » (build populaire le plus proche, P06b)
+    # « closest » (build populaire le plus proche, P06b)
     links: dict[str, str] = field(default_factory=dict)
     calls: list[tuple[str, dict[str, Any]]] = field(default_factory=list, compare=False)  # outil et arguments (P06b)
     events: list[dict[str, Any]] = field(
@@ -174,29 +173,9 @@ def _content_text(content: Any) -> str:
     return ""
 
 
-def _find_link(value: Any) -> str | None:
-    if isinstance(value, dict):
-        export = value.get("export")
-        if isinstance(export, dict):
-            tf = export.get("talents_forever")
-            if isinstance(tf, dict) and isinstance(tf.get("link"), str):
-                return str(tf["link"])
-    return None
-
-
-def _projected_link(value: Any) -> str | None:
-    """Lien Talents Forever du chemin conseillé depuis le build actuel (`respec.projected.export`)."""
-    respec = value.get("respec") if isinstance(value, dict) else None
-    projected = respec.get("projected") if isinstance(respec, dict) else None
-    export = projected.get("export") if isinstance(projected, dict) else None
-    if isinstance(export, dict) and export.get("status") == "ok" and isinstance(export.get("link"), str):
-        return str(export["link"])
-    return None
-
-
 def parse_stream(lines: Iterable[str]) -> AgentResult:
     """Résultat d'une conversation lu dans le flux `stream-json` : texte final, session, refus, blocs `provenance`
-    des outils forever, lien Talents Forever d'un résultat de `forever_build`."""
+    des outils forever, lien Talents Forever du build populaire le plus proche (`closest`)."""
     names: dict[str, str] = {}
     provenances: list[dict[str, Any]] = []
     tools: list[str] = []
@@ -245,14 +224,10 @@ def parse_stream(lines: Iterable[str]) -> AgentResult:
                     continue
                 if isinstance(value, dict) and isinstance(value.get("provenance"), dict):
                     provenances.append(value["provenance"])
-                link = _find_link(value) or link
-                if _find_link(value):
-                    links["build"] = str(_find_link(value))
-                if _projected_link(value):
-                    links["projected"] = str(_projected_link(value))
                 closest = value.get("closest") if isinstance(value, dict) else None
                 if isinstance(closest, dict) and closest.get("link"):
                     links["closest"] = str(closest["link"])  # build populaire le plus proche (P06b)
+                    link = links["closest"]
                 exports.update(typed_links(value))  # EX1 : liens typés (Talents Forever, Naowh)
         elif kind == "result":
             final = event
