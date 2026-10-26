@@ -1,8 +1,11 @@
 """Commandes du projet, identiques sous Windows, macOS et Linux : `uv run tasks.py <commande>`.
 
-quick       pendant le travail : lint + typage + tests rapides concernés par les fichiers modifiés depuis main
-verify      une fois avant chaque push : lint + typage + suite complète en parallèle + registry + numbers + origins
-            (définition de « fini ») ; `verify --data [--engines=a,b]` : vérification des données seulement
+quick       pendant le travail et avant chaque push : lint + typage + tests rapides concernés par les fichiers
+            modifiés depuis main
+ci          la CI : `ci --base=<rev>` lint + typage + tests concernés depuis <rev> (lents compris) + registry + numbers
+            + origins ; suite complète sans base valable, sur un changement de données ou de fichier partagé
+verify      suite complète : lint + typage + tous les tests en parallèle + registry + numbers + origins (passage de
+            nuit de la CI, sur demande) ; `verify --data [--engines=a,b]` : vérification des données seulement
             (clone de `forever update`, décision 206), suite complète si autre chose que des données a changé
 test        tous les tests, en parallèle
 test-fast   tests rapides (hors `slow`), en parallèle
@@ -12,10 +15,11 @@ typecheck   mypy strict sur forever/
 registry    contrôle du registre des mécaniques
 numbers     contrôle des chiffres de jeu dans le plugin
 origins     contrôle de l'origine déclarée de chaque valeur des données (T08b)
-e2e         bout en bout de forever update, CI simulée du clone comprise (long ; job e2e de la CI)
+e2e         bout en bout de forever update, CI simulée du clone comprise (long ; job e2e de la CI) ; `e2e --base=<rev>`
+            : sauté s'il n'est pas concerné par les changements depuis <rev>
 status      fraîcheur des données (après T01)
 
-Règle : `quick` en boucle pendant le travail, `verify` une seule fois avant le push, la CI (Ubuntu et Windows) juge.
+Règle : `quick` pendant le travail et avant le push ; la CI (Ubuntu et Windows) juge, suite complète chaque nuit.
 """
 
 import importlib.util
@@ -163,9 +167,59 @@ def verify(data: bool = False, engines: list[str] | None = None) -> bool:
     )
 
 
-def e2e() -> bool:
+def _commit_exists(rev: str) -> bool:
+    out = subprocess.run(
+        ["git", "rev-parse", "--verify", "--quiet", f"{rev}^{{commit}}"], cwd=ROOT, capture_output=True, check=False
+    )
+    return out.returncode == 0
+
+
+def _selection_since(base: str | None) -> list[str] | None:
+    """Fichiers de test concernés depuis `base` ; None (tous) sans base valable ou si la sélection le demande."""
+    if not base or not _commit_exists(base):
+        print(f"  base {base or 'absente'} : suite complète")
+        return None
+    sel = _selector()
+    selection = sel.select(sel.changed_since(base, ROOT), sel.TestIndex(ROOT))
+    for reason in selection.reasons:
+        print(f"  {reason}")
+    return selection.files
+
+
+def ci(base: str | None = None) -> bool:
+    """La CI : tests concernés par les changements depuis `base`, lents compris ; suite complète sans base valable
+    (passage de nuit) ou quand la sélection le demande (données, fichier partagé, module retiré)."""
+    files = _selection_since(base)
+    if files is None:
+        tests: Callable[[], bool] = test
+    elif not files:
+        print("  aucun test concerné")
+        tests = lambda: True
+    else:
+        print(f"  {len(files)} fichier(s) de test retenu(s)")
+        tests = lambda: pytest(*PARALLEL, *files)
+    return _summary(
+        "CI",
+        [
+            ("lint", lint),
+            ("typecheck", typecheck),
+            ("test", tests),
+            ("registry", registry),
+            ("numbers", numbers),
+            ("origins", origins),
+        ],
+    )
+
+
+def e2e(base: str | None = None) -> bool:
     """Version fictive installée par `forever update`, vérification du clone et suite complète de la CI simulée
-    comprises (décisions 192 et 206) ; hors de `test` : il tournerait aussi dans la CI simulée du clone."""
+    comprises (décisions 192 et 206) ; hors de `test` : il tournerait aussi dans la CI simulée du clone. Avec `base` :
+    sauté si le bout en bout n'est pas concerné par les changements depuis `base`."""
+    if base is not None:
+        files = _selection_since(base)
+        if files is not None and not [f for f in files if f.startswith("tests/e2e/")]:
+            print("e2e : non concerné par les changements, sauté")
+            return True
     env = {**os.environ, "FOREVER_E2E": "1"}
     cmd = PY + ["-m", "pytest", "-q", "tests/e2e"]
     print(f"$ FOREVER_E2E=1 {' '.join(cmd)}", flush=True)
@@ -179,6 +233,7 @@ def status() -> bool:
 COMMANDS: dict[str, Callable[[], bool]] = {
     "quick": quick,
     "verify": verify,
+    "ci": ci,
     "test": test,
     "test-fast": test_fast,
     "lint": lint,
@@ -197,6 +252,13 @@ def main(argv: Sequence[str]) -> int:
         print(__doc__)
         return 2
     name, options = argv[0], list(argv[1:])
+    if name in ("ci", "e2e"):
+        bases = [o.removeprefix("--base=") for o in options if o.startswith("--base=")]
+        if len(bases) != len(options) or len(bases) > 1:
+            print(__doc__)
+            return 2
+        base = bases[0] if bases else None
+        return 0 if (ci(base) if name == "ci" else e2e(base)) else 1
     if name == "verify":
         data = "--data" in options
         engines: list[str] | None = None

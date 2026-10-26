@@ -2,6 +2,9 @@ name: ci
 on:
   push:
   pull_request:
+  schedule:
+    - cron: "17 2 * * *"  # suite complète chaque nuit, Ubuntu et Windows (sans base : tous les tests, e2e compris)
+  workflow_dispatch:
 jobs:
   verify:
     strategy:
@@ -11,11 +14,22 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0  # base de la sélection des tests (scripts/select_tests.py)
       - uses: astral-sh/setup-uv@v10.2.0
       - run: uv sync
-      - run: uv run tasks.py verify
+      - id: base
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.base_ref }}
+        run: bash .github/ci_base.sh >> "$GITHUB_OUTPUT"
+      - run: uv run tasks.py ci ${{ steps.base.outputs.arg }}  # arg : --base=<rev>, ou rien (suite complète)
   e2e:
-    # bout en bout de forever update, verify réel du clone compris (décision 192) ; en parallèle de verify
+    # bout en bout de forever update, verify réel du clone compris (décision 192) ; en parallèle de verify, sauté s'il
+    # n'est pas concerné par les changements
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
@@ -23,4 +37,12 @@ jobs:
           fetch-depth: 0
       - uses: astral-sh/setup-uv@v10.2.0
       - run: uv sync
-      - run: uv run tasks.py e2e
+      - id: base
+        shell: bash
+        env:
+          EVENT: ${{ github.event_name }}
+          REF: ${{ github.ref_name }}
+          BEFORE: ${{ github.event.before }}
+          BASE_REF: ${{ github.base_ref }}
+        run: bash .github/ci_base.sh >> "$GITHUB_OUTPUT"
+      - run: uv run tasks.py e2e ${{ steps.base.outputs.arg }}

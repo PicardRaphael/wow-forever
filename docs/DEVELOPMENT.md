@@ -55,9 +55,8 @@ appliqué, le fichier y revient, et la justification va dans le message de commi
 
 ### 4. La fin
 
-1. `/verifier` : `uv run tasks.py verify` (lint, typage, suite complète en parallèle réseau coupé, registre, contrôle
-   des chiffres, origines) doit être vert, **lancé une seule fois, juste avant le push** (pendant le travail :
-   `uv run tasks.py quick`, voir « Boucle de tests »). Une tâche n'est finie qu'à cette condition.
+1. `/verifier` : `uv run tasks.py quick` vert avant le push, puis la CI verte (voir « Boucle de tests »). Une tâche
+   n'est finie qu'à cette condition.
 2. Mettre à jour [MECHANICS_REGISTRY.yaml](MECHANICS_REGISTRY.yaml) pour chaque mécanique touchée.
 3. Pousser la branche, **attendre la CI verte sous Ubuntu et Windows** (`gh run watch`) — les fins de ligne et les
    chemins diffèrent assez pour qu'un vert local ne prouve rien.
@@ -83,21 +82,22 @@ appliqué, le fichier y revient, et la justification va dans le message de commi
 | Niveau | Commande | Quand | Contenu |
 |---|---|---|---|
 | Travail | `uv run tasks.py quick` | en boucle, après chaque modification | lint, typage, tests rapides **concernés** par les fichiers modifiés depuis `main` (moins de 2 min) |
-| Avant le push | `uv run tasks.py verify` | **une seule fois**, juste avant de pousser | lint, typage, **suite complète en parallèle** (`pytest -n auto`, tests `slow` compris), registre, chiffres, origines |
-| Juge | CI (Ubuntu et Windows) | à chaque push | `verify` complet sur les deux systèmes, plus le job `e2e` |
+| Avant le push | `uv run tasks.py quick` | juste avant de pousser | comme ci-dessus |
+| Juge | CI (Ubuntu et Windows) | à chaque push | `tasks.py ci --base=<rev>` : lint, typage, tests **concernés** depuis le push précédent (`slow` compris), registre, chiffres, origines ; suite complète sur un changement de données ou de fichier partagé ; job `e2e` s'il est concerné |
+| Nuit | CI (Ubuntu et Windows) | chaque nuit (`schedule`) | suite complète (`tasks.py ci` sans base) et `e2e` : rattrape ce que la sélection manque |
 
-- **`verify` ne se lance jamais en boucle** : un échec se corrige avec `quick` ou un test isolé
-  (`uv run pytest tests/<fichier>.py::<test> -q`), puis `verify` une fois de plus avant le push.
+- **`uv run tasks.py verify`** (suite complète en local, environ 3 min) : seulement sur demande, jamais en boucle ; un
+  échec se corrige avec `quick` ou un test isolé (`uv run pytest tests/<fichier>.py::<test> -q`).
 - **Sélection de `quick`** (`scripts/select_tests.py`, analyse statique) : un module de `forever/` retient les tests
   qui l'importent (directement, par la fermeture des imports, ou par une fixture de `conftest.py`) ; un autre fichier
   (fixture, document, script, addon, plugin) retient les tests qui le nomment ; un fichier partagé (`conftest.py`,
   `pyproject.toml`, `uv.lock`, `tasks.py`) ou les données installées (`forever/data/`) : tous les tests rapides. La
-  sélection est une approximation assumée : `verify` et la CI rattrapent ce qu'elle manque. Le hook de fin de tour
+  sélection est une approximation assumée : le passage de nuit de la CI rattrape ce qu'elle manque. Le hook de fin de tour
   lance la même sélection, sauf si l'arbre est déjà vert (empreinte du dernier passage réussi, dans `.git/`), et
   l'arrête après 270 s (processus enfants compris) en invitant à lancer `quick`.
 - **Tests lents** : un test qui dure plus de quelques secondes (Monte Carlo, rejeu, parité avec le seed, bout en
   bout) porte le marqueur `slow` (`pytestmark = pytest.mark.slow` en tête de fichier, ou sur le test) : hors de
-  `quick`, toujours dans `verify` et la CI.
+  `quick`, dans la CI quand il est concerné, dans `verify` et le passage de nuit.
 - **Tests parallélisables** : un test écrit seulement dans `tmp_path` (ou `tmp_path_factory`), jamais dans le dépôt,
   `~/.forever` ou un cache partagé ; aucun port fixe ; aucune dépendance à l'ordre des tests.
 - **Clone de `forever update`** (décision 206) : quand une écriture ne change que des données (`forever/data/`,
