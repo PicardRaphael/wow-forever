@@ -941,12 +941,15 @@ def popular_plan(deps: Deps, current: Mapping[str, int] | None) -> dict[str, Any
     from forever.engine.talents import legal_order
     from forever.gamedata import build_game_data
     from forever.store import load_version
-    from forever.talents_forever import closest_popular, load_addon, popular_builds
+    from forever.talents_forever import DATA_FILE, addon_folder, closest_popular, load_addon, popular_builds
 
     placed = {k: v for k, v in (current or {}).items() if v > 0}
     data = load_version(deps)
-    key = (data.data_sha, str(deps.wow_dir), tuple(sorted(placed.items())))
-    if key in _PLANS:  # même plan pour les poids, la liste BiS et l'équipement d'une même demande
+    folder = addon_folder(deps)
+    stat = (folder / DATA_FILE).stat() if folder is not None and (folder / DATA_FILE).is_file() else None
+    # addon mis à jour (taille, date) : relu ; sinon même plan pour les poids, la liste BiS et l'équipement
+    key = (data.data_sha, str(folder), stat and (stat.st_size, stat.st_mtime_ns), tuple(sorted(placed.items())))
+    if key in _PLANS:
         return _PLANS[key]
     plan: dict[str, Any] | None = None
     addon = load_addon(deps)

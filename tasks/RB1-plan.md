@@ -1,4 +1,4 @@
-# RB1 : retrait de la recherche de build du Mage (2026-10-26, en attente de validation)
+# RB1 : retrait de la recherche de build du Mage (2026-10-26, validé et exécuté sur la branche rb1)
 
 Demande du 2026-10-26 : retirer totalement la recherche de build du Mage, « car de base on a eu modification sur
 les builds recherche ». Périmètre choisi : la **recherche de build seulement**. Le moteur gelé du Mage reste pour le
