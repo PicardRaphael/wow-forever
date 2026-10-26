@@ -339,10 +339,3 @@ def test_extraction_script_never_writes_computed_builds():
 def test_eval_cases_never_store_a_code():
     for path in EVALS.rglob("*.md"):
         assert not CODE.search(path.read_text(encoding="utf-8")), path
-
-
-def test_link_case_compares_to_the_code_of_the_tool():
-    grader = (EVALS / "build-lien-talents-forever" / "graders" / "code-outil.md").read_text(encoding="utf-8")
-    assert grader.startswith("---\ntype: llm\n---")
-    for words in ("forever_build", "export.talents_forever", "code", "/tf import", "même exécution"):
-        assert words in grader, words

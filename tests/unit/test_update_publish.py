@@ -242,7 +242,7 @@ def test_the_clone_checks_the_engines_whose_inputs_changed(origin):
     run_update(deps, GAME, runner=rec)
     (check,) = clone_checks(rec)
     engines = check[-1].removeprefix("--engines=").split(",")
-    assert check[-2:-1] == ["--data"] and "mage_build" in engines and "pvp_dr" not in engines
+    assert check[-2:-1] == ["--data"] and "mage_leveling" in engines and "pvp_dr" not in engines
 
 
 @pytest.mark.slow

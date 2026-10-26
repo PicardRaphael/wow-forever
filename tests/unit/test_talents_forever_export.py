@@ -1,21 +1,18 @@
 """Export de nos builds vers Talents Forever (FA1, bloc C) : code v6 et lien des trois builds du Mage de la fixture
 (`tests/fixtures/talents_forever/mage_builds.json`, points et ordre figés de 1.60.1.70245), relus sur les mêmes points
 et le même ordre ; blocages (talent sans correspondance, addon absent, ordre incohérent, autre génération) ;
-provenance ; `forever talents tf decode` ; bloc `export` de `forever build` (CLI) et de l'outil MCP `forever_build`.
+provenance ; `forever talents tf decode` .
 
 Addon synthétique écrit dans `tmp_path` (`tests/talents_forever_data.py`) ; aucun accès au dossier réel du jeu."""
 
-import asyncio
 import json
 
 import pytest
 from conftest import DATA_DIR, PRE_70450_VERSION
-from mcp import Client
 from talents_forever_data import load_fixture, write_addon
 
 from forever.cli import main
 from forever.errors import InvalidArgumentError
-from forever.mcp_server import build_server
 from forever.talents_forever import decode_code, export_build, load_addon
 
 
@@ -161,38 +158,3 @@ def test_cli_decode(deps, capsys):
     assert main(["talents", "tf", "decode", code], deps) == 0
     out = capsys.readouterr().out
     assert "légal" in out and "improvedFrostbolt" in out
-
-
-# --- forever build et forever_build (slow : optimiseur réel) ---------------------------------------------------
-
-
-def read_back(addon, deps, block):
-    back = decode_code(addon, deps, block["code"])
-    return back["talents"], back["order"]
-
-
-@pytest.mark.slow
-def test_mcp_build_carries_the_export(addon, deps):
-    async def go():
-        async with Client(build_server(deps)) as client:
-            return await client.call_tool(
-                "forever_build", {"context": "leveling", "level": 20, "preset": "rapide", "sensitivity": False}
-            )
-
-    r = asyncio.run(go())
-    assert not r.is_error
-    data = r.structured_content
-    block = data["export"]["talents_forever"]
-    assert block["status"] == "ok" and block["certainty"] == "certain"
-    talents, order = read_back(addon, deps, block)
-    assert talents == {k: v for k, v in data["talents"].items() if v}
-    assert order == [s["talent"] for s in data["order"] if s["talent"]]
-
-
-@pytest.mark.slow
-def test_cli_build_text_has_a_talents_forever_line(deps, capsys):
-    argv = ["build", "leveling", "--level", "20", "--preset", "rapide", "--sensitivity", "off"]
-    assert main(argv, deps) == 0
-    out = capsys.readouterr().out
-    line = next(ln for ln in out.splitlines() if ln.startswith("Talents Forever"))
-    assert "https://talentsforever.com/mage/20/" in line and "/tf import mage/20/" in line

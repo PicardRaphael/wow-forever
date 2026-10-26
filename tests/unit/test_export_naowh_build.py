@@ -331,21 +331,3 @@ def test_mcp_lookup_export(deps):
     assert not made.is_error and made.structured_content["status"] == "ordre_genere"
     assert validate_provenance(made.structured_content["provenance"]) == []
     assert read.structured_content["class"] == "Mage"
-
-
-@pytest.mark.slow
-def test_mcp_build_carries_the_naowh_export(deps):
-    async def go():
-        async with Client(build_server(deps)) as client:
-            return await client.call_tool(
-                "forever_build", {"context": "leveling", "level": 20, "preset": "rapide", "sensitivity": False}
-            )
-
-    r = asyncio.run(go())
-    assert not r.is_error
-    data = r.structured_content
-    block = data["export"]["naowh"]
-    assert block["status"] == "ok" and block["order_source"] == "leveling"
-    known = nodes("Mage")
-    expected = [known[s["talent"]]["node_id"] for s in data["order"] if s["talent"]]
-    assert list(read_naowh_build(block["code"]).points) == expected

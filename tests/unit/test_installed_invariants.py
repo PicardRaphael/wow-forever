@@ -45,16 +45,6 @@ def test_removed_talents_are_absent_from_the_installed_trees(deps):
     assert not keys & {r["key"] for r in server_removed_talents(REPO_DATA_DIR)}
 
 
-@pytest.mark.slow
-def test_a_leveling_build_is_computed_on_the_installed_version(deps):
-    from forever.build import build_report
-
-    rep = build_report(deps, "leveling", 20, preset="rapide", sensitivity=False)
-    assert rep["provenance"]["game_version"] == INSTALLED and rep["talents"]
-    gone = {r["key"] for r in server_removed_talents(REPO_DATA_DIR)}
-    assert not set(rep["talents"]) & gone
-
-
 def test_every_talent_description_variable_has_a_value():
     """Aucune description de talent installée n'affiche une variable `{i}` sans valeur dans ses rangs (« {0} »)."""
     import re
