@@ -93,7 +93,8 @@ appliqué, le fichier y revient, et la justification va dans le message de commi
   (fixture, document, script, addon, plugin) retient les tests qui le nomment ; un fichier partagé (`conftest.py`,
   `pyproject.toml`, `uv.lock`, `tasks.py`) ou les données installées (`forever/data/`) : tous les tests rapides. La
   sélection est une approximation assumée : `verify` et la CI rattrapent ce qu'elle manque. Le hook de fin de tour
-  lance la même sélection.
+  lance la même sélection, sauf si l'arbre est déjà vert (empreinte du dernier passage réussi, dans `.git/`), et
+  l'arrête après 270 s (processus enfants compris) en invitant à lancer `quick`.
 - **Tests lents** : un test qui dure plus de quelques secondes (Monte Carlo, rejeu, parité avec le seed, bout en
   bout) porte le marqueur `slow` (`pytestmark = pytest.mark.slow` en tête de fichier, ou sur le test) : hors de
   `quick`, toujours dans `verify` et la CI.
