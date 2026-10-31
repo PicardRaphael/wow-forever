@@ -340,10 +340,10 @@ def _addons_data(ctx: _Context) -> Check:
     if ctx.addons is None:
         return Check("addons.data", "unknown", "aucune installation lue", "forever wow list")
     report = addons_status(ctx.deps, addons_dir=ctx.addons)
-    absent = [a["name"] for a in report["addons"] if a["status"] == "absent"]
-    if absent:
-        return Check("addons.data", "info", f"addons de données absents (facultatifs) : {', '.join(absent)}")
-    return Check("addons.data", "ok", "addons de données présents")
+    # facultatifs : un addon absent n'est plus signalé (demande de l'utilisateur du 2026-10-31) ; liste complète dans
+    # `forever addons status`
+    present = sum(a["status"] != "absent" for a in report["addons"])
+    return Check("addons.data", "ok", f"{present} addon(s) de données lu(s) (forever addons status)")
 
 
 def _env_vars(ctx: _Context) -> Check:
