@@ -1,0 +1,1762 @@
+{
+ "schema_version": 1,
+ "build": "1.60.1.70707",
+ "source": "Client 1.60.1.70707 : tables Spell*, Item*, Trait*, CurvePoint et PlayerCondition (wago.tools) décodées par forever decode",
+ "aura_codes": {
+  "200": {
+   "key": "kill_xp_pct",
+   "applies_to": "kill",
+   "label": "% d'XP des monstres tués"
+  },
+  "291": {
+   "key": "quest_xp_pct",
+   "applies_to": "quest",
+   "label": "% d'XP des quêtes"
+  },
+  "386": {
+   "key": "rested_rate_pct",
+   "applies_to": "rested_gain",
+   "label": "vitesse d'accumulation du repos (%)"
+  },
+  "656": {
+   "key": "rested_cap_pct",
+   "applies_to": "rested_cap",
+   "label": "plafond du repos (%)"
+  },
+  "447": {
+   "key": "creature_type_kill_xp_pct",
+   "applies_to": "kill",
+   "label": "% d'XP contre un type de créature (valeur diverse : type)",
+   "misc": "creature_type"
+  }
+ },
+ "auras": [
+  {
+   "spell_id": 335924,
+   "name": "Winds of Wisdom",
+   "description": "Experience gains increased by $s1%.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 291,
+     "key": "quest_xp_pct",
+     "applies_to": "quest",
+     "base_points": 50.0,
+     "misc_value": 0
+    },
+    {
+     "index": 1,
+     "aura": 200,
+     "key": "kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 50.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": null,
+   "permanent": true,
+   "max_stacks": 1,
+   "access": "none",
+   "items": [],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "suppose"
+   }
+  },
+  {
+   "spell_id": 362859,
+   "name": "Adventure Awaits",
+   "description": "Quest experience increased by $s1%.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 291,
+     "key": "quest_xp_pct",
+     "applies_to": "quest",
+     "base_points": 100.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": null,
+   "permanent": true,
+   "max_stacks": 1,
+   "access": "none",
+   "items": [],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "suppose"
+   }
+  },
+  {
+   "spell_id": 429959,
+   "name": "Well-Rested",
+   "description": "Experience gains increased by $429959s0%. ",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 291,
+     "key": "quest_xp_pct",
+     "applies_to": "quest",
+     "base_points": 1.0,
+     "misc_value": 0
+    },
+    {
+     "index": 1,
+     "aura": 200,
+     "key": "kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 1.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": 7200000,
+   "permanent": false,
+   "max_stacks": 3,
+   "access": "item",
+   "items": [
+    {
+     "item": 211527,
+     "name": "Cozy Sleeping Bag",
+     "use_spell": 429961
+    }
+   ],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "probable"
+   }
+  },
+  {
+   "spell_id": 430496,
+   "name": "WoW Variety Show - The Winds of Inspiration!",
+   "description": "You feel inspired! Experience gains increased by $s1%.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 291,
+     "key": "quest_xp_pct",
+     "applies_to": "quest",
+     "base_points": 50.0,
+     "misc_value": 0
+    },
+    {
+     "index": 1,
+     "aura": 200,
+     "key": "kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 50.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": 300000,
+   "permanent": false,
+   "max_stacks": 1,
+   "access": "none",
+   "items": [],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "suppose"
+   }
+  },
+  {
+   "spell_id": 436412,
+   "name": "Discoverer's Delight",
+   "description": "Empowered by the brave discoverers that preceded you, experience gains increased by $w1%, and gold earned from quests also increases by $w3%.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 291,
+     "key": "quest_xp_pct",
+     "applies_to": "quest",
+     "base_points": 50.0,
+     "misc_value": 0
+    },
+    {
+     "index": 1,
+     "aura": 200,
+     "key": "kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 50.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": null,
+   "permanent": true,
+   "max_stacks": 1,
+   "access": "none",
+   "items": [],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "suppose"
+   }
+  },
+  {
+   "spell_id": 1225478,
+   "name": "Well Rested",
+   "description": "Your rested experience accumulates $s1% faster and your rested experience cap is increased by $s2%.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 386,
+     "key": "rested_rate_pct",
+     "applies_to": "rested_gain",
+     "base_points": 20.0,
+     "misc_value": 0
+    },
+    {
+     "index": 2,
+     "aura": 656,
+     "key": "rested_cap_pct",
+     "applies_to": "rested_cap",
+     "base_points": 20.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": null,
+   "permanent": true,
+   "max_stacks": 1,
+   "access": "legacy",
+   "items": [],
+   "legacy": {
+    "trait_definition": 141618,
+    "node": 110301,
+    "tree": 1188,
+    "max_ranks": 5,
+    "ranks": {
+     "0": [
+      4.0,
+      8.0,
+      12.0,
+      16.0,
+      20.0
+     ],
+     "1": [
+      4.0,
+      8.0,
+      12.0,
+      16.0,
+      20.0
+     ],
+     "2": [
+      4.0,
+      8.0,
+      12.0,
+      16.0,
+      20.0
+     ]
+    }
+   },
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "certain"
+   }
+  },
+  {
+   "spell_id": 1243969,
+   "name": "Well Fed XP Boost",
+   "description": "$?pc142418[Additionally, experience gained from kills is increased by $s1%.][]",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 200,
+     "key": "kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 5.0,
+     "misc_value": 0
+    },
+    {
+     "index": 1,
+     "aura": 291,
+     "key": "quest_xp_pct",
+     "applies_to": "quest",
+     "base_points": 0.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": null,
+   "permanent": true,
+   "max_stacks": 1,
+   "access": "food",
+   "items": [],
+   "legacy": null,
+   "food_spells": [
+    1248377,
+    1248378,
+    1248379,
+    1248380,
+    1248381,
+    1248382,
+    1248383,
+    1248384,
+    1248386,
+    1248387,
+    1248388,
+    1248389,
+    1248390,
+    1248391,
+    1248392,
+    1248393,
+    1248394,
+    1248395,
+    1248396,
+    1248397,
+    1248398,
+    1248399,
+    1248400,
+    1248401,
+    1248687,
+    1249500,
+    1249501,
+    1249502,
+    1249503,
+    1249504,
+    1249505,
+    1249506,
+    1249507,
+    1249508,
+    1249509,
+    1249510,
+    1249511,
+    1249512,
+    1249513,
+    1249514,
+    1249515,
+    1249516,
+    1249522,
+    1249906,
+    1249914,
+    1249915,
+    1249916,
+    1249917,
+    1249918,
+    1249919,
+    1249920,
+    1249921,
+    1249922,
+    1249923,
+    1249924,
+    1249925,
+    1294006,
+    1302066,
+    1319311
+   ],
+   "condition": 142418,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "certain"
+   }
+  },
+  {
+   "spell_id": 1292997,
+   "name": "Archmagister's Wisdom",
+   "description": "Increase experience gained from slaying Undead by $s1% for $d.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 447,
+     "key": "creature_type_kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 10.0,
+     "misc_value": 32
+    }
+   ],
+   "duration_ms": 300000,
+   "permanent": false,
+   "max_stacks": 1,
+   "access": "item",
+   "items": [
+    {
+     "item": 273049,
+     "name": null,
+     "use_spell": 1292997
+    }
+   ],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "certain"
+   }
+  },
+  {
+   "spell_id": 1293736,
+   "name": "Archmagister's Perception",
+   "description": "Increase experience gained from slaying Undead by $s1% for $d.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 447,
+     "key": "creature_type_kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 10.0,
+     "misc_value": 32
+    }
+   ],
+   "duration_ms": 300000,
+   "permanent": false,
+   "max_stacks": 1,
+   "access": "none",
+   "items": [],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "suppose"
+   }
+  },
+  {
+   "spell_id": 1328127,
+   "name": "Elixir of Endless Experience",
+   "description": "Increases experience gained by $s1% for $d.",
+   "effects": [
+    {
+     "index": 0,
+     "aura": 200,
+     "key": "kill_xp_pct",
+     "applies_to": "kill",
+     "base_points": 200.0,
+     "misc_value": 0
+    },
+    {
+     "index": 1,
+     "aura": 291,
+     "key": "quest_xp_pct",
+     "applies_to": "quest",
+     "base_points": 200.0,
+     "misc_value": 0
+    }
+   ],
+   "duration_ms": 3600000,
+   "permanent": false,
+   "max_stacks": 1,
+   "access": "item",
+   "items": [
+    {
+     "item": 289334,
+     "name": "Elixir of Endless Experience",
+     "use_spell": 1328127
+    }
+   ],
+   "legacy": null,
+   "food_spells": [],
+   "condition": null,
+   "certainty": {
+    "values": "certain",
+    "meaning": "probable",
+    "access": "certain"
+   }
+  }
+ ],
+ "sleeping_bag": {
+  "item": 211527,
+  "name": "Cozy Sleeping Bag",
+  "required_level": 1,
+  "use_spell": 429961,
+  "use_spell_name": "Unroll Bag",
+  "bag_duration_ms": 1200000,
+  "item_cooldown_ms": 3600000,
+  "tracking_aura": 429960,
+  "stack_period_ms": 60000,
+  "aura": 429959,
+  "aura_name": "Well-Rested",
+  "aura_duration_ms": 7200000,
+  "max_stacks": 3,
+  "description": "Unfurl a sleeping bag. Resting inside for at least one minute will provide a bonus to experience earned, stacking up to 3 times.",
+  "certainty": {
+   "values": "certain",
+   "chain": "probable"
+  },
+  "note": "lien du sort de pose (Unroll Bag) à l'aura de suivi : par l'objet de jeu posé, absent des tables du client ; déclaré ici, recoupé par la description du sort de pose (probable)"
+ },
+ "food": [
+  {
+   "item": 246916,
+   "name": null,
+   "required_level": null,
+   "spell": 1249509,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 277313,
+   "name": null,
+   "required_level": null,
+   "spell": 1302066,
+   "kind": "Nutritious Food",
+   "buff_spell": null,
+   "buff_name": null,
+   "buff_duration_ms": null,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 787,
+   "name": "Slitherskin Mackerel",
+   "required_level": 1,
+   "spell": 1249503,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2680,
+   "name": "Spiced Wolf Meat",
+   "required_level": 1,
+   "spell": 1248378,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2681,
+   "name": "Roasted Boar Meat",
+   "required_level": 1,
+   "spell": 1248380,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2682,
+   "name": "Cooked Crab Claw",
+   "required_level": 1,
+   "spell": 1248379,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2888,
+   "name": "Beer Basted Boar Ribs",
+   "required_level": 1,
+   "spell": 1248380,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3663,
+   "name": "Murloc Fin Soup",
+   "required_level": 1,
+   "spell": 1248377,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 5472,
+   "name": "Kaldorei Spider Kabob",
+   "required_level": 1,
+   "spell": 1248377,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 5474,
+   "name": "Roasted Kodo Meat",
+   "required_level": 1,
+   "spell": 1248377,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 5477,
+   "name": "Strider Stew",
+   "required_level": 1,
+   "spell": 1248379,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 6290,
+   "name": "Brilliant Smallfish",
+   "required_level": 1,
+   "spell": 1249500,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 6888,
+   "name": "Herb Baked Egg",
+   "required_level": 1,
+   "spell": 1248377,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 6890,
+   "name": "Smoked Bear Meat",
+   "required_level": 1,
+   "spell": 1248380,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12224,
+   "name": "Crispy Bat Wing",
+   "required_level": 1,
+   "spell": 1248379,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249865,
+   "name": "Peace Tea",
+   "required_level": 1,
+   "spell": 1249920,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249927,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249871,
+   "name": "Venomous Smoothie",
+   "required_level": 1,
+   "spell": 1249914,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249926,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250079,
+   "name": "Tasty Raptor Bites",
+   "required_level": 1,
+   "spell": 1248379,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 287973,
+   "name": "Tender Wolf Steak",
+   "required_level": 1,
+   "spell": 1248395,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 287974,
+   "name": "Grilled Squid",
+   "required_level": 1,
+   "spell": 1249522,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249523,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 724,
+   "name": "Goretusk Liver Pie",
+   "required_level": 5,
+   "spell": 1248384,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 733,
+   "name": "Westfall Stew",
+   "required_level": 5,
+   "spell": 1248687,
+   "kind": "Nutritious Food",
+   "buff_spell": null,
+   "buff_name": null,
+   "buff_duration_ms": null,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 1082,
+   "name": "Redridge Goulash",
+   "required_level": 5,
+   "spell": 1248383,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2683,
+   "name": "Crab Cake",
+   "required_level": 5,
+   "spell": 1248383,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2684,
+   "name": "Coyote Steak",
+   "required_level": 5,
+   "spell": 1248382,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2687,
+   "name": "Dry Pork Ribs",
+   "required_level": 5,
+   "spell": 1248384,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3220,
+   "name": "Blood Sausage",
+   "required_level": 5,
+   "spell": 1248384,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3662,
+   "name": "Crocolisk Steak",
+   "required_level": 5,
+   "spell": 1248382,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3726,
+   "name": "Big Bear Steak",
+   "required_level": 5,
+   "spell": 1248384,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 4592,
+   "name": "Longjaw Mud Snapper",
+   "required_level": 5,
+   "spell": 1249506,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 5095,
+   "name": "Rainbow Fin Albacore",
+   "required_level": 5,
+   "spell": 1249501,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 5476,
+   "name": "Fillet of Frenzy",
+   "required_level": 5,
+   "spell": 1249505,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249521,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 5479,
+   "name": "Crispy Lizard Tail",
+   "required_level": 5,
+   "spell": 1248381,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 6316,
+   "name": "Loch Frenzy Delight",
+   "required_level": 5,
+   "spell": 1249502,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249521,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12213,
+   "name": "Carrion Surprise",
+   "required_level": 5,
+   "spell": 1248381,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249866,
+   "name": "Royal Tea",
+   "required_level": 5,
+   "spell": 1249921,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249927,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249872,
+   "name": "Slimy Smoothie",
+   "required_level": 5,
+   "spell": 1249915,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249926,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250077,
+   "name": "Twice-Spiced Raptor Slice",
+   "required_level": 5,
+   "spell": 1248383,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250080,
+   "name": "Breakfast Omelette",
+   "required_level": 5,
+   "spell": 1248381,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 263509,
+   "name": "Skywall Souffle",
+   "required_level": 5,
+   "spell": 1248377,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 263512,
+   "name": "Pincer Bites",
+   "required_level": 5,
+   "spell": 1248379,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 268912,
+   "name": "Expiring Crab Cake",
+   "required_level": 5,
+   "spell": 1248381,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 268913,
+   "name": "Expiring Crocolisk Steak",
+   "required_level": 5,
+   "spell": 1248381,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 21072,
+   "name": "Smoked Sagefish",
+   "required_level": 10,
+   "spell": 1249504,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 1017,
+   "name": "Seasoned Wolf Kabob",
+   "required_level": 15,
+   "spell": 1248387,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 2685,
+   "name": "Succulent Pork Ribs",
+   "required_level": 15,
+   "spell": 1248389,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3664,
+   "name": "Crocolisk Gumbo",
+   "required_level": 15,
+   "spell": 1248387,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3665,
+   "name": "Curiously Tasty Omelet",
+   "required_level": 15,
+   "spell": 1248386,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3666,
+   "name": "Gooey Spider Cake",
+   "required_level": 15,
+   "spell": 1248386,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3727,
+   "name": "Hot Lion Chops",
+   "required_level": 15,
+   "spell": 1248387,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3729,
+   "name": "Soothing Turtle Bisque",
+   "required_level": 15,
+   "spell": 1248386,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 4593,
+   "name": "Bristle Whisker Catfish",
+   "required_level": 15,
+   "spell": 1249508,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249521,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 5480,
+   "name": "Lean Venison",
+   "required_level": 15,
+   "spell": 1248389,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12209,
+   "name": "Lean Wolf Steak",
+   "required_level": 15,
+   "spell": 1248387,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12210,
+   "name": "Roast Raptor",
+   "required_level": 15,
+   "spell": 1248388,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12214,
+   "name": "Mystery Stew",
+   "required_level": 15,
+   "spell": 1248386,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249867,
+   "name": "Root Tea",
+   "required_level": 15,
+   "spell": 1249922,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249927,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249873,
+   "name": "Mrrggl Smrrthle",
+   "required_level": 15,
+   "spell": 1249916,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249926,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 3728,
+   "name": "Tasty Lion Steak",
+   "required_level": 25,
+   "spell": 1248391,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 4457,
+   "name": "Barbecued Buzzard Wing",
+   "required_level": 25,
+   "spell": 1248392,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 4594,
+   "name": "Rockscale Cod",
+   "required_level": 25,
+   "spell": 1249511,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249521,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 6038,
+   "name": "Giant Clam Scorcho",
+   "required_level": 25,
+   "spell": 1248390,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 8364,
+   "name": "Mithril Head Trout",
+   "required_level": 25,
+   "spell": 1249509,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 10841,
+   "name": "Goldthorn Tea",
+   "required_level": 25,
+   "spell": 1249906,
+   "kind": "Nutritious Drink",
+   "buff_spell": null,
+   "buff_name": null,
+   "buff_duration_ms": null,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12215,
+   "name": "Heavy Kodo Stew",
+   "required_level": 25,
+   "spell": 1248390,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12216,
+   "name": "Spiced Chili Crab",
+   "required_level": 25,
+   "spell": 1248392,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13851,
+   "name": "Hot Wolf Ribs",
+   "required_level": 25,
+   "spell": 1248391,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 20074,
+   "name": "Heavy Crocolisk Stew",
+   "required_level": 25,
+   "spell": 1248391,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249868,
+   "name": "Triage Tea",
+   "required_level": 25,
+   "spell": 1249923,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249927,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249874,
+   "name": "Calcified Smoothie",
+   "required_level": 25,
+   "spell": 1249917,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249926,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250073,
+   "name": "Raging Raptor Ribs",
+   "required_level": 25,
+   "spell": 1248392,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250074,
+   "name": "Bear Brisket",
+   "required_level": 25,
+   "spell": 1248393,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250078,
+   "name": "Giant Scrambled Eggs",
+   "required_level": 25,
+   "spell": 1248390,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 274971,
+   "name": "Briny Seafood Stew",
+   "required_level": 25,
+   "spell": 1249510,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 274976,
+   "name": "Plain Ol' Paletusk",
+   "required_level": 25,
+   "spell": 1248393,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 21217,
+   "name": "Sagefish Delight",
+   "required_level": 30,
+   "spell": 1249507,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 6887,
+   "name": "Spotted Yellowtail",
+   "required_level": 35,
+   "spell": 1249513,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12212,
+   "name": "Jungle Stew",
+   "required_level": 35,
+   "spell": 1248395,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 12218,
+   "name": "Monster Omelet",
+   "required_level": 35,
+   "spell": 1248394,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13927,
+   "name": "Cooked Glossy Mightfish",
+   "required_level": 35,
+   "spell": 1249512,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13928,
+   "name": "Grilled Squid",
+   "required_level": 35,
+   "spell": 1249522,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249523,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13929,
+   "name": "Hot Smoked Bass",
+   "required_level": 35,
+   "spell": 1249522,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249523,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13930,
+   "name": "Filet of Redgill",
+   "required_level": 35,
+   "spell": 1249514,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249521,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13931,
+   "name": "Nightfin Soup",
+   "required_level": 35,
+   "spell": 1249513,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13932,
+   "name": "Poached Sunscale Salmon",
+   "required_level": 35,
+   "spell": 1249515,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 17222,
+   "name": "Spider Sausage",
+   "required_level": 35,
+   "spell": 1248394,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 18045,
+   "name": "Tender Wolf Steak",
+   "required_level": 35,
+   "spell": 1248395,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 18254,
+   "name": "Runn Tum Tuber Surprise",
+   "required_level": 35,
+   "spell": 1248396,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249869,
+   "name": "Sunny Tea",
+   "required_level": 35,
+   "spell": 1249924,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249927,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249875,
+   "name": "Spicy Smoothie",
+   "required_level": 35,
+   "spell": 1249918,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249926,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250065,
+   "name": "Savory Stag Sliders",
+   "required_level": 35,
+   "spell": 1248397,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250076,
+   "name": "Raptor Rouladen",
+   "required_level": 35,
+   "spell": 1248396,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 286152,
+   "name": "Plated Armorfish",
+   "required_level": 35,
+   "spell": 1319311,
+   "kind": "Nutritious Food",
+   "buff_spell": 1319310,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 8957,
+   "name": "Spinefin Halibut",
+   "required_level": 45,
+   "spell": 1249514,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249521,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13933,
+   "name": "Lobster Stew",
+   "required_level": 45,
+   "spell": 1249516,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13934,
+   "name": "Mightfish Steak",
+   "required_level": 45,
+   "spell": 1249515,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249519,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 13935,
+   "name": "Baked Salmon",
+   "required_level": 45,
+   "spell": 1249516,
+   "kind": "Nutritious Food",
+   "buff_spell": 1249520,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 20452,
+   "name": "Smoked Desert Dumplings",
+   "required_level": 45,
+   "spell": 1248401,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249870,
+   "name": "Sage's Tea",
+   "required_level": 45,
+   "spell": 1249925,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249927,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 249876,
+   "name": "Wicked Smoothie",
+   "required_level": 45,
+   "spell": 1249919,
+   "kind": "Nutritious Drink",
+   "buff_spell": 1249926,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250066,
+   "name": "Soaring Pamplona",
+   "required_level": 45,
+   "spell": 1248400,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250067,
+   "name": "Bat Hachee",
+   "required_level": 45,
+   "spell": 1248400,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250068,
+   "name": "Savory Turtle Stew",
+   "required_level": 45,
+   "spell": 1248398,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248406,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250069,
+   "name": "Flank au Poivre",
+   "required_level": 45,
+   "spell": 1248399,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250070,
+   "name": "Bear Bruscitti",
+   "required_level": 45,
+   "spell": 1248401,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250071,
+   "name": "Steaming Stag Steak",
+   "required_level": 45,
+   "spell": 1248401,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248422,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250072,
+   "name": "Swiftstrike Steak",
+   "required_level": 45,
+   "spell": 1248399,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248420,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 250075,
+   "name": "Prehistoric Pulled Raptor",
+   "required_level": 45,
+   "spell": 1248400,
+   "kind": "Nutritious Food",
+   "buff_spell": 1248421,
+   "buff_name": "Well Fed",
+   "buff_duration_ms": 900000,
+   "xp_aura": 1243969
+  },
+  {
+   "item": 267341,
+   "name": "Sweetpaw Jam",
+   "required_level": 55,
+   "spell": 1294006,
+   "kind": "Nutritious Food",
+   "buff_spell": null,
+   "buff_name": null,
+   "buff_duration_ms": null,
+   "xp_aura": 1243969
+  }
+ ],
+ "camp": {
+  "tent": {
+   "spell": 1307230,
+   "name": "Camp Tent",
+   "duration_ms": 900000,
+   "threshold_pct_of_level": 0.0,
+   "description": "Builds a tent that allows you and others sitting nearby to increase Rested experience to $s3% of a level. No effect if Rested experience already exceeds that value.\r\n\r\nRequires a Campfire nearby. All camping features share a cooldown of $1308027d."
+  },
+  "shared_cooldown": {
+   "spell": 1308027,
+   "name": "Camping",
+   "duration_ms": 3600000
+  },
+  "benefits": {
+   "spell": 1229741,
+   "name": "Camp Benefits",
+   "duration_ms": 3600000,
+   "xp_bonus": false
+  },
+  "fires": [
+   {
+    "spell": 1307227,
+    "name": "Basic Campfire",
+    "duration_ms": 900000
+   },
+   {
+    "spell": 1307252,
+    "name": "Journeyman Campfire",
+    "duration_ms": 900000
+   },
+   {
+    "spell": 1307237,
+    "name": "Expert Campfire",
+    "duration_ms": 900000
+   }
+  ],
+  "certainty": {
+   "values": "certain",
+   "meaning": "probable"
+  },
+  "note": "éléments de camp : tente (repos remonté à un seuil en % d'un niveau, sans effet au-dessus, d'après sa description), recharge partagée, Camp Benefits (aucune aura d'XP), feux"
+ },
+ "conditions": {
+  "142418": {
+   "missing": false,
+   "fields": {
+    "WorldStateExpressionID": {
+     "value": 47054,
+     "meaning": "expression d'état du monde (évaluée par le serveur, non lisible dans le client)"
+    },
+    "Flags": {
+     "value": 1,
+     "meaning": "inconnu"
+    }
+   },
+   "readable_in_client": false
+  }
+ },
+ "notes": [
+  "sens des codes d'aura (effet 6) déduit des descriptions des sorts qui les portent (probable) ; 348 (or des quêtes) et 637 (inconnu, valeur 0) hors sujet",
+  "accès none : aucune source joueur dans le client ; bonus listé, jamais appliqué (décision 262)",
+  "T04f, bloc A : bonus d'XP du client décodés dans xp_bonuses.json ; accès : perk Legacy (TraitDefinition rattachée à un nœud), objet (effet d'objet puis sorts déclenchés, chaîne du sac déclarée), nourriture (sort d'utilisation d'un objet dont la description cite l'aura par $@spelldesc), sinon aucun (listé, jamais appliqué, décision 262)"
+ ]
+}

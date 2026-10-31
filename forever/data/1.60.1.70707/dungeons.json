@@ -1,0 +1,1783 @@
+{
+ "schema_version": 1,
+ "build": "1.60.1.70707",
+ "instances": {
+  "33": {
+   "name": "Shadowfang Keep",
+   "areas": [
+    209
+   ],
+   "lfg": [
+    {
+     "id": 7,
+     "name": "Shadowfang Keep",
+     "level": 18,
+     "level_min": 18,
+     "level_max": 18,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2748,
+     "name": "Rethilgore",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2749,
+     "name": "Razorclaw the Butcher",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 2750,
+     "name": "Baron Silverlaine",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2751,
+     "name": "Commander Springvale",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 2752,
+     "name": "Odo the Blindwatcher",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 2753,
+     "name": "Fenrus the Devourer",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 2754,
+     "name": "Wolf Master Nandos",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 2755,
+     "name": "Archmage Arugal",
+     "order": 7000,
+     "flags": 1024
+    }
+   ]
+  },
+  "34": {
+   "name": "Stormwind Stockade",
+   "areas": [
+    717
+   ],
+   "lfg": [
+    {
+     "id": 11,
+     "name": "Stormwind Stockades",
+     "level": 23,
+     "level_min": 23,
+     "level_max": 23,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": "Alliance"
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2756,
+     "name": "Targorr the Dread",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2757,
+     "name": "Kam Deepfury",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 2758,
+     "name": "Hamhock",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2759,
+     "name": "Dextren Ward",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 2760,
+     "name": "Bazil Thredd",
+     "order": 4000,
+     "flags": 1024
+    }
+   ]
+  },
+  "36": {
+   "name": "Deadmines",
+   "areas": [
+    1581
+   ],
+   "lfg": [
+    {
+     "id": 5,
+     "name": "Deadmines",
+     "level": 16,
+     "level_min": 16,
+     "level_max": 16,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2741,
+     "name": "Rhahk'Zor",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2742,
+     "name": "Sneed",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 3676,
+     "name": "Miner Johnson",
+     "order": 1500,
+     "flags": 1024
+    },
+    {
+     "id": 2743,
+     "name": "Gilnid",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2744,
+     "name": "Captain Greenskin",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 2745,
+     "name": "Mr. Smite",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 2746,
+     "name": "Cookie",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 2747,
+     "name": "Edwin VanCleef",
+     "order": 6000,
+     "flags": 1024
+    }
+   ]
+  },
+  "43": {
+   "name": "Wailing Caverns",
+   "areas": [
+    718
+   ],
+   "lfg": [
+    {
+     "id": 1,
+     "name": "Wailing Caverns",
+     "level": 17,
+     "level_min": 17,
+     "level_max": 17,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 585,
+     "name": "Lady Anacondra",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 586,
+     "name": "Lord Cobrahn",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 587,
+     "name": "Kresh",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 588,
+     "name": "Lord Pythas",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 589,
+     "name": "Skum",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 590,
+     "name": "Lord Serpentis",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 591,
+     "name": "Verdan the Everliving",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 592,
+     "name": "Mutanus the Devourer",
+     "order": 7000,
+     "flags": 1024
+    }
+   ]
+  },
+  "47": {
+   "name": "Razorfen Kraul",
+   "areas": [
+    491
+   ],
+   "lfg": [
+    {
+     "id": 15,
+     "name": "Razorfen Kraul",
+     "level": 24,
+     "level_min": 24,
+     "level_max": 24,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2773,
+     "name": "Roogug",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2774,
+     "name": "Aggem Thorncurse",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 2775,
+     "name": "Death Speaker Jargba",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2776,
+     "name": "Overlord Ramtusk",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 2777,
+     "name": "Agathelos the Raging",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 2778,
+     "name": "Charlga Razorflank",
+     "order": 5000,
+     "flags": 1024
+    }
+   ]
+  },
+  "48": {
+   "name": "Blackfathom Deeps",
+   "areas": [
+    719
+   ],
+   "lfg": [
+    {
+     "id": 9,
+     "name": "Blackfathom Deeps",
+     "level": 22,
+     "level_min": 22,
+     "level_max": 22,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2916,
+     "name": "Ghamoo-ra",
+     "order": -6000,
+     "flags": 1024
+    },
+    {
+     "id": 2915,
+     "name": "Lady Sarevess",
+     "order": -5000,
+     "flags": 1024
+    },
+    {
+     "id": 2914,
+     "name": "Geilhast",
+     "order": -4000,
+     "flags": 1024
+    },
+    {
+     "id": 2913,
+     "name": "Lorgus Jett",
+     "order": -3000,
+     "flags": 1024
+    },
+    {
+     "id": 2912,
+     "name": "Old Serra'kis",
+     "order": -2000,
+     "flags": 1024
+    },
+    {
+     "id": 2911,
+     "name": "Twilight Lord Kelris",
+     "order": -1000,
+     "flags": 1024
+    },
+    {
+     "id": 2910,
+     "name": "Aku'mai",
+     "order": 0,
+     "flags": 1024
+    }
+   ]
+  },
+  "70": {
+   "name": "Uldaman",
+   "areas": [
+    1337
+   ],
+   "lfg": [
+    {
+     "id": 21,
+     "name": "Uldaman",
+     "level": 35,
+     "level_min": 35,
+     "level_max": 35,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 547,
+     "name": "Revelosh",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 548,
+     "name": "The Lost Dwarves",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 549,
+     "name": "Ironaya",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 1887,
+     "name": "Obsidian Sentinel",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 551,
+     "name": "Ancient Stone Keeper",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 552,
+     "name": "Galgann Firehammer",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 553,
+     "name": "Grimlok",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 554,
+     "name": "Archaedas",
+     "order": 7000,
+     "flags": 1024
+    }
+   ]
+  },
+  "90": {
+   "name": "Gnomeregan",
+   "areas": [
+    721
+   ],
+   "lfg": [
+    {
+     "id": 13,
+     "name": "Gnomeregan",
+     "level": 25,
+     "level_min": 25,
+     "level_max": 25,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2768,
+     "name": "Grubbis",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2769,
+     "name": "Viscous Fallout",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 2770,
+     "name": "Electrocutioner 6000",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2771,
+     "name": "Crowd Pummeler 9-60",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 2772,
+     "name": "Mekgineer Thermaplugg",
+     "order": 4000,
+     "flags": 1024
+    }
+   ]
+  },
+  "109": {
+   "name": "Sunken Temple",
+   "areas": [
+    1477,
+    1417
+   ],
+   "lfg": [
+    {
+     "id": 27,
+     "name": "Sunken Temple",
+     "level": 45,
+     "level_min": 45,
+     "level_max": 45,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 3582,
+     "name": "Atal'alarion",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 3583,
+     "name": "Avatar of Hakkar",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 3584,
+     "name": "Shade of Eranikus",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 3585,
+     "name": "Hazzas",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 3586,
+     "name": "Morphaz",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 3587,
+     "name": "Weaver",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 3588,
+     "name": "Dreamscythe",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 3589,
+     "name": "Jammal'an the Prophet",
+     "order": 7000,
+     "flags": 1024
+    }
+   ]
+  },
+  "129": {
+   "name": "Razorfen Downs",
+   "areas": [
+    722
+   ],
+   "lfg": [
+    {
+     "id": 19,
+     "name": "Razorfen Downs",
+     "level": 34,
+     "level_min": 34,
+     "level_max": 34,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2780,
+     "name": "Tuten'kash",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2781,
+     "name": "Plaguemaw the Rotting",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 2782,
+     "name": "Mordresh Fire Eye",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2783,
+     "name": "Ragglesnout",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 2784,
+     "name": "Glutton",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 2785,
+     "name": "Amnennar the Coldbringer",
+     "order": 5000,
+     "flags": 1024
+    }
+   ]
+  },
+  "189": {
+   "name": "Scarlet Monastery",
+   "areas": [
+    796
+   ],
+   "lfg": [
+    {
+     "id": 17,
+     "name": "Scarlet Monastery",
+     "level": 30,
+     "level_min": 30,
+     "level_max": 30,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 444,
+     "name": "Interrogator Vishas",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2779,
+     "name": "Bloodmage Thalnos",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 446,
+     "name": "Houndmaster Loksey",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 447,
+     "name": "Arcanist Doan",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 448,
+     "name": "Herod",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 449,
+     "name": "High Inquisitor Fairbanks",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 450,
+     "name": "High Inquisitor Whitemane",
+     "order": 6000,
+     "flags": 1024
+    }
+   ]
+  },
+  "209": {
+   "name": "Zul'Farrak",
+   "areas": [
+    1176
+   ],
+   "lfg": [
+    {
+     "id": 23,
+     "name": "Zul'Farak",
+     "level": 42,
+     "level_min": 42,
+     "level_max": 42,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 593,
+     "name": "Hydromancer Velratha",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 594,
+     "name": "Gahz'rilla",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 595,
+     "name": "Antu'sul",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 596,
+     "name": "Theka the Martyr",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 597,
+     "name": "Witch Doctor Zum'rah",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 598,
+     "name": "Nekrum Gutchewer",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 599,
+     "name": "Shadowpriest Sezz'ziz",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 600,
+     "name": "Chief Ukorz Sandscalp",
+     "order": 7000,
+     "flags": 1024
+    }
+   ]
+  },
+  "229": {
+   "name": "Blackrock Spire",
+   "areas": [
+    1583,
+    17804
+   ],
+   "lfg": [
+    {
+     "id": 31,
+     "name": "Lower Blackrock Spire",
+     "level": 53,
+     "level_min": 53,
+     "level_max": 53,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    },
+    {
+     "id": 43,
+     "name": "Upper Blackrock Spire",
+     "level": 53,
+     "level_min": 53,
+     "level_max": 53,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 267,
+     "name": "Highlord Omokk",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 268,
+     "name": "Shadow Hunter Vosh'gajin",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 269,
+     "name": "War Master Voone",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 270,
+     "name": "Mother Smolderweb",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 271,
+     "name": "Urok Doomhowl",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 272,
+     "name": "Quartermaster Zigris",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 274,
+     "name": "Halycon",
+     "order": 5500,
+     "flags": 1024
+    },
+    {
+     "id": 273,
+     "name": "Gizrul the Slavener",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 275,
+     "name": "Overlord Wyrmthalak",
+     "order": 8000,
+     "flags": 1024
+    },
+    {
+     "id": 3062,
+     "name": "Pyroguard Emberseer",
+     "order": 9000,
+     "flags": 1024
+    },
+    {
+     "id": 3063,
+     "name": "Warchief Rend Blackhand",
+     "order": 10000,
+     "flags": 1024
+    },
+    {
+     "id": 3068,
+     "name": "The Beast",
+     "order": 11000,
+     "flags": 1024
+    },
+    {
+     "id": 3069,
+     "name": "General Drakkisath",
+     "order": 12000,
+     "flags": 1024
+    },
+    {
+     "id": 3070,
+     "name": "Lord Valthalak",
+     "order": 13000,
+     "flags": 1024
+    }
+   ]
+  },
+  "230": {
+   "name": "Blackrock Depths",
+   "areas": [
+    1584,
+    17803
+   ],
+   "lfg": [
+    {
+     "id": 29,
+     "name": "Blackrock Depths",
+     "level": 48,
+     "level_min": 48,
+     "level_max": 48,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 227,
+     "name": "High Interrogator Gerstahn",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 228,
+     "name": "Lord Roccor",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 229,
+     "name": "Houndmaster Grebmar",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 230,
+     "name": "Ring of Law",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 231,
+     "name": "Pyromancer Loregrain",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 232,
+     "name": "Lord Incendius",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 233,
+     "name": "Warder Stilgiss",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 234,
+     "name": "Fineous Darkvire",
+     "order": 7000,
+     "flags": 1024
+    },
+    {
+     "id": 235,
+     "name": "Bael'Gar",
+     "order": 8000,
+     "flags": 1024
+    },
+    {
+     "id": 236,
+     "name": "General Angerforge",
+     "order": 9000,
+     "flags": 1024
+    },
+    {
+     "id": 237,
+     "name": "Golem Lord Argelmach",
+     "order": 10000,
+     "flags": 1024
+    },
+    {
+     "id": 238,
+     "name": "Hurley Blackbreath",
+     "order": 11000,
+     "flags": 1024
+    },
+    {
+     "id": 239,
+     "name": "Phalanx",
+     "order": 12000,
+     "flags": 1024
+    },
+    {
+     "id": 240,
+     "name": "Ribbly Screwspigot",
+     "order": 13000,
+     "flags": 1024
+    },
+    {
+     "id": 241,
+     "name": "Plugger Spazzring",
+     "order": 14000,
+     "flags": 1024
+    },
+    {
+     "id": 2791,
+     "name": "The Vault",
+     "order": 14500,
+     "flags": 1024
+    },
+    {
+     "id": 242,
+     "name": "Ambassador Flamelash",
+     "order": 15000,
+     "flags": 1024
+    },
+    {
+     "id": 243,
+     "name": "The Seven",
+     "order": 16000,
+     "flags": 1024
+    },
+    {
+     "id": 244,
+     "name": "Magmus",
+     "order": 17000,
+     "flags": 1024
+    },
+    {
+     "id": 2789,
+     "name": "Princess Moira Bronzebeard",
+     "order": 18000,
+     "flags": 1024
+    },
+    {
+     "id": 2790,
+     "name": "Emperor Dagran Thaurissan",
+     "order": 19000,
+     "flags": 1024
+    }
+   ]
+  },
+  "289": {
+   "name": "Scholomance",
+   "areas": [
+    2057
+   ],
+   "lfg": [
+    {
+     "id": 2,
+     "name": "Scholomance",
+     "level": 57,
+     "level_min": 57,
+     "level_max": 57,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2805,
+     "name": "Kirtonos",
+     "order": -1000,
+     "flags": 1024
+    },
+    {
+     "id": 2804,
+     "name": "Jandice Barov",
+     "order": -500,
+     "flags": 1024
+    },
+    {
+     "id": 2811,
+     "name": "Rattlegore",
+     "order": -250,
+     "flags": 1024
+    },
+    {
+     "id": 2809,
+     "name": "Marduk Blackpool",
+     "order": -125,
+     "flags": 1024
+    },
+    {
+     "id": 2813,
+     "name": "Vectus",
+     "order": -62,
+     "flags": 1024
+    },
+    {
+     "id": 3055,
+     "name": "Kormok",
+     "order": -46,
+     "flags": 1024
+    },
+    {
+     "id": 2810,
+     "name": "Ras Frostwhisperer",
+     "order": -31,
+     "flags": 1024
+    },
+    {
+     "id": 2803,
+     "name": "Instructor Malicia",
+     "order": -15,
+     "flags": 1024
+    },
+    {
+     "id": 2802,
+     "name": "Doctor Theolen Krastinov",
+     "order": -7,
+     "flags": 1024
+    },
+    {
+     "id": 2808,
+     "name": "Lorekeeper Polkelt",
+     "order": 7000,
+     "flags": 1024
+    },
+    {
+     "id": 2812,
+     "name": "The Ravenian",
+     "order": 11000,
+     "flags": 1024
+    },
+    {
+     "id": 2807,
+     "name": "Lord Alexei Barov",
+     "order": 11250,
+     "flags": 1024
+    },
+    {
+     "id": 2806,
+     "name": "Lady Illucia Barov",
+     "order": 11500,
+     "flags": 1024
+    },
+    {
+     "id": 2801,
+     "name": "Darkmaster Gandling",
+     "order": 12000,
+     "flags": 1024
+    }
+   ]
+  },
+  "329": {
+   "name": "Stratholme",
+   "areas": [
+    2017
+   ],
+   "lfg": [
+    {
+     "id": 39,
+     "name": "Stratholme",
+     "level": 55,
+     "level_min": 55,
+     "level_max": 55,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 473,
+     "name": "Hearthsinger Forresten",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 474,
+     "name": "Timmy the Cruel",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 476,
+     "name": "Malor the Zealous",
+     "order": 2500,
+     "flags": 1024
+    },
+    {
+     "id": 475,
+     "name": "Cannon Master Willey",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 477,
+     "name": "Archivist Galford",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 478,
+     "name": "Balnazzar",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 472,
+     "name": "The Unforgiven",
+     "order": 6500,
+     "flags": 1024
+    },
+    {
+     "id": 479,
+     "name": "Baroness Anastari",
+     "order": 7000,
+     "flags": 1024
+    },
+    {
+     "id": 480,
+     "name": "Nerub'enkan",
+     "order": 8000,
+     "flags": 1024
+    },
+    {
+     "id": 481,
+     "name": "Maleki the Pallid",
+     "order": 9000,
+     "flags": 1024
+    },
+    {
+     "id": 482,
+     "name": "Magistrate Barthilas",
+     "order": 10000,
+     "flags": 1024
+    },
+    {
+     "id": 483,
+     "name": "Ramstein the Gorger",
+     "order": 11000,
+     "flags": 1024
+    },
+    {
+     "id": 484,
+     "name": "Baron Rivendare",
+     "order": 12000,
+     "flags": 1024
+    },
+    {
+     "id": 2795,
+     "name": "Black Guard Swordsmith",
+     "order": 13000,
+     "flags": 1024
+    },
+    {
+     "id": 2796,
+     "name": "Crimson Hammersmith",
+     "order": 14000,
+     "flags": 1024
+    },
+    {
+     "id": 2797,
+     "name": "Ezra Grimm",
+     "order": 15000,
+     "flags": 1024
+    },
+    {
+     "id": 2798,
+     "name": "Postmaster Malown",
+     "order": 16000,
+     "flags": 1024
+    },
+    {
+     "id": 2799,
+     "name": "Skul",
+     "order": 17000,
+     "flags": 1024
+    },
+    {
+     "id": 2800,
+     "name": "Stonespine",
+     "order": 18000,
+     "flags": 1024
+    }
+   ]
+  },
+  "349": {
+   "name": "Maraudon",
+   "areas": [
+    2100
+   ],
+   "lfg": [
+    {
+     "id": 25,
+     "name": "Maraudon",
+     "level": 42,
+     "level_min": 42,
+     "level_max": 42,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 422,
+     "name": "Noxxion",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 423,
+     "name": "Razorlash",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 427,
+     "name": "Tinkerer Gizlock",
+     "order": 1500,
+     "flags": 1024
+    },
+    {
+     "id": 424,
+     "name": "Lord Vyletongue",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 425,
+     "name": "Celebras the Cursed",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 426,
+     "name": "Landslide",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 428,
+     "name": "Rotgrip",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 429,
+     "name": "Princess Theradras",
+     "order": 7000,
+     "flags": 1024
+    }
+   ]
+  },
+  "389": {
+   "name": "Ragefire Chasm",
+   "areas": [
+    2437
+   ],
+   "lfg": [
+    {
+     "id": 3,
+     "name": "Ragefire Chasm",
+     "level": 13,
+     "level_min": 13,
+     "level_max": 13,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": "Horde"
+    }
+   ],
+   "encounters": [
+    {
+     "id": 2732,
+     "name": "Oggleflint",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 2733,
+     "name": "Taragaman the Hungerer",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 2734,
+     "name": "Jergosh the Invoker",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2735,
+     "name": "Bazzalan",
+     "order": 3000,
+     "flags": 1024
+    }
+   ]
+  },
+  "429": {
+   "name": "Dire Maul",
+   "areas": [
+    2557
+   ],
+   "lfg": [
+    {
+     "id": 33,
+     "name": "Dire Maul - East",
+     "level": 54,
+     "level_min": 54,
+     "level_max": 54,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    },
+    {
+     "id": 35,
+     "name": "Dire Maul - West",
+     "level": 54,
+     "level_min": 54,
+     "level_max": 54,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    },
+    {
+     "id": 37,
+     "name": "Dire Maul - North",
+     "level": 54,
+     "level_min": 54,
+     "level_max": 54,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 343,
+     "name": "Zevrim Thornhoof",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 344,
+     "name": "Hydrospawn",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 345,
+     "name": "Lethtendris",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 2792,
+     "name": "Pusillin",
+     "order": 2500,
+     "flags": 1024
+    },
+    {
+     "id": 346,
+     "name": "Alzzin the Wildshaper",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 350,
+     "name": "Tendris Warpwood",
+     "order": 3500,
+     "flags": 1024
+    },
+    {
+     "id": 347,
+     "name": "Illyanna Ravenoak",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 348,
+     "name": "Magister Kalendris",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 349,
+     "name": "Immol'thar",
+     "order": 6000,
+     "flags": 1152
+    },
+    {
+     "id": 361,
+     "name": "Prince Tortheldrin",
+     "order": 7000,
+     "flags": 1024
+    },
+    {
+     "id": 362,
+     "name": "Guard Mol'dar",
+     "order": 8000,
+     "flags": 1024
+    },
+    {
+     "id": 363,
+     "name": "Stomper Kreeg",
+     "order": 9000,
+     "flags": 1024
+    },
+    {
+     "id": 364,
+     "name": "Guard Fengus",
+     "order": 10000,
+     "flags": 1024
+    },
+    {
+     "id": 365,
+     "name": "Guard Slip'kik",
+     "order": 11000,
+     "flags": 1024
+    },
+    {
+     "id": 366,
+     "name": "Captain Kromcrush",
+     "order": 12000,
+     "flags": 1024
+    },
+    {
+     "id": 367,
+     "name": "Cho'Rush the Observer",
+     "order": 13000,
+     "flags": 1024
+    },
+    {
+     "id": 368,
+     "name": "King Gordok",
+     "order": 14000,
+     "flags": 1024
+    },
+    {
+     "id": 2793,
+     "name": "Lord Hel'nurath",
+     "order": 15000,
+     "flags": 1024
+    },
+    {
+     "id": 2794,
+     "name": "Tsu'zee",
+     "order": 16000,
+     "flags": 1024
+    }
+   ]
+  },
+  "2959": {
+   "name": "City of Dalaran",
+   "areas": [
+    16544,
+    16560
+   ],
+   "lfg": [
+    {
+     "id": 3271,
+     "name": "City of Dalaran",
+     "level": 28,
+     "level_min": 28,
+     "level_max": 28,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 3298,
+     "name": "Arcane Anomaly",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 3299,
+     "name": "Fel Ancient",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 3300,
+     "name": "Mana Devourer",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 3301,
+     "name": "Mana Elemental",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 3302,
+     "name": "Unstable Sentinel",
+     "order": 4000,
+     "flags": 1024
+    },
+    {
+     "id": 3303,
+     "name": "Shade of the Archmage",
+     "order": 5000,
+     "flags": 1024
+    },
+    {
+     "id": 3310,
+     "name": "Lyn the Ignored",
+     "order": 6000,
+     "flags": 1024
+    },
+    {
+     "id": 3311,
+     "name": "Atrexis the Grave Knight",
+     "order": 7000,
+     "flags": 1024
+    },
+    {
+     "id": 3312,
+     "name": "Mana Wraith",
+     "order": 8000,
+     "flags": 1024
+    }
+   ]
+  },
+  "2998": {
+   "name": "Excavation Site: Wetlands",
+   "areas": [
+    16732
+   ],
+   "lfg": [
+    {
+     "id": 3274,
+     "name": "Excavation Site: Wetlands",
+     "level": 26,
+     "level_min": 26,
+     "level_max": 26,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 3480,
+     "name": "Saltspine",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 3481,
+     "name": "Shadetooth",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 3644,
+     "name": "Highland Horror",
+     "order": 1500,
+     "flags": 4
+    },
+    {
+     "id": 3482,
+     "name": "Relic Guardian",
+     "order": 2000,
+     "flags": 1024
+    }
+   ]
+  },
+  "2999": {
+   "name": "Ruins of Lordaeron",
+   "areas": [
+    16611
+   ],
+   "lfg": [
+    {
+     "id": 3272,
+     "name": "Ruins of Lordaeron",
+     "level": 15,
+     "level_min": 15,
+     "level_max": 15,
+     "lfg_min": 27,
+     "lfg_max": 27,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 3353,
+     "name": "Witherfang",
+     "order": 0,
+     "flags": 1024
+    },
+    {
+     "id": 3357,
+     "name": "The Abandoned",
+     "order": 250,
+     "flags": 1024
+    },
+    {
+     "id": 3355,
+     "name": "The Butcher",
+     "order": 500,
+     "flags": 1024
+    },
+    {
+     "id": 3354,
+     "name": "Rath'mael",
+     "order": 1000,
+     "flags": 1024
+    },
+    {
+     "id": 3408,
+     "name": "Lordaeron Captain",
+     "order": 2000,
+     "flags": 1024
+    },
+    {
+     "id": 3411,
+     "name": "Viktor the Vile",
+     "order": 3000,
+     "flags": 1024
+    },
+    {
+     "id": 3412,
+     "name": "Bjork",
+     "order": 4000,
+     "flags": 1024
+    }
+   ]
+  },
+  "3065": {
+   "name": "The Hall of Thanes",
+   "areas": [
+    16919
+   ],
+   "lfg": [
+    {
+     "id": 3273,
+     "name": "Hall of Thanes",
+     "level": 13,
+     "level_min": 13,
+     "level_max": 13,
+     "lfg_min": null,
+     "lfg_max": null,
+     "faction": null
+    }
+   ],
+   "encounters": [
+    {
+     "id": 3493,
+     "name": "Faldrim Anvilmar",
+     "order": 0,
+     "flags": 1028
+    },
+    {
+     "id": 3495,
+     "name": "Infurnus",
+     "order": 2000,
+     "flags": 1028
+    },
+    {
+     "id": 3494,
+     "name": "Plunder",
+     "order": 2500,
+     "flags": 1028
+    },
+    {
+     "id": 3496,
+     "name": "Durgen Dirgehammer",
+     "order": 3000,
+     "flags": 1028
+    }
+   ]
+  }
+ },
+ "unlisted": [
+  {
+   "map_id": 13,
+   "name": "Test Dungeon",
+   "encounters": 1
+  },
+  {
+   "map_id": 2720,
+   "name": "The Searing Basin",
+   "encounters": 1
+  },
+  {
+   "map_id": 2784,
+   "name": "Demon Fall Canyon",
+   "encounters": 7
+  },
+  {
+   "map_id": 2875,
+   "name": "Karazhan Crypts",
+   "encounters": 11
+  },
+  {
+   "map_id": 2921,
+   "name": "Naxxramas",
+   "encounters": 1
+  }
+ ],
+ "unmatched_lfg": [
+  {
+   "id": 45,
+   "name": "Onyxia",
+   "maps": []
+  }
+ ],
+ "notes": [
+  "23 donjon(s) à 5 reliés à une entrée de recherche de groupe ; 5 instance(s) de groupe avec rencontres sans entrée (unlisted) ; 1 entrée(s) non reliée(s) à une carte de groupe (unmatched_lfg)",
+  "niveau : ContentTuning (MinLevelSquish = MaxLevelSquish) de l'entrée de recherche de groupe, sens probable (niveau de contenu, DON9) ; lfg_min et lfg_max quand le client les renseigne",
+  "tables du journal (JournalInstance, JournalEncounter, JournalEncounterItem) absentes de la version sur wago.tools (DON9) : ni butin ni PNJ des boss dans ce fichier"
+ ],
+ "source": "Client 1.60.1.70707 : tables Map, LFGDungeons, ContentTuning, DungeonEncounter et AreaTable (wago.tools, decode_rules.json dungeons)",
+ "certainty": "certain"
+}
