@@ -8,6 +8,7 @@ injectée dans `Deps`, l'analyse de la liste des processus est testée sur du te
 
 import dataclasses
 import os
+import subprocess
 from datetime import timedelta
 
 from conftest import LOCAL_VERSION
@@ -136,3 +137,29 @@ def test_update_holds_a_log_being_written_and_proposes_it_again_later(logs):  # 
     assert (
         step(report, "journaux")["status"] != "rien" and report["pending"] == []
     )  # mesuré (décision 295 : sans attente)
+
+
+def test_a_process_list_in_the_windows_code_page_never_stops_the_pass(monkeypatch):
+    """Windows français (2026-10-31) : `tasklist` écrit les tailles avec une espace insécable (octet 0xFF de la page
+    de code OEM) ; lue en UTF-8 stricte, la liste levait et arrêtait le passage lancé par le pont."""
+    from forever.pipeline import live_logs
+
+    seen = {}
+
+    def fake(command, **kwargs):
+        seen.update(kwargs)
+        raw = b'"Wow.exe","4242","Console","1","1\xff234\xff567 Ko"\r\n'
+        return subprocess.CompletedProcess(command, 0, stdout=raw.decode("utf-8", errors=kwargs["errors"]), stderr="")
+
+    monkeypatch.setattr(live_logs.subprocess, "run", fake)
+    assert live_logs.detect_game_running(None) is True
+    assert seen["errors"] == "replace"
+
+
+def test_an_unreadable_process_list_gives_an_unknown_state(monkeypatch):
+    from forever.pipeline import live_logs
+
+    monkeypatch.setattr(
+        live_logs.subprocess, "run", lambda command, **_: subprocess.CompletedProcess(command, 0, stdout=None)
+    )
+    assert live_logs.detect_game_running(None) is None
