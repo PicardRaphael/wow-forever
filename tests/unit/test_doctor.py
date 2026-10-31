@@ -201,3 +201,10 @@ def test_outside_windows_the_windows_checks_are_not_applicable(world):
     checks = world.checks(windows=False)
     for name in ("tasks.bridge", "tasks.update", "antivirus"):
         assert checks[name].status == "unknown" and "non applicable" in checks[name].finding
+
+
+def test_absent_optional_data_addons_are_not_reported(world):
+    """Demande de l'utilisateur du 2026-10-31 : un addon de données facultatif qu'il n'installe pas (FojjiCore) n'est
+    plus signalé ; `forever addons status` garde la liste complète."""
+    check = world.checks()["addons.data"]
+    assert check.status == "ok" and "absent" not in check.finding

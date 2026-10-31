@@ -24,6 +24,7 @@ UI = (
     "FojjiCore_RaidTools",
     "FontMagic",
     "ForeverMove",
+    "OpenMap",  # carte, non utilisé comme source (demande de l'utilisateur du 2026-10-31)
     "Simulationcraft",
 )
 EXCLUDED = {"Tamed": "Classic", "AlexAtlasLoot": "licence"}
