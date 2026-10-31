@@ -25,7 +25,7 @@ from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
-from conftest import DATA_DIR, LOCAL_VERSION, REPO_ROOT, FakeHttp, read_json
+from conftest import REPO_DATA_DIR, REPO_ROOT, FakeHttp, read_json
 
 from forever.manifest import write_manifest
 from forever.pipeline import decode
@@ -44,8 +44,13 @@ NOT_IN_CANDIDATE = ("revisions.json", "confirmed_changes.json")  # écrits par l
 NOT_IN_CANDIDATE_PREFIXES = ("_seed_", "_source_")  # copies figées gardées par l'installation
 
 
+# Version installée du dépôt cloné (son manifeste), pas `LOCAL_VERSION` (données des tests ramenées à la version des
+# valeurs) : la veille du 2026-10-31 a installé 1.60.1.70707 et la version fictive tirée de 70450 était plus ancienne.
+INSTALLED = read_json(REPO_DATA_DIR / "manifest.json")["game_version"]
+
+
 def fictive_version() -> str:
-    head, build = LOCAL_VERSION.rsplit(".", 1)
+    head, build = INSTALLED.rsplit(".", 1)
     return f"{head}.{int(build) + 1}"
 
 
@@ -53,7 +58,7 @@ def candidate_of(version: str, root: Path) -> Path:
     """Candidate de `version` au contenu de la version installée (comme une sortie de `forever decode`)."""
     vdir = root / version
     vdir.mkdir(parents=True)
-    for path in sorted((DATA_DIR / LOCAL_VERSION).iterdir()):
+    for path in sorted((REPO_DATA_DIR / INSTALLED).iterdir()):
         if path.name in NOT_IN_CANDIDATE or path.name.startswith(NOT_IN_CANDIDATE_PREFIXES) or not path.is_file():
             continue
         shutil.copyfile(path, vdir / path.name)
@@ -74,10 +79,10 @@ def candidate_of(version: str, root: Path) -> Path:
     write(vdir / "talents.json", talents)
     for path in vdir.glob("*.json"):  # build lu par le décodage
         doc = read_json(path)
-        if isinstance(doc, dict) and doc.get("build") == LOCAL_VERSION:
+        if isinstance(doc, dict) and doc.get("build") == INSTALLED:
             doc["build"] = version
             if isinstance(doc.get("source"), str):
-                doc["source"] = doc["source"].replace(LOCAL_VERSION, version)
+                doc["source"] = doc["source"].replace(INSTALLED, version)
             write(path, doc)
     write_manifest(root)
     return root
@@ -187,11 +192,11 @@ def test_a_new_version_is_installed_end_to_end_with_the_clone_verify(tmp_path, m
         git(bare, "symbolic-ref", "HEAD", "refs/heads/main")
     wow = tmp_path / "World of Warcraft" / "_classic_beta_"
     wow.mkdir(parents=True)
-    product = read_json(DATA_DIR / LOCAL_VERSION / "sources.json")["product"]
+    product = read_json(REPO_DATA_DIR / INSTALLED / "sources.json")["product"]
     (wow.parent / ".build.info").write_text(f"{HEADER}\nus|1|{version}|{product}\n", encoding="utf-8")
     seen = datetime(2026, 10, 5, 11, 0, tzinfo=UTC)  # première vue 25 h avant le passage : sans_correctifs (déc. 207)
     record_build(tmp_path / "cache", ClientBuild(version, seen, product, "test"))
-    builds = {product: [{"version": v, "created_at": "2026-10-06T00:00:00Z"} for v in (LOCAL_VERSION, version)]}
+    builds = {product: [{"version": v, "created_at": "2026-10-06T00:00:00Z"} for v in (INSTALLED, version)]}
     deps = make_deps(
         cache_dir=tmp_path / "cache",
         wow_dir=wow,
@@ -218,5 +223,5 @@ def test_a_new_version_is_installed_end_to_end_with_the_clone_verify(tmp_path, m
     assert [w["version"] for w in report["written"]] == [version], journal
     assert report["pending"] == [] and exit_code(report) == 0
     manifest = json.loads(git(bare, "show", "main:forever/data/manifest.json"))
-    assert manifest["game_version"] == version and LOCAL_VERSION in manifest["versions"]
+    assert manifest["game_version"] == version and INSTALLED in manifest["versions"]
     assert git(bare, "rev-parse", "main") != head

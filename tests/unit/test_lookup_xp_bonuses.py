@@ -4,6 +4,7 @@ chaque bonus avec sa valeur, sa durée, son cumul, son accès, sa source et sa c
 import asyncio
 import json
 
+import pytest
 from conftest import DATA_DIR, LOCAL_VERSION, read_json
 from mcp import Client
 
@@ -18,13 +19,19 @@ def doc():
     return read_json(DATA_DIR / LOCAL_VERSION / "xp_bonuses.json")
 
 
-def lookup(capsys, *args):
-    code = main(["lookup", "xp_bonuses", *args, "--json"])
+@pytest.fixture
+def deps(make_deps):
+    """Données ramenées à la version des valeurs (`DATA_DIR`), comme `doc()` : jamais celles qu'installe la veille."""
+    return make_deps()
+
+
+def lookup(capsys, deps, *args):
+    code = main(["lookup", "xp_bonuses", *args, "--json"], deps)
     return code, json.loads(capsys.readouterr().out)
 
 
-def test_cli_lists_every_bonus_with_source_and_certainty(capsys):
-    code, out = lookup(capsys)
+def test_cli_lists_every_bonus_with_source_and_certainty(capsys, deps):
+    code, out = lookup(capsys, deps)
     assert code == 0 and validate_provenance(out["provenance"]) == []
     assert {b["spell_id"] for b in out["bonuses"]} == {a["spell_id"] for a in doc()["auras"]}
     for b in out["bonuses"]:
@@ -37,13 +44,13 @@ def test_cli_lists_every_bonus_with_source_and_certainty(capsys):
     assert out["camp"]["tent"]["threshold_pct_of_level"] == doc()["camp"]["tent"]["threshold_pct_of_level"]
 
 
-def test_cli_filters_by_access(capsys):
-    code, out = lookup(capsys, "--access", "none")
+def test_cli_filters_by_access(capsys, deps):
+    code, out = lookup(capsys, deps, "--access", "none")
     assert code == 0 and out["bonuses"] and all(b["access"] == "none" for b in out["bonuses"])
 
 
-def test_cli_text_names_the_bonuses(capsys):
-    assert main(["lookup", "xp_bonuses"]) == 0
+def test_cli_text_names_the_bonuses(capsys, deps):
+    assert main(["lookup", "xp_bonuses"], deps) == 0
     text = capsys.readouterr().out
     assert "Well-Rested" in text and "jamais appliqué" in text
 
