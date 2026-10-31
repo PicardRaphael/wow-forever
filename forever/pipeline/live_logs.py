@@ -51,6 +51,8 @@ def detect_game_running(wow_dir: Path | None) -> bool | None:
             command,
             capture_output=True,
             text=True,
+            encoding="utf-8",
+            errors="replace",  # page de code OEM (Windows français : espace insécable 0xFF) ; noms d'exécutables ASCII
             timeout=_TIMEOUT_S,
             check=False,
             stdin=subprocess.DEVNULL,
@@ -58,7 +60,7 @@ def detect_game_running(wow_dir: Path | None) -> bool | None:
         )
     except (OSError, subprocess.SubprocessError):
         return None
-    if done.returncode != 0:
+    if done.returncode != 0 or done.stdout is None:
         return None
     return game_running_from(done.stdout, client_executables(wow_dir))
 
