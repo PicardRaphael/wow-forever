@@ -87,6 +87,7 @@ from forever.pipeline.client_builds import (
     version_at,
     wago_product,
 )
+from forever.pipeline.client_files import locale_of
 from forever.pipeline.combatlog import LogHeader, LogSummary, log_files, read_log, scan_logs
 from forever.pipeline.dbd import layouts_from_json
 from forever.pipeline.decode import Candidate, decode_version, load_rules
@@ -252,7 +253,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     decode.add_argument(
         "--dbcache",
-        help="DBCache.bin (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin) ; « raidbots » : dernier cache vérifié"
+        help="DBCache.bin (défaut : <FOREVER_WOW_DIR>/Cache/ADB/<langue>/DBCache.bin) ; « raidbots » : dernier cache vérifié"
         " de Raidbots épinglé par forever hotfixes --raidbots (décision 290)",
     )
     decode.add_argument(
@@ -722,7 +723,9 @@ def build_parser() -> argparse.ArgumentParser:
     hot = sub.add_parser("hotfixes", help="correctifs du serveur lus dans Logs/Hotfix.log (lecture locale)")
     hot.add_argument("--log", help="journal Hotfix.log (défaut : <FOREVER_WOW_DIR>/Logs/Hotfix.log)")
     hot.add_argument("--since-install", action="store_true", help="seulement depuis la révision installée")
-    hot.add_argument("--dbcache", help="valeurs des correctifs (défaut : <FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin)")
+    hot.add_argument(
+        "--dbcache", help="valeurs des correctifs (défaut : <FOREVER_WOW_DIR>/Cache/ADB/<langue>/DBCache.bin)"
+    )
     hot.add_argument("--values", action="store_true", help="chaque valeur corrigée, avant et après (T08c)")
     hot.add_argument("--dbd-layouts", help="dispositions dérivées (JSON) au lieu du relevé de WoWDBDefs du cache")
     hot.add_argument("--csv-dir", help="dossier des CSV du build (défaut : cache de forever fetch)")
@@ -2760,7 +2763,9 @@ def _hotfix_source(deps: Deps, args: argparse.Namespace) -> HotfixSource | None:
     _, rules = load_rules(deps.data_dir)
     layouts, dbd = _dbd_layouts(deps, args.dbd_layouts, args.version, rules)
     journal = hotfixes.load_journal(deps.cache_dir)
-    return hotfix_source(path, layouts, dbd, journal, args.version, rules, format_utc(deps.now()))
+    return hotfix_source(
+        path, layouts, dbd, journal, args.version, rules, format_utc(deps.now()), locale=locale_of(path)
+    )
 
 
 def _cmd_decode(deps: Deps, args: argparse.Namespace) -> int:
@@ -3996,7 +4001,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
         updater = None
         if not deps.offline:  # décision 227 : passage de forever update quand le jeu se ferme ou écrit DBCache.bin
             from forever.bridge.updater import UpdateOnClose
-            from forever.pipeline.dbcache import DBCACHE_PATH
+            from forever.pipeline.dbcache import locate_dbcache
             from forever.spawn import spawn_detached
             from forever.update import launch_pass, run_log_path
 
@@ -4007,7 +4012,7 @@ def _bridge_run(deps: Deps, args: argparse.Namespace, wow: Path, addons: Path, j
 
             updater = UpdateOnClose(
                 game_running=lambda: api.process_running(executables),
-                dbcache=wow.joinpath(*(part.format(locale="enUS") for part in DBCACHE_PATH)),
+                dbcache=lambda: (locate_dbcache(wow) or (None, ""))[0],  # langue du client cherchée à chaque relevé
                 journal=journal,
                 clock=time.monotonic,
                 launch=launch_update,
@@ -4561,7 +4566,9 @@ def _cmd_hotfixes(deps: Deps, args: argparse.Namespace) -> int:
             notes.append(f"DBCache.bin du build {cache.build}, version installée {version} : non applicable")
         elif args.values:
             layouts, dbd = _dbd_layouts(deps, args.dbd_layouts, version, rules)
-            source = hotfix_source(cache_path, layouts, dbd, entries, version, rules, format_utc(deps.now()))
+            source = hotfix_source(
+                cache_path, layouts, dbd, entries, version, rules, format_utc(deps.now()), locale=locale_of(cache_path)
+            )
             values_dir = Path(args.csv_dir) if args.csv_dir else wago_dir(deps.cache_dir, version)
             cache_block["values"] = hotfix_values(source, values_dir, deps.data_dir / version)
     else:
@@ -4677,12 +4684,12 @@ def _cmd_hotfixes_raidbots(deps: Deps, args: argparse.Namespace) -> int:
 
 
 def _dbcache_path(deps: Deps, option: str | None) -> Path | None:
-    """`--dbcache`, sinon `<FOREVER_WOW_DIR>/Cache/ADB/enUS/DBCache.bin` ; None sans dossier du client."""
+    """`--dbcache`, sinon `<FOREVER_WOW_DIR>/Cache/ADB/<langue du client>/DBCache.bin` (enUS, frFR…) ; None sans
+    dossier du client ni cache."""
     if option:
         return Path(option)
-    if deps.wow_dir is None:
-        return None
-    return deps.wow_dir.joinpath(*(part.format(locale=DEFAULT_LOCALE) for part in dbcache.DBCACHE_PATH))
+    found = dbcache.locate_dbcache(deps.wow_dir)
+    return found[0] if found is not None else None
 
 
 def _cmd_origins(deps: Deps, args: argparse.Namespace) -> int:

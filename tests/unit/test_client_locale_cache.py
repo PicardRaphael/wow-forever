@@ -10,13 +10,13 @@ import os
 import shutil
 
 from conftest import FIXTURES, FakeHttp
-from forever.pipeline.client_files import locale_of, locate, text_locale
 from test_bridge_loop import NOW, Clock
 from test_hotfix_overlay import RULES, WAGO, by_id, source
 
 from forever.archive import archive_client_files, archived_dbcache, archived_locale
 from forever.bridge.journal import Journal
 from forever.bridge.updater import CHECK_S, SETTLE_S, UpdateOnClose
+from forever.pipeline.client_files import locale_of, locate, text_locale
 from forever.pipeline.dbcache import DBCACHE_PATH, locate_dbcache
 from forever.pipeline.decode import load_tables
 from forever.pipeline.hotfix_overlay import apply_hotfixes
@@ -157,7 +157,8 @@ def test_the_bridge_follows_the_cache_of_the_current_language(tmp_path):
     )
     trigger.tick()  # premier relevé : aucun cache encore (jeu jamais lancé)
     put(tmp_path, "frFR", data=b"premiere session")
-    while clock.t < CHECK_S + SETTLE_S + 2 * CHECK_S:
+    end = clock.t + CHECK_S + SETTLE_S + 2 * CHECK_S
+    while clock.t < end:
         clock.t += 1.0
         trigger.tick()
     assert launched == [1]

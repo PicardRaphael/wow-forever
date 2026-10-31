@@ -34,7 +34,6 @@ import copy
 import difflib
 import json
 import os
-import re
 from collections.abc import Mapping
 from datetime import datetime
 from pathlib import Path
@@ -44,6 +43,7 @@ from forever.config import Deps
 from forever.engine.talents import check_build, check_class_build
 from forever.errors import DataSchemaError, InvalidArgumentError
 from forever.gamedata import RACES_FILE, RACIALS_FILE, SEED_RACIALS_FILE, build_game_data, mage_races
+from forever.pipeline.client_files import LOCALE_RE, text_locale
 from forever.provenance import Provenance, local_provenance
 from forever.store import current_identity, load_version
 from forever.timefmt import format_utc
@@ -114,21 +114,9 @@ class ProfileView(TypedDict):
     provenance: Provenance
 
 
-CLIENT_CONFIG = ("WTF", "Config.wtf")
-LOCALE_RE = re.compile(r"^[a-z]{2}[A-Z]{2}$")
-_TEXT_LOCALE = re.compile(r'^\s*SET\s+textLocale\s+"(?P<value>[^"]*)"', re.MULTILINE)
-
-
 def client_locale(wow_dir: Path | None) -> str | None:
     """Langue du client lue dans `WTF/Config.wtf` (`SET textLocale "enUS"`), lecture locale ; None sans fichier."""
-    if wow_dir is None:
-        return None
-    path = wow_dir.joinpath(*CLIENT_CONFIG)
-    try:
-        m = _TEXT_LOCALE.search(path.read_text(encoding="utf-8", errors="replace"))
-    except OSError:
-        return None
-    return m["value"] if m and LOCALE_RE.fullmatch(m["value"]) else None
+    return text_locale(wow_dir)
 
 
 def check_locale(value: str) -> str:

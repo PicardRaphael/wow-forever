@@ -108,3 +108,10 @@ def read_questcache(path: Path) -> QuestCache:
 
 def questcache_path(wow_dir: Path, locale: str = "enUS") -> Path:
     return wow_dir.joinpath(*(part.format(locale=locale) for part in QUESTCACHE_PATH))
+
+
+def locate_questcache(wow_dir: Path | None) -> tuple[Path, str] | None:
+    """`questcache.wdb` du client dans le dossier de sa langue et cette langue ; None s'il n'y en a pas."""
+    from forever.pipeline.client_files import locate
+
+    return locate(wow_dir, QUESTCACHE_PATH)

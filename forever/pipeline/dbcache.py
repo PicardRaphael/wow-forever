@@ -23,6 +23,15 @@ from typing import Any, NamedTuple
 from forever.errors import DataSchemaError
 
 DBCACHE_PATH = ("Cache", "ADB", "{locale}", "DBCache.bin")
+
+
+def locate_dbcache(wow_dir: Path | None) -> tuple[Path, str] | None:
+    """`DBCache.bin` du client dans le dossier de sa langue (enUS, frFR…) et cette langue ; None s'il n'y en a pas."""
+    from forever.pipeline.client_files import locate
+
+    return locate(wow_dir, DBCACHE_PATH)
+
+
 SIGNATURE = b"XFTH"
 FORMAT = 9
 HEADER_SIZE = 44  # signature, format, build, 32 octets de contrôle

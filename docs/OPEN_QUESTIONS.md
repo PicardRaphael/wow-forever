@@ -618,6 +618,12 @@ Questions de la route de réputation (RP1, bloc 4e de CJ1). Test commun : gains 
   la **tenue du bouclier sous les coups** en leveling et en PvP (angle mort chiffré, borne haute : bouclier tenu tout
   le combat) ; à relever en jeu (docs/LANCEMENT.md, étape 14b). Winter's Chill : la part de la puissance des sorts
   ajoutée à Cone of Cold est modélisée (D4, r7).
+- **HF3** (2026-10-31, client frFR sur le portable) : les textes de `DBCache.bin` (descriptions, noms) sont-ils dans
+  la langue du client (`Cache/ADB/frFR/`) ? Supposé oui : un cache d'une autre langue que l'anglais n'écrit jamais ses
+  textes dans les tables anglaises (ceux d'avant sont gardés ; ligne nouvelle : texte du cache gardé et signalé dans
+  `foreign_strings`), ses chiffres s'appliquent. À vérifier à la première connexion en français : comparer
+  `Cache/ADB/frFR/DBCache.bin` à un cache enUS du même build ; dire aussi si un client frFR écrit encore dans
+  `Cache/ADB/enUS/`.
 - **RJ1** : analytique des nouveaux Arcanes de 70450 optimiste face au Monte Carlo (temps par monstre −20,8 % à L24,
   −12,6 % à L30, −8 % en leveling 30 ; DPS +3,5 % sur un boss au niveau 40). Cause probable : l'aura d'Arcane Blast
   qui dure depuis sa première application et les projectiles de Missile Barrage, comptés en moyenne par le cycle

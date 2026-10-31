@@ -159,8 +159,9 @@ def watch(deps: Deps, *, report: bool = False) -> dict[str, Any]:
                 "actions": [_action("forever profile import --dry-run", False, "profil depuis les sauvegardes")],
             }
         )
-    cache_path = wow.joinpath(*(part.format(locale="enUS") for part in dbcache.DBCACHE_PATH))
-    if cache_path.is_file():
+    found = dbcache.locate_dbcache(wow)  # dossier de la langue du client (enUS, frFR…)
+    if found is not None:
+        cache_path = found[0]
         version, sources = _installed(deps)
         st = cache_path.stat()
         cache_stamp: dict[str, Any] = {

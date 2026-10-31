@@ -28,13 +28,14 @@ class UpdateOnClose:
         self,
         *,
         game_running: Callable[[], bool],
-        dbcache: Path,
+        dbcache: Path | Callable[[], Path | None],
         journal: Journal,
         clock: Callable[[], float],
         launch: Callable[[], bool],
     ) -> None:
         self.game_running = game_running
-        self.dbcache = dbcache
+        # chemin fixe, ou cherché à chaque relevé (dossier de la langue du client, qui peut changer)
+        self.dbcache = dbcache if callable(dbcache) else (lambda: dbcache)
         self.journal = journal
         self.clock = clock
         self.launch = launch
@@ -46,8 +47,11 @@ class UpdateOnClose:
         self.deferred = False
 
     def _stamp(self) -> tuple[int, int] | None:
+        path = self.dbcache()
+        if path is None:
+            return None
         try:
-            st = self.dbcache.stat()
+            st = path.stat()
         except OSError:
             return None
         return (st.st_mtime_ns, st.st_size)

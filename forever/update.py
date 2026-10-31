@@ -840,7 +840,9 @@ def _hotfix_source(run: _Run, version: str, archive: Path, rules: Mapping[str, A
         commit = str(dbd.get("commit") or "?")[:12]
         raise _NeedLayouts(missing, f"WoWDBDefs (commit {commit}) sans disposition pour le build {version}")
     journal = hotfixes.load_journal(run.deps.cache_dir)
-    return hotfix_source(archive, layouts, dbd, journal, version, rules, run.now)
+    from forever.archive import archived_locale
+
+    return hotfix_source(archive, layouts, dbd, journal, version, rules, run.now, locale=archived_locale(archive))
 
 
 def _copy_data(base: Path, dest: Path) -> None:

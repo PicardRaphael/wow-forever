@@ -228,7 +228,24 @@ def _listed(source: HotfixSource) -> dict[str, Any]:
         "delete_absent": [],
         "unvalidated": {},
         "not_loaded": {},
+        # textes d'un cache d'une autre langue que l'anglais : ceux d'avant gardés, ceux des lignes nouvelles signalés
+        "foreign_strings": {"locale": source.locale, "kept": [], "added": []},
     }
+
+
+def _keep_english_strings(
+    row: dict[str, Any], before: Row | None, layout: Layout, table: str, rec_id: int, foreign: dict[str, Any]
+) -> dict[str, Any]:
+    """Cache d'une autre langue (frFR…) : ses textes sont dans la langue du client (question HF3), les tables sont en
+    anglais. Ligne connue : textes d'avant gardés ; ligne nouvelle : texte du cache gardé faute d'autre, signalé."""
+    names = [f.name for f in layout.fields if f.kind in ("string", "locstring") and f.name in row]
+    if not names:
+        return row
+    if before is None:
+        foreign["added"].append({"table": table, "rec_id": rec_id})
+        return row
+    foreign["kept"].append({"table": table, "rec_id": rec_id})
+    return {**row, **{name: before[name] for name in names if name in before}}
 
 
 def apply_hotfixes(
@@ -281,6 +298,8 @@ def apply_hotfixes(
                 applied.append(Applied(table, e.rec_id, "DELETE", e.push_id, e.unique_id, seen, before, None))
                 continue
             row = _typed(table, schema, decode_record(layout, e.data, e.rec_id), e.rec_id)
+            if source.locale != DEFAULT_LOCALE:
+                row = _keep_english_strings(row, before, layout, table, e.rec_id, listed["foreign_strings"])
             if before is None:
                 added.append(row)
             else:

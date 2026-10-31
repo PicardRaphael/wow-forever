@@ -32,7 +32,8 @@ from forever.errors import DataSchemaError
 from forever.installs import product_of
 from forever.pipeline import dbcache, hotfixes
 from forever.pipeline.client_builds import JOURNAL_NAME, load_builds, read_build_info, record_build, version_at
-from forever.pipeline.questcache import QuestCache, parse_questcache, questcache_path
+from forever.pipeline.client_files import DEFAULT_LOCALE
+from forever.pipeline.questcache import QuestCache, locate_questcache, parse_questcache
 from forever.timefmt import format_utc
 
 ARCHIVE_DIR = "dbcache"
@@ -162,7 +163,7 @@ def _copy(kind: str, build: str, path: Path, entry: dict[str, Any], new: bool) -
     )
 
 
-def _archive_dbcache(live: Path, root: Path, raw: bytes, cache: dbcache.DBCache, now: str) -> ArchivedCopy:
+def _archive_dbcache(live: Path, root: Path, raw: bytes, cache: dbcache.DBCache, now: str, locale: str) -> ArchivedCopy:
     build = str(cache.build)
     folder = root / build
     index = _Index(folder, now)
@@ -184,6 +185,7 @@ def _archive_dbcache(live: Path, root: Path, raw: bytes, cache: dbcache.DBCache,
         "size": len(raw),
         "file_mtime": _mtime(live),
         "copied_at": now,
+        "locale": locale,  # langue du dossier lu : les textes d'un autre cache que l'anglais ne sont pas appliqués
         **_dbcache_counts(cache),
     }
     index.copies.append(entry)
@@ -277,9 +279,7 @@ def _archive_hotfix_log(
     return _copy("hotfix_log", build, folder / target["file"], target, True)
 
 
-def archive_client_files(
-    deps: Deps, *, locale: str = "enUS", read_bytes: Callable[[Path], bytes] = Path.read_bytes
-) -> ArchiveResult:
+def archive_client_files(deps: Deps, *, read_bytes: Callable[[Path], bytes] = Path.read_bytes) -> ArchiveResult:
     """Un passage d'archivage ; ne lève jamais (les erreurs sont dans le résultat)."""
     copies: list[ArchivedCopy] = []
     errors: list[str] = []
@@ -305,9 +305,10 @@ def archive_client_files(
     state_path = root / STATE_NAME
     state = _read_json(state_path)
 
-    live = wow.joinpath(*(part.format(locale=locale) for part in dbcache.DBCACHE_PATH))
+    found = dbcache.locate_dbcache(wow)  # dossier de la langue du client (enUS, frFR…)
     try:
-        if live.is_file():
+        if found is not None:
+            live, locale = found
             stamp = _stamp(live)
             if state.get("dbcache") != stamp:
                 try:
@@ -318,15 +319,16 @@ def archive_client_files(
                     state["dbcache_failures"] = int(state.get("dbcache_failures", 0)) + 1
                     errors.append(f"DBCache.bin non archivé, relu au prochain passage : {_message(exc)}")
                 else:
-                    copies.append(_archive_dbcache(live, root, raw, parsed, now))
+                    copies.append(_archive_dbcache(live, root, raw, parsed, now, locale))
                     state["dbcache"] = stamp
                     state["dbcache_failures"] = 0
     except Exception as exc:  # noqa: BLE001
         errors.append(f"DBCache.bin : {_message(exc)}")
 
-    quests = questcache_path(wow, locale)
+    found_quests = locate_questcache(wow)
     try:
-        if quests.is_file():
+        if found_quests is not None:
+            quests = found_quests[0]
             stamp = _stamp(quests)
             if state.get("questcache") != stamp:
                 try:
@@ -363,6 +365,16 @@ def archived_dbcache(cache_dir: Path, build: str, *, product: str | None = None)
     """Copie la plus récente du `DBCache.bin` d'un build (`70235`) d'un produit (défaut : la bêta), ou None."""
     path = archive_dir(cache_dir, product, build) / CURRENT
     return path if path.is_file() else None
+
+
+def archived_locale(path: Path) -> str:
+    """Langue du dossier d'où vient une copie archivée de `DBCache.bin` (index du build) ; l'anglais pour une copie
+    d'avant cette information ou sans index."""
+    entries = _read_json(path.parent / INDEX_NAME).get("copies", [])
+    for entry in entries if isinstance(entries, list) else []:
+        if isinstance(entry, dict) and entry.get("kind") == "dbcache" and entry.get("file") == path.name:
+            return str(entry.get("locale") or DEFAULT_LOCALE)
+    return DEFAULT_LOCALE
 
 
 def archive_line(cache_dir: Path) -> str | None:
