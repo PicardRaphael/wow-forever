@@ -27,7 +27,15 @@ from forever.pipeline.dbcache import (
     read_dbcache,
     table_names,
 )
-from forever.pipeline.dbd import Layout, LayoutCheck, decode_record, layout_for, parse_dbd, validate_layout
+from forever.pipeline.dbd import (
+    Layout,
+    LayoutCheck,
+    csv_header,
+    decode_record,
+    layout_for,
+    parse_dbd,
+    validate_layout,
+)
 from forever.pipeline.tables import TABLES, Row, Value
 
 SERVER_ORIGIN = "correctif_serveur"
@@ -190,14 +198,48 @@ def _check(
     layout = source.layouts.get(table)
     if layout is None:
         return LayoutCheck(table, False, f"aucune disposition pour le build {source.cache.build}", 0, 0, None, None)
-    header, rows = _csv_header_and_rows(_csv_file(csv_dir, table), {e.rec_id for e in entries})
+    rec_ids = {e.rec_id for e in entries}
+    header, rows = _csv_header_and_rows(_csv_file(csv_dir, table), rec_ids)
+    if source.locale != DEFAULT_LOCALE:
+        rows = _localized_rows(rows, layout, csv_dir / source.locale / f"{table}.csv", rec_ids)
     known: dict[str, set[int]] = {}
     for f in layout.fields:
         if f.ref is not None and f.ref not in known:
             ids = _known_ids(f.ref, tables, csv_dir, source)
             if ids is not None:
                 known[f.ref] = ids
-    return validate_layout(layout, entries, header, rows, known)
+    check = validate_layout(layout, entries, header, rows, known)
+    if check.ok or source.locale == DEFAULT_LOCALE or not all(f.is_id or f.kind in TEXT_KINDS for f in layout.fields):
+        return check
+    # table de textes seulement, cache d'une autre langue sans les noms de cette langue : rien à comparer ; toutes les
+    # entrées lues à la bonne taille et au bon identifiant suffisent (leurs textes ne remplacent jamais l'anglais)
+    valid = sum(e.status == Status.VALID for e in entries)
+    same_header = header is None or list(header) == csv_header(layout)
+    if same_header and check.decoded == valid and check.equal_ratio is None and check.references_ok is None:
+        reason = (
+            f"disposition {layout.layout} validée : {valid} entrée(s) décodée(s) à la taille et à l'identifiant "
+            f"attendus ; textes en {source.locale} non comparés (noms de cette langue absents)"
+        )
+        return check._replace(ok=True, reason=reason)
+    return check
+
+
+TEXT_KINDS = ("string", "locstring")
+
+
+def _localized_rows(
+    rows: Mapping[int, Mapping[str, str]], layout: Layout, locale_csv: Path, ids: set[int]
+) -> dict[int, dict[str, str]]:
+    """Lignes du build comparées à un cache d'une autre langue (client frFR…) : textes pris dans le CSV de sa langue
+    quand la ligne y est, sinon laissés hors de la comparaison (seuls les chiffres jugent la disposition)."""
+    texts = [f.name for f in layout.fields if f.kind in TEXT_KINDS]
+    _, local = _csv_header_and_rows(locale_csv, ids)
+    out: dict[int, dict[str, str]] = {}
+    for rec_id, row in rows.items():
+        mine = local.get(rec_id, {})
+        out[rec_id] = {k: v for k, v in row.items() if k not in texts or k in mine}
+        out[rec_id].update({k: mine[k] for k in texts if k in mine})
+    return out
 
 
 def _typed(table: str, schema: str, record: Mapping[str, Value], rec_id: int) -> dict[str, Value]:
