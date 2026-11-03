@@ -33,7 +33,7 @@ def mutate(data_dir, change):
 
 
 def outdated(rules):
-    rules["target_auras"]["winters_chill"]["alternatives"][0]["sp_effect"] = 9  # effet absent du sort du talent
+    rules["target_auras"]["winters_chill"]["trigger_aura"] = 9999  # aura déclenchée absente du sort du talent
     rules["rank_variables"]["impact"] = [99]  # variable hors de l'infobulle
 
 
@@ -70,7 +70,7 @@ def test_every_other_talent_is_decoded_as_before(both):
 def test_the_talent_of_an_outdated_aura_rule_is_marked(both):
     _, vdir = both
     chill = talents(vdir)["wintersChill"]
-    assert chill["certainty"] == "suppose" and "sp_effect" in chill["review"]
+    assert chill["certainty"] == "suppose" and "déclenché" in chill["review"]
     auras = read_json(vdir / "spell_scaling.json")["auras"]
     assert "winters_chill" not in auras and "fire_vulnerability" in auras
 
@@ -88,7 +88,7 @@ def test_the_engine_leaves_out_a_talent_to_review(both):
     from forever.store import VersionData
 
     _, vdir = both
-    gd = build_game_data(VersionData(vdir.name, vdir))
+    gd = build_game_data(VersionData(vdir.name, "candidate", vdir, read_json(vdir / "sources.json")))
     assert "impact" not in gd.talents and "wintersChill" not in gd.talents
     assert "ignite" in gd.talents
 
@@ -107,7 +107,7 @@ def builds_http(*versions):
     return FakeHttp(body=json.dumps(payload).encode("utf-8"))
 
 
-@pytest.mark.parametrize(("published", "newer"), [("1.60.1.70532", False), ("1.60.1.99999", True)])
+@pytest.mark.parametrize(("published", "newer"), [("1.60.1.70009", False), ("1.60.1.99999", True)])
 def test_only_a_newer_published_version_is_new(make_deps, capsys, published, newer):
     assert main(["builds", "--json"], make_deps(http=builds_http(published))) == 0
     assert json.loads(capsys.readouterr().out)["newer"] is newer
@@ -130,3 +130,32 @@ def test_the_product_of_the_candidate_is_kept_at_install(tmp_path):
     (cand / "sources.json").write_text(json.dumps({}))
     carry_product(sources, cand)  # candidate sans produit (client d'un autre build) : rien ne change
     assert sources["product"] == "wow_fictif_finale"
+
+
+def test_the_install_keeps_a_talent_to_review_without_refusing(data_copy):
+    """L'installation ne refuse plus un talent à relire (ses valeurs non lues ne sont pas des écarts) : il est gardé,
+    marqué `suppose` avec la raison, et la révision le dit (règle « review »)."""
+    from forever.pipeline.install import _Merge
+
+    repo = read_json(data_copy / LOCAL_VERSION / "talents.json")
+    cand = json.loads(json.dumps(repo))
+    target = cand["trees"][0]["talents"][0]
+    target.update(ranks=[], certainty="suppose", review="rank_variables dépassée")
+    merge = _Merge(LOCAL_VERSION, [], "2026-11-03")
+    doc = merge.talents(repo, cand)
+    out = next(t for tree in doc["trees"] for t in tree["talents"] if t["key"] == target["key"])
+    assert out["certainty"] == "suppose" and out["review"] == "rank_variables dépassée"
+    assert out["ranks"] == repo["trees"][0]["talents"][0]["ranks"]  # anciennes valeurs gardées, hors des calculs
+    assert merge.refused == []
+    assert [c["path"] for c in merge.changes if c["rule"] == "review"] == [target["key"]]
+
+
+def test_the_candidate_with_a_talent_to_review_passes_verify(both, tmp_path, data_copy):
+    from forever.pipeline.decode import review_note
+    from forever.pipeline.verify import verify_version
+
+    _, vdir = both
+    result = verify_version(isolated_deps(tmp_path, data_copy), str(vdir.parent))
+    assert result["ok"], result.get("errors")
+    line = review_note(read_json(vdir / "sources.json")["to_review"][0])
+    assert line.startswith("à relire : talent ") and "exclu des calculs" in line
