@@ -93,7 +93,9 @@ def test_change_of_talents_forever_is_rechecked_without_pending_entry(deps, addo
     assert "proposal" not in tf  # FA1 (décision 209) : plus d'attente addon_data
     # relecture : recoupement des arbres avec classes.json installé (comptes seulement) et génération des codes
     assert tf["recheck"]["tf"] == 1 and tf["recheck"]["only_tf"] == 1
-    assert tf["recheck"]["code_version"] == "9" and tf["recheck"]["code_version_supported"] is True  # 9 lue depuis l'addon 0.38.14
+    assert (
+        tf["recheck"]["code_version"] == "9" and tf["recheck"]["code_version_supported"] is True
+    )  # 9 lue depuis l'addon 0.38.14
 
 
 def test_untracked_folders_are_classified(addons):
