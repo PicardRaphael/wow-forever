@@ -10,6 +10,7 @@ importée. Rien n'est écrit sans accord : `plan_import` rend les changements, `
 from __future__ import annotations
 
 import copy
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
@@ -21,7 +22,13 @@ from forever.errors import DataSchemaError, UnsupportedLogError
 from forever.installs import product_of
 from forever.pipeline.addon_sv import read_logger_db
 from forever.pipeline.auctionator import read_price_database
-from forever.pipeline.client_builds import ClientBuild, current_builds, version_at
+from forever.pipeline.client_builds import (
+    ClientBuild,
+    adopted_products,
+    current_builds,
+    final_client,
+    version_at,
+)
 from forever.pipeline.combatlog import log_files, read_log
 from forever.pipeline.questie import read_completed_quests
 from forever.profile import (
@@ -44,6 +51,24 @@ AUCTIONATOR_FILE = "Auctionator.lua"
 SPELLS_FILE = "spells.json"
 CLASSES_FILE = "classes.json"
 UNKNOWN_BUILD_NOTE = "version du client inconnue"
+BETA_REALM = re.compile("beta", re.IGNORECASE)  # royaumes de la bêta (« Classic Beta PvE », « ClassicBetaPvE »)
+
+
+def _adopted_at(deps: Deps) -> str | None:
+    """Date d'adoption de la version finale quand c'est l'installation lue (décision 300), sinon None."""
+    client = final_client(deps.cache_dir, deps.wow_dir)
+    if client is None:
+        return None
+    at = (adopted_products(deps.cache_dir).get(client.product) or {}).get("adopted_at")
+    return str(at) if at else None
+
+
+def _of_final(seen: _Seen, adopted_at: str) -> bool:
+    """Décision 300 : personnage vu dans la version finale, royaume hors bêta, relevé à version du client connue
+    postérieur à l'adoption ; tout le reste est un relevé de la bêta."""
+    if seen.realm and BETA_REALM.search(seen.realm):
+        return False
+    return any(f.get("client_build") is not None and str(f.get("at") or "") >= adopted_at for f in seen.fields.values())
 
 
 class ImportPlan(TypedDict):
@@ -308,6 +333,12 @@ def plan_import(
             skipped.append({"name": name, "guid": guid, "reason": reason})
             continue
         seen[guid] = _Seen(guid, name, realm, {"class": stamp.field(cls, "journal", last, "probable")})
+    adopted_at = _adopted_at(deps)
+    beta = 0
+    if adopted_at is not None:  # décision 300 : la bêta est finie, ses relevés sont ignorés sans question
+        kept = {guid: c for guid, c in seen.items() if _of_final(c, adopted_at)}
+        beta, seen = len(seen) - len(kept), kept
+        skipped = [s for s in skipped if s.get("guid") in seen]
     for questie in questies:
         for guid, character in seen.items():
             done = read_completed_quests(questie, guid)
@@ -321,9 +352,15 @@ def plan_import(
     version = current_identity(deps.data_dir).game_version
     for character in seen.values():
         _merge_character(deps, doc, character, plan, version, product)
+    beta_realms: set[str] = set()
     for auctionator in auctionators:
         realms = doc.setdefault("realms", {})
         for realm, items in read_price_database(auctionator).items():
+            if adopted_at is not None and (
+                BETA_REALM.search(realm) or max(p.date for p in items.values()) < adopted_at[:10]
+            ):
+                beta_realms.add(realm)
+                continue
             table = {str(item): price._asdict() for item, price in sorted(items.items())}
             new = make_field(table, "Auctionator", max(p.date for p in items.values()), None, "probable")
             old = (realms.get(realm) or {}).get("prices")
@@ -334,7 +371,11 @@ def plan_import(
                     {**_change(None, "prices", before, kept, realm=realm), "new": len(kept["value"])}
                 )
                 realms[realm] = {"prices": kept}
-    if stamp.unknown:
+    if beta or beta_realms:
+        notes.append(
+            f"relevés de la bêta ignorés (décision 300) : {beta} personnage(s), {len(beta_realms)} royaume(s) de prix"
+        )
+    if stamp.unknown and adopted_at is None:
         notes.append(
             f"{UNKNOWN_BUILD_NOTE} pour {', '.join(sorted(stamp.unknown))} (instant antérieur au premier relevé de "
             ".build.info, ou journal des versions absent) : champ `client_build` à null"
