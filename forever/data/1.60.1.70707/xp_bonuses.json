@@ -433,8 +433,8 @@
   },
   {
    "spell_id": 1328127,
-   "name": "Elixir of Endless Experience",
-   "description": "Increases experience gained by $s1% for $d.",
+   "name": "Élixir d’expérience infinie",
+   "description": "Gains d’expérience augmentés de $s1 % pendant $d.",
    "effects": [
     {
      "index": 0,
@@ -460,7 +460,7 @@
    "items": [
     {
      "item": 289334,
-     "name": "Elixir of Endless Experience",
+     "name": "Élixir d’expérience infinie",
      "use_spell": 1328127
     }
    ],

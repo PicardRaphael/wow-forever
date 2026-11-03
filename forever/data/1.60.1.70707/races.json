@@ -63,7 +63,7 @@
        "SpellEffect 697219"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -92,7 +92,7 @@
        "SpellEffect 698126"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -222,7 +222,7 @@
     },
     {
      "spell_id": 20576,
-     "name": "Command",
+     "name": "Ordre",
      "name_fr": "",
      "classes": [
       "Hunter"
@@ -251,12 +251,12 @@
        "SpellName 20576"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
      "spell_id": 21563,
-     "name": "Command",
+     "name": "Ordre",
      "name_fr": "",
      "classes": [
       "Druid",
@@ -292,12 +292,12 @@
        "SpellName 21563"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
      "spell_id": 20575,
-     "name": "Command",
+     "name": "Ordre",
      "name_fr": "",
      "classes": [
       "Warlock"
@@ -326,7 +326,7 @@
        "SpellName 20575"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     }
    ],
@@ -364,17 +364,7 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113276
-      ],
-      "rows": [
-       "Spell 2481"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     },
     {
      "spell_id": 20594,
@@ -439,7 +429,7 @@
     },
     {
      "spell_id": 1259719,
-     "name": "Artisan's Precision",
+     "name": "Earth Fury",
      "name_fr": "Fureur terrestre",
      "classes": null,
      "passive": true,
@@ -467,13 +457,11 @@
        113276
       ],
       "rows": [
-       "Spell 1259719",
        "SpellEffect 1268914",
-       "SpellEffect 1363668",
-       "SpellName 1259719"
+       "SpellEffect 1363668"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -814,12 +802,11 @@
        113276
       ],
       "rows": [
-       "Spell 20550",
        "SpellEffect 1322984",
        "SpellEffect 1349372"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -848,7 +835,7 @@
        "SpellCooldowns 96714"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -888,13 +875,12 @@
        113276
       ],
       "rows": [
-       "Spell 1259918",
        "SpellEffect 1269249",
        "SpellEffect 1322990",
        "SpellEffect 1363462"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     }
    ],
@@ -1299,7 +1285,7 @@
        "SpellMisc 329971"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -1403,16 +1389,14 @@
      "certainty": "FC-1.60.1.70707",
      "hotfix": {
       "pushes": [
-       113276,
        113396
       ],
       "rows": [
-       "Spell 1259705",
        "SpellInterrupts 235524",
        "SpellMisc 813211"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -1522,7 +1506,7 @@
        "SpellEffect 1354094"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     }
    ],
@@ -1651,7 +1635,7 @@
        "SpellEffect 1354094"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     {
@@ -1671,17 +1655,7 @@
        "mechanic": 0
       }
      ],
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113276
-      ],
-      "rows": [
-       "Spell 1259686"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     }
    ],
    "mage_values": {

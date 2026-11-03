@@ -2914,7 +2914,7 @@
        "SpellMisc 330772"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort5530": {
@@ -10028,7 +10028,7 @@
          "TraitNodeEntry 130029"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10073,7 +10073,7 @@
          "TraitNodeXTraitNodeEntry 139978"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10117,7 +10117,7 @@
          "TraitNodeEntry 137869"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10148,7 +10148,7 @@
          "TraitNodeEntry 130028"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10173,7 +10173,7 @@
          "TraitNode 105327"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10198,7 +10198,7 @@
          "TraitNode 105325"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10234,7 +10234,7 @@
          "TraitNode 105329"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10259,7 +10259,7 @@
          "TraitNode 105704"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10271,7 +10271,7 @@
        "tier": 4,
        "col": 1,
        "max": 2,
-       "desc": "Improves your chance to hit with Holy spells by $s1%, and reduces the duration of Silence effects on you by $s2%.",
+       "desc": "Improves your chance to hit with Holy spells by $s1%.",
        "spell_id": 1310904,
        "prereq": null,
        "prereqs": [],
@@ -10286,7 +10286,6 @@
          "CurvePoint 331270",
          "CurvePoint 371447",
          "CurvePoint 371448",
-         "Spell 1310904",
          "SpellEffect 1340799",
          "SpellEffect 1367623",
          "TraitDefinitionEffectPoints 25216",
@@ -10295,7 +10294,7 @@
          "TraitNodeEntry 130018"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10320,19 +10319,19 @@
          "TraitNode 110873"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
        "key": "oathOfLight",
-       "name": "Oath of Light",
+       "name": "Serment de lumière",
        "name_fr": "",
        "node_id": 105330,
        "tree": "Holy",
        "tier": 4,
        "col": 3,
        "max": 1,
-       "desc": "Swear an Oath to protect target ally for $d, increasing the healing of your Holy Light on them by up to $s1, your Flash of Light by up to $s2, and your Holy Shock by up to $s3. Only one Oath of Light may be sworn by the Paladin at any one time.",
+       "desc": "Vous jurez de protéger une cible alliée pendant $d, ce qui augmente les soins qui lui sont procurés par votre sort Lumière sacrée de $s1 $lpoint:points; maximum, par votre sort Éclair lumineux de $s2 $lpoint:points; maximum et par votre sort Horion sacré de $s3 $lpoint:points; maximum. Un seul serment de lumière peut être prononcé par le paladin ou la paladine à la fois.",
        "spell_id": 1328548,
        "prereq": null,
        "prereqs": [],
@@ -10358,8 +10357,12 @@
          "TraitNode 105330"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       },
+       "former_names": [
+        "Oath of Light"
+       ],
+       "client_key": "sermentDeLumiRe"
       },
       {
        "key": "consecratedGround",
@@ -10383,7 +10386,7 @@
          "TraitNode 110872"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10411,19 +10414,19 @@
          "TraitEdge 136771"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
        "key": "boundlessLight",
-       "name": "Boundless Light",
+       "name": "Lumière illimitée",
        "name_fr": "",
        "node_id": 113631,
        "tree": "Holy",
        "tier": 5,
        "col": 3,
        "max": 2,
-       "desc": "Increases the critical strike chance of your Holy Shock spell by $s1% when cast on allies not affected by your Oath of Light.",
+       "desc": "Augmente de $s1 % les chances de coup critique de votre sort Horion sacré lorsqu’il est lancé sur des cibles alliées qui ne bénéficient pas de votre Serment de lumière.",
        "spell_id": 1328550,
        "prereq": {
         "node_id": 105323,
@@ -10460,8 +10463,12 @@
          "TraitNodeXTraitNodeEntry 139979"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       },
+       "former_names": [
+        "Boundless Light"
+       ],
+       "client_key": "lumiReIllimitE"
       },
       {
        "key": "holyPower",
@@ -10472,7 +10479,7 @@
        "tier": 6,
        "col": 3,
        "max": 5,
-       "desc": "Increases the critical strike healing bonus of your Holy spells by $s1%.",
+       "desc": "Increases the critical strike chance of your Holy Shock and Holy Strike spells by $m2%, and all other spells by $m1%.",
        "spell_id": 5923,
        "prereq": null,
        "prereqs": [],
@@ -10487,13 +10494,12 @@
          "CurvePoint 240612",
          "CurvePoint 240613",
          "CurvePoint 240614",
-         "Spell 5923",
          "SpellEffect 683158",
          "SpellEffect 1340809",
          "TraitDefinitionEffectPoints 24609"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10505,7 +10511,7 @@
        "tier": 7,
        "col": 2,
        "max": 1,
-       "desc": "Applies Light's Vigil to a friendly target for $1310909d. The caster's next Holy Shock on the target incurs no cooldown and heals the target and their party for $1310912s1. Only one Vigil per Paladin may be active in each party.",
+       "desc": "Applies Light's Vigil to the target for $1310909d. Your next Holy Shock cast on them triggers no cooldown and causes enemy targets to suffer $1310914s1 Holy damage and refund $s2% of Light's Vigil's Mana cost, or allied targets to heal their party for $1310912s1. You may only have one Light's Vigil active per party.",
        "spell_id": 1310911,
        "prereq": {
         "node_id": 105323,
@@ -10527,7 +10533,6 @@
          113341
         ],
         "rows": [
-         "Spell 1310911",
          "SpellEffect 1340812",
          "SpellEffect 1341985",
          "SpellMisc 857503",
@@ -10535,7 +10540,7 @@
          "TraitEdge 136770"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       }
      ]
@@ -10566,7 +10571,7 @@
          "TraitNode 105332"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10598,7 +10603,7 @@
          "CurvePoint 371435"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10640,7 +10645,7 @@
        "tier": 2,
        "col": 4,
        "max": 2,
-       "desc": "Reduces the cooldown of your Divine Shield, Divine Protection, and Templar's Bulwark spells by ${$m2/-1000} sec, and reduces the duration of Forbearance by ${$m1/-1000} sec.",
+       "desc": "Increases your total Stamina by $s1% and reduces the cooldown of your Divine Shield, Divine Protection, and Templar's Bulwark spells by ${$m2/-1000} sec.",
        "spell_id": 1224697,
        "prereq": null,
        "prereqs": [],
@@ -10652,12 +10657,11 @@
         "rows": [
          "CurvePoint 240575",
          "CurvePoint 240576",
-         "Spell 1224697",
          "SpellEffect 1213490",
          "TraitNode 105632"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10686,7 +10690,7 @@
          "TraitNode 105625"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10711,7 +10715,7 @@
          "TraitNode 105633"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10753,7 +10757,7 @@
          "TraitNodeEntry 137872"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10778,7 +10782,7 @@
          "TraitNode 105630"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10790,7 +10794,7 @@
        "tier": 4,
        "col": 1,
        "max": 1,
-       "desc": "Unleash the energy of a Seal spell upon an enemy. Does not consume the Seal. Refer to individual Seals for Judgement effect. Does not share a cooldown with your Judgement ability.",
+       "desc": "Finishes the remaining cooldown on your Judgement ability and reduces the Mana cost of your next Judgement by $s1%.",
        "spell_id": 1310994,
        "prereq": {
         "node_id": 105625,
@@ -10815,7 +10819,6 @@
          113139
         ],
         "rows": [
-         "Spell 1310994",
          "SpellAuraOptions 247757",
          "SpellAuraRestrictions 25350",
          "SpellEffect 1340980",
@@ -10826,7 +10829,7 @@
          "TraitNode 110878"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10854,7 +10857,7 @@
          "TraitNode 105634"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -10879,19 +10882,19 @@
          "TraitNode 105636"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
        "key": "stoicism",
-       "name": "Stoicism",
+       "name": "Stoïcisme",
        "name_fr": "",
        "node_id": 105639,
        "tree": "Protection",
        "tier": 5,
        "col": 1,
        "max": 2,
-       "desc": "Reduces the duration of Stun and Charm effects on you by $s1%.",
+       "desc": "Réduit de $s1 % la durée des effets d’étourdissement et de charme qui vous sont infligés.",
        "spell_id": 1328546,
        "prereq": null,
        "prereqs": [],
@@ -10921,8 +10924,12 @@
          "TraitNodeEntry 130363"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       },
+       "former_names": [
+        "Stoicism"
+       ],
+       "client_key": "stoCisme"
       },
       {
        "key": "holyShield",
@@ -10951,7 +10958,7 @@
          "TraitNode 105628"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11001,12 +11008,12 @@
          "TraitNodeEntry 137877"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
        "key": "shieldsworn",
-       "name": "Shieldsworn",
+       "name": "Serment du bouclier",
        "name_fr": "",
        "node_id": 110875,
        "tree": "Protection",
@@ -11046,8 +11053,12 @@
          "TraitNode 110875"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       },
+       "former_names": [
+        "Shieldsworn"
+       ],
+       "client_key": "sermentDuBouclier"
       }
      ]
     },
@@ -11109,7 +11120,7 @@
        "tier": 2,
        "col": 2,
        "max": 3,
-       "desc": "Improves your chance to get a critical strike with all spells and attacks by $m1%.",
+       "desc": "Improves your chance to get a critical strike with melee attacks by $s1%.",
        "spell_id": 20117,
        "prereq": null,
        "prereqs": [],
@@ -11125,13 +11136,12 @@
          "CurvePoint 257227",
          "CurvePoint 257228",
          "CurvePoint 371449",
-         "Spell 20117",
          "SpellEffect 698173",
          "TraitNode 105703",
          "TraitNodeEntry 130432"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11157,7 +11167,7 @@
          "TraitNode 105701"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11169,21 +11179,11 @@
        "tier": 3,
        "col": 1,
        "max": 3,
-       "desc": "Gives your damaging melee attacks a chance to reduce the target's Attack Power by ${$m1/-3*$440667m1} for $440667d.",
+       "desc": "Gives your damaging melee attacks a chance to reduce the target's Attack Power by ${$m1/-3*$440667m1}, and increase your Attack Power by $m1% for $440667d.",
        "spell_id": 9452,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707",
-       "hotfix": {
-        "pushes": [
-         113139
-        ],
-        "rows": [
-         "Spell 9452"
-        ],
-        "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+       "certainty": "FC-1.60.1.70707"
       },
       {
        "key": "unyieldingFaith",
@@ -11207,7 +11207,7 @@
          "TraitNode 105331"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11232,7 +11232,7 @@
          "TraitEdge 136766"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11287,7 +11287,7 @@
          "TraitNode 105700"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11299,7 +11299,7 @@
        "tier": 4,
        "col": 4,
        "max": 3,
-       "desc": "Increases the physical damage you deal by $s1%, and reduces all threat you generate by $m2% while a two-handed melee weapon is equipped.",
+       "desc": "Increases the damage you deal with two-handed melee weapons by $s1%.",
        "spell_id": 20111,
        "prereq": null,
        "prereqs": [],
@@ -11312,13 +11312,12 @@
          "CurvePoint 371210",
          "CurvePoint 371211",
          "CurvePoint 371212",
-         "Spell 20111",
          "SpellEffect 1367246",
          "TraitDefinitionEffectPoints 25210",
          "TraitNode 105697"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11362,7 +11361,7 @@
          "TraitNodeXTraitNodeEntry 139977"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11388,7 +11387,7 @@
          "TraitNode 105694"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11426,7 +11425,7 @@
          "TraitNode 105693"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -11438,7 +11437,7 @@
        "tier": 6,
        "col": 3,
        "max": 5,
-       "desc": "Increases your spell damage by up to $m1% of your Intellect, and reduces the cast time of your Hammer of Wrath by ${$m2/-1000}.1 sec.",
+       "desc": "Increases your spell damage by up to $m1% of your Intellect.",
        "spell_id": 1311084,
        "prereq": null,
        "prereqs": [],
@@ -11459,26 +11458,25 @@
          "CurvePoint 371205",
          "CurvePoint 371206",
          "CurvePoint 371207",
-         "Spell 1311084",
          "SpellEffect 1367233",
          "TraitDefinitionEffectPoints 25209",
          "TraitNode 110882",
          "TraitNodeEntry 137880"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
        "key": "twistOfLight",
-       "name": "Unsealed Wrath",
+       "name": "Twist of Light",
        "name_fr": "Effet de lumière",
        "node_id": 105692,
        "tree": "Retribution",
        "tier": 7,
        "col": 2,
        "max": 1,
-       "desc": "Your melee attacks store a copy of your active Seal for $1311701d, stacking up to $1311701u times. Landing an attack with a different Seal consumes all stacks, giving the stored Seal its normal chance to activate once per stack.",
+       "desc": "Reduces the Mana cost of your Seal spells by $s1%, and when you replace your Seal of Command, Seal of Righteousness, Seal of Fury, or Seal of Justice with a different Seal, you gain an Echo of that Seal. Your next melee attack applies the replaced Seal's effects, consuming the Echo.",
        "spell_id": 1310735,
        "prereq": {
         "node_id": 105694,
@@ -11499,16 +11497,15 @@
          113139
         ],
         "rows": [
-         "Spell 1310735",
          "SpellEffect 1340538",
-         "SpellName 1310735",
          "TraitEdge 136767"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        },
        "former_names": [
-        "Twist of Light"
+        "Twist of Light",
+        "Unsealed Wrath"
        ],
        "client_key": "unsealedWrath"
       }
@@ -11610,17 +11607,7 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113139
-      ],
-      "rows": [
-       "Spell 9452"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     },
     "devotionAura": {
      "name": "Devotion Aura",
@@ -12404,7 +12391,7 @@
        "SpellEffect 688696"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "hammerOfJustice": {
@@ -12816,7 +12803,7 @@
        "SpellName 1038"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "blessingOfFreedom": {
@@ -13215,13 +13202,12 @@
        "CurvePoint 240612",
        "CurvePoint 240613",
        "CurvePoint 240614",
-       "Spell 5923",
        "SpellEffect 683158",
        "SpellEffect 1340809",
        "TraitDefinitionEffectPoints 24609"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort5924": {
@@ -13655,7 +13641,7 @@
        "TraitNode 105331"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "eyeForAnEye": {
@@ -14509,7 +14495,7 @@
        "SpellName 19977"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort19978": {
@@ -14557,7 +14543,7 @@
        "SpellName 19978"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort19979": {
@@ -14605,7 +14591,7 @@
        "SpellName 19979"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "improvedBlessingOfMight": {
@@ -14762,7 +14748,7 @@
        "TraitNode 105693"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20056": {
@@ -15112,7 +15098,7 @@
        "TraitNode 105694"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "improvedRetributionAura": {
@@ -15210,7 +15196,7 @@
        "TraitNode 105636"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20097": {
@@ -15532,13 +15518,12 @@
        "CurvePoint 371210",
        "CurvePoint 371211",
        "CurvePoint 371212",
-       "Spell 20111",
        "SpellEffect 1367246",
        "TraitDefinitionEffectPoints 25210",
        "TraitNode 105697"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20112": {
@@ -15776,13 +15761,12 @@
        "CurvePoint 257227",
        "CurvePoint 257228",
        "CurvePoint 371449",
-       "Spell 20117",
        "SpellEffect 698173",
        "TraitNode 105703",
        "TraitNodeEntry 130432"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20118": {
@@ -15955,7 +15939,7 @@
        "CurvePoint 371435"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20130": {
@@ -16274,7 +16258,7 @@
        "TraitNode 105630"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20144": {
@@ -16484,7 +16468,7 @@
        "TraitNodeEntry 137872"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sealOfRighteousness": {
@@ -16706,17 +16690,7 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113139
-      ],
-      "rows": [
-       "Spell 20293"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     },
     "sealOfTheCrusader": {
      "name": "Seal of the Crusader",
@@ -17646,7 +17620,7 @@
        "TraitNodeXTraitNodeEntry 127820"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20197": {
@@ -17818,7 +17792,7 @@
        "TraitNodeEntry 130029"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20206": {
@@ -17984,7 +17958,7 @@
        "TraitNode 105329"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20212": {
@@ -18163,7 +18137,7 @@
        "TraitNode 105325"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "blessingOfKings": {
@@ -18252,7 +18226,7 @@
        "TraitNodeEntry 130028"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20225": {
@@ -18700,7 +18674,7 @@
        "TraitNode 105332"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20258": {
@@ -18886,7 +18860,7 @@
        "TraitNodeXTraitNodeEntry 139978"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20263": {
@@ -19417,7 +19391,7 @@
        "TraitEdge 136766"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "improvedRighteousFury": {
@@ -19466,7 +19440,7 @@
        "TraitNode 105634"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20469": {
@@ -19648,7 +19622,7 @@
        "TraitEdge 136771"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "improvedHammerOfJustice": {
@@ -19694,7 +19668,7 @@
        "TraitNode 105633"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort20488": {
@@ -19954,25 +19928,6 @@
        "mechanic": 0,
        "diminish": 0,
        "dispel_type": 1
-      },
-      {
-       "spell_id": 1239570,
-       "rank": 4,
-       "level": null,
-       "cast_s": 0,
-       "cooldown_s": null,
-       "gcd_s": null,
-       "duration_s": 10,
-       "pvp_duration_s": null,
-       "range_yd": {
-        "min": 0,
-        "max": 0
-       },
-       "school": 2,
-       "cost": null,
-       "mechanic": 0,
-       "diminish": 0,
-       "dispel_type": 0
       }
      ],
      "pvp": {
@@ -19983,22 +19938,15 @@
      "certainty": "FC-1.60.1.70707",
      "hotfix": {
       "pushes": [
-       113139,
-       113341
+       113139
       ],
       "rows": [
-       "Spell 1239570",
-       "SpellAuraOptions 242217",
        "SpellEffect 697660",
        "SpellEffect 698886",
        "SpellEffect 699487",
-       "SpellEffect 1237444",
-       "SpellEffect 1237445",
        "SpellLevels 103515",
        "SpellLevels 103883",
        "SpellLevels 104071",
-       "SpellMisc 794141",
-       "SpellName 1239570",
        "SpellPower 184913",
        "SpellPower 185892",
        "SpellPower 186383",
@@ -20007,7 +19955,7 @@
        "TraitNode 105628"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "hammerOfWrath": {
@@ -20134,12 +20082,11 @@
        113139
       ],
       "rows": [
-       "Spell 25780",
        "SpellEffect 1237525",
        "SpellEffect 1367626"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort25781": {
@@ -20337,7 +20284,7 @@
        "SpellName 25890"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "greaterBlessingOfWisdom": {
@@ -20445,7 +20392,7 @@
        "SpellName 25895"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "greaterBlessingOfKings": {
@@ -21088,6 +21035,55 @@
      },
      "certainty": "FC-1.60.1.70707"
     },
+    "bouclierSacr": {
+     "name": "Bouclier sacré",
+     "name_fr": "",
+     "skill_line": 267,
+     "talent": null,
+     "ranks": [
+      {
+       "spell_id": 1239570,
+       "rank": null,
+       "level": null,
+       "cast_s": 0,
+       "cooldown_s": null,
+       "gcd_s": null,
+       "duration_s": 10,
+       "pvp_duration_s": null,
+       "range_yd": {
+        "min": 0,
+        "max": 0
+       },
+       "school": 2,
+       "cost": null,
+       "mechanic": 0,
+       "diminish": 0,
+       "dispel_type": 0
+      }
+     ],
+     "pvp": {
+      "kinds": [],
+      "certainty": "probable",
+      "via": []
+     },
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113139,
+       113341
+      ],
+      "rows": [
+       "Spell 1239570",
+       "SpellAuraOptions 242217",
+       "SpellEffect 1237444",
+       "SpellEffect 1237445",
+       "SpellMisc 794141",
+       "SpellName 1239570"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
+    },
     "sort1263893": {
      "name": "sort 1263893",
      "name_fr": "",
@@ -21203,7 +21199,7 @@
        "TraitNode 105330"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "lightsVigil": {
@@ -21297,9 +21293,6 @@
        113341
       ],
       "rows": [
-       "Spell 1310911",
-       "Spell 1311590",
-       "Spell 1311595",
        "SpellEffect 1340812",
        "SpellEffect 1341985",
        "SpellEffect 1341986",
@@ -21313,7 +21306,7 @@
        "TraitEdge 136770"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "swiftJudgement": {
@@ -21356,7 +21349,6 @@
        113139
       ],
       "rows": [
-       "Spell 1310994",
        "SpellAuraOptions 247757",
        "SpellAuraRestrictions 25350",
        "SpellEffect 1340980",
@@ -21367,7 +21359,7 @@
        "TraitNode 110878"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "templarsBulwark": {
@@ -21430,7 +21422,7 @@
        "TraitNode 105625"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sanctifiedJudgement": {
@@ -21477,7 +21469,7 @@
        "TraitNode 105701"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "improvedSealOfFury": {
@@ -21523,7 +21515,7 @@
        "TraitNode 110875"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort1325499": {
@@ -21567,11 +21559,11 @@
        "SpellName 1325499"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
-    "oathOfLight": {
-     "name": "Oath of Light",
+    "sermentDeLumiRe": {
+     "name": "Serment de lumière",
      "name_fr": "",
      "skill_line": 594,
      "talent": {
@@ -21630,7 +21622,7 @@
        "TraitNode 105330"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     }
    },
@@ -21727,7 +21719,7 @@
          "TraitNode 104972"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -21752,7 +21744,7 @@
          "TraitNode 104973"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -22092,7 +22084,17 @@
        "spell_id": 1299346,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707"
+       "certainty": "FC-1.60.1.70707",
+       "hotfix": {
+        "pushes": [
+         113534
+        ],
+        "rows": [
+         "SpellEffect 1323534"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       }
       },
       {
        "key": "mortalShots",
@@ -22159,7 +22161,19 @@
        "spell_id": 19461,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707"
+       "certainty": "FC-1.60.1.70707",
+       "hotfix": {
+        "pushes": [
+         113534
+        ],
+        "rows": [
+         "CurvePoint 240051",
+         "CurvePoint 240052",
+         "CurvePoint 240053"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       }
       },
       {
        "key": "scatterShot",
@@ -22215,7 +22229,17 @@
          "kind": "sufficient"
         }
        ],
-       "certainty": "FC-1.60.1.70707"
+       "certainty": "FC-1.60.1.70707",
+       "hotfix": {
+        "pushes": [
+         113534
+        ],
+        "rows": [
+         "SpellEffect 1340384"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       }
       }
      ]
     },
@@ -22487,7 +22511,21 @@
        "spell_id": 19168,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707"
+       "certainty": "FC-1.60.1.70707",
+       "hotfix": {
+        "pushes": [
+         113534
+        ],
+        "rows": [
+         "CurvePoint 329334",
+         "CurvePoint 329335",
+         "CurvePoint 329336",
+         "CurvePoint 329337",
+         "CurvePoint 329338"
+        ],
+        "first_logged_at": null,
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       }
       },
       {
        "key": "laceratingStrikes",
@@ -23356,7 +23394,7 @@
        "SpellCategories 74360"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "volley": {
@@ -23870,7 +23908,25 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "SpellEffect 679708",
+       "SpellEffect 690132",
+       "SpellEffect 690655",
+       "SpellEffect 690760",
+       "SpellEffect 691479",
+       "SpellEffect 691570",
+       "SpellEffect 691588",
+       "SpellEffect 691589",
+       "SpellEffect 702403"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "dismissPet": {
      "name": "Dismiss Pet",
@@ -24553,7 +24609,24 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "SpellEffect 680797",
+       "SpellEffect 690859",
+       "SpellEffect 690933",
+       "SpellEffect 690976",
+       "SpellEffect 691069",
+       "SpellEffect 691213",
+       "SpellEffect 691984",
+       "SpellEffect 692127"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "rapidFire": {
      "name": "Rapid Fire",
@@ -25242,7 +25315,22 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "SpellEffect 690400",
+       "SpellEffect 691884",
+       "SpellEffect 691886",
+       "SpellEffect 692138",
+       "SpellEffect 692212",
+       "SpellEffect 692607"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "immolationTrap": {
      "name": "Immolation Trap",
@@ -25512,7 +25600,7 @@
        "SpellCategories 74248"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "explosiveTrap": {
@@ -26158,7 +26246,21 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "CurvePoint 329334",
+       "CurvePoint 329335",
+       "CurvePoint 329336",
+       "CurvePoint 329337",
+       "CurvePoint 329338"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "sort19180": {
      "name": "sort 19180",
@@ -28340,7 +28442,22 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "SpellEffect 696631",
+       "SpellEffect 697762",
+       "SpellEffect 697763",
+       "SpellEffect 697764",
+       "SpellEffect 699653",
+       "SpellEffect 699670"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "improvedArcaneShot": {
      "name": "Improved Arcane Shot",
@@ -28532,7 +28649,19 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "CurvePoint 240051",
+       "CurvePoint 240052",
+       "CurvePoint 240053"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "sort19462": {
      "name": "sort 19462",
@@ -29213,7 +29342,21 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "SpellEffect 697417",
+       "SpellEffect 697683",
+       "SpellEffect 698474",
+       "SpellEffect 1323534",
+       "SpellEffect 1323538"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "rangedWeaponSpecialization": {
      "name": "Ranged Weapon Specialization",
@@ -29718,7 +29861,7 @@
        "TraitNode 104973"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort19560": {
@@ -31794,7 +31937,7 @@
        "TraitNode 104972"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort24691": {
@@ -32344,7 +32487,19 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707"
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113534
+      ],
+      "rows": [
+       "SpellEffect 1340384",
+       "SpellEffect 1340617",
+       "SpellEffect 1340619"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     },
     "striderKick": {
      "name": "Strider Kick",
@@ -43227,7 +43382,7 @@
        "SpellAuraOptions 117849"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "rupture": {
@@ -43921,7 +44076,7 @@
        "SpellAuraOptions 117084"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sprint": {
@@ -50068,7 +50223,7 @@
        "tier": 5,
        "col": 3,
        "max": 5,
-       "desc": "Your heals from Flash Heal, Lesser Heal, Heal, Greater Heal, and Penance gain $m1% increased critical strike chance when cast on targets with Weakened Soul, and reduce the remaining duration of Weakened Soul on their target by ${$m2/-1000} sec.",
+       "desc": "Your heals from Flash Heal, Binding Heal, Lesser Heal, Heal, Greater Heal, and Penance gain $m1% increased critical strike chance when cast on targets with Weakened Soul, and reduce the remaining duration of Weakened Soul on their target by ${$m2/-1000} sec.",
        "spell_id": 425280,
        "prereq": {
         "node_id": 105839,
@@ -50083,17 +50238,7 @@
          "kind": "sufficient"
         }
        ],
-       "certainty": "FC-1.60.1.70707",
-       "hotfix": {
-        "pushes": [
-         113279
-        ],
-        "rows": [
-         "Spell 425280"
-        ],
-        "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+       "certainty": "FC-1.60.1.70707"
       },
       {
        "key": "divineAegis",
@@ -50347,7 +50492,7 @@
          "TraitDefinition 135386"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -51469,7 +51614,7 @@
        "SpellShapeshift 39328"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "abolishDisease": {
@@ -51530,7 +51675,7 @@
        "SpellShapeshift 39316"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "smite": {
@@ -57081,7 +57226,7 @@
        "SpellEffect 693006"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort15008": {
@@ -61221,7 +61366,7 @@
        "TraitDefinition 135386"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "shadowfiend": {
@@ -62074,7 +62219,7 @@
        "SpellEffect 1338687"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "litanyOfLight": {
@@ -72775,7 +72920,7 @@
        "SpellEffect 1340790"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "riptide": {
@@ -73135,7 +73280,7 @@
          "TraitNodeEntry 130531"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -73855,7 +74000,7 @@
          "SpellEffect 1342606"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -73867,21 +74012,11 @@
        "tier": 4,
        "col": 1,
        "max": 2,
-       "desc": "Increases the range of your Frostbolt, Frost Blast, Ice Lance, and Blizzard spells and the radius of your Frost Nova and Cone of Cold spells by $s1%.",
+       "desc": "Increases the range of your Frostbolt, Frost Blast, and Blizzard spells and the radius of your Frost Nova and Cone of Cold spells by $s1%.",
        "spell_id": 16757,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707",
-       "hotfix": {
-        "pushes": [
-         113273
-        ],
-        "rows": [
-         "Spell 16757"
-        ],
-        "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+       "certainty": "FC-1.60.1.70707"
       },
       {
        "key": "iceBlock",
@@ -74018,7 +74153,7 @@
          "SpellEffect 1364980"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       }
      ]
@@ -80276,7 +80411,7 @@
        "SpellEffect 1365015"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "iceBlock": {
@@ -82749,17 +82884,7 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113273
-      ],
-      "rows": [
-       "Spell 16757"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     },
     "sort16758": {
      "name": "sort 16758",
@@ -83336,7 +83461,7 @@
        "TraitNodeEntry 130531"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort28592": {
@@ -84155,7 +84280,7 @@
        "SpellEffect 1342606"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "frostfireBolt": {
@@ -84571,7 +84696,7 @@
        "tier": 2,
        "col": 3,
        "max": 3,
-       "desc": "Increases Health drained, damage done, or Mana drained by your Drain Life, Drain Soul, and Drain Mana spells by $m1%.",
+       "desc": "Increases health drained or damage done by your Drain Life, Drain Soul, and Wrack spells by $m1%.",
        "spell_id": 403511,
        "prereq": null,
        "prereqs": [],
@@ -84584,12 +84709,11 @@
          "CurvePoint 371702",
          "CurvePoint 371703",
          "CurvePoint 371704",
-         "Spell 403511",
          "SpellEffect 1368037",
          "TraitDefinitionEffectPoints 25218"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -88404,7 +88528,7 @@
        "SpellAuraOptions 120918"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "searingPain": {
@@ -88603,7 +88727,7 @@
        "SpellAuraOptions 119452"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "createHealthstone": {
@@ -97846,7 +97970,7 @@
          "CurvePoint 294572"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98075,21 +98199,11 @@
        "tier": 7,
        "col": 2,
        "max": 1,
-       "desc": "Shapeshift into Moonkin Form, increasing Omen of Clarity's chance to trigger by $s5%, Armor contribution from items by $24905s1%, and all party or raid members within $24907a1 yards have their Critical Strike chance increased by $24907s1%. Also protects the caster from Polymorph effects and prevents the use of healing spells.\r\n\r\nThe act of shapeshifting frees the caster of Polymorph and Movement Impairing effects.",
+       "desc": "Shapeshift into Moonkin Form, increasing Omen of Clarity's chance to trigger by $s5%, Armor contribution from items by $24905s1%, and all party or raid members within $24907a1 yards have their spell Critical Strike chance increased by $24907s1%.  Also protects the caster from Polymorph effects and prevents the use of healing spells.\r\n\r\nThe act of shapeshifting frees the caster of Polymorph and Movement Impairing effects.",
        "spell_id": 24858,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707",
-       "hotfix": {
-        "pushes": [
-         113283
-        ],
-        "rows": [
-         "Spell 24858"
-        ],
-        "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+       "certainty": "FC-1.60.1.70707"
       }
      ]
     },
@@ -98162,7 +98276,7 @@
          "TraitDefinitionEffectPoints 25217"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98247,7 +98361,7 @@
          "TraitEdge 136730"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98317,19 +98431,19 @@
          "TraitNode 104952"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
        "key": "lacerate",
-       "name": "Lacerate",
+       "name": "Lacérer",
        "name_fr": "",
        "node_id": 104949,
        "tree": "Feral Combat",
        "tier": 4,
        "col": 2,
        "max": 1,
-       "desc": "Lacerates the enemy target, making them bleed for $o1 damage over $d plus $s2% weapon damage per existing application of Lacerate on the target. Causes a high amount of threat. This effect stacks up to $u times on the same target.",
+       "desc": "Lacère la cible, ce qui la fait saigner et lui inflige $o1 $lpoint:points; de dégâts en $d, plus $s2 % des dégâts de l’arme par application existante de Lacérer sur la cible. Génère un niveau de menace très élevé. Cet effet se cumule jusqu’à $u fois sur la même cible.",
        "spell_id": 1328617,
        "prereq": {
         "node_id": 104948,
@@ -98368,8 +98482,12 @@
          "TraitDefinition 134410"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+        "dbcache_date": "2026-11-03T13:13:38Z"
+       },
+       "former_names": [
+        "Lacerate"
+       ],
+       "client_key": "lacRer"
       },
       {
        "key": "predatoryDiscipline",
@@ -98401,7 +98519,7 @@
          "TraitNode 104951"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98439,21 +98557,11 @@
        "tier": 5,
        "col": 2,
        "max": 1,
-       "desc": "While in Cat Form, Bear Form, or Dire Bear Form, the Leader of the Pack increases the Critical Strike chance of all party or raid members within $24932a1 yards by $24932s1%.",
+       "desc": "While in Cat Form, Bear Form, or Dire Bear Form, the Leader of the Pack increases the melee and ranged Critical Strike chance of all party or raid members within $24932a1 yards by $24932s1%.",
        "spell_id": 17007,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707",
-       "hotfix": {
-        "pushes": [
-         113283
-        ],
-        "rows": [
-         "Spell 17007"
-        ],
-        "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+       "certainty": "FC-1.60.1.70707"
       },
       {
        "key": "predatoryInstincts",
@@ -98507,7 +98615,7 @@
          "TraitNode 104953"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98532,7 +98640,7 @@
          "TraitNode 104954"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98571,7 +98679,7 @@
          "TraitDefinition 134417"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98614,7 +98722,7 @@
          "TraitNodeEntry 141188"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       }
      ]
@@ -98688,7 +98796,7 @@
          "TraitDefinitionEffectPoints 25217"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98700,7 +98808,7 @@
        "tier": 2,
        "col": 1,
        "max": 5,
-       "desc": "Reduces the cast time of your Healing Touch and Wild Growth spells by $/1000;S1 sec and increases all damage you deal by $m2%.",
+       "desc": "Reduces the cast time of your Healing Touch spell by $/1000;S1 sec and increases all damage you deal by $m2%.",
        "spell_id": 17069,
        "prereq": null,
        "prereqs": [],
@@ -98714,11 +98822,10 @@
          "CurvePoint 251572",
          "CurvePoint 251573",
          "CurvePoint 251574",
-         "CurvePoint 251575",
-         "Spell 17069"
+         "CurvePoint 251575"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98750,7 +98857,7 @@
          "TraitDefinition 134381"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98797,7 +98904,7 @@
          "TraitDefinition 134381"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98844,7 +98951,7 @@
          "TraitDefinition 134379"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       },
       {
@@ -98886,21 +98993,11 @@
        "tier": 4,
        "col": 4,
        "max": 1,
-       "desc": "Instantly heals a target with your active Rejuvenation or Regrowth effect for an amount equal to the full duration of the periodic effect of the consumed spell.",
+       "desc": "Instantly heals a target with an active Rejuvenation or Regrowth effect for an amount equal to the full duration of the periodic effect of one of those spells.",
        "spell_id": 18562,
        "prereq": null,
        "prereqs": [],
-       "certainty": "FC-1.60.1.70707",
-       "hotfix": {
-        "pushes": [
-         113283
-        ],
-        "rows": [
-         "Spell 18562"
-        ],
-        "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
-       }
+       "certainty": "FC-1.60.1.70707"
       },
       {
        "key": "naturesSwiftness",
@@ -99017,7 +99114,7 @@
          "SpellMisc 698363"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-10-31T15:55:06Z"
+        "dbcache_date": "2026-11-03T13:13:38Z"
        }
       }
      ]
@@ -100928,7 +101025,7 @@
        "SpellAuraOptions 122904"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "hibernate": {
@@ -106321,7 +106418,7 @@
        "TraitEdge 136730"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "improvedShred": {
@@ -106400,7 +106497,7 @@
        "TraitNode 104952"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort16974": {
@@ -106645,7 +106742,7 @@
        "TraitDefinitionEffectPoints 25217"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort17004": {
@@ -106772,17 +106869,7 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113283
-      ],
-      "rows": [
-       "Spell 17007"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     },
     "improvedMarkOfTheWild": {
      "name": "Improved Mark of the Wild",
@@ -106964,7 +107051,7 @@
        "TraitDefinitionEffectPoints 25217"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort17058": {
@@ -107287,11 +107374,10 @@
        "CurvePoint 251572",
        "CurvePoint 251573",
        "CurvePoint 251574",
-       "CurvePoint 251575",
-       "Spell 17069"
+       "CurvePoint 251575"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort17070": {
@@ -107708,7 +107794,7 @@
        "TraitDefinition 134381"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort17107": {
@@ -107962,7 +108048,7 @@
        "TraitDefinition 134381"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort17119": {
@@ -108405,17 +108491,7 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113283
-      ],
-      "rows": [
-       "Spell 18562"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     },
     "teleportMoonglade": {
      "name": "Teleport: Moonglade",
@@ -108624,7 +108700,7 @@
        "SpellMisc 329904"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "bearFormPassive2": {
@@ -108727,31 +108803,8 @@
      "talent": null,
      "ranks": [
       {
-       "spell_id": 1328618,
-       "rank": 1,
-       "level": 24,
-       "cast_s": 0,
-       "cooldown_s": null,
-       "gcd_s": 1,
-       "duration_s": null,
-       "pvp_duration_s": null,
-       "range_yd": {
-        "min": 0,
-        "max": 5
-       },
-       "school": 1,
-       "cost": {
-        "power_type": 3,
-        "amount": 35,
-        "pct": 0
-       },
-       "mechanic": 0,
-       "diminish": 0,
-       "dispel_type": 0
-      },
-      {
        "spell_id": 22568,
-       "rank": 2,
+       "rank": 1,
        "level": 32,
        "cast_s": 0,
        "cooldown_s": null,
@@ -108774,7 +108827,7 @@
       },
       {
        "spell_id": 22827,
-       "rank": 3,
+       "rank": 2,
        "level": 40,
        "cast_s": 0,
        "cooldown_s": null,
@@ -108797,7 +108850,7 @@
       },
       {
        "spell_id": 22828,
-       "rank": 4,
+       "rank": 3,
        "level": 48,
        "cast_s": 0,
        "cooldown_s": null,
@@ -108820,7 +108873,7 @@
       },
       {
        "spell_id": 22829,
-       "rank": 5,
+       "rank": 4,
        "level": 56,
        "cast_s": 0,
        "cooldown_s": null,
@@ -108843,7 +108896,7 @@
       },
       {
        "spell_id": 31018,
-       "rank": 6,
+       "rank": 5,
        "level": 60,
        "cast_s": 0,
        "cooldown_s": null,
@@ -108873,33 +108926,13 @@
      "certainty": "FC-1.60.1.70707",
      "hotfix": {
       "pushes": [
-       113283,
-       113341,
        113449
       ],
       "rows": [
-       "SkillLineAbility 12256",
-       "SkillLineAbility 59885",
-       "Spell 22568",
-       "Spell 22827",
-       "Spell 22828",
-       "Spell 22829",
-       "Spell 31018",
-       "Spell 1328618",
-       "SpellCategories 190801",
-       "SpellClassOptions 85275",
-       "SpellCooldowns 102361",
-       "SpellEffect 1367722",
-       "SpellEffect 1367723",
-       "SpellLevels 154245",
-       "SpellMisc 873921",
-       "SpellName 1328618",
-       "SpellPower 315137",
-       "SpellPower 315138",
-       "SpellShapeshift 58758"
+       "SkillLineAbility 12256"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "sort22571": {
@@ -109168,17 +109201,7 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70707",
-     "hotfix": {
-      "pushes": [
-       113283
-      ],
-      "rows": [
-       "Spell 24858"
-      ],
-      "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
-     }
+     "certainty": "FC-1.60.1.70707"
     },
     "sort24866": {
      "name": "sort 24866",
@@ -109656,7 +109679,7 @@
        "TraitDefinition 134417"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "wildGrowth": {
@@ -109754,67 +109777,18 @@
        "SpellMisc 792797"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "lacerate": {
      "name": "Lacerate",
      "name_fr": "Lacérer",
      "skill_line": 134,
-     "talent": {
-      "node_id": 104949,
-      "key": "lacerate"
-     },
+     "talent": null,
      "ranks": [
       {
-       "spell_id": 1328617,
-       "rank": 1,
-       "level": 25,
-       "cast_s": 0,
-       "cooldown_s": null,
-       "gcd_s": 1.5,
-       "duration_s": 15,
-       "pvp_duration_s": null,
-       "range_yd": {
-        "min": 0,
-        "max": 5
-       },
-       "school": 1,
-       "cost": {
-        "power_type": 1,
-        "amount": 150,
-        "pct": 0
-       },
-       "mechanic": 15,
-       "diminish": 0,
-       "dispel_type": 0
-      },
-      {
-       "spell_id": 1328616,
-       "rank": 2,
-       "level": 34,
-       "cast_s": 0,
-       "cooldown_s": null,
-       "gcd_s": 1.5,
-       "duration_s": 15,
-       "pvp_duration_s": null,
-       "range_yd": {
-        "min": 0,
-        "max": 5
-       },
-       "school": 1,
-       "cost": {
-        "power_type": 1,
-        "amount": 150,
-        "pct": 0
-       },
-       "mechanic": 15,
-       "diminish": 0,
-       "dispel_type": 0
-      },
-      {
        "spell_id": 414644,
-       "rank": 3,
+       "rank": 1,
        "level": 42,
        "cast_s": 0,
        "cooldown_s": null,
@@ -109837,7 +109811,7 @@
       },
       {
        "spell_id": 1235826,
-       "rank": 4,
+       "rank": 2,
        "level": 50,
        "cast_s": 0,
        "cooldown_s": null,
@@ -109860,7 +109834,7 @@
       },
       {
        "spell_id": 1235827,
-       "rank": 5,
+       "rank": 3,
        "level": 58,
        "cast_s": 0,
        "cooldown_s": null,
@@ -109890,45 +109864,13 @@
      "certainty": "FC-1.60.1.70707",
      "hotfix": {
       "pushes": [
-       113283,
-       113341,
        113448
       ],
       "rows": [
-       "SkillLineAbility 49504",
-       "SkillLineAbility 59883",
-       "SkillLineAbility 59884",
-       "Spell 414644",
-       "Spell 1235826",
-       "Spell 1235827",
-       "Spell 1328616",
-       "Spell 1328617",
-       "SpellAuraOptions 249056",
-       "SpellAuraOptions 249057",
-       "SpellCategories 190797",
-       "SpellCategories 190798",
-       "SpellClassOptions 85273",
-       "SpellClassOptions 85274",
-       "SpellCooldowns 102359",
-       "SpellCooldowns 102360",
-       "SpellEffect 1367718",
-       "SpellEffect 1367719",
-       "SpellEffect 1367720",
-       "SpellEffect 1367721",
-       "SpellLevels 154243",
-       "SpellLevels 154244",
-       "SpellMisc 873919",
-       "SpellMisc 873920",
-       "SpellName 1328616",
-       "SpellName 1328617",
-       "SpellPower 315135",
-       "SpellPower 315136",
-       "SpellShapeshift 58756",
-       "SpellShapeshift 58757",
-       "TraitDefinition 134410"
+       "SkillLineAbility 49504"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-10-31T15:55:06Z"
+      "dbcache_date": "2026-11-03T13:13:38Z"
      }
     },
     "deeperWilds": {
@@ -110310,6 +110252,168 @@
       "via": []
      },
      "certainty": "FC-1.60.1.70707"
+    },
+    "lacRer": {
+     "name": "Lacérer",
+     "name_fr": "",
+     "skill_line": 134,
+     "talent": {
+      "node_id": 104949,
+      "key": "lacerate"
+     },
+     "ranks": [
+      {
+       "spell_id": 1328617,
+       "rank": null,
+       "level": 25,
+       "cast_s": 0,
+       "cooldown_s": null,
+       "gcd_s": 1.5,
+       "duration_s": 15,
+       "pvp_duration_s": null,
+       "range_yd": {
+        "min": 0,
+        "max": 5
+       },
+       "school": 1,
+       "cost": {
+        "power_type": 1,
+        "amount": 150,
+        "pct": 0
+       },
+       "mechanic": 15,
+       "diminish": 0,
+       "dispel_type": 0
+      },
+      {
+       "spell_id": 1328616,
+       "rank": null,
+       "level": 34,
+       "cast_s": 0,
+       "cooldown_s": null,
+       "gcd_s": 1.5,
+       "duration_s": 15,
+       "pvp_duration_s": null,
+       "range_yd": {
+        "min": 0,
+        "max": 5
+       },
+       "school": 1,
+       "cost": {
+        "power_type": 1,
+        "amount": 150,
+        "pct": 0
+       },
+       "mechanic": 15,
+       "diminish": 0,
+       "dispel_type": 0
+      }
+     ],
+     "pvp": {
+      "kinds": [],
+      "certainty": "probable",
+      "via": []
+     },
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113283,
+       113341,
+       113448
+      ],
+      "rows": [
+       "SkillLineAbility 59883",
+       "SkillLineAbility 59884",
+       "Spell 1328616",
+       "Spell 1328617",
+       "SpellAuraOptions 249056",
+       "SpellAuraOptions 249057",
+       "SpellCategories 190797",
+       "SpellCategories 190798",
+       "SpellClassOptions 85273",
+       "SpellClassOptions 85274",
+       "SpellCooldowns 102359",
+       "SpellCooldowns 102360",
+       "SpellEffect 1367718",
+       "SpellEffect 1367719",
+       "SpellEffect 1367720",
+       "SpellEffect 1367721",
+       "SpellLevels 154243",
+       "SpellLevels 154244",
+       "SpellMisc 873919",
+       "SpellMisc 873920",
+       "SpellName 1328616",
+       "SpellName 1328617",
+       "SpellPower 315135",
+       "SpellPower 315136",
+       "SpellShapeshift 58756",
+       "SpellShapeshift 58757",
+       "TraitDefinition 134410"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
+    },
+    "morsureFRoce": {
+     "name": "Morsure féroce",
+     "name_fr": "",
+     "skill_line": 134,
+     "talent": null,
+     "ranks": [
+      {
+       "spell_id": 1328618,
+       "rank": null,
+       "level": 24,
+       "cast_s": 0,
+       "cooldown_s": null,
+       "gcd_s": 1,
+       "duration_s": null,
+       "pvp_duration_s": null,
+       "range_yd": {
+        "min": 0,
+        "max": 5
+       },
+       "school": 1,
+       "cost": {
+        "power_type": 3,
+        "amount": 35,
+        "pct": 0
+       },
+       "mechanic": 0,
+       "diminish": 0,
+       "dispel_type": 0
+      }
+     ],
+     "pvp": {
+      "kinds": [],
+      "certainty": "probable",
+      "via": []
+     },
+     "certainty": "FC-1.60.1.70707",
+     "hotfix": {
+      "pushes": [
+       113283,
+       113341,
+       113449
+      ],
+      "rows": [
+       "SkillLineAbility 59885",
+       "Spell 1328618",
+       "SpellCategories 190801",
+       "SpellClassOptions 85275",
+       "SpellCooldowns 102361",
+       "SpellEffect 1367722",
+       "SpellEffect 1367723",
+       "SpellLevels 154245",
+       "SpellMisc 873921",
+       "SpellName 1328618",
+       "SpellPower 315137",
+       "SpellPower 315138",
+       "SpellShapeshift 58758"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-03T13:13:38Z"
+     }
     }
    },
    "unresolved_spells": []
