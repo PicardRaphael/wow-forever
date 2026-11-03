@@ -1426,7 +1426,10 @@ def render_route(doc: Mapping[str, Any]) -> list[str]:
     lines = [head]
     if doc["dungeons"]:
         lines.append("Donjons : " + ", ".join(f"{d['name']} (niveau {d['level']})" for d in doc["dungeons"]))
-    lines += [f"  rappel : {r['text']}" for r in doc["reminders"]]
+    counts: dict[str, int] = {}
+    for r in doc["reminders"]:  # même rappel à chaque recharge de l'objet : une ligne, avec le nombre de fois
+        counts[r["text"]] = counts.get(r["text"], 0) + 1
+    lines += [f"  rappel : {text}" + (f" (×{n} sur la séance)" if n > 1 else "") for text, n in counts.items()]
     for i, s in enumerate(doc["stops"], 1):
         where = f" · {s['zone']} {s['x']:.1f}, {s['y']:.1f}" if s["zone"] and s["x"] is not None else ""
         lines.append(f"  {i:3d}. niveau {s['level']} · {s['text']}{where} · {round(s['xp'])} XP · {s['certainty']}")
