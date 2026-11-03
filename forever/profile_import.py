@@ -336,8 +336,8 @@ def plan_import(
     adopted_at = _adopted_at(deps)
     beta = 0
     if adopted_at is not None:  # décision 300 : la bêta est finie, ses relevés sont ignorés sans question
-        kept = {guid: c for guid, c in seen.items() if _of_final(c, adopted_at)}
-        beta, seen = len(seen) - len(kept), kept
+        final = {guid: c for guid, c in seen.items() if _of_final(c, adopted_at)}
+        beta, seen = len(seen) - len(final), final
         skipped = [s for s in skipped if s.get("guid") in seen]
     for questie in questies:
         for guid, character in seen.items():
