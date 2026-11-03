@@ -79,3 +79,16 @@ def test_usage_describes_the_new_commands_and_variables():
         "docs/LANCEMENT.md",
     ):
         assert needle in text, needle
+
+
+def test_settings_of_the_beta_are_copied_after_the_first_login():
+    """Demande du 2026-11-03 : réglages de la bêta copiés, jeu fermé, après la première connexion (dossier du compte
+    créé) ; seulement SavedVariables, bindings-cache.wtf et macros-cache.txt ; jamais Config.wtf ni les dossiers des
+    personnages de la bêta."""
+    body = section(LANCEMENT.read_text(encoding="utf-8"), "## PC de jeu")
+    step = body[body.index("**Réglages de la bêta") :]
+    step = step[: step.index("\n11. ")]
+    for needed in (r"WTF\Account\140740490#1","SavedVariables", "bindings-cache.wtf", "macros-cache.txt",
+                   "jeu fermé", "jamais `Config.wtf`", "dossiers des personnages", "forever backup"):  # fmt: skip
+        assert needed in step, needed
+    assert body.index("**Première connexion**") < body.index("**Réglages de la bêta")

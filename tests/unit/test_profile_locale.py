@@ -96,3 +96,31 @@ def test_plugin_version_is_at_least_0_7_0():
     """Noms du client dans les skills depuis 0.7.0 (T08c) ; la version exacte est épinglée par test_plugin_version.py."""
     version = read_json(REPO_ROOT / "plugin" / ".claude-plugin" / "plugin.json")["version"]
     assert tuple(int(n) for n in version.split(".")) >= (0, 7, 0)
+
+
+# --- Client changé de langue (lancement du 2026-11-03 : profil en enUS, client de la version finale en frFR) -----------------
+
+
+def french_client(tmp_path):
+    wow = tmp_path / "wow"
+    (wow / "WTF").mkdir(parents=True)
+    (wow / "WTF" / "Config.wtf").write_text('SET textLocale "frFR"\n', encoding="utf-8")
+    return wow
+
+
+def test_a_player_setting_that_differs_from_the_client_is_flagged(make_deps, tmp_path, capsys):
+    deps = make_deps(wow_dir=french_client(tmp_path))
+    main(["profile", "set", "--game-locale", "enUS"], deps)
+    capsys.readouterr()
+    assert read_profile(deps)["game_locale"] == {"value": "enUS", "source": "joueur", "client": "frFR"}
+    main(["profile", "show"], deps)
+    out, _ = capsys.readouterr()
+    assert "client en frFR" in out and "--game-locale frFR" in out
+
+
+def test_setting_the_client_language_clears_the_flag(make_deps, tmp_path, capsys):
+    deps = make_deps(wow_dir=french_client(tmp_path))
+    main(["profile", "set", "--game-locale", "enUS"], deps)
+    main(["profile", "set", "--game-locale", "frFR"], deps)
+    capsys.readouterr()
+    assert read_profile(deps)["game_locale"] == {"value": "frFR", "source": "joueur"}

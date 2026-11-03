@@ -236,3 +236,23 @@ def test_status_offline_with_future_cache(capsys, make_deps, tmp_path):
 def test_freshness_for_version_reads_product_from_sources(make_deps):
     r = freshness_for_version(make_deps(http=FakeHttp.fixture("builds_stale.json")), LOCAL_VERSION, allow_network=True)
     assert r["freshness"] == "stale"
+
+
+# --- Version finale adoptée (anomalie du 2026-11-03 : la provenance citait encore le cache de la bêta) -------------
+
+
+def test_freshness_follows_the_product_of_the_adopted_final(make_deps, tmp_path):
+    from test_choice_everywhere import adopt
+    from test_installs import FINAL, make_root
+
+    final_newer = "1.60.1.99999"
+    root = make_root(tmp_path, [(FINAL, LOCAL_VERSION)], {"_fictif_": (FINAL, "WowF.exe")})
+    payload = {
+        PRODUCT: [{"version": "1.60.1.70009", "created_at": "2026-09-24 15:32:10"}],
+        FINAL: [{"version": final_newer, "created_at": "2026-09-26 18:45:00"}],
+    }
+    deps = make_deps(http=FakeHttp(body=json.dumps(payload).encode("utf-8")), wow_dir=root / "_fictif_")
+    adopt(deps.cache_dir, root)
+    r = freshness_for_version(deps, LOCAL_VERSION, allow_network=True)
+    assert r["latest_version"] == final_newer and r["freshness"] == "stale"
+    assert not any("1.60.1.70009" in a for a in r["assumptions"])
