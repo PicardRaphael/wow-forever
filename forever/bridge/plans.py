@@ -143,6 +143,7 @@ def button_plan(
     cible joueur pour PvP, classe que le bouton ne sert pas)."""
     if r.class_name is None or r.level is None:
         return None
+    read: tuple[str, ...]
     if key == "talents":
         guide = Call("forever_lookup", {"kind": "class_guide", "name": r.class_name, "level": r.level})
         if not r.current:

@@ -2621,7 +2621,7 @@ def undo(
     if record.get("state") == "annulée":
         raise InvalidArgumentError(f"L'installation {record_id} est déjà annulée.", "rien à faire")
     command = f"forever update undo {record_id}"
-    run = _Run(deps, UpdateOptions(), runner, None, None, deps.data_dir)
+    run = _Run(deps, UpdateOptions(), runner, None, deps.data_dir)
     run.progress = progress
     lock = acquire_lock(deps, command)
     if lock is not None and lock.status == "arrêt":
