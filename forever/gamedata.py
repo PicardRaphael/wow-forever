@@ -223,6 +223,8 @@ def _talents(raw: Any, file: str = TALENTS_FILE) -> tuple[dict[str, Talent], tup
             if not isinstance(t, dict):
                 raise r.fail(f"trees[{n}].talents", "liste d'objets")
             key = r.str_(t, "key", f"{tree_name}.key")
+            if t.get("review"):  # règle de lecture dépassée (2026-11-03) : talent à relire, laissé hors des calculs
+                continue
             where = f"talents.{key}"
             ranks = []
             for i, row in enumerate(r.list_(t, "ranks", f"{where}.ranks"), start=1):

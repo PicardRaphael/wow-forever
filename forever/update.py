@@ -933,6 +933,7 @@ def _evaluate(
     """Vérifie la candidate, l'installe dans la copie de préparation, applique la règle, puis écrit (clone et chemin
     git) ou rend une attente. `hotfixes_read` faux (candidate décodée sans correctifs du serveur) : les valeurs
     `correctif_serveur` de la version installée perdues dans la préparation gardent l'attente (décision 207)."""
+    from forever.pipeline.decode import review_note
     from forever.pipeline.install import InstallRefusedError, apply_install, plan_install
     from forever.pipeline.value_diff import capped_lines
     from forever.pipeline.verify import verify_version
@@ -946,8 +947,10 @@ def _evaluate(
     install_ok, plan = True, None
     observed: list[str] = []  # écarts tranchés par la décision 296 (carte « Mis à jour »)
     decoded = _read(candidate / version / "sources.json")  # relevés en jeu contredits au décodage (décision 297)
+    to_review: list[str] = []  # règles de lecture dépassées : talents gardés à relire (carte « Mis à jour »)
     if isinstance(decoded, dict):
         observed += [str(n) for n in decoded.get("observation_notes") or []]
+        to_review = [review_note(r) for r in decoded.get("to_review") or []]
     try:
         plan = plan_install(stage_deps, str(candidate), new_version=new_version)
         settled = _settle_observations(run, stage, candidate, plan, version) if plan["refused"] else None
@@ -992,7 +995,7 @@ def _evaluate(
         "action": action,
         "clauses": dict(verdict.clauses),
         "reasons": reasons,
-        "notes": [*observed, *verdict.notes],
+        "notes": [*to_review, *observed, *verdict.notes],
         "verify": {"ok": verify["ok"], "errors": verify.get("errors", [])[:20]},
         "carry": _carry_counts(carry),
         "superseded": [{"file": v.file, "pointer": v.pointer, "after": now} for v, now in carry.superseded],

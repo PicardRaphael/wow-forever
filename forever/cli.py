@@ -74,7 +74,7 @@ from forever.origins import render_report as render_origins_report
 from forever.pipeline import blizzard_api, dbcache, hotfixes, raidbots
 from forever.pipeline import notes as notes_mod
 from forever.pipeline.addon_sv import LoggerDB, read_logger_db
-from forever.pipeline.builds import list_builds
+from forever.pipeline.builds import list_builds, version_key
 from forever.pipeline.client_builds import (
     Accepted,
     accept_earlier,
@@ -2077,6 +2077,8 @@ def _cmd_builds(deps: Deps, args: argparse.Namespace) -> int:
         "prefix": prefix,
         "local_version": local,
         "latest": builds[0].version if builds else None,
+        # plus récente que la version installée : seule une telle version est « nouvelle » (surveillance de GitHub)
+        "newer": bool(builds) and version_key(builds[0].version) > version_key(local),
         "total": len(builds),
         "builds": [
             {"version": b.version, "created_at": format_utc(b.created_at), "local": b.version == local} for b in shown

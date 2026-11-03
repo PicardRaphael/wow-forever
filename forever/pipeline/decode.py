@@ -382,8 +382,12 @@ def _select(
     return out
 
 
-def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
-    """Contenu de `talents.json` décodé : arbres, puis talents par palier et colonne."""
+def decode_talents(
+    tables: Tables, rules: Mapping[str, Any], version: str, review: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
+    """Contenu de `talents.json` décodé : arbres, puis talents par palier et colonne. `review` (décodage d'une
+    version) : une règle `rank_variables` dépassée n'arrête plus rien, le talent est gardé avec le texte du client,
+    sans valeurs, marqué à relire ; sans `review`, refus comme avant."""
     client = _Client(tables, rules)
     geo = rules["talent_geometry"]
     lines = set(rules["skill_lines"].values())
@@ -440,8 +444,15 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             except ValueError as exc:
                 raise DataSchemaError(f"Infobulle du talent {key} (sort {spell}, rang {rank}) : {exc}.") from exc
         spec = rules.get("rank_variables", {}).get(key)
-        ranks = _select(key, values, spec)
-        desc_template = rank_template(template, values, _selected_indices(spec, len(values[0]) if values else 0))
+        stale = None
+        try:
+            ranks = _select(key, values, spec)
+            desc_template = rank_template(template, values, _selected_indices(spec, len(values[0]) if values else 0))
+        except DataSchemaError as exc:
+            if review is None:
+                raise
+            stale, ranks, desc_template = exc.message, [], None
+            review.append({"section": "rank_variables", "key": key, "talent": key, "reason": stale})
         talents[int(node["ID"])] = {
             "key": key,
             "name": name,
@@ -458,6 +469,8 @@ def decode_talents(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "prereq": None,
             "certainty": f"FC-{version}",
         }
+        if stale is not None:  # règle de lecture dépassée : texte du client gardé, valeurs à relire
+            talents[int(node["ID"])].update(certainty="suppose", review=stale)
         model = talent_model(rules.get("talent_models", {}), key, desc)
         if model is not None:  # 70450 : sens du talent changé par le client, lu par le moteur
             talents[int(node["ID"])]["model"] = model
@@ -1707,7 +1720,9 @@ def _components(client: _Client, spell: int, rules: Mapping[str, Any]) -> list[d
     return out
 
 
-def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> dict[str, Any]:
+def decode_scaling(
+    tables: Tables, rules: Mapping[str, Any], version: str, review: list[dict[str, Any]] | None = None
+) -> dict[str, Any]:
     """Contenu de `spell_scaling.json` : pour chaque rang des sorts suivis, niveaux (`MaxLevel` 0 résolu au plafond
     de `decode_rules.json`), recharge globale déclenchée (`SpellCooldowns.StartRecoveryTime`, 0 sans ligne) et effets
     de dégâts (points de base, points par niveau, variance, nombre de ticks, coefficient de puissance des sorts,
@@ -1759,13 +1774,13 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
             "decode_rules.json.utility_spells"
         )
     if "target_auras" in rules:
-        doc["auras"] = {**_target_auras(tables, rules, client), **_mechanic_auras(rules, client)}
+        doc["auras"] = {**_target_auras(tables, rules, client, review), **_mechanic_auras(rules, client, review)}
         notes.append(
             "auras : auras posées sur la cible par un talent (decode_rules.json.target_auras) : part par cumul (%), "
             "cumuls maximum, durée, écoles touchées"
         )
     if "talent_cooldowns" in rules:
-        doc["talent_cooldowns"] = _talent_cooldowns(tables, rules, client)
+        doc["talent_cooldowns"] = _talent_cooldowns(tables, rules, client, review)
         notes.append(
             "talent_cooldowns : recharge des sorts de talent actifs (decode_rules.json.talent_cooldowns), maximum de "
             "RecoveryTime et CategoryRecoveryTime de SpellCooldowns, en millisecondes"
@@ -1773,7 +1788,28 @@ def decode_scaling(tables: Tables, rules: Mapping[str, Any], version: str) -> di
     return doc
 
 
-def _talent_cooldowns(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, dict[str, int]]:
+def review_note(entry: Mapping[str, Any]) -> str:
+    """Ligne de la carte « Mis à jour » pour une règle de lecture dépassée."""
+    what = f"talent {entry['talent']}" if entry.get("talent") else str(entry["key"])
+    return (
+        f"à relire : {what} ({entry['section']}) : règle de lecture dépassée, installé avec le texte du client et "
+        f"exclu des calculs ({entry['reason']})"
+    )
+
+
+def _mark_review(talents: dict[str, Any], review: Sequence[Mapping[str, Any]]) -> None:
+    """Talents visés par une règle de lecture dépassée (auras, recharges) : certitude `suppose` et raison ; le moteur
+    les laisse de côté (`gamedata`)."""
+    reasons = {str(r["talent"]): str(r["reason"]) for r in review if r.get("talent")}
+    for tree in talents["trees"]:
+        for t in tree["talents"]:
+            if t["key"] in reasons and "review" not in t:
+                t.update(certainty="suppose", review=reasons[t["key"]])
+
+
+def _talent_cooldowns(
+    tables: Tables, rules: Mapping[str, Any], client: _Client, review: list[dict[str, Any]] | None = None
+) -> dict[str, dict[str, int]]:
     """Recharges des talents actifs (`talent_cooldowns.talents` : noms du client) : sort du talent (TraitDefinition,
     nom du sort à défaut du nom de remplacement), recharge = max(RecoveryTime, CategoryRecoveryTime) en ms."""
     talents: dict[str, int] = {}
@@ -1785,7 +1821,11 @@ def _talent_cooldowns(tables: Tables, rules: Mapping[str, Any], client: _Client)
         found = talents.get(name)
         cd = client.cooldowns.get(found) if found is not None else None
         if found is None or cd is None:
-            raise DataSchemaError(f"{RULES_NAME} : talent « {name} » sans sort ou sans recharge (talent_cooldowns).")
+            reason = f"{RULES_NAME} : talent « {name} » sans sort ou sans recharge (talent_cooldowns)."
+            if review is None:
+                raise DataSchemaError(reason)
+            review.append({"section": "talent_cooldowns", "key": name, "talent": talent_key(name), "reason": reason})
+            continue
         out[talent_key(name)] = {
             "spell_id": found,
             "cooldown_ms": max(int(cd["RecoveryTime"]), int(cd["CategoryRecoveryTime"])),
@@ -1793,39 +1833,53 @@ def _talent_cooldowns(tables: Tables, rules: Mapping[str, Any], client: _Client)
     return out
 
 
-def _mechanic_auras(rules: Mapping[str, Any], client: _Client) -> dict[str, dict[str, Any]]:
+def _mechanic_auras(
+    rules: Mapping[str, Any], client: _Client, review: list[dict[str, Any]] | None = None
+) -> dict[str, dict[str, Any]]:
     """Auras des mécaniques lues par leur nom et leur effet périodique (`mechanic_auras`, T08b, bloc B) : sort de
     l'aura, durée (SpellDuration), période (SpellEffect.EffectAuraPeriod), cumul (SpellAuraOptions)."""
     out: dict[str, dict[str, Any]] = {}
     for key, spec in rules.get("mechanic_auras", {}).items():
         if not isinstance(spec, dict):
             continue
-        ids = [s for s, n in client.names.items() if n == spec["aura_spell"]]
-        found = [
-            (s, e)
-            for s in ids
-            for e in client.effects.get(s, {}).values()
-            if int(e["EffectAura"]) == int(spec["periodic_aura"])
-        ]
-        if len(found) != 1:
-            raise DataSchemaError(
-                f"{RULES_NAME} : {len(found)} aura(s) « {spec['aura_spell']} » d'effet {spec['periodic_aura']} ({key}), "
-                "une seule attendue."
-            )
-        spell, effect = found[0]
-        options, duration = client.auras.get(spell), client.duration_ms(spell)
-        if options is None or duration is None:
-            raise DataSchemaError(f"{key} (sort {spell}) : cumul ou durée absents.")
-        out[key] = {
-            "spell_id": spell,
-            "duration_ms": duration,
-            "period_ms": int(effect["EffectAuraPeriod"]),
-            "cumulative": int(options["CumulativeAura"]),
-        }
+        try:
+            out[key] = _mechanic_aura(key, spec, client)
+        except DataSchemaError as exc:
+            if review is None:
+                raise
+            review.append({"section": "mechanic_auras", "key": key, "talent": None, "reason": exc.message})
     return out
 
 
-def _target_auras(tables: Tables, rules: Mapping[str, Any], client: _Client) -> dict[str, dict[str, Any]]:
+def _mechanic_aura(key: str, spec: Mapping[str, Any], client: _Client) -> dict[str, Any]:
+    """Une aura de `mechanic_auras` (DataSchemaError si la règle ne correspond plus au client)."""
+    ids = [s for s, n in client.names.items() if n == spec["aura_spell"]]
+    found = [
+        (s, e)
+        for s in ids
+        for e in client.effects.get(s, {}).values()
+        if int(e["EffectAura"]) == int(spec["periodic_aura"])
+    ]
+    if len(found) != 1:
+        raise DataSchemaError(
+            f"{RULES_NAME} : {len(found)} aura(s) « {spec['aura_spell']} » d'effet {spec['periodic_aura']} ({key}), "
+            "une seule attendue."
+        )
+    spell, effect = found[0]
+    options, duration = client.auras.get(spell), client.duration_ms(spell)
+    if options is None or duration is None:
+        raise DataSchemaError(f"{key} (sort {spell}) : cumul ou durée absents.")
+    return {
+        "spell_id": spell,
+        "duration_ms": duration,
+        "period_ms": int(effect["EffectAuraPeriod"]),
+        "cumulative": int(options["CumulativeAura"]),
+    }
+
+
+def _target_auras(
+    tables: Tables, rules: Mapping[str, Any], client: _Client, review: list[dict[str, Any]] | None = None
+) -> dict[str, dict[str, Any]]:
     """Auras posées sur la cible par un talent (`target_auras`) : sort de l'aura (EffectTriggerSpell du talent),
     part par cumul, cumuls maximum (SpellAuraOptions), durée (SpellDuration), écoles (bits de `school_masks`)."""
     fx = rules["effects"]
@@ -1836,39 +1890,58 @@ def _target_auras(tables: Tables, rules: Mapping[str, Any], client: _Client) -> 
         talents.setdefault(str(d["OverrideName_lang"]) or client.names.get(spell, ""), spell)
     out: dict[str, dict[str, Any]] = {}
     for key, spec in rules["target_auras"].items():
-        source = talents.get(spec["talent"])
-        if source is None:
-            raise DataSchemaError(f"{RULES_NAME} : talent « {spec['talent']} » absent de TraitDefinition ({key}).")
-        triggers = [
-            int(e["EffectTriggerSpell"])
-            for e in client.effects.get(source, {}).values()
-            if int(e["Effect"]) == fx["apply_aura"] and int(e["EffectAura"]) == spec["trigger_aura"]
-        ]
-        if len(triggers) != 1:
-            raise DataSchemaError(f"{key} : {len(triggers)} sort(s) déclenché(s) par {source}, un seul attendu.")
-        aura = triggers[0]
-        picked = pick_target_aura(spec, list(client.effects.get(aura, {}).values()), apply_aura=fx["apply_aura"])
-        options, duration = client.auras.get(aura), client.duration_ms(aura)
-        if picked is None or options is None or duration is None:
-            raise DataSchemaError(f"{key} (sort {aura}) : effet d'aura {spec['aura']}, cumuls ou durée absents.")
-        kind, effect = picked
-        mask = int(effect["EffectMiscValue_0"])
-        out[key] = {
-            "spell_id": aura,
-            "source_spell_id": source,
-            "talent": talent_key(spec["talent"]),
-            "pct_per_stack": normalize(float(effect[spec["field"]])),
-            "max_stacks": int(options["CumulativeAura"]),
-            "duration_ms": duration,
-            "schools": [school for school, bit in masks.items() if mask & int(bit)],
-        }
-        if kind != spec.get("kind", "crit"):  # 70450 : sorte de repli (Cone of Cold) dite au moteur ; critique sinon
-            out[key]["kind"] = kind
-        choice: Mapping[str, Any] = next((c for c in spec.get("alternatives", ()) if c["kind"] == kind), {})
-        sp = source_effect_points(choice, client.effects.get(source, {}), spec["field"])
-        if sp is not None:  # 70450 r7 (correctif 112753) : part de la puissance des sorts par cumul, effet du talent
-            out[key]["sp_pct_per_stack"] = normalize(sp)
+        try:
+            out[key] = _target_aura(key, spec, talents, client, fx, masks)
+        except DataSchemaError as exc:
+            if review is None:
+                raise
+            stale = {"section": "target_auras", "key": key, "talent": talent_key(spec["talent"]), "reason": exc.message}
+            review.append(stale)
     return out
+
+
+def _target_aura(
+    key: str,
+    spec: Mapping[str, Any],
+    talents: Mapping[str, int],
+    client: _Client,
+    fx: Mapping[str, Any],
+    masks: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Une aura de `target_auras` (DataSchemaError si la règle ne correspond plus au client)."""
+    source = talents.get(spec["talent"])
+    if source is None:
+        raise DataSchemaError(f"{RULES_NAME} : talent « {spec['talent']} » absent de TraitDefinition ({key}).")
+    triggers = [
+        int(e["EffectTriggerSpell"])
+        for e in client.effects.get(source, {}).values()
+        if int(e["Effect"]) == fx["apply_aura"] and int(e["EffectAura"]) == spec["trigger_aura"]
+    ]
+    if len(triggers) != 1:
+        raise DataSchemaError(f"{key} : {len(triggers)} sort(s) déclenché(s) par {source}, un seul attendu.")
+    aura = triggers[0]
+    picked = pick_target_aura(spec, list(client.effects.get(aura, {}).values()), apply_aura=fx["apply_aura"])
+    options, duration = client.auras.get(aura), client.duration_ms(aura)
+    if picked is None or options is None or duration is None:
+        raise DataSchemaError(f"{key} (sort {aura}) : effet d'aura {spec['aura']}, cumuls ou durée absents.")
+    kind, effect = picked
+    mask = int(effect["EffectMiscValue_0"])
+    entry: dict[str, Any] = {
+        "spell_id": aura,
+        "source_spell_id": source,
+        "talent": talent_key(spec["talent"]),
+        "pct_per_stack": normalize(float(effect[spec["field"]])),
+        "max_stacks": int(options["CumulativeAura"]),
+        "duration_ms": duration,
+        "schools": [school for school, bit in masks.items() if mask & int(bit)],
+    }
+    if kind != spec.get("kind", "crit"):  # 70450 : sorte de repli (Cone of Cold) dite au moteur ; critique sinon
+        entry["kind"] = kind
+    choice: Mapping[str, Any] = next((c for c in spec.get("alternatives", ()) if c["kind"] == kind), {})
+    sp = source_effect_points(choice, client.effects.get(source, {}), spec["field"])
+    if sp is not None:  # 70450 r7 (correctif 112753) : part de la puissance des sorts par cumul, effet du talent
+        entry["sp_pct_per_stack"] = normalize(sp)
+    return entry
 
 
 def source_effect_points(
@@ -2179,9 +2252,12 @@ def decode_version(
         raise CandidateExistsError(str(out))
     hot = _Hotfixes(hotfixes, csv_dir)
     tables = hot.apply(load_tables(csv_dir, rules))
-    talents = decode_talents(tables, rules, version)
+    # règle de lecture dépassée : le talent est gardé à relire au lieu d'arrêter tout le décodage (2026-11-03)
+    review: list[dict[str, Any]] = []
+    talents = decode_talents(tables, rules, version, review)
     spells = decode_spells(tables, rules, _read_json(base / "spells.json"), version)
-    scaling = decode_scaling(tables, rules, version)
+    scaling = decode_scaling(tables, rules, version, review)
+    _mark_review(talents, review)
     extra_notes: list[str] = []
     observation_notes: list[str] = []  # décision 296 : relevés en jeu contredits par le client
     decoded_classes: dict[str, Any] = {}
@@ -2408,6 +2484,10 @@ def decode_version(
     }
     if rules.get("retired_files"):
         sources["retired_files"] = copy.deepcopy(rules["retired_files"])
+    if review:
+        sources["to_review"] = review
+        sources["files"]["talents.json"]["certainty"] = "suppose"
+        extra_notes += [review_note(r) for r in review]
     if absent_names:
         sources["missing_names"] = absent_names
         extra_notes.append(f"noms manquants (tables d'une autre locale absentes) : {', '.join(absent_names)}")

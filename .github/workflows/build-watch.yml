@@ -35,8 +35,10 @@ jobs:
           installed=$(uv run python -c "import json;print(json.load(open('forever/data/manifest.json'))['game_version'])")
           echo "latest=$latest" >> "$GITHUB_OUTPUT"
           echo "installed=$installed" >> "$GITHUB_OUTPUT"
-          if [ "$latest" = "$installed" ]; then echo "nouvelle=non" >> "$GITHUB_OUTPUT";
-          else echo "nouvelle=oui" >> "$GITHUB_OUTPUT"; fi
+          # seule une version publiée plus récente que la version installée est nouvelle (jamais une plus ancienne)
+          newer=$(uv run python -c "import json;print(json.load(open('builds.json'))['newer'])")
+          if [ "$newer" = "True" ]; then echo "nouvelle=oui" >> "$GITHUB_OUTPUT";
+          else echo "nouvelle=non" >> "$GITHUB_OUTPUT"; fi
           echo "Installée : $installed — publiée : $latest"
 
       # --- Aucune version nouvelle : contrôle du silence (14 jours, SILENT_AFTER de forever/config.py) ---

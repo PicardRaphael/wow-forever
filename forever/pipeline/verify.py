@@ -47,7 +47,8 @@ def _talent_errors(doc: Any) -> list[str]:
     talents = [t for tree in doc.get("trees", []) for t in tree.get("talents", [])]
     for t in talents:
         key = t.get("key", "?")
-        if len(t.get("ranks", [])) != t.get("max"):
+        # talent à relire (règle de lecture dépassée) : valeurs non lues, hors des calculs
+        if len(t.get("ranks", [])) != t.get("max") and not t.get("review"):
             errors.append(f"talents.json : {key} a {len(t.get('ranks', []))} rang(s) pour max {t.get('max')}")
         place = (t.get("tree"), t.get("tier"), t.get("col"))
         if place in at:

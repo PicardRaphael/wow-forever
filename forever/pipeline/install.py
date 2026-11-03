@@ -57,6 +57,7 @@ RULES = (
     "game_state",
     "value",
     "rules",
+    "review",
 )
 # T04f, décision 263 : fichiers de règles d'une tranche (lecture, origines), installés avec la révision. CJ1
 # (2026-10-19) : mechanics.json aussi, valeurs écrites à la main jamais décodées (hérité tel quel par forever decode) ;
@@ -227,6 +228,13 @@ class _Merge:
                     self.applied.append(rename)
                 assert c is not None
                 t = dict(t)
+                if c.get("review"):  # règle de lecture dépassée : talent gardé, à relire, sans comparer ses valeurs
+                    out = {**t, "certainty": "suppose", "review": c["review"], "source": self._talent_source(c)}
+                    self.add(
+                        TALENTS, key, t.get("certainty"), "suppose", f"{source} ; {c['review']}", "suppose", "review"
+                    )
+                    merged.append(out)
+                    continue
                 for f in TALENT_FIELDS:
                     changed = t.get(f) != c.get(f) and not (rename is not None and f == "name")
                     if changed and self._confirmed_field(TALENTS, "talent", key, f, t.get(f), c.get(f), source):
@@ -250,7 +258,7 @@ class _Merge:
                 continue
             added = {
                 **{k: v for k, v in extra.items() if k not in ("certainty", "desc_template")},
-                "certainty": f"FC-{self.build}",
+                "certainty": "suppose" if extra.get("review") else f"FC-{self.build}",
             }
             added["desc"] = extra.get("desc_template") or extra.get(
                 "desc", ""
@@ -1125,6 +1133,7 @@ def apply_install(
     _write(vdir / SPELLS, docs["spells"], 1)
     _write(vdir / CONFIRMED, confirmed, 2)
     _carry_missing_names(sources, Path(docs["candidate_path"]))
+    carry_product(sources, Path(docs["candidate_path"]))
     _write(vdir / SOURCES_NAME, sources, 2)
     if carry_hotfix_provenance(vdir, Path(docs["candidate_path"])):
         revision["hotfixes"] = _json(vdir / SOURCES_NAME).get("hotfixes", {}).get("pushes", [])
@@ -1142,6 +1151,16 @@ def apply_install(
         _write_game_state(vdir, plan["game_state"], n, day)
     write_manifest(deps.data_dir)
     return revision
+
+
+def carry_product(sources: dict[str, Any], cand_vdir: Path) -> None:
+    """LN1 : produit et préfixe de la candidate décodée sur le client adopté (version finale) gardés à l'installation ;
+    une candidate sans produit (client d'un autre build) laisse ceux de la version installée."""
+    path = cand_vdir / SOURCES_NAME
+    cand = _json(path) if path.is_file() else {}
+    for key in ("product", "version_prefix"):
+        if isinstance(cand.get(key), str):
+            sources[key] = cand[key]
 
 
 def _carry_missing_names(sources: dict[str, Any], cand_vdir: Path) -> None:
@@ -1246,6 +1265,7 @@ LABELS = {
     "value": "valeur d'un fichier décodé (spell_scaling.json, character_scaling.json)",
     "rules": "règles de lecture ou d'origine, valeurs écrites à la main (decode_rules.json, origins.json, "
     "mechanics.json du dépôt)",
+    "review": "règle de lecture dépassée (talent gardé, à relire, certitude suppose, hors des calculs)",
     "refused": "hors règles (refusé)",
 }
 CELL_MAX = 80
