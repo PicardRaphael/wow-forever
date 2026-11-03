@@ -295,7 +295,7 @@ def load_addon(deps: Deps, *, folder: Path | None = None) -> TfAddon | None:
     except (ValueError, KeyError, TypeError):
         return TfAddon(folder, version, {}, fingerprint, game_version, {}, ("illisible",), None)
     checks: list[str] = []
-    if str(head.get("codeVersion")) not in CODE_VERSIONS:  # générations 6, 7 et 8 (même format)
+    if str(head.get("codeVersion")) not in CODE_VERSIONS:  # générations 6 à 10 (même format)
         checks.append("format_non_pris_en_charge")
     ours = _our_classes(deps.data_dir / game_version / "classes.json")
     layouts: dict[str, TfLayout] = {}

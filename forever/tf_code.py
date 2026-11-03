@@ -17,8 +17,9 @@ from dataclasses import dataclass
 
 CODE_VERSION = "6"
 # 70450 (bloc D) : même format, la génération dit la disposition des arbres (7 : build 70425, addon 0.38.9 ;
-# 8 : correctif du serveur du 20 octobre 2026 sur l'arbre Givre du Mage, addon 0.38.10, `TF.Decode` de l'addon)
-CODE_VERSIONS = ("6", "7", "8")
+# 8 : correctif du serveur du 20 octobre 2026 sur l'arbre Givre du Mage, addon 0.38.10 ; 9 : correctif du Mage du
+# 28 octobre ; 10 : correctif du Druide et du Paladin du 30 octobre, addon 0.38.14 ; `TF.Decode` de l'addon)
+CODE_VERSIONS = ("6", "7", "8", "9", "10")
 SYMBOLS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz056789"
 COUNTS = "1234"
 SITE = "https://talentsforever.com/"
