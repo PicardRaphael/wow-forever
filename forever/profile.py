@@ -130,9 +130,12 @@ def check_locale(value: str) -> str:
 def game_locale(deps: Deps, doc: Mapping[str, Any]) -> dict[str, Any] | None:
     """Langue du client : celle donnée par le joueur l'emporte, sinon celle du client ; None si aucune."""
     field = doc.get("game_locale")
-    if isinstance(field, dict) and field.get("value"):
-        return {"value": field["value"], "source": field.get("source", "joueur")}
     value = client_locale(deps.wow_dir)
+    if isinstance(field, dict) and field.get("value"):
+        out = {"value": field["value"], "source": field.get("source", "joueur")}
+        if value and value != field["value"]:  # client changé de langue depuis (lancement du 2026-11-03) : signalé
+            out["client"] = value
+        return out
     return {"value": value, "source": "client"} if value else None
 
 

@@ -34,7 +34,7 @@ import shutil
 import threading
 import time
 from collections.abc import Callable, Mapping, Sequence
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, NamedTuple, TypedDict
 
@@ -484,6 +484,11 @@ def installed_versions(data_dir: Path) -> list[str]:
     if manifest is None:
         return version_dirs(data_dir)
     return sorted(manifest["versions"], key=version_key)
+
+
+def installed_version(data_dir: Path) -> str | None:
+    """Version courante des données (`_installed`), pour la CLI."""
+    return _installed(data_dir)
 
 
 def _installed(data_dir: Path) -> str | None:
@@ -2117,6 +2122,70 @@ def _publish(
     )
 
 
+INSTALLED_COMMIT = re.compile(
+    r"^Veille : (?P<version>\S+) r(?P<revision>\d+) installée par (?P<by>.+?) \((?P<motif>.*)\)$"
+)
+UNDONE_COMMIT = re.compile(r"^Veille : annulation de (?P<version>\S+?)-r(?P<revision>\d+)-")
+AUTO_INSTALL_SINCE = (
+    "2026-10-22"  # décision 295 : installation automatique ; les installations d'avant ne sont pas relues
+)
+
+
+def import_installed(cache_dir: Path, runner: Runner | None = None) -> list[str]:
+    """Fiches « Mis à jour » des installations faites sur un autre PC (décision 295) : relues dans l'historique de
+    `main` du clone de la veille (commits « Veille : <version> r<n> installée par … » depuis la décision 295), créées
+    quand aucune fiche de ce PC ne porte le même commit ; une installation annulée ailleurs l'est aussi ici. Rend les
+    identifiants ajoutés ; sans clone ni git lisible : rien."""
+    from forever.pipeline import gitops
+    from forever.update_installed import list_installed, save_installed
+
+    clone = update_dir(cache_dir) / "repo"
+    if not (clone / ".git").exists():
+        return []
+    git = runner or gitops.subprocess_runner
+    try:
+        done = git(["git", "log", f"--since={AUTO_INSTALL_SINCE}", "--format=%H%x09%cI%x09%s", "HEAD"], clone, 60)
+    except OSError:
+        return []
+    if done.returncode != 0:
+        return []
+    found: list[tuple[str, str, re.Match[str]]] = []
+    undone_keys: set[tuple[str, int]] = set()
+    for line in done.stdout.splitlines():
+        sha, at, subject = (line.split("\t", 2) + ["", ""])[:3]
+        if m := INSTALLED_COMMIT.match(subject):
+            found.append((sha, at, m))
+        elif u := UNDONE_COMMIT.match(subject):
+            undone_keys.add((u["version"], int(u["revision"])))
+    known = {str(r.get("sha")) for r in list_installed(cache_dir)}
+    added: list[str] = []
+    for sha, at, m in reversed(found):
+        if sha in known:
+            continue
+        version, revision = m["version"], int(m["revision"])
+        record_id = f"{version}-r{revision}-git{sha[:12]}"
+        when = datetime.fromisoformat(at).astimezone(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+        save_installed(
+            cache_dir,
+            {
+                "id": record_id,
+                "kind": "install_revision",
+                "version": version,
+                "revision": revision,
+                "installed_at": when,
+                "sha": sha,
+                "summary": f"installée par {m['by']} ({m['motif']}), fiche relue dans l'historique de main",
+                "measures": [],
+                "notes": [],
+                "state": "annulée" if (version, revision) in undone_keys else "installée",
+                "by": m["by"],
+                "undo": f"forever update undo {record_id}",
+            },
+        )
+        added.append(record_id)
+    return added
+
+
 def _record_installed(run: _Run, verdict: Mapping[str, Any], info: Mapping[str, Any], *, base: str | None) -> None:
     """Fiche de l'historique des installations (décision 295) : écrite à la fusion (carte « Mis à jour »)."""
     measures = (verdict.get("summary") or {}).get("measures") if verdict.get("kind") == "measures" else None
@@ -2358,6 +2427,9 @@ def run_update(
         try:
             advance("archivage", lambda: _step_archive(run))
             advance("clone", lambda: _step_clone(run))
+            if run.clone is not None:  # décision 295 : installations faites sur un autre PC, fiches relues
+                import_installed(deps.cache_dir, run.runner)
+            archive_stale_pending(deps.cache_dir, _installed(run.base_data))
             target: list[str | None] = [None]
 
             def game() -> Step:
@@ -2506,13 +2578,50 @@ def content_fingerprint(version_dir: Path) -> str:
 
 
 def record_pending(cache_dir: Path, entry: Mapping[str, Any]) -> Path:
-    """Enregistre une attente (`<cache>/update/pending/<id>.json`) ; une entrée déjà approuvée ou faite est gardée."""
+    """Enregistre une attente (`<cache>/update/pending/<id>.json`) ; une entrée déjà approuvée ou faite est gardée,
+    rangée ou non."""
     path = _pending_path(cache_dir, str(entry["id"]))
-    old = _read(path)
-    if isinstance(old, dict) and old.get("state") in KEPT_STATES:
-        return path
+    for known in (path, path.parent / ARCHIVE_DIR / path.name):
+        old = _read(known)
+        if isinstance(old, dict) and old.get("state") in KEPT_STATES:
+            return known
     _write(path, {**entry, "state": "en_attente"})
     return path
+
+
+ARCHIVE_DIR = "archive"
+_GAME_VERSION = re.compile(r"^\d+\.\d+\.\d+\.\d+$")
+
+
+def archive_stale_pending(cache_dir: Path, installed: str | None) -> list[str]:
+    """Range dans `pending/archive/` les attentes closes d'avant la version installée (anomalie du 2026-11-03 : la
+    bêta encombrait `forever update status`) : version du jeu plus ancienne, ou créées avant la première
+    installation de cette version (erreurs de passage, relectures d'addons). Rien n'est supprimé ; une attente ouverte
+    reste. Rend les identifiants rangés."""
+    from forever.pipeline.builds import version_key
+    from forever.update_installed import list_installed
+
+    if installed is None:
+        return []
+    since = min(
+        (str(r.get("installed_at")) for r in list_installed(cache_dir) if r.get("version") == installed),
+        default=None,
+    )
+    folder = update_dir(cache_dir) / "pending"
+    moved: list[str] = []
+    for entry in list_pending(cache_dir):
+        if entry.get("state") in OPEN_STATES:
+            continue
+        version = str(entry.get("version") or "")
+        older = bool(_GAME_VERSION.match(version)) and version_key(version) < version_key(installed)
+        before = since is not None and not _GAME_VERSION.match(version) and str(entry.get("created_at")) < since
+        if not (older or before):
+            continue
+        source = _pending_path(cache_dir, str(entry["id"]))
+        (folder / ARCHIVE_DIR).mkdir(parents=True, exist_ok=True)
+        source.replace(folder / ARCHIVE_DIR / source.name)
+        moved.append(str(entry["id"]))
+    return moved
 
 
 def list_pending(cache_dir: Path) -> list[dict[str, Any]]:

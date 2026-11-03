@@ -2264,7 +2264,10 @@ def _locale_line(view: ProfileView) -> list[str]:
     if not loc:
         return ["Langue du client : inconnue (forever profile set --game-locale enUS, ou FOREVER_WOW_DIR)"]
     where = "WTF/Config.wtf" if loc["source"] == "client" else "donnée par le joueur"
-    return [f"Langue du client : {loc['value']} ({where})"]
+    line = f"Langue du client : {loc['value']} ({where})"
+    if loc.get("client"):
+        line += f" ; client en {loc['client']} : forever profile set --game-locale {loc['client']}"
+    return [line]
 
 
 def render_profile(view: ProfileView) -> list[str]:
@@ -3396,6 +3399,7 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
 
     provenance = local_provenance(deps, assumptions=["mise à jour automatique : attentes et passages (T08d)"])
     if args.update_command == "status":
+        update.archive_stale_pending(deps.cache_dir, update.installed_version(deps.data_dir))  # bêta rangée
         summary = update.update_summary(deps.cache_dir, deps.now())
         every = update.list_pending(deps.cache_dir)
         # Décision 227 : attentes ouvertes seulement par défaut, l'historique complet avec --all
@@ -3417,6 +3421,7 @@ def _cmd_update(deps: Deps, args: argparse.Namespace) -> int:
         if summary["running"] and summary.get("running_detail"):
             lines.append(f"  dernière ligne : {summary['running_detail']}")
         lines += [f"  écrit : {update.written_text(w)}" for w in (last or {}).get("written") or []]
+        update.import_installed(deps.cache_dir)  # décision 295 : installations faites sur un autre PC
         lines += _installed_lines(deps.cache_dir, every=args.all)
         for e in entries:
             lines.append(

@@ -194,8 +194,12 @@ def check_freshness(
 
 def freshness_for_version(deps: Deps, version: str, *, allow_network: bool) -> FreshnessResult:
     """Lit produit et préfixe dans `sources.json` de la version, puis appelle `check_freshness`."""
+    from forever.pipeline.client_builds import wago_product
+
     sources = read_sources(deps.data_dir, version) or {}
-    product, prefix = sources.get("product"), sources.get("version_prefix")
+    # LN1 : produit de la version finale adoptée quand c'est l'installation lue (plus le cache de la bêta)
+    found = wago_product(deps.cache_dir, deps.wow_dir, sources)
+    product, prefix = found if found is not None else (None, None)
     if not (isinstance(product, str) and isinstance(prefix, str)):
         return _result("unknown", None, deps.now(), "none", [f"produit inconnu : sources.json absent pour {version}"])
     return check_freshness(deps, version, product=product, prefix=prefix, allow_network=allow_network)

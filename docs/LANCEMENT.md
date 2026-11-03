@@ -60,6 +60,26 @@ PC `RAPHAEL-GAMING`, jeu dans `C:\Program Files (x86)\World of Warcraft`, sauveg
     gelé : ignorer les cartes « profil » du pont).
     - À voir ensuite : `uv run forever doctor` → `combatlog` `[ok]` (journal avancé récent, activé par
       ForeverLogger).
+10 bis. **Réglages de la bêta, une fois, jeu fermé**, après la première connexion (c'est elle qui crée le dossier du
+    compte de la version finale, `_forever_\WTF\Account\<compte>` ; chez moi `140740490#2`). Copier depuis le compte
+    de la bêta, `WTF\Account\140740490#1`, **seulement** le dossier `SavedVariables`, `bindings-cache.wtf` et
+    `macros-cache.txt` ; **jamais `Config.wtf`** (réglages du client de la bêta : langue, graphismes),
+    ni les dossiers des personnages de la bêta (`WTF\Account\140740490#1\<royaume>\<personnage>`). Dans PowerShell :
+
+    ```powershell
+    uv run forever backup --reason "avant la copie des réglages de la bêta"
+    $src = "C:\Program Files (x86)\World of Warcraft\_classic_beta_\WTF\Account\140740490#1"
+    $dst = "C:\Program Files (x86)\World of Warcraft\_forever_\WTF\Account\140740490#2"
+    Copy-Item "$src\SavedVariables" $dst -Recurse -Force
+    Copy-Item "$src\bindings-cache.wtf", "$src\macros-cache.txt" $dst -Force
+    ```
+
+    - Dossier de la bêta absent (client de la bêta désinstallé) : prendre `$src` dans la sauvegarde la plus récente
+      qui le contient, `F:\WoW Forever\sauvegardes\<date>\wtf\wow_classic_beta\WTF\Account\140740490#1` ; les
+      sauvegardes n'ont que `SavedVariables` (raccourcis et macros perdus : les refaire en jeu).
+    - Les fichiers du même nom déjà écrits par la version finale sont remplacés : la sauvegarde de la première ligne
+      permet de revenir en arrière (`uv run forever backup restore <date> --only wtf`).
+    - À voir : en jeu, réglages des addons, raccourcis et macros du compte retrouvés.
 11. **Données de la version finale** : `uv run forever update`.
     - À voir : la cible est le build du client final, le produit demandé à wago.tools est celui de la version finale
       (`uv run forever builds` le montre) ; la nouvelle version s'installe d'elle-même (décision 295) et
