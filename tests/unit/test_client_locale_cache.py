@@ -5,6 +5,7 @@ enUS ensuite).
 
 Dossier du client construit dans `tmp_path` ; `DBCache.bin` (build 70170) : `tests/fixtures/hotfix/`. Aucun réseau."""
 
+import csv
 import json
 import os
 import shutil
@@ -124,10 +125,11 @@ def test_an_archived_copy_without_language_is_english(tmp_path):
 # --- Textes d'un cache d'une autre langue -------------------------------------------------------------------------
 
 
-def test_a_french_cache_keeps_the_english_texts_and_applies_the_numbers():
-    tables = load_tables(WAGO, RULES)
+def test_a_french_cache_keeps_the_english_texts_and_applies_the_numbers(tmp_path):
+    csv_dir = foreign_csv(tmp_path)  # noms français du build = textes du cache
+    tables = load_tables(csv_dir, RULES)
     english = by_id(tables["Spell"])[1680]["Description_lang"]
-    ov = apply_hotfixes(tables, source()._replace(locale="frFR"), WAGO)
+    ov = apply_hotfixes(tables, source()._replace(locale="frFR"), csv_dir)
     assert by_id(ov.tables["Spell"])[1680]["Description_lang"] == english  # texte d'avant gardé
     assert by_id(ov.tables["TraitNode"])[105928]["PosX"] == 5620  # chiffres corrigés appliqués
     kept = ov.listed["foreign_strings"]
@@ -162,3 +164,43 @@ def test_the_bridge_follows_the_cache_of_the_current_language(tmp_path):
         clock.t += 1.0
         trigger.tick()
     assert launched == [1]
+
+
+# --- Disposition d'un cache d'une autre langue (client frFR du lancement, 2026-11-03) -------------------------------
+
+
+def foreign_csv(tmp_path, with_locale=True):
+    """CSV du build où l'anglais diffère des textes du cache (ceux de la fixture, pris pour la langue du client)."""
+    csv_dir = tmp_path / "wago"
+    shutil.copytree(WAGO, csv_dir)
+    english = csv_dir / "enUS" / "SpellName.csv"
+    if with_locale:
+        shutil.copy(english, csv_dir / "frFR" / "SpellName.csv")
+    else:
+        (csv_dir / "frFR" / "SpellName.csv").unlink()
+    with english.open(encoding="utf-8-sig", newline="") as f:
+        rows = list(csv.DictReader(f))
+    with english.open("w", encoding="utf-8", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=list(rows[0]))
+        writer.writeheader()
+        writer.writerows({**r, "Name_lang": f"{r['Name_lang']} (autre langue)"} for r in rows)
+    return csv_dir
+
+
+def test_a_french_cache_compares_its_texts_with_the_french_names(tmp_path):
+    csv_dir = foreign_csv(tmp_path)
+    ov = apply_hotfixes(load_tables(csv_dir, RULES), source()._replace(locale="frFR"), csv_dir)
+    assert ov.checks["SpellName"].ok
+
+
+def test_a_french_cache_without_french_names_is_not_judged_on_its_texts(tmp_path):
+    csv_dir = foreign_csv(tmp_path, with_locale=False)
+    ov = apply_hotfixes(load_tables(csv_dir, RULES), source()._replace(locale="frFR"), csv_dir, strict=False)
+    assert "valeurs égales" not in (ov.checks["SpellName"].reason or "")
+    assert ov.checks["Spell"].ok  # chiffres comparés, textes laissés de côté
+
+
+def test_an_english_cache_is_still_judged_on_its_texts(tmp_path):
+    csv_dir = foreign_csv(tmp_path)
+    ov = apply_hotfixes(load_tables(csv_dir, RULES), source(), csv_dir, strict=False)
+    assert not ov.checks["SpellName"].ok
