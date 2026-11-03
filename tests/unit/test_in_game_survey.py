@@ -283,7 +283,7 @@ def test_v6_format_is_certain_after_the_in_game_test(addon, deps):
 
 def test_other_generation_is_never_certain(tmp_path, make_deps):
     root = tmp_path / "wow"
-    write_addon(root, CLASSES, mutate=lambda doc: doc.update(codeVersion="9"))  # 7 et 8 lues, la 9 inconnue
+    write_addon(root, CLASSES, mutate=lambda doc: doc.update(codeVersion="11"))  # 6 à 10 lues, la 11 inconnue
     loaded = load_addon(make_deps(wow_dir=root))
     case = CASES["leveling-20"]
     block = export_build(loaded, "Mage", case["level"], case["talents"], case["order"])

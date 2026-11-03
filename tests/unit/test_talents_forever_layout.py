@@ -105,7 +105,7 @@ def test_trees_matched_by_index_tree_names_are_cosmetic(addon):
 
 def test_other_code_version_is_not_supported(tmp_path, make_deps):
     root = tmp_path / "wow"
-    write_addon(root, CLASSES, mutate=lambda doc: doc.update(codeVersion="9"))  # 7 et 8 lues, la 9 inconnue
+    write_addon(root, CLASSES, mutate=lambda doc: doc.update(codeVersion="11"))  # 6 à 10 lues, la 11 inconnue
     loaded = load_addon(make_deps(wow_dir=root))
     assert loaded is not None and not loaded.supported
     assert "format_non_pris_en_charge" in loaded.checks
