@@ -39,7 +39,7 @@ def test_code_of_another_generation_is_refused():
     with pytest.raises(ValueError):
         decode(encode(PLAN, generation="6"), MAX, "mage", generation="7")  # autre disposition des arbres
     with pytest.raises(ValueError):
-        decode("mage/20/1-02--8", MAX, "mage")  # génération inconnue
+        decode("mage/20/1-02--9", MAX, "mage")  # génération inconnue
 
 
 def test_export_follows_a_generation_7_addon(tmp_path, make_deps):
