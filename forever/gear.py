@@ -928,7 +928,7 @@ def learned_mage_weights(
 
 POPULAR_ASSUMPTION = (
     "talents des poids du Mage au-delà de mon niveau : build populaire de Talents Forever (choix de joueurs, supposé), "
-    "le plus proche de mes talents, sinon le plus joué ; ordre de prise généré (palier, prérequis), pas un ordre de "
+    "le plus proche de mes talents, sinon le plus joué des builds vérifiés sur le client ; ordre de prise généré (palier, prérequis), pas un ordre de "
     "leveling optimisé (décision 299)"
 )
 
@@ -1008,19 +1008,23 @@ def mage_talents_for(
     deps: Deps, *, level: int, talents: Mapping[str, int] | None, talents_level: int | None
 ) -> tuple[dict[str, int], str, dict[str, Any] | None]:
     """(talents, source, plan) pour les poids du Mage au niveau `level` : mes talents si `level` est mon niveau,
-    sinon le build populaire le plus proche (`popular_plan`), aucun avant le premier point ou sans build populaire.
-    Registre : I3"""
+    sinon le build populaire le plus proche (`popular_plan`), sans les talents que le moteur gelé ne connaît pas
+    (`plan["ignored"]`), aucun avant le premier point ou sans build populaire. Registre : I3"""
     from forever.gamedata import build_game_data
     from forever.store import load_version
 
     if talents is not None and talents_level == level:
         return dict(talents), "actuels", None
-    if level < build_game_data(load_version(deps)).constants.talents.first_level:
+    gd = build_game_data(load_version(deps))
+    if level < gd.constants.talents.first_level:
         return {}, "aucun", None
     plan = popular_plan(deps, talents)
     if plan is None:
         return {}, "aucun", None
-    chosen = talents_from_plan(deps, plan, level)
+    taken = talents_from_plan(deps, plan, level)
+    # talent du client que le moteur gelé ne connaît pas (décision 294) : écarté des poids et nommé, jamais deviné
+    chosen = {k: v for k, v in taken.items() if k in gd.talents}
+    plan = {**plan, "ignored": sorted(k for k in taken if k not in gd.talents)}
     return chosen, ("populaire" if chosen else "aucun"), plan
 
 
@@ -1029,7 +1033,10 @@ def _talent_names(deps: Deps) -> dict[str, str]:
     from forever.gamedata import build_game_data
     from forever.store import load_version
 
-    return {k: talent.name for k, talent in build_game_data(load_version(deps)).talents.items()}
+    gd = build_game_data(load_version(deps))
+    mage = gd.classes.get("Mage")
+    client = {t["key"]: str(t["name"]) for tree in mage.trees for t in tree["talents"]} if mage is not None else {}
+    return {**client, **{k: talent.name for k, talent in gd.talents.items()}}
 
 
 def _talent_notes(used: Mapping[int, Mapping[str, Any]], names: Mapping[str, str]) -> list[str]:
@@ -1045,11 +1052,17 @@ def _talent_notes(used: Mapping[int, Mapping[str, Any]], names: Mapping[str, str
         build = ", ".join(f"{names.get(k, k)} {v}" for k, v in sorted(last["talents"].items(), key=lambda kv: -kv[1]))
         span = f"au niveau {planned[0]}" if len(planned) == 1 else f"des niveaux {planned[0]} à {planned[-1]}"
         b = last["build"]
-        why = "le plus proche de tes talents" if b["closest"] else "le plus joué"
+        why = "le plus proche de tes talents" if b["closest"] else "le plus joué des builds vérifiés sur le client"
         notes.append(
             f"Talents des poids {span} : build populaire n° {b['rank']} {b['spec'] or ''} de Talents Forever ({why}, "
             f"relevé du {b['asOf']}), pris dans un ordre généré (palier, prérequis) ; au dernier niveau : {build}."
         )
+        ignored = sorted({k for lv in planned for k in used[lv]["build"].get("ignored") or []})
+        if ignored:
+            names_ = ", ".join(names.get(k, k) for k in ignored)
+            notes.append(
+                f"Talents du build populaire que mon calcul du Mage ne connaît pas, ignorés dans les poids : {names_}."
+            )
     none = [lv for lv, u in sorted(used.items()) if u["source"] == "aucun"]
     if none:
         span = f"Au niveau {none[0]}" if len(none) == 1 else f"Aux niveaux {none[0]} à {none[-1]}"
@@ -1273,7 +1286,9 @@ def gear_report(
                 wanted_at[lv] = wanted
                 talents_used[lv] = {"source": source, "talents": pts, "rotation": used}
                 if source == "populaire" and plan is not None:
-                    talents_used[lv]["build"] = {k: plan[k] for k in ("rank", "spec", "asOf", "link", "closest")}
+                    talents_used[lv]["build"] = {
+                        k: plan[k] for k in ("rank", "spec", "asOf", "link", "closest", "ignored")
+                    }
                 elif source == "aucun" and plan is None and lv >= first_point:
                     talents_used[lv]["no_popular"] = True
                 if report is not None:

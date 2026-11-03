@@ -65,3 +65,25 @@ def test_a_talent_that_changes_a_stat_value_changes_the_ranking(tmp_path, make_d
         for name, w in (("bare", bare), ("built", built))
     }
     assert first["bare"] != first["built"]  # le talent pris change le premier choix
+
+
+def test_a_popular_talent_unknown_to_the_frozen_engine_is_left_out_and_named(tmp_path, make_deps, monkeypatch):
+    """Vérification de RB1 sur 70707 : un talent du build populaire que le moteur gelé ne connaît pas (renommé par le
+    client) n'annule plus tous les talents des poids ; il est écarté et nommé. Clé inventée, aucune valeur de jeu."""
+    import forever.gear as gear
+    from forever.engine.talents import legal_order
+    from forever.gamedata import build_game_data
+    from forever.store import load_version
+
+    deps = make_deps(wow_dir=wow_dir(tmp_path), offline=True)
+    gd = build_game_data(load_version(deps))
+    known = next(iter(gd.talents))
+    order = legal_order(gd.classes["Mage"], gd.constants.talents, {known: 1})
+    plan = {"rank": 1, "spec": "Frost", "asOf": "2026-10-24", "link": "L", "closest": False, "rotation": "frost",
+            "order": [*order, "inventedTalent"]}  # fmt: skip
+    monkeypatch.setattr(gear, "popular_plan", lambda deps, current: plan)
+    doc = leveling(deps, HIGH)
+    used = doc["talents_used"][str(HIGH)]
+    assert used["source"] == "populaire" and used["talents"] == {known: 1}
+    assert used["build"]["ignored"] == ["inventedTalent"]
+    assert any("ignorés dans les poids : inventedTalent" in n for n in doc["weights_notes"])
