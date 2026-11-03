@@ -70,7 +70,7 @@ def test_a_talent_that_changes_a_stat_value_changes_the_ranking(tmp_path, make_d
 def test_a_popular_talent_unknown_to_the_frozen_engine_is_left_out_and_named(tmp_path, make_deps, monkeypatch):
     """Vérification de RB1 sur 70707 : un talent du build populaire que le moteur gelé ne connaît pas (renommé par le
     client) n'annule plus tous les talents des poids ; il est écarté et nommé. Clé inventée, aucune valeur de jeu."""
-    import forever.gear as gear
+    from forever import gear
     from forever.engine.talents import legal_order
     from forever.gamedata import build_game_data
     from forever.store import load_version
