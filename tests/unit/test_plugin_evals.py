@@ -10,7 +10,6 @@ import pytest
 import yaml
 from conftest import DATA_DIR, FIXTURES, NOW, REGISTRY_PATH, REPO_ROOT, FakeHttp
 from mcp import Client
-from talents_forever_data import load_fixture
 
 from forever.config import Deps
 from forever.hooks import GAME_NUMBER, NUMBERS_MARKER
@@ -24,7 +23,6 @@ POSITIVE_CATEGORIES = (
     "profil",
     "talent",
     "build",
-    "respec",
     "zone",
     "generale",
     "personnelle",
@@ -112,71 +110,6 @@ def test_empty_profile_cases():
     assert profile["active"] in profile["characters"]
 
 
-def test_talent_level_22_case():
-    """T06b (D7) : prochain talent depuis un build actuel écrit en toutes lettres ; juge « mesuré et modélisé »."""
-    case = EVALS / "talent-niveau-22"
-    meta, question = front(case / "prompt.md")
-    assert meta["tags"] == ["positif", "talent"]
-    assert "22" in question and "Givre" in question
-    g = graders(case)
-    assert set(g) == POSITIVE_GRADERS | {"mesure-et-modelise"}
-    outil = g["outil"][0]
-    assert outil["tool"] == MCP_PREFIX + "forever_build"
-    assert "current" in outil["input_match"] and re.search(r"level", outil["input_match"])
-    assert re.search(outil["input_match"], '{"context": "leveling", "level": 22, "current": {"x": 1}}')
-    judge_meta, judge = g["mesure-et-modelise"]
-    assert judge_meta["type"] == "llm"
-    for words in ("non modélisé", "Monte Carlo", "analytique", "non départagé"):
-        assert words in judge, words
-
-
-RESPEC_AT_ANOTHER_LEVEL = ("respec-troisieme",)
-
-
-def test_respec_at_another_level_is_planned_from_the_profile_build():
-    """Demande du 2026-09-29 (complément) : une respec posée à un autre niveau que celui du profil (profil de test au
-    niveau 23) est une question de planification ; l'agent part du build du profil, projette le chemin conseillé
-    jusqu'au niveau demandé (`respec.projected`) et conseille, sans redemander le build."""
-    for name in RESPEC_AT_ANOTHER_LEVEL:
-        meta, _ = front(EVALS / name / "prompt.md")
-        assert meta["tags"] == ["positif", "respec"]
-        g = graders(EVALS / name)
-        assert "demande-le-build" not in g, name
-        outil = g["outil"][0]
-        assert outil["tool"] == MCP_PREFIX + "forever_build", name
-        assert re.search(outil["input_match"], '{"context": "leveling", "level": 32, "current": {"x": 1}}'), name
-        assert g["profil"][0] == {"type": "tool_used", "tool": MCP_PREFIX + "forever_player_profile"}
-        judge_meta, judge = g["planification"]
-        assert judge_meta["type"] == "llm"
-        for words in ("build du profil", "chemin", "projeté", "ne redemande pas"):
-            assert words in judge, (name, words)
-    for name in ("respec-build-precis", "respec-leveling-vers-donjon"):
-        assert graders(EVALS / name)["outil"][0]["tool"] == MCP_PREFIX + "forever_build", name
-
-
-def test_respec_whose_question_contradicts_the_profile():
-    """Décision de l'utilisateur du 2026-09-30 : la question l'emporte sur le profil. « Tous mes points en Feu »
-    (profil de test : build Givre) : l'agent signale l'écart, propose la mise à jour du profil, puis demande les rangs
-    exacts en Feu ou suppose, en l'annonçant, le build Feu conseillé au niveau demandé ; le juge accepte les deux."""
-    case = EVALS / "respec-feu-vers-givre"
-    meta, question = front(case / "prompt.md")
-    assert meta["tags"] == ["positif", "respec"] and "Feu" in question  # question gardée telle quelle
-    g = graders(case)
-    assert "planification" not in g and "demande-le-build" not in g
-    assert g["outil"][0] == {"type": "tool_used", "tool": MCP_PREFIX + "forever_player_profile"}
-    judge_meta, judge = g["ecart-profil"]
-    assert judge_meta["type"] == "llm"
-    for words in (
-        "l'emporte sur le profil",
-        "écart",
-        "forever profile set",
-        "rangs exacts",
-        "build Feu conseillé",
-        "les deux",
-    ):
-        assert words in judge, words
-
-
 def test_planned_character_case():
     """Demande du 2026-09-29 (complément) : plan d'un personnage prévu du profil de test (pas encore créé)."""
     case = EVALS / "planification-personnage-prevu"
@@ -190,10 +123,10 @@ def test_planned_character_case():
     g = graders(case)
     assert g["profil"][0]["tool"] == MCP_PREFIX + "forever_player_profile"
     outil = g["outil"][0]
-    assert outil["tool"] == MCP_PREFIX + "forever_build"
-    assert re.search(outil["input_match"], f'{{"context": "leveling", "race": "{c["race"]}"}}')
+    assert outil["tool"] == MCP_PREFIX + "forever_lookup"  # RB1 : builds populaires, plus de build calculé
+    assert re.search(outil["input_match"], '{"kind": "tf_popular", "name": "Mage"}')
     judge = g["plan"][1]
-    for words in ("prévu", "builds par niveau", "métiers", "Legacy", "MT1", "LG1"):
+    for words in ("prévu", "Talents Forever", "pas calculé", "métiers", "Legacy", "MT1", "LG1"):
         assert words in judge, words
 
 
@@ -217,8 +150,8 @@ def test_general_and_personal_cases():
         assert no_profile["min"] == 0 and no_profile["max"] == 0
         assert g["hypothese-neutre"][0]["type"] == "llm"
     raid = graders(EVALS / "generale-mage-raid")
-    assert raid["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
-    assert re.search(raid["outil"][0]["input_match"], '{"context": "raid", "level": 60}')
+    assert raid["outil"][0]["tool"] == MCP_PREFIX + "forever_lookup"  # RB1 : builds populaires du Mage
+    assert re.search(raid["outil"][0]["input_match"], '{"kind": "tf_popular", "name": "Mage"}')
     for words in ("hypothèse", "race", "profil"):
         assert words in raid["hypothese-neutre"][1], words
     uncomputed = graders(EVALS / "generale-classe-non-calculee")
@@ -230,32 +163,23 @@ def test_general_and_personal_cases():
         g = graders(EVALS / name)
         assert g["profil"][0] == {"type": "tool_used", "tool": MCP_PREFIX + "forever_player_profile"}
         assert g["profil-actif"][0]["type"] == "llm" and "profil actif" in g["profil-actif"][1]
-        assert re.search(g["outil"][0]["input_match"], '{"level": 23, "race": "Orc"}'), name
-    assert graders(EVALS / "personnelle-mage-donjon")["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
-    assert graders(EVALS / "personnelle-mage-temps")["outil"][0]["tool"] == MCP_PREFIX + "forever_sim_leveling"
+    donjon = graders(EVALS / "personnelle-mage-donjon")["outil"][0]
+    assert donjon["tool"] == MCP_PREFIX + "forever_lookup"  # RB1 : build populaire le plus proche des talents du profil
+    assert re.search(donjon["input_match"], '{"kind": "tf_popular", "name": "Mage", "current": "iceShards=3"}')
+    temps = graders(EVALS / "personnelle-mage-temps")["outil"][0]
+    assert temps["tool"] == MCP_PREFIX + "forever_sim_leveling"
+    assert re.search(temps["input_match"], '{"level": 23, "race": "Orc"}')
 
 
 def test_talents_forever_cases():
-    """FA1 (décision 209) : lien Talents Forever du build calculé, builds populaires d'une autre classe, build proche
-    d'un populaire ; voisin négatif : chaîne d'import de talents de retail."""
-    link = graders(EVALS / "build-lien-talents-forever")
-    assert front(EVALS / "build-lien-talents-forever" / "prompt.md")[0]["tags"] == ["positif", "build"]
-    assert link["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
-    assert re.search(link["outil"][0]["input_match"], '{"context": "leveling", "level": 20}')
-    code = load_fixture("mage_builds.json")["cases"]["leveling-20"]["expected_code"]
-    assert re.search(link["lien"][0]["pattern"], "https://talentsforever.com/" + code)
-    assert "/tf import" in link["import"][0]["pattern"].replace("\\", "")
+    """FA1 (décision 209) : builds populaires d'une classe ; voisin négatif : chaîne d'import de talents de retail.
+    RB1 (décision 299) : plus de lien du build calculé ni de build proche du nôtre (cas retirés)."""
     popular = graders(EVALS / "builds-populaires-voleur")
     assert front(EVALS / "builds-populaires-voleur" / "prompt.md")[0]["tags"] == ["positif", "build"]
     assert popular["outil"][0]["tool"] == MCP_PREFIX + "forever_lookup"
     assert re.search(popular["outil"][0]["input_match"], '{"kind": "tf_popular", "name": "Rogue"}')
     assert re.search(popular["date"][0]["pattern"], "relevé du 2026-10-04")
     assert re.search(popular["certitude"][0]["pattern"], "Certitude : supposé", re.IGNORECASE)
-    close = graders(EVALS / "build-proche-populaire")
-    assert front(EVALS / "build-proche-populaire" / "prompt.md")[0]["tags"] == ["positif", "build"]
-    assert close["outil"][0]["tool"] == MCP_PREFIX + "forever_build"
-    assert re.search(close["outil"][0]["input_match"], '{"context": "dungeon", "level": 20}')
-    assert re.search(close["points"][0]["pattern"], "0 point absent")
     meta, question = front(EVALS / "neg-retail-loadout-talents" / "prompt.md")
     assert meta["tags"] == ["negatif", "wow-autre"] and "retail" in question
 

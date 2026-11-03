@@ -1,12 +1,12 @@
 ---
 name: forever-mage
-description: "Mage de WoW Forever : sorts (dégâts, rangs, coût, temps d'incantation), talents (effet à un rang, prérequis, palier), meilleur build par contexte (leveling, donjon, raid, PvP), rotations Givre, Feu et Arcanes, mécaniques du Mage (Ignite, Hot Streak, Arcane Blast, Winter's Chill, Clearcasting). Déclencher pour « que fait le talent X », « meilleur build Mage », « Givre ou Feu », « combien fait Frostbolt ». Pas pour d'autres classes (non couvertes), ni WoW retail ou WoW Classic hors Forever, ni la programmation."
+description: "Mage de WoW Forever : sorts (dégâts, rangs, coût, temps d'incantation), talents (effet à un rang, prérequis, palier), build du Mage (builds populaires de Talents Forever vérifiés sur le client, wowsims au niveau 60), rotations Givre, Feu et Arcanes, mécaniques du Mage (Ignite, Hot Streak, Arcane Blast, Winter's Chill, Clearcasting). Déclencher pour « que fait le talent X », « meilleur build Mage », « Givre ou Feu », « combien fait Frostbolt ». Pas pour d'autres classes (non couvertes), ni WoW retail ou WoW Classic hors Forever, ni la programmation."
 ---
 
 # Mage (WoW Forever)
 
 Race et niveau du joueur : `forever_player_profile` (section « Données du joueur » de `format-reponse.md`) ;
-comparer deux builds : section « Comparer deux options ».
+comparer deux options : section « Comparer deux options ».
 
 Lis d'abord `../forever-router/format-reponse.md` : section « Plugin mal installé » (outils forever introuvables :
 message fixe, rien de mémoire), forme de la réponse, règle « je ne sais pas ». Aucun chiffre de mémoire : tout vient
@@ -33,27 +33,19 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 - Certitude `probable` : valeurs lues sur un build antérieur du client (hypothèse de la provenance), à dire.
 
 ## Builds
-- `forever_build(context, level, race, current, respecs)` ; `context` : `leveling`, `dungeon`, `raid`, `pvp-bg` ou
-  `pvp-world`.
-- Réponse courte : talents conseillés et rotation (`choices`), puis l'écart avec l'alternative la plus proche
-  (`alternative`) si le joueur hésite entre deux builds.
-- Donne toujours `certainty` et `verifiable_in_game` ; au-delà du plafond de la bêta, le build n'est pas vérifiable
-  en jeu.
-- Moteur du Mage **gelé** (révision 7 de 1.60.1.70450, décision 294) : il répond sous le 60 et le dit. Donjon et
-  raid : scénarios provisoires, mana des combats longs non modélisée : écris-le en « Attention ». Au niveau 60, le
-  calcul de référence est wowsims/forever (`forever_simulate`, skill `forever-builds`).
-- PvP : le build sort de `forever_build` ; classes adverses, contrôles et affrontements : skill `forever-pvp` ;
-  profil PvP du Mage avec rendements décroissants et bijou : tranche PV2.
-- `sensitivity` et `stability` : seulement si le joueur demande le détail ou si une hypothèse retourne le choix.
-- Preset `complet` ou comparaison de plusieurs contextes : sous-agent `forever-sim-runner`.
-- Lien Talents Forever (bloc `export.talents_forever` de `forever_build`) : si `status` vaut `ok`, recopie tels quels
-  `code`, `link` et `import` (commande `/tf import <code>` à coller en jeu) ; ne recompose jamais un code. Sinon
-  dis la raison (`reason` : addon absent, export bloqué, format non pris en charge), jamais un code deviné. Cite
-  `order_note` quand l'ordre n'est pas compris, la certitude du bloc (`probable` : pas encore relu en jeu) et la
-  version de l'addon (`provenance.version`).
-- Build populaire le plus proche (`export.talents_forever.closest_popular`) : rang, spécialisation, points du nôtre
-  absents du sien (`missing_points`), points à ajouter, écart total, lien et date `asOf` ; certitude supposé
-  (choix de joueurs).
+- Le build du Mage n'est plus calculé (décision 299) : comme pour les autres classes, il vient des builds populaires
+  de Talents Forever, vérifiés sur les données du client ; détail dans le skill `forever-builds`.
+- `forever_lookup(kind="tf_popular", name="Mage")` : builds par spécialisation, lien, `import` et légalité ; talents
+  actuels connus (profil, contexte du jeu) : ajoute `current=<clé=rang,…>` et donne `closest` tel quel. Certitude
+  supposé (choix de joueurs), date `asOf` citée.
+- Contrôle : `forever_lookup(kind="build_check", name="Mage", level, talents)` ; guide de Forever Companion :
+  `forever_lookup(kind="class_guide", name="Mage", level)`.
+- Ordre des talents, prochain talent, respec, « meilleur build » par contexte (leveling, donjon, raid, PvP) : plus
+  calculés ; dis-le. Les builds populaires ne sont pas classés par contexte ; l'ordre de prise du code Naowh est
+  généré par palier et prérequis, pas optimisé.
+- Givre ou Feu, meilleure race au niveau 60 : `forever_simulate` (wowsims/forever, skill `forever-builds`). Sous le
+  60 : temps par monstre et XP/h par rotation avec `forever_sim_leveling` (moteur gelé, skill `forever-leveling`).
+- PvP : classes adverses, contrôles et affrontements : skill `forever-pvp`.
 
 ## Mécaniques
 - `forever_explain_mechanic(mechanic_id=<identifiant ou mots de la description>)` : description, statut, formule

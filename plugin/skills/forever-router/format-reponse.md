@@ -9,15 +9,15 @@ sensibilité) seulement si l'utilisateur le demande (« détaille », « pourquo
    `range_yd` : portée du jeu, que le client français écrit « m ») et l'outil entre parenthèses. Arrondis permis,
    jamais d'estimation. **Aucun calcul** : ni somme (points dépensés par arbre), ni produit (effet au maximum des
    cumuls), ni formule du registre appliquée à la main, ni moyenne de deux valeurs. Les totaux sont dans les
-   résultats : `points` (par arbre, total, disponibles, non dépensés) et `points_total` de chaque étape de `order` de
-   `forever_build`, `derived` (valeur de chaque cumul et au maximum) de `forever_explain_mechanic` et
+   résultats : points et erreurs de `build_check`, `missing_points` de `closest` (`tf_popular`),
+   `derived` (valeur de chaque cumul et au maximum) de `forever_explain_mechanic` et
    `forever_lookup`, `monte_carlo_stats` de `forever_sim_leveling`, `advantage` de chaque écart. Cite chaque valeur
    telle que l'outil la rend (un écart négatif se dit en mots : « de moins »). Si la question demande une valeur que
    l'outil ne rend pas, dis-le et donne la formule et ses paramètres tels quels.
-3. **Certitude** : `provenance.certainty` traduite (certain, probable, supposé) ; pour un build, le champ `certainty`
-   du rapport et `verifiable_in_game` (au-delà du plafond de la bêta, il n'est pas vérifiable avant la sortie).
+3. **Certitude** : `provenance.certainty` traduite (certain, probable, supposé) ; un build populaire ou de la
+   communauté est un choix de joueurs : au mieux supposé.
 4. **Hypothèses** : les plus importantes de `provenance.assumptions` (une ligne ; toutes sur demande).
-5. **Angles morts** : `blind_spots` de `forever_build` ; statut du registre (`forever_explain_mechanic`) quand une
+5. **Angles morts** : ce que l'outil dit ne pas modéliser ; statut du registre (`forever_explain_mechanic`) quand une
    mécanique décide de la réponse (statut `absent` : non modélisée).
 6. **Provenance** : version du jeu, fraîcheur, date du résultat.
 
@@ -45,11 +45,10 @@ Décide d'abord de quel type est la question.
 - **Générale** : elle porte sur une classe, un niveau ou un contexte sans personnage (« l'arbre optimal du Mage en
   raid », « un Mage niveau N », « le meilleur build Paladin »). N'appelle pas `forever_player_profile` et ne demande
   rien : calcule avec une hypothèse neutre annoncée en tête de réponse (« Hypothèse : … » : chaque champ de `inputs`
-  dont `origin` vaut `default`). Sans niveau dans la question, n'en passe aucun : `forever_build` prend le niveau
-  maximal des données (`inputs.level`) ; n'écris jamais toi-même ce niveau. Ne présente jamais ce résultat
-  comme celui du joueur. Montre si une donnée personnelle change le résultat : pour un build, un second appel avec une
-  race de l'autre faction (même contexte, même niveau ; l'erreur de l'outil liste les races acceptées) et une ligne
-  « la race change / ne change pas le build » ; plus de deux races ou de contextes : sous-agent `forever-sim-runner`.
+  dont `origin` vaut `default`). Sans niveau dans la question, n'en passe aucun et n'en écris jamais un toi-même.
+  Ne présente jamais ce résultat comme celui du joueur. Un build populaire ne dépend pas de la race ; au niveau 60,
+  la race compte pour les dégâts (`forever_simulate`) : ne la suppose pas, dis qu'elle n'est pas comparée et propose
+  la comparaison (`action="races"`) si le joueur donne la sienne.
 - Ni l'un ni l'autre écrit (« au niveau N en Givre, combien de temps par monstre ? », « faut-il respec ? ») : le
   joueur parle de son jeu, traite la question comme personnelle. Elle n'est générale que si elle vise une classe ou
   un personnage quelconque (« le Mage », « un Mage », « du Paladin »).
@@ -69,8 +68,8 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
   le calcul, en une question courte, avec la valeur la plus probable proposée (celle de la conversation ou du
   profil), et la commande pour l'enregistrer : `forever profile set <nom> --race … --level … --talents "clé=rang,…"`.
 - La question prime sur le profil : un niveau écrit dans la question remplace celui du profil ; les talents du
-  profil ne valent qu'au niveau du profil. Question posée à un autre niveau (« au niveau 30… ») : pour un build
-  conseillé, calcul pour ce niveau avec la race et la faction du profil, présenté comme tel (« build conseillé, pas
+  profil ne valent qu'au niveau du profil. Question posée à un autre niveau (« au niveau 30… ») : builds populaires
+  et guide de la classe à ce niveau (`build_check`, `class_guide`), présentés comme tels (« build de joueurs, pas
   le tien »), sans redemander les talents.
 
 - Le joueur donne en conversation une donnée qui diffère du profil (« j'ai … », « je suis passé niveau … ») : utilise
@@ -79,40 +78,36 @@ Race, faction, niveau, talents actuels et métiers sont des données personnelle
   `forever profile set <nom> --class … --race … --faction … --planned` (`--created` une fois créé).
 - Jamais de défaut muet : un résultat dont `inputs.<champ>.origin` vaut `default` pour une donnée personnelle ne se
   présente pas comme la réponse du joueur ; redemande la donnée ou dis que le calcul suppose ce défaut.
-- Ne compte jamais toi-même les points du joueur ni ceux d'un niveau : `points.available` et `points_total` de
-  `forever_build` les donnent.
+- Ne compte jamais toi-même les points du joueur ni ceux d'un niveau : `build_check` les contrôle et dit l'erreur.
 - Une réponse qui se limite à demander une donnée finit elle aussi par le pied de réponse (provenance de
   `forever_player_profile`).
 - Classe pas encore calculée : section « Classe pas encore calculée » du routeur.
 
 ## Planification
-- Respec ou prochain talent à un niveau plus haut que celui du profil (« respec au niveau 32 » avec un profil au
-  niveau 23) : question de planification. Passe les talents du profil comme `current` à
-  `forever_build(context="leveling", level=<niveau de la question>, …)` : le bloc `respec.projected` donne le chemin
-  de leveling conseillé depuis ce build jusqu'au niveau demandé (`steps`, `talents`, `points`) et le bloc `respec`
-  le conseil (verdict, niveau, coût, gain). Dis que le chemin est projeté depuis le build du profil. Ne demande le
-  build que si le profil n'en contient aucun.
+- Respec, prochain talent ou ordre des talents, à ce niveau ou à un autre : plus calculés (décision 299). Dis-le en
+  une ligne, puis donne le build populaire le plus proche des talents du profil (`tf_popular` avec `current` :
+  `closest`, ses points absents) et son contrôle au niveau demandé (`build_check`). L'ordre de prise du code Naowh
+  est généré par palier et prérequis, pas optimisé. Ne demande le build que si le profil n'en contient aucun.
 - Question qui contredit le profil (« tous mes points en Feu » avec un build Givre au profil) : ce que dit la
   question l'emporte. Signale l'écart avec le profil et propose sa mise à jour (`forever profile set`, règle du
-  « j'ai … ») ; ne calcule jamais depuis le build du profil. Puis, au choix : demande les rangs exacts du build
-  décrit, ou suppose le build conseillé de ce type au niveau demandé (`forever_build`), annoncé en tête comme une
-  hypothèse (« build Feu conseillé supposé, pas le tien »), et donne le conseil qui en découle. Build donné avec ses
-  talents et rangs : utilise-le tel quel.
+  « j'ai … ») ; ne pars jamais du build du profil. Puis demande les rangs exacts du build décrit, ou donne les builds
+  populaires de cette spécialisation, présentés comme des choix de joueurs. Build donné avec ses talents et rangs :
+  utilise-le tel quel.
 - Personnage prévu (`planned` vrai : pas encore créé) : ni niveau ni talents à demander. Prépare son plan : builds
-  par niveau calculés par `forever_build` avec sa race (classe à moteur ; plusieurs niveaux ou contextes : sous-agent
-  `forever-sim-runner`), sinon builds de la communauté (section « Classe pas encore calculée » du routeur) ; métiers
-  envisagés rappelés, répartition et plan de montée non calculés (MT1) ; Legacy non calculé (LG1).
+  populaires de Talents Forever et guide de Forever Companion de sa classe (section « Classe pas encore calculée » du
+  routeur) ; au niveau 60, `forever_simulate` avec sa race ; métiers envisagés rappelés, répartition et plan de
+  montée non calculés (MT1) ; Legacy non calculé (LG1).
 
 ## Comparer deux options
 - Compare à mesure égale : un Monte Carlo contre un Monte Carlo (mêmes combats), jamais un Monte Carlo contre un
   analytique.
-- Entre deux builds ou deux talents : l'écart apparié rendu par `forever_build` (`alternative.gap`, `gap` des étapes
-  de `order`, `next_step`), ou deux `monte_carlo_stats` avec leur intervalle.
+- Entre deux rotations ou deux jeux de talents du Mage sous le 60 : deux `monte_carlo_stats` de
+  `forever_sim_leveling` (même graine) avec leur intervalle ; au 60 : `forever_simulate` (`compare`). Aucun build
+  n'est cherché ni classé par le projet.
 - Intervalle qui contient zéro (`significant` faux) : dis « choix non départagé par le calcul », sans désigner de
   meilleur.
-- À égalité, un talent modélisé passe devant un non modélisé ; ne recommande jamais un talent non modélisé à la place
-  d'un modélisé. Seule exception : `decided_by` vaut `passage_palier` (point de passage vers un palier, effet non
-  modélisé), à dire comme tel. Talent non modélisé : `modeled` faux, ou angle mort `absent` du registre.
+- Talent non modélisé par le moteur gelé (angle mort `absent` du registre) : son effet manque à la comparaison,
+  dis-le ; ne le présente jamais comme sans effet.
 
 ## Plugin mal installé
 Avant tout, vérifie que les outils `mcp__plugin_forever_forever__…` existent (`ToolSearch`). Introuvables, ou

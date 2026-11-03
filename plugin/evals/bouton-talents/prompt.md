@@ -1,5 +1,5 @@
 ---
-description: "talent, bouton Talents de la fenêtre du jeu (contexte réel de la sonde F), prochain point au niveau suivant"
+description: "talent, bouton Talents de la fenêtre du jeu (contexte réel de la sonde F), build populaire de Talents Forever le plus proche, comme les autres classes (RB1)"
 tags: [positif, talent]
 max_turns: 20
 timeout_seconds: 900
@@ -18,17 +18,16 @@ map=1413
 talents=105778:5,105779:5
 gear=3:1769:Canvas Shoulderpads;4:5107:Deckhand's Shirt;5:2582:Green Woolen Vest;6:253885:Novice Arcanist's Sash;7:3309:Barbaric Loincloth;8:14364:Mystic's Slippers;9:15452:Featherbead Bracers;10:10637:Brewer's Gloves;11:281268:Depleted Ritual Band;12:5351:Bounty Hunter's Ring;15:2580:Reinforced Linen Cape;16:15444:Staff of Orgrimmar;18:11288:Greater Magic Wand
 client=1.60.1.70291
-Talents actuels (clés de forever, pour `current` de forever_build) : elementalPrecision:5 (Elemental Precision 5/5), improvedFrostbolt:5 (Improved Frostbolt 5/5)
+Talents actuels (clés de forever, pour `current` de tf_popular) : elementalPrecision:5 (Elemental Precision 5/5), improvedFrostbolt:5 (Improved Frostbolt 5/5)
 Équipement (noms du client ; objets pas encore reliés aux données de forever, comparaison d'objets à venir) : Canvas Shoulderpads, Deckhand's Shirt, Green Woolen Vest, Novice Arcanist's Sash, Barbaric Loincloth, Mystic's Slippers, Featherbead Bracers, Brewer's Gloves, Depleted Ritual Band, Bounty Hunter's Ring, Reinforced Linen Cape, Staff of Orgrimmar, Greater Magic Wand
 
 Consigne du bouton « talents » : appelle exactement, dans cet ordre :
-- forever_build {"context": "leveling", "level": 20, "race": "Orc", "current": {"elementalPrecision": 5, "improvedFrostbolt": 5}, "sensitivity": false}
+- forever_lookup {"kind": "tf_popular", "name": "Mage", "current": "elementalPrecision=5,improvedFrostbolt=5"}
+- forever_lookup {"kind": "build_check", "name": "Mage", "level": 19, "talents": "elementalPrecision=5,improvedFrostbolt=5"}
+- forever_lookup {"kind": "class_guide", "name": "Mage", "level": 19}
 Puis :
-- Prochain point, en premier : le talent du premier pas de `respec.projected.steps` et son niveau (un pas à un niveau inférieur ou égal à 19 est un point à placer dès maintenant).
-- Égalité : si `next_step.decided_by` vaut `non_departage` ou `modelise`, dis que le choix est à égalité statistique (non départagé par le calcul) et nomme `next_step.runner_up` et les autres candidats dont l'écart (`next_step.candidates[].gap.significant`) n'est pas significatif.
-- Lien Talents Forever : celui de `respec.projected.export` (build actuel plus ce point), tel quel.
-- Build, en complément, après le prochain point : le chemin part de ton niveau et de ton build actuels (temps cumulé, décision 220). Respec : si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, dis que le build d'une respec (`respec.versus_optimal.optimal_rotation`) n'apporte aucun gain mesurable et que tu gardes ton build ; si `stability.stable` est faux, ajoute que le build retenu est instable (il change avec la graine). Si `respec.versus_optimal.current_better` est vrai, dis que ton build actuel est meilleur que le build d'une respec et que tu le gardes. Sinon, donne l'écart (`respec.versus_optimal`) et le conseil de respec (`respec.verdict`).
-- Code Naowh du build (`export.naowh` ou `respec.projected.export.naowh` s'il y est) tel quel, à coller dans Naowh Forever, Training, Builds, Import, pour suivre l'ordre de prise « Level by level ».
+- Donne `closest` tel quel (spécialisation, lien, commande `/tf import`, points absents `missing_points`, écarts `differences`), avec sa date (`asOf`) et sa certitude ; n'en choisis pas un autre.
+- Guide de Forever Companion (`class_guide`), pour la spécialisation du build retenu ci-dessus : son build `pick` (nom ; légal à son niveau ou non) et les builds écartés avec leur raison (`set_aside`), puis la rotation telle quelle (`rotation.single`, puis `rotation.aoe`), en disant qu'elle vient de Forever Companion, qu'elle est écrite pour le niveau 30 et qu'aucun ordre de prise n'est calculé ; si `freshness.status` n'est pas « à jour », dis « calcul en cours de mise à jour » avec sa raison. Forever Companion absent : ne dis rien de plus.
 
 Question posée par le bouton « talents » de la fenêtre :
-Quel est mon prochain talent, avec le lien Talents Forever ?
+Quel build populaire de Talents Forever est le plus proche de mes talents actuels ? Donne son lien Talents Forever.

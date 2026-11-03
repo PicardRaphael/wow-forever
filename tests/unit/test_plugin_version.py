@@ -65,7 +65,9 @@ def test_plugin_json_has_a_semver_version():
     # 0.20.0 : routeur à l'état réel (leveling de toutes les classes, wowsims au 60, moteur du Mage gelé, SIM2 et CM1).
     # 0.20.1 : race de forever_simulate demandée au joueur, jamais celle d'un préréglage ; préréglage sans équipement
     # refusé (demande du 2026-10-22).
-    assert version == "0.20.1"
+    # 0.21.0 : recherche de build du Mage retirée (forever_build, ordre de talents, respec) : builds populaires de
+    # Talents Forever, build_check, class_guide, wowsims au 60 ; évaluations du build calculé retirées (RB1, décision 299).
+    assert version == "0.21.0"
 
 
 def test_fingerprint_is_up_to_date():

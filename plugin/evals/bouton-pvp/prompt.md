@@ -21,7 +21,7 @@ target=SHAMAN
 target_level=21
 target_race=Tauren
 client=1.60.1.70291
-Talents actuels (clés de forever, pour `current` de forever_build) : elementalPrecision:5 (Elemental Precision 5/5), improvedFrostbolt:5 (Improved Frostbolt 5/5)
+Talents actuels (clés de forever, pour `current` de tf_popular) : elementalPrecision:5 (Elemental Precision 5/5), improvedFrostbolt:5 (Improved Frostbolt 5/5)
 Cible (joueur) : Shaman, niveau 21, race Tauren
 Équipement (noms du client ; objets pas encore reliés aux données de forever, comparaison d'objets à venir) : Canvas Shoulderpads, Deckhand's Shirt, Green Woolen Vest, Novice Arcanist's Sash, Barbaric Loincloth, Mystic's Slippers, Featherbead Bracers, Brewer's Gloves, Depleted Ritual Band, Bounty Hunter's Ring, Reinforced Linen Cape, Staff of Orgrimmar, Greater Magic Wand
 

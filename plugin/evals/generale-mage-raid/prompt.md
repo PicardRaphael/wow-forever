@@ -1,5 +1,5 @@
 ---
-description: "question générale : rien demandé, hypothèse neutre annoncée, profil non lu"
+description: "question générale : rien demandé, hypothèse neutre annoncée, profil non lu ; build du Mage tiré des builds populaires de Talents Forever (RB1)"
 tags: [positif, generale]
 max_turns: 20
 timeout_seconds: 900

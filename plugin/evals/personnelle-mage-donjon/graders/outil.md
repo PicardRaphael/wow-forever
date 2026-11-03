@@ -1,5 +1,5 @@
 ---
 type: tool_used
-tool: mcp__plugin_forever_forever__forever_build
-input_match: '"level"\s*:\s*23'
+tool: mcp__plugin_forever_forever__forever_lookup
+input_match: '"kind"\s*:\s*"tf_popular".*"current"|"current".*"kind"\s*:\s*"tf_popular"'
 ---

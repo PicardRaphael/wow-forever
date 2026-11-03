@@ -1,6 +1,6 @@
 ---
 name: forever-builds
-description: "Builds de talents de WoW Forever pour les 9 classes : build calculé du Mage par contexte, builds populaires de Talents Forever et builds de la communauté pour les autres classes (Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide) vérifiés sur les données du client (légalité, paliers, prérequis, effet des talents), lien Talents Forever du build calculé. Déclencher pour « meilleur build Paladin », « ce build de Voleur est-il légal », « que fait ce talent de Druide ». Pas pour WoW retail ni WoW Classic hors Forever, ni la programmation."
+description: "Builds de talents de WoW Forever pour les 9 classes (Mage, Paladin, Démoniste, Prêtre, Chasseur, Chaman, Guerrier, Voleur, Druide) : builds populaires de Talents Forever et builds de la communauté vérifiés sur les données du client (légalité, paliers, prérequis, effet des talents), build le plus proche de mes talents, lien Talents Forever et code Naowh. Déclencher pour « meilleur build Paladin », « ce build de Voleur est-il légal », « que fait ce talent de Druide ». Pas pour WoW retail ni WoW Classic hors Forever, ni la programmation."
 ---
 
 # Builds (WoW Forever, 9 classes)
@@ -15,24 +15,13 @@ chaque sort, talent, capacité, objet et zone **tel qu'il apparaît dans son cli
 nom français entre parenthèses quand l'outil le rend (`name_fr`, `name.fr`) ; le reste de la réponse reste en
 français. Sans `game_locale` connue, cite le nom anglais du client et le nom français entre parenthèses.
 
-## Mage : build calculé
-- `forever_build(context, level, race, current, respecs)` : skill `forever-mage` pour le détail.
-- Lien Talents Forever (bloc `export.talents_forever` de `forever_build`) : si `status` vaut `ok`, recopie tels quels
-  `code`, `link` et `import` (commande `/tf import <code>` à coller en jeu) ; ne recompose jamais un code. Sinon
-  dis la raison (`reason` : addon absent, export bloqué, format non pris en charge), jamais un code deviné. Cite
-  `order_note` quand l'ordre n'est pas compris, la certitude du bloc (`probable` : pas encore relu en jeu) et la
-  version de l'addon (`provenance.version`).
-- Code Naowh Forever du même build (bloc `export.naowh` de `forever_build`, EX1) : si `status` vaut `ok` ou
-  `ordre_genere`, recopie tel quel `code` (chaîne `!NFB1!`) et `import` (en jeu : `/nf`, Profiles, Import) à côté du
-  lien Talents Forever ; cite `order_note` quand l'ordre est généré (légal à chaque prise, pas un ordre de leveling)
-  et la certitude du bloc (`probable` : jamais importé en jeu) ; `bloque` : dis la raison, jamais un code deviné.
-- Build populaire le plus proche (`export.talents_forever.closest_popular`) : rang, spécialisation, points du nôtre
-  absents du sien (`missing_points`), points à ajouter, écart total, lien et date `asOf` ; certitude supposé
-  (choix de joueurs).
-
-## Autres classes : builds de la communauté vérifiés
-- Au niveau 60, `forever_simulate` (wowsims/forever) calcule leurs dégâts, races et poids ; sous le 60, aucun calcul
-  chiffré (tranche SIM2, le Chaman d'abord : CM1) : dis-le, certitude au mieux supposé pour le choix du build.
+## Toutes les classes, Mage compris : builds de la communauté vérifiés
+- Le build du Mage n'est plus calculé (décision 299) : il suit le même chemin que les autres classes. Ordre des
+  talents, prochain talent ou respec demandés : dis que ce n'est plus calculé (choix de joueurs de Talents Forever ;
+  ordre de prise généré par palier et prérequis, pas optimisé), puis donne `closest`.
+- Au niveau 60, `forever_simulate` (wowsims/forever) calcule les dégâts, races et poids de toutes les classes ; sous
+  le 60, aucun calcul chiffré du build (tranche SIM2, le Chaman d'abord : CM1 ; Mage : temps par monstre et XP/h du
+  moteur gelé seulement, skill `forever-leveling`) : dis-le, certitude au mieux supposé pour le choix du build.
 - Question personnelle : `forever_player_profile` d'abord (classe, niveau, talents du profil) ; question générale :
   rien à demander, hypothèse neutre annoncée.
 - Chaque build populaire et chaque contrôle `build_check` légal portent aussi `naowh` (code `!NFB1!`, ordre
@@ -40,7 +29,7 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 - Macros de la classe ou profil EllesmereUI demandés : `forever_lookup(kind="export", name="naowh_macros")` (avec
   `class_name`, `level`) ou `name="ellesmere"` (avec `character`, `realm`, `class_name`, `level`, `role`) ; recopie
   `code` et `import` tels quels, certitude supposé (choix de catalogue).
-- Classe autre que le Mage (plan « Sources d'abord ») : `forever_lookup(kind="class_guide", name=<classe>,
+- Guide de la classe (plan « Sources d'abord ») : `forever_lookup(kind="class_guide", name=<classe>,
   level=<niveau>)` rend le guide de Forever Companion : par spécialisation, le build adapté au niveau (`pick`, légal à
   son niveau ou non), les builds écartés avec leur raison (`set_aside`) et la rotation en prose (`rotation.single`,
   `rotation.aoe`, écrite pour le niveau 30) ; dis que l'ordre de prise n'est pas calculé ; `freshness.status` autre que
@@ -60,9 +49,10 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   talents=<clé=rang,…>)` rend légal ou la liste des erreurs (paliers, prérequis, rangs, points au niveau) et la
   description des talents du client. Un build illégal se dit tel, avec les erreurs de l'outil.
 - Effet d'un talent : `forever_lookup(kind="talent", name=<nom anglais ou clé>, class_name=<classe>)` : arbre,
-  palier, prérequis, description du client (valeurs par rang non décodées pour ces classes : dis-le).
+  palier, prérequis, description du client (valeurs par rang non décodées hors du Mage : dis-le ; talent du Mage :
+  skill `forever-mage`).
 - Palier communautaire (probable) ou légalité non décidable (nœud hors grille) : répète ce que dit l'outil.
 
 ## Hors de ce skill
 - PvP d'une classe (contrôles, défensifs, affrontement) : skill `forever-pvp`.
-- Dégâts, rotations et leveling des autres classes : « je ne sais pas » + tranche de la classe.
+- Dégâts, rotations et leveling sous le 60 des classes autres que le Mage : « je ne sais pas » + tranche SIM2.

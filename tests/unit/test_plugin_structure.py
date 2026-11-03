@@ -297,7 +297,7 @@ def test_sim_runner_tools_are_forever_tools(tool_names):
     tools = {t.strip() for t in meta["tools"].split(",")}
     assert tools and all(t.startswith(MCP_PREFIX) for t in tools)
     assert {t.removeprefix(MCP_PREFIX) for t in tools} <= tool_names
-    assert "forever_build" in {t.removeprefix(MCP_PREFIX) for t in tools}
+    assert "forever_sim_leveling" in {t.removeprefix(MCP_PREFIX) for t in tools}  # RB1 : plus de forever_build
 
 
 def test_tools_cited_by_the_plugin_exist(tool_names):
@@ -361,8 +361,9 @@ def test_pvp_skill_states_no_live_cooldown_tracking():
 
 def test_builds_skill_checks_community_builds():
     _, body = frontmatter(PLUGIN / "skills" / "forever-builds" / "SKILL.md")
-    for word in ("forever_build", "forever-web-researcher", 'kind="build_check"', "légal"):
+    for word in ('kind="tf_popular"', "forever-web-researcher", 'kind="build_check"', "légal"):
         assert word in body, word
+    assert "forever_build" not in body  # RB1 (décision 299) : le Mage suit le chemin des autres classes
 
 
 def test_ch0_is_covered_and_the_pet_choice_waits_for_sim2():

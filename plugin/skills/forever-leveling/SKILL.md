@@ -1,6 +1,6 @@
 ---
 name: forever-leveling
-description: "Leveling du Mage dans WoW Forever : temps pour tuer un monstre, XP par heure (XP/h), repos et mana à un niveau, ordre des talents pendant la montée de niveau, faut-il respec et à quel niveau, quelle zone ou quel donjon faire à mon niveau. Déclencher pour « je suis niveau N », « combien de temps par monstre », « XP/h », « quel talent au prochain niveau », « respec », « où aller à mon niveau ». Pas pour WoW retail ni WoW Classic hors Forever, ni pour la programmation."
+description: "Leveling du Mage dans WoW Forever : temps pour tuer un monstre, XP par heure (XP/h), repos et mana à un niveau, build populaire de Talents Forever le plus proche de mes talents (ordre des talents et respec : plus calculés, dit tel quel), quelle zone ou quel donjon faire à mon niveau. Déclencher pour « je suis niveau N », « combien de temps par monstre », « XP/h », « quel talent au prochain niveau », « respec », « où aller à mon niveau ». Pas pour WoW retail ni WoW Classic hors Forever, ni pour la programmation."
 ---
 
 # Leveling du Mage (WoW Forever)
@@ -24,10 +24,9 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 - **Niveau** : obligatoire.
 - **Race**, **faction**, **build actuel** : lus dans le profil ou la question ; absents des deux, demande-les avant
   l'appel (jamais la race par défaut de l'outil sans le dire : `inputs.race.origin`).
-- **Respec ou prochain talent à un niveau plus haut que celui du profil** : planification (section du même nom
-  de `format-reponse.md`) : talents du profil en `current`, chemin projeté `respec.projected` ; le build n'est
-  demandé que si le profil n'en a aucun. Question qui contredit le profil (« tout en Feu ») : elle l'emporte ;
-  écart signalé, mise à jour proposée, puis rangs exacts demandés ou build conseillé de ce type supposé et annoncé.
+- **Talents actuels** : ceux du profil (ou du contexte du jeu) en `current` de `tf_popular` ; jamais redemandés
+  s'ils y sont. Question qui contredit le profil (« tout en Feu ») : elle l'emporte ; écart signalé, mise à jour
+  proposée, puis rangs exacts demandés.
 - Build actuel donné en clair (« j'ai Improved Frostbolt au max ») : traduis en clés de talent avec
   `forever_lookup(kind="talent", name=…)` (la clé est le champ `id`).
 
@@ -35,10 +34,8 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 | Question | Appel |
 |---|---|
 | Temps par monstre, XP/h, repos, dégâts subis | `forever_sim_leveling(level, race, rotation, talents)` : champs `monte_carlo` et `analytic` (`combat`, `downtime`, `total`, `xp_h`) et `mob_hp` |
-| Quel talent prendre au niveau N depuis mon build | `forever_build(context="leveling", level=N, race, current=<build actuel du niveau précédent>)` : bloc `next_step` (`choice`, `decided_by`, `candidates` avec écart et intervalle) |
-| Ordre des talents depuis le premier niveau de talent | `forever_build(context="leveling", level, race)` : `talents`, `order` (avec `decided_by`), `reasons` |
-| Suivre cet ordre en jeu avec Talents Forever | même appel : bloc `export.talents_forever` (`link`, `import` : `/tf import <code>`, ordre compris), recopié tel quel |
-| Faut-il respec, à quel niveau | `forever_build(context="leveling", level, current=<build actuel>, respecs=<nombre déjà fait>)` : bloc `respec` |
+| Build à suivre, le plus proche de mes talents | `forever_lookup(kind="tf_popular", name="Mage", current=<clé=rang,…>)` : `closest` (lien, `import`, `missing_points`, `differences`, `asOf`), puis `forever_lookup(kind="build_check", name="Mage", level, talents)` ; guide : `forever_lookup(kind="class_guide", name="Mage", level)` (skill `forever-builds`) |
+| Quel talent prendre au niveau N, ordre des talents, faut-il respec | plus calculés (décision 299) : dis-le, puis donne `closest` et ses points absents (`missing_points`) ; l'ordre de prise du code Naowh (`naowh`) est généré par palier et prérequis, pas optimisé |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` |
 | Où gagner le plus d'XP par heure, faut-il faire tel donjon (toutes les classes) | `forever_sim_leveling(kind="objectives", level, class_name, faction)` : `advice` rendu tel quel, `best`, `zones`, `dungeons` (`first_pass` avec ses quêtes, `repeat`), `kill_time.source` (`engine`, `measured`, `estimated`) |
 | Bonus d'XP : sac de couchage, nourriture nutritive, repos, perk Legacy, tente ; lequel prendre maintenant | `forever_sim_leveling(kind="objectives", level, class_name, faction, rested, food, sleeping_bag, legacy_rested_rank, auras, has_sleeping_bag)` : `xp_h`, `xp_h_rested`, `xp_h_sleeping_bag`, `xp_h_all` par objectif, `bonuses.active`, `bonuses.advice`, `bonus_advice` et `sleeping_bag_chain.sentence` rendus tels quels ; catalogue : `forever_lookup(kind="xp_bonuses")` (bonus sans source joueur : listés, jamais appliqués) |
@@ -46,33 +43,25 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 | Quêtes de Forever (nouvelles, retouchées, écarts entre addons) | `forever_lookup(kind="quests", level, faction, zone, status, dungeon)` |
 | Pourquoi ce résultat (mécanique) | `forever_explain_mechanic(mechanic_id=<identifiant ou mots>)` |
 
-- `rotation` : `frost`, `fire` ou `arcane`. Sans préférence du joueur, prends la rotation du build conseillé par
-  `forever_build` (bloc `choices`).
-- `talents` de `forever_sim_leveling` : dictionnaire clé → rang, par exemple le champ `talents` d'un rapport de
-  `forever_build`.
-- Comparer plusieurs niveaux, rotations ou builds, ou demander le preset `complet` : confie le calcul au sous-agent
-  `forever-sim-runner` et reprends son résumé.
+- `rotation` : `frost`, `fire` ou `arcane`. Sans préférence du joueur, prends celle de la spécialisation de ses
+  talents (ou de `closest`) et dis-le.
+- `talents` de `forever_sim_leveling` : dictionnaire clé → rang, les talents du joueur (profil ou contexte du jeu).
+- Comparer plusieurs niveaux, rotations ou jeux de talents, ou demander le preset `complet` : confie le calcul au
+  sous-agent `forever-sim-runner` et reprends son résumé.
 - `forever_lookup(kind="zones")` lit le livre de quêtes des sources Forever (addons du joueur, décision 294 ; plus
   la base Classic Era de Questie), filtré par camp, classe et niveau ; certitude `suppose` ; addons introuvables :
   dis comment régler `FOREVER_WOW_DIR`.
 
 ## Lire les résultats
-- **Prochain talent** (`next_step`) : donne `choice` et sa raison (`decided_by` : `monte_carlo`, écart significatif ;
-  `modelise`, égalité départagée en faveur du talent modélisé ; `non_departage`, choix non départagé par le calcul :
-  cite les candidats à égalité). Pas de `current` : `next_step` est vide, demande le build actuel.
-- **Prochain point quand tous les points sont placés** (« je suis niveau N », build actuel complet) : le prochain
-  point arrive au niveau N+1 ; appelle `forever_build` au niveau N+1 avec `current` = le build actuel, jamais au
-  niveau N (`next_step` y est vide). Donne d'abord le talent du premier pas de `respec.projected.steps`, l'égalité
-  de `next_step` s'il y en a une, le lien `respec.projected.export`, et le conseil de respec seulement en complément.
+- **Prochain talent, ordre, respec** : plus de calcul (pas de `next_step` : ne l'invente pas). Dis que ce n'est plus
+  calculé, que les builds sont des choix de joueurs de Talents Forever, puis donne `closest` tel quel (n'en choisis
+  pas un autre) et ses points absents ; `closest` vide (aucun point placé) : le build le plus joué (rang 1).
 - **Monte Carlo** et **analytique** : donne le Monte Carlo ; si `analytic_gap` est grand, signale l'écart.
 - **PV du monstre** (`mob_hp`) : sa source et sa certitude comptent ; une valeur `suppose` fait baisser la certitude
   de la réponse.
-- **Respec** : donne le conseil du bloc `respec` (coût, gain, niveau conseillé), sans le recalculer ; chemin
-  projeté depuis le build actuel : `respec.projected` (`steps` : talent de chaque niveau ; `talents` et `points` au
-  niveau demandé).
-- **Angles morts** : `blind_spots` du rapport de build ; moteur du Mage gelé sous le 60 (révision 7 de 1.60.1.70450),
-  à dire quand une question porte sur une valeur changée depuis.
+- **Angles morts** : statut du registre des mécaniques qui décident ; moteur du Mage gelé sous le 60 (révision 7 de
+  1.60.1.70450), à dire quand une question porte sur une valeur changée depuis.
 
 ## Hors de ce skill
-- Détail d'un sort ou d'un talent, build de donjon, de raid ou de PvP : skill `forever-mage`.
+- Détail d'un sort ou d'un talent : skill `forever-mage` ; builds populaires et légalité : skill `forever-builds`.
 - Autres classes, métiers, réputations, Legacy : carte du skill `forever-router` (« je ne sais pas » + tranche).

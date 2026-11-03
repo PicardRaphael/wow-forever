@@ -2,4 +2,4 @@
 type: llm
 ---
 
-La réponse suit la consigne du bouton : elle appelle forever_build au niveau suivant avec le build actuel du contexte, donne d'abord le talent à prendre au prochain niveau tiré du chemin projeté (respec.projected), signale l'égalité statistique quand next_step n'est pas départagé par le calcul en nommant les autres candidats, et ne donne le conseil de respec qu'en complément. Elle ne dit jamais qu'elle ne sait pas quel sera le prochain point, ni « je ne reconnais pas » un talent du contexte. Elle ne redemande pas le build.
+La réponse suit la consigne du bouton pour le Mage, comme pour les autres classes : elle donne le build populaire de Talents Forever le plus proche des talents placés (`closest` : spécialisation, lien et commande `/tf import` tels que l'outil les rend, points absents), avec sa date, et dit que c'est un choix de joueurs, pas un calcul ; elle reprend le guide de Forever Companion s'il est rendu et dit qu'aucun ordre de prise n'est calculé. Elle ne parle d'aucun build calculé, ni de prochain talent calculé, ni de conseil de respec. Elle ne dit jamais « je ne reconnais pas » un élément du contexte et ne redemande pas les talents.

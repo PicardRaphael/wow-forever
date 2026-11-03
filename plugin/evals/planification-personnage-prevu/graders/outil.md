@@ -1,5 +1,5 @@
 ---
 type: tool_used
-tool: mcp__plugin_forever_forever__forever_build
-input_match: '"race"\s*:\s*"Gnome"'
+tool: mcp__plugin_forever_forever__forever_lookup
+input_match: '"kind"\s*:\s*"(tf_popular|class_guide)".*"name"\s*:\s*"Mage"'
 ---

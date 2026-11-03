@@ -49,5 +49,6 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   mesure des rendements décroissants dans mes journaux (PV2), pas d'analyse de mes combats (AN1).
 
 ## Hors de ce skill
-- Build du Mage en PvP (`pvp-bg`, `pvp-world`) : skill `forever-mage` (`forever_build`).
+- Build du Mage en PvP : plus calculé ; builds populaires de Talents Forever (skill `forever-builds`), non classés
+  par contexte.
 - Build d'une autre classe : skill `forever-builds`.

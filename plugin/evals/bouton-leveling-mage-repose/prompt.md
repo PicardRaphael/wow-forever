@@ -22,17 +22,18 @@ rested=2400
 resting=0
 xp_auras=429959:2:3000
 xp_items=211527:1
-Talents actuels (clés de forever, pour `current` de forever_build) : elementalPrecision:5 (Elemental Precision 5/5), improvedFrostbolt:5 (Improved Frostbolt 5/5)
+Talents actuels (clés de forever, pour `current` de tf_popular) : elementalPrecision:5 (Elemental Precision 5/5), improvedFrostbolt:5 (Improved Frostbolt 5/5)
 Équipement (noms du client ; objets pas encore reliés aux données de forever, comparaison d'objets à venir) : Canvas Shoulderpads, Deckhand's Shirt, Green Woolen Vest, Novice Arcanist's Sash, Barbaric Loincloth, Mystic's Slippers, Featherbead Bracers, Brewer's Gloves, Depleted Ritual Band, Bounty Hunter's Ring, Reinforced Linen Cape, Staff of Orgrimmar, Greater Magic Wand
 
 Consigne du bouton « leveling » : appelle exactement, dans cet ordre :
 - forever_lookup {"kind": "zones", "level": 19, "faction": "horde", "limit": 5, "class_name": "Mage"}
-- forever_build {"context": "leveling", "level": 20, "race": "Orc", "current": {"elementalPrecision": 5, "improvedFrostbolt": 5}, "sensitivity": false}
+- forever_lookup {"kind": "tf_popular", "name": "Mage", "current": "elementalPrecision=5,improvedFrostbolt=5"}
 - forever_sim_leveling {"kind": "objectives", "level": 19, "class_name": "Mage", "faction": "horde", "race": "Orc", "rested": 2400.0, "auras": "429959:2:3000", "has_sleeping_bag": true}
 Puis :
 - Zones et quêtes : les trois premières zones du résultat de zones, dans l'ordre rendu, avec leur nombre de quêtes utiles ; prochain donjon : le premier donjon rendu (`dungeons`).
-- Prochain talent calculé, lu comme pour le bouton Talents (`respec.projected.steps`, chemin depuis ton niveau et ton build actuels) ; si `respec.versus_optimal.same` ou `respec.versus_optimal.tie` est vrai, tu gardes ton build (le build d'une respec, `respec.versus_optimal.optimal_rotation`, n'apporte aucun gain mesurable ; instable si `stability.stable` est faux).
+- Build populaire de ta classe : `closest` s'il est rendu (le plus proche de tes talents), sinon le build le plus joué ; son lien et sa commande `/tf import` tels quels, sa date (`asOf`).
 - Objectifs (résultat de forever_sim_leveling, kind objectives) : rends `advice` tel quel, puis le meilleur objectif (`best` : nom, XP, minutes, XP par heure) et, s'il y a un donjon, son premier passage avec ses quêtes et ses passages suivants ; puis `dungeon_advice` tel quel (donjon à faire maintenant ou à viser, avec son niveau de placement `placement.level` : niveau où son premier passage rapporte la plus grande part de niveau par heure) et la durée d'un passage (`run.source` : measured relevé, formula estimée) ; dis d'où vient le temps par monstre (`kill_time.source` : engine calculé, measured mesuré sur tes relevés, estimated estimé) et que les temps de trajet et de quête sont des hypothèses. Bonus d'XP : les bonus actifs (`bonuses.active` : nom, cumuls, temps restant `remaining_s`), puis `bonus_advice` tel quel ; si `sleeping_bag_chain` est rendu, sa phrase `sentence` telle quelle (étape suivante, lieu et position) et ses écarts entre sources (`discrepancies`) en une ligne.
+- Dis clairement ce qui est calculé et ce qui ne l'est pas encore : zones, quêtes, donjon et XP par heure viennent des données et de tes relevés ; le build est un choix de joueurs ; le prochain talent n'est pas calculé.
 
 Question posée par le bouton « leveling » de la fenêtre :
 Quel est mon prochain objectif de leveling ?

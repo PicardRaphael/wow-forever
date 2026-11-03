@@ -44,12 +44,13 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
 - **Leveling, toutes les classes** : feuilles de route (Polestar, livrées dans RestedXP), zones, donjons, quêtes de
   Forever, XP par heure par zone et par donjon, bonus d'XP.
 - **Talents, toutes les classes** : arbres lus dans le client, légalité de tout build, builds populaires de Talents
-  Forever et builds de Forever Companion, lien Talents Forever et code Naowh.
+  Forever et builds de Forever Companion, lien Talents Forever et code Naowh. Le build du Mage vient de là aussi :
+  plus de build, d'ordre de talents ni de conseil de respec calculés (décision 299).
 - **Niveau 60, toutes les classes** : dégâts, races, poids des statistiques et comparaisons par wowsims/forever
   (`forever_simulate`, simulateur de la communauté compilé tel quel, épinglé, certitude `suppose`) ; l'équipement au
   60 est classé par ses poids.
 - **Sous le niveau 60** : le moteur du Mage est **gelé** (révision 7 de 1.60.1.70450) ; il répond encore pour le Mage
-  (builds, temps par monstre, XP par heure) et le dit. Les autres classes n'ont pas de calcul chiffré sous le 60 :
+  (temps par monstre, XP par heure) et le dit. Les autres classes n'ont pas de calcul chiffré sous le 60 :
   builds de Talents Forever et de Forever Companion, mesures de tes journaux quand elles existent.
 - **Savoir par classe** : PvP des neuf classes (contrôles, défensifs, affrontements), familiers du Chasseur, donjons
   et butin, équipement de leveling (GearQuest Forever) et listes BiS (Naowh Forever).
@@ -60,10 +61,10 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
 |---|---|---|
 | Sort : dégâts, rangs, coût, incantation, portée | `forever_lookup(kind="spell", name=<nom anglais>, rank=…)` | `forever-mage` |
 | Talent : effet à un rang, prérequis, palier | `forever_lookup(kind="talent", name=<nom anglais ou clé>, rank=…)` | `forever-mage` |
-| Mage : meilleur build, ordre des talents, build par contexte (moteur gelé sous le 60, il le dit) | `forever_build(context, level, …)` | `forever-mage` |
-| Quel talent prendre au niveau N, faut-il respec | `forever_build(context="leveling", level, current, respecs)` | `forever-leveling` |
+| Mage : meilleur build, build par contexte | comme les autres classes : `forever_lookup(kind="tf_popular", name="Mage"[, current])` (`closest`), `build_check`, `class_guide` ; au 60 : `forever_simulate` | `forever-builds` |
+| Quel talent prendre au niveau N, ordre des talents, faut-il respec | plus calculés (décision 299) : dis-le, puis `closest` de `tf_popular` avec ses points absents | `forever-leveling` |
 | Mon personnage (race, faction, niveau, talents, métiers), personnage prévu | `forever_player_profile(name=…)` | selon la question |
-| Planifier : respec à un autre niveau, plan d'un personnage prévu | `forever_build(context, level, current=<talents du profil>)` : `respec.projected` | `forever-leveling` |
+| Plan d'un personnage prévu | `forever_player_profile`, puis `tf_popular` et `class_guide` de sa classe (section « Planification » de `format-reponse.md`) | `forever-builds` |
 | Mage : temps par monstre, XP par heure, repos, mana (moteur gelé) | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` | `forever-leveling` |
 | Donjons à mon niveau, fiche d'un donjon (boss, butin et taux, quêtes, prérequis, écarts) | `forever_lookup(kind="dungeons", level, faction)`, `forever_lookup(kind="dungeon", name, class_name, level)` | `forever-donjons` |
@@ -89,7 +90,8 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
   `forever-familiers`, `forever-donjons` ou `forever-routes`) dès que la question en relève.
 - `forever_explain_mechanic` accepte un identifiant du registre (« A18 ») ou des mots de sa description (« Ignite ») ;
   plusieurs entrées : l'erreur liste « identifiant : description », choisis puis rappelle l'outil.
-- Calcul lourd (preset `complet`, plusieurs niveaux ou contextes à comparer) : sous-agent `forever-sim-runner`.
+- Calcul lourd de leveling du Mage (preset `complet`, plusieurs niveaux, rotations ou jeux de talents à comparer) :
+  sous-agent `forever-sim-runner`.
 - Source extérieure demandée (notes de patch, guide, avis de la communauté) : sous-agent `forever-web-researcher` ;
   ce qu'il rapporte reste l'affirmation d'une source, jamais un fait du projet.
 
@@ -117,7 +119,8 @@ valeurs de WoW Classic ou retail « pour info ».
 
 ### Classe pas encore calculée sous le 60 (autre que le Mage)
 Toute classe autre que le Mage (« donne-moi les talents optimaux du Paladin ») : réponds avec ce qui existe, sans
-rien deviner.
+rien deviner. Le build du Mage suit les mêmes règles de builds (Talents Forever, `build_check`, Forever Companion) ;
+seuls son temps par monstre et son XP par heure sous le 60 restent calculés (moteur gelé).
 - **Préréglages de `forever_simulate`** : avant de citer un chiffre, regarde `items` dans `action="presets"` ; un
   préréglage sans équipement (`items` à 0) est refusé par l'outil et ne se cite jamais. Un résultat qui paraît
   anormal (écart énorme entre spécialisations proches) se vérifie avant d'être relayé : préréglage, race, `items` ;
