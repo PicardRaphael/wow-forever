@@ -164,12 +164,23 @@ def compare(
     for preset, race in pairs:
         cls = class_of(preset)
         conv = convs.get(cls) or convs.setdefault(cls, ClassTalents(deps, cls))
-        keys = conv.chosen(talents) if talents else conv.wowsims.decode(preset.talents)
-        ws_code = conv.wowsims.encode(keys) if talents else preset.talents
+        # talents du préréglage gardés tels quels pour wowsims : seul MythicSim a besoin de nos clés (un carré sans
+        # correspondance, ex. Call of Thunder, n'efface que sa colonne)
+        keys: dict[str, int] | ForeverError
+        try:
+            keys = conv.chosen(talents) if talents else conv.wowsims.decode(preset.talents)
+        except tal.TalentConversionError as err:
+            if engine == "mythicsim":
+                raise
+            keys = err
+        ws_code = conv.wowsims.encode(keys) if talents and isinstance(keys, dict) else preset.talents
         ws_cases.append((dataclasses.replace(preset, talents=ws_code), race))
-        labels.append({"source": "talents" if talents else "préréglage", "code": ws_code, "keys": keys})
+        labels.append({"source": "talents" if talents else "préréglage", "code": ws_code,
+                       "keys": keys if isinstance(keys, dict) else None})  # fmt: skip
         if engine != "wowsims":
             try:
+                if isinstance(keys, ForeverError):
+                    raise keys
                 ms_cases.append((preset, race, conv.mythicsim.encode(keys), conv.tree_names))
             except ForeverError as err:
                 if engine == "mythicsim":
