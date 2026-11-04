@@ -89,6 +89,23 @@ def test_a_mythicsim_refusal_keeps_the_wowsims_column(tmp_path, make_deps, monke
     assert "unknown item 18727" in row["mythicsim"]["error"]["message"]
 
 
+def test_unconvertible_preset_talents_only_drop_the_mythicsim_column(tmp_path, make_deps, monkeypatch):
+    """Préréglage Elemental dont la chaîne prend Call of Thunder (sans correspondance chez nous) : wowsims le joue tel
+    quel, la colonne de MythicSim dit le talent refusé."""
+    _setup(tmp_path, monkeypatch)
+    proto = tmp_path / "third_party" / "wowsims" / "forever" / "proto"
+    shutil.copy(FIXTURES / "sims" / "wowsims" / "proto" / "shaman.proto", proto)
+    build = tmp_path / "third_party" / "wowsims" / "forever" / "ui" / "specs" / "shaman" / "elemental" / "builds"
+    doc = json.loads((build / "testing.build.json").read_text(encoding="utf-8"))
+    doc["player"]["talentsString"] = "0000000000001"
+    (build / "testing.build.json").write_text(json.dumps(doc), encoding="utf-8")
+    out = simulate(make_deps(cache_dir=tmp_path), "compare", cases="shaman/elemental/testing@Dwarf", engine="both")
+    row = out["rows"][0]
+    assert row["wowsims"]["dps"] == 90.0 and row["gap"] is None
+    assert row["mythicsim"]["error"]["code"] == "talents_unconverted"
+    assert "call_of_thunder" in row["mythicsim"]["error"]["message"]
+
+
 def test_mythicsim_alone_says_its_refusal(tmp_path, make_deps, monkeypatch):
     _setup(tmp_path, monkeypatch, Engine(refuse=("talents", "Incineration has 5 ranks")))
     deps = make_deps(cache_dir=tmp_path)
