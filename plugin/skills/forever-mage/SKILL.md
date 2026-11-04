@@ -43,7 +43,9 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
 - Ordre des talents, prochain talent, respec, « meilleur build » par contexte (leveling, donjon, raid, PvP) : plus
   calculés ; dis-le. Les builds populaires ne sont pas classés par contexte ; l'ordre de prise du code Naowh est
   généré par palier et prérequis, pas optimisé.
-- Givre ou Feu, meilleure race au niveau 60 : `forever_simulate` (wowsims/forever, skill `forever-builds`). Sous le
+- Givre ou Feu, meilleure race au niveau 60 : `forever_simulate` (wowsims/forever, skill `forever-builds`) ;
+  MythicSim en recoupement (`engine="both"`, deux colonnes et leur écart, moteur, commit et date cités) ; un
+  build du 60 se cherche par `action="builds"` (décision 301). Sous le
   60 : temps par monstre et XP/h par rotation avec `forever_sim_leveling` (moteur gelé, skill `forever-leveling`).
 - PvP : classes adverses, contrôles et affrontements : skill `forever-pvp`.
 

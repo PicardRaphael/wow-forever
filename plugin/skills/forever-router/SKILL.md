@@ -48,7 +48,9 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
   plus de build, d'ordre de talents ni de conseil de respec calculés (décision 299).
 - **Niveau 60, toutes les classes** : dégâts, races, poids des statistiques et comparaisons par wowsims/forever
   (`forever_simulate`, simulateur de la communauté compilé tel quel, épinglé, certitude `suppose`) ; l'équipement au
-  60 est classé par ses poids.
+  60 est classé par ses poids. MythicSim (second simulateur, Mage et Chaman pour les talents choisis) en
+  recoupement : `engine="both"` ; cite pour chaque chiffre le moteur, son commit et sa date (`committed_at`), et
+  rends un refus d'un moteur tel quel.
 - **Sous le niveau 60** : le moteur du Mage est **gelé** (révision 7 de 1.60.1.70450) ; il répond encore pour le Mage
   (temps par monstre, XP par heure) et le dit. Les autres classes n'ont pas de calcul chiffré sous le 60 :
   builds de Talents Forever et de Forever Companion, mesures de tes journaux quand elles existent.
@@ -70,7 +72,7 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
 | Donjons à mon niveau, fiche d'un donjon (boss, butin et taux, quêtes, prérequis, écarts) | `forever_lookup(kind="dungeons", level, faction)`, `forever_lookup(kind="dungeon", name, class_name, level)` | `forever-donjons` |
 | Où trouver tel objet (donjon, boss, taux) | `forever_lookup(kind="dungeon_item", name=<identifiant>)` | `forever-donjons` |
 | Équipement : poids des statistiques (Mage ; au niveau 60, poids de wowsims/forever pour toutes les classes de dégâts, dits dans `weights_source`), liste BiS personnelle à importer dans Naowh, objet de leveling à viser, « est-ce une amélioration ? » | `forever_gear(action="weights"|"bis"|"leveling"|"upgrade", class_name, level, race, spec, faction, item, equipped)` : lignes `naowh` et `pawn`, `export` (!NBIS1!), `picks` de GearQuest, `verdict` ; donner les chaînes telles quelles avec où les coller ; « équipement au niveau N » : `leveling` seul, à ce niveau, jamais `route` (liste BiS sans niveau), et rien hors de sa sortie | `forever-builds` |
-| Niveau 60, toutes les classes : dégâts d'une spécialisation, meilleure race, poids des statistiques | `forever_simulate(action="presets"|"races"|"weights"|"compare", preset, races, stats, reference, race, cases, consumables)` (comparer des classes : `compare`, conditions identiques) : calcul de wowsims/forever (simulateur maintenu par d'autres, compilé tel quel, épinglé, certitude `suppose`) ; sous le niveau 60 il ne répond pas : le moteur du Mage, gelé, répond et le dit ; autres classes sous le 60 : « non calculé » ou mesures des journaux | `forever-builds` |
+| Niveau 60, toutes les classes : dégâts d'une spécialisation, meilleure race, poids des statistiques | `forever_simulate(action="presets"|"races"|"weights"|"compare"|"builds", preset, races, stats, reference, race, cases, consumables, talents, engine)` (comparer des classes : `compare`, conditions identiques ; talents choisis : `talents` ; deux moteurs : `engine="both"` ; recherche de builds : `builds`) : calcul de wowsims/forever (simulateur maintenu par d'autres, compilé tel quel, épinglé, certitude `suppose`) ; sous le niveau 60 il ne répond pas : le moteur du Mage, gelé, répond et le dit ; autres classes sous le 60 : « non calculé » ou mesures des journaux | `forever-builds` |
 | Feuille de route de leveling (quêtes dans l'ordre, donjons placés, guide RestedXP) | `forever_route(action="plan", class_name, faction, start_level, end_level)` | `forever-routes` |
 | XP par heure par zone et par donjon, toutes les classes | `forever_sim_leveling(kind="objectives", level, class_name, faction)` | `forever-leveling` |
 | Quêtes de Forever : nouvelles, retouchées, écarts entre sources | `forever_lookup(kind="quests", …)` | `forever-leveling` |
@@ -126,7 +128,8 @@ seuls son temps par monstre et son XP par heure sous le 60 restent calculés (mo
   anormal (écart énorme entre spécialisations proches) se vérifie avant d'être relayé : préréglage, race, `items` ;
   ne l'explique jamais par une supposition.
 - **Niveau 60** : `forever_simulate` (wowsims/forever) donne les dégâts, la race et les poids de la spécialisation ;
-  cite le préréglage, le commit et la certitude `suppose`. Un soigneur sans rotation dans wowsims : « non calculé ».
+  cite le préréglage, le moteur, le commit et sa date, et la certitude `suppose`. Un soigneur sans rotation dans
+  wowsims : « non calculé ».
 - **Sous le 60** : dis qu'aucun calcul chiffré n'existe pour cette classe sous le 60 (tranche SIM2) et que la
   certitude est au mieux supposé. Question générale : ne demande rien au joueur. Question personnelle : profil lu,
   rappelé en une ligne.

@@ -39,6 +39,7 @@ dépôt n'établit pas (fichier lu, inventaire, décision) est écrite « non d�
 | Addons de données installés | quêtes, donjons, butin, BiS, échelles, builds, familiers, métiers, trajets | variable (table plus bas) | empreinte des fichiers, contenu ou date | étape `addons` ; `forever addons status` |
 | RestedXP (parcours gratuits) | parcours de leveling en clair | CC BY-NC-SA 4.0 | version de l'addon installé | lu à chaque appel (`forever route …`) |
 | Polestar | guides de leveling au-delà de RestedXP | GPL-3.0 | commit épinglé du clone | étape `guides` (clone existant) ; `forever route polestar` |
+| MythicSim | second calcul au niveau 60 (Mage, Chaman pour les talents choisis ; décision 301) | MIT | commit épinglé et compilé (Rust), fork Go à sa révision épinglée | étape `simulateurs` (déjà copié une fois) |
 | wowsims/forever | calcul au niveau 60 (dégâts, poids, races, classes) | MIT (lien de retour demandé) | commit épinglé et compilé, daté contre le build | étape `simulateurs` (déjà compilé) ; `forever sims update` |
 | Factoruide | base de quêtes et méthode de route (recoupement) | code MIT, `data/` GPL-2.0+ (part VMaNGOS) | commit épinglé `f7da6da` | à la main seulement |
 | Forum de Blizzard | notes officielles (signal) | CC BY-NC-SA 3.0 (textes jamais recopiés) | une fois par jour au plus | `forever notes`, à la main ; `notes-watch.yml` à la main |
@@ -234,9 +235,15 @@ et cités (`forever/optimize/route.py`). Relu à la main seulement ; jamais tél
   recompilation au nouveau commit (git `GIT_TIMEOUT_S`, compilation `TIMEOUT_S`), cas de référence rejoués, écarts
   notés dans `veille.json` ; échec : binaire précédent gardé.
 
+### MythicSim (second simulateur au niveau 60, décision 301)
+- **Fournit** : dégâts par seconde au niveau 60 sous les règles de Forever (moteur Rust porté de son fork Go), même `RaidSimRequest` que wowsims. Adaptateur `forever/sims/mythicsim.py` (`sim --request … --outfile … --gate`), orchestration `forever/sims/engines.py` (`forever sims compare | builds`, `forever_simulate` avec `engine`). Rotation, options et buffs : fork Go épinglé (`ui/specs/`) ; équipement, talents, race et rencontre du cas.
+- **Licence** : MIT (moteur et fork Go). Code utilisé tel quel, sans modification.
+- **Fraîcheur** : compilé chez nous (`forever/pipeline/mythicsim_build.py`, clone superficiel `<cache>/third_party/mythicsim/engine`, fork Go `<cache>/third_party/mythicsim/go` à `pinned_revision` de `upstream/sources.json`, `cargo +<chaîne> build --locked --release`), épinglé dans `pin.json` (commit, date, empreinte, chaîne Rust, révision du fork). Changelog : https://mythicsim.com/changelog. Certitude `suppose`. `identity.client_build` de sa sortie est la version de son contrat, pas la version simulée.
+- **Relecture** : première copie par `forever sims update --mythicsim` (réseau : git, `rustup`, `cargo`) ; puis `forever sims update` et l'étape `simulateurs` : recompilation au nouveau commit, cas de référence rejoués, écarts dans `<cache>/third_party/mythicsim/veille.json` ; échec : binaire précédent gardé. Un refus du moteur est rendu tel quel.
+
 ### Simulateurs relus à la main seulement
 Sims Forever (site sans licence déclarée ; addon exportateur MIT), DPS Forever (aucune licence, code fermé), ForeverDB
-(code fermé, API de données avec clé et crédit obligatoire), MythicSim (MIT, fork de wowsims, en retard d'une version) :
+(code fermé, API de données avec clé et crédit obligatoire), site de MythicSim (son moteur est branché depuis la décision 301) :
 pas d'API utilisable ou `robots.txt` qui interdit leurs `/api/` ; références de recoupement relues à la main
 (`docs/research/simulateurs-2026-10-21.md`). Le dépôt `ElliotWood/Forever` n'existe plus (décision 291) : les
 reprises de formules prévues par les décisions 233 et 234 sont remplacées par la décision 293 (aucun nouveau code de

@@ -639,3 +639,7 @@ Questions de la route de réputation (RP1, bloc 4e de CJ1). Test commun : gains 
   calculées. Chasseur et Voleur lus depuis le 2026-10-21 (fonction `build`, étalements d'objets ; rotation « simple »
   du Voleur jouée par l'interface web seulement : APL par défaut de la spé) ; soigneurs : aucune rotation, non
   calculés.
+- **MS1-a** (2026-11-04, décision 301) : recharge partagée d'Ice Lance et de Fire Blast : quel moteur la modélise (wowsims, MythicSim, les deux) et comment ? Tant que ce n'est pas lu dans leur code épinglé, un écart entre les deux colonnes sur un build Givre ou Feu n'est pas expliqué. À relever en jeu (essai MS1).
+- **MS1-b** : valeurs de Lightning Bolt (rang 10) : deux sites de datamining (wclbox, wowforevertalents) divergent ; aucune n'est reprise, la valeur viendra du client et de la bulle d'aide en jeu (essai MS1).
+- **MS1-c** : effet réel de Call of Thunder (carré de Lava Burst de l'arbre Elemental dans les deux moteurs, absent de nos données du client) : talent sans correspondance, tout build qui le prend est refusé en le nommant jusqu'au décodage d'un client qui le porte. Mêmes données pour l'écart du préréglage Elemental de wowsims.
+- **MS1-d** : préréglages de MythicSim : son fork Go ne publie qu'équipements, talents et rotations séparés (pas de build complet) ; la rotation choisie est celle qui porte le nom de l'arbre le plus pris (Mage), ou la seule de la spé. Une rotation plus récente (celle de ses notes du 2 novembre) n'est pas dans le fork épinglé : écart possible avec le site de MythicSim.

@@ -57,7 +57,7 @@ forever/
 ├── data/<version>/            # une version du jeu par dossier, révisions numérotées (revisions.json)
 ├── data/manifest.json         # version courante, empreintes sha256 de chaque fichier
 ├── pipeline/                  # seul endroit qui touche Internet ; lecteurs du client et des addons
-├── sims/                      # adaptateurs des simulateurs maintenus par d'autres (wowsims/forever)
+├── sims/                      # adaptateurs des simulateurs maintenus par d'autres (wowsims/forever, MythicSim)
 ├── exports/                   # chaînes d'import des addons (Naowh, EllesmereUI, Pawn, Talents Forever)
 ├── engine/                    # moteur du Mage en fonctions pures (gelé, décision 293) et règles neutres
 ├── sim/ , optimize/           # orchestration du moteur (leveling, rencontres, objectifs) et recherche de builds
@@ -171,6 +171,7 @@ agrégats.
   `forever_simulate` : préréglages, races par paires, poids par tirages appariés, comparaison de classes) : binaire
   compilé chez nous depuis un commit épinglé, sans aucune modification, lancé en sous-processus local sans réseau,
   certitude `suppose`. `forever gear` prend ses poids au niveau 60 ; sous le 60, rien n'est demandé à wowsims.
+- **MythicSim, second moteur au niveau 60** (MS1, décision 301 ; `forever/sims/mythicsim.py`, `forever/pipeline/mythicsim_build.py`) : même requête, rotation et buffs de son fork Go épinglé, refus rendu tel quel. `forever/sims/talents.py` convertit nos clés vers la chaîne de chaque moteur par identifiant de sort ; `forever/sims/engines.py` orchestre `compare` (talents choisis, `engine` wowsims, mythicsim ou both) et `builds` (recherche locale, `forever/sims/builds.py`, confirmation sur 10 000 combats).
 - **Valeurs attendues des tests** : la suite lit une copie des données ramenée à `VALUES_VERSION`
   (`tests/conftest.py`, `pinned_data_dir`) ; seule `tests/unit/test_installed_invariants.py` lit la version réellement
   installée, et seulement pour des invariants.
@@ -204,7 +205,7 @@ verrou → archivage → clone → jeu → nouvelle_version → correctifs → j
 | `journaux` | mesure des journaux de combat de la version installée (journal en cours d'écriture remis au passage suivant) : révision suivante |
 | `addons` | empreintes des addons suivis ; Questie changé relance la mesure des journaux, écrite d'elle-même ; un autre addon changé laisse un rappel de relecture en session, sans rien bloquer |
 | `guides` | clone de Polestar remis sur son dernier commit, s'il existe |
-| `simulateurs` | wowsims/forever recompilé au nouveau commit, s'il a déjà été compilé ; cas de référence rejoués, écarts notés dans `veille.json` |
+| `simulateurs` | wowsims/forever et MythicSim recompilés au nouveau commit, chacun s'il a déjà été compilé ; cas de référence rejoués, écarts notés dans le `veille.json` de chaque moteur |
 
 **Écriture** (`_publish`, `forever/pipeline/gitops.py`) : branche `data/<version>-r<N>`, `tasks.py verify --data
 --engines=<moteurs touchés>` dans le clone (la suite complète si autre chose que des données change), poussée, CI
