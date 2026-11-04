@@ -1910,39 +1910,104 @@ def _step_guides(run: _Run) -> Step:
 
 
 def _step_simulators(run: _Run) -> Step:
-    """wowsims/forever tenu à jour (décisions 293 et 294) : seulement s'il a déjà été compilé (`forever sims update`),
-    jamais en simulation ni hors réseau ; au nouveau commit, recompilation épinglée puis cas de référence rejoués et
-    écarts notés (`veille.json`) ; un échec garde le binaire épinglé (attente, nouvel essai au passage suivant)."""
-    from forever.pipeline import gitops, wowsims_build
+    """wowsims/forever et MythicSim tenus à jour (décisions 293, 294 et 301) : chacun seulement s'il a déjà été compilé
+    (`forever sims update`), jamais en simulation ni hors réseau ; au nouveau commit, recompilation épinglée puis cas de
+    référence rejoués et écarts notés (`veille.json` de chaque moteur) ; un échec garde le binaire épinglé (attente,
+    nouvel essai au passage suivant) et ne bloque pas l'autre moteur."""
+    from forever.pipeline import gitops, mythicsim_build, wowsims_build
     from forever.sims import wowsims
 
     if not run.wants("simulateurs"):
         return Step("simulateurs", "rien", "non demandé (--only)", {})
     pin = wowsims_build.pinned(run.deps.cache_dir)
-    if pin is None:
+    ms_pin = mythicsim_build.pinned(run.deps.cache_dir)
+    if pin is None and ms_pin is None:
         return Step(
             "simulateurs", "rien", "wowsims/forever jamais compilé (le faire une fois : `forever sims update`)", {}
         )
-    before = str(pin.get("commit"))
-    if run.options.dry_run or not run.options.network or run.deps.offline:
-        detail = f"wowsims/forever non mis à jour (simulation ou hors réseau), commit {_short(before)}"
-        return Step("simulateurs", "rien", detail, {})
-    try:
-        new = wowsims_build.update_wowsims(run.deps.cache_dir, runner=run.runner)
-    except gitops.GitOpsError as exc:
-        detail = (
-            f"wowsims/forever injoignable ou non compilé ({exc.message}) : binaire du commit {_short(before)} gardé, "
-            "nouvel essai au passage suivant"
-        )
-        return Step("simulateurs", "rien", detail, {"commit": before, "unreachable": True})
-    if new.get("status") != "compilé":
-        return Step("simulateurs", "rien", f"wowsims/forever à jour : commit {_short(before)}", {"commit": before})
-    report = wowsims.replay_reference(run.deps.cache_dir, _playable_races(run.deps))
-    detail = (
-        f"wowsims/forever compilé au commit {_short(str(new['commit']))} ; {len(report['cases'])} cas rejoués, "
-        f"{len(report['gaps'])} écart(s) au-delà du seuil"
-    )
-    return Step("simulateurs", "fait", detail, {"commit": new["commit"], "gaps": report["gaps"]})
+    offline = run.options.dry_run or not run.options.network or run.deps.offline
+    details: list[str] = []
+    extra: dict[str, Any] = {}
+    done = False
+    if pin is not None:
+        before = str(pin.get("commit"))
+        if offline:
+            details.append(f"wowsims/forever non mis à jour (simulation ou hors réseau), commit {_short(before)}")
+        else:
+            try:
+                new = wowsims_build.update_wowsims(run.deps.cache_dir, runner=run.runner)
+            except gitops.GitOpsError as exc:
+                details.append(
+                    f"wowsims/forever injoignable ou non compilé ({exc.message}) : binaire du commit {_short(before)} "
+                    "gardé, nouvel essai au passage suivant"
+                )
+                extra.update(commit=before, unreachable=True)
+            else:
+                if new.get("status") != "compilé":
+                    details.append(f"wowsims/forever à jour : commit {_short(before)}")
+                    extra["commit"] = before
+                else:
+                    report = wowsims.replay_reference(run.deps.cache_dir, _playable_races(run.deps))
+                    details.append(
+                        f"wowsims/forever compilé au commit {_short(str(new['commit']))} ; {len(report['cases'])} cas "
+                        f"rejoués, {len(report['gaps'])} écart(s) au-delà du seuil"
+                    )
+                    extra.update(commit=new["commit"], gaps=report["gaps"])
+                    done = True
+    if ms_pin is not None:
+        ms_before = str(ms_pin.get("commit"))
+        if offline:
+            details.append(f"MythicSim non mis à jour (simulation ou hors réseau), commit {_short(ms_before)}")
+        else:
+            try:
+                ms_new = mythicsim_build.update_mythicsim(run.deps.cache_dir, runner=run.runner)
+            except gitops.GitOpsError as exc:
+                details.append(
+                    f"MythicSim injoignable ou non compilé ({exc.message}) : binaire du commit {_short(ms_before)} "
+                    "gardé, nouvel essai au passage suivant"
+                )
+                extra["mythicsim"] = {"commit": ms_before, "unreachable": True}
+            else:
+                if ms_new.get("status") != "compilé":
+                    details.append(f"MythicSim à jour : commit {_short(ms_before)}")
+                    extra["mythicsim"] = {"commit": ms_before}
+                else:
+                    ms_report = _replay_mythicsim(run)
+                    details.append(
+                        f"MythicSim compilé au commit {_short(str(ms_new['commit']))} ; {len(ms_report['cases'])} cas "
+                        f"rejoués, {len(ms_report['gaps'])} écart(s) au-delà du seuil"
+                    )
+                    extra["mythicsim"] = {"commit": ms_new["commit"], "gaps": ms_report["gaps"]}
+                    done = True
+    return Step("simulateurs", "fait" if done else "rien", " ; ".join(details), extra)
+
+
+def _replay_mythicsim(run: _Run) -> dict[str, Any]:
+    """Cas de référence de la veille rejoués par MythicSim : préréglages de wowsims (talents convertis par identifiant
+    de sort, `forever.sims.engines`), race du préréglage sinon une race jouable de la classe."""
+    from forever.errors import ForeverError
+    from forever.pipeline.wowsims_build import wowsims_dir
+    from forever.sims import engines, mythicsim, wowsims
+
+    presets = wowsims.read_presets(wowsims_dir(run.deps.cache_dir) / "forever")
+    races = _playable_races(run.deps)
+    convs: dict[str, Any] = {}
+
+    def convert(preset: wowsims.Preset) -> tuple[str, list[str]]:
+        cls = engines.class_of(preset)
+        if cls not in convs:
+            try:
+                convs[cls] = engines.ClassTalents(run.deps, cls)
+            except ForeverError as err:
+                convs[cls] = err
+        conv = convs[cls]
+        if isinstance(conv, ForeverError):
+            raise conv
+        return conv.mythicsim.encode(conv.wowsims.decode(preset.talents)), conv.tree_names
+
+    cases = [(p, p.race or races.get(engines.class_of(p))) for p in presets if p.items]
+    return mythicsim.replay_reference(run.deps.cache_dir, [(p, r) for p, r in cases if r], convert,
+                                      wowsims.reference_encounter(presets))  # fmt: skip
 
 
 def _playable_races(deps: Deps) -> dict[str, str]:

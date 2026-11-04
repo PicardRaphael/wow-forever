@@ -505,6 +505,7 @@ def build_parser() -> argparse.ArgumentParser:
         "update", help="copier, compiler et épingler wowsims/forever (réseau, lecture seule ; Go et protoc requis)"
     )
     s_up.add_argument("--json", action="store_true", help="sortie JSON")
+    s_up.add_argument("--mythicsim", action="store_true", help="copier et compiler aussi MythicSim (Rust requis)")
     s_pre = sims_sub.add_parser("presets", help="préréglages du dépôt épinglé (classe, spé, build)")
     s_pre.add_argument("--json", action="store_true", help="sortie JSON")
     s_races = sims_sub.add_parser("races", help="races comparées au niveau 60 sur un préréglage (même graine)")
@@ -512,6 +513,26 @@ def build_parser() -> argparse.ArgumentParser:
     s_races.add_argument("--races", required=True, help="races séparées par des virgules, ex. Human,Gnome")
     s_races.add_argument("--iterations", type=int, default=None, help="combats par race (défaut de l'outil)")
     s_races.add_argument("--json", action="store_true", help="sortie JSON")
+    s_cmp = sims_sub.add_parser(
+        "compare", help="cas comparés au niveau 60, talents choisis, un moteur ou les deux (MS1)"
+    )
+    s_cmp.add_argument("--cases", required=True, help="« clé@Race » séparés par des virgules, ex. mage/dps/Fire@Gnome")
+    s_cmp.add_argument("--talents", default=None, help="« clé=rang,… » en nos clés (légaux au niveau 60)")
+    s_cmp.add_argument("--engine", default="wowsims", choices=["wowsims", "mythicsim", "both"], help="moteur")
+    s_cmp.add_argument("--consumables", default="none", choices=["none", "own"], help="consommables")
+    s_cmp.add_argument("--rotation", default=None, help="rotation du fork de MythicSim (nom)")
+    s_cmp.add_argument("--iterations", type=int, default=None, help="combats par cas (défaut de l'outil)")
+    s_cmp.add_argument("--json", action="store_true", help="sortie JSON")
+    s_bld = sims_sub.add_parser("builds", help="recherche de builds au niveau 60 sur un préréglage (MS1)")
+    s_bld.add_argument("--preset", required=True, help="préréglage, ex. mage/dps/Fire")
+    s_bld.add_argument("--race", required=True, help="race du joueur, ex. Gnome")
+    s_bld.add_argument("--talents", default=None, help="départ supplémentaire « clé=rang,… »")
+    s_bld.add_argument("--engine", default="wowsims", choices=["wowsims", "mythicsim"], help="moteur")
+    s_bld.add_argument("--rotation", default=None, help="rotation du fork de MythicSim (nom)")
+    s_bld.add_argument("--iterations", type=int, default=None, help="combats par mesure de la recherche")
+    s_bld.add_argument("--max-steps", type=int, default=None, help="plafond d'échanges par départ")
+    s_bld.add_argument("--no-popular", action="store_true", help="sans les builds populaires de Talents Forever")
+    s_bld.add_argument("--json", action="store_true", help="sortie JSON")
     r_cov = route_sub.add_parser("rxp-coverage", help="jusqu'où vont les parcours gratuits en clair de RestedXP")
     r_cov.add_argument("--dungeon-guides", action="store_true", help="compter aussi les parcours de donjon (WIP)")
     r_cov.add_argument("--json", action="store_true", help="sortie JSON")
@@ -1706,18 +1727,90 @@ def _cmd_gear(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _sims_cell(r: dict[str, Any]) -> str:
+    if "error" in r:
+        return f"refus ({r['error']['code']} : {r['error']['message']})"
+    return f"{r['dps']:.1f} dégâts/s (écart type {r['stdev']:.1f}, {r['iterations']} combats)"
+
+
+def _sims_lines(doc: dict[str, Any]) -> list[str]:
+    """Texte de `forever sims compare` et `forever sims builds` (MS1) : chiffres recopiés des simulateurs."""
+    names = {"wowsims": "wowsims/forever", "mythicsim": "MythicSim"}
+    if "results" in doc:
+        race = str(doc["race"]).removeprefix("Race")
+        lines = [f"Builds au niveau 60, {doc['preset']}, {race} ({names[doc['engine']]}) :"]
+        for r in doc["results"]:
+            if "errors" in r:
+                lines.append(f"  {r['origin']} : illégal ({' ; '.join(r['errors'])})")
+                continue
+            lines.append(
+                f"  {r['origin']} : {r['start']['code']} {r['start']['dps']:.1f} → {r['final']['code']} "
+                f"{r['final']['dps']:.1f} ({r['verdict']}, gain {r['gain']:+.1f}, seuil {r['threshold']:.1f} ; "
+                f"{len(r['steps'])} échange(s), {r['stopped']})"
+            )
+        return lines
+    lines = [
+        f"Cas au niveau 60 ({'wowsims/forever et MythicSim' if doc['engine'] == 'both' else names[doc['engine']]}) :"
+    ]
+    for r in doc["rows"]:
+        head = f"  {r['preset']} {str(r['race']).removeprefix('Race')}"
+        if doc["engine"] == "both":
+            gap = f", écart {r['gap']:+.1f}" if r["gap"] is not None else ""
+            lines.append(
+                f"{head} : wowsims/forever {_sims_cell(r['wowsims'])} ; MythicSim {_sims_cell(r['mythicsim'])}{gap}"
+            )
+        else:
+            lines.append(f"{head} : {_sims_cell(r)} ({r['gap_to_best']:+.1f})")
+    return lines
+
+
 def _cmd_sims(deps: Deps, args: argparse.Namespace) -> int:
     from forever.pipeline import wowsims_build
     from forever.sims import wowsims
 
     if args.sims_command == "update":
+        from forever.pipeline import gitops, mythicsim_build
+        from forever.sims import mythicsim
+
         pin = wowsims_build.update_wowsims(deps.cache_dir)
-        provenance = local_provenance(deps, certainty="suppose", assumptions=[wowsims.source_note(pin)])
+        notes = [wowsims.source_note(pin)]
         lines = [
             f"wowsims/forever {pin['status']} : commit {pin['commit'][:12]} du {pin['committed_at']}, binaire "
             + f"{pin['binary']} (empreinte {pin['sha256'][:12]}), {pin['go']}, protoc {pin['protoc']}"
         ]
-        _emit({"pin": pin, "provenance": provenance}, lines, provenance, args.json)
+        data: dict[str, Any] = {"pin": pin}
+        # MS1 : second moteur, dès qu'il a été copié une fois (`--mythicsim` la première fois) ; son échec ne retire
+        # rien à wowsims (épinglage précédent gardé)
+        if not (args.mythicsim or mythicsim_build.mythicsim_dir(deps.cache_dir).is_dir()):
+            lines.append("MythicSim jamais copié : `forever sims update --mythicsim` pour l'ajouter")
+        else:
+            try:
+                ms = mythicsim_build.update_mythicsim(deps.cache_dir)
+            except gitops.GitOpsError as exc:
+                data["mythicsim"] = {"error": exc.message}
+                lines.append(f"MythicSim non mis à jour : {exc.message} (épinglage précédent gardé)")
+            else:
+                notes.append(mythicsim.source_note(ms))
+                data["mythicsim"] = ms
+                lines.append(
+                    f"MythicSim {ms['status']} : commit {ms['commit'][:12]} du {ms['committed_at']}, binaire "
+                    + f"{ms['binary']} (empreinte {ms['sha256'][:12]}), chaîne Rust {ms['toolchain']}, fork Go "
+                    + f"{str(ms['go_revision'])[:12]}"
+                )
+        provenance = local_provenance(deps, certainty="suppose", assumptions=notes)
+        _emit({**data, "provenance": provenance}, lines, provenance, args.json)
+        return EXIT_OK
+    if args.sims_command in ("compare", "builds"):
+        from forever.sims.report import simulate
+
+        if args.sims_command == "compare":
+            doc = simulate(deps, "compare", cases=args.cases, talents=args.talents, engine=args.engine,
+                           consumables=args.consumables, rotation=args.rotation, iterations=args.iterations)  # fmt: skip
+        else:
+            doc = simulate(deps, "builds", preset=args.preset, race=args.race, talents=args.talents,
+                           engine=args.engine, rotation=args.rotation, iterations=args.iterations,
+                           max_steps=args.max_steps, popular=not args.no_popular)  # fmt: skip
+        _emit(doc, _sims_lines(doc), doc["provenance"], args.json)
         return EXIT_OK
     pinned = wowsims_build.pinned(deps.cache_dir)
     if pinned is None:

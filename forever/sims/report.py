@@ -1,6 +1,8 @@
 """Réponses des outils (CLI `forever sims`, MCP `forever_simulate`) au niveau 60, calculées par wowsims/forever
-(décisions 293 et 294) : préréglages du dépôt épinglé, races comparées par paires, poids des statistiques. Chaque
-réponse porte la provenance (commit et empreinte du binaire, certitude `suppose`). Aucun calcul de jeu ici."""
+(décisions 293 et 294) et MythicSim (MS1, décision 301) : préréglages du dépôt épinglé, races comparées par paires,
+poids des statistiques, comparaisons avec les talents choisis (un moteur ou les deux), recherche de builds
+(`forever.sims.engines`). Chaque réponse porte la provenance (moteur, commit et empreinte du binaire, certitude
+`suppose`). Aucun calcul de jeu ici."""
 
 from __future__ import annotations
 
@@ -10,14 +12,15 @@ from forever.config import Deps
 from forever.errors import InvalidArgumentError
 from forever.pipeline.wowsims_build import pinned, wowsims_dir
 from forever.provenance import local_provenance
-from forever.sims import wowsims
+from forever.sims import engines, wowsims
 
 MAGE_ENGINE_FROZEN = (
     "moteur du Mage gelé à la révision 7 de 1.60.1.70450 (décision 293) : plus aucune mécanique ajoutée, recoupé par "
     "les journaux de combat ; au niveau 60, wowsims/forever répond (forever_simulate)"
 )
 LEVEL = 60  # wowsims/forever ne simule que le niveau 60 (constante de son code, issue #624)
-ACTIONS = ("presets", "races", "weights", "compare")
+ACTIONS = ("presets", "races", "weights", "compare", "builds")
+ENGINES = ("wowsims", "mythicsim", "both")
 
 
 def _stat(name: str) -> str:
@@ -37,13 +40,24 @@ def simulate(
     iterations: int | None = None,
     cases: str | None = None,
     consumables: str = "none",
+    talents: str | None = None,
+    engine: str = "wowsims",
+    rotation: str | None = None,
+    max_steps: int | None = None,
+    popular: bool = True,
 ) -> dict[str, Any]:
     """`action` : `presets` (liste, objets équipés de chacun), `races` (races séparées par des virgules, sur
     `preset`), `weights` (statistiques séparées par des virgules, rapportées à `reference`, `race` du joueur exigée),
     `compare` (`cases` : « clé@Race » séparés par des virgules, conditions identiques ; `consumables` : `none` ou
-    `own`). Préréglage sans équipement : refusé. La race vient toujours du joueur, jamais du préréglage."""
+    `own` ; `talents` : « clé=rang,… » en nos clés, légaux au niveau 60 ; `engine` : `wowsims`, `mythicsim` ou
+    `both`), `builds` (recherche locale sur `preset` pour `race` ; départs : `talents`, talents du préréglage, builds
+    populaires de Talents Forever si `popular` ; `rotation` : rotation du fork de MythicSim). Préréglage sans
+    équipement : refusé. La race vient toujours du joueur, jamais du préréglage."""
+
     if action not in ACTIONS:
         raise InvalidArgumentError(f"Action inconnue : « {action} ».", "choisir " + ", ".join(ACTIONS))
+    if engine not in ENGINES:
+        raise InvalidArgumentError(f"Moteur inconnu : « {engine} ».", "choisir " + ", ".join(ENGINES))
     pin = pinned(deps.cache_dir)
     if pin is None:
         raise wowsims.WowsimsError("wowsims/forever n'est pas encore compilé : lancer `uv run forever sims update`.")
@@ -61,10 +75,26 @@ def simulate(
                 raise InvalidArgumentError(f"Cas illisible : « {item} ».", "donner cases, ex. mage/dps/Fire@Human")
             pairs.append((by_key[key], wowsims.race_enum(race_name)))
         kw: dict[str, Any] = {"iterations": iterations} if iterations else {}
-        rows, conditions = wowsims.compare_presets(
-            deps.cache_dir, pairs, wowsims.reference_encounter(presets), consumables=consumables, **kw
-        )
-        return {"level": LEVEL, "rows": rows, "conditions": conditions, "provenance": provenance}
+        if engine == "wowsims" and not talents:  # comparaison d'avant MS1, inchangée
+            rows, conditions = wowsims.compare_presets(
+                deps.cache_dir, pairs, wowsims.reference_encounter(presets), consumables=consumables, **kw
+            )
+            return {"level": LEVEL, "engine": engine, "rows": rows, "conditions": conditions, "provenance": provenance}
+        return engines.compare(deps, pairs, presets, engine=engine, talents=talents, consumables=consumables,
+                               rotation=rotation, ws_note=wowsims.source_note(pin), **kw)  # fmt: skip
+    if action == "builds":
+        found = next((p for p in presets if p.key == preset), None)
+        if found is None:
+            raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir action=presets")
+        if not race:
+            raise InvalidArgumentError(
+                "Race manquante.", "demander la race au joueur (question ou profil), puis race=…"
+            )
+        if engine == "both":
+            raise InvalidArgumentError("Recherche de builds par un seul moteur.", "choisir engine=wowsims ou mythicsim")
+        return engines.search_builds(deps, found, presets, wowsims.race_enum(race), engine=engine, talents=talents,
+                                     iterations=iterations or wowsims.DEFAULT_ITERATIONS, max_steps=max_steps or 30,
+                                     popular=popular, rotation=rotation, ws_note=wowsims.source_note(pin))  # fmt: skip
     chosen = next((p for p in presets if p.key == preset), None)
     if chosen is None:
         raise InvalidArgumentError(f"Préréglage inconnu : « {preset} ».", "voir action=presets")

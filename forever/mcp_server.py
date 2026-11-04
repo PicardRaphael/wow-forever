@@ -449,8 +449,13 @@ def build_server(deps: Deps) -> MCPServer:
         iterations: int | None = None,
         cases: str | None = None,
         consumables: str = "none",
+        talents: str | None = None,
+        engine: str = "wowsims",
+        rotation: str | None = None,
+        max_steps: int | None = None,
+        popular: bool = True,
     ) -> dict[str, Any]:
-        """Calculs de wowsims/forever au niveau 60 seulement, toutes classes (décisions 293 et 294 : simulateur
+        """Calculs de wowsims/forever (et de MythicSim, MS1) au niveau 60 seulement, toutes classes (décisions 293 et 294 : simulateur
         maintenu par d'autres, compilé tel quel, épinglé) : `action="presets"` préréglages du dépôt (`key` :
         classe/spé/build) ; `action="races"` races comparées par paires sur `preset` (`races` séparées par des
         virgules, noms du client, ex. « Human,Gnome,High Order Skyborne ») ; `action="weights"` poids des statistiques
@@ -459,12 +464,20 @@ def build_server(deps: Deps) -> MCPServer:
         identiques (`cases` : « clé@Race » séparés par des virgules ; mêmes buffs, affaiblissements, rencontre, graine ;
         `consumables` : `none` aucun, `own` ceux de chaque préréglage). La race vient toujours du joueur (question ou
         profil, sinon la lui demander), jamais du champ `race` d'un préréglage ; préréglage sans équipement (`items`
-        à 0 dans `presets`) : refusé. Sous le niveau 60 : rien ici (le moteur du Mage gelé répond, en le disant)."""
+        à 0 dans `presets`) : refusé. MS1 (décision 301) : `talents` (« clé=rang,… », nos clés, légaux au niveau 60,
+        convertis par identifiant de sort ; un talent sans correspondance chez le moteur est refusé en le nommant) sur
+        `compare` ; `engine` : `wowsims` (défaut), `mythicsim` (second simulateur, Mage et Chaman ; un refus du moteur
+        est rendu tel quel, `mythicsim_refused`) ou `both` (deux colonnes et leur écart, sans moyenne ni choix) ;
+        `action="builds"` recherche de builds sur `preset` pour `race` (échange d'un point, confirmation sur 10 000
+        combats, verdict « meilleur » ou « non départagé » ; départs : `talents`, préréglage, builds populaires de
+        Talents Forever si `popular` ; `max_steps` plafond d'échanges ; `rotation` rotation du fork de MythicSim).
+        Sous le niveau 60 : rien ici (le moteur du Mage gelé répond, en le disant)."""
         from forever.sims.report import simulate
 
         try:
             return simulate(deps, action, preset=preset, races=races, race=race, stats=stats, reference=reference,
-                            iterations=iterations, cases=cases, consumables=consumables)  # fmt: skip
+                            iterations=iterations, cases=cases, consumables=consumables, talents=talents,
+                            engine=engine, rotation=rotation, max_steps=max_steps, popular=popular)  # fmt: skip
         except ForeverError as err:
             return cast(dict[str, Any], _error_result(deps, err))
 
