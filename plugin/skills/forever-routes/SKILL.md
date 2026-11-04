@@ -1,6 +1,6 @@
 ---
 name: forever-routes
-description: "Feuille de route de leveling de WoW Forever, toutes les classes : suite de quêtes à prendre, objectifs et rendus dans l'ordre, donjons placés à leur meilleur niveau, farm pour finir, temps et XP par heure jusqu'au niveau voulu, aperçu ajustable (enlever un donjon, exclure une quête, sans quêtes de classe), guide RestedXP à importer ou livré dans RestedXP par le pont. Déclencher pour « fais-moi une route du niveau 10 à 20 », « feuille de route RestedXP », « quelles quêtes faire dans l'ordre », « enlève tel donjon de ma route ». Pas pour WoW retail ni WoW Classic hors Forever, ni la programmation."
+description: "Feuille de route de leveling de WoW Forever, toutes les classes : guide Polestar à suivre en jeu (addon installé, guide de ma race et de ma tranche de niveaux), puis aperçu calculé en recoupement : suite de quêtes, objectifs et rendus dans l'ordre, donjons placés à leur meilleur niveau, farm pour finir, temps et XP par heure jusqu'au niveau voulu, aperçu ajustable (enlever un donjon, exclure une quête, sans quêtes de classe) ; guide RestedXP seulement sur demande. Déclencher pour « fais-moi une route du niveau 10 à 20 », « quel guide Polestar suivre », « feuille de route RestedXP », « quelles quêtes faire dans l'ordre », « enlève tel donjon de ma route ». Pas pour WoW retail ni WoW Classic hors Forever, ni la programmation."
 ---
 
 # Feuilles de route (WoW Forever)
@@ -18,6 +18,18 @@ Cite chaque quête, zone et donjon **tel qu'il apparaît dans le client du joueu
 
 Question personnelle : `forever_player_profile` d'abord (classe, camp, niveau). Une donnée manquante se demande avant
 le calcul (classe, camp, niveau de départ et d'arrivée), jamais devinée.
+
+## Polestar d'abord
+L'addon Polestar est installé en jeu, avec les guides de toutes les races : le joueur suit ses routes dans Polestar
+plutôt que dans RestedXP.
+- Pour une route demandée, nomme d'abord le guide Polestar à suivre en jeu : celui de la race du joueur et de la
+  tranche de niveaux demandée (`/polestar` ouvre le hub de l'addon).
+- Puis donne l'aperçu de `forever_route(action="plan")` (zones, donjons, heures) en recoupement, tel que l'outil le
+  rend.
+- Le guide RestedXP (`action="guide"`, « Valider et livrer ») ne se livre que si le joueur le demande.
+- Une route ajustée (donjon retiré, quête exclue) ne peut pas encore être livrée dans Polestar : dis que l'export en
+  chaîne d'import Polestar (`/polestar import`) est une tranche à venir ; propose l'aperçu ajusté, et RestedXP s'il
+  le veut.
 
 ## Outil
 - `forever_route(action="plan", class_name, faction, start_level, end_level, race, character, start_map, start_x,
@@ -48,5 +60,5 @@ le calcul (classe, camp, niveau de départ et d'arrivée), jamais devinée.
 - Quêtes « vues seulement chez Factoruide » : jamais placées ; ne les propose pas.
 
 ## Ce qui n'est pas couvert
-- Montée de métier optimisée (MT1), plan de réputation chiffré (RP1), suivi en direct (RestedXP le fait) : dis
+- Montée de métier optimisée (MT1), plan de réputation chiffré (RP1), suivi en direct (Polestar ou RestedXP le font) : dis
   « je ne sais pas » et la tranche.
