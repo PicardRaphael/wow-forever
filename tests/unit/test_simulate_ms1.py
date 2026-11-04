@@ -21,13 +21,13 @@ from forever.errors import ForeverError
 from forever.provenance import validate_provenance
 from forever.sims.report import simulate
 
-# build Mage légal au niveau 60, en nos clés (chaîne du préréglage « Fire » de wowsims, client 70707)
+# build Mage légal au niveau 60 sur les données des tests (VALUES_VERSION de conftest), en nos clés
 FIRE = (
-    "improvedChanneling=5,arcaneSubtlety=2,arcaneConcentration=5,missileBarrage=2,arcaneBlast=1,arcaneMeditation=1,"
-    "incineration=5,improvedFireball=5,ignite=5,pyroblast=1,wakeOfFire=2,improvedScorch=3,hotStreak=1,"
-    "masterOfElements=3,criticalMass=3,firePower=3,combustion=1,elementalPrecision=3"
+    "improvedChanneling=5,arcaneSubtlety=2,arcaneConcentration=5,missileBarrage=2,arcaneGeometry=2,arcaneImpact=3,"
+    "arcaneBlast=1,improvedCounterspell=1,arcaneMeditation=3,arcaneWrath=1,presenceOfMind=1,arcaneMind=5,"
+    "arcaneInstability=3,arcanePower=1,incineration=3,improvedFireball=5,ignite=5,elementalPrecision=3"
 )
-FIRE_CODE = "0502052001001-55500001230133031-003"
+FIRE_CODE = "050205223101311531-355-003"
 
 
 def _setup(tmp_path, monkeypatch, engine=None):

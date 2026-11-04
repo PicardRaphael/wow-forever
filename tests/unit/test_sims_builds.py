@@ -7,6 +7,8 @@ chaque build sur les arbres du client, tirages appariés (même graine) ; confir
 
 import math
 
+import pytest
+
 from forever.sims.builds import climb, decide
 
 
@@ -45,4 +47,4 @@ def test_gain_under_the_noise_is_not_decided():
     close = decide(start, {"dps": 1000.0 + threshold / 2, "stdev": 100.0, "iterations": 10000})
     assert close["verdict"] == "non départagé" and close["threshold"] == threshold
     far = decide(start, {"dps": 1000.0 + threshold * 2, "stdev": 100.0, "iterations": 10000})
-    assert far["verdict"] == "meilleur" and far["gain"] == threshold * 2
+    assert far["verdict"] == "meilleur" and far["gain"] == pytest.approx(threshold * 2)

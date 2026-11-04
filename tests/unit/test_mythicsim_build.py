@@ -11,9 +11,9 @@ import subprocess
 from pathlib import Path
 
 import pytest
-from forever.pipeline.mythicsim_build import GO_REPO, REPO, pinned, update_mythicsim
 
 from forever.pipeline.gitops import GitOpsError
+from forever.pipeline.mythicsim_build import GO_REPO, REPO, pinned, update_mythicsim
 
 COMMIT, NEXT = "a" * 40, "b" * 40
 FORK = "c" * 40

@@ -13,6 +13,8 @@ dépôt (`forever/data/`, version courante)."""
 
 import pytest
 from conftest import FIXTURES
+
+from forever.errors import ForeverError
 from forever.sims.talents import (
     TalentConversionError,
     client_trees,
@@ -20,8 +22,6 @@ from forever.sims.talents import (
     parse_talents,
     wowsims_layout,
 )
-
-from forever.errors import ForeverError
 
 SIMS = FIXTURES / "sims"
 WOWSIMS = SIMS / "wowsims"
