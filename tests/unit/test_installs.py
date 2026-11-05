@@ -114,6 +114,38 @@ def test_the_beta_product_comes_from_the_installed_data():
     assert beta_product(DATA_DIR) == PRODUCT
 
 
+def data_of(base: Path, products: dict[str, str]) -> Path:
+    """Dossier de données minimal : manifeste et `sources.json` de chaque version {version: produit}."""
+    data = base / "data"
+    for version, product in products.items():
+        (data / version).mkdir(parents=True)
+        (data / version / "sources.json").write_text(json.dumps({"product": product}), encoding="utf-8")
+    manifest = {"game_version": max(products, key=lambda v: tuple(map(int, v.split(".")))), "versions": {}}
+    manifest["versions"] = {v: {"product": p} for v, p in products.items()}
+    (data / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+    return data
+
+
+def test_the_beta_product_stays_the_oldest_data_product_once_the_final_is_decoded(tmp_path):
+    """LN2 (décision 302) : la veille écrit le produit de la version finale dans la version de données la plus
+    récente ; la bêta reste le produit de la plus ancienne, sinon plus aucune installation n'est la bêta."""
+    data = data_of(tmp_path, {BETA_V: PRODUCT, "1.60.1.80000": FINAL, "1.60.1.70450": PRODUCT})
+    assert beta_product(data) == PRODUCT
+    found = assign_roles(discover([both_root(tmp_path)]), beta=beta_product(data), adopted={})
+    assert {i.product: i.role for i in found} == {PRODUCT: ROLE_BETA, FINAL: ROLE_UNKNOWN}
+
+
+def test_the_final_product_of_the_data_can_still_be_adopted(tmp_path):
+    data = data_of(tmp_path, {BETA_V: PRODUCT, "1.60.1.80000": FINAL})
+    final = next(
+        i
+        for i in assign_roles(discover([both_root(tmp_path)]), beta=beta_product(data), adopted={})
+        if i.product == FINAL
+    )
+    adopt_product(tmp_path / "cache", final, NOW)
+    assert FINAL in adopted_products(tmp_path / "cache")
+
+
 def test_the_exclusion_list_is_public_products_only():
     assert "wow" in NOT_FOREVER_PRODUCTS and PRODUCT not in NOT_FOREVER_PRODUCTS
 
