@@ -13,7 +13,7 @@ from pathlib import Path
 import pytest
 from conftest import WAGO_70124
 from test_update_chain import DRY, TARGET, montage, step  # noqa: F401 : fixture partagée
-from test_update_publish import isolated_git, origin  # noqa: F401 : clone sur un dépôt nu local (LN2)
+from test_update_publish import Recorder, isolated_git, origin  # noqa: F401 : dépôt nu local, gh simulé (LN2)
 
 from forever.engine_inputs import DISPLAY_KEYS, compare_inputs
 from forever.errors import InvalidArgumentError
@@ -39,7 +39,7 @@ def pending(deps, kind):
 def test_a_failed_calculation_table_waits_for_the_network(origin):  # noqa: F811
     deps, http = origin[0]()
     break_route(http, "SpellName", "enUS")
-    report = run_update(deps, DRY._replace(dry_run=False))
+    report = run_update(deps, DRY._replace(dry_run=False), runner=Recorder())
     found = step(report, "nouvelle_version")
     assert found["status"] == "attente", found
     assert "enUS/SpellName" in found["detail"]
@@ -53,7 +53,7 @@ def test_a_failed_calculation_table_waits_for_the_network(origin):  # noqa: F811
 def test_the_network_wait_is_not_approvable(origin):  # noqa: F811
     deps, http = origin[0]()
     break_route(http, "SpellName", "enUS")
-    run_update(deps, DRY._replace(dry_run=False))
+    run_update(deps, DRY._replace(dry_run=False), runner=Recorder())
     assert "network" in SELF_CLEARING_KINDS
     with pytest.raises(InvalidArgumentError, match="se lève seule"):
         approve(deps, f"network-{TARGET}")
@@ -64,9 +64,9 @@ def test_the_network_wait_clears_itself_at_the_next_pass(origin):  # noqa: F811
     broken = table_url("SpellName", TARGET, "enUS")
     good = http.routes[broken]
     http.routes[broken] = TIMEOUT
-    run_update(deps, DRY._replace(dry_run=False))
+    run_update(deps, DRY._replace(dry_run=False), runner=Recorder())
     http.routes[broken] = good
-    report = run_update(deps, DRY._replace(dry_run=False))
+    report = run_update(deps, DRY._replace(dry_run=False), runner=Recorder())
     assert step(report, "nouvelle_version")["status"] != "attente"
     (wait,) = pending(deps, "network")
     assert wait["state"] == "faite"
