@@ -13,6 +13,7 @@ from pathlib import Path
 import pytest
 from conftest import WAGO_70124
 from test_update_chain import DRY, TARGET, montage, step  # noqa: F401 : fixture partagée
+from test_update_publish import isolated_git, origin  # noqa: F401 : clone sur un dépôt nu local (LN2)
 
 from forever.engine_inputs import DISPLAY_KEYS, compare_inputs
 from forever.errors import InvalidArgumentError
@@ -35,8 +36,8 @@ def pending(deps, kind):
     return [e for e in list_pending(deps.cache_dir) if e.get("kind") == kind]
 
 
-def test_a_failed_calculation_table_waits_for_the_network(montage):  # noqa: F811
-    deps, http = montage()
+def test_a_failed_calculation_table_waits_for_the_network(origin):  # noqa: F811
+    deps, http = origin[0]()
     break_route(http, "SpellName", "enUS")
     report = run_update(deps, DRY._replace(dry_run=False))
     found = step(report, "nouvelle_version")
@@ -49,8 +50,8 @@ def test_a_failed_calculation_table_waits_for_the_network(montage):  # noqa: F81
     assert len(calls) == 3  # trois essais avant l'attente
 
 
-def test_the_network_wait_is_not_approvable(montage):  # noqa: F811
-    deps, http = montage()
+def test_the_network_wait_is_not_approvable(origin):  # noqa: F811
+    deps, http = origin[0]()
     break_route(http, "SpellName", "enUS")
     run_update(deps, DRY._replace(dry_run=False))
     assert "network" in SELF_CLEARING_KINDS
@@ -58,8 +59,8 @@ def test_the_network_wait_is_not_approvable(montage):  # noqa: F811
         approve(deps, f"network-{TARGET}")
 
 
-def test_the_network_wait_clears_itself_at_the_next_pass(montage):  # noqa: F811
-    deps, http = montage()
+def test_the_network_wait_clears_itself_at_the_next_pass(origin):  # noqa: F811
+    deps, http = origin[0]()
     broken = table_url("SpellName", TARGET, "enUS")
     good = http.routes[broken]
     http.routes[broken] = TIMEOUT
