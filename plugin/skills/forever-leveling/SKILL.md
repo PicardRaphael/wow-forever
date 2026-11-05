@@ -1,6 +1,6 @@
 ---
 name: forever-leveling
-description: "Leveling du Mage dans WoW Forever : temps pour tuer un monstre, XP par heure (XP/h), repos et mana à un niveau, build populaire de Talents Forever le plus proche de mes talents (ordre des talents et respec : plus calculés, dit tel quel), quelle zone ou quel donjon faire à mon niveau. Déclencher pour « je suis niveau N », « combien de temps par monstre », « XP/h », « quel talent au prochain niveau », « respec », « où aller à mon niveau ». Pas pour WoW retail ni WoW Classic hors Forever, ni pour la programmation."
+description: "Leveling du Mage dans WoW Forever : temps pour tuer un monstre, XP par heure (XP/h), repos et mana à un niveau, build populaire de Talents Forever le plus proche de mes talents (talents niveau par niveau : plan de leveling lu dans Polestar et Talents Forever, code Naowh à suivre ; respec : aucun inventé), quelle zone ou quel donjon faire à mon niveau. Déclencher pour « je suis niveau N », « combien de temps par monstre », « XP/h », « quel talent au prochain niveau », « respec », « où aller à mon niveau ». Pas pour WoW retail ni WoW Classic hors Forever, ni pour la programmation."
 ---
 
 # Leveling du Mage (WoW Forever)
@@ -35,7 +35,7 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
 |---|---|
 | Temps par monstre, XP/h, repos, dégâts subis | `forever_sim_leveling(level, race, rotation, talents)` : champs `monte_carlo` et `analytic` (`combat`, `downtime`, `total`, `xp_h`) et `mob_hp` |
 | Build à suivre, le plus proche de mes talents | `forever_lookup(kind="tf_popular", name="Mage", current=<clé=rang,…>)` : `closest` (lien, `import`, `missing_points`, `differences`, `asOf`), puis `forever_lookup(kind="build_check", name="Mage", level, talents)` ; guide : `forever_lookup(kind="class_guide", name="Mage", level)` (skill `forever-builds`) |
-| Quel talent prendre au niveau N, ordre des talents, faut-il respec | plus calculés (décision 299) : dis-le, puis donne `closest` et ses points absents (`missing_points`) ; l'ordre de prise du code Naowh (`naowh`) est généré par palier et prérequis, pas optimisé |
+| Quel talent prendre au niveau N, ordre des talents, faut-il respec | `forever_lookup(kind="leveling_plan", name=<classe>[, class_name=<spé>, level=<niveau>])` (LV1, décision 303) : tranches de niveaux, point du prochain niveau (`next`), code Naowh `!NFB1!` de cet ordre ; puis `closest` de `tf_popular` si le joueur a déjà des points |
 | Zone ou donjon à mon niveau | `forever_lookup(kind="zones", level, faction)` |
 | Où gagner le plus d'XP par heure, faut-il faire tel donjon (toutes les classes) | `forever_sim_leveling(kind="objectives", level, class_name, faction)` : `advice` rendu tel quel, `best`, `zones`, `dungeons` (`first_pass` avec ses quêtes, `repeat`), `kill_time.source` (`engine`, `measured`, `estimated`) |
 | Bonus d'XP : sac de couchage, nourriture nutritive, repos, perk Legacy, tente ; lequel prendre maintenant | `forever_sim_leveling(kind="objectives", level, class_name, faction, rested, food, sleeping_bag, legacy_rested_rank, auras, has_sleeping_bag)` : `xp_h`, `xp_h_rested`, `xp_h_sleeping_bag`, `xp_h_all` par objectif, `bonuses.active`, `bonuses.advice`, `bonus_advice` et `sleeping_bag_chain.sentence` rendus tels quels ; catalogue : `forever_lookup(kind="xp_bonuses")` (bonus sans source joueur : listés, jamais appliqués) |
@@ -53,9 +53,13 @@ N »), aucun appel au profil, hypothèse neutre annoncée.
   dis comment régler `FOREVER_WOW_DIR`.
 
 ## Lire les résultats
-- **Prochain talent, ordre, respec** : plus de calcul (pas de `next_step` : ne l'invente pas). Dis que ce n'est plus
-  calculé, que les builds sont des choix de joueurs de Talents Forever, puis donne `closest` tel quel (n'en choisis
-  pas un autre) et ses points absents ; `closest` vide (aucun point placé) : le build le plus joué (rang 1).
+- **Prochain talent, ordre, respec** : plan `leveling_plan` (aucun calcul de rendement, décision 299) : build visé =
+  build le plus joué de Talents Forever pour la spécialisation, ordre de Polestar contrôlé sur le client (pas de
+  `next_step` : le point suivant est `next` du plan, jamais inventé). Donne les
+  `tranches` telles quelles (« niveaux A–B : talent »), marque les points `genere` (« généré : légal, pas un choix de
+  guide »), cite chaque écart de `polestar.issues` et `stops`, donne le code `naowh` avec « Import puis Follow dans
+  /nftraining ». Resets : `resets.note` tel quel, jamais un reset proposé. Talents déjà placés : `closest` de
+  `tf_popular` tel quel, avec ses points absents.
 - **Monte Carlo** et **analytique** : donne le Monte Carlo ; si `analytic_gap` est grand, signale l'écart.
 - **PV du monstre** (`mob_hp`) : sa source et sa certitude comptent ; une valeur `suppose` fait baisser la certitude
   de la réponse.

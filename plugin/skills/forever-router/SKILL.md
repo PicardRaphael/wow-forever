@@ -64,7 +64,7 @@ Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décision
 | Sort : dégâts, rangs, coût, incantation, portée | `forever_lookup(kind="spell", name=<nom anglais>, rank=…)` | `forever-mage` |
 | Talent : effet à un rang, prérequis, palier | `forever_lookup(kind="talent", name=<nom anglais ou clé>, rank=…)` | `forever-mage` |
 | Mage : meilleur build, build par contexte | comme les autres classes : `forever_lookup(kind="tf_popular", name="Mage"[, current])` (`closest`), `build_check`, `class_guide` ; au 60 : `forever_simulate` | `forever-builds` |
-| Quel talent prendre au niveau N, ordre des talents, faut-il respec | plus calculés (décision 299) : dis-le, puis `closest` de `tf_popular` avec ses points absents | `forever-leveling` |
+| Quel talent prendre au niveau N, ordre des talents, faut-il respec | `forever_lookup(kind="leveling_plan", name=<classe>[, class_name=<spé>, level=<niveau>])` (LV1, décision 303) (tranches, prochain point, code Naowh ; resets jamais inventés), puis `closest` de `tf_popular` si des points sont placés | `forever-leveling` |
 | Mon personnage (race, faction, niveau, talents, métiers), personnage prévu | `forever_player_profile(name=…)` | selon la question |
 | Plan d'un personnage prévu | `forever_player_profile`, puis `tf_popular` et `class_guide` de sa classe (section « Planification » de `format-reponse.md`) | `forever-builds` |
 | Mage : temps par monstre, XP par heure, repos, mana (moteur gelé) | `forever_sim_leveling(level, rotation, talents)` | `forever-leveling` |

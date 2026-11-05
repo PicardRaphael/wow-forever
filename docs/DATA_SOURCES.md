@@ -285,6 +285,7 @@ n'est jamais modifié ni recopié : formats réimplémentés d'après leur descr
 | --- | --- | --- | --- |
 | Build de talents | Talents Forever | code et lien | FA1 |
 | Build de talents | Naowh Forever | chaîne `!NFB1!` | EX1 |
+| Plan de talents de leveling (ordre point par point) | Naowh Forever | chaîne `!NFB1!`, puis Follow (onglet Builds) | LV1 |
 | Liste BiS par personnage et par contexte | Naowh Forever | chaîne `!NBIS1!` | CJ1 bloc 4, T10 |
 | Poids des statistiques | Naowh Forever | ligne `NFSW1:` | CJ1 bloc 4, T10 |
 | Poids des statistiques | Forever Companion | échelle texte Pawn v1 (« Import scale… ») | CJ1 bloc 4 |

@@ -40,6 +40,8 @@ français. Sans `game_locale` connue, cite le nom anglais du client et le nom fr
   son niveau ou non), les builds écartés avec leur raison (`set_aside`) et la rotation en prose (`rotation.single`,
   `rotation.aoe`, écrite pour le niveau 30) ; dis que l'ordre de prise n'est pas calculé ; `freshness.status` autre que
   « à jour » : « calcul en cours de mise à jour » et sa raison ; `available` faux : addon absent, dis-le.
+- Ordre de leveling niveau par niveau d'une spécialisation : `forever_lookup(kind="leveling_plan", name=<classe>[, class_name=<spé>, level=<niveau>])` (LV1, décision 303) (tranches, `next`, code `naowh` à
+  importer et suivre dans Naowh) ; points `genere` et écarts de Polestar dits tels quels.
 - Builds populaires de Talents Forever d'abord : `forever_lookup(kind="tf_popular", name=<classe>)` (addon lu sur
   disque) : part de chaque spécialisation, date `asOf` et fenêtre, puis chaque build avec son lien, sa commande
   `import` et sa légalité déjà contrôlée sur le client (`légal`, `illégal`, ou `non vérifiable` avec le talent

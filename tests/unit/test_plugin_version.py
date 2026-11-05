@@ -71,7 +71,8 @@ def test_plugin_json_has_a_semver_version():
     # décision 301) ; routes Polestar d'abord, livrées pour Polestar et RestedXP.
     # 0.22.1 : routes suivies dans RestedXP (les guides Polestar n'ont pas les donjons, demande du 2026-11-05) ;
     # Polestar en recoupement seulement.
-    assert version == "0.22.1"
+    # 0.22.2 : plan de talents de leveling niveau par niveau (LV1, décision 303 : Talents Forever, Polestar, Naowh).
+    assert version == "0.22.2"
 
 
 def test_fingerprint_is_up_to_date():
