@@ -6,7 +6,7 @@ dans `<dossier>/.flavor.info` ; à défaut, dans la ligne de `<racine>/.build.in
 dossier, sinon dans la ligne unique du fichier. Il n'est **jamais déduit du nom du dossier** : le produit de la
 version finale n'est pas annoncé, et un second produit Forever (stress test) existe déjà.
 
-Rôles : `beta` (produit des données installées, `sources.json`), `final` (produit adopté par `forever wow adopt`,
+Rôles : `beta` (produit de la plus ancienne version des données, `sources.json`, décision 302), `final` (produit adopté par `forever wow adopt`,
 inscrit au journal des versions), `other` (produit public connu qui n'est pas Forever), sinon `unknown`.
 
 Lecture sur disque seulement, jamais par le réseau ; `product.db` de Battle.net n'est jamais lu."""
@@ -236,11 +236,15 @@ def discover(candidates: Iterable[Path]) -> list[Install]:
 
 
 def beta_product(data_dir: Path) -> str | None:
-    """Produit de la version de données installée (`sources.json`), celui de la bêta aujourd'hui."""
+    """Produit de la bêta : celui de la **plus ancienne** version de données installée (`sources.json`).
+
+    LN2 (décision 302) : la veille écrit le produit de la version finale adoptée dans les versions qu'elle en décode ;
+    la plus récente ne dit donc plus la bêta."""
     try:
-        version = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))["game_version"]
-        product = json.loads((data_dir / str(version) / "sources.json").read_text(encoding="utf-8"))["product"]
-    except (OSError, ValueError, KeyError, TypeError):
+        versions = json.loads((data_dir / "manifest.json").read_text(encoding="utf-8"))["versions"]
+        oldest = min((str(v) for v in versions), key=_version_key)
+        product = json.loads((data_dir / oldest / "sources.json").read_text(encoding="utf-8"))["product"]
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
         return None
     return product if isinstance(product, str) else None
 

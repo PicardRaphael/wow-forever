@@ -1,6 +1,7 @@
 """Garde (LN1, décision 271) : le produit de la version finale n'est jamais deviné ni écrit. Aucun nom de produit
 Forever autre que celui de `sources.json` (la bêta) dans `forever/`, `scripts/`, `addon/`, `plugin/` et `tests/`
-(hors ce fichier) : la version finale est **adoptée** sur le poste (`forever wow adopt`), jamais écrite dans le code.
+(hors ce fichier et hors des données de `forever/data/`, où la veille écrit le produit observé, décision 302) :
+la version finale est **adoptée** sur le poste (`forever wow adopt`), jamais écrite dans le code.
 Les produits non bêta du code sont la liste d'exclusion publique (`forever.installs.NOT_FOREVER_PRODUCTS`)."""
 
 import re
