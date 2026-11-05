@@ -41,7 +41,7 @@ seulement par ce message, sans rien répondre à la question de mémoire :
 ## 2. Ce que l'agent sait faire aujourd'hui
 
 Le projet lit ce que d'autres maintiennent et ne recalcule pas le jeu (décisions 288, 293 et 294, Forever seulement) :
-- **Leveling, toutes les classes** : feuilles de route (Polestar, livrées dans RestedXP), zones, donjons, quêtes de
+- **Leveling, toutes les classes** : feuilles de route (livrées dans RestedXP, avec les donjons ; Polestar en recoupement), zones, donjons, quêtes de
   Forever, XP par heure par zone et par donjon, bonus d'XP.
 - **Talents, toutes les classes** : arbres lus dans le client, légalité de tout build, builds populaires de Talents
   Forever et builds de Forever Companion, lien Talents Forever et code Naowh. Le build du Mage vient de là aussi :

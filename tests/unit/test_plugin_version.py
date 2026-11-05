@@ -69,7 +69,9 @@ def test_plugin_json_has_a_semver_version():
     # Talents Forever, build_check, class_guide, wowsims au 60 ; évaluations du build calculé retirées (RB1, décision 299).
     # 0.22.0 : MythicSim en recoupement au 60, talents choisis et recherche de builds par les simulateurs (MS1,
     # décision 301) ; routes Polestar d'abord, livrées pour Polestar et RestedXP.
-    assert version == "0.22.0"
+    # 0.22.1 : routes suivies dans RestedXP (les guides Polestar n'ont pas les donjons, demande du 2026-11-05) ;
+    # Polestar en recoupement seulement.
+    assert version == "0.22.1"
 
 
 def test_fingerprint_is_up_to_date():
