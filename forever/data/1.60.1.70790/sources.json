@@ -12,7 +12,7 @@
   },
   "files": {
     "spells.json": {
-      "source": "Client 1.60.1.70790 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-11-05)",
+      "source": "Client 1.60.1.70790 : tables Spell*, SpellLevels, SpellPower et SkillLineAbility (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-11-05)",
       "certainty": "certain",
       "field_certainty": {
         "projectile_speed": "suppose"
@@ -27,7 +27,7 @@
       ]
     },
     "talents.json": {
-      "source": "Client 1.60.1.70790 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 2 (forever install, 2026-11-05)",
+      "source": "Client 1.60.1.70790 : tables Trait* et Spell* (wago.tools) décodées par forever decode, installé en révision 3 (forever install, 2026-11-05)",
       "certainty": "certain",
       "notes": [
         "rangs et tooltip_values : variables d'infobulle au niveau de base du sort (decode_rules.json)",
@@ -231,7 +231,7 @@
       "notes": [
         "arbres, talents (node_id), sorts et classement PvP des 9 classes (decode_rules.json, classes)",
         "classement PvP : table de decode_rules.json, certitude probable",
-        "installé en révision 2 (forever install, 2026-11-05)"
+        "installé en révision 3 (forever install, 2026-11-05)"
       ]
     },
     "races.json": {
@@ -345,7 +345,7 @@
       "notes": [
         "XP des quêtes par niveau et par difficulté (table QuestXP) et quêtes vues par le client (questcache.wdb, lecture locale ; decode_rules.json, quest_rewards)",
         "seen_quests : disposition des champs de questcache.wdb probable (recoupée par Questie, LVL6)",
-        "installé en révision 2 (forever install, 2026-11-05)"
+        "installé en révision 3 (forever install, 2026-11-05)"
       ]
     },
     "xp_bonuses.json": {
@@ -373,7 +373,7 @@
       ]
     }
   },
-  "revision": 2,
+  "revision": 3,
   "revised_at": "2026-11-05",
   "hotfixes": {
     "dbcache": {
@@ -381,10 +381,10 @@
       "locale": "frFR",
       "format": 9,
       "build": 70790,
-      "size": 5102994,
-      "sha256": "0f0e5b3f620656601b1cdcc9ab081638d07bf58ea1f980d47b12c538ec2d47d0",
-      "file_date": "2026-11-05T14:27:45Z",
-      "read_at": "2026-11-05T14:27:47Z"
+      "size": 4302685,
+      "sha256": "0751f130abe9f0125134ebc1b1dfc7a7b10772f10c15d59517c2b336d3cd0dff",
+      "file_date": "2026-11-05T17:15:40Z",
+      "read_at": "2026-11-05T17:15:41Z"
     },
     "dbd": {
       "repo": "wowdev/WoWDBDefs",
@@ -619,6 +619,7 @@
       113450,
       113455,
       113463,
+      113465,
       113483,
       113486,
       113492,
@@ -646,207 +647,208 @@
     ],
     "max_push": 113650,
     "seen_at": {
-      "112623": "2026-11-05T07:19:21.123",
-      "112624": "2026-11-05T07:19:21.123",
-      "112635": "2026-11-05T07:19:21.177",
-      "112640": "2026-11-05T07:19:21.123",
-      "112641": "2026-11-05T07:19:21.123",
-      "112686": "2026-11-05T07:19:21.123",
-      "112687": "2026-11-05T07:19:21.123",
-      "112694": "2026-11-05T07:19:21.123",
-      "112695": "2026-11-05T07:19:21.123",
-      "112707": "2026-11-05T07:19:21.123",
-      "112709": "2026-11-05T07:19:21.177",
-      "112713": "2026-11-05T07:19:21.123",
-      "112720": "2026-11-05T07:19:21.123",
-      "112726": "2026-11-05T07:19:21.129",
-      "112727": "2026-11-05T07:19:21.129",
-      "112740": "2026-11-05T07:19:21.129",
-      "112741": "2026-11-05T07:19:21.129",
-      "112742": "2026-11-05T07:19:21.129",
-      "112753": "2026-11-05T07:19:21.129",
-      "112758": "2026-11-05T07:19:21.177",
-      "112765": "2026-11-05T07:19:21.129",
-      "112766": "2026-11-05T07:19:21.129",
-      "112770": "2026-11-05T07:19:21.129",
-      "112771": "2026-11-05T07:19:21.129",
-      "112775": "2026-11-05T07:19:21.129",
-      "112791": "2026-11-05T07:19:21.129",
-      "112819": "2026-11-05T07:19:21.129",
-      "112831": "2026-11-05T07:19:21.129",
-      "112833": "2026-11-05T07:19:21.129",
-      "112838": "2026-11-05T07:19:21.129",
-      "112839": "2026-11-05T07:19:21.129",
-      "112840": "2026-11-05T07:19:21.129",
-      "112843": "2026-11-05T07:19:21.129",
-      "112844": "2026-11-05T07:19:21.129",
-      "112845": "2026-11-05T07:19:21.129",
-      "112852": "2026-11-05T07:19:21.129",
-      "112858": "2026-11-05T07:19:21.129",
-      "112863": "2026-11-05T07:19:21.129",
-      "112864": "2026-11-05T07:19:21.177",
-      "112875": "2026-11-05T07:19:21.129",
-      "112878": "2026-11-05T07:19:21.129",
-      "112887": "2026-11-05T07:19:21.129",
-      "112890": "2026-11-05T07:19:21.129",
-      "112900": "2026-11-05T07:19:21.177",
-      "112901": "2026-11-05T07:19:21.129",
-      "112903": "2026-11-05T07:19:21.129",
-      "112918": "2026-11-05T07:19:21.129",
-      "112919": "2026-11-05T07:19:21.129",
-      "112920": "2026-11-05T07:19:21.129",
-      "112922": "2026-11-05T07:19:21.129",
-      "112934": "2026-11-05T07:19:21.129",
-      "112935": "2026-11-05T07:19:21.129",
-      "112947": "2026-11-05T07:19:21.129",
-      "112948": "2026-11-05T07:19:21.129",
-      "112949": "2026-11-05T07:19:21.129",
-      "112952": "2026-11-05T07:19:21.129",
-      "112953": "2026-11-05T07:19:21.129",
-      "112957": "2026-11-05T07:19:21.129",
-      "112961": "2026-11-05T07:19:21.129",
-      "112964": "2026-11-05T07:19:21.129",
-      "112965": "2026-11-05T07:19:21.129",
-      "112976": "2026-11-05T07:19:21.129",
-      "112980": "2026-11-05T07:19:21.129",
-      "112985": "2026-11-05T07:19:21.129",
-      "112992": "2026-11-05T07:19:21.129",
-      "112994": "2026-11-05T07:19:21.129",
-      "112996": "2026-11-05T07:19:21.129",
-      "113000": "2026-11-05T07:19:21.129",
-      "113004": "2026-11-05T07:19:21.129",
-      "113005": "2026-11-05T07:19:21.129",
-      "113007": "2026-11-05T07:19:21.129",
-      "113008": "2026-11-05T07:19:21.129",
-      "113011": "2026-11-05T07:19:21.129",
-      "113015": "2026-11-05T07:19:21.129",
-      "113016": "2026-11-05T07:19:21.129",
-      "113020": "2026-11-05T07:19:21.129",
-      "113027": "2026-11-05T07:19:21.129",
-      "113030": "2026-11-05T07:19:21.129",
-      "113038": "2026-11-05T07:19:21.129",
-      "113040": "2026-11-05T07:19:21.129",
-      "113042": "2026-11-05T07:19:21.129",
-      "113043": "2026-11-05T07:19:21.129",
-      "113044": "2026-11-05T07:19:21.129",
-      "113046": "2026-11-05T07:19:21.129",
-      "113051": "2026-11-05T07:19:21.129",
-      "113061": "2026-11-05T07:19:21.129",
-      "113069": "2026-11-05T07:19:21.129",
-      "113070": "2026-11-05T07:19:21.129",
-      "113081": "2026-11-05T07:19:21.129",
-      "113082": "2026-11-05T07:19:21.129",
-      "113085": "2026-11-05T07:19:21.129",
-      "113088": "2026-11-05T07:19:21.129",
-      "113091": "2026-11-05T07:19:21.129",
-      "113092": "2026-11-05T07:19:21.129",
-      "113093": "2026-11-05T07:19:21.129",
-      "113096": "2026-11-05T07:19:21.129",
-      "113099": "2026-11-05T07:19:21.129",
-      "113106": "2026-11-05T07:19:21.129",
-      "113108": "2026-11-05T07:19:21.129",
-      "113121": "2026-11-05T07:19:21.129",
-      "113124": "2026-11-05T07:19:21.129",
-      "113127": "2026-11-05T07:19:21.129",
-      "113131": "2026-11-05T07:19:21.129",
-      "113134": "2026-11-05T07:19:21.129",
-      "113136": "2026-11-05T07:19:21.129",
-      "113139": "2026-11-05T07:19:21.129",
-      "113141": "2026-11-05T07:19:21.129",
-      "113149": "2026-11-05T07:19:21.129",
-      "113150": "2026-11-05T07:19:21.129",
-      "113156": "2026-11-05T07:19:21.129",
-      "113161": "2026-11-05T07:19:21.129",
-      "113162": "2026-11-05T07:19:21.129",
-      "113163": "2026-11-05T07:19:21.129",
-      "113164": "2026-11-05T07:19:21.129",
-      "113170": "2026-11-05T07:19:21.129",
-      "113186": "2026-11-05T07:19:21.129",
-      "113187": "2026-11-05T07:19:21.129",
-      "113191": "2026-11-05T07:19:21.129",
-      "113200": "2026-11-05T07:19:21.129",
-      "113201": "2026-11-05T07:19:21.129",
-      "113202": "2026-11-05T07:19:21.129",
-      "113205": "2026-11-05T07:19:21.129",
-      "113209": "2026-11-05T07:19:21.129",
-      "113213": "2026-11-05T07:19:21.129",
-      "113214": "2026-11-05T07:19:21.129",
-      "113217": "2026-11-05T07:19:21.129",
-      "113221": "2026-11-05T07:19:21.129",
-      "113223": "2026-11-05T07:19:21.129",
-      "113257": "2026-11-05T07:19:21.129",
-      "113269": "2026-11-05T07:19:21.129",
-      "113272": "2026-11-05T07:19:21.129",
-      "113273": "2026-11-05T07:19:21.129",
-      "113276": "2026-11-05T07:19:21.129",
-      "113277": "2026-11-05T07:19:21.129",
-      "113278": "2026-11-05T07:19:21.129",
-      "113279": "2026-11-05T07:19:21.129",
-      "113280": "2026-11-05T07:19:21.129",
-      "113282": "2026-11-05T07:19:21.129",
-      "113283": "2026-11-05T07:19:21.129",
-      "113284": "2026-11-05T07:19:21.129",
-      "113285": "2026-11-05T07:19:21.129",
-      "113293": "2026-11-05T07:19:21.177",
-      "113311": "2026-11-05T07:19:21.145",
-      "113323": "2026-11-05T07:19:21.145",
-      "113325": "2026-11-05T07:19:21.145",
-      "113326": "2026-11-05T07:19:21.145",
-      "113329": "2026-11-05T07:19:21.145",
-      "113330": "2026-11-05T07:19:21.145",
-      "113335": "2026-11-05T07:19:21.145",
-      "113336": "2026-11-05T07:19:21.145",
-      "113340": "2026-11-05T07:19:21.145",
-      "113341": "2026-11-05T07:19:21.145",
-      "113343": "2026-11-05T07:19:21.145",
-      "113344": "2026-11-05T07:19:21.145",
-      "113348": "2026-11-05T07:19:21.145",
-      "113349": "2026-11-05T07:19:21.145",
-      "113350": "2026-11-05T07:19:21.145",
-      "113351": "2026-11-05T07:19:21.145",
-      "113367": "2026-11-05T07:19:21.177",
-      "113375": "2026-11-05T07:19:21.145",
-      "113380": "2026-11-05T07:19:21.145",
-      "113382": "2026-11-05T07:19:21.145",
-      "113388": "2026-11-05T07:19:21.145",
-      "113396": "2026-11-05T07:19:21.145",
-      "113403": "2026-11-05T07:19:21.145",
-      "113412": "2026-11-05T07:19:21.145",
-      "113413": "2026-11-05T07:19:21.145",
-      "113414": "2026-11-05T07:19:21.145",
-      "113428": "2026-11-05T07:19:21.145",
-      "113438": "2026-11-05T07:19:21.145",
-      "113440": "2026-11-05T07:19:21.145",
-      "113443": "2026-11-05T07:19:21.145",
-      "113448": "2026-11-05T07:19:21.145",
-      "113449": "2026-11-05T07:19:21.145",
-      "113450": "2026-11-05T07:19:21.145",
-      "113455": "2026-11-05T07:19:21.145",
-      "113463": "2026-11-05T07:19:21.145",
-      "113483": "2026-11-05T07:19:21.145",
-      "113486": "2026-11-05T07:19:21.145",
-      "113492": "2026-11-05T07:19:21.145",
-      "113496": "2026-11-05T07:19:21.145",
-      "113498": "2026-11-05T07:19:21.145",
-      "113500": "2026-11-05T07:19:21.145",
-      "113527": "2026-11-05T07:19:21.145",
-      "113530": "2026-11-05T07:19:21.145",
-      "113531": "2026-11-05T07:19:21.145",
-      "113534": "2026-11-05T07:19:21.145",
-      "113537": "2026-11-05T07:19:21.145",
-      "113539": "2026-11-05T07:19:21.145",
-      "113542": "2026-11-05T07:19:21.145",
-      "113548": "2026-11-05T07:19:21.145",
-      "113557": "2026-11-05T07:19:21.145",
-      "113571": "2026-11-05T07:19:21.145",
-      "113574": "2026-11-05T07:19:21.145",
-      "113595": "2026-11-05T07:19:21.145",
-      "113601": "2026-11-05T07:19:21.145",
-      "113611": "2026-11-05T07:19:21.145",
-      "113623": "2026-11-05T07:19:21.177",
-      "113643": "2026-11-05T07:19:21.145",
-      "113649": "2026-11-05T07:19:21.177",
-      "113650": "2026-11-05T07:47:02.226"
+      "112623": null,
+      "112624": null,
+      "112635": null,
+      "112640": null,
+      "112641": null,
+      "112686": null,
+      "112687": null,
+      "112694": null,
+      "112695": null,
+      "112707": null,
+      "112709": null,
+      "112713": null,
+      "112720": null,
+      "112726": null,
+      "112727": null,
+      "112740": null,
+      "112741": null,
+      "112742": null,
+      "112753": null,
+      "112758": null,
+      "112765": null,
+      "112766": null,
+      "112770": null,
+      "112771": null,
+      "112775": null,
+      "112791": null,
+      "112819": null,
+      "112831": null,
+      "112833": null,
+      "112838": null,
+      "112839": null,
+      "112840": null,
+      "112843": null,
+      "112844": null,
+      "112845": null,
+      "112852": null,
+      "112858": null,
+      "112863": null,
+      "112864": null,
+      "112875": null,
+      "112878": null,
+      "112887": null,
+      "112890": null,
+      "112900": null,
+      "112901": null,
+      "112903": null,
+      "112918": null,
+      "112919": null,
+      "112920": null,
+      "112922": null,
+      "112934": null,
+      "112935": null,
+      "112947": null,
+      "112948": null,
+      "112949": null,
+      "112952": null,
+      "112953": null,
+      "112957": null,
+      "112961": null,
+      "112964": null,
+      "112965": null,
+      "112976": null,
+      "112980": null,
+      "112985": null,
+      "112992": null,
+      "112994": null,
+      "112996": null,
+      "113000": null,
+      "113004": null,
+      "113005": null,
+      "113007": null,
+      "113008": null,
+      "113011": null,
+      "113015": null,
+      "113016": null,
+      "113020": null,
+      "113027": null,
+      "113030": null,
+      "113038": null,
+      "113040": null,
+      "113042": null,
+      "113043": null,
+      "113044": null,
+      "113046": null,
+      "113051": null,
+      "113061": null,
+      "113069": null,
+      "113070": null,
+      "113081": null,
+      "113082": null,
+      "113085": null,
+      "113088": null,
+      "113091": null,
+      "113092": null,
+      "113093": null,
+      "113096": null,
+      "113099": null,
+      "113106": null,
+      "113108": null,
+      "113121": null,
+      "113124": null,
+      "113127": null,
+      "113131": null,
+      "113134": null,
+      "113136": null,
+      "113139": null,
+      "113141": null,
+      "113149": null,
+      "113150": null,
+      "113156": null,
+      "113161": null,
+      "113162": null,
+      "113163": null,
+      "113164": null,
+      "113170": null,
+      "113186": null,
+      "113187": null,
+      "113191": null,
+      "113200": null,
+      "113201": null,
+      "113202": null,
+      "113205": null,
+      "113209": null,
+      "113213": null,
+      "113214": null,
+      "113217": null,
+      "113221": null,
+      "113223": null,
+      "113257": null,
+      "113269": null,
+      "113272": null,
+      "113273": null,
+      "113276": null,
+      "113277": null,
+      "113278": null,
+      "113279": null,
+      "113280": null,
+      "113282": null,
+      "113283": null,
+      "113284": null,
+      "113285": null,
+      "113293": null,
+      "113311": null,
+      "113323": null,
+      "113325": null,
+      "113326": null,
+      "113329": null,
+      "113330": null,
+      "113335": null,
+      "113336": null,
+      "113340": null,
+      "113341": null,
+      "113343": null,
+      "113344": null,
+      "113348": null,
+      "113349": null,
+      "113350": null,
+      "113351": null,
+      "113367": null,
+      "113375": null,
+      "113380": null,
+      "113382": null,
+      "113388": null,
+      "113396": null,
+      "113403": null,
+      "113412": null,
+      "113413": null,
+      "113414": null,
+      "113428": null,
+      "113438": null,
+      "113440": null,
+      "113443": null,
+      "113448": null,
+      "113449": null,
+      "113450": null,
+      "113455": null,
+      "113463": null,
+      "113465": null,
+      "113483": null,
+      "113486": null,
+      "113492": null,
+      "113496": null,
+      "113498": null,
+      "113500": null,
+      "113527": null,
+      "113530": null,
+      "113531": null,
+      "113534": null,
+      "113537": null,
+      "113539": null,
+      "113542": null,
+      "113548": null,
+      "113557": null,
+      "113571": null,
+      "113574": null,
+      "113595": null,
+      "113601": null,
+      "113611": null,
+      "113623": null,
+      "113643": null,
+      "113649": null,
+      "113650": null
     },
     "counts": {
       "ChrRaces": {
@@ -870,9 +872,9 @@
         "identical": 1
       },
       "Item": {
-        "VALID": 548,
+        "VALID": 587,
         "DELETE": 0,
-        "identical": 531
+        "identical": 570
       },
       "ItemEffect": {
         "VALID": 39,
@@ -880,7 +882,7 @@
         "identical": 21
       },
       "ItemSparse": {
-        "VALID": 548,
+        "VALID": 587,
         "DELETE": 0,
         "identical": 449
       },
@@ -9960,6 +9962,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 1539,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 1547,
         "status": "VALID",
         "push": 113016,
@@ -10040,6 +10050,22 @@
       },
       {
         "table": "Item",
+        "rec_id": 1934,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 1935,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 1941,
         "status": "VALID",
         "push": 113016,
@@ -10052,6 +10078,14 @@
         "status": "VALID",
         "push": 112864,
         "unique_id": 956664938,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 1988,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
         "identical": true
       },
       {
@@ -10144,6 +10178,54 @@
       },
       {
         "table": "Item",
+        "rec_id": 2013,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 2015,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 2017,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 2018,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 2020,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 2021,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 2023,
         "status": "VALID",
         "push": 112720,
@@ -10177,6 +10259,22 @@
       {
         "table": "Item",
         "rec_id": 2032,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 2033,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 2034,
         "status": "VALID",
         "push": 113016,
         "unique_id": 1452364361,
@@ -10840,6 +10938,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 3229,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 3281,
         "status": "VALID",
         "push": 113016,
@@ -11032,6 +11138,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 5187,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 5188,
         "status": "VALID",
         "push": 112720,
@@ -11137,6 +11251,14 @@
       {
         "table": "Item",
         "rec_id": 6380,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 6447,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -11376,6 +11498,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 8110,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 8189,
         "status": "VALID",
         "push": 112709,
@@ -11432,6 +11562,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 8259,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 8260,
         "status": "VALID",
         "push": 112720,
@@ -11465,6 +11603,14 @@
       {
         "table": "Item",
         "rec_id": 8264,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 8265,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -11528,6 +11674,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 8273,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 8274,
         "status": "VALID",
         "push": 112720,
@@ -11536,7 +11690,55 @@
       },
       {
         "table": "Item",
+        "rec_id": 8275,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 8276,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 8277,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 8278,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 8279,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 8280,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 8281,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -11824,7 +12026,31 @@
       },
       {
         "table": "Item",
+        "rec_id": 9849,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 9851,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 9852,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 9854,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -11848,7 +12074,23 @@
       },
       {
         "table": "Item",
+        "rec_id": 9889,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 9890,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 9892,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -11889,6 +12131,14 @@
       {
         "table": "Item",
         "rec_id": 10126,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 10150,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -12376,6 +12626,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 15512,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 18288,
         "status": "VALID",
         "push": 112864,
@@ -12824,6 +13082,14 @@
       },
       {
         "table": "Item",
+        "rec_id": 251963,
+        "status": "VALID",
+        "push": 113465,
+        "unique_id": 804822650,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 252771,
         "status": "VALID",
         "push": 113492,
@@ -13124,6 +13390,14 @@
         "status": "VALID",
         "push": 113285,
         "unique_id": 166548340,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 273084,
+        "status": "VALID",
+        "push": 113164,
+        "unique_id": 4062305238,
         "identical": true
       },
       {
@@ -13576,7 +13850,47 @@
       },
       {
         "table": "Item",
+        "rec_id": 287064,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 287066,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 287067,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 287069,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": true
+      },
+      {
+        "table": "Item",
         "rec_id": 287070,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": true
+      },
+      {
+        "table": "Item",
+        "rec_id": 287071,
         "status": "VALID",
         "push": 112996,
         "unique_id": 2203034848,
@@ -14656,6 +14970,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 1539,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 1547,
         "status": "VALID",
         "push": 113016,
@@ -14736,6 +15058,22 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 1934,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 1935,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 1941,
         "status": "VALID",
         "push": 113016,
@@ -14749,6 +15087,14 @@
         "push": 112864,
         "unique_id": 956664938,
         "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 1988,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -14840,6 +15186,54 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 2013,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 2015,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 2017,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 2018,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 2020,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 2021,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 2023,
         "status": "VALID",
         "push": 112720,
@@ -14877,6 +15271,22 @@
         "push": 113016,
         "unique_id": 1452364361,
         "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 2033,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 2034,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -15536,6 +15946,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 3229,
+        "status": "VALID",
+        "push": 113016,
+        "unique_id": 1452364361,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 3281,
         "status": "VALID",
         "push": 113016,
@@ -15728,6 +16146,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 5187,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 5188,
         "status": "VALID",
         "push": 112720,
@@ -15833,6 +16259,14 @@
       {
         "table": "ItemSparse",
         "rec_id": 6380,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 6447,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -16072,6 +16506,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 8110,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 8189,
         "status": "VALID",
         "push": 112709,
@@ -16128,6 +16570,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 8259,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 8260,
         "status": "VALID",
         "push": 112720,
@@ -16161,6 +16611,14 @@
       {
         "table": "ItemSparse",
         "rec_id": 8264,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 8265,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -16224,6 +16682,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 8273,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 8274,
         "status": "VALID",
         "push": 112720,
@@ -16232,7 +16698,55 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 8275,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 8276,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 8277,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 8278,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 8279,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 8280,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 8281,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -16520,7 +17034,31 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 9849,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 9851,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 9852,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 9854,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -16544,7 +17082,23 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 9889,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 9890,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 9892,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -16585,6 +17139,14 @@
       {
         "table": "ItemSparse",
         "rec_id": 10126,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 10150,
         "status": "VALID",
         "push": 112720,
         "unique_id": 2205645639,
@@ -17072,6 +17634,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 15512,
+        "status": "VALID",
+        "push": 112720,
+        "unique_id": 2205645639,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 18288,
         "status": "VALID",
         "push": 112864,
@@ -17520,6 +18090,14 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 251963,
+        "status": "VALID",
+        "push": 113465,
+        "unique_id": 804822650,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 252771,
         "status": "VALID",
         "push": 113492,
@@ -17821,6 +18399,14 @@
         "push": 113285,
         "unique_id": 166548340,
         "identical": true
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 273084,
+        "status": "VALID",
+        "push": 113164,
+        "unique_id": 4062305238,
+        "identical": false
       },
       {
         "table": "ItemSparse",
@@ -18272,7 +18858,47 @@
       },
       {
         "table": "ItemSparse",
+        "rec_id": 287064,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 287066,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 287067,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 287069,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
         "rec_id": 287070,
+        "status": "VALID",
+        "push": 112996,
+        "unique_id": 2203034848,
+        "identical": false
+      },
+      {
+        "table": "ItemSparse",
+        "rec_id": 287071,
         "status": "VALID",
         "push": 112996,
         "unique_id": 2203034848,
@@ -61712,6 +62338,7 @@
       "ItemEffect 239687",
       "ItemEffect 239689",
       "ItemSparse 10126",
+      "ItemSparse 10150",
       "ItemSparse 10388",
       "ItemSparse 10389",
       "ItemSparse 10391",
@@ -61726,19 +62353,39 @@
       "ItemSparse 13027",
       "ItemSparse 13028",
       "ItemSparse 14309",
+      "ItemSparse 1539",
+      "ItemSparse 15512",
       "ItemSparse 18610",
       "ItemSparse 1917",
+      "ItemSparse 1934",
+      "ItemSparse 1935",
+      "ItemSparse 1988",
       "ItemSparse 1994",
       "ItemSparse 2011",
+      "ItemSparse 2013",
+      "ItemSparse 2015",
+      "ItemSparse 2017",
+      "ItemSparse 2018",
+      "ItemSparse 2020",
+      "ItemSparse 2021",
+      "ItemSparse 2033",
+      "ItemSparse 2034",
       "ItemSparse 2042",
       "ItemSparse 2140",
+      "ItemSparse 251963",
+      "ItemSparse 273084",
       "ItemSparse 286977",
       "ItemSparse 287059",
       "ItemSparse 287060",
       "ItemSparse 287061",
       "ItemSparse 287062",
       "ItemSparse 287063",
+      "ItemSparse 287064",
+      "ItemSparse 287066",
+      "ItemSparse 287067",
+      "ItemSparse 287069",
       "ItemSparse 287070",
+      "ItemSparse 287071",
       "ItemSparse 289081",
       "ItemSparse 289082",
       "ItemSparse 289083",
@@ -61773,17 +62420,23 @@
       "ItemSparse 3192",
       "ItemSparse 3197",
       "ItemSparse 3198",
+      "ItemSparse 3229",
+      "ItemSparse 5187",
       "ItemSparse 6268",
       "ItemSparse 6378",
       "ItemSparse 6379",
       "ItemSparse 6380",
+      "ItemSparse 6447",
       "ItemSparse 6578",
       "ItemSparse 7331",
+      "ItemSparse 8110",
+      "ItemSparse 8259",
       "ItemSparse 8260",
       "ItemSparse 8261",
       "ItemSparse 8262",
       "ItemSparse 8263",
       "ItemSparse 8264",
+      "ItemSparse 8265",
       "ItemSparse 8266",
       "ItemSparse 8267",
       "ItemSparse 8268",
@@ -61791,8 +62444,15 @@
       "ItemSparse 8270",
       "ItemSparse 8271",
       "ItemSparse 8272",
+      "ItemSparse 8273",
       "ItemSparse 8274",
+      "ItemSparse 8275",
+      "ItemSparse 8276",
+      "ItemSparse 8277",
+      "ItemSparse 8278",
       "ItemSparse 8279",
+      "ItemSparse 8280",
+      "ItemSparse 8281",
       "ItemSparse 8282",
       "ItemSparse 8283",
       "ItemSparse 8285",
@@ -61803,10 +62463,15 @@
       "ItemSparse 9785",
       "ItemSparse 9786",
       "ItemSparse 9803",
+      "ItemSparse 9849",
+      "ItemSparse 9851",
       "ItemSparse 9852",
+      "ItemSparse 9854",
       "ItemSparse 9855",
       "ItemSparse 9864",
+      "ItemSparse 9889",
       "ItemSparse 9890",
+      "ItemSparse 9892",
       "ItemSparse 9893",
       "ItemSparse 9946",
       "ItemSparse 9953",
@@ -62199,126 +62864,6 @@
       "invalid": [
         {
           "table": "ItemSparse",
-          "rec_id": 5187,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 5187,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 6447,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 6447,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8110,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8110,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8259,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8259,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8265,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8265,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8273,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8273,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8275,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8275,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8276,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8276,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8277,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8277,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8278,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8278,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8280,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8280,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 8281,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 8281,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 8284,
           "push": 112720
         },
@@ -62349,66 +62894,6 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 9849,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 9849,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 9851,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 9851,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 9854,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 9854,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 9889,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 9889,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 9892,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 9892,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 10150,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 10150,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 10710,
           "push": 112720
         },
@@ -62435,16 +62920,6 @@
         {
           "table": "Item",
           "rec_id": 11423,
-          "push": 112720
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 15512,
-          "push": 112720
-        },
-        {
-          "table": "Item",
-          "rec_id": 15512,
           "push": 112720
         },
         {
@@ -62594,16 +63069,6 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 287064,
-          "push": 112996
-        },
-        {
-          "table": "Item",
-          "rec_id": 287064,
-          "push": 112996
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 287065,
           "push": 112996
         },
@@ -62614,52 +63079,12 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 287066,
-          "push": 112996
-        },
-        {
-          "table": "Item",
-          "rec_id": 287066,
-          "push": 112996
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287067,
-          "push": 112996
-        },
-        {
-          "table": "Item",
-          "rec_id": 287067,
-          "push": 112996
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 287068,
           "push": 112996
         },
         {
           "table": "Item",
           "rec_id": 287068,
-          "push": 112996
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287069,
-          "push": 112996
-        },
-        {
-          "table": "Item",
-          "rec_id": 287069,
-          "push": 112996
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 287071,
-          "push": 112996
-        },
-        {
-          "table": "Item",
-          "rec_id": 287071,
           "push": 112996
         },
         {
@@ -62754,16 +63179,6 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 1539,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 1539,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 1664,
           "push": 113016
         },
@@ -62774,42 +63189,12 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 1934,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 1934,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 1935,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 1935,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 1986,
           "push": 113016
         },
         {
           "table": "Item",
           "rec_id": 1986,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 1988,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 1988,
           "push": 113016
         },
         {
@@ -62834,86 +63219,6 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 2013,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2013,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2015,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2015,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2017,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2017,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2018,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2018,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2020,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2020,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2021,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2021,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2033,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2033,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 2034,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 2034,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 2039,
           "push": 113016
         },
@@ -62930,16 +63235,6 @@
         {
           "table": "Item",
           "rec_id": 2955,
-          "push": 113016
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 3229,
-          "push": 113016
-        },
-        {
-          "table": "Item",
-          "rec_id": 3229,
           "push": 113016
         },
         {
@@ -64109,16 +64404,6 @@
         },
         {
           "table": "ItemSparse",
-          "rec_id": 273084,
-          "push": 113164
-        },
-        {
-          "table": "Item",
-          "rec_id": 273084,
-          "push": 113164
-        },
-        {
-          "table": "ItemSparse",
           "rec_id": 18204,
           "push": 113211
         },
@@ -64471,16 +64756,6 @@
           "table": "SpellPower",
           "rec_id": 315159,
           "push": 113388
-        },
-        {
-          "table": "ItemSparse",
-          "rec_id": 251963,
-          "push": 113465
-        },
-        {
-          "table": "Item",
-          "rec_id": 251963,
-          "push": 113465
         },
         {
           "table": "ItemSparse",
@@ -65691,30 +65966,30 @@
         }
       ],
       "dbreply": {
-        "0x021826bb": 59,
-        "ItemSparse": 20910
+        "0x021826bb": 1,
+        "ItemSparse": 2902
       },
       "item_reply": {
-        "0x198e28b5": 3012,
-        "0x5481af88": 3012,
-        "0xb50ca635": 3012,
-        "0xce88edca": 3012,
-        "Item": 3012,
-        "ItemSparse": 3012
+        "0x198e28b5": 3187,
+        "0x5481af88": 3187,
+        "0xb50ca635": 3187,
+        "0xce88edca": 3187,
+        "Item": 3187,
+        "ItemSparse": 3187
       },
       "unknown_hash": {
         "0x0024bced": 1,
         "0x01325ca0": 38,
-        "0x01476a10": 1,
+        "0x01476a10": 2,
         "0x017faea0": 2,
         "0x021826bb": 122,
-        "0x02e18f32": 35,
+        "0x02e18f32": 36,
         "0x08014697": 15,
         "0x0ad67ebf": 134,
         "0x0b685935": 1,
         "0x0e540efd": 2,
         "0x0e82664c": 14,
-        "0x0f992211": 485,
+        "0x0f992211": 486,
         "0x1018add5": 1,
         "0x12a212a9": 45,
         "0x12a76efd": 2,
@@ -65748,7 +66023,7 @@
         "0x37d001ef": 1,
         "0x394c3727": 14,
         "0x39606286": 2,
-        "0x3ac83109": 485,
+        "0x3ac83109": 486,
         "0x3b57c0a1": 3,
         "0x3b9e4ca2": 14,
         "0x3cc89c00": 3,
@@ -65758,7 +66033,7 @@
         "0x4553e9f7": 254,
         "0x45952e6e": 2,
         "0x461fdc45": 5,
-        "0x4666ed42": 236,
+        "0x4666ed42": 237,
         "0x490cdd72": 4,
         "0x495495df": 1,
         "0x4ad4429c": 34,
@@ -65795,7 +66070,7 @@
         "0x7e319a3d": 421,
         "0x7e692d56": 45,
         "0x7ea08450": 72,
-        "0x7f695fa5": 3,
+        "0x7f695fa5": 4,
         "0x803704b6": 1,
         "0x8318900a": 2,
         "0x83467feb": 579,
@@ -65816,7 +66091,7 @@
         "0x94f46395": 2,
         "0x96232523": 2,
         "0x96737a41": 1,
-        "0x96fb48d9": 1,
+        "0x96fb48d9": 2,
         "0x986f8cd0": 18,
         "0x9b1bee48": 4,
         "0xa161e42c": 24,
@@ -65828,7 +66103,7 @@
         "0xab7e4841": 1,
         "0xac92e4ad": 1,
         "0xae1ca308": 135,
-        "0xaeb11490": 6,
+        "0xaeb11490": 7,
         "0xafc190d1": 1,
         "0xb2bb19eb": 1,
         "0xb33f3964": 1,
@@ -65845,7 +66120,7 @@
         "0xbd84cd62": 5,
         "0xbe1eca27": 2,
         "0xbf0bc27a": 150,
-        "0xbfdaf9f1": 6,
+        "0xbfdaf9f1": 7,
         "0xc0a5f8c6": 31,
         "0xc2b150c7": 289,
         "0xc3062b9a": 9,
@@ -65882,11 +66157,11 @@
         "0xe849437c": 9,
         "0xe9becb23": 5,
         "0xef23dc80": 6,
-        "0xf07194c3": 124,
+        "0xf07194c3": 125,
         "0xf35af3db": 7,
         "0xf3d3e512": 1,
         "0xf3d99f2d": 12,
-        "0xf483eadb": 100,
+        "0xf483eadb": 101,
         "0xf5fa849b": 6,
         "0xf66e0076": 2,
         "0xf6bc85df": 14,
@@ -77880,7 +78155,23 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 1539
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 1917
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 1934
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 1935
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 1988
           },
           {
             "table": "ItemSparse",
@@ -77889,6 +78180,38 @@
           {
             "table": "ItemSparse",
             "rec_id": 2011
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2013
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2015
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2017
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2018
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2020
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2021
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2033
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 2034
           },
           {
             "table": "ItemSparse",
@@ -77968,6 +78291,14 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 3229
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 5187
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 6268
           },
           {
@@ -77984,11 +78315,23 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 6447
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 6578
           },
           {
             "table": "ItemSparse",
             "rec_id": 7331
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8110
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8259
           },
           {
             "table": "ItemSparse",
@@ -78009,6 +78352,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 8264
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8265
           },
           {
             "table": "ItemSparse",
@@ -78040,11 +78387,39 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 8273
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 8274
           },
           {
             "table": "ItemSparse",
+            "rec_id": 8275
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8276
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8277
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8278
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 8279
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8280
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 8281
           },
           {
             "table": "ItemSparse",
@@ -78088,7 +78463,19 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 9849
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 9851
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 9852
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 9854
           },
           {
             "table": "ItemSparse",
@@ -78100,7 +78487,15 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 9889
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 9890
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 9892
           },
           {
             "table": "ItemSparse",
@@ -78117,6 +78512,10 @@
           {
             "table": "ItemSparse",
             "rec_id": 10126
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 10150
           },
           {
             "table": "ItemSparse",
@@ -78164,7 +78563,19 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 15512
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 18610
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 251963
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 273084
           },
           {
             "table": "ItemSparse",
@@ -78192,7 +78603,27 @@
           },
           {
             "table": "ItemSparse",
+            "rec_id": 287064
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 287066
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 287067
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 287069
+          },
+          {
+            "table": "ItemSparse",
             "rec_id": 287070
+          },
+          {
+            "table": "ItemSparse",
+            "rec_id": 287071
           },
           {
             "table": "ItemSparse",
@@ -78772,9 +79203,9 @@
       },
       "Item": {
         "ok": true,
-        "reason": "disposition 9A2A4834 validée : 548 entrée(s) décodée(s), 531 comparée(s), 100% des valeurs égales au build, 7/7 références résolues",
-        "decoded": 548,
-        "compared": 531,
+        "reason": "disposition 9A2A4834 validée : 587 entrée(s) décodée(s), 570 comparée(s), 100% des valeurs égales au build, 7/7 références résolues",
+        "decoded": 587,
+        "compared": 570,
         "equal_ratio": 1.0,
         "references_ok": true
       },
@@ -78788,8 +79219,8 @@
       },
       "ItemSparse": {
         "ok": true,
-        "reason": "disposition 6FCC3191 validée : 548 entrée(s) décodée(s), 449 comparée(s), 100% des valeurs égales au build, 63/63 références résolues",
-        "decoded": 548,
+        "reason": "disposition 6FCC3191 validée : 587 entrée(s) décodée(s), 449 comparée(s), 100% des valeurs égales au build, 63/63 références résolues",
+        "decoded": 587,
         "compared": 449,
         "equal_ratio": 0.9995682014453888,
         "references_ok": true

@@ -1602,6 +1602,18 @@
    "money_difficulty": 0,
    "money_multiplier": 1.0
   },
+  "103": {
+   "type": 2,
+   "level": 16,
+   "min_level": 10,
+   "sort_id": 40,
+   "next_quest": 0,
+   "xp_difficulty": 5,
+   "xp_multiplier": 1.0,
+   "money": 600,
+   "money_difficulty": 4,
+   "money_multiplier": 1.0
+  },
   "109": {
    "type": 2,
    "level": 10,
@@ -6198,6 +6210,18 @@
    "money_difficulty": 1,
    "money_multiplier": 1.0
   },
+  "78150": {
+   "type": 0,
+   "level": 20,
+   "min_level": 1,
+   "sort_id": -284,
+   "next_quest": 0,
+   "xp_difficulty": 1,
+   "xp_multiplier": 1.0,
+   "money": 125,
+   "money_difficulty": 1,
+   "money_multiplier": 1.0
+  },
   "79008": {
    "type": 2,
    "level": 22,
@@ -9106,8 +9130,8 @@
  "questcache": {
   "build": 70790,
   "locale": "frFR",
-  "records": 351,
-  "kept_from_base": 629
+  "records": 132,
+  "kept_from_base": 658
  },
  "notes": [
   "quest_xp : XP d'une quête par niveau de quête (clé) et par difficulté (colonne), table QuestXP du client",
