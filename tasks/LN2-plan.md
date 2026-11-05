@@ -28,11 +28,9 @@ Constat du 2026-11-05 :
   finale ; une donnée `wowf` ne vaut pas adoption.
 
 ### b) Rôles des installations (`forever/installs.py`)
-- `beta_product` devient `data_products` : l'ensemble des produits de **toutes** les versions de données
-  installées, et non plus celui de la plus récente.
-- Rôle : produit adopté → finale ; produit présent dans les données et non adopté → bêta ; produit public connu →
-  autre ; sinon inconnu. Plusieurs installations bêta : la plus récente est choisie.
-- `forever wow list` et `forever doctor` (appel de `cli.py`) suivent le nouveau nom.
+- `beta_product` lit le produit de la **plus ancienne** version de données installée, et non plus celui de la plus
+  récente (un ensemble de produits aurait classé bêta le produit final non adopté et empêché son adoption).
+- Rôles inchangés : adopté → finale ; produit de la bêta → bêta ; produit public connu → autre ; sinon inconnu.
 
 ### c) Produit interrogé par la veille
 - `_local_product` / `wago_product` : inchangés pour le poste (produit adopté s'il est l'installation lue).
