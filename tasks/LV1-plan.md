@@ -1,66 +1,65 @@
-# Plan LV1 — Talents de leveling niveau par niveau et resets (2026-11-05, en attente de validation)
+# Plan LV1 — Talents de leveling niveau par niveau (2026-11-05, validé : « oui fais tout »)
 
-Demande de l'utilisateur (2026-11-05) : « de tel à tel niveau tu fais ça, ensuite tu reset », pour le leveling, « à la
-perfection », après datamining et recherche complète. Recherche faite le même jour (sources ci-dessous, chacune
-datée).
+Demande (2026-11-05) : « de tel à tel niveau tu fais ça, ensuite tu reset », « à la perfection », avec les addons de
+talents du joueur : **Naowh Forever** et **Talents Forever** (« moi pour talent on a naowh forever et talent forever »).
+Révision du premier plan (centré sur Sharpie's Gear Judge Talents, que le joueur n'a pas) : Sharpie n'est plus
+qu'un recoupement facultatif.
 
 ## 1. Les deux questions (décision 288)
 - **Qui maintient déjà ça mieux que nous ?**
-  - **Sharpie's Gear Judge Talents** (addon, CurseForge v1.2.5-forever du 2026-11-04, MIT selon CurseForge, dépôt
-    `Supersharpie/SharpiesGearJudge_Talents` sans licence déclarée) : un point par niveau de 10 à 60, pour chaque spé
-    de chaque classe (`Builds.lua`), et un modèle de vitesse de leveling (temps par monstre, dégâts subis, repos, écart
-    en % avec le build le plus rapide de la classe), recalé sur des journaux de la bêta. Son modèle de calcul n'est pas
-    publié ; ses builds le sont, dans l'addon.
-  - Talents Forever (builds populaires, sans tranches), Warcraft Tavern et Method (pas de tranches au-delà de la
-    bêta), Everloot (arbres du client, aucun build de départ pour le Chaman).
-  - wowsims/forever et MythicSim : niveau 60 seulement (`CharacterLevel = 60`, README de MythicSim), vérifié le
-    2026-11-05.
-  - Personne ne publie de plan de reset payant chiffré : toutes les sources disent « pas de reset en leveling »,
-    seule bascule citée : la double spécialisation au niveau 40 (prix inconnu).
-- **Que se passe-t-il au prochain patch ?** Sharpie publie une version par patch (version « -forever » le jour de la
-  sortie) ; nous lisons son fichier, rien ne casse chez nous. Un moteur de leveling à nous casserait à chaque patch
-  (décisions 288 et 293) : non construit.
+  - **Talents Forever** (installé) : builds les plus joués par spécialisation, relevés du jour (0.38.16, relevé du
+    2026-11-05 sur 70755), contrôlés sur notre client. Pas d'ordre de prise.
+  - **Polestar** (installé, `Polestar/Talents/Builds.lua`) : un point par niveau de 10 à 60 et des notes, pour les
+    3 spécialisations des 9 classes. Écrit sur la bêta 70450 (`checkedOn`, en-tête du fichier), pas revérifié au
+    commit 86a4c222 du 2026-11-05 : relevé du jour sur 70790 : Chaman Amélioration et Restauration entiers,
+    Élémentaire cassé au point 21 (Lava Burst retiré), Mage cassé dans les trois spécialisations (Givre au point 11).
+  - **Naowh Forever** (installé) : onglet Builds, suit un build point par point en jeu (« Follow ») ; aucun build
+    livré dans cette version, aucun build du joueur. Le projet sait déjà écrire son code `!NFB1!` (EX1).
+  - Sharpie's Gear Judge Talents : non installé ; recoupement facultatif seulement.
+  - wowsims, MythicSim : niveau 60 seulement.
+- **Que se passe-t-il au prochain patch ?** Talents Forever se met à jour seul (relevés quotidiens) ; Polestar
+  quand ses auteurs le revérifient ; nous relisons les deux fichiers à chaque appel et contrôlons chaque point sur le
+  client installé : un talent retiré ou un nœud réaffecté est signalé, jamais suivi. Aucun calcul de rendement à nous
+  (décisions 293 et 299).
 
 ## 2. Ce qui change
-### a) Lecteur de Sharpie (décision 272, mes addons d'abord)
-- L'utilisateur installe l'addon lui-même (l'agent n'installe rien). Lecture locale de `Builds.lua` (et
-  `Data/TalentSpellIDs_Forever.lua` pour relier les noms aux sorts du client), comme les autres addons
-  (`forever/addons.py`, `AddonSpec`).
-- Chaque build : classe, spé, contexte (solo, AoE), talent pris à chaque niveau, écart de vitesse annoncé.
-  Légalité contrôlée sur nos arbres du client 70790 (`build_check`) ; un talent inconnu du client est dit, jamais
-  corrigé.
+### a) Lecteur Polestar (décision 272)
+- `forever/polestar_talents.py` : lecture locale de `Interface/AddOns/Polestar/Talents/Builds.lua` (analyseur
+  `lua_table`, aucun Lua exécuté) : par classe, résumé, source, version du client d'écriture (en-tête), builds
+  (clé, spécialisation, répartition, points dans l'ordre, notes par niveau), table des nœuds (sort, nom).
+- Chaque point relié à nos clés **par le nom du talent dans la classe** (pas par le nœud : Blizzard réutilise des
+  nœuds, Primal Bite a pris celui de Berserk). Nom absent du client : « talent absent du client », point écarté.
+  Nœud de Polestar qui porte aujourd'hui un autre talent : dit (« nœud réaffecté »).
 
-### b) Plan de leveling par tranches (`forever_lookup(kind="leveling_plan", name, …)`)
-- Rend, pour une classe et un contexte : talents par tranche de niveaux (paliers clés : talent majeur pris, bascule
-  d'arbre), l'écart annoncé avec les autres builds, et le moment des bascules.
-- **Resets** : proposés seulement quand une source les donne ou à la double spécialisation (niveau 40). Coût du
-  reset lu dans les données (`respec.json`, aujourd'hui relevés de la bêta, certitude `suppose`) ; prix réel à
-  relever en jeu (essai ci-dessous). Aucun reset inventé pour « gagner » sans chiffre d'une source.
-- Recoupements dits à côté : build populaire de Talents Forever le plus proche ; pour le Mage, temps par monstre du
-  moteur gelé aux niveaux mesurés ; pour toutes les classes, mes journaux (ForeverLogger) quand ils existent.
-- Provenance : version et date de l'addon, certitude `probable` (modèle d'un tiers recalé sur la bêta).
+### b) Plan de leveling (`forever_lookup(kind="leveling_plan", name=<classe>, class_name=<spé>, level=…)`, CLI
+`forever talents plan`)
+- **Build visé** : le build populaire de Talents Forever le plus joué de la spécialisation, légal sur le client ; à
+  défaut, celui de Polestar s'il est entier.
+- **Ordre** : celui de Polestar tant que le point suivant est dans le build visé et légal ; sinon point généré légal
+  (moteur existant, `forever/engine/talents.py`), marqué `genere`. Chaque point dit sa source.
+- **Tranches** : « niveaux A–B : talent, rangs » ; niveau d'un point = premier niveau de talent des données
+  (`mechanics.json`), un point par niveau. Notes de Polestar reprises à leur niveau si le point est le même.
+- **Naowh** : code `!NFB1!` de cet ordre (`order_source="leveling"`), à coller dans `/nftraining`, Builds, Import,
+  puis Follow.
+- **Resets** : aucun inventé. Aucune source n'en donne : dit tel quel, avec ce que disent les données
+  (`respec.json`, relevés de la bêta, `suppose`) et la double spécialisation (prix inconnu, question ouverte).
+- Provenance : versions de Polestar et de Talents Forever, version d'écriture de Polestar contre le client, certitude
+  `suppose` (choix de joueurs et ordre d'un guide), écarts nommés.
 
-### c) Équipement de leveling
-- Inchangé : GearQuest Forever (`forever_gear action="leveling"`), poids de la spé du plan à chaque tranche.
+### c) Tests (d'abord, sans réseau)
+- `tests/fixtures/addons/Polestar/Talents/Builds.lua` synthétique (même forme, talents des fixtures).
+- Lecture ; point → niveau ; talent absent ; nœud réaffecté ; fusion avec le build visé (ordre Polestar gardé,
+  points générés marqués) ; tranches ; code Naowh ; provenance ; MCP et CLI.
 
-### d) Tests (d'abord, sans réseau)
-- Extrait de `Builds.lua` dans `tests/fixtures/addons/` (version figée) : lecture, ordre des points, bascule d'arbre.
-- Légalité sur les arbres du client ; talent absent du client signalé.
-- Plan par tranches : tranches et bascules, reset seulement sourcé, provenance.
-
-### e) Documents
-- Décision 303 (source des talents de leveling ; la décision 299 tient : aucun calcul à nous). Skills `forever-leveling`,
-  `forever-builds`, routeur. `docs/OPEN_QUESTIONS.md` : prix du reset et de la double spécialisation dans la version
-  finale.
+### d) Documents
+- Décision 303 ; `docs/DATA_SOURCES.md` ; skills `forever-leveling`, `forever-builds`, routeur ; plugin 0.22.2 ;
+  `docs/OPEN_QUESTIONS.md` : prix du reset et de la double spécialisation dans la version finale.
 
 ## 3. Essai en jeu (décision 273)
-- Chez le maître de classe : prix affiché du premier reset ; prix de la double spécialisation si proposée.
-- Addon de Sharpie : comparer son build affiché à celui que rend `forever_lookup` pour Chaman et Mage.
+- Coller le code `!NFB1!` du plan Chaman Amélioration dans `/nftraining`, Builds, Import ; Follow : le talent annoncé
+  au prochain niveau est celui du plan.
+- Chez le maître de classe : prix du premier reset ; double spécialisation proposée ou non, et son prix.
 
-## 4. Ce qui reste hors de portée (dit, pas caché)
-- « Parfait » au sens d'un calcul : aucun moteur de leveling ouvert n'existe pour Forever sous le 60 ; le modèle de
-  Sharpie est fermé. Le plan est le meilleur avis sourcé disponible, recoupé par nos mesures.
-- Si l'utilisateur veut un calcul à nous malgré la décision 293, c'est une autre tranche, à décider par lui.
-
-## 5. Durée et dépendances
-- Une demi-journée ; aucune dépendance ; aucun accès réseau (lecture de l'addon installé).
+## 4. Hors de portée (dit)
+- « Parfait » au sens d'un calcul : aucun moteur de leveling ouvert pour Forever sous le 60. Le plan est le meilleur
+  avis sourcé disponible (joueurs + guide), contrôlé sur le client.
