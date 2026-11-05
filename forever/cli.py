@@ -896,6 +896,13 @@ def build_parser() -> argparse.ArgumentParser:
     tal_check.add_argument("--level", type=int, required=True, help="niveau du personnage")
     tal_check.add_argument("points", nargs="*", help="talents « clé=rang » (clés de classes.json)")
     tal_check.add_argument("--json", action="store_true", help="sortie JSON")
+    tal_plan = tal_sub.add_parser(
+        "plan", help="plan de talents de leveling niveau par niveau (Polestar + Talents Forever, code Naowh ; LV1)"
+    )
+    tal_plan.add_argument("--class", dest="cls", required=True, help="classe (nom français ou anglais)")
+    tal_plan.add_argument("--spec", help="spécialisation (nom anglais ; défaut : les trois)")
+    tal_plan.add_argument("--level", type=int, help="niveau du personnage (point du prochain niveau)")
+    tal_plan.add_argument("--json", action="store_true", help="sortie JSON")
     tal_tf = tal_sub.add_parser("tf", help="Talents Forever installé : recoupement, code de build, builds populaires")
     tf_sub = tal_tf.add_subparsers(dest="tf_cmd", required=True)
     tf_cross = tf_sub.add_parser("crosscheck", help="recoupement de nos arbres avec ceux de l'addon (écarts)")
@@ -2626,6 +2633,12 @@ def _cmd_talents_tf(deps: Deps, args: argparse.Namespace) -> int:
 def _cmd_talents(deps: Deps, args: argparse.Namespace) -> int:
     if args.talents_cmd == "tf":
         return _cmd_talents_tf(deps, args)
+    if args.talents_cmd == "plan":
+        from forever.leveling_plan import leveling_plan, render_plan
+
+        plan = leveling_plan(deps, args.cls, spec=args.spec, level=args.level)
+        _emit(plan, render_plan(plan), plan["provenance"], args.json)
+        return EXIT_OK
     points = parse_talents(",".join(args.points)) if args.points else {}
     report = check_class_talents(deps, args.cls, points, args.level)
     verdict = "légal" if report["legal"] else "illégal"

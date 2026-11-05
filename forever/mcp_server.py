@@ -179,6 +179,12 @@ def build_server(deps: Deps) -> MCPServer:
         joueurs). P06b : avec `current` (talents actuels, « clé=rang,… »), `closest` : le build populaire le plus
         proche, calculé par l'outil (même spécialisation, points absents, écarts) ; à donner tel quel, sans en choisir
         un autre ; `null` si aucun point n'est placé.
+        LV1 : `kind="leveling_plan"` avec `name` (classe), `class_name` facultatif (spécialisation, nom anglais) et
+        `level` facultatif (niveau du personnage) : plan de talents de leveling niveau par niveau ; build visé = build
+        populaire de Talents Forever le plus joué de la spécialisation, ordre = Polestar (addon lu sur disque) contrôlé
+        point par point sur le client, points générés marqués `genere`, talents absents ou nœuds réaffectés dans
+        `polestar.issues`, `tranches` (« niveaux A–B : talent, rangs »), `next` (point du prochain niveau), `naowh`
+        (code `!NFB1!` dans cet ordre, à importer puis suivre avec Follow), `resets` (aucun inventé) ; `suppose`.
         T04d : `kind="quests"` : quêtes de Forever fusionnées (Questie, Naowh Forever, Forever Guide,
         ForeverDungeonJournal, GearQuest et quêtes vues par le client, lus en local) ; filtres `level` (quêtes
         accessibles et non grises), `faction`, `zone`, `status` (nouvelle, retouchée, absente des sources Forever,
@@ -263,6 +269,12 @@ def build_server(deps: Deps) -> MCPServer:
 
                 placed = parse_talents(current) if current else None
                 return popular_builds(require_addon(deps), deps, name or None, current=placed)
+            if kind == "leveling_plan":
+                from forever.leveling_plan import leveling_plan
+
+                if not name:
+                    raise InvalidArgumentError("Classe manquante.", "donner name (classe, nom français ou anglais)")
+                return leveling_plan(deps, name, spec=class_name or None, level=level)
             if kind == "export":
                 return _export_lookup(
                     deps, name, class_name=class_name, level=level, talents=talents, text=text,
@@ -294,6 +306,7 @@ def build_server(deps: Deps) -> MCPServer:
                         "build_check",
                         "pets",
                         "tf_popular",
+                        "leveling_plan",
                         "quests",
                         "xp_bonuses",
                         "dungeons",

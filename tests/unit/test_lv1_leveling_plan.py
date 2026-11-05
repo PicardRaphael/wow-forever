@@ -11,8 +11,6 @@ import json
 
 import pytest
 from conftest import DATA_DIR, PRE_70450_VERSION
-from forever.leveling_plan import leveling_plan
-from forever.polestar_talents import read_polestar_talents
 from mcp import Client
 from polestar_talents_data import TOC_VERSION, WRITTEN_ON, write_polestar
 from talents_forever_data import write_addon
@@ -21,7 +19,9 @@ from forever.cli import main
 from forever.engine.talents import legal_order
 from forever.errors import InvalidArgumentError
 from forever.gamedata import build_game_data
+from forever.leveling_plan import leveling_plan
 from forever.mcp_server import build_server
+from forever.polestar_talents import read_polestar_talents
 from forever.store import load_version
 from forever.talents_forever import load_addon, popular_builds
 

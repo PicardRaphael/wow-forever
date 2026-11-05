@@ -247,6 +247,25 @@ def check_order(knowledge: ClassKnowledge, rules: TalentRules, order: Sequence[s
     return errors
 
 
+def next_step_error(knowledge: ClassKnowledge, rules: TalentRules, order: Sequence[str], key: str) -> str | None:
+    """Erreur de la prise d'un point de `key` juste après l'ordre `order` (supposé légal) ; None : légale (LV1).
+
+    Registre : G3"""
+    known = {t["key"]: t for tree in knowledge.trees for t in tree["talents"]}
+    t = known.get(key)
+    if t is None:
+        return f"talent inconnu : {key}"
+    by_node = {x["node_id"]: x for x in known.values()}
+    taken: dict[str, int] = {}
+    spent: dict[str, int] = {}
+    for k in order:
+        taken[k] = taken.get(k, 0) + 1
+        tree = known[k]["tree"] if k in known else None
+        if tree is not None:
+            spent[tree] = spent.get(tree, 0) + 1
+    return _step_error(t, taken, spent.get(t["tree"], 0), rules.points_per_tier, by_node)
+
+
 def legal_order(knowledge: ClassKnowledge, rules: TalentRules, pts: Points) -> list[str]:
     """Ordre de prise légal d'un build sans ordre (EX1, décision 267) : arbre le plus chargé d'abord, palier
     croissant, prérequis d'abord, un point par entrée ; `ValueError` en français si aucun ordre légal n'existe.
