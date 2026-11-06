@@ -788,7 +788,7 @@
          "CurvePoint 328757"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-06T17:04:58Z"
+        "dbcache_date": "2026-11-06T17:33:25Z"
        }
       },
       {
@@ -3383,7 +3383,7 @@
        "SpellEffect 686475"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "berserkerStancePassive": {
@@ -6744,7 +6744,7 @@
        "CurvePoint 328757"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "improvedRevenge": {
@@ -10279,7 +10279,7 @@
          "SpellEffect 1367620"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-06T17:04:58Z"
+        "dbcache_date": "2026-11-06T17:33:25Z"
        },
        "former_names": [
         "Oath of Light",
@@ -10643,7 +10643,7 @@
          "SpellEffect 698886"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-06T17:04:58Z"
+        "dbcache_date": "2026-11-06T17:33:25Z"
        }
       },
       {
@@ -11877,7 +11877,7 @@
        "SpellEffect 688696"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "hammerOfJustice": {
@@ -19099,7 +19099,7 @@
        "SpellEffect 1237445"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "hammerOfWrath": {
@@ -20558,7 +20558,7 @@
        "SpellEffect 1367620"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     }
    },
@@ -56076,7 +56076,7 @@
        "SpellEffect 693006"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "sort15008": {
@@ -61812,7 +61812,7 @@
          "SpellEffect 1072707"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-06T17:04:58Z"
+        "dbcache_date": "2026-11-06T17:33:25Z"
        }
       }
      ]
@@ -62774,7 +62774,7 @@
        "SpellEffect 691780"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "chainLightning": {
@@ -62893,7 +62893,7 @@
        "SpellEffect 688920"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "curePoison": {
@@ -64781,7 +64781,7 @@
        "SpellEffect 688559"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "flameShock": {
@@ -64953,7 +64953,7 @@
        "SpellEffect 704946"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "frostShock": {
@@ -65086,7 +65086,7 @@
        "SpellEffect 688813"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "stoneskinTotem": {
@@ -71658,7 +71658,7 @@
        "SpellEffect 1236796"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "rageOfTheFarseer": {
@@ -83466,7 +83466,7 @@
          "SpellEffect 1349556"
         ],
         "first_logged_at": null,
-        "dbcache_date": "2026-11-06T17:04:58Z"
+        "dbcache_date": "2026-11-06T17:33:25Z"
        }
       }
      ]
@@ -94249,7 +94249,7 @@
        "SpellEffect 1349556"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     }
    },
@@ -99758,7 +99758,7 @@
        "SpellEffect 702704"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "catFormPassive": {
@@ -101026,7 +101026,20 @@
       "certainty": "probable",
       "via": []
      },
-     "certainty": "FC-1.60.1.70790"
+     "certainty": "FC-1.60.1.70790",
+     "hotfix": {
+      "pushes": [
+       112414
+      ],
+      "rows": [
+       "SpellAuraRestrictions 25394",
+       "SpellAuraRestrictions 25395",
+       "SpellAuraRestrictions 25396",
+       "SpellAuraRestrictions 25397"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-06T17:33:25Z"
+     }
     },
     "sort6793": {
      "name": "sort 6793",
@@ -101960,7 +101973,19 @@
        "via": null
       }
      },
-     "certainty": "FC-1.60.1.70790"
+     "certainty": "FC-1.60.1.70790",
+     "hotfix": {
+      "pushes": [
+       112414
+      ],
+      "rows": [
+       "SpellAuraRestrictions 25391",
+       "SpellAuraRestrictions 25392",
+       "SpellAuraRestrictions 25393"
+      ],
+      "first_logged_at": null,
+      "dbcache_date": "2026-11-06T17:33:25Z"
+     }
     },
     "direBearForm": {
      "name": "Dire Bear Form",
@@ -106864,7 +106889,7 @@
        "SpellEffect 700189"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "giftOfTheWild": {
@@ -107090,7 +107115,7 @@
        "SpellEffect 1367722"
       ],
       "first_logged_at": null,
-      "dbcache_date": "2026-11-06T17:04:58Z"
+      "dbcache_date": "2026-11-06T17:33:25Z"
      }
     },
     "sort22571": {
