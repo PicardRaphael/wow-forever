@@ -1,6 +1,6 @@
 {
  "schema_version": 2,
- "game_version": "1.60.1.70338",
+ "game_version": "1.60.1.70790",
  "source": "PV max lus dans le bloc avancé des journaux de combat du client ; Questie en regard",
  "logs": [
   "WoWCombatLog-092726_145346.txt",
@@ -18,34 +18,351 @@
   "WoWCombatLog-101126_090516.txt",
   "WoWCombatLog-101226_120722.txt",
   "WoWCombatLog-101326_083533.txt",
-  "WoWCombatLog-101326_095016.txt"
+  "WoWCombatLog-101326_095016.txt",
+  "WoWCombatLog-110526_070839.txt",
+  "WoWCombatLog-110526_152804.txt"
  ],
  "questie_version": "11.38.0",
  "questie_source": "communautaire (Classic Era, aucune correction Forever), Questie 11.38.0 Forever-v27",
  "npcs": {
+  "36": {
+   "name": "Golem des moissons",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 222,
+     "fought": false
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 247,
+     "fought": false
+    }
+   }
+  },
+  "95": {
+   "name": "Contrebandier défias",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 222,
+     "fought": false
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 247,
+     "fought": true
+    }
+   }
+  },
+  "114": {
+   "name": "Gardien des moissons",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 49 individu(s))",
+     "questie_hp": 300,
+     "fought": true
+    },
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 57 individu(s))",
+     "questie_hp": 328,
+     "fought": true
+    }
+   }
+  },
+  "117": {
+   "name": "Gnoll Rivepatte",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 19 individu(s))",
+     "questie_hp": 222,
+     "fought": false
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 23 individu(s))",
+     "questie_hp": 247,
+     "fought": false
+    }
+   }
+  },
+  "126": {
+   "name": "Cours-la-côte murloc",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 24 individu(s))",
+     "questie_hp": 247,
+     "fought": true
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 14 individu(s))",
+     "questie_hp": 273,
+     "fought": true
+    }
+   }
+  },
+  "157": {
+   "name": "Broche-tripes",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328,
+     "fought": true
+    }
+   }
+  },
+  "199": {
+   "name": "Jeune déchireur",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 13 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    }
+   }
+  },
+  "454": {
+   "name": "Jeune Broche-tripes",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 11 individu(s))",
+     "questie_hp": 247,
+     "fought": true
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 17 individu(s))",
+     "questie_hp": 273,
+     "fought": true
+    }
+   }
+  },
+  "478": {
+   "name": "Estafette Rivepatte",
+   "zone_id": 12,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 176,
+     "fought": false
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 198,
+     "fought": false
+    }
+   }
+  },
+  "480": {
+   "name": "Golem des moissons rouillé",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 180,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 23 individu(s))",
+     "questie_hp": 176,
+     "fought": true
+    },
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 27 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    }
+   }
+  },
+  "481": {
+   "name": "Détrousseur défias",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 198,
+     "fought": true
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    }
+   }
+  },
+  "500": {
+   "name": "Eclaireur Rivepatte",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 9 individu(s))",
+     "questie_hp": 247,
+     "fought": false
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 5 individu(s))",
+     "questie_hp": 273,
+     "fought": false
+    }
+   }
+  },
+  "502": {
+   "name": "Benny Blaanco",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "15": {
+     "max_hp": 385,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 328,
+     "fought": false
+    }
+   }
+  },
+  "504": {
+   "name": "Trappeur défias",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 247,
+     "fought": false
+    },
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 273,
+     "fought": true
+    }
+   }
+  },
+  "515": {
+   "name": "Ecumeur murloc",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 24 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    },
+    "12": {
+     "max_hp": 272,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 12 individu(s))",
+     "questie_hp": 247,
+     "fought": true
+    }
+   }
+  },
+  "547": {
+   "name": "Grand Broche-tripes",
+   "zone_id": 44,
+   "rank": 0,
+   "levels": {
+    "17": {
+     "max_hp": 473,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 386,
+     "fought": false
+    }
+   }
+  },
   "704": {
-   "name": "Ragged Timber Wolf",
+   "name": "Loup des bois décharné",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "2": {
      "max_hp": 55,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 55,
      "fought": null
     }
    }
   },
   "705": {
-   "name": "Ragged Young Wolf",
+   "name": "Jeune loup décharné",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "1": {
      "max_hp": 42,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 73 individu(s))",
+     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 7 individu(s))",
      "questie_hp": 42,
      "fought": null
     }
@@ -73,65 +390,121 @@
    }
   },
   "707": {
-   "name": "Rockjaw Trogg",
+   "name": "Trogg Mâcheroc",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "1": {
      "max_hp": 42,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 2 individu(s))",
+     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 42,
      "fought": null
     },
     "2": {
      "max_hp": 55,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 3 individu(s))",
+     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 55,
      "fought": null
     }
    }
   },
   "708": {
-   "name": "Small Crag Boar",
+   "name": "Petit sanglier des rochers",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "3": {
      "max_hp": 71,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 76 individu(s))",
+     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 71,
      "fought": null
     }
    }
   },
   "721": {
-   "name": "Rabbit",
+   "name": "Lapin",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "1": {
      "max_hp": 1,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100726_130833.txt (bloc avancé, 4 individu(s))",
+     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 1,
      "fought": null
     }
    }
   },
   "724": {
-   "name": "Burly Rockjaw Trogg",
+   "name": "Trogg Mâcheroc forcené",
    "zone_id": 1,
    "rank": 0,
    "levels": {
     "2": {
      "max_hp": 55,
      "certainty": "certain",
-     "source": "journal WoWCombatLog-100226_080035.txt (bloc avancé, 19 individu(s))",
+     "source": "journal WoWCombatLog-110526_070839.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 55,
      "fought": null
+    }
+   }
+  },
+  "822": {
+   "name": "Jeune ours des forêts",
+   "zone_id": 12,
+   "rank": 0,
+   "levels": {
+    "9": {
+     "max_hp": 225,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 220,
+     "fought": false
+    }
+   }
+  },
+  "834": {
+   "name": "Coyote",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "10": {
+     "max_hp": 208,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 3 individu(s))",
+     "questie_hp": 198,
+     "fought": false
+    },
+    "11": {
+     "max_hp": 239,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 6 individu(s))",
+     "questie_hp": 222,
+     "fought": true
+    }
+   }
+  },
+  "1109": {
+   "name": "Déchireur",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "13": {
+     "max_hp": 307,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 273,
+     "fought": true
+    },
+    "14": {
+     "max_hp": 345,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 2 individu(s))",
+     "questie_hp": 300,
+     "fought": true
     }
    }
   },
@@ -1045,6 +1418,20 @@
     }
    }
   },
+  "2914": {
+   "name": "Serpent",
+   "zone_id": 15,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 8,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 8,
+     "fought": false
+    }
+   }
+  },
   "3099": {
    "name": "Dire Mottled Boar",
    "zone_id": 14,
@@ -1706,7 +2093,7 @@
      "certainty": "certain",
      "source": "journal WoWCombatLog-101326_095016.txt (bloc avancé, 1 individu(s))",
      "questie_hp": 386,
-     "fought": false
+     "fought": null
     }
    }
   },
@@ -2326,6 +2713,20 @@
     }
    }
   },
+  "6271": {
+   "name": "Souris",
+   "zone_id": 40,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 8,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 8,
+     "fought": false
+    }
+   }
+  },
   "6328": {
    "name": "Dannie Fizzwizzle",
    "zone_id": 1,
@@ -2739,6 +3140,20 @@
     }
    }
   },
+  "13016": {
+   "name": "Rat des profondeurs",
+   "zone_id": 2257,
+   "rank": 0,
+   "levels": {
+    "1": {
+     "max_hp": 1,
+     "certainty": "certain",
+     "source": "journal WoWCombatLog-110526_152804.txt (bloc avancé, 1 individu(s))",
+     "questie_hp": 1,
+     "fought": false
+    }
+   }
+  },
   "13076": {
    "name": "Dun Morogh Mountaineer",
    "zone_id": 1,
@@ -2933,43 +3348,43 @@
    "value": 180,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 13
+   "n_npcs": 14
   },
   "10": {
    "value": 208,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 16
+   "n_npcs": 20
   },
   "11": {
    "value": 239,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 13
+   "n_npcs": 18
   },
   "12": {
    "value": 272,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 11
+   "n_npcs": 16
   },
   "13": {
    "value": 307,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 8
+   "n_npcs": 12
   },
   "14": {
    "value": 345,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 7
+   "n_npcs": 9
   },
   "15": {
    "value": 385,
    "certainty": "certain",
    "source": "journaux : valeur commune des PNJ normaux observés",
-   "n_npcs": 2
+   "n_npcs": 4
   },
   "16": {
    "value": 427,
@@ -3340,6 +3755,210 @@
  },
  "conflicts": [],
  "questie_gaps": [
+  {
+   "npc_id": 36,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 36,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 95,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 95,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 114,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
+  {
+   "npc_id": 114,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 117,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 117,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 126,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 126,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 157,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 199,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 199,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 454,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 454,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 478,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 478,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 480,
+   "level": 9,
+   "measured": 180,
+   "questie": 176
+  },
+  {
+   "npc_id": 480,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 481,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 481,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 500,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 500,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 502,
+   "level": 15,
+   "measured": 385,
+   "questie": 328
+  },
+  {
+   "npc_id": 504,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 504,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 515,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 515,
+   "level": 12,
+   "measured": 272,
+   "questie": 247
+  },
+  {
+   "npc_id": 547,
+   "level": 17,
+   "measured": 473,
+   "questie": 386
+  },
+  {
+   "npc_id": 822,
+   "level": 9,
+   "measured": 225,
+   "questie": 220
+  },
+  {
+   "npc_id": 834,
+   "level": 10,
+   "measured": 208,
+   "questie": 198
+  },
+  {
+   "npc_id": 834,
+   "level": 11,
+   "measured": 239,
+   "questie": 222
+  },
+  {
+   "npc_id": 1109,
+   "level": 13,
+   "measured": 307,
+   "questie": 273
+  },
+  {
+   "npc_id": 1109,
+   "level": 14,
+   "measured": 345,
+   "questie": 300
+  },
   {
    "npc_id": 1115,
    "level": 9,
@@ -4530,31 +5149,31 @@
    },
    "9": {
     "ratio": 1.0227272727272727,
-    "n_pairs": 13
+    "n_pairs": 14
    },
    "10": {
     "ratio": 1.0505050505050506,
-    "n_pairs": 16
+    "n_pairs": 20
    },
    "11": {
     "ratio": 1.0765765765765767,
-    "n_pairs": 12
+    "n_pairs": 17
    },
    "12": {
     "ratio": 1.1012145748987854,
-    "n_pairs": 11
+    "n_pairs": 16
    },
    "13": {
     "ratio": 1.1245421245421245,
-    "n_pairs": 8
+    "n_pairs": 12
    },
    "14": {
     "ratio": 1.15,
-    "n_pairs": 7
+    "n_pairs": 9
    },
    "15": {
     "ratio": 1.173780487804878,
-    "n_pairs": 2
+    "n_pairs": 4
    },
    "16": {
     "ratio": 1.3138461538461539,
@@ -4605,10 +5224,76 @@
   ],
   "excluded": [
    {
+    "npc_id": 36,
+    "name": "Golem des moissons",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 36,
+    "name": "Golem des moissons",
+    "level": 12,
+    "ratio": 1.1012145748987854
+   },
+   {
+    "npc_id": 117,
+    "name": "Gnoll Rivepatte",
+    "level": 11,
+    "ratio": 1.0765765765765767
+   },
+   {
+    "npc_id": 117,
+    "name": "Gnoll Rivepatte",
+    "level": 12,
+    "ratio": 1.1012145748987854
+   },
+   {
+    "npc_id": 478,
+    "name": "Estafette Rivepatte",
+    "level": 9,
+    "ratio": 1.0227272727272727
+   },
+   {
+    "npc_id": 478,
+    "name": "Estafette Rivepatte",
+    "level": 10,
+    "ratio": 1.0505050505050506
+   },
+   {
+    "npc_id": 500,
+    "name": "Eclaireur Rivepatte",
+    "level": 12,
+    "ratio": 1.1012145748987854
+   },
+   {
+    "npc_id": 500,
+    "name": "Eclaireur Rivepatte",
+    "level": 13,
+    "ratio": 1.1245421245421245
+   },
+   {
+    "npc_id": 502,
+    "name": "Benny Blaanco",
+    "level": 15,
+    "ratio": 1.173780487804878
+   },
+   {
+    "npc_id": 547,
+    "name": "Grand Broche-tripes",
+    "level": 17,
+    "ratio": 1.2253886010362693
+   },
+   {
     "npc_id": 721,
-    "name": "Rabbit",
+    "name": "Lapin",
     "level": 1,
     "ratio": 1.0
+   },
+   {
+    "npc_id": 822,
+    "name": "Jeune ours des forêts",
+    "level": 9,
+    "ratio": 1.0227272727272727
    },
    {
     "npc_id": 1128,
@@ -4803,6 +5488,12 @@
     "ratio": 1.2261410788381744
    },
    {
+    "npc_id": 2914,
+    "name": "Serpent",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 3239,
     "name": "Thunderhead",
     "level": 20,
@@ -4977,6 +5668,12 @@
     "ratio": 1.0765765765765767
    },
    {
+    "npc_id": 6271,
+    "name": "Souris",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 6328,
     "name": "Dannie Fizzwizzle",
     "level": 14,
@@ -5031,6 +5728,12 @@
     "ratio": 1.300711743772242
    },
    {
+    "npc_id": 13016,
+    "name": "Rat des profondeurs",
+    "level": 1,
+    "ratio": 1.0
+   },
+   {
     "npc_id": 13076,
     "name": "Dun Morogh Mountaineer",
     "level": 30,
@@ -5054,12 +5757,72 @@
  ],
  "curve_excluded": [
   {
+   "npc_id": 36,
+   "name": "Golem des moissons",
+   "levels": [
+    11,
+    12
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 117,
+   "name": "Gnoll Rivepatte",
+   "levels": [
+    11,
+    12
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 478,
+   "name": "Estafette Rivepatte",
+   "levels": [
+    9,
+    10
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 500,
+   "name": "Eclaireur Rivepatte",
+   "levels": [
+    12,
+    13
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 502,
+   "name": "Benny Blaanco",
+   "levels": [
+    15
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
+   "npc_id": 547,
+   "name": "Grand Broche-tripes",
+   "levels": [
+    17
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 721,
-   "name": "Rabbit",
+   "name": "Lapin",
    "levels": [
     1
    ],
    "reason": "hors norme : 1 PV au niveau 1, -97,6 % de la médiane des autres PNJ du niveau (42) ; mesuré, écarté de la courbe (décision 223)"
+  },
+  {
+   "npc_id": 822,
+   "name": "Jeune ours des forêts",
+   "levels": [
+    9
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 1128,
@@ -5250,6 +6013,14 @@
     17
    ],
    "reason": "PNJ hors norme dans le premier journal de 1.60.1.70170 (WoWCombatLog-100226_080035) : ours (Thistle Bear, Grizzled Thistle Bear) au-dessus des PNJ normaux de leur niveau, Dark Strand Enforcer et Wildthorn Stalker à 642 PV au niveau 20 contre 629 ; décision de l'utilisateur du 2026-10-02"
+  },
+  {
+   "npc_id": 2914,
+   "name": "Serpent",
+   "levels": [
+    1
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
   },
   {
    "npc_id": 3239,
@@ -5450,6 +6221,14 @@
    "reason": "PNJ nommés ou hors norme signalés par la mesure (un point d'apparition dans Questie ou absents de Questie) : Mountaineer Naarh (niveau 30), Ironforge Protector (garde élite, niveau 55) et 14 PNJ de quête ou de zone de départ ; accord de l'utilisateur du 2026-10-09"
   },
   {
+   "npc_id": 6271,
+   "name": "Souris",
+   "levels": [
+    1
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 6328,
    "name": "Dannie Fizzwizzle",
    "levels": [
@@ -5647,6 +6426,14 @@
    "reason": "PNJ nommé de quête (personnage unique) : mesuré un par un, écarté de la courbe au-dessus comme en dessous ; règle de l'utilisateur du 2026-10-06"
   },
   {
+   "npc_id": 13016,
+   "name": "Rat des profondeurs",
+   "levels": [
+    1
+   ],
+   "reason": "PNJ seulement vu à côté des combats, jamais combattu par le joueur dans les journaux : mesuré, écarté d'office de la courbe (décision 222)"
+  },
+  {
    "npc_id": 13076,
    "name": "Dun Morogh Mountaineer",
    "levels": [
@@ -5720,6 +6507,5 @@
   "hp_by_level : médiane des PNJ normaux (rang Questie 0 ou inconnu) ; journal d'abord, sinon Questie corrigé (questie_hp × ratio ; probable dans questie_correction.range, suppose au-delà)",
   "inversions : niveaux dont la valeur est sous celle du niveau précédent (listées, jamais lissées)",
   "créatures invoquées par un joueur (propriétaire non nul dans le bloc avancé, ou drapeaux familier, gardien ou contrôle par un joueur, décision 204) exclues"
- ],
- "inherited_from": "1.60.1.70707"
+ ]
 }
