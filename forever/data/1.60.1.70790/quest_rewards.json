@@ -9466,8 +9466,8 @@
  "questcache": {
   "build": 70790,
   "locale": "frFR",
-  "records": 207,
-  "kept_from_base": 660
+  "records": 160,
+  "kept_from_base": 688
  },
  "notes": [
   "quest_xp : XP d'une quête par niveau de quête (clé) et par difficulté (colonne), table QuestXP du client",
