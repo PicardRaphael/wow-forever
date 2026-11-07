@@ -99,6 +99,10 @@ SOURCE_RANK = {
     "api": 6,
 }
 GAME_SOURCES = ("jeu", "simulationcraft")
+WRITE_SOURCES = (
+    *GAME_SOURCES,
+    "api",
+)  # EC1a (décision 304) : fiche lue par l'API Blizzard, `forever api character --save`
 SHEET_NOTE = "lue avec les buffs actifs"
 
 
@@ -553,11 +557,11 @@ def apply_game_fields(
     client_build: str | None,
     deps: Deps | None = None,
 ) -> dict[str, Any]:
-    """Écrit des champs lus dans le jeu (source `jeu` ou `simulationcraft`, P06b) ; crée le personnage au besoin.
-    Appelé par le pont seulement, au clic du joueur. Certitude `certain` (valeur lue au client) ; la fiche porte la
+    """Écrit des champs lus dans le jeu (source `jeu` ou `simulationcraft`, P06b) ou par l'API Blizzard (source `api`,
+    EC1a) ; crée le personnage au besoin. Appelé par le pont au clic du joueur, ou par `forever api character --save`. Certitude `certain` (valeur lue au client) ; la fiche porte la
     note « lue avec les buffs actifs ». Rend le profil."""
-    if source not in GAME_SOURCES:
-        raise InvalidArgumentError(f"Source du jeu inconnue : {source}.", f"choisir parmi {', '.join(GAME_SOURCES)}")
+    if source not in WRITE_SOURCES:
+        raise InvalidArgumentError(f"Source du jeu inconnue : {source}.", f"choisir parmi {', '.join(WRITE_SOURCES)}")
     if not name.strip():
         raise InvalidArgumentError("Nom de personnage vide.", "donner un nom")
     doc = load_profile(path)

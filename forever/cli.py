@@ -134,6 +134,7 @@ from forever.pipeline.sources import load_source, source_provenance
 from forever.pipeline.verify import VerifyReport, verify_version
 from forever.profile import (
     ProfileView,
+    apply_game_fields,
     archive_characters,
     check_locale,
     load_profile,
@@ -572,6 +573,13 @@ def build_parser() -> argparse.ArgumentParser:
     a_probe.add_argument("--region", default="eu,us", help="régions séparées par des virgules (défaut : eu,us)")
     a_probe.add_argument("--env-file", default=".env", help="fichier des clés (défaut : .env ; variables d'abord)")
     a_probe.add_argument("--json", action="store_true", help="sortie JSON")
+    a_char = api_sub.add_parser("character", help="fiche et équipement d'un personnage (EC1a, décision 304)")
+    a_char.add_argument("name", help="nom et surnom du personnage, par exemple Rose-Krypto")
+    a_char.add_argument("--region", default="eu", help="région du compte (défaut : eu)")
+    a_char.add_argument("--locale", default="fr_FR", help="langue des noms rendus (défaut : fr_FR)")
+    a_char.add_argument("--env-file", default=".env", help="fichier des clés (défaut : .env ; variables d'abord)")
+    a_char.add_argument("--save", action="store_true", help="écrire niveau, classe et équipement dans le profil")
+    a_char.add_argument("--json", action="store_true", help="sortie JSON")
 
     w = sub.add_parser("watch", help="veille locale : client, addons, correctifs, journaux (hors ligne, rien lancé)")
     w.add_argument("--report", action="store_true", help="écrire le résumé dans le cache (tâche planifiée)")
@@ -3463,7 +3471,40 @@ def _cmd_notes(deps: Deps, args: argparse.Namespace) -> int:
     return EXIT_OK
 
 
+def _cmd_api_character(deps: Deps, args: argparse.Namespace) -> int:
+    keys = blizzard_api.load_keys(os.environ, Path(args.env_file))
+    result = blizzard_api.fetch_character(deps, keys, args.name, region=args.region, locale=args.locale)
+    c = result["character"]
+    notes = ["API Blizzard : état à la dernière déconnexion du personnage, pas en temps réel"]
+    saved = None
+    if args.save:
+        fields: dict[str, Any] = {"level": c["level"], "gear": result["gear"]}
+        if c.get("class"):
+            fields["class"] = normalize_class(str(c["class"]))
+        saved = str(c["name"])
+        at = c["last_login"] or result["checked_at"]
+        apply_game_fields(resolve_path(deps), saved, None, fields, source="api", at=at, client_build=None, deps=deps)
+    provenance = local_provenance(deps, certainty="certain", assumptions=notes)
+    lines = [
+        (
+            f"{c['name']} {c['surname']} : {c['class']} {c['race']}, {c['faction']}, niveau {c['level']} "
+            f"({c['experience']} XP), niveau d'objet {c['equipped_item_level']}, règles {c['ruleset']}"
+        ),
+        f"Dernière déconnexion : {c['last_login'] or 'inconnue'}",
+    ]
+    for slot, g in sorted(result["gear"].items(), key=lambda kv: int(kv[0])):
+        extra = f" ; enchantement {g['enchant']}" if g["enchant"] else ""
+        stats = f" : {', '.join(g['stats'])}" if g["stats"] else ""
+        lines.append(f"  {slot} {g['name']} (objet {g['item']}, niveau {g['item_level']}){stats}{extra}")
+    if saved:
+        lines.append(f"Profil : {saved} mis à jour (niveau, classe, équipement ; source api)")
+    _emit({**result, "saved": saved, "provenance": provenance}, lines, provenance, args.json)
+    return EXIT_OK
+
+
 def _cmd_api(deps: Deps, args: argparse.Namespace) -> int:
+    if args.api_command == "character":
+        return _cmd_api_character(deps, args)
     keys = blizzard_api.load_keys(os.environ, Path(args.env_file))
     regions = tuple(r.strip() for r in args.region.split(",") if r.strip())
     result = blizzard_api.probe(deps, keys, regions=regions)

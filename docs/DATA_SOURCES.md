@@ -43,7 +43,7 @@ dépôt n'établit pas (fichier lu, inventaire, décision) est écrite « non d�
 | wowsims/forever | calcul au niveau 60 (dégâts, poids, races, classes) | MIT (lien de retour demandé) | commit épinglé et compilé, daté contre le build | étape `simulateurs` (déjà compilé) ; `forever sims update` |
 | Factoruide | base de quêtes et méthode de route (recoupement) | code MIT, `data/` GPL-2.0+ (part VMaNGOS) | commit épinglé `f7da6da` | à la main seulement |
 | Forum de Blizzard | notes officielles (signal) | CC BY-NC-SA 3.0 (textes jamais recopiés) | une fois par jour au plus | `forever notes`, à la main ; `notes-watch.yml` à la main |
-| API Blizzard | (à venir) prix, fiches, PvP | conditions des API de Blizzard | sonde quotidienne | `forever api probe` ; `api-probe.yml` chaque jour |
+| API Blizzard | fiche et équipement d'un personnage (EC1a, `profile-forever-<région>`, décision 304) ; (à venir) prix, PvP | conditions des API de Blizzard | sonde quotidienne ; fiche à la demande | `forever api probe` ; `api-probe.yml` chaque jour ; `forever api character` |
 | Wowhead Forever | contrôle ponctuel d'une valeur | conditions du site : aucune aspiration | à la consultation | sous-agent `forever-web-researcher` seulement ; aucun code du dépôt ne le lit |
 
 ## Client du jeu (vérité)
@@ -271,6 +271,12 @@ mesure donne `certain`. Le sujet « Known Issues » liste des bugs reconnus : ja
 dépôt ou `.env`) sonde les seuls espaces de noms candidats de Forever ; aucun espace de Retail ni de Classic. Une issue
 `api-blizzard` s'ouvre dès qu'un espace répond, pour décider du démarrage d'EC1 (prix, fiches, PvP). Conditions des API
 de Blizzard ; tout nouvel accès réseau attend l'accord de l'utilisateur.
+
+`forever api character <Nom-Surnom>` (EC1a, décision 304) lit la fiche et l'équipement d'un personnage dans
+l'espace `profile-forever-<région>` (personnage sans royaume, `nom-surnom`), état à la **dernière déconnexion** ;
+`--save` l'écrit dans le profil (source `api`). Sur un autre ordinateur : cloner le dépôt, `uv sync`, puis créer
+`.env` à la racine (jamais committé) avec `BLIZZARD_CLIENT_ID=` et `BLIZZARD_CLIENT_SECRET=` (clés du client créé
+sur https://develop.battle.net/access/clients), puis `uv run forever api character Rose-Krypto --save`.
 
 ### Wowhead Forever : contrôle, jamais vérité (décision 128)
 Consultation ponctuelle par le sous-agent `forever-web-researcher` (adresse et date citées), pour contrôler une valeur

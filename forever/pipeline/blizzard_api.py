@@ -18,6 +18,7 @@ import json
 import re
 import time
 from collections.abc import Callable, Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -184,3 +185,139 @@ def probe_issue_body(result: Mapping[str, Any]) -> str:
         ),
     ]
     return "\n".join(lines) + "\n"
+
+
+# --- EC1a (décision 304) : fiche d'un personnage par l'API (espace profile-forever) ---------------------------------
+
+PROFILE_REGIONS = ("eu", "us", "kr", "tw")
+# Emplacement de l'API -> numéro d'emplacement du jeu (celui du profil, `gear`).
+SLOT_IDS = {
+    "HEAD": 1,
+    "NECK": 2,
+    "SHOULDER": 3,
+    "SHIRT": 4,
+    "CHEST": 5,
+    "WAIST": 6,
+    "LEGS": 7,
+    "FEET": 8,
+    "WRIST": 9,
+    "HANDS": 10,
+    "FINGER_1": 11,
+    "FINGER_2": 12,
+    "TRINKET_1": 13,
+    "TRINKET_2": 14,
+    "BACK": 15,
+    "MAIN_HAND": 16,
+    "OFF_HAND": 17,
+    "RANGED": 18,
+    "TABARD": 19,
+}
+_SLUG_PART = re.compile(r"^[^\W\d_]+$")
+ABSENT_HINT = (
+    "Personnage absent de l'API : il n'y apparaît qu'à partir du niveau 10 et après une déconnexion du jeu ; "
+    "vérifier le nom et le surnom (nom-surnom)."
+)
+
+
+def _default_post() -> Callable[..., bytes]:
+    from forever.pipeline.http_client import urllib_post
+
+    return urllib_post
+
+
+def character_slug(name: str) -> str:
+    """`Nom-Surnom` ou `Nom Surnom` -> `nom-surnom` : un personnage de Forever n'a pas de royaume dans l'API."""
+    parts = [p for p in re.split(r"[\s-]+", name.strip()) if p]
+    if len(parts) != 2 or not all(_SLUG_PART.match(p) for p in parts):
+        raise InvalidArgumentError(
+            f"Personnage illisible : {name!r}.", "donner le nom et le surnom du personnage, par exemple Rose-Krypto"
+        )
+    return "-".join(p.lower() for p in parts)
+
+
+def _gear(items: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    gear: dict[str, Any] = {}
+    for it in items:
+        slot = SLOT_IDS.get(str((it.get("slot") or {}).get("type")))
+        if slot is None:
+            continue
+        enchants = [e for e in it.get("enchantments") or [] if e.get("enchantment_id")]
+        permanent = [e for e in enchants if (e.get("enchantment_slot") or {}).get("type") == "PERMANENT"]
+        enchant = (permanent or enchants or [{}])[0].get("enchantment_id", 0)
+        gear[str(slot)] = {
+            "item": int((it.get("item") or {}).get("id", 0)),
+            "enchant": int(enchant or 0),
+            "gems": [],
+            "suffix": int((it.get("random_enchantment") or {}).get("id", 0)),
+            "unique": 0,
+            "name": it.get("name"),
+            "quality": (it.get("quality") or {}).get("type"),
+            "item_level": (it.get("level") or {}).get("value"),
+            "stats": [s["display"]["display_string"] for s in it.get("stats") or [] if s.get("display")],
+        }
+    return gear
+
+
+def fetch_character(
+    deps: Deps,
+    keys: Mapping[str, str],
+    name: str,
+    *,
+    region: str = "eu",
+    locale: str = "fr_FR",
+    http_post: Callable[..., bytes] | None = None,
+) -> dict[str, Any]:
+    """Fiche et équipement d'un personnage de Forever (`/profile/wow/character/{nom-surnom}` et `/equipment`, espace
+    `profile-forever-<région>`, jeton *client credentials*). L'API reflète la dernière déconnexion, pas le temps réel.
+    Rend {slug, region, namespace, character, gear, checked_at} ; aucune clé ni jeton dans le résultat."""
+    slug = character_slug(name)
+    if region not in PROFILE_REGIONS:
+        raise InvalidArgumentError(f"Région inconnue : {region}.", f"choisir parmi {', '.join(PROFILE_REGIONS)}")
+    missing = [k for k in KEY_NAMES if not keys.get(k)]
+    if missing:
+        raise InvalidArgumentError(
+            f"Clés de l'API Blizzard absentes : {', '.join(missing)}.",
+            "les mettre dans .env (local) ou dans les variables d'environnement, jamais dans le code",
+        )
+    if deps.offline:
+        raise OfflineError("la fiche de personnage de l'API Blizzard")
+    namespace = f"profile-forever-{region}"
+    if not is_forever_namespace(namespace):  # garde-fou : jamais un espace d'une autre version du jeu
+        raise InvalidArgumentError(f"Espace de noms refusé : {namespace}.", "Forever seulement")
+    token = _token(keys, http_post or _default_post())
+    headers = {"User-Agent": USER_AGENT, "Authorization": f"Bearer {token}"}
+    base = f"{API_HOST.format(region=region)}/profile/wow/character/{slug}"
+    query = f"?namespace={namespace}&locale={locale}"
+    docs: list[dict[str, Any]] = []
+    for path in ("", "/equipment"):
+        try:
+            docs.append(json.loads(deps.http_get(f"{base}{path}{query}", headers, FETCH_TIMEOUT).decode("utf-8")))
+        except OSError as exc:
+            detail = str(exc).replace(token, "…")[:80]
+            if "404" in detail:
+                raise FetchFailedError(f"{ABSENT_HINT} ({slug}, {region})") from None
+            raise FetchFailedError(f"API Blizzard injoignable pour {slug} ({detail}).") from None
+        except ValueError:
+            raise FetchFailedError(f"Réponse illisible de l'API Blizzard pour {slug}.") from None
+    prof, equip = docs
+    login = prof.get("last_login_timestamp")
+    character = {
+        "name": prof.get("name"),
+        "surname": prof.get("surname"),
+        "level": prof.get("level"),
+        "experience": prof.get("experience"),
+        "class": (prof.get("character_class") or {}).get("name"),
+        "race": (prof.get("race") or {}).get("name"),
+        "faction": (prof.get("faction") or {}).get("name"),
+        "ruleset": (prof.get("ruleset") or {}).get("name"),
+        "equipped_item_level": prof.get("equipped_item_level"),
+        "last_login": format_utc(datetime.fromtimestamp(login / 1000, UTC)) if login else None,
+    }
+    return {
+        "slug": slug,
+        "region": region,
+        "namespace": namespace,
+        "character": character,
+        "gear": _gear(equip.get("equipped_items") or []),
+        "checked_at": format_utc(deps.now()),
+    }
