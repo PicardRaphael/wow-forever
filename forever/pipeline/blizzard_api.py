@@ -37,8 +37,9 @@ PAUSE_S = 0.2  # pause entre deux requêtes (paramètre de l'outil, bien sous le
 ROUTES = (
     ("/data/wow/playable-class/index", "static", "game_data"),
     ("/data/wow/item/{item}", "static", "game_data"),
-    ("/data/wow/realm/index", "dynamic", "game_data"),
-    ("/data/wow/connected-realm/index", "dynamic", "auction_house"),
+    # EC1b : Forever n'a pas de royaumes dans l'API (liste en 404) ; rulesets et hôtel des ventes par ruleset
+    ("/data/wow/ruleset/index", "dynamic", "game_data"),
+    ("/data/wow/ruleset/1/auctions/", "dynamic", "auction_house"),
     ("/data/wow/pvp-season/index", "dynamic", "pvp"),
 )
 
@@ -148,7 +149,7 @@ def probe(
         section: any(r["status"] == "répond" for r in results if r["section"] == section)
         for section in ("game_data", "auction_house", "pvp")
     }
-    coverage["profile"] = "non sondé : une fiche de personnage demande un royaume et un nom (EC1)"
+    coverage["profile"] = "non sondé : une fiche demande un personnage (nom-surnom), voir `forever api character`"
     return {
         "checked_at": format_utc(deps.now()),
         "regions": list(regions),

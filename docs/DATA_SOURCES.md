@@ -268,7 +268,8 @@ mesure donne `certain`. Le sujet « Known Issues » liste des bugs reconnus : ja
 
 ### API Blizzard (décisions 126 et 149)
 `forever api probe` (`forever/pipeline/blizzard_api.py`, workflow `api-probe` quotidien, clés dans les secrets du
-dépôt ou `.env`) sonde les seuls espaces de noms candidats de Forever ; aucun espace de Retail ni de Classic. Une issue
+dépôt ou `.env`) sonde les seuls espaces de noms candidats de Forever ; aucun espace de Retail ni de Classic. Forever
+n'a pas de royaumes dans l'API : la sonde lit les rulesets et l'hôtel des ventes par ruleset (EC1b). Une issue
 `api-blizzard` s'ouvre dès qu'un espace répond, pour décider du démarrage d'EC1 (prix, fiches, PvP). Conditions des API
 de Blizzard ; tout nouvel accès réseau attend l'accord de l'utilisateur.
 

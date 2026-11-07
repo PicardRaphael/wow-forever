@@ -583,7 +583,8 @@ Notes officielles citées : [24/09](research/notes-blizzard-2026-09-24.md),
   [Détail](research/questions-ouvertes-detail.md#leg1)
 - **LEG2 — Que couvre l'API Blizzard pour Forever après le lancement ?** En partie répondu le 2026-11-07 (décision
   304) : Game Data (`static-forever`) et fiches de personnage (`profile-forever`, sans royaume) répondent sur l'UE ;
-  liste des royaumes absente (404) ; hôtel des ventes par `ruleset` d'après le forum, non essayé. Test : `forever api probe` après le
+  pas de royaumes sur Forever (liste en 404, normal) ; rulesets et hôtel des ventes par ruleset répondent (sonde
+  du 2026-11-07, EC1b) ; saisons PvP : 404. Test : `forever api probe` après le
   4 novembre. Priorité : basse. [Détail](research/questions-ouvertes-detail.md#leg2)
 - **PET1 — Quel rang enseigne une bête dont Forever Bestiary donne un rang au-dessus de son niveau ?** Le correctif
   officiel du 2026-10-01 dit que ces rangs ont été abaissés, sans dire jusqu'où ; forever suppose le plus haut rang
