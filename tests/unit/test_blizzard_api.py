@@ -134,3 +134,18 @@ def test_cli_probe_without_keys_is_a_usage_error(make_deps, capsys, monkeypatch)
     monkeypatch.delenv("BLIZZARD_CLIENT_SECRET", raising=False)
     code = main(["api", "probe", "--json", "--env-file", "absent.env"], make_deps())
     assert code == 2
+
+
+def test_probe_uses_rulesets_not_realms(make_deps):
+    """EC1b : Forever n'a pas de royaumes dans l'API ; la sonde lit les rulesets et l'hôtel des ventes par ruleset."""
+    host = "https://eu.api.blizzard.com"
+    dynamic = "dynamic-forever-eu"
+    rulesets = f"{host}/data/wow/ruleset/index?namespace={dynamic}&locale=en_US"
+    auctions = f"{host}/data/wow/ruleset/1/auctions/?namespace={dynamic}&locale=en_US"
+    http = FakeHttp(exc=OSError("404"), routes={rulesets: b"{}", auctions: b"{}"})
+    result = probe(make_deps(http=http), KEYS, regions=("eu",), http_post=FakePost(), sleep=no_sleep)
+    urls = [c[0] for c in http.calls]
+    assert rulesets in urls and auctions in urls
+    assert not any("/realm/" in u or "connected-realm" in u for u in urls)
+    assert result["coverage"]["game_data"] is True and result["coverage"]["auction_house"] is True
+    assert "royaume" not in result["coverage"]["profile"] and "forever api character" in result["coverage"]["profile"]
