@@ -1,0 +1,20 @@
+{
+ "_comment": "Réponse inventée de /profile/wow/character/{nom-surnom} (espace profile-forever-eu), forme relevée le 2026-11-07 ; personnage fictif.",
+ "_links": {"self": {"href": "https://eu.api.blizzard.com/profile/wow/character/judy-testeuse?namespace=profile-forever-eu"}},
+ "id": 1000001,
+ "name": "Judy",
+ "surname": "Testeuse",
+ "gender": {"type": "FEMALE", "name": "Femme"},
+ "faction": {"type": "ALLIANCE", "name": "Alliance"},
+ "race": {"name": "Gnome", "id": 7},
+ "character_class": {"name": "Mage", "id": 8},
+ "level": 20,
+ "experience": 1651,
+ "achievement_points": 0,
+ "last_login_timestamp": 1794044112000,
+ "average_item_level": 11,
+ "equipped_item_level": 11,
+ "is_remix": false,
+ "ruleset": {"name": "JcJ", "id": 1},
+ "name_search": "Judy Testeuse"
+}

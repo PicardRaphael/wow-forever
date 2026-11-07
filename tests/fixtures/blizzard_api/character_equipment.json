@@ -1,0 +1,41 @@
+{
+ "_comment": "Réponse inventée de /profile/wow/character/{nom-surnom}/equipment (espace profile-forever-eu), forme relevée le 2026-11-07 ; objets et valeurs inventés.",
+ "character": {"name": "Judy", "id": 1000001},
+ "equipped_items": [
+  {
+   "item": {"id": 900001},
+   "slot": {"type": "CHEST", "name": "Torse"},
+   "quantity": 1,
+   "quality": {"type": "RARE", "name": "Rare"},
+   "name": "Robe de test",
+   "level": {"value": 23, "display_string": "Niveau d'objet 23"},
+   "enchantments": [{"display_string": "Enchanté : Endurance +2", "enchantment_id": 4242, "enchantment_slot": {"id": 0, "type": "PERMANENT"}}],
+   "stats": [{"type": {"type": "INTELLECT", "name": "Intelligence"}, "value": 10, "display": {"display_string": "+10 Intelligence"}}]
+  },
+  {
+   "item": {"id": 900002},
+   "slot": {"type": "FINGER_1", "name": "Doigt 1"},
+   "quantity": 1,
+   "quality": {"type": "UNCOMMON", "name": "Inhabituel"},
+   "name": "Anneau de test",
+   "level": {"value": 23, "display_string": "Niveau d'objet 23"}
+  },
+  {
+   "item": {"id": 900003},
+   "slot": {"type": "MAIN_HAND", "name": "Main droite"},
+   "quantity": 1,
+   "quality": {"type": "RARE", "name": "Rare"},
+   "name": "Canne de test",
+   "level": {"value": 18, "display_string": "Niveau d'objet 18"},
+   "random_enchantment": {"id": 77}
+  },
+  {
+   "item": {"id": 900004},
+   "slot": {"type": "RANGED", "name": "À distance"},
+   "quantity": 1,
+   "quality": {"type": "RARE", "name": "Rare"},
+   "name": "Baguette de test",
+   "level": {"value": 18, "display_string": "Niveau d'objet 18"}
+  }
+ ]
+}
